@@ -2,11 +2,11 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaTagArray.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-17 00:44:27 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-02-20 23:29:32 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
-  Copyright (c) 2002/2004 
+  Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 #include "mmaTagArray.h"
@@ -148,7 +148,7 @@ bool mmaTagArray::Equals(const mmaTagArray *array) const
   int i=0;
   for (;it!=m_Tags.end();it++,it2++,i++)
   {
-    if (*it!=*it2)
+    if (it->second!=it2->second)
       return false;
   }
 
@@ -203,10 +203,11 @@ int mmaTagArray::InternalRestore(mafStorageElement *node)
   int idx=0;
   for (int i=0;(idx<num)&&(i<children.size())&&(ret==MAF_OK);i++)
   {
-    if (mafString(children[i]->GetName())=="TItem")
+    if (mafString().Set(children[i]->GetName())=="TItem")
     {
       mmuTagItem new_titem;
       ret=new_titem.Restore(children[i]);
+      SetTag(new_titem);
       idx++;
     }
   }

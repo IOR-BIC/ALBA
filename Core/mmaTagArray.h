@@ -2,11 +2,11 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaTagArray.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-17 00:44:27 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-02-20 23:29:32 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
-  Copyright (c) 2002/2004 
+  Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 #ifndef __mmaTagArray_h
