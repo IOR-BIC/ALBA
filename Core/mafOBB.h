@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOBB.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-19 18:20:46 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-11-23 15:17:16 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,11 +14,11 @@
 
 #include "mafDefines.h"
 #include "mafMTime.h"
+#include "mafMatrix.h"
 
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------
-class mafMatrix;
 
 
 /** This class simply stores a Box boundary (i.e. an array of 6 doubles).
@@ -34,9 +34,6 @@ public:
   mafOBB(double source[6]);
   ~mafOBB();
 
-  double Bounds[6];
-  mafMTime MTime;
-
   unsigned long int GetMTime() {return MTime.GetMTime();}
   void Modified() {this->MTime.Modified();}
 
@@ -44,6 +41,7 @@ public:
     Return 1 if the two bounds are equivalent. Use the float overload to compare with
   VTK bounds, since VTK manages bounds as floats!*/
   int Equals(float bounds[6]);
+  int Equals(double bounds[6]);
   int Equals(mafOBB &bounds);
   int Equals(mafOBB *bounds) {return this->Equals(*bounds);}
 
@@ -69,15 +67,20 @@ public:
   void CopyTo(float target[6]);
 
   /**
-    Apply a tranform to this bounding box, recompute the bounding box and 
-    stores new BBOx in the given object*/
-  void ApplyTransform(mafMatrix &mat, mafOBB &newbounds);
-  void ApplyTransform(mafMatrix &mat) {this->ApplyTransform(mat,*this);}
+    Apply a transform to the internally stored matrix */
+  //void ApplyTransform(mafMatrix &mat, mafOBB &newbounds);
+  //void ApplyTransform(mafMatrix &mat) {this->ApplyTransform(mat,*this);}
 
   /**
-    Apply internal transform to this bounding box, recompute the bounding box and 
-    stores new BBOx in the given object*/
+    Apply the internally stored transform to the bounding box, recompute the
+    internally stored bounding box. */
   void ApplyTransform();
+
+  /**
+    Apply the internally stored transform to the bounding box, recompute the
+    bounding box and stores new BBOx in the given object. This version doesn't 
+    change the internal representation but simply return the result in 'newbounds'*/
+  void ApplyTransform(mafOBB &newbounds);
 
   /**
     Merge this objects's bounds with the given one. If one of the two bounds is
@@ -125,6 +128,11 @@ public:
 
   /** return the Z dimension */
   double GetDepth();
+  
+  mafMatrix Matrix;
+  double    Bounds[6];
+  mafMTime  MTime;
+
 };
 
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOBB.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-19 18:20:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-11-23 15:17:16 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -58,6 +58,24 @@ int mafOBB::Equals(mafOBB &bounds)
     this->Bounds[3]==bounds.Bounds[3] && \
     this->Bounds[4]==bounds.Bounds[4] && \
     this->Bounds[5]==bounds.Bounds[5])
+  {
+    return 1;
+  }
+
+  return 0;
+}
+
+//-------------------------------------------------------------------------
+int mafOBB::Equals(double bounds[6])
+//-------------------------------------------------------------------------
+{
+
+  if (Bounds[0]==bounds[0] && \
+    Bounds[1]==bounds[1] && \
+    Bounds[2]==bounds[2] && \
+    Bounds[3]==bounds[3] && \
+    Bounds[4]==bounds[4] && \
+    Bounds[5]==bounds[5])
   {
     return 1;
   }
@@ -141,9 +159,16 @@ void mafOBB::CopyTo(double target[6])
     target[i]=this->Bounds[i];
   }
 }
+//-------------------------------------------------------------------------
+void mafOBB::ApplyTransform()
+//-------------------------------------------------------------------------
+{
+  ApplyTransform(*this); // self apply the transform
+  
+}
 
 //-------------------------------------------------------------------------
-void mafOBB::ApplyTransform(mafMatrix &mat,mafOBB &newbounds)
+void mafOBB::ApplyTransform(mafOBB &newbounds)
 //-------------------------------------------------------------------------
 {
   double newpoints[4*8];
@@ -168,7 +193,7 @@ void mafOBB::ApplyTransform(mafMatrix &mat,mafOBB &newbounds)
           newpoints[i*4+2]=Z;
           newpoints[i*4+3]=1;
 
-          mat.MultiplyPoint(&(newpoints[4*i]),&(newpoints[4*i]));
+          Matrix.MultiplyPoint(&(newpoints[4*i]),&(newpoints[4*i]));
         
           i++;
         }
@@ -204,7 +229,8 @@ void mafOBB::ApplyTransform(mafMatrix &mat,mafOBB &newbounds)
       if (newpoints[i*4+2]>newbounds.Bounds[5])
         newbounds.Bounds[5]=newpoints[i*4+2];
     }
-
+    
+    newbounds.Matrix.Identity(); // reset matrix to identiy
     newbounds.Modified();
   }
   else
