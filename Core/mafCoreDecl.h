@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafCoreDecl.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-14 10:24:13 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-02-17 00:43:35 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -44,9 +44,6 @@ class wxWindow;
 const int MAXWIDGET = 200; 
 const int MAXOP = 200; 
 const int MAXVIEW = 200; 
-
-
-enum MAF_TAG_IDS {MAF_MISSING_TAG=0,MAF_NUMERIC_TAG,MAF_STRING_TAG};
 
 /**
   Most of the constants used in LAL are declared here.
