@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-25 16:06:56 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-01 09:04:32 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone, Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -12,8 +12,8 @@
 
 #include "mafEvent.h"
 
-//#include "mafView.h"
-//#include "mafOp.h"
+#include "mafView.h"
+#include "mafOp.h"
 #include "mafNode.h"
 
 #ifdef MAF_USE_VTK
@@ -40,9 +40,9 @@ enum
   mafEvent::mafEvent(void *sender, int id, bool            b,       long arg)							{ Init(sender, id, arg); m_bool =b;											Initialized();}
   mafEvent::mafEvent(void *sender, int id, float           f,       long arg)							{ Init(sender, id, arg); m_float=f;											Initialized();}
   mafEvent::mafEvent(void *sender, int id, mafString      *s,       long arg)							{ Init(sender, id, arg); m_string =s;										Initialized();}
-//mafEvent::mafEvent(void *sender, int id, mafView         *view,   wxWindow *win)				{ Init(sender, id, 0);   m_view =view; m_win  =win;			Initialized();}
-//mafEvent::mafEvent(void *sender, int id, mafNode          *vme,    bool b,long arg)			{ Init(sender, id, arg); m_vme  =vme; m_bool = b;				Initialized();}
-//mafEvent::mafEvent(void *sender, int id, mafOp           *op,     long arg)							{ Init(sender, id, arg);   m_op   =op;									Initialized();}
+  mafEvent::mafEvent(void *sender, int id, mafView         *view,   wxWindow *win)				{ Init(sender, id, 0);   m_view =view; m_win  =win;			Initialized();}
+  mafEvent::mafEvent(void *sender, int id, mafNode          *vme,    bool b,long arg)			{ Init(sender, id, arg); m_vme  =vme; m_bool = b;				Initialized();}
+  mafEvent::mafEvent(void *sender, int id, mafOp           *op,     long arg)							{ Init(sender, id, arg);   m_op   =op;									Initialized();}
 #ifdef MAF_USE_WX
   mafEvent::mafEvent(void *sender, int id, wxWindow        *win,    long arg)							{ Init(sender, id, arg); m_win  =win;										Initialized();}
   mafEvent::mafEvent(void *sender, int id, wxUpdateUIEvent *e,      long arg)							{ Init(sender, id, arg); m_uiev = e;																	}
@@ -66,9 +66,9 @@ void mafEvent::Log()
   if(m_bool)   s << " bool= "  << (int)m_bool;
   if(m_float)  s << " float= " << m_float;
   if(m_string) s << " string= "<< *m_string;
-//if(m_view)   s << " view= "  << (long)m_view<<" : " << m_view->m_label;
-//if(m_vme)    s << " vme= "   << (long)m_vme <<" : " << m_vme->GetName();
-//if(m_op)     s << " op= "    << (long)m_op  <<" : " << m_op->m_label;
+  if(m_view)   s << " view= "  << (long)m_view<<" : " << m_view->m_label;
+  if(m_vme)    s << " vme= "   << (long)m_vme <<" : " << m_vme->GetName();
+  if(m_op)     s << " op= "    << (long)m_op  <<" : " << m_op->m_label;
 #ifdef MAF_USE_WX
   if(m_win)    s << " win= "   << (long)m_win;
   if(m_uiev)   s << " ui_evt= "<< (long)m_uiev;
@@ -90,9 +90,9 @@ mafEvent* mafEvent::Copy()
   mafEvent *e	= new mafEvent(m_sender,m_id,m_bool,m_arg);
   e->m_float		= m_float;
   e->m_string		= m_string;
-//e->m_view		  = m_view;
-//e->m_vme			= m_vme;
-//e->m_op		    = m_op;
+  e->m_view		  = m_view;
+  e->m_vme			= m_vme;
+  e->m_op		    = m_op;
 #ifdef MAF_USE_WX
   e->m_win			= m_win;
   e->m_uiev     = m_uiev;
@@ -117,9 +117,9 @@ void mafEvent::Init(void *sender, int id, long arg)
   m_bool   = false; 
   m_float  = 0; 
   m_string = NULL; 
-//  m_view   = NULL; 
-//  m_vme    = NULL; 
-//  m_op	   = NULL; 
+  m_view   = NULL; 
+  m_vme    = NULL; 
+  m_op	   = NULL; 
 #ifdef MAF_USE_WX
   m_win    = NULL;
   m_uiev   = NULL;

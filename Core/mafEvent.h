@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-25 16:06:56 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-01 09:04:33 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden, Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,8 +22,8 @@
 //----------------------------------------------------------------------------
 // Forward References:
 //----------------------------------------------------------------------------
-//class mafView;
-//class mafOp;
+class mafView;
+class mafOp;
 class mafNode;
 
 #ifdef MAF_USE_VTK
@@ -49,9 +49,9 @@ public:
   mafEvent(void *sender, int id, bool            b,       long arg=0);
   mafEvent(void *sender, int id, float           f,       long arg=0);
   mafEvent(void *sender, int id, mafString      *s,       long arg=0);
-//mafEvent(void *sender, int id, mafNode         *vme,    bool b=false, long arg=0);
-//mafEvent(void *sender, int id, mafView         *view,   wxWindow *win=NULL);
-//mafEvent(void *sender, int id, mafOp					 *op,     long arg=0);
+  mafEvent(void *sender, int id, mafNode         *vme,    bool b=false, long arg=0);
+  mafEvent(void *sender, int id, mafView         *view,   wxWindow *win=NULL);
+  mafEvent(void *sender, int id, mafOp					 *op,     long arg=0);
 
 	void*            GetSender()  {return m_sender;}
   int              GetId()      {return m_id;};
@@ -59,9 +59,9 @@ public:
   bool             GetBool()    {return m_bool;};
   float            GetFloat()   {return m_float;};
   mafString*       GetString()  {return m_string;};
-//mafView*         GetView()    {return m_view;};
-//mafNode*         GetVme()     {return m_vme;};
-//mafOp*					 GetOp()      {return m_op;};
+  mafView*         GetView()    {return m_view;};
+  mafNode*         GetVme()     {return m_vme;};
+  mafOp*					 GetOp()      {return m_op;};
 
   void SetSender(void* sender)  { m_sender = sender;};
   void SetId(int id)            { m_id = id;};
@@ -69,9 +69,9 @@ public:
   void SetBool(bool b)          { m_bool = b;};
   void SetFloat(float f)        { m_float = f;};
   void SetString(mafString *s)  { m_string = s;};
-//void SetView(mafView* view)   { m_view = view;};
-//void SetVme(mafNode* vme)     { m_vme = vme;};
-//void SetOp(mafOp* op)         { m_op = op;};
+  void SetView(mafView* view)   { m_view = view;};
+  void SetVme(mafNode* vme)     { m_vme = vme;};
+  void SetOp(mafOp* op)         { m_op = op;};
 
 protected:
   void            *m_sender;         
@@ -82,8 +82,8 @@ protected:
   mafString       *m_string;        
 
   mafNode         *m_vme;
-//mafView         *m_view;
-//mafOp						*m_op;
+  mafView         *m_view;
+  mafOp						*m_op;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #ifdef MAF_USE_WX

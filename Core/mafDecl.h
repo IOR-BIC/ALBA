@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 15:42:38 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-01 09:04:32 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -212,9 +212,8 @@ EVT_START,
 	MOUSE_DOWN, //(to be removed Marco)
 	MOUSE_MOVE, //(to be removed Marco)
 	MOUSE_UP,   //(to be removed Marco)
-   //modified by Stefano. 30-11-2003 (beg)
-  ID_TRANSFORM,
-   //modified by Stefano. 30-11-2003 (end)
+   
+  ID_TRANSFORM, //added by Stefano. 30-11-2003 
   SHOW_VIEW_CONTEXTUAL_MENU,	//Added by Paolo 16-9-2003
 
   INTERACTOR_ADD,     //modified by Marco. 25-8-2004 bind an interactor to an action 
