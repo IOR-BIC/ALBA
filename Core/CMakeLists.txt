@@ -14,6 +14,10 @@ SET(mafCore_SRCS
   mafObject.h
   mafEventSource.h
   mafEventSource.cpp
+  mafGEventSource.h
+  mafGEventSource.cpp
+  mafGObserver.h
+  mafGObserver.cpp
   mafObserver.h
   mafObserver.cpp
   mafObserverCallback.h
