@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:03:36 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-06 21:25:17 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,6 +33,9 @@ class MAF_EXPORT mafVMERoot : public mafVME, public mafNodeRoot
 {
 public:
   mafTypeMacro(mafVMERoot,mafVME);
+
+  /** compare two VME-Root. */
+  virtual bool Equals(mafVME *vme);
 
     /** 
     Return highest ItemId assigned for this tree. Return -1 if no one has

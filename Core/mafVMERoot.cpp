@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:03:36 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-06 21:25:17 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -41,6 +41,17 @@ mafVMERoot::~mafVMERoot()
 {
   mafDEL(m_Output);
   mafDEL(m_Transform);
+}
+
+//-------------------------------------------------------------------------
+bool mafVMERoot::Equals(mafVME *vme)
+//-------------------------------------------------------------------------
+{
+  if (Superclass::Equals(vme))
+  { 
+    return m_Transform->GetMatrix()==((mafVMERoot *)vme)->m_Transform->GetMatrix();
+  }
+  return false;
 }
 
 //-------------------------------------------------------------------------

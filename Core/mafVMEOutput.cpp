@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:03:35 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-06 21:24:19 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,6 +30,7 @@ mafVMEOutput::mafVMEOutput()
 //-------------------------------------------------------------------------
 {
   m_VME = NULL;
+  m_Transform = NULL;
 }
 
 //-------------------------------------------------------------------------
