@@ -2,11 +2,11 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-13 09:10:36 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-02-20 23:23:47 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden, Marco Petrone
 ==========================================================================
-  Copyright (c) 2002/2004 
+  Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
