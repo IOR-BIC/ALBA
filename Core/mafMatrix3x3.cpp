@@ -2,14 +2,15 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix3x3.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-22 14:06:34 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-01-10 00:12:23 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 #include "mafMatrix3x3.h"
+#include "mafIndent.h"
 #include <math.h>
 #include <sstream>
 #include <assert.h>
@@ -20,6 +21,7 @@ mafCxxTypeMacro(mafMatrix3x3)
 mafMatrix3x3::mafMatrix3x3()
 //----------------------------------------------------------------------------
 {
+  Zero();
 }
 
 //----------------------------------------------------------------------------
@@ -56,6 +58,28 @@ mafMatrix3x3::mafMatrix3x3(mafMatrix3x3 &mat)
 //------------------------------------------------------------------------------
 {
   *this=mat;
+}
+
+//------------------------------------------------------------------------------
+void mafMatrix3x3::Print (std::ostream& os, const int indent) const
+//------------------------------------------------------------------------------
+{
+  this->Superclass::Print(os, indent);
+  mafIndent the_indent(indent);
+  mafIndent next_indent = the_indent.GetNextIndent();
+
+  int i, j;
+  
+  os << the_indent << "Elements:\n";
+  for (i = 0; i < 3; i++) 
+  {
+    os << next_indent;
+    for (j = 0; j < 3; j++) 
+    {
+      os << GetElements()[i][j] << " ";
+    }
+    os << std::endl;
+  }
 }
 
 //----------------------------------------------------------------------------
