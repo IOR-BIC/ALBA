@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:02:25 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-01 09:49:17 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -64,6 +64,13 @@ mafMatrix &mafMatrix::operator=(const mafMatrix &mat)
 mafMatrix::mafMatrix(const mafMatrix &mat)
 //------------------------------------------------------------------------------
 {
+  m_TimeStamp=0;
+
+#ifdef MAF_USE_VTK 
+  // in case we are building under VTK we store the elements in a VTK Matrix
+  vtkNEW(m_VTKMatrix);
+#endif
+
   *this=mat;
 }
 
@@ -86,6 +93,14 @@ bool mafMatrix::operator==(const mafMatrix& mat) const
     }
   }
   return true;
+}
+
+//------------------------------------------------------------------------------
+bool mafMatrix::Equals(const mafMatrix *mat) const
+//------------------------------------------------------------------------------
+{
+  assert(mat);
+  return (*this==*mat);
 }
 
 #ifdef MAF_USE_VTK
@@ -236,6 +251,7 @@ void mafMatrix::CopyRotation(const mafMatrix &source, mafMatrix &target)
 		  target.SetElement(i,j, source.GetElement(i,j));
 		}
 	}
+  target.Modified();
 }
 
 //----------------------------------------------------------------------------
