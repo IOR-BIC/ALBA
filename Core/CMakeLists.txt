@@ -8,41 +8,33 @@ DBG_MESSAGE("Configuring project mafCore")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-#mafAbsMatrixPipe.cpp
-#mafAbsMatrixPipe.h
-#mafDataPipe.cpp
-#mafDataPipe.h
-#mafDataVector.h
-#mafMatrixPipe.cpp
-#mafMatrixPipe.h
-#mafMatrixVector.cpp
-#mafMatrixVector.h
-#mafTimeMap.h
-#mafVMEGeneric.cpp
-#mafVMEGeneric.h
-#mafVMEItem.cpp
-#mafVMEItem.h
-#mafVMEOutput.cpp
-#mafVMEOutput.h
-#mafVMERoot.cpp
-#mafVMERoot.h
-#mafVTKDataSet.cpp
-#mafVTKDataSet.h
+#mafOp.cpp
+#mafOp.h
+#mafView.cpp
+#mafView.h
 #mafViewManager.cpp
 #mafViewManager.h
+mafAbsMatrixPipe.cpp
+mafAbsMatrixPipe.h
 mafAttribute.cpp
 mafAttribute.h
 mafCoreFactory.cpp
 mafCoreFactory.h
+mafDataPipe.cpp
+mafDataPipe.h
 mafDecl.cpp
 mafDecl.h
 mafEvent.cpp
 mafEvent.h
 mafEventBase.cpp
 mafEventBase.h
+mafEventIO.cpp
+mafEventIO.h
 mafEventSender.h
 mafEventSource.cpp
 mafEventSource.h
+mafMatrixPipe.cpp
+mafMatrixPipe.h
 mafNode.cpp
 mafNode.h
 mafNodeIterator.cpp
@@ -53,17 +45,22 @@ mafObserver.cpp
 mafObserver.h
 mafObserverCallback.cpp
 mafObserverCallback.h
-mafOp.cpp
-mafOp.h
 mafTagArray.cpp
 mafTagArray.h
-mafView.cpp
-mafView.h
-mmuTagItem.cpp
-mmuTagItem.h
+mafTagItem.cpp
+mafTagItem.h
+mafTimeMap.h
+mafTimeMap.txx
+mafVME.cpp
+mafVME.h
+mafVMEOutput.cpp
+mafVMEOutput.h
+mafVMEOutputNULL.cpp
+mafVMEOutputNULL.h
+mafVMERoot.cpp
+mafVMERoot.h
 mmuTimeSet.cpp
 mmuTimeSet.h
-
 )
 
 IF (MAF_USE_VTK)
@@ -71,7 +68,6 @@ IF (MAF_USE_VTK)
   #${PROJECT_SRCS}
   #)
 ENDIF (MAF_USE_VTK)
-
 
 # List libraries that are needed by this project.
 SET(PROJECT_LIBS mafBase mafIO)
@@ -90,6 +86,10 @@ ENDIF (MAF_USE_VTK)
 
 IF (MAF_USE_WX)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_WXWIN_LIBRARY)
+ENDIF (MAF_USE_WX)
+
+IF (MAF_USE_WX)
+  ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_CRYPTO_LIBRARY)
 ENDIF (MAF_USE_WX)
 
 # build tests
