@@ -25,6 +25,8 @@ SET(PROJECT_SRCS
   mafMatrix3x3.h
   mafMutexLock.cpp
   mafMutexLock.h
+#  mafNode.cpp
+#  mafNode.h
   mafOBB.cpp
   mafOBB.h
   mafObject.cpp
@@ -37,8 +39,11 @@ SET(PROJECT_SRCS
   mafObserverCallback.h
   mafSmartObject.cpp
   mafSmartObject.h
+  mafSmartPointer.h
   mafString.cpp
   mafString.h
+  mafTemplatedVector.h
+  mafTemplatedVector.txx
   mafTransform.cpp
   mafTransform.h
   mafTransformBase.cpp
