@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttribute.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-13 09:10:00 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-02-17 00:42:46 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -27,11 +27,16 @@
 class MAF_EXPORT mafAttribute : public mafReferenceCounted, public mafStorable
 {
 public:
-  mafAttribute();
-  ~mafAttribute();
-
   /** attributes must define a copy rule */
   void operator=(const mafAttribute &a);
+
+  bool operator==(const mafAttribute &a) const;
+
+  /** copy the content of the given attribute. Attributes must be type compatible */
+  void DeepCopy(const mafAttribute *a);
+
+  /** return true if this attribute equals the given one */
+  bool Equals(const mafAttribute *a) const;
 };
 
 #endif 
