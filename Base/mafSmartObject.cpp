@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSmartObject.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-15 08:19:08 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-11-17 20:16:05 $
+  Version:   $Revision: 1.2 $
   Authors:   based on vtkObjectBase (www.vtk.org), adapted Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -11,12 +11,14 @@
 =========================================================================*/
 
 #include "mafSmartObject.h"
+#include <malloc.h>
+#include <sstream>
 
-#define vtkBaseDebugMacro(x)
-
-// avoid dll boundary problems
 #ifdef _WIN32
+//------------------------------------------------------------------------------
+// avoid dll boundary problems
 void* mafSmartObject::operator new(size_t nSize)
+//------------------------------------------------------------------------------
 {
   void* p=malloc(nSize);
   return p;
@@ -28,94 +30,50 @@ void mafSmartObject::operator delete( void *p )
 }
 #endif 
 
-// ------------------------------------mafSmartObject----------------------
-// This operator allows all subclasses of mafSmartObject to be printed via <<.
-// It in turn invokes the Print method, which in turn will invoke the
-// PrintSelf method that all objects should define, if they have anything
-// interesting to print out.
-ostream& operator<<(ostream& os, mafSmartObject& o)
-{
-  o.Print(os);
-  return os;
-}
-
+//------------------------------------------------------------------------------
 // Create an object with Debug turned off and modified time initialized 
 // to zero.
 mafSmartObject::mafSmartObject()
+//------------------------------------------------------------------------------
 {
   this->ReferenceCount = 1;
   // initial reference count = 1 and reference counting on.
 }
 
+//------------------------------------------------------------------------------
 mafSmartObject::~mafSmartObject() 
+//------------------------------------------------------------------------------
 {
   // warn user if reference counting is on and the object is being referenced
   // by another object
   if ( this->ReferenceCount > 0)
-    {
-    vtkGenericWarningMacro(<< "Trying to delete object with non-zero reference count.");
-    }
+  {
+    mafWarningMacro(<< "Trying to delete object with non-zero reference count.");
+  }
 }
 
-int mafSmartObject::IsTypeOf(const char *name) 
-{
-  if ( !strcmp("mafSmartObject",name) )
-    {
-    return 1;
-    }
-  return 0;
-}
-
-int mafSmartObject::IsA(const char *type)
-{
-  return this->mafSmartObject::IsTypeOf(type);
-}
-
+//------------------------------------------------------------------------------
 // Delete a vtk object. This method should always be used to delete an object 
 // when the new operator was used to create it. Using the C++ delete method
 // will not work with reference counting.
-void mafSmartObject::Delete() 
+void mafSmartObject::Delete()
+//------------------------------------------------------------------------------
 {
-  this->UnRegister((mafSmartObject *)NULL);
+  this->UnRegister();
 }
 
-void mafSmartObject::Print(ostream& os)
-{
-  vtkIndent indent;
-
-  this->PrintHeader(os,0); 
-  this->PrintSelf(os, indent.GetNextIndent());
-  this->PrintTrailer(os,0);
-}
-
-void mafSmartObject::PrintHeader(ostream& os, vtkIndent indent)
-{
-  os << indent << this->GetClassName() << " (" << this << ")\n";
-}
-
-// Chaining method to print an object's instance variables, as well as
-// its superclasses.
-void mafSmartObject::PrintSelf(ostream& os, vtkIndent indent)
-{
-  os << indent << "Reference Count: " << this->ReferenceCount << "\n";
-}
-
-void mafSmartObject::PrintTrailer(ostream& os, vtkIndent indent)
-{
-  os << indent << "\n";
-}
-
-// Description:
+//------------------------------------------------------------------------------
 // Sets the reference count (use with care)
 void mafSmartObject::SetReferenceCount(int ref)
+//------------------------------------------------------------------------------
 {
   this->ReferenceCount = ref;
-  vtkBaseDebugMacro(<< "Reference Count set to " << this->ReferenceCount);
 }
 
-// Description:
+//------------------------------------------------------------------------------
 // Increase the reference count (mark as used by another object).
-void mafSmartObject::Register(mafSmartObject*)
+void mafSmartObject::Register()
+//------------------------------------------------------------------------------
 {
   this->ReferenceCount++;
   if (this->ReferenceCount <= 0)
@@ -124,83 +82,15 @@ void mafSmartObject::Register(mafSmartObject*)
     }
 }
 
-// Description:
+//------------------------------------------------------------------------------
 // Decrease the reference count (release by another object).
-void mafSmartObject::UnRegister(mafSmartObject* o)
+void mafSmartObject::UnRegister()
+//------------------------------------------------------------------------------
 {
-  if (o)
-    {
-    vtkBaseDebugMacro(
-      << "UnRegistered by "
-      << o->GetClassName() << " (" << o << "), ReferenceCount = "
-      << (this->ReferenceCount-1));
-    }
-  else
-    {
-    vtkBaseDebugMacro(
-      << "UnRegistered " << this->GetClassName() 
-      << " by NULL, ReferenceCount = "
-      << (this->ReferenceCount-1));
-    }
-
   if (--this->ReferenceCount <= 0)
-    {
-#ifdef VTK_DEBUG_LEAKS
-    vtkDebugLeaks::DestructClass(this->GetClassName());
-#endif
+  {
     // invoke the delete method
     // Here we should call delete method
     delete this;
-    }
-}
-
-void mafSmartObject::CollectRevisions(ostream& os)
-{
-  os << "mafSmartObject $Revision: 1.1 $\n";
-}
-
-void mafSmartObject::PrintRevisions(ostream& os)
-{
-  ostrstream revisions;
-  this->CollectRevisions(revisions);
-  revisions << ends;
-  const char* c = revisions.str();
-  while(*c)
-    {
-    const char* beginClass = 0;
-    const char* endClass = 0;
-    const char* beginRevision = 0;
-    const char* endRevision = 0;
-    for(;*c && *c != '\n'; ++c)
-      {
-      if(!beginClass && *c != ' ')
-        {
-        beginClass = c;
-        }
-      else if(beginClass && !endClass && *c == ' ')
-        {
-        endClass = c;
-        }
-      else if(endClass && !beginRevision && (*c >= '0' && *c <= '9'))
-        {
-        beginRevision = c;
-        }
-      else if(beginRevision && !endRevision && *c == ' ')
-        {
-        endRevision = c;
-        }
-      }
-    if(beginClass && endClass && beginRevision && endRevision)
-      {
-      os.write(beginClass, endClass-beginClass);
-      os << " ";
-      os.write(beginRevision, endRevision-beginRevision);
-      os << "\n";
-      }
-    if(*c == '\n')
-      {
-      ++c;
-      }
-    }
-  revisions.rdbuf()->freeze(0);
+  }
 }

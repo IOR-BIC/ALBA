@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObjectFactory.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-15 08:19:07 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-11-17 20:16:05 $
+  Version:   $Revision: 1.4 $
   Authors:   Based on itkObjectFactory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,7 +12,7 @@
 #ifndef __mafObjectFactory_h
 #define __mafObjectFactory_h
 
-#include "mafObject.h"
+#include "mafSmartObject.h"
 #include "mafString.h"
 
 #include <vector>
@@ -38,11 +38,11 @@ class mafIndent;
   containing a colon separated (semi-colon on win32) list of paths.
   @sa mafObject 
 */
-class MAF_EXPORT mafObjectFactory : public mafObject
+class MAF_EXPORT mafObjectFactory : public mafSmartObject
 {
 public:    
   /** Run-time type information (and related methods). */
-  mafTypeMacro(mafObjectFactory, mafObject);
+  mafTypeMacro(mafObjectFactory, mafSmartObject);
 
   /** Create and return an instance of the named object.
    * Each loaded mafObjectFactory will be asked in the order
@@ -123,7 +123,7 @@ public:
     mafCreateObjectFunction *m_CreateObject;
   };
 
-  virtual void PrintSelf(std::ostream& os, mafIndent &indent) const;
+  //virtual void PrintSelf(std::ostream& os, mafIndent &indent) const;
 
 protected:
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObjectFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-15 08:19:07 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-11-17 20:16:05 $
+  Version:   $Revision: 1.4 $
   Authors:   Based on itkObjectFactory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -18,6 +18,7 @@
 #include <ctype.h>
 #include <algorithm>
 #include <map>
+#include <sstream>
 
 /** Utility class to clean up factory memory.*/  
 class CleanUpObjectFactory
@@ -357,17 +358,17 @@ void mafObjectFactory::RegisterFactory(mafObjectFactory* factory)
   if ( strcmp(factory->GetMAFSourceVersion(), 
             mafVersion::GetMAFSourceVersion()) != 0 )
     {
-    /*mafGenericOutputMacro(<< "Possible incompatible factory load:" 
-    << "\nRunning maf version :\n" << Version::GetMAFSourceVersion() 
-    << "\nLoaded Factory version:\n" << factory->GetMAFSourceVersion()
-    << "\nLoading factory:\n" << factory->m_LibraryPath << "\n");
-    }*/
+      mafWarningMacro(<< "Possible incompatible factory load:" 
+      << "\nRunning maf version :\n" << mafVersion::GetMAFSourceVersion() 
+      << "\nLoaded Factory version:\n" << factory->GetMAFSourceVersion()
+      << "\nLoading factory:\n" << factory->m_LibraryPath << "\n");
+    }
   mafObjectFactory::Initialize();
   mafObjectFactory::m_RegisteredFactories->push_back(factory);
   factory->Register();
 }
 
-//------------------------------------------------------------------------------
+/*//------------------------------------------------------------------------------
 void mafObjectFactory::PrintSelf(std::ostream& os, mafIndent indent) const
 //------------------------------------------------------------------------------
 {
@@ -453,7 +454,8 @@ mafObject *mafObjectFactory::CreateObject(const char* classname)
   mafOverRideMap::iterator pos = m_OverrideMap->find(classname);
   if ( pos != m_OverrideMap->end() )
     {
-    return (*pos).second.m_CreateObject->CreateObject();
+    //return (*pos).second.m_CreateObject->CreateObject();
+    return (*pos).second.m_CreateObject->NewObjectInstance();
     }
   return 0;
 }
