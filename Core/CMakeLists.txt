@@ -16,6 +16,8 @@ SET(PROJECT_SRCS
   mafCoreFactory.h
   mafVMEItem.h
   mafVMEItem.cpp
+  mafDataPipe.cpp
+  mafDataPipe.h
   mafDataVector.txx
   mafDataVector.h
   mafDecl.cpp
@@ -49,10 +51,8 @@ SET(PROJECT_SRCS
 #  mafVMEGeneric.cpp
 #  mafVMEOutput.cpp
 #  mafVMEOutput.h
-#  mafVTKDataSet.h
-#  mafVTKDataSet.cpp
-  mmaTagArray.cpp
-  mmaTagArray.h
+  mafTagArray.cpp
+  mafTagArray.h
   mmuTagItem.cpp
   mmuTagItem.h
   mmuTimeSet.cpp

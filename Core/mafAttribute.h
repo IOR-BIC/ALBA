@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttribute.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:12:37 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-03-11 15:42:13 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -53,6 +53,9 @@ public:
   mafObject *NewObjectInstance() const {return NULL;}
   /** defined to allow the definition of MakeCopy(). For mafAttribute abstract base class return NULL */
   mafAttribute *NewInstance() const {return mafAttribute::SafeDownCast(NewObjectInstance());}
+
+  /** dump the object to output stream */
+  virtual void Print(std::ostream& os, const int tabs=0) const;
 protected:
   mafString m_Name;
 };

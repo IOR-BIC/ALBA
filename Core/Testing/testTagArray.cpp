@@ -1,4 +1,4 @@
-#include "mmaTagArray.h"
+#include "mafTagArray.h"
 #include "mafDecl.h"
 #include "mafString.h"
 #include "mafXMLStorage.h"
@@ -60,7 +60,7 @@ int main()
 
   // Test1
   mmuTagItem ti1, ti2, ti3, ti4;
-  mmaTagArray test_tag_array;
+  mafTagArray test_tag_array;
   
 	ti1.SetName("qui");
 	ti2.SetName("quo");
@@ -126,7 +126,7 @@ int main()
   restore.SetURL("testTagArray.xml");
   restore.SetFileType("TagArrayXML");
   
-  mmaTagArray new_tag_array;
+  mafTagArray new_tag_array;
   restore.SetRoot(&new_tag_array);
   ret=restore.Restore();
 
