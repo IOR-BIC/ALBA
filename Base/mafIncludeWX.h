@@ -2,11 +2,11 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafIncludeWX.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-15 19:23:54 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-02-20 23:33:15 $
+  Version:   $Revision: 1.3 $
   Authors:   Based on itkWindows.h (www.itk.org)
 ==========================================================================
-  Copyright (c) 2002/2004 
+  Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 /** This file is used to include wx.h */

@@ -2,11 +2,11 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafIndent.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-15 19:23:54 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-02-20 23:33:15 $
+  Version:   $Revision: 1.3 $
   Authors:   originally based on vtkIndent (www.vtk.org), rewritten by Marco Petrone
 ==========================================================================
-  Copyright (c) 2002/2004 
+  Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 

@@ -2,11 +2,11 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObject.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-17 00:39:22 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-02-20 23:33:17 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
-  Copyright (c) 2002/2004 
+  Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
@@ -58,7 +58,7 @@ public:
   virtual bool IsA(const mafTypeID &type_id) const;
 
   /** Return a new instance of the same type */
-  virtual mafObject *NewInternalInstance() const = 0;
+  virtual mafObject *NewObjectInstance() const = 0;
 
   /** Return TypeId for this type (static function, i.e. the pointer type) */ 
   static const mafTypeID &GetStaticTypeId();

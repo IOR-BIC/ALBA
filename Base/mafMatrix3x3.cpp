@@ -2,11 +2,11 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix3x3.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-01-11 17:34:59 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-02-20 23:33:16 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
-  Copyright (c) 2002/2004 
+  Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 #include "mafMatrix3x3.h"
