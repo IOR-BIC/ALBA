@@ -58,6 +58,7 @@ IF (MAF_USE_VTK)
     ${PROJECT_SRCS}
     vtkMAFToLinearTransform.cxx
     vtkMAFToLinearTransform.h
+    vtkMAFSmartPointer.h
   )
 ENDIF (MAF_USE_VTK)
 
