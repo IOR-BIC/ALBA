@@ -2,23 +2,31 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:03:58 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-03-23 18:00:32 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
+#ifndef __mafDefines_h
+#define __mafDefines_h
 
 /** Standard macros and constants for the MAF library.
   This file include all the standard macros and constants used inside the MAF
   library.
 */
+//----------------------------------------------------------------------------
+// Pragmas: disable the "singned/unsigned mismatch" warning
+//----------------------------------------------------------------------------
+#pragma warning( disable : 4018 )
 
-#ifndef __mafDefines_h
-#define __mafDefines_h
-
+//----------------------------------------------------------------------------
+// Includes: mafConfigure should be first, mafIncludeWX second
+//----------------------------------------------------------------------------
 #include "mafConfigure.h"
+#include "mafIncludeWX.h" // must be after mafConfigure.h
+
 #include <string.h>
 #include <typeinfo>
 #include <iosfwd>
