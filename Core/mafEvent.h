@@ -2,14 +2,13 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:06:11 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-03-25 16:06:56 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden, Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-
 #ifndef __mafEvent_h
 #define __mafEvent_h
 
@@ -25,7 +24,8 @@
 //----------------------------------------------------------------------------
 //class mafView;
 //class mafOp;
-//class mflVME;
+class mafNode;
+
 #ifdef MAF_USE_VTK
   class vtkObject;
   class vtkProp;
@@ -49,7 +49,7 @@ public:
   mafEvent(void *sender, int id, bool            b,       long arg=0);
   mafEvent(void *sender, int id, float           f,       long arg=0);
   mafEvent(void *sender, int id, mafString      *s,       long arg=0);
-//mafEvent(void *sender, int id, mflVME          *vme,    bool b=false, long arg=0);
+//mafEvent(void *sender, int id, mafNode         *vme,    bool b=false, long arg=0);
 //mafEvent(void *sender, int id, mafView         *view,   wxWindow *win=NULL);
 //mafEvent(void *sender, int id, mafOp					 *op,     long arg=0);
 
@@ -60,7 +60,7 @@ public:
   float            GetFloat()   {return m_float;};
   mafString*       GetString()  {return m_string;};
 //mafView*         GetView()    {return m_view;};
-//mflVME*          GetVme()     {return m_vme;};
+//mafNode*         GetVme()     {return m_vme;};
 //mafOp*					 GetOp()      {return m_op;};
 
   void SetSender(void* sender)  { m_sender = sender;};
@@ -70,7 +70,7 @@ public:
   void SetFloat(float f)        { m_float = f;};
   void SetString(mafString *s)  { m_string = s;};
 //void SetView(mafView* view)   { m_view = view;};
-//void SetVme(mflVME* vme)      { m_vme = vme;};
+//void SetVme(mafNode* vme)     { m_vme = vme;};
 //void SetOp(mafOp* op)         { m_op = op;};
 
 protected:
@@ -80,8 +80,9 @@ protected:
   bool             m_bool;        
   float            m_float;        
   mafString       *m_string;        
+
+  mafNode         *m_vme;
 //mafView         *m_view;
-//mflVME          *m_vme;
 //mafOp						*m_op;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -108,7 +109,7 @@ protected:
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #ifdef MAF_USE_VTK
 public:
-  mafEvent(void *sender, int id, vtkProp         *prop,   mflVME *vme=NULL);
+  mafEvent(void *sender, int id, vtkProp         *prop,   mafNode *vme=NULL);
   mafEvent(void *sender, int id, vtkObject       *vtkobj, long arg=0);
   mafEvent(void *sender, int id, vtkObject       *vtkobj, mafString *s);
   mafEvent(void *sender, int id, vtkMatrix4x4    *m1,vtkMatrix4x4  *m2=NULL);
