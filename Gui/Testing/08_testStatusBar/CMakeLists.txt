@@ -5,8 +5,6 @@ testStatusBarApp.cpp
 testStatusBarApp.h
 testStatusBarLogic.cpp
 testStatusBarLogic.h
-testStatusBarGui.h
-testStatusBarGui.cpp
 )
 
 LINK_LIBRARIES(vtkImaging)

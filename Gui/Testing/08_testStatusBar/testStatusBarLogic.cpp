@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testStatusBarLogic.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-04 10:39:34 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-04 10:57:34 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -144,8 +144,6 @@ void testStatusBarLogic::CreateSideBar()
 void testStatusBarLogic::OnEvent(mafEvent& e)
 //----------------------------------------------------------------------------
 {
-
-
 switch(e.GetId())
   {
   case MENU_FILE_QUIT:
