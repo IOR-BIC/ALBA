@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:20:54 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-03-11 15:50:13 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -214,6 +214,7 @@ void mafTransformFrame::InternalUpdate()
 		}
 	
   }
+  m_Matrix->SetTimeStamp(m_TimeStamp);
 }
 
 //----------------------------------------------------------------------------

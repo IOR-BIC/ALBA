@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformBase.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:20:33 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-03-11 15:50:01 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -43,6 +43,11 @@ public:
 
   /** update and return internal transform matrix */
   virtual const mafMatrix &GetMatrix() {Update();return *m_Matrix;}
+
+  /** 
+    return pointer to internal matrix (after updating).
+    BEWARE: do not change the matrix directly. */
+  mafMatrix *GetMatrixPointer() {Update(); return m_Matrix;}
 
   /**
     Apply the transformation to a coordinate.  You can use the same 
@@ -112,6 +117,9 @@ public:
   /** return last update time */
   virtual unsigned long GetUpdateTime() {return m_UpdateTime.GetMTime();}
 
+  /** set the timestamp for the output matrix */
+  void SetTimeStamp(mafTimeStamp t) {m_TimeStamp=t;}
+
 #ifdef MAF_USE_VTK
   /** Return a VTK transform connected to this transform */
   vtkLinearTransform *GetVTKTransform();
@@ -121,10 +129,12 @@ public:
 #endif
 
 protected:
-  mafMatrix *m_Matrix; ///< internally stored matrix.
-  mafMTime m_MTime; ///< modification time
-  mafMTime m_UpdateTime; ///< We need to record the time of the last update
+  mafMatrix *m_Matrix;        ///< internally stored matrix.
+  mafMTime m_MTime;           ///< modification time
+  mafMTime m_UpdateTime;      ///< We need to record the time of the last update
   mafMutexLock m_UpdateMutex; ///< we also need to do mutex locking so updates don't collide.
+
+  mafTimeStamp m_TimeStamp;   ///< the timestamp to assign to the output matrix (default=0)
 
   //mafMutexLock m_InverseMutex;
   //mafTransformBase *m_MyInverse;
