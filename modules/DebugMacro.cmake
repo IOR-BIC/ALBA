@@ -1,0 +1,7 @@
+#Macro that print messages useful in debug phase.
+SET (DEBUG FALSE)
+MACRO(DBG_MESSAGE MSG DEBUG)
+	IF(DEBUG) 
+		MESSAGE(${MSG})
+	ENDIF(DEBUG)
+ENDMACRO(DBG_MESSAGE)
