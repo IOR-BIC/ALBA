@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-01-10 00:18:07 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-01-24 14:56:31 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -15,7 +15,7 @@
 #include "mafStorable.h"
 #include "mafStorageElement.h"
 #include "mafString.h"
-#include "mafVector.txx"
+#include <vector>
 #include <assert.h>
 #include <sstream>
 
@@ -26,7 +26,7 @@ mafStorageElement::mafStorageElement(mafStorageElement *parent,mafStorage *stora
   assert(storage); // no NULL storage is allowed
   m_Storage = storage;
   m_Parent = parent;
-  //m_Children = new mafVector<mafStorageElement>;
+  //m_Children = new std::vector<mafStorageElement>;
   m_Children = NULL;
 }
 //------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ mafStorageElement::~mafStorageElement()
   if (m_Children)
   {
     // remove all child nodes
-    for (int i=0;i<m_Children->GetNumberOfItems();i++)
+    for (int i=0;i<m_Children->size();i++)
     {
       delete (*m_Children)[i];
     }
@@ -56,10 +56,10 @@ mafStorageElement *mafStorageElement::FindNestedElement(const char *name)
   mafString node_name(name); // no memory copy, thanks mafString :-)
 
   // force children list creation
-  mafVector<mafStorageElement *> *children=GetChildren();
+  std::vector<mafStorageElement *> *children=GetChildren();
   
   // to be rewritten as a map access
-  for (int i=0;i<children->GetNumberOfItems();i++)
+  for (int i=0;i<children->size();i++)
   {
     mafStorageElement *node=(*children)[i];
     if (node_name==node->GetName())
@@ -70,22 +70,45 @@ mafStorageElement *mafStorageElement::FindNestedElement(const char *name)
 }
 
 //------------------------------------------------------------------------------
-int mafStorageElement::StoreObjectVector(mafVector<mafObject *> *vector,const char *name,const char *item_name)
+bool mafStorageElement::GetNestedElementsByName(const char *name,std::vector<mafStorageElement *> &list)
 //------------------------------------------------------------------------------
 {
-  assert(vector);
+  mafString node_name(name); // no memory copy, thanks mafString :-)
+
+  // force children list creation
+  std::vector<mafStorageElement *> *children=GetChildren();
+  list.clear();
+  
+  // to be rewritten as a map access
+  for (int i=0;i<children->size();i++)
+  {
+    mafStorageElement *node=(*children)[i];
+    if (node_name==node->GetName())
+    {
+      list.push_back(node);
+    }
+  }
+
+  return list.size()>0;
+
+}
+
+//------------------------------------------------------------------------------
+int mafStorageElement::StoreObjectVector(const std::vector<mafObject *> &vector,const char *name,const char *items_name)
+//------------------------------------------------------------------------------
+{
   assert(name);
 
   // create sub node for storing the vector
   mafStorageElement *vector_node = AppendChild(name);
-  vector_node->SetAttribute("Size",mafString(vector->GetNumberOfItems()));
+  vector_node->SetAttribute("Size",mafString(vector.size()));
   
-  for (int i=0;i<vector->GetNumberOfItems();i++)
+  for (int i=0;i<vector.size();i++)
   {
-    mafObject *object=vector->GetItem(i);
+    mafObject *object=vector[i];
     if (object)
     {
-      if (vector_node->StoreObject(object,item_name)==NULL)
+      if (vector_node->StoreObject(object,items_name)==NULL)
       {
         mafErrorMacro("Failed to store object of type \""<<object->GetTypeName()<<"\" in vector of objects");
         return MAF_ERROR;
@@ -101,30 +124,29 @@ int mafStorageElement::StoreObjectVector(mafVector<mafObject *> *vector,const ch
 }
 
 //------------------------------------------------------------------------------
-int mafStorageElement::RestoreObjectVector(mafVector<mafObject *> *vector,const char *name)
+int mafStorageElement::RestoreObjectVector(std::vector<mafObject *> &vector,const char *name)
 //------------------------------------------------------------------------------
 {
-  assert(vector);
   assert(name);
 
   mafStorageElement *subnode=FindNestedElement(name);
   if (subnode)
   {
-    mafVector<mafStorageElement *> *items = subnode->GetChildren();
-    for (int i=0;i<items->GetNumberOfItems();i++)
+    std::vector<mafStorageElement *> *items = subnode->GetChildren();
+    for (int i=0;i<items->size();i++)
     {
       mafStorageElement *item=(*items)[i];
-      mafObject *object=item->RestoreObject(item);
+      mafObject *object=RestoreObject(item);
       if (object)
       {
-        vector->AppendItem(object);
+        vector.push_back(object);
       }
       else
       {
         mafWarningMacro("Error while restoring <"<<GetName()<<"> element: cannot restore object");
       }
     }
-    mafWarningMacro("Error while restoring <"<<GetName()<<"> element: wrong number of fields inside nested element <"<<name<<">" );
+    return MAF_OK;
   }
   else
   {
