@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2004-10-29 11:25:35 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-10-29 17:50:17 $
+  Version:   $Revision: 1.4 $
 
 =========================================================================*/
 // .NAME standard macros and constants for the MFL libray
@@ -38,9 +38,8 @@ typedef unsigned long mafID;
 #define vtkNEW(a) a=a->New()
 
 /**
-  Macros used to determine whether a class is the same class or
-  a subclass of the named class and to create a new instance of
-  the same type of object.
+  Macro used by mafObjects for RTTI information. This macor must be placed
+  in the class definition puplic section.
 */
 #define mafTypeMacro(thisClass,superclass) \
   private: \
@@ -60,7 +59,10 @@ typedef unsigned long mafID;
   virtual mafObject *NewInternalInstance() const; \
   thisClass *NewInstance() const;
 
-/** This macro must be used in the cpp/cxx file to implement the TypeId member */
+/**
+  Macro used by mafObjects for RTTI information. This macor must be placed
+  in the .cpp file.
+*/
 #define mafCxxTypeMacro(thisClass) \
   mafID thisClass::TypeId = GetNextTypeId(#thisClass); \
   mafID thisClass::GetTypeId() {return thisClass::TypeId;} \
@@ -105,6 +107,15 @@ typedef unsigned long mafID;
   { \
     return thisClass::SafeDownCast(NewInternalInstance()); \
   }
+
+  
+/** Helper macro used for testing */  
+#define MAF_TEST(a) if (!(a)) \
+{ \
+  std::cerr << "Test failed at line " \
+  << __LINE__ << " : " << #a << std::endl; \
+  return MAF_ERROR; \
+}
 
 #endif
 
