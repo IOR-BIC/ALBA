@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTimeMap.txx,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:34:58 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-03-16 15:39:12 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -263,7 +263,7 @@ mafTimeMap<T>::TimeMap::iterator mafTimeMap<T>::FindItem(T *m)
 
 //----------------------------------------------------------------------------
 template <class T>
-void mafTimeMap<T>::Print(std::ostream& os, const int tabs)
+void mafTimeMap<T>::Print(std::ostream& os, const int tabs) const
 //----------------------------------------------------------------------------
 {
   mafIndent indent(tabs);

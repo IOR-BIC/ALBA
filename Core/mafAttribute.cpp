@@ -2,15 +2,18 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttribute.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 15:42:13 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-03-16 15:39:12 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 #include "mafAttribute.h"
+#include "mafIndent.h"
 #include "assert.h"
+
+#include <ostream>
 
 mafCxxAbstractTypeMacro(mafAttribute);
 
@@ -68,7 +71,7 @@ const char *mafAttribute::GetName() const
 }
 
 //-------------------------------------------------------------------------
-void Print(std::ostream& os, const int tabs=0) const
+void mafAttribute::Print(std::ostream& os, const int tabs) const
 //-------------------------------------------------------------------------
 {
   mafIndent indent(tabs);

@@ -14,12 +14,12 @@ SET(PROJECT_SRCS
   mafAbsMatrixPipe.h
   mafCoreFactory.cpp
   mafCoreFactory.h
-  mafVMEItem.h
-  mafVMEItem.cpp
-  mafDataPipe.cpp
-  mafDataPipe.h
-  mafDataVector.txx
-  mafDataVector.h
+#  mafVMEItem.h
+#  mafVMEItem.cpp
+#  mafDataPipe.cpp
+#  mafDataPipe.h
+#  mafDataVector.txx
+#  mafDataVector.h
   mafDecl.cpp
   mafDecl.h
   mafEventBase.cpp
@@ -27,10 +27,10 @@ SET(PROJECT_SRCS
   mafEventSender.h
   mafEventSource.cpp
   mafEventSource.h
-  mafMatrixPipe.cpp
-  mafMatrixPipe.h
-  mafMatrixVector.cpp
-  mafMatrixVector.h
+#  mafMatrixPipe.cpp
+#  mafMatrixPipe.h
+#  mafMatrixVector.cpp
+#  mafMatrixVector.h
   mafNode.cpp
   mafNode.h
   mafNodeRoot.h
@@ -41,8 +41,8 @@ SET(PROJECT_SRCS
   mafObserver.h
   mafObserverCallback.cpp
   mafObserverCallback.h
-  mafTimeMap.h
-  mafTimeMap.txx
+#  mafTimeMap.h
+#  mafTimeMap.txx
 #  mafVME.cpp
 #  mafVME.h
 #  mafVMERoot.cpp
