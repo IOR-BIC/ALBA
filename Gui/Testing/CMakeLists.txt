@@ -1,6 +1,7 @@
 PROJECT (Gui_TEST)
 
-LINK_LIBRARIES(mafGui)
+# mafGUI e' indipendente da Core, ma i test no -- Silvano 04/04/05
+LINK_LIBRARIES(mafGui mafCore)
 
 SUBDIRS(Minimal)
 SUBDIRS(01_testGui)
@@ -10,6 +11,10 @@ SUBDIRS(04_testSash)
 SUBDIRS(05_testLog)
 SUBDIRS(06_testTab)
 SUBDIRS(07_testSideBar)
+SUBDIRS(08_testStatusBar)
+SUBDIRS(09_testTimeBar)
+SUBDIRS(10_testTree)
+
 
 # wxWidgets specific classes
 IF (MAF_USE_WX)

@@ -80,7 +80,7 @@ mmgViewWin.h
 
 # List the kits from VTK that are needed by this project.
 SET(PROJECT_LIBS
-  mafCore
+  mafBase
 )
 
 #........................................................
