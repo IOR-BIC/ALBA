@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgFloatSlider.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:10:00 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-04 15:02:42 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -80,6 +80,7 @@ public:
 
 protected:
 	float	Round(float val);
+  float	Pow10(float exponent);
 	void DiscretizeRangeRange(float min,float max,float n, float *ra,float *rb,float *rs);
 
 	int DesiredTicks;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgFloatSlider.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:10:00 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-04 15:02:42 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -94,14 +94,28 @@ void mmgFloatSlider::SetRange(float min, float max, float value)
 void mmgFloatSlider::SetRange(float min, float max)
 //----------------------------------------------------------------------------
 {
-  if(abs(min)<1 || abs(max)<1 || (abs(max)-abs(min))<2 )
+  //if(abs(min)<1 || abs(max)<1 || (abs(max)-abs(min))<2 )
 		DiscretizeRangeRange(min, max, this->DesiredTicks, &this->Min, &this->Max, &this->Step);
-  else
-	{
-		DiscretizeRangeRange(min, max, this->DesiredTicks, &this->Min, &this->Max, &this->Step);
-	}
+  //else
+	//{
+    //Max = max;
+    //Min = min;
+    //Step = (max-min)/this->DesiredTicks;
+	//}
 	this->Ticks=ceil((this->Max-this->Min)/this->Step);
   wxSlider::SetRange(0,this->Ticks);
+}
+//----------------------------------------------------------------------------
+float	mmgFloatSlider::Pow10(float exponent)
+//----------------------------------------------------------------------------
+{
+   //pow dont work with negative exponent -- 
+   if(exponent == 0)
+     return 1;
+   if(exponent > 0)
+     return pow(10.0f,exponent);
+   else
+     return 1/pow(10.0f,-exponent);
 }
 //----------------------------------------------------------------------------
 float	mmgFloatSlider::Round(float val)
@@ -112,20 +126,25 @@ float	mmgFloatSlider::Round(float val)
 	int sign = (val > 0) ? 1 : -1;
 	val = fabs(val);
 
-	int   exponent = (int)(log10(val));
-	float mantissa = val/pow(10,exponent); 
+  // strange: (int)(-1f) = 0 --- anyway,it is fixed later
+  int   exponent = (int)log10(val);
+  float mantissa = val/Pow10(exponent); 
+
 	if(mantissa <1) // fix for val< 1
 	{
      mantissa *= 10;
 		 exponent --;
 	}
-	if(mantissa<2) 
+  // discretize the mantissa
+  if(mantissa<2) 
 		mantissa=1;
   else if(mantissa<5)
 	  mantissa=2;
   else 
 	  mantissa=5;
-	return sign*mantissa*pow(10,exponent);
+	
+  // rebuild the number
+  return sign*mantissa*Pow10(exponent);
 }
 //----------------------------------------------------------------------------
 void mmgFloatSlider::DiscretizeRangeRange(float min,float max,float n, float *ra,float *rb,float *rs)
@@ -141,7 +160,7 @@ void mmgFloatSlider::DiscretizeRangeRange(float min,float max,float n, float *ra
 	float fmax = floor(max/step+0.5);
 	int   imax = (int)(fmax);
 	float rmax = step*imax;
-	if(rmax >= max) rmax -= step;
+	if(rmax > max) rmax -= step;
 
   *rs = step;
 	*ra = rmin;
