@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:10:00 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-03-31 11:45:22 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -11,7 +11,8 @@
 =========================================================================*/
 
 #include "mmgFloatSlider.h"
-#include "mmgCheckListBox.h"
+ //SIL. 24-3-2005: temoporary removed
+//#include "mmgCheckListBox.h"
 
 #include "mmgValidator.h"
 #include "mmgGui.h"
@@ -687,6 +688,7 @@ void mmgGui::Radio(int id,wxString label,int* var, int numchoices, const wxStrin
   wxStaticText *lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT );
   if(m_use_bc) lab->SetBackgroundColour(m_bc);
   wxRadioBox *radio = new wxRadioBox  (this, GetId(id), "",    dp, wxSize(DW,-1), numchoices, choices,dim,wxRA_SPECIFY_COLS|m_entry_style|wxTAB_TRAVERSAL );
+  if(m_use_bc) radio->SetBackgroundColour(m_bc);
 
   radio->SetValidator( mmgValidator(this,id,radio,var) );
 	if(tooltip != "") radio->SetToolTip(tooltip);
@@ -876,6 +878,7 @@ wxGrid *mmgGui::Grid(int id, wxString label,int height, int row, int cols, wxStr
   }
 	return grid;
 }
+/*
 //----------------------------------------------------------------------------
 mmgCheckListBox* mmgGui::CheckList(int id,wxString label,int height, wxString tooltip)
 //----------------------------------------------------------------------------
@@ -901,6 +904,7 @@ mmgCheckListBox* mmgGui::CheckList(int id,wxString label,int height, wxString to
   }
 	return clb;
 }
+*/
 //----------------------------------------------------------------------------
 void mmgGui::VectorN(int id,wxString label, double *var,int num_elem,double min, double max, int decimal_digit, wxString tooltip)
 //----------------------------------------------------------------------------

@@ -2,24 +2,24 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:10:00 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-03-31 11:45:22 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
-  Copyright (c) 2002/2004
+  Copyright (c) 2002/2005
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
-
 #ifndef __mmgGui_H__
 #define __mmgGui_H__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
 #include "mafDefines.h" //important: mafDefines should always be included as first
-
 #include "wx/grid.h"
 #include "mafDecl.h"
 #include "mmgPanel.h"
 #include "mafEvent.h"
-
 //----------------------------------------------------------------------------
 // class forward :
 //----------------------------------------------------------------------------
@@ -167,7 +167,8 @@ public:
   mmgFloatSlider *FloatSlider(int id, wxString label, float *var,float min, float max, wxSize size = wxDefaultSize, wxString tooltip = "");
 
   /** Checked listbox widget. */
-  mmgCheckListBox *CheckList(int id, wxString label = "", int height = 60, wxString tooltip = "");
+  //SIL. 24-3-2005: - temporary removed
+  //mmgCheckListBox *CheckList(int id, wxString label = "", int height = 60, wxString tooltip = "");
 
   /** Listbox widget. */
 	wxListBox *ListBox(int id, wxString label = "", int height = 60, wxString tooltip = "", long lbox_style = 0);

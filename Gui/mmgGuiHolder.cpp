@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGuiHolder.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:10:01 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-03-31 11:45:22 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -11,7 +11,7 @@
 =========================================================================*/
 
 #include "mmgGuiHolder.h"
-#include "mmgCheckListBox.h"
+//@@@ #include "mmgCheckListBox.h"  //SIL. 29-3-2005: 
 //----------------------------------------------------------------------------
 // mmgGuiHolder
 //----------------------------------------------------------------------------
