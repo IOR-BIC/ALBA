@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObjectFactory.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-22 14:06:35 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-01-10 00:07:18 $
+  Version:   $Revision: 1.5 $
   Authors:   Based on itkObjectFactory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,7 +12,7 @@
 #ifndef __mafObjectFactory_h
 #define __mafObjectFactory_h
 
-#include "mafSmartObject.h"
+#include "mafReferenceCounted.h"
 #include "mafString.h"
 
 #include <vector>
@@ -39,11 +39,11 @@ class mafIndent;
   containing a colon separated (semi-colon on win32) list of paths.
   @sa mafObject 
 */
-class MAF_EXPORT mafObjectFactory : public mafSmartObject
+class MAF_EXPORT mafObjectFactory : public mafReferenceCounted
 {
 public:    
   /** Run-time type information (and related methods). */
-  mafTypeMacro(mafObjectFactory, mafSmartObject);
+  mafAbstractTypeMacro(mafObjectFactory, mafReferenceCounted);
 
   /** Create and return an instance of the named object.
    * Each loaded mafObjectFactory will be asked in the order
@@ -80,10 +80,10 @@ public:
    * MAF_SOURCE_VERSION and NOT a call to Version::GetMAFSourceVersion.
    * As the version needs to be compiled into the file as a string constant.
    * This is critical to determine possible incompatible dynamic factory loads. */
-  virtual const char* GetMAFSourceVersion(void) const;
+  virtual const char* GetMAFSourceVersion(void) const = 0;
 
   /** Return a descriptive string describing the factory. */
-  virtual const char* GetDescription(void) const;
+  virtual const char* GetDescription(void) const = 0;
 
   /** Return a list of classes that this factory overrides. */
   virtual std::list<std::string> GetClassOverrideNames();
@@ -106,13 +106,18 @@ public:
   virtual bool GetEnableFlag(const char* className,
                              const char* subclassName);
 
-  /** Set all enable flags for the given class to 0.  This will
-   * mean that the factory will stop producing class with the given
-   * name. */
+  /** 
+    Set all enable flags for the given class to 0.  This will
+    mean that the factory will stop producing class with the given
+    name. */
   virtual void Disable(const char* className);
   
   /** This returns the path to a dynamically loaded factory. */
   const char* GetLibraryPath();
+
+  /**
+    This function can be used by Application code to register new Objects's to the mflCoreFactory */
+  void RegisterNewObject(const char* ObjectName, const char* description, mafCreateObjectFunction createFunction);
 
   /** Register object creation information with the factory. */
   void RegisterOverride(const char* classOverride,
@@ -131,7 +136,7 @@ public:
     mafCreateObjectFunction m_CreateObject;
   };
   
-  //virtual void PrintSelf(std::ostream& os, mafIndent &indent) const;
+  virtual void Print(std::ostream& os, const int indent) const;
 
   mafObjectFactory();
   virtual ~mafObjectFactory();
@@ -172,5 +177,6 @@ private:
   unsigned long m_LibraryDate;
   std::string m_LibraryPath;
 };
+
 #endif
 

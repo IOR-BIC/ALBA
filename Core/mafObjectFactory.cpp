@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObjectFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-22 14:06:34 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-01-10 00:07:18 $
+  Version:   $Revision: 1.6 $
   Authors:   Based on itkObjectFactory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,6 +13,7 @@
 #include "mafObjectFactory.h"
 #include "mafDirectory.h"
 #include "mafVersion.h"
+#include "mafIndent.h"
 #include <stdlib.h>
 #include <ctype.h>
 #include <algorithm>
@@ -38,7 +39,7 @@ public:
 static CleanUpObjectFactory CleanUpObjectFactoryGlobal;
 //------------------------------------------------------------------------------
 
-mafCxxTypeMacro(mafObjectFactory);
+mafCxxAbstractTypeMacro(mafObjectFactory);
 
 //------------------------------------------------------------------------------
 // Add this for the SGI compiler which does not seem
@@ -375,31 +376,30 @@ void mafObjectFactory::RegisterFactory(mafObjectFactory* factory)
   factory->Register(0);
 }
 
-/*//------------------------------------------------------------------------------
-void mafObjectFactory::PrintSelf(std::ostream& os, mafIndent indent) const
+//------------------------------------------------------------------------------
+void mafObjectFactory::Print(std::ostream& os, const int indent) const
 //------------------------------------------------------------------------------
 {
-  Superclass::PrintSelf(os, indent);
+  Superclass::Print(os, indent);
 
   os << indent << "Factory DLL path: " << m_LibraryPath.c_str() << "\n";
   os << indent << "Factory description: " << this->GetDescription() << std::endl;
 
   int num = static_cast<int>( m_OverrideMap->size() );
-  os << indent << "Factory overides " << num << " classes:" << std::endl;
+  os << indent << "Factory overrides " << num << " classes:" << std::endl;
 
-  indent = indent.GetNextIndent();
+  mafIndent next_indent = mafIndent(indent).GetNextIndent();
   for(mafOverRideMap::iterator i = m_OverrideMap->begin();
       i != m_OverrideMap->end(); ++i)
     {
-    os << indent << "Class : " <<  (*i).first.c_str() << "\n";
-    os << indent << "Overriden with: " <<  (*i).second.m_OverrideWithName.c_str()
+    os << next_indent << "Class : " <<  (*i).first.c_str() << "\n";
+    os << next_indent << "Overriden with: " <<  (*i).second.m_OverrideWithName.c_str()
        << std::endl;
-    os << indent << "Enable flag: " << (*i).second.m_EnabledFlag
+    os << next_indent << "Enable flag: " << (*i).second.m_EnabledFlag
        << std::endl;
     os << std::endl;
   }
 }
-*/
 
 //------------------------------------------------------------------------------
 void mafObjectFactory::UnRegisterFactory(mafObjectFactory* factory)
@@ -408,14 +408,14 @@ void mafObjectFactory::UnRegisterFactory(mafObjectFactory* factory)
   for ( std::list<mafObjectFactory*>::iterator i = 
         m_RegisteredFactories->begin();
       i != m_RegisteredFactories->end(); ++i )
-    {
+  {
     if ( factory == *i )
-      {
+    {
       m_RegisteredFactories->remove(factory);
       factory->UnRegister(0);
       return;
-      }
     }
+  }
 }
 
 //------------------------------------------------------------------------------
@@ -454,14 +454,19 @@ void mafObjectFactory::RegisterOverride(const char* classOverride,
 }
 
 //------------------------------------------------------------------------------
+void mafObjectFactory::RegisterNewObject(const char* ObjectName, const char* description, mafCreateObjectFunction createFunction)
+//------------------------------------------------------------------------------
+{
+  this->RegisterOverride(ObjectName,ObjectName,description,true,createFunction);
+}
+
+//------------------------------------------------------------------------------
 mafObject *mafObjectFactory::CreateObject(const char* classname)
 //------------------------------------------------------------------------------
 {
-  m_OverrideMap->find(classname);
   mafOverRideMap::iterator pos = m_OverrideMap->find(classname);
   if ( pos != m_OverrideMap->end() )
   {
-    //return (*pos).second.m_CreateObject->CreateObject();
     return (*pos).second.m_CreateObject();
   }
   return NULL;
@@ -477,12 +482,12 @@ void mafObjectFactory::SetEnableFlag(bool flag,
   mafOverRideMap::iterator start = m_OverrideMap->lower_bound(className);
   mafOverRideMap::iterator end = m_OverrideMap->upper_bound(className);
   for ( mafOverRideMap::iterator i = start; i != end; ++i )
-    {
+  {
     if ( (*i).second.m_OverrideWithName == subclassName )
-      {
+    {
       (*i).second.m_EnabledFlag = flag;
-      }
     }
+  }
 }
 
 
@@ -581,19 +586,5 @@ std::list<bool> mafObjectFactory::GetEnableFlags()
     ret.push_back((*i).second.m_EnabledFlag);
   }
   return ret;
-}
-
-//------------------------------------------------------------------------------
-const char *mafObjectFactory::GetMAFSourceVersion(void) const
-//------------------------------------------------------------------------------
-{
-  return MAF_SOURCE_VERSION;
-}
-
-//------------------------------------------------------------------------------
-const char *mafObjectFactory::GetDescription() const
-//------------------------------------------------------------------------------
-{
-  return "MAF core factory.";
 }
 
