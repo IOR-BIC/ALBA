@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-29 09:33:05 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-01-10 00:03:42 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,10 +12,13 @@
 
 #include "mafTransformBase.h"
 
-//#include "vtkMath.h"
+#include "mafIndent.h"
 #include "mafMatrix.h"
+
 #include "vtkPoints.h"
 #include "vtkMAFToLinearTransform.h"
+
+#include <ostream>
 
 mafCxxAbstractTypeMacro(mafTransformBase);
 
@@ -23,16 +26,18 @@ mafCxxAbstractTypeMacro(mafTransformBase);
 mafTransformBase::mafTransformBase()
 //----------------------------------------------------------------------------
 {
+#ifdef MAF_USE_VTK
   m_VTKTransform = NULL;
-  //m_MyInverse = NULL;
+#endif
 }
 
 //----------------------------------------------------------------------------
 mafTransformBase::~mafTransformBase()
 //----------------------------------------------------------------------------
 {
+#ifdef MAF_USE_VTK
   vtkDEL(m_VTKTransform);
-  //mafDEL(m_MyInverse);
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -42,11 +47,16 @@ mafTransformBase::mafTransformBase(const mafTransformBase& copy)
 }
 
 //----------------------------------------------------------------------------
-/*void mafTransformBase::PrintSelf(ostream& os, vtkIndent indent)
+void mafTransformBase::Print(std::ostream& os, const int indent) const
 //----------------------------------------------------------------------------
 {
-  this->Superclass::PrintSelf(os, indent);
-}*/
+  Superclass::Print(os,indent);
+
+  mafIndent the_indent(indent);
+  os << the_indent << "Matrix:" << std::endl;
+  m_Matrix.Print(os,the_indent.GetNextIndent());
+  
+}
 
 //------------------------------------------------------------------------
 template <class T1, class T2, class T3>
@@ -80,22 +90,6 @@ void mafTransformBase::InternalTransformPoint(const double in[3], double out[3])
 }
 
 //----------------------------------------------------------------------------
-mafTransformBase *mafTransformBase::GetInverse()
-//----------------------------------------------------------------------------
-{
-// to be implemented
-  m_InverseMutex.Lock();
-  /*if (this->m_MyInverse == NULL)
-  {
-    mafTransformInverse *my_inverse = new mafTransformInverse;
-    my_inverse->SetInverse(this);
-    m_MyInverse=my_inverse;
-  }*/
- m_InverseMutex.Unlock();
- return m_MyInverse;
-}
-
-//----------------------------------------------------------------------------
 vtkLinearTransform *mafTransformBase::GetVTKTransform()
 //----------------------------------------------------------------------------
 {
@@ -120,12 +114,3 @@ void mafTransformBase::Update()
   }
   m_UpdateMutex.Unlock();
 }
-
-//----------------------------------------------------------------------------
-/*int mafTransformBase::CircuitCheck(mafTransformBase *transform)
-//----------------------------------------------------------------------------
-{
-  return (transform == this || (this->DependsOnInverse && 
-                                this->m_MyInverse->CircuitCheck(transform)));
-}*/
-

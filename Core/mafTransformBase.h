@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformBase.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-29 09:33:05 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-01-10 00:03:42 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,7 +13,7 @@
 #ifndef __mafTransformBase_h
 #define __mafTransformBase_h
 
-#include "mafSmartObject.h"
+#include "mafReferenceCounted.h"
 #include "mafMTime.h"
 #include "mafMutexLock.h"
 #include "mafMatrix.h"
@@ -29,7 +29,7 @@ class vtkLinearTransform;
   should always be called to update the output, which is a mafMatrix internally stored.
   @sa mafTransform
   */
-class MAF_EXPORT mafTransformBase : public mafSmartObject
+class MAF_EXPORT mafTransformBase : public mafReferenceCounted
 {
 public:
   mafTransformBase();
@@ -38,8 +38,8 @@ public:
   /** copy constructor */
   mafTransformBase(const mafTransformBase&);
 
-  mafAbstractTypeMacro(mafTransformBase,mafSmartObject);
-  //void PrintSelf(ostream& os, vtkIndent indent);
+  mafAbstractTypeMacro(mafTransformBase,mafReferenceCounted);
+  virtual void Print(std::ostream& os, const int indent=0) const;
 
   /** update and return internal transform matrix */
   const mafMatrix &GetMatrix() {Update();return m_Matrix;}
@@ -84,11 +84,6 @@ public:
                               double out[3]);
 
   /**
-    Get the inverse of this transform.  If you modify this transform,
-    the returned inverse transform will automatically update.*/
-  mafTransformBase *GetInverse();
-
-  /**
     Update the transform to account for any changes which
     have been made.  You do not have to call this method 
     yourself, it is called automatically whenever the
@@ -131,8 +126,8 @@ protected:
   mafMTime m_UpdateTime; ///< We need to record the time of the last update
   mafMutexLock m_UpdateMutex; ///< we also need to do mutex locking so updates don't collide.
 
-  mafMutexLock m_InverseMutex;
-  mafTransformBase *m_MyInverse;
+  //mafMutexLock m_InverseMutex;
+  //mafTransformBase *m_MyInverse;
 
   #ifdef MAF_USE_VTK
   vtkLinearTransform *m_VTKTransform; ///< VTK transform used to link to VTK process objects
