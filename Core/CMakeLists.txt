@@ -7,9 +7,11 @@ MESSAGE(STATUS "Configuring project mafCore")
 # Set your list of sources here.  Do not change the name of the
 # vtkLocal_SRCS variable.
 SET(mafCore_SRCS
+  mafDefines.h
   mafString.cpp
   mafString.h
-  mafDefines.h
+  mafObject.cpp
+  mafObject.h
 )
 
 # List the kits from VTK that are needed by this project.
