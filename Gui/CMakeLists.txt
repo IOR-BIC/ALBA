@@ -25,7 +25,7 @@ INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR})
 
 # Create the library.
 ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
-MESSAGE ("${PROJECT_NAME} linked libraries: ${PROJECT_LIBS}")
+##MESSAGE ("${PROJECT_NAME} linked libraries: ${PROJECT_LIBS}")
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
 
 # this is necessaty to force MFL compilation....
