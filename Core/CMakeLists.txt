@@ -12,6 +12,10 @@ SET(PROJECT_SRCS
   mafAttribute.h
   mafCoreFactory.cpp
   mafCoreFactory.h
+  mafDataSet.h
+  mafDataSet.cpp
+  mafDataSetVector.cpp
+  mafDataSetVector.h
   mafDecl.cpp
   mafDecl.h
   mafEventBase.cpp
@@ -28,12 +32,16 @@ SET(PROJECT_SRCS
   mafObserver.h
   mafObserverCallback.cpp
   mafObserverCallback.h
-  #mafVME.cpp
-  #mafVME.h
+  mafTimeMap.h
+  mafTimeMap.txx
+#  mafVME.cpp
+#  mafVME.h
   mmaTagArray.cpp
   mmaTagArray.h
   mmuTagItem.cpp
   mmuTagItem.h
+  mmuTimeSet.cpp
+  mmuTimeSet.h
 #  mafEvent.cpp
 #  mafEvent.h
 )
