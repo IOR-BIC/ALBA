@@ -6,6 +6,7 @@ int main()
 {
   mafTimeStamp tarray[6]={1, 2.5, 1.2, 1.8, 3.6, 0.5};
 
+  // mmuTimeSet is a container for mafTimeStamps
   mmuTimeSet tset;
   int i;
   for (i=0;i<6;i++)

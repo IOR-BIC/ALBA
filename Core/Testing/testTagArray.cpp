@@ -15,12 +15,13 @@ int main()
 
   int i=0;
   
-  //Test TagItem
+  //Test TagItem constructors
   mmuTagItem titem("TestTAG","String Value");
   mmuTagItem tnum("TestNUM",1235.67890123456e20);
   mmuTagItem tmulti("MultiString",strings,4);
   mmuTagItem tmulti_num("MultiNum",numbers,4);
   
+  // test TagItem's contents
   MAF_TEST(mafString::Equals("TestTAG",titem.GetName()));
   MAF_TEST(titem.GetType()==MAF_STRING_TAG);
   MAF_TEST(mafString::Equals(titem.GetValue(),"String Value"));
@@ -43,6 +44,7 @@ int main()
     MAF_TEST(tmulti_num.GetValueAsDouble(i)==numbers[i]);
   }
 
+  // test query function to extract the value as a single string 
   mafString value;
   tmulti.GetValueAsSingleString(value);
   mafString result="(\"qui\",\"quo\",\"qua\",\"paperino\")";
@@ -58,7 +60,7 @@ int main()
   MAF_TEST(tmulti_num.GetComponentAsDouble(4)==3.5);
   MAF_TEST(tmulti_num.GetComponentAsDouble(5)==3.456);
 
-  // Test1
+  // Test adding some TagItems to a TagArray
   mmuTagItem ti1, ti2, ti3, ti4;
   mafTagArray test_tag_array;
   
@@ -82,7 +84,9 @@ int main()
 	test_tag_array.SetTag(ti3);
 	test_tag_array.SetTag(ti4);
 
-  std::vector<mmuTagItem *>::iterator v_iterator;
+  
+  
+  // extract all items of a given type
   std::vector<mmuTagItem *> pti_vector;
   test_tag_array.GetTagsByType(MAF_STRING_TAG, pti_vector);
 
@@ -91,6 +95,8 @@ int main()
   std::cerr << "Tags of type MAF_STRING_TAG are:" << "\n";
   std::cerr << "\n";
 
+  // check type of extracted items
+  std::vector<mmuTagItem *>::iterator v_iterator;
   for (v_iterator = pti_vector.begin(); v_iterator != pti_vector.end(); v_iterator++)
   {
     std::cerr << (*v_iterator)->GetName() << "\n";
@@ -99,20 +105,25 @@ int main()
 
   pti_vector.clear();
 
+  // extract numerical items
   test_tag_array.GetTagsByType(MAF_NUMERIC_TAG, pti_vector);
 
   std::cerr << "\n";
   std::cerr << "\n";
   std::cerr << "Tags of type MAF_NUMERIC_TAG are:" << "\n";
   std::cerr << "\n";
-
+  
+  // test extracted items type
   for (v_iterator = pti_vector.begin(); v_iterator != pti_vector.end(); v_iterator++)
   {
 	  std::cerr << (*v_iterator)->GetName() << "\n";
     MAF_TEST((*v_iterator)->GetType()==MAF_NUMERIC_TAG);
   }
 
+
   // test TagArray storing/restoring...
+
+  // create an XML storage for storing the mafTagArray
   mafXMLStorage storage;
   storage.SetURL("testTagArray.xml");
   storage.SetFileType("TagArrayXML");
@@ -122,16 +133,19 @@ int main()
   
   MAF_TEST(ret==MAF_OK);
 
+  // create a new XML storage to restore the TagArray
   mafXMLStorage restore;
   restore.SetURL("testTagArray.xml");
   restore.SetFileType("TagArrayXML");
   
+  // create the root to restore the TagArray inside
   mafTagArray new_tag_array;
   restore.SetRoot(&new_tag_array);
   ret=restore.Restore();
 
   MAF_TEST(ret==MAF_OK);
 
+  // check restored TagArray contents
   MAF_TEST(new_tag_array==test_tag_array);
 
   std::cout<<"Test completed successfully!"<<std::endl;

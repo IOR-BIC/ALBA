@@ -2,6 +2,7 @@
 #include "mafCoreFactory.h"
 #include <iostream>
 
+/** a mafObject to be placed in the factory. */
 class mafFooObject: public mafObject
 {
 public:
@@ -12,6 +13,7 @@ public:
 
 mafCxxTypeMacro(mafFooObject);
 
+/** a mafObject to be placed in the factory. */
 class mafDummyObject: public mafObject
 {
 public:
@@ -24,7 +26,6 @@ mafCxxTypeMacro(mafDummyObject);
 
 int main()
 {
-
   // a couple of factories
   mafCoreFactory *first_factory = mafCoreFactory::New();
   mafCoreFactory *second_factory = mafCoreFactory::New();
@@ -39,9 +40,11 @@ int main()
   std::list<mafObjectFactory *> list=mafObjectFactory::GetRegisteredFactories();
   MAF_TEST(list.size()==2);
 
+  // register objects to the factories
   first_factory->RegisterOverride(mafFooObject::GetStaticTypeName(),mafFooObject::GetStaticTypeName(),"foo class",true,mafFooObject::NewObject);
   second_factory->RegisterOverride(mafDummyObject::GetStaticTypeName(),mafDummyObject::GetStaticTypeName(),"foo class",true,mafDummyObject::NewObject);
 
+  // create objects from the factory
   mafFooObject *foo=mafFooObject::SafeDownCast(mafObjectFactory::CreateInstance("mafFooObject"));
   mafDummyObject *dummy=mafDummyObject::SafeDownCast(mafObjectFactory::CreateInstance("mafDummyObject"));
 
@@ -54,15 +57,16 @@ int main()
   dummy->Print(std::cerr);
   std::cout<<" = "<<dummy->GetTypeName()<<std::endl;
   
+  // test newly created objects types
   MAF_TEST(foo->IsA("mafFooObject"));
-  MAF_TEST(foo->IsA(mafObject::GetStaticTypeId()));
+  MAF_TEST(foo->IsA(typeid(mafObject)));
   MAF_TEST(foo->IsA("mafObject"));
   MAF_TEST(foo->IsA(mafObject::GetStaticTypeId()));
   MAF_TEST(!foo->IsA(dummy->GetTypeId()));
   MAF_TEST(!foo->IsA(dummy->GetTypeName()));
-  MAF_TEST(!dummy->IsA(mafFooObject::GetStaticTypeId()));
-  MAF_TEST(!dummy->IsA(mafFooObject::GetStaticTypeName()));
-  MAF_TEST(dummy->GetStaticTypeId()==dummy->GetTypeId());
+  MAF_TEST(!dummy->IsA(typeid(mafFooObject::GetStaticTypeId()))); // test through static type id (equivalent to typeid())
+  MAF_TEST(!dummy->IsA(mafFooObject::GetStaticTypeName())); // test through static string type 
+  MAF_TEST(dummy->GetStaticTypeId()==dummy->GetTypeId()); 
   MAF_TEST(dummy->GetStaticTypeId()==dummy->GetTypeId());
   
   std::cout<<"Test completed successfully!"<<std::endl;

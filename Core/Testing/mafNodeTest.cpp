@@ -7,6 +7,12 @@
 #include <iostream>
 
 //-------------------------------------------------------------------------
+// A simple node used for testing. The node has a Flag member variable used
+// to reference an external flag. When destroyed the node reset the flag to
+// advise it has been destroyed. This way its possible to check the node is
+// really dead. The node has also a m_Value member variable to tag the node.
+// Root is also responsible for creating Ids, if a tree does not have a
+// mafNoreRoot node the tree won't support ids and links.
 class mafTestNode: public mafNode
 //-------------------------------------------------------------------------
 {
@@ -23,12 +29,15 @@ mafCxxTypeMacro(mafTestNode)
 //-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
-/** class for testing root mafNodeRoot. */
+// class for testing root mafNodeRoot. A mafNode inheriting from mafNodeRoot
+// is a node that can behave as a root for a tree. This node simply has to
+// inherit from mafNodeRoot and call the StoreRoot() and RestoreRoot()
+// respectivelly from inside InternalStore() and InternalRestore().  
 class mafTestRootNode: public mafNodeRoot, public mafTestNode
 //-------------------------------------------------------------------------
 {
 public:
-  mafTestRootNode() {SetId(0);}
+  mafTestRootNode() {SetId(0);} // self set its id to 0
   mafTypeMacro(mafTestRootNode,mafTestNode);
 protected:
   inline int InternalStore(mafStorageElement *parent);
@@ -66,6 +75,7 @@ class mafNodeB: public mafNode
 {
 public:
   mafTypeMacro(mafNodeB,mafNode);
+  /** this node can be reparented only under "mafNodeB" nodes. */
   bool CanReparentTo(mafNode *parent) {return Superclass::CanReparentTo(parent)&&parent->IsA(mafNodeB::GetStaticTypeId());}
 };
 
@@ -91,6 +101,7 @@ mafCxxTypeMacro(mafNodeA);
 int main()
 //-------------------------------------------------------------------------
 {
+  // create some nodes
   mafSmartPointer<mafTestRootNode> root;
   mafSmartPointer<mafTestNode> first_node;
   mafTestNode *first_ptr=first_node;
@@ -128,6 +139,7 @@ int main()
   MAF_TEST(third_ptr->GetReferenceCount()==1);
   
   root->CleanTree();
+
   // test if they are dead
   MAF_TEST(!Flags[1]);
   MAF_TEST(!Flags[2]);
@@ -151,14 +163,14 @@ int main()
   root->CleanTree();
 
   //
-  // test iterators
+  // test iterators to traverse the tree
   //
   int seq[10]={4,9,2,8,7,3,1,5,0,6};
 
   mafTestNode *node=NULL;
 
   //
-  // create a binary tree with ordered numbers
+  // this creates a binary tree with ordered numbers
   //
   for (int i=0;i<10;i++)
   {
@@ -203,7 +215,7 @@ int main()
   std::cerr<<"Testing mafNodeIterator PreOrder Traverse\n";  
   iter->SetTraversalModeToPreOrder();
 
-  int preorder[10]={4,2,1,0,3,9,8,7,5,6};
+  int preorder[10]={4,2,1,0,3,9,8,7,5,6}; // what should be the traversal order
   int vect[10];
 
   int j=0;
@@ -223,7 +235,7 @@ int main()
   std::cerr<<"Testing mafNodeIterator PreOrder Traverse in Reverse\n";
   iter->SetTraversalModeToPreOrder();
 
-  int preorderrev[10]={6,5,7,8,9,3,0,1,2,4};
+  int preorderrev[10]={6,5,7,8,9,3,0,1,2,4}; // what should be the traversal order
 
   j=0;
   for (node=(mafTestNode *)iter->GetLastNode();node;node=(mafTestNode *)iter->GetPreviousNode())
@@ -242,7 +254,7 @@ int main()
   std::cerr<<"Testing mafNodeIterator PostOrder Traverse in Reverse\n";
   iter->SetTraversalModeToPostOrder();
 
-  int postorderrev[10]={4,9,8,7,5,6,2,3,1,0};
+  int postorderrev[10]={4,9,8,7,5,6,2,3,1,0}; // what should be the traversal order
 
   j=0;
   for (node=(mafTestNode *)iter->GetLastNode();node;node=(mafTestNode *)iter->GetPreviousNode())
@@ -261,7 +273,7 @@ int main()
   std::cerr<<"Testing mafNodeIterator PostOrder Traverse\n";
   iter->SetTraversalModeToPostOrder();
 
-  int postorder[10]={0,1,3,2,6,5,7,8,9,4};
+  int postorder[10]={0,1,3,2,6,5,7,8,9,4}; // what should be the traversal order
 
   j=0;
   for (node=(mafTestNode *)iter->GetFirstNode();node;node=(mafTestNode *)iter->GetNextNode())
@@ -283,7 +295,7 @@ int main()
   MAF_TEST(node2);
   MAF_TEST(node3);
 
-  // a node to test detach from tree
+  // create a new node to test the detach from tree
   mafSmartPointer<mafTestNode> test_node;
   test_node->SetName("test_node");
   node2->AddChild(test_node);
@@ -299,15 +311,15 @@ int main()
 
   // test detaching from tree
   test_node->ReparentTo(NULL);
-  MAF_TEST(node1->GetLink("link3")==NULL);
+  MAF_TEST(node1->GetLink("link3")==NULL); // the link should have become invalid
   
   // test attaching to another tree
   test_node->ReparentTo(rootB);
-  MAF_TEST(node1->GetLink("link3")==NULL);
+  MAF_TEST(node1->GetLink("link3")==NULL); // the link should be still invalid
 
   // test attaching to tree
   test_node->ReparentTo(node3);
-  MAF_TEST(node1->GetLink("link3")==test_node.GetPointer());
+  MAF_TEST(node1->GetLink("link3")==test_node.GetPointer()); // the link should be valid now
   
   // add some tags
   root->GetTagArray()->SetTag(mmuTagItem("NumericTag",10.5));
@@ -315,7 +327,7 @@ int main()
   node3->GetTagArray()->SetTag(mmuTagItem("TestTag","test value"));
   node2->GetTagArray()->SetTag(mmuTagItem("TestTag","second value"));
 
-  // dump root node with tags
+  // dump root node with tags (just to visually test the Print() )
   std::cout<<"Root node with tags:\n";
   root->Print(std::cout);
 

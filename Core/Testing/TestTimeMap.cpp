@@ -4,6 +4,7 @@
 #include "mafSmartPointer.h"
 #include <iostream>
 
+/** an object with a "m_TimeStamp" member. */
 class mafTestTObject: public mafReferenceCounted
 {
 public:
@@ -21,6 +22,7 @@ protected:
 
 mafCxxTypeMacro(mafTestTObject);
 
+/** a container specialized for "mafTestTObject" objects. */
 class mafTestTVector: public mafTimeMap<mafTestTObject>
 {
   mafTypeMacro(mafTestTVector,mafObject);
@@ -34,6 +36,8 @@ int main()
 
   mafTestTVector tvector;
   
+  // create a number of objects and sets their timestamps from
+  // the tarray.
   int i;
   for (i=0;i<6;i++)
   {
@@ -45,7 +49,7 @@ int main()
 
   MAF_TEST(tvector.GetNumberOfItems()==6);
 
-  // test ordering
+  // test the ordering
   mafTimeStamp old_t;
   mafTestTVector::TimeMap::iterator it;
   for (old_t=0,it=tvector.Begin();it!=tvector.End();it++)
@@ -63,22 +67,23 @@ int main()
 
   mafSmartPointer<mafTestTObject> t0;
   t0->SetTimeStamp(.3);
-  // test insertion at begin
-  tvector.PrependItem(t0); // inserted in constant time
+
+  // test insertions at begin
+  tvector.PrependItem(t0); // inserted in constant time (already ordered object)
   MAF_TEST(tvector.FindItemIndex(.3)==0);
   mafSmartPointer<mafTestTObject> t5;
   t5->SetTimeStamp(2);
-  tvector.PrependItem(t5); // inserted in 2*log(N) time: worst case 
+  tvector.PrependItem(t5); // inserted in 2*log(N) time (worst case of non ordered object)
   MAF_TEST(tvector.FindItemIndex(2)==5); 
 
   // test insertion at end
   mafSmartPointer<mafTestTObject> t8;
   t8->SetTimeStamp(4);
-  tvector.AppendItem(t8); // inserted in constant time
+  tvector.AppendItem(t8); // inserted in constant time (already ordered object)
   MAF_TEST(tvector.FindItemIndex(4)==8);
   mafSmartPointer<mafTestTObject> t0b;
   t0b->SetTimeStamp(.2);
-  tvector.AppendItem(t0b); // inserted in 2*log(N) time: worst case
+  tvector.AppendItem(t0b); // inserted in 2*log(N) time: worst case (worst case of non ordered object)
   MAF_TEST(tvector.FindItemIndex(.2)==0); 
   
   // check we have the correct number of time stamps
@@ -96,14 +101,14 @@ int main()
   MAF_TEST(tvector.GetItemBefore(2.4)->GetTimeStamp()==2.0);
   MAF_TEST(tvector.GetNearestItem(2.4)->GetTimeStamp()==2.5);
   
-  // test search of an element out of bounds
+  // test search of elements out of bounds
   MAF_TEST(tvector.GetItemBefore(.1)->GetTimeStamp()==.2); 
   MAF_TEST(tvector.GetNearestItem(.1)->GetTimeStamp()==.2);
 
   MAF_TEST(tvector.GetItemBefore(5)->GetTimeStamp()==4); 
   MAF_TEST(tvector.GetNearestItem(5)->GetTimeStamp()==4);
 
-  // test removal
+  // test items removal
   it=tvector.FindItem(2.0);
   MAF_TEST(it!=tvector.End());
   tvector.RemoveItem(it);

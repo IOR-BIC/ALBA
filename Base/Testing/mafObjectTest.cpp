@@ -33,8 +33,9 @@ int main()
   dummy.Print(std::cerr);
   std::cout<<" = "<<dummy.GetTypeName()<<std::endl;
   
-  MAF_TEST(foo.IsA("mafFooObject"));
-  MAF_TEST(foo.IsType(mafObject));
+  // test functions to query the type
+  MAF_TEST(foo.IsA("mafFooObject")); // test the real object type with string type
+  MAF_TEST(foo.IsType(mafObject)); // test the real object type with typeid: IsType == IsA(typeid())
   MAF_TEST(foo.IsA("mafObject"));
   MAF_TEST(foo.IsType(mafObject));
   MAF_TEST(!foo.IsA(dummy.GetTypeId()));
@@ -44,6 +45,8 @@ int main()
   MAF_TEST(dummy.GetStaticTypeId()==dummy.GetTypeId());
   MAF_TEST(dummy.GetStaticTypeId()==dummy.GetTypeId());
 
+  // use NewInstance to test new objects of the same type. NewInstance create
+  // objects of the same "real" type.
   mafObject *new_dummy=dummy.NewInstance();
   mafObject *new_foo=foo.NewInstance();
 
@@ -60,11 +63,11 @@ int main()
   MAF_TEST(new_dummy->IsA(new_foo->GetStaticTypeId())); // they are both mafObject * variables
   MAF_TEST(new_dummy->IsA(new_foo->GetStaticTypeName()));
 
-  MAF_TEST(mafFooObject::SafeDownCast(new_dummy)==NULL);
+  // test casting function
+  MAF_TEST(mafFooObject::SafeDownCast(new_dummy)==NULL); // this cast should be failed
 
   mafDummyObject* tmp_dummy = mafDummyObject::SafeDownCast(new_dummy);
-
-  MAF_TEST(tmp_dummy!=NULL);
+  MAF_TEST(tmp_dummy!=NULL); // this should have been casted succesfully 
 
   std::cout<<"Test completed successfully!"<<std::endl;
 
