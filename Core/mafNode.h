@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-30 18:18:21 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-12-01 18:42:16 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,6 +13,8 @@
 #define __mafNode_h
 
 #include "mafSmartObject.h"
+#include "mafSmartPointer.h"
+#include "mafVector.h"
 #include "mafString.h"
 #include "mafMTime.h"
 
@@ -21,7 +23,7 @@
 //----------------------------------------------------------------------------
 class mafNodeIterator;
 class mafRootNode;
-template <class T> class mafTemplatedVector;
+//template <class T> class mafVector;
 
 //----------------------------------------------------------------------------
 // mafNode
@@ -200,7 +202,7 @@ public:
   /** return modification time */
   inline unsigned long GetMTime();
 
-  typedef mafTemplatedVector<mafAutoPointer<mafNode>> mafChildrenVector;
+  typedef mafVector<mafAutoPointer<mafNode>> mafChildrenVector;
 
 protected:
   mafNode();
