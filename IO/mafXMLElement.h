@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLElement.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-29 18:00:27 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-01-10 00:18:07 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -50,25 +50,34 @@ public:
   virtual const char *GetName();
 
   /** Store a generic text into an XML document */
-  virtual void StoreText(const const char *text,const char *name="Text");
-
-  /** Store a float number into an XML document */
-  virtual void StoreDouble(const double &value,const char *name="Double");
-
-  /** Store a integer number into an XML document */
-  virtual void StoreInteger(const int &value,const char *name="Integer");
+  virtual int StoreText(const char *text,const char *name="Text");
 
   /** Store a matrix into an XML document */
-  virtual void StoreMatrix(mafMatrix *matrix,const char *name="Matrix");
-
-  /** Store a vector of objects into an XML document */
-  virtual void StoreObjectVector(mafVector<mafStorable *> *vector,const char *name="ObjectVector");
-
-  /** Store a vector3 into an XML document */
-  virtual void StoreVector3(double comps[3],const char *name="Vector3");
+  virtual int StoreMatrix(mafMatrix *matrix,const char *name="Matrix");
 
   /** Store a vectorN into an XML document */
-  virtual void StoreVectorN(double *comps,int num,const char *name="Vector");
+  virtual int StoreVectorN(double *comps,int num,const char *name="Vector");
+
+  /** Store a vectorN into an XML document */
+  virtual int StoreVectorN(int *comps,int num,const char *name="Vector");
+
+  /** Store 8bit binary data */
+  virtual int StoreData(const char *data, const int size,const char *name="CData");
+
+  /** Store 16bit binary data */
+  virtual int StoreData16(const short *data, const int size,const char *name="CData16");
+
+  /** Store 32bit binary data */
+  virtual int StoreData32(const long *data, const int size,const char *name="CData32");
+
+  /** Store 8bit binary data */
+  virtual int RestoreData(char *data, const int size,const char *name="CData");
+
+  /** Store 16bit binary data */
+  virtual int RestoreData16(short *data, const int size,const char *name="CData16");
+
+  /** Store 32bit binary data */
+  virtual int RestoreData32(long *data, const int size,const char *name="CData32");
   
   /** Restore a matrix from an XML document */
   virtual int RestoreMatrix(mafMatrix *matrix,const char *name="Matrix");
@@ -76,17 +85,14 @@ public:
   /** Restore a vectorN from an XML document */
   virtual int RestoreVectorN(double *comps,unsigned int num,const char *name="Vector");
 
+  /** Restore a vectorN from an XML document */
+  virtual int RestoreVectorN(int *comps,unsigned int num,const char *name="Vector");
+
   /** Restore a generic text string from an XML document */
   virtual int RestoreText(char *&buffer,const char *name="Text");
 
   /** Restore a generic text string from an XML document */
   virtual int RestoreText(mafString &buffer,const char *name="Text");
-
-  /** Restore a float number from an XML document */
-  virtual int RestoreDouble(double &value,const char *name="Double");
-
-  /** Restore an integer number from an XML document */
-  virtual int RestoreInteger(int &value,const char *name="Integer");
 
   /** return a pointer to the storage who created this element */
   mafXMLStorage *GetXMLStorage();
@@ -116,19 +122,16 @@ public:
     Append an XML attribute to this element. Attribute 'name' and
     'value' must be passed as argument. This utility function takes care
     of string conversion problems. */
-  void SetXMLAttribute(const char *name,const char *value);
+  virtual void SetAttribute(const char *name,const char *value);
 
   /** 
     Return find an attribute given its name and return its value.
     Return false if not found. This function takes care of string
     conversion problems. */
-  bool GetXMLAttribute(const char *name,mafString &value);
+  virtual bool GetAttribute(const char *name,mafString &value);
 
   /** this writes text inside a DOM-XML element */
   void WriteXMLText(const char *text);
-
-  /** Internally used to extract vector values from Text data*/
-  int ParseData(const char *text,double *vector,int size);
 
   /** Internally used to extract vector values from Text data */
   int ParseData(double *vector,int size);
@@ -137,10 +140,7 @@ public:
 protected:
 
   DOMElement *m_XMLElement; ///< XML element wrapped by this object 
-  mafXMLString  *m_Name; ///< Convenient copy of tagName
-
-private:
-  
+  mafXMLString  *m_Name; ///< Convenient copy of etagName
 
 };
 #endif // _mafXMLElement_h_

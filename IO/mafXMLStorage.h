@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-29 18:00:28 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-01-10 00:18:08 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,31 +14,12 @@
 
 #include "mafStorage.h"
 
-// Sorry, unable to use PIMPL with this awful namespace
-//#include <xercesc/dom/DOM.hpp>
-//#include <xercesc/parsers/XercesDOMParser.hpp>
-
-//#ifdef XERCES_CPP_NAMESPACE_USE
-//XERCES_CPP_NAMESPACE_USE
-//#endif
-
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 class mafXMLElement;
 class mmuXMLDOM;
 
-/*namespace XERCES_CPP_NAMESPACE 
-{
-  class DOMImplementation;
-  class DOMDocument;
-  class DOMDocumentType;
-  class DOMNode;
-  class DOMWriter;
-  class XMLFormatTarget;
-  class XercesDOMParser;
-};
-*/
 
 /** mafXMLStorage 
   @todo to be written
@@ -80,13 +61,5 @@ protected:
   mafString  m_FileType;
   mafString  m_Version;
   mmuXMLDOM  *m_DOM; ///< PIMPL object storing XML objects' pointers
-  /*DOMDocumentType   *m_XMLDoctype;
-  DOMDocument       *m_XMLDoc;
-  DOMNode           *m_XMLNode;
-  DOMImplementation *m_XMLImplement;
-  DOMWriter         *m_XMLSerializer;
-  XMLFormatTarget   *m_XMLTarget;
-  XercesDOMParser   *m_XMLParser;
-  */
 };
 #endif // _mafXMLStorage_h_

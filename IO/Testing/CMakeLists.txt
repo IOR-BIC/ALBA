@@ -1,7 +1,7 @@
 PROJECT (mafCore_TEST)
 
 LINK_LIBRARIES(mafCore mafIO)
-ADD_EXECUTABLE(testXMLStorage.cpp mafXMLStorageTest.cpp)
+ADD_EXECUTABLE(testXMLStorage mafXMLStorageTest.cpp)
 
 # add here test list...
 

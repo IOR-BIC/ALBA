@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-29 18:00:27 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-01-10 00:18:07 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -15,6 +15,8 @@
 #include "mafXMLString.h"
 #include "mafMatrix.h"
 #include "mafVector.txx"
+#include "mafStorable.h"
+#include "mafObjectFactory.h"
 
 #include "mmuXMLDOM.h"
 
@@ -42,12 +44,13 @@ mafXMLElement::~mafXMLElement()
 }
 
 //------------------------------------------------------------------------------
-int mafXMLElement::ParseData(const char *text,double *vector,int size)
+template <class T>
+int InternalParseData(const char *text,T *vector,int size)
 //------------------------------------------------------------------------------
 {
   std::istringstream instr(text);
 
-  for (int i=0;i<size;)
+  for (int i=0;i<size;i++)
   {
     if (instr.eof())
       return i;
@@ -65,7 +68,7 @@ int mafXMLElement::ParseData(double *vector,int size)
   mafXMLString text_data(m_XMLElement->getTextContent());
   if (text_data.GetCStr())
   {
-    return ParseData(text_data,vector,size);
+    return InternalParseData(text_data,vector,size);
   }
   
   return 0;
@@ -75,16 +78,12 @@ int mafXMLElement::ParseData(int *vector,int size)
 //------------------------------------------------------------------------------
 {
   mafXMLString text_data(m_XMLElement->getTextContent());
+  
   if (text_data.GetCStr())
   {
-    double *tmp=new double[size];
-    int ret=ParseData(text_data,tmp,size);
-    for (int i=0;i<ret;i++)
-      vector[i]=tmp[i];
-    delete [] tmp;
-    return ret;
+    return InternalParseData(text_data,vector,size);
   }
-  
+ 
   return 0;
 }
 
@@ -157,13 +156,14 @@ mafXMLElement *mafXMLElement::AppendXMLChild(const char *name)
 //------------------------------------------------------------------------------
 {
   DOMElement *child_element=GetXMLStorage()->GetXMLDOM()->m_XMLDoc->createElement(mafXMLString(name));
+  m_XMLElement->appendChild(child_element);
   mafXMLElement *child=new mafXMLElement(child_element,this,GetXMLStorage());
   GetChildren()->AppendItem(child);
   return child;
 }
 
 //------------------------------------------------------------------------------
-void mafXMLElement::SetXMLAttribute(const char *name,const char *value)
+void mafXMLElement::SetAttribute(const char *name,const char *value)
 //------------------------------------------------------------------------------
 {
   assert(name);
@@ -173,7 +173,7 @@ void mafXMLElement::SetXMLAttribute(const char *name,const char *value)
 }
 
 //------------------------------------------------------------------------------
-bool mafXMLElement::GetXMLAttribute(const char *name, mafString &value)
+bool mafXMLElement::GetAttribute(const char *name, mafString &value)
 //------------------------------------------------------------------------------
 {
   assert(name);
@@ -195,7 +195,7 @@ void mafXMLElement::WriteXMLText(const char *text)
 }
 
 //------------------------------------------------------------------------------
-void mafXMLElement::StoreText(const const char *text,const char *name)
+int mafXMLElement::StoreText(const const char *text,const char *name)
 //------------------------------------------------------------------------------
 {
   assert(text);
@@ -203,22 +203,11 @@ void mafXMLElement::StoreText(const const char *text,const char *name)
 
   mafXMLElement *text_node=AppendXMLChild(name);
   text_node->WriteXMLText(text);
+  return MAF_OK;
 }
 
 //------------------------------------------------------------------------------
-void mafXMLElement::StoreDouble(const double &value,const char *name)
-//------------------------------------------------------------------------------
-{
-  StoreText(mafString(value),name);
-}
-//------------------------------------------------------------------------------
-void mafXMLElement::StoreInteger(const int &value,const char *name)
-//------------------------------------------------------------------------------
-{
-  StoreText(mafString(value),name);
-}
-//------------------------------------------------------------------------------
-void mafXMLElement::StoreMatrix(mafMatrix *matrix,const char *name)
+int mafXMLElement::StoreMatrix(mafMatrix *matrix,const char *name)
 //------------------------------------------------------------------------------
 {
   assert(matrix);
@@ -237,46 +226,12 @@ void mafXMLElement::StoreMatrix(mafMatrix *matrix,const char *name)
 
   mafXMLElement *matrix_node=AppendXMLChild(name);
   matrix_node->WriteXMLText(elements);
+  return MAF_OK;
 }
 
 //------------------------------------------------------------------------------
-void mafXMLElement::StoreObjectVector(mafVector<mafStorable *> *vector,const char *name)
-//------------------------------------------------------------------------------
-{
-  assert(vector);
-  assert(name);
-
-  // create sub node for storing the vector
-  mafXMLElement *vector_node = AppendXMLChild(name);
-  vector_node->SetXMLAttribute("Size",mafString(vector->GetNumberOfItems()));
-  
-  for (int i=0;i<vector->GetNumberOfItems();i++)
-  {
-    mafStorable *obj=vector->GetItem(i);
-    assert(obj);
-    obj->Store(vector_node);
-  }
-}
-
-//------------------------------------------------------------------------------
-void mafXMLElement::StoreVector3(double comps[3],const char *name)
-//------------------------------------------------------------------------------
-{
-  assert(name);
-
-  // Write all the 3 elements into as a single 3-tupla  
-  mafString elements;
-  for (int i=0;i<3;i++)
-  { 
-    elements << mafString(comps[i]) << " ";
-  }
-
-  mafXMLElement *vector_node=AppendXMLChild(name);
-  vector_node->WriteXMLText(elements);
-}
-
-//------------------------------------------------------------------------------
-void mafXMLElement::StoreVectorN(double *comps,int num,const char *name)
+template <class T>
+void InternalStoreVectorN(mafXMLElement *element,T *comps,int num,const char *name)
 //------------------------------------------------------------------------------
 {
   assert(comps);
@@ -289,10 +244,68 @@ void mafXMLElement::StoreVectorN(double *comps,int num,const char *name)
     elements << mafString(comps[i]) << " ";
   }
 
-  mafXMLElement *vector_node=AppendXMLChild(name);
+  mafXMLElement *vector_node=element->AppendXMLChild(name);
   vector_node->WriteXMLText(elements);
 }
 
+//------------------------------------------------------------------------------
+int mafXMLElement::StoreVectorN(double *comps,int num,const char *name)
+//------------------------------------------------------------------------------
+{
+  InternalStoreVectorN(this,comps,num,name);
+  return MAF_OK;
+}
+
+//------------------------------------------------------------------------------
+int mafXMLElement::StoreVectorN(int *comps,int num,const char *name)
+//------------------------------------------------------------------------------
+{
+  InternalStoreVectorN(this,comps,num,name);
+  return MAF_OK;
+}
+
+//------------------------------------------------------------------------------
+int mafXMLElement::StoreData(const char *data, const int size,const char *name)
+//------------------------------------------------------------------------------
+{
+  // to be implemented
+  return MAF_OK;
+}
+//------------------------------------------------------------------------------
+int mafXMLElement::StoreData16(const short *data, const int size,const char *name)
+//------------------------------------------------------------------------------
+{
+  // to be implemented
+  return MAF_OK;
+}
+//------------------------------------------------------------------------------
+int mafXMLElement::StoreData32(const long *data, const int size,const char *name)
+//------------------------------------------------------------------------------
+{
+  // to be implemented
+  return MAF_OK;
+}
+//------------------------------------------------------------------------------
+int mafXMLElement::RestoreData(char *data, const int size,const char *name)
+//------------------------------------------------------------------------------
+{
+  // to be implemented
+  return MAF_OK;
+}
+//------------------------------------------------------------------------------
+int mafXMLElement::RestoreData16(short *data, const int size,const char *name)
+//------------------------------------------------------------------------------
+{
+  // to be implemented
+  return MAF_OK;
+}
+//------------------------------------------------------------------------------
+int mafXMLElement::RestoreData32(long *data, const int size,const char *name)
+//------------------------------------------------------------------------------
+{
+  // to be implemented
+  return MAF_OK;
+}
 //------------------------------------------------------------------------------
 int mafXMLElement::RestoreMatrix(mafMatrix *matrix,const char *name)
 //------------------------------------------------------------------------------
@@ -306,7 +319,7 @@ int mafXMLElement::RestoreMatrix(mafMatrix *matrix,const char *name)
   {
     double *elem=*matrix->GetElements();
     if (subnode->ParseData(elem,16)==16)
-      return 0; 
+      return MAF_OK; 
 
     mafWarningMacro("XML Parse Error while parsing <"<<GetName()<<"> element: wrong number of fields inside nested XML element <"<<name<<">" );
   }
@@ -315,28 +328,44 @@ int mafXMLElement::RestoreMatrix(mafMatrix *matrix,const char *name)
     mafWarningMacro("XML Parse Error while parsing <"<<GetName()<<"> element: cannot find nested XML element <"<<name<<">" );
   }
 
-  return -1;
+  return MAF_ERROR;
+}
+
+//------------------------------------------------------------------------------
+template <class T>
+int InternalRestoreVectorN(mafXMLElement *element,T *comps,unsigned int num,const char *name)
+//------------------------------------------------------------------------------
+{
+  assert(comps);
+  assert(name);
+
+  mafXMLElement *subnode=element->FindNestedXMLElement(name);
+  if (subnode)
+  {
+    if (subnode->ParseData(comps,num)==num)
+      return MAF_OK;
+
+    mafWarningMacro("XML Parse Error while parsing <"<<element->GetName()<<"> element: wrong number of fields inside nested XML element <"<<name<<">" );
+  }
+  else
+  {
+    mafWarningMacro("XML Parse Error while parsing <"<<element->GetName()<<"> element: cannot find nested XML element <"<<name<<">" );
+  }
+  return MAF_ERROR;
 }
 
 //------------------------------------------------------------------------------
 int mafXMLElement::RestoreVectorN(double *comps,unsigned int num,const char *name)
 //------------------------------------------------------------------------------
 {
-  assert(comps);
+  return InternalRestoreVectorN(this,comps,num,name);
+}
 
-  mafXMLElement *subnode=FindNestedXMLElement(name);
-  if (subnode)
-  {
-    if (subnode->ParseData(comps,num)==num)
-      return 0;
-
-    mafWarningMacro("XML Parse Error while parsing <"<<GetName()<<"> element: wrong number of fields inside nested XML element <"<<name<<">" );
-  }
-  else
-  {
-    mafWarningMacro("XML Parse Error while parsing <"<<GetName()<<"> element: cannot find nested XML element <"<<name<<">" );
-  }
-  return -1;
+//------------------------------------------------------------------------------
+int mafXMLElement::RestoreVectorN(int *comps,unsigned int num,const char *name)
+//------------------------------------------------------------------------------
+{
+  return InternalRestoreVectorN(this,comps,num,name);
 }
 
 //------------------------------------------------------------------------------
@@ -348,14 +377,14 @@ int mafXMLElement::RestoreText(mafString &buffer,const char *name)
   if (subnode)
   {
     buffer.Copy(mafXMLString(subnode->GetXMLElement()->getTextContent()));    
-    return 0;
+    return MAF_OK;
   }
   else
   {
     mafWarningMacro("XML Parse Error while parsing <"<<GetName()<<"> element: cannot find XML element <"<<name<<">" );
   }
   
-  return -1;
+  return MAF_ERROR;
 }
 
 //------------------------------------------------------------------------------
@@ -367,47 +396,9 @@ int mafXMLElement::RestoreText(char *&buffer,const char *name)
   if (!RestoreText(tmp,name))
   {
     buffer=tmp.Duplicate();
-    return 0;
+    return MAF_OK;
   }
   
-  return -1;
+  return MAF_ERROR;
 }
 
-//------------------------------------------------------------------------------
-int mafXMLElement::RestoreDouble(double &value,const char *name)
-//------------------------------------------------------------------------------
-{
-  assert(name);
-  mafXMLElement *subnode=FindNestedXMLElement(name);
-  if (subnode)
-  {
-    if (subnode->ParseData(&value,1)==1)     
-      return 0;
-
-    mafWarningMacro("XML Parse Error while parsing <"<<GetName()<<"> element: error parsing nested XML element <"<<name<<">" );
-  }
-  else
-  {
-    mafWarningMacro("XML Parse Error while parsing <"<<GetName()<<"> element: cannot find nested XML element <"<<name<<">" );
-  }
-  
-  return -1;
-}
-
-//------------------------------------------------------------------------------
-int mafXMLElement::RestoreInteger(int &value,const char *name)
-//------------------------------------------------------------------------------
-{
-  assert(name);
-  mafXMLElement *subnode=FindNestedXMLElement(name);
-  if (subnode)
-  {
-    if (subnode->ParseData(&value,1)==1)     
-      return 0;
-
-    mafWarningMacro("XML Parse Error while parsing <"<<GetName()<<"> element: error parsing nested XML element <"<<name<<">" );
-  }  
-
-  mafWarningMacro("XML Parse Error while parsing <"<<GetName()<<"> element: cannot find XML nested element <"<<name<<">" );
-  return -1;
-}

@@ -1,74 +1,188 @@
 #include "mafObject.h"
 #include "mafStorable.h"
 #include "mafXMLStorage.h"
-
+#include "mafStorageElement.h"
+#include "mafCoreFactory.h"
+#include "mafIndent.h"
 #include <iostream>
 
-class mafStorableTestObject: public mafObject, public mafStorable
-{
-public:
-  mafTypeMacro(mafStorableTestObject,mafObject);
-  mafStorableTestObject() {}
-  void Print(std::ostream &out) {out<<"Foo";}
-};
-
-mafCxxTypeMacro(mafStorableTestObject);
-
-class mafDummyObject: public mafObject
+//------------------------------------------------------------------------------
+class mafDummyObject: public mafObject, public mafStorable
+//------------------------------------------------------------------------------
 {
 public:
   mafTypeMacro(mafDummyObject,mafObject);
+  void Print(std::ostream &os,const int tabs=0) {Superclass::Print(os,tabs);os<<mafIndent(tabs)<<"Name: \""<<m_Name.GetCStr()<<"\""<<std::endl;}
   mafDummyObject() {}
-  void Print(std::ostream &out) {out<<"Dummy";}
+  virtual int InternalStore(mafStorageElement *element){return element->StoreText(m_Name,"Name");}
+  virtual int InternalRestore(mafStorageElement *element){return element->RestoreText(m_Name,"Name");}
+  mafString m_Name;
 };
 
+//------------------------------------------------------------------------------
 mafCxxTypeMacro(mafDummyObject);
+//------------------------------------------------------------------------------
 
-int main()
+//------------------------------------------------------------------------------
+class mafStorableTestObject: public mafObject, public mafStorable
+//------------------------------------------------------------------------------
 {
+public:
+  mafTypeMacro(mafStorableTestObject,mafObject);
+  void Print(std::ostream &os,const int tabs=0);
+  mafStorableTestObject();
+  ~mafStorableTestObject() {}
+  virtual int InternalStore(mafStorageElement *parent);
+  virtual int InternalRestore(mafStorageElement *node);
+  double m_FValue;
+  int m_IValue;
+  double m_FVector[4];
+  int m_IVector[4];
+  mafString m_Text;
+  mafDummyObject *m_Dummy;
+  // char *CData8;
+  // short *CData16;
+  // long *CData32;
+};
+
+//------------------------------------------------------------------------------
+mafCxxTypeMacro(mafStorableTestObject);
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+mafStorableTestObject::mafStorableTestObject()
+//------------------------------------------------------------------------------
+{
+  m_FValue=0;
+  m_IValue=0;
+  m_Dummy=NULL;
+  m_FVector[0]=m_FVector[1]=m_FVector[2]=m_FVector[3]=0;
+  m_IVector[0]=m_IVector[1]=m_IVector[2]=m_IVector[3]=0;
+}
+//------------------------------------------------------------------------------
+// example of serialization code
+int mafStorableTestObject::InternalStore(mafStorageElement *element)
+//------------------------------------------------------------------------------
+{
+  element->StoreDouble(m_FValue);
+  element->StoreInteger(m_IValue);
+  element->StoreVectorN(m_FVector,4,"FVector");
+  element->StoreVectorN(m_IVector,4,"IVector");
+  element->StoreText(m_Text);
+  element->StoreObject(m_Dummy,"Dummy");
+  return MAF_OK;
+}
+
+//------------------------------------------------------------------------------
+// example of deserialization code
+int mafStorableTestObject::InternalRestore(mafStorageElement *element)
+//------------------------------------------------------------------------------
+{
+  if (
+    element->RestoreDouble(m_FValue)||
+    element->RestoreInteger(m_IValue)||
+    element->RestoreVectorN(m_FVector,4,"FVector")||
+    element->RestoreVectorN(m_IVector,4,"IVector")||
+    element->RestoreText(m_Text)||
+    (m_Dummy=dynamic_cast<mafDummyObject *>(element->RestoreObject("Dummy")))==NULL)
+    return MAF_ERROR;
+
+  return MAF_OK;
+}
+
+//------------------------------------------------------------------------------
+// object dubuf printing to output stream
+void mafStorableTestObject::Print(std::ostream &os,const int tabs)
+//------------------------------------------------------------------------------
+{
+  Superclass::Print(os,tabs);
+  mafIndent indent(tabs);
+  os<<indent<<"FValue: "<<m_FValue<<std::endl;
+  os<<indent<<"IValue: "<<m_IValue<<std::endl;
+  os<<indent<<"FVector: {"<<m_FVector[0]<<","<<m_FVector[1]<<","<<m_FVector[2]<<","<<m_FVector[3]<<"}"<<std::endl;
+  os<<indent<<"IVector: {"<<m_IVector[0]<<","<<m_IVector[1]<<","<<m_IVector[2]<<","<<m_IVector[3]<<"}"<<std::endl;
+  os<<indent<<"Text: \""<<m_Text.GetCStr()<<"\""<<std::endl;
+  os<<indent<<"Dummy Object:"<<std::endl;
+  m_Dummy->Print(os,indent.GetNextIndent());
+}
+//------------------------------------------------------------------------------
+int main()
+//------------------------------------------------------------------------------
+{
+  mafCoreFactory::Initialize();
+  mafPlugObject<mafDummyObject>("Dummy Object");
 
   mafStorableTestObject foo;
+  
   mafDummyObject dummy;
+  dummy.m_Name = "myDummyObject";
   
+  foo.m_FValue=1.5;
+  foo.m_IValue=15;
+  foo.m_FVector[0]=1.0;
+  foo.m_FVector[1]=1.1;
+  foo.m_FVector[2]=1.2;
+  foo.m_FVector[3]=1.3;
+  
+  foo.m_IVector[0]=10;
+  foo.m_IVector[1]=11;
+  foo.m_IVector[2]=12;
+  foo.m_IVector[3]=13;
+
+  foo.m_Text="Saved String";
+
+  foo.m_Dummy=&dummy;
+
   foo.Print(std::cerr);
-  std::cout<<" = "<<foo.GetTypeName()<<std::endl;
-
-  dummy.Print(std::cerr);
-  std::cout<<" = "<<dummy.GetTypeName()<<std::endl;
   
-  MAF_TEST(foo.IsA("mafStorableTestObject"));
-  MAF_TEST(foo.IsA(mafObject::GetStaticTypeId()));
-  MAF_TEST(foo.IsA("mafObject"));
-  MAF_TEST(foo.IsA(mafObject::GetStaticTypeId()));
-  MAF_TEST(!foo.IsA(dummy.GetTypeId()));
-  MAF_TEST(!foo.IsA(dummy.GetTypeName()));
-  MAF_TEST(!dummy.IsA(mafStorableTestObject::GetStaticTypeId()));
-  MAF_TEST(!dummy.IsA(mafStorableTestObject::GetStaticTypeName()));
-  MAF_TEST(dummy.GetStaticTypeId()==dummy.GetTypeId());
-  MAF_TEST(dummy.GetStaticTypeId()==dummy.GetTypeId());
+  mafXMLStorage storage;
+  storage.SetFileName("testfile.xml");
+  storage.SetFileType("TestXML");
+  storage.SetVersion("1.745");
 
-  mafObject *new_dummy=dummy.NewInstance();
-  mafObject *new_foo=foo.NewInstance();
+  mafStorable *storable=mafStorable::SafeDownCast(&foo);
+  MAF_TEST(storable!=NULL);
 
-  MAF_TEST(new_dummy);
-  MAF_TEST(new_foo);
-  MAF_TEST(new_foo->IsA(foo.GetStaticTypeId()));
-  MAF_TEST(new_foo->IsA(foo.GetStaticTypeName()));
-  MAF_TEST(new_foo->IsA(mafStorableTestObject::GetStaticTypeId()));
-  MAF_TEST(new_foo->IsA(mafStorableTestObject::GetStaticTypeName()));
-  MAF_TEST(!new_foo->IsA(new_dummy->GetTypeId()));
-  MAF_TEST(!new_foo->IsA(new_dummy->GetTypeName()));
-  MAF_TEST(!new_dummy->IsA(new_foo->GetTypeId()));
-  MAF_TEST(!new_dummy->IsA(new_foo->GetTypeName()));
-  MAF_TEST(new_dummy->IsA(new_foo->GetStaticTypeId())); // they are both mafObject * variables
-  MAF_TEST(new_dummy->IsA(new_foo->GetStaticTypeName()));
+  storage.SetRoot(storable);
 
-  MAF_TEST(mafStorableTestObject::SafeDownCast(new_dummy)==NULL);
+  int ret=storage.Store();
+  MAF_TEST(ret==MAF_OK);
 
-  mafDummyObject* tmp_dummy = mafDummyObject::SafeDownCast(new_dummy);
+  mafXMLStorage restore;
+  restore.SetFileName("testfile.xml");
+  restore.SetFileType("TestXML");
+  restore.SetVersion("1.745");
 
-  MAF_TEST(tmp_dummy!=NULL);
+  mafStorableTestObject new_foo;
+  restore.SetRoot(&new_foo);
+  ret=restore.Restore();
 
+  MAF_TEST(ret==MAF_OK);
+
+  mafObject *root=restore.GetRoot()->CastToObject();
+  MAF_TEST(root==&new_foo);
+
+  std::cerr<<"*** Restored object ***\n";  
+  new_foo.Print(std::cerr);
+
+  MAF_TEST(new_foo.m_FValue==1.5);
+  MAF_TEST(new_foo.m_IValue==15);
+  MAF_TEST(new_foo.m_FVector[0]==1.0);
+  MAF_TEST(new_foo.m_FVector[1]==1.1);
+  MAF_TEST(new_foo.m_FVector[2]==1.2);
+  MAF_TEST(new_foo.m_FVector[3]==1.3);
+  
+  MAF_TEST(new_foo.m_IVector[0]==10);
+  MAF_TEST(new_foo.m_IVector[1]==11);
+  MAF_TEST(new_foo.m_IVector[2]==12);
+  MAF_TEST(new_foo.m_IVector[3]==13);
+
+  MAF_TEST(new_foo.m_Text=="Saved String");
+
+  MAF_TEST(new_foo.m_Dummy!=NULL);
+  MAF_TEST(new_foo.m_Dummy->IsType(mafDummyObject))
+  MAF_TEST(new_foo.m_Dummy->m_Name == "myDummyObject");
+  
   std::cout<<"Test completed successfully!"<<std::endl;
 
   return MAF_OK;

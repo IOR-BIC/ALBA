@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-29 18:00:28 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-01-10 00:18:07 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -20,63 +20,15 @@
 #include <sstream>
 // Xerces-C specific
 #include "mmuXMLDOM.h"
-//#include <xercesc/dom/DOM.hpp>
-//#include <xercesc/util/PlatformUtils.hpp>
-//#include <xercesc/util/XMLString.hpp>
-//#include <xercesc/framework/LocalFileFormatTarget.hpp>
-//#include <xercesc/dom/impl/DOMWriterImpl.hpp>
-//#include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/framework/LocalFileInputSource.hpp>
 // required by error handlers
-#include <xercesc/dom/DOMErrorHandler.hpp>
-#include <xercesc/dom/DOMError.hpp>
+//#include <xercesc/dom/DOMErrorHandler.hpp>
+//#include <xercesc/dom/DOMError.hpp>
 #include <xercesc/util/XercesDefs.hpp>
 #include <xercesc/sax/ErrorHandler.hpp>
 #include <xercesc/sax/SAXParseException.hpp>
 
 #include <assert.h>
-
-//------------------------------------------------------------------------------
-// mmuDOMPrintErrorHandler
-//------------------------------------------------------------------------------
-/** Utility class to catch XML error rised while working with DOM */
-class mmuDOMPrintErrorHandler : public DOMErrorHandler
-{
-public:
-    mmuDOMPrintErrorHandler() {};
-    ~mmuDOMPrintErrorHandler() {};
-
-    /** @name The error handler interface */
-    bool handleError(const DOMError& domError);
-    void resetErrors(){};
-
-private :
-    /* Unimplemented constructors and operators */
-    mmuDOMPrintErrorHandler(const DOMErrorHandler&);
-    void operator=(const DOMErrorHandler&);
-
-};
-
-//------------------------------------------------------------------------------
-bool mmuDOMPrintErrorHandler::handleError(const DOMError &domError)
-//------------------------------------------------------------------------------
-{
-  mafString err_msg("XML Error: ");
-  err_msg<<mafXMLString(domError.getMessage());
-  
-  //
-  // Display whatever error message passed from the serializer
-  //
-  if (domError.getSeverity() == DOMError::DOM_SEVERITY_WARNING)
-    mafLogMessage(err_msg); // XML warning
-  else if (domError.getSeverity() == DOMError::DOM_SEVERITY_ERROR)
-    mafWarningMessage(err_msg); // XML error 
-  else
-    mafErrorMessage(err_msg); // XML fatal error
-  // Instructs the serializer to continue serialization if possible.
-
-  return true;
-}
 
 //------------------------------------------------------------------------------
 // mmuDOMTreeErrorReporter
@@ -231,20 +183,13 @@ int mafXMLStorage::InternalStore()
       m_DOM->m_XMLTarget = new LocalFileFormatTarget(filename);
 
       // set user specified end of line sequence and output encoding
-      m_DOM->m_XMLSerializer->setNewLine( mafXMLString("\n") );
+      m_DOM->m_XMLSerializer->setNewLine( mafXMLString("\r") );
 
-      // set feature if the serializer supports the feature/mode
-      if ( m_DOM->m_XMLSerializer->canSetFeature(XMLUni::fgDOMWRTSplitCdataSections, false) )
-  	    m_DOM->m_XMLSerializer->setFeature(XMLUni::fgDOMWRTSplitCdataSections, false);
-
-      if ( m_DOM->m_XMLSerializer->canSetFeature(XMLUni::fgDOMWRTDiscardDefaultContent, false) )
-  	    m_DOM->m_XMLSerializer->setFeature(XMLUni::fgDOMWRTDiscardDefaultContent, false);
-
-      if ( m_DOM->m_XMLSerializer->canSetFeature(XMLUni::fgDOMWRTFormatPrettyPrint, true) )
-  	    m_DOM->m_XMLSerializer->setFeature(XMLUni::fgDOMWRTFormatPrettyPrint, true);
-
-      if ( m_DOM->m_XMLSerializer->canSetFeature(XMLUni::fgDOMWRTBOM, false) )
-  	    m_DOM->m_XMLSerializer->setFeature(XMLUni::fgDOMWRTBOM, false);
+      // set serializer features 
+ 	    m_DOM->m_XMLSerializer->setFeature(XMLUni::fgDOMWRTSplitCdataSections, false);
+  	  m_DOM->m_XMLSerializer->setFeature(XMLUni::fgDOMWRTDiscardDefaultContent, false);
+  	  m_DOM->m_XMLSerializer->setFeature(XMLUni::fgDOMWRTFormatPrettyPrint, true);
+  	  m_DOM->m_XMLSerializer->setFeature(XMLUni::fgDOMWRTBOM, false);
 
       try
       {
@@ -259,12 +204,12 @@ int mafXMLStorage::InternalStore()
 	        m_DOM->m_XMLDoc->setVersion( mafXMLString("1.0") );
 
           // extract root element and wrap it with an mafXMLElement object
-          XERCES_CPP_NAMESPACE::DOMElement *root = m_DOM->m_XMLDoc->getDocumentElement();
+          DOMElement *root = m_DOM->m_XMLDoc->getDocumentElement();
           assert(root);
           m_RootElement = new mafXMLElement(root,NULL,this);
 
           // attach version attribute to the root node
-          ((mafXMLElement *)m_RootElement)->SetXMLAttribute("Version",m_Version);
+          m_RootElement->SetAttribute("Version",m_Version);
         
           // call Store function of the m_Root object. The root is passed
           // as parent the DOM root element. A tree root is usually a special
@@ -381,8 +326,25 @@ int mafXMLStorage::InternalRestore()
           assert(root);
           m_RootElement = new mafXMLElement(root,NULL,this);
 
-          // Start tree restoring from root node
-          m_Root->Restore(m_RootElement);
+          mafString doc_version;
+          if (m_RootElement->GetAttribute("Version",doc_version))
+          {
+            double doc_version_f=atof(doc_version);
+            double my_version_f=atof(m_Version);
+            
+            if (my_version_f<=doc_version_f)
+            {
+              // Start tree restoring from root node
+              if (m_Root->Restore(m_RootElement)!=MAF_OK)
+                errorCode=6;
+            }
+            else
+            {
+              mafErrorMacro("XML parsing error: wrong file version ("<<doc_version<<"), should be > "<<m_Version);
+              errorCode=7;
+            }
+          }
+          
 
           // destroy the root XML element
           cppDEL (m_RootElement);

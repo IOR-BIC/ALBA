@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLString.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-29 18:00:28 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-01-10 00:18:08 $
+  Version:   $Revision: 1.4 $
   Authors:   Rick Parrish (rfmobile@swbell.net) adapted by Marco Petrone (CINECA)
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,6 +13,7 @@
 #ifndef __mafXMLString_h__
 #define __mafXMLString_h__
 
+#include "mafConfigure.h"
 #include <xercesc/util/XMLString.hpp>
 
 #ifdef XERCES_CPP_NAMESPACE_USE
@@ -25,7 +26,7 @@ XERCES_CPP_NAMESPACE_USE
   adapted from example code "class XercesString" found in articles "Make the most of Xerces-C++"
   by Rick Parrish (rfmobile@swbell.net) that can be found at "www.ibm.com/developerworks/xml".
 */
-class mafXMLString
+class MAF_EXPORT mafXMLString
 {
 public:
 	mafXMLString() : m_WStr(0L) { };

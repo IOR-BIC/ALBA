@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorable.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-27 18:22:25 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-01-10 00:18:06 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -11,20 +11,49 @@
 =========================================================================*/
 
 #include "mafStorable.h"
-#include "mafStorageElement.h"
-#include <assert.h>
-#include "stdio.h"
+#include "mafObject.h"
 
 //------------------------------------------------------------------------------
-void mafStorable::Store(mafStorageElement *parent)
+int mafStorable::Store(mafStorageElement *parent)
 //------------------------------------------------------------------------------
 {
-  InternalStore(parent);
+  return InternalStore(parent);
 }
 
 //------------------------------------------------------------------------------
-int mafStorable::Restore(mafStorageElement *node)
+int mafStorable::Restore(mafStorageElement *element)
 //------------------------------------------------------------------------------
 {
-  return InternalRestore(node);
+  return InternalRestore(element);
+}
+
+//------------------------------------------------------------------------------
+mafStorable* mafStorable::SafeDownCast(mafObject *o)
+//------------------------------------------------------------------------------
+{
+  try 
+  {
+    return dynamic_cast<mafStorable *>(o);
+  } 
+  
+  catch (std::bad_cast) 
+  { 
+    return NULL;
+  } 
+}
+
+//------------------------------------------------------------------------------
+mafObject *mafStorable::CastToObject()
+//------------------------------------------------------------------------------
+{
+  try 
+  {
+    return dynamic_cast<mafObject *>(this);
+  } 
+  
+  catch (std::bad_cast) 
+  { 
+    return NULL;
+  }
+
 }
