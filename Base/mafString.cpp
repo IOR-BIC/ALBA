@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-10 06:59:18 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-11-11 09:12:42 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,6 +14,8 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <assert.h>
+
 
 //----------------------------------------------------------------------------
 mafString::~mafString()
@@ -21,8 +23,10 @@ mafString::~mafString()
 {
   if (this->m_CStr)
   {
-    delete this->m_CStr;
-    this->m_CStr=NULL;
+    if (m_Size>0)
+      delete m_CStr;
+
+    m_CStr=NULL;
   }
 }
 
@@ -44,8 +48,8 @@ mafString::mafString(const mafString& src)
 mafString::mafString(const char *src)
 //----------------------------------------------------------------------------
 {
-  this->Initialize();
-  this->Copy(src);
+  m_CStr = (char *)src; // don't worry it won't be overwritten!
+  m_Size = 0; // just to be sure to not overwrite... 
 }
 //----------------------------------------------------------------------------
 mafString::mafString(double num)
@@ -62,6 +66,15 @@ const mafID mafString::Length()
 //----------------------------------------------------------------------------
 {
   return Length(this->m_CStr);
+}
+
+//----------------------------------------------------------------------------
+void mafString::Set(const char *a, bool release)
+//----------------------------------------------------------------------------
+{
+  SetSize(0);
+  m_CStr = (char *)a;
+  m_Size = release?Length(a)+1:0;
 }
 
 //----------------------------------------------------------------------------
@@ -91,7 +104,7 @@ void mafString::Copy(char* dest, const char* src)
   }
   if ( !src )
   {
-    *dest = 0;
+    *dest = '\0';
     return;
   }
   strcpy(dest, src);
@@ -141,12 +154,12 @@ int mafString::Compare(const char* str1, const char* str2)
 //----------------------------------------------------------------------------
 // Description:
 // Check if the first string starts with the second one.
-int mafString::StartsWith(const char* str1, const char* str2)
+bool mafString::StartsWith(const char* str1, const char* str2)
 //----------------------------------------------------------------------------
 {
   if ( !str1 || !str2 || strlen(str1) < strlen(str2) )
   {
-    return 0;
+    return false;
   }
   return !strncmp(str1, str2, strlen(str2));  
 }
@@ -154,13 +167,13 @@ int mafString::StartsWith(const char* str1, const char* str2)
 //----------------------------------------------------------------------------
 // Description:
 // Check if the first string starts with the second one.
-int mafString::EndsWith(const char* str1, const char* str2)
+bool mafString::EndsWith(const char* str1, const char* str2)
 //----------------------------------------------------------------------------
 {
   if ( !str1 || !str2 || strlen(str1) < strlen(str2) )
-    {
-    return 0;
-    }
+  {
+    return false;
+  }
   return !strncmp(str1 + (strlen(str1)-strlen(str2)), str2, strlen(str2));
 }
 
@@ -179,7 +192,7 @@ char* mafString::Append(const char* str1, const char* str2)
     return NULL;
   }
 
-  newstr[0] = 0;
+  newstr[0] = '\0';
   if ( str1 )
   {
     strcat(newstr, str1);
@@ -193,14 +206,14 @@ char* mafString::Append(const char* str1, const char* str2)
   return newstr;
 }
 //----------------------------------------------------------------------------
-void mafString::Duplicate(char * &store,const char *src)
+void mafString::Duplicate(char * &store,const char *src,bool release)
 //----------------------------------------------------------------------------
 {
   // Avoid to relocate memory if not necessary
-  if ( store && src && (!strcmp(store,src))) {return;}
+  //if ( store && src && (!strcmp(store,src))) {return;}
    
   // release old memory
-  if (store) { delete [] store; }
+  if (store&&release) { delete [] store; }
 
   // allocate new memory and copy the second string's content
   if (src)
@@ -223,9 +236,9 @@ void mafString::Copy(const char* src)
   if (src)
   {
     // If the available memory is not sufficient, relocate!
-    if (Length(src)>=this->Size)
+    if (Length(src)>=this->m_Size)
     {
-      this->Duplicate(this->m_CStr,src);
+      this->Duplicate(this->m_CStr,src,m_Size>0);
     }
     else
     {
@@ -246,9 +259,18 @@ void mafString::NCopy(const char* src,int n)
   }
   else
   {
+    // release memory
     this->SetSize(0);
   }
 }
+
+//----------------------------------------------------------------------------
+int mafString::SetMaxLength(mafID len)
+//----------------------------------------------------------------------------
+{
+  return (len>=m_Size)?SetSize(len+1):0;
+}
+
 
 //----------------------------------------------------------------------------
 int mafString::SetSize(mafID size)
@@ -265,7 +287,7 @@ int mafString::SetSize(mafID size)
   {
     // allocate new memory
     tmp=new char[size];
-
+    *tmp='\0';
     if (!tmp)
     {
       //Cannot allocate memory
@@ -275,7 +297,7 @@ int mafString::SetSize(mafID size)
     // copy old contents
     if (this->m_CStr)
     {
-      if (size<this->Size)
+      if (size<this->m_Size)
       {
         strncpy(tmp,this->m_CStr,size-1);
       }
@@ -287,14 +309,14 @@ int mafString::SetSize(mafID size)
   }
 
   // free old memory if present
-  if (this->m_CStr)
+  if (this->m_CStr&&m_Size>0)
   {
     delete [] this->m_CStr;
   }
 
   // store new memory pointer and new memory size
-  this->m_CStr=tmp;
-  this->Size=size;
+  m_CStr=tmp;
+  m_Size=size;
 
   return 0;
 }
@@ -309,35 +331,13 @@ mafString &mafString::Append(const char* str)
   }
 
   unsigned long newsize = Length(m_CStr) + Length(str)+1;
-  if (newsize>Size)
+
+  if (SetMaxLength(newsize))
   {
-    char *newstr = new char[newsize];
-    Size = newsize;
-
-    if ( !newstr )
-    {
-      return *this;
-    }
-
-    newstr[0] = 0;
-    if ( m_CStr )
-    {
-      strcat(newstr, m_CStr);
-    }
-
-    if ( str )
-    {
-      strcat(newstr, str);
-    }
-
-    if (m_CStr)
-    {
-      delete [] m_CStr;
-    }
-
-    m_CStr=(char *)newstr;
+    assert(1);
   }
-  else
+
+  if ( str )
   {
     strcat(m_CStr, str);
   }
@@ -380,6 +380,7 @@ void mafString::Erase(int start,int end)
 //----------------------------------------------------------------------------
 {
   int len=this->Length();
+  SetMaxLength(len); // force relocating memory in case of m_Size>0
 
   if (end==-1||end>=len)
     end=len-1;
@@ -493,16 +494,39 @@ void mafString::ExtractPathName()
   {
     this->Set("");
   }
-
 }
 
 //----------------------------------------------------------------------------
 const bool mafString::operator==(const char *src)
 //----------------------------------------------------------------------------
 {
-  return Equals(this->m_CStr,src)!=0;
+  return Equals(this->m_CStr,src);
 }
 
+//----------------------------------------------------------------------------
+const bool mafString::operator<(const char *a)
+//----------------------------------------------------------------------------
+{
+  return Compare(a)<0;
+}
+//----------------------------------------------------------------------------
+const bool mafString::operator>(const char *a)
+//----------------------------------------------------------------------------
+{
+  return Compare(a)>0;
+}
+//----------------------------------------------------------------------------
+const bool mafString::operator<=(const char *a)
+//----------------------------------------------------------------------------
+{
+  return Compare(a)<=0;
+}
+//----------------------------------------------------------------------------
+const bool mafString::operator>=(const char *a)
+//----------------------------------------------------------------------------
+{
+  return Compare(a)>=0;
+}
 //----------------------------------------------------------------------------
 int mafString::FindChr(const int c)
 //----------------------------------------------------------------------------
@@ -520,6 +544,17 @@ int mafString::FindLastChr(const int c)
 void mafString::Printf(const char *format, ...)
 //----------------------------------------------------------------------------
 {
-  SetSize(1024);
-  MAF_PRINT_MACRO(format);
+  SetSize(0); // release old memory
+  SetSize(2048); // Preallocate space. Sorry, maximum output string size is 2048...
+  MAF_PRINT_MACRO(format,m_CStr,2048);
+  Set(Duplicate(),true); // release extra memory
+}
+
+//----------------------------------------------------------------------------
+void mafString::NPrintf(unsigned long size, const char *format, ...)
+//----------------------------------------------------------------------------
+{
+  SetSize(0); // release old memory
+  SetSize(size); // Pre-allocate space.
+  MAF_PRINT_MACRO(format,m_CStr,size);
 }

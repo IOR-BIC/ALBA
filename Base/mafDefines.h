@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-10 06:59:16 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-11-11 09:12:41 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -37,7 +37,6 @@ enum {MAF_STRING_BUFFER_SIZE=2048};
 //------------------------------------------------------------------------------
 // Global Variables
 //------------------------------------------------------------------------------
-char mafGlobalStringBuffer[MAF_STRING_BUFFER_SIZE];
 
 //------------------------------------------------------------------------------
 // Global Functions

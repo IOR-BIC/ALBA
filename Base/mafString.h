@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-10 06:59:18 $
-  Version:   $Revision: 1.1 $
-  Authors:   Marco Petrone
+  Date:      $Date: 2004-11-11 09:12:42 $
+  Version:   $Revision: 1.2 $
+  Authors:   originally based on vtkString (www.vtk.org), rewritten Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
@@ -16,11 +16,15 @@
 #include "mafDefines.h"
 #include <string.h>
 
-/** mafString - performs common string operations.
+/** mafString - performs common string operations on c-strings.
   mafString is an implementation of string which operates on a traditional
-  c-string internally stored. At each moment this string can be retrived with
+  c-string internally stored. At each moment this string can be retrieved with
   GetCStr(). The memory of this m_CStr is automatically garbaged. Originally based
-  on vtkString. */
+  on vtkString. BEWARE, when mafString is assigned to a "const char *" this is simply
+  referenced and not copied, this implies very high performance but can cause invalid
+  memory access: e.g. in case the "const char *" is a function argument. In this case
+  you should explicitly make a copy with Copy() or explicitelly converting with mafString(). 
+  */
 class MAF_EXPORT mafString
 {
 public:
@@ -49,7 +53,8 @@ public:
   /**
     This method makes a duplicate of a c-string similar to C function
     strdup but it uses new to create new string, so you can use
-    delete to remove it. It returns 0 if the input is empty.*/
+    delete to remove it. It returns 0 if the input is empty. This function
+    automatically release old pointed data (if not specified differently)*/
   static char* Duplicate(const char* str);
 
   /**
@@ -60,7 +65,7 @@ public:
     already != NULL, the corresponding memory is released. This is useful
     to automatically manage garbage collection but beware to not provide 
     an uninitialized pointer variable.*/
-  static void Duplicate(char * &store,const char *src);
+  static void Duplicate(char * &store,const char *src,bool release=true);
   
   /**
     Duplicate the string stored inside this object.*/
@@ -68,36 +73,38 @@ public:
  
   /** 
     This static method compare two strings. It is similar to strcmp, but it
-    can handle null pointers.*/
+    can handle null pointers. return 0 if str1 == str2, -1 if str1<str2,
+    1 if str1>str2*/
   static int Compare(const char* str1, const char* str2); 
 
   /** 
     This method compare the given c-string with the one stored inside this object.
-    It is similar to strcmp, but it can handle null pointers.*/
+    It is similar to strcmp, but it can handle null pointers. Return 0 if str equal this,
+    -1 if str > this, 1 if str < this*/
   int Compare(const char* str) { return Compare(m_CStr, str);};
   
   /**
     This static method compare two strings. It is similar to strcmp, but it
     can handle null pointers. Also it only returns C style true or
     false versus compare which returns also which one is greater.*/
-  static int Equals(const char* str1, const char* str2){ return Compare(str1, str2) == 0;}
+  static bool Equals(const char* str1, const char* str2){ return Compare(str1, str2) == 0;}
   
   /**
     This method compare the given c-string with the one stored inside this object.
     It is similar to strcmp, but it can handle null pointers. Also it only
     returns C style true or false versus compare which returns also which
     one is greater.*/
-  int Equals(const char* str) { return Equals(m_CStr, str); };
+  bool Equals(const char* str) { return Equals(m_CStr, str); };
   
   /** Static method to check if the first string starts with the second one.*/
-  static int StartsWith(const char* str1, const char* str2);
+  static bool StartsWith(const char* str1, const char* str2);
   /** Check if this string starts with the given one.*/
-  int StartsWith(const char* str) { return StartsWith(m_CStr, str);}
+  bool StartsWith(const char* str) { return StartsWith(m_CStr, str);}
 
   /** Static method to check if the first string ends with the second one.*/
-  static int EndsWith(const char* str1, const char* str2);
+  static bool EndsWith(const char* str1, const char* str2);
   /** Check if this string ends with the given one.*/
-  int EndsWith(const char* str) { return EndsWith(m_CStr, str);}
+  bool EndsWith(const char* str) { return EndsWith(m_CStr, str);}
 
   /**
     Append two strings and produce a new one.  The consumer must delete
@@ -155,35 +162,44 @@ public:
   char * GetCStr() {return m_CStr;};
 
   /** return the real memory size allocated for the internal c-string */
-  int GetSize() {return Size;};
+  int GetSize() {return m_Size;};
 
   /**
     Pre-Allocate space for the internal c-string. The memory size is
     is given in terms of string length, that is one more character
-    for the trailing '\0' is allocated.
-    Previous data is retained.
-    All the methods resize this memory when necessary, but to
+    for the trailing '\0' is allocated. Previous data is retained.
+    Memory is reallocated only if requested size is > of existing one.
+    All the mafString methods resize this memory when necessary, but to
     improve performance it's possible to preallocate an enough large
-    memory to store the data preventing reallocation of memory.*/
-  int SetMaxLength(int len) {return SetSize(len+1);};
+    memory to store the data preventing reallocation of memory.
+    Return 0 if OK, -1 in case of relocation problems */
+  int SetMaxLength(mafID len);
 
   /**  return true if empty*/
   static bool IsEmpty(const char *str) { return (str?str[0]=='\0':true);};
   /**  return true if empty*/
   bool IsEmpty() { return IsEmpty(m_CStr);};
 
-  /** Set the string to the specified value*/
-  void Set(const char *a) {*this=a;};
-  void Set(double a) {*this=a;};
+  /** 
+    Set the internal pointer to a give pointer. Second parameter allow 
+    to force the release of the memory */
+  void Set(const char *a, bool release=false);
 
   /** Format given arguments according to format string. Format string format is
       that of vsprintf function */
   void Printf(const char *format, ...);
 
+  /** like Printf but faster (you can specify output string size) */ 
+  void NPrintf(unsigned long size, const char *format, ...);
+
   /** this allows to convert a mafString to const char *. */
   operator const char*() const {return m_CStr;}  
 
   const bool operator==(const char *src);
+  const bool operator<(const char *a);
+  const bool operator>(const char *a);
+  const bool operator<=(const char *a);
+  const bool operator>=(const char *a);
 
   mafString &operator<<(const char *a) {return Append(a);};
 
@@ -195,30 +211,30 @@ public:
   ~mafString();
 protected:
 
-  /** Pre-Allocate space for the internal c-string. */
+  /** Allocate space for the internal c-string. */
   int SetSize(mafID size);
 
-  void Initialize() {m_CStr=NULL;Size=0;};
+  void Initialize() {m_CStr=NULL;m_Size=0;};
 
   char *m_CStr;
-  mafID Size;
+  mafID m_Size;
 };
 
 #ifdef MAF_USE_WX
 /** 
   Macro for formatted printing to string (adapted from wxWidgets IMPLEMENT_LOG_FUNCTION)
   To use it you will need to include wx/wx.h */
-#define MAF_PRINT_MACRO(format,buffer) \
+#define MAF_PRINT_MACRO(format,buffer,size) \
   va_list argptr; \
   va_start(argptr, format); \
-  wxVsnprintf(buffer, sizeof(buffer), format, argptr); \
+  wxVsnprintf(buffer, size, format, argptr); \
   va_end(argptr);
 
 #else MAF_USE_WX // this is less safe since it can't limit output string size
 /** 
   Macro for formatted printing to string (adapted from wxWidgets IMPLEMENT_LOG_FUNCTION)
   To use it you will need to include <stdio.h>, <stdarg.h> and <varargs.h> */
-#define MAF_PRINT_MACRO(format,buffer) \
+#define MAF_PRINT_MACRO(format,buffer,size) \
   va_list argptr; \
   va_start(argptr, format); \
   vsprintf(buffer, format, argptr); \

@@ -1,18 +1,13 @@
 /*=========================================================================
-
-  Program:   Insight Segmentation & Registration Toolkit
+  Program:   Multimod Application Framework
   Module:    $RCSfile: mafDynamicLoader.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-10 06:59:17 $
-  Version:   $Revision: 1.1 $
-
-  Copyright (c) 2002 Insight Consortium. All rights reserved.
-  See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-     PURPOSE.  See the above copyright notices for more information.
-
+  Date:      $Date: 2004-11-11 09:12:41 $
+  Version:   $Revision: 1.2 $
+  Authors:   Based on DynamicLoader (www.itk.org), adapted by Marco Petrone
+==========================================================================
+  Copyright (c) 2001/2005 
+  CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 #include "mafDynamicLoader.h"
 
@@ -22,37 +17,32 @@
 // 3. Windows which uses LoadLibrary
 // 4. Most unix systems which use dlopen (default )
 // Each part of the ifdef contains a complete implementation for
-// the static methods of DynamicLoader.  
+// the static methods of mafDynamicLoader.  
 
-
-// ---------------------------------------------------------------
-// 1. Implementation for HPUX  machines
-#ifdef __hpux
-#define ITKDYNAMICLOADER_DEFINED 1
-#include <dl.h>
-
-namespace itk
-{
 
 //----------------------------------------------------------------------------
-LibHandle 
-DynamicLoader
-::OpenLibrary(const char* libname )
+// 1. Implementation for HPUX  machines
+#ifdef __hpux
+#define MAFDYNAMICLOADER_DEFINED 1
+#include <dl.h>
+
+//----------------------------------------------------------------------------
+LibHandle mafDynamicLoader::OpenLibrary(const char* libname )
+//----------------------------------------------------------------------------
 {
   return shl_load(libname, BIND_DEFERRED | DYNAMIC_PATH, 0L);
 }
 
-int 
-DynamicLoader::
-CloseLibrary(LibHandle lib)
+//----------------------------------------------------------------------------
+int mafDynamicLoader::CloseLibrary(LibHandle lib)
+//----------------------------------------------------------------------------
 {
   return 0;
 }
 
 //----------------------------------------------------------------------------
-void* 
-DynamicLoader
-::GetSymbolAddress(LibHandle lib, const char* sym)
+void* mafDynamicLoader::GetSymbolAddress(LibHandle lib, const char* sym)
+//----------------------------------------------------------------------------
 { 
   void* addr;
   int status;
@@ -62,47 +52,38 @@ DynamicLoader
 }
 
 //----------------------------------------------------------------------------
-const char* 
-DynamicLoader
-::LibPrefix()
+const char* mafDynamicLoader::LibPrefix()
+//----------------------------------------------------------------------------
 { 
   return "lib";
 }
 
 //----------------------------------------------------------------------------
-const char* 
-DynamicLoader
-::LibExtension()
+const char* mafDynamicLoader::LibExtension()
+//----------------------------------------------------------------------------
 {
   return ".sl";
 }
 
 //----------------------------------------------------------------------------
-const char* 
-DynamicLoader
-::LastError()
+const char* mafDynamicLoader::LastError()
+//----------------------------------------------------------------------------
 {
   return 0;
 }
 
-} // end namespace itk
-
 #endif
 
 
-// ---------------------------------------------------------------
+//----------------------------------------------------------------------------
 // 2. Implementation for the Power PC (MAC)
 #ifdef __APPLE__
-#define ITKDYNAMICLOADER_DEFINED 
+#define MAFDYNAMICLOADER_DEFINED 
 #include <mach-o/dyld.h>
 
-namespace itk
-{
-
 //----------------------------------------------------------------------------
-LibHandle 
-DynamicLoader
-::OpenLibrary(const char* libname )
+LibHandle mafDynamicLoader::OpenLibrary(const char* libname )
+//----------------------------------------------------------------------------
 {
   NSObjectFileImageReturnCode rc;
   NSObjectFileImage image;
@@ -112,17 +93,15 @@ DynamicLoader
 }
 
 //----------------------------------------------------------------------------
-int 
-DynamicLoader
-::CloseLibrary(LibHandle lib)
+int mafDynamicLoader::CloseLibrary(LibHandle lib)
+//----------------------------------------------------------------------------
 {
   return 0;
 }
 
 //----------------------------------------------------------------------------
-void* 
-DynamicLoader
-::GetSymbolAddress(LibHandle lib, const char* sym)
+void* mafDynamicLoader::GetSymbolAddress(LibHandle lib, const char* sym)
+//----------------------------------------------------------------------------
 { 
   void *result=0;
   if(NSIsSymbolNameDefined(sym))
@@ -137,86 +116,72 @@ DynamicLoader
 }
 
 //----------------------------------------------------------------------------
-const char* 
-DynamicLoader
-::LibPrefix()
+const char* mafDynamicLoader::LibPrefix()
+//----------------------------------------------------------------------------
 { 
   return "";
 }
 
 //----------------------------------------------------------------------------
-const char* 
-DynamicLoader
-::LibExtension()
+const char* mafDynamicLoader::LibExtension()
+//----------------------------------------------------------------------------
 {
   return ".dylib";
 }
 
 //----------------------------------------------------------------------------
-const char* 
-DynamicLoader
-::LastError()
+const char* mafDynamicLoader::LastError()
+//----------------------------------------------------------------------------
 {
   return 0;
 }
 
-} // end namespace itk
-
 #endif
 
-// ---------------------------------------------------------------
+//----------------------------------------------------------------------------
 // 3. Implementation for Windows win32 code
 #ifdef _WIN32
-#include "itkWindows.h"
-#define ITKDYNAMICLOADER_DEFINED 1
-
-namespace itk
-{
+#include "mafWIN32.h"
+#define MAFDYNAMICLOADER_DEFINED 1
   
 //----------------------------------------------------------------------------
-LibHandle 
-DynamicLoader
-::OpenLibrary(const char* libname )
+LibHandle mafDynamicLoader::OpenLibrary(const char* libname )
+//----------------------------------------------------------------------------
 {
   return LoadLibrary(libname);
 }
 
 //----------------------------------------------------------------------------
-int 
-DynamicLoader
-::CloseLibrary(LibHandle lib)
+int mafDynamicLoader::CloseLibrary(LibHandle lib)
+//----------------------------------------------------------------------------
 {
   return (int)FreeLibrary(lib);
 }
 
 //----------------------------------------------------------------------------
-void* 
-DynamicLoader
-::GetSymbolAddress(LibHandle lib, const char* sym)
+void* mafDynamicLoader::GetSymbolAddress(LibHandle lib, const char* sym)
+//----------------------------------------------------------------------------
 { 
   return (void *)GetProcAddress(lib, sym);
 }
 
 //----------------------------------------------------------------------------
-const char* 
-DynamicLoader
-::LibPrefix()
+const char* mafDynamicLoader::LibPrefix()
+//----------------------------------------------------------------------------
 { 
   return "";
 }
 
 //----------------------------------------------------------------------------
-const char* 
-DynamicLoader
-::LibExtension()
+const char* mafDynamicLoader::LibExtension()
+//----------------------------------------------------------------------------
 {
   return ".dll";
 }
 
 //----------------------------------------------------------------------------
-const char* 
-DynamicLoader
-::LastError()
+const char* mafDynamicLoader::LastError()
+//----------------------------------------------------------------------------
 {
   LPVOID lpMsgBuf;
 
@@ -238,76 +203,63 @@ DynamicLoader
   return str;
 }
 
-} // end namespace itk
-
 #endif
 
 // ---------------------------------------------------------------
 // 4. Implementation for default UNIX machines.
 // if nothing has been defined then use this
-#ifndef ITKDYNAMICLOADER_DEFINED
-#define ITKDYNAMICLOADER_DEFINED
+#ifndef MAFDYNAMICLOADER_DEFINED
+#define MAFDYNAMICLOADER_DEFINED
 // Setup for most unix machines
 #include <dlfcn.h>
-
-namespace itk
-{
   
 //----------------------------------------------------------------------------
-LibHandle 
-DynamicLoader
-::OpenLibrary(const char* libname )
+LibHandle mafDynamicLoader::OpenLibrary(const char* libname )
+//----------------------------------------------------------------------------
 {
   return dlopen(libname, RTLD_LAZY);
 }
 
 //----------------------------------------------------------------------------
-int 
-DynamicLoader
-::CloseLibrary(LibHandle lib)
+int mafDynamicLoader::CloseLibrary(LibHandle lib)
+//----------------------------------------------------------------------------
 {
   if (lib)
-    {
+  {
     return (int)dlclose(lib);
-    }
+  }
   else
-    {
+  {
     return 0;
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
-void* 
-DynamicLoader
-::GetSymbolAddress(LibHandle lib, const char* sym)
+void* mafDynamicLoader::GetSymbolAddress(LibHandle lib, const char* sym)
+//----------------------------------------------------------------------------
 { 
   return dlsym(lib, sym);
 }
 
 //----------------------------------------------------------------------------
-const char* 
-DynamicLoader
-::LibPrefix()
+const char* mafDynamicLoader::LibPrefix()
+//----------------------------------------------------------------------------
 { 
   return "lib";
 }
 
 //----------------------------------------------------------------------------
-const char* 
-DynamicLoader
-::LibExtension()
+const char* mafDynamicLoader::LibExtension()
+//----------------------------------------------------------------------------
 {
   return ".so";
 }
 
 //----------------------------------------------------------------------------
-const char* 
-DynamicLoader
-::LastError()
+const char* mafDynamicLoader::LastError()
+//----------------------------------------------------------------------------
 {
   return dlerror(); 
 }
-
-} // end namespace itk
 
 #endif

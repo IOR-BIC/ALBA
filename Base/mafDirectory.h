@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDirectory.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-10 06:59:16 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-11-11 09:12:41 $
+  Version:   $Revision: 1.2 $
   Authors:   Based on itkDirectory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,6 +26,8 @@
 class MAF_EXPORT mafDirectory : public mafObject
 {
 public:  
+  mafDirectory();
+  ~mafDirectory();
   
   mafTypeMacro(mafDirectory,mafObject);
 
@@ -42,15 +44,11 @@ public:
   const char* GetFile(int index);
 
 protected:
-  mafDirectory();
-  ~mafDirectory();
-
+  std::vector<std::string> m_Files; // Array of Files
+  std::string m_Path;               // Path to Open'ed directory
 private:
   mafDirectory(const mafDirectory&); //purposely not implemented
   void operator=(const mafDirectory&); //purposely not implemented
-
-  std::vector<std::string> m_Files; // Array of Files
-  std::string m_Path;               // Path to Open'ed directory
 }; 
   
 #endif

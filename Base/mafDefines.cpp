@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-10 06:59:16 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-11-11 09:12:41 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -11,34 +11,46 @@
 =========================================================================*/
 
 #include "mafDefines.h"
-
-#include <stdio.h>
-#include <stdarg.h>
-#include <varargs.h>
+#include "mafString.h"
+#include "mafMutexLock.h"
 
 #include <iostream>
 using namespace std;
+
+static mafMutexLock mafLogMutex; 
+static char mafLogBuffer[2048];
 
 //------------------------------------------------------------------------------
 void mafLogMessage(const char *format, ...)
 //------------------------------------------------------------------------------
 {
-  MAF_PRINT_MACRO(format);
+  
+  mafLogMutex.Lock();
+  MAF_PRINT_MACRO(format,mafLogBuffer,sizeof(mafLogBuffer));
 
 #ifdef MAF_USE_WX
-  wxLogMessage(msg);
+  wxLogMessage(mafLogBuffer);
 #else MAF_USE_WX
-  cerr<<"mafGlobalStringBuffer"    
+  cerr << mafLogBuffer;    
 #endif MAF_USE_WX
+  
+  mafLogMutex.Unlock();
 }
 //------------------------------------------------------------------------------
 // open a warning dialog and write a message
 void mafWarningMessage(const char *format, ...)
 //------------------------------------------------------------------------------
 {
-#ifdef MAF_USE_WX
+  mafLogMutex.Lock();
+  MAF_PRINT_MACRO(format,mafLogBuffer,sizeof(mafLogBuffer));
 
+#ifdef MAF_USE_WX
+  //wxMessage(mafLogBuffer);
+#else MAF_USE_WX
+  cerr << "Warning: " << mafLogBuffer;    
 #endif MAF_USE_WX
+  
+  mafLogMutex.Unlock();
 }
 
 //------------------------------------------------------------------------------
@@ -46,9 +58,16 @@ void mafWarningMessage(const char *format, ...)
 void mafErrorMessage(const char *format, ...)
 //------------------------------------------------------------------------------
 {
-#ifdef MAF_USE_WX
+  mafLogMutex.Lock();
+  MAF_PRINT_MACRO(format,mafLogBuffer,sizeof(mafLogBuffer));
 
+#ifdef MAF_USE_WX
+  //wxLogMessage(mafLogBuffer);
+#else MAF_USE_WX
+  cerr << "Error:" << mafLogBuffer;
 #endif MAF_USE_WX
+  
+  mafLogMutex.Unlock();
 }
 
 //------------------------------------------------------------------------------
@@ -56,7 +75,14 @@ void mafErrorMessage(const char *format, ...)
 void mafMessage(const char *format, ...)
 //------------------------------------------------------------------------------
 {
-#ifdef MAF_USE_WX
+  mafLogMutex.Lock();
+  MAF_PRINT_MACRO(format,mafLogBuffer,sizeof(mafLogBuffer));
 
+#ifdef MAF_USE_WX
+  //wxLogMessage(mafLogBuffer);
+#else MAF_USE_WX
+  cerr << mafLogBuffer;
 #endif MAF_USE_WX
+  
+  mafLogMutex.Unlock();
 }
