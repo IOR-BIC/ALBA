@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTimeMap.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-02 00:30:31 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-03-10 12:34:58 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,7 +15,6 @@
 
 #include "mafObject.h"
 #include "mafSmartPointer.h"
-#include "mmuUtility.h"
 #include "mafMTime.h"
 #include <map>
 #include <vector>
@@ -23,7 +22,6 @@
 //------------------------------------------------------------------------------
 // Forward declarations
 //------------------------------------------------------------------------------
-class mafDataSet;
 typedef std::vector<mafTimeStamp> mmuTimeVector;
 
 /** a dynamic associative sorted array of timestamped objects indexed by their "timestamp".
@@ -39,8 +37,8 @@ template <class T>
 class MAF_EXPORT mafTimeMap : public mafObject
 {
 public:
+
   typedef std::map<mafTimeStamp,mafAutoPointer<T> > TimeMap;
-  typedef std::map<mafTimeStamp,mafAutoPointer<T> >::iterator Iterator;
   typedef std::pair<mafTimeStamp,mafAutoPointer<T> > mmuTimePair;
 
   mafTimeMap();  
@@ -53,8 +51,11 @@ public:
   
   /**
     Insert an item to the vector trying to append it, anyway the array is kept sorted.
-    If item's timestamp is <0 set its timestamp to the highest one + 1 */
+     */
   void AppendItem(T *m);
+
+  /** append item setting its timestamp to the highest one + 1 */
+  void AppendAndSetItem(T *m);
 
    /**
     Insert an item to the vector trying to prepend it, anyway the array is kept sorted.
@@ -69,10 +70,10 @@ public:
   int InsertItem(T *item);
 
   /** Find an item index given its pointer*/
-  Iterator FindItem(T *m);
+  mafTimeMap<T>::TimeMap::iterator FindItem(T *m);
 
   /** Remove an item given its iterator */
-  void RemoveItem(Iterator it);
+  void RemoveItem(mafTimeMap<T>::TimeMap::iterator it);
 
   /** Remove an item given its index*/
   int RemoveItem(int idx);
@@ -93,7 +94,7 @@ public:
   void GetTimeStamps(mafTimeStamp *&kframes);
   
   /** Return the number of ITEMS stored in this object*/
-  int GetNumberOfItems() {return m_TimeMap.size();};
+  int GetNumberOfItems() const {return m_TimeMap.size();};
   
   /** Set/Get the Current time for this object*/
   //mafTimeStamp GetCurrentTime() {return m_CurrentTime;}
@@ -111,19 +112,19 @@ public:
   bool Equals(mafTimeMap *vmat);
 
   /** Find the item with the timestamp nearest to t*/
-  Iterator FindNearestItem(mafTimeStamp t);
+  mafTimeMap<T>::TimeMap::iterator FindNearestItem(mafTimeStamp t);
 
   /** Find the item with timestamp <=t*/
-  Iterator FindItemBefore(mafTimeStamp t);
+  mafTimeMap<T>::TimeMap::iterator FindItemBefore(mafTimeStamp t);
 
   /**
     Find the item with the timestamp==t. Returns the item index, and 
     set "item" to its pointer. Return -1 and NULL if not found.
     not*/
-  Iterator FindItem(mafTimeStamp t);
+  mafTimeMap<T>::TimeMap::iterator FindItem(mafTimeStamp t);
 
   /** return iterator of item with given index */
-  Iterator FindItemByIndex(int idx);
+  mafTimeMap<T>::TimeMap::iterator FindItemByIndex(int idx);
 
   /** return index of the given item. return -1 if not found. */
   mafID FindItemIndex(mafTimeStamp t);
@@ -152,9 +153,9 @@ public:
   /** return modification time */
   unsigned long GetMTime() {return m_MTime.GetMTime();}
 
-  Iterator Begin() {return m_TimeMap.begin();}
+  mafTimeMap<T>::TimeMap::iterator Begin() {return m_TimeMap.begin();}
 
-  Iterator End() {return m_TimeMap.end();}
+  mafTimeMap<T>::TimeMap::iterator End() {return m_TimeMap.end();}
 
 protected:
 

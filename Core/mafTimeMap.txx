@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTimeMap.txx,v $
   Language:  C++
-  Date:      $Date: 2005-03-02 00:30:30 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-03-10 12:34:58 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,10 +14,10 @@
 #define __mafTimeMap_txx
 
 #include "mafTimeMap.h"
-//#include "mmuTimeVector.h"
 #include "mafIndent.h"
+#include <math.h>
 #include <assert.h>
-#include <vector>
+
 //-----------------------------------------------------------------------
 //template <class T>
 //mafCxxAbstractTypeMacro( mafTimeMap<T> )
@@ -39,25 +39,30 @@ mafTimeMap<T>::~mafTimeMap()
 
 //-----------------------------------------------------------------------
 template <class T>
+void mafTimeMap<T>::AppendAndSetItem(T *m)
+//-----------------------------------------------------------------------
+{
+  assert(m);
+  if (this->GetNumberOfItems()>0)
+  {
+    // Get last item
+	  assert(m_TimeMap.rbegin()->second);
+    // append adding 1 to the last time 
+    m->SetTimeStamp(m_TimeMap.rbegin()->first+1);
+  }
+  else
+	{
+    m->SetTimeStamp(0);
+  }
+  AppendItem(m);
+}
+
+//-----------------------------------------------------------------------
+template <class T>
 void mafTimeMap<T>::AppendItem(T *m)
 //-----------------------------------------------------------------------
 {
 	assert(m);
-	if (m->GetTimeStamp()<0)
-	{
-		if (this->GetNumberOfItems()>0)
-		{
-		  // Get last item
-		  assert(m_TimeMap.rbegin()->second);
-		  // append adding 1 to the last time 
-		  m->SetTimeStamp(m_TimeMap.rbegin()->first+1);
-		}
-		else
-		{
-		  m->SetTimeStamp(0);
-		}
-	}
-	//m_TimeMap[m->GetTimeStamp()]=m;
 	m_TimeMap.insert(m_TimeMap.end(),mmuTimePair(m->GetTimeStamp(),m));
 	Modified();
 }
@@ -115,7 +120,7 @@ void mafTimeMap<T>::GetTimeStamps(mmuTimeVector &kframes)
 {
   kframes.clear();
 
-  for (Iterator it=m_TimeMap.begin();it!=m_TimeMap.end();it++)
+  for (mafTimeMap<T>::TimeMap::iterator it=m_TimeMap.begin();it!=m_TimeMap.end();it++)
   {
     kframes.push_back(it->first);
   }
@@ -128,7 +133,7 @@ void mafTimeMap<T>::GetTimeStamps(mafTimeStamp *&kframes)
 {
   kframes = new mafTimeStamp[GetNumberOfItems()];
 
-  for (Iterator it=m_TimeMap.begin();it!=m_TimeMap.end();it++)
+  for (mafTimeMap<T>::TimeMap::iterator it=m_TimeMap.begin();it!=m_TimeMap.end();it++)
   {
     kframes[i]=it->first;
   }
@@ -155,8 +160,8 @@ bool mafTimeMap<T>::Equals(mafTimeMap *o)
   if (GetNumberOfItems()!=o->GetNumberOfItems())
     return false;
 
-  Iterator it;
-  Iterator it2;
+  mafTimeMap<T>::TimeMap::iterator it;
+  mafTimeMap<T>::TimeMap::iterator it2;
   for (it=m_TimeMap.begin(),it2=o->m_TimeMap.begin();it!=m_TimeMap.end();it++,it2++)
   {
     T *m=it->second;
@@ -171,7 +176,7 @@ bool mafTimeMap<T>::Equals(mafTimeMap *o)
 
 //-------------------------------------------------------------------------
 template <class T>
-void mafTimeMap<T>::RemoveItem(Iterator it)
+void mafTimeMap<T>::RemoveItem(mafTimeMap<T>::TimeMap::iterator it)
 //-------------------------------------------------------------------------
 {
   m_TimeMap.erase(it);
@@ -182,7 +187,7 @@ template <class T>
 int mafTimeMap<T>::RemoveItem(int idx)
 //-------------------------------------------------------------------------
 {
-  Iterator it=FindItemByIndex(idx);
+  mafTimeMap<T>::TimeMap::iterator it=FindItemByIndex(idx);
   if (it!=m_TimeMap.end())
   {
     m_TimeMap.erase(it);
@@ -204,10 +209,10 @@ void mafTimeMap<T>::RemoveAllItems()
 
 //-------------------------------------------------------------------------
 template <class T>
-mafTimeMap<T>::Iterator mafTimeMap<T>::FindNearestItem(mafTimeStamp t)
+mafTimeMap<T>::TimeMap::iterator mafTimeMap<T>::FindNearestItem(mafTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  std::pair<Iterator,Iterator> range=m_TimeMap.equal_range(t);
+  std::pair<mafTimeMap<T>::TimeMap::iterator,mafTimeMap<T>::TimeMap::iterator> range=m_TimeMap.equal_range(t);
   if (range.first!=m_TimeMap.end())
   {
     if (range.second!=m_TimeMap.end())
@@ -228,10 +233,10 @@ mafTimeMap<T>::Iterator mafTimeMap<T>::FindNearestItem(mafTimeStamp t)
 
 //-------------------------------------------------------------------------
 template <class T>
-mafTimeMap<T>::Iterator mafTimeMap<T>::FindItemBefore(mafTimeStamp t)
+mafTimeMap<T>::TimeMap::iterator mafTimeMap<T>::FindItemBefore(mafTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  Iterator it=m_TimeMap.lower_bound(t); // find first item >= t
+  mafTimeMap<T>::TimeMap::iterator it=m_TimeMap.lower_bound(t); // find first item >= t
   if (it==m_TimeMap.end()||it!=m_TimeMap.begin()&&it->first>t) // if > t get the previous 
     --it;
 
@@ -241,7 +246,7 @@ mafTimeMap<T>::Iterator mafTimeMap<T>::FindItemBefore(mafTimeStamp t)
 
 //-------------------------------------------------------------------------
 template <class T>
-mafTimeMap<T>::Iterator mafTimeMap<T>::FindItem(mafTimeStamp t)
+mafTimeMap<T>::TimeMap::iterator mafTimeMap<T>::FindItem(mafTimeStamp t)
 //-------------------------------------------------------------------------
 {
   return m_TimeMap.find(t);
@@ -249,7 +254,7 @@ mafTimeMap<T>::Iterator mafTimeMap<T>::FindItem(mafTimeStamp t)
 
 //----------------------------------------------------------------------------
 template <class T>
-mafTimeMap<T>::Iterator mafTimeMap<T>::FindItem(T *m)
+mafTimeMap<T>::TimeMap::iterator mafTimeMap<T>::FindItem(T *m)
 //----------------------------------------------------------------------------
 {
   assert(m);
@@ -266,7 +271,7 @@ void mafTimeMap<T>::Print(std::ostream& os, const int tabs)
   mmuTimeVector tvector;
   os << indent << "Time Stamps: {";
   GetTimeStamps(tvector);
-  for (int i=0;i<tvector.size();i++)
+  for (unsigned int i=0;i<tvector.size();i++)
   {
 	if (i!=0)
 	  os << ", ";
@@ -288,12 +293,12 @@ mafTimeStamp mafTimeMap<T>::GetItemTime(int idx)
 
 //----------------------------------------------------------------------------
 template <class T>
-mafTimeMap<T>::Iterator mafTimeMap<T>::FindItemByIndex(int idx)
+mafTimeMap<T>::TimeMap::iterator mafTimeMap<T>::FindItemByIndex(int idx)
 //----------------------------------------------------------------------------
 {
-  if (idx<m_TimeMap.size() && idx>=0)
+  if ((unsigned int)idx<m_TimeMap.size() && idx>=0)
   {
-     Iterator it=m_TimeMap.begin();
+     mafTimeMap<T>::TimeMap::iterator it=m_TimeMap.begin();
      std::advance(it,idx);
      return it;
   }
@@ -306,7 +311,7 @@ template <class T>
 mafID mafTimeMap<T>::FindItemIndex(mafTimeStamp t)
 //----------------------------------------------------------------------------
 {
-  Iterator it=FindItem(t);
+  mafTimeMap<T>::TimeMap::iterator it=FindItem(t);
   return it!=m_TimeMap.end()?std::distance(m_TimeMap.begin(),it):-1;
 }
 
@@ -315,7 +320,7 @@ template <class T>
 T *mafTimeMap<T>::GetItemByIndex(int idx)
 //----------------------------------------------------------------------------
 {
-  Iterator it=FindItemByIndex(idx);
+  mafTimeMap<T>::TimeMap::iterator it=FindItemByIndex(idx);
   return (it!=m_TimeMap.end())?it->second:NULL;
 }
 
@@ -324,7 +329,7 @@ template <class T>
 T *mafTimeMap<T>::GetItem(mafTimeStamp t)
 //----------------------------------------------------------------------------
 {
-  Iterator it=FindItem(t);
+  mafTimeMap<T>::TimeMap::iterator it=FindItem(t);
   return (it!=m_TimeMap.end())?it->second:NULL;
 }
 //----------------------------------------------------------------------------
@@ -332,7 +337,7 @@ template <class T>
 T *mafTimeMap<T>::GetNearestItem(mafTimeStamp t)
 //----------------------------------------------------------------------------
 {
-  Iterator it=FindNearestItem(t);
+  mafTimeMap<T>::TimeMap::iterator it=FindNearestItem(t);
   return (it!=m_TimeMap.end())?it->second:NULL;
 }
 //----------------------------------------------------------------------------
@@ -340,7 +345,7 @@ template <class T>
 T *mafTimeMap<T>::GetItemBefore(mafTimeStamp t)
 //----------------------------------------------------------------------------
 {
-  Iterator it=FindItemBefore(t);
+  mafTimeMap<T>::TimeMap::iterator it=FindItemBefore(t);
   return (it!=m_TimeMap.end())?it->second:NULL;
 }
 
