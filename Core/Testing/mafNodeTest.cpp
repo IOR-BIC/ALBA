@@ -1,5 +1,8 @@
 #include "mafNode.h"
 #include "mafNodeIterator.h"
+#include "mmaTagArray.h"
+#include "mafXMLStorage.h"
+#include "mafCoreFactory.h"
 #include <iostream>
 
 class mafTestNode: public mafNode
@@ -215,6 +218,37 @@ int main()
     }
   }
   
+  root->GetTagArray()->SetTag(mmuTagItem("NumericTag",10.5));
+  root->GetTagArray()->SetTag(mmuTagItem("StringTag","Donald"));
+
+  mafCoreFactory::Initialize();
+  mafPlugObject<mafTestNode>("Test Node");
+  mafPlugObject<mmaTagArray>("Test Node");
+
+  // test TagArray storing/restoring...
+  mafXMLStorage storage;
+  storage.SetURL("testNode.xml");
+  storage.SetFileType("MSF");
+  storage.SetVersion("2.0");
+  
+  storage.SetRoot(root);
+  int ret=storage.Store();
+  
+  MAF_TEST(ret==MAF_OK);
+
+  mafXMLStorage restore;
+  restore.SetURL("testNode.xml");
+  restore.SetFileType("MSF");
+  restore.SetVersion("2.0");
+  
+  mafSmartPointer<mafTestNode> new_root;
+  restore.SetRoot(new_root);
+  ret=restore.Restore();
+
+  MAF_TEST(ret==MAF_OK);
+
+  MAF_TEST(new_root->CompareTree(root));
+
   std::cerr<<"Test completed successfully!"<<std::endl;
 
   return MAF_OK;
