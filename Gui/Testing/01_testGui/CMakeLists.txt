@@ -1,4 +1,4 @@
-PROJECT (testFrame)
+PROJECT (testGui)
 
 SET(PROJECT_SRCS 
 testGuiApp.cpp
