@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaTagArray.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-01-13 09:10:00 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-01-15 18:59:04 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 

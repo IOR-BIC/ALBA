@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafCoreDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-01-14 18:20:48 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-01-15 18:59:05 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -61,7 +61,7 @@ std::string mafGetOpenFile(const char *initial, const char * wild, const char * 
   wxString path, name, ext;
   wxSplitPath(initial,&path,&name,&ext);
 
-  if(name != "" && ext != "") name = wxString::Format("%s.%s",name,ext);
+  if(name != "" && ext != "") name = wxString::Format("%s.%s",name.c_str(),ext.c_str());
 
   wxString wildcard=wild;
   wildcard+="|All Files (*.*)|*.*";
@@ -71,7 +71,7 @@ std::string mafGetOpenFile(const char *initial, const char * wild, const char * 
   dialog.SetReturnCode(wxID_OK);
 	int result = dialog.ShowModal();
   mafYield(); // wait for the dialog to disappear
-  return  (result == wxID_OK) ? dialog.GetPath() : "";
+  return  (result == wxID_OK) ? dialog.GetPath().c_str() : "";
 }
 
 //----------------------------------------------------------------------------
@@ -80,7 +80,7 @@ void mafGetOpenMultiFiles(const char * initial, const char * wild, std::vector<s
 {
   wxString path, name, ext;
   wxSplitPath(initial,&path,&name,&ext);
-  if(name != "" && ext != "") name = wxString::Format("%s.%s",name,ext);
+  if(name != "" && ext != "") name = wxString::Format("%s.%s",name.c_str(),ext.c_str());
   wxString wildcard = wild;
   wildcard += "|All Files (*.*)|*.*";
  
@@ -100,7 +100,7 @@ std::string mafGetSaveFile(const char * initial, const char * wild, const char *
 {
   wxString path, name, ext;
   wxSplitPath(initial,&path,&name,&ext);
-  if(name != "" && ext != "") name = wxString::Format("%s.%s",name,ext);
+  if(name != "" && ext != "") name = wxString::Format("%s.%s",name.c_str(),ext.c_str());
   wxString wildcard = wild;
   wildcard += "|All Files (*.*)|*.*";
   wxFileDialog dialog(parent,title, path, name, wildcard, wxSAVE|wxOVERWRITE_PROMPT|wxHIDE_READONLY);
@@ -121,7 +121,7 @@ std::string mafGetApplicationDirectory()
 		app_dir = wxGetCwd();
 		wxSetWorkingDirectory(cd);
 	}
-	return app_dir;
+	return app_dir.c_str();
 }
 //----------------------------------------------------------------------------
 wxColour mafRandomColor()
@@ -321,7 +321,7 @@ std::string  mafIdString(int id)
       s << id;
      break;
     }
-    return s; 
+    return s.c_str(); 
 }
 
 
