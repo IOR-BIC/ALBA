@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2005-01-11 17:22:51 $
-# Version:   $Revision: 1.15 $
+# Date:      $Date: 2005-02-21 13:53:51 $
+# Version:   $Revision: 1.16 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -61,7 +61,6 @@ ENDIF(WIN32)
 OPTION(BUILD_SHARED_LIBS "Build with shared libraries." 0 )
 OPTION(BUILD_EXAMPLES "Build examples." OFF )
 OPTION(BUILD_TESTING "Build the testing tree." OFF)
-OPTION(BUILD_MAF_DOCUMENTATION 0)
 
 SET (CONFIGURE_ERROR 0)
 
@@ -122,6 +121,9 @@ IF (MAF_CAN_BUILD)
   SUBDIRS (IO)
   SUBDIRS (vtkMAF)
   SUBDIRS (Gui)
+  
+  # Configuring Doxygen documentation  
+  SUBDIRS (Docs)
   
   #-----------------------------------------------------------------------------
   # Build examples too ?
