@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSmartPointer.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-30 18:18:22 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-12-01 18:43:07 $
+  Version:   $Revision: 1.3 $
   Authors:   based on vtkSmartPointer (www.vtk.org), rewritten by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -24,7 +24,7 @@ class MAF_EXPORT mafAutoPointer
 {
 public:  
   /** Initialize smart pointer to (optional) given object. */
-  mafAutoPointer(T* r=NULL);
+  mafAutoPointer(T* r=NULL,void *owner=NULL);
   
   /**
     Initialize smart pointer with a new reference to the same object
@@ -46,28 +46,17 @@ public:
   /**
     Allow to pass on the smart pointer to any function requiring a "T *". */
   operator T *() const {return (T *)m_Object;}
+  
+  /** Provides normal pointer target member access using operator ->. */
+  T* operator->() const { return static_cast<T*>(this->m_Object); }
 
-  inline bool \
-  operator == (const mafSmartPointer& l, const mafSmartPointer& r) \
-  { \
-    return (static_cast<void*>(l.GetPointer()) == static_cast<void*>(r.GetPointer())); \
-  } \
-  inline bool \
-  operator == (mafSmartObject* l, const mafSmartPointer& r) \
-  { \
-    return (static_cast<void*>(l) == static_cast<void*>(r.GetPointer())); \
-  } \
-  inline bool \
-  operator == (const mafSmartPointer& l, mafSmartObject* r) \
-  { \
-    return (static_cast<void*>(l.GetPointer()) == static_cast<void*>(r)); \
-  }
+  /** used to force releasing of internal object, specifying the owner */
+  void UnRegister(void *owner);
   
 protected:
   // Internal utility methods.
   void Swap(mafAutoPointer& r);
-  void Register();
-  void UnRegister();
+  void Register(void *owner);
 
   T* m_Object; ///<  Pointer to the actual object.
 };
@@ -95,31 +84,23 @@ public:
 
 //----------------------------------------------------------------------------
 template <class T>
-mafAutoPointer::mafAutoPointer(T* r):m_Object(r)
+mafAutoPointer<T>::mafAutoPointer(const mafAutoPointer<T>& r):m_Object(r.m_Object)
 //----------------------------------------------------------------------------
 {
-  Register();
-}
-
-//----------------------------------------------------------------------------
-template <class T>
-mafAutoPointer::mafAutoPointer(const mafAutoPointer& r):m_Object(r.m_Object)
-//----------------------------------------------------------------------------
-{
-  Register();
+  Register(NULL);
 }
   
 //----------------------------------------------------------------------------
 template <class T>
-mafAutoPointer::~mafAutoPointer()
+mafAutoPointer<T>::~mafAutoPointer()
 //----------------------------------------------------------------------------
 {
-  UnRegister();
+  UnRegister(NULL);
 }
   
 //----------------------------------------------------------------------------
 template <class T>
-mafAutoPointer& mafAutoPointer::operator=(T* r)
+mafAutoPointer<T>& mafAutoPointer<T>::operator=(T* r)
 //----------------------------------------------------------------------------
 {
   // make use of a temp auto-ptr to safely unregister, this
@@ -130,18 +111,19 @@ mafAutoPointer& mafAutoPointer::operator=(T* r)
 
 //----------------------------------------------------------------------------
 template <class T>
-mafAutoPointer& mafAutoPointer::operator=(const mafAutoPointer& r)
+mafAutoPointer<T>& mafAutoPointer<T>::operator=(const mafAutoPointer<T>& r)
 //----------------------------------------------------------------------------
 {
   // make use of a temp auto-ptr to safely unregister, this
   // to avoid deallocation in case of self assignment
   mafAutoPointer(r).Swap(*this);
+  Register(NULL);
   return *this;
 }
 
 //----------------------------------------------------------------------------
 template <class T>
-void mafAutoPointer::Swap(mafAutoPointer& r)
+void mafAutoPointer<T>::Swap(mafAutoPointer<T>& r)
 //----------------------------------------------------------------------------
 {
   T* temp = r.m_Object;
@@ -151,24 +133,55 @@ void mafAutoPointer::Swap(mafAutoPointer& r)
 
 //----------------------------------------------------------------------------
 template <class T>
-void mafAutoPointer::Register()
+void mafAutoPointer<T>::Register(void *owner)
 //----------------------------------------------------------------------------
 {
   if(m_Object)
   {
-    m_Object->Register(0);
+    m_Object->Register(owner);
   }
 }
 
 //----------------------------------------------------------------------------
 template <class T>
-void mafAutoPointer::UnRegister()
+void mafAutoPointer<T>::UnRegister(void *owner)
 //----------------------------------------------------------------------------
 {
   if(m_Object)
   {
-    m_Object->UnRegister(0);
+    m_Object->UnRegister(owner);
+    m_Object = NULL;
   }
 }
+
+//----------------------------------------------------------------------------
+template <class T>
+inline bool operator == (const mafAutoPointer<T>& l, const mafAutoPointer<T>& r) \
+{ return (static_cast<void*>(l.GetPointer()) == static_cast<void*>(r.GetPointer())); }
+//----------------------------------------------------------------------------
+
+
+//----------------------------------------------------------------------------
+template <class T>
+inline bool operator == (mafSmartObject* l, const mafAutoPointer<T>& r) \
+{ return (static_cast<void*>(l) == static_cast<void*>(r.GetPointer())); }
+//----------------------------------------------------------------------------
+
+
+//----------------------------------------------------------------------------
+template <class T>
+inline bool operator == (const mafAutoPointer<T>& l, mafSmartObject* r) \
+{ return (static_cast<void*>(l.GetPointer()) == static_cast<void*>(r)); }
+//----------------------------------------------------------------------------
+
+
+//----------------------------------------------------------------------------
+template <class T>
+mafAutoPointer<T>::mafAutoPointer(T* r, void *owner):m_Object(r)
+//----------------------------------------------------------------------------
+{
+  Register(owner);
+}
+
 
 #endif
