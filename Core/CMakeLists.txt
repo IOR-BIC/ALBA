@@ -7,20 +7,44 @@ MESSAGE(STATUS "Configuring project mafCore")
 # Set your list of sources here.  Do not change the name of the
 # vtkLocal_SRCS variable.
 SET(PROJECT_SRCS
-  mafEventBase.h
+  mafDefines.cpp
+  mafDefines.h
+  mafDirectory.cpp
+  mafDirectory.h
+  mafDynamicLoader.cpp
+  mafDynamicLoader.h
   mafEventBase.cpp
-#  mafEvent.h
-#  mafEvent.cpp
-  mafEventSource.h
+  mafEventBase.h
   mafEventSource.cpp
+  mafEventSource.h
+  mafMTime.cpp
+  mafMTime.h
   mafMatrix.cpp
   mafMatrix.h
-  mafObserver.h
-  mafObserver.cpp
-  mafObserverCallback.h
-  mafObserverCallback.cpp
+  mafMutexLock.cpp
+  mafMutexLock.h
   mafOBB.cpp
   mafOBB.h
+  mafObject.cpp
+  mafObject.h
+  mafObjectFactory.cpp
+  mafObjectFactory.h
+  mafObserver.cpp
+  mafObserver.h
+  mafObserverCallback.cpp
+  mafObserverCallback.h
+  mafSmartObject.cpp
+  mafSmartObject.h
+  mafString.cpp
+  mafString.h
+  mafTransform.cpp
+  mafTransform.h
+  mafTransformBase.cpp
+  mafTransformBase.h
+  mafVersion.h
+  mafWIN32.h
+#  mafEvent.cpp
+#  mafEvent.h
 )
 
 IF (MAF_USE_VTK)
@@ -31,7 +55,7 @@ ENDIF (MAF_USE_VTK)
 
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS mafBase )
+SET(PROJECT_LIBS "" )
 
 IF (MAF_USE_VTK)
   SET(PROJECT_LIBS ${PROJECT_LIBS} vtkCommon)
