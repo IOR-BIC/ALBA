@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuTimeSet.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:37:52 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-01 10:03:36 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -206,7 +206,7 @@ int mmuTimeSet::GetNumberOfTimeStamps() const
 }
 
 //-------------------------------------------------------------------------
-void mmuTimeSet::Merge(const mmuTimeVector &v1,const mmuTimeVector &v2,mmuTimeVector &outv)
+void mmuTimeSet::Merge(const std::vector<mafTimeStamp> &v1,const std::vector<mafTimeStamp> &v2,std::vector<mafTimeStamp> &outv)
 //-------------------------------------------------------------------------
 {
   std::set<mafTimeStamp> outset;
@@ -228,7 +228,7 @@ void mmuTimeSet::Merge(const mmuTimeVector &v1,const mmuTimeVector &v2,mmuTimeVe
 }
 
 //-------------------------------------------------------------------------
-void mmuTimeSet::Merge(const mmuTimeVector &v)
+void mmuTimeSet::Merge(const std::vector<mafTimeStamp> &v)
 //-------------------------------------------------------------------------
 {
   for (unsigned int i=0;i<v.size();i++)

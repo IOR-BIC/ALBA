@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 15:46:25 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-04-01 10:06:44 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -38,13 +38,14 @@ class mafVMEOutput;
   - implement the GetMTime() function: it's used by pipeline to trigger the update
   - Change the SetParent to update the AbsMatrixPipe connections
   - fix the VME_TIME_SET issuing and propagation
+  - implement Update() function
   */
 class MAF_EXPORT mafVME : public mafNode
 {
 public:
   mafAbstractTypeMacro(mafVME,mafNode);
 
-  typedef std::vector<mafTimeStamp> TimeVector;
+  //typedef std::vector<mafTimeStamp> std::vector<mafTimeStamp>;
 
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0) const;
@@ -53,6 +54,11 @@ public:
     return the parent VME Node. Notice that a VME can only reparented 
     under another VME, not to other kind of nodes! */
   mafVME *GetParent() const;
+
+  /**
+    This function set the parent for this Node. It has been redefined to update 
+    AbsMatrixPipe input frame. */
+  virtual int SetParent(mafNode *parent);
 
   /**
     Copy the contents of another VME into this one. Notice that subtrees
@@ -86,6 +92,9 @@ public:
     key matrices.*/
   virtual void SetMatrix(const mafMatrix &mat)=0;
 
+  /** set the pose matrix for a specific time stamp (ignore the matrix internal timestamp!) */
+  void SetPose(const mafMatrix &mat,mafTimeStamp t);
+
   /** 
     Set the pose for this VME This function modifies pose matrix of the VME.
     The pose is modified for the given timestamp, if VME supports 4D pose (e.g. 
@@ -115,14 +124,6 @@ public:
   /** apply a matrix to the VME abs pose matrix */
   void ApplyAbsMatrix(const mafMatrix &matrix,int premultiply,mafTimeStamp t=-1);
  
-  /**
-    Copy the given VME tree into a new tree. In case a parent is provided, link the new
-    root node to it. Return the root of the new tree.*/
-  static mafVME *CopyTree(mafVME *vme, mafVME *parent=NULL);
-
-  /** Make a copy of the whole subtree and return its pointer*/
-  mafVME *CopyTree() {return CopyTree(this);}
-
   /**
     return true if the VME can be reparented under the specified node */
   virtual bool CanReparentTo(mafNode *parent);
@@ -156,20 +157,17 @@ public:
   /**
     Return the list of timestamps for this VME. Timestamps list is 
     obtained merging timestamps for matrixes and VME items*/
-  void GetLocalTimeStamps(mafTimeStamp *&kframes);
-  virtual void GetLocalTimeStamps(TimeVector &kframes)=0;
+  virtual void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes)=0;
   
 	/**
     Return the list of timestamps considering all parents timestamps. Timestamps list is
     obtained merging timestamps for matrixes and VME items*/
-	void GetAbsTimeStamps(mafTimeStamp *&kframes);
-	virtual void GetAbsTimeStamps(TimeVector &kframes)=0;
+	virtual void GetAbsTimeStamps(std::vector<mafTimeStamp> &kframes);
   
 	/**
     Return the list of timestamps for the full sub tree. Timestamps list is
     obtained merging timestamps for matrixes and VME items*/
-  void GetTimeStamps(mafTimeStamp *&kframes);
-  virtual void GetTimeStamps(TimeVector &kframes)=0;  
+  virtual void GetTimeStamps(std::vector<mafTimeStamp> &kframes);  
   
   /** Return the number of time stamps in the whole tree*/
   int GetNumberOfTimeStamps();
@@ -178,7 +176,7 @@ public:
   int GetNumberOfLocalTimeStamps();
   
   /** Return true if the number of local time stamps is > 1*/
-  virtual int IsAnimated();
+  virtual bool IsAnimated();
   
   /** Set the crypting status for the vme. */
   void SetCrypting(int crypting);
@@ -187,7 +185,7 @@ public:
   int GetCrypting();
 
   /** return a pointer to the output data structure */
-  mafVMEOutput *GetOutput();
+  mafVMEOutput *GetOutput() {return m_Output;}
 
   /** process events coming from other components */
   void OnEvent(mafEventBase *e);
@@ -196,12 +194,18 @@ protected:
   mafVME(); // to be allocated with New()
   virtual ~mafVME(); // to be deleted with Delete()
 
-  /** This function is overridden by subclasses to perform custom initialization*/
-  virtual int InternalInitialize() {return 0;};
+  virtual int InternalStore(mafStorageElement *parent);
+  virtual int InternalRestore(mafStorageElement *node);
 
-  /** To be redefined by subclasses to define the shutdown actions */
-  virtual void InternalShutdown() {};
+  /** used to initialize the AbsMatrixPipe */
+  virtual int mafVME::InternalInitialize();
 
+  /** called to prepare the update of output */
+  virtual void InternalPreUpdate() {}
+
+  /** update the output data structure */
+  virtual void InternalUpdate() {}
+ 
   /** Set/Get the data pipe object, i.e. the source of the output dataset. */
   virtual int SetDataPipe(mafDataPipe *dpipe);
 
@@ -215,15 +219,9 @@ protected:
   mafAutoPointer<mafMatrixPipe>     m_MatrixPipe;
   mafAutoPointer<mafAbsMatrixPipe>  m_AbsMatrixPipe;
 
-  mafVMEOutput      *m_Output; ///< the datastructure storing the output of this VME
-
-  mafTimeStamp m_CurrentTime; ///< the time parameter for generation of the output
-
-  int m_Crypting;             ///< enable flag for this VME
-
-  // to be moved to output data structure
-  //mafAutoPointer<mafMatrix>  CurrentMatrix;
-  //mafAutoPointer<vtkDataSet> CurrentData;
+  mafVMEOutput  *m_Output;      ///< the data structure storing the output of this VME
+  mafTimeStamp  m_CurrentTime;  ///< the time parameter for generation of the output
+  int           m_Crypting;     ///< enable flag for this VME
   
 private:
   mafVME(const mafVME&); // Not implemented

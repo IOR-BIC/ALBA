@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTimeMap.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 15:44:41 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-01 10:06:43 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,8 +14,10 @@
 #define __mafTimeMap_h
 
 #include "mafObject.h"
+#include "mafTimeStamped.h"
 #include "mafSmartPointer.h"
 #include "mafMTime.h"
+#include "mafString.h"
 #include <map>
 #include <vector>
 
@@ -34,7 +36,7 @@ typedef std::vector<mafTimeStamp> mmuTimeVector;
 */
 
 template <class T>
-class MAF_EXPORT mafTimeMap : public mafObject
+class MAF_EXPORT mafTimeMap : public mafObject, public mafTimeStamped
 {
 public:
 
@@ -48,51 +50,49 @@ public:
   void operator=(const mafTimeMap<T>&);
 
   //mafAbstractTypeMacro(mafTimeMap<T>,mafObject);
+
+  /** set the TypeName of the kind of item accepted by this container */
+  void SetItemTypeName(const char *tname) {m_ItemTypeName=tname;}
+  const char *GetItemTypeName() {return m_ItemTypeName;}
   
   /**
-    Insert an item to the vector trying to append it, anyway the array is kept sorted.
-     */
-  void AppendItem(T *m);
+    Insert an item to the vector trying to append it, anyway the array
+    is kept sorted. */
+  virtual void AppendItem(T *m);
 
   /** append item setting its timestamp to the highest one + 1 */
-  void AppendAndSetItem(T *m);
+  virtual void AppendAndSetItem(T *m);
 
    /**
     Insert an item to the vector trying to prepend it, anyway the array is kept sorted.
     Item's timestamp must be >=0 */
-  void PrependItem(T *m);
+  virtual void PrependItem(T *m);
 
   /**
     Set the item for a specified time. If no item with the same time exist
     the item is inserted in the vector. If an item with the same time exist, it's simply
     substituted with the new one. The item is always references and not copied.
     This function also automatically call the UpdateData() member function.*/
-  int InsertItem(T *item);
+  virtual void InsertItem(T *m);
 
   /** Find an item index given its pointer*/
   mafTimeMap<T>::TimeMap::iterator FindItem(T *m);
 
   /** Remove an item given its iterator */
-  void RemoveItem(mafTimeMap<T>::TimeMap::iterator it);
+  virtual void RemoveItem(mafTimeMap<T>::TimeMap::iterator it);
 
   /** Remove an item given its index*/
   int RemoveItem(int idx);
 
   /** Remove all the items*/
-  void RemoveAllItems();
+  virtual void RemoveAllItems();
 
   /** Return the timestamp of the i-th item*/
   mafTimeStamp GetItemTime(int idx);
 
   /** Return the list of timestamp of the key matrixes in the given vector*/
-  void GetTimeStamps(mmuTimeVector &kframes);
+  void GetTimeStamps(mmuTimeVector &kframes) const;
 
-  /**
-    Return the list of timestamp of the key matrixes in the given vector. Beware, this function
-    allocated memory that must be release explicitly. The array pointer is overwritten, thus
-    beware of possible memory leaks.*/
-  void GetTimeStamps(mafTimeStamp *&kframes);
-  
   /** Return the number of ITEMS stored in this object*/
   int GetNumberOfItems() const {return m_TimeMap.size();};
   
@@ -147,20 +147,13 @@ public:
 
   virtual void Print(std::ostream& os, const int tabs=0) const;
 
-  /** increment update modification time */
-  void Modified() {m_MTime.Modified();}
-
-  /** return modification time */
-  unsigned long GetMTime() {return m_MTime.GetMTime();}
-
   mafTimeMap<T>::TimeMap::iterator Begin() {return m_TimeMap.begin();}
-
   mafTimeMap<T>::TimeMap::iterator End() {return m_TimeMap.end();}
 
 protected:
 
-  TimeMap        m_TimeMap;  ///< the set storing the datasets
-  mafMTime       m_MTime;    ///< Last modification time
+  TimeMap         m_TimeMap;        ///< the set storing the datasets
+  mafString       m_ItemTypeName;   ///< the name of the item type accepted by this container
 };
 
 #endif

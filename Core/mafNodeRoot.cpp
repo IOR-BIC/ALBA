@@ -2,26 +2,26 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeRoot.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 15:43:56 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-01 10:03:34 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-#ifndef __mafNodeRoot_cxx
-#define __mafNodeRoot_cxx
 
 #include "mafNodeRoot.h"
 #include "mafNode.h"
 #include "mafStorageElement.h"
+#include "mafStorage.h"
+#include "mafEventIO.h"
 #include "mafIndent.h"
 
 //-------------------------------------------------------------------------
 mafNodeRoot::mafNodeRoot()
 //-------------------------------------------------------------------------
 {
-  m_MaxNodeId=0;
+  m_MaxNodeId = 0;
 }
 
 //-------------------------------------------------------------------------
@@ -54,13 +54,39 @@ int mafNodeRoot::StoreRoot(mafStorageElement *parent)
 int mafNodeRoot::RestoreRoot(mafStorageElement *element)
 //-------------------------------------------------------------------------
 {
-  mafString max_id;
-  if (!element->GetAttribute("MaxNodeId",max_id))
+  mafID max_id;
+  if (!element->GetAttributeAsInteger("MaxNodeId",max_id))
     return MAF_ERROR;
 
-  SetMaxNodeId((mafID)atof(max_id));
+  SetMaxNodeId(max_id);
 
   return MAF_OK;
+}
+
+//-------------------------------------------------------------------------
+void mafNodeRoot::OnRootEvent(mafEventBase *e)
+//-------------------------------------------------------------------------
+{
+  if (e->GetChannel()==MCH_UP)
+  {
+    if (e->GetId()==NODE_GET_STORAGE)
+    {
+      // return the storage pointer: here the hypothesis sis the root node listener is a storage.
+      mafEventIO *io_event=mafEventIO::SafeDownCast(e);
+      io_event->SetStorage(GetStorage());
+    }
+    else
+    {
+      InvokeEvent(e);
+    }
+  }
+}
+
+//-------------------------------------------------------------------------
+mafStorage *mafNodeRoot::GetStorage()
+//-------------------------------------------------------------------------
+{
+  return (typeid(m_Listener)==typeid(mafStorage *))?(mafStorage *)m_Listener:NULL;
 }
 
 //-------------------------------------------------------------------------
@@ -69,5 +95,3 @@ void mafNodeRoot::Print(std::ostream& os, const int tabs) const
 {
   os << mafIndent(tabs) << "MaxNodeId: " << m_MaxNodeId << "\n";
 }
-  
-#endif

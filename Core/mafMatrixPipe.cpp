@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrixPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:27:15 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-01 10:03:32 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -18,14 +18,16 @@
 #include <sstream>
 
 //------------------------------------------------------------------------------
+mafCxxTypeMacro(mafMatrixPipe)
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
 mafMatrixPipe::mafMatrixPipe()
 //------------------------------------------------------------------------------
 {
   m_UpdateMatrixObserverFlag=1;
   m_Updating=0; // this should be used to avoid updating loops
   m_VME=NULL;
-  m_CurrentTime=0;
-  
 }
 
 //------------------------------------------------------------------------------
@@ -33,6 +35,20 @@ mafMatrixPipe::~mafMatrixPipe()
 //------------------------------------------------------------------------------
 {
   this->SetVME(NULL);
+}
+
+//------------------------------------------------------------------------------
+void mafMatrixPipe::SetCurrentTime(mafTimeStamp t)
+//------------------------------------------------------------------------------
+{
+  SetTimeStamp(t);Modified(); 
+}
+
+//------------------------------------------------------------------------------
+mafTimeStamp mafMatrixPipe::GetCurrentTime()
+//------------------------------------------------------------------------------
+{
+  return GetTimeStamp();
 }
 
 //------------------------------------------------------------------------------
@@ -105,5 +121,14 @@ unsigned long mafMatrixPipe::GetMTime()
 void mafMatrixPipe::InternalUpdate()
 //----------------------------------------------------------------------------
 {
-  InvokeEvent(MATRIX_UPDATED);
+  if (m_VME) m_VME->OnEvent(&mafEventBase(this,VME_MATRIX_UPDATE));
+}
+
+//----------------------------------------------------------------------------
+void mafMatrixPipe::Update()
+//----------------------------------------------------------------------------
+{
+  if (m_VME) m_VME->OnEvent(&mafEventBase(this,VME_MATRIX_PREUPDATE));
+  
+  Superclass::Update();
 }

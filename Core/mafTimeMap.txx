@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTimeMap.txx,v $
   Language:  C++
-  Date:      $Date: 2005-03-16 15:39:12 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-01 10:06:44 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,6 +17,7 @@
 #include "mafIndent.h"
 #include <math.h>
 #include <assert.h>
+#include <sstream>
 
 //-----------------------------------------------------------------------
 //template <class T>
@@ -63,6 +64,15 @@ void mafTimeMap<T>::AppendItem(T *m)
 //-----------------------------------------------------------------------
 {
 	assert(m);
+  if (!m_ItemTypeName.IsEmpty())
+  {
+    assert(m->IsA(m_ItemTypeName));
+    if (!m->IsA(m_ItemTypeName))
+    {
+      mafErrorMacro("Unsupported Item type \""<<m->GetTypeName()<<"\", allowed type is \""<<m_ItemTypeName<<"\": cannot Append item!");
+      return;
+    }
+  }
 	m_TimeMap.insert(m_TimeMap.end(),mmuTimePair(m->GetTimeStamp(),m));
 	Modified();
 }
@@ -73,26 +83,36 @@ void mafTimeMap<T>::PrependItem(T *m)
 //-----------------------------------------------------------------------
 {
   assert(m);
+  if (!m_ItemTypeName.IsEmpty())
+  {
+    assert(m->IsA(m_ItemTypeName));
+    if (!m->IsA(m_ItemTypeName))
+    {
+      mafErrorMacro("Unsupported Item type \""<<m->GetTypeName()<<"\", allowed type is \""<<m_ItemTypeName<<"\": cannot Prepend item!");
+      return;
+    }
+  }
   m_TimeMap.insert(m_TimeMap.begin(),mmuTimePair(m->GetTimeStamp(),m));
   Modified();
 }
 //-------------------------------------------------------------------------
 template <class T>
-int mafTimeMap<T>::InsertItem(T *item)
+void mafTimeMap<T>::InsertItem(T *m)
 //-------------------------------------------------------------------------
 {
-  assert(item);
+  assert(m);
+  if (!m_ItemTypeName.IsEmpty())
+  {
+    assert(m->IsA(m_ItemTypeName));
+    if (!m->IsA(m_ItemTypeName))
+    {
+      mafErrorMacro("Unsupported Item type \""<<m->GetTypeName()<<"\", allowed type is \""<<m_ItemTypeName<<"\": cannot Insert item!");
+      return;
+    }
+  }
 
-  if (item)
-  {
-    m_TimeMap[item->GetTimeStamp()]=item;	
-    Modified();
-    return MAF_OK;
-  }
-  else
-  {
-    return MAF_ERROR;
-  }
+  m_TimeMap[m->GetTimeStamp()]=m;	
+  Modified();
 }
 
 //-------------------------------------------------------------------------
@@ -115,27 +135,14 @@ void mafTimeMap<T>::GetTimeBounds(mafTimeStamp tbounds[2])
 
 //-------------------------------------------------------------------------
 template <class T>
-void mafTimeMap<T>::GetTimeStamps(mmuTimeVector &kframes)
+void mafTimeMap<T>::GetTimeStamps(mmuTimeVector &kframes) const
 //-------------------------------------------------------------------------
 {
   kframes.clear();
 
-  for (mafTimeMap<T>::TimeMap::iterator it=m_TimeMap.begin();it!=m_TimeMap.end();it++)
+  for (mafTimeMap<T>::TimeMap::const_iterator it=m_TimeMap.begin();it!=m_TimeMap.end();it++)
   {
     kframes.push_back(it->first);
-  }
-}
-
-//-------------------------------------------------------------------------
-template <class T>
-void mafTimeMap<T>::GetTimeStamps(mafTimeStamp *&kframes)
-//-------------------------------------------------------------------------
-{
-  kframes = new mafTimeStamp[GetNumberOfItems()];
-
-  for (mafTimeMap<T>::TimeMap::iterator it=m_TimeMap.begin();it!=m_TimeMap.end();it++)
-  {
-    kframes[i]=it->first;
   }
 }
 
@@ -180,6 +187,7 @@ void mafTimeMap<T>::RemoveItem(mafTimeMap<T>::TimeMap::iterator it)
 //-------------------------------------------------------------------------
 {
   m_TimeMap.erase(it);
+  Modified();
 }
 
 //-------------------------------------------------------------------------
@@ -190,8 +198,7 @@ int mafTimeMap<T>::RemoveItem(int idx)
   mafTimeMap<T>::TimeMap::iterator it=FindItemByIndex(idx);
   if (it!=m_TimeMap.end())
   {
-    m_TimeMap.erase(it);
-    Modified();
+    RemoveItem(it);
     return MAF_OK;
   }
 
@@ -236,11 +243,19 @@ template <class T>
 mafTimeMap<T>::TimeMap::iterator mafTimeMap<T>::FindItemBefore(mafTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  mafTimeMap<T>::TimeMap::iterator it=m_TimeMap.lower_bound(t); // find first item >= t
-  if (it==m_TimeMap.end()||it!=m_TimeMap.begin()&&it->first>t) // if > t get the previous 
-    --it;
+  if (m_TimeMap.size()>0)
+  {
+    mafTimeMap<T>::TimeMap::iterator it=m_TimeMap.lower_bound(t); // find first item >= t
+    if (it==m_TimeMap.end()||it!=m_TimeMap.begin()&&it->first>t) // if > t get the previous 
+      --it;
 
-  return it;
+    return it;
+  }
+  else
+  {
+    return m_TimeMap.end();
+  }
+  
 }
 
 
@@ -273,9 +288,9 @@ void mafTimeMap<T>::Print(std::ostream& os, const int tabs) const
   GetTimeStamps(tvector);
   for (unsigned int i=0;i<tvector.size();i++)
   {
-	if (i!=0)
-	  os << ", ";
-	os << tvector[i];
+	  if (i!=0)
+	    os << ", ";
+	  os << tvector[i];
   }
 
   os << "}\n";

@@ -2,21 +2,20 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 15:46:25 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-04-01 10:06:44 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-#ifndef __mafVME_cxx
-#define __mafVME_cxx
 
 #include "mafVME.h"
 #include "mafVMEOutput.h"
 #include "mafAbsMatrixPipe.h"
 #include "mafMatrixPipe.h"
 #include "mafDataPipe.h"
+#include "mafEventIO.h"
 #include "mafEventSource.h"
 #include "mafTagArray.h"
 #include "mafOBB.h"
@@ -24,17 +23,22 @@
 #include "mmuTimeSet.h"
 #include "mafIndent.h"
 #include "mafDecl.h"
+#include "mafStorageElement.h"
 
 #include <sstream>
 #include <assert.h>
 
 //-------------------------------------------------------------------------
+mafCxxAbstractTypeMacro(mafVME)
+//-------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------
 mafVME::mafVME()
 //-------------------------------------------------------------------------
 {
-  m_AbsMatrixPipe=mafAbsMatrixPipe::New();
-  m_AbsMatrixPipe->SetVME(this);
-  m_AbsMatrixPipe->SetListener(this);
+  m_Output        = NULL;
+
+  m_AbsMatrixPipe = mafAbsMatrixPipe::New();
 
   m_CurrentTime         = 0.0;
   m_Crypting            = -1;
@@ -46,6 +50,7 @@ mafVME::~mafVME()
 {
   // Pipes must be destroyed in the right order
   // to take into consideration dependencies
+  mafDEL(m_Output);
   m_DataPipe=NULL;
   
   m_AbsMatrixPipe->SetVME(NULL);
@@ -55,10 +60,27 @@ mafVME::~mafVME()
 }
 
 //-------------------------------------------------------------------------
+int mafVME::InternalInitialize()
+//-------------------------------------------------------------------------
+{
+
+  if (Superclass::InternalInitialize()==MAF_OK)
+  {
+    assert(m_AbsMatrixPipe);
+    // force the abs matrix pipe to update its inputs
+    m_AbsMatrixPipe->SetVME(this);
+
+    return MAF_OK;
+  }
+
+  return MAF_ERROR;
+}
+
+//-------------------------------------------------------------------------
 mafVME *mafVME::GetParent() const
 //-------------------------------------------------------------------------
 {
-  assert(m_Parent->IsA(typeid(mafVME)));
+  assert(m_Parent==NULL||m_Parent->IsA(typeid(mafVME)));
   return (mafVME *)Superclass::GetParent();
 }
 
@@ -96,6 +118,19 @@ int mafVME::ShallowCopy(mafVME *a)
 }
 
 //-------------------------------------------------------------------------
+int mafVME::SetParent(mafNode *parent)
+//-------------------------------------------------------------------------
+{
+  if (Superclass::SetParent(parent)==MAF_OK)
+  {
+    // this forces the the pipe to Update its input and input frame    
+    m_AbsMatrixPipe->SetVME(this);
+    return MAF_OK;
+  }
+  return MAF_ERROR;
+}
+
+//-------------------------------------------------------------------------
 // TODO: to be rewritten
 void mafVME::SetCurrentTime(mafTimeStamp t)
 //-------------------------------------------------------------------------
@@ -130,11 +165,11 @@ void mafVME::SetTreeTime(mafTimeStamp t)
 //-------------------------------------------------------------------------
 {
   SetCurrentTime(t);
-  //ForwardDownEvent(mafEventBase(this,VME_TIME_SET));
+  ForwardDownEvent(mafEventBase(this,VME_TIME_SET,&t));
 }
 
 //-------------------------------------------------------------------------
-int mafVME::IsAnimated()
+bool mafVME::IsAnimated()
 //-------------------------------------------------------------------------
 {
   return false;
@@ -144,7 +179,7 @@ int mafVME::IsAnimated()
 int mafVME::GetNumberOfLocalTimeStamps()
 //-------------------------------------------------------------------------
 {
-  TimeVector timestamps;
+  std::vector<mafTimeStamp> timestamps;
   GetLocalTimeStamps(timestamps);
   return timestamps.size();
 }
@@ -153,31 +188,13 @@ int mafVME::GetNumberOfLocalTimeStamps()
 int mafVME::GetNumberOfTimeStamps()
 //-------------------------------------------------------------------------
 {
-  TimeVector timestamps;
+  std::vector<mafTimeStamp> timestamps;
   GetTimeStamps(timestamps);
   return timestamps.size();
 }
 
 //-------------------------------------------------------------------------
-void mafVME::GetTimeStamps(mafTimeStamp *&kframes)
-//-------------------------------------------------------------------------
-{
-  std::vector<mafTimeStamp> frames;
-
-  GetTimeStamps(frames);
-
-  if(frames.size()>0)
-  {
-    kframes=new mafTimeStamp[frames.size()];
-  }
-  else
-  {
-    kframes=NULL;
-  }
-}
-
-//-------------------------------------------------------------------------
-void mafVME::GetTimeStamps(TimeVector &kframes)
+void mafVME::GetTimeStamps(std::vector<mafTimeStamp> &kframes)
 //-------------------------------------------------------------------------
 {
   GetLocalTimeStamps(kframes);
@@ -196,25 +213,7 @@ void mafVME::GetTimeStamps(TimeVector &kframes)
 }
 
 //-------------------------------------------------------------------------
-void mafVME::GetAbsTimeStamps(mafTimeStamp *&kframes)
-//-------------------------------------------------------------------------
-{
-  std::vector<mafTimeStamp> frames;
-
-  GetAbsTimeStamps(frames);
-
-  if(frames.size()>0)
-  {
-    kframes=new mafTimeStamp[frames.size()];
-  }
-  else
-  {
-    kframes=NULL;
-  }
-}
-
-//-------------------------------------------------------------------------
-void mafVME::GetAbsTimeStamps(TimeVector &kframes)
+void mafVME::GetAbsTimeStamps(std::vector<mafTimeStamp> &kframes)
 //-------------------------------------------------------------------------
 {
   GetLocalTimeStamps(kframes);
@@ -234,6 +233,15 @@ bool mafVME::CanReparentTo(mafNode *parent)
 //-------------------------------------------------------------------------
 {
   return (parent == NULL)|| (parent->IsA(typeid(mafVME)) && !IsInTree(parent));
+}
+
+//-------------------------------------------------------------------------
+void mafVME::SetPose(const mafMatrix &mat,mafTimeStamp t)
+//-------------------------------------------------------------------------
+{
+  mafMatrix new_mat(mat);
+  new_mat.SetTimeStamp(t);
+  SetMatrix(new_mat);
 }
 
 //-------------------------------------------------------------------------
@@ -323,6 +331,10 @@ void mafVME::SetAbsMatrix(const mafMatrix &matrix)
     pmat.Invert();
 
     mafMatrix::Multiply4x4(pmat,matrix,pmat);
+
+    //inherit timestamp from user provided!
+    pmat.SetTimeStamp(matrix.GetTimeStamp()); //modified by Vladik Aranov 25-03-2005
+    
     SetMatrix(pmat);
     return;
   }
@@ -546,6 +558,7 @@ int mafVME::GetAuxiliaryRefSys(mafMatrix *AuxRefSys, const char *RefSysName, int
 int mafVME::SetMatrixPipe(mafMatrixPipe *mpipe)
 //-------------------------------------------------------------------------
 {
+  assert(m_Output);
   if (mpipe!=m_MatrixPipe)
   {
     if (mpipe==NULL||mpipe->SetVME(this)==MAF_OK)
@@ -553,7 +566,6 @@ int mafVME::SetMatrixPipe(mafMatrixPipe *mpipe)
       if (m_MatrixPipe)
       {
         // detach the old pipe
-        m_MatrixPipe->SetListener(NULL);
         m_MatrixPipe->SetVME(NULL);
         m_MatrixPipe->SetCurrentTime(m_CurrentTime);
       }
@@ -562,18 +574,17 @@ int mafVME::SetMatrixPipe(mafMatrixPipe *mpipe)
 
       if (mpipe)
       {
-        // attach as observer to the new pipe
-        mpipe->SetListener(this);
+        // attach the new pipe
         mpipe->SetVME(this);
         // set the output matrix to pipe output matrix
-        GetOutput()->m_Matrix=mpipe->GetMatrixPointer();
+        GetOutput()->SetTransform(mpipe);
       }
       else
       {
         // When no Matrix pipe is set, simply provide
         // an identity matrix as output matrix
-        GetOutput()->m_Matrix=mafSmartPointer<mafMatrix>();
-        GetOutput()->m_Matrix->SetTimeStamp(m_CurrentTime);
+        GetOutput()->SetTransform(mafTransform::New());
+        GetOutput()->GetTransform()->SetTimeStamp(m_CurrentTime);
       }
 
       // this forces the the pipe to Update its input and input frame
@@ -609,7 +620,7 @@ void mafVME::SetCrypting(int crypting)
   else
     m_Crypting = 0;
 
-  GetTagArray()->SetTag(mmuTagItem("MAF_CRYPT_VME",m_Crypting));
+  GetTagArray()->SetTag(mafTagItem("MAF_CRYPT_VME",m_Crypting));
   Modified();
 }
 
@@ -624,6 +635,7 @@ int mafVME::GetCrypting()
 int mafVME::SetDataPipe(mafDataPipe *dpipe)
 //-------------------------------------------------------------------------
 {
+  assert(m_Output);
   if (dpipe==m_DataPipe.GetPointer())
     return MAF_OK;
 
@@ -633,7 +645,6 @@ int mafVME::SetDataPipe(mafDataPipe *dpipe)
     if (m_DataPipe)
     {
       // detach the old pipe
-      m_DataPipe->SetListener(NULL);
       m_DataPipe->SetVME(NULL);
     }
 
@@ -641,17 +652,9 @@ int mafVME::SetDataPipe(mafDataPipe *dpipe)
     
     if (m_DataPipe)
     {
+      //m_DataPipe->SetVME(this);
       m_DataPipe->SetCurrentTime(m_CurrentTime);
-      m_DataPipe->SetListener(this);
     }
-
-    // must plug the event source after calling UpdateCurrentData, since 
-    // UpdateCurrentData calls invoke explicitly the OutputDataChangedEvent,
-    // this avoids a double calling.
-    //if (m_DataPipe)
-    //{
-    //  mflAgent::PlugEventSource(dpipe,OutputDataUpdateCallback,this,mafDataPipe::OutputUpdateEvent);
-    //}
 
     // advise listeners the data pipe has changed
     GetEventSource()->InvokeEvent(this,VME_OUTPUT_DATA_CHANGED);
@@ -673,12 +676,52 @@ void mafVME::OnEvent(mafEventBase *e)
     switch (e->GetId())
     {
     case VME_TIME_SET:
-      //SetCurrentTime();
+      SetCurrentTime(*((mafTimeStamp *)e->GetData()));
+    break;
+    case VME_OUTPUT_DATA_PREUPDATE:
+      InternalPreUpdate();  // self process the event
+      GetEventSource()->InvokeEvent(e); // forward event to observers
+      return;
+    break;
+    case VME_OUTPUT_DATA_UPDATE:
+      InternalUpdate();   // self process the event
+      GetEventSource()->InvokeEvent(e); // forward event to observers
+      return;
     break;
     }
   }
-
   Superclass::OnEvent(e);
 }
 
-#endif
+
+//-------------------------------------------------------------------------
+int mafVME::InternalStore(mafStorageElement *parent)
+//-------------------------------------------------------------------------
+{
+  if (Superclass::InternalStore(parent)==MAF_OK)
+  {
+    parent->SetAttribute("Crypting",mafString(m_Crypting));    
+    return MAF_OK;
+  }
+  return MAF_ERROR;
+}
+
+//-------------------------------------------------------------------------
+int mafVME::InternalRestore(mafStorageElement *node)
+//-------------------------------------------------------------------------
+{
+  if (Superclass::InternalRestore(node)==MAF_OK)
+  {
+    mafString crypting;
+    node->GetAttribute("Crypting",crypting);
+    if (crypting=="true"||crypting=="True"||crypting=="TRUE")
+    {
+      SetCrypting(atof(crypting));
+    }
+    
+    return MAF_OK;
+  }
+  return MAF_ERROR;
+}
+
+

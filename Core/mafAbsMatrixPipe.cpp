@@ -2,18 +2,23 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAbsMatrixPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:27:15 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-01 10:03:30 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 #include "mafAbsMatrixPipe.h"
-
+#include "mafEventBase.h"
 #include "mafMatrix.h"
 #include "mafVME.h"
+#include "mafVMEOutput.h"
 #include "mafTransformFrame.h"
+
+//------------------------------------------------------------------------------
+mafCxxTypeMacro(mafAbsMatrixPipe)
+//------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 mafAbsMatrixPipe::mafAbsMatrixPipe()
@@ -31,6 +36,21 @@ mafAbsMatrixPipe::~mafAbsMatrixPipe()
 }
 
 //----------------------------------------------------------------------------
+unsigned long mafAbsMatrixPipe::GetMTime()
+//----------------------------------------------------------------------------
+{
+  unsigned long mtime = this->Superclass::GetMTime();
+
+  unsigned long transMTime = m_Transform->GetMTime();
+  if (transMTime > mtime)
+  {
+    return transMTime;
+  }
+  
+  return mtime;
+}
+
+//----------------------------------------------------------------------------
 int mafAbsMatrixPipe::SetVME(mafVME *vme)
 //----------------------------------------------------------------------------
 {
@@ -38,7 +58,11 @@ int mafAbsMatrixPipe::SetVME(mafVME *vme)
   {
     if (vme)
     {
-      m_Transform->SetInput(vme->GetMatrixPipe());
+      if (vme->GetOutput())
+        m_Transform->SetInput(vme->GetOutput()->GetTransform());
+      else
+        m_Transform->SetInput((mafTransformBase *)NULL);
+      
       if (vme->GetParent())
       {
         m_Transform->SetInputFrame(vme->GetParent()->GetAbsMatrixPipe());
@@ -70,25 +94,29 @@ void mafAbsMatrixPipe::InternalUpdate()
   
   m_Updating=1;
 
-  mafMatrixPipe *input = (mafMatrixPipe *)m_Transform->GetInput();
-  mafMatrixPipe *input_frame = (mafMatrixPipe *)m_Transform->GetInputFrame();
+  mafMatrixPipe *input = mafMatrixPipe::SafeDownCast(m_Transform->GetInput());
+  mafMatrixPipe *input_frame = mafMatrixPipe::SafeDownCast(m_Transform->GetInputFrame());
 
   mafTimeStamp old_vme_time = -1;
   mafTimeStamp old_vme_parent_time = -1;
 
+  m_Transform->SetTimeStamp(GetCurrentTime());
 
   // if the Current time of this transform is different from 
   // the input transforms' ones, force temporary input 
   // and input frame to a new current time. Also disable 
-  // the rising update event since it's only a temporary 
-  // update of the matrix.
+  // the rising of update event since it's only a temporary 
+  // update of the matrix. This is not an optimal solution, 
+  // since it will make matrix pipes' modification time to 
+  // be updated, therefore all depending process objects
+  // will be forced to updated themselves...
   if (input)
   {
     old_vme_time=input->GetCurrentTime();
 
-    if (m_CurrentTime!=old_vme_time)
+    if (GetCurrentTime()!=old_vme_time)
     {
-      input->SetCurrentTime(m_CurrentTime);
+      input->SetCurrentTime(GetCurrentTime());
     }
   }
 
@@ -96,23 +124,26 @@ void mafAbsMatrixPipe::InternalUpdate()
   {
     old_vme_parent_time = input_frame->GetCurrentTime();
 
-    if (old_vme_parent_time != m_CurrentTime)
+    if (old_vme_parent_time != GetCurrentTime())
     {
-      input_frame->SetCurrentTime(m_CurrentTime); 
+      input_frame->SetCurrentTime(GetCurrentTime()); 
     }
   }
   
+  *m_Matrix = m_Transform->GetMatrix();
+
+
   if (m_UpdateMatrixObserverFlag)
   {
-    InvokeEvent(MATRIX_UPDATED,m_Matrix);
+    if (m_VME) m_VME->OnEvent(&mafEventBase(this,VME_MATRIX_UPDATE,m_Matrix));
   }
    
-  if (input&&m_CurrentTime!=old_vme_time)
+  if (input&&GetCurrentTime()!=old_vme_time)
   {
     input->SetCurrentTime(old_vme_time);
   }
 
-  if (input_frame&&old_vme_parent_time != m_CurrentTime)
+  if (input_frame&&old_vme_parent_time != GetCurrentTime())
   {
     input_frame->SetCurrentTime(old_vme_parent_time);
   }

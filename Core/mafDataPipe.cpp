@@ -1,22 +1,21 @@
 /*=========================================================================
-
-Program:   Visualization Toolkit
-Module:    $RCSfile: mafDataPipe.cpp,v $
-Language:  C++
-Date:      $Date: 2005-03-11 15:42:25 $
-Version:   $Revision: 1.2 $
-
-
-
+  Program:   Multimod Application Framework
+  Module:    $RCSfile: mafDataPipe.cpp,v $
+  Language:  C++
+  Date:      $Date: 2005-04-01 10:03:31 $
+  Version:   $Revision: 1.3 $
+  Authors:   Marco Petrone
+==========================================================================
+  Copyright (c) 2001/2005 
+  CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 #include "mafDataPipe.h"
 
 #include "mafVME.h"
-#include "mafVMEItem.h"
 #include "mafAbsMatrixPipe.h"
 #include "mafOBB.h"
 #include "mafIndent.h"
-
+#include <sstream>
 //------------------------------------------------------------------------------
 mafCxxTypeMacro(mafDataPipe)
 //------------------------------------------------------------------------------
@@ -26,7 +25,7 @@ mafDataPipe::mafDataPipe()
 //------------------------------------------------------------------------------
 {
   m_CurrentTime = 0;
-  m_CurrentBounds.Reset();
+  m_Bounds.Reset();
   m_VME=NULL;
   m_DependOnAbsPose=0;
   m_DependOnPose=0;
@@ -41,6 +40,17 @@ mafDataPipe::~mafDataPipe()
 }
 
 //------------------------------------------------------------------------------
+void mafDataPipe::SetCurrentTime(mafTimeStamp t)
+//------------------------------------------------------------------------------
+{
+  if (t!=m_CurrentTime)
+  {
+    m_CurrentTime = t;
+    Modified();
+  }
+}
+
+//------------------------------------------------------------------------------
 int mafDataPipe::SetVME(mafVME *vme) 
 //------------------------------------------------------------------------------
 {
@@ -51,7 +61,7 @@ int mafDataPipe::SetVME(mafVME *vme)
     return MAF_OK;
   }
   
-  mafErrorMacro("Wrong m_VME type: " << vme->GetClassName());
+  mafErrorMacro("Wrong m_VME type: " << vme->GetTypeName());
   return MAF_ERROR;
 }
 
@@ -68,7 +78,7 @@ mafDataPipe *mafDataPipe::MakeACopy()
 int mafDataPipe::DeepCopy(mafDataPipe *pipe)
 //------------------------------------------------------------------------------
 {
-  if (pipe->IsA(this->GetClassName()))
+  if (pipe->IsA(this->GetTypeName()))
   {
     m_VME=pipe->GetVME();
     return MAF_OK;
@@ -85,9 +95,9 @@ unsigned long mafDataPipe::GetMTime()
 {
   unsigned long mtime = this->mafTimeStamped::GetMTime();
 
-  //if (m_CurrentBounds.GetMTime() > mtime)
+  //if (m_Bounds.GetMTime() > mtime)
   //{
-  //  mtime = m_CurrentBounds.GetMTime();
+  //  mtime = m_Bounds.GetMTime();
   //}
 
   if (m_VME)
@@ -126,46 +136,27 @@ unsigned long mafDataPipe::GetMTime()
 }
 
 //------------------------------------------------------------------------------
-// TO BE rewritten
-vtkDataSet * mafDataPipe::GetOutput() 
+void mafDataPipe::PreExecute()
 //------------------------------------------------------------------------------
 {
-/*  // check to see if an execute is necessary.
-  if (this->Outputs && this->Outputs[0])
-  {
-    return (vtkDataSet *)(this->Outputs[0]);
-  }
-
-  if (this->Outputs == NULL)
-  {
-    // this should create the right object type in the Output array
-    //this->ExecuteInformation();
-    this->UpdateInformation();
-  }
-
-  if (this->Outputs == NULL)
-  {
-    return NULL;
-  }
-
-  if (this->Outputs[0])
-  {
-    return (vtkDataSet *)(this->Outputs[0]);
-  }
-*/
-  return NULL;
+}
+//------------------------------------------------------------------------------
+void mafDataPipe::Execute()
+//------------------------------------------------------------------------------
+{
 }
 
 //------------------------------------------------------------------------------
-void mafDataPipe::UpdateBounds()
+void mafDataPipe::OnEvent(mafEventBase *event)
 //------------------------------------------------------------------------------
 {
-  //m_CurrentBounds.DeepCopy(this->GetOutput()->GetBounds());
+  if (m_VME) m_VME->OnEvent(event);
 }
 
 //------------------------------------------------------------------------------
 void mafDataPipe::Print(std::ostream& os, const int tabs) const
 //------------------------------------------------------------------------------
 {
-  
+  mafIndent indent(tabs);
+  os << indent << "VME:" << (m_VME?m_VME->GetName():"(NULL)") << std::endl;
 }

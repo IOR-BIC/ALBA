@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 15:46:26 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-01 10:03:35 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,52 +14,67 @@
 #define __mafVMEOutput_h
 
 #include "mafObject.h"
+#include "mafSmartPointer.h"
 #include "mafString.h"
-#include "mafVME.h"
+#include "mafOBB.h"
+
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
+class mafVME;
 class mafMatrix;
-class mafTransform;
+class mafTransformBase;
 class mafOBB;
 class mafNodeIterator;
+#ifdef MAF_USE_VTK
 class vtkDataSet;
+#endif MAF_USE_VTK
 
 /** mafVMEOutput - the output data structure of a VME node.
   mafVMEOutput is the output produced by a VME node.
 
   @todo
-  -
+  - add a GetITKMesh
+  - add a GetITKImage
   */
 class MAF_EXPORT mafVMEOutput : public mafObject
 {
 public:
   mafAbstractTypeMacro(mafVMEOutput,mafObject);
 
-  mafVME *GetVME();
+  /** return the VME connected to this object */
+  mafVME *GetVME() const;
+
+  /** internally used to set the VME connected to this object */
+  void SetVME(mafVME *vme) {m_VME=vme;} 
 
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0) const;
 
   /** Return the VME pose, this function queries the MatrixPipe for producing a matrix */
-  void GetPose(double &x,double &y,double &z,double &rx,double &ry,double &rz,mafTimeStamp t=-1);
+  void GetPose(double &x,double &y,double &z,double &rx,double &ry,double &rz,mafTimeStamp t=-1) const;
   /** Return the VME pose */
-  void GetPose(double xyz[3],double rxyz[3],mafTimeStamp t=-1);
+  void GetPose(double xyz[3],double rxyz[3],mafTimeStamp t=-1) const;
   /** Return the VME pose */
-  virtual void GetMatrix(mafMatrix &matrix,mafTimeStamp t=-1);
+  virtual void GetMatrix(mafMatrix &matrix,mafTimeStamp t=-1) const;
   /** Return the VME pose matrix for the current time */
-  virtual mafMatrix *GetMatrix();
-  
+  mafMatrix *GetMatrix() const;
+  /** Return the transform generating the pose matrix of the VME */ 
+  virtual mafTransformBase *GetTransform() const;
+
   /** Get the global pose matrix of this VME for the given time "t".*/
-  void GetAbsMatrix(mafMatrix &matrix,mafTimeStamp t=-1);
+  void GetAbsMatrix(mafMatrix &matrix,mafTimeStamp t=-1) const;
   /** Get the global pose matrix of this VME for the given time "t".*/
-  mafMatrix *GetAbsMatrix();
+  mafMatrix *GetAbsMatrix() const;
+  /** return the transform representing the Abs pose (typically the VME's AbsMatrix pipe) */
+  virtual mafTransformBase * GetAbsTransform() const;
   
   /** Get the global pose of this VME for the given time "t".*/
-  void GetAbsPose(double &x,double &y,double &z,double &rx,double &ry,double &rz,mafTimeStamp t=-1);
+  void GetAbsPose(double &x,double &y,double &z,double &rx,double &ry,double &rz,mafTimeStamp t=-1) const;
   /** Get the global pose of this VME for the given time "t".*/
-  void GetAbsPose(double xyz[3],double rxyz[3],mafTimeStamp t=-1);
+  void GetAbsPose(double xyz[3],double rxyz[3],mafTimeStamp t=-1) const;
   
+#ifdef MAF_USE_VTK
   /**
     Return a VTK dataset corresponding to the current time. This is
     the output of the DataPipe currently attached to the VME.
@@ -68,79 +83,85 @@ public:
     of stored Items is 0. Also special VME could not support VTK dataset output.
     An event is rised when the output data changes to allow attached classes to 
     update their input.*/
-  virtual vtkDataSet *GetVTKData()=0;
+  virtual vtkDataSet *GetVTKData();
+#endif
 
   /**
     Return the DataType to be produced as output. This can be used to avoid calling
     update for checking about data type directly in the output dataset and thus
     without actually loading the data from file. */
-  virtual const char *GetDataType() {return m_DataType;}
+  virtual const char *GetDataType() const {return m_DataType;}
 
   /**
-    Update all the output data structures (data, matrix and abs matrix).*/
+    Update all the output data structures (data, bounds, matrix and abs matrix).*/
   virtual void Update();
     
   /**
     Return the TimeBounds of the whole subtree, i.e recurse the GetLocalTimeBounds()
     function over all the VME in the subtree.*/
-  void GetTimeBounds(mafTimeStamp tbounds[2]);
+  void GetTimeBounds(mafTimeStamp tbounds[2]) const;
 
   /**
     Get TimeBounds for this VME. TimeBounds interval is defined by the minimum
     and maximum time stamps against the MatrixVector and VMEItems time stamps.
     If only the pose time stamps are required use the mafMatrixVector::GetTimeBounds()
     function. For the time bounds of the VME items only use the mafVMEGeneric::GetItemsTimesList()*/
-  void GetLocalTimeBounds(mafTimeStamp tbounds[2]);
+  void GetLocalTimeBounds(mafTimeStamp tbounds[2]) const;
   
   /**
     Extract the 4D bounds for this VME only, i.e. the space bounds along all the time range
-    for this VME. The first of these two functions allows to specify the time
-    interval for which the time bound is required*/
-  void GetLocal4DBounds(mafTimeStamp start, mafTimeStamp end, double bounds[6]);
-  void GetVME4DBounds(double bounds[6]);
-  void GetVME4DBounds(mafOBB &bounds);
+    for this VME. */
+  void GetVME4DBounds(double bounds[6]) const;
+  void GetVME4DBounds(mafOBB &bounds) const;
 
   /**
     Extract the 4D bounds for all the subtree starting a this VME, i.e. the space bounds 
-    along all the time for the VME in the subtree. The first of these two functions allows
-    to specify the time interval for which the time bound is required*/
-  void Get4DBounds(mafTimeStamp start, mafTimeStamp end, double bounds[6]);
-  void Get4DBounds(double bounds[6]);
-  void Get4DBounds(mafOBB &bounds);
+    along all the time for the VME in the subtree.*/
+  void Get4DBounds(double bounds[6]) const;
+  void Get4DBounds(mafOBB &bounds) const;
   
   /**
     Return the space bound of the subtree for the current time, taking in consideration
     the current data bounds and the current pose matrix*/
-  void GetBounds(double bounds[6]);
-  virtual void GetBounds(mafOBB &bounds,mafTimeStamp t=-1, mafNodeIterator *iter=NULL);
+  void GetBounds(double bounds[6]) const;
+  virtual void GetBounds(mafOBB &bounds,mafTimeStamp t=-1, mafNodeIterator *iter=NULL) const;
   
   /**
     Return the space bound of the VME (not the subtree) for the current time, taking in consideration 
-    the current data bounds and the current pose matrix*/
-  void GetVMEBounds(double bounds[6]);
-  virtual void GetVMEBounds(mafOBB &bounds,mafTimeStamp t=-1, mafNodeIterator *iter=NULL);
+    the current data bounds and the current pose matrix.*/
+  void GetVMEBounds(double bounds[6]) const;
+  virtual void GetVMEBounds(mafOBB &bounds,mafTimeStamp t=-1, mafNodeIterator *iter=NULL) const;
   
   /**
-    Return the local space bound (in local coordinates) of the VME (not the subtree) for the current time,
-    taking in consideration the current data bounds and the current pose matrix*/
-  void GetVMELocalBounds(double bounds[6]);
-  virtual void GetVMELocalBounds(mafOBB &bounds,mafTimeStamp t=-1, mafNodeIterator *iter=NULL);
+    Return the local space bound (in local coordinates) of the VME (not the whole subtree) for the 
+    current time, taking in consideration the current data bounds and the current pose matrix.*/
+  void GetVMELocalBounds(double bounds[6]) const;
+  virtual void GetVMELocalBounds(mafOBB &bounds,mafTimeStamp t=-1, mafNodeIterator *iter=NULL) const;
 
   /** return the time for which this output was computed */
-  mafTimeStamp GetCurrentTime();
+  mafTimeStamp GetCurrentTime() const;
 
-  friend class mafVME;
+  /** 
+    Used by source VME to set internal pointer to Transform: do not use this method directly,
+    use instead mafVME::SetMatrix() */
+  virtual void SetTransform(mafTransformBase *trans);
+  
+  /** 
+    Used by source VME to set internal bounds structure: never use this method directly. */
+  void SetBounds(const mafOBB &bounds);
+
 protected:
   mafVMEOutput(); // to be allocated with New()
   virtual ~mafVMEOutput(); // to be deleted with Delete()
 
-  /** internally used to compute bounds for non procedural data */
-  virtual void GetDataBounds(mafOBB &bounds,mafTimeStamp t)=0; 
+  /** retrieve bounds of the output data not considering the VME pose matrix and the visibility. */
+  virtual void GetDataBounds(mafOBB &bounds,mafTimeStamp t) const;
 
-  mafVME                    *m_VME;     ///< pointer to source VME
+  mafVME *                  m_VME;      ///< pointer to source VME
   mafString                 m_DataType; ///< the type of data stored in object expressed as a string
+  mafOBB                    m_Bounds;   ///< bounds of the output data (i.e. for current time)
 
-  mafAutoPointer<mafMatrix> m_Matrix;   ///< the output pose matrix
+  mafTransformBase *        m_Transform;///< the transform generating the output pose matrix
 
 private:
   mafVMEOutput(const mafVMEOutput&); // Not implemented

@@ -2,11 +2,11 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataPipe.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 15:42:26 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-01 10:03:32 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
-  Copyright (c) 2002/2004 
+  Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
@@ -14,8 +14,8 @@
 #define __mafDataPipe_h
 
 #include "mafReferenceCounted.h"
+#include "mafObserver.h"
 #include "mafTimeStamped.h"
-#include "mafEventSender.h"
 #include "mafOBB.h"
 
 //----------------------------------------------------------------------------
@@ -23,6 +23,7 @@
 //----------------------------------------------------------------------------
 class mafVMEItem;
 class mafVME;
+class vtkDataSet;
 
 /** abstract class for process objects producing data as output of a VME.
   mafDataPipe is the base class for process objects producing data as output 
@@ -30,7 +31,7 @@ class mafVME;
   also implements the mechanism to compute the 3D bounds
   at any time...
  
-  @sa mafInterpolator
+  @sa mafDataInterpolator
  
   @todo
   - rewrite comments
@@ -38,7 +39,7 @@ class mafVME;
   - rewrite GetOutput()
   - reerite UpdateBounds()
 */
-class MAF_EXPORT mafDataPipe:public mafReferenceCounted, public mafTimeStamped, public mafEventSender
+class MAF_EXPORT mafDataPipe:public mafReferenceCounted, public mafTimeStamped, public mafObserver
 {
 public:
   mafDataPipe();
@@ -47,19 +48,28 @@ public:
   mafTypeMacro(mafDataPipe,mafReferenceCounted);
 
   /**
-    This function makes the current bounds to be updated. It's optimized
-    to not require real data updating, i.e. data bounds are be evaluated 
+    This function makes the current bounds to be updated. It should be optimized
+    to not require data loading, i.e. data bounds to be evaluated 
     without actually loading the data, but reading dataset bounds from 
-    VME item meta-data structure */
-  virtual void UpdateBounds();
+    VME item meta-data structure (@sa mafDataInterpolator)*/
+  virtual void UpdateBounds() {}
  
-  /** 
+  /** update the output of the data pipe */
+  virtual void Update() {}
+
+  /**
     Return the current dataset bounds, updated by UpdateBounds() and
     Update() when CurrentTime is changed. The Update() functions
     must be called before calling this function, otherwise the bounds
     are invalid.*/
-  mafOBB *GetBounds() {return &m_CurrentBounds;}
-  
+  mafOBB *GetBounds() {return &m_Bounds;}
+
+#ifdef MAF_USE_VTK
+  /**
+    Return a VTK dataset corresponding to the current time.*/
+  virtual vtkDataSet *GetVTKData() {return NULL;}
+#endif
+
 
   /** Set/Get the current time */
   void SetCurrentTime(mafTimeStamp t);
@@ -98,15 +108,17 @@ public:
 
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0) const;
+
+  void OnEvent(mafEventBase *event);
   
 protected:
   /** function called before of data pipe execution */
-  virtual void PreExecute() {}
+  virtual void PreExecute();
 
   /** function called to updated the data pipe output */
-  virtual void Exectute() {}
+  virtual void Execute();
 
-  mafOBB        m_CurrentBounds;///< bounds of the output data
+  mafOBB        m_Bounds;///< bounds of the output data
   mafTimeStamp  m_CurrentTime;  ///< time for which data is computed
   mafVME        *m_VME;         ///< pointer to the VME for which output is computed
 

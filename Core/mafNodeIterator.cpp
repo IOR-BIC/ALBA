@@ -2,16 +2,13 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeIterator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:32:41 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-04-01 10:03:34 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-
-#ifndef __mafNodeIterator_cxx
-#define __mafNodeIterator_cxx
 
 #include "mafNodeIterator.h"
 #include "mafVector.txx"
@@ -37,7 +34,6 @@ mafNodeIterator::~mafNodeIterator()
   m_CurrentNode=NULL; // do not unregister since it was not registered!
   SetRootNode(NULL);
 }
-
 
 //----------------------------------------------------------------------------
 void mafNodeIterator::InitTraversal()
@@ -213,8 +209,12 @@ int mafNodeIterator::GoToNextNode()
       m_TraversalDone=1;
   }
 
-  return (!m_TraversalDone)?MAF_OK:MAF_ERROR;
+  if (!m_TraversalDone)
+  {
+    return (IsVisible(GetCurrentNode()))?MAF_OK:GoToNextNode();
+  }
 
+  return MAF_ERROR;
 }
 
 //----------------------------------------------------------------------------
@@ -367,7 +367,13 @@ int mafNodeIterator::GoToPreviousNode()
       mafErrorMacro("Unsupported Traversal Mode");
       m_TraversalDone=1;
   }
-  return (!m_TraversalDone)?MAF_OK:MAF_ERROR;
+
+  if (!m_TraversalDone)
+  {
+    return (IsVisible(GetCurrentNode()))?MAF_OK:GoToPreviousNode();
+  }
+
+  return MAF_ERROR;
 }
 
 //----------------------------------------------------------------------------
@@ -429,7 +435,7 @@ int mafNodeIterator::GoToFirstNode()
   {
     m_TraversalDone=0; // reset the traversal flag
     PreExecute(); // Call the pre-callback
-    return MAF_OK;
+    return IsVisible(m_CurrentNode)?MAF_OK:GoToNextNode();
   }
   else
   {
@@ -468,7 +474,7 @@ int mafNodeIterator::GoToLastNode()
   {
     m_TraversalDone=0; // reset the traversal flag
     PreExecute(); // Call the Pre-callbacks
-    return MAF_OK;
+    return IsVisible(m_CurrentNode)?MAF_OK:GoToPreviousNode();
   }
   else
   {
@@ -545,4 +551,3 @@ void mafNodeIterator::DoneExecute()
 {
   m_EventSource.InvokeEvent(this,ID_Done,m_CurrentNode);
 }
-#endif

@@ -2,16 +2,13 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 15:43:10 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-04-01 10:03:33 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-#ifndef __mafNode_cxx
-#define __mafNode_cxx
-
 #include "mafNode.h"
 #include "mafNodeIterator.h"
 #include "mafNodeRoot.h"
@@ -276,7 +273,7 @@ int mafNode::FindNodeIdx(const char *name)
 mafNode *mafNode::FindInTreeByTag(const char *name,const char *value,int type)
 //-------------------------------------------------------------------------
 {
-  mmuTagItem *titem=GetTagArray()->GetTag(name);
+  mafTagItem *titem=GetTagArray()->GetTag(name);
   if (titem&&mafCString(titem->GetName())==name)
     return this;
 
@@ -719,6 +716,14 @@ mafAttribute *mafNode::GetAttribute(const char *name)
   mafAttributesMap::iterator it=m_Attributes.find(name);
   return (it!=m_Attributes.end())?(*it).second.GetPointer():NULL;
 }
+
+//-------------------------------------------------------------------------
+void mafNode::RemoveAttribute(const char *name)
+//-------------------------------------------------------------------------
+{
+  m_Attributes.erase(m_Attributes.find(name));
+}
+
 //-------------------------------------------------------------------------
 void mafNode::RemoveAllAttributes()
 //-------------------------------------------------------------------------
@@ -868,7 +873,14 @@ void mafNode::OnEvent(mafEventBase *e)
   // events to be sent up or down in the tree are simply forwarded
   if (e->GetChannel()==MCH_UP)
   {
-    ForwardUpEvent(e);
+    switch (e->GetId())
+    {
+    case NODE_GET_ROOT:
+      e->SetData(GetRoot());
+      break;
+    default:
+      ForwardUpEvent(e);
+    };
     return;
   }
   if (e->GetChannel()==MCH_DOWN)
@@ -909,7 +921,7 @@ int mafNode::InternalStore(mafStorageElement *parent)
   {
     attrs.push_back(it->second);
   }
-  parent->StoreObjectVector(attrs,"Attributes");
+  parent->StoreObjectVector("Attributes",attrs);
 
   // store Links
   mafStorageElement *links_element=parent->AppendChild("Links");
@@ -932,7 +944,7 @@ int mafNode::InternalStore(mafStorageElement *parent)
       nodes_to_store.push_back(node);
     }
   }
-  parent->StoreObjectVector(nodes_to_store,"Children","Node");
+  parent->StoreObjectVector("Children",nodes_to_store,"Node");
 
   return MAF_OK;
 }
@@ -953,7 +965,7 @@ int mafNode::InternalRestore(mafStorageElement *node)
       // restore attributes
       RemoveAllAttributes();
       std::vector<mafObject *> attrs;
-      if (node->RestoreObjectVector(attrs,"Attributes")==MAF_OK)
+      if (node->RestoreObjectVector("Attributes",attrs)==MAF_OK)
       {
         for (unsigned int i=0;i<attrs.size();i++)
         {
@@ -978,15 +990,15 @@ int mafNode::InternalRestore(mafStorageElement *node)
           {
             mafString link_name;
             links_vector[i]->GetAttribute("Name",link_name);
-            mafString link_node_id;
-            links_vector[i]->GetAttribute("NodeId",link_node_id);
-            m_Links[link_name]=mmuNodeLink((mafID)atof(link_node_id));
+            mafID link_node_id;
+            links_vector[i]->GetAttributeAsInteger("NodeId",link_node_id);
+            m_Links[link_name]=mmuNodeLink(link_node_id);
           }
 
           // restore children
           RemoveAllChildren();
           std::vector<mafObject *> children;
-          if (node->RestoreObjectVector(children,"Children","Node")==MAF_OK)
+          if (node->RestoreObjectVector("Children",children,"Node")==MAF_OK)
           {
             m_Children.resize(children.size());
             for (unsigned int i=0;i<children.size();i++)
@@ -1036,5 +1048,3 @@ void mafNode::Print(std::ostream& os, const int tabs) const
     os << next_indent << "Name: " << lnk_it->first << "\tNodeId: " << lnk_it->second.m_NodeId << std::endl;
   }
 }
-  
-#endif

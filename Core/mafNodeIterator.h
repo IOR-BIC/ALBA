@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeIterator.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:26:49 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-04-01 10:03:34 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -45,6 +45,11 @@ public:
   mafNode * GetNextNode() {this->GoToNextNode(); return (m_TraversalDone)?NULL:this->GetCurrentNode();}
   /**  Shortcut to traverse the tree*/
   mafNode * GetPreviousNode() {this->GoToPreviousNode(); return (m_TraversalDone)?NULL:this->GetCurrentNode();}
+
+  /**
+    Return true if the VME is visible. This function can be overridden to implement
+    different visibility rules.*/
+  virtual bool IsVisible(mafNode *node) { return node->IsVisible();}
 
   /**
   Set the root node of the (sub)tree to be traversed. Used to set the start 

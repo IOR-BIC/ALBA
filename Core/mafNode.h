@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 15:43:21 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2005-04-01 10:03:34 $
+  Version:   $Revision: 1.18 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -16,9 +16,10 @@
 #include "mafStorable.h"
 #include "mafSmartPointer.h"
 #include "mafObserver.h"
-#include "mmuTagItem.h"
+#include "mafTagItem.h"
 #include "mafString.h"
 #include "mafTimeStamped.h"
+#include "mafAttribute.h"
 #include "mafDecl.h"
 #include <vector>
 #include <map>
@@ -29,7 +30,6 @@
 //----------------------------------------------------------------------------
 class mafEventSource;
 class mafNodeIterator;
-class mafAttribute;
 class mafTagArray;
 class mmgGui;
 
@@ -228,13 +228,12 @@ public:
   mafNodeIterator *NewIterator();
 
   /**
-  Set/Get the flag to make this VME visible to tree traversal. mflVMEIterator, 
-  GetSpaceBounds and Get4DBounds will skip this VME if the flag is OFF.*/
+    Set/Get the flag to make this VME visible to tree traversal. mflVMEIterator, 
+    GetSpaceBounds and Get4DBounds will skip this VME if the flag is OFF.*/
   void SetVisibleToTraverse(bool flag) {m_VisibleToTraverse=flag;}
   bool GetVisibleToTraverse() {return m_VisibleToTraverse;}
 
-  /**
-  Return true if visible to tree traversal*/
+  /**  Return true if visible to tree traversal*/
   bool IsVisible() {return m_VisibleToTraverse;}
 
   /** Compare two nodes. sublcasses should redefine this function. */
@@ -247,8 +246,7 @@ public:
     Order of children node is significative for comparison! */
   bool CompareTree(mafNode *vme);
 
-  /**
-  return true if node can be reparented under the specified node*/
+  /**  return true if node can be reparented under the specified node*/
   virtual bool CanReparentTo(mafNode *parent) {return parent==NULL||!IsInTree(parent);}
 
   /** redefined to cope with tree registering */
@@ -279,6 +277,9 @@ public:
 
   /** return an attribute given the name */
   mafAttribute *GetAttribute(const char *name);
+
+  /** remove an attibute */
+  void RemoveAttribute(const char *name);
 
   /** remove all the attributes of this node */
   void RemoveAllAttributes();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrixPipe.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 10:10:13 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-01 10:03:33 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,7 +14,6 @@
 #define __mafMatrixPipe_h
 
 #include "mafTransformBase.h"
-#include "mafEventSender.h"
 #include "mafTimeStamped.h"
 
 //----------------------------------------------------------------------------
@@ -32,7 +31,7 @@ class mafVME;
   @todo
   - to check the m_Updating effect and usefulness 
   */
-class MAF_EXPORT mafMatrixPipe: public mafTransformBase, public mafEventSender
+class MAF_EXPORT mafMatrixPipe: public mafTransformBase
 {
 public:
   mafMatrixPipe();
@@ -42,8 +41,8 @@ public:
   
   void UpdateMatrixObserverOn() {m_UpdateMatrixObserverFlag=1;}
   void UpdateMatrixObserverOff() {m_UpdateMatrixObserverFlag=0;}
-  void SetUpdateMatrixObserverFlag(bool flag);
-  bool GetUpdateMatrixObserverFlag();
+  void SetUpdateMatrixObserverFlag(bool flag) {m_UpdateMatrixObserverFlag=flag;}
+  bool GetUpdateMatrixObserverFlag() {return m_UpdateMatrixObserverFlag;}
 
   /** set the VME connected to this class. return MAF_ERROR if "vme" is not accepted */
   int SetVME(mafVME *vme);
@@ -54,7 +53,7 @@ public:
   virtual void SetCurrentTime(mafTimeStamp t);
 
   /** return the time stamp currently set to the pipe */
-  mafTimeStamp GetCurrentTime() {return m_CurrentTime;}
+  mafTimeStamp GetCurrentTime();
   
   /** Get the MTime: this is the bit of magic that makes everything work. */
   virtual unsigned long GetMTime();
@@ -76,13 +75,17 @@ public:
     Copy from another pipe, the function return MAF_ERROR if the specied pipe 
     is not compatible. */
   virtual int DeepCopy(mafMatrixPipe *pipe);
+
+  /** 
+    Redefined to send pre update event to the VME. In the pre update event
+    the VME can change pipe parameters */
+  virtual void Update();
   
 protected:
   /** To be redefined by subclasses to override Pipe behavior */
   virtual void InternalUpdate();
 
   bool          m_UpdateMatrixObserverFlag;
-  mafTimeStamp  m_CurrentTime;
   bool          m_Updating;
   mafVME        *m_VME; ///< pointer to VME
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeRoot.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 15:43:57 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-01 10:03:35 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,6 +23,7 @@ class mafNode;
 class mafObject;
 class mafObserver;
 class mafStorageElement;
+class mafStorage;
 
 /** mafNodeRoot - this class represent an interface for the root nodes of a MAF tree
   mafNodeRoot is an interface class to specialize node to become a root node. It forces
@@ -39,9 +40,6 @@ public:
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0) const;
 
-  /** Return the pointer to the parent node (if present)*/
-  mafNode *GetParent() {return NULL;};
-
   /** 
     Return highest NodeId assigned for this tree. Return -1 if no one has
     been assigned yet.*/
@@ -56,11 +54,18 @@ public:
   void SetMaxNodeId(mafID id) { m_MaxNodeId=id;}
   void ResetMaxNodeId() { this->SetMaxNodeId(0);}
 
-  /** root node cannot be reparented */
+  /** 
+    root node cannot be reparented. Root nodes should redefine CanReparent
+    to call this function. */
   virtual bool CanReparentTo(mafNode *parent) {return parent==NULL;}
 
   static mafNodeRoot* SafeDownCast(mafObject *o);
 
+  /** process event for the root node */
+  void OnRootEvent(mafEventBase *e);
+
+  mafStorage *GetStorage();
+  
 protected:
   mafNodeRoot();
   virtual ~mafNodeRoot();
@@ -68,7 +73,7 @@ protected:
   virtual int StoreRoot(mafStorageElement *parent);
   virtual int RestoreRoot(mafStorageElement *element);
 
-  mafID m_MaxNodeId;
+  mafID       m_MaxNodeId; ///< Counter for node Ids
 
 private:
   mafNodeRoot(const mafNodeRoot&); // Not implemented

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 15:46:52 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-01 10:03:36 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -29,7 +29,7 @@
   @todo
   - 
   */
-class MAF_EXPORT mafVMERoot : public mafVME
+class MAF_EXPORT mafVMERoot : public mafVME, public mafNodeRoot
 {
 public:
   mafTypeMacro(mafVMERoot,mafVME);
@@ -54,11 +54,30 @@ public:
     m_Attributes.clear(); \
   };
 
+  /** set the tree reference system */
+  virtual void SetMatrix(const mafMatrix &mat);
+
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0) const;
 
+  /** return no timestamps */
+  virtual void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes);
+
+  /** force the time of the internal matrix */
+  virtual void SetCurrentTime(mafTimeStamp t);
+
+  /** allow only a NULL parent */
+  virtual bool CanReparentTo(mafNode *parent) {return mafNodeRoot::CanReparentTo(parent);}
+
+  void OnEvent(mafEventBase *e);
+  
 protected:
-  mafID m_MaxItemId;
+  /** allowed only dynamic allocation via New() */
+  mafVMERoot();           
+  virtual ~mafVMERoot();  
+
+  mafID         m_MaxItemId; ///< id counter for VME items
+  mafTransform* m_Transform; ///< pose matrix for the root
 private:
   mafVMERoot(const mafVMERoot&); // Not implemented
   void operator=(const mafVMERoot&); // Not implemented
