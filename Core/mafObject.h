@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObject.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-08 19:59:57 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-11-09 06:43:10 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -74,9 +74,9 @@ protected:
   static mafID GetNextTypeId(const char *classname);
 
 private:
-  static mafID TypeId;
-  static mafID TypeIdCounter;
-  static mafObjectDictionaryType TypesDictionary;
+  static mafID m_TypeId;
+  static mafID m_TypeIdCounter;
+  static mafObjectDictionaryType m_TypesDictionary;
 };
 
 #endif /* __mafObject_h */

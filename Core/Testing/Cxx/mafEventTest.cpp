@@ -1,13 +1,11 @@
 #include "mafEventBase.h"
 #include <iostream>
-#include <utilities>
+#include <utility>
 
 using namespace std;
 
 int main()
-{
-  
-  
+{  
   typedef pair<int,const char *> test_type;
   test_type test_data(10,"ciao");
   

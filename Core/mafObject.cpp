@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObject.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-02 15:01:02 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-11-09 06:43:10 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -23,20 +23,20 @@
 class mafObjectDictionaryType
 {
   public:
-  static std::map<std::string,mafID> *TypeIDs;
+  static std::map<std::string,mafID> *m_TypeIDs;
 
-  mafObjectDictionaryType() {if (TypeIDs==NULL) TypeIDs=new std::map<std::string,mafID>;}
-  ~mafObjectDictionaryType() {if (TypeIDs) delete TypeIDs;} // this is to allow memory deallocation
+  mafObjectDictionaryType() {if (m_TypeIDs==NULL) m_TypeIDs=new std::map<std::string,mafID>;}
+  ~mafObjectDictionaryType() {if (m_TypeIDs) delete m_TypeIDs;} // this is to allow memory deallocation
 }; 
 
 //------------------------------------------------------------------------------
 // Static Objects
 //------------------------------------------------------------------------------
-std::map<std::string,mafID> * mafObjectDictionaryType::TypeIDs=NULL;
-mafObjectDictionaryType mafObject::TypesDictionary;
-mafID mafObject::TypeIdCounter = 0; // This is for allocating unique Object IDs.
+std::map<std::string,mafID> * mafObjectDictionaryType::m_TypeIDs=NULL;
+mafObjectDictionaryType mafObject::m_TypesDictionary;
+mafID mafObject::m_TypeIdCounter = 0; // This is for allocating unique Object IDs.
 
-mafID mafObject::TypeId = GetNextTypeId("mafObject");
+mafID mafObject::m_TypeId = GetNextTypeId("mafObject");
 //------------------------------------------------------------------------------
 mafObject::mafObject()
 //------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ int mafObject::IsTypeOf(const char *type_name)
 int mafObject::IsTypeOf(const mafID type_id)
 //------------------------------------------------------------------------------
 {
-  return ( type_id==mafObject::TypeId ) ? 1 : 0;
+  return ( type_id==mafObject::m_TypeId ) ? 1 : 0;
 }
 
 //------------------------------------------------------------------------------
@@ -116,26 +116,26 @@ mafObject *mafObject::NewInstance() const
 mafID mafObject::GetTypeId()
 //------------------------------------------------------------------------------
 {
-  return mafObject::TypeId;
+  return mafObject::m_TypeId;
 }
 
 //------------------------------------------------------------------------------
 mafID mafObject::GetClassId() const
 //------------------------------------------------------------------------------
 {
-  return mafObject::TypeId;
+  return mafObject::m_TypeId;
 }
 
 //------------------------------------------------------------------------------
 mafID mafObject::GetNextTypeId(const char *classname)
 //------------------------------------------------------------------------------
 {
-  mafID id=TypeIdCounter++;
+  mafID id=m_TypeIdCounter++;
 
-  if (TypesDictionary.TypeIDs==NULL)
-    TypesDictionary.TypeIDs=new std::map<std::string,mafID>;
+  if (m_TypesDictionary.m_TypeIDs==NULL)
+    m_TypesDictionary.m_TypeIDs=new std::map<std::string,mafID>;
 
-  (*TypesDictionary.TypeIDs)[classname]=id;
+  (*m_TypesDictionary.m_TypeIDs)[classname]=id;
 
   return id;
 }
@@ -146,9 +146,9 @@ mafID mafObject::GetTypeId(const char *classname)
 {
   mafID id=0;
   
-  std::map<std::string,mafID>::iterator  it=(*TypesDictionary.TypeIDs).find(classname);
+  std::map<std::string,mafID>::iterator  it=(*m_TypesDictionary.m_TypeIDs).find(classname);
 
-  if (it!=(*TypesDictionary.TypeIDs).end())
+  if (it!=(*m_TypesDictionary.m_TypeIDs).end())
   {
     id=it->second;
   }

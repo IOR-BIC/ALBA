@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObserverCallback.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-08 19:59:57 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-11-09 06:43:10 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -38,20 +38,20 @@ public:
   /** Set function callback to be called by this observer */
   void SetCallback(void (*f)(void *sender, mafID eid, 
                              void *clientdata, void *calldata))
-    {Callback = f;}
+    {m_Callback = f;}
    
   /** set client data to be passed to callback function */
-  void SetClientData(void *cd) {this->ClientData = cd;}
+  void SetClientData(void *cd) {this->m_ClientData = cd;}
     
   /** return client data passed to callback function */  
-  void* GetClientData() {return this->ClientData;}
+  void* GetClientData() {return this->m_ClientData;}
        
   /** process the events sent by subjects */
   virtual void OnEvent(mafEventBase *e);
 
 protected:
-  void (*Callback)(void *, mafID, void *, void *);  
-  void *ClientData;
+  void (*m_Callback)(void *, mafID, void *, void *);  
+  void *m_ClientData;
 };
 
 #endif /* __mafObserverCallback_h */

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-08 17:32:34 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-11-09 06:43:09 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -20,10 +20,11 @@ mafCxxTypeMacro(mafEventBase)
 mafEventBase::mafEventBase(void *sender, mafID id, void *data)
 //------------------------------------------------------------------------------
 {
-  Sender  = sender;
-  Source  = NULL;
-  Data    = data;
-  Id      = id;
+  m_Sender    = sender;
+  m_Source    = NULL;
+  m_Data      = data;
+  m_Id        = id;
+  m_SkipFlag  = false;
 }
 
 //------------------------------------------------------------------------------
@@ -36,61 +37,62 @@ mafEventBase::~mafEventBase()
 mafEventBase::mafEventBase(const mafEventBase& c)
 //------------------------------------------------------------------------------
 {
-  Sender  = c.Sender;
-  Source  = c.Source;
-  Data    = c.Data;
-  Id      = c.Id;
+  m_Sender    = c.m_Sender;
+  m_Source    = c.m_Source;
+  m_Data      = c.m_Data;
+  m_Id        = c.m_Id;
+  m_SkipFlag  = c.m_SkipFlag;
 }
 //------------------------------------------------------------------------------
 void mafEventBase::SetSender(void *sender)
 //------------------------------------------------------------------------------
 {
-  Sender = sender;
+  m_Sender = sender;
 }
 //------------------------------------------------------------------------------
 void *mafEventBase::GetSender()
 //------------------------------------------------------------------------------
 {
-  return Sender;
+  return m_Sender;
 }
 
 //------------------------------------------------------------------------------
 void mafEventBase::SetSource(mafEventSource *src)
 //------------------------------------------------------------------------------
 {
-  Source=src;
+  m_Source=src;
 }
 
 //------------------------------------------------------------------------------
 mafEventSource *mafEventBase::GetSource()
 //------------------------------------------------------------------------------
 {
-  return Source;
+  return m_Source;
 }
 
 //------------------------------------------------------------------------------
 void mafEventBase::SetData(void *calldata)
 //------------------------------------------------------------------------------
 {
-  Data = calldata;
+  m_Data = calldata;
 }
 
 //------------------------------------------------------------------------------
 void *mafEventBase::GetData()
 //------------------------------------------------------------------------------
 {
-  return Data;
+  return m_Data;
 }
 
 //------------------------------------------------------------------------------
 void mafEventBase::SetId(mafID id)
 //------------------------------------------------------------------------------
 {
-  Id = id;
+  m_Id = id;
 }
 //------------------------------------------------------------------------------
 mafID mafEventBase::GetId()
 //------------------------------------------------------------------------------
 {
-  return Id;
+  return m_Id;
 }

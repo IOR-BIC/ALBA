@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventSource.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-08 17:32:34 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-11-09 06:43:09 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -42,10 +42,12 @@ public:
   mafTypeMacro(mafEventSource,mafObject);
  
   mafEventSource(const mafEventSource& c) {}
-  //void operator=(const mafEventSource&) {}
 
   /** Register an observer of this subject */
   void AddObserver(mafObserver *obj, int priority=0);
+
+  /** Register an observer of this subject */
+  void AddObserver(mafObserver &obj, int priority=0);
 
   /** 
     Add as observer a callback function. This function returns  
@@ -64,7 +66,7 @@ public:
   bool HasObservers();
 
   /** invoke an event of this subject */
-  void InvokeEvent(mafEventBase &e) {InvokeEvent(&e);}
+  void InvokeEvent(mafEventBase &e);
 
   /** invoke an event of this subject */
   void InvokeEvent(mafEventBase *e);
@@ -88,9 +90,9 @@ public:
   void *GetOwner();
 
 protected:
-  void *Data;             ///< void pointer to be used to store client data 
-  mafObserversList *Observers;  ///< list of observers
-  void *Owner;                  ///< pointer to class owning this event source
+  void *m_Data;             ///< void pointer to be used to store client data 
+  mafObserversList *m_Observers;  ///< list of observers
+  void *m_Owner;                  ///< pointer to class owning this event source
 private:
   
 };

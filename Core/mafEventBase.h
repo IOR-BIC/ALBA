@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventBase.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-08 17:32:34 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-11-09 06:43:09 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -68,11 +68,24 @@ public:
   /** return call data, data sent by sender (event's invoker) to all observers */
   void *GetData();
 
+  /** return SkipFlag value. SkipFlag is used to make an event to be skipped by next observers */
+  bool GetSkipFlag() \
+    {return m_SkipFlag;}
+
+  /** set the skip flag. When true the event will be skipped by next observers */
+  void SetSkipFlag(bool flag) \
+    {m_SkipFlag=flag;}
+
+  /** force an event to be skipped by next observers */
+  void SkipNext() \
+    {m_SkipFlag=true;}
+
 protected:
-  void            *Sender;
-  mafEventSource  *Source;
-  void            *Data;
-  mafID           Id;
+  void            *m_Sender;
+  mafEventSource  *m_Source;
+  void            *m_Data;
+  mafID           m_Id;
+  bool            m_SkipFlag;
 };
 
 #endif /* __mafEventBase_h */

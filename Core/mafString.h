@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-04 20:59:02 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2004-11-09 06:43:10 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -20,7 +20,7 @@
 /** mafString - performs common string operations.
   mafString is an implementation of string which operates on a traditional
   c-string internally stored. At each moment this string can be retrived with
-  GetCStr(). The memory of this CStr is automatically garbaged. Originally based
+  GetCStr(). The memory of this m_CStr is automatically garbaged. Originally based
   on vtkString. */
 class mafCore_EXPORT mafString
 {
@@ -65,7 +65,7 @@ public:
   
   /**
     Duplicate the string stored inside this object.*/
-  char* Duplicate() { return Duplicate(CStr);};
+  char* Duplicate() { return Duplicate(m_CStr);};
  
   /** 
     This static method compare two strings. It is similar to strcmp, but it
@@ -75,7 +75,7 @@ public:
   /** 
     This method compare the given c-string with the one stored inside this object.
     It is similar to strcmp, but it can handle null pointers.*/
-  int Compare(const char* str) { return Compare(CStr, str);};
+  int Compare(const char* str) { return Compare(m_CStr, str);};
   
   /**
     This static method compare two strings. It is similar to strcmp, but it
@@ -88,17 +88,17 @@ public:
     It is similar to strcmp, but it can handle null pointers. Also it only
     returns C style true or false versus compare which returns also which
     one is greater.*/
-  int Equals(const char* str) { return Equals(CStr, str); };
+  int Equals(const char* str) { return Equals(m_CStr, str); };
   
   /** Static method to check if the first string starts with the second one.*/
   static int StartsWith(const char* str1, const char* str2);
   /** Check if this string starts with the given one.*/
-  int StartsWith(const char* str) { return StartsWith(CStr, str);}
+  int StartsWith(const char* str) { return StartsWith(m_CStr, str);}
 
   /** Static method to check if the first string ends with the second one.*/
   static int EndsWith(const char* str1, const char* str2);
   /** Check if this string ends with the given one.*/
-  int EndsWith(const char* str) { return EndsWith(CStr, str);}
+  int EndsWith(const char* str) { return EndsWith(m_CStr, str);}
 
   /**
     Append two strings and produce a new one.  The consumer must delete
@@ -122,7 +122,7 @@ public:
 
   /** Extract the base name of a filename string */
   static const char *BaseName(const char *filename);
-  const char *BaseName() {return BaseName(CStr);}
+  const char *BaseName() {return BaseName(m_CStr);}
 
   /** Extract the pathname from a filename string */
   void ExtractPathName();
@@ -133,14 +133,14 @@ public:
     character with the right pathname separator.*/
   void AppendPath(const char *str);
   void AppendPath(mafString *str)
-    { AppendPath(str->CStr);}
+    { AppendPath(str->m_CStr);}
 
   /**
     parse the given string to substitute each (back)slash
     character with the right pathname separator.*/
   void SetPathName(const char *str);
   void SetPathName(mafString *str)
-    { SetPathName(str->CStr);}
+    { SetPathName(str->m_CStr);}
 
   /**
     parse the given string to substitute each (back)slash
@@ -148,12 +148,12 @@ public:
   void ParsePathName() {mafString::ParsePathName(this);}
   static char *ParsePathName(char *str);
   static char *ParsePathName(mafString *str)
-    { return mafString::ParsePathName(str->CStr);}
+    { return mafString::ParsePathName(str->m_CStr);}
 
   //void SPrintf(const char *format,...);
 
   /** Return the pointer to the internal c-string */
-  char * GetCStr() {return CStr;};
+  char * GetCStr() {return m_CStr;};
 
   /** return the real memory size allocated for the internal c-string */
   int GetSize() {return Size;};
@@ -171,14 +171,14 @@ public:
   /**  return true if empty*/
   static bool IsEmpty(const char *str) { return (str?str[0]=='\0':true);};
   /**  return true if empty*/
-  bool IsEmpty() { return IsEmpty(CStr);};
+  bool IsEmpty() { return IsEmpty(m_CStr);};
 
   /** Set the string to the specified value*/
   void Set(const char *a) {*this=a;};
   void Set(double a) {*this=a;};
 
   /** this allows to convert a mafString to const char *. */
-  operator const char*() const {return CStr;}  
+  operator const char*() const {return m_CStr;}  
 
   const bool operator==(const char *src);
 
@@ -195,9 +195,9 @@ protected:
   /** Pre-Allocate space for the internal c-string. */
   int SetSize(mafID size);
 
-  void Initialize() {CStr=NULL;Size=0;};
+  void Initialize() {m_CStr=NULL;Size=0;};
 
-  char *CStr;
+  char *m_CStr;
   mafID Size;
 };
 

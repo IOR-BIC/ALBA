@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventSource.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-08 19:59:56 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-11-09 06:43:09 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -26,7 +26,7 @@ typedef std::list< mafObserversPairType > mafObserversListType;
 class mafObserversList
 {
 public:
-  mafObserversListType List; 
+  mafObserversListType m_List; 
 };
 
 //------------------------------------------------------------------------------
@@ -37,16 +37,23 @@ mafCxxTypeMacro(mafEventSource)
 mafEventSource::mafEventSource(void *owner)
 //------------------------------------------------------------------------------
 {
-  Data  = NULL;
-  Observers   = new mafObserversList;
-  Owner       = owner;
+  m_Data  = NULL;
+  m_Observers   = new mafObserversList;
+  m_Owner       = owner;
 }
 
 //------------------------------------------------------------------------------
 mafEventSource::~mafEventSource()
 //------------------------------------------------------------------------------
 {
-  delete Observers; Observers = NULL;
+  delete m_Observers; m_Observers = NULL;
+}
+
+//------------------------------------------------------------------------------
+void mafEventSource::AddObserver(mafObserver &obj, int priority)
+//------------------------------------------------------------------------------
+{
+  AddObserver(&obj,priority);
 }
 
 //------------------------------------------------------------------------------
@@ -55,25 +62,25 @@ void mafEventSource::AddObserver(mafObserver *obj, int priority)
 {
   // searches for first element with priority <= priority
   mafObserversListType::iterator it;
-  for (it=Observers->List.begin(); it!=Observers->List.end() && (*it).first>priority ;it++) ;
+  for (it=m_Observers->m_List.begin(); it!=m_Observers->m_List.end() && (*it).first>priority ;it++) ;
 
-  Observers->List.insert(it,mafObserversPairType(priority,obj));
+  m_Observers->m_List.insert(it,mafObserversPairType(priority,obj));
 }
 //------------------------------------------------------------------------------
 bool mafEventSource::RemoveObserver(mafObserver *obj)
 //------------------------------------------------------------------------------
 {
-  if (Observers->List.empty())
+  if (m_Observers->m_List.empty())
     return false;
 
   // an observer could be present more then one time!
   bool flag=false;
   mafObserversListType::iterator it;
-  for (it=Observers->List.begin(); it!=Observers->List.end() ;it++)
+  for (it=m_Observers->m_List.begin(); it!=m_Observers->m_List.end() ;it++)
   {
     if ((*it).second == obj)
     {
-      Observers->List.erase(it);
+      m_Observers->m_List.erase(it);
       flag=true;
     }
   }
@@ -84,11 +91,11 @@ bool mafEventSource::RemoveObserver(mafObserver *obj)
 bool mafEventSource::IsObserver(mafObserver *obj)
 //------------------------------------------------------------------------------
 {
-  if (Observers->List.empty())
+  if (m_Observers->m_List.empty())
     return false;
 
   mafObserversListType::iterator it;
-  for (it=Observers->List.begin();it!=Observers->List.end();it++) 
+  for (it=m_Observers->m_List.begin();it!=m_Observers->m_List.end();it++) 
     if ((*it).second!=obj) return true;
 
   return false;
@@ -98,24 +105,42 @@ bool mafEventSource::IsObserver(mafObserver *obj)
 bool mafEventSource::HasObservers()
 //------------------------------------------------------------------------------
 {
-  return !Observers->List.empty();
+  return !m_Observers->m_List.empty();
 }
 
 //------------------------------------------------------------------------------
 void mafEventSource::InvokeEvent(mafEventBase *e)
 //------------------------------------------------------------------------------
 {
-  if (Observers->List.empty())
+  if (m_Observers->m_List.empty())
     return;  
   
   e->SetSource(this);
 
   mafObserversListType::iterator it;
-  for (it=Observers->List.begin();it!=Observers->List.end();it++)
+  for (it=m_Observers->m_List.begin();it!=m_Observers->m_List.end();it++)
   {
     // rise an event to observers
     mafObserver *observer=(*it).second;
     observer->OnEvent(e);
+  }
+}
+
+//------------------------------------------------------------------------------
+void mafEventSource::InvokeEvent(mafEventBase &e)
+//------------------------------------------------------------------------------
+{
+  if (m_Observers->m_List.empty())
+    return;  
+  
+  e.SetSource(this);
+
+  mafObserversListType::iterator it;
+  for (it=m_Observers->m_List.begin();it!=m_Observers->m_List.end()&&!e.GetSkipFlag();it++)
+  {
+    // rise an event to observers
+    mafObserver *observer=(*it).second;
+    observer->OnEvent(&e);
   }
 }
 
@@ -132,28 +157,28 @@ void mafEventSource::InvokeEvent(void *sender, mafID id, void *data)
 void *mafEventSource::GetData()
 //------------------------------------------------------------------------------
 {
-  return Data;
+  return m_Data;
 }
 
 //------------------------------------------------------------------------------
 void mafEventSource::SetData(void *data)
 //------------------------------------------------------------------------------
 {
-  Data = data;
+  m_Data = data;
 }
 
 //------------------------------------------------------------------------------
 void mafEventSource::SetOwner(void *owner)
 //------------------------------------------------------------------------------
 {
-  Owner=owner;
+  m_Owner=owner;
 }
 
 //------------------------------------------------------------------------------
 void *mafEventSource::GetOwner()
 //------------------------------------------------------------------------------
 {
-  return Owner;
+  return m_Owner;
 }
 
 //------------------------------------------------------------------------------
