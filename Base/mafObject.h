@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObject.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-11 17:35:00 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-02-17 00:39:22 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,7 +14,6 @@
 #define __mafObject_h
 
 #include "mafDefines.h"
-#include <iosfwd>
 
 //------------------------------------------------------------------------------
 // Forward declarations
