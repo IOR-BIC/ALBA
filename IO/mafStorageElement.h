@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-24 14:56:49 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-01-28 13:58:18 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,8 +12,7 @@
 #ifndef __mafStorageElement_h__
 #define __mafStorageElement_h__
 
-#include "mafDefines.h"
-#include <iosfwd>
+#include "mafConfigure.h"
 #include <vector>
 //----------------------------------------------------------------------------
 // forward declarations :

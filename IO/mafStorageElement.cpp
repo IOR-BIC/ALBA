@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-01-24 14:56:31 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-01-28 13:58:18 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -40,7 +40,7 @@ mafStorageElement::~mafStorageElement()
   if (m_Children)
   {
     // remove all child nodes
-    for (int i=0;i<m_Children->size();i++)
+    for (unsigned int i=0;i<m_Children->size();i++)
     {
       delete (*m_Children)[i];
     }
@@ -59,7 +59,7 @@ mafStorageElement *mafStorageElement::FindNestedElement(const char *name)
   std::vector<mafStorageElement *> *children=GetChildren();
   
   // to be rewritten as a map access
-  for (int i=0;i<children->size();i++)
+  for (unsigned int i=0;i<children->size();i++)
   {
     mafStorageElement *node=(*children)[i];
     if (node_name==node->GetName())
@@ -80,7 +80,7 @@ bool mafStorageElement::GetNestedElementsByName(const char *name,std::vector<maf
   list.clear();
   
   // to be rewritten as a map access
-  for (int i=0;i<children->size();i++)
+  for (unsigned int i=0;i<children->size();i++)
   {
     mafStorageElement *node=(*children)[i];
     if (node_name==node->GetName())
@@ -103,7 +103,7 @@ int mafStorageElement::StoreObjectVector(const std::vector<mafObject *> &vector,
   mafStorageElement *vector_node = AppendChild(name);
   vector_node->SetAttribute("Size",mafString(vector.size()));
   
-  for (int i=0;i<vector.size();i++)
+  for (unsigned int i=0;i<vector.size();i++)
   {
     mafObject *object=vector[i];
     if (object)
@@ -133,7 +133,7 @@ int mafStorageElement::RestoreObjectVector(std::vector<mafObject *> &vector,cons
   if (subnode)
   {
     std::vector<mafStorageElement *> *items = subnode->GetChildren();
-    for (int i=0;i<items->size();i++)
+    for (unsigned int i=0;i<items->size();i++)
     {
       mafStorageElement *item=(*items)[i];
       mafObject *object=RestoreObject(item);
