@@ -57,8 +57,8 @@ SET(PROJECT_SRCS
   mmuTagItem.h
   mmuTimeSet.cpp
   mmuTimeSet.h
-#  mafEvent.cpp
-#  mafEvent.h
+  mafEvent.cpp
+  mafEvent.h
 )
 
 IF (MAF_USE_VTK)
