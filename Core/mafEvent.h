@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 09:04:33 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-04-01 09:22:58 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden, Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -173,7 +173,7 @@ public:
     if(e->IsType(mafEvent))              \
         OnEvent( *((mafEvent*)e) );      \
     else                                 \
-        mafObserver::OnEvent(e);         \
+        assert(false);                   \
   };
 };
 
