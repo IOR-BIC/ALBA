@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObject.h,v $
   Language:  C++
-  Date:      $Date: 2004-10-27 11:24:30 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-10-29 11:25:36 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -30,7 +30,7 @@ public:
   mafObject();
   virtual ~mafObject();
   
-  /** Return the class name of this class type */
+  /** Return the name of this type (static function) */
   static const char *GetTypeName();
 
   /** Return the class name of this instance */
@@ -57,14 +57,14 @@ public:
   /** Return a new instance of the same type */
   mafObject *NewInstance() const;
 
-  /** Return TypeId for this class type */ 
+  /** Return TypeId for this type (static function) */ 
   static mafID GetTypeId();
 
   /** Return TypeId for this class instance */ 
-  virtual mafID GetClassTypeId() const;
+  virtual mafID GetClassId() const;
 
   /** Return the ID for a specific classname */
-  static mafID GetClassTypeId(const char *classname);
+  static mafID GetTypeId(const char *classname);
 
   /** Internally used to keep a unique ID for all the object */
   static mafID GetNextTypeId(const char *classname);

@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2004-10-27 11:24:41 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-10-29 11:25:35 $
+  Version:   $Revision: 1.3 $
 
 =========================================================================*/
 // .NAME standard macros and constants for the MFL libray
@@ -48,7 +48,7 @@ typedef unsigned long mafID;
   public: \
   typedef superclass Superclass; \
   static mafID GetTypeId(); \
-  virtual mafID GetClassTypeId() const; \
+  virtual mafID GetClassId() const; \
   static const char *GetTypeName(); \
   virtual const char *GetClassName() const; \
   static int IsTypeOf(const char *type); \
@@ -64,7 +64,7 @@ typedef unsigned long mafID;
 #define mafCxxTypeMacro(thisClass) \
   mafID thisClass::TypeId = GetNextTypeId(#thisClass); \
   mafID thisClass::GetTypeId() {return thisClass::TypeId;} \
-  mafID thisClass::GetClassTypeId() const {return thisClass::TypeId;} \
+  mafID thisClass::GetClassId() const {return thisClass::TypeId;} \
   const char *thisClass::GetTypeName() {return #thisClass;} \
   const char *thisClass::GetClassName() const {return #thisClass;} \
   int thisClass::IsTypeOf(const char *type) \

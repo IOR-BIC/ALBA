@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObject.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-10-27 11:24:30 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-10-29 11:25:36 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -120,7 +120,7 @@ mafID mafObject::GetTypeId()
 }
 
 //------------------------------------------------------------------------------
-mafID mafObject::GetClassTypeId() const
+mafID mafObject::GetClassId() const
 //------------------------------------------------------------------------------
 {
   return mafObject::TypeId;
@@ -141,7 +141,7 @@ mafID mafObject::GetNextTypeId(const char *classname)
 }
 
 //------------------------------------------------------------------------------
-mafID mafObject::GetClassTypeId(const char *classname)
+mafID mafObject::GetTypeId(const char *classname)
 //------------------------------------------------------------------------------
 {
   mafID id=0;
