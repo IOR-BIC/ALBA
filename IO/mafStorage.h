@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorage.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-28 19:45:25 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-12-29 18:00:27 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -28,6 +28,9 @@ class mafStorageElement;
 class mafStorage
 {
 public:
+  mafStorage();
+  virtual ~mafStorage();
+
   /** Set the name of the file to be read or written */
   void SetFileName(const char *name);
 
@@ -49,10 +52,10 @@ public:
   void SetRoot (mafStorable *root);
 
   /** resolve an URL and provide local filename to be used as input */
-  bool ResolveInputURL(const mafString &url, mafString &filename)=0;
+  virtual bool ResolveInputURL(const mafString &url, mafString &filename)=0;
 
   /** resolve an URL and provide a local filename to be used as output */
-  bool ResolveOutputURL(const mafString &url, mafString &filename)=0;
+  virtual bool ResolveOutputURL(const mafString &url, mafString &filename)=0;
     
 protected:
   /** This is called by Store() and must be reimplemented by subclasses */

@@ -12,14 +12,8 @@ SET(PROJECT_SRCS
   mafStorable.cpp
   mafStorage.cpp
   mafStorage.h
-  mafStorageDocument.cpp
-  mafStorageDocument.h
   mafStorageElement.cpp
   mafStorageElement.h
-  mafStorageReader.cpp
-  mafStorageReader.h
-  mafStorageWriter.cpp
-  mafStorageWriter.h
 )
 
 # IO classes for VTK related objects
@@ -42,10 +36,7 @@ IF (MAF_USE_XercesC)
     mafXMLStorage.h
     mafXMLString.cpp
     mafXMLString.h
-#   mafXMLReader.cpp
-#   mafXMLReader.h
-#   mafXMLWriter.cpp
-#   mafXMLWriter.h
+    mmuXMLDOM.h
   )
   SET(PROJECT_LIBS ${PROJECT_LIBS} XercesC)
 ENDIF (MAF_USE_XercesC)

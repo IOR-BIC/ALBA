@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorable.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-27 18:22:25 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-12-29 18:00:26 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -60,4 +60,4 @@ protected:
     The element to be restored is passed as argument*/
   virtual int InternalRestore(mafStorageElement *node)=0;
 };
-#endif // _mafStorable_h_
+#endif // __mafStorable_h__

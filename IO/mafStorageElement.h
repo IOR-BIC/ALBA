@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-28 19:45:26 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-12-29 18:00:27 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -18,6 +18,7 @@
 // forward declarations :
 //----------------------------------------------------------------------------
 class mafStorage;
+class mafStorable;
 class mafMatrix;
 class mafString;
 template <class T> class mafVector;
@@ -27,9 +28,10 @@ template <class T> class mafVector;
   functions are defined to store and restore basic objects into the element. More complex serialization algorithms can
   be implemented by specific "serializable" objects.
   This abstract class does not implement any real encoding, and subclasses can define specialized de/serialization
-  algorithm.
-  
+  algorithm.  
   @sa mafXMLStorage mafStorageElement mafXMLElement mafStorable
+  @todo
+  - reimplement children list as a map
  */  
 class mafStorageElement
 {
@@ -90,7 +92,13 @@ public:
   virtual mafStorageElement *AppendChild(const char *name) = 0;
 
   /** Find a nested element by Name */
-  virtual mafStorageElement *FindNestedElement(const char *name)=0;
+  virtual mafStorageElement *FindNestedElement(const char *name);
+
+  /** 
+    Return the list of children. Subclasses must impement this to constrcut
+    the children list.  
+  */ 
+  virtual mafVector<mafStorageElement *> *GetChildren()=0; 
 
 protected:
   /** elements can be created only by means of AppendChild() or FindNestedElement() */
@@ -98,9 +106,9 @@ protected:
 
   void SetStorage(mafStorage *storage) {m_Storage = storage;}
   void SetParent(mafStorageElement *element) {m_Parent = element;}
-  
+
   mafStorage *m_Storage; ///< storage who created this element
   mafStorageElement *m_Parent; ///< the parent element in the hierarchy
-  mafVector<mafStorageElement> *m_Children; ///< children elements
+  mafVector<mafStorageElement *> *m_Children; ///< children elements
 };
 #endif // _mafStorageElement_h_

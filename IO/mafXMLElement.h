@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLElement.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-28 19:45:27 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-12-29 18:00:27 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,11 +14,18 @@
 
 #include "mafStorageElement.h"
 
+// Sorry, very difficult to use PIMPL with this awful namespace
+#include <xercesc/dom/DOM.hpp>
+
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 class mafXMLStorage;
-class DOMAttr;
+class mafXMLString;
+
+#ifdef XERCES_CPP_NAMESPACE_USE
+XERCES_CPP_NAMESPACE_USE
+#endif
 
 /** concrete implementation of mafStorageElement as an XML-DOM element
   This class represent a concrete implementation of a mafStorageElement in terms
@@ -36,7 +43,7 @@ class DOMAttr;
 class mafXMLElement : public mafStorageElement
 {
 public:
-  mafXMLElement(DOMElement *element,mafStorageElement *parent,mafStorage *storage);
+  mafXMLElement(DOMElement *element,mafXMLElement *parent,mafXMLStorage *storage);
   virtual ~mafXMLElement();
 
   /** get the name of this XML element */
@@ -86,6 +93,11 @@ public:
 
   /** return a pointer to the parent element, i.e. the element upper in the hierarchy */
   mafXMLElement *GetXMLParent();
+
+  /** 
+    Return the list of children. The list is created from DOM-Tree at the first access
+    during restoring. */ 
+  virtual mafVector<mafStorageElement *> *GetChildren();
   
   /** 
     Create a new XML child element and return its pointer. This is the only way to create a new
@@ -95,24 +107,40 @@ public:
   mafXMLElement *AppendXMLChild(const char *name);
 
   /** Find a nested XML element by Name */
-  virtual mafStorageElement *FindNestedElement(const char *name);
-  mafXMLElement *FindNestedElement(const char *name);
+  mafXMLElement *FindNestedXMLElement(const char *name);
 
   /** return DOM-XML element stored inside this mafXMLElement */
   DOMElement *GetXMLElement();
 
-  /** append an attribute to an XML element. attribute 'name' and 'value' must be passed as argument */
-  DOMAttr *AppendXMLAttribute(DOMElement *element,const char *name,const char *value);
-  DOMAttr *AppendXMLAttribute(const char *name,const char *value) {return AppendXMLAttribute(m_XMLElement,name,value);}
+  /** 
+    Append an XML attribute to this element. Attribute 'name' and
+    'value' must be passed as argument. This utility function takes care
+    of string conversion problems. */
+  void SetXMLAttribute(const char *name,const char *value);
 
-  /** Find a */
-  DOMAttr *FindXMLAttribute(DOMElement *element,const char *name);
+  /** 
+    Return find an attribute given its name and return its value.
+    Return false if not found. This function takes care of string
+    conversion problems. */
+  bool GetXMLAttribute(const char *name,mafString &value);
 
   /** this writes text inside a DOM-XML element */
-  void WriteXMLText(mafXMLElement *element,const char *text);
+  void WriteXMLText(const char *text);
+
+  /** Internally used to extract vector values from Text data*/
+  int ParseData(const char *text,double *vector,int size);
+
+  /** Internally used to extract vector values from Text data */
+  int ParseData(double *vector,int size);
+  int ParseData(int *vector,int size);
 
 protected:
 
   DOMElement *m_XMLElement; ///< XML element wrapped by this object 
+  mafXMLString  *m_Name; ///< Convenient copy of tagName
+
+private:
+  
+
 };
 #endif // _mafXMLElement_h_

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLString.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-28 19:45:27 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-12-29 18:00:28 $
+  Version:   $Revision: 1.3 $
   Authors:   Rick Parrish (rfmobile@swbell.net) adapted by Marco Petrone (CINECA)
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -43,10 +43,10 @@ public:
 	XMLCh & operator [] (const int i);
 	const XMLCh operator [] (const int i) const;
 	operator const XMLCh * () const { return m_WStr; };
-  operator const char * () const {return GetCStr();}
+  operator const char * () {return GetCStr();}
 protected:
   XMLCh *m_WStr;
-  const char *m_CStr;
+  char *m_CStr;
 };
 
 #endif
