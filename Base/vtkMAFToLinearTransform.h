@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFToLinearTransform.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-11 17:35:04 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-03-10 12:21:39 $
+  Version:   $Revision: 1.2 $
 
   Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
   All rights reserved.
@@ -16,54 +16,55 @@
 
 =========================================================================*/
 
-// .NAME vtkMAFToLinearTransform - convert a matrix to a transform
-// .SECTION Description
-// This is a very simple class which allows a vtkMatrix4x4 to be used in
-// place of a vtkLinearTransform or vtkAbstractTransform.  For example,
-// if you use it as a proxy between a matrix and vtkTransformPolyDataFilter
-// then any modifications to the matrix will automatically be reflected in
-// the output of the filter.
-// .SECTION See Also
-// vtkTransform vtkMatrix4x4 vtkMatrixToHomogeneousTransform 
 
 #ifndef __vtkMAFToLinearTransform_h
 #define __vtkMAFToLinearTransform_h
 
 #include "vtkLinearTransform.h"
 
-class vtkMatrix4x4;
+class mafTransformBase;
+class mafMatrix;
 
-class VTK_COMMON_EXPORT vtkMAFToLinearTransform : public vtkLinearTransform
+/** vtkMAFToLinearTransform - convert a MAF transform or matrix into a VTK transform.
+  This is a very simple class which allows a mafMatrix or mafTransform to be used in
+  place of a vtkLinearTransform or vtkAbstractTransform. This allows to attach MAF
+  objects to VTK pipeline mechanisms
+
+  @sa mafTransformBase mafMatrix vtkLinearTransform  
+*/
+class MAF_EXPORT vtkMAFToLinearTransform : public vtkLinearTransform
 {
  public:
   static vtkMAFToLinearTransform *New();
   vtkTypeRevisionMacro(vtkMAFToLinearTransform,vtkLinearTransform);
   void PrintSelf (ostream& os, vtkIndent indent);
+  
+  /** 
+    Set the input matrix.  Any modifications to the MAF matrix will be
+    reflected in the VTK transformation. This also set InputTransform to NULL.*/
+  virtual void SetInputMatrix(mafMatrix *);
 
-  // Description:
-  // Set the input matrix.  Any modifications to the matrix will be
-  // reflected in the transformation.
-  virtual void SetInput(vtkMatrix4x4*);
-  vtkGetObjectMacro(Input,vtkMatrix4x4);
+  /** return connected matrix if exists. */
+  mafMatrix *GetInputMatrix() {return InputMatrix;}
+  
+  /** 
+    Set the input transform.  Any modifications to the MAF transform will be
+    reflected in the VTK transformation. This also set InputMatrix to NULL.*/
+  virtual void SetInputTransform(mafTransformBase *);
 
-  // Description:
-  // The input matrix is left as-is, but the transformation matrix
-  // is inverted.
+  /** return connected matrix if exists. */
+  mafTransformBase *GetInputTransform() {return InputTransform;}
+ 
+  /**
+    The input matrix is left as-is, but the transformation matrix
+    is inverted. */
   void Inverse();
 
-  // Description:
-  // Get the MTime: this is the bit of magic that makes everything work.
+  /** Get the MTime: this is the bit of magic that makes everything work. */
   unsigned long GetMTime();
 
-  // Description:
-  // Make a new transform of the same type.
+  /** Make a new transform of the same type. */
   vtkAbstractTransform *MakeTransform();
-
-  // Description:
-  // This method is deprecated.
-  void SetMatrix(vtkMatrix4x4 *matrix) {
-    this->SetInput(matrix);
-    vtkWarningMacro("SetMatrix: deprecated, use SetInput() instead"); }
 
 protected:
   vtkMAFToLinearTransform();
@@ -72,8 +73,11 @@ protected:
   void InternalUpdate();
   void InternalDeepCopy(vtkAbstractTransform *transform);
 
-  int InverseFlag;
-  vtkMatrix4x4 *Input;
+  int               InverseFlag;
+
+  mafMatrix         *InputMatrix;
+  mafTransformBase  *InputTransform;
+  
 private:
   vtkMAFToLinearTransform(const vtkMAFToLinearTransform&);  // Not implemented.
   void operator=(const vtkMAFToLinearTransform&);  // Not implemented.

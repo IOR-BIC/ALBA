@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFToLinearTransform.cxx,v $
   Language:  C++
-  Date:      $Date: 2005-01-11 17:35:03 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-03-10 12:21:39 $
+  Version:   $Revision: 1.2 $
 
   Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
   All rights reserved.
@@ -15,40 +15,74 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "mafMatrix.h"
+#include "mafTransformBase.h"
+
 #include "vtkMAFToLinearTransform.h"
 
 #include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkMAFToLinearTransform, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkMAFToLinearTransform, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkMAFToLinearTransform);
-vtkCxxSetObjectMacro(vtkMAFToLinearTransform,Input,vtkMatrix4x4);
 
 //----------------------------------------------------------------------------
 vtkMAFToLinearTransform::vtkMAFToLinearTransform()
 {
-  this->Input = NULL;
-  this->InverseFlag = 0;
+  this->InputMatrix     = NULL;
+  this->InputTransform  = NULL;
+  this->InverseFlag     = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkMAFToLinearTransform::~vtkMAFToLinearTransform()
+//----------------------------------------------------------------------------
 {
-  this->SetInput(NULL);
+  this->SetInputMatrix((mafMatrix *)NULL);
+  this->SetInputTransform((mafTransformBase *)NULL);
 }
 
 //----------------------------------------------------------------------------
 void vtkMAFToLinearTransform::PrintSelf(ostream& os, vtkIndent indent)
+//----------------------------------------------------------------------------
 {
   this->Update();
 
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Input: " << this->Input << "\n";
+  os << indent << "InputMatrix: " << this->InputMatrix << "\n";
+  os << indent << "InputTransform: " << this->InputTransform << "\n";
   os << indent << "InverseFlag: " << this->InverseFlag << "\n";
 }
 
 //----------------------------------------------------------------------------
+void vtkMAFToLinearTransform::SetInputMatrix(mafMatrix *mat)
+//----------------------------------------------------------------------------
+{
+  if (mat!=InputMatrix)
+  {
+    vtkDEL(InputMatrix);
+    InputMatrix=mat;
+    mat->Register(this);
+    Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkMAFToLinearTransform::SetInputTransform(mafTransformBase *trans)
+//----------------------------------------------------------------------------
+{
+  if (trans!=InputTransform)
+  {
+    vtkDEL(InputTransform);
+    InputTransform=trans;
+    trans->Register(this);
+    Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkMAFToLinearTransform::Inverse()
+//----------------------------------------------------------------------------
 {
   this->InverseFlag = !this->InverseFlag;
   this->Modified();
@@ -57,28 +91,43 @@ void vtkMAFToLinearTransform::Inverse()
 //----------------------------------------------------------------------------
 void vtkMAFToLinearTransform::InternalUpdate()
 {
-  if (this->Input)
-    {
-    this->Matrix->DeepCopy(this->Input);
+  if (this->InputTransform)
+  {
+    this->Matrix->DeepCopy(this->InputTransform->GetMatrix().GetVTKMatrix());
     if (this->InverseFlag)
-      {
-      this->Matrix->Invert();
-      }
-    }
-  else
     {
-    this->Matrix->Identity();
+      this->Matrix->Invert();
     }
+  }
+  if (this->InputMatrix)
+  {
+    this->Matrix->DeepCopy(this->InputMatrix->GetVTKMatrix());
+    if (this->InverseFlag)
+    {
+      this->Matrix->Invert();
+    }
+  }
+  else
+  {
+    this->Matrix->Identity();
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkMAFToLinearTransform::InternalDeepCopy(vtkAbstractTransform *gtrans)
+//----------------------------------------------------------------------------
 {
   vtkMAFToLinearTransform *transform = 
     (vtkMAFToLinearTransform *)gtrans;
 
-  this->SetInput(transform->Input);
-
+  if (transform->GetInputMatrix())
+  {
+    this->SetInputMatrix(transform->InputMatrix);
+  }
+  else if (transform->GetInputTransform())
+  {
+    this->SetInputTransform(transform->InputTransform);
+  }
   if (this->InverseFlag != transform->InverseFlag)
     {
     this->Inverse();
@@ -87,6 +136,7 @@ void vtkMAFToLinearTransform::InternalDeepCopy(vtkAbstractTransform *gtrans)
 
 //----------------------------------------------------------------------------
 vtkAbstractTransform *vtkMAFToLinearTransform::MakeTransform()
+//----------------------------------------------------------------------------
 {
   return vtkMAFToLinearTransform::New();
 }
@@ -94,16 +144,25 @@ vtkAbstractTransform *vtkMAFToLinearTransform::MakeTransform()
 //----------------------------------------------------------------------------
 // Get the MTime
 unsigned long vtkMAFToLinearTransform::GetMTime()
+//----------------------------------------------------------------------------
 {
   unsigned long mtime = this->vtkLinearTransform::GetMTime();
 
-  if (this->Input)
-    {
-    unsigned long matrixMTime = this->Input->GetMTime();
+  if (this->InputMatrix)
+  {
+    unsigned long matrixMTime = this->InputMatrix->GetMTime();
     if (matrixMTime > mtime)
-      {
+    {
       return matrixMTime;
-      }
     }
+  }
+  else if (this->InputTransform)
+  {
+    unsigned long transformMTime = this->InputTransform->GetMTime();
+    if (transformMTime > mtime)
+    {
+      return transformMTime;
+    }
+  }
   return mtime;
 }
