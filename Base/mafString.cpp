@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-11 09:12:42 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-11-17 20:15:48 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -15,6 +15,9 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <assert.h>
+
+#include "wx/wx.h"
+#include <wx/string.h>
 
 
 //----------------------------------------------------------------------------
