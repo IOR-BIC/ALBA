@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-20 20:47:08 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2004-12-21 12:20:36 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -1089,7 +1089,7 @@ int mafTransform::MatrixToEulerCardanicAngle(const mafMatrix &v_matrix,
 		first_euler_cardan[2]= atan2(-sig*v_matrix.GetElement(i,j),v_matrix.GetElement(i,i));
 
 		second_euler_cardan[0]= atan2(sig*v_matrix.GetElement(j,k),-v_matrix.GetElement(k,k));
-		int division = round((PI-asin(sig*v_matrix.GetElement(i,k)) + PI) / (2.0*PI));
+		int division = (double)((PI-asin(sig*v_matrix.GetElement(i,k)) + PI) / (2.0*PI));
 		double remainder = (PI-asin(sig*v_matrix.GetElement(i,k)) + PI)-(division * (2*PI));
 		second_euler_cardan[1]= remainder - PI; 
 		second_euler_cardan[2]= atan2(sig*v_matrix.GetElement(i,j),-v_matrix.GetElement(i,i));
@@ -1567,7 +1567,7 @@ int mafTransform::MatrixToHelicalAxis(const mafMatrix &v_matrix,
 
 
 	
-	if (quad_sum <= sqrt(2)) 
+	if (quad_sum <= sqrt(2.0)) 
 		{
       phi=asin(0.5*quad_sum);
 			phi = phi * mafMatrix3x3::RadiansToDegrees();
