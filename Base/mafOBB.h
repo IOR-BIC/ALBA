@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOBB.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 10:11:16 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-03-11 15:48:50 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -131,7 +131,7 @@ public:
   double GetDepth();
 
   /** dump the bounding box */
-  virtual void Print(std::ostream& os, const int tabs);
+  virtual void Print(std::ostream& os, const int tabs=0) const;
 
   // memeber varialbles are left public to simplify access
 
