@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testGuiLogic.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 09:46:00 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-01 11:09:27 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,7 +28,7 @@ testGuiLogic::testGuiLogic()
   //mmgPanel *p = new mmgPanel(m_win,-1);
   //p->Show(true);
   //p->SetSize(100,100);
-  m_testGui = new testGui(this);
+  m_testGui = new testGui(m_win);
   //p->Add(m_testGui->GetGui());
 }
 //----------------------------------------------------------------------------
