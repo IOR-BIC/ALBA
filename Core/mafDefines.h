@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-20 20:47:07 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2004-12-27 18:21:17 $
+  Version:   $Revision: 1.18 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -62,9 +62,14 @@ void mafMessage(const char *format, ...);
 /** Allocate a new VTK object: don't worry, New is a static member function! */
 #define vtkNEW(a) a=a->New()
 
-/** Delete a MAF object */
-//#define mafDEL(a) if (a) {delete a; a = NULL;}
+/** Allocate a new MAF object: don't worry, New is a static member function! */
+#define mafNEW(a) a=a->New()
 
+/** Delete a MAF object */
+#define mafDEL(a) if (a) { a->Delete(); a = NULL;}
+
+/** delete a new() allocated object */
+#define cppDEL(a) if (a) { delete a; a = NULL;}
 
 /**
   Macro used by mafObjects for RTTI information. This macro must be placed
@@ -128,6 +133,8 @@ void mafMessage(const char *format, ...);
   thisClass *thisClass::NewInstance() const \
   { return (thisClass *)NewInternalInstance(); }
 
+/** Shortcut for type checking */
+#define IsAType(type_name) IsA(type_name::GetTypeID())
 
 /** Macro used to define Set/GetListener() member functions and a Listener member variable */
 #define mafListenerMacro \
