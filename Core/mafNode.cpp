@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 10:09:30 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-03-11 15:43:10 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,7 +20,7 @@
 #include "mafDecl.h"
 #include "mafIndent.h"
 #include "mafStorageElement.h"
-#include "mmaTagArray.h"
+#include "mafTagArray.h"
 #include <sstream>
 #include <assert.h>
 
@@ -64,7 +64,7 @@ void mafNode::SetId(mafID id)
 }
 
 //------------------------------------------------------------------------------
-mafID mafNode::GetId()
+mafID mafNode::GetId() const
 //------------------------------------------------------------------------------
 {
   return m_Id;
@@ -211,7 +211,7 @@ mafNodeIterator *mafNode::NewIterator()
 }
 
 //-------------------------------------------------------------------------
-unsigned long mafNode::GetNumberOfChildren()
+unsigned long mafNode::GetNumberOfChildren() const
 //-------------------------------------------------------------------------
 {
   return m_Children.size();
@@ -404,6 +404,21 @@ int mafNode::ReparentTo(mafNode *newparent)
   else
   {
     return MAF_ERROR;
+  }
+}
+
+//----------------------------------------------------------------------------
+void mafNode::Import(mafNode *tree)
+//-------------------------------------------------------------------------
+{
+  if (tree&&tree->GetNumberOfChildren()>0)
+  {
+    int num=tree->GetNumberOfChildren();
+    for (int i=0;i<num;i++)
+    {
+      mafNode *vme=tree->GetFirstChild();
+      vme->ReparentTo(this);
+    }
   }
 }
 
@@ -712,14 +727,14 @@ void mafNode::RemoveAllAttributes()
 }
 
 //-------------------------------------------------------------------------
-mmaTagArray  *mafNode::GetTagArray()
+mafTagArray  *mafNode::GetTagArray()
 //-------------------------------------------------------------------------
 {
-  mmaTagArray *tarray=mmaTagArray::SafeDownCast(GetAttribute("TagArray"));
+  mafTagArray *tarray=mafTagArray::SafeDownCast(GetAttribute("TagArray"));
   
   if (!tarray)
   {
-    tarray=mmaTagArray::New();
+    tarray=mafTagArray::New();
     SetAttribute("TagArray",tarray);
   }
 
@@ -996,10 +1011,11 @@ int mafNode::InternalRestore(mafStorageElement *node)
 }
 
 //-------------------------------------------------------------------------
-void mafNode::Print(std::ostream& os, const int tabs)
+void mafNode::Print(std::ostream& os, const int tabs) const
 //-------------------------------------------------------------------------
 {
   mafIndent indent(tabs);
+  mafIndent next_indent(indent.GetNextIndent());
 
   Superclass::Print(os,indent);
   os << indent << "Name: \"" << m_Name << "\"" << std::endl;
@@ -1007,6 +1023,18 @@ void mafNode::Print(std::ostream& os, const int tabs)
   os << indent << "VisibleToTraverse: " << m_VisibleToTraverse << std::endl;
   os << indent << "Parent: \"" << (m_Parent?m_Parent->m_Name:"NULL") << "\"" << std::endl; 
   os << indent << "Number of Children: " << GetNumberOfChildren() << std::endl;
+  os << indent << "Id: " << GetId() << std::endl;
+  os << indent << "Attributes:";
+  for (mafAttributesMap::const_iterator att_it=m_Attributes.begin();att_it!=m_Attributes.end();att_it++)
+  {
+    att_it->second->Print(os,next_indent);
+  }
+
+  os << indent << "Links:" << std::endl;
+  for (mafLinksMap::const_iterator lnk_it=m_Links.begin();lnk_it!=m_Links.end();lnk_it++)
+  {
+    os << next_indent << "Name: " << lnk_it->first << "\tNodeId: " << lnk_it->second.m_NodeId << std::endl;
+  }
 }
   
 #endif

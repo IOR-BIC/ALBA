@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:32:13 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2005-03-11 15:43:21 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,7 +30,7 @@
 class mafEventSource;
 class mafNodeIterator;
 class mafAttribute;
-class mmaTagArray;
+class mafTagArray;
 class mmgGui;
 
 //----------------------------------------------------------------------------
@@ -82,7 +82,7 @@ public:
   mafNode *NewInstance() {return SafeDownCast(NewObjectInstance());}
   
   /** print a dump of this object */
-  void Print(std::ostream& os, const int tabs);
+  virtual void Print(std::ostream& os, const int tabs=0) const;
 
   /**
     Initialize this node. Subclasses can redefine InternalInitialize() to customize
@@ -188,6 +188,9 @@ public:
     it into a Node of that tree.*/
   virtual int ReparentTo(mafNode *parent);
 
+  /** Import all children of another tree into this tree */
+  void Import(mafNode *tree);
+
   /** Return true if the given one is a child of this node.*/
   bool IsAChild(mafNode *a);
 
@@ -199,14 +202,14 @@ public:
   /** Return the root of the tree this node owns to. */
   mafNode *GetRoot();
 
-  bool IsEmpty() {return GetNumberOfChildren()==0;}
+  bool IsEmpty() const {return GetNumberOfChildren()==0;}
 
   /** Return the number of children of this node */
-  unsigned long GetNumberOfChildren();
+  unsigned long GetNumberOfChildren() const ;
   
   /**
   Return the pointer to the parent node (if present)*/
-  mafNode *GetParent() {return m_Parent;};
+  mafNode *GetParent() const {return m_Parent;};
 
   /**
     Remove recursively all nodes from this tree, forcing all subnodes
@@ -287,7 +290,7 @@ public:
     simple way to attach persistent attributes. For more complex attributes
     customized classes should be created, inheriting from mafAttribute
     (e.g. @sa mmaMaterial). */
-  mmaTagArray  *GetTagArray();
+  mafTagArray  *GetTagArray();
 
   /** data structure used to store a link VME and its Id */
   class mmuNodeLink :public mmuUtility
@@ -338,7 +341,7 @@ public:
   };
 
   /** return the Id of this node in the tree */
-  mafID GetId();
+  mafID GetId() const;
 
 protected:
 
