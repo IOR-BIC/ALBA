@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:28:39 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-02-22 17:13:01 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,70 +14,36 @@
 
 #include "mafVME.h"
 
-#include "vtkString.h"
-#include "vtkVector.txx"
-#include "mafVMEIterator.h"
-#include "vtkPivotTransform.h"
-#include "vtkDoubleArray.h"
-
-#include "mflAgent.h"
-#include "mflItemArray.txx"
-#include "mflMatrixVector.h"
-#include "mafVMEItemArray.h"
-#include "mflDataInterpolatorHolder.h"
-#include "mflMatrixInterpolatorHolder.h"
-#include "mflMatrixPipeDirectCinematic.h"
-#include "mflBounds.h"
-#include "mflSmartPointer.h"
-#include "mflDefines.h"
-#include "mafVMEIterator.h"
-#include "mflTransform.h"
-#include "vtkLinearTransform.h"
+//#include "mflItemArray.txx"
+//#include "mflMatrixVector.h"
+//#include "mafVMEItemArray.h"
+//#include "mflDataInterpolatorHolder.h"
+//#include "mflMatrixInterpolatorHolder.h"
+//#include "mflMatrixPipeDirectCinematic.h"
+#include "mafOBB.h"
+//#include "mflSmartPointer.h"
+//#include "mflDefines.h"
+//#include "mflTransform.h"
+//#include "vtkLinearTransform.h"
 
 #include <map>
 #include <assert.h>
-
-// This is for allocating unique VME IDs.
-unsigned long mafVME::VMEIdCounter = 0;
-
-//------------------------------------------------------------------------------
-// Events
-//------------------------------------------------------------------------------
-MFL_EVT_IMP(mafVME::TimeEvent);             // Event rised by time changes
-MFL_EVT_IMP(mafVME::MatrixUpdateEvent);     // Event rised by pose Matrix changes
-MFL_EVT_IMP(mafVME::AbsMatrixUpdateEvent);  // Event rised by AbsMatrix changes
-MFL_EVT_IMP(mafVME::DetachFromTreeEvent);   // Event rised by detachment from tree
-MFL_EVT_IMP(mafVME::AttachToTreeEvent);     // Event rised by attachment to tree
-MFL_EVT_IMP(mafVME::DestroyEvent);          // Event rised by VME destroying
-MFL_EVT_IMP(mafVME::DataPipeChangedEvent);  // Rised when the DataPipe is changed
-MFL_EVT_IMP(mafVME::MatrixPipeChangedEvent);// Rised when the MatrixPipe is changed
-MFL_EVT_IMP(mafVME::OutputDataChangedEvent);// Rised when the OutputData pointer is changed
-MFL_EVT_IMP(mafVME::OutputDataUpdateEvent); // Rised by Current Data Updates (this re-routes the same DataPipe event)
-//------------------------------------------------------------------------------
-
-vtkCxxSetObjectMacro(mafVME,AbsMatrixPipe,mflMatrixPipeDirectCinematic)
 
 //-------------------------------------------------------------------------
 mafVME::mafVME()
 //-------------------------------------------------------------------------
 {
   // Tags used for Observers
-  DataUpdateTag       = 0;
-  MatrixUpdateTag     = 0;
-  AbsMatrixUpdateTag  = 0;
-  
-
-	TagArray            = vtkTagArray::New();
 	MatrixVector        = mflMatrixVector::New();
   DataArray           = mafVMEItemArray::New();
   DataArray->SetVME(this);
 
   // Pipes are dynamically created
-  MatrixPipe          = NULL;
-  DataPipe            = NULL;
+  m_MatrixPipe          = NULL;
+  m_DataPipe            = NULL;
   AbsMatrixPipe       = NULL;
 
-  // if no MatrixPipe is given, provide a static pose matrix
+  // if no m_MatrixPipe is given, provide a static pose matrix
   CurrentMatrix       = mflSmartPointer<mflMatrix>();
 
   CurrentTime         = 0;
@@ -92,18 +58,16 @@ mafVME::~mafVME()
   // advise observers this is being destroyed
   InvokeEvent(mafVME::DestroyEvent,this);
 
-  SetTagArray(NULL);
-
   vtkDEL(MatrixVector);
   vtkDEL(DataArray);
 
   // Pipes must be destroyed in the right orde
   // to take into consideration dependencies
-  if (DataPipe)
+  if (m_DataPipe)
   {
     RemoveObserver(DataUpdateTag);
-    DataPipe->SetVME(NULL);
-    vtkDEL(DataPipe);
+    m_DataPipe->SetVME(NULL);
+    vtkDEL(m_DataPipe);
   }
 
   if (AbsMatrixPipe)
@@ -113,10 +77,10 @@ mafVME::~mafVME()
     vtkDEL(AbsMatrixPipe);
   }
     
-  if (MatrixPipe)
+  if (m_MatrixPipe)
   { 
     RemoveObserver(MatrixUpdateTag);
-    vtkDEL(MatrixPipe);
+    vtkDEL(m_MatrixPipe);
   }
 }
 
@@ -163,8 +127,8 @@ void mafVME::SetDefaultDataPipe()
   else
   {
     SetDataPipe((mflDataPipe *)mflCreateInstance(pipe_name));
-    if (DataPipe)
-      DataPipe->UnRegister(this); // Factory return an object with RefCount==1
+    if (m_DataPipe)
+      m_DataPipe->UnRegister(this); // Factory return an object with RefCount==1
   }
 }
 
@@ -188,8 +152,8 @@ void mafVME::SetDefaultMatrixPipe()
   else
   {
     SetMatrixPipe((mflMatrixPipe *)mflCreateInstance(pipe_name));
-    if (MatrixPipe)
-      MatrixPipe->UnRegister(this);
+    if (m_MatrixPipe)
+      m_MatrixPipe->UnRegister(this);
   }
 }
 
@@ -682,11 +646,11 @@ void mafVME::SetCurrentTime(mflTimeStamp t)
   // pipes to allow multiple pipes contemporary 
   // working at different times
   // 
-  if (DataPipe)
-    DataPipe->SetCurrentTime(t);
+  if (m_DataPipe)
+    m_DataPipe->SetCurrentTime(t);
 
-  if (MatrixPipe)
-    MatrixPipe->SetCurrentTime(t);
+  if (m_MatrixPipe)
+    m_MatrixPipe->SetCurrentTime(t);
   else if (CurrentMatrix.GetPointer())
     CurrentMatrix->SetTimeStamp(t);
 
@@ -1005,13 +969,13 @@ void mafVME::GetAbsTimeStamps(TimeVector &kframes)
 void mafVME::GetVME4DBounds(double bounds[6])
 //-------------------------------------------------------------------------
 {
-  mflBounds myBounds;
+  mafOBB myBounds;
   this->GetVME4DBounds(myBounds);
   myBounds.CopyTo(bounds);
 }
 
 //-------------------------------------------------------------------------
-void mafVME::GetVME4DBounds(mflBounds &bounds)
+void mafVME::GetVME4DBounds(mafOBB &bounds)
 //-------------------------------------------------------------------------
 {
   std::vector<mflTimeStamp> timestamps;
@@ -1023,10 +987,10 @@ void mafVME::GetVME4DBounds(mflBounds &bounds)
   if (GetDataPipe()) // allocate data pipe if not done yet
   {
     // THD SAFE implementation
-    //mflDataPipe *datapipe=this->DataPipe->MakeACopy();
+    //mflDataPipe *datapipe=this->m_DataPipe->MakeACopy();
 
     mflSmartPointer<mflMatrix> itemAbsPose;
-    mflBounds transformed_bounds;
+    mafOBB transformed_bounds;
 
     for (int i=0;i<timestamps.size();i++)
     {
@@ -1034,14 +998,14 @@ void mafVME::GetVME4DBounds(mflBounds &bounds)
       /*
       datapipe->SetCurrentTime(timestamps[i]);
       datapipe->UpdateCurrentBounds();
-      mflBounds *itemBounds=datapipe->GetCurrentBounds();
+      mafOBB *itemBounds=datapipe->GetCurrentBounds();
       */
 
-      this->DataPipe->SetCurrentTime(timestamps[i]);
-      this->DataPipe->UpdateCurrentBounds();
+      this->m_DataPipe->SetCurrentTime(timestamps[i]);
+      this->m_DataPipe->UpdateCurrentBounds();
 
       // must make a copy, otherwise I would transform the bounds inside the data pipe
-      transformed_bounds.DeepCopy(this->DataPipe->GetCurrentBounds());
+      transformed_bounds.DeepCopy(this->m_DataPipe->GetCurrentBounds());
       this->GetAbsMatrix(itemAbsPose,timestamps[i]);
     
       transformed_bounds.ApplyTransform(itemAbsPose);
@@ -1049,8 +1013,8 @@ void mafVME::GetVME4DBounds(mflBounds &bounds)
       bounds.MergeBounds(transformed_bounds);
     }
 
-    this->DataPipe->SetCurrentTime(this->CurrentTime);
-    this->DataPipe->UpdateCurrentBounds();
+    this->m_DataPipe->SetCurrentTime(this->CurrentTime);
+    this->m_DataPipe->UpdateCurrentBounds();
   }
   else if (CurrentData.GetPointer())
   {
@@ -1073,13 +1037,13 @@ void mafVME::GetVME4DBounds(mflBounds &bounds)
 void mafVME::GetVMESpaceBounds(double bounds[6])
 //-------------------------------------------------------------------------
 {
-  mflBounds myBounds;
+  mafOBB myBounds;
   this->GetVMESpaceBounds(myBounds);
   myBounds.CopyTo(bounds);
 }
 
 //-------------------------------------------------------------------------
-void mafVME::GetVMESpaceBounds(mflBounds &bounds,mflTimeStamp t, mafVMEIterator *iter)
+void mafVME::GetVMESpaceBounds(mafOBB &bounds,mflTimeStamp t, mafVMEIterator *iter)
 //-------------------------------------------------------------------------
 { 
   if ((iter&&iter->IsVisible(this))||this->IsVisible())
@@ -1106,13 +1070,13 @@ void mafVME::GetVMESpaceBounds(mflBounds &bounds,mflTimeStamp t, mafVMEIterator 
 void mafVME::GetVMELocalSpaceBounds(double bounds[6])
 //-------------------------------------------------------------------------
 {
-  mflBounds myBounds;
+  mafOBB myBounds;
   this->GetVMELocalSpaceBounds(myBounds);
   myBounds.CopyTo(bounds);
 }
 
 //-------------------------------------------------------------------------
-void mafVME::GetVMELocalSpaceBounds(mflBounds &bounds,mflTimeStamp t, mafVMEIterator *iter)
+void mafVME::GetVMELocalSpaceBounds(mafOBB &bounds,mflTimeStamp t, mafVMEIterator *iter)
 //-------------------------------------------------------------------------
 {
    if (t<0)
@@ -1125,21 +1089,21 @@ void mafVME::GetVMELocalSpaceBounds(mflBounds &bounds,mflTimeStamp t, mafVMEIter
     
     if (GetDataPipe()) // allocate data pipe if not done yet
     {
-      // We call directly the DataPipe UpdateBounds since this doesn't update
+      // We call directly the m_DataPipe UpdateBounds since this doesn't update
       // the output data, which is not necessary.
       // Must call explicitelly UpdateCurrentBounds() method, since datapipes
       // do not update automatically when time changes  
-      this->DataPipe->SetCurrentTime(t);
-      this->DataPipe->UpdateCurrentBounds();
-      bounds.DeepCopy(this->DataPipe->GetCurrentBounds());
+      this->m_DataPipe->SetCurrentTime(t);
+      this->m_DataPipe->UpdateCurrentBounds();
+      bounds.DeepCopy(this->m_DataPipe->GetCurrentBounds());
 
       // restore the right bounds for current time... 
       // TODO: modify the GetCurrentBounds to make it call UpdateCurentBounds explicitelly!
-      this->DataPipe->SetCurrentTime(this->CurrentTime);
-      this->DataPipe->UpdateCurrentBounds();
+      this->m_DataPipe->SetCurrentTime(this->CurrentTime);
+      this->m_DataPipe->UpdateCurrentBounds();
     
       // this is a thread safe implemetation
-      /*mflDataPipe *datapipe=this->DataPipe->MakeACopy();
+      /*mflDataPipe *datapipe=this->m_DataPipe->MakeACopy();
       datapipe->SetCurrentTime(t);
       datapipe->UpdateCurrentBounds();
       itemBounds=datapipe->GetCurrentBounds();
@@ -1157,13 +1121,13 @@ void mafVME::GetVMELocalSpaceBounds(mflBounds &bounds,mflTimeStamp t, mafVMEIter
 void mafVME::GetSpaceBounds(double bounds[6])
 //-------------------------------------------------------------------------
 {
-  mflBounds myBounds;
+  mafOBB myBounds;
   this->GetSpaceBounds(myBounds);
   myBounds.CopyTo(bounds);
 }
 
 //-------------------------------------------------------------------------
-void mafVME::GetSpaceBounds(mflBounds &bounds,mflTimeStamp t, mafVMEIterator *iter)
+void mafVME::GetSpaceBounds(mafOBB &bounds,mflTimeStamp t, mafVMEIterator *iter)
 //-------------------------------------------------------------------------
 {
   if (t<0)
@@ -1174,7 +1138,7 @@ void mafVME::GetSpaceBounds(mflBounds &bounds,mflTimeStamp t, mafVMEIterator *it
   for (int i=0;i<this->GetNumberOfChildren();i++)
   {
     mafVME *child=this->GetChild(i);
-    mflBounds childBounds;
+    mafOBB childBounds;
 
     child->GetSpaceBounds(childBounds,t);
 
@@ -1186,13 +1150,13 @@ void mafVME::GetSpaceBounds(mflBounds &bounds,mflTimeStamp t, mafVMEIterator *it
 void mafVME::Get4DBounds(double bounds[6])
 //-------------------------------------------------------------------------
 {
-  mflBounds myBounds;
+  mafOBB myBounds;
   this->Get4DBounds(myBounds);
   myBounds.CopyTo(bounds);
 }
 
 //-------------------------------------------------------------------------
-void mafVME::Get4DBounds(mflBounds &bounds)
+void mafVME::Get4DBounds(mafOBB &bounds)
 //-------------------------------------------------------------------------
 {
 
@@ -1202,7 +1166,7 @@ void mafVME::Get4DBounds(mflBounds &bounds)
 
   this->GetTimeStamps(timestamps);
 
-  mflBounds frameBounds;
+  mafOBB frameBounds;
   for (int i=0;i<timestamps.size();i++)
   {
     this->GetSpaceBounds(frameBounds,timestamps[i]);
@@ -1553,7 +1517,7 @@ void mafVME::SetOrientation(double rxyz[3], mflTimeStamp t)
 mflMatrix *mafVME::GetPose()
 //-------------------------------------------------------------------------
 {
-  return (this->GetMatrixPipe())?this->MatrixPipe->GetMatrix():this->CurrentMatrix;
+  return (this->GetMatrixPipe())?this->m_MatrixPipe->GetMatrix():this->CurrentMatrix;
 }
 
 //-------------------------------------------------------------------------
@@ -1572,17 +1536,17 @@ void mafVME::GetPose(mflMatrix *matrix,mflTimeStamp t)
       {
         // disable rising of update event since this is
         // only a temporary change to the matrix
-        int old_flag=this->MatrixPipe->GetUpdateMatrixObserverFlag();
-        this->MatrixPipe->UpdateMatrixObserverOff();
-        this->MatrixPipe->SetCurrentTime(t);
-        matrix->DeepCopy(this->MatrixPipe->GetMatrix());
+        int old_flag=this->m_MatrixPipe->GetUpdateMatrixObserverFlag();
+        this->m_MatrixPipe->UpdateMatrixObserverOff();
+        this->m_MatrixPipe->SetCurrentTime(t);
+        matrix->DeepCopy(this->m_MatrixPipe->GetMatrix());
         // restore right time
-        this->MatrixPipe->SetCurrentTime(this->CurrentTime);
-        this->MatrixPipe->SetUpdateMatrixObserverFlag(old_flag);
+        this->m_MatrixPipe->SetCurrentTime(this->CurrentTime);
+        this->m_MatrixPipe->SetUpdateMatrixObserverFlag(old_flag);
 
         // THD SAFE implementation
         // create a temporary pipe to interpolate at time t
-        /*mflMatrixPipe *newpipe=this->MatrixPipe->MakeACopy();
+        /*mflMatrixPipe *newpipe=this->m_MatrixPipe->MakeACopy();
         newpipe->SetCurrentTime(t);
         matrix->DeepCopy(newpipe->GetMatrix());
         newpipe->Delete();
@@ -2031,9 +1995,9 @@ void mafVME::OutputDataUpdateCallback(void *arg)
 
   if (self->GetDataPipe()) // allocate data pipe if not done yet
   {
-    if (self->DataPipe->GetOutput()!=self->CurrentData.GetPointer())
+    if (self->m_DataPipe->GetOutput()!=self->CurrentData.GetPointer())
     {
-      self->SetCurrentData(self->DataPipe->GetOutput());
+      self->SetCurrentData(self->m_DataPipe->GetOutput());
     
       // advise observers the output data has changed
       self->InvokeEvent(mafVME::OutputDataChangedEvent);
@@ -2088,7 +2052,7 @@ void mafVME::PrintSelf(ostream& os, vtkIndent indent)
   this->GetLocalTimeBounds(tbounds);
   os << indent << "Time Bounds: ("<<tbounds[0]<<","<<tbounds[1]<<"]"<<endl;
 
-  mflBounds bounds;
+  mafOBB bounds;
   this->GetVMESpaceBounds(bounds);
 
   os << indent << "VME Space Bounds: ["<<bounds.Bounds[0]<<","<<bounds.Bounds[1]<<","<<bounds.Bounds[2]<<"," \
@@ -2114,7 +2078,7 @@ void mafVME::PrintSelf(ostream& os, vtkIndent indent)
   else
     os << "NULL\n";
   
-  os << indent << "VME DataPipe: ";
+  os << indent << "VME m_DataPipe: ";
   if (this->GetDataPipe()) // allocate data pipe if not done yet
   {
     os << "\n";
@@ -2257,19 +2221,19 @@ int mafVME::GetAuxiliaryRefSys(vtkMatrix4x4 *AuxRefSys, const char *RefSysName, 
 int mafVME::SetMatrixPipe(mflMatrixPipe *mpipe)
 //-------------------------------------------------------------------------
 {
-  if (mpipe!=MatrixPipe)
+  if (mpipe!=m_MatrixPipe)
   {
     if (mpipe==NULL||mpipe->SetVME(this)==VTK_OK)
     { 
       // if we had an observer...
-      if (MatrixPipe && MatrixUpdateTag)
+      if (m_MatrixPipe && MatrixUpdateTag)
       {
-        MatrixPipe->RemoveObserver(MatrixUpdateTag);
-        MatrixPipe->SetVME(NULL);
-        MatrixPipe->SetCurrentTime(CurrentTime);
+        m_MatrixPipe->RemoveObserver(MatrixUpdateTag);
+        m_MatrixPipe->SetVME(NULL);
+        m_MatrixPipe->SetCurrentTime(CurrentTime);
       }
 
-      vtkSetObjectBodyMacro(MatrixPipe,mflMatrixPipe,mpipe);
+      vtkSetObjectBodyMacro(m_MatrixPipe,mflMatrixPipe,mpipe);
 
       if (mpipe)
       {
@@ -2361,24 +2325,24 @@ vtkDataSet *mafVME::GetCurrentData()
 int mafVME::SetDataPipe(mflDataPipe *dpipe)
 //-------------------------------------------------------------------------
 {
-  if (dpipe==this->DataPipe)
+  if (dpipe==this->m_DataPipe)
     return VTK_OK;
 
   if (dpipe==NULL||dpipe->SetVME(this)==VTK_OK)
   { 
     // if we had an observer...
-    if (DataPipe && DataUpdateTag)
+    if (m_DataPipe && DataUpdateTag)
     {
-      DataPipe->RemoveObserver(DataUpdateTag);
-      DataPipe->SetVME(NULL);
+      m_DataPipe->RemoveObserver(DataUpdateTag);
+      m_DataPipe->SetVME(NULL);
     }
 
-    vtkSetObjectBodyMacro(DataPipe,mflDataPipe,dpipe);
+    vtkSetObjectBodyMacro(m_DataPipe,mflDataPipe,dpipe);
     
-    if (DataPipe)
+    if (m_DataPipe)
     {
-      //SetCurrentData(DataPipe->GetOutput());
-      DataPipe->SetCurrentTime(CurrentTime);
+      //SetCurrentData(m_DataPipe->GetOutput());
+      m_DataPipe->SetCurrentTime(CurrentTime);
     }
     else
     {
@@ -2388,7 +2352,7 @@ int mafVME::SetDataPipe(mflDataPipe *dpipe)
     // must plug the event source after calling UpdateCurrentData, since 
     // UpdateCurrentData calls invoke explicitelly the OutputDataChangedEvent,
     // this avoids a double calling.
-    if (DataPipe)
+    if (m_DataPipe)
     {
       mflAgent::PlugEventSource(dpipe,OutputDataUpdateCallback,this,mflDataPipe::OutputUpdateEvent);
     }

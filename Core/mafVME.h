@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-21 19:13:12 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-02-22 17:13:01 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -136,7 +136,7 @@ public:
   /**
     Set/Get CurrentTime for this VME. This time is propagated to
     the matrix vector and is used to interpolate items' data.*/
-  mafTimeStamp GetCurrentTime() {return this->CurrentTime;}
+  mafTimeStamp GetCurrentTime() {return m_CurrentTime;}
 
   /**
    Set the time for this VME (not for the whole tree). Normaly time 
@@ -216,311 +216,247 @@ public:
   //mafVMEIterator *NewIterator();
 
   /**
-  Compare two VME. Two VME are considered equivalent if they have equivalent 
-  items, TagArrays, MatrixVectors, Name and Type. */
-  bool Equals(mafVME *vme) {return Equals((mafNode *)vme);}
+    Compare two VME. Two VME are considered equivalent if they have equivalent 
+    items, TagArrays, MatrixVectors, Name and Type. */
+  virtual bool Equals(mafNode *vme);
 
   /**
-  Compare the two subtrees starting at this VME and at the given one. Two trees
-  are considered equivalent if they have equivalent VME, disposed in the same hierarchy.
-  Order of children VME is significative for comparison. */
+    Compare the two subtrees starting at this VME and at the given one. Two trees
+    are considered equivalent if they have equivalent VME, disposed in the same hierarchy.
+    Order of children VME is significative for comparison. */
   bool CompareTree(mafVME *vme);
 
   /**
-  Copy the given VME tree into a new tree. In case a parent is provided, link the new
-  root node to it. Return the root of the new tree.*/
+    Copy the given VME tree into a new tree. In case a parent is provided, link the new
+    root node to it. Return the root of the new tree.*/
   static mafVME *CopyTree(mafVME *vme, mafVME *parent=NULL);
 
-  /**
-  Make a copy of the whole subtree and return its pointer*/
+  /** Make a copy of the whole subtree and return its pointer*/
   mafVME *CopyTree() {return this->CopyTree(this);}
 
   /**
-  Reparent this VME into a different place of the same tree
-  or into a different tree. If the tree is not the same, the data of
-  all items of all sub vme is read into memory and Id is reset to -1, 
-  to allow the VMEStorage to write new data as new files on file.
-  In case of error during operation return NULL, otherwise return
-  this node pointer: this is to be compatible with nodes that during
-  reparenting make copy of the VME (mafVMERoot)*/
+    Reparent this VME into a different place of the same tree
+    or into a different tree. If the tree is not the same, the data of
+    all items of all sub vme is read into memory and Id is reset to -1, 
+    to allow the VMEStorage to write new data as new files on file.
+    In case of error during operation return NULL, otherwise return
+    this node pointer: this is to be compatible with nodes that during
+    reparenting make copy of the VME (mafVMERoot)*/
   virtual mafVME *ReparentTo(mafVME *parent);
 
-  /**
-  return true if VME can be reparented under specified node*/
+  /** return true if VME can be reparented under specified node*/
   virtual int CanReparentTo(mafVME *parent) {return parent==NULL||!this->IsInTree(parent);}
 
-  /**
-  Import all children of a VME-tree into the Output */
+  /** To be moved to mafNode */
+  /** Import all children of a VME-tree into the Output */
   void Import(mafVME *tree);
 
-  /**
-  Set/Get the flag to make this VME visible to tree traversal. mafVMEIterator, 
-  GetSpaceBounds and Get4DBounds will skip this VME if the flag is OFF.*/
-  vtkSetMacro(VisibleToTraverse,int);
-  vtkGetMacro(VisibleToTraverse,int);
-  vtkBooleanMacro(VisibleToTraverse,int);
-
-  /**
-  Return true if visible to tree traversal*/
-  bool IsVisible() {return this->VisibleToTraverse!=0;}
-	
-	/**
-  Set auxiliary reference system and its name*/
-	int SetAuxiliaryRefSys(mflTransform *AuxRefSys, const char *RefSysName, int type = MFL_LOCAL_FRAME_TAG);
-  int SetAuxiliaryRefSys(vtkMatrix4x4 *AuxRefSys, const char *RefSysName, int type = MFL_LOCAL_FRAME_TAG);
-
-	/**
-  Get auxiliary reference system from its name*/
-  int GetAuxiliaryRefSys(mflTransform *AuxRefSys, const char *RefSysName, int type = MFL_LOCAL_FRAME_TAG);
-  int GetAuxiliaryRefSys(vtkMatrix4x4 *AuxRefSys, const char *RefSysName, int type = MFL_LOCAL_FRAME_TAG);
-
-  /**
-  Set/Get the matrix pipe object, i.e. the source of the output matrix. */
-  int SetMatrixPipe(mafMatrixPipe *pipe);
-  mafMatrixPipe *GetMatrixPipe() { if (!MatrixPipe) SetDefaultMatrixPipe(); return MatrixPipe;}
-  //vtkGetObjectMacro(MatrixPipe,mafMatrixPipe);
-  mafMatrixPipe *GetTransform() {return this->GetMatrixPipe();}
-
-  /**
-  return the matrix pipe used for computing the AbsMatrix.*/
-  //vtkGetObjectMacro(AbsMatrixPipe,mafMatrixPipeDirectCinematic);
-  mafMatrixPipeDirectCinematic *GetAbsMatrixPipe();
-
   
+	/** Set auxiliary reference system and its name*/
+	//int SetAuxiliaryRefSys(mflTransform *AuxRefSys, const char *RefSysName, int type = MFL_LOCAL_FRAME_TAG);
+  //int SetAuxiliaryRefSys(vtkMatrix4x4 *AuxRefSys, const char *RefSysName, int type = MFL_LOCAL_FRAME_TAG);
+
+	/** Get auxiliary reference system from its name*/
+  //int GetAuxiliaryRefSys(mflTransform *AuxRefSys, const char *RefSysName, int type = MFL_LOCAL_FRAME_TAG);
+  //int GetAuxiliaryRefSys(vtkMatrix4x4 *AuxRefSys, const char *RefSysName, int type = MFL_LOCAL_FRAME_TAG);
+
+  // OK
+  /** Set/Get the matrix pipe object, i.e. the source of the output matrix. */
+  //int SetMatrixPipe(mafMatrixPipe *pipe);
+  //mafMatrixPipe *GetMatrixPipe() { if (!MatrixPipe) SetDefaultMatrixPipe(); return MatrixPipe;}
+
+  // OK
+  /** return the matrix pipe used for computing the AbsMatrix.*/
+  //mafMatrixPipeDirectCinematic *GetAbsMatrixPipe();
+
+  // OK
+  /** Set/Get the data pipe object, i.e. the source of the output dataset. */
+  //virtual int SetDataPipe(mflDataPipe *dpipe);
+  //mflDataPipe *GetDataPipe() { if (!DataPipe) SetDefaultDataPipe(); return DataPipe;}
+
+  // To be moved to output data structure
   /**
-  Set/Get the data pipe object, i.e. the source of the output dataset. */
-  virtual int SetDataPipe(mflDataPipe *dpipe);
-  mflDataPipe *GetDataPipe() { if (!DataPipe) SetDefaultDataPipe(); return DataPipe;}
-  //vtkGetObjectMacro(DataPipe,mflDataPipe);
+    Retrieve the dataset corresponding to the current time. This is
+    the output of the DataPipe currently attached to the VME.
+    Usually the output is a  "smart copy" of one of the dataset in 
+    the DataArray.
+    If the number of stored Items is 0, or the DataPipe is not set
+    a NULL pointer is returned!
+    Moreover, notice the output data changes in case the DataPipe is changed. An
+    event is rised when the data pipe is changed to allow attached classes to 
+    update their input.*/
+  //vtkDataSet *GetCurrentData();
+  //vtkDataSet *GetOutput() {return this->GetCurrentData();}
 
   /**
-  Set the DataPipe to the default one*/
-  virtual void SetDefaultDataPipe();
-
-  /**
-  return the name of the default data pipe for this class*/
-  virtual const char *GetDefaultDataPipe();
-
-  /**
-  Set the MatrixPipe to the default one*/
-  virtual void SetDefaultMatrixPipe();
-
-  /**
-  return the name of the default matrix pipe for this class*/
-  virtual const char *GetDefaultMatrixPipe();
-
-  /**
-  Retrieve the dataset corresponding to the current time. This is
-  the output of the DataPipe currently attached to the VME.
-  Usually the output is a  "smart copy" of one of the dataset in 
-  the DataArray.
-  If the number of stored Items is 0, or the DataPipe is not set
-  a NULL pointer is returned!
-  Moreover, notice the output data changes in case the DataPipe is changed. An
-  event is rised when the data pipe is changed to allow attached classes to 
-  update their input.*/
-  vtkDataSet *GetCurrentData();
-  vtkDataSet *GetOutput() {return this->GetCurrentData();}
-
-  /**
-  this function make the current data pointer to point the right output
-  data, usually the DataPipe output data but suclasses can redefine this
-  fuction. By default if no data pipe is defined, current data is set to
-  NULL.*/
-  virtual void UpdateCurrentData();
-
-  /**
-  Update data stored in the VMEItems of this object. This function
-  propagate the update event in the tree up to the root
-  and from there to the source object that can update the item's data.
-  By default (no parameters) the data of the first item (idx=0) 
-  is updated.*/
-  void UpdateData(int idx=0);
-
-  /**
-  Update data of all items*/
-  void UpdateAllData();
+    this function make the current data pointer to point the right output
+    data, usually the DataPipe output data but suclasses can redefine this
+    fuction. By default if no data pipe is defined, current data is set to
+    NULL.*/
+  virtual void Update();
   
+  // To be moved to output data structure
   /**
-  Return the DataType associated with this specific VME.*/
-  virtual const char *GetDataType();
+    Return the DataType associated with this specific VME.*/
+  //virtual const char *GetDataType();
 
-  /**
-  Get the pointer to the array of VMEItem's*/
+  /** Get the pointer to the array of VMEItem's*/
   mafVMEItemArray *GetDataArray() {return this->DataArray;}
 
-  /**
-  Return the list of time stamps of the VMEItemArray stored in this VME. */
+  /** Return the list of time stamps of the VMEItemArray stored in this VME. */
   virtual void GetDataTimeStamps(mafTimeStamp *&kframes);
   void GetDataTimeStamps(TimeVector &kframes);
 
-  /**
-  Return the list of time stamps of the MatrixVector stored in this VME. */
+  /** Return the list of time stamps of the MatrixVector stored in this VME. */
   void GetMatrixTimeStamps(mafTimeStamp *&kframes);
   void GetMatrixTimeStamps(TimeVector &kframes);
 
-  /**
-  Utility function to merge two different time-stamps  vectors*/
+  // reasoning if to move to a mafTimeVector class
+  /** Utility function to merge two different time-stamps  vectors*/
   static void MergeTimeVectors(TimeVector &outv,TimeVector v1,TimeVector v2);
 
   /**
-  Return the list of timestamps for this VME. Timestamps list is 
-  obtained merging timestamps for matrixes and VME items*/
+    Return the list of timestamps for this VME. Timestamps list is 
+    obtained merging timestamps for matrixes and VME items*/
   void GetLocalTimeStamps(mafTimeStamp *&kframes);
   virtual void GetLocalTimeStamps(TimeVector &kframes);
   void GetLocalTimeStamps(vtkDoubleArray *kframes);
 
 	/**
-  Return the list of timestamps considering all parents timestamps. Timestamps list is
-  obtained merging timestamps for matrixes and VME items*/
+    Return the list of timestamps considering all parents timestamps. Timestamps list is
+    obtained merging timestamps for matrixes and VME items*/
 	void GetAbsTimeStamps(mafTimeStamp *&kframes);
 	void GetAbsTimeStamps(TimeVector &kframes);
   
 	/**
-  Return the list of timestamps for the full sub tree. Timestamps list is
-  obtained merging timestamps for matrixes and VME items*/
+    Return the list of timestamps for the full sub tree. Timestamps list is
+    obtained merging timestamps for matrixes and VME items*/
   void GetTimeStamps(mafTimeStamp *&kframes);
   void GetTimeStamps(TimeVector &kframes);  
-  void GetTimeStamps(vtkDoubleArray *kframes);
-
-  /**
-  Return the number of time stamps in the whole tree*/
+  
+  /** Return the number of time stamps in the whole tree*/
   int GetNumberOfTimeStamps();
-
-  /**
-  Return the number of time stamps in the whole tree*/
+  
+  /** Return the number of time stamps in the whole tree*/
   int GetNumberOfLocalTimeStamps();
-
-  /**
-  Return true if the number of local time stamps is > 1*/
+  
+  // To be moved to output data structure
+  /** Return true if the number of local time stamps is > 1*/
   virtual int IsAnimated();
-
+  
   /**
-  Return Time bounds interval of the only VMEItems stored in this VME. */
+    Return Time bounds interval of the only VMEItems stored in this VME. */
   void GetDataTimeBounds(mafTimeStamp tbounds[2]);
 
+  // To be moved to output data structure
   /**
-  Get TimeBounds for this VME. TimeBounds interval is defined by the minimum
-  and maximum time stamps against the MatrixVector and VMEItems time stamps.
-  If only the pose time stamps are required use the mafMatrixVector::GetTimeBounds()
-  function. For the time bounds of the VME items only use the mafVME::GetItemsTimesList()*/
+    Get TimeBounds for this VME. TimeBounds interval is defined by the minimum
+    and maximum time stamps against the MatrixVector and VMEItems time stamps.
+    If only the pose time stamps are required use the mafMatrixVector::GetTimeBounds()
+    function. For the time bounds of the VME items only use the mafVME::GetItemsTimesList()*/
   virtual void GetLocalTimeBounds(mafTimeStamp tbounds[2]);
-
+  
+  // To be moved to output data structure
   /**
-  Return the TimeBounds of the whole subtree, i.e recurse the GetLocalTimeBounds()
-  function over all the VME in the subtree.*/
+    Return the TimeBounds of the whole subtree, i.e recurse the GetLocalTimeBounds()
+    function over all the VME in the subtree.*/
   void GetTimeBounds(mafTimeStamp tbounds[2]);
-
+  
+  // To be moved to output data structure
   /**
-  Extract the 4D bounds for this VME only, i.e. the space bounds along all the time range
-  for this VME. The first of these two functions allows to specify the time
-  interval for which the time bound is required*/
-  //void GetLocal4DBounds(mafTimeStamp start, mafTimeStamp end, double bounds[6]);
+    Extract the 4D bounds for this VME only, i.e. the space bounds along all the time range
+    for this VME. The first of these two functions allows to specify the time
+    interval for which the time bound is required*/
+  void GetLocal4DBounds(mafTimeStamp start, mafTimeStamp end, double bounds[6]);
   void GetVME4DBounds(double bounds[6]);
-  void GetVME4DBounds(mflBounds &bounds);
+  void GetVME4DBounds(mafOBB &bounds);
 
+  // To be moved to output data structure
   /**
-  Extract the 4D bounds for all the subtree starting a this VME, i.e. the space bounds 
-  along all the time for the VME in the subtree. The first of these two functions allows
-  to specify the time interval for which the time bound is required*/
+    Extract the 4D bounds for all the subtree starting a this VME, i.e. the space bounds 
+    along all the time for the VME in the subtree. The first of these two functions allows
+    to specify the time interval for which the time bound is required*/
   void Get4DBounds(mafTimeStamp start, mafTimeStamp end, double bounds[6]);
   void Get4DBounds(double bounds[6]);
-  void Get4DBounds(mflBounds &bounds);
+  void Get4DBounds(mafOBB &bounds);
 
+  // To be moved to output data structure
   /**
-  Return the space bound of the subtree for the current time, taking in consideration
-  the current data bounds and the current pose matrix*/
+    Return the space bound of the subtree for the current time, taking in consideration
+    the current data bounds and the current pose matrix*/
   void GetSpaceBounds(double bounds[6]);
-  virtual void GetSpaceBounds(mflBounds &bounds,mafTimeStamp t=-1, mafVMEIterator *iter=NULL);
-
-    /**
-  Return the space bound of the VME (not the subtree) for the current time, taking in consideration 
-  the current data bounds and the current pose matrix*/
+  virtual void GetSpaceBounds(mafOBB &bounds,mafTimeStamp t=-1, mafVMEIterator *iter=NULL);
+  
+  // To be moved to output data structure
+  /**
+    Return the space bound of the VME (not the subtree) for the current time, taking in consideration 
+    the current data bounds and the current pose matrix*/
   void GetVMESpaceBounds(double bounds[6]);
-  virtual void GetVMESpaceBounds(mflBounds &bounds,mafTimeStamp t=-1, mafVMEIterator *iter=NULL);
-
+  virtual void GetVMESpaceBounds(mafOBB &bounds,mafTimeStamp t=-1, mafVMEIterator *iter=NULL);
+  
+  // To be moved to output data structure
   /**
-  Return the local space bound (in local coordinates) of the VME (not the subtree) for the current time,
-  taking in consideration the current data bounds and the current pose matrix*/
+    Return the local space bound (in local coordinates) of the VME (not the subtree) for the current time,
+    taking in consideration the current data bounds and the current pose matrix*/
   void GetVMELocalSpaceBounds(double bounds[6]);
-  virtual void GetVMELocalSpaceBounds(mflBounds &bounds,mafTimeStamp t=-1, mafVMEIterator *iter=NULL);
-
-  /**
-  Set the crypting status for the vme. */
+  virtual void GetVMELocalSpaceBounds(mafOBB &bounds,mafTimeStamp t=-1, mafVMEIterator *iter=NULL);
+  
+  /** Set the crypting status for the vme. */
   void SetCrypting(int crypting);
-
-  /**
-  Get the crypting status of the vme. */
+  
+  /** Get the crypting status of the vme. */
   int GetCrypting();
-
+  
 protected:
   mafVME();
   virtual ~mafVME();
 
-  /**
-  This function is overridden by subclasses to perform custom initialization*/
+  /** This function is overridden by subclasses to perform custom initialization*/
   virtual int InternalInitialize() {return 0;};
 
-  /** to be redefined by subclasses to define the shutdown actions */
+  /** To be redefined by subclasses to define the shutdown actions */
   virtual void InternalShutdown() {};
 
-  virtual void UpdateData(mafVMEItem *item=NULL);
-
-  vtkSetObjectMacro(TagArray,vtkTagArray);
-
-  void SetAbsMatrixPipe(mafMatrixPipeDirectCinematic *pipe);
+  //void SetAbsMatrixPipe(mafMatrixPipeDirectCinematic *pipe);
 
   /**
-  Reimplemented as protected to avoid attaching of mafNode parent. 
-  This reimplementation sends event when VME is detached from the tree.*/
+    Reimplemented as protected to avoid attaching of mafNode parent. 
+    This reimplementation sends event when VME is detached from the tree.*/
   virtual int SetParent(mafNode *parent);
 
+  // To be moved to output data structure
   /**
    To be use to override the current data pointer. By default CurrentData
    stores a pointer to the DataPipe output. */
-  void SetCurrentData(vtkDataSet *data);
+  //void SetCurrentData(vtkDataSet *data);
 
-  static void OutputDataUpdateCallback(void *arg);
-  static void MatrixUpdateCallback(void *arg);
-  static void AbsMatrixUpdateCallback(void *arg);
+  //static void OutputDataUpdateCallback(void *arg);
+  //static void MatrixUpdateCallback(void *arg);
+  //static void AbsMatrixUpdateCallback(void *arg);
 
-  vtkTagArray *TagArray;
+  mafMatrixVector *m_MatrixVector;
+  mafVMEItemArray *m_DataArray;
 
-  mafMatrixVector *MatrixVector;
-  mafVMEItemArray *DataArray;
+  mflDataPipe     *m_DataPipe;
+  mafMatrixPipe   *m_MatrixPipe;
 
-  mflDataPipe     *DataPipe;
-  mafMatrixPipe   *MatrixPipe;
+  mafTimeStamp m_CurrentTime; ///< the time parameter for generation of the output
 
-  mafTimeStamp CurrentTime;
+  mafMatrixPipeDirectCinematic *m_AbsMatrixPipe;
 
-  mflString Name;
+  //unsigned long MatrixUpdateTag;
+  //unsigned long AbsMatrixUpdateTag;
+  //unsigned long DataUpdateTag;
 
-  mafMatrixPipeDirectCinematic *AbsMatrixPipe;
+  int m_Crypting;             ///< enable flag for this VME
 
-  unsigned long MatrixUpdateTag;
-  unsigned long AbsMatrixUpdateTag;
-  unsigned long DataUpdateTag;
-
-  int VisibleToTraverse;///< disable traversing visit
-  int Crypting;         ///< enable flag for this VME
-  int Initialized;      ///< flag set true by Initialize()
-
-  mflAutoPointer<mafMatrix>  CurrentMatrix;
-  mflAutoPointer<vtkDataSet> CurrentData;
+  // to be moved to output data structure
+  //mafAutoPointer<mafMatrix>  CurrentMatrix;
+  //mafAutoPointer<vtkDataSet> CurrentData;
   
-  /**
-  Internally used to keep a unique ID for the VMEs*/
-  static unsigned long GetNextVMEId() {return ++VMEIdCounter;}
-  
-  static unsigned long VMEIdCounter;
-
 private:
   mafVME(const mafVME&); // Not implemented
   void operator=(const mafVME&); // Not implemented
-
-   /** Compare two nodes. Privatized to force the usage of the one accepting a VME as argument. */
-  virtual bool Equals(mafNode *vme);
 };
 
 #endif
