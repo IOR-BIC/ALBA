@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-10 00:18:08 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-01-24 14:58:59 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -21,8 +21,12 @@ class mafXMLElement;
 class mmuXMLDOM;
 
 
-/** mafXMLStorage 
-  @todo to be written
+/** Concrete implementation of Storage object using Xerces-C for storing in XML.
+  This is a concrete implementation of storage object for storing XML documents
+  by means of Xerces-C library (http://xml.apache.org/xerces-c/).
+  This class also defines a function to access to XML/Xerces-C specific objects, 
+  stored into a PIMPL class (mmuXMLDOM).
+  @sa mafStorage mafXMLElement mmuXMLDOM
 */  
 class mafXMLStorage: public mafStorage
 {

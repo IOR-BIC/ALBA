@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-01-15 19:21:42 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-01-24 14:55:39 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -26,7 +26,7 @@ int mafStorage::Store()
 //------------------------------------------------------------------------------
 {
   int ret=InternalStore();
-  m_ParserFileName=m_FileName; // set the new filename as current
+  m_ParserURL=m_URL; // set the new filename as current
 
   // here I should add a call for packing/sending files
 
@@ -36,29 +36,29 @@ int mafStorage::Store()
 int mafStorage::Restore()
 //------------------------------------------------------------------------------
 {
-  m_ParserFileName=m_FileName; // set the new filename as current
+  m_ParserURL=m_URL; // set the new filename as current
   return InternalRestore();
 }
 
 //------------------------------------------------------------------------------
-void mafStorage::SetFileName(const char *name)
+void mafStorage::SetURL(const char *name)
 //------------------------------------------------------------------------------
 {
-  m_FileName.Copy(name); // force copying the const char reference
+  m_URL.Copy(name); // force copying the const char reference
 }
 
 //------------------------------------------------------------------------------
-const char *mafStorage::GetFileName()
+const char *mafStorage::GetURL()
 //------------------------------------------------------------------------------
 {
-  return m_FileName;
+  return m_URL;
 }
 
 //------------------------------------------------------------------------------
-const char *mafStorage::GetPareserFileName()
+const char *mafStorage::GetPareserURL()
 //------------------------------------------------------------------------------
 {
-  return m_ParserFileName;
+  return m_ParserURL;
 }
 
 //------------------------------------------------------------------------------

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorage.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-10 00:18:07 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-01-24 14:55:39 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -21,9 +21,22 @@
 class mafStorageElement;
 class mafStorable;
 
-/** mafStorage.
-  to be written
-  @todo implement packing (single file) and remote files (URL access)
+/** Abstract class for an abject mastering the storing/restoring of objects
+  This is an abstract class providing defining APIs for objects mastering storing/restoring
+  of storing and restoring of mafStorable objects. Concrete implementation will define a concrete encoding.
+  The basic idea of storing and restoring is the creation of a parallel tree, with all information
+  to be stored or restored. The tree is made of mafStorageElement nodes (or better, concrete classes inherited
+  from it). The storage class provides an access to the root element and defines a couple of functions InternalStore
+  and InternalRestore for implementing the concrete mechanisms. Users of this kind of object should provide an URL of 
+  the document to be opened/saved, and than call Store() or Restore(). In case of Restoring, the Root element is automatically created
+  by the storage class, while when storing it must be set (or can have be created during a previous restoring).
+  This class will also provide a high level mechanism for resolving URLs, that will try to copy locally remote or zipped files
+  and allow a simple file access to I/O classes.
+  @sa mafStorageElement mafStorable
+  @todo
+  - implement packing (single file)
+  - remote files (URL access)
+  - 
  */  
 class mafStorage
 {
@@ -31,16 +44,16 @@ public:
   mafStorage();
   virtual ~mafStorage() {}
 
-  /** Set the name of the file to be read or written */
-  void SetFileName(const char *name);
+  /** Set the URL of the document to be read or written */
+  void SetURL(const char *name);
 
-  /** Return the name of the file to be read or written */
-  const char *GetFileName();
+  /** Return the URL of the document to be read or written */
+  const char *GetURL();
   
   /** 
     Return the name of the last read file, this is internally used when writing to
     a new file to read and copy information between the old and new file */
-  const char *GetPareserFileName();
+  const char *GetPareserURL();
 
   /** perform storing. the argument is the tag of the root node */
   int Store();
@@ -70,7 +83,7 @@ protected:
   mafStorable *m_Root;              ///< root object to be stored, or being restored
   mafStorageElement *m_RootElement; ///< root stored element
 
-  mafString m_FileName;             ///< name of the file being accessed
-  mafString m_ParserFileName;       ///< name of the last parsed file (used for SaveAs)
+  mafString m_URL;             ///< name of the file being accessed
+  mafString m_ParserURL;       ///< name of the last parsed file (used for SaveAs)
 };
 #endif // _mafStorage_h_

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-01-10 00:18:07 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-01-24 14:58:59 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -94,9 +94,6 @@ void mmuDOMTreeErrorReporter::resetErrors()
 
 //------------------------------------------------------------------------------
 mafXMLStorage::mafXMLStorage()
-//    :m_XMLDoctype(NULL),m_XMLDoc(NULL),m_XMLNode(NULL), \
-//    m_XMLImplement(NULL),m_XMLSerializer(NULL), \
-//    m_XMLTarget(NULL),m_XMLParser(NULL)
 //------------------------------------------------------------------------------
 {
   m_DOM = new mmuXMLDOM;
@@ -178,7 +175,7 @@ int mafXMLStorage::InternalStore()
     m_DOM->m_XMLSerializer = ( (DOMImplementationLS*)m_DOM->m_XMLImplement )->createDOMWriter();
 
     mafString filename;
-    if (ResolveOutputURL(m_FileName,filename))
+    if (ResolveOutputURL(m_URL,filename))
     {
       m_DOM->m_XMLTarget = new LocalFileFormatTarget(filename);
 
@@ -303,7 +300,7 @@ int mafXMLStorage::InternalRestore()
 
     // here I should resolve the XML file name
     mafString filename;
-    if (ResolveInputURL(m_ParserFileName,filename))
+    if (ResolveInputURL(m_ParserURL,filename))
     {
       int errorCode  = 0;
 
@@ -362,7 +359,7 @@ int mafXMLStorage::InternalRestore()
       catch (const DOMException& e)
       { 
         mafString err;
-        err << "DOM-XML Error while parsing file '" << m_ParserFileName << "'\n";
+        err << "DOM-XML Error while parsing file '" << m_ParserURL << "'\n";
         err << "DOMException code is: " << mafString(e.code);
 
         if (e.getMessage())
@@ -375,7 +372,7 @@ int mafXMLStorage::InternalRestore()
       /*catch (const SAXException& e)
       {
         mafString err;
-        err << "SAX-XML Error while parsing file: '" << m_ParserFileName << "'\n";
+        err << "SAX-XML Error while parsing file: '" << m_ParserURL << "'\n";
         err << "SAXException msg is: " << mafXMLString(e.getMessage());
         mafErrorMessage(err);
       }*/
