@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:19:56 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-03-21 17:49:28 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -151,6 +151,7 @@ wxColour mafRandomColor()
   };
 }
 //----------------------------------------------------------------------------
+ //SIL. 21-3-2005: - perche non ritorna una mafString ?
 std::string  mafIdString(int id)
 //----------------------------------------------------------------------------
 {
