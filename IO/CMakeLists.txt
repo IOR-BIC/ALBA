@@ -8,8 +8,8 @@ DBG_MESSAGE("Configuring project mafIO")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-  mafStorable.h
   mafStorable.cpp
+  mafStorable.h
   mafStorage.cpp
   mafStorage.h
   mafStorageElement.cpp
@@ -24,7 +24,7 @@ IF (MAF_USE_VTK)
 ENDIF (MAF_USE_VTK)
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS "mafCore" )
+SET(PROJECT_LIBS mafBase)
 
 # IO classes for XML related objects
 IF (MAF_USE_XercesC)
