@@ -2,11 +2,11 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorable.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-10 00:18:06 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-02-20 23:40:53 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
-  Copyright (c) 2002/2004 
+  Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 #ifndef __mafStorable_h__
@@ -53,7 +53,7 @@ public:
   mafObject *CastToObject();
 
   /** convenience function for dynamic casting */
-  static mafStorable* SafeDownCast(mafObject *o);
+  static mafStorable* SafeCastToObject(mafObject *o);
 protected:
   /**
     This is called by Store() and must be reimplemented by subclasses. 
