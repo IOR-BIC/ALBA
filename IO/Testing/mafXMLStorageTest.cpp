@@ -64,11 +64,11 @@ mafStorableTestObject::mafStorableTestObject()
 int mafStorableTestObject::InternalStore(mafStorageElement *element)
 //------------------------------------------------------------------------------
 {
-  element->StoreDouble(m_FValue);
-  element->StoreInteger(m_IValue);
+  element->StoreDouble(m_FValue,"FValue");
+  element->StoreInteger(m_IValue,"IValue");
   element->StoreVectorN(m_FVector,4,"FVector");
   element->StoreVectorN(m_IVector,4,"IVector");
-  element->StoreText(m_Text);
+  element->StoreText(m_Text,"Text");
   element->StoreObject(m_Dummy,"Dummy");
   return MAF_OK;
 }
@@ -79,11 +79,11 @@ int mafStorableTestObject::InternalRestore(mafStorageElement *element)
 //------------------------------------------------------------------------------
 {
   if (
-    element->RestoreDouble(m_FValue)||
-    element->RestoreInteger(m_IValue)||
+    element->RestoreDouble(m_FValue,"FValue")||
+    element->RestoreInteger(m_IValue,"IValue")||
     element->RestoreVectorN(m_FVector,4,"FVector")||
     element->RestoreVectorN(m_IVector,4,"IVector")||
-    element->RestoreText(m_Text)||
+    element->RestoreText(m_Text,"Text")||
     (m_Dummy=dynamic_cast<mafDummyObject *>(element->RestoreObject("Dummy")))==NULL)
     return MAF_ERROR;
 
@@ -129,14 +129,18 @@ int main()
   foo.m_IVector[2]=12;
   foo.m_IVector[3]=13;
 
+#ifdef WIN32
+  foo.m_Text="Saved String àèéìòù§°ç";
+#else
   foo.m_Text="Saved String Ã Ã¨Ã©Ã¬Ã²Ã¹";
+#endif
 
   foo.m_Dummy=&dummy;
 
   foo.Print(std::cerr);
   
   mafXMLStorage storage;
-  storage.SetFileName("testfile.xml");
+  storage.SetURL("testfile.xml");
   storage.SetFileType("TestXML");
   storage.SetVersion("1.745");
 
@@ -149,7 +153,7 @@ int main()
   MAF_TEST(ret==MAF_OK);
 
   mafXMLStorage restore;
-  restore.SetFileName("testfile.xml");
+  restore.SetURL("testfile.xml");
   restore.SetFileType("TestXML");
   restore.SetVersion("1.745");
 
@@ -177,7 +181,11 @@ int main()
   MAF_TEST(new_foo.m_IVector[2]==12);
   MAF_TEST(new_foo.m_IVector[3]==13);
 
+#ifdef WIN32
+  MAF_TEST(new_foo.m_Text=="Saved String àèéìòù§°ç");
+#else
   MAF_TEST(new_foo.m_Text=="Saved String Ã Ã¨Ã©Ã¬Ã²Ã¹");
+#endif
 
   MAF_TEST(new_foo.m_Dummy!=NULL);
   MAF_TEST(new_foo.m_Dummy->IsType(mafDummyObject))
