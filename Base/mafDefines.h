@@ -2,11 +2,11 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-15 19:23:54 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-02-20 23:32:02 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
-  Copyright (c) 2002/2004 
+  Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
@@ -97,7 +97,7 @@ void mafMessage(const char *format, ...);
 #define mafTypeMacro(thisClass,superclass) \
   mafAbstractTypeMacro(thisClass,superclass); \
   static mafObject *NewObject(); \
-  virtual mafObject *NewInternalInstance() const; \
+  virtual mafObject *NewObjectInstance() const; \
   thisClass *NewInstance() const; \
   static thisClass *New();
   
@@ -130,12 +130,12 @@ void mafMessage(const char *format, ...);
     if (obj) obj->m_HeapFlag=true; \
     return obj; \
   } \
-  mafObject *thisClass::NewInternalInstance() const \
+  mafObject *thisClass::NewObjectInstance() const \
   { return NewObject(); } \
   thisClass *thisClass::New() \
   { return (thisClass *)NewObject(); } \
   thisClass *thisClass::NewInstance() const \
-  { return (thisClass *)NewInternalInstance(); }
+  { return (thisClass *)NewObjectInstance(); }
 
 /** Shortcut for type checking */
 #define IsType(type_name) IsA(type_name::GetStaticTypeId())
@@ -153,7 +153,7 @@ void mafMessage(const char *format, ...);
 /** This macro is used to declare the base ID of a  group of ids. */
 #define MAF_ID_CLASS_DEC(baseClass) static const mafID BaseID;
 /** This macro is used to define the base ID of a  group of ids. */
-#define MAF_ID_CLASS_IMP(baseClass,num) const mafID baseClass::BaseID = mmuIdFactory::AllocIdGroup("BaseID",num);
+#define MAF_ID_CLASS_IMP(baseClass,num) const mafID baseClass::BaseID = mmuIdFactory::AllocIdGroup("#baseClass::BaseID",num);
 
 #define MAF_ID_LOC(name,idname) static const mafID name=mmuIdFactory::GetId(#idname);
 
@@ -169,7 +169,7 @@ void mafMessage(const char *format, ...);
   mafObserver *GetListener() { return m_Listener;}
   
 /** mafEventMacro is an handy shortcut to send an Event. */
-#define mafEventMacro(e)  if (m_Listener) {m_Listener->OnEvent(e);}
+#define mafObserverMacro(e)  if (m_Observer) {m_Observer->OnEvent(e);}
   
 /** Helper macro used for testing */  
 #define MAF_TEST(a) if (!(a)) \
