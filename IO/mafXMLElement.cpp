@@ -2,11 +2,11 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-17 00:47:02 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-02-20 23:42:23 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
-  Copyright (c) 2002/2004 
+  Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
@@ -231,7 +231,7 @@ bool mafXMLElement::GetAttribute(const char *name, mafString &value)
   const XMLCh *xml_value=m_DOMElement->m_XMLElement->getAttribute(mafXMLString(name));
   if (xml_value)
   {
-    value.Copy(mafXMLString(xml_value));
+    value=mafXMLString(xml_value);
     return true;
   }
   return false; 
@@ -525,7 +525,7 @@ int mafXMLElement::RestoreVectorN(std::vector<mafString> &comps,unsigned int num
       mafXMLElement *item_node=(mafXMLElement*)children[i];
       if (tag_name==item_node->GetName())
       {
-        comps[i].Copy(mafXMLString(item_node->GetXMLElement()->m_XMLElement->getTextContent()));
+        comps[i]=mafXMLString(item_node->GetXMLElement()->m_XMLElement->getTextContent());
       }
       else
       {
@@ -550,7 +550,7 @@ int mafXMLElement::RestoreText(mafString &buffer,const char *name)
   mafXMLElement *subnode=FindNestedXMLElement(name);
   if (subnode)
   {
-    buffer.Copy(mafXMLString(subnode->GetXMLElement()->m_XMLElement->getTextContent()));
+    buffer=mafXMLString(subnode->GetXMLElement()->m_XMLElement->getTextContent());
     return MAF_OK;
   }
   else
