@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-27 18:20:10 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2004-12-29 17:59:18 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -35,32 +35,27 @@ mafString::~mafString()
 }
 
 //----------------------------------------------------------------------------
-mafString::mafString()
+mafString::mafString():m_CStr(NULL),m_ConstCStr(""),m_Size(0)
 //----------------------------------------------------------------------------
 {
-  Initialize();
 }
 
 //----------------------------------------------------------------------------
-mafString::mafString(const mafString& src)
+mafString::mafString(const mafString& src):m_CStr(NULL),m_ConstCStr(""),m_Size(0)
 //----------------------------------------------------------------------------
 {
-  Initialize();
   Copy(src.GetCStr());
 }
 //----------------------------------------------------------------------------
-mafString::mafString(const char *src)
+mafString::mafString(const char *src):m_CStr(NULL),m_Size(0)
 //----------------------------------------------------------------------------
 {
-  m_ConstCStr = src?src:""; // don't worry it won't be overwritten!
-  m_CStr = NULL;
-  m_Size = 0; // just to be sure to not overwrite... 
+  m_ConstCStr = src?src:""; // store string reference pointer
 }
 //----------------------------------------------------------------------------
-mafString::mafString(double num)
+mafString::mafString(double num):m_CStr(NULL),m_ConstCStr(""),m_Size(0)
 //----------------------------------------------------------------------------
 {
-  Initialize();
   char tmp[64];
   sprintf(tmp,"%.16g",num);
   Copy(tmp);
@@ -196,7 +191,7 @@ void mafString::SetCStr(char *a, bool release)
   {
     SetSize(0); // force memory release
     m_CStr = a;
-    m_Size = release?Length(a)+1:0; // notice I could have a (char *) that must not be released
+    m_Size = release?Length(a)+1:0; // notice: I could have a (char *) that must not be released
   }
 }
 //----------------------------------------------------------------------------
