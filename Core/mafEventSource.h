@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventSource.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-04 12:18:53 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-11-08 17:32:34 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -70,7 +70,7 @@ public:
   void InvokeEvent(mafEventBase *e);
 
   /** invoke an event of this subject */
-  void InvokeEvent(void *sender,void *data=NULL);
+  void InvokeEvent(void *sender,mafID id=ID_NO_EVENT, void *data=NULL);
 
   /** return pointer to client data stored in this object */
   void *GetData();

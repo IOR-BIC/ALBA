@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-08 16:45:44 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2004-11-08 17:32:34 $
+  Version:   $Revision: 1.7 $
 
 =========================================================================*/
 // .NAME standard macros and constants for the MFL libray
@@ -23,6 +23,8 @@ typedef double mafTimeStamp;
 
 #define MAF_OK                 0
 #define MAF_ERROR              1
+
+enum {ID_NO_EVENT=0};
 
 //------------------------------------------------------------------------------
 // Macros

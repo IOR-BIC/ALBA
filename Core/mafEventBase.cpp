@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-04 12:18:53 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-11-08 17:32:34 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -17,13 +17,13 @@ mafCxxTypeMacro(mafEventBase)
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-mafEventBase::mafEventBase(void *sender,void *data)
+mafEventBase::mafEventBase(void *sender, mafID id, void *data)
 //------------------------------------------------------------------------------
 {
   Sender  = sender;
   Source  = NULL;
   Data    = data;
-  Id      = 0;
+  Id      = id;
 }
 
 //------------------------------------------------------------------------------
@@ -39,6 +39,7 @@ mafEventBase::mafEventBase(const mafEventBase& c)
   Sender  = c.Sender;
   Source  = c.Source;
   Data    = c.Data;
+  Id      = c.Id;
 }
 //------------------------------------------------------------------------------
 void mafEventBase::SetSender(void *sender)
