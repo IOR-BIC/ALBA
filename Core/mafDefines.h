@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-27 18:21:17 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2004-12-29 17:59:49 $
+  Version:   $Revision: 1.19 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -154,23 +154,57 @@ void mafMessage(const char *format, ...);
 }
 
 /** 
-  Macro for Print Warning messages in log area. To use this you must
+  Macro for printing Warning messages in log area. This macro also
+  displays line at which error was printed. To use this you must
   include <sstream> header file */
 #define mafWarningMacro(x) \
-{ std::stringstream msg; \
+{ \
+  std::stringstream msg; \
   msg << "Warning in: " __FILE__ ", line " << __LINE__ << "\n" x \
     << "\n"; \
-    mafLogMessage(msg.str().c_str());\
+  mafLogMessage(msg.str().c_str());\
 }
 
 /** 
-  Macro for Print Error messages in log area. To use this you must
+  Macro for printing Error messages in log area. This macro also
+  displays line at which error was printed. To use this you must
   include <sstream> header file */
 #define mafErrorMacro(x) \
-{ std::stringstream msg; \
+{ \
+  std::stringstream msg; \
   msg << "Error in: " __FILE__ ", line " << __LINE__ << "\n" x \
     << "\n"; \
-    mafLogMessage(msg.str().c_str());\
+  mafLogMessage(msg.str().c_str());\
+}
+
+/** 
+  Macro for displaying Warning messages. To use this you must
+  include <sstream> header file */
+#define mafWarningMessageMacro(x) \
+{ \
+  std::stringstream msg; \
+  msg << x << "\n"; \
+  mafWarningMessage(msg.str().c_str());\
+}
+
+/** 
+  Macro for displaying Error messages. To use this you must
+  include <sstream> header file */
+#define mafErrorMessageMacro(x) \
+{ \
+  std::stringstream msg; \
+  msg << x << "\n"; \
+  mafErrorMessage(msg.str().c_str());\
+}
+
+/** 
+  Macro for displaying messages. To use this you must
+  include <sstream> header file */
+#define mafMessageMacro(x) \
+{ \
+  std::stringstream msg; \
+  msg << x << "\n"; \
+  mafMessage(msg.str().c_str());\
 }
 
 #ifdef MAF_USE_WX
