@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-11 09:12:42 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-11-18 22:35:25 $
+  Version:   $Revision: 1.3 $
   Authors:   originally based on vtkString (www.vtk.org), rewritten Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -219,27 +219,5 @@ protected:
   char *m_CStr;
   mafID m_Size;
 };
-
-#ifdef MAF_USE_WX
-/** 
-  Macro for formatted printing to string (adapted from wxWidgets IMPLEMENT_LOG_FUNCTION)
-  To use it you will need to include wx/wx.h */
-#define MAF_PRINT_MACRO(format,buffer,size) \
-  va_list argptr; \
-  va_start(argptr, format); \
-  wxVsnprintf(buffer, size, format, argptr); \
-  va_end(argptr);
-
-#else MAF_USE_WX // this is less safe since it can't limit output string size
-/** 
-  Macro for formatted printing to string (adapted from wxWidgets IMPLEMENT_LOG_FUNCTION)
-  To use it you will need to include <stdio.h>, <stdarg.h> and <varargs.h> */
-#define MAF_PRINT_MACRO(format,buffer,size) \
-  va_list argptr; \
-  va_start(argptr, format); \
-  vsprintf(buffer, format, argptr); \
-  va_end(argptr);
-
-#endif MAF_USE_WX
 
 #endif

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-17 20:15:02 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-11-18 22:35:24 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -65,8 +65,8 @@ typedef unsigned long mafID;
 #define vtkNEW(a) a=a->New()
 
 /**
-  Macro used by mafObjects for RTTI information. This macor must be placed
-  in the class definition puplic section.
+  Macro used by mafObjects for RTTI information. This macro must be placed
+  in the class definition public section.
 */
 #define mafTypeMacro(thisClass,superclass) \
   private: \
@@ -172,6 +172,28 @@ typedef unsigned long mafID;
     << "\n"; \
     mafLogMessage(msg.str().c_str());\
 }
+
+#ifdef MAF_USE_WX
+/** 
+  Macro for formatted printing to string (adapted from wxWidgets IMPLEMENT_LOG_FUNCTION)
+  To use it you will need to include wx/wx.h */
+#define MAF_PRINT_MACRO(format,buffer,size) \
+  va_list argptr; \
+  va_start(argptr, format); \
+  wxVsnprintf(buffer, size, format, argptr); \
+  va_end(argptr);
+
+#else MAF_USE_WX // this is less safe since it can't limit output string size
+/** 
+  Macro for formatted printing to string (adapted from wxWidgets IMPLEMENT_LOG_FUNCTION)
+  To use it you will need to include <stdio.h>, <stdarg.h> and <varargs.h> */
+#define MAF_PRINT_MACRO(format,buffer,size) \
+  va_list argptr; \
+  va_start(argptr, format); \
+  vsprintf(buffer, format, argptr); \
+  va_end(argptr);
+
+#endif MAF_USE_WX
 
 #endif
 

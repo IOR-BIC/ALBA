@@ -2,16 +2,15 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObjectFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-18 18:58:35 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2004-11-18 22:35:25 $
+  Version:   $Revision: 1.6 $
   Authors:   Based on itkObjectFactory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-
-#include "mafObjectFactory.h"
 #include "mafDynamicLoader.h"
+#include "mafObjectFactory.h"
 #include "mafDirectory.h"
 #include "mafVersion.h"
 #include <stdlib.h>
@@ -19,8 +18,6 @@
 #include <algorithm>
 #include <map>
 #include <sstream>
-
-mafCxxTypeMacro(mafObjectFactory);
 
 //------------------------------------------------------------------------------
 /** Utility class to clean up factory memory.*/  
@@ -40,6 +37,8 @@ public:
 // Static object used to clean up memory at program closing
 static CleanUpObjectFactory CleanUpObjectFactoryGlobal;
 //------------------------------------------------------------------------------
+
+mafCxxTypeMacro(mafObjectFactory);
 
 //------------------------------------------------------------------------------
 // Add this for the SGI compiler which does not seem

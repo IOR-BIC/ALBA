@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDirectory.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-10 06:59:16 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-11-18 22:35:25 $
+  Version:   $Revision: 1.2 $
   Authors:   Based on itkDirectory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -11,6 +11,7 @@
 =========================================================================*/
 #include "mafDirectory.h"
 
+mafCxxTypeMacro(mafDirectory);
 
 //------------------------------------------------------------------------------
 mafDirectory::mafDirectory() 

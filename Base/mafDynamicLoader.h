@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDynamicLoader.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-11 09:12:41 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-11-18 22:35:25 $
+  Version:   $Revision: 1.3 $
   Authors:   Based on DynamicLoader (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -38,7 +38,11 @@ typedef void* LibHandle;
 
 /** Portable loading of dynamic libraries or dll's.
   mafDynamicLoader provides a portable interface to loading dynamic 
-  libraries or dll's into a process.
+  libraries or dll's into a process. Beware this class include mafWIN32.h 
+  and thus should be included before any other not including this header file,
+  since MS VS6.0 seems to have a bug which make macros and inline functions 
+  defined before of this class to be mis-compiled.
+  
  */
 class MAF_EXPORT mafDynamicLoader
 {
