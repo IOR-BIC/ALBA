@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-27 18:22:25 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-12-28 19:45:26 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,6 +13,7 @@
 #include "mafXMLElement.h"
 #include "mafXMLStorage.h"
 #include "mafMatrix.h"
+#include "mafVector.txx"
 
 #include <assert.h>
 #include "stdio.h"
@@ -21,7 +22,7 @@
 mafXMLElement(DOMElement *element,mafStorageElement *parent,mafStorage *storage) : mafStorageElement(parent,storage)
 //------------------------------------------------------------------------------
 {
-  assert(parent->IsAType(mafXMLElement));
+  assert(parent==NULL||parent->IsAType(mafXMLElement));
   assert(storage->IsAType(mafXMLStorage));
   assert(element);
   m_XMLElement = element;
@@ -37,28 +38,77 @@ mafXMLElement::~mafXMLElement()
 }
 
 //------------------------------------------------------------------------------
-mafStorageElement *mafXMLElement::AddChild(const char *name)
+DOMElement *mafXMLElement::GetXMLElement()
+//------------------------------------------------------------------------------
+{
+  return m_XMLElement;
+}
+
+//------------------------------------------------------------------------------
+const char *mafXMLElement::GetName()
+//------------------------------------------------------------------------------
+{
+}
+
+//------------------------------------------------------------------------------
+mafXMLStorage *mafXMLElement::GetXMLStorage()
+//------------------------------------------------------------------------------
+{
+  return (mafXMLStorage *)m_Storage;
+}
+
+//------------------------------------------------------------------------------
+mafXMLElement *mafXMLElement::GetXMLParent()
+//------------------------------------------------------------------------------
+{
+  return (mafXMLElement *)m_Parent;
+}
+
+//------------------------------------------------------------------------------
+mafStorageElement *mafXMLElement::AppendChild(const char *name)
+//------------------------------------------------------------------------------
+{
+ return AppendXMLChild(name); 
+}
+
+//------------------------------------------------------------------------------
+mafXMLElement *mafXMLElement::AppendXMLChild(const char *name)
 //------------------------------------------------------------------------------
 {
   DOMElement *child_element=GetXMLStorage()->GetXMLDocument()->createElement(mafXMLString(name));
   mafXMLElement *child=new mafXMLElement(child_element,this,GetXMLStorage());
   m_Children->AppendItem(child);
   return child;
+}
+
+
+
+//------------------------------------------------------------------------------
+DOMAttr *mafXMLElement::AppendXMLAttribute(DOMElement *element,const char *name,const char *value)
+//------------------------------------------------------------------------------
+{
+  assert(element);
+  assert(name);
+  assert(value);
   
+  DOMAttr *attr=GetXMLStorage()->GetXMLDocument()->createAttribute(name);
+  attr->setValue(mafXMLString(value));
+  element->appendChild(attr);
+
+  return attr;
 }
 
 //------------------------------------------------------------------------------
-mafXMLElement *mafXMLElement::AddXMLChild(const char *name)
+DOMAttr *mafXMLElement::FindXMLAttribute(DOMElement *element,const char *name)
 //------------------------------------------------------------------------------
 {
-  return (mafXMLElement *)AddChild(name);
 }
 
 //------------------------------------------------------------------------------
-void WriteText(mafXMLElement *element,const char *text)
+void mafXMLElement::WriteXMLText(mafXMLElement *element,const char *text)
 //------------------------------------------------------------------------------
 {
-  DOMText *text_node=element->GetXMLStorage()->GetXMLDocument()->createTextNode(mafXMLString(text));
+  DOMText *text_node=GetXMLStorage()->GetXMLDocument()->createTextNode(mafXMLString(text));
   element->m_XMLElement->appendChild(text_node);
 }
 
@@ -69,8 +119,8 @@ void mafXMLElement::StoreText(const const char *text,const char *name)
   assert(text);
   assert(name);
 
-  mafXMLElement *text_node=AddXMLChild(name);
-  text_node->WriteText(text);
+  mafXMLElement *text_node=AppendXMLChild(name);
+  text_node->WriteXMLText(text);
 }
 
 //------------------------------------------------------------------------------
@@ -103,8 +153,27 @@ void mafXMLElement::StoreMatrix(mafMatrix *matrix,const char *name)
     elements<<"\n"; // cr for read-ability
   }
 
-  mafXMLElement *matrix_node=AddXMLChild(name);
-  matrix_node->WriteText(elements);
+  mafXMLElement *matrix_node=AppendXMLChild(name);
+  matrix_node->WriteXMLText(elements);
+}
+
+//------------------------------------------------------------------------------
+void mafXMLElement::StoreObjectVector(mafVector<mafStorable *> *vector,const char *name)
+//------------------------------------------------------------------------------
+{
+  assert(vector);
+  assert(name);
+
+  // create sub node for storing the vector
+  mafXMLElement *vector_node = AppendXMLChild(name);
+  DOMAttr *size_attr=AppendXMLAttribute(vector_node->GetXMLElement(),"Size",vector->getNumberOfItems());
+  
+  for (int i=0;i<vector->GetNumberOfItems();i++)
+  {
+    mafStorable *obj=vector->GetItem(i);
+    assert(obj);
+    obj->Store(vector_node);
+  }
 }
 
 //------------------------------------------------------------------------------
@@ -120,8 +189,8 @@ void mafXMLElement::StoreVector3(double comps[3],const char *name)
     elements<<comps[i]<<" ";
   }
 
-  mafXMLElement *vector_node=AddXMLChild(name);
-  vector_node->WriteText(elements);
+  mafXMLElement *vector_node=AppendXMLChild(name);
+  vector_node->WriteXMLText(elements);
 }
 
 //------------------------------------------------------------------------------
@@ -138,15 +207,14 @@ void mafXMLElement::StoreVectorN(double *comps,int num,const char *name)
     elements<<comps[i]<<" ";
   }
 
-  mafXMLElement *vector_node=AddXMLChild(name);
-  vector_node->WriteText(elements);
+  mafXMLElement *vector_node=AppendXMLChild(name);
+  vector_node->WriteXMLText(elements);
 }
 
 //------------------------------------------------------------------------------
-int mafXMLElement::RestoreMatrix(mafXMLElement *node,mafMatrix *matrix,const char *name)
+int mafXMLElement::RestoreMatrix(mafMatrix *matrix,const char *name)
 //------------------------------------------------------------------------------
 {
-  assert(node);
   assert(matrix);
   
   mafXMLElement *subnode=node->FindNestedElementWithName(name);

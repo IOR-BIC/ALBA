@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLString.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-27 18:22:26 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-12-28 19:45:27 $
+  Version:   $Revision: 1.2 $
   Authors:   Rick Parrish (rfmobile@swbell.net) adapted by Marco Petrone (CINECA)
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -34,16 +34,19 @@ public:
 	mafXMLString(const XMLCh *wstr);
 	mafXMLString(const mafXMLString &copy);
 	~mafXMLString();
-	bool append(const XMLCh *tail);
-	bool erase(const XMLCh *head, const XMLCh *tail);
-	const XMLCh* begin() const;
-	const XMLCh* end() const;
-	int size() const;
+	bool Append(const XMLCh *tail);
+	bool Erase(const XMLCh *head, const XMLCh *tail);
+	const XMLCh* Begin() const;
+	const XMLCh* End() const;
+	int Size() const;
+  const char *GetCStr();
 	XMLCh & operator [] (const int i);
 	const XMLCh operator [] (const int i) const;
 	operator const XMLCh * () const { return m_WStr; };
+  operator const char * () const {return GetCStr();}
 protected:
   XMLCh *m_WStr;
+  const char *m_CStr;
 };
 
 #endif

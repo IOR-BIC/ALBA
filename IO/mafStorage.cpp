@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-27 18:22:26 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-12-28 19:45:25 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -19,14 +19,41 @@ mafStorage::mafStorage()
 }
 
 //------------------------------------------------------------------------------
-void mafStorage::Store(const char *root_tag)
+void int::Store()
 //------------------------------------------------------------------------------
 {
-  InternalStore(root_tag);
+  int ret=InternalStore();
+  m_ParserFileName=FileName; // set the new filename as current
+
+  // here I should add a call for packing/sending files
+
+  return ret;
 }
 //------------------------------------------------------------------------------
-int mafStorage::Restore(const char *root_tag)
+int mafStorage::Restore()
 //------------------------------------------------------------------------------
 {
-  return InternalRestore(root_tag);
+  m_ParserFileName=FileName; // set the new filename as current
+  return InternalRestore();
+}
+
+//------------------------------------------------------------------------------
+void mafStorage::SetFileName(const char *name)
+//------------------------------------------------------------------------------
+{
+  FileName.Copy(name); // force copying the const char reference
+}
+
+//------------------------------------------------------------------------------
+const char *mafStorage::GetFileName()
+//------------------------------------------------------------------------------
+{
+  return FileName;
+}
+
+//------------------------------------------------------------------------------
+const char *mafStorage::GetPareserFileName()
+//------------------------------------------------------------------------------
+{
+  return m_ParserFileName;
 }

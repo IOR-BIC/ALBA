@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-27 18:22:25 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-12-28 19:45:26 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -36,6 +36,6 @@ mafStorageElement::~mafStorageElement()
     delete m_Children[i];
   }
   
-  delete m_Children; m_Children = NULL;
+  cppDEL(m_Children);
 }
 

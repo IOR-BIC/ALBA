@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLElement.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-27 18:22:25 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-12-28 19:45:27 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -18,18 +18,20 @@
 // forward declarations :
 //----------------------------------------------------------------------------
 class mafXMLStorage;
+class DOMAttr;
 
-/** mafXMLElement is an interface for serializable objects.
-  The idea behind this class is to act as in interface to be inherited to
-  become a serializable object. This is a abstract interface, since Store and
-  Restore are not defined and should be implemented.
-  When storing an anchor element must be provided and the store will attach all necessary
-  subnoded to that point.
-  When restoring a correct element to start restoring from must be provided: the given node 
-  must have been serialized with the the corresponding store function. Restore() does not perfrom
-  a search for the right node. On the other end, for subnodes to be restored, the restore implementation
-  will probably implement a search mechanism. This happens for the specialized RestoreXX() functions,
-  which search for subnoded of with the right name.
+/** concrete implementation of mafStorageElement as an XML-DOM element
+  This class represent a concrete implementation of a mafStorageElement in terms
+  of a DOM-XML element. The real DOM-XML element object is embedded in this wrapper
+  object and can be retrieved with GetXMLElement(). Utility functions allow a mafStorable
+  object to serialize itself independently from the the serialization format. While storing to file
+  the mafXMLElement are created by attaching new children to existing nodes by means of AppendChild().
+  All the created elements are automatically destroyed at the end of the storing procedure by
+  mafStorage object.
+  During restoring, the DOM tree is created by DOMParser in the mafXMLStorage object, and the wrapping
+  mafXMLElements are created by means of FindNestedElement() function. All the mafXMLElements so created
+  during restoring are automatically destroyed by mafStorage object at the end of the restoring.
+  @sa mafXMLStorage
  */  
 class mafXMLElement : public mafStorageElement
 {
@@ -37,13 +39,8 @@ public:
   mafXMLElement(DOMElement *element,mafStorageElement *parent,mafStorage *storage);
   virtual ~mafXMLElement();
 
-  /** set the name of this element */
-  virtual void SetName(const char *name)=0;
-
-  /** get the name of this element */
-  virtual const char *GetName()=0;
-
-  
+  /** get the name of this XML element */
+  virtual const char *GetName();
 
   /** Store a generic text into an XML document */
   virtual void StoreText(const const char *text,const char *name="Text");
@@ -56,6 +53,9 @@ public:
 
   /** Store a matrix into an XML document */
   virtual void StoreMatrix(mafMatrix *matrix,const char *name="Matrix");
+
+  /** Store a vector of objects into an XML document */
+  virtual void StoreObjectVector(mafVector<mafStorable *> *vector,const char *name="ObjectVector");
 
   /** Store a vector3 into an XML document */
   virtual void StoreVector3(double comps[3],const char *name="Vector3");
@@ -82,19 +82,37 @@ public:
   virtual int RestoreInteger(int &value,const char *name="Integer");
 
   /** return a pointer to the storage who created this element */
-  mafXMLStorage *GetXMLStorage() {return (mafXMLStorage *) m_Storage;}
+  mafXMLStorage *GetXMLStorage();
 
   /** return a pointer to the parent element, i.e. the element upper in the hierarchy */
-  mafXMLElement *GetXMLParent() {return (mafXMLElement *)m_Parent;}
+  mafXMLElement *GetXMLParent();
+  
+  /** 
+    Create a new XML child element and return its pointer. This is the only way to create a new
+    XML element. The first element (the root) is automatically created by storage object and
+    is the DOM document root element */
+  virtual mafStorageElement *AppendChild(const char *name);
+  mafXMLElement *AppendXMLChild(const char *name);
 
-  /** Create a new child element and return its pointer */
-  virtual mafStorageElement *AddChild(const char *name);
-  mafXMLElement *AddXMLChild(const char *name);
+  /** Find a nested XML element by Name */
+  virtual mafStorageElement *FindNestedElement(const char *name);
+  mafXMLElement *FindNestedElement(const char *name);
 
-  /** this writes text inside an XML element */
-  void WriteText(mafXMLElement *element,const char *text);
+  /** return DOM-XML element stored inside this mafXMLElement */
+  DOMElement *GetXMLElement();
+
+  /** append an attribute to an XML element. attribute 'name' and 'value' must be passed as argument */
+  DOMAttr *AppendXMLAttribute(DOMElement *element,const char *name,const char *value);
+  DOMAttr *AppendXMLAttribute(const char *name,const char *value) {return AppendXMLAttribute(m_XMLElement,name,value);}
+
+  /** Find a */
+  DOMAttr *FindXMLAttribute(DOMElement *element,const char *name);
+
+  /** this writes text inside a DOM-XML element */
+  void WriteXMLText(mafXMLElement *element,const char *text);
 
 protected:
+
   DOMElement *m_XMLElement; ///< XML element wrapped by this object 
 };
 #endif // _mafXMLElement_h_
