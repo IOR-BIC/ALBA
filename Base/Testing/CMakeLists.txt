@@ -4,6 +4,7 @@ LINK_LIBRARIES(mafBase)
 
 ADD_EXECUTABLE(mafStringTest mafStringTest.cpp)
 ADD_EXECUTABLE(mafObjectTest mafObjectTest.cpp)
+ADD_EXECUTABLE(mafObjectFactoryTest mafObjectFactoryTest.cpp)
 
 # wxWidgets specific classes
 IF (MAF_USE_WX)
