@@ -61,10 +61,10 @@ int main()
   MAF_TEST(foo->IsA("mafFooObject"));
   MAF_TEST(foo->IsA(typeid(mafObject)));
   MAF_TEST(foo->IsA("mafObject"));
-  MAF_TEST(foo->IsA(mafObject::GetStaticTypeId()));
+  MAF_TEST(foo->IsMAFType(mafObject));
   MAF_TEST(!foo->IsA(dummy->GetTypeId()));
   MAF_TEST(!foo->IsA(dummy->GetTypeName()));
-  MAF_TEST(!dummy->IsA(typeid(mafFooObject::GetStaticTypeId()))); // test through static type id (equivalent to typeid())
+  MAF_TEST(!dummy->IsMAFType(mafFooObject)); // test through static type id (equivalent to typeid())
   MAF_TEST(!dummy->IsA(mafFooObject::GetStaticTypeName())); // test through static string type 
   MAF_TEST(dummy->GetStaticTypeId()==dummy->GetTypeId()); 
   MAF_TEST(dummy->GetStaticTypeId()==dummy->GetTypeId());

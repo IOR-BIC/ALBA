@@ -16,10 +16,10 @@ int main()
   int i=0;
   
   //Test TagItem constructors
-  mmuTagItem titem("TestTAG","String Value");
-  mmuTagItem tnum("TestNUM",1235.67890123456e20);
-  mmuTagItem tmulti("MultiString",strings,4);
-  mmuTagItem tmulti_num("MultiNum",numbers,4);
+  mafTagItem titem("TestTAG","String Value");
+  mafTagItem tnum("TestNUM",1235.67890123456e20);
+  mafTagItem tmulti("MultiString",strings,4);
+  mafTagItem tmulti_num("MultiNum",numbers,4);
   
   // test TagItem's contents
   MAF_TEST(mafString::Equals("TestTAG",titem.GetName()));
@@ -61,7 +61,7 @@ int main()
   MAF_TEST(tmulti_num.GetComponentAsDouble(5)==3.456);
 
   // Test adding some TagItems to a TagArray
-  mmuTagItem ti1, ti2, ti3, ti4;
+  mafTagItem ti1, ti2, ti3, ti4;
   mafTagArray test_tag_array;
   
 	ti1.SetName("qui");
@@ -87,7 +87,7 @@ int main()
   
   
   // extract all items of a given type
-  std::vector<mmuTagItem *> pti_vector;
+  std::vector<mafTagItem *> pti_vector;
   test_tag_array.GetTagsByType(MAF_STRING_TAG, pti_vector);
 
   std::cerr << "\n";
@@ -96,7 +96,7 @@ int main()
   std::cerr << "\n";
 
   // check type of extracted items
-  std::vector<mmuTagItem *>::iterator v_iterator;
+  std::vector<mafTagItem *>::iterator v_iterator;
   for (v_iterator = pti_vector.begin(); v_iterator != pti_vector.end(); v_iterator++)
   {
     std::cerr << (*v_iterator)->GetName() << "\n";

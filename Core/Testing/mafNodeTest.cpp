@@ -39,10 +39,22 @@ class mafTestRootNode: public mafNodeRoot, public mafTestNode
 public:
   mafTestRootNode() {SetId(0);} // self set its id to 0
   mafTypeMacro(mafTestRootNode,mafTestNode);
+  /** allow only a NULL parent */
+  virtual bool CanReparentTo(mafNode *parent) {return mafNodeRoot::CanReparentTo(parent);}
+  virtual void Print(std::ostream& os, const int tabs=0) const;
 protected:
   inline int InternalStore(mafStorageElement *parent);
   inline int InternalRestore(mafStorageElement *element);
 };
+
+//-------------------------------------------------------------------------
+inline void mafTestRootNode::Print(std::ostream& os, const int tabs) const
+//-------------------------------------------------------------------------
+{
+  Superclass::Print(os,tabs);
+  mafNodeRoot::Print(os,tabs);
+}
+
 
 //-------------------------------------------------------------------------
 inline int mafTestRootNode::InternalRestore(mafStorageElement *element)
@@ -159,6 +171,11 @@ int main()
   MAF_TEST(rootB->AddChild(nodeB)==MAF_OK);
   MAF_TEST(nodeA2->ReparentTo(root)==MAF_OK);
   MAF_TEST(nodeA2->ReparentTo(rootB)==MAF_ERROR);
+
+  
+  // test root reparenting
+  MAF_TEST(root->ReparentTo(rootB)==MAF_ERROR);
+  MAF_TEST(root->ReparentTo(NULL)==MAF_OK);
   
   root->CleanTree();
 
@@ -322,10 +339,10 @@ int main()
   MAF_TEST(node1->GetLink("link3")==test_node.GetPointer()); // the link should be valid now
   
   // add some tags
-  root->GetTagArray()->SetTag(mmuTagItem("NumericTag",10.5));
-  root->GetTagArray()->SetTag(mmuTagItem("StringTag","Donald"));
-  node3->GetTagArray()->SetTag(mmuTagItem("TestTag","test value"));
-  node2->GetTagArray()->SetTag(mmuTagItem("TestTag","second value"));
+  root->GetTagArray()->SetTag(mafTagItem("NumericTag",10.5));
+  root->GetTagArray()->SetTag(mafTagItem("StringTag","Donald"));
+  node3->GetTagArray()->SetTag(mafTagItem("TestTag","test value"));
+  node2->GetTagArray()->SetTag(mafTagItem("TestTag","second value"));
 
   // dump root node with tags (just to visually test the Print() )
   std::cout<<"Root node with tags:\n";
