@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-29 09:33:03 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-12-04 09:29:15 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -46,7 +46,7 @@ mafMatrix::mafMatrix(const mafMatrix &mat)
 }
 
 //------------------------------------------------------------------------------
-bool mafMatrix::operator==(mafMatrix& mat)
+bool mafMatrix::operator==(const mafMatrix& mat) const
 //------------------------------------------------------------------------------
 {
   if (m_TimeStamp!=mat.m_TimeStamp)
@@ -73,6 +73,21 @@ mafMatrix::mafMatrix(vtkMatrix4x4* mat, mafTimeStamp t)
     m_VTKMatrix->DeepCopy(mat);
     m_TimeStamp=t;
   }
+}
+
+//------------------------------------------------------------------------------
+bool mafMatrix::operator==(vtkMatrix4x4 *mat) const
+//------------------------------------------------------------------------------
+{
+  for (int i=0;i<4;i++)
+  {
+    for (int j=0;j<4;j++)
+    {
+      if (abs(GetElements()[i][j]-mat->Element[i][j])>(1e-17))
+        return false;
+    }
+  }
+  return true;
 }
 #endif
 

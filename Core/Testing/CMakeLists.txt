@@ -8,7 +8,6 @@ ADD_EXECUTABLE(mafStringTest mafStringTest.cpp)
 ADD_EXECUTABLE(mafObjectTest mafObjectTest.cpp)
 ADD_EXECUTABLE(mafSmartObjectTest mafSmartObjectTest.cpp)
 ADD_EXECUTABLE(mafObjectFactoryTest mafObjectFactoryTest.cpp)
-ADD_EXECUTABLE(mafTransformTest mafTransformTest.cpp)
 ADD_EXECUTABLE(mafNodeTest mafNodeTest.cpp)
 ADD_EXECUTABLE(mafVectorTest mafVectorTest.cpp)
 
@@ -18,6 +17,7 @@ ENDIF (MAF_USE_WX)
 
 # VTK specific classes
 IF (MAF_USE_VTK)
+  ADD_EXECUTABLE(mafTransformTest mafTransformTest.cpp)
 ENDIF (MAF_USE_VTK)  
 
 # classes using VTK+wxWidgets

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-30 18:18:20 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-12-04 09:29:15 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -48,13 +48,13 @@ public:
 
   mafMatrix(const mafMatrix &mat);
 
-  bool operator==(mafMatrix& m);
+  bool operator==(const mafMatrix& mat) const;
 
 #ifdef MAF_USE_VTK
   mafMatrix(vtkMatrix4x4* mat, mafTimeStamp t=0);
 
   /** this only checks the 4x4 matrix with VTK ones, not the time stamp */
-  bool operator==(vtkMatrix4x4 *m);
+  bool operator==(vtkMatrix4x4 *mat) const;
 
   /** return pointer to elements vector */
   mafMatrixElements GetElements() const {return (mafMatrixElements)m_VTKMatrix->Element;}
