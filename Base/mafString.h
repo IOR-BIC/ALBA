@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:35:11 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-03-10 12:13:19 $
+  Version:   $Revision: 1.8 $
   Authors:   originally based on vtkString (www.vtk.org), rewritten Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,10 +21,13 @@
   mafString is an implementation of string which operates on a traditional
   c-string internally stored. At each moment this string can be retrieved with
   GetCStr(). The memory of this m_CStr is automatically garbaged. Originally based
-  on vtkString. BEWARE, when mafString is assigned to a "const char *" this is simply
-  referenced and not copied, this implies very high performance but can cause invalid
-  memory access: e.g. in case the "const char *" is a function argument. In this case
-  you should explicitly make a copy with Copy() or explicitelly converting with mafString(). 
+  on vtkString. BEWARE, when mafString is assigned with Set() to a "const char *" this
+  is simply referenced and not copied, this implies very high performance but can cause
+  invalid  memory access: e.g. in case the "const char *" is a function argument.
+  When a mafString storing a reference to a const char * is modified the string is 
+  automatically copied into a new memory.
+  This string can be passed as argument wherever a const char * is expected.
+  @sa mafCString
   */
 class MAF_EXPORT mafString : public mafBase
 {
@@ -244,6 +247,13 @@ protected:
   char *m_CStr;
   const char *m_ConstCStr;
   mafID m_Size;
+};
+
+/** this string class is thought to simply wrap a c-string: no memory copy. */
+class mafCString : public mafString
+{
+public:
+  mafCString(const char *str) {Set(str);}
 };
 
 #endif
