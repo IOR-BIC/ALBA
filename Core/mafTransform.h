@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-30 14:17:00 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-01-10 00:04:53 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -57,9 +57,6 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   /** RTTI stuff */
   mafTypeMacro(mafTransform,mafTransformBase);
   
-  /** debug dumping */
-  virtual void Print (std::ostream& os, const int indent=0) const;
-
   /**
     Directly set the internal Matrix. It's overwritten by Update if Input or InputFrame !=NULL
     This function makes a copy of the input matrix. */

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-30 14:16:59 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-01-10 00:04:53 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -46,20 +46,6 @@ mafTransform::mafTransform(const mafTransform& copy)
   m_Matrix=copy.m_Matrix;
   Modified();
 }
-
-//----------------------------------------------------------------------------
-void mafTransform::Print (std::ostream& os, const int indent) const
-//----------------------------------------------------------------------------
-{
-  mafIndent the_indent(indent);
-  this->Superclass::Print(os, indent);
-  os << the_indent << "Matrix:" << std::endl;
-
-  // Print the internal matrix
-  m_Matrix.Print(os,the_indent.GetNextIndent());
-}
-
-
 
 //----------------------------------------------------------------------------
 void mafTransform::Identity()
