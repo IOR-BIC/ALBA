@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaTagArray.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-14 10:21:18 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-02-17 00:44:27 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -31,6 +31,8 @@ public:
 
   /** attributes must define a copy rule */
   void operator=(const mmaTagArray &a);
+
+  bool operator==(const mmaTagArray &a) const;
 
   /** provide access to vector items. If idx is outside the result is invalid */
   //mmuTagItem &operator [](const char *name);
@@ -72,7 +74,10 @@ public:
   /**
   Compare two tag arrays. Order of items is significative for
   the comparison*/
-  bool Equals(mmaTagArray *array);
+  bool Equals(const mmaTagArray *array) const;
+
+  /** copy the content of another array */
+  void DeepCopy(const mmaTagArray *a);
 	
 	/**
 	Search the tag array for tags of a given type and 
@@ -80,7 +85,7 @@ public:
 	void GetTagsByType(int type, std::vector<mmuTagItem *> &array);
 
   /** return the number of tags stored in this object */
-  int GetNumberOfTags();
+  int GetNumberOfTags() const;
 
   typedef std::map<std::string,mmuTagItem> mmuTagsMap;
 

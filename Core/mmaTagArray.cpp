@@ -2,14 +2,16 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaTagArray.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-14 10:21:18 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-02-17 00:44:27 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 #include "mmaTagArray.h"
+#include "mafStorageElement.h"
+#include <sstream>
 #include <assert.h>
 
 mafCxxTypeMacro(mmaTagArray)
@@ -37,6 +39,15 @@ void mmaTagArray::operator=(const mmaTagArray &a)
     SetTag(titem);
   }
 }
+
+//-------------------------------------------------------------------------
+void mmaTagArray::DeepCopy(const mmaTagArray *a)
+//-------------------------------------------------------------------------
+{
+  assert(a);
+  *this=*a;
+}
+
 //-------------------------------------------------------------------------
 mmuTagItem *mmaTagArray::GetTag(const char *name)
 //-------------------------------------------------------------------------
@@ -116,16 +127,24 @@ void mmaTagArray::GetTagList(std::vector<std::string> &list)
     list[i]=titem.GetName();
   }
 }
+
 //-------------------------------------------------------------------------
-bool mmaTagArray::Equals(mmaTagArray *array)
+bool mmaTagArray::operator==(const mmaTagArray &a) const
+//-------------------------------------------------------------------------
+{
+  return Equals(&a);
+}
+
+//-------------------------------------------------------------------------
+bool mmaTagArray::Equals(const mmaTagArray *array) const
 //-------------------------------------------------------------------------
 {
   assert(array);
   if (GetNumberOfTags()!=array->GetNumberOfTags())
     return false;
 
-  mmuTagsMap::iterator it=m_Tags.begin();
-  mmuTagsMap::iterator it2=array->m_Tags.begin();
+  mmuTagsMap::const_iterator it=m_Tags.begin();
+  mmuTagsMap::const_iterator it2=array->m_Tags.begin();
   int i=0;
   for (;it!=m_Tags.end();it++,it2++,i++)
   {
@@ -151,7 +170,7 @@ void mmaTagArray::GetTagsByType(int type, std::vector<mmuTagItem *> &array)
   }
 }
 //-------------------------------------------------------------------------
-int mmaTagArray::GetNumberOfTags()
+int mmaTagArray::GetNumberOfTags() const
 //-------------------------------------------------------------------------
 {
   return m_Tags.size();
@@ -161,12 +180,42 @@ int mmaTagArray::GetNumberOfTags()
 int mmaTagArray::InternalStore(mafStorageElement *parent)
 //-------------------------------------------------------------------------
 {
-  return MAF_OK;
+  parent->SetAttribute("NumberOfTags",mafString(GetNumberOfTags()));
+  int ret=MAF_OK;
+  for (mmuTagsMap::iterator it=m_Tags.begin();it!=m_Tags.end()&&ret==MAF_OK;it++)
+  {
+    mafStorageElement *item_element=parent->AppendChild("TItem");
+    ret=it->second.Store(item_element)!=MAF_OK;
+  }
+  return ret;
 }
 
 //-------------------------------------------------------------------------
 int mmaTagArray::InternalRestore(mafStorageElement *node)
 //-------------------------------------------------------------------------
 {
-  return MAF_OK;
+  mafString numAttrs;
+  node->GetAttribute("NumberOfTags",numAttrs);
+  int num=atof(numAttrs);
+
+  mafStorageElement::ChildrenVector &children=node->GetChildren();
+  int ret=MAF_OK;
+  int idx=0;
+  for (int i=0;(idx<num)&&(i<children.size())&&(ret==MAF_OK);i++)
+  {
+    if (mafString(children[i]->GetName())=="TItem")
+    {
+      mmuTagItem new_titem;
+      ret=new_titem.Restore(children[i]);
+      idx++;
+    }
+  }
+
+  if (idx<num)
+  {
+    mafErrorMacro("Error Restoring TagArray: wrong number of restored items.");
+    return MAF_ERROR;
+  }
+
+  return ret;
 }
