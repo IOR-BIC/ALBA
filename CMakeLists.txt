@@ -2,13 +2,14 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2004-10-12 12:38:25 $
-# Version:   $Revision: 1.2 $
+# Date:      $Date: 2004-10-13 12:05:46 $
+# Version:   $Revision: 1.3 $
 #
 # Description:
 # CMake Project file for the MAF.
 
 #MESSAGE("MAF:SOF")
+#Macro that helps in printing debug messages
 INCLUDE (${MAF_SOURCE_DIR}/modules/DebugMacro.cmake)
 
 SET (CMAKE_BACKWARDS_COMPATIBILITY "2.0" CACHE INSTERNAL "This project is for CMake 2.0")
@@ -58,9 +59,11 @@ ELSE (EXISTS ${MAF_SOURCE_DIR}/mfl)
   INCLUDE (${MAF_SOURCE_DIR}/modules/FindMFL.cmake)
   IF (MFL_FOUND)
     MESSAGE(STATUS "MAF: Found & Using MFL")
+    ##MM: come fa ad avere la variabile USE_MFL_FILE che e' nell'altro albero dell'IF???
     INCLUDE (${USE_MFL_FILE})
     # Here, in case MFL has been built as dynamic libs, should be added 
     # an option to ask if to copy all dynamic libs to the MAF dir. 
+    ##MM????? non ho mica capito!!!
     SET (MAF_CAN_BUILD 1)
   ENDIF (MFL_FOUND)
 ENDIF (EXISTS ${MAF_SOURCE_DIR}/mfl)
