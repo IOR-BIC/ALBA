@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGeneric.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:36:17 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-03-10 15:33:45 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -53,12 +53,6 @@ public:
     do not support such a function! */  
   virtual int ShallowCopy(mafVME *a);
   
-  /**
-    Query for VME child nodes */
-  mafVMEGeneric *GetVMEChild(mafID idx) {return mafVMEGeneric::SafeDownCast(this->Superclass::GetChild(idx));}
-  mafVMEGeneric *GetFirstVMEChild();
-  mafVMEGeneric *GetLastVMEChild();
-
   /**
    Set the time for this VME (not for the whole tree). Normaly time 
    of the tree is set by sending an event with id VME_TIME_SET */

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:37:02 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-03-10 15:33:25 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -35,35 +35,6 @@ mafVMEOutput::~mafVMEOutput()
 //-------------------------------------------------------------------------
 {
 }
-
-//------------------------------------------------------------------------------
-int mafVMEOutput::Initialize()
-//------------------------------------------------------------------------------
-{
-  if (m_Initialized)
-    return -1;
-
-  if (InternalInitialize() == 0)
-  {
-    m_Initialized=1;
-    return 0;
-  }
-
-  return -1;
-
-}
-
-//------------------------------------------------------------------------------
-void mafVMEOutput::Shutdown()
-//------------------------------------------------------------------------------
-{
-  if (m_Initialized)
-  {
-    InternalShutdown();
-    m_Initialized = 0;
-  }
-}
-
 
 //-------------------------------------------------------------------------
 mafAbsMatrixPipe *mafVMEOutput::GetAbsMatrixPipe()
