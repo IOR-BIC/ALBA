@@ -1,13 +1,6 @@
 #include "mafString.h"
 #include <iostream>
 
-#define ASSERT(a) if (!(a)) \
-{ \
-  std::cerr << "Test failed at line " \
-  << __LINE__ << " : " << #a << std::endl; \
-  return MAF_ERROR; \
-}
-
 int main()
 {
   mafString hello = "Hello World";
@@ -16,32 +9,34 @@ int main()
   std::cout<<(const char *)hello<<std::endl;
   std::cout<<(const char *)number<<std::endl;
 
-  ASSERT(hello.Length()==11);
+  MAF_TEST(hello.Length()==11);
   
   mafString italy = " and Italy";
   mafString tmp = hello + italy;
   
-  ASSERT(tmp=="Hello World and Italy");
-  ASSERT(tmp.EndsWith("Italy"));
-  ASSERT(tmp.StartsWith("Hello"));
-  ASSERT(tmp.FindFirst("and")==12);
+  MAF_TEST(tmp=="Hello World and Italy");
+  MAF_TEST(tmp.EndsWith("Italy"));
+  MAF_TEST(tmp.StartsWith("Hello"));
+  MAF_TEST(tmp.FindFirst("and")==12);
   
   mafString copy=tmp;
 
-  ASSERT(tmp==copy);
+  MAF_TEST(tmp==copy);
   
   tmp.Erase(6,15);
-  ASSERT(tmp=="Hello Italy");
+  MAF_TEST(tmp=="Hello Italy");
 
   tmp.Erase(5);
-  ASSERT(tmp=="Hello");
+  MAF_TEST(tmp=="Hello");
 
   tmp<<" everybody";
   tmp<<italy;
   tmp<<". Hello!";
   
-  ASSERT(tmp.FindLast("Hello")==(tmp.Length()-mafString::Length("Hello!")));
-  ASSERT(tmp[tmp.FindLast("Hello")]=='H');
+  MAF_TEST(tmp.FindLast("Hello")==(tmp.Length()-mafString::Length("Hello!")));
+  MAF_TEST(tmp[tmp.FindLast("Hello")]=='H');
+  
+  std::cout<<"Test completed successfully!"<<std::endl;
   
   return 0;
 }
