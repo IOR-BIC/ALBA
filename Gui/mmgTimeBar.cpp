@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 14:25:00 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-04 15:03:21 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,6 +43,7 @@ mmgTimeBar::mmgTimeBar( wxWindow* parent,wxWindowID id,bool CloseButton)
 m_timer(NULL, ID_TIMER)         
 //----------------------------------------------------------------------------
 {
+  m_Listener = NULL;
   m_timer.SetOwner(this, ID_TIMER);
   
   m_sizer =  new wxBoxSizer( wxHORIZONTAL );
@@ -59,15 +60,23 @@ m_timer(NULL, ID_TIMER)
   m_time_max  = 100; 
   m_time_step = 1;
 
-  m_entry = new wxTextCtrl  (this, ID_ENTRY, "" , wxDefaultPosition, wxSize(50,-1), 0 );
+  wxStaticText *lab1 = new wxStaticText(this,-1," time "); 
+  m_entry = new wxTextCtrl  (this, ID_ENTRY, "" , wxDefaultPosition, wxSize(40,17), 0 );
   m_entry->SetValidator(mmgValidator(this,ID_ENTRY,m_entry,&m_time,m_time_min,m_time_max));
+
+  wxStaticText *lab2 = new wxStaticText(this,-1," speed "); 
+  m_entry2 = new wxTextCtrl  (this, TIME_BAR_VELOCITY, "" , wxDefaultPosition, wxSize(40,17), 0 );
+  m_entry2 ->SetValidator(mmgValidator(this,TIME_BAR_VELOCITY,m_entry2,&m_time_step,1,100));
 
   m_slider = new mmgFloatSlider(this,ID_SLIDER,m_time,m_time_min,m_time_max );
   m_slider->SetValidator( mmgValidator(this,ID_SLIDER,m_slider,&m_time,m_entry) );
   m_slider->SetNumberOfSteps(500);
   TransferDataToWindow();
   m_sizer->Add( m_slider ,1,wxEXPAND);
-  m_sizer->Add( m_entry);
+  m_sizer->Add( lab1,0,wxALIGN_CENTER);
+  m_sizer->Add( m_entry,0,wxALIGN_CENTER);
+  m_sizer->Add( lab2,0,wxALIGN_CENTER);
+  m_sizer->Add( m_entry2,0,wxALIGN_CENTER);
 
   m_b[0] = new mmgPicButton(this, TIME_BEGIN);  
   m_b[1] = new mmgPicButton(this, TIME_PREV );  
@@ -100,12 +109,12 @@ void mmgTimeBar::OnEvent(mafEvent& e)
     case TIME_STOP:
     case ID_ENTRY:
     case ID_SLIDER:
-      // play = false
+      // time set is called later on
     break;
 		case TIME_BAR_VELOCITY:
 		break;
     case ID_CLOSE_BUTTON:
-			   HideGui();
+			   //HideGui();
 		break;
     case TIME_PREV:
       //m_time -= m_time_step;
@@ -137,7 +146,9 @@ void mmgTimeBar::OnEvent(mafEvent& e)
     m_b[2]->SetBitmap(TIME_PLAY, TIME_PLAY);
     m_timer.Stop();
   }
-  mafEventMacro(mafEvent(this,TIME_SET,m_time));
+  
+  if(e.GetId() != TIME_STOP )
+    mafEventMacro(mafEvent(this,TIME_SET,m_time));
   Update();
 }
 //----------------------------------------------------------------------------
@@ -184,6 +195,7 @@ void mmgTimeBar::SetBounds(float min, float max)
   m_entry->SetValidator(mmgValidator(this,ID_ENTRY,m_entry,&m_time,m_time_min,m_time_max));
   Update();
 }
+/* - removed  //SIL. 4-4-2005: 
 //----------------------------------------------------------------------------
 void mmgTimeBar::ShowSettings()
 //----------------------------------------------------------------------------
@@ -210,11 +222,9 @@ void mmgTimeBar::ShowGui()
 	// make modal the preferences panel
 	
   //SIL. 23-3-2005: temporary commented out
-  /*
-  wxUpdateUIEvent ui_e(ID_TIMEBAR_SETTINGS); 
-	mafEventMacro(mafEvent(this,UPDATE_UI,&ui_e));
-	mafEventMacro(mafEvent(this,OP_SHOW_GUI,(wxWindow *)m_guih));
-  */
+  //wxUpdateUIEvent ui_e(ID_TIMEBAR_SETTINGS);
+	//mafEventMacro(mafEvent(this,UPDATE_UI,&ui_e));
+	//mafEventMacro(mafEvent(this,OP_SHOW_GUI,(wxWindow *)m_guih));
 }
 //----------------------------------------------------------------------------
 void mmgTimeBar::HideGui()
@@ -229,3 +239,4 @@ void mmgTimeBar::HideGui()
 	m_guih = NULL;
 	m_gui  = NULL;
 }
+*/
