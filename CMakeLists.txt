@@ -2,19 +2,21 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2004-10-13 12:05:46 $
-# Version:   $Revision: 1.3 $
+# Date:      $Date: 2004-10-14 09:10:16 $
+# Version:   $Revision: 1.4 $
 #
 # Description:
 # CMake Project file for the MAF.
 
 #MESSAGE("MAF:SOF")
 #Macro that helps in printing debug messages
-INCLUDE (${MAF_SOURCE_DIR}/modules/DebugMacro.cmake)
+
 
 SET (CMAKE_BACKWARDS_COMPATIBILITY "2.0" CACHE INSTERNAL "This project is for CMake 2.0")
 CMAKE_MINIMUM_REQUIRED(VERSION 2.0) 
 PROJECT (MAF)
+
+INCLUDE (${MAF_SOURCE_DIR}/modules/DebugMacro.cmake)
 
 SET (LIBRARY_OUTPUT_PATH ${MAF_BINARY_DIR}/bin/ CACHE INTERNAL
      "Single output directory for building all libraries.")
