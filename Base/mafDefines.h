@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:00:32 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-04-01 09:48:07 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -44,7 +44,7 @@ typedef std::type_info mafTypeID; ///< type for mafObject's class type IDs
 //------------------------------------------------------------------------------
 // Constants
 //------------------------------------------------------------------------------
-enum {MAF_OK=0, MAF_ERROR=1};
+enum {MAF_OK=0, MAF_ERROR,MAF_USER_RETURN_VALUE};
 enum {ID_NO_EVENT=0};
 enum {MAF_STRING_BUFFER_SIZE=2048};
 
@@ -163,7 +163,7 @@ void mafMessage(const char *format, ...);
   { return (thisClass *)NewObjectInstance(); }
 
 /** Shortcut for type checking */
-#define IsType(type_name) IsA(type_name::GetStaticTypeId())
+#define IsMAFType(type_name) IsA(type_name::GetStaticTypeId())
 
 /** This macros is used to declare a new Id and should be placed in a .h file*/
 #define MAF_ID_IMP(idname) const mafID idname = mmuIdFactory::GetNextId(#idname);
@@ -188,7 +188,7 @@ void mafMessage(const char *format, ...);
 #define mafEvalGroupId(baseClass,id) (baseClass::BaseID+id)
 
 /** mafEventMacro is an handy shortcut to send an Event. */
-#define mafEventMacro(e)  if (m_Listener) {m_Listener->OnEvent(e);}
+#define mafEventMacro(e)  if (m_Listener) {m_Listener->OnEvent(&e);}
   
 /** Helper macro used for testing */  
 #define MAF_TEST(a) if (!(a)) \
