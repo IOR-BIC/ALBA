@@ -32,6 +32,13 @@
 
 #include <iostream>
 
+#ifdef WIN32
+  #define SLEEP(a) Sleep(a)
+#else
+  #include <unistd.h>
+  #define SLEEP(a) sleep(a)
+#endif
+
 /** attribute class for attaching vtkActor to VME */
 class mafClientData : public mafAttribute
 {
@@ -386,7 +393,7 @@ int main()
     renderer->ResetCameraClippingRange();
     //renderer->ResetCamera();
     renWin->Render();
-    //Sleep(100);
+    //SLEEP(100);
   }
 
   // open landmark cloud
@@ -615,7 +622,7 @@ int main()
 
   renderer->AddActor(tree4DBoundsActor);
 
-  //Sleep(500);
+  //SLEEP(500);
 
   //renderer->ResetCamera();
   renWin->Render();
@@ -639,7 +646,7 @@ int main()
     //renderer->GetActiveCamera()->Yaw(.003);
     renWin->Render();
 
-    Sleep(300);
+    SLEEP(300);
 
     root->GetOutput()->GetBounds(treeBounds);
     vtitle->GetOutput()->GetBounds(treeBounds);
