@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDirectory.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-11 17:34:57 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-01 09:48:31 $
+  Version:   $Revision: 1.5 $
   Authors:   Based on itkDirectory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,8 +33,8 @@ public:
 
   /** 
     Load the specified directory and load the names of the files
-    in that directory. 0 is returned if the directory can not be 
-    opened, 1 if it is opened.    */
+    in that directory. "false" is returned if the directory can not be 
+    opened, "true" if it is opened. */
   bool Load(const char* dir);
 
   /** Return the number of files in the current directory. */
