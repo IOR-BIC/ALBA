@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-13 09:10:36 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-02-17 00:42:00 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -19,6 +19,7 @@
 #include "mafObserver.h"
 #include "mafString.h"
 #include "mafMTime.h"
+#include "mmaTagArray.h"
 #include <vector>
 #include <map>
 #include <string>
@@ -28,7 +29,7 @@
 //----------------------------------------------------------------------------
 class mafNodeIterator;
 class mafAttribute;
-class mmaTagArray;
+//class mmaTagArray;
 
 //----------------------------------------------------------------------------
 // mafNode
@@ -168,7 +169,7 @@ public:
 
   /**
   Find a node in all the subtrees matching the given TagName/TagValue pair.*/
-  //mafNode *FindInTreeByTag(const char *name,const char *value="",int type=vtkTagItem::MFL_STRING_TAG); 
+  mafNode *FindInTreeByTag(const char *name,const char *value="",int type=MAF_STRING_TAG); 
   
   /**
     Find a node in all the subtrees matching the given VME Name.*/
