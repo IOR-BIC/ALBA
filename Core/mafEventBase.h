@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventBase.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:24:25 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-04-01 10:05:39 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,11 +24,10 @@ class mafEventSource;
 //------------------------------------------------------------------------------
 // mafEventBase
 //------------------------------------------------------------------------------
-/** Implementation of the Subject/Observer design pattern.
-  mafEventBase is a class implementing the "observer" in the Subject/Observer 
-  design pattern. Objective of this object is to listen to events rised by subjects.
-  An observer must be registered into a subject to create the communication channel 
-  between the two.
+/** Implementation of the message object for the Subject/Observer design pattern.
+  mafEventBase is a class implementing the "message" in the Subject/Observer 
+  design pattern. Objective of this object is to contain the message sent by subjects
+  and received by observers when an event is invoked.
   Fields of the basic events are:
   - Sender: the object who sent this event
   - Source: the event source object who issue the event (NULL for non event source sent events)
@@ -36,6 +35,9 @@ class mafEventSource;
   - Channel: a secondary ID identifying the scope of this message.
   - Data: a void * for data to be attached to this event. (No reference counting, smart or autopointer mechanism!!!)
   - SkipFlag: is used to make an event to be skipped by broadcasting mechanism for next observers
+
+  More complex messages can be defined inheriting from this class. The RTTI mechanism ensure
+  to be able recognized and cast the real kind of event.
 
   @sa mafSubject mafObserver mafEvent
 */
