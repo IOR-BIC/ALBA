@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:26:28 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-03-02 00:31:18 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -251,11 +251,11 @@ public:
   /** redefined to cope with tree registering */
   virtual void UnRegister(void *o);
 
-   /** increment update modification time */
-  inline void Modified();
+  /** increment update modification time */
+  void Modified() {m_MTime.Modified();}
 
   /** return modification time */
-  inline unsigned long GetMTime();
+  unsigned long GetMTime() {return m_MTime.GetMTime();}
 
   /** return a reference to the event source issuing events for this object */
   mafEventSource &GetEventSource() {return m_EventSource;}
@@ -375,22 +375,5 @@ protected:
 
   mafEventSource m_EventSource;   ///< source of events issued by the node
 };
-
-
-//------------------------------------------------------------------------------
-// speeds up this frequently called function
-inline unsigned long mafNode::GetMTime()
-//------------------------------------------------------------------------------
-{
-  return m_MTime.GetMTime();
-}
-
-//------------------------------------------------------------------------------
-// speeds up this frequently called function
-inline void mafNode::Modified()
-//------------------------------------------------------------------------------
-{
-  m_MTime.Modified();
-}
 
 #endif
