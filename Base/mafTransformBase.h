@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformBase.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 15:50:01 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-01 10:00:11 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,6 +22,7 @@
 // Forward declarations
 //------------------------------------------------------------------------------
 class vtkLinearTransform;
+class vtkMAFToLinearTransform;
 
 /**  Superclass for Homogeneous transformations.
   mafTransformBase is the superclass for MAF geometric, and currently homogeneous
@@ -90,10 +91,11 @@ public:
 
   /**
     Update the transform to account for any changes which
-    have been made.  You do not have to call this method 
+    have been made.  You should not need to call this method 
     yourself, it is called automatically whenever the
-    transform needs an update. */
-  void Update();
+    transform needs an update. For redefining the transform
+    behavior redefine InternalUpdate() function */
+  virtual void Update();
 
   /** update modification time stamp for this object */
   void Modified();
@@ -120,6 +122,8 @@ public:
   /** set the timestamp for the output matrix */
   void SetTimeStamp(mafTimeStamp t) {m_TimeStamp=t;}
 
+  mafTimeStamp GetTimeStamp() {return m_TimeStamp;}
+
 #ifdef MAF_USE_VTK
   /** Return a VTK transform connected to this transform */
   vtkLinearTransform *GetVTKTransform();
@@ -140,7 +144,7 @@ protected:
   //mafTransformBase *m_MyInverse;
 
   #ifdef MAF_USE_VTK
-  vtkLinearTransform *m_VTKTransform; ///< VTK transform used to link to VTK process objects
+  vtkMAFToLinearTransform *m_VTKTransform; ///< VTK transform used to link to VTK process objects
   #endif
 
   /**  Perform any subclass-specific Update. */

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:04:42 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-01 10:00:10 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -102,7 +102,7 @@ vtkLinearTransform *mafTransformBase::GetVTKTransform()
   if (!m_VTKTransform)
   {
     m_VTKTransform = vtkMAFToLinearTransform::New();
-    
+    m_VTKTransform->SetInputTransform(this);
   }
   return m_VTKTransform;
 }
