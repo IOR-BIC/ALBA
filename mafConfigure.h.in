@@ -5,6 +5,9 @@
 # define MAF_SHARED
 #endif
 
+//--------------------------------------------------------------------------
+// Disable some annoying warning message
+//--------------------------------------------------------------------------
 #if defined(_MSC_VER) && defined(MAF_SHARED)
 # pragma warning ( disable : 4275 )
 #endif
@@ -13,7 +16,9 @@
 # pragma warning ( disable : 4786 )
 #endif
 
-
+//--------------------------------------------------------------------------
+// For WIN32 dynamic linking
+//--------------------------------------------------------------------------
 #if defined(_WIN32) && defined(MAF_SHARED)
 # if defined(MAF_EXPORTS)
 #  define MAF_EXPORT __declspec( dllexport ) 
@@ -24,13 +29,25 @@
 # define MAF_EXPORT
 #endif
 
+//--------------------------------------------------------------------------
+// Which libraries MAF is linking
+//--------------------------------------------------------------------------
 #cmakedefine MAF_USE_VTK
 #cmakedefine MAF_USE_WX
 #cmakedefine MAF_USE_ITK
 
-/* what byte order */
+//--------------------------------------------------------------------------
+// MAF Versioning
+//--------------------------------------------------------------------------
 
-/* what threading system are we using */
+#define MAF_MAJOR_VERSION @MAF_MAJOR_VERSION@
+#define MAF_MINOR_VERSION @MAF_MINOR_VERSION@
+#define MAF_BUILD_VERSION @MAF_BUILD_VERSION@
+#define MAF_VERSION "@MAF_VERSION@"
+
+//--------------------------------------------------------------------------
+// Which threading system are we using
+//--------------------------------------------------------------------------
 #cmakedefine CMAKE_USE_PTHREADS_INIT
 #cmakedefine CMAKE_USE_SPROC_INIT
 #cmakedefine CMAKE_HP_PTHREADS_INIT
