@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuTagItem.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-13 09:10:00 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-02-14 10:21:19 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,7 +13,7 @@
 #define __mmuTagItem_h
 
 #include "mmuUtility.h"
-#include "mafDefines.h"
+#include "mafCoreDecl.h"
 #include "mafString.h"
 #include <vector>
 #include <string>
@@ -57,9 +57,9 @@ public:
   /**
     Set the Value of this Tag. In case the component is specified the function operates
     on that component, otherwise it works on component 0. */
-  void SetValue(const char *value,int component=0);
+  void SetValue(const mafString value,int component=0);
   /** same as SetValue() */
-  void SetComponent(const char *value,int component=0);
+  void SetComponent(const mafString value,int component=0);
 
   /** Set Tag value converting automatically to string and setting the type to NUMERIC. */
   void SetValue(const double value , int component=0);
@@ -97,7 +97,7 @@ public:
   const char *GetComponent(int comp) const;
 
   /** return the value stored in this item converting to a double. */
-  double GetValueAsDouble(int component) const;
+  double GetValueAsDouble(int component=0) const;
   double GetComponentAsDouble(int comp) const;
 
   /** return all the array of values */
@@ -140,8 +140,6 @@ public:
   
   /** Compare two Tag items*/
   bool Equals(const mmuTagItem *item) const;
-
-  enum MAF_TAG_IDS {MAF_MISSING_TAG=0,MAF_NUMERIC_TAG,MAF_STRING_TAG};
 
 protected:
   void Initialize();

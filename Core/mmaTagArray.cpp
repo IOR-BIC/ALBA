@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaTagArray.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-01-15 18:59:04 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-02-14 10:21:18 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -135,17 +135,20 @@ bool mmaTagArray::Equals(mmaTagArray *array)
 
   return true;
 }
-//-------------------------------------------------------------------------
-void mmaTagArray::GetTagsByType(int type, std::vector<int> &array)
-//-------------------------------------------------------------------------
-{
-  //
-}
+
 //-------------------------------------------------------------------------
 void mmaTagArray::GetTagsByType(int type, std::vector<mmuTagItem *> &array)
 //-------------------------------------------------------------------------
 {
-  //
+  array.clear();
+  mmuTagsMap::iterator it=m_Tags.begin();
+  for (;it!=m_Tags.end();it++)
+  {
+    if (it->second.GetType()==type)
+    {
+      array.push_back(&(it->second));
+    }
+  }
 }
 //-------------------------------------------------------------------------
 int mmaTagArray::GetNumberOfTags()

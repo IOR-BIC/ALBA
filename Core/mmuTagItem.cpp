@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuTagItem.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-01-13 09:10:00 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-02-14 10:21:18 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -83,7 +83,7 @@ mmuTagItem::mmuTagItem(const char *name, const std::vector<double> &values, int 
   Initialize();
   SetName(name);
   SetValues(values);
-  SetType(mmuTagItem::MAF_NUMERIC_TAG);
+  SetType(MAF_NUMERIC_TAG);
 }
 
 //-------------------------------------------------------------------------
@@ -143,11 +143,11 @@ void mmuTagItem::SetValue(double value,int component)
 {
   mafString tmp(value);
   SetValue(tmp,component);
-  SetType(mmuTagItem::MAF_NUMERIC_TAG);
+  SetType(MAF_NUMERIC_TAG);
 }
 
 //-------------------------------------------------------------------------
-void mmuTagItem::SetComponent(const char *value,int component)
+void mmuTagItem::SetComponent(const mafString value,int component)
 //-------------------------------------------------------------------------
 {
   SetValue(value,component);
@@ -161,11 +161,13 @@ void mmuTagItem::SetComponent(const double value , int component)
 }
 
 //-------------------------------------------------------------------------
-void mmuTagItem::SetValue(const char *value,int component)
+void mmuTagItem::SetValue(const mafString value,int component)
 //-------------------------------------------------------------------------
 {
+  if (component>=GetNumberOfComponents())
+    SetNumberOfComponents(component+1);
   m_Components[component]=value;
-  SetType(mmuTagItem::MAF_STRING_TAG);
+  SetType(MAF_STRING_TAG);
 }
 
 //-------------------------------------------------------------------------
@@ -334,7 +336,7 @@ void mmuTagItem::SetNumberOfComponents(int n)
 void mmuTagItem::GetValueAsSingleString(mafString &str) const
 //-------------------------------------------------------------------------
 {
-  if (GetNumberOfComponents()>1)
+  if (GetNumberOfComponents()>0)
   {
     int i;
     // the size of the single string is given by the sum of 
@@ -350,16 +352,11 @@ void mmuTagItem::GetValueAsSingleString(mafString &str) const
       // colon separator
       if (i>0) str<<",";
 
-      str<<m_Components[i];    
+      str<<"\""<<m_Components[i]<<"\"";    
     }
 
     // tailing parenthesis
     str<<")";
-  }
-  else if (GetNumberOfComponents()==1)
-  {
-    // single component value (no parenthisis)
-    str=m_Components[0];
   }
   else
   {
@@ -384,13 +381,13 @@ void mmuTagItem::GetTypeAsString(mafString &str) const
 {
   switch (m_Type)
   {
-  case (mmuTagItem::MAF_MISSING_TAG):
+  case (MAF_MISSING_TAG):
     str = "MIS";
     break;
-  case (mmuTagItem::MAF_NUMERIC_TAG):
+  case (MAF_NUMERIC_TAG):
     str = "NUM";
     break;
-  case (mmuTagItem::MAF_STRING_TAG):
+  case (MAF_STRING_TAG):
     str = "STR";
     break;
   default:
@@ -447,13 +444,13 @@ void mmuTagItem::Print(std::ostream& os, const int tabs) const
 
   switch (t)
   {
-  case (mmuTagItem::MAF_MISSING_TAG):
+  case (MAF_MISSING_TAG):
     tstr="MISSING";
     break;
-  case (mmuTagItem::MAF_NUMERIC_TAG):
+  case (MAF_NUMERIC_TAG):
     tstr="NUMERIC";
     break;
-  case (mmuTagItem::MAF_STRING_TAG):
+  case (MAF_STRING_TAG):
     tstr="STRING";
     break;
   default:

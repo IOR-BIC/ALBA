@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaTagArray.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-13 09:10:00 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-02-14 10:21:18 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -60,7 +60,7 @@ public:
     This function searches for an item with given name and if it doesn't exist
     append a new one to the Array, setting the value to the given value. The given
     strings are copied and not referenced */
-  void SetTag(const char *name, const char *value,int type=mmuTagItem::MAF_MISSING_TAG);
+  void SetTag(const char *name, const char *value,int type=MAF_MISSING_TAG);
 
   /** Remove an item from the array */
   void DeleteTag(const char *name);
@@ -73,11 +73,6 @@ public:
   Compare two tag arrays. Order of items is significative for
   the comparison*/
   bool Equals(mmaTagArray *array);
-
-	/**
-	Search the tag array for tags of a given type and 
-	put in the int array their indices  */
-	void GetTagsByType(int type, std::vector<int> &array);
 	
 	/**
 	Search the tag array for tags of a given type and 
