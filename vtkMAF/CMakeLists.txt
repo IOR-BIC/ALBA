@@ -8,8 +8,14 @@ PROJECT(vtkMAF)
 # Set your list of sources here.  Do not change the name of the
 # vtkMAF_SRCS variable.
 SET(vtkMAF_SRCS
+  vtkDistanceFilter.cxx
+  vtkDistanceFilter.h
   vtkMAFExample.cxx
   vtkMAFExample.h
+  vtkProjectSP.cxx
+  vtkProjectSP.h
+  vtkRGSliceAccumulate.cxx
+  vtkRGSliceAccumulate.h
   vtkVolumeSlicer.cxx
   vtkVolumeSlicer.h
 )
