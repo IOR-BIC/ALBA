@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeIterator.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-20 20:47:07 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-01-14 18:15:07 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -90,7 +90,7 @@ int mafNodeIterator::GoToNextNode()
             }
             else
             {
-              return VTK_ERROR;
+              return MAF_ERROR;
             }
           }
           else
@@ -213,7 +213,7 @@ int mafNodeIterator::GoToNextNode()
       m_TraversalDone=1;
   }
 
-  return (!m_TraversalDone)?VTK_OK:VTK_ERROR;
+  return (!m_TraversalDone)?MAF_OK:MAF_ERROR;
 
 }
 
@@ -303,13 +303,13 @@ int mafNodeIterator::GoToPreviousNode()
               {
                 parent=parent->GetParent();
 
-                if (m_CurrentIdx.Pop(idx)!=VTK_OK)
+                if (m_CurrentIdx.Pop(idx)!=MAF_OK)
                 {
                   mafErrorMacro("Stack Underflow");
                   m_TraversalDone=1;
                   m_CurrentNode=NULL;
                   DoneExecute();
-                  return VTK_ERROR;
+                  return MAF_ERROR;
                 }
 
                 UpperExecute(parent); //call the upper-callback
@@ -320,7 +320,7 @@ int mafNodeIterator::GoToPreviousNode()
               mafErrorMacro("Stack Underflow");
               m_CurrentNode=NULL;
               m_TraversalDone=1;
-              return VTK_ERROR;
+              return MAF_ERROR;
             }
 
             if (parent)
@@ -362,7 +362,7 @@ int mafNodeIterator::GoToPreviousNode()
       mafErrorMacro("Unsupported Traversal Mode");
       m_TraversalDone=1;
   }
-  return (!m_TraversalDone)?VTK_OK:VTK_ERROR;
+  return (!m_TraversalDone)?MAF_OK:MAF_ERROR;
 }
 
 //----------------------------------------------------------------------------
@@ -424,7 +424,7 @@ int mafNodeIterator::GoToFirstNode()
   {
     m_TraversalDone=0; // reset the traversal flag
     PreExecute(); // Call the pre-callback
-    return VTK_OK;
+    return MAF_OK;
   }
   else
   {
@@ -432,7 +432,7 @@ int mafNodeIterator::GoToFirstNode()
 
     m_TraversalDone=1; // set traversal flag
     DoneExecute();  // Call the Done-callback   
-    return VTK_ERROR;
+    return MAF_ERROR;
   }
 
   
@@ -463,13 +463,13 @@ int mafNodeIterator::GoToLastNode()
   {
     m_TraversalDone=0; // reset the traversal flag
     PreExecute(); // Call the Pre-callbacks
-    return VTK_OK;
+    return MAF_OK;
   }
   else
   {
     m_TraversalDone=1; // set traversal flag
     DoneExecute(); // Call the Done-callback
-    return VTK_ERROR;
+    return MAF_ERROR;
   }
 }
 
