@@ -2,11 +2,11 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuTagItem.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-17 00:45:34 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-02-20 23:30:11 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
-  Copyright (c) 2002/2004 
+  Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 #include "mmuTagItem.h"
@@ -486,7 +486,7 @@ void mmuTagItem::Print(std::ostream& os, const int tabs) const
 int mmuTagItem::InternalStore(mafStorageElement *parent)
 //-------------------------------------------------------------------------
 {
-  parent->SetAttribute("Tag", GetName());
+  parent->SetAttribute("Name", GetName());
   parent->SetAttribute("Mult",mafString(GetNumberOfComponents()));
   mafString type;
   GetTypeAsString(type);
