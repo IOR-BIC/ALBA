@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 09:04:32 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-01 10:07:38 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -317,14 +317,17 @@ NODE_START,
   NODE_DETACHED_FROM_TREE,///< issued when the node is detachment from the tree
   NODE_ATTACHED_TO_TREE,  ///< issued when the node is attached to the tree
   NODE_DESTROYED,         ///< issued when the node is destroyed
+  NODE_GET_STORAGE,       ///< issued by tree elements to retrieve the storage (served by mafNodeRoot)
+  NODE_GET_ROOT,          ///< issued by subnode components to extract ROOT node
   VME_TIME_SET,           ///< used either to set or to advise of time changes
   VME_MATRIX_CHANGED,     ///< issued when the matrix in the output has changed (e.g. when matrix pipe is changed at runtime)
-  VME_MATRIX_PRE_UPDATE,  ///< issued by mafMatrixPipe before updating the matrix 
+  VME_MATRIX_PREUPDATE,  ///< issued by mafMatrixPipe before updating the matrix 
   VME_MATRIX_UPDATE,      ///< issued when pose matrix is updated
   VME_ABSMATRIX_UPDATE,   ///< issued when absolute pose matrix is updated
   VME_OUTPUT_DATA_PREUPDATE, ///< issued by mafDataPipe before the output data is actually updated
   VME_OUTPUT_DATA_UPDATE, ///< issued when the output data is updated
   VME_OUTPUT_DATA_CHANGED,///< issued when the output data object has changed (i.e. object pointer changed)
+  VME_GET_NEWITEM_ID,     ///< issued by VMEItems or DataVector to retrieve a new item-ID (served by mafVMERoot)
 NODE_END,
 
 MATRIX_UPDATED, ///< issue by a matrix pipe to advise consumers of output matrix updating
