@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-21 17:50:46 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-03-25 16:07:25 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -88,52 +88,58 @@ void mafString::operator<<(std::ostream &os)
   os<<this->GetCStr();
 }
 //SIL. 16-3-2005: begin
-//TODO: verify portability of _snprintf
+//TODO: verify portability of _snprintf ---- replace with NPrintf
 //----------------------------------------------------------------------------
-void mafString::operator<<( int d )
-//----------------------------------------------------------------------------
-{
-  char tmp[100];
-  _snprintf(tmp,100,"%d",d);
-  Append(tmp);
-}
-//----------------------------------------------------------------------------
-void mafString::operator<<( long d )
+mafString &mafString::operator<<( int d )
 //----------------------------------------------------------------------------
 {
   char tmp[100];
   _snprintf(tmp,100,"%d",d);
   Append(tmp);
+  return *this;
 }
 //----------------------------------------------------------------------------
-void mafString::operator<<( float d )
+mafString &mafString::operator<<( long d )
+//----------------------------------------------------------------------------
+{
+  char tmp[100];
+  _snprintf(tmp,100,"%d",d);
+  Append(tmp);
+  return *this;
+}
+//----------------------------------------------------------------------------
+mafString &mafString::operator<<( float d )
 //----------------------------------------------------------------------------
 {
   char tmp[100];
   _snprintf(tmp,100,"%g",d);
   Append(tmp);
+  return *this;
 }
 //----------------------------------------------------------------------------
-void mafString::operator<<( double d )
+mafString &mafString::operator<<( double d )
 //----------------------------------------------------------------------------
 {
   char tmp[100];
   _snprintf(tmp,100,"%g",d);
   Append(tmp);
+  return *this;
 }
 /*
 //----------------------------------------------------------------------------
-void mafString::operator<<( std::string s )
+mafString &mafString::operator<<( std::string s )
 //----------------------------------------------------------------------------
 {
   Append(s);
+  return *this;
 }
 */
 //----------------------------------------------------------------------------
-void mafString::operator<<( mafString *s )
+mafString &mafString::operator<<( mafString *s )
 //----------------------------------------------------------------------------
 {
   Append( s->m_CStr );
+  return *this;
 }
 
 //SIL. 16-3-2005: end
