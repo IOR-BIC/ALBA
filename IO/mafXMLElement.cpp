@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:18:11 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-04-04 11:52:40 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -500,7 +500,7 @@ int mafXMLElement::RestoreVectorN(std::vector<mafString> &comps,unsigned int num
     }
     else
     {
-      mafWarningMacro("XML Parse Error while parsing <"<<GetName()<<"> item_node: wrong sub-element inside nested XML element <"<<tag_name<<">" );
+      mafWarningMacro("XML Parse Error while parsing <"<<GetName()<<"> item_node: wrong sub-element inside nested XML element <"<<(tag_name.GetCStr())<<">" );
       return MAF_ERROR;
     }
   }
