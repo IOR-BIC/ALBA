@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTagArray.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:06:57 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-06 21:22:30 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -11,6 +11,7 @@
 =========================================================================*/
 #include "mafTagArray.h"
 #include "mafStorageElement.h"
+#include "mafIndent.h"
 #include <sstream>
 #include <assert.h>
 
@@ -180,12 +181,16 @@ int mafTagArray::GetNumberOfTags() const
 int mafTagArray::InternalStore(mafStorageElement *parent)
 //-------------------------------------------------------------------------
 {
-  parent->SetAttribute("NumberOfTags",mafString(GetNumberOfTags()));
-  int ret=MAF_OK;
-  for (mmuTagsMap::iterator it=m_Tags.begin();it!=m_Tags.end()&&ret==MAF_OK;it++)
-  {
-    mafStorageElement *item_element=parent->AppendChild("TItem");
-    ret=it->second.Store(item_element)!=MAF_OK;
+  int ret=Superclass::InternalStore(parent);
+  if (ret==MAF_OK)
+  {  
+    parent->SetAttribute("NumberOfTags",mafString(GetNumberOfTags()));
+  
+    for (mmuTagsMap::iterator it=m_Tags.begin();it!=m_Tags.end()&&ret==MAF_OK;it++)
+    {
+      mafStorageElement *item_element=parent->AppendChild("TItem");
+      ret=it->second.Store(item_element)!=MAF_OK;
+    }
   }
   return ret;
 }
@@ -194,29 +199,49 @@ int mafTagArray::InternalStore(mafStorageElement *parent)
 int mafTagArray::InternalRestore(mafStorageElement *node)
 //-------------------------------------------------------------------------
 {
-  mafID numAttrs=-1;
-  node->GetAttributeAsInteger("NumberOfTags",numAttrs);
+  if (Superclass::InternalRestore(node)==MAF_OK)
+  {
+    mafID numAttrs=-1;
+    node->GetAttributeAsInteger("NumberOfTags",numAttrs);
   
-
-  mafStorageElement::ChildrenVector &children=node->GetChildren();
-  int ret=MAF_OK;
-  int idx=0;
-  for (int i=0;(idx < numAttrs) && (i < children.size()) && (ret == MAF_OK);i++)
-  {
-    if (mafString().Set(children[i]->GetName())=="TItem")
+    mafStorageElement::ChildrenVector &children=node->GetChildren();
+    int ret=MAF_OK;
+    int idx=0;
+    for (int i=0;(idx < numAttrs) && (i < children.size()) && (ret == MAF_OK);i++)
     {
-      mafTagItem new_titem;
-      ret=new_titem.Restore(children[i]);
-      SetTag(new_titem);
-      idx++;
+      if (mafString().Set(children[i]->GetName())=="TItem")
+      {
+        mafTagItem new_titem;
+        ret=new_titem.Restore(children[i]);
+        SetTag(new_titem);
+        idx++;
+      }
     }
+
+    if (idx<numAttrs)
+    {
+      mafErrorMacro("Error Restoring TagArray: wrong number of restored items, should be "<<numAttrs<<", found "<<children.size());
+      return MAF_ERROR;
+    }
+
+    return ret;
   }
 
-  if (idx<numAttrs)
+  return MAF_ERROR;
+}
+
+//-------------------------------------------------------------------------
+void mafTagArray::Print(std::ostream& os, const int tabs) const
+//-------------------------------------------------------------------------
+{
+  Superclass::Print(os,tabs);
+  
+  mafIndent indent(tabs);
+  os << indent << "Tags:"<<std::endl;
+  mafIndent next_indent(indent.GetNextIndent());
+
+  for (mmuTagsMap::const_iterator it=m_Tags.begin();it!=m_Tags.end();it++)
   {
-    mafErrorMacro("Error Restoring TagArray: wrong number of restored items, should be "<<numAttrs<<", found "<<children.size());
-    return MAF_ERROR;
+    it->second.Print(os,next_indent);
   }
-
-  return ret;
 }

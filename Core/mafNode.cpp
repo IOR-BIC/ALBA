@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 14:22:10 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2005-04-06 21:22:29 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -740,6 +740,7 @@ mafTagArray  *mafNode::GetTagArray()
   if (!tarray)
   {
     tarray=mafTagArray::New();
+    tarray->SetName("TagArray");
     SetAttribute("TagArray",tarray);
   }
 
@@ -1030,13 +1031,13 @@ void mafNode::Print(std::ostream& os, const int tabs) const
   mafIndent next_indent(indent.GetNextIndent());
 
   Superclass::Print(os,indent);
-  os << indent << "Name: \"" << m_Name << "\"" << std::endl;
+  os << indent << "Name: \"" << m_Name.GetCStr() << "\"" << std::endl;
   os << indent << "Initialized: " << m_Initialized << std::endl;
   os << indent << "VisibleToTraverse: " << m_VisibleToTraverse << std::endl;
-  os << indent << "Parent: \"" << (m_Parent?m_Parent->m_Name:"NULL") << "\"" << std::endl; 
+  os << indent << "Parent: \"" << (m_Parent?m_Parent->m_Name.GetCStr():"NULL") << "\"" << std::endl; 
   os << indent << "Number of Children: " << GetNumberOfChildren() << std::endl;
   os << indent << "Id: " << GetId() << std::endl;
-  os << indent << "Attributes:";
+  os << indent << "Attributes:\n";
   for (mafAttributesMap::const_iterator att_it=m_Attributes.begin();att_it!=m_Attributes.end();att_it++)
   {
     att_it->second->Print(os,next_indent);
@@ -1045,6 +1046,6 @@ void mafNode::Print(std::ostream& os, const int tabs) const
   os << indent << "Links:" << std::endl;
   for (mafLinksMap::const_iterator lnk_it=m_Links.begin();lnk_it!=m_Links.end();lnk_it++)
   {
-    os << next_indent << "Name: " << lnk_it->first << "\tNodeId: " << lnk_it->second.m_NodeId << std::endl;
+    os << next_indent << "Name: " << lnk_it->first.GetCStr() << "\tNodeId: " << lnk_it->second.m_NodeId << std::endl;
   }
 }
