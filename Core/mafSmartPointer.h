@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSmartPointer.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-22 14:06:35 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-01-10 00:01:38 $
+  Version:   $Revision: 1.7 $
   Authors:   based on vtkSmartPointer (www.vtk.org), rewritten by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,15 +12,18 @@
 #ifndef __mafSmartPointer_h
 #define __mafSmartPointer_h
 
-#include "mafDefines.h"
-#include "mafSmartObject.h"
+#include "mafConfigure.h"
 #include "mafBase.h"
+
+//----------------------------------------------------------------------------
+// forward declarations
+//----------------------------------------------------------------------------
+class mafReferenceCounted;
 
 /** Hold a reference to a T instance.
   mafAutoPointer stores a pointer to a mafSmartObjct, and keeps it registered. When 
   allocated on the stack this object allows to automatically unregister an object 
-  when exiting from the scope.
-*/
+  when exiting from the scope. */
 template <class T>
 class MAF_EXPORT mafAutoPointer : public mafBase
 {
@@ -67,7 +70,7 @@ protected:
   mafSmartPointer is a specialization of mafAutoPointer which automatically
   instantiate an object in the default constructor. */
 template <class T>
-class mafSmartPointer: public mafAutoPointer<T>
+class MAF_EXPORT mafSmartPointer: public mafAutoPointer<T>
 {
 public:
   /**
@@ -83,8 +86,6 @@ public:
   referenced by given smart pointer.*/
   mafSmartPointer(const mafAutoPointer<T>& r): mafAutoPointer<T>(r) {;}
 };
-//template <class T> typedef mafAutoPointer<T> mafAuto;
-//template <class T> typedef mafSmartPointer<T> mafSmart;
 
 //----------------------------------------------------------------------------
 template <class T>
@@ -170,23 +171,20 @@ mafAutoPointer<T>::mafAutoPointer(T* r, void *owner):m_Object(r)
 //----------------------------------------------------------------------------
 template <class T>
 inline bool operator == (const mafAutoPointer<T>& l, const mafAutoPointer<T>& r) \
+//----------------------------------------------------------------------------
 { return (static_cast<void*>(l.GetPointer()) == static_cast<void*>(r.GetPointer())); }
-//----------------------------------------------------------------------------
-
 
 //----------------------------------------------------------------------------
 template <class T>
-inline bool operator == (mafSmartObject* l, const mafAutoPointer<T>& r) \
+inline bool operator == (mafReferenceCounted* l, const mafAutoPointer<T>& r) \
+//----------------------------------------------------------------------------
 { return (static_cast<void*>(l) == static_cast<void*>(r.GetPointer())); }
-//----------------------------------------------------------------------------
-
 
 //----------------------------------------------------------------------------
 template <class T>
-inline bool operator == (const mafAutoPointer<T>& l, mafSmartObject* r) \
-{ return (static_cast<void*>(l.GetPointer()) == static_cast<void*>(r)); }
+inline bool operator == (const mafAutoPointer<T>& l, mafReferenceCounted* r) \
 //----------------------------------------------------------------------------
-
+{ return (static_cast<void*>(l.GetPointer()) == static_cast<void*>(r)); }
 
 #endif
 
