@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-22 17:13:01 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-03-02 00:30:04 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -310,10 +310,6 @@ public:
   /** Return the list of time stamps of the MatrixVector stored in this VME. */
   void GetMatrixTimeStamps(mafTimeStamp *&kframes);
   void GetMatrixTimeStamps(TimeVector &kframes);
-
-  // reasoning if to move to a mafTimeVector class
-  /** Utility function to merge two different time-stamps  vectors*/
-  static void MergeTimeVectors(TimeVector &outv,TimeVector v1,TimeVector v2);
 
   /**
     Return the list of timestamps for this VME. Timestamps list is 

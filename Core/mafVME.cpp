@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-22 17:13:01 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-03-02 00:30:04 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -848,37 +848,6 @@ void mafVME::GetLocalTimeStamps(vtkDoubleArray *kframes)
   for (int i=0;i<frames.size();i++)
   {
     kframes->SetTuple(i,&(frames[i]));
-  }
-}
-
-//-------------------------------------------------------------------------
-void mafVME::MergeTimeVectors(std::vector<mflTimeStamp> &outv,std::vector<mflTimeStamp> v1,std::vector<mflTimeStamp>v2)
-//-------------------------------------------------------------------------
-{
-  typedef std::map<mflTimeStamp,mflTimeStamp> TimeMap;
-
-  TimeMap mergedlist;
-  
-  int pos;
-
-  for (pos=0;pos<v1.size();pos++)
-  {
-    mergedlist[v1[pos]]=v1[pos];
-  }
-  
-  for (pos=0;pos<v2.size();pos++)
-  {
-    mergedlist[v2[pos]]=v2[pos];
-  }
-
-  outv.resize(mergedlist.size());
-
-
-  int i=0;
-  for (TimeMap::iterator ptr=mergedlist.begin();ptr!=mergedlist.end();ptr++)
-  {
-    outv[i]=ptr->second;
-    i++;
   }
 }
 
