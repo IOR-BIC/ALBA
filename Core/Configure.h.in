@@ -1,5 +1,7 @@
-#ifndef __@MAF_CORE_PROJECT_NAME@Configure_h
-#define __@MAF_CORE_PROJECT_NAME@Configure_h
+#ifndef __@PROJECT_NAME@Configure_h
+#define __@PROJECT_NAME@Configure_h
+
+#include "mafConfigure.h"
 
 #if @BUILD_SHARED_LIBS@
 # define @PROJECT_NAME@_SHARED
@@ -7,6 +9,7 @@
 
 #if defined(_MSC_VER) && defined(@PROJECT_NAME@_SHARED)
 # pragma warning ( disable : 4275 )
+# pragma warning ( disable : 4786 )
 #endif
 
 #if defined(_WIN32) && defined(@PROJECT_NAME@_SHARED)
