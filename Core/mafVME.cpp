@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 14:22:17 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-04-06 21:23:53 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -115,6 +115,24 @@ int mafVME::ShallowCopy(mafVME *a)
 {  
   // for basic VME ShallowCopy is the same of DeepCopy (no data stored inside)
   return mafVME::DeepCopy(a);
+}
+
+//-------------------------------------------------------------------------
+bool mafVME::Equals(mafVME *vme)
+//-------------------------------------------------------------------------
+{
+  return Superclass::Equals(vme);
+}
+
+//-------------------------------------------------------------------------
+bool mafVME::Equals(mafNode *node)
+//-------------------------------------------------------------------------
+{
+  if (mafVME *vme=mafVME::SafeDownCast(node))
+  {
+    return Equals(vme);
+  }
+  return false;
 }
 
 //-------------------------------------------------------------------------

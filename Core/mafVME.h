@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:06:44 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-04-06 21:23:54 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -73,6 +73,9 @@ public:
     can be very dangerous making one of the VME inconsistent. Some VMEs
     do not support such a function! */  
   virtual int ShallowCopy(mafVME *a);
+
+  /** Compare two VMEs. The specific comparison must be implemented by subclasses. */
+  virtual bool Equals(mafVME *vme);
 
   /**
    Set the time for this VME (not for the whole tree). Normaly time 
@@ -226,6 +229,7 @@ protected:
 private:
   mafVME(const mafVME&); // Not implemented
   void operator=(const mafVME&); // Not implemented
+  virtual bool Equals(mafNode *node); // not accessible from other classes
 };
 
 #endif
