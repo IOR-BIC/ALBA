@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeIterator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:26:49 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-03-10 12:32:41 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -271,13 +271,18 @@ int mafNodeIterator::GoToPreviousNode()
             DoneExecute();
           }
         }
+        else
+        {
+          m_TraversalDone=1;
+          DoneExecute();
+        }
       }
       break;
     case PostOrder:
       {
         if (m_CurrentNode)
         {
-          if (m_CurrentNode->GetNumberOfChildren()>=0)
+          if (m_CurrentNode->GetNumberOfChildren()>0)
           {
             m_TraversalDone=0;
             PostExecute(); 
@@ -295,15 +300,15 @@ int mafNodeIterator::GoToPreviousNode()
             mafNode *parent=m_CurrentNode->GetParent();
 
             mafID idx;
-            if (!m_CurrentIdx.Pop(idx))
+            if (m_CurrentIdx.Pop(idx))
             {
               UpperExecute(parent); 
 
-              while (parent && parent!=m_RootNode && idx>0)
+              while (parent && parent!=m_RootNode && idx<=0) // search for the first root where we still have children to be visited
               {
                 parent=parent->GetParent();
 
-                if (m_CurrentIdx.Pop(idx)!=MAF_OK)
+                if (!m_CurrentIdx.Pop(idx))
                 {
                   mafErrorMacro("Stack Underflow");
                   m_TraversalDone=1;
@@ -390,8 +395,8 @@ mafNode *mafNodeIterator::FindRightMostLeaf(mafNode *node)
     DeeperExecute(node);
   while (node&&node->GetNumberOfChildren()>0) 
   {
+    m_CurrentIdx.Push(node->GetNumberOfChildren()-1); // store index of the currently visited node
     node=node->GetChild(node->GetNumberOfChildren()-1);
-    m_CurrentIdx.Push(node->GetNumberOfChildren()-1);
     if (node)
       DeeperExecute(node);
   }
