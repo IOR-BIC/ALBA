@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVector.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-22 14:06:35 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2004-12-28 19:46:18 $
+  Version:   $Revision: 1.6 $
   Authors:   based on vtkObjectBase (www.vtk.org), adapted Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -16,15 +16,12 @@
 #include "mafDefines.h"
 #include "mafBase.h"
 
-template <class T>
-class mafVectorItems;
+template <class T> class mafVectorItems;
 
-/** mafVector - map container for vtkObjects
-  This class simply wraps the STL map container. It can be used in conjunction with
+/** mafVector - vector container wrapping STL vectors
+  This class simply wraps the STL vector container. It can be used in conjunction with
   mafSmartPointers to store mafSmartObject pointers.
-   
-  @todo
-  - Add a Test */
+*/
 template <class T>
 class MAF_EXPORT mafVector : public mafBase
 {
@@ -103,7 +100,6 @@ protected:
 
   mafVectorItems<T> *m_Items;
   
-
 private:
 
   mafVector(const mafVector&);  // Not implemented.

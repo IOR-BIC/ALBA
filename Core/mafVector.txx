@@ -3,8 +3,8 @@
 Program:   Visualization Toolkit
 Module:    $RCSfile: mafVector.txx,v $
 Language:  C++
-Date:      $Date: 2004-12-20 20:47:09 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2004-12-28 19:46:18 $
+Version:   $Revision: 1.5 $
 
 
 
@@ -55,7 +55,6 @@ void mafVector<T>::SetItem(mafID idx,const T &object)
   {
 	m_Items->Vector.resize(idx+1);
   }
-	
 
   m_Items->Vector[idx]=object;
 }
