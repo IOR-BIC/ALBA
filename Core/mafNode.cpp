@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-20 20:47:07 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2004-12-22 15:23:03 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -100,7 +100,7 @@ mafNodeIterator *mafNode::NewIterator()
 }
 
 //-------------------------------------------------------------------------
-int mafNode::GetNumberOfChildren()
+unsigned long mafNode::GetNumberOfChildren()
 //-------------------------------------------------------------------------
 {
   return m_Children.GetNumberOfItems();
@@ -258,7 +258,7 @@ void mafNode::UnRegister(void *o)
 void mafNode::CleanTree()
 //-------------------------------------------------------------------------
 {
-  for (int i=0;i<this->GetNumberOfChildren();i++)
+  for (unsigned long i=0;i<this->GetNumberOfChildren();i++)
   {
     mafNode *curr=this->GetChild(i);
     if (curr)
@@ -274,7 +274,7 @@ void mafNode::RemoveAllChildren()
 //-------------------------------------------------------------------------
 {
   
-  for (int i=0;i<this->GetNumberOfChildren();i++)
+  for (unsigned long i=0;i<this->GetNumberOfChildren();i++)
   {
     mafNode *curr=this->GetChild(i);
     if (curr)
@@ -403,7 +403,7 @@ bool mafNode::CompareTree(mafNode *vme)
     return false;
   }
 
-  for (int i=0;i<this->GetNumberOfChildren();i++)
+  for (unsigned long i=0;i<this->GetNumberOfChildren();i++)
   {
     if (!this->GetChild(i)->CompareTree(vme->GetChild(i)))
     {
@@ -428,7 +428,7 @@ mafNode *mafNode::CopyTree(mafNode *vme, mafNode *parent)
     v->Delete();
   }
 
-  for(int i=0; i<vme->GetNumberOfChildren(); i++)
+  for(unsigned long i=0; i<vme->GetNumberOfChildren(); i++)
   {
     if (mafNode *child=vme->GetChild(i))
       if (child->IsVisible())

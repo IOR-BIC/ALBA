@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-18 22:07:43 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2004-12-22 15:23:03 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -185,7 +185,7 @@ public:
   bool IsEmpty() {return GetNumberOfChildren()==0;}
 
   /** Return the number of children of this node */
-  int GetNumberOfChildren();
+  unsigned long GetNumberOfChildren();
   
   /**
   Return the pointer to the parent node (if present)*/

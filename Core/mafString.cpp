@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-22 08:25:31 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2004-12-22 15:23:03 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -238,7 +238,7 @@ void mafString::Copy(const char* src)
   if (src)
   {
     // If the available memory is not sufficient, relocate!
-    int len=Length(src);
+    unsigned long len=Length(src);
     if (len>=m_Size)
     {
       SetMaxLength(len);
