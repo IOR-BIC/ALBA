@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-28 13:58:18 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-02-17 00:47:02 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -59,6 +59,10 @@ public:
   virtual int StoreMatrix(mafMatrix *matrix,const char *name)=0;
   virtual int StoreVectorN(double *comps,int num,const char *name)=0;
   virtual int StoreVectorN(int *comps,int num,const char *name)=0;
+  virtual int StoreVectorN(const std::vector<double> &comps,int num,const char *name)=0;
+  virtual int StoreVectorN(const std::vector<int> &comps,int num,const char *name)=0;
+  /** store a vector of strings into an XML element, and stores single items in "tag" sub elements */
+  virtual int StoreVectorN(const std::vector<mafString> &comps,int num,const char *name,const char *tag)=0;
 
   /** Store 8bit binary data. Not yet supported. */
   //virtual int StoreData(const char *data, const int size,const char *name)=0;
@@ -73,10 +77,14 @@ public:
   //virtual int RestoreData16(short *data, const int size,const char *name)=0;
   /** Restore 32bit binary data. Not yet supported. */
   //virtual int RestoreData32(long *data, const int size,const char *name)=0;
-  
+ 
   virtual int RestoreMatrix(mafMatrix *matrix,const char *name)=0;
   virtual int RestoreVectorN(double *comps,unsigned int num,const char *name)=0;
   virtual int RestoreVectorN(int *comps,unsigned int num,const char *name)=0;
+  virtual int RestoreVectorN(std::vector<double> &comps,unsigned int num,const char *name)=0;
+  virtual int RestoreVectorN(std::vector<int> &comps,unsigned int num,const char *name)=0;
+  /** restore a vector of strings from an XML element, where single items are stored in "tag" sub elements */
+  virtual int RestoreVectorN(std::vector<mafString> &comps,unsigned int num,const char *name,const char *tag)=0;
   virtual int RestoreText(char *&buffer,const char *name)=0;
   virtual int RestoreText(mafString &buffer,const char *name)=0;
   
@@ -127,10 +135,12 @@ public:
   /** Find a nested element by Name */
   virtual mafStorageElement *FindNestedElement(const char *name);
 
+  typedef std::vector<mafStorageElement *> ChildrenVector;
+
   /** 
     Return the list of children. Subclasses must implement this to build
     the children list. */ 
-  virtual std::vector<mafStorageElement *> *GetChildren()=0;
+  virtual ChildrenVector &GetChildren()=0;
   
   /** 
     Return the list of all children with a given name. return true if at least one found. */ 

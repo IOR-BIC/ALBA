@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLElement.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-28 13:57:23 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-02-17 00:47:02 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -50,10 +50,15 @@ public:
   virtual int StoreMatrix(mafMatrix *matrix,const char *name);
 
   /** Store a vectorN into an XML document */
+  virtual int StoreVectorN(const std::vector<double> &comps,int num,const char *name);
   virtual int StoreVectorN(double *comps,int num,const char *name);
 
   /** Store a vectorN into an XML document */
+  virtual int StoreVectorN(const std::vector<int> &comps,int num,const char *name);
   virtual int StoreVectorN(int *comps,int num,const char *name);
+
+  /** Store a vectorN into an XML document */
+  virtual int StoreVectorN(const std::vector<mafString> &comps,int num,const char *name,const char *tag);
 
   /** Store 8bit binary data. Not yet supported. */
   //virtual int StoreData(const char *data, const int size,const char *name);
@@ -77,10 +82,15 @@ public:
   virtual int RestoreMatrix(mafMatrix *matrix,const char *name);
 
   /** Restore a vectorN from an XML document */
+  virtual int RestoreVectorN(std::vector<double> &comps,unsigned int num,const char *name);
   virtual int RestoreVectorN(double *comps,unsigned int num,const char *name);
 
   /** Restore a vectorN from an XML document */
+  virtual int RestoreVectorN(std::vector<int> &comps,unsigned int num,const char *name);
   virtual int RestoreVectorN(int *comps,unsigned int num,const char *name);
+
+  /** Restore a vectorN from an XML document */
+  virtual int RestoreVectorN(std::vector<mafString> &comps,unsigned int num,const char *name,const char *tag);
 
   /** Restore a generic text string from an XML document */
   virtual int RestoreText(char *&buffer,const char *name);
@@ -97,7 +107,7 @@ public:
   /** 
     Return the list of children. The list is created from DOM-Tree at the first access
     during restoring. */ 
-  virtual std::vector<mafStorageElement *> *GetChildren();
+  virtual ChildrenVector &GetChildren();
   
   /** 
     Create a new XML child element and return its pointer. This is the only way to create a new
@@ -128,6 +138,8 @@ public:
   void WriteXMLText(const char *text);
 
   /** Internally used to extract vector values from Text data */
+  int ParseData(std::vector<double> &vector,int size);
+  int ParseData(std::vector<int> &vector,int size);
   int ParseData(double *vector,int size);
   int ParseData(int *vector,int size);
 

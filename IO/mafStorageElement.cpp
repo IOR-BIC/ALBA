@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-01-28 13:58:18 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-02-17 00:47:02 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -56,12 +56,12 @@ mafStorageElement *mafStorageElement::FindNestedElement(const char *name)
   mafString node_name(name); // no memory copy, thanks mafString :-)
 
   // force children list creation
-  std::vector<mafStorageElement *> *children=GetChildren();
+  ChildrenVector &children=GetChildren();
   
   // to be rewritten as a map access
-  for (unsigned int i=0;i<children->size();i++)
+  for (unsigned int i=0;i<children.size();i++)
   {
-    mafStorageElement *node=(*children)[i];
+    mafStorageElement *node=children[i];
     if (node_name==node->GetName())
       return node;
   }
@@ -76,13 +76,13 @@ bool mafStorageElement::GetNestedElementsByName(const char *name,std::vector<maf
   mafString node_name(name); // no memory copy, thanks mafString :-)
 
   // force children list creation
-  std::vector<mafStorageElement *> *children=GetChildren();
+  ChildrenVector &children=GetChildren();
   list.clear();
   
   // to be rewritten as a map access
-  for (unsigned int i=0;i<children->size();i++)
+  for (unsigned int i=0;i<children.size();i++)
   {
-    mafStorageElement *node=(*children)[i];
+    mafStorageElement *node=children[i];
     if (node_name==node->GetName())
     {
       list.push_back(node);
@@ -132,10 +132,10 @@ int mafStorageElement::RestoreObjectVector(std::vector<mafObject *> &vector,cons
   mafStorageElement *subnode=FindNestedElement(name);
   if (subnode)
   {
-    std::vector<mafStorageElement *> *items = subnode->GetChildren();
-    for (unsigned int i=0;i<items->size();i++)
+    ChildrenVector &items = subnode->GetChildren();
+    for (unsigned int i=0;i<items.size();i++)
     {
-      mafStorageElement *item=(*items)[i];
+      mafStorageElement *item=items[i];
       mafObject *object=RestoreObject(item);
       if (object)
       {
@@ -288,12 +288,24 @@ void mafStorageElement::StoreInteger(const int &value,const char *name)
 int mafStorageElement::RestoreDouble(double &value,const char *name)
 //------------------------------------------------------------------------------
 {
-  return RestoreVectorN(&value,1,name);
+  mafString tmp;
+  if (RestoreText(tmp,name)==MAF_OK)
+  {
+    value=atof(tmp);
+    return MAF_OK;
+  }
+  return MAF_ERROR;
 }
 
 //------------------------------------------------------------------------------
 int mafStorageElement::RestoreInteger(int &value,const char *name)
 //------------------------------------------------------------------------------
 {
-  return RestoreVectorN(&value,1,name);
+  mafString tmp;
+  if (RestoreText(tmp,name)==MAF_OK)
+  {
+    value=atof(tmp);
+    return MAF_OK;
+  }
+  return MAF_ERROR;
 }
