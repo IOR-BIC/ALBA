@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMTime.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-28 13:56:53 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-03-23 18:03:41 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone, inspired to vtkTimeStamp (www.vtk.org)
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,7 +25,12 @@ class vtkTimeStamp;
   called. This time is guaranteed to be monotonically increasing.
   If MAF is build with VTK compilation enabled (MAF_USE_VTK) this object
   uses a mafMTime as counter, to have a unique time stamp against the
-  two libraries. */
+  two libraries. 
+  
+@todo
+ -fix the InterlockedIncrement - which was temporary commented out (sil)
+*/
+
 class MAF_EXPORT mafMTime : public mafBase
 {
 public:
@@ -51,7 +56,7 @@ public:
   void Modified();
 
   /** Return this object's Modified time. */
-  unsigned long int GetMTime();
+  unsigned long int GetMTime() const;
 
   /** Support comparisons of time stamp objects directly. */
   int operator>(mafMTime& ts) {return (GetMTime() > ts.GetMTime());};
