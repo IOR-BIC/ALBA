@@ -1,0 +1,133 @@
+/*=========================================================================
+  Program:   Multimod Application Framework
+  Module:    $RCSfile: mmgSashPanel.cpp,v $
+  Language:  C++
+  Date:      $Date: 2005-03-23 18:10:03 $
+  Version:   $Revision: 1.1 $
+  Authors:   Silvano Imboden
+==========================================================================
+  Copyright (c) 2002/2004
+  CINECA - Interuniversity Consortium (www.cineca.it) 
+=========================================================================*/
+
+#include "mafDecl.h"
+#include "mmgSashPanel.h"
+//----------------------------------------------------------------------------
+// mmgSashPanel
+//----------------------------------------------------------------------------
+BEGIN_EVENT_TABLE(mmgSashPanel,wxSashLayoutWindow)
+  EVT_BUTTON (ID_CLOSE_SASH, mmgSashPanel::OnHide)
+END_EVENT_TABLE()
+
+#define mmgSashPanelStyle wxNO_BORDER|wxSW_3D|wxCLIP_CHILDREN
+//----------------------------------------------------------------------------
+mmgSashPanel::mmgSashPanel (wxWindow* parent,wxWindowID id, wxDirection side , int defaultsize, wxString menu_string, bool sizable ) 
+ : wxSashLayoutWindow(parent,id,wxDefaultPosition,wxSize(100, 100), mmgSashPanelStyle)         
+//----------------------------------------------------------------------------
+{
+  m_currgui = new mmgPanel(this,-1);
+  m_frame = (wxFrame*)parent;
+  m_menubar = NULL;
+
+  switch (side)
+  {
+		case wxRIGHT:
+			SetAlignment(wxLAYOUT_RIGHT);
+			SetOrientation(wxLAYOUT_VERTICAL);
+			SetSashVisible(wxSASH_LEFT, TRUE);
+  		SetDefaultSize(wxSize(defaultsize, 1000));
+		break;
+		case wxLEFT:
+			SetAlignment(wxLAYOUT_LEFT);
+			SetOrientation(wxLAYOUT_VERTICAL);
+			SetSashVisible(wxSASH_RIGHT, TRUE);
+  		SetDefaultSize(wxSize(defaultsize, 1000));
+		break;
+		case wxTOP:
+			SetAlignment(wxLAYOUT_TOP);
+			SetOrientation(wxLAYOUT_HORIZONTAL);
+			SetSashVisible(wxSASH_BOTTOM, TRUE);
+  		SetDefaultSize(wxSize(1000, defaultsize));
+		break;
+		case wxBOTTOM:
+			SetAlignment(wxLAYOUT_BOTTOM);
+			SetOrientation(wxLAYOUT_HORIZONTAL);
+			SetSashVisible(wxSASH_TOP, TRUE);
+  		SetDefaultSize(wxSize(1000, defaultsize));
+		break;
+		default:
+			wxLogMessage("mmgSashPanel: unrecognized side");
+  }
+  SetExtraBorderSize(0);
+
+  if(!sizable)
+  {
+    SetSashVisible(wxSASH_LEFT,  FALSE);
+    SetSashVisible(wxSASH_RIGHT, FALSE);
+    SetSashVisible(wxSASH_BOTTOM,FALSE);
+    SetSashVisible(wxSASH_TOP,   FALSE);
+  }
+
+  // creat the menu item - store the menu in m_menubar
+  if (menu_string != "")
+  {
+    if ( m_menubar = m_frame->GetMenuBar() )
+    {
+      int idx = m_menubar->FindMenu("View");
+      if( idx != wxNOT_FOUND)
+      {
+        wxMenu *m = m_menubar->GetMenu(idx);
+        m->Append(id, menu_string, "", wxITEM_CHECK);
+        m_menubar->Check(id,true);
+      }
+    }
+  }
+}
+//----------------------------------------------------------------------------
+mmgSashPanel::~mmgSashPanel( ) 
+//----------------------------------------------------------------------------
+{
+}
+//----------------------------------------------------------------------------
+void mmgSashPanel::OnHide( wxCommandEvent &event )
+//----------------------------------------------------------------------------
+{
+  // notify Logic
+  wxCommandEvent c(wxEVT_COMMAND_MENU_SELECTED,this->GetId());
+	ProcessEvent(c);
+}
+//----------------------------------------------------------------------------
+bool mmgSashPanel::Show(bool show)
+//----------------------------------------------------------------------------
+{
+  // call show/hide
+  wxSashLayoutWindow::Show(show);   
+
+  // check menu item
+  if(m_menubar) 
+    m_menubar->Check(this->GetId(),show);
+
+  // event for Layout
+  wxCommandEvent c(wxEVT_COMMAND_BUTTON_CLICKED ,ID_LAYOUT);
+	ProcessEvent(c);
+  return true;
+}
+//----------------------------------------------------------------------------
+bool mmgSashPanel::Put(wxWindow* win)
+//----------------------------------------------------------------------------
+{
+  assert(m_currgui);
+
+  assert(m_currgui);
+  m_currgui->Reparent(mafGetFrame());
+  m_currgui->Show(false);
+
+  m_currgui = win;
+  m_currgui->Reparent(this);
+  m_currgui->Show(true);
+  Refresh();
+  wxLayoutAlgorithm layout;
+  layout.LayoutWindow(this,m_currgui);
+
+  return true;
+}

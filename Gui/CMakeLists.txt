@@ -3,12 +3,63 @@
 #
 
 PROJECT(mafGui)
-MESSAGE(STATUS "Configuring project mafCore")
-# Set your list of sources here.  Do not change the name of the
-# vtkLocal_SRCS variable.
+MESSAGE(STATUS "Configuring project ${PROJECT_NAME}")
+
 SET(PROJECT_SRCS
-  mafGuiTestClass.cpp
-  mafGuiTestClass.h
+#mafSideBar.cpp
+#mafSideBar.h
+#mmgCheckListBox.cpp
+#mmgCheckListBox.h
+#mmgLayoutDialog.cpp
+#mmgLayoutDialog.h
+#mmgListCtrlBitmap.cpp
+#mmgListCtrlBitmap.h
+mafWXLog.cpp
+mafWXLog.h
+mmgBitmaps.cpp
+mmgBitmaps.h
+mmgButton.cpp
+mmgButton.h
+mmgCrossSplitter.cpp
+mmgCrossSplitter.h
+mmgFileHistory.cpp
+mmgFileHistory.h
+mmgFlagSplitter.cpp
+mmgFlagSplitter.h
+mmgFloatSlider.cpp
+mmgFloatSlider.h
+mmgGui.cpp
+mmgGui.h
+mmgGuiHolder.cpp
+mmgGuiHolder.h
+mmgLab.cpp
+mmgLab.h
+mmgListBox.cpp
+mmgListBox.h
+mmgListCtrl.cpp
+mmgListCtrl.h
+mmgNamedPanel.cpp
+mmgNamedPanel.h
+mmgPanel.cpp
+mmgPanel.h
+mmgPanelStack.cpp
+mmgPanelStack.h
+mmgPicButton.cpp
+mmgPicButton.h
+mmgRangeSlider.cpp
+mmgRangeSlider.h
+mmgSashPanel.cpp
+mmgSashPanel.h
+mmgScrolledPanel.cpp
+mmgScrolledPanel.h
+mmgSplittedPanel.cpp
+mmgSplittedPanel.h
+mmgTimeBar.cpp
+mmgTimeBar.h
+mmgTree.cpp
+mmgTree.h
+mmgValidator.cpp
+mmgValidator.h
 )
 
 # List the kits from VTK that are needed by this project.
@@ -16,7 +67,24 @@ SET(PROJECT_LIBS
   mafCore
 )
 
-#-----------------------------------------------------------------------------
+#........................................................
+#solo la vtkCommon e' linkata per default
+#per linkare altre lib inserirle qui di seguito
+#
+#  # VTK specific classes
+#  IF (MAF_USE_VTK)
+#  SET(PROJECT_LIBS ${PROJECT_LIBS} 
+#    ...... place libname here .....     
+#  )
+#
+#  SET(PROJECT_SRCS
+#    ${PROJECT_SRCS}
+#    ...... place source filenames here .....     
+#  )
+#ENDIF (MAF_USE_VTK)
+#........................................................
+
+#--------------------------------------------------------
 # Do not change anything below this line.
 
 # Need to include class headers and the configuration header.
