@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafIndent.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:33:15 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-06 21:19:38 $
+  Version:   $Revision: 1.5 $
   Authors:   originally based on vtkIndent (www.vtk.org), rewritten by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -13,15 +13,15 @@
 #include <ostream>
 
 #define MAF_STD_INDENT 2
-#define MAF_NUMBER_OF_BLANKS 40
+#define MAF_NUMBER_OF_TABS 20
 
-static const char blanks[MAF_NUMBER_OF_BLANKS+1]="                                        ";
+static const char blanks[MAF_NUMBER_OF_TABS*MAF_STD_INDENT+1]="                                        ";
 
 //------------------------------------------------------------------------------
 mafIndent::mafIndent(int ind)
 //------------------------------------------------------------------------------
 {
-  m_Indent=ind*MAF_STD_INDENT;
+  m_Indent=ind;
 };
 
 //------------------------------------------------------------------------------
@@ -30,10 +30,10 @@ mafIndent::mafIndent(int ind)
 mafIndent mafIndent::GetNextIndent()
 //------------------------------------------------------------------------------
 {
-  int indent = m_Indent + MAF_STD_INDENT;
-  if ( indent > MAF_NUMBER_OF_BLANKS )
+  int indent = m_Indent + 1;
+  if ( indent > MAF_NUMBER_OF_TABS )
   {
-    indent = MAF_NUMBER_OF_BLANKS;
+    indent = MAF_NUMBER_OF_TABS;
   }
   return indent;
 }
@@ -43,7 +43,7 @@ mafIndent mafIndent::GetNextIndent()
 std::ostream& operator<<(std::ostream& os, const mafIndent& ind)
 //------------------------------------------------------------------------------
 {
-  os << blanks + (MAF_NUMBER_OF_BLANKS-ind.m_Indent) ;
+  os << blanks + (MAF_NUMBER_OF_TABS-ind.m_Indent)*MAF_STD_INDENT ;
   return os;
 }
 
