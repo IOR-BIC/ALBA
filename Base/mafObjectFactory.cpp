@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObjectFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-17 20:16:05 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2004-11-18 18:58:35 $
+  Version:   $Revision: 1.5 $
   Authors:   Based on itkObjectFactory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -20,6 +20,9 @@
 #include <map>
 #include <sstream>
 
+mafCxxTypeMacro(mafObjectFactory);
+
+//------------------------------------------------------------------------------
 /** Utility class to clean up factory memory.*/  
 class CleanUpObjectFactory
 {
@@ -33,9 +36,10 @@ public:
   }  
 };
 
-
+//------------------------------------------------------------------------------
 // Static object used to clean up memory at program closing
 static CleanUpObjectFactory CleanUpObjectFactoryGlobal;
+//------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 // Add this for the SGI compiler which does not seem
@@ -61,6 +65,7 @@ bool operator<(const mafObjectFactory::mafOverrideInformation& rhs,
 }
 
 
+//------------------------------------------------------------------------------
 /** mafStringOverMap - Internal implementation class for ObjectFactorBase.
   Create a sub class to shrink the size of the symbols
   Also, so a forward reference can be put in mafObjectFactory.h
@@ -69,12 +74,15 @@ bool operator<(const mafObjectFactory::mafOverrideInformation& rhs,
 typedef std::multimap<std::string, mafObjectFactory::mafOverrideInformation> 
               mafStringOverMapType;
 
+
+//------------------------------------------------------------------------------
 /** mafOverRideMap - Internal implementation class for ObjectFactorBase. */
 class mafOverRideMap : public mafStringOverMapType
 {
 public:
 };
 
+//------------------------------------------------------------------------------
 /** Initialize static list of factories.*/
 std::list<mafObjectFactory*>* 
   mafObjectFactory::m_RegisteredFactories = 0;
@@ -434,7 +442,7 @@ void mafObjectFactory::RegisterOverride(const char* classOverride,
                    const char* subclass,
                    const char* description,
                    bool enableFlag,
-                   mafCreateObjectFunction*
+                   mafCreateObjectFunction
                    createFunction)
 //------------------------------------------------------------------------------
 {
@@ -453,11 +461,11 @@ mafObject *mafObjectFactory::CreateObject(const char* classname)
   m_OverrideMap->find(classname);
   mafOverRideMap::iterator pos = m_OverrideMap->find(classname);
   if ( pos != m_OverrideMap->end() )
-    {
+  {
     //return (*pos).second.m_CreateObject->CreateObject();
-    return (*pos).second.m_CreateObject->NewObjectInstance();
-    }
-  return 0;
+    return (*pos).second.m_CreateObject();
+  }
+  return NULL;
 }
 
 
@@ -574,4 +582,18 @@ std::list<bool> mafObjectFactory::GetEnableFlags()
     ret.push_back((*i).second.m_EnabledFlag);
   }
   return ret;
+}
+
+//------------------------------------------------------------------------------
+const char *mafObjectFactory::GetMAFSourceVersion(void) const
+//------------------------------------------------------------------------------
+{
+  return MAF_SOURCE_VERSION;
+}
+
+//------------------------------------------------------------------------------
+const char *mafObjectFactory::GetDescription() const
+//------------------------------------------------------------------------------
+{
+  return "MAF core factory.";
 }

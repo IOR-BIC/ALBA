@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObjectFactory.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-17 20:16:05 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2004-11-18 18:58:36 $
+  Version:   $Revision: 1.5 $
   Authors:   Based on itkObjectFactory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -79,10 +79,10 @@ public:
    * MAF_SOURCE_VERSION and NOT a call to Version::GetMAFSourceVersion.
    * As the version needs to be compiled into the file as a string constant.
    * This is critical to determine possible incompatible dynamic factory loads. */
-  virtual const char* GetMAFSourceVersion(void) const = 0;
+  virtual const char* GetMAFSourceVersion(void) const;
 
   /** Return a descriptive string describing the factory. */
-  virtual const char* GetDescription(void) const = 0;
+  virtual const char* GetDescription(void) const;
 
   /** Return a list of classes that this factory overrides. */
   virtual std::list<std::string> GetClassOverrideNames();
@@ -113,6 +113,13 @@ public:
   /** This returns the path to a dynamically loaded factory. */
   const char* GetLibraryPath();
 
+  /** Register object creation information with the factory. */
+  void RegisterOverride(const char* classOverride,
+      const char* overrideClassName,
+      const char* description,
+      bool enableFlag,
+      mafCreateObjectFunction createFunction);
+
   /** mafOverrideInformation utility class.
     Internal implementation class for mafObjectFactory. */
   struct mafOverrideInformation
@@ -120,27 +127,21 @@ public:
     std::string m_Description;
     std::string m_OverrideWithName;
     bool m_EnabledFlag;
-    mafCreateObjectFunction *m_CreateObject;
+    mafCreateObjectFunction m_CreateObject;
   };
-
+  
   //virtual void PrintSelf(std::ostream& os, mafIndent &indent) const;
 
-protected:
+  mafObjectFactory();
+  virtual ~mafObjectFactory();
 
-  /** Register object creation information with the factory. */
-  void RegisterOverride(const char* classOverride,
-      const char* overrideClassName,
-      const char* description,
-      bool enableFlag,
-      mafCreateObjectFunction* createFunction);
+
+protected:
     
   /** This method is provided by sub-classes of mafObjectFactory.
    * It should create the named maf object or return 0 if that object
    * is not supported by the factory implementation. */
   virtual mafObject *CreateObject(const char* classname );
-  
-  mafObjectFactory();
-  virtual ~mafObjectFactory();
 
 private:
   mafOverRideMap* m_OverrideMap;

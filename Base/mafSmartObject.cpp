@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSmartObject.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-17 20:16:05 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-11-18 18:58:36 $
+  Version:   $Revision: 1.3 $
   Authors:   based on vtkObjectBase (www.vtk.org), adapted Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,6 +13,8 @@
 #include "mafSmartObject.h"
 #include <malloc.h>
 #include <sstream>
+
+mafCxxTypeMacro(mafSmartObject);
 
 #ifdef _WIN32
 //------------------------------------------------------------------------------
