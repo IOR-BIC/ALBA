@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 09:22:58 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-04-01 10:06:01 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden, Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -170,7 +170,7 @@ public:
       here it is redirected to the old OnEvent */
   virtual void OnEvent(mafEventBase *e)  \
   {                                      \
-    if(e->IsType(mafEvent))              \
+    if(e->IsMAFType(mafEvent))              \
         OnEvent( *((mafEvent*)e) );      \
     else                                 \
         assert(false);                   \
