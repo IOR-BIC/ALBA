@@ -2,11 +2,11 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-17 00:47:02 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-02-20 23:39:29 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
-  Copyright (c) 2002/2004 
+  Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 #ifndef __mafStorageElement_h__
@@ -119,7 +119,7 @@ public:
   virtual int StoreObjectVector(const std::vector<mafObject *> &vector,const char *name,const char *items_name="Item");
 
   /** Restore a vector of objects. Objects must be both mafObject and mafStorable @sa RestoreObject() */
-  virtual int RestoreObjectVector(std::vector<mafObject *> &vector,const char *name);
+  virtual int RestoreObjectVector(std::vector<mafObject *> &vector,const char *name,const char *items_name="Item");
 
   /** return a pointer to the storage who created this element */
   mafStorage *GetStorage() {return m_Storage;}

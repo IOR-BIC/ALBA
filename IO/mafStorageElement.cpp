@@ -2,11 +2,11 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-17 00:47:02 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-02-20 23:39:29 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
-  Copyright (c) 2002/2004 
+  Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
@@ -101,7 +101,7 @@ int mafStorageElement::StoreObjectVector(const std::vector<mafObject *> &vector,
 
   // create sub node for storing the vector
   mafStorageElement *vector_node = AppendChild(name);
-  vector_node->SetAttribute("Size",mafString(vector.size()));
+  vector_node->SetAttribute("NumberOfItems",mafString(vector.size()));
   
   for (unsigned int i=0;i<vector.size();i++)
   {
@@ -124,7 +124,7 @@ int mafStorageElement::StoreObjectVector(const std::vector<mafObject *> &vector,
 }
 
 //------------------------------------------------------------------------------
-int mafStorageElement::RestoreObjectVector(std::vector<mafObject *> &vector,const char *name)
+int mafStorageElement::RestoreObjectVector(std::vector<mafObject *> &vector,const char *name,const char *items_name)
 //------------------------------------------------------------------------------
 {
   assert(name);
@@ -133,26 +133,51 @@ int mafStorageElement::RestoreObjectVector(std::vector<mafObject *> &vector,cons
   if (subnode)
   {
     ChildrenVector &items = subnode->GetChildren();
+    mafString numItems_str;
+    int numItems=-1;
+    if (subnode->GetAttribute("NumberOfItems",numItems_str))
+    {
+      numItems=atof(numItems_str);  
+    }
+    else
+    {
+      mafWarningMacro("Warning while restoring <"<<GetName()<<"> element: cannot find \"NumberOfItems\" attribute..." );
+    }
+
+    int num=0;
     for (unsigned int i=0;i<items.size();i++)
     {
       mafStorageElement *item=items[i];
-      mafObject *object=RestoreObject(item);
-      if (object)
+      if (mafString::Equals(items_name,item->GetName()))
       {
-        vector.push_back(object);
-      }
-      else
-      {
-        mafWarningMacro("Error while restoring <"<<GetName()<<"> element: cannot restore object");
-      }
+        mafObject *object=RestoreObject(item);
+        if (object)
+        {
+          vector.push_back(object);
+        }
+        else
+        {
+          mafWarningMacro("Error while restoring <"<<GetName()<<"> element: cannot restore object");
+          return MAF_ERROR;
+        }
+        num++;
+      }    
     }
+
+    // check if restored num of items is correct
+    if (numItems>=0&&num!=numItems)
+    {
+      mafWarningMacro("Error while restoring <"<<GetName()<<"> element: wrong number of items in Objects vector");
+      return MAF_ERROR;
+    }
+
     return MAF_OK;
   }
   else
   {
     mafWarningMacro("Error while restoring <"<<GetName()<<"> element: cannot find nested element <"<<name<<">" );
   }
-  return -1;
+  return MAF_ERROR;
 }
 
 //------------------------------------------------------------------------------
