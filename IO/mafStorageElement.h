@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:39:29 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-03-10 12:41:14 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -54,7 +54,6 @@ public:
   /** Return an attribute value given its name. Return false if not found. */
   virtual bool GetAttribute(const char *name,mafString &value)=0;
 
-  
   virtual int StoreText(const char *text,const char *name)=0;
   virtual int StoreMatrix(mafMatrix *matrix,const char *name)=0;
   virtual int StoreVectorN(double *comps,int num,const char *name)=0;
@@ -88,10 +87,10 @@ public:
   virtual int RestoreText(char *&buffer,const char *name)=0;
   virtual int RestoreText(mafString &buffer,const char *name)=0;
   
-  virtual void StoreDouble(const double &value,const char *name);
+  virtual int StoreDouble(const double &value,const char *name);
   virtual int RestoreDouble(double &value,const char *name);
 
-  virtual void StoreInteger(const int &value,const char *name);
+  virtual int StoreInteger(const int &value,const char *name);
   virtual int RestoreInteger(int &value,const char *name);
   
   /**

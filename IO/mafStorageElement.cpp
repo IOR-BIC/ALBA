@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:39:29 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-03-10 12:41:14 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -297,16 +297,16 @@ int mafStorageElement::RestoreObject(mafObject * &object,const char *name)
 }
 
 //------------------------------------------------------------------------------
-void mafStorageElement::StoreDouble(const double &value,const char *name)
+int mafStorageElement::StoreDouble(const double &value,const char *name)
 //------------------------------------------------------------------------------
 {
-  StoreText(mafString(value),name);
+  return StoreText(mafString(value),name);
 }
 //------------------------------------------------------------------------------
-void mafStorageElement::StoreInteger(const int &value,const char *name)
+int mafStorageElement::StoreInteger(const int &value,const char *name)
 //------------------------------------------------------------------------------
 {
-  StoreText(mafString(value),name);
+  return StoreText(mafString(value),name);
 }
 
 //------------------------------------------------------------------------------
