@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOBB.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:33:17 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-02-28 15:26:09 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -35,8 +35,10 @@ public:
   mafOBB(double source[6]);
   ~mafOBB();
 
-  unsigned long int GetMTime() {return MTime.GetMTime();}
-  void Modified() {this->MTime.Modified();}
+  static mafOBB *New() {return new mafOBB;}
+
+  unsigned long int GetMTime() {return m_MTime.GetMTime();}
+  void Modified() {m_MTime.Modified();}
 
   /**
     Return 1 if the two bounds are equivalent. Use the float overload to compare with
@@ -44,14 +46,14 @@ public:
   int Equals(float bounds[6]);
   int Equals(double bounds[6]);
   int Equals(mafOBB &bounds);
-  int Equals(mafOBB *bounds) {return this->Equals(*bounds);}
+  int Equals(mafOBB *bounds) {return Equals(*bounds);}
 
 
   /**
     Return true if the BBox is valid*/
-  bool IsValid() {return (this->Bounds[0]<=this->Bounds[1] && \
-    this->Bounds[2]<=this->Bounds[3] && \
-    this->Bounds[4]<=this->Bounds[5]); \
+  bool IsValid() {return (m_Bounds[0]<=m_Bounds[1] && \
+    m_Bounds[2]<=m_Bounds[3] && \
+    m_Bounds[4]<=m_Bounds[5]); \
   }
 
   /**
@@ -63,14 +65,14 @@ public:
   void DeepCopy(double bounds[6]);
   void DeepCopy(float bounds[6]);
   void DeepCopy(mafOBB *);
-  void DeepCopy(mafOBB &source) {this->DeepCopy(&source);}
+  void DeepCopy(mafOBB &source) {DeepCopy(&source);}
   void CopyTo(double target[6]);
   void CopyTo(float target[6]);
 
   /**
     Apply a transform to the internally stored matrix */
   //void ApplyTransform(mafMatrix &mat, mafOBB &newbounds);
-  //void ApplyTransform(mafMatrix &mat) {this->ApplyTransform(mat,*this);}
+  //void ApplyTransform(mafMatrix &mat) {ApplyTransform(mat,*this);}
 
   /**
     Apply the internally stored transform to the bounding box, recompute the
@@ -130,9 +132,9 @@ public:
   /** return the Z dimension */
   double GetDepth();
   
-  mafMatrix Matrix;
-  double    Bounds[6];
-  mafMTime  MTime;
+  mafMatrix m_Matrix;
+  double    m_Bounds[6];
+  mafMTime  m_MTime;
 
 };
 
@@ -140,21 +142,21 @@ public:
 //-------------------------------------------------------------------------
 inline bool mafOBB::IsInside(double point[3])
 {
-  return this->IsInside(point[0],point[1],point[2]);
+  return IsInside(point[0],point[1],point[2]);
 }
 
 //-------------------------------------------------------------------------
 inline bool mafOBB::IsInside(float point[3])
 {
-  return this->IsInside(point[0],point[1],point[2]);
+  return IsInside(point[0],point[1],point[2]);
 }
 
 //-------------------------------------------------------------------------
 inline bool mafOBB::IsInside(double x,double y,double z)
 {
-  return ((x>=Bounds[0])&&(x<=Bounds[1])&& \
-          (y>=Bounds[2])&&(y<=Bounds[3])&& \
-          (z>=Bounds[4])&&(z<=Bounds[5]));
+  return ((x>=m_Bounds[0])&&(x<=m_Bounds[1])&& \
+          (y>=m_Bounds[2])&&(y<=m_Bounds[3])&& \
+          (z>=m_Bounds[4])&&(z<=m_Bounds[5]));
 }
 
 #endif 
