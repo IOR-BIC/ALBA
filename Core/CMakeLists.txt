@@ -16,6 +16,13 @@ mafCoreFactory.cpp
 mafCoreFactory.h
 mafDataPipe.cpp
 mafDataPipe.h
+mafEvent.cpp
+mafEvent.h
+mafEventBase.cpp
+mafEventBase.h
+mafEventSender.h
+mafEventSource.cpp
+mafEventSource.h
 mafEventIO.cpp
 mafEventIO.h
 mafMatrixPipe.cpp
@@ -26,6 +33,10 @@ mafNodeIterator.cpp
 mafNodeIterator.h
 mafNodeRoot.cpp
 mafNodeRoot.h
+mafObserver.cpp
+mafObserver.h
+mafObserverCallback.cpp
+mafObserverCallback.h
 mafTagArray.cpp
 mafTagArray.h
 mafTagItem.cpp
