@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-30 14:16:58 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2005-01-10 00:14:45 $
+  Version:   $Revision: 1.21 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -123,7 +123,7 @@ void mafMessage(const char *format, ...);
   mafObject *thisClass::NewObject() \
   { \
     thisClass *obj = new thisClass; \
-    if (obj) obj->HeapFlag=true; \
+    if (obj) obj->m_HeapFlag=true; \
     return obj; \
   } \
   mafObject *thisClass::NewInternalInstance() const \
