@@ -1,3 +1,4 @@
+PROJECT (Core_TEST)
 
 LINK_LIBRARIES(mafCore)
 
