@@ -13,10 +13,14 @@ SET(PROJECT_SRCS
 #  mafEvent.cpp
   mafEventSource.h
   mafEventSource.cpp
+  mafMatrix.cpp
+  mafMatrix.h
   mafObserver.h
   mafObserver.cpp
   mafObserverCallback.h
   mafObserverCallback.cpp
+  mafOBB.cpp
+  mafOBB.h
 )
 
 IF (MAF_USE_VTK)
