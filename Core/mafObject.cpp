@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObject.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-09 06:43:10 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2004-11-09 15:31:02 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -17,9 +17,7 @@
 //------------------------------------------------------------------------------
 // PIMPL declarations
 //------------------------------------------------------------------------------
-/** 
-  This class is used as a dictionary to inference event IDs from class names.
-*/
+/** This class is used as a dictionary to inference event IDs from class names. */
 class mafObjectDictionaryType
 {
   public:

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-08 19:59:56 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2004-11-09 15:31:00 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -18,7 +18,8 @@
 #ifndef __mafDefines_h
 #define __mafDefines_h
 
-#include "Configure.h"
+#include "mafConfigure.h"
+
 #include "string.h"
 
 //------------------------------------------------------------------------------
@@ -31,6 +32,24 @@ typedef double mafTimeStamp;
 //------------------------------------------------------------------------------
 enum {MAF_OK=0, MAF_ERROR=1};
 enum {ID_NO_EVENT=0};
+enum {MAF_STRING_BUFFER_SIZE=2048};
+
+//------------------------------------------------------------------------------
+// Global Variables
+//------------------------------------------------------------------------------
+char mafGlobalStringBuffer[MAF_STRING_BUFFER_SIZE];
+
+//------------------------------------------------------------------------------
+// Global Functions
+//------------------------------------------------------------------------------
+/** write a message in the log area */
+void mafLogMessage(const wxChar *format, ...);
+/** open a warning dialog and write a message */
+void mafWarningMessage(const wxChar *format, ...);
+/** open an error dialog and write a message */
+void mafErrorMessage(const wxChar *format, ...);
+/** open a message dialog and write a message */
+void mafMessage(const wxChar *format, ...);
 
 //------------------------------------------------------------------------------
 // Macros

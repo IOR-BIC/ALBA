@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventBase.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-09 06:43:09 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2004-11-09 15:31:01 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -31,7 +31,7 @@ class mafEventSource;
 
   @sa mafSubject mafObserver mafEvent
 */
-class mafEventBase: public mafObject
+class MAF_EXPORT mafEventBase: public mafObject
 {
 public:
   mafEventBase(void *sender=NULL,mafID id=ID_NO_EVENT,void *data=NULL);

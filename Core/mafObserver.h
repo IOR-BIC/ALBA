@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObserver.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-08 19:59:57 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-11-09 15:31:03 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -30,7 +30,7 @@ class mafEventBase;
   between the two. An observer can "observe" many subjects.
   @sa mafEventSource mafEventListener mafObserverCallback
 */
-class mafObserver: public mafObject
+class MAF_EXPORT mafObserver: public mafObject
 {
 public:
   mafObserver();

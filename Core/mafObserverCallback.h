@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObserverCallback.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-09 06:43:10 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-11-09 15:31:03 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -26,7 +26,7 @@
   is used to store the (self) pointer of the class to whom the callback function belongs.
   @sa mafEventSource mafObserver
 */
-class mafObserverCallback: public mafObserver
+class MAF_EXPORT mafObserverCallback: public mafObserver
 {
 public:
   mafObserverCallback();

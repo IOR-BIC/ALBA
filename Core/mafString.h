@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-09 06:43:10 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2004-11-09 15:31:03 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -22,7 +22,7 @@
   c-string internally stored. At each moment this string can be retrived with
   GetCStr(). The memory of this m_CStr is automatically garbaged. Originally based
   on vtkString. */
-class mafCore_EXPORT mafString
+class MAF_EXPORT mafString
 {
 public:
   

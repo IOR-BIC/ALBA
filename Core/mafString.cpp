@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-09 06:43:10 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2004-11-09 15:31:03 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,6 +12,27 @@
 
 #include "mafString.h"
 #include <stdio.h>
+
+#ifdef MAF_USE_WX
+#include "wx/wx.h"
+
+// macro for printing to string (adapted from wxWidgets IMPLEMENT_LOG_FUNCTION
+#define MAF_PRINT_MACRO(format) \
+  va_list argptr; \
+  va_start(argptr, format); \
+  wxVsnprintf(mafGlobalStringBuffer, sizeof(mafGlobalStringBuffer), format, argptr); \
+  va_end(argptr);
+
+#else MAF_USE_WX // this is less safe since it can't limit output string size
+
+#define MAF_PRINT_MACRO(format) \
+  va_list argptr; \
+  va_start(argptr, format); \
+  vsprintf(mafGlobalStringBuffer, format, argptr); \
+  va_end(argptr);
+
+#endif MAF_USE_WX
+
 
 //----------------------------------------------------------------------------
 mafString::~mafString()
