@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuTagItem.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-14 10:21:19 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-02-17 00:45:34 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,22 +13,26 @@
 #define __mmuTagItem_h
 
 #include "mmuUtility.h"
-#include "mafCoreDecl.h"
+#include "mafStorable.h"
 #include "mafString.h"
 #include <vector>
 #include <string>
 #include <iosfwd>
 
 //----------------------------------------------------------------------------
+// constants
+//----------------------------------------------------------------------------
+enum MAF_TAG_IDS {MAF_MISSING_TAG=0,MAF_NUMERIC_TAG,MAF_STRING_TAG};
+
+//----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------
-class mafString;
 
 /** an utility class for storing <key-type-array of values> information.
   an utility class for storing <key-type-array of values> information.
   @sa mmaTagArray
 */
-class MAF_EXPORT mmuTagItem : public mmuUtility
+class MAF_EXPORT mmuTagItem : public mmuUtility, public mafStorable
 {
 public:
   mmuTagItem();
@@ -141,7 +145,13 @@ public:
   /** Compare two Tag items*/
   bool Equals(const mmuTagItem *item) const;
 
+  /** copy contents of the given tag item */
+  void DeepCopy(const mmuTagItem *item);
+
 protected:
+  virtual int InternalStore(mafStorageElement *parent);
+  virtual int InternalRestore(mafStorageElement *node);
+
   void Initialize();
   
   mafString m_Name;

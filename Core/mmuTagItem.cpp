@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuTagItem.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-14 10:21:18 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-02-17 00:45:34 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,7 +12,9 @@
 #include "mmuTagItem.h"
 #include "mafString.h"
 #include "mafIndent.h"
+#include "mafStorageElement.h"
 #include <vector>
+#include <assert.h>
 
 //-------------------------------------------------------------------------
 mmuTagItem::mmuTagItem()
@@ -87,18 +89,25 @@ mmuTagItem::mmuTagItem(const char *name, const std::vector<double> &values, int 
 }
 
 //-------------------------------------------------------------------------
+void mmuTagItem::DeepCopy(const mmuTagItem *item)
+//-------------------------------------------------------------------------
+{
+  assert(item);
+  this->SetName(item->GetName());
+  this->SetNumberOfComponents(item->GetNumberOfComponents());
+  for (int i=0;i<GetNumberOfComponents();i++)
+  {
+    this->SetValue(item->GetValue(i),i);
+  }
+
+  this->SetType(item->GetType());
+
+}
+//-------------------------------------------------------------------------
 void mmuTagItem::operator=(const mmuTagItem& p)
 //-------------------------------------------------------------------------
 {
-  this->SetName(p.GetName());
-  this->SetNumberOfComponents(p.GetNumberOfComponents());
-  for (int i=0;i<GetNumberOfComponents();i++)
-  {
-    this->SetValue(p.GetValue(i),i);
-  }
-
-  this->SetType(p.GetType());
-
+  DeepCopy(&p);
 }
 
 //-------------------------------------------------------------------------
@@ -473,4 +482,56 @@ void mmuTagItem::Print(std::ostream& os, const int tabs) const
   os << std::endl; // end of single line printing
 }
 
+//-------------------------------------------------------------------------
+int mmuTagItem::InternalStore(mafStorageElement *parent)
+//-------------------------------------------------------------------------
+{
+  parent->SetAttribute("Tag", GetName());
+  parent->SetAttribute("Mult",mafString(GetNumberOfComponents()));
+  mafString type;
+  GetTypeAsString(type);
+  parent->SetAttribute("Type",type);
+
+  if (parent->StoreVectorN(m_Components,GetNumberOfComponents(),"TItem","TC")==MAF_ERROR)
+    return MAF_ERROR;
+
+  return MAF_OK;
+}
+
+//-------------------------------------------------------------------------
+int mmuTagItem::InternalRestore(mafStorageElement *node)
+//-------------------------------------------------------------------------
+{
+  if (!node->GetAttribute("Name",m_Name))
+    return MAF_ERROR;
+
+  mafString type;
+  if (!node->GetAttribute("Type",type))
+    return MAF_ERROR;
+  
+  if (type=="NUM")
+  {
+    SetType(MAF_NUMERIC_TAG);
+  }
+  else if (type=="STR")
+  {
+    SetType(MAF_STRING_TAG);
+  }
+  else if (type=="MIS")
+  {
+    SetType(MAF_MISSING_TAG);
+  }
+  else
+  {
+    SetType(atof(type));
+  }
+
+  mafString num;
+  if (!node->GetAttribute("Mult",num))
+    return MAF_ERROR;
+  
+  SetNumberOfComponents(atof(num));
+  
+  return node->RestoreVectorN(m_Components,GetNumberOfComponents(),"TItem","TC");
+}
 
