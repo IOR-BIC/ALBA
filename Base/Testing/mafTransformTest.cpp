@@ -1,11 +1,11 @@
-#include "vtkMath.h"
-#include "vtkTransform.h"
-#include "vtkSmartPointer.h"
-
 #include "mafDefines.h"
 #include "mafMatrix.h"
 #include "mafTransform.h"
 #include "mafTransformFrame.h"
+
+#include "vtkMath.h"
+#include "vtkTransform.h"
+#include "vtkSmartPointer.h"
 
 #include <iostream>
 
@@ -109,8 +109,14 @@ int main()
 
   invMxQxS.Print(std::cerr);
   mafMatrix identity;
-  MAF_TEST(identity==invMxQxS);
-
+  double *mat1=*(identity.GetElements());
+  double *mat2=*(invMxQxS.GetElements());
+  for (int idx=0;idx<16;idx++)
+  {  
+    double diff = fabs(mat1[idx]-mat2[idx]);
+    MAF_TEST(diff<.000000001);
+  }
+  
   std::cerr << "Test completed succesfully!" << std::endl << std::endl;
 
   return MAF_OK;

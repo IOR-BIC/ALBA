@@ -35,13 +35,13 @@ int main()
   
   // test functions to query the type
   MAF_TEST(foo.IsA("mafFooObject")); // test the real object type with string type
-  MAF_TEST(foo.IsType(mafObject)); // test the real object type with typeid: IsType == IsA(typeid())
+  MAF_TEST(foo.IsA(mafObject::GetStaticTypeId())); // test the real object type with typeid: IsType == IsA(typeid())
   MAF_TEST(foo.IsA("mafObject"));
-  MAF_TEST(foo.IsType(mafObject));
+  MAF_TEST(foo.IsA(mafObject::GetStaticTypeId()));
   MAF_TEST(!foo.IsA(dummy.GetTypeId()));
   MAF_TEST(!foo.IsA(dummy.GetTypeName()));
-  MAF_TEST(!dummy.IsType(mafFooObject));
-  MAF_TEST(!dummy.IsType(mafFooObject));
+  MAF_TEST(!dummy.IsA(mafFooObject::GetStaticTypeId()));
+  MAF_TEST(!dummy.IsA(mafFooObject::GetStaticTypeId()));
   MAF_TEST(dummy.GetStaticTypeId()==dummy.GetTypeId());
   MAF_TEST(dummy.GetStaticTypeId()==dummy.GetTypeId());
 
@@ -54,8 +54,8 @@ int main()
   MAF_TEST(new_foo);
   MAF_TEST(new_foo->IsA(foo.GetStaticTypeId()));
   MAF_TEST(new_foo->IsA(foo.GetStaticTypeName()));
-  MAF_TEST(new_foo->IsType(mafFooObject));
-  MAF_TEST(new_foo->IsType(mafFooObject));
+  MAF_TEST(new_foo->IsA(typeid(mafFooObject)));
+  MAF_TEST(new_foo->IsA(typeid(mafFooObject)));
   MAF_TEST(!new_foo->IsA(new_dummy->GetTypeId()));
   MAF_TEST(!new_foo->IsA(new_dummy->GetTypeName()));
   MAF_TEST(!new_dummy->IsA(new_foo->GetTypeId()));
