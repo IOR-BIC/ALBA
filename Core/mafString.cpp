@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-29 17:59:18 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-01-10 00:02:28 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -53,14 +53,33 @@ mafString::mafString(const char *src):m_CStr(NULL),m_Size(0)
   m_ConstCStr = src?src:""; // store string reference pointer
 }
 //----------------------------------------------------------------------------
-mafString::mafString(double num):m_CStr(NULL),m_ConstCStr(""),m_Size(0)
+mafString::mafString(const double &num):m_CStr(NULL),m_ConstCStr(""),m_Size(0)
 //----------------------------------------------------------------------------
 {
-  char tmp[64];
-  sprintf(tmp,"%.16g",num);
-  Copy(tmp);
+  NPrintf(32,"%.16g",num);
 }
 
+//----------------------------------------------------------------------------
+mafString &mafString::operator=(const mafString &src)
+//----------------------------------------------------------------------------
+{
+  Copy(src.GetCStr());
+  return *this;
+}
+//----------------------------------------------------------------------------
+mafString &mafString::operator=(const char *src)
+//----------------------------------------------------------------------------
+{
+  Set(src);
+  return *this;
+}
+//----------------------------------------------------------------------------
+mafString &mafString::operator=(const double &num)
+//----------------------------------------------------------------------------
+{
+  NPrintf(32,"%.16g",num);
+  return *this;
+}
 //----------------------------------------------------------------------------
 const char * mafString::GetCStr() const
 //----------------------------------------------------------------------------
