@@ -63,7 +63,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkProjectSP_h
 
 #include "vtkStructuredPointsToStructuredPointsFilter.h"
-#include "vtkSVTKWin32Header.h"
+#include "vtkMAFConfigure.h"
 
 #define VTK_PROJECT_FROM_X 1
 #define VTK_PROJECT_FROM_Y 2
@@ -71,7 +71,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 
 //class VTK_EXPORT vtkProjectSP : public vtkStructuredPointsToStructuredPointsFilter
-class VTK_SVTK_EXPORT vtkProjectSP : public vtkStructuredPointsToStructuredPointsFilter
+class VTK_vtkMAF_EXPORT vtkProjectSP : public vtkStructuredPointsToStructuredPointsFilter
 
 {
 public:

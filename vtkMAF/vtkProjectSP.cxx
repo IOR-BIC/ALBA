@@ -124,7 +124,7 @@ void vtkProjectSP::Execute()
 //=========================================================================
 {
   int dims[3], outDims[3];
-  float origin[3], ar[3], outOrigin[3]={0.0,0.0,0.0}, outAR[3];
+  double origin[3], ar[3], outOrigin[3]={0.0,0.0,0.0}, outAR[3];
 
   int i, j, k, dim, idx, newIdx;
   int sliceSize, jOffset, kOffset;
