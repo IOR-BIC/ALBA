@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:32:02 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-02-28 15:25:02 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -67,10 +67,12 @@ void mafMessage(const char *format, ...);
 #define vtkNEW(a) a=a->New()
 
 /** Allocate a new MAF object: don't worry, New is a static member function! */
-#define mafNEW(a) a=a->New()
+#define mafNEW(a) a=a->New();a->Register(this)
 
 /** Delete a MAF object */
 #define mafDEL(a) if (a) { a->Delete(); a = NULL;}
+
+#define cppNEW(a) a=a->New()
 
 /** delete a new() allocated object */
 #define cppDEL(a) if (a) { delete a; a = NULL;}
