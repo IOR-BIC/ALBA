@@ -2,11 +2,11 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testMinimalWX.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-01-15 19:25:38 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-02-25 07:26:10 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
-  Copyright (c) 2002/2004 
+  Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
