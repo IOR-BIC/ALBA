@@ -2,11 +2,11 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-13 09:09:14 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-02-20 23:35:11 $
+  Version:   $Revision: 1.7 $
   Authors:   originally based on vtkString (www.vtk.org), rewritten Marco Petrone
 ==========================================================================
-  Copyright (c) 2002/2004 
+  Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
@@ -189,7 +189,7 @@ public:
   /** 
     Set the internal pointer to a give pointer. Second parameter allow 
     to force the release of the memory */
-  void Set(const char *a, bool release=false);
+  mafString &Set(const char *a, bool release=false);
   
   /** this can be used only with non constant c-string */
   void SetCStr(char *a, bool release=false);
@@ -213,12 +213,16 @@ public:
   const char operator [] (const int i) const;
 
   const bool operator==(const char *src) const;
+  const bool operator!=(const char *src) const;
   const bool operator<(const char *a) const;
   const bool operator>(const char *a) const;
   const bool operator<=(const char *a) const;
   const bool operator>=(const char *a) const;
 
   mafString &operator<<(const char *a) {return Append(a);};
+
+  void operator<<(std::ostream &os);
+  void operator>>(std::istream &os);
 
   mafString(const mafString &src);
   mafString(const char *src);

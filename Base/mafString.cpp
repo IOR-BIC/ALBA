@@ -2,11 +2,11 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-01-13 09:09:14 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-02-20 23:35:10 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
-  Copyright (c) 2002/2004 
+  Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
@@ -18,6 +18,7 @@
 
 #include "wx/wx.h"
 #include <wx/string.h>
+#include <string>
 
 
 //----------------------------------------------------------------------------
@@ -47,10 +48,10 @@ mafString::mafString(const mafString& src):m_CStr(NULL),m_ConstCStr(""),m_Size(0
   Copy(src.GetCStr());
 }
 //----------------------------------------------------------------------------
-mafString::mafString(const char *src):m_CStr(NULL),m_Size(0)
+mafString::mafString(const char *src):m_CStr(NULL),m_ConstCStr(""),m_Size(0)
 //----------------------------------------------------------------------------
 {
-  m_ConstCStr = src?src:""; // store string reference pointer
+  Copy(src);
 }
 //----------------------------------------------------------------------------
 mafString::mafString(const double &num):m_CStr(NULL),m_ConstCStr(""),m_Size(0)
@@ -70,7 +71,7 @@ mafString &mafString::operator=(const mafString &src)
 mafString &mafString::operator=(const char *src)
 //----------------------------------------------------------------------------
 {
-  Set(src);
+  Copy(src);
   return *this;
 }
 //----------------------------------------------------------------------------
@@ -80,6 +81,20 @@ mafString &mafString::operator=(const double &num)
   NPrintf(32,"%.16g",num);
   return *this;
 }
+//----------------------------------------------------------------------------
+void mafString::operator<<(std::ostream &os)
+//----------------------------------------------------------------------------
+{
+  os<<this->GetCStr();
+}
+//----------------------------------------------------------------------------
+void mafString::operator>>(std::istream &is)
+//----------------------------------------------------------------------------
+{
+  std::string tmp; is>>tmp;
+  this->Copy(tmp.c_str());
+}
+
 //----------------------------------------------------------------------------
 const char * mafString::GetCStr() const
 //----------------------------------------------------------------------------
@@ -191,7 +206,7 @@ const mafID mafString::Length() const
 }
 
 //----------------------------------------------------------------------------
-void mafString::Set(const char *a, bool release)
+mafString &mafString::Set(const char *a, bool release)
 //----------------------------------------------------------------------------
 {
   if (a!=GetCStr())
@@ -200,6 +215,7 @@ void mafString::Set(const char *a, bool release)
     m_ConstCStr = a;
     m_Size = release?Length(a)+1:0;
   }
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -645,6 +661,13 @@ const bool mafString::operator==(const char *src) const
 //----------------------------------------------------------------------------
 {
   return Equals(GetCStr(),src);
+}
+
+//----------------------------------------------------------------------------
+const bool mafString::operator!=(const char *src) const
+//----------------------------------------------------------------------------
+{
+  return !Equals(GetCStr(),src);
 }
 
 //----------------------------------------------------------------------------
