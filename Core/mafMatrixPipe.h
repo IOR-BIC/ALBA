@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrixPipe.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:27:15 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-03-11 10:10:13 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -35,6 +35,9 @@ class mafVME;
 class MAF_EXPORT mafMatrixPipe: public mafTransformBase, public mafEventSender
 {
 public:
+  mafMatrixPipe();
+  virtual ~mafMatrixPipe();
+
   mafTypeMacro(mafMatrixPipe,mafTransformBase);
   
   void UpdateMatrixObserverOn() {m_UpdateMatrixObserverFlag=1;}
@@ -75,9 +78,6 @@ public:
   virtual int DeepCopy(mafMatrixPipe *pipe);
   
 protected:
-  mafMatrixPipe();
-  virtual ~mafMatrixPipe();
-
   /** To be redefined by subclasses to override Pipe behavior */
   virtual void InternalUpdate();
 

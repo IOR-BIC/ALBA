@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:37:02 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-03-11 10:07:45 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,13 +14,15 @@
 #define __mafVMEOutput_h
 
 #include "mafObject.h"
-
+#include "mafString.h"
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 class mafMatrix;
 class mafTransform;
 class mafOBB;
+class mafVME;
+class mafNodeIterator;
 class vtkDataSet;
 
 /** mafVMEOutput - the output data structure of a VME node.
@@ -39,7 +41,6 @@ public:
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs);
 
-  
   /** Return the VME pose, this function queries the MatrixPipe for producing a matrix */
   void GetPose(double &x,double &y,double &z,double &rx,double &ry,double &rz,mafTimeStamp t=-1);
   /** Return the VME pose */
@@ -71,19 +72,25 @@ public:
 
   /**
     Return the DataType to be produced as output. This can be used to avoid calling
-    update for checking about data type and thus without actually loading the data
-    from file. */
-  virtual const char *GetDataType()=0;
+    update for checking about data type directly in the output dataset and thus
+    without actually loading the data from file. */
+  virtual const char *GetDataType() {return m_DataType;}
 
-  
   /**
-    Update all the output data structures (data, matrix and abs matrix.*/
+    Update all the output data structures (data, matrix and abs matrix).*/
   virtual void Update();
     
   /**
     Return the TimeBounds of the whole subtree, i.e recurse the GetLocalTimeBounds()
     function over all the VME in the subtree.*/
   void GetTimeBounds(mafTimeStamp tbounds[2]);
+
+  /**
+    Get TimeBounds for this VME. TimeBounds interval is defined by the minimum
+    and maximum time stamps against the MatrixVector and VMEItems time stamps.
+    If only the pose time stamps are required use the mafMatrixVector::GetTimeBounds()
+    function. For the time bounds of the VME items only use the mafVMEGeneric::GetItemsTimesList()*/
+  void GetLocalTimeBounds(mafTimeStamp tbounds[2]);
   
   /**
     Extract the 4D bounds for this VME only, i.e. the space bounds along all the time range
@@ -104,31 +111,35 @@ public:
   /**
     Return the space bound of the subtree for the current time, taking in consideration
     the current data bounds and the current pose matrix*/
-  void GetSpaceBounds(double bounds[6]);
-  virtual void GetSpaceBounds(mafOBB &bounds,mafTimeStamp t=-1, mafNodeIterator *iter=NULL);
+  void GetBounds(double bounds[6]);
+  virtual void GetBounds(mafOBB &bounds,mafTimeStamp t=-1, mafNodeIterator *iter=NULL);
   
   /**
     Return the space bound of the VME (not the subtree) for the current time, taking in consideration 
     the current data bounds and the current pose matrix*/
-  void GetVMESpaceBounds(double bounds[6]);
-  virtual void GetVMESpaceBounds(mafOBB &bounds,mafTimeStamp t=-1, mafNodeIterator *iter=NULL);
+  void GetVMEBounds(double bounds[6]);
+  virtual void GetVMEBounds(mafOBB &bounds,mafTimeStamp t=-1, mafNodeIterator *iter=NULL);
   
   /**
     Return the local space bound (in local coordinates) of the VME (not the subtree) for the current time,
     taking in consideration the current data bounds and the current pose matrix*/
-  void GetVMELocalSpaceBounds(double bounds[6]);
-  virtual void GetVMELocalSpaceBounds(mafOBB &bounds,mafTimeStamp t=-1, mafNodeIterator *iter=NULL);
+  void GetVMELocalBounds(double bounds[6]);
+  virtual void GetVMELocalBounds(mafOBB &bounds,mafTimeStamp t=-1, mafNodeIterator *iter=NULL);
+
+  /** return the time for which this output was computed */
+  mafTimeStamp GetCurrentTime();
     
 protected:
   mafVMEOutput(); // to be allocated with New()
   virtual ~mafVMEOutput(); // to be deleted with Delete()
 
-  /**
-   To be use to override the current data pointer. By default CurrentData
-   stores a pointer to the DataPipe output. */
-  //void SetCurrentData(vtkDataSet *data);
+  /** internally used to compute bounds for non procedural data */
+  virtual void GetDataBounds(mafOBB &bounds,mafTimeStamp t)=0; 
 
-  mafVME                    *m_VME; ///< pointer to source VME
+  mafVME                    *m_VME;     ///< pointer to source VME
+  mafString                 m_DataType; ///< the type of data stored in object expressed as a string
+  mafAutoPointer<mafMatrix> m_Matrix;   ///< the output pose matrix
+
 private:
   mafVMEOutput(const mafVMEOutput&); // Not implemented
   void operator=(const mafVMEOutput&); // Not implemented

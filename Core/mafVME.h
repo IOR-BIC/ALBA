@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:35:41 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-03-11 10:07:19 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -37,6 +37,7 @@ class mafVMEOutput;
   @todo
   - implement the GetMTime() function: it's used by pipeline to trigger the update
   - Change the SetParent to update the AbsMatrixPipe connections
+  - fix the VME_TIME_SET issuing and propagation
   */
 class MAF_EXPORT mafVME : public mafNode
 {
@@ -58,21 +59,15 @@ public:
     are not copied, i.e. copy is not recursive!
     Concrete class should reimplement this function to verify admitted
     conversion. */
-  //virtual int DeepCopy(mafNode *a);
+  virtual int DeepCopy(mafNode *a);
 
   /** 
     perform a copy by simply referencing the copied VME's data array. 
     Beware: This can allow to save memory when doing special tasks, but
     can be very dangerous making one of the VME inconsistent. Some VMEs
-    do not support such a function!
-  */  
-  //virtual int ShallowCopy(mafNode *a);
+    do not support such a function! */  
+  virtual int ShallowCopy(mafVME *a);
 
-  /**
-    Test if the given VME instance can be copied into this. This function can
-    be reimplemented into inherited classes*/
-  //virtual bool CanCopy(mafNode *vme);
-  
   /**
     Query for VME child nodes */
   mafVME *GetVMEChild(mafID idx) {return mafVME::SafeDownCast(this->Superclass::GetChild(idx));}
@@ -83,6 +78,7 @@ public:
    Set the time for this VME (not for the whole tree). Normaly time 
    of the tree is set by sending an event with id VME_TIME_SET */
   virtual void SetCurrentTime(mafTimeStamp t);
+  mafTimeStamp GetCurrentTime() {return m_CurrentTime;}
   
   /**
     Set/Get CurrentTime for this VME and all subtree. Normaly time 
@@ -94,11 +90,24 @@ public:
     The pose is modified for the given timestamp, if VME supports 4D pose (e.g. 
     MatrixVector of VME-Generic) the output matrix is interpolated among set
     key matrices.*/
-  virtual void SetMatrix(const mafMatrix &mat);
+  virtual void SetMatrix(const mafMatrix &mat)=0;
+
+  /** 
+    Set the pose for this VME This function modifies pose matrix of the VME.
+    The pose is modified for the given timestamp, if VME supports 4D pose (e.g. 
+    MatrixVector of VME-Generic) the output matrix is interpolated among set
+    key matrices.*/
+  void SetPose(double x,double y,double z,double rx,double ry,double rz, mafTimeStamp t);
+
+  /** 
+    Set the pose for this VME This function modifies pose matrix of the VME.
+    The pose is modified for the given timestamp, if VME supports 4D pose (e.g. 
+    MatrixVector of VME-Generic) the output matrix is interpolated among set
+    key matrices.*/
+  void SetPose(double xyz[3],double rxyz[3], mafTimeStamp t);
 
   /** apply a matrix to the VME pose matrix */
   void ApplyMatrix(const mafMatrix &matrix,int premultiply,mafTimeStamp t=-1);
-
   
   /** Set the global pose of this VME for the given time "t". This function usually modifies the MatrixVector. */
   void SetAbsPose(double x,double y,double z,double rx,double ry,double rz, mafTimeStamp t=-1);
@@ -108,44 +117,19 @@ public:
   void SetAbsMatrix(const mafMatrix &matrix);
 
   /** apply a matrix to the VME abs pose matrix */
-  //void ApplyAbsMatrix(vtkMatrix4x4 *matrix,int premultiply,mafTimeStamp t=-1);
   void ApplyAbsMatrix(const mafMatrix &matrix,int premultiply,mafTimeStamp t=-1);
  
-  /**
-    Compare two VME. Two VME are considered equivalent if they have equivalent 
-    items, TagArrays, MatrixVectors, Name and Type. */
-  virtual bool Equals(mafNode *vme);
-
-  /**
-    Compare the two subtrees starting at this VME and at the given one. Two trees
-    are considered equivalent if they have equivalent VME, disposed in the same hierarchy.
-    Order of children VME is significative for comparison. */
-  bool CompareTree(mafVME *vme);
-
   /**
     Copy the given VME tree into a new tree. In case a parent is provided, link the new
     root node to it. Return the root of the new tree.*/
   static mafVME *CopyTree(mafVME *vme, mafVME *parent=NULL);
 
   /** Make a copy of the whole subtree and return its pointer*/
-  mafVME *CopyTree() {return this->CopyTree(this);}
-
+  mafVME *CopyTree() {return CopyTree(this);}
 
   /**
     return true if the VME can be reparented under the specified node */
   virtual bool CanReparentTo(mafNode *parent);
-
-
-  // to be moved to VME generic?
-  /**
-    Reparent this VME into a different place of the same tree
-    or into a different tree. If the tree is not the same, the data of
-    all items of all sub vme is read into memory and Id is reset to -1, 
-    to allow the VMEStorage to write new data as new files on file.
-    In case of error during operation return NULL, otherwise return
-    this node pointer: this is to be compatible with nodes that during
-    reparenting make copy of the VME (mafVMERoot)*/
-  virtual mafVME *ReparentTo(mafVME *parent);
 
   /** To be moved to mafNode */
   /** Import all children of a VME-tree into the Output */
@@ -156,21 +140,21 @@ public:
 	/** Set auxiliary reference system and its name*/
 	//int SetAuxiliaryRefSys(mflTransform *AuxRefSys, const char *RefSysName, int type = MFL_LOCAL_FRAME_TAG);
   //int SetAuxiliaryRefSys(vtkMatrix4x4 *AuxRefSys, const char *RefSysName, int type = MFL_LOCAL_FRAME_TAG);
-
+  
   // to be revises
 	/** Get auxiliary reference system from its name*/
   //int GetAuxiliaryRefSys(mflTransform *AuxRefSys, const char *RefSysName, int type = MFL_LOCAL_FRAME_TAG);
   //int GetAuxiliaryRefSys(vtkMatrix4x4 *AuxRefSys, const char *RefSysName, int type = MFL_LOCAL_FRAME_TAG);
-
+  
   /** return the matrix pipe object, i.e. the source of the output matrix. */
   mafMatrixPipe *GetMatrixPipe() {return m_MatrixPipe;}
-
+  
   /** return the matrix pipe used for computing the AbsMatrix.*/
   mafAbsMatrixPipe *GetAbsMatrixPipe() {return m_AbsMatrixPipe;}
-
+  
   /** return the data pipe object, i.e. the source of the output dataset. */
   mafDataPipe *GetDataPipe() {return m_DataPipe;}
-
+  
   /**
     this function makes the current data pointer to point the right output
     data, usually the DataPipe output data but subclasses can redefine this
@@ -182,8 +166,8 @@ public:
     Return the list of timestamps for this VME. Timestamps list is 
     obtained merging timestamps for matrixes and VME items*/
   void GetLocalTimeStamps(mafTimeStamp *&kframes);
-  virtual void GetLocalTimeStamps(TimeVector &kframes);
-
+  virtual void GetLocalTimeStamps(TimeVector &kframes)=0;
+  
 	/**
     Return the list of timestamps considering all parents timestamps. Timestamps list is
     obtained merging timestamps for matrixes and VME items*/
@@ -202,20 +186,17 @@ public:
   /** Return the number of time stamps in the whole tree*/
   int GetNumberOfLocalTimeStamps();
   
-  // To be moved (also) to output data structure
   /** Return true if the number of local time stamps is > 1*/
   virtual int IsAnimated();
-  
-  // to be moved to VME-Generic
-  /**
-    Return Time bounds interval of the only VMEItems stored in this VME. */
-  //virtual void GetDataTimeBounds(mafTimeStamp tbounds[2]);
   
   /** Set the crypting status for the vme. */
   void SetCrypting(int crypting);
   
   /** Get the crypting status of the vme. */
   int GetCrypting();
+
+  /** return a pointer to the output data structure */
+  mafVMEOutput *GetOutput();
   
 protected:
   mafVME(); // to be allocated with New()
@@ -236,19 +217,6 @@ protected:
   /** Set the abs matrix pipe object, i.e. the source of the output abs matrix. */
   void SetAbsMatrixPipe(mafAbsMatrixPipe *pipe);
 
-  // to be removed!!!!
-  /**
-    Reimplemented as protected to avoid attaching of mafNode parent. 
-    This function implementation sends and event when VME is detached
-    from the tree.*/
-  //virtual int SetParent(mafNode *parent);
-
-  // To be moved to output data structure
-  /**
-   To be use to override the current data pointer. By default CurrentData
-   stores a pointer to the DataPipe output. */
-  //void SetCurrentData(vtkDataSet *data);
-
   mafDataPipe       *m_DataPipe;
   mafMatrixPipe     *m_MatrixPipe;
   mafAbsMatrixPipe  *m_AbsMatrixPipe;
@@ -256,8 +224,6 @@ protected:
   mafVMEOutput      *m_Output; ///< the datastructure storing the output of this VME
 
   mafTimeStamp m_CurrentTime; ///< the time parameter for generation of the output
-
-  
 
   int m_Crypting;             ///< enable flag for this VME
 
