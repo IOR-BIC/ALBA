@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-25 11:29:33 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2004-11-25 19:17:20 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -64,11 +64,13 @@ typedef unsigned long mafID;
 /** Allocate a new VTK object: don't worry, New is a static member function! */
 #define vtkNEW(a) a=a->New()
 
+/** Delete a MAF object */
+#define mafDEL(a) if (a) {delete a; a = NULL;}
+
 /**
   Macro used by mafObjects for RTTI information. This macro must be placed
-  in the class definition public section.
-*/
-#define mafTypeMacro(thisClass,superclass) \
+  in the class definition public section. */
+#define mafAbstractTypeMacro(thisClass,superclass) \
   private: \
   static mafID TypeId; \
   public: \
@@ -81,16 +83,21 @@ typedef unsigned long mafID;
   static int IsTypeOf(const mafID type); \
   virtual int IsA(const char *type) const; \
   virtual int IsA(const mafID type) const; \
-  static thisClass* SafeDownCast(mafObject *o); \
+  static thisClass* SafeDownCast(mafObject *o);
+
+/**
+  Macro used by mafObjects for RTTI information. This macro must be placed
+  in the class definition public section. */
+#define mafTypeMacro(thisClass,superclass) \
+  mafAbstractTypeMacro(thisClass,superclass); \
   static mafObject *NewObjectInstance(); \
   virtual mafObject *NewInternalInstance() const; \
   thisClass *NewInstance() const;
 
 /**
   Macro used by mafObjects for RTTI information. This macor must be placed
-  in the .cpp file.
-*/
-#define mafCxxTypeMacro(thisClass) \
+  in the .cpp file. */
+#define mafCxxAbstractTypeMacro(thisClass) \
   mafID thisClass::TypeId = GetNextTypeId(#thisClass); \
   mafID thisClass::GetTypeId() {return thisClass::TypeId;} \
   mafID thisClass::GetClassId() const {return thisClass::TypeId;} \
@@ -121,7 +128,14 @@ typedef unsigned long mafID;
       return static_cast<thisClass *>(o); \
     } \
     return NULL;\
-  } \
+  }
+
+
+/**
+  Macro used by mafObjects for RTTI information. This macor must be placed
+  in the .cpp file. */
+#define mafCxxTypeMacro(thisClass) \
+  mafCxxAbstractTypeMacro(thisClass); \
   mafObject *thisClass::NewObjectInstance() \
   { \
     return new thisClass; \
@@ -137,13 +151,13 @@ typedef unsigned long mafID;
 
 
 /** Macro used to define Set/GetListener() member functions and a Listener member variable */
-#define mafSetGetListenerMacro \
+#define mafListenerMacro \
   public: \
-  void SetListener(mafObserver *observer) { Listener=observer;} \
-  mafObserver *GetListener() { return Listener;}
+  void SetListener(mafObserver *observer) { m_Listener=observer;} \
+  mafObserver *GetListener() { return m_Listener;}
   
 /** mafEventMacro is an handy shortcut to send an Event. */
-#define mafEventMacro(e)  (Listener) ? Listener->OnEvent(e) : 0
+#define mafEventMacro(e)  if (m_Listener) {m_Listener->OnEvent(e);}
   
 /** Helper macro used for testing */  
 #define MAF_TEST(a) if (!(a)) \
