@@ -2,18 +2,21 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:43:18 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-04-01 10:18:11 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
+#include "mafIncludeWX.h" // to be removed
+
 #include "mafXMLStorage.h"
 #include "mafXMLElement.h"
 #include "mafXMLString.h"
 #include "mafStorable.h"
+#include "mafDirectory.h"
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
@@ -94,6 +97,10 @@ void mmuDOMTreeErrorReporter::resetErrors()
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
+mafCxxTypeMacro(mafXMLStorage)
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
 mafXMLStorage::mafXMLStorage()
 //------------------------------------------------------------------------------
 {
@@ -108,8 +115,36 @@ mafXMLStorage::~mafXMLStorage()
   cppDEL(m_DOM);
 }
 
+//----------------------------------------------------------------------------
+int mafXMLStorage::OpenDirectory(const char *pathname)
+//----------------------------------------------------------------------------
+{
+  mafDirectory dir;
+  if (mafString::IsEmpty(pathname))
+  {
+    if (!dir.Load("."))
+      return MAF_ERROR;
+  }
+  else
+  {
+    if (!dir.Load(pathname))
+      return MAF_ERROR;
+  }
+  
+  m_FilesDictionary.clear();
+
+  for (int i=0;i<dir.GetNumberOfFiles();i++)
+  {
+    const char *fullname=dir.GetFile(i);  
+    const char *filename=mafString::BaseName(fullname);
+    m_FilesDictionary.insert(filename);
+  }
+
+  return MAF_OK;
+}
+
 //------------------------------------------------------------------------------
-bool mafXMLStorage::ResolveInputURL(const mafString &url, mafString &filename)
+bool mafXMLStorage::ResolveInputURL(const char * url, mafString &filename)
 //------------------------------------------------------------------------------
 {
   // currently no URL support
@@ -117,13 +152,34 @@ bool mafXMLStorage::ResolveInputURL(const mafString &url, mafString &filename)
   return true;
 }
 //------------------------------------------------------------------------------
-bool mafXMLStorage::ResolveOutputURL(const mafString &url, mafString &filename)
+int mafXMLStorage::StoreToURL(const char * filename, const char * url)
 //------------------------------------------------------------------------------
 {
-  // currently no URL support
-  filename=url;
+  assert(url); // NULL url not yet supported
+
+#ifdef MAF_USE_WX
+  // currently only local files are supported
+  return wxRenameFile(filename,url)?MAF_OK:MAF_ERROR;
+#else
+  // ????
+#endif
+
   return true;
 }
+
+//------------------------------------------------------------------------------
+int mafXMLStorage::ReleaseURL(const char *url)
+//------------------------------------------------------------------------------
+{
+#ifdef MAF_USE_WX
+  // currently only local files are supported
+  return wxRemoveFile(url)?MAF_OK:MAF_ERROR;
+#else
+  // ????
+#endif
+
+}
+
 //------------------------------------------------------------------------------
 void mafXMLStorage::SetFileType(const char *filetype)
 //------------------------------------------------------------------------------
@@ -176,70 +232,73 @@ int mafXMLStorage::InternalStore()
     m_DOM->m_XMLSerializer = ( (DOMImplementationLS*)m_DOM->m_XMLImplement )->createDOMWriter();
 
     mafString filename;
-    if (ResolveOutputURL(m_URL,filename))
+
+    // initially store to a tmp file
+    GetTmpFile(filename);
+
+    m_DOM->m_XMLTarget = new LocalFileFormatTarget(filename);
+
+    // set user specified end of line sequence and output encoding
+    m_DOM->m_XMLSerializer->setNewLine( mafXMLString("\r") );
+
+    // set serializer features 
+ 	  m_DOM->m_XMLSerializer->setFeature(XMLUni::fgDOMWRTSplitCdataSections, false);
+  	m_DOM->m_XMLSerializer->setFeature(XMLUni::fgDOMWRTDiscardDefaultContent, false);
+  	m_DOM->m_XMLSerializer->setFeature(XMLUni::fgDOMWRTFormatPrettyPrint, true);
+  	m_DOM->m_XMLSerializer->setFeature(XMLUni::fgDOMWRTBOM, false);
+
+    try
     {
-      m_DOM->m_XMLTarget = new LocalFileFormatTarget(filename);
-
-      // set user specified end of line sequence and output encoding
-      m_DOM->m_XMLSerializer->setNewLine( mafXMLString("\r") );
-
-      // set serializer features 
- 	    m_DOM->m_XMLSerializer->setFeature(XMLUni::fgDOMWRTSplitCdataSections, false);
-  	  m_DOM->m_XMLSerializer->setFeature(XMLUni::fgDOMWRTDiscardDefaultContent, false);
-  	  m_DOM->m_XMLSerializer->setFeature(XMLUni::fgDOMWRTFormatPrettyPrint, true);
-  	  m_DOM->m_XMLSerializer->setFeature(XMLUni::fgDOMWRTBOM, false);
-
-      try
+      // create a document
+      m_DOM->m_XMLDoc = m_DOM->m_XMLImplement->createDocument( NULL, mafXMLString(m_FileType), NULL ); // NO URI and NO DTD
+      if (m_DOM->m_XMLDoc)
       {
-        // create a document
-        m_DOM->m_XMLDoc = m_DOM->m_XMLImplement->createDocument( NULL, mafXMLString(m_FileType), NULL ); // NO URI and NO DTD
-        if (m_DOM->m_XMLDoc)
-        {
-          // output related nodes are prefixed with "svg"
-          // to distinguish them from input nodes.
-	        m_DOM->m_XMLDoc->setEncoding( mafXMLString("UTF-8") );
-	        m_DOM->m_XMLDoc->setStandalone(true);
-	        m_DOM->m_XMLDoc->setVersion( mafXMLString("1.0") );
+        // output related nodes are prefixed with "svg"
+        // to distinguish them from input nodes.
+	      m_DOM->m_XMLDoc->setEncoding( mafXMLString("UTF-8") );
+	      m_DOM->m_XMLDoc->setStandalone(true);
+	      m_DOM->m_XMLDoc->setVersion( mafXMLString("1.0") );
 
-          // extract root element and wrap it with an mafXMLElement object
-          DOMElement *root = m_DOM->m_XMLDoc->getDocumentElement();
-          assert(root);
-          m_RootElement = new mafXMLElement(new mmuXMLDOMElement(root),NULL,this);
+        // extract root element and wrap it with an mafXMLElement object
+        DOMElement *root = m_DOM->m_XMLDoc->getDocumentElement();
+        assert(root);
+        m_RootElement = new mafXMLElement(new mmuXMLDOMElement(root),NULL,this);
 
-          // attach version attribute to the root node
-          m_RootElement->SetAttribute("Version",m_Version);
-        
-          // call Store function of the m_Root object. The root is passed
-          // as parent the DOM root element. A tree root is usually a special
-          // kind of object and can decide to store itself in the root
-          // object itself, or below it as it happens for other nodes.
-          assert(m_Root);
-          m_Root->Store(m_RootElement);
+        // attach version attribute to the root node
+        m_RootElement->SetAttribute("Version",m_Version);
+      
+        // call Store function of the m_Root object. The root is passed
+        // as parent the DOM root element. A tree root is usually a special
+        // kind of object and can decide to store itself in the root
+        // object itself, or below it as it happens for other nodes.
+        assert(m_Root);
+        m_Root->Store(m_RootElement);
 
-          // write the tree to disk
-          m_DOM->m_XMLSerializer->writeNode(m_DOM->m_XMLTarget, *(m_DOM->m_XMLDoc));
+        // write the tree to disk
+        m_DOM->m_XMLSerializer->writeNode(m_DOM->m_XMLTarget, *(m_DOM->m_XMLDoc));
 
-          // destroy all intermediate objects
-          cppDEL (m_RootElement);  
-          cppDEL (m_DOM->m_XMLDoc);
-        }    
-      }
-      catch (const DOMException& e)
-      {
-        mafErrorMessageMacro( "XML error, DOMException code is:  " << e.code );
-        errorCode = 2;
-      }
-      catch (...)
-      {
-         mafErrorMessage("XML error, an error occurred creating the XML document!");
-         errorCode = 3;
-      }
-
-      cppDEL (m_DOM->m_XMLTarget);
-      cppDEL (m_DOM->m_XMLSerializer);
-      cppDEL (m_DOM->m_XMLDoctype);
+        // destroy all intermediate objects
+        cppDEL (m_RootElement);  
+        cppDEL (m_DOM->m_XMLDoc);
+      }    
     }
-    else 
+    catch (const DOMException& e)
+    {
+      mafErrorMessageMacro( "XML error, DOMException code is:  " << e.code );
+      errorCode = 2;
+    }
+    catch (...)
+    {
+       mafErrorMessage("XML error, an error occurred creating the XML document!");
+       errorCode = 3;
+    }
+
+    cppDEL (m_DOM->m_XMLTarget);
+    cppDEL (m_DOM->m_XMLSerializer);
+    cppDEL (m_DOM->m_XMLDoctype);
+
+    // move to destination URL
+    if (StoreToURL(filename,m_URL)!=MAF_OK)
     {
       mafErrorMessage("Unable to resolve URL for output XML file");
       errorCode = 4;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorage.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:40:37 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-04-01 10:18:10 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -12,7 +12,7 @@
 #ifndef __mafStorage_h__
 #define __mafStorage_h__
 
-#include "mafConfigure.h"
+#include "mafObject.h"
 #include "mafString.h"
 #include <set>
 
@@ -39,9 +39,11 @@ class mafStorable;
   - remote files (URL access)
   - improve tmp files management
  */  
-class mafStorage
+class mafStorage: public mafObject
 {
 public:
+  mafAbstractTypeMacro(mafStorage,mafObject)
+
   mafStorage();
   virtual ~mafStorage() {}
 
@@ -69,10 +71,21 @@ public:
   mafStorable *GetRoot();
 
   /** resolve an URL and provide local filename to be used as input */
-  virtual bool ResolveInputURL(const mafString &url, mafString &filename)=0;
+  virtual bool ResolveInputURL(const char * url, mafString &filename)=0;
 
   /** resolve an URL and provide a local filename to be used as output */
-  virtual bool ResolveOutputURL(const mafString &url, mafString &filename)=0;
+  //virtual bool ResolveOutputURL(const mafCString url, mafString &filename)=0;
+
+  /** 
+    store a file to an URL. This API transfer a tmp local file to URL.
+    If no URL is specified use the storage URL as a base URL. */
+  virtual int StoreToURL(const char *filename, const char *url=NULL) = 0;
+
+  /** 
+    Remove a file from the specified URL. Used when a file in the storage
+    is no more necessary. If the specified URL is a local file name try 
+    to prepend the storage URL as a base URL name.*/
+  virtual int ReleaseURL(const char *url) = 0;
 
   /** 
     Return a name of file to be used as tmp file during store/restore.
@@ -81,6 +94,11 @@ public:
 
   /** remove the tmp file */
   void ReleaseTmpFile(const char *filename);
+
+  /** 
+    Check if a file is present in the storage directory. The directory list is 
+    open when Store() is called and directory data is updated at that time. */
+  bool IsFileInDirectory(const char *filename);
     
 protected:
   /** This is called by Store() and must be reimplemented by subclasses */
@@ -89,12 +107,16 @@ protected:
   /** This is called by Restore() and must be reimplemented by subclasses */
   virtual int InternalRestore()=0;
 
+  /** populate the list of files in the storage folder */
+  virtual int OpenDirectory(const char *dir_name)=0;
+
   mafStorable         *m_Root;        ///< root object to be stored, or being restored
   mafStorageElement   *m_RootElement; ///< root stored element
 
   mafString           m_URL;          ///< name of the file being accessed
   mafString           m_ParserURL;    ///< name of the last parsed file (used for SaveAs)
   mafID               m_TmpFileId;    ///< counter for unique tmp file naming
-  std::set<mafString> m_TmpFileNames; ///< name of tmp files in the MSF dir 
+  std::set<mafString> m_TmpFileNames; ///< name of tmp files in the MSF dir
+  std::set<mafString> m_FilesDictionary; ///< list of files in the storage folder: to be populated by OpenDirectory()
 };
 #endif // _mafStorage_h_

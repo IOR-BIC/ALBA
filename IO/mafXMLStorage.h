@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:43:18 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-01 10:18:11 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,10 +27,15 @@ class mmuXMLDOM;
   This class also defines a function to access to XML/Xerces-C specific objects, 
   stored into a PIMPL class (mmuXMLDOM).
   @sa mafStorage mafXMLElement mmuXMLDOM
+  @todo
+    - remove "IncludeWX.h" inclusion from .cpp
+    - add support for NULL destination URL
 */  
 class mafXMLStorage: public mafStorage
 {
 public:
+  mafTypeMacro(mafXMLStorage,mafStorage)
+
   mafXMLStorage();
   virtual ~mafXMLStorage();
 
@@ -46,14 +51,21 @@ public:
 
   /** The version of the file format used type of file. (default "1.1") */
   void SetVersion(const char *version);
+
   /** The version of the file format used type of file. (default "1.1") */
   const char *GetVersion();
 
   /** resolve an URL and provide local filename to be used as input */
-  virtual bool ResolveInputURL(const mafString &url, mafString &filename);
+  virtual bool ResolveInputURL(const char * url, mafString &filename);
 
   /** resolve an URL and provide a local filename to be used as output */
-  virtual bool ResolveOutputURL(const mafString &url, mafString &filename);
+  virtual int StoreToURL(const char * filename, const char * url);
+
+  /** delete file from storage */
+  virtual int ReleaseURL(const char *url);
+
+  /** populate the list of file in the directory */
+  virtual int OpenDirectory(const char *pathname);
 
 protected:
   /** This is called by Store() and must be reimplemented by subclasses */
@@ -62,8 +74,8 @@ protected:
   /** This is called by Restore() and must be reimplemented by subclasses */
   virtual int InternalRestore();
 
-  mafString  m_FileType;
-  mafString  m_Version;
-  mmuXMLDOM  *m_DOM; ///< PIMPL object storing XML objects' pointers
+  mafString  m_FileType;  ///< The type of file to be opened
+  mafString  m_Version;   ///< The version of the file to be opened
+  mmuXMLDOM  *m_DOM;      ///< PIMPL object storing XML objects' pointers
 };
 #endif // _mafXMLStorage_h_

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:41:14 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-04-01 10:18:10 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -94,7 +94,7 @@ bool mafStorageElement::GetNestedElementsByName(const char *name,std::vector<maf
 }
 
 //------------------------------------------------------------------------------
-int mafStorageElement::StoreObjectVector(const std::vector<mafObject *> &vector,const char *name,const char *items_name)
+int mafStorageElement::StoreObjectVector(const char *name,const std::vector<mafObject *> &vector,const char *items_name)
 //------------------------------------------------------------------------------
 {
   assert(name);
@@ -108,7 +108,7 @@ int mafStorageElement::StoreObjectVector(const std::vector<mafObject *> &vector,
     mafObject *object=vector[i];
     if (object)
     {
-      if (vector_node->StoreObject(object,items_name)==NULL)
+      if (vector_node->StoreObject(items_name,object)==NULL)
       {
         mafErrorMacro("Failed to store object of type \""<<object->GetTypeName()<<"\" in vector of objects");
         return MAF_ERROR;
@@ -124,7 +124,7 @@ int mafStorageElement::StoreObjectVector(const std::vector<mafObject *> &vector,
 }
 
 //------------------------------------------------------------------------------
-int mafStorageElement::RestoreObjectVector(std::vector<mafObject *> &vector,const char *name,const char *items_name)
+int mafStorageElement::RestoreObjectVector(const char *name,std::vector<mafObject *> &vector,const char *items_name)
 //------------------------------------------------------------------------------
 {
   assert(name);
@@ -132,56 +132,60 @@ int mafStorageElement::RestoreObjectVector(std::vector<mafObject *> &vector,cons
   mafStorageElement *subnode=FindNestedElement(name);
   if (subnode)
   {
-    ChildrenVector &items = subnode->GetChildren();
-    mafString numItems_str;
-    int numItems=-1;
-    if (subnode->GetAttribute("NumberOfItems",numItems_str))
-    {
-      numItems=atof(numItems_str);  
-    }
-    else
-    {
-      mafWarningMacro("Warning while restoring <"<<GetName()<<"> element: cannot find \"NumberOfItems\" attribute..." );
-    }
-
-    int num=0;
-    for (unsigned int i=0;i<items.size();i++)
-    {
-      mafStorageElement *item=items[i];
-      if (mafString::Equals(items_name,item->GetName()))
-      {
-        mafObject *object=RestoreObject(item);
-        if (object)
-        {
-          vector.push_back(object);
-        }
-        else
-        {
-          mafWarningMacro("Error while restoring <"<<GetName()<<"> element: cannot restore object");
-          return MAF_ERROR;
-        }
-        num++;
-      }    
-    }
-
-    // check if restored num of items is correct
-    if (numItems>=0&&num!=numItems)
-    {
-      mafWarningMacro("Error while restoring <"<<GetName()<<"> element: wrong number of items in Objects vector");
-      return MAF_ERROR;
-    }
-
-    return MAF_OK;
+    return RestoreObjectVector(subnode,vector,items_name);
   }
-  else
-  {
-    mafWarningMacro("Error while restoring <"<<GetName()<<"> element: cannot find nested element <"<<name<<">" );
-  }
+  
+  mafWarningMacro("Error while restoring <"<<GetName()<<"> element: cannot find nested element <"<<name<<">" );
+  
   return MAF_ERROR;
 }
 
 //------------------------------------------------------------------------------
-mafStorageElement *mafStorageElement::StoreObject(mafObject *object,const char *name)
+int mafStorageElement::RestoreObjectVector(mafStorageElement *subnode,std::vector<mafObject *> &vector,const char *items_name)
+//------------------------------------------------------------------------------
+{
+  assert(subnode);
+
+  ChildrenVector &items = subnode->GetChildren();
+
+  mafID numItems=-1;
+  if (!subnode->GetAttributeAsInteger("NumberOfItems",numItems))
+  {
+    mafWarningMacro("Warning while restoring <"<<GetName()<<"> element: cannot find \"NumberOfItems\" attribute..." );
+  }
+
+  int num=0;
+  for (unsigned int i=0;i<items.size();i++)
+  {
+    mafStorageElement *item=items[i];
+    if (mafString::Equals(items_name,item->GetName()))
+    {
+      mafObject *object=item->RestoreObject();
+      if (object)
+      {
+        vector.push_back(object);
+      }
+      else
+      {
+        mafWarningMacro("Error while restoring <"<<GetName()<<"> element: cannot restore object");
+        return MAF_ERROR;
+      }
+      num++;
+    }    
+  }
+
+  // check if restored num of items is correct
+  if (numItems>=0&&num!=numItems)
+  {
+    mafWarningMacro("Error while restoring <"<<GetName()<<"> element: wrong number of items in Objects vector");
+    return MAF_ERROR;
+  }
+
+  return MAF_OK;
+}
+
+//------------------------------------------------------------------------------
+mafStorageElement *mafStorageElement::StoreObject(const char *name,mafObject *object)
 //------------------------------------------------------------------------------
 {
   assert(name);
@@ -222,12 +226,12 @@ mafStorageElement *mafStorageElement::StoreObject(mafObject *object,const char *
 }
 
 //------------------------------------------------------------------------------
-mafObject *mafStorageElement::RestoreObject(mafStorageElement *element)
+mafObject *mafStorageElement::RestoreObject()
 //------------------------------------------------------------------------------
 {
   mafString type_name;
 
-  if (element->GetAttribute("Type",type_name)&&!type_name.IsEmpty())
+  if (GetAttribute("Type",type_name)&&!type_name.IsEmpty())
   {
     mafObject *object=mafObjectFactory::CreateInstance(type_name);
     if (object)
@@ -239,24 +243,24 @@ mafObject *mafStorageElement::RestoreObject(mafStorageElement *element)
         
         if (restorable)
         {
-          if (restorable->Restore(element)==MAF_OK)
+          if (restorable->Restore(this)==MAF_OK)
           {
             // if restored correctly 
             return object;
           }
           else
           {
-            mafErrorMacro("Problems restoring object of type "<<object->GetTypeName()<<" from element <"<<element->GetName()<<">");
+            mafErrorMacro("Problems restoring object of type "<<object->GetTypeName()<<" from element <"<<GetName()<<">");
           }
         }
         else
         {
-          mafErrorMacro("Cannot restore object of type "<<object->GetTypeName()<<" from element <"<<element->GetName()<<"> since it's a not a restorable object");
+          mafErrorMacro("Cannot restore object of type "<<object->GetTypeName()<<" from element <"<<GetName()<<"> since it's a not a restorable object");
         }
       }
       catch (std::bad_cast) 
       {
-        mafErrorMacro("Cannot restore object of type "<<object->GetTypeName()<<" from element <"<<element->GetName()<<"> since it's a not a restorable object");
+        mafErrorMacro("Cannot restore object of type "<<object->GetTypeName()<<" from element <"<<GetName()<<"> since it's a not a restorable object");
       }
       // release object memory
       object->Delete();     
@@ -265,7 +269,7 @@ mafObject *mafStorageElement::RestoreObject(mafStorageElement *element)
   else
   {
 
-    mafErrorMacro("Cannot restore object from element <"<<element->GetName()<<"> since no 'Type' attribute is present");
+    mafErrorMacro("Cannot restore object from element <"<<GetName()<<"> since no 'Type' attribute is present");
   }
 
   return NULL;
@@ -276,12 +280,12 @@ mafObject *mafStorageElement::RestoreObject(const char *name)
 //------------------------------------------------------------------------------
 {
   mafStorageElement *element=FindNestedElement(name);
-  return (element)?RestoreObject(element):NULL;
+  return (element)?element->RestoreObject():NULL;
 }
 
 
 //------------------------------------------------------------------------------
-int mafStorageElement::RestoreObject(mafObject * &object,const char *name)
+int mafStorageElement::RestoreObject(const char *name,mafObject * &object)
 //------------------------------------------------------------------------------
 {
   object=NULL;
@@ -290,31 +294,32 @@ int mafStorageElement::RestoreObject(mafObject * &object,const char *name)
 
   if (element)
   {
-    object = RestoreObject(element);
+    object = element->RestoreObject();
   }
   
   return (object)?MAF_OK:MAF_ERROR;
 }
 
 //------------------------------------------------------------------------------
-int mafStorageElement::StoreDouble(const double &value,const char *name)
+int mafStorageElement::StoreDouble(const char *name,const double &value)
 //------------------------------------------------------------------------------
 {
-  return StoreText(mafString(value),name);
+  return StoreText(name,mafString(value));
 }
 //------------------------------------------------------------------------------
-int mafStorageElement::StoreInteger(const int &value,const char *name)
+int mafStorageElement::StoreInteger(const char *name,const int &value)
 //------------------------------------------------------------------------------
 {
-  return StoreText(mafString(value),name);
+  return StoreText(name,mafString(value));
 }
 
 //------------------------------------------------------------------------------
-int mafStorageElement::RestoreDouble(double &value,const char *name)
+int mafStorageElement::RestoreDouble(const char *name,double &value)
 //------------------------------------------------------------------------------
 {
   mafString tmp;
-  if (RestoreText(tmp,name)==MAF_OK)
+
+  if (RestoreText(name,tmp)==MAF_OK)
   {
     value=atof(tmp);
     return MAF_OK;
@@ -323,14 +328,198 @@ int mafStorageElement::RestoreDouble(double &value,const char *name)
 }
 
 //------------------------------------------------------------------------------
-int mafStorageElement::RestoreInteger(int &value,const char *name)
+int mafStorageElement::RestoreDouble(double &value)
 //------------------------------------------------------------------------------
 {
   mafString tmp;
-  if (RestoreText(tmp,name)==MAF_OK)
+  if (RestoreText(tmp)==MAF_OK)
   {
     value=atof(tmp);
     return MAF_OK;
   }
+
   return MAF_ERROR;
+}
+
+//------------------------------------------------------------------------------
+int mafStorageElement::RestoreInteger(int &value)
+//------------------------------------------------------------------------------
+{
+  mafString tmp;
+  if (RestoreText(tmp)==MAF_OK)
+  {
+    value=atof(tmp);
+    return MAF_OK;
+  }
+
+  return MAF_ERROR;
+}
+
+//------------------------------------------------------------------------------
+int mafStorageElement::RestoreInteger(const char *name,int &value)
+//------------------------------------------------------------------------------
+{
+  mafString tmp;
+  if (RestoreText(name,tmp)==MAF_OK)
+  {
+    value=atof(tmp);
+    return MAF_OK;
+  }
+
+  return MAF_ERROR;
+}
+
+//------------------------------------------------------------------------------
+int mafStorageElement::RestoreText(char *&buffer)
+//------------------------------------------------------------------------------
+{
+  mafString tmp;
+  if (!RestoreText(tmp))
+  {
+    buffer=tmp.Duplicate();
+    return MAF_OK;
+  }
+
+  return MAF_ERROR;
+}
+
+
+//------------------------------------------------------------------------------
+int mafStorageElement::RestoreMatrix(const char *name,mafMatrix *matrix)
+//------------------------------------------------------------------------------
+{
+  mafStorageElement *elem=FindNestedElement(name);
+  if (elem)
+  {
+    return elem->RestoreMatrix(matrix);
+  }
+
+  mafWarningMacro("Parse Error while parsing <"<<GetName()<<"> element: cannot find nested XML element <"<<name<<">" );
+
+  return MAF_ERROR;
+}
+
+//------------------------------------------------------------------------------
+int mafStorageElement::RestoreVectorN(const char *name,double *comps,unsigned int num)
+//------------------------------------------------------------------------------
+{
+  mafStorageElement *elem=FindNestedElement(name);
+  if (elem)
+  {
+    return elem->RestoreVectorN(comps,num);
+  }
+
+  mafWarningMacro("Parse Error while parsing <"<<GetName()<<"> element: cannot find nested XML element <"<<name<<">" );
+
+  return MAF_ERROR;
+}
+//------------------------------------------------------------------------------
+int mafStorageElement::RestoreVectorN(const char *name,int *comps,unsigned int num)
+//------------------------------------------------------------------------------
+{
+  mafStorageElement *elem=FindNestedElement(name);
+  if (elem)
+  {
+    return elem->RestoreVectorN(comps,num);
+  }
+
+  mafWarningMacro("Parse Error while parsing <"<<GetName()<<"> element: cannot find nested XML element <"<<name<<">" );
+
+  return MAF_ERROR;
+}
+//------------------------------------------------------------------------------
+int mafStorageElement::RestoreVectorN(const char *name,std::vector<double> &comps,unsigned int num)
+//------------------------------------------------------------------------------
+{
+  mafStorageElement *elem=FindNestedElement(name);
+  if (elem)
+  {
+    return elem->RestoreVectorN(comps,num);
+  }
+
+  mafWarningMacro("Parse Error while parsing <"<<GetName()<<"> element: cannot find nested XML element <"<<name<<">" );
+
+  return MAF_ERROR;
+}
+//------------------------------------------------------------------------------
+int mafStorageElement::RestoreVectorN(const char *name,std::vector<int> &comps,unsigned int num)
+//------------------------------------------------------------------------------
+{
+  mafStorageElement *elem=FindNestedElement(name);
+  if (elem)
+  {
+    return elem->RestoreVectorN(comps,num);
+  }
+
+  mafWarningMacro("Parse Error while parsing <"<<GetName()<<"> element: cannot find nested XML element <"<<name<<">" );
+
+  return MAF_ERROR;
+}
+//------------------------------------------------------------------------------
+int mafStorageElement::RestoreVectorN(const char *name,std::vector<mafString> &comps,unsigned int num,const char *tag)
+//------------------------------------------------------------------------------
+{
+  mafStorageElement *elem=FindNestedElement(name);
+  if (elem)
+  {
+    return elem->RestoreVectorN(comps,num,tag);
+  }
+
+  mafWarningMacro("Parse Error while parsing <"<<GetName()<<"> element: cannot find nested XML element <"<<name<<">" );
+
+  return MAF_ERROR;
+}
+
+//------------------------------------------------------------------------------
+int mafStorageElement::RestoreText(const char *name,char *&buffer)
+//------------------------------------------------------------------------------
+{
+  mafStorageElement *elem=FindNestedElement(name);
+  if (elem)
+  {
+    return elem->RestoreText(buffer);
+  }
+ 
+  mafWarningMacro("Parse Error while parsing <"<<GetName()<<"> element: cannot find nested XML element <"<<name<<">" );
+  
+  return MAF_ERROR;
+}
+//------------------------------------------------------------------------------
+int mafStorageElement::RestoreText(const char *name,mafString &buffer)
+//------------------------------------------------------------------------------
+{
+  mafStorageElement *elem=FindNestedElement(name);
+  if (elem)
+  {
+    return elem->RestoreText(buffer);
+  }
+
+  mafWarningMacro("Parse Error while parsing <"<<GetName()<<"> element: cannot find nested XML element <"<<name<<">" );
+
+  return MAF_ERROR;
+}
+//------------------------------------------------------------------------------
+bool mafStorageElement::GetAttributeAsDouble(const char *name,double &value)
+//------------------------------------------------------------------------------
+{
+  mafString tmp;
+  if (GetAttribute(name,tmp))
+  {
+    value=atof(tmp);
+    return true;
+  }
+  return false;
+}
+
+//------------------------------------------------------------------------------
+bool mafStorageElement::GetAttributeAsInteger(const char *name,mafID &value)
+//------------------------------------------------------------------------------
+{
+  mafString tmp;
+  if (GetAttribute(name,tmp))
+  {
+    value=atof(tmp);
+    return true;
+  }
+  return false;
 }

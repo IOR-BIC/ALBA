@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLElement.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:42:23 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-04-01 10:18:11 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -44,59 +44,56 @@ public:
   virtual const char *GetName();
 
   /** Store a generic text into an XML document */
-  virtual int StoreText(const char *text,const char *name);
+  virtual int StoreText(const char *name, const char *text);
 
   /** Store a matrix into an XML document */
-  virtual int StoreMatrix(mafMatrix *matrix,const char *name);
+  virtual int StoreMatrix(const char *name,mafMatrix *matrix);
 
   /** Store a vectorN into an XML document */
-  virtual int StoreVectorN(const std::vector<double> &comps,int num,const char *name);
-  virtual int StoreVectorN(double *comps,int num,const char *name);
+  virtual int StoreVectorN(const char *name,const std::vector<double> &comps,int num);
+  virtual int StoreVectorN(const char *name,double *comps,int num);
 
   /** Store a vectorN into an XML document */
-  virtual int StoreVectorN(const std::vector<int> &comps,int num,const char *name);
-  virtual int StoreVectorN(int *comps,int num,const char *name);
+  virtual int StoreVectorN(const char *name,const std::vector<int> &comps,int num);
+  virtual int StoreVectorN(const char *name,int *comps,int num);
 
   /** Store a vectorN into an XML document */
-  virtual int StoreVectorN(const std::vector<mafString> &comps,int num,const char *name,const char *tag);
+  virtual int StoreVectorN(const char *name,const std::vector<mafString> &comps,int num,const char *tag);
 
   /** Store 8bit binary data. Not yet supported. */
-  //virtual int StoreData(const char *data, const int size,const char *name);
+  //virtual int StoreData(const char *name,const char *data, const int size);
 
   /** Store 16bit binary data. Not yet supported. */
-  //virtual int StoreData16(const short *data, const int size,const char *name);
+  //virtual int StoreData16(const char *name,const short *data, const int size);
 
   /** Store 32bit binary data. Not yet supported. */
-  //virtual int StoreData32(const long *data, const int size,const char *name);
+  //virtual int StoreData32(const char *name,const long *data, const int size);
 
   /** Store 8bit binary data. Not yet supported. */
-  //virtual int RestoreData(char *data, const int size,const char *name);
+  //virtual int RestoreData(const char *name,char *data, const int size);
 
   /** Store 16bit binary data. Not yet supported. */
-  //virtual int RestoreData16(short *data, const int size,const char *name);
+  //virtual int RestoreData16(const char *name,short *data, const int size);
 
   /** Store 32bit binary data. Not yet supported. */
-  //virtual int RestoreData32(long *data, const int size,const char *name);
+  //virtual int RestoreData32(const char *name,long *data, const int size);
   
   /** Restore a matrix from an XML document */
-  virtual int RestoreMatrix(mafMatrix *matrix,const char *name);
+  virtual int RestoreMatrix(mafMatrix *matrix);
 
   /** Restore a vectorN from an XML document */
-  virtual int RestoreVectorN(std::vector<double> &comps,unsigned int num,const char *name);
-  virtual int RestoreVectorN(double *comps,unsigned int num,const char *name);
+  virtual int RestoreVectorN(std::vector<double> &comps,unsigned int num);
+  virtual int RestoreVectorN(double *comps,unsigned int num);
 
   /** Restore a vectorN from an XML document */
-  virtual int RestoreVectorN(std::vector<int> &comps,unsigned int num,const char *name);
-  virtual int RestoreVectorN(int *comps,unsigned int num,const char *name);
+  virtual int RestoreVectorN(std::vector<int> &comps,unsigned int num);
+  virtual int RestoreVectorN(int *comps,unsigned int num);
 
   /** Restore a vectorN from an XML document */
-  virtual int RestoreVectorN(std::vector<mafString> &comps,unsigned int num,const char *name,const char *tag);
+  virtual int RestoreVectorN(std::vector<mafString> &comps,unsigned int num,const char *tag);
 
   /** Restore a generic text string from an XML document */
-  virtual int RestoreText(char *&buffer,const char *name);
-
-  /** Restore a generic text string from an XML document */
-  virtual int RestoreText(mafString &buffer,const char *name);
+  virtual int RestoreText(mafString &buffer);
 
   /** return a pointer to the storage who created this element */
   mafXMLStorage *GetXMLStorage();

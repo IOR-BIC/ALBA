@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:40:37 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-04-01 10:18:10 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -12,6 +12,10 @@
 
 #include "mafStorage.h"
 #include "mafStorable.h"
+
+//------------------------------------------------------------------------------
+mafCxxAbstractTypeMacro(mafStorage);
+//------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 mafStorage::mafStorage()
@@ -60,6 +64,13 @@ const char *mafStorage::GetPareserURL()
 //------------------------------------------------------------------------------
 {
   return m_ParserURL;
+}
+
+//----------------------------------------------------------------------------
+bool mafStorage::IsFileInDirectory(const char *filename)
+//----------------------------------------------------------------------------
+{
+  return m_FilesDictionary.find(filename)!=m_FilesDictionary.end();
 }
 
 //------------------------------------------------------------------------------
