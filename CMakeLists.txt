@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2004-12-15 09:16:38 $
-# Version:   $Revision: 1.11 $
+# Date:      $Date: 2004-12-22 10:14:39 $
+# Version:   $Revision: 1.12 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -78,10 +78,10 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/mafConfigure.h.in
 #-----------------------------------------------------------------------------
 # Check if MFL is inside the MAF tree.
 #-----------------------------------------------------------------------------
-MAF_SUBPROJECT(MFL mfl)
+MAF_SUBPROJECT(MFL Libraries)
 
 IF (MFL_CONFIG_FOUND)
-  FIND_FILE (USE_MFL_FILE UseMFL.cmake "${MAF_BINARY_DIR}/mfl") 
+  FIND_FILE (USE_MFL_FILE UseMFL.cmake "${MAF_BINARY_DIR}/Libraries") 
   IF (USE_MFL_FILE)
     DBG_MESSAGE("MAF: MFL Configured")
     SET (MAF_CAN_BUILD 1)

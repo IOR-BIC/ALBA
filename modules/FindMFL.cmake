@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: FindMFL.cmake,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2004-08-25 13:48:42 $
-# Version:   $Revision: 1.1 $
+# Date:      $Date: 2004-12-22 10:14:50 $
+# Version:   $Revision: 1.2 $
 #
 # Description: Find the MFL location. MFL package can be shared by two
 # different MAF distributions.
@@ -31,7 +31,7 @@ STRING(REGEX REPLACE "/;" ";" MFL_DIR_SEARCH2 "${MFL_DIR_SEARCH1}")
 # Construct a set of paths relative to the system search path.
 SET(MFL_DIR_SEARCH "")
 FOREACH(dir ${MFL_DIR_SEARCH2})
-  SET(MFL_DIR_SEARCH ${MFL_DIR_SEARCH} "${dir}/../lib/mfl")
+  SET(MFL_DIR_SEARCH ${MFL_DIR_SEARCH} "${dir}/../lib/Libraries")
 ENDFOREACH(dir)
 
 #
@@ -43,8 +43,8 @@ FIND_PATH(MFL_BINARY_PATH UseMFL.cmake
   ${MFL_DIR_SEARCH}
 
   # Look in standard UNIX install locations.
-  /usr/local/lib/mfl
-  /usr/lib/mfl
+  /usr/local/lib/Libraries
+  /usr/lib/Libraries
 
   # Read from the CMakeSetup registry entries.  It is likely that
   # MFL will have been recently built.
@@ -58,20 +58,20 @@ FIND_PATH(MFL_BINARY_PATH UseMFL.cmake
   [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild8]
   [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild9]
   [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild10]
-  [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild1]\\mfl
-  [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild2]\\mfl
-  [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild3]\\mfl
-  [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild4]\\mfl
-  [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild5]\\mfl
-  [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild6]\\mfl
-  [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild7]\\mfl
-  [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild8]\\mfl
-  [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild9]\\mfl
-  [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild10]\\mfl
-  ../mfl
+  [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild1]\\Libraries
+  [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild2]\\Libraries
+  [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild3]\\Libraries
+  [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild4]\\Libraries
+  [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild5]\\Libraries
+  [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild6]\\Libraries
+  [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild7]\\Libraries
+  [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild8]\\Libraries
+  [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild9]\\Libraries
+  [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild10]\\Libraries
+  ../Libraries
 
   # Help the user find it if we cannot.
-  DOC "The directory containing UseMFL.cmake.  This is either the root of the build tree, or PREFIX/lib/mfl for an installation."
+  DOC "The directory containing UseMFL.cmake.  This is either the root of the build tree, or PREFIX/lib/Libraries for an installation."
 )
 
 ## TODO: Load cache information
