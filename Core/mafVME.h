@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:28:40 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-02-21 19:13:12 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,9 +21,10 @@
 class mafVMEIterator;
 class mafMatrix;
 class mafTransform;
-class mafBounds;
-/*class mafVMEItemArray;
+class mafOBB;
+class mafVMEItemArray;
 class mafMatrixVector;
+/*
 class mflDataPipe;
 class mafMatrixPipe;
 class vtkLinearTransform;
@@ -147,95 +148,62 @@ public:
     of the tree is set by sending an event with id VME_TIME_SET*/
   void SetTreeTime(mafTimeStamp t);
 
-  /**
-  Return the matrix vector associated with this VME*/
-  //mafMatrixVector *GetVMatrix() {return this->MatrixVector;}
-  //mafMatrixVector *GetMatrixVector() {return this->GetVMatrix();}
+  /**  
+    Return the matrix vector associated with this VME. Matrix vector is an array of
+    time stamped 4x4 matrices, used to generate the output VME pose matrix. The matrix
+    vector is made persistent by saving it in the MSF-XML file (or other kind of storage
+    for metadata).
+    This array can be NULL for VMEs generating the output matrix procedurally starting from from
+    different sources. */
+  mafMatrixVector *GetMatrixVector();
 
   /**
-  Set the Pose matrix of the VME. This function modifies the MatrixVector. You can
-  set or get the Pose for a specified time. When setting, if the time does not exist
-  the MatrixVector creates a new KeyMatrix on the fly. When getting, the matrix vector
-  interpolates on the fly according to the matrix interpolator.*/
-  void SetMatrix(mafMatrix *mat) {this->SetPose(mat);}
+    Set the Pose matrix of the VME. This function modifies the MatrixVector. You can
+    set or get the Pose for a specified time. When setting, if the time does not exist
+    the MatrixVector creates a new KeyMatrix on the fly. When getting, the matrix vector
+    interpolates on the fly according to the matrix interpolator.*/
+  void SetMatrix(mafMatrix *mat);
   /** Set VME pose matrix for the given time */
   void SetMatrix(vtkMatrix4x4 *mat, mafTimeStamp t=-1);
-  /** Set VME pose matrix for the given time */
-  void SetPose(double x,double y,double z,double rx,double ry,double rz, mafTimeStamp t=-1);
-  /** Set VME pose matrix for the given time */
-  virtual void SetPose(double xyz[3],double rxyz[3], mafTimeStamp t=-1);
-
+ 
   /** apply a transform to the VME pose matrix */
   void ApplyTransform(vtkLinearTransform *transform,int premultiply,mafTimeStamp t=-1);
   /** apply a matrix to the VME pose matrix */
   void ApplyMatrix(vtkMatrix4x4 *matrix,int premultiply,mafTimeStamp t=-1);
 
-  /* Return the VME pose, this function queries the MatrixPipe for producing a matrix */
-  void GetPose(double &x,double &y,double &z,double &rx,double &ry,double &rz,mafTimeStamp t=-1);
-  /* Return the VME pose */
-  void GetPose(double xyz[3],double rxyz[3],mafTimeStamp t=-1);
-  /* Return the VME pose */
-  virtual void GetPose(mafMatrix *matrix,mafTimeStamp t=-1);
-  /* Return the VME pose matrix */
-  virtual mafMatrix *GetPose();
-  /* Return the VME pose */
-  mafMatrix *GetMatrix() {return this->GetPose();}
-  /* Return the VME pose */
-  void GetMatrix(mafMatrix *matrix,mafTimeStamp t=-1) {this->GetPose(matrix,t);}
+  /* Query functions to be moved to Output data structure */
+  /** Return the VME pose, this function queries the MatrixPipe for producing a matrix */
+  //void GetPose(double &x,double &y,double &z,double &rx,double &ry,double &rz,mafTimeStamp t=-1);
+  /** Return the VME pose */
+  //void GetPose(double xyz[3],double rxyz[3],mafTimeStamp t=-1);
+  /** Return the VME pose */
+  //virtual void GetPose(mafMatrix *matrix,mafTimeStamp t=-1);
+  /** Return the VME pose matrix for the current time */
+  //virtual mafMatrix *GetPose();
+  /** Return the VME pose matrix for the current time */
+  //mafMatrix *GetMatrix() {return this->GetPose();}
+  /** Return the VME pose matrix for the give time */
+  //void GetMatrix(mafMatrix *matrix,mafTimeStamp t=-1) {this->GetPose(matrix,t);}
   
-  /**
-  Set/Get the position of the VME, preserving the orientation. This function modifies the MatrixVector.*/
-  void SetPosition(double x,double y,double z, mafTimeStamp t=-1);
-  virtual void SetPosition(double xyz[3], mafTimeStamp t);
-  void GetPosition(double &x,double &y,double &z,mafTimeStamp t=-1);
-  void GetPosition(double xyz[3],mafTimeStamp t=-1);
-
-  /**
-  Set/Get the orientation of the VME, preserving the position. This function modifies the MatrixVector.*/
-  void SetOrientation(double rx,double ry,double rz, mafTimeStamp t=-1);
-  virtual void SetOrientation(double rxyz[3], mafTimeStamp t);
-  void GetOrientation(double &rx,double &ry,double &rz,mafTimeStamp t=-1);
-  void GetOrientation(double rxyz[3],mafTimeStamp t=-1);
+  /** Set the global pose of this VME for the given time "t". This function usually modifies the MatrixVector. */
+  void SetAbsMatrix(double x,double y,double z,double rx,double ry,double rz, mafTimeStamp t=-1);
+  /** Set the global pose of this VME for the given time "t". This function usually modifies the MatrixVector. */
+  void SetAbsMatrix(double xyz[3],double rxyz[3], mafTimeStamp t);
+  /** Set the global pose of this VME for the given time "t". This function usually modifies the MatrixVector. */
+  void SetAbsMatrix(mafMatrix *matrix);
+  /** Set the global pose of this VME for the given time "t". This function usually modifies the MatrixVector. */
+  void SetAbsMatrix(vtkMatrix4x4 *matrix,mafTimeStamp t = -1);
   
-  /**
-  Set/Get the scale factor for the matrix at the given time*/
-  //void SetScale(double sx,double sy,double sz,mafTimeStamp t=-1);
-  //void SetScale(double sxyz[3],mafTimeStamp t=-1);
-  void GetScale(double sxyz[3],mafTimeStamp t=-1);
-  void GetScale(double &sx,double &sy,double &sz,mafTimeStamp t=-1);
 
-   /**
-  Set/Get the position of the VME, preserving the orientation. This function modifies the MatrixVector.*/
-  void SetAbsPosition(double x,double y,double z, mafTimeStamp t=-1);
-  void SetAbsPosition(double xyz[3], mafTimeStamp t);
-  void GetAbsPosition(double &x,double &y,double &z,mafTimeStamp t=-1);
-  void GetAbsPosition(double xyz[3],mafTimeStamp t=-1);
-
-  /**
-  Set/Get the orientation of the VME, preserving the position. This function modifies the MatrixVector.*/
-  void SetAbsOrientation(double rx,double ry,double rz, mafTimeStamp t=-1);
-  void SetAbsOrientation(double rxyz[3], mafTimeStamp t);
-  void GetAbsOrientation(double &rx,double &ry,double &rz,mafTimeStamp t=-1);
-  void GetAbsOrientation(double rxyz[3],mafTimeStamp t=-1);
-
-  /** Set the global pose of this VME for the given time "t"*/
-  void SetAbsPose(double x,double y,double z,double rx,double ry,double rz, mafTimeStamp t=-1);
-  /** Set the global pose of this VME for the given time "t"*/
-  void SetAbsPose(double xyz[3],double rxyz[3], mafTimeStamp t);
-  /** Set the global pose of this VME for the given time "t"*/
-  void SetAbsPose(mafMatrix *matrix);
-  /** Set the global pose of this VME for the given time "t"*/
-  void SetAbsPose(vtkMatrix4x4 *matrix,mafTimeStamp t = -1);
-  /** Set the global pose of this VME for the given time "t"*/
-
-  /** Get the global pose of this VME for the given time "t"*/
-  void GetAbsPose(mafMatrix *matrix,mafTimeStamp t=-1);
-  /** Get the global pose of this VME for the given time "t"*/
-  mafMatrix *GetAbsPose();
-  /** Get the global pose of this VME for the given time "t"*/
-  void GetAbsPose(double &x,double &y,double &z,double &rx,double &ry,double &rz,mafTimeStamp t=-1);
-  /** Get the global pose of this VME for the given time "t"*/
-  void GetAbsPose(double xyz[3],double rxyz[3],mafTimeStamp t=-1);
+  /* To be moved to the output data structure */
+  /** Get the global pose of this VME for the given time "t". This function usually modifies the MatrixVector. */
+  //void GetAbsMatrix(mafMatrix *matrix,mafTimeStamp t=-1);
+  /** Get the global pose of this VME for the given time "t". This function usually modifies the MatrixVector. */
+  //mafMatrix *GetAbsMatrix();
+  /** Get the global pose of this VME for the given time "t". This function usually modifies the MatrixVector. */
+  //void GetAbsMatrix(double &x,double &y,double &z,double &rx,double &ry,double &rz,mafTimeStamp t=-1);
+  /** Get the global pose of this VME for the given time "t". This function usually modifies the MatrixVector. */
+  //void GetAbsMatrix(double xyz[3],double rxyz[3],mafTimeStamp t=-1);
 
   /** apply a transform to the VME abs pose matrix */
   void ApplyAbsTransform(vtkLinearTransform *transform,int premultiply,mafTimeStamp t=-1);
@@ -243,31 +211,14 @@ public:
   void ApplyAbsMatrix(vtkMatrix4x4 *matrix,int premultiply,mafTimeStamp t=-1);
  
   /**
-  Update and return the AbsMatrix stored into this VME. */
-  mafMatrix *GetAbsMatrix() {return this->GetAbsPose();}
-  void GetAbsMatrix(mafMatrix *mat,mafTimeStamp t=-1) {this->GetAbsPose(mat,t);}
-
-  /**
-  Update the Absolute Matrix of this VME. This is called automatically by 
-  SetCurrentTime if AutoUpdateAbsMatrix flag is ON.*/
-  //void UpdateAbsMatrix(mafTimeStamp t=-1);
-
-  /**
-  return a new Tree iterator already set to traverse 
-  the sub tree starting a this node*/
-  mafVMEIterator *NewIterator();
-
-  /**
-  return the name of this VME*/
-  const char *GetName() {return this->Name.GetCStr();};
-  void GetName(mflString &name) {name=this->Name;};
-  void SetName(const char *name) {this->Name=name;this->Modified();};
-  void SetName(mflString name) {this->Name=name;this->Modified();};
+    return a new Tree iterator already set to traverse 
+    the sub tree starting a this node*/
+  //mafVMEIterator *NewIterator();
 
   /**
   Compare two VME. Two VME are considered equivalent if they have equivalent 
   items, TagArrays, MatrixVectors, Name and Type. */
-  bool Equals(mafVME *vme);
+  bool Equals(mafVME *vme) {return Equals((mafNode *)vme);}
 
   /**
   Compare the two subtrees starting at this VME and at the given one. Two trees
@@ -568,8 +519,8 @@ private:
   mafVME(const mafVME&); // Not implemented
   void operator=(const mafVME&); // Not implemented
 
-  friend void mafVMEItem::UpdateData();
-  static mafVME *New() {return NULL;}
+   /** Compare two nodes. Privatized to force the usage of the one accepting a VME as argument. */
+  virtual bool Equals(mafNode *vme);
 };
 
 #endif
