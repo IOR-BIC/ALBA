@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-25 19:17:20 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2004-11-29 21:15:48 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -65,14 +65,15 @@ typedef unsigned long mafID;
 #define vtkNEW(a) a=a->New()
 
 /** Delete a MAF object */
-#define mafDEL(a) if (a) {delete a; a = NULL;}
+//#define mafDEL(a) if (a) {delete a; a = NULL;}
+
 
 /**
   Macro used by mafObjects for RTTI information. This macro must be placed
   in the class definition public section. */
 #define mafAbstractTypeMacro(thisClass,superclass) \
   private: \
-  static mafID TypeId; \
+  static mafID m_TypeId; \
   public: \
   typedef superclass Superclass; \
   static mafID GetTypeId(); \
@@ -90,17 +91,19 @@ typedef unsigned long mafID;
   in the class definition public section. */
 #define mafTypeMacro(thisClass,superclass) \
   mafAbstractTypeMacro(thisClass,superclass); \
-  static mafObject *NewObjectInstance(); \
+  static mafObject *NewObject(); \
   virtual mafObject *NewInternalInstance() const; \
-  thisClass *NewInstance() const;
+  thisClass *NewInstance() const; \
+  static thisClass *New();
+  
 
 /**
   Macro used by mafObjects for RTTI information. This macor must be placed
   in the .cpp file. */
 #define mafCxxAbstractTypeMacro(thisClass) \
-  mafID thisClass::TypeId = GetNextTypeId(#thisClass); \
-  mafID thisClass::GetTypeId() {return thisClass::TypeId;} \
-  mafID thisClass::GetClassId() const {return thisClass::TypeId;} \
+  mafID thisClass::m_TypeId = GetNextTypeId(#thisClass); \
+  mafID thisClass::GetTypeId() {return thisClass::m_TypeId;} \
+  mafID thisClass::GetClassId() const {return thisClass::m_TypeId;} \
   const char *thisClass::GetTypeName() {return #thisClass;} \
   const char *thisClass::GetClassName() const {return #thisClass;} \
   int thisClass::IsTypeOf(const char *type) \
@@ -113,7 +116,7 @@ typedef unsigned long mafID;
   } \
   int thisClass::IsTypeOf(const mafID type) \
   { \
-    if ( type==thisClass::TypeId) \
+    if ( type==thisClass::m_TypeId) \
     { \
       return 1; \
     } \
@@ -123,7 +126,7 @@ typedef unsigned long mafID;
   int thisClass::IsA(const mafID type) const {return IsTypeOf(type);} \
   thisClass* thisClass::SafeDownCast(mafObject *o) \
   { \
-    if ( o && o->IsA(thisClass::TypeId) ) \
+    if ( o && o->IsA(thisClass::m_TypeId) ) \
     { \
       return static_cast<thisClass *>(o); \
     } \
@@ -132,17 +135,23 @@ typedef unsigned long mafID;
 
 
 /**
-  Macro used by mafObjects for RTTI information. This macor must be placed
+  Macro used by mafObjects for RTTI information. This macro must be placed
   in the .cpp file. */
 #define mafCxxTypeMacro(thisClass) \
   mafCxxAbstractTypeMacro(thisClass); \
-  mafObject *thisClass::NewObjectInstance() \
+  mafObject *thisClass::NewObject() \
   { \
-    return new thisClass; \
+    thisClass *obj = new thisClass; \
+    if (obj) obj->HeapFlag=true; \
+    return obj; \
   } \
   mafObject *thisClass::NewInternalInstance() const \
   { \
-    return NewObjectInstance(); \
+    return NewObject(); \
+  } \
+  thisClass *thisClass::New() \
+  { \
+    return thisClass::SafeDownCast(NewObject()); \
   } \
   thisClass *thisClass::NewInstance() const \
   { \
