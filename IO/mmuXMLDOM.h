@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuXMLDOM.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-29 18:00:28 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-01-24 14:59:19 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -30,7 +30,10 @@ XERCES_CPP_NAMESPACE_USE
 //------------------------------------------------------------------------------
 // mmuXMLDOM
 //------------------------------------------------------------------------------
-/** Utility class to catch XML error rised while working with DOM */
+/** PIMPL class to hide XercesC specific objects. 
+  This class is internally used by mafXMLStorage and mafXMLElement for accessing
+  XML DOM objects.
+*/
 class mmuXMLDOM: public mmuUtility
 {
 public:
