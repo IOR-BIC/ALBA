@@ -1,29 +1,47 @@
-MAF Multimod Application Framework
-Instruction for building CosmoMAF:
+openMAF (Multimod Application Framework)
 
+Instructions for building:
 
 WINDOWS:
-MAF currently compiles only under Windows and its building has been tested with the following configuration:
-- CMake 2.0.x from kitware (see later)
+MAF compilation under Windows has been tested with the following configuration:
+- CMake 2.0.x and 2.1.x from kitware (see later)
 - Microsoft Visual Studio 6 (SP5).
-
 
 Setup and Build:
    1. Place somewhere the source dir (typically e.g. c:\MyProject\openMAF)
-   2. Download Cmake 2.0.x from the kitware web site:  http://www.cmake.org/HTML/Download.html
+   2. Download Cmake from the kitware web site:  http://www.cmake.org/HTML/Download.html
    3. Run CMake and configure the project, by specifying the source tree (e.g. c:\MyProject\openMAF) and where to place the compiled binaries (CMake will create one for you if not existing). Configuring will take some steps: simply continue to press the "Configure" button until all fields become gray, and then press "OK" to generate the project file.*
-   4. Using Visual Studio 6 (I'm sorry but VS7 or later won't work) and open the "maf.dsw" workspace file in the build directory. Note: it's a very big project, since it includes VTK, ITK and wxWindows, it will take some time to parse all classes (currently, we only support the full source distribution): wait until all classes have been parsed.
-   5. Compile and build (F7) the project.
-   6. Compilation process is generally time-consuming but it should not return any errors. Close down Visual Studio and reOpen with subproject cosmoMAF.dsp.** 
-   (5. You'll found a subproject called "Datamanager": that's the main multimod application. Compile it (I suggest you to verify the "Build->Set Active Configuration" is set to "Datamanager - Win32 Debug", since sometimes the compiler switches automatically to "RelWithDebInfo"))
+   4. Using Visual Studio 6 (I'm sorry but VS7 or later won't work yet) and open the "MAF.dsw" workspace file in the build directory.
+   5. Compile and build the project. Visual Studio should select automatically the "ALL_BUILD" subproject.
+   6. First compilation process is generally time-consuming but it should not return any errors.   
 
+CMake 2.0.x problems: we noticed the autoconfiguration of external projects (VTK, ITK, etc.) has problems with such a version. To make it to work it's necessary to add the visual studio executables directory in the system PATH. When installing VS6 it's an option to register all the PATHs in system variable. Alternativelly you'll have to use vcvars32.bat script to set the environment. The current CMake development version (2.1.x) seems to have solved such a problem.
 
-Some extra hints:
-   *To speedup the compilation it is reccomended to disable the "VTK_USE_ANSI_STDLIB" option from in the CMake panel, this will increase compile time up to 4x. Currently defualt is ANSI_STD on, but we still support non-ANSI compilation to speed up the compile time with VC6.
-   **Once you have compiled the whole project, you can go to a subdirectory in the Build directory and open a subproject (e.g. cosmoMAF.dsp) to speed up your load and compile times. By opening the ".dsp" file, visual studio will automatically generate a corresponding .dsw one. I reccomend you to add the following subprojects to the workspace (that you can find in the Buid directory): 
-      - "mafCore.dsp" 
-      - "mafLibrary.dsp" 
-      - "mflCore.dsp" 
-      - "vtkSVTK.dsp" 
-   and set the Datamanager dependencies from the Project->Dependencies menu accordingly.
-   ***For some reason, the Active Configuration (in the Build menu) may set itself to "Win32 RelWithDebInfo". Always, make sure it is set to "Win32 Debug".
+Linux:
+MAF compilation under Linux has been tested with the following configuration:
+- CMake 2.0.x and 2.1.x from kitware
+- Make+GCC and  Kdevelop3 (Fedora Core 2 versions)
+
+Setup and Build:
+   1. Place somewhere the source dir (typically e.g. ~/openMAF)
+   2. Download Cmake from the kitware web site:  http://www.cmake.org/HTML/Download.html. For binary version simply untar it (e.g. inside /usr/local) or compile and install it.
+
+For Makefile only configuration:
+   3. Create a new directory where to place binaries (e.g. ~/build.openMAF), and change current directory to it.
+   4. Run CMake by specifying source directory as an argument: (e.g. "ccmake ../openMAF")
+   5  Configure the project by pressing "c" key until the "g" (generation) command is enabled and then press "g" to generate the makefiles
+   6. build all by running the "make" command.
+   7. enter the "bin" subdirectory and run one of the examples (currently none!)
+
+For KDevelop3 configuration:   
+   3. Run CMake directly inside the source tree by specifying the "KDevelop3" generator: "ccmake -GKDevelop3"
+   4  Configure the project by pressing "c" key until the "g" (generation) command is enabled and then press "g" to generate the projects
+   5. open the MAF.kdevelop project
+   6. build all by pressing F8 or from menu.
+   7. enter the "bin" subdirectory and run one of the examples (currently none!)
+
+Note:
+No installation process is currently supported.
+No compilation of external applications is currently supported.
+Currently only some base classes has been ported to the new tree. 
+Enable testing flag to compile test programs unsing new classes.
