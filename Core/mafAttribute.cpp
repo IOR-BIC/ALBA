@@ -2,14 +2,15 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttribute.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-16 15:39:12 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-06 21:20:32 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 #include "mafAttribute.h"
+#include "mafStorageElement.h"
 #include "mafIndent.h"
 #include "assert.h"
 
@@ -71,10 +72,23 @@ const char *mafAttribute::GetName() const
 }
 
 //-------------------------------------------------------------------------
+int mafAttribute::InternalStore(mafStorageElement *parent)
+//-------------------------------------------------------------------------
+{
+  return parent->StoreText("Name",m_Name);
+}
+
+//-------------------------------------------------------------------------
+int mafAttribute::InternalRestore(mafStorageElement *node)
+//-------------------------------------------------------------------------
+{
+  return node->RestoreText("Name",m_Name);
+}
+//-------------------------------------------------------------------------
 void mafAttribute::Print(std::ostream& os, const int tabs) const
 //-------------------------------------------------------------------------
 {
   mafIndent indent(tabs);
 
-  os << indent << "Name: " << m_Name << std::endl;
+  os << indent << "Name: " << m_Name.GetCStr() << std::endl;
 }

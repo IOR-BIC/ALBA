@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttribute.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 15:42:13 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-06 21:20:32 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -57,6 +57,10 @@ public:
   /** dump the object to output stream */
   virtual void Print(std::ostream& os, const int tabs=0) const;
 protected:
+  
+  virtual int InternalStore(mafStorageElement *parent);
+  virtual int InternalRestore(mafStorageElement *node);
+
   mafString m_Name;
 };
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTagArray.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:06:58 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-06 21:22:46 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -91,6 +91,9 @@ public:
 
   /** return the container of the tags stored in this attribute */
   mmuTagsMap *GetTagsContainer() {return &m_Tags;}
+
+  /** dump tags stored into this array */
+  virtual void Print(std::ostream& os, const int tabs=0) const;
 
 protected:
   
