@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 14:21:29 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-04-04 11:50:08 $
+  Version:   $Revision: 1.13 $
   Authors:   originally based on vtkString (www.vtk.org), rewritten Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -222,8 +222,8 @@ public:
   const bool operator<=(const char *a) const;
   const bool operator>=(const char *a) const;
 
-  friend MAF_EXPORT std::ostream& operator<<(std::ostream& os, const mafString& s);
-  friend MAF_EXPORT std::istream& operator>>(std::istream& is, mafString& s);
+  //friend MAF_EXPORT std::ostream& operator<<(std::ostream& os, const mafString& s);
+  //friend MAF_EXPORT std::istream& operator>>(std::istream& is, mafString& s);
 
   mafString &operator<<(const char *a) {return Append(a);};
 

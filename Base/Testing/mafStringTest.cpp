@@ -8,8 +8,8 @@ int main()
   mafString number(150.2567890123456); // 16 digits precision
   
   // streaming towards standard output
-  std::cout<<hello<<std::endl;
-  std::cout<<number<<std::endl;
+  std::cout<<hello.GetCStr()<<std::endl;
+  std::cout<<number.GetCStr()<<std::endl;
 
   // test the contents and the length of the numerical string
   MAF_TEST(number=="150.2567890123456")

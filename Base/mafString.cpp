@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 14:21:21 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-04-04 11:50:08 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -98,12 +98,13 @@ mafString &mafString::operator=(const wxString &src)
   return *this;
 }
 #endif
-
+/*
 //----------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& os, const mafString& s)
 //----------------------------------------------------------------------------
 {
-  os << s.GetCStr();
+  const char *str=s.GetCStr();
+  os << str;
   return os;
 }
 
@@ -115,7 +116,7 @@ void mafString::operator>>(std::istream &is)
   is >> tmp;
   *this=tmp.c_str();
 }
-
+*/
 //SIL. 16-3-2005: begin
 //TODO: verify portability of _snprintf ---- replace with NPrintf
 //Marco. 1-4-2005: chnged _snprintf with NPrintf()
@@ -170,7 +171,14 @@ mafString &mafString::operator<<( mafString *s )
 const char * mafString::GetCStr() const
 //----------------------------------------------------------------------------
 {
-  return m_Size>0?m_CStr:m_ConstCStr;
+  if (m_Size>0)
+  {
+    return m_CStr;
+  }
+  else
+  { 
+    return m_ConstCStr;
+  }
 }
 
 //----------------------------------------------------------------------------
