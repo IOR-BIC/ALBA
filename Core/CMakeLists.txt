@@ -10,6 +10,8 @@ DBG_MESSAGE("Configuring project mafCore")
 SET(PROJECT_SRCS
   mafCoreFactory.cpp
   mafCoreFactory.h
+  mafCoreDecl.cpp
+  mafCoreDecl.h
   mafEventBase.cpp
   mafEventBase.h
   mafEventSource.cpp
