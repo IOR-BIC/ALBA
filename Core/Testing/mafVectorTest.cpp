@@ -21,7 +21,7 @@ int main()
 { 
   bool flags[10];
   mafVector<mafAutoPointer<mafTestObject> > oarray;
-
+  
   // Test with an array of smart pointers
   int i;
   for (i=0;i<10;i++)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeIterator.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-02 13:28:59 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-12-02 21:07:05 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -16,6 +16,7 @@
 #include "mafObject.h"
 #include "mafNode.h"
 #include "mafVector.h"
+#include "mafEventSource.h"
 
 /** mafNodeIterator - an m-way tree data structure iterator
   mafNodeIterator is a class to traverse a tree data structure. It allows 
@@ -96,7 +97,8 @@ public:
   //void SetTraversalModeToInOrder() {this->SetTraversalMode(InOrder);}
   
   enum traversalMode {PreOrder=0,PostOrder};
-  enum callbacks {PreTraversal=100,PostTraversal,Deeper, Upper,FirstNode,LastNode, Done};
+
+  enum events_ID {ID_PreTraversal=0,ID_PostTraversal,ID_Deeper, ID_Upper, ID_FirstNode, ID_LastNode, ID_Done};
 protected:
 
   /**
@@ -107,62 +109,35 @@ protected:
   Find the right most leaf of the tree*/
   mafNode *FindRightMostLeaf(mafNode *node);
 
+  mafEventSource &GetTraverseEvents() {return m_TraverseEvents;}
+
   /**
-    Callback function. By default these functions look for the corresponding
-    observer to be present and execute the associated command.
-    Executed before traversing a node. This function pass the current
-    node pointer to the callback function.*/
+    Callback function. By default send an event through the m_TraverseEvents source. */
   virtual PreExecute(); 
 
   /**
-    Callback function. By default these functions look for the corresponding
-    observer to be present and execute the associated command.
-    Executed after traversing a node. This function pass the current
-     node pointer to the callback function.*/
+    Callback function. By default send an event through the m_TraverseEvents source. */
   virtual PostExecute();  
 
   /**
-    Callback function. By default these functions look for the corresponding
-    observer to be present and execute the associated command.
-    Executed when going down in the tree.. This function pass to the
-    callback function the pointer to the node is being processed
-    while changing the depth in the tree. Not necessary it is the
-    current node or next node to be traversed.*/
+    Callback function. By default send an event through the m_TraverseEvents source. */
   virtual DeeperExecute(mafNode *); 
 
   /**
-    Callback function. By default these functions look for the corresponding
-    observer to be present and execute the associated command. 
-    Executed when going up in the tree. This function pass to the
-    callback function the pointer to the node is being processed
-    while changing the depth in the tree. Not necessary it is the
-    current node or next node to be traversed.*/
+    Callback function. By default send an event through the m_TraverseEvents source. */
   virtual UpperExecute(mafNode *);  
 
   /**
-    Callback function. By default these functions look for the corresponding
-    observer to be present and execute the associated command. 
-    executed when GoToFirstNode is executed. This function pass the
-    the pointer to this iterator to the callback function.*/
+    Callback function. By default send an event through the m_TraverseEvents source. */
   virtual FirstExecute(); 
 
   /**
-    Callback function. By default these functions look for the corresponding
-    observer to be present and execute the associated command.
-    executed when last node is traversed. This function pass the
-    the pointer to this iterator to the callback function.*/
+    Callback function. By default send an event through the m_TraverseEvents source. */
   virtual LastExecute();  
 
   /**
-    Callback function. By default these functions look for the corresponding
-    observer to be present and execute the associated command.
-    executed when the container is exhausted, i.e. when IsDoneWithTraversal
-    return "true". This function pass the the pointer to this iterator to 
-    the callback function.*/
+    Callback function. By default send an event through the m_TraverseEvents source. */
   virtual DoneExecute();  
-
-  //mafSetObjectMacro(CurrentNode,mafNode);
-  //mafSetObjectMacro(CurrentIdx,mafStack<mafIdType>);
 
   mafNodeIterator(mafNode *root=NULL);
   virtual ~mafNodeIterator();
@@ -173,6 +148,8 @@ protected:
   int             m_TraversalDone;
 
   mafVector<mafID> m_CurrentIdx;
+
+  mafEventSource  m_TraverseEvents;
 
 private:
   mafNodeIterator(const mafNodeIterator&) {} // Not implemented

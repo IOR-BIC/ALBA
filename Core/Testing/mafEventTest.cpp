@@ -1,15 +1,24 @@
 #include "mafEventBase.h"
+#include "mafSmartObject.h"
 #include <iostream>
 #include <utility>
 
 using namespace std;
+
+class mafTestObject: public mafSmartObject
+{
+public:
+  mafTypeMacro(mafTestObject,mafSmartObject);
+};
+
+mafCxxTypeMacro(mafTestObject);
 
 int main()
 {  
   typedef pair<int,const char *> test_type;
   test_type test_data(10,"ciao");
   
-  mafObject test_object;
+  mafTestObject test_object;
 
   // test constructor
   mafEventBase event_a(&test_object,5,&test_data);

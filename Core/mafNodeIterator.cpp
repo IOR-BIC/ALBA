@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeIterator.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-02 13:28:59 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-12-02 21:07:05 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -96,7 +96,7 @@ int mafNodeIterator::GoToNextNode()
           { 
 						if (m_CurrentNode!=m_RootNode)
             {
-							int idx=0;
+							mafID idx=0;
 							mafNode *parent=m_CurrentNode->GetParent();
 							if (parent) 
 							{ 
@@ -153,7 +153,7 @@ int mafNodeIterator::GoToNextNode()
 
           if (parent)
           {
-            int idx;
+            mafID idx;
             if (!m_CurrentIdx.Pop(idx))
             {
               mafErrorMacro("Stack Underflow");
@@ -230,7 +230,7 @@ int mafNodeIterator::GoToPreviousNode()
 
           if (parent)
           {
-            int idx;
+            mafID idx;
             if (!m_CurrentIdx.Pop(idx))
             {
               mafErrorMacro("Stack Underflow");
@@ -282,7 +282,7 @@ int mafNodeIterator::GoToPreviousNode()
             PostExecute(); 
 
             // go to root of last subtree
-            int idx=m_CurrentNode->GetNumberOfChildren()-1;
+            mafID idx=m_CurrentNode->GetNumberOfChildren()-1;
             m_CurrentIdx.Push(idx);
             m_CurrentNode=m_CurrentNode->GetChild(idx);
 
@@ -293,7 +293,7 @@ int mafNodeIterator::GoToPreviousNode()
           {
             mafNode *parent=m_CurrentNode->GetParent();
 
-            int idx;
+            mafID idx;
             if (!m_CurrentIdx.Pop(idx))
             {
               UpperExecute(parent); 
@@ -332,7 +332,7 @@ int mafNodeIterator::GoToPreviousNode()
                 idx--;
                 m_CurrentIdx.Push(idx);
                 // go to root of prevoius brother subtree
-                CurrentNode=parent->GetChild(idx);
+                m_CurrentNode=parent->GetChild(idx);
                 DeeperExecute(m_CurrentNode); //call the deeper-callback
 
                 // before doing anything else call the pre-execute
@@ -349,7 +349,7 @@ int mafNodeIterator::GoToPreviousNode()
             {
               m_TraversalDone=1;
               mafErrorMacro("Troubles: found an orphan node: stopping traversing immediately!");
-              CurrentNode=NULL;
+              m_CurrentNode=NULL;
               DoneExecute();
             }            
           }
@@ -495,69 +495,48 @@ void mafNodeIterator::SetRootNode(mafNode *root)
 mafNodeIterator::PreExecute()
 //----------------------------------------------------------------------------
 {
-  if (HasObserver(PreTraversal))
-  {
-    InvokeEvent(PreTraversal,m_CurrentNode);
-  }
+  m_TraverseEvents.InvokeEvent(this,ID_PreTraversal,m_CurrentNode);
 }
 //----------------------------------------------------------------------------
 // executed after traversing a node
 mafNodeIterator::PostExecute()
 //----------------------------------------------------------------------------
 {
-  if (HasObserver(PostTraversal))
-  {
-    InvokeEvent(PostTraversal,m_CurrentNode);
-  }
+  m_TraverseEvents.InvokeEvent(this,ID_PostTraversal,m_CurrentNode);
 }
 //----------------------------------------------------------------------------
 // executed when going down in the tree
 mafNodeIterator::DeeperExecute(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  if (HasObserver(Deeper))
-  {
-    InvokeEvent(Deeper,node);
-  }
+  m_TraverseEvents.InvokeEvent(this,ID_Deeper,m_CurrentNode);
 }
 //----------------------------------------------------------------------------
 // executed when going up in the tree
 mafNodeIterator::UpperExecute(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  if (HasObserver(Upper))
-  {
-    InvokeEvent(Upper,node);
-  }
+  m_TraverseEvents.InvokeEvent(this,ID_Upper,m_CurrentNode);
 }
 //----------------------------------------------------------------------------
 // executed when GoToFirstNode is executed
 mafNodeIterator::FirstExecute()
 //----------------------------------------------------------------------------
 {
-  if (HasObserver(FirstNode))
-  {
-    InvokeEvent(FirstNode,this);
-  }
+  m_TraverseEvents.InvokeEvent(this,ID_FirstNode,m_CurrentNode);
 }
 //----------------------------------------------------------------------------
 // executed when last node is traversed
 mafNodeIterator::LastExecute()
 //----------------------------------------------------------------------------
 {
-  if (HasObserver(LastNode))
-  {
-    InvokeEvent(LastNode,this);
-  }
+  m_TraverseEvents.InvokeEvent(this,ID_LastNode,m_CurrentNode);
 }
 //----------------------------------------------------------------------------
 // executed when IsDoneWithTraversal return "true"
 mafNodeIterator::DoneExecute()
 //----------------------------------------------------------------------------
 {
-  if (HasObserver(Done))
-  {
-    InvokeEvent(Done,this);
-  }
+  m_TraverseEvents.InvokeEvent(this,ID_Done,m_CurrentNode);
 }
 #endif

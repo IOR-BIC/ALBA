@@ -39,8 +39,8 @@ int main()
   std::list<mafObjectFactory *> list=mafObjectFactory::GetRegisteredFactories();
   MAF_TEST(list.size()==2);
 
-  first_factory->RegisterOverride(mafFooObject::GetTypeName(),mafFooObject::GetTypeName(),"foo class",true,mafFooObject::NewObjectInstance);
-  second_factory->RegisterOverride(mafDummyObject::GetTypeName(),mafDummyObject::GetTypeName(),"foo class",true,mafDummyObject::NewObjectInstance);
+  first_factory->RegisterOverride(mafFooObject::GetTypeName(),mafFooObject::GetTypeName(),"foo class",true,mafFooObject::NewObject);
+  second_factory->RegisterOverride(mafDummyObject::GetTypeName(),mafDummyObject::GetTypeName(),"foo class",true,mafDummyObject::NewObject);
 
   mafFooObject *foo=mafFooObject::SafeDownCast(mafObjectFactory::CreateInstance("mafFooObject"));
   mafDummyObject *dummy=mafDummyObject::SafeDownCast(mafObjectFactory::CreateInstance("mafDummyObject"));
@@ -64,7 +64,6 @@ int main()
   MAF_TEST(!dummy->IsA(mafFooObject::GetTypeName()));
   MAF_TEST(dummy->GetTypeId()==dummy->GetClassId());
   MAF_TEST(dummy->GetTypeId()==dummy->GetClassId());
-  MAF_TEST(mafObject::GetTypeId("mafDummyObject")==dummy->GetClassId());
   
   std::cout<<"Test completed successfully!"<<std::endl;
 

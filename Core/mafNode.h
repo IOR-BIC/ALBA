@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-02 13:28:59 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2004-12-02 21:07:05 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -31,10 +31,27 @@ class mafNodeIterator;
   and RemoveChild. To access the tree you can use GetChild(). You can also obtain an iterator
   to iterate through the tree with a simple for (;;) loop. This node implementation take
   advantage of the MAF smart object reference counting mechanism. To avoid confusion constructor
-  and destructor have been commented. To allocate use New and to deallocate use Delete() or UnRegister().
-
+  and destructor have been protected. To allocate a node use New() and to deallocate use Delete()
+  or UnRegister().
+  To create a copy of the node you can use MakeCopy(). To copy node content use DeepCopy(). Any 
+  node has a CanCopy() to test if copying from a different node type i possible.
+  A number of functions allow to wuery the tree, like IsEmpty(), IsInTree(), GetRoot(), GetNumberOfChildren(),
+  FindNodeIdx(), FindInTreeByName(), FindInTreeById(), IsAChild(), GetParent().
+  A special features allow to make a node to be skipped by iterators: SetVisibleToTraverse()
+  and IsVisible().
+  Comparison between nodes and trees can be accomplished through Equals() and CompareTree().
+  Nore reparenting can be performed through ReparentTo(). This function returns MAF_ERROR in case
+  reparenting is not allowed. Each node type can decide nodes to which it can be reparented by
+  redefining the CanReparentTo(( virtual function. Also each node type can decide nodes it is 
+  accepting as a child by redefining the AddChild() which also can return MAF_ERROR in case of 
+  denied reparenting.
+  A node can detach all children RemoveAllChildren() and an entire tree can be cleaned, by detaching each sub node, 
+  through CleanTree().
+  Nodes have a modification time, updated each time Modified() is called, that can be retrieved with GetMTime().
+  A tree can be initialized by calling Initialize() of its root, and deinitialized by means of Shutdown(). When
+  attaching a node to an initialised tree the node is automatically initialized.
   @todo
-  - test
+  - testing
   - events invoking
 
   @sa mafRootNode
@@ -57,53 +74,53 @@ public:
     the initialisation. A node is typically initialized when added to the tree, or
     just after tree loading in case of load from storage. */
   int Initialize();
-
+  
   /**
     Shutdown this node. Subclasses can redefine InternalShutdown() to customize 
     actions for shutting down. A node is typically shutdown when detached from
     the tree */
   void Shutdown();
-
+  
   /** Return true if this agent has been initialized */
   int IsInitialized() {return m_Initialized;}
-
+  
   /**
   return the name of this VME*/
   const char *GetName() {return m_Name;};
   void SetName(const char *name) {m_Name=mafString(name);Modified();}; // force string copy
   void SetName(mafString name) {m_Name=name;Modified();};
-
+  
   /**
     Copy the contents of another node into this one. Notice that subtrees
     are not copied, i.e. copy is not recursive!
     Concrete nodes should reimplement this function to verify admitted
     conversion. */
   virtual int DeepCopy(mafNode *a);
-
+  
   /** TODO: to be moved to mafVME
     perform a copy by simply referencing the copied node's data array. 
     Beware: This can allow to save memory when doing special tasks, but
     can be very dangerous making one of the VME inconsistent. Some nodes
     do not support such a function! */  
   //virtual int ShallowCopy(mafNode *a);
-
+  
   /**
     Test if the given node instance can be copied into this. This function should
     be reimplemented into subclasses classes*/
   virtual bool CanCopy(mafNode *vme);
-
+  
   /** Create a copy of this node (do not copy the sub tree,just the node) */
   static mafNode *MakeCopy(mafNode *a);
   mafNode *MakeCopy() {return MakeCopy(this);}
-
+  
   /**
     Copy the given VME tree into a new tree. In case a parent is provided, link the new
     root node to it. Return the root of the new tree.*/
   static mafNode *CopyTree(mafNode *vme, mafNode *parent=NULL);
-
+  
   /** Make a copy of the whole subtree and return its pointer */
   mafNode *CopyTree() {return CopyTree(this);}
-
+  
   /** Return a the pointer to a child given its index */
   mafNode *GetChild(mafID idx);
   /** Get the First child in the list.*/
