@@ -41,8 +41,12 @@ SET(PROJECT_SRCS
   mafTransform.h
   mafTransformBase.cpp
   mafTransformBase.h
+  mafTransformFrame.cpp
+  mafTransformFrame.h
   mafVersion.h
   mafWIN32.h
+  vtkMAFToLinearTransform.cxx
+  vtkMAFToLinearTransform.h
 #  mafEvent.cpp
 #  mafEvent.h
 )
