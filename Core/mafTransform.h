@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-25 19:16:42 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-11-29 09:33:04 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -33,10 +33,7 @@ enum { POST_MULTIPLY=0, PRE_MULTIPLY };
   be expressed as a mafTransformBase.
 
   @sa mafTransformBase
-  @todo
-
-  - Modifica GetMTime per considerare anche l'MTime di InputFrame e TargetFrame
-  - Rimuovi il vecchio ConversionRToHelicalAxis e  usa il nuovo ConversionTranslationMatrixToHelicalAxis al suo posto (aggiorna la opTransform di conseguenza)
+  @todo 
   - Aggiorna il test della mafTransform per testare le funzioni di conversione degli angoli
 */
 class MAF_EXPORT mafTransform : public mafTransformBase
@@ -51,7 +48,7 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   ~mafTransform();
 
   /** copy constructor */
-  mafTransformBase(const mafTransformBase&);
+  mafTransform(const mafTransform&);
 
   mafTypeMacro(mafTransform,mafTransformBase);
   //void PrintSelf (ostream& os, vtkIndent indent);
@@ -59,12 +56,12 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   /**
     Directly set the internal Matrix. It's overwritten by Update if Input or InputFrame !=NULL
     This function makes a copy of the input matrix. */
-  virtual void SetMatrix(const mafMatrix &input) {*this=input;}
+  virtual void SetMatrix(const mafMatrix &input) {this->m_Matrix=input;}
 
 	/**
 	Polar Decomposition of matrix M in Q * S.*/
-	static double PolarDecomp(mafMatrix &M, mafMatrix &Q, mafMatrix &S, double translation[3]);
-  double PolarDecomp(mafMatrix &Q, mafMatrix &S, double translation[3]) {return PolarDecomp(&GetMatrix(),Q,S,translation);}
+	static double PolarDecomp(const mafMatrix &M, mafMatrix &Q, mafMatrix &S, double translation[3]);
+  double PolarDecomp(mafMatrix &Q, mafMatrix &S, double translation[3]) {return PolarDecomp(GetMatrix(),Q,S,translation);}
   
   /** set internal matrix to Identity */
   void Identity();
@@ -72,8 +69,8 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   /**
 	Get the x, y, z orientation angles from the transformation matrix as an
   array of three floating point values. Copied from vtkTransform::GetOrientation()*/
-  static void GetOrientation(mafMatrix &in_matrix,double orientation[3]);
-  static void GetOrientation(mafMatrix &in_matrix,float orientation[3]);
+  static void GetOrientation(const mafMatrix &in_matrix,double orientation[3]);
+  static void GetOrientation(const mafMatrix &in_matrix,float orientation[3]);
   void GetOrientation(double orientation[3]) { this->GetOrientation(this->GetMatrix(),orientation);}
   void GetOrientation(float orient[3]) {
     double temp[3]; this->GetOrientation(temp); 
@@ -84,11 +81,11 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   /**
 	Return the wxyz angle+axis representing the current orientation.
   Copied from vtkTransform::GetVTKOrientationWXYZ()*/
-  static void GetOrientationWXYZ(mafMatrix &in_matrix, double wxyz[4]);
+  static void GetOrientationWXYZ(const mafMatrix &in_matrix, double wxyz[4]);
   void GetOrientationWXYZ(double wxyz[4]) \
-      { this->GetOrientationWXYZ(this->GetMatrix(),wxyz);}
+      { GetOrientationWXYZ(GetMatrix(),wxyz);}
   void GetOrientationWXYZ(float wxyz[3]) {
-    double temp[4]; this->GetOrientationWXYZ(temp); 
+    double temp[4]; GetOrientationWXYZ(temp); 
     wxyz[0]=static_cast<float>(temp[0]); 
     wxyz[1]=static_cast<float>(temp[1]); 
     wxyz[2]=static_cast<float>(temp[2]); 
@@ -98,9 +95,9 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   Return the position from the current transformation matrix as an array
   of three floating point numbers. This is simply returning the translation 
   component of the 4x4 matrix. Copied from vtkTransform::GetPosition()*/
-  static void GetPosition(mafMatrix &matrix,double position[3]);
-  static void GetPosition(mafMatrix &matrix,float position[3]);
-  void GetPosition(double position[3]) {this->GetPosition(this->GetMatrix(),position);}
+  static void GetPosition(const mafMatrix &matrix,double position[3]);
+  static void GetPosition(const mafMatrix &matrix,float position[3]);
+  void GetPosition(double position[3]) {this->GetPosition(GetMatrix(),position);}
   void GetPosition(float position[3]) {
     double temp[3]; this->GetPosition(temp); 
     position[0] = static_cast<float>(temp[0]); 
@@ -112,8 +109,8 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   work on the internal matrix and can be used in conjuction with SetMatrix, but if a pipeline
   is defined (input, input_frame or target_frame) it's overwritten whenever the Update() is perfromed.*/
   static void SetPosition(mafMatrix &matrix,double position[3]);
-  void SetPosition(double position[3]) {this->SetPosition(this->GetMatrix(),position);}
-  void SetPosition(double x,double y,double z) {this->SetPosition(this->GetMatrix(),x,y,z);}
+  void SetPosition(double position[3]) {this->SetPosition(m_Matrix,position);}
+  void SetPosition(double x,double y,double z) {this->SetPosition(m_Matrix,x,y,z);}
   static void SetPosition(mafMatrix &matrix, double x,double y,double z) {
     double temp[3];
     temp[0]=x;temp[1]=y;temp[2]=z;
@@ -125,8 +122,8 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   in conjuction with SetMatrix, but if a pipeline  is defined (input, input_frame or 
   target_frame) it's overwritten whenever the Update() is perfromed.*/
   static void Translate(mafMatrix &matrix,double translation[3],int premultiply);
-  void Translate(double translation[3],int premultiply) {this->Translate(this->GetMatrix(),translation,premultiply);}
-  void Translate(double x,double y,double z,int premultiply) {this->Translate(this->GetMatrix(),x,y,z,premultiply);}
+  void Translate(double translation[3],int premultiply) {this->Translate(m_Matrix,translation,premultiply);}
+  void Translate(double x,double y,double z,int premultiply) {this->Translate(m_Matrix,x,y,z,premultiply);}
   static void Translate(mafMatrix &matrix, double x,double y,double z,int premultiply) {
     double temp[3];
     temp[0]=x;temp[1]=y;temp[2]=z;
@@ -136,9 +133,9 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   This function rotate the matrix around the specified axis. Notice, the non static functions
   work on the internal matrix and can be used in conjuction with SetMatrix, but if a pipeline
   is defined (input, input_frame or target_frame) it's overwritten whenever the Update() is perfromed.*/
-  static void RotateWXYZ(vtkMatrix4x4* source,mafMatrix &target,double angle,double x, double y, double z,int premultiply);
-  void RotateWXYZ(double angle,double x, double y, double z,int premultiply) {this->RotateWXYZ(this->GetMatrix(),this->GetMatrix(),angle,x,y,z,premultiply);}
-  void RotateWXYZ(double angle,double rot[3],int premultiply) {this->RotateWXYZ(this->GetMatrix(),this->GetMatrix(),angle, rot[0], rot[1], rot[2],premultiply);}
+  static void RotateWXYZ(const mafMatrix &source,mafMatrix &target,double angle,double x, double y, double z,int premultiply);
+  void RotateWXYZ(double angle,double x, double y, double z,int premultiply) {this->RotateWXYZ(m_Matrix,m_Matrix,angle,x,y,z,premultiply);}
+  void RotateWXYZ(double angle,double rot[3],int premultiply) {this->RotateWXYZ(m_Matrix,m_Matrix,angle, rot[0], rot[1], rot[2],premultiply);}
 
 
   /**
@@ -148,12 +145,12 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   static void RotateX(mafMatrix &matrix,double angle,int premultiply) { mafTransform::RotateWXYZ(matrix,matrix,angle, 1, 0, 0,premultiply); };
   static void RotateY(mafMatrix &matrix,double angle,int premultiply) { mafTransform::RotateWXYZ(matrix,matrix,angle, 0, 1, 0,premultiply); };
   static void RotateZ(mafMatrix &matrix,double angle,int premultiply) { mafTransform::RotateWXYZ(matrix,matrix,angle, 0, 0, 1,premultiply); };
-  void RotateX(double angle,int premultiply) { this->RotateX(this->GetMatrix(),angle,premultiply); };
-  void RotateY(double angle,int premultiply) { this->RotateY(this->GetMatrix(),angle,premultiply); };
-  void RotateZ(double angle,int premultiply) { this->RotateZ(this->GetMatrix(),angle,premultiply); };
+  void RotateX(double angle,int premultiply) { this->RotateX(m_Matrix,angle,premultiply); };
+  void RotateY(double angle,int premultiply) { this->RotateY(m_Matrix,angle,premultiply); };
+  void RotateZ(double angle,int premultiply) { this->RotateZ(m_Matrix,angle,premultiply); };
 
   /** Pre or Post multiply the  internal matrix for given matrix and store result in the internal matrix */
-  void Concatenate(mafMatrix &matrix, int premultiply);
+  void Concatenate(const mafMatrix &matrix, int premultiply);
 
   /** Pre or Post multiply the  internal matrix for given transform and store result in the internal matrix */
   void Concatenate(mafTransformBase *trans, int premultiply) {Concatenate(trans->GetMatrix(),premultiply);}
@@ -163,8 +160,8 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   work on the internal matrix and can be used in conjuction with SetMatrix, but if a pipeline
   is defined (input, input_frame or target_frame) it's overwritten whenever the Update() is performed.*/
   static void SetOrientation(mafMatrix &matrix,double orientation[3]);
-  void SetOrientation(double orientation[3]) {this->SetOrientation(this->GetMatrix(),orientation);}
-  void SetOrientation(double rx,double ry,double rz) {this->SetOrientation(this->GetMatrix(),rx,ry,rz);}
+  void SetOrientation(double orientation[3]) {this->SetOrientation(m_Matrix,orientation);}
+  void SetOrientation(double rx,double ry,double rz) {this->SetOrientation(m_Matrix,rx,ry,rz);}
   static void SetOrientation(mafMatrix &matrix,double rx,double ry,double rz) {
     double temp[3];
     temp[0]=rx;temp[1]=ry;temp[2]=rz;
@@ -175,8 +172,8 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   an array of three float numbers.  These scale factors are not necessarily
   about the x, y, and z axes unless unless the scale transformation was
   applied before any rotations. Copied from vtkTransform::GetScale()*/
-  static void GetScale(mafMatrix &matrix,double scale[3]);
-  void GetScale(double scale[3]) {this->GetScale(this->GetMatrix(),scale);}
+  static void GetScale(const mafMatrix &matrix,double scale[3]);
+  void GetScale(double scale[3]) {this->GetScale(m_Matrix,scale);}
   void GetScale(float scale[3]) {
     double temp[3]; this->GetScale(temp); 
     scale[0] = static_cast<float>(temp[0]); 
@@ -186,74 +183,64 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   /** apply a scale transform. By default the scale matrix is premultiplied */
   static void Scale(mafMatrix &matrix,double scalex,double scaley,double scalez,int premultiply);
   void Scale(double scalex,double scaley,double scalez,int premultiply) \
-    { Scale(Matrix,scalex,scaley,scalez,premultiply);}
+    { Scale(m_Matrix,scalex,scaley,scalez,premultiply);}
 
   /**  Extract the given matrix versor*/
-  static void GetVersor(int axis, const mafMatrix &matrix, double versor[3]);
+  static void GetVersor(int axis, const mafMatrix &matrix, double versor[3]) {mafMatrix::GetVersor(axis,matrix,versor);}
   static void GetVersor(int axis, const mafMatrix &matrix, float versor[3]) \
-    { \ 
-      double temp[3]; mafTransform::GetVersor(axis, matrix, temp); \
+    { \
+      double temp[3]; GetVersor(axis, matrix, temp); \
       versor[0] = static_cast<float>(temp[0]); \
       versor[1] = static_cast<float>(temp[1]); \
       versor[2] = static_cast<float>(temp[2]); };
   
   /** */
-  void GetVersor(int axis, double versor[3]) {GetVersor(axis,this->GetMatrix(),versor);}
-  void GetVersor(int axis, float versor[3]) \
-  { \
-    double temp[3]; this->GetVersor(axis, this->GetMatrix(), temp); \
-    versor[0] = static_cast<float>(temp[0]); \
-    versor[1] = static_cast<float>(temp[1]); \ 
-    versor[2] = static_cast<float>(temp[2]); };
-
+  void GetVersor(int axis, double versor[3]) {GetVersor(axis,GetMatrix(),versor);}
+  void GetVersor(int axis, float versor[3]) {GetVersor(axis,GetMatrix(),versor);}
 
   /**
   Copy the 3x3 rotation matrix from another 4x4 matrix into the specified matrix, or in the internal matrix.*/
   static void CopyRotation(const mafMatrix &source, mafMatrix &target);
-  void CopyRotation(const mafMatrix &source) {this->CopyRotation(source,this->Matrix);}
+  void CopyRotation(const mafMatrix &source) {this->CopyRotation(source,m_Matrix);}
 
   /** Copy the translation vector */
   static void CopyTranslation(const mafMatrix &source, mafMatrix &target);
-  void CopyTranslation(const mafMatrix &source) {this->CopyTranslation(source,this->Matrix);}
+  void CopyTranslation(const mafMatrix &source) {this->CopyTranslation(source,m_Matrix);}
 
-
-  /** */
-	int ConversionRToHelicalAxis(mafMatrix &matrix,
-											 double helical_axis[3],double& angle);
-
-  /** */
-	int ConversionRToAttitudeVector(mafMatrix &matrix,
+  /** rotation representation conversion */
+	int MatrixToAttitudeVector(const mafMatrix &matrix,
 										        double attitude_vector[3]);
 
-  /** */
-	int ConversionRToEulerCardanicAngle(mafMatrix &matrix,
+  /** rotation representation conversion */
+	int MatrixToEulerCardanicAngle(const mafMatrix &matrix,
 													int i,int j,int k,
 													double euler_cardan[3],
 													double tentative_euler_cardan_first,
 													double tentative_euler_cardan_second,
 													double tentative_euler_cardan_third);
 
-  /** */
-	int ConversionRToQuaternion(mafMatrix &matrix, double quaternion[4]);
+  /** rotation representation conversion */
+	int MatrixToQuaternion(const mafMatrix &matrix, double quaternion[4]);
 
-  /** */
-	int ConversionQuaternionToR(double quaternion[4],	mafMatrix &matrix);
+  /** rotation representation conversion */
+	int QuaternionToMatrix(double quaternion[4],	mafMatrix &matrix);
 
-  /** */
-	int ConversionHelicalAxisToR(double helical_axis[3],double angle, mafMatrix &matrix);
+  /** rotation + translation representation conversion */
+	int HelicalAxisToMatrix(double helical_axis[3],double angle, mafMatrix &matrix);
 
-  /** */
-	int ConversionAttitudeVectorToR(double attitude_vector[3], mafMatrix &matrix);
+  /** rotation representation conversion */
+	int AttitudeVectorToMatrix(double attitude_vector[3], mafMatrix &matrix);
 
-  /** */
-	int ConversionEulerCardanicAngleToR(double euler_cardan[3],
+  /** rotation representation conversion */
+	int EulerCardanicAngleToMatrix(double euler_cardan[3],
 													int i,int j,int k,
 													mafMatrix &matrix);
 
-  /** */
-	int ConversionTranslationMatrixToHelicalAxis(mafMatrix &v_matrix,
+  /** rotation + translation representation conversion */
+	int MatrixToHelicalAxis(const mafMatrix &v_matrix,
 										 											 double helical_axis[3],double point[3],
 																					 double& phi,double& t, int intersect);
+
 
   //----------------------------------------------------------------------------
   // declarations for polar_decomp algorithm from Graphics Gems IV,
@@ -261,21 +248,25 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   //----------------------------------------------------------------------------
   enum QuatPart {X, Y, Z, W};
 
-  typedef struct {float x, y, z, w;} Quat; /* Quaternion */
+  typedef struct {double x, y, z, w;} Quat; /* Quaternion */
   typedef Quat HVect; /* Homogeneous 3D vector */
   typedef struct {
 	  HVect t;	///< Translation components
 	  Quat  q;	///< Essential rotation
 	  Quat  u;	///< Stretch rotation
 	  HVect k;	///< Stretch factors
-	  float f;	///< Sign of determinant
+	  double f;	///< Sign of determinant
   } AffineParts;
 	  
-  typedef float HMatrix[4][4]; /* Right-handed, for column vectors */
-  float polar_decomp(HMatrix M, HMatrix Q, HMatrix S);
-  //----------------------------------------------------------------------------	
+  typedef double HMatrix[4][4]; /* Right-handed, for column vectors */
+  static double PolarDecomp(HMatrix M, HMatrix Q, HMatrix S);
+  static void DecompAffine(HMatrix A, AffineParts *parts);
+  static HVect SpectDecomp(HMatrix S, HMatrix U);
+  static Quat QuaternionFromMatrix(HMatrix mat);
+  static void InvertAffine(AffineParts *parts, AffineParts *inverse);
+  static Quat Snuggle(Quat q, HVect *k);
+  //----------------------------------------------------------------------------
 protected:
-
   /** does nothing, this is not a procedural transform */
   virtual void InternalUpdate() {m_UpdateTime.Modified();}
 private:

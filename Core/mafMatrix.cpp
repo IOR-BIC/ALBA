@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-19 18:20:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-11-29 09:33:03 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -34,7 +34,7 @@ mafMatrix::~mafMatrix()
 }
 
 //------------------------------------------------------------------------------
-mafMatrix::mafMatrix(mafMatrix &mat)
+mafMatrix::mafMatrix(const mafMatrix &mat)
 //------------------------------------------------------------------------------
 {
 #ifdef MAF_USE_VTK

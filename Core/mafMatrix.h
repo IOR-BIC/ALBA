@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-19 18:20:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-11-29 09:33:04 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,7 +13,7 @@
 #ifndef __mafMatrix_h
 #define __mafMatrix_h
 
-#include "mafObject.h"
+#include "mafSmartObject.h"
 #include "mafMTime.h"
 
 #ifdef MAF_USE_VTK
@@ -34,19 +34,19 @@ typedef double (*mafMatrixElements)[4];
   return a vtkMatrix4x4 pointer.
   Also mafMatrix can reference a vtkMatrix4x4, i.e. register it and share the
   same Elements vector, with SetVTKMatrix.
-  Currently this is defined as a mafObject, i.e. with RTTI information, but not
+  NOMORE: Currently this is defined as a mafObject, i.e. with RTTI information, but not
   as a mafSmartObject (i.e. reference counting).
-  @sa mafObject vtkMatrix4x4 vnl_matrix
+  @sa mafSmartObject vtkMatrix4x4 vnl_matrix
 */
-class MAF_EXPORT mafMatrix : public mafObject
+class MAF_EXPORT mafMatrix : public mafSmartObject
 {
 public:
-  mafTypeMacro(mafMatrix,mafObject);
+  mafTypeMacro(mafMatrix,mafSmartObject);
 
   mafMatrix();
   ~mafMatrix();
 
-  mafMatrix(mafMatrix &mat);
+  mafMatrix(const mafMatrix &mat);
 
   bool operator==(mafMatrix& m);
 
@@ -65,10 +65,10 @@ public:
   /** 
     Sets the element i,j in the matrix. Remember to call explicitly
     Modified when using this function. */
-  void SetElement(int i, int j, double value) {GetElements()[i][j]=value;}
+  void SetElement(const int i, const int j, double value) {GetElements()[i][j]=value;}
 
   /** Returns the element i,j from the matrix. */
-  double GetElement(int i, int j) const {return GetElements()[i][j];}
+  double GetElement(const int i, const int j) const {return GetElements()[i][j];}
 
   /** return modification time for this object */
   unsigned long GetMTime();
@@ -81,9 +81,9 @@ public:
   mafTimeStamp GetTimeStamp() {return m_TimeStamp;};
 
   /** Get the given matrix versor. Static version. */
-  static void GetVersor(int axis, const mafMatrix &matrix, double versor[3]);
+  static void GetVersor(const int axis, const mafMatrix &matrix, double versor[3]);
   /** Get the given matrix versor*/
-  void GetVersor(int axis, double versor[3]) {GetVersor(axis,*this,versor);}
+  void GetVersor(const int axis, double versor[3]) {GetVersor(axis,(*this),versor);}
 
   /** Copy the 3x3 rotation matrix from another 4x4 matrix */
   void CopyRotation(const mafMatrix &source) {CopyRotation(source,*this);}
@@ -132,7 +132,7 @@ public:
                             const double in[4], double out[4]);
 
   /** Multiplies matrices a and b and stores the result in c.*/
-  static void Multiply4x4(mafMatrix &a, mafMatrix &b, mafMatrix &c) {
+  static void Multiply4x4(const mafMatrix &a, const mafMatrix &b, mafMatrix &c) {
     mafMatrix::Multiply4x4(*a.GetElements(),*b.GetElements(),*c.GetElements()); };
   /** Multiplies matrices a and b and stores the result in c. this works with arrays. */
   static void Multiply4x4(const double a[16], const double b[16], 

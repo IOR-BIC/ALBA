@@ -1,47 +1,17 @@
 /*=========================================================================
-
-  Program:   Visualization Toolkit
+  Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-25 19:16:42 $
-  Version:   $Revision: 1.2 $
-  
-  Copyright (c) 2002/2003
-  B3C -  BioComputing Competence Centre (www.cineca.it/B3C)
-  v. Magnanelli 6/3
-  40033 Casalecchio di Reno (BO)
-  Italy
-  ph. +39-051-6171411 (90 lines) - Fax +39-051-6132198
-
-Use, modification and redistribution of the software, in source or
-binary forms, are permitted provided that the following terms and
-conditions are met:
-
-1) Redistribution of the source code, in verbatim or modified
-   form, must retain the above copyright notice, this license,
-   the following disclaimer, and any notices that refer to this
-   license and/or the following disclaimer.  
-
-2) Redistribution in binary form must include the above copyright
-   notice, a copy of this license and the following disclaimer
-   in the documentation or with other materials provided with the
-   distribution.
-
-3) Modified copies of the source code must be clearly marked as such,
-   and must not be misrepresented as verbatim copies of the source code.
-
-THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE SOFTWARE "AS IS"
-WITHOUT EXPRESSED OR IMPLIED WARRANTY INCLUDING, BUT NOT LIMITED TO,
-THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-PURPOSE.  IN NO EVENT SHALL ANY COPYRIGHT HOLDER OR OTHER PARTY WHO MAY
-MODIFY AND/OR REDISTRIBUTE THE SOFTWARE UNDER THE TERMS OF THIS LICENSE
-BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, LOSS OF DATA OR DATA BECOMING INACCURATE
-OR LOSS OF PROFIT OR BUSINESS INTERRUPTION) ARISING IN ANY WAY OUT OF
-THE USE OR INABILITY TO USE THE SOFTWARE, EVEN IF ADVISED OF THE
-POSSIBILITY OF SUCH DAMAGES.
+  Date:      $Date: 2004-11-29 09:33:04 $
+  Version:   $Revision: 1.3 $
+  Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
+==========================================================================
+  Copyright (c) 2002/2004 
+  CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 #include "mafTransform.h"
+#include "mafMatrix.h"
+#include "mafMatrix3x3.h"
 
 #include <math.h>
 #include <assert.h>
@@ -66,10 +36,10 @@ mafTransform::~mafTransform()
 }
 
 //----------------------------------------------------------------------------
-mafTransform::mafTransform(const mafTransformBase& copy)
+mafTransform::mafTransform(const mafTransform& copy)
 //----------------------------------------------------------------------------
 {
-  m_Matrix=copy.GetMatrix();
+  m_Matrix=copy.m_Matrix;
   Modified();
 }
 
@@ -90,13 +60,13 @@ void mafTransform::PrintSelf(ostream& os, vtkIndent indent)
 void mafTransform::Identity()
 //----------------------------------------------------------------------------
 {
-  GetMatrix().Identity();
+  m_Matrix.Identity();
   Modified();
 }
 
 //----------------------------------------------------------------------------
 // Copied from vtkTransformConcatenation::Rotate(...)
-void mafTransform::RotateWXYZ(vtkMatrix4x4* source,vtkMatrix4x4 *target,double angle,double x, double y, double z,int premultiply)
+void mafTransform::RotateWXYZ(const mafMatrix &source,mafMatrix &target,double angle,double x, double y, double z,int premultiply)
 //----------------------------------------------------------------------------
 {
   if (angle == 0.0 || (x == 0.0 && y == 0.0 && z == 0.0)) 
@@ -105,7 +75,7 @@ void mafTransform::RotateWXYZ(vtkMatrix4x4* source,vtkMatrix4x4 *target,double a
   }
 
   // convert to radians
-  angle = angle*vtkMath::DoubleDegreesToRadians();
+  angle = angle*mafMatrix3x3::DegreesToRadians();
 
   // make a normalized quaternion
   double w = cos(0.5*angle);
@@ -149,39 +119,39 @@ void mafTransform::RotateWXYZ(vtkMatrix4x4* source,vtkMatrix4x4 *target,double a
 
   if (premultiply)
   {
-    vtkMatrix4x4::Multiply4x4(source,mat,target);
+    mafMatrix::Multiply4x4(source,mat,target);
   }
   else
   {
-    vtkMatrix4x4::Multiply4x4(mat,source,target);
+    mafMatrix::Multiply4x4(mat,source,target);
   }
-  Modified();
+  target.Modified();
 }
 
 //----------------------------------------------------------------------------
-void mafTransform::Concatenate(vtkMatrix4x4 *matrix, int premultiply)
+void mafTransform::Concatenate(const mafMatrix &matrix, int premultiply)
 //----------------------------------------------------------------------------
 {
   if(premultiply)
   {
-    vtkMatrix4x4::Multiply4x4(Matrix, matrix, Matrix);
+    mafMatrix::Multiply4x4(m_Matrix, matrix, m_Matrix);
   }
   else
   {
-    vtkMatrix4x4::Multiply4x4(matrix, Matrix, Matrix);
+    mafMatrix::Multiply4x4(matrix, m_Matrix, m_Matrix);
   }
   
   Modified();
 }
 
 //----------------------------------------------------------------------------
-void mafTransform::SetOrientation(vtkMatrix4x4 *matrix,double orientation[3])
+void mafTransform::SetOrientation(mafMatrix &matrix,double orientation[3])
 //----------------------------------------------------------------------------
 {
   double pos[3];
 
   mafTransform::GetPosition(matrix,pos);
-  matrix->Identity();
+  matrix.Identity();
   mafTransform::RotateZ(matrix,orientation[2], PRE_MULTIPLY);
   mafTransform::RotateX(matrix,orientation[0], PRE_MULTIPLY);
   mafTransform::RotateY(matrix,orientation[1], PRE_MULTIPLY);  
@@ -189,135 +159,80 @@ void mafTransform::SetOrientation(vtkMatrix4x4 *matrix,double orientation[3])
 }
 
 //----------------------------------------------------------------------------
-void mafTransform::SetPosition(vtkMatrix4x4 *matrix,double position[3])
+void mafTransform::SetPosition(mafMatrix &matrix,double position[3])
 //----------------------------------------------------------------------------
 {
 	for (int i = 0; i < 3; i++)
 	{
-	  matrix->SetElement(i, 3, position[i]);
+	  matrix.SetElement(i, 3, position[i]);
 	}	
-  Modified();
+  matrix.Modified();
 }
 
 //----------------------------------------------------------------------------
-void mafTransform::Translate(vtkMatrix4x4 *matrix,double translation[3],int premultiply)
+void mafTransform::Translate(mafMatrix &matrix,double translation[3],int premultiply)
 //----------------------------------------------------------------------------
 {
   mafMatrix trans_matrix;
   SetPosition(trans_matrix,translation);
   if(premultiply)
   {
-    vtkMatrix4x4::Multiply4x4(matrix, trans_matrix, matrix);
+    mafMatrix::Multiply4x4(matrix, trans_matrix, matrix);
   }
   else
   {
-    vtkMatrix4x4::Multiply4x4(trans_matrix, matrix, matrix);
+    mafMatrix::Multiply4x4(trans_matrix, matrix, matrix);
   }
 }
 
 //----------------------------------------------------------------------------
-void mafTransform::GetVersor(int axis, const vtkMatrix4x4 *matrix, double versor[3])
-//----------------------------------------------------------------------------
-{
-	if (0 <= axis && axis <= 2)
-	{
-		for (int i = 0; i < 3; i++)
-		{
-			versor[i] = matrix->GetElement(i, axis);
-		}	
-	}
-}
-
-//----------------------------------------------------------------------------
-void mafTransform::CopyRotation(const vtkMatrix4x4 *source, vtkMatrix4x4 *target)
+void mafTransform::CopyRotation(const mafMatrix &source, mafMatrix &target)
 //----------------------------------------------------------------------------
 {
 	for (int i = 0; i < 3; i++)
 	{
 		for (int j = 0; j < 3; j++)
 		{
-		  target->SetElement(i,j, source->GetElement(i,j));
+		  target.SetElement(i,j, source.GetElement(i,j));
 		}
 	}
 }
 
 //----------------------------------------------------------------------------
-void mafTransform::CopyTranslation(const vtkMatrix4x4 *source, vtkMatrix4x4 *target)
+void mafTransform::CopyTranslation(const mafMatrix &source, mafMatrix &target)
 //----------------------------------------------------------------------------
 {
   for (int i = 0; i < 3; i++)
 	{
-		target->SetElement(i,3, source->GetElement(i,3));
+		target.SetElement(i,3, source.GetElement(i,3));
 	}
 }
 
 //----------------------------------------------------------------------------
-void mafTransform::SetInput(vtkMatrix4x4 *input)
+double mafTransform::PolarDecomp(const mafMatrix &v_M, mafMatrix &v_Q, mafMatrix &v_S,
+																double translation[3])
 //----------------------------------------------------------------------------
 {
-  mflSmartPointer<mafTransform> trans;
-  trans->SetMatrix(input);
-  this->SetInput(trans);
-}
-
-//----------------------------------------------------------------------------
-void mafTransform::SetInputFrame(vtkMatrix4x4 *frame)
-//----------------------------------------------------------------------------
-{
-  if (frame != NULL)
-  {
-    mflSmartPointer<mafTransform> trans;
-    trans->SetMatrix(frame);
-    this->SetInputFrame(trans);
-  }
-}
-
-//----------------------------------------------------------------------------
-void mafTransform::SetTargetFrame(vtkMatrix4x4 *frame)
-//----------------------------------------------------------------------------
-{
-  if (frame != NULL)
-  {
-    mflSmartPointer<mafTransform> trans;
-    trans->SetMatrix(frame);
-    this->SetTargetFrame(trans);
-  }
-}
-
-//----------------------------------------------------------------------------
-void mafTransform::Inverse()
-//----------------------------------------------------------------------------
-{
-  this->InverseFlag = !this->InverseFlag;
-  this->Modified();
-}
-
-//----------------------------------------------------------------------------
-float mafTransform::PolarDecomp(vtkMatrix4x4 *v_M, vtkMatrix4x4 *v_Q, vtkMatrix4x4 *v_S,
-																float translation[3])
-//----------------------------------------------------------------------------
-{
-typedef float HMatrix[4][4];
-float det;
+double det;
 int i, j;
 
 for (i = 0; i < 3; i++)
 {
-translation[i] = v_M->GetElement(i, 3);
+translation[i] = v_M.GetElement(i, 3);
 }
 
-HMatrix M, Q, S;
+mafTransform::HMatrix M, Q, S;
 for (i = 0; i < 3; i++)
 	for (j = 0;j < 3; j++)
-	M[i][j] = v_M->GetElement(i,j);
+	M[i][j] = v_M.GetElement(i,j);
 
-	det = polar_decomp(M, Q, S);
+	det = PolarDecomp(M, Q, S);
 
 for (i = 0; i < 4; i++)
 	for (j = 0;j < 4; j++)
 	{
-	v_Q->SetElement(i, j, Q[i][j]);
-	v_S->SetElement(i, j, S[i][j]);
+	v_Q.SetElement(i, j, Q[i][j]);
+	v_S.SetElement(i, j, S[i][j]);
 	}
 
 return det;
@@ -348,7 +263,7 @@ return det;
 
 //----------------------------------------------------------------------------
 // Multiply the upper left 3x3 parts of A and B to get AB 
-void mat_mult(HMatrix A, HMatrix B, HMatrix AB)
+void mat_mult(mafTransform::HMatrix A, mafTransform::HMatrix B, mafTransform::HMatrix AB)
 {
     int i, j;
     for (i=0; i<3; i++) for (j=0; j<3; j++)
@@ -357,7 +272,7 @@ void mat_mult(HMatrix A, HMatrix B, HMatrix AB)
 
 //----------------------------------------------------------------------------
 // Return dot product of length 3 vectors va and vb
-float vdot(float *va, float *vb)
+double vdot(double *va, double *vb)
 //----------------------------------------------------------------------------
 {
     return (va[0]*vb[0] + va[1]*vb[1] + va[2]*vb[2]);
@@ -365,7 +280,7 @@ float vdot(float *va, float *vb)
 
 //----------------------------------------------------------------------------
 // Set v to cross product of length 3 vectors va and vb
-void vcross(float *va, float *vb, float *v)
+void vcross(double *va, double *vb, double *v)
 {
     v[0] = va[1]*vb[2] - va[2]*vb[1];
     v[1] = va[2]*vb[0] - va[0]*vb[2];
@@ -374,7 +289,7 @@ void vcross(float *va, float *vb, float *v)
 
 //----------------------------------------------------------------------------
 // Set MadjT to transpose of inverse of M times determinant of M
-void adjoint_transpose(HMatrix M, HMatrix MadjT)
+void adjoint_transpose(mafTransform::HMatrix M, mafTransform::HMatrix MadjT)
 //----------------------------------------------------------------------------
 {
     vcross(M[1], M[2], MadjT[0]);
@@ -388,20 +303,20 @@ void adjoint_transpose(HMatrix M, HMatrix MadjT)
 
 //----------------------------------------------------------------------------
 // Construct a (possibly non-unit) quaternion from real components.
-Quat Qt_(float x, float y, float z, float w)
+mafTransform::Quat Qt_(double x, double y, double z, double w)
 //----------------------------------------------------------------------------
 {
-    Quat qq;
+    mafTransform::Quat qq;
     qq.x = x; qq.y = y; qq.z = z; qq.w = w;
     return (qq);
 }
 
 //----------------------------------------------------------------------------
 // Return conjugate of quaternion.
-Quat Qt_Conj(Quat q)
+mafTransform::Quat Qt_Conj(mafTransform::Quat q)
 //----------------------------------------------------------------------------
 {
-    Quat qq;
+    mafTransform::Quat qq;
     qq.x = -q.x; qq.y = -q.y; qq.z = -q.z; qq.w = q.w;
     return (qq);
 }
@@ -410,10 +325,10 @@ Quat Qt_Conj(Quat q)
 // Return quaternion product qL * qR.  Note: order is important!
 // To combine rotations, use the product Mul(qSecond, qFirst),
 // which gives the effect of rotating by qFirst then qSecond.
-Quat Qt_Mul(Quat qL, Quat qR)
+mafTransform::Quat Qt_Mul(mafTransform::Quat qL, mafTransform::Quat qR)
 //----------------------------------------------------------------------------
 {
-    Quat qq;
+    mafTransform::Quat qq;
     qq.w = qL.w*qR.w - qL.x*qR.x - qL.y*qR.y - qL.z*qR.z;
     qq.x = qL.w*qR.x + qL.x*qR.w + qL.y*qR.z - qL.z*qR.y;
     qq.y = qL.w*qR.y + qL.y*qR.w + qL.z*qR.x - qL.x*qR.z;
@@ -423,21 +338,20 @@ Quat Qt_Mul(Quat qL, Quat qR)
 
 //----------------------------------------------------------------------------
 // Return product of quaternion q by scalar w.
-Quat Qt_Scale(Quat q, float w)
+mafTransform::Quat Qt_Scale(mafTransform::Quat q, double w)
 //----------------------------------------------------------------------------
 {
-    Quat qq;
+    mafTransform::Quat qq;
     qq.w = q.w*w; qq.x = q.x*w; qq.y = q.y*w; qq.z = q.z*w;
     return (qq);
 }
-
 
 //----------------------------------------------------------------------------
 // Construct a unit quaternion from rotation matrix.  Assumes matrix is
 // used to multiply column vector on the left: vnew = mat vold.	 Works
 // correctly for right-handed coordinate system and right-handed rotations.
 // Translation and perspective components ignored.
-Quat Qt_FromMatrix(HMatrix mat)
+mafTransform::Quat mafTransform::QuaternionFromMatrix(HMatrix mat)
 //----------------------------------------------------------------------------
 {
     /* This algorithm avoids near-zero divides by looking for a large component
@@ -483,13 +397,13 @@ Quat Qt_FromMatrix(HMatrix mat)
 //                  ******* Decomp Auxiliaries *******
 //----------------------------------------------------------------------------
 
-static HMatrix mat_id = {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
+static mafTransform::HMatrix mat_id = {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
 
 /** Compute either the 1 or infinity norm of M, depending on tpose **/
-float mat_norm(HMatrix M, int tpose)
+double mat_norm(mafTransform::HMatrix M, int tpose)
 {
     int i;
-    float sum, max;
+    double sum, max;
     max = 0.0;
     for (i=0; i<3; i++) {
 	if (tpose) sum = fabs(M[0][i])+fabs(M[1][i])+fabs(M[2][i]);
@@ -499,16 +413,16 @@ float mat_norm(HMatrix M, int tpose)
     return max;
 }
 
-float norm_inf(HMatrix M) {return mat_norm(M, 0);}
-float norm_one(HMatrix M) {return mat_norm(M, 1);}
+double norm_inf(mafTransform::HMatrix M) {return mat_norm(M, 0);}
+double norm_one(mafTransform::HMatrix M) {return mat_norm(M, 1);}
 
 //----------------------------------------------------------------------------
 // Return index of column of M containing maximum abs entry, or -1 if M=0
 //----------------------------------------------------------------------------
-int find_max_col(HMatrix M)
+int find_max_col(mafTransform::HMatrix M)
 //----------------------------------------------------------------------------
 {
-    float abs, max;
+    double abs, max;
     int i, j, col;
     max = 0.0; col = -1;
     for (i=0; i<3; i++) for (j=0; j<3; j++) {
@@ -520,10 +434,10 @@ int find_max_col(HMatrix M)
 
 //----------------------------------------------------------------------------
 // Setup u for Household reflection to zero all v components but first
-void make_reflector(float *v, float *u)
+void make_reflector(double *v, double *u)
 //----------------------------------------------------------------------------
 {
-    float s = sqrt(vdot(v, v));
+    double s = sqrt(vdot(v, v));
     u[0] = v[0]; u[1] = v[1];
     u[2] = v[2] + ((v[2]<0.0) ? -s : s);
     s = sqrt(2.0/vdot(u, u));
@@ -532,34 +446,34 @@ void make_reflector(float *v, float *u)
 
 //----------------------------------------------------------------------------
 // Apply Householder reflection represented by u to column vectors of M 
-void reflect_cols(HMatrix M, float *u)
+void reflect_cols(mafTransform::HMatrix M, double *u)
 //----------------------------------------------------------------------------
 {
     int i, j;
     for (i=0; i<3; i++) {
-	float s = u[0]*M[0][i] + u[1]*M[1][i] + u[2]*M[2][i];
+	double s = u[0]*M[0][i] + u[1]*M[1][i] + u[2]*M[2][i];
 	for (j=0; j<3; j++) M[j][i] -= u[j]*s;
     }
 }
 
 //----------------------------------------------------------------------------
 // Apply Householder reflection represented by u to row vectors of M
-void reflect_rows(HMatrix M, float *u)
+void reflect_rows(mafTransform::HMatrix M, double *u)
 //----------------------------------------------------------------------------
 {
     int i, j;
     for (i=0; i<3; i++) {
-	float s = vdot(u, M[i]);
+	double s = vdot(u, M[i]);
 	for (j=0; j<3; j++) M[i][j] -= u[j]*s;
     }
 }
 
 //----------------------------------------------------------------------------
 // Find orthogonal factor Q of rank 1 (or less) M
-void do_rank1(HMatrix M, HMatrix Q)
+void do_rank1(mafTransform::HMatrix M, mafTransform::HMatrix Q)
 //----------------------------------------------------------------------------
 {
-    float v1[3], v2[3], s;
+    double v1[3], v2[3], s;
     int col;
     mat_copy(Q,=,mat_id,4);
     /* If rank(M) is 1, we should find a non-zero column in M */
@@ -577,11 +491,11 @@ void do_rank1(HMatrix M, HMatrix Q)
 
 //----------------------------------------------------------------------------
 // Find orthogonal factor Q of rank 2 (or less) M using adjoint transpose
-void do_rank2(HMatrix M, HMatrix MadjT, HMatrix Q)
+void do_rank2(mafTransform::HMatrix M, mafTransform::HMatrix MadjT, mafTransform::HMatrix Q)
 //----------------------------------------------------------------------------
 {
-    float v1[3], v2[3];
-    float w, x, y, z, c, s, d;
+    double v1[3], v2[3];
+    double w, x, y, z, c, s, d;
     int col;
     /* If rank(M) is 2, we should find a non-zero column in MadjT */
     col = find_max_col(MadjT);
@@ -614,12 +528,12 @@ void do_rank2(HMatrix M, HMatrix MadjT, HMatrix Q)
 // Technical Report 88-942, October 1988,
 // Department of Computer Science, Cornell University.
 //----------------------------------------------------------------------------
-float polar_decomp(HMatrix M, HMatrix Q, HMatrix S)
+double mafTransform::PolarDecomp(HMatrix M, HMatrix Q, HMatrix S)
 //----------------------------------------------------------------------------
 {
 #define TOL 1.0e-6
     HMatrix Mk, MadjTk, Ek;
-    float det, M_one, M_inf, MadjT_one, MadjT_inf, E_one, gamma, g1, g2;
+    double det, M_one, M_inf, MadjT_one, MadjT_inf, E_one, gamma, g1, g2;
     int i, j;
     mat_tpose(Mk,=,M,3);
     M_one = norm_one(Mk);  M_inf = norm_inf(Mk);
@@ -655,7 +569,7 @@ float polar_decomp(HMatrix M, HMatrix Q, HMatrix S)
 // matrix of the scale factors, then S = U K (U transpose). Uses Jacobi method.
 // See Gene H. Golub and Charles F. Van Loan. Matrix Computations. Hopkins 1983.
 //----------------------------------------------------------------------------
-HVect spect_decomp(HMatrix S, HMatrix U)
+mafTransform::HVect mafTransform::SpectDecomp(HMatrix S, HMatrix U)
 //----------------------------------------------------------------------------
 {
     HVect kv;
@@ -667,7 +581,7 @@ HVect spect_decomp(HMatrix S, HMatrix U)
     Diag[X] = S[X][X]; Diag[Y] = S[Y][Y]; Diag[Z] = S[Z][Z];
     OffD[X] = S[Y][Z]; OffD[Y] = S[Z][X]; OffD[Z] = S[X][Y];
     for (sweep=20; sweep>0; sweep--) {
-	float sm = fabs(OffD[X])+fabs(OffD[Y])+fabs(OffD[Z]);
+	double sm = fabs(OffD[X])+fabs(OffD[Y])+fabs(OffD[Z]);
 	if (sm==0.0) break;
 	for (i=Z; i>=X; i--) {
 	    int p = nxt[i]; int q = nxt[p];
@@ -714,7 +628,7 @@ HVect spect_decomp(HMatrix S, HMatrix U)
 // See Ken Shoemake and Tom Duff. Matrix Animation and Polar Decomposition.
 // Proceedings of Graphics Interface 1992. Details on p. 262-263.
 //----------------------------------------------------------------------------
-Quat snuggle(Quat q, HVect *k)
+mafTransform::Quat mafTransform::Snuggle(Quat q, HVect *k)
 //----------------------------------------------------------------------------
 {
 #define SQRTHALF (0.7071067811865475244)
@@ -723,7 +637,7 @@ Quat snuggle(Quat q, HVect *k)
 #define cycle(a,p)  if (p) {a[3]=a[0]; a[0]=a[1]; a[1]=a[2]; a[2]=a[3];}\
 		    else   {a[3]=a[2]; a[2]=a[1]; a[1]=a[0]; a[0]=a[3];}
     Quat p;
-    float ka[4];
+    double ka[4];
     int i, turn = -1;
     ka[X] = k->x; ka[Y] = k->y; ka[Z] = k->z;
     if (ka[X]==ka[Y]) {if (ka[X]==ka[Z]) turn = W; else turn = Z;}
@@ -763,7 +677,7 @@ Quat snuggle(Quat q, HVect *k)
 	p = Qt_Mul(p, Qt_(0.0,0.0,-qp.z/t,qp.w/t));
 	p = Qt_Mul(qtoz, Qt_Conj(p));
     } else {
-	float qa[4], pa[4];
+	double qa[4], pa[4];
 	unsigned lo, hi, neg[4], par = 0;
 	double all, big, two;
 	qa[0] = q.x; qa[1] = q.y; qa[2] = q.z; qa[3] = q.w;
@@ -813,22 +727,22 @@ Quat snuggle(Quat q, HVect *k)
 // See Ken Shoemake and Tom Duff. Matrix Animation and Polar Decomposition.
 // Proceedings of Graphics Interface 1992.
 //----------------------------------------------------------------------------
-void decomp_affine(HMatrix A, AffineParts *parts)
+void mafTransform::DecompAffine(HMatrix A, AffineParts *parts)
 //----------------------------------------------------------------------------
 {
-    HMatrix Q, S, U;
+    mafTransform::HMatrix Q, S, U;
     Quat p;
-    float det;
+    double det;
     parts->t = Qt_(A[X][W], A[Y][W], A[Z][W], 0);
-    det = polar_decomp(A, Q, S);
+    det = PolarDecomp(A, Q, S);
     if (det<0.0) {
 	mat_copy(Q,=,-Q,3);
 	parts->f = -1;
     } else parts->f = 1;
-    parts->q = Qt_FromMatrix(Q);
-    parts->k = spect_decomp(S, U);
-    parts->u = Qt_FromMatrix(U);
-    p = snuggle(parts->u, &parts->k);
+    parts->q = QuaternionFromMatrix(Q);
+    parts->k = SpectDecomp(S, U);
+    parts->u = QuaternionFromMatrix(U);
+    p = Snuggle(parts->u, &parts->k);
     parts->u = Qt_Mul(parts->u, p);
 }
 
@@ -838,7 +752,7 @@ void decomp_affine(HMatrix A, AffineParts *parts)
 
 //----------------------------------------------------------------------------
 // Compute inverse of affine decomposition.
-void invert_affine(AffineParts *parts, AffineParts *inverse)
+void mafTransform::InvertAffine(AffineParts *parts, AffineParts *inverse)
 //----------------------------------------------------------------------------
 {
     Quat t, p;
@@ -865,14 +779,14 @@ void invert_affine(AffineParts *parts, AffineParts *inverse)
 // copied from vtkTransform::GetOrientation
 // Get the x, y, z orientation angles from the transformation matrix as an
 // array of three floating point values.
-void mafTransform::GetOrientation(vtkMatrix4x4 *in_matrix,double orientation[3])
+void mafTransform::GetOrientation(const mafMatrix &in_matrix,double orientation[3])
 //----------------------------------------------------------------------------
 {
-#define VTK_AXIS_EPSILON 0.001
+#define MAF_AXIS_EPSILON 0.001
   int i;
 
   // convenient access to matrix
-  double (*matrix)[4] = in_matrix->Element;
+  double (*matrix)[4] = in_matrix.GetElements();
   double ortho[3][3];
 
   for (i = 0; i < 3; i++)
@@ -881,14 +795,14 @@ void mafTransform::GetOrientation(vtkMatrix4x4 *in_matrix,double orientation[3])
     ortho[1][i] = matrix[1][i];
     ortho[2][i] = matrix[2][i];
     }
-  if (vtkMath::Determinant3x3(ortho) < 0)
+  if (mafMatrix3x3::Determinant(ortho) < 0)
     {
     ortho[0][2] = -ortho[0][2];
     ortho[1][2] = -ortho[1][2];
     ortho[2][2] = -ortho[2][2];
     }
 
-  vtkMath::Orthogonalize3x3(ortho, ortho);
+  mafMatrix3x3::Orthogonalize(ortho, ortho);
 
   // first rotate about y axis
   double x2 = ortho[2][0];
@@ -902,7 +816,7 @@ void mafTransform::GetOrientation(vtkMatrix4x4 *in_matrix,double orientation[3])
   double d1 = sqrt(x2*x2 + z2*z2);
 
   double cosTheta, sinTheta;
-  if (d1 < VTK_AXIS_EPSILON) 
+  if (d1 < MAF_AXIS_EPSILON) 
     {
     cosTheta = 1.0;
     sinTheta = 0.0;
@@ -914,18 +828,18 @@ void mafTransform::GetOrientation(vtkMatrix4x4 *in_matrix,double orientation[3])
     }
 
   double theta = atan2(sinTheta, cosTheta);
-  orientation[1] = -theta/vtkMath::DoubleDegreesToRadians();
+  orientation[1] = -theta/mafMatrix3x3::DegreesToRadians();
 
   // now rotate about x axis
   double d = sqrt(x2*x2 + y2*y2 + z2*z2);
 
   double sinPhi, cosPhi;
-  if (d < VTK_AXIS_EPSILON) 
+  if (d < MAF_AXIS_EPSILON) 
     {
     sinPhi = 0.0;
     cosPhi = 1.0;
     }
-  else if (d1 < VTK_AXIS_EPSILON) 
+  else if (d1 < MAF_AXIS_EPSILON) 
     {
     sinPhi = y2/d;
     cosPhi = z2/d;
@@ -937,7 +851,7 @@ void mafTransform::GetOrientation(vtkMatrix4x4 *in_matrix,double orientation[3])
     }
 
   double phi = atan2(sinPhi, cosPhi);
-  orientation[0] = phi/vtkMath::DoubleDegreesToRadians();
+  orientation[0] = phi/mafMatrix3x3::DegreesToRadians();
 
   // finally, rotate about z
   double x3p = x3*cosTheta - z3*sinTheta;
@@ -945,7 +859,7 @@ void mafTransform::GetOrientation(vtkMatrix4x4 *in_matrix,double orientation[3])
   double d2 = sqrt(x3p*x3p + y3p*y3p);
 
   double cosAlpha, sinAlpha;
-  if (d2 < VTK_AXIS_EPSILON) 
+  if (d2 < MAF_AXIS_EPSILON) 
     {
     cosAlpha = 1.0;
     sinAlpha = 0.0;
@@ -957,14 +871,14 @@ void mafTransform::GetOrientation(vtkMatrix4x4 *in_matrix,double orientation[3])
     }
 
   double alpha = atan2(sinAlpha, cosAlpha);
-  orientation[2] = alpha/vtkMath::DoubleDegreesToRadians();
+  orientation[2] = alpha/mafMatrix3x3::DegreesToRadians();
 }
 
 //----------------------------------------------------------------------------
-void mafTransform::GetOrientation(vtkMatrix4x4 *in_matrix,float orientation[3])
+void mafTransform::GetOrientation(const mafMatrix &in_matrix,float orientation[3])
 //----------------------------------------------------------------------------
 {
-  double temp[3];
+  float temp[3];
   GetOrientation(in_matrix,temp);
   orientation[0]=temp[0];
   orientation[1]=temp[1];
@@ -973,13 +887,13 @@ void mafTransform::GetOrientation(vtkMatrix4x4 *in_matrix,float orientation[3])
 
 //----------------------------------------------------------------------------
 // copied from vtkTransform::GetOrientationWXYZ 
-void mafTransform::GetOrientationWXYZ(vtkMatrix4x4 *in_matrix, double wxyz[4])
+void mafTransform::GetOrientationWXYZ(const mafMatrix &in_matrix, double wxyz[4])
 //----------------------------------------------------------------------------
 {
   int i;
 
   // convenient access to matrix
-  double (*matrix)[4] = in_matrix->Element;
+  double (*matrix)[4] = in_matrix.GetElements();
   double ortho[3][3];
 
   for (i = 0; i < 3; i++)
@@ -988,21 +902,21 @@ void mafTransform::GetOrientationWXYZ(vtkMatrix4x4 *in_matrix, double wxyz[4])
     ortho[1][i] = matrix[1][i];
     ortho[2][i] = matrix[2][i];
     }
-  if (vtkMath::Determinant3x3(ortho) < 0)
+  if (mafMatrix3x3::Determinant(ortho) < 0)
     {
     ortho[0][i] = -ortho[0][i];
     ortho[1][i] = -ortho[1][i];
     ortho[2][i] = -ortho[2][i];
     }
 
-  vtkMath::Matrix3x3ToQuaternion(ortho, wxyz);
+  mafMatrix3x3::MatrixToQuaternion(ortho, wxyz);
 
   // calc the return value wxyz
  double mag = sqrt(wxyz[1]*wxyz[1] + wxyz[2]*wxyz[2] + wxyz[3]*wxyz[3]);
 
   if (mag)
     {
-    wxyz[0] = 2.0*acos(wxyz[0])/vtkMath::DoubleDegreesToRadians();
+    wxyz[0] = 2.0*acos(wxyz[0])/mafMatrix3x3::DegreesToRadians();
     wxyz[1] /= mag;
     wxyz[2] /= mag;
     wxyz[3] /= mag;
@@ -1017,29 +931,29 @@ void mafTransform::GetOrientationWXYZ(vtkMatrix4x4 *in_matrix, double wxyz[4])
 }
 
 //----------------------------------------------------------------------------
-void mafTransform::GetPosition(vtkMatrix4x4 *matrix,double position[3])
+void mafTransform::GetPosition(const mafMatrix &matrix,double position[3])
 //----------------------------------------------------------------------------
 {
-  position[0] = matrix->Element[0][3];
-  position[1] = matrix->Element[1][3];
-  position[2] = matrix->Element[2][3];
+  position[0] = matrix.GetElements()[0][3];
+  position[1] = matrix.GetElements()[1][3];
+  position[2] = matrix.GetElements()[2][3];
 }
 
 //----------------------------------------------------------------------------
-void mafTransform::GetPosition(vtkMatrix4x4 *matrix,float position[3])
+void mafTransform::GetPosition(const mafMatrix &matrix,float position[3])
 //----------------------------------------------------------------------------
 {
-  position[0] = matrix->Element[0][3];
-  position[1] = matrix->Element[1][3];
-  position[2] = matrix->Element[2][3];
+  position[0] = matrix.GetElements()[0][3];
+  position[1] = matrix.GetElements()[1][3];
+  position[2] = matrix.GetElements()[2][3];
 }
 
 //----------------------------------------------------------------------------
-void mafTransform::GetScale(vtkMatrix4x4 *in_matrix,double scale[3])
+void mafTransform::GetScale(const mafMatrix &in_matrix,double scale[3])
 //----------------------------------------------------------------------------
 {
   // convenient access to matrix
-  double (*matrix)[4] = in_matrix->Element;
+  double (*matrix)[4] = in_matrix.GetElements();
   double U[3][3], VT[3][3];
 
   for (int i = 0; i < 3; i++) 
@@ -1049,11 +963,11 @@ void mafTransform::GetScale(vtkMatrix4x4 *in_matrix,double scale[3])
     U[2][i] = matrix[2][i];
     }
 
-  vtkMath::SingularValueDecomposition3x3(U, U, scale, VT);
+  mafMatrix3x3::SingularValueDecomposition(U, U, scale, VT);
 }
 
 //----------------------------------------------------------------------------
-void mafTransform::Scale(vtkMatrix4x4 *matrix,double scalex,double scaley,double scalez,int premult)
+void mafTransform::Scale(mafMatrix &matrix,double scalex,double scaley,double scalez,int premult)
 //----------------------------------------------------------------------------
 {
   mafMatrix tmp;
@@ -1062,127 +976,35 @@ void mafTransform::Scale(vtkMatrix4x4 *matrix,double scalex,double scaley,double
     return;
   }
 
-  tmp->SetElement(0,0,scalex);
-  tmp->SetElement(1,1,scaley);
-  tmp->SetElement(2,2,scalez);
+  tmp.SetElement(0,0,scalex);
+  tmp.SetElement(1,1,scaley);
+  tmp.SetElement(2,2,scalez);
   
   if (premult)
-    vtkMatrix4x4::Multiply4x4(matrix,tmp,matrix);
+    mafMatrix::Multiply4x4(matrix,tmp,matrix);
   else
-    vtkMatrix4x4::Multiply4x4(tmp,matrix,matrix);
+    mafMatrix::Multiply4x4(tmp,matrix,matrix);
 }
 
 //----------------------------------------------------------------------------
-// angles in degrees
-int mafTransform::ConversionRToHelicalAxis(vtkMatrix4x4 *v_matrix,										 
-										   double helical_axis[3],double& angle)
+inline double sign(double a) 
 //----------------------------------------------------------------------------
 {
-
-  double PI = vtkMath::DoublePi();      
-  
-  double kx, ky, kz,cangle;
-
-    
-  cangle = (v_matrix->GetElement(X,0) + v_matrix->GetElement(Y,1) + v_matrix->GetElement(Z,2) - 1.) * 0.5;
-
-  if (fabs(cangle) > 1.)
-	{
-		//come si usa vtkErrorMacro? che file bisogna includere?
-		//vtkErrorMacro(<<"Division By Zero");
-		return 0;
-
-	}
-	
-
- 
-  kx = (v_matrix->GetElement(Z,1) - v_matrix->GetElement(Y,2));
-  ky = (v_matrix->GetElement(X,2) - v_matrix->GetElement(Z,0));
-  kz = (v_matrix->GetElement(Y,0) - v_matrix->GetElement(X,1));
-
-  angle  = acos(cangle);
-  if (angle < PI / 2) {
-    double isangle = 0.5 / sqrt(1 - cangle * cangle);
-    kx *= isangle;
-    ky *= isangle;
-    kz *= isangle;
-    }
-  else {
-    double ica = 1. - cangle;
-
-	assert(ica != 0);
-    //assert(!is_zero(ica));
-    kx = sign(kx) * sqrt((v_matrix->GetElement(X,0) - cangle) / ica);
-    ky = sign(ky) * sqrt((v_matrix->GetElement(Y,1) - cangle) / ica);
-    kz = sign(kz) * sqrt((v_matrix->GetElement(Z,2) - cangle) / ica);
-    if ( kx > ky && kx > kz) {
-      ky = (v_matrix->GetElement(Y,0) + v_matrix->GetElement(X,1)) / (2 * kx * ica);
-      kz = (v_matrix->GetElement(Z,2) + v_matrix->GetElement(X,0)) / (2 * kx * ica);
-      }
-    else if (ky > kx && ky > kz) {
-      kx = (v_matrix->GetElement(Y,0) + v_matrix->GetElement(X,1)) / (2 * ky * ica);
-      kz = (v_matrix->GetElement(Z,1) + v_matrix->GetElement(Y,2)) / (2 * ky * ica);
-      }
-    else {
-      kx = (v_matrix->GetElement(X,2) + v_matrix->GetElement(Z,0)) / (2 * kz * ica);
-      ky = (v_matrix->GetElement(Z,1) + v_matrix->GetElement(Y,2)) / (2 * kz * ica);
-      }
-    }
-  if (angle > FLT_MAX || angle < -FLT_MAX)
-	{
-		//vtkErrorMacro(<<"Division By Zero");
-		return 0;
-
-	}
-
-  
-  
-	double norma = sqrt(kx * kx + ky * ky + kz * kz); 
-
-	kx = kx /norma;
-	ky = ky /norma;
-	kz = kz /norma;
-
-	helical_axis[0] = kx;
-	helical_axis[1] = ky;
-	helical_axis[2] = kz;
-
-	//modified by Stefano. 1-7-2003 (beg)
-	//converison to degree
-	angle = angle * vtkMath::DoubleRadiansToDegrees ();
-	//modified by Stefano. 1-7-2003 (end)
-
-	return 1;
-	
-
+  return (a>0) ? 1.0 : ((a<0) ? -1.0 : 0.0);
 }
 
-
 //----------------------------------------------------------------------------
-double mafTransform::sign(double a) 
-//----------------------------------------------------------------------------
-{
-	if (a>0)
-        return 1.;
-	else if (a<0)
-        return -1.;
-	else
-        return 0.;
-}
-
-
-//----------------------------------------------------------------------------
-int mafTransform::ConversionRToAttitudeVector(vtkMatrix4x4 *v_matrix,
+int mafTransform::MatrixToAttitudeVector(const mafMatrix &v_matrix,
 											  double attitude_vector[3])
 //----------------------------------------------------------------------------
 {
 	double c,s,first_diagonal,second_diagonal,third_diagonal,alpha;
 	
-	c =	(v_matrix->GetElement(0,0)+v_matrix->GetElement(1,1)+v_matrix->GetElement(2,2)-1)/2.0;
+	c =	(v_matrix.GetElement(0,0)+v_matrix.GetElement(1,1)+v_matrix.GetElement(2,2)-1)/2.0;
 	
-	third_diagonal	= v_matrix->GetElement(2,1)-v_matrix->GetElement(1,2);
-	second_diagonal = v_matrix->GetElement(2,0)-v_matrix->GetElement(0,2);
-	first_diagonal	= v_matrix->GetElement(1,0)-v_matrix->GetElement(0,1);
+	third_diagonal	= v_matrix.GetElement(2,1)-v_matrix.GetElement(1,2);
+	second_diagonal = v_matrix.GetElement(2,0)-v_matrix.GetElement(0,2);
+	first_diagonal	= v_matrix.GetElement(1,0)-v_matrix.GetElement(0,1);
 
 
 	s =	sqrt((third_diagonal*third_diagonal)+(second_diagonal*second_diagonal)+(first_diagonal*first_diagonal))/2.0;
@@ -1190,16 +1012,16 @@ int mafTransform::ConversionRToAttitudeVector(vtkMatrix4x4 *v_matrix,
 	alpha = atan2(s,c);
 
 	// attitude_vector is the Orientation Vector [rad] 
-	attitude_vector[0] = (v_matrix->GetElement(2,1)-v_matrix->GetElement(1,2))*alpha/(2*sin(alpha));
-	attitude_vector[1] = (v_matrix->GetElement(0,2)-v_matrix->GetElement(2,0))*alpha/(2*sin(alpha));
-	attitude_vector[2] = (v_matrix->GetElement(1,0)-v_matrix->GetElement(0,1))*alpha/(2*sin(alpha));
+	attitude_vector[0] = (v_matrix.GetElement(2,1)-v_matrix.GetElement(1,2))*alpha/(2*sin(alpha));
+	attitude_vector[1] = (v_matrix.GetElement(0,2)-v_matrix.GetElement(2,0))*alpha/(2*sin(alpha));
+	attitude_vector[2] = (v_matrix.GetElement(1,0)-v_matrix.GetElement(0,1))*alpha/(2*sin(alpha));
 
 	
 	//modified by Stefano. 1-7-2003 (beg)
 	//conversion to degrees
-	attitude_vector[0] = attitude_vector[0] * vtkMath::DoubleRadiansToDegrees (); 
-	attitude_vector[1] = attitude_vector[1] * vtkMath::DoubleRadiansToDegrees ();
-	attitude_vector[2] = attitude_vector[2] * vtkMath::DoubleRadiansToDegrees ();
+	attitude_vector[0] = attitude_vector[0] * mafMatrix3x3::RadiansToDegrees (); 
+	attitude_vector[1] = attitude_vector[1] * mafMatrix3x3::RadiansToDegrees ();
+	attitude_vector[2] = attitude_vector[2] * mafMatrix3x3::RadiansToDegrees ();
 	//modified by Stefano. 1-7-2003 (end)
 
 	return 1;
@@ -1207,7 +1029,7 @@ int mafTransform::ConversionRToAttitudeVector(vtkMatrix4x4 *v_matrix,
 }		
 
 //----------------------------------------------------------------------------
-int mafTransform::ConversionRToEulerCardanicAngle(vtkMatrix4x4 *v_matrix,
+int mafTransform::MatrixToEulerCardanicAngle(const mafMatrix &v_matrix,
 												 int i,int j,int k,
 												 double euler_cardan[3],
 												 double tentative_euler_cardan_first = 0,
@@ -1229,12 +1051,12 @@ int mafTransform::ConversionRToEulerCardanicAngle(vtkMatrix4x4 *v_matrix,
 
 	//modified by Stefano. 1-7-2003 (beg)
 	//converison from degree to radians
-	tentative_euler_cardan_first = tentative_euler_cardan_first * vtkMath::DoubleDegreesToRadians();
-	tentative_euler_cardan_second = tentative_euler_cardan_second * vtkMath::DoubleDegreesToRadians();	
-	tentative_euler_cardan_third =	tentative_euler_cardan_third * vtkMath::DoubleDegreesToRadians();
+	tentative_euler_cardan_first = tentative_euler_cardan_first * mafMatrix3x3::DegreesToRadians();
+	tentative_euler_cardan_second = tentative_euler_cardan_second * mafMatrix3x3::DegreesToRadians();	
+	tentative_euler_cardan_third =	tentative_euler_cardan_third * mafMatrix3x3::DegreesToRadians();
 	//modified by Stefano. 1-7-2003 (end)	
 
-	double PI = vtkMath::DoublePi();
+	double PI = mafMatrix3x3::Pi();
 
 	double first_euler_cardan[3];
 	double second_euler_cardan[3];
@@ -1260,15 +1082,15 @@ int mafTransform::ConversionRToEulerCardanicAngle(vtkMatrix4x4 *v_matrix,
 
 	if (i!=k)	// Cardan Angles 
 	{		
-		first_euler_cardan[0]= atan2(-sig*v_matrix->GetElement(j,k),v_matrix->GetElement(k,k));
-		first_euler_cardan[1]= asin(sig*v_matrix->GetElement(i,k));
-		first_euler_cardan[2]= atan2(-sig*v_matrix->GetElement(i,j),v_matrix->GetElement(i,i));
+		first_euler_cardan[0]= atan2(-sig*v_matrix.GetElement(j,k),v_matrix.GetElement(k,k));
+		first_euler_cardan[1]= asin(sig*v_matrix.GetElement(i,k));
+		first_euler_cardan[2]= atan2(-sig*v_matrix.GetElement(i,j),v_matrix.GetElement(i,i));
 
-		second_euler_cardan[0]= atan2(sig*v_matrix->GetElement(j,k),-v_matrix->GetElement(k,k));
-		int division = (PI-asin(sig*v_matrix->GetElement(i,k)) + PI) / (2*PI);
-		double remainder = (PI-asin(sig*v_matrix->GetElement(i,k)) + PI)-(division * (2*PI));
+		second_euler_cardan[0]= atan2(sig*v_matrix.GetElement(j,k),-v_matrix.GetElement(k,k));
+		int division = (PI-asin(sig*v_matrix.GetElement(i,k)) + PI) / (2*PI);
+		double remainder = (PI-asin(sig*v_matrix.GetElement(i,k)) + PI)-(division * (2*PI));
 		second_euler_cardan[1]= remainder - PI; 
-		second_euler_cardan[2]= atan2(sig*v_matrix->GetElement(i,j),-v_matrix->GetElement(i,i));
+		second_euler_cardan[2]= atan2(sig*v_matrix.GetElement(i,j),-v_matrix.GetElement(i,i));
 
 	}
 
@@ -1279,13 +1101,13 @@ int mafTransform::ConversionRToEulerCardanicAngle(vtkMatrix4x4 *v_matrix,
 
 		int l=3-i-j;
 
-		first_euler_cardan[0]= atan2(v_matrix->GetElement(j,i),-sig*v_matrix->GetElement(l,i));
-		first_euler_cardan[1]= acos(v_matrix->GetElement(i,i));
-		first_euler_cardan[2]= atan2(v_matrix->GetElement(i,j),sig*v_matrix->GetElement(i,l));
+		first_euler_cardan[0]= atan2(v_matrix.GetElement(j,i),-sig*v_matrix.GetElement(l,i));
+		first_euler_cardan[1]= acos(v_matrix.GetElement(i,i));
+		first_euler_cardan[2]= atan2(v_matrix.GetElement(i,j),sig*v_matrix.GetElement(i,l));
 
-		second_euler_cardan[0]= atan2(-v_matrix->GetElement(j,i),sig*v_matrix->GetElement(l,i));
-		second_euler_cardan[1]= -acos(v_matrix->GetElement(i,i));
-		second_euler_cardan[2]= atan2(-v_matrix->GetElement(i,j),-sig*v_matrix->GetElement(i,l));
+		second_euler_cardan[0]= atan2(-v_matrix.GetElement(j,i),sig*v_matrix.GetElement(l,i));
+		second_euler_cardan[1]= -acos(v_matrix.GetElement(i,i));
+		second_euler_cardan[2]= atan2(-v_matrix.GetElement(i,j),-sig*v_matrix.GetElement(i,l));
 
 	}
 
@@ -1320,9 +1142,9 @@ int mafTransform::ConversionRToEulerCardanicAngle(vtkMatrix4x4 *v_matrix,
 
 	//modified by Stefano. 1-7-2003 (beg)
 	//converison to degree
-	euler_cardan[0] = euler_cardan[0] * vtkMath::DoubleRadiansToDegrees ();	
-	euler_cardan[1] = euler_cardan[1] * vtkMath::DoubleRadiansToDegrees ();
-	euler_cardan[2] = euler_cardan[2] * vtkMath::DoubleRadiansToDegrees ();
+	euler_cardan[0] = euler_cardan[0] * mafMatrix3x3::RadiansToDegrees ();	
+	euler_cardan[1] = euler_cardan[1] * mafMatrix3x3::RadiansToDegrees ();
+	euler_cardan[2] = euler_cardan[2] * mafMatrix3x3::RadiansToDegrees ();
 	//modified by Stefano. 1-7-2003 (end)	
 
 	return 1;
@@ -1330,7 +1152,7 @@ int mafTransform::ConversionRToEulerCardanicAngle(vtkMatrix4x4 *v_matrix,
 }	
 		
 //----------------------------------------------------------------------------
-int mafTransform::ConversionRToQuaternion(vtkMatrix4x4 *v_matrix,
+int mafTransform::MatrixToQuaternion(const mafMatrix &v_matrix,
 										  double quaternion[4])
 //----------------------------------------------------------------------------
 {
@@ -1341,49 +1163,49 @@ int mafTransform::ConversionRToQuaternion(vtkMatrix4x4 *v_matrix,
   	// Third coordinate of the vectorial part of the quaternion:	q3 = quaternion[3] 
 
 
-	double s = v_matrix->GetElement(0,0) + v_matrix->GetElement(1,1) + v_matrix->GetElement(2,2);
+	double s = v_matrix.GetElement(0,0) + v_matrix.GetElement(1,1) + v_matrix.GetElement(2,2);
 	if (s > -0.19) 
 		{
 			// compute quaternion[0] and deduce quaternion[1], quaternion[2] and quaternion[3]
 			quaternion[0] = 0.5 * sqrt(s + 1.0);
 			double inv = 0.25 / quaternion[0];
-			quaternion[1] = inv * (v_matrix->GetElement(1,2) - v_matrix->GetElement(2,1));
-			quaternion[2] = inv * (v_matrix->GetElement(2,0) - v_matrix->GetElement(0,2));
-			quaternion[3] = inv * (v_matrix->GetElement(0,1) - v_matrix->GetElement(1,0));
+			quaternion[1] = inv * (v_matrix.GetElement(1,2) - v_matrix.GetElement(2,1));
+			quaternion[2] = inv * (v_matrix.GetElement(2,0) - v_matrix.GetElement(0,2));
+			quaternion[3] = inv * (v_matrix.GetElement(0,1) - v_matrix.GetElement(1,0));
 		} 
 	else 
 		{
-			s = v_matrix->GetElement(0,0) - v_matrix->GetElement(1,1) - v_matrix->GetElement(2,2);
+			s = v_matrix.GetElement(0,0) - v_matrix.GetElement(1,1) - v_matrix.GetElement(2,2);
 			if (s > -0.19) 
 				{
 					// compute quaternion[1] and deduce quaternion[0], quaternion[2] and quaternion[3]
 					quaternion[1] = 0.5 * sqrt(s + 1.0);
 					double inv = 0.25 / quaternion[1];
-					quaternion[0] = inv * (v_matrix->GetElement(1,2) - v_matrix->GetElement(2,1));
-					quaternion[2] = inv * (v_matrix->GetElement(0,1) + v_matrix->GetElement(1,0));
-					quaternion[3] = inv * (v_matrix->GetElement(0,2) + v_matrix->GetElement(2,0));
+					quaternion[0] = inv * (v_matrix.GetElement(1,2) - v_matrix.GetElement(2,1));
+					quaternion[2] = inv * (v_matrix.GetElement(0,1) + v_matrix.GetElement(1,0));
+					quaternion[3] = inv * (v_matrix.GetElement(0,2) + v_matrix.GetElement(2,0));
 				} 
 			else 
 				{
-					s = v_matrix->GetElement(1,1) - v_matrix->GetElement(0,0) - v_matrix->GetElement(2,2);
+					s = v_matrix.GetElement(1,1) - v_matrix.GetElement(0,0) - v_matrix.GetElement(2,2);
 					if (s > -0.19) 
 						{
 							// compute quaternion[2] and deduce quaternion[0], quaternion[1] and quaternion[3]
 							quaternion[2] = 0.5 * sqrt(s + 1.0);
 							double inv = 0.25 / quaternion[2];
-							quaternion[0] = inv * (v_matrix->GetElement(2,0) - v_matrix->GetElement(0,2));
-							quaternion[1] = inv * (v_matrix->GetElement(0,1) + v_matrix->GetElement(1,0));
-							quaternion[3] = inv * (v_matrix->GetElement(2,1) + v_matrix->GetElement(1,2));
+							quaternion[0] = inv * (v_matrix.GetElement(2,0) - v_matrix.GetElement(0,2));
+							quaternion[1] = inv * (v_matrix.GetElement(0,1) + v_matrix.GetElement(1,0));
+							quaternion[3] = inv * (v_matrix.GetElement(2,1) + v_matrix.GetElement(1,2));
 						} 
 					else 
 						{
 							// compute quaternion[3] and deduce quaternion[0], quaternion[1] and quaternion[2]
-							s = v_matrix->GetElement(2,2) - v_matrix->GetElement(0,0) - v_matrix->GetElement(1,1);
+							s = v_matrix.GetElement(2,2) - v_matrix.GetElement(0,0) - v_matrix.GetElement(1,1);
 							quaternion[3] = 0.5 * sqrt(s + 1.0);
 							double inv = 0.25 / quaternion[3];
-							quaternion[0] = inv * (v_matrix->GetElement(0,1) - v_matrix->GetElement(1,0));
-							quaternion[1] = inv * (v_matrix->GetElement(0,2) + v_matrix->GetElement(2,0));
-							quaternion[2] = inv * (v_matrix->GetElement(2,1) + v_matrix->GetElement(1,2));
+							quaternion[0] = inv * (v_matrix.GetElement(0,1) - v_matrix.GetElement(1,0));
+							quaternion[1] = inv * (v_matrix.GetElement(0,2) + v_matrix.GetElement(2,0));
+							quaternion[2] = inv * (v_matrix.GetElement(2,1) + v_matrix.GetElement(1,2));
 						}
 				 }
 			}
@@ -1393,8 +1215,8 @@ int mafTransform::ConversionRToQuaternion(vtkMatrix4x4 *v_matrix,
 }
 
 //----------------------------------------------------------------------------
-int mafTransform::ConversionQuaternionToR(double quaternion[4],
-										  vtkMatrix4x4 *v_matrix)
+int mafTransform::QuaternionToMatrix(double quaternion[4],
+										  mafMatrix &v_matrix)
 //----------------------------------------------------------------------------
 {
 
@@ -1435,46 +1257,46 @@ int mafTransform::ConversionQuaternionToR(double quaternion[4],
     
 
 
-	v_matrix->SetElement(0, 0, m00); 
-	v_matrix->SetElement(0, 1, m01); 
-	v_matrix->SetElement(0, 2, m02);
+	v_matrix.SetElement(0, 0, m00); 
+	v_matrix.SetElement(0, 1, m01); 
+	v_matrix.SetElement(0, 2, m02);
 
-	v_matrix->SetElement(0, 3, 0);
+	v_matrix.SetElement(0, 3, 0);
 
 	
-	v_matrix->SetElement(1, 0, m10);
-	v_matrix->SetElement(1, 1, m11);
-	v_matrix->SetElement(1, 2, m12);
+	v_matrix.SetElement(1, 0, m10);
+	v_matrix.SetElement(1, 1, m11);
+	v_matrix.SetElement(1, 2, m12);
 
-	v_matrix->SetElement(1, 3, 0);
-
-
-
-	v_matrix->SetElement(2, 0, m20);
-	v_matrix->SetElement(2, 1, m21);
-	v_matrix->SetElement(2, 2, m22);
-
-	v_matrix->SetElement(2, 3, 0);
+	v_matrix.SetElement(1, 3, 0);
 
 
 
+	v_matrix.SetElement(2, 0, m20);
+	v_matrix.SetElement(2, 1, m21);
+	v_matrix.SetElement(2, 2, m22);
 
-	v_matrix->SetElement(3, 0, 0);
-	v_matrix->SetElement(3, 1, 0);
-	v_matrix->SetElement(3, 2, 0);
-	v_matrix->SetElement(3, 3, 1);
+	v_matrix.SetElement(2, 3, 0);
+
+
+
+
+	v_matrix.SetElement(3, 0, 0);
+	v_matrix.SetElement(3, 1, 0);
+	v_matrix.SetElement(3, 2, 0);
+	v_matrix.SetElement(3, 3, 1);
 
 	
 	return 1;
 }
 
 //----------------------------------------------------------------------------
-int mafTransform::ConversionHelicalAxisToR(double helical_axis[3],double angle,
-										   vtkMatrix4x4 *v_matrix)
+int mafTransform::HelicalAxisToMatrix(double helical_axis[3],double angle,
+										   mafMatrix &v_matrix)
 {
 	//modified by Stefano. 1-7-2003 (beg)
 	//conversion to radians
-	angle = angle * vtkMath::DoubleDegreesToRadians();
+	angle = angle * mafMatrix3x3::DegreesToRadians();
 	//modified by Stefano. 1-7-2003 (end)
 
 	double kx = helical_axis[0], ky = helical_axis[1], kz = helical_axis[2];
@@ -1491,39 +1313,39 @@ int mafTransform::ConversionHelicalAxisToR(double helical_axis[3],double angle,
 		}
 
  
-	v_matrix->SetElement(X, 0, kx * kx * ica + ca); 
-	v_matrix->SetElement(X, 1, ky * kx * ica - kz * sa); 
-	v_matrix->SetElement(X, 2, kz * kx * ica + ky * sa);
+	v_matrix.SetElement(X, 0, kx * kx * ica + ca); 
+	v_matrix.SetElement(X, 1, ky * kx * ica - kz * sa); 
+	v_matrix.SetElement(X, 2, kz * kx * ica + ky * sa);
 
-	v_matrix->SetElement(0, 3, 0);
-
-
-	v_matrix->SetElement(Y, 0, kx * ky * ica + kz * sa);
-	v_matrix->SetElement(Y, 1, ky * ky * ica + ca);
-	v_matrix->SetElement(Y, 2, kz * ky * ica - kx * sa);
-
-	v_matrix->SetElement(1, 3, 0);
+	v_matrix.SetElement(0, 3, 0);
 
 
-	v_matrix->SetElement(Z, 0, kx * kz * ica - ky * sa);
-	v_matrix->SetElement(Z, 1, ky * kz * ica + kx * sa);
-	v_matrix->SetElement(Z, 2, kz * kz * ica + ca);
+	v_matrix.SetElement(Y, 0, kx * ky * ica + kz * sa);
+	v_matrix.SetElement(Y, 1, ky * ky * ica + ca);
+	v_matrix.SetElement(Y, 2, kz * ky * ica - kx * sa);
 
-	v_matrix->SetElement(2, 3, 0);
+	v_matrix.SetElement(1, 3, 0);
 
 
-	v_matrix->SetElement(3, 0, 0);
-	v_matrix->SetElement(3, 1, 0);
-	v_matrix->SetElement(3, 2, 0);
-	v_matrix->SetElement(3, 3, 1);
+	v_matrix.SetElement(Z, 0, kx * kz * ica - ky * sa);
+	v_matrix.SetElement(Z, 1, ky * kz * ica + kx * sa);
+	v_matrix.SetElement(Z, 2, kz * kz * ica + ca);
+
+	v_matrix.SetElement(2, 3, 0);
+
+
+	v_matrix.SetElement(3, 0, 0);
+	v_matrix.SetElement(3, 1, 0);
+	v_matrix.SetElement(3, 2, 0);
+	v_matrix.SetElement(3, 3, 1);
 
 
 	return 1;
 
 }
 //----------------------------------------------------------------------------
-int mafTransform::ConversionAttitudeVectorToR(double attitude_vector[3],
-											  vtkMatrix4x4 *v_matrix)
+int mafTransform::AttitudeVectorToMatrix(double attitude_vector[3],
+											  mafMatrix &v_matrix)
 //----------------------------------------------------------------------------
 {
 
@@ -1542,29 +1364,29 @@ int mafTransform::ConversionAttitudeVectorToR(double attitude_vector[3],
 
 	
 
-	v_matrix->SetElement(0,0,cos(fi) + cosc*attitude_vector[0]*attitude_vector[0]);
-	v_matrix->SetElement(0,1,sinc*(-attitude_vector[2]) + cosc*attitude_vector[0]*attitude_vector[1]);	
-	v_matrix->SetElement(0,2,sinc*attitude_vector[1] + cosc*attitude_vector[0]*attitude_vector[2]);
+	v_matrix.SetElement(0,0,cos(fi) + cosc*attitude_vector[0]*attitude_vector[0]);
+	v_matrix.SetElement(0,1,sinc*(-attitude_vector[2]) + cosc*attitude_vector[0]*attitude_vector[1]);	
+	v_matrix.SetElement(0,2,sinc*attitude_vector[1] + cosc*attitude_vector[0]*attitude_vector[2]);
 
-	v_matrix->SetElement(1,0,sinc*attitude_vector[2] + cosc*attitude_vector[1]*attitude_vector[0]);
-	v_matrix->SetElement(1,1,cos(fi) + cosc*attitude_vector[1]*attitude_vector[1]);
-	v_matrix->SetElement(1,2,sinc*(-attitude_vector[0]) + cosc*attitude_vector[1]*attitude_vector[2]);
+	v_matrix.SetElement(1,0,sinc*attitude_vector[2] + cosc*attitude_vector[1]*attitude_vector[0]);
+	v_matrix.SetElement(1,1,cos(fi) + cosc*attitude_vector[1]*attitude_vector[1]);
+	v_matrix.SetElement(1,2,sinc*(-attitude_vector[0]) + cosc*attitude_vector[1]*attitude_vector[2]);
 
-	v_matrix->SetElement(2,0,sinc*(-attitude_vector[1]) + cosc*attitude_vector[2]*attitude_vector[0]);
-	v_matrix->SetElement(2,1,sinc*attitude_vector[0] + cosc*attitude_vector[2]*attitude_vector[1]);
-	v_matrix->SetElement(2,2,cos(fi) + cosc*attitude_vector[2]*attitude_vector[2]);
+	v_matrix.SetElement(2,0,sinc*(-attitude_vector[1]) + cosc*attitude_vector[2]*attitude_vector[0]);
+	v_matrix.SetElement(2,1,sinc*attitude_vector[0] + cosc*attitude_vector[2]*attitude_vector[1]);
+	v_matrix.SetElement(2,2,cos(fi) + cosc*attitude_vector[2]*attitude_vector[2]);
 
 
-	v_matrix->SetElement(0, 3, 0);
+	v_matrix.SetElement(0, 3, 0);
 
-	v_matrix->SetElement(1, 3, 0);
+	v_matrix.SetElement(1, 3, 0);
 
-	v_matrix->SetElement(2, 3, 0);
+	v_matrix.SetElement(2, 3, 0);
 
-	v_matrix->SetElement(3, 0, 0);
-	v_matrix->SetElement(3, 1, 0);
-	v_matrix->SetElement(3, 2, 0);
-	v_matrix->SetElement(3, 3, 1);
+	v_matrix.SetElement(3, 0, 0);
+	v_matrix.SetElement(3, 1, 0);
+	v_matrix.SetElement(3, 2, 0);
+	v_matrix.SetElement(3, 3, 1);
 
 
 
@@ -1574,17 +1396,17 @@ int mafTransform::ConversionAttitudeVectorToR(double attitude_vector[3],
 }
 
 //----------------------------------------------------------------------------
-int mafTransform::ConversionEulerCardanicAngleToR(double euler_cardan[3],
+int mafTransform::EulerCardanicAngleToMatrix(double euler_cardan[3],
 												  int i,int j,int k,
-												  vtkMatrix4x4 *v_matrix)
+												  mafMatrix &v_matrix)
 //----------------------------------------------------------------------------
 {
 
 	//modified by Stefano. 1-7-2003 (beg)
 	//converson to radians
-	euler_cardan[0] = euler_cardan[0] * vtkMath::DoubleDegreesToRadians ();	
-	euler_cardan[1] = euler_cardan[1] * vtkMath::DoubleDegreesToRadians ();
-	euler_cardan[2] = euler_cardan[2] * vtkMath::DoubleDegreesToRadians ();	
+	euler_cardan[0] = euler_cardan[0] * mafMatrix3x3::DegreesToRadians ();	
+	euler_cardan[1] = euler_cardan[1] * mafMatrix3x3::DegreesToRadians ();
+	euler_cardan[2] = euler_cardan[2] * mafMatrix3x3::DegreesToRadians ();	
 	//modified by Stefano. 1-7-2003 (end)	
 
 	double alfa		= euler_cardan[0];
@@ -1621,30 +1443,30 @@ int mafTransform::ConversionEulerCardanicAngleToR(double euler_cardan[3],
 	if (i!=k)	// Cardan Angles 
 		{
 			
-			v_matrix->SetElement(i,i,cb*cc);
-			v_matrix->SetElement(i,j,-sig*cb*sc);
-			v_matrix->SetElement(i,k,sig*sb);
+			v_matrix.SetElement(i,i,cb*cc);
+			v_matrix.SetElement(i,j,-sig*cb*sc);
+			v_matrix.SetElement(i,k,sig*sb);
 
 			
-			v_matrix->SetElement(j,i,sa*sb*cc + sig*ca*sc);
-			v_matrix->SetElement(j,j,-sig*sa*sb*sc + cc*ca);
-			v_matrix->SetElement(j,k,-sig*sa*cb);
+			v_matrix.SetElement(j,i,sa*sb*cc + sig*ca*sc);
+			v_matrix.SetElement(j,j,-sig*sa*sb*sc + cc*ca);
+			v_matrix.SetElement(j,k,-sig*sa*cb);
 
-			v_matrix->SetElement(k,i,-sig*ca*sb*cc + sa*sc);
-			v_matrix->SetElement(k,j,ca*sb*sc + sig*sa*cc);
-			v_matrix->SetElement(k,k,ca*cb);
+			v_matrix.SetElement(k,i,-sig*ca*sb*cc + sa*sc);
+			v_matrix.SetElement(k,j,ca*sb*sc + sig*sa*cc);
+			v_matrix.SetElement(k,k,ca*cb);
 			
 
-			v_matrix->SetElement(0, 3, 0);
+			v_matrix.SetElement(0, 3, 0);
 
-			v_matrix->SetElement(1, 3, 0);
+			v_matrix.SetElement(1, 3, 0);
 
-			v_matrix->SetElement(2, 3, 0);
+			v_matrix.SetElement(2, 3, 0);
 
-			v_matrix->SetElement(3, 0, 0);
-			v_matrix->SetElement(3, 1, 0);
-			v_matrix->SetElement(3, 2, 0);
-			v_matrix->SetElement(3, 3, 1);
+			v_matrix.SetElement(3, 0, 0);
+			v_matrix.SetElement(3, 1, 0);
+			v_matrix.SetElement(3, 2, 0);
+			v_matrix.SetElement(3, 3, 1);
 
 			
 		}	
@@ -1656,30 +1478,30 @@ int mafTransform::ConversionEulerCardanicAngleToR(double euler_cardan[3],
 
 			int l=3-i-j;
 
-			v_matrix->SetElement(i,i,cb);
-			v_matrix->SetElement(i,j,sb*sc);
-			v_matrix->SetElement(i,l,sig*sb*cc);
+			v_matrix.SetElement(i,i,cb);
+			v_matrix.SetElement(i,j,sb*sc);
+			v_matrix.SetElement(i,l,sig*sb*cc);
 
 			
-			v_matrix->SetElement(j,i,sa*sb);
-			v_matrix->SetElement(j,j,-sa*cb*sc + ca*cc);
-			v_matrix->SetElement(j,l,-sig*(ca*sc + sa*cb*cc));
+			v_matrix.SetElement(j,i,sa*sb);
+			v_matrix.SetElement(j,j,-sa*cb*sc + ca*cc);
+			v_matrix.SetElement(j,l,-sig*(ca*sc + sa*cb*cc));
 
-			v_matrix->SetElement(l,i,-sig*ca*sb);
-			v_matrix->SetElement(l,j,sig*(ca*cb*sc + sa*cc));
-			v_matrix->SetElement(l,l,-sa*sc + ca*cb*cc);
+			v_matrix.SetElement(l,i,-sig*ca*sb);
+			v_matrix.SetElement(l,j,sig*(ca*cb*sc + sa*cc));
+			v_matrix.SetElement(l,l,-sa*sc + ca*cb*cc);
 
 
-			v_matrix->SetElement(0, 3, 0);
+			v_matrix.SetElement(0, 3, 0);
 
-			v_matrix->SetElement(1, 3, 0);
+			v_matrix.SetElement(1, 3, 0);
 
-			v_matrix->SetElement(2, 3, 0);
+			v_matrix.SetElement(2, 3, 0);
 
-			v_matrix->SetElement(3, 0, 0);
-			v_matrix->SetElement(3, 1, 0);
-			v_matrix->SetElement(3, 2, 0);
-			v_matrix->SetElement(3, 3, 1);
+			v_matrix.SetElement(3, 0, 0);
+			v_matrix.SetElement(3, 1, 0);
+			v_matrix.SetElement(3, 2, 0);
+			v_matrix.SetElement(3, 3, 1);
 
 		}
 
@@ -1694,13 +1516,13 @@ int mafTransform::ConversionEulerCardanicAngleToR(double euler_cardan[3],
 //----------------------------------------------------------------------------
 //modified by STEFY 10-7-2003(begin)//modified because Helical Axis conversion must be made 
 //from a translation matrix (not from a rotation matrix)
-int mafTransform::ConversionTranslationMatrixToHelicalAxis(vtkMatrix4x4 *v_matrix,
-										 																				double helical_axis[3],double point[3],
-																														double& phi,double& t, int intersect = Z)
+int mafTransform::MatrixToHelicalAxis(const mafMatrix &v_matrix,
+                                      double helical_axis[3],double point[3],
+                                      double& phi,double& t, int intersect = Z)
 //----------------------------------------------------------------------------
 {
 	// input: 
-	// vtkMatrix4x4 *v_matrix (translation matrix)
+	// mafMatrix &v_matrix (translation matrix)
 	// int intersect:location of the screw axis where it intersects either the X, Y, or the Z plane
 	// default: intersect = Z
 
@@ -1713,9 +1535,9 @@ int mafTransform::ConversionTranslationMatrixToHelicalAxis(vtkMatrix4x4 *v_matri
 
 	double tmp[3];
 
-	tmp[0] = v_matrix->GetElement(2,1) - v_matrix->GetElement(1,2);
-	tmp[1] = v_matrix->GetElement(0,2) - v_matrix->GetElement(2,0);
-	tmp[2] = v_matrix->GetElement(1,0) - v_matrix->GetElement(0,1);
+	tmp[0] = v_matrix.GetElement(2,1) - v_matrix.GetElement(1,2);
+	tmp[1] = v_matrix.GetElement(0,2) - v_matrix.GetElement(2,0);
+	tmp[2] = v_matrix.GetElement(1,0) - v_matrix.GetElement(0,1);
 
 	double quad_sum;
 	quad_sum = 0;
@@ -1745,15 +1567,15 @@ int mafTransform::ConversionTranslationMatrixToHelicalAxis(vtkMatrix4x4 *v_matri
 	if (quad_sum <= sqrt(2)) 
 		{
       phi=asin(0.5*quad_sum);
-			phi = phi * vtkMath::DoubleRadiansToDegrees ();
+			phi = phi * mafMatrix3x3::RadiansToDegrees();
 
 		}
 
 	else  
 		{
-			double sum = v_matrix->GetElement(0,0)+v_matrix->GetElement(1,1)+v_matrix->GetElement(2,2)-1;
+			double sum = v_matrix.GetElement(0,0)+v_matrix.GetElement(1,1)+v_matrix.GetElement(2,2)-1;
 			phi=acos(0.5*sum);
-			phi = phi * vtkMath::DoubleRadiansToDegrees ();
+			phi = phi * mafMatrix3x3::RadiansToDegrees();
 		}
 
 
@@ -1763,19 +1585,19 @@ int mafTransform::ConversionTranslationMatrixToHelicalAxis(vtkMatrix4x4 *v_matri
 		{
 			mafMatrix b_mat;
 
-			double phi_rad = phi * vtkMath::DoubleDegreesToRadians ();
+			double phi_rad = phi * mafMatrix3x3::DegreesToRadians();
 
-			double b00 = 0.5 * (v_matrix->GetElement(0,0)+v_matrix->GetElement(0,0)) - cos(phi_rad); 
-			double b01 = 0.5 * (v_matrix->GetElement(0,1)+v_matrix->GetElement(1,0)); 
-			double b02 = 0.5 * (v_matrix->GetElement(0,2)+v_matrix->GetElement(2,0)); 
+			double b00 = 0.5 * (v_matrix.GetElement(0,0)+v_matrix.GetElement(0,0)) - cos(phi_rad); 
+			double b01 = 0.5 * (v_matrix.GetElement(0,1)+v_matrix.GetElement(1,0)); 
+			double b02 = 0.5 * (v_matrix.GetElement(0,2)+v_matrix.GetElement(2,0)); 
 
-			double b10 = 0.5 * (v_matrix->GetElement(1,0)+v_matrix->GetElement(0,1)); 
-			double b11 = 0.5 * (v_matrix->GetElement(1,1)+v_matrix->GetElement(1,1)) - cos(phi_rad); 
-			double b12 = 0.5 * (v_matrix->GetElement(1,2)+v_matrix->GetElement(2,1)); 
+			double b10 = 0.5 * (v_matrix.GetElement(1,0)+v_matrix.GetElement(0,1)); 
+			double b11 = 0.5 * (v_matrix.GetElement(1,1)+v_matrix.GetElement(1,1)) - cos(phi_rad); 
+			double b12 = 0.5 * (v_matrix.GetElement(1,2)+v_matrix.GetElement(2,1)); 
 
-			double b20 = 0.5 * (v_matrix->GetElement(2,0)+v_matrix->GetElement(0,2)); 
-			double b21 = 0.5 * (v_matrix->GetElement(2,1)+v_matrix->GetElement(1,2)); 
-			double b22 = 0.5 * (v_matrix->GetElement(2,2)+v_matrix->GetElement(2,2)) - cos(phi_rad); 
+			double b20 = 0.5 * (v_matrix.GetElement(2,0)+v_matrix.GetElement(0,2)); 
+			double b21 = 0.5 * (v_matrix.GetElement(2,1)+v_matrix.GetElement(1,2)); 
+			double b22 = 0.5 * (v_matrix.GetElement(2,2)+v_matrix.GetElement(2,2)) - cos(phi_rad); 
 
 
 
@@ -1822,7 +1644,7 @@ int mafTransform::ConversionTranslationMatrixToHelicalAxis(vtkMatrix4x4 *v_matri
 			helical_axis[2] = (b_mat.GetElement(2,index))/sqrt(bmax);
 
 
-			if ( sign(v_matrix->GetElement(2,1)- v_matrix->GetElement(1,2)) != sign(helical_axis[0]) )
+			if ( sign(v_matrix.GetElement(2,1)- v_matrix.GetElement(1,2)) != sign(helical_axis[0]) )
 				{
 						helical_axis[0] = (-1) * helical_axis[0];
 						helical_axis[1]	= (-1) * helical_axis[1];
@@ -1835,25 +1657,25 @@ int mafTransform::ConversionTranslationMatrixToHelicalAxis(vtkMatrix4x4 *v_matri
 
 	// calculation of t:amount of translation along screw axis
 
-	t = helical_axis[0] * v_matrix->GetElement(0,3) + helical_axis[1] * v_matrix->GetElement(1,3)	+ 
-			helical_axis[2] * v_matrix->GetElement(2,3);
+	t = helical_axis[0] * v_matrix.GetElement(0,3) + helical_axis[1] * v_matrix.GetElement(1,3)	+ 
+			helical_axis[2] * v_matrix.GetElement(2,3);
 
 	//calculating where the screw axis intersects the plane as defined in 'intersect'
 
 	double q_mat[3][3];
 	double q_inv[3][3];
 
-	q_mat[0][0] = v_matrix->GetElement(0,0) - 1;
-	q_mat[0][1] = v_matrix->GetElement(0,1);
-	q_mat[0][2] = v_matrix->GetElement(0,2);
+	q_mat[0][0] = v_matrix.GetElement(0,0) - 1;
+	q_mat[0][1] = v_matrix.GetElement(0,1);
+	q_mat[0][2] = v_matrix.GetElement(0,2);
 
-	q_mat[1][0] = v_matrix->GetElement(1,0);
-	q_mat[1][1] = v_matrix->GetElement(1,1) - 1;
-	q_mat[1][2] = v_matrix->GetElement(1,2);
+	q_mat[1][0] = v_matrix.GetElement(1,0);
+	q_mat[1][1] = v_matrix.GetElement(1,1) - 1;
+	q_mat[1][2] = v_matrix.GetElement(1,2);
 
-	q_mat[2][0] = v_matrix->GetElement(2,0);
-	q_mat[2][1] = v_matrix->GetElement(2,1);
-	q_mat[2][2] = v_matrix->GetElement(2,2) - 1;
+	q_mat[2][0] = v_matrix.GetElement(2,0);
+	q_mat[2][1] = v_matrix.GetElement(2,1);
+	q_mat[2][2] = v_matrix.GetElement(2,2) - 1;
 
 
 	
@@ -1862,12 +1684,12 @@ int mafTransform::ConversionTranslationMatrixToHelicalAxis(vtkMatrix4x4 *v_matri
 	q_mat[2][intersect] = (-1)*helical_axis[2];
 
 
-	vtkMath::Invert3x3(q_mat, q_inv);
+	mafMatrix3x3::Invert(q_mat, q_inv);
 	
 
-	double v03 = (-1) * (v_matrix->GetElement(0,3));
-	double v13 = (-1) * (v_matrix->GetElement(1,3));
-	double v23 = (-1) * (v_matrix->GetElement(2,3));
+	double v03 = (-1) * (v_matrix.GetElement(0,3));
+	double v13 = (-1) * (v_matrix.GetElement(1,3));
+	double v23 = (-1) * (v_matrix.GetElement(2,3));
 
 
 	// calculting the point on helical axis 

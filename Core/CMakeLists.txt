@@ -21,6 +21,8 @@ SET(PROJECT_SRCS
   mafMTime.h
   mafMatrix.cpp
   mafMatrix.h
+  mafMatrix3x3.cpp
+  mafMatrix3x3.h
   mafMutexLock.cpp
   mafMutexLock.h
   mafOBB.cpp

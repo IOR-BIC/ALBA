@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformBase.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-25 19:16:43 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-11-29 09:33:05 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,7 +13,7 @@
 #ifndef __mafTransformBase_h
 #define __mafTransformBase_h
 
-#include "mafObject.h"
+#include "mafSmartObject.h"
 #include "mafMTime.h"
 #include "mafMutexLock.h"
 #include "mafMatrix.h"
@@ -29,7 +29,7 @@ class vtkLinearTransform;
   should always be called to update the output, which is a mafMatrix internally stored.
   @sa mafTransform
   */
-class MAF_EXPORT mafTransformBase : public mafObject
+class MAF_EXPORT mafTransformBase : public mafSmartObject
 {
 public:
   mafTransformBase();
@@ -38,7 +38,7 @@ public:
   /** copy constructor */
   mafTransformBase(const mafTransformBase&);
 
-  mafAbstractTypeMacro(mafTransformBase,mafObject);
+  mafAbstractTypeMacro(mafTransformBase,mafSmartObject);
   //void PrintSelf(ostream& os, vtkIndent indent);
 
   /** update and return internal transform matrix */
@@ -101,8 +101,8 @@ public:
   /**
     This will calculate the transformation without calling Update.
     Meant for use only within other VTK classes. */
-  virtual void InternalTransformPoint(const float in[3], float out[3]) = 0;
-  virtual void InternalTransformPoint(const double in[3], double out[3]) = 0;
+  virtual void InternalTransformPoint(const double in[3], double out[3]);
+  virtual void InternalTransformPoint(const float in[3], float out[3]);
 
   /** Make another transform of the same type. */
   //virtual mafTransformBase *MakeTransform() = 0;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSmartObject.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-25 11:29:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-11-29 09:33:04 $
+  Version:   $Revision: 1.2 $
   Authors:   based on vtkObjectBase (www.vtk.org), adapted Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -39,23 +39,21 @@ class MAF_EXPORT mafSmartObject: public mafObject
 public:
   mafTypeMacro(mafSmartObject,mafObject);
 
+  mafSmartObject(); 
+  virtual ~mafSmartObject(); 
+
+
   /**
     Delete a MAF object.  This method should always be used to delete
     an object when the New() method was used to create it. Using the
     C++ delete method will not work with reference counting. */
-  virtual void Delete();
+  //virtual void Delete();
 
   /**
     Create an object with Debug turned off, modified time initialized 
     to zero, and reference counting on. */
-  static mafSmartObject *New() {return new mafSmartObject;}
-  
-#ifdef _WIN32
-    // avoid dll boundary problems
-  void* operator new( size_t tSize );
-  void operator delete( void* p );
-#endif 
-  
+  //static mafSmartObject *New() {return new mafSmartObject;}
+
   /** Increase the reference count (mark as used by another object). */
   void Register();
 
@@ -71,11 +69,16 @@ public:
   /** Sets the reference count. (This is very dangerous, use with care.) */
   void SetReferenceCount(int);
   
+#ifdef _WIN32
+    // avoid dll boundary problems
+  void* operator new( size_t tSize );
+  void operator delete( void* p );
+#endif 
+  
 protected:
-  mafSmartObject(); 
-  virtual ~mafSmartObject(); 
 
   int ReferenceCount;      ///< Number of uses of this object by other objects
+  bool DynamicObject;
 };
 
 #endif

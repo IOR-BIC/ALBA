@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSmartObject.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-25 11:29:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-11-29 09:33:04 $
+  Version:   $Revision: 1.2 $
   Authors:   based on vtkObjectBase (www.vtk.org), adapted Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -28,7 +28,9 @@ void* mafSmartObject::operator new(size_t nSize)
 
 void mafSmartObject::operator delete( void *p )
 {
-  free(p);
+  mafSmartObject *obj=(mafSmartObject *)p;
+  if (obj->ReferenceCount<=0)
+    free(p);
 }
 #endif 
 
@@ -54,6 +56,7 @@ mafSmartObject::~mafSmartObject()
   }
 }
 
+/*
 //------------------------------------------------------------------------------
 // Delete a vtk object. This method should always be used to delete an object 
 // when the new operator was used to create it. Using the C++ delete method
@@ -62,7 +65,7 @@ void mafSmartObject::Delete()
 //------------------------------------------------------------------------------
 {
   this->UnRegister();
-}
+}*/
 
 //------------------------------------------------------------------------------
 // Sets the reference count (use with care)
