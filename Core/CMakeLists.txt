@@ -42,7 +42,7 @@ ENDIF (MAF_USE_VTK)
 
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS "mafBase" )
+SET(PROJECT_LIBS mafBase mafIO)
 
 IF (MAF_USE_VTK)
   SET(PROJECT_LIBS ${PROJECT_LIBS} vtkCommon)
