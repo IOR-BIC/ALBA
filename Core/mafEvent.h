@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-04 12:18:53 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-01-13 09:10:36 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden, Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -18,7 +18,6 @@
 #endif
 
 #include "mafEventBase.h"
-//#include "mafString.h"
 
 //------------------------------------------------------------------------------
 // Forward declarations

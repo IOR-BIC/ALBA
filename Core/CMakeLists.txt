@@ -22,6 +22,12 @@ SET(PROJECT_SRCS
   mafObserver.h
   mafObserverCallback.cpp
   mafObserverCallback.h
+  mafAttribute.cpp
+  mafAttribute.h
+  mmaTagArray.cpp
+  mmaTagArray.h
+  mmuTagItem.cpp
+  mmuTagItem.h
 #  mafEvent.cpp
 #  mafEvent.h
 )

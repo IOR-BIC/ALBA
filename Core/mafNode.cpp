@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-01-11 17:25:26 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-01-13 09:10:36 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -15,6 +15,7 @@
 #include "mafNode.h"
 #include "mafNodeIterator.h"
 #include "mafIndent.h"
+#include "mmaTagArray.h"
 #include <sstream>
 #include <assert.h>
 
@@ -81,23 +82,16 @@ void mafNode::Shutdown()
 const char *mafNode::GetName()
 //-------------------------------------------------------------------------
 {
-  return m_Name;
+  return m_Name.c_str();
 }
 
 //-------------------------------------------------------------------------
 void mafNode::SetName(const char *name)
 //-------------------------------------------------------------------------
 {
-  m_Name=mafString(name); // force string copy
+  m_Name=name; // force string copy
   Modified();
 } 
-
-//-------------------------------------------------------------------------
-void mafNode::SetName(mafString name)
-//-------------------------------------------------------------------------
-{
-  m_Name=name;Modified();
-}
 
 //-------------------------------------------------------------------------
 mafNodeIterator *mafNode::NewIterator()
@@ -229,6 +223,7 @@ int mafNode::ReparentTo(mafNode *newparent)
       {
         this->SetParent(NULL);
       }
+
       // remove self registration
       UnRegister(this);
       
@@ -462,6 +457,36 @@ mafNode *mafNode::CopyTree(mafNode *vme, mafNode *parent)
   }
 
   return v;
+}
+
+//-------------------------------------------------------------------------
+void mafNode::SetAttribute(const char *name,mafAttribute *a)
+//-------------------------------------------------------------------------
+{
+  m_Attributes[name]=a;
+}
+
+//-------------------------------------------------------------------------
+mafAttribute *mafNode::GetAttribute(const char *name)
+//-------------------------------------------------------------------------
+{
+  mafAttributesMap::iterator it=m_Attributes.find(name);
+  return (it!=m_Attributes.end())?(*it).second.GetPointer():NULL;
+}
+
+//-------------------------------------------------------------------------
+mmaTagArray  *mafNode::GetTagArray()
+//-------------------------------------------------------------------------
+{
+  mmaTagArray *tarray=mmaTagArray::SafeDownCast(GetAttribute("TagArray"));
+  
+  if (!tarray)
+  {
+    tarray=mmaTagArray::New();
+    SetAttribute("TagArray",tarray);
+  }
+
+  return tarray;
 }
 
 //-------------------------------------------------------------------------

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-11 17:25:26 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-01-13 09:10:36 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -20,11 +20,15 @@
 #include "mafString.h"
 #include "mafMTime.h"
 #include <vector>
+#include <map>
+#include <string>
 
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------
 class mafNodeIterator;
+class mafAttribute;
+class mmaTagArray;
 
 //----------------------------------------------------------------------------
 // mafNode
@@ -80,7 +84,8 @@ public:
 
   // Interface for creating a copy of the node (works only for concrete subclasses)
   mafNode *NewInstance() {return SafeDownCast(NewInternalInstance());}
-
+  
+  /** print a dump of this object */
   void Print(std::ostream& os, const int tabs);
 
   /**
@@ -106,9 +111,9 @@ public:
   
   /** return the name of this node*/
   const char *GetName();
+
   /** set node name */
   void SetName(const char *name);
-  void SetName(mafString name);
   
   /**
     Copy the contents of another node into this one. Notice that subtrees
@@ -254,13 +259,37 @@ public:
   /** return a reference to the event source issuing events for this object */
   mafEventSource &GetEventSource() {return m_EventSource;}
 
-  typedef std::vector<mafAutoPointer<mafNode> > mafChildrenVector;
-
-  /** return list of children */
-  const mafChildrenVector *GetChildren() {return &m_Children;}
-
   /** Precess events coming from other objects */ 
   virtual void OnEvent(mafEventBase *e);
+
+  typedef std::vector<mafAutoPointer<mafNode> > mafChildrenVector;
+
+  /** 
+    return list of children. The returned list is a const, since it can be
+    modified by means of nodes APIs */
+  const mafChildrenVector *GetChildren() {return &m_Children;}
+
+  typedef std::map<std::string,mafAutoPointer<mafAttribute> > mafAttributesMap;
+
+  /** 
+    return the list of attributes. Attributes vector can be manipulated
+    directly by means of the map container APIs. */
+  mafAttributesMap *GetAttributes() {return &m_Attributes;}
+
+  /** Set a new attribute. The given attribute is */
+  void SetAttribute(const char *name,mafAttribute *a);
+
+  /** return an attribute given the name */
+  mafAttribute *GetAttribute(const char *name);
+
+  /** 
+    return a pointer to the tag array attribute. If this attribute doesn't
+    exist yet, create a new one. TagArray is a map storing pairs of
+    Name<->components, where components are an array of mafStrings. It's a
+    simple way to attach persistent attributes. For more complex attributes
+    customized classes should be created, inheriting from mafAttribute
+    (e.g. @sa mmaMaterial). */
+  mmaTagArray  *GetTagArray();
 protected:
   mafNode();
   virtual ~mafNode();
@@ -279,22 +308,25 @@ protected:
     to allow subclasses to implement selective reparenting.*/
   virtual int SetParent(mafNode *parent);
 
-  mafChildrenVector m_Children; ///< list of children
-  mafNode           *m_Parent;  ///< parent node
+  mafChildrenVector m_Children;  ///< list of children
+  mafNode           *m_Parent;    ///< parent node
 
-  mafString         m_Name;     ///< name of this node
-  mafMTime          m_MTime;    ///< Last modification time
+  mafAttributesMap  m_Attributes;///< vector of attached attributes
 
-  mafID             m_Id;       ///< ID of this node
+  std::string       m_Name;       ///< name of this node
+  mafMTime          m_MTime;      ///< Last modification time
 
-  bool  m_VisibleToTraverse;    ///< enable/disable traversing visit of this node
-  bool  m_Initialized;          ///< set true by Initialize()
+  mafID             m_Id;         ///< ID of this node
 
-  mafEventSource m_EventSource; ///< source of events issued by the node
+  bool  m_VisibleToTraverse;      ///< enable/disable traversing visit of this node
+  bool  m_Initialized;            ///< set true by Initialize()
+
+  mafEventSource m_EventSource;   ///< source of events issued by the node
 };
 
 
 //------------------------------------------------------------------------------
+// speeds up this frequently called function
 inline unsigned long mafNode::GetMTime()
 //------------------------------------------------------------------------------
 {
@@ -302,6 +334,7 @@ inline unsigned long mafNode::GetMTime()
 }
 
 //------------------------------------------------------------------------------
+// speeds up this frequently called function
 inline void mafNode::Modified()
 //------------------------------------------------------------------------------
 {

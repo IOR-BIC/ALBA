@@ -1,0 +1,155 @@
+/*=========================================================================
+  Program:   Multimod Application Framework
+  Module:    $RCSfile: mmuTagItem.h,v $
+  Language:  C++
+  Date:      $Date: 2005-01-13 09:10:00 $
+  Version:   $Revision: 1.1 $
+  Authors:   Marco Petrone
+==========================================================================
+  Copyright (c) 2002/2004 
+  CINECA - Interuniversity Consortium (www.cineca.it)
+=========================================================================*/
+#ifndef __mmuTagItem_h
+#define __mmuTagItem_h
+
+#include "mmuUtility.h"
+#include "mafDefines.h"
+#include "mafString.h"
+#include <vector>
+#include <string>
+#include <iosfwd>
+
+//----------------------------------------------------------------------------
+// forward declarations
+//----------------------------------------------------------------------------
+class mafString;
+
+/** an utility class for storing <key-type-array of values> information.
+  an utility class for storing <key-type-array of values> information.
+  @sa mmaTagArray
+*/
+class MAF_EXPORT mmuTagItem : public mmuUtility
+{
+public:
+  mmuTagItem();
+  ~mmuTagItem();
+
+  /** Constructors for with implicit Tag type...*/
+  mmuTagItem(const char *name, const char *value, int t=MAF_STRING_TAG);
+  mmuTagItem(const char *name, const char **values, int numcomp, int t=MAF_STRING_TAG);
+  mmuTagItem(const char *name, const std::vector<mafString> &values, int numcomp, int t=MAF_STRING_TAG);
+  mmuTagItem(const char *name, const double value);
+  mmuTagItem(const char *name, const double *value, int numcomp);
+  mmuTagItem(const char *name, const std::vector<double> &values, int numcomp);
+
+  mmuTagItem(const mmuTagItem& p);
+  void operator=(const mmuTagItem& p);
+
+  bool operator==(const mmuTagItem& p) const;
+  bool operator!=(const mmuTagItem& p) const;
+
+  void Print(std::ostream& os, const int indent) const;
+
+  /** Set/Get the name of this Tag*/
+  void SetName(const char *name);
+  const char *GetName() const;
+
+  /**
+    Set the Value of this Tag. In case the component is specified the function operates
+    on that component, otherwise it works on component 0. */
+  void SetValue(const char *value,int component=0);
+  /** same as SetValue() */
+  void SetComponent(const char *value,int component=0);
+
+  /** Set Tag value converting automatically to string and setting the type to NUMERIC. */
+  void SetValue(const double value , int component=0);
+  /** Set Tag value converting automatically to string and setting the type to NUMERIC. */
+  void SetComponent(const double value , int component=0);
+  
+  /** Set array of components at a once */
+  void SetComponents(const char **values, int numcomp);
+  /** Set array of components at a once */
+  void SetComponents(const std::vector<mafString> components);
+
+  /** same as SetComponents() */
+  void SetValues(const std::vector<mafString> values);
+  /** same as SetComponents() */
+  void SetValues(const char **values, int numcomp);
+  
+  /** Set array of components at a once, specifying an array of numeric values. */
+  void SetValues(const double *values, int numcomp);
+  /** Set array of components at a once, specifying an array of numeric values. */
+  void SetValues(const std::vector<double> values);
+  
+  /** Set array of components at a once, specifying an array of numeric values. */
+  void SetComponents(const double *components, int numcomp);
+
+  /** Set array of components at a once, specifying an array of numeric values. */
+  void SetComponents(const std::vector<double> components);
+
+  /**
+    return the value stored in this item. By default the function 
+    work on the first component, but specifying the component number
+    it's possible to retain the specific component.*/
+  const char *GetValue(int component=0) const;
+
+  /** same as GetValue() */
+  const char *GetComponent(int comp) const;
+
+  /** return the value stored in this item converting to a double. */
+  double GetValueAsDouble(int component) const;
+  double GetComponentAsDouble(int comp) const;
+
+  /** return all the array of values */
+  const std::vector<mafString> *GetComponents() const {return &m_Components;};
+
+  /**
+    return the array of values as a single string, representing
+    the array of components as a tuple of the form:
+    "( <component1>, <component2>,...)" */
+  void GetValueAsSingleString(mafString &str) const;
+  void GetValueAsSingleString(std::string &str) const;
+  
+
+  /** 
+    Set the type of this Tag. Default available types are MAF_MISSING_TAG=0,
+    , MAF_NUMERIC_TAG=1, MAF_STRING_TAG=2 where the first one means a NULL value 
+    (no component) is present. Custom ids can be defined by applications. */
+  void SetType (int t) {m_Type=t;};
+
+  /** 
+    return the type of this tag. Default available types are MAF_MISSING_TAG=0,
+    MAF_NUMERIC_TAG=1, MAF_STRING_TAG=2 where the first one means a NULL value 
+    (no component) is present. Custom ids can be defined by applications. */
+  int GetType() const {return m_Type;};
+
+  /** 
+    return the type of this tag item as a string. Default available types
+    are "MIS", "NUM", "STR" where the first means a NULL value (no component)
+    is present. Custom ids can be defined by applications and a reported by this
+    functions as numerical strings. */
+  void GetTypeAsString(mafString &value) const;
+  void GetTypeAsString(std::string &value) const;
+
+  /**
+    Set the NumberOfComponents of the value corresponding to this Tag.
+    When a new NumberOfComponents is specified, where possible old value are
+    preserved.*/
+  void SetNumberOfComponents(int n);
+  int GetNumberOfComponents() const;
+  
+  /** Compare two Tag items*/
+  bool Equals(const mmuTagItem *item) const;
+
+  enum MAF_TAG_IDS {MAF_MISSING_TAG=0,MAF_NUMERIC_TAG,MAF_STRING_TAG};
+
+protected:
+  void Initialize();
+  
+  mafString m_Name;
+  int m_Type;
+  std::vector<mafString> m_Components;
+};
+
+#endif 
+
