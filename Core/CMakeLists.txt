@@ -6,7 +6,7 @@ PROJECT(mafCore)
 MESSAGE(STATUS "Configuring project mafCore")
 # Set your list of sources here.  Do not change the name of the
 # vtkLocal_SRCS variable.
-SET(mafCore_SRCS
+SET(PROJECT_SRCS
   mafDefines.h
   mafString.cpp
   mafString.h
@@ -14,10 +14,10 @@ SET(mafCore_SRCS
   mafObject.h
   mafEventSource.h
   mafEventSource.cpp
-  mafGEventSource.h
-  mafGEventSource.cpp
-  mafGObserver.h
-  mafGObserver.cpp
+#  mafGEventSource.h
+#  mafGEventSource.cpp
+#  mafGObserver.h
+#  mafGObserver.cpp
   mafObserver.h
   mafObserver.cpp
   mafObserverCallback.h
@@ -29,7 +29,7 @@ SET(mafCore_SRCS
 )
 
 # List the kits from VTK that are needed by this project.
-SET(mafCore_LIBS
+SET(PROJECT_LIBS
   vtkCommon
 )
 
@@ -46,9 +46,9 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Configure.h.in
                @ONLY IMMEDIATE)
 
 # Create the library.
-ADD_LIBRARY(${PROJECT_NAME} ${mafCore_SRCS})
-##MESSAGE ("${PROJECT_NAME} linked libraries: ${mafCore_LIBS}")
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${mafCore_LIBS})
+ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
+##MESSAGE ("${PROJECT_NAME} linked libraries: ${PROJECT_LIBS}")
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
 # this is necessaty to force MFL compilation....
 ##MESSAGE ("${PROJECT_NAME} dependencies: ${MFL_BUILD_TARGETS}")
 ADD_DEPENDENCIES(${PROJECT_NAME} ${MFL_BUILD_TARGETS})
