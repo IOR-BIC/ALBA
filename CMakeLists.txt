@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2004-10-22 14:47:58 $
-# Version:   $Revision: 1.6 $
+# Date:      $Date: 2004-10-25 18:10:14 $
+# Version:   $Revision: 1.7 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -104,11 +104,11 @@ IF (MAF_CAN_BUILD)
         SET (CXX_TEST_PATH .)
     ENDIF (EXECUTABLE_OUTPUT_PATH)
     
-    IF (WIN32)
-      FIND_PROGRAM (PKZIP_COMMAND pkzipc.exe "c:/program files/pkware/pkzipc" "c:/programmi/pkware/pkzipc" DOC "Utility used for packing ditribution files")
-      SET(PACKAGES_OUTPUT_PATH "c:/temp" CACHE PATH "Path for distribution zip files" )
-      CONFIGURE_FILE(${MAF_SOURCE_DIR}/RunDart.tcl.in ${MAF_SOURCE_DIR}/RunDart.tcl @ONLY)
-    ENDIF (WIN32)
+    #IF (WIN32)
+    #  FIND_PROGRAM (PKZIP_COMMAND pkzipc.exe "c:/program files/pkware/pkzipc" "c:/programmi/pkware/pkzipc" DOC "Utility used for packing ditribution files")
+    #  SET(PACKAGES_OUTPUT_PATH "c:/temp" CACHE PATH "Path for distribution zip files" )
+    #  CONFIGURE_FILE(${MAF_SOURCE_DIR}/RunDart.tcl.in ${MAF_SOURCE_DIR}/RunDart.tcl @ONLY)
+    #ENDIF (WIN32)
     
   ENDIF(BUILD_TESTING)
 ELSE (MAF_CAN_BUILD)
