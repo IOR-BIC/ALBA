@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSmartPointer.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-29 21:15:27 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-11-30 18:18:22 $
+  Version:   $Revision: 1.2 $
   Authors:   based on vtkSmartPointer (www.vtk.org), rewritten by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -46,6 +46,22 @@ public:
   /**
     Allow to pass on the smart pointer to any function requiring a "T *". */
   operator T *() const {return (T *)m_Object;}
+
+  inline bool \
+  operator == (const mafSmartPointer& l, const mafSmartPointer& r) \
+  { \
+    return (static_cast<void*>(l.GetPointer()) == static_cast<void*>(r.GetPointer())); \
+  } \
+  inline bool \
+  operator == (mafSmartObject* l, const mafSmartPointer& r) \
+  { \
+    return (static_cast<void*>(l) == static_cast<void*>(r.GetPointer())); \
+  } \
+  inline bool \
+  operator == (const mafSmartPointer& l, mafSmartObject* r) \
+  { \
+    return (static_cast<void*>(l.GetPointer()) == static_cast<void*>(r)); \
+  }
   
 protected:
   // Internal utility methods.

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-29 21:15:02 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-11-30 18:18:20 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -179,21 +179,25 @@ int mafNode::ReparentTo(mafNode *newparent)
     // We must keep the oldparent pointer somewhere since it is oeverwritten
     // by AddChild.
     mafNode *oldparent=m_Parent;
-
-    if (newparent)
+    
+    if (oldparent!=newparent)
     {
-      newparent->AddChild(this);
-    }
-    else
-    {
-      this->SetParent(NULL);
-    }
+      if (newparent)
+      {
+        newparent->AddChild(this);
+      }
+      else
+      {
+        this->SetParent(NULL);
+      }
 
-    if (oldparent)
-    {
-      oldparent->RemoveChild(this);
+      if (oldparent)
+      {
+        oldparent->RemoveChild(this);
+      }
+      Modified();
     }
-
+    
     return MAF_OK;
   }
   else
@@ -287,7 +291,7 @@ int mafNode::SetParent(mafNode *parent)
 int mafNode::SetParent(mafNode *parent)
 //-------------------------------------------------------------------------
 {
-  if (mflVME *parent_node=mafNode::SafeDownCast(parent))
+  if (mafNode *parent_node=mafNode::SafeDownCast(parent))
   {
     if (this->CanReparentTo(parent_node)==MAF_OK)
     {  
@@ -383,7 +387,7 @@ bool mafNode::CanCopy(mafNode *node)
 }
 
 //-------------------------------------------------------------------------
-bool mflVME::CompareTree(mflVME *vme)
+bool mafNode::CompareTree(mafNode *vme)
 //-------------------------------------------------------------------------
 {
   if (!this->Equals(vme))
@@ -406,11 +410,11 @@ bool mflVME::CompareTree(mflVME *vme)
 }
 
 //----------------------------------------------------------------------------
-mflVME *mflVME::CopyTree(mflVME *vme, mflVME *parent)
+mafNode *mafNode::CopyTree(mafNode *vme, mafNode *parent)
 //-------------------------------------------------------------------------
 {
   
-  mflVME* v = vme->MakeCopy();
+  mafNode* v = vme->MakeCopy();
 
   v->ReparentTo(parent);
 
@@ -421,109 +425,13 @@ mflVME *mflVME::CopyTree(mflVME *vme, mflVME *parent)
 
   for(int i=0; i<vme->GetNumberOfChildren(); i++)
   {
-    if (mflVME *child=vme->GetChild(i))
+    if (mafNode *child=vme->GetChild(i))
       if (child->IsVisible())
-        mflVME::CopyTree(child,v);
+        mafNode::CopyTree(child,v);
   }
 
   return v;
 }
-
-//-------------------------------------------------------------------------
-mflVME *mflVME::ReparentTo(mflVME *newparent)
-//-------------------------------------------------------------------------
-{
-  // We cannot reparent to a subnode!!!
-  if (!this->IsInTree(newparent))
-  {
-    // When we reparent to a different tree, or we simply
-    // cut a tree, pre travers the sub tree to read data into memory
-    // future release should read one item at once, write it
-    // to disk and then release the data, or better simply copy the file
-    // into the new place, this to be able to manage HUGE datasets.
-    if (newparent==NULL||this->GetRoot()!=newparent->GetRoot())
-    {
-      mflVMEIterator *iter=this->NewIterator();
-      for (mflVME *vme=iter->GetFirstNode();vme;vme=iter->GetNextNode())
-      {
-        for (int i=0;i<vme->GetNumberOfItems();i++)
-        {
-          mflVMEItem *item=vme->GetItem(i);
-          if (item)
-          {
-            // read the data from disk and set the Id to -1
-            // to advise the reader to write it again on disk.
-            // Also remove the old file name...
-            vtkDataSet *data=item->GetData();
-            if (data)
-            {
-              item->SetId(-1);
-              item->SetFileName("");
-            }
-          }
-          else
-          {
-            vtkGenericWarningMacro("Debug: found NULL node");
-          }
-        }
-      }
-
-      iter->Delete();
-    }
-
-    // Add this node to the new parent children list and
-    // remove it from old parent children list.
-    // We first add it to the new parent, thus it is registered
-    // from the new parent, the we remove it from the list of the old parent.
-    // We must keep the oldparent pointer somewhere since it is oeverwritten
-    // by AddChild.
-    
-    mflVME *oldparent=this->GetParent();
-
-    this->Register(this);
-
-    if (newparent)
-    {
-      if (newparent->AddChild(this)==VTK_ERROR)
-      {
-        vtkErrorMacro("Cannot Reparent node "<<this->GetName()<<" to node "<<newparent->GetName());
-        return NULL;
-      }
-
-      this->SetCurrentTime(newparent->GetCurrentTime()); // update data & pose to parent CurrentTime
-    }
-    else
-    {
-      if (this->SetParent(NULL)==VTK_ERROR)
-      {
-        vtkErrorMacro("Cannot Reparent node "<<this->GetName()<<" to NULL");
-        return NULL;
-      }
-    }
-
-    if (this->AbsMatrixPipe)
-    {
-      this->AbsMatrixPipe->SetVME(this);
-      this->AbsMatrixPipe->Update();
-    }
-
-    if (oldparent)
-    {
-      oldparent->RemoveChild(this);
-    }
-
-    mflVME *ret=(this->ReferenceCount==1)?NULL:this;
-    
-    this->UnRegister(this);
-
-    return ret;
-  }
-  else
-  {
-    return NULL;
-  }
-}
-
 
 
 /*//-------------------------------------------------------------------------

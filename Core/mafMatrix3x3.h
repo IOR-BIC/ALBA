@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix3x3.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-29 09:33:04 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-11-30 18:18:20 $
+  Version:   $Revision: 1.3 $
   Authors:   Based on vtkMath code (www.vtk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -30,7 +30,7 @@ public:
   mafTypeMacro(mafMatrix3x3,mafObject);
 
   mafMatrix3x3();
-  ~mafMatrix3x3();
+  virtual ~mafMatrix3x3();
 
   mafMatrix3x3(mafMatrix3x3 &mat);
 

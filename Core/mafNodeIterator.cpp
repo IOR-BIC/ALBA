@@ -2,100 +2,95 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeIterator.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-29 21:15:02 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-11-30 18:18:21 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#ifndef __vtkTreeIterator_cxx
-#define __vtkTreeIterator_cxx
+#ifndef __mafNodeIterator_cxx
+#define __mafNodeIterator_cxx
 
-#include "vtkTreeIterator.h"
-#include "vtkStack.txx"
+#include "mafNodeIterator.h"
+#include "mafStack.txx"
 
 
 //----------------------------------------------------------------------------
-
-vtkTreeIterator *vtkTreeIterator::New()
+mafNodeIterator::mafNodeIterator(mafNode *root)
+//----------------------------------------------------------------------------
 { 
-#ifdef VTK_DEBUG_LEAKS
-  vtkDebugLeaks::ConstructClass("vtkTreeIterator");
-#endif
-  return new vtkTreeIterator(); 
+  m_CurrentNode=NULL;
+  m_RootNode=NULL; // initialize
+  SetRootNode(root);
+  m_CurrentIdx=mafStack<mafID>::New();
+  m_TraversalMode=0;
+  m_TraversalDone=0;
 }
 
-vtkTreeIterator::vtkTreeIterator()
-{ 
-  this->CurrentNode=NULL;
-  this->RootNode=NULL;
-  this->CurrentIdx=vtkStack<vtkIdType>::New();
-  this->TraversalMode=0;
-  this->TraversalDone=0;
-}
-
-vtkTreeIterator::~vtkTreeIterator()
+//----------------------------------------------------------------------------
+mafNodeIterator::~mafNodeIterator()
+//----------------------------------------------------------------------------
 {
-  this->CurrentNode=NULL; // do not unregister since it was not registered!
-  this->SetRootNode(NULL);
-  if (this->CurrentIdx)
+  m_CurrentNode=NULL; // do not unregister since it was not registered!
+  SetRootNode(NULL);
+  if (m_CurrentIdx)
   {
-    this->CurrentIdx->UnRegister(this);
-    this->CurrentIdx=NULL;
+    m_CurrentIdx->UnRegister(this);
+    m_CurrentIdx=NULL;
   }
 }
 
 
 //----------------------------------------------------------------------------
-
-void vtkTreeIterator::InitTraversal()
+void mafNodeIterator::InitTraversal()
+//----------------------------------------------------------------------------
 {
-  this->GoToFirstNode();
+  GoToFirstNode();
 }
 
 //----------------------------------------------------------------------------
-
-void vtkTreeIterator::SetTraversalMode(int mode)
+void mafNodeIterator::SetTraversalMode(int mode)
+//----------------------------------------------------------------------------
 {
   if (mode!=PreOrder && mode!=PostOrder)
   {
-    vtkErrorMacro("Unsupported Traversal Mode");
+    mafErrorMacro("Unsupported Traversal Mode");
   }
   else
   {
-    this->TraversalMode=mode;
-    this->InitTraversal();
+    m_TraversalMode=mode;
+    InitTraversal();
   }
 }
 
 
 //----------------------------------------------------------------------------
-
-int vtkTreeIterator::GoToNextNode()
+int mafNodeIterator::GoToNextNode()
+//----------------------------------------------------------------------------
 {
-  switch (this->TraversalMode)
+  switch (m_TraversalMode)
   {
     case PreOrder:
       {
-        if (this->CurrentNode)
+        if (m_CurrentNode)
         {
-          if (this->CurrentNode->GetNumberOfChildren()>0)
+          if (m_CurrentNode->GetNumberOfChildren()>0)
           {
-            this->TraversalDone=0; //reset the traversal flag
+            m_TraversalDone=0; //reset the traversal flag
             // before changing node call the post-execute
-            this->PostExecute();
+            PostExecute();
 
             // go to root of first subtree
-            this->CurrentNode=this->CurrentNode->GetChild(0);
-            if (this->CurrentNode)
+            m_CurrentNode=m_CurrentNode->GetChild(0);
+            if (m_CurrentNode)
             {
-              this->CurrentIdx->Push(0);
-              this->DeeperExecute(this->CurrentNode); //call the deeper-callback
+              m_CurrentIdx->Push(0);
+              DeeperExecute(m_CurrentNode); //call the deeper-callback
 
               // before doing anything else call the pre-execute
-              this->PreExecute();
+              PreExecute();
             }
             else
             {
@@ -104,52 +99,52 @@ int vtkTreeIterator::GoToNextNode()
           }
           else
           { 
-						if (this->CurrentNode!=this->RootNode)
+						if (m_CurrentNode!=m_RootNode)
             {
 							int idx=0;
-							vtkTree *parent=this->CurrentNode->GetParent();
+							mafNode *parent=m_CurrentNode->GetParent();
 							if (parent) 
 							{ 
-								idx=this->CurrentIdx->Pop();
-								this->UpperExecute(parent); //call the upper-callback
+								idx=m_CurrentIdx->Pop();
+								UpperExecute(parent); //call the upper-callback
 
-								while (parent&&parent!=this->RootNode&&idx>=(parent->GetNumberOfChildren()-1))
+								while (parent&&parent!=m_RootNode&&idx>=(parent->GetNumberOfChildren()-1))
 								{
 									parent=parent->GetParent();
-									idx=this->CurrentIdx->Pop();
-									this->UpperExecute(parent); //call the upper-callback
+									idx=m_CurrentIdx->Pop();
+									UpperExecute(parent); //call the upper-callback
 								}
 							}
 
 							if (parent&&idx<(parent->GetNumberOfChildren()-1))
 							{
 								// reset the traversal flag
-								this->TraversalDone=0;
+								m_TraversalDone=0;
 
 								// before changing node call the post-execute
-								this->PostExecute();
+								PostExecute();
 
 								// go to root of next brother subtree
 								idx++;
-								this->CurrentNode=parent->GetChild(idx);
-								this->CurrentIdx->Push(idx);
-								this->DeeperExecute(this->CurrentNode); //call the deeper-callback
+								m_CurrentNode=parent->GetChild(idx);
+								m_CurrentIdx->Push(idx);
+								DeeperExecute(m_CurrentNode); //call the deeper-callback
 
 								// before doing anything else call the pre-execute
-								this->PreExecute();
+								PreExecute();
 							}
 							else
 							{
 								// Tuch Down!!!
-								this->TraversalDone=1; // set the traveral flag
-								this->DoneExecute(); // call the Done-execute
+								m_TraversalDone=1; // set the traveral flag
+								DoneExecute(); // call the Done-execute
 							}            
 						}
 						else
 						{
 							// Tuch Down!!!
-								this->TraversalDone=1; // set the traveral flag
-								this->DoneExecute(); // call the Done-execute
+								m_TraversalDone=1; // set the traveral flag
+								DoneExecute(); // call the Done-execute
 						}
           }
         }
@@ -157,178 +152,178 @@ int vtkTreeIterator::GoToNextNode()
       }
     case PostOrder:
       {
-        if ((this->CurrentNode)&&(this->CurrentNode!=this->RootNode))
+        if ((m_CurrentNode)&&(m_CurrentNode!=m_RootNode))
         {
-          vtkTree *parent=this->CurrentNode->GetParent();
+          mafNode *parent=m_CurrentNode->GetParent();
 
           if (parent)
           {
             int idx;
-            if (this->CurrentIdx->Pop(idx)!=VTK_OK)
+            if (m_CurrentIdx->Pop(idx)!=VTK_OK)
             {
-              vtkErrorMacro("Stack Underflow");
-              this->TraversalDone=1; //set the traversal flag
-              this->CurrentNode=NULL;
-              this->DoneExecute();
+              mafErrorMacro("Stack Underflow");
+              m_TraversalDone=1; //set the traversal flag
+              m_CurrentNode=NULL;
+              DoneExecute();
             }
             else if (idx<(parent->GetNumberOfChildren()-1))
             {
-              this->TraversalDone=0; //reset the traversal flag
-              this->UpperExecute(parent); //call the upper-callback
+              m_TraversalDone=0; //reset the traversal flag
+              UpperExecute(parent); //call the upper-callback
 
-              this->PostExecute(); // call the post-execute
+              PostExecute(); // call the post-execute
 
               idx++;
-              this->CurrentIdx->Push(idx);
-              this->CurrentNode=this->FindLeftMostLeaf(parent->GetChild(idx));
+              m_CurrentIdx->Push(idx);
+              m_CurrentNode=FindLeftMostLeaf(parent->GetChild(idx));
               // the call to the deeper-callback is inside FindLeftMostLeaf
 
               // before doing anything else call the pre-execute
-              this->PreExecute();
+              PreExecute();
             }
             else
             {
-              this->TraversalDone=0; //reset the traversal flag
-              this->UpperExecute(parent); //call the upper-callback
+              m_TraversalDone=0; //reset the traversal flag
+              UpperExecute(parent); //call the upper-callback
               // before changing node call the post-execute
-              this->PostExecute();
+              PostExecute();
 
-              this->CurrentNode=parent;
+              m_CurrentNode=parent;
 
               // before doing anything else call the pre-execute
-              this->PreExecute();
+              PreExecute();
 
             }
           }
           else
           {
-            vtkErrorMacro("Troubles: found an orphan node: stopping traversing immediately!");
-            this->TraversalDone=1; //set the traversal flag
-            this->CurrentNode=NULL;
-            this->DoneExecute();
+            mafErrorMacro("Troubles: found an orphan node: stopping traversing immediately!");
+            m_TraversalDone=1; //set the traversal flag
+            m_CurrentNode=NULL;
+            DoneExecute();
           }
         }
         else
         {
           // Got to the last node (or Current==NULL)
-          this->TraversalDone=1; //set the traversal flag
-          this->DoneExecute();
+          m_TraversalDone=1; //set the traversal flag
+          DoneExecute();
         }
         break;
       }
     default:
-      vtkErrorMacro("Unsupported Traversal Mode");
-      this->CurrentNode=NULL;
-      this->TraversalDone=1;
+      mafErrorMacro("Unsupported Traversal Mode");
+      m_CurrentNode=NULL;
+      m_TraversalDone=1;
   }
 
-  return (!this->TraversalDone)?VTK_OK:VTK_ERROR;
+  return (!m_TraversalDone)?VTK_OK:VTK_ERROR;
 
 }
 
 //----------------------------------------------------------------------------
-
-int vtkTreeIterator::GoToPreviousNode()
+int mafNodeIterator::GoToPreviousNode()
+//----------------------------------------------------------------------------
 {
-  switch (this->TraversalMode)
+  switch (m_TraversalMode)
   {
     case PreOrder:
       {
-        if ((this->CurrentNode)&&(this->CurrentNode!=this->RootNode))
+        if ((m_CurrentNode)&&(m_CurrentNode!=m_RootNode))
         {
-          vtkTree *parent=this->CurrentNode->GetParent();
+          mafNode *parent=m_CurrentNode->GetParent();
 
           if (parent)
           {
             int idx;
-            if (this->CurrentIdx->Pop(idx)!=VTK_OK)
+            if (m_CurrentIdx->Pop(idx)!=VTK_OK)
             {
-              vtkErrorMacro("Stack Underflow");
-              this->TraversalDone=1;
-              this->CurrentNode=NULL;
-              this->DoneExecute();
+              mafErrorMacro("Stack Underflow");
+              m_TraversalDone=1;
+              m_CurrentNode=NULL;
+              DoneExecute();
             }
             else if (idx>0)
             {
-              this->TraversalDone=0;
-              this->UpperExecute(parent); //call the upper-execute
-              this->PostExecute(); // call the post-execute
+              m_TraversalDone=0;
+              UpperExecute(parent); //call the upper-execute
+              PostExecute(); // call the post-execute
 
               idx--;
-              this->CurrentIdx->Push(idx);
-              this->CurrentNode=this->FindRightMostLeaf(parent->GetChild(idx));
+              m_CurrentIdx->Push(idx);
+              m_CurrentNode=FindRightMostLeaf(parent->GetChild(idx));
               //the call to the deeper-callback is inside the FindRightMostLeaf
               
-              this->PreExecute(); // call the pre-execute
+              PreExecute(); // call the pre-execute
             }
             else
             {
-              this->TraversalDone=0;
-              this->UpperExecute(parent); //call the upper-callback
-              this->PostExecute(); // call the post-execute
+              m_TraversalDone=0;
+              UpperExecute(parent); //call the upper-callback
+              PostExecute(); // call the post-execute
 
-              this->CurrentNode=parent;
+              m_CurrentNode=parent;
 
-              this->PreExecute(); // call the pre-execute
+              PreExecute(); // call the pre-execute
             }
           }
           else
           {
-            vtkErrorMacro("Find an orphan node: stopping traversing immediately!");
-            this->TraversalDone=1;
-            this->CurrentNode=NULL;
-            this->DoneExecute();
+            mafErrorMacro("Find an orphan node: stopping traversing immediately!");
+            m_TraversalDone=1;
+            m_CurrentNode=NULL;
+            DoneExecute();
           }
         }
       }
       break;
     case PostOrder:
       {
-        if (this->CurrentNode)
+        if (m_CurrentNode)
         {
-          if (this->CurrentNode->GetNumberOfChildren()>=0)
+          if (m_CurrentNode->GetNumberOfChildren()>=0)
           {
-            this->TraversalDone=0;
-            this->PostExecute(); 
+            m_TraversalDone=0;
+            PostExecute(); 
 
             // go to root of last subtree
-            int idx=this->CurrentNode->GetNumberOfChildren()-1;
-            this->CurrentIdx->Push(idx);
-            this->CurrentNode=this->CurrentNode->GetChild(idx);
+            int idx=m_CurrentNode->GetNumberOfChildren()-1;
+            m_CurrentIdx->Push(idx);
+            m_CurrentNode=m_CurrentNode->GetChild(idx);
 
-            this->DeeperExecute(this->CurrentNode);
-            this->PreExecute();
+            DeeperExecute(m_CurrentNode);
+            PreExecute();
           }
           else
           {
-            vtkTree *parent=this->CurrentNode->GetParent();
+            mafNode *parent=m_CurrentNode->GetParent();
 
             int idx;
-            if (this->CurrentIdx->Pop(idx)==VTK_OK)
+            if (CurrentIdx->Pop(idx)==VTK_OK)
             {
-              this->UpperExecute(parent); 
+              UpperExecute(parent); 
 
-              while (parent && parent!=this->RootNode && idx>0)
+              while (parent && parent!=m_RootNode && idx>0)
               {
                 parent=parent->GetParent();
 
-                if (this->CurrentIdx->Pop(idx)!=VTK_OK)
+                if (m_CurrentIdx->Pop(idx)!=VTK_OK)
                 {
-                  vtkErrorMacro("Stack Underflow");
-                  this->TraversalDone=1;
-                  this->CurrentNode=NULL;
-                  this->DoneExecute();
+                  mafErrorMacro("Stack Underflow");
+                  m_TraversalDone=1;
+                  m_CurrentNode=NULL;
+                  DoneExecute();
                   return VTK_ERROR;
                 }
 
-                this->UpperExecute(parent); //call the upper-callback
+                UpperExecute(parent); //call the upper-callback
               }
             }
             else
             {
-              vtkErrorMacro("Stack Underflow");
-              this->CurrentNode=NULL;
-              this->TraversalDone=1;
+              mafErrorMacro("Stack Underflow");
+              m_CurrentNode=NULL;
+              m_TraversalDone=1;
               return VTK_ERROR;
             }
 
@@ -336,31 +331,31 @@ int vtkTreeIterator::GoToPreviousNode()
             {
               if (idx>0)
               {
-                this->TraversalDone=0;
-                this->PostExecute();
+                m_TraversalDone=0;
+                PostExecute();
 
                 idx--;
-                this->CurrentIdx->Push(idx);
+                m_CurrentIdx->Push(idx);
                 // go to root of prevoius brother subtree
-                this->CurrentNode=parent->GetChild(idx);
-                this->DeeperExecute(this->CurrentNode); //call the deeper-callback
+                CurrentNode=parent->GetChild(idx);
+                DeeperExecute(m_CurrentNode); //call the deeper-callback
 
                 // before doing anything else call the pre-execute
-                this->PreExecute();
+                PreExecute();
               }
               else
               {
                 // touch down!
-                this->TraversalDone=1;
-                this->DoneExecute();
+                m_TraversalDone=1;
+                DoneExecute();
               }
             }
             else
             {
-              this->TraversalDone=1;
-              vtkErrorMacro("Troubles: found an orphan node: stopping traversing immediately!");
-              this->CurrentNode=NULL;
-              this->DoneExecute();
+              m_TraversalDone=1;
+              mafErrorMacro("Troubles: found an orphan node: stopping traversing immediately!");
+              CurrentNode=NULL;
+              DoneExecute();
             }            
           }
         }
@@ -368,79 +363,79 @@ int vtkTreeIterator::GoToPreviousNode()
       }
       break;
     default:
-      vtkErrorMacro("Unsupported Traversal Mode");
-      this->TraversalDone=1;
+      mafErrorMacro("Unsupported Traversal Mode");
+      m_TraversalDone=1;
   }
-  return (!this->TraversalDone)?VTK_OK:VTK_ERROR;
+  return (!m_TraversalDone)?VTK_OK:VTK_ERROR;
 }
 
 //----------------------------------------------------------------------------
-
-vtkTree *vtkTreeIterator::FindLeftMostLeaf(vtkTree *node)
+mafNode *mafNodeIterator::FindLeftMostLeaf(mafNode *node)
+//----------------------------------------------------------------------------
 {
   if (node)
-    this->DeeperExecute(node);
+    DeeperExecute(node);
   while (node&&node->GetNumberOfChildren()>0) 
   {
     node=node->GetChild(0);
-    this->CurrentIdx->Push(0);
+    m_CurrentIdx->Push(0);
     if (node)
-      this->DeeperExecute(node);
+      DeeperExecute(node);
   }
 
   return node;
 }
 
 //----------------------------------------------------------------------------
-
-vtkTree *vtkTreeIterator::FindRightMostLeaf(vtkTree *node)
+mafNode *mafNodeIterator::FindRightMostLeaf(mafNode *node)
+//----------------------------------------------------------------------------
 {
   if (node)
-    this->DeeperExecute(node);
+    DeeperExecute(node);
   while (node&&node->GetNumberOfChildren()>0) 
   {
     node=node->GetChild(node->GetNumberOfChildren()-1);
-    this->CurrentIdx->Push(node->GetNumberOfChildren()-1);
+    m_CurrentIdx->Push(node->GetNumberOfChildren()-1);
     if (node)
-      this->DeeperExecute(node);
+      DeeperExecute(node);
   }
 
   return node;
 }
 
 //----------------------------------------------------------------------------
-
-int vtkTreeIterator::GoToFirstNode()
+int mafNodeIterator::GoToFirstNode()
+//----------------------------------------------------------------------------
 {
-  this->CurrentIdx->RemoveAllItems();
-  switch (this->TraversalMode)
+  m_CurrentIdx->RemoveAllItems();
+  switch (m_TraversalMode)
   {
     case PreOrder:
-      this->CurrentNode=this->RootNode;
-      this->DeeperExecute(this->CurrentNode);
+      m_CurrentNode=m_RootNode;
+      DeeperExecute(m_CurrentNode);
       break;
     case PostOrder:
-      this->CurrentNode=this->FindLeftMostLeaf(this->RootNode);
+      m_CurrentNode=FindLeftMostLeaf(m_RootNode);
       break;
     default:
-      vtkErrorMacro("Unsupported Traversal Mode");
-      this->CurrentNode=NULL;
+      mafErrorMacro("Unsupported Traversal Mode");
+      m_CurrentNode=NULL;
   }
 
-  this->FirstExecute(); // Call the FirstNode-Callback
+  FirstExecute(); // Call the FirstNode-Callback
 
-  if (this->CurrentNode)
+  if (m_CurrentNode)
   {
-    this->TraversalDone=0; // reset the traversal flag
-    this->PreExecute(); // Call the pre-callback
+    m_TraversalDone=0; // reset the traversal flag
+    PreExecute(); // Call the pre-callback
     return VTK_OK;
   }
   else
   {
     // the tree is empty traverse is already complete
 
-    this->TraversalDone=1; // set traversal flag
-    this->DoneExecute();  // Call the Done-callback   
+    m_TraversalDone=1; // set traversal flag
+    DoneExecute();  // Call the Done-callback   
     return VTK_ERROR;
   }
 
@@ -448,118 +443,126 @@ int vtkTreeIterator::GoToFirstNode()
 }
 
 //----------------------------------------------------------------------------
-
-int vtkTreeIterator::GoToLastNode()
+int mafNodeIterator::GoToLastNode()
+//----------------------------------------------------------------------------
 {
-  this->CurrentIdx->RemoveAllItems();
-  switch (this->TraversalMode)
+  m_CurrentIdx->RemoveAllItems();
+  switch (m_TraversalMode)
   {
     case PreOrder:
-      this->CurrentNode=this->FindRightMostLeaf(this->RootNode);
+      m_CurrentNode=FindRightMostLeaf(m_RootNode);
       break;
     case PostOrder:
-      this->CurrentNode=this->RootNode;
-      this->DeeperExecute(this->CurrentNode);
+      m_CurrentNode=m_RootNode;
+      DeeperExecute(m_CurrentNode);
       break;
     default:
-      vtkErrorMacro("Unsupported Traversal Mode");
-      this->CurrentNode=NULL;
+      mafErrorMacro("Unsupported Traversal Mode");
+      m_CurrentNode=NULL;
   }
 
-  this->LastExecute(); // Call the LastNode-callbacks
+  LastExecute(); // Call the LastNode-callbacks
 
-  if (this->CurrentNode)
+  if (m_CurrentNode)
   {
-    this->TraversalDone=0; // reset the traversal flag
-    this->PreExecute(); // Call the Pre-callbacks
+    m_TraversalDone=0; // reset the traversal flag
+    PreExecute(); // Call the Pre-callbacks
     return VTK_OK;
   }
   else
   {
-    this->TraversalDone=1; // set traversal flag
-    this->DoneExecute(); // Call the Done-callback
+    m_TraversalDone=1; // set traversal flag
+    DoneExecute(); // Call the Done-callback
     return VTK_ERROR;
   }
 }
 
 //----------------------------------------------------------------------------
-void vtkTreeIterator::SetRootNode(vtkTree *root)
+void mafNodeIterator::SetRootNode(mafNode *root)
+//----------------------------------------------------------------------------
 {
-  if (this->RootNode==root)
+  if (m_RootNode==root)
     return;
 
-  if (this->RootNode)
+  if (m_RootNode)
   {
-    this->RootNode->UnRegister(this);
+    m_RootNode->UnRegister(this);
   }
 
-  this->RootNode=root;
+  m_RootNode=root;
 
-  if (this->RootNode)
-    this->RootNode->Register(this);
+  if (m_RootNode)
+    m_RootNode->Register(this);
 }
 
 //----------------------------------------------------------------------------
 // executed before traversing a node
-vtkTreeIterator::PreExecute()
+mafNodeIterator::PreExecute()
+//----------------------------------------------------------------------------
 {
-  if (this->HasObserver(PreTraversal))
+  if (HasObserver(PreTraversal))
   {
-    this->InvokeEvent(PreTraversal,this->CurrentNode);
+    InvokeEvent(PreTraversal,m_CurrentNode);
   }
 }
 //----------------------------------------------------------------------------
 // executed after traversing a node
-vtkTreeIterator::PostExecute()
+mafNodeIterator::PostExecute()
+//----------------------------------------------------------------------------
 {
-  if (this->HasObserver(PostTraversal))
+  if (HasObserver(PostTraversal))
   {
-    this->InvokeEvent(PostTraversal,this->CurrentNode);
+    InvokeEvent(PostTraversal,m_CurrentNode);
   }
 }
 //----------------------------------------------------------------------------
 // executed when going down in the tree
-vtkTreeIterator::DeeperExecute(vtkTree *node)
+mafNodeIterator::DeeperExecute(mafNode *node)
+//----------------------------------------------------------------------------
 {
-  if (this->HasObserver(Deeper))
+  if (HasObserver(Deeper))
   {
-    this->InvokeEvent(Deeper,node);
+    InvokeEvent(Deeper,node);
   }
 }
 //----------------------------------------------------------------------------
 // executed when going up in the tree
-vtkTreeIterator::UpperExecute(vtkTree *node)
+mafNodeIterator::UpperExecute(mafNode *node)
+//----------------------------------------------------------------------------
 {
-  if (this->HasObserver(Upper))
+  if (HasObserver(Upper))
   {
-    this->InvokeEvent(Upper,node);
+    InvokeEvent(Upper,node);
   }
 }
 //----------------------------------------------------------------------------
 // executed when GoToFirstNode is executed
-vtkTreeIterator::FirstExecute()
+mafNodeIterator::FirstExecute()
+//----------------------------------------------------------------------------
 {
-  if (this->HasObserver(FirstNode))
+  if (HasObserver(FirstNode))
   {
-    this->InvokeEvent(FirstNode,this);
+    InvokeEvent(FirstNode,this);
   }
 }
 //----------------------------------------------------------------------------
 // executed when last node is traversed
-vtkTreeIterator::LastExecute()
+mafNodeIterator::LastExecute()
+//----------------------------------------------------------------------------
 {
-  if (this->HasObserver(LastNode))
+  if (HasObserver(LastNode))
   {
-    this->InvokeEvent(LastNode,this);
+    InvokeEvent(LastNode,this);
   }
 }
 //----------------------------------------------------------------------------
 // executed when IsDoneWithTraversal return "true"
-vtkTreeIterator::DoneExecute()
+mafNodeIterator::DoneExecute()
+//----------------------------------------------------------------------------
 {
-  if (this->HasObserver(Done))
+  if (HasObserver(Done))
   {
-    this->InvokeEvent(Done,this);
+    InvokeEvent(Done,this);
   }
 }
 #endif

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObject.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-29 21:14:32 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2004-11-30 18:18:21 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -20,7 +20,7 @@ class mafObjectDictionaryType;
 //------------------------------------------------------------------------------
 // mafObject
 //------------------------------------------------------------------------------
-/** Superclass for all MAF classes implementing RTTI APIs.
+/** Abstract superclass for all MAF classes implementing RTTI APIs.
   mafObject is a superclass implementing some useful features like 
   RTTI APIs.
 */
@@ -34,37 +34,31 @@ public:
   static const char *GetTypeName();
 
   /** Return the class name of this instance */
-  virtual const char *GetClassName() const; 
+  const char *GetClassName() const; 
   
   /** This is used by IsA to check the class name */
-  static int IsTypeOf(const char *type_name);
+  static bool IsTypeOf(const char *type_name);
   
   /** This is used by IsA to check the class type id */
-  static int IsTypeOf(const mafID type_id);
+  static bool IsTypeOf(const mafTypeID &type_id);
 
   /** Check the class name of this instance */
-  virtual int IsA(const char *type_name) const;
+  virtual bool IsA(const char *type_name) const;
   
   /** Check the type id of this instance */
-  virtual int IsA(const mafID type_id) const;
-  
-  /** Return a new instance of the same type */
-  static mafObject *NewObjectInstance();
+  virtual bool IsA(const mafTypeID &type_id) const;
 
   /** Return a new instance of the same type */
-  virtual mafObject *NewInternalInstance() const;
- 
-  /** Return a new instance of the same type */
-  mafObject *NewInstance() const;
+  virtual mafObject *NewInternalInstance() const = 0;
 
   /** Return TypeId for this type (static function) */ 
-  static mafID GetTypeId();
+  static const mafTypeID &GetTypeId();
 
   /** Return TypeId for this class instance */ 
-  virtual mafID GetClassId() const;
+  const mafTypeID &GetClassId() const;
 
   /** Return the ID for a specific classname */
-  static mafID GetTypeId(const char *classname);
+  //static mafTypeID &GetTypeId(const char *classname);
 
   mafObject(const mafObject& c) {}
   //void operator=(const mafObject&) {}
@@ -77,13 +71,13 @@ public:
 
 protected:
   /** Internally used to keep a unique ID for all the object */
-  static mafID GetNextTypeId(const char *classname);
+  //static mafID GetNextTypeId(const char *classname);
   bool HeapFlag;
 
 private:
-  static mafID m_TypeId;
-  static mafID m_TypeIdCounter;
-  static mafObjectDictionaryType m_TypesDictionary;
+//  static mafID m_TypeId;
+//  static mafID m_TypeIdCounter;
+//  static mafObjectDictionaryType m_TypesDictionary;
 };
 
 #endif /* __mafObject_h */

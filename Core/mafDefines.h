@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-29 21:15:48 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2004-11-30 18:18:20 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -19,8 +19,8 @@
 #define __mafDefines_h
 
 #include "mafConfigure.h"
-
-#include "string.h"
+#include <string.h>
+#include <typeinfo>
 
 //------------------------------------------------------------------------------
 // Typedefs
@@ -57,6 +57,7 @@ void mafMessage(const char *format, ...);
 /** this is the type used for IDs inside the MAF
     @todo: to be changed to support 64bit IDs */
 typedef unsigned long mafID;
+typedef type_info mafTypeID;
 
 /** Delete a VTK object */
 #define vtkDEL(a) if (a) { a->Delete(); a = NULL; }
@@ -72,18 +73,14 @@ typedef unsigned long mafID;
   Macro used by mafObjects for RTTI information. This macro must be placed
   in the class definition public section. */
 #define mafAbstractTypeMacro(thisClass,superclass) \
-  private: \
-  static mafID m_TypeId; \
   public: \
   typedef superclass Superclass; \
-  static mafID GetTypeId(); \
-  virtual mafID GetClassId() const; \
+  static const mafTypeID &GetTypeId(); \
   static const char *GetTypeName(); \
-  virtual const char *GetClassName() const; \
-  static int IsTypeOf(const char *type); \
-  static int IsTypeOf(const mafID type); \
-  virtual int IsA(const char *type) const; \
-  virtual int IsA(const mafID type) const; \
+  static bool IsTypeOf(const char *type); \
+  static bool IsTypeOf(const mafTypeID &type); \
+  virtual bool IsA(const char *type) const; \
+  virtual bool IsA(const mafTypeID &type) const; \
   static thisClass* SafeDownCast(mafObject *o);
 
 /**
@@ -101,38 +98,15 @@ typedef unsigned long mafID;
   Macro used by mafObjects for RTTI information. This macor must be placed
   in the .cpp file. */
 #define mafCxxAbstractTypeMacro(thisClass) \
-  mafID thisClass::m_TypeId = GetNextTypeId(#thisClass); \
-  mafID thisClass::GetTypeId() {return thisClass::m_TypeId;} \
-  mafID thisClass::GetClassId() const {return thisClass::m_TypeId;} \
+  const mafTypeID &thisClass::GetTypeId() {return typeid(thisClass);} \
   const char *thisClass::GetTypeName() {return #thisClass;} \
-  const char *thisClass::GetClassName() const {return #thisClass;} \
-  int thisClass::IsTypeOf(const char *type) \
-  { \
-    if ( !strcmp(#thisClass,type) ) \
-      { \
-      return 1; \
-      } \
-    return Superclass::IsTypeOf(type); \
-  } \
-  int thisClass::IsTypeOf(const mafID type) \
-  { \
-    if ( type==thisClass::m_TypeId) \
-    { \
-      return 1; \
-    } \
-    return Superclass::IsTypeOf(type); \
-  } \
-  int thisClass::IsA(const char *type) const {return IsTypeOf(type);} \
-  int thisClass::IsA(const mafID type) const {return IsTypeOf(type);} \
+  bool thisClass::IsTypeOf(const char *type) \
+  { return ( strcmp(#thisClass,type)==0 ) ? true : Superclass::IsTypeOf(type); } \
+  bool thisClass::IsTypeOf(const mafTypeID &type) { return ( type==typeid(thisClass) ? true : false ); } \
+  bool thisClass::IsA(const char *type) const {return IsTypeOf(type);} \
+  bool thisClass::IsA(const mafTypeID &type) const {return IsTypeOf(type);} \
   thisClass* thisClass::SafeDownCast(mafObject *o) \
-  { \
-    if ( o && o->IsA(thisClass::m_TypeId) ) \
-    { \
-      return static_cast<thisClass *>(o); \
-    } \
-    return NULL;\
-  }
-
+  { try { return dynamic_cast<thisClass *>(o); } catch (std::bad_cast) { return NULL;} }
 
 /**
   Macro used by mafObjects for RTTI information. This macro must be placed
@@ -146,17 +120,11 @@ typedef unsigned long mafID;
     return obj; \
   } \
   mafObject *thisClass::NewInternalInstance() const \
-  { \
-    return NewObject(); \
-  } \
+  { return NewObject(); } \
   thisClass *thisClass::New() \
-  { \
-    return thisClass::SafeDownCast(NewObject()); \
-  } \
+  { return thisClass::SafeDownCast(NewObject()); } \
   thisClass *thisClass::NewInstance() const \
-  { \
-    return thisClass::SafeDownCast(NewInternalInstance()); \
-  }
+  { return thisClass::SafeDownCast(NewInternalInstance()); }
 
 
 /** Macro used to define Set/GetListener() member functions and a Listener member variable */

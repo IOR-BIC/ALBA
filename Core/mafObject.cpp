@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObject.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-29 21:14:32 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2004-11-30 18:18:21 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -30,11 +30,11 @@ class mafObjectDictionaryType
 //------------------------------------------------------------------------------
 // Static Objects
 //------------------------------------------------------------------------------
-std::map<std::string,mafID> * mafObjectDictionaryType::m_TypeIDs=NULL;
-mafObjectDictionaryType mafObject::m_TypesDictionary;
-mafID mafObject::m_TypeIdCounter = 0; // This is for allocating unique Object IDs.
+//std::map<std::string,mafID> * mafObjectDictionaryType::m_TypeIDs=NULL;
+//mafObjectDictionaryType mafObject::m_TypesDictionary;
+//mafID mafObject::m_TypeIdCounter = 0; // This is for allocating unique Object IDs.
 
-mafID mafObject::m_TypeId = GetNextTypeId("mafObject");
+//mafID mafObject::m_TypeId = GetNextTypeId("mafObject");
 
 
 #ifdef _WIN32
@@ -78,73 +78,52 @@ const char *mafObject::GetTypeName()
 const char *mafObject::GetClassName() const
 //------------------------------------------------------------------------------
 {
-  return "mafObject";
+  return typeid(this).name();
 }
 
 //------------------------------------------------------------------------------
-int mafObject::IsTypeOf(const char *type_name)
+bool mafObject::IsTypeOf(const char *type_name)
 //------------------------------------------------------------------------------
 {
-  return ( !strcmp("mafObject",type_name) )? 1 : 0;
+  return ( !strcmp("mafObject",type_name) )? true : false;
 }
 
 //------------------------------------------------------------------------------
-int mafObject::IsTypeOf(const mafID type_id)
+bool mafObject::IsTypeOf(const mafTypeID &type_id)
 //------------------------------------------------------------------------------
 {
-  return ( type_id==mafObject::m_TypeId ) ? 1 : 0;
+  return ( type_id==typeid(mafObject) ) ? true : false;
 }
 
 //------------------------------------------------------------------------------
-int mafObject::IsA(const mafID type_id) const
+bool mafObject::IsA(const mafTypeID &type_id) const
 //------------------------------------------------------------------------------
 {
   return IsTypeOf(type_id);
 }
 
 //------------------------------------------------------------------------------
-int mafObject::IsA(const char *type_name) const
+bool mafObject::IsA(const char *type_name) const
 //------------------------------------------------------------------------------
 {
   return IsTypeOf(type_name);
 }
 
 //------------------------------------------------------------------------------
-mafObject *mafObject::NewObjectInstance()
+const mafTypeID &mafObject::GetTypeId()
 //------------------------------------------------------------------------------
 {
-  return new mafObject;
+  return typeid(mafObject);
 }
 
 //------------------------------------------------------------------------------
-mafObject *mafObject::NewInternalInstance() const
+const mafTypeID &mafObject::GetClassId() const
 //------------------------------------------------------------------------------
 {
-  return new mafObject;
+  return typeid(mafObject);
 }
 
-//------------------------------------------------------------------------------
-mafObject *mafObject::NewInstance() const
-//------------------------------------------------------------------------------
-{
-  return NewObjectInstance();
-}
-
-//------------------------------------------------------------------------------
-mafID mafObject::GetTypeId()
-//------------------------------------------------------------------------------
-{
-  return mafObject::m_TypeId;
-}
-
-//------------------------------------------------------------------------------
-mafID mafObject::GetClassId() const
-//------------------------------------------------------------------------------
-{
-  return mafObject::m_TypeId;
-}
-
-//------------------------------------------------------------------------------
+/*//------------------------------------------------------------------------------
 mafID mafObject::GetNextTypeId(const char *classname)
 //------------------------------------------------------------------------------
 {
@@ -173,3 +152,4 @@ mafID mafObject::GetTypeId(const char *classname)
   
   return id;
 }
+*/

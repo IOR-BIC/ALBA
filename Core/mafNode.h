@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-29 21:15:02 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-11-30 18:18:21 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,6 +14,7 @@
 
 #include "mafSmartObject.h"
 #include "mafString.h"
+#include "mafMTime.h"
 
 //----------------------------------------------------------------------------
 // forward declarations
@@ -83,7 +84,7 @@ public:
 
   /** Create a copy of this node (do not copy the sub tree,just the node) */
   static mafNode *MakeCopy(mafNode *a);
-  mafNode *MakeCopy() {return this->MakeCopy(this);}
+  mafNode *MakeCopy() {return MakeCopy(this);}
 
   /**
     Copy the given VME tree into a new tree. In case a parent is provided, link the new
@@ -91,7 +92,7 @@ public:
   static mafNode *CopyTree(mafNode *vme, mafNode *parent=NULL);
 
   /** Make a copy of the whole subtree and return its pointer */
-  mafNode *CopyTree() {return this->CopyTree(this);}
+  mafNode *CopyTree() {return CopyTree(this);}
 
   /** Return a the pointer to a child given its index */
   mafNode *GetChild(mafID idx);
@@ -107,12 +108,12 @@ public:
   /** Replace a child with a new node.*/ 
   //virtual void ReplaceChild(const int idx,mafNode *node);
   /** Replace a child with a new node.*/
-  //virtual void ReplaceChild(mafNode *oldnode,mafNode *node) {this->ReplaceChild(this->FindNodeIdx(oldnode),node);};
+  //virtual void ReplaceChild(mafNode *oldnode,mafNode *node) {ReplaceChild(FindNodeIdx(oldnode),node);};
 
   /** Remove a child node*/
   virtual void RemoveChild(const int idx);
   /** Remove a child node*/
-  virtual void RemoveChild(mafNode *node) {this->RemoveChild(this->FindNodeIdx(node));};
+  virtual void RemoveChild(mafNode *node) {RemoveChild(FindNodeIdx(node));};
 
   /**
     Find a child given its pointer and return its index. Return -1 in
@@ -151,14 +152,14 @@ public:
   /** Return the root of the tree this node owns to. */
   mafRootNode *GetRoot();
 
-  bool IsEmpty() {return this->GetNumberOfChildren()==0;}
+  bool IsEmpty() {return GetNumberOfChildren()==0;}
 
   /** Return the number of children of this node */
   int GetNumberOfChildren();
   
   /**
   Return the pointer to the parent node (if present)*/
-  mafNode *GetParent() {return this->Parent;};
+  mafNode *GetParent() {return m_Parent;};
 
   /**
     Remove recursively all nodes from this tree, forcing all subnodes
@@ -188,7 +189,7 @@ public:
 
   /**
   return true if VME can be reparented under the specified node*/
-  virtual bool CanReparentTo(mafNode *parent) {return parent==NULL||!this->IsInTree(parent);}
+  virtual bool CanReparentTo(mafNode *parent) {return parent==NULL||!IsInTree(parent);}
 
   /** redefined to cope with tree registering */
   virtual void UnRegister(void *o);
@@ -198,6 +199,8 @@ public:
 
   /** return modification time */
   inline unsigned long GetMTime();
+
+  typedef mafTemplatedVector<mafAutoPointer<mafNode>> mafChildrenVector;
 
 protected:
   mafNode();
@@ -215,16 +218,16 @@ protected:
     to allow subclasses to implement selective reparenting.*/
   virtual int SetParent(mafNode *parent);
 
-  mafTemplatedVector<mafNode> *m_Children;
+  mafChildrenVector *m_Children;
   
   mafNode   *m_Parent;      ///< parent node
 
   mafString m_Name;         ///< name of this node
   mafMTime  m_MTime;        ///< Last modification time
 
-  bool m_VisibleToTraverse;  ///< enable/disable traversing visit of this node
-  bool m_Initialized;        ///< set true by Initialize()
-  int m_Crypting;           ///< enable crypting during storing/restoring for this node
+  bool  m_VisibleToTraverse;  ///< enable/disable traversing visit of this node
+  bool  m_Initialized;        ///< set true by Initialize()
+  int   m_Crypting;           ///< enable crypting during storing/restoring for this node
 };
 
 

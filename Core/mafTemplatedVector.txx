@@ -3,8 +3,8 @@
 Program:   Visualization Toolkit
 Module:    $RCSfile: mafTemplatedVector.txx,v $
 Language:  C++
-Date:      $Date: 2004-11-29 21:16:06 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2004-11-30 18:18:22 $
+Version:   $Revision: 1.2 $
 
 
 
@@ -23,10 +23,7 @@ template <class T>
 class mafTemplatedVectorItems 
 {
   public:
-  typedef std::vector<mafID, mafAutoPointer<T> > STLVector;
-
-  std::vector<mafID, mafAutoPointer<T> > Vector;
-  STLVector::iterator Iterator;
+  std::vector<mafID, T > Vector;
 };
 
 //------------------------------------------------------------------------------
@@ -56,7 +53,7 @@ mafID mafTemplatedVector<T>::GetNumberOfItems()
 
 //------------------------------------------------------------------------------
 template <class T>
-void mafTemplatedVector<T>::SetItem(mafID idx,T *object)
+void mafTemplatedVector<T>::SetItem(mafID idx,T &object)
 //------------------------------------------------------------------------------
 {
   assert(object);
@@ -65,7 +62,7 @@ void mafTemplatedVector<T>::SetItem(mafID idx,T *object)
 
 //------------------------------------------------------------------------------
 template <class T>
-mafID mafTemplatedVector<T>::AppendItem(T *object)
+mafID mafTemplatedVector<T>::AppendItem(T &object)
 //------------------------------------------------------------------------------
 {
   assert(object);
@@ -75,7 +72,7 @@ mafID mafTemplatedVector<T>::AppendItem(T *object)
 
 //------------------------------------------------------------------------------
 template <class T>
-T *mafTemplatedVector<T>::GetItem(mafID idx)
+T &mafTemplatedVector<T>::GetItem(mafID idx)
 //------------------------------------------------------------------------------
 {
   return (idx<Items->Vector.size())?Items->Vector[idx]:NULL;
@@ -83,7 +80,7 @@ T *mafTemplatedVector<T>::GetItem(mafID idx)
 
 //------------------------------------------------------------------------------
 template <class T>
-bool mafTemplatedVector<T>::ReplaceItem(mafID idx, T *newitem)
+bool mafTemplatedVector<T>::ReplaceItem(mafID idx, T &newitem)
 //------------------------------------------------------------------------------
 {
   assert(newitem);
@@ -115,7 +112,7 @@ bool mafTemplatedVector<T>::RemoveItem(mafID idx)
 
 //------------------------------------------------------------------------------
 template <class T>
-int mafTemplatedVector<T>::RemoveItem(T *object)
+bool mafTemplatedVector<T>::RemoveItem(T &object)
 //------------------------------------------------------------------------------
 {
   assert(object);
@@ -139,7 +136,7 @@ void mafTemplatedVector<T>::RemoveAllItems()
 
 //------------------------------------------------------------------------------
 template <class T>
-bool mafTemplatedVector<T>::FindItem(T *object, mafID &idx)
+bool mafTemplatedVector<T>::FindItem(T &object, mafID &idx)
 //------------------------------------------------------------------------------
 {
   for (mafID i=0;i<Items->Vector.size();i++)
@@ -154,11 +151,29 @@ bool mafTemplatedVector<T>::FindItem(T *object, mafID &idx)
 
 //------------------------------------------------------------------------------
 template <class T>
-bool mafTemplatedVector<T>::IsItemPresent(T *object)
+bool mafTemplatedVector<T>::IsItemPresent(T &object)
 //------------------------------------------------------------------------------
 {
   mafID idx;
   return FindItem(object,idx);
+}
+
+//------------------------------------------------------------------------------
+template <class T>
+mafID Push(T &object)
+//------------------------------------------------------------------------------
+{
+	AppendItem(object);
+}
+
+//------------------------------------------------------------------------------
+template <class T>
+T &Pop()
+//------------------------------------------------------------------------------
+{
+	T obj=GetItem(GetNumberOfItems()-1);	
+	RemoveItem(GetNumberOfItems()-1);
+	return obj;
 }
 
 #endif
