@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-31 11:45:22 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-01 08:58:07 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -77,7 +77,7 @@ mmgPanel(mafGetFrame(),-1,dp,wxDefaultSize,wxNO_BORDER | wxCLIP_CHILDREN | wxTAB
 	 m_Listener = listener;
    m_id= MINID;
 
-   m_use_bc = true;
+   m_use_bc = false;
    m_bc = wxColour(251,251,253);
    if(m_use_bc) this->SetBackgroundColour(m_bc);
 
@@ -101,6 +101,12 @@ mmgPanel(mafGetFrame(),-1,dp,wxDefaultSize,wxNO_BORDER | wxCLIP_CHILDREN | wxTAB
 mmgGui::~mmgGui()
 //----------------------------------------------------------------------------
 {
+}
+//----------------------------------------------------------------------------
+void mmgGui::FitGui() 
+//----------------------------------------------------------------------------
+{
+  this->SetSize(FW+M+M,m_sizer->GetMinSize().GetHeight());
 }
 //----------------------------------------------------------------------------
 int mmgGui::GetMetrics(int id)
@@ -180,32 +186,28 @@ void mmgGui::Enable(int mod_id, bool enable)
 void mmgGui::Divider (long style)
 //----------------------------------------------------------------------------
 {
-
-	if(style ==0)
+	if(style ==0) //simple empty space
 	{
 		wxStaticText* div = new wxStaticText(this, -1, "",dp, wxSize(FW,4), 0);
 		Add(div,0,wxALL, M);
     if(m_use_bc) div->SetBackgroundColour(m_bc);
 	}
-	else if(style ==1)
+	else if(style ==1) //gray line
 	{
 		wxStaticText* div = new wxStaticText(this, -1, "",dp, wxSize(FW,2), 0);
-		if(m_use_bc) div->SetBackgroundColour(wxColour(150,150,150));
+		div->SetBackgroundColour(wxColour(50,50,50));
 		Add(div,0,wxALL, 2*M);
-    if(m_use_bc) div->SetBackgroundColour(m_bc);
 	}
-	else if(style ==2)
+	else if(style ==2) //white line
 	{
-		wxStaticText* div = new wxStaticText(this, -1, "",dp, wxSize(FW,2), 0);
-		if(m_use_bc) div->SetBackgroundColour(wxColour(255,255,255));
+		wxStaticText* div = new wxStaticText(this, -1, "",dp, wxSize(FW,3), 0);
+		div->SetBackgroundColour(wxColour(255,255,255));
 		Add(div,0,wxALL, 2*M);
-    if(m_use_bc) div->SetBackgroundColour(m_bc);
 	}
-	else
+	else //sunken divider
 	{
 		wxTextCtrl* div   = new wxTextCtrl(this, -1, "",dp, wxSize(FW,6), wxSUNKEN_BORDER);
 		Add(div,0,wxALL, 2*M);
-    if(m_use_bc) div->SetBackgroundColour(m_bc);
 	}
 }
 //----------------------------------------------------------------------------
@@ -566,7 +568,7 @@ void mmgGui::Double(int id,wxString label,double* var,double min, double max, in
 }
 //----------------------------------------------------------------------------
 void mmgGui::Bool_(int id,wxString label,int* var, int flag, wxString tooltip)  // <*> non mi piace il flag - trovare una sintassi piu comprensibile
-//---------------------------------------------------------------------------- // <*> ci vorrebbe anche il layout check al centro, label a destra
+//----------------------------------------------------------------------------  // <*> ci vorrebbe anche il layout check al centro, label a destra
 {
   if (flag) // testo a sinistra
   {

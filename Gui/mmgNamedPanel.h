@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgNamedPanel.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:10:02 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-01 08:58:08 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,12 +51,16 @@ public:
   /** Set the text shown on the title-bar. */
   void SetTitle(wxString label) {if(m_lab) m_lab->SetLabel(label);};
 
+  /** Change the background color of the title. */
+  void SetTitleColor(wxColour *color = NULL);
+
 protected:
-  wxPanel      *m_top;
-  mmgLab         *m_lab;
-  wxBoxSizer   *m_sizer;
-  wxBoxSizer   *m_topsizer;
-  mmgNamedPanel  *m_next;
+  wxPanel         *m_top;
+  mmgLab          *m_lab;
+  wxBoxSizer      *m_sizer;
+  wxBoxSizer      *m_topsizer;
+  mmgNamedPanel   *m_next;
+  wxColour         m_col; 
 
 DECLARE_EVENT_TABLE()
 };

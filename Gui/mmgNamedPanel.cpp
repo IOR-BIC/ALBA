@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgNamedPanel.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:10:01 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-01 08:58:08 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -14,6 +14,8 @@
 #include "mmgNamedPanel.h"
 #include "mmgBitmaps.h"
 #include "mmgPicButton.h"
+#include <wx/statbox.h> // testing -- maye to be removed  //SIL. 31-3-2005: 
+
 //----------------------------------------------------------------------------
 // mmgNamedPanel
 //----------------------------------------------------------------------------
@@ -34,16 +36,19 @@ mmgNamedPanel::mmgNamedPanel( wxWindow* parent,wxWindowID id,bool CloseButton,bo
   m_topsizer = NULL;
   m_lab = NULL; 
 
+  m_col = wxColour(133,162,185);
+  m_col = wxColour(110,150,200);
+  //m_col = wxColour(190,190,190);
+  //m_col = wxColour(255,255,255);
+
   if (!HideTitle)
   {
+    //m_top = new wxStaticBox( this, -1,"",wxDefaultPosition,wxSize(-1,30));
     m_top = new wxPanel( this, -1);
-	  m_top->SetBackgroundColour(wxColour(133,162,185));
-	  m_top->SetBackgroundColour(wxColour(110,150,200));
-	  m_topsizer =  new wxBoxSizer( wxHORIZONTAL );
+
+    m_topsizer =  new wxBoxSizer( wxHORIZONTAL );
 
 	  m_lab = new mmgLab( m_top, ID_LABEL_CLICK, " Panel Title:");
-	  m_lab->SetBackgroundColour(wxColour(133,162,185));
-	  m_lab->SetBackgroundColour(wxColour(110,150,200));
 
 	  wxFont font = wxFont(wxSystemSettings::GetSystemFont(wxSYS_DEFAULT_GUI_FONT));
 	  font.SetPointSize(9);
@@ -64,7 +69,9 @@ mmgNamedPanel::mmgNamedPanel( wxWindow* parent,wxWindowID id,bool CloseButton,bo
 
 	  m_sizer->Add(m_top,0,wxEXPAND|wxTOP,2);
   }
-   
+  
+  SetTitleColor(&m_col);
+
   this->SetAutoLayout( TRUE );
   this->SetSizer( m_sizer );
   m_sizer->Fit(this);
@@ -74,4 +81,12 @@ mmgNamedPanel::mmgNamedPanel( wxWindow* parent,wxWindowID id,bool CloseButton,bo
 mmgNamedPanel::~mmgNamedPanel( ) 
 //----------------------------------------------------------------------------
 {
+}
+//----------------------------------------------------------------------------
+void mmgNamedPanel::SetTitleColor(wxColour *color)
+//----------------------------------------------------------------------------
+{
+  if(color) m_col = *color;
+  if(m_top) m_top->SetBackgroundColour(m_col);
+  if(m_lab) m_lab->SetBackgroundColour(m_col);
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGuiHolder.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-31 11:45:22 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-01 08:58:08 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,7 +25,11 @@ mmgGuiHolder::mmgGuiHolder(wxWindow* parent,wxWindowID id,bool CloseButton,bool 
 //----------------------------------------------------------------------------
 {
   SetTitle(" module controls area:");
+  //m_panel = new wxScrolledWindow(this,-1);
   m_panel = new mmgScrolledPanel(this,-1);
+  //m_panel->SetBackgroundColour(wxColour(251,251,253)); //SIL. 31-3-2005: 
+  //m_panel->SetBackgroundColour(wxColour(255,0,0)); //SIL. 31-3-2005: 
+
   Add(m_panel,1,wxEXPAND);
     
   m_currgui = NULL;

@@ -6,14 +6,18 @@ PROJECT(mafGui)
 MESSAGE(STATUS "Configuring project ${PROJECT_NAME}")
 
 SET(PROJECT_SRCS
-#mafSideBar.cpp
-#mafSideBar.h
 #mmgCheckListBox.cpp
 #mmgCheckListBox.h
 #mmgLayoutDialog.cpp
 #mmgLayoutDialog.h
 #mmgListCtrlBitmap.cpp
 #mmgListCtrlBitmap.h
+#mafLogic.cpp
+#mafLogic.h
+mafLogicBase.cpp
+mafLogicBase.h
+mafSideBar.cpp
+mafSideBar.h
 mafWXLog.cpp
 mafWXLog.h
 mmgBitmaps.cpp
@@ -22,12 +26,16 @@ mmgButton.cpp
 mmgButton.h
 mmgCrossSplitter.cpp
 mmgCrossSplitter.h
+mmgDialog.cpp
+mmgDialog.h
 mmgFileHistory.cpp
 mmgFileHistory.h
 mmgFlagSplitter.cpp
 mmgFlagSplitter.h
 mmgFloatSlider.cpp
 mmgFloatSlider.h
+mmgFrame.cpp
+mmgFrame.h
 mmgGui.cpp
 mmgGui.h
 mmgGuiHolder.cpp
@@ -38,6 +46,10 @@ mmgListBox.cpp
 mmgListBox.h
 mmgListCtrl.cpp
 mmgListCtrl.h
+mmgMDIChild.cpp
+mmgMDIChild.h
+mmgMDIFrame.cpp
+mmgMDIFrame.h
 mmgNamedPanel.cpp
 mmgNamedPanel.h
 mmgPanel.cpp
@@ -60,6 +72,10 @@ mmgTree.cpp
 mmgTree.h
 mmgValidator.cpp
 mmgValidator.h
+mmgViewFrame.cpp
+mmgViewFrame.h
+mmgViewWin.cpp
+mmgViewWin.h
 )
 
 # List the kits from VTK that are needed by this project.

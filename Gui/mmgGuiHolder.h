@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGuiHolder.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:10:01 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-01 08:58:08 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -41,7 +41,7 @@ public:
 protected:
   mmgGui           *m_currgui;
   mmgScrolledPanel *m_panel;
-
+  //wxScrolledWindow *m_panel;
 DECLARE_EVENT_TABLE()
 };
 #endif

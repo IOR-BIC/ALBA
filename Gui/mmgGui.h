@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-31 11:45:22 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-01 08:58:08 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2005
@@ -192,7 +192,7 @@ public:
   bool Remove(wxSizer*  sizer ) {return m_sizer->Remove(sizer);};
 
   /** Fit the gui widgets to gui sizer. */
-  void FitGui() {this->SetSize(200,m_sizer->GetMinSize().GetHeight());};
+  void FitGui();
 
 	/** Update gui widget. */
   void Update();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgScrolledPanel.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:10:03 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-01 08:58:09 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,8 +25,13 @@ mmgScrolledPanel::mmgScrolledPanel(wxWindow* parent,wxWindowID id)
 {
   m_sizer =  new wxBoxSizer( wxVERTICAL );
 
-  this->SetScrollbars(0, 10, 0, 100);
-  this->EnableScrolling(0,1);
+   //SIL. 31-3-2005: 
+  this->SetScrollbars(0, 10, 0, 100); // vertical sb. only - this work
+  this->EnableScrolling(0,1);         // vertical sb. only - this work
+  //this->SetScrollbars(0, 100, 0, 100); 
+  //this->EnableScrolling(1,1); 
+
+
   this->SetAutoLayout( TRUE );
   this->SetSizer( m_sizer );
   m_sizer->Fit(this);
@@ -49,14 +54,16 @@ void mmgScrolledPanel::Add(wxWindow* window,int option, int flag, int border)
 //----------------------------------------------------------------------------
 {
   m_sizer->Add(window,option,flag,border);
-  this->SetScrollbars(0, 10,0, m_sizer->GetMinSize().GetHeight()/10);
+  this->SetScrollbars(0, 10,0, m_sizer->GetMinSize().GetHeight()/10); //this work
+  //this->SetScrollbars(0, m_sizer->GetMinSize().GetWidth()/10,0, m_sizer->GetMinSize().GetHeight()/10); 
 }
 //----------------------------------------------------------------------------
 void mmgScrolledPanel::Add(wxSizer*  sizer, int option, int flag, int border)  
 //----------------------------------------------------------------------------
 {
   m_sizer->Add(sizer, option,flag,border);
-  this->SetScrollbars(0, 10,0, m_sizer->GetMinSize().GetHeight()/10);
+  this->SetScrollbars(0, 10,0, m_sizer->GetMinSize().GetHeight()/10); //this work
+  //this->SetScrollbars(0, m_sizer->GetMinSize().GetWidth()/10 ,0, m_sizer->GetMinSize().GetHeight()/10); //SIL. 31-3-2005: 
 }
 //----------------------------------------------------------------------------
 bool mmgScrolledPanel::Remove(wxWindow* window)
