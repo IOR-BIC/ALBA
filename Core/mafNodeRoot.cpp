@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeRoot.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:27:14 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-03-10 12:33:03 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -13,19 +13,15 @@
 #define __mafNodeRoot_cxx
 
 #include "mafNodeRoot.h"
+#include "mafNode.h"
+#include "mafStorageElement.h"
 #include "mafIndent.h"
-#include "mafAttribute.h"
-
-//-------------------------------------------------------------------------
-mafCxxTypeMacro(mafNodeRoot);
-//-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
 mafNodeRoot::mafNodeRoot()
 //-------------------------------------------------------------------------
 {
-  m_MaxItemId=-1;
-  m_MaxNodeId=-1;
+  m_MaxNodeId=0;
 }
 
 //-------------------------------------------------------------------------
@@ -33,35 +29,44 @@ mafNodeRoot::~mafNodeRoot()
 //-------------------------------------------------------------------------
 {
 }
-
 //-------------------------------------------------------------------------
-int mafNodeRoot::ReparentTo(mafNode *parent)
+mafNodeRoot* mafNodeRoot::SafeDownCast(mafObject *o)
 //-------------------------------------------------------------------------
 {
-/*  mafNode *node=mafNodeGroup::New();
-  node->DeepCopy(this);
-  //node->Import(this);
-
-  return node->ReparentTo(parent);*/
-  
-  return MAF_ERROR;
+  try 
+  { 
+    return dynamic_cast<mafNodeRoot *>(o);
+  } 
+  catch (std::bad_cast) 
+  { 
+    return NULL;
+  }
 }
 
 //-------------------------------------------------------------------------
-void mafNodeRoot::CleanTree()
+int mafNodeRoot::StoreRoot(mafStorageElement *parent)
 //-------------------------------------------------------------------------
 {
-  Superclass::CleanTree();
-  m_Attributes.clear();
+  parent->SetAttribute("MaxNodeId",mafString(m_MaxNodeId));
+  return MAF_OK;
 }
+//-------------------------------------------------------------------------
+int mafNodeRoot::RestoreRoot(mafStorageElement *element)
+//-------------------------------------------------------------------------
+{
+  mafString max_id;
+  if (!element->GetAttribute("MaxNodeId",max_id))
+    return MAF_ERROR;
 
+  SetMaxNodeId((mafID)atof(max_id));
+
+  return MAF_OK;
+}
 
 //-------------------------------------------------------------------------
 void mafNodeRoot::Print(std::ostream& os, const int tabs)
 //-------------------------------------------------------------------------
 {
-  mafNode::Print(os,tabs);
-  os << mafIndent(tabs) << "MaxItemId: " << m_MaxItemId << "\n";
   os << mafIndent(tabs) << "MaxNodeId: " << m_MaxNodeId << "\n";
 }
   
