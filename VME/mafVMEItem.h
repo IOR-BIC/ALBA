@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:16:32 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-01 10:56:08 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -266,9 +266,6 @@ protected:
   unsigned long m_InputMemorySize;  ///< size of memory storing data to be read
   const char *  m_OutputMemory;     ///< pointer to memory storing the data to be written
   unsigned long m_OutputMemorySize; ///< size of the block of memory where data has been stored
-  
- 
-
 };
 
 #endif
