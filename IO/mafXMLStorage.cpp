@@ -2,11 +2,11 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-01-28 13:58:37 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-02-20 23:43:18 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
-  Copyright (c) 2002/2004 
+  Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
@@ -128,7 +128,7 @@ bool mafXMLStorage::ResolveOutputURL(const mafString &url, mafString &filename)
 void mafXMLStorage::SetFileType(const char *filetype)
 //------------------------------------------------------------------------------
 {
-  m_FileType.Copy(filetype); // force string copying
+  m_FileType=filetype; // force string copying
 }
 
 //------------------------------------------------------------------------------
@@ -142,7 +142,7 @@ const char *mafXMLStorage::GetFileType()
 void mafXMLStorage::SetVersion(const char *version)
 //------------------------------------------------------------------------------
 {
-  m_Version.Copy(version); // force string copying
+  m_Version=version; // force string copying
 }
 //------------------------------------------------------------------------------
 const char *mafXMLStorage::GetVersion()
@@ -338,7 +338,7 @@ int mafXMLStorage::InternalRestore()
             }
             else
             {
-              mafErrorMacro("XML parsing error: wrong file version ("<<doc_version<<"), should be > "<<m_Version);
+              mafErrorMacro("XML parsing error: wrong file version v"<<doc_version.GetCStr()<<", should be > v"<<m_Version.GetCStr());
               errorCode=7;
             }
           }

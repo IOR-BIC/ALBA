@@ -2,11 +2,11 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuXMLDOMElement.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-28 13:57:23 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-02-20 23:43:19 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
-  Copyright (c) 2002/2004 
+  Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 #ifndef __mmuXMLDOMElement_h__
