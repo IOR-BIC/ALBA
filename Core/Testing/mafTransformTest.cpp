@@ -45,6 +45,7 @@ int main()
   transform.Scale(scale[0],scale[1],scale[2],PRE_MULTIPLY);
   M=transform.GetMatrix();
 
+  // test using a VTK trasnform for comparison
   vtk_transform->Translate(translation);
   vtk_transform->RotateX(angle[0]);
   vtk_transform->RotateY(angle[1]);
