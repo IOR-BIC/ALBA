@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-22 14:06:35 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2004-12-27 18:20:10 $
+  Version:   $Revision: 1.12 $
   Authors:   originally based on vtkString (www.vtk.org), rewritten Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -189,7 +189,7 @@ public:
     to force the release of the memory */
   void Set(const char *a, bool release=false);
   
-  /** this can be used only with non constant cstring */
+  /** this can be used only with non constant c-string */
   void SetCStr(char *a, bool release=false);
 
   /** Format given arguments according to format string. Format string format is
@@ -200,7 +200,15 @@ public:
   void NPrintf(unsigned long size, const char *format, ...);
 
   /** this allows to convert a mafString to const char *. */
-  operator const char*() const {return GetCStr();}  
+  operator const char*() const {return GetCStr();}
+
+  /** 
+    Direct access to single string elements for writing. This operator
+    forces memory copy in case of internal const char reference. */
+  char & operator [] (const int i);
+
+  /** direct access to string single elements for reading */
+  const char operator [] (const int i) const;
 
   const bool operator==(const char *src);
   const bool operator<(const char *a);

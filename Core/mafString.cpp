@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-22 15:23:03 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2004-12-27 18:20:10 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -657,6 +657,25 @@ const bool mafString::operator>=(const char *a)
 {
   return Compare(a)>=0;
 }
+
+//------------------------------------------------------------------------------
+char & mafString::operator [] (const int i)
+//------------------------------------------------------------------------------
+{
+  // check if the string is referencing a "const char *"
+  if (!m_CStr)
+    ForceDuplicate(); // force memory copying
+    
+  return m_CStr[i];
+}
+
+//------------------------------------------------------------------------------
+const char mafString::operator [] (const int i) const
+//------------------------------------------------------------------------------
+{
+  return GetCStr()[i];
+}
+
 //----------------------------------------------------------------------------
 int mafString::FindChr(const int c)
 //----------------------------------------------------------------------------
