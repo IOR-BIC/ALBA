@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:10:04 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-01 14:25:00 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -11,7 +11,7 @@
 =========================================================================*/
 #include "mmgTimeBar.h"  
 
-#include <wx/treeCtrl.h> // per floor
+#include <wx/treectrl.h> // per floor
 
 #include "mafDecl.h"
 #include "mmgBitmaps.h" 

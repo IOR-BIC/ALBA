@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:03:35 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-01 14:25:52 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,7 +28,7 @@ class mafOBB;
 class mafNodeIterator;
 #ifdef MAF_USE_VTK
 class vtkDataSet;
-#endif MAF_USE_VTK
+#endif //MAF_USE_VTK
 
 /** mafVMEOutput - the output data structure of a VME node.
   mafVMEOutput is the output produced by a VME node.

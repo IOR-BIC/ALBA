@@ -6,7 +6,7 @@ ADD_EXECUTABLE(testVMEGeneric testVMEGeneric.cpp)
 ADD_TEST(testVMEGeneric ${EXECUTABLE_OUTPUT_PATH}/testVMEGeneric)
 ADD_EXECUTABLE(testDataVector testDataVector.cpp)
 ADD_TEST(testDataVector ${EXECUTABLE_OUTPUT_PATH}/testDataVector)
-ADD_EXECUTABLE(testMatrixVector TestMatrixVector.cpp)
+ADD_EXECUTABLE(testMatrixVector testMatrixVector.cpp)
 ADD_TEST(testMatrixVector ${EXECUTABLE_OUTPUT_PATH}/testMatrixVector)
 
 # wxWidgets specific classes
