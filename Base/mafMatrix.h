@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:07:12 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-01 09:49:53 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -50,6 +50,8 @@ public:
 
   bool operator==(const mafMatrix& mat) const;
 
+  bool Equals(const mafMatrix *mat) const;
+
   void DeepCopy(const mafMatrix* mat) {*this=*mat;}
 
 #ifdef MAF_USE_VTK
@@ -72,7 +74,7 @@ public:
   bool operator==(vtkMatrix4x4 *mat) const;  
 #endif
 
-  /** return pointer to elements vector */
+  /** return pointer to elements matrix: returned type is a double [4][4] object */
   mafMatrixElements GetElements() const;
 
   /** 
@@ -131,8 +133,8 @@ public:
 
   /** Matrix adjoint */
   static void Adjoint(const double inElements[16], double outElements[16]);
-  void Adjoint(const mafMatrix &inMat, mafMatrix &outMat);
-  void Adjoint() {Adjoint(*GetElements(),*GetElements());}
+  void Adjoint(const mafMatrix &inMat, mafMatrix &outMat) {Adjoint(*(inMat.GetElements()),*(outMat.GetElements()));outMat.Modified();};
+  void Adjoint() {Adjoint(*GetElements(),*GetElements());Modified();}
 
   /** Transpose the matrix and put it into out. static version.*/
   static void Transpose(const mafMatrix &in, mafMatrix &out) 
@@ -145,7 +147,7 @@ public:
   /**
     Multiply a homogeneous coordinate by this matrix, i.e. out = A*in.
     The in[4] and out[4] can be the same array. */
-  void MultiplyPoint(const double in[4], double out[4]) 
+  void MultiplyPoint(const double in[4], double out[4]) const
     {mafMatrix::MultiplyPoint(*GetElements(),in,out); }
   /**
     Multiply a homogeneous coordinate by this matrix, i.e. out = A*in.
