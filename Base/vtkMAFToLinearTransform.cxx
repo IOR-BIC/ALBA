@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFToLinearTransform.cxx,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:21:39 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-01 10:00:32 $
+  Version:   $Revision: 1.3 $
 
   Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
   All rights reserved.
@@ -23,7 +23,7 @@
 #include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkMAFToLinearTransform, "$Revision: 1.2 $");
+vtkCxxRevisionMacro(vtkMAFToLinearTransform, "$Revision: 1.3 $");
 vtkStandardNewMacro(vtkMAFToLinearTransform);
 
 //----------------------------------------------------------------------------
@@ -99,7 +99,7 @@ void vtkMAFToLinearTransform::InternalUpdate()
       this->Matrix->Invert();
     }
   }
-  if (this->InputMatrix)
+  else if (this->InputMatrix)
   {
     this->Matrix->DeepCopy(this->InputMatrix->GetVTKMatrix());
     if (this->InverseFlag)
