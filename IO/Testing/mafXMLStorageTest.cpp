@@ -178,7 +178,7 @@ int main()
   storage.SetFileType("TestXML");
   storage.SetVersion("1.745");
 
-  mafStorable *storable=mafStorable::SafeDownCast(&foo);
+  mafStorable *storable=mafStorable::SafeCastToObject(&foo);
   MAF_TEST(storable!=NULL);
 
   storage.SetRoot(storable);
