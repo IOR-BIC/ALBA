@@ -141,7 +141,7 @@ int main()
   //
   // PreOrder Traverse
   //
-  cerr<<"Testing mafNodeIterator PreOrder Traverse\n";  
+  std::cerr<<"Testing mafNodeIterator PreOrder Traverse\n";  
   iter->SetTraversalModeToPreOrder();
 
   int preorder[10]={4,2,1,0,3,9,8,7,5,6};
@@ -161,7 +161,7 @@ int main()
   //
   // PreOrder Traverse
   //
-  cerr<<"Testing mafNodeIterator PreOrder Traverse in Reverse\n";
+  std::cerr<<"Testing mafNodeIterator PreOrder Traverse in Reverse\n";
   iter->SetTraversalModeToPreOrder();
 
   int preorderrev[10]={6,5,7,8,9,3,0,1,2,4};
@@ -180,7 +180,7 @@ int main()
   //
   // PostOrder Traverse Reverse
   //
-  cerr<<"Testing mafNodeIterator PostOrder Traverse in Reverse\n";
+  std::cerr<<"Testing mafNodeIterator PostOrder Traverse in Reverse\n";
   iter->SetTraversalModeToPostOrder();
 
   int postorderrev[10]={4,9,8,7,5,6,2,3,1,0};
@@ -199,7 +199,7 @@ int main()
   //
   // PostOrder Traverse
   //
-  cerr<<"Testing mafNodeIterator PostOrder Traverse\n";
+  std::cerr<<"Testing mafNodeIterator PostOrder Traverse\n";
   iter->SetTraversalModeToPostOrder();
 
   int postorder[10]={0,1,3,2,6,5,7,8,9,4};
