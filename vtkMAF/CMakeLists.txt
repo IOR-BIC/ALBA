@@ -9,6 +9,9 @@ PROJECT(vtkMAF)
 # vtkMAF_SRCS variable.
 SET(vtkMAF_SRCS
   vtkMAFExample.cxx
+  vtkMAFExample.h
+  vtkVolumeSlicer.cxx
+  vtkVolumeSlicer.h
 )
 
 # List the kits from VTK that are needed by this project.
