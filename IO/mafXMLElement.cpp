@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-01-10 00:18:07 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-01-15 19:21:41 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -195,7 +195,7 @@ void mafXMLElement::WriteXMLText(const char *text)
 }
 
 //------------------------------------------------------------------------------
-int mafXMLElement::StoreText(const const char *text,const char *name)
+int mafXMLElement::StoreText(const char *text,const char *name)
 //------------------------------------------------------------------------------
 {
   assert(text);

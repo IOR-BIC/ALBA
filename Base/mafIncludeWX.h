@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafIncludeWX.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-14 18:24:21 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-01-15 19:23:54 $
+  Version:   $Revision: 1.2 $
   Authors:   Based on itkWindows.h (www.itk.org)
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -22,4 +22,4 @@
 //  #endif
 #endif
 
-#endif 
+#endif

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-01-11 17:34:59 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-01-15 19:23:54 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,7 +12,6 @@
 #include "mafMatrix.h"
 #include "mafMatrix3x3.h"
 #include "mafIndent.h"
-#include "vtkObjectFactory.h"
 #include <assert.h>
 #include <sstream>
 
@@ -69,7 +68,9 @@ bool mafMatrix::operator==(const mafMatrix& mat) const
   {
     for (int j=0;j<4;j++)
     {
-      if (abs(GetElements()[i][j]-mat.GetElements()[i][j])>(1e-17))
+      mafMatrixElements myelements = GetElements();
+      mafMatrixElements otherelements = mat.GetElements();
+      if (fabs(myelements[i][j]-otherelements[i][j])>1.0e-17)
         return false;
     }
   }
@@ -122,7 +123,8 @@ bool mafMatrix::operator==(vtkMatrix4x4 *mat) const
   {
     for (int j=0;j<4;j++)
     {
-      if (abs(GetElements()[i][j]-mat->Element[i][j])>(1e-17))
+      mafMatrixElements myelements=GetElements(); 
+      if (fabs(myelements[i][j]-mat->Element[i][j])>1.0e-17)
         return false;
     }
   }

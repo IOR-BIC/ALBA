@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafIndent.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-11 17:34:58 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-01-15 19:23:54 $
+  Version:   $Revision: 1.2 $
   Authors:   originally based on vtkIndent (www.vtk.org), rewritten by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -15,7 +15,7 @@
 
 #include "mafConfigure.h"
 #include "mafBase.h" 
-#include <iosfwd>
+#include <ostream>
 
 class mafIndent;
 MAF_EXPORT std::ostream& operator<<(std::ostream& os, const mafIndent& o);
