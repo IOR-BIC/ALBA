@@ -2,11 +2,11 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorage.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-24 14:55:39 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-02-20 23:41:23 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
-  Copyright (c) 2002/2004 
+  Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 #ifndef __mafStorage_h__
