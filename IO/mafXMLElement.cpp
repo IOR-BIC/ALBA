@@ -2,22 +2,24 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-01-24 14:58:26 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-01-28 13:57:23 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
+#include "mmuXMLDOMElement.h"
+#include "mmuXMLDOM.h"
 #include "mafXMLElement.h"
+
 #include "mafXMLStorage.h"
 #include "mafXMLString.h"
+
 #include "mafMatrix.h"
 #include "mafStorable.h"
 #include "mafObjectFactory.h"
-
-#include "mmuXMLDOM.h"
 
 #include <vector>
 #include <sstream>
@@ -25,14 +27,15 @@
 #include "stdio.h"
 
 //------------------------------------------------------------------------------
-mafXMLElement::mafXMLElement(DOMElement *element,mafXMLElement *parent,mafXMLStorage *storage) :
+mafXMLElement::mafXMLElement(mmuXMLDOMElement *element,mafXMLElement *parent,mafXMLStorage *storage) :
   mafStorageElement(parent,storage)
 //------------------------------------------------------------------------------
 {
   assert(storage);
   assert(element);
-  m_XMLElement = element;
-  m_Name = new mafXMLString(element->getTagName());
+  assert(element->m_XMLElement);
+  m_DOMElement = element;
+  m_Name = new mafXMLString(element->m_XMLElement->getTagName());
 }
 
 //------------------------------------------------------------------------------
@@ -40,7 +43,7 @@ mafXMLElement::~mafXMLElement()
 //------------------------------------------------------------------------------
 {
   // the XML element is destroyed by its creator (the DOMDocument)
-  m_XMLElement = NULL;
+  cppDEL(m_DOMElement);
 }
 
 //------------------------------------------------------------------------------
@@ -65,7 +68,7 @@ int InternalParseData(const char *text,T *vector,int size)
 int mafXMLElement::ParseData(double *vector,int size)
 //------------------------------------------------------------------------------
 {
-  mafXMLString text_data(m_XMLElement->getTextContent());
+  mafXMLString text_data(m_DOMElement->m_XMLElement->getTextContent());
   if (text_data.GetCStr())
   {
     return InternalParseData(text_data,vector,size);
@@ -77,7 +80,7 @@ int mafXMLElement::ParseData(double *vector,int size)
 int mafXMLElement::ParseData(int *vector,int size)
 //------------------------------------------------------------------------------
 {
-  mafXMLString text_data(m_XMLElement->getTextContent());
+  mafXMLString text_data(m_DOMElement->m_XMLElement->getTextContent());
   
   if (text_data.GetCStr())
   {
@@ -88,10 +91,10 @@ int mafXMLElement::ParseData(int *vector,int size)
 }
 
 //------------------------------------------------------------------------------
-DOMElement *mafXMLElement::GetXMLElement()
+mmuXMLDOMElement *mafXMLElement::GetXMLElement()
 //------------------------------------------------------------------------------
 {
-  return m_XMLElement;
+  return m_DOMElement;
 }
 
 //------------------------------------------------------------------------------
@@ -130,13 +133,13 @@ std::vector<mafStorageElement *> *mafXMLElement::GetChildren()
   {
     // create and fill in new children list with element nodes
     m_Children = new std::vector<mafStorageElement *>;
-    DOMNodeList *children=m_XMLElement->getChildNodes();
-    for (int i = 0; i<children->getLength();i++)
+    DOMNodeList *children=m_DOMElement->m_XMLElement->getChildNodes();
+    for (unsigned int i = 0; i<children->getLength();i++)
     {
       DOMNode *child_element=children->item(i);
       if (children->item(i)->getNodeType()==DOMNode::ELEMENT_NODE)
       {
-        mafXMLElement *child=new mafXMLElement((DOMElement *)child_element,this,GetXMLStorage());
+        mafXMLElement *child=new mafXMLElement(new mmuXMLDOMElement((DOMElement *)child_element),this,GetXMLStorage());
         m_Children->push_back(child);
       }      
     }
@@ -156,8 +159,8 @@ mafXMLElement *mafXMLElement::AppendXMLChild(const char *name)
 //------------------------------------------------------------------------------
 {
   DOMElement *child_element=GetXMLStorage()->GetXMLDOM()->m_XMLDoc->createElement(mafXMLString(name));
-  m_XMLElement->appendChild(child_element);
-  mafXMLElement *child=new mafXMLElement(child_element,this,GetXMLStorage());
+  m_DOMElement->m_XMLElement->appendChild(child_element);
+  mafXMLElement *child=new mafXMLElement(new mmuXMLDOMElement(child_element),this,GetXMLStorage());
   GetChildren()->push_back(child);
   return child;
 }
@@ -169,7 +172,7 @@ void mafXMLElement::SetAttribute(const char *name,const char *value)
   assert(name);
   assert(value);
   
-  m_XMLElement->setAttribute(mafXMLString(name),mafXMLString(value));
+  m_DOMElement->m_XMLElement->setAttribute(mafXMLString(name),mafXMLString(value));
 }
 
 //------------------------------------------------------------------------------
@@ -177,7 +180,7 @@ bool mafXMLElement::GetAttribute(const char *name, mafString &value)
 //------------------------------------------------------------------------------
 {
   assert(name);
-  const XMLCh *xml_value=m_XMLElement->getAttribute(mafXMLString(name));
+  const XMLCh *xml_value=m_DOMElement->m_XMLElement->getAttribute(mafXMLString(name));
   if (xml_value)
   {
     value.Copy(mafXMLString(xml_value));
@@ -191,7 +194,7 @@ void mafXMLElement::WriteXMLText(const char *text)
 //------------------------------------------------------------------------------
 {
   DOMText *text_node=GetXMLStorage()->GetXMLDOM()->m_XMLDoc->createTextNode(mafXMLString(text));
-  m_XMLElement->appendChild(text_node);
+  m_DOMElement->m_XMLElement->appendChild(text_node);
 }
 
 //------------------------------------------------------------------------------
@@ -377,7 +380,7 @@ int mafXMLElement::RestoreText(mafString &buffer,const char *name)
   mafXMLElement *subnode=FindNestedXMLElement(name);
   if (subnode)
   {
-    buffer.Copy(mafXMLString(subnode->GetXMLElement()->getTextContent()));    
+    buffer.Copy(mafXMLString(subnode->GetXMLElement()->m_XMLElement->getTextContent()));    
     return MAF_OK;
   }
   else

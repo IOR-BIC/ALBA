@@ -37,6 +37,7 @@ IF (MAF_USE_XercesC)
     mafXMLString.cpp
     mafXMLString.h
     mmuXMLDOM.h
+    mmuXMLDOMElement.h
   )
   SET(PROJECT_LIBS ${PROJECT_LIBS} XercesC)
 ENDIF (MAF_USE_XercesC)

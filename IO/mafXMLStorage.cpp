@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-01-24 14:58:59 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-01-28 13:58:37 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -20,6 +20,7 @@
 #include <sstream>
 // Xerces-C specific
 #include "mmuXMLDOM.h"
+#include "mmuXMLDOMElement.h"
 #include <xercesc/framework/LocalFileInputSource.hpp>
 // required by error handlers
 //#include <xercesc/dom/DOMErrorHandler.hpp>
@@ -203,7 +204,7 @@ int mafXMLStorage::InternalStore()
           // extract root element and wrap it with an mafXMLElement object
           DOMElement *root = m_DOM->m_XMLDoc->getDocumentElement();
           assert(root);
-          m_RootElement = new mafXMLElement(root,NULL,this);
+          m_RootElement = new mafXMLElement(new mmuXMLDOMElement(root),NULL,this);
 
           // attach version attribute to the root node
           m_RootElement->SetAttribute("Version",m_Version);
@@ -321,7 +322,7 @@ int mafXMLStorage::InternalRestore()
           m_DOM->m_XMLDoc = m_DOM->m_XMLParser->getDocument();
           DOMElement *root = m_DOM->m_XMLDoc->getDocumentElement();
           assert(root);
-          m_RootElement = new mafXMLElement(root,NULL,this);
+          m_RootElement = new mafXMLElement(new mmuXMLDOMElement(root),NULL,this);
 
           mafString doc_version;
           if (m_RootElement->GetAttribute("Version",doc_version))

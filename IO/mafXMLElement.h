@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLElement.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-24 14:58:27 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-01-28 13:57:23 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,18 +14,12 @@
 
 #include "mafStorageElement.h"
 
-// Sorry, very difficult to use PIMPL with this awful namespace
-#include <xercesc/dom/DOM.hpp>
-
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 class mafXMLStorage;
 class mafXMLString;
-
-#ifdef XERCES_CPP_NAMESPACE_USE
-XERCES_CPP_NAMESPACE_USE
-#endif
+class mmuXMLDOMElement;
 
 /** concrete implementation of mafStorageElement as an XML-DOM element
   This class represent a concrete implementation of a mafStorageElement in terms
@@ -43,7 +37,7 @@ XERCES_CPP_NAMESPACE_USE
 class mafXMLElement : public mafStorageElement
 {
 public:
-  mafXMLElement(DOMElement *element,mafXMLElement *parent,mafXMLStorage *storage);
+  mafXMLElement(mmuXMLDOMElement *element,mafXMLElement *parent,mafXMLStorage *storage);
   virtual ~mafXMLElement();
 
   /** get the name of this XML element */
@@ -116,7 +110,7 @@ public:
   mafXMLElement *FindNestedXMLElement(const char *name);
 
   /** return DOM-XML element stored inside this mafXMLElement */
-  DOMElement *GetXMLElement();
+  mmuXMLDOMElement *GetXMLElement();
 
   /** 
     Append an XML attribute to this element. Attribute 'name' and
@@ -142,7 +136,7 @@ public:
 
 protected:
 
-  DOMElement *m_XMLElement; ///< XML element wrapped by this object 
+  mmuXMLDOMElement *m_DOMElement; ///< XML element wrapped by this object (USING PIMPL due to Internal Compile errors of VS7)
   mafXMLString  *m_Name; ///< Convenient copy of etagName
 
 };

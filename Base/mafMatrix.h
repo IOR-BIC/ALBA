@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-11 17:34:59 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-01-28 13:56:53 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -16,15 +16,14 @@
 #include "mafReferenceCounted.h"
 #include "mafMTime.h"
 
-#ifdef MAF_USE_VTK
-  #include "vtkMatrix4x4.h"
-#endif
-
 typedef double (*mafMatrixElements)[4];
 
 //------------------------------------------------------------------------------
 // Forward declarations
 //------------------------------------------------------------------------------
+#ifdef MAF_USE_VTK
+class vtkMatrix4x4;
+#endif
 
 
 /** mafMatrix - Time stamped 4x4 Matrix.
@@ -59,13 +58,11 @@ public:
   vtkMatrix4x4 *GetVTKMatrix() {return m_VTKMatrix;}
 
   /** this only checks the 4x4 matrix with VTK ones, not the time stamp */
-  bool operator==(vtkMatrix4x4 *mat) const;
+  bool operator==(vtkMatrix4x4 *mat) const;  
+#endif
 
   /** return pointer to elements vector */
-  mafMatrixElements GetElements() const {return (mafMatrixElements)m_VTKMatrix->Element;}
-#else
-  mafMatrixElements GetElements() const {return (mafMatrixElements)m_Elements;}
-#endif
+  mafMatrixElements GetElements() const;
 
   /** 
     Sets the element i,j in the matrix. Remember to call explicitly
@@ -181,27 +178,5 @@ protected:
 #endif
   
 };
-
-//------------------------------------------------------------------------------
-inline unsigned long mafMatrix::GetMTime()
-//------------------------------------------------------------------------------
-{
-#ifdef MAF_USE_VTK
-  return m_VTKMatrix->GetMTime();
-#else
-  return m_MTime.GetMTime();
-#endif
-}
-
-//------------------------------------------------------------------------------
-inline void mafMatrix::Modified()
-//------------------------------------------------------------------------------
-{
-  #ifdef MAF_USE_VTK
-  m_VTKMatrix->Modified();
-#else
-  m_MTime.Modified();
-#endif
-}
 
 #endif 

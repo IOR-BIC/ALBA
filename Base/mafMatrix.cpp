@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-01-15 19:23:54 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-01-28 13:56:53 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,6 +14,11 @@
 #include "mafIndent.h"
 #include <assert.h>
 #include <sstream>
+
+#ifdef MAF_USE_VTK
+  #include "vtkMatrix4x4.h"
+#endif
+
 
 mafCxxTypeMacro(mafMatrix);
 
@@ -131,6 +136,40 @@ bool mafMatrix::operator==(vtkMatrix4x4 *mat) const
   return true;
 }
 #endif
+
+//------------------------------------------------------------------------------
+unsigned long mafMatrix::GetMTime()
+//------------------------------------------------------------------------------
+{
+#ifdef MAF_USE_VTK
+  return m_VTKMatrix->GetMTime();
+#else
+  return m_MTime.GetMTime();
+#endif
+}
+
+//------------------------------------------------------------------------------
+void mafMatrix::Modified()
+//------------------------------------------------------------------------------
+{
+#ifdef MAF_USE_VTK
+  m_VTKMatrix->Modified();
+#else
+  m_MTime.Modified();
+#endif
+}
+
+
+//------------------------------------------------------------------------------
+mafMatrixElements mafMatrix::GetElements() const
+//------------------------------------------------------------------------------
+{
+#ifdef MAF_USE_VTK
+  return (mafMatrixElements)m_VTKMatrix->Element;
+#else
+  return (mafMatrixElements)m_Elements;
+#endif
+}
 
 //------------------------------------------------------------------------------
 void mafMatrix::Print (std::ostream& os, const int indent) const
