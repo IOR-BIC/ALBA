@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2004-11-15 08:21:40 $
-# Version:   $Revision: 1.10 $
+# Date:      $Date: 2004-12-15 09:16:38 $
+# Version:   $Revision: 1.11 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -17,7 +17,7 @@ PROJECT (MAF)
 # Macro for DEBUG logging
 #-----------------------------------------------------------------------------
 INCLUDE (${MAF_SOURCE_DIR}/modules/DebugMacro.cmake)
-SET (DEBUG FALSE)
+OPTION(DEBUG_MESSAGES "Enable debug Messages" OFF)
 
 #-----------------------------------------------------------------------------
 # this define the MAF_SUBPROJECT macro
@@ -83,7 +83,7 @@ MAF_SUBPROJECT(MFL mfl)
 IF (MFL_CONFIG_FOUND)
   FIND_FILE (USE_MFL_FILE UseMFL.cmake "${MAF_BINARY_DIR}/mfl") 
   IF (USE_MFL_FILE)
-    DBG_MESSAGE("MAF: MFL Configured" ${DEBUG})
+    DBG_MESSAGE("MAF: MFL Configured")
     SET (MAF_CAN_BUILD 1)
   ENDIF (USE_MFL_FILE)   
 ELSE (MFL_CONFIG_FOUND)
@@ -109,14 +109,12 @@ IF (MAF_CAN_BUILD)
   INCLUDE_DIRECTORIES(${MAF_BINARY_DIR})
 
   #todo: add a FOREACH on all subdirs but "modules"
-  INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/Base)
   INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/Core)
   INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/Gui)
 
   # Configuring MAF kits
-  DBG_MESSAGE("MAF: Configuring MAF Kits" ${DEBUG})
+  DBG_MESSAGE("MAF: Configuring MAF Kits")
   MESSAGE(STATUS "MAF: Configuring MAF Kits")
-  SUBDIRS (Base)
   SUBDIRS (Core)
   SUBDIRS (vtkMAF)
   SUBDIRS (Gui)
