@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-08-24 12:46:49 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-10-25 09:41:16 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -22,6 +22,30 @@ mafString::~mafString()
     delete this->CStr;
     this->CStr=NULL;
   }
+}
+
+//----------------------------------------------------------------------------
+mafString::mafString(const mafString& src)
+//----------------------------------------------------------------------------
+{
+  this->Initialize();
+  this->Copy(src.CStr);
+}
+//----------------------------------------------------------------------------
+mafString::mafString(const char *src)
+//----------------------------------------------------------------------------
+{
+  this->Initialize();
+  this->Copy(src);
+}
+//----------------------------------------------------------------------------
+mafString::mafString(double num)
+//----------------------------------------------------------------------------
+{
+  this->Initialize();
+  char tmp[64];
+  sprintf(tmp,"%.16g",num);
+  this->Copy(tmp);
 }
 
 //----------------------------------------------------------------------------
@@ -412,15 +436,4 @@ void mafString::ExtractPathName()
     this->Set("");
   }
 
-}
-
-//----------------------------------------------------------------------------
-const char *& mafString::operator=(double num)
-//----------------------------------------------------------------------------
-{
-  char tmp[64];
-  sprintf(tmp,"%.16g",num);
-  this->Copy(tmp);
-
-  return this->CStr;
 }

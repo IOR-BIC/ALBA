@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.h,v $
   Language:  C++
-  Date:      $Date: 2004-08-24 12:46:49 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-10-25 09:41:16 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -214,9 +214,6 @@ public:
   /** this allows to convert a mafString to const char *. */
   operator const char*() const {return this->CStr;}  
 
-  const char *& operator=(mafString &);
-  const char *& operator=(const char *src);
-  const char *& operator=(double num);
   const bool operator==(const mafString&);
   const bool operator==(const char *src);
   //const int operator!=(const mafString& str) {return !this->Equals(str);}
@@ -250,36 +247,6 @@ mafString operator +(const char ch, const mafString &s) {mafString tmp(ch); tmp.
 
 ostream &operator <<( ostream &os, mafString &s ) {return os<<s.GetCStr();}
 */
-inline mafString::mafString(const mafString& src)
-{
-  this->Initialize();
-  this->Copy(src.CStr);
-}
-inline mafString::mafString(const char *src)
-{
-  this->Initialize();
-  this->Copy(src);
-}
-
-inline mafString::mafString(double num)
-{
-  this->Initialize();
-  *this=num;
-}
-
-inline const char *& mafString::operator=(mafString &src)
-{
-  this->Copy(src.CStr);
-  return this->CStr;
-}
-
-inline const char *& mafString::operator=(const char *src)
-{
-  this->Copy(src);
-  return this->CStr;
-}
-
-const char *& mafString::operator=(double num);
 
 inline const bool mafString::operator==(const mafString& src)
 {
