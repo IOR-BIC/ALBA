@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-11 17:34:57 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-01-13 09:08:15 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -21,6 +21,17 @@
 #include "mafConfigure.h"
 #include <string.h>
 #include <typeinfo>
+
+//----------------------------------------------------------------------------
+// forward declarations :
+//----------------------------------------------------------------------------
+namespace std
+{
+  template <class VType> class allocator;
+  template <class Key> struct less;
+  template <class VType, class AType = allocator<VType> > class vector;
+  template <class Key, class T, class Pred = less<Key>, class A = allocator<T> > class map;
+}
 
 //------------------------------------------------------------------------------
 // Typedefs
