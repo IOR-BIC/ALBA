@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-09 15:31:03 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2004-11-10 06:59:18 $
+  Version:   $Revision: 1.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -15,7 +15,6 @@
 
 #include "mafDefines.h"
 #include <string.h>
-
 
 /** mafString - performs common string operations.
   mafString is an implementation of string which operates on a traditional
@@ -177,6 +176,10 @@ public:
   void Set(const char *a) {*this=a;};
   void Set(double a) {*this=a;};
 
+  /** Format given arguments according to format string. Format string format is
+      that of vsprintf function */
+  void Printf(const char *format, ...);
+
   /** this allows to convert a mafString to const char *. */
   operator const char*() const {return m_CStr;}  
 
@@ -200,5 +203,27 @@ protected:
   char *m_CStr;
   mafID Size;
 };
+
+#ifdef MAF_USE_WX
+/** 
+  Macro for formatted printing to string (adapted from wxWidgets IMPLEMENT_LOG_FUNCTION)
+  To use it you will need to include wx/wx.h */
+#define MAF_PRINT_MACRO(format,buffer) \
+  va_list argptr; \
+  va_start(argptr, format); \
+  wxVsnprintf(buffer, sizeof(buffer), format, argptr); \
+  va_end(argptr);
+
+#else MAF_USE_WX // this is less safe since it can't limit output string size
+/** 
+  Macro for formatted printing to string (adapted from wxWidgets IMPLEMENT_LOG_FUNCTION)
+  To use it you will need to include <stdio.h>, <stdarg.h> and <varargs.h> */
+#define MAF_PRINT_MACRO(format,buffer) \
+  va_list argptr; \
+  va_start(argptr, format); \
+  vsprintf(buffer, format, argptr); \
+  va_end(argptr);
+
+#endif MAF_USE_WX
 
 #endif

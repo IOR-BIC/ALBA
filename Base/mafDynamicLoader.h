@@ -3,7 +3,7 @@
   Program:   Insight Segmentation & Registration Toolkit
   Module:    $RCSfile: mafDynamicLoader.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-09 15:31:01 $
+  Date:      $Date: 2004-11-10 06:59:17 $
   Version:   $Revision: 1.1 $
 
   Copyright (c) 2002 Insight Consortium. All rights reserved.

@@ -1,9 +1,9 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mafDefines.cxx,v $
+  Module:    $RCSfile: mafDefines.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-09 15:31:00 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-11-10 06:59:16 $
+  Version:   $Revision: 1.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -20,7 +20,7 @@
 using namespace std;
 
 //------------------------------------------------------------------------------
-void mafLogMessage(const wxChar *format, ...)
+void mafLogMessage(const char *format, ...)
 //------------------------------------------------------------------------------
 {
   MAF_PRINT_MACRO(format);
@@ -33,7 +33,7 @@ void mafLogMessage(const wxChar *format, ...)
 }
 //------------------------------------------------------------------------------
 // open a warning dialog and write a message
-void mafWarningMessage(const wxChar *format, ...)
+void mafWarningMessage(const char *format, ...)
 //------------------------------------------------------------------------------
 {
 #ifdef MAF_USE_WX
@@ -43,7 +43,7 @@ void mafWarningMessage(const wxChar *format, ...)
 
 //------------------------------------------------------------------------------
 // open an error dialog and write a message
-void mafErrorMessage(const wxChar *format, ...)
+void mafErrorMessage(const char *format, ...)
 //------------------------------------------------------------------------------
 {
 #ifdef MAF_USE_WX
@@ -53,7 +53,7 @@ void mafErrorMessage(const wxChar *format, ...)
 
 //------------------------------------------------------------------------------
 // open a message dialog and write a message
-void mafMessage(const wxChar *format, ...)
+void mafMessage(const char *format, ...)
 //------------------------------------------------------------------------------
 {
 #ifdef MAF_USE_WX

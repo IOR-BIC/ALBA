@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-09 15:31:00 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2004-11-10 06:59:16 $
+  Version:   $Revision: 1.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -43,13 +43,13 @@ char mafGlobalStringBuffer[MAF_STRING_BUFFER_SIZE];
 // Global Functions
 //------------------------------------------------------------------------------
 /** write a message in the log area */
-void mafLogMessage(const wxChar *format, ...);
+void mafLogMessage(const char *format, ...);
 /** open a warning dialog and write a message */
-void mafWarningMessage(const wxChar *format, ...);
+void mafWarningMessage(const char *format, ...);
 /** open an error dialog and write a message */
-void mafErrorMessage(const wxChar *format, ...);
+void mafErrorMessage(const char *format, ...);
 /** open a message dialog and write a message */
-void mafMessage(const wxChar *format, ...);
+void mafMessage(const char *format, ...);
 
 //------------------------------------------------------------------------------
 // Macros

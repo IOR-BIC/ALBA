@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-10 06:58:45 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2004-11-10 06:59:18 $
+  Version:   $Revision: 1.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -11,7 +11,9 @@
 =========================================================================*/
 
 #include "mafString.h"
+
 #include <stdio.h>
+#include <stdarg.h>
 
 //----------------------------------------------------------------------------
 mafString::~mafString()
@@ -515,8 +517,9 @@ int mafString::FindLastChr(const int c)
 }
 
 //----------------------------------------------------------------------------
-void Printf(const char *format, ...)
+void mafString::Printf(const char *format, ...)
 //----------------------------------------------------------------------------
 {
-  MAF_PRINT_MACRO(format)
+  SetSize(1024);
+  MAF_PRINT_MACRO(format);
 }

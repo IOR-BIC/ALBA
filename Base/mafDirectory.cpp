@@ -2,7 +2,7 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDirectory.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-09 15:31:00 $
+  Date:      $Date: 2004-11-10 06:59:16 $
   Version:   $Revision: 1.1 $
   Authors:   Based on itkDirectory (www.itk.org), adapted by Marco Petrone
 ==========================================================================

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObject.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-09 15:31:02 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2004-11-10 06:59:17 $
+  Version:   $Revision: 1.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
