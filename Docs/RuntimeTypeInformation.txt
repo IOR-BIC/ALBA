@@ -1,0 +1,59 @@
+[HOWTO about MAF custom RTTI Apis]
+
+The new MAF tree now has its own API for RTTI. These rtti Apis are implementated
+over standard C++ RTTI mechanims, and in most part the two syntax are equivalent. 
+MAF systax are inspired to VTK and ITK syntax for the same kind of objects. See 
+the Doxygen pages fr more
+details on syntax.
+The idea behaind these Apis is to provide simple functions to query an object
+about its type. Apis allow either alphanumerical queries (these are not available
+in standard C++ rtti apis), and by a "typeid". The later is much faster, while the 
+former provide features usually avaliable only in scripting languages.
+
+*** STATIC type versus object TYPE. 
+All Apis are subdivided into two groups: static apis and non-static ones. The 
+first ones allow to query the a pointer variable for its type. The returned
+type is not related to the pointed object but to the pointer itself. E.g.
+GetStaticName() returns the type of the pointer. On the other hand non static
+functions query the pointed object. Following example shows the difference:
+
+mafObject *ptr = new mafEvent;
+mafString static_name = ptr->GetStaticTypeName();
+mafString real_name = ptr->GetTypeName();
+
+static_name is "mafObject", while real_name is "mafEvent".
+
+*** RTTI Macro and Abstract VS Concrete classes
+Any class inheriting from mafObject must add one of the two following lines
+to its declaration (in the public: area):
+
+  mafTypeMacro(classname,parent_classname);
+
+or
+
+ mafAbstractTypeMacro(classname,parent_classname);
+
+where "classname" is the name of the class, and "parent_classname" is the name
+of the main parent class. Note in MAF multiple inheritance is supported but
+with limitations, and hierarchical RTTI only refers to main parent class. See
+also (MAF interfaces HowTo)
+
+The first macro must be used by concrete classes, i.e. that do not have pure 
+virtual member functions and thus can be created. Classes representing only
+interfaces (abstract classes) must use the second macro. The difference is
+the first also defines methods to instantiate the class (see the ObjectFactory
+HowTo).
+
+Also, all classes inheriting from mafObjectFactory must add one of the following 
+two lines to the .cpp file:
+
+mafCxxTypeMacro(classname)
+
+or
+
+mafCxxAbstractTypeMacro(classname)
+
+*** Superclass typedef
+Type macros also define the "Superclass" type, which concide with the parent
+class type. This should preferably be used to refer to the parent class, since
+in case of changing the parent class the code needs less patching.
