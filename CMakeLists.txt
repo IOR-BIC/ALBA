@@ -2,13 +2,15 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2004-08-24 12:45:52 $
-# Version:   $Revision: 1.1 $
+# Date:      $Date: 2004-10-12 12:38:25 $
+# Version:   $Revision: 1.2 $
 #
 # Description:
 # CMake Project file for the MAF.
 
 #MESSAGE("MAF:SOF")
+INCLUDE (${MAF_SOURCE_DIR}/modules/DebugMacro.cmake)
+
 SET (CMAKE_BACKWARDS_COMPATIBILITY "2.0" CACHE INSTERNAL "This project is for CMake 2.0")
 CMAKE_MINIMUM_REQUIRED(VERSION 2.0) 
 PROJECT (MAF)
@@ -109,4 +111,12 @@ ENDIF (MAF_CAN_BUILD)
 #  BUILD_EXAMPLES
 #)
 
+
+#Write the list of variables and their values that are defined by CMake when running this CMakeList file
+FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/AllVariables.txt "")
+GET_CMAKE_PROPERTY(VARS VARIABLES)
+FOREACH(var ${VARS})
+	FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/AllVariables.txt 
+							"${var} \"${${var}}\"\n")
+ENDFOREACH(var ${VARS})
 
