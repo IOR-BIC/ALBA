@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafCoreDecl.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-15 18:59:05 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-02-14 10:24:13 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,7 +14,7 @@
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // be careful in changing this file
-// because force most of the MAF to rebuild
+// because force most of the MAF to be rebuilt
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 #ifndef __mafCoreDecl_H__
@@ -23,7 +23,6 @@
 #include "mafDefines.h"
 #include <string>
 #include <vector>
-
 // To be removed: no more including WX by default! (Marco)
 /*
 #ifndef WX_PRECOMP
@@ -41,15 +40,19 @@ class wxWindow;
 //----------------------------------------------------------------------------
 // constant
 //----------------------------------------------------------------------------
-// max number of widget that mmgGUI can hold - used also by mmgGuiValidator
+// MAX number of widgets that mmgGUI can hold - used also by mmgGuiValidator
 const int MAXWIDGET = 200; 
 const int MAXOP = 200; 
 const int MAXVIEW = 200; 
 
-// most of the constants used in LAL are declared here
-// constants must be non-overlapping 
-// constant are grouped by bracket xx_START, xx_END as needed by mmgFrame
 
+enum MAF_TAG_IDS {MAF_MISSING_TAG=0,MAF_NUMERIC_TAG,MAF_STRING_TAG};
+
+/**
+  Most of the constants used in LAL are declared here.
+  These constants must be non-overlapping.
+  Constants are grouped by bracket xx_START, xx_END as needed by mmgFrame
+*/
 enum
 {
 MENU_START = 10000,
