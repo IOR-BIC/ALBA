@@ -12,8 +12,8 @@ SET(PROJECT_SRCS
   mafAttribute.h
   mafCoreFactory.cpp
   mafCoreFactory.h
-  mafCoreDecl.cpp
-  mafCoreDecl.h
+  mafCore.cpp
+  mafCore.h
   mafEventBase.cpp
   mafEventBase.h
   mafEventSource.cpp
