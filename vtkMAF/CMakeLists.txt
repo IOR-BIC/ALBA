@@ -87,7 +87,7 @@ IF(VTK_FOUND)
   ADD_LIBRARY(${PROJECT_NAME} ${vtkMAF_SRCS} ${vtkMAFInstantiator_SRCS})
   TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${vtkMAF_LIBS})
   # this is necessaty to force MFL compilation....
-  ADD_DEPENDENCIES(${PROJECT_NAME} ${MFL_BUILD_TARGETS})
+  #ADD_DEPENDENCIES(${PROJECT_NAME} ${MFL_BUILD_TARGETS})
 
   # Create Tcl wrappers if VTK is wrapped in Tcl.
   IF(VTK_WRAP_TCL)
