@@ -10,18 +10,25 @@ DBG_MESSAGE("Configuring project mafCore")
 SET(PROJECT_SRCS
   mafAttribute.cpp
   mafAttribute.h
+  mafAbsMatrixPipe.cpp
+  mafAbsMatrixPipe.h
   mafCoreFactory.cpp
   mafCoreFactory.h
-  mafDataSet.h
-  mafDataSet.cpp
-  mafDataSetVector.cpp
-  mafDataSetVector.h
+  mafVMEItem.h
+  mafVMEItem.cpp
+  mafDataVector.txx
+  mafDataVector.h
   mafDecl.cpp
   mafDecl.h
   mafEventBase.cpp
   mafEventBase.h
+  mafEventSender.h
   mafEventSource.cpp
   mafEventSource.h
+  mafMatrixPipe.cpp
+  mafMatrixPipe.h
+  mafMatrixVector.cpp
+  mafMatrixVector.h
   mafNode.cpp
   mafNode.h
   mafNodeRoot.h
@@ -36,6 +43,14 @@ SET(PROJECT_SRCS
   mafTimeMap.txx
 #  mafVME.cpp
 #  mafVME.h
+#  mafVMERoot.cpp
+#  mafVMERoot.h
+#  mafVMEGeneric.h
+#  mafVMEGeneric.cpp
+#  mafVMEOutput.cpp
+#  mafVMEOutput.h
+#  mafVTKDataSet.h
+#  mafVTKDataSet.cpp
   mmaTagArray.cpp
   mmaTagArray.h
   mmuTagItem.cpp
