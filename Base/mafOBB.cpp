@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOBB.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-28 15:26:09 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-03-02 00:35:38 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -193,7 +193,7 @@ void mafOBB::ApplyTransform(mafOBB &newbounds)
           newpoints[i*4+2]=Z;
           newpoints[i*4+3]=1;
 
-          Matrix.MultiplyPoint(&(newpoints[4*i]),&(newpoints[4*i]));
+          m_Matrix.MultiplyPoint(&(newpoints[4*i]),&(newpoints[4*i]));
         
           i++;
         }
@@ -230,7 +230,7 @@ void mafOBB::ApplyTransform(mafOBB &newbounds)
         newbounds.m_Bounds[5]=newpoints[i*4+2];
     }
     
-    newbounds.Matrix.Identity(); // reset matrix to identiy
+    newbounds.m_Matrix.Identity(); // reset matrix to identiy
     newbounds.Modified();
   }
   else
