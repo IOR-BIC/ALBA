@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-22 15:23:03 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2004-12-23 09:16:21 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -244,6 +244,9 @@ public:
   mafEventSource &GetEventSource() {return m_EventSource;}
 
   typedef mafVector<mafAutoPointer<mafNode> > mafChildrenVector;
+
+  /** return list of children */
+  const mafChildrenVector *GetChildren() {return &m_Children;}
 
   enum crypting {NO_CRYPTING=0,DEFAULT_CRYPTING};
 protected:
