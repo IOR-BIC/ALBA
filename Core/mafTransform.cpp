@@ -1,0 +1,2093 @@
+/*=========================================================================
+
+  Program:   Visualization Toolkit
+  Module:    $RCSfile: mafTransform.cpp,v $
+  Language:  C++
+  Date:      $Date: 2004-11-23 15:17:41 $
+  Version:   $Revision: 1.1 $
+  
+  Copyright (c) 2002/2003
+  B3C -  BioComputing Competence Centre (www.cineca.it/B3C)
+  v. Magnanelli 6/3
+  40033 Casalecchio di Reno (BO)
+  Italy
+  ph. +39-051-6171411 (90 lines) - Fax +39-051-6132198
+
+Use, modification and redistribution of the software, in source or
+binary forms, are permitted provided that the following terms and
+conditions are met:
+
+1) Redistribution of the source code, in verbatim or modified
+   form, must retain the above copyright notice, this license,
+   the following disclaimer, and any notices that refer to this
+   license and/or the following disclaimer.  
+
+2) Redistribution in binary form must include the above copyright
+   notice, a copy of this license and the following disclaimer
+   in the documentation or with other materials provided with the
+   distribution.
+
+3) Modified copies of the source code must be clearly marked as such,
+   and must not be misrepresented as verbatim copies of the source code.
+
+THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE SOFTWARE "AS IS"
+WITHOUT EXPRESSED OR IMPLIED WARRANTY INCLUDING, BUT NOT LIMITED TO,
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE.  IN NO EVENT SHALL ANY COPYRIGHT HOLDER OR OTHER PARTY WHO MAY
+MODIFY AND/OR REDISTRIBUTE THE SOFTWARE UNDER THE TERMS OF THIS LICENSE
+BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, LOSS OF DATA OR DATA BECOMING INACCURATE
+OR LOSS OF PROFIT OR BUSINESS INTERRUPTION) ARISING IN ANY WAY OUT OF
+THE USE OR INABILITY TO USE THE SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGES.
+=========================================================================*/
+#include "mflTransform.h"
+
+#include "vtkMatrix4x4.h"
+#include "vtkObjectFactory.h"
+#include "vtkMath.h"
+#include "mflSmartPointer.h"
+
+#include <math.h>
+#include <assert.h>
+
+//------------------------------------------------------------------------------
+// Events
+//------------------------------------------------------------------------------
+MFL_EVT_IMP(mflTransform::UpdateEvent); // Event rised by updates of the internal matrix
+
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(mflTransform);
+vtkCxxSetObjectMacro(mflTransform,Input,vtkLinearTransform);
+vtkCxxSetObjectMacro(mflTransform,InputFrame,vtkLinearTransform);
+vtkCxxSetObjectMacro(mflTransform,TargetFrame,vtkLinearTransform);
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+mflTransform::mflTransform()
+//----------------------------------------------------------------------------
+{
+  this->Input = NULL;
+  this->InverseFlag = 0;
+  this->InputFrame = NULL;
+  this->TargetFrame = NULL;
+}
+
+//----------------------------------------------------------------------------
+mflTransform::~mflTransform()
+//----------------------------------------------------------------------------
+{
+  this->SetInput((mflTransform *)NULL);
+  this->SetTargetFrame((mflTransform*)NULL);
+  this->SetInputFrame((mflTransform*)NULL);
+}
+
+//----------------------------------------------------------------------------
+void mflTransform::PrintSelf(ostream& os, vtkIndent indent)
+//----------------------------------------------------------------------------
+{
+  this->Update();
+
+  this->Superclass::PrintSelf(os, indent);
+  os << indent << "Input: ";
+  if (Input)
+  {
+    os << Input << " Matrix:\n";
+    Input->GetMatrix()->PrintSelf(os,indent.GetNextIndent());
+  }
+  else
+    os << "NULL\n";
+
+  os << indent << "InputFrame: ";
+  if (InputFrame)
+  {
+    os << InputFrame << "\n";
+    InputFrame->GetMatrix()->PrintSelf(os,indent.GetNextIndent());
+  }
+  else
+    os << "NULL\n";
+
+  os << indent << "TargetFrame: ";
+  if (TargetFrame)
+  {
+    os << TargetFrame << "\n";
+    TargetFrame->GetMatrix()->PrintSelf(os,indent.GetNextIndent()); 
+  }
+  else
+    os << "NULL\n";
+
+  os << indent << "InverseFlag: " << this->InverseFlag << "\n";
+}
+
+typedef double (*SqMatPtr)[4];
+
+//----------------------------------------------------------------------------
+void mflTransform::Identity()
+//----------------------------------------------------------------------------
+{
+  vtkMatrix4x4::Identity(&(GetMatrix()->Element[0][0]));
+}
+
+//----------------------------------------------------------------------------
+// Copied from vtkTransformConcatenation::Rotate(...)
+void mflTransform::RotateWXYZ(vtkMatrix4x4* source,vtkMatrix4x4 *target,double angle,double x, double y, double z,int premultiply)
+//----------------------------------------------------------------------------
+{
+  if (angle == 0.0 || (x == 0.0 && y == 0.0 && z == 0.0)) 
+    {
+    return;
+    }
+
+  // convert to radians
+  angle = angle*vtkMath::DoubleDegreesToRadians();
+
+  // make a normalized quaternion
+  double w = cos(0.5*angle);
+  double f = sin(0.5*angle)/sqrt(x*x+y*y+z*z);
+  x *= f;
+  y *= f;
+  z *= f;
+
+  
+  // temporary matrix
+  mflSmartPointer<vtkMatrix4x4> mat;
+  SqMatPtr matrix=(SqMatPtr)mat->Element;
+
+  // convert the quaternion to a matrix
+  double ww = w*w;
+  double wx = w*x;
+  double wy = w*y;
+  double wz = w*z;
+
+  double xx = x*x;
+  double yy = y*y;
+  double zz = z*z;
+
+  double xy = x*y;
+  double xz = x*z;
+  double yz = y*z;
+
+  double s = ww - xx - yy - zz;
+
+  matrix[0][0] = xx*2 + s;
+  matrix[1][0] = (xy + wz)*2;
+  matrix[2][0] = (xz - wy)*2;
+
+  matrix[0][1] = (xy - wz)*2;
+  matrix[1][1] = yy*2 + s;
+  matrix[2][1] = (yz + wx)*2;
+
+  matrix[0][2] = (xz + wy)*2;
+  matrix[1][2] = (yz - wx)*2;
+  matrix[2][2] = zz*2 + s;
+
+  if (premultiply)
+  {
+    vtkMatrix4x4::Multiply4x4(source,mat,target);
+  }
+  else
+  {
+    vtkMatrix4x4::Multiply4x4(mat,source,target);
+  }
+}
+
+//----------------------------------------------------------------------------
+void mflTransform::Concatenate(vtkMatrix4x4 *matrix, int premultiply)
+//----------------------------------------------------------------------------
+{
+  if(premultiply)
+  {
+    vtkMatrix4x4::Multiply4x4(Matrix, matrix, Matrix);
+  }
+  else
+  {
+    vtkMatrix4x4::Multiply4x4(matrix, Matrix, Matrix);
+  }
+  
+  Modified();
+}
+
+//----------------------------------------------------------------------------
+void mflTransform::SetOrientation(vtkMatrix4x4 *matrix,double orientation[3])
+//----------------------------------------------------------------------------
+{
+  double pos[3];
+
+  mflTransform::GetPosition(matrix,pos);
+  matrix->Identity();
+  mflTransform::RotateZ(matrix,orientation[2], PRE_MULTIPLY);
+  mflTransform::RotateX(matrix,orientation[0], PRE_MULTIPLY);
+  mflTransform::RotateY(matrix,orientation[1], PRE_MULTIPLY);  
+  mflTransform::SetPosition(matrix,pos);
+}
+
+//----------------------------------------------------------------------------
+void mflTransform::SetPosition(vtkMatrix4x4 *matrix,double position[3])
+//----------------------------------------------------------------------------
+{
+	for (int i = 0; i < 3; i++)
+	{
+	  matrix->SetElement(i, 3, position[i]);
+	}	
+}
+
+//----------------------------------------------------------------------------
+void mflTransform::Translate(vtkMatrix4x4 *matrix,double translation[3],int premultiply)
+//----------------------------------------------------------------------------
+{
+  mflSmartPointer<vtkMatrix4x4> trans_matrix;
+  SetPosition(trans_matrix,translation);
+  if(premultiply)
+  {
+    vtkMatrix4x4::Multiply4x4(matrix, trans_matrix, matrix);
+  }
+  else
+  {
+    vtkMatrix4x4::Multiply4x4(trans_matrix, matrix, matrix);
+  }
+}
+
+//----------------------------------------------------------------------------
+void mflTransform::GetVersor(int axis, const vtkMatrix4x4 *matrix, double versor[3])
+//----------------------------------------------------------------------------
+{
+	if (0 <= axis && axis <= 2)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			versor[i] = matrix->GetElement(i, axis);
+		}	
+	}
+}
+
+//----------------------------------------------------------------------------
+void mflTransform::CopyRotation(const vtkMatrix4x4 *source, vtkMatrix4x4 *target)
+//----------------------------------------------------------------------------
+{
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+		  target->SetElement(i,j, source->GetElement(i,j));
+		}
+	}
+}
+
+//----------------------------------------------------------------------------
+void mflTransform::CopyTranslation(const vtkMatrix4x4 *source, vtkMatrix4x4 *target)
+//----------------------------------------------------------------------------
+{
+  for (int i = 0; i < 3; i++)
+	{
+		target->SetElement(i,3, source->GetElement(i,3));
+	}
+}
+
+//----------------------------------------------------------------------------
+void mflTransform::SetMatrix(vtkMatrix4x4 *input,int copy)
+//----------------------------------------------------------------------------
+{
+  if (copy)
+  {
+    Matrix->DeepCopy(input);
+  }
+  else
+  {
+    vtkSetObjectBodyMacro(Matrix,vtkMatrix4x4,input);
+  }
+
+  Modified();
+  
+}
+
+//----------------------------------------------------------------------------
+void mflTransform::SetInput(vtkMatrix4x4 *input)
+//----------------------------------------------------------------------------
+{
+  mflSmartPointer<mflTransform> trans;
+  trans->SetMatrix(input);
+  this->SetInput(trans);
+}
+
+//----------------------------------------------------------------------------
+void mflTransform::SetInputFrame(vtkMatrix4x4 *frame)
+//----------------------------------------------------------------------------
+{
+  if (frame != NULL)
+  {
+    mflSmartPointer<mflTransform> trans;
+    trans->SetMatrix(frame);
+    this->SetInputFrame(trans);
+  }
+}
+
+//----------------------------------------------------------------------------
+void mflTransform::SetTargetFrame(vtkMatrix4x4 *frame)
+//----------------------------------------------------------------------------
+{
+  if (frame != NULL)
+  {
+    mflSmartPointer<mflTransform> trans;
+    trans->SetMatrix(frame);
+    this->SetTargetFrame(trans);
+  }
+}
+
+//----------------------------------------------------------------------------
+void mflTransform::Inverse()
+//----------------------------------------------------------------------------
+{
+  this->InverseFlag = !this->InverseFlag;
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void mflTransform::InternalUpdate()
+//----------------------------------------------------------------------------
+{
+
+  /*
+
+  SceneGraph matrix concatenation order:
+  
+  root
+  |
+   -Mtf-     => M   = M  * M
+       |         abs   tf   in
+       -Min-
+
+  transformation are applied in reverse order:
+  M  first then M
+   in            tf
+
+
+  Mif: input frame matrix
+  Mtf: target frame matrix
+
+                                  -1          
+  M   * M  = M   * M   =>  M   = M   * M   * M  
+    if   in   tf    out      out  tf    if    in
+
+  */
+
+	mflSmartPointer<vtkMatrix4x4> inv_target_frame_matrix;
+
+  if (this->Input)
+  {
+		//change input matrix base and copy the result in this->Matrix(); if the 
+		//input frame or reference frame is null identity matrix is assumed as input
+		mflSmartPointer<vtkMatrix4x4> in_fr_mat_x_in_mat;
+
+		if (this->TargetFrame == NULL)
+		{
+		  inv_target_frame_matrix->Identity();
+		}
+		else
+		{
+		  vtkMatrix4x4::Invert(this->TargetFrame->GetMatrix(),  inv_target_frame_matrix);
+		}
+	
+		if (this->InputFrame == NULL)
+		{
+		  in_fr_mat_x_in_mat->DeepCopy(this->Input->GetMatrix());     
+		}
+		else
+		{
+		  vtkMatrix4x4::Multiply4x4(this->InputFrame->GetMatrix(), this->Input->GetMatrix(),
+								in_fr_mat_x_in_mat);
+		}
+
+		if (this->InverseFlag)
+        in_fr_mat_x_in_mat->Invert();
+
+	  vtkMatrix4x4::Multiply4x4(inv_target_frame_matrix, in_fr_mat_x_in_mat, this->Matrix);
+
+  }
+  else
+  {
+		//compute the transformation matrix between the two reference systems
+		if (this->TargetFrame == NULL)
+		{
+      if (this->InputFrame)
+      {
+        this->Matrix->DeepCopy(this->InputFrame->GetMatrix());
+      }
+			
+			if (this->InverseFlag)
+				this->Matrix->Invert();
+
+			  
+      // if input, inputframe, targetframe are all NULL this->Matrix is left unchanged,
+      // this is useful in compbination with SetMatrix to avoid overwriting.
+		}
+		else
+		{
+			vtkMatrix4x4::Invert(this->TargetFrame->GetMatrix(), 
+										inv_target_frame_matrix);
+
+			if (this->InputFrame == NULL)
+			{
+			  this->Matrix->DeepCopy(inv_target_frame_matrix);
+			}
+			else
+			{
+			vtkMatrix4x4::Multiply4x4(inv_target_frame_matrix, 
+						this->InputFrame->GetMatrix(), this->Matrix);				
+			}
+
+      if (this->InverseFlag)
+            this->Matrix->Invert();
+		}
+	
+  }
+}
+
+//----------------------------------------------------------------------------
+void mflTransform::InternalDeepCopy(vtkAbstractTransform *gtrans)
+//----------------------------------------------------------------------------
+{
+  mflTransform *transform = (mflTransform *)gtrans;
+
+  this->SetInput(transform);
+
+  if (this->InverseFlag != transform->InverseFlag)
+  {
+    this->Inverse();
+  }
+
+	this->SetInputFrame((mflTransform*)NULL);
+	this->SetTargetFrame((mflTransform*)NULL);
+}
+
+//----------------------------------------------------------------------------
+vtkAbstractTransform *mflTransform::MakeTransform()
+//----------------------------------------------------------------------------
+{
+  return mflTransform::New();
+}
+
+//----------------------------------------------------------------------------
+unsigned long mflTransform::GetMTime()
+//----------------------------------------------------------------------------
+{
+  unsigned long mtime = this->vtkLinearTransform::GetMTime();
+
+  if (this->Input)
+  {
+    unsigned long matrixMTime = this->Input->GetMTime();
+    if (matrixMTime > mtime)
+    {
+      mtime = matrixMTime;
+    }
+  }
+  
+  if (this->InputFrame)
+  {
+    unsigned long matrixMTime = this->InputFrame->GetMTime();
+    if (matrixMTime > mtime)
+    {
+      mtime = matrixMTime;
+    }
+  }
+
+  if (this->TargetFrame)
+  {
+    unsigned long matrixMTime = this->TargetFrame->GetMTime();
+    if (matrixMTime > mtime)
+    {
+      mtime = matrixMTime;
+    }
+  }
+
+  return mtime;
+}
+
+//----------------------------------------------------------------------------
+float mflTransform::PolarDecomp(vtkMatrix4x4 *v_M, vtkMatrix4x4 *v_Q, vtkMatrix4x4 *v_S,
+																float translation[3])
+//----------------------------------------------------------------------------
+{
+typedef float HMatrix[4][4];
+float det;
+int i, j;
+
+for (i = 0; i < 3; i++)
+{
+translation[i] = v_M->GetElement(i, 3);
+}
+
+HMatrix M, Q, S;
+for (i = 0; i < 3; i++)
+	for (j = 0;j < 3; j++)
+	M[i][j] = v_M->GetElement(i,j);
+
+	det = polar_decomp(M, Q, S);
+
+for (i = 0; i < 4; i++)
+	for (j = 0;j < 4; j++)
+	{
+	v_Q->SetElement(i, j, Q[i][j]);
+	v_S->SetElement(i, j, S[i][j]);
+	}
+
+return det;
+}
+
+
+//----------------------------------------------------------------------------	
+// Fill out 3x3 matrix to 4x4
+#define mat_pad(A) (A[W][X]=A[X][W]=A[W][Y]=A[Y][W]=A[W][Z]=A[Z][W]=0,A[W][W]=1)
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+// Copy nxn matrix A to C using "gets" for assignment
+#define mat_copy(C,gets,A,n) {int i,j; for(i=0;i<n;i++) for(j=0;j<n;j++)\
+    C[i][j] gets (A[i][j]);}
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+// Copy transpose of nxn matrix A to C using "gets" for assignment
+#define mat_tpose(AT,gets,A,n) {int i,j; for(i=0;i<n;i++) for(j=0;j<n;j++)\
+    AT[i][j] gets (A[j][i]);}
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+// Assign nxn matrix C the element-wise combination of A and B using "op"
+#define mat_binop(C,gets,A,op,B,n) {int i,j; for(i=0;i<n;i++) for(j=0;j<n;j++)\
+    C[i][j] gets (A[i][j]) op (B[i][j]);}
+
+//----------------------------------------------------------------------------
+// Multiply the upper left 3x3 parts of A and B to get AB 
+void mat_mult(HMatrix A, HMatrix B, HMatrix AB)
+{
+    int i, j;
+    for (i=0; i<3; i++) for (j=0; j<3; j++)
+	AB[i][j] = A[i][0]*B[0][j] + A[i][1]*B[1][j] + A[i][2]*B[2][j];
+}
+
+//----------------------------------------------------------------------------
+// Return dot product of length 3 vectors va and vb
+float vdot(float *va, float *vb)
+//----------------------------------------------------------------------------
+{
+    return (va[0]*vb[0] + va[1]*vb[1] + va[2]*vb[2]);
+}
+
+//----------------------------------------------------------------------------
+// Set v to cross product of length 3 vectors va and vb
+void vcross(float *va, float *vb, float *v)
+{
+    v[0] = va[1]*vb[2] - va[2]*vb[1];
+    v[1] = va[2]*vb[0] - va[0]*vb[2];
+    v[2] = va[0]*vb[1] - va[1]*vb[0];
+}
+
+//----------------------------------------------------------------------------
+// Set MadjT to transpose of inverse of M times determinant of M
+void adjoint_transpose(HMatrix M, HMatrix MadjT)
+//----------------------------------------------------------------------------
+{
+    vcross(M[1], M[2], MadjT[0]);
+    vcross(M[2], M[0], MadjT[1]);
+    vcross(M[0], M[1], MadjT[2]);
+}
+
+//----------------------------------------------------------------------------
+//                ******* Quaternion Preliminaries *******
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+// Construct a (possibly non-unit) quaternion from real components.
+Quat Qt_(float x, float y, float z, float w)
+//----------------------------------------------------------------------------
+{
+    Quat qq;
+    qq.x = x; qq.y = y; qq.z = z; qq.w = w;
+    return (qq);
+}
+
+//----------------------------------------------------------------------------
+// Return conjugate of quaternion.
+Quat Qt_Conj(Quat q)
+//----------------------------------------------------------------------------
+{
+    Quat qq;
+    qq.x = -q.x; qq.y = -q.y; qq.z = -q.z; qq.w = q.w;
+    return (qq);
+}
+
+//----------------------------------------------------------------------------
+// Return quaternion product qL * qR.  Note: order is important!
+// To combine rotations, use the product Mul(qSecond, qFirst),
+// which gives the effect of rotating by qFirst then qSecond.
+Quat Qt_Mul(Quat qL, Quat qR)
+//----------------------------------------------------------------------------
+{
+    Quat qq;
+    qq.w = qL.w*qR.w - qL.x*qR.x - qL.y*qR.y - qL.z*qR.z;
+    qq.x = qL.w*qR.x + qL.x*qR.w + qL.y*qR.z - qL.z*qR.y;
+    qq.y = qL.w*qR.y + qL.y*qR.w + qL.z*qR.x - qL.x*qR.z;
+    qq.z = qL.w*qR.z + qL.z*qR.w + qL.x*qR.y - qL.y*qR.x;
+    return (qq);
+}
+
+//----------------------------------------------------------------------------
+// Return product of quaternion q by scalar w.
+Quat Qt_Scale(Quat q, float w)
+//----------------------------------------------------------------------------
+{
+    Quat qq;
+    qq.w = q.w*w; qq.x = q.x*w; qq.y = q.y*w; qq.z = q.z*w;
+    return (qq);
+}
+
+
+//----------------------------------------------------------------------------
+// Construct a unit quaternion from rotation matrix.  Assumes matrix is
+// used to multiply column vector on the left: vnew = mat vold.	 Works
+// correctly for right-handed coordinate system and right-handed rotations.
+// Translation and perspective components ignored.
+Quat Qt_FromMatrix(HMatrix mat)
+//----------------------------------------------------------------------------
+{
+    /* This algorithm avoids near-zero divides by looking for a large component
+     * - first w, then x, y, or z.  When the trace is greater than zero,
+     * |w| is greater than 1/2, which is as small as a largest component can be.
+     * Otherwise, the largest diagonal entry corresponds to the largest of |x|,
+     * |y|, or |z|, one of which must be larger than |w|, and at least 1/2. */
+    Quat qu;
+    register double tr, s;
+
+    tr = mat[X][X] + mat[Y][Y]+ mat[Z][Z];
+    if (tr >= 0.0) {
+	    s = sqrt(tr + mat[W][W]);
+	    qu.w = s*0.5;
+	    s = 0.5 / s;
+	    qu.x = (mat[Z][Y] - mat[Y][Z]) * s;
+	    qu.y = (mat[X][Z] - mat[Z][X]) * s;
+	    qu.z = (mat[Y][X] - mat[X][Y]) * s;
+	} else {
+	    int h = X;
+	    if (mat[Y][Y] > mat[X][X]) h = Y;
+	    if (mat[Z][Z] > mat[h][h]) h = Z;
+	    switch (h) {
+#define caseMacro(i,j,k,I,J,K) \
+	    case I:\
+		s = sqrt( (mat[I][I] - (mat[J][J]+mat[K][K])) + mat[W][W] );\
+		qu.i = s*0.5;\
+		s = 0.5 / s;\
+		qu.j = (mat[I][J] + mat[J][I]) * s;\
+		qu.k = (mat[K][I] + mat[I][K]) * s;\
+		qu.w = (mat[K][J] - mat[J][K]) * s;\
+		break
+	    caseMacro(x,y,z,X,Y,Z);
+	    caseMacro(y,z,x,Y,Z,X);
+	    caseMacro(z,x,y,Z,X,Y);
+	    }
+	}
+    if (mat[W][W] != 1.0) qu = Qt_Scale(qu, 1/sqrt(mat[W][W]));
+    return (qu);
+}
+
+//----------------------------------------------------------------------------
+//                  ******* Decomp Auxiliaries *******
+//----------------------------------------------------------------------------
+
+static HMatrix mat_id = {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
+
+/** Compute either the 1 or infinity norm of M, depending on tpose **/
+float mat_norm(HMatrix M, int tpose)
+{
+    int i;
+    float sum, max;
+    max = 0.0;
+    for (i=0; i<3; i++) {
+	if (tpose) sum = fabs(M[0][i])+fabs(M[1][i])+fabs(M[2][i]);
+	else	   sum = fabs(M[i][0])+fabs(M[i][1])+fabs(M[i][2]);
+	if (max<sum) max = sum;
+    }
+    return max;
+}
+
+float norm_inf(HMatrix M) {return mat_norm(M, 0);}
+float norm_one(HMatrix M) {return mat_norm(M, 1);}
+
+//----------------------------------------------------------------------------
+// Return index of column of M containing maximum abs entry, or -1 if M=0
+//----------------------------------------------------------------------------
+int find_max_col(HMatrix M)
+//----------------------------------------------------------------------------
+{
+    float abs, max;
+    int i, j, col;
+    max = 0.0; col = -1;
+    for (i=0; i<3; i++) for (j=0; j<3; j++) {
+	abs = M[i][j]; if (abs<0.0) abs = -abs;
+	if (abs>max) {max = abs; col = j;}
+    }
+    return col;
+}
+
+//----------------------------------------------------------------------------
+// Setup u for Household reflection to zero all v components but first
+void make_reflector(float *v, float *u)
+//----------------------------------------------------------------------------
+{
+    float s = sqrt(vdot(v, v));
+    u[0] = v[0]; u[1] = v[1];
+    u[2] = v[2] + ((v[2]<0.0) ? -s : s);
+    s = sqrt(2.0/vdot(u, u));
+    u[0] = u[0]*s; u[1] = u[1]*s; u[2] = u[2]*s;
+}
+
+//----------------------------------------------------------------------------
+// Apply Householder reflection represented by u to column vectors of M 
+void reflect_cols(HMatrix M, float *u)
+//----------------------------------------------------------------------------
+{
+    int i, j;
+    for (i=0; i<3; i++) {
+	float s = u[0]*M[0][i] + u[1]*M[1][i] + u[2]*M[2][i];
+	for (j=0; j<3; j++) M[j][i] -= u[j]*s;
+    }
+}
+
+//----------------------------------------------------------------------------
+// Apply Householder reflection represented by u to row vectors of M
+void reflect_rows(HMatrix M, float *u)
+//----------------------------------------------------------------------------
+{
+    int i, j;
+    for (i=0; i<3; i++) {
+	float s = vdot(u, M[i]);
+	for (j=0; j<3; j++) M[i][j] -= u[j]*s;
+    }
+}
+
+//----------------------------------------------------------------------------
+// Find orthogonal factor Q of rank 1 (or less) M
+void do_rank1(HMatrix M, HMatrix Q)
+//----------------------------------------------------------------------------
+{
+    float v1[3], v2[3], s;
+    int col;
+    mat_copy(Q,=,mat_id,4);
+    /* If rank(M) is 1, we should find a non-zero column in M */
+    col = find_max_col(M);
+    if (col<0) return; /* Rank is 0 */
+    v1[0] = M[0][col]; v1[1] = M[1][col]; v1[2] = M[2][col];
+    make_reflector(v1, v1); reflect_cols(M, v1);
+    v2[0] = M[2][0]; v2[1] = M[2][1]; v2[2] = M[2][2];
+    make_reflector(v2, v2); reflect_rows(M, v2);
+    s = M[2][2];
+    if (s<0.0) Q[2][2] = -1.0;
+    reflect_cols(Q, v1); reflect_rows(Q, v2);
+}
+
+
+//----------------------------------------------------------------------------
+// Find orthogonal factor Q of rank 2 (or less) M using adjoint transpose
+void do_rank2(HMatrix M, HMatrix MadjT, HMatrix Q)
+//----------------------------------------------------------------------------
+{
+    float v1[3], v2[3];
+    float w, x, y, z, c, s, d;
+    int col;
+    /* If rank(M) is 2, we should find a non-zero column in MadjT */
+    col = find_max_col(MadjT);
+    if (col<0) {do_rank1(M, Q); return;} /* Rank<2 */
+    v1[0] = MadjT[0][col]; v1[1] = MadjT[1][col]; v1[2] = MadjT[2][col];
+    make_reflector(v1, v1); reflect_cols(M, v1);
+    vcross(M[0], M[1], v2);
+    make_reflector(v2, v2); reflect_rows(M, v2);
+    w = M[0][0]; x = M[0][1]; y = M[1][0]; z = M[1][1];
+    if (w*z>x*y) {
+	c = z+w; s = y-x; d = sqrt(c*c+s*s); c = c/d; s = s/d;
+	Q[0][0] = Q[1][1] = c; Q[0][1] = -(Q[1][0] = s);
+    } else {
+	c = z-w; s = y+x; d = sqrt(c*c+s*s); c = c/d; s = s/d;
+	Q[0][0] = -(Q[1][1] = c); Q[0][1] = Q[1][0] = s;
+    }
+    Q[0][2] = Q[2][0] = Q[1][2] = Q[2][1] = 0.0; Q[2][2] = 1.0;
+    reflect_cols(Q, v1); reflect_rows(Q, v2);
+}
+
+
+//----------------------------------------------------------------------------
+//                ******* Polar Decomposition *******
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+// Polar Decomposition of 3x3 matrix in 4x4,
+// M = QS.  See Nicholas Higham and Robert S. Schreiber,
+// Fast Polar Decomposition of An Arbitrary Matrix,
+// Technical Report 88-942, October 1988,
+// Department of Computer Science, Cornell University.
+//----------------------------------------------------------------------------
+float polar_decomp(HMatrix M, HMatrix Q, HMatrix S)
+//----------------------------------------------------------------------------
+{
+#define TOL 1.0e-6
+    HMatrix Mk, MadjTk, Ek;
+    float det, M_one, M_inf, MadjT_one, MadjT_inf, E_one, gamma, g1, g2;
+    int i, j;
+    mat_tpose(Mk,=,M,3);
+    M_one = norm_one(Mk);  M_inf = norm_inf(Mk);
+    do {
+	adjoint_transpose(Mk, MadjTk);
+	det = vdot(Mk[0], MadjTk[0]);
+	if (det==0.0) {do_rank2(Mk, MadjTk, Mk); break;}
+	MadjT_one = norm_one(MadjTk); MadjT_inf = norm_inf(MadjTk);
+	gamma = sqrt(sqrt((MadjT_one*MadjT_inf)/(M_one*M_inf))/fabs(det));
+	g1 = gamma*0.5;
+	g2 = 0.5/(gamma*det);
+	mat_copy(Ek,=,Mk,3);
+	mat_binop(Mk,=,g1*Mk,+,g2*MadjTk,3);
+	mat_copy(Ek,-=,Mk,3);
+	E_one = norm_one(Ek);
+	M_one = norm_one(Mk);  M_inf = norm_inf(Mk);
+    } while (E_one>(M_one*TOL));
+    mat_tpose(Q,=,Mk,3); mat_pad(Q);
+    mat_mult(Mk, M, S);	 mat_pad(S);
+    for (i=0; i<3; i++) for (j=i; j<3; j++)
+	S[i][j] = S[j][i] = 0.5*(S[i][j]+S[j][i]);
+    return (det);
+}
+
+
+//----------------------------------------------------------------------------
+//            ******* Spectral Decomposition *******
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+// Compute the spectral decomposition of symmetric positive semi-definite S.
+// Returns rotation in U and scale factors in result, so that if K is a diagonal
+// matrix of the scale factors, then S = U K (U transpose). Uses Jacobi method.
+// See Gene H. Golub and Charles F. Van Loan. Matrix Computations. Hopkins 1983.
+//----------------------------------------------------------------------------
+HVect spect_decomp(HMatrix S, HMatrix U)
+//----------------------------------------------------------------------------
+{
+    HVect kv;
+    double Diag[3],OffD[3]; /* OffD is off-diag (by omitted index) */
+    double g,h,fabsh,fabsOffDi,t,theta,c,s,tau,ta,OffDq,a,b;
+    static char nxt[] = {Y,Z,X};
+    int sweep, i, j;
+    mat_copy(U,=,mat_id,4);
+    Diag[X] = S[X][X]; Diag[Y] = S[Y][Y]; Diag[Z] = S[Z][Z];
+    OffD[X] = S[Y][Z]; OffD[Y] = S[Z][X]; OffD[Z] = S[X][Y];
+    for (sweep=20; sweep>0; sweep--) {
+	float sm = fabs(OffD[X])+fabs(OffD[Y])+fabs(OffD[Z]);
+	if (sm==0.0) break;
+	for (i=Z; i>=X; i--) {
+	    int p = nxt[i]; int q = nxt[p];
+	    fabsOffDi = fabs(OffD[i]);
+	    g = 100.0*fabsOffDi;
+	    if (fabsOffDi>0.0) {
+		h = Diag[q] - Diag[p];
+		fabsh = fabs(h);
+		if (fabsh+g==fabsh) {
+		    t = OffD[i]/h;
+		} else {
+		    theta = 0.5*h/OffD[i];
+		    t = 1.0/(fabs(theta)+sqrt(theta*theta+1.0));
+		    if (theta<0.0) t = -t;
+		}
+		c = 1.0/sqrt(t*t+1.0); s = t*c;
+		tau = s/(c+1.0);
+		ta = t*OffD[i]; OffD[i] = 0.0;
+		Diag[p] -= ta; Diag[q] += ta;
+		OffDq = OffD[q];
+		OffD[q] -= s*(OffD[p] + tau*OffD[q]);
+		OffD[p] += s*(OffDq   - tau*OffD[p]);
+		for (j=Z; j>=X; j--) {
+		    a = U[j][p]; b = U[j][q];
+		    U[j][p] -= s*(b + tau*a);
+		    U[j][q] += s*(a - tau*b);
+		}
+	    }
+	}
+    }
+    kv.x = Diag[X]; kv.y = Diag[Y]; kv.z = Diag[Z]; kv.w = 1.0;
+    return (kv);
+}
+
+//----------------------------------------------------------------------------
+//          ******* Spectral Axis Adjustment *******
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+// Given a unit quaternion, q, and a scale vector, k, find a unit quaternion, p,
+// which permutes the axes and turns freely in the plane of duplicate scale
+// factors, such that q p has the largest possible w component, i.e. the
+// smallest possible angle. Permutes k's components to go with q p instead of q.
+// See Ken Shoemake and Tom Duff. Matrix Animation and Polar Decomposition.
+// Proceedings of Graphics Interface 1992. Details on p. 262-263.
+//----------------------------------------------------------------------------
+Quat snuggle(Quat q, HVect *k)
+//----------------------------------------------------------------------------
+{
+#define SQRTHALF (0.7071067811865475244)
+#define sgn(n,v)    ((n)?-(v):(v))
+#define swap(a,i,j) {a[3]=a[i]; a[i]=a[j]; a[j]=a[3];}
+#define cycle(a,p)  if (p) {a[3]=a[0]; a[0]=a[1]; a[1]=a[2]; a[2]=a[3];}\
+		    else   {a[3]=a[2]; a[2]=a[1]; a[1]=a[0]; a[0]=a[3];}
+    Quat p;
+    float ka[4];
+    int i, turn = -1;
+    ka[X] = k->x; ka[Y] = k->y; ka[Z] = k->z;
+    if (ka[X]==ka[Y]) {if (ka[X]==ka[Z]) turn = W; else turn = Z;}
+    else {if (ka[X]==ka[Z]) turn = Y; else if (ka[Y]==ka[Z]) turn = X;}
+    if (turn>=0) {
+	Quat qtoz, qp;
+	unsigned neg[3], win;
+	double mag[3], t;
+	static Quat qxtoz = {0,SQRTHALF,0,SQRTHALF};
+	static Quat qytoz = {SQRTHALF,0,0,SQRTHALF};
+	static Quat qppmm = { 0.5, 0.5,-0.5,-0.5};
+	static Quat qpppp = { 0.5, 0.5, 0.5, 0.5};
+	static Quat qmpmm = {-0.5, 0.5,-0.5,-0.5};
+	static Quat qpppm = { 0.5, 0.5, 0.5,-0.5};
+	static Quat q0001 = { 0.0, 0.0, 0.0, 1.0};
+	static Quat q1000 = { 1.0, 0.0, 0.0, 0.0};
+	switch (turn) {
+	default: return (Qt_Conj(q));
+	case X: q = Qt_Mul(q, qtoz = qxtoz); swap(ka,X,Z) break;
+	case Y: q = Qt_Mul(q, qtoz = qytoz); swap(ka,Y,Z) break;
+	case Z: qtoz = q0001; break;
+	}
+	q = Qt_Conj(q);
+	mag[0] = (double)q.z*q.z+(double)q.w*q.w-0.5;
+	mag[1] = (double)q.x*q.z-(double)q.y*q.w;
+	mag[2] = (double)q.y*q.z+(double)q.x*q.w;
+	for (i=0; i<3; i++) if (neg[i] = (mag[i]<0.0)) mag[i] = -mag[i];
+	if (mag[0]>mag[1]) {if (mag[0]>mag[2]) win = 0; else win = 2;}
+	else		   {if (mag[1]>mag[2]) win = 1; else win = 2;}
+	switch (win) {
+	case 0: if (neg[0]) p = q1000; else p = q0001; break;
+	case 1: if (neg[1]) p = qppmm; else p = qpppp; cycle(ka,0) break;
+	case 2: if (neg[2]) p = qmpmm; else p = qpppm; cycle(ka,1) break;
+	}
+	qp = Qt_Mul(q, p);
+	t = sqrt(mag[win]+0.5);
+	p = Qt_Mul(p, Qt_(0.0,0.0,-qp.z/t,qp.w/t));
+	p = Qt_Mul(qtoz, Qt_Conj(p));
+    } else {
+	float qa[4], pa[4];
+	unsigned lo, hi, neg[4], par = 0;
+	double all, big, two;
+	qa[0] = q.x; qa[1] = q.y; qa[2] = q.z; qa[3] = q.w;
+	for (i=0; i<4; i++) {
+	    pa[i] = 0.0;
+	    if (neg[i] = (qa[i]<0.0)) qa[i] = -qa[i];
+	    par ^= neg[i];
+	}
+	/* Find two largest components, indices in hi and lo */
+	if (qa[0]>qa[1]) lo = 0; else lo = 1;
+	if (qa[2]>qa[3]) hi = 2; else hi = 3;
+	if (qa[lo]>qa[hi]) {
+	    if (qa[lo^1]>qa[hi]) {hi = lo; lo ^= 1;}
+	    else {hi ^= lo; lo ^= hi; hi ^= lo;}
+	} else {if (qa[hi^1]>qa[lo]) lo = hi^1;}
+	all = (qa[0]+qa[1]+qa[2]+qa[3])*0.5;
+	two = (qa[hi]+qa[lo])*SQRTHALF;
+	big = qa[hi];
+	if (all>two) {
+	    if (all>big) {/*all*/
+		{int i; for (i=0; i<4; i++) pa[i] = sgn(neg[i], 0.5);}
+		cycle(ka,par)
+	    } else {/*big*/ pa[hi] = sgn(neg[hi],1.0);}
+	} else {
+	    if (two>big) {/*two*/
+		pa[hi] = sgn(neg[hi],SQRTHALF); pa[lo] = sgn(neg[lo], SQRTHALF);
+		if (lo>hi) {hi ^= lo; lo ^= hi; hi ^= lo;}
+		if (hi==W) {hi = "\001\002\000"[lo]; lo = 3-hi-lo;}
+		swap(ka,hi,lo)
+	    } else {/*big*/ pa[hi] = sgn(neg[hi],1.0);}
+	}
+	p.x = -pa[0]; p.y = -pa[1]; p.z = -pa[2]; p.w = pa[3];
+    }
+    k->x = ka[X]; k->y = ka[Y]; k->z = ka[Z];
+    return (p);
+}
+
+//----------------------------------------------------------------------------
+//          ******* Decompose Affine Matrix *******
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+// Decompose 4x4 affine matrix A as TFRUK(U transpose), where t contains the
+// translation components, q contains the rotation R, u contains U, k contains
+// scale factors, and f contains the sign of the determinant.
+// Assumes A transforms column vectors in right-handed coordinates.
+// See Ken Shoemake and Tom Duff. Matrix Animation and Polar Decomposition.
+// Proceedings of Graphics Interface 1992.
+//----------------------------------------------------------------------------
+void decomp_affine(HMatrix A, AffineParts *parts)
+//----------------------------------------------------------------------------
+{
+    HMatrix Q, S, U;
+    Quat p;
+    float det;
+    parts->t = Qt_(A[X][W], A[Y][W], A[Z][W], 0);
+    det = polar_decomp(A, Q, S);
+    if (det<0.0) {
+	mat_copy(Q,=,-Q,3);
+	parts->f = -1;
+    } else parts->f = 1;
+    parts->q = Qt_FromMatrix(Q);
+    parts->k = spect_decomp(S, U);
+    parts->u = Qt_FromMatrix(U);
+    p = snuggle(parts->u, &parts->k);
+    parts->u = Qt_Mul(parts->u, p);
+}
+
+//----------------------------------------------------------------------------
+//            ******* Invert Affine Decomposition *******
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+// Compute inverse of affine decomposition.
+void invert_affine(AffineParts *parts, AffineParts *inverse)
+//----------------------------------------------------------------------------
+{
+    Quat t, p;
+    inverse->f = parts->f;
+    inverse->q = Qt_Conj(parts->q);
+    inverse->u = Qt_Mul(parts->q, parts->u);
+    inverse->k.x = (parts->k.x==0.0) ? 0.0 : 1.0/parts->k.x;
+    inverse->k.y = (parts->k.y==0.0) ? 0.0 : 1.0/parts->k.y;
+    inverse->k.z = (parts->k.z==0.0) ? 0.0 : 1.0/parts->k.z;
+    inverse->k.w = parts->k.w;
+    t = Qt_(-parts->t.x, -parts->t.y, -parts->t.z, 0);
+    t = Qt_Mul(Qt_Conj(inverse->u), Qt_Mul(t, inverse->u));
+    t = Qt_(inverse->k.x*t.x, inverse->k.y*t.y, inverse->k.z*t.z, 0);
+    p = Qt_Mul(inverse->q, inverse->u);
+    t = Qt_Mul(p, Qt_Mul(t, Qt_Conj(p)));
+    inverse->t = (inverse->f>0.0) ? t : Qt_(-t.x, -t.y, -t.z, 0);
+}
+
+//----------------------------------------------------------------------------
+// Conversion functions:
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+// copied from vtkTransform::GetOrientation
+// Get the x, y, z orientation angles from the transformation matrix as an
+// array of three floating point values.
+void mflTransform::GetOrientation(vtkMatrix4x4 *in_matrix,double orientation[3])
+//----------------------------------------------------------------------------
+{
+#define VTK_AXIS_EPSILON 0.001
+  int i;
+
+  // convenient access to matrix
+  double (*matrix)[4] = in_matrix->Element;
+  double ortho[3][3];
+
+  for (i = 0; i < 3; i++)
+    {
+    ortho[0][i] = matrix[0][i];
+    ortho[1][i] = matrix[1][i];
+    ortho[2][i] = matrix[2][i];
+    }
+  if (vtkMath::Determinant3x3(ortho) < 0)
+    {
+    ortho[0][2] = -ortho[0][2];
+    ortho[1][2] = -ortho[1][2];
+    ortho[2][2] = -ortho[2][2];
+    }
+
+  vtkMath::Orthogonalize3x3(ortho, ortho);
+
+  // first rotate about y axis
+  double x2 = ortho[2][0];
+  double y2 = ortho[2][1];
+  double z2 = ortho[2][2];
+
+  double x3 = ortho[1][0];
+  double y3 = ortho[1][1];
+  double z3 = ortho[1][2];
+
+  double d1 = sqrt(x2*x2 + z2*z2);
+
+  double cosTheta, sinTheta;
+  if (d1 < VTK_AXIS_EPSILON) 
+    {
+    cosTheta = 1.0;
+    sinTheta = 0.0;
+    }
+  else 
+    {
+    cosTheta = z2/d1;
+    sinTheta = x2/d1;
+    }
+
+  double theta = atan2(sinTheta, cosTheta);
+  orientation[1] = -theta/vtkMath::DoubleDegreesToRadians();
+
+  // now rotate about x axis
+  double d = sqrt(x2*x2 + y2*y2 + z2*z2);
+
+  double sinPhi, cosPhi;
+  if (d < VTK_AXIS_EPSILON) 
+    {
+    sinPhi = 0.0;
+    cosPhi = 1.0;
+    }
+  else if (d1 < VTK_AXIS_EPSILON) 
+    {
+    sinPhi = y2/d;
+    cosPhi = z2/d;
+    }
+  else 
+    {
+    sinPhi = y2/d;
+    cosPhi = (x2*x2 + z2*z2)/(d1*d);
+    }
+
+  double phi = atan2(sinPhi, cosPhi);
+  orientation[0] = phi/vtkMath::DoubleDegreesToRadians();
+
+  // finally, rotate about z
+  double x3p = x3*cosTheta - z3*sinTheta;
+  double y3p = - sinPhi*sinTheta*x3 + cosPhi*y3 - sinPhi*cosTheta*z3;
+  double d2 = sqrt(x3p*x3p + y3p*y3p);
+
+  double cosAlpha, sinAlpha;
+  if (d2 < VTK_AXIS_EPSILON) 
+    {
+    cosAlpha = 1.0;
+    sinAlpha = 0.0;
+    }
+  else 
+    {
+    cosAlpha = y3p/d2;
+    sinAlpha = x3p/d2;
+    }
+
+  double alpha = atan2(sinAlpha, cosAlpha);
+  orientation[2] = alpha/vtkMath::DoubleDegreesToRadians();
+}
+
+//----------------------------------------------------------------------------
+void mflTransform::GetOrientation(vtkMatrix4x4 *in_matrix,float orientation[3])
+//----------------------------------------------------------------------------
+{
+  double temp[3];
+  GetOrientation(in_matrix,temp);
+  orientation[0]=temp[0];
+  orientation[1]=temp[1];
+  orientation[2]=temp[2];
+}
+
+//----------------------------------------------------------------------------
+// copied from vtkTransform::GetOrientationWXYZ 
+void mflTransform::GetOrientationWXYZ(vtkMatrix4x4 *in_matrix, double wxyz[4])
+//----------------------------------------------------------------------------
+{
+  int i;
+
+  // convenient access to matrix
+  double (*matrix)[4] = in_matrix->Element;
+  double ortho[3][3];
+
+  for (i = 0; i < 3; i++)
+    {
+    ortho[0][i] = matrix[0][i];
+    ortho[1][i] = matrix[1][i];
+    ortho[2][i] = matrix[2][i];
+    }
+  if (vtkMath::Determinant3x3(ortho) < 0)
+    {
+    ortho[0][i] = -ortho[0][i];
+    ortho[1][i] = -ortho[1][i];
+    ortho[2][i] = -ortho[2][i];
+    }
+
+  vtkMath::Matrix3x3ToQuaternion(ortho, wxyz);
+
+  // calc the return value wxyz
+ double mag = sqrt(wxyz[1]*wxyz[1] + wxyz[2]*wxyz[2] + wxyz[3]*wxyz[3]);
+
+  if (mag)
+    {
+    wxyz[0] = 2.0*acos(wxyz[0])/vtkMath::DoubleDegreesToRadians();
+    wxyz[1] /= mag;
+    wxyz[2] /= mag;
+    wxyz[3] /= mag;
+    }
+  else
+    {
+    wxyz[0] = 0.0;
+    wxyz[1] = 0.0;
+    wxyz[2] = 0.0;
+    wxyz[3] = 1.0;
+    }
+}
+
+//----------------------------------------------------------------------------
+void mflTransform::GetPosition(vtkMatrix4x4 *matrix,double position[3])
+//----------------------------------------------------------------------------
+{
+  position[0] = matrix->Element[0][3];
+  position[1] = matrix->Element[1][3];
+  position[2] = matrix->Element[2][3];
+}
+
+//----------------------------------------------------------------------------
+void mflTransform::GetPosition(vtkMatrix4x4 *matrix,float position[3])
+//----------------------------------------------------------------------------
+{
+  position[0] = matrix->Element[0][3];
+  position[1] = matrix->Element[1][3];
+  position[2] = matrix->Element[2][3];
+}
+
+//----------------------------------------------------------------------------
+void mflTransform::GetScale(vtkMatrix4x4 *in_matrix,double scale[3])
+//----------------------------------------------------------------------------
+{
+  // convenient access to matrix
+  double (*matrix)[4] = in_matrix->Element;
+  double U[3][3], VT[3][3];
+
+  for (int i = 0; i < 3; i++) 
+    {
+    U[0][i] = matrix[0][i];
+    U[1][i] = matrix[1][i];
+    U[2][i] = matrix[2][i];
+    }
+
+  vtkMath::SingularValueDecomposition3x3(U, U, scale, VT);
+}
+
+//----------------------------------------------------------------------------
+void mflTransform::Scale(vtkMatrix4x4 *matrix,double scalex,double scaley,double scalez,int premult)
+//----------------------------------------------------------------------------
+{
+  mflSmartPointer<vtkMatrix4x4> tmp;
+  if (scalex == 1.0 && scaley == 1.0 && scalez == 1.0) 
+  {
+    return;
+  }
+
+  tmp->SetElement(0,0,scalex);
+  tmp->SetElement(1,1,scaley);
+  tmp->SetElement(2,2,scalez);
+  
+  if (premult)
+    vtkMatrix4x4::Multiply4x4(matrix,tmp,matrix);
+  else
+    vtkMatrix4x4::Multiply4x4(tmp,matrix,matrix);
+}
+
+//----------------------------------------------------------------------------
+// angles in degrees
+int mflTransform::ConversionRToHelicalAxis(vtkMatrix4x4 *v_matrix,										 
+										   double helical_axis[3],double& angle)
+//----------------------------------------------------------------------------
+{
+
+  double PI = vtkMath::DoublePi();      
+  
+  double kx, ky, kz,cangle;
+
+    
+  cangle = (v_matrix->GetElement(X,0) + v_matrix->GetElement(Y,1) + v_matrix->GetElement(Z,2) - 1.) * 0.5;
+
+  if (fabs(cangle) > 1.)
+	{
+		//come si usa vtkErrorMacro? che file bisogna includere?
+		//vtkErrorMacro(<<"Division By Zero");
+		return 0;
+
+	}
+	
+
+ 
+  kx = (v_matrix->GetElement(Z,1) - v_matrix->GetElement(Y,2));
+  ky = (v_matrix->GetElement(X,2) - v_matrix->GetElement(Z,0));
+  kz = (v_matrix->GetElement(Y,0) - v_matrix->GetElement(X,1));
+
+  angle  = acos(cangle);
+  if (angle < PI / 2) {
+    double isangle = 0.5 / sqrt(1 - cangle * cangle);
+    kx *= isangle;
+    ky *= isangle;
+    kz *= isangle;
+    }
+  else {
+    double ica = 1. - cangle;
+
+	assert(ica != 0);
+    //assert(!is_zero(ica));
+    kx = sign(kx) * sqrt((v_matrix->GetElement(X,0) - cangle) / ica);
+    ky = sign(ky) * sqrt((v_matrix->GetElement(Y,1) - cangle) / ica);
+    kz = sign(kz) * sqrt((v_matrix->GetElement(Z,2) - cangle) / ica);
+    if ( kx > ky && kx > kz) {
+      ky = (v_matrix->GetElement(Y,0) + v_matrix->GetElement(X,1)) / (2 * kx * ica);
+      kz = (v_matrix->GetElement(Z,2) + v_matrix->GetElement(X,0)) / (2 * kx * ica);
+      }
+    else if (ky > kx && ky > kz) {
+      kx = (v_matrix->GetElement(Y,0) + v_matrix->GetElement(X,1)) / (2 * ky * ica);
+      kz = (v_matrix->GetElement(Z,1) + v_matrix->GetElement(Y,2)) / (2 * ky * ica);
+      }
+    else {
+      kx = (v_matrix->GetElement(X,2) + v_matrix->GetElement(Z,0)) / (2 * kz * ica);
+      ky = (v_matrix->GetElement(Z,1) + v_matrix->GetElement(Y,2)) / (2 * kz * ica);
+      }
+    }
+  if (angle > FLT_MAX || angle < -FLT_MAX)
+	{
+		//vtkErrorMacro(<<"Division By Zero");
+		return 0;
+
+	}
+
+  
+  
+	double norma = sqrt(kx * kx + ky * ky + kz * kz); 
+
+	kx = kx /norma;
+	ky = ky /norma;
+	kz = kz /norma;
+
+	helical_axis[0] = kx;
+	helical_axis[1] = ky;
+	helical_axis[2] = kz;
+
+	//modified by Stefano. 1-7-2003 (beg)
+	//converison to degree
+	angle = angle * vtkMath::DoubleRadiansToDegrees ();
+	//modified by Stefano. 1-7-2003 (end)
+
+	return 1;
+	
+
+}
+
+
+//----------------------------------------------------------------------------
+double mflTransform::sign(double a) 
+//----------------------------------------------------------------------------
+{
+	if (a>0)
+        return 1.;
+	else if (a<0)
+        return -1.;
+	else
+        return 0.;
+}
+
+
+//----------------------------------------------------------------------------
+int mflTransform::ConversionRToAttitudeVector(vtkMatrix4x4 *v_matrix,
+											  double attitude_vector[3])
+//----------------------------------------------------------------------------
+{
+	double c,s,first_diagonal,second_diagonal,third_diagonal,alpha;
+	
+	c =	(v_matrix->GetElement(0,0)+v_matrix->GetElement(1,1)+v_matrix->GetElement(2,2)-1)/2.0;
+	
+	third_diagonal	= v_matrix->GetElement(2,1)-v_matrix->GetElement(1,2);
+	second_diagonal = v_matrix->GetElement(2,0)-v_matrix->GetElement(0,2);
+	first_diagonal	= v_matrix->GetElement(1,0)-v_matrix->GetElement(0,1);
+
+
+	s =	sqrt((third_diagonal*third_diagonal)+(second_diagonal*second_diagonal)+(first_diagonal*first_diagonal))/2.0;
+
+	alpha = atan2(s,c);
+
+	// attitude_vector is the Orientation Vector [rad] 
+	attitude_vector[0] = (v_matrix->GetElement(2,1)-v_matrix->GetElement(1,2))*alpha/(2*sin(alpha));
+	attitude_vector[1] = (v_matrix->GetElement(0,2)-v_matrix->GetElement(2,0))*alpha/(2*sin(alpha));
+	attitude_vector[2] = (v_matrix->GetElement(1,0)-v_matrix->GetElement(0,1))*alpha/(2*sin(alpha));
+
+	
+	//modified by Stefano. 1-7-2003 (beg)
+	//conversion to degrees
+	attitude_vector[0] = attitude_vector[0] * vtkMath::DoubleRadiansToDegrees (); 
+	attitude_vector[1] = attitude_vector[1] * vtkMath::DoubleRadiansToDegrees ();
+	attitude_vector[2] = attitude_vector[2] * vtkMath::DoubleRadiansToDegrees ();
+	//modified by Stefano. 1-7-2003 (end)
+
+	return 1;
+	
+}		
+
+//----------------------------------------------------------------------------
+int mflTransform::ConversionRToEulerCardanicAngle(vtkMatrix4x4 *v_matrix,
+												 int i,int j,int k,
+												 double euler_cardan[3],
+												 double tentative_euler_cardan_first = 0,
+												 double tentative_euler_cardan_second = 0,
+												 double tentative_euler_cardan_third = 0)
+//----------------------------------------------------------------------------
+{
+
+	// Extracts the Euler and Cardan angles from a rotation matrix.
+	// The  parameters  i, j, k  specify the sequence of the rotation axes 
+	// their value must be the constant:X,Y or Z. 
+	// j must be different from i and k, 
+	// if k is equal to i ->Euler angles
+	// if k is different from i ->Cardan angles
+
+
+	// The two solutions are stored in the three-element vectors 
+	// m_first_euler_cardan and m_second_euler_cardan
+
+	//modified by Stefano. 1-7-2003 (beg)
+	//converison from degree to radians
+	tentative_euler_cardan_first = tentative_euler_cardan_first * vtkMath::DoubleDegreesToRadians();
+	tentative_euler_cardan_second = tentative_euler_cardan_second * vtkMath::DoubleDegreesToRadians();	
+	tentative_euler_cardan_third =	tentative_euler_cardan_third * vtkMath::DoubleDegreesToRadians();
+	//modified by Stefano. 1-7-2003 (end)	
+
+	double PI = vtkMath::DoublePi();
+
+	double first_euler_cardan[3];
+	double second_euler_cardan[3];
+
+	if ( i<X || i>Z || j<X || j>Z || k<X || k>Z || i==j || j==k )
+	{
+		//vtkErrorMacro(<<"Illegal rotation axis");
+		return 0;
+
+	}	
+
+
+	int sig;
+
+	if ((( (j-i+3) % 3 ) ) == 1  && ((j-i+3) > 0) )                  
+	{
+			sig=1;  // ciclic 
+	}	
+
+	else		sig=-1;	// anti ciclic
+
+
+
+	if (i!=k)	// Cardan Angles 
+	{		
+		first_euler_cardan[0]= atan2(-sig*v_matrix->GetElement(j,k),v_matrix->GetElement(k,k));
+		first_euler_cardan[1]= asin(sig*v_matrix->GetElement(i,k));
+		first_euler_cardan[2]= atan2(-sig*v_matrix->GetElement(i,j),v_matrix->GetElement(i,i));
+
+		second_euler_cardan[0]= atan2(sig*v_matrix->GetElement(j,k),-v_matrix->GetElement(k,k));
+		int division = (PI-asin(sig*v_matrix->GetElement(i,k)) + PI) / (2*PI);
+		double remainder = (PI-asin(sig*v_matrix->GetElement(i,k)) + PI)-(division * (2*PI));
+		second_euler_cardan[1]= remainder - PI; 
+		second_euler_cardan[2]= atan2(sig*v_matrix->GetElement(i,j),-v_matrix->GetElement(i,i));
+
+	}
+
+
+
+	else		// Euler Angles
+	{
+
+		int l=3-i-j;
+
+		first_euler_cardan[0]= atan2(v_matrix->GetElement(j,i),-sig*v_matrix->GetElement(l,i));
+		first_euler_cardan[1]= acos(v_matrix->GetElement(i,i));
+		first_euler_cardan[2]= atan2(v_matrix->GetElement(i,j),sig*v_matrix->GetElement(i,l));
+
+		second_euler_cardan[0]= atan2(-v_matrix->GetElement(j,i),sig*v_matrix->GetElement(l,i));
+		second_euler_cardan[1]= -acos(v_matrix->GetElement(i,i));
+		second_euler_cardan[2]= atan2(-v_matrix->GetElement(i,j),-sig*v_matrix->GetElement(i,l));
+
+	}
+
+  //modified by STEFY 18-6-2003 (begin)
+
+	double a = (first_euler_cardan[0]-tentative_euler_cardan_first); 
+	double b = (first_euler_cardan[1]-tentative_euler_cardan_second); 
+	double c = (first_euler_cardan[2]-tentative_euler_cardan_third); 
+
+	double first_distance = sqrt(a*a+b*b+c*c);
+
+	double d = (second_euler_cardan[0]-tentative_euler_cardan_first); 
+	double e = (second_euler_cardan[1]-tentative_euler_cardan_second); 
+	double f = (second_euler_cardan[2]-tentative_euler_cardan_third); 
+
+	double second_distance = sqrt(d*d+e*e+f*f);
+
+	if (first_distance < second_distance)
+		{
+			euler_cardan[0] = first_euler_cardan[0];
+			euler_cardan[1] = first_euler_cardan[1];
+			euler_cardan[2] = first_euler_cardan[2];
+		}
+	else 
+		{
+			euler_cardan[0] = second_euler_cardan[0];
+			euler_cardan[1] = second_euler_cardan[1];
+			euler_cardan[2] = second_euler_cardan[2];
+		}
+
+	//modified by STEFY 18-6-2003 (end)
+
+	//modified by Stefano. 1-7-2003 (beg)
+	//converison to degree
+	euler_cardan[0] = euler_cardan[0] * vtkMath::DoubleRadiansToDegrees ();	
+	euler_cardan[1] = euler_cardan[1] * vtkMath::DoubleRadiansToDegrees ();
+	euler_cardan[2] = euler_cardan[2] * vtkMath::DoubleRadiansToDegrees ();
+	//modified by Stefano. 1-7-2003 (end)	
+
+	return 1;
+  
+}	
+		
+//----------------------------------------------------------------------------
+int mflTransform::ConversionRToQuaternion(vtkMatrix4x4 *v_matrix,
+										  double quaternion[4])
+//----------------------------------------------------------------------------
+{
+
+	// Scalar coordinate of the quaternion:							q0 = quaternion[0]
+  	// First coordinate of the vectorial part of the quaternion:	q1 = quaternion[1]
+  	// Second coordinate of the vectorial part of the quaternion:	q2 = quaternion[2]
+  	// Third coordinate of the vectorial part of the quaternion:	q3 = quaternion[3] 
+
+
+	double s = v_matrix->GetElement(0,0) + v_matrix->GetElement(1,1) + v_matrix->GetElement(2,2);
+	if (s > -0.19) 
+		{
+			// compute quaternion[0] and deduce quaternion[1], quaternion[2] and quaternion[3]
+			quaternion[0] = 0.5 * sqrt(s + 1.0);
+			double inv = 0.25 / quaternion[0];
+			quaternion[1] = inv * (v_matrix->GetElement(1,2) - v_matrix->GetElement(2,1));
+			quaternion[2] = inv * (v_matrix->GetElement(2,0) - v_matrix->GetElement(0,2));
+			quaternion[3] = inv * (v_matrix->GetElement(0,1) - v_matrix->GetElement(1,0));
+		} 
+	else 
+		{
+			s = v_matrix->GetElement(0,0) - v_matrix->GetElement(1,1) - v_matrix->GetElement(2,2);
+			if (s > -0.19) 
+				{
+					// compute quaternion[1] and deduce quaternion[0], quaternion[2] and quaternion[3]
+					quaternion[1] = 0.5 * sqrt(s + 1.0);
+					double inv = 0.25 / quaternion[1];
+					quaternion[0] = inv * (v_matrix->GetElement(1,2) - v_matrix->GetElement(2,1));
+					quaternion[2] = inv * (v_matrix->GetElement(0,1) + v_matrix->GetElement(1,0));
+					quaternion[3] = inv * (v_matrix->GetElement(0,2) + v_matrix->GetElement(2,0));
+				} 
+			else 
+				{
+					s = v_matrix->GetElement(1,1) - v_matrix->GetElement(0,0) - v_matrix->GetElement(2,2);
+					if (s > -0.19) 
+						{
+							// compute quaternion[2] and deduce quaternion[0], quaternion[1] and quaternion[3]
+							quaternion[2] = 0.5 * sqrt(s + 1.0);
+							double inv = 0.25 / quaternion[2];
+							quaternion[0] = inv * (v_matrix->GetElement(2,0) - v_matrix->GetElement(0,2));
+							quaternion[1] = inv * (v_matrix->GetElement(0,1) + v_matrix->GetElement(1,0));
+							quaternion[3] = inv * (v_matrix->GetElement(2,1) + v_matrix->GetElement(1,2));
+						} 
+					else 
+						{
+							// compute quaternion[3] and deduce quaternion[0], quaternion[1] and quaternion[2]
+							s = v_matrix->GetElement(2,2) - v_matrix->GetElement(0,0) - v_matrix->GetElement(1,1);
+							quaternion[3] = 0.5 * sqrt(s + 1.0);
+							double inv = 0.25 / quaternion[3];
+							quaternion[0] = inv * (v_matrix->GetElement(0,1) - v_matrix->GetElement(1,0));
+							quaternion[1] = inv * (v_matrix->GetElement(0,2) + v_matrix->GetElement(2,0));
+							quaternion[2] = inv * (v_matrix->GetElement(2,1) + v_matrix->GetElement(1,2));
+						}
+				 }
+			}
+
+	return 1;
+
+}
+
+//----------------------------------------------------------------------------
+int mflTransform::ConversionQuaternionToR(double quaternion[4],
+										  vtkMatrix4x4 *v_matrix)
+//----------------------------------------------------------------------------
+{
+
+
+	double q0 = quaternion[0];
+    double q1 = quaternion[1];
+    double q2 = quaternion[2];
+	double q3 = quaternion[3];
+
+
+
+    // products
+    double q0q0  = q0 * q0;
+    double q0q1  = q0 * q1;
+    double q0q2  = q0 * q2;
+    double q0q3  = q0 * q3;
+    double q1q1  = q1 * q1;
+    double q1q2  = q1 * q2;
+    double q1q3  = q1 * q3;
+    double q2q2  = q2 * q2;
+    double q2q3  = q2 * q3;
+    double q3q3  = q3 * q3;
+
+    // create the matrix
+    
+    double m00  = 2.0 * (q0q0 + q1q1) - 1.0;
+    double m10  = 2.0 * (q1q2 - q0q3);
+    double m20  = 2.0 * (q1q3 + q0q2);
+
+    double m01  = 2.0 * (q1q2 + q0q3);
+    double m11  = 2.0 * (q0q0 + q2q2) - 1.0;
+    double m21  = 2.0 * (q2q3 - q0q1);
+
+    double m02  = 2.0 * (q1q3 - q0q2);
+    double m12  = 2.0 * (q2q3 + q0q1);
+    double m22  = 2.0 * (q0q0 + q3q3) - 1.0;
+
+    
+
+
+	v_matrix->SetElement(0, 0, m00); 
+	v_matrix->SetElement(0, 1, m01); 
+	v_matrix->SetElement(0, 2, m02);
+
+	v_matrix->SetElement(0, 3, 0);
+
+	
+	v_matrix->SetElement(1, 0, m10);
+	v_matrix->SetElement(1, 1, m11);
+	v_matrix->SetElement(1, 2, m12);
+
+	v_matrix->SetElement(1, 3, 0);
+
+
+
+	v_matrix->SetElement(2, 0, m20);
+	v_matrix->SetElement(2, 1, m21);
+	v_matrix->SetElement(2, 2, m22);
+
+	v_matrix->SetElement(2, 3, 0);
+
+
+
+
+	v_matrix->SetElement(3, 0, 0);
+	v_matrix->SetElement(3, 1, 0);
+	v_matrix->SetElement(3, 2, 0);
+	v_matrix->SetElement(3, 3, 1);
+
+	
+	return 1;
+}
+
+//----------------------------------------------------------------------------
+int mflTransform::ConversionHelicalAxisToR(double helical_axis[3],double angle,
+										   vtkMatrix4x4 *v_matrix)
+{
+	//modified by Stefano. 1-7-2003 (beg)
+	//conversion to radians
+	angle = angle * vtkMath::DoubleDegreesToRadians();
+	//modified by Stefano. 1-7-2003 (end)
+
+	double kx = helical_axis[0], ky = helical_axis[1], kz = helical_axis[2];
+	double ks = kx * kx + ky * ky + kz * kz;
+	double ca = cos(angle), sa = sin(angle);
+	double ica = 1. - ca;
+
+	//attention: for ica = 0 there is a singolarity!
+	// assert(ica != 0);
+   
+	if ((ks - 1.) != 0) {
+		ks = sqrt(ks);
+		kx /= ks; ky /= ks; kz /= ks;
+		}
+
+ 
+	v_matrix->SetElement(X, 0, kx * kx * ica + ca); 
+	v_matrix->SetElement(X, 1, ky * kx * ica - kz * sa); 
+	v_matrix->SetElement(X, 2, kz * kx * ica + ky * sa);
+
+	v_matrix->SetElement(0, 3, 0);
+
+
+	v_matrix->SetElement(Y, 0, kx * ky * ica + kz * sa);
+	v_matrix->SetElement(Y, 1, ky * ky * ica + ca);
+	v_matrix->SetElement(Y, 2, kz * ky * ica - kx * sa);
+
+	v_matrix->SetElement(1, 3, 0);
+
+
+	v_matrix->SetElement(Z, 0, kx * kz * ica - ky * sa);
+	v_matrix->SetElement(Z, 1, ky * kz * ica + kx * sa);
+	v_matrix->SetElement(Z, 2, kz * kz * ica + ca);
+
+	v_matrix->SetElement(2, 3, 0);
+
+
+	v_matrix->SetElement(3, 0, 0);
+	v_matrix->SetElement(3, 1, 0);
+	v_matrix->SetElement(3, 2, 0);
+	v_matrix->SetElement(3, 3, 1);
+
+
+	return 1;
+
+}
+//----------------------------------------------------------------------------
+int mflTransform::ConversionAttitudeVectorToR(double attitude_vector[3],
+											  vtkMatrix4x4 *v_matrix)
+//----------------------------------------------------------------------------
+{
+
+	double fi = sqrt(attitude_vector[0]*attitude_vector[0] + attitude_vector[1]*attitude_vector[1] + 
+					 attitude_vector[2]*attitude_vector[2]);
+
+
+	/* if abs(fi)> PI
+		{
+			return 0;
+		}
+	*/
+
+	double sinc = sin(fi)/fi; 
+	double cosc =(1-cos(fi))/(fi*fi);
+
+	
+
+	v_matrix->SetElement(0,0,cos(fi) + cosc*attitude_vector[0]*attitude_vector[0]);
+	v_matrix->SetElement(0,1,sinc*(-attitude_vector[2]) + cosc*attitude_vector[0]*attitude_vector[1]);	
+	v_matrix->SetElement(0,2,sinc*attitude_vector[1] + cosc*attitude_vector[0]*attitude_vector[2]);
+
+	v_matrix->SetElement(1,0,sinc*attitude_vector[2] + cosc*attitude_vector[1]*attitude_vector[0]);
+	v_matrix->SetElement(1,1,cos(fi) + cosc*attitude_vector[1]*attitude_vector[1]);
+	v_matrix->SetElement(1,2,sinc*(-attitude_vector[0]) + cosc*attitude_vector[1]*attitude_vector[2]);
+
+	v_matrix->SetElement(2,0,sinc*(-attitude_vector[1]) + cosc*attitude_vector[2]*attitude_vector[0]);
+	v_matrix->SetElement(2,1,sinc*attitude_vector[0] + cosc*attitude_vector[2]*attitude_vector[1]);
+	v_matrix->SetElement(2,2,cos(fi) + cosc*attitude_vector[2]*attitude_vector[2]);
+
+
+	v_matrix->SetElement(0, 3, 0);
+
+	v_matrix->SetElement(1, 3, 0);
+
+	v_matrix->SetElement(2, 3, 0);
+
+	v_matrix->SetElement(3, 0, 0);
+	v_matrix->SetElement(3, 1, 0);
+	v_matrix->SetElement(3, 2, 0);
+	v_matrix->SetElement(3, 3, 1);
+
+
+
+
+	
+	return 1;
+}
+
+//----------------------------------------------------------------------------
+int mflTransform::ConversionEulerCardanicAngleToR(double euler_cardan[3],
+												  int i,int j,int k,
+												  vtkMatrix4x4 *v_matrix)
+//----------------------------------------------------------------------------
+{
+
+	//modified by Stefano. 1-7-2003 (beg)
+	//converson to radians
+	euler_cardan[0] = euler_cardan[0] * vtkMath::DoubleDegreesToRadians ();	
+	euler_cardan[1] = euler_cardan[1] * vtkMath::DoubleDegreesToRadians ();
+	euler_cardan[2] = euler_cardan[2] * vtkMath::DoubleDegreesToRadians ();	
+	//modified by Stefano. 1-7-2003 (end)	
+
+	double alfa		= euler_cardan[0];
+	double beta		= euler_cardan[1];
+	double gamma	= euler_cardan[2];
+
+
+
+	double sa = sin(alfa);	
+	double sb = sin(beta);
+	double sc = sin(gamma);
+	double ca = cos(alfa);
+	double cb = cos(beta);	
+	double cc = cos(gamma);
+
+	if ( i<X || i>Z || j<X || j>Z || k<X || k>Z || i==j || j==k )
+		{
+			//vtkErrorMacro(<<"Illegal rotation axis");
+			return 0;
+		}	
+	
+
+	int sig;
+
+	if ((( (j-i+3) % 3 ) ) == 1  && ((j-i+3) > 0) )                  
+	{
+			sig=1;  // ciclic 
+	}	
+
+	else		sig=-1;	// anti ciclic
+
+
+
+	if (i!=k)	// Cardan Angles 
+		{
+			
+			v_matrix->SetElement(i,i,cb*cc);
+			v_matrix->SetElement(i,j,-sig*cb*sc);
+			v_matrix->SetElement(i,k,sig*sb);
+
+			
+			v_matrix->SetElement(j,i,sa*sb*cc + sig*ca*sc);
+			v_matrix->SetElement(j,j,-sig*sa*sb*sc + cc*ca);
+			v_matrix->SetElement(j,k,-sig*sa*cb);
+
+			v_matrix->SetElement(k,i,-sig*ca*sb*cc + sa*sc);
+			v_matrix->SetElement(k,j,ca*sb*sc + sig*sa*cc);
+			v_matrix->SetElement(k,k,ca*cb);
+			
+
+			v_matrix->SetElement(0, 3, 0);
+
+			v_matrix->SetElement(1, 3, 0);
+
+			v_matrix->SetElement(2, 3, 0);
+
+			v_matrix->SetElement(3, 0, 0);
+			v_matrix->SetElement(3, 1, 0);
+			v_matrix->SetElement(3, 2, 0);
+			v_matrix->SetElement(3, 3, 1);
+
+			
+		}	
+	
+	
+
+	else		// Euler Angles
+		{
+
+			int l=3-i-j;
+
+			v_matrix->SetElement(i,i,cb);
+			v_matrix->SetElement(i,j,sb*sc);
+			v_matrix->SetElement(i,l,sig*sb*cc);
+
+			
+			v_matrix->SetElement(j,i,sa*sb);
+			v_matrix->SetElement(j,j,-sa*cb*sc + ca*cc);
+			v_matrix->SetElement(j,l,-sig*(ca*sc + sa*cb*cc));
+
+			v_matrix->SetElement(l,i,-sig*ca*sb);
+			v_matrix->SetElement(l,j,sig*(ca*cb*sc + sa*cc));
+			v_matrix->SetElement(l,l,-sa*sc + ca*cb*cc);
+
+
+			v_matrix->SetElement(0, 3, 0);
+
+			v_matrix->SetElement(1, 3, 0);
+
+			v_matrix->SetElement(2, 3, 0);
+
+			v_matrix->SetElement(3, 0, 0);
+			v_matrix->SetElement(3, 1, 0);
+			v_matrix->SetElement(3, 2, 0);
+			v_matrix->SetElement(3, 3, 1);
+
+		}
+
+
+
+
+	return 1;
+
+}
+												
+													   
+//----------------------------------------------------------------------------
+//modified by STEFY 10-7-2003(begin)//modified because Helical Axis conversion must be made 
+//from a translation matrix (not from a rotation matrix)
+int mflTransform::ConversionTranslationMatrixToHelicalAxis(vtkMatrix4x4 *v_matrix,
+										 																				double helical_axis[3],double point[3],
+																														double& phi,double& t, int intersect = Z)
+//----------------------------------------------------------------------------
+{
+	// input: 
+	// vtkMatrix4x4 *v_matrix (translation matrix)
+	// int intersect:location of the screw axis where it intersects either the X, Y, or the Z plane
+	// default: intersect = Z
+
+	// output:
+	// helical_axis[3] is the unit vector with direction of helical axis
+	// point[3] is the point on helical axis 
+	// phi is the rotation angle (in deg)
+	// t is the amount of translation along screw axis
+
+
+	double tmp[3];
+
+	tmp[0] = v_matrix->GetElement(2,1) - v_matrix->GetElement(1,2);
+	tmp[1] = v_matrix->GetElement(0,2) - v_matrix->GetElement(2,0);
+	tmp[2] = v_matrix->GetElement(1,0) - v_matrix->GetElement(0,1);
+
+	double quad_sum;
+	quad_sum = 0;
+	for (int i=0; i<3; i++)
+		{
+			
+				quad_sum = (tmp[i] * tmp[i]);
+		}
+
+
+	quad_sum = sqrt(quad_sum);
+
+	for (i=0; i<3; i++)
+		{
+			tmp[i] = tmp[i]/quad_sum;
+				
+		}
+	
+	
+
+	helical_axis[0] = tmp[0];
+	helical_axis[1] = tmp[1];
+	helical_axis[2] = tmp[2];
+
+
+	
+	if (quad_sum <= sqrt(2)) 
+		{
+      phi=asin(0.5*quad_sum);
+			phi = phi * vtkMath::DoubleRadiansToDegrees ();
+
+		}
+
+	else  
+		{
+			double sum = v_matrix->GetElement(0,0)+v_matrix->GetElement(1,1)+v_matrix->GetElement(2,2)-1;
+			phi=acos(0.5*sum);
+			phi = phi * vtkMath::DoubleRadiansToDegrees ();
+		}
+
+
+	
+	//if phi approaches 180 deg it is better to use the following:
+	if (phi>135)
+		{
+			mflSmartPointer<vtkMatrix4x4> b_mat;
+
+			double phi_rad = phi * vtkMath::DoubleDegreesToRadians ();
+
+			double b00 = 0.5 * (v_matrix->GetElement(0,0)+v_matrix->GetElement(0,0)) - cos(phi_rad); 
+			double b01 = 0.5 * (v_matrix->GetElement(0,1)+v_matrix->GetElement(1,0)); 
+			double b02 = 0.5 * (v_matrix->GetElement(0,2)+v_matrix->GetElement(2,0)); 
+
+			double b10 = 0.5 * (v_matrix->GetElement(1,0)+v_matrix->GetElement(0,1)); 
+			double b11 = 0.5 * (v_matrix->GetElement(1,1)+v_matrix->GetElement(1,1)) - cos(phi_rad); 
+			double b12 = 0.5 * (v_matrix->GetElement(1,2)+v_matrix->GetElement(2,1)); 
+
+			double b20 = 0.5 * (v_matrix->GetElement(2,0)+v_matrix->GetElement(0,2)); 
+			double b21 = 0.5 * (v_matrix->GetElement(2,1)+v_matrix->GetElement(1,2)); 
+			double b22 = 0.5 * (v_matrix->GetElement(2,2)+v_matrix->GetElement(2,2)) - cos(phi_rad); 
+
+
+
+			b_mat->SetElement(0,0,b00);
+			b_mat->SetElement(0,1,b01);
+			b_mat->SetElement(0,2,b02);
+
+			b_mat->SetElement(1,0,b10);
+			b_mat->SetElement(1,1,b11);
+			b_mat->SetElement(1,2,b12);
+
+			b_mat->SetElement(2,0,b20);
+			b_mat->SetElement(2,1,b21);
+			b_mat->SetElement(2,2,b22);
+
+
+
+			double btmp[3];
+
+			btmp[0] = b00*b00 + b10*b10 + b20*b20;
+			btmp[1] = b01*b01 + b11*b11 + b21*b21;
+			btmp[2] = b02*b02 + b12*b12 + b22*b22;
+
+
+			double bmax = 0.0;
+			int index = 0;
+
+			for (i=0; i<3; i++)
+				{
+
+					if (btmp[i] > bmax)
+						{
+
+							bmax = btmp[i];
+							index = i;
+
+						}
+
+				}
+
+
+			helical_axis[0] = (b_mat->GetElement(0,index))/sqrt(bmax);
+			helical_axis[1] = (b_mat->GetElement(1,index))/sqrt(bmax);
+			helical_axis[2] = (b_mat->GetElement(2,index))/sqrt(bmax);
+
+
+			if ( sign(v_matrix->GetElement(2,1)- v_matrix->GetElement(1,2)) != sign(helical_axis[0]) )
+				{
+						helical_axis[0] = (-1) * helical_axis[0];
+						helical_axis[1]	= (-1) * helical_axis[1];
+						helical_axis[2]	= (-1) * helical_axis[2];
+					
+				}
+
+	}
+
+
+	// calculation of t:amount of translation along screw axis
+
+	t = helical_axis[0] * v_matrix->GetElement(0,3) + helical_axis[1] * v_matrix->GetElement(1,3)	+ 
+			helical_axis[2] * v_matrix->GetElement(2,3);
+
+	//calculating where the screw axis intersects the plane as defined in 'intersect'
+
+	double q_mat[3][3];
+	double q_inv[3][3];
+
+	q_mat[0][0] = v_matrix->GetElement(0,0) - 1;
+	q_mat[0][1] = v_matrix->GetElement(0,1);
+	q_mat[0][2] = v_matrix->GetElement(0,2);
+
+	q_mat[1][0] = v_matrix->GetElement(1,0);
+	q_mat[1][1] = v_matrix->GetElement(1,1) - 1;
+	q_mat[1][2] = v_matrix->GetElement(1,2);
+
+	q_mat[2][0] = v_matrix->GetElement(2,0);
+	q_mat[2][1] = v_matrix->GetElement(2,1);
+	q_mat[2][2] = v_matrix->GetElement(2,2) - 1;
+
+
+	
+	q_mat[0][intersect] = (-1)*helical_axis[0];
+	q_mat[1][intersect] = (-1)*helical_axis[1];
+	q_mat[2][intersect] = (-1)*helical_axis[2];
+
+
+	vtkMath::Invert3x3(q_mat, q_inv);
+	
+
+	double v03 = (-1) * (v_matrix->GetElement(0,3));
+	double v13 = (-1) * (v_matrix->GetElement(1,3));
+	double v23 = (-1) * (v_matrix->GetElement(2,3));
+
+
+	// calculting the point on helical axis 
+
+	point[0] = q_mat[0][0]*v03 + q_mat[0][1]*v13 + q_mat[0][2]*v23;  
+	point[1] = q_mat[1][0]*v03 + q_mat[1][1]*v13 + q_mat[1][2]*v23;
+	point[2] = q_mat[2][0]*v03 + q_mat[2][1]*v13 + q_mat[2][2]*v23;
+
+	point[intersect] = 0;
+
+	return 1;
+
+}
