@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix3x3.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:33:16 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-01 09:55:57 $
+  Version:   $Revision: 1.3 $
   Authors:   Based on vtkMath code (www.vtk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,7 +14,7 @@
 #define __mafMatrix3x3_h
 
 #include "mafObject.h"
-#include "mafMTime.h"
+#include "mafTimeStamped.h"
 #include <math.h>
 
 typedef double (*mafMatrix3x3Elements)[3];
@@ -25,7 +25,7 @@ typedef double (*mafMatrix3x3Elements)[3];
   This is typically used for internal algorithms, use mafMatrix for complex usage.
   @sa mafMatrix
 */
-class MAF_EXPORT mafMatrix3x3: public mafObject
+class MAF_EXPORT mafMatrix3x3: public mafObject, public mafTimeStamped
 {
 public:
   mafTypeMacro(mafMatrix3x3,mafObject);
@@ -202,13 +202,6 @@ public:
   static double Pi() {return 3.1415926535897932384626;};
   static double RadiansToDegrees() {return 57.29577951308232;};
 
-
-  /** increment update modification time */
-  inline void Modified();
-
-  /** return modification time */
-  inline unsigned long GetMTime();
-
   /** bracket operator to access & write single elements */
   double *operator[](const unsigned int i) {return &(GetElements()[i][0]);}
 
@@ -232,23 +225,8 @@ public:
 protected:
 
   double m_Elements[3][3];  ///< internal representation
-  mafMTime m_MTime;
-  
 };
 
-//------------------------------------------------------------------------------
-inline unsigned long mafMatrix3x3::GetMTime()
-//------------------------------------------------------------------------------
-{
-  return m_MTime.GetMTime();
-}
-
-//------------------------------------------------------------------------------
-inline void mafMatrix3x3::Modified()
-//------------------------------------------------------------------------------
-{
-  m_MTime.Modified();
-}
 //------------------------------------------------------------------------------
 inline double mafMatrix3x3::Determinant(double A[3][3])
 //------------------------------------------------------------------------------
