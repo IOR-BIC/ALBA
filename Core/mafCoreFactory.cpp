@@ -1,0 +1,87 @@
+/*=========================================================================
+  Program:   Multimod Application Framework
+  Module:    $RCSfile: mafCoreFactory.cpp,v $
+  Language:  C++
+  Date:      $Date: 2005-01-10 00:14:06 $
+  Version:   $Revision: 1.1 $
+  Authors:   Marco Petrone
+==========================================================================
+  Copyright (c) 2002/2004 
+  CINECA - Interuniversity Consortium (www.cineca.it)
+=========================================================================*/
+
+#include "mafCoreFactory.h"
+#include "mafVersion.h"
+#include "mafIndent.h"
+
+mafCoreFactory *mafCoreFactory::Instance=NULL;
+
+mafCxxTypeMacro(mafCoreFactory);
+
+//----------------------------------------------------------------------------
+// This is used to register the factory when linking statically
+int mafCoreFactory::Initialize()
+//----------------------------------------------------------------------------
+{
+  if (Instance==NULL)
+  {
+    Instance=mafCoreFactory::New();
+
+    if (Instance)
+    {
+      Instance->RegisterFactory(Instance);
+      return MAF_OK;  
+    }
+    else
+    {
+      return MAF_ERROR;
+    }
+  }
+  
+  return MAF_OK;
+}
+
+//----------------------------------------------------------------------------
+void mafCoreFactory::PrintSelf(std::ostream& os, const int indent)
+//------------------------------------------------------------------------------
+{
+  Superclass::Print(os,indent);
+  os << mafIndent(indent) << "MAF Core object factory" << std::endl;
+}
+
+
+//------------------------------------------------------------------------
+mafCoreFactory::mafCoreFactory()
+//------------------------------------------------------------------------------
+{
+  //RegisterNewObject(objectName,"ObjectDescrition");
+}
+
+//------------------------------------------------------------------------------
+const char* mafCoreFactory::GetMAFSourceVersion() const
+//------------------------------------------------------------------------------
+{
+  return MAF_SOURCE_VERSION;
+}
+
+//------------------------------------------------------------------------------
+const char* mafCoreFactory::GetDescription() const
+//------------------------------------------------------------------------------
+{
+  return "MAF Core Object Factory";
+}
+
+
+//------------------------------------------------------------------------------
+const char *mafObjectFactory::GetMAFSourceVersion(void) const
+//------------------------------------------------------------------------------
+{
+  return MAF_SOURCE_VERSION;
+}
+
+//------------------------------------------------------------------------------
+const char *mafObjectFactory::GetDescription() const
+//------------------------------------------------------------------------------
+{
+  return "MAF core factory.";
+}
