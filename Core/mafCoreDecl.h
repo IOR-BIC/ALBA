@@ -2,11 +2,11 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafCoreDecl.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-17 00:43:35 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-02-20 23:14:11 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
-  Copyright (c) 2002/2004 
+  Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
@@ -45,8 +45,10 @@ const int MAXWIDGET = 200;
 const int MAXOP = 200; 
 const int MAXVIEW = 200; 
 
+/** @ingroup Events */
+/** @{ */
 /**
-  Most of the constants used in LAL are declared here.
+  Most of the constants used in MAF are declared here.
   These constants must be non-overlapping.
   Constants are grouped by bracket xx_START, xx_END as needed by mmgFrame
 */
@@ -301,42 +303,34 @@ PIC_END,
 
 PARSE_STRING,	//Added by Paolo 16-9-2003 execute the operation passed as a string
 APPSTAMP,
-MFL_EVENT_ID, //modified by Marco. 25-8-2004 used to convey a MFL event through a LAL event
+
+// ids for event channels
+MCH_START,
+  MCH_UP,   ///< channel used to send events up in the tree
+  MCH_DOWN, ///< channel used to send events down in the tree
+MCH_END,
+
+// ids issued/observed by mafNode and mafVME
+NODE_START,
+  NODE_DETACHED_FROM_TREE,///< issued when the node is detachment from the tree
+  NODE_ATTACHED_TO_TREE,  ///< issued when the node is attached to the tree
+  NODE_DESTROY,           ///< issued when the node is destroyed
+  VME_TIME_SET,           ///< used either to set or to advise of time changes
+  VME_MATRIX_UPDATE,      ///< issue when pose matrix is updated
+  VME_ABSMATRIX_UPDATE,   ///< issue when absolute pose matrix is updated
+  VME_OUTPUT_DATA_UPDATE, ///< issued when the output data is updated
+  VME_OUTPUT_DATA_CHANGED,///< issued when the output data object is changed (i.e. object pointer changed)
+NODE_END,
 
 // const used by mmgGui and mmgGuiValidator
 MINID,      
 MAXID = MINID + MAXWIDGET,
+
 ID_GUI_UPDATE,
+
+MAF_BASE_ID ///< base numeric ID used by mafIdFactory. This must be the LAST ONE!!!
 };
-
-/* To be removed (Marco)
-// definition of VME base type
-enum mafVmeBaseTypes
-{
-	VME_GENERIC = 0,
-	VME_SURFACE,
-	VME_VOLUME,
-	VME_GRAY_VOLUME,
-	VME_IMAGE,
-	VME_POINTSET,
-	VME_GIZMO,
-	VME_FEM,
-	VME_SCALAR,
-	VME_TOOL,
-  VME_EXTERNAL_DATA,
-
-  //BEZ. 20-7-2004: begin
-  VME_EX_FIELD,
-  VME_EX_FIELD_SCALAR,
-  VME_EX_FIELD_VECTOR,
-  VME_EX_FIELD_PROFILE,
-  //BEZ. 20-7-2004: end
-
-  VME_WIDGET, //SIL. 18-11-2004: 
-
-	NUM_OF_BASETYPE,
-};
-*/
+/** @} */
 
 //----------------------------------------------------------------------------
 // global functions
