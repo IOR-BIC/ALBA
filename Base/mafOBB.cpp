@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOBB.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 15:48:50 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-04-01 09:56:52 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -50,7 +50,7 @@ void mafOBB::Reset()
 }
 
 //-------------------------------------------------------------------------
-int mafOBB::Equals(mafOBB &bounds)
+bool mafOBB::Equals(mafOBB &bounds) const
 //-------------------------------------------------------------------------
 {
   if (m_Bounds[0]==bounds.m_Bounds[0] && \
@@ -60,14 +60,14 @@ int mafOBB::Equals(mafOBB &bounds)
     m_Bounds[4]==bounds.m_Bounds[4] && \
     m_Bounds[5]==bounds.m_Bounds[5])
   {
-    return 1;
+    return true;
   }
 
-  return 0;
+  return false;
 }
 
 //-------------------------------------------------------------------------
-int mafOBB::Equals(double bounds[6])
+bool mafOBB::Equals(double bounds[6]) const
 //-------------------------------------------------------------------------
 {
 
@@ -78,14 +78,14 @@ int mafOBB::Equals(double bounds[6])
     m_Bounds[4]==bounds[4] && \
     m_Bounds[5]==bounds[5])
   {
-    return 1;
+    return true;
   }
 
-  return 0;
+  return false;
 }
 
 //-------------------------------------------------------------------------
-int mafOBB::Equals(float bounds[6])
+bool mafOBB::Equals(float bounds[6]) const
 //-------------------------------------------------------------------------
 {
   float myBounds[6];
@@ -98,10 +98,10 @@ int mafOBB::Equals(float bounds[6])
     myBounds[4]==bounds[4] && \
     myBounds[5]==bounds[5])
   {
-    return 1;
+    return true;
   }
 
-  return 0;
+  return false;
 }
 
 //-------------------------------------------------------------------------
@@ -142,7 +142,7 @@ void mafOBB::DeepCopy(mafOBB *source)
 }
 
 //-------------------------------------------------------------------------
-void mafOBB::CopyTo(float target[6])
+void mafOBB::CopyTo(float target[6]) const
 //-------------------------------------------------------------------------
 {
   for (int i=0;i<6;i++)
@@ -152,7 +152,7 @@ void mafOBB::CopyTo(float target[6])
 }
 
 //-------------------------------------------------------------------------
-void mafOBB::CopyTo(double target[6])
+void mafOBB::CopyTo(double target[6]) const
 //-------------------------------------------------------------------------
 {
   for (int i=0;i<6;i++)
@@ -160,16 +160,9 @@ void mafOBB::CopyTo(double target[6])
     target[i]=m_Bounds[i];
   }
 }
-//-------------------------------------------------------------------------
-void mafOBB::ApplyTransform()
-//-------------------------------------------------------------------------
-{
-  ApplyTransform(*this); // self apply the transform
-  
-}
 
 //-------------------------------------------------------------------------
-void mafOBB::ApplyTransform(mafOBB &newbounds)
+void mafOBB::ApplyTransform(const mafMatrix &mat, mafOBB &newbounds) const
 //-------------------------------------------------------------------------
 {
   double newpoints[4*8];
@@ -194,7 +187,7 @@ void mafOBB::ApplyTransform(mafOBB &newbounds)
           newpoints[i*4+2]=Z;
           newpoints[i*4+3]=1;
 
-          m_Matrix.MultiplyPoint(&(newpoints[4*i]),&(newpoints[4*i]));
+          mat.MultiplyPoint(&(newpoints[4*i]),&(newpoints[4*i]));
         
           i++;
         }
@@ -272,7 +265,7 @@ void mafOBB::MergeBounds(double b1[6], double b2[6])
 }
 
 //-------------------------------------------------------------------------
-void mafOBB::GetDimensions(float dims[3])
+void mafOBB::GetDimensions(float dims[3]) const
 //-------------------------------------------------------------------------
 {
   dims[0]=(float)(m_Bounds[1]-m_Bounds[0]);
@@ -281,7 +274,7 @@ void mafOBB::GetDimensions(float dims[3])
 }
 
 //-------------------------------------------------------------------------
-void mafOBB::GetDimensions(double dims[3])
+void mafOBB::GetDimensions(double dims[3]) const
 //-------------------------------------------------------------------------
 {
   dims[0]=m_Bounds[1]-m_Bounds[0];
@@ -290,7 +283,7 @@ void mafOBB::GetDimensions(double dims[3])
 }
 
 //-------------------------------------------------------------------------
-void mafOBB::GetCenter(float center[3])
+void mafOBB::GetCenter(float center[3]) const
 //-------------------------------------------------------------------------
 {
   center[0]=(float)(m_Bounds[0]+m_Bounds[1])/2;
@@ -299,7 +292,7 @@ void mafOBB::GetCenter(float center[3])
 }
 
 //-------------------------------------------------------------------------
-void mafOBB::GetCenter(double center[3])
+void mafOBB::GetCenter(double center[3]) const
 //-------------------------------------------------------------------------
 {
   center[0]=(m_Bounds[0]+m_Bounds[1])/2;
@@ -368,7 +361,7 @@ void mafOBB::SetDimensions(float dims[3])
 }
 
 //-------------------------------------------------------------------------
-double mafOBB::GetWidth()
+double mafOBB::GetWidth() const
 //-------------------------------------------------------------------------
 {
   double dims[3];
@@ -377,7 +370,7 @@ double mafOBB::GetWidth()
 }
 
 //-------------------------------------------------------------------------
-double mafOBB::GetHeight()
+double mafOBB::GetHeight() const
 //-------------------------------------------------------------------------
 {
   double dims[3];
@@ -385,7 +378,7 @@ double mafOBB::GetHeight()
   return dims[1];
 }
 //-------------------------------------------------------------------------
-double mafOBB::GetDepth()
+double mafOBB::GetDepth() const
 //-------------------------------------------------------------------------
 {
   double dims[3];

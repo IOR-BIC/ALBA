@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOBB.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 15:48:50 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-01 09:56:53 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -41,15 +41,15 @@ public:
   /**
     Return 1 if the two bounds are equivalent. Use the float overload to compare with
   VTK bounds, since VTK manages bounds as floats!*/
-  int Equals(float bounds[6]);
-  int Equals(double bounds[6]);
-  int Equals(mafOBB &bounds);
-  int Equals(mafOBB *bounds) {return Equals(*bounds);}
+  bool Equals(float bounds[6]) const;
+  bool Equals(double bounds[6]) const;
+  bool Equals(mafOBB &bounds) const;
+  bool Equals(mafOBB *bounds) {return Equals(*bounds);}
 
 
   /**
     Return true if the BBox is valid*/
-  bool IsValid() {return (m_Bounds[0]<=m_Bounds[1] && \
+  bool IsValid() const {return (m_Bounds[0]<=m_Bounds[1] && \
     m_Bounds[2]<=m_Bounds[3] && \
     m_Bounds[4]<=m_Bounds[5]); \
   }
@@ -64,24 +64,25 @@ public:
   void DeepCopy(float bounds[6]);
   void DeepCopy(mafOBB *);
   void DeepCopy(mafOBB &source) {DeepCopy(&source);}
-  void CopyTo(double target[6]);
-  void CopyTo(float target[6]);
-
-  /**
-    Apply a transform to the internally stored matrix */
-  //void ApplyTransform(mafMatrix &mat, mafOBB &newbounds);
-  //void ApplyTransform(mafMatrix &mat) {ApplyTransform(mat,*this);}
+  void CopyTo(double target[6]) const;
+  void CopyTo(float target[6]) const;
 
   /**
     Apply the internally stored transform to the bounding box, recompute the
     internally stored bounding box. */
-  void ApplyTransform();
+  void ApplyTransform() {ApplyTransform(m_Matrix,*this);}
 
   /**
     Apply the internally stored transform to the bounding box, recompute the
     bounding box and stores new BBOx in the given object. This version doesn't 
     change the internal representation but simply return the result in 'newbounds'*/
-  void ApplyTransform(mafOBB &newbounds);
+  void ApplyTransform(mafOBB &newbounds) const {ApplyTransform(m_Matrix,newbounds);}
+
+  /** 
+    Apply the given transform to the internal bounds (do not concatenate to
+    the internal Matrix). */
+  void ApplyTransform(const mafMatrix &mat, mafOBB &newbounds) const;
+  void ApplyTransform(const mafMatrix &mat) {ApplyTransform(mat,*this);}
 
   /**
     Merge this objects's bounds with the given one. If one of the two bounds is
@@ -90,9 +91,9 @@ public:
 
   /**
     Return true if the point is inside the bounds*/
-  bool IsInside(double point[3]);
-  bool IsInside(float point[3]);
-  bool IsInside(double x,double y,double z);
+  bool IsInside(double point[3]) const;
+  bool IsInside(float point[3]) const;
+  bool IsInside(double x,double y,double z) const;
 
   /**
     This is a static function to merge two different space bounds. The two bounds
@@ -100,14 +101,14 @@ public:
   static void MergeBounds(double b1[6], double b2[6]);
 
   /** return dimensions of this box */
-  void GetDimensions(float dims[3]);
+  void GetDimensions(float dims[3]) const;
   /** return dimensions of this box */
-  void GetDimensions(double dims[3]);
+  void GetDimensions(double dims[3]) const;
 
   /** return center of the box */
-  void GetCenter(float center[3]);
+  void GetCenter(float center[3]) const;
   /** return center of the box */
-  void GetCenter(double center[3]);
+  void GetCenter(double center[3]) const;
 
   /** translate the box to the new center */
   void SetCenter(double center[3]);
@@ -122,18 +123,18 @@ public:
   void SetDimensions(float dims[3]);
 
   /** return the X dimension */
-  double GetWidth();
+  double GetWidth() const;
 
   /** return the Y dimension */
-  double GetHeight();
+  double GetHeight() const;
 
   /** return the Z dimension */
-  double GetDepth();
+  double GetDepth() const;
 
   /** dump the bounding box */
   virtual void Print(std::ostream& os, const int tabs=0) const;
 
-  // memeber varialbles are left public to simplify access
+  // member variables are left public to simplify access
 
   mafMatrix m_Matrix; ///< the pose matrix of the OBB
   double    m_Bounds[6]; ///< the bounding box
@@ -141,21 +142,23 @@ public:
 
 };
 
-
 //-------------------------------------------------------------------------
-inline bool mafOBB::IsInside(double point[3])
+inline bool mafOBB::IsInside(double point[3]) const
+//-------------------------------------------------------------------------
 {
   return IsInside(point[0],point[1],point[2]);
 }
 
 //-------------------------------------------------------------------------
-inline bool mafOBB::IsInside(float point[3])
+inline bool mafOBB::IsInside(float point[3]) const
+//-------------------------------------------------------------------------
 {
   return IsInside(point[0],point[1],point[2]);
 }
 
 //-------------------------------------------------------------------------
-inline bool mafOBB::IsInside(double x,double y,double z)
+inline bool mafOBB::IsInside(double x,double y,double z) const
+//-------------------------------------------------------------------------
 {
   return ((x>=m_Bounds[0])&&(x<=m_Bounds[1])&& \
           (y>=m_Bounds[2])&&(y<=m_Bounds[3])&& \
