@@ -6,6 +6,7 @@ ADD_EXECUTABLE(testEvent mafEventTest.cpp)
 ADD_EXECUTABLE(testObserver mafObserverTest.cpp)
 ADD_EXECUTABLE(testNode mafNodeTest.cpp)
 ADD_EXECUTABLE(testObjectFactory mafObjectFactoryTest.cpp)
+ADD_EXECUTABLE(testTagArray testTagArray.cpp)
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
