@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-10-25 09:41:16 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-10-29 11:24:21 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -49,15 +49,23 @@ mafString::mafString(double num)
 }
 
 //----------------------------------------------------------------------------
+const mafID mafString::Length()
+//----------------------------------------------------------------------------
+{
+  return Length(this->CStr);
+}
+
+//----------------------------------------------------------------------------
 // Description:
 // This method returns the size of string. If the string is empty,
 // it returns 0. It can handle null pointers.
 mafID mafString::Length(const char* str)
+//----------------------------------------------------------------------------
 {
   if ( !str )
-    {
+  {
     return 0;
-    }
+  }
   return static_cast<mafID>(strlen(str));
 }
 
@@ -66,16 +74,17 @@ mafID mafString::Length(const char* str)
 // Description:
 // Copy string to the other string.
 void mafString::Copy(char* dest, const char* src)
+//----------------------------------------------------------------------------
 {
   if ( !dest )
-    {
+  {
     return;
-    }
+  }
   if ( !src )
-    {
+  {
     *dest = 0;
     return;
-    }
+  }
   strcpy(dest, src);
 }
 
@@ -86,13 +95,14 @@ void mafString::Copy(char* dest, const char* src)
 // you can use delete to remove it. It returns empty string 
 // "" if the input is empty.
 char* mafString::Duplicate(const char* str)
+//----------------------------------------------------------------------------
 {    
   if ( str )
-    {
+  {
     char *newstr = new char [ Length(str) + 1 ];
     Copy(newstr, str);
     return newstr;
-    }
+  }
   return 0;
 }
 
@@ -101,17 +111,21 @@ char* mafString::Duplicate(const char* str)
 // This method compare two strings. It is similar to strcmp,
 // but it can handle null pointers.
 int mafString::Compare(const char* str1, const char* str2)
+//----------------------------------------------------------------------------
 {
   if (!str1&&!str2)
     return 0;
+
   if ( !str1&&str2 )
-    {
+  {
     return -1;
-    }
+  }
+
   if ( !str2&&str1 )
-    {
+  {
     return 1;
-    }
+  }
+
   return strcmp(str1, str2);
 }
 
@@ -119,11 +133,12 @@ int mafString::Compare(const char* str1, const char* str2)
 // Description:
 // Check if the first string starts with the second one.
 int mafString::StartsWith(const char* str1, const char* str2)
+//----------------------------------------------------------------------------
 {
   if ( !str1 || !str2 || strlen(str1) < strlen(str2) )
-    {
+  {
     return 0;
-    }
+  }
   return !strncmp(str1, str2, strlen(str2));  
 }
 
@@ -131,6 +146,7 @@ int mafString::StartsWith(const char* str1, const char* str2)
 // Description:
 // Check if the first string starts with the second one.
 int mafString::EndsWith(const char* str1, const char* str2)
+//----------------------------------------------------------------------------
 {
   if ( !str1 || !str2 || strlen(str1) < strlen(str2) )
     {
@@ -141,26 +157,30 @@ int mafString::EndsWith(const char* str1, const char* str2)
 
 //----------------------------------------------------------------------------
 char* mafString::Append(const char* str1, const char* str2)
+//----------------------------------------------------------------------------
 {
   if ( !str1 && !str2 )
-    {
-    return 0;
-    }
-  char *newstr = 
-    new char[ Length(str1) + Length(str2)+1];
+  {
+    return NULL;
+  }
+
+  char *newstr = new char[ Length(str1) + Length(str2)+1];
   if ( !newstr )
-    {
-    return 0;
-    }
+  {
+    return NULL;
+  }
+
   newstr[0] = 0;
   if ( str1 )
-    {
+  {
     strcat(newstr, str1);
-    }
+  }
+
   if ( str2 )
-    {
+  {
     strcat(newstr, str2);
-    }
+  }
+
   return newstr;
 }
 //----------------------------------------------------------------------------
@@ -271,48 +291,77 @@ int mafString::SetSize(mafID size)
 }
 
 //----------------------------------------------------------------------------
-void mafString::Append(const char* str)
+mafString &mafString::Append(const char* str)
 //----------------------------------------------------------------------------
 {
-
-  const char *newstr=Append(this->CStr,str);
-  if (newstr)
+  if ( !str )
   {
-    if (this->CStr)
-    {
-      delete [] this->CStr;
-    }
-    this->CStr=(char *)newstr;
-  
+    return *this;
   }
+
+  unsigned long newsize = Length(CStr) + Length(str)+1;
+  if (newsize>Size)
+  {
+    char *newstr = new char[newsize];
+    Size = newsize;
+
+    if ( !newstr )
+    {
+      return *this;
+    }
+
+    newstr[0] = 0;
+    if ( CStr )
+    {
+      strcat(newstr, CStr);
+    }
+
+    if ( str )
+    {
+      strcat(newstr, str);
+    }
+
+    if (CStr)
+    {
+      delete [] CStr;
+    }
+
+    CStr=(char *)newstr;
+  }
+  else
+  {
+    strcat(CStr, str);
+  }
+
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-int mafString::FindFirst(mafString *str)
+int mafString::FindFirst(const char *str)
 //----------------------------------------------------------------------------
 {
-  int len=this->Length();
-  int len2=str->Length();
+  int len=Length();
+  int len2=Length(str);
 
   for (int i=0;i<=len-len2;i++)
   {
-    if (strcmp(&this->CStr[i],str->CStr)==0)
+    if (strncmp(&CStr[i],str,len2)==0)
       return i;
   }
   return -1;
 }
 
 //----------------------------------------------------------------------------
-int mafString::FindLast(mafString *str)
+int mafString::FindLast(const char *str)
 //----------------------------------------------------------------------------
 {
   int len=this->Length();
-  int len2=str->Length();
+  int len2=Length(str);
 
   for (int i=0;i<=len-len2;i++)
   {
-    if (strcmp(&this->CStr[len-len2-i-1],str->CStr)==0)
-      return i;
+    if (strncmp(&CStr[len-len2-i-1],str,len2)==0)
+      return len-len2-i-1;
   }
   return -1;  
 }
@@ -436,4 +485,32 @@ void mafString::ExtractPathName()
     this->Set("");
   }
 
+}
+
+//----------------------------------------------------------------------------
+const bool mafString::operator==(const mafString& src)
+//----------------------------------------------------------------------------
+{
+  return this->Equals(src)!=0;
+}
+
+//----------------------------------------------------------------------------
+const bool mafString::operator==(const char *src)
+//----------------------------------------------------------------------------
+{
+  return Equals(this->CStr,src)!=0;
+}
+
+//----------------------------------------------------------------------------
+int mafString::FindChr(const int c)
+//----------------------------------------------------------------------------
+{
+  return (this->IsEmpty()?-1:(strchr(this->CStr,c)-this->CStr));
+}
+
+//----------------------------------------------------------------------------
+int mafString::FindLastChr(const int c)
+//----------------------------------------------------------------------------
+{
+  return (this->IsEmpty()?-1:(strrchr(this->CStr,c)-this->CStr));
 }
