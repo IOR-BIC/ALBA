@@ -2,7 +2,7 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventSender.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:26:42 $
+  Date:      $Date: 2005-04-04 10:42:14 $
   Version:   $Revision: 1.1 $
   Authors:   Marco Petrone
 ==========================================================================

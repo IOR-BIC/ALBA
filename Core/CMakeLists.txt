@@ -8,10 +8,6 @@ DBG_MESSAGE("Configuring project mafCore")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-#mafOp.cpp
-#mafOp.h
-#mafViewManager.cpp
-#mafViewManager.h
 mafAbsMatrixPipe.cpp
 mafAbsMatrixPipe.h
 mafAttribute.cpp
@@ -20,17 +16,8 @@ mafCoreFactory.cpp
 mafCoreFactory.h
 mafDataPipe.cpp
 mafDataPipe.h
-mafDecl.cpp
-mafDecl.h
-mafEvent.cpp
-mafEvent.h
-mafEventBase.cpp
-mafEventBase.h
 mafEventIO.cpp
 mafEventIO.h
-mafEventSender.h
-mafEventSource.cpp
-mafEventSource.h
 mafMatrixPipe.cpp
 mafMatrixPipe.h
 mafNode.cpp
@@ -39,16 +26,11 @@ mafNodeIterator.cpp
 mafNodeIterator.h
 mafNodeRoot.cpp
 mafNodeRoot.h
-mafObserver.cpp
-mafObserver.h
-mafObserverCallback.cpp
-mafObserverCallback.h
 mafTagArray.cpp
 mafTagArray.h
 mafTagItem.cpp
 mafTagItem.h
 mafTimeMap.h
-mafTimeMap.txx
 mafVME.cpp
 mafVME.h
 mafVMEOutput.cpp
@@ -70,7 +52,7 @@ IF (MAF_USE_VTK)
 ENDIF (MAF_USE_VTK)
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS mafBase mafIO)
+SET(PROJECT_LIBS mafBase mafIO mafGui)
 
 IF (MAF_USE_VTK)
   SET(PROJECT_LIBS ${PROJECT_LIBS} vtkCommon)

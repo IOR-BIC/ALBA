@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-21 17:49:28 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-04 10:42:13 $
+  Version:   $Revision: 1.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 

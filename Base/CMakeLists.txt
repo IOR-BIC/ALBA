@@ -8,49 +8,63 @@ DBG_MESSAGE("Configuring project mafCore")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-  mafBase.h
-  mafDefines.cpp
-  mafDefines.h
-  mafDirectory.cpp
-  mafDirectory.h
-  mafDynamicLoader.cpp
-  mafDynamicLoader.h
-  mafIncludeWIN32.h
-  mafIncludeWX.h
-  mafIndent.cpp
-  mafIndent.h
-  mafMatrix.cpp
-  mafMatrix.h
-  mafMatrix3x3.cpp
-  mafMatrix3x3.h
-  mafMTime.cpp
-  mafMTime.h
-  mafMutexLock.cpp
-  mafMutexLock.h
-  mafOBB.cpp
-  mafOBB.h
-  mafObject.cpp
-  mafObject.h
-  mafObjectFactory.cpp
-  mafObjectFactory.h
-  mafReferenceCounted.cpp
-  mafReferenceCounted.h
-  mafSmartPointer.h
-  mafString.cpp
-  mafString.h
-  mafTimeStamped.h
-  mafTransform.cpp
-  mafTransform.h
-  mafTransformBase.cpp
-  mafTransformBase.h
-  mafTransformFrame.cpp
-  mafTransformFrame.h
-  mafVector.h
-  mafVector.txx
-  mafVersion.h
-  mmuIdFactory.cpp
-  mmuIdFactory.h
-  mmuUtility.h
+mafBase.h
+mafDecl.cpp
+mafDecl.h
+mafDefines.cpp
+mafDefines.h
+mafDirectory.cpp
+mafDirectory.h
+mafDynamicLoader.cpp
+mafDynamicLoader.h
+mafEvent.cpp
+mafEvent.h
+mafEventBase.cpp
+mafEventBase.h
+mafEventSender.h
+mafEventSource.cpp
+mafEventSource.h
+mafIncludeWIN32.h
+mafIncludeWX.h
+mafIndent.cpp
+mafIndent.h
+mafMTime.cpp
+mafMTime.h
+mafMatrix.cpp
+mafMatrix.h
+mafMatrix3x3.cpp
+mafMatrix3x3.h
+mafMutexLock.cpp
+mafMutexLock.h
+mafOBB.cpp
+mafOBB.h
+mafObject.cpp
+mafObject.h
+mafObjectFactory.cpp
+mafObjectFactory.h
+mafObserver.cpp
+mafObserver.h
+mafObserverCallback.cpp
+mafObserverCallback.h
+mafReferenceCounted.cpp
+mafReferenceCounted.h
+mafSmartPointer.h
+mafString.cpp
+mafString.h
+mafTimeStamped.h
+mafTransform.cpp
+mafTransform.h
+mafTransformBase.cpp
+mafTransformBase.h
+mafTransformFrame.cpp
+mafTransformFrame.h
+mafVector.h
+mafVersion.h
+mmuIdFactory.cpp
+mmuIdFactory.h
+mmuUtility.h
+vtkMAFSmartPointer.h
+vtkMAFToLinearTransform.h
 )
 
 IF (MAF_USE_VTK)
