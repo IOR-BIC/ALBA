@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:30:13 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-03-11 15:42:38 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -317,14 +317,15 @@ MCH_END,
 NODE_START,
   NODE_DETACHED_FROM_TREE,///< issued when the node is detachment from the tree
   NODE_ATTACHED_TO_TREE,  ///< issued when the node is attached to the tree
-  NODE_DESTROYED,           ///< issued when the node is destroyed
+  NODE_DESTROYED,         ///< issued when the node is destroyed
   VME_TIME_SET,           ///< used either to set or to advise of time changes
+  VME_MATRIX_CHANGED,     ///< issued when the matrix in the output has changed (e.g. when matrix pipe is changed at runtime)
   VME_MATRIX_PRE_UPDATE,  ///< issued by mafMatrixPipe before updating the matrix 
   VME_MATRIX_UPDATE,      ///< issued when pose matrix is updated
   VME_ABSMATRIX_UPDATE,   ///< issued when absolute pose matrix is updated
   VME_OUTPUT_DATA_PREUPDATE, ///< issued by mafDataPipe before the output data is actually updated
   VME_OUTPUT_DATA_UPDATE, ///< issued when the output data is updated
-  //VME_OUTPUT_DATA_CHANGED,///< issued when the output data object has changed (i.e. object pointer changed)
+  VME_OUTPUT_DATA_CHANGED,///< issued when the output data object has changed (i.e. object pointer changed)
 NODE_END,
 
 MATRIX_UPDATED, ///< issue by a matrix pipe to advise consumers of output matrix updating
