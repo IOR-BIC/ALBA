@@ -9,6 +9,8 @@ DBG_MESSAGE("Configuring project mafCore")
 # Set your list of sources here.
 SET(PROJECT_SRCS
   mafBase.h
+  mafCoreFactory.cpp
+  mafCoreFactory.h
   mafDefines.cpp
   mafDefines.h
   mafDirectory.cpp
@@ -43,8 +45,8 @@ SET(PROJECT_SRCS
   mafObserver.h
   mafObserverCallback.cpp
   mafObserverCallback.h
-  mafSmartObject.cpp
-  mafSmartObject.h
+  mafReferenceCounted.cpp
+  mafReferenceCounted.h
   mafSmartPointer.h
   mafString.cpp
   mafString.h

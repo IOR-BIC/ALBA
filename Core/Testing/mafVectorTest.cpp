@@ -1,15 +1,16 @@
 #include "mafVector.txx"
 #include "mafSmartPointer.h"
+#include "mafReferenceCounted.h"
 #include <iostream>
 
 /**
  This object set a flag when allocated and reset it when deallocated,
  this way I can test when it's really deallocated.
 */
-class mafTestObject: public mafSmartObject
+class mafTestObject: public mafReferenceCounted
 {
 public:
-  mafTypeMacro(mafTestObject,mafSmartObject);
+  mafTypeMacro(mafTestObject,mafReferenceCounted);
   mafTestObject():Flag(NULL) {}
   ~mafTestObject() {if (Flag) *Flag=false;}
   bool *Flag;

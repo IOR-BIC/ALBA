@@ -30,6 +30,7 @@ int main()
   mafString copy=tmp;
 
   MAF_TEST(tmp==copy);
+  MAF_TEST(tmp.GetCStr()!=copy.GetCStr());
   
   tmp.Erase(6,15);
   MAF_TEST(tmp=="Hello Italy");

@@ -1,4 +1,5 @@
 #include "mafEventSource.h"
+#include "mafObject.h"
 #include "mafObserver.h"
 #include "mafEventBase.h"
 #include "mafString.h"
@@ -30,10 +31,10 @@ protected:
 
 mafCxxTypeMacro(mafSubjectTestClass);
 
-class mafObserverTestClass:public mafObserver
+class mafObserverTestClass:public mafObject, public mafObserver
 {
 public:
-  mafTypeMacro(mafObserverTestClass,mafObserver);
+  mafTypeMacro(mafObserverTestClass,mafObject);
   mafObserverTestClass(const char *name=NULL):Name(name),SkipNext(false) {}
 
   virtual void OnEvent(mafEventBase *event) {LastEvent=*event;if (SkipNext) event->SkipNext();};

@@ -1,14 +1,14 @@
 #include "mafEventBase.h"
-#include "mafSmartObject.h"
+#include "mafReferenceCounted.h"
 #include <iostream>
 #include <utility>
 
 using namespace std;
 
-class mafTestObject: public mafSmartObject
+class mafTestObject: public mafReferenceCounted
 {
 public:
-  mafTypeMacro(mafTestObject,mafSmartObject);
+  mafTypeMacro(mafTestObject,mafReferenceCounted);
 };
 
 mafCxxTypeMacro(mafTestObject);

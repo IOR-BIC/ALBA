@@ -1,4 +1,4 @@
-#include "mafSmartObject.h"
+#include "mafReferenceCounted.h"
 #include "mafSmartPointer.h"
 #include <iostream>
 #include <map>
@@ -7,10 +7,10 @@
  This object set a flag when allocated and reset it when deallocated,
  this way I can test when it's really deallocated.
 */
-class mafFooObject: public mafSmartObject
+class mafFooObject: public mafReferenceCounted
 {
 public:
-  mafTypeMacro(mafFooObject,mafSmartObject);
+  mafTypeMacro(mafFooObject,mafReferenceCounted);
   mafFooObject():Flag(NULL) {}
   ~mafFooObject() {if (Flag) *Flag=false;}
   int *Flag;
@@ -18,18 +18,7 @@ public:
 
 mafCxxTypeMacro(mafFooObject);
 
-/*class mafDummyObject: public mafObject
-{
-public:
-  mafTypeMacro(mafDummyObject,mafObject);
-  mafDummyObject() {}
-  void Print(std::ostream &out) {out<<"Dummy";}
-};
-
-mafCxxTypeMacro(mafDummyObject);
-*/
-
-mafSmartObject *CreateSmartObject(int &flag)
+mafReferenceCounted *CreateSmartObject(int &flag)
 {
   mafFooObject *foo= mafFooObject::New();
   foo->Flag=&flag;
@@ -49,7 +38,7 @@ void CreateSmartObject2(mafAutoPointer<mafFooObject> &out,int &flag)
 int main()
 {
   int flag;
-  mafSmartObject *obj=CreateSmartObject(flag);
+  mafReferenceCounted *obj=CreateSmartObject(flag);
 
   MAF_TEST(flag);
   obj->UnRegister(0);
@@ -60,7 +49,7 @@ int main()
   CreateSmartObject2(auto_foo,flag);
   MAF_TEST(flag);
   // force releasing object.
-  // Notice: calling the mafSmartPointer UnRegister() not the mafSmartObject one!!!
+  // Notice: calling the mafSmartPointer UnRegister() not the mafReferenceCounted one!!!
   auto_foo.UnRegister(NULL); 
   MAF_TEST(!flag);
 
