@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 10:07:19 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-03-11 15:46:25 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -47,12 +47,12 @@ public:
   typedef std::vector<mafTimeStamp> TimeVector;
 
   /** print a dump of this object */
-  virtual void Print(std::ostream& os, const int tabs);
+  virtual void Print(std::ostream& os, const int tabs=0) const;
 
   /** 
     return the parent VME Node. Notice that a VME can only reparented 
     under another VME, not to other kind of nodes! */
-  mafVME *GetParent();
+  mafVME *GetParent() const;
 
   /**
     Copy the contents of another VME into this one. Notice that subtrees
@@ -67,12 +67,6 @@ public:
     can be very dangerous making one of the VME inconsistent. Some VMEs
     do not support such a function! */  
   virtual int ShallowCopy(mafVME *a);
-
-  /**
-    Query for VME child nodes */
-  mafVME *GetVMEChild(mafID idx) {return mafVME::SafeDownCast(this->Superclass::GetChild(idx));}
-  mafVME *GetFirstVMEChild();
-  mafVME *GetLastVMEChild();
 
   /**
    Set the time for this VME (not for the whole tree). Normaly time 
@@ -112,8 +106,10 @@ public:
   /** Set the global pose of this VME for the given time "t". This function usually modifies the MatrixVector. */
   void SetAbsPose(double x,double y,double z,double rx,double ry,double rz, mafTimeStamp t=-1);
   /** Set the global pose of this VME for the given time "t". This function usually modifies the MatrixVector. */
-  void SetAbsPose(double xyz[3],double rxyz[3], mafTimeStamp t);
+  void SetAbsPose(double xyz[3],double rxyz[3], mafTimeStamp t=-1);
   /** Set the global pose of this VME for the given time "t". This function usually modifies the MatrixVector. */
+  void SetAbsMatrix(const mafMatrix &matrix,mafTimeStamp t);
+  /** Set the global pose of this VME for the current time. This function usually modifies the MatrixVector. */
   void SetAbsMatrix(const mafMatrix &matrix);
 
   /** apply a matrix to the VME abs pose matrix */
@@ -130,11 +126,6 @@ public:
   /**
     return true if the VME can be reparented under the specified node */
   virtual bool CanReparentTo(mafNode *parent);
-
-  /** To be moved to mafNode */
-  /** Import all children of a VME-tree into the Output */
-  void Import(mafVME *tree);
-
   
   // to be revised
 	/** Set auxiliary reference system and its name*/
@@ -197,6 +188,9 @@ public:
 
   /** return a pointer to the output data structure */
   mafVMEOutput *GetOutput();
+
+  /** process events coming from other components */
+  void OnEvent(mafEventBase *e);
   
 protected:
   mafVME(); // to be allocated with New()
@@ -217,9 +211,9 @@ protected:
   /** Set the abs matrix pipe object, i.e. the source of the output abs matrix. */
   void SetAbsMatrixPipe(mafAbsMatrixPipe *pipe);
 
-  mafDataPipe       *m_DataPipe;
-  mafMatrixPipe     *m_MatrixPipe;
-  mafAbsMatrixPipe  *m_AbsMatrixPipe;
+  mafAutoPointer<mafDataPipe>       m_DataPipe;
+  mafAutoPointer<mafMatrixPipe>     m_MatrixPipe;
+  mafAutoPointer<mafAbsMatrixPipe>  m_AbsMatrixPipe;
 
   mafVMEOutput      *m_Output; ///< the datastructure storing the output of this VME
 

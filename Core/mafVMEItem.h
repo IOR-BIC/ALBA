@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:36:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-03-11 15:46:25 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,7 +24,7 @@
 class mafVME;
 class mafOBB;
 class mafStorageElement;
-class mmaTagArray;
+class mafTagArray;
 class vtkDataSet;
 
 /** mafVMEItem - store the single dataset stored into a mafTimeMap
@@ -38,7 +38,7 @@ class vtkDataSet;
   <B>m_Id<\B> to store a numeric unique Id (for internal use) see mafVMERoot::GetNextItemId)
   <B>m_URL<\B> internally used to store the name of the file where data is stored
 
-  @sa mafVME mafVMERoot mafMSFStorage mafTimeMap mmaTagArray
+  @sa mafVME mafVMERoot mafMSFStorage mafTimeMap mafTagArray
 
   @todo
   - Add a link to the VME object
@@ -50,7 +50,7 @@ class MAF_EXPORT mafVMEItem : public mafReferenceCounted, public mafStorable
 public:  
   mafAbstractTypeMacro(mafVMEItem,mafReferenceCounted);
 
-  void Print(std::ostream& os, const int indent);
+  virtual void Print(std::ostream& os, const int indent=0) const;
 
   /** Get the TimeStamp of this dataset*/
   mafTimeStamp GetTimeStamp() {return m_TimeStamp;}
@@ -78,7 +78,7 @@ public:
 
   /**
   Return the array of Tags for this object*/
-  mmaTagArray *GetTagArray();
+  mafTagArray *GetTagArray();
 
   /**
     Return the type of data stored in this object. The name returned
@@ -188,7 +188,7 @@ protected:
   user but only by mflVME and mafVMEItemArray functions.*/
   void SetVME(mafVME *vme) {m_VME=vme;}
 
-  mmaTagArray   *m_TagArray;             ///< meta data attributes attached to this dataset      
+  mafTagArray   *m_TagArray;             ///< meta data attributes attached to this dataset      
   bool          m_ModifiedData;         ///< true when data has been mofied from last storing
   static bool   m_GlobalCompareDataFlag;///< if true Equals will also compare internal data
 

@@ -3,8 +3,8 @@
 Program:   Visualization Toolkit
 Module:    $RCSfile: mafDataPipe.cpp,v $
 Language:  C++
-Date:      $Date: 2005-03-11 10:10:46 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2005-03-11 15:42:25 $
+Version:   $Revision: 1.2 $
 
 
 
@@ -164,7 +164,7 @@ void mafDataPipe::UpdateBounds()
 }
 
 //------------------------------------------------------------------------------
-void mafDataPipe::Print(std::ostream& os, const int tabs)
+void mafDataPipe::Print(std::ostream& os, const int tabs) const
 //------------------------------------------------------------------------------
 {
   

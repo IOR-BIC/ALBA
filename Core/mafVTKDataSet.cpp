@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVTKDataSet.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:39:14 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-03-11 15:47:05 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -226,11 +226,11 @@ int mafVTKDataSet::InternalRestore(mafStorageElement *node)
       node->RestoreObject(obj,"TagArray")==MAF_OK)
   {
     m_Crypting = (crypting=="true"||crypting=="True"||crypting=="TRUE")?true:false;
-    mmaTagArray *tarray=mmaTagArray::SafeDownCast(obj);
+    mafTagArray *tarray=mafTagArray::SafeDownCast(obj);
 
     assert(tarray);
     mafDEL(m_TagArray);
-    m_TagArray=mmaTagArray::SafeDownCast(tarray);
+    m_TagArray=mafTagArray::SafeDownCast(tarray);
 
     assert(m_TagArray);
     m_TagArray->Register(this);

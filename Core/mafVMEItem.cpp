@@ -2,15 +2,15 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:36:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-03-11 15:46:25 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 #include "mafVMEItem.h"
-#include "mmaTagArray.h"
+#include "mafTagArray.h"
 #include "mafIndent.h"
 #include "mafOBB.h"
 #include "mafStorageElement.h"
@@ -85,7 +85,7 @@ double *mafVMEItem::GetBounds()
 
 
 //-------------------------------------------------------------------------
-mmaTagArray *mafVMEItem::GetTagArray()
+mafTagArray *mafVMEItem::GetTagArray()
 //-------------------------------------------------------------------------
 {
   return m_TagArray;
@@ -207,11 +207,11 @@ int mafVMEItem::InternalRestore(mafStorageElement *node)
     &&node->RestoreObject(obj,"TagArray")==MAF_OK)
   {
     m_Crypting = (crypting=="true"||crypting=="True"||crypting=="TRUE")?true:false;
-    mmaTagArray *tarray=mmaTagArray::SafeDownCast(obj);
+    mafTagArray *tarray=mafTagArray::SafeDownCast(obj);
 
     assert(tarray);
     mafDEL(m_TagArray);
-    m_TagArray=mmaTagArray::SafeDownCast(tarray);
+    m_TagArray=mafTagArray::SafeDownCast(tarray);
 
     assert(m_TagArray);
     m_TagArray->Register(this);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVTKDataSet.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:39:14 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-03-11 15:47:06 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,7 +27,7 @@ class MAF_EXPORT mafVTKDataSet : public mafVMEItem
 public:
   mafTypeMacro(mafVTKDataSet,mafVMEItem);
 
-  void Print(std::ostream& os, const int indent);
+  virtual void Print(std::ostream& os, const int indent);
 
   /** 
     return data converted into VTK format. (supported only if MAF is compiled

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 10:07:18 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-03-11 15:46:25 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -13,15 +13,17 @@
 #define __mafVME_cxx
 
 #include "mafVME.h"
-
+#include "mafVMEOutput.h"
 #include "mafAbsMatrixPipe.h"
 #include "mafMatrixPipe.h"
 #include "mafDataPipe.h"
 #include "mafEventSource.h"
+#include "mafTagArray.h"
 #include "mafOBB.h"
 #include "mafTransform.h"
 #include "mmuTimeSet.h"
 #include "mafIndent.h"
+#include "mafDecl.h"
 
 #include <sstream>
 #include <assert.h>
@@ -30,11 +32,7 @@
 mafVME::mafVME()
 //-------------------------------------------------------------------------
 {
-  // Pipes are dynamically created
-  m_MatrixPipe          = NULL; // to be created by subclasses
-  m_DataPipe            = NULL; // to be created by subclasses
-
-  cppNEW(m_AbsMatrixPipe);
+  m_AbsMatrixPipe=mafAbsMatrixPipe::New();
   m_AbsMatrixPipe->SetVME(this);
   m_AbsMatrixPipe->SetListener(this);
 
@@ -48,20 +46,20 @@ mafVME::~mafVME()
 {
   // Pipes must be destroyed in the right order
   // to take into consideration dependencies
-  cppDEL(m_DataPipe);
+  m_DataPipe=NULL;
   
   m_AbsMatrixPipe->SetVME(NULL);
-  cppDEL(m_AbsMatrixPipe);
+  m_AbsMatrixPipe=NULL;
     
-  cppDEL(m_MatrixPipe);
+  m_MatrixPipe=NULL;
 }
 
 //-------------------------------------------------------------------------
-mafVME *mafVME::GetParent()
+mafVME *mafVME::GetParent() const
 //-------------------------------------------------------------------------
 {
-  assert(m_Parent->IsA(mafVME::GetStaticTypeId()));
-  return (mafVME *)GetParent();
+  assert(m_Parent->IsA(typeid(mafVME)));
+  return (mafVME *)Superclass::GetParent();
 }
 
 //-------------------------------------------------------------------------
@@ -188,7 +186,10 @@ void mafVME::GetTimeStamps(TimeVector &kframes)
 
   for (int i=0;i<GetNumberOfChildren();i++)
   {
-    GetChild(i)->GetTimeStamps(subKFrames);
+    if (mafVME *vme=mafVME::SafeDownCast(GetChild(i)))
+    {
+      vme->GetTimeStamps(subKFrames);
+    }
 
     mmuTimeSet::Merge(kframes,subKFrames,kframes);
   }
@@ -220,9 +221,8 @@ void mafVME::GetAbsTimeStamps(TimeVector &kframes)
   
   std::vector<mafTimeStamp> parentKFrames;
 
-  for (mafVME *parent=GetParent();parent;parent=parent->GetParent())
+  for (mafVME *parent=mafVME::SafeDownCast(GetParent());parent;parent=mafVME::SafeDownCast(parent->GetParent()))
   {
-
     parent->GetLocalTimeStamps(parentKFrames);
 
     mmuTimeSet::Merge(kframes,parentKFrames,kframes);
@@ -233,22 +233,7 @@ void mafVME::GetAbsTimeStamps(TimeVector &kframes)
 bool mafVME::CanReparentTo(mafNode *parent)
 //-------------------------------------------------------------------------
 {
-  return parent==NULL||(parent->IsA(mafVME::GetStaticTypeId())&&||!IsInTree(parent));
-}
-
-//----------------------------------------------------------------------------
-void mafVME::Import(mafVME *tree)
-//-------------------------------------------------------------------------
-{
-  if (tree&&tree->GetNumberOfChildren()>0)
-  {
-    int num=tree->GetNumberOfChildren();
-    for (int i=0;i<num;i++)
-    {
-      mafVME *vme=tree->GetFirstChild();
-      vme->ReparentTo(this);
-    }
-  }
+  return (parent == NULL)|| (parent->IsA(typeid(mafVME)) && !IsInTree(parent));
 }
 
 //-------------------------------------------------------------------------
@@ -271,9 +256,9 @@ void mafVME::SetPose(double xyz[3],double rxyz[3], mafTimeStamp t)
 
   mafTransform::SetOrientation(matrix,rxyz);
   mafTransform::SetPosition(matrix,xyz);
-  matrix->SetTimeStamp(t);
+  matrix.SetTimeStamp(t);
  
-  SetMatrix(&matrix);
+  SetMatrix(matrix);
 }
 
 //----------------------------------------------------------------------------
@@ -284,10 +269,11 @@ void mafVME::ApplyMatrix(const mafMatrix &matrix,int premultiply,mafTimeStamp t)
 
   mafTransform new_pose;
   mafMatrix pose;
-  GetOutput()->GetMatrix(&pose,t);
-  new_pose.SetMatrix(&pose);
+  GetOutput()->GetMatrix(pose,t);
+  new_pose.SetMatrix(pose);
   new_pose.Concatenate(matrix,premultiply);
-  SetMatrix(new_pose.GetMatrix(),t);
+  new_pose.SetTimeStamp(t);
+  SetMatrix(new_pose.GetMatrix());
 }
 
 //-------------------------------------------------------------------------
@@ -310,9 +296,9 @@ void mafVME::SetAbsPose(double xyz[3],double rxyz[3], mafTimeStamp t)
 
   mafTransform::SetOrientation(matrix,rxyz);
   mafTransform::SetPosition(matrix,xyz);
-  matrix->SetTimeStamp(t);
+  matrix.SetTimeStamp(t);
 
-  SetAbsPose(matrix);
+  SetAbsMatrix(matrix);
 }
 
 //-------------------------------------------------------------------------
@@ -321,10 +307,9 @@ void mafVME::SetAbsMatrix(const mafMatrix &matrix,mafTimeStamp t)
 {
   t=(t<0)?m_CurrentTime:t;
 
-  mafMatrix mat;
-  mat->DeepCopy(matrix);
-  mat->SetTimeStamp(t);
-  SetAbsPose(mat);
+  mafMatrix mat=matrix;
+  mat.SetTimeStamp(t);
+  SetAbsMatrix(mat);
 }
 //-------------------------------------------------------------------------
 void mafVME::SetAbsMatrix(const mafMatrix &matrix)
@@ -333,28 +318,31 @@ void mafVME::SetAbsMatrix(const mafMatrix &matrix)
   if (GetParent())
   {
     mafMatrix pmat;
-    GetParent()->GetAbsMatrix(pmat,matrix->GetTimeStamp());
+    GetParent()->GetOutput()->GetAbsMatrix(pmat,matrix.GetTimeStamp());
 
-    pmat->Invert();
+    pmat.Invert();
 
-    mafMatrix::Multiply4x4(pmat,matrix,matrix);
+    mafMatrix::Multiply4x4(pmat,matrix,pmat);
+    SetMatrix(pmat);
+    return;
   }
   
-  SetPose(matrix);
+  SetMatrix(matrix);
 }
 
 
 //----------------------------------------------------------------------------
-void mafVME::ApplyAbsMatrix(mafMatrix *matrix,int premultiply,mafTimeStamp t)
+void mafVME::ApplyAbsMatrix(const mafMatrix &matrix,int premultiply,mafTimeStamp t)
 //----------------------------------------------------------------------------
 {
   t=(t<0)?m_CurrentTime:t;
   mafTransform new_pose;
   mafMatrix pose;
   GetOutput()->GetAbsMatrix(pose,t);
-  new_pose->SetMatrix(pose);
-  new_pose->Concatenate(matrix,premultiply);
-  SetAbsPose(new_pose->GetMatrix(),t);
+  new_pose.SetMatrix(pose);
+  new_pose.Concatenate(matrix,premultiply);
+  new_pose.SetTimeStamp(t);
+  SetAbsMatrix(new_pose.GetMatrix());
 }
 
 /*
@@ -402,36 +390,32 @@ void mafVME::AbsMatrixUpdateCallback(void *arg)
 }
 */
 //-------------------------------------------------------------------------
-void mafVME::Print(std::ostream& os, const int tabs)
+void mafVME::Print(std::ostream& os, const int tabs) const
 //-------------------------------------------------------------------------
 {
+  Superclass::Print(os,tabs);
+  
   mafIndent indent(tabs);
-  os << indent << "Name: "<<GetName()<<std::endl;
-
-  os << indent << "Number of Children: "<<Children->GetNumberOfItems()<<std::endl;
-
-	os << indent << "Tag Array Contents: \n";
-	GetTagArray()->PrintSelf(os,indent.GetNextIndent());
 
   os << indent << "Current Time: "<<m_CurrentTime<<"\n";
 
   os << indent << "Output:\n";
-  GetOutput()->Print(os,indent.GetNextIndent());
+  m_Output->Print(os,indent.GetNextIndent());
 
   os << indent << "Matrix Pipe: ";
-  if (GetMatrixPipe())
+  if (m_MatrixPipe)
   {
     os << "\n";
-    GetMatrixPipe()->Print(os,indent.GetNextIndent());
+    m_MatrixPipe->Print(os,indent.GetNextIndent());
   }
   else
     os << "NULL\n";
   
   os << indent << "DataPipe: ";
-  if (GetDataPipe()) // allocate data pipe if not done yet
+  if (m_DataPipe) // allocate data pipe if not done yet
   {
     os << "\n";
-    GetDataPipe()->Print(os,indent.GetNextIndent());
+    m_DataPipe->Print(os,indent.GetNextIndent());
   }
   else
     os << "NULL\n";
@@ -566,35 +550,37 @@ int mafVME::SetMatrixPipe(mafMatrixPipe *mpipe)
   {
     if (mpipe==NULL||mpipe->SetVME(this)==MAF_OK)
     { 
-      // if we had an observer...
-      if (m_MatrixPipe && MatrixUpdateTag)
+      if (m_MatrixPipe)
       {
-        m_MatrixPipe->RemoveObserver(MatrixUpdateTag);
+        // detach the old pipe
+        m_MatrixPipe->SetListener(NULL);
         m_MatrixPipe->SetVME(NULL);
         m_MatrixPipe->SetCurrentTime(m_CurrentTime);
       }
-
-      vtkSetObjectBodyMacro(m_MatrixPipe,mafMatrixPipe,mpipe);
+      
+      m_MatrixPipe = mpipe;
 
       if (mpipe)
       {
-        // attach oberver to new pipe (to be substitute with DefaultChannel communication)
-        mflAgent::PlugEventSource(mpipe,MatrixUpdateCallback,this,mafMatrixPipe::MatrixUpdateEvent);
-        CurrentMatrix=mpipe->GetMatrix();
+        // attach as observer to the new pipe
+        mpipe->SetListener(this);
+        mpipe->SetVME(this);
+        // set the output matrix to pipe output matrix
+        GetOutput()->m_Matrix=mpipe->GetMatrixPointer();
       }
       else
       {
-        // When no Matrix pipe is set, simple provide
-        // an identity matrix
-        CurrentMatrix=mafSmartPointer<mafMatrix>();
-        CurrentMatrix->SetTimeStamp(m_CurrentTime);
+        // When no Matrix pipe is set, simply provide
+        // an identity matrix as output matrix
+        GetOutput()->m_Matrix=mafSmartPointer<mafMatrix>();
+        GetOutput()->m_Matrix->SetTimeStamp(m_CurrentTime);
       }
 
       // this forces the the pipe to Update its input and input frame
       if (m_AbsMatrixPipe)
         m_AbsMatrixPipe->SetVME(this);
 
-      InvokeEvent(mafVME::MatrixPipeChangedEvent);
+      GetEventSource()->InvokeEvent(this,VME_MATRIX_CHANGED);
 
       return MAF_OK;
     }
@@ -608,26 +594,10 @@ int mafVME::SetMatrixPipe(mafMatrixPipe *mpipe)
 }
 
 //-------------------------------------------------------------------------
-void mafVME::UpdateCurrentData()
+void mafVME::Update()
 //-------------------------------------------------------------------------
 {
-  // if output data is available force an update
-  if (GetCurrentData()) 
-  {
-    GetCurrentData()->Update();
-  }
-}
-
-//-------------------------------------------------------------------------
-void mafVME::SetCurrentData(vtkDataSet *data)
-//-------------------------------------------------------------------------
-{
-  if (data!=CurrentData.GetPointer())
-  {
-    CurrentData=data;
-    Modified();
-    InvokeEvent(mafVME::OutputDataChangedEvent); // advise observers data pointer has changed
-  }
+  // to be written  
 }
 
 //-------------------------------------------------------------------------
@@ -635,11 +605,11 @@ void mafVME::SetCrypting(int crypting)
 //-------------------------------------------------------------------------
 {
   if(crypting > 0)
-    Crypting = 1;
+    m_Crypting = 1;
   else
-    Crypting = 0;
+    m_Crypting = 0;
 
-  TagArray->SetTag(vtkTagItem("MFL_CRYPT_VME",Crypting));
+  GetTagArray()->SetTag(mmuTagItem("MAF_CRYPT_VME",m_Crypting));
   Modified();
 }
 
@@ -647,59 +617,44 @@ void mafVME::SetCrypting(int crypting)
 int mafVME::GetCrypting()
 //-------------------------------------------------------------------------
 {
-  return RestoreNumericFromTag(GetTagArray(),"MFL_CRYPT_VME",Crypting,-1,0);
+  return mafRestoreNumericFromTag(GetTagArray(),"MAF_CRYPT_VME",m_Crypting,-1,0);
 }
 
 //-------------------------------------------------------------------------
-vtkDataSet *mafVME::GetCurrentData()
+int mafVME::SetDataPipe(mafDataPipe *dpipe)
 //-------------------------------------------------------------------------
 {
-  if (GetDataPipe()) // allocate data pipe if not done yet
-  {
-    SetCurrentData(GetDataPipe()->GetOutput());
-  }
- 
-  return CurrentData;
-}
-
-//-------------------------------------------------------------------------
-int mafVME::SetDataPipe(mflDataPipe *dpipe)
-//-------------------------------------------------------------------------
-{
-  if (dpipe==m_DataPipe)
+  if (dpipe==m_DataPipe.GetPointer())
     return MAF_OK;
 
   if (dpipe==NULL||dpipe->SetVME(this)==MAF_OK)
   { 
     // if we had an observer...
-    if (m_DataPipe && DataUpdateTag)
+    if (m_DataPipe)
     {
-      m_DataPipe->RemoveObserver(DataUpdateTag);
+      // detach the old pipe
+      m_DataPipe->SetListener(NULL);
       m_DataPipe->SetVME(NULL);
     }
 
-    vtkSetObjectBodyMacro(m_DataPipe,mflDataPipe,dpipe);
+    m_DataPipe = dpipe;
     
     if (m_DataPipe)
     {
-      //SetCurrentData(m_DataPipe->GetOutput());
       m_DataPipe->SetCurrentTime(m_CurrentTime);
-    }
-    else
-    {
-      SetCurrentData(NULL);
+      m_DataPipe->SetListener(this);
     }
 
     // must plug the event source after calling UpdateCurrentData, since 
-    // UpdateCurrentData calls invoke explicitelly the OutputDataChangedEvent,
+    // UpdateCurrentData calls invoke explicitly the OutputDataChangedEvent,
     // this avoids a double calling.
-    if (m_DataPipe)
-    {
-      mflAgent::PlugEventSource(dpipe,OutputDataUpdateCallback,this,mflDataPipe::OutputUpdateEvent);
-    }
+    //if (m_DataPipe)
+    //{
+    //  mflAgent::PlugEventSource(dpipe,OutputDataUpdateCallback,this,mafDataPipe::OutputUpdateEvent);
+    //}
 
     // advise listeners the data pipe has changed
-    InvokeEvent(mafVME::DataPipeChangedEvent);
+    GetEventSource()->InvokeEvent(this,VME_OUTPUT_DATA_CHANGED);
 
     return MAF_OK;
   }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 10:07:45 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-03-11 15:46:26 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,13 +15,13 @@
 
 #include "mafObject.h"
 #include "mafString.h"
+#include "mafVME.h"
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 class mafMatrix;
 class mafTransform;
 class mafOBB;
-class mafVME;
 class mafNodeIterator;
 class vtkDataSet;
 
@@ -39,19 +39,19 @@ public:
   mafVME *GetVME();
 
   /** print a dump of this object */
-  virtual void Print(std::ostream& os, const int tabs);
+  virtual void Print(std::ostream& os, const int tabs=0) const;
 
   /** Return the VME pose, this function queries the MatrixPipe for producing a matrix */
   void GetPose(double &x,double &y,double &z,double &rx,double &ry,double &rz,mafTimeStamp t=-1);
   /** Return the VME pose */
   void GetPose(double xyz[3],double rxyz[3],mafTimeStamp t=-1);
   /** Return the VME pose */
-  virtual void GetMatrix(mafMatrix *matrix,mafTimeStamp t=-1);
+  virtual void GetMatrix(mafMatrix &matrix,mafTimeStamp t=-1);
   /** Return the VME pose matrix for the current time */
   virtual mafMatrix *GetMatrix();
   
   /** Get the global pose matrix of this VME for the given time "t".*/
-  void GetAbsMatrix(mafMatrix *matrix,mafTimeStamp t=-1);
+  void GetAbsMatrix(mafMatrix &matrix,mafTimeStamp t=-1);
   /** Get the global pose matrix of this VME for the given time "t".*/
   mafMatrix *GetAbsMatrix();
   
@@ -128,7 +128,8 @@ public:
 
   /** return the time for which this output was computed */
   mafTimeStamp GetCurrentTime();
-    
+
+  friend class mafVME;
 protected:
   mafVMEOutput(); // to be allocated with New()
   virtual ~mafVMEOutput(); // to be deleted with Delete()
@@ -138,6 +139,7 @@ protected:
 
   mafVME                    *m_VME;     ///< pointer to source VME
   mafString                 m_DataType; ///< the type of data stored in object expressed as a string
+
   mafAutoPointer<mafMatrix> m_Matrix;   ///< the output pose matrix
 
 private:

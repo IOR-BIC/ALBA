@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataPipe.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 10:10:46 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-03-11 15:42:26 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,7 +13,7 @@
 #ifndef __mafDataPipe_h
 #define __mafDataPipe_h
 
-#include "mafObject.h"
+#include "mafReferenceCounted.h"
 #include "mafTimeStamped.h"
 #include "mafEventSender.h"
 #include "mafOBB.h"
@@ -38,13 +38,13 @@ class mafVME;
   - rewrite GetOutput()
   - reerite UpdateBounds()
 */
-class MAF_EXPORT mafDataPipe:public mafObject, public mafTimeStamped, public mafEventSender
+class MAF_EXPORT mafDataPipe:public mafReferenceCounted, public mafTimeStamped, public mafEventSender
 {
 public:
   mafDataPipe();
   virtual ~mafDataPipe();
 
-  mafTypeMacro(mafDataPipe,mafObject);
+  mafTypeMacro(mafDataPipe,mafReferenceCounted);
 
   /**
     This function makes the current bounds to be updated. It's optimized
@@ -97,7 +97,7 @@ public:
   int GetDependOnAbsPose() {return m_DependOnAbsPose;}
 
   /** print a dump of this object */
-  virtual void Print(std::ostream& os, const int tabs);
+  virtual void Print(std::ostream& os, const int tabs=0) const;
   
 protected:
   /** function called before of data pipe execution */

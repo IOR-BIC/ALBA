@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 10:07:44 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-03-11 15:46:26 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -38,7 +38,7 @@ mafVMEOutput::~mafVMEOutput()
 int mafVMEOutput::IsAnimated()
 //-------------------------------------------------------------------------
 {
-  //return ((GetNumberOfItems()>1)||(GetMatrixVector()->GetNumberOfMatrixes()>1));
+  return m_VME->IsAnimated();
 }
 
 //-------------------------------------------------------------------------
