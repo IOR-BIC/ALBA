@@ -16,7 +16,7 @@
 #  define @PROJECT_NAME@_EXPORT __declspec( dllimport ) 
 # endif
 #else
-# define@PROJECT_NAME@_EXPORT
+# define @PROJECT_NAME@_EXPORT
 #endif
 
 #endif // __@PROJECT_NAME@Configure_h
