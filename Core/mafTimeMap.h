@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTimeMap.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:34:58 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-03-11 15:44:41 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -145,7 +145,7 @@ public:
   /** return  the item with given its order index. NULL is returned if not found. */
   T *GetItemByIndex(int idx);
 
-  virtual void Print(std::ostream& os, const int tabs);
+  virtual void Print(std::ostream& os, const int tabs=0) const;
 
   /** increment update modification time */
   void Modified() {m_MTime.Modified();}

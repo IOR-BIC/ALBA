@@ -1,7 +1,7 @@
 #include "mafNode.h"
 #include "mafNodeRoot.h"
 #include "mafNodeIterator.h"
-#include "mmaTagArray.h"
+#include "mafTagArray.h"
 #include "mafXMLStorage.h"
 #include "mafCoreFactory.h"
 #include <iostream>
@@ -292,7 +292,7 @@ int main()
   node1->SetLink("link1",node2);
   node1->SetLink("link2",node3);
   node1->SetLink("link3",test_node);
-
+  
   MAF_TEST(node1->GetLink("link1")==node2);
   MAF_TEST(node1->GetLink("link2")==node3);
   MAF_TEST(node1->GetLink("link3")==test_node.GetPointer());
@@ -315,6 +315,10 @@ int main()
   node3->GetTagArray()->SetTag(mmuTagItem("TestTag","test value"));
   node2->GetTagArray()->SetTag(mmuTagItem("TestTag","second value"));
 
+  // dump root node with tags
+  std::cout<<"Root node with tags:\n";
+  root->Print(std::cout);
+
   // test finding by TAG
   mafNode *tagged_node=root->FindInTreeByTag("TestTag","test value");
   MAF_TEST(tagged_node==node3);
@@ -328,7 +332,7 @@ int main()
   // plug nodes to factory for being able to restore
   mafCoreFactory::Initialize();
   mafPlugObject<mafTestNode>("Test Node");
-  mafPlugObject<mmaTagArray>("Test Node");
+  mafPlugObject<mafTagArray>("Test Node");
 
   // test storing/restoring...
   mafXMLStorage storage;
@@ -362,6 +366,10 @@ int main()
   // test restored links
   mafNode *new_node1=new_root->FindInTreeByName("5");
   MAF_TEST(new_node1);
+
+  // display a dump of restored node
+  std::cout << "Restored node with Links:\n";
+  new_node1->Print(std::cout);
 
   mafNode *new_node2=new_node1->GetLink("link1");
   mafNode *new_node3=new_node1->GetLink("link2");

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeRoot.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:33:03 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-03-11 15:43:57 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -37,7 +37,7 @@ class MAF_EXPORT mafNodeRoot: public mafEventSender
 public:
 
   /** print a dump of this object */
-  void Print(std::ostream& os, const int tabs);
+  virtual void Print(std::ostream& os, const int tabs=0) const;
 
   /** Return the pointer to the parent node (if present)*/
   mafNode *GetParent() {return NULL;};

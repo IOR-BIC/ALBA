@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:25:54 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-03-11 15:46:52 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -55,7 +55,7 @@ public:
   };
 
   /** print a dump of this object */
-  virtual void Print(std::ostream& os, const int tabs);
+  virtual void Print(std::ostream& os, const int tabs=0) const;
 
 protected:
   mafID m_MaxItemId;

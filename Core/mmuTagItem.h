@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuTagItem.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:30:11 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-03-11 15:47:20 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,7 +30,7 @@ enum MAF_TAG_IDS {MAF_MISSING_TAG=0,MAF_NUMERIC_TAG,MAF_STRING_TAG};
 
 /** an utility class for storing <key-type-array of values> information.
   an utility class for storing <key-type-array of values> information.
-  @sa mmaTagArray
+  @sa mafTagArray
 */
 class MAF_EXPORT mmuTagItem : public mmuUtility, public mafStorable
 {
@@ -52,7 +52,7 @@ public:
   bool operator==(const mmuTagItem& p) const;
   bool operator!=(const mmuTagItem& p) const;
 
-  void Print(std::ostream& os, const int indent) const;
+  virtual void Print(std::ostream& os, const int indent=0) const;
 
   /** Set/Get the name of this Tag*/
   void SetName(const char *name);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuTimeSet.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-02 00:33:04 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-03-11 15:47:50 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -111,7 +111,7 @@ public:
   void Merge(const mmuTimeSet &v);
 
   /** Merge two different time-stamps vectors*/
-  void Merge(const mmuTimeVector &v1,const mmuTimeVector &v2,mmuTimeVector &outv);
+  static void Merge(const mmuTimeVector &v1,const mmuTimeVector &v2,mmuTimeVector &outv);
 
   /** Merge a time-stamps vector into this set*/
   void Merge(const mmuTimeVector &v);
