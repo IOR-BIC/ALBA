@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:33:18 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-03-10 12:19:51 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,7 +23,7 @@ mafCxxTypeMacro(mafTransform)
 //------------------------------------------------------------------------------
 // Events
 //------------------------------------------------------------------------------
-//MFL_EVT_IMP(mafTransform::UpdateEvent); // Event rised by updates of the internal matrix
+//MAF_ID_IMP(mafTransform::UpdateEvent); // Event rised by updates of the internal matrix
 
 //----------------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ mafTransform::~mafTransform()
 mafTransform::mafTransform(const mafTransform& copy)
 //----------------------------------------------------------------------------
 {
-  m_Matrix=copy.m_Matrix;
+  *m_Matrix=*copy.m_Matrix;
   Modified();
 }
 
@@ -51,7 +51,7 @@ mafTransform::mafTransform(const mafTransform& copy)
 void mafTransform::Identity()
 //----------------------------------------------------------------------------
 {
-  m_Matrix.Identity();
+  m_Matrix->Identity();
   Modified();
 }
 
@@ -125,11 +125,11 @@ void mafTransform::Concatenate(const mafMatrix &matrix, int premultiply)
 {
   if(premultiply)
   {
-    mafMatrix::Multiply4x4(m_Matrix, matrix, m_Matrix);
+    mafMatrix::Multiply4x4(*m_Matrix, matrix, *m_Matrix);
   }
   else
   {
-    mafMatrix::Multiply4x4(matrix, m_Matrix, m_Matrix);
+    mafMatrix::Multiply4x4(matrix, *m_Matrix, *m_Matrix);
   }
   
   Modified();
@@ -174,6 +174,7 @@ void mafTransform::Translate(mafMatrix &matrix,double translation[3],int premult
   {
     mafMatrix::Multiply4x4(trans_matrix, matrix, matrix);
   }
+  matrix.Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -204,29 +205,29 @@ double mafTransform::PolarDecomp(const mafMatrix &v_M, mafMatrix &v_Q, mafMatrix
 																double translation[3])
 //----------------------------------------------------------------------------
 {
-double det;
-int i, j;
+  double det;
+  int i, j;
 
-for (i = 0; i < 3; i++)
-{
-translation[i] = v_M.GetElement(i, 3);
-}
+  for (i = 0; i < 3; i++)
+  {
+  translation[i] = v_M.GetElement(i, 3);
+  }
 
-mafTransform::HMatrix M, Q, S;
-for (i = 0; i < 3; i++)
-	for (j = 0;j < 3; j++)
-	M[i][j] = v_M.GetElement(i,j);
+  mafTransform::HMatrix M, Q, S;
+  for (i = 0; i < 3; i++)
+	  for (j = 0;j < 3; j++)
+	  M[i][j] = v_M.GetElement(i,j);
 
-	det = PolarDecomp(M, Q, S);
+	  det = PolarDecomp(M, Q, S);
 
-for (i = 0; i < 4; i++)
-	for (j = 0;j < 4; j++)
-	{
-	v_Q.SetElement(i, j, Q[i][j]);
-	v_S.SetElement(i, j, S[i][j]);
-	}
+  for (i = 0; i < 4; i++)
+	  for (j = 0;j < 4; j++)
+	  {
+	  v_Q.SetElement(i, j, Q[i][j]);
+	  v_S.SetElement(i, j, S[i][j]);
+	  }
 
-return det;
+  return det;
 }
 
 
@@ -871,9 +872,9 @@ void mafTransform::GetOrientation(const mafMatrix &in_matrix,float orientation[3
 {
   double temp[3];
   GetOrientation(in_matrix,temp);
-  orientation[0]=temp[0];
-  orientation[1]=temp[1];
-  orientation[2]=temp[2];
+  orientation[0]=(float)temp[0];
+  orientation[1]=(float)temp[1];
+  orientation[2]=(float)temp[2];
 }
 
 //----------------------------------------------------------------------------
@@ -934,9 +935,9 @@ void mafTransform::GetPosition(const mafMatrix &matrix,double position[3])
 void mafTransform::GetPosition(const mafMatrix &matrix,float position[3])
 //----------------------------------------------------------------------------
 {
-  position[0] = matrix.GetElements()[0][3];
-  position[1] = matrix.GetElements()[1][3];
-  position[2] = matrix.GetElements()[2][3];
+  position[0] = (float)matrix.GetElements()[0][3];
+  position[1] = (float)matrix.GetElements()[1][3];
+  position[2] = (float)matrix.GetElements()[2][3];
 }
 
 //----------------------------------------------------------------------------

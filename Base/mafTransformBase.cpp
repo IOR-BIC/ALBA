@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:33:19 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-03-10 12:20:32 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,6 +26,7 @@ mafCxxAbstractTypeMacro(mafTransformBase);
 mafTransformBase::mafTransformBase()
 //----------------------------------------------------------------------------
 {
+  mafNEW(m_Matrix); // dynamic allocation to allow reference counting
 #ifdef MAF_USE_VTK
   m_VTKTransform = NULL;
 #endif
@@ -35,6 +36,7 @@ mafTransformBase::mafTransformBase()
 mafTransformBase::~mafTransformBase()
 //----------------------------------------------------------------------------
 {
+  mafDEL(m_Matrix);
 #ifdef MAF_USE_VTK
   vtkDEL(m_VTKTransform);
 #endif
@@ -54,7 +56,7 @@ void mafTransformBase::Print(std::ostream& os, const int indent) const
 
   mafIndent the_indent(indent);
   os << the_indent << "Matrix:" << std::endl;
-  m_Matrix.Print(os,the_indent.GetNextIndent());
+  m_Matrix->Print(os,the_indent.GetNextIndent());
   
 }
 
@@ -79,14 +81,14 @@ inline double mafHomogeneousTransformPoint(T1 M[4][4], T2 in[3], T3 out[3])
 void mafTransformBase::InternalTransformPoint(const float in[3], float out[3])
 //------------------------------------------------------------------------
 {
-  mafHomogeneousTransformPoint(m_Matrix.GetElements(),in,out);
+  mafHomogeneousTransformPoint(m_Matrix->GetElements(),in,out);
 }
 
 //------------------------------------------------------------------------
 void mafTransformBase::InternalTransformPoint(const double in[3], double out[3])
 //------------------------------------------------------------------------
 {
-  mafHomogeneousTransformPoint(m_Matrix.GetElements(),in,out);
+  mafHomogeneousTransformPoint(m_Matrix->GetElements(),in,out);
 }
 
 //----------------------------------------------------------------------------
@@ -96,6 +98,7 @@ vtkLinearTransform *mafTransformBase::GetVTKTransform()
   if (!m_VTKTransform)
   {
     m_VTKTransform = vtkMAFToLinearTransform::New();
+    
   }
   return m_VTKTransform;
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:33:19 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-03-10 12:20:54 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -181,7 +181,7 @@ void mafTransformFrame::InternalUpdate()
 								in_fr_mat_x_in_mat);
 		}
 
-	  mafMatrix::Multiply4x4(inv_target_frame_matrix, in_fr_mat_x_in_mat, m_Matrix);
+	  mafMatrix::Multiply4x4(inv_target_frame_matrix, in_fr_mat_x_in_mat, *m_Matrix);
 
   }
   else
@@ -191,7 +191,7 @@ void mafTransformFrame::InternalUpdate()
 		{
       if (m_InputFrame)
       {
-        m_Matrix = m_InputFrame->GetMatrix();
+        *m_Matrix = m_InputFrame->GetMatrix();
       }
 			  
       // if input, inputframe, targetframe are all NULL this->Matrix is left unchanged,
@@ -203,12 +203,12 @@ void mafTransformFrame::InternalUpdate()
 
 			if (m_InputFrame == NULL)
 			{
-			  m_Matrix = inv_target_frame_matrix;
+			  *m_Matrix = inv_target_frame_matrix;
 			}
 			else
 			{
 			mafMatrix::Multiply4x4(inv_target_frame_matrix, 
-						m_InputFrame->GetMatrix(), m_Matrix);				
+						m_InputFrame->GetMatrix(), *m_Matrix);				
 			}
 
 		}

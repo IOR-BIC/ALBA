@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformBase.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:33:19 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-03-10 12:20:33 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -42,7 +42,7 @@ public:
   virtual void Print(std::ostream& os, const int indent=0) const;
 
   /** update and return internal transform matrix */
-  const mafMatrix &GetMatrix() {Update();return m_Matrix;}
+  virtual const mafMatrix &GetMatrix() {Update();return *m_Matrix;}
 
   /**
     Apply the transformation to a coordinate.  You can use the same 
@@ -121,7 +121,7 @@ public:
 #endif
 
 protected:
-  mafMatrix m_Matrix; ///< internally stored matrix.
+  mafMatrix *m_Matrix; ///< internally stored matrix.
   mafMTime m_MTime; ///< modification time
   mafMTime m_UpdateTime; ///< We need to record the time of the last update
   mafMutexLock m_UpdateMutex; ///< we also need to do mutex locking so updates don't collide.
