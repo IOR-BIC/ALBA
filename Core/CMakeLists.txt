@@ -8,6 +8,8 @@ DBG_MESSAGE("Configuring project mafCore")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
+  mafAttribute.cpp
+  mafAttribute.h
   mafCoreFactory.cpp
   mafCoreFactory.h
   mafCoreDecl.cpp
@@ -18,14 +20,16 @@ SET(PROJECT_SRCS
   mafEventSource.h
   mafNode.cpp
   mafNode.h
+  mafNodeRoot.h
+  mafNodeRoot.cpp
   mafNodeIterator.cpp
   mafNodeIterator.h
   mafObserver.cpp
   mafObserver.h
   mafObserverCallback.cpp
   mafObserverCallback.h
-  mafAttribute.cpp
-  mafAttribute.h
+  #mafVME.cpp
+  #mafVME.h
   mmaTagArray.cpp
   mmaTagArray.h
   mmuTagItem.cpp
