@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMTime.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:03:41 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-01 09:56:33 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone, inspired to vtkTimeStamp (www.vtk.org)
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,6 +15,7 @@
 #include "mafMTime.h"
 #include "mafDefines.h"
 #include "mafMutexLock.h"
+#include "mafIncludeWIN32.h"
 
 #ifdef MAF_USE_VTK
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMTime.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:03:41 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-01 09:56:33 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone, inspired to vtkTimeStamp (www.vtk.org)
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,15 +20,14 @@
 class vtkTimeStamp;
 #endif
 
-/** mafMTime - record modification timestamp
+/** mafMTime - record modification timestamp.
   mafMTime records a unique time stamp when the method Modified() is 
   called. This time is guaranteed to be monotonically increasing.
   If MAF is build with VTK compilation enabled (MAF_USE_VTK) this object
-  uses a mafMTime as counter, to have a unique time stamp against the
-  two libraries. 
-  
+  uses a vtkTimeStamp as counter to have a unique time stamp against the
+  two libraries.   
 @todo
- -fix the InterlockedIncrement - which was temporary commented out (sil)
+ - fix the InterlockedIncrement - which was temporary commented out (sil)
 */
 
 class MAF_EXPORT mafMTime : public mafBase
@@ -45,7 +44,7 @@ public:
   virtual const char *GetTypeName() {return "mafMTime";};
 
   /**
-    Set this objects time to the current time. The current time is
+    Update this object modification time. The modification time is
     just a monotonically increasing unsigned long integer. It is
     possible for this number to wrap around back to zero.
     This should only happen for processes that have been running
