@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTagItem.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:04:56 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-06 21:23:16 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -446,7 +446,7 @@ void mafTagItem::Print(std::ostream& os, const int tabs) const
 {
   mafIndent indent(tabs);
 
-  os << indent <<"Name: \"" << (m_Name?m_Name:"(NULL)") <<"\"";
+  os << indent <<"Name: \"" << (m_Name?m_Name.GetCStr():"(NULL)") <<"\"";
 
   int t=this->GetType();
   char *tstr;
@@ -475,7 +475,7 @@ void mafTagItem::Print(std::ostream& os, const int tabs) const
   {
     mafString tmp;
     GetValueAsSingleString(tmp);
-    os  << tmp;
+    os  << tmp.GetCStr();
     os  <<" NumComp: " << GetNumberOfComponents();
   }
 
