@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2005-04-01 09:46:38 $
-# Version:   $Revision: 1.17 $
+# Date:      $Date: 2005-04-05 15:09:44 $
+# Version:   $Revision: 1.18 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -138,6 +138,7 @@ IF (MAF_CAN_BUILD)
   # Testing stuff
   #-----------------------------------------------------------------------------
   IF(BUILD_TESTING)
+    FIND_PATH(MAF_DATA_ROOT "DataRoot.txt" "${MAF_SOURCE_DIR}/../mmData" "${MAF_SOURCE_DIR}/../../mmData" DOC "Test data repository")
     INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
     ENABLE_TESTING()
   

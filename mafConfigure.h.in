@@ -54,4 +54,9 @@
 #cmakedefine CMAKE_HP_PTHREADS_INIT
 #cmakedefine CMAKE_USE_WIN32_THREADS_INIT
 
+//--------------------------------------------------------------------------
+// Data root used to reach data for testing
+//--------------------------------------------------------------------------
+#cmakedefine MAF_DATA_ROOT
+
 #endif // __mafConfigure_h
