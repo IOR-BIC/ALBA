@@ -31,6 +31,7 @@ protected:
 
 mafCxxTypeMacro(mafSubjectTestClass);
 
+/** an observer test class used to test event receiption */
 class mafObserverTestClass:public mafObject, public mafObserver
 {
 public:
@@ -103,6 +104,8 @@ int main()
 
   // test priority and the event skipping
   MAF_TEST(second_observer.LastEvent.GetId()==mafSubjectTestClass::ID_DUMMY);
+  MAF_TEST(second_observer.LastEvent.GetSender()==&first_subject);
+
 
   // these two should have been skipped
   MAF_TEST(third_observer.LastEvent.GetId()!=mafSubjectTestClass::ID_DUMMY);

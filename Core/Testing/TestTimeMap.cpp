@@ -47,7 +47,7 @@ int main()
 
   // test ordering
   mafTimeStamp old_t;
-  mafTestTVector::Iterator it;
+  mafTestTVector::TimeMap::iterator it;
   for (old_t=0,it=tvector.Begin();it!=tvector.End();it++)
   {
     MAF_TEST(it->second->GetTimeStamp()==it->first);

@@ -1,43 +1,97 @@
 #include "mafNode.h"
+#include "mafNodeRoot.h"
 #include "mafNodeIterator.h"
 #include "mmaTagArray.h"
 #include "mafXMLStorage.h"
 #include "mafCoreFactory.h"
 #include <iostream>
 
+//-------------------------------------------------------------------------
 class mafTestNode: public mafNode
+//-------------------------------------------------------------------------
 {
 public:
   mafTypeMacro(mafTestNode,mafNode);
-  mafTestNode():Flag(NULL),m_ID(-1) {}
+  mafTestNode():Flag(NULL),m_Value(-1) {}
   ~mafTestNode() {if (Flag) *Flag=false;}
   bool *Flag;
-  int m_ID;
+  int m_Value;
 };
 
-mafCxxTypeMacro(mafTestNode);
+//-------------------------------------------------------------------------
+mafCxxTypeMacro(mafTestNode)
+//-------------------------------------------------------------------------
 
+//-------------------------------------------------------------------------
+/** class for testing root mafNodeRoot. */
+class mafTestRootNode: public mafNodeRoot, public mafTestNode
+//-------------------------------------------------------------------------
+{
+public:
+  mafTestRootNode() {SetId(0);}
+  mafTypeMacro(mafTestRootNode,mafTestNode);
+protected:
+  inline int InternalStore(mafStorageElement *parent);
+  inline int InternalRestore(mafStorageElement *element);
+};
+
+//-------------------------------------------------------------------------
+inline int mafTestRootNode::InternalRestore(mafStorageElement *element)
+//-------------------------------------------------------------------------
+{
+  if (mafNodeRoot::RestoreRoot(element)==MAF_OK && \
+      Superclass::InternalRestore(element)==MAF_OK)
+    return MAF_OK;
+
+  return MAF_ERROR;
+}
+
+//-------------------------------------------------------------------------
+inline int mafTestRootNode::InternalStore(mafStorageElement *parent)
+//-------------------------------------------------------------------------
+{
+  mafNodeRoot::StoreRoot(parent);
+  Superclass::InternalStore(parent);
+  return MAF_OK;
+}
+
+//-------------------------------------------------------------------------
+mafCxxTypeMacro(mafTestRootNode)
+//-------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------
+/** class for testing reparenting. */
 class mafNodeB: public mafNode
+//-------------------------------------------------------------------------
 {
 public:
   mafTypeMacro(mafNodeB,mafNode);
   bool CanReparentTo(mafNode *parent) {return Superclass::CanReparentTo(parent)&&parent->IsA(mafNodeB::GetStaticTypeId());}
 };
 
-mafCxxTypeMacro(mafNodeB);
+//-------------------------------------------------------------------------
+mafCxxTypeMacro(mafNodeB)
+//-------------------------------------------------------------------------
 
+//-------------------------------------------------------------------------
+/** class for testing reparenting. */
 class mafNodeA: public mafNode
+//-------------------------------------------------------------------------
 {
 public:
   mafTypeMacro(mafNodeA,mafNode);
   bool CanReparentTo(mafNode *parent) {return Superclass::CanReparentTo(parent)&&!parent->IsA(mafNodeB::GetStaticTypeId());}
 };
 
+//-------------------------------------------------------------------------
 mafCxxTypeMacro(mafNodeA);
+//-------------------------------------------------------------------------
 
+//-------------------------------------------------------------------------
 int main()
+//-------------------------------------------------------------------------
 {
-  mafSmartPointer<mafTestNode> root;
+  mafSmartPointer<mafTestRootNode> root;
   mafSmartPointer<mafTestNode> first_node;
   mafTestNode *first_ptr=first_node;
   mafSmartPointer<mafTestNode> second_node;
@@ -110,11 +164,13 @@ int main()
   {
     for (node=(mafTestNode *)root;node;)
     {
-      if (node->m_ID < 0)
+      if (node->m_Value < 0)
       {
-        node->m_ID = seq[i];
+        node->m_Value = seq[i];
+        node->SetName(mafString(node->m_Value));
         break;
-      }      else
+      }
+      else
       {
         if (node->GetNumberOfChildren()==0)
         {
@@ -123,7 +179,7 @@ int main()
             node->AddChild(mafTestNode::New());
         }
 
-        int value=node->m_ID;
+        int value=node->m_Value;
         if (value>=seq[i])
         {          
           node=(mafTestNode *)node->GetFirstChild();
@@ -153,16 +209,16 @@ int main()
   int j=0;
   for (node=(mafTestNode *)iter->GetFirstNode();node;node=(mafTestNode *)iter->GetNextNode())
   {
-    if (node->m_ID>=0)
+    if (node->m_Value>=0)
     {
-      vect[j]=node->m_ID;
+      vect[j]=node->m_Value;
       MAF_TEST(vect[j]==preorder[j]);
       j++;
     }
   }
 
   //
-  // PreOrder Traverse
+  // PreOrder Reverse Traverse
   //
   std::cerr<<"Testing mafNodeIterator PreOrder Traverse in Reverse\n";
   iter->SetTraversalModeToPreOrder();
@@ -172,16 +228,16 @@ int main()
   j=0;
   for (node=(mafTestNode *)iter->GetLastNode();node;node=(mafTestNode *)iter->GetPreviousNode())
   {
-    if (node->m_ID>=0)
+    if (node->m_Value>=0)
     {
-      vect[j]=node->m_ID;
+      vect[j]=node->m_Value;
       MAF_TEST(vect[j]==preorderrev[j]);
       j++;
     }
   }
-
+  
   //
-  // PostOrder Traverse Reverse
+  // PostOrder Reverse Traverse
   //
   std::cerr<<"Testing mafNodeIterator PostOrder Traverse in Reverse\n";
   iter->SetTraversalModeToPostOrder();
@@ -191,9 +247,9 @@ int main()
   j=0;
   for (node=(mafTestNode *)iter->GetLastNode();node;node=(mafTestNode *)iter->GetPreviousNode())
   {
-    if (node->m_ID>=0)
+    if (node->m_Value>=0)
     {
-      vect[j]=node->m_ID;
+      vect[j]=node->m_Value;
       MAF_TEST(vect[j]==postorderrev[j]);
       j++;
     }
@@ -210,22 +266,71 @@ int main()
   j=0;
   for (node=(mafTestNode *)iter->GetFirstNode();node;node=(mafTestNode *)iter->GetNextNode())
   {
-    if (node->m_ID>=0)
+    if (node->m_Value>=0)
     {
-      vect[j]=node->m_ID;
+      vect[j]=node->m_Value;
       MAF_TEST(vect[j]==postorder[j]);
       j++;
     }
   }
+
+  // find nodes by name
+  mafNode *node1=root->FindInTreeByName("5");
+  mafNode *node2=root->FindInTreeByName("7");
+  mafNode *node3=root->FindInTreeByName("2");
+
+  MAF_TEST(node1);
+  MAF_TEST(node2);
+  MAF_TEST(node3);
+
+  // a node to test detach from tree
+  mafSmartPointer<mafTestNode> test_node;
+  test_node->SetName("test_node");
+  node2->AddChild(test_node);
+
+  // set some links in the tree
+  node1->SetLink("link1",node2);
+  node1->SetLink("link2",node3);
+  node1->SetLink("link3",test_node);
+
+  MAF_TEST(node1->GetLink("link1")==node2);
+  MAF_TEST(node1->GetLink("link2")==node3);
+  MAF_TEST(node1->GetLink("link3")==test_node.GetPointer());
+
+  // test detaching from tree
+  test_node->ReparentTo(NULL);
+  MAF_TEST(node1->GetLink("link3")==NULL);
   
+  // test attaching to another tree
+  test_node->ReparentTo(rootB);
+  MAF_TEST(node1->GetLink("link3")==NULL);
+
+  // test attaching to tree
+  test_node->ReparentTo(node3);
+  MAF_TEST(node1->GetLink("link3")==test_node.GetPointer());
+  
+  // add some tags
   root->GetTagArray()->SetTag(mmuTagItem("NumericTag",10.5));
   root->GetTagArray()->SetTag(mmuTagItem("StringTag","Donald"));
+  node3->GetTagArray()->SetTag(mmuTagItem("TestTag","test value"));
+  node2->GetTagArray()->SetTag(mmuTagItem("TestTag","second value"));
 
+  // test finding by TAG
+  mafNode *tagged_node=root->FindInTreeByTag("TestTag","test value");
+  MAF_TEST(tagged_node==node3);
+
+  // test tree copy
+  mafNode *root_copy=root->MakeCopy();
+  root_copy->IsA(mafTestRootNode::GetStaticTypeId());
+
+  MAF_TEST(root->Equals(root_copy));
+
+  // plug nodes to factory for being able to restore
   mafCoreFactory::Initialize();
   mafPlugObject<mafTestNode>("Test Node");
   mafPlugObject<mmaTagArray>("Test Node");
 
-  // test TagArray storing/restoring...
+  // test storing/restoring...
   mafXMLStorage storage;
   storage.SetURL("testNode.xml");
   storage.SetFileType("MSF");
@@ -241,13 +346,29 @@ int main()
   restore.SetFileType("MSF");
   restore.SetVersion("2.0");
   
-  mafSmartPointer<mafTestNode> new_root;
+  mafSmartPointer<mafTestRootNode> new_root;
   restore.SetRoot(new_root);
   ret=restore.Restore();
 
   MAF_TEST(ret==MAF_OK);
 
+  // initialized the tree to resolve links
+  ret=new_root->Initialize();
+
+  MAF_TEST(ret==MAF_OK);
+
   MAF_TEST(new_root->CompareTree(root));
+
+  // test restored links
+  mafNode *new_node1=new_root->FindInTreeByName("5");
+  MAF_TEST(new_node1);
+
+  mafNode *new_node2=new_node1->GetLink("link1");
+  mafNode *new_node3=new_node1->GetLink("link2");
+  mafNode *new_test_node=new_node1->GetLink("link3");
+  MAF_TEST(mafCString("7")==new_node2->GetName());
+  MAF_TEST(mafCString("2")==new_node3->GetName());
+  MAF_TEST(mafCString("test_node")==new_test_node->GetName())
 
   std::cerr<<"Test completed successfully!"<<std::endl;
 
