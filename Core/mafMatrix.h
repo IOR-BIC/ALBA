@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-30 14:16:59 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-01-10 00:13:33 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,7 +13,7 @@
 #ifndef __mafMatrix_h
 #define __mafMatrix_h
 
-#include "mafSmartObject.h"
+#include "mafReferenceCounted.h"
 #include "mafMTime.h"
 
 #ifdef MAF_USE_VTK
@@ -30,17 +30,17 @@ typedef double (*mafMatrixElements)[4];
 /** mafMatrix - Time stamped 4x4 Matrix.
   This class defines a TimeStamped 4x4 Matrix class. If MAF has been compiled
   with VTK support, this class can be used whereever a vtkMatrix4x4 is requested, 
-  and indeed the internal representation is a vtkMatrix4x4. Also GetVTKMatrix() explicitelly
+  and indeed the internal representation is a vtkMatrix4x4. Also GetVTKMatrix() explicitly
   return a vtkMatrix4x4 pointer.
   Also mafMatrix can reference a vtkMatrix4x4, i.e. register it and share the
   same Elements vector, with SetVTKMatrix.
-  @sa mafSmartObject vtkMatrix4x4
+  @sa mafReferenceCounted vtkMatrix4x4
 */
-class MAF_EXPORT mafMatrix : public mafSmartObject
+class MAF_EXPORT mafMatrix : public mafReferenceCounted
 {
 public:
-  mafTypeMacro(mafMatrix,mafSmartObject);
-  virtual void Print (std::ostream& os, const int indent=0) const;
+  mafTypeMacro(mafMatrix,mafReferenceCounted);
+  virtual void Print(std::ostream& os, const int indent=0) const;
 
   mafMatrix();
   virtual ~mafMatrix();

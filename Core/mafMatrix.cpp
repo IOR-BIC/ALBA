@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-30 14:16:59 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-01-10 00:13:33 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -139,7 +139,8 @@ void mafMatrix::Print (std::ostream& os, const int indent) const
   mafIndent next_indent = the_indent.GetNextIndent();
 
   int i, j;
-
+  
+  os << the_indent << "TimeStamp: " << m_TimeStamp << std::endl;
   os << the_indent << "Elements:\n";
   for (i = 0; i < 4; i++) 
   {
@@ -148,7 +149,7 @@ void mafMatrix::Print (std::ostream& os, const int indent) const
     {
       os << GetElements()[i][j] << " ";
     }
-    os << "\n";
+    os << std::endl;
   }
 }
 
