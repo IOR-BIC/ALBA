@@ -2,8 +2,7 @@ PROJECT (Gui_TEST)
 
 LINK_LIBRARIES(mafGui)
 
-ADD_EXECUTABLE(mmgGuiTest mafGuiTest.cpp)
-ADD_TEST(mmgGuiTest mafStringTest)
+SUBDIRS(Minimal)
 
 # wxWidgets specific classes
 IF (MAF_USE_WX)
