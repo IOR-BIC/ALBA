@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-28 15:25:02 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-03-10 12:03:58 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,7 +30,7 @@
 // Typedefs
 //------------------------------------------------------------------------------
 typedef double mafTimeStamp; ///< type for time varying data timestamps (not for pipelines timestamps!)
-typedef unsigned long mafID; ///< type for IDs inside MAF @todo to be changed to support 64bit IDs
+typedef long mafID; ///< type for IDs inside MAF @todo to be changed to support 64bit IDs
 typedef std::type_info mafTypeID; ///< type for mafObject's class type IDs
 
 //------------------------------------------------------------------------------
@@ -82,15 +82,25 @@ void mafMessage(const char *format, ...);
   in the class definition public section. */
 #define mafAbstractTypeMacro(thisClass,superclass) \
   public: \
+  /** commodity type representing the parent class type */ \
   typedef superclass Superclass; \
+  /** return the class type id for this class type (static function) */ \
   static const mafTypeID &GetStaticTypeId(); \
+  /** return the class type id for this mafObject instance */ \
   virtual const mafTypeID &GetTypeId() const; \
+  /** Return the name of this type (static function) */ \
   static const char *GetStaticTypeName(); \
+  /** Return the class name of this instance */ \
   virtual const char *GetTypeName() const; \
+  /** This is used by IsA to check the class name */ \
   static bool IsStaticType(const char *type); \
+  /** This is used by IsA to check the class type id */ \
   static bool IsStaticType(const mafTypeID &type); \
+  /** Check the class name of this instance */ \
   virtual bool IsA(const char *type) const; \
+  /** Check the type id of this instance */ \
   virtual bool IsA(const mafTypeID &type) const; \
+  /** Cast with dynamic type checking. This is used for casting from a (mafObject *) */ \
   static thisClass* SafeDownCast(mafObject *o);
 
 /**
@@ -98,12 +108,17 @@ void mafMessage(const char *format, ...);
   in the class definition public section. */
 #define mafTypeMacro(thisClass,superclass) \
   mafAbstractTypeMacro(thisClass,superclass); \
+  /** return a new instance of the given type (static function) */  \
   static mafObject *NewObject(); \
+  /** return a new instance of the mafObject instance */ \
   virtual mafObject *NewObjectInstance() const; \
+  /** return a typed new instance of a given object (this calls NewObject and casts) */ \
   thisClass *NewInstance() const; \
+  /** return a new instance of the this class type (static function). It can be called with "object_type::New()"  \
+      Also this function must be used for creating objects to be used with reference counting in place of the new() \
+      operator. */ \
   static thisClass *New();
   
-
 /**
   Macro used by mafObjects for RTTI information. This macor must be placed
   in the .cpp file. */
@@ -164,14 +179,8 @@ void mafMessage(const char *format, ...);
 #define mafGetEventGroupId(event,baseID) (event->GetID()-baseID)
 #define mafEvalGroupId(baseClass,id) (baseClass::BaseID+id)
 
-/** Macro used to define Set/GetListener() member functions and a Listener member variable */
-#define mafListenerMacro \
-  public: \
-  void SetListener(mafObserver *observer) { m_Listener=observer;} \
-  mafObserver *GetListener() { return m_Listener;}
-  
 /** mafEventMacro is an handy shortcut to send an Event. */
-#define mafObserverMacro(e)  if (m_Observer) {m_Observer->OnEvent(e);}
+#define mafEventMacro(e)  if (m_Listener) {m_Listener->OnEvent(e);}
   
 /** Helper macro used for testing */  
 #define MAF_TEST(a) if (!(a)) \
