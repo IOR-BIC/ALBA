@@ -29,6 +29,8 @@ mafMatrixPipe.cpp
 mafMatrixPipe.h
 mafNode.cpp
 mafNode.h
+mafNodeFactory.h
+mafNodeFactory.cpp
 mafNodeIterator.cpp
 mafNodeIterator.h
 mafNodeRoot.cpp
