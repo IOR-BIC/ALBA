@@ -12,12 +12,19 @@ int main()
   MAF_TEST(hello.Length()==11);
   
   mafString italy = " and Italy";
-  mafString tmp = hello + italy;
   
+  mafString tmp;
+  tmp << hello << italy;
+
   MAF_TEST(tmp=="Hello World and Italy");
   MAF_TEST(tmp.EndsWith("Italy"));
   MAF_TEST(tmp.StartsWith("Hello"));
   MAF_TEST(tmp.FindFirst("and")==12);
+
+  mafString tmp2 = "Ciao";
+  tmp2 << " Bel" << " Mondo!";
+
+  MAF_TEST(tmp2 == "Ciao Bel Mondo!");
   
   mafString copy=tmp;
 
