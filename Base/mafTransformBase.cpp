@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 15:50:00 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-03-23 18:04:42 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,8 +15,10 @@
 #include "mafIndent.h"
 #include "mafMatrix.h"
 
-#include "vtkPoints.h"
-#include "vtkMAFToLinearTransform.h"
+//#include "vtkPoints.h" //SIL. 23-3-2005: 
+#ifdef MAF_USE_VTK
+  #include "vtkMAFToLinearTransform.h"
+#endif
 
 #include <ostream>
 
@@ -92,6 +94,7 @@ void mafTransformBase::InternalTransformPoint(const double in[3], double out[3])
   mafHomogeneousTransformPoint(m_Matrix->GetElements(),in,out);
 }
 
+#ifdef MAF_USE_VTK
 //----------------------------------------------------------------------------
 vtkLinearTransform *mafTransformBase::GetVTKTransform()
 //----------------------------------------------------------------------------
@@ -103,6 +106,7 @@ vtkLinearTransform *mafTransformBase::GetVTKTransform()
   }
   return m_VTKTransform;
 }
+#endif
 
 //----------------------------------------------------------------------------
 void mafTransformBase::Update()
