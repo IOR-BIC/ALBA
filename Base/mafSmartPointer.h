@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSmartPointer.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:33:18 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-02-28 15:26:47 $
+  Version:   $Revision: 1.3 $
   Authors:   based on vtkSmartPointer (www.vtk.org), rewritten by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -44,6 +44,8 @@ public:
     object.*/
   mafAutoPointer& operator=(T* r);
   mafAutoPointer& operator=(const mafAutoPointer<T>& r);
+
+  bool operator==(const mafAutoPointer<T>& r) const {return r.m_Object==m_Object;}
   
   /** Get the contained pointer. */
   T* GetPointer() const {return m_Object;}
