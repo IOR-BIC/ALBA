@@ -2,11 +2,11 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-17 00:42:00 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-02-20 23:26:28 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
-  Copyright (c) 2002/2004 
+  Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 #ifndef __mafNode_h
@@ -17,9 +17,10 @@
 #include "mafSmartPointer.h"
 #include "mafEventSource.h"
 #include "mafObserver.h"
+#include "mmuTagItem.h"
 #include "mafString.h"
 #include "mafMTime.h"
-#include "mmaTagArray.h"
+#include "mafDecl.h"
 #include <vector>
 #include <map>
 #include <string>
@@ -29,7 +30,8 @@
 //----------------------------------------------------------------------------
 class mafNodeIterator;
 class mafAttribute;
-//class mmaTagArray;
+class mmaTagArray;
+class mmgGui;
 
 //----------------------------------------------------------------------------
 // mafNode
@@ -59,32 +61,25 @@ class mafAttribute;
   A tree can be initialized by calling Initialize() of its root, and deinitialized by means of Shutdown(). When
   attaching a node to an initialised tree the node is automatically initialized.
   @todo
-  - testing
   - events invoking
-  - implement the Store/Restore
-  - add the attributes and the TagArray
+  - add storing of Id and Links
+  - test Links and Id
+  - test FindInTree* functions
+  - test node events (attach/detach from tree, destroy)
+  - test DeepCopy()
 
   @sa mafRootNode
 */
 class MAF_EXPORT mafNode : public mafReferenceCounted, public mafStorable, public mafObserver
 {
 public:
-  //------------------------------------------------------------------------------
-  // Events
-  //------------------------------------------------------------------------------
-  /** @ingroup Events */
-  /** @{ */
-  //MAF_ID_DEC(MAF_CH_DOWNTREE) ///< Channel used broadcast an event down in the tree
-  //MAF_ID_DEC(MAF_CH_UPTREE) ///< Channel used issue an event up in the tree
-  /** @} */
-
   mafAbstractTypeMacro(mafNode,mafReferenceCounted);
 
-  // the base class cannot be instantiated, and thus copied
-  virtual mafObject *NewInternalInstance() {return NULL;}
+  /** defined to allow MakeCopy implementation. For the base class return a NULL pointer. */
+  virtual mafObject *NewObjectInstance() {return NULL;}
 
-  // Interface for creating a copy of the node (works only for concrete subclasses)
-  mafNode *NewInstance() {return SafeDownCast(NewInternalInstance());}
+  /** Interface to allow creation of a copy of the node (works only for concrete subclasses) */
+  mafNode *NewInstance() {return SafeDownCast(NewObjectInstance());}
   
   /** print a dump of this object */
   void Print(std::ostream& os, const int tabs);
@@ -160,12 +155,17 @@ public:
   /** Remove a child node*/
   virtual void RemoveChild(const mafID idx);
   /** Remove a child node*/
-  virtual void RemoveChild(mafNode *node) {RemoveChild(FindNodeIdx(node));};
+  virtual void RemoveChild(mafNode *node);
 
   /**
     Find a child given its pointer and return its index. Return -1 in
     case of not found or failure.*/
   int FindNodeIdx(mafNode *a);
+
+  /**
+    Find a child index given its name. Search is performed only on first level childe not
+    in the substree. Return -1 in case of not found or failure.*/
+  int FindNodeIdx(const char *name);
 
   /**
   Find a node in all the subtrees matching the given TagName/TagValue pair.*/
@@ -270,7 +270,7 @@ public:
     modified by means of nodes APIs */
   const mafChildrenVector *GetChildren() {return &m_Children;}
 
-  typedef std::map<std::string,mafAutoPointer<mafAttribute> > mafAttributesMap;
+  typedef std::map<mafString,mafAutoPointer<mafAttribute> > mafAttributesMap;
 
   /** 
     return the list of attributes. Attributes vector can be manipulated
@@ -291,12 +291,50 @@ public:
     customized classes should be created, inheriting from mafAttribute
     (e.g. @sa mmaMaterial). */
   mmaTagArray  *GetTagArray();
+
+  typedef std::map<mafString,mafNode *> mafLinksMap;
+
+  /** 
+    return the value of a link to another node in the tree. If no link with
+    such a name exists return NULL. */
+  mafNode *GetLink(const char *name);
+
+  /** set a link to another node in the tree */
+  void SetLink(const char *name, mafNode *node);
+
+  /** remove a link */
+  void RemoveLink(const char *name);
+  
+  /** return links array: links from this node to other arrays */
+  const mafLinksMap &GetLinks() {return m_Links;}
+
+  /** create and return the GUI for changing the node parameters */
+  mmgGui *GetGui();
+
+  /** used to send an event up in the tree */
+  void ForwardUpEvent(mafEventBase *event);
+  void ForwardUpEvent(mafEventBase &event);
+
+  /** used to send an event down in the tree */
+  void ForwardDownEvent(mafEventBase *event);
+  void ForwardDownEvent(mafEventBase &event);
+
+  /** IDs for the GUI */
+  enum 
+  {
+    ID_FIRST = MINID,
+    ID_LAST
+  };
+
 protected:
   mafNode();
   virtual ~mafNode();
 
-  virtual int InternalStore(mafStorageElement *parent) {return MAF_OK;}
-  virtual int InternalRestore(mafStorageElement *node) {return MAF_OK;}
+  /** internally used to set the node ID */
+  void SetId(mafID id);
+
+  virtual int InternalStore(mafStorageElement *parent);
+  virtual int InternalRestore(mafStorageElement *node);
 
   //This function is overridden by subclasses to perform custom initialization */
   virtual int InternalInitialize() {return 0;};
@@ -309,12 +347,25 @@ protected:
     to allow subclasses to implement selective reparenting.*/
   virtual int SetParent(mafNode *parent);
 
-  mafChildrenVector m_Children;  ///< list of children
+  /**
+    Internally used to create a new instance of the GUI. This function should be
+    overridden by subclasses to create specialized GUIs. Each subclass should append
+    its own widgets and define the enum of IDs for the widgets as an extension of
+    the superclass enum. The last id value must be defined as "LAST_ID" to allow the 
+    subclass to continue the ID enumeration from it. For appending the widgets in the
+    same pannel GUI, each CreateGUI() function should first call the superclass' one.*/
+  virtual mmgGui    *CreateGUI();
+
+  mmgGui            *m_GUI;       ///< pointer to the node GUI
+
+  mafChildrenVector m_Children;   ///< list of children
   mafNode           *m_Parent;    ///< parent node
 
-  mafAttributesMap  m_Attributes;///< vector of attached attributes
+  mafAttributesMap  m_Attributes; ///< attributes attached to this node
 
-  std::string       m_Name;       ///< name of this node
+  mafLinksMap       m_Links;      ///< links to other nodes in the tree
+
+  mafString         m_Name;       ///< name of this node
   mafMTime          m_MTime;      ///< Last modification time
 
   mafID             m_Id;         ///< ID of this node

@@ -2,11 +2,11 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-01-13 09:10:36 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-02-20 23:26:28 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
-  Copyright (c) 2002/2004 
+  Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 #ifndef __mafNode_cxx
@@ -14,17 +14,14 @@
 
 #include "mafNode.h"
 #include "mafNodeIterator.h"
+#include "mafNodeRoot.h"
+#include "mafEventBase.h"
+#include "mafDecl.h"
 #include "mafIndent.h"
+#include "mafStorageElement.h"
 #include "mmaTagArray.h"
 #include <sstream>
 #include <assert.h>
-
-//------------------------------------------------------------------------------
-// Events
-//------------------------------------------------------------------------------
-//MAF_ID_DEC(mafNode::MAF_CH_DOWNTREE)
-//MAF_ID_DEC(mafNode::MAF_CH_UPTREE)
-//-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
 mafCxxAbstractTypeMacro(mafNode)
@@ -37,7 +34,7 @@ mafNode::mafNode()
   m_Parent              = NULL;
   m_Initialized         = false;
   m_VisibleToTraverse   = true;
-  m_Id                  = 0; // root ID
+  m_Id                  = -1; // invalid ID
 }
 
 //-------------------------------------------------------------------------
@@ -50,6 +47,13 @@ mafNode::~mafNode()
   SetParent(NULL);
 }
 
+//------------------------------------------------------------------------------
+void mafNode::SetId(mafID id)
+//------------------------------------------------------------------------------
+{
+  m_Id=id;
+  Modified();
+}
 //------------------------------------------------------------------------------
 int mafNode::Initialize()
 //------------------------------------------------------------------------------
@@ -79,10 +83,68 @@ void mafNode::Shutdown()
 }
 
 //-------------------------------------------------------------------------
+mmgGui *mafNode::GetGui()
+//-------------------------------------------------------------------------
+{
+  if (m_GUI==NULL)
+    CreateGUI();
+
+  return m_GUI;
+}
+//-------------------------------------------------------------------------
+mmgGui* mafNode::CreateGUI()
+//-------------------------------------------------------------------------
+{
+//#ifdef MAF_BUILD_GUI
+//  m_GUI = new mmgGUI(this);
+//    
+//#endif
+  return m_GUI;
+}
+
+//-------------------------------------------------------------------------
+void mafNode::ForwardUpEvent(mafEventBase &event)
+//-------------------------------------------------------------------------
+{
+  ForwardUpEvent(&event);
+}
+
+//-------------------------------------------------------------------------
+void mafNode::ForwardUpEvent(mafEventBase *event)
+//-------------------------------------------------------------------------
+{
+  if (m_Parent)
+  {
+    event->SetChannel(MCH_UP);
+    m_Parent->OnEvent(event);
+  }
+}
+//-------------------------------------------------------------------------
+void mafNode::ForwardDownEvent(mafEventBase &event)
+//-------------------------------------------------------------------------
+{
+  ForwardDownEvent(&event);
+}
+
+//-------------------------------------------------------------------------
+void mafNode::ForwardDownEvent(mafEventBase *event)
+//-------------------------------------------------------------------------
+{
+  if (GetNumberOfChildren()>0)
+  {
+    event->SetChannel(MCH_DOWN);
+    for (int i=0;i<GetNumberOfChildren();i++)
+    {
+      mafNode *child=m_Children[i];
+      child->OnEvent(event);
+    }
+  }
+}
+//-------------------------------------------------------------------------
 const char *mafNode::GetName()
 //-------------------------------------------------------------------------
 {
-  return m_Name.c_str();
+  return m_Name;
 }
 
 //-------------------------------------------------------------------------
@@ -165,6 +227,13 @@ int mafNode::AddChild(mafNode *node)
 }  
 
 //-------------------------------------------------------------------------
+void mafNode::RemoveChild(mafNode *node)
+//-------------------------------------------------------------------------
+{
+  RemoveChild(FindNodeIdx(node));
+}
+
+//-------------------------------------------------------------------------
 void mafNode::RemoveChild(const mafID idx)
 //-------------------------------------------------------------------------
 {  
@@ -226,7 +295,24 @@ int mafNode::ReparentTo(mafNode *newparent)
 
       // remove self registration
       UnRegister(this);
+
+      if (newparent)
+      {
+        mafNodeRoot *oldroot=oldparent?mafNodeRoot::SafeDownCast(oldparent->GetRoot()):NULL;       
+        mafNodeRoot *newroot=newparent?mafNodeRoot::SafeDownCast(newparent->GetRoot()):NULL;
+        
+        if (oldroot!=newroot)
+        {
+          if (newroot)
+          {
+            SetId(newroot->GetNextNodeId());
+
+            return MAF_OK;
+          }
+        }
+      }
       
+      SetId(-1);
     }
     
     return MAF_OK;
@@ -318,14 +404,14 @@ int mafNode::SetParent(mafNode *parent)
       m_Parent=parent_node;
 
       // TODO: reimplement with new events
-      /*if (parent_node==NULL)
+      if (parent_node==NULL)
       {
-        this->InvokeEvent(mafNode::DetachFromTreeEvent,this);
+        ForwardUpEvent(mafEventBase(this,NODE_DETACHED_FROM_TREE));
       }
       else
       {
-        this->InvokeEvent(mafNode::AttachToTreeEvent,this);
-      }*/
+        ForwardUpEvent(mafEventBase(this,NODE_ATTACHED_TO_TREE));
+      }
       Modified();
       return MAF_OK;
     }
@@ -362,22 +448,19 @@ mafNode *mafNode::MakeCopy(mafNode *a)
 int mafNode::DeepCopy(mafNode *a)
 //-------------------------------------------------------------------------
 {  
+  assert(a);
   if (this->CanCopy(a))
   {
-    // Copy arrays.
-    /*
-		if (this->TagArray)
-			this->TagArray->DeepCopy(a->GetTagArray());
-
-    this->DataArray->DeepCopy(a->GetDataArray());
-
-    this->MatrixVector->DeepCopy(a->MatrixVector);
-
-    this->SetMatrixPipe(a->GetMatrixPipe()?a->GetMatrixPipe()->MakeACopy():NULL);
-    this->SetDataPipe(a->GetDataPipe()?a->GetDataPipe()->MakeACopy():NULL);
+    // Copy attributes
+    m_Attributes.clear();
+    for (mafAttributesMap::iterator it=a->m_Attributes.begin();it!=a->m_Attributes.end();it++)
+    {
+      mafAttribute *attr=it->second;
+      assert(attr);
+      m_Attributes[attr->GetName()]=attr->MakeCopy();
+    }
     
-    */
-    // attributes
+    // member variables
     SetName(a->GetName());
 
     return MAF_OK;
@@ -490,10 +573,133 @@ mmaTagArray  *mafNode::GetTagArray()
 }
 
 //-------------------------------------------------------------------------
+mafNode *mafNode::GetLink(const char *name)
+//-------------------------------------------------------------------------
+{
+  assert(name);
+  mafLinksMap::iterator it=m_Links.find(mafString().Set(name));
+  return it!=m_Links.end()?it->second:NULL;
+}
+//-------------------------------------------------------------------------
+void mafNode::SetLink(const char *name, mafNode *node)
+//-------------------------------------------------------------------------
+{
+  assert(name);
+  assert(node);
+  assert(node->GetRoot()==GetRoot());
+  if (node->GetRoot()==GetRoot())
+  {
+    mafLinksMap::iterator it=m_Links.find(mafString().Set(name));
+
+    if (it!=m_Links.end())
+    {
+      // if already linked simply return
+      if (it->second==node)
+        return;
+
+      // detach old linked node
+      it->second->GetEventSource().RemoveObserver(this);
+  
+    }
+
+    // set the link to the new node
+    m_Links[name]=node;
+    node->GetEventSource().AddObserver(this);    
+  }
+  else
+  { 
+    mafErrorMacro("Canbnot link to nodes outside of the tree.")
+  }
+  
+}
+//-------------------------------------------------------------------------
+void mafNode::RemoveLink(const char *name)
+//-------------------------------------------------------------------------
+{
+  assert(name);
+  mafLinksMap::iterator it=m_Links.find(mafString().Set(name));
+  if (it!=m_Links.end())
+    m_Links.erase(it);
+}
+//-------------------------------------------------------------------------
 void mafNode::OnEvent(mafEventBase *e)
 //-------------------------------------------------------------------------
 {
-  // default behavior is to send event to parent or to children depending on 
+  // default behavior is to send event to parent or to children depending on channel
+}
+
+//-------------------------------------------------------------------------
+int mafNode::InternalStore(mafStorageElement *parent)
+//-------------------------------------------------------------------------
+{
+  parent->SetAttribute("Name",m_Name);
+  parent->SetAttribute("Id",mafString(m_Id));
+
+  // store attributes into a tmp array
+  std::vector<mafObject *> attrs;
+  for (mafAttributesMap::iterator it=m_Attributes.begin();it!=m_Attributes.end();it++)
+  {
+    attrs.push_back(it->second);
+  }
+  parent->StoreObjectVector(attrs,"Attributes");
+
+  // store the visible children into a tmp array
+  std::vector<mafObject *> nodes_to_store;
+  for (int i=0;i<GetNumberOfChildren();i++)
+  {
+    mafNode *node=GetChild(i);
+    if (node->IsVisible())
+    {
+      nodes_to_store.push_back(node);
+    }
+  }
+  parent->StoreObjectVector(nodes_to_store,"Children","Node");
+  return MAF_OK;
+}
+
+//-------------------------------------------------------------------------
+int mafNode::InternalRestore(mafStorageElement *node)
+//-------------------------------------------------------------------------
+{
+  if (node->GetAttribute("Name",m_Name))
+  {
+    mafString id;
+    if (node->GetAttribute("Id",id))
+    {
+      SetId(atof(id));
+      std::vector<mafObject *> attrs;
+      if (node->RestoreObjectVector(attrs,"Attributes")==MAF_OK)
+      {
+        for (int i=0;i<attrs.size();i++)
+        {
+          mafAttribute *item=mafAttribute::SafeDownCast(attrs[i]);
+          assert(item);
+          if (item)
+          {
+            m_Attributes[item->GetName()]=item;
+          }
+        }
+
+        std::vector<mafObject *> children;
+        if (node->RestoreObjectVector(children,"Children","Node")==MAF_OK)
+        {
+          for (int i=0;i<children.size();i++)
+          {
+            mafNode *node=mafNode::SafeDownCast(children[i]);
+            assert(node);
+            if (node)
+            {
+              AddChild(node);
+            }
+          }
+
+          return MAF_OK;
+        }
+      }
+    }
+  }
+
+  return MAF_ERROR;
 }
 
 //-------------------------------------------------------------------------
