@@ -10,8 +10,6 @@ DBG_MESSAGE("Configuring project mafCore")
 SET(PROJECT_SRCS
 #mafOp.cpp
 #mafOp.h
-#mafView.cpp
-#mafView.h
 #mafViewManager.cpp
 #mafViewManager.h
 mafAbsMatrixPipe.cpp
@@ -59,6 +57,8 @@ mafVMEOutputNULL.cpp
 mafVMEOutputNULL.h
 mafVMERoot.cpp
 mafVMERoot.h
+mafView.cpp
+mafView.h
 mmuTimeSet.cpp
 mmuTimeSet.h
 )
