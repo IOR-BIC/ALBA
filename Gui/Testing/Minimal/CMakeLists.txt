@@ -1,17 +1,17 @@
 # il project name deve finire con test
-PROJECT (MinimalTest)
+PROJECT (testMinimalWX)
 
-SET(MinimalTest_SRCS 
-MinimalTest.cpp
+SET(testMinimalWX_SRCS 
+testMinimalWX.cpp
 )
 
 
 # copia icona e file delle risorse nella Build
-#CONFIGURE_FILE( ${MinimalTest_SOURCE_DIR}/app.rc.in ${MinimalTest_BINARY_DIR}/app.rc IMMEDIATE)
-#CONFIGURE_FILE( ${MinimalTest_SOURCE_DIR}/app.ico   ${MinimalTest_BINARY_DIR}/app.ico COPYONLY)
+#CONFIGURE_FILE( ${testMinimalWX_SOURCE_DIR}/app.rc.in ${testMinimalWX_BINARY_DIR}/app.rc IMMEDIATE)
+#CONFIGURE_FILE( ${testMinimalWX_SOURCE_DIR}/app.ico   ${testMinimalWX_BINARY_DIR}/app.ico COPYONLY)
 
 IF (WIN32)
-  ADD_EXECUTABLE(MinimalTest WIN32 ${MinimalTest_SRCS} ${MinimalTest_SOURCE_DIR}/app.rc)
+  ADD_EXECUTABLE(testMinimalWX WIN32 ${testMinimalWX_SRCS} ${testMinimalWX_SOURCE_DIR}/app.rc)
 ELSE (WIN32)
-  ADD_EXECUTABLE(MinimalTest ${MinimalTest_SRCS} )
+  ADD_EXECUTABLE(testMinimalWX ${testMinimalWX_SRCS} )
 ENDIF (WIN32)

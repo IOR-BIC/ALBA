@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-04 12:18:53 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-12-30 14:16:58 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -109,7 +109,7 @@ void mafEvent::Log()
   if(m_matrix)  s << " Matrix= "  << (long)Matrix.GetPointer();
   if(m_matrix2) s << " Matrix= "  << (long)Matrix2.GetPointer();
   if(m_uiev)    s << " UIEvent= " << (long)UIEvent;
-  //if(m_vtkobj)  s << " VtkObj= "  << (long)VtkObj.GetPointer() << " : " << m_vtkobj->GetClassName();
+  //if(m_vtkobj)  s << " VtkObj= "  << (long)VtkObj.GetPointer() << " : " << m_vtkobj->GetTypeName();
                
   wxLogMessage(s);
 }

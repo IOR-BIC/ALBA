@@ -80,11 +80,11 @@ int main()
 
 
   std::cerr << "############# M ###########" << std::endl;
-  //M->Print(std::cerr);
+  M.Print(std::cerr);
   std::cerr << "############# Q ###########" << std::endl;
-  //Q->Print(std::cerr);
+  Q.Print(std::cerr);
   std::cerr << "############# S ###########" << std::endl;
-  //S->Print(std::cerr);
+  S.Print(std::cerr);
   std::cerr << "############# T ###########" << std::endl;
   std::cerr << T[0] << " " << T[1] << " " << T[2] << std::endl;
 
@@ -94,7 +94,7 @@ int main()
 
   std::cerr << "############# QxS ###########" << std::endl;
 
-  //QxS->Print(std::cerr);
+  QxS.Print(std::cerr);
 
   for (int i = 0; i < 3; i++)
   {
@@ -107,7 +107,7 @@ int main()
   std::cerr << " ############# invMxQxS ########### " << std::endl;
   std::cerr << " ######(should be identity)######## " << std::endl;
 
-  //invMxQxS->Print(std::cerr);
+  invMxQxS.Print(std::cerr);
   mafMatrix identity;
   MAF_TEST(identity==invMxQxS);
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-13 00:44:34 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2004-12-30 14:16:59 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -11,6 +11,7 @@
 =========================================================================*/
 #include "mafMatrix.h"
 #include "mafMatrix3x3.h"
+#include "mafIndent.h"
 #include "vtkObjectFactory.h"
 #include <assert.h>
 #include <sstream>
@@ -128,6 +129,28 @@ bool mafMatrix::operator==(vtkMatrix4x4 *mat) const
   return true;
 }
 #endif
+
+//------------------------------------------------------------------------------
+void mafMatrix::Print (std::ostream& os, const int indent) const
+//------------------------------------------------------------------------------
+{
+  this->Superclass::Print(os, indent);
+  mafIndent the_indent(indent);
+  mafIndent next_indent = the_indent.GetNextIndent();
+
+  int i, j;
+
+  os << the_indent << "Elements:\n";
+  for (i = 0; i < 4; i++) 
+  {
+    os << next_indent;
+    for (j = 0; j < 4; j++) 
+    {
+      os << GetElements()[i][j] << " ";
+    }
+    os << "\n";
+  }
+}
 
 //----------------------------------------------------------------------------
 void mafMatrix::GetVersor(int axis, const mafMatrix &matrix, double versor[3])

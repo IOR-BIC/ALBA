@@ -1,10 +1,10 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mafIndent\040.h,v $
+  Module:    $RCSfile: mafIndent.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-22 14:06:33 $
-  Version:   $Revision: 1.2 $
-  Authors:   originally based on vtkString (www.vtk.org), rewritten Marco Petrone
+  Date:      $Date: 2004-12-30 14:17:00 $
+  Version:   $Revision: 1.1 $
+  Authors:   originally based on vtkIndent (www.vtk.org), rewritten by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
@@ -15,14 +15,10 @@
 
 #include "mafConfigure.h"
 #include "mafBase.h" 
-
-namespace std
-{
-  class ostream;
-}
+#include <iosfwd>
 
 class mafIndent;
-MAF_EXPORT ostream& operator<<(ostream& os, const mafIndent& o);
+MAF_EXPORT std::ostream& operator<<(std::ostream& os, const mafIndent& o);
 
 /** mafIndent - a simple class to control print indentation.
   mafIndent is used to control indentation during the chaining print 
@@ -30,22 +26,22 @@ MAF_EXPORT ostream& operator<<(ostream& os, const mafIndent& o);
 class MAF_EXPORT mafIndent : public mafBase
 {
 public:
-  mafIndent(int ind=0) {this->Indent=ind;};
+  mafIndent(int ind=0);
 
-  virtual const char *GetClassName() {return "mafIndent";};
+  /** return next level of indentetion */
+  virtual const char *GetTypeName() {return "mafIndent";};
 
   /**
     Determine the next indentation level. Keep indenting by two until the 
     max of forty. */
   mafIndent GetNextIndent();
 
-  //BTX
+  operator const int() const {return m_Indent;}
   /** Print out the indentation. Basically output a bunch of spaces. */
-  friend MAF_EXPORT ostream& operator<<(ostream& os, const mafIndent& o);
-  //ETX
+  friend MAF_EXPORT std::ostream& operator<<(std::ostream& os, const mafIndent& o);
 
 protected:
-  int Indent;  
+  int m_Indent;  
 };
 
 #endif

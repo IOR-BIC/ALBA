@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-22 14:06:35 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2004-12-30 14:17:00 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -17,6 +17,9 @@
 #include "mmuUtility.h"
 //#include "mafEvent.h"
 
+//------------------------------------------------------------------------------
+// Forward declarations
+//------------------------------------------------------------------------------
 class vtkMatrix4x4;
 
 //----------------------------------------------------------------------------	
@@ -51,8 +54,11 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   /** copy constructor */
   mafTransform(const mafTransform&);
 
+  /** RTTI stuff */
   mafTypeMacro(mafTransform,mafTransformBase);
-  //void PrintSelf (ostream& os, vtkIndent indent);
+  
+  /** debug dumping */
+  virtual void Print (std::ostream& os, const int indent=0) const;
 
   /**
     Directly set the internal Matrix. It's overwritten by Update if Input or InputFrame !=NULL

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObject.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-02 13:28:59 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2004-12-30 14:16:59 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,8 +14,11 @@
 #define __mafObject_h
 
 #include "mafDefines.h"
+#include <iosfwd>
 
-class mafObjectDictionaryType;
+//------------------------------------------------------------------------------
+// Forward declarations
+//------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 // mafObject
@@ -38,16 +41,16 @@ public:
   virtual void Delete() {delete this;};
   
   /** Return the name of this type (static function) */
-  static const char *GetTypeName();
+  static const char *GetStaticTypeName();
 
   /** Return the class name of this instance */
-  virtual const char *GetClassName() const; 
+  virtual const char *GetTypeName() const; 
   
   /** This is used by IsA to check the class name */
-  static bool IsTypeOf(const char *type_name);
+  static bool IsStaticType(const char *type_name);
   
   /** This is used by IsA to check the class type id */
-  static bool IsTypeOf(const mafTypeID &type_id);
+  static bool IsStaticType(const mafTypeID &type_id);
 
   /** Check the class name of this instance */
   virtual bool IsA(const char *type_name) const;
@@ -59,10 +62,13 @@ public:
   virtual mafObject *NewInternalInstance() const = 0;
 
   /** Return TypeId for this type (static function, i.e. the pointer type) */ 
-  static const mafTypeID &GetTypeId();
+  static const mafTypeID &GetStaticTypeId();
 
   /** Return TypeId for this object instance (the real type) */ 
-  virtual const mafTypeID &GetClassId() const;
+  virtual const mafTypeID &GetTypeId() const;
+
+  /** print debug information for this object */
+  virtual void Print(std::ostream &os, const int indent=0) const;
 
   mafObject(const mafObject& c) {}
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-29 17:59:49 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2004-12-30 14:16:58 $
+  Version:   $Revision: 1.20 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -77,12 +77,12 @@ void mafMessage(const char *format, ...);
 #define mafAbstractTypeMacro(thisClass,superclass) \
   public: \
   typedef superclass Superclass; \
-  static const mafTypeID &GetTypeId(); \
-  virtual const mafTypeID &GetClassId() const; \
-  static const char *GetTypeName(); \
-  virtual const char *GetClassName() const; \
-  static bool IsTypeOf(const char *type); \
-  static bool IsTypeOf(const mafTypeID &type); \
+  static const mafTypeID &GetStaticTypeId(); \
+  virtual const mafTypeID &GetTypeId() const; \
+  static const char *GetStaticTypeName(); \
+  virtual const char *GetTypeName() const; \
+  static bool IsStaticType(const char *type); \
+  static bool IsStaticType(const mafTypeID &type); \
   virtual bool IsA(const char *type) const; \
   virtual bool IsA(const mafTypeID &type) const; \
   static thisClass* SafeDownCast(mafObject *o);
@@ -102,16 +102,16 @@ void mafMessage(const char *format, ...);
   Macro used by mafObjects for RTTI information. This macor must be placed
   in the .cpp file. */
 #define mafCxxAbstractTypeMacro(thisClass) \
-  const mafTypeID &thisClass::GetTypeId() {return typeid(thisClass);} \
-  const mafTypeID &thisClass::GetClassId() const {return typeid(thisClass);} \
-  const char *thisClass::GetTypeName() {return #thisClass;} \
-  const char *thisClass::GetClassName() const {return #thisClass;} \
-  bool thisClass::IsTypeOf(const char *type) \
-  { return ( strcmp(#thisClass,type)==0 ) ? true : Superclass::IsTypeOf(type); } \
-  bool thisClass::IsTypeOf(const mafTypeID &type) \
-  { return ( type==typeid(thisClass) ? true : Superclass::IsTypeOf(type) ); } \
-  bool thisClass::IsA(const char *type) const {return IsTypeOf(type);} \
-  bool thisClass::IsA(const mafTypeID &type) const {return IsTypeOf(type);} \
+  const mafTypeID &thisClass::GetStaticTypeId() {return typeid(thisClass);} \
+  const mafTypeID &thisClass::GetTypeId() const {return typeid(thisClass);} \
+  const char *thisClass::GetStaticTypeName() {return #thisClass;} \
+  const char *thisClass::GetTypeName() const {return #thisClass;} \
+  bool thisClass::IsStaticType(const char *type) \
+  { return ( strcmp(#thisClass,type)==0 ) ? true : Superclass::IsStaticType(type); } \
+  bool thisClass::IsStaticType(const mafTypeID &type) \
+  { return ( type==typeid(thisClass) ? true : Superclass::IsStaticType(type) ); } \
+  bool thisClass::IsA(const char *type) const {return IsStaticType(type);} \
+  bool thisClass::IsA(const mafTypeID &type) const {return IsStaticType(type);} \
   thisClass* thisClass::SafeDownCast(mafObject *o) \
   { try { return dynamic_cast<thisClass *>(o); } catch (std::bad_cast) { return NULL;} }
 
@@ -134,7 +134,7 @@ void mafMessage(const char *format, ...);
   { return (thisClass *)NewInternalInstance(); }
 
 /** Shortcut for type checking */
-#define IsAType(type_name) IsA(type_name::GetTypeID())
+#define IsType(type_name) IsA(type_name::GetStaticTypeId())
 
 /** Macro used to define Set/GetListener() member functions and a Listener member variable */
 #define mafListenerMacro \

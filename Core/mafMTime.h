@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMTime.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-22 14:06:34 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-12-30 14:16:58 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone, inspired to vtkTimeStamp (www.vtk.org)
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -34,7 +34,7 @@ public:
 #else
   mafMTime() {m_ModifiedTime = 0;}; 
 #endif
-  virtual const char *GetClassName() {return "mafMTime";};
+  virtual const char *GetTypeName() {return "mafMTime";};
 
   /**
     Set this objects time to the current time. The current time is

@@ -19,6 +19,8 @@ SET(PROJECT_SRCS
   mafEventBase.h
   mafEventSource.cpp
   mafEventSource.h
+  mafIndent.cpp
+  mafIndent.h
   mafMTime.cpp
   mafMTime.h
   mafMatrix.cpp

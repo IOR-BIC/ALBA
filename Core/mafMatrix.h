@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-13 00:44:34 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2004-12-30 14:16:59 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -34,14 +34,13 @@ typedef double (*mafMatrixElements)[4];
   return a vtkMatrix4x4 pointer.
   Also mafMatrix can reference a vtkMatrix4x4, i.e. register it and share the
   same Elements vector, with SetVTKMatrix.
-  NOMORE: Currently this is defined as a mafObject, i.e. with RTTI information, but not
-  as a mafSmartObject (i.e. reference counting).
-  @sa mafSmartObject vtkMatrix4x4 vnl_matrix
+  @sa mafSmartObject vtkMatrix4x4
 */
 class MAF_EXPORT mafMatrix : public mafSmartObject
 {
 public:
   mafTypeMacro(mafMatrix,mafSmartObject);
+  virtual void Print (std::ostream& os, const int indent=0) const;
 
   mafMatrix();
   virtual ~mafMatrix();
@@ -53,7 +52,6 @@ public:
   bool operator==(const mafMatrix& mat) const;
 
 #ifdef MAF_USE_VTK
-  //mafMatrix(vtkMatrix4x4* mat, mafTimeStamp t=0);
 
   void SetVTKMatrix(vtkMatrix4x4 *mat,mafTimeStamp t=0);
   void DeepCopy(vtkMatrix4x4 *mat);

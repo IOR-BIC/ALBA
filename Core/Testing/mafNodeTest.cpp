@@ -18,7 +18,7 @@ class mafNodeB: public mafNode
 {
 public:
   mafTypeMacro(mafNodeB,mafNode);
-  bool CanReparentTo(mafNode *parent) {return Superclass::CanReparentTo(parent)&&parent->IsA(mafNodeB::GetTypeId());}
+  bool CanReparentTo(mafNode *parent) {return Superclass::CanReparentTo(parent)&&parent->IsA(mafNodeB::GetStaticTypeId());}
 };
 
 mafCxxTypeMacro(mafNodeB);
@@ -27,7 +27,7 @@ class mafNodeA: public mafNode
 {
 public:
   mafTypeMacro(mafNodeA,mafNode);
-  bool CanReparentTo(mafNode *parent) {return Superclass::CanReparentTo(parent)&&!parent->IsA(mafNodeB::GetTypeId());}
+  bool CanReparentTo(mafNode *parent) {return Superclass::CanReparentTo(parent)&&!parent->IsA(mafNodeB::GetStaticTypeId());}
 };
 
 mafCxxTypeMacro(mafNodeA);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-22 15:23:03 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2004-12-30 14:16:59 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -309,7 +309,7 @@ int mafNode::SetParent(mafNode *parent)
 
     
     // modified by Stefano 27-10-2004: Changed the error macro to give feedback about node names 
-    mafErrorMacro("Cannot reparent the VME: " << GetName() << " under the " << parent->GetClassName() \
+    mafErrorMacro("Cannot reparent the VME: " << GetName() << " under the " << parent->GetTypeName() \
       << " named " << parent_node->GetName());
   }
   else
@@ -363,8 +363,8 @@ int mafNode::DeepCopy(mafNode *a)
   }
   else
   {
-    mafErrorMacro("Cannot copy Node of type "<<a->GetClassName()<<" into a Node of type " \
-      << GetClassName());
+    mafErrorMacro("Cannot copy Node of type "<<a->GetTypeName()<<" into a Node of type " \
+      << GetTypeName());
 
     return MAF_ERROR;
   }
@@ -377,7 +377,7 @@ bool mafNode::CanCopy(mafNode *node)
   if (!node)
     return false;
 
-  if (node->IsA(GetTypeId()))
+  if (node->IsA(GetStaticTypeId()))
   {
     return true;
   }

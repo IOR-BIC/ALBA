@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObject.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-02 13:28:59 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2004-12-30 14:16:59 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -11,6 +11,8 @@
 =========================================================================*/
 
 #include "mafObject.h"
+#include "mafIndent.h"
+#include <ostream>
 #include <map>
 #include <string>
 
@@ -58,28 +60,28 @@ mafObject::~mafObject()
 }
 
 //------------------------------------------------------------------------------
-const char *mafObject::GetTypeName()
+const char *mafObject::GetStaticTypeName()
 //------------------------------------------------------------------------------
 {
   return "mafObject";
 }
 
 //------------------------------------------------------------------------------
-const char *mafObject::GetClassName() const
+const char *mafObject::GetTypeName() const
 //------------------------------------------------------------------------------
 {
   return "mafObject";
 }
 
 //------------------------------------------------------------------------------
-bool mafObject::IsTypeOf(const char *type_name)
+bool mafObject::IsStaticType(const char *type_name)
 //------------------------------------------------------------------------------
 {
   return ( !strcmp("mafObject",type_name) )? true : false;
 }
 
 //------------------------------------------------------------------------------
-bool mafObject::IsTypeOf(const mafTypeID &type_id)
+bool mafObject::IsStaticType(const mafTypeID &type_id)
 //------------------------------------------------------------------------------
 {
   return ( type_id==typeid(mafObject) ) ? true : false;
@@ -89,26 +91,33 @@ bool mafObject::IsTypeOf(const mafTypeID &type_id)
 bool mafObject::IsA(const mafTypeID &type_id) const
 //------------------------------------------------------------------------------
 {
-  return IsTypeOf(type_id);
+  return IsStaticType(type_id);
 }
 
 //------------------------------------------------------------------------------
 bool mafObject::IsA(const char *type_name) const
 //------------------------------------------------------------------------------
 {
-  return IsTypeOf(type_name);
+  return IsStaticType(type_name);
 }
 
 //------------------------------------------------------------------------------
-const mafTypeID &mafObject::GetTypeId()
+const mafTypeID &mafObject::GetStaticTypeId()
 //------------------------------------------------------------------------------
 {
   return typeid(mafObject);
 }
 
 //------------------------------------------------------------------------------
-const mafTypeID &mafObject::GetClassId() const
+const mafTypeID &mafObject::GetTypeId() const
 //------------------------------------------------------------------------------
 {
   return typeid(mafObject);
+}
+
+//------------------------------------------------------------------------------
+void mafObject::Print(std::ostream &os, const int indent) const
+//------------------------------------------------------------------------------
+{
+  os << mafIndent(indent) << "Object Type Name: " << GetTypeName() << std::endl;
 }

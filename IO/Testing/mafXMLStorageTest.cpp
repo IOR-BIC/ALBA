@@ -1,15 +1,18 @@
 #include "mafObject.h"
+#include "mafStorable.h"
+#include "mafXMLStorage.h"
+
 #include <iostream>
 
-class mafFooObject: public mafObject
+class mafStorableTestObject: public mafObject, public mafStorable
 {
 public:
-  mafTypeMacro(mafFooObject,mafObject);
-  mafFooObject() {}
+  mafTypeMacro(mafStorableTestObject,mafObject);
+  mafStorableTestObject() {}
   void Print(std::ostream &out) {out<<"Foo";}
 };
 
-mafCxxTypeMacro(mafFooObject);
+mafCxxTypeMacro(mafStorableTestObject);
 
 class mafDummyObject: public mafObject
 {
@@ -24,7 +27,7 @@ mafCxxTypeMacro(mafDummyObject);
 int main()
 {
 
-  mafFooObject foo;
+  mafStorableTestObject foo;
   mafDummyObject dummy;
   
   foo.Print(std::cerr);
@@ -33,14 +36,14 @@ int main()
   dummy.Print(std::cerr);
   std::cout<<" = "<<dummy.GetTypeName()<<std::endl;
   
-  MAF_TEST(foo.IsA("mafFooObject"));
-  MAF_TEST(foo.IsType(mafObject));
+  MAF_TEST(foo.IsA("mafStorableTestObject"));
+  MAF_TEST(foo.IsA(mafObject::GetStaticTypeId()));
   MAF_TEST(foo.IsA("mafObject"));
-  MAF_TEST(foo.IsType(mafObject));
+  MAF_TEST(foo.IsA(mafObject::GetStaticTypeId()));
   MAF_TEST(!foo.IsA(dummy.GetTypeId()));
   MAF_TEST(!foo.IsA(dummy.GetTypeName()));
-  MAF_TEST(!dummy.IsType(mafFooObject));
-  MAF_TEST(!dummy.IsType(mafFooObject));
+  MAF_TEST(!dummy.IsA(mafStorableTestObject::GetStaticTypeId()));
+  MAF_TEST(!dummy.IsA(mafStorableTestObject::GetStaticTypeName()));
   MAF_TEST(dummy.GetStaticTypeId()==dummy.GetTypeId());
   MAF_TEST(dummy.GetStaticTypeId()==dummy.GetTypeId());
 
@@ -51,8 +54,8 @@ int main()
   MAF_TEST(new_foo);
   MAF_TEST(new_foo->IsA(foo.GetStaticTypeId()));
   MAF_TEST(new_foo->IsA(foo.GetStaticTypeName()));
-  MAF_TEST(new_foo->IsType(mafFooObject));
-  MAF_TEST(new_foo->IsType(mafFooObject));
+  MAF_TEST(new_foo->IsA(mafStorableTestObject::GetStaticTypeId()));
+  MAF_TEST(new_foo->IsA(mafStorableTestObject::GetStaticTypeName()));
   MAF_TEST(!new_foo->IsA(new_dummy->GetTypeId()));
   MAF_TEST(!new_foo->IsA(new_dummy->GetTypeName()));
   MAF_TEST(!new_dummy->IsA(new_foo->GetTypeId()));
@@ -60,7 +63,7 @@ int main()
   MAF_TEST(new_dummy->IsA(new_foo->GetStaticTypeId())); // they are both mafObject * variables
   MAF_TEST(new_dummy->IsA(new_foo->GetStaticTypeName()));
 
-  MAF_TEST(mafFooObject::SafeDownCast(new_dummy)==NULL);
+  MAF_TEST(mafStorableTestObject::SafeDownCast(new_dummy)==NULL);
 
   mafDummyObject* tmp_dummy = mafDummyObject::SafeDownCast(new_dummy);
 

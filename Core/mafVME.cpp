@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-29 21:17:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-12-30 14:17:00 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -223,7 +223,7 @@ const char *mflVME::GetDataType()
 //-------------------------------------------------------------------------
 {
   vtkDataSet *data=this->GetOutput();  
-  return data?data->GetClassName():NULL;
+  return data?data->GetTypeName():NULL;
 }
 
 //-------------------------------------------------------------------------
@@ -263,8 +263,8 @@ int mflVME::DeepCopy(mflVME *a)
   }
   else
   {
-    vtkErrorMacro("Cannot copy VME of type "<<a->GetClassName()<<" into a VME \
-    VME of type "<<this->GetClassName());
+    vtkErrorMacro("Cannot copy VME of type "<<a->GetTypeName()<<" into a VME \
+    VME of type "<<this->GetTypeName());
 
     return VTK_ERROR;
   }
@@ -301,8 +301,8 @@ int mflVME::ShallowCopy(mflVME *a)
   }
   else
   {
-    vtkErrorMacro("Cannot copy VME of type "<<a->GetClassName()<<" into a VME \
-    VME of type "<<this->GetClassName());
+    vtkErrorMacro("Cannot copy VME of type "<<a->GetTypeName()<<" into a VME \
+    VME of type "<<this->GetTypeName());
 
     return VTK_ERROR;
   }
@@ -315,7 +315,7 @@ bool mflVME::CanCopy(mflVME *vme)
   if (!vme)
     return false;
 
-  if (vme->IsA(this->GetClassName()))
+  if (vme->IsA(this->GetTypeName()))
   {
     return true;
   }
@@ -418,7 +418,7 @@ int mflVME::SetParent(vtkTree *parent)
     //modified by Stefano 27-10-2004 (beg)
     //Changed the error macro to give feedback about vme names
     
-    vtkErrorMacro("Cannot reparent the VME: " << this->GetName() << " under the "<<parent->GetClassName() 
+    vtkErrorMacro("Cannot reparent the VME: " << this->GetName() << " under the "<<parent->GetTypeName() 
       << " named " << parent_vme->GetName());
     //modified by Stefano 27-10-2004 (end)
   }
@@ -499,7 +499,7 @@ mflVME *mflVME::FindInTree(const char *name,const char *value,int type)
 
   if (vtkTagItem *item=tarray->GetTag(name))
   {
-    if (item->GetType()==type)
+    if (item->GetStaticType()==type)
     {
       if (vtkString::Compare(item->GetValue(),value))
       {
@@ -1215,7 +1215,7 @@ void mflVME::Get4DBounds(mflBounds &bounds)
 bool mflVME::Equals(mflVME *vme)
 //-------------------------------------------------------------------------
 {
-  if (!vme||!vme->IsA(this->GetClassName()))
+  if (!vme||!vme->IsA(this->GetTypeName()))
     return false;
 
   if (this->GetNumberOfItems()!=vme->GetNumberOfItems())
@@ -2129,7 +2129,7 @@ void mflVME::PrintSelf(ostream& os, vtkIndent indent)
   }
   else
   {
-    os << indent << "Current Data: "<< this->CurrentData->GetClassName()<<"("<<this->CurrentData<<")\n";
+    os << indent << "Current Data: "<< this->CurrentData->GetTypeName()<<"("<<this->CurrentData<<")\n";
     this->GetCurrentData()->PrintSelf(os,indent.GetNextIndent());
   }
 }
@@ -2223,7 +2223,7 @@ int mflVME::GetAuxiliaryRefSys(vtkMatrix4x4 *AuxRefSys, const char *RefSysName, 
 	    
       if (item)
       {
-			  if (item->GetType() == type)
+			  if (item->GetStaticType() == type)
 			  {			
 			      //copy from tag item in frame
 					  int item_component = 1;

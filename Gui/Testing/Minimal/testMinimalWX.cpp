@@ -1,8 +1,8 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: MinimalTest.cpp,v $
+  Module:    $RCSfile: testMinimalWX.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-22 15:22:33 $
+  Date:      $Date: 2004-12-30 14:17:02 $
   Version:   $Revision: 1.1 $
   Authors:   Silvano Imboden
 ==========================================================================

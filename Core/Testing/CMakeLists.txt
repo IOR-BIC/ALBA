@@ -2,14 +2,14 @@ PROJECT (mafCore_TEST)
 
 LINK_LIBRARIES(mafCore)
 
-ADD_EXECUTABLE(mafEventTest mafEventTest.cpp)
-ADD_EXECUTABLE(mafObserverTest mafObserverTest.cpp)
-ADD_EXECUTABLE(mafStringTest mafStringTest.cpp)
-ADD_EXECUTABLE(mafObjectTest mafObjectTest.cpp)
-ADD_EXECUTABLE(mafSmartObjectTest mafSmartObjectTest.cpp)
-ADD_EXECUTABLE(mafObjectFactoryTest mafObjectFactoryTest.cpp)
-ADD_EXECUTABLE(mafNodeTest mafNodeTest.cpp)
-ADD_EXECUTABLE(mafVectorTest mafVectorTest.cpp)
+ADD_EXECUTABLE(testEvent mafEventTest.cpp)
+ADD_EXECUTABLE(testObserver mafObserverTest.cpp)
+ADD_EXECUTABLE(testString mafStringTest.cpp)
+ADD_EXECUTABLE(testObject mafObjectTest.cpp)
+ADD_EXECUTABLE(testSmartObject mafSmartObjectTest.cpp)
+ADD_EXECUTABLE(testObjectFactory mafObjectFactoryTest.cpp)
+ADD_EXECUTABLE(testNode mafNodeTest.cpp)
+ADD_EXECUTABLE(testVector mafVectorTest.cpp)
 
 # wxWidgets specific classes
 IF (MAF_USE_WX)
@@ -17,7 +17,7 @@ ENDIF (MAF_USE_WX)
 
 # VTK specific classes
 IF (MAF_USE_VTK)
-  ADD_EXECUTABLE(mafTransformTest mafTransformTest.cpp)
+  ADD_EXECUTABLE(testTransform mafTransformTest.cpp)
 ENDIF (MAF_USE_VTK)  
 
 # classes using VTK+wxWidgets

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTestClass.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-08 16:38:10 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-12-30 14:17:02 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -41,5 +41,5 @@ mafGuiTestClass::mafGuiTestClass(const mafGuiTestClass& c)
 void mafGuiTestClass::Print()
 //------------------------------------------------------------------------------
 {
-  cerr<<GetClassName()<<" dump."<<endl;
+  cerr<<GetTypeName()<<" dump."<<endl;
 }
