@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaTagArray.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:29:32 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-03-10 12:37:30 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -196,7 +196,7 @@ int mmaTagArray::InternalRestore(mafStorageElement *node)
 {
   mafString numAttrs;
   node->GetAttribute("NumberOfTags",numAttrs);
-  int num=atof(numAttrs);
+  int num=(int)atof(numAttrs);
 
   mafStorageElement::ChildrenVector &children=node->GetChildren();
   int ret=MAF_OK;
