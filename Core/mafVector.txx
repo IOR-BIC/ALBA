@@ -1,19 +1,19 @@
 /*=========================================================================
-
-Program:   Visualization Toolkit
-Module:    $RCSfile: mafVector.txx,v $
-Language:  C++
-Date:      $Date: 2004-12-28 19:46:18 $
-Version:   $Revision: 1.5 $
-
-
-
+  Program:   Multimod Application Framework
+  Module:    $RCSfile: mafVector.txx,v $
+  Language:  C++
+  Date:      $Date: 2005-01-10 00:04:24 $
+  Version:   $Revision: 1.6 $
+  Authors:   Marco Petrone
+==========================================================================
+  Copyright (c) 2002/2004 
+  CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 #ifndef __mafVector_txx
 #define __mafVector_txx
 
 #include "mafVector.h"
-//#include "mafSmartPointer.h"
+#include "mmuUtility.h"
 #include <vector>
 
 template <class T>
@@ -23,7 +23,7 @@ T mafVector<T>::NullItem;
 // PIMPL declarations
 //------------------------------------------------------------------------------
 template <class T>
-class mafVectorItems 
+class mmuVectorItems: public mmuUtility 
 {
   public:
   std::vector<T> Vector;
@@ -34,7 +34,7 @@ template <class T>
 mafVector<T>::mafVector()
 //------------------------------------------------------------------------------
 {
-  m_Items  = new mafVectorItems<T>;
+  m_Items  = new mmuVectorItems<T>;
 }
 
 //------------------------------------------------------------------------------
