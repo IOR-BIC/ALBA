@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOBB.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-23 15:17:16 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-12-22 14:06:34 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -11,6 +11,7 @@
 =========================================================================*/
 #ifndef __mafOBB_h
 #define __mafOBB_h
+#include "mafBase.h" 
 
 #include "mafDefines.h"
 #include "mafMTime.h"
@@ -27,7 +28,7 @@
   @todo
   - a Test program
 */
-class MAF_EXPORT mafOBB 
+class MAF_EXPORT mafOBB : public mafBase
 {
 public:
   mafOBB();
@@ -157,3 +158,4 @@ inline bool mafOBB::IsInside(double x,double y,double z)
 }
 
 #endif 
+

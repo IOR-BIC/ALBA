@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObjectFactory.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-25 11:29:35 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-12-22 14:06:35 $
+  Version:   $Revision: 1.4 $
   Authors:   Based on itkObjectFactory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -121,9 +121,9 @@ public:
       bool enableFlag,
       mafCreateObjectFunction createFunction);
 
-  /** mafOverrideInformation utility class.
+  /** mmuOverrideInformation utility class.
     Internal implementation class for mafObjectFactory. */
-  struct mafOverrideInformation
+  struct mmuOverrideInformation
   {
     std::string m_Description;
     std::string m_OverrideWithName;
@@ -173,3 +173,4 @@ private:
   std::string m_LibraryPath;
 };
 #endif
+

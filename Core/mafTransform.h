@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-30 18:18:22 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2004-12-22 14:06:35 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,6 +14,7 @@
 #define __mafTransform_h
 
 #include "mafTransformBase.h"
+#include "mmuUtility.h"
 //#include "mafEvent.h"
 
 class vtkMatrix4x4;
@@ -220,10 +221,10 @@ class MAF_EXPORT mafTransform : public mafTransformBase
 													double tentative_euler_cardan_third);
 
   /** rotation representation conversion */
-	int MatrixToQuaternion(const mafMatrix &matrix, double quaternion[4]);
+	int MatrixTommuQuaternion(const mafMatrix &matrix, double quaternion[4]);
 
   /** rotation representation conversion */
-	int QuaternionToMatrix(double quaternion[4],	mafMatrix &matrix);
+	int mmuQuaternionToMatrix(double quaternion[4],	mafMatrix &matrix);
 
   /** rotation + translation representation conversion */
 	int HelicalAxisToMatrix(double helical_axis[3],double angle, mafMatrix &matrix);
@@ -246,25 +247,26 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   // declarations for polar_decomp algorithm from Graphics Gems IV,
   // by Ken Shoemake <shoemake@graphics.cis.upenn.edu>
   //----------------------------------------------------------------------------
-  enum QuatPart {X, Y, Z, W};
+  enum mmuQuatPart {X, Y, Z, W};
 
-  typedef struct {double x, y, z, w;} Quat; /* Quaternion */
-  typedef Quat HVect; /* Homogeneous 3D vector */
+  typedef struct {double x, y, z, w;} mmuQuat; ///< mmuQuaternion 
+  typedef mmuQuat HVect; ///< Homogeneous 3D vector 
+  
   typedef struct {
 	  HVect t;	///< Translation components
-	  Quat  q;	///< Essential rotation
-	  Quat  u;	///< Stretch rotation
+	  mmuQuat  q;	///< Essential rotation
+	  mmuQuat  u;	///< Stretch rotation
 	  HVect k;	///< Stretch factors
 	  double f;	///< Sign of determinant
-  } AffineParts;
-	  
+  } mmuAffineParts;
+  
   typedef double HMatrix[4][4]; /* Right-handed, for column vectors */
   static double PolarDecomp(HMatrix M, HMatrix Q, HMatrix S);
-  static void DecompAffine(HMatrix A, AffineParts *parts);
+  static void DecompAffine(HMatrix A, mmuAffineParts *parts);
   static HVect SpectDecomp(HMatrix S, HMatrix U);
-  static Quat QuaternionFromMatrix(HMatrix mat);
-  static void InvertAffine(AffineParts *parts, AffineParts *inverse);
-  static Quat Snuggle(Quat q, HVect *k);
+  static mmuQuat mmuQuaternionFromMatrix(HMatrix mat);
+  static void InvertAffine(mmuAffineParts *parts, mmuAffineParts *inverse);
+  static mmuQuat Snuggle(mmuQuat q, HVect *k);
   //----------------------------------------------------------------------------
 protected:
   /** does nothing, this is not a procedural transform */
@@ -273,3 +275,4 @@ private:
 };
 
 #endif
+

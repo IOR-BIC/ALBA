@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-21 12:20:36 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2004-12-22 14:06:35 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -300,25 +300,25 @@ void adjoint_transpose(mafTransform::HMatrix M, mafTransform::HMatrix MadjT)
 }
 
 //----------------------------------------------------------------------------
-//                ******* Quaternion Preliminaries *******
+//                ******* mmuQuaternion Preliminaries *******
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 // Construct a (possibly non-unit) quaternion from real components.
-mafTransform::Quat Qt_(double x, double y, double z, double w)
+mafTransform::mmuQuat Qt_(double x, double y, double z, double w)
 //----------------------------------------------------------------------------
 {
-    mafTransform::Quat qq;
+    mafTransform::mmuQuat qq;
     qq.x = x; qq.y = y; qq.z = z; qq.w = w;
     return (qq);
 }
 
 //----------------------------------------------------------------------------
 // Return conjugate of quaternion.
-mafTransform::Quat Qt_Conj(mafTransform::Quat q)
+mafTransform::mmuQuat Qt_Conj(mafTransform::mmuQuat q)
 //----------------------------------------------------------------------------
 {
-    mafTransform::Quat qq;
+    mafTransform::mmuQuat qq;
     qq.x = -q.x; qq.y = -q.y; qq.z = -q.z; qq.w = q.w;
     return (qq);
 }
@@ -327,10 +327,10 @@ mafTransform::Quat Qt_Conj(mafTransform::Quat q)
 // Return quaternion product qL * qR.  Note: order is important!
 // To combine rotations, use the product Mul(qSecond, qFirst),
 // which gives the effect of rotating by qFirst then qSecond.
-mafTransform::Quat Qt_Mul(mafTransform::Quat qL, mafTransform::Quat qR)
+mafTransform::mmuQuat Qt_Mul(mafTransform::mmuQuat qL, mafTransform::mmuQuat qR)
 //----------------------------------------------------------------------------
 {
-    mafTransform::Quat qq;
+    mafTransform::mmuQuat qq;
     qq.w = qL.w*qR.w - qL.x*qR.x - qL.y*qR.y - qL.z*qR.z;
     qq.x = qL.w*qR.x + qL.x*qR.w + qL.y*qR.z - qL.z*qR.y;
     qq.y = qL.w*qR.y + qL.y*qR.w + qL.z*qR.x - qL.x*qR.z;
@@ -340,10 +340,10 @@ mafTransform::Quat Qt_Mul(mafTransform::Quat qL, mafTransform::Quat qR)
 
 //----------------------------------------------------------------------------
 // Return product of quaternion q by scalar w.
-mafTransform::Quat Qt_Scale(mafTransform::Quat q, double w)
+mafTransform::mmuQuat Qt_Scale(mafTransform::mmuQuat q, double w)
 //----------------------------------------------------------------------------
 {
-    mafTransform::Quat qq;
+    mafTransform::mmuQuat qq;
     qq.w = q.w*w; qq.x = q.x*w; qq.y = q.y*w; qq.z = q.z*w;
     return (qq);
 }
@@ -353,7 +353,7 @@ mafTransform::Quat Qt_Scale(mafTransform::Quat q, double w)
 // used to multiply column vector on the left: vnew = mat vold.	 Works
 // correctly for right-handed coordinate system and right-handed rotations.
 // Translation and perspective components ignored.
-mafTransform::Quat mafTransform::QuaternionFromMatrix(HMatrix mat)
+mafTransform::mmuQuat mafTransform::mmuQuaternionFromMatrix(HMatrix mat)
 //----------------------------------------------------------------------------
 {
     /* This algorithm avoids near-zero divides by looking for a large component
@@ -361,7 +361,7 @@ mafTransform::Quat mafTransform::QuaternionFromMatrix(HMatrix mat)
      * |w| is greater than 1/2, which is as small as a largest component can be.
      * Otherwise, the largest diagonal entry corresponds to the largest of |x|,
      * |y|, or |z|, one of which must be larger than |w|, and at least 1/2. */
-    Quat qu;
+    mmuQuat qu;
     register double tr, s;
 
     tr = mat[X][X] + mat[Y][Y]+ mat[Z][Z];
@@ -630,7 +630,7 @@ mafTransform::HVect mafTransform::SpectDecomp(HMatrix S, HMatrix U)
 // See Ken Shoemake and Tom Duff. Matrix Animation and Polar Decomposition.
 // Proceedings of Graphics Interface 1992. Details on p. 262-263.
 //----------------------------------------------------------------------------
-mafTransform::Quat mafTransform::Snuggle(Quat q, HVect *k)
+mafTransform::mmuQuat mafTransform::Snuggle(mmuQuat q, HVect *k)
 //----------------------------------------------------------------------------
 {
 #define SQRTHALF (0.7071067811865475244)
@@ -638,24 +638,24 @@ mafTransform::Quat mafTransform::Snuggle(Quat q, HVect *k)
 #define swap(a,i,j) {a[3]=a[i]; a[i]=a[j]; a[j]=a[3];}
 #define cycle(a,p)  if (p) {a[3]=a[0]; a[0]=a[1]; a[1]=a[2]; a[2]=a[3];}\
 		    else   {a[3]=a[2]; a[2]=a[1]; a[1]=a[0]; a[0]=a[3];}
-    Quat p;
+    mmuQuat p;
     double ka[4];
     int i, turn = -1;
     ka[X] = k->x; ka[Y] = k->y; ka[Z] = k->z;
     if (ka[X]==ka[Y]) {if (ka[X]==ka[Z]) turn = W; else turn = Z;}
     else {if (ka[X]==ka[Z]) turn = Y; else if (ka[Y]==ka[Z]) turn = X;}
     if (turn>=0) {
-	Quat qtoz, qp;
+	mmuQuat qtoz, qp;
 	unsigned neg[3], win;
 	double mag[3], t;
-	static Quat qxtoz = {0,SQRTHALF,0,SQRTHALF};
-	static Quat qytoz = {SQRTHALF,0,0,SQRTHALF};
-	static Quat qppmm = { 0.5, 0.5,-0.5,-0.5};
-	static Quat qpppp = { 0.5, 0.5, 0.5, 0.5};
-	static Quat qmpmm = {-0.5, 0.5,-0.5,-0.5};
-	static Quat qpppm = { 0.5, 0.5, 0.5,-0.5};
-	static Quat q0001 = { 0.0, 0.0, 0.0, 1.0};
-	static Quat q1000 = { 1.0, 0.0, 0.0, 0.0};
+	static mmuQuat qxtoz = {0,SQRTHALF,0,SQRTHALF};
+	static mmuQuat qytoz = {SQRTHALF,0,0,SQRTHALF};
+	static mmuQuat qppmm = { 0.5, 0.5,-0.5,-0.5};
+	static mmuQuat qpppp = { 0.5, 0.5, 0.5, 0.5};
+	static mmuQuat qmpmm = {-0.5, 0.5,-0.5,-0.5};
+	static mmuQuat qpppm = { 0.5, 0.5, 0.5,-0.5};
+	static mmuQuat q0001 = { 0.0, 0.0, 0.0, 1.0};
+	static mmuQuat q1000 = { 1.0, 0.0, 0.0, 0.0};
 	switch (turn) {
 	default: return (Qt_Conj(q));
 	case X: q = Qt_Mul(q, qtoz = qxtoz); swap(ka,X,Z) break;
@@ -729,11 +729,11 @@ mafTransform::Quat mafTransform::Snuggle(Quat q, HVect *k)
 // See Ken Shoemake and Tom Duff. Matrix Animation and Polar Decomposition.
 // Proceedings of Graphics Interface 1992.
 //----------------------------------------------------------------------------
-void mafTransform::DecompAffine(HMatrix A, AffineParts *parts)
+void mafTransform::DecompAffine(HMatrix A, mmuAffineParts *parts)
 //----------------------------------------------------------------------------
 {
     mafTransform::HMatrix Q, S, U;
-    Quat p;
+    mmuQuat p;
     double det;
     parts->t = Qt_(A[X][W], A[Y][W], A[Z][W], 0);
     det = PolarDecomp(A, Q, S);
@@ -741,9 +741,9 @@ void mafTransform::DecompAffine(HMatrix A, AffineParts *parts)
 	mat_copy(Q,=,-Q,3);
 	parts->f = -1;
     } else parts->f = 1;
-    parts->q = QuaternionFromMatrix(Q);
+    parts->q = mmuQuaternionFromMatrix(Q);
     parts->k = SpectDecomp(S, U);
-    parts->u = QuaternionFromMatrix(U);
+    parts->u = mmuQuaternionFromMatrix(U);
     p = Snuggle(parts->u, &parts->k);
     parts->u = Qt_Mul(parts->u, p);
 }
@@ -754,10 +754,10 @@ void mafTransform::DecompAffine(HMatrix A, AffineParts *parts)
 
 //----------------------------------------------------------------------------
 // Compute inverse of affine decomposition.
-void mafTransform::InvertAffine(AffineParts *parts, AffineParts *inverse)
+void mafTransform::InvertAffine(mmuAffineParts *parts, mmuAffineParts *inverse)
 //----------------------------------------------------------------------------
 {
-    Quat t, p;
+    mmuQuat t, p;
     inverse->f = parts->f;
     inverse->q = Qt_Conj(parts->q);
     inverse->u = Qt_Mul(parts->q, parts->u);
@@ -911,7 +911,7 @@ void mafTransform::GetOrientationWXYZ(const mafMatrix &in_matrix, double wxyz[4]
     ortho[2][i] = -ortho[2][i];
     }
 
-  mafMatrix3x3::MatrixToQuaternion(ortho, wxyz);
+  mafMatrix3x3::MatrixTommuQuaternion(ortho, wxyz);
 
   // calc the return value wxyz
  double mag = sqrt(wxyz[1]*wxyz[1] + wxyz[2]*wxyz[2] + wxyz[3]*wxyz[3]);
@@ -1154,7 +1154,7 @@ int mafTransform::MatrixToEulerCardanicAngle(const mafMatrix &v_matrix,
 }	
 		
 //----------------------------------------------------------------------------
-int mafTransform::MatrixToQuaternion(const mafMatrix &v_matrix,
+int mafTransform::MatrixTommuQuaternion(const mafMatrix &v_matrix,
 										  double quaternion[4])
 //----------------------------------------------------------------------------
 {
@@ -1217,7 +1217,7 @@ int mafTransform::MatrixToQuaternion(const mafMatrix &v_matrix,
 }
 
 //----------------------------------------------------------------------------
-int mafTransform::QuaternionToMatrix(double quaternion[4],
+int mafTransform::mmuQuaternionToMatrix(double quaternion[4],
 										  mafMatrix &v_matrix)
 //----------------------------------------------------------------------------
 {
@@ -1706,3 +1706,4 @@ int mafTransform::MatrixToHelicalAxis(const mafMatrix &v_matrix,
 	return 1;
 
 }
+

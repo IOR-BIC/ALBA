@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObjectFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-29 21:14:32 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2004-12-22 14:06:34 $
+  Version:   $Revision: 1.5 $
   Authors:   Based on itkObjectFactory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -44,8 +44,8 @@ mafCxxTypeMacro(mafObjectFactory);
 // Add this for the SGI compiler which does not seem
 // to provide a default implementation as it should.
 //
-bool operator==(const mafObjectFactory::mafOverrideInformation& rhs, 
-    const mafObjectFactory::mafOverrideInformation& lhs)
+bool operator==(const mafObjectFactory::mmuOverrideInformation& rhs, 
+    const mafObjectFactory::mmuOverrideInformation& lhs)
 //------------------------------------------------------------------------------
 {
   return (rhs.m_Description == lhs.m_Description
@@ -55,8 +55,8 @@ bool operator==(const mafObjectFactory::mafOverrideInformation& rhs,
 //------------------------------------------------------------------------------
 // Add this for the SGI compiler which does not seem
 // to provide a default implementation as it should.
-bool operator<(const mafObjectFactory::mafOverrideInformation& rhs, 
-    const mafObjectFactory::mafOverrideInformation& lhs)
+bool operator<(const mafObjectFactory::mmuOverrideInformation& rhs, 
+    const mafObjectFactory::mmuOverrideInformation& lhs)
 //------------------------------------------------------------------------------
 {
   return (rhs.m_Description < lhs.m_Description
@@ -70,7 +70,7 @@ bool operator<(const mafObjectFactory::mafOverrideInformation& rhs,
   Also, so a forward reference can be put in mafObjectFactory.h
   and a pointer member can be used.  This avoids other
   classes including <map> and getting long symbol warnings.*/
-typedef std::multimap<std::string, mafObjectFactory::mafOverrideInformation> 
+typedef std::multimap<std::string, mafObjectFactory::mmuOverrideInformation> 
               mafStringOverMapType;
 
 
@@ -445,7 +445,7 @@ void mafObjectFactory::RegisterOverride(const char* classOverride,
                    createFunction)
 //------------------------------------------------------------------------------
 {
-  mafObjectFactory::mafOverrideInformation info;
+  mafObjectFactory::mmuOverrideInformation info;
   info.m_Description = description;
   info.m_OverrideWithName = subclass;
   info.m_EnabledFlag = enableFlag;
@@ -596,3 +596,4 @@ const char *mafObjectFactory::GetDescription() const
 {
   return "MAF core factory.";
 }
+

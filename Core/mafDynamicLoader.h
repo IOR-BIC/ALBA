@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDynamicLoader.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-25 11:29:34 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-12-22 14:06:33 $
+  Version:   $Revision: 1.4 $
   Authors:   Based on DynamicLoader (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -11,7 +11,7 @@
 =========================================================================*/
 #ifndef __mafDynamicLoader_h
 #define __mafDynamicLoader_h
-
+#include "mafBase.h"
 #include "mafConfigure.h"
 
 // Ugly stuff for library handles.
@@ -44,7 +44,7 @@ typedef void* LibHandle;
   defined before of this class to be mis-compiled.
   
  */
-class MAF_EXPORT mafDynamicLoader
+class MAF_EXPORT mafDynamicLoader : public mafBase
 {
 public:
   /** Load a dynamic library into the current process.
@@ -74,3 +74,4 @@ protected:
 };
   
 #endif
+

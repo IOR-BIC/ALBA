@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVersion.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-25 11:29:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-12-22 14:06:36 $
+  Version:   $Revision: 1.2 $
   Authors:   based on mafVersion (www.vtk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,9 +14,10 @@
 #define __mafVersion_h
 
 
+#include "mafBase.h" 
 #include "mafConfigure.h"
 
-#define MAF_SOURCE_VERSION "maf version " MAF_VERSION ", maf source $Revision: 1.1 $, $Date: 2004-11-25 11:29:36 $ (GMT)"
+#define MAF_SOURCE_VERSION "maf version " MAF_VERSION ", maf source $Revision: 1.2 $, $Date: 2004-12-22 14:06:36 $ (GMT)"
 
 /** mafVersion - Versioning class for MAF.
   Holds methods for defining/determining the current MAF version
@@ -26,7 +27,7 @@
   This file will change frequently to update the MAF_SOURCE_VERSION which
   timestamps a particular source release.
 */
-class MAF_EXPORT mafVersion
+class MAF_EXPORT mafVersion : public mafBase
 {
 public:
   mafVersion() {};
@@ -48,3 +49,4 @@ private:
 };
 
 #endif 
+

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMutexLock.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-25 11:29:34 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-12-22 14:06:34 $
+  Version:   $Revision: 1.2 $
   Authors:   Based on itkmafMutexLock (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,6 +13,7 @@
 #define __mafMutexLock_h
 
 #include "mafConfigure.h"
+#include "mafBase.h" 
 
 #ifdef CMAKE_USE_SPROC_INIT
 #include <abi_mutex.h>
@@ -58,7 +59,7 @@ typedef int FastMutexType;
   mafMutexLock provides a higher-performance locking mechanism on 
   Windows, but won't work across processes.
 */
-class MAF_EXPORT mafMutexLock
+class MAF_EXPORT mafMutexLock : public mafBase
 {
 public:
   /** Constructor and destructor left public purposely because of stack allocation. */
@@ -76,4 +77,5 @@ protected:
 };
 
 #endif
+
 

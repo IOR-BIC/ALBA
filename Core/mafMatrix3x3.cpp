@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix3x3.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-18 22:07:44 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2004-12-22 14:06:34 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -486,7 +486,7 @@ int mafMatrix3x3::JacobiN(double **a, int n, double *w, double **v)
 
 
 //----------------------------------------------------------------------------
-void mafMatrix3x3::QuaternionToMatrix(const double quat[4], double A[3][3])
+void mafMatrix3x3::mmuQuaternionToMatrix(const double quat[4], double A[3][3])
 //----------------------------------------------------------------------------
 {
   double ww = quat[0]*quat[0];
@@ -526,7 +526,7 @@ void mafMatrix3x3::QuaternionToMatrix(const double quat[4], double A[3][3])
 //  Berthold K. P. Horn (1987),
 //  "Closed-form solution of absolute orientation using unit quaternions,"
 //  Journal of the Optical Society of America A, 4:629-642
-void mafMatrix3x3::MatrixToQuaternion(const double A[3][3], double quat[4])
+void mafMatrix3x3::MatrixTommuQuaternion(const double A[3][3], double quat[4])
 //----------------------------------------------------------------------------
 {
   double N[4][4];
@@ -651,8 +651,8 @@ void mafMatrix3x3::Orthogonalize(const double A[3][3], double B[3][3])
   // diagonalization of an appropriately constructed symmetric
   // 4x4 matrix rather than by doing SVD of the 3x3 matrix)
   double quat[4];
-  MatrixToQuaternion(B,quat);
-  QuaternionToMatrix(quat,B);
+  MatrixTommuQuaternion(B,quat);
+  mmuQuaternionToMatrix(quat,B);
 
   // Put the flip back into the orthogonalized matrix.
   if (d < 0)
@@ -877,3 +877,4 @@ void mafMatrix3x3::SingularValueDecomposition(const double A[3][3],
     w[2] = -w[2];
   }
 }
+

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-20 20:47:08 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2004-12-22 14:06:35 $
+  Version:   $Revision: 1.11 $
   Authors:   originally based on vtkString (www.vtk.org), rewritten Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,6 +14,7 @@
 #define __mafString_h
 
 #include "mafDefines.h"
+#include "mafBase.h" 
 #include <string.h>
 
 /** mafString - performs common string operations on c-strings.
@@ -25,7 +26,7 @@
   memory access: e.g. in case the "const char *" is a function argument. In this case
   you should explicitly make a copy with Copy() or explicitelly converting with mafString(). 
   */
-class MAF_EXPORT mafString
+class MAF_EXPORT mafString : public mafBase
 {
 public:
   
@@ -228,3 +229,4 @@ protected:
 };
 
 #endif
+

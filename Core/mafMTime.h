@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMTime.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-25 11:29:34 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-12-22 14:06:34 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone, inspired to vtkTimeStamp (www.vtk.org)
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,6 +14,7 @@
 #define __mafMTime_h
 
 #include "mafDefines.h"
+#include "mafBase.h" 
 
 #ifdef MAF_USE_VTK
   #include "vtkTimeStamp.h"
@@ -25,7 +26,7 @@
   If MAF is build with VTK compilation enabled (MAF_USE_VTK) this object
   uses a mafMTime as counter, to have a unique time stamp against the
   two libraries. */
-class MAF_EXPORT mafMTime 
+class MAF_EXPORT mafMTime : public mafBase
 {
 public:
 #ifdef MAF_USE_VTK
@@ -86,3 +87,4 @@ inline unsigned long int mafMTime::GetMTime()
 #endif
 
 #endif
+

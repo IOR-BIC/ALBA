@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix3x3.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-18 22:07:44 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2004-12-22 14:06:34 $
+  Version:   $Revision: 1.6 $
   Authors:   Based on vtkMath code (www.vtk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -125,24 +125,24 @@ public:
   /**
     Convert a quaternion to a 3x3 rotation matrix.  The quaternion
     does not have to be normalized beforehand. */
-  static void QuaternionToMatrix(const double quat[4], double A[3][3]); 
+  static void mmuQuaternionToMatrix(const double quat[4], double A[3][3]); 
   
   /**
     Convert a quaternion to a 3x3 rotation matrix.  The quaternion
     does not have to be normalized beforehand. */
-  void QuaternionToMatrix(const double quat[4]) {QuaternionToMatrix(quat,GetElements());}
+  void mmuQuaternionToMatrix(const double quat[4]) {mmuQuaternionToMatrix(quat,GetElements());}
 
   /**
    Convert a 3x3 matrix into a quaternion.  This will provide the
    best possible answer even if the matrix is not a pure rotation matrix.
    The method used is that of B.K.P. Horn. */
-  static void MatrixToQuaternion(const double A[3][3], double quat[4]);
+  static void MatrixTommuQuaternion(const double A[3][3], double quat[4]);
   
   /**
    Convert a 3x3 matrix into a quaternion.  This will provide the
    best possible answer even if the matrix is not a pure rotation matrix.
    The method used is that of B.K.P. Horn. */
-  void MatrixToQuaternion(double quat[4]) {MatrixToQuaternion(GetElements(),quat);}
+  void MatrixTommuQuaternion(double quat[4]) {MatrixTommuQuaternion(GetElements(),quat);}
   
   /**
     Perform singular value decomposition on a 3x3 matrix.  This is not
@@ -301,3 +301,4 @@ inline double mafMatrix3x3::Normalize(double x[3])
 }
 
 #endif 
+

@@ -7,6 +7,7 @@ MESSAGE(STATUS "Configuring project mafCore")
 # Set your list of sources here.  Do not change the name of the
 # vtkLocal_SRCS variable.
 SET(PROJECT_SRCS
+  mafBase.h
   mafDefines.cpp
   mafDefines.h
   mafDirectory.cpp
@@ -44,16 +45,17 @@ SET(PROJECT_SRCS
   mafSmartPointer.h
   mafString.cpp
   mafString.h
-  mafVector.h
-  mafVector.txx
   mafTransform.cpp
   mafTransform.h
   mafTransformBase.cpp
   mafTransformBase.h
   mafTransformFrame.cpp
   mafTransformFrame.h
+  mafVector.h
+  mafVector.txx
   mafVersion.h
   mafWIN32.h
+  mmuUtility.h
   vtkMAFToLinearTransform.cxx
   vtkMAFToLinearTransform.h
 #  mafEvent.cpp

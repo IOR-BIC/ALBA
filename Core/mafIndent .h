@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafIndent\040.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-25 11:29:34 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-12-22 14:06:33 $
+  Version:   $Revision: 1.2 $
   Authors:   originally based on vtkString (www.vtk.org), rewritten Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,6 +14,8 @@
 #define __mafIndent_h
 
 #include "mafConfigure.h"
+#include "mafBase.h" 
+
 namespace std
 {
   class ostream;
@@ -25,7 +27,7 @@ MAF_EXPORT ostream& operator<<(ostream& os, const mafIndent& o);
 /** mafIndent - a simple class to control print indentation.
   mafIndent is used to control indentation during the chaining print 
   process. This way nested objects can correctly indent themselves.*/
-class MAF_EXPORT mafIndent
+class MAF_EXPORT mafIndent : public mafBase
 {
 public:
   mafIndent(int ind=0) {this->Indent=ind;};
@@ -47,3 +49,4 @@ protected:
 };
 
 #endif
+

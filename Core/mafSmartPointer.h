@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSmartPointer.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-20 20:47:08 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2004-12-22 14:06:35 $
+  Version:   $Revision: 1.6 $
   Authors:   based on vtkSmartPointer (www.vtk.org), rewritten by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,6 +14,7 @@
 
 #include "mafDefines.h"
 #include "mafSmartObject.h"
+#include "mafBase.h"
 
 /** Hold a reference to a T instance.
   mafAutoPointer stores a pointer to a mafSmartObjct, and keeps it registered. When 
@@ -21,7 +22,7 @@
   when exiting from the scope.
 */
 template <class T>
-class MAF_EXPORT mafAutoPointer
+class MAF_EXPORT mafAutoPointer : public mafBase
 {
 public:  
   /** Initialize smart pointer to (optional) given object. */
@@ -188,3 +189,4 @@ inline bool operator == (const mafAutoPointer<T>& l, mafSmartObject* r) \
 
 
 #endif
+

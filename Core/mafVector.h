@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVector.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-20 20:47:08 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2004-12-22 14:06:35 $
+  Version:   $Revision: 1.5 $
   Authors:   based on vtkObjectBase (www.vtk.org), adapted Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,6 +14,7 @@
 #define __mafVector_h
 
 #include "mafDefines.h"
+#include "mafBase.h"
 
 template <class T>
 class mafVectorItems;
@@ -25,7 +26,7 @@ class mafVectorItems;
   @todo
   - Add a Test */
 template <class T>
-class MAF_EXPORT mafVector
+class MAF_EXPORT mafVector : public mafBase
 {
 public:
   mafVector();
@@ -111,3 +112,4 @@ private:
 };
 
 #endif 
+
