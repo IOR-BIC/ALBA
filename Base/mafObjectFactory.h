@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObjectFactory.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-18 18:58:36 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2004-11-18 23:23:13 $
+  Version:   $Revision: 1.6 $
   Authors:   Based on itkObjectFactory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -17,6 +17,7 @@
 
 #include <vector>
 #include <list>
+#include <string>
 
 typedef mafObject* (*mafCreateObjectFunction)();
 

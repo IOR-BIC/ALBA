@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-18 22:35:24 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2004-11-18 23:23:13 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -183,17 +183,18 @@ typedef unsigned long mafID;
   wxVsnprintf(buffer, size, format, argptr); \
   va_end(argptr);
 
-#else MAF_USE_WX // this is less safe since it can't limit output string size
+#else
 /** 
   Macro for formatted printing to string (adapted from wxWidgets IMPLEMENT_LOG_FUNCTION)
-  To use it you will need to include <stdio.h>, <stdarg.h> and <varargs.h> */
+  To use it you will need to include <stdio.h>, <stdarg.h> and <varargs.h>
+  This is less safe since it can't limit output string size. */
 #define MAF_PRINT_MACRO(format,buffer,size) \
   va_list argptr; \
   va_start(argptr, format); \
   vsprintf(buffer, format, argptr); \
   va_end(argptr);
 
-#endif MAF_USE_WX
+#endif
 
 #endif
 
