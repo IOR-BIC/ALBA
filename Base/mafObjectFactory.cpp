@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObjectFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:33:17 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-04-06 21:20:00 $
+  Version:   $Revision: 1.10 $
   Authors:   Based on itkObjectFactory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -441,8 +441,8 @@ void mafObjectFactory::RegisterOverride(const char* classOverride,
                    const char* subclass,
                    const char* description,
                    bool enableFlag,
-                   mafCreateObjectFunction
-                   createFunction)
+                   mafCreateObjectFunction createFunction,
+                   mafReferenceCounted *args)
 //------------------------------------------------------------------------------
 {
   mafObjectFactory::mmuOverrideInformation info;
@@ -450,14 +450,15 @@ void mafObjectFactory::RegisterOverride(const char* classOverride,
   info.m_OverrideWithName = subclass;
   info.m_EnabledFlag = enableFlag;
   info.m_CreateObject = createFunction;
+  info.m_Args = args;
   m_OverrideMap->insert(mafOverRideMap::value_type(classOverride, info));
 }
 
 //------------------------------------------------------------------------------
-void mafObjectFactory::RegisterNewObject(const char* ObjectName, const char* description, mafCreateObjectFunction createFunction)
+void mafObjectFactory::RegisterNewObject(const char* ObjectName, const char* description, mafCreateObjectFunction createFunction,mafReferenceCounted *args)
 //------------------------------------------------------------------------------
 {
-  this->RegisterOverride(ObjectName,ObjectName,description,true,createFunction);
+  this->RegisterOverride(ObjectName,ObjectName,description,true,createFunction,args);
 }
 
 //------------------------------------------------------------------------------
@@ -588,3 +589,37 @@ std::list<bool> mafObjectFactory::GetEnableFlags()
   return ret;
 }
 
+//------------------------------------------------------------------------------
+mafReferenceCounted *mafObjectFactory::GetFactoryArgs(const char *type_name)
+//------------------------------------------------------------------------------
+{
+  mafOverRideMap::iterator i=m_OverrideMap->find(type_name);
+  if (i!=m_OverrideMap->end())
+  {
+    return i->second.m_Args;
+  }
+
+  return NULL;
+}
+
+//------------------------------------------------------------------------------
+mafReferenceCounted *mafObjectFactory::GetArgs(const char *type_name)
+//------------------------------------------------------------------------------
+{
+  if ( !mafObjectFactory::m_RegisteredFactories )
+  {
+    mafObjectFactory::Initialize();
+  }
+  
+  for ( std::list<mafObjectFactory*>::iterator 
+      i = m_RegisteredFactories->begin();
+      i != m_RegisteredFactories->end(); ++i )
+  {
+    mafReferenceCounted *args = (*i)->GetFactoryArgs(type_name);
+    if(args)
+    {
+      return args;
+    }
+  }
+  return NULL;
+}

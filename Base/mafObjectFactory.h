@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObjectFactory.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 15:49:00 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-04-06 21:20:00 $
+  Version:   $Revision: 1.11 $
   Authors:   Based on itkObjectFactory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -13,6 +13,7 @@
 #define __mafObjectFactory_h
 
 #include "mafReferenceCounted.h"
+#include "mafSmartPointer.h"
 #include "mafString.h"
 
 #include <vector>
@@ -117,14 +118,18 @@ public:
 
   /**
     This function can be used by Application code to register new Objects's to the mflCoreFactory */
-  void RegisterNewObject(const char* ObjectName, const char* description, mafCreateObjectFunction createFunction);
+  void RegisterNewObject(const char* ObjectName, const char* description, mafCreateObjectFunction createFunction,mafReferenceCounted *args=NULL);
 
   /** Register object creation information with the factory. */
   void RegisterOverride(const char* classOverride,
       const char* overrideClassName,
       const char* description,
       bool enableFlag,
-      mafCreateObjectFunction createFunction);
+      mafCreateObjectFunction createFunction,
+      mafReferenceCounted *args=NULL);
+
+  /** return argument data assigned to object inthe factory */
+  mafReferenceCounted *GetArgs(const char *type_name);
 
   /** mmuOverrideInformation utility class.
     Internal implementation class for mafObjectFactory. */
@@ -134,6 +139,7 @@ public:
     std::string m_OverrideWithName;
     bool m_EnabledFlag;
     mafCreateObjectFunction m_CreateObject;
+    mafAutoPointer<mafReferenceCounted> m_Args;
   };
   
   /** dump the object */
@@ -149,6 +155,10 @@ protected:
    * It should create the named maf object or return 0 if that object
    * is not supported by the factory implementation. */
   virtual mafObject *CreateObject(const char* classname );
+
+  /** internally used to retrieve args for this factory */
+  mafReferenceCounted *GetFactoryArgs(const char *type_name);
+
 
 private:
   mafOverRideMap* m_OverrideMap;
