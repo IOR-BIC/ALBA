@@ -1,0 +1,2 @@
+ADD_EXECUTABLE(mafCoreTest mafCoreTest.cxx)
+TARGET_LINK_LIBRARIES(mafCoreTest mafCore)
