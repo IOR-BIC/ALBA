@@ -15,6 +15,8 @@ SET(PROJECT_SRCS
   mafDirectory.h
   mafDynamicLoader.cpp
   mafDynamicLoader.h
+  mafIncludeWIN32.h
+  mafIncludeWX.h
   mafIndent.cpp
   mafIndent.h
   mafMatrix.cpp
@@ -45,7 +47,6 @@ SET(PROJECT_SRCS
   mafVector.h
   mafVector.txx
   mafVersion.h
-  mafWIN32.h
   mmuIdFactory.cpp
   mmuIdFactory.h
   mmuUtility.h
