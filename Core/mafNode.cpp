@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-01-10 00:11:06 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-01-11 17:25:26 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,12 +14,20 @@
 
 #include "mafNode.h"
 #include "mafNodeIterator.h"
-#include "mafVector.txx"
 #include "mafIndent.h"
 #include <sstream>
 #include <assert.h>
 
+//------------------------------------------------------------------------------
+// Events
+//------------------------------------------------------------------------------
+//MAF_ID_DEC(mafNode::MAF_CH_DOWNTREE)
+//MAF_ID_DEC(mafNode::MAF_CH_UPTREE)
+//-------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------
 mafCxxAbstractTypeMacro(mafNode)
+//-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
 mafNode::mafNode()
@@ -104,7 +112,7 @@ mafNodeIterator *mafNode::NewIterator()
 unsigned long mafNode::GetNumberOfChildren()
 //-------------------------------------------------------------------------
 {
-  return m_Children.GetNumberOfItems();
+  return m_Children.size();
 }
 
 //-------------------------------------------------------------------------
@@ -132,16 +140,21 @@ mafNode *mafNode::GetLastChild()
 mafNode *mafNode::GetChild(mafID idx)
 //-------------------------------------------------------------------------
 {
-  return m_Children[idx].GetPointer();
+  return (idx>=0&&idx<m_Children.size())?m_Children[idx].GetPointer():NULL;
 }
   
 //-------------------------------------------------------------------------
 int mafNode::FindNodeIdx(mafNode *a)
 //-------------------------------------------------------------------------
 {
-  mafID idx;
-  mafAutoPointer<mafNode> tmp(a);
-  return m_Children.FindItem(a,idx)?(int)idx:-1;
+  for (mafID i=0;i<m_Children.size();i++)
+  {
+    if (m_Children[i].GetPointer()==a)
+	  {
+	    return i;
+	  }
+  }
+  return -1;
 }
 
 //-------------------------------------------------------------------------
@@ -150,7 +163,7 @@ int mafNode::AddChild(mafNode *node)
 {
   if (node->SetParent(this)==MAF_OK)
   {
-    m_Children.AppendItem(node);
+    m_Children.push_back(node);
     Modified();
     return MAF_OK;
   }
@@ -161,13 +174,24 @@ int mafNode::AddChild(mafNode *node)
 void mafNode::RemoveChild(const mafID idx)
 //-------------------------------------------------------------------------
 {  
-  mafNode *oldnode=this->GetChild(idx);
+  mafNode *oldnode=GetChild(idx);
   if (oldnode)
   {
     // when called by ReparentTo the parent is already changed
     if (oldnode->GetParent()==this)
+    {
       oldnode->SetParent(NULL); 
-    m_Children.RemoveItem(idx);
+    }
+    else
+    {
+      mafErrorMacro("Wrong Parent pointer found in child node while removing it: should point to \""<<(m_Parent?m_Parent->GetName():"(NULL)")<<"\", instead points to "<<(oldnode->GetParent()?oldnode->GetParent()->GetName():"(NULL)")<<"\"");
+    }
+    m_Children.erase(m_Children.begin()+idx);
+    Modified();
+  }
+  else
+  {
+    mafWarningMacro("Trying to remove a child node with wrong index: "<<idx);
   }
 }
 
@@ -176,7 +200,7 @@ int mafNode::ReparentTo(mafNode *newparent)
 //-------------------------------------------------------------------------
 {
   // We cannot reparent to a subnode!!!
-  if (!this->IsInTree(newparent))
+  if (!IsInTree(newparent))
   {
     // Add this node to the new parent children list and
     // remove it from old parent children list.
@@ -188,6 +212,14 @@ int mafNode::ReparentTo(mafNode *newparent)
     
     if (oldparent!=newparent)
     {
+      // self register to preserve from distruction
+      Register(this);
+
+      if (oldparent)
+      {
+        oldparent->RemoveChild(this);
+      }
+
       if (newparent)
       {
         if (newparent->AddChild(this)==MAF_ERROR)
@@ -197,12 +229,9 @@ int mafNode::ReparentTo(mafNode *newparent)
       {
         this->SetParent(NULL);
       }
-
-      if (oldparent)
-      {
-        oldparent->RemoveChild(this);
-      }
-      Modified();
+      // remove self registration
+      UnRegister(this);
+      
     }
     
     return MAF_OK;
@@ -241,14 +270,12 @@ void mafNode::UnRegister(void *o)
 {
   if (this->m_ReferenceCount<=1)
   {
+    // m_Parent should already be set to NULL when deallocating memory
     if (m_Parent)
     {
-      if (o!=&(m_Parent->m_Children))
-      {
-        m_Parent->RemoveChild(this);
-
-        return;
-      }
+      mafWarningMacro("Deallocating a node still attached to the tree, detaching it immediatelly");
+      m_Parent->RemoveChild(this);
+      return;
     }    
   }
   
@@ -282,7 +309,7 @@ void mafNode::RemoveAllChildren()
       curr->SetParent(NULL);
   }
   
-  m_Children.RemoveAllItems();
+  m_Children.clear();
 }
 
 //------------------------------------------------------------------------------
@@ -304,11 +331,10 @@ int mafNode::SetParent(mafNode *parent)
       {
         this->InvokeEvent(mafNode::AttachToTreeEvent,this);
       }*/
-
+      Modified();
       return MAF_OK;
     }
 
-    
     // modified by Stefano 27-10-2004: Changed the error macro to give feedback about node names 
     mafErrorMacro("Cannot reparent the VME: " << GetName() << " under the " << parent->GetTypeName() \
       << " named " << parent_node->GetName());
@@ -319,14 +345,13 @@ int mafNode::SetParent(mafNode *parent)
     if (parent==NULL)
     {
       m_Parent=parent;
+      Modified();
       return MAF_OK;
     }
   }
 
   return MAF_ERROR;
 }
-
-
 
 //-------------------------------------------------------------------------
 mafNode *mafNode::MakeCopy(mafNode *a)
@@ -437,6 +462,13 @@ mafNode *mafNode::CopyTree(mafNode *vme, mafNode *parent)
   }
 
   return v;
+}
+
+//-------------------------------------------------------------------------
+void mafNode::OnEvent(mafEventBase *e)
+//-------------------------------------------------------------------------
+{
+  // default behavior is to send event to parent or to children depending on 
 }
 
 //-------------------------------------------------------------------------

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventSource.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-09 06:43:09 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-01-11 17:25:25 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -60,7 +60,7 @@ void mafEventSource::AddObserver(mafObserver &obj, int priority)
 void mafEventSource::AddObserver(mafObserver *obj, int priority)
 //------------------------------------------------------------------------------
 {
-  // searches for first element with priority <= priority
+  // search for first element with priority <= priority
   mafObserversListType::iterator it;
   for (it=m_Observers->m_List.begin(); it!=m_Observers->m_List.end() && (*it).first>priority ;it++) ;
 

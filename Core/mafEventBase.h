@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventBase.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-09 15:31:01 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-01-11 17:25:25 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -28,13 +28,20 @@ class mafEventSource;
   design pattern. Objective of this object is to listen to events rised by subjects.
   An observer must be registered into a subject to create the communication channel 
   between the two.
+  Fields of the basic events are:
+  - Sender: the object who sent this event
+  - Source: the event source object who issue the event (NULL for non event source sent events)
+  - Id: a numerical an ID identifying the type of content of this message
+  - Channel: a secondary ID identifying the scope of this message.
+  - Data: a void * for data to be attached to this event. (No reference counting, smart or autopointer mechanism!!!)
+  - SkipFlag: is used to make an event to be skipped by broadcasting mechanism for next observers
 
   @sa mafSubject mafObserver mafEvent
 */
 class MAF_EXPORT mafEventBase: public mafObject
 {
 public:
-  mafEventBase(void *sender=NULL,mafID id=ID_NO_EVENT,void *data=NULL);
+  mafEventBase(void *sender=NULL,mafID id=ID_NO_EVENT,void *data=NULL, mafID channel=0);
   virtual ~mafEventBase();
 
   mafTypeMacro(mafEventBase,mafObject);
@@ -62,6 +69,12 @@ public:
   /** return Id of this event */
   mafID GetId();
 
+  /** return channel this event is travelling through */
+  mafID GetChannel();
+  
+  /** set channel this event is travelling through */
+  void SetChannel(mafID channel);
+;
   /** set call data, data sent by sender (event's invoker) to all observers */
   void SetData(void *calldata);
 
@@ -69,22 +82,20 @@ public:
   void *GetData();
 
   /** return SkipFlag value. SkipFlag is used to make an event to be skipped by next observers */
-  bool GetSkipFlag() \
-    {return m_SkipFlag;}
+  bool GetSkipFlag();
 
   /** set the skip flag. When true the event will be skipped by next observers */
-  void SetSkipFlag(bool flag) \
-    {m_SkipFlag=flag;}
+  void SetSkipFlag(bool flag);
 
   /** force an event to be skipped by next observers */
-  void SkipNext() \
-    {m_SkipFlag=true;}
+  void SkipNext();
 
 protected:
   void            *m_Sender;
   mafEventSource  *m_Source;
   void            *m_Data;
   mafID           m_Id;
+  mafID           m_Channel;
   bool            m_SkipFlag;
 };
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-10 00:11:06 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-01-11 17:25:26 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -16,9 +16,10 @@
 #include "mafStorable.h"
 #include "mafSmartPointer.h"
 #include "mafEventSource.h"
-#include "mafVector.h"
+#include "mafObserver.h"
 #include "mafString.h"
 #include "mafMTime.h"
+#include <vector>
 
 //----------------------------------------------------------------------------
 // forward declarations
@@ -60,9 +61,18 @@ class mafNodeIterator;
 
   @sa mafRootNode
 */
-class MAF_EXPORT mafNode : public mafReferenceCounted, public mafStorable
+class MAF_EXPORT mafNode : public mafReferenceCounted, public mafStorable, public mafObserver
 {
 public:
+  //------------------------------------------------------------------------------
+  // Events
+  //------------------------------------------------------------------------------
+  /** @ingroup Events */
+  /** @{ */
+  //MAF_ID_DEC(MAF_CH_DOWNTREE) ///< Channel used broadcast an event down in the tree
+  //MAF_ID_DEC(MAF_CH_UPTREE) ///< Channel used issue an event up in the tree
+  /** @} */
+
   mafAbstractTypeMacro(mafNode,mafReferenceCounted);
 
   // the base class cannot be instantiated, and thus copied
@@ -244,10 +254,13 @@ public:
   /** return a reference to the event source issuing events for this object */
   mafEventSource &GetEventSource() {return m_EventSource;}
 
-  typedef mafVector<mafAutoPointer<mafNode> > mafChildrenVector;
+  typedef std::vector<mafAutoPointer<mafNode> > mafChildrenVector;
 
   /** return list of children */
   const mafChildrenVector *GetChildren() {return &m_Children;}
+
+  /** Precess events coming from other objects */ 
+  virtual void OnEvent(mafEventBase *e);
 protected:
   mafNode();
   virtual ~mafNode();
