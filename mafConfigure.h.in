@@ -29,7 +29,6 @@
 #cmakedefine MAF_USE_ITK
 
 /* what byte order */
-#cmakedefine CMAKE_WORDS_BIGENDIAN
 
 /* what threading system are we using */
 #cmakedefine CMAKE_USE_PTHREADS_INIT
