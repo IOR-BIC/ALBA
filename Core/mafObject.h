@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObject.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-25 11:29:35 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2004-11-29 21:14:32 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -69,9 +69,16 @@ public:
   mafObject(const mafObject& c) {}
   //void operator=(const mafObject&) {}
 
+#ifdef _WIN32
+    // avoid dll boundary problems
+  void* operator new( size_t tSize );
+  void operator delete( void* p );
+#endif
+
 protected:
   /** Internally used to keep a unique ID for all the object */
   static mafID GetNextTypeId(const char *classname);
+  bool HeapFlag;
 
 private:
   static mafID m_TypeId;

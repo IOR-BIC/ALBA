@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObjectFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-25 11:29:35 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-11-29 21:14:32 $
+  Version:   $Revision: 1.4 $
   Authors:   Based on itkObjectFactory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -372,7 +372,7 @@ void mafObjectFactory::RegisterFactory(mafObjectFactory* factory)
     }
   mafObjectFactory::Initialize();
   mafObjectFactory::m_RegisteredFactories->push_back(factory);
-  factory->Register();
+  factory->Register(0);
 }
 
 /*//------------------------------------------------------------------------------
@@ -412,7 +412,7 @@ void mafObjectFactory::UnRegisterFactory(mafObjectFactory* factory)
     if ( factory == *i )
       {
       m_RegisteredFactories->remove(factory);
-      factory->UnRegister();
+      factory->UnRegister(0);
       return;
       }
     }
@@ -429,7 +429,7 @@ void mafObjectFactory::UnRegisterAllFactories()
             = m_RegisteredFactories->begin();
           i != m_RegisteredFactories->end(); ++i )
     {
-      (*i)->UnRegister();
+      (*i)->UnRegister(0);
     }
     delete mafObjectFactory::m_RegisteredFactories;
     mafObjectFactory::m_RegisteredFactories = 0;

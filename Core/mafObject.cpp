@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObject.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-25 11:29:35 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2004-11-29 21:14:32 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -35,8 +35,28 @@ mafObjectDictionaryType mafObject::m_TypesDictionary;
 mafID mafObject::m_TypeIdCounter = 0; // This is for allocating unique Object IDs.
 
 mafID mafObject::m_TypeId = GetNextTypeId("mafObject");
+
+
+#ifdef _WIN32
 //------------------------------------------------------------------------------
-mafObject::mafObject()
+// avoid dll boundary problems
+void* mafObject::operator new(size_t nSize)
+//------------------------------------------------------------------------------
+{
+  void* p=malloc(nSize);
+  return p;
+}
+
+//------------------------------------------------------------------------------
+void mafObject::operator delete( void *p )
+//------------------------------------------------------------------------------
+{
+  free(p);
+}
+#endif 
+
+//------------------------------------------------------------------------------
+mafObject::mafObject():HeapFlag(0)
 //------------------------------------------------------------------------------
 {
 }

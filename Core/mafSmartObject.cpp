@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSmartObject.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-29 09:33:04 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-11-29 21:14:32 $
+  Version:   $Revision: 1.3 $
   Authors:   based on vtkObjectBase (www.vtk.org), adapted Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,26 +13,16 @@
 #include "mafSmartObject.h"
 #include <malloc.h>
 #include <sstream>
+#include <assert.h>
 
-mafCxxTypeMacro(mafSmartObject);
+mafCxxAbstractTypeMacro(mafSmartObject);
 
-#ifdef _WIN32
 //------------------------------------------------------------------------------
-// avoid dll boundary problems
-void* mafSmartObject::operator new(size_t nSize)
+void mafSmartObject::Delete()
 //------------------------------------------------------------------------------
 {
-  void* p=malloc(nSize);
-  return p;
+  UnRegister(NULL);
 }
-
-void mafSmartObject::operator delete( void *p )
-{
-  mafSmartObject *obj=(mafSmartObject *)p;
-  if (obj->ReferenceCount<=0)
-    free(p);
-}
-#endif 
 
 //------------------------------------------------------------------------------
 // Create an object with Debug turned off and modified time initialized 
@@ -40,7 +30,7 @@ void mafSmartObject::operator delete( void *p )
 mafSmartObject::mafSmartObject()
 //------------------------------------------------------------------------------
 {
-  this->ReferenceCount = 1;
+  this->ReferenceCount = 0;
   // initial reference count = 1 and reference counting on.
 }
 
@@ -52,20 +42,10 @@ mafSmartObject::~mafSmartObject()
   // by another object
   if ( this->ReferenceCount > 0)
   {
-    mafWarningMacro(<< "Trying to delete object with non-zero reference count.");
+    mafErrorMacro(<< "Trying to delete object with non-zero reference count.");
+    assert(true);
   }
 }
-
-/*
-//------------------------------------------------------------------------------
-// Delete a vtk object. This method should always be used to delete an object 
-// when the new operator was used to create it. Using the C++ delete method
-// will not work with reference counting.
-void mafSmartObject::Delete()
-//------------------------------------------------------------------------------
-{
-  this->UnRegister();
-}*/
 
 //------------------------------------------------------------------------------
 // Sets the reference count (use with care)
@@ -77,21 +57,34 @@ void mafSmartObject::SetReferenceCount(int ref)
 
 //------------------------------------------------------------------------------
 // Increase the reference count (mark as used by another object).
-void mafSmartObject::Register()
+void mafSmartObject::Register(void *obj)
 //------------------------------------------------------------------------------
 {
+  if (!HeapFlag)
+  {
+    mafErrorMacro(<< "Trying to Register a non-dynamically allocated object.");
+    return;
+  }
+
   this->ReferenceCount++;
+
   if (this->ReferenceCount <= 0)
-    {
+  {
     delete this;
-    }
+  }
 }
 
 //------------------------------------------------------------------------------
 // Decrease the reference count (release by another object).
-void mafSmartObject::UnRegister()
+void mafSmartObject::UnRegister(void *obj)
 //------------------------------------------------------------------------------
 {
+  if (!HeapFlag)
+  {
+    mafErrorMacro(<< "Trying to UnRegister a non-dynamically allocated object.");
+    return;
+  }
+
   if (--this->ReferenceCount <= 0)
   {
     // invoke the delete method

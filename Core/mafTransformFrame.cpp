@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-29 09:33:05 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-11-29 21:16:22 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -70,10 +70,10 @@ void mafTransformFrame::PrintSelf(ostream& os, vtkIndent indent)
 void mafTransformFrame::SetInput(mafTransformBase *matrix)
 //----------------------------------------------------------------------------
 {
-  if (m_Input) m_Input->UnRegister();
+  if (m_Input) m_Input->UnRegister(this);
   m_Input = matrix;
   if (matrix)
-    matrix->Register();
+    matrix->Register(this);
 }
 
 //----------------------------------------------------------------------------
@@ -90,10 +90,10 @@ void mafTransformFrame::SetInput(mafMatrix *matrix)
 void mafTransformFrame::SetInputFrame(mafTransformBase *frame)
 //----------------------------------------------------------------------------
 {
-  if (m_InputFrame) m_InputFrame->UnRegister();
+  if (m_InputFrame) m_InputFrame->UnRegister(this);
   m_InputFrame = frame;
   if (frame)
-    frame->Register();
+    frame->Register(this);
 }
 
 //----------------------------------------------------------------------------
@@ -109,10 +109,10 @@ void mafTransformFrame::SetInputFrame(mafMatrix *matrix)
 void mafTransformFrame::SetTargetFrame(mafTransformBase *frame)
 //----------------------------------------------------------------------------
 {
-  if (m_TargetFrame) m_TargetFrame->UnRegister();
+  if (m_TargetFrame) m_TargetFrame->UnRegister(this);
   m_TargetFrame = frame;
   if (frame)
-    frame->Register();
+    frame->Register(this);
 }
 
 //----------------------------------------------------------------------------

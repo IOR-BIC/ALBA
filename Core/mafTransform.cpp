@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-29 09:33:04 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-11-29 21:16:22 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -878,7 +878,7 @@ void mafTransform::GetOrientation(const mafMatrix &in_matrix,double orientation[
 void mafTransform::GetOrientation(const mafMatrix &in_matrix,float orientation[3])
 //----------------------------------------------------------------------------
 {
-  float temp[3];
+  double temp[3];
   GetOrientation(in_matrix,temp);
   orientation[0]=temp[0];
   orientation[1]=temp[1];
