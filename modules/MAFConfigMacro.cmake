@@ -11,7 +11,7 @@ MACRO(MAF_SUBPROJECT SUBPROJECT_NAME SUBPROJECT_DIR)
   # if not previous configure errors
   IF (NOT CONFIGURE_ERROR)  
     IF (EXISTS ${MAF_SOURCE_DIR}/${SUBPROJECT_DIR}/Configure.cmake)
-      MESSAGE ("Configuring subproject ${SUBPROJECT_NAME}")
+      MESSAGE (STATUS "Configuring subproject ${SUBPROJECT_NAME}")
       # Set some useful variables
       SET(SUBPROJECT_BINARY_DIR ${MAF_BINARY_DIR}/${SUBPROJECT_DIR})
       SET (${SUBPROJECT_NAME}_BINARY_DIR ${MAF_BINARY_DIR}/${SUBPROJECT_DIR})
