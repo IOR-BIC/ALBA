@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2005-02-21 13:53:51 $
-# Version:   $Revision: 1.16 $
+# Date:      $Date: 2005-04-01 09:46:38 $
+# Version:   $Revision: 1.17 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -112,6 +112,7 @@ IF (MAF_CAN_BUILD)
   INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/Core)
   INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/Gui)
   INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/IO)
+  INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/VME)
 
   # Configuring MAF kits
   DBG_MESSAGE("MAF: Configuring MAF Kits")
@@ -119,6 +120,7 @@ IF (MAF_CAN_BUILD)
   SUBDIRS (Base)
   SUBDIRS (Core)
   SUBDIRS (IO)
+  SUBDIRS (VME)
   SUBDIRS (vtkMAF)
   SUBDIRS (Gui)
   
