@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:32:13 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-03-11 10:09:30 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -600,41 +600,44 @@ bool mafNode::CanCopy(mafNode *node)
 }
 
 //-------------------------------------------------------------------------
-bool mafNode::Equals(mafNode *vme)
+bool mafNode::Equals(mafNode *node)
 //-------------------------------------------------------------------------
 {
-  // do not check ID!!!
+  if (!node||!node->IsA(GetTypeName()))
+    return false;
 
-  if (m_Name != vme->m_Name)
+  // do not check the ID!!!
+
+  if (m_Name != node->m_Name)
     return false;
 
   // check attributes
-  if (m_Attributes.size()!=vme->GetAttributes()->size())
+  if (m_Attributes.size()!=node->GetAttributes()->size())
     return false;
 
   mafAttributesMap::iterator att_it;
   mafAttributesMap::iterator att_it2;
-  for (att_it=m_Attributes.begin(),att_it2=vme->GetAttributes()->begin();att_it!=m_Attributes.end();att_it++,att_it2++)
+  for (att_it=m_Attributes.begin(),att_it2=node->GetAttributes()->begin();att_it!=m_Attributes.end();att_it++,att_it2++)
   {
     if (!att_it->second->Equals(att_it2->second))
       return false;
 
-    if (att_it2==vme->GetAttributes()->end())
+    if (att_it2==node->GetAttributes()->end())
       return false;
   }
 
   // check links (poor links checking, only linked VME name)
-  if (m_Links.size()!=vme->GetLinks()->size())
+  if (m_Links.size()!=node->GetLinks()->size())
     return false;
 
   mafLinksMap::iterator lnk_it;
   mafLinksMap::iterator lnk_it2;
-  for (lnk_it=m_Links.begin(),lnk_it2=vme->GetLinks()->begin();lnk_it!=m_Links.end();lnk_it++,lnk_it2++)
+  for (lnk_it=m_Links.begin(),lnk_it2=node->GetLinks()->begin();lnk_it!=m_Links.end();lnk_it++,lnk_it2++)
   {
     if (!(lnk_it->second.m_NodeId==lnk_it2->second.m_NodeId))
       return false;
 
-    if (lnk_it2==vme->GetLinks()->end())
+    if (lnk_it2==node->GetLinks()->end())
       return false;
   }
 
@@ -853,25 +856,29 @@ void mafNode::OnEvent(mafEventBase *e)
     ForwardUpEvent(e);
     return;
   }
-
   if (e->GetChannel()==MCH_DOWN)
   {
     ForwardDownEvent(e);
     return;
   }
 
-  switch (e->GetId())
+  // events arriving directly from another node
+  if (e->GetChannel()==MCH_NODE)
   {
-  case NODE_DETACHED_FROM_TREE:
-    OnNodeDetachedFromTree(e);
-  break;
-  case NODE_ATTACHED_TO_TREE:
-    OnNodeAttachedToTree(e);
-  break;
-  case NODE_DESTROYED:
-    OnNodeDestroyed(e);
-  break;
+    switch (e->GetId())
+    {
+    case NODE_DETACHED_FROM_TREE:
+      OnNodeDetachedFromTree(e);
+    break;
+    case NODE_ATTACHED_TO_TREE:
+      OnNodeAttachedToTree(e);
+    break;
+    case NODE_DESTROYED:
+      OnNodeDestroyed(e);
+    break;
+    }
   }
+  
 }
 
 //-------------------------------------------------------------------------
