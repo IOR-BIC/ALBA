@@ -3,8 +3,8 @@
 Program:   Visualization Toolkit
 Module:    $RCSfile: mafVector.txx,v $
 Language:  C++
-Date:      $Date: 2004-12-01 18:42:53 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2004-12-02 13:29:00 $
+Version:   $Revision: 1.2 $
 
 
 
@@ -16,6 +16,9 @@ Version:   $Revision: 1.1 $
 //#include "mafSmartPointer.h"
 #include <vector>
 #include <assert.h>
+
+template <class T>
+T mafVector<T>::NullItem;
 
 //------------------------------------------------------------------------------
 // PIMPL declarations
@@ -32,7 +35,7 @@ template <class T>
 mafVector<T>::mafVector()
 //------------------------------------------------------------------------------
 {
-  Items  = new mafVectorItems<T>;
+  m_Items  = new mafVectorItems<T>;
 }
 
 //------------------------------------------------------------------------------
@@ -41,7 +44,7 @@ mafVector<T>::~mafVector()
 //------------------------------------------------------------------------------
 {
   RemoveAllItems();
-  delete Items;
+  delete m_Items;
 }
 
 //------------------------------------------------------------------------------
@@ -50,7 +53,13 @@ void mafVector<T>::SetItem(mafID idx,const T &object)
 //------------------------------------------------------------------------------
 {
   assert(object);
-  Items->Vector[idx]=object;
+  if (m_Items->Vector.size()<=idx)
+  {
+	m_Items->Vector.resize(idx+1);
+  }
+	
+
+  m_Items->Vector[idx]=object;
 }
 
 //------------------------------------------------------------------------------
@@ -59,18 +68,18 @@ mafID mafVector<T>::AppendItem(const T &object)
 //------------------------------------------------------------------------------
 {
   assert(object);
-  Items->Vector.push_back(object);
-  return Items->Vector.size()-1;
+  m_Items->Vector.push_back(object);
+  return m_Items->Vector.size()-1;
 }
 
 //------------------------------------------------------------------------------
 template <class T>
-bool mafVector<T>::GetItem(mafID idx, T &object)
+bool mafVector<T>::GetItem(mafID idx,T &obj)
 //------------------------------------------------------------------------------
 {
-	if (idx<Items->Vector.size())
+	if (idx>=0 && idx<m_Items->Vector.size())
 	{
-		object = Items->Vector[idx];
+		obj=m_Items->Vector[idx];
 		return true;
 	}
 	else
@@ -81,18 +90,33 @@ bool mafVector<T>::GetItem(mafID idx, T &object)
 
 //------------------------------------------------------------------------------
 template <class T>
-T &mafVector<T>::operator [](const mafID idx)
+T &mafVector<T>::GetItem(const mafID idx)
 //------------------------------------------------------------------------------
 {
-  return Items->Vector[idx];
+	if (idx>=0 && idx<m_Items->Vector.size())
+	{
+		return m_Items->Vector[idx];
+	}
+	else
+	{
+		return NullItem;
+	}
 }
 
 //------------------------------------------------------------------------------
 template <class T>
-T mafVector<T>::operator [](const mafID idx) const
+T &mafVector<T>::operator [](const mafID idx)
 //------------------------------------------------------------------------------
 {
-  return Items->Vector[idx];
+  return (idx<m_Items->Vector.size())?m_Items->Vector[idx]:NullItem;
+}
+
+//------------------------------------------------------------------------------
+template <class T>
+const T &mafVector<T>::operator [](const mafID idx) const
+//------------------------------------------------------------------------------
+{
+  return (idx<m_Items->Vector.size())?m_Items->Vector[idx]:NullItem;
 }
 
 //------------------------------------------------------------------------------
@@ -102,9 +126,9 @@ bool mafVector<T>::ReplaceItem(mafID idx, const T &newitem)
 {
   assert(newitem);
 
-  if (idx<Items->Vector.size())
+  if (idx<m_Items->Vector.size())
   {
-	Items->Vector[idx]=newitem;
+	m_Items->Vector[idx]=newitem;
 
     return true;
   }
@@ -117,9 +141,9 @@ template <class T>
 bool mafVector<T>::RemoveItem(mafID idx)
 //------------------------------------------------------------------------------
 {
-  if (idx<Items->Vector.size())
+  if (idx<m_Items->Vector.size())
   {
-    Items->Vector.erase(&Items->Vector[idx]);
+    m_Items->Vector.erase(&m_Items->Vector[idx]);
 
     return true;
   }
@@ -148,7 +172,7 @@ template <class T>
 void mafVector<T>::RemoveAllItems()
 //------------------------------------------------------------------------------
 {
-  Items->Vector.clear();
+  m_Items->Vector.clear();
 }
 
 //------------------------------------------------------------------------------
@@ -156,8 +180,8 @@ template <class T>
 bool mafVector<T>::FindItem(const T &object, mafID &idx)
 //------------------------------------------------------------------------------
 {
-  for (mafID i=0;i<Items->Vector.size();i++)
-    if (Items->Vector[i].GetPointer()==object)
+  for (mafID i=0;i<m_Items->Vector.size();i++)
+    if (m_Items->Vector[i]==object)
 	{
 	  idx=i;
       return true;
@@ -165,6 +189,7 @@ bool mafVector<T>::FindItem(const T &object, mafID &idx)
 
   return false;
 }
+
 
 //------------------------------------------------------------------------------
 template <class T>
@@ -180,7 +205,7 @@ template <class T>
 mafID mafVector<T>::Push(const T &object)
 //------------------------------------------------------------------------------
 {
-	return AppendItem(object);
+  return AppendItem(object);
 }
 
 //------------------------------------------------------------------------------
@@ -188,15 +213,13 @@ template <class T>
 bool mafVector<T>::Pop(T &obj)
 //------------------------------------------------------------------------------
 {
-	if (GetItem(GetNumberOfItems()-1,obj))
-	{
-		RemoveItem(GetNumberOfItems()-1);
-		return true;
-	}	
-	else
-	{
-		return false;
-	}	
+  if (GetItem(GetNumberOfItems()-1,obj))
+  {
+    RemoveItem(GetNumberOfItems()-1);
+    return true;
+  }
+	 
+  return false;	
 }
 
 //------------------------------------------------------------------------------
@@ -204,8 +227,7 @@ template <class T>
 mafID mafVector<T>::GetNumberOfItems()
 //------------------------------------------------------------------------------
 {
-  return Items->Vector.size();
+  return m_Items->Vector.size();
 }
-
 
 #endif

@@ -1,6 +1,7 @@
 #include "mafSmartObject.h"
 #include "mafSmartPointer.h"
 #include <iostream>
+#include <map>
 
 /**
  This object set a flag when allocated and reset it when deallocated,
@@ -62,6 +63,12 @@ int main()
   // Notice: calling the mafSmartPointer UnRegister() not the mafSmartObject one!!!
   auto_foo.UnRegister(NULL); 
   MAF_TEST(!flag);
+
+  mafSmartPointer<mafFooObject> a,b,c;
+  a=b;
+  b=c;
+  MAF_TEST(a->GetReferenceCount()==1);
+  
 
   std::cout<<"Test completed successfully!"<<std::endl;
 

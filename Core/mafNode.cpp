@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-30 18:18:20 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-12-02 13:28:58 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,18 +14,18 @@
 
 #include "mafNode.h"
 #include "mafNodeIterator.h"
-#include "mafTemplatedVector.txx"
+#include "mafVector.txx"
+#include <sstream>
 
 //-------------------------------------------------------------------------
 mafNode::mafNode()
 //-------------------------------------------------------------------------
 {
-  m_Children  = new mafTemplatedVector<mafNode>;
   m_Parent    = NULL;
 
   m_Initialized         = false;
   m_VisibleToTraverse   = true;
-  m_Crypting            = -1;
+  m_Crypting            = NO_CRYPTING;
 }
 
 //-------------------------------------------------------------------------
@@ -35,21 +35,19 @@ mafNode::~mafNode()
   // remove all the children
   RemoveAllChildren();
 
-  m_Children->UnRegister(this);
   SetParent(NULL);
-  SetClientData(NULL);
 }
 
 //------------------------------------------------------------------------------
 int mafNode::Initialize()
 //------------------------------------------------------------------------------
 {
-  if (this->Initialized)
+  if (m_Initialized)
     return -1;
 
   if (this->InternalInitialize() == 0)
   {
-    this->Initialized=1;
+    m_Initialized=1;
     return 0;
   }
 
@@ -61,10 +59,10 @@ int mafNode::Initialize()
 void mafNode::Shutdown()
 //------------------------------------------------------------------------------
 {
-  if (Initialized)
+  if (m_Initialized)
   {
     InternalShutdown();
-    Initialized = 0;
+    m_Initialized = 0;
   }
 }
 
@@ -72,7 +70,7 @@ void mafNode::Shutdown()
 mafNodeIterator *mafNode::NewIterator()
 //-------------------------------------------------------------------------
 {
-  mafNodeIterator *iter= new mafNodeIterator;
+  mafNodeIterator *iter= mafNodeIterator::New();
   iter->SetRootNode(this);
   return iter;
 }
@@ -81,7 +79,7 @@ mafNodeIterator *mafNode::NewIterator()
 int mafNode::GetNumberOfChildren()
 //-------------------------------------------------------------------------
 {
-  return m_Children->GetNumberOfItems();
+  return m_Children.GetNumberOfItems();
 }
 
 //-------------------------------------------------------------------------
@@ -106,19 +104,22 @@ mafNode *mafNode::GetLastChild()
 }
 
 //-------------------------------------------------------------------------
-mafNode *mafNode::GetChild(vtkIdType idx)
+mafNode *mafNode::GetChild(mafID idx)
 //-------------------------------------------------------------------------
 {
-  mafNode *node;
-  return m_Children->GetItem(idx,node)==MAF_OK?node:NULL;
+  if (idx<0||idx>=GetNumberOfChildren())
+    return m_Children[idx].GetPointer();
+
+  return NULL;
 }
   
 //-------------------------------------------------------------------------
 int mafNode::FindNodeIdx(mafNode *a)
 //-------------------------------------------------------------------------
 {
-  int idx;
-  return (m_Children->FindItem(a,idx)==MAF_OK?idx:-1);
+  mafID idx;
+  mafAutoPointer<mafNode> tmp(a);
+  return m_Children.FindItem(a,idx)?idx:-1;
 }
 
 //-------------------------------------------------------------------------
@@ -127,7 +128,7 @@ int mafNode::AddChild(mafNode *node)
 {
   if (node->SetParent(this)==MAF_OK)
   {
-    if (m_Children->AppendItem(node)==MAF_OK)
+    if (m_Children.AppendItem(node))
     {
       Modified();
       return MAF_OK;
@@ -136,32 +137,16 @@ int mafNode::AddChild(mafNode *node)
   return MAF_ERROR;
 }  
 
-/*//-------------------------------------------------------------------------
-void mafNode::ReplaceChild(int idx,mafNode *node)
 //-------------------------------------------------------------------------
-{
-  if (idx>=0&&idx<m_GetNumberOfChildren())
-  {
-    mafNode *oldnode=m_GetChild(idx);
-    if (oldnode)
-    {
-      oldnode->SetParent(NULL);
-      m_Children->SetItem(idx,node);
-      node->SetParent(this);
-    }
-  }
-}
-*/
-//-------------------------------------------------------------------------
-void mafNode::RemoveChild(int idx)
+void mafNode::RemoveChild(const mafID idx)
 //-------------------------------------------------------------------------
 {  
   mafNode *oldnode=this->GetChild(idx);
   if (oldnode)
   {
-    assert(oldnode->GetParent()==this)
+    assert(oldnode->GetParent()==this);
     oldnode->SetParent(NULL);
-    m_Children->RemoveItem(idx);
+    m_Children.RemoveItem(idx);
   }
 }
 
@@ -176,7 +161,7 @@ int mafNode::ReparentTo(mafNode *newparent)
     // remove it from old parent children list.
     // We first add it to the new parent, thus it is registered
     // from the new parent, the we remove it from the list of the old parent.
-    // We must keep the oldparent pointer somewhere since it is oeverwritten
+    // We must keep the oldparent pointer somewhere since it is overwritten
     // by AddChild.
     mafNode *oldparent=m_Parent;
     
@@ -207,7 +192,7 @@ int mafNode::ReparentTo(mafNode *newparent)
 }
 
 //-------------------------------------------------------------------------
-mafRootNode *mafRootNode::GetRoot()
+mafNode *mafNode::GetRoot()
 //-------------------------------------------------------------------------
 {
   mafNode *node;
@@ -236,7 +221,7 @@ void mafNode::UnRegister(void *o)
   {
     if (m_Parent)
     {
-      if (o!=m_Parent->m_Children)
+      if (o!=&(m_Parent->m_Children))
       {
         m_Parent->RemoveChild(this);
 
@@ -275,16 +260,7 @@ void mafNode::RemoveAllChildren()
       curr->SetParent(NULL);
   }
   
-  m_Children->RemoveAllItems();
-}
-
-//-------------------------------------------------------------------------
-int mafNode::SetParent(mafNode *parent)
-//-------------------------------------------------------------------------
-{
-  m_Parent=parent;
-
-  return MAF_OK;
+  m_Children.RemoveAllItems();
 }
 
 //------------------------------------------------------------------------------
@@ -297,6 +273,7 @@ int mafNode::SetParent(mafNode *parent)
     {  
       m_Parent=parent_node;
 
+      // TODO: reimplement with new events
       /*if (parent_node==NULL)
       {
         this->InvokeEvent(mafNode::DetachFromTreeEvent,this);
@@ -334,7 +311,8 @@ mafNode *mafNode::MakeCopy(mafNode *a)
 //-------------------------------------------------------------------------
 {
   mafNode* newnode=a->NewInstance();
-  newnode->DeepCopy(a);
+  if (newnode)
+    newnode->DeepCopy(a);
   return newnode;
 }
 

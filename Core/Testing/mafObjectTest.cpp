@@ -43,7 +43,6 @@ int main()
   MAF_TEST(!dummy.IsA(mafFooObject::GetTypeName()));
   MAF_TEST(dummy.GetTypeId()==dummy.GetClassId());
   MAF_TEST(dummy.GetTypeId()==dummy.GetClassId());
-  MAF_TEST(mafObject::GetTypeId("mafDummyObject")==dummy.GetClassId());
 
   mafObject *new_dummy=dummy.NewInstance();
   mafObject *new_foo=foo.NewInstance();

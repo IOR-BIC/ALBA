@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSmartPointer.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-01 18:43:07 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-12-02 13:28:59 $
+  Version:   $Revision: 1.4 $
   Authors:   based on vtkSmartPointer (www.vtk.org), rewritten by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,6 +13,7 @@
 #define __mafSmartPointer_h
 
 #include "mafDefines.h"
+#include "mafSmartObject.h"
 
 /** Hold a reference to a T instance.
   mafAutoPointer stores a pointer to a mafSmartObjct, and keeps it registered. When 
@@ -70,7 +71,7 @@ class mafSmartPointer: public mafAutoPointer<T>
 public:
   /**
   Initialize smart pointer to a new instance of class T.*/
-  mafSmartPointer() {m_Object=T::New();}
+  mafSmartPointer() {m_Object=T::New();Register(NULL);}
 
   /**
   Initialize smart pointer to given object pointer and reference the given object.*/
@@ -81,6 +82,8 @@ public:
   referenced by given smart pointer.*/
   mafSmartPointer(const mafAutoPointer& r): mafAutoPointer(r) {}
 };
+template <class T> typedef mafAutoPointer<T> mafAuto;
+template <class T> typedef mafSmartPointer<T> mafSmart;
 
 //----------------------------------------------------------------------------
 template <class T>
@@ -97,7 +100,19 @@ mafAutoPointer<T>::~mafAutoPointer()
 {
   UnRegister(NULL);
 }
-  
+
+//----------------------------------------------------------------------------
+template <class T>
+mafAutoPointer<T>& mafAutoPointer<T>::operator=(const mafAutoPointer<T>& r)
+//----------------------------------------------------------------------------
+{
+  // make use of a temp auto-ptr to safely unregister, this
+  // to avoid deallocation in case of self assignment
+  mafAutoPointer<T> tmp(r);
+  tmp.Swap(*this); // swaps the two pointers
+  return *this;
+}
+
 //----------------------------------------------------------------------------
 template <class T>
 mafAutoPointer<T>& mafAutoPointer<T>::operator=(T* r)
@@ -109,17 +124,6 @@ mafAutoPointer<T>& mafAutoPointer<T>::operator=(T* r)
   return *this;
 }
 
-//----------------------------------------------------------------------------
-template <class T>
-mafAutoPointer<T>& mafAutoPointer<T>::operator=(const mafAutoPointer<T>& r)
-//----------------------------------------------------------------------------
-{
-  // make use of a temp auto-ptr to safely unregister, this
-  // to avoid deallocation in case of self assignment
-  mafAutoPointer(r).Swap(*this);
-  Register(NULL);
-  return *this;
-}
 
 //----------------------------------------------------------------------------
 template <class T>
@@ -156,6 +160,14 @@ void mafAutoPointer<T>::UnRegister(void *owner)
 
 //----------------------------------------------------------------------------
 template <class T>
+mafAutoPointer<T>::mafAutoPointer(T* r, void *owner):m_Object(r)
+//----------------------------------------------------------------------------
+{
+  Register(owner);
+}
+
+//----------------------------------------------------------------------------
+template <class T>
 inline bool operator == (const mafAutoPointer<T>& l, const mafAutoPointer<T>& r) \
 { return (static_cast<void*>(l.GetPointer()) == static_cast<void*>(r.GetPointer())); }
 //----------------------------------------------------------------------------
@@ -173,15 +185,6 @@ template <class T>
 inline bool operator == (const mafAutoPointer<T>& l, mafSmartObject* r) \
 { return (static_cast<void*>(l.GetPointer()) == static_cast<void*>(r)); }
 //----------------------------------------------------------------------------
-
-
-//----------------------------------------------------------------------------
-template <class T>
-mafAutoPointer<T>::mafAutoPointer(T* r, void *owner):m_Object(r)
-//----------------------------------------------------------------------------
-{
-  Register(owner);
-}
 
 
 #endif

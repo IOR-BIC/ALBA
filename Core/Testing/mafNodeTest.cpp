@@ -4,11 +4,12 @@
 int main()
 {
   
-  mafNode *node = 
+  mafSmartPointer<mafNode> root;
+  mafSmartPointer<mafNode> first_node;
+  mafSmartPointer<mafNode> second_node;
+  mafSmartPointer<mafNode> third_node;
 
-  MAF_TEST(flag);
-  obj->UnRegister();
-  MAF_TEST(!flag);
+
 
   std::cout<<"Test completed successfully!"<<std::endl;
 

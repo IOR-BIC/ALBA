@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVector.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-01 18:42:52 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-12-02 13:29:00 $
+  Version:   $Revision: 1.2 $
   Authors:   based on vtkObjectBase (www.vtk.org), adapted Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -68,9 +68,14 @@ public:
   bool IsItemPresent(const T &object);
  
   /**
-   Get the item with given Key in the container. NULL is returned if no item
-   with such key is present */
-  bool GetItem(const mafID idx,T &object);
+   Get the item with given Key in the container. false is returned if no item
+   with such index is present */
+  bool GetItem(const mafID idx,T &obj);
+
+  /**
+   Get the item with given Key in the container. NullItem is returned if no item
+   with such index is present */
+  T &GetItem(const mafID idx);
 
   /** Return the item index */
   bool FindItem(const T &object, mafID &idx);
@@ -80,20 +85,23 @@ public:
   //int GetNumberOfItems();
 
   /** append an item */
-  mafID Push(const T &object);
+  mafID Push(const T &obj);
 
-  /** 
-    retrieve an item. The item is dereferenced without deallocating, this
-    way the reference count of the returned object could be 0. The retrievier
-    should take care */ 
+  /** Retrieve an item */ 
   bool Pop(T &obj);
-
+  
+  /** provide access to vector items. If idx is outside the result is invalid */
   T &operator [](const mafID idx);
-  T operator [](const mafID idx) const;
+  
+  /** provide access to vector items. If idx is outside the result is invalid */
+  const T &operator [](const mafID idx) const;
 
+  static T NullItem;
+  
 protected:
 
-  mafVectorItems<T> *Items;
+  mafVectorItems<T> *m_Items;
+  
 
 private:
 

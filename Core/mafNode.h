@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-01 18:42:16 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-12-02 13:28:59 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -22,8 +22,6 @@
 // forward declarations
 //----------------------------------------------------------------------------
 class mafNodeIterator;
-class mafRootNode;
-//template <class T> class mafVector;
 
 //----------------------------------------------------------------------------
 // mafNode
@@ -35,12 +33,22 @@ class mafRootNode;
   advantage of the MAF smart object reference counting mechanism. To avoid confusion constructor
   and destructor have been commented. To allocate use New and to deallocate use Delete() or UnRegister().
 
+  @todo
+  - test
+  - events invoking
+
   @sa mafRootNode
 */
 class MAF_EXPORT mafNode : public mafSmartObject
 {
 public:
   mafAbstractTypeMacro(mafNode,mafSmartObject);
+
+  // the base class cannot be instantiated, and thus copied
+  virtual mafObject *NewInternalInstance() {return NULL;}
+
+  // Interface for creating a copy of the node (works only for concrete subclasses)
+  mafNode *NewInstance() {return SafeDownCast(NewInternalInstance());}
 
   //void PrintSelf(std::ostream& os, vtkIndent indent);
 
@@ -106,21 +114,15 @@ public:
   /** Add a child to this node. Return MAF_OK if success.*/
   virtual int AddChild(mafNode *node);
 
-  // TODO: to be removed
-  /** Replace a child with a new node.*/ 
-  //virtual void ReplaceChild(const int idx,mafNode *node);
-  /** Replace a child with a new node.*/
-  //virtual void ReplaceChild(mafNode *oldnode,mafNode *node) {ReplaceChild(FindNodeIdx(oldnode),node);};
-
   /** Remove a child node*/
-  virtual void RemoveChild(const int idx);
+  virtual void RemoveChild(const mafID idx);
   /** Remove a child node*/
   virtual void RemoveChild(mafNode *node) {RemoveChild(FindNodeIdx(node));};
 
   /**
     Find a child given its pointer and return its index. Return -1 in
     case of not found or failure.*/
-  int FindNodeIdx(const mafNode *a);
+  int FindNodeIdx(mafNode *a);
 
   /**
   Find a node in all the subtrees matching the given TagName/TagValue pair.*/
@@ -152,7 +154,7 @@ public:
   bool IsInTree(mafNode *a);
 
   /** Return the root of the tree this node owns to. */
-  mafRootNode *GetRoot();
+  mafNode *GetRoot();
 
   bool IsEmpty() {return GetNumberOfChildren()==0;}
 
@@ -179,6 +181,16 @@ public:
     the sub tree starting a this node*/
   mafNodeIterator *NewIterator();
 
+  /**
+  Set/Get the flag to make this VME visible to tree traversal. mflVMEIterator, 
+  GetSpaceBounds and Get4DBounds will skip this VME if the flag is OFF.*/
+  void SetVisibleToTraverse(bool flag) {m_VisibleToTraverse=flag;}
+  bool GetVisibleToTraverse() {return m_VisibleToTraverse;}
+
+  /**
+  Return true if visible to tree traversal*/
+  bool IsVisible() {return m_VisibleToTraverse;}
+
   /** Compare two nodes. sublcasses should redefine this function. */
   virtual bool Equals(mafNode *vme);
 
@@ -202,8 +214,9 @@ public:
   /** return modification time */
   inline unsigned long GetMTime();
 
-  typedef mafVector<mafAutoPointer<mafNode>> mafChildrenVector;
+  typedef mafVector<mafAutoPointer<mafNode> > mafChildrenVector;
 
+  enum crypting {NO_CRYPTING=0,DEFAULT_CRYPTING};
 protected:
   mafNode();
   virtual ~mafNode();
@@ -220,7 +233,7 @@ protected:
     to allow subclasses to implement selective reparenting.*/
   virtual int SetParent(mafNode *parent);
 
-  mafChildrenVector *m_Children;
+  mafChildrenVector m_Children;
   
   mafNode   *m_Parent;      ///< parent node
 

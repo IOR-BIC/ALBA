@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeIterator.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-30 18:18:21 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-12-02 13:28:59 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -15,17 +15,17 @@
 
 #include "mafObject.h"
 #include "mafNode.h"
-#include "mafStack.h"
+#include "mafVector.h"
 
 /** mafNodeIterator - an m-way tree data structure iterator
   mafNodeIterator is a class to traverse a tree data structure. It allows 
   to set the traverse modality. The iterator allows to set some callback to the 
-  traverse by means of the Subject/Observer mechanism of the mafObject. Recognized
-  observers' events are: "PreTraversal","PostTraversal","Deeper","Upper","FirstNode",
+  traverse by means of the MAF Subject/Observer mechanism.
+  Issued events are: "PreTraversal","PostTraversal","Deeper","Upper","FirstNode",
   "LastNode", "Done".
   These can be overidden by adding an observer
   
-  @sa mafNode mafObject
+  @sa mafNode
   */
 
 class MAF_EXPORT mafNodeIterator : public mafObject
@@ -36,11 +36,13 @@ public:
   /** Retrieve the current node pointer data from the iterator. */
   mafNode * GetCurrentNode() {return m_CurrentNode;}
 
-  /**
-  Shortcuts to traverse the tree*/
+  /**  Shortcut to traverse the tree*/
   mafNode * GetFirstNode() {this->GoToFirstNode(); return (m_TraversalDone)?NULL:this->GetCurrentNode();}
+  /**  Shortcut to traverse the tree*/
   mafNode * GetLastNode() {this->GoToLastNode(); return (m_TraversalDone)?NULL:this->GetCurrentNode();}
+  /**  Shortcut to traverse the tree*/
   mafNode * GetNextNode() {this->GoToNextNode(); return (m_TraversalDone)?NULL:this->GetCurrentNode();}
+  /**  Shortcut to traverse the tree*/
   mafNode * GetPreviousNode() {this->GoToPreviousNode(); return (m_TraversalDone)?NULL:this->GetCurrentNode();}
 
   /**
@@ -170,7 +172,7 @@ protected:
   int             m_TraversalMode;
   int             m_TraversalDone;
 
-  mafTemplatedVector<mafID> m_CurrentIdx;
+  mafVector<mafID> m_CurrentIdx;
 
 private:
   mafNodeIterator(const mafNodeIterator&) {} // Not implemented

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObject.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-30 18:18:21 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2004-12-02 13:28:59 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -26,16 +26,6 @@ class mafObjectDictionaryType
   mafObjectDictionaryType() {if (m_TypeIDs==NULL) m_TypeIDs=new std::map<std::string,mafID>;}
   ~mafObjectDictionaryType() {if (m_TypeIDs) delete m_TypeIDs;} // this is to allow memory deallocation
 }; 
-
-//------------------------------------------------------------------------------
-// Static Objects
-//------------------------------------------------------------------------------
-//std::map<std::string,mafID> * mafObjectDictionaryType::m_TypeIDs=NULL;
-//mafObjectDictionaryType mafObject::m_TypesDictionary;
-//mafID mafObject::m_TypeIdCounter = 0; // This is for allocating unique Object IDs.
-
-//mafID mafObject::m_TypeId = GetNextTypeId("mafObject");
-
 
 #ifdef _WIN32
 //------------------------------------------------------------------------------
@@ -78,7 +68,7 @@ const char *mafObject::GetTypeName()
 const char *mafObject::GetClassName() const
 //------------------------------------------------------------------------------
 {
-  return typeid(this).name();
+  return "mafObject";
 }
 
 //------------------------------------------------------------------------------
@@ -122,34 +112,3 @@ const mafTypeID &mafObject::GetClassId() const
 {
   return typeid(mafObject);
 }
-
-/*//------------------------------------------------------------------------------
-mafID mafObject::GetNextTypeId(const char *classname)
-//------------------------------------------------------------------------------
-{
-  mafID id=m_TypeIdCounter++;
-
-  if (m_TypesDictionary.m_TypeIDs==NULL)
-    m_TypesDictionary.m_TypeIDs=new std::map<std::string,mafID>;
-
-  (*m_TypesDictionary.m_TypeIDs)[classname]=id;
-
-  return id;
-}
-
-//------------------------------------------------------------------------------
-mafID mafObject::GetTypeId(const char *classname)
-//------------------------------------------------------------------------------
-{
-  mafID id=0;
-  
-  std::map<std::string,mafID>::iterator  it=(*m_TypesDictionary.m_TypeIDs).find(classname);
-
-  if (it!=(*m_TypesDictionary.m_TypeIDs).end())
-  {
-    id=it->second;
-  }
-  
-  return id;
-}
-*/

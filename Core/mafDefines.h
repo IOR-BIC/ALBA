@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-30 18:18:20 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2004-12-02 13:28:58 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -76,7 +76,9 @@ typedef type_info mafTypeID;
   public: \
   typedef superclass Superclass; \
   static const mafTypeID &GetTypeId(); \
+  virtual const mafTypeID &GetClassId() const; \
   static const char *GetTypeName(); \
+  virtual const char *GetClassName() const; \
   static bool IsTypeOf(const char *type); \
   static bool IsTypeOf(const mafTypeID &type); \
   virtual bool IsA(const char *type) const; \
@@ -99,10 +101,13 @@ typedef type_info mafTypeID;
   in the .cpp file. */
 #define mafCxxAbstractTypeMacro(thisClass) \
   const mafTypeID &thisClass::GetTypeId() {return typeid(thisClass);} \
+  const mafTypeID &thisClass::GetClassId() const {return typeid(thisClass);} \
   const char *thisClass::GetTypeName() {return #thisClass;} \
+  const char *thisClass::GetClassName() const {return #thisClass;} \
   bool thisClass::IsTypeOf(const char *type) \
   { return ( strcmp(#thisClass,type)==0 ) ? true : Superclass::IsTypeOf(type); } \
-  bool thisClass::IsTypeOf(const mafTypeID &type) { return ( type==typeid(thisClass) ? true : false ); } \
+  bool thisClass::IsTypeOf(const mafTypeID &type) \
+  { return ( type==typeid(thisClass) ? true : Superclass::IsTypeOf(type) ); } \
   bool thisClass::IsA(const char *type) const {return IsTypeOf(type);} \
   bool thisClass::IsA(const mafTypeID &type) const {return IsTypeOf(type);} \
   thisClass* thisClass::SafeDownCast(mafObject *o) \

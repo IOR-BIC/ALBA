@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSmartObject.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-29 21:14:32 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-12-02 13:28:59 $
+  Version:   $Revision: 1.4 $
   Authors:   based on vtkObjectBase (www.vtk.org), adapted Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -38,7 +38,8 @@ public:
   /**
     Delete a MAF object.  This method should be used to delete
     an object when the New() method was used to create it. Using the
-    C++ delete method will not work with reference counting. */
+    C++ delete method will not work with reference counting. This is 
+    the same as UnRegister(NULL) */
   virtual void Delete();
 
   /** Increase the reference count (mark as used by another object). */
