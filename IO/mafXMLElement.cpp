@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-01-15 19:21:41 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-01-24 14:58:26 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,12 +14,12 @@
 #include "mafXMLStorage.h"
 #include "mafXMLString.h"
 #include "mafMatrix.h"
-#include "mafVector.txx"
 #include "mafStorable.h"
 #include "mafObjectFactory.h"
 
 #include "mmuXMLDOM.h"
 
+#include <vector>
 #include <sstream>
 #include <assert.h>
 #include "stdio.h"
@@ -122,14 +122,14 @@ mafXMLElement *mafXMLElement::GetXMLParent()
 }
 
 //------------------------------------------------------------------------------
-mafVector<mafStorageElement *> *mafXMLElement::GetChildren()
+std::vector<mafStorageElement *> *mafXMLElement::GetChildren()
 //------------------------------------------------------------------------------
 {
   
   if (!m_Children)
   {
     // create and fill in new children list with element nodes
-    m_Children = new mafVector<mafStorageElement *>;
+    m_Children = new std::vector<mafStorageElement *>;
     DOMNodeList *children=m_XMLElement->getChildNodes();
     for (int i = 0; i<children->getLength();i++)
     {
@@ -137,7 +137,7 @@ mafVector<mafStorageElement *> *mafXMLElement::GetChildren()
       if (children->item(i)->getNodeType()==DOMNode::ELEMENT_NODE)
       {
         mafXMLElement *child=new mafXMLElement((DOMElement *)child_element,this,GetXMLStorage());
-        m_Children->AppendItem(child);
+        m_Children->push_back(child);
       }      
     }
   }
@@ -158,7 +158,7 @@ mafXMLElement *mafXMLElement::AppendXMLChild(const char *name)
   DOMElement *child_element=GetXMLStorage()->GetXMLDOM()->m_XMLDoc->createElement(mafXMLString(name));
   m_XMLElement->appendChild(child_element);
   mafXMLElement *child=new mafXMLElement(child_element,this,GetXMLStorage());
-  GetChildren()->AppendItem(child);
+  GetChildren()->push_back(child);
   return child;
 }
 
@@ -263,7 +263,7 @@ int mafXMLElement::StoreVectorN(int *comps,int num,const char *name)
   InternalStoreVectorN(this,comps,num,name);
   return MAF_OK;
 }
-
+/*
 //------------------------------------------------------------------------------
 int mafXMLElement::StoreData(const char *data, const int size,const char *name)
 //------------------------------------------------------------------------------
@@ -306,6 +306,7 @@ int mafXMLElement::RestoreData32(long *data, const int size,const char *name)
   // to be implemented
   return MAF_OK;
 }
+*/
 //------------------------------------------------------------------------------
 int mafXMLElement::RestoreMatrix(mafMatrix *matrix,const char *name)
 //------------------------------------------------------------------------------

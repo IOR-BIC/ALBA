@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-10 00:18:07 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-01-24 14:56:49 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,8 +12,9 @@
 #ifndef __mafStorageElement_h__
 #define __mafStorageElement_h__
 
-#include "mafConfigure.h"
-
+#include "mafDefines.h"
+#include <iosfwd>
+#include <vector>
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
@@ -22,7 +23,7 @@ class mafStorable;
 class mafMatrix;
 class mafString;
 class mafObject;
-template <class T> class mafVector;
+
 
 /** Abstract class representing the interface for the unit of information stored in the storage.
   Abstract class representing the interface for the unit of information stored into a storage. A number of utility
@@ -55,36 +56,36 @@ public:
   virtual bool GetAttribute(const char *name,mafString &value)=0;
 
   
-  virtual int StoreText(const char *text,const char *name="Text")=0;
-  virtual int StoreMatrix(mafMatrix *matrix,const char *name="Matrix")=0;
-  virtual int StoreVectorN(double *comps,int num,const char *name="Vector")=0;
-  virtual int StoreVectorN(int *comps,int num,const char *name="Vector")=0;
+  virtual int StoreText(const char *text,const char *name)=0;
+  virtual int StoreMatrix(mafMatrix *matrix,const char *name)=0;
+  virtual int StoreVectorN(double *comps,int num,const char *name)=0;
+  virtual int StoreVectorN(int *comps,int num,const char *name)=0;
 
-  /** Store 8bit binary data */
-  virtual int StoreData(const char *data, const int size,const char *name="CData")=0;
-  /** Store 16bit binary data */
-  virtual int StoreData16(const short *data, const int size,const char *name="CData16")=0;
-  /** Store 32bit binary data */
-  virtual int StoreData32(const long *data, const int size,const char *name="CData32")=0;
+  /** Store 8bit binary data. Not yet supported. */
+  //virtual int StoreData(const char *data, const int size,const char *name)=0;
+  /** Store 16bit binary data. Not yet supported. */
+  //virtual int StoreData16(const short *data, const int size,const char *name)=0;
+  /** Store 32bit binary data. Not yet supported. */
+  //virtual int StoreData32(const long *data, const int size,const char *name)=0;
 
-  /** Restore 8bit binary data */
-  virtual int RestoreData(char *data, const int size,const char *name="CData")=0;
-  /** Restore 16bit binary data */
-  virtual int RestoreData16(short *data, const int size,const char *name="CData16")=0;
-  /** Restore 32bit binary data */
-  virtual int RestoreData32(long *data, const int size,const char *name="CData32")=0;
+  /** Restore 8bit binary data. Not yet supported. */
+  //virtual int RestoreData(char *data, const int size,const char *name)=0;
+  /** Restore 16bit binary data. Not yet supported. */
+  //virtual int RestoreData16(short *data, const int size,const char *name)=0;
+  /** Restore 32bit binary data. Not yet supported. */
+  //virtual int RestoreData32(long *data, const int size,const char *name)=0;
   
-  virtual int RestoreMatrix(mafMatrix *matrix,const char *name="Matrix")=0;
-  virtual int RestoreVectorN(double *comps,unsigned int num,const char *name="Vector")=0;
-  virtual int RestoreVectorN(int *comps,unsigned int num,const char *name="Vector")=0;
-  virtual int RestoreText(char *&buffer,const char *name="Text")=0;
-  virtual int RestoreText(mafString &buffer,const char *name="Text")=0;
+  virtual int RestoreMatrix(mafMatrix *matrix,const char *name)=0;
+  virtual int RestoreVectorN(double *comps,unsigned int num,const char *name)=0;
+  virtual int RestoreVectorN(int *comps,unsigned int num,const char *name)=0;
+  virtual int RestoreText(char *&buffer,const char *name)=0;
+  virtual int RestoreText(mafString &buffer,const char *name)=0;
   
-  virtual void StoreDouble(const double &value,const char *name="Double");
-  virtual int RestoreDouble(double &value,const char *name="Double");
+  virtual void StoreDouble(const double &value,const char *name);
+  virtual int RestoreDouble(double &value,const char *name);
 
-  virtual void StoreInteger(const int &value,const char *name="Integer");
-  virtual int RestoreInteger(int &value,const char *name="Integer");
+  virtual void StoreInteger(const int &value,const char *name);
+  virtual int RestoreInteger(int &value,const char *name);
   
   /**
     Function to try restoring a mafObject from a mafStorageElement. If the element has
@@ -108,10 +109,10 @@ public:
 
   /** 
     Store a vector of objects. Objects must be both mafObject and mafStorable @sa StoreObject() */
-  virtual int StoreObjectVector(mafVector<mafObject *> *vector,const char *name="ObjectVector",const char *item_name="Item");
+  virtual int StoreObjectVector(const std::vector<mafObject *> &vector,const char *name,const char *items_name="Item");
 
   /** Restore a vector of objects. Objects must be both mafObject and mafStorable @sa RestoreObject() */
-  virtual int RestoreObjectVector(mafVector<mafObject *> *vector,const char *name="ObjectVector");
+  virtual int RestoreObjectVector(std::vector<mafObject *> &vector,const char *name);
 
   /** return a pointer to the storage who created this element */
   mafStorage *GetStorage() {return m_Storage;}
@@ -128,9 +129,13 @@ public:
   virtual mafStorageElement *FindNestedElement(const char *name);
 
   /** 
-    Return the list of children. Subclasses must impement this to constrcut
+    Return the list of children. Subclasses must implement this to build
     the children list. */ 
-  virtual mafVector<mafStorageElement *> *GetChildren()=0; 
+  virtual std::vector<mafStorageElement *> *GetChildren()=0;
+  
+  /** 
+    Return the list of all children with a given name. return true if at least one found. */ 
+  virtual bool GetNestedElementsByName(const char *name,std::vector<mafStorageElement *> &list);
 
 protected:
   /** elements can be created only by means of AppendChild() or FindNestedElement() */
@@ -139,8 +144,8 @@ protected:
   void SetStorage(mafStorage *storage) {m_Storage = storage;}
   void SetParent(mafStorageElement *element) {m_Parent = element;}
 
-  mafStorage *m_Storage; ///< storage who created this element
-  mafStorageElement *m_Parent; ///< the parent element in the hierarchy
-  mafVector<mafStorageElement *> *m_Children; ///< children elements
+  mafStorage *m_Storage;                        ///< storage who created this element
+  mafStorageElement *m_Parent;                  ///< the parent element in the hierarchy
+  std::vector<mafStorageElement *> *m_Children;  ///< children elements
 };
 #endif // _mafStorageElement_h_

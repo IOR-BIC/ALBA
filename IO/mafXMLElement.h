@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLElement.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-10 00:18:07 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-01-24 14:58:27 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -50,49 +50,49 @@ public:
   virtual const char *GetName();
 
   /** Store a generic text into an XML document */
-  virtual int StoreText(const char *text,const char *name="Text");
+  virtual int StoreText(const char *text,const char *name);
 
   /** Store a matrix into an XML document */
-  virtual int StoreMatrix(mafMatrix *matrix,const char *name="Matrix");
+  virtual int StoreMatrix(mafMatrix *matrix,const char *name);
 
   /** Store a vectorN into an XML document */
-  virtual int StoreVectorN(double *comps,int num,const char *name="Vector");
+  virtual int StoreVectorN(double *comps,int num,const char *name);
 
   /** Store a vectorN into an XML document */
-  virtual int StoreVectorN(int *comps,int num,const char *name="Vector");
+  virtual int StoreVectorN(int *comps,int num,const char *name);
 
-  /** Store 8bit binary data */
-  virtual int StoreData(const char *data, const int size,const char *name="CData");
+  /** Store 8bit binary data. Not yet supported. */
+  //virtual int StoreData(const char *data, const int size,const char *name);
 
-  /** Store 16bit binary data */
-  virtual int StoreData16(const short *data, const int size,const char *name="CData16");
+  /** Store 16bit binary data. Not yet supported. */
+  //virtual int StoreData16(const short *data, const int size,const char *name);
 
-  /** Store 32bit binary data */
-  virtual int StoreData32(const long *data, const int size,const char *name="CData32");
+  /** Store 32bit binary data. Not yet supported. */
+  //virtual int StoreData32(const long *data, const int size,const char *name);
 
-  /** Store 8bit binary data */
-  virtual int RestoreData(char *data, const int size,const char *name="CData");
+  /** Store 8bit binary data. Not yet supported. */
+  //virtual int RestoreData(char *data, const int size,const char *name);
 
-  /** Store 16bit binary data */
-  virtual int RestoreData16(short *data, const int size,const char *name="CData16");
+  /** Store 16bit binary data. Not yet supported. */
+  //virtual int RestoreData16(short *data, const int size,const char *name);
 
-  /** Store 32bit binary data */
-  virtual int RestoreData32(long *data, const int size,const char *name="CData32");
+  /** Store 32bit binary data. Not yet supported. */
+  //virtual int RestoreData32(long *data, const int size,const char *name);
   
   /** Restore a matrix from an XML document */
-  virtual int RestoreMatrix(mafMatrix *matrix,const char *name="Matrix");
+  virtual int RestoreMatrix(mafMatrix *matrix,const char *name);
 
   /** Restore a vectorN from an XML document */
-  virtual int RestoreVectorN(double *comps,unsigned int num,const char *name="Vector");
+  virtual int RestoreVectorN(double *comps,unsigned int num,const char *name);
 
   /** Restore a vectorN from an XML document */
-  virtual int RestoreVectorN(int *comps,unsigned int num,const char *name="Vector");
+  virtual int RestoreVectorN(int *comps,unsigned int num,const char *name);
 
   /** Restore a generic text string from an XML document */
-  virtual int RestoreText(char *&buffer,const char *name="Text");
+  virtual int RestoreText(char *&buffer,const char *name);
 
   /** Restore a generic text string from an XML document */
-  virtual int RestoreText(mafString &buffer,const char *name="Text");
+  virtual int RestoreText(mafString &buffer,const char *name);
 
   /** return a pointer to the storage who created this element */
   mafXMLStorage *GetXMLStorage();
@@ -103,7 +103,7 @@ public:
   /** 
     Return the list of children. The list is created from DOM-Tree at the first access
     during restoring. */ 
-  virtual mafVector<mafStorageElement *> *GetChildren();
+  virtual std::vector<mafStorageElement *> *GetChildren();
   
   /** 
     Create a new XML child element and return its pointer. This is the only way to create a new
@@ -136,6 +136,9 @@ public:
   /** Internally used to extract vector values from Text data */
   int ParseData(double *vector,int size);
   int ParseData(int *vector,int size);
+
+  /** return true if an element with that name exists */
+  bool ExistElement(const char *name);
 
 protected:
 
