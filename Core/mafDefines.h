@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-02 13:28:58 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2004-12-18 22:07:44 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -127,9 +127,9 @@ typedef type_info mafTypeID;
   mafObject *thisClass::NewInternalInstance() const \
   { return NewObject(); } \
   thisClass *thisClass::New() \
-  { return thisClass::SafeDownCast(NewObject()); } \
+  { return (thisClass *)NewObject(); } \
   thisClass *thisClass::NewInstance() const \
-  { return thisClass::SafeDownCast(NewInternalInstance()); }
+  { return (thisClass *)NewInternalInstance(); }
 
 
 /** Macro used to define Set/GetListener() member functions and a Listener member variable */

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-25 11:29:32 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2004-12-18 22:07:43 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -51,7 +51,7 @@ mafString::mafString(const mafString& src)
 mafString::mafString(const char *src)
 //----------------------------------------------------------------------------
 {
-  m_CStr = (char *)src; // don't worry it won't be overwritten!
+  m_CStr = src?(char *)src:""; // don't worry it won't be overwritten!
   m_Size = 0; // just to be sure to not overwrite... 
 }
 //----------------------------------------------------------------------------
@@ -284,7 +284,7 @@ int mafString::SetSize(mafID size)
   if (size==0)
   {
     // if size set to 0 simply free the memory
-    tmp=NULL;
+    tmp="";
   }
   else
   {

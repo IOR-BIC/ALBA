@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix3x3.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-13 00:44:35 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2004-12-18 22:07:44 $
+  Version:   $Revision: 1.5 $
   Authors:   Based on vtkMath code (www.vtk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -35,6 +35,9 @@ public:
 
   mafMatrix3x3 &operator=(const mafMatrix3x3 &mat);
   mafMatrix3x3(mafMatrix3x3 &mat);
+
+  /** copy the given matrix content */
+  void DeepCopy(mafMatrix3x3 *mat);
 
   /** Multiply a vector by a 3x3 matrix.  The result is placed in out.*/
   static void MultiplyVector(const float A[3][3], const float in[3], 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix3x3.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-13 00:44:34 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-12-18 22:07:44 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,6 +12,7 @@
 #include "mafMatrix3x3.h"
 #include <math.h>
 #include <sstream>
+#include <assert.h>
 
 mafCxxTypeMacro(mafMatrix3x3)
 
@@ -41,6 +42,15 @@ mafMatrix3x3 &mafMatrix3x3::operator=(const mafMatrix3x3 &mat)
   Modified();
   return *this;
 }
+
+//------------------------------------------------------------------------------
+void mafMatrix3x3::DeepCopy(mafMatrix3x3 *mat)
+//------------------------------------------------------------------------------
+{
+  assert(mat);
+  *this=*mat;
+}
+
 //------------------------------------------------------------------------------
 mafMatrix3x3::mafMatrix3x3(mafMatrix3x3 &mat)
 //------------------------------------------------------------------------------

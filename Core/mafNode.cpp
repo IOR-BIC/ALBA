@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-02 13:28:58 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-12-18 22:07:43 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -16,13 +16,15 @@
 #include "mafNodeIterator.h"
 #include "mafVector.txx"
 #include <sstream>
+#include <assert.h>
+
+mafCxxAbstractTypeMacro(mafNode)
 
 //-------------------------------------------------------------------------
 mafNode::mafNode()
 //-------------------------------------------------------------------------
 {
-  m_Parent    = NULL;
-
+  m_Parent              = NULL;
   m_Initialized         = false;
   m_VisibleToTraverse   = true;
   m_Crypting            = NO_CRYPTING;
@@ -67,6 +69,28 @@ void mafNode::Shutdown()
 }
 
 //-------------------------------------------------------------------------
+const char *mafNode::GetName()
+//-------------------------------------------------------------------------
+{
+  return m_Name;
+}
+
+//-------------------------------------------------------------------------
+void mafNode::SetName(const char *name)
+//-------------------------------------------------------------------------
+{
+  m_Name=mafString(name); // force string copy
+  Modified();
+} 
+
+//-------------------------------------------------------------------------
+void mafNode::SetName(mafString name)
+//-------------------------------------------------------------------------
+{
+  m_Name=name;Modified();
+}
+
+//-------------------------------------------------------------------------
 mafNodeIterator *mafNode::NewIterator()
 //-------------------------------------------------------------------------
 {
@@ -107,10 +131,7 @@ mafNode *mafNode::GetLastChild()
 mafNode *mafNode::GetChild(mafID idx)
 //-------------------------------------------------------------------------
 {
-  if (idx<0||idx>=GetNumberOfChildren())
-    return m_Children[idx].GetPointer();
-
-  return NULL;
+  return m_Children[idx].GetPointer();
 }
   
 //-------------------------------------------------------------------------
@@ -128,11 +149,9 @@ int mafNode::AddChild(mafNode *node)
 {
   if (node->SetParent(this)==MAF_OK)
   {
-    if (m_Children.AppendItem(node))
-    {
-      Modified();
-      return MAF_OK;
-    }
+    m_Children.AppendItem(node);
+    Modified();
+    return MAF_OK;
   }
   return MAF_ERROR;
 }  
@@ -144,8 +163,9 @@ void mafNode::RemoveChild(const mafID idx)
   mafNode *oldnode=this->GetChild(idx);
   if (oldnode)
   {
-    assert(oldnode->GetParent()==this);
-    oldnode->SetParent(NULL);
+    // when called by ReparentTo the parent is already changed
+    if (oldnode->GetParent()==this)
+      oldnode->SetParent(NULL); 
     m_Children.RemoveItem(idx);
   }
 }
@@ -169,7 +189,8 @@ int mafNode::ReparentTo(mafNode *newparent)
     {
       if (newparent)
       {
-        newparent->AddChild(this);
+        if (newparent->AddChild(this)==MAF_ERROR)
+          return MAF_ERROR;
       }
       else
       {
@@ -267,9 +288,9 @@ void mafNode::RemoveAllChildren()
 int mafNode::SetParent(mafNode *parent)
 //-------------------------------------------------------------------------
 {
-  if (mafNode *parent_node=mafNode::SafeDownCast(parent))
+  if (mafNode *parent_node=parent)
   {
-    if (this->CanReparentTo(parent_node)==MAF_OK)
+    if (this->CanReparentTo(parent_node))
     {  
       m_Parent=parent_node;
 
@@ -364,6 +385,12 @@ bool mafNode::CanCopy(mafNode *node)
   return false;
 }
 
+//-------------------------------------------------------------------------
+bool mafNode::Equals(mafNode *vme)
+//-------------------------------------------------------------------------
+{
+  return m_Name == vme->m_Name;
+}
 //-------------------------------------------------------------------------
 bool mafNode::CompareTree(mafNode *vme)
 //-------------------------------------------------------------------------

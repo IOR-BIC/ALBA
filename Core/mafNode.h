@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-04 09:28:38 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2004-12-18 22:07:43 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -55,6 +55,7 @@ class mafNodeIterator;
   - testing
   - events invoking
   - implement the Store/Restore
+  - add the attributes and the TagArray
 
   @sa mafRootNode
 */
@@ -92,11 +93,11 @@ public:
   /** unserialized the object from a storage. @todo syntax to be changed */
   int Restore();
   
-  /**
-  return the name of this VME*/
-  const char *GetName() {return m_Name;};
-  void SetName(const char *name) {m_Name=mafString(name);Modified();}; // force string copy
-  void SetName(mafString name) {m_Name=name;Modified();};
+  /** return the name of this node*/
+  const char *GetName();
+  /** set node name */
+  void SetName(const char *name);
+  void SetName(mafString name);
   
   /**
     Copy the contents of another node into this one. Notice that subtrees

@@ -3,8 +3,8 @@
 Program:   Visualization Toolkit
 Module:    $RCSfile: mafVector.txx,v $
 Language:  C++
-Date:      $Date: 2004-12-02 13:29:00 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2004-12-18 22:07:42 $
+Version:   $Revision: 1.3 $
 
 
 
@@ -15,7 +15,6 @@ Version:   $Revision: 1.2 $
 #include "mafVector.h"
 //#include "mafSmartPointer.h"
 #include <vector>
-#include <assert.h>
 
 template <class T>
 T mafVector<T>::NullItem;
@@ -52,7 +51,6 @@ template <class T>
 void mafVector<T>::SetItem(mafID idx,const T &object)
 //------------------------------------------------------------------------------
 {
-  assert(object);
   if (m_Items->Vector.size()<=idx)
   {
 	m_Items->Vector.resize(idx+1);
@@ -67,7 +65,6 @@ template <class T>
 mafID mafVector<T>::AppendItem(const T &object)
 //------------------------------------------------------------------------------
 {
-  assert(object);
   m_Items->Vector.push_back(object);
   return m_Items->Vector.size()-1;
 }
@@ -124,8 +121,6 @@ template <class T>
 bool mafVector<T>::ReplaceItem(mafID idx, const T &newitem)
 //------------------------------------------------------------------------------
 {
-  assert(newitem);
-
   if (idx<m_Items->Vector.size())
   {
 	m_Items->Vector[idx]=newitem;
@@ -156,8 +151,6 @@ template <class T>
 bool mafVector<T>::RemoveItem(const T &object)
 //------------------------------------------------------------------------------
 {
-  assert(object);
-
   mafID idx;
   if (FindItem(object,idx))
   {   

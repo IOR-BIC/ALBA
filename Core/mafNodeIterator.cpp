@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeIterator.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-04 09:28:39 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2004-12-18 22:07:43 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -17,6 +17,7 @@
 #include "mafVector.txx"
 #include <sstream>
 
+mafCxxTypeMacro(mafNodeIterator)
 
 //----------------------------------------------------------------------------
 mafNodeIterator::mafNodeIterator(mafNode *root)

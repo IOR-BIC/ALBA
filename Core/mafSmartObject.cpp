@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSmartObject.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-29 21:14:32 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-12-18 22:07:43 $
+  Version:   $Revision: 1.4 $
   Authors:   based on vtkObjectBase (www.vtk.org), adapted Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -81,7 +81,7 @@ void mafSmartObject::UnRegister(void *obj)
 {
   if (!HeapFlag)
   {
-    mafErrorMacro(<< "Trying to UnRegister a non-dynamically allocated object.");
+    mafErrorMacro("Trying to UnRegister a non-dynamically allocated object.");
     return;
   }
 

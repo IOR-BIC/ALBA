@@ -26,8 +26,8 @@ int main()
 {
 
   // a couple of factories
-  mafObjectFactory *first_factory = new mafObjectFactory();
-  mafObjectFactory *second_factory = new mafObjectFactory();
+  mafObjectFactory *first_factory = mafObjectFactory::New();
+  mafObjectFactory *second_factory = mafObjectFactory::New();
 
   MAF_TEST(first_factory!=NULL);
   MAF_TEST(second_factory!=NULL);
