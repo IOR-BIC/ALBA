@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDynamicLoader.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-11 17:34:58 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-01-14 18:13:48 $
+  Version:   $Revision: 1.6 $
   Authors:   Based on DynamicLoader (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,7 +23,7 @@ typedef shl_t LibHandle;
 
 #elif defined(_WIN32)
 
-#include "mafWIN32.h"
+#include "mafIncludeWIN32.h"
 typedef HMODULE LibHandle;
 
 #elif defined(__powerpc)

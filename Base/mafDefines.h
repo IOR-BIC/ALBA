@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-13 09:08:15 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-01-14 18:13:49 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -19,7 +19,7 @@
 #define __mafDefines_h
 
 #include "mafConfigure.h"
-#include <string.h>
+//#include <string.h>
 #include <typeinfo>
 
 //----------------------------------------------------------------------------
@@ -31,6 +31,10 @@ namespace std
   template <class Key> struct less;
   template <class VType, class AType = allocator<VType> > class vector;
   template <class Key, class T, class Pred = less<Key>, class A = allocator<T> > class map;
+  template<class E>  struct char_traits;
+  struct char_traits<char>;
+  template<class E,class T = char_traits<E>,class A = allocator<E> > class basic_string;
+  typedef basic_string<char> string;
 }
 
 //------------------------------------------------------------------------------

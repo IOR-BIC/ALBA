@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMTime.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-11 17:34:58 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-01-14 18:13:48 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone, inspired to vtkTimeStamp (www.vtk.org)
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -13,11 +13,12 @@
 #ifndef __mafMTime_h
 #define __mafMTime_h
 
-#include "mafDefines.h"
+#include "mafConfigure.h"
 #include "mafBase.h" 
 
 #ifdef MAF_USE_VTK
-  #include "vtkTimeStamp.h"
+//  #include "vtkTimeStamp.h"
+class vtkTimeStamp;
 #endif
 
 /** mafMTime - record modification timestamp
@@ -30,10 +31,13 @@ class MAF_EXPORT mafMTime : public mafBase
 {
 public:
 #ifdef MAF_USE_VTK
-  mafMTime() {} 
+  mafMTime();
+  ~mafMTime();
 #else
   mafMTime() {m_ModifiedTime = 0;}; 
 #endif
+
+
   virtual const char *GetTypeName() {return "mafMTime";};
 
   /**
@@ -60,31 +64,12 @@ public:
 private:
 
 #ifdef MAF_USE_VTK
-  vtkTimeStamp m_VTKTimeStamp;
+  vtkTimeStamp *m_VTKTimeStamp;
 #else
   unsigned long m_ModifiedTime;
 #endif
+  
 };
-
-#ifdef MAF_USE_VTK
-
-//-------------------------------------------------------------------------
-inline unsigned long int mafMTime::GetMTime()
-//-------------------------------------------------------------------------
-{
-  return m_VTKTimeStamp.GetMTime();
-}
-
-#else
-
-//-------------------------------------------------------------------------
-inline unsigned long int mafMTime::GetMTime()
-//-------------------------------------------------------------------------
-{
-  return m_ModifiedTime;
-}
-
-#endif
 
 #endif
 

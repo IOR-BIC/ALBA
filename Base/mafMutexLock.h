@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMutexLock.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-11 17:34:59 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-01-14 18:13:48 $
+  Version:   $Revision: 1.4 $
   Authors:   Based on itkmafMutexLock (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,43 +12,9 @@
 #ifndef __mafMutexLock_h
 #define __mafMutexLock_h
 
-#include "mafConfigure.h"
 #include "mafBase.h" 
 
-#ifdef CMAKE_USE_SPROC_INIT
-#include <abi_mutex.h>
-#endif
-
-#ifdef CMAKE_USE_PTHREADS_INIT
-#include <pthread.h>
-#endif
- 
-#if defined(_WIN32) && !defined(CMAKE_USE_PTHREADS_INIT)
-#include "mafWIN32.h"
-#endif
-
-#ifdef CMAKE_USE_SPROC_INIT
-#include <abi_mutex.h>
-typedef abilock_t FastMutexType;
-#endif
-
-#ifdef CMAKE_USE_PTHREADS_INIT
-#include <pthread.h>
-typedef pthread_mutex_t FastMutexType;
-#endif
- 
-#if defined(_WIN32) && !defined(CMAKE_USE_PTHREADS_INIT)
-#include <winbase.h>
-typedef CRITICAL_SECTION FastMutexType;
-#endif
-
-#ifndef CMAKE_USE_SPROC_INIT
-#ifndef CMAKE_USE_PTHREADS_INIT
-#ifndef _WIN32
-typedef int FastMutexType;
-#endif
-#endif
-#endif
+class mmuPIMPLMutexLock;
 
 /** Critical section locking class that can be allocated on the stack.
   mafMutexLock allows the locking of variables which are accessed 
@@ -71,9 +37,8 @@ public:
 
   /** Unlock access. */
   void Unlock( void ) const;
-
 protected:
-  mutable FastMutexType   m_FastMutexLock;
+  mmuPIMPLMutexLock *m_PIMPLMutexLock;
 };
 
 #endif

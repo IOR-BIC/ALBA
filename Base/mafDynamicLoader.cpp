@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDynamicLoader.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-01-11 17:34:57 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-01-14 18:13:48 $
+  Version:   $Revision: 1.5 $
   Authors:   Based on DynamicLoader (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -141,7 +141,7 @@ const char* mafDynamicLoader::LastError()
 //----------------------------------------------------------------------------
 // 3. Implementation for Windows win32 code
 #ifdef _WIN32
-#include "mafWIN32.h"
+#include "mafIncludeWIN32.h"
 #define MAFDYNAMICLOADER_DEFINED 1
   
 //----------------------------------------------------------------------------
