@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTagArray.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 15:44:19 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-01 10:06:58 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -13,7 +13,7 @@
 #define __mafTagArray_h
 
 #include "mafAttribute.h"
-#include "mmuTagItem.h"
+#include "mafTagItem.h"
 #include <map>
 
 /** An attribute used to store an associtive array of <key,value> pairs, where value is multi component.
@@ -35,18 +35,18 @@ public:
   bool operator==(const mafTagArray &a) const;
 
   /** provide access to vector items. If idx is outside the result is invalid */
-  //mmuTagItem &operator [](const char *name);
+  //mafTagItem &operator [](const char *name);
   
   /** provide access to vector items. If idx is outside the result is invalid */
-  //const mmuTagItem &operator [](const char *name) const;
+  //const mafTagItem &operator [](const char *name) const;
 
   /**
     Get a particular tag item. The returned object is returned by reference. */
-  mmuTagItem *GetTag(const char *name);
+  mafTagItem *GetTag(const char *name);
 
   /**
     Get a particular tag item. The object value is copied in the given item argument. */
-  bool GetTag(const char *name,mmuTagItem &item);
+  bool GetTag(const char *name,mafTagItem &item);
 
   /**
     return true if the give TAG exists. */
@@ -56,7 +56,7 @@ public:
     This function searches for an item with same Tag name of the given one and 
     if it doesn't exist append a new one to the Array. The given tag is copied
     and not referenced. */
-  void SetTag(const mmuTagItem &value);
+  void SetTag(const mafTagItem &value);
 
   /**
     This function searches for an item with given name and if it doesn't exist
@@ -82,12 +82,12 @@ public:
 	/**
 	Search the tag array for tags of a given type and 
 	put in the array pointers to them   */
-	void GetTagsByType(int type, std::vector<mmuTagItem *> &array);
+	void GetTagsByType(int type, std::vector<mafTagItem *> &array);
 
   /** return the number of tags stored in this object */
   int GetNumberOfTags() const;
 
-  typedef std::map<std::string,mmuTagItem> mmuTagsMap;
+  typedef std::map<std::string,mafTagItem> mmuTagsMap;
 
   /** return the container of the tags stored in this attribute */
   mmuTagsMap *GetTagsContainer() {return &m_Tags;}
@@ -108,7 +108,7 @@ inline TType mafRestoreNumericFromTag(mafTagArray *array,const char *name, TType
 {
   if (variable==unset_value)
   {
-    if (mmuTagItem *item=array->GetTag(name))
+    if (mafTagItem *item=array->GetTag(name))
     {
       variable = item->GetValueAsDouble();
     }
@@ -128,7 +128,7 @@ inline TType mafRestoreStringFromTag(mafTagArray *array,const char *name, TType 
 {
   if (variable==unset_value)
   {
-    if (mmuTagItem *item=array->GetTag(name))
+    if (mafTagItem *item=array->GetTag(name))
     {
       variable = item->GetValue();
     }

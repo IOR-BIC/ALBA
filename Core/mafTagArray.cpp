@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTagArray.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 15:44:19 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-01 10:06:57 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -35,7 +35,7 @@ void mafTagArray::operator=(const mafTagArray &a)
   Superclass::operator =(a);
   for (mmuTagsMap::iterator it=m_Tags.begin();it!=m_Tags.end();it++)
   {
-    mmuTagItem &titem=it->second;
+    mafTagItem &titem=it->second;
     SetTag(titem);
   }
 }
@@ -49,7 +49,7 @@ void mafTagArray::DeepCopy(const mafTagArray *a)
 }
 
 //-------------------------------------------------------------------------
-mmuTagItem *mafTagArray::GetTag(const char *name)
+mafTagItem *mafTagArray::GetTag(const char *name)
 //-------------------------------------------------------------------------
 {
   mmuTagsMap::iterator it=m_Tags.find(name);
@@ -60,10 +60,10 @@ mmuTagItem *mafTagArray::GetTag(const char *name)
 }
 
 //-------------------------------------------------------------------------
-bool mafTagArray::GetTag(const char *name,mmuTagItem &item)
+bool mafTagArray::GetTag(const char *name,mafTagItem &item)
 //-------------------------------------------------------------------------
 {
-  mmuTagItem *tmp_item=GetTag(name);
+  mafTagItem *tmp_item=GetTag(name);
   if (tmp_item)
   {
     item=*tmp_item;
@@ -83,10 +83,10 @@ bool mafTagArray::IsTagPresent(const char *name)
 }
 
 //-------------------------------------------------------------------------
-void mafTagArray::SetTag(const mmuTagItem &value)
+void mafTagArray::SetTag(const mafTagItem &value)
 //-------------------------------------------------------------------------
 {
-  mmuTagItem *tmp_item=GetTag(value.GetName());
+  mafTagItem *tmp_item=GetTag(value.GetName());
   if (tmp_item)
   {
     *tmp_item=value;
@@ -101,7 +101,7 @@ void mafTagArray::SetTag(const mmuTagItem &value)
 void mafTagArray::SetTag(const char *name, const char *value,int type)
 //-------------------------------------------------------------------------
 {
-  mmuTagItem tmp(name,value,type);
+  mafTagItem tmp(name,value,type);
   m_Tags[name]=tmp;
 }
 
@@ -123,7 +123,7 @@ void mafTagArray::GetTagList(std::vector<std::string> &list)
   int i=0;
   for (mmuTagsMap::iterator it=m_Tags.begin();it!=m_Tags.end();it++,i++)
   {
-    mmuTagItem &titem=it->second;
+    mafTagItem &titem=it->second;
     list[i]=titem.GetName();
   }
 }
@@ -156,7 +156,7 @@ bool mafTagArray::Equals(const mafTagArray *array) const
 }
 
 //-------------------------------------------------------------------------
-void mafTagArray::GetTagsByType(int type, std::vector<mmuTagItem *> &array)
+void mafTagArray::GetTagsByType(int type, std::vector<mafTagItem *> &array)
 //-------------------------------------------------------------------------
 {
   array.clear();
@@ -194,27 +194,27 @@ int mafTagArray::InternalStore(mafStorageElement *parent)
 int mafTagArray::InternalRestore(mafStorageElement *node)
 //-------------------------------------------------------------------------
 {
-  mafString numAttrs;
-  node->GetAttribute("NumberOfTags",numAttrs);
-  int num=(int)atof(numAttrs);
+  mafID numAttrs=-1;
+  node->GetAttributeAsInteger("NumberOfTags",numAttrs);
+  
 
   mafStorageElement::ChildrenVector &children=node->GetChildren();
   int ret=MAF_OK;
   int idx=0;
-  for (int i=0;(idx<num)&&(i<children.size())&&(ret==MAF_OK);i++)
+  for (int i=0;(idx < numAttrs) && (i < children.size()) && (ret == MAF_OK);i++)
   {
     if (mafString().Set(children[i]->GetName())=="TItem")
     {
-      mmuTagItem new_titem;
+      mafTagItem new_titem;
       ret=new_titem.Restore(children[i]);
       SetTag(new_titem);
       idx++;
     }
   }
 
-  if (idx<num)
+  if (idx<numAttrs)
   {
-    mafErrorMacro("Error Restoring TagArray: wrong number of restored items.");
+    mafErrorMacro("Error Restoring TagArray: wrong number of restored items, should be "<<numAttrs<<", found "<<children.size());
     return MAF_ERROR;
   }
 
