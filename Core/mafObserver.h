@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObserver.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-04 09:27:59 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-01-10 00:05:43 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -23,31 +23,22 @@ class mafEventBase;
 //------------------------------------------------------------------------------
 // mafObserver
 //------------------------------------------------------------------------------
-/** Implementation of the Subject/Observer design pattern.
-  mafObserver is a class implementing the "observer" in the Subject/Observer 
-  design pattern. Objective of this object is to listen to events rised by subjects.
+/** Interface implementing the Observer of the Subject/Observer design pattern.
+  mafObserver is an abstract class implementing the "observer" in the Subject/Observer 
+  design pattern. Objective of this object is to provide an interface for listening to events
+  issued by subjects.
   An observer must be registered to a subject to create the communication channel 
-  between the two. An observer can "observe" many subjects.
+  between the two. An observer can "observe" many subjects at the same time.
   @sa mafEventSource mafEventListener mafObserverCallback
 */
-class MAF_EXPORT mafObserver: public mafObject
+class MAF_EXPORT mafObserver
 {
 public:
-  mafObserver();
-  virtual ~mafObserver();
-
-  mafAbstractTypeMacro(mafObserver,mafObject);
-
-  mafObserver(const mafObserver& c) {}
-  //void operator=(const mafObserver&) {}
+  mafObserver() {}
+  virtual ~mafObserver() {}
 
   /** process the events sent by subjects */
   virtual void OnEvent(mafEventBase *e) = 0;
-  
-protected:
-
-private:
-  
 };
 
 #endif /* __mafObserver_h */

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObserverCallback.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-09 06:43:10 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-01-10 00:05:43 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -40,4 +40,25 @@ void mafObserverCallback::OnEvent(mafEventBase *e)
   {
     m_Callback(e->GetSender(), e->GetId(), this->GetClientData(), e->GetSource()->GetData());
   }
+}
+
+//------------------------------------------------------------------------------
+void mafObserverCallback::SetCallback(void (*f)(void *sender, mafID eid, void *clientdata, void *calldata))
+//------------------------------------------------------------------------------
+{
+  m_Callback = f;
+}
+
+//------------------------------------------------------------------------------
+void mafObserverCallback::SetClientData(void *cd)
+//------------------------------------------------------------------------------
+{
+  this->m_ClientData = cd;
+}
+
+//------------------------------------------------------------------------------
+void* mafObserverCallback::GetClientData()
+//------------------------------------------------------------------------------
+{
+  return this->m_ClientData;
 }

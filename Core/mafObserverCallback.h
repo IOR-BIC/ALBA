@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObserverCallback.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-09 15:31:03 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-01-10 00:05:43 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,38 +13,38 @@
 #ifndef __mafObserverCallback_h
 #define __mafObserverCallback_h
 
+#include "mafObject.h"
 #include "mafObserver.h"
 
 //------------------------------------------------------------------------------
 // mafObserverCallback
 //------------------------------------------------------------------------------
-/** Implementation of the Subject/Observer design pattern.
+/** Concrete implementation of Observer calling a callback function.
   mafObserverCallback is a class implementing an "observer" that launches a callback
-  function. It's useful to attach as observers objects that can not inherit from mafObserver.
+  function. It's useful for attaching as observers objects that do not inherit from mafObserver.
   When an event is rised the callback function is called passing as argument some event content 
   plus event source Data and this class ClientData, that can be set to any value. Usually ClientData
   is used to store the (self) pointer of the class to whom the callback function belongs.
   @sa mafEventSource mafObserver
+  @todo 
+  - create a test
 */
-class MAF_EXPORT mafObserverCallback: public mafObserver
+class MAF_EXPORT mafObserverCallback:public mafObject, public mafObserver
 {
 public:
   mafObserverCallback();
   virtual ~mafObserverCallback();
-  mafObserverCallback(const mafObserverCallback& c) {}
 
-  mafTypeMacro(mafObserverCallback,mafObserver);
+  mafTypeMacro(mafObserverCallback,mafObject);
 
   /** Set function callback to be called by this observer */
-  void SetCallback(void (*f)(void *sender, mafID eid, 
-                             void *clientdata, void *calldata))
-    {m_Callback = f;}
+  void SetCallback(void (*f)(void *sender, mafID eid, void *clientdata, void *calldata));
    
   /** set client data to be passed to callback function */
-  void SetClientData(void *cd) {this->m_ClientData = cd;}
+  void SetClientData(void *cd);
     
   /** return client data passed to callback function */  
-  void* GetClientData() {return this->m_ClientData;}
+  void* GetClientData();
        
   /** process the events sent by subjects */
   virtual void OnEvent(mafEventBase *e);
