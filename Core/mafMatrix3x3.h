@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix3x3.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-30 18:18:20 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-12-13 00:44:35 $
+  Version:   $Revision: 1.4 $
   Authors:   Based on vtkMath code (www.vtk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -15,6 +15,7 @@
 
 #include "mafObject.h"
 #include "mafMTime.h"
+#include <math.h>
 
 typedef double (*mafMatrix3x3Elements)[3];
 
@@ -32,6 +33,7 @@ public:
   mafMatrix3x3();
   virtual ~mafMatrix3x3();
 
+  mafMatrix3x3 &operator=(const mafMatrix3x3 &mat);
   mafMatrix3x3(mafMatrix3x3 &mat);
 
   /** Multiply a vector by a 3x3 matrix.  The result is placed in out.*/
@@ -96,11 +98,26 @@ public:
    rotation plus a flip i.e. it will have a determinant of -1. */
   void Orthogonalize() {Orthogonalize(GetElements(),GetElements());Modified();}
 
+  /**
+    Diagonalize a symmetric 3x3 matrix and return the eigenvalues in
+    w and the eigenvectors in the columns of V.  The matrix V will 
+    have a positive determinant, and the three eigenvectors will be
+    aligned as closely as possible with the x, y, and z axes. */
+  static void Diagonalize(const double A[3][3],double w[3],double V[3][3]);
+
   /** Return the determinant of a 3x3 matrix. */
   static double Determinant(double A[3][3]);
 
   /** Compute the determinant of the matrix and return it.*/
   double Determinant() {return Determinant(GetElements());}
+
+  static inline double mafMatrix3x3::Determinant(const double c1[3], 
+                                      const double c2[3], 
+                                      const double c3[3]);
+
+  static inline double mafMatrix3x3::Determinant(double a1, double a2, double a3, 
+                                      double b1, double b2, double b3, 
+                                      double c1, double c2, double c3);
   
   /**
     Convert a quaternion to a 3x3 rotation matrix.  The quaternion
@@ -194,6 +211,20 @@ public:
   /** bracket operator to access single elements */
   const double *operator[](unsigned int i) const { return &(GetElements()[i][0]); }  
   
+  /** Calculate the determinant of a 2x2 matrix: | a b | | c d | */
+  static double Determinant2x2(double a, double b, double c, double d) {
+    return (a * d - b * c);};
+  /** Calculate the determinant of a 2x2 matrix with columns c1 and c2 */
+  static double Determinant2x2(const double c1[2], const double c2[2]) {
+    return (c1[0]*c2[1] - c2[0]*c1[1]);};
+
+  /** Compute the norm of 3-vector (double-precision version).*/
+  static double Norm(const double x[3]) {
+    return sqrt(x[0]*x[0] + x[1]*x[1] + x[2]*x[2]);};
+  
+  static inline void Cross(const double x[3], const double y[3], double z[3]);
+  static inline double Normalize(double x[3]);
+  
 protected:
 
   double m_Elements[3][3];  ///< internal representation
@@ -213,6 +244,57 @@ inline void mafMatrix3x3::Modified()
 //------------------------------------------------------------------------------
 {
   m_MTime.Modified();
+}
+//------------------------------------------------------------------------------
+inline double mafMatrix3x3::Determinant(double A[3][3])
+//------------------------------------------------------------------------------
+{
+  return A[0][0]*A[1][1]*A[2][2] + A[1][0]*A[2][1]*A[0][2] + 
+         A[2][0]*A[0][1]*A[1][2] - A[0][0]*A[2][1]*A[1][2] - 
+         A[1][0]*A[0][1]*A[2][2] - A[2][0]*A[1][1]*A[0][2];
+}
+//------------------------------------------------------------------------------
+inline double mafMatrix3x3::Determinant(const double c1[3], 
+                                      const double c2[3], 
+                                      const double c3[3])
+//------------------------------------------------------------------------------
+{
+  return c1[0]*c2[1]*c3[2] + c2[0]*c3[1]*c1[2] + c3[0]*c1[1]*c2[2] -
+         c1[0]*c3[1]*c2[2] - c2[0]*c1[1]*c3[2] - c3[0]*c2[1]*c1[2];
+}
+//------------------------------------------------------------------------------
+inline double mafMatrix3x3::Determinant(double a1, double a2, double a3, 
+                                      double b1, double b2, double b3, 
+                                      double c1, double c2, double c3)
+//------------------------------------------------------------------------------
+{
+    return ( a1 * mafMatrix3x3::Determinant2x2( b2, b3, c2, c3 )
+           - b1 * mafMatrix3x3::Determinant2x2( a2, a3, c2, c3 )
+           + c1 * mafMatrix3x3::Determinant2x2( a2, a3, b2, b3 ) );
+}
+//------------------------------------------------------------------------------
+// Cross product of two 3-vectors. Result vector in z[3].
+inline void mafMatrix3x3::Cross(const double x[3], const double y[3], double z[3])
+//------------------------------------------------------------------------------
+{
+  double Zx = x[1]*y[2] - x[2]*y[1]; 
+  double Zy = x[2]*y[0] - x[0]*y[2];
+  double Zz = x[0]*y[1] - x[1]*y[0];
+  z[0] = Zx; z[1] = Zy; z[2] = Zz; 
+}
+//------------------------------------------------------------------------------
+inline double mafMatrix3x3::Normalize(double x[3])
+//------------------------------------------------------------------------------
+{
+  double den; 
+  if ( (den = mafMatrix3x3::Norm(x)) != 0.0 )
+  {
+    for (int i=0; i < 3; i++)
+    {
+      x[i] /= den;
+    }
+  }
+  return den;
 }
 
 #endif 

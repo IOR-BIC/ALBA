@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-04 09:29:15 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2004-12-13 00:44:34 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -48,10 +48,17 @@ public:
 
   mafMatrix(const mafMatrix &mat);
 
+  mafMatrix &operator=(const mafMatrix &mat);
+
   bool operator==(const mafMatrix& mat) const;
 
 #ifdef MAF_USE_VTK
-  mafMatrix(vtkMatrix4x4* mat, mafTimeStamp t=0);
+  //mafMatrix(vtkMatrix4x4* mat, mafTimeStamp t=0);
+
+  void SetVTKMatrix(vtkMatrix4x4 *mat,mafTimeStamp t=0);
+  void DeepCopy(vtkMatrix4x4 *mat);
+
+  vtkMatrix4x4 *GetVTKMatrix() {return m_VTKMatrix;}
 
   /** this only checks the 4x4 matrix with VTK ones, not the time stamp */
   bool operator==(vtkMatrix4x4 *mat) const;
@@ -111,6 +118,15 @@ public:
     Matrix Inversion, (adapted from Richard Carling in "Graphics Gems," 
     Academic Press, 1990). static version.*/
   static void Invert(const double inElements[16], double outElements[16]);
+  
+  /** Matrix determinant */
+  static double Determinant(const double Elements[16]);
+  double Determinant() {return Determinant(*GetElements());};
+
+  /** Matrix adjoint */
+  static void Adjoint(const double inElements[16], double outElements[16]);
+  void Adjoint(const mafMatrix &inMat, mafMatrix &outMat);
+  void Adjoint() {Adjoint(*GetElements(),*GetElements());}
 
   /** Transpose the matrix and put it into out. static version.*/
   static void Transpose(const mafMatrix &in, mafMatrix &out) 
@@ -137,15 +153,6 @@ public:
   /** Multiplies matrices a and b and stores the result in c. this works with arrays. */
   static void Multiply4x4(const double a[16], const double b[16], 
                           double c[16]);
-
-  /** Compute adjoint of the matrix and put it into out.*/
-  void Adjoint(const mafMatrix &in, mafMatrix &out) 
-    {mafMatrix::Adjoint(*in.GetElements(),*out.GetElements());}
-  static void Adjoint(const double inElements[16], double outElements[16]);
-
-  /** Compute the determinant of the matrix and return it.*/
-  double Determinant() {return mafMatrix::Determinant(*GetElements());}
-  static double Determinant(const double Elements[16]);
 
   /** bracket operator to access & write single elements */
   double *operator[](const unsigned int i) {return &(GetElements()[i][0]);}
