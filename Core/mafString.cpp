@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-20 20:47:08 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2004-12-22 08:25:31 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -46,13 +46,14 @@ mafString::mafString(const mafString& src)
 //----------------------------------------------------------------------------
 {
   Initialize();
-  Copy(GetCStr());
+  Copy(src.GetCStr());
 }
 //----------------------------------------------------------------------------
 mafString::mafString(const char *src)
 //----------------------------------------------------------------------------
 {
   m_ConstCStr = src?src:""; // don't worry it won't be overwritten!
+  m_CStr = NULL;
   m_Size = 0; // just to be sure to not overwrite... 
 }
 //----------------------------------------------------------------------------
@@ -110,9 +111,21 @@ int mafString::SetSize(mafID size)
       }
       else
       {
-        Copy(tmp,m_CStr);
+        strcpy(tmp,m_CStr);
       }
     }
+    else if (m_ConstCStr)
+    {
+      if (size<m_Size)
+      {
+        strncpy(tmp,m_ConstCStr,size-1);
+      }
+      else
+      {
+        strcpy(tmp,m_ConstCStr);
+      }
+    }
+
   }
 
   // free old memory if present
@@ -125,10 +138,12 @@ int mafString::SetSize(mafID size)
   if (size>0)
   {
     m_CStr=tmp;
+    m_ConstCStr=NULL;
   }
   else
   {
     m_ConstCStr=tmp;
+    m_CStr=NULL;
   }
   m_Size=size;
 
@@ -223,14 +238,18 @@ void mafString::Copy(const char* src)
   if (src)
   {
     // If the available memory is not sufficient, relocate!
-    if (Length(src)>=m_Size)
+    int len=Length(src);
+    if (len>=m_Size)
     {
-      Duplicate(m_CStr,src,m_Size>0);
+      SetMaxLength(len);
     }
-    else
-    {
-      Copy(m_CStr,src);
-    }
+
+    Copy(m_CStr,src);
+  }
+  else
+  {
+    SetMaxLength(0);
+    m_ConstCStr="";
   }
 }
 

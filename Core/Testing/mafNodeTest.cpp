@@ -91,6 +91,8 @@ int main()
   MAF_TEST(nodeA2->ReparentTo(root)==MAF_OK);
   MAF_TEST(nodeA2->ReparentTo(rootB)==MAF_ERROR);
   
+  root->CleanTree();
+
   //
   // test iterators
   //
