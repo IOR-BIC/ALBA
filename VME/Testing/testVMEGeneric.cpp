@@ -36,7 +36,7 @@
   #define SLEEP(a) Sleep(a)
 #else
   #include <unistd.h>
-  #define SLEEP(a) sleep(a)
+  #define SLEEP(a) usleep(a*10)
 #endif
 
 /** attribute class for attaching vtkActor to VME */
