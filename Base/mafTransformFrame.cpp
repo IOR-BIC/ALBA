@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 15:50:13 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-01 10:01:23 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -12,6 +12,10 @@
 #include "mafTransformFrame.h"
 #include "mafTransform.h"
 #include <assert.h>
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mafTransformFrame)
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mafTransformFrame::mafTransformFrame()
@@ -29,14 +33,16 @@ mafTransformFrame::~mafTransformFrame()
 }
 /*
 //----------------------------------------------------------------------------
-void mafTransformFrame::PrintSelf(ostream& os, vtkIndent indent)
+virtual void Print(std::ostream& os, const int tabs) const;
 //----------------------------------------------------------------------------
 {
-  this->Update();
+  Update();
 
-  this->Superclass::PrintSelf(os, indent);
+  mafIndent indent(tabs);
+
+  Superclass::Print(os, indent);
   os << indent << "Input: ";
-  if (Input)
+  if (m_Input)
   {
     os << Input << " Matrix:\n";
     Input->GetMatrix()->PrintSelf(os,indent.GetNextIndent());
@@ -45,27 +51,22 @@ void mafTransformFrame::PrintSelf(ostream& os, vtkIndent indent)
     os << "NULL\n";
 
   os << indent << "InputFrame: ";
-  if (InputFrame)
+  if (m_InputFrame)
   {
-    os << InputFrame << "\n";
-    InputFrame->GetMatrix()->PrintSelf(os,indent.GetNextIndent());
+    m_InputFrame->GetMatrix()->PrintSelf(os,indent.GetNextIndent());
   }
   else
     os << "NULL\n";
 
   os << indent << "TargetFrame: ";
-  if (TargetFrame)
+  if (m_TargetFrame)
   {
-    os << TargetFrame << "\n";
-    TargetFrame->GetMatrix()->PrintSelf(os,indent.GetNextIndent()); 
+    m_TargetFrame->GetMatrix()->PrintSelf(os,indent.GetNextIndent()); 
   }
   else
     os << "NULL\n";
-
-  os << indent << "InverseFlag: " << this->InverseFlag << "\n";
 }
 */
-
 //----------------------------------------------------------------------------
 void mafTransformFrame::SetInput(mafTransformBase *matrix)
 //----------------------------------------------------------------------------

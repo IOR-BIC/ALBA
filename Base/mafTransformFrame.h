@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformFrame.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:33:19 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-01 10:01:23 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -37,7 +37,8 @@ class MAF_EXPORT mafTransformFrame : public mafTransformBase
   ~mafTransformFrame();
 	
   mafTypeMacro(mafTransformFrame,mafTransformBase);
-  //void PrintSelf (ostream& os, vtkIndent indent);
+
+  //virtual void Print(std::ostream& os, const int tabs=0) const;
 
   /** set the matrix to be transformed */
   void SetInput(mafTransformBase *frame);
