@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:41:23 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-03-10 12:40:37 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -19,6 +19,7 @@ mafStorage::mafStorage()
 {
   m_Root        = NULL;
   m_RootElement = NULL;
+  m_TmpFileId   = 0;
 }
 
 //------------------------------------------------------------------------------
@@ -72,4 +73,29 @@ mafStorable *mafStorage::GetRoot()
 //------------------------------------------------------------------------------
 {
   return m_Root;
+}
+
+//------------------------------------------------------------------------------
+void mafStorage::GetTmpFile(mafString &filename)
+//------------------------------------------------------------------------------
+{
+  mafString tmpfname="~tmp.";
+  do 
+  {
+    tmpfname<<mafString(m_TmpFileId++);	
+  } while(m_TmpFileNames.find(tmpfname)!=m_TmpFileNames.end());
+  
+  filename=tmpfname;
+  m_TmpFileNames.insert(filename);
+}
+//------------------------------------------------------------------------------
+void mafStorage::ReleaseTmpFile(const char *filename)
+//------------------------------------------------------------------------------
+{
+  std::set<mafString>::iterator it=m_TmpFileNames.find(filename);
+  if (it!=m_TmpFileNames.end())
+  {
+    m_TmpFileNames.erase(it);
+  }
+  // file deletion not yet implemented
 }

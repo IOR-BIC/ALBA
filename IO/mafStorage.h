@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorage.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:41:23 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-03-10 12:40:37 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,6 +14,7 @@
 
 #include "mafConfigure.h"
 #include "mafString.h"
+#include <set>
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -36,7 +37,7 @@ class mafStorable;
   @todo
   - implement packing (single file)
   - remote files (URL access)
-  - 
+  - improve tmp files management
  */  
 class mafStorage
 {
@@ -72,6 +73,14 @@ public:
 
   /** resolve an URL and provide a local filename to be used as output */
   virtual bool ResolveOutputURL(const mafString &url, mafString &filename)=0;
+
+  /** 
+    Return a name of file to be used as tmp file during store/restore.
+    This is usually located insed the MSF file directory */
+  virtual void GetTmpFile(mafString &filename);
+
+  /** remove the tmp file */
+  void ReleaseTmpFile(const char *filename);
     
 protected:
   /** This is called by Store() and must be reimplemented by subclasses */
@@ -80,10 +89,12 @@ protected:
   /** This is called by Restore() and must be reimplemented by subclasses */
   virtual int InternalRestore()=0;
 
-  mafStorable *m_Root;              ///< root object to be stored, or being restored
-  mafStorageElement *m_RootElement; ///< root stored element
+  mafStorable         *m_Root;        ///< root object to be stored, or being restored
+  mafStorageElement   *m_RootElement; ///< root stored element
 
-  mafString m_URL;             ///< name of the file being accessed
-  mafString m_ParserURL;       ///< name of the last parsed file (used for SaveAs)
+  mafString           m_URL;          ///< name of the file being accessed
+  mafString           m_ParserURL;    ///< name of the last parsed file (used for SaveAs)
+  mafID               m_TmpFileId;    ///< counter for unique tmp file naming
+  std::set<mafString> m_TmpFileNames; ///< name of tmp files in the MSF dir 
 };
 #endif // _mafStorage_h_
