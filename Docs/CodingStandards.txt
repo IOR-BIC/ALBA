@@ -1,0 +1,96 @@
+Following is a number of rules for MAF coding:
+
+** NAMING CONVENTIONS **
+
+MAF classes
+Each class name should start with tree characters from the following list:
+"maf" - for generic maf classes
+"mmo" - for maf operations
+"mmg" - for GUI related classes
+"mmd" - for MAF devices
+"mmi" - for interactors
+
+After first three characters, the class name is composed of a number of words separated by capital letters, e.g. "mafViewManager", "mafEventListener", "mafObserver" etc. 
+
+Member Variables
+For MAF classes, member variables name starts with "m_" to clearly stat it's a member variable, followed by a number of wording each one starting with capital letter: e.g. "m_Observers", "m_View", "m_Initialized"
+
+Member Functions
+For MAF classes, member function names are composed by words starting with capital letters, e.g. "SetRenderWindow()", "GetActorsList()", "IsInitialized()". When a function is for setting or gettig the value of a member variable, its name is composed by "Set" or "Get" followed by variable name without the leading "m_", e.g. "SetRenderWindow()". 
+
+** SOURCES ORGANIZATION **
+Each class should have two files, for for class declaration and one for class implementation, with the same name of the class followed respectivelly by ".h" and ".cpp": e.g. "mafObserver.h" and "mafObserver.cpp"
+
+** LICENSING AND AUTHORS **
+Source files of the MAF distribution should have an header of the form:
+
+/*=========================================================================
+  Program:   Multimod Application Framework RELOADED
+  Module:    $RCSfile: CodingStandards.txt,v $
+  Language:  C++
+  Date:      $Date: 2004-11-15 08:20:49 $
+  Version:   $Revision: 1.1 $
+  Authors:   Author Name (suggested to not report e-mails to avoid spam)
+==========================================================================
+  Copyright (c) 2002/2005 
+  CINECA - Interuniversity Consortium (www.cineca.it)
+  See the COPYINGS file for license details
+=========================================================================*/
+
+Each file should report the author's organization, but for license details files
+in MAF distribution should undergo the BSD-like license reported in COPYINGS
+file.
+
+** COMMENTS STYLING **
+Code comments style inside MAF has been selected to allow a good readability of the code and to allow an automatic document processing by means of the doyxgen utility. In general code is organized in specific sections, where each section is separated by comments with dash lines to make evident code separation. Following are comments styling for different kind 
+of elements/sections.
+
+- MEMBER FUNCTIONS DECLARATION
+For member funciton declarations inside header files the following comment style should be adopted:
+
+/** short function comment.
+  Detailed function comments */
+void MyFunction();
+
+/** short only function comment */
+void ShortFunction();
+
+/**
+  Detailed only function comment */
+void LongFunction();
+
+- FORWARD DECLARATIONS
+forward declarations in the header file should be reported before of class declarations and preceded by a clear comment:
+
+//------------------------------------------------------------------------------
+// Forward declarations
+//------------------------------------------------------------------------------
+class myclass;
+class fooclass;
+
+
+- FUNCTIONS IMPLEMENTATION
+Each function body has the following comments styling
+
+//------------------------------------------------------------------------------
+void FunctionBody()
+//------------------------------------------------------------------------------
+{
+}
+
+or 
+
+//------------------------------------------------------------------------------
+// Function body comments...
+void CommentedFunctionBody()
+//------------------------------------------------------------------------------
+{
+}
+
+Dash lines are used to improve code readability and making more evident functions starting in the code.
+
+- MEMBER VARIABLES
+member factions can also be commented in a way doygen can process the comment, by using a comment of the form:
+
+double MyVariable; ///< short comment for the variable
+
