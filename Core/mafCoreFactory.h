@@ -1,4 +1,14 @@
-
+/*=========================================================================
+  Program:   Multimod Application Framework
+  Module:    $RCSfile: mafCoreFactory.h,v $
+  Language:  C++
+  Date:      $Date: 2005-04-06 21:21:47 $
+  Version:   $Revision: 1.2 $
+  Authors:   Marco Petrone
+==========================================================================
+  Copyright (c) 2001/2005 
+  CINECA - Interuniversity Consortium (www.cineca.it)
+=========================================================================*/
 
 #ifndef __mafCoreFactory_h
 #define __mafCoreFactory_h
@@ -10,20 +20,19 @@ class MAF_EXPORT mafCoreFactory : public mafObjectFactory
 {
 public: 
   mafTypeMacro(mafCoreFactory,mafObjectFactory);
-  void PrintSelf(std::ostream& os, const int indent);
   virtual const char* GetMAFSourceVersion() const;
   virtual const char* GetDescription() const;
 
   /* Initialize the factory creating and registering a new instance */
   static int Initialize();
   /** return the instance pointer of the factory. return NULL if not iitialized yet */
-  static mafCoreFactory *GetInstance() {return Instance;}
+  static mafCoreFactory *GetInstance() {if (!m_Instance) Initialize(); return m_Instance;}
 
 protected:
   mafCoreFactory();
   ~mafCoreFactory() { }
 
-  static mafCoreFactory *Instance;
+  static mafCoreFactory *m_Instance;
   
 private:
   mafCoreFactory(const mafCoreFactory&);  // Not implemented.
@@ -35,11 +44,11 @@ template <class T>
 class MAF_EXPORT mafPlugObject
 {
   public:
-  mafPlugObject(const char *name) \
+  mafPlugObject(const char *description) \
   { \
     mafCoreFactory *factory=mafCoreFactory::GetInstance(); \
     if (factory) \
-      factory->RegisterNewObject(T::GetStaticTypeName(), name, T::NewObject); \
+      factory->RegisterNewObject(T::GetStaticTypeName(), description, T::NewObject); \
   }
 };
 

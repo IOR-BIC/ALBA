@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafCoreFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:22:14 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-06 21:21:47 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,7 +17,7 @@
 #include <ostream>
 #include <sstream>
 
-mafCoreFactory *mafCoreFactory::Instance=NULL;
+mafCoreFactory *mafCoreFactory::m_Instance=NULL;
 
 mafCxxTypeMacro(mafCoreFactory);
 
@@ -26,13 +26,13 @@ mafCxxTypeMacro(mafCoreFactory);
 int mafCoreFactory::Initialize()
 //----------------------------------------------------------------------------
 {
-  if (Instance==NULL)
+  if (m_Instance==NULL)
   {
-    Instance=mafCoreFactory::New();
+    m_Instance=mafCoreFactory::New();
 
-    if (Instance)
+    if (m_Instance)
     {
-      Instance->RegisterFactory(Instance);
+      m_Instance->RegisterFactory(m_Instance);
       return MAF_OK;  
     }
     else
@@ -44,20 +44,15 @@ int mafCoreFactory::Initialize()
   return MAF_OK;
 }
 
-//----------------------------------------------------------------------------
-void mafCoreFactory::PrintSelf(std::ostream& os, const int indent)
-//------------------------------------------------------------------------------
-{
-  Superclass::Print(os,indent);
-  os << mafIndent(indent) << "MAF Core object factory" << std::endl;
-}
-
-
 //------------------------------------------------------------------------
 mafCoreFactory::mafCoreFactory()
 //------------------------------------------------------------------------------
 {
-  //RegisterNewObject(objectName,"ObjectDescrition");
+  //
+  // Plug here Objects in this factory
+  //
+
+  //mafPlugObject<object_type>("comment");
 }
 
 //------------------------------------------------------------------------------
@@ -71,20 +66,5 @@ const char* mafCoreFactory::GetMAFSourceVersion() const
 const char* mafCoreFactory::GetDescription() const
 //------------------------------------------------------------------------------
 {
-  return "MAF Core Object Factory";
-}
-
-
-//------------------------------------------------------------------------------
-const char *mafObjectFactory::GetMAFSourceVersion(void) const
-//------------------------------------------------------------------------------
-{
-  return MAF_SOURCE_VERSION;
-}
-
-//------------------------------------------------------------------------------
-const char *mafObjectFactory::GetDescription() const
-//------------------------------------------------------------------------------
-{
-  return "MAF core factory.";
+  return "MAF-Core Object Factory";
 }
