@@ -31,9 +31,10 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Configure.h.in
 
 # Create the library.
 ADD_LIBRARY(${PROJECT_NAME} ${mafCore_SRCS})
+##MESSAGE ("${PROJECT_NAME} linked libraries: ${mafCore_LIBS}")
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${mafCore_LIBS})
 # this is necessaty to force MFL compilation....
-MESSAGE ("${PROJECT_NAME} dependencies: ${MFL_BUILD_TARGETS}")
+##MESSAGE ("${PROJECT_NAME} dependencies: ${MFL_BUILD_TARGETS}")
 ADD_DEPENDENCIES(${PROJECT_NAME} ${MFL_BUILD_TARGETS})
 
 IF(BUILD_TESTING)
