@@ -1,5 +1,5 @@
 #include "mmaTagArray.h"
-#include "mafCoreDecl.h"
+#include "mafDecl.h"
 #include "mafString.h"
 #include "mafXMLStorage.h"
 #include <iostream>
@@ -21,22 +21,22 @@ int main()
   mmuTagItem tmulti("MultiString",strings,4);
   mmuTagItem tmulti_num("MultiNum",numbers,4);
   
-  MAF_TEST(mafString("TestTAG")==titem.GetName());
+  MAF_TEST(mafString::Equals("TestTAG",titem.GetName()));
   MAF_TEST(titem.GetType()==MAF_STRING_TAG);
-  MAF_TEST(mafString(titem.GetValue())=="String Value");
+  MAF_TEST(mafString::Equals(titem.GetValue(),"String Value"));
   
-  MAF_TEST(mafString("TestNUM")==tnum.GetName());
+  MAF_TEST(mafString::Equals("TestNUM",tnum.GetName()));
   MAF_TEST(tnum.GetType()==MAF_NUMERIC_TAG);
   MAF_TEST(tnum.GetValueAsDouble()==1235.67890123456e20);
   
-  MAF_TEST(mafString("MultiString")==tmulti.GetName());
+  MAF_TEST(mafString::Equals("MultiString",tmulti.GetName()));
   MAF_TEST(tmulti.GetType()==MAF_STRING_TAG);
   for (i=0;i<4;i++)
   {
-    MAF_TEST(mafString(tmulti.GetValue(i))==strings[i]);
+    MAF_TEST(mafString::Equals(tmulti.GetValue(i),strings[i]));
   }
 
-  MAF_TEST(mafString("MultiNum")==tmulti_num.GetName());
+  MAF_TEST(mafString::Equals("MultiNum",tmulti_num.GetName()));
   MAF_TEST(tmulti_num.GetType()==MAF_NUMERIC_TAG);
   for (i=0;i<4;i++)
   {
@@ -123,7 +123,7 @@ int main()
   MAF_TEST(ret==MAF_OK);
 
   mafXMLStorage restore;
-  restore.SetURL("testfile.xml");
+  restore.SetURL("testTagArray.xml");
   restore.SetFileType("TagArrayXML");
   
   mmaTagArray new_tag_array;
