@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafIncludeWIN32.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:33:15 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-01 14:21:13 $
+  Version:   $Revision: 1.3 $
   Authors:   Based on itkWindows.h (www.itk.org)
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,8 +25,10 @@
   #define NOMINMAX
 #endif
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <winbase.h>
+#ifdef WIN32
+  #define WIN32_LEAN_AND_MEAN
+  #include <windows.h>
+  #include <winbase.h>
+#endif
 
 #endif

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:06:44 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-04-01 14:22:17 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -165,7 +165,7 @@ void mafVME::SetTreeTime(mafTimeStamp t)
 //-------------------------------------------------------------------------
 {
   SetCurrentTime(t);
-  ForwardDownEvent(mafEventBase(this,VME_TIME_SET,&t));
+  ForwardDownEvent(&mafEventBase(this,VME_TIME_SET,&t));
 }
 
 //-------------------------------------------------------------------------

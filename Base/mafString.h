@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 09:58:23 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-04-01 14:21:29 $
+  Version:   $Revision: 1.12 $
   Authors:   originally based on vtkString (www.vtk.org), rewritten Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -242,11 +242,16 @@ public:
   mafString(const mafString &src);
   mafString(const char *src);
   mafString(const double &num);
+#ifdef MAF_USE_WX
+  mafString(const wxString &str);
+#endif
 
   mafString &operator=(const mafString &mat);
   mafString &operator=(const char *src);
   mafString &operator=(const double &num);
-
+#ifdef MAF_USE_WX
+  mafString &operator=(const wxString &str);
+#endif
   mafString();
   ~mafString();
 protected:

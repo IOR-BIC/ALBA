@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:03:33 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-04-01 14:22:10 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -503,7 +503,7 @@ int mafNode::SetParent(mafNode *parent)
       // if the Node was attached to another tree, first send detaching event
       if ( old_root && (new_root!=old_root) )
       {      
-        ForwardUpEvent(mafEventBase(this,NODE_DETACHED_FROM_TREE));
+        ForwardUpEvent(&mafEventBase(this,NODE_DETACHED_FROM_TREE));
         m_EventSource->InvokeEvent(this,NODE_DETACHED_FROM_TREE);
       }
 
@@ -526,7 +526,7 @@ int mafNode::SetParent(mafNode *parent)
       }
 
       // send attachment event
-      ForwardUpEvent(mafEventBase(this,NODE_ATTACHED_TO_TREE));
+      ForwardUpEvent(&mafEventBase(this,NODE_ATTACHED_TO_TREE));
       m_EventSource->InvokeEvent(this,NODE_ATTACHED_TO_TREE);
       
       Modified();
@@ -545,7 +545,7 @@ int mafNode::SetParent(mafNode *parent)
     if (m_Parent!=NULL)
     {
       // send event about detachment from the tree
-      ForwardUpEvent(mafEventBase(this,NODE_DETACHED_FROM_TREE));
+      ForwardUpEvent(&mafEventBase(this,NODE_DETACHED_FROM_TREE));
       m_EventSource->InvokeEvent(this,NODE_DETACHED_FROM_TREE);
 
       m_Parent=parent;

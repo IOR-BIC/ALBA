@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 09:58:23 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-04-01 14:21:21 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -59,6 +59,14 @@ mafString::mafString(const double &num):m_CStr(NULL),m_ConstCStr(""),m_Size(0)
 {
   NPrintf(32,"%.16g",num);
 }
+#ifdef MAF_USE_WX
+//----------------------------------------------------------------------------
+mafString::mafString(const wxString& str):m_CStr(NULL),m_ConstCStr(""),m_Size(0)
+//----------------------------------------------------------------------------
+{
+  Copy(str.c_str());
+}
+#endif
 
 //----------------------------------------------------------------------------
 mafString &mafString::operator=(const mafString &src)
@@ -81,6 +89,15 @@ mafString &mafString::operator=(const double &num)
   NPrintf(32,"%.16g",num);
   return *this;
 }
+#ifdef MAF_USE_WX
+//----------------------------------------------------------------------------
+mafString &mafString::operator=(const wxString &src)
+//----------------------------------------------------------------------------
+{
+  Copy(src.c_str());
+  return *this;
+}
+#endif
 
 //----------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& os, const mafString& s)
@@ -101,40 +118,33 @@ void mafString::operator>>(std::istream &is)
 
 //SIL. 16-3-2005: begin
 //TODO: verify portability of _snprintf ---- replace with NPrintf
+//Marco. 1-4-2005: chnged _snprintf with NPrintf()
 //----------------------------------------------------------------------------
 mafString &mafString::operator<<( int d )
 //----------------------------------------------------------------------------
 {
-  char tmp[100];
-  _snprintf(tmp,100,"%d",d);
-  Append(tmp);
+  NPrintf(100,"%d",d);
   return *this;
 }
 //----------------------------------------------------------------------------
 mafString &mafString::operator<<( long d )
 //----------------------------------------------------------------------------
 {
-  char tmp[100];
-  _snprintf(tmp,100,"%d",d);
-  Append(tmp);
+  NPrintf(100,"%d",d);
   return *this;
 }
 //----------------------------------------------------------------------------
 mafString &mafString::operator<<( float d )
 //----------------------------------------------------------------------------
 {
-  char tmp[100];
-  _snprintf(tmp,100,"%g",d);
-  Append(tmp);
+  NPrintf(100,"%g",d);
   return *this;
 }
 //----------------------------------------------------------------------------
 mafString &mafString::operator<<( double d )
 //----------------------------------------------------------------------------
 {
-  char tmp[100];
-  _snprintf(tmp,100,"%g",d);
-  Append(tmp);
+  NPrintf(100,"%g",d);
   return *this;
 }
 /*
