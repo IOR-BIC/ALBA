@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2004-12-24 15:10:47 $
-# Version:   $Revision: 1.13 $
+# Date:      $Date: 2004-12-29 17:57:12 $
+# Version:   $Revision: 1.14 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -111,13 +111,13 @@ IF (MAF_CAN_BUILD)
   #todo: add a FOREACH on all subdirs but "modules"
   INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/Core)
   INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/Gui)
-#  INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/IO)
+  INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/IO)
 
   # Configuring MAF kits
   DBG_MESSAGE("MAF: Configuring MAF Kits")
   MESSAGE(STATUS "MAF: Configuring MAF Kits")
   SUBDIRS (Core)
-#  SUBDIRS (IO)
+  SUBDIRS (IO)
   SUBDIRS (vtkMAF)
   SUBDIRS (Gui)
   
