@@ -2,11 +2,13 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2004-10-18 07:37:32 $
-# Version:   $Revision: 1.5 $
+# Date:      $Date: 2004-10-22 14:47:58 $
+# Version:   $Revision: 1.6 $
 #
 # Description:
 # CMake Project file for the MAF.
+
+
 
 SET (CMAKE_BACKWARDS_COMPATIBILITY "2.0" CACHE INSTERNAL "This project is for CMake 2.0")
 CMAKE_MINIMUM_REQUIRED(VERSION 2.0) 
@@ -14,7 +16,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.0)
 PROJECT (MAF)
 
 INCLUDE (${MAF_SOURCE_DIR}/modules/DebugMacro.cmake)
-
+SET (DEBUG FALSE)
 # this define the MAF_SUBPROJECT macro
 INCLUDE (${MAF_SOURCE_DIR}/modules/MAFConfigMacro.cmake)
 
@@ -52,13 +54,13 @@ MAF_SUBPROJECT(MFL mfl)
 IF (MFL_CONFIG_FOUND)
   FIND_FILE (USE_MFL_FILE UseMFL.cmake "${MAF_BINARY_DIR}/mfl") 
   IF (USE_MFL_FILE)
-    MESSAGE("MAF: MFL Configured")
+    DBG_MESSAGE("MAF: MFL Configured" ${DEBUG})
     SET (MAF_CAN_BUILD 1)
   ENDIF (USE_MFL_FILE)   
 ELSE (MFL_CONFIG_FOUND)
   # Search for MFL outside the MAF tree: MFL must be already built!
   # If found the USE_MFL_FILE variable is set 
-  MESSAGE("MAF: Searching for MFL libraries")
+  MESSAGE(STATUS "MAF: Searching for MFL libraries")
   INCLUDE (${MAF_SOURCE_DIR}/modules/FindMFL.cmake)
   IF (MFL_FOUND)
     MESSAGE(STATUS "MAF: Found MFL use file at: ${USE_MFL_FILE}")  
@@ -75,7 +77,8 @@ IF (MAF_CAN_BUILD)
   INCLUDE_DIRECTORIES(${MAF_BINARY_DIR}/Core)
   
   # Configuring MAF kits
-  MESSAGE("MAF: Configuring MAF Kits")
+  DBG_MESSAGE("MAF: Configuring MAF Kits" ${DEBUG})
+  MESSAGE(STATUS "MAF: Configuring MAF Kits")
   SUBDIRS (Core)
   SUBDIRS (vtkMAF)
   
@@ -118,10 +121,10 @@ MARK_AS_ADVANCED(
 
 
 #Write the list of variables and their values that are defined by CMake when running this CMakeList file
-FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/AllVariables.txt "")
 GET_CMAKE_PROPERTY(VARS VARIABLES)
 FOREACH(var ${VARS})
 	FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/AllVariables.txt 
 							"${var} \"${${var}}\"\n")
 ENDFOREACH(var ${VARS})
+
 
