@@ -58,7 +58,8 @@ int main()
   MAF_TEST(achar>="a");
 
   const char *char_str="const string";
-  mafString test_str(char_str);
+  mafString test_str;
+  test_str.Set(char_str);
 
   MAF_TEST(char_str==test_str.GetCStr());
 
@@ -67,7 +68,8 @@ int main()
   MAF_TEST(char_str!=test_str.GetCStr());
   MAF_TEST(test_str=="const string not overwritten!");
 
-  mafString const_str=char_str;
+  mafString const_str;
+  const_str.Set(char_str);
   const_str.Erase(6,7);
   MAF_TEST(const_str.GetCStr()!=char_str);
   MAF_TEST(const_str=="const ring");
