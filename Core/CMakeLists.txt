@@ -3,7 +3,7 @@
 #
 
 PROJECT(mafCore)
-MESSAGE("Configuring project mafCore")
+MESSAGE(STATUS "Configuring project mafCore")
 # Set your list of sources here.  Do not change the name of the
 # vtkLocal_SRCS variable.
 SET(mafCore_SRCS
@@ -40,6 +40,8 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Configure.h.in
 # Create the library.
 ADD_LIBRARY(${PROJECT_NAME} ${mafCore_SRCS})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${mafCore_LIBS})
+# this is necessaty to force MFL compilation....
+ADD_DEPENDENCIES(${PROJECT_NAME} ${MFL_BUILD_TARGETS})
 
 # Create Tcl wrappers if VTK is wrapped in Tcl.
 #IF(VTK_WRAP_TCL)
