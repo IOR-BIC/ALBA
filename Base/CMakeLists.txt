@@ -38,6 +38,7 @@ SET(PROJECT_SRCS
   mafSmartPointer.h
   mafString.cpp
   mafString.h
+  mafTimeStamped.h
   mafTransform.cpp
   mafTransform.h
   mafTransformBase.cpp
