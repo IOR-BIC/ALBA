@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-02 00:30:04 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-03-10 12:35:41 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,86 +14,59 @@
 
 #include "mafVME.h"
 
-//#include "mflItemArray.txx"
-//#include "mflMatrixVector.h"
-//#include "mafVMEItemArray.h"
-//#include "mflDataInterpolatorHolder.h"
-//#include "mflMatrixInterpolatorHolder.h"
-//#include "mflMatrixPipeDirectCinematic.h"
+#include "mafDataVector.h"
+#include "mafMatrixVector.h"
+#include "mafAbsMatrixPipe.h"
 #include "mafOBB.h"
-//#include "mflSmartPointer.h"
-//#include "mflDefines.h"
-//#include "mflTransform.h"
-//#include "vtkLinearTransform.h"
+#include "mafSmartPointer.h"
+#include "mafTransform.h"
 
-#include <map>
 #include <assert.h>
 
 //-------------------------------------------------------------------------
 mafVME::mafVME()
 //-------------------------------------------------------------------------
 {
-  // Tags used for Observers
-	MatrixVector        = mflMatrixVector::New();
-  DataArray           = mafVMEItemArray::New();
-  DataArray->SetVME(this);
-
   // Pipes are dynamically created
-  m_MatrixPipe          = NULL;
-  m_DataPipe            = NULL;
-  AbsMatrixPipe       = NULL;
+  m_MatrixPipe          = NULL; // to be created by subclasses
+  m_DataPipe            = NULL; // to be created by subclasses
 
+  cppNEW(m_AbsMatrixPipe);
+  m_AbsMatrixPipe->SetVME(this);
+  m_AbsMatrixPipe->SetListener(this);
+
+  // move to Output data structure
   // if no m_MatrixPipe is given, provide a static pose matrix
-  CurrentMatrix       = mflSmartPointer<mflMatrix>();
+  //CurrentMatrix       = mafSmartPointer<mflMatrix>();
 
-  CurrentTime         = 0;
-  VisibleToTraverse   = 1;
-  Crypting            = -1;
+  m_CurrentTime         = 0.0;
+  m_Crypting            = -1;
 }
 
 //-------------------------------------------------------------------------
 mafVME::~mafVME()
 //-------------------------------------------------------------------------
 {
-  // advise observers this is being destroyed
-  InvokeEvent(mafVME::DestroyEvent,this);
-
-  vtkDEL(MatrixVector);
-  vtkDEL(DataArray);
-
   // Pipes must be destroyed in the right orde
   // to take into consideration dependencies
-  if (m_DataPipe)
-  {
-    RemoveObserver(DataUpdateTag);
-    m_DataPipe->SetVME(NULL);
-    vtkDEL(m_DataPipe);
-  }
-
-  if (AbsMatrixPipe)
-  {
-    RemoveObserver(AbsMatrixUpdateTag);
-    AbsMatrixPipe->SetVME(NULL);
-    vtkDEL(AbsMatrixPipe);
-  }
+  cppDEL(m_DataPipe);
+  
+  m_AbsMatrixPipe->SetVME(NULL);
+  cppDEL(m_AbsMatrixPipe);
     
-  if (m_MatrixPipe)
-  { 
-    RemoveObserver(MatrixUpdateTag);
-    vtkDEL(m_MatrixPipe);
-  }
+  cppDEL(m_MatrixPipe);
 }
 
 //------------------------------------------------------------------------------
 int mafVME::Initialize()
 //------------------------------------------------------------------------------
 {
-  if (this->Initialized)
+  if (m_Initialized)
     return -1;
 
-  if (this->InternalInitialize() == 0)
+  if (InternalInitialize() == 0)
   {
-    this->Initialized=1;
+    m_Initialized=1;
     return 0;
   }
 
@@ -105,88 +78,44 @@ int mafVME::Initialize()
 void mafVME::Shutdown()
 //------------------------------------------------------------------------------
 {
-  if (Initialized)
+  if (m_Initialized)
   {
     InternalShutdown();
-    Initialized = 0;
+    m_Initialized = 0;
   }
 }
 
 //-------------------------------------------------------------------------
-void mafVME::SetDefaultDataPipe()
+mafVME *mafVME::GetParent()
 //-------------------------------------------------------------------------
 {
-  // Default Data Pipe
-  mflString pipe_name=GetDefaultDataPipe();
-  
-  if (pipe_name.IsEmpty())
-  {
-    SetDataPipe(NULL);
-    //CurrentData=NULL;
-  }
-  else
-  {
-    SetDataPipe((mflDataPipe *)mflCreateInstance(pipe_name));
-    if (m_DataPipe)
-      m_DataPipe->UnRegister(this); // Factory return an object with RefCount==1
-  }
+  assert(m_Parent->IsA(mafVME::GetStaticTypeId()));
+  return (mafVME *)GetParent();
 }
 
 //-------------------------------------------------------------------------
-const char *mafVME::GetDefaultDataPipe()
+mafAbsMatrixPipe *mafVME::GetAbsMatrixPipe()
 //-------------------------------------------------------------------------
 {
-  return "mflDataInterpolatorHolder";
-}
-
-//-------------------------------------------------------------------------
-void mafVME::SetDefaultMatrixPipe()
-//-------------------------------------------------------------------------
-{
-  // Default Matrix Pipe
-  mflString pipe_name=GetDefaultMatrixPipe();
-  if (pipe_name.IsEmpty())
-  {
-    SetMatrixPipe(NULL);
-  }
-  else
-  {
-    SetMatrixPipe((mflMatrixPipe *)mflCreateInstance(pipe_name));
-    if (m_MatrixPipe)
-      m_MatrixPipe->UnRegister(this);
-  }
-}
-
-//-------------------------------------------------------------------------
-const char *mafVME::GetDefaultMatrixPipe()
-//-------------------------------------------------------------------------
-{
-  return "mflMatrixInterpolatorHolder";
-}
-
-//-------------------------------------------------------------------------
-mflMatrixPipeDirectCinematic *mafVME::GetAbsMatrixPipe()
-//-------------------------------------------------------------------------
-{
-  if (!AbsMatrixPipe)
+  return m_AbsMatrixPipe;
+  if (!m_AbsMatrixPipe)
   {
     // the matrix pipe for computing the ABS matrix (direct cinematic)
-    vtkNEW(AbsMatrixPipe);
-    AbsMatrixPipe->SetVME(this);
-    AbsMatrixPipe->SetCurrentTime(CurrentTime);
+    vtkNEW(m_AbsMatrixPipe);
+    
 
     // TODO: evaluate if this anymore necessary 
-    AbsMatrixUpdateTag= mflAgent::PlugEventSource(this->AbsMatrixPipe,this->AbsMatrixUpdateCallback,this,mflMatrixPipe::MatrixUpdateEvent);
+    AbsMatrixUpdateTag= mflAgent::PlugEventSource(m_AbsMatrixPipe,AbsMatrixUpdateCallback,this,mflMatrixPipe::MatrixUpdateEvent);
   }
 
-  return AbsMatrixPipe;
+  return m_AbsMatrixPipe;
 }
 
 //-------------------------------------------------------------------------
 const char *mafVME::GetDataType()
 //-------------------------------------------------------------------------
 {
-  vtkDataSet *data=this->GetOutput();  
+  vtkDataSet *data=GetOutput();  
   return data?data->GetTypeName():NULL;
 }
 
@@ -203,34 +132,23 @@ mafVME *mafVME::MakeCopy(mafVME *a)
 int mafVME::DeepCopy(mafVME *a)
 //-------------------------------------------------------------------------
 {  
-  if (this->CanCopy(a))
+  if (CanCopy(a))
   {
-    // Copy arrays.
-		if (this->TagArray)
-			this->TagArray->DeepCopy(a->GetTagArray());
-
-    this->DataArray->DeepCopy(a->GetDataArray());
-
-    this->MatrixVector->DeepCopy(a->MatrixVector);
-
-    this->SetMatrixPipe(a->GetMatrixPipe()?a->GetMatrixPipe()->MakeACopy():NULL);
-    this->SetDataPipe(a->GetDataPipe()?a->GetDataPipe()->MakeACopy():NULL);
-
-    // attributes
-    this->SetName(a->GetName());
+    SetMatrixPipe(a->GetMatrixPipe()?a->GetMatrixPipe()->MakeACopy():NULL);
+    SetDataPipe(a->GetDataPipe()?a->GetDataPipe()->MakeACopy():NULL);
 
     // Runtime properties
-    //this->AutoUpdateAbsMatrix=a->GetAutoUpdateAbsMatrix();
-    this->SetCurrentTime(a->GetCurrentTime());
+    //AutoUpdateAbsMatrix=a->GetAutoUpdateAbsMatrix();
+    SetCurrentTime(a->GetCurrentTime());
 
-    return VTK_OK;
+    return MAF_OK;
   }
   else
   {
     vtkErrorMacro("Cannot copy VME of type "<<a->GetTypeName()<<" into a VME \
-    VME of type "<<this->GetTypeName());
+    VME of type "<<GetTypeName());
 
-    return VTK_ERROR;
+    return MAF_ERROR;
   }
 }
 
@@ -238,11 +156,11 @@ int mafVME::DeepCopy(mafVME *a)
 int mafVME::ShallowCopy(mafVME *a)
 //-------------------------------------------------------------------------
 {  
-  if (this->CanCopy(a))
+  if (CanCopy(a))
   {
     // Copy tag & matrix array.
-    if (this->TagArray)
-			this->TagArray->DeepCopy(a->GetTagArray());
+    if (TagArray)
+			TagArray->DeepCopy(a->GetTagArray());
 
     MatrixVector->DeepCopy(a->GetMatrixVector());    
 
@@ -251,24 +169,24 @@ int mafVME::ShallowCopy(mafVME *a)
 
     
 
-    this->SetMatrixPipe(a->GetMatrixPipe()?a->GetMatrixPipe()->MakeACopy():NULL);
-    this->SetDataPipe(a->GetDataPipe()?a->GetDataPipe()->MakeACopy():NULL);
+    SetMatrixPipe(a->GetMatrixPipe()?a->GetMatrixPipe()->MakeACopy():NULL);
+    SetDataPipe(a->GetDataPipe()?a->GetDataPipe()->MakeACopy():NULL);
 
     // attributes
-    this->SetName(a->GetName());
+    SetName(a->GetName());
 
     // Runtime properties
-    //this->AutoUpdateAbsMatrix=a->GetAutoUpdateAbsMatrix();
-    this->SetCurrentTime(a->GetCurrentTime());
+    //AutoUpdateAbsMatrix=a->GetAutoUpdateAbsMatrix();
+    SetCurrentTime(a->GetCurrentTime());
 
-    return VTK_OK;
+    return MAF_OK;
   }
   else
   {
     vtkErrorMacro("Cannot copy VME of type "<<a->GetTypeName()<<" into a VME \
-    VME of type "<<this->GetTypeName());
+    VME of type "<<GetTypeName());
 
-    return VTK_ERROR;
+    return MAF_ERROR;
   }
 }
 
@@ -279,7 +197,7 @@ bool mafVME::CanCopy(mafVME *vme)
   if (!vme)
     return false;
 
-  if (vme->IsA(this->GetTypeName()))
+  if (vme->IsA(GetTypeName()))
   {
     return true;
   }
@@ -291,7 +209,7 @@ bool mafVME::CanCopy(mafVME *vme)
 int mafVME::GetItem(int id,mafVMEItem *&item)
 //-------------------------------------------------------------------------
 {
-  return this->DataArray->GetItemByIndex(id,item);
+  return DataArray->GetItemByIndex(id,item);
 }
 
 //-------------------------------------------------------------------------
@@ -299,7 +217,7 @@ mafVMEItem *mafVME::GetItem(int id)
 //-------------------------------------------------------------------------
 {
   mafVMEItem *item;
-  return (this->GetItem(id,item)==VTK_OK?item:NULL);
+  return (GetItem(id,item)==MAF_OK?item:NULL);
 }
 
 //-------------------------------------------------------------------------
@@ -308,10 +226,10 @@ int mafVME::AddItem(mafVMEItem *item)
 {
   if (item)
   {
-    return this->DataArray->SetItem(item);
+    return DataArray->SetItem(item);
   }
 
-  return VTK_ERROR;
+  return MAF_ERROR;
 }
   
 
@@ -319,7 +237,7 @@ int mafVME::AddItem(mafVMEItem *item)
 int mafVME::RemoveItem(int id)
 //-------------------------------------------------------------------------
 {
-  return this->DataArray->RemoveItem(id);
+  return DataArray->RemoveItem(id);
 }
 
 //-------------------------------------------------------------------------
@@ -328,14 +246,14 @@ int mafVME::RemoveItem(mafVMEItem *item)
 {
   int idx;
 
-  idx=this->DataArray->FindItem(item);
+  idx=DataArray->FindItem(item);
   if (idx>=0)
   {
-    return this->DataArray->RemoveItem(idx);
+    return DataArray->RemoveItem(idx);
   }
   else
   {
-    return VTK_ERROR;
+    return MAF_ERROR;
   }
 }
 
@@ -343,14 +261,14 @@ int mafVME::RemoveItem(mafVMEItem *item)
 void mafVME::RemoveAllItems()
 //-------------------------------------------------------------------------
 {
-  this->DataArray->RemoveAllItems();
+  DataArray->RemoveAllItems();
 }
 
 //-------------------------------------------------------------------------
 int mafVME::GetNumberOfItems()
 //-------------------------------------------------------------------------
 {
-  return this->DataArray->GetNumberOfItems();
+  return DataArray->GetNumberOfItems();
 }
 
 /*//------------------------------------------------------------------------------
@@ -359,30 +277,30 @@ int mafVME::SetParent(vtkTree *parent)
 {
   if (mafVME *parent_vme=mafVME::SafeDownCast(parent))
   {
-    if (this->CanReparentTo(parent_vme)==VTK_OK)
+    if (CanReparentTo(parent_vme)==MAF_OK)
     {  
-      this->Superclass::SetParent(parent_vme);
+      Superclass::SetParent(parent_vme);
 
       if (parent_vme==NULL)
       {
-        this->InvokeEvent(mafVME::DetachFromTreeEvent,this);
+        InvokeEvent(mafVME::DetachFromTreeEvent,this);
       }
       else
       {
-        this->InvokeEvent(mafVME::AttachToTreeEvent,this);
+        InvokeEvent(mafVME::AttachToTreeEvent,this);
       }
 
       // this forces the the pipe to Update its input and input frame
-      if (AbsMatrixPipe)
-        this->AbsMatrixPipe->SetVME(this);
+      if (m_AbsMatrixPipe)
+        m_AbsMatrixPipe->SetVME(this);
 
-      return VTK_OK;
+      return MAF_OK;
     }
 
     //modified by Stefano 27-10-2004 (beg)
     //Changed the error macro to give feedback about vme names
     
-    vtkErrorMacro("Cannot reparent the VME: " << this->GetName() << " under the "<<parent->GetTypeName() 
+    vtkErrorMacro("Cannot reparent the VME: " << GetName() << " under the "<<parent->GetTypeName() 
       << " named " << parent_vme->GetName());
     //modified by Stefano 27-10-2004 (end)
   }
@@ -391,12 +309,12 @@ int mafVME::SetParent(vtkTree *parent)
     // reparenting to NULL is admitted
     if (parent==NULL)
     {
-      this->Superclass::SetParent(parent);
-      return VTK_OK;
+      Superclass::SetParent(parent);
+      return MAF_OK;
     }
   }
 
-  return VTK_ERROR;
+  return MAF_ERROR;
 }
 */
 //-------------------------------------------------------------------------
@@ -406,28 +324,28 @@ int mafVME::SetParent(vtkTree *parent)
   // If this object is still referenced only by its children
   // and items the object is deleted, removing all children and
   // items
-  if (this->ReferenceCount==(this->GetNumberOfChildren()+this->GetNumberOfItems()))
+  if (ReferenceCount==(GetNumberOfChildren()+GetNumberOfItems()))
   {
     
     // if the unregistering object is an Item simply return
     if (mafVMEItem *b=mafVMEItem::SafeDownCast(a))
     {
       vtkIdType ret;
-      if (this->DataArray->FindItem(b))
+      if (DataArray->FindItem(b))
         return;    
     }
    
     // if the unregister object is 
     if (mafVME *b=mafVME::SafeDownCast(a))
     {
-      if (this->IsAChild(b))
+      if (IsAChild(b))
         return;
     }
 
-    this->RemoveAllNodes();
-    this->RemoveAllItems();
+    RemoveAllNodes();
+    RemoveAllItems();
   }
-  this->vtkObject::UnRegister(this);
+  vtkObject::UnRegister(this);
 }
 */
 //-------------------------------------------------------------------------
@@ -435,13 +353,13 @@ int mafVME::SetParent(vtkTree *parent)
 //-------------------------------------------------------------------------
 {
   vtkIdType ret;
-  this->DataArray->FindItem(a,ret);
-  if (ret==VTK_OK)
+  DataArray->FindItem(a,ret);
+  if (ret==MAF_OK)
   {
-    this->vtkObject::UnRegister(a);
+    vtkObject::UnRegister(a);
   }
   
-  this->UnRegister((vtkObject *)a);
+  UnRegister((vtkObject *)a);
   
 }
 */
@@ -451,7 +369,7 @@ int mafVME::FindItem(mflTimeStamp t,mafVMEItem *&item)
 //-------------------------------------------------------------------------
 {
   
-  return this->DataArray->FindItem(t,item);
+  return DataArray->FindItem(t,item);
 
 }
 
@@ -459,7 +377,7 @@ int mafVME::FindItem(mflTimeStamp t,mafVMEItem *&item)
 mafVME *mafVME::FindInTree(const char *name,const char *value,int type)
 //-------------------------------------------------------------------------
 {
-  vtkTagArray *tarray=this->GetTagArray();
+  vtkTagArray *tarray=GetTagArray();
 
   if (vtkTagItem *item=tarray->GetTag(name))
   {
@@ -472,9 +390,9 @@ mafVME *mafVME::FindInTree(const char *name,const char *value,int type)
     }
   }
   
-  for (int i=0;i<this->GetNumberOfChildren();i++)
+  for (int i=0;i<GetNumberOfChildren();i++)
   {
-    mafVME *curr=this->GetChild(i);
+    mafVME *curr=GetChild(i);
     
     if (mafVME *ret=curr->FindInTree(name,value,type))
       return ret;
@@ -487,14 +405,14 @@ mafVME *mafVME::FindInTree(const char *name,const char *value,int type)
 mafVME *mafVME::FindInTreeByName(const char *name)
 //-------------------------------------------------------------------------
 {
-  if (this->Name==name)
+  if (Name==name)
   {
      return this;
   }
   
-  for (int i=0;i<this->GetNumberOfChildren();i++)
+  for (int i=0;i<GetNumberOfChildren();i++)
   {
-    mafVME *curr=this->GetChild(i);
+    mafVME *curr=GetChild(i);
     
     if (mafVME *ret=curr->FindInTreeByName(name))
       return ret;
@@ -509,9 +427,9 @@ int mafVME::FindChildIdx(const char *name)
 {
   if (name)
   {
-    for (int i=0;i<this->GetNumberOfChildren();i++)
+    for (int i=0;i<GetNumberOfChildren();i++)
     {
-      mafVME *vme=this->GetChild(i);
+      mafVME *vme=GetChild(i);
       if (vme&&vtkString::Equals(vme->GetName(),name))
       {
         return i;
@@ -526,7 +444,7 @@ int mafVME::FindChildIdx(const char *name)
 void mafVME::UpdateData(int idx)
 //-------------------------------------------------------------------------
 {
-  mafVMEItem *item=this->GetItem(idx);
+  mafVMEItem *item=GetItem(idx);
   if (item)
     item->UpdateData();
 }
@@ -540,22 +458,22 @@ void mafVME::UpdateAllData()
   // propagate in the sub tree since to do this 
   // we must use a VMEIterator, specifying the 
   // traversing modality
-  for (int i=0;i<this->GetNumberOfItems();i++)
+  for (int i=0;i<GetNumberOfItems();i++)
   {
-    this->GetItem(i)->UpdateData();
+    GetItem(i)->UpdateData();
   }
 }
 
 //-------------------------------------------------------------------------
-// TODO: to be moved to mflMatrixPipeDirectCinematic
+// TODO: to be moved to mafAbsMatrixPipe
 /*void mafVME::UpdateAbsMatrix(mflTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  t=t<0?this->CurrentTime:t;
+  t=t<0?m_CurrentTime:t;
 
-  mflMatrix *absmat=this->AbsMatrix;
+  mflMatrix *absmat=AbsMatrix;
   
-  mafVME *parent=this->GetParent();
+  mafVME *parent=GetParent();
   mflMatrix *pmat=NULL;
 
   if (parent)
@@ -566,12 +484,12 @@ void mafVME::UpdateAllData()
     
   
   if (absmat==NULL||(absmat->GetTimeStamp()!=t)|| \
-    (absmat->GetMTime()<this->MatrixVector->GetMTime())|| \
+    (absmat->GetMTime()<MatrixVector->GetMTime())|| \
   (pmat&&absmat->GetMTime()<pmat->GetMTime()))
   {
     if (absmat==NULL)
     {
-      this->AbsMatrix=mflMatrix::New();
+      AbsMatrix=mflMatrix::New();
     }
 
     //DEBUG
@@ -579,12 +497,12 @@ void mafVME::UpdateAllData()
     //double rxyz[3];
     //trans->PreMultiply();
 
-    mflMatrix *mat=this->GetVMatrix()->GetMatrix(t);
+    mflMatrix *mat=GetVMatrix()->GetMatrix(t);
 
     if (pmat)
     {
     
-        this->AbsMatrix->DeepCopy(pmat);
+        AbsMatrix->DeepCopy(pmat);
         
         //DEBUG
         //trans->SetMatrix(pmat); 
@@ -594,23 +512,23 @@ void mafVME::UpdateAllData()
     }
     else
     {
-      this->AbsMatrix->Identity();
+      AbsMatrix->Identity();
     }
 
     //trans->Concatenate(mat);
-    //this->AbsMatrix->DeepCopy(trans->GetMatrix());
-    //this->AbsMatrix->SetTimeStamp(this->GetCurrentTime());
+    //AbsMatrix->DeepCopy(trans->GetMatrix());
+    //AbsMatrix->SetTimeStamp(GetCurrentTime());
     //trans->Delete();
 
-    vtkMatrix4x4::Multiply4x4(this->AbsMatrix, mat,this->AbsMatrix);
+    vtkMatrix4x4::Multiply4x4(AbsMatrix, mat,AbsMatrix);
 
     //DEBUG
-    //trans->SetMatrix(this->AbsMatrix);    
+    //trans->SetMatrix(AbsMatrix);    
     //trans->GetOrientation(rxyz);
 
     //trans->Delete();
 
-    this->AbsMatrix->SetTimeStamp(t);
+    AbsMatrix->SetTimeStamp(t);
   }
 }
 */
@@ -621,10 +539,10 @@ void mafVME::UpdateData(mafVMEItem *item)
 {
   if (item)
   {
-    if (this->GetParent())
+    if (GetParent())
     {
       // propagate the update event up to the root
-      this->GetParent()->UpdateData(item);
+      GetParent()->UpdateData(item);
     }
     // if this node hasn't a parent, since it's not
     // a root we can't do anything: this is an orphan
@@ -640,7 +558,7 @@ void mafVME::SetCurrentTime(mflTimeStamp t)
   if (t<0)
     t=0;
 
-  this->CurrentTime=t;
+  m_CurrentTime=t;
 
   // Must keep a time variable also on the
   // pipes to allow multiple pipes contemporary 
@@ -654,13 +572,13 @@ void mafVME::SetCurrentTime(mflTimeStamp t)
   else if (CurrentMatrix.GetPointer())
     CurrentMatrix->SetTimeStamp(t);
 
-  if (AbsMatrixPipe)
-    this->AbsMatrixPipe->SetCurrentTime(t);
+  if (m_AbsMatrixPipe)
+    m_AbsMatrixPipe->SetCurrentTime(t);
 
-  this->Modified();
+  Modified();
 
   // TODO: consider if to add a flag to diable event issuing
-  this->InvokeEvent(mafVME::TimeEvent,this);
+  InvokeEvent(mafVME::TimeEvent,this);
   
 }
 
@@ -668,11 +586,11 @@ void mafVME::SetCurrentTime(mflTimeStamp t)
 void mafVME::SetTreeTime(mflTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  this->SetCurrentTime(t);
+  SetCurrentTime(t);
 
-  for (int i=0;i<this->GetNumberOfChildren();i++)
+  for (int i=0;i<GetNumberOfChildren();i++)
   {
-    this->GetChild(i)->SetTreeTime(t);
+    GetChild(i)->SetTreeTime(t);
   }
 }
 
@@ -689,7 +607,7 @@ mafVMEIterator *mafVME::NewIterator()
 int mafVME::IsAnimated()
 //-------------------------------------------------------------------------
 {
-  return ((this->GetNumberOfItems()>1)||(this->GetMatrixVector()->GetNumberOfMatrixes()>1));
+  return ((GetNumberOfItems()>1)||(GetMatrixVector()->GetNumberOfMatrixes()>1));
 }
 
 
@@ -701,9 +619,9 @@ void mafVME::GetDataTimeBounds(mflTimeStamp tbounds[2])
   tbounds[1]=-1;
 
   // find the time interval for the items in this VME
-  for (int i=0;i<this->GetNumberOfItems();i++)
+  for (int i=0;i<GetNumberOfItems();i++)
   {
-    mafVMEItem *item=this->GetItem(i);
+    mafVMEItem *item=GetItem(i);
     if (item->GetTimeStamp()<tbounds[0]||tbounds[0]<0)
       tbounds[0]=item->GetTimeStamp();
     if (item->GetTimeStamp()>tbounds[1]||tbounds[1]<0)
@@ -716,7 +634,7 @@ int mafVME::GetNumberOfLocalTimeStamps()
 //-------------------------------------------------------------------------
 {
   TimeVector timestamps;
-  this->GetLocalTimeStamps(timestamps);
+  GetLocalTimeStamps(timestamps);
   return timestamps.size();
 }
 
@@ -725,7 +643,7 @@ int mafVME::GetNumberOfTimeStamps()
 //-------------------------------------------------------------------------
 {
   TimeVector timestamps;
-  this->GetTimeStamps(timestamps);
+  GetTimeStamps(timestamps);
   return timestamps.size();
 }
 
@@ -736,11 +654,11 @@ void mafVME::GetLocalTimeBounds(mflTimeStamp tbounds[2])
   tbounds[0]=-1;
   tbounds[1]=-1;
 
-  this->DataArray->GetTimeBounds(tbounds);
+  DataArray->GetTimeBounds(tbounds);
   
   mflTimeStamp tmp[2];
   // does the same this with the matrix vector
-  this->MatrixVector->GetTimeBounds(tmp);
+  MatrixVector->GetTimeBounds(tmp);
 
   if (tmp[0]<0 || tmp[1]<0)
       return;
@@ -757,13 +675,13 @@ void mafVME::GetLocalTimeBounds(mflTimeStamp tbounds[2])
 void mafVME::GetTimeBounds(mflTimeStamp tbounds[2])
 //-------------------------------------------------------------------------
 {
-  this->GetLocalTimeBounds(tbounds);
+  GetLocalTimeBounds(tbounds);
 
-  for (int i=0;i<this->GetNumberOfChildren();i++)
+  for (int i=0;i<GetNumberOfChildren();i++)
   {
     mflTimeStamp tmp[2];
 
-    this->GetChild(i)->GetTimeBounds(tmp);
+    GetChild(i)->GetTimeBounds(tmp);
     if (tmp[0]<0 || tmp[1]<0)
       continue;
 
@@ -779,21 +697,21 @@ void mafVME::GetTimeBounds(mflTimeStamp tbounds[2])
 void mafVME::GetDataTimeStamps(mflTimeStamp *&kframes)
 //-------------------------------------------------------------------------
 {
-  this->DataArray->GetTimeStamps(kframes);
+  DataArray->GetTimeStamps(kframes);
 }
 
 //-------------------------------------------------------------------------
 void mafVME::GetDataTimeStamps(TimeVector &kframes)
 //-------------------------------------------------------------------------
 {
-  this->DataArray->GetTimeStamps(kframes);
+  DataArray->GetTimeStamps(kframes);
 }
 
 //-------------------------------------------------------------------------
 void mafVME::GetMatrixTimeStamps(mflTimeStamp *&kframes)
 //-------------------------------------------------------------------------
 {
-  this->MatrixVector->GetTimeStamps(kframes);
+  MatrixVector->GetTimeStamps(kframes);
 }
 
 
@@ -802,7 +720,7 @@ void mafVME::GetMatrixTimeStamps(mflTimeStamp *&kframes)
 void mafVME::GetMatrixTimeStamps(TimeVector &kframes)
 //-------------------------------------------------------------------------
 {
-  this->MatrixVector->GetTimeStamps(kframes);
+  MatrixVector->GetTimeStamps(kframes);
 }
 
 //-------------------------------------------------------------------------
@@ -811,7 +729,7 @@ void mafVME::GetLocalTimeStamps(mflTimeStamp *&kframes)
 { 
   TimeVector frames;
 
-  this->GetLocalTimeStamps(frames);
+  GetLocalTimeStamps(frames);
   
   kframes=new mflTimeStamp[frames.size()];
 
@@ -830,10 +748,10 @@ void mafVME::GetLocalTimeStamps(std::vector<mflTimeStamp> &kframes)
   std::vector<mflTimeStamp> datatimestamps;
   std::vector<mflTimeStamp> matrixtimestamps;
   
-  this->DataArray->GetTimeStamps(datatimestamps);
-  this->MatrixVector->GetTimeStamps(matrixtimestamps);
+  DataArray->GetTimeStamps(datatimestamps);
+  MatrixVector->GetTimeStamps(matrixtimestamps);
 
-  this->MergeTimeVectors(kframes,datatimestamps,matrixtimestamps);
+  MergeTimeVectors(kframes,datatimestamps,matrixtimestamps);
 }
 
 //-------------------------------------------------------------------------
@@ -842,7 +760,7 @@ void mafVME::GetLocalTimeStamps(vtkDoubleArray *kframes)
 {
   assert(kframes);
   TimeVector frames;
-  this->GetLocalTimeStamps(frames);
+  GetLocalTimeStamps(frames);
   kframes->SetNumberOfComponents(1);
   kframes->SetNumberOfTuples(frames.size());
   for (int i=0;i<frames.size();i++)
@@ -857,7 +775,7 @@ void mafVME::GetTimeStamps(mflTimeStamp *&kframes)
 {
   std::vector<mflTimeStamp> frames;
 
-  this->GetTimeStamps(frames);
+  GetTimeStamps(frames);
 
   if(frames.size()>0)
   {
@@ -873,15 +791,15 @@ void mafVME::GetTimeStamps(mflTimeStamp *&kframes)
 void mafVME::GetTimeStamps(TimeVector &kframes)
 //-------------------------------------------------------------------------
 {
-  this->GetLocalTimeStamps(kframes);
+  GetLocalTimeStamps(kframes);
   
   std::vector<mflTimeStamp> subKFrames;
 
-  for (int i=0;i<this->GetNumberOfChildren();i++)
+  for (int i=0;i<GetNumberOfChildren();i++)
   {
-    this->GetChild(i)->GetTimeStamps(subKFrames);
+    GetChild(i)->GetTimeStamps(subKFrames);
 
-    this->MergeTimeVectors(kframes,kframes,subKFrames);
+    MergeTimeVectors(kframes,kframes,subKFrames);
   }
 }
 
@@ -891,7 +809,7 @@ void mafVME::GetTimeStamps(vtkDoubleArray *kframes)
 {
   assert(kframes);
   TimeVector frames;
-  this->GetTimeStamps(frames);
+  GetTimeStamps(frames);
   kframes->SetNumberOfComponents(1);
   kframes->SetNumberOfTuples(frames.size());
   for (int i=0;i<frames.size();i++)
@@ -905,7 +823,7 @@ void mafVME::GetAbsTimeStamps(mflTimeStamp *&kframes)
 {
   std::vector<mflTimeStamp> frames;
 
-  this->GetAbsTimeStamps(frames);
+  GetAbsTimeStamps(frames);
 
   if(frames.size()>0)
   {
@@ -920,16 +838,16 @@ void mafVME::GetAbsTimeStamps(mflTimeStamp *&kframes)
 //-------------------------------------------------------------------------
 void mafVME::GetAbsTimeStamps(TimeVector &kframes)
 {
-  this->GetLocalTimeStamps(kframes);
+  GetLocalTimeStamps(kframes);
   
   std::vector<mflTimeStamp> parentKFrames;
 
-  for (mafVME *parent=this->GetParent();parent;parent=parent->GetParent())
+  for (mafVME *parent=GetParent();parent;parent=parent->GetParent())
   {
 
     parent->GetLocalTimeStamps(parentKFrames);
 
-    this->MergeTimeVectors(kframes,kframes,parentKFrames);
+    MergeTimeVectors(kframes,kframes,parentKFrames);
   }
 }
 
@@ -939,7 +857,7 @@ void mafVME::GetVME4DBounds(double bounds[6])
 //-------------------------------------------------------------------------
 {
   mafOBB myBounds;
-  this->GetVME4DBounds(myBounds);
+  GetVME4DBounds(myBounds);
   myBounds.CopyTo(bounds);
 }
 
@@ -949,16 +867,16 @@ void mafVME::GetVME4DBounds(mafOBB &bounds)
 {
   std::vector<mflTimeStamp> timestamps;
 
-  this->GetTimeStamps(timestamps);
+  GetTimeStamps(timestamps);
 
   bounds.Reset();
 
   if (GetDataPipe()) // allocate data pipe if not done yet
   {
     // THD SAFE implementation
-    //mflDataPipe *datapipe=this->m_DataPipe->MakeACopy();
+    //mflDataPipe *datapipe=m_DataPipe->MakeACopy();
 
-    mflSmartPointer<mflMatrix> itemAbsPose;
+    mafSmartPointer<mflMatrix> itemAbsPose;
     mafOBB transformed_bounds;
 
     for (int i=0;i<timestamps.size();i++)
@@ -970,20 +888,20 @@ void mafVME::GetVME4DBounds(mafOBB &bounds)
       mafOBB *itemBounds=datapipe->GetCurrentBounds();
       */
 
-      this->m_DataPipe->SetCurrentTime(timestamps[i]);
-      this->m_DataPipe->UpdateCurrentBounds();
+      m_DataPipe->SetCurrentTime(timestamps[i]);
+      m_DataPipe->UpdateCurrentBounds();
 
       // must make a copy, otherwise I would transform the bounds inside the data pipe
-      transformed_bounds.DeepCopy(this->m_DataPipe->GetCurrentBounds());
-      this->GetAbsMatrix(itemAbsPose,timestamps[i]);
+      transformed_bounds.DeepCopy(m_DataPipe->GetCurrentBounds());
+      GetAbsMatrix(itemAbsPose,timestamps[i]);
     
       transformed_bounds.ApplyTransform(itemAbsPose);
 
       bounds.MergeBounds(transformed_bounds);
     }
 
-    this->m_DataPipe->SetCurrentTime(this->CurrentTime);
-    this->m_DataPipe->UpdateCurrentBounds();
+    m_DataPipe->SetCurrentTime(m_CurrentTime);
+    m_DataPipe->UpdateCurrentBounds();
   }
   else if (CurrentData.GetPointer())
   {
@@ -1007,7 +925,7 @@ void mafVME::GetVMESpaceBounds(double bounds[6])
 //-------------------------------------------------------------------------
 {
   mafOBB myBounds;
-  this->GetVMESpaceBounds(myBounds);
+  GetVMESpaceBounds(myBounds);
   myBounds.CopyTo(bounds);
 }
 
@@ -1015,21 +933,21 @@ void mafVME::GetVMESpaceBounds(double bounds[6])
 void mafVME::GetVMESpaceBounds(mafOBB &bounds,mflTimeStamp t, mafVMEIterator *iter)
 //-------------------------------------------------------------------------
 { 
-  if ((iter&&iter->IsVisible(this))||this->IsVisible())
+  if ((iter&&iter->IsVisible(this))||IsVisible())
   {
-    mflSmartPointer<mflMatrix> itemPose;
+    mafSmartPointer<mflMatrix> itemPose;
     
     if (t<0)
     {
-      t=this->CurrentTime;
-      itemPose=this->GetAbsMatrix();
+      t=m_CurrentTime;
+      itemPose=GetAbsMatrix();
     }
     else
     {
-      this->GetAbsMatrix(itemPose,t);
+      GetAbsMatrix(itemPose,t);
     }
     
-    this->GetVMELocalSpaceBounds(bounds,t,iter);  
+    GetVMELocalSpaceBounds(bounds,t,iter);  
 
     bounds.ApplyTransform(itemPose);
   }
@@ -1040,7 +958,7 @@ void mafVME::GetVMELocalSpaceBounds(double bounds[6])
 //-------------------------------------------------------------------------
 {
   mafOBB myBounds;
-  this->GetVMELocalSpaceBounds(myBounds);
+  GetVMELocalSpaceBounds(myBounds);
   myBounds.CopyTo(bounds);
 }
 
@@ -1049,11 +967,11 @@ void mafVME::GetVMELocalSpaceBounds(mafOBB &bounds,mflTimeStamp t, mafVMEIterato
 //-------------------------------------------------------------------------
 {
    if (t<0)
-    t=this->CurrentTime;
+    t=m_CurrentTime;
 
   bounds.Reset();
 
-  if ((iter&&iter->IsVisible(this))||this->IsVisible())
+  if ((iter&&iter->IsVisible(this))||IsVisible())
   {
     
     if (GetDataPipe()) // allocate data pipe if not done yet
@@ -1062,17 +980,17 @@ void mafVME::GetVMELocalSpaceBounds(mafOBB &bounds,mflTimeStamp t, mafVMEIterato
       // the output data, which is not necessary.
       // Must call explicitelly UpdateCurrentBounds() method, since datapipes
       // do not update automatically when time changes  
-      this->m_DataPipe->SetCurrentTime(t);
-      this->m_DataPipe->UpdateCurrentBounds();
-      bounds.DeepCopy(this->m_DataPipe->GetCurrentBounds());
+      m_DataPipe->SetCurrentTime(t);
+      m_DataPipe->UpdateCurrentBounds();
+      bounds.DeepCopy(m_DataPipe->GetCurrentBounds());
 
       // restore the right bounds for current time... 
       // TODO: modify the GetCurrentBounds to make it call UpdateCurentBounds explicitelly!
-      this->m_DataPipe->SetCurrentTime(this->CurrentTime);
-      this->m_DataPipe->UpdateCurrentBounds();
+      m_DataPipe->SetCurrentTime(m_CurrentTime);
+      m_DataPipe->UpdateCurrentBounds();
     
       // this is a thread safe implemetation
-      /*mflDataPipe *datapipe=this->m_DataPipe->MakeACopy();
+      /*mflDataPipe *datapipe=m_DataPipe->MakeACopy();
       datapipe->SetCurrentTime(t);
       datapipe->UpdateCurrentBounds();
       itemBounds=datapipe->GetCurrentBounds();
@@ -1091,7 +1009,7 @@ void mafVME::GetSpaceBounds(double bounds[6])
 //-------------------------------------------------------------------------
 {
   mafOBB myBounds;
-  this->GetSpaceBounds(myBounds);
+  GetSpaceBounds(myBounds);
   myBounds.CopyTo(bounds);
 }
 
@@ -1100,13 +1018,13 @@ void mafVME::GetSpaceBounds(mafOBB &bounds,mflTimeStamp t, mafVMEIterator *iter)
 //-------------------------------------------------------------------------
 {
   if (t<0)
-    t=this->CurrentTime;
+    t=m_CurrentTime;
 
-  this->GetVMESpaceBounds(bounds,t,iter);
+  GetVMESpaceBounds(bounds,t,iter);
   
-  for (int i=0;i<this->GetNumberOfChildren();i++)
+  for (int i=0;i<GetNumberOfChildren();i++)
   {
-    mafVME *child=this->GetChild(i);
+    mafVME *child=GetChild(i);
     mafOBB childBounds;
 
     child->GetSpaceBounds(childBounds,t);
@@ -1120,7 +1038,7 @@ void mafVME::Get4DBounds(double bounds[6])
 //-------------------------------------------------------------------------
 {
   mafOBB myBounds;
-  this->Get4DBounds(myBounds);
+  Get4DBounds(myBounds);
   myBounds.CopyTo(bounds);
 }
 
@@ -1133,12 +1051,12 @@ void mafVME::Get4DBounds(mafOBB &bounds)
 
   bounds.Reset();
 
-  this->GetTimeStamps(timestamps);
+  GetTimeStamps(timestamps);
 
   mafOBB frameBounds;
   for (int i=0;i<timestamps.size();i++)
   {
-    this->GetSpaceBounds(frameBounds,timestamps[i]);
+    GetSpaceBounds(frameBounds,timestamps[i]);
     bounds.MergeBounds(frameBounds); 
   }
 
@@ -1148,29 +1066,29 @@ void mafVME::Get4DBounds(mafOBB &bounds)
 bool mafVME::Equals(mafVME *vme)
 //-------------------------------------------------------------------------
 {
-  if (!vme||!vme->IsA(this->GetTypeName()))
+  if (!vme||!vme->IsA(GetTypeName()))
     return false;
 
-  if (this->GetNumberOfItems()!=vme->GetNumberOfItems())
+  if (GetNumberOfItems()!=vme->GetNumberOfItems())
   {
     return false;
   }
 
-  for (int i=0;i<this->GetNumberOfItems();i++)
+  for (int i=0;i<GetNumberOfItems();i++)
   {
-    if (!this->GetItem(i)->Equals(vme->GetItem(i)))
+    if (!GetItem(i)->Equals(vme->GetItem(i)))
     {
       return false;
     }
   }
 
-  if (!this->GetTagArray()->Equals(vme->GetTagArray()))
+  if (!GetTagArray()->Equals(vme->GetTagArray()))
     return false;
 
-  if (!this->GetMatrixVector()->Equals(vme->GetMatrixVector()))
+  if (!GetMatrixVector()->Equals(vme->GetMatrixVector()))
     return false;
 
-  if (!this->Name.Equals(vme->GetName()))
+  if (!Name.Equals(vme->GetName()))
     return false;
 
   return true;
@@ -1180,17 +1098,17 @@ bool mafVME::Equals(mafVME *vme)
 bool mafVME::CompareTree(mafVME *vme)
 //-------------------------------------------------------------------------
 {
-  if (!this->Equals(vme))
+  if (!Equals(vme))
     return false;
 
-  if (vme->GetNumberOfChildren()!=this->GetNumberOfChildren())
+  if (vme->GetNumberOfChildren()!=GetNumberOfChildren())
   {
     return false;
   }
 
-  for (int i=0;i<this->GetNumberOfChildren();i++)
+  for (int i=0;i<GetNumberOfChildren();i++)
   {
-    if (!this->GetChild(i)->CompareTree(vme->GetChild(i)))
+    if (!GetChild(i)->CompareTree(vme->GetChild(i)))
     {
       return false;
     }
@@ -1224,20 +1142,27 @@ mafVME *mafVME::CopyTree(mafVME *vme, mafVME *parent)
 }
 
 //-------------------------------------------------------------------------
+bool mafVME::CanReparentTo(mafNode *parent)
+//-------------------------------------------------------------------------
+{
+  return parent==NULL||(parent->IsA(mafVME::GetStaticTypeId())&&||!IsInTree(parent));
+}
+
+//-------------------------------------------------------------------------
 mafVME *mafVME::ReparentTo(mafVME *newparent)
 //-------------------------------------------------------------------------
 {
   // We cannot reparent to a subnode!!!
-  if (!this->IsInTree(newparent))
+  if (!IsInTree(newparent))
   {
     // When we reparent to a different tree, or we simply
     // cut a tree, pre travers the sub tree to read data into memory
     // future release should read one item at once, write it
     // to disk and then release the data, or better simply copy the file
     // into the new place, this to be able to manage HUGE datasets.
-    if (newparent==NULL||this->GetRoot()!=newparent->GetRoot())
+    if (newparent==NULL||GetRoot()!=newparent->GetRoot())
     {
-      mafVMEIterator *iter=this->NewIterator();
+      mafVMEIterator *iter=NewIterator();
       for (mafVME *vme=iter->GetFirstNode();vme;vme=iter->GetNextNode())
       {
         for (int i=0;i<vme->GetNumberOfItems();i++)
@@ -1272,33 +1197,33 @@ mafVME *mafVME::ReparentTo(mafVME *newparent)
     // We must keep the oldparent pointer somewhere since it is oeverwritten
     // by AddChild.
     
-    mafVME *oldparent=this->GetParent();
+    mafVME *oldparent=GetParent();
 
-    this->Register(this);
+    Register(this);
 
     if (newparent)
     {
-      if (newparent->AddChild(this)==VTK_ERROR)
+      if (newparent->AddChild(this)==MAF_ERROR)
       {
-        vtkErrorMacro("Cannot Reparent node "<<this->GetName()<<" to node "<<newparent->GetName());
+        vtkErrorMacro("Cannot Reparent node "<<GetName()<<" to node "<<newparent->GetName());
         return NULL;
       }
 
-      this->SetCurrentTime(newparent->GetCurrentTime()); // update data & pose to parent CurrentTime
+      SetCurrentTime(newparent->GetCurrentTime()); // update data & pose to parent m_CurrentTime
     }
     else
     {
-      if (this->SetParent(NULL)==VTK_ERROR)
+      if (SetParent(NULL)==MAF_ERROR)
       {
-        vtkErrorMacro("Cannot Reparent node "<<this->GetName()<<" to NULL");
+        vtkErrorMacro("Cannot Reparent node "<<GetName()<<" to NULL");
         return NULL;
       }
     }
 
-    if (this->AbsMatrixPipe)
+    if (m_AbsMatrixPipe)
     {
-      this->AbsMatrixPipe->SetVME(this);
-      this->AbsMatrixPipe->Update();
+      m_AbsMatrixPipe->SetVME(this);
+      m_AbsMatrixPipe->Update();
     }
 
     if (oldparent)
@@ -1306,9 +1231,9 @@ mafVME *mafVME::ReparentTo(mafVME *newparent)
       oldparent->RemoveChild(this);
     }
 
-    mafVME *ret=(this->ReferenceCount==1)?NULL:this;
+    mafVME *ret=(ReferenceCount==1)?NULL:this;
     
-    this->UnRegister(this);
+    UnRegister(this);
 
     return ret;
   }
@@ -1338,25 +1263,25 @@ void mafVME::Import(mafVME *tree)
 mafVMEItem *mafVME::GetItemByTimeStamp(mflTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  return this->DataArray->GetItemByTimeStamp(t);
+  return DataArray->GetItemByTimeStamp(t);
 }
 
 //-------------------------------------------------------------------------
 void mafVME::SetPose(mflMatrix *mat)
 //-------------------------------------------------------------------------
 {
-  this->GetMatrixVector()->SetMatrix(mat);
+  GetMatrixVector()->SetMatrix(mat);
 }
 
 //-------------------------------------------------------------------------
 void mafVME::SetPose(vtkMatrix4x4 *mat, mflTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  t=(t<0)?t=this->CurrentTime:t;
-  if (this->MatrixVector)
-    this->GetMatrixVector()->SetMatrix(mat,t);
+  t=(t<0)?t=m_CurrentTime:t;
+  if (MatrixVector)
+    GetMatrixVector()->SetMatrix(mat,t);
   else
-    this->CurrentMatrix->DeepCopy(mat);
+    CurrentMatrix->DeepCopy(mat);
 }
 
 //-------------------------------------------------------------------------
@@ -1366,16 +1291,16 @@ void mafVME::SetPose(double x,double y,double z,double rx,double ry,double rz, m
   double txyz[3],trxyz[3];
   txyz[0]=x; txyz[1]=y; txyz[2]=z;
   trxyz[0]=rx; trxyz[1]=ry; trxyz[2]=rz;
-  this->SetPose(txyz,trxyz,t);
+  SetPose(txyz,trxyz,t);
 }
 
 //-------------------------------------------------------------------------
 void mafVME::SetPose(double xyz[3],double rxyz[3], mflTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  t=(t<0)?t=this->CurrentTime:t;
+  t=(t<0)?t=m_CurrentTime:t;
 
-  mflSmartPointer<mflMatrix> matrix;
+  mafSmartPointer<mflMatrix> matrix;
 
   mflTransform::SetOrientation(matrix,rxyz);
 
@@ -1383,19 +1308,19 @@ void mafVME::SetPose(double xyz[3],double rxyz[3], mflTimeStamp t)
 
   matrix->SetTimeStamp(t);
   
-  if (this->MatrixVector)
-    this->MatrixVector->SetMatrix(matrix);
+  if (MatrixVector)
+    MatrixVector->SetMatrix(matrix);
   else
-    this->CurrentMatrix->DeepCopy(matrix);
+    CurrentMatrix->DeepCopy(matrix);
 }
 
 //----------------------------------------------------------------------------
 void mafVME::ApplyTransform(vtkLinearTransform *transform,int premultiply,mflTimeStamp t)
 //----------------------------------------------------------------------------
 {
-  t=(t<0)?this->CurrentTime:t;
-  mflSmartPointer<mflTransform> new_pose;
-  mflSmartPointer<mflMatrix> pose;
+  t=(t<0)?m_CurrentTime:t;
+  mafSmartPointer<mflTransform> new_pose;
+  mafSmartPointer<mflMatrix> pose;
   GetMatrix(pose,t);
   new_pose->SetMatrix(pose);
   new_pose->Concatenate(transform,premultiply);
@@ -1405,9 +1330,9 @@ void mafVME::ApplyTransform(vtkLinearTransform *transform,int premultiply,mflTim
 void mafVME::ApplyMatrix(vtkMatrix4x4 *matrix,int premultiply,mflTimeStamp t)
 //----------------------------------------------------------------------------
 {
-  t=(t<0)?this->CurrentTime:t;
-  mflSmartPointer<mflTransform> new_pose;
-  mflSmartPointer<mflMatrix> pose;
+  t=(t<0)?m_CurrentTime:t;
+  mafSmartPointer<mflTransform> new_pose;
+  mafSmartPointer<mflMatrix> pose;
   GetMatrix(pose,t);
   new_pose->SetMatrix(pose);
   new_pose->Concatenate(matrix,premultiply);
@@ -1420,19 +1345,19 @@ void mafVME::SetPosition(double x,double y,double z, mflTimeStamp t)
 {
   double txyz[3];
   txyz[0]=x; txyz[1]=y; txyz[2]=z;
-  this->SetPosition(txyz,t);
+  SetPosition(txyz,t);
 }
 
 //-------------------------------------------------------------------------
 void mafVME::SetPosition(double xyz[3], mflTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  mflSmartPointer<mflMatrix> matrix;
+  mafSmartPointer<mflMatrix> matrix;
   
   mflTransform::SetPosition(matrix,xyz);
 
   mflMatrix *oldpose;
-  this->MatrixVector->FindMatrix(t,oldpose);
+  MatrixVector->FindMatrix(t,oldpose);
 
   // recover the orientation only if a key matrix is present
   if (oldpose)
@@ -1440,10 +1365,10 @@ void mafVME::SetPosition(double xyz[3], mflTimeStamp t)
 
   matrix->SetTimeStamp(t);
   
-  if (this->MatrixVector)
-    this->MatrixVector->SetMatrix(matrix);
+  if (MatrixVector)
+    MatrixVector->SetMatrix(matrix);
   else
-    this->CurrentMatrix->DeepCopy(matrix);
+    CurrentMatrix->DeepCopy(matrix);
 }
 
 //-------------------------------------------------------------------------
@@ -1452,17 +1377,17 @@ void mafVME::SetOrientation(double rx,double ry,double rz, mflTimeStamp t)
 {
   double trxyz[3];
   trxyz[0]=rx; trxyz[1]=ry; trxyz[2]=rz;
-  this->SetOrientation(trxyz,t);
+  SetOrientation(trxyz,t);
 }
 
 //-------------------------------------------------------------------------
 void mafVME::SetOrientation(double rxyz[3], mflTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  mflSmartPointer<mflMatrix> matrix;
+  mafSmartPointer<mflMatrix> matrix;
 
   mflMatrix *oldpose;
-  this->MatrixVector->FindMatrix(t,oldpose);
+  MatrixVector->FindMatrix(t,oldpose);
     
   mflTransform::SetOrientation(matrix,rxyz);
   
@@ -1476,17 +1401,17 @@ void mafVME::SetOrientation(double rxyz[3], mflTimeStamp t)
 
   matrix->SetTimeStamp(t);
 
-  if (this->MatrixVector)
-    this->MatrixVector->SetMatrix(matrix);
+  if (MatrixVector)
+    MatrixVector->SetMatrix(matrix);
   else
-    this->CurrentMatrix->DeepCopy(matrix);
+    CurrentMatrix->DeepCopy(matrix);
 }
 
 //-------------------------------------------------------------------------
 mflMatrix *mafVME::GetPose()
 //-------------------------------------------------------------------------
 {
-  return (this->GetMatrixPipe())?this->m_MatrixPipe->GetMatrix():this->CurrentMatrix;
+  return (GetMatrixPipe())?m_MatrixPipe->GetMatrix():CurrentMatrix;
 }
 
 //-------------------------------------------------------------------------
@@ -1497,25 +1422,25 @@ void mafVME::GetPose(mflMatrix *matrix,mflTimeStamp t)
   {
     if (GetMatrixPipe()) // allocate matrix pipe if not done yet
     {
-      if (t<0||t==this->CurrentTime)
+      if (t<0||t==m_CurrentTime)
       {
-        matrix->DeepCopy(this->GetPose());
+        matrix->DeepCopy(GetPose());
       }
       else
       {
         // disable rising of update event since this is
         // only a temporary change to the matrix
-        int old_flag=this->m_MatrixPipe->GetUpdateMatrixObserverFlag();
-        this->m_MatrixPipe->UpdateMatrixObserverOff();
-        this->m_MatrixPipe->SetCurrentTime(t);
-        matrix->DeepCopy(this->m_MatrixPipe->GetMatrix());
+        int old_flag=m_MatrixPipe->GetUpdateMatrixObserverFlag();
+        m_MatrixPipe->UpdateMatrixObserverOff();
+        m_MatrixPipe->SetCurrentTime(t);
+        matrix->DeepCopy(m_MatrixPipe->GetMatrix());
         // restore right time
-        this->m_MatrixPipe->SetCurrentTime(this->CurrentTime);
-        this->m_MatrixPipe->SetUpdateMatrixObserverFlag(old_flag);
+        m_MatrixPipe->SetCurrentTime(m_CurrentTime);
+        m_MatrixPipe->SetUpdateMatrixObserverFlag(old_flag);
 
         // THD SAFE implementation
         // create a temporary pipe to interpolate at time t
-        /*mflMatrixPipe *newpipe=this->m_MatrixPipe->MakeACopy();
+        /*mflMatrixPipe *newpipe=m_MatrixPipe->MakeACopy();
         newpipe->SetCurrentTime(t);
         matrix->DeepCopy(newpipe->GetMatrix());
         newpipe->Delete();
@@ -1533,9 +1458,9 @@ void mafVME::GetPose(mflMatrix *matrix,mflTimeStamp t)
 void mafVME::GetPose(double xyz[3],double rxyz[3],mflTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  mflSmartPointer<mflMatrix> mat;
+  mafSmartPointer<mflMatrix> mat;
   
-  this->GetMatrix(mat,t);
+  GetMatrix(mat,t);
   
   mflTransform::GetOrientation(mat,rxyz);
   
@@ -1548,7 +1473,7 @@ void mafVME::GetPose(double &x,double &y,double &z,double &rx,double &ry,double 
 {
   double xyz[3],rxyz[3];
 
-  this->GetPose(xyz,rxyz,t);
+  GetPose(xyz,rxyz,t);
 
   x=xyz[0];
   y=xyz[1];
@@ -1564,7 +1489,7 @@ void mafVME::GetPosition(double &x,double &y,double &z,mflTimeStamp t)
 //-------------------------------------------------------------------------
 {
   double xyz[3];
-  this->GetPosition(xyz,t);
+  GetPosition(xyz,t);
   x=xyz[0];
   y=xyz[1];
   z=xyz[2];
@@ -1575,14 +1500,14 @@ void mafVME::GetPosition(double &x,double &y,double &z,mflTimeStamp t)
 void mafVME::GetPosition(double xyz[3],mflTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  if (t<0||t==this->CurrentTime)
+  if (t<0||t==m_CurrentTime)
   {
-    mflTransform::GetPosition(this->GetMatrix(),xyz); 
+    mflTransform::GetPosition(GetMatrix(),xyz); 
   }
   else
   {
-    mflSmartPointer<mflMatrix> mat;
-    this->GetMatrix(mat,t);
+    mafSmartPointer<mflMatrix> mat;
+    GetMatrix(mat,t);
     mflTransform::GetPosition(mat,xyz); 
   }  
 }
@@ -1592,7 +1517,7 @@ void mafVME::GetOrientation(double &rx,double &ry,double &rz,mflTimeStamp t)
 //-------------------------------------------------------------------------
 {
   double rxyz[3];
-  this->GetOrientation(rxyz,t);
+  GetOrientation(rxyz,t);
   rx=rxyz[0];
   ry=rxyz[1];
   rz=rxyz[2];
@@ -1602,14 +1527,14 @@ void mafVME::GetOrientation(double &rx,double &ry,double &rz,mflTimeStamp t)
 void mafVME::GetOrientation(double rxyz[3],mflTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  if (t<0||t==this->CurrentTime)
+  if (t<0||t==m_CurrentTime)
   {
-    mflTransform::GetOrientation(this->GetMatrix(),rxyz);
+    mflTransform::GetOrientation(GetMatrix(),rxyz);
   }
   else
   {
-    mflSmartPointer<mflMatrix> mat;
-    this->GetMatrix(mat,t);
+    mafSmartPointer<mflMatrix> mat;
+    GetMatrix(mat,t);
     mflTransform::GetOrientation(mat,rxyz);
   }  
 }
@@ -1620,13 +1545,13 @@ void mafVME::GetAbsPose(mflMatrix *matrix,mflTimeStamp t)
 {
   if (matrix)
   {
-    if (t<0||t==this->CurrentTime)
+    if (t<0||t==m_CurrentTime)
     {
-      matrix->DeepCopy(this->GetAbsPose());
+      matrix->DeepCopy(GetAbsPose());
     }
     else
     {
-      mflMatrixPipeDirectCinematic *abspipe=GetAbsMatrixPipe();
+      mafAbsMatrixPipe *abspipe=GetAbsMatrixPipe();
       // disable rising of update event since this is
       // only a temporary change to the matrix
       int old_flag=abspipe->GetUpdateMatrixObserverFlag();
@@ -1635,7 +1560,7 @@ void mafVME::GetAbsPose(mflMatrix *matrix,mflTimeStamp t)
       matrix->DeepCopy(abspipe->GetMatrix());
       
       // restore right time
-      abspipe->SetCurrentTime(this->CurrentTime);
+      abspipe->SetCurrentTime(m_CurrentTime);
       abspipe->SetUpdateMatrixObserverFlag(old_flag);
 
       // THD SAFE implementation
@@ -1653,15 +1578,15 @@ void mafVME::GetAbsPose(mflMatrix *matrix,mflTimeStamp t)
 mflMatrix *mafVME::GetAbsPose()
 //-------------------------------------------------------------------------
 {
-  return this->GetAbsMatrixPipe()->GetMatrix();
+  return GetAbsMatrixPipe()->GetMatrix();
 }
 
 //-------------------------------------------------------------------------
 void mafVME::GetAbsPose(double xyz[3],double rxyz[3],mflTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  mflSmartPointer<mflMatrix> mat;
-  this->GetAbsMatrix(mat,t);
+  mafSmartPointer<mflMatrix> mat;
+  GetAbsMatrix(mat,t);
 
   mflTransform::GetPosition(mat,xyz);
 
@@ -1674,7 +1599,7 @@ void mafVME::GetAbsPose(double &x,double &y,double &z,double &rx,double &ry,doub
 {
   double xyz[3],rxyz[3];
 
-  this->GetAbsPose(xyz,rxyz,t);
+  GetAbsPose(xyz,rxyz,t);
 
   x=xyz[0];
   y=xyz[1];
@@ -1689,14 +1614,14 @@ void mafVME::GetAbsPose(double &x,double &y,double &z,double &rx,double &ry,doub
 void mafVME::GetAbsPosition(double xyz[3],mflTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  if (t<0||t==this->CurrentTime)
+  if (t<0||t==m_CurrentTime)
   {
-    mflTransform::GetPosition(this->GetAbsMatrix(),xyz);
+    mflTransform::GetPosition(GetAbsMatrix(),xyz);
   }
   else
   {
-    mflSmartPointer<mflMatrix> mat;
-    this->GetAbsMatrix(mat,t);
+    mafSmartPointer<mflMatrix> mat;
+    GetAbsMatrix(mat,t);
     mflTransform::GetPosition(mat,xyz);
   }
   
@@ -1708,7 +1633,7 @@ void mafVME::GetAbsPosition(double &x,double &y,double &z,mflTimeStamp t)
 {
   double xyz[3];
 
-  this->GetAbsPosition(xyz,t);
+  GetAbsPosition(xyz,t);
 
   x=xyz[0];
   y=xyz[1];
@@ -1719,14 +1644,14 @@ void mafVME::GetAbsPosition(double &x,double &y,double &z,mflTimeStamp t)
 void mafVME::GetAbsOrientation(double rxyz[3],mflTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  if (t<0||t==this->CurrentTime)
+  if (t<0||t==m_CurrentTime)
   {
-    mflTransform::GetOrientation(this->GetAbsMatrix(),rxyz);
+    mflTransform::GetOrientation(GetAbsMatrix(),rxyz);
   }
   else
   {
-    mflSmartPointer<mflMatrix> mat;
-    this->GetAbsMatrix(mat,t);
+    mafSmartPointer<mflMatrix> mat;
+    GetAbsMatrix(mat,t);
     mflTransform::GetOrientation(mat,rxyz);
   }
 }
@@ -1737,7 +1662,7 @@ void mafVME::GetAbsOrientation(double &rx,double &ry,double &rz,mflTimeStamp t)
 {
   double rxyz[3];
 
-  this->GetAbsOrientation(rxyz,t);
+  GetAbsOrientation(rxyz,t);
 
   rx=rxyz[0];
   ry=rxyz[1];
@@ -1751,16 +1676,16 @@ void mafVME::SetAbsPose(double x,double y,double z,double rx,double ry,double rz
   double txyz[3],trxyz[3];
   txyz[0]=x; txyz[1]=y; txyz[2]=z;
   trxyz[0]=rx; trxyz[1]=ry; trxyz[2]=rz;
-  this->SetAbsPose(txyz,trxyz,t);
+  SetAbsPose(txyz,trxyz,t);
 }
 
 //-------------------------------------------------------------------------
 void mafVME::SetAbsPose(double xyz[3],double rxyz[3], mflTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  t=(t<0)?this->CurrentTime:t;
+  t=(t<0)?m_CurrentTime:t;
   
-  mflSmartPointer<mflMatrix> matrix;
+  mafSmartPointer<mflMatrix> matrix;
 
   mflTransform::SetOrientation(matrix,rxyz);
 
@@ -1775,9 +1700,9 @@ void mafVME::SetAbsPose(double xyz[3],double rxyz[3], mflTimeStamp t)
 void mafVME::SetAbsPose(vtkMatrix4x4 *matrix,mflTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  t=(t<0)?this->CurrentTime:t;
+  t=(t<0)?m_CurrentTime:t;
 
-  mflSmartPointer<mflMatrix> mat;
+  mafSmartPointer<mflMatrix> mat;
   mat->DeepCopy(matrix);
   mat->SetTimeStamp(t);
   SetAbsPose(mat);
@@ -1786,17 +1711,17 @@ void mafVME::SetAbsPose(vtkMatrix4x4 *matrix,mflTimeStamp t)
 void mafVME::SetAbsPose(mflMatrix *matrix)
 //-------------------------------------------------------------------------
 {
-  if (this->Parent)
+  if (Parent)
   {
-    mflSmartPointer<mflMatrix> pmat;
-    this->GetParent()->GetAbsMatrix(pmat,matrix->GetTimeStamp());
+    mafSmartPointer<mflMatrix> pmat;
+    GetParent()->GetAbsMatrix(pmat,matrix->GetTimeStamp());
 
     pmat->Invert();
 
     vtkMatrix4x4::Multiply4x4(pmat,matrix,matrix);
   }
   
-  this->SetPose(matrix);
+  SetPose(matrix);
 }
 //-------------------------------------------------------------------------
 void mafVME::SetAbsPosition(double x,double y,double z, mflTimeStamp t)
@@ -1804,43 +1729,43 @@ void mafVME::SetAbsPosition(double x,double y,double z, mflTimeStamp t)
 {
   double txyz[3];
   txyz[0]=x; txyz[1]=y; txyz[2]=z;
-  this->SetAbsPosition(txyz,t);
+  SetAbsPosition(txyz,t);
 }
 
 //-------------------------------------------------------------------------
 void mafVME::SetAbsPosition(double xyz[3], mflTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  t=(t<0)?this->CurrentTime:t;
+  t=(t<0)?m_CurrentTime:t;
 
-  mflSmartPointer<mflMatrix> matrix;
+  mafSmartPointer<mflMatrix> matrix;
   
   mflTransform::SetPosition(matrix,xyz);
 
   matrix->SetTimeStamp(t);
 
   mflMatrix *oldpose;
-  this->MatrixVector->FindMatrix(t,oldpose);
+  MatrixVector->FindMatrix(t,oldpose);
 
   // recover the orientation only if a key matrix is present
   if (oldpose)
   {
-    mflSmartPointer<mflMatrix> oldmat;
-    this->GetAbsMatrix(oldmat,t);
+    mafSmartPointer<mflMatrix> oldmat;
+    GetAbsMatrix(oldmat,t);
     mflTransform::CopyRotation(matrix,oldmat);
   }
 
-  if (this->Parent)
+  if (Parent)
   {
-    mflSmartPointer<mflMatrix> pmat;
-    this->GetParent()->GetAbsMatrix(pmat,t);
+    mafSmartPointer<mflMatrix> pmat;
+    GetParent()->GetAbsMatrix(pmat,t);
     
     pmat->Invert();
 
     vtkMatrix4x4::Multiply4x4(pmat,matrix,matrix);
   }
 
-  this->SetPose(matrix);
+  SetPose(matrix);
 }
 
 //-------------------------------------------------------------------------
@@ -1849,52 +1774,52 @@ void mafVME::SetAbsOrientation(double rx,double ry,double rz, mflTimeStamp t)
 {
   double trxyz[3];
   trxyz[0]=rx; trxyz[1]=ry; trxyz[2]=rz;
-  this->SetAbsOrientation(trxyz,t);
+  SetAbsOrientation(trxyz,t);
 }
 
 //-------------------------------------------------------------------------
 void mafVME::SetAbsOrientation(double rxyz[3], mflTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  t=(t<0)?this->CurrentTime:t;
+  t=(t<0)?m_CurrentTime:t;
 
-  mflSmartPointer<mflMatrix> matrix;
+  mafSmartPointer<mflMatrix> matrix;
   
   mflTransform::SetOrientation(matrix,rxyz);
 
   matrix->SetTimeStamp(t);
 
   mflMatrix *oldpose;
-  this->MatrixVector->FindMatrix(t,oldpose);
+  MatrixVector->FindMatrix(t,oldpose);
 
   // recover the position only if a key matrix is present
   if (oldpose)
   {
     double pos[3];
-    this->GetAbsPosition(pos,t);
+    GetAbsPosition(pos,t);
     mflTransform::SetPosition(matrix,pos);
   }
 
-  if (this->Parent)
+  if (Parent)
   {
-    mflSmartPointer<mflMatrix> pmat;
-    this->GetParent()->GetAbsMatrix(pmat,t);
+    mafSmartPointer<mflMatrix> pmat;
+    GetParent()->GetAbsMatrix(pmat,t);
 
     pmat->Invert();
 
     vtkMatrix4x4::Multiply4x4(pmat,matrix,matrix);
   }
 
-  this->SetPose(matrix);
+  SetPose(matrix);
 }
 
 //----------------------------------------------------------------------------
 void mafVME::ApplyAbsTransform(vtkLinearTransform *transform,int premultiply,mflTimeStamp t)
 //----------------------------------------------------------------------------
 {
-  t=(t<0)?this->CurrentTime:t;
-  mflSmartPointer<mflTransform> new_pose;
-  mflSmartPointer<mflMatrix> pose;
+  t=(t<0)?m_CurrentTime:t;
+  mafSmartPointer<mflTransform> new_pose;
+  mafSmartPointer<mflMatrix> pose;
   GetAbsMatrix(pose,t);
   new_pose->SetMatrix(pose);
   new_pose->Concatenate(transform,premultiply);
@@ -1904,9 +1829,9 @@ void mafVME::ApplyAbsTransform(vtkLinearTransform *transform,int premultiply,mfl
 void mafVME::ApplyAbsMatrix(vtkMatrix4x4 *matrix,int premultiply,mflTimeStamp t)
 //----------------------------------------------------------------------------
 {
-  t=(t<0)?this->CurrentTime:t;
-  mflSmartPointer<mflTransform> new_pose;
-  mflSmartPointer<mflMatrix> pose;
+  t=(t<0)?m_CurrentTime:t;
+  mafSmartPointer<mflTransform> new_pose;
+  mafSmartPointer<mflMatrix> pose;
   GetAbsMatrix(pose,t);
   new_pose->SetMatrix(pose);
   new_pose->Concatenate(matrix,premultiply);
@@ -1917,21 +1842,21 @@ void mafVME::ApplyAbsMatrix(vtkMatrix4x4 *matrix,int premultiply,mflTimeStamp t)
 //----------------------------------------------------------------------------
 void mafVME::SetScale(double sx,double sy,double sz,mflTimeStamp t)
 {
-  t=(t<0)?this->CurrentTime:t;
+  t=(t<0)?m_CurrentTime:t;
 
-  mflSmartPointer<mflMatrix> matrix;
+  mafSmartPointer<mflMatrix> matrix;
 
-  matrix->DeepCopy(this->GetMatrix(t));
+  matrix->DeepCopy(GetMatrix(t));
   
   mflTransform::Scale(matrix,sx,sy,sz);
 
-  this->MatrixVector->SetMatrix(matrix);
+  MatrixVector->SetMatrix(matrix);
 }
 
 //----------------------------------------------------------------------------
 void mafVME::SetScale(double sxyz[3],mflTimeStamp t)
 {
-  this->SetScale(sxyz[0],sxyz[1],sxyz[2]);
+  SetScale(sxyz[0],sxyz[1],sxyz[2]);
 }
 */
 
@@ -1939,8 +1864,8 @@ void mafVME::SetScale(double sxyz[3],mflTimeStamp t)
 void mafVME::GetScale(double sxyz[3],mflTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  mflSmartPointer<mflMatrix> mat;
-  this->GetMatrix(mat,t);
+  mafSmartPointer<mflMatrix> mat;
+  GetMatrix(mat,t);
   mflTransform::GetScale(mat,sxyz);
 }
 
@@ -1949,7 +1874,7 @@ void mafVME::GetScale(double &sx,double &sy,double &sz,mflTimeStamp t)
 //-------------------------------------------------------------------------
 {
   double sxyz[3];
-  this->GetScale(sxyz,t);
+  GetScale(sxyz,t);
   sx=sxyz[0];
   sy=sxyz[1];
   sz=sxyz[2];
@@ -2002,68 +1927,68 @@ void mafVME::AbsMatrixUpdateCallback(void *arg)
 void mafVME::PrintSelf(ostream& os, vtkIndent indent)
 //-------------------------------------------------------------------------
 {
-  os << indent << "Name: "<<this->GetName()<<endl;
+  os << indent << "Name: "<<GetName()<<endl;
 
-	os << indent << "Number of Children: "<<this->Children->GetNumberOfItems()<<endl;
+	os << indent << "Number of Children: "<<Children->GetNumberOfItems()<<endl;
 
 	os << indent << "Tag Array Contents: \n";
-	this->GetTagArray()->PrintSelf(os,indent.GetNextIndent());
+	GetTagArray()->PrintSelf(os,indent.GetNextIndent());
 
-  os << indent << "Current Time: "<<this->CurrentTime<<"\n";
+  os << indent << "Current Time: "<<m_CurrentTime<<"\n";
 
   os << indent << "Current Matrix:\n";
-  this->GetMatrix()->PrintSelf(os,indent.GetNextIndent());
+  GetMatrix()->PrintSelf(os,indent.GetNextIndent());
 
   os << indent << "Current Absolute Matrix:\n";
-  this->GetAbsMatrix()->PrintSelf(os,indent.GetNextIndent());
+  GetAbsMatrix()->PrintSelf(os,indent.GetNextIndent());
 
   mflTimeStamp tbounds[2];
-  this->GetLocalTimeBounds(tbounds);
+  GetLocalTimeBounds(tbounds);
   os << indent << "Time Bounds: ("<<tbounds[0]<<","<<tbounds[1]<<"]"<<endl;
 
   mafOBB bounds;
-  this->GetVMESpaceBounds(bounds);
+  GetVMESpaceBounds(bounds);
 
   os << indent << "VME Space Bounds: ["<<bounds.Bounds[0]<<","<<bounds.Bounds[1]<<","<<bounds.Bounds[2]<<"," \
     <<bounds.Bounds[3]<<","<<bounds.Bounds[4]<<","<<bounds.Bounds[5]<<"]\n";
   
 
   //os << indent << "VME 4D Bounds:\n";
-  //this->Get4DBounds()->PrintSelf(os,indent.GetNextIndent());
+  //Get4DBounds()->PrintSelf(os,indent.GetNextIndent());
 
   os << indent << "Matrix Vector:\n";
-  this->GetMatrixVector()->PrintSelf(os,indent.GetNextIndent());
+  GetMatrixVector()->PrintSelf(os,indent.GetNextIndent());
   
   os << indent << "VME DataSet Array:\n";
-  this->GetDataArray()->PrintSelf(os,indent.GetNextIndent());
-  //os << indent << "Number of Items:"<<this->GetDataArray()->GetNumberOfItems()<<"\n";
+  GetDataArray()->PrintSelf(os,indent.GetNextIndent());
+  //os << indent << "Number of Items:"<<GetDataArray()->GetNumberOfItems()<<"\n";
 
   os << indent << "Matrix Pipe: ";
-  if (this->GetMatrixPipe())
+  if (GetMatrixPipe())
   {
     os << "\n";
-    this->GetMatrixPipe()->PrintSelf(os,indent.GetNextIndent());
+    GetMatrixPipe()->PrintSelf(os,indent.GetNextIndent());
   }
   else
     os << "NULL\n";
   
   os << indent << "VME m_DataPipe: ";
-  if (this->GetDataPipe()) // allocate data pipe if not done yet
+  if (GetDataPipe()) // allocate data pipe if not done yet
   {
     os << "\n";
-    this->GetDataPipe()->PrintSelf(os,indent.GetNextIndent());
+    GetDataPipe()->PrintSelf(os,indent.GetNextIndent());
   }
   else
     os << "NULL\n";
 
-  if (!this->CurrentData)
+  if (!CurrentData)
   {
     os << indent << "Current Data: NULL\n";
   }
   else
   {
-    os << indent << "Current Data: "<< this->CurrentData->GetTypeName()<<"("<<this->CurrentData<<")\n";
-    this->GetCurrentData()->PrintSelf(os,indent.GetNextIndent());
+    os << indent << "Current Data: "<< CurrentData->GetTypeName()<<"("<<CurrentData<<")\n";
+    GetCurrentData()->PrintSelf(os,indent.GetNextIndent());
   }
 }
 
@@ -2073,10 +1998,10 @@ int mafVME::SetAuxiliaryRefSys(mflTransform *AuxRefSys, const char *RefSysName, 
 {
   if (AuxRefSys)
   {
-    return this->SetAuxiliaryRefSys(AuxRefSys->GetMatrix(),RefSysName,type);
+    return SetAuxiliaryRefSys(AuxRefSys->GetMatrix(),RefSysName,type);
   }
 
-  return VTK_ERROR;
+  return MAF_ERROR;
 }
 
 //-------------------------------------------------------------------------
@@ -2101,13 +2026,13 @@ int mafVME::SetAuxiliaryRefSys(vtkMatrix4x4 *AuxRefSys, const char *RefSysName, 
 
 	    item.SetType(type);
   
-      this->GetTagArray()->AddTag(item);
+      GetTagArray()->AddTag(item);
 	  
-	    return VTK_OK;
+	    return MAF_OK;
 	  }
   }
 
-	return VTK_ERROR;
+	return MAF_ERROR;
 }
 
 //-------------------------------------------------------------------------
@@ -2116,16 +2041,16 @@ int mafVME::GetAuxiliaryRefSys(mflTransform *AuxRefSys, const char *RefSysName, 
 {
   if (AuxRefSys)
   {
-    mflSmartPointer<vtkMatrix4x4> matrix;
-    if (this->GetAuxiliaryRefSys(matrix,RefSysName,type)==0)
+    mafSmartPointer<vtkMatrix4x4> matrix;
+    if (GetAuxiliaryRefSys(matrix,RefSysName,type)==0)
     {
       AuxRefSys->SetMatrix(matrix);
 
-      return VTK_OK;
+      return MAF_OK;
     }
   }
 
-  return VTK_ERROR;
+  return MAF_ERROR;
 }
 
 //-------------------------------------------------------------------------
@@ -2139,20 +2064,20 @@ int mafVME::GetAuxiliaryRefSys(vtkMatrix4x4 *AuxRefSys, const char *RefSysName, 
     {
       if (vtkString::Compare(RefSysName,"Global") == 0)
 		  {
-        if (this->GetParent())
+        if (GetParent())
         {
-          AuxRefSys->DeepCopy(this->GetParent()->GetAbsMatrix());
+          AuxRefSys->DeepCopy(GetParent()->GetAbsMatrix());
         }
         else
         {
           AuxRefSys->Identity();
         }
 
-        return VTK_OK;
+        return MAF_OK;
       }
 
 		  
-      vtkTagItem *item=this->GetTagArray()->GetTag(RefSysName);
+      vtkTagItem *item=GetTagArray()->GetTag(RefSysName);
 	    
       if (item)
       {
@@ -2171,7 +2096,7 @@ int mafVME::GetAuxiliaryRefSys(vtkMatrix4x4 *AuxRefSys, const char *RefSysName, 
 						  }
 					  }
           
-					  return VTK_OK;
+					  return MAF_OK;
 			  }
 		  }
       else if (RefSysName == "Default")
@@ -2179,11 +2104,11 @@ int mafVME::GetAuxiliaryRefSys(vtkMatrix4x4 *AuxRefSys, const char *RefSysName, 
         // if not Default reference system was specified return the Local reference system
         // i.e. the identity!
         AuxRefSys->Identity();
-        return VTK_OK;
+        return MAF_OK;
       }
 	  }
   }
-  return VTK_ERROR;
+  return MAF_ERROR;
 }
 
 //-------------------------------------------------------------------------
@@ -2192,14 +2117,14 @@ int mafVME::SetMatrixPipe(mflMatrixPipe *mpipe)
 {
   if (mpipe!=m_MatrixPipe)
   {
-    if (mpipe==NULL||mpipe->SetVME(this)==VTK_OK)
+    if (mpipe==NULL||mpipe->SetVME(this)==MAF_OK)
     { 
       // if we had an observer...
       if (m_MatrixPipe && MatrixUpdateTag)
       {
         m_MatrixPipe->RemoveObserver(MatrixUpdateTag);
         m_MatrixPipe->SetVME(NULL);
-        m_MatrixPipe->SetCurrentTime(CurrentTime);
+        m_MatrixPipe->SetCurrentTime(m_CurrentTime);
       }
 
       vtkSetObjectBodyMacro(m_MatrixPipe,mflMatrixPipe,mpipe);
@@ -2214,25 +2139,25 @@ int mafVME::SetMatrixPipe(mflMatrixPipe *mpipe)
       {
         // When no Matrix pipe is set, simple provide
         // an identity matrix
-        CurrentMatrix=mflSmartPointer<mflMatrix>();
-        CurrentMatrix->SetTimeStamp(this->CurrentTime);
+        CurrentMatrix=mafSmartPointer<mflMatrix>();
+        CurrentMatrix->SetTimeStamp(m_CurrentTime);
       }
 
       // this forces the the pipe to Update its input and input frame
-      if (AbsMatrixPipe)
-        AbsMatrixPipe->SetVME(this);
+      if (m_AbsMatrixPipe)
+        m_AbsMatrixPipe->SetVME(this);
 
-      this->InvokeEvent(mafVME::MatrixPipeChangedEvent);
+      InvokeEvent(mafVME::MatrixPipeChangedEvent);
 
-      return VTK_OK;
+      return MAF_OK;
     }
     else
     {
-      return VTK_ERROR;
+      return MAF_ERROR;
     }
   }
 
-  return VTK_OK;
+  return MAF_OK;
 }
 
 //-------------------------------------------------------------------------
@@ -2268,7 +2193,7 @@ void mafVME::SetCrypting(int crypting)
     Crypting = 0;
 
   TagArray->SetTag(vtkTagItem("MFL_CRYPT_VME",Crypting));
-  this->Modified();
+  Modified();
 }
 
 //-------------------------------------------------------------------------
@@ -2294,10 +2219,10 @@ vtkDataSet *mafVME::GetCurrentData()
 int mafVME::SetDataPipe(mflDataPipe *dpipe)
 //-------------------------------------------------------------------------
 {
-  if (dpipe==this->m_DataPipe)
-    return VTK_OK;
+  if (dpipe==m_DataPipe)
+    return MAF_OK;
 
-  if (dpipe==NULL||dpipe->SetVME(this)==VTK_OK)
+  if (dpipe==NULL||dpipe->SetVME(this)==MAF_OK)
   { 
     // if we had an observer...
     if (m_DataPipe && DataUpdateTag)
@@ -2311,7 +2236,7 @@ int mafVME::SetDataPipe(mflDataPipe *dpipe)
     if (m_DataPipe)
     {
       //SetCurrentData(m_DataPipe->GetOutput());
-      m_DataPipe->SetCurrentTime(CurrentTime);
+      m_DataPipe->SetCurrentTime(m_CurrentTime);
     }
     else
     {
@@ -2329,11 +2254,11 @@ int mafVME::SetDataPipe(mflDataPipe *dpipe)
     // advise listeners the data pipe has changed
     InvokeEvent(mafVME::DataPipeChangedEvent);
 
-    return VTK_OK;
+    return MAF_OK;
   }
   else
   {
-    return VTK_ERROR;
+    return MAF_ERROR;
   }
 }
 
