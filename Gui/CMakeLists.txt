@@ -23,11 +23,6 @@ SET(PROJECT_LIBS
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR})
 
-# Create the header to configure the classes.
-CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Configure.h.in
-               ${PROJECT_BINARY_DIR}/Configure.h
-               @ONLY IMMEDIATE)
-
 # Create the library.
 ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
 MESSAGE ("${PROJECT_NAME} linked libraries: ${PROJECT_LIBS}")

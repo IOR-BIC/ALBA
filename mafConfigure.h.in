@@ -1,5 +1,5 @@
-#ifndef __MAF_Configure_h
-#define __MAF_Configure_h
+#ifndef __mafConfigure_h
+#define __mafConfigure_h
 
 #if @BUILD_SHARED_LIBS@
 # define MAF_SHARED
@@ -28,4 +28,4 @@
 #cmakedefine MAF_USE_WX
 #cmakedefine MAF_USE_ITK
 
-#endif // __MAF_Configure_h
+#endif // __mafConfigure_h

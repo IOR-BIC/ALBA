@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTestClass.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-08 16:38:10 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-11-09 15:31:43 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -28,7 +28,7 @@
 
   @sa mafObject
 */
-class mafGuiTestClass: public mafObject
+class MAF_EXPORT mafGuiTestClass: public mafObject
 {
 public:
   mafGuiTestClass();
