@@ -1,0 +1,29 @@
+MAF Multimod Application Framework
+Instruction for building CosmoMAF:
+
+
+WINDOWS:
+MAF currently compiles only under Windows and its building has been tested with the following configuration:
+- CMake 2.0.x from kitware (see later)
+- Microsoft Visual Studio 6 (SP5).
+
+
+Setup and Build:
+   1. Place somewhere the source dir (typically e.g. c:\MyProject\openMAF)
+   2. Download Cmake 2.0.x from the kitware web site:  http://www.cmake.org/HTML/Download.html
+   3. Run CMake and configure the project, by specifying the source tree (e.g. c:\MyProject\openMAF) and where to place the compiled binaries (CMake will create one for you if not existing). Configuring will take some steps: simply continue to press the "Configure" button until all fields become gray, and then press "OK" to generate the project file.*
+   4. Using Visual Studio 6 (I'm sorry but VS7 or later won't work) and open the "maf.dsw" workspace file in the build directory. Note: it's a very big project, since it includes VTK, ITK and wxWindows, it will take some time to parse all classes (currently, we only support the full source distribution): wait until all classes have been parsed.
+   5. Compile and build (F7) the project.
+   6. Compilation process is generally time-consuming but it should not return any errors. Close down Visual Studio and reOpen with subproject cosmoMAF.dsp.** 
+   (5. You'll found a subproject called "Datamanager": that's the main multimod application. Compile it (I suggest you to verify the "Build->Set Active Configuration" is set to "Datamanager - Win32 Debug", since sometimes the compiler switches automatically to "RelWithDebInfo"))
+
+
+Some extra hints:
+   *To speedup the compilation it is reccomended to disable the "VTK_USE_ANSI_STDLIB" option from in the CMake panel, this will increase compile time up to 4x. Currently defualt is ANSI_STD on, but we still support non-ANSI compilation to speed up the compile time with VC6.
+   **Once you have compiled the whole project, you can go to a subdirectory in the Build directory and open a subproject (e.g. cosmoMAF.dsp) to speed up your load and compile times. By opening the ".dsp" file, visual studio will automatically generate a corresponding .dsw one. I reccomend you to add the following subprojects to the workspace (that you can find in the Buid directory): 
+      - "mafCore.dsp" 
+      - "mafLibrary.dsp" 
+      - "mflCore.dsp" 
+      - "vtkSVTK.dsp" 
+   and set the Datamanager dependencies from the Project->Dependencies menu accordingly.
+   ***For some reason, the Active Configuration (in the Build menu) may set itself to "Win32 RelWithDebInfo". Always, make sure it is set to "Win32 Debug".
