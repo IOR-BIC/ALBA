@@ -10,6 +10,7 @@ ADD_EXECUTABLE(mafSmartObjectTest mafSmartObjectTest.cpp)
 ADD_EXECUTABLE(mafObjectFactoryTest mafObjectFactoryTest.cpp)
 ADD_EXECUTABLE(mafTransformTest mafTransformTest.cpp)
 ADD_EXECUTABLE(mafNodeTest mafNodeTest.cpp)
+ADD_EXECUTABLE(mafVectorTest mafVectorTest.cpp)
 
 # wxWidgets specific classes
 IF (MAF_USE_WX)

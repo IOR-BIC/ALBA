@@ -1,4 +1,5 @@
 #include "mafSmartObject.h"
+#include "mafSmartPointer.h"
 #include <iostream>
 
 /**
@@ -29,12 +30,19 @@ mafCxxTypeMacro(mafDummyObject);
 
 mafSmartObject *CreateSmartObject(int &flag)
 {
-  //mafFooObject foo(&flag);
   mafFooObject *foo= mafFooObject::New();
   foo->Flag=&flag;
   flag=true;
   foo->Register(0); // keep it alive
   return foo;
+}
+
+void CreateSmartObject2(mafAutoPointer<mafFooObject> &out,int &flag)
+{
+  mafSmartPointer<mafFooObject> smart_foo;
+  smart_foo->Flag=&flag;
+  flag=true;
+  out = smart_foo;
 }
 
 int main()
@@ -44,6 +52,15 @@ int main()
 
   MAF_TEST(flag);
   obj->UnRegister(0);
+  MAF_TEST(!flag);
+
+  
+  mafAutoPointer<mafFooObject> auto_foo;
+  CreateSmartObject2(auto_foo,flag);
+  MAF_TEST(flag);
+  // force releasing object.
+  // Notice: calling the mafSmartPointer UnRegister() not the mafSmartObject one!!!
+  auto_foo.UnRegister(NULL); 
   MAF_TEST(!flag);
 
   std::cout<<"Test completed successfully!"<<std::endl;
