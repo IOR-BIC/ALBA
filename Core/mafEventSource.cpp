@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventSource.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:24:58 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-03-10 12:28:05 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -40,6 +40,7 @@ mafEventSource::mafEventSource(void *owner)
   m_Data  = NULL;
   m_Observers   = new mafObserversList;
   m_Owner       = owner;
+  m_Channel     = -1;
 }
 
 //------------------------------------------------------------------------------
@@ -113,35 +114,39 @@ void mafEventSource::InvokeEvent(mafEventBase *e)
 //------------------------------------------------------------------------------
 {
   if (m_Observers->m_List.empty())
-    return;  
+    return;
   
+  // store old channel
+  mafID old_ch=(m_Channel<0)?-1:e->GetChannel();
+    
   e->SetSource(this);
-
+  
   mafObserversListType::iterator it;
-  for (it=m_Observers->m_List.begin();it!=m_Observers->m_List.end();it++)
+  for (it=m_Observers->m_List.begin();it!=m_Observers->m_List.end()&&!e->GetSkipFlag();it++)
   {
+    // Set the event channel (if neccessary).
+    // Must set it at each iteration since it could have
+    // been changed by other event sources on the path
+    if (m_Channel>=0&&m_Channel!=e->GetChannel())
+      e->SetChannel(m_Channel);
+
     // rise an event to observers
     mafObserver *observer=(*it).second;
     observer->OnEvent(e);
   }
+  
+  // reset skip flag
+  e->SetSkipFlag(false);
+
+  // restore old channel
+  if (old_ch>0) e->SetChannel(old_ch);
 }
 
 //------------------------------------------------------------------------------
 void mafEventSource::InvokeEvent(mafEventBase &e)
 //------------------------------------------------------------------------------
 {
-  if (m_Observers->m_List.empty())
-    return;  
-  
-  e.SetSource(this);
-
-  mafObserversListType::iterator it;
-  for (it=m_Observers->m_List.begin();it!=m_Observers->m_List.end()&&!e.GetSkipFlag();it++)
-  {
-    // rise an event to observers
-    mafObserver *observer=(*it).second;
-    observer->OnEvent(&e);
-  }
+  InvokeEvent(&e);
 }
 
 //------------------------------------------------------------------------------
@@ -189,4 +194,17 @@ mafObserverCallback *mafEventSource::AddObserverCallback(void (*f)(void *sender,
   mafObserverCallback *observer=new mafObserverCallback();
   AddObserver(observer);
   return observer;
+}
+
+//------------------------------------------------------------------------------
+void mafEventSource::SetChannel(mafID ch)
+//------------------------------------------------------------------------------
+{
+  m_Channel = ch;
+}
+//------------------------------------------------------------------------------
+mafID mafEventSource::GetChannel()
+//------------------------------------------------------------------------------
+{
+  return m_Channel;
 }

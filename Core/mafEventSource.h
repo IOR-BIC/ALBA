@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventSource.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:24:59 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-03-10 12:28:17 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -89,10 +89,21 @@ public:
   /** return the owner class of this event source */
   void *GetOwner();
 
+  /** 
+    set the channel Id assigned to this event source. If set to <0 
+    no channel is assigned */
+  void SetChannel(mafID ch);
+
+  /** 
+    return the channel assigned to this event source. If <0 no 
+    channel has been assigned */
+  mafID GetChannel();
+
 protected:
-  void *m_Data;             ///< void pointer to be used to store client data 
-  mafObserversList *m_Observers;  ///< list of observers
-  void *m_Owner;                  ///< pointer to class owning this event source
+  void              *m_Data;       ///< void pointer to be used to store client data 
+  mafObserversList  *m_Observers;  ///< list of observers
+  void              *m_Owner;      ///< pointer to class owning this event source
+  mafID             m_Channel;     ///< a channel assigned to this event source, if <0 no channel is assigned
 private:
   
 };
