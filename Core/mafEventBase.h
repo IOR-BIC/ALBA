@@ -2,11 +2,11 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventBase.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-11 17:25:25 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-02-20 23:24:25 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
-  Copyright (c) 2002/2004 
+  Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
@@ -14,6 +14,7 @@
 #define __mafEventBase_h
 
 #include "mafObject.h"
+#include "mafDecl.h"
 
 //------------------------------------------------------------------------------
 // Forward declarations
@@ -41,7 +42,7 @@ class mafEventSource;
 class MAF_EXPORT mafEventBase: public mafObject
 {
 public:
-  mafEventBase(void *sender=NULL,mafID id=ID_NO_EVENT,void *data=NULL, mafID channel=0);
+  mafEventBase(void *sender=NULL,mafID id=ID_NO_EVENT,void *data=NULL, mafID channel=MCH_UP);
   virtual ~mafEventBase();
 
   mafTypeMacro(mafEventBase,mafObject);
