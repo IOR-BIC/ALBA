@@ -1,4 +1,4 @@
-Following is a number of rules for MAF coding:
+[HOW-TO about MAF coding]
 
 ** NAMING CONVENTIONS **
 
@@ -28,8 +28,8 @@ Source files of the MAF distribution should have an header of the form:
   Program:   Multimod Application Framework RELOADED
   Module:    $RCSfile: CodingStandards.txt,v $
   Language:  C++
-  Date:      $Date: 2004-11-15 08:20:49 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-02-21 13:54:27 $
+  Version:   $Revision: 1.2 $
   Authors:   Author Name (suggested to not report e-mails to avoid spam)
 ==========================================================================
   Copyright (c) 2002/2005 
