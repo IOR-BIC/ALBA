@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 09:01:23 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-04 09:12:01 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,13 +18,14 @@
 
 #include <wx/laywin.h>
 #include <wx/mdi.h>
-//#include <vtkViewport.h>
-//#include <vtkProcessObject.h>
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
 class mafEventListener;
-
+class vtkProcessObject;
+class vtkViewport;
+class vtkObject;
+class mmgMDIFrameCallback; 
 //----------------------------------------------------------------------------
 // mmgMDIFrame :
 //----------------------------------------------------------------------------
@@ -48,15 +49,6 @@ class mmgMDIFrame: public wxMDIParentFrame
 	/** End the progress. */
   void Ready();
 
-	/** Link a vtk object to the progress bar. */
-  //void BindToProgressBar(vtkObject* vtkobj,	wxString  *msg);
-
-	/** Link a vtk process object (filter) to the progress bar. */
-  //void BindToProgressBar(vtkProcessObject* filter, wxString  *msg);
-
-	/** Link a vtkViewport to the progress bar. */
-  //void BindToProgressBar(vtkViewport* ren, wxString  *msg);
-
 	/** Show the progress bar. */
   void ProgressBarShow();
 
@@ -70,25 +62,41 @@ class mmgMDIFrame: public wxMDIParentFrame
   void ProgressBarSetText(wxString *msg);
 
 	/** Start rendering progress. */
-  static void RenderStart(void*);
+  void RenderStart();
 
 	/** End rendering progress. */
-  static void RenderEnd(void*);
+  void RenderEnd();
 
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#ifdef MAF_USE_VTK
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-  /** Start the progress bar visualization. */
-  //static void ProgressStart(void*);
+  /** Link a vtk object to the progress bar. -  */
+  void BindToProgressBar(vtkObject* vtkobj,	wxString  *msg);
 
-	/** Update the progress bar visualization. */
-  //static void ProgressUpdate(void*);
+  /** Link a vtk process object (filter) to the progress bar. */
+  void BindToProgressBar(vtkProcessObject* filter, wxString  *msg);
 
-	/** End the progress bar visualization. */
-  //static void ProgressEnd(void*);
+  /** Link a vtkViewport to the progress bar. */
+  void BindToProgressBar(vtkViewport* ren, wxString  *msg);
 
-	/** Delete the progress bar argument. */
-  //static void ProgressDeleteArgs(void*);
- 
+  /* - used for vtk4.2  
+  static void ProgressStart(void*);
+  static void ProgressUpdate(void*);
+  static void ProgressEnd(void*);
+  static void ProgressDeleteArgs(void*);
+  */
+
 protected:
+  mmgMDIFrameCallback *m_StartCallback; 
+  mmgMDIFrameCallback *m_EndCallback; ; 
+  mmgMDIFrameCallback *m_ProgressCallback; 
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#endif  //MAF_USE_VTK
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+protected:
+ 
 	/** Send the men event. */
   void OnMenu(wxCommandEvent& e);
 
@@ -131,6 +139,7 @@ protected:
   wxStaticText *m_busyl;
   wxGauge      *m_gauge;
 
-DECLARE_EVENT_TABLE()
+
+  DECLARE_EVENT_TABLE()
 };
 #endif

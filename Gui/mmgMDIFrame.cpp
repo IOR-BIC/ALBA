@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 09:01:23 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-04 09:12:01 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -14,12 +14,63 @@
 // Include: - include the class being defined first
 //----------------------------------------------------------------------------
 #include "mmgMDIFrame.h"
-
-
 #include "mafDecl.h"
 #include "mafEvent.h"
 
-//#include "vtkVersion.h"
+#ifdef MAF_USE_VTK //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+  #include "vtkVersion.h"
+  #include "vtkProcessObject.h"
+  #include "vtkViewport.h"
+  #include "vtkCommand.h"
+
+class mmgMDIFrameCallback : public vtkCommand
+{
+  public:
+    static mmgMDIFrameCallback *New() {return new mmgMDIFrameCallback;}
+    mmgMDIFrameCallback() {m_mode=0; m_frame=NULL;};
+    void Delete() {delete this;};
+    void SetMode(int mode){m_mode=mode;};
+    void SetFrame(mmgMDIFrame *frame){m_frame=frame;};
+    virtual void Execute(vtkObject *caller, unsigned long, void*)
+    {
+      assert(m_frame);
+      if(caller->IsA("vtkProcessObject"))
+      {
+        vtkProcessObject *po = (vtkProcessObject*)caller;
+
+        if(m_mode==0) // ProgressEvent-Callback
+        {
+          m_frame->ProgressBarSetVal(po->GetProgress()*100);
+          //wxLogMessage("progress = %g", po->GetProgress()*100);
+        }
+        else if(m_mode==1) // StartEvent-Callback
+        {
+          m_frame->ProgressBarShow();
+          m_frame->ProgressBarSetVal(0);
+          m_frame->ProgressBarSetText(&wxString(po->GetClassName()));
+        }
+        else if(m_mode==2) // EndEvent-Callback
+        {
+          m_frame->ProgressBarHide();
+        }
+      } 
+      else if(caller->IsA("vtkViewport"))
+      {
+        if(m_mode==1) // StartRenderingEvent-Callback
+        {
+          m_frame->RenderStart();
+        }
+        else if(m_mode==2) // StartRenderingEvent-Callback
+        {
+          m_frame->RenderEnd();
+        }
+      }
+    }
+  protected:  
+    int m_mode;
+    mmgMDIFrame *m_frame;
+};
+#endif //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 //----------------------------------------------------------------------------
 // mmgMDIFrame
@@ -39,17 +90,6 @@ BEGIN_EVENT_TABLE(mmgMDIFrame, wxMDIParentFrame)
 		EVT_IDLE(mmgMDIFrame::OnIdle)  
 END_EVENT_TABLE()
 
-/*
-//----------------------------------------------------------------------------
-//struct mafProgressArgs
-//----------------------------------------------------------------------------
-struct mafProgressArgs {
- vtkProcessObject* f;   //filter
- wxString m;            //message 
- mmgMDIFrame* t;        //this  
- bool ren;              //ProgressArg of a Renderer  
-};
-*/
 //----------------------------------------------------------------------------
 mmgMDIFrame::mmgMDIFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 //----------------------------------------------------------------------------
@@ -60,11 +100,30 @@ mmgMDIFrame::mmgMDIFrame(const wxString& title, const wxPoint& pos, const wxSize
   m_clientwin= NULL;
   CreateStatusbar();
   Centre();
+
+#ifdef MAF_USE_VTK
+  m_ProgressCallback= mmgMDIFrameCallback::New(); 
+  m_ProgressCallback->SetFrame(this);
+  m_ProgressCallback->SetMode(0);
+  m_StartCallback = mmgMDIFrameCallback::New();; 
+  m_StartCallback->SetFrame(this);
+  m_StartCallback->SetMode(1);
+  m_EndCallback = mmgMDIFrameCallback::New(); 
+  m_EndCallback->SetFrame(this);
+  m_EndCallback->SetMode(2);
+#endif //MAF_USE_VTK
 }
+
 //----------------------------------------------------------------------------
 mmgMDIFrame::~mmgMDIFrame( ) 
 //----------------------------------------------------------------------------
 {
+#ifdef MAF_USE_VTK
+  vtkDEL(m_ProgressCallback); 
+  vtkDEL(m_StartCallback); 
+  vtkDEL(m_EndCallback); 
+#endif 
+
   mafSetFrame( NULL);
 }
 //----------------------------------------------------------------------------
@@ -97,19 +156,17 @@ void mmgMDIFrame::OnCloseWindow(wxCloseEvent& event)
 { 
   mafEventMacro(mafEvent(this,MENU_FILE_QUIT));
 }
-
 //----------------------------------------------------------------------------
 void mmgMDIFrame::OnSashDrag(wxSashEvent& event)
 //----------------------------------------------------------------------------
 {
-	/*
-	Seems that there is no way to handle sash-messages from
-	the guiSashPanel itself. So every window using Sashes
-	have to implement OnSashDrag like this.
-	You can avoid to use specific sash names here, but you have 
-	still to be aware of the existing guiSashPanel's to 
-	write the entry in the Event-Table.
-	*/
+	
+	//Seems that there is no way to handle sash-messages from
+	//the guiSashPanel itself. So every window using Sashes
+	//have to implement OnSashDrag like this.
+	//You can avoid to use specific sash names here, but you have 
+	//still to be aware of the existing guiSashPanel's to 
+	//write the entry in the Event-Table.
  
 	if(event.GetDragStatus() == wxSASH_STATUS_OUT_OF_RANGE)
     return;
@@ -141,7 +198,7 @@ void mmgMDIFrame::OnSize(wxSizeEvent& event)
 		return;
   wxRect r;
 	m_frameStatusBar->GetFieldRect(4,r);
-  m_gauge->SetSize(r.x,r.y,r.width,r.height);
+  m_gauge->SetSize(r.x,r.y+2,r.width -4 ,r.height -4);
 }
 //----------------------------------------------------------------------------
 void mmgMDIFrame::LayoutWindow()
@@ -178,7 +235,7 @@ void mmgMDIFrame::CreateStatusbar ()
 	SetStatusText( " ",3);
 
 	m_busy=FALSE;
-	m_gauge = new wxGauge(m_frameStatusBar, -1, 100);
+	m_gauge = new wxGauge(m_frameStatusBar, -1, 100,wxDefaultPosition,wxDefaultSize,wxGA_SMOOTH);
 	m_gauge->SetForegroundColour( *wxRED );
   m_gauge->Show(FALSE);
 }
@@ -192,7 +249,7 @@ void mmgMDIFrame::OnLayout(wxCommandEvent& event)
 void mmgMDIFrame::OnIdle(wxIdleEvent& event)
 //----------------------------------------------------------------------------
 { 
-  /* @@@   //SIL. 29-3-2005: 
+  // @@@   //SIL. 29-3-2005: 
   #ifdef __WIN32__
 	MEMORYSTATUS ms;
 	GlobalMemoryStatus( &ms );
@@ -200,9 +257,70 @@ void mmgMDIFrame::OnIdle(wxIdleEvent& event)
   s << "free mem " << ms.dwAvailPhys/1000000 << " mb";   
   SetStatusText(s,5);
 	#endif
-  */
 }
-/*
+//-----------------------------------------------------------
+void mmgMDIFrame::Busy()
+//-----------------------------------------------------------
+  {
+  SetStatusText("Busy",2);
+  SetStatusText("",3);
+  m_gauge->Show(TRUE);
+  m_gauge->SetValue(0);
+  Refresh(FALSE);
+  }
+//-----------------------------------------------------------
+void mmgMDIFrame::Ready()
+//-----------------------------------------------------------
+  {
+  SetStatusText("",2);
+  SetStatusText("",3);
+  m_gauge->Show(FALSE);
+  Refresh(FALSE);
+  }
+//-----------------------------------------------------------
+void mmgMDIFrame::ProgressBarShow()
+//-----------------------------------------------------------
+  {
+  SetStatusText("",0);
+  Busy();
+  }
+//-----------------------------------------------------------
+void mmgMDIFrame::ProgressBarHide()
+//-----------------------------------------------------------
+  {
+  SetStatusText("",0);
+  Ready();
+  }
+//-----------------------------------------------------------
+void mmgMDIFrame::ProgressBarSetVal(int progress)
+//-----------------------------------------------------------
+  {
+  m_gauge->SetValue(progress);
+  SetStatusText(wxString::Format(" %d%% ",progress),3);
+  }
+//-----------------------------------------------------------
+void mmgMDIFrame::ProgressBarSetText(wxString *msg)
+//-----------------------------------------------------------
+  {
+  if(msg) SetStatusText(*msg,0);
+  }
+//-----------------------------------------------------------
+void mmgMDIFrame::RenderStart()
+//-----------------------------------------------------------
+  {
+    SetStatusText( "Rendering",1);
+  }
+//-----------------------------------------------------------
+void mmgMDIFrame::RenderEnd()
+//-----------------------------------------------------------
+  {
+    SetStatusText( " ",1);
+  }
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#ifdef MAF_USE_VTK
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //-----------------------------------------------------------
 void mmgMDIFrame::BindToProgressBar(vtkObject* vtkobj, wxString *msg)
 //-----------------------------------------------------------
@@ -216,42 +334,26 @@ void mmgMDIFrame::BindToProgressBar(vtkObject* vtkobj, wxString *msg)
 		v = (vtkViewport*)vtkobj;
 		BindToProgressBar(v,msg);
   } 
-
   if(vtkobj->IsA("vtkProcessObject")) 
 	{
 		p = (vtkProcessObject*)vtkobj;
 		BindToProgressBar(p,msg);
   } 
-	
 	if(v == NULL && p == NULL)
 	{
     wxLogMessage("wrong vtkObject passed to BindToProgressBar");
 	}
 }
-//-----------------------------------------------------------
-void mmgMDIFrame::BindToProgressBar(vtkProcessObject* filter, wxString  *msg)
-//-----------------------------------------------------------
-{
-  mafProgressArgs *args = new mafProgressArgs;
-  args->f = filter;
-	args->m = *msg;
-	args->t = this;
-	args->ren = false;
-	
-  filter->SetStartMethod(	   this->ProgressStart, (void*)args);
-  filter->SetProgressMethod( this->ProgressUpdate,(void*)args);
-  filter->SetEndMethod(	     this->ProgressEnd,   (void*)args);
-
-  // link only one ArgDelete - the object arg is only one !!
-  filter->SetEndMethodArgDelete(this->ProgressDeleteArgs);
-}
-//-----------------------------------------------------------
-void mmgMDIFrame::BindToProgressBar(vtkViewport* ren, wxString  *msg)
-//-----------------------------------------------------------
-{
-  ren->SetStartRenderMethod(	this->RenderStart, this);
-  ren->SetEndRenderMethod(	this->RenderEnd,   this);
-}
+/* --- used for vtk v.4.2
+//----------------------------------------------------------------------------
+//struct mafProgressArgs
+//----------------------------------------------------------------------------
+struct mafProgressArgs {
+vtkProcessObject* f;   //filter
+wxString m;            //message 
+mmgMDIFrame* t;        //this  
+bool ren;              //ProgressArg of a Renderer  
+};
 //-----------------------------------------------------------
 void mmgMDIFrame::ProgressStart(void* a)
 //-----------------------------------------------------------
@@ -284,64 +386,45 @@ void mmgMDIFrame::ProgressDeleteArgs(void* a)
 //-----------------------------------------------------------
 {
   mafProgressArgs *args = (mafProgressArgs *)a;
-  wxDEL(args);
+  cppDEL(args);
 }
 */
+
 //-----------------------------------------------------------
-void mmgMDIFrame::RenderStart(void* a)
-//-----------------------------------------------------------
-{
-  ((mmgMDIFrame*)a)->SetStatusText( "rendering",1);
-}
-//-----------------------------------------------------------
-void mmgMDIFrame::RenderEnd(void* a)
+void mmgMDIFrame::BindToProgressBar(vtkProcessObject* filter, wxString  *msg)
 //-----------------------------------------------------------
 {
-  ((mmgMDIFrame*)a)->SetStatusText( " ",1);
+  // - syntax for vtk v.4.4
+  filter->AddObserver(vtkCommand::ProgressEvent,m_ProgressCallback);
+  filter->AddObserver(vtkCommand::StartEvent,m_StartCallback);
+  filter->AddObserver(vtkCommand::EndEvent,m_EndCallback);
+
+  // - syntax for vtk v.4.2 or less
+  //mafProgressArgs *args = new mafProgressArgs;
+  //args->f = filter;
+  //args->m = *msg;
+  //args->t = this;
+  //args->ren = false;
+  //filter->SetStartMethod(	   this->ProgressStart, (void*)args);
+  //filter->SetProgressMethod( this->ProgressUpdate,(void*)args);
+  //filter->SetEndMethod(	     this->ProgressEnd,   (void*)args);
+  // link only one ArgDelete - the object arg is only one !!
+  //filter->SetEndMethodArgDelete(this->ProgressDeleteArgs);
 }
 //-----------------------------------------------------------
-void mmgMDIFrame::Busy()
+void mmgMDIFrame::BindToProgressBar(vtkViewport* ren, wxString  *msg)
 //-----------------------------------------------------------
 {
-  SetStatusText("Busy",2);
-  SetStatusText("",3);
-  m_gauge->Show(TRUE);
-  m_gauge->SetValue(0);
-  Refresh(FALSE);
+  // - syntax for vtk v.4.4
+  ren->AddObserver(vtkCommand::StartEvent,m_StartCallback);
+  ren->AddObserver(vtkCommand::EndEvent,m_EndCallback);
+
+  // - syntax for vtk v.4.2 or less
+  //ren->SetStartRenderMethod(	this->RenderStart, this);
+  //ren->SetEndRenderMethod(	this->RenderEnd,   this);
 }
-//-----------------------------------------------------------
-void mmgMDIFrame::Ready()
-//-----------------------------------------------------------
-{
-  SetStatusText("",2);
-  SetStatusText("",3);
-  m_gauge->Show(FALSE);
-  Refresh(FALSE);
-}
-//-----------------------------------------------------------
-void mmgMDIFrame::ProgressBarShow()
-//-----------------------------------------------------------
-{
-  SetStatusText("",0);
-  Busy();
-}
-//-----------------------------------------------------------
-void mmgMDIFrame::ProgressBarHide()
-//-----------------------------------------------------------
-{
-  SetStatusText("",0);
-  Ready();
-}
-//-----------------------------------------------------------
-void mmgMDIFrame::ProgressBarSetVal(int progress)
-//-----------------------------------------------------------
-{
-  m_gauge->SetValue(progress);
-  SetStatusText(wxString::Format(" %d%% ",progress),3);
-}
-//-----------------------------------------------------------
-void mmgMDIFrame::ProgressBarSetText(wxString *msg)
-//-----------------------------------------------------------
-{
-  if(msg) SetStatusText(*msg,0);
-}
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#endif //MAF_USE_VTK
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+

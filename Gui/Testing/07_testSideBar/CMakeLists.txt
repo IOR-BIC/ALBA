@@ -1,4 +1,4 @@
-PROJECT (testSideBar)
+PROJECT (TestSideBar)
 
 SET(PROJECT_SRCS 
 testSideBarApp.cpp
