@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-18 22:07:44 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2004-12-20 20:47:07 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -25,7 +25,9 @@
 //------------------------------------------------------------------------------
 // Typedefs
 //------------------------------------------------------------------------------
-typedef double mafTimeStamp;
+typedef double mafTimeStamp; ///< type for time varying data timestamps (not for pipelines timestamps!)
+typedef unsigned long mafID; ///< type for IDs inside MAF @todo to be changed to support 64bit IDs
+typedef std::type_info mafTypeID; ///< type for mafObject's class type IDs
 
 //------------------------------------------------------------------------------
 // Constants
@@ -53,11 +55,6 @@ void mafMessage(const char *format, ...);
 //------------------------------------------------------------------------------
 // Macros
 //------------------------------------------------------------------------------
-
-/** this is the type used for IDs inside the MAF
-    @todo: to be changed to support 64bit IDs */
-typedef unsigned long mafID;
-typedef type_info mafTypeID;
 
 /** Delete a VTK object */
 #define vtkDEL(a) if (a) { a->Delete(); a = NULL; }

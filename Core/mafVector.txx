@@ -3,8 +3,8 @@
 Program:   Visualization Toolkit
 Module:    $RCSfile: mafVector.txx,v $
 Language:  C++
-Date:      $Date: 2004-12-18 22:07:42 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2004-12-20 20:47:09 $
+Version:   $Revision: 1.4 $
 
 
 
@@ -133,12 +133,12 @@ bool mafVector<T>::ReplaceItem(mafID idx, const T &newitem)
 
 //------------------------------------------------------------------------------
 template <class T>
-bool mafVector<T>::RemoveItem(mafID idx)
+bool mafVector<T>::RemoveItem(const mafID idx)
 //------------------------------------------------------------------------------
 {
   if (idx<m_Items->Vector.size())
   {
-    m_Items->Vector.erase(&m_Items->Vector[idx]);
+    m_Items->Vector.erase(m_Items->Vector.begin()+idx);
 
     return true;
   }
@@ -148,13 +148,13 @@ bool mafVector<T>::RemoveItem(mafID idx)
 
 //------------------------------------------------------------------------------
 template <class T>
-bool mafVector<T>::RemoveItem(const T &object)
+bool mafVector<T>::FindAndRemoveItem(const T &object)
 //------------------------------------------------------------------------------
 {
   mafID idx;
   if (FindItem(object,idx))
   {   
-    return RemoveItem(idx);
+    return RemoveItem(m_Items->Vector.begin()+idx);
   }
 
   return false;
@@ -224,3 +224,4 @@ mafID mafVector<T>::GetNumberOfItems()
 }
 
 #endif
+

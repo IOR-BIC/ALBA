@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSmartPointer.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-02 13:28:59 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2004-12-20 20:47:08 $
+  Version:   $Revision: 1.5 $
   Authors:   based on vtkSmartPointer (www.vtk.org), rewritten by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -75,15 +75,15 @@ public:
 
   /**
   Initialize smart pointer to given object pointer and reference the given object.*/
-  mafSmartPointer(T* r): mafAutoPointer<T>(r) {}
+  mafSmartPointer(T* r): mafAutoPointer<T>(r) {;}
   
   /**
   Initialize smart pointer with a new reference to the same object
   referenced by given smart pointer.*/
-  mafSmartPointer(const mafAutoPointer& r): mafAutoPointer(r) {}
+  mafSmartPointer(const mafAutoPointer<T>& r): mafAutoPointer<T>(r) {;}
 };
-template <class T> typedef mafAutoPointer<T> mafAuto;
-template <class T> typedef mafSmartPointer<T> mafSmart;
+//template <class T> typedef mafAutoPointer<T> mafAuto;
+//template <class T> typedef mafSmartPointer<T> mafSmart;
 
 //----------------------------------------------------------------------------
 template <class T>

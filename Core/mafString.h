@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-18 22:07:42 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2004-12-20 20:47:08 $
+  Version:   $Revision: 1.10 $
   Authors:   originally based on vtkString (www.vtk.org), rewritten Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -69,7 +69,7 @@ public:
   
   /**
     Duplicate the string stored inside this object.*/
-  char* Duplicate() { return Duplicate(m_CStr);};
+  char* Duplicate();
  
   /** 
     This static method compare two strings. It is similar to strcmp, but it
@@ -81,7 +81,7 @@ public:
     This method compare the given c-string with the one stored inside this object.
     It is similar to strcmp, but it can handle null pointers. Return 0 if str equal this,
     -1 if str > this, 1 if str < this*/
-  int Compare(const char* str) { return Compare(m_CStr, str);};
+  int Compare(const char* str);
   
   /**
     This static method compare two strings. It is similar to strcmp, but it
@@ -94,17 +94,17 @@ public:
     It is similar to strcmp, but it can handle null pointers. Also it only
     returns C style true or false versus compare which returns also which
     one is greater.*/
-  bool Equals(const char* str) { return Equals(m_CStr, str); };
+   bool Equals(const char* str);
   
   /** Static method to check if the first string starts with the second one.*/
   static bool StartsWith(const char* str1, const char* str2);
   /** Check if this string starts with the given one.*/
-  bool StartsWith(const char* str) { return StartsWith(m_CStr, str);}
+  bool StartsWith(const char* str);
 
   /** Static method to check if the first string ends with the second one.*/
   static bool EndsWith(const char* str1, const char* str2);
   /** Check if this string ends with the given one.*/
-  bool EndsWith(const char* str) { return EndsWith(m_CStr, str);}
+  bool EndsWith(const char* str);
 
   /**
     Append two strings and produce a new one.  The consumer must delete
@@ -128,7 +128,7 @@ public:
 
   /** Extract the base name of a filename string */
   static const char *BaseName(const char *filename);
-  const char *BaseName() {return BaseName(m_CStr);}
+  const char *BaseName();
 
   /** Extract the pathname from a filename string */
   void ExtractPathName();
@@ -138,28 +138,31 @@ public:
     local OS, if needed also parse the given string to substitute each (back)slash
     character with the right pathname separator.*/
   void AppendPath(const char *str);
-  void AppendPath(mafString *str)
-    { AppendPath(str->m_CStr);}
+  void AppendPath(mafString *str);
 
   /**
     parse the given string to substitute each (back)slash
     character with the right pathname separator.*/
   void SetPathName(const char *str);
-  void SetPathName(mafString *str)
-    { SetPathName(str->m_CStr);}
+  void SetPathName(mafString *str);
 
   /**
     parse the given string to substitute each (back)slash
     character with the right pathname separator.*/
-  void ParsePathName() {mafString::ParsePathName(this);}
+  char *ParsePathName();
   static char *ParsePathName(char *str);
-  static char *ParsePathName(mafString *str)
-    { return mafString::ParsePathName(str->m_CStr);}
+  char *ParsePathName(mafString *str);
 
-  //void SPrintf(const char *format,...);
-
+  /** Force the string to create an internal duplication in place of reference to const char */
+  void ForceDuplicate();
+  
   /** Return the pointer to the internal c-string */
-  char * GetCStr() {return m_CStr;};
+  const char * GetCStr() const;
+  
+  /** 
+    Return the pointer to the internal c-string, but first force string
+    the internal copy @sa ForceDulicate () */
+  char *GetNonConstCStr();
 
   /** return the real memory size allocated for the internal c-string */
   int GetSize() {return m_Size;};
@@ -178,12 +181,15 @@ public:
   /**  return true if empty*/
   static bool IsEmpty(const char *str) { return (str?str[0]=='\0':true);};
   /**  return true if empty*/
-  bool IsEmpty() { return IsEmpty(m_CStr);};
+  bool IsEmpty() { return IsEmpty(GetCStr());};
 
   /** 
     Set the internal pointer to a give pointer. Second parameter allow 
     to force the release of the memory */
   void Set(const char *a, bool release=false);
+  
+  /** this can be used only with non constant cstring */
+  void SetCStr(char *a, bool release=false);
 
   /** Format given arguments according to format string. Format string format is
       that of vsprintf function */
@@ -193,7 +199,7 @@ public:
   void NPrintf(unsigned long size, const char *format, ...);
 
   /** this allows to convert a mafString to const char *. */
-  operator const char*() const {return m_CStr;}  
+  operator const char*() const {return GetCStr();}  
 
   const bool operator==(const char *src);
   const bool operator<(const char *a);
@@ -214,9 +220,10 @@ protected:
   /** Allocate space for the internal c-string. */
   int SetSize(mafID size);
 
-  void Initialize() {m_CStr="";m_Size=0;};
+  void Initialize() {m_CStr=NULL;m_ConstCStr="";m_Size=0;};
 
   char *m_CStr;
+  const char *m_ConstCStr;
   mafID m_Size;
 };
 

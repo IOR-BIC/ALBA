@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-18 22:07:43 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2004-12-20 20:47:07 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -140,7 +140,7 @@ int mafNode::FindNodeIdx(mafNode *a)
 {
   mafID idx;
   mafAutoPointer<mafNode> tmp(a);
-  return m_Children.FindItem(a,idx)?idx:-1;
+  return m_Children.FindItem(a,idx)?(int)idx:-1;
 }
 
 //-------------------------------------------------------------------------

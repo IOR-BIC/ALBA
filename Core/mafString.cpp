@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-18 22:07:43 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2004-12-20 20:47:08 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -24,12 +24,13 @@
 mafString::~mafString()
 //----------------------------------------------------------------------------
 {
-  if (this->m_CStr)
+  if (m_CStr)
   {
     if (m_Size>0)
       delete m_CStr;
 
     m_CStr=NULL;
+    m_ConstCStr=NULL;
   }
 }
 
@@ -44,44 +45,146 @@ mafString::mafString()
 mafString::mafString(const mafString& src)
 //----------------------------------------------------------------------------
 {
-  this->Initialize();
-  this->Copy(src.m_CStr);
+  Initialize();
+  Copy(GetCStr());
 }
 //----------------------------------------------------------------------------
 mafString::mafString(const char *src)
 //----------------------------------------------------------------------------
 {
-  m_CStr = src?(char *)src:""; // don't worry it won't be overwritten!
+  m_ConstCStr = src?src:""; // don't worry it won't be overwritten!
   m_Size = 0; // just to be sure to not overwrite... 
 }
 //----------------------------------------------------------------------------
 mafString::mafString(double num)
 //----------------------------------------------------------------------------
 {
-  this->Initialize();
+  Initialize();
   char tmp[64];
   sprintf(tmp,"%.16g",num);
-  this->Copy(tmp);
+  Copy(tmp);
 }
 
+//----------------------------------------------------------------------------
+const char * mafString::GetCStr() const
+//----------------------------------------------------------------------------
+{
+  return m_Size>0?m_CStr:m_ConstCStr;
+}
+
+//----------------------------------------------------------------------------
+int mafString::SetMaxLength(mafID len)
+//----------------------------------------------------------------------------
+{
+  return (len>=m_Size)?SetSize(len+1):0;
+}
+
+//----------------------------------------------------------------------------
+int mafString::SetSize(mafID size)
+//----------------------------------------------------------------------------
+{
+  char *tmp;
+
+  if (size==0)
+  {
+    // if size set to 0 simply free the memory
+    tmp="";
+  }
+  else
+  {
+    // allocate new memory
+    tmp=new char[size];
+    *tmp='\0';
+    if (!tmp)
+    {
+      //Cannot allocate memory
+      return -1;
+    }
+
+    // copy old contents
+    if (m_CStr)
+    {
+      if (size<m_Size)
+      {
+        strncpy(tmp,m_CStr,size-1);
+      }
+      else
+      {
+        Copy(tmp,m_CStr);
+      }
+    }
+  }
+
+  // free old memory if present
+  if (m_CStr&&m_Size>0)
+  {
+    delete [] m_CStr;
+  }
+
+  // store new memory pointer and new memory size
+  if (size>0)
+  {
+    m_CStr=tmp;
+  }
+  else
+  {
+    m_ConstCStr=tmp;
+  }
+  m_Size=size;
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+void mafString::ForceDuplicate()
+//----------------------------------------------------------------------------
+{
+  if (m_CStr==NULL)
+  {
+    unsigned long len=Length();
+    SetMaxLength(m_Size>=len?m_Size:len);    
+  }
+}
+
+
+//----------------------------------------------------------------------------
+char *mafString::GetNonConstCStr()
+//----------------------------------------------------------------------------
+{
+  ForceDuplicate();
+  return m_CStr;
+}
 //----------------------------------------------------------------------------
 const mafID mafString::Length()
 //----------------------------------------------------------------------------
 {
-  return Length(this->m_CStr);
+  return Length(GetCStr());
 }
 
 //----------------------------------------------------------------------------
 void mafString::Set(const char *a, bool release)
 //----------------------------------------------------------------------------
 {
-  SetSize(0);
-  m_CStr = (char *)a;
-  m_Size = release?Length(a)+1:0;
+  if (a!=GetCStr())
+  {
+    SetSize(0); // force memory release
+    m_ConstCStr = a;
+    m_Size = release?Length(a)+1:0;
+  }
 }
 
 //----------------------------------------------------------------------------
-// Description:
+void mafString::SetCStr(char *a, bool release)
+//----------------------------------------------------------------------------
+{
+  if (a!=GetCStr())
+  {
+    SetSize(0); // force memory release
+    m_CStr = a;
+    m_Size = release?Length(a)+1:0; // notice I could have a (char *) that must not be released
+  }
+}
+//----------------------------------------------------------------------------
 // This method returns the size of string. If the string is empty,
 // it returns 0. It can handle null pointers.
 mafID mafString::Length(const char* str)
@@ -114,6 +217,41 @@ void mafString::Copy(char* dest, const char* src)
 }
 
 //----------------------------------------------------------------------------
+void mafString::Copy(const char* src)
+//----------------------------------------------------------------------------
+{
+  if (src)
+  {
+    // If the available memory is not sufficient, relocate!
+    if (Length(src)>=m_Size)
+    {
+      Duplicate(m_CStr,src,m_Size>0);
+    }
+    else
+    {
+      Copy(m_CStr,src);
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void mafString::NCopy(const char* src,int n)
+//----------------------------------------------------------------------------
+{
+  if (src)
+  {
+    SetMaxLength(n);
+    strncpy(m_CStr,src,n);
+    m_CStr[n]='\0';
+  }
+  else
+  {
+    // release memory
+    SetSize(0);
+  }
+}
+
+//----------------------------------------------------------------------------
 // Description:
 // This method makes a duplicate of the string similar to
 // C function strdup but it uses new to create new string, so
@@ -132,7 +270,37 @@ char* mafString::Duplicate(const char* str)
 }
 
 //----------------------------------------------------------------------------
-// Description:
+void mafString::Duplicate(char * &store,const char *src,bool release)
+//----------------------------------------------------------------------------
+{
+  // Avoid to relocate memory if not necessary
+  //if ( store && src && (!strcmp(store,src))) {return;}
+   
+  // release old memory
+  if (store&&release) { delete [] store; }
+
+  // allocate new memory and copy the second string's content
+  if (src)
+  { 
+    store = new char[strlen(src)+1];
+    strcpy(store,src);
+  }
+  else 
+  { 
+    // in case of NULL string reset the output string pointer...
+    store = NULL;
+  }
+}
+
+//----------------------------------------------------------------------------
+char* mafString::Duplicate()
+//---------------------------------------------------------------------------- 
+{
+  return Duplicate(m_Size>0?m_CStr:m_ConstCStr);
+}
+
+
+//----------------------------------------------------------------------------
 // This method compare two strings. It is similar to strcmp,
 // but it can handle null pointers.
 int mafString::Compare(const char* str1, const char* str2)
@@ -155,7 +323,20 @@ int mafString::Compare(const char* str1, const char* str2)
 }
 
 //----------------------------------------------------------------------------
-// Description:
+int mafString::Compare(const char* str)
+//----------------------------------------------------------------------------
+{
+  return Compare(m_Size>0?m_CStr:m_ConstCStr, str);
+}
+
+//----------------------------------------------------------------------------
+bool mafString::Equals(const char* str)
+//----------------------------------------------------------------------------
+{
+  return Equals(m_Size>0?m_CStr:m_ConstCStr, str);
+}
+
+//----------------------------------------------------------------------------
 // Check if the first string starts with the second one.
 bool mafString::StartsWith(const char* str1, const char* str2)
 //----------------------------------------------------------------------------
@@ -168,7 +349,13 @@ bool mafString::StartsWith(const char* str1, const char* str2)
 }
 
 //----------------------------------------------------------------------------
-// Description:
+bool mafString::StartsWith(const char* str)
+//----------------------------------------------------------------------------
+{ 
+  return StartsWith(m_Size>0?m_CStr:m_ConstCStr, str);
+}
+
+//----------------------------------------------------------------------------
 // Check if the first string starts with the second one.
 bool mafString::EndsWith(const char* str1, const char* str2)
 //----------------------------------------------------------------------------
@@ -178,6 +365,20 @@ bool mafString::EndsWith(const char* str1, const char* str2)
     return false;
   }
   return !strncmp(str1 + (strlen(str1)-strlen(str2)), str2, strlen(str2));
+}
+
+//----------------------------------------------------------------------------
+bool mafString::EndsWith(const char* str)
+//----------------------------------------------------------------------------
+{
+  return EndsWith(m_Size>0?m_CStr:m_ConstCStr, str);
+}
+
+//----------------------------------------------------------------------------
+const char *mafString::BaseName()
+//----------------------------------------------------------------------------
+{
+  return BaseName(m_Size>0?m_CStr:m_ConstCStr);
 }
 
 //----------------------------------------------------------------------------
@@ -208,120 +409,12 @@ char* mafString::Append(const char* str1, const char* str2)
 
   return newstr;
 }
-//----------------------------------------------------------------------------
-void mafString::Duplicate(char * &store,const char *src,bool release)
-//----------------------------------------------------------------------------
-{
-  // Avoid to relocate memory if not necessary
-  //if ( store && src && (!strcmp(store,src))) {return;}
-   
-  // release old memory
-  if (store&&release) { delete [] store; }
 
-  // allocate new memory and copy the second string's content
-  if (src)
-  { 
-    store = new char[strlen(src)+1];
-    strcpy(store,src);
-  }
-  else 
-  { 
-    // in case of NULL string reset the output string pointer...
-    store = NULL;
-  }
-} 
-
-  
 //----------------------------------------------------------------------------
-void mafString::Copy(const char* src)
+void mafString::AppendPath(mafString *str)
 //----------------------------------------------------------------------------
 {
-  if (src)
-  {
-    // If the available memory is not sufficient, relocate!
-    if (Length(src)>=this->m_Size)
-    {
-      this->Duplicate(this->m_CStr,src,m_Size>0);
-    }
-    else
-    {
-      Copy(this->m_CStr,src);
-    }
-  }
-}
-
-//----------------------------------------------------------------------------
-void mafString::NCopy(const char* src,int n)
-//----------------------------------------------------------------------------
-{
-  if (src)
-  {
-    this->SetMaxLength(n);
-    strncpy(this->m_CStr,src,n);
-    this->m_CStr[n]='\0';
-  }
-  else
-  {
-    // release memory
-    this->SetSize(0);
-  }
-}
-
-//----------------------------------------------------------------------------
-int mafString::SetMaxLength(mafID len)
-//----------------------------------------------------------------------------
-{
-  return (len>=m_Size)?SetSize(len+1):0;
-}
-
-
-//----------------------------------------------------------------------------
-int mafString::SetSize(mafID size)
-//----------------------------------------------------------------------------
-{
-  char *tmp;
-
-  if (size==0)
-  {
-    // if size set to 0 simply free the memory
-    tmp="";
-  }
-  else
-  {
-    // allocate new memory
-    tmp=new char[size];
-    *tmp='\0';
-    if (!tmp)
-    {
-      //Cannot allocate memory
-      return -1;
-    }
-
-    // copy old contents
-    if (this->m_CStr)
-    {
-      if (size<this->m_Size)
-      {
-        strncpy(tmp,this->m_CStr,size-1);
-      }
-      else
-      {
-        Copy(tmp,this->m_CStr);
-      }
-    }
-  }
-
-  // free old memory if present
-  if (this->m_CStr&&m_Size>0)
-  {
-    delete [] this->m_CStr;
-  }
-
-  // store new memory pointer and new memory size
-  m_CStr=tmp;
-  m_Size=size;
-
-  return 0;
+  AppendPath(str->m_Size>0?m_CStr:m_ConstCStr);
 }
 
 //----------------------------------------------------------------------------
@@ -333,7 +426,7 @@ mafString &mafString::Append(const char* str)
     return *this;
   }
 
-  unsigned long newsize = Length(m_CStr) + Length(str)+1;
+  unsigned long newsize = Length(GetCStr()) + Length(str)+1;
 
   if (SetMaxLength(newsize))
   {
@@ -357,7 +450,7 @@ int mafString::FindFirst(const char *str)
 
   for (int i=0;i<=len-len2;i++)
   {
-    if (strncmp(&m_CStr[i],str,len2)==0)
+    if (strncmp(&(GetCStr()[i]),str,len2)==0)
       return i;
   }
   return -1;
@@ -367,12 +460,12 @@ int mafString::FindFirst(const char *str)
 int mafString::FindLast(const char *str)
 //----------------------------------------------------------------------------
 {
-  int len=this->Length();
+  int len=Length();
   int len2=Length(str);
 
   for (int i=0;i<=len-len2;i++)
   {
-    if (strncmp(&m_CStr[len-len2-i-1],str,len2)==0)
+    if (strncmp(&(GetCStr()[len-len2-i-1]),str,len2)==0)
       return len-len2-i-1;
   }
   return -1;  
@@ -382,9 +475,8 @@ int mafString::FindLast(const char *str)
 void mafString::Erase(int start,int end)
 //----------------------------------------------------------------------------
 {
-  int len=this->Length();
-  SetMaxLength(len); // force relocating memory in case of m_Size>0
-
+  ForceDuplicate(); // force allocating memory in case of m_Size=0
+  int len=Length();
   if (end==-1||end>=len)
     end=len-1;
 
@@ -392,7 +484,7 @@ void mafString::Erase(int start,int end)
     return;
 
   // copy shift back the tail
-  strcpy(&this->m_CStr[start],&this->m_CStr[end+1]);
+  strcpy(&m_CStr[start],&m_CStr[end+1]);
 
 }
 
@@ -401,9 +493,7 @@ char *mafString::ParsePathName(char *str)
 //----------------------------------------------------------------------------
 {
   if (mafString::IsEmpty(str))
-  {
     return str;
-  }
 
   // parse the appended string to substitute "/" and "\\" with the right one.
   for (unsigned int i=0;i<Length(str);i++)
@@ -421,17 +511,37 @@ char *mafString::ParsePathName(char *str)
 }
 
 //----------------------------------------------------------------------------
+char *mafString::ParsePathName(mafString *str)
+//----------------------------------------------------------------------------
+{
+  str->ForceDuplicate();
+  return ParsePathName(str->m_CStr);
+}
+
+//----------------------------------------------------------------------------
+char *mafString::ParsePathName()
+//----------------------------------------------------------------------------
+{
+  return mafString::ParsePathName(this);
+}
+
+//----------------------------------------------------------------------------
 void mafString::SetPathName(const char *str)
 //----------------------------------------------------------------------------
 {
   if (mafString::IsEmpty(str))
-  {
     return;
-  }
 
-  this->Set(str);
+  Copy(str);
 
-  mafString::ParsePathName(this->m_CStr);
+  ParsePathName(m_CStr);
+}
+
+//----------------------------------------------------------------------------
+void mafString::SetPathName(mafString *str)
+//----------------------------------------------------------------------------
+{
+  SetPathName(str->GetCStr());
 }
 
 //----------------------------------------------------------------------------
@@ -439,29 +549,27 @@ void mafString::AppendPath(const char *str)
 //----------------------------------------------------------------------------
 {
   if (mafString::IsEmpty(str))
-  {
     return;
-  }
 
 #ifdef _WIN32
-  if (!this->IsEmpty()&&!this->EndsWith("\\"))
+  if (!IsEmpty()&&!EndsWith("\\"))
   {
-    this->Append("\\");
+    Append("\\");
   }
   
-  this->Append(str);
+  Append(str);
 
 #else
-  if (!this->IsEmpty()&&!this->EndsWith("/"))
+  if (!IsEmpty()&&!EndsWith("/"))
   {
-    this->Append("/");
+    Append("/");
   }
 
-  this->Append(str);
+  Append(str);
 
 #endif
 
-  mafString::ParsePathName(this->m_CStr);
+  mafString::ParsePathName(m_CStr);
 }
 
 //----------------------------------------------------------------------------
@@ -484,18 +592,18 @@ void mafString::ExtractPathName()
 //----------------------------------------------------------------------------
 {
 #ifdef _WIN32
-  int idx=this->FindLastChr('\\');
+  int idx=FindLastChr('\\');
 #else
-  int idx=this->FindLastChr('/');
+  int idx=FindLastChr('/');
 #endif
 
   if (idx>=0)
   { 
-    this->Erase(idx+1,-1);
+    Erase(idx+1,-1);
   }
   else
   {
-    this->Set("");
+    Set("");
   }
 }
 
@@ -503,7 +611,7 @@ void mafString::ExtractPathName()
 const bool mafString::operator==(const char *src)
 //----------------------------------------------------------------------------
 {
-  return Equals(this->m_CStr,src);
+  return Equals(GetCStr(),src);
 }
 
 //----------------------------------------------------------------------------
@@ -534,13 +642,13 @@ const bool mafString::operator>=(const char *a)
 int mafString::FindChr(const int c)
 //----------------------------------------------------------------------------
 {
-  return (this->IsEmpty()?-1:(strchr(this->m_CStr,c)-this->m_CStr));
+  return (IsEmpty()?-1:(strchr(GetCStr(),c)-GetCStr())); // difference between pointers
 }
 //----------------------------------------------------------------------------
 int mafString::FindLastChr(const int c)
 //----------------------------------------------------------------------------
 {
-  return (this->IsEmpty()?-1:(strrchr(this->m_CStr,c)-this->m_CStr));
+  return (IsEmpty()?-1:(strrchr(GetCStr(),c)-GetCStr()));
 }
 
 //----------------------------------------------------------------------------
@@ -561,3 +669,4 @@ void mafString::NPrintf(unsigned long size, const char *format, ...)
   SetSize(size); // Pre-allocate space.
   MAF_PRINT_MACRO(format,m_CStr,size);
 }
+

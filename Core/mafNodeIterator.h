@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeIterator.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-04 09:28:39 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2004-12-20 20:47:08 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -101,43 +101,34 @@ public:
   enum events_ID {ID_PreTraversal=0,ID_PostTraversal,ID_Deeper, ID_Upper, ID_FirstNode, ID_LastNode, ID_Done};
 protected:
 
-  /**
-  Find the left most leaf of the tree*/
+  /** Find the left most leaf of the tree*/
   mafNode *FindLeftMostLeaf(mafNode *node);
 
-  /**
-  Find the right most leaf of the tree*/
+  /** Find the right most leaf of the tree*/
   mafNode *FindRightMostLeaf(mafNode *node);
 
   mafEventSource &GetEventSource() {return m_EventSource;}
 
-  /**
-    Callback function. By default send an event through the m_EventSource source. */
-  virtual PreExecute(); 
+  /** Callback function. By default send an event through the m_EventSource source. */
+  virtual void PreExecute(); 
 
-  /**
-    Callback function. By default send an event through the m_EventSource source. */
-  virtual PostExecute();  
+  /** Callback function. By default send an event through the m_EventSource source. */
+  virtual void PostExecute();  
 
-  /**
-    Callback function. By default send an event through the m_EventSource source. */
-  virtual DeeperExecute(mafNode *); 
+  /** Callback function. By default send an event through the m_EventSource source. */
+  virtual void DeeperExecute(mafNode *); 
 
-  /**
-    Callback function. By default send an event through the m_EventSource source. */
-  virtual UpperExecute(mafNode *);  
+  /** Callback function. By default send an event through the m_EventSource source. */
+  virtual void UpperExecute(mafNode *);  
 
-  /**
-    Callback function. By default send an event through the m_EventSource source. */
-  virtual FirstExecute(); 
+  /** Callback function. By default send an event through the m_EventSource source. */
+  virtual void FirstExecute(); 
 
-  /**
-    Callback function. By default send an event through the m_EventSource source. */
-  virtual LastExecute();  
+  /** Callback function. By default send an event through the m_EventSource source. */
+  virtual void LastExecute();  
 
-  /**
-    Callback function. By default send an event through the m_EventSource source. */
-  virtual DoneExecute();  
+  /** Callback function. By default send an event through the m_EventSource source. */
+  virtual void DoneExecute();  
 
   mafNodeIterator(mafNode *root=NULL);
   virtual ~mafNodeIterator();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeIterator.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-18 22:07:43 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2004-12-20 20:47:07 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -493,49 +493,49 @@ void mafNodeIterator::SetRootNode(mafNode *root)
 
 //----------------------------------------------------------------------------
 // executed before traversing a node
-mafNodeIterator::PreExecute()
+void mafNodeIterator::PreExecute()
 //----------------------------------------------------------------------------
 {
   m_EventSource.InvokeEvent(this,ID_PreTraversal,m_CurrentNode);
 }
 //----------------------------------------------------------------------------
 // executed after traversing a node
-mafNodeIterator::PostExecute()
+void mafNodeIterator::PostExecute()
 //----------------------------------------------------------------------------
 {
   m_EventSource.InvokeEvent(this,ID_PostTraversal,m_CurrentNode);
 }
 //----------------------------------------------------------------------------
 // executed when going down in the tree
-mafNodeIterator::DeeperExecute(mafNode *node)
+void mafNodeIterator::DeeperExecute(mafNode *node)
 //----------------------------------------------------------------------------
 {
   m_EventSource.InvokeEvent(this,ID_Deeper,m_CurrentNode);
 }
 //----------------------------------------------------------------------------
 // executed when going up in the tree
-mafNodeIterator::UpperExecute(mafNode *node)
+void mafNodeIterator::UpperExecute(mafNode *node)
 //----------------------------------------------------------------------------
 {
   m_EventSource.InvokeEvent(this,ID_Upper,m_CurrentNode);
 }
 //----------------------------------------------------------------------------
 // executed when GoToFirstNode is executed
-mafNodeIterator::FirstExecute()
+void mafNodeIterator::FirstExecute()
 //----------------------------------------------------------------------------
 {
   m_EventSource.InvokeEvent(this,ID_FirstNode,m_CurrentNode);
 }
 //----------------------------------------------------------------------------
 // executed when last node is traversed
-mafNodeIterator::LastExecute()
+void mafNodeIterator::LastExecute()
 //----------------------------------------------------------------------------
 {
   m_EventSource.InvokeEvent(this,ID_LastNode,m_CurrentNode);
 }
 //----------------------------------------------------------------------------
 // executed when IsDoneWithTraversal return "true"
-mafNodeIterator::DoneExecute()
+void mafNodeIterator::DoneExecute()
 //----------------------------------------------------------------------------
 {
   m_EventSource.InvokeEvent(this,ID_Done,m_CurrentNode);

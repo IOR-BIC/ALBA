@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVector.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-18 22:07:42 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2004-12-20 20:47:08 $
+  Version:   $Revision: 1.4 $
   Authors:   based on vtkObjectBase (www.vtk.org), adapted Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -57,7 +57,7 @@ public:
    Remove an object from the list. If object is not found,
    the list is unaffected and return false. See warning in
    description of RemoveItem(int). */
-  bool RemoveItem(const T &object);
+  bool FindAndRemoveItem(const T &object);
 
   /**
    Remove all objects from the list. */
