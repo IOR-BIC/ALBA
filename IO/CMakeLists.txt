@@ -10,6 +10,8 @@ DBG_MESSAGE("Configuring project mafIO")
 SET(PROJECT_SRCS
   mafStorable.h
   mafStorable.cpp
+  mafStorage.cpp
+  mafStorage.h
   mafStorageDocument.cpp
   mafStorageDocument.h
   mafStorageElement.cpp
@@ -18,14 +20,9 @@ SET(PROJECT_SRCS
   mafStorageReader.h
   mafStorageWriter.cpp
   mafStorageWriter.h
-  mafXMLElement.cpp
-  mafXMLElement.h
-  mafXMLReader.cpp
-  mafXMLReader.h
-  mafXMLWriter.cpp
-  mafXMLWriter.h
 )
 
+# IO classes for VTK related objects
 IF (MAF_USE_VTK)
   #SET(PROJECT_SRCS
   #${PROJECT_SRCS}
@@ -35,7 +32,21 @@ ENDIF (MAF_USE_VTK)
 # List libraries that are needed by this project.
 SET(PROJECT_LIBS "mafCore" )
 
+# IO classes for XML related objects
 IF (MAF_USE_XercesC)
+  SET(PROJECT_SRCS
+    ${PROJECT_SRCS}
+    mafXMLElement.cpp
+    mafXMLElement.h
+    mafXMLStorage.cpp
+    mafXMLStorage.h
+    mafXMLString.cpp
+    mafXMLString.h
+#   mafXMLReader.cpp
+#   mafXMLReader.h
+#   mafXMLWriter.cpp
+#   mafXMLWriter.h
+  )
   SET(PROJECT_LIBS ${PROJECT_LIBS} XercesC)
 ENDIF (MAF_USE_XercesC)
 

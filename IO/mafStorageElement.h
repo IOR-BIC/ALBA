@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-24 15:11:09 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-12-27 18:22:25 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -20,7 +20,7 @@
 class mafStorage;
 class mafMatrix;
 class mafString;
-
+template <class T> class mafVector;
 
 /** Abstract class representing the interface for the unit of information stored in the storage.
   This object represent the interface of the unit of information stored into a storage. A number of utility
@@ -33,8 +33,19 @@ class mafString;
 class mafStorageElement
 {
 public:
-  mafStorageElement(mafStorage *storage);
   virtual ~mafStorageElement();
+
+  /** set the name of this element */
+  virtual void SetName(const char *name)=0;
+
+  /** get the name of this element */
+  virtual const char *GetName()=0;
+
+  /** Store a float number into an XML document */
+  virtual void StoreDouble(const double &value,const char *name="Double")=0;
+
+  /** Store a integer number into an XML document */
+  virtual void StoreInteger(const int &value,const char *name="Integer")=0;
 
   /** Store a generic text into an XML document */
   virtual void StoreText(const const char *text,const char *name="Text")=0;
@@ -66,17 +77,30 @@ public:
   /** Restore an integer number from an XML document */
   virtual int RestoreInteger(int &value,const char *name="Integer")=0;
 
-  /** return a pointer to the storage which created this element */
-  mafStorage *GetStorage();
-
   /** resolve an URL and provide local filename to be used as input */
   //bool ResolveInputURL(const mafString &url, mafString &filename)=0;
 
   /** resolve an URL and provide a local filename to be used as output */
   //bool ResolveOutputURL(const mafString &url, mafString &filename)=0;
 
+  /** return a pointer to the storage who created this element */
+  mafStorage *GetStorage() {return m_Storage;}
+
+  /** return a pointer to the parent element, i.e. the element upper in the hierarchy */
+  mafStorageElement *GetParent() {return m_Parent;}
+
+  /** Create a new child element and return its pointer */
+  virtual mafStorageElement *AddChild(const char *name) = 0;
+
 protected:
+  /** elements can be created only through AddChild() */
+  mafStorageElement(mafStorageElement *parent,mafStorage *storage);
+
+  void SetStorage(mafStorage *storage) {m_Storage = storage;}
+  void SetParent(mafStorageElement *element) {m_Parent = element;}
   
-  mafStorage *m_Storage;
+  mafStorage *m_Storage; ///< storage who created this element
+  mafStorageElement *m_Parent; ///< the parent element in the hierarchy
+  mafVector<mafStorageElement> *m_Children;
 };
 #endif // _mafStorageElement_h_

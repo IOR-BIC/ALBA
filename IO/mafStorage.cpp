@@ -1,30 +1,32 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mafStorable.cpp,v $
+  Module:    $RCSfile: mafStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-27 18:22:25 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-12-27 18:22:26 $
+  Version:   $Revision: 1.1 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#include "mafStorable.h"
-#include "mafStorageElement.h"
-#include <assert.h>
-#include "stdio.h"
+#include "mafStorage.h"
 
 //------------------------------------------------------------------------------
-void mafStorable::Store(mafStorageElement *parent)
+mafStorage::mafStorage()
 //------------------------------------------------------------------------------
 {
-  InternalStore(parent);
 }
 
 //------------------------------------------------------------------------------
-int mafStorable::Restore(mafStorageElement *node)
+void mafStorage::Store(const char *root_tag)
 //------------------------------------------------------------------------------
 {
-  return InternalRestore(node);
+  InternalStore(root_tag);
+}
+//------------------------------------------------------------------------------
+int mafStorage::Restore(const char *root_tag)
+//------------------------------------------------------------------------------
+{
+  return InternalRestore(root_tag);
 }
