@@ -8,57 +8,57 @@ DBG_MESSAGE("Configuring project mafCore")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-  mafAttribute.cpp
-  mafAttribute.h
   mafAbsMatrixPipe.cpp
   mafAbsMatrixPipe.h
+  mafAttribute.cpp
+  mafAttribute.h
   mafCoreFactory.cpp
   mafCoreFactory.h
-#  mafVMEItem.h
-#  mafVMEItem.cpp
-#  mafDataPipe.cpp
-#  mafDataPipe.h
-#  mafDataVector.txx
-#  mafDataVector.h
   mafDecl.cpp
   mafDecl.h
+  mafEvent.cpp
+  mafEvent.h
   mafEventBase.cpp
   mafEventBase.h
   mafEventSender.h
   mafEventSource.cpp
   mafEventSource.h
-#  mafMatrixPipe.cpp
-#  mafMatrixPipe.h
-#  mafMatrixVector.cpp
-#  mafMatrixVector.h
   mafNode.cpp
   mafNode.h
-  mafNodeRoot.h
-  mafNodeRoot.cpp
   mafNodeIterator.cpp
   mafNodeIterator.h
+  mafNodeRoot.cpp
+  mafNodeRoot.h
   mafObserver.cpp
   mafObserver.h
   mafObserverCallback.cpp
   mafObserverCallback.h
-#  mafTimeMap.h
-#  mafTimeMap.txx
-#  mafVME.cpp
-#  mafVME.h
-#  mafVMERoot.cpp
-#  mafVMERoot.h
-#  mafVMEGeneric.h
-#  mafVMEGeneric.cpp
-#  mafVMEOutput.cpp
-#  mafVMEOutput.h
   mafTagArray.cpp
   mafTagArray.h
   mmuTagItem.cpp
   mmuTagItem.h
   mmuTimeSet.cpp
   mmuTimeSet.h
-  mafEvent.cpp
-  mafEvent.h
+#  mafDataPipe.cpp
+#  mafDataPipe.h
+#  mafDataVector.h
+#  mafDataVector.txx
+#  mafMatrixPipe.cpp
+#  mafMatrixPipe.h
+#  mafMatrixVector.cpp
+#  mafMatrixVector.h
+#  mafTimeMap.h
+#  mafTimeMap.txx
+#  mafVME.cpp
+#  mafVME.h
+#  mafVMEGeneric.cpp
+#  mafVMEGeneric.h
+#  mafVMEItem.cpp
+#  mafVMEItem.h
+#  mafVMEOutput.cpp
+#  mafVMEOutput.h
+#  mafVMERoot.cpp
+#  mafVMERoot.h
 )
 
 IF (MAF_USE_VTK)
