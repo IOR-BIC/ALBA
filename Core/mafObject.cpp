@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObject.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-10-29 11:25:36 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-11-02 15:01:02 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -35,7 +35,7 @@ class mafObjectDictionaryType
 std::map<std::string,mafID> * mafObjectDictionaryType::TypeIDs=NULL;
 mafObjectDictionaryType mafObject::TypesDictionary;
 mafID mafObject::TypeIdCounter = 0; // This is for allocating unique Object IDs.
-//mafCxxTypeMacro(mafObject) 
+
 mafID mafObject::TypeId = GetNextTypeId("mafObject");
 //------------------------------------------------------------------------------
 mafObject::mafObject()
