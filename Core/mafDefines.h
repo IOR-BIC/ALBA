@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2004-10-29 17:50:17 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2004-11-04 12:18:52 $
+  Version:   $Revision: 1.5 $
 
 =========================================================================*/
 // .NAME standard macros and constants for the MFL libray
@@ -17,6 +17,7 @@
 #define __mafDefines_h
 
 #include "Core/Configure.h"
+#include "string.h"
 
 typedef double mafTimeStamp;
 

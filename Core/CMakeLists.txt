@@ -12,6 +12,16 @@ SET(mafCore_SRCS
   mafString.h
   mafObject.cpp
   mafObject.h
+  mafEventSource.h
+  mafEventSource.cpp
+  mafObserver.h
+  mafObserver.cpp
+  mafObserverCallback.h
+  mafObserverCallback.cpp
+  mafEventBase.h
+  mafEventBase.cpp
+#  mafEvent.h
+#  mafEvent.cpp
 )
 
 # List the kits from VTK that are needed by this project.
