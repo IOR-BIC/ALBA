@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:33:16 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-03-10 12:07:12 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -49,6 +49,10 @@ mafMatrix &mafMatrix::operator=(const mafMatrix &mat)
 {
 #ifdef MAF_USE_VTK
   m_VTKMatrix->DeepCopy(mat.m_VTKMatrix);
+#else
+  for (int i=0;i<4;i++)
+    for (int j=0;j<4;j++)
+      m_Elements[i][j]=mat.m_Elements[i][j];
 #endif  
 
   m_TimeStamp=mat.m_TimeStamp;
@@ -75,7 +79,8 @@ bool mafMatrix::operator==(const mafMatrix& mat) const
     {
       mafMatrixElements myelements = GetElements();
       mafMatrixElements otherelements = mat.GetElements();
-      if (fabs(myelements[i][j]-otherelements[i][j])>1.0e-17)
+      double diff=fabs(myelements[i][j]-otherelements[i][j]);
+      if (diff>1.0e-17f)
         return false;
     }
   }
@@ -83,6 +88,16 @@ bool mafMatrix::operator==(const mafMatrix& mat) const
 }
 
 #ifdef MAF_USE_VTK
+//------------------------------------------------------------------------------
+mafMatrix::mafMatrix(vtkMatrix4x4 *mat)
+//------------------------------------------------------------------------------
+{
+  m_VTKMatrix=NULL;
+  m_TimeStamp=0;
+  SetVTKMatrix(mat);
+
+}
+
 //------------------------------------------------------------------------------
 //mafMatrix::mafMatrix(vtkMatrix4x4* mat, mafTimeStamp t)
 void mafMatrix::SetVTKMatrix(vtkMatrix4x4 *mat,mafTimeStamp t)
@@ -98,6 +113,7 @@ void mafMatrix::SetVTKMatrix(vtkMatrix4x4 *mat,mafTimeStamp t)
     if (old_mat)
       vtkDEL(old_mat);
     m_TimeStamp=t;
+    Modified();
   }
   else
   {
@@ -113,6 +129,7 @@ void mafMatrix::DeepCopy(vtkMatrix4x4 *mat)
   if (mat)
   {
     m_VTKMatrix->DeepCopy(mat);
+    Modified();
   }
   else
   {
@@ -138,7 +155,7 @@ bool mafMatrix::operator==(vtkMatrix4x4 *mat) const
 #endif
 
 //------------------------------------------------------------------------------
-unsigned long mafMatrix::GetMTime()
+unsigned long mafMatrix::GetMTime() const
 //------------------------------------------------------------------------------
 {
 #ifdef MAF_USE_VTK
@@ -218,7 +235,6 @@ void mafMatrix::CopyRotation(const mafMatrix &source, mafMatrix &target)
 		  target.SetElement(i,j, source.GetElement(i,j));
 		}
 	}
-
 }
 
 //----------------------------------------------------------------------------
