@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-11 09:12:41 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-11-17 20:15:02 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -151,6 +151,26 @@ typedef unsigned long mafID;
   std::cerr << "Test failed at line " \
   << __LINE__ << " : " << #a << std::endl; \
   return MAF_ERROR; \
+}
+
+/** 
+  Macro for Print Warning messages in log area. To use this you must
+  include <sstream> header file */
+#define mafWarningMacro(x) \
+{ std::stringstream msg; \
+  msg << "Warning in: " __FILE__ ", line " << __LINE__ << "\n" x \
+    << "\n"; \
+    mafLogMessage(msg.str().c_str());\
+}
+
+/** 
+  Macro for Print Error messages in log area. To use this you must
+  include <sstream> header file */
+#define mafErrorMacro(x) \
+{ std::stringstream msg; \
+  msg << "Error in: " __FILE__ ", line " << __LINE__ << "\n" x \
+    << "\n"; \
+    mafLogMessage(msg.str().c_str());\
 }
 
 #endif
