@@ -1,36 +1,42 @@
 /*=========================================================================
-
-  Program:   Visualization Toolkit
+  Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-08 17:32:34 $
-  Version:   $Revision: 1.7 $
-
+  Date:      $Date: 2004-11-08 19:59:56 $
+  Version:   $Revision: 1.8 $
+  Authors:   Marco Petrone
+==========================================================================
+  Copyright (c) 2002/2004 
+  CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-// .NAME standard macros and constants for the MFL libray
-// .SECTION Description
-// This file include all the standard macros and constants used inside the MFL
-// library.
-// .SECTION ToDO
-// - Make a test for the VME object factory 
+
+/** Standard macros and constants for the MAF library.
+  This file include all the standard macros and constants used inside the MAF
+  library.
+*/
+
 #ifndef __mafDefines_h
 #define __mafDefines_h
 
 #include "Configure.h"
 #include "string.h"
 
+//------------------------------------------------------------------------------
+// Typedefs
+//------------------------------------------------------------------------------
 typedef double mafTimeStamp;
 
-#define MAF_OK                 0
-#define MAF_ERROR              1
-
+//------------------------------------------------------------------------------
+// Constants
+//------------------------------------------------------------------------------
+enum {MAF_OK=0, MAF_ERROR=1};
 enum {ID_NO_EVENT=0};
 
 //------------------------------------------------------------------------------
 // Macros
 //------------------------------------------------------------------------------
 
-/** this is the type used for IDs inside the MAF 
+/** this is the type used for IDs inside the MAF
     @todo: to be changed to support 64bit IDs */
 typedef unsigned long mafID;
 
@@ -111,6 +117,15 @@ typedef unsigned long mafID;
     return thisClass::SafeDownCast(NewInternalInstance()); \
   }
 
+
+/** Macro used to define Set/GetListener() member functions and a Listener member variable */
+#define mafSetGetListenerMacro \
+  public: \
+  void SetListener(mafObserver *observer) { Listener=observer;} \
+  mafObserver *GetListener() { return Listener;}
+  
+/** mafEventMacro is an handy shortcut to send an Event. */
+#define mafEventMacro(e)  (Listener) ? Listener->OnEvent(e) : 0
   
 /** Helper macro used for testing */  
 #define MAF_TEST(a) if (!(a)) \

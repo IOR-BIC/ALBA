@@ -9,6 +9,11 @@
 # pragma warning ( disable : 4275 )
 #endif
 
+#if defined(_MSC_VER)
+# pragma warning ( disable : 4786 )
+#endif
+
+
 #if defined(_WIN32) && defined(MAF_SHARED)
 # if defined(MAF_EXPORTS)
 #  define MAF_EXPORT __declspec( dllexport ) 

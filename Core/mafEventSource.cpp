@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventSource.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-08 17:32:34 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-11-08 19:59:56 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -115,7 +115,7 @@ void mafEventSource::InvokeEvent(mafEventBase *e)
   {
     // rise an event to observers
     mafObserver *observer=(*it).second;
-    observer->ProcessEvent(e);
+    observer->OnEvent(e);
   }
 }
 

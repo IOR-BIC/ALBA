@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGObserver.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-05 18:35:54 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-11-08 19:59:56 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -29,7 +29,7 @@ mafGObserver::~mafGObserver()
 }
 
 //------------------------------------------------------------------------------
-void mafGObserver::ProcessEvent(mafEventBase *e)
+OnEvent mafGObserver::ProcessEvent(mafEventBase *e)
 //------------------------------------------------------------------------------
 {
 }

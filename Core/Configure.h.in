@@ -9,7 +9,6 @@
 
 #if defined(_MSC_VER) && defined(@PROJECT_NAME@_SHARED)
 # pragma warning ( disable : 4275 )
-# pragma warning ( disable : 4786 )
 #endif
 
 #if defined(_WIN32) && defined(@PROJECT_NAME@_SHARED)

@@ -10,18 +10,26 @@ class mafSubjectTestClass:public mafObject
 {
 public:
   mafTypeMacro(mafSubjectTestClass,mafObject);
-  mafSubjectTestClass():Listeners(this) {}
-  mafEventSource *GetListeners() {return Listeners;} 
+  mafSubjectTestClass():EventDummy(this),EventFoo(this) {}
+  mafEventSource &GetEventDummy() {return EventDummy;} 
+  mafEventSource &GetEventFoo() {return EventFoo;} 
 
-  void DoSomeThing() {Listeners->InvokeEvent(this,);
+  enum my_ids {ID_MY_OWN=ID_NO_EVENT+1, ID_DUMMY, ID_FOO};
+
+  void DoSomeThing() {EventDummy.InvokeEvent(this);}
   void DoSomeThingElse();
   //void Print(ostream &out) {out<<"Dummy";}
 protected:
-  mafEventSource Listeners;
+  mafEventSource EventDummy;
+  mafEventSource EventFoo;
 };
+
+mafCxxTypeMacro(mafSubjectTestClass);
 
 int main()
 {
-  
+  mafSubjectTestClass first_subject;
+  mafSubjectTestClass second_subject;
+
   return 0;
 }
