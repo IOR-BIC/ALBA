@@ -1,7 +1,7 @@
 #include "mmaTagArray.h"
 #include "mafCoreDecl.h"
 #include "mafString.h"
-
+#include "mafXMLStorage.h"
 #include <iostream>
 
 //----------------------------------------------------------------------------
@@ -111,6 +111,28 @@ int main()
 	  std::cerr << (*v_iterator)->GetName() << "\n";
     MAF_TEST((*v_iterator)->GetType()==MAF_NUMERIC_TAG);
   }
+
+  // test TagArray storing/restoring...
+  mafXMLStorage storage;
+  storage.SetURL("testTagArray.xml");
+  storage.SetFileType("TagArrayXML");
+  
+  storage.SetRoot(&test_tag_array);
+  int ret=storage.Store();
+  
+  MAF_TEST(ret==MAF_OK);
+
+  mafXMLStorage restore;
+  restore.SetURL("testfile.xml");
+  restore.SetFileType("TagArrayXML");
+  
+  mmaTagArray new_tag_array;
+  restore.SetRoot(&new_tag_array);
+  ret=restore.Restore();
+
+  MAF_TEST(ret==MAF_OK);
+
+  MAF_TEST(new_tag_array==test_tag_array);
 
   std::cout<<"Test completed successfully!"<<std::endl;
   
