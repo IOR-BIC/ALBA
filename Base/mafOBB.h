@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOBB.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-28 15:26:09 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-03-11 10:11:16 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -16,6 +16,7 @@
 #include "mafDefines.h"
 #include "mafMTime.h"
 #include "mafMatrix.h"
+#include "mafTimeStamped.h"
 
 //----------------------------------------------------------------------------
 // forward declarations
@@ -26,9 +27,9 @@
   This class stores a Box Boundary (i.e. array of 6 double), plus a Modified
   timestamp of the boundary to be used when re-computing.
   @todo
-  - a Test program
+  - a Test program 
 */
-class MAF_EXPORT mafOBB : public mafBase
+class MAF_EXPORT mafOBB : public mafBase, public mafTimeStamped
 {
 public:
   mafOBB();
@@ -36,9 +37,6 @@ public:
   ~mafOBB();
 
   static mafOBB *New() {return new mafOBB;}
-
-  unsigned long int GetMTime() {return m_MTime.GetMTime();}
-  void Modified() {m_MTime.Modified();}
 
   /**
     Return 1 if the two bounds are equivalent. Use the float overload to compare with
@@ -131,10 +129,15 @@ public:
 
   /** return the Z dimension */
   double GetDepth();
-  
-  mafMatrix m_Matrix;
-  double    m_Bounds[6];
-  mafMTime  m_MTime;
+
+  /** dump the bounding box */
+  virtual void Print(std::ostream& os, const int tabs);
+
+  // memeber varialbles are left public to simplify access
+
+  mafMatrix m_Matrix; ///< the pose matrix of the OBB
+  double    m_Bounds[6]; ///< the bounding box
+  mafMTime  m_MTime; ///< a modification time
 
 };
 

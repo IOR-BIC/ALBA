@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOBB.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:10:25 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-03-11 10:11:16 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -11,6 +11,7 @@
 =========================================================================*/
 #include "mafOBB.h"
 #include "mafMatrix.h"
+#include "mafIndent.h"
 
 //-------------------------------------------------------------------------
 mafOBB::mafOBB()
@@ -392,3 +393,13 @@ double mafOBB::GetDepth()
   return dims[2];
 }
 
+//-------------------------------------------------------------------------
+void mafOBB::Print(std::ostream& os, const int tabs)
+//-------------------------------------------------------------------------
+{
+  mafIndent indent;
+  os << indent << "Bounds: ["<<m_Bounds[0]<<","<<m_Bounds[1]<<","<<m_Bounds[2]<<"," \
+    <<m_Bounds[3]<<","<<m_Bounds[4]<<","<<m_Bounds[5]<<"]\n";
+  os << indent << "Matrix: \n";
+  m_Matrix.Print(os,indent.GetNextIndent()); 
+}
