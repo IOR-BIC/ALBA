@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-02 00:31:18 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-03-10 12:32:13 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,11 +15,10 @@
 #include "mafReferenceCounted.h"
 #include "mafStorable.h"
 #include "mafSmartPointer.h"
-#include "mafEventSource.h"
 #include "mafObserver.h"
 #include "mmuTagItem.h"
 #include "mafString.h"
-#include "mafMTime.h"
+#include "mafTimeStamped.h"
 #include "mafDecl.h"
 #include <vector>
 #include <map>
@@ -28,6 +27,7 @@
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------
+class mafEventSource;
 class mafNodeIterator;
 class mafAttribute;
 class mmaTagArray;
@@ -57,26 +57,26 @@ class mmgGui;
   denied reparenting.
   A node can detach all children RemoveAllChildren() and an entire tree can be cleaned, by detaching each sub node, 
   through CleanTree().
-  Nodes have a modification time, updated each time Modified() is called, that can be retrieved with GetMTime().
+  Nodes inherits from mafTimeStamped a modification time updated each time Modified() is called, that can be retrieved with GetMTime().
   A tree can be initialized by calling Initialize() of its root, and deinitialized by means of Shutdown(). When
   attaching a node to an initialised tree the node is automatically initialized.
   @todo
   - events invoking
   - add storing of Id and Links
   - test Links and Id
-  - test FindInTree* functions
+  - test FindInTree functions
   - test node events (attach/detach from tree, destroy)
   - test DeepCopy()
 
   @sa mafRootNode
 */
-class MAF_EXPORT mafNode : public mafReferenceCounted, public mafStorable, public mafObserver
+class MAF_EXPORT mafNode : public mafReferenceCounted, public mafStorable, public mafObserver, public mafTimeStamped
 {
 public:
   mafAbstractTypeMacro(mafNode,mafReferenceCounted);
 
   /** defined to allow MakeCopy implementation. For the base class return a NULL pointer. */
-  virtual mafObject *NewObjectInstance() {return NULL;}
+  virtual mafObject *NewObjectInstance() const {return NULL;}
 
   /** Interface to allow creation of a copy of the node (works only for concrete subclasses) */
   mafNode *NewInstance() {return SafeDownCast(NewObjectInstance());}
@@ -245,27 +245,21 @@ public:
   bool CompareTree(mafNode *vme);
 
   /**
-  return true if VME can be reparented under the specified node*/
+  return true if node can be reparented under the specified node*/
   virtual bool CanReparentTo(mafNode *parent) {return parent==NULL||!IsInTree(parent);}
 
   /** redefined to cope with tree registering */
   virtual void UnRegister(void *o);
 
-  /** increment update modification time */
-  void Modified() {m_MTime.Modified();}
-
-  /** return modification time */
-  unsigned long GetMTime() {return m_MTime.GetMTime();}
-
   /** return a reference to the event source issuing events for this object */
-  mafEventSource &GetEventSource() {return m_EventSource;}
+  mafEventSource *GetEventSource() {return m_EventSource;}
 
   /** Precess events coming from other objects */ 
   virtual void OnEvent(mafEventBase *e);
 
   typedef std::vector<mafAutoPointer<mafNode> > mafChildrenVector;
 
-  /** 
+  /**
     return list of children. The returned list is a const, since it can be
     modified by means of nodes APIs */
   const mafChildrenVector *GetChildren() {return &m_Children;}
@@ -283,6 +277,9 @@ public:
   /** return an attribute given the name */
   mafAttribute *GetAttribute(const char *name);
 
+  /** remove all the attributes of this node */
+  void RemoveAllAttributes();
+
   /** 
     return a pointer to the tag array attribute. If this attribute doesn't
     exist yet, create a new one. TagArray is a map storing pairs of
@@ -292,7 +289,15 @@ public:
     (e.g. @sa mmaMaterial). */
   mmaTagArray  *GetTagArray();
 
-  typedef std::map<mafString,mafNode *> mafLinksMap;
+  /** data structure used to store a link VME and its Id */
+  class mmuNodeLink :public mmuUtility
+  {
+  public:
+    mmuNodeLink(mafID id=-1,mafNode *node=NULL):m_NodeId(id),m_Node(node) {}
+    mafNode *m_Node;
+    mafID   m_NodeId;
+  };
+  typedef std::map<mafString,mmuNodeLink> mafLinksMap;
 
   /** 
     return the value of a link to another node in the tree. If no link with
@@ -304,9 +309,15 @@ public:
 
   /** remove a link */
   void RemoveLink(const char *name);
+
+  /** return the number of links stored in this Node */
+  mafID GetNumberOfLinks() {return m_Links.size();}
+
+  /** remove all links */
+  void RemoveAllLinks();
   
   /** return links array: links from this node to other arrays */
-  const mafLinksMap &GetLinks() {return m_Links;}
+  mafLinksMap *GetLinks() {return &m_Links;}
 
   /** create and return the GUI for changing the node parameters */
   mmgGui *GetGui();
@@ -326,7 +337,11 @@ public:
     ID_LAST
   };
 
+  /** return the Id of this node in the tree */
+  mafID GetId();
+
 protected:
+
   mafNode();
   virtual ~mafNode();
 
@@ -337,7 +352,7 @@ protected:
   virtual int InternalRestore(mafStorageElement *node);
 
   //This function is overridden by subclasses to perform custom initialization */
-  virtual int InternalInitialize() {return 0;};
+  virtual int InternalInitialize();
 
   /** to be redefined by subclasses to define the shutdown actions */
   virtual void InternalShutdown() {};
@@ -346,7 +361,7 @@ protected:
     This function set the parent for this Node. It returns a value
     to allow subclasses to implement selective reparenting.*/
   virtual int SetParent(mafNode *parent);
-
+  
   /**
     Internally used to create a new instance of the GUI. This function should be
     overridden by subclasses to create specialized GUIs. Each subclass should append
@@ -356,24 +371,28 @@ protected:
     same pannel GUI, each CreateGUI() function should first call the superclass' one.*/
   virtual mmgGui    *CreateGUI();
 
-  mmgGui            *m_GUI;       ///< pointer to the node GUI
+  void OnNodeDetachedFromTree(mafEventBase *e);
+  void OnNodeAttachedToTree(mafEventBase *e);
+  void OnNodeDestroyed(mafEventBase *e);
 
-  mafChildrenVector m_Children;   ///< list of children
-  mafNode           *m_Parent;    ///< parent node
 
-  mafAttributesMap  m_Attributes; ///< attributes attached to this node
+  mmgGui            *m_GUI;         ///< pointer to the node GUI
 
-  mafLinksMap       m_Links;      ///< links to other nodes in the tree
+  mafChildrenVector m_Children;     ///< list of children
+  mafNode           *m_Parent;      ///< parent node
 
-  mafString         m_Name;       ///< name of this node
-  mafMTime          m_MTime;      ///< Last modification time
+  mafAttributesMap  m_Attributes;   ///< attributes attached to this node
 
-  mafID             m_Id;         ///< ID of this node
+  mafLinksMap       m_Links;        ///< links to other nodes in the tree
 
-  bool  m_VisibleToTraverse;      ///< enable/disable traversing visit of this node
-  bool  m_Initialized;            ///< set true by Initialize()
+  mafString         m_Name;         ///< name of this node
 
-  mafEventSource m_EventSource;   ///< source of events issued by the node
+  mafID             m_Id;           ///< ID of this node
+
+  bool  m_VisibleToTraverse;        ///< enable/disable traversing visit of this node
+  bool  m_Initialized;              ///< set true by Initialize()
+
+  mafEventSource    *m_EventSource; ///< source of events issued by the node
 };
 
 #endif

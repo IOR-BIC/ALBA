@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:26:28 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-03-10 12:32:13 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -16,6 +16,7 @@
 #include "mafNodeIterator.h"
 #include "mafNodeRoot.h"
 #include "mafEventBase.h"
+#include "mafEventSource.h"
 #include "mafDecl.h"
 #include "mafIndent.h"
 #include "mafStorageElement.h"
@@ -35,16 +36,23 @@ mafNode::mafNode()
   m_Initialized         = false;
   m_VisibleToTraverse   = true;
   m_Id                  = -1; // invalid ID
+  m_GUI                 = NULL;
+  cppNEW(m_EventSource);
+  m_EventSource->SetChannel(MCH_NODE);
 }
 
 //-------------------------------------------------------------------------
 mafNode::~mafNode()
 //-------------------------------------------------------------------------
 {
+  // advise observers this is being destroyed
+  m_EventSource->InvokeEvent(this,NODE_DESTROYED);
+
   // remove all the children
   RemoveAllChildren();
 
   SetParent(NULL);
+  cppDEL(m_EventSource);
 }
 
 //------------------------------------------------------------------------------
@@ -54,6 +62,14 @@ void mafNode::SetId(mafID id)
   m_Id=id;
   Modified();
 }
+
+//------------------------------------------------------------------------------
+mafID mafNode::GetId()
+//------------------------------------------------------------------------------
+{
+  return m_Id;
+}
+
 //------------------------------------------------------------------------------
 int mafNode::Initialize()
 //------------------------------------------------------------------------------
@@ -82,6 +98,36 @@ void mafNode::Shutdown()
   }
 }
 
+//-------------------------------------------------------------------------
+int mafNode::InternalInitialize()
+//-------------------------------------------------------------------------
+{
+  mafNode *root=GetRoot();
+  for (mafLinksMap::iterator it=m_Links.begin();it!=m_Links.end();it++)
+  {
+    mmuNodeLink &link=it->second;
+    if (link.m_Node==NULL&&link.m_NodeId>=0)
+    {
+      mafNode *node=root->FindInTreeById(link.m_NodeId);
+      assert(node);
+      if (node)
+      {
+        // attach linked node to this one
+        link.m_Node=node;
+        node->GetEventSource()->AddObserver(this);
+      }
+    }    
+  }
+
+  // initialize children
+  for (int i=0;i<GetNumberOfChildren();i++)
+  {
+    mafNode *child=GetChild(i);
+    if (child->Initialize()==MAF_ERROR)
+      return MAF_ERROR;
+  }
+  return MAF_OK;
+}
 //-------------------------------------------------------------------------
 mmgGui *mafNode::GetGui()
 //-------------------------------------------------------------------------
@@ -133,7 +179,7 @@ void mafNode::ForwardDownEvent(mafEventBase *event)
   if (GetNumberOfChildren()>0)
   {
     event->SetChannel(MCH_DOWN);
-    for (int i=0;i<GetNumberOfChildren();i++)
+    for (unsigned int i=0;i<GetNumberOfChildren();i++)
     {
       mafNode *child=m_Children[i];
       child->OnEvent(event);
@@ -213,6 +259,62 @@ int mafNode::FindNodeIdx(mafNode *a)
   return -1;
 }
 
+//-------------------------------------------------------------------------
+int mafNode::FindNodeIdx(const char *name)
+//-------------------------------------------------------------------------
+{
+  for (mafID i=0;i<m_Children.size();i++)
+  {
+    if (mafString::Equals(m_Children[i]->GetName(),name))
+	  {
+	    return i;
+	  }
+  }
+  return -1;
+}
+//-------------------------------------------------------------------------
+mafNode *mafNode::FindInTreeByTag(const char *name,const char *value,int type)
+//-------------------------------------------------------------------------
+{
+  mmuTagItem *titem=GetTagArray()->GetTag(name);
+  if (titem&&mafCString(titem->GetName())==name)
+    return this;
+
+  for (mafID i=0;i<m_Children.size();i++)
+  {
+    if (mafNode *node=m_Children[i]->FindInTreeByTag(name,value,type))
+      return node;
+  }
+  return NULL;
+}
+//-------------------------------------------------------------------------
+mafNode *mafNode::FindInTreeByName(const char *name)
+//-------------------------------------------------------------------------
+{
+  if (mafCString(GetName())==name)
+    return this;
+
+  for (mafID i=0;i<m_Children.size();i++)
+  {
+    if (mafNode *node=m_Children[i]->FindInTreeByName(name))
+      return node;
+  }
+  return NULL;
+}
+//-------------------------------------------------------------------------
+mafNode *mafNode::FindInTreeById(const mafID id)
+//-------------------------------------------------------------------------
+{
+  if (GetId()==id)
+    return this;
+
+  for (mafID i=0;i<m_Children.size();i++)
+  {
+    if (mafNode *node=m_Children[i]->FindInTreeById(id))
+      return node;
+  }
+  return NULL;
+}
 //-------------------------------------------------------------------------
 int mafNode::AddChild(mafNode *node)
 //-------------------------------------------------------------------------
@@ -295,24 +397,6 @@ int mafNode::ReparentTo(mafNode *newparent)
 
       // remove self registration
       UnRegister(this);
-
-      if (newparent)
-      {
-        mafNodeRoot *oldroot=oldparent?mafNodeRoot::SafeDownCast(oldparent->GetRoot()):NULL;       
-        mafNodeRoot *newroot=newparent?mafNodeRoot::SafeDownCast(newparent->GetRoot()):NULL;
-        
-        if (oldroot!=newroot)
-        {
-          if (newroot)
-          {
-            SetId(newroot->GetNextNodeId());
-
-            return MAF_OK;
-          }
-        }
-      }
-      
-      SetId(-1);
     }
     
     return MAF_OK;
@@ -397,41 +481,67 @@ void mafNode::RemoveAllChildren()
 int mafNode::SetParent(mafNode *parent)
 //-------------------------------------------------------------------------
 {
-  if (mafNode *parent_node=parent)
+  if (parent)
   {
-    if (this->CanReparentTo(parent_node))
-    {  
-      m_Parent=parent_node;
+    if (this->CanReparentTo(parent))
+    {
+      mafNode *old_root=(m_Parent?m_Parent->GetRoot():NULL);
+      mafNode *new_root=parent->GetRoot();
 
-      // TODO: reimplement with new events
-      if (parent_node==NULL)
-      {
+      // if the Node was attached to another tree, first send detaching event
+      if ( old_root && (new_root!=old_root) )
+      {      
         ForwardUpEvent(mafEventBase(this,NODE_DETACHED_FROM_TREE));
+        m_EventSource->InvokeEvent(this,NODE_DETACHED_FROM_TREE);
       }
-      else
+
+      m_Parent=parent;
+
+      // if it's being attached to a new tree and this has 'mafNodeRoot' root node, ask for a new Id
+      mafNodeRoot *root=mafNodeRoot::SafeDownCast(new_root);
+      
+      // if attached under a new root (i.e. a new tree
+      // with a root node of type mafNodeRoot) ask for
+      // a new Id and set it.
+      if (old_root!=new_root)
       {
-        ForwardUpEvent(mafEventBase(this,NODE_ATTACHED_TO_TREE));
+        SetId(root?root->GetNextNodeId():-1);
+        if (parent->IsInitialized())
+        {
+          if (Initialize())
+            return MAF_ERROR;
+        }
       }
+
+      // send attachment event
+      ForwardUpEvent(mafEventBase(this,NODE_ATTACHED_TO_TREE));
+      m_EventSource->InvokeEvent(this,NODE_ATTACHED_TO_TREE);
+      
       Modified();
       return MAF_OK;
     }
 
     // modified by Stefano 27-10-2004: Changed the error macro to give feedback about node names 
     mafErrorMacro("Cannot reparent the VME: " << GetName() << " under the " << parent->GetTypeName() \
-      << " named " << parent_node->GetName());
+      << " named " << parent->GetName());
+
+    return MAF_ERROR;
   }
   else
   {
     // reparenting to NULL is admitted in any case
-    if (parent==NULL)
+    if (m_Parent!=NULL)
     {
+      // send event about detachment from the tree
+      ForwardUpEvent(mafEventBase(this,NODE_DETACHED_FROM_TREE));
+      m_EventSource->InvokeEvent(this,NODE_DETACHED_FROM_TREE);
+
       m_Parent=parent;
       Modified();
-      return MAF_OK;
+      
     }
+    return MAF_OK;
   }
-
-  return MAF_ERROR;
 }
 
 //-------------------------------------------------------------------------
@@ -493,7 +603,42 @@ bool mafNode::CanCopy(mafNode *node)
 bool mafNode::Equals(mafNode *vme)
 //-------------------------------------------------------------------------
 {
-  return m_Name == vme->m_Name;
+  // do not check ID!!!
+
+  if (m_Name != vme->m_Name)
+    return false;
+
+  // check attributes
+  if (m_Attributes.size()!=vme->GetAttributes()->size())
+    return false;
+
+  mafAttributesMap::iterator att_it;
+  mafAttributesMap::iterator att_it2;
+  for (att_it=m_Attributes.begin(),att_it2=vme->GetAttributes()->begin();att_it!=m_Attributes.end();att_it++,att_it2++)
+  {
+    if (!att_it->second->Equals(att_it2->second))
+      return false;
+
+    if (att_it2==vme->GetAttributes()->end())
+      return false;
+  }
+
+  // check links (poor links checking, only linked VME name)
+  if (m_Links.size()!=vme->GetLinks()->size())
+    return false;
+
+  mafLinksMap::iterator lnk_it;
+  mafLinksMap::iterator lnk_it2;
+  for (lnk_it=m_Links.begin(),lnk_it2=vme->GetLinks()->begin();lnk_it!=m_Links.end();lnk_it++,lnk_it2++)
+  {
+    if (!(lnk_it->second.m_NodeId==lnk_it2->second.m_NodeId))
+      return false;
+
+    if (lnk_it2==vme->GetLinks()->end())
+      return false;
+  }
+
+  return true;
 }
 //-------------------------------------------------------------------------
 bool mafNode::CompareTree(mafNode *vme)
@@ -556,6 +701,12 @@ mafAttribute *mafNode::GetAttribute(const char *name)
   mafAttributesMap::iterator it=m_Attributes.find(name);
   return (it!=m_Attributes.end())?(*it).second.GetPointer():NULL;
 }
+//-------------------------------------------------------------------------
+void mafNode::RemoveAllAttributes()
+//-------------------------------------------------------------------------
+{
+  m_Attributes.clear();
+}
 
 //-------------------------------------------------------------------------
 mmaTagArray  *mafNode::GetTagArray()
@@ -577,8 +728,18 @@ mafNode *mafNode::GetLink(const char *name)
 //-------------------------------------------------------------------------
 {
   assert(name);
-  mafLinksMap::iterator it=m_Links.find(mafString().Set(name));
-  return it!=m_Links.end()?it->second:NULL;
+  mafLinksMap::iterator it=m_Links.find(mafCString(name));
+  if (it!=m_Links.end())
+  {
+    // if the link is still valid return its pointer
+    if (it->second.m_NodeId>=0)
+    {
+      assert(it->second.m_Node);
+      return it->second.m_Node;
+    }
+  }
+
+  return NULL;
 }
 //-------------------------------------------------------------------------
 void mafNode::SetLink(const char *name, mafNode *node)
@@ -586,46 +747,131 @@ void mafNode::SetLink(const char *name, mafNode *node)
 {
   assert(name);
   assert(node);
-  assert(node->GetRoot()==GetRoot());
+
+  mmuNodeLink newlink;
   if (node->GetRoot()==GetRoot())
   {
-    mafLinksMap::iterator it=m_Links.find(mafString().Set(name));
-
-    if (it!=m_Links.end())
-    {
-      // if already linked simply return
-      if (it->second==node)
-        return;
-
-      // detach old linked node
-      it->second->GetEventSource().RemoveObserver(this);
-  
-    }
-
-    // set the link to the new node
-    m_Links[name]=node;
-    node->GetEventSource().AddObserver(this);    
+    newlink.m_NodeId=node->GetId();
   }
-  else
-  { 
-    mafErrorMacro("Canbnot link to nodes outside of the tree.")
+
+  mafLinksMap::iterator it=m_Links.find(mafString().Set(name));
+
+  if (it!=m_Links.end())
+  {
+    // if already linked simply return
+    if (it->second.m_Node==node)
+      return;
+   
+    // detach old linked node, if present
+    if (it->second.m_Node)
+      it->second.m_Node->GetEventSource()->RemoveObserver(this);
   }
-  
+
+  // set the link to the new node
+  m_Links[name]=mmuNodeLink(node->GetId(),node);
+
+  // attach as observer of the linked node to catch events
+  // of de/attachment to the tree and destroy event.
+  node->GetEventSource()->AddObserver(this);    
 }
 //-------------------------------------------------------------------------
 void mafNode::RemoveLink(const char *name)
 //-------------------------------------------------------------------------
 {
   assert(name);
-  mafLinksMap::iterator it=m_Links.find(mafString().Set(name));
+  mafLinksMap::iterator it=m_Links.find(mafCString(name));
   if (it!=m_Links.end())
-    m_Links.erase(it);
+  {
+    assert(it->second.m_Node);
+    // detach as observer from the linked node
+    it->second.m_Node->GetEventSource()->RemoveObserver(this);
+    m_Links.erase(it); // remove linked node from links container
+  }
 }
+
+//-------------------------------------------------------------------------
+void mafNode::RemoveAllLinks()
+//-------------------------------------------------------------------------
+{
+  for (mafLinksMap::iterator it=m_Links.begin();it!=m_Links.end();it++)
+  {
+    assert(it->second.m_Node);
+    // detach as observer from the linked node
+    it->second.m_Node->GetEventSource()->RemoveObserver(this);
+  }
+  m_Links.clear();
+}
+
+//-------------------------------------------------------------------------
+void mafNode::OnNodeDetachedFromTree(mafEventBase *e)
+//-------------------------------------------------------------------------
+{
+  for (mafLinksMap::iterator it=m_Links.begin();it!=m_Links.end();it++)
+  {
+    if (it->second.m_Node==e->GetSender())
+    {
+      it->second.m_NodeId=-1; // reset Id value to invalid value
+    }
+  }
+}
+
+//-------------------------------------------------------------------------
+void mafNode::OnNodeAttachedToTree(mafEventBase *e)
+//-------------------------------------------------------------------------
+{
+  for (mafLinksMap::iterator it=m_Links.begin();it!=m_Links.end();it++)
+  {
+    if (it->second.m_Node==e->GetSender())
+    {
+      // restore Id value but only if node is attached to this tree!!!
+      if (GetRoot()->IsInTree(it->second.m_Node))
+        it->second.m_NodeId=it->second.m_Node->GetId();
+    }
+  }
+}
+//-------------------------------------------------------------------------
+void mafNode::OnNodeDestroyed(mafEventBase *e)
+//-------------------------------------------------------------------------
+{
+  for (mafLinksMap::iterator it=m_Links.begin();it!=m_Links.end();it++)
+  {
+    if (it->second.m_Node==e->GetSender())
+    {
+      it->second.m_NodeId=-1; // reset Id value
+      it->second.m_Node=NULL; // set VME pointer to NULL
+    }
+  }
+}
+
 //-------------------------------------------------------------------------
 void mafNode::OnEvent(mafEventBase *e)
 //-------------------------------------------------------------------------
 {
-  // default behavior is to send event to parent or to children depending on channel
+  // events to be sent up or down in the tree are simply forwarded
+  if (e->GetChannel()==MCH_UP)
+  {
+    ForwardUpEvent(e);
+    return;
+  }
+
+  if (e->GetChannel()==MCH_DOWN)
+  {
+    ForwardDownEvent(e);
+    return;
+  }
+
+  switch (e->GetId())
+  {
+  case NODE_DETACHED_FROM_TREE:
+    OnNodeDetachedFromTree(e);
+  break;
+  case NODE_ATTACHED_TO_TREE:
+    OnNodeAttachedToTree(e);
+  break;
+  case NODE_DESTROYED:
+    OnNodeDestroyed(e);
+  break;
+  }
 }
 
 //-------------------------------------------------------------------------
@@ -635,7 +881,7 @@ int mafNode::InternalStore(mafStorageElement *parent)
   parent->SetAttribute("Name",m_Name);
   parent->SetAttribute("Id",mafString(m_Id));
 
-  // store attributes into a tmp array
+  // store Attributes into a tmp array
   std::vector<mafObject *> attrs;
   for (mafAttributesMap::iterator it=m_Attributes.begin();it!=m_Attributes.end();it++)
   {
@@ -643,9 +889,20 @@ int mafNode::InternalStore(mafStorageElement *parent)
   }
   parent->StoreObjectVector(attrs,"Attributes");
 
+  // store Links
+  mafStorageElement *links_element=parent->AppendChild("Links");
+  links_element->SetAttribute("NumberOfLinks",mafString(GetNumberOfLinks()));
+  for (mafLinksMap::iterator links_it=m_Links.begin();links_it!=m_Links.end();links_it++)
+  {
+    mmuNodeLink &link=links_it->second;
+    mafStorageElement *link_item_element=links_element->AppendChild("Link");
+    link_item_element->SetAttribute("Name",links_it->first);
+    link_item_element->SetAttribute("NodeId",mafString(link.m_NodeId));
+  }
+
   // store the visible children into a tmp array
   std::vector<mafObject *> nodes_to_store;
-  for (int i=0;i<GetNumberOfChildren();i++)
+  for (unsigned int i=0;i<GetNumberOfChildren();i++)
   {
     mafNode *node=GetChild(i);
     if (node->IsVisible())
@@ -654,6 +911,7 @@ int mafNode::InternalStore(mafStorageElement *parent)
     }
   }
   parent->StoreObjectVector(nodes_to_store,"Children","Node");
+
   return MAF_OK;
 }
 
@@ -661,16 +919,21 @@ int mafNode::InternalStore(mafStorageElement *parent)
 int mafNode::InternalRestore(mafStorageElement *node)
 //-------------------------------------------------------------------------
 {
+  // first restore node Name
   if (node->GetAttribute("Name",m_Name))
   {
+    // restore Id
     mafString id;
     if (node->GetAttribute("Id",id))
     {
-      SetId(atof(id));
+      SetId((mafID)atof(id));
+
+      // restore attributes
+      RemoveAllAttributes();
       std::vector<mafObject *> attrs;
       if (node->RestoreObjectVector(attrs,"Attributes")==MAF_OK)
       {
-        for (int i=0;i<attrs.size();i++)
+        for (unsigned int i=0;i<attrs.size();i++)
         {
           mafAttribute *item=mafAttribute::SafeDownCast(attrs[i]);
           assert(item);
@@ -679,22 +942,45 @@ int mafNode::InternalRestore(mafStorageElement *node)
             m_Attributes[item->GetName()]=item;
           }
         }
-
-        std::vector<mafObject *> children;
-        if (node->RestoreObjectVector(children,"Children","Node")==MAF_OK)
+        
+        // restore Links
+        RemoveAllLinks();
+        if (mafStorageElement *links_element=node->FindNestedElement("Links"))
         {
-          for (int i=0;i<children.size();i++)
+          mafString num_links;
+          links_element->GetAttribute("NumberOfLinks",num_links);
+          int n=(int)atof(num_links);
+          mafStorageElement::ChildrenVector links_vector=links_element->GetChildren();
+          assert(links_vector.size()==n);
+          for (int i=0;i<n;i++)
           {
-            mafNode *node=mafNode::SafeDownCast(children[i]);
-            assert(node);
-            if (node)
-            {
-              AddChild(node);
-            }
+            mafString link_name;
+            links_vector[i]->GetAttribute("Name",link_name);
+            mafString link_node_id;
+            links_vector[i]->GetAttribute("NodeId",link_node_id);
+            m_Links[link_name]=mmuNodeLink((mafID)atof(link_node_id));
           }
 
-          return MAF_OK;
-        }
+          // restore children
+          RemoveAllChildren();
+          std::vector<mafObject *> children;
+          if (node->RestoreObjectVector(children,"Children","Node")==MAF_OK)
+          {
+            m_Children.resize(children.size());
+            for (unsigned int i=0;i<children.size();i++)
+            {
+              mafNode *node=mafNode::SafeDownCast(children[i]);
+              assert(node);
+              if (node)
+              {
+                node->m_Parent=this;
+                m_Children[i]=node;
+              }
+            }
+
+            return MAF_OK;
+          }
+        }     
       }
     }
   }
