@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-23 09:16:21 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-01-10 00:11:06 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,7 +12,8 @@
 #ifndef __mafNode_h
 #define __mafNode_h
 
-#include "mafSmartObject.h"
+#include "mafReferenceCounted.h"
+#include "mafStorable.h"
 #include "mafSmartPointer.h"
 #include "mafEventSource.h"
 #include "mafVector.h"
@@ -31,7 +32,7 @@ class mafNodeIterator;
   This class implements a an m-way tree. You can add/remove nodes by means of AddChild
   and RemoveChild. To access the tree you can use GetChild(). You can also obtain an iterator
   to iterate through the tree with a simple for (;;) loop. This node implementation take
-  advantage of the MAF smart object reference counting mechanism. To avoid confusion constructor
+  advantage of the MAF reference counting mechanism. To avoid confusion constructor
   and destructor have been protected. To allocate a node use New() and to deallocate use Delete()
   or UnRegister().
   To create a copy of the node you can use MakeCopy(). To copy node content use DeepCopy(). Any 
@@ -59,10 +60,10 @@ class mafNodeIterator;
 
   @sa mafRootNode
 */
-class MAF_EXPORT mafNode : public mafSmartObject
+class MAF_EXPORT mafNode : public mafReferenceCounted, public mafStorable
 {
 public:
-  mafAbstractTypeMacro(mafNode,mafSmartObject);
+  mafAbstractTypeMacro(mafNode,mafReferenceCounted);
 
   // the base class cannot be instantiated, and thus copied
   virtual mafObject *NewInternalInstance() {return NULL;}
@@ -70,7 +71,7 @@ public:
   // Interface for creating a copy of the node (works only for concrete subclasses)
   mafNode *NewInstance() {return SafeDownCast(NewInternalInstance());}
 
-  //void PrintSelf(std::ostream& os, vtkIndent indent);
+  void Print(std::ostream& os, const int tabs);
 
   /**
     Initialize this node. Subclasses can redefine InternalInitialize() to customize
@@ -247,11 +248,12 @@ public:
 
   /** return list of children */
   const mafChildrenVector *GetChildren() {return &m_Children;}
-
-  enum crypting {NO_CRYPTING=0,DEFAULT_CRYPTING};
 protected:
   mafNode();
   virtual ~mafNode();
+
+  virtual int InternalStore(mafStorageElement *parent) {return MAF_OK;}
+  virtual int InternalRestore(mafStorageElement *node) {return MAF_OK;}
 
   //This function is overridden by subclasses to perform custom initialization */
   virtual int InternalInitialize() {return 0;};
@@ -259,22 +261,21 @@ protected:
   /** to be redefined by subclasses to define the shutdown actions */
   virtual void InternalShutdown() {};
 
-
   /**
     This function set the parent for this Node. It returns a value
     to allow subclasses to implement selective reparenting.*/
   virtual int SetParent(mafNode *parent);
 
-  mafChildrenVector m_Children;
-  
-  mafNode   *m_Parent;      ///< parent node
+  mafChildrenVector m_Children; ///< list of children
+  mafNode           *m_Parent;  ///< parent node
 
-  mafString m_Name;         ///< name of this node
-  mafMTime  m_MTime;        ///< Last modification time
+  mafString         m_Name;     ///< name of this node
+  mafMTime          m_MTime;    ///< Last modification time
 
-  bool  m_VisibleToTraverse;  ///< enable/disable traversing visit of this node
-  bool  m_Initialized;        ///< set true by Initialize()
-  int   m_Crypting;           ///< enable crypting during storing/restoring for this node
+  mafID             m_Id;       ///< ID of this node
+
+  bool  m_VisibleToTraverse;    ///< enable/disable traversing visit of this node
+  bool  m_Initialized;          ///< set true by Initialize()
 
   mafEventSource m_EventSource; ///< source of events issued by the node
 };

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-30 14:16:59 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-01-10 00:11:06 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -15,6 +15,7 @@
 #include "mafNode.h"
 #include "mafNodeIterator.h"
 #include "mafVector.txx"
+#include "mafIndent.h"
 #include <sstream>
 #include <assert.h>
 
@@ -27,7 +28,7 @@ mafNode::mafNode()
   m_Parent              = NULL;
   m_Initialized         = false;
   m_VisibleToTraverse   = true;
-  m_Crypting            = NO_CRYPTING;
+  m_Id                  = 0; // root ID
 }
 
 //-------------------------------------------------------------------------
@@ -238,7 +239,7 @@ bool mafNode::IsInTree(mafNode *a)
 void mafNode::UnRegister(void *o)
 //-------------------------------------------------------------------------
 {
-  if (this->ReferenceCount<=1)
+  if (this->m_ReferenceCount<=1)
   {
     if (m_Parent)
     {
@@ -438,11 +439,18 @@ mafNode *mafNode::CopyTree(mafNode *vme, mafNode *parent)
   return v;
 }
 
-
-/*//-------------------------------------------------------------------------
-void mafNode::PrintSelf(ostream& os, vtkIndent indent)
+//-------------------------------------------------------------------------
+void mafNode::Print(std::ostream& os, const int tabs)
+//-------------------------------------------------------------------------
 {
-	os << indent << "Number of Children: "<<this->GetNumberOfChildren()<<endl;
-}*/
+  mafIndent indent(tabs);
+
+  Superclass::Print(os,indent);
+  os << indent << "Name: \"" << m_Name << "\"" << std::endl;
+  os << indent << "Initialized: " << m_Initialized << std::endl;
+  os << indent << "VisibleToTraverse: " << m_VisibleToTraverse << std::endl;
+  os << indent << "Parent: \"" << (m_Parent?m_Parent->m_Name:"NULL") << "\"" << std::endl; 
+  os << indent << "Number of Children: " << GetNumberOfChildren() << std::endl;
+}
   
 #endif
