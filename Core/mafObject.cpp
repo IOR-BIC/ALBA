@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObject.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-30 14:16:59 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-01-10 00:08:59 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -48,7 +48,7 @@ void mafObject::operator delete( void *p )
 #endif 
 
 //------------------------------------------------------------------------------
-mafObject::mafObject():HeapFlag(0)
+mafObject::mafObject():m_HeapFlag(0)
 //------------------------------------------------------------------------------
 {
 }
@@ -113,6 +113,20 @@ const mafTypeID &mafObject::GetTypeId() const
 //------------------------------------------------------------------------------
 {
   return typeid(mafObject);
+}
+
+//------------------------------------------------------------------------------
+mafObject* mafObject::SafeDownCast(mafObject *o)
+//------------------------------------------------------------------------------
+{
+  try 
+  { 
+    return dynamic_cast<mafObject *>(o);
+  }
+  catch (std::bad_cast)
+  { 
+    return NULL;
+  }
 }
 
 //------------------------------------------------------------------------------

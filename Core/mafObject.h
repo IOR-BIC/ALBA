@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObject.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-30 14:16:59 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-01-10 00:08:59 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -28,8 +28,8 @@
   RTTI APIs. MAF objects can be created either on the stack or dynamically
   in the heap. The the latter you can use both "new" or "::New()" for instantiacion
   and "delete" or "Delete()" for deletion. There's no difference between the two.
-  For smart objects these two methods behave differently.
-  @sa mafSmartObject
+  For reference counted objects these two methods behave differently.
+  @sa mafReferenceCounted
 */
 class MAF_EXPORT mafObject
 {
@@ -67,6 +67,9 @@ public:
   /** Return TypeId for this object instance (the real type) */ 
   virtual const mafTypeID &GetTypeId() const;
 
+  /** Cast with dynamic type checking. This is used for casting from (void *) */
+  static mafObject* SafeDownCast(mafObject *o);
+
   /** print debug information for this object */
   virtual void Print(std::ostream &os, const int indent=0) const;
 
@@ -79,8 +82,7 @@ public:
 #endif
 
 protected:
-  /** Internally used to mark objects created on the Heap with New() */
-  bool HeapFlag;
+  bool m_HeapFlag; ///< Internally used to mark objects created on the Heap with New()
 };
 
 #endif /* __mafObject_h */
