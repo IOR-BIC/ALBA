@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.h,v $
   Language:  C++
-  Date:      $Date: 2005-01-11 17:35:01 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-01-13 09:09:14 $
+  Version:   $Revision: 1.6 $
   Authors:   originally based on vtkString (www.vtk.org), rewritten Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -36,7 +36,7 @@ public:
   static mafID Length(const char* str);
    
   /** This method returns the size of this string. */
-  const mafID Length();
+  const mafID Length() const;
 
   /** static method to copy c-string to the another c-string.*/
   static void Copy(char* dest, const char* src);
@@ -65,12 +65,14 @@ public:
     string pointer is copied in the destination pointer. If this was
     already != NULL, the corresponding memory is released. This is useful
     to automatically manage garbage collection but beware to not provide 
-    an uninitialized pointer variable.*/
+    an uninitialized pointer variable. Beware memory releasing
+    must be performed by consumer*/
   static void Duplicate(char * &store,const char *src,bool release=true);
   
   /**
-    Duplicate the string stored inside this object.*/
-  char* Duplicate();
+    Duplicate the string stored inside this object. Beware memory releasing
+    must be performed by consumer */
+  char* Duplicate() const;
  
   /** 
     This static method compare two strings. It is similar to strcmp, but it
@@ -82,30 +84,30 @@ public:
     This method compare the given c-string with the one stored inside this object.
     It is similar to strcmp, but it can handle null pointers. Return 0 if str equal this,
     -1 if str > this, 1 if str < this*/
-  int Compare(const char* str);
+  int Compare(const char* str) const;
   
   /**
     This static method compare two strings. It is similar to strcmp, but it
     can handle null pointers. Also it only returns C style true or
     false versus compare which returns also which one is greater.*/
-  static bool Equals(const char* str1, const char* str2){ return Compare(str1, str2) == 0;}
+  static bool Equals(const char* str1, const char* str2) { return Compare(str1, str2) == 0;}
   
   /**
     This method compare the given c-string with the one stored inside this object.
     It is similar to strcmp, but it can handle null pointers. Also it only
     returns C style true or false versus compare which returns also which
     one is greater.*/
-   bool Equals(const char* str);
+   bool Equals(const char* str) const;
   
   /** Static method to check if the first string starts with the second one.*/
   static bool StartsWith(const char* str1, const char* str2);
   /** Check if this string starts with the given one.*/
-  bool StartsWith(const char* str);
+  bool StartsWith(const char* str) const;
 
   /** Static method to check if the first string ends with the second one.*/
-  static bool EndsWith(const char* str1, const char* str2);
+  static bool EndsWith(const char* str1, const char* str2); 
   /** Check if this string ends with the given one.*/
-  bool EndsWith(const char* str);
+  bool EndsWith(const char* str) const;
 
   /**
     Append two strings and produce a new one.  The consumer must delete
@@ -116,22 +118,22 @@ public:
   mafString &Append(const char* str);
 
   /** Scan the string for the first occurrence of the character */
-  int FindChr(const int c);
+  int FindChr(const int c) const;
 
   /** Scan the string for the first occurrence of the character */
-  int FindLastChr(const int c);
+  int FindLastChr(const int c) const;
 
   /** Find first occurrence of a substring */
-  int FindFirst(const char *str);
+  int FindFirst(const char *str) const;
 
   /** Find last occurrence of a substring */
-  int FindLast(const char *str);
+  int FindLast(const char *str) const;
 
   /** Extract the base name of a filename string */
   static const char *BaseName(const char *filename);
-  const char *BaseName();
+  const char *BaseName() const;
 
-  /** Extract the pathname from a filename string */
+  /** Extract the pathname from a filename string. Result is written inplace. */
   void ExtractPathName();
 
   /**
@@ -166,7 +168,7 @@ public:
   char *GetNonConstCStr();
 
   /** return the real memory size allocated for the internal c-string */
-  int GetSize() {return m_Size;};
+  int GetSize() const {return m_Size;};
 
   /**
     Pre-Allocate space for the internal c-string. The memory size is
@@ -182,7 +184,7 @@ public:
   /**  return true if empty*/
   static bool IsEmpty(const char *str) { return (str?str[0]=='\0':true);};
   /**  return true if empty*/
-  bool IsEmpty() { return IsEmpty(GetCStr());};
+  bool IsEmpty() const { return IsEmpty(GetCStr());};
 
   /** 
     Set the internal pointer to a give pointer. Second parameter allow 
@@ -210,11 +212,11 @@ public:
   /** direct access to string single elements for reading */
   const char operator [] (const int i) const;
 
-  const bool operator==(const char *src);
-  const bool operator<(const char *a);
-  const bool operator>(const char *a);
-  const bool operator<=(const char *a);
-  const bool operator>=(const char *a);
+  const bool operator==(const char *src) const;
+  const bool operator<(const char *a) const;
+  const bool operator>(const char *a) const;
+  const bool operator<=(const char *a) const;
+  const bool operator>=(const char *a) const;
 
   mafString &operator<<(const char *a) {return Append(a);};
 

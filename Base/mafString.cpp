@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-01-11 17:35:01 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-01-13 09:09:14 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -184,7 +184,7 @@ char *mafString::GetNonConstCStr()
   return m_CStr;
 }
 //----------------------------------------------------------------------------
-const mafID mafString::Length()
+const mafID mafString::Length() const
 //----------------------------------------------------------------------------
 {
   return Length(GetCStr());
@@ -326,7 +326,7 @@ void mafString::Duplicate(char * &store,const char *src,bool release)
 }
 
 //----------------------------------------------------------------------------
-char* mafString::Duplicate()
+char* mafString::Duplicate() const
 //---------------------------------------------------------------------------- 
 {
   return Duplicate(m_Size>0?m_CStr:m_ConstCStr);
@@ -356,14 +356,14 @@ int mafString::Compare(const char* str1, const char* str2)
 }
 
 //----------------------------------------------------------------------------
-int mafString::Compare(const char* str)
+int mafString::Compare(const char* str) const
 //----------------------------------------------------------------------------
 {
   return Compare(m_Size>0?m_CStr:m_ConstCStr, str);
 }
 
 //----------------------------------------------------------------------------
-bool mafString::Equals(const char* str)
+bool mafString::Equals(const char* str) const
 //----------------------------------------------------------------------------
 {
   return Equals(m_Size>0?m_CStr:m_ConstCStr, str);
@@ -382,7 +382,7 @@ bool mafString::StartsWith(const char* str1, const char* str2)
 }
 
 //----------------------------------------------------------------------------
-bool mafString::StartsWith(const char* str)
+bool mafString::StartsWith(const char* str) const
 //----------------------------------------------------------------------------
 { 
   return StartsWith(m_Size>0?m_CStr:m_ConstCStr, str);
@@ -401,14 +401,14 @@ bool mafString::EndsWith(const char* str1, const char* str2)
 }
 
 //----------------------------------------------------------------------------
-bool mafString::EndsWith(const char* str)
+bool mafString::EndsWith(const char* str) const
 //----------------------------------------------------------------------------
 {
   return EndsWith(m_Size>0?m_CStr:m_ConstCStr, str);
 }
 
 //----------------------------------------------------------------------------
-const char *mafString::BaseName()
+const char *mafString::BaseName() const
 //----------------------------------------------------------------------------
 {
   return BaseName(m_Size>0?m_CStr:m_ConstCStr);
@@ -475,7 +475,7 @@ mafString &mafString::Append(const char* str)
 }
 
 //----------------------------------------------------------------------------
-int mafString::FindFirst(const char *str)
+int mafString::FindFirst(const char *str) const
 //----------------------------------------------------------------------------
 {
   int len=Length();
@@ -490,7 +490,7 @@ int mafString::FindFirst(const char *str)
 }
 
 //----------------------------------------------------------------------------
-int mafString::FindLast(const char *str)
+int mafString::FindLast(const char *str) const  
 //----------------------------------------------------------------------------
 {
   int len=Length();
@@ -641,32 +641,32 @@ void mafString::ExtractPathName()
 }
 
 //----------------------------------------------------------------------------
-const bool mafString::operator==(const char *src)
+const bool mafString::operator==(const char *src) const
 //----------------------------------------------------------------------------
 {
   return Equals(GetCStr(),src);
 }
 
 //----------------------------------------------------------------------------
-const bool mafString::operator<(const char *a)
+const bool mafString::operator<(const char *a) const
 //----------------------------------------------------------------------------
 {
   return Compare(a)<0;
 }
 //----------------------------------------------------------------------------
-const bool mafString::operator>(const char *a)
+const bool mafString::operator>(const char *a) const
 //----------------------------------------------------------------------------
 {
   return Compare(a)>0;
 }
 //----------------------------------------------------------------------------
-const bool mafString::operator<=(const char *a)
+const bool mafString::operator<=(const char *a) const
 //----------------------------------------------------------------------------
 {
   return Compare(a)<=0;
 }
 //----------------------------------------------------------------------------
-const bool mafString::operator>=(const char *a)
+const bool mafString::operator>=(const char *a) const
 //----------------------------------------------------------------------------
 {
   return Compare(a)>=0;
@@ -691,13 +691,13 @@ const char mafString::operator [] (const int i) const
 }
 
 //----------------------------------------------------------------------------
-int mafString::FindChr(const int c)
+int mafString::FindChr(const int c) const
 //----------------------------------------------------------------------------
 {
   return (IsEmpty()?-1:(strchr(GetCStr(),c)-GetCStr())); // difference between pointers
 }
 //----------------------------------------------------------------------------
-int mafString::FindLastChr(const int c)
+int mafString::FindLastChr(const int c) const
 //----------------------------------------------------------------------------
 {
   return (IsEmpty()?-1:(strrchr(GetCStr(),c)-GetCStr()));
