@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObject.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:33:17 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-03-10 12:10:47 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -66,7 +66,7 @@ public:
   /** Return TypeId for this object instance (the real type) */ 
   virtual const mafTypeID &GetTypeId() const;
 
-  /** Cast with dynamic type checking. This is used for casting from (void *) */
+  /** Cast with dynamic type checking. This is used for casting from (mafObject *) */
   static mafObject* SafeDownCast(mafObject *o);
 
   /** print debug information for this object */
