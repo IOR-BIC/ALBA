@@ -2,19 +2,15 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testMinimalWX.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-12-30 14:17:02 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-01-15 19:25:38 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#ifdef WX_PRECOMP
-    #include "wx/wx.h"
-#else
-    #include "wx/wxprec.h"
-#endif
+#include "mafIncludeWX.h"
 
 // ============================================================================
 class myApp : public wxApp
