@@ -1,0 +1,157 @@
+/*=========================================================================
+  Program:   Multimod Application Framework
+  Module:    $RCSfile: mafMatrix3x3.cpp,v $
+  Language:  C++
+  Date:      $Date: 2004-11-25 19:16:43 $
+  Version:   $Revision: 1.1 $
+  Authors:   Marco Petrone
+==========================================================================
+  Copyright (c) 2002/2004 
+  CINECA - Interuniversity Consortium (www.cineca.it)
+=========================================================================*/
+#include "mafMatrix3x3.h"
+#include "vtkObjectFactory.h"
+
+//----------------------------------------------------------------------------
+mafMatrix3x3::mafMatrix3x3()
+//----------------------------------------------------------------------------
+{
+  m_TimeStamp=0;
+
+#ifdef MAF_USE_VTK 
+  // in case we are building under VTK we store the elements in a VTK Matrix
+  vtkNEW(m_VTKMatrix);
+#endif
+}
+
+//----------------------------------------------------------------------------
+mafMatrix3x3::~mafMatrix3x3()
+//----------------------------------------------------------------------------
+{
+#ifdef MAF_USE_VTK
+  vtkDEL(m_VTKMatrix);
+#endif
+}
+
+//------------------------------------------------------------------------------
+mafMatrix3x3::mafMatrix3x3(mafMatrix3x3 &mat)
+//------------------------------------------------------------------------------
+{
+#ifdef MAF_USE_VTK
+  m_VTKMatrix->DeepCopy(mat.m_VTKMatrix);
+#endif  
+
+  m_TimeStamp=mat.m_TimeStamp;
+  Modified();
+}
+
+//------------------------------------------------------------------------------
+bool mafMatrix3x3::operator==(mafMatrix3x3& mat)
+//------------------------------------------------------------------------------
+{
+  if (m_TimeStamp!=mat.m_TimeStamp)
+    return false;
+
+  for (int i=0;i<4;i++)
+  {
+    for (int j=0;j<4;j++)
+    {
+      if (abs(GetElements()[i][j]-mat.GetElements()[i][j])>(1e-17))
+        return false;
+    }
+  }
+  return true;
+}
+
+#ifdef MAF_USE_VTK
+//------------------------------------------------------------------------------
+mafMatrix3x3::mafMatrix3x3(vtkMatrix4x4* mat, mafTimeStamp t)
+//----------------------------------------------------------------------------
+{
+  if (mat&&t>=0)
+  {
+    m_VTKMatrix->DeepCopy(mat);
+    m_TimeStamp=t;
+  }
+}
+#endif
+
+//----------------------------------------------------------------------------
+void mafMatrix3x3::GetVersor(int axis, const mafMatrix3x3 &matrix, double versor[3])
+//----------------------------------------------------------------------------
+{
+	if (0 <= axis && axis <= 2)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			versor[i] = matrix.GetElement(i, axis);
+		}	
+	}
+}
+
+//----------------------------------------------------------------------------
+void mafMatrix3x3::CopyRotation(const mafMatrix3x3 &source, mafMatrix3x3 &target)
+//----------------------------------------------------------------------------
+{
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+		  target.SetElement(i,j, source.GetElement(i,j));
+		}
+	}
+
+}
+
+//----------------------------------------------------------------------------
+void mafMatrix3x3::Zero(double elements[16])
+//----------------------------------------------------------------------------
+{
+  mafMatrix3x3Elements elem  = (mafMatrix3x3Elements)elements;
+  int i,j;
+  for (i = 0; i < 4; i++)
+  {
+    for (j = 0; j < 4; j++)
+    {
+      elem[i][j] = 0.0;
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void mafMatrix3x3::Identity(double elements[16])
+//----------------------------------------------------------------------------
+{
+  elements[0] = elements[5] = elements[10] = elements[15] = 1.0;
+  elements[1] = elements[2] = elements[3] = elements[4] = 
+  elements[6] = elements[7] = elements[8] = elements[9] = 
+  elements[11] = elements[12] = elements[13] = elements[14] = 0.0;
+
+}
+
+
+//----------------------------------------------------------------------------
+void mafMatrix3x3::MultiplyPoint(const double elem[16], 
+                                 const double in[4], double out[4])
+//----------------------------------------------------------------------------
+{
+  double v1 = in[0];
+  double v2 = in[1];
+  double v3 = in[2];
+  double v4 = in[3];
+
+  out[0] = v1*elem[0]  + v2*elem[1]  + v3*elem[2]  + v4*elem[3];
+  out[1] = v1*elem[4]  + v2*elem[5]  + v3*elem[6]  + v4*elem[7];
+  out[2] = v1*elem[8]  + v2*elem[9]  + v3*elem[10] + v4*elem[11];
+  out[3] = v1*elem[12] + v2*elem[13] + v3*elem[14] + v4*elem[15];
+}
+
+//----------------------------------------------------------------------------
+void mafMatrix3x3::PointMultiply(const double Elements[16], 
+                                 const double in[4], double result[4])
+//----------------------------------------------------------------------------
+{
+  double newElements[16];
+  mafMatrix3x3::Transpose(Elements,newElements);
+  mafMatrix3x3::MultiplyPoint(newElements,in,result);
+}

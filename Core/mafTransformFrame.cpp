@@ -1,10 +1,10 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    $RCSfile: mafTransform.cpp,v $
+  Module:    $RCSfile: mafTransformFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-25 19:16:42 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2004-11-25 19:16:43 $
+  Version:   $Revision: 1.1 $
   
   Copyright (c) 2002/2003
   B3C -  BioComputing Competence Centre (www.cineca.it/B3C)
@@ -43,55 +43,89 @@ POSSIBILITY OF SUCH DAMAGES.
 =========================================================================*/
 #include "mafTransform.h"
 
+#include "vtkMatrix4x4.h"
+#include "vtkObjectFactory.h"
+#include "vtkMath.h"
+#include "mflSmartPointer.h"
+
 #include <math.h>
 #include <assert.h>
 
 //------------------------------------------------------------------------------
 // Events
 //------------------------------------------------------------------------------
-//MFL_EVT_IMP(mafTransform::UpdateEvent); // Event rised by updates of the internal matrix
+MFL_EVT_IMP(mafTransform::UpdateEvent); // Event rised by updates of the internal matrix
 
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(mafTransform);
+vtkCxxSetObjectMacro(mafTransform,Input,vtkLinearTransform);
+vtkCxxSetObjectMacro(mafTransform,InputFrame,vtkLinearTransform);
+vtkCxxSetObjectMacro(mafTransform,TargetFrame,vtkLinearTransform);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mafTransform::mafTransform()
 //----------------------------------------------------------------------------
 {
+  this->Input = NULL;
+  this->InverseFlag = 0;
+  this->InputFrame = NULL;
+  this->TargetFrame = NULL;
 }
 
 //----------------------------------------------------------------------------
 mafTransform::~mafTransform()
 //----------------------------------------------------------------------------
 {
+  this->SetInput((mafTransform *)NULL);
+  this->SetTargetFrame((mafTransform*)NULL);
+  this->SetInputFrame((mafTransform*)NULL);
 }
 
 //----------------------------------------------------------------------------
-mafTransform::mafTransform(const mafTransformBase& copy)
-//----------------------------------------------------------------------------
-{
-  m_Matrix=copy.GetMatrix();
-  Modified();
-}
-
-/*//----------------------------------------------------------------------------
 void mafTransform::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 {
   this->Update();
 
-  this->Superclass::PrintSelf(os, indent);  
-  // Print the internal matrix
-  //...
-}
-*/
+  this->Superclass::PrintSelf(os, indent);
+  os << indent << "Input: ";
+  if (Input)
+  {
+    os << Input << " Matrix:\n";
+    Input->GetMatrix()->PrintSelf(os,indent.GetNextIndent());
+  }
+  else
+    os << "NULL\n";
 
+  os << indent << "InputFrame: ";
+  if (InputFrame)
+  {
+    os << InputFrame << "\n";
+    InputFrame->GetMatrix()->PrintSelf(os,indent.GetNextIndent());
+  }
+  else
+    os << "NULL\n";
+
+  os << indent << "TargetFrame: ";
+  if (TargetFrame)
+  {
+    os << TargetFrame << "\n";
+    TargetFrame->GetMatrix()->PrintSelf(os,indent.GetNextIndent()); 
+  }
+  else
+    os << "NULL\n";
+
+  os << indent << "InverseFlag: " << this->InverseFlag << "\n";
+}
+
+typedef double (*SqMatPtr)[4];
 
 //----------------------------------------------------------------------------
 void mafTransform::Identity()
 //----------------------------------------------------------------------------
 {
-  GetMatrix().Identity();
-  Modified();
+  vtkMatrix4x4::Identity(&(GetMatrix()->Element[0][0]));
 }
 
 //----------------------------------------------------------------------------
@@ -100,9 +134,9 @@ void mafTransform::RotateWXYZ(vtkMatrix4x4* source,vtkMatrix4x4 *target,double a
 //----------------------------------------------------------------------------
 {
   if (angle == 0.0 || (x == 0.0 && y == 0.0 && z == 0.0)) 
-  {
+    {
     return;
-  }
+    }
 
   // convert to radians
   angle = angle*vtkMath::DoubleDegreesToRadians();
@@ -116,8 +150,8 @@ void mafTransform::RotateWXYZ(vtkMatrix4x4* source,vtkMatrix4x4 *target,double a
 
   
   // temporary matrix
-  mafMatrix mat;
-  mafMatrixElements matrix=mat.GetElements();
+  mflSmartPointer<vtkMatrix4x4> mat;
+  SqMatPtr matrix=(SqMatPtr)mat->Element;
 
   // convert the quaternion to a matrix
   double ww = w*w;
@@ -155,7 +189,6 @@ void mafTransform::RotateWXYZ(vtkMatrix4x4* source,vtkMatrix4x4 *target,double a
   {
     vtkMatrix4x4::Multiply4x4(mat,source,target);
   }
-  Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -196,14 +229,13 @@ void mafTransform::SetPosition(vtkMatrix4x4 *matrix,double position[3])
 	{
 	  matrix->SetElement(i, 3, position[i]);
 	}	
-  Modified();
 }
 
 //----------------------------------------------------------------------------
 void mafTransform::Translate(vtkMatrix4x4 *matrix,double translation[3],int premultiply)
 //----------------------------------------------------------------------------
 {
-  mafMatrix trans_matrix;
+  mflSmartPointer<vtkMatrix4x4> trans_matrix;
   SetPosition(trans_matrix,translation);
   if(premultiply)
   {
@@ -252,6 +284,23 @@ void mafTransform::CopyTranslation(const vtkMatrix4x4 *source, vtkMatrix4x4 *tar
 }
 
 //----------------------------------------------------------------------------
+void mafTransform::SetMatrix(vtkMatrix4x4 *input,int copy)
+//----------------------------------------------------------------------------
+{
+  if (copy)
+  {
+    Matrix->DeepCopy(input);
+  }
+  else
+  {
+    vtkSetObjectBodyMacro(Matrix,vtkMatrix4x4,input);
+  }
+
+  Modified();
+  
+}
+
+//----------------------------------------------------------------------------
 void mafTransform::SetInput(vtkMatrix4x4 *input)
 //----------------------------------------------------------------------------
 {
@@ -290,6 +339,167 @@ void mafTransform::Inverse()
 {
   this->InverseFlag = !this->InverseFlag;
   this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void mafTransform::InternalUpdate()
+//----------------------------------------------------------------------------
+{
+
+  /*
+
+  SceneGraph matrix concatenation order:
+  
+  root
+  |
+   -Mtf-     => M   = M  * M
+       |         abs   tf   in
+       -Min-
+
+  transformation are applied in reverse order:
+  M  first then M
+   in            tf
+
+
+  Mif: input frame matrix
+  Mtf: target frame matrix
+
+                                  -1          
+  M   * M  = M   * M   =>  M   = M   * M   * M  
+    if   in   tf    out      out  tf    if    in
+
+  */
+
+	mflSmartPointer<vtkMatrix4x4> inv_target_frame_matrix;
+
+  if (this->Input)
+  {
+		//change input matrix base and copy the result in this->Matrix(); if the 
+		//input frame or reference frame is null identity matrix is assumed as input
+		mflSmartPointer<vtkMatrix4x4> in_fr_mat_x_in_mat;
+
+		if (this->TargetFrame == NULL)
+		{
+		  inv_target_frame_matrix->Identity();
+		}
+		else
+		{
+		  vtkMatrix4x4::Invert(this->TargetFrame->GetMatrix(),  inv_target_frame_matrix);
+		}
+	
+		if (this->InputFrame == NULL)
+		{
+		  in_fr_mat_x_in_mat->DeepCopy(this->Input->GetMatrix());     
+		}
+		else
+		{
+		  vtkMatrix4x4::Multiply4x4(this->InputFrame->GetMatrix(), this->Input->GetMatrix(),
+								in_fr_mat_x_in_mat);
+		}
+
+		if (this->InverseFlag)
+        in_fr_mat_x_in_mat->Invert();
+
+	  vtkMatrix4x4::Multiply4x4(inv_target_frame_matrix, in_fr_mat_x_in_mat, this->Matrix);
+
+  }
+  else
+  {
+		//compute the transformation matrix between the two reference systems
+		if (this->TargetFrame == NULL)
+		{
+      if (this->InputFrame)
+      {
+        this->Matrix->DeepCopy(this->InputFrame->GetMatrix());
+      }
+			
+			if (this->InverseFlag)
+				this->Matrix->Invert();
+
+			  
+      // if input, inputframe, targetframe are all NULL this->Matrix is left unchanged,
+      // this is useful in compbination with SetMatrix to avoid overwriting.
+		}
+		else
+		{
+			vtkMatrix4x4::Invert(this->TargetFrame->GetMatrix(), 
+										inv_target_frame_matrix);
+
+			if (this->InputFrame == NULL)
+			{
+			  this->Matrix->DeepCopy(inv_target_frame_matrix);
+			}
+			else
+			{
+			vtkMatrix4x4::Multiply4x4(inv_target_frame_matrix, 
+						this->InputFrame->GetMatrix(), this->Matrix);				
+			}
+
+      if (this->InverseFlag)
+            this->Matrix->Invert();
+		}
+	
+  }
+}
+
+//----------------------------------------------------------------------------
+void mafTransform::InternalDeepCopy(vtkAbstractTransform *gtrans)
+//----------------------------------------------------------------------------
+{
+  mafTransform *transform = (mafTransform *)gtrans;
+
+  this->SetInput(transform);
+
+  if (this->InverseFlag != transform->InverseFlag)
+  {
+    this->Inverse();
+  }
+
+	this->SetInputFrame((mafTransform*)NULL);
+	this->SetTargetFrame((mafTransform*)NULL);
+}
+
+//----------------------------------------------------------------------------
+vtkAbstractTransform *mafTransform::MakeTransform()
+//----------------------------------------------------------------------------
+{
+  return mafTransform::New();
+}
+
+//----------------------------------------------------------------------------
+unsigned long mafTransform::GetMTime()
+//----------------------------------------------------------------------------
+{
+  unsigned long mtime = this->vtkLinearTransform::GetMTime();
+
+  if (this->Input)
+  {
+    unsigned long matrixMTime = this->Input->GetMTime();
+    if (matrixMTime > mtime)
+    {
+      mtime = matrixMTime;
+    }
+  }
+  
+  if (this->InputFrame)
+  {
+    unsigned long matrixMTime = this->InputFrame->GetMTime();
+    if (matrixMTime > mtime)
+    {
+      mtime = matrixMTime;
+    }
+  }
+
+  if (this->TargetFrame)
+  {
+    unsigned long matrixMTime = this->TargetFrame->GetMTime();
+    if (matrixMTime > mtime)
+    {
+      mtime = matrixMTime;
+    }
+  }
+
+  return mtime;
 }
 
 //----------------------------------------------------------------------------
@@ -1056,7 +1266,7 @@ void mafTransform::GetScale(vtkMatrix4x4 *in_matrix,double scale[3])
 void mafTransform::Scale(vtkMatrix4x4 *matrix,double scalex,double scaley,double scalez,int premult)
 //----------------------------------------------------------------------------
 {
-  mafMatrix tmp;
+  mflSmartPointer<vtkMatrix4x4> tmp;
   if (scalex == 1.0 && scaley == 1.0 && scalez == 1.0) 
   {
     return;
@@ -1761,7 +1971,7 @@ int mafTransform::ConversionTranslationMatrixToHelicalAxis(vtkMatrix4x4 *v_matri
 	//if phi approaches 180 deg it is better to use the following:
 	if (phi>135)
 		{
-			mafMatrix b_mat;
+			mflSmartPointer<vtkMatrix4x4> b_mat;
 
 			double phi_rad = phi * vtkMath::DoubleDegreesToRadians ();
 
@@ -1779,17 +1989,17 @@ int mafTransform::ConversionTranslationMatrixToHelicalAxis(vtkMatrix4x4 *v_matri
 
 
 
-			b_mat.SetElement(0,0,b00);
-			b_mat.SetElement(0,1,b01);
-			b_mat.SetElement(0,2,b02);
+			b_mat->SetElement(0,0,b00);
+			b_mat->SetElement(0,1,b01);
+			b_mat->SetElement(0,2,b02);
 
-			b_mat.SetElement(1,0,b10);
-			b_mat.SetElement(1,1,b11);
-			b_mat.SetElement(1,2,b12);
+			b_mat->SetElement(1,0,b10);
+			b_mat->SetElement(1,1,b11);
+			b_mat->SetElement(1,2,b12);
 
-			b_mat.SetElement(2,0,b20);
-			b_mat.SetElement(2,1,b21);
-			b_mat.SetElement(2,2,b22);
+			b_mat->SetElement(2,0,b20);
+			b_mat->SetElement(2,1,b21);
+			b_mat->SetElement(2,2,b22);
 
 
 
@@ -1817,9 +2027,9 @@ int mafTransform::ConversionTranslationMatrixToHelicalAxis(vtkMatrix4x4 *v_matri
 				}
 
 
-			helical_axis[0] = (b_mat.GetElement(0,index))/sqrt(bmax);
-			helical_axis[1] = (b_mat.GetElement(1,index))/sqrt(bmax);
-			helical_axis[2] = (b_mat.GetElement(2,index))/sqrt(bmax);
+			helical_axis[0] = (b_mat->GetElement(0,index))/sqrt(bmax);
+			helical_axis[1] = (b_mat->GetElement(1,index))/sqrt(bmax);
+			helical_axis[2] = (b_mat->GetElement(2,index))/sqrt(bmax);
 
 
 			if ( sign(v_matrix->GetElement(2,1)- v_matrix->GetElement(1,2)) != sign(helical_axis[0]) )
