@@ -12,7 +12,7 @@ SUBDIRS(05_testLog)
 SUBDIRS(06_testTab)
 SUBDIRS(07_testSideBar)
 SUBDIRS(08_testStatusBar)
-#SUBDIRS(09_testTimeBar)
+SUBDIRS(09_testTimeBar)
 #SUBDIRS(10_testTree)
 
 
