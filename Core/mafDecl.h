@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:19:57 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-03-10 12:30:13 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -306,21 +306,28 @@ APPSTAMP,
 
 // ids for event channels
 MCH_START,
-  MCH_UP,   ///< channel used to send events up in the tree
-  MCH_DOWN, ///< channel used to send events down in the tree
+  MCH_UP,     ///< channel used to send events up in the tree
+  MCH_DOWN,   ///< channel used to send events down in the tree
+  MCH_INPUT,  ///< channel used for events coming from an input device
+  MCH_OUTPUT, ///< channel used for events sent to an output device
+  MCH_NODE,   ///< channel used by nodes for sending events to observers
 MCH_END,
 
 // ids issued/observed by mafNode and mafVME
 NODE_START,
   NODE_DETACHED_FROM_TREE,///< issued when the node is detachment from the tree
   NODE_ATTACHED_TO_TREE,  ///< issued when the node is attached to the tree
-  NODE_DESTROY,           ///< issued when the node is destroyed
+  NODE_DESTROYED,           ///< issued when the node is destroyed
   VME_TIME_SET,           ///< used either to set or to advise of time changes
-  VME_MATRIX_UPDATE,      ///< issue when pose matrix is updated
-  VME_ABSMATRIX_UPDATE,   ///< issue when absolute pose matrix is updated
+  VME_MATRIX_PRE_UPDATE,  ///< issued by mafMatrixPipe before updating the matrix 
+  VME_MATRIX_UPDATE,      ///< issued when pose matrix is updated
+  VME_ABSMATRIX_UPDATE,   ///< issued when absolute pose matrix is updated
+  VME_OUTPUT_DATA_PREUPDATE, ///< issued by mafDataPipe before the output data is actually updated
   VME_OUTPUT_DATA_UPDATE, ///< issued when the output data is updated
-  VME_OUTPUT_DATA_CHANGED,///< issued when the output data object is changed (i.e. object pointer changed)
+  //VME_OUTPUT_DATA_CHANGED,///< issued when the output data object has changed (i.e. object pointer changed)
 NODE_END,
+
+MATRIX_UPDATED, ///< issue by a matrix pipe to advise consumers of output matrix updating
 
 // const used by mmgGui and mmgGuiValidator
 MINID,      
