@@ -21,6 +21,8 @@ SET(PROJECT_SRCS
   mafSmartObject.h
   mafString.cpp
   mafString.h
+  mafMTime.cpp
+  mafMTime.h
   mafVersion.h
   mafWIN32.h
 )
