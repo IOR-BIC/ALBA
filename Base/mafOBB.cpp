@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOBB.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-02 00:35:38 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-03-10 12:10:25 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -146,7 +146,7 @@ void mafOBB::CopyTo(float target[6])
 {
   for (int i=0;i<6;i++)
   {
-    target[i]=m_Bounds[i];
+    target[i]=(float)m_Bounds[i];
   }
 }
 
@@ -274,9 +274,9 @@ void mafOBB::MergeBounds(double b1[6], double b2[6])
 void mafOBB::GetDimensions(float dims[3])
 //-------------------------------------------------------------------------
 {
-  dims[0]=m_Bounds[1]-m_Bounds[0];
-  dims[1]=m_Bounds[3]-m_Bounds[2];
-  dims[2]=m_Bounds[5]-m_Bounds[4];
+  dims[0]=(float)(m_Bounds[1]-m_Bounds[0]);
+  dims[1]=(float)(m_Bounds[3]-m_Bounds[2]);
+  dims[2]=(float)(m_Bounds[5]-m_Bounds[4]);
 }
 
 //-------------------------------------------------------------------------
@@ -292,9 +292,9 @@ void mafOBB::GetDimensions(double dims[3])
 void mafOBB::GetCenter(float center[3])
 //-------------------------------------------------------------------------
 {
-  center[0]=(m_Bounds[0]+m_Bounds[1])/2;
-  center[1]=(m_Bounds[2]+m_Bounds[3])/2;
-  center[2]=(m_Bounds[4]+m_Bounds[5])/2;
+  center[0]=(float)(m_Bounds[0]+m_Bounds[1])/2;
+  center[1]=(float)(m_Bounds[2]+m_Bounds[3])/2;
+  center[2]=(float)(m_Bounds[4]+m_Bounds[5])/2;
 }
 
 //-------------------------------------------------------------------------
