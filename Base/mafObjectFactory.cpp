@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObjectFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-11 09:12:41 $
-  Version:   $Revision: 1.2 $
-  Authors:   Marco Petrone
+  Date:      $Date: 2004-11-15 08:19:07 $
+  Version:   $Revision: 1.3 $
+  Authors:   Based on itkObjectFactory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
@@ -13,12 +13,13 @@
 #include "mafObjectFactory.h"
 #include "mafDynamicLoader.h"
 #include "mafDirectory.h"
-//#include "mafVersion.h"
+#include "mafVersion.h"
 #include <stdlib.h>
 #include <ctype.h>
 #include <algorithm>
 #include <map>
-  
+
+/** Utility class to clean up factory memory.*/  
 class CleanUpObjectFactory
 {
 public:
@@ -31,6 +32,8 @@ public:
   }  
 };
 
+
+// Static object used to clean up memory at program closing
 static CleanUpObjectFactory CleanUpObjectFactoryGlobal;
 
 //------------------------------------------------------------------------------
@@ -76,7 +79,7 @@ std::list<mafObjectFactory*>*
   mafObjectFactory::m_RegisteredFactories = 0;
 
 //------------------------------------------------------------------------------
-// Create an instance of a named maf object using the loaded factories
+// Create an instance of a named MAF object using the loaded factories
 mafObject *mafObjectFactory::CreateInstance(const char* classname)
 //------------------------------------------------------------------------------
 {
@@ -282,20 +285,20 @@ void mafObjectFactory::LoadLibrariesInPath(const char* path)
       if ( lib )
       {
         /**
-   * Look for the symbol mafLoad in the library
-   */
+        * Look for the symbol mafLoad in the library
+        */
         MAF_LOAD_FUNCTION loadfunction
           = (MAF_LOAD_FUNCTION)mafDynamicLoader::GetSymbolAddress(lib, "mafLoad");
         /**
-   * if the symbol is found call it to create the factory
-         * from the library
-   */
+        * if the symbol is found call it to create the factory
+        * from the library
+        */
         if ( loadfunction )
         {
           mafObjectFactory* newfactory = (*loadfunction)();
           /**
-     * initialize class members if load worked
-     */
+          * initialize class members if load worked
+          */
           newfactory->m_LibraryHandle = (void*)lib;
           newfactory->m_LibraryPath = fullpath;
           newfactory->m_LibraryDate = 0; // unused for now...
@@ -305,7 +308,6 @@ void mafObjectFactory::LoadLibrariesInPath(const char* path)
     }
   }
 }
-
 
 //------------------------------------------------------------------------------
 // Recheck the MAF_AUTOLOAD_PATH for new libraries
@@ -353,7 +355,7 @@ void mafObjectFactory::RegisterFactory(mafObjectFactory* factory)
     factory->m_LibraryPath = nonDynamicName;
     }
   if ( strcmp(factory->GetMAFSourceVersion(), 
-            Version::GetMAFSourceVersion()) != 0 )
+            mafVersion::GetMAFSourceVersion()) != 0 )
     {
     /*mafGenericOutputMacro(<< "Possible incompatible factory load:" 
     << "\nRunning maf version :\n" << Version::GetMAFSourceVersion() 
@@ -365,9 +367,8 @@ void mafObjectFactory::RegisterFactory(mafObjectFactory* factory)
   factory->Register();
 }
 
-/*
 //------------------------------------------------------------------------------
-void mafObjectFactory::PrintSelf(std::ostream& os, Indent indent) const
+void mafObjectFactory::PrintSelf(std::ostream& os, mafIndent indent) const
 //------------------------------------------------------------------------------
 {
   Superclass::PrintSelf(os, indent);
@@ -408,7 +409,6 @@ void mafObjectFactory::UnRegisterFactory(mafObjectFactory* factory)
       }
     }
 }
-  
 
 //------------------------------------------------------------------------------
 // unregister all factories and delete the RegisteredFactories list
@@ -427,7 +427,6 @@ void mafObjectFactory::UnRegisterAllFactories()
     mafObjectFactory::m_RegisteredFactories = 0;
   }
 }
-
 
 //------------------------------------------------------------------------------
 void mafObjectFactory::RegisterOverride(const char* classOverride,

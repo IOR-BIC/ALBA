@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObjectFactory.h,v $
   Language:  C++
-  Date:      $Date: 2004-11-11 09:12:41 $
-  Version:   $Revision: 1.2 $
-  Authors:   Marco Petrone
+  Date:      $Date: 2004-11-15 08:19:07 $
+  Version:   $Revision: 1.3 $
+  Authors:   Based on itkObjectFactory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
@@ -24,6 +24,7 @@ typedef mafObject* (*mafCreateObjectFunction)();
 // Forward declarations
 //------------------------------------------------------------------------------
 class mafOverRideMap;
+class mafIndent;
 
 /** Create instances of classes using an object factory.
   mafObjectFactory is used to create mafObject's. The base class
@@ -122,9 +123,9 @@ public:
     mafCreateObjectFunction *m_CreateObject;
   };
 
-protected:
+  virtual void PrintSelf(std::ostream& os, mafIndent &indent) const;
 
-  //virtual void PrintSelf(std::ostream& os, Indent indent) const;
+protected:
 
   /** Register object creation information with the factory. */
   void RegisterOverride(const char* classOverride,

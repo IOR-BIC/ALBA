@@ -17,8 +17,11 @@ SET(PROJECT_SRCS
   mafObject.h
   mafObjectFactory.cpp
   mafObjectFactory.h
+  mafSmartObject.cpp
+  mafSmartObject.h
   mafString.cpp
   mafString.h
+  mafVersion.h
   mafWIN32.h
 )
 
