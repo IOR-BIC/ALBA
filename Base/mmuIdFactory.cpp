@@ -3,13 +3,13 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: mmuIdFactory.cpp,v $
 Language:  C++
-Date:      $Date: 2005-01-11 17:35:03 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2005-02-20 23:36:21 $
+Version:   $Revision: 1.2 $
 
 =========================================================================*/
 
 #include "mmuIdFactory.h"
-
+#include "mafDecl.h"
 #include <map>
 #include <vector>
 #include <string>
@@ -43,7 +43,7 @@ static mmuIdFactoryDictionaryType mmuIdFactoryDictionary;
 //static mmuIdFactory::mmuIdFactoryDictionaryType mmuIdFactoryDictionary; 
 
 // This is for allocating unique  Ids.
-mafID mmuIdFactory::m_IdCounter = 1;
+mafID mmuIdFactory::m_IdCounter = MAF_BASE_ID;
 
 //------------------------------------------------------------------------------
 mafID mmuIdFactory::AllocIdGroup(const char *idname,int num)
