@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObserver.cpp,v $
   Language:  C++
-  Date:      $Date: 2004-11-04 12:18:53 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2004-11-05 18:35:54 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -29,7 +29,7 @@ mafObserver::~mafObserver()
 }
 
 //------------------------------------------------------------------------------
-void ProcessEvent(mafEventBase *e)
+void mafObserver::ProcessEvent(mafEventBase *e)
 //------------------------------------------------------------------------------
 {
 }
