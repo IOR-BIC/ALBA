@@ -129,7 +129,7 @@ int main()
   foo.m_IVector[2]=12;
   foo.m_IVector[3]=13;
 
-  foo.m_Text="Saved String";
+  foo.m_Text="Saved String àèéìòù";
 
   foo.m_Dummy=&dummy;
 
@@ -177,7 +177,7 @@ int main()
   MAF_TEST(new_foo.m_IVector[2]==12);
   MAF_TEST(new_foo.m_IVector[3]==13);
 
-  MAF_TEST(new_foo.m_Text=="Saved String");
+  MAF_TEST(new_foo.m_Text=="Saved String àèéìòù");
 
   MAF_TEST(new_foo.m_Dummy!=NULL);
   MAF_TEST(new_foo.m_Dummy->IsType(mafDummyObject))
