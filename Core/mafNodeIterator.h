@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeIterator.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-02 21:07:05 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2004-12-04 09:28:39 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -109,34 +109,34 @@ protected:
   Find the right most leaf of the tree*/
   mafNode *FindRightMostLeaf(mafNode *node);
 
-  mafEventSource &GetTraverseEvents() {return m_TraverseEvents;}
+  mafEventSource &GetEventSource() {return m_EventSource;}
 
   /**
-    Callback function. By default send an event through the m_TraverseEvents source. */
+    Callback function. By default send an event through the m_EventSource source. */
   virtual PreExecute(); 
 
   /**
-    Callback function. By default send an event through the m_TraverseEvents source. */
+    Callback function. By default send an event through the m_EventSource source. */
   virtual PostExecute();  
 
   /**
-    Callback function. By default send an event through the m_TraverseEvents source. */
+    Callback function. By default send an event through the m_EventSource source. */
   virtual DeeperExecute(mafNode *); 
 
   /**
-    Callback function. By default send an event through the m_TraverseEvents source. */
+    Callback function. By default send an event through the m_EventSource source. */
   virtual UpperExecute(mafNode *);  
 
   /**
-    Callback function. By default send an event through the m_TraverseEvents source. */
+    Callback function. By default send an event through the m_EventSource source. */
   virtual FirstExecute(); 
 
   /**
-    Callback function. By default send an event through the m_TraverseEvents source. */
+    Callback function. By default send an event through the m_EventSource source. */
   virtual LastExecute();  
 
   /**
-    Callback function. By default send an event through the m_TraverseEvents source. */
+    Callback function. By default send an event through the m_EventSource source. */
   virtual DoneExecute();  
 
   mafNodeIterator(mafNode *root=NULL);
@@ -149,7 +149,7 @@ protected:
 
   mafVector<mafID> m_CurrentIdx;
 
-  mafEventSource  m_TraverseEvents;
+  mafEventSource  m_EventSource; ///< Source of events issued during traverse
 
 private:
   mafNodeIterator(const mafNodeIterator&) {} // Not implemented

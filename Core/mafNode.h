@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2004-12-02 21:07:05 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2004-12-04 09:28:38 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,6 +14,7 @@
 
 #include "mafSmartObject.h"
 #include "mafSmartPointer.h"
+#include "mafEventSource.h"
 #include "mafVector.h"
 #include "mafString.h"
 #include "mafMTime.h"
@@ -53,6 +54,7 @@ class mafNodeIterator;
   @todo
   - testing
   - events invoking
+  - implement the Store/Restore
 
   @sa mafRootNode
 */
@@ -83,6 +85,12 @@ public:
   
   /** Return true if this agent has been initialized */
   int IsInitialized() {return m_Initialized;}
+
+  /** serialize the object on a store. @todo syntax to be changed */
+  int Store();
+
+  /** unserialized the object from a storage. @todo syntax to be changed */
+  int Restore();
   
   /**
   return the name of this VME*/
@@ -231,6 +239,9 @@ public:
   /** return modification time */
   inline unsigned long GetMTime();
 
+  /** return a reference to the event source issuing events for this object */
+  mafEventSource &GetEventSource() {return m_EventSource;}
+
   typedef mafVector<mafAutoPointer<mafNode> > mafChildrenVector;
 
   enum crypting {NO_CRYPTING=0,DEFAULT_CRYPTING};
@@ -260,6 +271,8 @@ protected:
   bool  m_VisibleToTraverse;  ///< enable/disable traversing visit of this node
   bool  m_Initialized;        ///< set true by Initialize()
   int   m_Crypting;           ///< enable crypting during storing/restoring for this node
+
+  mafEventSource m_EventSource; ///< source of events issued by the node
 };
 
 
