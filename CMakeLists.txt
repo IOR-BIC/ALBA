@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2004-10-25 18:10:14 $
-# Version:   $Revision: 1.7 $
+# Date:      $Date: 2004-11-08 16:36:01 $
+# Version:   $Revision: 1.8 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -71,16 +71,27 @@ ENDIF (MFL_CONFIG_FOUND)
 IF (MAF_CAN_BUILD)
   # include all necessary for using the MFL
   INCLUDE (${USE_MFL_FILE})
+
+  # Create the header to configure the classes.
+  CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/mafConfigure.h.in
+               ${PROJECT_BINARY_DIR}/mafConfigure.h
+               @ONLY)
   
   # Add single dirs to inclusion path
+  INCLUDE_DIRECTORIES(BEFORE ".")
   INCLUDE_DIRECTORIES(${MAF_BINARY_DIR})
+
+  #todo: add a FOREACH on all subdirs but "modules"
   INCLUDE_DIRECTORIES(${MAF_BINARY_DIR}/Core)
-  
+  INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/Core)
+  INCLUDE_DIRECTORIES(${MAF_BINARY_DIR}/Gui)
+  INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/Gui)
   # Configuring MAF kits
   DBG_MESSAGE("MAF: Configuring MAF Kits" ${DEBUG})
   MESSAGE(STATUS "MAF: Configuring MAF Kits")
   SUBDIRS (Core)
   SUBDIRS (vtkMAF)
+  SUBDIRS (Gui)
   
   #
   # Build examples too ?

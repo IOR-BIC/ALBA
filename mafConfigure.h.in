@@ -1,0 +1,26 @@
+#ifndef __MAF_Configure_h
+#define __MAF_Configure_h
+
+#if @BUILD_SHARED_LIBS@
+# define MAF_SHARED
+#endif
+
+#if defined(_MSC_VER) && defined(MAF_SHARED)
+# pragma warning ( disable : 4275 )
+#endif
+
+#if defined(_WIN32) && defined(MAF_SHARED)
+# if defined(MAF_EXPORTS)
+#  define MAF_EXPORT __declspec( dllexport ) 
+# else
+#  define MAF_EXPORT __declspec( dllimport ) 
+# endif
+#else
+# define MAF_EXPORT
+#endif
+
+#cmakedefine MAF_USE_VTK
+#cmakedefine MAF_USE_WX
+#cmakedefine MAF_USE_ITK
+
+#endif // __MAF_Configure_h
