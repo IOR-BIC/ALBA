@@ -3,9 +3,10 @@
 #
 
 PROJECT(mafCore)
-MESSAGE(STATUS "Configuring project mafCore")
-# Set your list of sources here.  Do not change the name of the
-# vtkLocal_SRCS variable.
+
+DBG_MESSAGE("Configuring project mafCore")
+
+# Set your list of sources here.
 SET(PROJECT_SRCS
   mafBase.h
   mafDefines.cpp
@@ -70,14 +71,11 @@ ENDIF (MAF_USE_VTK)
 
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS "" )
+#SET(PROJECT_LIBS "mafIO" )
 
 IF (MAF_USE_VTK)
   SET(PROJECT_LIBS ${PROJECT_LIBS} vtkCommon)
 ENDIF (MAF_USE_VTK)
-
-#-----------------------------------------------------------------------------
-# Do not change anything below this line.
 
 # Create the library.
 ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
@@ -91,6 +89,7 @@ IF (MAF_USE_WX)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_WXWIN_LIBRARY)
 ENDIF (MAF_USE_WX)
 
+# build tests
 IF(BUILD_TESTING)
   SUBDIRS(Testing)
 ENDIF(BUILD_TESTING)
