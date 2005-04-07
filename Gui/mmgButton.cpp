@@ -2,15 +2,13 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:09:59 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 11:39:44 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
-
-#include "mmgBitmaps.h"
 #include "mmgButton.h"
 
  //SIL. 23-3-2005:  -- hack to be removed

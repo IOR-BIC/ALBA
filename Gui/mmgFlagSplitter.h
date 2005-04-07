@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgFlagSplitter.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:10:00 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 11:39:45 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,7 +18,6 @@
 #include <wx/splitter.h>
 #include <wx/hash.h>
 
-#include "mmgBitmaps.h"
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "mmgPanel.h"

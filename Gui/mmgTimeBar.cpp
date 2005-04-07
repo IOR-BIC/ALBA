@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 08:37:04 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-07 11:39:47 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -14,10 +14,7 @@
 #include <wx/treectrl.h> // per floor
 
 #include "mafDecl.h"
-
-#include "mmgBitmaps.h" //to be removed
 #include "mafPics.h"  //SIL. 7-4-2005: 
-
 
 #include "mmgPicButton.h"
 #include "mmgValidator.h"
@@ -25,7 +22,7 @@
 //----------------------------------------------------------------------------
 // constant
 //----------------------------------------------------------------------------
-enum 
+enum mmgTimeBar_Constants
 {
   ID_ENTRY = MINID,
   ID_SLIDER,

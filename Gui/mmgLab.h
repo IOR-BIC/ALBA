@@ -2,16 +2,16 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLab.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:10:01 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 11:39:45 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef _mmgLab_H_
-#define _mmgLab_H_
+#ifndef __mmgLab_H__
+#define __mmgLab_H__
 
 #include "mafDefines.h" //important: mafDefines should always be included as first
 
@@ -44,4 +44,4 @@ protected:
 	void OnLeftMouseButtonDown(wxMouseEvent &event);
 DECLARE_EVENT_TABLE()
 };
-#endif // _mmgLab_H_
+#endif // __mmgLab_H__

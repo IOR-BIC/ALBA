@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 08:36:12 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-07 11:39:46 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -104,8 +104,8 @@ mmgMDIFrame::mmgMDIFrame(const wxString& title, const wxPoint& pos, const wxSize
   Centre();
 
   wxIconBundle ib;
-  ib.AddIcon( mafGetIcon("FRAME_ICON16x16") );
-  ib.AddIcon( mafGetIcon("FRAME_ICON32x32") );
+  ib.AddIcon( mafPics.GetIcon("FRAME_ICON16x16") );
+  ib.AddIcon( mafPics.GetIcon("FRAME_ICON32x32") );
   SetIcons(ib);
 
 #ifdef MAF_USE_VTK

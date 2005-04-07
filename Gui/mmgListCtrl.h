@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgListCtrl.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:10:01 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 11:39:46 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,7 +30,9 @@
 enum ITEM_ICONS
 {
    ITEM_ERROR  =-1, //restituito da GetItemIcon(id) se id non esiste
-   ITEM_YELLOW =0,
+
+
+   ITEM_YELLOW =0,  //todo: to be verified (after changes in mmgBitmaps)  //SIL. 7-4-2005: 
    ITEM_GRAY,
    ITEM_RED,
    ITEM_BLUE

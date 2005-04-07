@@ -2,19 +2,18 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgNamedPanel.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 08:58:08 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-07 11:39:47 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
+#include "mmgNamedPanel.h"
 
 #include "mafDecl.h"
-#include "mmgNamedPanel.h"
-#include "mmgBitmaps.h"
+#include "mafPics.h"
 #include "mmgPicButton.h"
-#include <wx/statbox.h> // testing -- maye to be removed  //SIL. 31-3-2005: 
 
 //----------------------------------------------------------------------------
 // mmgNamedPanel
@@ -58,7 +57,8 @@ mmgNamedPanel::mmgNamedPanel( wxWindow* parent,wxWindowID id,bool CloseButton,bo
 
 	  if (CloseButton)
 	  {
-		  mmgPicButton *b = new mmgPicButton(m_top, ID_CLOSE_SASH);
+		  mmgPicButton *b = new mmgPicButton(m_top, "CLOSE_SASH");
+      b->SetEventId(ID_CLOSE_SASH);  //SIL. 7-4-2005: 
 		  m_topsizer->Add(b,0,wxRIGHT,2);
 	  }
 

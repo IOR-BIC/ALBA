@@ -2,16 +2,16 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgButton.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:09:59 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 11:39:44 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef _mmgButton_H_
-#define _mmgButton_H_
+#ifndef __mmgButton_H__
+#define __mmgButton_H__
 
 #include "mafDefines.h" //important: mafDefines should always be included as first
 #include "mafEvent.h"
@@ -58,4 +58,4 @@ protected:
 
   DECLARE_EVENT_TABLE()
 };
-#endif  // _mmgButton_H_
+#endif  // __mmgButton_H__

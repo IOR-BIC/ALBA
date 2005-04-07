@@ -20,8 +20,6 @@ mafSideBar.cpp
 mafSideBar.h
 mafWXLog.cpp
 mafWXLog.h
-mmgBitmaps.cpp
-mmgBitmaps.h
 mmgButton.cpp
 mmgButton.h
 mmgCrossSplitter.cpp

@@ -2,16 +2,16 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgPicButton.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 08:36:53 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-07 11:39:47 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef _mmgPicButton_H_
-#define _mmgPicButton_H_
+#ifndef __mmgPicButton_H__
+#define __mmgPicButton_H__
 
 #include "mafDefines.h" //important: mafDefines should always be included as first
 #include "mafEvent.h"
@@ -32,7 +32,7 @@ DECLARE_DYNAMIC_CLASS(mmgPicButton)
 
 public:
   mmgPicButton() { };
-  mmgPicButton(wxWindow *parent, long BitmapId, wxWindowID id = 0 );
+  
   mmgPicButton(wxWindow *parent, wxString BitmapId, wxWindowID id = 0 );
 
   /** Set the Listener that will receive event-notification. */
@@ -40,7 +40,6 @@ public:
   void SetEventId(long EventId); 
 
   /** Link the bitmap to the button through the id. */
-  void SetBitmap(long     BitmapId, wxWindowID id = 0); 
   void SetBitmap(wxString BitmapId, wxWindowID id = 0); 
 
 protected:  
@@ -60,4 +59,4 @@ protected:
 
 DECLARE_EVENT_TABLE()
 };
-#endif // _mmgPicButton_H_
+#endif // __mmgPicButton_H__

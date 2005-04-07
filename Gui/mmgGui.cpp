@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 08:35:33 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-07 11:39:45 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,7 +17,6 @@
 #include "mmgValidator.h"
 #include "mmgGui.h"
 
-#include "mmgBitmaps.h"
 #include "mmgButton.h"
 #include "mmgPicButton.h"
 //----------------------------------------------------------------------------

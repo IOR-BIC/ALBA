@@ -2,17 +2,18 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgListCtrl.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:10:01 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 11:39:46 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
+#include "mmgListCtrl.h"
+
 #include "mafDecl.h"
 #include "mafString.h"
-#include "mmgListCtrl.h"
-#include "mmgBitmaps.h"
+#include "mafPics.h"
 
 //----------------------------------------------------------------------------
 // EVENT_TABLE
@@ -33,10 +34,10 @@ mmgListCtrl::mmgListCtrl( wxWindow* parent,wxWindowID id, bool CloseButton, bool
   m_Listener = NULL;
 
   m_images = new wxImageList(15,15,FALSE,4);
-  m_images->Add(mmgBitmaps(PIC_NODE_YELLOW));
-  m_images->Add(mmgBitmaps(PIC_NODE_GRAY));
-  m_images->Add(mmgBitmaps(PIC_NODE_RED));
-  m_images->Add(mmgBitmaps(PIC_NODE_BLUE));
+  m_images->Add(mafPics.GetBmp("PIC_NODE_YELLOW"));
+  m_images->Add(mafPics.GetBmp("PIC_NODE_GRAY"));
+  m_images->Add(mafPics.GetBmp("PIC_NODE_RED"));
+  m_images->Add(mafPics.GetBmp("PIC_NODE_BLUE"));
 
   m_list = new wxListCtrl(this,ID_LIST,wxDefaultPosition,wxSize(100,100) ,wxLC_REPORT);
   

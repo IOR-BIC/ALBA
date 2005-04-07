@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIChild.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 09:01:23 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 11:39:46 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,7 +18,7 @@
 #include <wx/laywin.h>
 #include <wx/mdi.h>
 
-#define MAX_CUSTOM_ID 20
+//#define MAX_CUSTOM_ID 20  //todo: SIL. 7-4-2005: ---- what is this ?
 
 #include "mafEvent.h"
 //----------------------------------------------------------------------------

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPics.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 08:34:28 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 11:39:44 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -16,22 +16,27 @@
 #include "mafPics.h" 
 #include <map>
 #include <string>
-
 //----------------------------------------------------------------------------
-// ThePicMap
+// mafPictureFactory_Pimpl
 //----------------------------------------------------------------------------
-
 typedef std::map<std::string,wxImage> mafPicMap;
-mafPicMap ThePicMap;
+
+struct mafPictureFactory_Pimpl
+{
+   public:
+   mafPicMap map;
+};
+//----------------------------------------------------------------------------
+// the mafPic Singleton
+//----------------------------------------------------------------------------
+mafPictureFactory mafPics;
 
 //----------------------------------------------------------------------------
-// ThePicMapInitializer
+mafPictureFactory::mafPictureFactory()
 //----------------------------------------------------------------------------
-class PicMapInitializer
 {
-public:
-  PicMapInitializer()
-  {
+    m_p = new mafPictureFactory_Pimpl();
+
     #include <pic/FRAME_ICON16x16.xpm>   
     mafADDPIC(FRAME_ICON16x16);
     #include <pic/FRAME_ICON32x32.xpm>   
@@ -88,42 +93,61 @@ public:
     mafADDPIC(ZOOM_ALL);     
     #include <pic/ZOOM_SEL.xpm>        
     mafADDPIC(ZOOM_SEL);     
-  }
-};
-PicMapInitializer ThePicMapInitializer;
 
-//----------------------------------------------------------------------------
-void mafAddPic(wxString id,char** xpm)
-//----------------------------------------------------------------------------
-{
-  ThePicMap[id.c_str()]= wxImage(xpm);
+    // these are used by the ListCtrl
+    #include <pic/NODE_YELLOW.xpm>        
+    mafADDPIC(NODE_YELLOW);     
+    #include <pic/NODE_RED.xpm>        
+    mafADDPIC(NODE_RED);     
+    #include <pic/NODE_BLUE.xpm>        
+    mafADDPIC(NODE_BLUE);     
+    #include <pic/NODE_GRAY.xpm>        
+    mafADDPIC(NODE_GRAY);     
 }
 //----------------------------------------------------------------------------
-wxBitmap mafGetBmp(wxString id)
+mafPictureFactory::~mafPictureFactory()
 //----------------------------------------------------------------------------
 {
-  mafPicMap::iterator it=ThePicMap.find(id.c_str());
-  if (it!=ThePicMap.end())
+  cppDEL(m_p);
+}
+//----------------------------------------------------------------------------
+void mafPictureFactory::Add(wxString id,char** xpm)
+//----------------------------------------------------------------------------
+{
+  m_p->map[id.c_str()]= wxImage(xpm);
+}
+//----------------------------------------------------------------------------
+wxBitmap mafPictureFactory::GetBmp(wxString id)
+//----------------------------------------------------------------------------
+{
+  mafPicMap::iterator it=m_p->map.find(id.c_str());
+  if (it!= m_p->map.end())
     return wxBitmap((*it).second);
   else
+  {
+    wxLogMessage("mafPictureFactory: pic with id = %s not found",id);
     return wxNullBitmap;
+  }
 }
 //----------------------------------------------------------------------------
-wxImage mafGetImg(wxString id)
+wxImage mafPictureFactory::GetImg(wxString id)
 //----------------------------------------------------------------------------
 {
-  mafPicMap::iterator it=ThePicMap.find(id.c_str());
-  if (it!=ThePicMap.end())
+  mafPicMap::iterator it=m_p->map.find(id.c_str());
+  if (it!= m_p->map.end())
     return (*it).second;
   else
+  {
+    wxLogMessage("mafPictureFactory: pic with id = %s not found",id);
     return wxNullImage;
+  }
 }
 //----------------------------------------------------------------------------
-wxIcon mafGetIcon(wxString id)
+wxIcon mafPictureFactory::GetIcon(wxString id)
 //----------------------------------------------------------------------------
 {
-  mafPicMap::iterator it=ThePicMap.find(id.c_str());
-  if (it!=ThePicMap.end())
+  mafPicMap::iterator it=m_p->map.find(id.c_str());
+  if (it!= m_p->map.end())
   {
     wxBitmap bmp = wxBitmap((*it).second);
     wxIcon icon;
@@ -131,7 +155,10 @@ wxIcon mafGetIcon(wxString id)
     return icon;
   }
   else
+  {
+    wxLogMessage("mafPictureFactory: pic with id = %s not found",id);
     return wxNullIcon;
+  }
 }
 
 

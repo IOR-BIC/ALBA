@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 08:58:08 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-07 11:39:45 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2005
@@ -38,7 +38,7 @@ class mmgCheckListBox;
 //----------------------------------------------------------------------------
 // Constants to be used with mmgGUI::GetMetrics()
 //----------------------------------------------------------------------------
-enum 
+enum mmgGUI_constants
 {
   GUI_ROW_MARGIN,
   GUI_LABEL_MARGIN,

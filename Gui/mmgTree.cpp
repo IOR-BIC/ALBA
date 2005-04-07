@@ -2,17 +2,17 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:10:04 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 11:39:47 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#include "mafDecl.h"
 #include "mmgTree.h"
-#include "mmgBitmaps.h"
+#include "mafDecl.h"
+#include "mafPics.h"
 
 //----------------------------------------------------------------------------
 // EVENT_TABLE
@@ -32,10 +32,10 @@ mmgTree::mmgTree( wxWindow* parent,wxWindowID id, bool CloseButton, bool HideTit
   m_Listener = NULL;
 
   m_images = new wxImageList(15,15,FALSE,4);
-  m_images->Add(mmgBitmaps(PIC_NODE_YELLOW));
-  m_images->Add(mmgBitmaps(PIC_NODE_GRAY));
-  m_images->Add(mmgBitmaps(PIC_NODE_RED));
-  m_images->Add(mmgBitmaps(PIC_NODE_BLUE));
+  m_images->Add(mafPics.GetBmp("PIC_NODE_YELLOW"));
+  m_images->Add(mafPics.GetBmp("PIC_NODE_GRAY"));
+  m_images->Add(mafPics.GetBmp("PIC_NODE_RED"));
+  m_images->Add(mafPics.GetBmp("PIC_NODE_BLUE"));
 
   m_tree = new wxTreeCtrl(this,ID_TREE,wxDefaultPosition,wxSize(100,100),wxNO_BORDER | wxTR_HAS_BUTTONS);
   m_tree->SetImageList(m_images);

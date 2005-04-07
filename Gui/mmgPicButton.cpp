@@ -2,15 +2,14 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgPicButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 08:36:52 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-07 11:39:47 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#include "mmgBitmaps.h"
 #include "mmgPicButton.h"
 #include "mafPics.h"
 
@@ -24,19 +23,6 @@ END_EVENT_TABLE()
 
 IMPLEMENT_DYNAMIC_CLASS(mmgPicButton,wxBitmapButton)
 //----------------------------------------------------------------------------
-mmgPicButton::mmgPicButton(wxWindow *parent, long BitmapId, wxWindowID id)
-//----------------------------------------------------------------------------
-{
-  m_Listener = NULL;
-  if(id == 0) m_id = BitmapId; else m_id = id;
-
-  wxBitmap b = mmgBitmaps(BitmapId);
-  wxSize size(b.GetWidth(),b.GetHeight());
-   
-  Create(parent, m_id, mmgBitmaps(BitmapId), wxDefaultPosition, size);
-  SetBitmapFocus(mmgBitmaps(BitmapId));
-};
-//----------------------------------------------------------------------------
 mmgPicButton::mmgPicButton(wxWindow *parent, wxString BitmapId, wxWindowID id)
 //----------------------------------------------------------------------------
 {
@@ -44,7 +30,7 @@ mmgPicButton::mmgPicButton(wxWindow *parent, wxString BitmapId, wxWindowID id)
   //if(id == 0) m_id = BitmapId; else m_id = id;
   m_id = id; //SIL. 7-4-2005: 
 
-  wxBitmap b = mafGetBmp(BitmapId);
+  wxBitmap b = mafPics.GetBmp(BitmapId);
   wxSize size(b.GetWidth(),b.GetHeight());
 
   Create(parent, m_id, b, wxDefaultPosition, size);
@@ -83,20 +69,11 @@ bool mmgPicButton::MSWCommand(WXUINT param, WXWORD id)
 }
 #endif
 //----------------------------------------------------------------------------
-void mmgPicButton::SetBitmap(long BitmapId, wxWindowID id )
-//----------------------------------------------------------------------------
-{
-  SetBitmapLabel(mmgBitmaps(BitmapId));
-  SetBitmapFocus(mmgBitmaps(BitmapId));
-  if(id == 0) m_id = BitmapId; else m_id = id;
-  Refresh();
-}
-//----------------------------------------------------------------------------
 void mmgPicButton::SetBitmap(wxString BitmapId, wxWindowID id )
 //----------------------------------------------------------------------------
 {
-  SetBitmapLabel(mafGetBmp(BitmapId));
-  SetBitmapFocus(mafGetBmp(BitmapId));
+  SetBitmapLabel(mafPics.GetBmp(BitmapId));
+  SetBitmapFocus(mafPics.GetBmp(BitmapId));
   //if(id == 0) m_id = BitmapId; else  //SIL. 7-4-2005: 
     m_id = id;
   Refresh();
