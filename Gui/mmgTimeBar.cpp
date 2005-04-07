@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-04 15:03:21 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-07 08:37:04 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -14,7 +14,11 @@
 #include <wx/treectrl.h> // per floor
 
 #include "mafDecl.h"
-#include "mmgBitmaps.h" 
+
+#include "mmgBitmaps.h" //to be removed
+#include "mafPics.h"  //SIL. 7-4-2005: 
+
+
 #include "mmgPicButton.h"
 #include "mmgValidator.h"
 #include "mmgFloatSlider.h"
@@ -78,11 +82,11 @@ m_timer(NULL, ID_TIMER)
   m_sizer->Add( lab2,0,wxALIGN_CENTER);
   m_sizer->Add( m_entry2,0,wxALIGN_CENTER);
 
-  m_b[0] = new mmgPicButton(this, TIME_BEGIN);  
-  m_b[1] = new mmgPicButton(this, TIME_PREV );  
-  m_b[2] = new mmgPicButton(this, TIME_PLAY );  
-  m_b[3] = new mmgPicButton(this, TIME_NEXT );  
-  m_b[4] = new mmgPicButton(this, TIME_END  );  
+  m_b[0] = new mmgPicButton(this, "TIME_BEGIN", TIME_BEGIN);  
+  m_b[1] = new mmgPicButton(this, "TIME_PREV",  TIME_PREV);  
+  m_b[2] = new mmgPicButton(this, "TIME_PLAY",  TIME_PLAY);  
+  m_b[3] = new mmgPicButton(this, "TIME_NEXT",  TIME_NEXT);  
+  m_b[4] = new mmgPicButton(this, "TIME_END",   TIME_END);  
 
   for(int i = 0; i < 5; i++)
   {
@@ -138,12 +142,14 @@ void mmgTimeBar::OnEvent(mafEvent& e)
   }
   if(play)
   {
-    m_b[2]->SetBitmap(TIME_STOP, TIME_STOP);
+    m_b[2]->SetBitmap("TIME_STOP");
+    m_b[2]->SetEventId(TIME_STOP);
     m_timer.Start(1);
   }
   else
   {
-    m_b[2]->SetBitmap(TIME_PLAY, TIME_PLAY);
+    m_b[2]->SetBitmap("TIME_PLAY");
+    m_b[2]->SetEventId(TIME_PLAY);
     m_timer.Stop();
   }
   

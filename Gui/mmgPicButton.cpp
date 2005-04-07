@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgPicButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:10:02 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 08:36:52 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -12,6 +12,7 @@
 
 #include "mmgBitmaps.h"
 #include "mmgPicButton.h"
+#include "mafPics.h"
 
 #define BN_CLICKED 0  //SIL. 23-3-2005:  Hack to be Removed
 //----------------------------------------------------------------------------
@@ -27,10 +28,7 @@ mmgPicButton::mmgPicButton(wxWindow *parent, long BitmapId, wxWindowID id)
 //----------------------------------------------------------------------------
 {
   m_Listener = NULL;
-  if(id == 0) 
-		m_id = BitmapId; 
-	else 
-		m_id = id;
+  if(id == 0) m_id = BitmapId; else m_id = id;
 
   wxBitmap b = mmgBitmaps(BitmapId);
   wxSize size(b.GetWidth(),b.GetHeight());
@@ -38,6 +36,26 @@ mmgPicButton::mmgPicButton(wxWindow *parent, long BitmapId, wxWindowID id)
   Create(parent, m_id, mmgBitmaps(BitmapId), wxDefaultPosition, size);
   SetBitmapFocus(mmgBitmaps(BitmapId));
 };
+//----------------------------------------------------------------------------
+mmgPicButton::mmgPicButton(wxWindow *parent, wxString BitmapId, wxWindowID id)
+//----------------------------------------------------------------------------
+{
+  m_Listener = NULL;
+  //if(id == 0) m_id = BitmapId; else m_id = id;
+  m_id = id; //SIL. 7-4-2005: 
+
+  wxBitmap b = mafGetBmp(BitmapId);
+  wxSize size(b.GetWidth(),b.GetHeight());
+
+  Create(parent, m_id, b, wxDefaultPosition, size);
+  SetBitmapFocus(b);
+};
+//----------------------------------------------------------------------------
+void mmgPicButton::SetEventId(long EventId)
+//----------------------------------------------------------------------------
+{
+   m_id = EventId;
+}
 //----------------------------------------------------------------------------
 void mmgPicButton::Command(wxCommandEvent& event)
 //----------------------------------------------------------------------------
@@ -71,5 +89,15 @@ void mmgPicButton::SetBitmap(long BitmapId, wxWindowID id )
   SetBitmapLabel(mmgBitmaps(BitmapId));
   SetBitmapFocus(mmgBitmaps(BitmapId));
   if(id == 0) m_id = BitmapId; else m_id = id;
+  Refresh();
+}
+//----------------------------------------------------------------------------
+void mmgPicButton::SetBitmap(wxString BitmapId, wxWindowID id )
+//----------------------------------------------------------------------------
+{
+  SetBitmapLabel(mafGetBmp(BitmapId));
+  SetBitmapFocus(mafGetBmp(BitmapId));
+  //if(id == 0) m_id = BitmapId; else  //SIL. 7-4-2005: 
+    m_id = id;
   Refresh();
 }
