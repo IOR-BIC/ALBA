@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:56:08 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-07 20:44:59 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -255,10 +255,10 @@ protected:
   mafString     m_URL;        ///< the URL of the data file for this dataset
   mafTimeStamp  m_TimeStamp;  ///< time stamp of this dataset
   mafString     m_DataType;   ///< the dataset type expressed as a string 
-  mafVME *      m_VME;       ///< the VME this dataset is part of
+  //mafVME *      m_VME;       ///< the VME this dataset is part of
   mafOBB        m_Bounds;     ///< spatial bounds for this dataset
   mafMTime      m_UpdateTime; ///< store modification timestamp for last update
-  mafMTime      m_MTime;      ///< Last modification time
+  //mafMTime      m_MTime;      ///< Last modification time
 
   mafString     m_TmpFileName;///< file name used for local cache
   int           m_IOMode;     ///< IO modality to be used for store/restore data

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 14:25:52 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-07 20:46:53 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -36,6 +36,7 @@ class vtkDataSet;
   @todo
   - add a GetITKMesh
   - add a GetITKImage
+  - try to remove the restore of old data_pipe timestamp inside GetDataBounds()
   */
 class MAF_EXPORT mafVMEOutput : public mafObject
 {

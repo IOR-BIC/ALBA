@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:16:32 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 20:44:59 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,6 +17,10 @@
 #include "mafVMEItemVTK.h"
 #include "mafVMEOutputVTK.h"
 #include "mafAbsMatrixPipe.h"
+#include "vtkDataSet.h"
+
+#include "vtkPolyData.h"
+#include "vtkPoints.h"
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMEGenericVTK)
@@ -45,13 +49,34 @@ mafVMEGenericVTK::~mafVMEGenericVTK()
 }
 
 //-------------------------------------------------------------------------
-void mafVMEGenericVTK::SetData(vtkDataSet *data, mafTimeStamp t)
+int mafVMEGenericVTK::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
 //-------------------------------------------------------------------------
 {
   assert(data);
   mafSmartPointer<mafVMEItemVTK> item;
-  item->SetData(data);
+  
+  switch (mode)
+  {
+  case MAF_VME_COPY_DATA:
+  {
+    data->Update();
+    vtkDataSet *new_data=data->NewInstance();
+    new_data->DeepCopy(data);
+    item->SetData(new_data);
+  }
+  break;
+  case MAF_VME_REFERENCE_DATA:
+    item->SetData(data);
+  break;
+  case MAF_VME_DETACH_DATA:  
+    item->SetData(data);
+    data->SetSource(NULL);
+  break;
+  }
+
   item->SetTimeStamp(t);
   GetDataVector()->InsertItem(item);
+
+  return MAF_OK;
 }
 

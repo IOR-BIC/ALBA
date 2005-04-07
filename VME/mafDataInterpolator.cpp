@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataInterpolator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:16:31 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 20:44:59 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -104,11 +104,12 @@ void mafDataInterpolator::PreExecute()
 void mafDataInterpolator::UpdateBounds()
 //------------------------------------------------------------------------------
 {
+  mafVMEItem *old_item=m_CurrentItem;
   this->InternalItemUpdate();
 
   if (m_CurrentItem)
-  {
-    if ( (!m_Bounds.IsValid())||(m_CurrentItem!=m_OldItem)|| \
+  { 
+    if ( (!m_Bounds.IsValid())||(m_CurrentItem!=old_item)|| \
       (m_CurrentItem->GetMTime()>m_Bounds.GetMTime())|| \
       (m_CurrentItem && m_CurrentItem->GetUpdateTime()>m_Bounds.GetMTime()))
     {

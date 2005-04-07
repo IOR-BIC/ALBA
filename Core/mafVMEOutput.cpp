@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-06 21:24:19 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-07 20:46:53 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -191,15 +191,7 @@ void mafVMEOutput::GetVMEBounds(mafOBB &bounds,mafTimeStamp t, mafNodeIterator *
   {
     mafMatrix itemPose;
     
-    if (t<0)
-    {
-      t=m_VME->GetCurrentTime();
-      GetAbsMatrix(itemPose);
-    }
-    else
-    {
-      GetAbsMatrix(itemPose,t);
-    }
+    GetAbsMatrix(itemPose,t);
     
     GetVMELocalBounds(bounds,t,iter);  
 
@@ -243,14 +235,23 @@ void mafVMEOutput::GetDataBounds(mafOBB &bounds,mafTimeStamp t) const
     // We must call explicitly UpdateBounds() method, since data pipes
     // do not update automatically the bounds when time changes.
     mafDataPipe *dpipe=m_VME->GetDataPipe();
-    dpipe->SetCurrentTime(t);
-    dpipe->UpdateBounds();
+    mafTimeStamp old_time=dpipe->GetCurrentTime();
+    
+    //if (t!=old_time)
+    //{
+      dpipe->SetCurrentTime(t);
+      dpipe->UpdateBounds();
+    //}
+
     bounds.DeepCopy(dpipe->GetBounds());
 
-    // Restore the right bounds for current time... 
-    // TODO: modify the GetBounds to make it call UpdateCurentBounds explicitly!
-    dpipe->SetCurrentTime(m_VME->GetCurrentTime());
-    dpipe->UpdateBounds();    
+    if (t!=old_time)
+    {
+      // Restore the right bounds for current time... 
+      // TODO: modify the GetBounds to make it call UpdateCurentBounds explicitly!
+      dpipe->SetCurrentTime(m_VME->GetCurrentTime());
+      dpipe->UpdateBounds();
+    }
   }
   else
   {

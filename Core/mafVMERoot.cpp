@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-06 21:25:17 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-07 20:46:54 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -73,6 +73,7 @@ void mafVMERoot::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes)
 void mafVMERoot::SetCurrentTime(mafTimeStamp t)
 //-------------------------------------------------------------------------
 {
+  Superclass::SetCurrentTime(t);
   m_Transform->SetTimeStamp(t);
 }
 

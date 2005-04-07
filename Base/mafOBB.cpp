@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOBB.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 09:56:52 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-04-07 20:42:14 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,13 +17,19 @@
 mafOBB::mafOBB()
 //-------------------------------------------------------------------------
 {
-  Reset();
+  m_Bounds[0]=0;
+  m_Bounds[1]=-1;
+  m_Bounds[2]=0;
+  m_Bounds[3]=-1;
+  m_Bounds[4]=0;
+  m_Bounds[5]=-1;
 }
 
 //-------------------------------------------------------------------------
 mafOBB::mafOBB(double source[6])
 //-------------------------------------------------------------------------
 {
+
   for (int i=0;i<6;i++)
   {
     m_Bounds[i]=source[i];
@@ -162,25 +168,25 @@ void mafOBB::CopyTo(double target[6]) const
 }
 
 //-------------------------------------------------------------------------
-void mafOBB::ApplyTransform(const mafMatrix &mat, mafOBB &newbounds) const
+void mafOBB::ApplyTransform(const mafMatrix &mat, mafOBB &newbounds)
 //-------------------------------------------------------------------------
 {
   double newpoints[4*8];
 
   int i=0;
 
-  if (IsValid())
+  if (newbounds.IsValid())
   {
 
     for (int x=0;x<2;x++)
     {
-      double X=m_Bounds[x];
+      double X=newbounds.m_Bounds[x];
       for (int y=0;y<2;y++)
       {
-        double Y=m_Bounds[y+2];
+        double Y=newbounds.m_Bounds[y+2];
         for (int z=0;z<2;z++)
         {
-          double Z=m_Bounds[z+4];
+          double Z=newbounds.m_Bounds[z+4];
         
           newpoints[i*4]=X;
           newpoints[i*4+1]=Y;

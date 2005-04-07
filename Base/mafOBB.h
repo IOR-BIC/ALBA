@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOBB.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 09:56:53 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-07 20:42:15 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -12,11 +12,11 @@
 #ifndef __mafOBB_h
 #define __mafOBB_h
 #include "mafBase.h" 
+#include "mafTimeStamped.h"
 
 #include "mafDefines.h"
 #include "mafMTime.h"
 #include "mafMatrix.h"
-#include "mafTimeStamped.h"
 
 //----------------------------------------------------------------------------
 // forward declarations
@@ -76,12 +76,12 @@ public:
     Apply the internally stored transform to the bounding box, recompute the
     bounding box and stores new BBOx in the given object. This version doesn't 
     change the internal representation but simply return the result in 'newbounds'*/
-  void ApplyTransform(mafOBB &newbounds) const {ApplyTransform(m_Matrix,newbounds);}
+  void ApplyTransform(mafOBB &newbounds) {ApplyTransform(m_Matrix,newbounds);}
 
   /** 
     Apply the given transform to the internal bounds (do not concatenate to
     the internal Matrix). */
-  void ApplyTransform(const mafMatrix &mat, mafOBB &newbounds) const;
+  static void ApplyTransform(const mafMatrix &mat, mafOBB &newbounds);
   void ApplyTransform(const mafMatrix &mat) {ApplyTransform(mat,*this);}
 
   /**
@@ -138,8 +138,6 @@ public:
 
   mafMatrix m_Matrix; ///< the pose matrix of the OBB
   double    m_Bounds[6]; ///< the bounding box
-  mafMTime  m_MTime; ///< a modification time
-
 };
 
 //-------------------------------------------------------------------------
