@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTree.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:10:04 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 16:43:30 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,18 +23,6 @@
 
 #include "mafEvent.h"
 #include "mmgNamedPanel.h"
-//----------------------------------------------------------------------------
-// Constants :
-//----------------------------------------------------------------------------
-/// possible values for icon
-enum NODE_ICONS
-{
-   NODE_YELLOW =0,
-   NODE_GRAY,
-   NODE_RED,
-   NODE_BLUE
-};
-
 //----------------------------------------------------------------------------
 // mmgTree :
 //----------------------------------------------------------------------------
@@ -105,8 +93,10 @@ public:
   /** Clears all items in the tree. */
 	void Reset();
   
-	/** Create a new tree item with the specified parent,label and icon. */
-	bool AddNode(long node_id, long parent_id , wxString label, NODE_ICONS icon = NODE_GRAY);
+	/** Create a new tree item with the specified parent,label and icon. 
+      Set parent = 0 to create the root. 0 is not a valid node_id.
+  */
+	bool AddNode(long node_id, long parent_id , wxString label, int icon = 0);
   
 	/** Delete the specified node, and its subtree. */
 	bool DeleteNode(long node_id);
@@ -118,10 +108,20 @@ public:
 	bool SetNodeParent(long node_id, long parent_id );
   
 	/** Set the icon for the node. */
-  bool SetNodeIcon(long node_id, NODE_ICONS icon);
+  bool SetNodeIcon(long node_id, int icon);
   
 	/** Select the node. */
   bool SelectNode(long node_id);
+
+  /** Set the images to be used for the nodes. 
+      Must be set before adding any node. 
+      The default ImageList provide 4 icons :
+      -1 gray dot 
+      -2 red dot 
+      -3 blue dot 
+      -4 yellow dot 
+  */
+  void SetImageList(wxImageList *img);
 
   /** Set the Listener that will receive event-notification, the Listener can be changed any time  */
   void SetListener(mafEventListener *listener)   {m_Listener=listener;}; 
@@ -148,6 +148,9 @@ protected:
 	/** Move a node, and its subtree. */
   void SetNodeParent2(long node_id, long parent_id );
     
+  /** Check that id is a valid index in the imagelist - return the (eventually clamped) value */
+  int CheckIconId(int icon);
+
   bool               m_prevent_notify;
   long               m_root;
   wxTreeCtrl        *m_tree;         

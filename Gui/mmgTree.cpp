@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 11:39:47 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-07 16:43:30 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,19 +30,25 @@ mmgTree::mmgTree( wxWindow* parent,wxWindowID id, bool CloseButton, bool HideTit
 //----------------------------------------------------------------------------
 {
   m_Listener = NULL;
-
-  m_images = new wxImageList(15,15,FALSE,4);
-  m_images->Add(mafPics.GetBmp("PIC_NODE_YELLOW"));
-  m_images->Add(mafPics.GetBmp("PIC_NODE_GRAY"));
-  m_images->Add(mafPics.GetBmp("PIC_NODE_RED"));
-  m_images->Add(mafPics.GetBmp("PIC_NODE_BLUE"));
-
-  m_tree = new wxTreeCtrl(this,ID_TREE,wxDefaultPosition,wxSize(100,100),wxNO_BORDER | wxTR_HAS_BUTTONS);
-  m_tree->SetImageList(m_images);
-  m_sizer->Add(m_tree,1,wxEXPAND);
-
+  m_images = NULL;
   m_table = NULL;
   m_prevent_notify = false;
+
+  m_tree = new wxTreeCtrl(this,ID_TREE,wxDefaultPosition,wxSize(100,100),wxNO_BORDER | wxTR_HAS_BUTTONS );
+  m_sizer->Add(m_tree,1,wxEXPAND);
+
+  //default imagelist
+  wxBitmap bmp = mafPics.GetBmp("NODE_GRAY");
+  int w = bmp.GetWidth();
+  int h = bmp.GetHeight();
+
+  m_images = new wxImageList(w,h,FALSE,4);
+  m_images->Add(bmp);
+  m_images->Add(mafPics.GetBmp("NODE_RED"));
+  m_images->Add(mafPics.GetBmp("NODE_BLUE"));
+  m_images->Add(mafPics.GetBmp("NODE_YELLOW"));
+  m_tree->SetImageList(m_images);
+
   Reset();
 }
 //----------------------------------------------------------------------------
@@ -54,7 +60,7 @@ mmgTree::~mmgTree( )
     m_table->DeleteContents(true);
     delete m_table;
   }
-	delete m_images;
+  delete m_images;
 }
 //----------------------------------------------------------------------------
 void mmgTree::Reset ()
@@ -68,16 +74,18 @@ void mmgTree::Reset ()
   m_root  = 0;
 }
 //----------------------------------------------------------------------------
-bool mmgTree::AddNode (long node_id, long parent_id , wxString label, NODE_ICONS icon)
+bool mmgTree::AddNode (long node_id, long parent_id , wxString label, int icon)
 //----------------------------------------------------------------------------
 {
 	/*
 	- se parent_id = 0 to create the root
-	- icon may be any of NODE_YELLOW,NODE_RED,NODE_GRAY,NODE_BLUE
+	- icon must be a valid index in the m_images - otherwise it is clamped
 	- fails if node_id already exist
 	- parent_id must exist
 	- return true on success
 	*/
+
+  icon = CheckIconId(icon);
 
   wxTreeItemId  item, parent_item;
 
@@ -267,9 +275,10 @@ void mmgTree::SetNodeParent2(long node_id, long parent_id )
   m_tree->Delete(item);
 }
 //----------------------------------------------------------------------------
-bool mmgTree::SetNodeIcon (long node_id, NODE_ICONS icon)
+bool mmgTree::SetNodeIcon (long node_id, int icon)
 //----------------------------------------------------------------------------
 {
+  icon = CheckIconId(icon);
   if( !NodeExist(node_id) ) return false;
   wxTreeItemId  item = ItemFromNode(node_id);
   m_tree->SetItemImage(item,icon);
@@ -329,3 +338,41 @@ void mmgTree::OnSize(wxSizeEvent& event)
 	mmgNamedPanel::OnSize(event);
   m_tree->Refresh();
 }
+//----------------------------------------------------------------------------
+int mmgTree::CheckIconId(int icon)
+//----------------------------------------------------------------------------
+{
+  if(!m_images) return 0;
+  if( icon <0 )
+  {
+    wxLogMessage("mmgTree: icon id = %d out of range ", icon);
+    return 0;
+  }
+  if( icon >= m_images->GetImageCount() ) 
+  {
+    wxLogMessage("mmgTree: icon id = %d out of range ", icon);
+    return m_images->GetImageCount()-1;
+  }
+  return icon;
+}
+//----------------------------------------------------------------------------
+void mmgTree::SetImageList(wxImageList *img)
+//----------------------------------------------------------------------------
+{
+  if(m_root != 0)
+  {
+    wxLogMessage("warning: mmgTree::SetImageList must be called before adding any node");
+    // if you replace the imagelist with a shorter one 
+    // the icon-index actually in use by the existing nodes 
+    // can become inconsistent 
+    
+    //return; //SIL. 7-4-2005: - commented 4 testing -- to be reinserted
+  }
+
+  if(img == m_images) return;
+  cppDEL(m_images);
+  m_images = img;
+  m_tree->SetImageList(m_images);
+}
+
+
