@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgSashPanel.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-31 11:45:22 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-07 08:37:56 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -110,7 +110,13 @@ bool mmgSashPanel::Show(bool show)
 
   // check menu item
   if(m_menubar) 
-    m_menubar->Check(this->GetId(),show);
+    //SIL. 7-4-2005: 
+    // when the application close,
+    // when this is about to be destroyed a Show(false) is received
+    // at that time the menubar is already there, but the menuitem was destroyed.
+    // Calling Check without controlling for the menuitem raise an exception.
+    if(m_menubar->FindItem(this->GetId())) 
+        m_menubar->Check(this->GetId(),show);
 
   // event for Layout
   wxCommandEvent c(wxEVT_COMMAND_BUTTON_CLICKED ,ID_LAYOUT);
