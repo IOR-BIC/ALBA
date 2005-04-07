@@ -1,9 +1,9 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: testPicFactoryLogic.cpp,v $
+  Module:    $RCSfile: testStatusBarLogic.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 08:42:26 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 10:09:27 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -13,22 +13,25 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "testPicFactoryLogic.h" //the class being defined, must be included as first
+#include "testStatusBarLogic.h" //the class being defined, must be included as first
 #include "mmgMDIFrame.h"
 #include "mmgNamedPanel.h"
 #include "mmgSashPanel.h"
 #include "mafWXLog.h"
 
-#include "mafPics.h"
-#include <wx/statbmp.h>
-
 #include "mmgGui.h"
 #include "mafSideBar.h"
+#include "mafView.h"
+#include <wx/gauge.h>
+#include <vtkImageMandelbrotSource.h>
 //----------------------------------------------------------------------------
-testPicFactoryLogic::testPicFactoryLogic()
+testStatusBarLogic::testStatusBarLogic()
 //----------------------------------------------------------------------------
 {
-  m_win = new mmgMDIFrame("testPicFactory", wxDefaultPosition, wxSize(800, 600));
+  m_progress =0;
+  m_progress_text = "progress text";
+
+  m_win = new mmgMDIFrame("testStatusBar", wxDefaultPosition, wxSize(800, 600));
   m_win->SetListener(this);
 
   CreateMenu();
@@ -36,25 +39,25 @@ testPicFactoryLogic::testPicFactoryLogic()
   CreateLogBar();
 }
 //----------------------------------------------------------------------------
-void testPicFactoryLogic::Show()
+void testStatusBarLogic::Show()
 //----------------------------------------------------------------------------
 {
 	m_win->Show(TRUE);
 }
 //----------------------------------------------------------------------------
-void testPicFactoryLogic::OnQuit()
+void testStatusBarLogic::OnQuit()
 //----------------------------------------------------------------------------
 {
   m_win->Destroy();
 }
 //----------------------------------------------------------------------------
-wxWindow* testPicFactoryLogic::GetTopWin()
+wxWindow* testStatusBarLogic::GetTopWin()
 //----------------------------------------------------------------------------
 {
   return m_win;
 }
 //----------------------------------------------------------------------------
-void testPicFactoryLogic::CreateMenu()
+void testStatusBarLogic::CreateMenu()
 //----------------------------------------------------------------------------
 {
   m_menu_bar  = new wxMenuBar;
@@ -66,7 +69,7 @@ void testPicFactoryLogic::CreateMenu()
   m_win->SetMenuBar(m_menu_bar);
 }
 //----------------------------------------------------------------------------
-void testPicFactoryLogic::CreateLogBar()
+void testStatusBarLogic::CreateLogBar()
 //----------------------------------------------------------------------------
 {
   wxTextCtrl *log  = new wxTextCtrl( m_win, -1, "", wxPoint(0,0), wxSize(100,300), wxNO_BORDER | wxTE_MULTILINE );
@@ -89,56 +92,48 @@ void testPicFactoryLogic::CreateLogBar()
 enum 
 {
   ID_BUSY = MINID,
+  ID_READY,
+  ID_SHOWPB,
+  ID_HIDEPB,
+  ID_PB_VALUE,
+  ID_PB_TEXT,
+  ID_TEST_VTK,
+  ID_REN_START,
+  ID_REN_END,
 };
 //----------------------------------------------------------------------------
-void testPicFactoryLogic::CreateSideBar()
+void testStatusBarLogic::CreateSideBar()
 //----------------------------------------------------------------------------
 {
   m_side_bar = new mmgSashPanel(m_win, MENU_VIEW_SIDEBAR, wxRIGHT,220,"Side Bar \tCtrl+S");
+  //mafSideBar *sb = new mafSideBar(m_win,-1,this);
   
   mmgGui *gui = new mmgGui(this); 
 
   gui->Divider();
-  gui->Label("all the icons");
+  gui->Label("Direct Api Call",true);
+  gui->Button(ID_BUSY,"busy");
+  gui->Button(ID_READY,"ready");
+  gui->Divider();
+  gui->Button(ID_REN_START,"render start");
+  gui->Button(ID_REN_END,  "render end");
+  gui->Divider();
+  gui->Button(ID_SHOWPB,"show progress bar");
+  gui->Button(ID_HIDEPB,"hide progress bar");
+  gui->Label("progress value");
+  gui->Slider(ID_PB_VALUE,"",&m_progress,0,100);
+  gui->Label("progress text");
+  gui->String(ID_PB_TEXT,"",&m_progress_text);
+  gui->Divider(2);
+  gui->Label("Connect a vtkObject",true);
+  gui->Button(ID_TEST_VTK,"test vtkProgress");
 
   /*
-  wxStaticBitmap *bmp; 
-  bmp = new wxStaticBitmap(gui,-1,mafGetPic("ico"));
-  gui->Add(bmp,0,wxLEFT);
-
-  bmp = new wxStaticBitmap(gui,-1,mafGetPic("FILE_OPEN"));
-  gui->Add(bmp,0,wxLEFT);
+  wxGauge *g = new wxGauge(gui,-1,100,wxPoint(0,100),wxSize(200,10),wxGA_SMOOTH); //SIL. 1-4-2005: 
+  g->SetRange(100);
+  g->SetValue(50);
+  gui->Add(g);
   */
-
-  #define FOO(n) { wxStaticBitmap *bmp = new wxStaticBitmap(gui,-1,mafGetBmp(#n));  gui->Add(bmp,0,wxLEFT); }
-  FOO(APP_ICON16x16)
-    FOO(APP_ICON32x32)
-    FOO(CLOSE_SASH)
-    FOO(FILE_NEW)
-    FOO(FILE_OPEN)
-    FOO(FILE_SAVE)
-    FOO(FLYTO)
-    FOO(MDICHILD_ICON)
-    FOO(OP_COPY)
-    FOO(OP_CUT)
-    FOO(OP_PASTE)
-    FOO(OP_REDO)
-    FOO(OP_UNDO)
-    FOO(PIC_BACK)
-    FOO(PIC_BOTTOM)
-    FOO(PIC_FRONT)
-    FOO(PIC_LEFT)
-    FOO(PIC_RIGHT)
-    FOO(PIC_TOP)
-    FOO(TIME_BEGIN)
-    FOO(TIME_END)
-    FOO(TIME_NEXT)
-    FOO(TIME_PLAY)
-    FOO(TIME_PREV)
-    FOO(TIME_STOP)
-    FOO(ZOOM)
-    FOO(ZOOM_ALL)
-    FOO(ZOOM_SEL)
 
   gui->FitGui();
   gui->Reparent(m_side_bar);
@@ -146,7 +141,7 @@ void testPicFactoryLogic::CreateSideBar()
   gui->Show();
 }
 //----------------------------------------------------------------------------
-void testPicFactoryLogic::OnEvent(mafEvent& e)
+void testStatusBarLogic::OnEvent(mafEvent& e)
 //----------------------------------------------------------------------------
 {
 switch(e.GetId())
@@ -162,13 +157,47 @@ switch(e.GetId())
     break; 
   case UPDATE_UI:
     break; 
-
+  case ID_BUSY:
+    m_win->Busy();
+    break; 
+  case ID_READY:
+    m_win->Ready();
+    break; 
+  case ID_SHOWPB:
+    m_win->ProgressBarShow();
+    m_win->ProgressBarSetVal(m_progress);
+    m_win->ProgressBarSetText(&m_progress_text);
+    break; 
+  case ID_HIDEPB:
+    m_win->ProgressBarHide();
+    break; 
+  case ID_PB_VALUE:
+    m_win->ProgressBarSetVal(m_progress);
+  break; 
+  case ID_PB_TEXT:
+    m_win->ProgressBarSetText(&m_progress_text);
+  break; 
+  case ID_TEST_VTK:
+  {
+    vtkImageMandelbrotSource *ims = NULL;
+    ims = vtkImageMandelbrotSource::New();
+    ims->SetWholeExtent(0,1000,0,1000,0,1);
+    m_win->BindToProgressBar(ims,&wxString("vtkImageMandelbrotSource"));
+    ims->Update();
+    ims->Delete();
+  }
+  break; 
+  case ID_REN_START:
+    m_win->RenderStart();
+  break; 
+  case ID_REN_END:
+    m_win->RenderEnd();
+  break; 
   default:
     e.Log();
     break; 
   }
 }
-
 
 
 

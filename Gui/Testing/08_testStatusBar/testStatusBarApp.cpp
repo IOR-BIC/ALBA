@@ -1,9 +1,9 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: testPicFactoryApp.cpp,v $
+  Module:    $RCSfile: testStatusBarApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 08:42:26 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 10:09:26 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -11,41 +11,29 @@
 =========================================================================*/
 
 #include "mafDefines.h"
-#include "testPicFactoryApp.h"
-#include "mafPics.h"
+#include "testStatusBarApp.h"
 
 //--------------------------------------------------------------------------------
 // Create the Application
 //--------------------------------------------------------------------------------
-IMPLEMENT_APP(testPicFactoryApp)
+IMPLEMENT_APP(testStatusBarApp)
 
 //--------------------------------------------------------------------------------
-bool testPicFactoryApp::OnInit()
+bool testStatusBarApp::OnInit()
 //--------------------------------------------------------------------------------
 {
-  // this defines a char** variable called ico_xpm
-  #include "ico.xpm"
-  
-  // this add the icon to the PicFactory as "ico"
-  mafADDPIC(ico);
-
-  // these replace the File_Open and File_Save icon with ico
-  mafAddPic("FILE_OPEN",ico_xpm);
-  mafAddPic("FILE_SAVE",ico_xpm);
-
-  m_logic = new testPicFactoryLogic();
+	m_logic = new testStatusBarLogic();
   SetTopWindow(m_logic->GetTopWin());  
   m_logic->Show();
   return TRUE;
 }
 //--------------------------------------------------------------------------------
-int testPicFactoryApp::OnExit()
+int testStatusBarApp::OnExit()
 //--------------------------------------------------------------------------------
 {
   cppDEL(m_logic);
   return 0;
 }
-
 
 
 

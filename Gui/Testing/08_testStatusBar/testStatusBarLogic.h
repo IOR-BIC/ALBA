@@ -1,16 +1,16 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: testPicFactoryLogic.h,v $
+  Module:    $RCSfile: testStatusBarLogic.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 08:42:26 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 10:09:27 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-#ifndef __testPicFactoryLogic_H__
-#define __testPicFactoryLogic_H__
+#ifndef __testStatusBarLogic_H__
+#define __testStatusBarLogic_H__
 
 //----------------------------------------------------------------------------
 // Include:
@@ -24,12 +24,13 @@
 //----------------------------------------------------------------------------
 class mmgMDIFrame;
 class mmgSashPanel;
+class testStatusBarGui;
 // ============================================================================
-class testPicFactoryLogic : public mafEventListener
+class testStatusBarLogic : public mafEventListener
 // ============================================================================
 {
 public:
-                testPicFactoryLogic();
+                testStatusBarLogic();
   virtual void  OnEvent(mafEvent& e);
           void  Show(); 
           void  OnQuit();
@@ -44,10 +45,12 @@ protected:
  wxMenuBar     *m_menu_bar;
  mmgSashPanel  *m_log_bar; 
  mmgSashPanel  *m_side_bar;
+
+ int            m_progress;
+ wxString       m_progress_text;
 };
 
-#endif // __testPicFactoryLogic_H__
-
+#endif // __testStatusBarLogic_H__
 
 
 

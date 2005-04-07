@@ -1,10 +1,10 @@
-PROJECT (testPicFactory)
+PROJECT (testStatusBar)
 
 SET(PROJECT_SRCS 
-testPicFactoryApp.cpp
-testPicFactoryApp.h
-testPicFactoryLogic.cpp
-testPicFactoryLogic.h
+testStatusBarApp.cpp
+testStatusBarApp.h
+testStatusBarLogic.cpp
+testStatusBarLogic.h
 )
 
 LINK_LIBRARIES(vtkImaging)
