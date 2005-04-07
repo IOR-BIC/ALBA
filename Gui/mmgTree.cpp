@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 16:43:30 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-07 18:34:39 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,6 +33,7 @@ mmgTree::mmgTree( wxWindow* parent,wxWindowID id, bool CloseButton, bool HideTit
   m_images = NULL;
   m_table = NULL;
   m_prevent_notify = false;
+  m_autosort	= false;
 
   m_tree = new wxTreeCtrl(this,ID_TREE,wxDefaultPosition,wxSize(100,100),wxNO_BORDER | wxTR_HAS_BUTTONS );
   m_sizer->Add(m_tree,1,wxEXPAND);
@@ -185,7 +186,7 @@ bool mmgTree::SetNodeLabel (long node_id, wxString label)
 
   wxTreeItemId parent = m_tree->GetItemParent(item);
   if(parent.IsOk() )
-    m_tree->SortChildren(parent); //SIL. 10-6-2003 added line - 
+    if(m_autosort) m_tree->SortChildren(parent); 
 
   return true;
 }
@@ -373,6 +374,44 @@ void mmgTree::SetImageList(wxImageList *img)
   cppDEL(m_images);
   m_images = img;
   m_tree->SetImageList(m_images);
+}
+//----------------------------------------------------------------------------
+int mmgTree::GetNodeIcon(long node_id)
+//----------------------------------------------------------------------------
+{
+  if( !NodeExist(node_id) ) return 0;
+  wxTreeItemId  item = ItemFromNode(node_id);
+  if(!item.IsOk()) return 0;
+  return m_tree->GetItemImage(item);
+}
+//----------------------------------------------------------------------------
+void mmgTree::SortChildren(long node_id)
+//----------------------------------------------------------------------------
+{
+  if(node_id == 0)
+    m_tree->SortChildren(m_tree->GetRootItem());
+  else
+    m_tree->SortChildren(ItemFromNode(node_id));
+}
+//----------------------------------------------------------------------------
+void mmgTree::CollapseNode(long node_id)
+//----------------------------------------------------------------------------
+{
+  if( !NodeExist(node_id) ) return;
+  wxTreeItemId  item;
+  item = ItemFromNode(node_id);
+  if(!item.IsOk()) return;
+  m_tree->Collapse(item);
+}
+//----------------------------------------------------------------------------
+void mmgTree::ExpandNode(long node_id)
+//----------------------------------------------------------------------------
+{
+  if( !NodeExist(node_id) ) return;
+  wxTreeItemId  item;
+  item = ItemFromNode(node_id);
+  if(!item.IsOk()) return;
+  m_tree->Expand(item);
 }
 
 

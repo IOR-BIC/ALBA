@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTree.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 16:43:30 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-07 18:34:39 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -110,7 +110,10 @@ public:
 	/** Set the icon for the node. */
   bool SetNodeIcon(long node_id, int icon);
   
-	/** Select the node. */
+  /** Return the icon index for the node 'node_id'. */
+  int  GetNodeIcon(long node_id);
+
+  /** Select the node. */
   bool SelectNode(long node_id);
 
   /** Set the images to be used for the nodes. 
@@ -122,6 +125,19 @@ public:
       -4 yellow dot 
   */
   void SetImageList(wxImageList *img);
+
+  /** Sort the children of node_id. (not the subtree) 
+      give node_id = 0 to specify the root. */
+  void SortChildren(long node_id =0);
+
+  /** if autosort is on - the tree is always kept sorted */
+  void SetAutoSort(bool enable) {m_autosort=enable;};
+
+  /** collapse the children of node_id */
+  void CollapseNode(long node_id);
+
+  /** expand the children of node_id */
+  void ExpandNode(long node_id);
 
   /** Set the Listener that will receive event-notification, the Listener can be changed any time  */
   void SetListener(mafEventListener *listener)   {m_Listener=listener;}; 
@@ -152,6 +168,7 @@ protected:
   int CheckIconId(int icon);
 
   bool               m_prevent_notify;
+  bool               m_autosort;
   long               m_root;
   wxTreeCtrl        *m_tree;         
   wxImageList       *m_images;       
