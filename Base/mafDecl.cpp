@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-04 10:42:13 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 08:47:09 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -304,7 +304,7 @@ std::string  mafIdString(int id)
      case TIME_NEXT:	          s="TIME_NEXT"; break; 
      case TIME_BEGIN:	          s="TIME_BEGIN"; break; 
      case TIME_END:	            s="TIME_END"; break; 
-
+     
      case APP_ICON:	            s="APP_ICON"; break; 
      case PIC_NODE_BLUE:	      s="PIC_NODE_BLUE"; break; 
      case PIC_NODE_YELLOW:	    s="PIC_NODE_YELLOW"; break; 

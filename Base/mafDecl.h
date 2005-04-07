@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-04 10:42:13 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 08:47:09 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -294,11 +294,10 @@ PIC_START,
   CAMERA_ZOOM2,
   CAMERA_ZOOM3,
   CAMERA_ZOOM4,
+  PIC_END,
 
-	PIC_USER_START,// to be used from vertical applications
-	PIC_USER_END = PIC_USER_START +1000,// to be used from vertical applications
-	
-PIC_END,
+  PIC_USER_START = PIC_START+500 ,// to be used from vertical applications
+	PIC_USER_END = PIC_USER_START +100,// to be used from vertical applications
 
 PARSE_STRING,	//Added by Paolo 16-9-2003 execute the operation passed as a string
 APPSTAMP,
