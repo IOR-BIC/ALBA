@@ -1,0 +1,38 @@
+/* XPM */
+static char *CLOSE_SASH_xpm[] = {
+/* columns rows colors chars-per-pixel */
+"13 13 19 1",
+"< c Black",
+"o c #CEDEE7",
+"& c #DEE7EF",
+"% c #94ADC6",
+"$ c #BDCEDE",
+"O c #9CB5C6",
+"  c #84A5BD",
+", c #CED6E7",
+"+ c #F7F7F7",
+"> c #ADBDCE",
+"= c #181818",
+"@ c #FFFFFF",
+"; c #212121",
+"- c #5A5A5A",
+"X c #C6D6DE",
+"# c #EFF7F7",
+"* c #8CA5BD",
+". c #A5BDCE",
+": c #B5C6D6",
+/* pixels */
+"    .XoXO    ",
+"  OX+@@@#$%  ",
+" O#@@@@@@@&% ",
+"*&@=-@+@-=@X ",
+"O+@-;-@-;-@#%",
+":@@@-;;;-@@@>",
+",@@+@;<;@+@@X",
+"X@@@-;;;-@@@>",
+"O#@-;-@-;-@&*",
+" $@=-@+@-=+. ",
+" %&@@@@@@@X  ",
+"  %X#@@@#X*  ",
+"    %>:>%    "
+};

@@ -1,0 +1,25 @@
+/* XPM */
+static char *FRAME_ICON16x16_xpm[] = {
+/* columns rows colors chars-per-pixel */
+"16 16 3 1",
+"  c Black",
+"X c #FF0000",
+". c #FFFFFF",
+/* pixels */
+"               .",
+" ............. .",
+" .XXXXX.XXXXX. .",
+" .X.X.X.X.X.X. .",
+" .X.X.X.X.X.X. .",
+" .X.X.X.X.X.X. .",
+" .X.X.X.X.X.X. .",
+" .X.X.X.X.X.X. .",
+" .X.X.X.X.X.X. .",
+" .X.X.X.X.X.X. .",
+" .X.X.X.X.X.X. .",
+" .X.X.X.X.X.X. .",
+" .X.X.X.X.X.X. .",
+" .X.X.X.X.X.X. .",
+" ............. .",
+"               ."
+};
