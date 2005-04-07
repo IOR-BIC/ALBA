@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: Bmp2Xpm.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 08:39:39 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 11:37:27 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -13,7 +13,7 @@
 #include "mafDefines.h"
 #include "mafWXLog.h"
 #include "mafDecl.h"
-#include "mmgBitmaps.h"
+#include "mafPics.h"
 #include <wx/dir.h>
 #include <stdio.h>
 
@@ -41,7 +41,7 @@ IMPLEMENT_APP(myApp)
 bool myApp::OnInit()
 //--------------------------------------------------------------------------------
 {
-  wxInitAllImageHandlers();
+  //wxInitAllImageHandlers();
   myFrame *frame = new myFrame();
 
   SetTopWindow(frame);

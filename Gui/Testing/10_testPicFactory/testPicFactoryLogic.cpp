@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testPicFactoryLogic.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 10:05:19 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 11:37:08 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -100,12 +100,12 @@ void testPicFactoryLogic::CreateSideBar()
 
   gui->Divider();
   gui->Label("all the icons");
-  gui->Label("note: Open and Save where overwritten");
+  gui->Label("note: Open and Save were overwritten");
 
   
-  #define FOO(n) { wxStaticBitmap *bmp = new wxStaticBitmap(gui,-1,mafGetBmp(#n));  gui->Add(bmp,0,wxLEFT); }
-  FOO(APP_ICON16x16)
-    FOO(APP_ICON32x32)
+  #define FOO(n) { wxStaticBitmap *bmp = new wxStaticBitmap(gui,-1, mafPics.GetBmp(#n));  gui->Add(bmp,0,wxLEFT); }
+    FOO(FRAME_ICON16x16)
+    FOO(FRAME_ICON32x32)
     FOO(CLOSE_SASH)
     FOO(FILE_NEW)
     FOO(FILE_OPEN)
@@ -132,6 +132,10 @@ void testPicFactoryLogic::CreateSideBar()
     FOO(ZOOM)
     FOO(ZOOM_ALL)
     FOO(ZOOM_SEL)
+    FOO(NODE_YELLOW)
+    FOO(NODE_RED)
+    FOO(NODE_BLUE)
+    FOO(NODE_GRAY)
 
   gui->FitGui();
   gui->Reparent(m_side_bar);

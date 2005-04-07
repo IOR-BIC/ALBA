@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testPicFactoryApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 10:05:19 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 11:37:08 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,8 +30,8 @@ bool testPicFactoryApp::OnInit()
   mafADDPIC(ico);
 
   // these replace the File_Open and File_Save icon with ico
-  mafAddPic("FILE_OPEN",ico_xpm);
-  mafAddPic("FILE_SAVE",ico_xpm);
+  mafPics.Add("FILE_OPEN",ico_xpm);
+  mafPics.Add("FILE_SAVE",ico_xpm);
 
   m_logic = new testPicFactoryLogic();
   SetTopWindow(m_logic->GetTopWin());  
