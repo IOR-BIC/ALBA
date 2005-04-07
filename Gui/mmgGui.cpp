@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 08:58:07 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-07 08:35:33 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -797,7 +797,8 @@ void mmgGui::Color(int id,wxString label,wxColour* var, wxString tooltip)
 	wxStaticText	*lab  = new wxStaticText(this, GetId(id), label,dp, wxSize(LW,LH), wxALIGN_RIGHT );
   if(m_use_bc) lab->SetBackgroundColour(m_bc);
 	wxTextCtrl		*text = new wxTextCtrl  (this, GetId(id), ""   ,dp, wxSize(EW,LH),wxTE_READONLY|m_entry_style );
-  mmgPicButton  *butt = new mmgPicButton(this, MENU_FILE_OPEN ,GetId(id));
+  //mmgPicButton  *butt = new mmgPicButton(this, MENU_FILE_OPEN ,GetId(id));
+  mmgButton    *butt = new mmgButton   (this, GetId(id), "...",  dp, wxSize(BH,BH));
   butt->SetValidator( mmgValidator(this,id,butt,var,text) );
 	if(tooltip != "") butt->SetToolTip(tooltip);
 
