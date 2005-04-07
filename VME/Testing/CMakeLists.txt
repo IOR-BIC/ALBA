@@ -8,6 +8,8 @@ ADD_EXECUTABLE(testDataVector testDataVector.cpp)
 ADD_TEST(testDataVector ${EXECUTABLE_OUTPUT_PATH}/testDataVector)
 ADD_EXECUTABLE(testMatrixVector testMatrixVector.cpp)
 ADD_TEST(testMatrixVector ${EXECUTABLE_OUTPUT_PATH}/testMatrixVector)
+ADD_EXECUTABLE(testVMEGenericPose testVMEGenericPose.cpp)
+ADD_TEST(testVMEGenericPose ${EXECUTABLE_OUTPUT_PATH}/testVMEGenericPose)
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
