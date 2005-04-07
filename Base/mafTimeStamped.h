@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTimeStamped.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 09:58:54 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-07 20:41:45 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,8 +27,6 @@
 class MAF_EXPORT mafTimeStamped
 {
 public:
-  mafTimeStamped() {}
-
   /**
     Update this objects modification time. The modification time is
     just a monotonically increasing unsigned long integer. It is
@@ -38,10 +36,10 @@ public:
     within the program. When this does occur, the typical consequence
     should be that some process objects will update themselves when really
     they don't need to. */
-  virtual void Modified() {m_MTime.Modified();}
+  virtual void Modified();
 
   /** return modification time */
-  virtual unsigned long GetMTime() {return m_MTime.GetMTime();}
+  virtual unsigned long GetMTime();
 
 protected:
   mafMTime          m_MTime;        ///< Last modification time

@@ -41,6 +41,7 @@ mafSmartPointer.h
 mafString.cpp
 mafString.h
 mafTimeStamped.h
+mafTimeStamped.cpp
 mafTransform.cpp
 mafTransform.h
 mafTransformBase.cpp
