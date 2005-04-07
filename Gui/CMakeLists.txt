@@ -76,6 +76,8 @@ mmgViewFrame.cpp
 mmgViewFrame.h
 mmgViewWin.cpp
 mmgViewWin.h
+mafPics.h
+mafPics.cpp
 )
 
 # List the kits from VTK that are needed by this project.
