@@ -1,10 +1,10 @@
-PROJECT (TestStatusBar)
+PROJECT (testPicFactory)
 
 SET(PROJECT_SRCS 
-testStatusBarApp.cpp
-testStatusBarApp.h
-testStatusBarLogic.cpp
-testStatusBarLogic.h
+testPicFactoryApp.cpp
+testPicFactoryApp.h
+testPicFactoryLogic.cpp
+testPicFactoryLogic.h
 )
 
 LINK_LIBRARIES(vtkImaging)
@@ -19,6 +19,7 @@ IF (WIN32)
 ELSE (WIN32)
   ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS} )
 ENDIF (WIN32)
+
 
 
 
