@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:16:33 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 08:35:13 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -43,7 +43,7 @@ public:
 
   /**
     Update all the output data structures (data, bounds, matrix and abs matrix).*/
-  virtual void Update();
+  //virtual void Update();
     
 protected:
   mafVMEOutputVTK(); // to be allocated with New()
