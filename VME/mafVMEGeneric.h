@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGeneric.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:16:32 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 08:34:36 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -106,12 +106,6 @@ public:
 protected:
   mafVMEGeneric();
   virtual ~mafVMEGeneric();
-
-  /** This function is overridden by subclasses to perform custom initialization. */
-  virtual int InternalInitialize() {return 0;};
-
-  /** To be redefined by subclasses to define the shutdown actions */
-  virtual void InternalShutdown() {};
 
   virtual int InternalStore(mafStorageElement *parent);
   virtual int InternalRestore(mafStorageElement *node);
