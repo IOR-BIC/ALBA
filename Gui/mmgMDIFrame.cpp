@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-04 09:12:01 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-07 08:36:12 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -14,8 +14,10 @@
 // Include: - include the class being defined first
 //----------------------------------------------------------------------------
 #include "mmgMDIFrame.h"
+#include <wx/icon.h>
 #include "mafDecl.h"
 #include "mafEvent.h"
+#include "mafPics.h"
 
 #ifdef MAF_USE_VTK //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
   #include "vtkVersion.h"
@@ -100,6 +102,11 @@ mmgMDIFrame::mmgMDIFrame(const wxString& title, const wxPoint& pos, const wxSize
   m_clientwin= NULL;
   CreateStatusbar();
   Centre();
+
+  wxIconBundle ib;
+  ib.AddIcon( mafGetIcon("FRAME_ICON16x16") );
+  ib.AddIcon( mafGetIcon("FRAME_ICON32x32") );
+  SetIcons(ib);
 
 #ifdef MAF_USE_VTK
   m_ProgressCallback= mmgMDIFrameCallback::New(); 
