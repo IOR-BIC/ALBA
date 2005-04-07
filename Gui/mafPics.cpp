@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPics.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 11:39:44 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-07 16:43:52 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -13,7 +13,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafPics.h" 
+#include "mafPics.h" //always include the class being defined as first
 #include <map>
 #include <string>
 //----------------------------------------------------------------------------
