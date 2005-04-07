@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testTimeBarLogic.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-04 15:01:48 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 08:40:13 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -89,7 +89,7 @@ void testTimeBarLogic::CreateLogBar()
 void testTimeBarLogic::CreateTimeBar()
 //----------------------------------------------------------------------------
 {
-  m_time_bar = new mmgSashPanel(m_win,MENU_VIEW_TIMEBAR,wxBOTTOM,22,"Time Bar",false);
+  m_time_bar = new mmgSashPanel(m_win,MENU_VIEW_TIMEBAR,wxBOTTOM,22,"Time Bar \tCtrl+T",false);
   m_time_panel = new mmgTimeBar(m_time_bar,-1,true);
   m_time_panel->SetListener(this);
   m_time_bar->Put(m_time_panel);
