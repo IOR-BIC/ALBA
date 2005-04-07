@@ -52,7 +52,7 @@ int main()
   tmp.Erase(5);
   MAF_TEST(tmp=="Hello");
 
-  // test the FindLast function to find last occurance of the "Hello" string.
+  // test the FindLast function to find last occurrence of the "Hello" string.
   tmp<<" everybody";
   tmp<<italy;
   tmp<<". Hello!";
