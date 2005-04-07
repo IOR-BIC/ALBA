@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrixInterpolator.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:16:32 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-07 08:33:57 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -76,9 +76,6 @@ protected:
   mafMatrix    *m_OldItem;     ///< the item previously selected
 
   mafTimeStamp  m_OldTimeStamp; ///< previous time
-
-  mafMTime      m_UpdateTime;   ///< the modification time of last data update
-
 private:
   mafMatrixInterpolator(const mafMatrixInterpolator&); // Not implemented
   void operator=(const mafMatrixInterpolator&); // Not implemented
