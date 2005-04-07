@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-04 11:50:08 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-04-07 16:53:13 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -124,28 +124,36 @@ void mafString::operator>>(std::istream &is)
 mafString &mafString::operator<<( int d )
 //----------------------------------------------------------------------------
 {
-  NPrintf(100,"%d",d);
+  mafString tmp;
+  tmp.NPrintf(100,"%d",d);
+  Append(tmp);
   return *this;
 }
 //----------------------------------------------------------------------------
 mafString &mafString::operator<<( long d )
 //----------------------------------------------------------------------------
 {
-  NPrintf(100,"%d",d);
+  mafString tmp;
+  tmp.NPrintf(100,"%d",d);
+  Append(tmp);
   return *this;
 }
 //----------------------------------------------------------------------------
 mafString &mafString::operator<<( float d )
 //----------------------------------------------------------------------------
 {
-  NPrintf(100,"%g",d);
+  mafString tmp;
+  tmp.NPrintf(100,"%.7g",d);
+  Append(tmp);
   return *this;
 }
 //----------------------------------------------------------------------------
 mafString &mafString::operator<<( double d )
 //----------------------------------------------------------------------------
 {
-  NPrintf(100,"%g",d);
+  mafString tmp;
+  tmp.NPrintf(100,"%.16g",d);
+  Append(tmp);
   return *this;
 }
 /*
