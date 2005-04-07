@@ -13,7 +13,8 @@ SUBDIRS(06_testTab)
 SUBDIRS(07_testSideBar)
 SUBDIRS(08_testStatusBar)
 SUBDIRS(09_testTimeBar)
-#SUBDIRS(10_testTree)
+SUBDIRS(10_testPicFactory)
+SUBDIRS(12_Bmp2Xpm)
 
 
 # wxWidgets specific classes
