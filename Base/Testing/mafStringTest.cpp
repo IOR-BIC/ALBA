@@ -34,6 +34,10 @@ int main()
   tmp2 << " Bel" << " Mondo!";
 
   MAF_TEST(tmp2 == "Ciao Bel Mondo!");
+
+  mafString tmp3 = "Numbers = ";
+  tmp3 << (long)10 << " " << (float).12345671 << " " << (double).12345678901234561;
+  MAF_TEST(tmp3 == "Numbers = 10 0.1234567 0.1234567890123456");
   
   // test copy  feature
   mafString copy=tmp;
