@@ -1,0 +1,23 @@
+/* XPM */
+static char *DISABLED_xpm[] = {
+/* columns rows colors chars-per-pixel */
+"15 15 2 1",
+"  c #FFFFFF",
+". c #808080",
+/* pixels */
+"               ",
+"               ",
+"               ",
+"               ",
+"               ",
+"               ",
+"               ",
+"               ",
+". . . . . . .  ",
+"               ",
+"               ",
+"               ",
+"               ",
+"               ",
+"               "
+};

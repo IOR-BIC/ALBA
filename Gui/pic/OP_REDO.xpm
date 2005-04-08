@@ -63,7 +63,7 @@ static char *OP_REDO_xpm[] = {
 "@ c #B0B0B0",
 "; c #97A4BB",
 "p c #8DAFCB",
-"  c #ECEADC",
+"  c None",
 "d c #649DDE",
 "Z c #6D9ACD",
 "c c #9FB5C3",

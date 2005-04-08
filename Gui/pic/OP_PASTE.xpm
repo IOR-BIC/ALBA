@@ -88,7 +88,7 @@ static char *OP_PASTE_xpm[] = {
 "n  c #76A9BC",
 "$  c #D4C28C",
 "{  c #394D59",
-"   c #ECEADC",
+"   c None",
 ";  c #D4C596",
 "#. c #76A9C4",
 "@  c #B9B9B9",

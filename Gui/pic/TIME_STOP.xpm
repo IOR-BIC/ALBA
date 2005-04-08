@@ -114,7 +114,7 @@ static char *TIME_STOP_xpm[] = {
 "-  c #CDD0D9",
 "F  c #4C6BB8",
 "i. c #B4BEDA",
-"   c #ECEADC",
+"   c None",
 "k  c #5979CB",
 ".. c #A1B1D9",
 "j  c #5C7DD0",

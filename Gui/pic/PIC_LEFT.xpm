@@ -34,7 +34,7 @@ static char *PIC_LEFT_xpm[] = {
 "Y. c #4D6875",
 "+  c #979797",
 "V. c #526974",
-"   c #ECEADC",
+"   c None",
 "/  c #A6A6A6",
 "-. c #C4C4C4",
 "<  c #D3D3D3",

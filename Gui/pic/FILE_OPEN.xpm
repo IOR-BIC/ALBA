@@ -75,7 +75,7 @@ static char *FILE_OPEN_xpm[] = {
 "7 c #76A9BC",
 "C c #698691",
 "K c #395669",
-"  c #ECEADC",
+"  c None",
 "` c #697D89",
 "z c #76A9C4",
 "m c #9FBEC3",

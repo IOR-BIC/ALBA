@@ -84,7 +84,7 @@ static char *TIME_PREV_xpm[] = {
 "Y  c #AEBCDE",
 "&. c #8E9EC6",
 "l  c #95AADF",
-"   c #ECEADC",
+"   c None",
 "8  c #5979CB",
 "+. c #6E83B8",
 "i  c #E6E8EA",

@@ -25,7 +25,7 @@ static char *FLYTO_xpm[] = {
 ". c #417EB1",
 "# c #4B8ECD",
 "5 c #EADEDF",
-"  c #ECEADC",
+"  c None",
 ", c #9FACBB",
 "1 c #E8E8E8",
 /* pixels */

@@ -119,7 +119,7 @@ static char *TIME_BEGIN_xpm[] = {
 "}  c #717E9F",
 "f. c #DADEE6",
 "W  c #5678CE",
-"   c #ECEADC",
+"   c None",
 "0. c #4C6BBA",
 "7  c #455FA1",
 "x  c #9DA6BB",

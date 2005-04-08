@@ -2,6 +2,7 @@
 static char *OP_UNDO_xpm[] = {
 /* columns rows colors chars-per-pixel */
 "20 20 64 1",
+"  c None",
 ". c #C1C1C1",
 "D c #5C9FDE",
 "; c #617689",
@@ -55,7 +56,6 @@ static char *OP_UNDO_xpm[] = {
 "& c #417EB1",
 "@ c #B0B0B0",
 "s c #4B8ECD",
-"  c #ECEADC",
 "9 c #64A6DE",
 "x c #B6CDDC",
 "l c #74ACE6",

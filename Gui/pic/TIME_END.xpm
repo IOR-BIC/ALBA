@@ -106,7 +106,7 @@ static char *TIME_END_xpm[] = {
 "#. c #6B7FB1",
 "D  c #4C6BB8",
 "i. c #E0E0E4",
-"   c #ECEADC",
+"   c None",
 "<. c #4C6BBA",
 "F  c #586FAA",
 "a  c #5979CB",

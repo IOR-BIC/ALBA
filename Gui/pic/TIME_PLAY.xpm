@@ -62,7 +62,7 @@ static char *TIME_PLAY_xpm[] = {
 "6 c #6082D8",
 "p c #4F69AB",
 "I c #BAC0D0",
-"  c #ECEADC",
+"  c None",
 "t c #5979CB",
 "C c #4F6FBF",
 "2 c #5C7DD0",

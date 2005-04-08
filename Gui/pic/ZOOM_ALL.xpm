@@ -82,7 +82,7 @@ static char *ZOOM_ALL_xpm[] = {
 "n c #EADEDF",
 "g c #808C9A",
 "d c #506E88",
-"  c #ECEADC",
+"  c None",
 "a c #9092A2",
 "p c #B9B9B9",
 "e c #596E81",

@@ -68,7 +68,7 @@ static char *OP_COPY_xpm[] = {
 "C c #495C61",
 "i c #B0B0B0",
 "l c #76A9BC",
-"  c #ECEADC",
+"  c None",
 "D c #7FA9B3",
 "I c #76A9C4",
 "V c #9FA9A8",

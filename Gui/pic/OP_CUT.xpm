@@ -58,7 +58,7 @@ static char *OP_CUT_xpm[] = {
 "= c #6D97AB",
 "y c #B0B0B0",
 "p c #595959",
-"  c #ECEADC",
+"  c None",
 "4 c #76A9C4",
 "U c #B9B9B9",
 "i c #282828",

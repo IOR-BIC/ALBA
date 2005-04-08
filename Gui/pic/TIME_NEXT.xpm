@@ -93,7 +93,7 @@ static char *TIME_NEXT_xpm[] = {
 "l  c #5675C4",
 "J  c #526AA8",
 "m  c #4C6BB8",
-"   c #ECEADC",
+"   c None",
 "w  c #5979CB",
 "[  c #496ABF",
 "&. c #A1AED5",

@@ -40,7 +40,7 @@ static char *PIC_RIGHT_xpm[] = {
 "k  c #818D93",
 "O. c #778287",
 "e. c #557989",
-"   c #ECEADC",
+"   c None",
 "1  c #A6A6A6",
 "%  c #B5B5B5",
 "G. c #C4C4C4",

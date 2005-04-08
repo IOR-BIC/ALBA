@@ -39,7 +39,7 @@ static char *PIC_BACK_xpm[] = {
 "z  c #48616E",
 "N. c #C9CED1",
 "+  c #979797",
-"   c #ECEADC",
+"   c None",
 "2  c #A6A6A6",
 "[. c #B5B5B5",
 "q. c #C4C4C4",

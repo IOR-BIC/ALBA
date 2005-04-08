@@ -91,7 +91,7 @@ static char *FILE_SAVE_xpm[] = {
 "$  c #6DACCD",
 "!  c #595959",
 "V  c #EADEDF",
-"   c #ECEADC",
+"   c None",
 "g  c #76A9C4",
 "s  c #B6D6E4",
 "#. c #B9B9B9",
