@@ -2,14 +2,13 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPics.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 16:43:52 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-08 18:01:04 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
@@ -25,6 +24,7 @@ struct mafPictureFactory_Pimpl
 {
    public:
    mafPicMap map;
+   mafPicMap vme_map; //here are kept the vme icons
 };
 //----------------------------------------------------------------------------
 // the mafPic Singleton
@@ -103,6 +103,17 @@ mafPictureFactory::mafPictureFactory()
     mafADDPIC(NODE_BLUE);     
     #include <pic/NODE_GRAY.xpm>        
     mafADDPIC(NODE_GRAY);     
+
+    #include <pic/DISABLED.xpm>        
+    mafADDPIC(DISABLED);     
+    #include <pic/RADIO_ON.xpm>        
+    mafADDPIC(RADIO_ON);     
+    #include <pic/RADIO_OFF.xpm>        
+    mafADDPIC(RADIO_OFF);     
+    #include <pic/CHECK_ON.xpm>        
+    mafADDPIC(CHECK_ON);     
+    #include <pic/CHECK_OFF.xpm>        
+    mafADDPIC(CHECK_OFF);     
 }
 //----------------------------------------------------------------------------
 mafPictureFactory::~mafPictureFactory()
@@ -160,8 +171,36 @@ wxIcon mafPictureFactory::GetIcon(wxString id)
     return wxNullIcon;
   }
 }
-
-
+//----------------------------------------------------------------------------
+void mafPictureFactory::AddVmePic(wxString id,char** xpm)
+//----------------------------------------------------------------------------
+{
+  m_p->vme_map[id.c_str()]= wxImage(xpm);
+}
+//----------------------------------------------------------------------------
+wxBitmap mafPictureFactory::GetVmePic(wxString id)
+//----------------------------------------------------------------------------
+{
+  mafPicMap::iterator it=m_p->vme_map.find(id.c_str());
+  if (it!= m_p->vme_map.end())
+    return wxBitmap((*it).second);
+  else
+  {
+    wxLogMessage("mafPictureFactory: vme-pic with id = %s not found",id);
+    return wxNullBitmap;
+  }
+}
+//----------------------------------------------------------------------------
+void mafPictureFactory::GetVmeNames( std::vector<wxString>& v )
+//----------------------------------------------------------------------------
+{
+  v.clear();
+  for (mafPicMap::iterator it=m_p->vme_map.begin(); it!=m_p->vme_map.end(); it++)
+  {
+    wxString s = ((*it).first).c_str();
+    v.push_back(s);
+  }
+}
 /*
 NOTE FOR SILVANO
 

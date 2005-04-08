@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 18:35:37 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-08 18:01:05 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,6 +20,18 @@
 #include "mafPics.h"
 #include <wx/imaglist.h>
 #include <wx/treectrl.h>
+#include <map>
+//----------------------------------------------------------------------------
+// Constants: --- to be removed --- should by defined by the SceneGrahp
+//----------------------------------------------------------------------------
+enum 
+{
+  NODE_NON_VISIBLE,
+  NODE_VISIBLE_ON,
+  NODE_VISIBLE_OFF,
+  NODE_MUTEX_ON,
+  NODE_MUTEX_OFF,
+};
 //----------------------------------------------------------------------------
 // Forward refs:
 //----------------------------------------------------------------------------
@@ -29,7 +41,8 @@ class mafView;
 //----------------------------------------------------------------------------
 // mmgCheckTree :
 //----------------------------------------------------------------------------
-/** */
+/** 
+*/
 class mmgCheckTree: public mmgTree
 {
 public:
@@ -74,36 +87,41 @@ protected:
   /** Enable/disable crypto for a subtree. */
   void CryptSubTree(bool crypt);
 
-public:
-  /** Intercept the mouse button down and check if the click is on the icon. */
+  /** retrieve the icon-index for a vme given the classname */
+  int ClassNameToIcon(wxString classname);
+
+  void InitializeImageList();
+  wxBitmap MergeIcons(wxBitmap state, wxBitmap vme);
+  wxBitmap GrayScale(wxBitmap bmp);
+
+public: 
+  /** Called by the Custom-Tree-Event-Handler */
 	void OnMouseDown(wxMouseEvent& event);
 
-  /** Intercept the mouse button down and check if the click is on the icon. */
+  /** Called by the Custom-Tree-Event-Handler */
   void OnMouseUp(wxMouseEvent& event);
 
-  /** Intercept the mouse button down and check if the click is on the icon. */
+  /** Called by the Custom-Tree-Event-Handler */
   void OnMouseEvent(wxMouseEvent& event);
+
+  /** Called by the Custom-Tree-Event-Handler - via OnMouseDown*/
+  void OnIconClick(wxTreeItemId item);
+
+  /** Called by the Custom-Tree-Event-Handler */
+  void ShowContextualMenu(wxMouseEvent& event);
+
+  /** Respond to the Contextual Menu */
+  void OnContextualMenu(wxCommandEvent& event);
 
 protected:
   mafView  *m_view;
   mafNode  *m_clicked_vme;
   bool      m_check_crypto;
   bool      m_canSelect;
+  wxMenu   *m_RMenu;	
 
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::
-// RMENU
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::
-public:
-
-  /** Show the contextual menù over the selected node. */
-  void ShowContextualMenu(wxMouseEvent& event);
-
-protected:
-
-  /** Manage the contextual menù. */
-  void OnContextualMenu(wxCommandEvent& event);
-
-  wxMenu *m_RMenu;	
+  typedef std::map<wxString,int> MapClassNameToIcon;
+  MapClassNameToIcon m_MapClassNameToIcon;
 
   DECLARE_EVENT_TABLE()
 }; // end of mmgCheckTree

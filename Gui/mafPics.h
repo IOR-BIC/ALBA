@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPics.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 11:39:44 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-08 18:01:05 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -16,9 +16,11 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafDefines.h" //important: mafDefines should always be included as first
+#include "mmgCheckTree.h" // friend class
 #include <wx/bitmap.h>
 #include <wx/image.h>
 #include <wx/icon.h>
+#include <vector>
 
 //----------------------------------------------------------------------------
 // Forward refs:
@@ -51,25 +53,44 @@ struct mafPictureFactory_Pimpl;
 
 -NODE_YELLOW,NODE_GRAY,NODE_RED,NODE_BLUE : used by ListCtrl
 
+NOTE:
+- Icons for the Toolbar must be 20x20 in size, and with transparent background (using color "None" in the XPM)
+- Icons to be used in one ImageList (mmgTree,mmgCheckTree,...) must be all the same size, and with white background.
+- Icons to be used in mmgCheckTree (vme icons) must be 16x16 with white background
 */
 class mafPictureFactory 
 {
 public:
-  /* initialize the factory with the standard icons */
+  /** initialize the factory with the standard icons */
    mafPictureFactory();
   ~mafPictureFactory();
 
-  /* add a picture to the factory -- if id already exist it is overwritten */
+  /** add a picture to the factory -- if id already exist it is overwritten */
   void Add(wxString id,char** xpm);
 
-  /* retrieve a picture from the Factory as a wxBitmap */
+  /** retrieve a picture from the Factory as a wxBitmap */
   wxBitmap GetBmp(wxString id);
 
-  /* retrieve a picture from the Factory as a wxImage */
+  /** retrieve a picture from the Factory as a wxImage */
   wxImage GetImg(wxString id);
 
-  /* retrieve a picture from the Factory as a wxIcon */
+  /** retrieve a picture from the Factory as a wxIcon */
   wxIcon GetIcon(wxString id);
+
+  /** Fills the given vectors with the available Pic Id's */
+  void GetPicIds(std::vector<wxString>& v);
+
+  /** add a vme-picture to the factory. 
+      id should be the ClassName.
+      if id already exist it is overwritten.
+  */
+  void AddVmePic(wxString id,char** xpm);
+
+  /** retrieve a vme-picture from the Factory as a wxBitmap. */
+  wxBitmap GetVmePic(wxString id);
+
+  /** retrieve the names of the registered vme-pics */
+  void GetVmeNames( std::vector<wxString>& v );
 
 protected:
   mafPictureFactory_Pimpl *m_p;
@@ -80,8 +101,11 @@ protected:
 /* shotcut to add a picture to the factory */
 #define mafADDPIC(X) mafPics.Add( #X , X##_xpm )
 
+/* shotcut to add a vmepicture to the factory */
+#define mafADDVMEPIC(X) mafPics.AddVmePic( #X , X##_xpm )
+
 //----------------------------------------------------------------------------
-// the mafPics singleton
+// the mafPics and mafVmePics singleton
 //----------------------------------------------------------------------------
 extern mafPictureFactory mafPics;
 

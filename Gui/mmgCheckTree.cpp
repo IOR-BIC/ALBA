@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 18:35:37 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-08 18:01:05 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -16,19 +16,18 @@
 #include "mmgCheckTree.h" //always include the class being defined as first
 #include "mafPics.h" 
 
-//#include <wx/laywin.h>
-//#include <wx/image.h>
-//#include <wx/hash.h>
+#include "mafNode.h"
+#include "mafView.h"
+
+#include <vector>
 
 //#include "mafDecl.h"
 //#include "mafEvent.h"
-#include "mafView.h"
 //#include "mafVmeData.h"
 //#include "mafSceneNode.h"
 //#include "mafSceneGraph.h" 
+//#include "mafNodeIterator.h" //used in CryptSubTree
 
-#include "mafNode.h"
-//#include "mafNodeIterator.h"
 //=========================================================================================
 // Helper class to subclass the wxTreeCtrl
 // in order to intercept mouse clicks. 
@@ -50,7 +49,6 @@ private:
 	DECLARE_DYNAMIC_CLASS(mmgCheckTreeEvtHandler )
   DECLARE_EVENT_TABLE()
 };
-
 IMPLEMENT_DYNAMIC_CLASS( mmgCheckTreeEvtHandler , wxEvtHandler )
 BEGIN_EVENT_TABLE( mmgCheckTreeEvtHandler , wxEvtHandler )
     EVT_LEFT_DOWN( mmgCheckTreeEvtHandler ::OnMouseDown )
@@ -58,25 +56,6 @@ BEGIN_EVENT_TABLE( mmgCheckTreeEvtHandler , wxEvtHandler )
     EVT_LEFT_UP( mmgCheckTreeEvtHandler ::OnMouseUp )
     EVT_MOUSE_EVENTS( mmgCheckTreeEvtHandler ::OnMouseEvent )
 END_EVENT_TABLE()
-
-/*
-void mmgCheckTreeEvtHandler::OnMouseDown( wxMouseEvent& event )
-{
-  m_tree->OnMouseDown(event);
-}
-void mmgCheckTreeEvtHandler::OnMouseUp( wxMouseEvent& event )
-{
-  m_tree->OnMouseUp(event);
-}
-void mmgCheckTreeEvtHandler::OnMouseEvent( wxMouseEvent& event )
-{
-  m_tree->OnMouseEvent(event);
-}
-void mmgCheckTreeEvtHandler::ShowContextualMenu( wxMouseEvent& event )
-{
-  m_tree->ShowContextualMenu(event);
-}
-*/
 
 //----------------------------------------------------------------------------
 // constants
@@ -113,14 +92,9 @@ mmgCheckTree::mmgCheckTree( wxWindow* parent,wxWindowID id, bool CloseButton, bo
   m_canSelect	= true;
   m_RMenu	= NULL;
 
-  /*
-  m_images = new wxImageList(30,15,FALSE,30);
-  for(int i=0; i<PIC_VME_LAST; i++)
-		m_images->Add(mafCheckTreePic(i));
-    m_tree->SetImageList(m_images);
-  */
-
   m_tree->PushEventHandler( new mmgCheckTreeEvtHandler(this) );
+
+  InitializeImageList();
 }
 //----------------------------------------------------------------------------
 mmgCheckTree::~mmgCheckTree( )
@@ -204,12 +178,11 @@ void mmgCheckTree::OnContextualMenu(wxCommandEvent& event)
 //----------------------------------------------------------------------------
 {
 /*
-  //assert(m_view); // check at menù creation
 	mafSceneGraph *sg = NULL;
   if(m_view != NULL)
 		sg = m_view->GetSceneGraph();
 	
-	//assert(sg);
+	assert(sg);
 
 	switch(event.GetId())
 	{
@@ -263,45 +236,33 @@ void mmgCheckTree::OnContextualMenu(wxCommandEvent& event)
 void mmgCheckTree::EnableSelect(bool enable)
 //----------------------------------------------------------------------------
 {
-  //!!!!!!
-  //TODO: ---- I can still change the selection using the keyboard 
-  //SIL. 7-4-2005: 
   m_canSelect = enable;
 }
 //----------------------------------------------------------------------------
 void mmgCheckTree::OnMouseDown( wxMouseEvent& event )
 //----------------------------------------------------------------------------
 {
-	int flag;
+  //pourpose: intercept and notify if the icon was clicked,
+  //prevent node selection if the icon was clicked,
+  //prevent node selection anyway, if the selection is disabled,
+  int flag;
 	wxTreeItemId i = m_tree->HitTest(wxPoint(event.GetX(),event.GetY()),flag);
-
 	if(i.IsOk() && flag == wxTREE_HITTEST_ONITEMICON )
 	{
-		mafNode* vme = (mafNode*) (NodeFromItem(i));
-/*
-		int status = GetVmeStatus(vme); 
-
-    if(status != NODE_NON_VISIBLE)		
-    {
-			bool show = !(status == NODE_VISIBLE_ON || status == NODE_MUTEX_ON ); 
-			mafEventMacro(mafEvent(this, VME_SHOW, vme, show));
-			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
-		}
-*/		
+    OnIconClick(i); 
 		return;//eat message
 	} 
-	
-	//eat message if selection is disabled
 	if(!this->m_canSelect)	
-	  return;
-		
+	  return; //also eat message if selection is disabled
 	event.Skip();//process event as usual
 }
 //----------------------------------------------------------------------------
 void mmgCheckTree::OnMouseUp( wxMouseEvent& event )
 //----------------------------------------------------------------------------
 {
-	int flag;
+  //pourpose: prevent selection if I clicked on the icon.
+  //to select you must click the node name
+  int flag;
 	wxTreeItemId i = m_tree->HitTest(wxPoint(event.GetX(),event.GetY()),flag);
 	if(flag == wxTREE_HITTEST_ONITEMICON )
 		return;//eat message
@@ -311,7 +272,9 @@ void mmgCheckTree::OnMouseUp( wxMouseEvent& event )
 void mmgCheckTree::OnMouseEvent( wxMouseEvent& event )
 //----------------------------------------------------------------------------
 {
-	if(event.ButtonDown() || event.ButtonUp() || event.ButtonDClick())
+	//pourpose: prevent selection if I clicked on the icon.
+  //to select you must click the node name
+  if(event.ButtonDown() || event.ButtonUp() || event.ButtonDClick())
 	{
 	 int flag;
 	 wxTreeItemId i = m_tree->HitTest(wxPoint(event.GetX(),event.GetY()),flag);
@@ -319,8 +282,22 @@ void mmgCheckTree::OnMouseEvent( wxMouseEvent& event )
 			return;//eat message
 	}
 	if(event.RightDown() || event.RightIsDown() || event.RightUp() || event.RightDClick())
-		return;
+		return;//eat message 
 	event.Skip();//process event as usual
+}
+//----------------------------------------------------------------------------
+void mmgCheckTree::OnIconClick(wxTreeItemId item)
+//----------------------------------------------------------------------------
+{
+  mafNode* vme = (mafNode*) (NodeFromItem(item));
+  int status = GetVmeStatus(vme); 
+
+  if(status != NODE_NON_VISIBLE)		
+  {
+    bool show = !(status == NODE_VISIBLE_ON || status == NODE_MUTEX_ON ); 
+    mafEventMacro(mafEvent(this, VME_SHOW, vme, show));
+    mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+  }
 }
 //----------------------------------------------------------------------------
 void mmgCheckTree::VmeAdd(mafNode *vme)   
@@ -358,19 +335,24 @@ void mmgCheckTree::VmeShow(mafNode *vme, bool show)
 int mmgCheckTree::GetVmeStatus(mafNode *vme)
 //----------------------------------------------------------------------------
 {
+  static int foo =0;
+  foo++;
+  if (foo>=5) foo=0;
+  return foo;
   /*
   if(!m_view) return NODE_NON_VISIBLE;
   mafSceneGraph *sg = m_view->GetSceneGraph();
   if(!sg)     return NODE_NON_VISIBLE;
   return sg->GetNodeStatus(vme);
   */
-
-  return 0; // to be removed
 }
 //----------------------------------------------------------------------------
 void mmgCheckTree::VmeUpdateIcon(mafNode *vme)   
 //----------------------------------------------------------------------------
 {
+  int icon_index = ClassNameToIcon(vme->GetTypeName()) + GetVmeStatus(vme);
+  SetNodeIcon( (long)vme, icon_index );
+
   /*
   int type = mafGetBaseType(vme);
 
@@ -453,3 +435,128 @@ void mmgCheckTree::CryptSubTree(bool crypt)
 	iter->Delete();
   */
 }
+//----------------------------------------------------------------------------
+int mmgCheckTree::ClassNameToIcon(wxString classname)
+//----------------------------------------------------------------------------
+{
+  MapClassNameToIcon::iterator it=m_MapClassNameToIcon.find(classname.c_str());
+  if (it!= m_MapClassNameToIcon.end())
+    return int((*it).second);
+  else
+  {
+    wxLogMessage("mafPictureFactory::ClassNameToIcon: cant find = %s ",classname);
+    return 0;
+  }
+}
+//----------------------------------------------------------------------------
+void mmgCheckTree::InitializeImageList()
+//----------------------------------------------------------------------------
+{
+  // pourpose:
+  // each vme-picture is combined with each state-picture,
+  // all the combined picture are inserted in the imagelist.
+  // given a vme-class-name and a vme-state
+  // the corresponding icon index can be retrieved as 
+  // ClassNameToIcon(vme-class-name) + vme-state
+
+  std::vector<wxString>  v;
+  mafPics.GetVmeNames(v);
+
+  const int num_of_status = 5; 
+  int num_types = v.size();
+  int num_icons = num_types * num_of_status;
+
+  if(num_types <= 0)
+  {
+    wxLogMessage("mmgCheckTree:  Warning - no vme-icons defined");
+    return;
+  }
+  //retrieve state icons
+  //I assume all state-icon to have the same size
+  wxBitmap state_ico[num_of_status];
+  state_ico[0] = mafPics.GetBmp("DISABLED");
+  state_ico[1] = mafPics.GetBmp("CHECK_OFF");
+  state_ico[2] = mafPics.GetBmp("CHECK_ON");
+  state_ico[3] = mafPics.GetBmp("RADIO_ON");
+  state_ico[4] = mafPics.GetBmp("RADIO_OFF");
+  int sw = state_ico[0].GetWidth();
+  int sh = state_ico[0].GetHeight();
+
+  //get icon size 
+  //I assume all vme-icon to have the same size
+  wxBitmap bmp = mafPics.GetVmePic(v[0]);
+  assert(bmp != wxNullBitmap);
+  int w = bmp.GetWidth();
+  int h = bmp.GetHeight();
+  assert(w>0 && h>0);
+
+  // create the ImageList 
+  int mw = sw+w; 
+  int mh = (sh>h) ? sh : h;
+  wxImageList *imgs = new wxImageList(mw,mh,FALSE,num_icons);
+
+  for(int i=0; i<num_types; i++)
+  {
+    wxString name = v[i];
+    m_MapClassNameToIcon[name]=i*num_of_status;
+    
+    for( int s=0; s<num_of_status; s++)
+    {
+      wxBitmap vmeico = mafPics.GetVmePic(name);
+      if(s==0) vmeico = GrayScale(vmeico);
+      wxBitmap merged = MergeIcons(state_ico[s],vmeico);
+      imgs->Add(merged);
+    }
+  }
+  SetImageList(imgs);
+}
+//----------------------------------------------------------------------------
+wxBitmap mmgCheckTree::MergeIcons(wxBitmap state, wxBitmap vme)
+//----------------------------------------------------------------------------
+{
+  int sw = state.GetWidth();
+  int sh = state.GetHeight();
+  int vw = vme.GetWidth();
+  int vh = vme.GetHeight();
+  int w = sw+vw;
+  int h = vh;
+  int hpos = (vh-sh)/2; // state icon should be center-aligned in vertical 
+
+  wxMemoryDC statedc;
+  statedc.SelectObject(state);
+
+  wxMemoryDC vmedc;  
+  vmedc.SelectObject(vme);
+
+  wxBitmap merge = wxBitmap(w,h);
+  wxMemoryDC mergedc;
+  mergedc.SelectObject(merge);
+
+  mergedc.SetBackground(*wxWHITE_BRUSH);
+  mergedc.Clear();
+  mergedc.Blit(0, hpos, sw, sh, &statedc, 0, 0);
+  mergedc.Blit(sw, 0, vw, vh, &vmedc, 0, 0);
+  mergedc.SelectObject(wxNullBitmap); //merge must be removed from the DC at the end
+  return merge;
+}
+//----------------------------------------------------------------------------
+wxBitmap mmgCheckTree::GrayScale(wxBitmap bmp)
+//----------------------------------------------------------------------------
+{
+  wxImage img = bmp.ConvertToImage();
+  unsigned char *p = img.GetData();
+  unsigned char *max = p + img.GetWidth() * img.GetHeight() * 3;
+  unsigned char *r, *g, *b;
+  unsigned int gray ;
+  while( p < max )
+  {
+     r = p++;
+     g = p++;
+     b = p++;
+     gray = *r + *g + *b;
+     *r = *g = *b = gray / 3;
+  }
+  return wxBitmap(img);
+}
+
+
