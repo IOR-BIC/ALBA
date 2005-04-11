@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTimeMap.txx,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:06:44 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-11 17:15:15 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -152,7 +152,15 @@ void mafTimeMap<T>::DeepCopy(mafTimeMap *o)
 //-------------------------------------------------------------------------
 {
   RemoveAllItems();
-  m_TimeMap=o->m_TimeMap;
+  //m_TimeMap=o->m_TimeMap;
+  mafTimeMap<T>::TimeMap::iterator it;
+  for (it=o->Begin();it!=o->End();it++)
+  {
+    T *m=it->second;
+    T *new_item=m->NewInstance();
+    new_item->DeepCopy(m);
+    AppendItem(new_item);
+  }
   Modified();
 }
 
