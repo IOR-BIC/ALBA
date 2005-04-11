@@ -39,6 +39,8 @@ mafObserver.cpp
 mafObserver.h
 mafObserverCallback.cpp
 mafObserverCallback.h
+mafRoot.h
+mafRoot.cpp
 mafTagArray.cpp
 mafTagArray.h
 mafTagItem.cpp

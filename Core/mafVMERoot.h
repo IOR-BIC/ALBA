@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:20 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-04-11 12:59:56 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,21 +15,22 @@
 // includes :
 //----------------------------------------------------------------------------
 #include "mafVME.h"
-#include "mafNodeRoot.h"
+#include "mafRoot.h"
+
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 
 /** mafVMERoot - a VME is the root of a tree of VME nodes. 
   This node is a specialized VME acting as root of the tree. It inherits
-  root behavior from mafNodeRoot and also is responsible for generating 
+  root behavior from mafRoot and also is responsible for generating 
   Ids fore VME items added to the tree.
-  @sa mafNodeRoot mafVME
+  @sa mafRoot mafVME
 
   @todo
   - 
   */
-class MAF_EXPORT mafVMERoot : public mafVME, public mafNodeRoot
+class MAF_EXPORT mafVMERoot : public mafVME, public mafRoot
 {
 public:
   mafTypeMacro(mafVMERoot,mafVME);
@@ -72,7 +73,7 @@ public:
   virtual void SetCurrentTime(mafTimeStamp t);
 
   /** allow only a NULL parent */
-  virtual bool CanReparentTo(mafNode *parent) {return mafNodeRoot::CanReparentTo(parent);}
+  virtual bool CanReparentTo(mafNode *parent) {return mafRoot::CanReparentTo(parent);}
 
   void OnEvent(mafEventBase *e);
 

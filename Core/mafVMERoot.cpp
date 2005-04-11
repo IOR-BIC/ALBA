@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:20 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-04-11 12:59:56 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -127,7 +127,7 @@ void mafVMERoot::OnEvent(mafEventBase *e)
       }
     break;
     default:
-      mafNodeRoot::OnRootEvent(e);
+      mafRoot::OnRootEvent(e);
     };
   }
   else
@@ -141,7 +141,7 @@ void mafVMERoot::Print(std::ostream& os, const int tabs) const
 //-------------------------------------------------------------------------
 {
   mafNode::Print(os,tabs);
-  mafNodeRoot::Print(os,tabs);
+  mafRoot::Print(os,tabs);
   os << mafIndent(tabs) << "MaxItemId: " << m_MaxItemId << "\n";
 }
 //-------------------------------------------------------------------------
