@@ -2,20 +2,20 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventBase.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-04 13:47:29 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-04-11 11:23:14 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-
 #ifndef __mafEventBase_h
 #define __mafEventBase_h
-
+//----------------------------------------------------------------------------
+// includes :
+//----------------------------------------------------------------------------
 #include "mafObject.h"
 #include "mafDecl.h"
-
 //------------------------------------------------------------------------------
 // Forward declarations
 //------------------------------------------------------------------------------

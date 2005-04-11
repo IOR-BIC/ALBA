@@ -2,17 +2,18 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-06 21:23:54 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-04-11 11:23:19 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-
 #ifndef __mafVME_h
 #define __mafVME_h
-
+//----------------------------------------------------------------------------
+// includes :
+//----------------------------------------------------------------------------
 #include "mafNode.h"
 
 //----------------------------------------------------------------------------

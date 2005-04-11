@@ -2,20 +2,20 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMAFDataPipe.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:16:33 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-11 11:22:00 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-
 #ifndef __vtkMAFDataPipe_h
 #define __vtkMAFDataPipe_h
-
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
 #include "mafObserver.h"
 #include "vtkDataSetToDataSetFilter.h"
-
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------

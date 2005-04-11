@@ -2,17 +2,18 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObserverCallback.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-04 13:47:31 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-04-11 11:23:17 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-
 #ifndef __mafObserverCallback_h
 #define __mafObserverCallback_h
-
+//----------------------------------------------------------------------------
+// includes :
+//----------------------------------------------------------------------------
 #include "mafObject.h"
 #include "mafObserver.h"
 

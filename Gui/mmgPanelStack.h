@@ -2,20 +2,19 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgPanelStack.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:10:02 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-11 11:22:26 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
-
 #ifndef __mmgPanelStack_H__
 #define __mmgPanelStack_H__
-
-#include "mafDefines.h" //important: mafDefines should always be included as first
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
 #include <wx/laywin.h>
-
 #include "mmgPanel.h"
 //----------------------------------------------------------------------------
 // mmgPanelStack :

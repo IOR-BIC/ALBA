@@ -2,20 +2,20 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrixPipe.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:03:33 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-11 11:23:15 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-
 #ifndef __mafMatrixPipe_h
 #define __mafMatrixPipe_h
-
+//----------------------------------------------------------------------------
+// includes :
+//----------------------------------------------------------------------------
 #include "mafTransformBase.h"
 #include "mafTimeStamped.h"
-
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------

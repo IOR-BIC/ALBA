@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-08 18:01:05 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-11 11:22:20 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -11,11 +11,9 @@
 =========================================================================*/
 #ifndef __mmgCheckTree_H__
 #define __mmgCheckTree_H__
-
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafDefines.h" //important: mafDefines should always be included as first
 #include "mmgTree.h"
 #include "mafPics.h"
 #include <wx/imaglist.h>

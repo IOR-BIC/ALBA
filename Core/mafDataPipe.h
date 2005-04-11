@@ -2,17 +2,18 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataPipe.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 20:46:53 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-11 11:23:14 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-
 #ifndef __mafDataPipe_h
 #define __mafDataPipe_h
-
+//----------------------------------------------------------------------------
+// includes :
+//----------------------------------------------------------------------------
 #include "mafReferenceCounted.h"
 #include "mafObserver.h"
 #include "mafTimeStamped.h"

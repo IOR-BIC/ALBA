@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttribute.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-06 21:20:32 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-11 11:23:13 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -11,7 +11,9 @@
 =========================================================================*/
 #ifndef __mafAttribute_h
 #define __mafAttribute_h
-
+//----------------------------------------------------------------------------
+// includes :
+//----------------------------------------------------------------------------
 #include "mafReferenceCounted.h" 
 #include "mafStorable.h"
 #include "mafString.h"

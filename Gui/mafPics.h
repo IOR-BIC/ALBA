@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPics.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-08 18:01:05 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-11 11:22:19 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -11,11 +11,9 @@
 =========================================================================*/
 #ifndef __mafPics_H__
 #define __mafPics_H__
-
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafDefines.h" //important: mafDefines should always be included as first
 #include "mmgCheckTree.h" // friend class
 #include <wx/bitmap.h>
 #include <wx/image.h>

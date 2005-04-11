@@ -2,25 +2,23 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTree.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 18:34:39 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-11 11:22:28 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
-
 #ifndef __mmgTree_H__
 #define __mmgTree_H__
-
-#include "mafDefines.h" //important: mafDefines should always be included as first
-
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
 #include <wx/laywin.h>
 #include <wx/image.h>
 #include <wx/imaglist.h>
 #include <wx/treectrl.h>
 #include <wx/hash.h>
-
 #include "mafEvent.h"
 #include "mmgNamedPanel.h"
 //----------------------------------------------------------------------------

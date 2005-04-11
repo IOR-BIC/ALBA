@@ -2,22 +2,22 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuTimeSet.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:03:36 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-11 11:23:21 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-
 #ifndef __mmuTimeSet_h
 #define __mmuTimeSet_h
-
+//----------------------------------------------------------------------------
+// includes :
+//----------------------------------------------------------------------------
 #include "mmuUtility.h"
 #include "mafDefines.h"
 #include <set>
 #include <vector>
-
 //------------------------------------------------------------------------------
 // Forward declarations
 //------------------------------------------------------------------------------

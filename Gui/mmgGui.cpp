@@ -2,13 +2,23 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 11:39:45 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-11 11:22:23 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
+
+
+#include "mafDefines.h" 
+//----------------------------------------------------------------------------
+// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// This force to include Window,wxWidgets and VTK exactly in this order.
+// Failing in doing this will result in a run-time error saying:
+// "Failure#0: The value of ESP was not properly saved across a function call"
+//----------------------------------------------------------------------------
+
 
 #include "mmgFloatSlider.h"
  //SIL. 24-3-2005: temoporary removed
@@ -16,7 +26,6 @@
 
 #include "mmgValidator.h"
 #include "mmgGui.h"
-
 #include "mmgButton.h"
 #include "mmgPicButton.h"
 //----------------------------------------------------------------------------

@@ -2,19 +2,19 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 08:35:13 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-11 11:21:59 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-
 #ifndef __mafVMEOutputVTK_h
 #define __mafVMEOutputVTK_h
-
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
 #include "mafVMEOutput.h"
-
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------

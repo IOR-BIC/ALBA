@@ -2,23 +2,23 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 08:15:30 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-11 11:21:59 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-
 #ifndef __mafVMEItemVTK_h
 #define __mafVMEItemVTK_h
-
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
 #include "mafVMEItem.h"
 #include "mafStorable.h"
 #include "mafString.h"
 #include "mafMTime.h"
 #include "vtkSmartPointer.h"
-
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------

@@ -2,17 +2,25 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPics.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-08 18:01:04 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-11 11:22:19 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
+
+
+#include "mafDefines.h" 
 //----------------------------------------------------------------------------
-// Include:
+// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// This force to include Window,wxWidgets and VTK exactly in this order.
+// Failing in doing this will result in a run-time error saying:
+// "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
-#include "mafPics.h" //always include the class being defined as first
+
+
+#include "mafPics.h" 
 #include <map>
 #include <string>
 //----------------------------------------------------------------------------

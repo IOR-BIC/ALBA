@@ -2,17 +2,18 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeIterator.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:03:34 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-04-11 11:23:16 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-
 #ifndef __mafNodeIterator_h
 #define __mafNodeIterator_h
-
+//----------------------------------------------------------------------------
+// includes :
+//----------------------------------------------------------------------------
 #include "mafObject.h"
 #include "mafNode.h"
 #include "mafVector.h"

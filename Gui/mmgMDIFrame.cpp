@@ -2,17 +2,24 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 11:39:46 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-11 11:22:25 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
+
+#include "mafDefines.h" 
 //----------------------------------------------------------------------------
-// Include: - include the class being defined first
+// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// This force to include Window,wxWidgets and VTK exactly in this order.
+// Failing in doing this will result in a run-time error saying:
+// "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
+
+
 #include "mmgMDIFrame.h"
 #include <wx/icon.h>
 #include "mafDecl.h"
@@ -329,27 +336,15 @@ void mmgMDIFrame::RenderEnd()
 #ifdef MAF_USE_VTK
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //-----------------------------------------------------------
-void mmgMDIFrame::BindToProgressBar(vtkObject* vtkobj, wxString *msg)
+void mmgMDIFrame::BindToProgressBar(vtkObject* vtkobj)
 //-----------------------------------------------------------
 {
-  // New methods to handle the ProgressBar
-  vtkViewport *v = NULL;
-  vtkProcessObject *p = NULL;
-
 	if(vtkobj->IsA("vtkViewport")) 
-	{
-		v = (vtkViewport*)vtkobj;
-		BindToProgressBar(v,msg);
-  } 
-  if(vtkobj->IsA("vtkProcessObject")) 
-	{
-		p = (vtkProcessObject*)vtkobj;
-		BindToProgressBar(p,msg);
-  } 
-	if(v == NULL && p == NULL)
-	{
+		BindToProgressBar((vtkViewport*)vtkobj);
+  else if(vtkobj->IsA("vtkProcessObject")) 
+		BindToProgressBar((vtkProcessObject*)vtkobj);
+	else 
     wxLogMessage("wrong vtkObject passed to BindToProgressBar");
-	}
 }
 /* --- used for vtk v.4.2
 //----------------------------------------------------------------------------
@@ -398,7 +393,7 @@ void mmgMDIFrame::ProgressDeleteArgs(void* a)
 */
 
 //-----------------------------------------------------------
-void mmgMDIFrame::BindToProgressBar(vtkProcessObject* filter, wxString  *msg)
+void mmgMDIFrame::BindToProgressBar(vtkProcessObject* filter)
 //-----------------------------------------------------------
 {
   // - syntax for vtk v.4.4
@@ -419,7 +414,7 @@ void mmgMDIFrame::BindToProgressBar(vtkProcessObject* filter, wxString  *msg)
   //filter->SetEndMethodArgDelete(this->ProgressDeleteArgs);
 }
 //-----------------------------------------------------------
-void mmgMDIFrame::BindToProgressBar(vtkViewport* ren, wxString  *msg)
+void mmgMDIFrame::BindToProgressBar(vtkViewport* ren)
 //-----------------------------------------------------------
 {
   // - syntax for vtk v.4.4

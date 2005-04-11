@@ -2,20 +2,20 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventSender.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-04 13:47:29 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-11 11:23:15 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-
 #ifndef __mafEventSender_h
 #define __mafEventSender_h
-
+//----------------------------------------------------------------------------
+// includes :
+//----------------------------------------------------------------------------
 #include "mafObserver.h"
 #include "mafEventBase.h"
-
 //------------------------------------------------------------------------------
 // mafEventSender
 //------------------------------------------------------------------------------

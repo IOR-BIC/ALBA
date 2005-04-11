@@ -2,22 +2,22 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrixVector.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:16:32 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-11 11:21:58 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
- 
 #ifndef __mafMatrixVector_h
 #define __mafMatrixVector_h
-
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
 #include "mafTimeMap.txx"
 #include "mafStorable.h"
 #include "mafStorageElement.h"
 #include "mafMatrix.h"
-
 //------------------------------------------------------------------------------
 // Forward declarations
 //------------------------------------------------------------------------------

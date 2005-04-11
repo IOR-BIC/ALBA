@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialog.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 09:01:22 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-11 11:22:21 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -14,9 +14,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafDefines.h" //important: mafDefines should always be included as first
 #include "wx/dialog.h"
-
 //----------------------------------------------------------------------------
 // mmgDialog :
 //----------------------------------------------------------------------------

@@ -2,17 +2,18 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTimeMap.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:06:43 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-11 11:23:18 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
- 
 #ifndef __mafTimeMap_h
 #define __mafTimeMap_h
-
+//----------------------------------------------------------------------------
+// includes :
+//----------------------------------------------------------------------------
 #include "mafObject.h"
 #include "mafTimeStamped.h"
 #include "mafSmartPointer.h"

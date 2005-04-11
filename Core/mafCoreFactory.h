@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafCoreFactory.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-06 21:21:47 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-11 11:23:13 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -12,7 +12,9 @@
 
 #ifndef __mafCoreFactory_h
 #define __mafCoreFactory_h
-
+//----------------------------------------------------------------------------
+// includes :
+//----------------------------------------------------------------------------
 #include "mafObjectFactory.h"
 
 /** Object factory for objects in the MAF library */

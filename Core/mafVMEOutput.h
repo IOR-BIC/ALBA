@@ -2,22 +2,22 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 20:46:53 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-11 11:23:20 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-
 #ifndef __mafVMEOutput_h
 #define __mafVMEOutput_h
-
+//----------------------------------------------------------------------------
+// includes :
+//----------------------------------------------------------------------------
 #include "mafObject.h"
 #include "mafSmartPointer.h"
 #include "mafString.h"
 #include "mafOBB.h"
-
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------

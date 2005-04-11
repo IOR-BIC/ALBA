@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTagItem.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:04:56 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-11 11:23:18 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -11,7 +11,9 @@
 =========================================================================*/
 #ifndef __mafTagItem_h
 #define __mafTagItem_h
-
+//----------------------------------------------------------------------------
+// includes :
+//----------------------------------------------------------------------------
 #include "mmuUtility.h"
 #include "mafStorable.h"
 #include "mafString.h"

@@ -2,19 +2,18 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGuiHolder.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 08:58:08 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-11 11:22:23 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
-
 #ifndef __mmgGuiHolder_H__
 #define __mmgGuiHolder_H__
-
-#include "mafDefines.h" //important: mafDefines should always be included as first
-
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
 #include <wx/scrolwin.h>
 #include "mmgNamedPanel.h"
 #include "mmgScrolledPanel.h"

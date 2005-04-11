@@ -2,25 +2,24 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 09:01:22 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-11 11:22:19 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
-
 #ifndef __mafSideBar_H__
 #define __mafSideBar_H__
-
-#include "mafDefines.h" //important: mafDefines should always be included as first
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
 #include <wx/notebook.h>
 #include "mafEvent.h"
-
+#include "mmgSashPanel.h"
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
-class mmgSashPanel;
 class mmgGuiHolder;
 class mmgGui;
 class mmgPanelStack;
@@ -90,6 +89,9 @@ public:
 	// Description:
 	// Return the pointer to the tree.
 	mmgTree *GetTree() {return m_tree;};
+
+  bool IsShown() {return m_side_bar->IsShown();};
+  void Show( bool show) {m_side_bar->Show(show);};
 
 protected:
   wxNotebook        *m_notebook;

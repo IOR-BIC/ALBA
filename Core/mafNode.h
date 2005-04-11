@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 10:13:08 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2005-04-11 11:23:16 $
+  Version:   $Revision: 1.20 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -11,7 +11,9 @@
 =========================================================================*/
 #ifndef __mafNode_h
 #define __mafNode_h
-
+//----------------------------------------------------------------------------
+// includes :
+//----------------------------------------------------------------------------
 #include "mafReferenceCounted.h"
 #include "mafStorable.h"
 #include "mafSmartPointer.h"
@@ -24,7 +26,6 @@
 #include <vector>
 #include <map>
 #include <string>
-
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------

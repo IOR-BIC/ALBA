@@ -2,17 +2,18 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:16:31 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-11 11:21:57 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
- 
 #ifndef __mafDataVector_h
 #define __mafDataVector_h
-
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
 #include "mafTimeMap.h"
 #include "mafTimeMap.txx"
 #include "mafStorable.h"

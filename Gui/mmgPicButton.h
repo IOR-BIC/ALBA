@@ -2,18 +2,18 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgPicButton.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 11:39:47 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-11 11:22:26 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
-
 #ifndef __mmgPicButton_H__
 #define __mmgPicButton_H__
-
-#include "mafDefines.h" //important: mafDefines should always be included as first
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
 #include "mafEvent.h"
 //----------------------------------------------------------------------------
 // mmgPicButton :

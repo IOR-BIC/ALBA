@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 11:39:45 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-11 11:22:23 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2005
@@ -11,11 +11,9 @@
 =========================================================================*/
 #ifndef __mmgGui_H__
 #define __mmgGui_H__
-
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafDefines.h" //important: mafDefines should always be included as first
 #include "wx/grid.h"
 #include "mafDecl.h"
 #include "mmgPanel.h"

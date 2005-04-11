@@ -2,20 +2,19 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgViewWin.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 09:01:24 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-11 11:22:30 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
-
 #ifndef __mmgViewWin_H__
 #define __mmgViewWin_H__
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafDefines.h" //important: mafDefines should always be included as first
+
 //----------------------------------------------------------------------------
 // forward references
 //----------------------------------------------------------------------------

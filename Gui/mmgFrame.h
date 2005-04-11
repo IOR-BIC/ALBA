@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgFrame.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 09:01:23 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-11 11:22:22 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -14,7 +14,6 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafDefines.h" //important: mafDefines should always be included as first
 #include <wx/laywin.h>
 
 //----------------------------------------------------------------------------

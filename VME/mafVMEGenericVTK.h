@@ -2,19 +2,19 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 20:44:59 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-11 11:21:58 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-
 #ifndef __mafVMEGenericVTK_h
 #define __mafVMEGenericVTK_h
-
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
 #include "mafVMEGeneric.h"
-
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------

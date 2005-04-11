@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrixInterpolator.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 08:33:57 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-11 11:21:57 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -11,9 +11,10 @@
 =========================================================================*/
 #ifndef __mafMatrixInterpolator_h
 #define __mafMatrixInterpolator_h
-
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
 #include "mafMatrixPipe.h"
-
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------

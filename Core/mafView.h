@@ -2,14 +2,13 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 09:02:56 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-11 11:23:19 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
-
 #ifndef __mafView_H__
 #define __mafView_H__
 //----------------------------------------------------------------------------

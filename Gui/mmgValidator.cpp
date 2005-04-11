@@ -2,19 +2,27 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgValidator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-23 18:10:05 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-11 11:22:29 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#include "mmgValidator.h"
 
+#include "mafDefines.h" 
+//----------------------------------------------------------------------------
+// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// This force to include Window,wxWidgets and VTK exactly in this order.
+// Failing in doing this will result in a run-time error saying:
+// "Failure#0: The value of ESP was not properly saved across a function call"
+//----------------------------------------------------------------------------
+
+
+#include "mmgValidator.h"
 #include <wx/colordlg.h>
 #include <math.h>
-
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "mmgFloatSlider.h"

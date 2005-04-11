@@ -2,17 +2,18 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 08:15:30 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-11 11:21:58 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-
 #ifndef __mafVMEItem_h
 #define __mafVMEItem_h
-
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
 #include "mafReferenceCounted.h"
 #include "mafTimeStamped.h"
 #include "mafEventSender.h"
@@ -20,7 +21,6 @@
 #include "mafString.h"
 #include "mafMTime.h"
 #include "mafOBB.h"
-
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------

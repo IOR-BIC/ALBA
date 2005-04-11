@@ -2,24 +2,25 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgFloatSlider.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-04 15:02:42 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-11 11:22:22 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
-
 #ifndef __mmgFloatSlider_H__
 #define __mmgFloatSlider_H__
-
-#include "mafDefines.h" //important: mafDefines should always be included as first
 
 //#ifdef __WIN32__
 //  #define FLOAT_SLIDER_PARENT wxSlider95
 //#else
   #define FLOAT_SLIDER_PARENT wxSlider
 //#endif	
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+
 
 //----------------------------------------------------------------------------
 // mmgFloatSlider

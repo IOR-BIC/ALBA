@@ -2,20 +2,20 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeRoot.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 10:13:09 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-11 11:23:17 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
- 
 #ifndef __mafNodeRoot_h
 #define __mafNodeRoot_h
-
+//----------------------------------------------------------------------------
+// includes :
+//----------------------------------------------------------------------------
 #include "mafDefines.h"
 #include "mafEventSender.h"
-
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------

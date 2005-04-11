@@ -2,19 +2,19 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputNULL.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:03:35 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-11 11:23:20 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-
 #ifndef __mafVMEOutputNULL_h
 #define __mafVMEOutputNULL_h
-
+//----------------------------------------------------------------------------
+// includes :
+//----------------------------------------------------------------------------
 #include "mafVMEOutput.h"
-
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
