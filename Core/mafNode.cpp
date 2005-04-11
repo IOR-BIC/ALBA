@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-06 21:22:29 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2005-04-11 07:56:58 $
+  Version:   $Revision: 1.18 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -686,11 +686,6 @@ mafNode *mafNode::CopyTree(mafNode *vme, mafNode *parent)
   mafNode* v = vme->MakeCopy();
 
   v->ReparentTo(parent);
-
-  if (parent)
-  {
-    v->Delete();
-  }
 
   for(unsigned long i=0; i<vme->GetNumberOfChildren(); i++)
   {

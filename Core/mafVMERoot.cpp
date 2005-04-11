@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 20:46:54 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-11 07:56:59 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -18,6 +18,7 @@
 #include "mafIndent.h"
 #include "mafStorage.h"
 #include "mafEventIO.h"
+#include <sstream>
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMERoot)
@@ -53,6 +54,29 @@ bool mafVMERoot::Equals(mafVME *vme)
   }
   return false;
 }
+
+//-------------------------------------------------------------------------
+int mafVMERoot::DeepCopy(mafNode *a)
+//-------------------------------------------------------------------------
+{ 
+  if (Superclass::DeepCopy(a)==MAF_OK)
+  {
+    
+    mafVMERoot *vme=mafVMERoot::SafeDownCast(a);
+    m_Transform->SetMatrix(vme->m_Transform->GetMatrix());
+    m_Transform->SetTimeStamp(vme->m_Transform->GetTimeStamp());
+
+    return MAF_OK;
+  }
+  else
+  {
+    mafErrorMacro("Cannot copy VME of type "<<a->GetTypeName()<<" into a VME \
+    VME of type "<<GetTypeName());
+
+    return MAF_ERROR;
+  }
+}
+
 
 //-------------------------------------------------------------------------
 void mafVMERoot::SetMatrix(const mafMatrix &mat)

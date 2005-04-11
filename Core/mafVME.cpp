@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-06 21:23:53 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-04-11 07:56:58 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -88,9 +88,10 @@ mafVME *mafVME::GetParent() const
 int mafVME::DeepCopy(mafNode *a)
 //-------------------------------------------------------------------------
 { 
-  if (CanCopy(a))
+  if (Superclass::DeepCopy(a)==MAF_OK)
   {
     mafVME *vme=mafVME::SafeDownCast(a);
+    
     SetMatrixPipe(vme->GetMatrixPipe()?vme->GetMatrixPipe()->MakeACopy():NULL);
     SetDataPipe(vme->GetDataPipe()?vme->GetDataPipe()->MakeACopy():NULL);
 
