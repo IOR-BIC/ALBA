@@ -14,8 +14,10 @@ SUBDIRS(07_testSideBar)
 SUBDIRS(08_testStatusBar)
 SUBDIRS(09_testTimeBar)
 SUBDIRS(10_testPicFactory)
+SUBDIRS(11_testTree)
 SUBDIRS(12_Bmp2Xpm)
-
+SUBDIRS(13_testCheckTree)
+SUBDIRS(14_testOpMan)
 
 # wxWidgets specific classes
 IF (MAF_USE_WX)
