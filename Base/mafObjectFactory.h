@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObjectFactory.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-06 21:20:00 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-04-11 16:42:50 $
+  Version:   $Revision: 1.12 $
   Authors:   Based on itkObjectFactory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -19,6 +19,10 @@
 #include <vector>
 #include <list>
 #include <string>
+
+/** to be used internally for plugging default objects --- calls a member function directly */
+#define mafPlugObjectMacro(node_type,descr) \
+  RegisterNewObject(node_type::GetStaticTypeName(), descr, node_type::NewObject);
 
 typedef mafObject* (*mafCreateObjectFunction)();
 
