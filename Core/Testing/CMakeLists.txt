@@ -22,8 +22,8 @@ ADD_EXECUTABLE(testTimeVector testTimeVector.cpp)
 ADD_TEST(testTimeVector ${EXECUTABLE_OUTPUT_PATH}/testTimeVector)
 ADD_EXECUTABLE(testVMEPose testVMEPose.cpp)
 ADD_TEST(testVMEPose ${EXECUTABLE_OUTPUT_PATH}/testVMEPose)
-ADD_EXECUTABLE(testVMEData testVMEData.cpp)
-ADD_TEST(testVMEData ${EXECUTABLE_OUTPUT_PATH}/testVMEData)
+#ADD_EXECUTABLE(testVMEData testVMEData.cpp)
+#ADD_TEST(testVMEData ${EXECUTABLE_OUTPUT_PATH}/testVMEData)
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
