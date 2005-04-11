@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafCoreFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:13 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-11 16:40:41 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -58,10 +58,11 @@ int mafCoreFactory::Initialize()
 mafCoreFactory::mafCoreFactory()
 //------------------------------------------------------------------------------
 {
+  m_Instance = NULL;
+  
   //
   // Plug here Objects in this factory
   //
-
   //mafPlugObject<object_type>("comment");
 }
 

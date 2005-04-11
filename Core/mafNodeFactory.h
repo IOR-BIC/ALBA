@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeFactory.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:16 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-11 16:40:41 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,12 +17,15 @@
 #include "mafObjectFactory.h"
 #include "mafPics.h"
 
-/** to be used internally --- calls a member function directly */
+/** to be used internally for plugging default nodes --- calls a member function directly */
 #define mafPlugNodeMacro(node_type,descr) \
   RegisterNewNode(node_type::GetStaticTypeName(), descr, node_type::NewObject); \
-  /** add here plug of Node icon in Picture Factory */
+  mafPics.AddVmePic(node_type::GetStaticTypeName(),node_type::GetIcon());
 
 
+//----------------------------------------------------------------------------
+// forward declarations :
+//----------------------------------------------------------------------------  
 class mafNode;
 
 /** Object factory for Nodes.
@@ -39,17 +42,17 @@ public:
 
   /* Initialize the factory creating and registering a new instance */
   static int Initialize();
-  /** return the instance pointer of the factory. return NULL if not iitialized yet */
+  /** return the instance pointer of the factory. return NULL if not initialized yet */
   static mafNodeFactory *GetInstance() {if (!m_Instance) Initialize(); return m_Instance;}
 
   /** create an instance of the node give its type name */
-  static mafNode *CreateInstance(const char *type_name);
+  static mafNode *CreateNodeInstance(const char *type_name);
    
    /**
     This function can be used by Application code to register new Objects's to the mflCoreFactory */
   void RegisterNewNode(const char* node_name, const char* description, mafCreateObjectFunction createFunction);
 
-  /** return list of names for nodes pugged into this factory */
+  /** return list of names for nodes plugged into this factory */
   const static std::vector<std::string> GetNodeNames() {return m_NodeNames;}
 
 protected:

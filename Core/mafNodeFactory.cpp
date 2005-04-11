@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:16 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-11 16:40:41 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,10 +20,11 @@
 //----------------------------------------------------------------------------
 
 
-
 #include "mafNodeFactory.h"
 #include "mafVersion.h"
-#include "mafNode.h"
+#include "mafNodeRoot.h"
+#include "mafNodeGeneric.h"
+#include "mafTagArray.h"
 #include "mafIndent.h"
 #include <string>
 #include <ostream>
@@ -62,11 +63,14 @@ int mafNodeFactory::Initialize()
 mafNodeFactory::mafNodeFactory()
 //------------------------------------------------------------------------------
 {
+  m_Instance = NULL;
+  
   //
   // Plug here Nodes in this factory
   //
-
-  //mafPlugNodeMacro(node_type,"comment");
+  //mafPlugNodeMacro(mafNodeRoot,"root for generic nodes tree");
+  //mafPlugNodeMacro(mafNodeGeneric,"a generic node with only basic features");
+  //mafPlugObjectMacro(mafTagArray,"a basic kind of attribute used to store key-value pairs");
 }
 
 //------------------------------------------------------------------------------
@@ -84,7 +88,7 @@ const char* mafNodeFactory::GetDescription() const
 }
 
 //------------------------------------------------------------------------------
-mafNode *mafNodeFactory::CreateInstance(const char *type_name)
+mafNode *mafNodeFactory::CreateNodeInstance(const char *type_name)
 //------------------------------------------------------------------------------
 {
   return mafNode::SafeDownCast(Superclass::CreateInstance(type_name));
