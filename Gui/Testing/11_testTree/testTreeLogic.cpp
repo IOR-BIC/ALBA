@@ -2,18 +2,26 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testTreeLogic.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 18:37:23 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-11 11:25:25 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
+
+
+#include "mafDefines.h" 
 //----------------------------------------------------------------------------
-// Include:
+// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// This force to include Window,wxWidgets and VTK exactly in this order.
+// Failing in doing this will result in a run-time error saying:
+// "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
-#include "testTreeLogic.h" //the class being defined, must be included as first
+
+
+#include "testTreeLogic.h" 
 #include "mmgMDIFrame.h"
 #include "mmgNamedPanel.h"
 #include "mmgSashPanel.h"
@@ -131,43 +139,15 @@ void testTreeLogic::CreateSideBar()
   int w = bmp.GetWidth();
   int h = bmp.GetHeight();
 
+/*
   wxImageList *imgs = new wxImageList(w,h,FALSE,4);
   imgs->Add(bmp);
   imgs->Add(mafPics.GetBmp("FILE_SAVE"));
   imgs->Add(mafPics.GetBmp("FILE_OPEN"));
   imgs->Add(mafPics.GetBmp("FILE_SAVE"));
   tree->SetImageList(imgs);
+*/
 
-
-  /*
-  mafSideBar *sb = new mafSideBar(m_win,-1,this);
-
-  m_notebook = new wxNotebook(m_side_bar,-1);
-  m_side_bar->Put(m_notebook);
-
-  mmgNamedPanel *p1 = new mmgNamedPanel(m_notebook,-1,true);
-  p1->SetTitle(" p1:");
-  m_notebook->AddPage(p1,"page 1",true);
-
-  mmgNamedPanel *p2 = new mmgNamedPanel(m_notebook,-1,true);
-  p2->SetTitle(" p2:");
-  m_notebook->AddPage(p2,"page 2",true);
-
-  //mmgNamedPanel *p3 = new mmgNamedPanel(m_notebook,-1,true);
-  //p3->SetTitle(" p3:");
-  m_gui = new testTreeGui(m_notebook);
-  //p3->Add(m_gui->GetGui());
-
-  //m_notebook->AddPage(p3,"page 3",true);
-  m_notebook->AddPage(m_gui->GetGui(),"gui",true);
-  
-  //p3->SetTitleColor();
-
-  mafView *v = new mafView("pippo");
-  m_gui = new testTreeGui(m_win);
-  v->m_gui = m_gui->m_gui;
-  sb->ViewSelect(v);
-  */
 }
 
 

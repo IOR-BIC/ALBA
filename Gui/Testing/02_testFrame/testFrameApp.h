@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testFrameApp.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 09:46:28 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-11 11:23:58 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -11,11 +11,9 @@
 =========================================================================*/
 #ifndef __testFrameApp_H__
 #define __testFrameApp_H__
-
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafDefines.h" //important: mafDefines should always be included as first
 #include "testFrameLogic.h" 
 
 // ============================================================================

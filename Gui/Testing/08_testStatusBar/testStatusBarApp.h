@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testStatusBarApp.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 10:09:27 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-11 11:24:57 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -11,11 +11,9 @@
 =========================================================================*/
 #ifndef __testStatusBarApp_H__
 #define __testStatusBarApp_H__
-
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafDefines.h" //important: mafDefines should always be included as first
 #include "testStatusBarLogic.h" 
 
 // ============================================================================

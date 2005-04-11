@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testGuiLogic.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 09:46:00 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-11 11:23:49 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -11,13 +11,10 @@
 =========================================================================*/
 #ifndef __testGuiLogic_H__
 #define __testGuiLogic_H__
-
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafDefines.h" //important: mafDefines should always be included as first
 #include "mafEvent.h"
-
 //----------------------------------------------------------------------------
 // Forward References:
 //----------------------------------------------------------------------------

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testSideBarLogic.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 09:48:39 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-11 11:24:48 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -11,14 +11,11 @@
 =========================================================================*/
 #ifndef __testSideBarLogic_H__
 #define __testSideBarLogic_H__
-
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafDefines.h" //important: mafDefines should always be included as first
 #include "mafEvent.h"
 #include <wx/notebook.h>
-
 //----------------------------------------------------------------------------
 // Forward Refs:
 //----------------------------------------------------------------------------

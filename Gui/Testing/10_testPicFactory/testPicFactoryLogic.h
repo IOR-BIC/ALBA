@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testPicFactoryLogic.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 10:05:19 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-11 11:25:17 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -11,11 +11,9 @@
 =========================================================================*/
 #ifndef __testPicFactoryLogic_H__
 #define __testPicFactoryLogic_H__
-
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafDefines.h" //important: mafDefines should always be included as first
 #include "mafEvent.h"
 #include <wx/notebook.h>
 

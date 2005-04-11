@@ -2,15 +2,25 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testStatusBarApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 10:09:26 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-11 11:24:57 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#include "mafDefines.h"
+
+
+#include "mafDefines.h" 
+//----------------------------------------------------------------------------
+// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// This force to include Window,wxWidgets and VTK exactly in this order.
+// Failing in doing this will result in a run-time error saying:
+// "Failure#0: The value of ESP was not properly saved across a function call"
+//----------------------------------------------------------------------------
+
+
 #include "testStatusBarApp.h"
 
 //--------------------------------------------------------------------------------

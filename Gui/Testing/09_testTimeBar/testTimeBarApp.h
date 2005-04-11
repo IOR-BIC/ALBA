@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testTimeBarApp.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-04 15:01:48 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-11 11:25:07 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -11,13 +11,10 @@
 =========================================================================*/
 #ifndef __testTimeBarApp_H__
 #define __testTimeBarApp_H__
-
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafDefines.h" //important: mafDefines should always be included as first
 #include "testTimeBarLogic.h" 
-
 /*
 risultato del test :
 i tab sembrano funzionare bene -- ad eccezzione del colore di sfondo
