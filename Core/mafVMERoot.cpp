@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 12:59:56 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-04-11 16:40:53 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,6 +28,7 @@
 #include "mafVMEOutputNULL.h"
 #include "mafIndent.h"
 #include "mafStorage.h"
+#include "mafStorageElement.h"
 #include "mafEventIO.h"
 #include <sstream>
 
@@ -110,6 +111,7 @@ void mafVMERoot::SetCurrentTime(mafTimeStamp t)
 {
   Superclass::SetCurrentTime(t);
   m_Transform->SetTimeStamp(t);
+  m_Transform->Modified();
 }
 
 //-------------------------------------------------------------------------
@@ -150,4 +152,32 @@ char** mafVMERoot::GetIcon()
 {
 #include "mafVMERoot.xpm"
   return mafVMERoot_xpm;
+}
+
+//-------------------------------------------------------------------------
+int mafVMERoot::InternalStore(mafStorageElement *parent)
+//-------------------------------------------------------------------------
+{
+  if (Superclass::InternalStore(parent)==MAF_OK)
+  {
+    parent->StoreMatrix("Transform",&m_Transform->GetMatrix());
+    return MAF_OK;
+  }
+  return MAF_ERROR;
+}
+
+//-------------------------------------------------------------------------
+int mafVMERoot::InternalRestore(mafStorageElement *node)
+//-------------------------------------------------------------------------
+{
+  if (Superclass::InternalRestore(node)==MAF_OK)
+  {
+    mafMatrix matrix;
+    if (node->RestoreMatrix("Transform",&matrix)==MAF_OK)
+    {
+      m_Transform->SetMatrix(matrix);
+      return MAF_OK;
+    }
+  }
+  return MAF_ERROR;
 }

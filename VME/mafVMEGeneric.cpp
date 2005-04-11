@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGeneric.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:21:58 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-11 16:43:33 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -50,7 +50,7 @@ mafVMEGeneric::~mafVMEGeneric()
 }
 
 //-------------------------------------------------------------------------
-int mafVMEGeneric::DeepCopy(mafVME *a)
+int mafVMEGeneric::DeepCopy(mafNode *a)
 //-------------------------------------------------------------------------
 { 
   if (Superclass::DeepCopy(a)==MAF_OK)

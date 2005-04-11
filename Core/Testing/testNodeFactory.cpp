@@ -1,4 +1,5 @@
 #include "mafVME.h"
+#include "mafTagArray.h"
 #include "mafTransform.h"
 #include "mafNodeFactory.h"
 #include "mafVMEOutputNULL.h"
@@ -101,14 +102,22 @@ public:
   /* Initialize the factory creating and registering a new instance */
   static int Initialize();
   
+  static mafTestNodeFactory *GetInstance() {if (!m_Instance) Initialize(); return m_Instance; }
+
 protected:
   mafTestNodeFactory();
-  ~mafTestNodeFactory() { }
+  ~mafTestNodeFactory() {}
+
+  static mafTestNodeFactory *m_Instance; // stores pointer to this kind of factory
   
 private:
   mafTestNodeFactory(const mafTestNodeFactory&);  // Not implemented.
   void operator=(const mafTestNodeFactory&);  // Not implemented.
 };
+
+//----------------------------------------------------------------------------
+mafTestNodeFactory *mafTestNodeFactory::m_Instance=NULL;
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafTestNodeFactory)
@@ -118,8 +127,11 @@ mafCxxTypeMacro(mafTestNodeFactory)
 mafTestNodeFactory::mafTestNodeFactory()
 //----------------------------------------------------------------------------
 {
+  m_Instance = NULL;
+  
 // a VME plugged by default in this factory
   mafPlugNodeMacro(mafVMETest,"a test VME");
+  mafPlugObjectMacro(mafTagArray,"the TagArray attribute");
 }
 
 //----------------------------------------------------------------------------
@@ -127,13 +139,43 @@ mafTestNodeFactory::mafTestNodeFactory()
 int mafTestNodeFactory::Initialize()
 //----------------------------------------------------------------------------
 {
-  if (mafTestNodeFactory *factory=mafTestNodeFactory::New())
+  if (m_Instance==NULL)
   {
-    factory->RegisterFactory(factory);
-    return MAF_OK;  
+    if (m_Instance=mafTestNodeFactory::New())
+    {
+      m_Instance->RegisterFactory(m_Instance);
+      return MAF_OK;  
+    }
+    
+    return MAF_ERROR;
   }
+
+  return MAF_OK;
+}
+
+//------------------------------------------------------------------------------
+// a custom plugger for the new factory
+template <class T>
+class mafPlugTestNode
+//------------------------------------------------------------------------------
+{
+  public:
+  mafPlugTestNode(const char *description);
   
-  return MAF_ERROR;
+};
+
+//------------------------------------------------------------------------------
+template <class T>
+mafPlugTestNode<T>::mafPlugTestNode(const char *description)
+//------------------------------------------------------------------------------
+{ 
+  mafTestNodeFactory *factory=mafTestNodeFactory::GetInstance();
+  if (factory)
+  {
+    factory->RegisterNewNode(T::GetStaticTypeName(), description, T::NewObject);
+    // here plug node's icon inside picture factory
+    mafPics.AddVmePic(T::GetStaticTypeName(),T::GetIcon());
+  }
 }
 
 //-------------------------------------------------------------------------
@@ -150,10 +192,10 @@ int main()
   std::list<mafObjectFactory *> list=mafObjectFactory::GetRegisteredFactories();
   MAF_TEST(list.size()==2);
 
-  mafPlugNode<mafTestNode>("a test node"); // plug a node in the main node factory
+  mafPlugTestNode<mafTestNode>("a test node"); // plug a node in the main node factory
 
-  mafNode *node1=mafNodeFactory::CreateInstance("mafTestNode");
-  mafNode *node2=mafNodeFactory::CreateInstance("mafVMETest");
+  mafNode *node1=mafNodeFactory::CreateNodeInstance("mafTestNode");
+  mafNode *node2=mafNodeFactory::CreateNodeInstance("mafVMETest");
 
   MAF_TEST(node1!=NULL);
   MAF_TEST(node2!=NULL);
@@ -161,9 +203,19 @@ int main()
   MAF_TEST(node1->IsMAFType(mafTestNode));
   MAF_TEST(node2->IsMAFType(mafVMETest));
 
-  MAF_TEST(node_factory->GetNodeNames().size()==2);
-  MAF_TEST(node_factory->GetNodeNames()[1]=="mafTestNode");
-  MAF_TEST(node_factory->GetNodeNames()[0]=="mafVMETest");
+  // test factory contents
+  const std::vector<std::string> &nodes=node_factory->GetNodeNames();
+  MAF_TEST(nodes.size()==2); // one node is plugged by default, the other is plugged in the main
+  
+  bool found1=false;
+  bool found2=false;
+  for (int i=0;i<nodes.size();i++)
+  {
+    if (nodes[i]=="mafTestNode")
+      found1=true;
+    if (nodes[i]=="mafVMETest")
+      found2=true;
+  }
   
   std::cout<<"Test completed successfully!"<<std::endl;
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGeneric.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:21:58 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-11 16:43:33 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -44,7 +44,7 @@ public:
     are not copied, i.e. copy is not recursive!
     Concrete class should reimplement this function to verify admitted
     conversion. */
-  virtual int DeepCopy(mafVME *a);
+  virtual int DeepCopy(mafNode *a);
 
   /** 
     perform a copy by simply referencing the copied VME's data array. 

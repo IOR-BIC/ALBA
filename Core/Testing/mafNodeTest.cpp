@@ -1,8 +1,9 @@
 #include "mafNode.h"
-#include "mafNodeRoot.h"
+#include "mafRoot.h"
 #include "mafNodeIterator.h"
 #include "mafTagArray.h"
 #include "mafXMLStorage.h"
+#include "mafNodeFactory.h"
 #include "mafCoreFactory.h"
 #include <iostream>
 
@@ -29,18 +30,18 @@ mafCxxTypeMacro(mafTestNode)
 //-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
-// class for testing root mafNodeRoot. A mafNode inheriting from mafNodeRoot
+// class for testing root mafRoot. A mafNode inheriting from mafRoot
 // is a node that can behave as a root for a tree. This node simply has to
-// inherit from mafNodeRoot and call the StoreRoot() and RestoreRoot()
+// inherit from mafRoot and call the StoreRoot() and RestoreRoot()
 // respectivelly from inside InternalStore() and InternalRestore().  
-class mafTestRootNode: public mafNodeRoot, public mafTestNode
+class mafTestRootNode: public mafRoot, public mafTestNode
 //-------------------------------------------------------------------------
 {
 public:
   mafTestRootNode() {SetId(0);} // self set its id to 0
   mafTypeMacro(mafTestRootNode,mafTestNode);
   /** allow only a NULL parent */
-  virtual bool CanReparentTo(mafNode *parent) {return mafNodeRoot::CanReparentTo(parent);}
+  virtual bool CanReparentTo(mafNode *parent) {return mafRoot::CanReparentTo(parent);}
   virtual void Print(std::ostream& os, const int tabs=0) const;
 protected:
   inline int InternalStore(mafStorageElement *parent);
@@ -52,7 +53,7 @@ inline void mafTestRootNode::Print(std::ostream& os, const int tabs) const
 //-------------------------------------------------------------------------
 {
   Superclass::Print(os,tabs);
-  mafNodeRoot::Print(os,tabs);
+  mafRoot::Print(os,tabs);
 }
 
 
@@ -60,7 +61,7 @@ inline void mafTestRootNode::Print(std::ostream& os, const int tabs) const
 inline int mafTestRootNode::InternalRestore(mafStorageElement *element)
 //-------------------------------------------------------------------------
 {
-  if (mafNodeRoot::RestoreRoot(element)==MAF_OK && \
+  if (mafRoot::RestoreRoot(element)==MAF_OK && \
       Superclass::InternalRestore(element)==MAF_OK)
     return MAF_OK;
 
@@ -71,7 +72,7 @@ inline int mafTestRootNode::InternalRestore(mafStorageElement *element)
 inline int mafTestRootNode::InternalStore(mafStorageElement *parent)
 //-------------------------------------------------------------------------
 {
-  mafNodeRoot::StoreRoot(parent);
+  mafRoot::StoreRoot(parent);
   Superclass::InternalStore(parent);
   return MAF_OK;
 }
@@ -359,9 +360,9 @@ int main()
   MAF_TEST(root->Equals(root_copy));
 
   // plug nodes to factory for being able to restore
-  mafCoreFactory::Initialize();
-  mafPlugObject<mafTestNode>("Test Node");
-  mafPlugObject<mafTagArray>("Test Node");
+  mafNodeFactory::Initialize();
+  mafPlugNode<mafTestNode>("Test Node");
+  mafPlugObject<mafTagArray>("the TagArray");
 
   // test storing/restoring...
   mafXMLStorage storage;
