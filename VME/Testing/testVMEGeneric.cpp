@@ -23,7 +23,8 @@
 #include "vtkConeSource.h"
 #include "vtkCylinderSource.h"
 #include "vtkAxes.h"
-#include "vtkDataSetMapper.h"
+//#include "vtkDataSetMapper.h"
+#include "vtkPolyDataMapper.h"
 #include "vtkPolyData.h"
 #include "vtkGlyph3D.h"
 #include "vtkOutlineSource.h"
@@ -72,11 +73,24 @@ int main()
   vtkMAFSmartPointer<vtkRenderWindowInteractor> iren = vtkRenderWindowInteractor::New();
   iren->SetRenderWindow(renWin);
 
-  renderer->SetBackground(0.1, 0.1, 0.1);
+  //renderer->SetBackground(0.1, 0.1, 0.1);
   renWin->SetSize(640, 480);
-  renWin->SetPosition(400,0);
-  renWin->StereoCapableWindowOn();
-  renWin->StereoRenderOn();
+  //renWin->SetPosition(0,0);
+  //renWin->StereoCapableWindowOn();
+  //renWin->StereoRenderOn();
+  //renderer->ResetCamera();
+  renderer->GetActiveCamera()->ParallelProjectionOff();
+
+  vtkMAFSmartPointer<vtkCubeSource> test_cone;
+  test_cone->SetBounds(0,1,0,1,0,1);
+  vtkMAFSmartPointer<vtkPolyDataMapper> test_mapper;
+  test_mapper->SetInput(test_cone->GetOutput());
+  vtkMAFSmartPointer<vtkActor> test_actor;
+  test_actor->SetMapper(test_mapper);
+  test_actor->SetPosition(4,0,0);
+  test_actor->GetProperty()->SetColor(1,0,0);
+  renderer->AddActor(test_actor);
+
 
   vtkMAFSmartPointer<vtkAxes> axes;
   axes->SetScaleFactor(2);
@@ -109,12 +123,15 @@ int main()
   std::vector<mafTimeStamp> matrix_time_stamps;
 
   // arrays used to store output data and pose matrices for later testing
-  vtkSphereSource *test_sphere[10];
+  vtkMAFAutoPointer<vtkSphereSource> test_sphere[10];
   mafMatrix test_vtitle_pose[10],test_sphere_pose[10],test_sphere_abspose[10];
 
   //
   // Fill in VME-tree with data and pose matrices to create a beautiful animation
   //
+
+  vmorph->SetPose(0,0,0,0,0,90,0);
+
   int i;
   for (i=0;i<100;i++)
   {
@@ -289,7 +306,7 @@ int main()
         vtkMAFSmartPointer<vtkGlyph3D> glyph;
         glyph->SetInput((vtkPolyData *)data);
 
-        vtkMAFSmartPointer<vtkDataSetMapper> mapper;
+        vtkMAFSmartPointer<vtkPolyDataMapper> mapper;
 
         mapper->SetInput(glyph->GetOutput());
 
@@ -312,7 +329,7 @@ int main()
   
         vtkMAFSmartPointer<vtkActor> vmeact;
         vmeact->SetMapper(mapper);
-
+        vmeact->GetProperty()->SetColor(0,1,0);
         vtkMAFSmartPointer<vtkAssembly> vmeasm;
         vmeasm->AddPart(vmeact);
         mafSmartPointer<mafClientData> attr;
@@ -337,11 +354,13 @@ int main()
 
         MAF_TEST(data->IsA("vtkPolyData")!=0);
 
-        vtkDataSetMapper *mapper=vtkDataSetMapper::New();
+        vtkPolyDataMapper *mapper=vtkPolyDataMapper::New();
 
         mapper->SetInput((vtkPolyData *)data);
   
         vtkMAFSmartPointer<vtkActor> vmeact;
+        vmeact->GetProperty()->SetColor(0,1,0);
+        vmeact->GetProperty()->SetOpacity(1);
         vmeact->SetMapper(mapper);
         mapper->Delete();
 
@@ -366,13 +385,12 @@ int main()
     }
   }
 
-  renderer->GetActiveCamera()->Zoom(.5);
+  //renderer->GetActiveCamera()->Zoom(.5);
   renderer->Render();
-  renderer->ResetCamera();
-  
-  
   //renderer->GetActiveCamera()->SetViewAngle(0);
-
+  renderer->GetActiveCamera()->Pitch(20);
+  renderer->GetActiveCamera()->Azimuth(10);
+  renderer->ResetCamera();
 
 
   int t;
@@ -387,78 +405,6 @@ int main()
     //SLEEP(100);
   }
 
-  // open landmark cloud
-  /*
-  mafVMELandmarkCloud *cloud=mafVMELandmarkCloud::SafeDownCast(root->FindInTreeByName("landmarks"));
-
-  MAF_TEST(cloud!=NULL);
-
-  cloud->Open();
-
-  if (vtkAssembly * cloudasm=(vtkAssembly *)cloud->GetClientData())
-  {
-    vtkProp3DCollection *parts=cloudasm->GetParts();
-    parts->InitTraversal();
-    for (vtkProp3D *prop=parts->GetNextProp3D();prop;prop=parts->GetNextProp3D())
-    {
-      cloudasm->RemovePart(prop);
-    }
-  }
-  
-  
-
-  for (int i=0;i<cloud->GetNumberOfChildren();i++)
-  {
-    mafVME *vme=cloud->GetChild(i);
-
-    if (vme->IsA("mafVMELandmark"))
-    {
-      vtkDataSet *data=vme->GetCurrentData();
-      MAF_TEST(data!=NULL);
-
-      MAF_TEST(data->IsA("vtkPolyData")!=0);
-
-      vtkMAFSmartPointer<vtkGlyph3D> glyph;
-      glyph->SetInput((vtkPolyData *)data);
-
-      vtkMAFSmartPointer<vtkDataSetMapper> mapper;
-
-      mapper->SetInput(glyph->GetOutput());
-
-      vtkMAFSmartPointer<vtkSphereSource> sphere;
-
-        
-      sphere->SetRadius(cloud->GetRadius());
-      mapper->ScalarVisibilityOff();
-
-      glyph->SetSource(sphere->GetOutput());
-
-      glyph->SetScaleModeToScaleByScalar();
-      glyph->SetColorModeToColorByScale();
-  
-      vtkMAFSmartPointer<vtkActor> vmeact;
-      vmeact->SetMapper(mapper);
-
-      vtkMAFSmartPointer<vtkAssembly> vmeasm;
-      vmeasm->AddPart(vmeact);
-
-      vmeasm->SetUserTransform(vme->GetOutput()->GetVTKTransform());
-
-      vme->SetClientData(vmeasm);
-      vmeasm->Register(vme);
-
-      MAF_TEST(vme->GetClientData()==vmeasm);
-
-      vtkAssembly *pvmeasm=(vtkAssembly *)cloud->GetClientData();
-      MAF_TEST(pvmeasm!=NULL);
-      MAF_TEST(pvmeasm->IsA("vtkAssembly")!=0);
-      pvmeasm->AddPart(vmeasm);
-
-    }
-  }
-  
-  */
-  
   //--------------------------------------------------------------------------
   //          Test the GetTimeBounds function of the VME tree
   //--------------------------------------------------------------------------
@@ -558,7 +504,7 @@ int main()
   treeBoundsBox->SetBounds(treeBounds.m_Bounds[0],treeBounds.m_Bounds[1],treeBounds.m_Bounds[2], \
     treeBounds.m_Bounds[3],treeBounds.m_Bounds[4],treeBounds.m_Bounds[5]);
 
-  vtkDataSetMapper *treeBoundsMapper=vtkDataSetMapper::New();
+  vtkPolyDataMapper *treeBoundsMapper=vtkPolyDataMapper::New();
   treeBoundsMapper->SetInput(treeBoundsBox->GetOutput());
   treeBoundsBox->Delete();
 
@@ -573,7 +519,7 @@ int main()
   tree4DBoundsBox->SetBounds(tree4DBounds.m_Bounds[0],tree4DBounds.m_Bounds[1],tree4DBounds.m_Bounds[2], \
     tree4DBounds.m_Bounds[3],tree4DBounds.m_Bounds[4],tree4DBounds.m_Bounds[5]);
 
-  vtkDataSetMapper *tree4DBoundsMapper=vtkDataSetMapper::New();
+  vtkPolyDataMapper *tree4DBoundsMapper=vtkPolyDataMapper::New();
   tree4DBoundsMapper->SetInput(tree4DBoundsBox->GetOutput());
   tree4DBoundsBox->Delete();
 
@@ -596,7 +542,7 @@ int main()
 
   asmBoundsBox->SetBounds(asmBounds);
 
-  vtkDataSetMapper *asmBoundsMapper=vtkDataSetMapper::New();
+  vtkPolyDataMapper *asmBoundsMapper=vtkPolyDataMapper::New();
   asmBoundsMapper->SetInput(asmBoundsBox->GetOutput());
   asmBoundsBox->Delete();
 
@@ -632,12 +578,12 @@ int main()
     // Update time into all the tree
     root->SetTreeTime(t);
 
-    renderer->ResetCameraClippingRange();
+    //renderer->ResetCameraClippingRange();
     //renderer->ResetCamera();
-    //renderer->GetActiveCamera()->Yaw(.003);
+    //renderer->GetActiveCamera()->Pitch(.003);
     renWin->Render();
 
-    SLEEP(300);
+    //SLEEP(300);
 
     root->GetOutput()->GetBounds(treeBounds);
     vtitle->GetOutput()->GetBounds(treeBounds);
@@ -798,9 +744,8 @@ int main()
   // try to copy the sub tree
   //---------------------------
 
-  mafVMERoot *newroot=mafVMERoot::SafeDownCast(root->CopyTree());
+  mafAutoPointer<mafVMERoot> newroot=mafVMERoot::SafeDownCast(root->CopyTree());
 
-/*
   mafVMEItem::GlobalCompareDataFlagOn();
   //---------------------------------------
   // Compare the new tree with the old one
@@ -811,25 +756,21 @@ int main()
   //------------------------------
   // compare test that should fail
   //------------------------------
-  mafVME *badVME=vmorph->MakeCopy();
+  mafAutoPointer<mafVME> badVME=mafVME::SafeDownCast(vmorph->MakeCopy());
 
-  mflMatrix mat;
+  mafMatrix mat;
   mat.SetTimeStamp(23.4455667788);
-  badVME->GetMatrixVector()->SetMatrix(mat);
+  badVME->SetMatrix(mat);
 
-  SHOULDFAIL(vmorph->Equals(badVME));
+  MAF_TEST(!vmorph->Equals(badVME));
 
 
-  mafVME *badTree=root->GetFirstChild()->CopyTree();
+  mafAutoPointer<mafVME> badTree=mafVME::SafeDownCast(root->GetFirstChild()->CopyTree());
   badTree->AddChild(badVME);
   
-  SHOULDFAIL(root->GetFirstChild()->CompareTree(badTree));
+  MAF_TEST(!root->GetFirstChild()->CompareTree(badTree));
 
-  badTree->Delete();
-  badVME->Delete();
-  */
   MAF_TEST(newroot->GetReferenceCount()==1);
-  newroot->Delete();
 
   std::cerr<<"Test completed successfully!"<<std::endl;
 
