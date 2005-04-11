@@ -247,7 +247,7 @@ int main()
         mafOBB tree_bounds,test_tree_bounds;
         test_tree_bounds.m_Bounds[0]=cube_bounds[i].m_Bounds[0]-50;
         test_tree_bounds.m_Bounds[1]=cube_bounds[i].m_Bounds[1]+50;
-        test_tree_bounds.m_Bounds[2]=cube_bounds[i].m_Bounds[2];
+        test_tree_bounds.m_Bounds[2]=cube_bounds[i].m_Bounds[2]+i-50;
         test_tree_bounds.m_Bounds[3]=cube_bounds[i].m_Bounds[3]+i-50;
         test_tree_bounds.m_Bounds[4]=cube_bounds[i].m_Bounds[4];
         test_tree_bounds.m_Bounds[5]=cube_bounds[i].m_Bounds[5];
@@ -291,7 +291,7 @@ int main()
   }
   
 
-  
+/*  
   //---------------------------------------------------------------------------------------
   //        A visual feedback on the animation
   //---------------------------------------------------------------------------------------
