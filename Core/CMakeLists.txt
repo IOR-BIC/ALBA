@@ -44,6 +44,8 @@ mafTagArray.h
 mafTagItem.cpp
 mafTagItem.h
 mafTimeMap.h
+mafTimeVector.txx
+mafTimeVector.h
 mafVME.cpp
 mafVME.h
 mafVMEOutput.cpp
