@@ -31,6 +31,8 @@ mafNode.cpp
 mafNode.h
 mafNodeFactory.h
 mafNodeFactory.cpp
+mafNodeGeneric.cpp
+mafNodeGeneric.h
 mafNodeIterator.cpp
 mafNodeIterator.h
 mafNodeRoot.cpp
