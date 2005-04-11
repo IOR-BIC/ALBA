@@ -16,6 +16,8 @@ SET(PROJECT_SRCS
   mafMatrixInterpolator.h
   mafMatrixVector.cpp
   mafMatrixVector.h
+  mafVMEFactory.cpp
+  mafVMEFactory.h
   mafVMEGeneric.h
   mafVMEGeneric.cpp
   mafVMEGenericVTK.cpp
