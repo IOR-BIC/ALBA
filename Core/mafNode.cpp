@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:16 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2005-04-11 13:06:13 $
+  Version:   $Revision: 1.21 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,7 +23,7 @@
 
 #include "mafNode.h"
 #include "mafNodeIterator.h"
-#include "mafNodeRoot.h"
+#include "mafRoot.h"
 #include "mafEventBase.h"
 #include "mafEventSource.h"
 #include "mafDecl.h"
@@ -521,11 +521,11 @@ int mafNode::SetParent(mafNode *parent)
 
       m_Parent=parent;
 
-      // if it's being attached to a new tree and this has 'mafNodeRoot' root node, ask for a new Id
-      mafNodeRoot *root=mafNodeRoot::SafeDownCast(new_root);
+      // if it's being attached to a new tree and this has 'mafRoot' root node, ask for a new Id
+      mafRoot *root=mafRoot::SafeDownCast(new_root);
       
       // if attached under a new root (i.e. a new tree
-      // with a root node of type mafNodeRoot) ask for
+      // with a root node of type mafRoot) ask for
       // a new Id and set it.
       if (old_root!=new_root)
       {
