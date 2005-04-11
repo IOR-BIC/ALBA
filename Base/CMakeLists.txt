@@ -53,6 +53,7 @@ mafVersion.h
 mmuIdFactory.cpp
 mmuIdFactory.h
 mmuUtility.h
+sorted_vector.h
 vtkMAFSmartPointer.h
 vtkMAFToLinearTransform.h
 )
