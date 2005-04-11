@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 07:56:59 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-11 10:13:09 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -132,4 +132,11 @@ void mafVMERoot::Print(std::ostream& os, const int tabs) const
   mafNode::Print(os,tabs);
   mafNodeRoot::Print(os,tabs);
   os << mafIndent(tabs) << "MaxItemId: " << m_MaxItemId << "\n";
+}
+//-------------------------------------------------------------------------
+char** mafVMERoot::GetIcon() 
+//-------------------------------------------------------------------------
+{
+#include "mafVMERoot.xpm"
+  return mafVMERoot_xpm;
 }

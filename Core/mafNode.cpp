@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 07:56:58 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2005-04-11 10:13:08 $
+  Version:   $Revision: 1.19 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1043,4 +1043,11 @@ void mafNode::Print(std::ostream& os, const int tabs) const
   {
     os << next_indent << "Name: " << lnk_it->first.GetCStr() << "\tNodeId: " << lnk_it->second.m_NodeId << std::endl;
   }
+}
+//-------------------------------------------------------------------------
+char** mafNode::GetIcon() 
+//-------------------------------------------------------------------------
+{
+  #include "mafNode.xpm"
+  return mafNode_xpm;
 }

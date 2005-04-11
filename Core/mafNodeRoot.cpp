@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeRoot.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:03:34 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-11 10:13:09 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -94,4 +94,11 @@ void mafNodeRoot::Print(std::ostream& os, const int tabs) const
 //-------------------------------------------------------------------------
 {
   os << mafIndent(tabs) << "MaxNodeId: " << m_MaxNodeId << "\n";
+}
+//-------------------------------------------------------------------------
+char** mafNodeRoot::GetIcon() 
+//-------------------------------------------------------------------------
+{
+  #include "mafNodeRoot.xpm"
+  return mafNodeRoot_xpm;
 }

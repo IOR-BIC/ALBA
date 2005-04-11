@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGeneric.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 08:34:36 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-11 10:13:35 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -103,6 +103,9 @@ public:
     data or matrices */
   virtual bool IsAnimated();
   
+  /** return an xpm-icon that can be used to represent this node */
+  static char ** GetIcon();   //SIL. 11-4-2005:  
+
 protected:
   mafVMEGeneric();
   virtual ~mafVMEGeneric();

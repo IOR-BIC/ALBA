@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGeneric.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:16:32 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-11 10:13:35 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -259,4 +259,11 @@ void mafVMEGeneric::Print(std::ostream& os, const int tabs)
   {
     os << "(NULL)\n";
   }
+}
+//-------------------------------------------------------------------------
+char** mafVMEGeneric::GetIcon() 
+//-------------------------------------------------------------------------
+{
+  #include "mafVMEGeneric.xpm"
+  return mafVMEGeneric_xpm;
 }

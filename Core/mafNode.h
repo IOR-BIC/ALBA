@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:03:34 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2005-04-11 10:13:08 $
+  Version:   $Revision: 1.19 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -343,6 +343,9 @@ public:
 
   /** return the Id of this node in the tree */
   mafID GetId() const;
+
+  /** return an xpm-icon that can be used to represent this node */
+  static char ** GetIcon();   //SIL. 11-4-2005:  
 
 protected:
 

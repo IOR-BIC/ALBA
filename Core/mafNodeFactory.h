@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeFactory.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-06 21:21:13 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-11 10:13:09 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,7 +14,9 @@
 #define __mafNodeFactory_h
 
 #include "mafObjectFactory.h"
+#include "mafPics.h"
 
+/** to be used internally --- calls a member function directly */
 #define mafPlugNodeMacro(node_type,descr) \
   RegisterNewNode(node_type::GetStaticTypeName(), descr, node_type::NewObject); \
   /** add here plug of Node icon in Picture Factory */
@@ -80,6 +82,7 @@ mafPlugNode<T>::mafPlugNode(const char *description)
   {
     factory->RegisterNewNode(T::GetStaticTypeName(), description, T::NewObject);
     // here plug node's icon inside picture factory
+    mafPics.AddVmePic(T::GetStaticTypeName(),T::GetIcon());
   }
 }
 

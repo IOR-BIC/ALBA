@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 07:56:59 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-11 10:13:09 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -75,7 +75,10 @@ public:
   virtual bool CanReparentTo(mafNode *parent) {return mafNodeRoot::CanReparentTo(parent);}
 
   void OnEvent(mafEventBase *e);
-  
+
+  /** return an xpm-icon that can be used to represent this node */
+  static char ** GetIcon();   //SIL. 11-4-2005:  
+
 protected:
   /** allowed only dynamic allocation via New() */
   mafVMERoot();           
