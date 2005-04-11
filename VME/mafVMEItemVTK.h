@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:16:33 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-11 08:15:30 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,7 +30,7 @@ class vtkDataSet;
 class vtkDataReader;
 class vtkDataSetWriter;
 
-/** mafVMEItemVTK - store the single dataset stored into a mafTimeMap
+/** mafVMEItemVTK - store the single VTK dataset stored into a mafDataVector
   mafVMEItemVTK is an object that stores the single time stamped dataset of a
   mafVME. This class associates a Time stamp and a Tagged list to an internally 
   stored dataset. The type of dataset is not defined by base class, and subclasses
@@ -41,7 +41,7 @@ class vtkDataSetWriter;
   <B>m_Id<\B> to store a numeric unique Id (for internal use) see mafVMERoot::GetNextItemId)
   <B>m_URL<\B> internally used to store the name of the file where data is stored
 
-  @sa mafVME mafVMERoot mafMSFStorage mafTimeMap mafTagArray
+  @sa mafVMEGenericVTK mafDataVector mafTagArray
 
   @todo
   - Add a link to the VME object
