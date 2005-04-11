@@ -3,7 +3,7 @@ PROJECT (Gui_TEST)
 # mafGUI e' indipendente da Core, ma i test no -- Silvano 04/04/05
 LINK_LIBRARIES(mafGui mafCore)
 
-SUBDIRS(Minimal)
+#SUBDIRS(Minimal)
 SUBDIRS(01_testGui)
 SUBDIRS(02_testFrame)
 SUBDIRS(03_testMenu)
