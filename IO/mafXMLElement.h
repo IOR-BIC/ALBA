@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLElement.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:18:11 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-04-11 16:45:03 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -47,7 +47,7 @@ public:
   virtual int StoreText(const char *name, const char *text);
 
   /** Store a matrix into an XML document */
-  virtual int StoreMatrix(const char *name,mafMatrix *matrix);
+  virtual int StoreMatrix(const char *name,const mafMatrix *matrix);
 
   /** Store a vectorN into an XML document */
   virtual int StoreVectorN(const char *name,const std::vector<double> &comps,int num);

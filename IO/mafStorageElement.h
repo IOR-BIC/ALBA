@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:18:11 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-04-11 16:45:03 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -65,7 +65,7 @@ public:
   bool GetAttributeAsInteger(const char *name,mafID &value);
 
   virtual int StoreText(const char *name, const char *text)=0;
-  virtual int StoreMatrix(const char *name,mafMatrix *matrix)=0;
+  virtual int StoreMatrix(const char *name,const mafMatrix *matrix)=0;
   virtual int StoreVectorN(const char *name, double *comps,int num)=0;
   virtual int StoreVectorN(const char *name, int *comps,int num)=0;
   virtual int StoreVectorN(const char *name, const std::vector<double> &comps,int num)=0;

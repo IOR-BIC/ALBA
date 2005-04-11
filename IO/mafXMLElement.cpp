@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-04 11:52:40 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-04-11 16:45:03 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -258,7 +258,7 @@ int mafXMLElement::StoreText(const char *name, const char *text)
 }
 
 //------------------------------------------------------------------------------
-int mafXMLElement::StoreMatrix(const char *name,mafMatrix *matrix)
+int mafXMLElement::StoreMatrix(const char *name,const mafMatrix *matrix)
 //------------------------------------------------------------------------------
 {
   assert(matrix);
