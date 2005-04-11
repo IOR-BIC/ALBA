@@ -74,15 +74,18 @@ int main()
   iren->SetRenderWindow(renWin);
 
   //renderer->SetBackground(0.1, 0.1, 0.1);
-  renWin->SetSize(640, 480);
+  //renWin->SetSize(640, 480);
   //renWin->SetPosition(0,0);
   //renWin->StereoCapableWindowOn();
   //renWin->StereoRenderOn();
   //renderer->ResetCamera();
+
   renderer->GetActiveCamera()->ParallelProjectionOff();
 
-  vtkMAFSmartPointer<vtkCubeSource> test_cone;
-  test_cone->SetBounds(0,1,0,1,0,1);
+  vtkMAFSmartPointer<vtkConeSource> test_cone;
+  test_cone->SetResolution(10);
+  test_cone->SetHeight(2);
+  test_cone->CappingOn();
   vtkMAFSmartPointer<vtkPolyDataMapper> test_mapper;
   test_mapper->SetInput(test_cone->GetOutput());
   vtkMAFSmartPointer<vtkActor> test_actor;
@@ -311,16 +314,8 @@ int main()
         mapper->SetInput(glyph->GetOutput());
 
         vtkMAFSmartPointer<vtkSphereSource> sphere;
-        /*
-        if (mafVMELandmarkCloud *cloud=mafVMELandmarkCloud::SafeDownCast(vme))
-        {  
-          sphere->SetRadius(cloud->GetRadius());
-          mapper->ScalarVisibilityOff();
-        }
-        else
-        {*/
-          sphere->SetRadius(.01);
-        /*}*/
+        sphere->SetRadius(.01);
+  
 
         glyph->SetSource(sphere->GetOutput());
 
@@ -399,7 +394,8 @@ int main()
     // Update time into all the tree
     root->SetTreeTime(t);
   
-    renderer->ResetCameraClippingRange();
+    renderer->GetActiveCamera()->Azimuth(1);
+    //renderer->ResetCameraClippingRange();
     //renderer->ResetCamera();
     renWin->Render();
     //SLEEP(100);
