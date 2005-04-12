@@ -365,19 +365,19 @@ int main()
 //timed tests
     std::vector<int> v;
     int i;
-    for(i=0;i<50000;i++){v.push_back(rand());}
+    for(i=0;i<500;i++){v.push_back(rand());}
     std::cout   <<  "--------------Tests with element type int-------------"   <<  std::endl;
     ExecTests(v);
  
     std::vector<STest> vt;
-    for(i=0;i<50000;i++){vt.push_back(MakeSTest());}
+    for(i=0;i<500;i++){vt.push_back(MakeSTest());}
      std::cout   <<  "-Tests with element type 'STest' (string,int)--------"   <<  std::endl;
     ExecTests(v);
 
 //set operations-test
     std::vector<int> v1,v2;
-    for(i=0;i<10000;i++){v1.push_back(rand());}
-    for(i=0;i<10000;i++){v2.push_back(rand());}
+    for(i=0;i<100;i++){v1.push_back(rand());}
+    for(i=0;i<100;i++){v2.push_back(rand());}
     TestSetOperations(v,v1,v2,std::greater<int>());
 
     assert(BuildIntersection(v1,v2)==BuildIntersection1(v1,v2));
