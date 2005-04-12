@@ -75,6 +75,9 @@ int main()
     vme3_pose_test.SetOrientation(j*10,j*10,j*10);
     vme3_pose_test.SetTimeStamp(j);
 
+    root_pose_result.SetTimeStamp(j);
+    root_pose_result.Modified();
+
     MAF_TEST(root_pose==root_pose_result.GetMatrix());
     MAF_TEST(vme1_pose==vme1_pose_test.GetMatrix());
     MAF_TEST(vme2_pose==vme2_pose_test.GetMatrix())
