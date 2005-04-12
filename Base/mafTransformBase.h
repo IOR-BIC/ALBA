@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformBase.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:00:11 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-12 20:01:58 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -29,6 +29,8 @@ class vtkMAFToLinearTransform;
   only, transformations. The idea behind a mafTransformBase is the Update() method
   should always be called to update the output, which is a mafMatrix internally stored.
   @sa mafTransform
+  @todo
+  - change SetTimeStamp to apply a Modified(), than change matrix pipes to not call it!!!
   */
 class MAF_EXPORT mafTransformBase : public mafReferenceCounted
 {
