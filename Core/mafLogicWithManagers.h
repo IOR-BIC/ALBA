@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:06:46 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-12 14:13:33 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,6 +45,15 @@ Derived classes can replace any of these manager with a customized version.
 
 It is Recommended that Derived Classes call mafLogicWithManagers::OnEvent to 
 for every un-handled event.
+
+USAGE - member function MUST be called in this order:
+  -- create a mafLogicWithManagers object (-> create the mainwindow)
+  -- call PlugXXX:          to customize the GUI and the Managers
+  -- call Configure:        to create the GUI and the managers
+  -- call Plug              to plug-in operations and views
+  -- call Show              it is before Init, to eventually show the Progressbar during a Load
+  -- call Init(argc,argv)   will call MSFNew or MSFLoad
+
 */
 class mafLogicWithManagers: public mafLogicWithGUI
 {
