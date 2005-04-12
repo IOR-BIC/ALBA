@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testOpManApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:01:00 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-12 15:42:10 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -51,8 +51,8 @@ bool testOpManApp::OnInit()
   m_logic->Configure();
 
   m_logic->GetTopWin()->SetTitle("testOpMan");
-  //m_logic->Plug(new mmoCreateGenericVme("Add Vme Generic \tCtrl+A"));
-  //m_logic->Plug(new mmoTest("Test \tCtrl+B"));
+  m_logic->Plug(new mmoCreateGenericVme("Add Vme Generic \tCtrl+A"));
+  m_logic->Plug(new mmoTest("Test \tCtrl+B"));
 
   SetTopWindow(mafGetFrame());  
   m_logic->Show();

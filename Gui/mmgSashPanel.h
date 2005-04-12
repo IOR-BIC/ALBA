@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgSashPanel.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:27 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-12 15:41:55 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,7 +36,7 @@
 
   \tech
   mmgSash create a menu item called "View" (it must be present)
-  mmgSash must be put only on one frame - it filnd the men just doing parent->GetMenuBar
+  mmgSash must be put only on one frame - it find the menu calling frame->GetMenuBar()
   mmgSash manage by itself the Show - so it can set in sync mode the checkbutton on men - do not matter to manage the UpdateUI
   mmgSash::Show needs to call frame::Layout into the frame, and do it by firing a message with id = ID_LAYOUT 
   If mmgSash receive the message HIDE_SASH, it call directly Show, a menu event can be send anyway.

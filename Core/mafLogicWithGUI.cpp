@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:06:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-12 15:41:31 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -208,7 +208,7 @@ void mafLogicWithGUI::CreateToolbar()
   m_toolbar->AddTool(MENU_FILE_SAVE,mafPics.GetBmp("FILE_SAVE"),  "save current msf storage file");
   m_toolbar->AddSeparator();
 
-  m_toolbar->AddTool(OP_UNDO,mafPics.GetBmp("OP_UNDO"),  "undo (ctrl+z)");
+  m_toolbar->AddTool(OP_UNDO,mafPics.GetBmp("OP_UNDO"),  "undo (ctrl+z)"); //correggere tooltip - shortcut sbagliati
   m_toolbar->AddTool(OP_REDO,mafPics.GetBmp("OP_REDO"),  "redo (ctrl+shift+z)");
   m_toolbar->AddSeparator();
 
@@ -226,7 +226,7 @@ void mafLogicWithGUI::CreateToolbar()
 void mafLogicWithGUI::CreateSidebar()
 //----------------------------------------------------------------------------
 {
-  m_side_bar = new mafSideBar(m_win,-1,this);
+  m_side_bar = new mafSideBar(m_win,MENU_VIEW_SIDEBAR,this);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithGUI::CreateTimebar()
@@ -241,13 +241,11 @@ void mafLogicWithGUI::CreateTimebar()
 void mafLogicWithGUI::EnableItem(int item, bool enable)
 //----------------------------------------------------------------------------
 {
-  // must always check if an item exist because
-  // at application shutdown it is not guaranteed
   if(m_menu_bar) 
+     // must always check if a menu item exist because
+     // during application shutdown it is not guaranteed
      if(m_menu_bar->FindItem(item))	
         m_menu_bar->Enable(item,enable );
   if(m_toolbar) 
-    if(m_toolbar->FindItem(item))	
-      m_toolbar->EnableTool(item,enable );
-
+     m_toolbar->EnableTool(item,enable );
 }

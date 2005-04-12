@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgNamedPanel.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:25 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-12 15:41:54 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -66,7 +66,7 @@ mmgNamedPanel::mmgNamedPanel( wxWindow* parent,wxWindowID id,bool CloseButton,bo
 
 	  if (CloseButton)
 	  {
-		  mmgPicButton *b = new mmgPicButton(m_top, "CLOSE_SASH");
+		  mmgPicButton *b = new mmgPicButton(m_top, "CLOSE_SASH",ID_CLOSE_SASH);
       b->SetEventId(ID_CLOSE_SASH);  //SIL. 7-4-2005: 
 		  m_topsizer->Add(b,0,wxRIGHT,2);
 	  }

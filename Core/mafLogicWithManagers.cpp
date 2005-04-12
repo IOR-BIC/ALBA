@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:06:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-12 15:41:31 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,6 +50,7 @@ mafLogicWithManagers::mafLogicWithManagers()
 mafLogicWithManagers::~mafLogicWithManagers( ) 
 //----------------------------------------------------------------------------
 {
+  // Managers are distructed in the OnClose 
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Configure()
@@ -177,11 +178,6 @@ void mafLogicWithManagers::CreateMenu()
   m_menu_bar->Append(m_op_menu, "&Operations");
 
   m_win->SetMenuBar(m_menu_bar);
-
-  //m_VmeManager->SetFileHistoryMenu(recentFile_menu);
-  //m_ViewManager->FillMenu(m_view_menu);  
-  //m_OpManager->FillMenu(import_menu,export_menu,op_menu);
-  //m_OpManager->SetMenubar(m_menu_bar);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::UpdateFrameTitle()
@@ -197,7 +193,7 @@ void mafLogicWithManagers::OnEvent(mafEvent& e)
 {
   if(e.GetId()!= UPDATE_UI)
   {
-    e.Log();
+    e.Log(); // for debugging pourpose
     int foo=0;
   }
 

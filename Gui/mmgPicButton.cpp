@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgPicButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:02:35 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-12 15:41:55 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -67,8 +67,8 @@ bool mmgPicButton::MSWCommand(WXUINT param, WXWORD id)
   switch ( param )
   {
     case 1:                     // message came from an accelerator
-    case BN_CLICKED:            // normal buttons send this
-    //case BN_DOUBLECLICKED:      // owner-drawn ones also send this
+    case BN_CLICKED:            // normal buttons send this.
+    //case BN_DOUBLECLICKED:    // 
 			if(m_Listener) 
 				m_Listener->OnEvent(mafEvent(this, m_id));
 			else

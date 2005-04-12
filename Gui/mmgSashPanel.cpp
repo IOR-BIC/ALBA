@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgSashPanel.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:02:35 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-12 15:41:55 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -89,7 +89,7 @@ mmgSashPanel::mmgSashPanel (wxWindow* parent,wxWindowID id, wxDirection side , i
       {
         wxMenu *m = m_menubar->GetMenu(idx);
         m->Append(id, menu_string, "", wxITEM_CHECK);
-        //@@@ m_menubar->Check(id,true);
+        m_menubar->Check(id,true);
       }
       else
       {

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateGenericVme.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:00:59 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-12 15:42:10 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,6 +27,7 @@ mmoCreateGenericVme::mmoCreateGenericVme(wxString label)
 : mafOp(label)
 //----------------------------------------------------------------------------
 {
+  m_canundo = true;
   m_vme = NULL;
 }
 //----------------------------------------------------------------------------
