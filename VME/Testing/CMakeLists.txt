@@ -2,8 +2,6 @@ PROJECT (mafVME_TEST)
 
 LINK_LIBRARIES(mafVME vtkRendering vtkGraphics)
 
-ADD_EXECUTABLE(testVMEGeneric testVMEGeneric.cpp)
-ADD_TEST(testVMEGeneric ${EXECUTABLE_OUTPUT_PATH}/testVMEGeneric)
 ADD_EXECUTABLE(testDataVector testDataVector.cpp)
 ADD_TEST(testDataVector ${EXECUTABLE_OUTPUT_PATH}/testDataVector)
 ADD_EXECUTABLE(testMatrixVector testMatrixVector.cpp)
@@ -18,8 +16,12 @@ ADD_TEST(testVMEGenericBounds ${EXECUTABLE_OUTPUT_PATH}/testVMEGenericBounds)
 #ENDIF (MAF_USE_WX)
 
 # VTK specific classes
-#IF (MAF_USE_VTK)
-#ENDIF (MAF_USE_VTK)  
+IF (MAF_USE_VTK)
+  #ADD_EXECUTABLE(testMSF testMSF.cpp)
+  #ADD_TEST(testMSF ${EXECUTABLE_OUTPUT_PATH}/testMSF)
+  ADD_EXECUTABLE(testVMEGeneric testVMEGeneric.cpp)
+  ADD_TEST(testVMEGeneric ${EXECUTABLE_OUTPUT_PATH}/testVMEGeneric)
+ENDIF (MAF_USE_VTK)  
 
 # classes using VTK+wxWidgets
 #IF (MAF_USE_WX AND MAF_USE_VTK)
