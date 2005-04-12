@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:19 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-04-12 19:38:53 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -41,7 +41,7 @@ mafVMEOutput::mafVMEOutput()
 //-------------------------------------------------------------------------
 {
   m_VME = NULL;
-  m_Transform = NULL;
+  m_Transform = mafTransform::New(); // Transform is created by VME 
 }
 
 //-------------------------------------------------------------------------
@@ -335,14 +335,25 @@ void mafVMEOutput::Get4DBounds(mafOBB &bounds) const
 mafTransformBase * mafVMEOutput::GetTransform() const
 //-------------------------------------------------------------------------
 {
+  // if VME supports a matrix pipe return its pointer
+  if (m_VME)
+  {
+    if (mafMatrixPipe *mpipe=m_VME->GetMatrixPipe())
+    {
+      return mpipe;
+    }
+  }
+
+  assert(m_Transform);
+
+  // return internal transform
   return m_Transform;
 }
 //-------------------------------------------------------------------------
 mafMatrix *mafVMEOutput::GetMatrix() const
 //-------------------------------------------------------------------------
 {
-  assert(m_Transform);
-  return m_Transform->GetMatrixPointer();
+  return GetTransform()->GetMatrixPointer();
 }
 
 //-------------------------------------------------------------------------

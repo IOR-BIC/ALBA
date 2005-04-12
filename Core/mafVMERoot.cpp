@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 16:40:53 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-04-12 19:39:05 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -42,18 +42,16 @@ mafVMERoot::mafVMERoot()
 {
    m_MaxItemId=-1;
    mafNEW(m_Transform);
-   m_Output = mafVMEOutputNULL::New();
-   m_Output->SetTransform(m_Transform);
-   m_Output->SetVME(this);
-   m_AbsMatrixPipe->SetVME(this);
+   mafVMEOutputNULL *output=mafVMEOutputNULL::New(); // an output with no data
+   output->SetTransform(m_Transform); // force my transform in the output
+   SetOutput(output);
 }
 
 //-------------------------------------------------------------------------
 mafVMERoot::~mafVMERoot()
 //-------------------------------------------------------------------------
 {
-  mafDEL(m_Output);
-  mafDEL(m_Transform);
+  SetOutput(NULL);
 }
 
 //-------------------------------------------------------------------------
@@ -74,9 +72,9 @@ int mafVMERoot::DeepCopy(mafNode *a)
   if (Superclass::DeepCopy(a)==MAF_OK)
   {
     
-    mafVMERoot *vme=mafVMERoot::SafeDownCast(a);
-    m_Transform->SetMatrix(vme->m_Transform->GetMatrix());
-    m_Transform->SetTimeStamp(vme->m_Transform->GetTimeStamp());
+    mafVMERoot *vme_root=mafVMERoot::SafeDownCast(a);
+    m_Transform->SetMatrix(vme_root->m_Transform->GetMatrix());
+    m_Transform->SetTimeStamp(vme_root->m_Transform->GetTimeStamp());
 
     return MAF_OK;
   }

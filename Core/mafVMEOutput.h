@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:20 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-04-12 19:38:53 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -41,6 +41,9 @@ class vtkDataSet;
 class MAF_EXPORT mafVMEOutput : public mafObject
 {
 public:
+  mafVMEOutput();
+  virtual ~mafVMEOutput();
+
   mafAbstractTypeMacro(mafVMEOutput,mafObject);
 
   /** return the VME connected to this object */
@@ -62,6 +65,11 @@ public:
   mafMatrix *GetMatrix() const;
   /** Return the transform generating the pose matrix of the VME */ 
   virtual mafTransformBase *GetTransform() const;
+  
+  /** 
+    Used by source VME to set internal pointer to Transform: do not use this method directly,
+    use instead mafVME::SetMatrix() */
+  virtual void SetTransform(mafTransformBase *trans);
 
   /** Get the global pose matrix of this VME for the given time "t".*/
   void GetAbsMatrix(mafMatrix &matrix,mafTimeStamp t=-1) const;
@@ -106,7 +114,7 @@ public:
     Get TimeBounds for this VME. TimeBounds interval is defined by the minimum
     and maximum time stamps against the MatrixVector and VMEItems time stamps.
     If only the pose time stamps are required use the mafMatrixVector::GetTimeBounds()
-    function. For the time bounds of the VME items only use the mafVMEGeneric::GetItemsTimesList()*/
+    function. For the time bounds of the VME items only use the mafVMEGenericAbstract::GetItemsTimesList()*/
   void GetLocalTimeBounds(mafTimeStamp tbounds[2]) const;
   
   /**
@@ -141,19 +149,12 @@ public:
 
   /** return the time for which this output was computed */
   mafTimeStamp GetCurrentTime() const;
-
-  /** 
-    Used by source VME to set internal pointer to Transform: do not use this method directly,
-    use instead mafVME::SetMatrix() */
-  virtual void SetTransform(mafTransformBase *trans);
   
   /** 
     Used by source VME to set internal bounds structure: never use this method directly. */
   void SetBounds(const mafOBB &bounds);
 
 protected:
-  mafVMEOutput(); // to be allocated with New()
-  virtual ~mafVMEOutput(); // to be deleted with Delete()
 
   /** retrieve bounds of the output data not considering the VME pose matrix and the visibility. */
   virtual void GetDataBounds(mafOBB &bounds,mafTimeStamp t) const;
@@ -162,7 +163,7 @@ protected:
   mafString                 m_DataType; ///< the type of data stored in object expressed as a string
   mafOBB                    m_Bounds;   ///< bounds of the output data (i.e. for current time)
 
-  mafTransformBase *        m_Transform;///< the transform generating the output pose matrix
+  mafAutoPointer<mafTransformBase> m_Transform; ///< the transform generating the output pose matrix
 
 private:
   mafVMEOutput(const mafVMEOutput&); // Not implemented

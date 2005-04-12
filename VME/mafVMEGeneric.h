@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGeneric.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 16:43:33 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-12 19:34:38 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,107 +14,59 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafVME.h"
+#include "mafVMEGenericAbstract.h"
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class mafDataVector;
-class mafMatrixVector;
+class vtkDataSet;
+class mafVMEOutputVTK;
 
-/** mafVMEGeneric - a VME featuring an internal array for matrices and data.
-  mafVMEGeneric is a node featuring a standard way for managing 4D data, featuring
-  an array for pose matrixes (MatrixVector) and an array for internally stored
-  data (DataSetVector).
+/** mafVMEGeneric - a VME featuring an internal array for matrices and VTK datasets.
+  mafVMEGeneric is a specialized VME inheriting the VME-Generic features to internally
+  store data, and specialized for VTK data. This specialization consists in creating
+  a specialized data pipe and to redefining some APIs for casting to concrete classes.
   @sa mafVME mafMatrixVector mafDataVector
 
   @todo
   - 
   */
-class MAF_EXPORT mafVMEGeneric : public mafVME
+class MAF_EXPORT mafVMEGeneric : public mafVMEGenericAbstract
 {
 public:
+  mafTypeMacro(mafVMEGeneric,mafVMEGenericAbstract);
 
-  mafTypeMacro(mafVMEGeneric,mafVME);
-
-  /** print a dump of this object */
-  virtual void Print(std::ostream& os, const int tabs=0);
-
-  /**
-    Copy the contents of another VME into this one. Notice that subtrees
-    are not copied, i.e. copy is not recursive!
-    Concrete class should reimplement this function to verify admitted
-    conversion. */
-  virtual int DeepCopy(mafNode *a);
+  enum DATA_REFERENCE_TYPE {MAF_VME_COPY_DATA,MAF_VME_REFERENCE_DATA,MAF_VME_DETACH_DATA};
 
   /** 
-    perform a copy by simply referencing the copied VME's data array. 
-    Beware: This can allow to save memory when doing special tasks, but
-    can be very dangerous making one of the VME inconsistent. Some VMEs
-    do not support such a function! */  
-  virtual int ShallowCopy(mafVME *a);
+    Set data for the give timestamp. This function automatically creates a
+    a VMEItem for the data to be stored. The optional parameter specify if
+    data must be copied, referenced, or detached from original source. Default
+    is to copy data which creates a new data set copying the original one.
+    Referencing means the data is kept connected to its original source, and
+    detaching means disconnect is like referencing but also disconnect the data
+    from the source.
+    Return MAF_OK if succeeded, MAF_ERROR if they kind of data is not accepted by
+    this type of VME. */
+  virtual int SetData(vtkDataSet *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
 
-  /**
-    Compare two VME. Two VME are considered equivalent if they have equivalent 
-    items, TagArrays, MatrixVectors, Name and Type. */
-  virtual bool Equals(mafVME *vme);
-
-  /**
-    Reparent this VME into a different place of the same tree
-    or into a different tree. If the tree is not the same, the data of
-    all items of all sub vme is read into memory and Id is reset to -1, 
-    to allow the VMEStorage to write new data as new files on file.
-    In case of error during operation return NULL, otherwise return
-    this node pointer: this is to be compatible with nodes that during
-    reparenting make copy of the VME (mafVMEGenericRoot)*/
-  virtual mafVMEGeneric *ReparentTo(mafVMEGeneric *parent);
-   
-  /**  
-    Return the matrix vector associated with this VME. Matrix vector is an array of
-    time stamped 4x4 matrices, used to generate the output VME pose matrix. The matrix
-    vector is made persistent by saving it in the MSF-XML file (or other kind of storage
-    for metadata).
-    This array can be NULL for VMEs generating the output matrix procedurally starting from from
-    different sources. */
-  mafMatrixVector *GetMatrixVector() {return m_MatrixVector;}
-
-  /**
-    Set the Pose matrix of the VME. This function modifies the MatrixVector. You can
-    set or get the Pose for a specified time. When setting, if the time does not exist
-    the MatrixVector creates a new KeyMatrix on the fly. When getting, the matrix vector
-    interpolates on the fly according to the matrix interpolator.*/
-  void SetMatrix(const mafMatrix &mat);
-
-  /** Get the pointer to the array of VMEItem's*/
-  mafDataVector *GetDataVector() {return m_DataVector;}
-
-  /** Return the list of time stamps of the VMEItemArray stored in this VME. */
-  void GetDataTimeStamps(std::vector<mafTimeStamp> &kframes);
-
-  /** Return the list of time stamps of the MatrixVector stored in this VME. */
-  void GetMatrixTimeStamps(std::vector<mafTimeStamp> &kframes);
-
-  /**
-    Return the list of timestamps for this VME. Timestamps list is 
-    obtained merging timestamps for matrixes and VME items*/
-  virtual void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes);
-
-  /** 
-    return true is this VME has more than one time stamp, either  for
-    data or matrices */
-  virtual bool IsAnimated();
+  /** Set data by referencing it. See SetData() for more details. */
+  int SetDataByReference(vtkDataSet *data, mafTimeStamp t) {return SetData(data,t,MAF_VME_REFERENCE_DATA);}
   
-  /** return an xpm-icon that can be used to represent this node */
-  static char ** GetIcon();   //SIL. 11-4-2005:  
+  /** Set data by detaching it from its original source. See SetData() for more details. */
+  int SetDataByDetaching(vtkDataSet *data, mafTimeStamp t) {return SetData(data,t,MAF_VME_REFERENCE_DATA);}
 
+  /** return the right type of output.*/  
+  mafVMEOutputVTK *GetVTKOutput() {return (mafVMEOutputVTK *)GetOutput();}
+
+  /** 
+    Return the output. This create the output object on
+    demand to avoid subclasses to destroy the output. */  
+  virtual mafVMEOutput *GetOutput();
+  
 protected:
   mafVMEGeneric();
   virtual ~mafVMEGeneric();
 
-  virtual int InternalStore(mafStorageElement *parent);
-  virtual int InternalRestore(mafStorageElement *node);
-
-  mafMatrixVector   *m_MatrixVector;
-  mafDataVector     *m_DataVector;
 private:
   mafVMEGeneric(const mafVMEGeneric&); // Not implemented
   void operator=(const mafVMEGeneric&); // Not implemented
