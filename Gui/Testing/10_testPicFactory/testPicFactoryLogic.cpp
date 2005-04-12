@@ -2,12 +2,13 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testPicFactoryLogic.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:25:17 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-12 14:01:41 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
+==========================================================================*/
 
 
 

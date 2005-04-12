@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testStatusBarLogic.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:24:57 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-12 14:01:52 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -190,7 +190,7 @@ switch(e.GetId())
     vtkImageMandelbrotSource *ims = NULL;
     ims = vtkImageMandelbrotSource::New();
     ims->SetWholeExtent(0,1000,0,1000,0,1);
-    m_win->BindToProgressBar(ims,&wxString("vtkImageMandelbrotSource"));
+    m_win->BindToProgressBar(ims);
     ims->Update();
     ims->Delete();
   }

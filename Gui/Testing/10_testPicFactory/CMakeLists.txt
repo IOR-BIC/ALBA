@@ -1,4 +1,4 @@
-PROJECT (testPicFactory)
+PROJECT (TestPicFactory)
 
 SET(PROJECT_SRCS 
 testPicFactoryApp.cpp

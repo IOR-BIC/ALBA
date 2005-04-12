@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:19 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-12 14:02:33 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,7 +42,7 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafEventListener *Listener)
   m_notebook->AddPage(sp,"vme manager",true);
 
   //tree ----------------------------
-  m_tree = new mmgTree(sp,-1,true);
+  m_tree = new mmgCheckTree(sp,-1,true);
   m_tree->SetListener(Listener);
   m_tree->SetTitle(" vme hierarchy: ");
   sp->PutOnTop(m_tree);
@@ -71,12 +71,6 @@ mafSideBar::~mafSideBar()
 //----------------------------------------------------------------------------
 {
 	cppDEL(m_side_bar);
-/* //SIL. 13-11-2003: - objects die by themself because are children of m_side_bar
-	wxDEL(m_notebook);
-	wxDEL(m_vme_panel);
-	wxDEL(m_view_property_panel);
-	wxDEL(m_op_panel);
-*/
 }
 //----------------------------------------------------------------------------
 void mafSideBar::OpShowGui(bool push_gui, mmgPanel *panel)
@@ -109,7 +103,7 @@ void mafSideBar::OpHideGui(bool view_closed)
 void mafSideBar::ViewSelect(mafView *view)
 //----------------------------------------------------------------------------
 {
-	//tree->ViewSelected(view);
+	m_tree->ViewSelected(view);
 	if(view)
 	{
 		wxString s = " ";
@@ -132,43 +126,43 @@ void mafSideBar::ViewSelect(mafView *view)
 void mafSideBar::ViewDeleted(mafView *view)
 //----------------------------------------------------------------------------
 {
-	//m_tree->ViewDeleted(view);
+	m_tree->ViewDeleted(view);
 }
 //----------------------------------------------------------------------------
 void mafSideBar::EnableSelect(bool enable)
 //----------------------------------------------------------------------------
 {
-	//m_tree->EnableSelect(enable);
+	m_tree->EnableSelect(enable);
 }
 //----------------------------------------------------------------------------
 void mafSideBar::VmeAdd(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-	//m_tree->VmeAdd(vme);
+	m_tree->VmeAdd(vme);
 }
 //----------------------------------------------------------------------------
 void mafSideBar::VmeRemove(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-	//m_tree->VmeRemove(vme);
+	m_tree->VmeRemove(vme);
 }
 //----------------------------------------------------------------------------
 void mafSideBar::VmeModified(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-	//m_tree->VmeModified(vme);
+	m_tree->VmeModified(vme);
 }
 //----------------------------------------------------------------------------
 void mafSideBar::VmeShow(mafNode *vme, bool visibility)
 //----------------------------------------------------------------------------
 {
-	//m_tree->VmeShow(vme,visibility);
+	m_tree->VmeShow(vme,visibility);
 }
 //----------------------------------------------------------------------------
 void mafSideBar::VmeSelected(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-  //m_tree->VmeSelected(vme);
+  m_tree->VmeSelected(vme);
   //mafVmeData* vd = (mafVmeData*)vme->GetClientData();
 	//vd->UpdateMaterialIcon();
 	//m_vme_panel->Put(vd->m_gui);

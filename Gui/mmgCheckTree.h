@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:20 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-12 14:02:34 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -110,6 +110,9 @@ public:
 
   /** Respond to the Contextual Menu */
   void OnContextualMenu(wxCommandEvent& event);
+
+  /** respond to Selection Changed */
+  virtual void OnSelectionChanged(wxTreeEvent& event);
 
 protected:
   mafView  *m_view;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTree.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:28 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-12 14:02:35 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,6 +21,11 @@
 #include <wx/hash.h>
 #include "mafEvent.h"
 #include "mmgNamedPanel.h"
+
+//----------------------------------------------------------------------------
+// const :
+//----------------------------------------------------------------------------
+const int ID_TREE = 200;
 //----------------------------------------------------------------------------
 // mmgTree :
 //----------------------------------------------------------------------------
@@ -142,7 +147,7 @@ public:
 
 protected:
   /** Private function that notify the Listener of node selection and deselection. */
-  void OnSelectionChanged(wxTreeEvent& event);
+  virtual void OnSelectionChanged(wxTreeEvent& event);
   
 	/** When tree is used on a wxNotebook m_tree must be called on Sizing . */
   void OnSize(wxSizeEvent& event);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:20 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-12 14:02:34 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -84,6 +84,7 @@ enum TREE_RMENU_COMMANDS
 // EVENT_TABLE
 //----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(mmgCheckTree,wxPanel)
+    EVT_TREE_SEL_CHANGED(ID_TREE, mmgCheckTree::OnSelectionChanged)
 		EVT_MENU_RANGE(RMENU_START, RMENU_STOP, mmgCheckTree::OnContextualMenu)	//Added by Paolo 15-9-2003
 END_EVENT_TABLE()
 
@@ -449,6 +450,8 @@ int mmgCheckTree::ClassNameToIcon(wxString classname)
     return int((*it).second);
   else
   {
+    // cercare l'icona della superclasse
+    // se non c'e' neanche quella usare una icona "Unknow"
     wxLogMessage("mafPictureFactory::ClassNameToIcon: cant find = %s ",classname);
     return 0;
   }
@@ -562,6 +565,18 @@ wxBitmap mmgCheckTree::GrayScale(wxBitmap bmp)
      *r = *g = *b = gray / 3;
   }
   return wxBitmap(img);
+}
+//----------------------------------------------------------------------------
+void mmgCheckTree::OnSelectionChanged(wxTreeEvent& event)
+//----------------------------------------------------------------------------
+{
+  wxTreeItemId i;
+  if(m_prevent_notify) return;
+
+  i = event.GetItem();
+  if(i.IsOk())
+    mafEventMacro(mafEvent(this, VME_SELECT, NodeFromItem(i)));
+  event.Skip();
 }
 
 

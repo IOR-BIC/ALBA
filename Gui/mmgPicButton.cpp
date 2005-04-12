@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgPicButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:26 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-12 14:02:35 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,7 +43,7 @@ mmgPicButton::mmgPicButton(wxWindow *parent, wxString BitmapId, wxWindowID id)
   wxBitmap b = mafPics.GetBmp(BitmapId);
   wxSize size(b.GetWidth(),b.GetHeight());
 
-  Create(parent, m_id, b, wxDefaultPosition, size);
+  Create(parent, m_id, b, wxDefaultPosition, size,0);
   SetBitmapFocus(b);
 };
 //----------------------------------------------------------------------------

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:28 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-12 14:02:35 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,7 +28,6 @@
 //----------------------------------------------------------------------------
 // EVENT_TABLE
 //----------------------------------------------------------------------------
-const int ID_TREE = 200;
 
 BEGIN_EVENT_TABLE(mmgTree,wxPanel)
     EVT_TREE_SEL_CHANGED(ID_TREE, mmgTree::OnSelectionChanged)

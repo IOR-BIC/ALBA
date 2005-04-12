@@ -6,16 +6,6 @@ PROJECT(mafGui)
 MESSAGE(STATUS "Configuring project ${PROJECT_NAME}")
 
 SET(PROJECT_SRCS
-#mafLogic.cpp
-#mafLogic.h
-#mmgCheckListBox.cpp
-#mmgCheckListBox.h
-#mmgLayoutDialog.cpp
-#mmgLayoutDialog.h
-#mmgListCtrlBitmap.cpp
-#mmgListCtrlBitmap.h
-mafLogicBase.cpp
-mafLogicBase.h
 mafPics.cpp
 mafPics.h
 mafSideBar.cpp
@@ -72,6 +62,8 @@ mmgTimeBar.cpp
 mmgTimeBar.h
 mmgTree.cpp
 mmgTree.h
+mmgTreeContextualMenu.cpp
+mmgTreeContextualMenu.h
 mmgValidator.cpp
 mmgValidator.h
 mmgViewFrame.cpp

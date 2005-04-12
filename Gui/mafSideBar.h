@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:19 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-12 14:02:34 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,6 +17,7 @@
 #include <wx/notebook.h>
 #include "mafEvent.h"
 #include "mmgSashPanel.h"
+#include "mmgCheckTree.h"
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
@@ -24,7 +25,6 @@ class mmgGuiHolder;
 class mmgGui;
 class mmgPanelStack;
 class mmgPanel;
-class mmgTree;
 class mafNode;
 class mafView;
 //----------------------------------------------------------------------------
@@ -88,7 +88,7 @@ public:
 
 	// Description:
 	// Return the pointer to the tree.
-	mmgTree *GetTree() {return m_tree;};
+	mmgCheckTree *GetTree() {return m_tree;};
 
   bool IsShown() {return m_side_bar->IsShown();};
   void Show( bool show) {m_side_bar->Show(show);};
@@ -98,7 +98,7 @@ protected:
   mmgSashPanel      *m_side_bar;
   mmgPanelStack			*m_op_panel;
 	mmgGuiHolder			*m_view_property_panel;
-  mmgTree           *m_tree;
+  mmgCheckTree      *m_tree;
   mmgGuiHolder      *m_vme_panel;
 };
 #endif

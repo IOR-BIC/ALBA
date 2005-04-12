@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:23 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-12 14:02:34 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -575,7 +575,7 @@ void mmgGui::Double(int id,wxString label,double* var,double min, double max, in
 	}
 }
 //----------------------------------------------------------------------------
-void mmgGui::Bool_(int id,wxString label,int* var, int flag, wxString tooltip)  // <*> non mi piace il flag - trovare una sintassi piu comprensibile
+void mmgGui::Bool(int id,wxString label,int* var, int flag, wxString tooltip)  // <*> non mi piace il flag - trovare una sintassi piu comprensibile
 //----------------------------------------------------------------------------  // <*> ci vorrebbe anche il layout check al centro, label a destra
 {
   if (flag) // testo a sinistra
