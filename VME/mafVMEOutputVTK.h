@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:21:59 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-12 19:36:49 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -29,7 +29,6 @@ class MAF_EXPORT mafVMEOutputVTK : public mafVMEOutput
 public:
   mafTypeMacro(mafVMEOutputVTK,mafVMEOutput)
 
-#ifdef MAF_USE_VTK
   /**
     Return a VTK dataset corresponding to the current time. This is
     the output of the DataPipe currently attached to the VME.
@@ -39,7 +38,6 @@ public:
     An event is rised when the output data changes to allow attached classes to 
     update their input.*/
   virtual vtkDataSet *GetVTKData();
-#endif
 
   /**
     Update all the output data structures (data, bounds, matrix and abs matrix).*/

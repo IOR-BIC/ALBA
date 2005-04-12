@@ -2,6 +2,19 @@ PROJECT (mafCore_TEST)
 
 LINK_LIBRARIES(mafCore)
 
+# wxWidgets specific classes
+#IF (MAF_USE_WX)
+#ENDIF (MAF_USE_WX)
+
+# VTK specific classes
+IF (MAF_USE_VTK)
+  LINK_LIBRARIES(vtkGraphics vtkRendering)
+ENDIF (MAF_USE_VTK)  
+
+# classes using VTK+wxWidgets
+#IF (MAF_USE_WX AND MAF_USE_VTK)
+#ENDIF (MAF_USE_WX AND MAF_USE_VTK)
+
 ADD_EXECUTABLE(testEvent mafEventTest.cpp)
 ADD_TEST(testEvent ${EXECUTABLE_OUTPUT_PATH}/testEvent)
 ADD_EXECUTABLE(testObserver mafObserverTest.cpp)
@@ -24,15 +37,3 @@ ADD_EXECUTABLE(testVMEPose testVMEPose.cpp)
 ADD_TEST(testVMEPose ${EXECUTABLE_OUTPUT_PATH}/testVMEPose)
 #ADD_EXECUTABLE(testVMEData testVMEData.cpp)
 #ADD_TEST(testVMEData ${EXECUTABLE_OUTPUT_PATH}/testVMEData)
-
-# wxWidgets specific classes
-#IF (MAF_USE_WX)
-#ENDIF (MAF_USE_WX)
-
-# VTK specific classes
-#IF (MAF_USE_VTK)
-#ENDIF (MAF_USE_VTK)  
-
-# classes using VTK+wxWidgets
-#IF (MAF_USE_WX AND MAF_USE_VTK)
-#ENDIF (MAF_USE_WX AND MAF_USE_VTK)
