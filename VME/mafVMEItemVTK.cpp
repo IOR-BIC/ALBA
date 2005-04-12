@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:21:59 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-12 19:31:39 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -70,19 +70,32 @@ mafVMEItemVTK::~mafVMEItemVTK()
 }
 
 //-------------------------------------------------------------------------
-void mafVMEItemVTK::DeepCopy(mafVMEItemVTK *a)
+void mafVMEItemVTK::DeepCopy(mafVMEItem *a)
 //-------------------------------------------------------------------------
 {
-  Superclass::DeepCopy(a);
-  m_Data->DeepCopy(a->GetData());
+  mafVMEItemVTK *vtk_item=mafVMEItemVTK::SafeDownCast(a);
+  assert(vtk_item);
+  Superclass::DeepCopy(vtk_item);
+  if (vtk_item->GetData())
+  {
+    m_Data = vtk_item->GetData()->NewInstance();
+    m_Data->Delete(); // decrease reference count since VTK set it to 1 by default
+    m_Data->DeepCopy(vtk_item->GetData());
+  }
+  else
+  {
+    m_Data = NULL;
+  }
+  
 }
 
 //-------------------------------------------------------------------------
-void mafVMEItemVTK::ShallowCopy(mafVMEItemVTK *a)
+void mafVMEItemVTK::ShallowCopy(mafVMEItem *a)
 //-------------------------------------------------------------------------
 {
-  Superclass::ShallowCopy(a);
-  m_Data=a->GetData();
+  mafVMEItemVTK *vtk_item=mafVMEItemVTK::SafeDownCast(a);
+  assert(vtk_item);
+  m_Data=vtk_item->GetData();
 }
 
 //-------------------------------------------------------------------------

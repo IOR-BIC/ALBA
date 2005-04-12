@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:21:58 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-12 19:31:59 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -59,7 +59,7 @@ public:
   /** defined to allow DataVector copy */
   static mafObject *NewObject() {return NULL;}
   /** defined to allow DataVector copy */
-  mafVMEItem *NewInstance() {return (mafVMEItem *)NewObject();}
+  mafVMEItem *NewInstance() {return (mafVMEItem *)NewObjectInstance();}
 
   virtual void Print(std::ostream& os, const int indent=0) const;
 
