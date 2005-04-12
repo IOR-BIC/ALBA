@@ -1,6 +1,6 @@
-// Test mafVMEGenericVTK class
+// Test mafVMEGeneric class
 
-#include "mafVMEGenericVTK.h"
+#include "mafVMEGeneric.h"
 #include "mafVMERoot.h"
 #include "mafTransform.h"
 #include "mafAttribute.h"
@@ -70,40 +70,34 @@ int main()
   vtkMAFSmartPointer<vtkRenderer> renderer;
   vtkMAFSmartPointer<vtkRenderWindow> renWin;
   renWin->AddRenderer(renderer);
-  vtkMAFSmartPointer<vtkRenderWindowInteractor> iren = vtkRenderWindowInteractor::New();
-  iren->SetRenderWindow(renWin);
 
-  //renderer->SetBackground(0.1, 0.1, 0.1);
-  //renWin->SetSize(640, 480);
-  //renWin->SetPosition(0,0);
-  //renWin->StereoCapableWindowOn();
-  //renWin->StereoRenderOn();
-  //renderer->ResetCamera();
+  renWin->SetSize(1000,1000);
+  renderer->SetBackground( 0.1, 0.2, 0.4 );
 
-  renderer->GetActiveCamera()->ParallelProjectionOff();
 
   vtkMAFSmartPointer<vtkConeSource> test_cone;
-  test_cone->SetResolution(10);
+  test_cone->SetResolution(30);
   test_cone->SetHeight(2);
-  test_cone->CappingOn();
+  test_cone->SetRadius( 1.0 );
+  //test_cone->CappingOn();
   vtkMAFSmartPointer<vtkPolyDataMapper> test_mapper;
   test_mapper->SetInput(test_cone->GetOutput());
+
   vtkMAFSmartPointer<vtkActor> test_actor;
   test_actor->SetMapper(test_mapper);
   test_actor->SetPosition(4,0,0);
-  test_actor->GetProperty()->SetColor(1,0,0);
+  //test_actor->GetProperty()->SetColor(1,0,0);
   renderer->AddActor(test_actor);
-
 
   vtkMAFSmartPointer<vtkAxes> axes;
   axes->SetScaleFactor(2);
 
   // create a tree of VMEs: notice ref. counter is initially set to 0,
   // so noneed to unregister VME's when they are attached to the tree!
-  mafVMEGenericVTK *vtitle=mafVMEGenericVTK::New();
-  mafVMEGenericVTK *vsphere=mafVMEGenericVTK::New();
-  mafVMEGenericVTK *vcone=mafVMEGenericVTK::New();
-  mafVMEGenericVTK *vmorph=mafVMEGenericVTK::New();
+  mafVMEGeneric *vtitle=mafVMEGeneric::New();
+  mafVMEGeneric *vsphere=mafVMEGeneric::New();
+  mafVMEGeneric *vcone=mafVMEGeneric::New();
+  mafVMEGeneric *vmorph=mafVMEGeneric::New();
 
   vtitle->SetName("title");
   vsphere->SetName("sphere");
@@ -133,7 +127,7 @@ int main()
   // Fill in VME-tree with data and pose matrices to create a beautiful animation
   //
 
-  vmorph->SetPose(0,0,0,0,0,90,0);
+  vmorph->SetPose(-1,0,0,0,0,90,0);
 
   int i;
   for (i=0;i<100;i++)
@@ -238,6 +232,7 @@ int main()
     }
   }
 
+
   for (i=0;i<10;i++)
   {
     root->SetTreeTime(i*10);
@@ -246,6 +241,7 @@ int main()
     MAF_TEST(pose!=NULL);
     MAF_TEST(*pose==test_vtitle_pose[i]);
   }
+  
 
   for (i=0;i<10;i++)
   {
@@ -270,18 +266,10 @@ int main()
 
   cerr << "Testing VME time dynamic behavior\n";
 
-  //root->FindInTreeByName("landmarks")->Delete();
-
   // Test display of generic VME tree of surfaces
   mafNodeIterator *iter=root->NewIterator();
 
-  //root->AutoUpdateCurrentDataOn();
-
   root->SetTreeTime(0);
-  //renderer->GetActiveCamera()->Zoom(.5);
-  renderer->Render();
-  renderer->ResetCamera();
-  renderer->GetActiveCamera()->SetViewAngle(0);
 
   mafNode *node;
 
@@ -380,25 +368,18 @@ int main()
     }
   }
 
-  //renderer->GetActiveCamera()->Zoom(.5);
-  renderer->Render();
-  //renderer->GetActiveCamera()->SetViewAngle(0);
-  renderer->GetActiveCamera()->Pitch(20);
-  renderer->GetActiveCamera()->Azimuth(10);
   renderer->ResetCamera();
 
-
   int t;
-  for (t = 0; t < 100; t++) 
+  for (t = 0; t < 200; t++) 
   {   
     // Update time into all the tree
     root->SetTreeTime(t);
   
-    renderer->GetActiveCamera()->Azimuth(1);
-    //renderer->ResetCameraClippingRange();
-    //renderer->ResetCamera();
+    renderer->GetActiveCamera()->Azimuth(-1);
+    renderer->ResetCameraClippingRange();
     renWin->Render();
-    //SLEEP(100);
+    SLEEP(10);
   }
 
   //--------------------------------------------------------------------------
@@ -566,23 +547,21 @@ int main()
   tree4DBoundsActor->Delete();
   treeBoundsActor->Delete();
   asmBoundsActor->Delete();
-  
-  //renderer->GetActiveCamera()->SetViewAngle(30);
 
-  for (t = 0; t < 100; t++) 
+
+  for (t = 0; t < 200; t++) 
   {
     // Update time into all the tree
     root->SetTreeTime(t);
 
-    //renderer->ResetCameraClippingRange();
-    //renderer->ResetCamera();
-    //renderer->GetActiveCamera()->Pitch(.003);
+    renderer->ResetCameraClippingRange();
+    renderer->GetActiveCamera()->Azimuth(1);
     renWin->Render();
 
-    //SLEEP(300);
+    SLEEP(10);
 
     root->GetOutput()->GetBounds(treeBounds);
-    vtitle->GetOutput()->GetBounds(treeBounds);
+    //vtitle->GetOutput()->GetBounds(treeBounds);
 
     rootAsm->GetBounds(asmBounds);
 
@@ -591,7 +570,7 @@ int main()
 
     asmBoundsBox->SetBounds(asmBounds);    
 
-    //MAF_TEST(treeBounds.Equals(asmBounds));
+    MAF_TEST(treeBounds.Equals(asmBounds));
   
   }
 

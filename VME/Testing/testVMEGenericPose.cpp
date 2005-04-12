@@ -1,4 +1,4 @@
-#include "mafVMEGenericVTK.h"
+#include "mafVMEGeneric.h"
 #include "mafVMERoot.h"
 #include "mafVMEOutput.h"
 #include "mafTransform.h"
@@ -14,9 +14,9 @@ int main()
 //-------------------------------------------------------------------------
 {
   // create a small tree
-  mafVMEGenericVTK *vme1=mafVMEGenericVTK::New();
-  mafVMEGenericVTK *vme2=mafVMEGenericVTK::New();
-  mafVMEGenericVTK *vme3=mafVMEGenericVTK::New();
+  mafVMEGeneric *vme1=mafVMEGeneric::New();
+  mafVMEGeneric *vme2=mafVMEGeneric::New();
+  mafVMEGeneric *vme3=mafVMEGeneric::New();
   mafSmartPointer<mafVMERoot> root;
   
   root->AddChild(vme1);

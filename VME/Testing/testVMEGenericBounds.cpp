@@ -1,6 +1,6 @@
-// Test mafVMEGenericVTK class
+// Test mafVMEGeneric class
 
-#include "mafVMEGenericVTK.h"
+#include "mafVMEGeneric.h"
 #include "mafVMERoot.h"
 #include "mafTransform.h"
 #include "mafVMEOutput.h"
@@ -77,9 +77,9 @@ int main()
   //renWin->StereoRenderOn();
 
   // create a tree of VMEs composed of 2 boxes under a root box.
-  mafVMEGenericVTK *box0=mafVMEGenericVTK::New();
-  mafVMEGenericVTK *box1=mafVMEGenericVTK::New();
-  mafVMEGenericVTK *box2=mafVMEGenericVTK::New();
+  mafVMEGeneric *box0=mafVMEGeneric::New();
+  mafVMEGeneric *box1=mafVMEGeneric::New();
+  mafVMEGeneric *box2=mafVMEGeneric::New();
 
   box0->SetName("box0");
   box1->SetName("box1");
