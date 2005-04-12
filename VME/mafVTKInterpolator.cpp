@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVTKInterpolator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:21:59 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-12 19:36:28 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,7 +24,7 @@
 
 #include "mafVME.h"
 #include "mafVMEItemVTK.h"
-#include "mafVMEGenericVTK.h"
+#include "mafVMEGeneric.h"
 #include "vtkMAFDataPipe.h"
 #include "mafEventBase.h"
 
@@ -53,7 +53,7 @@ mafVTKInterpolator::~mafVTKInterpolator()
 bool mafVTKInterpolator::Accept(mafVME *vme)
 //------------------------------------------------------------------------------
 {
-  return Superclass::Accept(vme)&&vme->IsA(mafVMEGenericVTK::GetStaticTypeId());
+  return Superclass::Accept(vme)&&vme->IsA(mafVMEGeneric::GetStaticTypeId());
 }
 
 //------------------------------------------------------------------------------
