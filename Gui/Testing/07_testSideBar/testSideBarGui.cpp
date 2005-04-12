@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testSideBarGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:24:47 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-12 20:03:01 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -65,7 +65,7 @@ testSideBarGui::testSideBarGui(wxWindow* parent)
   m_gui->Vector  (ID, "i vector", m_iv);
   m_gui->Vector  (ID, "f vector", m_fv);
   m_gui->Vector  (ID, "d vector", m_dv);
-  m_gui->Bool_   (ID, "label",  &m_i);
+  m_gui->Bool    (ID, "label",  &m_i);
   m_gui->Combo   (ID,	"combo",  &m_idx, numchoices, choices );
   m_gui->Radio   (ID,	"radio",  &m_idx, numchoices, choices, 3);
   m_gui->Slider  (ID, "slider", &m_i);
