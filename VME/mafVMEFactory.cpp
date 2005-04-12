@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 16:43:20 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-12 19:35:32 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,7 +21,9 @@
 #include "mafVMEFactory.h"
 #include "mafVersion.h"
 #include "mafVMERoot.h"
-#include "mafVMEGenericVTK.h"
+#include "mafVMEGeneric.h"
+#include "mafVMEImage.h"
+#include "mafVMESurface.h"
 #include "mafTagArray.h"
 #include "mafIndent.h"
 #include <string>
@@ -62,7 +64,9 @@ mafVMEFactory::mafVMEFactory()
   //
   mafPlugObjectMacro(mafTagArray,"a basic kind of attribute used to store key-value pairs");
   mafPlugNodeMacro(mafVMERoot,"root for VME tree");
-  mafPlugNodeMacro(mafVMEGenericVTK,"Generic VME storing VTK datasets");
+  mafPlugNodeMacro(mafVMEGeneric,"Generic VME storing VTK datasets");
+  mafPlugNodeMacro(mafVMEImage,"Generic VME storing vtkImageData datasets");
+  mafPlugNodeMacro(mafVMESurface,"Generic VME storing vtkPolyData surfaces datasets");
 }
 
 //------------------------------------------------------------------------------

@@ -8,30 +8,24 @@ DBG_MESSAGE("Configuring project ${PROJECT_NAME}")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-  mafDataVector.cpp
-  mafDataVector.h
-  mafDataInterpolator.cpp
-  mafDataInterpolator.h
-  mafMatrixInterpolator.cpp
-  mafMatrixInterpolator.h
-  mafMatrixVector.cpp
-  mafMatrixVector.h
-  mafVMEFactory.cpp
-  mafVMEFactory.h
-  mafVMEGeneric.h
-  mafVMEGeneric.cpp
-  mafVMEGenericVTK.cpp
-  mafVMEGenericVTK.h
-  mafVMEItem.h
-  mafVMEItem.cpp
-  mafVMEItemVTK.cpp
-  mafVMEItemVTK.h
-  mafVMEOutputVTK.cpp
-  mafVMEOutputVTK.h
-  mafVTKInterpolator.cpp
-  mafVTKInterpolator.h
-  vtkMAFDataPipe.cpp
-  vtkMAFDataPipe.h
+mafDataVector.cpp
+mafDataVector.h
+mafDataInterpolator.cpp
+mafDataInterpolator.h
+mafMatrixInterpolator.cpp
+mafMatrixInterpolator.h
+mafMatrixVector.cpp
+mafMatrixVector.h
+mafVMEFactory.cpp
+mafVMEFactory.h
+mafVMEGenericAbstract.cpp
+mafVMEGenericAbstract.h
+mafVMEImage.cpp
+mafVMEImage.h
+mafVMEItem.h
+mafVMEItem.cpp
+mafVMESurface.cpp
+mafVMESurface.h
 )
 
 IF (MAF_USE_CRYPTO)
@@ -42,9 +36,23 @@ SET(PROJECT_SRCS  ${PROJECT_SRCS}
 ENDIF (MAF_USE_CRYPTO)
 
 IF (MAF_USE_VTK)
-  #SET(PROJECT_SRCS
-  #${PROJECT_SRCS}
-  #)
+  SET(PROJECT_SRCS
+  ${PROJECT_SRCS}
+  mafVMEGeneric.h
+  mafVMEGeneric.cpp
+  mafVMEItemVTK.cpp
+  mafVMEItemVTK.h
+  mafVMEOutputVTK.cpp
+  mafVMEOutputVTK.h
+  mafVMEOutputImage.cpp
+  mafVMEOutputImage.h
+  mafVMEOutputSurface.cpp
+  mafVMEOutputSurface.h
+  mafVTKInterpolator.cpp
+  mafVTKInterpolator.h
+  vtkMAFDataPipe.cpp
+  vtkMAFDataPipe.h
+  )
 ENDIF (MAF_USE_VTK)
 
 

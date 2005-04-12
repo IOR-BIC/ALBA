@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:19 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-04-12 19:38:23 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -61,13 +61,14 @@ mafVME::~mafVME()
 {
   // Pipes must be destroyed in the right order
   // to take into consideration dependencies
-  mafDEL(m_Output);
-  m_DataPipe=NULL;
+  cppDEL(m_Output);
+
+  m_DataPipe=NULL; // smart pointer
   
-  m_AbsMatrixPipe->SetVME(NULL);
-  m_AbsMatrixPipe=NULL;
+  m_AbsMatrixPipe->SetVME(NULL); // ???
+  m_AbsMatrixPipe=NULL; // smart pointer
     
-  m_MatrixPipe=NULL;
+  m_MatrixPipe=NULL; // smart pointer
 }
 
 //-------------------------------------------------------------------------
@@ -584,11 +585,29 @@ int mafVME::GetAuxiliaryRefSys(mafMatrix *AuxRefSys, const char *RefSysName, int
   return MAF_ERROR;
 }
 */
+
+//-------------------------------------------------------------------------
+void mafVME::SetOutput(mafVMEOutput *output)
+//-------------------------------------------------------------------------
+{
+  cppDEL(m_Output);
+
+  m_Output=output;
+  
+  if (m_Output)
+  {
+    m_Output->SetVME(this);
+  }
+  
+  // force the update of the abs matrix pipe
+  if (m_AbsMatrixPipe.GetPointer())
+    m_AbsMatrixPipe->SetVME(this);
+}
+
 //-------------------------------------------------------------------------
 int mafVME::SetMatrixPipe(mafMatrixPipe *mpipe)
 //-------------------------------------------------------------------------
 {
-  assert(m_Output);
   if (mpipe!=m_MatrixPipe)
   {
     if (mpipe==NULL||mpipe->SetVME(this)==MAF_OK)
@@ -604,19 +623,10 @@ int mafVME::SetMatrixPipe(mafMatrixPipe *mpipe)
 
       if (mpipe)
       {
-        // attach the new pipe
         mpipe->SetVME(this);
-        // set the output matrix to pipe output matrix
-        GetOutput()->SetTransform(mpipe);
+        mpipe->SetCurrentTime(GetCurrentTime());
       }
-      else
-      {
-        // When no Matrix pipe is set, simply provide
-        // an identity matrix as output matrix
-        GetOutput()->SetTransform(mafTransform::New());
-        GetOutput()->GetTransform()->SetTimeStamp(m_CurrentTime);
-      }
-
+      
       // this forces the the pipe to Update its input and input frame
       if (m_AbsMatrixPipe)
         m_AbsMatrixPipe->SetVME(this);
@@ -665,7 +675,6 @@ int mafVME::GetCrypting()
 int mafVME::SetDataPipe(mafDataPipe *dpipe)
 //-------------------------------------------------------------------------
 {
-  assert(m_Output);
   if (dpipe==m_DataPipe.GetPointer())
     return MAF_OK;
 
@@ -682,7 +691,7 @@ int mafVME::SetDataPipe(mafDataPipe *dpipe)
     
     if (m_DataPipe)
     {
-      //m_DataPipe->SetVME(this);
+      m_DataPipe->SetVME(this);
       m_DataPipe->SetCurrentTime(m_CurrentTime);
     }
 

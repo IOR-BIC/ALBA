@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:19 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-04-12 19:38:24 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -189,7 +189,7 @@ public:
   int GetCrypting();
 
   /** return a pointer to the output data structure */
-  mafVMEOutput *GetOutput() {return m_Output;}
+  virtual mafVMEOutput *GetOutput() {return m_Output;}
 
   /** process events coming from other components */
   void OnEvent(mafEventBase *e);
@@ -209,7 +209,12 @@ protected:
 
   /** update the output data structure */
   virtual void InternalUpdate() {}
- 
+
+  /** 
+    Set the output and connect it to the VME. This is automatically called
+    by GetOutput() of specific VME's */
+  void SetOutput(mafVMEOutput *output);
+  
   /** Set/Get the data pipe object, i.e. the source of the output dataset. */
   virtual int SetDataPipe(mafDataPipe *dpipe);
 
