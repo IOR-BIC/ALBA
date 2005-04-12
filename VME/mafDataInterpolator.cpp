@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataInterpolator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:21:56 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-12 19:35:53 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,7 +24,7 @@
 
 #include "mafVME.h"
 #include "mafVMEItem.h"
-#include "mafVMEGeneric.h"
+#include "mafVMEGenericAbstract.h"
 
 #include "mafDataVector.h"
 
@@ -67,7 +67,7 @@ unsigned long mafDataInterpolator::GetMTime()
 {
   unsigned long mtime = Superclass::GetMTime();
   
-  mafVMEGeneric *vme = (mafVMEGeneric *)m_VME;
+  mafVMEGenericAbstract *vme = (mafVMEGenericAbstract *)m_VME;
 
   if (vme && vme->GetDataVector())
   {
@@ -85,7 +85,7 @@ unsigned long mafDataInterpolator::GetMTime()
 bool mafDataInterpolator::Accept(mafVME *vme)
 //------------------------------------------------------------------------------
 {
-  return vme && vme->IsA(mafVMEGeneric::GetStaticTypeId());
+  return vme && vme->IsA(mafVMEGenericAbstract::GetStaticTypeId());
 }
 
 //------------------------------------------------------------------------------
@@ -133,7 +133,7 @@ void mafDataInterpolator::UpdateBounds()
 void mafDataInterpolator::InternalItemUpdate()
 //------------------------------------------------------------------------------
 {  
-  mafVMEGeneric *vme=(mafVMEGeneric *)m_VME;
+  mafVMEGenericAbstract *vme=(mafVMEGenericAbstract *)m_VME;
   mafDataVector *array = vme ? vme->GetDataVector() : NULL;
 
   if (array)

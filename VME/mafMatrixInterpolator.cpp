@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrixInterpolator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:21:57 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-12 19:35:53 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,7 +24,7 @@
 
 #include "mafVME.h"
 #include "mafMatrix.h"
-#include "mafVMEGeneric.h"
+#include "mafVMEGenericAbstract.h"
 
 #include "mafMatrixVector.h"
 
@@ -65,7 +65,7 @@ unsigned long mafMatrixInterpolator::GetMTime()
 {
   unsigned long mtime = Superclass::GetMTime();
   
-  mafVMEGeneric *vme = (mafVMEGeneric *)m_VME;
+  mafVMEGenericAbstract *vme = (mafVMEGenericAbstract *)m_VME;
 
   if (vme && vme->GetMatrixVector())
   {
@@ -83,7 +83,7 @@ unsigned long mafMatrixInterpolator::GetMTime()
 bool mafMatrixInterpolator::Accept(mafVME *vme)
 //------------------------------------------------------------------------------
 {
-  return vme && vme->IsA(mafVMEGeneric::GetStaticTypeId());
+  return vme && vme->IsA(mafVMEGenericAbstract::GetStaticTypeId());
 }
 
 //------------------------------------------------------------------------------
@@ -110,7 +110,7 @@ void mafMatrixInterpolator::Update()
 void mafMatrixInterpolator::InternalItemUpdate()
 //------------------------------------------------------------------------------
 {  
-  mafVMEGeneric *vme=(mafVMEGeneric *)m_VME;
+  mafVMEGenericAbstract *vme=(mafVMEGenericAbstract *)m_VME;
   mafMatrixVector *array = vme ? vme->GetMatrixVector() : NULL;
 
   if (array)
