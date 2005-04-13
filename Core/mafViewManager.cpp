@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:06:47 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-13 13:09:02 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -256,8 +256,7 @@ void mafViewManager::FillMenu (wxMenu* menu)
 	{
     mafView* v = m_t[i];  
 	  //s = wxString::Format("create new %s view",v->m_label);
-	  menu->Append(v->m_id, v->m_label, (wxMenu *)NULL, v->m_label);
-	}
+	  menu->Append(v->m_id, v->GetLabel(), (wxMenu *)NULL, v->GetLabel());	}
 }
 //----------------------------------------------------------------------------
 mafView *mafViewManager::ViewCreate(int id)
@@ -292,7 +291,7 @@ mafView *mafViewManager::ViewCreate(int id)
 
   mafEventMacro(mafEvent(this,VIEW_CREATED,new_view)); // ask Logic to create the frame
 	
-	new_view->m_frame->Show(true);
+	new_view->GetFrame()->Show(true);
 
 	return new_view;
 }
@@ -396,7 +395,7 @@ void mafViewManager::ViewDeleteAll()
 //----------------------------------------------------------------------------
 {
 	while(m_vlist)
-    m_vlist->m_frame->Close();
+    m_vlist->GetFrame()->Close();
 }
 //----------------------------------------------------------------------------
 mafView *mafViewManager::GetSelectedView()

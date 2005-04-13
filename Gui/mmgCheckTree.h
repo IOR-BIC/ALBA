@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:02:34 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-13 13:08:08 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -19,17 +19,6 @@
 #include <wx/imaglist.h>
 #include <wx/treectrl.h>
 #include <map>
-//----------------------------------------------------------------------------
-// Constants: --- to be removed --- should by defined by the SceneGrahp
-//----------------------------------------------------------------------------
-enum 
-{
-  NODE_NON_VISIBLE,
-  NODE_VISIBLE_ON,
-  NODE_VISIBLE_OFF,
-  NODE_MUTEX_ON,
-  NODE_MUTEX_OFF,
-};
 //----------------------------------------------------------------------------
 // Forward refs:
 //----------------------------------------------------------------------------

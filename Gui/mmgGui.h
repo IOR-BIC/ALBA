@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:02:34 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-13 13:08:08 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2005
@@ -212,6 +212,9 @@ public:
   \sa GetId GetModuleId m_id m_table
   */
   int GetId(int mod_id)       {m_id++; assert(m_id<MAXID); m_table[m_id-MINID]=mod_id; return m_id;}; 
+
+  /** place the GUI on a different parent, and perform the required Resize/Stretch/ and Show */
+  void Reparent(wxWindow *parent);
 
 protected:
   mafEventListener  *m_Listener;     

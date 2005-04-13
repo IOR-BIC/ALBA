@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 15:41:31 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-13 13:09:02 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,6 +36,7 @@ mafLogicWithManagers::mafLogicWithManagers()
 : mafLogicWithGUI()
 //----------------------------------------------------------------------------
 {
+  m_side_bar      = NULL;
   m_NodeManager   = false;
   m_ViewManager   = false;
   m_OpManager     = false;
@@ -57,6 +58,12 @@ void mafLogicWithManagers::Configure()
 //----------------------------------------------------------------------------
 {
   mafLogicWithGUI::Configure(); // create the GUI - and calls CreateMenu
+
+  if(m_side_sash)
+  {
+    m_side_bar = new mafSideBar(m_side_sash,-1,this);
+    m_side_sash->Put(m_side_bar->m_notebook);
+  }
 
   if(m_UseNodeManager)
   {
@@ -553,7 +560,7 @@ void mafLogicWithManagers::ViewCreated(mafView *v)
 	{
       mmgMDIChild *c = new mmgMDIChild(m_win,v);   
 			c->SetListener(m_ViewManager);
-			v->m_frame = c;
+			v->SetFrame(c);
  			v->ShowSettings();
 	}
 }
@@ -571,7 +578,7 @@ void mafLogicWithManagers::UpdateTimeBounds()
   float min,max; 
   if(m_NodeManager) m_NodeManager->TimeGetBounds(&min,&max);
   if(m_time_panel)  m_time_panel->SetBounds(min,max);
-  if(m_time_bar)    m_time_bar->Show(min!=max);
+  if(m_time_sash)   m_time_sash->Show(min!=max);
 }
 //----------------------------------------------------------------------------
 mafNode* mafLogicWithManagers::VmeChoose()

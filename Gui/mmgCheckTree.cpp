@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:02:34 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-13 13:08:07 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -341,16 +341,8 @@ void mmgCheckTree::VmeShow(mafNode *vme, bool show)
 int mmgCheckTree::GetVmeStatus(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-  static int foo =0;
-  foo++;
-  if (foo>=5) foo=0;
-  return foo;
-  /*
   if(!m_view) return NODE_NON_VISIBLE;
-  mafSceneGraph *sg = m_view->GetSceneGraph();
-  if(!sg)     return NODE_NON_VISIBLE;
-  return sg->GetNodeStatus(vme);
-  */
+  return m_view->GetNodeStatus(vme);
 }
 //----------------------------------------------------------------------------
 void mmgCheckTree::VmeUpdateIcon(mafNode *vme)   
@@ -358,45 +350,11 @@ void mmgCheckTree::VmeUpdateIcon(mafNode *vme)
 {
   int icon_index = ClassNameToIcon(vme->GetTypeName()) + GetVmeStatus(vme);
   SetNodeIcon( (long)vme, icon_index );
-
-  /*
-  int type = mafGetBaseType(vme);
-
-  if(type == VME_WIDGET) type = VME_GIZMO;//SIL. 18-11-2004: 
-
-  if(type == VME_POINTSET && vme->IsA("mafNodeLandmark")) type++;
-
-  if(vme->IsA("mafNodeExField")           ==1) type = VME_VOLUME;            
-
-  if(type == VME_TOOL ) 
-  {
-    	   if(vme->IsA("mafNodePointSet")==1) type = VME_POINTSET;
-	  else if(vme->IsA("mafNodeSurface") ==1) type = VME_SURFACE;
-	  else if(vme->IsA("mafNodeImage")   ==1) type = VME_IMAGE;
-	  else if(vme->IsA("mafNodeGrayVolume")  ==1) type = VME_GRAY_VOLUME;
-	  else if(vme->IsA("mafNodeVolume")  ==1) type = VME_VOLUME;
-	  else if(vme->IsA("mafNodeGizmo")   ==1) type = VME_GIZMO;
-    else if(vme->IsA("mafNodeExternalData")  ==1) type = VME_EXTERNAL_DATA;
-	  else if(vme->IsA("mafNodefem")     ==1) type = VME_FEM;
-	  else if(vme->IsA("mafNodeScalar")     ==1) type = VME_SCALAR;
-	  else type = VME_GENERIC;
-  }
-
-#ifdef MAF_SHOW_GIZMO
-	if(type == VME_GIZMO) type = VME_SURFACE;
-#endif
-
-	int status = GetVmeStatus(vme);
-  int icon = type * 5 + status;
-
-	SetNodeIcon((long)vme,icon);
-  */
 }
 //----------------------------------------------------------------------------
 void mmgCheckTree::ViewSelected(mafView *view)
 //----------------------------------------------------------------------------
 {
-	/*
   m_view=view;
 
 	m_table->BeginFind();
@@ -408,7 +366,6 @@ void mmgCheckTree::ViewSelected(mafView *view)
 		if(i.IsOk())
 			VmeUpdateIcon((mafNode*)NodeFromItem(i));
 	}
-  */
 }
 //----------------------------------------------------------------------------
 void mmgCheckTree::ViewDeleted(mafView *view)
@@ -482,11 +439,11 @@ void mmgCheckTree::InitializeImageList()
   //retrieve state icons
   //I assume all state-icon to have the same size
   wxBitmap state_ico[num_of_status];
-  state_ico[0] = mafPics.GetBmp("DISABLED");
-  state_ico[1] = mafPics.GetBmp("CHECK_OFF");
-  state_ico[2] = mafPics.GetBmp("CHECK_ON");
-  state_ico[3] = mafPics.GetBmp("RADIO_ON");
-  state_ico[4] = mafPics.GetBmp("RADIO_OFF");
+  state_ico[NODE_NON_VISIBLE] = mafPics.GetBmp("DISABLED");
+  state_ico[NODE_VISIBLE_OFF] = mafPics.GetBmp("CHECK_OFF");
+  state_ico[NODE_VISIBLE_ON]  = mafPics.GetBmp("CHECK_ON");
+  state_ico[NODE_MUTEX_OFF]   = mafPics.GetBmp("RADIO_OFF");
+  state_ico[NODE_MUTEX_ON]    = mafPics.GetBmp("RADIO_ON");
   int sw = state_ico[0].GetWidth();
   int sh = state_ico[0].GetHeight();
 

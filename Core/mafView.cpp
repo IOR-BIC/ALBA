@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:19 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-13 13:09:02 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,11 +21,6 @@
 
 
 #include "mafView.h"
-#include "mafDecl.h"
-#include "mmgGuiHolder.h"
-#include "mmgGui.h"
-//#include "mafVME.h"
-//#include "mafSceneNode.h"
 //----------------------------------------------------------------------------
 mafView::mafView( wxString label, bool external)
 //----------------------------------------------------------------------------
@@ -39,7 +34,7 @@ mafView::mafView( wxString label, bool external)
   m_guih					= NULL;
 	m_gui					 	= NULL;
 	m_plugged				= false;
-	m_external_flag = external;
+	//m_external_flag = external;
 }
 //----------------------------------------------------------------------------
 mafView::~mafView( ) 
@@ -51,7 +46,7 @@ mafView::~mafView( )
 void mafView::OnEvent(mafEvent& e)
 //----------------------------------------------------------------------------
 {
-  //@@@ mafEventMacro(e); 
+  mafEventMacro(e); 
 }
 //----------------------------------------------------------------------------
 void mafView::ShowGui()

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:13:33 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-13 13:09:02 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,6 +24,7 @@
 class mafNodeManager;
 class mafViewManager;
 class mafOpManager;
+class mafSideBar;
 //----------------------------------------------------------------------------
 // mafLogicWithManagers :
 //----------------------------------------------------------------------------
@@ -158,6 +159,7 @@ protected:
   /** Called after FileOpen or Save operation */
   void UpdateFrameTitle();
 
+  mafSideBar *m_side_bar;
   mafNodeManager *m_NodeManager;
   mafViewManager *m_ViewManager;
   mafOpManager   *m_OpManager;

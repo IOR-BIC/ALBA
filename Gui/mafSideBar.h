@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:02:34 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-13 13:08:07 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -90,12 +90,12 @@ public:
 	// Return the pointer to the tree.
 	mmgCheckTree *GetTree() {return m_tree;};
 
-  bool IsShown() {return m_side_bar->IsShown();};
-  void Show( bool show) {m_side_bar->Show(show);};
+  bool IsShown() {return m_notebook->IsShown();};
+  void Show( bool show) {m_notebook->Show(show);};
 
-protected:
   wxNotebook        *m_notebook;
-  mmgSashPanel      *m_side_bar;
+protected:
+  //mmgSashPanel    *m_side_bar;
   mmgPanelStack			*m_op_panel;
 	mmgGuiHolder			*m_view_property_panel;
   mmgCheckTree      *m_tree;

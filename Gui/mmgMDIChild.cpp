@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIChild.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:24 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-13 13:08:08 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -61,12 +61,12 @@ mmgMDIChild::mmgMDIChild(wxMDIParentFrame* parent,mafView *view)
   m_view     = view;
   m_Listener = NULL;
 
-  m_win = m_view->m_win;
+  m_win = m_view->GetWindow();
   m_win->Reparent(this);
   m_win->Show(true);
 
   SetIcon(mafPics.GetIcon("MDICHILD_ICON"));
-	SetTitle(wxStripMenuCodes(m_view->m_label));
+	SetTitle(wxStripMenuCodes(m_view->GetLabel()));
 }
 //----------------------------------------------------------------------------
 mmgMDIChild::~mmgMDIChild( ) 

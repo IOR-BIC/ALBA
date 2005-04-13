@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:06:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-13 13:09:01 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -123,10 +123,10 @@ protected:
 
   mmgMDIFrame       *m_win;
   wxToolBar         *m_toolbar;
-  mmgSashPanel      *m_log_bar;
-  mmgSashPanel      *m_time_bar;
+  mmgSashPanel      *m_log_sash;
+  mmgSashPanel      *m_time_sash;
+  mmgSashPanel			*m_side_sash;
   wxMenuBar         *m_menu_bar;
-	mafSideBar				*m_side_bar;
 	wxString					 m_last_selected_panel;
   mmgTimeBar        *m_time_panel;
 	wxString					 m_AppTitle;

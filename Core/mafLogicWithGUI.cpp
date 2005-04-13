@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 15:41:31 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-13 13:09:01 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,7 +35,6 @@
 #include "mmgNamedPanel.h"
 #include "mmgCrossSplitter.h"
 #include "mmgTimeBar.h"
-#include "mafSideBar.h"
 #include "mafWXLog.h"
 #include "mafPics.h"
 //----------------------------------------------------------------------------
@@ -45,10 +44,10 @@ mafLogicWithGUI::mafLogicWithGUI()
   m_win = new mmgMDIFrame("maf", wxDefaultPosition, wxSize(800, 600));
   m_win->SetListener(this);
 
-  m_log_bar				= NULL;
-  m_time_bar			= NULL;
+  m_log_sash				= NULL;
+  m_time_sash			= NULL;
   m_time_panel  	= NULL;
-  m_side_bar	    = NULL;
+  m_side_sash	    = NULL;
 
 	m_log_to_file			= false;
 	m_log_all_events	= false;
@@ -124,13 +123,13 @@ void mafLogicWithGUI::OnEvent(mafEvent& e)
   // ###############################################################
   // commands related to the SASH
   case MENU_VIEW_LOGBAR:
-    if(m_log_bar) m_log_bar->Show(!m_log_bar->IsShown());
+    if(m_log_sash) m_log_sash->Show(!m_log_sash->IsShown());
     break; 
   case MENU_VIEW_SIDEBAR:
-    if(m_side_bar) m_side_bar->Show(!m_side_bar->IsShown());
+    if(m_side_sash) m_side_sash->Show(!m_side_sash->IsShown());
     break; 
   case MENU_VIEW_TIMEBAR:
-    if(m_time_bar) m_time_bar->Show(!m_time_bar->IsShown());
+    if(m_time_sash) m_time_sash->Show(!m_time_sash->IsShown());
     break; 
   case MENU_VIEW_TOOLBAR:
     if(m_PlugToolbar)	
@@ -172,7 +171,7 @@ void mafLogicWithGUI::OnQuit()
 {
   // if OnQuit is redefined in a deriver class,  mafLogicWithGUI::OnQuit() must be clalled last
 
-  cppDEL(m_side_bar); //must be after deleting the vme_manager
+  cppDEL(m_side_sash); //must be after deleting the vme_manager
   if(m_PlugLogbar) delete wxLog::SetActiveTarget(NULL); 
   m_win->Destroy();
 }
@@ -189,9 +188,9 @@ void mafLogicWithGUI::CreateLogbar()
   log_panel->SetTitle(" Log Area:");
   log_panel->Add(log,1,wxEXPAND);
 
-  m_log_bar = new mmgSashPanel(m_win, MENU_VIEW_LOGBAR, wxBOTTOM,80,"Log Bar \tCtrl+L");
-  m_log_bar->Put(log_panel);
-  //m_log_bar->Show(false);
+  m_log_sash = new mmgSashPanel(m_win, MENU_VIEW_LOGBAR, wxBOTTOM,80,"Log Bar \tCtrl+L");
+  m_log_sash->Put(log_panel);
+  //m_log_sash->Show(false);
   wxLogMessage("welcome");
 }
 
@@ -226,16 +225,16 @@ void mafLogicWithGUI::CreateToolbar()
 void mafLogicWithGUI::CreateSidebar()
 //----------------------------------------------------------------------------
 {
-  m_side_bar = new mafSideBar(m_win,MENU_VIEW_SIDEBAR,this);
+  m_side_sash = new mmgSashPanel(m_win, MENU_VIEW_SIDEBAR, wxRIGHT,245, "Side Bar \tCtrl+S"); // 245 is the width of the sideBar
 }
 //----------------------------------------------------------------------------
 void mafLogicWithGUI::CreateTimebar()
 //----------------------------------------------------------------------------
 {
-  m_time_bar = new mmgSashPanel(m_win,MENU_VIEW_TIMEBAR,wxBOTTOM,22,"Time Bar \tCtrl+T",false);
-  m_time_panel = new mmgTimeBar(m_time_bar,-1,true);
+  m_time_sash = new mmgSashPanel(m_win,MENU_VIEW_TIMEBAR,wxBOTTOM,22,"Time Bar \tCtrl+T",false);
+  m_time_panel = new mmgTimeBar(m_time_sash,-1,true);
   m_time_panel->SetListener(this);
-  m_time_bar->Put(m_time_panel);
+  m_time_sash->Put(m_time_panel);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithGUI::EnableItem(int item, bool enable)

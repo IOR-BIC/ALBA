@@ -8,6 +8,10 @@ MESSAGE(STATUS "Configuring project ${PROJECT_NAME}")
 SET(PROJECT_SRCS
 mafPics.cpp
 mafPics.h
+mafRWI.cpp
+mafRWI.h
+mafRWIBase.cpp
+mafRWIBase.h
 mafSideBar.cpp
 mafSideBar.h
 mafWXLog.cpp
@@ -70,6 +74,7 @@ mmgViewFrame.cpp
 mmgViewFrame.h
 mmgViewWin.cpp
 mmgViewWin.h
+
 )
 
 # List the kits from VTK that are needed by this project.

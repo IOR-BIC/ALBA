@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgSashPanel.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 15:41:55 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-13 13:08:08 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -137,8 +137,6 @@ bool mmgSashPanel::Show(bool show)
 bool mmgSashPanel::Put(wxWindow* win)
 //----------------------------------------------------------------------------
 {
-  assert(m_currgui);
-
   assert(m_currgui);
   m_currgui->Reparent(mafGetFrame());
   m_currgui->Show(false);

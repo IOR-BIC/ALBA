@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:14 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-04-13 13:09:01 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone, Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -77,7 +77,7 @@ void mafEvent::Log()
   if(m_bool)   s << " bool= "  << (int)m_bool;
   if(m_float)  s << " float= " << m_float;
   if(m_string) s << " string= "<< *m_string;
-  if(m_view)   s << " view= "  << (long)m_view<<" : " << m_view->m_label;
+  if(m_view)   s << " view= "  << (long)m_view<<" : " << m_view->GetLabel();
   if(m_vme)    s << " vme= "   << (long)m_vme <<" : " << m_vme->GetName();
   if(m_op)     s << " op= "    << (long)m_op  <<" : " << m_op->m_label;
 #ifdef MAF_USE_WX

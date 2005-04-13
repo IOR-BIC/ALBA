@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:02:34 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-04-13 13:08:08 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -984,4 +984,13 @@ void mmgGui::OnCheckListBox (wxCommandEvent &event)
 {
    mafEventMacro(mafEvent(this, GetModuleId(event.GetId()),event.GetInt()));
 }
-
+//----------------------------------------------------------------------------
+void mmgGui::Reparent(wxWindow *parent)
+//----------------------------------------------------------------------------
+{
+  assert(parent);
+  wxWindow::Reparent(parent);
+  this->FitGui();
+  this->Update();
+  this->Show(true);
+}

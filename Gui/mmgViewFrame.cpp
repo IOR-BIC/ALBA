@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgViewFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:29 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-13 13:08:09 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -100,11 +100,11 @@ void mmgViewFrame::SetView(mafView *view)
 //----------------------------------------------------------------------------
 {
    m_view = view;
-   m_clientwin = m_view->m_win;
+   m_clientwin = m_view->GetWindow();
    m_clientwin->Reparent(this);
    m_clientwin->Show(true);
 
-   SetTitle(wxStripMenuCodes(m_view->m_label));
+   SetTitle(wxStripMenuCodes(m_view->GetLabel()));
 }
 //----------------------------------------------------------------------------
 void mmgViewFrame::OnEvent(mafEvent& e)

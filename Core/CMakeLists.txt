@@ -86,6 +86,8 @@ mafView.cpp
 mafView.h
 mafViewManager.cpp
 mafViewManager.h
+mafViewVTK.cpp
+mafViewVTK.h
 mmuTimeSet.cpp
 mmuTimeSet.h
 )

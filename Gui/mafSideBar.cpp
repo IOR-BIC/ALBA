@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:02:33 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-13 13:08:07 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,9 +33,10 @@
 mafSideBar::mafSideBar(wxWindow* parent, int id, mafEventListener *Listener)
 //----------------------------------------------------------------------------
 {
-	m_side_bar = new mmgSashPanel(parent, id, wxRIGHT,245, "Side Bar \tCtrl+S"); // 245 is the width of the sideBar
+	//m_side_bar = new mmgSashPanel(parent, id, wxRIGHT,245, "Side Bar \tCtrl+S"); // 245 is the width of the sideBar
   
-	m_notebook = new wxNotebook(m_side_bar,-1);
+	m_notebook = new wxNotebook(parent,-1);
+  //m_notebook->SetSize();
 
   //splitted panel  
   mmgSplittedPanel *sp = new mmgSplittedPanel(m_notebook,-1,140);  //SIL. 29-4-2003 - 140 is the height of the vme_property panel
@@ -64,19 +65,19 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafEventListener *Listener)
   m_op_panel->Push(empty_op);
 	m_notebook->AddPage(m_op_panel ," op. parameters");
 
-  m_side_bar->Put(m_notebook);
+  //m_side_bar->Put(m_notebook);
 }
 //----------------------------------------------------------------------------
 mafSideBar::~mafSideBar() 
 //----------------------------------------------------------------------------
 {
-	cppDEL(m_side_bar);
+	cppDEL(m_notebook);
 }
 //----------------------------------------------------------------------------
 void mafSideBar::OpShowGui(bool push_gui, mmgPanel *panel)
 //----------------------------------------------------------------------------
 {
-	m_side_bar->Show(true);
+	m_notebook->Show(true);
 	if(push_gui)
 	{
 		m_notebook->SetSelection(2);
@@ -107,7 +108,7 @@ void mafSideBar::ViewSelect(mafView *view)
 	if(view)
 	{
 		wxString s = " ";
-		s += wxStripMenuCodes(view->m_label);
+		s += wxStripMenuCodes(view->GetLabel());
 		s += " view:";
 		m_view_property_panel->SetTitle(s);
 		mmgGui *gui = (mmgGui*)view->m_gui;
@@ -177,5 +178,5 @@ void mafSideBar::VmePropertyRemove(mmgGui *gui)
 void mafSideBar::Show()
 //----------------------------------------------------------------------------
 {
-	m_side_bar->Show(!m_side_bar->IsShown());
+	m_notebook->Show(!m_notebook->IsShown());
 }
