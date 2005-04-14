@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTreeContextualMenu.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 13:21:52 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-14 15:15:49 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,6 +21,7 @@ class mafEvent;
 class mafEventListener;
 class mmgCheckTree;
 class mafNode;
+class mafVME;
 
 //----------------------------------------------------------------------------
 // mmgTreeContextualMenu :
@@ -37,7 +38,8 @@ public:
 
 protected:
   mafView          *m_view;
-  mafNode          *m_clicked_vme;
+  mafVME           *m_clicked_vme;
+  mafNode          *m_clicked_node;
   mmgCheckTree     *m_tree;
   mafEventListener *m_Listener;
   
@@ -52,5 +54,3 @@ protected:
   DECLARE_EVENT_TABLE()
 };
 #endif
-
-
