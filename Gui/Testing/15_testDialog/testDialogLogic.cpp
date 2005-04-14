@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testDialogLogic.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-13 21:04:15 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-14 13:39:40 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -59,16 +59,14 @@ testDialogLogic::testDialogLogic()
   mmgGui *gui = new mmgGui(this);
   gui->Divider();
   gui->Label("Examples of mmgDialog",true); 
-  gui->Label("without the CLOSEWINDOW button"); 
-  gui->Button(ID_D1,"non sizable");
-  gui->Button(ID_D2,"sizable");
-  gui->Label("with the CLOSEWINDOW button"); 
-  gui->Button(ID_D3,"non sizable");
-  gui->Button(ID_D4,"sizable");
-  gui->Label("using predefined buttons"); 
-  gui->Button(ID_D5,"ok");
-  gui->Button(ID_D6,"ok cancel");
-  gui->Button(ID_D7,"close");
+  gui->Label("mmgDialog styles"); 
+  gui->Button(ID_D1,"using mafRESIZABLE style");
+  gui->Button(ID_D2,"without");
+  gui->Button(ID_D3,"using mafCLOSEWINDOW");
+  gui->Button(ID_D4,"without");
+  gui->Button(ID_D5,"using mafOK style");
+  gui->Button(ID_D6,"using mafOK|mafCANCEL");
+  gui->Button(ID_D7,"using mafCLOSE");
 
   gui->Label("Dialogs with a mmgGui",true); 
   gui->Button(ID_D8,"non sizable");
@@ -93,7 +91,7 @@ testDialogLogic::testDialogLogic()
 testDialogLogic::~testDialogLogic()
 //--------------------------------------------------------------------------------
 {
-  //m_win->Destroy();
+  //m_win->Destroy(); //is implicit
 }
 //--------------------------------------------------------------------------------
 void testDialogLogic::OnEvent(mafEvent& e)
@@ -101,10 +99,10 @@ void testDialogLogic::OnEvent(mafEvent& e)
 {
   switch(e.GetId())
   {
-  case ID_D1: { mmgDialog dlg("foo",mafCLOSE);                            dlg.ShowModal(); }break;
-  case ID_D2: { mmgDialog dlg("foo",mafRESIZABLE|mafCLOSE );              dlg.ShowModal(); }break;
-  case ID_D3: { mmgDialog dlg("foo",mafCLOSEWINDOW);                      dlg.ShowModal(); }break;
-  case ID_D4: { mmgDialog dlg("foo",mafRESIZABLE|mafCLOSEWINDOW);         dlg.ShowModal(); }break;
+  case ID_D1: { mmgDialog dlg("foo",mafRESIZABLE|mafCLOSEWINDOW);         dlg.ShowModal(); }break;
+  case ID_D2: { mmgDialog dlg("foo",mafCLOSEWINDOW);                      dlg.ShowModal(); }break;
+  case ID_D3: { mmgDialog dlg("foo",mafRESIZABLE|mafCLOSEWINDOW);         dlg.ShowModal(); }break;
+  case ID_D4: { mmgDialog dlg("foo",mafRESIZABLE|mafCLOSE);               dlg.ShowModal(); }break;
   case ID_D5: { mmgDialog dlg("foo",mafRESIZABLE|mafOK);                  dlg.ShowModal(); }break;
   case ID_D6: { mmgDialog dlg("foo",mafRESIZABLE|mafOK|mafCANCEL);        dlg.ShowModal(); }break;
   case ID_D7: { mmgDialog dlg("foo",mafRESIZABLE|mafCLOSE);               dlg.ShowModal(); }break;
@@ -131,19 +129,22 @@ void testDialogLogic::OnEvent(mafEvent& e)
       gui->Label("this change a variable in logic");
       gui->Slider(ID_SLIDER,"",&m_test_variable,0,10); 
 
-      // to have the Dialog resized correctly you must use a code like follows
-      // place the gui on the dialog by calling Reparent and then Add
+      // place the GUI on the Dialog calling Add.
+      // note that the initial (and minimum if sizable) size of the Dialog are correct //SIL. 14-4-2005: :-) finally
       mmgDialog dlg("pippo",mafCLOSEWINDOW);
-      gui->Reparent(&dlg);
       gui->SetListener(&dlg);  
       dlg.Add(gui,1,wxEXPAND);
       dlg.ShowModal();
+
+      // also note that you dont need to destroy the GUI.
+      // The Dialog take possess of it and destroy it with itself
     } 
     break;
   case ID_D9: 
     { 
       //example2:
-      // placing a mmgGui on a Sizable Dialog 
+      // placing a mmgGui on a Sizable Dialog: 
+      // Since Gui don't stretch (if you want this feature, shout a lot to the management)
       // this is a poor solution unless you have something else that stretch on the Dialog
       mmgGui *gui = new mmgGui(NULL);
       gui->Label("placing a mmgGui alone");
@@ -153,7 +154,6 @@ void testDialogLogic::OnEvent(mafEvent& e)
       gui->Slider(ID_SLIDER,"",&m_test_variable,0,10); 
 
       mmgDialog dlg("pippo");
-      gui->Reparent(&dlg);
       dlg.Add(gui,1,wxEXPAND);
       dlg.ShowModal();
     }
@@ -161,7 +161,7 @@ void testDialogLogic::OnEvent(mafEvent& e)
   case ID_10: 
     { 
       //example3:
-      // Mixing a gui with other resizable Elements
+      // Mixing a gui togheter with other resizable Elements
       mmgDialog dlg("pippo");
       
       wxPanel *p = new wxPanel(&dlg,-1,wxDefaultPosition,wxSize(200,200),wxSUNKEN_BORDER);
@@ -176,8 +176,11 @@ void testDialogLogic::OnEvent(mafEvent& e)
       gui->Slider(ID_SLIDER,"",&m_test_variable,0,10); 
       gui->Slider(ID_SLIDER,"",&m_test_variable,0,10); 
       gui->Slider(ID_SLIDER,"",&m_test_variable,0,10); 
-      gui->Reparent(&dlg);
       gui->SetListener(&dlg);
+      // Reparent the GUI under the Dialog is normally a side effect of dlg.Add;
+      // Since here we not Add the GUI, but a Sizer containing the Gui,
+      // the Gui must be reparented explicitly.
+      gui->Reparent(&dlg);
 
       wxSizer *sz = new wxBoxSizer(wxHORIZONTAL);
       sz->Add(p,1,wxEXPAND);
@@ -195,7 +198,6 @@ void testDialogLogic::OnEvent(mafEvent& e)
       gui->Button(ID_TEST,"test");
 
       mmgDialog dlg("pippo");
-      gui->Reparent(&dlg);
       gui->SetListener(&dlg); // event from Gui goes to the Dialog
       dlg.SetListener(this);  // event from the Dialog come here
       dlg.Add(gui,1,wxEXPAND);
