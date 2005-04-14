@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataInterpolator.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:21:57 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-14 18:15:33 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,11 +25,7 @@ class mafVMEItem;
   against the ones stored in the array associated to the VME itself (only for VMEs
   with data array like mafVMEGeneric). The class also provides the mechanism to 
   obtain the 3D bounds for any time.
-
   @sa mflDataPipe mafVMEGeneric
-  
-  @todo
- 
 */
 class MAF_EXPORT mafDataInterpolator:public mafDataPipe
 {
@@ -72,8 +68,16 @@ protected:
   interpolator rules. It should be reimplemented in sub-classes.*/
   virtual void InternalItemUpdate();
 
+  /** Internally used to set the current item memeber variable*/
   void SetCurrentItem(mafVMEItem *data);
+
+  /** Internally used update the current item variable to a new value (only if necessary)*/
   void UpdateCurrentItem(mafVMEItem *item);
+
+  /** Set a flag making the interpolator to release data of unnecessary items */
+  void SetReleaseDataFlag(bool flag);
+  void ReleaseDataFlagOn();
+  void ReleaseDataFlagOff();
 
   mafVMEItem    *m_CurrentItem; ///< the item currently selected for the current time
 
@@ -82,6 +86,8 @@ protected:
   mafTimeStamp  m_OldTimeStamp; ///< previous time
 
   mafMTime      m_UpdateTime;   ///< the modification time of last data update
+
+  bool          m_ReleaseDataFlag; ///< this flag forces the interpolator to release unnecessary data (default == false)
 
 private:
   mafDataInterpolator(const mafDataInterpolator&); // Not implemented
