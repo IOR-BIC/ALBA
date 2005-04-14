@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTreeContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:29 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-14 13:21:52 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,7 +25,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mmgTreeContextualMenu.h" //always include the class being defined as first
+#include "mmgTreeContextualMenu.h" 
 
 #include "wx/utils.h"
 #include <wx/laywin.h>
@@ -37,9 +37,7 @@
 #include "mafView.h"
 //#include "mafSceneNode.h"
 //#include "mafSceneGraph.h"
-//#include "mmgMDIChild.h"
 #include "mmgCheckTree.h"
-#include "mmgTreeContextualMenu.h"
 
 //#include "mmgBitmaps.h"
 #include "mmgLab.h"
@@ -83,10 +81,11 @@ mmgTreeContextualMenu::mmgTreeContextualMenu()
 {
 	m_view        = NULL;
   m_clicked_vme = NULL;
-  m_listener    = NULL;
+  m_Listener    = NULL;
   m_tree        = NULL;
 
   m_autosort = false;
+  m_check_crypto = false;
 }
 //----------------------------------------------------------------------------
 mmgTreeContextualMenu::~mmgTreeContextualMenu()
@@ -97,7 +96,6 @@ mmgTreeContextualMenu::~mmgTreeContextualMenu()
 void mmgTreeContextualMenu::ShowContextualMenu(mmgCheckTree *tree, mafView *view, mafNode *vme, bool vme_menu)
 //----------------------------------------------------------------------------
 {
-	/*
   m_view        = view;
   m_clicked_vme = vme;
   m_tree        = tree;
@@ -109,7 +107,7 @@ void mmgTreeContextualMenu::ShowContextualMenu(mmgCheckTree *tree, mafView *view
 
     if(m_view != NULL)
     {
-      mafSceneGraph *sg = NULL;
+/*      mafSceneGraph *sg = NULL;
 	    sg = m_view->GetSceneGraph(); 
       mafSceneNode *n = sg->Vme2Node(m_clicked_vme);
 
@@ -133,7 +131,7 @@ void mmgTreeContextualMenu::ShowContextualMenu(mmgCheckTree *tree, mafView *view
 		  // enable show/hide same type - must be visualized and not mutex
 		  enable = n->m_pipe_creatable && !n->m_mutex;
 		  this->FindItem(RMENU_SHOW_SAMETYPE)->Enable(enable);
-		  this->FindItem(RMENU_HIDE_SAMETYPE)->Enable(enable);
+		  this->FindItem(RMENU_HIDE_SAMETYPE)->Enable(enable);*/
     }
 
 	  this->Append(RMENU_CRYPT_VME, "Crypt","",true);
@@ -142,7 +140,7 @@ void mmgTreeContextualMenu::ShowContextualMenu(mmgCheckTree *tree, mafView *view
 	  this->AppendSeparator();
     this->Append(RMENU_SORT_TREE,		 "Sort children nodes");
 
-    m_check_crypto = m_clicked_vme->GetCrypting() != 0;
+    //m_check_crypto = m_clicked_vme->GetCrypting() != 0;
     this->FindItem(RMENU_CRYPT_VME)->Check(m_check_crypto);
 		enable = (m_clicked_vme->GetNumberOfChildren() > 0 );
     this->FindItem(RMENU_ENABLE_CRYPT_SUBTREE)->Enable(enable);
@@ -156,7 +154,6 @@ void mmgTreeContextualMenu::ShowContextualMenu(mmgCheckTree *tree, mafView *view
 	::wxGetMousePosition(&x, &y);
   m_tree->ScreenToClient(&x, &y);
 	m_tree->PopupMenu(this, wxPoint(x, y));
-  */
 }
 //----------------------------------------------------------------------------
 void mmgTreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
@@ -165,11 +162,11 @@ void mmgTreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
   /*
 	mafSceneGraph *sg = NULL;
   if(m_view != NULL)
-		sg = m_view->GetSceneGraph();
+		sg = m_view->GetSceneGraph();*/
 	
 	switch(event.GetId())
 	{
-	  case RMENU_SHOW_VME:
+	  /*case RMENU_SHOW_VME:
 		{
       mafSceneNode *n = NULL;
       if(sg)
@@ -191,12 +188,12 @@ void mmgTreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
 		break;
 		case RMENU_HIDE_SAMETYPE:
 			sg->VmeShowByType(m_clicked_vme, false);
-		break;
+		break;*/
     case RMENU_CRYPT_VME:
     {
       m_check_crypto = !m_check_crypto;
-      m_clicked_vme->SetCrypting(m_check_crypto);
-      ((mafVmeData *)m_clicked_vme->GetClientData())->UpdateFromTag();
+      //m_clicked_vme->SetCrypting(m_check_crypto);
+      //((mafVmeData *)m_clicked_vme->GetClientData())->UpdateFromTag();
     }
     break;
     case RMENU_ENABLE_CRYPT_SUBTREE:
@@ -206,13 +203,13 @@ void mmgTreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
       CryptSubTree(false);
     break;
 		case RMENU_SORT_TREE:
-      m_tree->SortTree((long)m_clicked_vme);
+      m_tree->SortChildren((long)m_clicked_vme);
 		break;
 		case RMENU_AUTO_SORT:
  			m_autosort = !m_autosort;
       m_tree->SetAutoSort(m_autosort);
 			if(m_autosort) 
-        m_tree->SortTree();
+        m_tree->SortChildren();
 		break;
 		default:
 			assert(false);
@@ -221,13 +218,12 @@ void mmgTreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
 
   if(m_view != NULL)
 		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
-  */
 }
 //----------------------------------------------------------------------------
 void mmgTreeContextualMenu::CryptSubTree(bool crypt)
 //----------------------------------------------------------------------------
 {
-  /*
+/*
   mafVmeData *vd = NULL;
   mafNodeIterator *iter = m_clicked_vme->NewIterator();
 
