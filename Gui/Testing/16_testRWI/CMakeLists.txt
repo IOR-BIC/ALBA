@@ -1,6 +1,10 @@
 PROJECT (TestRWI)
 
 SET(PROJECT_SRCS 
+testRWIApp.h
+testRWIApp.cpp
+testRWILogic.h
+testRWILogic.cpp
 )
 
 # copia icona e file delle risorse nella Build
@@ -18,6 +22,9 @@ SET(PROJECT_LIBS
   mafBase
   mafCore
   mafVME
+  vtkCommon
+  vtkRendering
+  vtkGraphics
 )
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
 
