@@ -1,2 +1,4 @@
+LINK_LIBRARIES(vtkMAF)
 ADD_EXECUTABLE(vtkMAFTest vtkMAFTest.cxx)
-TARGET_LINK_LIBRARIES(vtkMAFTest vtkMAF)
+#ADD_EXECUTABLE(testDicom testDicom.cxx)
+#ADD_TEST(testDicom ${EXECUTABLE_OUTPUT_PATH}/testDicom)
