@@ -16,16 +16,16 @@ mafMatrixInterpolator.cpp
 mafMatrixInterpolator.h
 mafMatrixVector.cpp
 mafMatrixVector.h
+mafMSFStorage.cpp
+mafMSFStorage.h
 mafVMEFactory.cpp
 mafVMEFactory.h
 mafVMEGenericAbstract.cpp
 mafVMEGenericAbstract.h
-mafVMEImage.cpp
-mafVMEImage.h
+mafVMEGroup.cpp
+mafVMEGroup.h
 mafVMEItem.h
 mafVMEItem.cpp
-mafVMESurface.cpp
-mafVMESurface.h
 )
 
 IF (MAF_USE_CRYPTO)
@@ -40,14 +40,22 @@ IF (MAF_USE_VTK)
   ${PROJECT_SRCS}
   mafVMEGeneric.h
   mafVMEGeneric.cpp
+  mafVMEImage.cpp
+  mafVMEImage.h
   mafVMEItemVTK.cpp
   mafVMEItemVTK.h
   mafVMEOutputVTK.cpp
   mafVMEOutputVTK.h
   mafVMEOutputImage.cpp
   mafVMEOutputImage.h
+  mafVMEOutputPolyline.cpp
+  mafVMEOutputPolyline.h
   mafVMEOutputSurface.cpp
   mafVMEOutputSurface.h
+  mafVMEPolyline.cpp
+  mafVMEPolyline.h
+  mafVMESurface.cpp
+  mafVMESurface.h
   mafVTKInterpolator.cpp
   mafVTKInterpolator.h
   vtkMAFDataPipe.cpp
