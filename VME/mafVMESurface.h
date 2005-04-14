@@ -2,25 +2,25 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 19:31:17 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-14 18:16:48 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-#ifndef __mafVMEGenericVTK_h
-#define __mafVMEGenericVTK_h
+#ifndef __mafVMESurface_h
+#define __mafVMESurface_h
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
 #include "mafVMEGeneric.h"
+#include "mafVMEOutputSurface.h"
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 class vtkDataSet;
-class vtkImageData;
-class mafVMEOutputImage;
+class vtkPolyData;
 
 /** mafVMESurface - a VME featuring an internal array for matrices and VTK datasets.
   mafVMESurface is a specialized VME inheriting the VME-Generic features to internally
@@ -42,10 +42,10 @@ public:
     from the source.
     Return MAF_OK if succeeded, MAF_ERROR if they kind of data is not accepted by
     this type of VME. */
-    virtual int SetData(vtkImageData *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
+    virtual int SetData(vtkPolyData *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
 
     /** return the right type of output */  
-    mafVMEOutputImage *GetImageOutput() {return (mafVMEOutputImage *)GetOutput();}
+    mafVMEOutputSurface *GetSurfaceOutput() {return (mafVMEOutputSurface *)GetOutput();}
 
     /** return the right type of output */  
     virtual mafVMEOutput *GetOutput();

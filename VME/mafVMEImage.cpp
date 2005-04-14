@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEImage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 19:31:16 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-14 18:16:48 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,7 +26,6 @@
 #include "mafDataVector.h"
 #include "mafVTKInterpolator.h"
 #include "mafVMEItemVTK.h"
-#include "mafVMEOutputImage.h"
 #include "mafAbsMatrixPipe.h"
 #include "vtkDataSet.h"
 #include "vtkImageData.h"

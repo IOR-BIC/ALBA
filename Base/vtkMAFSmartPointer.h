@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMAFSmartPointer.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:29:48 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-14 18:18:12 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -33,7 +33,7 @@ public:
   /**
   Initialize smart pointer with a new reference to the same object
   referenced by given smart pointer.*/
-  vtkMAFAutoPointer(const vtkSmartPointerBase& r): vtkSmartPointerBase(r) {}
+  vtkMAFAutoPointer(const vtkSmartPointerBase& r): vtkSmartPointer<T>(r) {}
   /**
   Allows passing the smart pointer to any function requiring a "T *".*/
   operator T *() const {return (T *)this->Object;}

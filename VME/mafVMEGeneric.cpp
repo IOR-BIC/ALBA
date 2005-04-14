@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGeneric.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 19:34:38 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-14 18:16:47 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -19,14 +19,10 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-
-
 #include "mafVMEGeneric.h"
 #include "mafDataVector.h"
 #include "mafVTKInterpolator.h"
 #include "mafVMEItemVTK.h"
-#include "mafVMEOutputVTK.h"
-#include "mafAbsMatrixPipe.h"
 #include "vtkDataSet.h"
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMEGeneric)
@@ -38,6 +34,7 @@ mafVMEGeneric::mafVMEGeneric()
 {
   m_DataVector = mafDataVector::New();
   m_DataVector->SetItemTypeName(mafVMEItemVTK::GetStaticTypeName());  
+  m_DataVector->SetListener(this);
   SetDataPipe(mafVTKInterpolator::New()); // interpolator data pipe
 
   // The output is created on demand in GetOutput() to avoid
@@ -75,6 +72,7 @@ int mafVMEGeneric::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
   {
   case MAF_VME_COPY_DATA:
   {
+    // update and make a copy of the VTK dataset
     data->Update();
     vtkDataSet *new_data=data->NewInstance();
     new_data->DeepCopy(data);
@@ -82,9 +80,11 @@ int mafVMEGeneric::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
   }
   break;
   case MAF_VME_REFERENCE_DATA:
+    // simply reference the VTK dataset (keep it attached to the source) 
     item->SetData(data);
   break;
   case MAF_VME_DETACH_DATA:  
+    // reference the dataset and detach it from its source
     item->SetData(data);
     data->SetSource(NULL);
   break;

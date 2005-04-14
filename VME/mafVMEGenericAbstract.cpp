@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 19:35:19 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-14 18:16:48 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -38,7 +38,7 @@ mafCxxTypeMacro(mafVMEGenericAbstract)
 mafVMEGenericAbstract::mafVMEGenericAbstract()
 //-------------------------------------------------------------------------
 {
-	cppNEW(m_MatrixVector);
+	m_MatrixVector = new mafMatrixVector;
   m_DataVector  = NULL;
   SetMatrixPipe(mafMatrixInterpolator::New()); // matrix interpolator pipe  
 }

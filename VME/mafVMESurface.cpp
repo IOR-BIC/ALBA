@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 19:31:17 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-14 18:16:48 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,10 +26,9 @@
 #include "mafDataVector.h"
 #include "mafVTKInterpolator.h"
 #include "mafVMEItemVTK.h"
-#include "mafVMEOutputImage.h"
 #include "mafAbsMatrixPipe.h"
 #include "vtkDataSet.h"
-#include "vtkImageData.h"
+#include "vtkPolyData.h"
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMESurface)
 //-------------------------------------------------------------------------
@@ -56,13 +55,13 @@ mafVMEOutput *mafVMESurface::GetOutput()
   // allocate the right type of output on demand
   if (m_Output==NULL)
   {
-    SetOutput(mafVMEOutputImage::New()); // create the output
+    SetOutput(mafVMEOutputSurface::New()); // create the output
   }
   return m_Output;
 }
 
 //-------------------------------------------------------------------------
-int mafVMESurface::SetData(vtkImageData *data, mafTimeStamp t, int mode)
+int mafVMESurface::SetData(vtkPolyData *data, mafTimeStamp t, int mode)
 //-------------------------------------------------------------------------
 {
   return Superclass::SetData(data,t,mode);
@@ -72,7 +71,7 @@ int mafVMESurface::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
 //-------------------------------------------------------------------------
 {
   assert(data);
-  if (data->IsA("vtkImageData"))
+  if (data->IsA("vtkPolyData"))
   {
     return Superclass::SetData(data,t,mode);
   }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGeneric.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 19:34:38 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-14 18:16:47 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,21 +15,17 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafVMEGenericAbstract.h"
+#include "mafVMEOutputVTK.h"
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 class vtkDataSet;
-class mafVMEOutputVTK;
 
 /** mafVMEGeneric - a VME featuring an internal array for matrices and VTK datasets.
   mafVMEGeneric is a specialized VME inheriting the VME-Generic features to internally
   store data, and specialized for VTK data. This specialization consists in creating
   a specialized data pipe and to redefining some APIs for casting to concrete classes.
-  @sa mafVME mafMatrixVector mafDataVector
-
-  @todo
-  - 
-  */
+  @sa mafVME mafMatrixVector mafDataVector  */
 class MAF_EXPORT mafVMEGeneric : public mafVMEGenericAbstract
 {
 public:
@@ -59,8 +55,7 @@ public:
   mafVMEOutputVTK *GetVTKOutput() {return (mafVMEOutputVTK *)GetOutput();}
 
   /** 
-    Return the output. This create the output object on
-    demand to avoid subclasses to destroy the output. */  
+    Return the output. This create the output object on demand. */  
   virtual mafVMEOutput *GetOutput();
   
 protected:

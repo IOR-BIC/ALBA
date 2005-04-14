@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEImage.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 19:31:16 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-14 18:16:48 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,12 +15,12 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafVMEGeneric.h"
+#include "mafVMEOutputImage.h"
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 class vtkDataSet;
 class vtkImageData;
-class mafVMEOutputImage;
 
 /** mafVMEImage - a VME featuring an internal array for matrices and VTK datasets.
   mafVMEImage is a specialized VME inheriting the VME-Generic features to internally
