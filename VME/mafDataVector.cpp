@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:21:57 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-14 18:15:52 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -124,7 +124,7 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
   mafEventIO e(this,NODE_GET_ROOT);
   InvokeEvent(e);
 
-  mafVMERoot *root=(mafVMERoot *)e.GetData();
+  mafVMERoot *root=mafVMERoot::SafeDownCast(e.GetRoot());
   assert(root);
 
   if (GetVectorID()<0)
