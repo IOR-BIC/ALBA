@@ -14,6 +14,8 @@ SET(PROJECT_SRCS
 #mafSceneGraph.h
 #mafSceneNode.cpp
 #mafSceneNode.h
+#mafTimeVector.h
+#mafTimeVector.txx
 #mafVmeData.cpp
 #mafVmeData.h
 mafAbsMatrixPipe.cpp
@@ -72,8 +74,6 @@ mafTagArray.h
 mafTagItem.cpp
 mafTagItem.h
 mafTimeMap.h
-mafTimeVector.h
-mafTimeVector.txx
 mafVME.cpp
 mafVME.h
 mafVMEOutput.cpp
@@ -90,6 +90,7 @@ mafViewVTK.cpp
 mafViewVTK.h
 mmuTimeSet.cpp
 mmuTimeSet.h
+
 )
 
 IF (MAF_USE_VTK)
@@ -123,5 +124,9 @@ ENDIF (MAF_USE_CRYPTO)
 
 # build tests
 IF(BUILD_TESTING)
-  SUBDIRS(Testing)
+  OPTION(BUILD_CORE_TESTING "Enable building of testing for CORE classes" ON)
+  IF (BUILD_CORE_TESTING)
+    SUBDIRS(Testing)
+  ENDIF (BUILD_CORE_TESTING)
+  MARK_AS_ADVANCED(BUILD_CORE_TESTING)
 ENDIF(BUILD_TESTING)
