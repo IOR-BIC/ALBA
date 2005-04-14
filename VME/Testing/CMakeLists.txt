@@ -17,8 +17,8 @@ ADD_TEST(testVMEGenericBounds ${EXECUTABLE_OUTPUT_PATH}/testVMEGenericBounds)
 
 # VTK specific classes
 IF (MAF_USE_VTK)
-  #ADD_EXECUTABLE(testMSF testMSF.cpp)
-  #ADD_TEST(testMSF ${EXECUTABLE_OUTPUT_PATH}/testMSF)
+  ADD_EXECUTABLE(testMSF testMSF.cpp)
+  ADD_TEST(testMSF ${EXECUTABLE_OUTPUT_PATH}/testMSF)
   ADD_EXECUTABLE(testVMEGeneric testVMEGeneric.cpp)
   ADD_TEST(testVMEGeneric ${EXECUTABLE_OUTPUT_PATH}/testVMEGeneric)
 ENDIF (MAF_USE_VTK)  
