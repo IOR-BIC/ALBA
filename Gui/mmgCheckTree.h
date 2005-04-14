@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-13 13:08:08 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-14 13:22:32 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -71,9 +71,6 @@ protected:
   /** Return the status of the node according to the vme visibility. */
   int GetVmeStatus(mafNode *vme);
 
-  /** Enable/disable crypto for a subtree. */
-  void CryptSubTree(bool crypt);
-
   /** retrieve the icon-index for a vme given the classname */
   int ClassNameToIcon(wxString classname);
 
@@ -96,9 +93,6 @@ public:
 
   /** Called by the Custom-Tree-Event-Handler */
   void ShowContextualMenu(wxMouseEvent& event);
-
-  /** Respond to the Contextual Menu */
-  void OnContextualMenu(wxCommandEvent& event);
 
   /** respond to Selection Changed */
   virtual void OnSelectionChanged(wxTreeEvent& event);
