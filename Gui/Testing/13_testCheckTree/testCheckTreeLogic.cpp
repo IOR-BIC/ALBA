@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testCheckTreeLogic.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:00:08 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-14 15:17:31 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -32,7 +32,7 @@
 #include "mafSideBar.h"
 #include "mafView.h"
 #include "mafNode.h"
-
+#include "mmgTreeContextualMenu.h"
 #include "mmgCheckTree.h"
 
 
@@ -105,20 +105,33 @@ void testCheckTreeLogic::OnEvent(mafEvent& e)
 {
   switch(e.GetId())
   {
-  case MENU_FILE_QUIT:
+    case MENU_FILE_QUIT:
 			OnQuit();		
-  break; 
-  case MENU_VIEW_LOGBAR:
+    break; 
+    case MENU_VIEW_LOGBAR:
       if(m_log_bar) m_log_bar->Show(!m_log_bar->IsShown());
-  break; 
-  case MENU_VIEW_SIDEBAR:
-    if(m_side_bar) m_side_bar->Show(!m_side_bar->IsShown());
-  break; 
-  case UPDATE_UI:
-  break; 
-  default:
-    e.Log();
-  break; 
+    break; 
+    case MENU_VIEW_SIDEBAR:
+      if(m_side_bar) m_side_bar->Show(!m_side_bar->IsShown());
+    break; 
+    case SHOW_CONTEXTUAL_MENU:
+    {
+      mmgTreeContextualMenu *contextMenu = new mmgTreeContextualMenu();
+      contextMenu->SetListener(this);
+      //mafView *v = m_ViewManager->GetSelectedView();
+      mafNode *vme = e.GetVme();
+      bool vme_menu = e.GetBool();
+      bool autosort = e.GetArg() != 0;
+      contextMenu->ShowContextualMenu((mmgCheckTree *)e.GetSender(),NULL,vme,vme_menu);
+      delete contextMenu;
+      contextMenu = NULL;
+    }
+    break;
+    case UPDATE_UI:
+    break; 
+    default:
+      e.Log();
+    break; 
   }
 }
 //----------------------------------------------------------------------------
@@ -186,18 +199,11 @@ void testCheckTreeLogic::CreateSideBar()
   m_side_bar = NULL;
   m_side_bar = new mmgSashPanel(m_win, MENU_VIEW_SIDEBAR, wxRIGHT,330,"Side Bar \tCtrl+S");
 
-  mmgCheckTree *tree = new mmgCheckTree(m_side_bar,-1,true);
-  tree->SetListener(this);
-  tree->SetTitle("mmgCheckTree");
-  m_side_bar->Put(tree);
+  m_tree = new mmgCheckTree(m_side_bar,-1,true);
+  m_tree->SetListener(this);
+  m_tree->SetTitle("mmgCheckTree");
+  m_side_bar->Put(m_tree);
 
-  tree->VmeAdd(m_nodea);
-  tree->VmeAdd(m_nodeb);
+  m_tree->VmeAdd(m_nodea);
+  m_tree->VmeAdd(m_nodeb);
 }
-
-
-
-
-
-
-
