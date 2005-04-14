@@ -8,6 +8,7 @@ DBG_MESSAGE("Configuring project mafCore")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
+#sorted_vector.h
 mafBase.h
 mafDecl.cpp
 mafDecl.h
@@ -40,8 +41,8 @@ mafReferenceCounted.h
 mafSmartPointer.h
 mafString.cpp
 mafString.h
-mafTimeStamped.h
 mafTimeStamped.cpp
+mafTimeStamped.h
 mafTransform.cpp
 mafTransform.h
 mafTransformBase.cpp
@@ -53,9 +54,9 @@ mafVersion.h
 mmuIdFactory.cpp
 mmuIdFactory.h
 mmuUtility.h
-sorted_vector.h
 vtkMAFSmartPointer.h
 vtkMAFToLinearTransform.h
+
 )
 
 IF (MAF_USE_VTK)
@@ -89,5 +90,9 @@ ENDIF (MAF_USE_WX)
 
 # build tests
 IF(BUILD_TESTING)
-  SUBDIRS(Testing)
+  OPTION(BUILD_BASE_TESTING "Enable building of testing for BASE classes" ON)
+  IF (BUILD_BASE_TESTING)
+    SUBDIRS(Testing)
+  ENDIF (BUILD_BASE_TESTING)
+  MARK_AS_ADVANCED(BUILD_BASE_TESTING)
 ENDIF(BUILD_TESTING)
