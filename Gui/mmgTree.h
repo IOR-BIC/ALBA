@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTree.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:02:35 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-14 13:21:06 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -135,6 +135,9 @@ public:
 
   /** if autosort is on - the tree is always kept sorted */
   void SetAutoSort(bool enable) {m_autosort=enable;};
+
+  /** Get the autosort flag. */
+  bool GetAutoSort() {return m_autosort;};
 
   /** collapse the children of node_id */
   void CollapseNode(long node_id);
