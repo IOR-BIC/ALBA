@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 13:22:32 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-14 15:15:13 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -122,7 +122,7 @@ void mmgCheckTree::ShowContextualMenu(wxMouseEvent& event)
   e.SetBool(vmeMenu);
   e.SetArg(m_autosort);
   if(vmeMenu)
-    e.SetVme((mflVME*) (NodeFromItem(i)));
+    e.SetVme((mafNode *) (NodeFromItem(i)));
   mafEventMacro(e);
 }
 //----------------------------------------------------------------------------
