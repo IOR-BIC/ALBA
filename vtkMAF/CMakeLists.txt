@@ -8,16 +8,18 @@ PROJECT(vtkMAF)
 # Set your list of sources here.  Do not change the name of the
 # vtkMAF_SRCS variable.
 SET(vtkMAF_SRCS
-  vtkDistanceFilter.cxx
-  vtkDistanceFilter.h
-  vtkMAFExample.cxx
-  vtkMAFExample.h
-  vtkProjectSP.cxx
-  vtkProjectSP.h
-  vtkRGSliceAccumulate.cxx
-  vtkRGSliceAccumulate.h
-  vtkVolumeSlicer.cxx
-  vtkVolumeSlicer.h
+#vtkDicomUnPacker.cxx
+#vtkDicomUnPacker.h
+vtkDistanceFilter.cxx
+vtkDistanceFilter.h
+vtkMAFExample.cxx
+vtkMAFExample.h
+vtkProjectSP.cxx
+vtkProjectSP.h
+vtkRGSliceAccumulate.cxx
+vtkRGSliceAccumulate.h
+vtkVolumeSlicer.cxx
+vtkVolumeSlicer.h
 )
 
 # List the kits from VTK that are needed by this project.
@@ -155,6 +157,11 @@ IF(VTK_FOUND)
       INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
       ENABLE_TESTING()
     ENDIF (NOT MAKECOMMAND)
-    SUBDIRS(Testing)
+    
+    OPTION(BUILD_vtkMAF_TESTING "Enable building of testing for vtkMAF classes" ON)
+    IF (BUILD_vtkMAF_TESTING)
+      SUBDIRS(Testing)
+    ENDIF (BUILD_vtkMAF_TESTING)
+    MARK_AS_ADVANCED(BUILD_vtkMAF_TESTING)
   ENDIF (BUILD_TESTING)
 ENDIF(VTK_FOUND)
