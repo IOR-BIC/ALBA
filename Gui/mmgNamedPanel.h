@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgNamedPanel.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:25 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-14 13:44:57 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,7 +35,7 @@ public:
   mmgNamedPanel (wxWindow* parent,wxWindowID id = -1,bool CloseButton = false,bool HideTitle = false); 
   virtual ~mmgNamedPanel();
   
-	/** Add a widget to the panel. */
+  /** Add a widget to the panel. */
   void Add(wxWindow* window,int option = 0, int flag = wxEXPAND, int border = 0)  {window->Reparent(this); m_sizer->Add(window,option,flag,border);};
   
 	/** Add a sizer to the panel. */

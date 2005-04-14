@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-13 13:07:54 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-14 13:44:56 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,7 +39,8 @@ Normally there is no need to destroy any object
 derived from wxWindow, they will be automatically 
 destroyed as a result of closing the MainFrame.
 mafRWIBase behave differently, and you 
-must explicitly destroy them by calling "Delete()". 
+must explicitly destroy them by calling "Delete()"
+BEFORE wxWindow destroy it (using "delete"). 
 */
 class mafRWIBase : public wxScrolledWindow, virtual public vtkRenderWindowInteractor
 {
