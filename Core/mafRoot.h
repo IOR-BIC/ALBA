@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRoot.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 12:59:56 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-14 18:08:59 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 #include "mafDefines.h"
 #include "mafEventSender.h"
-
+#include "mafVMEOutputNULL.h"
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------
