@@ -57,6 +57,6 @@
 //--------------------------------------------------------------------------
 // Data root used to reach data for testing
 //--------------------------------------------------------------------------
-#cmakedefine MAF_DATA_ROOT
+#define MAF_DATA_ROOT "@MAF_DATA_ROOT@"
 
 #endif // __mafConfigure_h

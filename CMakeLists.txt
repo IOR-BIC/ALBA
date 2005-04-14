@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2005-04-05 15:09:44 $
-# Version:   $Revision: 1.18 $
+# Date:      $Date: 2005-04-14 18:14:50 $
+# Version:   $Revision: 1.19 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -138,7 +138,7 @@ IF (MAF_CAN_BUILD)
   # Testing stuff
   #-----------------------------------------------------------------------------
   IF(BUILD_TESTING)
-    FIND_PATH(MAF_DATA_ROOT "DataRoot.txt" "${MAF_SOURCE_DIR}/../mmData" "${MAF_SOURCE_DIR}/../../mmData" DOC "Test data repository")
+    FIND_PATH(MAF_DATA_ROOT "TestingDataRoot.txt" "${MAF_SOURCE_DIR}/../TestingData" "${MAF_SOURCE_DIR}/../mmData/TestingData" "${MAF_SOURCE_DIR}/../../TestingData" DOC "Test data repository")
     INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
     ENABLE_TESTING()
   
@@ -170,10 +170,12 @@ MARK_AS_ADVANCED(
 # Write the list of variables and their values that are defined by CMake 
 # when running this CMakeList file
 #-----------------------------------------------------------------------------
-GET_CMAKE_PROPERTY(VARS VARIABLES)
-FOREACH(var ${VARS})
-	FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/AllVariables.txt 
-							"${var} \"${${var}}\"\n")
-ENDFOREACH(var ${VARS})
+IF (DEBUG_MESSAGES)
+  GET_CMAKE_PROPERTY(VARS VARIABLES)
+  FOREACH(var ${VARS})
+  	FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/AllVariables.txt 
+  							"${var} \"${${var}}\"\n")
+  ENDFOREACH(var ${VARS})
+ENDIF (DEBUG_MESSAGES)
 
 
