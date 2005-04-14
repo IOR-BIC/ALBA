@@ -18,6 +18,9 @@ SUBDIRS(11_testTree)
 SUBDIRS(12_Bmp2Xpm)
 SUBDIRS(13_testCheckTree)
 SUBDIRS(14_testOpMan)
+SUBDIRS(15_testDialog)
+SUBDIRS(16_testRWI)
+SUBDIRS(17_testWXVTK)
 
 # wxWidgets specific classes
 IF (MAF_USE_WX)
