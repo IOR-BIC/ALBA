@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventIO.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:15 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-14 18:10:10 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,6 +22,8 @@
 
 
 #include "mafEventIO.h"
+#include "mafNode.h"
+#include "mafRoot.h"
 
 //------------------------------------------------------------------------------
 mafCxxTypeMacro(mafEventIO)
@@ -34,6 +36,7 @@ mafEventIO::mafEventIO(void *sender, mafID id, mafID item_id, void *data, mafID 
 {
   m_ItemId = item_id;
   m_Storage = NULL;
+  m_Root    = NULL;
 }
 
 //------------------------------------------------------------------------------
@@ -73,4 +76,25 @@ mafStorage *mafEventIO::GetStorage()
 //------------------------------------------------------------------------------
 {
   return m_Storage;
+}
+
+//------------------------------------------------------------------------------
+void mafEventIO::SetRoot(mafNode *root)
+//------------------------------------------------------------------------------
+{
+  try 
+  { 
+    m_Root=dynamic_cast<mafRoot *>(root); // test if it's a root
+  } 
+  catch (std::bad_cast) 
+  { 
+    m_Root = NULL;
+  }
+  
+}
+//------------------------------------------------------------------------------
+mafNode *mafEventIO::GetRoot()
+//------------------------------------------------------------------------------
+{
+  return (mafNode *)m_Root;  
 }

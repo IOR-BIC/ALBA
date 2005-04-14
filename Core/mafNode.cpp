@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 13:06:13 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2005-04-14 18:09:48 $
+  Version:   $Revision: 1.22 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,7 +24,7 @@
 #include "mafNode.h"
 #include "mafNodeIterator.h"
 #include "mafRoot.h"
-#include "mafEventBase.h"
+#include "mafEventIO.h"
 #include "mafEventSource.h"
 #include "mafDecl.h"
 #include "mafIndent.h"
@@ -46,7 +46,7 @@ mafNode::mafNode()
   m_VisibleToTraverse   = true;
   m_Id                  = -1; // invalid ID
   m_GUI                 = NULL;
-  cppNEW(m_EventSource);
+  m_EventSource         = new mafEventSource;
   m_EventSource->SetChannel(MCH_NODE);
 }
 
@@ -884,8 +884,11 @@ void mafNode::OnEvent(mafEventBase *e)
     switch (e->GetId())
     {
     case NODE_GET_ROOT:
-      e->SetData(GetRoot());
-      break;
+    {
+      mafEventIO *event=mafEventIO::SafeDownCast(e);
+      event->SetRoot(GetRoot());
+    }
+    break;
     default:
       ForwardUpEvent(e);
     };

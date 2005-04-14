@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventIO.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:15 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-14 18:10:11 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -19,7 +19,8 @@
 // Forward declarations
 //------------------------------------------------------------------------------
 class mafStorage;
-
+class mafNode;
+class mafRoot;
 //------------------------------------------------------------------------------
 // mafEventIO
 //------------------------------------------------------------------------------
@@ -50,9 +51,13 @@ public:
   void SetStorage(mafStorage *storage);
   mafStorage *GetStorage();
 
+  void SetRoot(mafNode *root);
+  mafNode *GetRoot();
+
 protected:
   mafID           m_ItemId;
-  mafStorage      *m_Storage;
+  mafStorage*     m_Storage;
+  mafRoot*        m_Root;
 };
 
 #endif /* __mafEventIO_h */

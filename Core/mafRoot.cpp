@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRoot.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 12:59:56 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-14 18:09:30 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -86,7 +86,16 @@ void mafRoot::OnRootEvent(mafEventBase *e)
 mafStorage *mafRoot::GetStorage()
 //-------------------------------------------------------------------------
 {
-  return (typeid(m_Listener)==typeid(mafStorage *))?(mafStorage *)m_Listener:NULL;
+  //return (typeid(m_Listener)==typeid(mafStorage *))?(mafStorage *)m_Listener:NULL;
+
+  try 
+  { 
+    return dynamic_cast<mafStorage *>(m_Listener);
+  } 
+  catch (std::bad_cast) 
+  { 
+    return NULL;
+  }
 }
 
 //-------------------------------------------------------------------------
