@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 09:48:07 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-04-14 18:07:33 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -79,8 +79,6 @@ void mafMessage(const char *format, ...);
 
 /** Delete a MAF object */
 #define mafDEL(a) if (a) { a->Delete(); a = NULL;}
-
-#define cppNEW(a) a=a->New()
 
 /** delete a new() allocated object */
 #define cppDEL(a) if (a) { delete a; a = NULL;}
