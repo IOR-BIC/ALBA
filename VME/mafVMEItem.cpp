@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:21:58 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-16 12:08:47 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -24,9 +24,12 @@
 #include "mafTagArray.h"
 #include "mafIndent.h"
 #include "mafStorageElement.h"
+#include "mmuIdFactory.h"
 #include <assert.h>
 
 bool mafVMEItem::m_GlobalCompareDataFlag=0;
+
+MAF_ID_IMP(mafVMEItem::VME_ITEM_DATA_MODIFIED);
 
 //-------------------------------------------------------------------------
 mafCxxAbstractTypeMacro(mafVMEItem);
@@ -36,7 +39,7 @@ mafCxxAbstractTypeMacro(mafVMEItem);
 mafVMEItem::mafVMEItem()
 //-------------------------------------------------------------------------
 {
-  m_ModifiedData  = false;
+  m_DataModified  = false;
   //m_VME=NULL;
   mafNEW(m_TagArray);
   
@@ -70,6 +73,15 @@ void mafVMEItem::SetCrypting(bool flag)
 {
   m_Crypting = flag;
   Modified();
+}
+
+//-------------------------------------------------------------------------
+void mafVMEItem::SetDataModified(bool flag)
+//-------------------------------------------------------------------------
+{
+  m_DataModified=flag;
+  Modified();
+  InvokeEvent(VME_ITEM_DATA_MODIFIED);
 }
 
 //-------------------------------------------------------------------------
@@ -120,7 +132,7 @@ void mafVMEItem::DeepCopy(mafVMEItem *a)
 
   Modified();
   //m_UpdateTime.Modified();
-  SetModifiedData(true);
+  SetDataModified(true);
 }
 
 //-------------------------------------------------------------------------
@@ -139,7 +151,7 @@ void mafVMEItem::ShallowCopy(mafVMEItem *a)
   // subclass should copy also data pointer
 
   Modified();
-  SetModifiedData(true);
+  SetDataModified(true);
 }
 
 //-------------------------------------------------------------------------
@@ -210,24 +222,16 @@ int mafVMEItem::InternalRestore(mafStorageElement *node)
 //-------------------------------------------------------------------------
 {
   mafString crypting;
-  mafObject *obj;
+  mafNEW(m_TagArray);
   if (node->RestoreText("URL",m_URL)==MAF_OK \
     &&node->RestoreInteger("Id",m_Id)==MAF_OK \
     &&node->RestoreText("DataType",m_DataType)==MAF_OK \
     &&node->RestoreDouble("TimeStamp",m_TimeStamp)==MAF_OK \
     &&node->RestoreText("Crypting",crypting)==MAF_OK \
     &&node->RestoreVectorN("Bounds",m_Bounds.m_Bounds,6)==MAF_OK \
-    &&node->RestoreObject("TagArray",obj)==MAF_OK)
+    &&node->RestoreObject("TagArray",m_TagArray)==MAF_OK)
   {
     m_Crypting = (crypting=="true"||crypting=="True"||crypting=="TRUE")?true:false;
-    mafTagArray *tarray=mafTagArray::SafeDownCast(obj);
-
-    assert(tarray);
-    mafDEL(m_TagArray);
-    m_TagArray=mafTagArray::SafeDownCast(tarray);
-
-    assert(m_TagArray);
-    m_TagArray->Register(this);
 
     // DATA is restored only on demand
 

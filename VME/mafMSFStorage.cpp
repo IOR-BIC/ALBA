@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 18:16:05 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-16 12:08:36 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,6 +14,30 @@
 
 #include "mafMSFStorage.h"
 #include "mafVMERoot.h"
+#include "mmuUtility.h"
+#include "mafStorable.h"
+#include "mafStorageElement.h"
+
+//------------------------------------------------------------------------------
+// mmuMSFDocument
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+int mmuMSFDocument::InternalStore(mafStorageElement *node)
+//------------------------------------------------------------------------------
+{
+  // here should write elements specific for the document
+  mafStorageElement *root_elem=node->StoreObject("Root",m_Root);
+  return root_elem?MAF_OK:MAF_ERROR;
+}
+
+//------------------------------------------------------------------------------
+int mmuMSFDocument::InternalRestore(mafStorageElement *node)
+//-------------------------------------------------------
+{
+  // here should restore elements specific for the document
+  return node->RestoreObject("Root",m_Root);
+}
 
 //------------------------------------------------------------------------------
 // mafMSFStorage
@@ -29,33 +53,25 @@ mafMSFStorage::mafMSFStorage()
 {
   SetVersion("2.0");
   SetFileType("MSF");
-  mafNEW(m_VMERoot);
-  SetRoot(m_VMERoot);
-  m_VMERoot->SetName("Root");
-  m_VMERoot->SetListener(this);
+  mafNEW(m_Root); // create a root node
+  m_Root->SetName("Root");
+  m_Root->SetListener(this);
+  SetDocument(new mmuMSFDocument(m_Root)); // create a MSF doc and set the root node
 }
 
 //------------------------------------------------------------------------------
 mafMSFStorage::~mafMSFStorage()
 //------------------------------------------------------------------------------
 {
-  mafDEL(m_VMERoot);
-}
-
-
-//------------------------------------------------------------------------------
-void mafMSFStorage::SetRoot(mafStorable *root)
-//------------------------------------------------------------------------------
-{
-  Superclass::SetRoot(root);
+  cppDEL(m_Document); // delete the document object
+  mafDEL(m_Root);
 }
 
 //------------------------------------------------------------------------------
 mafVMERoot *mafMSFStorage::GetRoot()
 //------------------------------------------------------------------------------
 {
-  assert(m_VMERoot==m_Root);
-  return m_VMERoot;
+  return m_Root;
 }
 
 //------------------------------------------------------------------------------

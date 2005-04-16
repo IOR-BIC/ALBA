@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 19:31:59 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-16 12:08:48 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -51,7 +51,9 @@ class vtkDataSet;
 */
 class MAF_EXPORT mafVMEItem : public mafReferenceCounted, public mafStorable, public mafEventSender, public mafTimeStamped
 {
-public:  
+public:
+  MAF_ID_DEC(VME_ITEM_DATA_MODIFIED) ///< event rised by mafVMEItem to advice DataVector a dataset has been modified
+
   mafAbstractTypeMacro(mafVMEItem,mafReferenceCounted);
 
   enum {MAF_NO_IO=MAF_USER_RETURN_VALUE+1};
@@ -82,7 +84,7 @@ public:
   /**
     return true if the data stored in this object has been
     externally modified (i.e with SetData()).*/
-  bool IsDataModified() {return m_ModifiedData;};
+  bool IsDataModified() {return m_DataModified;};
 
   /** return the URL where this data is stored */
   const char *GetURL() {return m_URL;};
@@ -236,8 +238,8 @@ protected:
   /**
     Internally used to specify if data stored in this object has been
     modified with respect to saved data.*/
-  void SetModifiedData(bool flag) {m_ModifiedData=flag;Modified();}
-  bool GetModifiedData() ;
+  void SetDataModified(bool flag);
+  bool GetDataModified() {return m_DataModified;}
 
   /**
   Set the VME to which this item owns. At present the VME object is
@@ -246,7 +248,7 @@ protected:
   //void SetVME(mafVME *vme) {m_VME=vme;}
 
   mafTagArray * m_TagArray;             ///< meta data attributes attached to this dataset      
-  bool          m_ModifiedData;         ///< true when data has been mofied from last storing
+  bool          m_DataModified;         ///< true when data has been mofied from last storing
   static bool   m_GlobalCompareDataFlag;///< if true Equals will also compare internal data
 
   int           m_Id;         ///< the id assigned to the dataset/file to be stored in the MSF

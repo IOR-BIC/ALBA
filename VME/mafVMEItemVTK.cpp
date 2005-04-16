@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 19:31:39 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-16 12:08:48 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -201,7 +201,7 @@ void mafVMEItemVTK::SetData(vtkDataSet *data)
 
     Modified();
 
-    SetModifiedData(true);
+    SetDataModified(true);
   }
 }
 
@@ -222,13 +222,13 @@ void mafVMEItemVTK::UpdateData()
   // At present... if data is already present, simply return
   // otherwise make it be read from disk. Notice that when read
   // from this SetData() is called: Bounds are updated but we need 
-  // to reset the ModifiedData flag.
+  // to reset the DataModified flag.
   if (m_Data.GetPointer()==NULL)
   {
     if (InternalRestoreData()==MAF_OK)
     {
       // Data has been generated internally
-      //SetModifiedData(false);
+      //SetDataModified(false);
     }
   }
 }
@@ -533,7 +533,7 @@ int mafVMEItemVTK::InternalStoreData()
     }
 
     // reset modified data flag
-    SetModifiedData(false);
+    SetDataModified(false);
 
     if (m_IOStatus!=MAF_OK)
       return MAF_ERROR;

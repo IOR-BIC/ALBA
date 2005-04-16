@@ -254,7 +254,7 @@ int main( int argc, char *argv[] )
       morph=cube;
     }
 
-    vmorph->SetData(morph->GetOutput(),log10(100-i)*50);
+    vmorph->SetData(morph->GetOutput(),log10((double)(100-i))*50);
   }
 
   trans.Identity();
