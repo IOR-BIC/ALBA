@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:18:11 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-04-16 12:09:05 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -262,23 +262,24 @@ int mafXMLStorage::InternalStore()
         // extract root element and wrap it with an mafXMLElement object
         DOMElement *root = m_DOM->m_XMLDoc->getDocumentElement();
         assert(root);
-        m_RootElement = new mafXMLElement(new mmuXMLDOMElement(root),NULL,this);
+        m_DocumentElement = new mafXMLElement(new mmuXMLDOMElement(root),NULL,this);
 
         // attach version attribute to the root node
-        m_RootElement->SetAttribute("Version",m_Version);
+        m_DocumentElement->SetAttribute("Version",m_Version);
       
-        // call Store function of the m_Root object. The root is passed
+        // call Store function of the m_Document object. The root is passed
         // as parent the DOM root element. A tree root is usually a special
         // kind of object and can decide to store itself in the root
         // object itself, or below it as it happens for other nodes.
-        assert(m_Root);
-        m_Root->Store(m_RootElement);
+        assert(m_Document);
+        m_Document->Store(m_DocumentElement);
 
         // write the tree to disk
         m_DOM->m_XMLSerializer->writeNode(m_DOM->m_XMLTarget, *(m_DOM->m_XMLDoc));
 
         // destroy all intermediate objects
-        cppDEL (m_RootElement);  
+        cppDEL (m_DocumentElement);  
+        cppDEL (m_DOM->m_XMLTarget);
         cppDEL (m_DOM->m_XMLDoc);
       }    
     }
@@ -300,8 +301,12 @@ int mafXMLStorage::InternalStore()
     // move to destination URL
     if (StoreToURL(filename,m_URL)!=MAF_OK)
     {
-      mafErrorMessage("Unable to resolve URL for output XML file");
+      mafErrorMessage("Unable to resolve URL for output XML file, a copy of the file can be found in: %s",filename);
       errorCode = 4;
+    }
+    else
+    {
+      ReleaseTmpFile(filename);
     }
     
   }
@@ -322,9 +327,9 @@ int mafXMLStorage::InternalStore()
 int mafXMLStorage::InternalRestore()
 //------------------------------------------------------------------------------
 {
-  assert (m_Root);
+  assert (m_Document);
 
-  if (!m_Root)
+  if (!m_Document)
     return MAF_ERROR;
   
   int errorCode=0;
@@ -381,10 +386,10 @@ int mafXMLStorage::InternalRestore()
           m_DOM->m_XMLDoc = m_DOM->m_XMLParser->getDocument();
           DOMElement *root = m_DOM->m_XMLDoc->getDocumentElement();
           assert(root);
-          m_RootElement = new mafXMLElement(new mmuXMLDOMElement(root),NULL,this);
+          m_DocumentElement = new mafXMLElement(new mmuXMLDOMElement(root),NULL,this);
 
           mafString doc_version;
-          if (m_RootElement->GetAttribute("Version",doc_version))
+          if (m_DocumentElement->GetAttribute("Version",doc_version))
           {
             double doc_version_f=atof(doc_version);
             double my_version_f=atof(m_Version);
@@ -392,7 +397,7 @@ int mafXMLStorage::InternalRestore()
             if (my_version_f<=doc_version_f)
             {
               // Start tree restoring from root node
-              if (m_Root->Restore(m_RootElement)!=MAF_OK)
+              if (m_Document->Restore(m_DocumentElement)!=MAF_OK)
                 errorCode=6;
             }
             else
@@ -404,7 +409,7 @@ int mafXMLStorage::InternalRestore()
           
 
           // destroy the root XML element
-          cppDEL (m_RootElement);
+          cppDEL (m_DocumentElement);
         }
       }
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:18:10 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-04-16 12:09:05 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -185,6 +185,26 @@ int mafStorageElement::RestoreObjectVector(mafStorageElement *subnode,std::vecto
 }
 
 //------------------------------------------------------------------------------
+mafStorageElement *mafStorageElement::StoreObject(const char *name,mafStorable *storable, const char *type_name)
+//------------------------------------------------------------------------------
+{
+  assert(storable);
+  mafStorageElement *element=AppendChild(name);
+  if (element)
+  {
+    element->SetAttribute("Type",type_name);
+
+    if (storable->Store(element)==MAF_OK)
+    {
+      return element;
+    }
+  }
+
+  mafErrorMacro("Failed to store object of type \""<<type_name<<"\"");
+
+  return NULL;
+}
+//------------------------------------------------------------------------------
 mafStorageElement *mafStorageElement::StoreObject(const char *name,mafObject *object)
 //------------------------------------------------------------------------------
 {
@@ -199,18 +219,7 @@ mafStorageElement *mafStorageElement::StoreObject(const char *name,mafObject *ob
     
     if (storable)
     {
-      mafStorageElement *element=AppendChild(name);
-      if (element)
-      {
-        element->SetAttribute("Type",object->GetTypeName());
-      }
-
-      if (storable->Store(element)==MAF_OK)
-      {
-        return element;
-      }
-      
-      mafErrorMacro("Failed to store object of type \""<<object->GetTypeName()<<"\"");
+      return StoreObject(name,storable,object->GetTypeName());
     }
     else
     {
@@ -219,7 +228,7 @@ mafStorageElement *mafStorageElement::StoreObject(const char *name,mafObject *ob
   } 
   catch (std::bad_cast) 
   { 
-    mafErrorMacro("Cannot store object in vector because it's not a storable object");
+    mafErrorMacro("Cannot store the given object because it's not a storable object");
 
   }
   return NULL;
@@ -285,7 +294,7 @@ mafObject *mafStorageElement::RestoreObject(const char *name)
 
 
 //------------------------------------------------------------------------------
-int mafStorageElement::RestoreObject(const char *name,mafObject * &object)
+int mafStorageElement::RestoreObject(const char *name,mafStorable * object)
 //------------------------------------------------------------------------------
 {
   object=NULL;
@@ -294,10 +303,10 @@ int mafStorageElement::RestoreObject(const char *name,mafObject * &object)
 
   if (element)
   {
-    object = element->RestoreObject();
+    return object->Restore(element);
   }
   
-  return (object)?MAF_OK:MAF_ERROR;
+  return MAF_ERROR;
 }
 
 //------------------------------------------------------------------------------

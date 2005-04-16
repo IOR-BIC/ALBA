@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 16:45:03 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-04-16 12:09:05 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -124,7 +124,9 @@ public:
     object is always created by means of New(), this way in case of smart object it can be registered.
     The object to be restored must be both a mafObject (to stay in the object factory) and a mafStorable
     to support Restore() method.*/  
-  int RestoreObject(const char *name,mafObject * &object);
+  int RestoreObject(const char *name,mafStorable * object);
+
+  /** Restore object from given element. @sa RestoreObject(const char *name,mafObject *&) */
   mafObject *RestoreObject(const char *name);
 
   /** Restore object from given element. @sa RestoreObject(const char *name,mafObject *&) */
@@ -175,6 +177,9 @@ public:
 protected:
   /** elements can be created only by means of AppendChild() or FindNestedElement() */
   mafStorageElement(mafStorageElement *parent,mafStorage *storage);
+
+  /** commodity function to store a storable object creating on the fly the element to store it inside. */
+  mafStorageElement *StoreObject(const char *name,mafStorable *storable, const char *type_name);
 
   void SetStorage(mafStorage *storage) {m_Storage = storage;}
   void SetParent(mafStorageElement *element) {m_Parent = element;}
