@@ -2,41 +2,27 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 13:20:29 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-16 10:17:18 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-
-/** Base declarations of the application core */
-
+#ifndef __mafDecl_H__
+#define __mafDecl_H__
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // be careful in changing this file
 // because force most of the MAF to be rebuilt
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-#ifndef __mafDecl_H__
-#define __mafDecl_H__
-
 #include "mafDefines.h"
 #include <string>
 #include <vector>
-// To be removed: no more including WX by default! (Marco)
-/*
-#ifndef WX_PRECOMP
-    #include "wx/wx.h"
-#endif
-*/
-
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class mafVME;
 class wxColour;
 class wxWindow;
-
 //----------------------------------------------------------------------------
 // constant
 //----------------------------------------------------------------------------
@@ -69,8 +55,7 @@ MENU_EDIT_END,
 MENU_VIEW_START,
   MENU_VIEW_LAYOUT,        // call the Load/Save Layout Dialog
   MENU_VIEW_LAYOUT_MSF,    // call the Load/Save Layout_Msf Dialog 
-
-SASH_START,            // ids of mmgSashPanel - must be Menu events too
+SASH_START,                // ids of mmgSashPanel - must be Menu events too
 	MENU_VIEW_TOOLBAR,
 	MENU_VIEW_LOGBAR,
   MENU_VIEW_SIDEBAR,
@@ -99,11 +84,9 @@ MENU_SETTINGS_END,
 MENU_HELP_START,
   ABOUT_APPLICATION,
 MENU_HELP_END,
-
 EVT_START,
   UPDATE_UI,           // update menu and toolbar widgets
 	UPDATE_PROPERTY,     // update vme property widgets
-
   // connect a vtkObject to the ProgressBar
   BIND_TO_PROGRESSBAR, 
   // manually set the ProgressBar status
@@ -111,7 +94,6 @@ EVT_START,
   PROGRESSBAR_HIDE, 
   PROGRESSBAR_SET_VALUE, 
   PROGRESSBAR_SET_TEXT, 
-
   // events about vme
   VME_ADD,       // from a generic mafOp to mafLogic  (to be removed Marco)
   VME_ADDED,     // from mafVmeManager to mafLogic (to be removed Marco)
@@ -268,36 +250,18 @@ PIC_START,
   TIME_NEXT,
   TIME_BEGIN,
   TIME_END,
-
+  /*
   APP_ICON, 
   PIC_NODE_BLUE,   //picture used by the tree
   PIC_NODE_YELLOW,
   PIC_NODE_RED,
   PIC_NODE_GRAY,
-
 	PIC_ZOOM_ALL,    //picture used by the toolbar
 	PIC_ZOOM_SEL,
-
-  PIC_OPACITY_0,   //pictures not currently used
-  PIC_OPACITY_05,
-  PIC_OPACITY_1,
-  MENU_FILE_OPEN_D,  
-  MENU_FILE_SAVE_D,  
-  MENU_EDIT_UNDO_D,  
-  MENU_EDIT_REDO_D,  
-  MENU_EDIT_CUT_D,  
-  MENU_EDIT_COPY_D,  
-  MENU_EDIT_PASTE_D,  
-
-  CAMERA_RESET_D,
-  CAMERA_ZOOM1,
-  CAMERA_ZOOM2,
-  CAMERA_ZOOM3,
-  CAMERA_ZOOM4,
-  PIC_END,
-
-  PIC_USER_START = PIC_START+500 ,// to be used from vertical applications
-	PIC_USER_END = PIC_USER_START +100,// to be used from vertical applications
+  */ 
+PIC_END,
+PIC_USER_START = PIC_START+500 ,// to be used from vertical applications
+PIC_USER_END = PIC_USER_START +100,// to be used from vertical applications
 
 PARSE_STRING,	//Added by Paolo 16-9-2003 execute the operation passed as a string
 APPSTAMP,

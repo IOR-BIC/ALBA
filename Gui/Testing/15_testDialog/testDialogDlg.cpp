@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testDialogDlg.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-13 21:04:15 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-16 10:19:43 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,17 +24,6 @@
 #include "mafDecl.h"
 #include "mmgValidator.h"
 //----------------------------------------------------------------------------
-// Event Table:
-//----------------------------------------------------------------------------
-BEGIN_EVENT_TABLE(testDialogDlg, wxDialog)
-	EVT_CLOSE(testDialogDlg::OnCloseWindow)
-  EVT_BUTTON(wxID_OK, testDialogDlg::OnOK)
-  EVT_BUTTON(wxID_CANCEL, testDialogDlg::OnCancel)
-  EVT_BUTTON(wxOK, testDialogDlg::OnOK)
-  EVT_BUTTON(wxCANCEL, testDialogDlg::OnCancel)
-END_EVENT_TABLE()
-
-//----------------------------------------------------------------------------
 // Event ids
 //----------------------------------------------------------------------------
 enum 
@@ -44,7 +33,7 @@ enum
 };
 //----------------------------------------------------------------------------
 testDialogDlg::testDialogDlg(const wxString& title)
-: mmgDialog(title,mafOK|mafCANCEL|mafCLOSEWINDOW)
+: mmgDialog(title,mafOK|mafCANCEL/*|mafCLOSE*/|mafCLOSEWINDOW)
 //----------------------------------------------------------------------------
 {
    wxButton *b1 = new wxButton(this,ID_ENABLE,"enable ok");
