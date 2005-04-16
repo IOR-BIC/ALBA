@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEFactory.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 16:43:20 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-16 11:23:22 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,6 +15,7 @@
 // includes :
 //----------------------------------------------------------------------------
 #include "mafNodeFactory.h"
+#include "mafVME.h"
 
 /** Object factory for Nodes.
   To make a new VME available in the MAF it must be plugged inside a factory, in particular
