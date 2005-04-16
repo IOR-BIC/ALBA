@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 19:35:19 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-16 11:23:58 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -66,7 +66,7 @@ public:
     In case of error during operation return NULL, otherwise return
     this node pointer: this is to be compatible with nodes that during
     reparenting make copy of the VME (mafVMEGenericAbstractRoot)*/
-  virtual mafVMEGenericAbstract *ReparentTo(mafVMEGenericAbstract *parent);
+  virtual mafVME *ReparentTo(mafVME *parent);
    
   /**  
     Return the matrix vector associated with this VME. Matrix vector is an array of
