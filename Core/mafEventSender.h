@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventSender.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:15 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-16 12:07:42 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -48,7 +48,7 @@ public:
   void InvokeEvent(mafEventBase *e) {if (m_Listener) m_Listener->OnEvent(e);}
 
   /** invoke an event of this subject */
-  void InvokeEvent(mafID id=ID_NO_EVENT, void *data=NULL) {mafEventBase e(this,id,data);InvokeEvent(e);}
+  void InvokeEvent(mafID id=ID_NO_EVENT, void *data=NULL) {if (m_Listener) m_Listener->OnEvent(&mafEventBase(this,id,data));}
 
 protected:
   mafObserver *m_Listener;  ///< object to which events issued by this object are sent
