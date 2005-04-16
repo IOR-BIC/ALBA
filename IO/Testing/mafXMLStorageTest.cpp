@@ -194,7 +194,7 @@ int main()
   mafStorable *storable=mafStorable::SafeCastToObject(&foo);
   MAF_TEST(storable!=NULL);
 
-  storage.SetRoot(storable);
+  storage.SetDocument(storable);
 
   int ret=storage.Store();
   MAF_TEST(ret==MAF_OK);
@@ -207,14 +207,14 @@ int main()
 
   // create a new object to restore into
   mafStorableTestObject new_foo;
-  restore.SetRoot(&new_foo);
+  restore.SetDocument(&new_foo);
   ret=restore.Restore();
 
   MAF_TEST(ret==MAF_OK);
 
   // cast from mafStorable to mafObject
-  mafObject *root=restore.GetRoot()->CastToObject();
-  MAF_TEST(root==&new_foo); // check casting succeded
+  mafObject *doc=restore.GetDocument()->CastToObject();
+  MAF_TEST(doc==&new_foo); // check casting succeded
 
   std::cerr<<"*** Restored object ***\n";  
   new_foo.Print(std::cerr);

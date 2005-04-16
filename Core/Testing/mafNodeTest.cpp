@@ -370,7 +370,7 @@ int main()
   storage.SetFileType("MSF");
   storage.SetVersion("2.0");
   
-  storage.SetRoot(root);
+  storage.SetDocument(root);
   int ret=storage.Store();
   
   MAF_TEST(ret==MAF_OK);
@@ -381,7 +381,7 @@ int main()
   restore.SetVersion("2.0");
   
   mafSmartPointer<mafTestRootNode> new_root;
-  restore.SetRoot(new_root);
+  restore.SetDocument(new_root);
   ret=restore.Restore();
 
   MAF_TEST(ret==MAF_OK);

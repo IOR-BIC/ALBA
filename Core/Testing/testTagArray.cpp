@@ -128,7 +128,7 @@ int main()
   storage.SetURL("testTagArray.xml");
   storage.SetFileType("TagArrayXML");
   
-  storage.SetRoot(&test_tag_array);
+  storage.SetDocument(&test_tag_array);
   int ret=storage.Store();
   
   MAF_TEST(ret==MAF_OK);
@@ -140,7 +140,7 @@ int main()
   
   // create the root to restore the TagArray inside
   mafTagArray new_tag_array;
-  restore.SetRoot(&new_tag_array);
+  restore.SetDocument(&new_tag_array);
   ret=restore.Restore();
 
   MAF_TEST(ret==MAF_OK);
