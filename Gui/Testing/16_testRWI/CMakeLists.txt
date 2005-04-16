@@ -5,6 +5,10 @@ testRWIApp.h
 testRWIApp.cpp
 testRWILogic.h
 testRWILogic.cpp
+testRWIDlg.cpp
+testRWIDlg.h
+testRWIBaseDlg.cpp
+testRWIBaseDlg.h
 )
 
 # copia icona e file delle risorse nella Build

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testRWILogic.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 16:20:19 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-16 10:00:19 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,22 +22,10 @@
 class vtkRenderWindow;
 class vtkRenderer;
 class mafRWIBase;
+class mafRWI;
 class vtkConeSource;
 class vtkPolyDataMapper;
 class vtkActor;
-class myFrame;
-
-
-
-class myFrame : public wxFrame
-{
-public:
-  myFrame(wxWindow *parent,long id, wxString title) :wxFrame(parent,id,title) {};
-  void OnCloseWindow(wxCloseEvent& event) {mafEventMacro(mafEvent(this,MENU_FILE_QUIT));};
-  mafEventListener *m_Listener;
-  DECLARE_EVENT_TABLE()
-};
-
 
 // ============================================================================
 class testRWILogic : public mafEventListener
@@ -49,15 +37,7 @@ public:
    void OnEvent(mafEvent& e);
    void Show();
 
-   myFrame *m_win;
-
-   vtkRenderer *R;
-   vtkRenderWindow *RW; 
-   mafRWIBase *RWI;
-   vtkConeSource *CS;
-   vtkPolyDataMapper *PDM;
-   vtkActor *A;
-
+   wxFrame *m_win;
 };
 
 #endif //__testRWILogic_H__

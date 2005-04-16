@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testRWILogic.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 16:20:19 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-16 10:00:19 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,65 +22,52 @@
 
 #include "testRWILogic.h"
 #include "mafDecl.h"
-#include "mmgDialog.h"
 #include "mmgGui.h"
-#include "mmgValidator.h"
+#include "testRWIBaseDlg.h"
+#include "testRWIDlg.h"
 
-#include "mafRWIBase.h"
-#include "vtkPolyData.h"
-#include "vtkConeSource.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkActor.h"
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
 //--------------------------------------------------------------------------------
 //const:
 //--------------------------------------------------------------------------------
 enum 
 {
   ID_D1 = MINID,
+  ID_D2,
+  ID_D3,
 };
-
-BEGIN_EVENT_TABLE(myFrame, wxFrame)
-EVT_CLOSE(myFrame::OnCloseWindow)
-END_EVENT_TABLE()
 
 //--------------------------------------------------------------------------------
 testRWILogic::testRWILogic()
 //--------------------------------------------------------------------------------
 {
-  m_win = new myFrame(NULL,-1,"TestRWI");
-  m_win->m_Listener = this;
-  m_win->SetSize(500,400);
+  /**todo: PAOLO please read here */
+
+  // RESULT OF RWI TEST :
+  // RWIBASE produce a memory leak 5600 byte long, as follow -- by me (Silvano) this is not considered an error but a feature :-)
+  // C:\Program Files\VisualStudio7\Vc7\include\crtdbg.h(689) : {2804} normal block at 0x099C00A8, 5600 bytes long.
+  // Data: <            Buil> 00 00 00 00 00 00 00 00 00 00 00 00 42 75 69 6C 
+  // Object dump complete.
+
+  // the leaks is always 5600 bytes long, doesn't matter how many instances of RWI you have created,
+  // so maybe it is related to something concerned with the initialization of the OpenGL context,
+  // and the real problem could be in my NVidia OpenGL Driver
+
+
+  m_win = new wxFrame(NULL,-1,"TestRWI",wxDefaultPosition,wxDefaultSize,
+    wxMINIMIZE_BOX | wxMAXIMIZE_BOX | /*wxRESIZE_BORDER |*/ wxSYSTEM_MENU | wxCAPTION );
   mafSetFrame(m_win);
 
-  CS  = NULL;
-  PDM  = NULL;
-  A  = NULL;
-  R  = NULL;
-  RW  = NULL;
-  RWI = NULL;
-
-  CS = vtkConeSource::New();
-  CS->Update();
-
-  PDM = vtkPolyDataMapper::New();
-  PDM->SetInput((vtkPolyData *) CS->GetOutput());
-
-  A = vtkActor::New();
-  A->SetMapper(PDM);
-
-  R = vtkRenderer::New();
-  R->AddActor( A );
-  R->SetBackground(1,0,0);
-
-  RW = vtkRenderWindow::New();
-  RW->AddRenderer(R);
-  R->ResetCamera();
-
-  RWI = new mafRWIBase(m_win,-1);
-  RWI->SetRenderWindow(RW);   //SIL. 14-4-2005: Uncomment This to have a leak
-  RWI->Show(true);
+  mmgGui *gui = new mmgGui(this);
+  gui->Divider();
+  gui->Label("Examples of VTK RenderWindow"); 
+  gui->Button(ID_D1,"test RWIBase");
+  gui->Button(ID_D2,"test RWI");
+  gui->Label("");
+  gui->Label("");
+  gui->Button(ID_D3,"quit");
+  gui->Reparent(m_win);
+  m_win->Fit(); // resize m_win to fit it's content
+  
 }
 //--------------------------------------------------------------------------------
 testRWILogic::~testRWILogic()
@@ -93,41 +80,19 @@ void testRWILogic::OnEvent(mafEvent& e)
 {
   switch(e.GetId())
   {
-    case MENU_FILE_QUIT: 
-      int i=0;
-
-      CS->Delete();
-      PDM->Delete();
-      A->Delete();
-      R->Delete();
-      RW->Delete();
-      RWI->Delete(); 
-
-      /*
-      //vtkDEL(CS);
-      //vtkDEL(PDM);
-      //vtkDEL(A);
-
-      //if(R) R->RemoveActor(A);
-
-      CS->Delete();
-      PDM->Delete();
-      A->Delete();
-
-      //if(R) 
-      //{
-      //  R->GetActors();        
-      //  if(RW) RW->RemoveRenderer(R);
-      //}
-      R->Delete();
-
-      //if(RW) RW->SetInteractor(NULL);
-      RW->Delete();
-
-//      if(RWI) RWI->SetRenderWindow(NULL); 
-      RWI->Delete(); // must use vtkDEL, and not the delete operator
-      //cppDEL(RWI); must use vtkDEL, and not the delete operator
-      */
+    case ID_D1:
+      {
+      testRWIBaseDlg d("test RWIBase");
+      d.ShowModal();
+      }
+    break;
+    case ID_D2: 
+      {
+      testRWIDlg d("test RWI");
+      d.ShowModal();
+      }
+    break;
+    case ID_D3: 
       m_win->Destroy();
     break;
   }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialog.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 13:44:57 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-16 09:59:37 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,7 +26,7 @@ enum mmgDIALOG_STYLES
   mafCLOSEWINDOW =2, // to enable the close button on the window frame
   mafOK =4,          // to create an ok button
   mafCANCEL =8,      // to create a cancel button 
-  mafCLOSE =16,      // to create a close button // still closes with ok, just different caption
+  mafCLOSE =16,      // to create a close button
 };
 //----------------------------------------------------------------------------
 // mmgDialog :
@@ -41,6 +41,10 @@ depending on the flag passed as the "Style" parameter
 mmgDialog can be resizable or not, 
 have a close button on the frame or nor,
 have an ok and/or cancel and/or close button.
+
+The Close button have the same behaviour of the Button on the Dialog Frame,
+both of them call wxWindow::Close(), wich in turn call wx::CloseWindow(),
+-- that you can redefine -- the default for CloseWindow is to call OnCancel().
 
 mmgDialog is meant do be "Modal", to create non-modal Dialogs use a wxFrame instead.
 
@@ -90,12 +94,11 @@ public:
   void EnableCancel(bool enable) {if(m_cancel_button) m_cancel_button->Enable(enable);};
   void EnableClose(bool enable)  {if(m_close_button)  m_close_button->Enable(enable);};
 
-protected:
-	/** Close the dialog */
-	virtual void OnCloseWindow(wxCloseEvent& event);
+  /** Virtual functions called on Dialoag Close - these can be redefined witout providing the Event Table */
+  virtual void OnCloseWindow(wxCloseEvent& event);
   virtual void OnOK(wxCommandEvent& event);
   virtual void OnCancel(wxCommandEvent& event);
-	
+
   /** sizer for user widgets */
   wxBoxSizer      *m_sizer; 
 
@@ -106,6 +109,14 @@ protected:
   wxButton        *m_close_button;
 
   mafEventListener   *m_Listener;
-	DECLARE_EVENT_TABLE()
+
+private:
+  /** non virtual function, called on Dialog Closing and bound trought the event table */
+  void nvOnCloseWindow(wxCloseEvent& event) {OnCloseWindow(event);};
+  void nvOnOK(wxCommandEvent& event)        {OnOK(event);};    
+  void nvOnCancel(wxCommandEvent& event)    {OnCancel(event);};    
+  void nvOnClose(wxCommandEvent& event)     {wxDialog::Close();}; //calls nvOnCloseWindow
+
+  DECLARE_EVENT_TABLE()
 };
 #endif

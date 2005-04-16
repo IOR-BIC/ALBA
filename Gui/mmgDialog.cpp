@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialog.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 13:44:57 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-16 09:59:36 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,11 +26,21 @@
 // Event Table:
 //----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(mmgDialog, wxDialog)
-	EVT_CLOSE(mmgDialog::OnCloseWindow)
-  EVT_BUTTON(wxID_OK, mmgDialog::OnOK)
-  EVT_BUTTON(wxID_CANCEL, mmgDialog::OnCancel)
-  EVT_BUTTON(wxOK, mmgDialog::OnOK)
-  EVT_BUTTON(wxCANCEL, mmgDialog::OnCancel)
+  EVT_CLOSE(mmgDialog::nvOnCloseWindow)
+  EVT_BUTTON(wxID_OK, mmgDialog::nvOnOK)
+  EVT_BUTTON(wxID_CANCEL, mmgDialog::nvOnCancel)
+  EVT_BUTTON(wxID_CLOSE, mmgDialog::nvOnClose)
+  EVT_BUTTON(wxOK, mmgDialog::nvOnOK)
+  EVT_BUTTON(wxCANCEL, mmgDialog::nvOnCancel)
+
+/* todo: discover if the following syntax is valid -- if yes I can have the redefined handler called (if handler are virtual)
+  EVT_CLOSE(OnCloseWindow)
+  EVT_BUTTON(wxID_OK, OnOK)
+  EVT_BUTTON(wxID_CANCEL, OnCancel)
+  EVT_BUTTON(wxID_CLOSE, OnClose)
+  EVT_BUTTON(wxOK, OnOK)
+  EVT_BUTTON(wxCANCEL, OnCancel)
+*/
 END_EVENT_TABLE()
 
 //----------------------------------------------------------------------------
@@ -68,9 +78,9 @@ mmgDialog::mmgDialog(const wxString& title,long style)
     m_cancel_button = new wxButton(this,wxID_CANCEL,"cancel");
     m_buttons_sizer->Add(m_cancel_button ,0);
   }
-  if( (style & mafCLOSE) && !(style & mafOK) && !(style & mafCANCEL) )
+  if( (style & mafCLOSE) /*&& !(style & mafOK) && !(style & mafCANCEL)*/ )
   {
-    m_close_button = new wxButton(this,wxID_OK,"close");
+    m_close_button = new wxButton(this,wxID_CLOSE,"close");
     m_buttons_sizer->Add(m_close_button ,0);
   }
 }
@@ -111,6 +121,11 @@ void mmgDialog::OnEvent(mafEvent& e)
     {
       wxCommandEvent c(0, wxID_CANCEL);
       OnOK(c);
+    }
+  break;
+  case wxID_CLOSE:
+    {
+      wxDialog::Close(); // OnCloseWindow will be called
     }
   break;
   default:

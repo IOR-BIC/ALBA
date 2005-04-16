@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testRWIApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 16:20:18 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-16 10:00:18 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,7 +21,6 @@
 
 
 #include "testRWIApp.h"
-#include "mmgMDIFrame.h"
 //--------------------------------------------------------------------------------
 // Create the Application
 //--------------------------------------------------------------------------------
