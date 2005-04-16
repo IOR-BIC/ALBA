@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:21:57 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-16 12:08:18 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -88,7 +88,6 @@ public:
   
   /** internally used by mafMSFWriter/Reader to remember this is a encrypted data */
   void SetCrypting(bool flag);
-
 protected:
  
   virtual int InternalStore(mafStorageElement *parent);

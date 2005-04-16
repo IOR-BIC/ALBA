@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 18:15:52 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-16 12:08:18 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -310,6 +310,11 @@ int mafDataVector::InternalRestore(mafStorageElement *node)
 void mafDataVector::OnEvent(mafEventBase *event)
 //-----------------------------------------------------------------------
 {
+  if (event->GetId()==mafVMEItem::VME_ITEM_DATA_MODIFIED)
+  {
+    m_DataModified=true;
+    return;
+  }
   mafEventMacro(*event);
 }
 
