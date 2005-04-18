@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEFactory.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-16 11:23:22 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-18 19:56:27 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,11 +17,11 @@
 #include "mafNodeFactory.h"
 #include "mafVME.h"
 
-/** Object factory for Nodes.
-  To make a new VME available in the MAF it must be plugged inside a factory, in particular
-  this factory must be of type mafVMEFactory to be able to retrieve the list of nodes plugged
-  in the factory. Also when using mafPlugNode<node_type> the node icon is plugged inside the
-  the MAF picture factory. */
+/** Object factory for VMEs.
+  This is a simple specialization of mafNodeFactory. Notice that mafVMEFactory is also
+  a mafNodeFactory this last does not need to be crated: you should create one or the other but
+  not both since the Instance would be overwritten and thus the Plug*<> methods would always
+  plug inside one of the two. */
 class MAF_EXPORT mafVMEFactory : public mafNodeFactory
 {
 public: 

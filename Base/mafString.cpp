@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 16:53:13 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-04-18 19:53:19 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -57,7 +57,7 @@ mafString::mafString(const char *src):m_CStr(NULL),m_ConstCStr(""),m_Size(0)
 mafString::mafString(const double &num):m_CStr(NULL),m_ConstCStr(""),m_Size(0)
 //----------------------------------------------------------------------------
 {
-  NPrintf(32,"%.16g",num);
+  NPrintf(32,"%.16g",num); // only 16 digits are represented to avoid dirty bits
 }
 #ifdef MAF_USE_WX
 //----------------------------------------------------------------------------
