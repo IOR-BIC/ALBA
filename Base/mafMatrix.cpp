@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 09:49:17 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-04-18 19:52:57 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -78,7 +78,7 @@ mafMatrix::mafMatrix(const mafMatrix &mat)
 bool mafMatrix::operator==(const mafMatrix& mat) const
 //------------------------------------------------------------------------------
 {
-  if (m_TimeStamp!=mat.m_TimeStamp)
+  if (!mafEquals(m_TimeStamp,mat.m_TimeStamp))
     return false;
 
   for (int i=0;i<4;i++)
@@ -87,8 +87,7 @@ bool mafMatrix::operator==(const mafMatrix& mat) const
     {
       mafMatrixElements myelements = GetElements();
       mafMatrixElements otherelements = mat.GetElements();
-      double diff=fabs(myelements[i][j]-otherelements[i][j]);
-      if (diff>1.0e-17f)
+      if (!mafEquals(myelements[i][j],otherelements[i][j])) // only 15 digits are considered since the I/O mechanism saves only 16 digits to avoid dirty bits
         return false;
     }
   }

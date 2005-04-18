@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOBB.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 20:42:14 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-04-18 19:52:57 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -12,7 +12,7 @@
 #include "mafOBB.h"
 #include "mafMatrix.h"
 #include "mafIndent.h"
-
+#include "math.h"
 //-------------------------------------------------------------------------
 mafOBB::mafOBB()
 //-------------------------------------------------------------------------
@@ -59,35 +59,29 @@ void mafOBB::Reset()
 bool mafOBB::Equals(mafOBB &bounds) const
 //-------------------------------------------------------------------------
 {
-  if (m_Bounds[0]==bounds.m_Bounds[0] && \
-    m_Bounds[1]==bounds.m_Bounds[1] && \
-    m_Bounds[2]==bounds.m_Bounds[2] && \
-    m_Bounds[3]==bounds.m_Bounds[3] && \
-    m_Bounds[4]==bounds.m_Bounds[4] && \
-    m_Bounds[5]==bounds.m_Bounds[5])
+  for (int i=0;i<6;i++)
   {
-    return true;
+    if (!mafEquals(m_Bounds[i],bounds.m_Bounds[i])) // consider only 15 digits to avoid dirty bits
+    {
+      return false;
+    }
   }
-
-  return false;
+  
+  return  m_Matrix==bounds.m_Matrix;
 }
 
 //-------------------------------------------------------------------------
 bool mafOBB::Equals(double bounds[6]) const
 //-------------------------------------------------------------------------
 {
-
-  if (m_Bounds[0]==bounds[0] && \
-    m_Bounds[1]==bounds[1] && \
-    m_Bounds[2]==bounds[2] && \
-    m_Bounds[3]==bounds[3] && \
-    m_Bounds[4]==bounds[4] && \
-    m_Bounds[5]==bounds[5])
+  for (int i=0;i<6;i++)
   {
-    return true;
+    if (!mafEquals(m_Bounds[i],bounds[i])) // consider only 15 digits to avoid dirty bits
+    {
+      return false;
+    }
   }
-
-  return false;
+  return true;
 }
 
 //-------------------------------------------------------------------------
@@ -97,17 +91,14 @@ bool mafOBB::Equals(float bounds[6]) const
   float myBounds[6];
   CopyTo(myBounds);
 
-  if (myBounds[0]==bounds[0] && \
-    myBounds[1]==bounds[1] && \
-    myBounds[2]==bounds[2] && \
-    myBounds[3]==bounds[3] && \
-    myBounds[4]==bounds[4] && \
-    myBounds[5]==bounds[5])
+  for (int i=0;i<6;i++)
   {
-    return true;
+    if (!mafFloatEquals(myBounds[i],bounds[i]))
+    {
+      return false;
+    }
   }
-
-  return false;
+  return true;
 }
 
 //-------------------------------------------------------------------------
@@ -144,6 +135,7 @@ void mafOBB::DeepCopy(mafOBB *source)
     m_Bounds[i]=source->m_Bounds[i];
   }
 
+  m_Matrix=source->m_Matrix; 
   Modified();
 }
 
