@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:32:02 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-04-18 19:52:38 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,6 +14,8 @@
 
 #include "mafIncludeWX.h"
 #include "wx/string.h"
+
+#include <math.h>
 
 #include <iostream>
 using namespace std;
@@ -86,4 +88,25 @@ void mafMessage(const char *format, ...)
 #endif
   
   mafLogMutex.Unlock();
+}
+
+
+//------------------------------------------------------------------------------
+bool mafEquals(double x, double y)
+//------------------------------------------------------------------------------
+{
+   double diff=fabs(x - y);
+   double max_err=fabs(x / pow(10,15));
+   if (diff > max_err)
+     return false;
+   return  ( diff <= max_err);
+}
+
+//------------------------------------------------------------------------------
+bool mafFloatEquals(float x, float y)
+//------------------------------------------------------------------------------
+{
+   float diff=fabs(x - y);
+   float max_err=(x / fabs(pow(10,7)));
+   return  ( diff <= max_err);
 }

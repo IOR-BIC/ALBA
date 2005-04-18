@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 18:07:33 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2005-04-18 19:52:39 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -63,6 +63,12 @@ void mafWarningMessage(const char *format, ...);
 void mafErrorMessage(const char *format, ...);
 /** open a message dialog and write a message */
 void mafMessage(const char *format, ...);
+/** 
+  reliable comparison test for floating point numbers. Extracted from article:
+  "Work Around Floating-Point Accuracy/Comparison Problems" Article ID: Q69333
+  of MSDN library*/
+bool mafEquals(double x, double y);
+bool mafFloatEquals(float x, float y);
 
 //------------------------------------------------------------------------------
 // Macros
