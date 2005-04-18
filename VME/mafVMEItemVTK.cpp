@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-16 12:08:48 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-18 19:55:57 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -537,6 +537,8 @@ int mafVMEItemVTK::InternalStoreData()
 
     if (m_IOStatus!=MAF_OK)
       return MAF_ERROR;
+
+    m_LastURL=m_URL;
 
     return storage->StoreToURL(filename,m_URL);
   }

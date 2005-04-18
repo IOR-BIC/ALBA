@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-16 12:08:48 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-04-18 19:55:57 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -90,7 +90,7 @@ public:
   const char *GetURL() {return m_URL;};
 
   /** used to set an external URL where this data is stored */
-  void SetURL(const char *name) {m_URL=name;};
+  virtual void SetURL(const char *name);
 
   /** 
     Return the extension to be used for data file storing data of this item.

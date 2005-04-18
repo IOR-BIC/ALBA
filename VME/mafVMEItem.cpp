@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-16 12:08:47 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-18 19:55:57 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -25,7 +25,11 @@
 #include "mafIndent.h"
 #include "mafStorageElement.h"
 #include "mmuIdFactory.h"
+#include "mafEventIO.h"
+#include "mafStorage.h"
+#include <math.h>
 #include <assert.h>
+#include <sstream>
 
 bool mafVMEItem::m_GlobalCompareDataFlag=0;
 
@@ -51,12 +55,14 @@ mafVMEItem::mafVMEItem()
   m_OutputMemory    = NULL;
   m_OutputMemorySize= 0;
   m_InputMemory     = NULL;
+  m_InputMemorySize = 0;
 }
 
 //-------------------------------------------------------------------------
 mafVMEItem::~mafVMEItem()
 //-------------------------------------------------------------------------
 {
+  SetURL(""); // this simply force to garbage collect the linked URL when the item is destroyed
   mafDEL(m_TagArray);
 }
 
@@ -160,7 +166,7 @@ bool mafVMEItem::Equals(mafVMEItem *o)
 {
   if (o==NULL || !o->IsA(GetTypeId()) || \
     m_DataType!=o->m_DataType || \
-    m_TimeStamp!=o->m_TimeStamp)
+    !mafEquals(m_TimeStamp,o->m_TimeStamp)) // consider only 15 digits to avoid the dirty bit
   {
     return false;
   }
@@ -215,6 +221,24 @@ int mafVMEItem::InternalStore(mafStorageElement *parent)
   }
   
   return MAF_ERROR;
+}
+
+//-------------------------------------------------------------------------
+void mafVMEItem::SetURL(const char *name)
+//-------------------------------------------------------------------------
+{
+  if (!m_URL.IsEmpty()&&m_URL!=name)
+  {
+    mafEventIO e(this,NODE_GET_STORAGE);
+    mafEventMacro(e);
+    mafStorage *storage=e.GetStorage();
+    if (storage)
+    {
+      storage->ReleaseURL(m_URL); // remove old file
+      SetDataModified(true); // force rewriting data 
+    }
+  }
+  m_URL=name;
 }
 
 //-------------------------------------------------------------------------

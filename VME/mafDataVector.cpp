@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-16 12:08:18 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-18 19:55:57 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -49,6 +49,11 @@ mafDataVector::mafDataVector()
 mafDataVector::~mafDataVector()
 //-----------------------------------------------------------------------
 {
+  Iterator it;
+  for (it=Begin();it!=End();it++)
+  {
+    it->second->SetListener(NULL); // detach items before destoying
+  }
 }
 
 //-------------------------------------------------------------------------
@@ -138,13 +143,20 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
 
   // define base file name for data files
   mafString base_url = storage->GetURL();
-  int last_slash = base_url.FindLastChr('.');
+  int last_dot = base_url.FindLastChr('.');
 
-  base_url.Erase(last_slash);
+  base_url.Erase(last_dot);
+  mafString base_name=base_url;
 
+  int last_slash = base_name.FindLastChr('/');
+  if (last_slash>=0)
+  {
+    base_name.Erase(0,last_slash);
+  }
+  
   DataMap::iterator it;
   
-  if (IsDataModified()) // if some data added or removed...
+  if (m_LastBaseURL!=base_url||IsDataModified()) // if some data added or removed...
   {
     // store data
     bool new_data=false;
@@ -159,13 +171,15 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
       mafVMEItem *item=it->second;
       
       // set item ID if not yet set
-      if (item->GetId()<0)
+      if (item->GetId()<0 || m_LastBaseURL!=base_url)
       {
-        item->SetId(root->GetNextItemId());
+        if (item->GetId()<0)
+          item->SetId(root->GetNextItemId());
       
         mafString data_file_url;
-      
-        data_file_url<<base_url<<"."<<mafString(item->GetId())<<"."<<item->GetDataFileExtension(); // extension is defined by the kind of item itself
+        
+        // data file URL is specified as a local filename
+        data_file_url<<base_name<<"."<<mafString(item->GetId())<<"."<<item->GetDataFileExtension(); // extension is defined by the kind of item itself
         item->SetURL(data_file_url); 
       }
       
@@ -205,7 +219,7 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
       
       // the URL to which the single file will be stored
       mafString file_url;
-      file_url<<base_url<<"."<<mafString(m_VectorID)<<".mdf"; // extension for single file format
+      file_url<<base_name<<"."<<mafString(m_VectorID)<<".mdf"; // extension for single file format
 
       // in single file mode merge single files into a single file
       if (new_data)
@@ -248,6 +262,9 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
         }
       }
     }
+
+    // update the last base name for next time writing
+    m_LastBaseURL=base_url;
   }
 
   parent->SetAttribute("SingleFileMode",m_SingleFileMode?"true":"false");

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrixVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:21:57 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-18 19:55:57 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -90,7 +90,7 @@ int mafMatrixVector::InternalRestore(mafStorageElement *node)
     mafStorageElement::ChildrenVector vector_elements;
     node->GetNestedElementsByName("Matrix",vector_elements);
 
-    assert(vector_elements.size()!=num_items);
+    assert(vector_elements.size()==num_items);
 
     if (vector_elements.size()!=num_items)
       mafWarningMacro("Restore I/O error: found wrong number of matrices in restored MatrixVector.");
@@ -100,6 +100,7 @@ int mafMatrixVector::InternalRestore(mafStorageElement *node)
       mafSmartPointer<mafMatrix> mat;
       if (vector_elements[i]->RestoreMatrix(mat)!=MAF_OK)
         return MAF_ERROR;
+      AppendItem(mat);
     }
     
     return MAF_OK;

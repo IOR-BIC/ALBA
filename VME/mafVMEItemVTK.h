@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 19:31:39 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-18 19:55:58 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -123,6 +123,7 @@ protected:
   vtkDataReader *             m_DataReader; ///< the reader used to read VTK data
   vtkDataSetWriter *          m_DataWriter; ///< the writer used to write VTK data
   int                         m_IOStatus;   ///< internally used to store the IO status
+  mafString                   m_LastURL;    ///< last URL where data was saved
   
 private:
   mafVMEItemVTK(const mafVMEItemVTK&);

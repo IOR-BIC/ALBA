@@ -8,12 +8,16 @@
 #include "mafDefines.h"
 
 #include "mafVMEFactory.h"
+#include "mafCoreFactory.h"
 #include "mafNodeIterator.h"
 #include "mafMSFStorage.h"
 #include "mafVMERoot.h"
 #include "mafVMESurface.h"
 #include "mafVMEPolyline.h"
 #include "mafTransform.h"
+#include "mafVMEItem.h"
+#include "mafDataVector.h"
+#include "mafDirectory.h"
 
 #include "vtkRenderer.h"
 #include "vtkActor.h"
@@ -34,6 +38,7 @@
 #include "vtkMAFSmartPointer.h"
 
 #include <iostream>
+#include <set>
 
 #ifdef WIN32
   #define SLEEP(a) Sleep(a)
@@ -174,6 +179,9 @@ int main( int argc, char *argv[] )
   // initialized the VME factory
   mafVMEFactory::Initialize();
 
+  // plug the custom attribute in the Node Factory
+  mafPlugAttribute<mafClientData>("Simple attribute for attaching actors to VMEs");
+
   vtkMAFSmartPointer<vtkAxes> axes;
   axes->SetScaleFactor(2);
 
@@ -182,8 +190,11 @@ int main( int argc, char *argv[] )
   text->SetText("VME Tree Test");
   text->Update();
 
+  // create folder for test file
+  wxMkdir("testMSF");
+
   mafMSFStorage storage;
-  storage.SetURL("testMSF.msf");
+  storage.SetURL("testMSF/testMSF.msf");
   mafVMERoot *root=storage.GetRoot();
 
   mafSmartPointer<mafVMEGeneric> vtitle;
@@ -273,7 +284,7 @@ int main( int argc, char *argv[] )
   // Test data reloading
   //
   mafMSFStorage load_storage;
-  load_storage.SetURL("testMSF.msf");
+  load_storage.SetURL("testMSF/testMSF.msf");
   mafVMERoot *loaded_root=load_storage.GetRoot();
   load_storage.Restore();
 
@@ -282,6 +293,7 @@ int main( int argc, char *argv[] )
   // test if data is automatically released
 
   MAF_TEST(play_tree(loaded_root)==MAF_OK);
+  mafVMEItem::GlobalCompareDataFlagOn();
   MAF_TEST(root->CompareTree(loaded_root));
 
   //
@@ -289,21 +301,43 @@ int main( int argc, char *argv[] )
   //
   cone->SetRadius(2.5);
  
+  std::vector<mafString> cone_items_fname;
+  cone_items_fname.resize(100);
+
   for (i=0;i<100;i++)
   {
+    cone_items_fname[i]=vcone->GetDataVector()->GetItemByIndex(i)->GetURL();
     // change the cone radius
     cone->SetResolution(103-i);
+    vcone->SetData(cone->GetOutput(),200-i*2);
   }
 
 
   // save changed data
   storage.Store();
-   
-  // test removal of old files
-  //...
+
+  mafDirectory dir;
+  std::set<mafString> file_list;
+  dir.Load("testMSF");
+  for (i=0;i<dir.GetNumberOfFiles();i++)
+  {
+    file_list.insert(dir.GetFile(i));
+  }
+  
+  for (i=0;i<100;i++)
+  {
+    // test if data files has
+
+    mafString new_fname=vcone->GetDataVector()->GetItemByIndex(i)->GetURL();
+    MAF_TEST(new_fname!=cone_items_fname[i]);
+    
+    // test removal of old files
+    MAF_TEST(file_list.find(cone_items_fname[i])==file_list.end());
+    MAF_TEST(file_list.find(new_fname)!=file_list.end());
+  }
   
   mafMSFStorage reload_storage;
-  reload_storage.SetURL("testMSF.msf");
+  reload_storage.SetURL("testMSF/testMSF.msf");
   mafVMERoot *reloaded_root=reload_storage.GetRoot();
   reload_storage.Restore();
   
@@ -311,13 +345,16 @@ int main( int argc, char *argv[] )
 
   MAF_TEST(!root->CompareTree(loaded_root));
 
+  // create folder for new file
+  wxMkdir("testMSF_saveAs");
+
   // Test saving with different name
-  storage.SetURL("testMSF_saveAs.msf");
+  storage.SetURL("testMSF_saveAs/testMSF_saveAs.msf");
   storage.Store();
 
 
   mafMSFStorage load_saveas_storage;
-  load_saveas_storage.SetURL("testMSF_saveAs.msf");
+  load_saveas_storage.SetURL("testMSF_saveAs/testMSF_saveAs.msf");
   mafVMERoot *loaded_saveas_root=load_saveas_storage.GetRoot();
   load_saveas_storage.Restore();
   
