@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-11 15:49:38 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-18 19:53:58 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -60,7 +60,7 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   /**
     Directly set the internal Matrix. It's overwritten by Update if Input or InputFrame !=NULL
     This function makes a copy of the input matrix. */
-  virtual void SetMatrix(const mafMatrix &input) {*m_Matrix=input;Modified();}
+  virtual void SetMatrix(const mafMatrix &input) {*m_Matrix=input;SetTimeStamp(input.GetTimeStamp());Modified();}
 
 	/**
 	  Polar Decomposition of matrix M in Q * S.*/
