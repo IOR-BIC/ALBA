@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeFactory.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 16:40:41 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-18 19:51:37 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,7 +21,6 @@
 #define mafPlugNodeMacro(node_type,descr) \
   RegisterNewNode(node_type::GetStaticTypeName(), descr, node_type::NewObject); \
   mafPics.AddVmePic(node_type::GetStaticTypeName(),node_type::GetIcon());
-
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -77,6 +76,7 @@ class MAF_EXPORT mafPlugNode
 };
 
 //------------------------------------------------------------------------------
+/** Plug a new Node class into the Node factory.*/
 template <class T>
 mafPlugNode<T>::mafPlugNode(const char *description)
 //------------------------------------------------------------------------------
@@ -89,5 +89,18 @@ mafPlugNode<T>::mafPlugNode(const char *description)
     mafPics.AddVmePic(T::GetStaticTypeName(),T::GetIcon());
   }
 }
+
+/** Plug an attribute class into the Node factory.*/
+template <class T>
+class MAF_EXPORT mafPlugAttribute
+{
+  public:
+  mafPlugAttribute(const char *description) \
+  { \
+    mafNodeFactory *factory=mafNodeFactory::GetInstance(); \
+    if (factory) \
+      factory->RegisterNewObject(T::GetStaticTypeName(), description, T::NewObject); \
+  }
+};
 
 #endif
