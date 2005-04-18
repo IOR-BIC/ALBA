@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-16 12:09:05 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-04-18 19:54:50 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -297,8 +297,6 @@ mafObject *mafStorageElement::RestoreObject(const char *name)
 int mafStorageElement::RestoreObject(const char *name,mafStorable * object)
 //------------------------------------------------------------------------------
 {
-  object=NULL;
-
   mafStorageElement *element=FindNestedElement(name);
 
   if (element)
