@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorage.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-16 12:09:05 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-04-18 19:55:15 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -48,7 +48,7 @@ public:
   virtual ~mafStorage() {}
 
   /** Set the URL of the document to be read or written */
-  void SetURL(const char *name);
+  virtual void SetURL(const char *name);
 
   /** Return the URL of the document to be read or written */
   const char *GetURL();
@@ -99,6 +99,15 @@ public:
     Check if a file is present in the storage directory. The directory list is 
     open when Store() is called and directory data is updated at that time. */
   bool IsFileInDirectory(const char *filename);
+
+  /** 
+    Set the folder where to store tmp files. If not specified the storage 
+    will automatically use a default folder, like the current directory 
+    or the storage file folder. */
+  virtual void SetTmpFolder(const char *folder) {m_TmpFolder=folder;}
+
+  /** return the folder where tmp files are stored */
+  virtual const char* GetTmpFolder() {return m_TmpFolder;}
     
 protected:
   /** This is called by Store() and must be reimplemented by subclasses */
@@ -116,6 +125,7 @@ protected:
   mafString           m_URL;          ///< name of the file being accessed
   mafString           m_ParserURL;    ///< name of the last parsed file (used for SaveAs)
   mafID               m_TmpFileId;    ///< counter for unique tmp file naming
+  mafString           m_TmpFolder;    ///< folder where to store tmp files
   std::set<mafString> m_TmpFileNames; ///< name of tmp files in the MSF dir
   std::set<mafString> m_FilesDictionary; ///< list of files in the storage folder: to be populated by OpenDirectory()
 };

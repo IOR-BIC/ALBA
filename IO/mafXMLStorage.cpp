@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-16 12:09:05 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-04-18 19:55:15 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,6 +33,10 @@
 #include <xercesc/sax/SAXParseException.hpp>
 
 #include <assert.h>
+
+#ifndef MAF_USE_WX
+#error "XML Storage cannot be compiled without wxWidgets"
+#endif
 
 //------------------------------------------------------------------------------
 // mmuDOMTreeErrorReporter
@@ -115,6 +119,23 @@ mafXMLStorage::~mafXMLStorage()
   cppDEL(m_DOM);
 }
 
+//------------------------------------------------------------------------------
+const char* mafXMLStorage::GetTmpFolder()
+//------------------------------------------------------------------------------
+{
+  if (m_TmpFolder.IsEmpty())
+  {
+    wxString path=wxPathOnly(m_URL.GetCStr());
+    m_DefaultTmpFolder=path;
+    m_DefaultTmpFolder<<"/";
+    return m_DefaultTmpFolder;
+  }
+  else
+  {
+    return Superclass::GetTmpFolder();
+  }
+}
+
 //----------------------------------------------------------------------------
 int mafXMLStorage::OpenDirectory(const char *pathname)
 //----------------------------------------------------------------------------
@@ -144,11 +165,42 @@ int mafXMLStorage::OpenDirectory(const char *pathname)
 }
 
 //------------------------------------------------------------------------------
+void mafXMLStorage::SetURL(const char *name)
+//------------------------------------------------------------------------------
+{
+  if (m_URL!=name)
+  {
+    // when saving to a new file or loading a different file
+    // simply clear the list of URLs to be released.
+    m_GarbageCollector.clear();
+    Superclass::SetURL(name);
+  }
+}
+
+//------------------------------------------------------------------------------
 bool mafXMLStorage::ResolveInputURL(const char * url, mafString &filename)
 //------------------------------------------------------------------------------
 {
-  // currently no URL support
-  filename=url;
+  // currently no real URL support
+  wxString path;
+  path=wxPathOnly(url);
+  if (path.IsEmpty())
+  {
+    wxString base_path;
+    base_path=wxPathOnly(m_ParserURL.GetCStr());
+
+    filename=base_path;
+    
+    if (!base_path.IsEmpty())
+      filename<<"/";
+
+    filename<<url;
+  }
+  else
+  {
+    filename=url;
+  }
+  
   return true;
 }
 //------------------------------------------------------------------------------
@@ -157,28 +209,75 @@ int mafXMLStorage::StoreToURL(const char * filename, const char * url)
 {
   assert(url); // NULL url not yet supported
 
-#ifdef MAF_USE_WX
-  // currently only local files are supported
-  return wxRenameFile(filename,url)?MAF_OK:MAF_ERROR;
-#else
-  // ????
-#endif
+  // currently no real URL support
+  wxString path;
+  path=wxPathOnly(url);
 
-  return true;
+  if (path.IsEmpty())
+  {
+    // if local file prepend base_path
+    wxString base_path,fullpathname;
+    base_path=wxPathOnly(m_URL.GetCStr());
+    fullpathname=base_path+"/"+url;
+    if (IsFileInDirectory(url))
+    {
+      // remove old file if present
+      wxRemoveFile(fullpathname);
+    }
+
+    // currently only local files are supported
+    return wxRenameFile(filename,fullpathname)?MAF_OK:MAF_ERROR;
+  }
+  else
+  {
+    // remove old file if present
+    wxRemoveFile(url);
+    // currently only local files are supported
+    return wxRenameFile(filename,url)?MAF_OK:MAF_ERROR;
+  } 
 }
 
 //------------------------------------------------------------------------------
 int mafXMLStorage::ReleaseURL(const char *url)
 //------------------------------------------------------------------------------
 {
-#ifdef MAF_USE_WX
-  // currently only local files are supported
-  return wxRemoveFile(url)?MAF_OK:MAF_ERROR;
-#else
-  // ????
-#endif
+  // add to list of files to be deleted
+  m_GarbageCollector.insert(url);
+  return MAF_OK;
+}
+
+
+//------------------------------------------------------------------------------
+int mafXMLStorage::DeleteURL(const char *url)
+//------------------------------------------------------------------------------
+{
+  // currently no real URL support
+  wxString path;
+  path=wxPathOnly(url);
+
+  if (path.IsEmpty())
+  {
+    // if local file prepend base_path
+    wxString base_path,fullpathname;
+    base_path=wxPathOnly(m_URL.GetCStr());
+    fullpathname=base_path+"/"+url;
+
+    if (IsFileInDirectory(url))
+    {
+      // remove old file if present
+      wxRemoveFile(fullpathname);
+      return MAF_OK;
+    }
+
+    return MAF_ERROR;
+  }
+  else
+  {
+    return (wxRemoveFile(url)?MAF_OK:MAF_ERROR);
+  }
 
 }
+
 
 //------------------------------------------------------------------------------
 void mafXMLStorage::SetFileType(const char *filetype)
@@ -281,6 +380,7 @@ int mafXMLStorage::InternalStore()
         cppDEL (m_DocumentElement);  
         cppDEL (m_DOM->m_XMLTarget);
         cppDEL (m_DOM->m_XMLDoc);
+        errorCode=0;
       }    
     }
     catch (const DOMException& e)
@@ -299,16 +399,28 @@ int mafXMLStorage::InternalStore()
     cppDEL (m_DOM->m_XMLDoctype);
 
     // move to destination URL
-    if (StoreToURL(filename,m_URL)!=MAF_OK)
+    if (errorCode==0)
     {
-      mafErrorMessage("Unable to resolve URL for output XML file, a copy of the file can be found in: %s",filename);
-      errorCode = 4;
-    }
-    else
-    {
-      ReleaseTmpFile(filename);
-    }
-    
+      if (StoreToURL(filename,m_URL)!=MAF_OK)
+      {
+        mafErrorMessage("Unable to resolve URL for output XML file, a copy of the file can be found in: %s",filename);
+        errorCode = 4;
+      }
+      else
+      {
+        //
+        // clean the storage file directory
+        //
+
+        ReleaseTmpFile(filename); // remove the storage tmp file
+
+        // remove old URLs
+        for (std::set<mafString>::iterator it=m_GarbageCollector.begin();it!=m_GarbageCollector.end();it++)
+        {
+          DeleteURL(*it);
+        }
+      }
+    }    
   }
   else
   {

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:18:11 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-04-18 19:55:15 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -61,11 +61,19 @@ public:
   /** resolve an URL and provide a local filename to be used as output */
   virtual int StoreToURL(const char * filename, const char * url);
 
-  /** delete file from storage */
+  /** release file from storage. Actually do not delete, just collect. */
   virtual int ReleaseURL(const char *url);
+
+  /** remove the file from URL */
+  virtual int DeleteURL(const char *url);
 
   /** populate the list of file in the directory */
   virtual int OpenDirectory(const char *pathname);
+
+  /** Set the URL of the document to be read or written */
+  virtual void SetURL(const char *name);
+
+  virtual const char* GetTmpFolder();
 
 protected:
   /** This is called by Store() and must be reimplemented by subclasses */
@@ -77,5 +85,7 @@ protected:
   mafString  m_FileType;  ///< The type of file to be opened
   mafString  m_Version;   ///< The version of the file to be opened
   mmuXMLDOM  *m_DOM;      ///< PIMPL object storing XML objects' pointers
+  std::set<mafString> m_GarbageCollector; ///< collect URL to be released
+  mafString  m_DefaultTmpFolder; ///< used to store the current default tmp folder
 };
 #endif // _mafXMLStorage_h_
