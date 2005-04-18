@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:06:46 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-18 10:15:58 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,32 +32,32 @@
 #include "vtkMatrix4x4.h"
 
 /**
-ci sono 4 percorsi nel OpProcessor
+There are 4 paths in OpProcessor
 
-1) OpRun -> lancia la gui della op, ...... in modo asincrono puo chiamare OpDo
-usato dalle operazioni op,imp,exp
+1) OpRun -> run the op's GUI, ...... in asynchronous way can call OpDo
+used into operations op,imp,exp
 
-2) OpExec -> lancia OpDo in modo sincrono
-usato da select,transform,cut,copy,paste, op annidate
+2) OpExec -> run OpDo in synchronous way
+used by nested select,transform,cut,copy,paste, op
 
-3) OpUndo -> fa pop e lancia in modo sincrono op->OpUndo
-usato da undo
+3) OpUndo -> do pop e run in synchronous way op->OpUndo
+used by undo
 
-4) OpRedo -> fa pop e lancia in modo sincrono op->OpRedo
-usato da redo
+4) OpRedo -> do pop e run in synchronous way op->OpRedo
+used by redo
 
-Durante la Run una operazione puo lanciare nested operations,
-le nested operations possono essere annullate separatamente.
+During the Run an operation can run nested operations,
+the nested operations can be cancelled individually.
 
-le nested operation mandano OP_RUN_STARTING e OP_RUN_TERMINATED alla operazione caller.
-invece che a Logic - in Logic non serve piu il running_op_counter, in teoria.
-In pratica serve per le View-Settings.
+the nested operations send OP_RUN_STARTING and OP_RUN_TERMINATED to the caller operation.
+instead to Logic - in Logic don't need any more running_op_counter, in theory.
+In practice it needs for View-Settings.
 
-No e' pericoloso - se le operazioni non gestiscono OP_RUN_STARTING e OP_RUN_TERMINATED 
-questi tornano indietro e finiscono da logic - meglio evitare.
+No is dangerous - if the operations don't manage OP_RUN_STARTING and OP_RUN_TERMINATED 
+these return and reach logic - is better to avoid.
 
-Durante la Exec, si possono lanciare operazioni annidate
-ma comunque non si potrebbe fare l'undo.
+During the Exec, can be run nested operations
+but could not be done the undo.
 */
 //----------------------------------------------------------------------------
 mafOpManager::mafOpManager()
@@ -131,7 +131,6 @@ void mafOpManager::OnEvent(mafEvent& e)
 }
 //----------------------------------------------------------------------------
 void mafOpManager::OpAdd(mafOp *op, wxString menuPath)
-/** aggiunge un op alla lista */
 //----------------------------------------------------------------------------
 {
   assert(m_numop < MAXOP);
@@ -169,22 +168,18 @@ void mafOpManager::FillMenu (wxMenu* import, wxMenu* export, wxMenu* operations)
         sub_menu = new wxMenu;
         m_menu[o->GetType()]->Append(submenu_id++,o->m_opMenuPath,sub_menu);
       }
-
       
       if(sub_menu)
         sub_menu->Append(o->m_id, o->m_label, o->m_label);
       else
         wxLogMessage("error in FillMenu");
-    
     }
     else
     {
       m_menu[o->GetType()]->Append(o->m_id, o->m_label, o->m_label);
     }
-
     SetAccelerator(o);
   }
-
   wxAcceleratorTable accel(MAXOP, m_OpAccelEntries);
   if (accel.Ok())
     mafGetFrame()->SetAcceleratorTable(accel);
@@ -198,6 +193,7 @@ void mafOpManager::SetAccelerator(mafOp *op)
   accelerator = op->m_label;
   wxStringTokenizer tkz(accelerator, "\t");
   int token = tkz.CountTokens();
+
   if (token > 1)
   {
     accelerator  = tkz.GetNextToken();
@@ -249,7 +245,8 @@ mafNode* mafOpManager::GetSelectedVme()
 void mafOpManager::OpSelect(mafNode* vme)   
 //----------------------------------------------------------------------------
 {
-	if(vme == m_selected ) return;
+	if(vme == m_selected ) 
+    return;
 	m_opselect->SetNewSel(vme);
 	OpExec(m_opselect);
 }
@@ -356,7 +353,6 @@ bool mafOpManager::WarnUser(mafOp *op)
 							wxYES_NO|wxYES_DEFAULT
 							);
 		if(dialog.ShowModal() == wxID_NO) go = false;
-
 	}
   return go;
 }
@@ -366,28 +362,28 @@ void mafOpManager::OpRun(int op_id)
 {
   switch(op_id)
   {
-	case OP_UNDO:
+	  case OP_UNDO:
 			 OpUndo();
-	break;
-	case OP_REDO:
+	  break;
+	  case OP_REDO:
 			 OpRedo();
-	break;
-	case OP_DELETE:
-	case OP_CUT:
+	  break;
+	  case OP_DELETE:
+	  case OP_CUT:
 			 OpExec(m_opcut);
-	break;
-	case OP_COPY:
+	  break;
+	  case OP_COPY:
 			 OpExec(m_opcopy);
-	break;
-	case OP_PASTE:
+	  break;
+	  case OP_PASTE:
 			 OpExec(m_oppaste);
-	break;
-	default:
+	  break;
+	  default:
 		{
-       int index = op_id - OP_USER;
-			 if(index >=0 && index <m_numop) OpRun(m_opv[index]);
+      int index = op_id - OP_USER;
+		  if(index >=0 && index <m_numop) OpRun(m_opv[index]);
 		}
-	break;
+	  break;
 	}
 }
 //----------------------------------------------------------------------------
@@ -445,10 +441,9 @@ void mafOpManager::OpRunOk(mafOp *op)
 	{
 		OpDo(op);
 	}
-
   Notify(OP_RUN_TERMINATED);
-
-	if(m_context.Caller() == NULL) 	EnableOp();
+	if(m_context.Caller() == NULL) 	
+    EnableOp();
 }
 //----------------------------------------------------------------------------
 void mafOpManager::OpRunCancel(mafOp *op)
@@ -481,33 +476,32 @@ void mafOpManager::OpExec(mafOp *op)
 		  OpDo(o);
 	  }
   }
-
 	EnableOp();
 }
 //----------------------------------------------------------------------------
 void mafOpManager::OpDo(mafOp *op)
 //----------------------------------------------------------------------------
 {
- 	 if(!WarnUser(op)) 
-   {
-      delete op;
-			return;
-	 }
-   
-   m_context.Redo_Clear();
-   op->OpDo();
-   
-   wxLogMessage("do=%s",op->m_label);
+ 	if(!WarnUser(op)) 
+  {
+    delete op;
+		return;
+	}
+  
+  m_context.Redo_Clear();
+  op->OpDo();
+  
+  wxLogMessage("do=%s",op->m_label);
 
-   if(op->CanUndo()) 
-   {
-	   m_context.Undo_Push(op);
-   }
-   else
-   {
-	   m_context.Undo_Clear();
-     delete op;  
-   }
+  if(op->CanUndo()) 
+  {
+	  m_context.Undo_Push(op);
+  }
+  else
+  {
+	  m_context.Undo_Clear();
+    delete op;  
+  }
 }
 //----------------------------------------------------------------------------
 void mafOpManager::OpUndo()   
@@ -518,7 +512,6 @@ void mafOpManager::OpUndo()
     wxLogMessage("empty undo stack");
     return;
   }
-
 	EnableOp(false);
 
 	mafOp* op = m_context.Undo_Pop();
@@ -565,28 +558,25 @@ bool mafOpManager::StopCurrentOperation()
 //----------------------------------------------------------------------------
 {
   assert(false); //SIL. 2-7-2004: -- Seems that no-one is using this -- but tell me if the program stop here -- thank
-  
-  
   mafOp *prev_running_op = m_running_op;
 	
 	while(m_running_op) //loop danger !!!
 	{
-     if(m_running_op->OkEnabled())
-		    m_running_op->ForceStopWithOk();
-     else
-		    m_running_op->ForceStopWithCancel();
+    if(m_running_op->OkEnabled())
+		  m_running_op->ForceStopWithOk();
+    else
+		  m_running_op->ForceStopWithCancel();
 
-     //if(prev_running_op == m_running_op)
-		 //{
-        //previous try failed, be more bad
-				//OpRunCancel(m_running_op); - wrong: op-gui will be still plugged
-		 //}
+    //if(prev_running_op == m_running_op)
+		//{
+      //previous try failed, be more bad
+			//OpRunCancel(m_running_op); - wrong: op-gui will be still plugged
+		//}
 
-     if(prev_running_op == m_running_op)
-		 {
-        //second try failed, give it up and break to prevent loops
-				break;
-		 }
+    if(prev_running_op == m_running_op)
+		{
+			break; //second try failed, give it up and break to prevent loops
+		}
 	}
   return (m_running_op == NULL);
 }
@@ -594,11 +584,12 @@ bool mafOpManager::StopCurrentOperation()
 bool mafOpManager::ForceStopWithOk()
 //----------------------------------------------------------------------------
 {
-  if(!m_running_op) return false;
+  if(!m_running_op) 
+    return false;
   mafOp *to_be_killed = m_running_op;
 
   if(m_running_op->OkEnabled())
-     m_running_op->ForceStopWithOk();
+    m_running_op->ForceStopWithOk();
   
   return m_running_op != to_be_killed;
 }
@@ -606,7 +597,8 @@ bool mafOpManager::ForceStopWithOk()
 bool mafOpManager::ForceStopWithCancel()
 //----------------------------------------------------------------------------
 {
-  if(!m_running_op) return false;
+  if(!m_running_op) 
+    return false;
   mafOp *to_be_killed = m_running_op;
 
   m_running_op->ForceStopWithCancel();
