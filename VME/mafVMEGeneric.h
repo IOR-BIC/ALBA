@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGeneric.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 18:16:47 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-04-19 08:27:00 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -57,6 +57,9 @@ public:
   /** 
     Return the output. This create the output object on demand. */  
   virtual mafVMEOutput *GetOutput();
+
+  /** return icon */
+  static char** GetIcon();
   
 protected:
   mafVMEGeneric();

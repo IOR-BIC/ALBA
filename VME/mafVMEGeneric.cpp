@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGeneric.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 18:16:47 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-19 08:27:00 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -96,3 +96,10 @@ int mafVMEGeneric::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
   return MAF_OK;
 }
 
+//-------------------------------------------------------------------------
+char** mafVMEGeneric::GetIcon() 
+//-------------------------------------------------------------------------
+{
+  #include "mafVMEGeneric.xpm"
+  return mafVMEGeneric_xpm;
+}

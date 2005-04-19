@@ -1,9 +1,9 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mafMSFStorage.cpp,v $
+  Module:    $RCSfile: mafVMEStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-16 12:08:36 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-19 08:27:01 $
+  Version:   $Revision: 1.1 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -12,7 +12,7 @@
 
 #include "mafIncludeWX.h" // to be removed
 
-#include "mafMSFStorage.h"
+#include "mafVMEStorage.h"
 #include "mafVMERoot.h"
 #include "mmuUtility.h"
 #include "mafStorable.h"
@@ -40,15 +40,15 @@ int mmuMSFDocument::InternalRestore(mafStorageElement *node)
 }
 
 //------------------------------------------------------------------------------
-// mafMSFStorage
+// mafVMEStorage
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-mafCxxTypeMacro(mafMSFStorage)
+mafCxxTypeMacro(mafVMEStorage)
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-mafMSFStorage::mafMSFStorage()
+mafVMEStorage::mafVMEStorage()
 //------------------------------------------------------------------------------
 {
   SetVersion("2.0");
@@ -60,7 +60,7 @@ mafMSFStorage::mafMSFStorage()
 }
 
 //------------------------------------------------------------------------------
-mafMSFStorage::~mafMSFStorage()
+mafVMEStorage::~mafVMEStorage()
 //------------------------------------------------------------------------------
 {
   cppDEL(m_Document); // delete the document object
@@ -68,14 +68,14 @@ mafMSFStorage::~mafMSFStorage()
 }
 
 //------------------------------------------------------------------------------
-mafVMERoot *mafMSFStorage::GetRoot()
+mafVMERoot *mafVMEStorage::GetRoot()
 //------------------------------------------------------------------------------
 {
   return m_Root;
 }
 
 //------------------------------------------------------------------------------
-void mafMSFStorage::OnEvent(mafEventBase *e)
+void mafVMEStorage::OnEvent(mafEventBase *e)
 //------------------------------------------------------------------------------
 {
   // default forward events to 

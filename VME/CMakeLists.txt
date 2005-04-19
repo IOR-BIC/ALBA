@@ -16,8 +16,8 @@ mafMatrixInterpolator.cpp
 mafMatrixInterpolator.h
 mafMatrixVector.cpp
 mafMatrixVector.h
-mafMSFStorage.cpp
-mafMSFStorage.h
+mafVMEStorage.cpp
+mafVMEStorage.h
 mafVMEFactory.cpp
 mafVMEFactory.h
 mafVMEGenericAbstract.cpp

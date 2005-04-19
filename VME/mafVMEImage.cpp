@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEImage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 18:16:48 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-19 08:27:01 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -80,3 +80,10 @@ int mafVMEImage::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
   return MAF_ERROR;
 }
 
+//-------------------------------------------------------------------------
+char** mafVMEImage::GetIcon() 
+//-------------------------------------------------------------------------
+{
+  #include "mafVMEImage.xpm"
+  return mafVMEImage_xpm;
+}

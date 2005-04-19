@@ -1,16 +1,16 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mafMSFStorage.h,v $
+  Module:    $RCSfile: mafVMEStorage.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-16 12:08:37 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-19 08:27:01 $
+  Version:   $Revision: 1.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-#ifndef __mafMSFStorage_h__
-#define __mafMSFStorage_h__
+#ifndef __mafVMEStorage_h__
+#define __mafVMEStorage_h__
 
 #include "mafXMLStorage.h"
 #include "mafObserver.h"
@@ -41,15 +41,15 @@ protected:
   @todo
     - 
 */  
-class mafMSFStorage: public mafXMLStorage, public mafObserver, public mafEventSender
+class mafVMEStorage: public mafXMLStorage, public mafObserver, public mafEventSender
 {
 public:
   
 
-  mafTypeMacro(mafMSFStorage,mafXMLStorage)
+  mafTypeMacro(mafVMEStorage,mafXMLStorage)
 
-  mafMSFStorage();
-  virtual ~mafMSFStorage();
+  mafVMEStorage();
+  virtual ~mafVMEStorage();
   
   /** return the root node attached to this tree */
   mafVMERoot *GetRoot();
@@ -71,4 +71,4 @@ private:
   /** avoid external objects to set the root */
   void SetRoot (mafStorable *root);
 };
-#endif // _mafMSFStorage_h_
+#endif // _mafVMEStorage_h_

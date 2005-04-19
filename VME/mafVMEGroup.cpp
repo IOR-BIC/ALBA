@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGroup.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 18:16:22 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-19 08:27:00 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -54,4 +54,12 @@ mafVMEOutput *mafVMEGroup::GetOutput()
     SetOutput(mafVMEOutputNULL::New()); // create the output
   }
   return m_Output;
+}
+
+//-------------------------------------------------------------------------
+char** mafVMEGroup::GetIcon() 
+//-------------------------------------------------------------------------
+{
+  #include "mafVMEGroup.xpm"
+  return mafVMEGroup_xpm;
 }

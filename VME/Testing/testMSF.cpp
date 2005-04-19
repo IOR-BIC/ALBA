@@ -10,7 +10,7 @@
 #include "mafVMEFactory.h"
 #include "mafCoreFactory.h"
 #include "mafNodeIterator.h"
-#include "mafMSFStorage.h"
+#include "mafVMEStorage.h"
 #include "mafVMERoot.h"
 #include "mafVMESurface.h"
 #include "mafVMEPolyline.h"
@@ -193,7 +193,7 @@ int main( int argc, char *argv[] )
   // create folder for test file
   wxMkdir("testMSF");
 
-  mafMSFStorage storage;
+  mafVMEStorage storage;
   storage.SetURL("testMSF/testMSF.msf");
   mafVMERoot *root=storage.GetRoot();
 
@@ -283,7 +283,7 @@ int main( int argc, char *argv[] )
   //
   // Test data reloading
   //
-  mafMSFStorage load_storage;
+  mafVMEStorage load_storage;
   load_storage.SetURL("testMSF/testMSF.msf");
   mafVMERoot *loaded_root=load_storage.GetRoot();
   load_storage.Restore();
@@ -336,7 +336,7 @@ int main( int argc, char *argv[] )
     MAF_TEST(file_list.find(new_fname)!=file_list.end());
   }
   
-  mafMSFStorage reload_storage;
+  mafVMEStorage reload_storage;
   reload_storage.SetURL("testMSF/testMSF.msf");
   mafVMERoot *reloaded_root=reload_storage.GetRoot();
   reload_storage.Restore();
@@ -353,7 +353,7 @@ int main( int argc, char *argv[] )
   storage.Store();
 
 
-  mafMSFStorage load_saveas_storage;
+  mafVMEStorage load_saveas_storage;
   load_saveas_storage.SetURL("testMSF_saveAs/testMSF_saveAs.msf");
   mafVMERoot *loaded_saveas_root=load_saveas_storage.GetRoot();
   load_saveas_storage.Restore();

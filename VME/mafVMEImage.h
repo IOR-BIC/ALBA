@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEImage.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 18:16:48 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-19 08:27:01 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -49,6 +49,9 @@ public:
 
     /** return the right type of output */  
     virtual mafVMEOutput *GetOutput();
+
+    /** return icon */
+    static char** GetIcon();
 protected:
   mafVMEImage();
   virtual ~mafVMEImage();
