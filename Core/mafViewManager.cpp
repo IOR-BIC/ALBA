@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-13 13:09:02 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-19 12:32:45 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -349,7 +349,8 @@ void mafViewManager::ViewInsert(mafView *view)
     m_vlist = view;
   else
   {
-    for(mafView* v = m_vlist; v->m_next; v = v->m_next) ; // go on until the end of the list is reached.
+    mafView* v;
+    for(v = m_vlist; v->m_next; v = v->m_next) ; // go on until the end of the list is reached.
     v->m_next = view;
   }
 }

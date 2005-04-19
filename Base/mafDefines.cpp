@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-18 19:52:38 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-04-19 12:33:12 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -96,7 +96,7 @@ bool mafEquals(double x, double y)
 //------------------------------------------------------------------------------
 {
    double diff=fabs(x - y);
-   double max_err=fabs(x / pow(10,15));
+   double max_err=fabs(x / pow((double)10,(double)15));
    if (diff > max_err)
      return false;
    return  ( diff <= max_err);
@@ -107,6 +107,6 @@ bool mafFloatEquals(float x, float y)
 //------------------------------------------------------------------------------
 {
    float diff=fabs(x - y);
-   float max_err=(x / fabs(pow(10,7)));
+   float max_err=fabs(x / pow((double)10,(double)7));
    return  ( diff <= max_err);
 }

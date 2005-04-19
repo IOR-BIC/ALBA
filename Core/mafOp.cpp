@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:18 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-19 12:32:44 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -146,11 +146,14 @@ void mafOp::ShowGui()
 //----------------------------------------------------------------------------
 {
   assert(m_gui); 
-	m_guih = new mmgGuiHolder(mafGetFrame(),-1);
-	m_guih->Put(m_gui);
+  m_guih = new mmgGuiHolder(mafGetFrame(),-1);
+  m_guih->Put(m_gui);
 	
-	m_guih->SetTitle(wxString::Format(" %s parameters:",wxStripMenuCodes(m_label)));
-	mafEventMacro(mafEvent(this,OP_SHOW_GUI,(wxWindow *)m_guih));
+  wxString title;
+  wxString menu_codes=wxStripMenuCodes(m_label);
+  title.Format(" %s parameters:",menu_codes.c_str());
+  m_guih->SetTitle(title);
+  mafEventMacro(mafEvent(this,OP_SHOW_GUI,(wxWindow *)m_guih));
 }
 //----------------------------------------------------------------------------
 void mafOp::HideGui()
@@ -159,30 +162,32 @@ void mafOp::HideGui()
 {
    assert(m_gui); 
    mafEventMacro(mafEvent(this,OP_HIDE_GUI,(wxWindow *)m_guih));
-	 delete m_guih;
+   delete m_guih;
    m_guih = NULL;
-	 m_gui = NULL;
+   m_gui = NULL;
 }
 //----------------------------------------------------------------------------
 bool mafOp::OkEnabled()
 //----------------------------------------------------------------------------
 {
-   if(!m_gui) return false;
-	 wxWindow* win = m_gui->FindWindow(wxOK);
-	 if (!win) return false;
-	 return win->IsEnabled();
+  if(!m_gui) return false;
+  wxWindow* win = m_gui->FindWindow(wxOK);
+  if (!win) return false;
+  return win->IsEnabled();
 }
 //----------------------------------------------------------------------------
 void mafOp::ForceStopWithOk()
 //----------------------------------------------------------------------------
 {
-   OnEvent(mafEvent(this,wxOK));
+  mafEvent e(this,wxOK);
+  OnEvent(e);
 }
 //----------------------------------------------------------------------------
 void mafOp::ForceStopWithCancel()
 //----------------------------------------------------------------------------
 {
-   OnEvent(mafEvent(this,wxCANCEL));
+  mafEvent e(this,wxCANCEL);
+  OnEvent(e);
 }
 //----------------------------------------------------------------------------
 void mafOp::SetMouseAction(mafAction *action)

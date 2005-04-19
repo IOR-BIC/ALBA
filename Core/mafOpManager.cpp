@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-18 10:15:58 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-19 12:32:45 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -140,13 +140,13 @@ void mafOpManager::OpAdd(mafOp *op, wxString menuPath)
   m_numop++;
 }
 //----------------------------------------------------------------------------
-void mafOpManager::FillMenu (wxMenu* import, wxMenu* export, wxMenu* operations)
+void mafOpManager::FillMenu (wxMenu* import, wxMenu* mexport, wxMenu* operations)
 //----------------------------------------------------------------------------
 {
   int submenu_id = 1;
   
   m_menu[OPTYPE_IMPORTER] = import;
-  m_menu[OPTYPE_EXPORTER] = export;
+  m_menu[OPTYPE_EXPORTER] = mexport;
   m_menu[OPTYPE_OP] = operations;
    
 	for(int i=0; i<m_numop; i++)
