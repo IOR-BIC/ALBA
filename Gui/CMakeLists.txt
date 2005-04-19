@@ -24,6 +24,8 @@ mmgCrossSplitter.cpp
 mmgCrossSplitter.h
 mmgDialog.cpp
 mmgDialog.h
+mmgDialogPreview.cpp
+mmgDialogPreview.h
 mmgFileHistory.cpp
 mmgFileHistory.h
 mmgFlagSplitter.cpp
