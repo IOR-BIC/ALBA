@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-19 07:13:53 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-19 08:25:21 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,7 +32,7 @@
 //#include "mafVmeData.h"
 #include "mafVMEManager.h"
 #include "mafNode.h"
-#include "mafMSFStorage.h"
+#include "mafVMEStorage.h"
 #include "mafNodeIterator.h"
 #include "mafTagArray.h"
 
@@ -82,7 +82,7 @@ void mafVMEManager::CreateNewStorage()
 //----------------------------------------------------------------------------
 {
   if(m_Storage) m_Storage->Delete(); 
-  m_Storage = mafMSFStorage::New();
+  m_Storage = mafVMEStorage::New();
   m_Storage->GetRoot()->SetName("root");
 }
 

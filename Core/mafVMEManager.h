@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-19 07:13:53 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-19 08:25:21 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,7 +22,7 @@
 //----------------------------------------------------------------------------
 // Forward References :
 //----------------------------------------------------------------------------
-class mafMSFStorage;
+class mafVMEStorage;
 //----------------------------------------------------------------------------
 // mafVMEManager :
 //----------------------------------------------------------------------------
@@ -123,6 +123,6 @@ protected:
 
   
   bool              m_Crypting;
-  mafMSFStorage*    m_Storage;
+  mafVMEStorage*    m_Storage;
 };
 #endif
