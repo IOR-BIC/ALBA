@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2005-04-14 18:14:50 $
-# Version:   $Revision: 1.19 $
+# Date:      $Date: 2005-04-19 08:22:46 $
+# Version:   $Revision: 1.20 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -130,9 +130,9 @@ IF (MAF_CAN_BUILD)
   #-----------------------------------------------------------------------------
   # Build examples too ?
   #-----------------------------------------------------------------------------
-  IF (BUILD_EXAMPLES AND MFL_CONFIGURED)
+  IF (BUILD_EXAMPLES AND MAF_CAN_BUILD)
     SUBDIRS(Examples)
-  ENDIF (BUILD_EXAMPLES AND MFL_CONFIGURED)
+  ENDIF (BUILD_EXAMPLES AND MAF_CAN_BUILD)
   
   #-----------------------------------------------------------------------------
   # Testing stuff
