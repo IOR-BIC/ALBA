@@ -1,7 +1,7 @@
 PROJECT (TestWXVTK)
 
 SET(PROJECT_SRCS 
-  sample.cpp
+  Sample.cpp
   wxVTKRenderWindowInteractor.cxx
 )
 
