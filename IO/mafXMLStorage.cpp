@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-18 19:55:15 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-04-19 08:27:34 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -126,8 +126,16 @@ const char* mafXMLStorage::GetTmpFolder()
   if (m_TmpFolder.IsEmpty())
   {
     wxString path=wxPathOnly(m_URL.GetCStr());
-    m_DefaultTmpFolder=path;
-    m_DefaultTmpFolder<<"/";
+    if (!path.IsEmpty())
+    {
+      m_DefaultTmpFolder=path;
+      m_DefaultTmpFolder<<"/";
+    }
+    else
+    {
+      m_DefaultTmpFolder="";
+    }
+    
     return m_DefaultTmpFolder;
   }
   else
@@ -218,11 +226,19 @@ int mafXMLStorage::StoreToURL(const char * filename, const char * url)
     // if local file prepend base_path
     wxString base_path,fullpathname;
     base_path=wxPathOnly(m_URL.GetCStr());
-    fullpathname=base_path+"/"+url;
-    if (IsFileInDirectory(url))
+    if (!base_path.IsEmpty())
+    {
+      fullpathname=base_path+"/"+url;
+    }
+    else
+    {
+      fullpathname=url;
+    }
+    
+    if (IsFileInDirectory(url)) // IsFileInDirectory accepts URL specifications
     {
       // remove old file if present
-      wxRemoveFile(fullpathname);
+      DeleteURL(url);
     }
 
     // currently only local files are supported
