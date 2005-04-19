@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialog.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-16 09:59:37 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-19 15:57:18 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -100,15 +100,14 @@ public:
   virtual void OnCancel(wxCommandEvent& event);
 
   /** sizer for user widgets */
-  wxBoxSizer      *m_sizer; 
+  wxBoxSizer *m_sizer;
+  wxBoxSizer *m_buttons_sizer;
+  wxBoxSizer *m_dialog_sizer;
+  wxButton   *m_ok_button;
+  wxButton   *m_cancel_button;
+  wxButton   *m_close_button;
 
-  wxBoxSizer      *m_buttons_sizer; 
-  wxBoxSizer      *m_dialog_sizer; 
-  wxButton        *m_ok_button;
-  wxButton        *m_cancel_button;
-  wxButton        *m_close_button;
-
-  mafEventListener   *m_Listener;
+  mafEventListener *m_Listener;
 
 private:
   /** non virtual function, called on Dialog Closing and bound trought the event table */
