@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPics.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:19 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-19 12:37:06 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -144,7 +144,7 @@ wxBitmap mafPictureFactory::GetBmp(wxString id)
     return wxBitmap((*it).second);
   else
   {
-    wxLogMessage("mafPictureFactory: pic with id = %s not found",id);
+    wxLogMessage("mafPictureFactory: pic with id = %s not found",id.c_str());
     return wxNullBitmap;
   }
 }
@@ -157,7 +157,7 @@ wxImage mafPictureFactory::GetImg(wxString id)
     return (*it).second;
   else
   {
-    wxLogMessage("mafPictureFactory: pic with id = %s not found",id);
+    wxLogMessage("mafPictureFactory: pic with id = %s not found",id.c_str());
     return wxNullImage;
   }
 }
@@ -175,7 +175,7 @@ wxIcon mafPictureFactory::GetIcon(wxString id)
   }
   else
   {
-    wxLogMessage("mafPictureFactory: pic with id = %s not found",id);
+    wxLogMessage("mafPictureFactory: pic with id = %s not found",id.c_str());
     return wxNullIcon;
   }
 }
@@ -194,7 +194,7 @@ wxBitmap mafPictureFactory::GetVmePic(wxString id)
     return wxBitmap((*it).second);
   else
   {
-    wxLogMessage("mafPictureFactory: vme-pic with id = %s not found",id);
+    wxLogMessage("mafPictureFactory: vme-pic with id = %s not found",id.c_str());
     return wxNullBitmap;
   }
 }

@@ -20,7 +20,7 @@ SUBDIRS(13_testCheckTree)
 SUBDIRS(14_testOpMan)
 SUBDIRS(15_testDialog)
 SUBDIRS(16_testRWI)
-SUBDIRS(17_testWXVTK)
+SUBDIRS(17_TestWXVTK)
 
 # wxWidgets specific classes
 IF (MAF_USE_WX)
