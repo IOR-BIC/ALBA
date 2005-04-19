@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-13 13:07:53 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-19 12:03:38 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -112,11 +112,11 @@ mafRWIBase * mafRWIBase::New()
   return new mafRWIBase();
 }
 //----------------------------------------------------------------------------
-void mafRWIBase::SetMouseAction(mafAction *action)
+//void mafRWIBase::SetMouseAction(mafAction *action)
 //----------------------------------------------------------------------------
-{
+//{
   //m_MouseAction = action;
-}
+//}
 //----------------------------------------------------------------------------
 void mafRWIBase::Initialize()
 //----------------------------------------------------------------------------

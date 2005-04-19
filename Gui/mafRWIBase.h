@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 13:44:56 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-19 12:03:38 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,7 +25,7 @@ class wxKeyEvent;
 class wxSizeEvent;
 class vtkInteractorObserver;
 class vtkCamera;
-class mafAction;
+//class mafAction;
 //----------------------------------------------------------------------------
 // Constant:
 //----------------------------------------------------------------------------
@@ -120,10 +120,9 @@ public:
 	/** Do nothing. */
 	void OnIdle(wxIdleEvent& event);
   /** Initialize the action for the mouse device. */
-  void SetMouseAction(mafAction *action);
+  //void SetMouseAction(mafAction *action);
 
-  /** 
-  Redefined to set the m_CustomInteractorStyle flag. */
+  /** Redefined to set the m_CustomInteractorStyle flag. */
   void SetInteractorStyle(vtkInteractorObserver *o);
 
   bool m_hidden;
