@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-13 13:09:02 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-19 08:25:07 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,7 +21,7 @@
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
-class mafNodeManager;
+class mafVMEManager;
 class mafViewManager;
 class mafOpManager;
 class mafSideBar;
@@ -30,7 +30,7 @@ class mafSideBar;
 //----------------------------------------------------------------------------
 /** 
 mafLogicWithManagers provide:
-- the NodeManager
+- the VMEManager
 - the OperationManager, and the support for plugging operations
 - the ViewManager, and the support for plugging views
 and manage all the Events related to Nodes,Operations and Views.
@@ -78,7 +78,7 @@ public:
 	virtual void Init(int argc, char **argv);
 
   // must be called before Configure 
-  void PlugNodeManager(bool b) {m_UseNodeManager =b;};
+  void PlugVMEManager(bool b) {m_UseVMEManager =b;};
   void PlugViewManager(bool b){m_UseViewManager=b;};
   void PlugOpManager(bool b){m_UseOpManager=b;};
 
@@ -160,7 +160,7 @@ protected:
   void UpdateFrameTitle();
 
   mafSideBar *m_side_bar;
-  mafNodeManager *m_NodeManager;
+  mafVMEManager *m_VMEManager;
   mafViewManager *m_ViewManager;
   mafOpManager   *m_OpManager;
 
@@ -170,7 +170,7 @@ protected:
   wxMenu *m_op_menu;
   wxMenu *m_view_menu; 
 
-  bool m_UseNodeManager;
+  bool m_UseVMEManager;
   bool m_UseViewManager;
   bool m_UseOpManager;
 };

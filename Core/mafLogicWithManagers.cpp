@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-13 13:09:02 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-19 08:25:07 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,7 +24,7 @@
 
 #include "mafView.h"
 #include "mafViewManager.h"
-#include "mafNodeManager.h"
+#include "mafVMEManager.h"
 #include "mafOpManager.h"
 
 #include "mmgMDIFrame.h"
@@ -37,7 +37,7 @@ mafLogicWithManagers::mafLogicWithManagers()
 //----------------------------------------------------------------------------
 {
   m_side_bar      = NULL;
-  m_NodeManager   = false;
+  m_VMEManager   = false;
   m_ViewManager   = false;
   m_OpManager     = false;
 
@@ -65,10 +65,10 @@ void mafLogicWithManagers::Configure()
     m_side_sash->Put(m_side_bar->m_notebook);
   }
 
-  if(m_UseNodeManager)
+  if(m_UseVMEManager)
   {
-    m_NodeManager = new mafNodeManager();
-    m_NodeManager->SetListener(this); 
+    m_VMEManager = new mafVMEManager();
+    m_VMEManager->SetListener(this); 
   }
   if(m_UseViewManager)
   {
@@ -97,8 +97,8 @@ void mafLogicWithManagers::Plug(mafOp *op)
 void mafLogicWithManagers::Show()
 //----------------------------------------------------------------------------
 {
-  if(m_NodeManager && m_recentFile_menu)
-    m_NodeManager->SetFileHistoryMenu(m_recentFile_menu);
+  if(m_VMEManager && m_recentFile_menu)
+    m_VMEManager->SetFileHistoryMenu(m_recentFile_menu);
 
   if(m_UseViewManager && m_view_menu)
     m_ViewManager->FillMenu(m_view_menu);
@@ -119,20 +119,20 @@ void mafLogicWithManagers::Show()
 void mafLogicWithManagers::Init(int argc, char **argv)
 //----------------------------------------------------------------------------
 {
-  if(m_NodeManager)
+  if(m_VMEManager)
   {
     if(argc > 1 )
 	  {
 		  wxString file = argv[1];
 		  if(wxFileExists(file))
 		  {
-			  m_NodeManager->MSFOpen(file);
+			  m_VMEManager->MSFOpen(file);
 			  UpdateFrameTitle();
 		  }
 	  }
     else
     {
-      m_NodeManager->MSFNew();
+      m_VMEManager->MSFNew();
     }
   }
 }
@@ -191,7 +191,7 @@ void mafLogicWithManagers::UpdateFrameTitle()
 //----------------------------------------------------------------------------
 {
   wxString title(m_AppTitle);
-  title += "   " + m_NodeManager->GetFileName();
+  title += "   " + m_VMEManager->GetFileName();
   m_win->SetTitle(title);
 }
 //----------------------------------------------------------------------------
@@ -311,11 +311,11 @@ void mafLogicWithManagers::OnEvent(mafEvent& e)
 void mafLogicWithManagers::OnFileNew()
 //----------------------------------------------------------------------------
 {
-	if(m_NodeManager)
+	if(m_VMEManager)
   {
-    if( m_NodeManager->AskConfirmAndSave())
+    if( m_VMEManager->AskConfirmAndSave())
 	  {
-		  m_NodeManager->MSFNew();
+		  m_VMEManager->MSFNew();
 		  if(m_OpManager) m_OpManager->ClearUndoStack(); 
 	  }
   }
@@ -325,9 +325,9 @@ void mafLogicWithManagers::OnFileNew()
 void mafLogicWithManagers::OnFileOpen()
 //----------------------------------------------------------------------------
 {
-  if(m_NodeManager)
+  if(m_VMEManager)
   {
-	  if(m_NodeManager->AskConfirmAndSave())
+	  if(m_VMEManager->AskConfirmAndSave())
 	  {
 		  wxString m_wildc    = "Multimod Storage Format file (*.msf)|*.msf";
 		  wxString m_msf_dir  = mafGetApplicationDirectory().c_str();
@@ -335,7 +335,7 @@ void mafLogicWithManagers::OnFileOpen()
 		  wxString file				= mafGetOpenFile(m_msf_dir, m_wildc).c_str();
 		  if(file == "") return;
 
-		  m_NodeManager->MSFOpen(file);
+		  m_VMEManager->MSFOpen(file);
 		  if(m_OpManager) m_OpManager->ClearUndoStack(); 
 	  }
   }
@@ -344,9 +344,9 @@ void mafLogicWithManagers::OnFileOpen()
 void mafLogicWithManagers::OnFileHistory(int menuId)
 //----------------------------------------------------------------------------
 {
-	if(m_NodeManager) 
+	if(m_VMEManager) 
   {
-    this->m_NodeManager->MSFOpen(menuId);
+    this->m_VMEManager->MSFOpen(menuId);
     UpdateFrameTitle();
   }
 }
@@ -354,15 +354,15 @@ void mafLogicWithManagers::OnFileHistory(int menuId)
 void mafLogicWithManagers::OnFileSave()
 //----------------------------------------------------------------------------
 {
-  if(m_NodeManager) m_NodeManager->MSFSave();
+  if(m_VMEManager) m_VMEManager->MSFSave();
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OnFileSaveAs()
 //----------------------------------------------------------------------------
 {
-  if(m_NodeManager) 
+  if(m_VMEManager) 
   {
-    m_NodeManager->MSFSaveAs();
+    m_VMEManager->MSFSaveAs();
     UpdateFrameTitle();
   }
 }
@@ -371,10 +371,10 @@ void mafLogicWithManagers::OnQuit()
 //----------------------------------------------------------------------------
 {
   /*
-  if(m_NodeManager)
+  if(m_VMEManager)
   {
     bool quit = false;
-    if (m_NodeManager->MSFIsModified())
+    if (m_VMEManager->MSFIsModified())
     {
       int answer = wxMessageBox
           (
@@ -382,7 +382,7 @@ void mafLogicWithManagers::OnQuit()
           "Confirm", 
           wxYES_NO|wxCANCEL|wxICON_QUESTION , m_win
           );
-      if(answer == wxYES) m_NodeManager->MSFSave();
+      if(answer == wxYES) m_VMEManager->MSFSave();
       quit = answer != wxCANCEL;
     }
     else 
@@ -395,7 +395,7 @@ void mafLogicWithManagers::OnQuit()
   */
   //mmgMDIChild::OnQuit(); //reinsert when the view system is ready
 
-  cppDEL(m_NodeManager);
+  cppDEL(m_VMEManager);
   cppDEL(m_ViewManager);
   cppDEL(m_OpManager);
 
@@ -414,12 +414,12 @@ void mafLogicWithManagers::VmeSelect(mafEvent& e)	//modified by Paolo 10-9-2003
 
 	if(vme == NULL)
 	{
-		if(m_NodeManager)
+		if(m_VMEManager)
     {
 /*
       //vme can be selected by its name
 		  wxString *vme_name = e.GetString()->c_str(); //@@@@@ ????
-		  mafNodeRoot *root = this->m_NodeManager->GetRoot();
+		  mafNodeRoot *root = this->m_VMEManager->GetRoot();
 		  if (vme_name && root)
 		  {
 			  vme = root->FindInTreeByName(vme_name->c_str());        // not yet implemented
@@ -452,13 +452,13 @@ void mafLogicWithManagers::VmeModified(mafNode *vme)
 {
   if(m_PlugTimebar) UpdateTimeBounds();
 	if(m_side_bar)    m_side_bar->VmeModified(vme);
-	if(m_NodeManager) m_NodeManager->MSFModified(true);
+	if(m_VMEManager) m_VMEManager->MSFModified(true);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeAdd(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-	if(m_NodeManager) m_NodeManager->VmeAdd(vme);
+	if(m_VMEManager) m_VMEManager->VmeAdd(vme);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeAdded(mafNode *vme)
@@ -472,7 +472,7 @@ void mafLogicWithManagers::VmeAdded(mafNode *vme)
 void mafLogicWithManagers::VmeRemove(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-  if(m_NodeManager) m_NodeManager->VmeRemove(vme);
+  if(m_VMEManager) m_VMEManager->VmeRemove(vme);
 	UpdateTimeBounds();
 }
 //----------------------------------------------------------------------------
@@ -568,7 +568,7 @@ void mafLogicWithManagers::ViewCreated(mafView *v)
 void mafLogicWithManagers::TimeSet(float t)
 //----------------------------------------------------------------------------
 {
-  if(m_NodeManager) m_NodeManager->TimeSet(t);
+  if(m_VMEManager) m_VMEManager->TimeSet(t);
   if(m_ViewManager) m_ViewManager->CameraUpdate();
 }
 //----------------------------------------------------------------------------
@@ -576,7 +576,7 @@ void mafLogicWithManagers::UpdateTimeBounds()
 //----------------------------------------------------------------------------
 {
   float min,max; 
-  if(m_NodeManager) m_NodeManager->TimeGetBounds(&min,&max);
+  if(m_VMEManager) m_VMEManager->TimeGetBounds(&min,&max);
   if(m_time_panel)  m_time_panel->SetBounds(min,max);
   if(m_time_sash)   m_time_sash->Show(min!=max);
 }
