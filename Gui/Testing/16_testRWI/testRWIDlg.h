@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testRWIDlg.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-16 10:00:19 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-20 14:36:41 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,8 +37,6 @@ public:
 	testRWIDlg (const wxString& title);
 	virtual ~testRWIDlg (); 
 protected:
-	virtual void OnCloseWindow(wxCloseEvent& event);
-
   vtkConeSource *CS;
   vtkPolyDataMapper *PDM;
   vtkActor *A;

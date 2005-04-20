@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testRWIDlg.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-16 10:00:19 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-20 14:36:41 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -63,18 +63,8 @@ testRWIDlg::testRWIDlg(const wxString& title)
 testRWIDlg::~testRWIDlg( ) 
 //----------------------------------------------------------------------------
 {
-}
-//----------------------------------------------------------------------------
-void testRWIDlg::OnCloseWindow(wxCloseEvent& event)
-//----------------------------------------------------------------------------
-{
   vtkDEL(CS);
   vtkDEL(PDM);
   vtkDEL(A);
   cppDEL(RWI); 
-  //RWI (which is here a mafRWI, not a mafRWIBase) must be Deleted :
-  // -- using the delete operator
-  // -- before the parent window is destroyed -- so, not in the destructor of this Dialog
-  wxDialog::OnCloseWindow(event);
 }
-

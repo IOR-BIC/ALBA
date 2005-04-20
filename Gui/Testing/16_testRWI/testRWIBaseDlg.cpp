@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testRWIBaseDlg.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-16 10:00:18 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-20 14:36:41 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -78,20 +78,10 @@ testRWIBaseDlg::testRWIBaseDlg(const wxString& title)
 testRWIBaseDlg::~testRWIBaseDlg( ) 
 //----------------------------------------------------------------------------
 {
-}
-//----------------------------------------------------------------------------
-void testRWIBaseDlg::OnCloseWindow(wxCloseEvent& event)
-//----------------------------------------------------------------------------
-{
   vtkDEL(CS);
   vtkDEL(PDM);
   vtkDEL(A);
   vtkDEL(R);
   vtkDEL(RW);
   vtkDEL(RWI); 
-  //RWI must be Deleted :
-  // -- using the vtk Delete() function
-  // -- before the parent window is destroyed -- so, not in the destructor of this Dialog
-  wxDialog::OnCloseWindow(event);
 }
-
