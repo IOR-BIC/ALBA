@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialog.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-20 14:11:14 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-04-20 14:29:47 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -107,6 +107,11 @@ public:
   called when a ShowModal stage end with because the user press a 'Close' button or the CloseButton on the frame.
   The default behaviur is to call OnCancel() - I recommend not to override this, but OnCancel */
   virtual void OnCloseWindow(wxCloseEvent& event);
+
+
+  // to Paolo
+  // m_sizer         forse sarebbe meglio chiamarlo m_UserSizer - e' dove l'user plugga i suoi widget
+  // m_PreviewSizer (se lo aggiungi) lo chiamerei m_ClientSizer - di fatto riempira la ClientArea della finestra
 
   wxBoxSizer *m_sizer;          ///< Sizer for user widgets -- Calling Add() insert a widget in this sizer
   wxBoxSizer *m_buttons_sizer;  ///< Sizer holding the ok,cancel,close button (if any)

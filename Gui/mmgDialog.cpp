@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialog.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-20 14:11:14 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-20 14:29:47 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,14 +60,19 @@ mmgDialog::mmgDialog(const wxString& title,long style)
 
   m_dialog_sizer  =  new wxBoxSizer( wxVERTICAL );
   m_sizer         =  new wxBoxSizer( wxVERTICAL );
-  m_buttons_sizer =  new wxBoxSizer( wxHORIZONTAL );
+  m_buttons_sizer =  NULL;
   m_dialog_sizer->Add(m_sizer,1,wxEXPAND);
-  m_dialog_sizer->Add(m_buttons_sizer,0,wxCENTRE);
 
   m_ok_button    = NULL;
   m_cancel_button = NULL;
   m_close_button  = NULL;
 
+  // To Paolo -- il sizer vuoto si setta un MinSize arbitrario -->  se non serve non lo metto
+  if(style & mafOK || style & mafCANCEL || style & mafCLOSE )
+  {
+    m_buttons_sizer =  new wxBoxSizer( wxHORIZONTAL );
+    m_dialog_sizer->Add(m_buttons_sizer,0,wxCENTRE);
+  }
   if( style & mafOK )
   {
     m_ok_button = new wxButton(this,wxID_OK,"ok");
@@ -78,7 +83,7 @@ mmgDialog::mmgDialog(const wxString& title,long style)
     m_cancel_button = new wxButton(this,wxID_CANCEL,"cancel");
     m_buttons_sizer->Add(m_cancel_button ,0);
   }
-  if( (style & mafCLOSE) /*&& !(style & mafOK) && !(style & mafCANCEL)*/ )
+  if( (style & mafCLOSE) )
   {
     m_close_button = new wxButton(this,wxID_CLOSE,"close");
     m_buttons_sizer->Add(m_close_button ,0);
