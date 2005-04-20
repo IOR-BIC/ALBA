@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testDialogApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-13 21:04:15 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-20 07:36:56 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -43,13 +43,3 @@ int testDialogApp::OnExit()
   cppDEL(m_logic);
   return 0;
 }
-
-
-
-
-
-
-
-
-
-
