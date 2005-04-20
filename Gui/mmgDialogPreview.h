@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialogPreview.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-19 15:57:05 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-20 09:39:10 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,11 +30,8 @@ enum mmgDIALOG_EXSTYLES
   mafUSERWI = mafUSEGUI*2,
 };
 
-//----------------------------------------------------------------------------
-// mmgDialogPreview :
-//----------------------------------------------------------------------------
-/**
-
+/** mmgDialogPreview - a dialog widget with a render window.
+mmgDialogPreview can be used inside operations to make a preview window.
 */
 class mmgDialogPreview : public mmgDialog
 {
@@ -42,17 +39,15 @@ public:
 	mmgDialogPreview (const wxString& title,	long style = mafCLOSEWINDOW | mafRESIZABLE | mafCLOSE | mafUSEGUI | mafUSERWI );
 	virtual ~mmgDialogPreview (); 
 
+  /** Return the dialog's render window.*/
   mafRWI *GetRWI() {return m_rwi;};
+  /** Return the dialog's gui.*/
   mmgGui *GetGui() {return m_gui;};
 
- // int ShowModal();
-
 protected:
-
-  /** sizer for user widgets */
-  wxBoxSizer      *m_preview_sizer;
-  mafRWI          *m_rwi;
-  mmgGui          *m_gui;
+  wxBoxSizer *m_preview_sizer; ///< Sizer used for the preview render window
+  mafRWI     *m_rwi; ///< Render window
+  mmgGui     *m_gui; ///< Gui variable used to plug custom widgets
 
   /** Virtual functions called on Dialoag Close - these can be redefined witout providing the Event Table */
   virtual void OnCloseWindow(wxCloseEvent& event);
