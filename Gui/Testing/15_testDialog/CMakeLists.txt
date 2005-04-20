@@ -24,6 +24,9 @@ SET(PROJECT_LIBS
   mafBase
   mafCore
   mafVME
+  vtkGraphics
+  vtkCommon
+  vtkRendering
 )
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
 
