@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testDialogLogic.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 13:39:40 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-20 07:37:21 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,6 +22,7 @@
 
 #include "testDialogLogic.h"
 #include "mmgDialog.h"
+#include "mmgDialogPreview.h"
 #include "mmgGui.h"
 #include "mmgValidator.h"
 #include "testDialogDlg.h"
@@ -43,6 +44,7 @@ enum
   ID_11,
   ID_12,
   ID_13,
+  ID_14,
   ID_SLIDER,
   ID_TEST,
 };
@@ -84,6 +86,9 @@ testDialogLogic::testDialogLogic()
   gui->Label("but before the dialog closes."); 
   gui->Button(ID_13,"test custom dialog");
 
+  gui->Label("dialog with preview renderwindow.");
+  gui->Button(ID_14,"test preview dialog");
+
   gui->Reparent(m_win);
   m_win->Fit(); // resize m_win to fit it's content
 }
@@ -99,15 +104,14 @@ void testDialogLogic::OnEvent(mafEvent& e)
 {
   switch(e.GetId())
   {
-  case ID_D1: { mmgDialog dlg("foo",mafRESIZABLE|mafCLOSEWINDOW);         dlg.ShowModal(); }break;
-  case ID_D2: { mmgDialog dlg("foo",mafCLOSEWINDOW);                      dlg.ShowModal(); }break;
-  case ID_D3: { mmgDialog dlg("foo",mafRESIZABLE|mafCLOSEWINDOW);         dlg.ShowModal(); }break;
-  case ID_D4: { mmgDialog dlg("foo",mafRESIZABLE|mafCLOSE);               dlg.ShowModal(); }break;
-  case ID_D5: { mmgDialog dlg("foo",mafRESIZABLE|mafOK);                  dlg.ShowModal(); }break;
-  case ID_D6: { mmgDialog dlg("foo",mafRESIZABLE|mafOK|mafCANCEL);        dlg.ShowModal(); }break;
-  case ID_D7: { mmgDialog dlg("foo",mafRESIZABLE|mafCLOSE);               dlg.ShowModal(); }break;
-
-  case ID_D8: 
+    case ID_D1: { mmgDialog dlg("foo",mafRESIZABLE|mafCLOSEWINDOW);         dlg.ShowModal(); }break;
+    case ID_D2: { mmgDialog dlg("foo",mafCLOSEWINDOW);                      dlg.ShowModal(); }break;
+    case ID_D3: { mmgDialog dlg("foo",mafRESIZABLE|mafCLOSEWINDOW);         dlg.ShowModal(); }break;
+    case ID_D4: { mmgDialog dlg("foo",mafRESIZABLE|mafCLOSE);               dlg.ShowModal(); }break;
+    case ID_D5: { mmgDialog dlg("foo",mafRESIZABLE|mafOK);                  dlg.ShowModal(); }break;
+    case ID_D6: { mmgDialog dlg("foo",mafRESIZABLE|mafOK|mafCANCEL);        dlg.ShowModal(); }break;
+    case ID_D7: { mmgDialog dlg("foo",mafRESIZABLE|mafCLOSE);               dlg.ShowModal(); }break;
+    case ID_D8: 
     { 
       //very easy example (without using Sizers): 
       //create a GUI 
@@ -140,7 +144,7 @@ void testDialogLogic::OnEvent(mafEvent& e)
       // The Dialog take possess of it and destroy it with itself
     } 
     break;
-  case ID_D9: 
+    case ID_D9: 
     { 
       //example2:
       // placing a mmgGui on a Sizable Dialog: 
@@ -157,8 +161,8 @@ void testDialogLogic::OnEvent(mafEvent& e)
       dlg.Add(gui,1,wxEXPAND);
       dlg.ShowModal();
     }
-  break;
-  case ID_10: 
+    break;
+    case ID_10: 
     { 
       //example3:
       // Mixing a gui togheter with other resizable Elements
@@ -188,8 +192,8 @@ void testDialogLogic::OnEvent(mafEvent& e)
       dlg.Add(sz,1);
       dlg.ShowModal();
     }
-  break;
-  case ID_11: 
+    break;
+    case ID_11: 
     {
       //example 4: Receiving Events form a Dialog - using mmgGui
       mmgGui *gui = new mmgGui(NULL);
@@ -204,7 +208,7 @@ void testDialogLogic::OnEvent(mafEvent& e)
       dlg.ShowModal();
     }
     break;
-  case ID_12: 
+    case ID_12: 
     {
       //example 4: Receiving Events form a Dialog - using mmgValidators
       mmgDialog dlg("pippo");
@@ -218,13 +222,24 @@ void testDialogLogic::OnEvent(mafEvent& e)
       dlg.ShowModal();
     }
     break;
-  case ID_13:
+    case ID_13:
     {
       testDialogDlg dlg("Customized Dialog");
       dlg.ShowModal();
     }
     break;
-  case ID_TEST: 
+    case ID_14:
+    {
+      mmgDialogPreview dlg("preview",mafCLOSEWINDOW | mafRESIZABLE | mafUSEGUI | mafUSERWI);
+      dlg.SetListener(this);  // event from the Dialog come here
+      mmgGui *gui = dlg.GetGui();
+      gui->Label("This call a function in Logic");
+      gui->Divider();
+      gui->Button(ID_TEST,"test");
+      dlg.ShowModal();
+    }
+    break;
+    case ID_TEST: 
       wxMessageBox("ID_TEST event received");
     break;
   }
@@ -235,13 +250,3 @@ void testDialogLogic::Show()
 {
   m_win->Show(true);
 }
-
-
-
-
-
-
-
-
-
-
