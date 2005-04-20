@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-19 12:37:07 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-20 10:52:04 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -326,10 +326,10 @@ void mafRWI::SetStereo(int stereo_type)
   if(m_stereo_type == stereo_type) 
 	   return;
  
-	m_stereo_type = stereo_type;
+  m_stereo_type = stereo_type;
   
   //warning: non portable
-  m_rw->SetWindowId( (HWND) 0 );
+  //m_rw->SetWindowId( (HWND) 0 );
 
   
   int *size = m_rw->GetSize();
@@ -343,7 +343,7 @@ void mafRWI::SetStereo(int stereo_type)
 	
 
   //warning: non portable
-  m_rw->SetWindowId( (HWND) m_rwi->GetHWND() );
+  //m_rw->SetWindowId( (HWND) m_rwi->GetHWND() );
 
   //m_rw->AddRenderer(m_r1);
   //m_rwi->SetRenderWindow(m_rw);

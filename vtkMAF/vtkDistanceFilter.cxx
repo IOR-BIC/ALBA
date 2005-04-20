@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkDistanceFilter.cxx,v $
   Language:  C++
-  Date:      $Date: 2005-04-06 11:08:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-20 10:52:26 $
+  Version:   $Revision: 1.2 $
 
 =========================================================================*/
 
@@ -23,7 +23,7 @@
 #include "assert.h"
 
 
-vtkCxxRevisionMacro(vtkDistanceFilter, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkDistanceFilter, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkDistanceFilter);
 
 #define min(x0, x1) (((x0) < (x1)) ? (x0) : (x1))
@@ -216,6 +216,7 @@ template<typename DataType> double vtkDistanceFilter::TraceRay(const double orig
   double xyz[3], dxyz[3];
   double tmin = VTK_FLOAT_MIN, tmax = VTK_FLOAT_MAX;
   assert(fabs(vtkMath::Norm(ray) - 1.) < 1.e-5);
+  int i;
   for (int i = 0; i < 3; i++) {
     const double idistance = 1.f / ray[i];
     dxyz[i] = fabs(idistance);
@@ -342,7 +343,8 @@ void vtkDistanceFilter::PrepareVolume() {
     
     if (imageData) {
       const float spacing = imageData->GetSpacing()[axis], origin = imageData->GetOrigin()[axis];
-      for (int i = 0; i < this->DataDimensions[axis]; i++)
+      int i;
+      for (i = 0; i < this->DataDimensions[axis]; i++)
         this->VoxelSizes[axis][i] = spacing;
       this->VoxelSizes[axis][this->DataDimensions[axis] - 1] = 0;
       for (i = 0; i <= this->UniformToRectGridMaxIndex[axis]; i++)
@@ -357,7 +359,8 @@ void vtkDistanceFilter::PrepareVolume() {
       vtkDataArray *coordinates = (axis == 2) ? gridData->GetZCoordinates() : (axis == 1 ? gridData->GetYCoordinates() : gridData->GetXCoordinates());
       const float origin = *(coordinates->GetTuple(0));
       this->UniformToRectGridMultiplier[axis] = float(this->UniformToRectGridMaxIndex[axis]) / (*(coordinates->GetTuple(this->DataDimensions[axis] - 1)) - origin);
-      for (int i = 0, aj = 0; i < (this->DataDimensions[axis] - 1); i++) {
+      int i,aj;
+      for (i = 0, aj = 0; i < (this->DataDimensions[axis] - 1); i++) {
         float a = *(coordinates->GetTuple(i)), b = *(coordinates->GetTuple(i + 1));
         this->VoxelSizes[axis][i] = b - a;
         int bj = int((b - origin) * this->UniformToRectGridMultiplier[axis]);

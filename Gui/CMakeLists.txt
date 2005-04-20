@@ -104,6 +104,15 @@ SET(PROJECT_LIBS
 #--------------------------------------------------------
 # Do not change anything below this line.
 
+IF (NOT WIN32)
+  #INCLUDE (${MAF_SOURCE_DIR}/modules/FindGTK20.cmake)
+  INCLUDE (${CMAKE_ROOT}/Modules/FindGTK.cmake)
+  INCLUDE_DIRECTORIES(${GTK_gtk_INCLUDE_PATH})
+  INCLUDE_DIRECTORIES(${GTK_glib_INCLUDE_PATH})
+  INCLUDE_DIRECTORIES(${GTK_glibconfig_INCLUDE_PATH})
+  #INCLUDE_DIRECTORIES(${GTK_gtkgl_INCLUDE_PATH})
+ENDIF (NOT WIN32)
+
 # Need to include class headers and the configuration header.
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR})

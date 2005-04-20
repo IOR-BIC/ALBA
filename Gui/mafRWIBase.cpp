@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-19 12:03:38 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-20 10:52:05 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,8 +32,9 @@
 #include "wx/timer.h"
 
 #ifdef __WXGTK__
-# include <gdk/gdkprivate.h>
-# include "wx/gtk/win_gtk.h"
+//  #include <glib/gmacros.h>
+  #include <gdk/gdkprivate.h>
+  #include "wx/gtk/win_gtk.h"
 #endif
 
 #include "mafDecl.h"
