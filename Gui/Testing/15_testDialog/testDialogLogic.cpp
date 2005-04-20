@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testDialogLogic.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-20 07:37:21 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-20 09:10:14 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -45,6 +45,7 @@ enum
   ID_12,
   ID_13,
   ID_14,
+  ID_15,
   ID_SLIDER,
   ID_TEST,
 };
@@ -88,6 +89,7 @@ testDialogLogic::testDialogLogic()
 
   gui->Label("dialog with preview renderwindow.");
   gui->Button(ID_14,"test preview dialog");
+  gui->Button(ID_15,"test preview dialog again");
 
   gui->Reparent(m_win);
   m_win->Fit(); // resize m_win to fit it's content
@@ -236,6 +238,15 @@ void testDialogLogic::OnEvent(mafEvent& e)
       gui->Label("This call a function in Logic");
       gui->Divider();
       gui->Button(ID_TEST,"test");
+      dlg.ShowModal();
+    }
+    break;
+    case ID_15:
+    {
+      mmgDialogPreview dlg("preview",mafCLOSEWINDOW | mafRESIZABLE | mafCLOSE | mafCANCEL | mafOK |mafUSERWI);
+      dlg.SetListener(this);  // event from the Dialog come here
+      wxSlider *sli = new wxSlider(&dlg, ID_SLIDER, 0,100,50, wxDefaultPosition);
+      dlg.Add(sli);
       dlg.ShowModal();
     }
     break;
