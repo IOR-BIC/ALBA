@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialogPreview.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-19 15:57:05 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-20 14:11:14 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -52,11 +52,8 @@ mmgDialogPreview::mmgDialogPreview(const wxString& title,long style)
 mmgDialogPreview::~mmgDialogPreview()
 //----------------------------------------------------------------------------
 {
-}
-//----------------------------------------------------------------------------
-void mmgDialogPreview::OnCloseWindow(wxCloseEvent& event)
-//----------------------------------------------------------------------------
-{
+  // this is the right place where to delete rwi
+  // the rest of the dialog is destructed by inherited 
+  // destructor that execute after this.  //SIL. 20-4-2005: 
   cppDEL(m_rwi);
-  mmgDialog::OnCloseWindow(event);
 }

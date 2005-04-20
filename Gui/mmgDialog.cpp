@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialog.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-20 09:09:36 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-20 14:11:14 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -94,9 +94,9 @@ int mmgDialog::ShowModal()
 //----------------------------------------------------------------------------
 {
   m_dialog_sizer->SetMinSize(100,50); // looks ugly when it is empty
-  //this->SetAutoLayout( TRUE );
+  //this->SetAutoLayout( TRUE ); -- not to be called here
   this->SetSizer( m_dialog_sizer );
-  //m_dialog_sizer->Fit(this); //called by SetSizeHints
+  //m_dialog_sizer->Fit(this); //-- not to be called, is called by SetSizeHints
   m_dialog_sizer->SetSizeHints(this);
   return wxDialog::ShowModal();
 }
@@ -120,13 +120,12 @@ void mmgDialog::OnEvent(mafEvent& e)
   case wxCANCEL:
     {
       wxCommandEvent c(0, wxID_CANCEL);
-      //OnOK(c);
-      OnCancel(c);  // Paolo 2005-04-20
+      OnCancel(c);  
     }
   break;
   case wxID_CLOSE:
     {
-      wxDialog::Close(); // OnCloseWindow will be called
+      wxDialog::Close(); // will call OnCloseWindow -- which will call OnCancel
     }
   break;
   default:
@@ -137,6 +136,29 @@ void mmgDialog::OnEvent(mafEvent& e)
 void mmgDialog::OnCloseWindow(wxCloseEvent& event)
 //----------------------------------------------------------------------------
 {
+  // --- note about wxDialog::OnCloseWindow
+  
+  // We'll send a Cancel message by default, which may close the dialog.
+  // Check for looping if the Cancel event handler calls Close().
+
+  // Note that if a cancel button and handler aren't present in the dialog,
+  // nothing will happen when you close the dialog via the window manager, or
+  // via Close(). We wouldn't want to destroy the dialog by default, since
+  // the dialog may have been created on the stack. However, this does mean
+  // that calling dialog->Close() won't delete the dialog unless the handler
+  // for wxID_CANCEL does so. So use Destroy() if you want to be sure to
+  // destroy the dialog. The default OnCancel (above) simply ends a modal
+  // dialog, and hides a modeless dialog.
+
+  //SIL. 20-4-2005: 
+  //So, in normal windows the close buttons destroy the window (Close -> CloseWindow -> Destroy )
+  //in dialogs the close button calls Show(false) and dont call Destroy by default.
+  //This is reasonable, because the user can call dlg.Show again.
+
+  //So, The close button should call Cancel
+  //Cancel should not destroy the window - just hide it
+  //To know when the window is destroyed - override Destroy.
+
   wxDialog::OnCloseWindow(event);
 }
 //----------------------------------------------------------------------------
@@ -144,11 +166,25 @@ void mmgDialog::OnOK(wxCommandEvent& event)
 //----------------------------------------------------------------------------
 {
   wxDialog::OnOK(event);
+  /* --- this is what wxDialog::OnOK does
+   this is what is done 
+  if ( Validate() && TransferDataFromWindow() )
+  {
+    SetReturnCode(wxID_OK);  
+    Show(false);
+  }
+  Note that the Window just hidden, is not destroyed.  
+  */
 }
 //----------------------------------------------------------------------------
 void mmgDialog::OnCancel(wxCommandEvent& event)
 //----------------------------------------------------------------------------
 {
   wxDialog::OnCancel(event);
+  /* --- this is what wxDialog::OnCancel does
+  SetReturnCode(wxID_CANCEL);
+  Show(false);
+  Note that the Window just hidden, is not destroyed.  
+  */
 }
 

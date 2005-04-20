@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialog.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-20 09:54:35 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-20 14:11:14 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -94,17 +94,26 @@ public:
   void EnableCancel(bool enable) {if(m_cancel_button) m_cancel_button->Enable(enable);};
   void EnableClose(bool enable)  {if(m_close_button)  m_close_button->Enable(enable);};
 
-  /** Virtual functions called on Dialoag Close - these can be redefined witout providing the Event Table */
-  virtual void OnCloseWindow(wxCloseEvent& event);
+  /** 
+  Virtual functions called to terminate ShowModal - these can be redefined without providing the Event Table. 
+  called when a ShowModal stage end with ok - tipically is called by an 'OK' button -- */
   virtual void OnOK(wxCommandEvent& event);
+  /** 
+  Virtual functions called to terminate ShowModal - these can be redefined without providing the Event Table. 
+  called when a ShowModal stage end with Cancel - tipically is called by an 'Cancel' button -- */
   virtual void OnCancel(wxCommandEvent& event);
+  /** 
+  Virtual functions called to terminate ShowModal - these can be redefined without providing the Event Table. 
+  called when a ShowModal stage end with because the user press a 'Close' button or the CloseButton on the frame.
+  The default behaviur is to call OnCancel() - I recommend not to override this, but OnCancel */
+  virtual void OnCloseWindow(wxCloseEvent& event);
 
-  wxBoxSizer *m_sizer;          ///< Sizer used to plug the custom gui
-  wxBoxSizer *m_buttons_sizer;  ///< Sizer used to show buttons to close the dialog
-  wxBoxSizer *m_dialog_sizer;   ///< Dialog sizer
-  wxButton   *m_ok_button;      ///< Button used to close the dialog with wxID_OK or wxOK id
-  wxButton   *m_cancel_button;  ///< Button used to close the dialog with wxID_CANCEL or wxCANCEL id
-  wxButton   *m_close_button;   ///< Button used to close the dialog with wxID_CLOSE id
+  wxBoxSizer *m_sizer;          ///< Sizer for user widgets -- Calling Add() insert a widget in this sizer
+  wxBoxSizer *m_buttons_sizer;  ///< Sizer holding the ok,cancel,close button (if any)
+  wxBoxSizer *m_dialog_sizer;   ///< Dialog sizer -- manage the Dialog initial Size, and the other sizers
+  wxButton   *m_ok_button;      ///< Button used to close the dialog with wxID_OK
+  wxButton   *m_cancel_button;  ///< Button used to close the dialog with wxID_CANCEL
+  wxButton   *m_close_button;   ///< Button used to close the dialog with wxID_CLOSE
 
   mafEventListener *m_Listener;
 
