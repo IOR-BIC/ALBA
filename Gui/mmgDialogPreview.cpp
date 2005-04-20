@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialogPreview.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-20 14:11:14 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-20 14:22:21 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,7 +19,6 @@
 //----------------------------------------------------------------------------
 
 #include "mmgDialogPreview.h"
-
 #include "mafDecl.h"
 #include "mafRWI.h"
 
@@ -52,7 +51,7 @@ mmgDialogPreview::mmgDialogPreview(const wxString& title,long style)
 mmgDialogPreview::~mmgDialogPreview()
 //----------------------------------------------------------------------------
 {
-  // this is the right place where to delete rwi
+  // this is the right place where to delete rwi.
   // the rest of the dialog is destructed by inherited 
   // destructor that execute after this.  //SIL. 20-4-2005: 
   cppDEL(m_rwi);
