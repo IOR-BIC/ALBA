@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-13 13:07:53 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-20 10:02:58 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -88,16 +88,16 @@ public:
 
   mafSceneGraph    *m_sg; 
   mafRWIBase			 *m_rwi;
-  vtkRenderer      *m_r1;
-  vtkRenderer      *m_r2;
+  vtkRenderer      *m_r1; ///< Renderer used to show actors on the first layer.
+  vtkRenderer      *m_r2; ///< Renderer used to show actors on the second layer.
   vtkRenderWindow  *m_rw;
   vtkLight         *m_l;
   vtkCamera				 *m_c;
-  int               m_cam_position;
+  int               m_cam_position; ///< Used to store camera position ID.
   
-	mafAxes          *m_axes;
-	vtkGridActor     *m_grid;
-	bool              m_show_grid;
+	mafAxes          *m_axes; ///< Actor representing a global reference system.
+	vtkGridActor     *m_grid; ///< Actor representing a grid showed into the render window.
+	bool              m_show_grid; ///< Flag used to show/hide the grid.
 
 protected:
 	/** Compute the bounds for the visible actors; if vme is passed, the bounds of vme are calculated. */
