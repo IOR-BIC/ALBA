@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialogPreview.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-20 09:39:10 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-20 09:54:35 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,6 +32,7 @@ enum mmgDIALOG_EXSTYLES
 
 /** mmgDialogPreview - a dialog widget with a render window.
 mmgDialogPreview can be used inside operations to make a preview window.
+@sa mmgDialog
 */
 class mmgDialogPreview : public mmgDialog
 {

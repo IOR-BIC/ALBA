@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialog.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-19 15:57:18 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-20 09:54:35 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,11 +22,11 @@
 //----------------------------------------------------------------------------
 enum mmgDIALOG_STYLES
 {
-  mafRESIZABLE =1,   // make the Dialog Resizable  
-  mafCLOSEWINDOW =2, // to enable the close button on the window frame
-  mafOK =4,          // to create an ok button
-  mafCANCEL =8,      // to create a cancel button 
-  mafCLOSE =16,      // to create a close button
+  mafRESIZABLE    =1,  // make the Dialog Resizable  
+  mafCLOSEWINDOW  =2,  // to enable the close button on the window frame
+  mafOK           =4,  // to create an ok button
+  mafCANCEL       =8,  // to create a cancel button 
+  mafCLOSE        =16, // to create a close button
 };
 //----------------------------------------------------------------------------
 // mmgDialog :
@@ -62,7 +62,7 @@ Example:
 -Gui SetListener Dialog
 -Dialog SetListener Me
 
-see the "TestDialog" project for more examples.
+@sa mmgDialogPreview
 */
 class mmgDialog : public wxDialog, public mafEventListener  
 {
@@ -99,13 +99,12 @@ public:
   virtual void OnOK(wxCommandEvent& event);
   virtual void OnCancel(wxCommandEvent& event);
 
-  /** sizer for user widgets */
-  wxBoxSizer *m_sizer;
-  wxBoxSizer *m_buttons_sizer;
-  wxBoxSizer *m_dialog_sizer;
-  wxButton   *m_ok_button;
-  wxButton   *m_cancel_button;
-  wxButton   *m_close_button;
+  wxBoxSizer *m_sizer;          ///< Sizer used to plug the custom gui
+  wxBoxSizer *m_buttons_sizer;  ///< Sizer used to show buttons to close the dialog
+  wxBoxSizer *m_dialog_sizer;   ///< Dialog sizer
+  wxButton   *m_ok_button;      ///< Button used to close the dialog with wxID_OK or wxOK id
+  wxButton   *m_cancel_button;  ///< Button used to close the dialog with wxID_CANCEL or wxCANCEL id
+  wxButton   *m_close_button;   ///< Button used to close the dialog with wxID_CLOSE id
 
   mafEventListener *m_Listener;
 
