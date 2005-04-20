@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialog.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-16 09:59:36 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-20 09:09:36 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -120,7 +120,8 @@ void mmgDialog::OnEvent(mafEvent& e)
   case wxCANCEL:
     {
       wxCommandEvent c(0, wxID_CANCEL);
-      OnOK(c);
+      //OnOK(c);
+      OnCancel(c);  // Paolo 2005-04-20
     }
   break;
   case wxID_CLOSE:
