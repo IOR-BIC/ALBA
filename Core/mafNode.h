@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:16 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2005-04-20 10:17:46 $
+  Version:   $Revision: 1.21 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -38,7 +38,7 @@ class mmgGui;
 // mafNode
 //----------------------------------------------------------------------------
 /** mafNode - the base class for the MAF tree.
-  This class implements a an m-way tree. You can add/remove nodes by means of AddChild
+  This class implements a m-way tree. You can add/remove nodes by means of AddChild
   and RemoveChild. To access the tree you can use GetChild(). You can also obtain an iterator
   to iterate through the tree with a simple for (;;) loop. This node implementation take
   advantage of the MAF reference counting mechanism. To avoid confusion constructor
@@ -46,14 +46,14 @@ class mmgGui;
   or UnRegister().
   To create a copy of the node you can use MakeCopy(). To copy node content use DeepCopy(). Any 
   node has a CanCopy() to test if copying from a different node type i possible.
-  A number of functions allow to wuery the tree, like IsEmpty(), IsInTree(), GetRoot(), GetNumberOfChildren(),
+  A number of functions allow to query the tree, like IsEmpty(), IsInTree(), GetRoot(), GetNumberOfChildren(),
   FindNodeIdx(), FindInTreeByName(), FindInTreeById(), IsAChild(), GetParent().
   A special features allow to make a node to be skipped by iterators: SetVisibleToTraverse()
   and IsVisible().
   Comparison between nodes and trees can be accomplished through Equals() and CompareTree().
   Nore reparenting can be performed through ReparentTo(). This function returns MAF_ERROR in case
   reparenting is not allowed. Each node type can decide nodes to which it can be reparented by
-  redefining the CanReparentTo(( virtual function. Also each node type can decide nodes it is 
+  redefining the CanReparentTo() virtual function. Also each node type can decide nodes it is 
   accepting as a child by redefining the AddChild() which also can return MAF_ERROR in case of 
   denied reparenting.
   A node can detach all children RemoveAllChildren() and an entire tree can be cleaned, by detaching each sub node, 
@@ -69,7 +69,7 @@ class mmgGui;
   - test node events (attach/detach from tree, destroy)
   - test DeepCopy()
 
-  @sa mafRootNode
+  @sa mafNodeRoot
 */
 class MAF_EXPORT mafNode : public mafReferenceCounted, public mafStorable, public mafObserver, public mafTimeStamped
 {
