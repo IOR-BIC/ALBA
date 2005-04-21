@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafReferenceCounted.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:33:18 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-21 13:56:38 $
+  Version:   $Revision: 1.3 $
   Authors:   based on vtkObjectBase (www.vtk.org), adapted Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -12,7 +12,6 @@
 
 #include "mafReferenceCounted.h"
 #include <malloc.h>
-#include <sstream>
 #include <assert.h>
 
 mafCxxAbstractTypeMacro(mafReferenceCounted)

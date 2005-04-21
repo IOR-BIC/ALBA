@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTagArray.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:18 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-21 13:58:27 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,7 +23,6 @@
 #include "mafTagArray.h"
 #include "mafStorageElement.h"
 #include "mafIndent.h"
-#include <sstream>
 #include <assert.h>
 
 mafCxxTypeMacro(mafTagArray)

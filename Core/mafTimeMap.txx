@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTimeMap.txx,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 17:15:15 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-21 13:58:27 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,7 +17,6 @@
 #include "mafIndent.h"
 #include <math.h>
 #include <assert.h>
-#include <sstream>
 
 //-----------------------------------------------------------------------
 //template <class T>

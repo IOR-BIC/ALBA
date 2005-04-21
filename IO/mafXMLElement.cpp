@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 16:45:03 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-04-21 14:03:23 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,7 +22,6 @@
 #include "mafObjectFactory.h"
 
 #include <vector>
-#include <sstream>
 #include <assert.h>
 #include "stdio.h"
 

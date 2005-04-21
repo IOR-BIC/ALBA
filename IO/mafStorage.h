@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorage.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-18 19:55:15 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-04-21 14:03:23 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -42,7 +42,9 @@ class mafStorable;
 class mafStorage: public mafObject
 {
 public:
-  mafAbstractTypeMacro(mafStorage,mafObject)
+  mafAbstractTypeMacro(mafStorage,mafObject);
+
+  enum STORAGE_IO_ERRORS {IO_OK=0,IO_GENERIC_ERROR,IO_WRONG_OBJECT_TYPE,IO_LAST_ERROR};
 
   mafStorage();
   virtual ~mafStorage() {}
@@ -108,6 +110,9 @@ public:
 
   /** return the folder where tmp files are stored */
   virtual const char* GetTmpFolder() {return m_TmpFolder;}
+
+  void SetErrorCode(int err) {m_ErrorCode=err;}
+  int GetErrorCode() {return m_ErrorCode;}
     
 protected:
   /** This is called by Store() and must be reimplemented by subclasses */
@@ -128,5 +133,6 @@ protected:
   mafString           m_TmpFolder;    ///< folder where to store tmp files
   std::set<mafString> m_TmpFileNames; ///< name of tmp files in the MSF dir
   std::set<mafString> m_FilesDictionary; ///< list of files in the storage folder: to be populated by OpenDirectory()
+  int                 m_ErrorCode;    ///< the error code 0==OK
 };
 #endif // _mafStorage_h_

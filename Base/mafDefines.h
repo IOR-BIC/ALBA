@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-18 19:52:39 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2005-04-21 13:55:36 $
+  Version:   $Revision: 1.18 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,6 +30,7 @@
 #include <string.h>
 #include <typeinfo>
 #include <iosfwd>
+#include <sstream>
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
@@ -204,8 +205,7 @@ bool mafFloatEquals(float x, float y);
 
 /** 
   Macro for printing Warning messages in log area. This macro also
-  displays line at which error was printed. To use this you must
-  include <sstream> header file */
+  displays line at which error was printed. */
 #define mafWarningMacro(x) \
 { \
   std::stringstream msg; \
@@ -216,8 +216,7 @@ bool mafFloatEquals(float x, float y);
 
 /** 
   Macro for printing Error messages in log area. This macro also
-  displays line at which error was printed. To use this you must
-  include <sstream> header file */
+  displays line at which error was printed. */
 #define mafErrorMacro(x) \
 { \
   std::stringstream msg; \
@@ -227,8 +226,7 @@ bool mafFloatEquals(float x, float y);
 }
 
 /** 
-  Macro for displaying Warning messages. To use this you must
-  include <sstream> header file */
+  Macro for displaying Warning messages.*/
 #define mafWarningMessageMacro(x) \
 { \
   std::stringstream msg; \
@@ -237,8 +235,7 @@ bool mafFloatEquals(float x, float y);
 }
 
 /** 
-  Macro for displaying Error messages. To use this you must
-  include <sstream> header file */
+  Macro for displaying Error messages. */
 #define mafErrorMessageMacro(x) \
 { \
   std::stringstream msg; \
@@ -247,8 +244,7 @@ bool mafFloatEquals(float x, float y);
 }
 
 /** 
-  Macro for displaying messages. To use this you must
-  include <sstream> header file */
+  Macro for displaying messages. */
 #define mafMessageMacro(x) \
 { \
   std::stringstream msg; \

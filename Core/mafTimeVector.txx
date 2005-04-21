@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTimeVector.txx,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 07:59:37 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-21 13:58:28 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,7 +17,6 @@
 #include "mafIndent.h"
 #include <math.h>
 #include <assert.h>
-#include <sstream>
 
 //-----------------------------------------------------------------------
 //template <class T>

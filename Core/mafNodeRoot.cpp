@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeRoot.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 12:59:55 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-04-21 13:58:27 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,7 +25,6 @@
 #include "mafIndent.h"
 #include "mafStorage.h"
 #include "mafEventIO.h"
-#include <sstream>
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafNodeRoot)

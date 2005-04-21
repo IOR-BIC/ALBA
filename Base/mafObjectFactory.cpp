@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObjectFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-06 21:20:00 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-04-21 13:56:37 $
+  Version:   $Revision: 1.11 $
   Authors:   Based on itkObjectFactory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -18,7 +18,6 @@
 #include <ctype.h>
 #include <algorithm>
 #include <map>
-#include <sstream>
 
 //------------------------------------------------------------------------------
 /** Utility class to clean up factory memory.*/  

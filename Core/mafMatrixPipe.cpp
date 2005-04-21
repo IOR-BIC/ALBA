@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrixPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 21:27:24 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-21 13:57:39 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -27,7 +27,6 @@
 #include "mafVME.h"
 #include "mafEventBase.h"
 #include "mafDecl.h"
-#include <sstream>
 
 //------------------------------------------------------------------------------
 mafCxxTypeMacro(mafMatrixPipe)

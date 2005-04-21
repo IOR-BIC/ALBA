@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafCoreFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 16:40:41 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-21 13:57:38 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,7 +25,6 @@
 #include "mafIndent.h"
 #include <string>
 #include <ostream>
-#include <sstream>
 
 mafCoreFactory *mafCoreFactory::m_Instance=NULL;
 
