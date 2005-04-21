@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-19 08:27:34 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-04-21 14:01:50 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,7 +20,6 @@
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
-#include <sstream>
 // Xerces-C specific
 #include "mmuXMLDOM.h"
 #include "mmuXMLDOMElement.h"
@@ -506,7 +505,7 @@ int mafXMLStorage::InternalRestore()
         {
           // errors while parsing...
           mafErrorMessage("Errors while parsing XML file");
-          errorCode = 1;
+          errorCode = IO_XML_PARSE_ERROR;
         }
         else
         {
@@ -526,12 +525,12 @@ int mafXMLStorage::InternalRestore()
             {
               // Start tree restoring from root node
               if (m_Document->Restore(m_DocumentElement)!=MAF_OK)
-                errorCode=6;
+                errorCode=IO_RESTORE_ERROR;
             }
             else
             {
               mafErrorMacro("XML parsing error: wrong file version v"<<doc_version.GetCStr()<<", should be > v"<<m_Version.GetCStr());
-              errorCode=7;
+              errorCode=IO_WRONG_FILE_VERSION;
             }
           }
           
@@ -546,7 +545,7 @@ int mafXMLStorage::InternalRestore()
         mafString err;
         err << "An error occurred during XML parsing.\n Message: " << mafXMLString(e.getMessage());
         mafErrorMessage(err);
-        errorCode = 2;
+        errorCode = IO_XML_PARSE_ERROR;
       }
 
       catch (const DOMException& e)
@@ -559,7 +558,7 @@ int mafXMLStorage::InternalRestore()
           err << "DOMException msg is: " << mafXMLString(e.getMessage());
       
         mafErrorMessage(err);
-        errorCode = 3;
+        errorCode = IO_DOM_XML_ERROR;
       }
 
       /*catch (const SAXException& e)
@@ -573,12 +572,13 @@ int mafXMLStorage::InternalRestore()
       catch (...)
       {
         mafErrorMessage("An error occurred during XML parsing");
-        errorCode = 4;
+        errorCode = IO_XML_PARSE_ERROR;
       }
     }
     else
     {
       mafErrorMessage("Unable to resolve URL for input XML file");
+      errorCode = IO_WRONG_URL;
     }
 
     cppDEL (errReporter);
@@ -588,11 +588,14 @@ int mafXMLStorage::InternalRestore()
   {
     // parser allocation error
     mafErrorMessage("Failed to allocate XML parser");
-    errorCode = 5;
+    errorCode = IO_XML_PARSER_INTRNAL_ERROR;
   }
 
   // terminate the XML library
   XMLPlatformUtils::Terminate();
+  
+  if (GetErrorCode()==0)
+    SetErrorCode(errorCode);
 
-  return errorCode;
+  return GetErrorCode();
 }

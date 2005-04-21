@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-18 19:55:15 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-04-21 14:01:50 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,13 +23,15 @@ mafStorage::mafStorage()
 {
   m_Document        = NULL;
   m_DocumentElement = NULL;
-  m_TmpFileId   = 0;
+  m_TmpFileId       = 0;
+  m_ErrorCode       = 0;
 }
 
 //------------------------------------------------------------------------------
 int mafStorage::Store()
 //------------------------------------------------------------------------------
 {
+  SetErrorCode(0);
   // extract the path substring
   mafString dir_path=m_URL;
   int last_slash=dir_path.FindLastChr('/');
@@ -43,7 +45,11 @@ int mafStorage::Store()
   }
 
   //open the directory index
-  OpenDirectory(dir_path);
+  if (OpenDirectory(dir_path)==MAF_ERROR)
+  {
+    mafErrorMessage("I/O Error: stored failed because path not found!");
+    return MAF_ERROR;
+  }
 
   // store the content
   int ret=InternalStore();
@@ -59,6 +65,7 @@ int mafStorage::Store()
 int mafStorage::Restore()
 //------------------------------------------------------------------------------
 {
+  SetErrorCode(0);
   m_ParserURL=m_URL; // set the new filename as current
   return InternalRestore();
 }
