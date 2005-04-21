@@ -341,6 +341,11 @@ int main( int argc, char *argv[] )
   mafVMERoot *reloaded_root=reload_storage.GetRoot();
   reload_storage.Restore();
   
+  mafTimeStamp tb[2],rtb[2];
+  root->GetOutput()->GetTimeBounds(tb);
+  reloaded_root->GetOutput()->GetTimeBounds(rtb);
+  MAF_TEST(mafEquals(tb[0],rtb[0])&&mafEquals(tb[1],rtb[1]));
+
   MAF_TEST(root->CompareTree(reloaded_root));
 
   MAF_TEST(!root->CompareTree(loaded_root));
@@ -350,16 +355,31 @@ int main( int argc, char *argv[] )
 
   // Test saving with different name
   storage.SetURL("testMSF_saveAs/testMSF_saveAs.msf");
-  storage.Store();
+  MAF_TEST(storage.Store()==MAF_OK);
 
 
   mafVMEStorage load_saveas_storage;
   load_saveas_storage.SetURL("testMSF_saveAs/testMSF_saveAs.msf");
   mafVMERoot *loaded_saveas_root=load_saveas_storage.GetRoot();
-  load_saveas_storage.Restore();
+  MAF_TEST(load_saveas_storage.Restore()==MAF_OK);
+  MAF_TEST(load_saveas_storage.GetErrorCode()==mafStorage::IO_OK);
+
+  wxMkdir("testMSF_saveAgain");
+  load_saveas_storage.SetURL("testMSF_saveAgain/testMSF_saveAgain.msf");
+
+  MAF_TEST(load_saveas_storage.Store()==MAF_OK);
   
+  mafVMEStorage load_saveAgain_storage;
+  load_saveAgain_storage.SetURL("testMSF_saveAgain/testMSF_saveAgain.msf");
+  mafVMERoot *loaded_saveAgain_root=load_saveAgain_storage.GetRoot();
+  MAF_TEST(load_saveAgain_storage.Restore()==MAF_OK);
+  MAF_TEST(load_saveAgain_storage.GetErrorCode()==mafStorage::IO_OK);
+
   MAF_TEST(root->CompareTree(loaded_saveas_root));
 
+  MAF_TEST(root->CompareTree(loaded_saveAgain_root));
+
+  std::cerr << "Test Completed Successfully!\n";
   return 0;
 }
 
