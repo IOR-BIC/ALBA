@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-18 19:55:57 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-21 14:06:37 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -29,7 +29,6 @@
 #include "mafStorage.h"
 #include <math.h>
 #include <assert.h>
-#include <sstream>
 
 bool mafVMEItem::m_GlobalCompareDataFlag=0;
 
@@ -266,10 +265,10 @@ int mafVMEItem::InternalRestore(mafStorageElement *node)
 }
 
 //-------------------------------------------------------------------------
-int mafVMEItem::StoreData()
+int mafVMEItem::StoreData(const char *url)
 //-------------------------------------------------------------------------
 {
-  return InternalStoreData();
+  return InternalStoreData(url);
 }
 //-------------------------------------------------------------------------
 int mafVMEItem::RestoreData()

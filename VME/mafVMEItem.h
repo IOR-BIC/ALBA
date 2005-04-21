@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-18 19:55:57 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-04-21 14:06:50 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -100,18 +100,10 @@ public:
   /** 
     Store data to the storage. Write modality depends on item
     settings (@sa SetIOMode() ). */
-  virtual int StoreData();
+  virtual int StoreData(const char *url);
 
   /** Restore data to storage. . */
   virtual int RestoreData();
-
-  /** return the name of local file used for storing data */
-  const char *GetTmpFileName() {return m_TmpFileName;}
-
-  /** 
-    Set the local file where to write/read data to/from in case
-    of TMP_FILE */
-  void SetTmpFileName(const char *fname) {m_TmpFileName=fname;}
 
   enum VME_ITEM_WRITE_MODALITIY {DEFAULT,TMP_FILE,MEMORY};
 
@@ -230,7 +222,7 @@ protected:
     Return MAF_OK if data has been read, MAF_ERROR in case of I/O errors
     and MAF_NO_IO in case no I/O is really performed (e.g. data already
     present on storage). */
-  virtual int InternalStoreData()=0; 
+  virtual int InternalStoreData(const char *url)=0; 
 
   /** Set the data type expressed as string name. */
   void SetDataType(const char *name) {m_DataType=name;};

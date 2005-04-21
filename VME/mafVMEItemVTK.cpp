@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-18 19:55:57 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-21 14:06:37 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -43,7 +43,6 @@
 #include "vtkDataSetWriter.h"
 
 #include <assert.h>
-#include <sstream>
 
 const char *file_extension="vtk";
 
@@ -379,6 +378,8 @@ int mafVMEItemVTK::InternalRestoreData()
       //data->SetSource(NULL);
     }
 
+    SetDataModified(false);
+
     reader->Delete();
 
     return MAF_OK;
@@ -388,10 +389,10 @@ int mafVMEItemVTK::InternalRestoreData()
 }
 
 //-------------------------------------------------------------------------
-int mafVMEItemVTK::InternalStoreData()
+int mafVMEItemVTK::InternalStoreData(const char *url)
 //-------------------------------------------------------------------------
 {
-  if (IsDataPresent())
+  if (GetData())
   {
     bool found=false;
     mafString filename;
@@ -409,30 +410,27 @@ int mafVMEItemVTK::InternalStoreData()
       return MAF_ERROR;
     case TMP_FILE:
       found = false;
-      filename = GetTmpFileName();
+      filename = url; // use directly the url as a tmp file
       mafErrorMacro("Unsupported I/O Mode");
       return MAF_ERROR;
     case DEFAULT:
+      if (mafString::IsEmpty(url))
       {
-        if (m_URL.IsEmpty())
-        {
-          mafWarningMacro("No filename specified: cannot write data to disk");
-          return MAF_ERROR;
-        }
-        
-        found=storage->IsFileInDirectory(m_URL);
+        mafWarningMacro("No filename specified: cannot write data to disk");
+        return MAF_ERROR;
       }
+
+      found=storage->IsFileInDirectory(url);
+      storage->GetTmpFile(filename);
       break;
     default:
       mafErrorMacro("Unsupported I/O Mode");
       return MAF_ERROR;
     };
 
-    storage->GetTmpFile(filename);
+    assert(!(m_IOMode!=MEMORY&&filename.IsEmpty()));
 
-    assert(!filename.IsEmpty());
-
-    if (filename.IsEmpty())
+    if (m_IOMode!=MEMORY&&filename.IsEmpty())
     {
       mafErrorMacro("Unsupported I/O Mode");
       return MAF_ERROR;
@@ -458,7 +456,7 @@ int mafVMEItemVTK::InternalStoreData()
 
     m_IOStatus=0;
 
-    if ((IsDataPresent()&&!found)||((IsDataPresent()==found)&&(found==IsDataModified())))
+    if ((IsDataPresent()&&(!found||(m_URL!=url)))||((IsDataPresent()==found)&&(found==IsDataModified())))
     {       
       //if (!item->IsDataModified()&&found)
       //  return;
@@ -477,7 +475,6 @@ int mafVMEItemVTK::InternalStoreData()
       vtkMAFSmartPointer<vtkDataSetWriter> writer;
 
       // this is to catch possible I/O errors
-  
       //unsigned long tag=mflAgent::PlugEventSource(writer,mflMSFWriter::ErrorHandler,this,vtkCommand::ErrorEvent);
 
       writer->SetInput(data);
@@ -532,13 +529,14 @@ int mafVMEItemVTK::InternalStoreData()
       UpdateBounds(); // force updating the bounds
     }
 
-    // reset modified data flag
-    SetDataModified(false);
-
     if (m_IOStatus!=MAF_OK)
       return MAF_ERROR;
 
-    m_LastURL=m_URL;
+    if (m_IOMode==DEFAULT)
+      SetURL(url);
+
+    // reset modified data flag
+    SetDataModified(false);
 
     return storage->StoreToURL(filename,m_URL);
   }

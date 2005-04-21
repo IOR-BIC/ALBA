@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-18 19:55:57 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-21 14:06:37 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -170,17 +170,16 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
     {
       mafVMEItem *item=it->second;
       
+      mafString data_file_url;
+
       // set item ID if not yet set
       if (item->GetId()<0 || m_LastBaseURL!=base_url)
       {
         if (item->GetId()<0)
           item->SetId(root->GetNextItemId());
-      
-        mafString data_file_url;
         
         // data file URL is specified as a local filename
         data_file_url<<base_name<<"."<<mafString(item->GetId())<<"."<<item->GetDataFileExtension(); // extension is defined by the kind of item itself
-        item->SetURL(data_file_url); 
       }
       
       int ret;
@@ -194,13 +193,12 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
         data_files[i]=tmp_filename;
        
         item->SetIOModeToTmpFile();
-        item->SetTmpFileName(tmp_filename);
-        ret=item->StoreData();
+        ret=item->StoreData(tmp_filename);
       }
       else
       {
         item->SetIOModeToDefault();
-        ret=item->StoreData();
+        ret=item->StoreData(data_file_url);
       }
       
       switch (ret)
@@ -212,11 +210,9 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
       // ...
     }
     
-    // if single data file...
-    // To be completed!!!
+    // if single data file... To be completed!!!
     if (m_SingleFileMode)
     {
-      
       // the URL to which the single file will be stored
       mafString file_url;
       file_url<<base_name<<"."<<mafString(m_VectorID)<<".mdf"; // extension for single file format

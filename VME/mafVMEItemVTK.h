@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-18 19:55:58 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-21 14:06:51 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -117,13 +117,12 @@ protected:
     Store data stored in this object. This function asks the storage object
     for a tmp filename for saving and then call ... to store the tmp file
     into the URL. This method is called by Store().*/
-  virtual int InternalStoreData();
+  virtual int InternalStoreData(const char *url);
 
   vtkSmartPointer<vtkDataSet> m_Data;       ///< pointer to VTK dataset
   vtkDataReader *             m_DataReader; ///< the reader used to read VTK data
   vtkDataSetWriter *          m_DataWriter; ///< the writer used to write VTK data
   int                         m_IOStatus;   ///< internally used to store the IO status
-  mafString                   m_LastURL;    ///< last URL where data was saved
   
 private:
   mafVMEItemVTK(const mafVMEItemVTK&);
