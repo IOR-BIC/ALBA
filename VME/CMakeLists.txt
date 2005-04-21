@@ -8,24 +8,25 @@ DBG_MESSAGE("Configuring project ${PROJECT_NAME}")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-mafDataVector.cpp
-mafDataVector.h
 mafDataInterpolator.cpp
 mafDataInterpolator.h
+mafDataVector.cpp
+mafDataVector.h
 mafMatrixInterpolator.cpp
 mafMatrixInterpolator.h
 mafMatrixVector.cpp
 mafMatrixVector.h
-mafVMEStorage.cpp
-mafVMEStorage.h
 mafVMEFactory.cpp
 mafVMEFactory.h
 mafVMEGenericAbstract.cpp
 mafVMEGenericAbstract.h
 mafVMEGroup.cpp
 mafVMEGroup.h
-mafVMEItem.h
 mafVMEItem.cpp
+mafVMEItem.h
+mafVMEStorage.cpp
+mafVMEStorage.h
+
 )
 
 IF (MAF_USE_CRYPTO)
@@ -38,34 +39,45 @@ ENDIF (MAF_USE_CRYPTO)
 IF (MAF_USE_VTK)
   SET(PROJECT_SRCS
   ${PROJECT_SRCS}
-  mafVMEGeneric.h
+  mafDataPipeCustom.cpp
+  mafDataPipeCustom.h
   mafVMEGeneric.cpp
+  mafVMEGeneric.h
   mafVMEImage.cpp
   mafVMEImage.h
   mafVMEItemVTK.cpp
   mafVMEItemVTK.h
-  mafVMEOutputVTK.cpp
-  mafVMEOutputVTK.h
   mafVMEOutputImage.cpp
   mafVMEOutputImage.h
   mafVMEOutputPolyline.cpp
   mafVMEOutputPolyline.h
   mafVMEOutputSurface.cpp
   mafVMEOutputSurface.h
+  mafVMEOutputVolume.cpp
+  mafVMEOutputVolume.h
+  mafVMEOutputVTK.cpp
+  mafVMEOutputVTK.h
   mafVMEPolyline.cpp
   mafVMEPolyline.h
+  mafVMESlicer.cpp
+  mafVMESlicer.h
   mafVMESurface.cpp
   mafVMESurface.h
+  mafVMEVolume.cpp
+  mafVMEVolume.h
+  mafVMEVolumeGray.cpp
+  mafVMEVolumeGray.h
   mafVTKInterpolator.cpp
   mafVTKInterpolator.h
   vtkMAFDataPipe.cpp
   vtkMAFDataPipe.h
+
   )
 ENDIF (MAF_USE_VTK)
 
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS mafCore)
+SET(PROJECT_LIBS mafCore vtkMAF)
 
 IF (MAF_USE_CRYPTO)
   SET(PROJECT_LIBS ${PROJECT_LIBS} Crypto)
@@ -89,5 +101,8 @@ ENDIF (MAF_USE_WX)
 
 # build tests
 IF(BUILD_TESTING)
-  SUBDIRS(Testing)
+  OPTION(BUILD_VME_TESTING "Enable building of testing for VME classes" ON)
+  IF (BUILD_VME_TESTING)
+    SUBDIRS(Testing)
+  ENDIF (BUILD_VME_TESTING)
 ENDIF(BUILD_TESTING)
