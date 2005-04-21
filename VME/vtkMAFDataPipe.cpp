@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMAFDataPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:08:56 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-21 22:04:09 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -84,6 +84,28 @@ unsigned long vtkMAFDataPipe::GetInformationTime()
 //------------------------------------------------------------------------------
 {
   return InformationTime.GetMTime();
+}
+
+//------------------------------------------------------------------------------
+vtkDataSet *vtkMAFDataPipe::GetOutput(int idx)
+//------------------------------------------------------------------------------
+{
+  if (this->NumberOfOutputs < idx+1)
+  {
+    UpdateInformation(); // force creating the outputs
+  }
+  return Superclass::GetOutput(idx);
+}
+
+//------------------------------------------------------------------------------
+vtkDataSet *vtkMAFDataPipe::GetOutput()
+//------------------------------------------------------------------------------
+{
+  if (this->NumberOfOutputs == 0)
+  {
+    UpdateInformation(); // force creating the outputs
+  }
+  return Superclass::GetOutput();
 }
 
 //------------------------------------------------------------------------------

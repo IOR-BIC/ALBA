@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMAFDataPipe.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:00 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-21 22:04:09 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -38,13 +38,16 @@ public:
   static vtkMAFDataPipe *New();
 
   /** Set the dataset to be reported as output of the VTK data pipe */
-  void SetNthInput(int num, vtkDataSet *input);
+  virtual void SetNthInput(int num, vtkDataSet *input);
+
+  virtual vtkDataSet *GetOutput(int idx);
+  virtual vtkDataSet *GetOutput();
 
   /** A bit of magic making this filter to take into consideration VME data pipe MTime */
-  unsigned long GetMTime();
+  virtual unsigned long GetMTime();
 
   /** return the modification time for internally stored information */
-  unsigned long GetInformationTime();
+  virtual unsigned long GetInformationTime();
 
   /** the data pipe it is linked to */
   void SetDataPipe(mafDataPipe *dpipe);
