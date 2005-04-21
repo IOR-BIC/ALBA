@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-18 19:56:42 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-21 14:09:56 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,7 +30,6 @@
 #include "mafIndent.h"
 #include <string>
 #include <ostream>
-#include <sstream>
 
 mafCxxTypeMacro(mafVMEFactory);
 
