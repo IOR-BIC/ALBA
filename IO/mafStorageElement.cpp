@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-18 19:54:50 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-04-21 14:02:56 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,10 +14,10 @@
 #include "mafObjectFactory.h"
 #include "mafStorable.h"
 #include "mafStorageElement.h"
+#include "mafStorage.h"
 #include "mafString.h"
 #include <vector>
 #include <assert.h>
-#include <sstream>
 
 //------------------------------------------------------------------------------
 mafStorageElement::mafStorageElement(mafStorageElement *parent,mafStorage *storage)
@@ -155,6 +155,7 @@ int mafStorageElement::RestoreObjectVector(mafStorageElement *subnode,std::vecto
   }
 
   int num=0;
+  bool fail=false;
   for (unsigned int i=0;i<items.size();i++)
   {
     mafStorageElement *item=items[i];
@@ -167,12 +168,17 @@ int mafStorageElement::RestoreObjectVector(mafStorageElement *subnode,std::vecto
       }
       else
       {
-        mafWarningMacro("Error while restoring <"<<GetName()<<"> element: cannot restore object");
-        return MAF_ERROR;
+        fail=true;
+        mafWarningMacro("Error while restoring element <"<<GetName()<<"> element: cannot restore object");
+        // try continue restoring other objects
+        GetStorage()->SetErrorCode(mafStorage::IO_WRONG_OBJECT_TYPE);
       }
       num++;
     }    
   }
+
+  if (fail)
+    return MAF_ERROR;
 
   // check if restored num of items is correct
   if (numItems>=0&&num!=numItems)
@@ -189,19 +195,21 @@ mafStorageElement *mafStorageElement::StoreObject(const char *name,mafStorable *
 //------------------------------------------------------------------------------
 {
   assert(storable);
-  mafStorageElement *element=AppendChild(name);
-  if (element)
+  if (storable->IsStorable())
   {
-    element->SetAttribute("Type",type_name);
-
-    if (storable->Store(element)==MAF_OK)
+    mafStorageElement *element=AppendChild(name);
+    if (element)
     {
-      return element;
+      element->SetAttribute("Type",type_name);
+
+      if (storable->Store(element)==MAF_OK)
+      {
+        return element;
+      }
     }
+    mafErrorMacro("Failed to store object of type \""<<type_name<<"\"");
   }
-
-  mafErrorMacro("Failed to store object of type \""<<type_name<<"\"");
-
+  
   return NULL;
 }
 //------------------------------------------------------------------------------
