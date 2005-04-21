@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMAFDataPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:00 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-21 14:08:56 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -109,14 +109,18 @@ void vtkMAFDataPipe::ExecuteInformation()
     // create a new object of the same type of those in the array
     if (GetNumberOfInputs()>0)
     {
-      vtkDataSet *data=GetInput();
-      if (data)
+      for (int i=0;i<GetNumberOfInputs();i++)
       {
-        data->UpdateInformation();
-        vtkDataSet *new_data=data->NewInstance();
-        new_data->CopyInformation(data);
-        this->SetNthOutput(0,new_data);
-        new_data->Delete();
+        
+        vtkDataSet *data=(vtkDataSet *)GetInputs()[i];
+        if (data)
+        {
+          data->UpdateInformation();
+          vtkDataSet *new_data=data->NewInstance();
+          new_data->CopyInformation(data);
+          this->SetNthOutput(i,new_data);
+          new_data->Delete();
+        }
       }
     }
   } 
@@ -130,14 +134,16 @@ void vtkMAFDataPipe::Execute()
 {
   if (GetInput())
   {
+    // forward event to MAF data pipe
+    m_DataPipe->OnEvent(&mafEventBase(this,VME_OUTPUT_DATA_UPDATE));
+
     for (int i=0;i<GetNumberOfInputs();i++)
     {
-      if (this->Outputs[i])
+      if (GetNumberOfOutputs()>i)
       {
-        this->Outputs[i]->ShallowCopy(GetInputs()[i]);
-      
-        // forward event to MAF data pipe
-        m_DataPipe->OnEvent(&mafEventBase(this,VME_OUTPUT_DATA_UPDATE));
+        vtkDataSet *input=(vtkDataSet *)GetInputs()[i];
+        input->Update();
+        this->Outputs[i]->ShallowCopy(input);
       }
       else
       {
