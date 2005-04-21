@@ -12,6 +12,8 @@ ADD_EXECUTABLE(testVMEGenericBounds testVMEGenericBounds.cpp)
 ADD_TEST(testVMEGenericBounds ${EXECUTABLE_OUTPUT_PATH}/testVMEGenericBounds)
 ADD_EXECUTABLE(testVMESlicer testVMESlicer.cpp)
 ADD_TEST(testVMESlicer ${EXECUTABLE_OUTPUT_PATH}/testVMESlicer)
+ADD_EXECUTABLE(testCustomDataPipe testCustomDataPipe.cpp)
+ADD_TEST(testCustomDataPipe ${EXECUTABLE_OUTPUT_PATH}/testCustomDataPipe)
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
