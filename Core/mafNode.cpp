@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:58:07 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2005-04-21 14:26:17 $
+  Version:   $Revision: 1.24 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1004,7 +1004,8 @@ int mafNode::InternalRestore(mafStorageElement *node)
         int n=(int)atof(num_links);
         mafStorageElement::ChildrenVector links_vector=links_element->GetChildren();
         assert(links_vector.size()==n);
-        for (int i=0;i<n;i++)
+        unsigned int i;
+        for (i=0;i<n;i++)
         {
           mafString link_name;
           links_vector[i]->GetAttribute("Name",link_name);
@@ -1023,7 +1024,8 @@ int mafNode::InternalRestore(mafStorageElement *node)
           // error messaged issued by failing node
         }
         m_Children.resize(children.size());
-        for (unsigned int i=0;i<children.size();i++)
+        
+        for (i=0;i<children.size();i++)
         {
           mafNode *node=mafNode::SafeDownCast(children[i]);
           assert(node);
