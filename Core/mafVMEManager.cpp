@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-19 08:25:21 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-21 14:00:10 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,7 +45,9 @@ mafVMEManager::mafVMEManager()
 	m_Listener  = NULL;
 	m_Storage   = NULL;
 
-	m_msf_dir   = mafGetApplicationDirectory().c_str();
+  mafString msf_dir=mafGetApplicationDirectory().c_str();
+  msf_dir.ParsePathName();
+	m_msf_dir   = msf_dir;
   m_msf_dir   += "/Data/MSF/";
 	m_msffile   = "";
 	m_zipfile   = "";
@@ -81,7 +83,11 @@ mafVMERoot *mafVMEManager::GetRoot()
 void mafVMEManager::CreateNewStorage()
 //----------------------------------------------------------------------------
 {
-  if(m_Storage) m_Storage->Delete(); 
+  if (m_Storage)
+  {
+    NotifyRemove(m_Storage->GetRoot());
+    m_Storage->Delete();
+  }
   m_Storage = mafVMEStorage::New();
   m_Storage->GetRoot()->SetName("root");
 }
@@ -92,7 +98,6 @@ void mafVMEManager::MSFNew(bool notify_root_creation)
 {
   m_modified = false;
   
-  if (m_Storage) NotifyRemove(m_Storage->GetRoot());
   CreateNewStorage();
 
   if(notify_root_creation)
@@ -146,9 +151,13 @@ void mafVMEManager::MSFOpen(wxString filename)
     return;
   }
   
-  m_msffile = filename; 
+  mafString unixname=filename;
+  unixname.ParsePathName(); // convert to unix format
+
+  m_msffile = unixname; 
 
   wxBusyInfo wait("Loading MSF: Please wait");
+
   m_Storage->SetURL(m_msffile.c_str());
  
   int res = m_Storage->Restore();  //modified by Stefano 29-10-2004
@@ -183,14 +192,11 @@ void mafVMEManager::MSFOpen(wxString filename)
 
   NotifyAdd(m_Storage->GetRoot());
 
-  // modified by Stefano 29-10-2004 (beg)
   // if some problems occurred during import give feedback to the user
-  if (res == 1)
+  if (res!=MAF_OK)
   {
-    wxString tmpStr("Errors during file parsing! Look the log area for error messages.");
-    wxMessageBox(tmpStr, "Error", wxOK | wxICON_ERROR);
+    mafErrorMessage("Errors during file parsing! Look the log area for error messages.");
   }
-  //modified by Stefano 29-10-2004 (end)
 
 
 	mafEventMacro(mafEvent(this,VME_SELECTED,m_Storage->GetRoot())); 
@@ -310,18 +316,22 @@ void mafVMEManager::MSFSave()
 {
   if(m_msffile == "") 
   {
-    std::string file = mafGetSaveFile(m_msf_dir, m_wildc);
+    mafString file = mafGetSaveFile(m_msf_dir, m_wildc).c_str();
+   
     if(file == "") return;
-		if(!wxFileExists(file.c_str()))
+		if(!wxFileExists(file.GetCStr()))
 		{
 			wxString path, name, ext, file_dir;
-			wxSplitPath(file.c_str(),&path,&name,&ext);
-			file_dir = path + "\\" + name;
+			wxSplitPath(file.GetCStr(),&path,&name,&ext);
+			file_dir = path + "/" + name;
 			if(!wxDirExists(file_dir))
 				wxMkdir(file_dir);
-			file = file_dir + "\\" + name + "." + ext;
+			file = file_dir + "/" + name + "." + ext;
 		}
-    m_msffile = file.c_str();
+
+    // convert to unix format
+    file.ParsePathName();
+    m_msffile = file.GetCStr();
   }
   if(wxFileExists(m_msffile) && m_make_bak_file)
 	{
