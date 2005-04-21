@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputSurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 19:31:17 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-21 14:07:11 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -18,12 +18,14 @@
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class mafVMEGerericVTK;
 class vtkPolyData;
+class vtkImageData;
 
 /** NULL output for VME node with a VTK image output data.
   mafVMEOutputSurface is the output produced by a node generating an output
   with a VTK dataset.
+  @todo
+  - add a method to extract/set material properties
 */
 class MAF_EXPORT mafVMEOutputSurface : public mafVMEOutputVTK
 {
@@ -42,6 +44,14 @@ public:
     An event is rised when the output data changes to allow attached classes to 
     update their input.*/
   virtual vtkPolyData *GetSurfaceData();
+  
+  /** return the texture object: return NULL in case of no texture attached to the surface */
+  virtual vtkImageData *GetTexture();
+
+  /** used by VME to set the texture */
+  void SetTexture(vtkImageData *tex);
+protected: 
+  vtkImageData *m_Texture; ///< the optional texture to be applied to the surface
 
 private:
   mafVMEOutputSurface(const mafVMEOutputSurface&); // Not implemented

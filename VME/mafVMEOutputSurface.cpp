@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 19:31:17 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-21 14:07:11 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,8 +24,10 @@
 #include "mafVMEOutputSurface.h"
 #include "mafVME.h"
 #include "mafIndent.h"
+#include "mafDataPipe.h"
 
 #include "vtkPolyData.h"
+#include "vtkImageData.h"
 
 #include <assert.h>
 
@@ -37,12 +39,14 @@ mafCxxTypeMacro(mafVMEOutputSurface)
 mafVMEOutputSurface::mafVMEOutputSurface()
 //-------------------------------------------------------------------------
 {
+  m_Texture = NULL;
 }
 
 //-------------------------------------------------------------------------
 mafVMEOutputSurface::~mafVMEOutputSurface()
 //-------------------------------------------------------------------------
 {
+  vtkDEL(m_Texture);
 }
 
 //-------------------------------------------------------------------------
@@ -51,3 +55,24 @@ vtkPolyData *mafVMEOutputSurface::GetSurfaceData()
 {
   return (vtkPolyData *)GetVTKData();
 }
+
+//-------------------------------------------------------------------------
+void mafVMEOutputSurface::SetTexture(vtkImageData *tex)
+//-------------------------------------------------------------------------
+{
+  if (m_Texture!=tex)
+  {
+    vtkDEL (m_Texture)
+    m_Texture = tex;
+    m_Texture->Register(NULL);
+  }
+}
+//-------------------------------------------------------------------------
+vtkImageData *mafVMEOutputSurface::GetTexture()
+//-------------------------------------------------------------------------
+{
+  if (m_VME&&m_VME->GetDataPipe()&&m_VME->GetDataPipe()->GetVTKData())
+    m_VME->GetDataPipe()->GetVTKData()->UpdateInformation();
+  return m_Texture;
+}
+
