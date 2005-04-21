@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:05:14 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-21 22:03:41 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -52,7 +52,7 @@ mafVMESlicer::mafVMESlicer()
   mafDataPipeCustom *dpipe=mafDataPipeCustom::New();
   SetDataPipe(dpipe);
 
-  m_TextureRes = 512;
+  m_TextureRes = 128;
   m_Xspc = m_Yspc = 0.3;
 
   //vtkMAFSmartPointer<vtkImageData> image_data;
@@ -78,6 +78,9 @@ mafVMESlicer::mafVMESlicer()
   
   dpipe->GetVTKDataPipe()->SetNthInput(0,slice);
   dpipe->GetVTKDataPipe()->SetNthInput(1,image);
+
+  // set the texture in the output, must do it here, after setting slicer filter's input
+  GetSurfaceOutput()->SetTexture((vtkImageData *)((mafDataPipeCustom *)GetDataPipe())->GetVTKDataPipe()->GetOutput(1));
 }
 
 //-------------------------------------------------------------------------
@@ -170,6 +173,11 @@ void mafVMESlicer::InternalPreUpdate()
       vtkMath::Cross(n, vectX, vectY);
       vtkMath::Normalize(vectY);
 
+      if (vtkdata->IsA("vtkRectilinearGrid"))
+      {
+        vtkdata->Update();
+      }
+
       m_PSlicer->SetInput(vtkdata);
       m_PSlicer->SetPlaneOrigin(pos);
       m_PSlicer->SetPlaneAxisX(vectX);
@@ -179,9 +187,6 @@ void mafVMESlicer::InternalPreUpdate()
       m_ISlicer->SetPlaneOrigin(pos);
       m_ISlicer->SetPlaneAxisX(vectX);
       m_ISlicer->SetPlaneAxisY(vectY); 
-
-      // set the texture in the output, must do it here, after setting slicer filter's input
-      GetSurfaceOutput()->SetTexture((vtkImageData *)((mafDataPipeCustom *)GetDataPipe())->GetVTKDataPipe()->GetOutput(1));
     }
   }
 }
