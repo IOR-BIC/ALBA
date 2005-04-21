@@ -26,7 +26,6 @@ mafVMEItem.cpp
 mafVMEItem.h
 mafVMEStorage.cpp
 mafVMEStorage.h
-
 )
 
 IF (MAF_USE_CRYPTO)
@@ -41,6 +40,8 @@ IF (MAF_USE_VTK)
   ${PROJECT_SRCS}
   mafDataPipeCustom.cpp
   mafDataPipeCustom.h
+  mafPipeSurface.cpp
+  mafPipeSurface.h
   mafVMEGeneric.cpp
   mafVMEGeneric.h
   mafVMEImage.cpp

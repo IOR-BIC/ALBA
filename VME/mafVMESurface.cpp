@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-19 08:27:01 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-21 16:36:22 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -29,6 +29,8 @@
 #include "mafAbsMatrixPipe.h"
 #include "vtkDataSet.h"
 #include "vtkPolyData.h"
+
+#include "mafPipeSurface.h" //SIL. 21-4-2005: 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMESurface)
 //-------------------------------------------------------------------------
@@ -87,3 +89,11 @@ char** mafVMESurface::GetIcon()
   #include "mafVMESurface.xpm"
   return mafVMESurface_xpm;
 }
+//-------------------------------------------------------------------------
+mafPipe* mafVMESurface::GetVisualPipe(mafSceneNode* sn)
+//-------------------------------------------------------------------------
+{
+   mafPipeSurface *pipe = new mafPipeSurface(sn);
+   return pipe;
+}
+
