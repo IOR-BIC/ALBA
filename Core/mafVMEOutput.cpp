@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 19:38:53 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-04-21 22:02:47 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -66,14 +66,7 @@ void mafVMEOutput::Update()
 {
   assert(m_VME);
 
-  if (m_VME)
-  {
-    if (m_VME->GetDataPipe())
-      m_VME->GetDataPipe()->Update();
-
-    if (m_VME->GetMatrixPipe())
-      m_VME->GetMatrixPipe()->Update();
-  }
+  m_VME->Update();
 }
 
 //-------------------------------------------------------------------------
