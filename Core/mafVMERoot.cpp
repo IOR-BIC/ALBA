@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 19:39:05 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-04-21 13:59:49 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,7 +30,6 @@
 #include "mafStorage.h"
 #include "mafStorageElement.h"
 #include "mafEventIO.h"
-#include <sstream>
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMERoot)
@@ -51,6 +50,7 @@ mafVMERoot::mafVMERoot()
 mafVMERoot::~mafVMERoot()
 //-------------------------------------------------------------------------
 {
+  mafDEL(m_Transform);
   SetOutput(NULL);
 }
 
@@ -71,11 +71,8 @@ int mafVMERoot::DeepCopy(mafNode *a)
 { 
   if (Superclass::DeepCopy(a)==MAF_OK)
   {
-    
     mafVMERoot *vme_root=mafVMERoot::SafeDownCast(a);
     m_Transform->SetMatrix(vme_root->m_Transform->GetMatrix());
-    m_Transform->SetTimeStamp(vme_root->m_Transform->GetTimeStamp());
-
     return MAF_OK;
   }
   else
@@ -101,15 +98,6 @@ void mafVMERoot::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes)
 //-------------------------------------------------------------------------
 {
   kframes.clear(); // no timestamp
-}
-
-//-------------------------------------------------------------------------
-void mafVMERoot::SetCurrentTime(mafTimeStamp t)
-//-------------------------------------------------------------------------
-{
-  Superclass::SetCurrentTime(t);
-  m_Transform->SetTimeStamp(t);
-  m_Transform->Modified();
 }
 
 //-------------------------------------------------------------------------

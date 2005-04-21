@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 16:40:53 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-04-21 13:59:49 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -68,9 +68,6 @@ public:
 
   /** return no timestamps */
   virtual void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes);
-
-  /** force the time of the internal matrix */
-  virtual void SetCurrentTime(mafTimeStamp t);
 
   /** allow only a NULL parent */
   virtual bool CanReparentTo(mafNode *parent) {return mafRoot::CanReparentTo(parent);}
