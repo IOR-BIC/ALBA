@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-04 11:50:08 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-04-21 13:54:28 $
+  Version:   $Revision: 1.14 $
   Authors:   originally based on vtkString (www.vtk.org), rewritten Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -138,13 +138,6 @@ public:
 
   /** Extract the pathname from a filename string. Result is written inplace. */
   void ExtractPathName();
-
-  /**
-    Concatenate a string prepending a "/" or "\", depending on the 
-    local OS, if needed also parse the given string to substitute each (back)slash
-    character with the right pathname separator.*/
-  void AppendPath(const char *str);
-  void AppendPath(mafString *str);
 
   /**
     parse the given string to substitute each (back)slash

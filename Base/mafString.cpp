@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-18 19:53:19 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-04-21 13:54:28 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -545,13 +545,6 @@ char* mafString::Append(const char* str1, const char* str2)
 }
 
 //----------------------------------------------------------------------------
-void mafString::AppendPath(mafString *str)
-//----------------------------------------------------------------------------
-{
-  AppendPath(str->m_Size>0?m_CStr:m_ConstCStr);
-}
-
-//----------------------------------------------------------------------------
 mafString &mafString::Append(const char* str)
 //----------------------------------------------------------------------------
 {
@@ -629,17 +622,14 @@ char *mafString::ParsePathName(char *str)
   if (mafString::IsEmpty(str))
     return str;
 
-  // parse the appended string to substitute "/" and "\\" with the right one.
+ // for Windows platforms parse the string to substitute "/" and "\\" with the right one.
+#ifdef _WIN32
   for (unsigned int i=0;i<Length(str);i++)
   {
-#ifdef _WIN32
-    if (str[i]=='/')
-      str[i]='\\';
-#else
     if (str[i]=='\\')
       str[i]='/';
-#endif
   }
+#endif
 
   return str;
 }
@@ -679,45 +669,14 @@ void mafString::SetPathName(mafString *str)
 }
 
 //----------------------------------------------------------------------------
-void mafString::AppendPath(const char *str)
-//----------------------------------------------------------------------------
-{
-  if (mafString::IsEmpty(str))
-    return;
-
-#ifdef _WIN32
-  if (!IsEmpty()&&!EndsWith("\\"))
-  {
-    Append("\\");
-  }
-  
-  Append(str);
-
-#else
-  if (!IsEmpty()&&!EndsWith("/"))
-  {
-    Append("/");
-  }
-
-  Append(str);
-
-#endif
-
-  mafString::ParsePathName(m_CStr);
-}
-
-//----------------------------------------------------------------------------
 const char *mafString::BaseName(const char *filename)
 //----------------------------------------------------------------------------
 {
 if (filename==NULL)
   return NULL;
 
-#ifdef _WIN32
-  char *ptr=strrchr(filename,'\\');
-#else
   char *ptr=strrchr(filename,'/');
-#endif
+
   return (ptr==NULL?filename:ptr+1);
 }
 
@@ -725,11 +684,7 @@ if (filename==NULL)
 void mafString::ExtractPathName()
 //----------------------------------------------------------------------------
 {
-#ifdef _WIN32
-  int idx=FindLastChr('\\');
-#else
   int idx=FindLastChr('/');
-#endif
 
   if (idx>=0)
   { 
