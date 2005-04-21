@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 19:38:23 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-04-21 13:59:08 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -36,7 +36,6 @@
 #include "mafDecl.h"
 #include "mafStorageElement.h"
 
-#include <sstream>
 #include <assert.h>
 
 //-------------------------------------------------------------------------
@@ -52,7 +51,7 @@ mafVME::mafVME()
   m_AbsMatrixPipe = mafAbsMatrixPipe::New();
 
   m_CurrentTime         = 0.0;
-  m_Crypting            = -1;
+  m_Crypting            = 0;
 }
 
 //-------------------------------------------------------------------------
@@ -648,7 +647,8 @@ int mafVME::SetMatrixPipe(mafMatrixPipe *mpipe)
 void mafVME::Update()
 //-------------------------------------------------------------------------
 {
-  // to be written  
+  InternalPreUpdate();
+  InternalUpdate();
 }
 
 //-------------------------------------------------------------------------
@@ -660,7 +660,6 @@ void mafVME::SetCrypting(int crypting)
   else
     m_Crypting = 0;
 
-  GetTagArray()->SetTag(mafTagItem("MAF_CRYPT_VME",m_Crypting));
   Modified();
 }
 
@@ -668,7 +667,7 @@ void mafVME::SetCrypting(int crypting)
 int mafVME::GetCrypting()
 //-------------------------------------------------------------------------
 {
-  return mafRestoreNumericFromTag(GetTagArray(),"MAF_CRYPT_VME",m_Crypting,-1,0);
+  return m_Crypting;
 }
 
 //-------------------------------------------------------------------------
@@ -717,6 +716,13 @@ void mafVME::OnEvent(mafEventBase *e)
     case VME_TIME_SET:
       SetCurrentTime(*((mafTimeStamp *)e->GetData()));
     break;
+    }
+   }
+  
+  if (e->GetChannel()==MCH_UP)
+  {
+    switch (e->GetId())
+    {
     case VME_OUTPUT_DATA_PREUPDATE:
       InternalPreUpdate();  // self process the event
       GetEventSource()->InvokeEvent(e); // forward event to observers
@@ -739,7 +745,7 @@ int mafVME::InternalStore(mafStorageElement *parent)
 {
   if (Superclass::InternalStore(parent)==MAF_OK)
   {
-    parent->SetAttribute("Crypting",mafString(m_Crypting));    
+    parent->SetAttribute("Crypting",mafString(m_Crypting));
     return MAF_OK;
   }
   return MAF_ERROR;
@@ -751,12 +757,9 @@ int mafVME::InternalRestore(mafStorageElement *node)
 {
   if (Superclass::InternalRestore(node)==MAF_OK)
   {
-    mafString crypting;
-    node->GetAttribute("Crypting",crypting);
-    if (crypting=="true"||crypting=="True"||crypting=="TRUE")
-    {
-      SetCrypting(atof(crypting));
-    }
+    mafID crypt;
+    node->GetAttributeAsInteger("Crypting",crypt);
+    SetCrypting(crypt);
     
     return MAF_OK;
   }
