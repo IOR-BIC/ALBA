@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exVMEManApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-18 21:09:12 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-21 14:12:15 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,7 +25,7 @@
 #include "mafPics.h"
 #include "mmgMDIFrame.h"
 
-#include "mafNodeFactory.h"
+#include "mafVMEFactory.h"
 #include "mafNodeGeneric.h"
 #include "mafNodeRoot.h"
 
@@ -40,13 +40,9 @@ IMPLEMENT_APP(exVMEManApp)
 bool exVMEManApp::OnInit()
 //--------------------------------------------------------------------------------
 {
-  mafNodeFactory *node_factory  = mafNodeFactory::GetInstance();
-  assert(node_factory!=NULL);
-  int result = mafNodeFactory::Initialize();
+  int result = mafVMEFactory::Initialize();
   assert(result==MAF_OK);
-  mafPlugNode<mafNodeRoot>("mafNodeRoot");
-  mafPlugNode<mafNodeGeneric>("mafNodeGeneric");
-
+ 
   m_logic = new mafLogicWithManagers();
   m_logic->Configure();
 
