@@ -23,6 +23,7 @@
 #include "vtkVolumeSlicer.h"
 #include "vtkTexture.h"
 #include "vtkProperty.h"
+#include <iostream>
 
 //--------------------------------------------------------------------
 int VolumeSlicerTest()

@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkDistanceFilter.cxx,v $
   Language:  C++
-  Date:      $Date: 2005-04-20 10:52:26 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-21 22:07:45 $
+  Version:   $Revision: 1.3 $
 
 =========================================================================*/
 
@@ -23,7 +23,7 @@
 #include "assert.h"
 
 
-vtkCxxRevisionMacro(vtkDistanceFilter, "$Revision: 1.2 $");
+vtkCxxRevisionMacro(vtkDistanceFilter, "$Revision: 1.3 $");
 vtkStandardNewMacro(vtkDistanceFilter);
 
 #define min(x0, x1) (((x0) < (x1)) ? (x0) : (x1))
@@ -217,7 +217,7 @@ template<typename DataType> double vtkDistanceFilter::TraceRay(const double orig
   double tmin = VTK_FLOAT_MIN, tmax = VTK_FLOAT_MAX;
   assert(fabs(vtkMath::Norm(ray) - 1.) < 1.e-5);
   int i;
-  for (int i = 0; i < 3; i++) {
+  for (i = 0; i < 3; i++) {
     const double idistance = 1.f / ray[i];
     dxyz[i] = fabs(idistance);
     if (fabs(idistance) > maxD) {
