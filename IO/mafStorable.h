@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorable.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:40:53 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-21 14:02:28 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -36,6 +36,7 @@ class mafObject;
 class mafStorable
 {
 public:
+  mafStorable():m_Storable(true) {}
   /**
     Storing this object as part of an XML document. The element node must be passed as argument,
     which can eventually be the XML document root. The store function will append all the necessary 
@@ -54,6 +55,9 @@ public:
 
   /** convenience function for dynamic casting */
   static mafStorable* SafeCastToObject(mafObject *o);
+
+  /** return true if the object should be stored */
+  bool IsStorable() {return m_Storable;}
 protected:
   /**
     This is called by Store() and must be reimplemented by subclasses. 
@@ -64,5 +68,7 @@ protected:
     This is called by Restore() and must be reimplemented by subclasses 
     The element to be restored is passed as argument*/
   virtual int InternalRestore(mafStorageElement *node)=0;
+
+  bool m_Storable; ///< if this flag is set to false the object does not store itself
 };
 #endif // __mafStorable_h__
