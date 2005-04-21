@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testView.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:20:04 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-21 16:33:44 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,31 +23,18 @@
 // testView :
 //----------------------------------------------------------------------------
 /** 
+ an example view that can display every vme which self provide a VisualPipe
 */
 class testView: public mafViewVTK
 {
 public:
-  testView(wxString label);
-  virtual ~testView(); 
+  testView(wxString label) : mafViewVTK(label) {};
+
   virtual mafView*  Copy(mafEventListener *Listener);
-  virtual void      Create();
-
-  /*
-  virtual void			VmeAdd(mafNode *vme);
-  virtual void			VmeRemove(mafNode *vme);
-  virtual void			VmeSelect(mafNode *vme, bool select);
-  virtual void			VmeShow(mafNode *vme, bool show);
-	virtual void      VmeUpdateProperty(mafNode *vme, bool fromTag = false);
   virtual int 	    GetNodeStatus(mafNode *vme);
-  */
+  virtual void	    VmeCreatePipe(mafNode *vme);
+  virtual void	    VmeDeletePipe(mafNode *vme);
 
-	virtual void			CameraReset();	 
-  virtual void			CameraUpdate(); 
-
-  virtual mafSceneGraph *GetSceneGraph()	  {return m_sg;}; 
-  virtual mafRWIBase    *GetRWI()           {return m_rwi->m_rwi;}; 
 protected:
-  mafRWI        *m_rwi; 
-  mafSceneGraph *m_sg; 
 };
 #endif

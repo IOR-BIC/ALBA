@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testView.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:20:03 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-21 16:33:44 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,24 +20,8 @@
 //----------------------------------------------------------------------------
 
 #include "testView.h"
-#include "vtkCamera.h"
-
-
-//----------------------------------------------------------------------------
-testView::testView(wxString label)
-:mafView(label)
-//----------------------------------------------------------------------------
-{
-  //m_sg  = NULL;
-  m_rwi = NULL;
-}
-//----------------------------------------------------------------------------
-testView::~testView( ) 
-//----------------------------------------------------------------------------
-{
-  //cppDEL(m_sg);
-  cppDEL(m_rwi);
-}
+#include "mafVME.h"
+#include "mafPipe.h"
 //----------------------------------------------------------------------------
 mafView *testView::Copy(mafEventListener *Listener)
 //----------------------------------------------------------------------------
@@ -48,40 +32,39 @@ mafView *testView::Copy(mafEventListener *Listener)
   return v;
 }
 //----------------------------------------------------------------------------
-void testView::Create( ) 
+int testView::GetNodeStatus(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-  m_rwi = new mafRWI(mafGetFrame() /*, ONE_LAYER, m_show_grid == 1, m_stereo_type*/);
-  m_rwi->SetListener(this); //SIL. 16-6-2004: 
-  //m_rwi->CameraSet(m_cam_position);
-  //m_rwi->SetAxesVisibility(m_show_axes != 0);
-  m_win = m_rwi->m_rwi;
+  assert(m_sg);
+  mafSceneNode *n = m_sg->Vme2Node(vme);
+  assert(n);
 
-  /*
-  m_sg  = new mafSceneGraph(this,m_rwi->m_r1,m_rwi->m_r2);
-  m_sg->SetListener(this);
-  m_sg->SetCreatableFlag(VME_SURFACE);
-  m_sg->SetCreatableFlag(VME_GRAY_VOLUME);
-  m_sg->SetCreatableFlag(VME_VOLUME);
-  m_sg->SetCreatableFlag(VME_IMAGE);
-  m_sg->SetCreatableFlag(VME_POINTSET);
-  m_sg->SetCreatableFlag(VME_TOOL);
-  m_sg->SetCreatableFlag(VME_SCALAR);
-  m_rwi->m_sg = m_sg;
-  */
+  if(!vme->IsA("mafVME"))
+    return NODE_NON_VISIBLE;
 
-  m_rwi->m_c->SetClippingRange(0.1,1000); 
-  this->CameraReset();
+  mafVME *v = ((mafVME*)vme);
+  if(!v->HasVisualPipe())  
+    return NODE_NON_VISIBLE;
+  else
+    return (n->IsVisible()) ? NODE_VISIBLE_ON :  NODE_VISIBLE_OFF;
 }
-/*
 //----------------------------------------------------------------------------
-void testView::VmeAdd(mafNode *vme)                                   {assert(m_sg) m_sg->VmeAdd(vme);}
-void testView::VmeRemove(mafNode *vme)                                {assert(m_sg) m_sg->VmeRemove(vme);}
-void testView::VmeSelect(mafNode *vme, bool select)                   {assert(m_sg) m_sg->VmeSelect(vme);}
-void testView::VmeShow(mafNode *vme, bool show)												{assert(m_sg) m_sg->VmeShow(vme,show);}
-void testView::VmeUpdateProperty(mafNode *vme, bool fromTag = false)	{assert(m_sg) m_sg->VmeUpdateProperty(vme,fromTag);}
-int  testView::GetNodeStatus(mafNode *vme)                            {return m_sg ? m_sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;}
-void testView::CameraReset()	{assert(m_rwi) m_rwi->CameraReset();}
-void testView::CameraUpdate() {assert(m_rwi) m_rwi->CameraUpdate();}
+void testView::VmeCreatePipe(mafNode *vme)
 //----------------------------------------------------------------------------
-*/
+{
+  mafSceneNode *n = m_sg->Vme2Node(vme);
+  assert(n && !n->m_pipe);
+  assert(vme->IsA("mafVME"));
+  mafVME *v = ((mafVME*)vme);
+
+  n->m_pipe = v->GetVisualPipe(n);
+}
+//----------------------------------------------------------------------------
+void testView::VmeDeletePipe(mafNode *vme)
+//----------------------------------------------------------------------------
+{
+  mafSceneNode *n = m_sg->Vme2Node(vme);
+  assert(n && n->m_pipe);
+  cppDEL(n->m_pipe);
+}
+

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:18:02 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-21 16:37:44 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -115,8 +115,8 @@ public:
 //  void SetMouseAction(mafAction *action);
 
 protected:
-//  mafISV             *m_is;
-//  mafAction          *m_MouseAction;
+//mafISV             *m_is;
+//mafAction          *m_MouseAction;
   mafView            *m_vlist;  // created view list
 
   mafView            *m_t[MAXVIEW];   // view template vector
@@ -124,9 +124,9 @@ protected:
 
   mafEventListener   *m_Listener;
   mafVMERoot         *m_root_vme;
-  mafNode             *m_selected_vme;
+  mafNode            *m_selected_vme;
   mafView            *m_selected_view;
-//  mafRWIBase         *m_selected_rwi;
+//mafRWIBase         *m_selected_rwi;
 	mafView            *m_view_being_created;
 };
 #endif

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:18:01 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-21 16:37:43 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -295,7 +295,7 @@ void mafSceneGraph::VmeShow(mafNode *vme, bool show)
 			if(node->m_pipe) m_view->VmeDeletePipe(vme);
 		}
   }
-	node->Show(show);
+	//node->Show(show);  //SIL. 21-4-2005: 
   
   /* @@@
   // update m_shown_mutex_vme

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneNode.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:18:01 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-21 16:37:43 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,15 +35,15 @@ public:
 	void Select(bool select);
 
   /** Call Show method for the vme's pipe. */
-	void Show(bool show);
+	//void Show(bool show);  --  //SIL. 21-4-2005: removed unused function Show from mafScenenNode and mafPipe
 
   /** Call UpdateProperty method for the vme's pipe. */
 	void UpdateProperty(bool fromTag = false);
 
   /** Return the vme's visibility. */
-  bool IsVisible() {return m_visible;};
+  bool IsVisible() {return m_pipe != NULL;};
 
-  mafNode            *m_vme;
+  mafNode           *m_vme;
   mafSceneNode      *m_parent;
   mafPipe           *m_pipe;
   bool               m_pipe_creatable;
@@ -97,6 +97,6 @@ public:
 
 protected:
   
-  bool m_visible;   
+  //bool m_visible;   // a SceneNode is visible if a pipe has been created
 };  
 #endif // _mafSceneNode_H_

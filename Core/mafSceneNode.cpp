@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:18:01 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-21 16:37:43 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,10 +24,13 @@
 #include "mafSceneGraph.h"
 #include "mafSceneNode.h"
 #include "mafNode.h"
+#include "mafVME.h"
 #include "mafMatrixPipe.h"
 #include "vtkMAFAssembly.h"
 #include "mafNodeIterator.h" 
 #include "vtkRenderer.h"
+//#include "vtkTransform.h"
+#include "vtkLinearTransform.h"
 //@@@ #include "mafNodeLandmarkCloud.h"
 //@@@ #include "mafNodeScalar.h"
 //@@@ #include "mflMatrixPipe.h"
@@ -46,13 +49,24 @@ mafSceneNode::mafSceneNode(mafSceneGraph *sg,mafSceneNode *parent, mafNode* vme,
   m_pipe					 = NULL;
   m_pipe_creatable = true;
   m_mutex          = false;
-  m_visible        = false;
+  //m_visible        = false;
   m_asm1 = NULL;
   m_asm2 = NULL;
   
+  assert(vme);
+  vtkLinearTransform *transform = NULL;
+  if(vme->IsA("mafVME"))
+  {
+    mafVME* v = ((mafVME*)vme);
+    assert(v->GetOutput());
+    assert(v->GetOutput()->GetTransform());
+    assert(v->GetOutput()->GetTransform()->GetVTKTransform());
+    transform = v->GetOutput()->GetTransform()->GetVTKTransform();
+  }
+
   m_asm1 = vtkMAFAssembly::New();
-  //@@@ m_asm1->SetUserTransform(m_vme->GetMatrixPipe()->GetVTKTransform() ); //SIL. 18-4-2005:  era GetMatrixPipe();
   m_asm1->SetVme(vme);
+  m_asm1->SetUserTransform(transform);
 
   if(m_ren1 != NULL) //modified by Vladik. 03-03-2004
   {
@@ -65,8 +79,8 @@ mafSceneNode::mafSceneNode(mafSceneGraph *sg,mafSceneNode *parent, mafNode* vme,
 	if(m_ren2 != NULL)
 	{
 		m_asm2 = vtkMAFAssembly::New();
-    //@@@ m_asm2->SetUserTransform(m_vme->GetMatrixPipe()->GetVTKTransform());  //SIL. 18-4-2005: added ->GetVTKTransform()
     m_asm2->SetVme(vme);
+    m_asm2->SetUserTransform(transform);
     if(m_vme->IsA("mafNodeRoot") || m_vme->IsA("mafVMERoot")) 
 			m_ren2->AddActor(m_asm2); 
 		else
@@ -149,6 +163,7 @@ void mafSceneNode::Select(bool select)
 {
   if(m_pipe) m_pipe->Select(select);
 }
+/*
 //----------------------------------------------------------------------------
 void mafSceneNode::Show(bool show)   
 //----------------------------------------------------------------------------
@@ -156,6 +171,7 @@ void mafSceneNode::Show(bool show)
 	m_visible = show;
   if(m_pipe) m_pipe->Show(show);
 }
+*/
 //----------------------------------------------------------------------------
 void mafSceneNode::UpdateProperty(bool fromTag)
 //----------------------------------------------------------------------------

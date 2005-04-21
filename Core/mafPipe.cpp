@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:18:01 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-21 16:37:43 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,31 +25,17 @@
 #include "mafPipe.h"
 #include "mafNode.h"
 #include "vtkMAFAssembly.h"
-
 //----------------------------------------------------------------------------
 mafPipe::mafPipe(mafSceneNode *n)
 //----------------------------------------------------------------------------
 {
 	m_sg       = n->m_sg;
-	m_vme			 = n->m_vme;
+  m_mafnode  = n->m_vme;
+  m_vme			 = m_mafnode->IsA("mafVME") ? ((mafVME*)m_mafnode) : NULL;
 	m_asm1		 = n->m_asm1;
 	m_asm2		 = n->m_asm2;
 	m_ren1     = n->m_ren1;
 	m_ren2     = n->m_ren2;
-  m_next     = NULL;
-	m_selected = false;
-}
-//----------------------------------------------------------------------------
-mafPipe::mafPipe()
-//----------------------------------------------------------------------------
-{
-	m_sg       = NULL;
-	m_vme			 = NULL;
-	m_asm1		 = NULL;
-	m_asm2		 = NULL;
-	m_ren1     = NULL;
-	m_ren2     = NULL;
-  m_next     = NULL;
 	m_selected = false;
 }
 //----------------------------------------------------------------------------
@@ -57,18 +43,3 @@ mafPipe::~mafPipe( )
 //----------------------------------------------------------------------------
 {
 }
-//----------------------------------------------------------------------------
-void mafPipe::Create(mafSceneNode *n) 
-//----------------------------------------------------------------------------
-{
-	m_sg       = n->m_sg;
-	m_vme			 = n->m_vme;
-	m_asm1		 = n->m_asm1;
-	m_asm2		 = n->m_asm2;
-	m_ren1     = n->m_ren1;
-	m_ren2     = n->m_ren2;
-	m_selected = false;
-  //SIL. 19-5-2004:  important -- dont initialize m_next
-}
-
-

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:18:02 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-21 16:37:44 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,8 +27,8 @@
 #include "mafNodeIterator.h"
 #include "mafVMERoot.h"
 
-//#include "mmgMDIFrame.h"
-//#include "mmgMDIChild.h"
+#include "mmgMDIFrame.h"
+#include "mmgMDIChild.h"
 
 /*
 #include "wx/busyinfo.h"
@@ -37,8 +37,6 @@
 #include "mafRWIBase.h"
 #include "mafDevice.h"
 #include "typeinfo.h"
-*/
-/*
 #include "mafAction.h"
 #include "vtkRenderWindow.h"
 #include "vtkWindowToImageFilter.h"
@@ -52,11 +50,11 @@ mafViewManager::mafViewManager()
   //m_selected_rwi = NULL;
   //m_is=NULL;
 
-  m_vlist        = NULL;
-  m_Listener     = NULL;
-  m_selected_vme = NULL;
-  m_selected_view= NULL;
-	m_root_vme     = NULL;
+  m_vlist              = NULL;
+  m_Listener           = NULL;
+  m_selected_vme       = NULL;
+  m_selected_view      = NULL;
+	m_root_vme           = NULL;
   m_view_being_created = NULL; 
   m_tcount       = 0;
   for(int i=0; i<MAXVIEW; i++) m_t[i]=NULL;
@@ -176,8 +174,8 @@ void mafViewManager::VmeRemove(mafNode *n)
 void mafViewManager::VmeModified(mafNode *vme)
 //---------------------------------------------------------------------------
 {
-//@@@  for(mafView* v = m_vlist; v; v=v->m_next) 
-//@@@    v->VmeModified(vme);
+ //@@@ for(mafView* v = m_vlist; v; v=v->m_next) 
+ //@@@   v->VmeModified(vme);  -- view::vmeModified not exist now -- is this required ?  //SIL. 21-4-2005: 
 }
 //----------------------------------------------------------------------------
 void mafViewManager::VmeSelect(mafNode *n)   
@@ -185,13 +183,13 @@ void mafViewManager::VmeSelect(mafNode *n)
 {
 	if(n != m_selected_vme)
 	{
-//@@@		if(m_selected_vme)
-//@@@			for(mafView* v = m_vlist; v; v=v->m_next) 
-//@@@				v->VmeSelect(m_selected_vme,false);
+		if(m_selected_vme)
+			for(mafView* v = m_vlist; v; v=v->m_next) 
+				v->VmeSelect(m_selected_vme,false); //deselect the previous selected vme
 		m_selected_vme = n;
 	}
-//@@@	for(mafView* v = m_vlist; v; v=v->m_next) 
-//@@@    v->VmeSelect(n,true);
+	for(mafView* v = m_vlist; v; v=v->m_next) 
+    v->VmeSelect(n,true); //select the new one
 	CameraUpdate();
 }
 //----------------------------------------------------------------------------
@@ -200,13 +198,13 @@ void mafViewManager::VmeShow(mafNode *n, bool show)
 {
  if(m_view_being_created) // Important - test m_view_being_created first
  {
-//@@@   m_view_being_created->VmeShow(n,show);
+   m_view_being_created->VmeShow(n,show);
  }
  else
  {
 	 if(m_selected_view)
 	 {
-//@@@     m_selected_view->VmeShow(n,show);
+     m_selected_view->VmeShow(n,show);
 	 }
  }
 }
@@ -214,20 +212,22 @@ void mafViewManager::VmeShow(mafNode *n, bool show)
 void mafViewManager::PropertyUpdate(bool fromTag)
 //----------------------------------------------------------------------------
 {
-//@@@			for(mafView* v = m_vlist; v; v=v->m_next) 
-//@@@		v->VmeUpdateProperty(this->m_selected_vme, fromTag);
+  for(mafView* v = m_vlist; v; v=v->m_next) 
+		v->VmeUpdateProperty(this->m_selected_vme, fromTag);
 }
 //----------------------------------------------------------------------------
 void mafViewManager::CameraReset(bool sel)   
 //----------------------------------------------------------------------------
 {
-//@@@  if(m_selected_view) m_selected_view->CameraReset( sel ? m_selected_vme : NULL);
+  //@@@ if(m_selected_view) m_selected_view->CameraReset( sel ? m_selected_vme : NULL);
+  if(m_selected_view) m_selected_view->CameraReset();
 }
 //----------------------------------------------------------------------------
 void mafViewManager::CameraReset(mafNode *vme)   
 //----------------------------------------------------------------------------
 {
-//@@@  if(m_selected_view) m_selected_view->CameraReset(vme);
+  //@@@ if(m_selected_view) m_selected_view->CameraReset(vme);
+  if(m_selected_view) m_selected_view->CameraReset();
 }
 //----------------------------------------------------------------------------
 void mafViewManager::CameraUpdate()   
@@ -255,8 +255,9 @@ void mafViewManager::FillMenu (wxMenu* menu)
 	for(int i=0; i<m_tcount; i++)
 	{
     mafView* v = m_t[i];  
-	  //s = wxString::Format("create new %s view",v->m_label);
-	  menu->Append(v->m_id, v->GetLabel(), (wxMenu *)NULL, v->GetLabel());	}
+	  s = wxString::Format("create new %s view",v->GetLabel());
+	  menu->Append(v->m_id, s, (wxMenu *)NULL, s );	
+  }
 }
 //----------------------------------------------------------------------------
 mafView *mafViewManager::ViewCreate(int id)
@@ -384,9 +385,9 @@ void mafViewManager::ViewDelete(mafView *view)
       m_selected_rwi->SetMouseAction(NULL);
 //old		m_is->SetInteractor(NULL);
 //old    m_is->SetListener(this); // A. Savenko
-		m_selected_view = NULL;
     m_selected_rwi = NULL;
     */
+    m_selected_view = NULL;
 	}
 	delete view;
 }

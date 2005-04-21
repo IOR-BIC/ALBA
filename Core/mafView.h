@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:18:01 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-21 16:37:43 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -89,8 +89,8 @@ public:
 
   virtual void			HideGui();
   virtual void			ShowGui();
-  virtual void			ShowSettings()																					{};
-  virtual void			OnSize(wxSizeEvent &event)															{};
+  virtual void			ShowSettings()							{};
+  virtual void			OnSize(wxSizeEvent &event)	{};
 
 protected:
   mafEventListener	*m_Listener;
@@ -98,12 +98,12 @@ protected:
   wxString           m_name;
   wxWindow					*m_win;
   wxFrame					  *m_frame;
+  mmgGui      			*m_gui;
+  mmgGuiHolder			*m_guih;
 
 public:
   int                m_id;       // forget it - it is used from outside 
   bool               m_plugged;  // forget it - it is used from outside 
   mafView           *m_next;     // forget it - it is used from outside 
-	mmgGui      			*m_gui;
-	mmgGuiHolder			*m_guih;
 };
 #endif

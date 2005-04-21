@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:18:02 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-21 16:37:44 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,6 +18,7 @@
 #include "mafRWIBase.h"
 #include "mafRWI.h"
 #include "mafSceneGraph.h"
+#include "mafSceneNode.h" //used in subclasses
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------

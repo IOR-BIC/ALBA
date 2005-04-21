@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testViewApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:20:04 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-21 16:33:44 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,6 +33,7 @@
 
 #include "mmoCreateVmeSurface.h"
 #include "mafViewVTK.h"
+#include "testView.h"
 //--------------------------------------------------------------------------------
 // Create the Application
 //--------------------------------------------------------------------------------
@@ -66,10 +67,10 @@ bool testViewApp::OnInit()
   SetTopWindow(mafGetFrame());  
 
   m_logic->Plug(new mmoCreateVmeSurface("Add Vme Surface \tCtrl+A"));
-  m_logic->Plug(new mafViewVTK("mafViewVTK"));
+  m_logic->Plug(new testView("testView"));
 
   m_logic->Show();
-  m_logic->Init(0,NULL);
+  m_logic->Init(0,NULL); // calls FileNew - which create the root
   return TRUE;
 }
 //--------------------------------------------------------------------------------

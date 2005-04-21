@@ -5,8 +5,8 @@ testViewApp.cpp
 testViewApp.h
 mmoCreateVmeSurface.h
 mmoCreateVmeSurface.cpp
-#testView.h
-#testView.cpp
+testView.h
+testView.cpp
 )
 
 # copia icona e file delle risorse nella Build
