@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-19 12:33:12 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-04-21 13:55:14 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -48,7 +48,7 @@ void mafWarningMessage(const char *format, ...)
   MAF_PRINT_MACRO(format,mafLogBuffer,sizeof(mafLogBuffer));
 
 #ifdef MAF_USE_WX
-  //wxMessage(mafLogBuffer);
+  wxMessageBox(mafLogBuffer,"Warning Message",wxOK|wxICON_WARNING);
 #else
   cerr << "Warning: " << mafLogBuffer;    
 #endif
@@ -65,7 +65,7 @@ void mafErrorMessage(const char *format, ...)
   MAF_PRINT_MACRO(format,mafLogBuffer,sizeof(mafLogBuffer));
 
 #ifdef MAF_USE_WX
-  //wxLogMessage(mafLogBuffer);
+  wxMessageBox(mafLogBuffer,"Error Message",wxOK|wxICON_ERROR);
 #else
   cerr << "Error:" << mafLogBuffer;
 #endif
@@ -82,7 +82,7 @@ void mafMessage(const char *format, ...)
   MAF_PRINT_MACRO(format,mafLogBuffer,sizeof(mafLogBuffer));
 
 #ifdef MAF_USE_WX
-  //wxLogMessage(mafLogBuffer);
+  wxMessageBox(mafLogBuffer,"Information",wxOK|wxICON_INFORMATION);
 #else
   cerr << mafLogBuffer;
 #endif
