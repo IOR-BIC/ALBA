@@ -18,6 +18,8 @@ vtkProjectSP.cxx
 vtkProjectSP.h
 vtkRGSliceAccumulate.cxx
 vtkRGSliceAccumulate.h
+vtkVolumeResample.h
+vtkVolumeResample.cxx
 vtkVolumeSlicer.cxx
 vtkVolumeSlicer.h
 )
@@ -162,6 +164,5 @@ IF(VTK_FOUND)
     IF (BUILD_vtkMAF_TESTING)
       SUBDIRS(Testing)
     ENDIF (BUILD_vtkMAF_TESTING)
-    MARK_AS_ADVANCED(BUILD_vtkMAF_TESTING)
   ENDIF (BUILD_TESTING)
 ENDIF(VTK_FOUND)

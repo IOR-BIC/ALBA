@@ -1,0 +1,863 @@
+/*=========================================================================
+
+  Module:    vtkDicomUnPacker.cxx
+  Language:  C++
+  Date:      06/2000
+  Version:   .1
+  Thanks:    
+
+=========================================================================*/
+#include "vtkDicomUnPacker.h"
+#include "vtkObjectFactory.h"
+#include "vtkImageData.h"
+
+//----------------------------------------------------------------------------
+vtkDicomUnPacker* vtkDicomUnPacker::New()
+//----------------------------------------------------------------------------
+{
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkDicomUnPacker");
+  if(ret)
+  {
+    return (vtkDicomUnPacker*)ret;
+  }
+  // If the factory was unable to create the object, then create it here.
+  return new vtkDicomUnPacker;
+}
+
+//----------------------------------------------------------------------------
+// Construct an instance of vtkDicomUnPacker with no data.
+vtkDicomUnPacker::vtkDicomUnPacker()
+//----------------------------------------------------------------------------
+{
+	DebugFlag=0;
+	FlipImage=0;
+	Flag=0;
+	DictionaryFileName=NULL;
+	strcpy(PatientName,"                   ");
+	strcpy(StudyUID,"                   ");
+	strcpy(Study,"                   ");
+	strcpy(PatientBirthDate,"          ");
+	strcpy(CTMode[0],"           ");
+	strcpy(CTMode[1],"           ");
+	strcpy(StudyDate,"           ");
+	strcpy(PatientID, "          ");
+	strcpy(PatientSex," ");
+	strcpy(Modality,"  ");
+	SetDictionaryFileName("dicom3.txt");
+	UnPackFromFileOn();
+  DICT_line = 0;
+	Status = 0;
+}
+//----------------------------------------------------------------------------
+vtkDicomUnPacker::~vtkDicomUnPacker()
+//----------------------------------------------------------------------------
+{
+	// Free the compressor
+	SetDictionaryFileName(NULL);
+}
+//----------------------------------------------------------------------------
+void vtkDicomUnPacker::PrintSelf(ostream& os, vtkIndent indent)
+//----------------------------------------------------------------------------
+{
+  vtkImageUnPacker::PrintSelf(os,indent);
+}
+//----------------------------------------------------------------------------
+void  vtkDicomUnPacker::parser_multepl(tipo str , FILE * fp, long Length, VALUE * VAL)
+//----------------------------------------------------------------------------
+{
+  long p,r;
+  char c;
+/***********  init  *********/
+  r=0; 
+  VAL->type= str;
+  VAL->mult=0;
+/***************************/ 
+	for (p=0; p< Length; p++)
+	{
+		c=fgetc(fp);
+		if(c=='\\') 
+		{ 
+			VAL->stringa[VAL->mult][r]='\0'; r=0; VAL->mult++; 
+		}
+		else 
+		{        
+			VAL->stringa[VAL->mult][r]=c;  r++;
+		}
+	}
+	   
+	if (str == num)     
+	{
+		for (r=0; r<=VAL->mult; r++) VAL->num[r]=atof(VAL->stringa[r]);
+	}
+	else 
+	{
+		VAL->stringa[VAL->mult][r]=0;
+	}
+}
+//----------------------------------------------------------------------------
+long vtkDicomUnPacker::find (long Group, long Element , DICOM DICT[], long n_line)
+//----------------------------------------------------------------------------
+{
+	/* FROM (Group, Element)  returns the position of rispective pattern into Dictionary */ 
+  long n;
+  long index=-1;
+  if ((Group>20479) & (Group<20736)) Group=20480; /*  repeating groups 0x50xx */ 
+  if ((Group>24575) & (Group<24832)) Group=24576; /*  repeating group  0x60xx */ 
+  for (n=0; n<n_line; n++)  if((DICT[n].Group==Group) & (DICT[n].Element==Element)) { index=n; break;}
+  return index;
+}
+//----------------------------------------------------------------------------
+int vtkDicomUnPacker::load_dictionary(DICOM DICT[])
+//----------------------------------------------------------------------------
+{   /* return  N_line and structure DICOM */ 
+  char pre=' ', cur=' ';
+  uint32 p_line;
+  uint8 r;
+  char pt[5];
+  FILE *Dictionary;
+	
+	if ((Dictionary=fopen(DictionaryFileName, "rb")) == NULL)
+	{
+		return -1;
+	}
+
+	p_line=0;
+	while ( (int) cur != EOF)
+	{
+		cur=( char)fgetc(Dictionary);
+    if (cur =='=')
+		{
+			switch(pre)
+			{
+				case 'p' :
+					fgetc(Dictionary);/* skip character " */
+					r=0; cur=fgetc(Dictionary);
+					while (cur != '"')
+					{		
+						if(cur=='x')	cur='0'; /*  repeating groups  */                 
+						*(pt + r) = cur;
+						cur=(char)fgetc(Dictionary); 
+						r++;
+					} 
+					*(pt + r)='\0';
+					DICT[p_line].Group= strtol(pt,NULL,16);
+        break;
+				case 't' :
+					fgetc(Dictionary);/* skip character " */
+					r=0; cur=fgetc(Dictionary);
+					while (cur != '"')
+					{
+						*(pt + r) = cur;	
+					  cur=(char)fgetc(Dictionary); 
+            r++;
+					} 
+					*(pt + r)='\0';
+					DICT[p_line].Element= strtol(pt,NULL,16);
+			  break;
+        case 'S' :
+					fgetc(Dictionary);/* skip character " */
+					r=0; cur=fgetc(Dictionary);
+					while (cur != '"')
+					{
+						DICT[p_line].Version[r]=cur;
+					  cur=(char)fgetc(Dictionary); 
+            r++;
+					}    
+          DICT[p_line].Version[r]='\0';  
+			  break;
+        case 'R' :
+					fgetc(Dictionary);/* skip character " */
+					r=0; cur=fgetc(Dictionary);
+					while (cur != '"')
+					{
+						DICT[p_line].Val_Repr[r]=cur;
+					  cur=(char)fgetc(Dictionary); 
+            r++;
+					} 
+					DICT[p_line].Val_Repr[r] ='\0';
+			  break;
+        case 'M' :
+					fgetc(Dictionary);/* skip character " */
+					r=0; cur=fgetc(Dictionary);
+					while (cur != '"')
+					{
+						DICT[p_line].Val_Mult[r]=cur;
+					  cur=(char)fgetc(Dictionary);
+            r++;
+					} 
+					DICT[p_line].Val_Mult[r] ='\0'; 
+			  break;
+        case 'd' :
+					fgetc(Dictionary);/* skip character " */
+					r=0; cur=fgetc(Dictionary);
+					while (cur != '"')
+					{
+						DICT[p_line].Keyword[r]=cur;
+					  cur=(char)fgetc(Dictionary);  
+            r++;
+					} 
+					DICT[p_line].Keyword[r] ='\0';
+			  break;
+        case 'e' :
+					fgetc(Dictionary);/* skip character " */
+					r=0; cur=fgetc(Dictionary);
+					while (cur != '"')
+					{
+						DICT[p_line].Name[r]=cur;
+						cur=(char)fgetc(Dictionary); 
+            r++;
+					} 
+					DICT[p_line].Name[r] ='\0';
+			  break;		   
+			}
+		}
+		else if ( (int)cur == 10 )
+			p_line++; /* carriage return */  
+		pre=cur;
+  }
+  fclose(Dictionary);
+  return p_line;
+}
+//----------------------------------------------------------------------------
+uint16 read16 ( FILE* fp, char little_endian)  
+//----------------------------------------------------------------------------
+{
+	int n;
+	uint8 t1, t2;   
+	n = fread(&t1,sizeof(t1), 1, fp); 
+	n = fread(&t2,sizeof(t2), 1, fp);
+
+	if (little_endian)  return t1 + t2*256;
+	else                return t1*256 + t2;
+}    
+//----------------------------------------------------------------------------
+uint32 read32 ( FILE* fp, char little_endian )  
+//----------------------------------------------------------------------------
+{
+  int n;
+  uint8 t1, t2, t3, t4;
+  n = fread(&t1, sizeof t1, 1, fp);                         
+  n = fread(&t2, sizeof t2, 1, fp);                         
+  n = fread(&t3, sizeof t3, 1, fp);                         
+  n = fread(&t4, sizeof t4, 1, fp); 
+
+  if (little_endian)    return t1 + t2*256 + t3*256*256 + t4*256*256*256;
+  else                  return t1*256*256*256 + t2*256*256 + t3*256 + t4;
+}
+//----------------------------------------------------------------------------
+void read (FILE* fp, char little_endian, char &value) 
+//----------------------------------------------------------------------------
+{
+	value = fgetc(fp);
+}
+//----------------------------------------------------------------------------
+void read (FILE* fp, char little_endian, short &value) 
+//----------------------------------------------------------------------------
+{
+	value = read16(fp, little_endian);
+}
+//----------------------------------------------------------------------------
+void read (FILE* fp, char little_endian, long &value) 
+//----------------------------------------------------------------------------
+{
+	value = read32(fp, little_endian);
+}
+//----------------------------------------------------------------------------
+int vtkDicomUnPacker::read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *size_image, uint32 *result_line)
+//----------------------------------------------------------------------------
+{
+	char    time_to_exit=1;
+	char    first_one		= 1;
+	char    explicitVR;
+	int			fseek_result= 0;
+	uint8   * t;
+	uint8   * pvr;
+	uint8   vr0,vr1;
+	uint16  groupWord;
+	uint16  elementWord;
+	uint32  elementLength;
+
+	uint32   RESULT_line;
+	long   pos;
+	FILE    *fp;
+	char little_endian = 1;  /* set default little endian */ 
+
+/*******************************    INIT    ***************************/
+	if (FileName == NULL) {vtkErrorMacro ("Dicom File Name NULL"); return -1;}
+	if (DictionaryFileName == NULL) {vtkErrorMacro ("Dictionary File Name NULL"); return -1;}
+	t=    (uint8 *) calloc(4,sizeof(uint8));
+	DICT_line=load_dictionary(DICT);  /* LOAD DICTIONARY dict_line = lines number of dictionary DICT */
+	if (DICT_line < 0) {vtkErrorMacro (" Dictionary File Not Open"); return -1;}
+	if ((fp=fopen(FileName, "rb")) == NULL) {vtkErrorMacro (" Dicom File Not Reached \n"); return -1;} 
+	RESULT_line=0;
+/**********************************************************************/
+  while (time_to_exit != 0)
+	{ 
+		explicitVR = 0;
+		groupWord      = read16(fp,little_endian);
+		elementWord    = read16(fp,little_endian);
+		elementLength  = read32(fp,little_endian);
+		if (first_one) 
+		{ 	
+			if (groupWord != 0 && elementWord == 0 && elementLength == 4)  
+				first_one = 0;
+			else if  (!little_endian &&  elementLength == 0x04000000)  
+			{
+				first_one = 0;
+        little_endian = 1;
+        rewind(fp);/* inizio del file */ 
+			}
+			else if  (little_endian && elementLength == 0x04000000)     
+			{
+				first_one = 0;
+        little_endian = 0;
+				rewind(fp);/* inizio del file */
+			}     	               
+      else 
+			{
+				first_one= 0 ;
+	      fseek_result = fseek(fp,128,0); /* skip preamble bytes next 4 bytes should be "DICM" */ 
+	      fread(t, 1 , 4, fp);
+	      if (t[0] != 'D' || t[1] != 'I' || t[2] != 'C' || t[3] != 'M')  
+				{
+					/* it's not proper part 10 - try w/out the 128 byte preamble */ 
+	        rewind(fp);
+	        groupWord   = read16(fp,little_endian);
+	        elementWord    = read16(fp,little_endian);
+	        elementLength  = read32(fp,little_endian); 
+        }
+			}
+		}
+		else 
+		{ /* not first_one */ 
+			pvr = (unsigned char*) &elementLength;
+      if ( (pvr[0]=='O' && pvr[1]=='B') ||
+           (pvr[0]=='U' && pvr[1]=='N') ||
+           (pvr[0]=='O' && pvr[1]=='W') ||
+			     (pvr[0]=='U' && pvr[1]=='T') ||
+           (pvr[0]=='S' && pvr[1]=='Q') ) 
+			{
+				vr0=pvr[0]; vr1=pvr[1];
+				explicitVR=1;
+        elementLength = read32(fp,little_endian);
+		  }
+      else if ( (pvr[0]=='A' && pvr[1]=='E') ||
+                (pvr[0]=='A' && pvr[1]=='S') ||
+                (pvr[0]=='A' && pvr[1]=='T') ||
+                (pvr[0]=='C' && pvr[1]=='S') ||
+                (pvr[0]=='D' && pvr[1]=='A') ||
+                (pvr[0]=='D' && pvr[1]=='S') ||
+                (pvr[0]=='D' && pvr[1]=='T') ||
+                (pvr[0]=='F' && pvr[1]=='L') ||
+                (pvr[0]=='F' && pvr[1]=='D') ||
+                (pvr[0]=='I' && pvr[1]=='S') ||
+                (pvr[0]=='L' && pvr[1]=='O') ||
+                (pvr[0]=='L' && pvr[1]=='T') ||
+                (pvr[0]=='P' && pvr[1]=='N') ||
+                (pvr[0]=='S' && pvr[1]=='H') ||
+                (pvr[0]=='S' && pvr[1]=='L') ||
+                (pvr[0]=='S' && pvr[1]=='S') ||
+                (pvr[0]=='S' && pvr[1]=='T') ||
+                (pvr[0]=='T' && pvr[1]=='M') ||
+                (pvr[0]=='U' && pvr[1]=='I') ||
+                (pvr[0]=='U' && pvr[1]=='L') ||
+								(pvr[0]=='U' && pvr[1]=='S') ) 
+			{
+				vr0=pvr[0]; vr1=pvr[1];
+        explicitVR=1;
+        elementLength &= 0xffff0000; 
+        elementLength >>= 16;      
+      }
+		}
+		pos=find(groupWord,elementWord  ,DICT,DICT_line);
+
+		if (pos<0) 
+		{ /* NO DEFINED into CURRENT DICTIONARY */ 
+			RESULT[RESULT_line].intoDictionary=no;
+      RESULT[RESULT_line].Group=groupWord; 
+      RESULT[RESULT_line].Element=elementWord;
+      RESULT[RESULT_line].Version[0]='\0';
+      RESULT[RESULT_line].Val_Repr[0]='\0';
+      RESULT[RESULT_line].Val_Mult[0]='\0';
+      RESULT[RESULT_line].Keyword[0]='\0';
+	    RESULT[RESULT_line].Name[0]='\0';
+		}
+		else
+		{
+			RESULT[RESULT_line]=DICT[pos]; 
+      RESULT[RESULT_line].intoDictionary=yes;
+    }
+
+		if ( RESULT[RESULT_line].intoDictionary == yes) 
+		{
+			if (explicitVR) 
+			{
+				RESULT[RESULT_line].Val_Repr[0]= vr0;
+        RESULT[RESULT_line].Val_Repr[1]= vr1;
+        RESULT[RESULT_line].Val_Repr[2]='\0';
+      }
+      vr0=RESULT[RESULT_line].Val_Repr[0];
+      vr1=RESULT[RESULT_line].Val_Repr[1];
+
+      if( (vr0=='A') && (vr1=='E') || /* string of characters without numerical meaning                */ 
+          (vr0=='A') && (vr1=='S') || /* string of characters without numerical meaning 	AGE	     */ 
+          (vr0=='C') && (vr1=='S') || /* string of characters without numerical meaning                */
+          (vr0=='D') && (vr1=='A') || /* string of characters without numerical meaning    DATE        */
+          (vr0=='D') && (vr1=='T') || /* string of characters without numerical meaning    DATE TIME   */
+          (vr0=='L') && (vr1=='O') || /* string of characters without numerical meaning    LONG STRING */
+          (vr0=='L') && (vr1=='T') || /* string of characters without numerical meaning    LONG TEXT   */
+          (vr0=='P') && (vr1=='N') || /* string of characters without numerical meaning    PERSON NAME */ 
+          (vr0=='S') && (vr1=='H') || /* string of characters without numerical meaning    SHORT STRING*/   
+          (vr0=='S') && (vr1=='T') || /* string of characters without numerical meaning    SHORT TEXT  */
+          (vr0=='T') && (vr1=='M') || /* string of characters without numerical meaning    TIME        */
+          (vr0=='U') && (vr1=='I') )  /* string of characters without numerical meaning    UNIQUE IDENTIFIER */
+			{
+				parser_multepl(string, fp, elementLength,& VALUES[RESULT_line]);
+			}
+			else if( (vr0=='D') && (vr1=='S') || /* string of characters representing floating number */ 
+               (vr0=='I') && (vr1=='S') )  /* string of characters representing integer  number */ 
+			{
+				parser_multepl(num, fp, elementLength,& VALUES[RESULT_line]);
+			}
+			else if( (vr0=='U') && (vr1=='S') ) 
+			{ /* unsigned short */ 
+				VALUES[RESULT_line].type = num;
+        VALUES[RESULT_line].mult = 0;
+        VALUES[RESULT_line].num[VALUES[RESULT_line].mult] = 0;
+        if(elementLength == 2)  
+				{
+					VALUES[RESULT_line].num[VALUES[RESULT_line].mult] = read16(fp,little_endian);
+				}
+        else  
+				{
+					fseek_result = fseek(fp,elementLength,SEEK_CUR);/* multeplicity is not considered on unsigned short */
+				}
+			}
+			else if( (vr0=='U') && (vr1=='L') ) 
+			{ /* unsigned long */ 
+				VALUES[RESULT_line].type = num;
+				VALUES[RESULT_line].mult = 0;
+        VALUES[RESULT_line].num[VALUES[RESULT_line].mult] = 0;
+				if(elementLength == 4)
+				{
+					VALUES[RESULT_line].num[VALUES[RESULT_line].mult] = read32(fp,little_endian);
+				}
+        else  
+				{
+					fseek_result = fseek(fp,elementLength,SEEK_CUR);/* multeplicity is not considered on unsigned long */
+				}
+			}
+			else if( (vr0=='O') && (vr1=='B') ||
+               (vr0=='O') && (vr1=='W') ) 
+			{  /* only for size image */ 
+				if ((groupWord == 0x7fe0) & (elementWord == 0x0010)) 
+				{
+					time_to_exit = 0;
+          *size_image  = elementLength;
+				}
+        else 
+				{
+					fseek_result = fseek(fp,elementLength,SEEK_CUR);
+				}
+			}
+      else 
+			{
+				fseek_result = fseek(fp,elementLength,SEEK_CUR);
+			}
+		} /*  END   if ( RESULT[RESULT_line].intoDictionary == yes) */ 
+		else  
+		{
+			fseek_result = fseek(fp,elementLength,SEEK_CUR);
+			if( RESULT_line == SIZE_TAG && fseek_result != 0)
+			{
+				Status = -1;
+				return -1;
+			}
+		}
+    RESULT_line++;
+  } /* END  while (time_to_exit) */ 
+
+	*result_line = RESULT_line;
+	free((uint8 *)t);
+	fclose(fp);
+	return *result_line;
+}
+//----------------------------------------------------------------------------
+template <class T>
+int read_dicom_string_image(char *filename, T *IMAGE, float slope_value, float intercept_value, int rows, int cols, int flip=0)
+//----------------------------------------------------------------------------
+{
+	char    time_to_exit=1;
+	char    first_one  = 1;
+	char    explicitVR;
+	uint8   * t;
+	uint8   * pvr;
+	uint16  groupWord;
+	uint16  elementWord;
+	uint32  elementLength;
+	FILE    *fp;
+	char little_endian = 1;  /* set default little endian */ 
+	float HU_value;
+	T value;
+	// int cols = dim_x;
+	// int rows = dim_y;
+
+/*********************************   INIT   ***************************/
+   t=    (uint8 *) calloc(4,sizeof(uint8));
+   if ((fp=fopen(filename, "rb")) == NULL) { return -1;} 
+/**********************************************************************/
+
+  while (time_to_exit!=0)
+	{ 
+		explicitVR = 0;
+		groupWord      = read16(fp,little_endian);
+		elementWord    = read16(fp,little_endian);
+		elementLength  = read32(fp,little_endian);
+		if (first_one) 
+		{
+			if (groupWord != 0 && elementWord == 0 && elementLength == 4)  
+				first_one = 0;
+			else if  (!little_endian &&  elementLength == 0x04000000)  
+			{
+				first_one = 0;
+				little_endian = 1;
+				rewind(fp);/* inizio del file */ 
+			}
+			else if  (little_endian && elementLength == 0x04000000)
+			{
+				first_one = 0;
+				little_endian = 0;
+				rewind(fp);/* inizio del file */ 
+			}     	               
+			else 
+			{
+				first_one= 0 ;
+				fseek(fp,128,0); /* skip preamble bytes next 4 bytes should be "DICM" */ 
+				fread(t, 1 , 4, fp);
+				if (t[0] != 'D' || t[1] != 'I' || t[2] != 'C' || t[3] != 'M')  
+				{
+					/* it's not proper part 10 - try w/out the 128 byte preamble */ 
+					rewind(fp);
+					groupWord   = read16(fp,little_endian);
+					elementWord    = read16(fp,little_endian);
+					elementLength  = read32(fp,little_endian); 
+				}
+			}
+		}
+		else 
+		{ /* not first_one */ 
+			pvr = (unsigned char*) &elementLength;
+			if ( (pvr[0]=='O' && pvr[1]=='B') ||
+					 (pvr[0]=='U' && pvr[1]=='N') ||
+					 (pvr[0]=='O' && pvr[1]=='W') ||
+					 (pvr[0]=='U' && pvr[1]=='T') ||
+					 (pvr[0]=='S' && pvr[1]=='Q') ) 
+			{
+				explicitVR=1;
+				elementLength = read32(fp,little_endian);
+		  }
+      else if ( (pvr[0]=='A' && pvr[1]=='E') ||
+								(pvr[0]=='A' && pvr[1]=='S') ||
+                (pvr[0]=='A' && pvr[1]=='T') ||
+                (pvr[0]=='C' && pvr[1]=='S') ||
+                (pvr[0]=='D' && pvr[1]=='A') ||
+                (pvr[0]=='D' && pvr[1]=='S') ||
+                (pvr[0]=='D' && pvr[1]=='T') ||
+                (pvr[0]=='F' && pvr[1]=='L') ||
+                (pvr[0]=='F' && pvr[1]=='D') ||
+                (pvr[0]=='I' && pvr[1]=='S') ||
+                (pvr[0]=='L' && pvr[1]=='O') ||
+                (pvr[0]=='L' && pvr[1]=='T') ||
+                (pvr[0]=='P' && pvr[1]=='N') ||
+                (pvr[0]=='S' && pvr[1]=='H') ||
+                (pvr[0]=='S' && pvr[1]=='L') ||
+                (pvr[0]=='S' && pvr[1]=='S') ||
+                (pvr[0]=='S' && pvr[1]=='T') ||
+                (pvr[0]=='T' && pvr[1]=='M') ||
+                (pvr[0]=='U' && pvr[1]=='I') ||
+                (pvr[0]=='U' && pvr[1]=='L') ||
+								(pvr[0]=='U' && pvr[1]=='S') ) 
+			{
+				explicitVR=1;
+				elementLength &= 0xffff0000; 
+				elementLength >>= 16;      
+      }
+		}
+		if ((groupWord == 0x7fe0) & (elementWord == 0x0010)) 
+		{
+			int r,c;
+			if (flip)
+			{
+				for (r = rows - 1; r >= 0; r--) 
+				{
+					for (c = 0; c < cols; c++)
+					{
+						read(fp,little_endian,value); // data shold be always in lttle endian
+						HU_value = (float) value;
+						HU_value = HU_value * slope_value + intercept_value;
+						IMAGE[cols*r+c] = (T) HU_value;
+					}
+				}
+			}
+			else
+			{
+				for (r = 0; r < rows; r++) 
+				{
+					for (c = 0; c < cols; c++)
+					{
+						read(fp,little_endian,value); // data shold be always in lttle endian
+						HU_value = (float) value;
+						HU_value = HU_value * slope_value + intercept_value;
+						IMAGE[cols*r+c] = (T) HU_value;
+					}
+				}
+			}
+			time_to_exit=0;
+		}
+		fseek(fp,elementLength,SEEK_CUR);
+  } /* END  while (time_to_exit) */ 
+	free((uint8 *)t);
+	fclose(fp);
+	return 0;
+}
+//----------------------------------------------------------------------------
+int vtkDicomUnPacker::ReadImageInformation(vtkPackedImage *packed)
+//----------------------------------------------------------------------------
+{
+	uint32 p;
+
+	if (Flag)
+	{
+		return 0;
+	}
+
+	Flag=1;
+
+	if (UnPackFromFile)
+	{
+		if (!FileName)
+		{
+			vtkErrorMacro("You must set a file name");
+			return -1;
+		}
+
+		// Read image parameters from FILE
+		if (read_dicom_header(RESULT,VALUES, &ImageSize, &TAGNumbers) < 0) 
+			return -1;
+	}
+	else
+	{
+		if (packed->GetPackType()!=VTK_IMG_PACK_DICOM)
+		{
+			vtkErrorMacro("This class supports only DICOM images.");
+			return -1;
+		}
+	}	
+
+	bits_allocated=16;
+	bits_stored=16;
+	dim_x=512;
+	dim_y=512;
+	high_bit=15;
+	pixel_rapresentation=0;
+	smallest_image_pixel_value=0;
+	largest_image_pixel_value=0;
+	slope=1;
+	intercept=0;
+	spacing[0]=2.0;
+	spacing[1]=2.0;
+	position[0]=0.0;
+	position[1]=0.0;
+	position[2]=0.0;
+//	SliceLocation=0.0;
+	orientation[0]=0.0;
+	orientation[1]=0.0;
+	orientation[2]=0.0;
+	strcpy(photometric_interpretation,"          ");
+
+	for (p=0; p<TAGNumbers; p++)
+  {
+		if ((RESULT[p].Group==8) & (RESULT[p].Element==8)) 
+    {
+      int n = strlen(VALUES[p].stringa[0]);
+      if (n<256)
+      {
+        strncpy(ImageType[0], (char *)&(VALUES[p].stringa[0]), n);
+        ImageType[0][n] = '\0';
+      }
+      n = strlen(VALUES[p].stringa[1]);
+      if (n<256)
+      {
+        strncpy(ImageType[1], (char *)&(VALUES[p].stringa[1]), n);
+        ImageType[1][n] = '\0';
+      }
+      n = strlen(VALUES[p].stringa[2]);
+      if (n<256)
+      {
+        strncpy(ImageType[2], (char *)&(VALUES[p].stringa[2]), n);
+        ImageType[2][n] = '\0';
+      }
+    }
+		if ((RESULT[p].Group==8) & (RESULT[p].Element==32)) 
+			strncpy(StudyDate, (char *)&(VALUES[p].stringa[0]), 14);
+		if ((RESULT[p].Group==8) & (RESULT[p].Element==96)) 
+			strncpy(Modality, (char *)&(VALUES[p].stringa[0]), 2);
+    if ((RESULT[p].Group==8) & (RESULT[p].Element==4158)) 
+      strncpy(CTMode[1], (char *)&(VALUES[p].stringa[0]), 14);
+
+		if ((RESULT[p].Group==16) & (RESULT[p].Element==16)) 
+			strncpy(PatientName, (char *)&(VALUES[p].stringa[0]), 255);
+		if ((RESULT[p].Group==16) & (RESULT[p].Element==32))
+			strncpy(PatientID, (char *)&(VALUES[p].stringa[0]), 10);
+    if ((RESULT[p].Group==16) & (RESULT[p].Element==48)) 
+			strncpy(PatientBirthDate, (char *)&(VALUES[p].stringa[0]), 255);
+		if ((RESULT[p].Group==16) & (RESULT[p].Element==64)) 
+			strncpy(PatientSex, (char *)&(VALUES[p].stringa[0]), 1);
+		
+    if ((RESULT[p].Group==24) & (RESULT[p].Element==34)) 
+      strncpy(CTMode[0], (char *)&(VALUES[p].stringa[0]), 14);
+		
+    if ((RESULT[p].Group==32) & (RESULT[p].Element==13)) 
+			strncpy(StudyUID, (char *)&(VALUES[p].stringa[0]), 255);
+		if ((RESULT[p].Group==32) & (RESULT[p].Element==16)) 
+			strncpy(Study, (char *)&(VALUES[p].stringa[0]), 79);
+		if ((RESULT[p].Group==32) & (RESULT[p].Element==50)) 
+		{
+			position[0]=(float) VALUES[p].num[0];
+			position[1]=(float) VALUES[p].num[1];
+			position[2]=(float) VALUES[p].num[2];
+		}
+		if ((RESULT[p].Group==32) & (RESULT[p].Element==4161)) 
+		{
+			//SliceLocation=(float) VALUES[p].num[0];
+			position[0]=0.0;
+			position[1]=0.0;
+			//position[2]=SliceLocation;
+			position[2] = VALUES[p].num[0];
+		}
+		if ((RESULT[p].Group==32) & (RESULT[p].Element==55))
+		{	
+			orientation[0]=(float) VALUES[p].num[0];
+			orientation[1]=(float) VALUES[p].num[1];
+			orientation[2]=(float) VALUES[p].num[2];
+		}
+
+		if ((RESULT[p].Group==40) & (RESULT[p].Element==256)) 
+      bits_allocated=(int) VALUES[p].num[0];
+		if ((RESULT[p].Group==40) & (RESULT[p].Element==257)) 
+      bits_stored=(int) VALUES[p].num[0];  
+		if ((RESULT[p].Group==40) & (RESULT[p].Element==258)) 
+      high_bit=(int) VALUES[p].num[0];
+		if ((RESULT[p].Group==40) & (RESULT[p].Element==259)) 
+      pixel_rapresentation=(int) VALUES[p].num[0];
+		if ((RESULT[p].Group==40) & (RESULT[p].Element==262)) 
+      smallest_image_pixel_value=(int) VALUES[p].num[0];
+		if ((RESULT[p].Group==40) & (RESULT[p].Element==263)) 
+      largest_image_pixel_value=(int) VALUES[p].num[0];
+		if ((RESULT[p].Group==40) & (RESULT[p].Element==16)) 
+      dim_y=(int) VALUES[p].num[0];                       
+		if ((RESULT[p].Group==40) & (RESULT[p].Element==17)) 
+      dim_x=(int) VALUES[p].num[0];
+		if ((RESULT[p].Group==40) & (RESULT[p].Element==4178)) 
+      intercept=(int) VALUES[p].num[0];
+		if ((RESULT[p].Group==40) & (RESULT[p].Element==4179)) 
+      slope=(int) VALUES[p].num[0];
+		if ((RESULT[p].Group==40) & (RESULT[p].Element==4)) 
+      strcpy(photometric_interpretation, (char *)&(VALUES[p].stringa[0]));
+		if ((RESULT[p].Group==40) & (RESULT[p].Element==48)) 
+		{
+			spacing[0]=(float) VALUES[p].num[0];
+			spacing[1]=(float) VALUES[p].num[1];
+		}
+  }
+
+/*	if (bits_stored != 16 && bits_stored != 8 && bits_stored != 12)
+		{
+			vtkErrorMacro("Supports only 8, 12, 16 bits DICOM images.");
+			return -1;
+		}*/
+	if (bits_allocated != 8 && bits_allocated != 16)
+		{
+			vtkErrorMacro("Unsupported DICOM image.");
+			return -1;
+		}
+
+	// Set the image parameters necessary for cache allocation
+	SetDataExtent(0,dim_x-1,0,dim_y-1,0,0);
+	switch (bits_allocated)
+	{
+	case 8:
+		SetDataScalarType(VTK_CHAR);
+		break;
+	case 16:
+		SetDataScalarType(VTK_SHORT);
+		break;
+	}
+
+	SetNumberOfScalarComponents(1); // Only gray scale CT images supported
+
+	GetOutput()->SetSpacing(spacing);
+	GetOutput()->SetOrigin(position);
+
+	return 0;
+}
+//----------------------------------------------------------------------------
+// This function does nothing is only an example of unpacking function
+int vtkDicomUnPacker::vtkImageUnPackerUpdate(vtkPackedImage *packed, vtkImageData *data)
+//----------------------------------------------------------------------------
+{
+	int ret;
+
+	if (!Flag)
+	{
+		vtkGenericWarningMacro("DEBUG: ExecuteInformation not executed, cannot continue with decompression");
+		return -1;
+	}
+
+	if (!UnPackFromFile)
+	{
+		// Check if the image is of the right type
+		if (packed->GetPackType()!=VTK_IMG_PACK_DICOM)
+		{
+			vtkErrorMacro("This class supports only DICOM images.");
+			return -1;
+		}
+	}
+
+	int *ext=data->GetExtent();
+
+	switch (bits_allocated) 
+	{
+		case 8:
+		{
+			ret = read_dicom_string_image(FileName, (char *)data->GetScalarPointer(), slope, intercept, dim_y, dim_x,FlipImage);
+		}
+		break;
+		case 16:
+		{
+			ret = read_dicom_string_image(FileName, (short *)data->GetScalarPointer(), slope, intercept, dim_y, dim_x,FlipImage);
+		}
+		break;
+	}
+
+	Flag=0;
+
+	return ret;
+}
+//----------------------------------------------------------------------------
+char *vtkDicomUnPacker::GetCTMode()
+//----------------------------------------------------------------------------
+{
+	if(strcmp(Modality,"CT") == 0) 
+		return CTMode[0];
+	else
+		return CTMode[1];
+}
+//----------------------------------------------------------------------------
+char *vtkDicomUnPacker::GetImageType(int id_caracrteristic)
+//----------------------------------------------------------------------------
+{
+  char *img_type = (id_caracrteristic >= 0 && id_caracrteristic < 3) ? ImageType[id_caracrteristic] : ImageType[0];
+  return img_type;
+}

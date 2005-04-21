@@ -1,10 +1,10 @@
 /*=========================================================================
 
   Program:   Multimod Fundation Library
-  Module:    $RCSfile: vtkVolumeSlicer.h,v $
+  Module:    $RCSfile: vtkVolumeResample.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:53:10 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-21 13:53:11 $
+  Version:   $Revision: 1.1 $
   Authors:   Alexander Savenko
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -45,7 +45,7 @@ THE USE OR INABILITY TO USE THE SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGES.
 
 =========================================================================*/
-// .NAME vtkVolumeSlicer - a filter for creating slices from structured volume data (rectilinear grid or structured points)
+// .NAME vtkVolumeResample- a filter for creating slices from structured volume data (rectilinear grid or structured points)
 //
 // .SECTION Description
 // Inputs of the filter are:
@@ -54,41 +54,42 @@ POSSIBILITY OF SUCH DAMAGES.
 //   color mapping: window and level of color mapping
 //   
 // Outputs of the filter are:
-//   image (vtkImageData): The resolution and spacing of the image should be specified by consumer. 
+//   image (vtkImageData): The resolution and spacing of the output volume image should be specified by consumer. 
 //                         The origin will be automatically set to zero.
-//   polyline slice (vtkPolyData): This output includes both the polyline that define the cut and corresponded triangles. The texture coordinates are provided as well.
+//   polyline slice (vtkPolyData): This output includes both the polyline that define the cut of a plane and corresponded triangles. The texture coordinates are provided as well.
 // .SECTION See Also
 // vtkProbeFilter, vtkPlaneSource
 
-#ifndef __vtkVolumeSlicer_h
-#define __vtkVolumeSlicer_h
+#ifndef __vtkVolumeResample_h
+#define __vtkVolumeResample_h
 
 #include "vtkMAFConfigure.h"
 #include "vtkDataSetToDataSetFilter.h"
+#include "vtkImageData.h"
 
-class vtkPolyData;
-class vtkImageData;
+//class vtkImageData;
 class vtkRectilinearGrid;
 
-class VTK_vtkMAF_EXPORT vtkVolumeSlicer : public vtkDataSetToDataSetFilter {
+
+class VTK_vtkMAF_EXPORT vtkVolumeResample: public vtkDataSetToDataSetFilter {
 public:
-  static vtkVolumeSlicer *New();
-  vtkTypeRevisionMacro(vtkVolumeSlicer, vtkDataSetToDataSetFilter);
+  static vtkVolumeResample*New();
+  vtkTypeRevisionMacro(vtkVolumeResample, vtkDataSetToDataSetFilter);
 
   /**
   Specify a point defining the origin of the plane.*/
-  vtkSetVector3Macro(PlaneOrigin, double);
-  vtkGetVectorMacro(PlaneOrigin, double, 3);
+  vtkSetVector3Macro(VolumeOrigin, double);
+  vtkGetVectorMacro(VolumeOrigin, double, 3);
 
   /**
   Specify x-axis of the plane*/
-  void SetPlaneAxisX(double axis[3]);
-  vtkGetVectorMacro(PlaneAxisX, double, 3);
+  void SetVolumeAxisX(double axis[3]);
+  vtkGetVectorMacro(VolumeAxisX, double, 3);
 
   /**
   Specify x-axis of the plane*/
-  void SetPlaneAxisY(double axis[3]);
-  vtkGetVectorMacro(PlaneAxisY, double, 3);
+  void SetVolumeAxisY(double axis[3]);
+  vtkGetVectorMacro(VolumeAxisY, double, 3);
 
   /**
   Set / Get the Window for color modulation. The formula for modulation is 
@@ -104,27 +105,32 @@ public:
   vtkGetMacro( Level, double );
 
   /**
+  Set/Get the value used for padding empty areas*/
+  vtkSetMacro( ZeroValue, double );
+  vtkGetMacro( ZeroValue, double );
+  
+
+  /**
   Set/get auto-spacing feature. In this mode the image spacing is selected automatically to fit the whole slice*/
   vtkSetMacro( AutoSpacing, int );
   vtkGetMacro( AutoSpacing, int );
+  vtkBooleanMacro(AutoSpacing, int );
 
   void SetOutput(vtkImageData *data) { vtkDataSetSource::SetOutput(data); }
-  void SetOutput(vtkPolyData  *data) { vtkDataSetSource::SetOutput(data); }
 
-  /**
-  specify the image to be used for texturing output polydata object*/
-  void SetTexture(vtkImageData *data) {this->SetNthInput(1, (vtkDataObject*)data);};
-  vtkImageData *GetTexture() { return vtkImageData::SafeDownCast(this->Inputs[1]);};
+  static inline void vtkVolumeResample::clip(double val, float& out);
+  static inline void vtkVolumeResample::clip(double val, char&  out);
+  static inline void vtkVolumeResample::clip(double val, short& out);
+  static inline void vtkVolumeResample::clip(double val, unsigned char&  out);
+  static inline void vtkVolumeResample::clip(double val, unsigned short& out);
 
 protected:
-  vtkVolumeSlicer();
-  ~vtkVolumeSlicer();
+  vtkVolumeResample();
+  ~vtkVolumeResample();
 
   void ExecuteInformation();
   void ExecuteData(vtkDataObject *output);
   
-  // different implementations for polydata and imagedata
-  void ExecuteData(vtkPolyData *output);
   void ExecuteData(vtkImageData *output);
 
   void ComputeInputUpdateExtents(vtkDataObject *output);
@@ -134,32 +140,80 @@ protected:
 
   template<typename InputDataType, typename OutputDataType> void CreateImage(const InputDataType *input, OutputDataType *output, vtkImageData *outputObject);
 
-	int   NumComponents;
+  void myDBG(const char *msg,int index);
+
   // plane coordinates
-  double PlaneOrigin[3];
-  double PlaneAxisX[3];
-  double PlaneAxisY[3];
-  double PlaneAxisZ[3];
+  double VolumeOrigin[3];
+  double VolumeAxisX[3];
+  double VolumeAxisY[3];
+  double VolumeAxisZ[3];
+
+  double ZeroValue;
+
+//  vtkMatrix4x4 *ResampleAxis;
 
   // color mapping
   double Window;
   double Level;
 
+//  int Num;
   int   AutoSpacing;
 
   // look-up tables and caches
   vtkTimeStamp PreprocessingTime;
 
   double*       VoxelCoordinates[3];
-  double       DataOrigin[3];
+  double        DataOrigin[3];
   double        DataBounds[3][2];
   int          DataDimensions[3];
   double        SamplingTableMultiplier[3];
 
 private:
-  vtkVolumeSlicer(const vtkVolumeSlicer&);  // Not implemented.
-  void operator=(const vtkVolumeSlicer&);  // Not implemented.
+  vtkVolumeResample(const vtkVolumeResample&);  // Not implemented.
+  void operator=(const vtkVolumeResample&);  // Not implemented.
 };
+
+inline void vtkVolumeResample::clip(double val, float& out) { out = val; }
+
+inline void vtkVolumeResample::clip(double val, char&  out) 
+{ 
+  if (val < VTK_CHAR_MIN)
+    out = VTK_CHAR_MIN;
+  else if (val > VTK_CHAR_MAX)
+    out = VTK_CHAR_MAX;
+  else 
+    out = char(val);
+}
+
+inline void vtkVolumeResample::clip(double val, short& out) 
+{ 
+  if (val < VTK_SHORT_MIN)
+    out = VTK_SHORT_MIN;
+  else if (val > VTK_SHORT_MAX)
+    out = VTK_SHORT_MAX;
+  else 
+    out = short(val); 
+}
+
+inline void vtkVolumeResample::clip(double val, unsigned char&  out) 
+{ 
+  if (val < VTK_UNSIGNED_CHAR_MIN) 
+    out = VTK_UNSIGNED_CHAR_MIN; 
+  else if (val > VTK_UNSIGNED_CHAR_MAX) 
+    out = VTK_UNSIGNED_CHAR_MAX; 
+  else 
+    out = unsigned char(val);
+ }
+
+inline void vtkVolumeResample::clip(double val, unsigned short& out)
+{
+  if (val < VTK_UNSIGNED_SHORT_MIN)
+    out = VTK_UNSIGNED_SHORT_MIN;
+  else if (val > VTK_UNSIGNED_SHORT_MAX)
+    out = VTK_UNSIGNED_SHORT_MAX;
+  else
+    out = unsigned short(val);
+}
 
 #endif
 
