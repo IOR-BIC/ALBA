@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 16:37:44 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-04-21 22:02:04 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -151,7 +151,7 @@ public:
   
   /** return the data pipe object, i.e. the source of the output dataset. */
   mafDataPipe *GetDataPipe() {return m_DataPipe;}
-  
+
   /**
     this function makes the current data pointer to point the right output
     data, usually the DataPipe output data but subclasses can redefine this
@@ -195,11 +195,9 @@ public:
   /** process events coming from other components */
   void OnEvent(mafEventBase *e);
 
-  //SIL. 21-4-2005: 
   /** Return a suggested pipe for the visualization of this vme */
   virtual mafPipe *GetVisualPipe(mafSceneNode* sn) {return NULL;};
   
-  //SIL. 21-4-2005: 
   /** Inform (views) if a default pipe is available without creating it */
   virtual bool HasVisualPipe() {return false;};
 
@@ -240,6 +238,7 @@ protected:
   mafVMEOutput  *m_Output;      ///< the data structure storing the output of this VME
   mafTimeStamp  m_CurrentTime;  ///< the time parameter for generation of the output
   int           m_Crypting;     ///< enable flag for this VME
+  mafMTime      m_PreUpdateTime;///< use to reduce the number of time InternalPreUpdate is called
   
 private:
   mafVME(const mafVME&); // Not implemented

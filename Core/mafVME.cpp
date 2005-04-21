@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:59:08 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-04-21 22:02:04 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -18,8 +18,6 @@
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
-
-
 
 #include "mafVME.h"
 #include "mafVMEOutput.h"
@@ -647,8 +645,14 @@ int mafVME::SetMatrixPipe(mafMatrixPipe *mpipe)
 void mafVME::Update()
 //-------------------------------------------------------------------------
 {
-  InternalPreUpdate();
-  InternalUpdate();
+  //InternalPreUpdate();
+  //InternalUpdate();
+
+  if (GetMatrixPipe())
+    GetMatrixPipe()->Update();
+
+  if (GetDataPipe())
+    GetDataPipe()->Update();
 }
 
 //-------------------------------------------------------------------------
@@ -724,8 +728,12 @@ void mafVME::OnEvent(mafEventBase *e)
     switch (e->GetId())
     {
     case VME_OUTPUT_DATA_PREUPDATE:
-      InternalPreUpdate();  // self process the event
-      GetEventSource()->InvokeEvent(e); // forward event to observers
+      if (GetMTime()>m_PreUpdateTime.GetMTime())
+      {
+        m_PreUpdateTime.Modified();
+        InternalPreUpdate();  // self process the event
+        GetEventSource()->InvokeEvent(e); // forward event to observers
+      }
       return;
     break;
     case VME_OUTPUT_DATA_UPDATE:
