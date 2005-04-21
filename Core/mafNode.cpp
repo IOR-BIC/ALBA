@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 18:09:48 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2005-04-21 13:58:07 $
+  Version:   $Revision: 1.23 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -29,8 +29,8 @@
 #include "mafDecl.h"
 #include "mafIndent.h"
 #include "mafStorageElement.h"
+#include "mafStorage.h"
 #include "mafTagArray.h"
-#include <sstream>
 #include <assert.h>
 
 //-------------------------------------------------------------------------
@@ -976,58 +976,78 @@ int mafNode::InternalRestore(mafStorageElement *node)
       // restore attributes
       RemoveAllAttributes();
       std::vector<mafObject *> attrs;
-      if (node->RestoreObjectVector("Attributes",attrs)==MAF_OK)
+      if (node->RestoreObjectVector("Attributes",attrs)!=MAF_OK)
       {
-        for (unsigned int i=0;i<attrs.size();i++)
+        mafErrorMacro("Problems restoring attributes for node "<<GetName());
+
+        // do not return MAF_ERROR when cannot restore an attribute due to missing object type
+        if (node->GetStorage()->GetErrorCode()!=mafStorage::IO_WRONG_OBJECT_TYPE)
+          return MAF_ERROR;
+      }
+
+      for (unsigned int i=0;i<attrs.size();i++)
+      {
+        mafAttribute *item=mafAttribute::SafeDownCast(attrs[i]);
+        assert(item);
+        if (item)
         {
-          mafAttribute *item=mafAttribute::SafeDownCast(attrs[i]);
-          assert(item);
-          if (item)
+          m_Attributes[item->GetName()]=item;
+        }
+      }
+      
+      // restore Links
+      RemoveAllLinks();
+      if (mafStorageElement *links_element=node->FindNestedElement("Links"))
+      {
+        mafString num_links;
+        links_element->GetAttribute("NumberOfLinks",num_links);
+        int n=(int)atof(num_links);
+        mafStorageElement::ChildrenVector links_vector=links_element->GetChildren();
+        assert(links_vector.size()==n);
+        for (int i=0;i<n;i++)
+        {
+          mafString link_name;
+          links_vector[i]->GetAttribute("Name",link_name);
+          mafID link_node_id;
+          links_vector[i]->GetAttributeAsInteger("NodeId",link_node_id);
+          m_Links[link_name]=mmuNodeLink(link_node_id);
+        }
+
+        // restore children
+        RemoveAllChildren();
+        std::vector<mafObject *> children;
+        if (node->RestoreObjectVector("Children",children,"Node")!=MAF_OK)
+        {
+          if (node->GetStorage()->GetErrorCode()!=mafStorage::IO_WRONG_OBJECT_TYPE)
+            return MAF_ERROR;
+          // error messaged issued by failing node
+        }
+        m_Children.resize(children.size());
+        for (unsigned int i=0;i<children.size();i++)
+        {
+          mafNode *node=mafNode::SafeDownCast(children[i]);
+          assert(node);
+          if (node)
           {
-            m_Attributes[item->GetName()]=item;
+            node->m_Parent=this;
+            m_Children[i]=node;
           }
         }
-        
-        // restore Links
-        RemoveAllLinks();
-        if (mafStorageElement *links_element=node->FindNestedElement("Links"))
-        {
-          mafString num_links;
-          links_element->GetAttribute("NumberOfLinks",num_links);
-          int n=(int)atof(num_links);
-          mafStorageElement::ChildrenVector links_vector=links_element->GetChildren();
-          assert(links_vector.size()==n);
-          for (int i=0;i<n;i++)
-          {
-            mafString link_name;
-            links_vector[i]->GetAttribute("Name",link_name);
-            mafID link_node_id;
-            links_vector[i]->GetAttributeAsInteger("NodeId",link_node_id);
-            m_Links[link_name]=mmuNodeLink(link_node_id);
-          }
-
-          // restore children
-          RemoveAllChildren();
-          std::vector<mafObject *> children;
-          if (node->RestoreObjectVector("Children",children,"Node")==MAF_OK)
-          {
-            m_Children.resize(children.size());
-            for (unsigned int i=0;i<children.size();i++)
-            {
-              mafNode *node=mafNode::SafeDownCast(children[i]);
-              assert(node);
-              if (node)
-              {
-                node->m_Parent=this;
-                m_Children[i]=node;
-              }
-            }
-
-            return MAF_OK;
-          }
-        }     
+        return MAF_OK;
+      }
+      else
+      {
+        mafErrorMacro("I/O error restoring node "<<GetName()<<" of type "<<GetTypeName()<<" : problems restoring links.");
       }
     }
+    else
+    {
+      mafErrorMacro("I/O error restoring node "<<GetName()<<" of type "<<GetTypeName()<<" : cannot found Id attribute.");
+    }
+  }
+  else
+  {
+    mafErrorMacro("I/O error restoring node of type "<<GetTypeName()<<" : cannot found Name attribute.");
   }
 
   return MAF_ERROR;
