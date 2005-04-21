@@ -40,14 +40,6 @@
 #include <iostream>
 #include <set>
 
-#ifdef WIN32
-  #define SLEEP(a) Sleep(a)
-#else
-  #include <unistd.h>
-  #define SLEEP(a) usleep(a*10)
-#endif
-
-
 /** attribute class for attaching vtkActor to VME */
 class mafClientData : public mafAttribute
 {
@@ -146,7 +138,7 @@ int play_tree(mafVMERoot *root)
     if (t==100)
     {
       step=-1;
-      SLEEP(500);
+      mafSleep(500);
       continue;
     }
     
@@ -155,10 +147,10 @@ int play_tree(mafVMERoot *root)
 
     renderer->ResetCameraClippingRange();
     renWin->Render();
-    SLEEP(10);
+    mafSleep(10);
   }
 
-  SLEEP(1000);
+  mafSleep(1000);
 
   iter->Delete();
 

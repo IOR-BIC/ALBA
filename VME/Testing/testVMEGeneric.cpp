@@ -33,13 +33,6 @@
 
 #include <iostream>
 
-#ifdef WIN32
-  #define SLEEP(a) Sleep(a)
-#else
-  #include <unistd.h>
-  #define SLEEP(a) usleep(a*10)
-#endif
-
 /** attribute class for attaching vtkActor to VME */
 class mafClientData : public mafAttribute
 {
@@ -377,7 +370,7 @@ int main()
     renderer->GetActiveCamera()->Azimuth(-1);
     renderer->ResetCameraClippingRange();
     renWin->Render();
-    SLEEP(10);
+    mafSleep(10);
   }
 
   //--------------------------------------------------------------------------
@@ -534,7 +527,7 @@ int main()
 
   renderer->AddActor(tree4DBoundsActor);
 
-  //SLEEP(500);
+  //mafSleep(500);
 
   //renderer->ResetCamera();
   renWin->Render();
@@ -556,7 +549,7 @@ int main()
     renderer->GetActiveCamera()->Azimuth(1);
     renWin->Render();
 
-    SLEEP(10);
+    mafSleep(10);
 
     root->GetOutput()->GetBounds(treeBounds);
     //vtitle->GetOutput()->GetBounds(treeBounds);

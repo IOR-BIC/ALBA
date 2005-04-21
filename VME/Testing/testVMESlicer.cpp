@@ -24,13 +24,6 @@
 
 #include <iostream>
 
-#ifdef WIN32
-  #define SLEEP(a) Sleep(a)
-#else
-  #include <unistd.h>
-  #define SLEEP(a) usleep(a*1000)
-#endif
-
 //-------------------------------------------------------------------------
 int main()
 //-------------------------------------------------------------------------
@@ -51,14 +44,14 @@ int main()
   //set data to VME volume
   vtkMAFSmartPointer<vtkDataSetReader> reader;
   mafString filename=MAF_DATA_ROOT;
-  //filename<<"/VTK_Volumes/mummy_head.vtk";
-  filename<<"/VTK_Volumes/femur_r.vtk";
+  filename<<"/VTK_Volumes/mummy_head.vtk";
+  //filename<<"/VTK_Volumes/femur_r.vtk";
   reader->SetFileName(filename);
 
   reader->Update();
 
-  //vvol->SetDataByReference(reader->GetStructuredPointsOutput(),0);
-  vvol->SetDataByReference(reader->GetRectilinearGridOutput(),0);
+  vvol->SetDataByReference(reader->GetStructuredPointsOutput(),0);
+  //vvol->SetDataByReference(reader->GetRectilinearGridOutput(),0);
 
   mafTransform trans;
 
@@ -120,19 +113,19 @@ int main()
     vslicer->SetMatrix(trans.GetMatrix());
   
     //renderer->GetActiveCamera()->Azimuth(-(180.0/steps));
-    renderer->ResetCameraClippingRange();
+    //renderer->ResetCameraClippingRange();
     renWin->Render();
 
-    double srange[2];
-    vslicer->GetSurfaceOutput()->GetTexture()->GetScalarRange(srange);
-    cerr<<"bounds=["<<srange[0]<<" , "<<srange[1]<<"]\n";
+    //double srange[2];
+    //vslicer->GetSurfaceOutput()->GetTexture()->GetScalarRange(srange);
+    //cerr<<"bounds=["<<srange[0]<<" , "<<srange[1]<<"]\n";
 
     //mafString filename="slice_";
     //filename<<t;
     //filename<<".vtk";
     //writer->SetFileName(filename);
     //writer->Write();
-    //SLEEP(250);
+    //mafSleep(250);
   }
 
   std::cerr<<"Test completed successfully!"<<std::endl;
