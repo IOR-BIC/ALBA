@@ -1,20 +1,25 @@
 /*=========================================================================
-
-  Program:   Visualization Toolkit
+  Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMAFAssembly.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-18 14:52:53 $
-  Version:   $Revision: 1.1 $
-
-  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-     PURPOSE.  See the above copyright notice for more information.
-
+  Date:      $Date: 2005-04-21 13:18:02 $
+  Version:   $Revision: 1.2 $
+  Authors:   Silvano Imboden
+==========================================================================
+  Copyright (c) 2002/2004
+  CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
+
+
+#include "mafDefines.h" 
+//----------------------------------------------------------------------------
+// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// This force to include Window,wxWidgets and VTK exactly in this order.
+// Failing in doing this will result in a run-time error saying:
+// "Failure#0: The value of ESP was not properly saved across a function call"
+//----------------------------------------------------------------------------
+
+
 #include "vtkMAFAssembly.h"
 #include "vtkRenderWindow.h"
 #include "vtkObjectFactory.h"
@@ -24,7 +29,7 @@
 #include "vtkActor.h"
 #include "vtkVolume.h"
 
-vtkCxxRevisionMacro(vtkMAFAssembly, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkMAFAssembly, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkMAFAssembly);
 
 // Construct object with no children.
@@ -292,12 +297,12 @@ void vtkMAFAssembly::BuildPaths(vtkAssemblyPaths *paths, vtkAssemblyPath *path)
 */
 
 // Get the bounds for the assembly as (Xmin,Xmax,Ymin,Ymax,Zmin,Zmax).
-float *vtkMAFAssembly::GetBounds()
+double *vtkMAFAssembly::GetBounds()
 {
   vtkProp3D *prop3D;
   vtkAssemblyPath *path;
   int i, n;
-  float *bounds, bbox[24];
+  double *bounds, bbox[24];
   int propVisible=0;
 
   this->UpdatePaths();

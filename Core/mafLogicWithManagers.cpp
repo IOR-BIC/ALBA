@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-19 08:25:07 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-21 13:18:00 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -85,7 +85,7 @@ void mafLogicWithManagers::Configure()
 void mafLogicWithManagers::Plug(mafView* view) 
 //----------------------------------------------------------------------------
 {
-  //if(m_ViewManager) m_ViewManager->ViewAdd(view);
+  if(m_ViewManager) m_ViewManager->ViewAdd(view);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Plug(mafOp *op)
@@ -393,11 +393,14 @@ void mafLogicWithManagers::OnQuit()
     if(!quit) return;
   }
   */
-  //mmgMDIChild::OnQuit(); //reinsert when the view system is ready
+  mmgMDIChild::OnQuit(); //reinsert when the view system is ready
 
   cppDEL(m_VMEManager);
   cppDEL(m_ViewManager);
   cppDEL(m_OpManager);
+
+  // must be deleted after m_VMEManager
+  cppDEL(m_side_bar);
 
   mafLogicWithGUI::OnQuit();
 }
@@ -532,7 +535,7 @@ void mafLogicWithManagers::ViewCreate(int viewId)
 	if(m_ViewManager)
   {
     mafView* v = m_ViewManager->ViewCreate(viewId);
-    VmeShow(m_OpManager->GetSelectedVme(),true);
+    if(m_OpManager) VmeShow(m_OpManager->GetSelectedVme(),true);
   }
 }
 //----------------------------------------------------------------------------

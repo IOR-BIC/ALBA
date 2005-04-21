@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-19 12:32:45 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-21 13:18:02 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,7 +25,7 @@
 #include "mafView.h"
 #include "mafNode.h"
 #include "mafNodeIterator.h"
-#include "mafNodeRoot.h"
+#include "mafVMERoot.h"
 
 //#include "mmgMDIFrame.h"
 //#include "mmgMDIChild.h"
@@ -147,14 +147,14 @@ void mafViewManager::ViewSelected(mafView *view/*, mafRWIBase *rwi*/)
 void mafViewManager::VmeAdd(mafNode *n)   
 //----------------------------------------------------------------------------
 {
-//@@@  for(mafView* v = m_vlist; v; v=v->m_next) 
-//@@@    v->VmeAdd(n);
+  for(mafView* v = m_vlist; v; v=v->m_next) 
+    v->VmeAdd(n);
 
   wxString s;
-//  s = n->GetTypeName();
-  if(s == "mafNodeRoot") 
+  s = n->GetTypeName();
+  if(s == "mafVMERoot") 
   {
-    m_root_vme     = (mafNodeRoot*)n;
+    m_root_vme     = (mafVMERoot*)n;
     m_selected_vme = n;     // Paolo 24-06-2004 Adding new tree, selected vme must be initialized at the root.
   }
 }
@@ -162,11 +162,11 @@ void mafViewManager::VmeAdd(mafNode *n)
 void mafViewManager::VmeRemove(mafNode *n)   
 //----------------------------------------------------------------------------
 {
-//@@@  for(mafView* v = m_vlist; v; v=v->m_next) 
-//@@@    v->VmeRemove(n);
+  for(mafView* v = m_vlist; v; v=v->m_next) 
+    v->VmeRemove(n);
 
 	wxString s(n->GetTypeName());
-	if(s == "mafNodeRoot") 
+	if(s == "mafVMERoot") 
   {
     m_root_vme     = NULL;
     m_selected_vme = NULL;   // Paolo 24-06-2004 Removing the tree, selected vme must be set to NULL.
@@ -274,7 +274,7 @@ mafView *mafViewManager::ViewCreate(int id)
 	view = m_t[index];
   if(!view) return NULL;
 
-  //@@@//@@@//@@@//@@@//@@@//@@@ new_view = view->Copy(this);
+  new_view = view->Copy(this);
   
 /*
   for (int idx = 0; idx < view->m_CustomPipeVmeList.size(); idx ++)
@@ -313,7 +313,7 @@ mafView *mafViewManager::ViewCreate(wxString type)
 	}
 
 	assert(view);
-//@@@//@@@//@@@//@@@//@@@//@@@	new_view = view->Copy(this);
+	new_view = view->Copy(this);
 /*
   for (int idx = 0; idx < view->m_CustomPipeVmeList.size(); idx ++)
     new_view->m_CustomPipeVmeList.push_back(view->m_CustomPipeVmeList[idx]);
@@ -333,7 +333,6 @@ void mafViewManager::ViewInsert(mafView *view)
 	view->SetListener(this);
 //@@@  view->SetMouseAction(m_MouseAction);
 
-/*//@@@
   if(m_root_vme != NULL)
   {
     mafNodeIterator *iter = m_root_vme->NewIterator();
@@ -341,9 +340,9 @@ void mafViewManager::ViewInsert(mafView *view)
 			view->VmeAdd(vme);
     iter->Delete();
   }
-*/
-//@@@  if(m_selected_vme)
-//@@@    view->VmeSelect(m_selected_vme,true);
+
+  if(m_selected_vme)
+    view->VmeSelect(m_selected_vme,true);
 
   if(!m_vlist)
     m_vlist = view;
@@ -358,7 +357,7 @@ void mafViewManager::ViewInsert(mafView *view)
 void mafViewManager::ViewDelete(mafView *view)
 //----------------------------------------------------------------------------
 {
-  mafEventMacro(mafEvent(this,VIEW_DELETE,view));
+  mafEventMacro(mafEvent(this,VIEW_DELETE,view)); // inform the sidebar
 	
 	if(!m_vlist) return;
   if(m_vlist == view)

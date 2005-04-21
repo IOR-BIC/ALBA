@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:06:46 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-21 13:18:01 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 #include  "mafEvent.h"
 #include  "mafNode.h"
-#include  "mafNodeRoot.h"
+#include  "mafVMERoot.h"
 #include  "mafVMERoot.h"
 #include  "mmgFileHistory.h"
 //----------------------------------------------------------------------------
@@ -91,7 +91,7 @@ public:
   void SetFileHistoryMenu(wxMenu *menu);
  
 	/** Return the tree's root. */
-  mafNodeRoot *GetRoot() { return m_root;};		
+  mafVMERoot *GetRoot() { return m_root;};		
 
 	/** Set the application stamp; this is the mark of the specific vertical application (must be equal to the application name). */
   void SetApplicationStamp(wxString appstamp) {m_AppStamp = appstamp;};
@@ -105,7 +105,7 @@ public:
 protected:
   bool m_modified;
 
-  mafNodeRoot       *m_root;
+  mafVMERoot       *m_root;
   mafEventListener  *m_Listener;
   wxConfigBase			*m_Config;
   mmgFileHistory	   m_FileHistory;

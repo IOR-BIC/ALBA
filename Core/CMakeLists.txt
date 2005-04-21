@@ -67,8 +67,14 @@ mafOpSelect.cpp
 mafOpSelect.h
 mafOpStack.cpp
 mafOpStack.h
+mafPipe.cpp
+mafPipe.h
 mafRoot.cpp
 mafRoot.h
+mafSceneGraph.cpp
+mafSceneGraph.h
+mafSceneNode.cpp
+mafSceneNode.h
 mafTagArray.cpp
 mafTagArray.h
 mafTagItem.cpp
@@ -92,7 +98,8 @@ mafViewVTK.cpp
 mafViewVTK.h
 mmuTimeSet.cpp
 mmuTimeSet.h
-
+vtkMAFAssembly.cpp
+vtkMAFAssembly.h
 )
 
 IF (MAF_USE_VTK)

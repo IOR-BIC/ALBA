@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:06:47 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-21 13:18:02 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 class mafEventListener;
 class mafNode;
-class mafNodeRoot;
+class mafVMERoot;
 class mafView;
 class mmgViewPanel;
 //class mafRWIBase;
@@ -123,7 +123,7 @@ protected:
   int                 m_tcount;       // number of template
 
   mafEventListener   *m_Listener;
-  mafNodeRoot         *m_root_vme;
+  mafVMERoot         *m_root_vme;
   mafNode             *m_selected_vme;
   mafView            *m_selected_view;
 //  mafRWIBase         *m_selected_rwi;

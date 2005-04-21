@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMAFAssembly.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-18 14:52:54 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-21 13:18:02 $
+  Version:   $Revision: 1.2 $
   Authors:   Sivano Imboden 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,7 +13,6 @@
 #ifndef __vtkMAFAssembly_h
 #define __vtkMAFAssembly_h
 
-#include "mflCoreWin32Header.h"
 #include "vtkProp3D.h"
 
 //----------------------------------------------------------------------------
@@ -23,14 +22,14 @@ class vtkAssemblyPaths;
 class vtkProp3DCollection;
 class vtkMapper;
 class vtkActor;
-class mflVME;
+class mafNode;
 
 /** create hierarchies of vtkProp3Ds (transformable props)
   vtkMAFAssembly same as vtkAssembly, but has an extra link 
   for client data.
   @sa vtkActor vtkAssembly vtkTransform vtkMapper vtkPolyDataMapper vtkPropAssembly
   */
-class MFL_CORE_EXPORT vtkMAFAssembly : public vtkProp3D
+class /*MFL_CORE_EXPORT*/ vtkMAFAssembly : public vtkProp3D
 {
 public:
   static vtkMAFAssembly *New();
@@ -40,11 +39,11 @@ public:
 
   /**
   Get the VME associated to this Assembly */
-  mflVME *  GetVme() 							    {return m_vme;};
+  mafNode *  GetVme() 							    {return m_vme;};
 
   /**
   Set the VME associated to this Assembly */
-  void      SetVme(mflVME *vme)       {m_vme=vme;};
+  void      SetVme(mafNode *vme)       {m_vme=vme;};
 
   /**
   Add a part to the list of parts.*/
@@ -98,8 +97,8 @@ public:
 
   /**
   Get the bounds for the assembly as (Xmin,Xmax,Ymin,Ymax,Zmin,Zmax).*/
-  void GetBounds(float bounds[6]) {this->vtkProp3D::GetBounds( bounds );};
-  float *GetBounds();
+  void GetBounds(double bounds[6]) {this->vtkProp3D::GetBounds( bounds );};
+  virtual double  *GetBounds();
 
   /**
   Override default GetMTime method to also consider all of the
@@ -124,7 +123,7 @@ protected:
   ~vtkMAFAssembly();
 
   // pointer to the VME that is represented by this Assembly
-  mflVME      *m_vme;
+  mafNode      *m_vme;
 
   // Keep a list of direct descendants of the assembly hierarchy
   vtkProp3DCollection *Parts;
