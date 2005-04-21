@@ -364,6 +364,9 @@ int main()
   mafPlugNode<mafTestNode>("Test Node");
   mafPlugObject<mafTagArray>("the TagArray");
 
+  mafObject *obj=mafObjectFactory::CreateInstance("mafTestNode");
+  MAF_TEST(obj!=NULL);
+
   // test storing/restoring...
   mafXMLStorage storage;
   storage.SetURL("testNode.xml");
