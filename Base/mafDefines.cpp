@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:55:14 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-04-21 22:05:37 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -12,9 +12,9 @@
 #include "mafDefines.h"
 #include "mafMutexLock.h"
 
-#include "mafIncludeWX.h"
 #include "wx/string.h"
 
+#include <stdio.h>
 #include <math.h>
 
 #include <iostream>
@@ -109,4 +109,16 @@ bool mafFloatEquals(float x, float y)
    float diff=fabs(x - y);
    float max_err=fabs(x / pow((double)10,(double)7));
    return  ( diff <= max_err);
+}
+
+//------------------------------------------------------------------------------
+void mafSleep(int msec)
+//------------------------------------------------------------------------------
+{
+#ifdef WIN32
+  //Sleep(msec);
+#else
+  #include <unistd.h>
+  usleep(msec*1000);
+#endif
 }

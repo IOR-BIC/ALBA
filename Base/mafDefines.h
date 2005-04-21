@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:55:36 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2005-04-21 22:05:37 $
+  Version:   $Revision: 1.19 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -70,6 +70,9 @@ void mafMessage(const char *format, ...);
   of MSDN library*/
 bool mafEquals(double x, double y);
 bool mafFloatEquals(float x, float y);
+
+/** wait for given milliseconds */
+void mafSleep(int msec);
 
 //------------------------------------------------------------------------------
 // Macros
