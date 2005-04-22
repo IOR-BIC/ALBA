@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPics.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-19 12:37:06 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-22 13:05:07 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -44,8 +44,12 @@ mafPictureFactory::mafPictureFactory()
 //----------------------------------------------------------------------------
 {
     m_p = new mafPictureFactory_Pimpl();
-
-    #include <pic/FRAME_ICON16x16.xpm>   
+}
+//----------------------------------------------------------------------------
+void mafPictureFactory::Initialize()
+//----------------------------------------------------------------------------
+{
+   #include <pic/FRAME_ICON16x16.xpm>   
     mafADDPIC(FRAME_ICON16x16);
     #include <pic/FRAME_ICON32x32.xpm>   
     mafADDPIC(FRAME_ICON32x32);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPics.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:19 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-22 13:05:08 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -62,6 +62,7 @@ public:
   /** initialize the factory with the standard icons */
    mafPictureFactory();
   ~mafPictureFactory();
+  void Initialize();
 
   /** add a picture to the factory -- if id already exist it is overwritten */
   void Add(wxString id,char** xpm);
