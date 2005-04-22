@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testSideBarLogic.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:24:47 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-22 11:50:11 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -148,7 +148,8 @@ void testSideBarLogic::CreateSideBar()
 
   mafView *v = new mafView("pippo");
   m_gui = new testSideBarGui(m_win);
-  v->m_gui = m_gui->m_gui;
+  mmgGui *view_gui = v->GetGui();   // Paolo 2005-04-22
+  view_gui = m_gui->m_gui;          // Paolo 2005-04-22
   sb->ViewSelect(v);
 }
 
