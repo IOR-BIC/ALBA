@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testDialogApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-20 07:36:56 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-22 13:19:13 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,6 +22,8 @@
 
 #include "testDialogApp.h"
 #include "mmgMDIFrame.h"
+#include "mafPics.h"
+
 //--------------------------------------------------------------------------------
 // Create the Application
 //--------------------------------------------------------------------------------
@@ -31,6 +33,8 @@ IMPLEMENT_APP(testDialogApp)
 bool testDialogApp::OnInit()
 //--------------------------------------------------------------------------------
 {
+  mafPics.Initialize();	
+
   m_logic = new testDialogLogic();
   SetTopWindow(m_logic->m_win);
   m_logic->Show();

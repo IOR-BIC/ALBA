@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testOpManApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 15:42:10 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-22 13:19:05 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -40,6 +40,8 @@ IMPLEMENT_APP(testOpManApp)
 bool testOpManApp::OnInit()
 //--------------------------------------------------------------------------------
 {
+  mafPics.Initialize();	
+
   mafNodeFactory *node_factory  = mafNodeFactory::GetInstance();
   assert(node_factory!=NULL);
   int result = mafNodeFactory::Initialize();

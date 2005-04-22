@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testLogApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:24:27 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-22 13:17:47 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,6 +22,7 @@
 
 
 #include "testLogApp.h"
+#include "mafPics.h"
 
 //--------------------------------------------------------------------------------
 // Create the Application
@@ -32,6 +33,8 @@ IMPLEMENT_APP(testLogApp)
 bool testLogApp::OnInit()
 //--------------------------------------------------------------------------------
 {
+  mafPics.Initialize();	
+
 	m_logic = new testLogLogic();
   SetTopWindow(m_logic->GetTopWin());  
   m_logic->Show();

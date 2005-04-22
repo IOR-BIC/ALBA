@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testCheckTreeApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:00:07 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-22 13:18:51 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,6 +22,7 @@
 
 
 #include "testCheckTreeApp.h"
+#include "mafPics.h"
 
 //--------------------------------------------------------------------------------
 // Create the Application
@@ -32,6 +33,8 @@ IMPLEMENT_APP(testCheckTreeApp)
 bool testCheckTreeApp::OnInit()
 //--------------------------------------------------------------------------------
 {
+  mafPics.Initialize();	
+
 	m_logic = new testCheckTreeLogic();
   SetTopWindow(m_logic->GetTopWin());  
   m_logic->Show();

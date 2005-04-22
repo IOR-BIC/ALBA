@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testSashApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 20:02:46 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-22 13:17:38 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,6 +21,7 @@
 
 
 #include "testSashApp.h"
+#include "mafPics.h"
 
 //--------------------------------------------------------------------------------
 // Create the Application
@@ -31,6 +32,8 @@ IMPLEMENT_APP(testSashApp)
 bool testSashApp::OnInit()
 //--------------------------------------------------------------------------------
 {
+  mafPics.Initialize();	
+
 	m_logic = new testSashLogic();
   SetTopWindow(m_logic->GetTopWin());  
   m_logic->Show();

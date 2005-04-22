@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testRWIApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-16 10:00:18 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-22 13:19:21 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,6 +21,8 @@
 
 
 #include "testRWIApp.h"
+#include "mafPics.h"
+
 //--------------------------------------------------------------------------------
 // Create the Application
 //--------------------------------------------------------------------------------
@@ -30,6 +32,8 @@ IMPLEMENT_APP(testRWIApp)
 bool testRWIApp::OnInit()
 //--------------------------------------------------------------------------------
 {
+  mafPics.Initialize();	
+
   m_logic = new testRWILogic();
   SetTopWindow(m_logic->m_win);
   m_logic->Show();

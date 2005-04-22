@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testPicFactoryApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:25:17 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-22 13:18:28 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,6 +33,8 @@ IMPLEMENT_APP(testPicFactoryApp)
 bool testPicFactoryApp::OnInit()
 //--------------------------------------------------------------------------------
 {
+  mafPics.Initialize();	
+
   // this defines a char** variable called ico_xpm
   #include "ico.xpm"
   

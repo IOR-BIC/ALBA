@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testTimeBarApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:25:07 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-22 13:18:19 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,6 +22,7 @@
 
 
 #include "testTimeBarApp.h"
+#include "mafPics.h"
 
 //--------------------------------------------------------------------------------
 // Create the Application
@@ -32,6 +33,8 @@ IMPLEMENT_APP(testTimeBarApp)
 bool testTimeBarApp::OnInit()
 //--------------------------------------------------------------------------------
 {
+  mafPics.Initialize();	
+
 	m_logic = new testTimeBarLogic();
   SetTopWindow(m_logic->GetTopWin());  
   m_logic->Show();

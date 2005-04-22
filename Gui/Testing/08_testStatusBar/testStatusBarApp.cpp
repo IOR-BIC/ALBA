@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testStatusBarApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:24:57 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-22 13:18:11 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,6 +22,7 @@
 
 
 #include "testStatusBarApp.h"
+#include "mafPics.h"
 
 //--------------------------------------------------------------------------------
 // Create the Application
@@ -32,6 +33,8 @@ IMPLEMENT_APP(testStatusBarApp)
 bool testStatusBarApp::OnInit()
 //--------------------------------------------------------------------------------
 {
+  mafPics.Initialize();	
+
 	m_logic = new testStatusBarLogic();
   SetTopWindow(m_logic->GetTopWin());  
   m_logic->Show();
