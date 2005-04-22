@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 16:37:44 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-22 09:57:36 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -110,6 +110,9 @@ public:
   /** Empty. */
   void OnQuit();
 
+  /** Return the view pointer from view's id and multeplicity. */
+  mafView *GetView(int id, int mult) {return m_ViewMatrixID[id][mult];};
+
   /** 
   Initialize the action for the mouse device. */
 //  void SetMouseAction(mafAction *action);
@@ -128,5 +131,6 @@ protected:
   mafView            *m_selected_view;
 //mafRWIBase         *m_selected_rwi;
 	mafView            *m_view_being_created;
+  mafView            *m_ViewMatrixID[MAXVIEW][MAXVIEW];  ///< Matrix to access views directly by (id, multiplicity)
 };
 #endif

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 16:37:44 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-22 09:57:35 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -57,7 +57,13 @@ mafViewManager::mafViewManager()
 	m_root_vme           = NULL;
   m_view_being_created = NULL; 
   m_tcount       = 0;
-  for(int i=0; i<MAXVIEW; i++) m_t[i]=NULL;
+  for(int i=0; i<MAXVIEW; i++) 
+    m_t[i]=NULL;
+
+  // Paolo 2005-04-22
+  for(int t=0; t<MAXVIEW; t++)
+    for(int v=0; v<MAXVIEW; v++)
+      m_ViewMatrixID[t][v] = NULL;
 }
 //----------------------------------------------------------------------------
 mafViewManager::~mafViewManager( ) 
@@ -125,6 +131,7 @@ void mafViewManager::ViewAdd(mafView *view)
 {
   m_t[m_tcount] = view;
 	view->m_id = m_tcount + VIEW_START;
+  view->m_mult = 0; // Paolo 2005-04-22
   view->SetListener(this);
 
   m_tcount++;    
@@ -275,8 +282,20 @@ mafView *mafViewManager::ViewCreate(int id)
 	view = m_t[index];
   if(!view) return NULL;
 
+  // Paolo 2005-04-22
+  int view_id   = view->m_id;
+  int view_mult = 0;
   new_view = view->Copy(this);
-  
+  new_view->m_id = view_id;
+
+  for(;view_mult < MAXVIEW; view_mult++)
+    if(m_ViewMatrixID[index][view_mult] == NULL)
+      break;
+  view->m_mult = view_mult;
+
+  //update the matrix containing all created view
+  m_ViewMatrixID[index][view_mult] = new_view;
+
 /*
   for (int idx = 0; idx < view->m_CustomPipeVmeList.size(); idx ++)
     new_view->m_CustomPipeVmeList.push_back(view->m_CustomPipeVmeList[idx]);
@@ -285,9 +304,7 @@ mafView *mafViewManager::ViewCreate(int id)
 	// during ViewInsert the View may send Events that will not be forwarded because 
 	// the view isn't already selected - 
 	m_view_being_created = new_view;
-
 	ViewInsert(new_view);
-
 	m_view_being_created = NULL;
 
   mafEventMacro(mafEvent(this,VIEW_CREATED,new_view)); // ask Logic to create the frame
@@ -301,20 +318,34 @@ mafView *mafViewManager::ViewCreate(wxString type)
 //----------------------------------------------------------------------------
 {
 	mafView* new_view = NULL;
-	mafView* view = NULL;
+	mafView* view     = NULL;
 
-	for(int i=0; i<m_tcount; i++)
+	int index = 0;
+  for(; index<m_tcount; index++)
 	{
-    wxString t = typeid(*m_t[i]).name();
+    wxString t = typeid(*m_t[index]).name();
 		if(t == type )
 		{
-	    view = m_t[i];
+	    view = m_t[index];
 			break;
 		}
 	}
+  assert(view);
 
-	assert(view);
+  // Paolo 2005-04-22
+  int view_id   = view->m_id;
+  int view_mult = 0;
 	new_view = view->Copy(this);
+  new_view->m_id = view_id;
+
+  for(;view_mult < MAXVIEW; view_mult++)
+    if(m_ViewMatrixID[index][view_mult] == NULL)
+      break;
+  view->m_mult = view_mult;
+
+  //update the matrix containing all created view
+  m_ViewMatrixID[index][view_mult] = new_view;
+
 /*
   for (int idx = 0; idx < view->m_CustomPipeVmeList.size(); idx ++)
     new_view->m_CustomPipeVmeList.push_back(view->m_CustomPipeVmeList[idx]);
@@ -360,7 +391,13 @@ void mafViewManager::ViewDelete(mafView *view)
 {
   mafEventMacro(mafEvent(this,VIEW_DELETE,view)); // inform the sidebar
 	
-	if(!m_vlist) return;
+  // Paolo 2005-04-22
+  // calculate the view type index
+  int index = view->m_id - VIEW_START;
+  // set to NULL the pointer into the state matrix
+  m_ViewMatrixID[index][view->m_mult] = NULL;
+
+  if(!m_vlist) return;
   if(m_vlist == view)
   {
     m_vlist = view->m_next;

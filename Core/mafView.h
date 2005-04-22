@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 16:37:43 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-22 09:57:35 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -102,8 +102,9 @@ protected:
   mmgGuiHolder			*m_guih;
 
 public:
-  int                m_id;       // forget it - it is used from outside 
-  bool               m_plugged;  // forget it - it is used from outside 
-  mafView           *m_next;     // forget it - it is used from outside 
+  int                m_mult;    ///< Used to store the multiplicity of the view type created (e.g. the 3rd view surface created).
+  int                m_id;      ///< Used to store the view type created (e.g. view surface).
+  bool               m_plugged; // forget it - it is used from outside 
+  mafView           *m_next;    // forget it - it is used from outside 
 };
 #endif

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-13 13:09:02 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-22 09:57:35 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,6 +34,8 @@ mafView::mafView( wxString label, bool external)
   m_guih					= NULL;
 	m_gui					 	= NULL;
 	m_plugged				= false;
+  m_id            = 0;
+  m_mult          = 0;
 	//m_external_flag = external;
 }
 //----------------------------------------------------------------------------
