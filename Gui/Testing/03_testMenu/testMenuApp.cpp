@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testMenuApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 13:17:30 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-22 14:18:59 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,7 +23,6 @@
 
 #include "testMenuApp.h"
 #include "mafPics.h"
-  mafPics.Initialize();	
 
 //--------------------------------------------------------------------------------
 // Create the Application
