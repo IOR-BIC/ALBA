@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 09:57:35 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-22 10:24:53 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,6 +19,9 @@
 #include "mafNode.h"
 #include "mmgGuiHolder.h"
 #include "mmgGui.h"
+
+#include <vector>
+
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
@@ -91,6 +94,10 @@ public:
   virtual void			ShowGui();
   virtual void			ShowSettings()							{};
   virtual void			OnSize(wxSizeEvent &event)	{};
+
+  /** Vme list with custom pipe. */
+  void PlugVmeTypeWithCustomPipe(char *vme_type);
+  std::vector<std::string> m_CustomPipeVmeList;
 
 protected:
   mafEventListener	*m_Listener;
