@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-13 13:08:08 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-04-22 20:02:20 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2005
@@ -91,6 +91,20 @@ public:
 
   /** Double label widget. */
   void Label(wxString label1,wxString *var, bool bold = false);
+
+  //---------------------------------------------
+  /** Label widget. */
+  //void Label(mafString label,bool bold = false, bool multiline = false);
+
+  /** Label widget. */
+  //void Label(mafString *var ,bool bold = false, bool multiline = false);
+
+  /** Double label widget. */
+  //void Label(mafString label1,mafString  label2, bool bold = false);
+
+  /** Double label widget. */
+  //void Label(mafString label1,mafString *var, bool bold = false);
+  //---------------------------------------------
 
   /** String entry widget. */
   void String(int id,wxString label,wxString *var, wxString tooltip = "");

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-13 13:08:08 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-04-22 20:02:20 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -271,6 +271,63 @@ void mmgGui::Label(wxString label1,wxString *var, bool bold)
 	sizer->Add( lab2, 0, wxEXPAND);
 	Add(sizer,0,wxALL, M); 
 }
+//#########################
+/*
+//----------------------------------------------------------------------------
+void mmgGui::Label(mafString label, bool bold, bool multiline ) 
+//----------------------------------------------------------------------------
+{
+  int h = (multiline) ? -1 : LH;
+  wxStaticText* lab = new wxStaticText(this, -1, ,   dp, wxSize(-1,h), wxALIGN_LEFT );
+  if(m_use_bc) lab->SetBackgroundColour(m_bc);
+  if(bold) lab->SetFont(m_bold);
+	Add(lab,0,wxEXPAND|wxALL, M);
+}
+//----------------------------------------------------------------------------
+void mmgGui::Label(mafString *var, bool bold, bool multiline)
+//----------------------------------------------------------------------------
+{
+  int h = (multiline) ? -1 : LH;
+	wxStaticText* lab = new wxStaticText(this, -1, *var,    dp, wxSize(-1,h), wxALIGN_LEFT );
+	if(m_use_bc) lab->SetBackgroundColour(m_bc);
+  if(bold) lab->SetFont(m_bold);
+	lab->SetValidator( mmgValidator(this,-1,lab,var) );
+	Add(lab,0,wxEXPAND|wxALL, M);
+}
+//----------------------------------------------------------------------------
+void mmgGui::Label(mafString label1,mafString label2, bool bold)
+//----------------------------------------------------------------------------
+{
+	wxStaticText* lab1 = new wxStaticText(this, -1, label1, dp, wxSize(LW,LH), wxALIGN_RIGHT ); 
+	wxStaticText* lab2 = new wxStaticText(this, -1, label2, dp, wxSize(-1,LH), wxALIGN_LEFT ); 
+	if(bold) lab1->SetFont(m_bold);
+	if(bold) lab2->SetFont(m_bold);
+  if(m_use_bc) lab1->SetBackgroundColour(m_bc);
+  if(m_use_bc) lab2->SetBackgroundColour(m_bc);	
+  wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
+	sizer->Add( lab1, 0, wxRIGHT, LM);
+	sizer->Add( lab2, 0, wxEXPAND);
+	Add(sizer,0,wxALL, M); 
+}
+//----------------------------------------------------------------------------
+void mmgGui::Label(mafString label1,mafString *var, bool bold)
+//----------------------------------------------------------------------------
+{
+	wxStaticText* lab1 = new wxStaticText(this, -1, label1, dp, wxSize(LW,LH), wxALIGN_RIGHT );
+	wxStaticText* lab2 = new wxStaticText(this, -1, *var,   dp, wxSize(-1,LH), wxALIGN_LEFT );
+  if(m_use_bc) lab1->SetBackgroundColour(m_bc);
+  if(m_use_bc) lab2->SetBackgroundColour(m_bc);	
+	lab2->SetValidator( mmgValidator(this,-1,lab2,var) );
+	if(bold) lab1->SetFont(m_bold);
+	if(bold) lab2->SetFont(m_bold);
+
+	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
+	sizer->Add( lab1, 0, wxRIGHT, LM);
+	sizer->Add( lab2, 0, wxEXPAND);
+	Add(sizer,0,wxALL, M); 
+}
+//#########################
+*/
 //----------------------------------------------------------------------------
 void mmgGui::Button(int id,wxString button_text,wxString label, wxString tooltip) 
 //----------------------------------------------------------------------------
