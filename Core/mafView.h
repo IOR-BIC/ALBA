@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 10:24:53 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-04-22 20:01:06 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,6 +19,7 @@
 #include "mafNode.h"
 #include "mmgGuiHolder.h"
 #include "mmgGui.h"
+#include "mafPipe.h"
 
 #include <vector>
 
@@ -81,6 +82,9 @@ public:
   /** return the status of the node within this view. es: NON_VISIBLE,VISIBLE_ON, ... */
   //having mafView::GetNodeStatus allow mmgCheckTree to not know about mafSceneGraph
   virtual int 	    GetNodeStatus(mafNode *vme) {return NODE_NON_VISIBLE;};
+  
+  /** return the current pipe for the specified vme (if any exist at this moment) */
+  virtual mafPipe*  GetNodePipe(mafNode *vme) {return NULL;};
 
   virtual wxString        GetLabel() {return m_label;};
   virtual wxString        GetName()  {return m_name;};

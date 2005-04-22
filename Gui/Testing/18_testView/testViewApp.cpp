@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testViewApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 13:19:32 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-22 20:03:09 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,6 +30,8 @@
 #include "mafNodeRoot.h"
 #include "mafVMERoot.h"
 #include "mafVMESurface.h"
+#include "mafPipeFactory.h"
+#include "mafPipeSurface.h"
 
 #include "mmoCreateVmeSurface.h"
 #include "mafViewVTK.h"
@@ -53,6 +55,13 @@ bool testViewApp::OnInit()
   mafPlugNode<mafNodeGeneric>("mafNodeGeneric");
   mafPlugNode<mafVMERoot>("mafVMERoot");
   mafPlugNode<mafVMESurface>("mafVMESurface");
+
+  // Inizializzazione e Fill della PipeFactory -- potrebbe essere un SideEffect del Plug dei Nodi
+  mafPipeFactory *pipe_factory  = mafPipeFactory::GetInstance();
+  assert(pipe_factory!=NULL);
+  result = mafPipeFactory::Initialize();
+  assert(result==MAF_OK);
+  mafPlugPipe<mafPipeSurface>("mafPipeSurface");
 
   m_logic = new mafLogicWithManagers();
   //m_logic->PlugTimebar(false);

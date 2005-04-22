@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 19:38:53 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-04-22 20:01:07 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -18,6 +18,7 @@
 #include "mafSmartPointer.h"
 #include "mafString.h"
 #include "mafOBB.h"
+#include "mafDecl.h" // for MINID
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
@@ -26,6 +27,7 @@ class mafMatrix;
 class mafTransformBase;
 class mafOBB;
 class mafNodeIterator;
+class mmgGui;
 #ifdef MAF_USE_VTK
 class vtkDataSet;
 #endif //MAF_USE_VTK
@@ -154,7 +156,28 @@ public:
     Used by source VME to set internal bounds structure: never use this method directly. */
   void SetBounds(const mafOBB &bounds);
 
+  /** IDs for the GUI */
+  enum 
+  {
+    ID_FIRST = MINID,
+    ID_LAST
+  };
+
+  /** create and return the GUI for changing the node parameters */
+  mmgGui *GetGui();
+
+  /** destroy the Gui */
+  void DeleteGui();
+
 protected:
+  /**
+  Internally used to create a new instance of the GUI. This function should be
+  overridden by subclasses to create specialized GUIs. Each subclass should append
+  its own widgets and define the enum of IDs for the widgets as an extension of
+  the superclass enum. The last id value must be defined as "LAST_ID" to allow the 
+  subclass to continue the ID enumeration from it. For appending the widgets in the
+  same pannel GUI, each CreateGUI() function should first call the superclass' one.*/
+  virtual mmgGui  *CreateGui();
 
   /** retrieve bounds of the output data not considering the VME pose matrix and the visibility. */
   virtual void GetDataBounds(mafOBB &bounds,mafTimeStamp t) const;
@@ -162,6 +185,7 @@ protected:
   mafVME *                  m_VME;      ///< pointer to source VME
   mafString                 m_DataType; ///< the type of data stored in object expressed as a string
   mafOBB                    m_Bounds;   ///< bounds of the output data (i.e. for current time)
+  mmgGui                   *m_Gui;      ///< user interface
 
   mafAutoPointer<mafTransformBase> m_Transform; ///< the transform generating the output pose matrix
 

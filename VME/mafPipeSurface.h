@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 16:36:22 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-22 20:02:53 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,10 +29,13 @@ class vtkProperty;
 class mafPipeSurface : public mafPipe
 {
 public:
-               mafPipeSurface(mafSceneNode *n,bool use_axes = true);
+  mafTypeMacro(mafPipeSurface,mafPipe);
+
+               mafPipeSurface();
   virtual     ~mafPipeSurface ();
-  //virtual void Show       (bool show); 
-  virtual void Select     (bool select); 
+
+  virtual void Create(mafSceneNode *n /*,bool use_axes = true*/ ); //Can't add parameters - is Virtual
+  virtual void Select(bool select); 
 
   vtkPolyDataMapper	     *m_act_m;
   vtkActor               *m_act_a;

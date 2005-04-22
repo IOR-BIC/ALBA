@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:18:02 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-22 20:01:06 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -84,3 +84,13 @@ int  mafViewVTK::GetNodeStatus(mafNode *vme)                            {return 
 void mafViewVTK::CameraReset()	{assert(m_rwi); m_rwi->CameraReset();}
 void mafViewVTK::CameraUpdate() {assert(m_rwi); m_rwi->CameraUpdate();}
 //----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+mafPipe* mafViewVTK::GetNodePipe(mafNode *vme)
+//----------------------------------------------------------------------------
+{
+   assert(m_sg);
+   mafSceneNode *n = m_sg->Vme2Node(vme);
+   if(!n) return NULL;
+   return n->m_pipe;
+}

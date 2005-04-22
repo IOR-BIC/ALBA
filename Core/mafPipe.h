@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 11:07:58 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-22 20:01:05 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -12,6 +12,8 @@
 #ifndef __mafPipe_H__
 #define __mafPipe_H__
 
+#include "mafDecl.h" // for MINID
+#include "mafObject.h"
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
@@ -21,33 +23,60 @@ class mafSceneNode;
 class mafSceneGraph;
 class vtkMAFAssembly;
 class vtkRenderer;
+class mmgGui;
 //----------------------------------------------------------------------------
 // mafPipe :
 //----------------------------------------------------------------------------
-class mafPipe
+class mafPipe : public mafObject
 {
 public:
-							 mafPipe(mafSceneNode *n);
+  mafTypeMacro(mafPipe,mafObject);
+  
+  mafPipe();
 	virtual			~mafPipe();
+
+  /** The real setup must be performed here - not in the ctor */
+  virtual void Create(mafSceneNode *n);
 
 	/** Change the visibility of the bounding box actor representing the selection for the vme. */
 	virtual	void Select(bool select)										{};
 
-	 //SIL. 21-4-2005: -- SHOW is to be removed -- when a vme is hidden the pipe is destroyed
-  /** Change the visibility of the actor representing the vme. */
-	// virtual void Show(bool show)												{};
-
 	/** Update the properties according to the vme's tags. */
 	virtual	void UpdateProperty(bool fromTag = false)		{};
 
+  /** IDs for the GUI */
+  enum 
+  {
+    ID_FIRST = MINID,
+    ID_LAST
+  };
+
+  /** create and return the GUI for changing the node parameters */
+  mmgGui *GetGui();
+
+  /** destroy the Gui */
+  void DeleteGui();
+
+  mmgGui         *m_Gui;      ///< user inteface
 	mafNode        *m_mafnode;
   mafVME         *m_vme;
 	vtkMAFAssembly *m_asm1;
 	vtkMAFAssembly *m_asm2;
 	mafSceneGraph  *m_sg;
-  bool            m_selected; //we need to remeber if this is selected when show(true) is called
-  vtkRenderer    *m_ren1;     //used by the axis
+  bool            m_selected; 
+  vtkRenderer    *m_ren1;     
   vtkRenderer    *m_ren2;
+
+protected:
+  /**
+  Internally used to create a new instance of the GUI. This function should be
+  overridden by subclasses to create specialized GUIs. Each subclass should append
+  its own widgets and define the enum of IDs for the widgets as an extension of
+  the superclass enum. The last id value must be defined as "LAST_ID" to allow the 
+  subclass to continue the ID enumeration from it. For appending the widgets in the
+  same pannel GUI, each CreateGUI() function should first call the superclass' one.*/
+  virtual mmgGui  *CreateGui();
+
 };
 #endif
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:26:17 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2005-04-22 20:01:04 $
+  Version:   $Revision: 1.25 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -31,6 +31,7 @@
 #include "mafStorageElement.h"
 #include "mafStorage.h"
 #include "mafTagArray.h"
+#include "mmgGui.h"
 #include <assert.h>
 
 //-------------------------------------------------------------------------
@@ -45,7 +46,7 @@ mafNode::mafNode()
   m_Initialized         = false;
   m_VisibleToTraverse   = true;
   m_Id                  = -1; // invalid ID
-  m_GUI                 = NULL;
+  m_Gui                 = NULL;
   m_EventSource         = new mafEventSource;
   m_EventSource->SetChannel(MCH_NODE);
 }
@@ -62,6 +63,8 @@ mafNode::~mafNode()
 
   SetParent(NULL);
   cppDEL(m_EventSource);
+  cppDEL(m_Gui);
+
 }
 
 //------------------------------------------------------------------------------
@@ -137,26 +140,6 @@ int mafNode::InternalInitialize()
   }
   return MAF_OK;
 }
-//-------------------------------------------------------------------------
-mmgGui *mafNode::GetGui()
-//-------------------------------------------------------------------------
-{
-  if (m_GUI==NULL)
-    CreateGUI();
-
-  return m_GUI;
-}
-//-------------------------------------------------------------------------
-mmgGui* mafNode::CreateGUI()
-//-------------------------------------------------------------------------
-{
-//#ifdef MAF_BUILD_GUI
-//  m_GUI = new mmgGUI(this);
-//    
-//#endif
-  return m_GUI;
-}
-
 //-------------------------------------------------------------------------
 void mafNode::ForwardUpEvent(mafEventBase &event)
 //-------------------------------------------------------------------------
@@ -1087,4 +1070,32 @@ char** mafNode::GetIcon()
 {
   #include "mafNode.xpm"
   return mafNode_xpm;
+}
+//-------------------------------------------------------------------------
+mmgGui *mafNode::GetGui()
+//-------------------------------------------------------------------------
+{
+  if (m_Gui==NULL) CreateGui();
+  assert(m_Gui);
+  return m_Gui;
+}
+//-------------------------------------------------------------------------
+void mafNode::DeleteGui()
+//-------------------------------------------------------------------------
+{
+  cppDEL(m_Gui);
+}
+//-------------------------------------------------------------------------
+mmgGui* mafNode::CreateGui()
+//-------------------------------------------------------------------------
+{
+  assert(m_Gui == NULL);
+  m_Gui = new mmgGui(NULL); // replace NULL with 'this' ....  //SIL. 22-4-2005: 
+  
+  wxString type = GetTypeName(); 
+  m_Gui->Label("type :", type);
+  wxString name = GetName();
+  m_Gui->Label("name :", name);
+
+  return m_Gui;
 }

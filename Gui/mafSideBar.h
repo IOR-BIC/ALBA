@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-13 13:08:07 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-22 20:02:38 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -95,10 +95,17 @@ public:
 
   wxNotebook        *m_notebook;
 protected:
-  //mmgSashPanel    *m_side_bar;
+  void UpdateVmePanel();  
+
   mmgPanelStack			*m_op_panel;
 	mmgGuiHolder			*m_view_property_panel;
   mmgCheckTree      *m_tree;
+
   mmgGuiHolder      *m_vme_panel;
+  mmgGuiHolder      *m_vme_output_panel;
+  mmgGuiHolder      *m_vme_pipe_panel;
+
+  mafNode *m_selected_vme;
+  mafView *m_selected_view;
 };
 #endif

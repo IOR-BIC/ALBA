@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 11:07:58 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-22 20:01:05 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -80,6 +80,12 @@ void mafSceneGraph::VmeAdd(mafNode *vme)
 	mafSceneNode *node = NodeAdd(vme);
 	if(!node) return;
 	
+  // must be after NodeAdd
+  int nodestatus = m_view->GetNodeStatus(vme);
+  node->m_pipe_creatable = ( nodestatus != NODE_NON_VISIBLE );
+  node->m_mutex          = ( nodestatus == NODE_MUTEX_ON  || nodestatus == NODE_MUTEX_OFF );
+
+
   /* @@@
 
   mafNodeBaseTypes type = mafGetBaseType(vme);

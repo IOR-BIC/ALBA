@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 22:02:47 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-04-22 20:01:07 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -29,7 +29,7 @@
 #include "mafSmartPointer.h"
 #include "mafTransform.h"
 #include "mafIndent.h"
-
+#include "mmgGUI.h"
 #include <assert.h>
 
 //-------------------------------------------------------------------------
@@ -42,12 +42,14 @@ mafVMEOutput::mafVMEOutput()
 {
   m_VME = NULL;
   m_Transform = mafTransform::New(); // Transform is created by VME 
+  m_Gui = NULL;
 }
 
 //-------------------------------------------------------------------------
 mafVMEOutput::~mafVMEOutput()
 //-------------------------------------------------------------------------
 {
+  cppDEL(m_Gui);
 }
 
 #ifdef MAF_USE_VTK
@@ -523,3 +525,29 @@ void mafVMEOutput::Print(std::ostream& os, const int tabs) const
   os << indent << "DataType: "<<m_DataType<<std::endl;
 }
 
+//-------------------------------------------------------------------------
+mmgGui *mafVMEOutput::GetGui()
+//-------------------------------------------------------------------------
+{
+  if (m_Gui==NULL) CreateGui();
+  assert(m_Gui);
+  return m_Gui;
+}
+//-------------------------------------------------------------------------
+void mafVMEOutput::DeleteGui()
+//-------------------------------------------------------------------------
+{
+  cppDEL(m_Gui);
+}
+//-------------------------------------------------------------------------
+mmgGui* mafVMEOutput::CreateGui()
+//-------------------------------------------------------------------------
+{
+  assert(m_Gui == NULL);
+  m_Gui = new mmgGui(NULL); // replace NULL with 'this' ....  //SIL. 22-4-2005: 
+
+  wxString type = GetTypeName(); 
+  m_Gui->Label("type :", type);
+
+  return m_Gui;
+}

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testView.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 16:33:44 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-22 20:03:09 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,6 +22,8 @@
 #include "testView.h"
 #include "mafVME.h"
 #include "mafPipe.h"
+#include "mafPipeFactory.h"
+
 //----------------------------------------------------------------------------
 mafView *testView::Copy(mafEventListener *Listener)
 //----------------------------------------------------------------------------
@@ -43,7 +45,7 @@ int testView::GetNodeStatus(mafNode *vme)
     return NODE_NON_VISIBLE;
 
   mafVME *v = ((mafVME*)vme);
-  if(!v->HasVisualPipe())  
+  if( v->GetVisualPipe() == "" )  
     return NODE_NON_VISIBLE;
   else
     return (n->IsVisible()) ? NODE_VISIBLE_ON :  NODE_VISIBLE_OFF;
@@ -57,7 +59,17 @@ void testView::VmeCreatePipe(mafNode *vme)
   assert(vme->IsA("mafVME"));
   mafVME *v = ((mafVME*)vme);
 
-  n->m_pipe = v->GetVisualPipe(n);
+  assert( v->GetVisualPipe() != "" );
+  
+  mafPipeFactory *pipe_factory  = mafPipeFactory::GetInstance();
+  assert(pipe_factory!=NULL);
+  mafObject *obj = pipe_factory->CreateInstance(v->GetVisualPipe());
+  assert(obj);
+  mafPipe *pipe = (mafPipe*)obj;
+  
+  pipe->Create(n);
+
+  n->m_pipe = (mafPipe*)pipe;
 }
 //----------------------------------------------------------------------------
 void testView::VmeDeletePipe(mafNode *vme)

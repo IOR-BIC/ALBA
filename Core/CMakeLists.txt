@@ -8,8 +8,6 @@ DBG_MESSAGE("Configuring project mafCore")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-#mafLogic_full_MAF1.cpp
-#mafLogic_full_MAF1.h
 #mafSceneGraph.cpp
 #mafSceneGraph.h
 #mafSceneNode.cpp
@@ -69,8 +67,8 @@ mafOpStack.cpp
 mafOpStack.h
 mafPipe.cpp
 mafPipe.h
-#mafPipeFactory.cpp
-#mafPipeFactory.h
+mafPipeFactory.cpp
+mafPipeFactory.h
 mafRoot.cpp
 mafRoot.h
 mafSceneGraph.cpp

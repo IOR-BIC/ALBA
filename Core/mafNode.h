@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-20 10:17:46 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2005-04-22 20:01:04 $
+  Version:   $Revision: 1.22 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -324,9 +324,6 @@ public:
   /** return links array: links from this node to other arrays */
   mafLinksMap *GetLinks() {return &m_Links;}
 
-  /** create and return the GUI for changing the node parameters */
-  mmgGui *GetGui();
-
   /** used to send an event up in the tree */
   void ForwardUpEvent(mafEventBase *event);
   void ForwardUpEvent(mafEventBase &event);
@@ -341,6 +338,12 @@ public:
     ID_FIRST = MINID,
     ID_LAST
   };
+
+  /** create and return the GUI for changing the node parameters */
+  mmgGui *GetGui();
+
+  /** destroy the Gui */
+  void DeleteGui();
 
   /** return the Id of this node in the tree */
   mafID GetId() const;
@@ -377,14 +380,13 @@ protected:
     the superclass enum. The last id value must be defined as "LAST_ID" to allow the 
     subclass to continue the ID enumeration from it. For appending the widgets in the
     same pannel GUI, each CreateGUI() function should first call the superclass' one.*/
-  virtual mmgGui    *CreateGUI();
+  virtual mmgGui  *CreateGui();
 
   void OnNodeDetachedFromTree(mafEventBase *e);
   void OnNodeAttachedToTree(mafEventBase *e);
   void OnNodeDestroyed(mafEventBase *e);
 
-
-  mmgGui            *m_GUI;         ///< pointer to the node GUI
+  mmgGui            *m_Gui;         ///< pointer to the node GUI
 
   mafChildrenVector m_Children;     ///< list of children
   mafNode           *m_Parent;      ///< parent node

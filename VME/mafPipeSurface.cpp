@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 16:36:22 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-22 20:02:53 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,11 +40,25 @@
 #include "vtkActor.h"
 #include "vtkProperty.h"
 
+mafCxxTypeMacro(mafPipeSurface);
+
 //----------------------------------------------------------------------------
-mafPipeSurface::mafPipeSurface(mafSceneNode *n, bool use_axes)
-:mafPipe(n)
+mafPipeSurface::mafPipeSurface() 
 //----------------------------------------------------------------------------
 {
+  m_act_m    =NULL;
+  m_act_a    =NULL;
+  m_sel_ocf  =NULL;
+  m_sel_m    =NULL;
+  m_sel_p    =NULL;
+  m_sel_a    =NULL;
+}
+//----------------------------------------------------------------------------
+void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
+//----------------------------------------------------------------------------
+{
+  Superclass::Create(n);
+  
   m_selected = false;
   m_act_m   = NULL;
   m_act_a   = NULL;;

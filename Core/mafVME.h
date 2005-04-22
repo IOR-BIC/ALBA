@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 07:40:28 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2005-04-22 20:01:07 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,9 +26,6 @@ class mafDataPipe;
 class mafMatrixPipe;
 
 class mafAbsMatrixPipe;
-
-class mafPipe;  //SIL. 21-4-2005: 
-class mafSceneNode;  //SIL. 21-4-2005: 
 
 /** mafVME - a tree node implementation with an output with a pose matrix and a VTK dataset.
   mafVME is a node for sciViz purposes. It features a procedural core generating an output 
@@ -195,12 +192,9 @@ public:
   /** process events coming from other components */
   void OnEvent(mafEventBase *e);
 
-  /** Return a suggested pipe for the visualization of this vme */
-  virtual mafPipe *GetVisualPipe(mafSceneNode* sn) {return NULL;};
+  /** Return the suggested pipe-typename for the visualization of this vme */
+  virtual mafString GetVisualPipe() {return mafString("");};
   
-  /** Inform (views) if a default pipe is available without creating it */
-  virtual bool HasVisualPipe() {return false;};
-
 protected:
   mafVME(); // to be allocated with New()
   virtual ~mafVME(); // to be deleted with Delete()
