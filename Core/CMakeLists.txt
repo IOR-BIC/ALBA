@@ -69,6 +69,8 @@ mafOpStack.cpp
 mafOpStack.h
 mafPipe.cpp
 mafPipe.h
+#mafPipeFactory.cpp
+#mafPipeFactory.h
 mafRoot.cpp
 mafRoot.h
 mafSceneGraph.cpp
