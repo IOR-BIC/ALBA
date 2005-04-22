@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 22:05:37 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-04-22 07:39:51 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -13,6 +13,7 @@
 #include "mafMutexLock.h"
 
 #include "wx/string.h"
+#include "mafIncludeWin32.h"
 
 #include <stdio.h>
 #include <math.h>
@@ -116,7 +117,7 @@ void mafSleep(int msec)
 //------------------------------------------------------------------------------
 {
 #ifdef WIN32
-  //Sleep(msec);
+  Sleep(msec);
 #else
   #include <unistd.h>
   usleep(msec*1000);
