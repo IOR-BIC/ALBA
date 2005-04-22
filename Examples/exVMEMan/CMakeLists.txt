@@ -1,5 +1,4 @@
 PROJECT (exVMEMan)
-MESSAGE("DEBUG3")
 SET(PROJECT_SRCS 
 exVMEManApp.cpp
 exVMEManApp.h
