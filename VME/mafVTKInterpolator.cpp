@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVTKInterpolator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 19:36:28 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-22 07:41:42 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -94,18 +94,6 @@ void mafVTKInterpolator::OnEvent(mafEventBase *e)
 //------------------------------------------------------------------------------
 {
   assert(e->GetSender()==m_VTKDataPipe); // should not receive events from other sources
-
-  if (e->GetSender()==m_VTKDataPipe)
-  {
-    switch (e->GetId())
-    {
-    case VME_OUTPUT_DATA_PREUPDATE:
-      PreExecute();
-    break;
-    case VME_OUTPUT_DATA_UPDATE:
-      Execute(); // superclass execute...
-    };
-  }
 
   Superclass::OnEvent(e); // this also forwards the event to parent class
 }
