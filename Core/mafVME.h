@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 22:02:04 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-04-22 07:40:28 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -238,7 +238,6 @@ protected:
   mafVMEOutput  *m_Output;      ///< the data structure storing the output of this VME
   mafTimeStamp  m_CurrentTime;  ///< the time parameter for generation of the output
   int           m_Crypting;     ///< enable flag for this VME
-  mafMTime      m_PreUpdateTime;///< use to reduce the number of time InternalPreUpdate is called
   
 private:
   mafVME(const mafVME&); // Not implemented

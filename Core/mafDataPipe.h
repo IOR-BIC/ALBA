@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataPipe.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:14 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-22 07:40:16 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -122,6 +122,7 @@ protected:
   mafOBB        m_Bounds;///< bounds of the output data
   mafTimeStamp  m_CurrentTime;  ///< time for which data is computed
   mafVME        *m_VME;         ///< pointer to the VME for which output is computed
+  mafMTime      m_PreExecuteTime;///< use to reduce the number of time PreExecute is called
 
   int           m_DependOnPose;
   int           m_DependOnAbsPose;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 22:02:04 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2005-04-22 07:40:16 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -727,13 +727,9 @@ void mafVME::OnEvent(mafEventBase *e)
   {
     switch (e->GetId())
     {
-    case VME_OUTPUT_DATA_PREUPDATE:
-      if (GetMTime()>m_PreUpdateTime.GetMTime())
-      {
-        m_PreUpdateTime.Modified();
-        InternalPreUpdate();  // self process the event
-        GetEventSource()->InvokeEvent(e); // forward event to observers
-      }
+    case VME_OUTPUT_DATA_PREUPDATE:      
+      InternalPreUpdate();  // self process the event
+      GetEventSource()->InvokeEvent(e); // forward event to observers
       return;
     break;
     case VME_OUTPUT_DATA_UPDATE:

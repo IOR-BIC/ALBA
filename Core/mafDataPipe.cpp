@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:57:38 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-22 07:40:16 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,6 +25,7 @@
 #include "mafVME.h"
 #include "mafAbsMatrixPipe.h"
 #include "mafOBB.h"
+#include "mafEventBase.h"
 #include "mafIndent.h"
 //------------------------------------------------------------------------------
 mafCxxTypeMacro(mafDataPipe)
@@ -160,7 +161,23 @@ void mafDataPipe::Execute()
 void mafDataPipe::OnEvent(mafEventBase *event)
 //------------------------------------------------------------------------------
 {
-  if (m_VME) m_VME->OnEvent(event);
+  switch (event->GetId())
+  {
+  case VME_OUTPUT_DATA_PREUPDATE:
+    if (GetMTime()>m_PreExecuteTime.GetMTime())
+    {
+      m_PreExecuteTime.Modified();
+      PreExecute();
+      // forward event to VME
+      if (m_VME) m_VME->OnEvent(event);
+    }
+  break;
+  case VME_OUTPUT_DATA_UPDATE:
+    Execute();
+    // forward event to VME
+    if (m_VME) m_VME->OnEvent(event);
+  break;
+  }; 
 }
 
 //------------------------------------------------------------------------------
