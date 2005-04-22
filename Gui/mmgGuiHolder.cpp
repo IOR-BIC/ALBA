@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGuiHolder.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:23 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-22 20:02:09 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -53,8 +53,13 @@ mmgGuiHolder::~mmgGuiHolder( )
 bool mmgGuiHolder::Put(mmgGui* gui)
 //----------------------------------------------------------------------------
 {
+  if(gui == m_currgui ) return false; //SIL. 22-4-2005: -- if passing the current content, nothing happen
+
   if(m_currgui) Remove(m_currgui); 
   m_currgui = gui;
+
+  if( m_currgui == NULL ) return false; //SIL. 22-4-2005: -- if passing NULL, the old content is removed 
+
   m_currgui->FitGui();
   m_currgui->Reparent(m_panel);
   m_panel->Add(m_currgui,0,wxEXPAND);
@@ -69,13 +74,23 @@ bool mmgGuiHolder::Put(mmgGui* gui)
 bool mmgGuiHolder::Remove(mmgGui* gui)
 //----------------------------------------------------------------------------
 {
-	if(m_currgui == NULL) return false; 
-	if(gui==NULL ) gui = m_currgui;
-	if(gui != m_currgui) return false; 
+	if(m_currgui == NULL) return false;  //nothing to remove
 
-	m_currgui->Show(false);
+  //SIL. 22-4-2005: hack -- vme_show(false) kills a pipe, the pipe kills its gui, and we have an invalid pointer
+  //checking the parent allow to be more robust
+  if(m_currgui->GetParent() != m_panel ) // m_currgui has been deleted, and is now invalid
+  {
+    m_currgui = NULL;
+    return false;
+  }
+
+  if(gui==NULL ) gui = m_currgui; // if NULL was passed we remove the current gui
+
+  if(gui != m_currgui) return false;  // if a non-NULL-Gui was specified  and is different from the current we do nothing
+
 	m_panel->Remove(m_currgui);
 	m_currgui->Reparent(mafGetFrame());
+  m_currgui->Show(false);
 	m_panel->Layout();    
 	m_currgui = NULL;
 	return true;
