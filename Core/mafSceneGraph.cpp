@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 16:37:43 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-22 11:07:58 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,7 +24,7 @@
 #include "mafView.h"
 //#include "mafPipeGizmo.h"
 //#include "mafPipePointSet.h"
-#include "mmgGUI.h"
+#include "mmgGui.h"
 #include "mafSceneGraph.h"
 #include "mafNode.h"
 #include "mafNodeIterator.h"
@@ -139,8 +139,8 @@ mafSceneNode *mafSceneGraph::NodeAdd(mafNode *vme)
   }
   else
   {
-		parent = Vme2Node(vme->GetParent()); 
-		assert(parent);
+    parent = Vme2Node(vme->GetParent()); 
+    assert(parent);
   }
   // create node
   mafSceneNode *node = new mafSceneNode(this,parent,vme,m_ren1,m_ren2) ;
@@ -150,8 +150,9 @@ mafSceneNode *mafSceneGraph::NodeAdd(mafNode *vme)
 		m_list = node;
   else
   {
-    for(mafSceneNode* n = m_list; n->m_next; n=n->m_next); // go to the end of the list
-			n->m_next = node;
+    mafSceneNode* n;
+    for(n = m_list; n->m_next; n=n->m_next); // go to the end of the list
+      n->m_next = node;
   }
   return node;
 }
@@ -159,16 +160,16 @@ mafSceneNode *mafSceneGraph::NodeAdd(mafNode *vme)
 void mafSceneGraph::VmeRemove(mafNode *vme)   
 //----------------------------------------------------------------------------
 {
-	VmeShow(vme,false);
+  VmeShow(vme,false);
 
   mafSceneNode *node;
-	
-	if(!m_list) return;
+
+  if(!m_list) return;
 
   if(m_list->m_vme == vme)
   {
      node = m_list;
-		 m_list = m_list->m_next;
+     m_list = m_list->m_next;
   }
   else
   {

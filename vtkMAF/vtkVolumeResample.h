@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkVolumeResample.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:53:11 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-22 11:08:58 $
+  Version:   $Revision: 1.2 $
   Authors:   Alexander Savenko
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -118,12 +118,6 @@ public:
 
   void SetOutput(vtkImageData *data) { vtkDataSetSource::SetOutput(data); }
 
-  static inline void vtkVolumeResample::clip(double val, float& out);
-  static inline void vtkVolumeResample::clip(double val, char&  out);
-  static inline void vtkVolumeResample::clip(double val, short& out);
-  static inline void vtkVolumeResample::clip(double val, unsigned char&  out);
-  static inline void vtkVolumeResample::clip(double val, unsigned short& out);
-
 protected:
   vtkVolumeResample();
   ~vtkVolumeResample();
@@ -172,48 +166,6 @@ private:
   vtkVolumeResample(const vtkVolumeResample&);  // Not implemented.
   void operator=(const vtkVolumeResample&);  // Not implemented.
 };
-
-inline void vtkVolumeResample::clip(double val, float& out) { out = val; }
-
-inline void vtkVolumeResample::clip(double val, char&  out) 
-{ 
-  if (val < VTK_CHAR_MIN)
-    out = VTK_CHAR_MIN;
-  else if (val > VTK_CHAR_MAX)
-    out = VTK_CHAR_MAX;
-  else 
-    out = char(val);
-}
-
-inline void vtkVolumeResample::clip(double val, short& out) 
-{ 
-  if (val < VTK_SHORT_MIN)
-    out = VTK_SHORT_MIN;
-  else if (val > VTK_SHORT_MAX)
-    out = VTK_SHORT_MAX;
-  else 
-    out = short(val); 
-}
-
-inline void vtkVolumeResample::clip(double val, unsigned char&  out) 
-{ 
-  if (val < VTK_UNSIGNED_CHAR_MIN) 
-    out = VTK_UNSIGNED_CHAR_MIN; 
-  else if (val > VTK_UNSIGNED_CHAR_MAX) 
-    out = VTK_UNSIGNED_CHAR_MAX; 
-  else 
-    out = unsigned char(val);
- }
-
-inline void vtkVolumeResample::clip(double val, unsigned short& out)
-{
-  if (val < VTK_UNSIGNED_SHORT_MIN)
-    out = VTK_UNSIGNED_SHORT_MIN;
-  else if (val > VTK_UNSIGNED_SHORT_MAX)
-    out = VTK_UNSIGNED_SHORT_MAX;
-  else
-    out = unsigned short(val);
-}
 
 #endif
 

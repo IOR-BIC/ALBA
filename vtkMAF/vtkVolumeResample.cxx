@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkVolumeResample.cxx,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:53:10 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-22 11:08:57 $
+  Version:   $Revision: 1.2 $
 
 =========================================================================*/
 #include "vtkObjectFactory.h"
@@ -21,8 +21,19 @@
 
 #include "assert.h"
 
-vtkCxxRevisionMacro(vtkVolumeResample, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkVolumeResample, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkVolumeResample);
+
+typedef unsigned short u_short;
+typedef unsigned char u_char;
+typedef unsigned int u_int;
+
+inline void clip(float val, float& out) { out = val; }
+inline void clip(float val, char&  out) { int x = float(VTK_CHAR_MAX) * (val - 0.5f); if (x < VTK_CHAR_MIN) out = VTK_CHAR_MIN; else if (x > VTK_CHAR_MAX) out = VTK_CHAR_MAX; else out = char(x); }
+inline void clip(float val, short& out) { int x = float(VTK_SHORT_MAX) * (val - 0.5f);; if (x < VTK_SHORT_MIN) out = VTK_SHORT_MIN; else if (x > VTK_SHORT_MAX) out = VTK_SHORT_MAX; else out = short(x); }
+inline void clip(float val, u_char &  out) { int x = VTK_UNSIGNED_CHAR_MAX * val; if (x < VTK_UNSIGNED_CHAR_MIN) out = VTK_UNSIGNED_CHAR_MIN; else if (x > VTK_UNSIGNED_CHAR_MAX) out = VTK_UNSIGNED_CHAR_MAX; else out = u_char(x); }
+inline void clip(float val, u_short & out) { int x = VTK_UNSIGNED_SHORT_MAX * val; if (x < VTK_UNSIGNED_SHORT_MIN) out = VTK_UNSIGNED_SHORT_MIN; else if (x > VTK_UNSIGNED_SHORT_MAX) out = VTK_UNSIGNED_SHORT_MAX; else out = u_short(x); }
+
 
 #define min(x0, x1) (((x0) < (x1)) ? (x0) : (x1))
 #define max(x0, x1) (((x0) > (x1)) ? (x0) : (x1))
@@ -33,9 +44,9 @@ vtkStandardNewMacro(vtkVolumeResample);
 inline int mflVolumeResliceFloor(double x)
 {
 #if defined mips || defined sparc || defined __ppc__
-  return (int)((unsigned int)(x + 2147483648.0) - 2147483648U);
+  return (int)((u_int)(x + 2147483648.0) - 2147483648U);
 #elif defined i386 || defined _M_IX86
-  unsigned int hilo[2];
+  u_int hilo[2];
   *((double *)hilo) = x + 103079215104.0;  // (2**(52-16))*1.5
   return (int)((hilo[1]<<16)|(hilo[0]>>16));
 #else
@@ -237,7 +248,8 @@ void vtkVolumeResample::PrepareVolume() {
       vtkDataArray *coordinates = (axis == 2) ? gridData->GetZCoordinates() : (axis == 1 ? gridData->GetYCoordinates() : gridData->GetXCoordinates());
       const double spacing = *(coordinates->GetTuple(1)) - *(coordinates->GetTuple(0));
       const double blockSpacingThreshold = 0.01f * spacing + 0.001f;
-      for (int i = 0; i < this->DataDimensions[axis]; i++) {
+      int i;
+      for (i = 0; i < this->DataDimensions[axis]; i++) {
         this->VoxelCoordinates[axis][i] = *(coordinates->GetTuple(i));
         if (i > 0 && fabs(this->VoxelCoordinates[axis][i] - this->VoxelCoordinates[axis][i - 1] - spacing) > blockSpacingThreshold) {
           // try to correct the coordinates
@@ -264,7 +276,7 @@ void vtkVolumeResample::PrepareVolume() {
   this->SamplingTableMultiplier[2] = SamplingTableSize / (this->DataBounds[2][1] - this->DataBounds[2][0]);
 
   this->PreprocessingTime.Modified();
-  }
+}
 
 
 //----------------------------------------------------------------------------
@@ -295,13 +307,13 @@ void vtkVolumeResample::ExecuteData(vtkImageData *outputObject)
           this->CreateImage((const char*)inputPointer, (char*)outputPointer, outputObject);
           break;
         case VTK_UNSIGNED_CHAR:
-          this->CreateImage((const char*)inputPointer, (unsigned char*)outputPointer, outputObject);
+          this->CreateImage((const char*)inputPointer, (u_char*)outputPointer, outputObject);
           break;
         case VTK_SHORT:
           this->CreateImage((const char*)inputPointer, (short*)outputPointer, outputObject);
           break;
         case VTK_UNSIGNED_SHORT:
-          this->CreateImage((const char*)inputPointer, (unsigned short*)outputPointer, outputObject);
+          this->CreateImage((const char*)inputPointer, (u_short*)outputPointer, outputObject);
           break;
         case VTK_FLOAT:
           this->CreateImage((const char*)inputPointer, (float*)outputPointer, outputObject);
@@ -314,19 +326,19 @@ void vtkVolumeResample::ExecuteData(vtkImageData *outputObject)
     case VTK_UNSIGNED_CHAR: //------------------------------------
       switch (outputObject->GetPointData()->GetScalars()->GetDataType()) {
         case VTK_CHAR:
-          this->CreateImage((const unsigned char*)inputPointer, (char*)outputPointer, outputObject);
+          this->CreateImage((const u_char*)inputPointer, (char*)outputPointer, outputObject);
           break;
         case VTK_UNSIGNED_CHAR:
-          this->CreateImage((const unsigned char*)inputPointer, (unsigned char*)outputPointer, outputObject);
+          this->CreateImage((const u_char*)inputPointer, (u_char*)outputPointer, outputObject);
           break;
         case VTK_SHORT:
-          this->CreateImage((const unsigned char*)inputPointer, (short*)outputPointer, outputObject);
+          this->CreateImage((const u_char*)inputPointer, (short*)outputPointer, outputObject);
           break;
         case VTK_UNSIGNED_SHORT:
-          this->CreateImage((const unsigned char*)inputPointer, (unsigned short*)outputPointer, outputObject);
+          this->CreateImage((const u_char*)inputPointer, (u_short*)outputPointer, outputObject);
           break;
         case VTK_FLOAT:
-          this->CreateImage((const unsigned char*)inputPointer, (float*)outputPointer, outputObject);
+          this->CreateImage((const u_char*)inputPointer, (float*)outputPointer, outputObject);
           break;
         default:
           vtkErrorMacro(<< "vtkVolumeResample: Scalar type is not supported");
@@ -339,13 +351,13 @@ void vtkVolumeResample::ExecuteData(vtkImageData *outputObject)
           this->CreateImage((const short*)inputPointer, (char*)outputPointer, outputObject);
           break;
         case VTK_UNSIGNED_CHAR:
-          this->CreateImage((const short*)inputPointer, (unsigned char*)outputPointer, outputObject);
+          this->CreateImage((const short*)inputPointer, (u_char*)outputPointer, outputObject);
           break;
         case VTK_SHORT:
           this->CreateImage((const short*)inputPointer, (short*)outputPointer, outputObject);
           break;
         case VTK_UNSIGNED_SHORT:
-          this->CreateImage((const short*)inputPointer, (unsigned short*)outputPointer, outputObject);
+          this->CreateImage((const short*)inputPointer, (u_short*)outputPointer, outputObject);
           break;
         case VTK_FLOAT:
           this->CreateImage((const short*)inputPointer, (float*)outputPointer, outputObject);
@@ -359,19 +371,19 @@ void vtkVolumeResample::ExecuteData(vtkImageData *outputObject)
       switch (outputObject->GetPointData()->GetScalars()->GetDataType()) 
       {
         case VTK_CHAR:
-          this->CreateImage((const unsigned short*)inputPointer, (char*)outputPointer, outputObject);
+          this->CreateImage((const u_short*)inputPointer, (char*)outputPointer, outputObject);
           break;
         case VTK_UNSIGNED_CHAR:
-          this->CreateImage((const unsigned short*)inputPointer, (unsigned char*)outputPointer, outputObject);
+          this->CreateImage((const u_short*)inputPointer, (u_char*)outputPointer, outputObject);
           break;
         case VTK_SHORT:
-          this->CreateImage((const unsigned short*)inputPointer, (short*)outputPointer, outputObject);
+          this->CreateImage((const u_short*)inputPointer, (short*)outputPointer, outputObject);
           break;
         case VTK_UNSIGNED_SHORT:
-          this->CreateImage((const unsigned short*)inputPointer, (unsigned short*)outputPointer, outputObject);
+          this->CreateImage((const u_short*)inputPointer, (u_short*)outputPointer, outputObject);
           break;
         case VTK_FLOAT:
-          this->CreateImage((const unsigned short*)inputPointer, (float*)outputPointer, outputObject);
+          this->CreateImage((const u_short*)inputPointer, (float*)outputPointer, outputObject);
           break;
         default:
           vtkErrorMacro(<< "vtkVolumeResample: Scalar type is not supported");
@@ -385,13 +397,13 @@ void vtkVolumeResample::ExecuteData(vtkImageData *outputObject)
           this->CreateImage((const float*)inputPointer, (char*)outputPointer, outputObject);
           break;
         case VTK_UNSIGNED_CHAR:
-          this->CreateImage((const float*)inputPointer, (unsigned char*)outputPointer, outputObject);
+          this->CreateImage((const float*)inputPointer, (u_char*)outputPointer, outputObject);
           break;
         case VTK_SHORT:
           this->CreateImage((const float*)inputPointer, (short*)outputPointer, outputObject);
           break;
         case VTK_UNSIGNED_SHORT:
-          this->CreateImage((const float*)inputPointer, (unsigned short*)outputPointer, outputObject);
+          this->CreateImage((const float*)inputPointer, (u_short*)outputPointer, outputObject);
           break;
         case VTK_FLOAT:
           this->CreateImage((const float*)inputPointer, (float*)outputPointer, outputObject);
@@ -490,9 +502,9 @@ template<typename InputDataType, typename OutputDataType> void vtkVolumeResample
       for (int xi = 0; xi < xs; xi++, p[0] += xaxis[0], p[1] += xaxis[1], p[2] += xaxis[2], pixel += di/*, this->Num++*/) 
       {
         // find index
-        //const unsigned int pi[3] = { unsigned int(p[0]), unsigned int(p[1]), unsigned int(p[2])};
-        const unsigned int pi[3] = { mflVolumeResliceFloor(p[0]), mflVolumeResliceFloor(p[1]), mflVolumeResliceFloor(p[2])};
-        //const unsigned int pi[3] = { mflVolumeResliceRound(p[0]), mflVolumeResliceRound(p[1]), mflVolumeResliceRound(p[2])};
+        //const u_int pi[3] = { u_int(p[0]), u_int(p[1]), u_int(p[2])};
+        const u_int pi[3] = { mflVolumeResliceFloor(p[0]), mflVolumeResliceFloor(p[1]), mflVolumeResliceFloor(p[2])};
+        //const u_int pi[3] = { mflVolumeResliceRound(p[0]), mflVolumeResliceRound(p[1]), mflVolumeResliceRound(p[2])};
 
         if (pi[0] >= SamplingTableSize || pi[1] >= SamplingTableSize || pi[2] >= SamplingTableSize)
         {
@@ -532,7 +544,7 @@ template<typename InputDataType, typename OutputDataType> void vtkVolumeResample
           }
         }
         // mapping
-        this->clip(((sample + shift) * scale), *pixel);
+        clip(((sample + shift) * scale), *pixel);
         //myDBG(NULL,index);
         for (int i = 1; i < di; i++)
           pixel[i] = *pixel;

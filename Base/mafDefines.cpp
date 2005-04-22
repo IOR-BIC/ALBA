@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 07:39:51 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-04-22 11:07:39 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -13,7 +13,7 @@
 #include "mafMutexLock.h"
 
 #include "wx/string.h"
-#include "mafIncludeWin32.h"
+#include "mafIncludeWIN32.h"
 
 #include <stdio.h>
 #include <math.h>

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 16:37:43 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-22 11:07:58 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -11,14 +11,6 @@
 =========================================================================*/
 #ifndef __mafPipe_H__
 #define __mafPipe_H__
-
-#ifdef __GNUG__
-    #pragma interface "mafPipe.cpp"
-#endif
-
-#ifndef WX_PRECOMP
-    #include "wx/wx.h"
-#endif
 
 //----------------------------------------------------------------------------
 // forward references :
