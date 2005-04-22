@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkVolumeSlicer.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:53:10 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-22 16:20:03 $
+  Version:   $Revision: 1.3 $
   Authors:   Alexander Savenko
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -82,13 +82,13 @@ public:
 
   /**
   Specify x-axis of the plane*/
-  void SetPlaneAxisX(double axis[3]);
-  vtkGetVectorMacro(PlaneAxisX, double, 3);
+  void SetPlaneAxisX(float axis[3]);
+  vtkGetVectorMacro(PlaneAxisX, float, 3);
 
   /**
   Specify x-axis of the plane*/
-  void SetPlaneAxisY(double axis[3]);
-  vtkGetVectorMacro(PlaneAxisY, double, 3);
+  void SetPlaneAxisY(float axis[3]);
+  vtkGetVectorMacro(PlaneAxisY, float, 3);
 
   /**
   Set / Get the Window for color modulation. The formula for modulation is 
@@ -130,16 +130,16 @@ protected:
   void ComputeInputUpdateExtents(vtkDataObject *output);
 
   void PrepareVolume();
-  void CalculateTextureCoordinates(const double point[3], const int size[2], const double spacing[2], double ts[2]);
+  void CalculateTextureCoordinates(const float point[3], const int size[2], const double spacing[2], float ts[2]);
 
   template<typename InputDataType, typename OutputDataType> void CreateImage(const InputDataType *input, OutputDataType *output, vtkImageData *outputObject);
 
 	int   NumComponents;
   // plane coordinates
   double PlaneOrigin[3];
-  double PlaneAxisX[3];
-  double PlaneAxisY[3];
-  double PlaneAxisZ[3];
+  float PlaneAxisX[3];
+  float PlaneAxisY[3];
+  float PlaneAxisZ[3];
 
   // color mapping
   double Window;
@@ -150,7 +150,7 @@ protected:
   // look-up tables and caches
   vtkTimeStamp PreprocessingTime;
 
-  double*       VoxelCoordinates[3];
+  float*       VoxelCoordinates[3];
   double       DataOrigin[3];
   double        DataBounds[3][2];
   int          DataDimensions[3];

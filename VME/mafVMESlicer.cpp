@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 22:03:41 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-22 16:20:26 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -52,7 +52,7 @@ mafVMESlicer::mafVMESlicer()
   mafDataPipeCustom *dpipe=mafDataPipeCustom::New();
   SetDataPipe(dpipe);
 
-  m_TextureRes = 128;
+  m_TextureRes = 256;
   m_Xspc = m_Yspc = 0.3;
 
   //vtkMAFSmartPointer<vtkImageData> image_data;
@@ -158,7 +158,8 @@ void mafVMESlicer::InternalPreUpdate()
   {
     if (vtkDataSet *vtkdata=vol->GetOutput()->GetVTKData())
     {
-      double pos[3],vectX[3],vectY[3], n[3];
+      double pos[3];
+      float vectX[3],vectY[3], n[3];
 
       mafTransform trans;
       trans.SetMatrix(*(GetOutput()->GetMatrix()));
