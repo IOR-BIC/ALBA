@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-20 10:52:05 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-22 12:27:55 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -56,7 +56,7 @@
 #include "vtkMatrix4x4.h"
 #include "vtkRendererCollection.h"
 #include "vtkLight.h"
-#include "vtkWindowToImageFilter.h"
+//#include "vtkWindowToImageFilter.h"
 #include "vtkBMPWriter.h"
 #include "vtkImageData.h"
 
@@ -535,6 +535,7 @@ void mafRWIBase::OnSize(wxSizeEvent &event)
 wxBitmap *mafRWIBase::GetImage()
 //----------------------------------------------------------------------------
 {
+/* @@@
 	int dim[3];
 
 	vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
@@ -547,16 +548,19 @@ wxBitmap *mafRWIBase::GetImage()
   delete img;
   w2i->Delete();
 	return bmp;
+	*/
+return NULL;
 }
 //----------------------------------------------------------------------------
 void mafRWIBase::SaveImage(wxString view_name, int magnification)
 //---------------------------------------------------------------------------
 {
+/* @@@
 	wxString wildc = "Bitmap Image (*.bmp)|*.bmp";
-  wxString name = wxString::Format("%s\\%sSnapshot", m_save_dir,view_name);
+  wxString name = wxString::Format("%s\\%sSnapshot", m_save_dir.c_str(),view_name.c_str());
 	wxString file = name + ".bmp";
   int i=1;
-  while(::wxFileExists(file) && i<100 ) file = wxString::Format("%s%d.bmp",name, i++);
+  while(::wxFileExists(file) && i<100 ) file = wxString::Format("%s%d.bmp",name.c_str(), i++);
 	
 	wxString filename = mafGetSaveFile(file,wildc).c_str(); 
 	if(filename == "") return;
@@ -581,6 +585,7 @@ void mafRWIBase::SaveImage(wxString view_name, int magnification)
 	w2i->Delete();
 	w->Delete();
 	::wxEndBusyCursor();
+@@@ */
 }
 //----------------------------------------------------------------------------
 vtkCamera* mafRWIBase::GetCamera()
