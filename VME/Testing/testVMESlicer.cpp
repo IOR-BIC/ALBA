@@ -95,7 +95,7 @@ int main()
   volBounds.GetCenter(center);
 
   trans.SetPosition(center);
-  trans.SetOrientation(5,5,0);
+  //trans.SetOrientation(5,5,0);
 
   vslicer->SetMatrix(trans.GetMatrix());
 
@@ -109,16 +109,16 @@ int main()
   int steps=50;
   for (t = 0; t < steps; t++) 
   {
-    trans.SetPosition(center[0],center[1],(volBounds.m_Bounds[5]-volBounds.m_Bounds[4])/(double)steps*t);
+    trans.SetPosition(center[0],center[1],(volBounds.m_Bounds[5]-volBounds.m_Bounds[4])/(double)steps*t+volBounds.m_Bounds[4]);
     vslicer->SetMatrix(trans.GetMatrix());
   
-    //renderer->GetActiveCamera()->Azimuth(-(180.0/steps));
+    renderer->GetActiveCamera()->Azimuth(-(180.0/steps));
     //renderer->ResetCameraClippingRange();
     renWin->Render();
 
-    //double srange[2];
-    //vslicer->GetSurfaceOutput()->GetTexture()->GetScalarRange(srange);
-    //cerr<<"bounds=["<<srange[0]<<" , "<<srange[1]<<"]\n";
+    double srange[2];
+    vslicer->GetSurfaceOutput()->GetTexture()->GetScalarRange(srange);
+    cerr<<"bounds=["<<srange[0]<<" , "<<srange[1]<<"]\n";
 
     //mafString filename="slice_";
     //filename<<t;
