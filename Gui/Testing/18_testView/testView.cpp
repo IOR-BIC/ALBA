@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testView.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 20:03:09 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-23 10:44:23 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -59,12 +59,26 @@ void testView::VmeCreatePipe(mafNode *vme)
   assert(vme->IsA("mafVME"));
   mafVME *v = ((mafVME*)vme);
 
-  assert( v->GetVisualPipe() != "" );
-  
+  mafObject *obj= NULL;
+  mafString pipe_name = "";
+  mafString vme_type = "mafVMESurface"; // Paolo 2005-04-23 Just to try PlugVisualPipe 
+                                        // (to be replaced with something that extract the type of the vme)
+
   mafPipeFactory *pipe_factory  = mafPipeFactory::GetInstance();
   assert(pipe_factory!=NULL);
-  mafObject *obj = pipe_factory->CreateInstance(v->GetVisualPipe());
-  assert(obj);
+  if (!m_PipeMap.empty() && (m_PipeMap[vme_type].m_Visibility == NODE_VISIBLE_ON))  // Paolo 2005-04-23
+  {
+    // keep the visual pipe from the view's visual pipe map
+    obj = pipe_factory->CreateInstance(m_PipeMap[vme_type].m_PipeName);
+  }
+  else
+  {
+    // keep the default visual pipe from the vme
+    pipe_name = v->GetVisualPipe();
+    assert( pipe_name != "" );
+    obj = pipe_factory->CreateInstance(pipe_name);
+    assert(obj);
+  }
   mafPipe *pipe = (mafPipe*)obj;
   
   pipe->Create(n);
