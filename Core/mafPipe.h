@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 20:01:05 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-23 09:49:33 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,6 +24,7 @@ class mafSceneGraph;
 class vtkMAFAssembly;
 class vtkRenderer;
 class mmgGui;
+
 //----------------------------------------------------------------------------
 // mafPipe :
 //----------------------------------------------------------------------------
@@ -76,31 +77,5 @@ protected:
   subclass to continue the ID enumeration from it. For appending the widgets in the
   same pannel GUI, each CreateGUI() function should first call the superclass' one.*/
   virtual mmgGui  *CreateGui();
-
 };
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

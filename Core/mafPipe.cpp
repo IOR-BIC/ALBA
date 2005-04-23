@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 20:01:05 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-23 09:49:32 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
