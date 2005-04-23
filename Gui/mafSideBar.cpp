@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-23 09:14:53 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-04-23 09:48:38 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,64 +34,64 @@
 mafSideBar::mafSideBar(wxWindow* parent, int id, mafEventListener *Listener)
 //----------------------------------------------------------------------------
 {
-  m_selected_vme =NULL;
-  m_selected_view =NULL;
+  m_SelectedVme =NULL;
+  m_SelectedView =NULL;
   
-	m_notebook = new wxNotebook(parent,-1);
-  //m_notebook->SetSize();
+	m_Notebook = new wxNotebook(parent,-1);
+  //m_Notebook->SetSize();
 
   //splitted panel  
-  mmgSplittedPanel *sp = new mmgSplittedPanel(m_notebook,-1,200);  //SIL. 29-4-2003 - 200 is the height of the vme_property panel
-  m_notebook->AddPage(sp,"vme manager",true);
+  mmgSplittedPanel *sp = new mmgSplittedPanel(m_Notebook,-1,200);  //SIL. 29-4-2003 - 200 is the height of the vme_property panel
+  m_Notebook->AddPage(sp,"vme manager",true);
 
   //tree ----------------------------
-  m_tree = new mmgCheckTree(sp,-1,true);
-  m_tree->SetListener(Listener);
-  m_tree->SetTitle(" vme hierarchy: ");
-  sp->PutOnTop(m_tree);
+  m_Tree = new mmgCheckTree(sp,-1,true);
+  m_Tree->SetListener(Listener);
+  m_Tree->SetTitle(" vme hierarchy: ");
+  sp->PutOnTop(m_Tree);
   
   //vme_panel  //SIL. 22-4-2005: refactored
   mmgNamedPanel *vme_np = new mmgNamedPanel(sp,-1);
   vme_np->SetTitle("Selected Vme Property");
   wxNotebook *vme_notebook = new wxNotebook(vme_np,-1);
-  m_vme_panel = new mmgGuiHolder(vme_notebook,-1,false,true);
-  vme_notebook->AddPage(m_vme_panel," vme object ");
-  m_vme_output_panel = new mmgGuiHolder(vme_notebook,-1,false,true);
-  vme_notebook->AddPage(m_vme_output_panel," vme output ");
-  m_vme_pipe_panel = new mmgGuiHolder(vme_notebook,-1,false,true);
-  vme_notebook->AddPage(m_vme_pipe_panel," vme pipe ");
+  m_VmePanel = new mmgGuiHolder(vme_notebook,-1,false,true);
+  vme_notebook->AddPage(m_VmePanel," vme object ");
+  m_VmeOutputPanel = new mmgGuiHolder(vme_notebook,-1,false,true);
+  vme_notebook->AddPage(m_VmeOutputPanel," vme output ");
+  m_VmePipePanel = new mmgGuiHolder(vme_notebook,-1,false,true);
+  vme_notebook->AddPage(m_VmePipePanel," vme pipe ");
   vme_np->Add(vme_notebook,1,wxEXPAND);
   sp->PutOnBottom(vme_np);
 
   //view property panel
-	m_view_property_panel = new mmgGuiHolder(m_notebook,-1,true);
-  m_view_property_panel->SetTitle(" no view selected:");
-	m_notebook->AddPage(m_view_property_panel,"view settings");
+	m_ViewPropertyPanel = new mmgGuiHolder(m_Notebook,-1,true);
+  m_ViewPropertyPanel->SetTitle(" no view selected:");
+	m_Notebook->AddPage(m_ViewPropertyPanel,"view settings");
 	
 	//op_panel ----------------------------
-  m_op_panel  = new mmgPanelStack(m_notebook ,-1);
-	mmgNamedPanel *empty_op = new mmgNamedPanel(m_op_panel ,-1,true);
+  m_OpPanel  = new mmgPanelStack(m_Notebook ,-1);
+	mmgNamedPanel *empty_op = new mmgNamedPanel(m_OpPanel ,-1,true);
   empty_op->SetTitle(" no operation running:");
-  m_op_panel->Push(empty_op);
-	m_notebook->AddPage(m_op_panel ," op. parameters");
+  m_OpPanel->Push(empty_op);
+	m_Notebook->AddPage(m_OpPanel ," op. parameters");
 
-  //m_side_bar->Put(m_notebook);
+  //m_side_bar->Put(m_Notebook);
 }
 //----------------------------------------------------------------------------
 mafSideBar::~mafSideBar() 
 //----------------------------------------------------------------------------
 {
-	cppDEL(m_notebook);
+	cppDEL(m_Notebook);
 }
 //----------------------------------------------------------------------------
 void mafSideBar::OpShowGui(bool push_gui, mmgPanel *panel)
 //----------------------------------------------------------------------------
 {
-	m_notebook->Show(true);
+	m_Notebook->Show(true);
 	if(push_gui)
 	{
-		m_notebook->SetSelection(2);
-		m_op_panel->Push(panel);
+		m_Notebook->SetSelection(2);
+		m_OpPanel->Push(panel);
 	}
 }
 //----------------------------------------------------------------------------
@@ -100,98 +100,98 @@ void mafSideBar::OpHideGui(bool view_closed)
 {
 	if(view_closed)
 	{
-		this->m_notebook->SetSelection(0);
-		this->m_view_property_panel->Remove();
-		this->m_view_property_panel->SetTitle("");
+		this->m_Notebook->SetSelection(0);
+		this->m_ViewPropertyPanel->Remove();
+		this->m_ViewPropertyPanel->SetTitle("");
 	}
 	else
 	{
-		m_op_panel->Pop();
-		m_notebook->SetSelection(0);
+		m_OpPanel->Pop();
+		m_Notebook->SetSelection(0);
 	}
 }
 //----------------------------------------------------------------------------
 void mafSideBar::ViewSelect(mafView *view)
 //----------------------------------------------------------------------------
 {
-	m_tree->ViewSelected(view);
+	m_Tree->ViewSelected(view);
 	if(view)
 	{
 		wxString s = " ";
 		s += wxStripMenuCodes(view->GetLabel());
 		s += " view:";
-		m_view_property_panel->SetTitle(s);
+		m_ViewPropertyPanel->SetTitle(s);
 		mmgGui *gui = view->GetGui();
 		if(gui) 
-			m_view_property_panel->Put(gui);
+			m_ViewPropertyPanel->Put(gui);
 		else
-			m_view_property_panel->Remove();
+			m_ViewPropertyPanel->Remove();
 	}
 	else
 	{
-		m_view_property_panel->SetTitle("");
-		m_view_property_panel->Remove();
+		m_ViewPropertyPanel->SetTitle("");
+		m_ViewPropertyPanel->Remove();
 	}
-  m_selected_view = view;
+  m_SelectedView = view;
   UpdateVmePanel();
 }
 //----------------------------------------------------------------------------
 void mafSideBar::ViewDeleted(mafView *view)
 //----------------------------------------------------------------------------
 {
-	m_tree->ViewDeleted(view);
-  m_selected_view = NULL; // Paolo 2005-04-23 m_selected_view is initialized in ViewSelect
+	m_Tree->ViewDeleted(view);
+  m_SelectedView = NULL; // Paolo 2005-04-23 m_SelectedView is initialized in ViewSelect
 }
 //----------------------------------------------------------------------------
 void mafSideBar::EnableSelect(bool enable)
 //----------------------------------------------------------------------------
 {
-	m_tree->EnableSelect(enable);
+	m_Tree->EnableSelect(enable);
 }
 //----------------------------------------------------------------------------
 void mafSideBar::VmeAdd(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-	m_tree->VmeAdd(vme);
+	m_Tree->VmeAdd(vme);
 }
 //----------------------------------------------------------------------------
 void mafSideBar::VmeRemove(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-	m_tree->VmeRemove(vme);
+	m_Tree->VmeRemove(vme);
 }
 //----------------------------------------------------------------------------
 void mafSideBar::VmeModified(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-	m_tree->VmeModified(vme);
+	m_Tree->VmeModified(vme);
 }
 //----------------------------------------------------------------------------
 void mafSideBar::VmeShow(mafNode *vme, bool visibility)
 //----------------------------------------------------------------------------
 {
-	m_tree->VmeShow(vme,visibility);
+	m_Tree->VmeShow(vme,visibility);
   UpdateVmePanel();
 }
 //----------------------------------------------------------------------------
 void mafSideBar::VmeSelected(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-  m_selected_vme = vme;
-  m_tree->VmeSelected(vme);
+  m_SelectedVme = vme;
+  m_Tree->VmeSelected(vme);
   UpdateVmePanel();
 }
 //----------------------------------------------------------------------------
 void mafSideBar::VmePropertyRemove(mmgGui *gui)
 //----------------------------------------------------------------------------
 {
-	m_vme_panel->Remove(gui);
+	m_VmePanel->Remove(gui);
 }
 //----------------------------------------------------------------------------
 void mafSideBar::Show()
 //----------------------------------------------------------------------------
 {
-	m_notebook->Show(!m_notebook->IsShown());
+	m_Notebook->Show(!m_Notebook->IsShown());
 }
 //----------------------------------------------------------------------------
 void mafSideBar::UpdateVmePanel()
@@ -210,21 +210,21 @@ void mafSideBar::UpdateVmePanel()
   mmgGui       *vme_out_gui = NULL;
   mmgGui       *vme_pipe_gui = NULL;
 
-  if(m_selected_vme)
+  if(m_SelectedVme)
   {
-    vme_gui = m_selected_vme->GetGui();
+    vme_gui = m_SelectedVme->GetGui();
 
-    if(m_selected_vme->IsA("mafVME"))
+    if(m_SelectedVme->IsA("mafVME"))
     {
-      mafVME *v = (mafVME*) m_selected_vme;
+      mafVME *v = (mafVME*) m_SelectedVme;
       vme_out = v->GetOutput();
       if(vme_out)
         vme_out_gui = vme_out->GetGui();
     }
 
-    if(m_selected_view)
+    if(m_SelectedView)
     {
-      vme_pipe = m_selected_view->GetNodePipe(m_selected_vme);
+      vme_pipe = m_SelectedView->GetNodePipe(m_SelectedVme);
       if(vme_pipe)
         vme_pipe_gui = vme_pipe->GetGui();
     }
@@ -233,7 +233,7 @@ void mafSideBar::UpdateVmePanel()
   // vme_gui changed 
   if( vme_gui != last_vme_gui ) 
   {
-    m_vme_panel->Put(vme_gui);
+    m_VmePanel->Put(vme_gui);
     
     //if(last_vme_gui && last_vme)
        //last_vme->DeleteGui(); // - what if last_vme was destroyed ?
@@ -242,7 +242,7 @@ void mafSideBar::UpdateVmePanel()
   // vme_out changed 
   if( vme_out_gui != last_vme_out_gui ) 
   {
-    m_vme_output_panel->Put(vme_out_gui);
+    m_VmeOutputPanel->Put(vme_out_gui);
 
     //if(last_vme_out_gui && last_vme_out)
       // last_vme_out->DeleteGui(); // - what if last_vme_out was destroyed ?
@@ -251,13 +251,13 @@ void mafSideBar::UpdateVmePanel()
   // vme_pipe changed 
   if( vme_pipe_gui != last_vme_pipe_gui ) 
   {
-    m_vme_pipe_panel->Put(vme_pipe_gui);
+    m_VmePipePanel->Put(vme_pipe_gui);
 
     //if(last_vme_pipe_gui && last_vme_pipe)
       // last_vme_pipe->DeleteGui(); // - what if last_vme_pipe was destroyed ?
   }
 
-  //last_vme = m_selected_vme;
+  //last_vme = m_SelectedVme;
   //last_vme_out = vme_out;
   //last_vme_pipe = vme_pipe;
   last_vme_gui = vme_gui;

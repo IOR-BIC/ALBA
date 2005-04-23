@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 20:02:38 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-23 09:48:38 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -88,24 +88,24 @@ public:
 
 	// Description:
 	// Return the pointer to the tree.
-	mmgCheckTree *GetTree() {return m_tree;};
+	mmgCheckTree *GetTree() {return m_Tree;};
 
-  bool IsShown() {return m_notebook->IsShown();};
-  void Show( bool show) {m_notebook->Show(show);};
+  bool IsShown() {return m_Notebook->IsShown();};
+  void Show( bool show) {m_Notebook->Show(show);};
 
-  wxNotebook        *m_notebook;
+  wxNotebook        *m_Notebook;
 protected:
   void UpdateVmePanel();  
 
-  mmgPanelStack			*m_op_panel;
-	mmgGuiHolder			*m_view_property_panel;
-  mmgCheckTree      *m_tree;
+  mmgPanelStack			*m_OpPanel;
+	mmgGuiHolder			*m_ViewPropertyPanel;
+  mmgCheckTree      *m_Tree;
 
-  mmgGuiHolder      *m_vme_panel;
-  mmgGuiHolder      *m_vme_output_panel;
-  mmgGuiHolder      *m_vme_pipe_panel;
+  mmgGuiHolder      *m_VmePanel;
+  mmgGuiHolder      *m_VmeOutputPanel;
+  mmgGuiHolder      *m_VmePipePanel;
 
-  mafNode *m_selected_vme;
-  mafView *m_selected_view;
+  mafNode *m_SelectedVme;
+  mafView *m_SelectedView;
 };
 #endif

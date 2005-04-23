@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-13 13:09:01 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-23 09:48:51 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -77,7 +77,7 @@ public:
   /** Main initalization.*/
   virtual void Init(int argc, char **argv) {};
 	/** Returns the pointer to the main panel of the application.*/
-	virtual mmgMDIFrame *GetTopWin()						{return m_win;};
+	virtual mmgMDIFrame *GetTopWin()						{return m_Win;};
 	/** Sets the icon for the application.*/
 	//virtual void SetAppIcon(char **icon)				{m_AppIcon = icon;};
 	/** Sets icon for the child windows.*/
@@ -121,18 +121,18 @@ protected:
   /** Enable/disable a Toolbar or Menu Item */
   void EnableItem(int item, bool enable);
 
-  mmgMDIFrame       *m_win;
-  wxToolBar         *m_toolbar;
-  mmgSashPanel      *m_log_sash;
-  mmgSashPanel      *m_time_sash;
-  mmgSashPanel			*m_side_sash;
-  wxMenuBar         *m_menu_bar;
-	wxString					 m_last_selected_panel;
-  mmgTimeBar        *m_time_panel;
+  mmgMDIFrame       *m_Win;
+  wxToolBar         *m_TooBar;
+  mmgSashPanel      *m_LogSash;
+  mmgSashPanel      *m_TimeSash;
+  mmgSashPanel			*m_SideSash;
+  wxMenuBar         *m_MenuBar;
+	wxString					 m_LastSelectedPanel;
+  mmgTimeBar        *m_TimePanel;
 	wxString					 m_AppTitle;
-	bool               m_log_to_file;
-	bool               m_log_all_events;
-  mafWXLog          *m_logger;
+	bool               m_LogToFile;
+	bool               m_LogAllEvents;
+  mafWXLog          *m_Logger;
 
 	bool m_PlugMenu;
 	bool m_PlugToolbar;

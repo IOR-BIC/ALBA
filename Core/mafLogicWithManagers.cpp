@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 16:37:42 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-23 09:48:51 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,16 +36,16 @@ mafLogicWithManagers::mafLogicWithManagers()
 : mafLogicWithGUI()
 //----------------------------------------------------------------------------
 {
-  m_side_bar      = NULL;
+  m_SideBar      = NULL;
   m_VMEManager   = false;
   m_ViewManager   = false;
   m_OpManager     = false;
 
-  m_import_menu; 
-  m_export_menu; 
-  m_recentFile_menu;
-  m_op_menu;
-  m_view_menu; 
+  m_ImportMenu; 
+  m_ExportMenu; 
+  m_RecentFileMenu;
+  m_OpMenu;
+  m_ViewMenu; 
 }
 //----------------------------------------------------------------------------
 mafLogicWithManagers::~mafLogicWithManagers( ) 
@@ -59,10 +59,10 @@ void mafLogicWithManagers::Configure()
 {
   mafLogicWithGUI::Configure(); // create the GUI - and calls CreateMenu
 
-  if(m_side_sash)
+  if(m_SideSash)
   {
-    m_side_bar = new mafSideBar(m_side_sash,-1,this);
-    m_side_sash->Put(m_side_bar->m_notebook);
+    m_SideBar = new mafSideBar(m_SideSash,-1,this);
+    m_SideSash->Put(m_SideBar->m_Notebook);
   }
 
   if(m_UseVMEManager)
@@ -97,20 +97,20 @@ void mafLogicWithManagers::Plug(mafOp *op)
 void mafLogicWithManagers::Show()
 //----------------------------------------------------------------------------
 {
-  if(m_VMEManager && m_recentFile_menu)
-    m_VMEManager->SetFileHistoryMenu(m_recentFile_menu);
+  if(m_VMEManager && m_RecentFileMenu)
+    m_VMEManager->SetFileHistoryMenu(m_RecentFileMenu);
 
-  if(m_UseViewManager && m_view_menu)
-    m_ViewManager->FillMenu(m_view_menu);
+  if(m_UseViewManager && m_ViewMenu)
+    m_ViewManager->FillMenu(m_ViewMenu);
 
   if(m_OpManager )
   {
-    if(m_menu_bar && m_import_menu && m_op_menu && m_export_menu) 
+    if(m_MenuBar && m_ImportMenu && m_OpMenu && m_ExportMenu) 
     {
-      m_OpManager->FillMenu(m_import_menu,m_export_menu,m_op_menu);
-      m_OpManager->SetMenubar(m_menu_bar);
+      m_OpManager->FillMenu(m_ImportMenu,m_ExportMenu,m_OpMenu);
+      m_OpManager->SetMenubar(m_MenuBar);
     }
-    if(m_toolbar)  m_OpManager->SetToolbar(m_toolbar);
+    if(m_TooBar)  m_OpManager->SetToolbar(m_TooBar);
   }
 
   mafLogicWithGUI::Show();
@@ -140,7 +140,7 @@ void mafLogicWithManagers::Init(int argc, char **argv)
 void mafLogicWithManagers::CreateMenu()
 //----------------------------------------------------------------------------
 {
-  m_menu_bar  = new wxMenuBar;
+  m_MenuBar  = new wxMenuBar;
   wxMenu    *file_menu = new wxMenu;
   file_menu->Append(MENU_FILE_NEW,   "&New");
   file_menu->Append(MENU_FILE_OPEN,  "&Open ..");
@@ -151,19 +151,19 @@ void mafLogicWithManagers::CreateMenu()
   wxMenu *import_menu = NULL;
   wxMenu *export_menu = NULL;
 
-  m_import_menu = new wxMenu;
-  file_menu->Append(0,"Import",m_import_menu );
-  m_export_menu = new wxMenu;
-  file_menu->Append(0,"Export",m_export_menu);					
+  m_ImportMenu = new wxMenu;
+  file_menu->Append(0,"Import",m_ImportMenu );
+  m_ExportMenu = new wxMenu;
+  file_menu->Append(0,"Export",m_ExportMenu);					
   file_menu->AppendSeparator();
 
-  m_recentFile_menu = new wxMenu;
-  file_menu->Append(0,"Recent Files",m_recentFile_menu);
+  m_RecentFileMenu = new wxMenu;
+  file_menu->Append(0,"Recent Files",m_RecentFileMenu);
   //m_VmeManager->SetFileHistoryMenu(recentFile_menu);
 
   file_menu->AppendSeparator();
   file_menu->Append(MENU_FILE_QUIT,  "&Quit");
-  m_menu_bar->Append(file_menu, "&File");
+  m_MenuBar->Append(file_menu, "&File");
 
   wxMenu    *edit_menu = new wxMenu;
   edit_menu->Append(OP_UNDO,   "Undo  \tCtrl+Z");
@@ -173,18 +173,18 @@ void mafLogicWithManagers::CreateMenu()
   edit_menu->Append(OP_CUT,   "Cut   \tCtrl+Shift+X");
   edit_menu->Append(OP_COPY,  "Copy  \tCtrl+Shift+C");
   edit_menu->Append(OP_PASTE, "Paste \tCtrl+Shift+V");
-  m_menu_bar->Append(edit_menu, "&Edit");
+  m_MenuBar->Append(edit_menu, "&Edit");
 
-  m_view_menu = new wxMenu;
-  //m_ViewManager->FillMenu(m_view_menu);  
-  m_view_menu->AppendSeparator();
-  if(this->m_PlugToolbar) m_view_menu->Append(MENU_VIEW_TOOLBAR, "Toolbar","",true);
-  m_menu_bar->Append(m_view_menu, "&View");
+  m_ViewMenu = new wxMenu;
+  //m_ViewManager->FillMenu(m_ViewMenu);  
+  m_ViewMenu->AppendSeparator();
+  if(this->m_PlugToolbar) m_ViewMenu->Append(MENU_VIEW_TOOLBAR, "Toolbar","",true);
+  m_MenuBar->Append(m_ViewMenu, "&View");
 
-  m_op_menu = new wxMenu;
-  m_menu_bar->Append(m_op_menu, "&Operations");
+  m_OpMenu = new wxMenu;
+  m_MenuBar->Append(m_OpMenu, "&Operations");
 
-  m_win->SetMenuBar(m_menu_bar);
+  m_Win->SetMenuBar(m_MenuBar);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::UpdateFrameTitle()
@@ -192,7 +192,7 @@ void mafLogicWithManagers::UpdateFrameTitle()
 {
   wxString title(m_AppTitle);
   title += "   " + m_VMEManager->GetFileName();
-  m_win->SetTitle(title);
+  m_Win->SetTitle(title);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OnEvent(mafEvent& e)
@@ -282,7 +282,7 @@ void mafLogicWithManagers::OnEvent(mafEvent& e)
   break;
   case VIEW_DELETE:
     if(m_PlugSidebar)
-			this->m_side_bar->ViewDeleted(e.GetView());
+			this->m_SideBar->ViewDeleted(e.GetView());
   break;	
   case VIEW_SELECT:
 		ViewSelect();
@@ -319,7 +319,7 @@ void mafLogicWithManagers::OnFileNew()
 		  if(m_OpManager) m_OpManager->ClearUndoStack(); 
 	  }
   }
-	m_win->SetTitle(m_AppTitle);
+	m_Win->SetTitle(m_AppTitle);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OnFileOpen()
@@ -380,14 +380,14 @@ void mafLogicWithManagers::OnQuit()
           (
           "would you like to save your work before quitting ?",
           "Confirm", 
-          wxYES_NO|wxCANCEL|wxICON_QUESTION , m_win
+          wxYES_NO|wxCANCEL|wxICON_QUESTION , m_Win
           );
       if(answer == wxYES) m_VMEManager->MSFSave();
       quit = answer != wxCANCEL;
     }
     else 
     {
-    int answer = wxMessageBox("quit program?", "Confirm", wxYES_NO | wxICON_QUESTION , m_win);
+    int answer = wxMessageBox("quit program?", "Confirm", wxYES_NO | wxICON_QUESTION , m_Win);
     quit = answer == wxYES;
     }
     if(!quit) return;
@@ -400,7 +400,7 @@ void mafLogicWithManagers::OnQuit()
   cppDEL(m_OpManager);
 
   // must be deleted after m_VMEManager
-  cppDEL(m_side_bar);
+  cppDEL(m_SideBar);
 
   mafLogicWithGUI::OnQuit();
 }
@@ -410,7 +410,7 @@ void mafLogicWithManagers::VmeSelect(mafEvent& e)	//modified by Paolo 10-9-2003
 {
   mafNode *vme = NULL;
 
-	if(m_PlugSidebar && (e.GetSender() == this->m_side_bar->GetTree()))
+	if(m_PlugSidebar && (e.GetSender() == this->m_SideBar->GetTree()))
     vme = (mafNode*)e.GetArg();//sender == tree => the vme is in e.arg
   else
     vme = e.GetVme();          //sender == ISV  => the vme is in e.vme  
@@ -440,21 +440,21 @@ void mafLogicWithManagers::VmeSelected(mafNode *vme)
 {
   if(m_ViewManager) m_ViewManager->VmeSelect(vme);
   if(m_OpManager)   m_OpManager->VmeSelected(vme);
-	if(m_side_bar)    m_side_bar->VmeSelected(vme);
+	if(m_SideBar)    m_SideBar->VmeSelected(vme);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeShow(mafNode *vme, bool visibility)
 //----------------------------------------------------------------------------
 {
 	if(m_ViewManager) m_ViewManager->VmeShow(vme, visibility);
-	if(m_side_bar)    m_side_bar->VmeShow(vme,visibility);
+	if(m_SideBar)    m_SideBar->VmeShow(vme,visibility);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeModified(mafNode *vme)
 //----------------------------------------------------------------------------
 {
   if(m_PlugTimebar) UpdateTimeBounds();
-	if(m_side_bar)    m_side_bar->VmeModified(vme);
+	if(m_SideBar)    m_SideBar->VmeModified(vme);
 	if(m_VMEManager) m_VMEManager->MSFModified(true);
 }
 //----------------------------------------------------------------------------
@@ -468,7 +468,7 @@ void mafLogicWithManagers::VmeAdded(mafNode *vme)
 //----------------------------------------------------------------------------
 {
   if(m_ViewManager) m_ViewManager->VmeAdd(vme);
-	if(m_side_bar)    m_side_bar->VmeAdd(vme);
+	if(m_SideBar)    m_SideBar->VmeAdd(vme);
   UpdateTimeBounds();
 }
 //----------------------------------------------------------------------------
@@ -482,7 +482,7 @@ void mafLogicWithManagers::VmeRemove(mafNode *vme)
 void mafLogicWithManagers::VmeRemoving(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-	if(m_side_bar) m_side_bar->VmeRemove(vme);
+	if(m_SideBar) m_SideBar->VmeRemove(vme);
 	if(m_ViewManager) m_ViewManager->VmeRemove(vme);
 }
 //----------------------------------------------------------------------------
@@ -491,7 +491,7 @@ void mafLogicWithManagers::OpRunStarting()
 {
 	EnableMenuAndToolbar(false);
   if(m_ViewManager) m_ViewManager->EnableSelect(false);
-	if(m_side_bar)    m_side_bar->EnableSelect(false);
+	if(m_SideBar)    m_SideBar->EnableSelect(false);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OpRunTerminated()
@@ -499,7 +499,7 @@ void mafLogicWithManagers::OpRunTerminated()
 {
 	EnableMenuAndToolbar(true);
   if(m_ViewManager) m_ViewManager->EnableSelect(true);
-  if(m_side_bar)    m_side_bar->EnableSelect(true);
+  if(m_SideBar)    m_SideBar->EnableSelect(true);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::EnableMenuAndToolbar(bool enable)
@@ -520,13 +520,13 @@ void mafLogicWithManagers::EnableMenuAndToolbar(bool enable)
 void mafLogicWithManagers::OpShowGui(bool push_gui, mmgPanel *panel)
 //----------------------------------------------------------------------------
 {
-	if(m_side_bar) m_side_bar->OpShowGui(push_gui, panel);
+	if(m_SideBar) m_SideBar->OpShowGui(push_gui, panel);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OpHideGui(bool view_closed)
 //----------------------------------------------------------------------------
 {
-	if(m_side_bar) m_side_bar->OpHideGui(view_closed);
+	if(m_SideBar) m_SideBar->OpHideGui(view_closed);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::ViewCreate(int viewId)
@@ -547,7 +547,7 @@ void mafLogicWithManagers::ViewSelect()
   if(m_ViewManager) 
   {
     mafView *view = m_ViewManager->GetSelectedView();
-    if(m_side_bar)	m_side_bar->ViewSelect(view);
+    if(m_SideBar)	m_SideBar->ViewSelect(view);
 
     EnableItem(CAMERA_RESET, view!=NULL);
     EnableItem(CAMERA_FIT,   view!=NULL);
@@ -561,7 +561,7 @@ void mafLogicWithManagers::ViewCreated(mafView *v)
   // tolto il supporto alle View esterne -- per il momento
   if(v) 
 	{
-      mmgMDIChild *c = new mmgMDIChild(m_win,v);   
+      mmgMDIChild *c = new mmgMDIChild(m_Win,v);   
 			c->SetListener(m_ViewManager);
 			v->SetFrame(c);
  			v->ShowSettings();
@@ -580,8 +580,8 @@ void mafLogicWithManagers::UpdateTimeBounds()
 {
   float min,max; 
   if(m_VMEManager) m_VMEManager->TimeGetBounds(&min,&max);
-  if(m_time_panel)  m_time_panel->SetBounds(min,max);
-  if(m_time_sash)   m_time_sash->Show(min!=max);
+  if(m_TimePanel)  m_TimePanel->SetBounds(min,max);
+  if(m_TimeSash)   m_TimeSash->Show(min!=max);
 }
 //----------------------------------------------------------------------------
 mafNode* mafLogicWithManagers::VmeChoose()
