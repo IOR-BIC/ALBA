@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 10:24:52 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-23 09:52:01 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,10 +39,10 @@ mafView::mafView( wxString label, bool external)
 	//m_external_flag = external;
 }
 //----------------------------------------------------------------------------
-mafView::~mafView( ) 
+mafView::~mafView()
 //----------------------------------------------------------------------------
 {
-  m_CustomPipeVmeList.clear();
+  m_PipeMap.clear();
 
   if(m_gui != NULL) 
     HideGui();
@@ -51,7 +51,7 @@ mafView::~mafView( )
 void mafView::OnEvent(mafEvent& e)
 //----------------------------------------------------------------------------
 {
-  mafEventMacro(e); 
+  mafEventMacro(e);
 }
 //----------------------------------------------------------------------------
 void mafView::ShowGui()
@@ -72,8 +72,8 @@ void mafView::HideGui()
 	mafEventMacro(settings_event);
 }
 //----------------------------------------------------------------------------
-void mafView::PlugVmeTypeWithCustomPipe(char *vme_type)
+void mafView::PlugVisualPipe(mafID vme_type_id, mafVisualPipeInfo plugged_pipe)
 //----------------------------------------------------------------------------
-{  
-  m_CustomPipeVmeList.push_back(vme_type);
+{
+  m_PipeMap[vme_type_id] = plugged_pipe;
 }
