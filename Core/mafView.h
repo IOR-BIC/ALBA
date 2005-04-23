@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-23 09:52:01 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-04-23 10:43:37 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,7 +29,7 @@ struct mafVisualPipeInfo
   mafString m_PipeName;
   long      m_Visibility;
 };
-typedef std::map<mafID, mafVisualPipeInfo> mafPipeMap;
+typedef std::map<mafString, mafVisualPipeInfo> mafPipeMap;
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -108,7 +108,7 @@ public:
   virtual void			OnSize(wxSizeEvent &event)	{};
 
   /** Plug a visual pipe for a particular vme. It is used also to plug custom pipe.*/
-  void PlugVisualPipe(mafID vme_type_id, mafVisualPipeInfo plugged_pipe);
+  void PlugVisualPipe(mafString vme_type, mafVisualPipeInfo plugged_pipe);
   
   mafPipeMap m_PipeMap;
 
