@@ -23,7 +23,6 @@ mafEventBase.h
 mafEventSender.h
 mafEventSource.cpp
 mafEventSource.h
-
 mafIncludeWIN32.h
 mafIncludeWX.h
 mafIndent.cpp

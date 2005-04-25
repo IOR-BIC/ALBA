@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:01:50 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-04-25 21:24:02 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -418,7 +418,7 @@ int mafXMLStorage::InternalStore()
     {
       if (StoreToURL(filename,m_URL)!=MAF_OK)
       {
-        mafErrorMessage("Unable to resolve URL for output XML file, a copy of the file can be found in: %s",filename);
+        mafErrorMessage("Unable to resolve URL for output XML file, a copy of the file can be found in: %s",filename.GetCStr());
         errorCode = 4;
       }
       else
