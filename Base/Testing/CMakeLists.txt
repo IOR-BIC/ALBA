@@ -12,8 +12,15 @@ ADD_EXECUTABLE(testVector mafVectorTest.cpp)
 ADD_TEST(testVector ${EXECUTABLE_OUTPUT_PATH}/testVector)
 ADD_EXECUTABLE(testTransform mafTransformTest.cpp)
 ADD_TEST(testTransform ${EXECUTABLE_OUTPUT_PATH}/testTransform)
+ADD_EXECUTABLE(testIdFactory testIdFactory.cpp)
+ADD_TEST(testIdFactory ${EXECUTABLE_OUTPUT_PATH}/testIdFactory)
 #ADD_EXECUTABLE(test_sorted_vector test_sorted_vector.cpp)
 #ADD_TEST(test_sorted_vector ${EXECUTABLE_OUTPUT_PATH}/test_sorted_vector)
+ADD_EXECUTABLE(testEvent mafEventTest.cpp)
+ADD_TEST(testEvent ${EXECUTABLE_OUTPUT_PATH}/testEvent)
+ADD_EXECUTABLE(testObserver mafObserverTest.cpp)
+ADD_TEST(testObserver ${EXECUTABLE_OUTPUT_PATH}/testObserver)
+
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
