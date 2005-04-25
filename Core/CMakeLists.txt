@@ -24,15 +24,8 @@ mafCoreFactory.cpp
 mafCoreFactory.h
 mafDataPipe.cpp
 mafDataPipe.h
-mafEvent.cpp
-mafEvent.h
-mafEventBase.cpp
-mafEventBase.h
 mafEventIO.cpp
 mafEventIO.h
-mafEventSender.h
-mafEventSource.cpp
-mafEventSource.h
 mafLogicWithGUI.cpp
 mafLogicWithGUI.h
 mafLogicWithManagers.cpp
@@ -51,10 +44,6 @@ mafNodeManager.cpp
 mafNodeManager.h
 mafNodeRoot.cpp
 mafNodeRoot.h
-mafObserver.cpp
-mafObserver.h
-mafObserverCallback.cpp
-mafObserverCallback.h
 mafOp.cpp
 mafOp.h
 mafOpContextStack.cpp
@@ -90,6 +79,8 @@ mafVMEOutputNULL.cpp
 mafVMEOutputNULL.h
 mafVMERoot.cpp
 mafVMERoot.h
+mafVMEStorage.cpp
+mafVMEStorage.h
 mafView.cpp
 mafView.h
 mafViewManager.cpp
