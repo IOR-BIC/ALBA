@@ -3,8 +3,8 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: mmuIdFactory.cpp,v $
 Language:  C++
-Date:      $Date: 2005-02-20 23:36:21 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2005-04-25 18:20:30 $
+Version:   $Revision: 1.3 $
 
 =========================================================================*/
 
@@ -14,33 +14,23 @@ Version:   $Revision: 1.2 $
 #include <vector>
 #include <string>
 
-//------------------------------------------------------------------------------
-// PIMPL declarations
-//------------------------------------------------------------------------------
+std::map<std::string,mafID> *mmuIdFactoryMap=NULL;
+std::vector<std::string> *mmuIdFactoryNames=NULL;
 
-// this is used as a dictionary for event IDs from their name.
-// A lot of problems bacause of initialization problems: the mmuIdFactoryDictionary seems to be
-// initialized after the events ID objects 
-class mmuIdFactoryDictionaryType
+/** this class is used to destroy Id factory */
+class mmuIdFactoryDestroyer
 {
   public:
-  static std::map<std::string,mafID> *m_Ids;
-  static std::vector<std::string> *m_IdNames;
-
-  mmuIdFactoryDictionaryType() {if (m_Ids==NULL) m_Ids=new std::map<std::string,mafID>;}
-  ~mmuIdFactoryDictionaryType() { \
-    if (m_Ids) \
-      delete m_Ids; \
-    if (m_IdNames) \
-      delete m_IdNames; \
+  mmuIdFactoryDestroyer() {}
+  ~mmuIdFactoryDestroyer() { \
+    if (mmuIdFactoryMap) \
+      delete mmuIdFactoryMap; \
+    if (mmuIdFactoryNames) \
+      delete mmuIdFactoryNames; \
   } // this is to allow memory deallocation
 }; 
 
-std::map<std::string,mafID> *mmuIdFactoryDictionaryType::m_Ids=NULL;
-std::vector<std::string> *mmuIdFactoryDictionaryType::m_IdNames=NULL;
-static mmuIdFactoryDictionaryType mmuIdFactoryDictionary;
-
-//static mmuIdFactory::mmuIdFactoryDictionaryType mmuIdFactoryDictionary; 
+static mmuIdFactoryDestroyer mmuIdFactoryDestroyerSingleton;
 
 // This is for allocating unique  Ids.
 mafID mmuIdFactory::m_IdCounter = MAF_BASE_ID;
@@ -52,13 +42,13 @@ mafID mmuIdFactory::AllocIdGroup(const char *idname,int num)
   mafID id=m_IdCounter;
   m_IdCounter+=num;
 
-  if (mmuIdFactoryDictionary.m_Ids==NULL)
+  if (mmuIdFactoryMap==NULL)
   {
-    mmuIdFactoryDictionary.m_Ids=new std::map<std::string,mafID>;
-    mmuIdFactoryDictionary.m_IdNames=new std::vector<std::string>;
+    mmuIdFactoryMap   = new std::map<std::string,mafID>;
+    mmuIdFactoryNames = new std::vector<std::string>;
   }
 
-  (*mmuIdFactoryDictionary.m_Ids)[idname]=id;
+  (*mmuIdFactoryMap)[idname]=id;
 
   return id;
 }
@@ -69,18 +59,16 @@ mafID mmuIdFactory::GetNextId(const char *idname)
 {
   mafID id=m_IdCounter++;
 
-  if (mmuIdFactoryDictionary.m_Ids==NULL)
+  if (mmuIdFactoryMap==NULL)
   {
-    mmuIdFactoryDictionary.m_Ids=new std::map<std::string,mafID>;
-    mmuIdFactoryDictionary.m_IdNames=new std::vector<std::string>;
+    mmuIdFactoryMap   = new std::map<std::string,mafID>;
+    mmuIdFactoryNames = new std::vector<std::string>;
   }
 
-  (*mmuIdFactoryDictionary.m_Ids)[idname]=id;
-
-  //if ((*mmuIdFactoryDictionary.m_IdNames).size()<=id)
-    (*mmuIdFactoryDictionary.m_IdNames).resize(id+1);
-    
-  (*mmuIdFactoryDictionary.m_IdNames)[id]=idname;
+  (*mmuIdFactoryMap)[idname]=id;
+  
+  (*mmuIdFactoryNames).resize(id+1);  
+  (*mmuIdFactoryNames)[id]=idname;
 
   return id;
 }
@@ -91,9 +79,9 @@ mafID mmuIdFactory::GetId(const char *idname)
 {
   mafID id=0;
   
-  std::map<std::string,mafID>::iterator  it=(*mmuIdFactoryDictionary.m_Ids).find(idname);
+  std::map<std::string,mafID>::iterator  it=(*mmuIdFactoryMap).find(idname);
 
-  if (it!=(*mmuIdFactoryDictionary.m_Ids).end())
+  if (it!=(*mmuIdFactoryMap).end())
   {
     id=it->second;
   }
@@ -105,6 +93,6 @@ mafID mmuIdFactory::GetId(const char *idname)
 const char *mmuIdFactory::GetIdName(mafID id)
 //------------------------------------------------------------------------------
 {
-  return (id<(*mmuIdFactoryDictionary.m_IdNames).size())?(*mmuIdFactoryDictionary.m_IdNames)[id].c_str():NULL;
+  return (id<(*mmuIdFactoryNames).size())?(*mmuIdFactoryNames)[id].c_str():NULL;
 }
 

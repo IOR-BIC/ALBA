@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuIdFactory.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:35:47 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-25 18:20:30 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -71,7 +71,7 @@ public:
   static mafID GetId(const char *evtname);
 
   /** this function can be used to obtain an event Name, given its ID */
-  static const char *mmuIdFactory::GetIdName(mafID id);
+  static const char *GetIdName(mafID id);
 protected:
   static mafID m_IdCounter;
 };
