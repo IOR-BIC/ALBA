@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exVMEManApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:12:15 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-25 21:27:12 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -40,9 +40,13 @@ IMPLEMENT_APP(exVMEManApp)
 bool exVMEManApp::OnInit()
 //--------------------------------------------------------------------------------
 {
+  // this must be initialized before of Node/VME factories to allow
+  // plugging of Node/VME icons
+  mafPics.Initialize();  
+
   int result = mafVMEFactory::Initialize();
   assert(result==MAF_OK);
- 
+  
   m_logic = new mafLogicWithManagers();
   m_logic->Configure();
 
