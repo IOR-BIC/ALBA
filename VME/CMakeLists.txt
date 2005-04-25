@@ -24,8 +24,6 @@ mafVMEGroup.cpp
 mafVMEGroup.h
 mafVMEItem.cpp
 mafVMEItem.h
-mafVMEStorage.cpp
-mafVMEStorage.h
 )
 
 IF (MAF_USE_CRYPTO)
