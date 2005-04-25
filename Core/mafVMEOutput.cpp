@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 20:01:07 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-04-25 21:13:05 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -29,7 +29,7 @@
 #include "mafSmartPointer.h"
 #include "mafTransform.h"
 #include "mafIndent.h"
-#include "mmgGUI.h"
+#include "mmgGui.h"
 #include <assert.h>
 
 //-------------------------------------------------------------------------
