@@ -26,6 +26,8 @@ mmgDialog.cpp
 mmgDialog.h
 mmgDialogPreview.cpp
 mmgDialogPreview.h
+mafEvent.cpp
+mafEvent.h
 mmgFileHistory.cpp
 mmgFileHistory.h
 mmgFlagSplitter.cpp
