@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 20:01:04 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2005-04-25 21:12:02 $
+  Version:   $Revision: 1.26 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -178,13 +178,6 @@ void mafNode::ForwardDownEvent(mafEventBase *event)
     }
   }
 }
-//-------------------------------------------------------------------------
-const char *mafNode::GetName()
-//-------------------------------------------------------------------------
-{
-  return m_Name;
-}
-
 //-------------------------------------------------------------------------
 void mafNode::SetName(const char *name)
 //-------------------------------------------------------------------------

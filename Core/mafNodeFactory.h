@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeFactory.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-18 19:51:37 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-25 21:12:02 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,7 +20,8 @@
 /** to be used internally for plugging default nodes --- calls a member function directly */
 #define mafPlugNodeMacro(node_type,descr) \
   RegisterNewNode(node_type::GetStaticTypeName(), descr, node_type::NewObject); \
-  mafPics.AddVmePic(node_type::GetStaticTypeName(),node_type::GetIcon());
+  if (mafPics_Initialized) \
+    mafPics.AddVmePic(node_type::GetStaticTypeName(),node_type::GetIcon());
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -86,7 +87,8 @@ mafPlugNode<T>::mafPlugNode(const char *description)
   {
     factory->RegisterNewNode(T::GetStaticTypeName(), description, T::NewObject);
     // here plug node's icon inside picture factory
-    mafPics.AddVmePic(T::GetStaticTypeName(),T::GetIcon());
+    if (mafPics_Initialized)
+      mafPics.AddVmePic(T::GetStaticTypeName(),T::GetIcon());
   }
 }
 

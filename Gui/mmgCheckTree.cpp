@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 15:15:13 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-04-25 21:13:54 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -272,7 +272,7 @@ int mmgCheckTree::ClassNameToIcon(wxString classname)
   {
     // cercare l'icona della superclasse
     // se non c'e' neanche quella usare una icona "Unknow"
-    wxLogMessage("mafPictureFactory::ClassNameToIcon: cant find = %s ",classname);
+    wxLogMessage("mafPictureFactory::ClassNameToIcon: cant find = %s ",classname.c_str());
     return 0;
   }
 }

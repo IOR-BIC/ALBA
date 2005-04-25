@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventIO.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 18:10:11 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-25 21:12:16 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -52,12 +52,14 @@ public:
   mafStorage *GetStorage();
 
   void SetRoot(mafNode *root);
+  
+  /** return the pointer to the tree root node */
   mafNode *GetRoot();
 
 protected:
   mafID           m_ItemId;
   mafStorage*     m_Storage;
-  mafRoot*        m_Root;
+  mafNode*        m_Root;
 };
 
 #endif /* __mafEventIO_h */

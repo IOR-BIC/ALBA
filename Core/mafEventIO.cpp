@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventIO.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 18:10:10 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-25 21:12:16 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -84,7 +84,8 @@ void mafEventIO::SetRoot(mafNode *root)
 {
   try 
   { 
-    m_Root=dynamic_cast<mafRoot *>(root); // test if it's a root
+    dynamic_cast<mafRoot *>(root); // test if it's a root
+    m_Root=root;
   } 
   catch (std::bad_cast) 
   { 

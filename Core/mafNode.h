@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 20:01:04 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2005-04-25 21:12:02 $
+  Version:   $Revision: 1.23 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -107,7 +107,7 @@ public:
   int Restore();
   
   /** return the name of this node*/
-  const char *GetName();
+  const char *GetName() {return m_Name;}
 
   /** set node name */
   void SetName(const char *name);
