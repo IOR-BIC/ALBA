@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-23 09:49:33 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-25 21:10:58 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -53,7 +53,12 @@ public:
   };
 
   /** create and return the GUI for changing the node parameters */
-  mmgGui *GetGui();
+  mmgGui *GetGui() \
+  { \
+    if (m_Gui==NULL) CreateGui(); \
+    assert(m_Gui); \
+    return m_Gui; \
+  }
 
   /** destroy the Gui */
   void DeleteGui();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-23 09:49:32 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-25 21:10:58 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,14 +60,6 @@ mafPipe::~mafPipe( )
 //----------------------------------------------------------------------------
 {
   cppDEL(m_Gui);
-}
-//-------------------------------------------------------------------------
-mmgGui *mafPipe::GetGui()
-//-------------------------------------------------------------------------
-{
-  if (m_Gui==NULL) CreateGui();
-  assert(m_Gui);
-  return m_Gui;
 }
 //-------------------------------------------------------------------------
 void mafPipe::DeleteGui()
