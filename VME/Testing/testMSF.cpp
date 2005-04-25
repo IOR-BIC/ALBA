@@ -183,10 +183,10 @@ int main( int argc, char *argv[] )
   text->Update();
 
   // create folder for test file
-  wxMkdir("testMSF");
+  wxMkdir("test_MSF");
 
   mafVMEStorage storage;
-  storage.SetURL("testMSF/testMSF.msf");
+  storage.SetURL("test_MSF/test_MSF.msf");
   mafVMERoot *root=storage.GetRoot();
 
   mafSmartPointer<mafVMEGeneric> vtitle;
@@ -276,7 +276,7 @@ int main( int argc, char *argv[] )
   // Test data reloading
   //
   mafVMEStorage load_storage;
-  load_storage.SetURL("testMSF/testMSF.msf");
+  load_storage.SetURL("test_MSF/test_MSF.msf");
   mafVMERoot *loaded_root=load_storage.GetRoot();
   load_storage.Restore();
 
@@ -310,7 +310,7 @@ int main( int argc, char *argv[] )
 
   mafDirectory dir;
   std::set<mafString> file_list;
-  dir.Load("testMSF");
+  dir.Load("test_MSF");
   for (i=0;i<dir.GetNumberOfFiles();i++)
   {
     file_list.insert(dir.GetFile(i));
@@ -329,7 +329,7 @@ int main( int argc, char *argv[] )
   }
   
   mafVMEStorage reload_storage;
-  reload_storage.SetURL("testMSF/testMSF.msf");
+  reload_storage.SetURL("test_MSF/test_MSF.msf");
   mafVMERoot *reloaded_root=reload_storage.GetRoot();
   reload_storage.Restore();
   
