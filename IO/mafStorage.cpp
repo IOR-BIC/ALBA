@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:01:50 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-04-25 21:24:45 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -116,7 +116,7 @@ void mafStorage::GetTmpFile(mafString &filename)
 //------------------------------------------------------------------------------
 {
   mafString tmpfname=GetTmpFolder();
-  tmpfname<<"~tmp.";
+  tmpfname<<"#tmp.";
   do 
   {
     tmpfname<<mafString(m_TmpFileId++);	
