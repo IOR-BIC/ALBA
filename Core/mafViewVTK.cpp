@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 12:16:33 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-26 17:23:06 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,6 +44,8 @@ mafView *mafViewVTK::Copy(mafEventListener *Listener)
 {
   mafViewVTK *v = new mafViewVTK(m_Label);
   v->m_Listener = Listener;
+  v->m_Id = m_Id;
+  v->m_PipeMap = m_PipeMap;
   v->Create();
   return v;
 }
