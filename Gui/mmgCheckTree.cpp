@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-25 21:13:54 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-04-26 18:14:09 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -140,7 +140,7 @@ void mmgCheckTree::OnMouseDown( wxMouseEvent& event )
   //prevent node selection anyway, if the selection is disabled,
   int flag;
 	wxTreeItemId i = m_tree->HitTest(wxPoint(event.GetX(),event.GetY()),flag);
-	if(i.IsOk() && flag == wxTREE_HITTEST_ONITEMICON )
+	if(i.IsOk() && flag & wxTREE_HITTEST_ONITEMICON )
 	{
     OnIconClick(i); 
 		return;//eat message
@@ -157,7 +157,7 @@ void mmgCheckTree::OnMouseUp( wxMouseEvent& event )
   //to select you must click the node name
   int flag;
 	wxTreeItemId i = m_tree->HitTest(wxPoint(event.GetX(),event.GetY()),flag);
-	if(flag == wxTREE_HITTEST_ONITEMICON )
+	if(flag & wxTREE_HITTEST_ONITEMICON )
 		return;//eat message
 	event.Skip();//process event as usual
 }
@@ -171,7 +171,7 @@ void mmgCheckTree::OnMouseEvent( wxMouseEvent& event )
 	{
 	 int flag;
 	 wxTreeItemId i = m_tree->HitTest(wxPoint(event.GetX(),event.GetY()),flag);
-	 if(flag == wxTREE_HITTEST_ONITEMICON )
+	 if(flag & wxTREE_HITTEST_ONITEMICON )
 			return;//eat message
 	}
 	if(event.RightDown() || event.RightIsDown() || event.RightUp() || event.RightDClick())
