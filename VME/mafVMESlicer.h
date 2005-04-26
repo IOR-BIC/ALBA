@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:05:14 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-26 17:27:12 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -19,8 +19,6 @@
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class mafDataVector;
-class mafMatrixVector;
 class vtkVolumeSlicer;
 
 /** mafVMESlicer - a procedural VME computing the slice of its parent VME.
