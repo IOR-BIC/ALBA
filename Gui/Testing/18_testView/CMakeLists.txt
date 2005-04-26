@@ -21,13 +21,7 @@ ELSE (WIN32)
 ENDIF (WIN32)
 
 SET(PROJECT_LIBS
-  mafBase
-  mafCore
   mafVME
-  vtkCommon
-  vtkRendering
-  vtkGraphics
-
 )
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
 
