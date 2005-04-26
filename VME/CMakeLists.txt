@@ -46,6 +46,8 @@ IF (MAF_USE_VTK)
   mafVMEImage.h
   mafVMEItemVTK.cpp
   mafVMEItemVTK.h
+  mafVMEMeter.cpp
+  mafVMEMeter.h
   mafVMEOutputImage.cpp
   mafVMEOutputImage.h
   mafVMEOutputPolyline.cpp
@@ -68,6 +70,8 @@ IF (MAF_USE_VTK)
   mafVMEVolumeGray.h
   mafVTKInterpolator.cpp
   mafVTKInterpolator.h
+  mmaMeter.cpp
+  mmaMeter.h
   vtkMAFDataPipe.cpp
   vtkMAFDataPipe.h
 
