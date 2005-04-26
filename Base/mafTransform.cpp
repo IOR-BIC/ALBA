@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:19:51 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-26 17:22:13 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1690,6 +1690,10 @@ int mafTransform::MatrixToHelicalAxis(const mafMatrix &matrix,
 	point[intersect] = 0;
 
 	return 1;
-
 }
-
+//----------------------------------------------------------------------------
+void mafTransform::Invert()
+//----------------------------------------------------------------------------
+{
+  m_Matrix->Invert();
+}

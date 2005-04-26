@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-18 19:53:58 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-26 17:22:13 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -69,6 +69,9 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   
   /** set internal matrix to Identity */
   void Identity();
+
+  /** Invert internal matrix */
+  void Invert();
 
   /**
 	  Get the x, y, z orientation angles from the transformation matrix as an
