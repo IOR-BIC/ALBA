@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 11:08:34 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-26 16:09:04 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -491,7 +491,7 @@ void mafOpManager::OpDo(mafOp *op)
   m_context.Redo_Clear();
   op->OpDo();
   
-  wxLogMessage("do=%s",op->m_Label);
+  wxLogMessage("do=%s",op->m_Label.c_str());
 
   if(op->CanUndo()) 
   {
@@ -515,7 +515,7 @@ void mafOpManager::OpUndo()
 	EnableOp(false);
 
 	mafOp* op = m_context.Undo_Pop();
-	wxLogMessage("undo=%s",op->m_Label);
+	wxLogMessage("undo=%s",op->m_Label.c_str());
 	op->OpUndo();
 	m_context.Redo_Push(op);
 
@@ -533,7 +533,7 @@ void mafOpManager::OpRedo()
 	EnableOp(false);
 
 	mafOp* op = m_context.Redo_Pop();
-	wxLogMessage("redo=%s",op->m_Label);
+	wxLogMessage("redo=%s",op->m_Label.c_str());
 	op->OpDo();
 	m_context.Undo_Push(op);
 
