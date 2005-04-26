@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 10:27:04 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-04-26 15:18:26 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -262,7 +262,7 @@ void mafViewManager::FillMenu (wxMenu* menu)
 	for(int i=0; i<m_tcount; i++)
 	{
     mafView* v = m_t[i];  
-	  s = wxString::Format("create new %s view",v->GetLabel());
+	  s = wxString::Format("create new %s view",v->GetLabel().c_str());
 	  menu->Append(v->m_Id, s, (wxMenu *)NULL, s );	
   }
 }
