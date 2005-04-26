@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneNode.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 16:37:43 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-26 12:16:33 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -41,20 +41,20 @@ public:
 	void UpdateProperty(bool fromTag = false);
 
   /** Return the vme's visibility. */
-  bool IsVisible() {return m_pipe != NULL;};
+  bool IsVisible() {return m_Pipe != NULL;};
 
-  mafNode           *m_vme;
-  mafSceneNode      *m_parent;
-  mafPipe           *m_pipe;
-  bool               m_pipe_creatable;
-  bool               m_mutex;
-  vtkRenderer       *m_ren1;
-  vtkMAFAssembly    *m_asm1;
-  vtkRenderer       *m_ren2;
-  vtkMAFAssembly    *m_asm2;
+  mafNode           *m_Vme;
+  mafSceneNode      *m_Parent;
+  mafPipe           *m_Pipe;
+  bool               m_PipeCreatable;
+  bool               m_Mutex;
+  vtkRenderer       *m_RenFront;
+  vtkMAFAssembly    *m_AssemblyFront;
+  vtkRenderer       *m_RenBack;
+  vtkMAFAssembly    *m_AssemblyBack;
 
-  mafSceneNode      *m_next;
-	mafSceneGraph     *m_sg;
+  mafSceneNode      *m_Next;
+	mafSceneGraph     *m_Sg;
 
   //observer to Listen to Clouds Open/CloseEvent
 	//@@@ mafNodeLandmarkCloud	*m_cloud;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-25 21:10:58 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-26 12:16:32 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -64,14 +64,14 @@ public:
   void DeleteGui();
 
   mmgGui         *m_Gui;      ///< user inteface
-	mafNode        *m_mafnode;
-  mafVME         *m_vme;
-	vtkMAFAssembly *m_asm1;
-	vtkMAFAssembly *m_asm2;
-	mafSceneGraph  *m_sg;
-  bool            m_selected; 
-  vtkRenderer    *m_ren1;     
-  vtkRenderer    *m_ren2;
+	mafNode        *m_MafNode;
+  mafVME         *m_Vme;
+	vtkMAFAssembly *m_AssemblyFront;
+	vtkMAFAssembly *m_AssemblyBack;
+	mafSceneGraph  *m_Sg;
+  bool            m_Selected; 
+  vtkRenderer    *m_RenFront;     
+  vtkRenderer    *m_RenBack;
 
 protected:
   /**

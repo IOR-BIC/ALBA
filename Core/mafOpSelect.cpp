@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpSelect.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 11:08:35 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-26 12:16:31 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -125,7 +125,7 @@ void mafOpEdit::ClipboardRestore()
 mafOpCut::mafOpCut(wxString label) 
 {
   m_Label=label;
-  m_selection_parent = NULL; 
+  m_SelectionParent = NULL; 
 }
 //----------------------------------------------------------------------------
 mafOpCut::~mafOpCut() 
@@ -151,10 +151,10 @@ Select the vme parent
 */
 {
 	ClipboardBackup();
-	m_selection_parent = m_selection->GetParent(); 
+	m_SelectionParent = m_selection->GetParent(); 
 	m_clipboard = m_selection;
 	mafEventMacro(mafEvent(this,VME_REMOVE,m_selection));
-	mafEventMacro(mafEvent(this,VME_SELECTED,m_selection_parent));
+	mafEventMacro(mafEvent(this,VME_SELECTED,m_SelectionParent));
 }
 //----------------------------------------------------------------------------
 void mafOpCut::OpUndo()
@@ -167,7 +167,7 @@ Restore the Selection
 {
 	m_selection = m_clipboard.GetPointer();
 	
-	m_selection->ReparentTo(m_selection_parent);
+	m_selection->ReparentTo(m_SelectionParent);
 	mafEventMacro(mafEvent(this,VME_ADD,m_selection));
 	mafEventMacro(mafEvent(this,VME_SELECTED,m_selection));
 	ClipboardRestore();

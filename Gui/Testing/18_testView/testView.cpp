@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testView.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 10:27:54 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-26 12:17:04 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -55,7 +55,7 @@ void testView::VmeCreatePipe(mafNode *vme)
 //----------------------------------------------------------------------------
 {
   mafSceneNode *n = m_Sg->Vme2Node(vme);
-  assert(n && !n->m_pipe);
+  assert(n && !n->m_Pipe);
   assert(vme->IsA("mafVME"));
   mafVME *v = ((mafVME*)vme);
 
@@ -83,14 +83,14 @@ void testView::VmeCreatePipe(mafNode *vme)
   
   pipe->Create(n);
 
-  n->m_pipe = (mafPipe*)pipe;
+  n->m_Pipe = (mafPipe*)pipe;
 }
 //----------------------------------------------------------------------------
 void testView::VmeDeletePipe(mafNode *vme)
 //----------------------------------------------------------------------------
 {
   mafSceneNode *n = m_Sg->Vme2Node(vme);
-  assert(n && n->m_pipe);
-  cppDEL(n->m_pipe);
+  assert(n && n->m_Pipe);
+  cppDEL(n->m_Pipe);
 }
 

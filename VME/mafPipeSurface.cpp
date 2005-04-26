@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 20:02:53 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-26 12:17:34 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -59,7 +59,7 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
 {
   Superclass::Create(n);
   
-  m_selected = false;
+  m_Selected = false;
   m_act_m   = NULL;
   m_act_a   = NULL;;
   m_sel_ocf = NULL;;
@@ -68,12 +68,12 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
   m_sel_a   = NULL;;
 
 	//@@@ m_use_axes = use_axes;
-	//@@@ mafVmeData *data = (mafVmeData*) m_vme->GetClientData();
+	//@@@ mafVmeData *data = (mafVmeData*) m_Vme->GetClientData();
 	//@@@ assert(data);
-  //@@@ m_vme->UpdateCurrentData();
+  //@@@ m_Vme->UpdateCurrentData();
 
-  assert(m_vme->IsA("mafVMESurface"));
-  mafVMESurface *vme = ((mafVMESurface*) m_vme);
+  assert(m_Vme->IsA("mafVMESurface"));
+  mafVMESurface *vme = ((mafVMESurface*) m_Vme);
   assert(vme->GetSurfaceOutput());
   vme->GetSurfaceOutput()->Update();
   vtkPolyData *data = vme->GetSurfaceOutput()->GetSurfaceData();
@@ -91,7 +91,7 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
 	//@@@ m_act_a->SetProperty(data->m_mat_gui->GetMaterial()->m_prop);
 	m_act_a->SetMapper(m_act_m);
 
-  m_asm1->AddPart(m_act_a);
+  m_AssemblyFront->AddPart(m_act_a);
 
   // selection hilight
 	m_sel_ocf = vtkOutlineCornerFilter::New();
@@ -112,11 +112,11 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
 	m_sel_a->PickableOff();
 	m_sel_a->SetProperty(m_sel_p);
 
-  m_asm1->AddPart(m_sel_a);
+  m_AssemblyFront->AddPart(m_sel_a);
 
   /*
   m_axes = NULL;
-	if(m_use_axes) m_axes = new mafAxes(m_ren1,m_vme);
+	if(m_use_axes) m_axes = new mafAxes(m_ren1,m_Vme);
 	if(m_use_axes) m_axes->SetVisibility(0);
 	*/
 }
@@ -124,8 +124,8 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
 mafPipeSurface::~mafPipeSurface()
 //----------------------------------------------------------------------------
 {
-  m_asm1->RemovePart(m_act_a);
-  m_asm1->RemovePart(m_sel_a);
+  m_AssemblyFront->RemovePart(m_act_a);
+  m_AssemblyFront->RemovePart(m_sel_a);
 
 	vtkDEL(m_act_m);
   vtkDEL(m_act_a);
@@ -141,7 +141,7 @@ void mafPipeSurface::Show(bool show)
 //----------------------------------------------------------------------------
 {
 	m_act_a->SetVisibility(show);
-	if(m_selected)
+	if(m_Selected)
 	{
 	  m_sel_a->SetVisibility(show);
 		//@@@ if(m_use_axes) m_axes->SetVisibility(show);
@@ -152,7 +152,7 @@ void mafPipeSurface::Show(bool show)
 void mafPipeSurface::Select(bool sel)
 //----------------------------------------------------------------------------
 {
-	m_selected = sel;
+	m_Selected = sel;
 	if(m_act_a->GetVisibility()) 
 	{
 			m_sel_a->SetVisibility(sel);
@@ -166,13 +166,13 @@ void mafPipeSurface::UpdateProperty(bool fromTag)
 	/*
 	if(fromTag)
   {
-		((mafVmeData *)m_vme->GetClientData())->UpdateFromTag();
-    int idx = m_vme->GetTagArray()->FindTag("VME_CENTER_ROTATION_POSE");
+		((mafVmeData *)m_Vme->GetClientData())->UpdateFromTag();
+    int idx = m_Vme->GetTagArray()->FindTag("VME_CENTER_ROTATION_POSE");
     vtkTagItem *item = NULL;
     double vec[16];
     if (idx != -1)
     {
-      item = m_vme->GetTagArray()->GetTag(idx);
+      item = m_Vme->GetTagArray()->GetTag(idx);
       mflSmartPointer<vtkMatrix4x4> pose;
       for (int el=0;el<16;el++)
       {
@@ -185,6 +185,6 @@ void mafPipeSurface::UpdateProperty(bool fromTag)
       m_axes->SetPose();
   }
   else
-	  m_act_m->SetScalarVisibility(((mafVmeData *)m_vme->GetClientData())->GetColorByScalar());
+	  m_act_m->SetScalarVisibility(((mafVmeData *)m_Vme->GetClientData())->GetColorByScalar());
 	*/
 }

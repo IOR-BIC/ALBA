@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:18:01 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-26 12:16:32 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,7 +33,7 @@ class mafSceneGraph  /*: public mafEventListener*/
 public:
 								mafSceneGraph(mafView	*view, vtkRenderer *ren1, vtkRenderer *ren2=NULL);
 	virtual			 ~mafSceneGraph();
-  virtual void	SetListener(mafEventListener *Listener) {m_listener = Listener;};
+  virtual void	SetListener(mafEventListener *Listener) {m_Listener = Listener;};
 	//virtual void	OnEvent(mafEvent& e);
 
 	/** Add a vme to the scene graph. */
@@ -42,7 +42,7 @@ public:
 	/** Remove a vme from the scene graph. */
 	virtual void					VmeRemove					(mafNode *vme);
 
-	/** Select a vme and store a reference to it into m_selected_vme variable. */
+	/** Select a vme and store a reference to it into m_SelectedVme variable. */
 	virtual void					VmeSelect					(mafNode *vme,					bool select);
 
 	/** Change the visibility of the vme and if necessary create the vme releted pipe. */
@@ -64,10 +64,10 @@ public:
 	/** Find the corresponding vme's node. */
 	virtual mafSceneNode *Vme2Node					(mafNode *vme);
 
-  mafSceneNode	*m_list;
-  vtkRenderer		*m_ren1;
-  vtkRenderer		*m_ren2;
-  mafView		    *m_view;
+  mafSceneNode	*m_List;
+  vtkRenderer		*m_RenFront;
+  vtkRenderer		*m_RenBack;
+  mafView		    *m_View;
 
   // Set the flags for creatable vmes type.
 	//@@@ virtual void SetCreatableFlag	(mafNodeBaseTypes type,  bool flag = true);
@@ -82,7 +82,7 @@ public:
 	//@@@ virtual mmgGui *GetGui();
 
   // Return the selected vme.
-	virtual mafNode *GetSelectedVme() {return m_selected_vme;};
+	virtual mafNode *GetSelectedVme() {return m_SelectedVme;};
 
   // Used by the mmgCheckTree - return the status of a SceneNode
 	virtual int  GetNodeStatus (mafNode *vme);
@@ -101,9 +101,9 @@ protected:
 */
 
 	mafSceneNode			*NodeAdd	(mafNode *vme);
-  mafEventListener	*m_listener;
-	mmgGui						*m_gui;
+  mafEventListener	*m_Listener;
+	mmgGui						*m_Gui;
 
-	mafNode            *m_selected_vme;
+	mafNode            *m_SelectedVme;
 };
 #endif

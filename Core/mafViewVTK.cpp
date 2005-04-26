@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 10:27:04 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-26 12:16:33 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -92,5 +92,5 @@ mafPipe* mafViewVTK::GetNodePipe(mafNode *vme)
    assert(m_Sg);
    mafSceneNode *n = m_Sg->Vme2Node(vme);
    if(!n) return NULL;
-   return n->m_pipe;
+   return n->m_Pipe;
 }

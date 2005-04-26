@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpSelect.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:06:47 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-26 12:16:31 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -76,7 +76,7 @@ public:
     void OpUndo();
     mafOp* Copy(); 
 protected:
-    mafNode *m_selection_parent;
+    mafNode *m_SelectionParent;
 };
 //----------------------------------------------------------------------------
 // mafOpCopy :

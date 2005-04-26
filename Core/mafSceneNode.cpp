@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 16:37:43 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-26 12:16:33 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,18 +40,18 @@
 mafSceneNode::mafSceneNode(mafSceneGraph *sg,mafSceneNode *parent, mafNode* vme, vtkRenderer *ren, vtkRenderer *ren2)
 //----------------------------------------------------------------------------
 {
-	m_sg             = sg;
-	m_parent				 = parent;
-	m_vme						 = vme;
-	m_ren1					 = ren;
-	m_ren2					 = ren2;
-  m_next					 = NULL;
-  m_pipe					 = NULL;
-  m_pipe_creatable = true;
-  m_mutex          = false;
-  //m_visible        = false;
-  m_asm1 = NULL;
-  m_asm2 = NULL;
+	m_Sg            = sg;
+	m_Parent				= parent;
+	m_Vme						= vme;
+	m_RenFront			= ren;
+	m_RenBack				= ren2;
+  m_Next					= NULL;
+  m_Pipe					= NULL;
+  m_PipeCreatable = true;
+  m_Mutex         = false;
+  //m_visible      = false;
+  m_AssemblyFront = NULL;
+  m_AssemblyBack  = NULL;
   
   assert(vme);
   vtkLinearTransform *transform = NULL;
@@ -64,27 +64,27 @@ mafSceneNode::mafSceneNode(mafSceneGraph *sg,mafSceneNode *parent, mafNode* vme,
     transform = v->GetOutput()->GetTransform()->GetVTKTransform();
   }
 
-  m_asm1 = vtkMAFAssembly::New();
-  m_asm1->SetVme(vme);
-  m_asm1->SetUserTransform(transform);
+  m_AssemblyFront = vtkMAFAssembly::New();
+  m_AssemblyFront->SetVme(vme);
+  m_AssemblyFront->SetUserTransform(transform);
 
-  if(m_ren1 != NULL) //modified by Vladik. 03-03-2004
+  if(m_RenFront != NULL) //modified by Vladik. 03-03-2004
   {
-	  if(m_vme->IsA("mafNodeRoot") || m_vme->IsA("mafVMERoot")) 
-		  m_ren1->AddActor(m_asm1); 
-	  else if (m_asm1)  //modified by Marco. 20-7-2004
-		  m_parent->m_asm1->AddPart(m_asm1);
+	  if(m_Vme->IsA("mafNodeRoot") || m_Vme->IsA("mafVMERoot")) 
+		  m_RenFront->AddActor(m_AssemblyFront); 
+	  else if (m_AssemblyFront)  //modified by Marco. 20-7-2004
+		  m_Parent->m_AssemblyFront->AddPart(m_AssemblyFront);
   }
 
-	if(m_ren2 != NULL)
+	if(m_RenBack != NULL)
 	{
-		m_asm2 = vtkMAFAssembly::New();
-    m_asm2->SetVme(vme);
-    m_asm2->SetUserTransform(transform);
-    if(m_vme->IsA("mafNodeRoot") || m_vme->IsA("mafVMERoot")) 
-			m_ren2->AddActor(m_asm2); 
+		m_AssemblyBack = vtkMAFAssembly::New();
+    m_AssemblyBack->SetVme(vme);
+    m_AssemblyBack->SetUserTransform(transform);
+    if(m_Vme->IsA("mafNodeRoot") || m_Vme->IsA("mafVMERoot")) 
+			m_RenBack->AddActor(m_AssemblyBack); 
 		else
-			m_parent->m_asm2->AddPart(m_asm2);
+			m_Parent->m_AssemblyBack->AddPart(m_AssemblyBack);
 	}
 
 
@@ -94,24 +94,24 @@ mafSceneNode::mafSceneNode(mafSceneGraph *sg,mafSceneNode *parent, mafNode* vme,
   m_CloudOpenClose_observer = 0;
 	m_CloudRadiusModified_observer = 0;
   m_CloudSphereResolutionModified_observer = 0;
-	if( m_vme->IsA("mafNodeLandmarkCloud") )
+	if( m_Vme->IsA("mafNodeLandmarkCloud") )
 	{
-		m_cloud = (mafNodeLandmarkCloud *)m_vme;
-		m_CloudOpenClose_observer = mflAgent::PlugEventSource(m_vme,OnOpenCloseEvent,this,mafNodeLandmarkCloud::OpenCloseEvent); 
-		m_CloudRadiusModified_observer = mflAgent::PlugEventSource(m_vme,OnRadiusModifiedEvent,this,mafNodeLandmarkCloud::RadiusModifiedEvent); 
-		m_CloudSphereResolutionModified_observer = mflAgent::PlugEventSource(m_vme,OnSphereResolutionModifiedEvent,this,mafNodeLandmarkCloud::SphereResolutionModifiedEvent); 
+		m_cloud = (mafNodeLandmarkCloud *)m_Vme;
+		m_CloudOpenClose_observer = mflAgent::PlugEventSource(m_Vme,OnOpenCloseEvent,this,mafNodeLandmarkCloud::OpenCloseEvent); 
+		m_CloudRadiusModified_observer = mflAgent::PlugEventSource(m_Vme,OnRadiusModifiedEvent,this,mafNodeLandmarkCloud::RadiusModifiedEvent); 
+		m_CloudSphereResolutionModified_observer = mflAgent::PlugEventSource(m_Vme,OnSphereResolutionModifiedEvent,this,mafNodeLandmarkCloud::SphereResolutionModifiedEvent); 
 	}
 	m_scalar							= NULL;
 	m_Scalar_ScalingModified_observer	= 0;
 	m_Scalar_DiameterModified_observer	= 0;
 	m_Scalar_HeadModified_observer		= 0;
  
-	if( m_vme->IsA("mafNodeScalar") )
+	if( m_Vme->IsA("mafNodeScalar") )
 	{
-		m_scalar = (mafNodeScalar *)m_vme;
-		m_Scalar_ScalingModified_observer = mflAgent::PlugEventSource(m_vme,OnScalingModifiedEvent,this,mafNodeScalar::ScalingModifiedEvent); 
-		m_Scalar_DiameterModified_observer = mflAgent::PlugEventSource(m_vme,OnDiameterModifiedEvent,this,mafNodeScalar::DiameterModifiedEvent);
-		m_Scalar_HeadModified_observer = mflAgent::PlugEventSource(m_vme,OnHeadModifiedEvent,this,mafNodeScalar::HeadModifiedEvent); 
+		m_scalar = (mafNodeScalar *)m_Vme;
+		m_Scalar_ScalingModified_observer = mflAgent::PlugEventSource(m_Vme,OnScalingModifiedEvent,this,mafNodeScalar::ScalingModifiedEvent); 
+		m_Scalar_DiameterModified_observer = mflAgent::PlugEventSource(m_Vme,OnDiameterModifiedEvent,this,mafNodeScalar::DiameterModifiedEvent);
+		m_Scalar_HeadModified_observer = mflAgent::PlugEventSource(m_Vme,OnHeadModifiedEvent,this,mafNodeScalar::HeadModifiedEvent); 
 	}
 @@@ */
 
@@ -120,26 +120,26 @@ mafSceneNode::mafSceneNode(mafSceneGraph *sg,mafSceneNode *parent, mafNode* vme,
 mafSceneNode::~mafSceneNode()
 //----------------------------------------------------------------------------
 {
-	cppDEL(m_pipe);
+	cppDEL(m_Pipe);
 	
-	if(m_ren1 != NULL)  //modified by Vladik. 03-03-2004
+	if(m_RenFront != NULL)  //modified by Vladik. 03-03-2004
   {
-    if(m_vme->IsA("mafNodeRoot") || m_vme->IsA("mafVMERoot")) 
-		  m_ren1->RemoveActor(m_asm1);
-    else if (m_asm1)  //modified by Marco. 20-7-2004
-	   	m_parent->m_asm1->RemovePart(m_asm1); 
+    if(m_Vme->IsA("mafNodeRoot") || m_Vme->IsA("mafVMERoot")) 
+		  m_RenFront->RemoveActor(m_AssemblyFront);
+    else if (m_AssemblyFront)  //modified by Marco. 20-7-2004
+	   	m_Parent->m_AssemblyFront->RemovePart(m_AssemblyFront); 
   }
 
-  vtkDEL(m_asm1); 
+  vtkDEL(m_AssemblyFront); 
 
-	if(m_ren2 != NULL)
+	if(m_RenBack != NULL)
 	{
-    if(m_vme->IsA("mafNodeRoot") || m_vme->IsA("mafVMERoot")) 
-			m_ren2->RemoveActor(m_asm2);
+    if(m_Vme->IsA("mafNodeRoot") || m_Vme->IsA("mafVMERoot")) 
+			m_RenBack->RemoveActor(m_AssemblyBack);
 		else
-			m_parent->m_asm2->RemovePart(m_asm2); 
+			m_Parent->m_AssemblyBack->RemovePart(m_AssemblyBack); 
 
-    vtkDEL(m_asm2);  
+    vtkDEL(m_AssemblyBack);  
 	}
  /* @@@
 	if (m_cloud && m_CloudOpenClose_observer > 0 )
@@ -161,7 +161,7 @@ mafSceneNode::~mafSceneNode()
 void mafSceneNode::Select(bool select)   
 //----------------------------------------------------------------------------
 {
-  if(m_pipe) m_pipe->Select(select);
+  if(m_Pipe) m_Pipe->Select(select);
 }
 /*
 //----------------------------------------------------------------------------
@@ -169,14 +169,14 @@ void mafSceneNode::Show(bool show)
 //----------------------------------------------------------------------------
 {
 	m_visible = show;
-  if(m_pipe) m_pipe->Show(show);
+  if(m_Pipe) m_Pipe->Show(show);
 }
 */
 //----------------------------------------------------------------------------
 void mafSceneNode::UpdateProperty(bool fromTag)
 //----------------------------------------------------------------------------
 {
-  if(m_pipe) m_pipe->UpdateProperty(fromTag);
+  if(m_Pipe) m_Pipe->UpdateProperty(fromTag);
 }
 /* @@@
 //----------------------------------------------------------------------------
@@ -185,25 +185,25 @@ void mafSceneNode::OnOpenCloseEvent(void *arg)
 {
   mafSceneNode *self=(mafSceneNode *)arg;
   if(self)
-    self->m_sg->OnOpenCloseEvent(self);
+    self->m_Sg->OnOpenCloseEvent(self);
 }
 //----------------------------------------------------------------------------
 void mafSceneNode::OnRadiusModifiedEvent(void *arg)
 //----------------------------------------------------------------------------
 {
   mafSceneNode *self=(mafSceneNode *)arg;
-  if(self && self->m_sg && self->m_cloud)
+  if(self && self->m_Sg && self->m_cloud)
 	{
     if(self->m_cloud->IsOpen())
     {
       mafNodeIterator *iter=self->m_cloud->NewIterator();
       for (mafNode *vme=iter->GetFirstNode();vme;vme=iter->GetNextNode())
 	      if(vme->IsA("mafNodeLandmark"))
-				  self->m_sg->VmeUpdateProperty(vme);
+				  self->m_Sg->VmeUpdateProperty(vme);
       iter->Delete();
     }
     else
-      self->m_sg->VmeUpdateProperty(self->m_cloud);
+      self->m_Sg->VmeUpdateProperty(self->m_cloud);
 	}
 }
 @@@ */
@@ -213,18 +213,18 @@ void mafSceneNode::OnSphereResolutionModifiedEvent(void *arg)
 //----------------------------------------------------------------------------
 {
   mafSceneNode *self=(mafSceneNode *)arg;
-  if(self && self->m_sg && self->m_cloud)
+  if(self && self->m_Sg && self->m_cloud)
 	{
     if(self->m_cloud->IsOpen())
     {
       mafNodeIterator *iter=self->m_cloud->NewIterator();
       for (mafNode *vme=iter->GetFirstNode();vme;vme=iter->GetNextNode())
 	      if(vme->IsA("mafNodeLandmark"))
-				  self->m_sg->VmeUpdateProperty(vme);
+				  self->m_Sg->VmeUpdateProperty(vme);
       iter->Delete();
     }
     else
-      self->m_sg->VmeUpdateProperty(self->m_cloud);
+      self->m_Sg->VmeUpdateProperty(self->m_cloud);
   } 
 }
 //----------------------------------------------------------------------------
@@ -232,8 +232,8 @@ void mafSceneNode::OnScalingModifiedEvent(void *arg)
 //----------------------------------------------------------------------------
 {
   mafSceneNode *self=(mafSceneNode *)arg;
-  if(self && self->m_sg && self->m_scalar)
-      self->m_sg->VmeUpdateProperty(self->m_scalar);
+  if(self && self->m_Sg && self->m_scalar)
+      self->m_Sg->VmeUpdateProperty(self->m_scalar);
 	  
  }
 //----------------------------------------------------------------------------
@@ -241,15 +241,15 @@ void mafSceneNode::OnDiameterModifiedEvent(void *arg)
 //----------------------------------------------------------------------------
 {
   mafSceneNode *self=(mafSceneNode *)arg;
-  if(self && self->m_sg && self->m_scalar)
-	  self->m_sg->VmeUpdateProperty(self->m_scalar);
+  if(self && self->m_Sg && self->m_scalar)
+	  self->m_Sg->VmeUpdateProperty(self->m_scalar);
 }
 //----------------------------------------------------------------------------
 void mafSceneNode::OnHeadModifiedEvent(void *arg)
 //----------------------------------------------------------------------------
 {
   mafSceneNode *self=(mafSceneNode *)arg;
-  if(self && self->m_sg && self->m_scalar)
-	  self->m_sg->VmeUpdateProperty(self->m_scalar);
+  if(self && self->m_Sg && self->m_scalar)
+	  self->m_Sg->VmeUpdateProperty(self->m_scalar);
 }
 @@@ */

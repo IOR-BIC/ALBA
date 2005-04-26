@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-25 21:10:58 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-26 12:16:32 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,28 +32,28 @@ mafCxxTypeMacro(mafPipe);
 mafPipe::mafPipe()
 //----------------------------------------------------------------------------
 {
-	m_sg       = NULL;
-  m_mafnode  = NULL;
-  m_vme			 = NULL;
-	m_asm1		 = NULL;
-	m_asm2		 = NULL;
-	m_ren1     = NULL;
-	m_ren2     = NULL;
+	m_Sg       = NULL;
+  m_MafNode  = NULL;
+  m_Vme			 = NULL;
+	m_AssemblyFront		 = NULL;
+	m_AssemblyBack		 = NULL;
+	m_RenFront     = NULL;
+	m_RenBack     = NULL;
   m_Gui      = NULL;
-	m_selected = false;
+	m_Selected = false;
 }
 //----------------------------------------------------------------------------
 void mafPipe::Create(mafSceneNode *n)
 //----------------------------------------------------------------------------
 {
-  m_sg       = n->m_sg;
-  m_mafnode  = n->m_vme;
-  m_vme			 = m_mafnode->IsA("mafVME") ? ((mafVME*)m_mafnode) : NULL;
-  m_asm1		 = n->m_asm1;
-  m_asm2		 = n->m_asm2;
-  m_ren1     = n->m_ren1;
-  m_ren2     = n->m_ren2;
-  m_selected = false;
+  m_Sg       = n->m_Sg;
+  m_MafNode  = n->m_Vme;
+  m_Vme			 = m_MafNode->IsA("mafVME") ? ((mafVME*)m_MafNode) : NULL;
+  m_AssemblyFront		 = n->m_AssemblyFront;
+  m_AssemblyBack		 = n->m_AssemblyBack;
+  m_RenFront     = n->m_RenFront;
+  m_RenBack     = n->m_RenBack;
+  m_Selected = false;
 }
 //----------------------------------------------------------------------------
 mafPipe::~mafPipe( ) 
