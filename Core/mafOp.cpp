@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-19 12:32:44 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-26 11:08:33 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,31 +29,31 @@
 mafOp::mafOp(wxString label)
 //----------------------------------------------------------------------------
 {
-	m_gui = NULL;
+	m_Gui = NULL;
 	m_Listener = NULL;
-	m_next = NULL;
-	m_optype = OPTYPE_OP;
-  m_opMenuPath = "";
-	m_canundo = false;
-	m_natural_preserving = true;
-	m_label = label;
-  m_guih = NULL;
-	m_input = NULL;
-  m_menu_item = NULL;
+	m_Next = NULL;
+	m_OpType = OPTYPE_OP;
+  m_OpMenuPath = "";
+	m_Canundo = false;
+	m_NaturalPreserving = true;
+	m_Label = label;
+  m_Guih = NULL;
+	m_Input = NULL;
+  m_MenuItem = NULL;
 }
 //----------------------------------------------------------------------------
 mafOp::mafOp()
 //----------------------------------------------------------------------------
 {
-	m_gui = NULL;
+	m_Gui = NULL;
 	m_Listener = NULL;
-	m_next = NULL;
-	m_optype = OPTYPE_OP;
-	m_canundo = false;
-	m_label = "default op name";
-  m_guih = NULL;
-	m_input = NULL;
-	m_compatibility = 0xFFFF;
+	m_Next = NULL;
+	m_OpType = OPTYPE_OP;
+	m_Canundo = false;
+	m_Label = "default op name";
+  m_Guih = NULL;
+	m_Input = NULL;
+	m_Compatibility = 0xFFFF;
 }
 //----------------------------------------------------------------------------
 mafOp::~mafOp() 
@@ -104,13 +104,13 @@ bool mafOp::CanUndo()
 /**  */
 //----------------------------------------------------------------------------
 {
-  return m_canundo;
+  return m_Canundo;
 }
 //----------------------------------------------------------------------------
 bool mafOp::IsCompatible(long state)
 //----------------------------------------------------------------------------
 {
-  return (m_compatibility & state) != 0;
+  return (m_Compatibility & state) != 0;
 }
 
 /*
@@ -118,19 +118,19 @@ bool mafOp::IsCompatible(long state)
 bool mafOp::IsImporter()   
 //----------------------------------------------------------------------------
 {
-  return m_optype == OPTYPE_IMPORTER;
+  return m_OpType == OPTYPE_IMPORTER;
 }
 //----------------------------------------------------------------------------
 bool mafOp::IsExporter()   
 //----------------------------------------------------------------------------
 {
-  return m_optype == OPTYPE_EXPORTER;
+  return m_OpType == OPTYPE_EXPORTER;
 }
 //----------------------------------------------------------------------------
 bool mafOp::IsOp()   
 //----------------------------------------------------------------------------
 {
-  return m_optype == OPTYPE_OP;
+  return m_OpType == OPTYPE_OP;
 }
 */
 //----------------------------------------------------------------------------
@@ -138,40 +138,40 @@ int mafOp::GetType()
 /**  */
 //----------------------------------------------------------------------------
 {
-  return m_optype;
+  return m_OpType;
 }
 //----------------------------------------------------------------------------
 void mafOp::ShowGui()
 /**  */
 //----------------------------------------------------------------------------
 {
-  assert(m_gui); 
-  m_guih = new mmgGuiHolder(mafGetFrame(),-1);
-  m_guih->Put(m_gui);
+  assert(m_Gui); 
+  m_Guih = new mmgGuiHolder(mafGetFrame(),-1);
+  m_Guih->Put(m_Gui);
 	
   wxString title;
-  wxString menu_codes=wxStripMenuCodes(m_label);
+  wxString menu_codes=wxStripMenuCodes(m_Label);
   title.Format(" %s parameters:",menu_codes.c_str());
-  m_guih->SetTitle(title);
-  mafEventMacro(mafEvent(this,OP_SHOW_GUI,(wxWindow *)m_guih));
+  m_Guih->SetTitle(title);
+  mafEventMacro(mafEvent(this,OP_SHOW_GUI,(wxWindow *)m_Guih));
 }
 //----------------------------------------------------------------------------
 void mafOp::HideGui()
 /**  */
 //----------------------------------------------------------------------------
 {
-   assert(m_gui); 
-   mafEventMacro(mafEvent(this,OP_HIDE_GUI,(wxWindow *)m_guih));
-   delete m_guih;
-   m_guih = NULL;
-   m_gui = NULL;
+   assert(m_Gui); 
+   mafEventMacro(mafEvent(this,OP_HIDE_GUI,(wxWindow *)m_Guih));
+   delete m_Guih;
+   m_Guih = NULL;
+   m_Gui = NULL;
 }
 //----------------------------------------------------------------------------
 bool mafOp::OkEnabled()
 //----------------------------------------------------------------------------
 {
-  if(!m_gui) return false;
-  wxWindow* win = m_gui->FindWindow(wxOK);
+  if(!m_Gui) return false;
+  wxWindow* win = m_Gui->FindWindow(wxOK);
   if (!win) return false;
   return win->IsEnabled();
 }

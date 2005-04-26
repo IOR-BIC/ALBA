@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateVmeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:20:03 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-26 11:09:29 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,7 +28,7 @@ mmoCreateVmeSurface::mmoCreateVmeSurface(wxString label)
 : mafOp(label)
 //----------------------------------------------------------------------------
 {
-  m_canundo = true;
+  m_Canundo = true;
   m_vme = NULL;
 }
 //----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ mmoCreateVmeSurface::~mmoCreateVmeSurface()
 mafOp* mmoCreateVmeSurface::Copy()
 //----------------------------------------------------------------------------
 {
-  return new mmoCreateVmeSurface(m_label);
+  return new mmoCreateVmeSurface(m_Label);
 }
 //----------------------------------------------------------------------------
 void mmoCreateVmeSurface::OnEvent(mafEvent& e)
@@ -65,7 +65,7 @@ void mmoCreateVmeSurface::OpDo()
   static int counter = 0;
   wxString name = wxString::Format("vme surface %d",counter++);
   m_vme->SetName(name);
-  m_vme->ReparentTo( (mafVME*)m_input);
+  m_vme->ReparentTo( (mafVME*)m_Input);
 
   vtkConeSource *cs = vtkConeSource::New();
   cs->SetResolution(20);

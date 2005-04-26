@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateGenericVme.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-18 21:09:12 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-26 11:09:57 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,7 +27,7 @@ mmoCreateGenericVme::mmoCreateGenericVme(wxString label)
 : mafOp(label)
 //----------------------------------------------------------------------------
 {
-  m_canundo = true;
+  m_Canundo = true;
   m_vme = NULL;
 }
 //----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ mmoCreateGenericVme::~mmoCreateGenericVme()
 mafOp* mmoCreateGenericVme::Copy()
 //----------------------------------------------------------------------------
 {
-  return new mmoCreateGenericVme(m_label);
+  return new mmoCreateGenericVme(m_Label);
 }
 //----------------------------------------------------------------------------
 void mmoCreateGenericVme::OnEvent(mafEvent& e)
@@ -64,7 +64,7 @@ void mmoCreateGenericVme::OpDo()
   static int counter = 0;
   wxString name = wxString::Format("vme generic %d",counter++);
   m_vme->SetName(name);
-  m_vme->ReparentTo(m_input);
+  m_vme->ReparentTo(m_Input);
   mafEventMacro(mafEvent(this,VME_ADD,m_vme));
 }
 //----------------------------------------------------------------------------

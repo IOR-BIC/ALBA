@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:18 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-26 11:08:34 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -64,10 +64,10 @@ public:
 	virtual void		OpUndo();
 
 	/** Return the operation's interface. */
-	virtual mmgGui*	OpGui()	{return m_gui;};
+	virtual mmgGui*	OpGui()	{return m_Gui;};
 
 	/** Set the input vme for the operation. */
-	virtual void		SetInput(mafNode* vme)	{m_input = vme;};
+	virtual void		SetInput(mafNode* vme)	{m_Input = vme;};
 
 	/** Return true for the acceptable vme type. */
 	virtual bool		Accept(mafNode* vme);
@@ -85,7 +85,7 @@ public:
 	//bool IsOp();
 
 	/** Return true if the operation preserve the input vme. */
-	bool IsNaturalPreserving() {return m_natural_preserving;};
+	bool IsNaturalPreserving() {return m_NaturalPreserving;};
 
 	/** Puts the operation's interface into the gui holder and send the event to plug the interface on the side bar. */
 	void ShowGui();
@@ -102,15 +102,15 @@ public:
 	/** Stop operation with CANCEL condition. */
 	virtual void		ForceStopWithCancel();
 
-	wxString				m_label; 
-	int							m_id;
-	mafOp					 *m_next;
+	wxString				m_Label; 
+	int							m_Id;
+	mafOp					 *m_Next;
 
   //SIL 22/04/04
-	long            m_compatibility;
+	long            m_Compatibility;
 	bool 						IsCompatible(long state);
-  wxMenuItem     *m_menu_item;  
-  wxString        m_opMenuPath;
+  wxMenuItem     *m_MenuItem;  
+  wxString        m_OpMenuPath;
 
   //MARCO 7/05/04
   virtual const char ** GetActions() {return NULL;}; 
@@ -120,12 +120,12 @@ public:
   void SetMouseAction(mafAction *action);
 
 protected:
-	mafNode				 *m_input;
-	mmgGui      	 *m_gui;
-	mmgGuiHolder	 *m_guih;
-	bool 						m_canundo;
-	int 						m_optype;
-	bool						m_natural_preserving;
+	mafNode				 *m_Input;
+	mmgGui      	 *m_Gui;
+	mmgGuiHolder	 *m_Guih;
+	bool 						m_Canundo;
+	int 						m_OpType;
+	bool						m_NaturalPreserving;
 	mafEventListener *m_Listener;
   mafAction        *m_MouseAction;
 };

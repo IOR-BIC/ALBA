@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-19 12:32:45 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-26 11:08:34 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -135,8 +135,8 @@ void mafOpManager::OpAdd(mafOp *op, wxString menuPath)
 {
   assert(m_numop < MAXOP);
   m_opv[m_numop] = op;
-  op->m_opMenuPath = menuPath;
-	op->m_id = m_numop + OP_USER;
+  op->m_OpMenuPath = menuPath;
+	op->m_Id = m_numop + OP_USER;
   m_numop++;
 }
 //----------------------------------------------------------------------------
@@ -152,11 +152,11 @@ void mafOpManager::FillMenu (wxMenu* import, wxMenu* mexport, wxMenu* operations
 	for(int i=0; i<m_numop; i++)
   {
     mafOp *o = m_opv[i];
-    if (o->m_opMenuPath != "")
+    if (o->m_OpMenuPath != "")
     {
       wxMenu *sub_menu = NULL;
         
-      int item = m_menu[o->GetType()]->FindItem(o->m_opMenuPath);
+      int item = m_menu[o->GetType()]->FindItem(o->m_OpMenuPath);
       if (item != wxNOT_FOUND)
       {
          wxMenuItem *menu_item = m_menu[o->GetType()]->FindItem(item);
@@ -166,17 +166,17 @@ void mafOpManager::FillMenu (wxMenu* import, wxMenu* mexport, wxMenu* operations
       else
       {
         sub_menu = new wxMenu;
-        m_menu[o->GetType()]->Append(submenu_id++,o->m_opMenuPath,sub_menu);
+        m_menu[o->GetType()]->Append(submenu_id++,o->m_OpMenuPath,sub_menu);
       }
       
       if(sub_menu)
-        sub_menu->Append(o->m_id, o->m_label, o->m_label);
+        sub_menu->Append(o->m_Id, o->m_Label, o->m_Label);
       else
         wxLogMessage("error in FillMenu");
     }
     else
     {
-      m_menu[o->GetType()]->Append(o->m_id, o->m_label, o->m_label);
+      m_menu[o->GetType()]->Append(o->m_Id, o->m_Label, o->m_Label);
     }
     SetAccelerator(o);
   }
@@ -190,7 +190,7 @@ void mafOpManager::SetAccelerator(mafOp *op)
 {
   wxString accelerator, flag = "", extra_flag = "", key_code = "";
   int flag_num;
-  accelerator = op->m_label;
+  accelerator = op->m_Label;
   wxStringTokenizer tkz(accelerator, "\t");
   int token = tkz.CountTokens();
 
@@ -225,7 +225,7 @@ void mafOpManager::SetAccelerator(mafOp *op)
     else if(extra_flag == "Shift")
       flag_num |= wxACCEL_SHIFT;
 
-    m_OpAccelEntries[m_numAccel++].Set(flag_num,  (int) *key_code.c_str(), op->m_id);
+    m_OpAccelEntries[m_numAccel++].Set(flag_num,  (int) *key_code.c_str(), op->m_Id);
   }
 }
 //----------------------------------------------------------------------------
@@ -315,8 +315,8 @@ void mafOpManager::EnableOp(bool CanEnable)
 		  for(int i=0; i<m_numop; i++)
 		  {
         mafOp *o = m_opv[i]; 
-        if(m_menubar->FindItem(o->m_id))
-          m_menubar->Enable(o->m_id,false); 
+        if(m_menubar->FindItem(o->m_Id))
+          m_menubar->Enable(o->m_Id,false); 
       }
 	  }
 	  else
@@ -331,8 +331,8 @@ void mafOpManager::EnableOp(bool CanEnable)
 		  for(int i=0; i<m_numop; i++)
 		  {
         mafOp *o = m_opv[i]; 
-        if(m_menubar->FindItem(o->m_id))
-          m_menubar->Enable(o->m_id,o->Accept(m_selected)); 
+        if(m_menubar->FindItem(o->m_Id))
+          m_menubar->Enable(o->m_Id,o->Accept(m_selected)); 
       }
 	  }
   }
@@ -419,7 +419,7 @@ void mafOpManager::OpRun(mafOp *op)
   //Notify(OP_RUN_STARTING); //SIL. 17-9-2004: --- moved after m_running_op has been set
 
 	mafOp* o = op->Copy();
-  o->m_id = op->m_id;    //Paolo 15/09/2004 The operation ID is not copyed from the Copy() method.
+  o->m_Id = op->m_Id;    //Paolo 15/09/2004 The operation ID is not copyed from the Copy() method.
 	o->SetListener(this);
 	o->SetInput(m_selected);
   o->SetMouseAction(m_MouseAction);
@@ -491,7 +491,7 @@ void mafOpManager::OpDo(mafOp *op)
   m_context.Redo_Clear();
   op->OpDo();
   
-  wxLogMessage("do=%s",op->m_label);
+  wxLogMessage("do=%s",op->m_Label);
 
   if(op->CanUndo()) 
   {
@@ -515,7 +515,7 @@ void mafOpManager::OpUndo()
 	EnableOp(false);
 
 	mafOp* op = m_context.Undo_Pop();
-	wxLogMessage("undo=%s",op->m_label);
+	wxLogMessage("undo=%s",op->m_Label);
 	op->OpUndo();
 	m_context.Redo_Push(op);
 
@@ -533,7 +533,7 @@ void mafOpManager::OpRedo()
 	EnableOp(false);
 
 	mafOp* op = m_context.Redo_Pop();
-	wxLogMessage("redo=%s",op->m_label);
+	wxLogMessage("redo=%s",op->m_Label);
 	op->OpDo();
 	m_context.Undo_Push(op);
 

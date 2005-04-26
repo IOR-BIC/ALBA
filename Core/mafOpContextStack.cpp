@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpContextStack.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:06:46 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-26 11:08:34 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,110 +28,110 @@
 //----------------------------------------------------------------------------
 struct mafOpContext
 {
-  mafOpStack 		m_redo;
-  mafOpStack 		m_undo;
-  mafOp				 *m_caller;
-  mafOpContext *m_next;
+  mafOpStack 		m_ReDo;
+  mafOpStack 		m_UnDo;
+  mafOp				 *m_Caller;
+  mafOpContext *m_Next;
 };
 //----------------------------------------------------------------------------
 mafOpContextStack::mafOpContextStack()
 //----------------------------------------------------------------------------
 {
-  m_context = NULL;
+  m_Context = NULL;
   Push(NULL);
 }	
 //----------------------------------------------------------------------------
 mafOpContextStack::~mafOpContextStack() 
 //----------------------------------------------------------------------------
 {
-  while(m_context) Pop();
+  while(m_Context) Pop();
 }	
 //----------------------------------------------------------------------------
 void mafOpContextStack::Clear() 
 //----------------------------------------------------------------------------
 {
-  while(m_context) Pop();
+  while(m_Context) Pop();
   Push(NULL);
 }	
 //----------------------------------------------------------------------------
 mafOp* mafOpContextStack::Caller() 
 //----------------------------------------------------------------------------
 {
-  return m_context->m_caller;
+  return m_Context->m_Caller;
 }	
 //----------------------------------------------------------------------------
 void mafOpContextStack::Push(mafOp *caller)
 //----------------------------------------------------------------------------
 {
   mafOpContext *context = new mafOpContext;
-  context->m_next = m_context;
-  context->m_caller = caller;  
-  m_context = context;
+  context->m_Next = m_Context;
+  context->m_Caller = caller;  
+  m_Context = context;
 }	
 //----------------------------------------------------------------------------
 void mafOpContextStack::Pop()
 //----------------------------------------------------------------------------
 {
-  assert(m_context);
-  mafOpContext *c = m_context;
-  m_context = m_context->m_next;
-  c->m_undo.Clear();
-  c->m_redo.Clear();
+  assert(m_Context);
+  mafOpContext *c = m_Context;
+  m_Context = m_Context->m_Next;
+  c->m_UnDo.Clear();
+  c->m_ReDo.Clear();
   delete c;
 }	
 //----------------------------------------------------------------------------
 void 	 mafOpContextStack::Undo_Push(mafOp* op)
 //----------------------------------------------------------------------------
 {
-  assert(m_context);
-  m_context->m_undo.Push(op);  
+  assert(m_Context);
+  m_Context->m_UnDo.Push(op);  
 }	
 //----------------------------------------------------------------------------
 mafOp* mafOpContextStack::Undo_Pop()
 //----------------------------------------------------------------------------
 {
-  assert(m_context);
-  return m_context->m_undo.Pop();  
+  assert(m_Context);
+  return m_Context->m_UnDo.Pop();  
 }	
 //----------------------------------------------------------------------------
 void 	 mafOpContextStack::Undo_Clear()
 //----------------------------------------------------------------------------
 {
-  assert(m_context);
-  m_context->m_undo.Clear();  
+  assert(m_Context);
+  m_Context->m_UnDo.Clear();  
 }	
 //----------------------------------------------------------------------------
 bool 	 mafOpContextStack::Undo_IsEmpty()
 //----------------------------------------------------------------------------
 {
-  assert(m_context);
-  return m_context->m_undo.IsEmpty();  
+  assert(m_Context);
+  return m_Context->m_UnDo.IsEmpty();  
 }	
 //----------------------------------------------------------------------------
 void 	 mafOpContextStack::Redo_Push(mafOp* op)
 //----------------------------------------------------------------------------
 {
-  assert(m_context);
-  m_context->m_redo.Push(op);  
+  assert(m_Context);
+  m_Context->m_ReDo.Push(op);  
 }	
 //----------------------------------------------------------------------------
 mafOp* mafOpContextStack::Redo_Pop()
 //----------------------------------------------------------------------------
 {
-  assert(m_context);
-  return m_context->m_redo.Pop();  
+  assert(m_Context);
+  return m_Context->m_ReDo.Pop();  
 }	
 //----------------------------------------------------------------------------
 void 	 mafOpContextStack::Redo_Clear()
 //----------------------------------------------------------------------------
 {
-  assert(m_context);
-  m_context->m_redo.Clear();  
+  assert(m_Context);
+  m_Context->m_ReDo.Clear();  
 }	
 //----------------------------------------------------------------------------
 bool 	 mafOpContextStack::Redo_IsEmpty()
 //----------------------------------------------------------------------------
 {
-  assert(m_context);
-  return m_context->m_redo.IsEmpty();  
+  assert(m_Context);
+  return m_Context->m_ReDo.IsEmpty();  
 }	

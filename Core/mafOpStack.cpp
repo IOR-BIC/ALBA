@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpStack.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:06:47 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-26 11:08:35 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -46,7 +46,7 @@ bool mafOpStack::IsEmpty()
 void mafOpStack::Push(mafOp* op)   
 //----------------------------------------------------------------------------
 {
-  op->m_next = m_stack;
+  op->m_Next = m_stack;
   m_stack = op;
 }
 //----------------------------------------------------------------------------
@@ -54,7 +54,7 @@ mafOp* mafOpStack::Pop()
 //----------------------------------------------------------------------------
 {
   mafOp* op = m_stack;
-  m_stack = op->m_next;
+  m_stack = op->m_Next;
   return op;
 }
 //----------------------------------------------------------------------------

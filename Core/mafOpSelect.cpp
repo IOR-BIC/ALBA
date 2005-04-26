@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpSelect.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:06:46 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-26 11:08:35 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,9 +35,9 @@ mafAutoPointer<mafNode>  mafOpEdit::m_clipboard(NULL);
 //----------------------------------------------------------------------------
 mafOpSelect::mafOpSelect(wxString label) 
 {
-	m_canundo = true; 
-	m_optype = OPTYPE_EDIT; 
-	m_label=label;
+	m_Canundo = true; 
+	m_OpType = OPTYPE_EDIT; 
+	m_Label=label;
 }
 //----------------------------------------------------------------------------
 mafOpSelect::~mafOpSelect()
@@ -85,8 +85,8 @@ void mafOpSelect::OpUndo()
 mafOpEdit::mafOpEdit(wxString label)
 : m_backup(NULL)
 {
-	m_canundo = true; 
-	m_optype = OPTYPE_EDIT; 
+	m_Canundo = true; 
+	m_OpType = OPTYPE_EDIT; 
 	m_selection = NULL; 
 }
 //----------------------------------------------------------------------------
@@ -124,7 +124,7 @@ void mafOpEdit::ClipboardRestore()
 //----------------------------------------------------------------------------
 mafOpCut::mafOpCut(wxString label) 
 {
-  m_label=label;
+  m_Label=label;
   m_selection_parent = NULL; 
 }
 //----------------------------------------------------------------------------
@@ -134,7 +134,7 @@ mafOpCut::~mafOpCut()
 //----------------------------------------------------------------------------
 mafOp* mafOpCut::Copy() 
 {
-	return new mafOpCut(m_label);
+	return new mafOpCut(m_Label);
 }
 //----------------------------------------------------------------------------
 bool mafOpCut::Accept(mafNode* vme)
@@ -181,7 +181,7 @@ Restore the Selection
 //----------------------------------------------------------------------------
 mafOpCopy::mafOpCopy(wxString label) 
 {
-  m_label=label;
+  m_Label=label;
 }
 //----------------------------------------------------------------------------
 mafOpCopy::~mafOpCopy()
@@ -190,7 +190,7 @@ mafOpCopy::~mafOpCopy()
 //----------------------------------------------------------------------------
 mafOp* mafOpCopy::Copy()
 {
-	return new mafOpCopy(m_label);
+	return new mafOpCopy(m_Label);
 }
 //----------------------------------------------------------------------------
 bool mafOpCopy::Accept(mafNode* vme)
@@ -225,13 +225,13 @@ ripristino la clipboard precedente
 //----------------------------------------------------------------------------
 mafOpPaste::mafOpPaste(wxString label) 
 {
-  m_label=label;
+  m_Label=label;
   m_pasted_vme = NULL; 
 }
 //----------------------------------------------------------------------------
 mafOp* mafOpPaste::Copy() 
 {                    
-	return new mafOpPaste(m_label);
+	return new mafOpPaste(m_Label);
 }
 //----------------------------------------------------------------------------
 bool mafOpPaste::Accept(mafNode* vme)       
