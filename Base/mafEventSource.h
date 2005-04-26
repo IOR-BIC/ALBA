@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventSource.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-25 18:18:01 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-26 18:31:17 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -58,6 +58,9 @@ public:
 
   /** Unregister an observer. Return false if object is not an observer */
   bool RemoveObserver(mafObserver *obj);
+
+  /** remove all observers at once */
+  void RemoveAllObservers();
 
   /** return true if object is an observer of this subject */
   bool IsObserver(mafObserver *obj);
