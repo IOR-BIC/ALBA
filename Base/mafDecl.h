@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-16 10:17:18 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-26 18:31:28 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -273,6 +273,8 @@ MCH_START,
   MCH_INPUT,  ///< channel used for events coming from an input device
   MCH_OUTPUT, ///< channel used for events sent to an output device
   MCH_NODE,   ///< channel used by nodes for sending events to observers
+  MCH_ANY,    ///< Id used by mafAgent to identify any channel connected to it
+  MCH_VTK,    ///< channel used to as a bridge from VTK objects
 MCH_END,
 
 // ids issued/observed by mafNode and mafVME
