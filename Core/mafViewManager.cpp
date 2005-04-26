@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 15:18:26 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-04-26 17:23:49 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -283,10 +283,8 @@ mafView *mafViewManager::ViewCreate(int id)
   if(!view) return NULL;
 
   // Paolo 2005-04-22
-  int view_id   = view->m_Id;
   int view_mult = 0;
   new_view = view->Copy(this);
-  new_view->m_Id = view_id;
 
   for(;view_mult < MAXVIEW; view_mult++)
     if(m_ViewMatrixID[index][view_mult] == NULL)
@@ -296,8 +294,6 @@ mafView *mafViewManager::ViewCreate(int id)
   //update the matrix containing all created view
   m_ViewMatrixID[index][view_mult] = new_view;
   
-  new_view->m_PipeMap = view->m_PipeMap;
-
 	// during ViewInsert the View may send Events that will not be forwarded because 
 	// the view isn't already selected - 
 	m_view_being_created = new_view;
@@ -330,10 +326,8 @@ mafView *mafViewManager::ViewCreate(wxString type)
   assert(view);
 
   // Paolo 2005-04-22
-  int view_id   = view->m_Id;
   int view_mult = 0;
 	new_view = view->Copy(this);
-  new_view->m_Id = view_id;
 
   for(;view_mult < MAXVIEW; view_mult++)
     if(m_ViewMatrixID[index][view_mult] == NULL)
@@ -343,9 +337,7 @@ mafView *mafViewManager::ViewCreate(wxString type)
   //update the matrix containing all created view
   m_ViewMatrixID[index][view_mult] = new_view;
 
-  new_view->m_PipeMap = view->m_PipeMap;
-
-	m_view_being_created = new_view;
+  m_view_being_created = new_view;
 	ViewInsert(new_view);
 	m_view_being_created = NULL;
 
