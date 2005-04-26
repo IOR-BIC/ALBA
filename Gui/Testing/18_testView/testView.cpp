@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testView.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 12:17:04 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-26 17:26:39 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -61,7 +61,7 @@ void testView::VmeCreatePipe(mafNode *vme)
 
   mafObject *obj= NULL;
   mafString pipe_name = "";
-  mafString vme_type = "mafVMESurface"; // Paolo 2005-04-23 Just to try PlugVisualPipe 
+  mafString vme_type = v->GetTypeName(); // Paolo 2005-04-23 Just to try PlugVisualPipe 
                                         // (to be replaced with something that extract the type of the vme)
 
   mafPipeFactory *pipe_factory  = mafPipeFactory::GetInstance();
