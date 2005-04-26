@@ -174,7 +174,8 @@ mafPlugTestNode<T>::mafPlugTestNode(const char *description)
   {
     factory->RegisterNewNode(T::GetStaticTypeName(), description, T::NewObject);
     // here plug node's icon inside picture factory
-    mafPics.AddVmePic(T::GetStaticTypeName(),T::GetIcon());
+    if (mafPics_Initialized)
+      mafPics.AddVmePic(T::GetStaticTypeName(),T::GetIcon());
   }
 }
 
