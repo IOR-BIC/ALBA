@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 10:27:03 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-04-26 17:24:43 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,8 +44,7 @@ mafView::~mafView()
 {
   m_PipeMap.clear();
 
-  if(m_Gui != NULL) 
-    HideGui();
+  cppDEL(m_Gui);
 }
 //----------------------------------------------------------------------------
 void mafView::OnEvent(mafEvent& e)
@@ -53,6 +52,7 @@ void mafView::OnEvent(mafEvent& e)
 {
   mafEventMacro(e);
 }
+/*
 //----------------------------------------------------------------------------
 void mafView::ShowGui()
 //----------------------------------------------------------------------------
@@ -71,9 +71,26 @@ void mafView::HideGui()
 	settings_event.SetBool(true);
 	mafEventMacro(settings_event);
 }
+*/
 //----------------------------------------------------------------------------
-void mafView::PlugVisualPipe(mafString vme_type, mafVisualPipeInfo plugged_pipe)
+void mafView::PlugVisualPipe(mafString vme_type, mafString pipe_type, long visibility)
 //----------------------------------------------------------------------------
 {
+  mafVisualPipeInfo plugged_pipe = {pipe_type,visibility};
   m_PipeMap[vme_type] = plugged_pipe;
+}
+//-------------------------------------------------------------------------
+void mafView::DeleteGui()
+//-------------------------------------------------------------------------
+{
+  cppDEL(m_Gui);
+}
+//-------------------------------------------------------------------------
+mmgGui* mafView::CreateGui()
+//-------------------------------------------------------------------------
+{
+  assert(m_Gui == NULL);
+  m_Gui = new mmgGui(NULL); // replace NULL with 'this' ....  //SIL. 22-4-2005: 
+  m_Gui->Label("view default gui");
+  return m_Gui;
 }

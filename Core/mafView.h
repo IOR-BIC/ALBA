@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 10:27:03 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-04-26 17:24:43 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,6 +38,13 @@ enum
   NODE_VISIBLE_ON,
   NODE_MUTEX_OFF,
   NODE_MUTEX_ON,
+};
+/** VME visibility attribute when plugging visual pipe.*/
+enum 
+{
+  NON_VISIBLE = 0,
+  VISIBLE,
+  MUTEX,
 };
 //----------------------------------------------------------------------------
 // mafView :
@@ -90,13 +97,13 @@ public:
   virtual wxString        GetName()  {return m_Name;};
   virtual wxWindow*	      GetWindow(){return m_Win;};
   virtual wxFrame*		    GetFrame() {return m_Frame;};
-  virtual mmgGui*		      GetGui()   {return m_Gui;};
-  virtual mmgGuiHolder*		GetGuih()  {return m_Guih;};
+  virtual mmgGui*		      GetGui()   {if(m_Gui == NULL) CreateGui(); assert(m_Gui); return m_Gui;};
+//  virtual mmgGuiHolder*		GetGuih()  {return m_Guih;};
   virtual void		  SetFrame(wxFrame* f) {m_Frame = f;};
 
-  virtual void			HideGui();
-  virtual void			ShowGui();
-  virtual void			ShowSettings()							{};
+  //virtual void			HideGui();
+  //virtual void			ShowGui();
+//  virtual void			ShowSettings()							{};
   virtual void			OnSize(wxSizeEvent &event)	{};
 
   /** Struct containing information regarding visual pipe plugged into the view. */
@@ -108,7 +115,7 @@ public:
   typedef std::map<mafString, mafVisualPipeInfo> mafPipeMap;
 
   /** Plug a visual pipe for a particular vme. It is used also to plug custom pipe.*/
-  void PlugVisualPipe(mafString vme_type, mafVisualPipeInfo plugged_pipe);
+  void PlugVisualPipe(mafString vme_type, mafString pipe_type, long visibility = VISIBLE);
   
   mafPipeMap m_PipeMap;
 
@@ -126,5 +133,25 @@ public:
   int                m_Id;      ///< Used to store the view type created (e.g. view surface).
   bool               m_Plugged; // forget it - it is used from outside 
   mafView           *m_Next;    // forget it - it is used from outside 
+
+
+  /** IDs for the GUI */
+  enum 
+  {
+    ID_FIRST = MINID,
+    ID_LAST
+  };
+  /** destroy the Gui */
+  void DeleteGui();
+
+protected:
+  /**
+  Internally used to create a new instance of the GUI. This function should be
+  overridden by subclasses to create specialized GUIs. Each subclass should append
+  its own widgets and define the enum of IDs for the widgets as an extension of
+  the superclass enum. The last id value must be defined as "LAST_ID" to allow the 
+  subclass to continue the ID enumeration from it. For appending the widgets in the
+  same pannel GUI, each CreateGUI() function should first call the superclass' one.*/
+  virtual mmgGui  *CreateGui();
 };
 #endif
