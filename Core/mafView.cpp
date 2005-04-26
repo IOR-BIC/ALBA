@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-23 10:43:36 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-04-26 10:27:03 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,17 +25,17 @@
 mafView::mafView( wxString label, bool external)
 //----------------------------------------------------------------------------
 {
-	m_label					= label;
-  m_name					= "";
-	m_win						= NULL;
-  m_frame					= NULL;
+	m_Label					= label;
+  m_Name					= "";
+	m_Win						= NULL;
+  m_Frame					= NULL;
 	m_Listener			= NULL;
-	m_next					= NULL;
-  m_guih					= NULL;
-	m_gui					 	= NULL;
-	m_plugged				= false;
-  m_id            = 0;
-  m_mult          = 0;
+	m_Next					= NULL;
+  m_Guih					= NULL;
+	m_Gui					 	= NULL;
+	m_Plugged				= false;
+  m_Id            = 0;
+  m_Mult          = 0;
 	//m_external_flag = external;
 }
 //----------------------------------------------------------------------------
@@ -44,7 +44,7 @@ mafView::~mafView()
 {
   m_PipeMap.clear();
 
-  if(m_gui != NULL) 
+  if(m_Gui != NULL) 
     HideGui();
 }
 //----------------------------------------------------------------------------
@@ -57,8 +57,8 @@ void mafView::OnEvent(mafEvent& e)
 void mafView::ShowGui()
 //----------------------------------------------------------------------------
 {
-  assert(m_gui); 
-	mafEvent settings_event(this,OP_SHOW_GUI,(wxWindow *)m_gui);
+  assert(m_Gui); 
+	mafEvent settings_event(this,OP_SHOW_GUI,(wxWindow *)m_Gui);
 	settings_event.SetBool(true);
 	mafEventMacro(settings_event);
 }
@@ -66,8 +66,8 @@ void mafView::ShowGui()
 void mafView::HideGui()
 //----------------------------------------------------------------------------
 {
-	assert(m_gui); 
-	mafEvent settings_event(this,OP_HIDE_GUI,(wxWindow *)m_gui);
+	assert(m_Gui); 
+	mafEvent settings_event(this,OP_HIDE_GUI,(wxWindow *)m_Gui);
 	settings_event.SetBool(true);
 	mafEventMacro(settings_event);
 }

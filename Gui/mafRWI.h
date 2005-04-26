@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-20 10:02:58 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-26 10:27:18 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -86,24 +86,24 @@ public:
 	/** Set the visibility for the axes actor. */
 	void SetAxesVisibility(bool show);
 
-  mafSceneGraph    *m_sg; 
-  mafRWIBase			 *m_rwi;
-  vtkRenderer      *m_r1; ///< Renderer used to show actors on the first layer.
-  vtkRenderer      *m_r2; ///< Renderer used to show actors on the second layer.
-  vtkRenderWindow  *m_rw;
-  vtkLight         *m_l;
-  vtkCamera				 *m_c;
-  int               m_cam_position; ///< Used to store camera position ID.
+  mafSceneGraph    *m_Sg; 
+  mafRWIBase			 *m_Rwi;
+  vtkRenderer      *m_RenFront; ///< Renderer used to show actors on the first layer.
+  vtkRenderer      *m_RenBack; ///< Renderer used to show actors on the second layer.
+  vtkRenderWindow  *m_RenderWindow;
+  vtkLight         *m_Light;
+  vtkCamera				 *m_Camera;
+  int               m_CameraPosition; ///< Used to store camera position ID.
   
-	mafAxes          *m_axes; ///< Actor representing a global reference system.
-	vtkGridActor     *m_grid; ///< Actor representing a grid showed into the render window.
-	bool              m_show_grid; ///< Flag used to show/hide the grid.
+	mafAxes          *m_Axes; ///< Actor representing a global reference system.
+	vtkGridActor     *m_Grid; ///< Actor representing a grid showed into the render window.
+	bool              m_ShowGrid; ///< Flag used to show/hide the grid.
 
 protected:
 	/** Compute the bounds for the visible actors; if vme is passed, the bounds of vme are calculated. */
 	float* ComputeVisibleBounds(mafNode *vme = NULL);
 	
-  int               m_stereo_type;
+  int               m_StereoType;
 
   mafEventListener *m_Listener;	
 };

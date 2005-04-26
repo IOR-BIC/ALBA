@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testRWIDlg.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-20 14:36:41 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-26 10:27:44 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -53,11 +53,11 @@ testRWIDlg::testRWIDlg(const wxString& title)
   
   RWI = new mafRWI(this);
   RWI->SetSize(0,0,400,300);
-  RWI->m_rwi->Show(true);
-  RWI->m_r1->AddActor(A);
+  RWI->m_Rwi->Show(true);
+  RWI->m_RenFront->AddActor(A);
   RWI->CameraReset();
 
-  Add(RWI->m_rwi,1);
+  Add(RWI->m_Rwi,1);
 }
 //----------------------------------------------------------------------------
 testRWIDlg::~testRWIDlg( ) 

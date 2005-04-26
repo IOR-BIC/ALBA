@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 20:01:06 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-26 10:27:04 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,10 +49,10 @@ public:
 	virtual void			CameraReset();	 
   virtual void			CameraUpdate(); 
 
-  virtual mafSceneGraph *GetSceneGraph()	  {return m_sg;}; 
-  virtual mafRWIBase    *GetRWI()           {return m_rwi->m_rwi;}; 
+  virtual mafSceneGraph *GetSceneGraph()	  {return m_Sg;}; 
+  virtual mafRWIBase    *GetRWI()           {return m_Rwi->m_Rwi;}; 
 protected:
-  mafRWI        *m_rwi; 
-  mafSceneGraph *m_sg; 
+  mafRWI        *m_Rwi; 
+  mafSceneGraph *m_Sg; 
 };
 #endif

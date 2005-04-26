@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-23 10:43:37 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-04-26 10:27:03 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,14 +22,6 @@
 #include "mafPipe.h"
 
 #include <map>
-
-/** Struct containing information regarding visual pipe plugged into the view. */
-struct mafVisualPipeInfo
-{
-  mafString m_PipeName;
-  long      m_Visibility;
-};
-typedef std::map<mafString, mafVisualPipeInfo> mafPipeMap;
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -94,18 +86,26 @@ public:
   /** return the current pipe for the specified vme (if any exist at this moment) */
   virtual mafPipe*  GetNodePipe(mafNode *vme) {return NULL;};
 
-  virtual wxString        GetLabel() {return m_label;};
-  virtual wxString        GetName()  {return m_name;};
-  virtual wxWindow*	      GetWindow(){return m_win;};
-  virtual wxFrame*		    GetFrame() {return m_frame;};
-  virtual mmgGui*		      GetGui()   {return m_gui;};
-  virtual mmgGuiHolder*		GetGuih()  {return m_guih;};
-  virtual void		  SetFrame(wxFrame* f) {m_frame = f;};
+  virtual wxString        GetLabel() {return m_Label;};
+  virtual wxString        GetName()  {return m_Name;};
+  virtual wxWindow*	      GetWindow(){return m_Win;};
+  virtual wxFrame*		    GetFrame() {return m_Frame;};
+  virtual mmgGui*		      GetGui()   {return m_Gui;};
+  virtual mmgGuiHolder*		GetGuih()  {return m_Guih;};
+  virtual void		  SetFrame(wxFrame* f) {m_Frame = f;};
 
   virtual void			HideGui();
   virtual void			ShowGui();
   virtual void			ShowSettings()							{};
   virtual void			OnSize(wxSizeEvent &event)	{};
+
+  /** Struct containing information regarding visual pipe plugged into the view. */
+  struct mafVisualPipeInfo
+  {
+    mafString m_PipeName;
+    long      m_Visibility;
+  };
+  typedef std::map<mafString, mafVisualPipeInfo> mafPipeMap;
 
   /** Plug a visual pipe for a particular vme. It is used also to plug custom pipe.*/
   void PlugVisualPipe(mafString vme_type, mafVisualPipeInfo plugged_pipe);
@@ -114,17 +114,17 @@ public:
 
 protected:
   mafEventListener	*m_Listener;
-  wxString           m_label; 
-  wxString           m_name;
-  wxWindow					*m_win;
-  wxFrame					  *m_frame;
-  mmgGui      			*m_gui;
-  mmgGuiHolder			*m_guih;
+  wxString           m_Label; 
+  wxString           m_Name;
+  wxWindow					*m_Win;
+  wxFrame					  *m_Frame;
+  mmgGui      			*m_Gui;
+  mmgGuiHolder			*m_Guih;
 
 public:
-  int                m_mult;    ///< Used to store the multiplicity of the view type created (e.g. the 3rd view surface created).
-  int                m_id;      ///< Used to store the view type created (e.g. view surface).
-  bool               m_plugged; // forget it - it is used from outside 
-  mafView           *m_next;    // forget it - it is used from outside 
+  int                m_Mult;    ///< Used to store the multiplicity of the view type created (e.g. the 3rd view surface created).
+  int                m_Id;      ///< Used to store the view type created (e.g. view surface).
+  bool               m_Plugged; // forget it - it is used from outside 
+  mafView           *m_Next;    // forget it - it is used from outside 
 };
 #endif

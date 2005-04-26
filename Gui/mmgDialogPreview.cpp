@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialogPreview.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-20 14:22:21 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-26 10:27:18 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,25 +27,25 @@ mmgDialogPreview::mmgDialogPreview(const wxString& title,long style)
 : mmgDialog(title, style)
 //----------------------------------------------------------------------------
 {
-  m_preview_sizer = new wxBoxSizer( wxHORIZONTAL );
-  m_rwi = NULL;
-  m_gui = NULL;
+  m_PreviewSizer = new wxBoxSizer( wxHORIZONTAL );
+  m_Rwi = NULL;
+  m_Gui = NULL;
 
   if( style & mafUSERWI )
   {
-    m_rwi = new mafRWI(this);
-    m_rwi->SetSize(0,0,300,200);
-    m_rwi->Show(true);
-    m_preview_sizer->Add(m_rwi->m_rwi,1,wxEXPAND);
+    m_Rwi = new mafRWI(this);
+    m_Rwi->SetSize(0,0,300,200);
+    m_Rwi->Show(true);
+    m_PreviewSizer->Add(m_Rwi->m_Rwi,1,wxEXPAND);
   }
   if( style & mafUSEGUI )
   {
-    m_gui = new mmgGui(NULL);
-    m_gui->SetListener(this);
-    m_gui->Reparent(this);
-    m_preview_sizer->Add(m_gui,0,wxEXPAND);
+    m_Gui = new mmgGui(NULL);
+    m_Gui->SetListener(this);
+    m_Gui->Reparent(this);
+    m_PreviewSizer->Add(m_Gui,0,wxEXPAND);
   }
-  Add(m_preview_sizer,1);
+  Add(m_PreviewSizer,1);
 }
 //----------------------------------------------------------------------------
 mmgDialogPreview::~mmgDialogPreview()
@@ -54,5 +54,5 @@ mmgDialogPreview::~mmgDialogPreview()
   // this is the right place where to delete rwi.
   // the rest of the dialog is destructed by inherited 
   // destructor that execute after this.  //SIL. 20-4-2005: 
-  cppDEL(m_rwi);
+  cppDEL(m_Rwi);
 }

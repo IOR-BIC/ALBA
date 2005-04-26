@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-20 10:52:04 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-26 10:27:17 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,67 +49,67 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, int stereo)
 //----------------------------------------------------------------------------
 {
   m_Listener = NULL;
-  m_sg = NULL;
+  m_Sg = NULL;
 
-  m_l = vtkLight::New();
-  m_l->SetLightTypeToCameraLight();  
+  m_Light = vtkLight::New();
+  m_Light->SetLightTypeToCameraLight();  
 
-  m_c = vtkCamera::New();
-	m_c->SetViewAngle(20); 
-  m_c->ParallelProjectionOn(); 
+  m_Camera = vtkCamera::New();
+	m_Camera->SetViewAngle(20); 
+  m_Camera->ParallelProjectionOn(); 
 
-	m_r1 = vtkRenderer::New();
-  m_r1->SetBackground(0.4,0.4,0.4);
-  m_r1->SetActiveCamera(m_c);
-  m_r1->AddLight(m_l);
-  m_r1->BackingStoreOff();
-  m_r1->LightFollowCameraOn(); 
+	m_RenFront = vtkRenderer::New();
+  m_RenFront->SetBackground(0.4,0.4,0.4);
+  m_RenFront->SetActiveCamera(m_Camera);
+  m_RenFront->AddLight(m_Light);
+  m_RenFront->BackingStoreOff();
+  m_RenFront->LightFollowCameraOn(); 
 	
   if(stereo)
   {
-    m_rw = vtkRenderWindow::New(); //SIL. 13-11-2003: - temporary removed - cause error in OpenGLMApper during close
-    m_rw->StereoCapableWindowOn();
-    m_rw->StereoRenderOn();
+    m_RenderWindow = vtkRenderWindow::New(); //SIL. 13-11-2003: - temporary removed - cause error in OpenGLMApper during close
+    m_RenderWindow->StereoCapableWindowOn();
+    m_RenderWindow->StereoRenderOn();
     SetStereo(stereo);
   }
   else
-    m_rw = vtkRenderWindow::New(); 
-  m_rw->AddRenderer(m_r1);
+    m_RenderWindow = vtkRenderWindow::New(); 
+  m_RenderWindow->AddRenderer(m_RenFront);
 
-  m_rwi = new mafRWIBase(parent, -1);
-	m_rwi->SetRenderWindow(m_rw);
+  m_Rwi = new mafRWIBase(parent, -1);
+	m_Rwi->SetRenderWindow(m_RenderWindow);
   
-	m_r2 = NULL;
+	m_RenBack = NULL;
 	if(layers == TWO_LAYER)
 	{
-		m_r2 = vtkRenderer::New();
-		m_r2->SetBackground(0.4,0.4,0.4);
-		m_r2->SetActiveCamera(m_c);
-		m_r2->AddLight(m_l);
-		m_r2->BackingStoreOff();
-		m_r2->LightFollowCameraOn(); 
-		m_r2->SetInteractive(0); 
+		m_RenBack = vtkRenderer::New();
+		m_RenBack->SetBackground(0.4,0.4,0.4);
+		m_RenBack->SetActiveCamera(m_Camera);
+		m_RenBack->AddLight(m_Light);
+		m_RenBack->BackingStoreOff();
+		m_RenBack->LightFollowCameraOn(); 
+		m_RenBack->SetInteractive(0); 
 
-    m_r1->SetLayer(0); 
-		m_r2->SetLayer(1); 
-    m_rw->SetNumberOfLayers(2);
-    m_rw->AddRenderer(m_r2);
+    m_RenFront->SetLayer(0); 
+		m_RenBack->SetLayer(1); 
+    m_RenderWindow->SetNumberOfLayers(2);
+    m_RenderWindow->AddRenderer(m_RenBack);
   }
 
-	m_grid = NULL;
+	m_Grid = NULL;
 /*
-  m_show_grid = use_grid;
+  m_ShowGrid = use_grid;
 
   if(use_grid)
 	{
-     m_grid= vtkGridActor::New();
-		 m_r1->AddActor(m_grid);
-		 m_r1->AddActor2D(m_grid->GetLabelActor());
+     m_Grid= vtkGridActor::New();
+		 m_RenFront->AddActor(m_Grid);
+		 m_RenFront->AddActor2D(m_Grid->GetLabelActor());
 	   SetGridNormal(GRID_Y);
 	}
 
-	m_axes = new mafAxes(m_r1);
-  m_axes->SetVisibility(0);
+	m_Axes = new mafAxes(m_RenFront);
+  m_Axes->SetVisibility(0);
   */
 }
 //----------------------------------------------------------------------------
@@ -117,39 +117,39 @@ mafRWI::~mafRWI( )
 //----------------------------------------------------------------------------
 {
 	  /*
-    if(m_grid) m_r1->RemoveActor(m_grid);
-		if(m_grid) m_r1->RemoveActor2D(m_grid->GetLabelActor());
-		vtkDEL(m_grid);
+    if(m_Grid) m_RenFront->RemoveActor(m_Grid);
+		if(m_Grid) m_RenFront->RemoveActor2D(m_Grid->GetLabelActor());
+		vtkDEL(m_Grid);
 		
-		wxDEL(m_axes); //SIL. 31-10-2003: must be removed before deleting renderers
+		wxDEL(m_Axes); //SIL. 31-10-2003: must be removed before deleting renderers
 		*/
-    vtkDEL(m_l);
-		vtkDEL(m_c);
-		if(m_r1) 
+    vtkDEL(m_Light);
+		vtkDEL(m_Camera);
+		if(m_RenFront) 
     {
-      m_r1->GetActors();        //Paolo 23-06-2004
-      m_rw->RemoveRenderer(m_r1);
+      m_RenFront->GetActors();        //Paolo 23-06-2004
+      m_RenderWindow->RemoveRenderer(m_RenFront);
     }
-    vtkDEL(m_r1);
-    if(m_r2) 
+    vtkDEL(m_RenFront);
+    if(m_RenBack) 
     {
-      m_r2->GetActors();        //Paolo 23-06-2004
-      m_rw->RemoveRenderer(m_r2);
+      m_RenBack->GetActors();        //Paolo 23-06-2004
+      m_RenderWindow->RemoveRenderer(m_RenBack);
     }
-		vtkDEL(m_r2);
-		if(m_rw) 
-      m_rw->SetInteractor(NULL);    //Paolo 23-06-2004
-    vtkDEL(m_rw);
-    if(m_rwi) 
-      m_rwi->SetRenderWindow(NULL); //Paolo 23-06-2004
-		vtkDEL(m_rwi);  //SIL. 13-11-2003: The renderer has to be Deleted as last
+		vtkDEL(m_RenBack);
+		if(m_RenderWindow) 
+      m_RenderWindow->SetInteractor(NULL);    //Paolo 23-06-2004
+    vtkDEL(m_RenderWindow);
+    if(m_Rwi) 
+      m_Rwi->SetRenderWindow(NULL); //Paolo 23-06-2004
+		vtkDEL(m_Rwi);  //SIL. 13-11-2003: The renderer has to be Deleted as last
 }
 //-----------------------------------------------------------------------------------------
 void mafRWI::CameraSet(int cam_position)
 //-----------------------------------------------------------------------------------------
 {
   int x,y,z,vx,vy,vz;
-  m_cam_position = cam_position;
+  m_CameraPosition = cam_position;
 
   if(cam_position == CAMERA_PERSPECTIVE
 	|| cam_position == CAMERA_PERSPECTIVE_FRONT
@@ -159,9 +159,9 @@ void mafRWI::CameraSet(int cam_position)
 	|| cam_position == CAMERA_PERSPECTIVE_TOP 
 	|| cam_position == CAMERA_PERSPECTIVE_BOTTOM 
   )
-		m_c->ParallelProjectionOff();
+		m_Camera->ParallelProjectionOff();
 	else
-		m_c->ParallelProjectionOn();
+		m_Camera->ParallelProjectionOn();
 
   switch (cam_position) 
 	{
@@ -203,15 +203,15 @@ void mafRWI::CameraSet(int cam_position)
 			x=-1;y=0; z=0; vx=0; vy=0; vz=1;
 		break;
 		case CAMERA_DRR_FRONT:
-			m_c->ParallelProjectionOff();
+			m_Camera->ParallelProjectionOff();
 			x=0; y=-1; z=0; vx=0; vy=0; vz=1;	//modified by Paolo 10-6-2003
 		break;
 		case CAMERA_DRR_LEFT:
-			m_c->ParallelProjectionOff();
+			m_Camera->ParallelProjectionOff();
 			x=1 ;y=0; z=0; vx=0; vy=0; vz=1;	//modified by Paolo 10-6-2003
 		break;
 		case CAMERA_DRR_RIGHT:
-			m_c->ParallelProjectionOff();
+			m_Camera->ParallelProjectionOff();
 			x=-1;y=0; z=0; vx=0; vy=0; vz=1;	//modified by Paolo 10-6-2003
 		break;
 		case CAMERA_CT:
@@ -227,7 +227,7 @@ void mafRWI::CameraSet(int cam_position)
 			x=0; y=0; z=-1; vx=0; vy=-1; vz=0;
 		break;
 		case CAMERA_OS_P:
-      m_c->ParallelProjectionOff();     // Paolo 09/06/2004
+      m_Camera->ParallelProjectionOff();     // Paolo 09/06/2004
 			x=-1; y=-1; z=1; vx=0; vy=0; vz=1;
 		break;
     // ste beg
@@ -251,9 +251,9 @@ void mafRWI::CameraSet(int cam_position)
     break;
     // ste end
   }
-  m_c->SetFocalPoint(0,0,0);
-  m_c->SetPosition(x*100,y*100,z*100);
-  m_c->SetViewUp(vx,vy,vz);
+  m_Camera->SetFocalPoint(0,0,0);
+  m_Camera->SetPosition(x*100,y*100,z*100);
+  m_Camera->SetViewUp(vx,vy,vz);
   
 	CameraReset();
 
@@ -262,36 +262,36 @@ void mafRWI::CameraSet(int cam_position)
 void mafRWI::SetSize(int x, int y, int w,int h)
 //----------------------------------------------------------------------------
 {
-   ((wxWindow*)m_rwi)->SetSize(x,y,w,h);
+   ((wxWindow*)m_Rwi)->SetSize(x,y,w,h);
 }
 //----------------------------------------------------------------------------
 void mafRWI::Show(bool show)
 //----------------------------------------------------------------------------
 {
-   m_rwi->Show(show);
+   m_Rwi->Show(show);
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetGridNormal(int normal_id)
 //----------------------------------------------------------------------------
 {
-//   if(m_grid) m_grid->SetGridNormal(normal_id);
+//   if(m_Grid) m_Grid->SetGridNormal(normal_id);
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetGridPosition(float position)
 //----------------------------------------------------------------------------
 {
-//   if(m_grid) m_grid->SetGridPosition(position);
+//   if(m_Grid) m_Grid->SetGridPosition(position);
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetGridVisibility(bool show)
 //----------------------------------------------------------------------------
 {
 /* 
-  if(m_grid)
+  if(m_Grid)
 	 {
-	   m_show_grid = show;
-		 m_grid->SetVisibility(m_show_grid );
-	   m_grid->GetLabelActor()->SetVisibility(m_show_grid );
+	   m_ShowGrid = show;
+		 m_Grid->SetVisibility(m_ShowGrid );
+	   m_Grid->GetLabelActor()->SetVisibility(m_ShowGrid );
 	 }
    */
 }
@@ -299,84 +299,84 @@ void mafRWI::SetGridVisibility(bool show)
 void mafRWI::SetAxesVisibility(bool show)
 //----------------------------------------------------------------------------
 {
-   //if(m_axes) m_axes->SetVisibility(show);
+   //if(m_Axes) m_Axes->SetVisibility(show);
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetGridColor(wxColor col)
 //----------------------------------------------------------------------------
 {
-   //if(m_grid) m_grid->SetGridColor(col.Red()/255.0,col.Green()/255.0,col.Blue()/255.0);
+   //if(m_Grid) m_Grid->SetGridColor(col.Red()/255.0,col.Green()/255.0,col.Blue()/255.0);
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetBackgroundColor(wxColor col)
 //----------------------------------------------------------------------------
 {
-            m_r1->SetBackground(col.Red()/255.0,col.Green()/255.0,col.Blue()/255.0);
-   if(m_r2) m_r2->SetBackground(col.Red()/255.0,col.Green()/255.0,col.Blue()/255.0);
+            m_RenFront->SetBackground(col.Red()/255.0,col.Green()/255.0,col.Blue()/255.0);
+   if(m_RenBack) m_RenBack->SetBackground(col.Red()/255.0,col.Green()/255.0,col.Blue()/255.0);
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetStereo(int stereo_type)
 //----------------------------------------------------------------------------
 {
-  if(m_r2) {wxLogMessage("LAL WARNING: SetStereo is disabled for RWI with two layers"); return;}
+  if(m_RenBack) {wxLogMessage("LAL WARNING: SetStereo is disabled for RWI with two layers"); return;}
 	
   if (stereo_type < VTK_STEREO_CRYSTAL_EYES)
   stereo_type = 0; 
 	  
-  if(m_stereo_type == stereo_type) 
+  if(m_StereoType == stereo_type) 
 	   return;
  
-  m_stereo_type = stereo_type;
+  m_StereoType = stereo_type;
   
   //warning: non portable
-  //m_rw->SetWindowId( (HWND) 0 );
+  //m_RenderWindow->SetWindowId( (HWND) 0 );
 
   
-  int *size = m_rw->GetSize();
-	//m_rw->RemoveRenderer(m_r1);
-  //vtkDEL(m_rw);
-	//m_rw = vtkRenderWindow::New();
-  //m_rw->SetSize(size);
-  m_rw->SetStereoCapableWindow(m_stereo_type != 0);
-  m_rw->SetStereoType(m_stereo_type);
-  m_rw->SetStereoRender(m_stereo_type != 0);
+  int *size = m_RenderWindow->GetSize();
+	//m_RenderWindow->RemoveRenderer(m_RenFront);
+  //vtkDEL(m_RenderWindow);
+	//m_RenderWindow = vtkRenderWindow::New();
+  //m_RenderWindow->SetSize(size);
+  m_RenderWindow->SetStereoCapableWindow(m_StereoType != 0);
+  m_RenderWindow->SetStereoType(m_StereoType);
+  m_RenderWindow->SetStereoRender(m_StereoType != 0);
 	
 
   //warning: non portable
-  //m_rw->SetWindowId( (HWND) m_rwi->GetHWND() );
+  //m_RenderWindow->SetWindowId( (HWND) m_Rwi->GetHWND() );
 
-  //m_rw->AddRenderer(m_r1);
-  //m_rwi->SetRenderWindow(m_rw);
-  m_rwi->ReInitialize();
+  //m_RenderWindow->AddRenderer(m_RenFront);
+  //m_Rwi->SetRenderWindow(m_RenderWindow);
+  m_Rwi->ReInitialize();
 }
 //----------------------------------------------------------------------------
 void mafRWI::CameraUpdate()
 //----------------------------------------------------------------------------
 {
-  //if(!m_rwi->IsShown()) return; //TODO: capire perche' non funziona piu' - risulta sempre nascosta
-  if (m_rw->GetGenericWindowId() == 0) 
+  //if(!m_Rwi->IsShown()) return; //TODO: capire perche' non funziona piu' - risulta sempre nascosta
+  if (m_RenderWindow->GetGenericWindowId() == 0) 
 		return;
 
-	m_r1->ResetCameraClippingRange(); 
-  m_rw->Render();
+	m_RenFront->ResetCameraClippingRange(); 
+  m_RenderWindow->Render();
 
 }
 //----------------------------------------------------------------------------
 void mafRWI::CameraReset(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-  if (m_rw->GetGenericWindowId() == 0) 
+  if (m_RenderWindow->GetGenericWindowId() == 0) 
 		return;
 
-//	if(m_grid && m_show_grid) m_grid->VisibilityOff();
+//	if(m_Grid && m_ShowGrid) m_Grid->VisibilityOff();
 
-  mafEventMacro(mafEvent(this,CAMERA_PRE_RESET,m_r1));  //SIL. 16-6-2004: - Attention - I'm sending m_r1, I suppose that m_r2 is never required 
+  mafEventMacro(mafEvent(this,CAMERA_PRE_RESET,m_RenFront));  //SIL. 16-6-2004: - Attention - I'm sending m_RenFront, I suppose that m_RenBack is never required 
   CameraReset(ComputeVisibleBounds(vme));
-//	if(m_grid && m_show_grid) m_grid->VisibilityOn();
+//	if(m_Grid && m_ShowGrid) m_Grid->VisibilityOn();
 
-  mafEventMacro(mafEvent(this,CAMERA_POST_RESET,m_r1)); //SIL. 16-6-2004:
-  m_r1->ResetCameraClippingRange(); //per la griglia
-  m_rw->Render();
+  mafEventMacro(mafEvent(this,CAMERA_POST_RESET,m_RenFront)); //SIL. 16-6-2004:
+  m_RenFront->ResetCameraClippingRange(); //per la griglia
+  m_RenderWindow->Render();
 }
 //----------------------------------------------------------------------------
 float* mafRWI::ComputeVisibleBounds(mafNode *vme)
@@ -390,8 +390,8 @@ float* mafRWI::ComputeVisibleBounds(mafNode *vme)
 	if(vme) 
 		if(!vme->IsA("mafNodeRoot") ) 
 			if(vme->GetCurrentData() ) 
-				if(m_sg) 
-					if(mafSceneNode *n = m_sg->Vme2Node(vme) )
+				if(m_Sg) 
+					if(mafSceneNode *n = m_Sg->Vme2Node(vme) )
 						if(n->IsVisible())
 	{
 		vme->UpdateCurrentData();
@@ -432,7 +432,7 @@ float* mafRWI::ComputeVisibleBounds(mafNode *vme)
     //t->Delete();
 		return b1;
 	}
-	m_r1->ComputeVisiblePropBounds(b1);   
+	m_RenFront->ComputeVisiblePropBounds(b1);   
 	return b1;
   */
 }
@@ -442,11 +442,11 @@ void mafRWI::CameraReset(float bounds[6])
 {
   double view_up[3], view_look[3], view_right[3];
 
-  m_c->OrthogonalizeViewUp();
-  m_c->ComputeViewPlaneNormal();
-  m_c->GetViewUp(view_up);
+  m_Camera->OrthogonalizeViewUp();
+  m_Camera->ComputeViewPlaneNormal();
+  m_Camera->GetViewUp(view_up);
   vtkMath::Normalize(view_up);
-  m_c->GetViewPlaneNormal(view_look);
+  m_Camera->GetViewPlaneNormal(view_look);
   vtkMath::Cross(view_up, view_look, view_right);
   vtkMath::Normalize(view_right);
 	
@@ -473,7 +473,7 @@ void mafRWI::CameraReset(float bounds[6])
 	diag[2] = (bounds[5] - bounds[4]);
 
 	//--------------------------------------
-	if(m_c->GetParallelProjection())
+	if(m_Camera->GetParallelProjection())
 	{
 		height = fabs( 0.52 * vtkMath::Dot(vu,diag) );
 		width  = fabs( 0.52 * vtkMath::Dot(vr,diag) );
@@ -489,7 +489,7 @@ void mafRWI::CameraReset(float bounds[6])
 	height = (height == 0) ? 1.0 : height;	
   
 	//check aspect ratio - and eventually compensate height
-	float view_aspect  = (m_rwi->m_w*1.0)/(m_rwi->m_h*1.0);
+	float view_aspect  = (m_Rwi->m_Width*1.0)/(m_Rwi->m_Height*1.0);
 	float scene_aspect = (width)/(height);
   if( scene_aspect > view_aspect )
   {
@@ -497,19 +497,19 @@ void mafRWI::CameraReset(float bounds[6])
 	}
 
   float distance;
-	distance  = height/tan(m_c->GetViewAngle()*vtkMath::Pi()/360.0);
+	distance  = height/tan(m_Camera->GetViewAngle()*vtkMath::Pi()/360.0);
 	distance += depth/2;
 
   // update the camera
-  m_c->SetFocalPoint(center[0],center[1],center[2]);
-  m_c->SetPosition(center[0]+distance*vl[0],
+  m_Camera->SetFocalPoint(center[0],center[1],center[2]);
+  m_Camera->SetPosition(center[0]+distance*vl[0],
                    center[1]+distance*vl[1],
                    center[2]+distance*vl[2]);
 
   // setup parallel scale
-  m_c->SetParallelScale(height);
+  m_Camera->SetParallelScale(height);
 	
-	//m_r1->ResetCameraClippingRange(bounds);
+	//m_RenFront->ResetCameraClippingRange(bounds);
 }
 
 

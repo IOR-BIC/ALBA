@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testViewApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-23 10:50:31 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-26 10:27:54 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -79,7 +79,7 @@ bool testViewApp::OnInit()
 
   m_logic->Plug(new mmoCreateVmeSurface("Add Vme Surface \tCtrl+A"));
   //m_logic->Plug(new testView("testView"));
-  mafVisualPipeInfo vpi = {"mafPipeSurface", NODE_VISIBLE_ON};
+  mafView::mafVisualPipeInfo vpi = {"mafPipeSurface", NODE_VISIBLE_ON};
   testView *tv = new testView("testView");
   tv->PlugVisualPipe("mafVMESurface",vpi);
   m_logic->Plug(tv);

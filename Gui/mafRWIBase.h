@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-19 12:03:38 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-26 10:27:18 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -125,13 +125,13 @@ public:
   /** Redefined to set the m_CustomInteractorStyle flag. */
   void SetInteractorStyle(vtkInteractorObserver *o);
 
-  bool m_hidden;
-  int  m_w;
-  int  m_h;
+  bool m_Hidden;
+  int  m_Width;
+  int  m_Height;
 
 protected:
-	wxString   m_save_dir;
-  vtkCamera *m_cam;
+	wxString   m_SaveDir;
+  vtkCamera *m_Camera;
 //mafAction *m_MouseAction;
   bool       m_CustomInteractorStyle;
   

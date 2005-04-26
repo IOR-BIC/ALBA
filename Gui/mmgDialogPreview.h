@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialogPreview.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-20 14:11:14 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-26 10:27:18 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -41,13 +41,13 @@ public:
 	virtual ~mmgDialogPreview (); 
    
   /** Return the dialog's render window.*/
-  mafRWI *GetRWI() {return m_rwi;};
+  mafRWI *GetRWI() {return m_Rwi;};
   /** Return the dialog's gui.*/
-  mmgGui *GetGui() {return m_gui;};
+  mmgGui *GetGui() {return m_Gui;};
 
 protected:
-  wxBoxSizer *m_preview_sizer; ///< Sizer used for the preview render window
-  mafRWI     *m_rwi; ///< Render window
-  mmgGui     *m_gui; ///< Gui variable used to plug custom widgets
+  wxBoxSizer *m_PreviewSizer; ///< Sizer used for the preview render window
+  mafRWI     *m_Rwi; ///< Render window
+  mmgGui     *m_Gui; ///< Gui variable used to plug custom widgets
 };
 #endif

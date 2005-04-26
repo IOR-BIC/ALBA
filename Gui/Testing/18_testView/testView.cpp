@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testView.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-23 10:44:23 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-26 10:27:54 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,7 +28,7 @@
 mafView *testView::Copy(mafEventListener *Listener)
 //----------------------------------------------------------------------------
 {
-  testView *v = new testView(m_label);
+  testView *v = new testView(m_Label);
   v->m_Listener = Listener;
   v->Create();
   return v;
@@ -37,8 +37,8 @@ mafView *testView::Copy(mafEventListener *Listener)
 int testView::GetNodeStatus(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-  assert(m_sg);
-  mafSceneNode *n = m_sg->Vme2Node(vme);
+  assert(m_Sg);
+  mafSceneNode *n = m_Sg->Vme2Node(vme);
   assert(n);
 
   if(!vme->IsA("mafVME"))
@@ -54,7 +54,7 @@ int testView::GetNodeStatus(mafNode *vme)
 void testView::VmeCreatePipe(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-  mafSceneNode *n = m_sg->Vme2Node(vme);
+  mafSceneNode *n = m_Sg->Vme2Node(vme);
   assert(n && !n->m_pipe);
   assert(vme->IsA("mafVME"));
   mafVME *v = ((mafVME*)vme);
@@ -89,7 +89,7 @@ void testView::VmeCreatePipe(mafNode *vme)
 void testView::VmeDeletePipe(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-  mafSceneNode *n = m_sg->Vme2Node(vme);
+  mafSceneNode *n = m_Sg->Vme2Node(vme);
   assert(n && n->m_pipe);
   cppDEL(n->m_pipe);
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 12:27:55 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-26 10:27:18 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -92,11 +92,11 @@ mafRWIBase::mafRWIBase(wxWindow *parent, wxWindowID id, const wxPoint &pos,
     timer(this, ID_mafRWIBase_TIMER)
 //----------------------------------------------------------------------------
 {
-  m_hidden = true;
+  m_Hidden = true;
   this->Show(false);
-	m_save_dir = ::wxGetHomeDir(); m_save_dir += "\\desktop"; 
-  m_w = m_h = 10;
-  m_cam = NULL;
+	m_SaveDir = ::wxGetHomeDir(); m_SaveDir += "\\desktop"; 
+  m_Width = m_Height = 10;
+  m_Camera = NULL;
 //  m_MouseAction = NULL;
   m_CustomInteractorStyle = false;
 }
@@ -257,13 +257,13 @@ void mafRWIBase::OnLeftMouseButtonDown(wxMouseEvent &event)
 
   if (m_CustomInteractorStyle)
   {
-    SetEventInformation(event.GetX(),m_h - event.GetY() - 1,event.ControlDown(),event.ShiftDown());
+    SetEventInformation(event.GetX(),m_Height - event.GetY() - 1,event.ControlDown(),event.ShiftDown());
     InvokeEvent(vtkCommand::LeftButtonPressEvent,NULL);
   }
   else
   {
     /*
-    mflSMART(mflEventInteraction,e)(mmdButtonsPad::ButtonDownEvent,this,event.GetX(),m_h - event.GetY() - 1);
+    mflSMART(mflEventInteraction,e)(mmdButtonsPad::ButtonDownEvent,this,event.GetX(),m_Height - event.GetY() - 1);
     e->SetButton(MAF_LEFT_BUTTON);
     e->SetModifier(MAF_SHIFT_KEY,event.ShiftDown());
     e->SetModifier(MAF_CTRL_KEY,event.ControlDown());
@@ -283,13 +283,13 @@ void mafRWIBase::OnMiddleMouseButtonDown(wxMouseEvent &event)
 
   if (m_CustomInteractorStyle)
   {
-    SetEventInformation(event.GetX(),m_h - event.GetY() - 1,event.ControlDown(),event.ShiftDown());
+    SetEventInformation(event.GetX(),m_Height - event.GetY() - 1,event.ControlDown(),event.ShiftDown());
     InvokeEvent(vtkCommand::MiddleButtonPressEvent,NULL);
   }
   else
   {
     /*
-    mflSMART(mflEventInteraction,e)(mmdButtonsPad::ButtonDownEvent,this,event.GetX(),m_h - event.GetY() - 1);
+    mflSMART(mflEventInteraction,e)(mmdButtonsPad::ButtonDownEvent,this,event.GetX(),m_Height - event.GetY() - 1);
     e->SetButton(MAF_MIDDLE_BUTTON);
     e->SetModifier(MAF_SHIFT_KEY,event.ShiftDown());
     e->SetModifier(MAF_CTRL_KEY,event.ControlDown());
@@ -309,13 +309,13 @@ void mafRWIBase::OnRightMouseButtonDown(wxMouseEvent &event)
 
   if (m_CustomInteractorStyle)
   {
-    SetEventInformation(event.GetX(),m_h - event.GetY() - 1,event.ControlDown(),event.ShiftDown());
+    SetEventInformation(event.GetX(),m_Height - event.GetY() - 1,event.ControlDown(),event.ShiftDown());
     InvokeEvent(vtkCommand::RightButtonPressEvent,NULL);
   }
   else
   {
     /*
-    mflSMART(mflEventInteraction,e)(mmdButtonsPad::ButtonDownEvent,this,event.GetX(),m_h - event.GetY() - 1);
+    mflSMART(mflEventInteraction,e)(mmdButtonsPad::ButtonDownEvent,this,event.GetX(),m_Height - event.GetY() - 1);
     e->SetButton(MAF_RIGHT_BUTTON);
     e->SetModifier(MAF_SHIFT_KEY,event.ShiftDown());
     e->SetModifier(MAF_CTRL_KEY,event.ControlDown());
@@ -332,13 +332,13 @@ void mafRWIBase::OnLeftMouseButtonUp(wxMouseEvent &event)
 
   if (m_CustomInteractorStyle)
   {
-	  SetEventInformation(event.GetX(),m_h - event.GetY() - 1,event.ControlDown(),event.ShiftDown());
+	  SetEventInformation(event.GetX(),m_Height - event.GetY() - 1,event.ControlDown(),event.ShiftDown());
 	  InvokeEvent(vtkCommand::LeftButtonReleaseEvent,NULL);
   }
   else
   {
     /*
-    mflSMART(mflEventInteraction,e)(mmdButtonsPad::ButtonUpEvent,this,event.GetX(),m_h - event.GetY() - 1);
+    mflSMART(mflEventInteraction,e)(mmdButtonsPad::ButtonUpEvent,this,event.GetX(),m_Height - event.GetY() - 1);
     e->SetButton(MAF_LEFT_BUTTON);
     e->SetModifier(MAF_SHIFT_KEY,event.ShiftDown());
     e->SetModifier(MAF_CTRL_KEY,event.ControlDown());
@@ -357,13 +357,13 @@ void mafRWIBase::OnMiddleMouseButtonUp(wxMouseEvent &event)
 
   if (m_CustomInteractorStyle)
   {
-	  SetEventInformation(event.GetX(),m_h - event.GetY() - 1,event.ControlDown(),event.ShiftDown());
+	  SetEventInformation(event.GetX(),m_Height - event.GetY() - 1,event.ControlDown(),event.ShiftDown());
 	  InvokeEvent(vtkCommand::MiddleButtonReleaseEvent,NULL);
   }
   else
   {
     /*
-    mflSMART(mflEventInteraction,e)(mmdButtonsPad::ButtonUpEvent,this,event.GetX(),m_h - event.GetY() - 1);
+    mflSMART(mflEventInteraction,e)(mmdButtonsPad::ButtonUpEvent,this,event.GetX(),m_Height - event.GetY() - 1);
     e->SetButton(MAF_MIDDLE_BUTTON);
     e->SetModifier(MAF_SHIFT_KEY,event.ShiftDown());
     e->SetModifier(MAF_CTRL_KEY,event.ControlDown());
@@ -382,13 +382,13 @@ void mafRWIBase::OnRightMouseButtonUp(wxMouseEvent &event)
 
   if (m_CustomInteractorStyle)
   {
-    SetEventInformation(event.GetX(),m_h - event.GetY() - 1,event.ControlDown(),event.ShiftDown());
+    SetEventInformation(event.GetX(),m_Height - event.GetY() - 1,event.ControlDown(),event.ShiftDown());
     InvokeEvent(vtkCommand::RightButtonReleaseEvent,NULL);
   }
   else
   {
     /*
-    mflSMART(mflEventInteraction,e)(mmdButtonsPad::ButtonUpEvent,this,event.GetX(),m_h - event.GetY() - 1);
+    mflSMART(mflEventInteraction,e)(mmdButtonsPad::ButtonUpEvent,this,event.GetX(),m_Height - event.GetY() - 1);
     e->SetButton(MAF_RIGHT_BUTTON);
     e->SetModifier(MAF_SHIFT_KEY,event.ShiftDown());
     e->SetModifier(MAF_CTRL_KEY,event.ControlDown());
@@ -407,13 +407,13 @@ void mafRWIBase::OnMouseMotion(wxMouseEvent &event)
 
   if (m_CustomInteractorStyle)
   {
-    SetEventInformation(event.GetX(),m_h - event.GetY() - 1,event.ControlDown(),event.ShiftDown());
+    SetEventInformation(event.GetX(),m_Height - event.GetY() - 1,event.ControlDown(),event.ShiftDown());
     InvokeEvent(vtkCommand::MouseMoveEvent,NULL);
   }
   else
   {
     /*
-    mflSMART(mflEventInteraction,e)(mmdMouse::Move2DEvent,this,event.GetX(),m_h - event.GetY() - 1);
+    mflSMART(mflEventInteraction,e)(mmdMouse::Move2DEvent,this,event.GetX(),m_Height - event.GetY() - 1);
     e->SetModifier(MAF_SHIFT_KEY,event.ShiftDown());
     e->SetModifier(MAF_CTRL_KEY,event.ControlDown());
     e->SetModifier(MAF_ALT_KEY,event.AltDown());
@@ -482,9 +482,9 @@ void mafRWIBase::OnChar(wxKeyEvent &event)
 void mafRWIBase::OnIdle(wxIdleEvent& event)
 //----------------------------------------------------------------------------
 {
-  //if(m_hidden)
+  //if(m_Hidden)
   //{
-  //   m_hidden = false;
+  //   m_Hidden = false;
   //   this->Show(true);
   //}
 }
@@ -501,10 +501,10 @@ void mafRWIBase::OnSize(wxSizeEvent &event)
 //----------------------------------------------------------------------------
 {
   //   this->Show(false); 
-     //m_hidden = true;
+     //m_Hidden = true;
 
-  m_w = event.GetSize().GetWidth();
-  m_h = event.GetSize().GetHeight();
+  m_Width = event.GetSize().GetWidth();
+  m_Height = event.GetSize().GetHeight();
 
   #define DONT_FIX_CAMERA_RESET
 	#ifdef FIX_CAMERA_RESET
@@ -515,7 +515,7 @@ void mafRWIBase::OnSize(wxSizeEvent &event)
 		vtkCamera *cam = GetCamera();
 		if(cam)
 		{
-			if(m_w < m_h)
+			if(m_Width < m_Height)
 				cam->UseHorizontalViewAngleOn();
 			else
 				cam->UseHorizontalViewAngleOff();
@@ -557,7 +557,7 @@ void mafRWIBase::SaveImage(wxString view_name, int magnification)
 {
 /* @@@
 	wxString wildc = "Bitmap Image (*.bmp)|*.bmp";
-  wxString name = wxString::Format("%s\\%sSnapshot", m_save_dir.c_str(),view_name.c_str());
+  wxString name = wxString::Format("%s\\%sSnapshot", m_SaveDir.c_str(),view_name.c_str());
 	wxString file = name + ".bmp";
   int i=1;
   while(::wxFileExists(file) && i<100 ) file = wxString::Format("%s%d.bmp",name.c_str(), i++);
@@ -566,7 +566,7 @@ void mafRWIBase::SaveImage(wxString view_name, int magnification)
 	if(filename == "") return;
 
   wxString foo1,foo2;
-  wxSplitPath(filename.c_str(),&m_save_dir,&foo1,&foo2);  // remember save folder
+  wxSplitPath(filename.c_str(),&m_SaveDir,&foo1,&foo2);  // remember save folder
 		
 	::wxBeginBusyCursor();
 
@@ -591,7 +591,7 @@ void mafRWIBase::SaveImage(wxString view_name, int magnification)
 vtkCamera* mafRWIBase::GetCamera()
 //---------------------------------------------------------------------------
 {
-  if(m_cam == NULL)
+  if(m_Camera == NULL)
   {
     vtkRenderWindow *rw = this->GetRenderWindow();
     if(rw)
@@ -603,12 +603,12 @@ vtkCamera* mafRWIBase::GetCamera()
 			  vtkRenderer *ren = rc->GetNextItem(); 
 			  if(ren)
 			  {  
-				  m_cam = ren->GetActiveCamera();
+				  m_Camera = ren->GetActiveCamera();
 			  }	
 		  }			 
 	  }
   }  
-  return m_cam;
+  return m_Camera;
 }
 //---------------------------------------------------------------------------
 void mafRWIBase::SetInteractorStyle(vtkInteractorObserver *o)

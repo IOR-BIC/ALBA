@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-23 09:53:15 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-04-26 10:27:04 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -78,7 +78,7 @@ mafViewManager::~mafViewManager( )
   while(m_vlist)
   {
     v = m_vlist;
-    m_vlist = v->m_next;
+    m_vlist = v->m_Next;
     delete v;
   }
 
@@ -130,8 +130,8 @@ void mafViewManager::ViewAdd(mafView *view)
 //----------------------------------------------------------------------------
 {
   m_t[m_tcount] = view;
-	view->m_id = m_tcount + VIEW_START;
-  view->m_mult = 0; // Paolo 2005-04-22
+	view->m_Id = m_tcount + VIEW_START;
+  view->m_Mult = 0; // Paolo 2005-04-22
   view->SetListener(this);
 
   m_tcount++;    
@@ -152,7 +152,7 @@ void mafViewManager::ViewSelected(mafView *view/*, mafRWIBase *rwi*/)
 void mafViewManager::VmeAdd(mafNode *n)   
 //----------------------------------------------------------------------------
 {
-  for(mafView* v = m_vlist; v; v=v->m_next) 
+  for(mafView* v = m_vlist; v; v=v->m_Next) 
     v->VmeAdd(n);
 
   wxString s;
@@ -167,7 +167,7 @@ void mafViewManager::VmeAdd(mafNode *n)
 void mafViewManager::VmeRemove(mafNode *n)   
 //----------------------------------------------------------------------------
 {
-  for(mafView* v = m_vlist; v; v=v->m_next) 
+  for(mafView* v = m_vlist; v; v=v->m_Next) 
     v->VmeRemove(n);
 
 	wxString s(n->GetTypeName());
@@ -191,11 +191,11 @@ void mafViewManager::VmeSelect(mafNode *n)
 	if(n != m_selected_vme)
 	{
 		if(m_selected_vme)
-			for(mafView* v = m_vlist; v; v=v->m_next) 
+			for(mafView* v = m_vlist; v; v=v->m_Next) 
 				v->VmeSelect(m_selected_vme,false); //deselect the previous selected vme
 		m_selected_vme = n;
 	}
-	for(mafView* v = m_vlist; v; v=v->m_next) 
+	for(mafView* v = m_vlist; v; v=v->m_Next) 
     v->VmeSelect(n,true); //select the new one
 	CameraUpdate();
 }
@@ -219,7 +219,7 @@ void mafViewManager::VmeShow(mafNode *n, bool show)
 void mafViewManager::PropertyUpdate(bool fromTag)
 //----------------------------------------------------------------------------
 {
-  for(mafView* v = m_vlist; v; v=v->m_next) 
+  for(mafView* v = m_vlist; v; v=v->m_Next) 
 		v->VmeUpdateProperty(this->m_selected_vme, fromTag);
 }
 //----------------------------------------------------------------------------
@@ -240,7 +240,7 @@ void mafViewManager::CameraReset(mafNode *vme)
 void mafViewManager::CameraUpdate()   
 //----------------------------------------------------------------------------
 {
-  for(mafView* v = m_vlist; v; v=v->m_next) 
+  for(mafView* v = m_vlist; v; v=v->m_Next) 
     v->CameraUpdate();;
 }
 //----------------------------------------------------------------------------
@@ -263,7 +263,7 @@ void mafViewManager::FillMenu (wxMenu* menu)
 	{
     mafView* v = m_t[i];  
 	  s = wxString::Format("create new %s view",v->GetLabel());
-	  menu->Append(v->m_id, s, (wxMenu *)NULL, s );	
+	  menu->Append(v->m_Id, s, (wxMenu *)NULL, s );	
   }
 }
 //----------------------------------------------------------------------------
@@ -283,15 +283,15 @@ mafView *mafViewManager::ViewCreate(int id)
   if(!view) return NULL;
 
   // Paolo 2005-04-22
-  int view_id   = view->m_id;
+  int view_id   = view->m_Id;
   int view_mult = 0;
   new_view = view->Copy(this);
-  new_view->m_id = view_id;
+  new_view->m_Id = view_id;
 
   for(;view_mult < MAXVIEW; view_mult++)
     if(m_ViewMatrixID[index][view_mult] == NULL)
       break;
-  view->m_mult = view_mult;
+  view->m_Mult = view_mult;
 
   //update the matrix containing all created view
   m_ViewMatrixID[index][view_mult] = new_view;
@@ -330,15 +330,15 @@ mafView *mafViewManager::ViewCreate(wxString type)
   assert(view);
 
   // Paolo 2005-04-22
-  int view_id   = view->m_id;
+  int view_id   = view->m_Id;
   int view_mult = 0;
 	new_view = view->Copy(this);
-  new_view->m_id = view_id;
+  new_view->m_Id = view_id;
 
   for(;view_mult < MAXVIEW; view_mult++)
     if(m_ViewMatrixID[index][view_mult] == NULL)
       break;
-  view->m_mult = view_mult;
+  view->m_Mult = view_mult;
 
   //update the matrix containing all created view
   m_ViewMatrixID[index][view_mult] = new_view;
@@ -376,8 +376,8 @@ void mafViewManager::ViewInsert(mafView *view)
   else
   {
     mafView* v;
-    for(v = m_vlist; v->m_next; v = v->m_next) ; // go on until the end of the list is reached.
-    v->m_next = view;
+    for(v = m_vlist; v->m_Next; v = v->m_Next) ; // go on until the end of the list is reached.
+    v->m_Next = view;
   }
 }
 //----------------------------------------------------------------------------
@@ -388,22 +388,22 @@ void mafViewManager::ViewDelete(mafView *view)
 	
   // Paolo 2005-04-22
   // calculate the view type index
-  int index = view->m_id - VIEW_START;
+  int index = view->m_Id - VIEW_START;
   // set to NULL the pointer into the state matrix
-  m_ViewMatrixID[index][view->m_mult] = NULL;
+  m_ViewMatrixID[index][view->m_Mult] = NULL;
 
   if(!m_vlist) return;
   if(m_vlist == view)
   {
-    m_vlist = view->m_next;
+    m_vlist = view->m_Next;
   }
   else
   {
-    for(mafView* v = m_vlist; v; v = v->m_next) // find previous(view)
+    for(mafView* v = m_vlist; v; v = v->m_Next) // find previous(view)
     {
-      if(v->m_next == view)
+      if(v->m_Next == view)
       {
-        v->m_next = view->m_next;
+        v->m_Next = view->m_Next;
         break; 
       }
     }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 20:01:06 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-26 10:27:04 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,21 +28,21 @@ mafViewVTK::mafViewVTK(wxString label)
 :mafView(label)
 //----------------------------------------------------------------------------
 {
-  m_sg  = NULL;
-  m_rwi = NULL;
+  m_Sg  = NULL;
+  m_Rwi = NULL;
 }
 //----------------------------------------------------------------------------
 mafViewVTK::~mafViewVTK( ) 
 //----------------------------------------------------------------------------
 {
-  cppDEL(m_sg);
-  cppDEL(m_rwi);
+  cppDEL(m_Sg);
+  cppDEL(m_Rwi);
 }
 //----------------------------------------------------------------------------
 mafView *mafViewVTK::Copy(mafEventListener *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewVTK *v = new mafViewVTK(m_label);
+  mafViewVTK *v = new mafViewVTK(m_Label);
   v->m_Listener = Listener;
   v->Create();
   return v;
@@ -51,46 +51,46 @@ mafView *mafViewVTK::Copy(mafEventListener *Listener)
 void mafViewVTK::Create( ) 
 //----------------------------------------------------------------------------
 {
-  m_rwi = new mafRWI(mafGetFrame() /*, ONE_LAYER, m_show_grid == 1, m_stereo_type*/);
-  m_rwi->SetListener(this); //SIL. 16-6-2004: 
-  //m_rwi->CameraSet(m_cam_position);
-  //m_rwi->SetAxesVisibility(m_show_axes != 0);
-  m_win = m_rwi->m_rwi;
+  m_Rwi = new mafRWI(mafGetFrame() /*, ONE_LAYER, m_show_grid == 1, m_stereo_type*/);
+  m_Rwi->SetListener(this); //SIL. 16-6-2004: 
+  //m_Rwi->CameraSet(m_cam_position);
+  //m_Rwi->SetAxesVisibility(m_show_axes != 0);
+  m_Win = m_Rwi->m_Rwi;
 
-  m_sg  = new mafSceneGraph(this,m_rwi->m_r1,m_rwi->m_r2);
-  m_sg->SetListener(this);
-  m_rwi->m_sg = m_sg;
+  m_Sg  = new mafSceneGraph(this,m_Rwi->m_RenFront,m_Rwi->m_RenBack);
+  m_Sg->SetListener(this);
+  m_Rwi->m_Sg = m_Sg;
   /*
-  m_sg->SetCreatableFlag(VME_SURFACE);
-  m_sg->SetCreatableFlag(VME_GRAY_VOLUME);
-  m_sg->SetCreatableFlag(VME_VOLUME);
-  m_sg->SetCreatableFlag(VME_IMAGE);
-  m_sg->SetCreatableFlag(VME_POINTSET);
-  m_sg->SetCreatableFlag(VME_TOOL);
-  m_sg->SetCreatableFlag(VME_SCALAR);
+  m_Sg->SetCreatableFlag(VME_SURFACE);
+  m_Sg->SetCreatableFlag(VME_GRAY_VOLUME);
+  m_Sg->SetCreatableFlag(VME_VOLUME);
+  m_Sg->SetCreatableFlag(VME_IMAGE);
+  m_Sg->SetCreatableFlag(VME_POINTSET);
+  m_Sg->SetCreatableFlag(VME_TOOL);
+  m_Sg->SetCreatableFlag(VME_SCALAR);
   */
 
-  m_rwi->m_c->SetClippingRange(0.1,1000); 
+  m_Rwi->m_Camera->SetClippingRange(0.1,1000); 
   this->CameraReset();
 }
 
 //----------------------------------------------------------------------------
-void mafViewVTK::VmeAdd(mafNode *vme)                                   {assert(m_sg); m_sg->VmeAdd(vme);}
-void mafViewVTK::VmeRemove(mafNode *vme)                                {assert(m_sg); m_sg->VmeRemove(vme);}
-void mafViewVTK::VmeSelect(mafNode *vme, bool select)                   {assert(m_sg); m_sg->VmeSelect(vme,select);}
-void mafViewVTK::VmeShow(mafNode *vme, bool show)												{assert(m_sg); m_sg->VmeShow(vme,show);}
-void mafViewVTK::VmeUpdateProperty(mafNode *vme, bool fromTag)	        {assert(m_sg); m_sg->VmeUpdateProperty(vme,fromTag);}
-int  mafViewVTK::GetNodeStatus(mafNode *vme)                            {return m_sg ? m_sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;}
-void mafViewVTK::CameraReset()	{assert(m_rwi); m_rwi->CameraReset();}
-void mafViewVTK::CameraUpdate() {assert(m_rwi); m_rwi->CameraUpdate();}
+void mafViewVTK::VmeAdd(mafNode *vme)                                   {assert(m_Sg); m_Sg->VmeAdd(vme);}
+void mafViewVTK::VmeRemove(mafNode *vme)                                {assert(m_Sg); m_Sg->VmeRemove(vme);}
+void mafViewVTK::VmeSelect(mafNode *vme, bool select)                   {assert(m_Sg); m_Sg->VmeSelect(vme,select);}
+void mafViewVTK::VmeShow(mafNode *vme, bool show)												{assert(m_Sg); m_Sg->VmeShow(vme,show);}
+void mafViewVTK::VmeUpdateProperty(mafNode *vme, bool fromTag)	        {assert(m_Sg); m_Sg->VmeUpdateProperty(vme,fromTag);}
+int  mafViewVTK::GetNodeStatus(mafNode *vme)                            {return m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;}
+void mafViewVTK::CameraReset()	{assert(m_Rwi); m_Rwi->CameraReset();}
+void mafViewVTK::CameraUpdate() {assert(m_Rwi); m_Rwi->CameraUpdate();}
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mafPipe* mafViewVTK::GetNodePipe(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-   assert(m_sg);
-   mafSceneNode *n = m_sg->Vme2Node(vme);
+   assert(m_Sg);
+   mafSceneNode *n = m_Sg->Vme2Node(vme);
    if(!n) return NULL;
    return n->m_pipe;
 }
