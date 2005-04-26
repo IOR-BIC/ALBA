@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testViewApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 10:27:54 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-04-26 15:09:49 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@
 
 
 #include "testViewApp.h"
-#include "mafNodeFactory.h"
+#include "mafVMEFactory.h"
 #include "mafPics.h"
 #include "mmgMDIFrame.h"
 
@@ -47,18 +47,10 @@ bool testViewApp::OnInit()
 {
   mafPics.Initialize();	
 
-  mafNodeFactory *node_factory  = mafNodeFactory::GetInstance();
-  assert(node_factory!=NULL);
-  int result = mafNodeFactory::Initialize();
+  int result = mafVMEFactory::Initialize();
   assert(result==MAF_OK);
-  mafPlugNode<mafNodeRoot>("mafNodeRoot");
-  mafPlugNode<mafNodeGeneric>("mafNodeGeneric");
-  mafPlugNode<mafVMERoot>("mafVMERoot");
-  mafPlugNode<mafVMESurface>("mafVMESurface");
-
+  
   // Inizializzazione e Fill della PipeFactory -- potrebbe essere un SideEffect del Plug dei Nodi
-  mafPipeFactory *pipe_factory  = mafPipeFactory::GetInstance();
-  assert(pipe_factory!=NULL);
   result = mafPipeFactory::Initialize();
   assert(result==MAF_OK);
   mafPlugPipe<mafPipeSurface>("mafPipeSurface");
