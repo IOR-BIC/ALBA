@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateVmeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 11:09:29 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-27 13:02:55 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -84,13 +84,3 @@ void mmoCreateVmeSurface::OpUndo()
   mafEventMacro(mafEvent(this,VME_REMOVE,m_vme));
   mafDEL(m_vme);
 }
-
-
-
-
-
-
-
-
-
-
