@@ -3,43 +3,44 @@
 Program:   Visualization Toolkit
 Module:    $RCSfile: mafAgentThreaded.cpp,v $
 Language:  C++
-Date:      $Date: 2005-04-26 18:32:34 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2005-04-27 16:56:03 $
+Version:   $Revision: 1.2 $
 
 
 
 =========================================================================*/
 #include "mafAgentThreaded.h"
-#include "vtkObjectFactory.h"
-#include "mflDefines.h"
-#include "vtkCriticalSection.h"
+#include "mafMutexLock.h"
+#include "mmuIdFactory.h"
 
 #include <assert.h>
 
 //------------------------------------------------------------------------------
 // Events
 //------------------------------------------------------------------------------
-MFL_EVT_IMP(mafAgentThreaded::AsyncDispatchEvent);
+MAF_ID_IMP(mafAgentThreaded::AsyncDispatchEvent);
 
 //------------------------------------------------------------------------------
-vtkStandardNewMacro(mafAgentThreaded)
+mafCxxTypeMacro(mafAgentThreaded);
+//------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 mafAgentThreaded::mafAgentThreaded()
 //------------------------------------------------------------------------------
 {
-  this->Threaded      = 1;
-  this->ThreadId      = -1;
-  this->ActiveFlag    = 0;
-  this->ThreadData    = NULL;
-  this->Threader      = NULL;
-  this->SetDispatchModeToSelfProcess();
+  m_Threaded      = 1;
+  m_ThreadId      = -1;
+  m_ThreadData    = NULL;
+  m_Threader      = NULL;
+  m_ActiveFlag    = 0;
+
+  SetDispatchModeToSelfProcess();
 
 #ifdef _WIN32
-  this->MessageSignal = CreateEvent(0, FALSE, FALSE, 0);
+  m_MessageSignal = CreateEvent(0, FALSE, FALSE, 0);
 #else
-  this->Gate = new vtkSimpleCriticalSection;
-  this->Gate->Lock();
+  m_Gate = new vtkSimpleCriticalSection;
+  m_Gate->Lock();
 #endif
 }
 
@@ -49,9 +50,9 @@ mafAgentThreaded::~mafAgentThreaded()
 {
   Shutdown();
 #ifdef _WIN32
-  CloseHandle(this->MessageSignal);
+  CloseHandle(m_MessageSignal);
 #else
-  delete this->Gate;
+  delete m_Gate;
 #endif
 }
 
@@ -59,26 +60,25 @@ mafAgentThreaded::~mafAgentThreaded()
 void mafAgentThreaded::InternalShutdown()
 //------------------------------------------------------------------------------
 {
-  if (this->Initialized)
-    this->StopThread();
+  StopThread();
 }
 
 //------------------------------------------------------------------------------
 void mafAgentThreaded::StopThread()
 //------------------------------------------------------------------------------
 {
-  if (this->ThreadId!=-1)
+  if (m_ThreadId!=-1)
   {
-    if (this->ActiveFlag)
+    if (m_ActiveFlag)
     {
-      this->ActiveFlag=0;
+      m_ActiveFlag=0;
       this->SignalNewMessage(); //awoke the thread to make it die
     }
     // terminate the thread
-    this->Threader->TerminateThread(this->ThreadId);
-    this->ThreadId = -1;
+    m_Threader->TerminateThread(m_ThreadId);
+    m_ThreadId = -1;
 
-    vtkDEL(this->Threader);
+    delete m_Threader;
   }
 }
 
@@ -87,18 +87,18 @@ int mafAgentThreaded::InternalInitialize()
 //------------------------------------------------------------------------------
 {
   // Spawns a thread if necessary
-  if (this->Threaded)
+  if (m_Threaded)
   {
-    if (this->ActiveFlag || this->ThreadId != -1) 
+    if (m_ActiveFlag || m_ThreadId != -1) 
     {
-      vtkErrorMacro("Dispatcher handler polling thread already started!");
+      mafErrorMacro("Dispatcher handler polling thread already started!");
       return -1;
     }
 
-    vtkNEW(this->Threader);
-    this->ActiveFlag=1;
-    this->ThreadId = this->Threader->SpawnThread((vtkThreadFunctionType) \
-                       &mafAgentThreaded::UpdateLoop,this);    
+    m_Threader = new mafMultiThreader;
+    m_ActiveFlag=1;
+
+    m_ThreadId = m_Threader->SpawnThread(&mafAgentThreaded::UpdateLoop,this);    
   }
 
   return 0;
@@ -108,18 +108,17 @@ int mafAgentThreaded::InternalInitialize()
 int mafAgentThreaded::GetActiveFlag()
 //------------------------------------------------------------------------------
 {
-  int activeFlag = *(this->ThreadData->ActiveFlag);
-  return activeFlag;
+  return m_ActiveFlag;
 }
 
       
 //------------------------------------------------------------------------------
-void *mafAgentThreaded::UpdateLoop(vtkMultiThreader::ThreadInfo *data)
+void mafAgentThreaded::UpdateLoop(mmuThreadInfoStruct *data)
 //------------------------------------------------------------------------------
 {
-  mafAgentThreaded *self = (mafAgentThreaded *)(data->UserData);
+  mafAgentThreaded *self = (mafAgentThreaded *)(data->m_UserData);
 
-  self->SetThreadData(data);
+  self->m_ThreadData=data;
 
   // wait for initialization to be completed
   for (;self->GetActiveFlag()&&!self->IsInitialized();)
@@ -129,11 +128,9 @@ void *mafAgentThreaded::UpdateLoop(vtkMultiThreader::ThreadInfo *data)
   // if InternalUpdate() returns a value !=0
   for (;self->GetActiveFlag()&&!self->InternalUpdate();) ; // active loop
 
-  self->SetThreadData(NULL);
+  self->m_ThreadData=NULL;
 
-  self->ThreadId=-1;
-
-  return NULL;
+  self->m_ThreadId=-1;
 }
 
 //------------------------------------------------------------------------------
@@ -148,24 +145,25 @@ int mafAgentThreaded::InternalUpdate()
 }
 
 //------------------------------------------------------------------------------
-void mafAgentThreaded::ProcessEvent(mflEvent *event,unsigned long channel)
+void mafAgentThreaded::OnEvent(mafEventBase *event)
 //------------------------------------------------------------------------------
 {
   assert(event);
 
-  if (event->GetID()==AsyncDispatchEvent)
+  if (event->GetId()==AsyncDispatchEvent)
   {
     if (event->GetSender()==this)
     {
       // this is used for the asynchronous ForwardEvent
-      this->ForwardEvent((mflEvent *)event->GetData(),channel);
+      this->ForwardEvent((mafEventBase *)event->GetData(),event->GetChannel());
     }
     else
     {
-      assert(true);
+      assert(true); // should not pass from here
+      
       // this is used for the asynchronous SendEvent
       // notice we are using the sender field of the AsyncForwardEvent to store the recipient
-      this->SendEvent((mflAgent *)event->GetSender(),(mflEvent *)event->GetData(),channel);
+      //((mafObserver *)event->GetSender())->OnEvent((mafEventBase *)event->GetData());
     }
   }
 }
@@ -174,9 +172,9 @@ void mafAgentThreaded::ProcessEvent(mflEvent *event,unsigned long channel)
 void mafAgentThreaded::RequestForDispatching()
 //------------------------------------------------------------------------------
 {
-  //if (this->Threaded&&this->Initialized&&this->GetActiveFlag())
+  //if (m_Threaded&&this->Initialized&&this->GetActiveFlag())
   //{
-    if (PeekLastEvent()->GetID()==AsyncDispatchEvent)
+    if (PeekLastEvent()->GetId()==AsyncDispatchEvent)
     {
       Superclass::RequestForDispatching();
     }
@@ -194,21 +192,34 @@ void mafAgentThreaded::RequestForDispatching()
 }
 
 //------------------------------------------------------------------------------
-void mafAgentThreaded::AsyncForwardEvent(mflEvent *event, unsigned long channel)
+void mafAgentThreaded::AsyncForwardEvent(mafEventBase *event, mafID channel)
 //------------------------------------------------------------------------------
 {
-  this->PushEvent(mflSmartEvent(AsyncDispatchEvent,this,event),channel);
+  mafID old_ch=event->GetChannel();
+  event->SetChannel(channel);
+  PushEvent(AsyncDispatchEvent,this,event); // this make a copy of the event
+  event->SetChannel(old_ch);
 }
 
 //------------------------------------------------------------------------------
-void mafAgentThreaded::AsyncSendEvent(mflAgent *target,mflEvent *event, unsigned long channel)
+void mafAgentThreaded::AsyncSendEvent(mafObserver *target,mafEventBase *event, mafID channel)
 //------------------------------------------------------------------------------
 {
   if (event&&target&&target!=this)
   {
     // use the sender field to store the recipient.
-    this->PushEvent(mflSmartEvent(AsyncDispatchEvent,target,event),channel);
+    mafID old_ch=event->GetChannel();
+    event->SetChannel(channel); // set the right channel
+    PushEvent(AsyncDispatchEvent,target,event);
+    event->SetChannel(old_ch);
   }
+}
+
+//----------------------------------------------------------------------------
+void mafAgentThreaded::AsyncForwardEvent(mafID id, mafID channel,void *data)
+//----------------------------------------------------------------------------
+{
+  AsyncForwardEvent(&mafEventBase(this,id,data,channel),channel);
 }
 
 //----------------------------------------------------------------------------
@@ -216,9 +227,9 @@ void mafAgentThreaded::WaitForNewMessage()
 //------------------------------------------------------------------------------
 {
 #ifdef _WIN32
-  WaitForSingleObject( this->MessageSignal, INFINITE );
+  WaitForSingleObject( m_MessageSignal, INFINITE );
 #else
-  this->Gate->Lock();
+  m_Gate->Lock();
 #endif
 }
 
@@ -227,9 +238,14 @@ void mafAgentThreaded::SignalNewMessage()
 //------------------------------------------------------------------------------
 {
 #ifdef _WIN32
-  SetEvent( this->MessageSignal );
+  SetEvent( m_MessageSignal );
 #else
-  this->Gate->Unlock();
+  m_Gate->Unlock();
 #endif
 }
-
+//----------------------------------------------------------------------------
+void AsyncSendEvent(mafObserver *target, void *sender, mafID id, mafID channel=MCH_UP,void *data=NULL)
+//----------------------------------------------------------------------------
+{
+  AsyncSendEvent(target,&mafEventBase(sender,id,data,channel),channel);
+}

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAgent.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 18:32:33 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-27 16:56:03 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -16,20 +16,21 @@
 #include "mafObject.h"
 #include "mafObserver.h"
 #include "mafString.h"
-
-#ifdef MAF_USE_VTK
-#include "vtkCallbackCommand.h"
-#ifdef MAF_USE_VTK
-
 #include "mafEventBase.h"
+
+//----------------------------------------------------------------------------
+// forward declarations
+//----------------------------------------------------------------------------
+class vtkObject;
+class vtkCallbackCommand;
 
 /** An agent is a computational object with a default I/O interface.
   An agent is a computational object with a conventional events I/O interface,
   processing its input events, taking some action and producing output events toward
   other agents.
   An agent is a mafObserver, thus an object able to listen to MAF events coming from other objects
-  and extends the idea of channels keeping an internal dynamic array of channels: this wat an agent
-  can be attached as obeserver of events on any channel of other evetns, allowing the creation of a netwaork 
+  and extends the idea of channels keeping an internal dynamic array of channels: this was an agent
+  can be attached as observer of events on any channel of other events, allowing the creation of a network 
   of agents.
   This class support also bridging of events coming from VTK: a mafAgent can be set as observer of VTK events
   which are tunneled inside MAF events.
@@ -37,7 +38,7 @@
 class MAF_EXPORT mafAgent: public mafObject, public mafObserver//, public mafEventSender
 {
 public:
-  mafAbstractTypeMacro(mafAgent,vtkObject);
+  mafAbstractTypeMacro(mafAgent,mafObject);
   
   //------------------------------------------------------------------------------
   // Events
@@ -58,13 +59,13 @@ public:
 #ifdef MAF_USE_VTK
   /**
     Plug in a VTK object as source of events, specifying the VTK event ID to be observed.*/
-  virtual void PlugEventSource(vtkObject *source,mafID eventid=vtkCommand::AnyEvent, float priority = 0.0);
+  virtual void PlugEventSource(vtkObject *source,mafID eventid, float priority = 0.0);
 
   /**
   This is a commodity function to attach a callback function to a VTK event. 'source' is the vtkObject
   to which attach the event, 'arg' is typically the pointer of the class that wants to link to the event (the 'self')
   and 'f' is the callback function to be attached to the event.*/
-  static int PlugEventSource(vtkObject *source,void (*f)(void *), void *self, mafID eventid = vtkCommand::AnyEvent, float priority = 0.0);
+  static int PlugEventSource(vtkObject *source,void (*f)(void *), void *self, mafID eventid, float priority = 0.0);
 
   /**
   Unplug an events source. Remember to explicitly unplug all the source before destroying the
@@ -87,7 +88,7 @@ public:
   the function doesn't return until the event is processed by someone. If the class
   cannot manage the event it is passed to its listeners on the same channel and so on,
   until it's processed.*/
-  virtual void OnEvent(mafEventBase *event,mafID channel=MCH_UP);
+  virtual void OnEvent(mafEventBase *event);
 
   /**  return true if there's a listener on the specified channel. (noarg == MCH_UP) */
   inline int HasObserver(mafID channel);
@@ -103,7 +104,7 @@ public:
   void Shutdown();
 
   /** Return true if this agent has been initialized */
-  int IsInitialized() {return Initialized;}
+  int IsInitialized() {return m_Initialized;}
   
   /**
   The Agent name is used to identify the Agent in a unique way*/
@@ -125,7 +126,8 @@ protected:
   /**
   Static event handler function. This function simply call the OnEvent()
   virtual function and is used to convey events from VTK observers*/
-  static void InternalProcessVTKEvents(vtkObject* sender, mafID channel, void* clientdata, void* calldata);
+  static void InternalProcessVTKEvents(vtkObject* sender, unsigned long channel, void* clientdata, void* calldata);
+#endif 
 
   /**
   This function make an event to be passed to listeners of this class for the specified channel. In case
@@ -141,7 +143,7 @@ protected:
   std::vector<mafEventSource *> m_Channels;
 
 #ifdef MAF_USE_VTK
-  vtkCallbackCommand m_EventCallbackCommand; ///< this object is used as connection to event sources
+  vtkCallbackCommand *m_EventCallbackCommand; ///< this object is used as connection to event sources
 #endif 
 
 private:

@@ -3,127 +3,122 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: mafAgentEventQueue.cpp,v $
 Language:  C++
-Date:      $Date: 2005-04-26 18:32:33 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2005-04-27 16:56:03 $
+Version:   $Revision: 1.2 $
 
 =========================================================================*/
-#include "mafAgentEventQueue.h.h"
-#include "vtkObjectFactory.h"
+#include "mafAgentEventQueue.h"
+#include "mafMutexLock.h"
+#include "mmuIdFactory.h"
 
-#include "mflDefines.h"
-#include "vtkMultiThreader.h"
-#include "vtkCriticalSection.h"
 #include <assert.h>
 
 #include <deque>
 
-//typedef std::deque< mflSmartEvent > EventQueue;
-
 //------------------------------------------------------------------------------
 // PIMPL declarations
 //------------------------------------------------------------------------------
-class mafAgentEventQueue.h::EventQueueItem
+class mafAgentEventQueue::EventQueueItem
 {
 public:
-  EventQueueItem(mflEvent *event=NULL,unsigned long channel=mflAgent::DefaultChannel):Event(event),Channel(channel) {};
-//  EventQueueItem(const EventQueueItem& s):Event(s.Event),Channel(s.Channel) {};
+  EventQueueItem(mafEventBase *event=NULL):m_Event(event) {};
 
-  mflEvent *Event;
-  unsigned long Channel;
+  mafEventBase *m_Event;
 };
 
 
-struct mafAgentEventQueue.h::InternalEventQueue 
+struct mafAgentEventQueue::InternalEventQueue 
 {
-  std::deque< mafAgentEventQueue.h::EventQueueItem > Q;
+  std::deque< mafAgentEventQueue::EventQueueItem > Q;
 };
 
 //------------------------------------------------------------------------------
 // Events
 //------------------------------------------------------------------------------
-MFL_EVT_IMP(mafAgentEventQueue.h::DispatchEvent);
+MAF_ID_IMP(mafAgentEventQueue::DispatchEvent);
 
 //------------------------------------------------------------------------------
-vtkStandardNewMacro(mafAgentEventQueue.h);
+mafCxxTypeMacro(mafAgentEventQueue);
+//------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-mafAgentEventQueue.h::mafAgentEventQueue.h()
+mafAgentEventQueue::mafAgentEventQueue()
 //------------------------------------------------------------------------------
 {
-  this->Initialized     = 0;
-  this->Dispatched      = true;
-  this->EventQueue      = new InternalEventQueue;
-  this->DispatchMode    = SelfProcessMode;
-  this->DequeueMode     = MultipleEventMode;
-  this->PushMode        = DispatchEventMode;
+  m_Dispatched      = true;
+  m_EventQueue      = new InternalEventQueue;
+  m_DispatchMode    = SelfProcessMode;
+  m_DequeueMode     = MultipleEventMode;
+  m_PushMode        = DispatchEventMode;
   
-  vtkNEW(Mutex);
+  m_Mutex = new mafMutexLock;
 }
 
 //------------------------------------------------------------------------------
-mafAgentEventQueue.h::~mafAgentEventQueue.h()
+mafAgentEventQueue::~mafAgentEventQueue()
 //------------------------------------------------------------------------------
 {
-  //vtkGenericWarningMacro("Destroying mafAgentEventQueue.h");
-  delete this->EventQueue; this->EventQueue=NULL;
-  vtkDEL(Mutex);
+  //vtkGenericWarningMacro("Destroying mafAgentEventQueue");
+  delete m_EventQueue; m_EventQueue=NULL;
+  cppDEL(m_Mutex);
 }
 
 //------------------------------------------------------------------------------
-void mafAgentEventQueue.h::SetDispatched(bool value)
+void mafAgentEventQueue::SetDispatched(bool value)
 //------------------------------------------------------------------------------
 {
-  this->Mutex->Lock();
-  this->Dispatched=value;
-  this->Mutex->Unlock();
+  m_Mutex->Lock();
+  m_Dispatched=value;
+  m_Mutex->Unlock();
 }
 
 //------------------------------------------------------------------------------
-bool mafAgentEventQueue.h::DispatchEvents()
+bool mafAgentEventQueue::DispatchEvents()
 //------------------------------------------------------------------------------
 {
-  if (this->Dispatched)
+  if (m_Dispatched)
     return false;
 
-  if (this->DequeueMode==MultipleEventMode)
+  if (m_DequeueMode==MultipleEventMode)
   {
-    mflEvent *event;
+    mafEventBase *event;
     unsigned long channel;
     
-    mflEvent *last_event=PeekLastEvent(); // store the last event of the queue.
+    mafEventBase *last_event=PeekLastEvent(); // store the last event of the queue.
   
     // flush the queue but avoid infinite loops, by looping for no more than queue size
     //for (int qsize=GetQueueSize();(qsize>0)&&this->PopEvent(event,channel);qsize--)    
     do 
     {
-      this->PopEvent(event,channel);
+      this->PopEvent(event);
+      channel=event->GetChannel();
       if (event)
       {
-        if (event->GetID()==mafAgentEventQueue.h::DispatchEvent)
+        if (event->GetId()==mafAgentEventQueue::DispatchEvent)
         {
-          mafAgentEventQueue.h *sender=(mafAgentEventQueue.h *)event->GetSender();
+          mafAgentEventQueue *sender=(mafAgentEventQueue *)event->GetSender();
           sender->DispatchEvents();
         }
         else
         {
-          if (this->DispatchMode==SelfProcessMode)
+          if (m_DispatchMode==SelfProcessMode)
           {
-            this->ProcessEvent(event,channel);
+            OnEvent(event);
           }
           else
           {
-            this->ForwardEvent(event,channel);
+            ForwardEvent(event,channel);
           }
         }
-        event->UnRegister(this); // release memory
+        event->Delete(); // release memory
       }
     }
     while (event&&PeekEvent()!=last_event);
 
     //this->SetDispatched();
 
-    Mutex->Lock();
-    if (this->EventQueue->Q.size()==0)
+    m_Mutex->Lock();
+    if (m_EventQueue->Q.size()==0)
     {
         this->SetDispatched();
     }
@@ -131,37 +126,38 @@ bool mafAgentEventQueue.h::DispatchEvents()
     {
       this->RequestForDispatching();
     }
-    Mutex->Unlock();
+    m_Mutex->Unlock();
   }
   else
   {
-    mflEvent *event;
+    mafEventBase *event;
     unsigned long channel;
 
-    if (this->PopEvent(event,channel))
+    if (this->PopEvent(event))
     {
-      if (event->GetID()==mafAgentEventQueue.h::DispatchEvent)
+      channel=event->GetChannel();
+      if (event->GetId()==mafAgentEventQueue::DispatchEvent)
       {
-        mafAgentEventQueue.h *sender=(mafAgentEventQueue.h *)event->GetSender();
+        mafAgentEventQueue *sender=(mafAgentEventQueue *)event->GetSender();
         sender->DispatchEvents();
       }
       else
       {
-        if (this->DispatchMode==SelfProcessMode)
+        if (m_DispatchMode==SelfProcessMode)
         {
-          this->ProcessEvent(event,channel);
+          this->OnEvent(event);
         }
         else
         {
           this->ForwardEvent(event,channel);
         }
-        event->UnRegister(this); // release memory
+        event->Delete(); // release memory
       }
     }
 
     if (this->IsQueueEmpty())
     {
-        this->SetDispatched();
+      this->SetDispatched();
     }
     else
     {
@@ -173,91 +169,85 @@ bool mafAgentEventQueue.h::DispatchEvents()
 }
 
 //------------------------------------------------------------------------------
-int mafAgentEventQueue.h::PushEvent(unsigned long event, mafAgentEventQueue.h *sender,vtkObjectBase *data,unsigned long channel)
+int mafAgentEventQueue::PushEvent(mafID event, void *sender,void *data)
 //------------------------------------------------------------------------------
 {
-  return this->PushEvent(mflSmartEvent(event,sender,data),channel);
+  return this->PushEvent(mafEventBase(sender,event,data));
 }
 
 //------------------------------------------------------------------------------
-int mafAgentEventQueue.h::PushEvent(mflEvent *event,unsigned long channel)
+int mafAgentEventQueue::PushEvent(mafEventBase *event)
 //------------------------------------------------------------------------------
 {
   if (event)
   {
-    this->Mutex->Lock();
-    event->Register(this);
+    m_Mutex->Lock();
+    
+    mafEventBase *new_event=event->NewInstance();
+    assert(new_event);
+    *new_event=*event;
+    
+    mafAgentEventQueue::EventQueueItem item(new_event);
+    
+    m_EventQueue->Q.push_front(item);
 
-    mafAgentEventQueue.h::EventQueueItem item(event,channel);
-
-    this->EventQueue->Q.push_front(item);
-
-    if (this->Dispatched&&this->PushMode==DispatchEventMode)
+    if (m_Dispatched&&m_PushMode==DispatchEventMode)
     {
       // advise listener class a new event is in the queue
-      this->Dispatched=false;
-
-      this->RequestForDispatching();
+      m_Dispatched=false;
+      RequestForDispatching();
     }
-    this->Mutex->Unlock();
+    m_Mutex->Unlock();
     return true;
   }
   
-  vtkErrorMacro("Trying to push a NULL event");
+  mafErrorMacro("Trying to push a NULL event");
   return false;
 }
 
 //------------------------------------------------------------------------------
-void mafAgentEventQueue.h::RequestForDispatching()
+void mafAgentEventQueue::RequestForDispatching()
 //------------------------------------------------------------------------------
 {
-  if (this->Listener)
-    this->Listener->ProcessEvent(mflSmartEvent(mafAgentEventQueue.h::DispatchEvent,this));
+  ForwardEvent(mafAgentEventQueue::DispatchEvent,MCH_UP);
 }
 
 //------------------------------------------------------------------------------
-int mafAgentEventQueue.h::PopEvent(mflEvent *&event,unsigned long &channel)
+int mafAgentEventQueue::PopEvent(mafEventBase *&event)
 //------------------------------------------------------------------------------
 {
-  this->Mutex->Lock();
+  m_Mutex->Lock();
 
   int ret;
-  if (this->EventQueue->Q.size()>0)
+  if (m_EventQueue->Q.size()>0)
   {
-    mafAgentEventQueue.h::EventQueueItem item=this->EventQueue->Q.back();
-    event=item.Event;
-    channel=item.Channel;
-
-    // decrease reference counting without releasing memory 
-    //event->SetReferenceCount(event->GetReferenceCount()-1); 
-
-    // Notice the reference counting is descreased by DispatchEvents
-    // after dispatching, to keep the object alive.
-    this->EventQueue->Q.pop_back();
-
+    
+    // Notice the event object destruction is left to DispatchEvents()
+    // after dispatching to avoid object copying.
+    mafAgentEventQueue::EventQueueItem item=m_EventQueue->Q.back();
+    m_EventQueue->Q.pop_back();
+    event=item.m_Event;
     ret=true;
   }
   else
   {
     event=NULL;
-    channel=0;
     ret=false;
   }
 
-  this->Mutex->Unlock();
+  m_Mutex->Unlock();
 
   return ret;
 
 }
 
 //------------------------------------------------------------------------------
-mflEvent *mafAgentEventQueue.h::PopEvent()
+mafEventBase *mafAgentEventQueue::PopEvent()
 //------------------------------------------------------------------------------
 {
-  mflEvent *ev;
-  unsigned long channel;
+  mafEventBase *ev;
 
-  if (this->PopEvent(ev,channel))
+  if (this->PopEvent(ev))
   { 
     return ev;
   }
@@ -266,15 +256,16 @@ mflEvent *mafAgentEventQueue.h::PopEvent()
 }
 
 //------------------------------------------------------------------------------
-int mafAgentEventQueue.h::PopEvent(mflSmartEvent &event,unsigned long &channel)
+int mafAgentEventQueue::PopEvent(mafEventBase &event)
 //------------------------------------------------------------------------------
 {
-  mflEvent *ev;
+  mafEventBase *ev;
 
-  if (this->PopEvent(ev,channel))
+  if (this->PopEvent(ev))
   {
-    event=ev;
-    
+    event=*ev;
+    ev->Delete(); // destroy the queued event
+
     return true;
   }
 
@@ -282,45 +273,45 @@ int mafAgentEventQueue.h::PopEvent(mflSmartEvent &event,unsigned long &channel)
 }
 
 //------------------------------------------------------------------------------
-mflEvent *mafAgentEventQueue.h::PeekEvent()
+mafEventBase *mafAgentEventQueue::PeekEvent()
 //------------------------------------------------------------------------------
 {
-  this->Mutex->Lock();
+  m_Mutex->Lock();
 
-  mflEvent *event=NULL;
-  if (this->EventQueue->Q.size()>0)
+  mafEventBase *event=NULL;
+  if (m_EventQueue->Q.size()>0)
   {
-    EventQueueItem item=this->EventQueue->Q.back();
-    event=item.Event;  
+    EventQueueItem item=m_EventQueue->Q.back();
+    event=item.m_Event;  
   }
   
-  this->Mutex->Unlock();
+  m_Mutex->Unlock();
 
   return event;
 }
 
 //------------------------------------------------------------------------------
-mflEvent *mafAgentEventQueue.h::PeekLastEvent()
+mafEventBase *mafAgentEventQueue::PeekLastEvent()
 //------------------------------------------------------------------------------
 {
-  this->Mutex->Lock();
+  m_Mutex->Lock();
 
-  mflEvent *event=NULL;
-  if (this->EventQueue->Q.size()>0)
+  mafEventBase *event=NULL;
+  if (m_EventQueue->Q.size()>0)
   {
-    EventQueueItem item=this->EventQueue->Q.front();
-    event=item.Event;  
+    EventQueueItem item=m_EventQueue->Q.front();
+    event=item.m_Event;  
   }
   
-  this->Mutex->Unlock();
+  m_Mutex->Unlock();
 
   return event;
 }
 //------------------------------------------------------------------------------
-int mafAgentEventQueue.h::GetQueueSize()
+int mafAgentEventQueue::GetQueueSize()
 //------------------------------------------------------------------------------
 {
-  this->Mutex->Lock();
-  return this->EventQueue->Q.size();
-  this->Mutex->Unlock();
+  m_Mutex->Lock();
+  return m_EventQueue->Q.size();
+  m_Mutex->Unlock();
 }

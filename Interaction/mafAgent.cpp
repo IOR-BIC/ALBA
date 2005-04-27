@@ -3,36 +3,42 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: mafAgent.cpp,v $
 Language:  C++
-Date:      $Date: 2005-04-26 18:32:33 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2005-04-27 16:56:03 $
+Version:   $Revision: 1.2 $
 
 =========================================================================*/
 #include "mafAgent.h"
 #include "vtkObjectFactory.h"
 
 #include "mafEventBase.h"
-#include "mflDefines.h"
-#include "vtkOldStyleCallbackCommand.h"
-
+#include "mafEventSource.h"
+#include "mmuIdFactory.h"
 #include <assert.h>
+
+#ifdef MAF_USE_VTK
+#include "vtkCallbackCommand.h"
+#include "vtkOldStyleCallbackCommand.h"
+#include "vtkObject.h"
+#include "vtkMAFSmartPointer.h"
+#endif
 
 
 //------------------------------------------------------------------------------
 // Events
 //------------------------------------------------------------------------------
-MAF_ID_IMP(MCH_UP)
-MAF_ID_IMP(mafAgent::DownStreamChannel)
 MAF_ID_IMP(mafAgent::InitializeEvent);
-MAF_ID_IMP(mafAgent::VTKObserverChannel); 
 
 //------------------------------------------------------------------------------
 mafCxxAbstractTypeMacro(mafAgent);
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-mafAgent::mafAgent():m_m_Listener(NULL),m_EventCallbackCommand(NULL),m_Initialized(false)
+mafAgent::mafAgent():m_Initialized(false)
 //------------------------------------------------------------------------------
-{ 
+{
+#ifdef MAF_USE_VTK
+  m_EventCallbackCommand=NULL;
+#endif
 }
 
 //------------------------------------------------------------------------------
@@ -82,33 +88,70 @@ void mafAgent::Shutdown()
   }
 }
 
+//------------------------------------------------------------------------------
+void mafAgent::AddObserver(mafObserver *listener,mafID channel, float priority)
+//------------------------------------------------------------------------------
+{
+  assert(listener);
+  assert(listener!=this); // avoid loops
+
+  // add as observer of the channel with the right channel ID
+  int i;
+  for (i=0;i<m_Channels.size();i++)
+  {
+    if (m_Channels[i]->GetChannel()==channel)
+    {
+      m_Channels[i]->AddObserver(listener,priority);
+      return;
+    }
+  }
+
+  // if no channel with the right channel Id was found
+  // create a new one.
+  mafEventSource *newch =new mafEventSource();
+  newch->SetChannel(channel);
+  m_Channels.push_back(newch);
+
+  newch->AddObserver(listener,priority);
+}
+
+//------------------------------------------------------------------------------
+void mafAgent::RemoveObserver(mafObserver *listener)
+//------------------------------------------------------------------------------
+{  
+  assert(listener);
+  if (!listener)
+  {
+    mafErrorMacro("NULL observer provided, cannot RemoveObserver it.");
+    return;
+  }
+
+  // remove from any channel
+  for (int i=0;i<m_Channels.size();i++)
+  {
+    assert(m_Channels[i]);
+    m_Channels[i]->RemoveObserver(listener);
+  }
+}
+//------------------------------------------------------------------------------
+void mafAgent::RemoveAllObservers()
+//------------------------------------------------------------------------------
+{
+  for (int i=0;i<m_Channels.size();i++)
+  {
+    m_Channels[i]->RemoveAllObservers();
+  }
+}
 
 //------------------------------------------------------------------------------
 void mafAgent::UnPlugEventSource(mafAgent *source)
 //------------------------------------------------------------------------------
 {
   assert(source);
-  if (!source)
+  if (source)
   {
-    mafErrorMacro("NULL source provided, cannot UnPlug it.");
-    return;
-  }
-
-  // remove from any channel
-  for (int i=0;i<source->m_Channels.size();i++)
-  {
-    assert(source->m_Channels[i]);
-    source->m_Channels[i]->RemoveObserver(this);
-  }
-}
-
-//------------------------------------------------------------------------------
-void mafAgent::UnPlugAllListeners()
-//------------------------------------------------------------------------------
-{
-  for (int i=0;i<m_Channels[i].size();i++)
-  {
-    m_Channels[i]->RemoveObserver();
+    source->RemoveObserver(this);
+    //this->Modified();
   }
 }
 
@@ -117,35 +160,12 @@ void mafAgent::PlugEventSource(mafAgent *source,mafID channel, float priority)
 //------------------------------------------------------------------------------
 {
   assert(source);
-  if (!source)
-  {
-    mafErrorMacro("NULL source provided, cannot Plug it.");
-  }
-
-  assert(source!=this);
-  // add as observer of the channel with the right channel ID
-  int i;
-  for (i=0;i<source->m_Channels.size();i++)
-  {
-    if (source->m_Channels[i]->GetChannel()==channel)
-    {
-      source->m_Channels[i]->AddObserver(this,priority);
-      return;
-    }
-  }
-  
-  // if no channel with the right channel Id was found
-  // create a new one.
-  mafEventSource *newch =new mafEventSource();
-  newch->SetChannel(channel);
-  source->m_Channels.push_back(newch);
-  
-  newch->AddObserver(this,priority);
+  source->AddObserver(this,channel,priority);
 }
 
 #ifdef MAF_USE_VTK
 //------------------------------------------------------------------------------
-void mafAgent::PlugEventSource(vtkObject *source,unsigned long channel, float priority)
+void mafAgent::PlugEventSource(vtkObject *source,mafID channel, float priority)
 //------------------------------------------------------------------------------
 {
   if (!m_EventCallbackCommand) // Alloc this object only when necessary
@@ -161,12 +181,11 @@ void mafAgent::PlugEventSource(vtkObject *source,unsigned long channel, float pr
     mafErrorMacro("NULL source provided, cannot Plug it.");
   }
 
-  assert(source!=this);
   source->AddObserver(channel,m_EventCallbackCommand,priority); 
 }
 
 //------------------------------------------------------------------------------
-int mafAgent::PlugEventSource(vtkObject *source,void (*f)(void *), void *self, unsigned long channel, float priority)
+int mafAgent::PlugEventSource(vtkObject *source,void (*f)(void *), void *self, mafID channel, float priority)
 //------------------------------------------------------------------------------
 { 
   assert(source);
@@ -205,7 +224,7 @@ void mafAgent::OnEvent(mafEventBase *event)
 {
   assert(event);
  
-  if (event->GetID()==InitializeEvent)
+  if (event->GetId()==InitializeEvent)
     Initialize();
   
   if (event->GetSender()!=this) // avoid loops!
@@ -224,32 +243,6 @@ void mafAgent::InternalProcessVTKEvents(vtkObject* sender, unsigned long eventid
 }
 
 //------------------------------------------------------------------------------
-void mafAgent::PlugListener(mafAgent *listener,unsigned long channel, float priority)
-//------------------------------------------------------------------------------
-{
-  if (listener)
-  {
-    assert(listener!=this);
-    listener->PlugEventSource(this,channel,priority);
-    //this->Modified();
-  }
-}
-
-//------------------------------------------------------------------------------
-void mafAgent::UnPlugListener(mafAgent *listener)
-//------------------------------------------------------------------------------
-{  
-  if (listener)
-  {
-    if (listener == m_Listener)
-      this->SetListener(NULL);
-
-    listener->UnPlugEventSource(this);
-    //this->Modified();
-  }
-}
-
-//------------------------------------------------------------------------------
 void mafAgent::ForwardEvent(int id, mafID channel,void *data)
 //------------------------------------------------------------------------------
 {
@@ -262,7 +255,7 @@ void mafAgent::ForwardEvent(mafEventBase *event, mafID channel)
 {
  for (int i=0;i<m_Channels.size();i++)
  {
-   if (m_Channels[i].GetChannel()==channel || channel == MCH_ANY)
-     m_Channels[i].InvokeEvent(event); // broadcast event on the right channel
+   if (m_Channels[i]->GetChannel()==channel || channel == MCH_ANY)
+     m_Channels[i]->InvokeEvent(event); // broadcast event on the right channel
  }
 }
