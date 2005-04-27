@@ -14,6 +14,8 @@ SET(PROJECT_SRCS
 IF (MAF_USE_VTK)
   SET(PROJECT_SRCS
     ${PROJECT_SRCS}
+    mmoCreateMeter.cpp
+    mmoCreateMeter.h
     mmoVTKImporter.cpp
     mmoVTKImporter.h
   )
