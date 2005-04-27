@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 17:23:49 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-04-27 10:19:29 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -380,9 +380,9 @@ void mafViewManager::ViewDelete(mafView *view)
 	
   // Paolo 2005-04-22
   // calculate the view type index
-  int index = view->m_Id - VIEW_START;
+  //int index = view->m_Id - VIEW_START;
   // set to NULL the pointer into the state matrix
-  m_ViewMatrixID[index][view->m_Mult] = NULL;
+  m_ViewMatrixID[view->m_Id][view->m_Mult] = NULL;
 
   if(!m_vlist) return;
   if(m_vlist == view)
