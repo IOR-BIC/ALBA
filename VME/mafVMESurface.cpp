@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 20:02:53 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-27 14:08:58 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -29,6 +29,7 @@
 #include "mafAbsMatrixPipe.h"
 #include "vtkDataSet.h"
 #include "vtkPolyData.h"
+#include "vtkCellArray.h"
 
 #include "mafPipeSurface.h" //SIL. 21-4-2005: 
 //-------------------------------------------------------------------------
@@ -73,7 +74,11 @@ int mafVMESurface::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
 //-------------------------------------------------------------------------
 {
   assert(data);
-  if (data->IsA("vtkPolyData"))
+  vtkPolyData *polydata = vtkPolyData::SafeDownCast(data);
+
+  if (polydata && polydata->GetPoints() && polydata->GetVerts()->GetNumberOfCells()==0 && \
+     (polydata->GetPolys()->GetNumberOfCells() > 0 || polydata->GetStrips()->GetNumberOfCells() > 0) && \
+      polydata->GetLines()->GetNumberOfCells() == 0)
   {
     return Superclass::SetData(data,t,mode);
   }
