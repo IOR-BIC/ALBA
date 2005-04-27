@@ -1,5 +1,5 @@
 /* XPM */
-static char *mafVMECloud_xpm[] = {
+static char *VME_CLOUD_xpm[] = {
 /* columns rows colors chars-per-pixel */
 "15 15 69 1",
 "O c #EEF0F2",

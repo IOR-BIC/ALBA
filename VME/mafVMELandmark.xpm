@@ -1,5 +1,5 @@
 /* XPM */
-static char *mafVMELandmark_xpm[] = {
+static char *VME_LANDMARK_xpm[] = {
 /* columns rows colors chars-per-pixel */
 "15 15 89 1",
 "C c #6188A6",

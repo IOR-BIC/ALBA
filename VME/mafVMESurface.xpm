@@ -1,5 +1,5 @@
 /* XPM */
-static char *mafVMESurface_xpm[] = {
+static char *VME_SURFACE_xpm[] = {
 /* columns rows colors chars-per-pixel */
 "15 15 128 2",
 "b  c #92CBF8",
