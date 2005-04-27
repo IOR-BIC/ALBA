@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-27 14:10:06 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-27 16:27:49 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,7 +23,6 @@ class mmaMeter;
 class vtkLineSource;
 class vtkLineSource;
 class vtkAppendPolyData;
-class vtkTubeFilter;
 
 /** mafVMEMeter - 
 */
@@ -214,7 +213,6 @@ protected:
   vtkLineSource     *m_LineSource;
   vtkLineSource     *m_LineSource2;
   vtkAppendPolyData *m_Goniometer;
-  vtkTubeFilter     *m_Tube;
   mafTransform      *m_TmpTransform;
 
 private:

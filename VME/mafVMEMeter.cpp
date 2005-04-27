@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-27 14:10:06 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-27 16:27:49 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -36,7 +36,6 @@
 #include "vtkLine.h"
 #include "vtkLineSource.h"
 #include "vtkAppendPolyData.h"
-#include "vtkTubeFilter.h"
 
 #include <assert.h>
 
@@ -64,8 +63,6 @@ mafVMEMeter::mafVMEMeter()
   m_Goniometer->AddInput(m_LineSource->GetOutput());
   m_Goniometer->AddInput(m_LineSource2->GetOutput());
 
-  vtkNEW(m_Tube);
-  m_Tube->UseDefaultNormalOff();
   vtkNEW(m_TmpTransform);
 
   // attach a datapipe which creates a bridge between VTK and MAF
@@ -81,7 +78,6 @@ mafVMEMeter::~mafVMEMeter()
 {
   mafDEL(m_MeterAttributes);
   mafDEL(m_Transform);
-  vtkDEL(m_Tube);
   vtkDEL(m_LineSource);
   vtkDEL(m_LineSource2);
   vtkDEL(m_Goniometer);
@@ -216,13 +212,6 @@ void mafVMEMeter::InternalUpdate()
       m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
       m_LineSource->SetPoint2(local_end[0],local_end[1],local_end[2]);
       m_LineSource->Update();
-
-      m_Tube->SetInput(m_LineSource->GetOutput());
-      m_Tube->SetRadius(GetMeterRadius());
-      m_Tube->SetCapping(GetMeterCapping());
-      m_Tube->SetNumberOfSides(20);
-      m_Tube->UseDefaultNormalOff();
-      m_Tube->Update();
     }
     else
       m_Distance = -1;
@@ -336,13 +325,6 @@ void mafVMEMeter::InternalUpdate()
       m_LineSource2->SetPoint1(local_p1);
       m_LineSource2->SetPoint2(local_p2);
       m_LineSource2->Update();
-
-      m_Tube->SetInput(m_Goniometer->GetOutput());
-      m_Tube->SetRadius(GetMeterRadius());
-      m_Tube->SetCapping(GetMeterCapping());
-      m_Tube->SetNumberOfSides(20);
-      m_Tube->UseDefaultNormalOff();
-      m_Tube->Update();
     }
     else
       m_Distance = -1;
@@ -455,13 +437,6 @@ void mafVMEMeter::InternalUpdate()
       m_LineSource2->SetPoint1(local_start);
       m_LineSource2->SetPoint2(local_end2);
       m_LineSource2->Update();
-
-      m_Tube->SetInput(m_Goniometer->GetOutput());
-      m_Tube->SetRadius(GetMeterRadius());
-      m_Tube->SetCapping(GetMeterCapping());
-      m_Tube->SetNumberOfSides(20);
-      m_Tube->UseDefaultNormalOff();
-      m_Tube->Update();
     }
     else
       m_Angle = 0;
