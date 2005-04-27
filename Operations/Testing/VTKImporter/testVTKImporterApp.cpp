@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testVTKImporterApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-27 12:50:16 $
-  Version:   $Revision: 1.1 $
-  Authors:   Silvano Imboden
+  Date:      $Date: 2005-04-27 12:59:41 $
+  Version:   $Revision: 1.2 $
+  Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
@@ -33,9 +33,8 @@
 #include "mafPipeFactory.h"
 #include "mafPipeSurface.h"
 
-#include "mmoCreateVmeSurface.h"
+#include "mmoVTKImporter.h"
 #include "mafViewVTK.h"
-#include "testView.h"
 //--------------------------------------------------------------------------------
 // Create the Application
 //--------------------------------------------------------------------------------
@@ -66,14 +65,10 @@ bool testVTKImporterApp::OnInit()
   //m_logic->PlugVMEManager(false);  // the VmeManager at the moment cause 4 leaks of 200+32+24+56 bytes  //SIL. 20-4-2005: 
   m_logic->Configure();
 
-  m_logic->GetTopWin()->SetTitle("testView");
-  SetTopWindow(mafGetFrame());  
+  m_logic->GetTopWin()->SetTitle("test VTK Importer");
+  SetTopWindow(mafGetFrame());
 
-  m_logic->Plug(new mmoCreateVmeSurface("Add Vme Surface \tCtrl+A"));
-  //m_logic->Plug(new testView("testView"));
-  testView *tv = new testView("testView");
-  tv->PlugVisualPipe("mafVMESurface", "mafPipeSurface");
-  m_logic->Plug(tv);
+  m_logic->Plug(new mmoVTKImporter("VTK Importer"));
 
   m_logic->Show();
   m_logic->Init(0,NULL); // calls FileNew - which create the root
@@ -86,14 +81,3 @@ int testVTKImporterApp::OnExit()
   cppDEL(m_logic);
   return 0;
 }
-
-
-
-
-
-
-
-
-
-
-

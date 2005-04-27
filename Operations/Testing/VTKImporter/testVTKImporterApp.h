@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testVTKImporterApp.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-27 12:50:16 $
-  Version:   $Revision: 1.1 $
-  Authors:   Silvano Imboden
+  Date:      $Date: 2005-04-27 12:59:42 $
+  Version:   $Revision: 1.2 $
+  Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
@@ -21,21 +21,11 @@ class testVTKImporterApp : public wxApp
 // ============================================================================
 {
 public:
-    bool OnInit();
-    int  OnExit();
+  bool OnInit();
+  int  OnExit();
+
 protected:
-    mafLogicWithManagers *m_logic;
-
+  mafLogicWithManagers *m_logic;
 };
-
 DECLARE_APP(testVTKImporterApp)
-
 #endif //__testVTKImporterApp_H__
-
-
-
-
-
-
-
-
