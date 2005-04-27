@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:09:56 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-27 15:07:16 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,6 +26,9 @@
 #include "mafVMEImage.h"
 #include "mafVMESurface.h"
 #include "mafVMEGroup.h"
+#include "mafVMEVolumeGray.h"
+#include "mafVMEVolume.h"
+#include "mafVMEPolyline.h"
 #include "mafTagArray.h"
 #include "mafIndent.h"
 #include <string>
@@ -63,6 +66,7 @@ mafVMEFactory::mafVMEFactory()
   //
   // Plug here Nodes in this factory
   //
+
   mafPlugObjectMacro(mafTagArray,"a basic kind of attribute used to store key-value pairs");
   mafPlugObjectMacro(mafVMEItemVTK,"a VME item storing VTK datasets");
   mafPlugNodeMacro(mafVMERoot,"root for VME tree");
@@ -70,6 +74,9 @@ mafVMEFactory::mafVMEFactory()
   mafPlugNodeMacro(mafVMEGeneric,"Generic VME storing VTK datasets");
   mafPlugNodeMacro(mafVMEImage,"Generic VME storing vtkImageData datasets");
   mafPlugNodeMacro(mafVMESurface,"Generic VME storing vtkPolyData surfaces datasets");
+  mafPlugNodeMacro(mafVMEVolumeGray,"Generic VME storing vtk volume datasets with one scalar component");
+  mafPlugNodeMacro(mafVMEVolume,"Generic VME storing generic vtk volume datasets");
+  mafPlugNodeMacro(mafVMEPolyline,"Generic VME storing polyline datasets");
 }
 
 //------------------------------------------------------------------------------
