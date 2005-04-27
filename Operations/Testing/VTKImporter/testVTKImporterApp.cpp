@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testVTKImporterApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-27 12:59:41 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-27 16:25:59 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -31,7 +31,6 @@
 #include "mafVMERoot.h"
 #include "mafVMESurface.h"
 #include "mafPipeFactory.h"
-#include "mafPipeSurface.h"
 
 #include "mmoVTKImporter.h"
 #include "mafViewVTK.h"
@@ -52,7 +51,6 @@ bool testVTKImporterApp::OnInit()
   // Inizializzazione e Fill della PipeFactory -- potrebbe essere un SideEffect del Plug dei Nodi
   result = mafPipeFactory::Initialize();
   assert(result==MAF_OK);
-  mafPlugPipe<mafPipeSurface>("mafPipeSurface");
 
   m_logic = new mafLogicWithManagers();
   //m_logic->PlugTimebar(false);
