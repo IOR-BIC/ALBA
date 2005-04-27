@@ -33,6 +33,8 @@ mafMatrix.cpp
 mafMatrix.h
 mafMatrix3x3.cpp
 mafMatrix3x3.h
+mafMultiThreader.h
+mafMultiThreader.cpp
 mafMutexLock.cpp
 mafMutexLock.h
 mafOBB.cpp
