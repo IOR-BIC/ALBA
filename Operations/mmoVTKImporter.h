@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKImporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-27 12:35:09 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-27 14:08:39 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -18,8 +18,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
+class mafNode;
 class mafVME;
-class mafVMESurface;
 
 //----------------------------------------------------------------------------
 // mmoVTKImporter :
@@ -44,10 +44,14 @@ public:
 	/** Makes the undo for the operation. */
   void OpUndo();
 
+  /** Set the vtk filename to be imported. 
+      This is used when the operation is executed not using user interface. */
+  void SetFileName(const char *name) {m_File = name;};
+
 protected:
   wxString m_File;
   wxString m_FileDir;
-  
-  mafVMESurface *m_Vme;
+
+  mafVME   *m_Vme;
 };
 #endif

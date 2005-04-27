@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-27 12:35:09 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-27 14:08:39 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,9 +21,16 @@
 #include "mmoVTKImporter.h"
 #include <wx/busyinfo.h>
 #include "mafEvent.h"
+
 #include "mafVME.h"
+#include "mafVMEGeneric.h"
+#include "mafVMEImage.h"
+#include "mafVMEPolyline.h"
 #include "mafVMESurface.h"
+#include "mafVMEVolumeGray.h"
+
 #include "mafTagArray.h"
+#include "vtkMAFSmartPointer.h"
 
 #include "vtkDataSet.h"
 #include "vtkDataSetReader.h"
@@ -39,7 +46,7 @@ mafOp(label)
 //----------------------------------------------------------------------------
 {
 	m_Vme     = NULL;
-	m_OpType  = OPTYPE_IMPORTER;
+  m_OpType  = OPTYPE_IMPORTER;
 	m_Canundo = true;
 	m_File    = "";
 
@@ -82,35 +89,33 @@ void mmoVTKImporter::OpDo()
 //----------------------------------------------------------------------------
 {
   bool success = false;
-  
 	wxBusyInfo wait("Loading file: ...");
-  assert(!m_Vme);
   
-  vtkDataSetReader *reader = vtkDataSetReader::New();
+  vtkMAFSmartPointer<vtkDataSetReader> reader;
   reader->SetFileName(m_File);
 
   vtkDataReader *preader;
   // workaround to avoid double reading
   switch (reader->ReadOutputType())
-    {
-    case VTK_POLY_DATA:  
+  {
+    case VTK_POLY_DATA:
       preader = vtkPolyDataReader::New();
-      break;
+    break;
     case VTK_STRUCTURED_POINTS:
       preader = vtkStructuredPointsReader::New();
-      break;
+    break;
     case VTK_STRUCTURED_GRID:
       preader = vtkStructuredGridReader::New();
-      break;
+    break;
     case VTK_RECTILINEAR_GRID:
       preader = vtkRectilinearGridReader::New();
-      break;
+    break;
     case VTK_UNSTRUCTURED_GRID:
       preader = vtkUnstructuredGridReader::New();
-      break;
+    break;
     default:
       wxMessageBox("Unsupported file format", "I/O Error", wxICON_ERROR );
-      return;
+    return;
   }
   mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,preader));
   preader->SetFileName(m_File);
@@ -125,32 +130,47 @@ void mmoVTKImporter::OpDo()
 
     if (data)
     {
-      mafNEW(m_Vme);
-      m_Vme->SetName(name.c_str());
-      m_Vme->SetDataByDetaching(data,0);
+      mafSmartPointer<mafVMEPolyline>   vme_poly;
+      mafSmartPointer<mafVMESurface>    vme_surf;
+      mafSmartPointer<mafVMEVolumeGray> vme_gray;
+      mafSmartPointer<mafVMEGeneric>    vme_generic;
+      if (vme_poly->SetDataByDetaching(data,0) == MAF_OK)
+      {
+        m_Vme = vme_poly;
+      }
+      else if (vme_surf->SetDataByDetaching(data,0) == MAF_OK)
+      {
+        m_Vme = vme_surf;
+      }
+      else if (vme_gray->SetDataByDetaching(data,0) == MAF_OK)
+      {
+        m_Vme = vme_gray;
+      }
+      else
+      {
+        vme_generic->SetDataByDetaching(data,0);
+        m_Vme = vme_generic;
+      }
 
       mafTagItem tag_Nature;
       tag_Nature.SetName("VME_NATURE");
       tag_Nature.SetValue("NATURAL");
-
       m_Vme->GetTagArray()->SetTag(tag_Nature);
+      m_Vme->SetName(name.c_str());
 
       mafEventMacro(mafEvent(this,VME_ADD,m_Vme));
       success = true;
     }
   }
-
-  //vtkDEL(dsi);
-  vtkDEL(reader);
   vtkDEL(preader);
-  if(!success)	wxMessageBox("Error reading VTK file.", "I/O Error", wxICON_ERROR );
+  if(!success)
+    wxMessageBox("Error reading VTK file.", "I/O Error", wxICON_ERROR );
 }
 //----------------------------------------------------------------------------
-void mmoVTKImporter::OpUndo()   
-/**  */
+void mmoVTKImporter::OpUndo()
 //----------------------------------------------------------------------------
 {
   assert(m_Vme);
   mafEventMacro(mafEvent(this,VME_REMOVE,m_Vme));
-  mafDEL(m_Vme);
+  m_Vme = NULL;
 }
