@@ -20,6 +20,8 @@ ADD_EXECUTABLE(testEvent mafEventTest.cpp)
 ADD_TEST(testEvent ${EXECUTABLE_OUTPUT_PATH}/testEvent)
 ADD_EXECUTABLE(testObserver mafObserverTest.cpp)
 ADD_TEST(testObserver ${EXECUTABLE_OUTPUT_PATH}/testObserver)
+ADD_EXECUTABLE(testMultithreader testMultithreader.cpp)
+ADD_TEST(testMultithreader ${EXECUTABLE_OUTPUT_PATH}/testMultithreader)
 
 
 # wxWidgets specific classes
