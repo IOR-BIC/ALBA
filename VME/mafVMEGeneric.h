@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGeneric.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-19 08:27:00 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-04-27 14:09:30 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -49,7 +49,7 @@ public:
   int SetDataByReference(vtkDataSet *data, mafTimeStamp t) {return SetData(data,t,MAF_VME_REFERENCE_DATA);}
   
   /** Set data by detaching it from its original source. See SetData() for more details. */
-  int SetDataByDetaching(vtkDataSet *data, mafTimeStamp t) {return SetData(data,t,MAF_VME_REFERENCE_DATA);}
+  int SetDataByDetaching(vtkDataSet *data, mafTimeStamp t) {return SetData(data,t,MAF_VME_DETACH_DATA);}
 
   /** return the right type of output.*/  
   mafVMEOutputVTK *GetVTKOutput() {return (mafVMEOutputVTK *)GetOutput();}
