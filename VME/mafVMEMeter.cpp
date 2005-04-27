@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 17:27:49 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-27 14:10:06 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,6 +27,7 @@
 #include "mafIndent.h"
 #include "mafDataPipeCustom.h"
 #include "mmuIdFactory.h"
+#include "mmgGui.h"
 
 #include "vtkMAFDataPipe.h"
 #include "vtkMath.h"
@@ -681,4 +682,18 @@ double mafVMEMeter::GetAngle()
 //-------------------------------------------------------------------------
 {
   return m_Angle;
+}
+//-------------------------------------------------------------------------
+mmgGui* mafVMEMeter::CreateGui()
+//-------------------------------------------------------------------------
+{
+  assert(m_Gui == NULL);
+  m_Gui = new mmgGui(NULL); // replace NULL with 'this' ....  //SIL. 22-4-2005: 
+
+  wxString type = GetTypeName(); 
+  m_Gui->Label("type :", type);
+  wxString name = GetName();
+  m_Gui->Label("name :", name);
+
+  return m_Gui;
 }

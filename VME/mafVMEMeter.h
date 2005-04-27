@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 17:27:49 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-27 14:10:06 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -198,6 +198,9 @@ protected:
 
   /** return the meter's attributes */
   mmaMeter *GetMeterAttributes();
+
+  /** Internally used to create a new instance of the GUI.*/
+  virtual mmgGui *CreateGui();
 
   double m_Distance;
   double m_Angle;
