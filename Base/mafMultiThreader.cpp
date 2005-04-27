@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafMultiThreader.cpp,v $
 Language:  C++
-Date:      $Date: 2005-04-27 14:36:30 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2005-04-27 16:55:16 $
+Version:   $Revision: 1.2 $
 Authors:   Based on mafMultiThreader (www.vtk.org), adapted by Marco Petrone
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -26,11 +26,11 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // platforms about passing function pointer to an argument expecting an
 // extern "C" function.  Placing the typedef of the function pointer type
 // inside an extern "C" block solves this problem.
-#if defined(CMAKE_USE_PTHREADS_INIT) || defined(VTK_HP_PTHREADS)
+#if defined(CMAKE_USE_PTHREADS_INIT) || defined(CMAKE_USE_PTHREADS_INIT)
 #include <pthread.h>
 extern "C" { typedef void *(*mmuExternCThreadFunctionType)(void *); }
 #else
-typedef mmuThreadFunctionType mmuExternCThreadFunctionType;
+typedef mmuInternalThreadFunctionType mmuExternCThreadFunctionType;
 #endif
 
 #ifdef __APPLE__
@@ -60,12 +60,27 @@ mafMultiThreader::~mafMultiThreader()
 {
 }
 
-int mafMultiThreader::SpawnThread( mmuThreadFunctionType f, void *UserData )
+#ifdef CMAKE_USE_WIN32_THREADS_INIT
+struct mmuInternalWin32ThreadData
+{
+  mafMultiThreader::mafThreadFunctionType f;
+  mmuThreadInfoStruct *data;
+};
+DWORD WINAPI mmuInternalWin32ThreadProc(LPVOID lpParameter)
+{
+  ((struct mmuInternalWin32ThreadData *)lpParameter)->f(((struct mmuInternalWin32ThreadData *)lpParameter)->data);
+  delete ((struct mmuInternalWin32ThreadData *)lpParameter); //remove data
+  
+  return 0;
+}
+#endif
+
+int mafMultiThreader::SpawnThread( mafThreadFunctionType f, void *UserData )
 {
   int id;
 
   // avoid a warning
-  mmuThreadFunctionType tf;
+  mafThreadFunctionType tf;
   tf = f; tf= tf;
   
 #ifdef CMAKE_USE_WIN32_THREADS_INIT
@@ -83,7 +98,7 @@ int mafMultiThreader::SpawnThread( mmuThreadFunctionType f, void *UserData )
     m_SpawnedThreadActiveFlagLock[id]->Lock();
     if (m_SpawnedThreadActiveFlag[id] == 0)
     {
-      // We've got a useable thread id, so grab it
+      // We've got a usable thread id, so grab it
       m_SpawnedThreadActiveFlag[id] = 1;
       m_SpawnedThreadActiveFlagLock[id]->Unlock();
       break;
@@ -99,7 +114,6 @@ int mafMultiThreader::SpawnThread( mmuThreadFunctionType f, void *UserData )
     return MAF_ERROR;
   }
 
-
   m_SpawnedThreadInfoArray[id].m_UserData = UserData;
   m_SpawnedThreadInfoArray[id].m_NumberOfThreads = 1;
   m_SpawnedThreadInfoArray[id].m_ActiveFlag = &m_SpawnedThreadActiveFlag[id];
@@ -109,11 +123,15 @@ int mafMultiThreader::SpawnThread( mmuThreadFunctionType f, void *UserData )
   // CreateThread (on win32), or generating an error  
 
 #ifdef CMAKE_USE_WIN32_THREADS_INIT
+
+  mmuInternalWin32ThreadData *data=new mmuInternalWin32ThreadData;
+  data->data= &(m_SpawnedThreadInfoArray[id]);
+  data->f=f;
   // Using CreateThread on a PC
   //
   m_SpawnedThreadProcessID[id] = 
-      CreateThread(NULL, 0, f, 
-             ((void *)(&m_SpawnedThreadInfoArray[id])), 0, &threadId);
+      CreateThread(NULL, 0, mmuInternalWin32ThreadProc, data, 0, &threadId);
+  mafSleep(10);
 
   if (m_SpawnedThreadProcessID[id] == NULL)
   {
@@ -132,7 +150,7 @@ int mafMultiThreader::SpawnThread( mmuThreadFunctionType f, void *UserData )
   //
   pthread_attr_t attr;
 
-#ifdef VTK_HP_PTHREADS
+#ifdef CMAKE_USE_PTHREADS_INIT
   pthread_attr_create( &attr );
 #else  
   pthread_attr_init(&attr);
@@ -141,7 +159,7 @@ int mafMultiThreader::SpawnThread( mmuThreadFunctionType f, void *UserData )
 #endif
 #endif
   
-#ifdef VTK_HP_PTHREADS
+#ifdef CMAKE_USE_PTHREADS_INIT
   pthread_create( &(m_SpawnedThreadProcessID[id]),
                   attr, f,  
                   ( (void *)(&m_SpawnedThreadInfoArray[id]) ) );

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafMultiThreader.h,v $
 Language:  C++
-Date:      $Date: 2005-04-27 14:36:31 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2005-04-27 16:55:17 $
+Version:   $Revision: 1.2 $
 Authors:   Based on vtkMultiThreader (www.vtk.org), adapted by Marco Petrone
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -17,14 +17,14 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafBase.h"
 #include "mafIncludeWIN32.h"
 
-#define MAF_MAX_THREADS 8
+#define MAF_MAX_THREADS 16
 
 #ifdef CMAKE_USE_SPROC_INIT
 #include <sys/types.h>   Needed for unix implementation of sproc
 #include <unistd.h>   Needed for unix implementation of sproc
 #endif
 
-#if defined(CMAKE_USE_PTHREADS_INIT) || defined(VTK_HP_PTHREADS)
+#if defined(CMAKE_USE_PTHREADS_INIT) || defined(CMAKE_USE_PTHREADS_INIT)
 #include <pthread.h>   Needed for PTHREAD implementation of mutex
 #include <sys/types.h>   Needed for unix implementation of pthreads
 #include <unistd.h>   Needed for unix implementation of pthreads
@@ -46,17 +46,17 @@ typedef int mmuThreadProcessIDType;
 
 
 #ifdef CMAKE_USE_PTHREADS_INIT
-typedef void *(*mmuThreadFunctionType)(void *);
+typedef void *(*mmuInternalThreadFunctionType)(void *);
 typedef pthread_t mmuThreadProcessIDType;
 #endif
 
 #ifdef CMAKE_USE_WIN32_THREADS_INIT
-typedef LPTHREAD_START_ROUTINE mmuThreadFunctionType;
+typedef LPTHREAD_START_ROUTINE mmuInternalThreadFunctionType;
 typedef HANDLE mmuThreadProcessIDType;
 #endif
 
 #if !defined(CMAKE_USE_PTHREADS_INIT) && !defined(CMAKE_USE_WIN32_THREADS_INIT)
-typedef void (*mmuThreadFunctionType)(void *);
+typedef void (*mmuInternalThreadFunctionType)(void *);
 typedef int mmuThreadProcessIDType;
 #endif
 
@@ -98,11 +98,13 @@ public:
     void*               m_UserData;
   };
 
+  typedef void (*mafThreadFunctionType)(mmuThreadInfoStruct *);
+
   /**
     Create a new thread for the given function. Return a thread id
     which is a number between 0 and MAF_MAX_THREADS - 1. This id should
     be used to kill the thread at a later time. */
-  int SpawnThread( mmuThreadFunctionType, void *data );
+  int SpawnThread( mafThreadFunctionType, void *UserData );
 
   /** Terminate the thread that was created with a SpawnThreadExecute() */
   void TerminateThread( int thread_id );
