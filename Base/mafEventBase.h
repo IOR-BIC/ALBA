@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventBase.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-25 18:18:00 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-28 16:11:47 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -51,6 +51,8 @@ public:
  
   /** copy constructor, this makes a copy of the event */
   mafEventBase(const mafEventBase& c);
+
+  virtual void DeepCopy(const mafEventBase *event);
 
   /** set the sender (invoker) of this event */
   void SetSender(void *sender);

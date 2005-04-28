@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventIO.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-25 21:12:16 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-28 16:15:29 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -46,10 +46,11 @@ mafEventIO::~mafEventIO()
 }
 
 //------------------------------------------------------------------------------
-mafEventIO::mafEventIO(const mafEventIO& c)
+void mafEventIO::DeepCopy(const mafEventIO *c)
 //------------------------------------------------------------------------------
 {
-  m_ItemId = c.m_ItemId;
+  Superclass::DeepCopy(c);
+  m_ItemId = c->m_ItemId;
 }
 
 //------------------------------------------------------------------------------

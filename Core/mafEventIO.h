@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventIO.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-25 21:12:16 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-28 16:15:30 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -39,7 +39,7 @@ public:
   mafTypeMacro(mafEventIO,mafEventBase);
  
   /** copy constructor, this makes a copy of the event */
-  mafEventIO(const mafEventIO& c);
+  virtual void DeepCopy(const mafEventIO *c);
 
   /** set item Id stored into this event */
   void SetItemId(mafID id);
