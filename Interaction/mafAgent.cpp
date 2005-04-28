@@ -3,8 +3,8 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: mafAgent.cpp,v $
 Language:  C++
-Date:      $Date: 2005-04-27 16:56:03 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2005-04-28 16:10:09 $
+Version:   $Revision: 1.3 $
 
 =========================================================================*/
 #include "mafAgent.h"
@@ -26,7 +26,7 @@ Version:   $Revision: 1.2 $
 //------------------------------------------------------------------------------
 // Events
 //------------------------------------------------------------------------------
-MAF_ID_IMP(mafAgent::InitializeEvent);
+MAF_ID_IMP(mafAgent::AGENT_INITIALIZE);
 
 //------------------------------------------------------------------------------
 mafCxxAbstractTypeMacro(mafAgent);
@@ -224,7 +224,7 @@ void mafAgent::OnEvent(mafEventBase *event)
 {
   assert(event);
  
-  if (event->GetId()==InitializeEvent)
+  if (event->GetId()==AGENT_INITIALIZE)
     Initialize();
   
   if (event->GetSender()!=this) // avoid loops!

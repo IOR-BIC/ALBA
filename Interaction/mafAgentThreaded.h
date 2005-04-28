@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAgentThreaded.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-27 16:56:03 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-28 16:10:10 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -26,7 +26,7 @@ class mafMutexLock;
   queued events. The class also features an asynchronous mechanism for
   forwarding (or sending) events allowing the precessing thread to send
   an event to be processed by a separate thread. This happens by queuing 
-  the output event wrapped in a AsyncDispatchEvent, which is processed in
+  the output event wrapped in a AGENT_ASYNC_DISPATCH, which is processed in
   the main thread, by using the original mafAgentEventQueue mechanism for dispatching.
   @sa mafAgent mafAgentEventQueue mafEventBase
 */
@@ -36,7 +36,7 @@ public:
   //------------------------------------------------------------------------------
   // Events
   //------------------------------------------------------------------------------
-  MAF_ID_DEC(AsyncDispatchEvent);
+  MAF_ID_DEC(AGENT_ASYNC_DISPATCH);
 
   mafTypeMacro(mafAgentThreaded,mafAgentEventQueue);
 
@@ -61,7 +61,7 @@ public:
   
   /**
     Send an event to the specified object (i.e. Post to that listener) asynchronously. 
-    This happens by queuing the output event wrapped in a AsyncDispatchEvent, 
+    This happens by queuing the output event wrapped in a AGENT_ASYNC_DISPATCH, 
     which is processed in the main thread, by using the original mafAgentEventQueue 
     mechanism for dispatching.
     @sa SendEvent() for general semantic */
@@ -70,7 +70,7 @@ public:
 
   /**
     This function implements asynchronous forward of an event. This happens by queuing 
-    the output event wrapped in a AsyncDispatchEvent, which is processed in
+    the output event wrapped in a AGENT_ASYNC_DISPATCH, which is processed in
     the main thread, by using the original mafAgentEventQueue mechanism for dispatching.
     @sa ForwardEvent() for general semantic */
   void AsyncForwardEvent(mafEventBase *event, mafID channel=MCH_UP);

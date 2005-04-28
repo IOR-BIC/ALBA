@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAgent.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-27 16:56:03 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-28 16:10:10 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -45,7 +45,7 @@ public:
   //------------------------------------------------------------------------------
   /** @ingroup Events
       Event used to force initialization of this object */
-  MAF_ID_DEC(InitializeEvent); 
+  MAF_ID_DEC(AGENT_INITIALIZE); 
  
   /**
   Plug in a source of events, specifying the channel ID. All the mechanism is based on Observers, 
@@ -108,8 +108,8 @@ public:
   
   /**
   The Agent name is used to identify the Agent in a unique way*/
-  void SetName() {};
-  const char *GetName();
+  virtual void SetName(const char *name) {m_Name=name;}
+  const char *GetName() {return m_Name;}
 
 protected:
   mafAgent();

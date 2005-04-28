@@ -3,8 +3,8 @@
 Program:   Visualization Toolkit
 Module:    $RCSfile: mafAgentThreaded.cpp,v $
 Language:  C++
-Date:      $Date: 2005-04-27 16:56:03 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2005-04-28 16:10:10 $
+Version:   $Revision: 1.3 $
 
 
 
@@ -18,7 +18,7 @@ Version:   $Revision: 1.2 $
 //------------------------------------------------------------------------------
 // Events
 //------------------------------------------------------------------------------
-MAF_ID_IMP(mafAgentThreaded::AsyncDispatchEvent);
+MAF_ID_IMP(mafAgentThreaded::AGENT_ASYNC_DISPATCH);
 
 //------------------------------------------------------------------------------
 mafCxxTypeMacro(mafAgentThreaded);
@@ -150,7 +150,7 @@ void mafAgentThreaded::OnEvent(mafEventBase *event)
 {
   assert(event);
 
-  if (event->GetId()==AsyncDispatchEvent)
+  if (event->GetId()==AGENT_ASYNC_DISPATCH)
   {
     if (event->GetSender()==this)
     {
@@ -174,7 +174,7 @@ void mafAgentThreaded::RequestForDispatching()
 {
   //if (m_Threaded&&this->Initialized&&this->GetActiveFlag())
   //{
-    if (PeekLastEvent()->GetId()==AsyncDispatchEvent)
+    if (PeekLastEvent()->GetId()==AGENT_ASYNC_DISPATCH)
     {
       Superclass::RequestForDispatching();
     }
@@ -197,7 +197,7 @@ void mafAgentThreaded::AsyncForwardEvent(mafEventBase *event, mafID channel)
 {
   mafID old_ch=event->GetChannel();
   event->SetChannel(channel);
-  PushEvent(AsyncDispatchEvent,this,event); // this make a copy of the event
+  PushEvent(AGENT_ASYNC_DISPATCH,this,event); // this make a copy of the event
   event->SetChannel(old_ch);
 }
 
@@ -210,7 +210,7 @@ void mafAgentThreaded::AsyncSendEvent(mafObserver *target,mafEventBase *event, m
     // use the sender field to store the recipient.
     mafID old_ch=event->GetChannel();
     event->SetChannel(channel); // set the right channel
-    PushEvent(AsyncDispatchEvent,target,event);
+    PushEvent(AGENT_ASYNC_DISPATCH,target,event);
     event->SetChannel(old_ch);
   }
 }
