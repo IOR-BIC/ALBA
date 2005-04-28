@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 18:31:28 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-28 15:58:38 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,6 +30,23 @@ class wxWindow;
 const int MAXWIDGET = 200; 
 const int MAXOP = 200; 
 const int MAXVIEW = 200; 
+
+/** conventional device button values */
+enum DEVICE_BUTTONS
+{
+  MAF_ANY_BUTTON = -1,
+  MAF_LEFT_BUTTON = 0,
+  MAF_MIDDLE_BUTTON,    
+  MAF_RIGHT_BUTTON
+};
+
+/** conventional key modifiers values */
+enum DEVICE_MODIFIERS
+{
+  MAF_SHIFT_KEY = 0,
+  MAF_CTRL_KEY,
+  MAF_ALT_KEY
+};
 
 /** @ingroup Events */
 /** @{ */
