@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafMultiThreader.cpp,v $
 Language:  C++
-Date:      $Date: 2005-04-27 16:55:16 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2005-04-29 06:02:47 $
+Version:   $Revision: 1.3 $
 Authors:   Based on mafMultiThreader (www.vtk.org), adapted by Marco Petrone
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -150,7 +150,7 @@ int mafMultiThreader::SpawnThread( mafThreadFunctionType f, void *UserData )
   //
   pthread_attr_t attr;
 
-#ifdef CMAKE_USE_PTHREADS_INIT
+#ifdef CMAKE_HP_PTHREADS_INIT
   pthread_attr_create( &attr );
 #else  
   pthread_attr_init(&attr);
@@ -159,7 +159,7 @@ int mafMultiThreader::SpawnThread( mafThreadFunctionType f, void *UserData )
 #endif
 #endif
   
-#ifdef CMAKE_USE_PTHREADS_INIT
+#ifdef CMAKE_HP_PTHREADS_INIT
   pthread_create( &(m_SpawnedThreadProcessID[id]),
                   attr, f,  
                   ( (void *)(&m_SpawnedThreadInfoArray[id]) ) );

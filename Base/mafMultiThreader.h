@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafMultiThreader.h,v $
 Language:  C++
-Date:      $Date: 2005-04-27 16:55:17 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2005-04-29 06:02:46 $
+Version:   $Revision: 1.3 $
 Authors:   Based on vtkMultiThreader (www.vtk.org), adapted by Marco Petrone
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -24,10 +24,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <unistd.h>   Needed for unix implementation of sproc
 #endif
 
-#if defined(CMAKE_USE_PTHREADS_INIT) || defined(CMAKE_USE_PTHREADS_INIT)
-#include <pthread.h>   Needed for PTHREAD implementation of mutex
-#include <sys/types.h>   Needed for unix implementation of pthreads
-#include <unistd.h>   Needed for unix implementation of pthreads
+#if defined(CMAKE_USE_PTHREADS_INIT) || defined(CMAKE_HP_PTHREADS_INIT)
+#include <pthread.h>   //Needed for PTHREAD implementation of mutex
+#include <sys/types.h>   //Needed for unix implementation of pthreads
+#include <unistd.h>   //Needed for unix implementation of pthreads
 #endif
 /**
   If CMAKE_USE_SPROC_INIT is defined, then sproc() will be used to create
