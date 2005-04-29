@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-19 08:25:21 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-29 16:50:48 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include  "mafEvent.h"
+#include  "mafObserver.h"
 #include  "mafNode.h"
 #include  "mafNodeRoot.h"
 #include  "mafVMERoot.h"
@@ -26,14 +26,14 @@ class mafVMEStorage;
 //----------------------------------------------------------------------------
 // mafVMEManager :
 //----------------------------------------------------------------------------
-class mafVMEManager: public mafEventListener
+class mafVMEManager: public mafObserver
 {
 public:
        mafVMEManager();
       ~mafVMEManager(); 
 
-  void SetListener(mafEventListener *Listener) {m_Listener = Listener;};
-  void OnEvent(mafEvent& e);
+  void SetListener(mafObserver *listener) {m_Listener = listener;};
+  void OnEvent(mafEventBase *e);
  
   /** create a new storage object */
   virtual void CreateNewStorage();
@@ -58,10 +58,10 @@ public:
   void MSFSaveAs();
   
 	/** Return true if the tree has been modifyed. */
-  bool MSFIsModified() {return m_modified;};
+  bool MSFIsModified() {return m_Modified;};
   
 	/** Set the modify flag. */
-  void MSFModified(bool modified) {m_modified = modified;};
+  void MSFModified(bool modified) {m_Modified = modified;};
 
 	/** Add the vme to the tree. */
   void VmeAdd(mafNode *v);
@@ -85,10 +85,10 @@ public:
 	bool AskConfirmAndSave();
  
 	/** Set the filename for the current tree. */
-  void SetFileName (wxString& filename) {m_msffile = filename;};
+  void SetFileName (wxString& filename) {m_MSFFile = filename;};
  
 	/** Get the filename of the current tree. */
-  wxString& GetFileName () {return m_msffile;};
+  wxString& GetFileName () {return m_MSFFile;};
  
 	/** Link to the main menù the file history manager. */
   void SetFileHistoryMenu(wxMenu *menu);
@@ -99,30 +99,29 @@ public:
 	/** Set the application stamp; this is the mark of the specific vertical application (must be equal to the application name). */
   void SetApplicationStamp(wxString appstamp) {m_AppStamp = appstamp;};
 
-	/** Set the flag for bak file generation on saving msf file. */
-	void MakeBakFileOnSave(bool bakfile = true) {m_make_bak_file = bakfile;}
+	/** Set the flag for bak file generation on saving MSF file. */
+	void MakeBakFileOnSave(bool bakfile = true) {m_MakeBakFile = bakfile;}
 
   /** Update vme client data interface from tag. if vme == NULL, the update is propagated from root vme to all the tree. */
   void UpdateFromTag(mafNode *vme = NULL);
 
 protected:
-  bool m_modified;
+  bool              m_Modified;     ///< Used to known when the tree has been modified...
 
-  //mafNodeRoot       *m_root;
-  mafEventListener  *m_Listener;
-  wxConfigBase			*m_Config;
-  mmgFileHistory	   m_FileHistory;
+  mafObserver*      m_Listener;
+  wxConfigBase*     m_Config;
+  mmgFileHistory	  m_FileHistory;
 
-  bool m_make_bak_file;
-  wxString m_msf_dir;
-  wxString m_wildc;
-  wxString m_AppStamp;
-  wxString m_msffile;
-  wxString m_zipfile;
-  wxString m_mergefile;
-
+  bool              m_MakeBakFile;
+  wxString          m_MSFDir;
+  wxString          m_Wildchar;
+  wxString          m_AppStamp;     ///< the application stamp for our application
+  wxString          m_MSFFile;
+  wxString          m_ZipFile;
+  wxString          m_MergeFile;
   
-  bool              m_Crypting;
-  mafVMEStorage*    m_Storage;
+  bool              m_LoadingFlag;  ///< used when an MSF is being loaded
+  bool              m_Crypting;     ///< used to enable the Crypting in the MSF
+  mafVMEStorage*    m_Storage;      
 };
 #endif

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:00:10 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-29 16:50:47 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,19 +40,21 @@
 mafVMEManager::mafVMEManager()
 //----------------------------------------------------------------------------
 {
-  m_modified  = false;
-	m_make_bak_file = true;
-	m_Listener  = NULL;
-	m_Storage   = NULL;
+  m_Modified    = false;
+	m_MakeBakFile = true;
+	m_Listener    = NULL;
+	m_Storage     = NULL;
+  m_Crypting    = false;
+  m_LoadingFlag = false;
 
-  mafString msf_dir=mafGetApplicationDirectory().c_str();
-  msf_dir.ParsePathName();
-	m_msf_dir   = msf_dir;
-  m_msf_dir   += "/Data/MSF/";
-	m_msffile   = "";
-	m_zipfile   = "";
-	m_mergefile = "";
-	m_wildc     = "Multimod Storage Format file (*.msf)|*.msf";
+  mafString MSFDir=mafGetApplicationDirectory().c_str();
+  MSFDir.ParsePathName();
+	m_MSFDir   = MSFDir;
+  m_MSFDir   += "/Data/MSF/";
+	m_MSFFile   = "";
+	m_ZipFile   = "";
+	m_MergeFile = "";
+	m_Wildchar  = "Multimod Storage Format file (*.msf)|*.msf";
 
   m_Config = wxConfigBase::Get();
 }
@@ -66,10 +68,34 @@ mafVMEManager::~mafVMEManager( )
   delete m_Config;  
 }
 //----------------------------------------------------------------------------
-void mafVMEManager::OnEvent(mafEvent& e)
+void mafVMEManager::OnEvent(mafEventBase *event)
 //----------------------------------------------------------------------------
 {
-   e.Log();
+  if (event->GetChannel()==MCH_UP)
+  {
+    // events coming from the tree...
+
+    switch (event->GetId())
+    {
+      case NODE_ATTACHED_TO_TREE:
+      {
+        if (!m_LoadingFlag)
+          NotifyAdd((mafNode *)event->GetSender());
+      }
+      break;
+      case NODE_DETACHED_FROM_TREE:
+      {
+        if (!m_LoadingFlag)
+          NotifyRemove((mafNode *)event->GetSender());
+      }
+      break;
+    }
+  }
+  
+  //if (mafEvent *e=mafEvent::SafeDownCast(event))
+  //{
+  //  e->Log(); 
+  //}
 }
 
 //----------------------------------------------------------------------------
@@ -86,17 +112,20 @@ void mafVMEManager::CreateNewStorage()
   if (m_Storage)
   {
     NotifyRemove(m_Storage->GetRoot());
+    m_LoadingFlag = true;
     m_Storage->Delete();
+    m_LoadingFlag = false;
   }
   m_Storage = mafVMEStorage::New();
   m_Storage->GetRoot()->SetName("root");
+  m_Storage->SetListener(this);
 }
 
 //----------------------------------------------------------------------------
 void mafVMEManager::MSFNew(bool notify_root_creation)   
 //----------------------------------------------------------------------------
 {
-  m_modified = false;
+  m_Modified = false;
   
   CreateNewStorage();
 
@@ -111,7 +140,7 @@ void mafVMEManager::MSFNew(bool notify_root_creation)
 		mafEventMacro(mafEvent(this,VME_SELECTED,m_Storage->GetRoot())); 
 	}
 
-  m_msffile = ""; //next MSFSave will ask for a filename
+  m_MSFFile = ""; //next MSFSave will ask for a filename
 }
 //----------------------------------------------------------------------------
 void mafVMEManager::MSFOpen(int file_id)   
@@ -140,7 +169,7 @@ void mafVMEManager::MSFOpen(wxString filename)
 		return;
 	}
 
-  // insert and select the root - reset m_msffile 
+  // insert and select the root - reset m_MSFFile 
   MSFNew(false);
 
   wxString path, name, ext;
@@ -154,13 +183,15 @@ void mafVMEManager::MSFOpen(wxString filename)
   mafString unixname=filename;
   unixname.ParsePathName(); // convert to unix format
 
-  m_msffile = unixname; 
+  m_MSFFile = unixname; 
 
   wxBusyInfo wait("Loading MSF: Please wait");
 
-  m_Storage->SetURL(m_msffile.c_str());
+  m_Storage->SetURL(m_MSFFile.c_str());
  
+  m_LoadingFlag = true; // while loading do not send events coming from the tree
   int res = m_Storage->Restore();  //modified by Stefano 29-10-2004
+  m_LoadingFlag = false;
 
   mafTimeStamp b[2];
   m_Storage->GetRoot()->GetOutput()->GetTimeBounds(b);
@@ -182,7 +213,7 @@ void mafVMEManager::MSFOpen(wxString filename)
 	{
 		//Application stamp not valid
 		wxMessageBox("File not valid for this application!","Warning", wxOK, NULL);
-		m_modified = false;
+		m_Modified = false;
 		m_Storage->Delete();
 		m_Storage = NULL;
 		MSFNew();
@@ -202,7 +233,7 @@ void mafVMEManager::MSFOpen(wxString filename)
 	mafEventMacro(mafEvent(this,VME_SELECTED,m_Storage->GetRoot())); 
   mafEventMacro(mafEvent(this,CAMERA_RESET)); 
 
-	m_FileHistory.AddFileToHistory(m_msffile);
+	m_FileHistory.AddFileToHistory(m_MSFFile);
 	m_FileHistory.Save(*m_Config);
 }
 //----------------------------------------------------------------------------
@@ -212,9 +243,9 @@ void mafVMEManager::ZIPOpen(wxString filename)
   /*
   wxBusyInfo wait("Unzipping file: Please wait");
 
-  m_zipfile = filename;
+  m_ZipFile = filename;
   wxString file, ext, working_dir = "";
-  wxSplitPath(m_zipfile,&working_dir,&file,&ext);
+  wxSplitPath(m_ZipFile,&working_dir,&file,&ext);
   if (working_dir == "")
     working_dir = ::wxGetCwd();
   
@@ -224,7 +255,7 @@ void mafVMEManager::ZIPOpen(wxString filename)
   wxSetWorkingDirectory(working_dir);
 
   wxString path, name, complete_name, zfile, out_file;
-  wxSplitPath(m_zipfile,&path,&name,&ext);
+  wxSplitPath(m_ZipFile,&path,&name,&ext);
   complete_name = name + "." + ext;
   
   wxFSFile *zfileStream;
@@ -235,7 +266,7 @@ void mafVMEManager::ZIPOpen(wxString filename)
   bool enable_mid = false;
   wxFileSystem *zip_fs = new wxFileSystem();
   zip_fs->AddHandler(new wxZipFSHandler);
-  zip_fs->ChangePathTo(m_zipfile);
+  zip_fs->ChangePathTo(m_ZipFile);
   // extract filename from the zip archive
   zfile = zip_fs->FindFirst(complete_name+pkg+name+"\\*.*");
   if (zfile == "")
@@ -259,7 +290,7 @@ void mafVMEManager::ZIPOpen(wxString filename)
 #endif
   if(ext == "msf")
   {
-    m_msffile = out_file;
+    m_MSFFile = out_file;
     out_file_stream.open(out_file, std::ios_base::out);
   }
   else
@@ -282,7 +313,7 @@ void mafVMEManager::ZIPOpen(wxString filename)
     out_file = working_dir + "\\" + complete_name;
     if(ext == "msf")
     {
-      m_msffile = out_file;
+      m_MSFFile = out_file;
       out_file_stream.open(out_file, std::ios_base::out);
     }
     else
@@ -300,23 +331,23 @@ void mafVMEManager::ZIPOpen(wxString filename)
   zip_fs->CleanUpHandlers();
   delete zip_fs;
   
-  if (m_msffile == "")
+  if (m_MSFFile == "")
   {
     wxMessageBox("zip archive is not a valid msf file!", "Error");
     return;
   }
 
   wxSetWorkingDirectory(working_dir);
-  MSFOpen(m_msffile);
+  MSFOpen(m_MSFFile);
   */
 }
 //----------------------------------------------------------------------------
 void mafVMEManager::MSFSave()   
 //----------------------------------------------------------------------------
 {
-  if(m_msffile == "") 
+  if(m_MSFFile == "") 
   {
-    mafString file = mafGetSaveFile(m_msf_dir, m_wildc).c_str();
+    mafString file = mafGetSaveFile(m_MSFDir, m_Wildchar).c_str();
    
     if(file == "") return;
 		if(!wxFileExists(file.GetCStr()))
@@ -331,34 +362,29 @@ void mafVMEManager::MSFSave()
 
     // convert to unix format
     file.ParsePathName();
-    m_msffile = file.GetCStr();
+    m_MSFFile = file.GetCStr();
   }
-  if(wxFileExists(m_msffile) && m_make_bak_file)
+  if(wxFileExists(m_MSFFile) && m_MakeBakFile)
 	{
-		wxString bak_filename = m_msffile + ".bak";
-    wxRenameFile(m_msffile,bak_filename);
-		//ifstream old_msf_file(m_msffile.c_str(), ios::in|ios::binary);
-		//ofstream bak_msf_file(bak_filename.c_str(),ios::out|ios::binary);
-		//bak_msf_file << old_msf_file.rdbuf();
-		//old_msf_file.close();
-		//bak_msf_file.close();
+		wxString bak_filename = m_MSFFile + ".bak";
+    wxRenameFile(m_MSFFile,bak_filename);
 	}
 	
 	wxBusyInfo wait("Saving MSF: Please wait");
-  m_Storage->SetURL(m_msffile.c_str());
+  m_Storage->SetURL(m_MSFFile.c_str());
   if (m_Storage->Store()!=0)
   {
     wxLogMessage("Error during MSF saving");
   }
-	m_FileHistory.AddFileToHistory(m_msffile );
+	m_FileHistory.AddFileToHistory(m_MSFFile );
 	m_FileHistory.Save(*m_Config);
-  m_modified = false;
+  m_Modified = false;
 }
 //----------------------------------------------------------------------------
 void mafVMEManager::MSFSaveAs()   
 //----------------------------------------------------------------------------
 {
-   m_msffile = "";
+   m_MSFFile = "";
    MSFSave();
 }
 //----------------------------------------------------------------------------
@@ -371,9 +397,10 @@ void mafVMEManager::VmeAdd(mafNode *v)
     assert( vp == NULL || m_Storage->GetRoot()->IsInTree(vp) );
     if(vp == NULL) 
 			v->ReparentTo(m_Storage->GetRoot());
-     //v->SetTreeTime(m_Storage->GetRoot()->GetTime()); //spostare in mfl
-    NotifyAdd(v);
-    m_modified = true;
+
+    //Marco: no more sent: it is the tree which sends the event (see OnEvent())
+    //NotifyAdd(v); 
+    //m_Modified = true;
   }
 }
 //----------------------------------------------------------------------------
@@ -382,9 +409,12 @@ void mafVMEManager::VmeRemove(mafNode *v)
 {
   if(v != NULL && m_Storage->GetRoot() /*&& m_Storage->GetRoot()->IsInTree(v)*/) 
   {
-    NotifyRemove(v);
-    v->ReparentTo(NULL); // may kill the vme
-    m_modified = true;
+    assert(m_Storage->GetRoot()->IsInTree(v));
+
+    //Marco: no more sent: it is the tree which sends the event (see OnEvent())
+    //NotifyRemove(v);
+    //v->ReparentTo(NULL); // may kill the vme
+    //m_Modified = true;
   }
 }
 //----------------------------------------------------------------------------
@@ -442,7 +472,7 @@ bool mafVMEManager::AskConfirmAndSave()
 //----------------------------------------------------------------------------
 {
   bool go = true;
-	if (m_modified)
+	if (m_Modified)
 	{
 		int answer = wxMessageBox("your work is modified, would you like to save it?","Confirm",
 			                     wxYES_NO|wxCANCEL|wxICON_QUESTION , mafGetFrame());
