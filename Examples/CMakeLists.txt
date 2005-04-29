@@ -1,3 +1,3 @@
+SUBDIRS(exOperations)
 SUBDIRS(exVMEMan)
 SUBDIRS(exViewVTK)
-SUBDIRS(exOperations)

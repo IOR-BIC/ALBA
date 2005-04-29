@@ -1,10 +1,8 @@
-PROJECT (TestVTKImporter)
+PROJECT (exOperations)
 
 SET(PROJECT_SRCS 
-testCreateMeterApp.cpp
-testCreateMeterApp.h
-testVTKImporterApp.cpp
-testVTKImporterApp.h
+exOperationApp.cpp
+exOperationApp.h
 )
 
 # copia icona e file delle risorse nella Build
@@ -19,7 +17,7 @@ ELSE (WIN32)
 ENDIF (WIN32)
 
 SET(PROJECT_LIBS
-  mafVME
+  mafVME mafOperations
 )
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
 

@@ -1,8 +1,8 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: testVTKImporterApp.cpp,v $
+  Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 10:47:04 $
+  Date:      $Date: 2005-04-29 12:27:23 $
   Version:   $Revision: 1.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 
 
-#include "testVTKImporterApp.h"
+#include "exOperationApp.h"
 #include "mafVMEFactory.h"
 #include "mafPics.h"
 #include "mmgMDIFrame.h"
@@ -31,16 +31,18 @@
 #include "mafVMERoot.h"
 #include "mafVMESurface.h"
 #include "mafPipeFactory.h"
+#include "mafPipeSurface.h"
 
 #include "mmoVTKImporter.h"
+#include "mmoCreateMeter.h"
 #include "mafViewVTK.h"
 //--------------------------------------------------------------------------------
 // Create the Application
 //--------------------------------------------------------------------------------
-IMPLEMENT_APP(testVTKImporterApp)
+IMPLEMENT_APP(exOperationApp)
 
 //--------------------------------------------------------------------------------
-bool testVTKImporterApp::OnInit()
+bool exOperationApp::OnInit()
 //--------------------------------------------------------------------------------
 {
   mafPics.Initialize();	
@@ -51,6 +53,7 @@ bool testVTKImporterApp::OnInit()
   // Inizializzazione e Fill della PipeFactory -- potrebbe essere un SideEffect del Plug dei Nodi
   result = mafPipeFactory::Initialize();
   assert(result==MAF_OK);
+  mafPlugPipe<mafPipeSurface>("mafPipeSurface");
 
   m_logic = new mafLogicWithManagers();
   //m_logic->PlugTimebar(false);
@@ -63,17 +66,20 @@ bool testVTKImporterApp::OnInit()
   //m_logic->PlugVMEManager(false);  // the VmeManager at the moment cause 4 leaks of 200+32+24+56 bytes  //SIL. 20-4-2005: 
   m_logic->Configure();
 
-  m_logic->GetTopWin()->SetTitle("test VTK Importer");
-  SetTopWindow(mafGetFrame());
+  m_logic->GetTopWin()->SetTitle("ViewVTK example");
+  SetTopWindow(mafGetFrame());  
 
   m_logic->Plug(new mmoVTKImporter("VTK Importer"));
+  m_logic->Plug(new mmoCreateMeter("Create Meter"));
+  
+  m_logic->Plug(new mafViewVTK("VTK view"));
 
   m_logic->Show();
   m_logic->Init(0,NULL); // calls FileNew - which create the root
   return TRUE;
 }
 //--------------------------------------------------------------------------------
-int testVTKImporterApp::OnExit()
+int exOperationApp::OnExit()
 //--------------------------------------------------------------------------------
 {
   cppDEL(m_logic);
