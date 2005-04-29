@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgValidator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:29 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-29 06:05:38 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,6 +26,7 @@
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "mmgFloatSlider.h"
+#include "mafString.h"
 //----------------------------------------------------------------------------
 // mmgValidator
 //----------------------------------------------------------------------------
@@ -65,6 +66,7 @@ void mmgValidator::Init(mafEventListener* listener, int mid, wxControl *win)
 	m_dvar = NULL;
   m_ivar = NULL;
   m_svar = NULL;
+  m_svar2= NULL;
   m_cvar = NULL;
 
   m_fmax =-1; 
@@ -114,7 +116,7 @@ bool mmgValidator::IsValid()
     break;
     case VAL_STRING:
       if ( !(m_TextCtrl && m_TextCtrl->IsKindOf(CLASSINFO(wxTextCtrl)))  ) return false;
-      if ( !m_svar ) return false;
+      if ( !m_svar && !m_svar2 ) return false;
     break;
     case VAL_SLIDER:
 		case VAL_SLIDER_2:
@@ -216,6 +218,15 @@ mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxTextCtrl *win,
   Init(listener,mid,win);  m_mode = VAL_STRING;
   m_TextCtrl  =win; 
   m_svar      =var;     
+  assert(IsValid());
+}
+//----------------------------------------------------------------------------
+mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxTextCtrl *win,mafString* var) //String
+//----------------------------------------------------------------------------
+{
+  Init(listener,mid,win);  m_mode = VAL_STRING;
+  m_TextCtrl  =win; 
+  m_svar2     =var;     
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
@@ -527,7 +538,8 @@ bool mmgValidator::TransferToWindow(void)
       m_TextCtrl->SetValue(s);
     break;
     case VAL_STRING:
-      m_TextCtrl->SetValue(*m_svar);
+      if (m_svar) m_TextCtrl->SetValue(*m_svar);
+      if (m_svar2) m_TextCtrl->SetValue(m_svar2->GetCStr());
     break;
     case VAL_SLIDER:
       m_Slider->SetValue(*m_ivar);
@@ -664,7 +676,8 @@ bool mmgValidator::TransferFromWindow(void)
 			return res;
     break;
     case VAL_STRING:
-			*m_svar = m_TextCtrl->GetValue();
+      if (m_svar)  *m_svar = m_TextCtrl->GetValue();
+      if (m_svar2) *m_svar2 = m_TextCtrl->GetValue();
     break;
     case VAL_SLIDER:
 			*m_ivar = m_Slider->GetValue();

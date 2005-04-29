@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgValidator.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:29 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-29 06:05:38 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,7 +20,8 @@
 //forward ref
 //-----------------------------------------------------------------------------
 class mmgFloatSlider;
-class mafEventListener; 
+class mafEventListener;
+class mafString; 
 
 //-----------------------------------------------------------------------------
 // constant :
@@ -53,7 +54,8 @@ class mmgValidator : public wxValidator
 {
 public:
   mmgValidator (mafEventListener* listener,int mid,wxStaticText *win,wxString* var);                                             //String
-  mmgValidator (mafEventListener* listener,int mid,wxTextCtrl   *win,wxString* var);                                             //String
+  mmgValidator (mafEventListener* listener,int mid,wxTextCtrl   *win,wxString* var);   //String
+  mmgValidator (mafEventListener* listener,int mid,wxTextCtrl   *win,mafString* var);  //String
   mmgValidator (mafEventListener* listener,int mid,wxTextCtrl   *win,   int*		var, int		min=-32000,			 int		max=32000);     //Integer
   mmgValidator (mafEventListener* listener,int mid,wxTextCtrl   *win,   float*	var, float	min=-2000000000, float	max=2000000000, int dec_digits = 2);//Float
   mmgValidator (mafEventListener* listener,int mid,wxTextCtrl   *win,   double* var, double min=-2000000000, double max=2000000000, int dec_digits = 2);//Double
@@ -107,6 +109,7 @@ protected:
   double     *m_dvar;
   int        *m_ivar;
   wxString   *m_svar;
+  mafString  *m_svar2;
   wxColour   *m_cvar;
                         // associated valid range (int or float)
   float       m_fmax;

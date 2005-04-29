@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 20:02:20 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-04-29 06:05:56 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,6 +28,7 @@
 #include "mmgGui.h"
 #include "mmgButton.h"
 #include "mmgPicButton.h"
+#include "mafString.h"
 //----------------------------------------------------------------------------
 // constant
 //----------------------------------------------------------------------------
@@ -529,6 +530,31 @@ void mmgGui::Vector(int id,wxString label,double var[3],double minx,double maxx,
 }
 //----------------------------------------------------------------------------
 void mmgGui::String(int id,wxString label,wxString* var, wxString tooltip) // <*> togliere flag, passare label vuota per ometterla
+//----------------------------------------------------------------------------
+{
+	if(label == "")
+	{
+		wxTextCtrl  *text = new wxTextCtrl  (this, GetId(id), "", dp, wxSize(FW,LH), m_entry_style  );
+		text->SetValidator( mmgValidator(this,id,text,var) );
+		if(tooltip != "") text->SetToolTip(tooltip);
+	  Add(text,0,wxALL, M);
+	}
+	else
+	{
+		wxStaticText *lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT );
+    if(m_use_bc) lab->SetBackgroundColour(m_bc);
+		wxTextCtrl  *text = new wxTextCtrl  (this, GetId(id), ""   , dp, wxSize(DW,LH), m_entry_style  );
+		text->SetValidator( mmgValidator(this,id,text,var) );
+		if(tooltip != "")
+			text->SetToolTip(tooltip);
+		wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
+		sizer->Add( lab,  0, wxRIGHT, LM);
+		sizer->Add( text, 0, wxRIGHT, HM);
+		Add(sizer,0,wxALL, M);
+	}
+}
+//----------------------------------------------------------------------------
+void mmgGui::String(int id,const char *label,mafString* var, const char *tooltip)
 //----------------------------------------------------------------------------
 {
 	if(label == "")
