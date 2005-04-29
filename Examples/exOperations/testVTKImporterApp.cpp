@@ -1,8 +1,8 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: testCreateMeterApp.cpp,v $
+  Module:    $RCSfile: testVTKImporterApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-27 16:25:19 $
+  Date:      $Date: 2005-04-29 10:47:04 $
   Version:   $Revision: 1.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 
 
-#include "testCreateMeterApp.h"
+#include "testVTKImporterApp.h"
 #include "mafVMEFactory.h"
 #include "mafPics.h"
 #include "mmgMDIFrame.h"
@@ -31,17 +31,16 @@
 #include "mafVMERoot.h"
 #include "mafVMESurface.h"
 #include "mafPipeFactory.h"
-#include "mafPipeSurface.h"
 
-#include "mmoCreateMeter.h"
+#include "mmoVTKImporter.h"
 #include "mafViewVTK.h"
 //--------------------------------------------------------------------------------
 // Create the Application
 //--------------------------------------------------------------------------------
-IMPLEMENT_APP(testCreateMeterApp)
+IMPLEMENT_APP(testVTKImporterApp)
 
 //--------------------------------------------------------------------------------
-bool testCreateMeterApp::OnInit()
+bool testVTKImporterApp::OnInit()
 //--------------------------------------------------------------------------------
 {
   mafPics.Initialize();	
@@ -67,14 +66,14 @@ bool testCreateMeterApp::OnInit()
   m_logic->GetTopWin()->SetTitle("test VTK Importer");
   SetTopWindow(mafGetFrame());
 
-  m_logic->Plug(new mmoCreateMeter("VTK Importer"));
+  m_logic->Plug(new mmoVTKImporter("VTK Importer"));
 
   m_logic->Show();
   m_logic->Init(0,NULL); // calls FileNew - which create the root
   return TRUE;
 }
 //--------------------------------------------------------------------------------
-int testCreateMeterApp::OnExit()
+int testVTKImporterApp::OnExit()
 //--------------------------------------------------------------------------------
 {
   cppDEL(m_logic);

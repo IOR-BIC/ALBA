@@ -2,7 +2,7 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testCreateMeterApp.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-27 16:25:19 $
+  Date:      $Date: 2005-04-29 10:47:03 $
   Version:   $Revision: 1.1 $
   Authors:   Paolo Quadrani
 ==========================================================================

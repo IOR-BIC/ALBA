@@ -1,8 +1,10 @@
-PROJECT (TestCreateMeter)
+PROJECT (TestVTKImporter)
 
 SET(PROJECT_SRCS 
 testCreateMeterApp.cpp
 testCreateMeterApp.h
+testVTKImporterApp.cpp
+testVTKImporterApp.h
 )
 
 # copia icona e file delle risorse nella Build
@@ -20,7 +22,6 @@ SET(PROJECT_LIBS
   mafVME
 )
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
-
 
 
 
