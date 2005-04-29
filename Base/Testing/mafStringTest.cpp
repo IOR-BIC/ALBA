@@ -83,7 +83,7 @@ int main()
   MAF_TEST(achar<="a");
   MAF_TEST(achar>="a");
   MAF_TEST(achar<bchar);
-  MAF_TEST(bchar<achar);
+  MAF_TEST(bchar>achar);
 
   // test the referencing mechansim of mafString. Notice mafCString is
   // equivalent to mafString::Set() 
