@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-25 21:12:02 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2005-04-29 06:04:17 $
+  Version:   $Revision: 1.24 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -335,7 +335,7 @@ public:
   /** IDs for the GUI */
   enum 
   {
-    ID_FIRST = MINID,
+    ID_NAME = MINID,
     ID_LAST
   };
 
