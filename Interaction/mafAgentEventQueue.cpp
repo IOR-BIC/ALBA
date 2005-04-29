@@ -3,8 +3,8 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: mafAgentEventQueue.cpp,v $
 Language:  C++
-Date:      $Date: 2005-04-27 16:56:03 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2005-04-29 06:06:34 $
+Version:   $Revision: 1.3 $
 
 =========================================================================*/
 #include "mafAgentEventQueue.h"
@@ -172,7 +172,7 @@ bool mafAgentEventQueue::DispatchEvents()
 int mafAgentEventQueue::PushEvent(mafID event, void *sender,void *data)
 //------------------------------------------------------------------------------
 {
-  return this->PushEvent(mafEventBase(sender,event,data));
+  return this->PushEvent(&mafEventBase(sender,event,data));
 }
 
 //------------------------------------------------------------------------------

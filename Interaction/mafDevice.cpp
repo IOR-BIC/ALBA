@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDevice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-28 16:10:10 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-29 06:06:33 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -15,6 +15,9 @@
 // base includes
 #include "mafDevice.h"
 #include "mmuIdFactory.h"
+
+// GUI
+#include "mmgGui.h"
 
 // serialization
 #include "mafStorageElement.h"
@@ -30,8 +33,8 @@ MAF_ID_IMP(mafDevice::DEVICE_STOPPED)
 mafDevice::mafDevice()
 //------------------------------------------------------------------------------
 {
+  m_Gui       = NULL;
   m_ID        = 0;
-  m_Settings  = NULL;
   m_AutoStart = false; // auto is enabled when device is started the first time
   m_Locked    = false;
   m_PersistentFalg = false;
@@ -88,6 +91,64 @@ void mafDevice::Stop()
   ForwardEvent(DEVICE_STOPPED,MCH_INPUT);
 }
 
+//----------------------------------------------------------------------------
+mmgGui *mafDevice::GetGui()
+//----------------------------------------------------------------------------
+{
+  if (!m_Gui)
+    CreateGui();
+  return m_Gui;
+}
+//----------------------------------------------------------------------------
+void mafDevice::CreateGui()
+//----------------------------------------------------------------------------
+{
+  assert(m_Gui == NULL);
+  m_Gui = new mmgGui(NULL);
+  m_Gui->String(ID_NAME,"name",&m_Name);
+  m_Gui->Divider();
+  m_Gui->Button(ID_ACTIVATE,"activate device");
+  m_Gui->Button(ID_SHUTDOWN,"shutdown device");
+  m_Gui->Bool(ID_AUTO_START,"auto start",&m_AutoStart,0,"automatically start device on application startup");
+  m_Gui->Enable(ID_ACTIVATE,!IsInitialized());
+  m_Gui->Enable(ID_SHUTDOWN,IsInitialized()!=0);
+}
+
+//----------------------------------------------------------------------------
+void mafDevice::UpdateGui()
+//----------------------------------------------------------------------------
+{
+  m_Gui->Enable(ID_ACTIVATE,!IsInitialized());
+  m_Gui->Enable(ID_SHUTDOWN,IsInitialized()!=0);
+  if (m_Gui)
+    m_Gui->Update();
+}
+//----------------------------------------------------------------------------
+void mafDevice::OnEvent(mafEventBase *e)
+//----------------------------------------------------------------------------
+{
+  switch(e->GetId()) 
+  {
+  case ID_NAME:
+    SetName(m_Name); // force sending an event
+    break;
+  case ID_ACTIVATE:
+    if (Initialize())
+    {
+      mafErrorMessage("Cannot Initialize Device","I/O Error");
+      return;
+    }
+    UpdateGui();
+    break;
+  case ID_SHUTDOWN:
+    Shutdown();
+    UpdateGui();
+    break;
+  default:
+    // pass event to superclass to be processed
+    Superclass::OnEvent(e);
+  }
+}
 //------------------------------------------------------------------------------
 int mafDevice::InternalStore(mafStorageElement *node)
 //------------------------------------------------------------------------------

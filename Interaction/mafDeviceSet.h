@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceSet.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-28 16:10:11 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-29 06:06:33 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,21 +12,13 @@
 #ifndef __mafDeviceSet_h
 #define __mafDeviceSet_h
 
-#ifdef __GNUG__
-    #pragma interface "mafDeviceSet.cpp"
-#endif
-
-#ifndef WX_PRECOMP
-    #include "wx/wx.h"
-#endif
-
 #include "mafDevice.h"
+#include <list>
 
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-template <class T> class vtkTemplatedList;
-
+class mafMutexLock;
 /**
   This class manages a set of devices storing the list of device pointers and 
   dispatching commands to strored devices, e.g. initializzation commands. Being an event 
@@ -44,25 +36,24 @@ public:
   //------------------------------------------------------------------------------
   /** @ingroup Events 
       Adds a device (in Data argument) to this set (to be removed) */
-  MFL_EVT_DEC(AddDeviceEvent);
+  MAF_ID_DEC(DEVICE_ADD);
   /** @ingroup Events 
       Remove a device (in Data argument) from this set (to be removed) */
-  MFL_EVT_DEC(RemoveDeviceEvent);
+  MAF_ID_DEC(DEVICE_REMOVE);
   /** @ingroup Events 
       Issued when a new device (in Data argument) is added to this set */
-  MFL_EVT_DEC(DeviceAddedEvent);
+  MAF_ID_DEC(DEVICE_ADDED);
   /** @ingroup Events 
       Issued when a device (in Data argument) is being removed from this set */
-  MFL_EVT_DEC(DeviceRemovingEvent); 
+  MAF_ID_DEC(DEVICE_REMOVING); 
   /** @ingroup channel
       New channel for settings */
-  MFL_EVT_DEC(DeviceSetUpChannel);
+  //MAF_ID_DEC(MCH_DEVICE_SETUP);
   /** @ingroup channel 
       New channel for settings */
-  MFL_EVT_DEC(DeviceSetDownChannel);
+  //MAF_ID_DEC(MCH_DEVICE_SETDOWN);
 
-  static mafDeviceSet *New();
-  vtkTypeMacro(mafDeviceSet,mafDevice);
+  mafTypeMacro(mafDeviceSet,mafDevice);
 
   /** Add a new device. If the returned value is false the operation has failed! */
   virtual void AddDevice(mafDevice *device);
@@ -95,27 +86,27 @@ public:
   void RemoveAllDevices(bool force=false);
 
   /** Reimplemented to manage AddDevice event */
-  virtual void ProcessEvent(mflEvent *event,mafID channel=mflAgent::DefaultChannel);
+  virtual void OnEvent(mafEventBase *event);
 
   /** Return the list of devices pluged into this device set */
-  vtkTemplatedList<mafDevice> *GetDevices() {return Devices;}
+  std::list<mafDevice*> *GetDevices() {return &m_Devices;}
 
 protected:
   mafDeviceSet();
   virtual ~mafDeviceSet();
 
-  virtual int InternalStore(mflXMLWriter *writer);
-  virtual int InternalRestore(vtkXMLDataElement *node,vtkXMLDataParser *parser);
+  virtual int InternalStore(mafStorageElement *node);
+  virtual int InternalRestore(mafStorageElement *node);
 
   /** Initialization automatically initialize subdevices */
   virtual int InternalInitialize();
 
-  /** shutdowns also subdevices */
+  /** shutdown also subdevices */
   virtual void InternalShutdown();
 
-  vtkTemplatedList<mafDevice> *Devices;
+  std::list<mafDevice *> m_Devices;
 
-  vtkSimpleCriticalSection *DevicesMutex;
+  mafMutexLock*          m_DevicesMutex;
 
 private:
   mafDeviceSet(const mafDeviceSet&);  // Not implemented.

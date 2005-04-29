@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventInteraction.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-28 16:10:11 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-29 06:06:33 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -46,29 +46,29 @@ public:
   
   /** Set/Get the triggering button */
   void SetButton(int button);
-  int GetButton() {return Button;}
+  int GetButton() {return m_Button;}
 
   /** Set/Get the optional key argument */
   void SetKey(unsigned char key);
-  unsigned char GetKey() {return Key;}
+  unsigned char GetKey() {return m_Key;}
 
   /** Set/Get the pose matrix, for 3D tracking devices */
   mafMatrix *GetMatrix();
-  void SetMatrix(mafMatrix *matrix);
+  void SetMatrix(const mafMatrix &matrix);
 
   /** Set/Get the given modifier value*/
   void SetModifier(unsigned long idx,bool value=true);
   bool GetModifier(unsigned long idx);
   void SetModifiers(unsigned long modifiers);
-  unsigned long GetModifiers() {return Modifiers;}
+  unsigned long GetModifiers() {return m_Modifiers;}
 
-  void DeepCopy(mafEventInteraction *e);
+  virtual void DeepCopy(mafEventBase *event);
   
-  mafEventInteraction(mafID id=0,void *sender=NULL,mafMatrix *matrix=NULL,int button=0,unsigned long modifiers=0):
-  mafEventBase(id,sender),Button(button),Modifiers(modifiers),Key(0),Matrix(matrix),X(0),Y(0),XYFlag(false) {ReferenceCount=0;}
+  mafEventInteraction(mafID id=0,void *sender=NULL,const mafMatrix &matrix=NULL,int button=0,unsigned long modifiers=0):
+  mafEventBase(sender,id),m_Button(button),m_Modifiers(modifiers),m_Key(0),m_Matrix(matrix),m_X(0),m_Y(0),m_XYFlag(false) {}
 
   mafEventInteraction(mafID id,void *sender,double x,double y,int button=0,unsigned long modifiers=0):
-  mafEventBase(id,sender),X(x),Y(y),XYFlag(true),Button(button),Modifiers(modifiers),Key(0),Matrix(NULL) {ReferenceCount=0;}
+  mafEventBase(sender,id),m_X(x),m_Y(y),m_XYFlag(true),m_Button(button),m_Modifiers(modifiers),m_Key(0) {}
   virtual ~mafEventInteraction() {}
  
 protected:
@@ -80,11 +80,6 @@ protected:
   double        m_Y;          ///< Y coordinate, used by mouse device
   bool          m_XYFlag;     ///< Used to signal a 2D coordinate is present
   mafMatrix     m_Matrix;    ///< Pose matrix, used by 3D trackers
-  
-
-private:
-  mafEventInteraction(const mafEventInteraction& c) {}
-  void operator=(const mafEventInteraction&) {}
 };
 
 #endif /* __mafEventInteraction_h */

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAgent.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-28 16:10:10 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-29 06:06:34 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -83,6 +83,9 @@ public:
   void RemoveObserver(mafObserver *listener);
   void RemoveAllObservers();
 
+  /** provided for compatibility reasons */
+  void SetListener(mafObserver *listener) {AddObserver(listener);}
+  
   /**
   Process an event: the event is processed immediately and synchronously, i.e.
   the function doesn't return until the event is processed by someone. If the class

@@ -3,8 +3,8 @@
 Program:   Visualization Toolkit
 Module:    $RCSfile: mafAgentThreaded.cpp,v $
 Language:  C++
-Date:      $Date: 2005-04-28 16:10:10 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2005-04-29 06:06:34 $
+Version:   $Revision: 1.4 $
 
 
 
@@ -39,7 +39,7 @@ mafAgentThreaded::mafAgentThreaded()
 #ifdef _WIN32
   m_MessageSignal = CreateEvent(0, FALSE, FALSE, 0);
 #else
-  m_Gate = new vtkSimpleCriticalSection;
+  m_Gate = new mafMutexLock;
   m_Gate->Lock();
 #endif
 }
@@ -122,7 +122,7 @@ void mafAgentThreaded::UpdateLoop(mmuThreadInfoStruct *data)
 
   // wait for initialization to be completed
   for (;self->GetActiveFlag()&&!self->IsInitialized();)
-    Sleep(100); 
+    mafSleep(100); 
 
   // This loop is termintated when active flag is set by TerminateThread() or 
   // if InternalUpdate() returns a value !=0

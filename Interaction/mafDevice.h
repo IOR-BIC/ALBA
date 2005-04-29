@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDevice.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-28 16:10:10 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-29 06:06:33 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -18,10 +18,7 @@
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class mflXMLWriter;
-class vtkXMLDataElement;
-class vtkXMLDataParser;
-class mmgDeviceSettings;
+class mmgGui;
 
 /** 
   This abstract class manages function calls coming from devices and 
@@ -49,6 +46,18 @@ public:
   MAF_ID_DEC(DEVICE_STARTED); ///< Issued when device is initialized
   MAF_ID_DEC(DEVICE_STOPPED); ///< Issued when device is shutdown
   /** @} */
+  
+  //----------------------------------------------------------------------------
+  //    GUI Constants
+  //----------------------------------------------------------------------------
+  enum 
+  {
+    ID_NAME=MINID,
+    ID_ACTIVATE,
+    ID_SHUTDOWN,
+    ID_AUTO_START,
+    ID_LAST
+  };
 
   mafTypeMacro(mafDevice,mafAgentThreaded);
 
@@ -66,7 +75,7 @@ public:
   /** Set the AutoStart flag. This makes the device automatically 
       restart net time the application is started */
   void SetAutoStart(bool flag) {m_AutoStart=flag;}
-  bool GetAutoStart() { return m_AutoStart;}
+  bool GetAutoStart() { return m_AutoStart!=0;}
 
   /** 
     Enable autostarting of this device */
@@ -109,8 +118,15 @@ public:
 
   /** return true if it's a persistent device. @sa SetPersistentFlag() */
   bool IsPersistent() {return m_PersistentFalg;}
-
-  friend mmgDeviceSettings;
+  
+  /** Return pointer to the GUI. */
+  mmgGui *GetGui();
+  
+  /** used to force Gui to update its content */
+  virtual void UpdateGui();
+  
+  /** process events sent to the device */
+  virtual void OnEvent(mafEventBase *event);
 
 protected:
   mafDevice();
@@ -119,8 +135,8 @@ protected:
   /** start device */
   virtual int InternalInitialize();
 
-  /** internal function to create device settings object */
-  virtual void CreateSettings();
+  /** Create the dialog that show the interface for settings. */
+  virtual void CreateGui();
 
   /** This is used to allow nested serialization of subclasses.
     This function is called by Store and is reimplemented in subclasses.
@@ -134,10 +150,11 @@ protected:
     Subclasses should reimplement it to restore custom settings. Reimplemented
     functions should first call Superclass implementation. */
   virtual int InternalRestore(mafStorageElement *node);
+  
 
+  mmgGui*             m_Gui;
   mafID               m_ID;
-  mmgDeviceSettings*  m_Settings;
-  bool                m_AutoStart;
+  int                 m_AutoStart;
   bool                m_Locked;
   bool                m_PersistentFalg;
 

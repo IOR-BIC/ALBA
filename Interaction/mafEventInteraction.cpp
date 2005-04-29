@@ -1,145 +1,130 @@
 /*=========================================================================
-
-Program:   Multimod Fundation Library
-Module:    $RCSfile: mafEventInteraction.cpp,v $
-Language:  C++
-Date:      $Date: 2005-04-28 16:10:11 $
-Version:   $Revision: 1.1 $
-
+  Program:   Multimod Application Framework
+  Module:    $RCSfile: mafEventInteraction.cpp,v $
+  Language:  C++
+  Date:      $Date: 2005-04-29 06:06:33 $
+  Version:   $Revision: 1.2 $
+  Authors:   Marco Petrone
+==========================================================================
+  Copyright (c) 2002/2004 
+  CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#include "mflEventInteraction.h"
-#include "mflMatrix.h"
+#include "mafEventInteraction.h"
+#include "mafMatrix.h"
 
 //------------------------------------------------------------------------------
-mflEventInteraction *mflEventInteraction::New(unsigned long id,vtkObject *sender,mflMatrix *data,int button,unsigned long modifiers)
+void mafEventInteraction::Set2DPosition(double x,double y)
 //------------------------------------------------------------------------------
 {
-  mflEventInteraction *e=new mflEventInteraction(id,sender,data,button,modifiers);
-  e->ReferenceCount++;
-  return e;
-}
-
-//------------------------------------------------------------------------------
-mflEventInteraction *mflEventInteraction::New(unsigned long id,vtkObject *sender,double x,double y,int button,unsigned long modifiers)
-//------------------------------------------------------------------------------
-{
-  mflEventInteraction *e=new mflEventInteraction(id,sender,x,y,button,modifiers);
-  e->ReferenceCount++;
-  return e;
-}
-
-//------------------------------------------------------------------------------
-void mflEventInteraction::Set2DPosition(double x,double y)
-//------------------------------------------------------------------------------
-{
-  X=x;
-  Y=y;
-  XYFlag=true;
-  Modified();
+  m_X=x;
+  m_Y=y;
+  m_XYFlag=true;
+  //Modified();
 }
 //------------------------------------------------------------------------------
-void mflEventInteraction::Set2DPosition(double pos[2])
+void mafEventInteraction::Set2DPosition(double pos[2])
 //------------------------------------------------------------------------------
 {
-  X=pos[0];
-  Y=pos[1];
-  XYFlag=true;
-  Modified();
+  m_X=pos[0];
+  m_Y=pos[1];
+  m_XYFlag=true;
+  //Modified();
 }
 //------------------------------------------------------------------------------
-void mflEventInteraction::Get2DPosition(double pos[2])
+void mafEventInteraction::Get2DPosition(double pos[2])
 //------------------------------------------------------------------------------
 {
-  pos[0]=X;
-  pos[1]=Y;
-  Modified();
+  pos[0]=m_X;
+  pos[1]=m_Y;
+  //Modified();
 }
 
 //------------------------------------------------------------------------------
-void mflEventInteraction::SetXYFlag(bool val)
+void mafEventInteraction::SetXYFlag(bool val)
 //------------------------------------------------------------------------------
 {
-  XYFlag=val;
-  Modified();
+  m_XYFlag=val;
+  //Modified();
 }
 //------------------------------------------------------------------------------
-bool mflEventInteraction::GetXYFlag()
+bool mafEventInteraction::GetXYFlag()
 //------------------------------------------------------------------------------
 {
-  return XYFlag;
-}
-
-//------------------------------------------------------------------------------
-void mflEventInteraction::SetButton(int button)
-//------------------------------------------------------------------------------
-{
-  Button=button;
-  Modified();
+  return m_XYFlag;
 }
 
 //------------------------------------------------------------------------------
-void mflEventInteraction::SetKey(unsigned char key)
+void mafEventInteraction::SetButton(int button)
 //------------------------------------------------------------------------------
 {
-  Key=key;
-  Modified();
+  m_Button=button;
+  //Modified();
 }
 
 //------------------------------------------------------------------------------
-mflMatrix *mflEventInteraction::GetMatrix()
+void mafEventInteraction::SetKey(unsigned char key)
 //------------------------------------------------------------------------------
 {
-  return Matrix;
+  m_Key=key;
+  //Modified();
 }
 
 //------------------------------------------------------------------------------
-void mflEventInteraction::SetMatrix(mflMatrix *matrix)
+mafMatrix *mafEventInteraction::GetMatrix()
 //------------------------------------------------------------------------------
 {
-  vtkSetObjectBodyMacro(Matrix,mflMatrix,matrix);
+  return &m_Matrix;
 }
 
 //------------------------------------------------------------------------------
-void mflEventInteraction::SetModifier(unsigned long idx,bool value)
+void mafEventInteraction::SetMatrix(const mafMatrix &matrix)
+//------------------------------------------------------------------------------
+{
+  m_Matrix=matrix;
+}
+
+//------------------------------------------------------------------------------
+void mafEventInteraction::SetModifier(unsigned long idx,bool value)
 //------------------------------------------------------------------------------
 {
   int flag = 1<<idx;
   if (value)
   {
-    Modifiers=Modifiers|flag;
+    m_Modifiers=m_Modifiers|flag;
   }
   else
   {
-    Modifiers=Modifiers&(~flag);
+    m_Modifiers=m_Modifiers&(~flag);
   }
 
-  Modified();
+  //Modified();
 }
 
 //------------------------------------------------------------------------------
-bool mflEventInteraction::GetModifier(unsigned long idx)
+bool mafEventInteraction::GetModifier(unsigned long idx)
 //------------------------------------------------------------------------------
 {
-  return (Modifiers&(1<<idx))!=0;
+  return (m_Modifiers&(1<<idx))!=0;
 }
 //------------------------------------------------------------------------------
-void mflEventInteraction::SetModifiers(unsigned long modifiers)
+void mafEventInteraction::SetModifiers(unsigned long modifiers)
 //------------------------------------------------------------------------------
 {
-  Modifiers = modifiers;
+  m_Modifiers = modifiers;
 }
 
 //------------------------------------------------------------------------------
-void mflEventInteraction::DeepCopy(mflEventInteraction *e)
+void mafEventInteraction::DeepCopy(mafEventBase *event)
 //------------------------------------------------------------------------------
 {
-  SetSender(this);
-  SetID(e->GetID());
-  SetMatrix(e->GetMatrix());
-  SetXYFlag(e->GetXYFlag());
-  X=e->X;;
-  Y=e->Y;
-  SetModifiers(e->GetModifiers());
-  SetKey(e->GetKey());
+  mafEventInteraction *e=mafEventInteraction::SafeDownCast(event);
+  assert(e);
+  Superclass::DeepCopy(e);
+  m_Matrix=e->m_Matrix;
+  m_XYFlag=e->m_XYFlag;
+  m_X=e->m_X;;
+   m_Y=e->m_Y;
+  m_Modifiers=e->m_Modifiers;
+  m_Key=e->m_Key;
 }
