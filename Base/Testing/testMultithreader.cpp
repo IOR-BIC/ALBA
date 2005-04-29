@@ -28,8 +28,8 @@ int main()
 {  
   mafMultiThreader threader;
   test_data data[8];
-
-  for (int i=0;i<8;i++)
+  int i;
+  for (i=0;i<8;i++)
   {
     data[i].thread_id=i;
     data[i].flag=0;
@@ -38,19 +38,20 @@ int main()
   }
   mafSleep(500); // wait 1sec for all threads to complete their work
   std::cerr<<"Gate1\n";
-  for (int i=0;i<8;i++)
+  
+  for (i=0;i<8;i++)
   {
     MAF_TEST(data[i].flag==1);
     data[i].lock.Unlock();
   }
   mafSleep(500); // wait 1sec for all threads to complete their work
   
-  for (int i=0;i<8;i++)
+  for (i=0;i<8;i++)
   {
     MAF_TEST(data[i].flag==2);
   }
   std::cerr<<"Gate2\n";
-  for (int i=0;i<8;i++)
+  for (i=0;i<8;i++)
   {
    data[i].flag=0;
   }
