@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-27 16:23:32 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-29 10:28:31 $
+  Version:   $Revision: 1.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -72,7 +72,7 @@ mafPipeFactory::mafPipeFactory()
   //mafPlugObjectMacro(mafTagArray,"a basic kind of attribute used to store key-value pairs");
 
   mafPlugPipeMacro(mafPipeSurface,"Pipe to render vtk polydata as surface rendering");
-  mafPlugPipeMacro(mafPipeMeter,"Pipe for mafVMEMeter");
+  //mafPlugPipeMacro(mafPipeMeter,"Pipe for mafVMEMeter");
 }
 
 //------------------------------------------------------------------------------
