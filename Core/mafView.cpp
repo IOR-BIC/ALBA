@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 17:24:43 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-04-29 10:47:31 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -76,7 +76,9 @@ void mafView::HideGui()
 void mafView::PlugVisualPipe(mafString vme_type, mafString pipe_type, long visibility)
 //----------------------------------------------------------------------------
 {
-  mafVisualPipeInfo plugged_pipe = {pipe_type,visibility};
+  mafVisualPipeInfo plugged_pipe;
+  plugged_pipe.m_PipeName=pipe_type;
+  plugged_pipe.m_Visibility=visibility;
   m_PipeMap[vme_type] = plugged_pipe;
 }
 //-------------------------------------------------------------------------
