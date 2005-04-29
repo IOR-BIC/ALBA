@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 17:25:48 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-04-29 06:04:55 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
