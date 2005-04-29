@@ -62,6 +62,12 @@ int main()
   // test single character accessor 
   MAF_TEST(tmp[tmp.FindLast("Hello")]=='H');
 
+  // test += operator
+  mafString red_box="The Red";
+  red_box+=" Box";
+
+  MAF_TEST(red_box=="The Red Box");
+
   // test alphabetical comparison
   mafString num5=5;
   mafString num1=1;
@@ -73,8 +79,11 @@ int main()
   
   // some extra comparison. Notice the "a" string is not copied!
   mafCString achar="a";
+  mafCString bchar="ab";
   MAF_TEST(achar<="a");
   MAF_TEST(achar>="a");
+  MAF_TEST(achar<bchar);
+  MAF_TEST(bchar<achar);
 
   // test the referencing mechansim of mafString. Notice mafCString is
   // equivalent to mafString::Set() 
