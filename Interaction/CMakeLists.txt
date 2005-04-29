@@ -18,16 +18,14 @@ mafDevice.cpp
 mafDevice.h
 mafDeviceSet.cpp
 mafDeviceSet.h
-mafDeviceManager.cpp
-mafDeviceManager.h
-mafEventHandler.cpp
-mafEventHandler.h
+#mafDeviceManager.cpp
+#mafDeviceManager.h
+#mafEventHandler.cpp
+#mafEventHandler.h
 mafEventInteraction.cpp
 mafEventInteraction.h
-mafInteractionDecl.h
-mafInteractionDecl.cpp
-mafInteractor.cpp
-mafInteractor.h
+#mafInteractor.cpp
+#mafInteractor.h
 )
 
 #IF (MAF_USE_VTK)
