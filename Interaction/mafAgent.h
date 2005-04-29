@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAgent.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 06:06:34 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-29 16:10:16 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -46,7 +46,7 @@ public:
   /** @ingroup Events
       Event used to force initialization of this object */
   MAF_ID_DEC(AGENT_INITIALIZE); 
- 
+  
   /**
   Plug in a source of events, specifying the channel ID. All the mechanism is based on Observers, 
   and the channel ID correspond to the event ID used to convey events through observers.
@@ -55,18 +55,18 @@ public:
   as a bridge for the events will remain alive.*/
   virtual void PlugEventSource(mafAgent *source,mafID channel=MCH_ANY, float priority = 0.0);
   virtual void UnPlugEventSource(mafAgent *source);
-
+  
 #ifdef MAF_USE_VTK
   /**
     Plug in a VTK object as source of events, specifying the VTK event ID to be observed.*/
   virtual void PlugEventSource(vtkObject *source,mafID eventid, float priority = 0.0);
-
+  
   /**
   This is a commodity function to attach a callback function to a VTK event. 'source' is the vtkObject
   to which attach the event, 'arg' is typically the pointer of the class that wants to link to the event (the 'self')
   and 'f' is the callback function to be attached to the event.*/
   static int PlugEventSource(vtkObject *source,void (*f)(void *), void *self, mafID eventid, float priority = 0.0);
-
+  
   /**
   Unplug an events source. Remember to explicitly unplug all the source before destroying the
   listener.*/
@@ -82,9 +82,9 @@ public:
   void AddObserver(mafObserver *listener,mafID channel=MCH_UP, float priority = 0.0);
   void RemoveObserver(mafObserver *listener);
   void RemoveAllObservers();
-
+  
   /** provided for compatibility reasons */
-  void SetListener(mafObserver *listener) {AddObserver(listener);}
+  void SetListener(mafObserver *listener);
   
   /**
   Process an event: the event is processed immediately and synchronously, i.e.
@@ -92,7 +92,7 @@ public:
   cannot manage the event it is passed to its listeners on the same channel and so on,
   until it's processed.*/
   virtual void OnEvent(mafEventBase *event);
-
+  
   /**  return true if there's a listener on the specified channel. (noarg == MCH_UP) */
   inline int HasObserver(mafID channel);
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-28 16:10:11 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-29 16:10:17 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,35 +12,27 @@
 #ifndef __mafDeviceManager_h
 #define __mafDeviceManager_h
 
-#ifdef __GNUG__
-    #pragma interface "mafDeviceManager.cpp"
-#endif
+#include "mafAgentEventHandler.h"
+#include "mafStorable.h"
 
-#ifndef WX_PRECOMP
-    #include "wx/wx.h"
-#endif
-
-#include "mafEventHandler.h"
-#include "mflDefines.h"
+#include <list>
 
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 class mafDevice;
 class mafDeviceSet;
-class mflXMLWriter;
-class vtkXMLDataElement;
-class vtkXMLDataParser;
-template <class T> class vtkTemplatedList;
 
 /**
-  Class managing input device managment and synchronization with wxWindows message pump.
+  Class managing the devices and the synchronization with wxWindows message pump.
   This class is used both as a container for all active devices and manages synchronization
-  of events coming from input devices with wxWindows messsage pump. To store devices
+  of events coming from input devices with wxWindows message pump. To store devices
   a mafDeviceSet object is used.
   @sa mafDevice mafDeviceSet
+  @todo 
+  - implement AddDevice()
  */
-class mafDeviceManager : public mafEventHandler
+class mafDeviceManager : public mafAgentEventHandler
 {
 public:
   //------------------------------------------------------------------------------
@@ -48,13 +40,15 @@ public:
   //------------------------------------------------------------------------------
   /** @ingroup Events
       advise dispatching has started */
-  MFL_EVT_DEC(StartDispatchingEvent)
+  MAF_ID_DEC(DISPATCH_START)
   /** @ingroup Events
       advise dispatching has finished  */
-  MFL_EVT_DEC(EndDispatchingEvent) 
+  MAF_ID_DEC(DISPATCH_END) 
 
-  static mafDeviceManager *New();
-  vtkTypeMacro(mafDeviceManager,mafEventHandler);
+  mafDeviceManager();
+  virtual ~mafDeviceManager();
+
+  mafTypeMacro(mafDeviceManager,mafAgentEventHandler);
 
   /**
     Add a new device. If the returned value is 0 the operation has failed! */
@@ -85,20 +79,12 @@ public:
   void RemoveAllDevices(bool force=false);
 
   /** return the list of active devices */
-  vtkTemplatedList<mafDevice> *GetDevices();
+  std::list<mafDevice *> *GetDevices();
 
   /** return the device set storing first level devices */
-  mafDeviceSet *GetDeviceSet() {return DeviceSet;}
+  mafDeviceSet *GetDeviceSet() {return m_DeviceSet;}
 
-  /**
-    Implement storing and restoring of this object. To store
-    an XML Writer must be passed as argument, while to restore the node
-    of the XML structure from where starting the restoring must must be passed.
-  */
-  virtual int Store(mflXMLWriter *writer);
-  virtual int Restore(vtkXMLDataElement *parent,vtkXMLDataParser *parser);
-
-  virtual void ProcessEvent(mflEvent *event,mafID channel=mflAgent::DefaultChannel);
+  virtual void OnEvent(mafEventBase *event);
 
   /**
     Redefined to manage the synchronization with display rendering: during the event
@@ -107,17 +93,20 @@ public:
     StopDispatchingEvent is sent when dispatching is finished */
   virtual bool DispatchEvents();
 protected:
-  mafDeviceManager();
-  virtual ~mafDeviceManager();
+  /**
+  Implement storing and restoring of this object. To store
+  an XML Writer must be passed as argument, while to restore the node
+  of the XML structure from where starting the restoring must must be passed.  */
+  virtual int InternalStore(mafStorageElement *node);
+  virtual int InternalRestore(mafStorageElement *node);
 
   virtual int InternalInitialize();
   virtual void InternalShutdown();
 
-  mafDeviceSet *DeviceSet;
-
-  mafID DeviceIdCounter;
-  mafID PersistentDeviceIdCounter;
-  bool  RestoringFlag;
+  mafDeviceSet*   m_DeviceSet;        ///< container for first level devices
+  mafID           m_DeviceIdCounter;  ///< number of plugged devices
+  mafID           m_PersistentDeviceIdCounter; ///< number of persistent plugged devices
+  bool            m_RestoringFlag;
   
 private:
   mafDeviceManager(const mafDeviceManager&);  // Not implemented.

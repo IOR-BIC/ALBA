@@ -3,8 +3,8 @@
 Program:   Visualization Toolkit
 Module:    $RCSfile: mafAgentThreaded.cpp,v $
 Language:  C++
-Date:      $Date: 2005-04-29 06:06:34 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2005-04-29 16:10:16 $
+Version:   $Revision: 1.5 $
 
 
 
@@ -244,7 +244,7 @@ void mafAgentThreaded::SignalNewMessage()
 #endif
 }
 //----------------------------------------------------------------------------
-void AsyncSendEvent(mafObserver *target, void *sender, mafID id, mafID channel=MCH_UP,void *data=NULL)
+void mafAgentThreaded::AsyncSendEvent(mafObserver *target, void *sender, mafID id, mafID channel,void *data)
 //----------------------------------------------------------------------------
 {
   AsyncSendEvent(target,&mafEventBase(sender,id,data,channel),channel);

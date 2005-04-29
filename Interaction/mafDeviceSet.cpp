@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceSet.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 06:06:33 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-29 16:10:17 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -200,7 +200,8 @@ mafDevice *mafDeviceSet::GetDevice(mafID id)
 //------------------------------------------------------------------------------
 {
   m_DevicesMutex->Lock();
-  for (std::list<mafDevice*>::iterator it=m_Devices.begin();it!=m_Devices.end();it++)
+  std::list<mafDevice*>::iterator it;
+  for (it=m_Devices.begin();it!=m_Devices.end();it++)
   {
     mafDevice *device=*it;
     if (device->GetID()==id)
@@ -210,7 +211,7 @@ mafDevice *mafDeviceSet::GetDevice(mafID id)
     }
   }
 
-  for (std::list<mafDevice*>::iterator it=m_Devices.begin();it!=m_Devices.end();it++)
+  for (it=m_Devices.begin();it!=m_Devices.end();it++)
   {
     mafDevice *device=*it;
     mafDeviceSet *device_set=mafDeviceSet::SafeDownCast(device);

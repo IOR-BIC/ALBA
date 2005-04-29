@@ -10,6 +10,8 @@ DBG_MESSAGE("Configuring project ${PROJECT_NAME}")
 SET(PROJECT_SRCS
 mafAgent.cpp
 mafAgent.h
+mafAgentEventHandler.cpp
+mafAgentEventHandler.h
 mafAgentEventQueue.h
 mafAgentEventQueue.cpp
 mafAgentThreaded.h
@@ -20,8 +22,6 @@ mafDeviceSet.cpp
 mafDeviceSet.h
 #mafDeviceManager.cpp
 #mafDeviceManager.h
-#mafEventHandler.cpp
-#mafEventHandler.h
 mafEventInteraction.cpp
 mafEventInteraction.h
 #mafInteractor.cpp

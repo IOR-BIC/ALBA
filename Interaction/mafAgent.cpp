@@ -3,8 +3,8 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: mafAgent.cpp,v $
 Language:  C++
-Date:      $Date: 2005-04-28 16:10:09 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2005-04-29 16:10:16 $
+Version:   $Revision: 1.4 $
 
 =========================================================================*/
 #include "mafAgent.h"
@@ -140,6 +140,23 @@ void mafAgent::RemoveAllObservers()
   for (int i=0;i<m_Channels.size();i++)
   {
     m_Channels[i]->RemoveAllObservers();
+  }
+}
+
+//------------------------------------------------------------------------------
+void mafAgent::SetListener(mafObserver *listener)
+//------------------------------------------------------------------------------
+{
+  for (int i=0;i<m_Channels.size();i++)
+  {
+    if (m_Channels[i]->GetChannel()==MCH_UP)
+    {
+      m_Channels[i]->RemoveAllObservers();
+      if (listener)
+      {
+        m_Channels[i]->AddObserver(listener);
+      }
+    }
   }
 }
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAgentThreaded.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-28 16:10:10 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-29 16:10:16 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -52,7 +52,7 @@ public:
 
   /**
     This function forces the agent to update its state. Return 0 if Update is OK.*/
-  int Update() {return this->IsInitialized()?this->InternalUpdate():-1;}
+  int Update() {return IsInitialized()?InternalUpdate():-1;}
 
   /**
     This function enques events to be processed by agent. Events are processed by agent's
