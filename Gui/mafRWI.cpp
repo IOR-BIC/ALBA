@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 10:27:17 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-04-29 10:47:43 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,6 +29,9 @@
 //#include "mafSceneNode.h"
 
 #include "mafNode.h"
+#include "mafSceneNode.h"
+#include "mafSceneGraph.h"
+#include "mafVME.h"
 //#include "mafNodeLandmark.h"
 //#include "mafNodeLandmarkCloud.h"
 //#include "mflMatrixPipeDirectCinematic.h"
@@ -38,11 +41,12 @@
 #include "vtkLight.h"
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
-//#include "vtkAutoStereoRenderWindow.h"
+#include "vtkLinearTransform.h"
 #include "vtkRenderWindow.h"
 #include "vtkMath.h"
 #include "vtkActor.h"
 #include "vtkActor2D.h"
+#include "vtkDataSet.h"
 
 //----------------------------------------------------------------------------
 mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, int stereo)
@@ -379,23 +383,21 @@ void mafRWI::CameraReset(mafNode *vme)
   m_RenderWindow->Render();
 }
 //----------------------------------------------------------------------------
-float* mafRWI::ComputeVisibleBounds(mafNode *vme)
+double *mafRWI::ComputeVisibleBounds(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  static float b1[6],b2[6]; // static so it is possible to return it
-  b1[0]=b1[2]=b1[4]=0;
-  b1[1]=b1[3]=b1[5]=100;
-  return b1;
-/*
-	if(vme) 
-		if(!vme->IsA("mafNodeRoot") ) 
-			if(vme->GetCurrentData() ) 
+  static double b1[6],b2[6]; // static so it is possible to return it
+  mafVME *vme = NULL;
+  
+  if(node && (vme = mafVME::SafeDownCast(node)))
+		if(!vme->IsA("mafNodeRoot"))
+			if(vme->GetOutput()->GetVTKData())
 				if(m_Sg) 
 					if(mafSceneNode *n = m_Sg->Vme2Node(vme) )
 						if(n->IsVisible())
 	{
-		vme->UpdateCurrentData();
-		vme->GetCurrentData()->GetBounds(b1);
+		vme->GetOutput()->GetVTKData();
+		vme->GetOutput()->GetVTKData()->GetBounds(b1);
     float loc_p1[3],loc_p2[3],abs_p1[3], abs_p2[3];
     loc_p1[0] = b1[0];
     loc_p1[1] = b1[2];
@@ -405,10 +407,10 @@ float* mafRWI::ComputeVisibleBounds(mafNode *vme)
     loc_p2[2] = b1[5];
 
     double r=0;
-    if(vme->IsA("mafNodeLandmark"))
+/*    if(vme->IsA("mafNodeLandmark"))
        r = ((mafNodeLandmark*)vme)->GetRadius();
     if(vme->IsA("mafNodeLandmarkCloud"))
-       r = ((mafNodeLandmarkCloud*)vme)->GetRadius();
+       r = ((mafNodeLandmarkCloud*)vme)->GetRadius();*/
 		loc_p1[0] -= r;
 		loc_p1[1] -= r;
 		loc_p1[2] -= r;
@@ -416,12 +418,11 @@ float* mafRWI::ComputeVisibleBounds(mafNode *vme)
 		loc_p2[1] += r;
 		loc_p2[2] += r;
     
-    vtkLinearTransform *t=vme->GetAbsMatrixPipe();
+    vtkLinearTransform *t = (vtkLinearTransform *)vme->GetAbsMatrixPipe();
 		t->TransformPoint(loc_p1,abs_p1);
 		t->TransformPoint(loc_p2,abs_p2);
     // TODO: test the usage of vtkMatrix4x4::MultiplyPoint instead
 
-		
 		b1[0] = abs_p1[0];
 		b1[1] = abs_p2[0];
 		b1[2] = abs_p1[1];
@@ -429,15 +430,13 @@ float* mafRWI::ComputeVisibleBounds(mafNode *vme)
 		b1[4] = abs_p1[2];
 		b1[5] = abs_p2[2];
 
-    //t->Delete();
 		return b1;
 	}
 	m_RenFront->ComputeVisiblePropBounds(b1);   
 	return b1;
-  */
 }
 //----------------------------------------------------------------------------
-void mafRWI::CameraReset(float bounds[6])
+void mafRWI::CameraReset(double bounds[6])
 //----------------------------------------------------------------------------
 {
   double view_up[3], view_look[3], view_right[3];
@@ -451,7 +450,7 @@ void mafRWI::CameraReset(float bounds[6])
   vtkMath::Normalize(view_right);
 	
   //convert camera vectors to float
-	float vu[3],vl[3],vr[3];
+	double vu[3],vl[3],vr[3];
 	for(int i=0; i<3; i++)
   {
 	  vu[i]=view_up[i];
@@ -459,15 +458,15 @@ void mafRWI::CameraReset(float bounds[6])
 	  vr[i]=view_right[i];
 	} 	
 
-  float height;	
-  float width;	
-  float depth;	
-	float center[3];
+  double height;	
+  double width;	
+  double depth;	
+	double center[3];
   center[0] = (bounds[0] + bounds[1])/2.0;
   center[1] = (bounds[2] + bounds[3])/2.0;
   center[2] = (bounds[4] + bounds[5])/2.0;
 	
-	float diag[3];
+	double diag[3];
 	diag[0] = (bounds[1] - bounds[0]);
 	diag[1] = (bounds[3] - bounds[2]);
 	diag[2] = (bounds[5] - bounds[4]);
@@ -489,14 +488,14 @@ void mafRWI::CameraReset(float bounds[6])
 	height = (height == 0) ? 1.0 : height;	
   
 	//check aspect ratio - and eventually compensate height
-	float view_aspect  = (m_Rwi->m_Width*1.0)/(m_Rwi->m_Height*1.0);
-	float scene_aspect = (width)/(height);
+	double view_aspect  = (m_Rwi->m_Width*1.0)/(m_Rwi->m_Height*1.0);
+	double scene_aspect = (width)/(height);
   if( scene_aspect > view_aspect )
   {
     height = width/view_aspect; 
 	}
 
-  float distance;
+  double distance;
 	distance  = height/tan(m_Camera->GetViewAngle()*vtkMath::Pi()/360.0);
 	distance += depth/2;
 
@@ -511,7 +510,3 @@ void mafRWI::CameraReset(float bounds[6])
 	
 	//m_RenFront->ResetCameraClippingRange(bounds);
 }
-
-
-
-

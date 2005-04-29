@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 10:27:18 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-29 10:47:43 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -51,7 +51,7 @@ public:
 	void CameraReset(mafNode *vme = NULL);
 
 	/** Reset the camera position according to the bounds. */
-	void CameraReset(float bounds[6]);
+	void CameraReset(double bounds[6]);
   
 	/** Update the renderwindow. */
 	void CameraUpdate();
@@ -101,7 +101,7 @@ public:
 
 protected:
 	/** Compute the bounds for the visible actors; if vme is passed, the bounds of vme are calculated. */
-	float* ComputeVisibleBounds(mafNode *vme = NULL);
+	double *ComputeVisibleBounds(mafNode *node = NULL);
 	
   int               m_StereoType;
 
