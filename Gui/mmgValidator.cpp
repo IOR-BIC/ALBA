@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgValidator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 06:05:38 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-29 12:49:41 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -188,6 +188,7 @@ bool mmgValidator::Copy(const mmgValidator& val)
   m_dvar        = val.m_dvar;
   m_ivar        = val.m_ivar;
   m_svar        = val.m_svar;
+  m_svar2       = val.m_svar2;
   m_cvar        = val.m_cvar;
 
   m_fmax        = val.m_fmax;
@@ -539,7 +540,7 @@ bool mmgValidator::TransferToWindow(void)
     break;
     case VAL_STRING:
       if (m_svar) m_TextCtrl->SetValue(*m_svar);
-      if (m_svar2) m_TextCtrl->SetValue(m_svar2->GetCStr());
+      if (m_svar2) m_TextCtrl->SetValue(wxString(m_svar2->GetCStr()));
     break;
     case VAL_SLIDER:
       m_Slider->SetValue(*m_ivar);
@@ -677,7 +678,7 @@ bool mmgValidator::TransferFromWindow(void)
     break;
     case VAL_STRING:
       if (m_svar)  *m_svar = m_TextCtrl->GetValue();
-      if (m_svar2) *m_svar2 = m_TextCtrl->GetValue();
+      if (m_svar2) *m_svar2 = m_TextCtrl->GetValue().c_str();
     break;
     case VAL_SLIDER:
 			*m_ivar = m_Slider->GetValue();
