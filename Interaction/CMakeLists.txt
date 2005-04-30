@@ -56,8 +56,8 @@ mmdButtonsPad.cpp
 mmdButtonsPad.h
 mmdRemoteMouse.cpp
 mmdRemoteMouse.h
-vtkMAFCameraTransform.cpp
-vtkMAFCameraTransform.h
+mafCameraTransform.cpp
+mafCameraTransform.h
 )
 
 #IF (MAF_USE_VTK)
