@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-16 12:09:05 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-04-30 14:39:08 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -50,6 +50,8 @@ public:
     Set an attribute of this element. Attribute 'name' and
     'value' must be passed as argument. */
   virtual void SetAttribute(const char *name,const char *value)=0;
+  void SetAttribute(const char *name,const mafID value);
+  void SetAttribute(const char *name,const double value);
 
   /** Return an attribute value given its name. Return false if not found. */
   virtual bool GetAttribute(const char *name,mafString &value)=0;

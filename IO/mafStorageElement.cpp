@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:02:56 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-04-30 14:39:08 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -282,6 +282,10 @@ mafObject *mafStorageElement::RestoreObject()
       // release object memory
       object->Delete();     
     }    
+    else
+    {
+      mafErrorMacro("Cannot restore object of type \""<<type_name<<"\" from element <"<<GetName()<<"> since this object type is unknown.");
+    }
   }
   else
   {
@@ -537,4 +541,17 @@ bool mafStorageElement::GetAttributeAsInteger(const char *name,mafID &value)
     return true;
   }
   return false;
+}
+
+//------------------------------------------------------------------------------
+void mafStorageElement::SetAttribute(const char *name,const mafID value)
+//------------------------------------------------------------------------------
+{
+  SetAttribute(name,mafString(value));
+}
+//------------------------------------------------------------------------------
+void mafStorageElement::SetAttribute(const char *name,const double value)
+//------------------------------------------------------------------------------
+{
+  SetAttribute(name,mafString(value));
 }
