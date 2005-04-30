@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeFactory.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-25 21:12:02 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-30 14:38:42 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -53,7 +53,7 @@ public:
   void RegisterNewNode(const char* node_name, const char* description, mafCreateObjectFunction createFunction);
 
   /** return list of names for nodes plugged into this factory */
-  const static std::vector<std::string> GetNodeNames() {return m_NodeNames;}
+  const static std::vector<std::string> &GetNodeNames() {return m_NodeNames;}
 
 protected:
   mafNodeFactory();
