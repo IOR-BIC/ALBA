@@ -1,229 +1,165 @@
 /*=========================================================================
-
-  Program:   Visualization Toolkit
+  Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-28 16:10:12 $
-  Version:   $Revision: 1.1 $
-
+  Date:      $Date: 2005-04-30 14:34:53 $
+  Version:   $Revision: 1.2 $
+  Authors:   Marco Petrone
+==========================================================================
+  Copyright (c) 2001/2005 
+  CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-// To be included first because of wxWindows
-#ifdef __GNUG__
-    #pragma implementation "mafInteractionFactory.cpp"
-#endif
 
-// For compilers that support precompilation, includes "wx/wx.h".
-#include "wx/wxprec.h"
+
+#include "mafDefines.h" 
+//----------------------------------------------------------------------------
+// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// This force to include Window,wxWidgets and VTK exactly in this order.
+// Failing in doing this will result in a run-time error saying:
+// "Failure#0: The value of ESP was not properly saved across a function call"
+//----------------------------------------------------------------------------
 
 #include "mafInteractionFactory.h"
-#include "mflCoreFactory.h"
-#include "vtkVersion.h"
-#include "mafAvatar.h"
 #include "mafDevice.h"
-
-#include <vector>
+#include "mafAvatar.h"
+#include "mafVersion.h"
+#include "mafIndent.h"
 #include <string>
-#include <utility>
+#include <ostream>
 
-typedef struct std::pair<std::string,std::string> list_item;
-
-class mafInteractionFactory::PIMPL : public vtkObjectBase
-{
-public:
-  static mafInteractionFactory::PIMPL *New() {return new mafInteractionFactory::PIMPL;}
-
-  std::vector<list_item> DevicesList;
-  std::vector<list_item> AvatarsList;
-};
-
-mafInteractionFactory::PIMPL *mafInteractionFactory::Internals = NULL;
-
-//---------------------------------------------------------------------------
-// Static Variables
-//----------------------------------------------------------------------------
-mafID DeviceCounter = 0; // Counter of Devices in the factory
-mafID AvatarCounter = 0; // Counter of Avatars in the factory
-
-// Factory pointer
-mafInteractionFactory * mafInteractionFactory::InteractionFactory = NULL;
+mafInteractionFactory *mafInteractionFactory::m_Instance=NULL;
 
 //----------------------------------------------------------------------------
-mafInteractionFactory *mafInteractionFactory::GetInstance()
+mafCxxTypeMacro(mafInteractionFactory);
 //----------------------------------------------------------------------------
-{
-  if (InteractionFactory==NULL)
-    Initialize();
-  
-  return InteractionFactory;
-} 
 
 //----------------------------------------------------------------------------
 // This is used to register the factory when linking statically
-//------------------------------------------------------------------------
-void mafInteractionFactory::Initialize()
+int mafInteractionFactory::Initialize()
+//----------------------------------------------------------------------------
 {
-  InteractionFactory=mafInteractionFactory::New();
-
-  if (InteractionFactory)
+  if (m_Instance==NULL)
   {
-    InteractionFactory->RegisterFactory(InteractionFactory);
-    InteractionFactory->Delete();  
+    m_Instance=mafInteractionFactory::New();
+
+    if (m_Instance)
+    {
+      m_Instance->RegisterFactory(m_Instance);
+      return MAF_OK;  
+    }
+    else
+    {
+      return MAF_ERROR;
+    }
   }
-}
-
-
-//------------------------------------------------------------------------
-mafInteractionFactory* mafInteractionFactory::New()
-//------------------------------------------------------------------------
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("mafInteractionFactory");
   
-  if(ret)
-  {
-    return (mafInteractionFactory*)ret;
-  }
-  // If the factory was unable to create the object, then create it here.
-  return new mafInteractionFactory;
+  return MAF_OK;
 }
-
-//------------------------------------------------------------------------
-void mafInteractionFactory::PrintSelf(ostream& os, vtkIndent indent)
-//------------------------------------------------------------------------
-{
-  os << indent << "MAF Interaction objects factory" << endl;
-  os << indent << "Number of Devices = " << DeviceCounter << endl;
-  os << indent << "Number of Avatars = " << AvatarCounter << endl;
-}
-
-//------------------------------------------------------------------------
-// Table of create functions for factory's classes
-//------------------------------------------------------------------------
-//VTK_CREATE_CREATE_FUNCTION(mmdP5Glove);//SIL. 26-5-2004: 
-
 
 //------------------------------------------------------------------------
 mafInteractionFactory::mafInteractionFactory()
-//------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 {
-  if (Internals==NULL)
+  m_Instance = NULL;
+  
+  //
+  // Plug here Devices in this factory
+  //
+  //mafPlugDeviceMacro(mmdViconTracker,"tracker set device for Vicon systems");
+  
+  
+  //
+  // Plug here Devices that should not stay in the list (sub devices)
+  //
+  //mafPlugObjectMacro(mmdViconTool,"a tracker device representing the single body tracked by a vicon system");
+  
+  //
+  // Plug here Avatars in this factory
+  //
+  //mafPlugAvatarMacro(mafAvatar3DCone,"an avatar represented as a 3D cone");
+}
+
+//------------------------------------------------------------------------------
+const char* mafInteractionFactory::GetMAFSourceVersion() const
+//------------------------------------------------------------------------------
+{
+  return MAF_SOURCE_VERSION;
+}
+
+//------------------------------------------------------------------------------
+const char* mafInteractionFactory::GetDescription() const
+//------------------------------------------------------------------------------
+{
+  return "Factory for MAF Devices and Avatars";
+}
+
+//------------------------------------------------------------------------------
+mafDevice *mafInteractionFactory::CreateDeviceInstance(const char *type_name)
+//------------------------------------------------------------------------------
+{
+  return mafDevice::SafeDownCast(Superclass::CreateInstance(type_name));
+}
+
+//------------------------------------------------------------------------------
+void mafInteractionFactory::RegisterNewDevice(const char* node_name, const char* description, mafCreateObjectFunction createFunction)
+//------------------------------------------------------------------------------
+{
+  m_DeviceNames.insert(node_name);
+  RegisterNewObject(node_name,description,createFunction);
+}
+
+//------------------------------------------------------------------------------
+mafDevice *mafInteractionFactory::CreateAvatarInstance(const char *type_name)
+//------------------------------------------------------------------------------
+{
+  return mafAvatar::SafeDownCast(Superclass::CreateInstance(type_name));
+}
+
+//------------------------------------------------------------------------------
+mafAvatar *mafInteractionFactory::CreateAvatarInstance(const char *type_name)
+//------------------------------------------------------------------------------
+{
+  return mafAvatar::SafeDownCast(Superclass::CreateInstance(type_name));
+}
+
+//------------------------------------------------------------------------------
+void mafInteractionFactory::RegisterNewAvatar(const char* node_name, const char* description, mafCreateObjectFunction createFunction)
+//------------------------------------------------------------------------------
+{
+  m_AvatarNames.insert(node_name);
+  RegisterNewObject(node_name,description,createFunction);
+}
+
+//------------------------------------------------------------------------------
+const char *mafInteractionFactory::GetDeviceDescription(const char *device_name)
+//------------------------------------------------------------------------------
+{
+  // check if that device exists
+  if (m_DeviceNames.find(device_name))
   {
-    Internals = mafInteractionFactory::PIMPL::New(); 
+    mafOverRideMap::iterator pos = m_OverrideMap->find(device_name);
+    if ( pos != m_OverrideMap->end() )
+    {
+      return (*pos).second.m_Description;
+    }
   }
-  else
-  {
-    Internals->Register(this);
-  }
-  //RegisterNewDevice(mmdP5Glove,"driver for essential reality P5 glove");//SIL. 26-5-2004: 
-}
-
-//------------------------------------------------------------------------
-mafInteractionFactory::~mafInteractionFactory()
-//------------------------------------------------------------------------
-{
-  Internals->UnRegister(this);
-}
-//------------------------------------------------------------------------
-const char* mafInteractionFactory::GetVTKSourceVersion()
-//------------------------------------------------------------------------
-{
-  return VTK_SOURCE_VERSION;
-}
-
-//------------------------------------------------------------------------
-const char* mafInteractionFactory::GetDescription()
-//------------------------------------------------------------------------
-{
-  return "MAF Interaction Objects Factory";
-}
-
-//------------------------------------------------------------------------
-mafID mafInteractionFactory::RegisterNewDevice(const char* type, const char* name, CreateFunction createFunction)
-//------------------------------------------------------------------------
-{ 
-  RegisterNewObject(type,name,createFunction); 
-  Internals->DevicesList.push_back(std::make_pair(type,name));
-  return Internals->DevicesList.size();
-}
-
-//------------------------------------------------------------------------
-mafID mafInteractionFactory::RegisterNewAvatar(const char* type, const char* name, CreateFunction createFunction)
-//------------------------------------------------------------------------
-{
-  RegisterNewObject(type,name,createFunction);
-  Internals->AvatarsList.push_back(std::make_pair(type,name));
-  return Internals->AvatarsList.size();
-}
-
-//------------------------------------------------------------------------
-int mafInteractionFactory::GetNumberOfDevices()
-//------------------------------------------------------------------------
-{
-  return Internals->DevicesList.size();
-}
-
-//------------------------------------------------------------------------
-int mafInteractionFactory::GetNumberOfAvatars()
-//------------------------------------------------------------------------
-{
-  return Internals->AvatarsList.size();
-}
-
-//------------------------------------------------------------------------
-const char *mafInteractionFactory::GetDeviceName(mafID idx)
-//------------------------------------------------------------------------
-{
-  return Internals->DevicesList[idx].second.c_str();
-}
-
-//------------------------------------------------------------------------
-const char *mafInteractionFactory::GetDeviceName(const char *type)
-//------------------------------------------------------------------------
-{
-  for (int i=0;i<Internals->DevicesList.size();i++)
-    if (Internals->DevicesList[i].first == type)
-      return Internals->DevicesList[i].second.c_str();
+  
   return NULL;
 }
 
-//------------------------------------------------------------------------
-const char *mafInteractionFactory::GetDeviceType(mafID idx)
-//------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+const char *mafInteractionFactory::GetAvatarDescription(const char *avatar_name)
+//------------------------------------------------------------------------------
 {
-  return Internals->DevicesList[idx].first.c_str();
-}
-//------------------------------------------------------------------------
-const char *mafInteractionFactory::GetAvatarName(mafID idx)
-//------------------------------------------------------------------------
-{
-  return Internals->AvatarsList[idx].second.c_str();
-}
+  // check if that device exists
+  if (m_AvatarNames.find(avatar_name))
+  {
+    mafOverRideMap::iterator pos = m_OverrideMap->find(avatar_name);
+    if ( pos != m_OverrideMap->end() )
+    {
+      return (*pos).second.m_Description;
+    }
+  }
 
-//------------------------------------------------------------------------
-const char *mafInteractionFactory::GetAvatarName(const char *type)
-//------------------------------------------------------------------------
-{
-  for (int i=0;i<Internals->AvatarsList.size();i++)
-    if (Internals->AvatarsList[i].first == type)
-      return Internals->AvatarsList[i].second.c_str();
   return NULL;
-}
-
-//------------------------------------------------------------------------
-const char *mafInteractionFactory::GetAvatarType(mafID idx)
-//------------------------------------------------------------------------
-{
-  return Internals->AvatarsList[idx].first.c_str();
-}
-//------------------------------------------------------------------------
-mafAvatar *mafInteractionFactory::CreateAvatarInstance(const char *name)
-//------------------------------------------------------------------------
-{
-  return mafAvatar::SafeDownCast(GetInstance()->CreateObject(name));
-}
-//------------------------------------------------------------------------
-mafDevice *mafInteractionFactory::CreateDeviceInstance(const char *name)
-//------------------------------------------------------------------------
-{
-  return mafDevice::SafeDownCast(GetInstance()->CreateObject(name));
 }

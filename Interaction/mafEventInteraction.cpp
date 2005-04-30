@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventInteraction.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 06:06:33 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-30 14:34:52 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -23,7 +23,7 @@ void mafEventInteraction::Set2DPosition(double x,double y)
   //Modified();
 }
 //------------------------------------------------------------------------------
-void mafEventInteraction::Set2DPosition(double pos[2])
+void mafEventInteraction::Set2DPosition(const double pos[2])
 //------------------------------------------------------------------------------
 {
   m_X=pos[0];
@@ -74,11 +74,11 @@ void mafEventInteraction::SetKey(unsigned char key)
 mafMatrix *mafEventInteraction::GetMatrix()
 //------------------------------------------------------------------------------
 {
-  return &m_Matrix;
+  return m_Matrix;
 }
 
 //------------------------------------------------------------------------------
-void mafEventInteraction::SetMatrix(const mafMatrix &matrix)
+void mafEventInteraction::SetMatrix(mafMatrix *matrix)
 //------------------------------------------------------------------------------
 {
   m_Matrix=matrix;

@@ -2,128 +2,114 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-28 16:10:12 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-30 14:34:53 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-// To be included first because of wxWindows
-#ifdef __GNUG__
-    #pragma implementation "mafInteractor.cpp"
-#endif
-
-// For compilers that support precompilation, includes "wx/wx.h".
-#include "wx/wxprec.h"
 
 #include "mafInteractor.h"
-#include "mafInteractionDecl.h"
-#include "vtkRenderer.h"
-#include "mmdButtonsPad.h"
-#include "mflEventInteraction.h"
-#include "mflVME.h"
-#include "vtkProp3D.h"
-#include <assert.h>
 
-#include "mflAssembly.h"
+//#include "mmdButtonsPad.h"
 #include "mmdTracker.h"
 #include "mafAvatar.h"
 #include "mmdMouse.h"
+#include "mafEventInteraction.h"
+#include "mafVME.h"
+#include "mmuIdFactory.h"
+
+#include "vtkMAFAssembly.h"
 #include "vtkAssemblyNode.h"
 #include "vtkAssemblyPath.h"
-#include "mafVmeData.h"
 #include "vtkAbstractPropPicker.h"
+#include "vtkRenderer.h"
+#include "vtkProp3D.h"
+
+#include <assert.h>
 
 //------------------------------------------------------------------------------
 // Events
 //------------------------------------------------------------------------------
-MFL_EVT_IMP(mafInteractor::InteractionStartedEvent);
-MFL_EVT_IMP(mafInteractor::InteractionStoppedEvent);
-MFL_EVT_IMP(mafInteractor::ButtonDownEvent);
-MFL_EVT_IMP(mafInteractor::ButtonUpEvent);
-
-//------------------------------------------------------------------------------
-vtkCxxSetObjectMacro(mafInteractor,Renderer,vtkRenderer);
-//------------------------------------------------------------------------------
+MAF_ID_IMP(mafInteractor::INTERACTION_STARTED);
+MAF_ID_IMP(mafInteractor::INTERACTION_STOPPED);
+MAF_ID_IMP(mafInteractor::BUTTON_DOWN);
+MAF_ID_IMP(mafInteractor::BUTTON_UP);
 
 //------------------------------------------------------------------------------
 mafInteractor::mafInteractor()
 //------------------------------------------------------------------------------
 {
-  Renderer            = NULL;
-  Device              = NULL;
-  VME                 = NULL;
-  Prop                = NULL;
+  m_Renderer            = NULL;
+  m_Device              = NULL;
+  m_VME                 = NULL;
+  m_Prop                = NULL;
   
-  LockDevice            = true;
-  DeviceIsSet           = false;
-  IgnoreTriggerEvents   = false;
-  InteractionFlag       = false;
-  StartInteractionEvent = mmdButtonsPad::ButtonDownEvent;
-  StopInteractionEvent  = mmdButtonsPad::ButtonUpEvent;
-  StartButton           = 0;// Button 0
-  Modifiers             = 0;// no modifiers
-  ButtonMode            = SINGLE_BUTTON_MODE;
-  ButtonsCounter        = 0;
+  m_LockDevice            = true;
+  m_DeviceIsSet           = false;
+  m_IgnoreTriggerEvents   = false;
+  m_InteractionFlag       = false;
+  m_StartInteractionEvent = mmdButtonsPad::BUTTON_DOWN;
+  m_StopInteractionEvent  = mmdButtonsPad::BUTTON_UP;
+  m_StartButton           = 0;// Button 0
+  m_Modifiers             = 0;// no modifiers
+  m_ButtonMode            = SINGLE_BUTTON_MODE;
+  m_ButtonsCounter        = 0;
 
-  CurrentButton         = 0;
-  CurrentModifier       = 0;
-  m_listener            = NULL;
+  m_CurrentButton         = 0;
+  m_CurrentModifier       = 0;
 }
 
 //------------------------------------------------------------------------------
 mafInteractor::~mafInteractor()
 //------------------------------------------------------------------------------
 {
-  if (IsInteracting()&&Device&&LockDevice)
-    Device->Unlock();
-    
-  vtkDEL(Renderer);
-  Device = NULL;
-  vtkDEL(Prop);
-  vtkDEL(VME);
+  if (IsInteracting()&&m_Device&&m_LockDevice)
+    m_Device->Unlock();
+  
+  m_Device = NULL;
 }
 
 //------------------------------------------------------------------------------
 void mafInteractor::SetDevice(mafDevice *device)
 //------------------------------------------------------------------------------
 {
-  if (Device)
-    UnPlugEventSource(Device);
-  Device = device; // avoid cross reference counting
-  if (Device)
-    PlugEventSource(device,mafDevice::DeviceInputChannel);
+  if (m_Device)
+    UnPlugEventSource(m_Device);
+  m_Device = device; // avoid cross reference counting
+  if (m_Device)
+    PlugEventSource(device,MCH_INPUT);
 
-  DeviceIsSet=(device!=NULL);
+  m_DeviceIsSet=(device!=NULL);
 }
 
 //------------------------------------------------------------------------------
-void mafInteractor::SetVME(mflVME *vme)
+void mafInteractor::SetVME(mafVME *vme)
 //------------------------------------------------------------------------------
 {
-  vtkSetObjectBodyMacro(VME,mflVME,vme);
+  m_VME=vme;
 }
 
 //------------------------------------------------------------------------------
 void mafInteractor::SetProp(vtkProp3D *prop)
 //------------------------------------------------------------------------------
 {
-  vtkSetObjectBodyMacro(Prop,vtkProp3D,prop);
+  m_Prop=prop;
 }
 
 //------------------------------------------------------------------------------
 bool mafInteractor::IsInteracting() 
 //------------------------------------------------------------------------------
 {
-  return InteractionFlag!=0;
+  return m_InteractionFlag!=0;
 }
 
 //------------------------------------------------------------------------------
 bool mafInteractor::IsInteracting(mafDevice *device)
 //------------------------------------------------------------------------------
 {
-  return ((InteractionFlag!=0)&&(Device==device));
+  return ((m_InteractionFlag!=0)&&(m_Device==device));
 }
 
 //------------------------------------------------------------------------------
@@ -134,33 +120,33 @@ int mafInteractor::StartInteraction(mafDevice *device)
   if (!IsInteracting())
   {
     // if device already in use return
-    if (device&&LockDevice&&device->IsLocked())
+    if (device&&m_LockDevice&&device->IsLocked())
       return false;
 
     // if device != from device set from outside
-    if (DeviceIsSet&&device!=Device)
+    if (m_DeviceIsSet&&device!=m_Device)
       return false;
 
-    InteractionFlag=true;// lock the interactor
+    m_InteractionFlag=true;// lock the interactor
 
     // Set the device being interacting
     if (device)         
     { 
-      Device=device;// Beware there could be more then one attached as input, set which is interacting
-      if (LockDevice)
+      m_Device=device;// Beware there could be more then one attached as input, set which is interacting
+      if (m_LockDevice)
         device->Lock();
     }
                        
-    ButtonsCounter=1;
+    m_ButtonsCounter=1;
 
     return true;
   }
-  else if (ButtonMode==MULTI_BUTTON_MODE)
+  else if (m_ButtonMode==MULTI_BUTTON_MODE)
   {
     // interaction already started! return true to allow multi-button interaction
     if (IsInteracting(device))
     {
-      ButtonsCounter++;
+      m_ButtonsCounter++;
       return true;
     }
   }
@@ -176,36 +162,36 @@ int mafInteractor::StopInteraction(mafDevice *device)
   // its the right device which is sending the event
   if (IsInteracting(device))
   {
-    ButtonsCounter--;
+    m_ButtonsCounter--;
 
     // if no more active button pressed, stop the interaction
-    if (ButtonsCounter==0)
+    if (m_ButtonsCounter==0)
     {
-      InteractionFlag=false;
+      m_InteractionFlag=false;
 
       if (device)
       {
-        if (LockDevice)
+        if (m_LockDevice)
           device->Unlock();
 
-        if (!DeviceIsSet) // if device set from outside, do not reset
-          Device=NULL;
+        if (!m_DeviceIsSet) // if device set from outside, do not reset
+          m_Device=NULL;
       }
-      CurrentButton=-1;
-      CurrentModifier=0;
+      m_CurrentButton=-1;
+      m_CurrentModifier=0;
     }
     
     return true;
   }
   else
   {
-    vtkGenericWarningMacro("StopInteraction without a StartInteraction or stopped by wrong device.");
+    mafWarningMacro("StopInteraction without a StartInteraction or stopped by wrong device.");
   }
   return false;
 }
 
 //------------------------------------------------------------------------------
-int mafInteractor::OnStartInteraction(mflEventInteraction *e)
+int mafInteractor::OnStartInteraction(mafEventInteraction *e)
 //------------------------------------------------------------------------------
 {
   mafDevice *device=mafDevice::SafeDownCast((mafDevice *)e->GetSender());
@@ -218,7 +204,7 @@ int mafInteractor::OnStartInteraction(mflEventInteraction *e)
   return true;  
 }
 //------------------------------------------------------------------------------
-int mafInteractor::OnStopInteraction(mflEventInteraction *e)
+int mafInteractor::OnStopInteraction(mafEventInteraction *e)
 //------------------------------------------------------------------------------
 {
   mafDevice *device=mafDevice::SafeDownCast((mafDevice *)e->GetSender());
@@ -232,63 +218,64 @@ int mafInteractor::OnStopInteraction(mflEventInteraction *e)
 }
 
 //------------------------------------------------------------------------------
-void mafInteractor::OnButtonDown(mflEventInteraction *e)
+void mafInteractor::OnButtonDown(mafEventInteraction *e)
 //------------------------------------------------------------------------------
 { 
-  mflSmartPointer<mflEventInteraction> event;
-  event->DeepCopy(e);
-  e->SetID(ButtonDownEvent);
+  mafEventBase *event=e->NewInstance();
+  e->DeepCopy(e);
+  e->SetId(BUTTON_DOWN);
   e->SetSender(this);
+  e->SetChannel(MCH_UP);
   ForwardEvent(e);
 }
 //------------------------------------------------------------------------------
-void mafInteractor::OnButtonUp(mflEventInteraction *e)
+void mafInteractor::OnButtonUp(mafEventInteraction *e)
 //------------------------------------------------------------------------------
 {
-  mflSmartPointer<mflEventInteraction> event;
-  event->DeepCopy(e);
-  e->SetID(ButtonUpEvent);
+  mafEventBase *event=e->NewInstance();
+  e->DeepCopy(e);
+  e->SetId(BUTTON_UP);
   e->SetSender(this);
-  
+  e->SetChannel(MCH_UP);
   ForwardEvent(e);
 }
 //------------------------------------------------------------------------------
-void mafInteractor::ProcessEvent(mflEvent *event,mafID ch)
+void mafInteractor::OnEvent(mafEventBase *event)
 //------------------------------------------------------------------------------
 {
   assert(event);
   
-  mafID id=event->GetID();
-
-  if (ch==mafDevice::DeviceInputChannel)
+  mafID id=event->GetId();
+  mafID ch=event->GetChannel();
+  if (ch==MCH_INPUT)
   {
     // Start the interaction if not disabled
-    if (id==StartInteractionEvent && !IgnoreTriggerEvents)
+    if (id==m_StartInteractionEvent && !m_IgnoreTriggerEvents)
     {
-      mflEventInteraction *e=mflEventInteraction::SafeDownCast(event);
+      mafEventInteraction *e=mafEventInteraction::SafeDownCast(event);
       assert(e);
 
       // check if the right button has been pressed
-      if ((e->GetButton()==StartButton || (StartButton<0)) && ((e->GetModifiers()&Modifiers) == Modifiers ))
+      if ((e->GetButton()==m_StartButton || (m_StartButton<0)) && ((e->GetModifiers()&m_Modifiers) == m_Modifiers ))
       {
         // the start button has been already pressed once
         if (IsInteracting((mafDevice *)e->GetSender()))
         {
-          if (ButtonMode==MULTI_BUTTON_MODE && ButtonsCounter > 0)
+          if (m_ButtonMode==MULTI_BUTTON_MODE && m_ButtonsCounter > 0)
           {
             OnStartInteraction(e);
           }
           return;
         }
 
-        CurrentButton   = e->GetButton();
-        CurrentModifier = e->GetModifiers();
+        m_CurrentButton   = e->GetButton();
+        m_CurrentModifier = e->GetModifiers();
         if (OnStartInteraction(e))
         {
-          if (IsInteracting()) ForwardEvent(InteractionStartedEvent);
+          if (IsInteracting()) ForwardEvent(INTERACTION_STARTED);
         }
       }
-      else if (ButtonMode==MULTI_BUTTON_MODE && ButtonsCounter > 0)
+      else if (m_ButtonMode==MULTI_BUTTON_MODE && m_ButtonsCounter > 0)
       {
         // in case of MULTI BUTTON and the start button has already started 
         // the interaction we call anyway the OnStartInteraction function
@@ -297,30 +284,29 @@ void mafInteractor::ProcessEvent(mflEvent *event,mafID ch)
     }
     
     // Stop the interaction if not disabled
-    else if (id==StopInteractionEvent && !IgnoreTriggerEvents)
+    else if (id==m_StopInteractionEvent && !m_IgnoreTriggerEvents)
     {
-      mflEventInteraction *e=mflEventInteraction::SafeDownCast(event);
+      mafEventInteraction *e=mafEventInteraction::SafeDownCast(event);
       assert(e);
 
       // check if the right button has been released
-      if (e->GetButton()==StartButton || (StartButton<0))
+      if (e->GetButton()==m_StartButton || (m_StartButton<0))
       {
         if (OnStopInteraction(e))
-          if (!IsInteracting()) ForwardEvent(InteractionStoppedEvent);
+          if (!IsInteracting()) ForwardEvent(INTERACTION_STOPPED);
       }
-      else if (ButtonMode==MULTI_BUTTON_MODE && ButtonsCounter > 0)
+      else if (m_ButtonMode==MULTI_BUTTON_MODE && m_ButtonsCounter > 0)
       {
         // in case of MULTI BUTTON and the start button has already started 
         // the interaction we call anyway the OnStopInteraction function
         if (OnStopInteraction(e))
-          if (!IsInteracting()) ForwardEvent(InteractionStoppedEvent);
+          if (!IsInteracting()) ForwardEvent(INTERACTION_STOPPED);
       }
-
     }
   }
   else
   {
-    Superclass::ProcessEvent(event,ch);
+    Superclass::OnEvent(event);
   }
 }
 
@@ -328,31 +314,12 @@ void mafInteractor::ProcessEvent(mflEvent *event,mafID ch)
 void mafInteractor::ComputeDisplayToWorld(double x, double y, double z, double worldPt[4])
 //----------------------------------------------------------------------------
 {
-  if ( !Renderer ) 
+  if ( !m_Renderer ) 
     return;
   
-  Renderer->SetDisplayPoint(x, y, z);
-  Renderer->DisplayToWorld();
-  Renderer->GetWorldPoint(worldPt);
-  if (worldPt[3])
-  {
-    worldPt[0] /= worldPt[3];
-    worldPt[1] /= worldPt[3];
-    worldPt[2] /= worldPt[3];
-    worldPt[3] = 1.0;
-  }
-}
-
-//----------------------------------------------------------------------------
-void mafInteractor::ComputeDisplayToWorld(double x, double y, double z, float worldPt[4])
-//----------------------------------------------------------------------------
-{
-  if ( !Renderer ) 
-    return;
-  
-  Renderer->SetDisplayPoint(x, y, z);
-  Renderer->DisplayToWorld();
-  Renderer->GetWorldPoint(worldPt);
+  m_Renderer->SetDisplayPoint(x, y, z);
+  m_Renderer->DisplayToWorld();
+  m_Renderer->GetWorldPoint(worldPt);
   if (worldPt[3])
   {
     worldPt[0] /= worldPt[3];
@@ -366,43 +333,28 @@ void mafInteractor::ComputeDisplayToWorld(double x, double y, double z, float wo
 void mafInteractor::ComputeWorldToDisplay(double x, double y, double z, double displayPt[3])
 //----------------------------------------------------------------------------
 {
-  if ( !Renderer ) 
+  if ( !m_Renderer ) 
     return;
   
-  Renderer->SetWorldPoint(x, y, z, 1.0);
-  Renderer->WorldToDisplay();
-  Renderer->GetDisplayPoint(displayPt);
-}
-
-// Description:
-// transform from world to display coordinates.
-// displayPt has to be allocated as 3 vector
-//----------------------------------------------------------------------------
-void mafInteractor::ComputeWorldToDisplay(double x, double y, double z, float displayPt[3])
-//----------------------------------------------------------------------------
-{
-  if ( !Renderer ) 
-    return;
-  
-  Renderer->SetWorldPoint(x, y, z, 1.0);
-  Renderer->WorldToDisplay();
-  Renderer->GetDisplayPoint(displayPt);
+  m_Renderer->SetWorldPoint(x, y, z, 1.0);
+  m_Renderer->WorldToDisplay();
+  m_Renderer->GetDisplayPoint(displayPt);
 }
 
 //----------------------------------------------------------------------------
-bool mafInteractor::FindPokedVme(mafDevice *device,mflMatrix *point_pose,vtkProp3D *&picked_prop,mflVME *&picked_vme,mafInteractor *&picked_behavior)
+bool mafInteractor::FindPokedVme(mafDevice *device,mafMatrix *point_pose,vtkProp3D *&picked_prop,mafVME *&picked_vme,mafInteractor *&picked_behavior)
 //----------------------------------------------------------------------------
 {
   bool                foundVme = false;
-  mflVME              *vme = NULL;
-  mflAssembly         *as = NULL;
+  mafVME              *vme = NULL;
+  vtkMAFAssembly         *as = NULL;
   vtkAssemblyPath     *ap = NULL;
   mafInteractor       *bh = NULL;
 
   if (mmdTracker *tracker=mmdTracker::SafeDownCast(device))
   { // is it a tracker?
     
-    mflMatrix *tracker_pose = point_pose;
+    mafMatrix *tracker_pose = point_pose;
 
     // extract device avatar's renderer, no avatar == no picking
     mafAvatar *avatar = tracker->GetAvatar();
@@ -415,7 +367,7 @@ bool mafInteractor::FindPokedVme(mafDevice *device,mflMatrix *point_pose,vtkProp
         //avatar->ShowPickLine();
         //avatar->Hide();
 
-        // find picked VME
+        // find picked m_VME
         vtkAbstractPropPicker *picker = avatar->GetPicker();        
         ap = picker->GetPath(); // extract the assembly path
       }
@@ -441,16 +393,15 @@ bool mafInteractor::FindPokedVme(mafDevice *device,mflMatrix *point_pose,vtkProp
       if (an)
       {
         vtkProp *p = an->GetProp();
-        if(p && p->IsA("mflAssembly"))
+        if(p && p->IsA("vtkMAFAssembly"))
         {
-          as  = (mflAssembly*)p;
-          vme  = as->GetVme();
+          as  = (vtkMAFAssembly*)p;
+          vme  = mafVME::SafeDownCast(as->GetVme());
           foundVme = true;
 
-          if(vme && vme->GetClientData() )
+          if(vme )
           {
-            mafVmeData *vd = (mafVmeData*) vme->GetClientData();
-            bh = vd->m_behavior; //can be NULL
+            bh = vme->GetBehavior();
           }
           break;
         }
@@ -472,24 +423,4 @@ bool mafInteractor::FindPokedVme(mafDevice *device,mflMatrix *point_pose,vtkProp
   }
 
   return foundVme;
-}
-
-//------------------------------------------------------------------------------
-void mafInteractor::ForwardEvent(int id, mafID channel,vtkObjectBase *data)
-//------------------------------------------------------------------------------
-{
-  ForwardEvent(mflSmartEvent(id,this,data),channel);
-}
-
-//------------------------------------------------------------------------------
-void mafInteractor::ForwardEvent(mflEvent *event, mafID channel)
-//------------------------------------------------------------------------------
-{
-  Superclass::ForwardEvent(event,channel);
-
-  if (channel==mflAgent::DefaultChannel)
-  {    
-    // send event through m_listenter too...
-    mafEventMacro(mafEvent(this,MFL_EVENT_ID,event));
-  }
 }

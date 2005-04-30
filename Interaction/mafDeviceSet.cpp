@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceSet.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 16:10:17 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-04-30 14:34:52 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -134,17 +134,25 @@ int mafDeviceSet::InternalRestore(mafStorageElement *node)
     mafStorageElement *device_node=devices[i];  
     if (mafCString(device_node->GetName())=="Device")
     {
-      if (mafDevice *device=(mafDevice *)device_node->RestoreObject())
+      if (mafObject *obj=device_node->RestoreObject())
       {
-        // Must set the device ID before adding to the device tree
-        // since device tree identifies device by ID 
-        AddDevice(device);
-      } 
+        if (mafDevice *device=mafDevice::SafeDownCast(obj)) // check the restored object is really a mafDevice
+        {
+          AddDevice(device);
+        } 
+        else
+        {
+          mafErrorMacro("Wrong object type, expect \"mafDevice\" found \""<<obj->GetTypeName()<<"\".");
+          fail=MAF_ERROR;
+          obj->Delete(); // release memory
+        }
+      }
       else
       {
-        mafErrorMacro("Unknown Device type or I/O parse error");
+        mafErrorMacro("Unknown Device type, I/O parse error.");
         fail=MAF_ERROR;
       }
+      
     }
   }
 

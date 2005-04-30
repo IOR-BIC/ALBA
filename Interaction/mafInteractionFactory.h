@@ -1,157 +1,132 @@
 /*=========================================================================
-
-  Program:   Visualization Toolkit
+  Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionFactory.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-28 16:10:12 $
-  Version:   $Revision: 1.1 $
-
+  Date:      $Date: 2005-04-30 14:34:53 $
+  Version:   $Revision: 1.2 $
+  Authors:   Marco Petrone
+==========================================================================
+  Copyright (c) 2001/2005 
+  CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-// .NAME mafInteractionFactory - 
-// .SECTION Description
-
 #ifndef __mafInteractionFactory_h
 #define __mafInteractionFactory_h
+//----------------------------------------------------------------------------
+// includes :
+//----------------------------------------------------------------------------
+#include "mafObjectFactory.h"
+#include <set>
 
-#ifdef __GNUG__
-    #pragma interface "mafInteractionFactory.cpp"
-#endif
-
-#ifndef WX_PRECOMP
-    #include "wx/wx.h"
-#endif
-
-#include "mflCoreFactory.h"
-#include "mflDefines.h"
+/** to be used internally for plugging default devices --- calls a member function directly */
+#define mafPlugDeviceMacro(node_type,descr) \
+  RegisterNewDevice(node_type::GetStaticTypeName(), descr, node_type::NewObject);
+  
+/** to be used internally for plugging default avatars --- calls a member function directly */    
+#define mafPlugAvatarMacro(node_type,descr) \
+  RegisterNewAvatar(node_type::GetStaticTypeName(), descr, node_type::NewObject);
 
 //----------------------------------------------------------------------------
 // forward declarations :
-//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------  
 class mafAvatar;
 class mafDevice;
 
-/**
-  This class is an object factory specialized for interaction related objects,
-  in particular APIs are provided for registering and creating instances of 
-  Devices and Avatars. A couple of spiecialized classes are defined to allow
-  easier registration mafPlugDevice and mafPlugAvatar
-*/
-class mafInteractionFactory : public mflCoreFactory
+/** Object factory for Devices and Avatars.
+  To make a new Device or Avatar available in the MAF it must be plugged inside a factory, in particular
+  this factory must be of type mafInteractionFactory to be able to retrieve the list of devices and avatars
+  plugged inside the factory. */
+class MAF_EXPORT mafInteractionFactory : public mafObjectFactory
 {
-public:
-  class PIMPL;
+public: 
+  mafTypeMacro(mafInteractionFactory,mafObjectFactory);
+  virtual const char* GetMAFSourceVersion() const;
+  virtual const char* GetDescription() const;
 
-// Methods from vtkObject
-  vtkTypeMacro(mafInteractionFactory,mflCoreFactory);
-  static mafInteractionFactory *New();
-  void PrintSelf(ostream& os, vtkIndent indent);
-  virtual const char* GetVTKSourceVersion();
-  virtual const char* GetDescription();
+  /* Initialize the factory creating and registering a new instance */
+  static int Initialize();
   
-  /** return pointer to mafInteractionFactory instance */
-  static mafInteractionFactory *GetInstance();
+  /** return the instance pointer of the factory. return NULL if not initialized yet */
+  static mafInteractionFactory *GetInstance() {if (!m_Instance) Initialize(); return m_Instance;}
 
-  /** create a new instance of the specified avatar */
-  static mafAvatar *CreateAvatarInstance(const char *name);
-
-  /** create a new instance of the specified device */
-  static mafDevice *CreateDeviceInstance(const char *name);
-
+  /** create an instance of the node give its type name */
+  static mafDevice *CreateDeviceInstance(const char *type_name);
+   
   /**
-  This function can be used by Application code to register new Devices to the InteractioFactory */
-  mafID RegisterNewDevice(const char* type, const char* name, CreateFunction createFunction);
+    This function can be used by Application code to register new Objects's to the mflCoreFactory */
+  void RegisterNewDevice(const char* node_name, const char* description, mafCreateObjectFunction createFunction);
+
+  /** return list of names for nodes plugged into this factory */
+  const static std::set<std::string> &GetDeviceNames() {return m_DeviceNames;}
+
+  const char *GetDeviceDescription(const char *device_name);
   
+  /** create an instance of the node give its type name */
+  static mafAvatar *CreateAvatarInstance(const char *type_name);
+   
   /**
-  This function can be used by Application code to register new Avatars to the InteractioFactory */
-  mafID RegisterNewAvatar(const char* type, const char* name, CreateFunction createFunction);
-  
-  /**  Return number of devices in the factory */
-  int GetNumberOfDevices();
+    This function can be used by Application code to register new Objects's to the mflCoreFactory */
+  void RegisterNewAvatar(const char* node_name, const char* description, mafCreateObjectFunction createFunction);
 
-  /**  Return number of avatars in the factory */
-  int GetNumberOfAvatars();
+  /** return list of names for nodes plugged into this factory */
+  const static std::set<std::string> &GetAvatarNames() {return m_AvatarNames;}
 
-  /**  Return the name assigned to a device in the list of available devices */
-  const char *GetDeviceName(mafID idx);
-
-  /**  Return the name assigned to a device in the list of available devices */
-  const char *GetDeviceName(const char *type);
-
-  /**  Return the class type of a device in the list of available devices */
-  const char *GetDeviceType(mafID idx);
-
-  /**  Return the name assigned to an avatar in the list of available avatars */
-  const char *GetAvatarName(mafID idx);
-
-  /**  Return the name assigned to an avatar in the list of available avatars */
-  const char *GetAvatarName(const char *type);
-
-  /**  Return the class type of an avatar in the list of available avatars */
-  const char *GetAvatarType(mafID idx);
-
-  /**
-    This is used to register the factory when linking as statically */
-  static void Initialize();
+  const char *GetAvatarDescription(const char *device_name);
 
 protected:
   mafInteractionFactory();
-  ~mafInteractionFactory();
+  ~mafInteractionFactory() { }
 
-  static PIMPL *Internals;
-
-  /**
-  This is used to access the interaction factory instance */
-  static mafInteractionFactory * InteractionFactory;
-
+  static mafInteractionFactory *m_Instance;
+  static std::set<std::string> m_DeviceNames; 
+  static std::set<std::string> m_AvatarNames; 
+  
 private:
   mafInteractionFactory(const mafInteractionFactory&);  // Not implemented.
   void operator=(const mafInteractionFactory&);  // Not implemented.
 };
 
-
-/**
-  this templated class has the only objective to register a class to the interaction factory.
-  Registration occurs by calling the static member function "Plug", and the class type to be registred 
-  is specified as template argument of the class, while a comment can be 
-  provided as argument of the Plug function. Typical usage is mafPlugger<mafDeviceFoo>::Plug("test") */
+/** Plug  a node in the main MAF Avatar factory.*/
 template <class T>
-class mafPlugDevice
+class MAF_EXPORT mafPlugAvatar
 {
-public:
-  mafPlugDevice(const char *name="") { \
-  assert(T::IsTypeOf("mafDevice")); \
-  mafInteractionFactory *iFactory=mafInteractionFactory::GetInstance(); \
-  if (iFactory) \
-    iFactory->RegisterNewDevice(T::GetTypeName(), name, T::NewObjectInstance); \
-  }
+  public:
+  mafPlugAvatar(const char *description);
+  
 };
 
-/** Plug an Avatar */
+//------------------------------------------------------------------------------
+/** Plug a new Avatar class into the Avatar factory.*/
 template <class T>
-class mafPlugAvatar
-{
-  public: \
-  mafPlugAvatar(const char *name) \
-  { \
-    assert(T::IsTypeOf("mafAvatar3D"));
-    mafInteractionFactory *iFactory=mafInteractionFactory::GetInstance(); \
-    if (iFactory) \
-      iFactory->RegisterNewAvatar(T::GetTypeName(), name, T::NewObjectInstance); \
+mafPlugAvatar<T>::mafPlugAvatar(const char *description)
+//------------------------------------------------------------------------------
+{ 
+  mafInteractionFactory *factory=mafInteractionFactory::GetInstance();
+  if (factory)
+  {
+    factory->RegisterNewAvatar(T::GetStaticTypeName(), description, T::NewObject);
   }
+}
+
+/** Plug  a node in the main MAF Device factory.*/
+template <class T>
+class MAF_EXPORT mafPlugDevice
+{
+  public:
+  mafPlugDevice(const char *description);
+  
 };
 
-
-/** Plug generic object. To be moved to CoreFactory */
+//------------------------------------------------------------------------------
+/** Plug a new Device class into the Device factory.*/
 template <class T>
-class mafPlugObject
-{
-  public: \
-  mafPlugObject(const char *name) \
-  { \
-    mafInteractionFactory *iFactory=mafInteractionFactory::GetInstance(); \
-    if (iFactory) \
-      iFactory->RegisterNewObject(T::GetTypeName(), name, T::NewObjectInstance); \
+mafPlugDevice<T>::mafPlugDevice(const char *description)
+//------------------------------------------------------------------------------
+{ 
+  mafInteractionFactory *factory=mafInteractionFactory::GetInstance();
+  if (factory)
+  {
+    factory->RegisterNewDevice(T::GetStaticTypeName(), description, T::NewObject);
   }
-};
+}
 
 #endif

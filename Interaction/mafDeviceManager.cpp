@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 16:10:17 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-30 14:34:52 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -19,6 +19,7 @@
 // local 
 #include "mafDeviceSet.h"
 #include "mmuIdFactory.h"
+#include "mafInteractionFactory.h"
 
 // serialization
 #include "mafStorageElement.h"
@@ -97,7 +98,6 @@ mafID mafDeviceManager::AddDevice(mafDevice *device)
 mafDevice *mafDeviceManager::AddDevice(const char *type, bool persistent)
 //------------------------------------------------------------------------------
 {
-  /*
   mafDevice *device = mafInteractionFactory::CreateDeviceInstance(type);
   
   if (device)
@@ -106,18 +106,17 @@ mafDevice *mafDeviceManager::AddDevice(const char *type, bool persistent)
 
     
     mafInteractionFactory *iFactory = mafInteractionFactory::GetInstance();
-    
-    const char *dev_name=iFactory->GetDeviceName(type);
+    const char *dev_name=iFactory->GetDeviceDescription(type);
     assert(dev_name);
 
-    mafString base_name=dev_name;    
+    mafString base_name=dev_name;
     mafString instance_name = base_name;
 
     for (int id=1;true;id++)
     {
       
       // if no device with the same name exists break!
-      if (DeviceSet->GetDevice(instance_name)==NULL)
+      if (m_DeviceSet->GetDevice(instance_name)==NULL)
         break;
 
       // else append an numeric postfix
@@ -133,7 +132,7 @@ mafDevice *mafDeviceManager::AddDevice(const char *type, bool persistent)
     return ret;
   }
 
-  return device;*/
+  return device;
 }
 
 //------------------------------------------------------------------------------
@@ -188,38 +187,29 @@ int mafDeviceManager::InternalStore(mafStorageElement *node)
 //----------------------------------------------------------------------------
 {
   assert(node);
-  node->SetAttribute()
-  writer->OpenTag("DeviceManager");
-  writer->AddAttribute("DeviceIdCounter",DeviceIdCounter);
-  writer->CloseTag("DeviceManager");
-
-  if (m_DeviceSet->Store(writer))
-    return -1;
+  node->SetAttribute("DeviceIdCounter",m_DeviceIdCounter);
   
-  writer->CloseElement("DeviceManager");
-  return 0;
+  if (node->StoreObject("DeviceSet",m_DeviceSet))
+    return MAF_ERROR;
+
+  return MAF_OK;
 }
 
 //----------------------------------------------------------------------------
 int mafDeviceManager::InternalRestore(mafStorageElement *node)
 //----------------------------------------------------------------------------
 {
-  assert(parent);
+  assert(node);
   m_RestoringFlag=true; // used to avoid DeviceManager set device ID when restoring
-  int fail=-1;
-
-  vtkXMLDataElement *node=parent->FindNestedElementWithName("DeviceManager");
-  if (node)
+  
+  if (!node->GetAttributeAsInteger("DeviceIdCounter",m_DeviceIdCounter))
   {
-    int id_counter;
-    if (node->GetScalarAttribute("DeviceIdCounter",id_counter))
-    {
-      m_DeviceIdCounter=id_counter;
-      vtkXMLDataElement *sub_node=node->FindNestedElementWithName("Device");
-      if (sub_node&&mafString(sub_node->GetAttribute("Type"))=="mafDeviceSet")
-        fail=m_DeviceSet->Restore(sub_node,parser);
-    }
+    assert(true);
+    mafErrorMacro("Cannot find \"DeviceIdCounter\" attribute, possible subsequent restoring problems!");
+    m_DeviceIdCounter = mafDevice::MIN_DEVICE_ID;
   }
+  
+  int fail = node->RestoreObject("DeviceSet",m_DeviceSet);
   
   m_RestoringFlag=false;
 
@@ -233,7 +223,7 @@ bool mafDeviceManager::DispatchEvents()
   if (m_Dispatched)
     return false;
 
-  ForwardEvent(DISPATCH_START); // Advise dispatching is starting 
+  ForwardEvent(DISPATCH_START); // Advise dispatching is started 
   bool ret=Superclass::DispatchEvents();
   ForwardEvent(DISPATCH_END); // Advise dispatching is finished 
 
@@ -246,9 +236,9 @@ void mafDeviceManager::OnEvent(mafEventBase *event)
 {
   assert(event&&event->GetSender());
 
-  int id=event->GetID();
+  int id=event->GetId();
 
-  if (id==DispatchEvent)
+  if (id==EVENT_DISPATCH)
   {
     // Push the event to the queue. The DispatchEvent() of this
     // function will automatically call DispatchEvents() of the
@@ -270,9 +260,8 @@ void mafDeviceManager::OnEvent(mafEventBase *event)
       {
         device->SetID(++m_DeviceIdCounter);
       }
-
     }
-    ForwardEvent(event,event->GetChannel());
+    ForwardEvent(event); // send also to InteractionManager
   }
  
   Superclass::OnEvent(event);

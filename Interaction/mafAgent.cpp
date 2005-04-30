@@ -3,8 +3,8 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: mafAgent.cpp,v $
 Language:  C++
-Date:      $Date: 2005-04-29 16:10:16 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2005-04-30 14:34:51 $
+Version:   $Revision: 1.5 $
 
 =========================================================================*/
 #include "mafAgent.h"
@@ -270,9 +270,19 @@ void mafAgent::ForwardEvent(int id, mafID channel,void *data)
 void mafAgent::ForwardEvent(mafEventBase *event, mafID channel)
 //------------------------------------------------------------------------------
 {
- for (int i=0;i<m_Channels.size();i++)
- {
-   if (m_Channels[i]->GetChannel()==channel || channel == MCH_ANY)
-     m_Channels[i]->InvokeEvent(event); // broadcast event on the right channel
- }
+  if ( channel == -1 )
+    channel=event->GetChannel();
+
+  for (int i=0;i<m_Channels.size();i++)
+  {
+    if (m_Channels[i]->GetChannel()==channel || channel == MCH_ANY)
+      m_Channels[i]->InvokeEvent(event); // broadcast event on the right channel
+  }
+}
+
+//------------------------------------------------------------------------------
+void mafAgent::ForwardEvent(mafEventBase &event, mafID channel)
+//------------------------------------------------------------------------------
+{
+  ForwardEvent(&event,channel);
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAgent.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 16:10:16 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-04-30 14:34:51 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,7 +13,7 @@
 #ifndef __mafAgent_h
 #define __mafAgent_h
 
-#include "mafObject.h"
+#include "mafReferenceCounted.h"
 #include "mafObserver.h"
 #include "mafString.h"
 #include "mafEventBase.h"
@@ -35,10 +35,10 @@ class vtkCallbackCommand;
   This class support also bridging of events coming from VTK: a mafAgent can be set as observer of VTK events
   which are tunneled inside MAF events.
   @sa mafEventBase mafAgent mafAgentEventQueue mafAgentThreaded */
-class MAF_EXPORT mafAgent: public mafObject, public mafObserver//, public mafEventSender
+class MAF_EXPORT mafAgent: public mafReferenceCounted, public mafObserver
 {
 public:
-  mafAbstractTypeMacro(mafAgent,mafObject);
+  mafAbstractTypeMacro(mafAgent,mafReferenceCounted);
   
   //------------------------------------------------------------------------------
   // Events
@@ -137,7 +137,8 @@ protected:
   of MCH_UP the message is passed to the object pointed by the "Listener" member variable, otherwise 
   the event is broad casted by means of the VTK Subject/Observer mechanism on the specified channel,
   i.e. rising an event with ID equal to the channel.*/
-  void ForwardEvent(mafEventBase *event, mafID channel=MCH_UP);
+  void ForwardEvent(mafEventBase &event, mafID channel=-1);
+  void ForwardEvent(mafEventBase *event, mafID channel=-1);
   void ForwardEvent(int id, mafID channel=MCH_UP,void *data=NULL);
 
   mafString       m_Name;

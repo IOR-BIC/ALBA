@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 16:10:17 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-30 14:34:52 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -55,8 +55,9 @@ public:
   virtual mafID AddDevice(mafDevice *device);
 
   /**
-    Add a new device specifying only its class name. If the returned pointer is NULL the
-    operation has failed! "persistent" flag must be used to add persistent devices */
+    Add a new device specifying only its class name.
+    If the returned pointer is NULL the operation has failed! "persistent" flag must be
+    used to add persistent devices */
   virtual mafDevice *AddDevice(const char *type, bool persistent=false);
 
   /** Remove a device from the manager's list. force flag must be used to remove

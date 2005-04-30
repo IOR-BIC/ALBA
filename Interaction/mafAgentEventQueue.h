@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAgentEventQueue.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-27 16:56:03 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-04-30 14:34:52 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -33,13 +33,13 @@ class mafMutexLock;
   can override this virtual method.
   The EventQueue class is also the base class for managing the synchronization. To do this, 
   when the first event is queued (i.e. the queue was previously empty), the mafAgentEventQueue creates
-  a new event with ID "mafAgentEventQueue::DispatchEvent", (it's a request for dispatching) and
+  a new event with ID "mafAgentEventQueue::EVENT_DISPATCH", (it's a request for dispatching) and
   sends it to its Listener (if present). This events should be managed by a dispatched object, usually
   another queue or better a threaded agent (@sa mflThreadedAgent and mafEventHandler).
-  While dispatching events in the queue if a mafAgentEventQueue::DispatchEvent is found it not processed
+  While dispatching events in the queue if a mafAgentEventQueue::EVENT_DISPATCH is found it not processed
   by ProcessEvent neither broadcasted, but DispatchEvents() of the sender is called. This way a manager
   can manage dispatching of events in a separate thread by simpling calling PushEvent() when it finds
-  a mafAgentEventQueue::DispatchEvent during ProcessEvent() (see mafDeviceManager).
+  a mafAgentEventQueue::EVENT_DISPATCH during ProcessEvent() (see mafDeviceManager).
 
   When dispatching events (i.e. when DispatchEvents() is called), if the EventQueue finds
   a request for dispatching in the queue it calls the DispatchEvents() function of the sender
@@ -61,7 +61,7 @@ public:
   //------------------------------------------------------------------------------
   /** @ingroup Events
       This is used by queues to manage synchronization (see class description) */
-  MAF_ID_DEC(DispatchEvent);
+  MAF_ID_DEC(EVENT_DISPATCH);
 
   enum DispatchModalities {
     SelfProcessMode = 0,
@@ -123,9 +123,9 @@ public:
   void SetDispatchModeToBroadcast() {SetDispatchMode(BroadcastMode);}
 
   /**
-  Set the Push modality. If in DispatchEvent mode, the first time a new event is pushed
-  in the queue, a DispatchEvent is sent to the Listener. If in polling mode no event is sent
-  and events can be dispatched by explicitly calling the DispatchEvent function.*/
+  Set the Push modality. If in EVENT_DISPATCH mode, the first time a new event is pushed
+  in the queue, a EVENT_DISPATCH is sent to the Listener. If in polling mode no event is sent
+  and events can be dispatched by explicitly calling the EVENT_DISPATCH function.*/
   void SetPushMode(int mode) {m_PushMode=mode;}
   int GetPushMode() {return m_PushMode;}
   void SetPushModeToDispatchEvent() {m_PushMode=DispatchEventMode;}

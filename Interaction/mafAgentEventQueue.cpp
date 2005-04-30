@@ -3,8 +3,8 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: mafAgentEventQueue.cpp,v $
 Language:  C++
-Date:      $Date: 2005-04-29 06:06:34 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2005-04-30 14:34:52 $
+Version:   $Revision: 1.4 $
 
 =========================================================================*/
 #include "mafAgentEventQueue.h"
@@ -35,7 +35,7 @@ struct mafAgentEventQueue::InternalEventQueue
 //------------------------------------------------------------------------------
 // Events
 //------------------------------------------------------------------------------
-MAF_ID_IMP(mafAgentEventQueue::DispatchEvent);
+MAF_ID_IMP(mafAgentEventQueue::EVENT_DISPATCH);
 
 //------------------------------------------------------------------------------
 mafCxxTypeMacro(mafAgentEventQueue);
@@ -94,7 +94,7 @@ bool mafAgentEventQueue::DispatchEvents()
       channel=event->GetChannel();
       if (event)
       {
-        if (event->GetId()==mafAgentEventQueue::DispatchEvent)
+        if (event->GetId()==EVENT_DISPATCH)
         {
           mafAgentEventQueue *sender=(mafAgentEventQueue *)event->GetSender();
           sender->DispatchEvents();
@@ -136,7 +136,7 @@ bool mafAgentEventQueue::DispatchEvents()
     if (this->PopEvent(event))
     {
       channel=event->GetChannel();
-      if (event->GetId()==mafAgentEventQueue::DispatchEvent)
+      if (event->GetId()==EVENT_DISPATCH)
       {
         mafAgentEventQueue *sender=(mafAgentEventQueue *)event->GetSender();
         sender->DispatchEvents();
@@ -209,7 +209,7 @@ int mafAgentEventQueue::PushEvent(mafEventBase *event)
 void mafAgentEventQueue::RequestForDispatching()
 //------------------------------------------------------------------------------
 {
-  ForwardEvent(mafAgentEventQueue::DispatchEvent,MCH_UP);
+  ForwardEvent(EVENT_DISPATCH,MCH_UP);
 }
 
 //------------------------------------------------------------------------------
