@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorable.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:02:28 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-30 14:39:35 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -61,12 +61,12 @@ public:
 protected:
   /**
     This is called by Store() and must be reimplemented by subclasses. 
-    The parent element being stored is passed as argument. */
-  virtual int InternalStore(mafStorageElement *parent)=0;
+    The node element where the object should store itself is passed as argument. */
+  virtual int InternalStore(mafStorageElement *node)=0;
 
   /** 
     This is called by Restore() and must be reimplemented by subclasses 
-    The element to be restored is passed as argument*/
+    The element from which the object should restore itself is passed as argument*/
   virtual int InternalRestore(mafStorageElement *node)=0;
 
   bool m_Storable; ///< if this flag is set to false the object does not store itself
