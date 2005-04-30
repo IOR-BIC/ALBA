@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeFactory.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 10:28:31 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-04-30 14:59:19 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -51,7 +51,7 @@ public:
   void RegisterNewPipe(const char* pipe_name, const char* description, mafCreateObjectFunction createFunction);
 
   /** return list of names for pipes plugged into this factory */
-  const static std::vector<std::string> GetPipeNames() {return m_PipeNames;}
+  const static std::vector<std::string> &GetPipeNames() {return m_PipeNames;}
 
 protected:
   mafPipeFactory();
