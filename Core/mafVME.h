@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 20:01:07 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2005-04-30 14:36:50 $
+  Version:   $Revision: 1.18 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,10 +21,10 @@
 //----------------------------------------------------------------------------
 class mafMatrix;
 class mafTransform;
+class mafInteractor;
 
 class mafDataPipe;
 class mafMatrixPipe;
-
 class mafAbsMatrixPipe;
 
 /** mafVME - a tree node implementation with an output with a pose matrix and a VTK dataset.
@@ -194,6 +194,15 @@ public:
 
   /** Return the suggested pipe-typename for the visualization of this vme */
   virtual mafString GetVisualPipe() {return mafString("");};
+
+  /** 
+    return the interactor assigned as a behavior to this VME. This is the 
+    interactor to which events coming from input devices are sent when 
+    user pick this VME. Responsible of this routing is the PER (@sa mmiPER) */
+  mafInteractor *GetBehavior() {return m_Behavior;}
+
+  /** set the interactor representing the behavior of this VME. @sa GetBehavior() */
+  void SetBehavior(mafInteractor *bh) {m_Behavior=bh;};
   
 protected:
   mafVME(); // to be allocated with New()
@@ -229,9 +238,11 @@ protected:
   mafAutoPointer<mafMatrixPipe>     m_MatrixPipe;
   mafAutoPointer<mafAbsMatrixPipe>  m_AbsMatrixPipe;
 
-  mafVMEOutput  *m_Output;      ///< the data structure storing the output of this VME
-  mafTimeStamp  m_CurrentTime;  ///< the time parameter for generation of the output
-  int           m_Crypting;     ///< enable flag for this VME
+  mafVMEOutput*   m_Output;       ///< the data structure storing the output of this VME
+  mafTimeStamp    m_CurrentTime;  ///< the time parameter for generation of the output
+  int             m_Crypting;     ///< enable flag for this VME
+  
+  mafInteractor*  m_Behavior;     ///< the interactor representing the behavior of this VME
   
 private:
   mafVME(const mafVME&); // Not implemented
