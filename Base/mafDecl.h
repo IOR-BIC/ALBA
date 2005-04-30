@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-28 15:58:38 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-04-30 14:36:23 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -311,6 +311,9 @@ NODE_START,
   VME_OUTPUT_DATA_CHANGED,///< issued when the output data object has changed (i.e. object pointer changed)
   VME_GET_NEWITEM_ID,     ///< issued by VMEItems or DataVector to retrieve a new item-ID (served by mafVMERoot)
 NODE_END,
+
+AVATAR_ADDED,     ///< used to advise the InteractionManager an avatar has been added (issued by mmdTracker's)
+AVATAR_REMOVED,   ///< used to advise the InteractionManager an avatar has been removed (issued by mmdTracker's)
 
 MATRIX_UPDATED, ///< issue by a matrix pipe to advise consumers of output matrix updating
 
