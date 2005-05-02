@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 06:04:55 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-05-02 10:32:09 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -467,23 +467,28 @@ void mafLogicWithManagers::VmeAdd(mafNode *vme)
 void mafLogicWithManagers::VmeAdded(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-  if(m_ViewManager) m_ViewManager->VmeAdd(vme);
-	if(m_SideBar)    m_SideBar->VmeAdd(vme);
+  if(m_ViewManager)
+    m_ViewManager->VmeAdd(vme);
+	if(m_SideBar)
+    m_SideBar->VmeAdd(vme);
   UpdateTimeBounds();
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeRemove(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-  if(m_VMEManager) m_VMEManager->VmeRemove(vme);
+  if(m_VMEManager)
+    m_VMEManager->VmeRemove(vme);
 	UpdateTimeBounds();
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeRemoving(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-	if(m_SideBar) m_SideBar->VmeRemove(vme);
-	if(m_ViewManager) m_ViewManager->VmeRemove(vme);
+	if(m_SideBar)
+    m_SideBar->VmeRemove(vme);
+	if(m_ViewManager)
+    m_ViewManager->VmeRemove(vme);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OpRunStarting()

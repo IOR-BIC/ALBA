@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGuiHolder.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 20:02:09 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-05-02 10:32:33 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -74,7 +74,8 @@ bool mmgGuiHolder::Put(mmgGui* gui)
 bool mmgGuiHolder::Remove(mmgGui* gui)
 //----------------------------------------------------------------------------
 {
-	if(m_currgui == NULL) return false;  //nothing to remove
+	if(m_currgui == NULL) 
+    return false;  //nothing to remove
 
   //SIL. 22-4-2005: hack -- vme_show(false) kills a pipe, the pipe kills its gui, and we have an invalid pointer
   //checking the parent allow to be more robust
@@ -84,14 +85,16 @@ bool mmgGuiHolder::Remove(mmgGui* gui)
     return false;
   }
 
-  if(gui==NULL ) gui = m_currgui; // if NULL was passed we remove the current gui
+  if(gui==NULL )
+    gui = m_currgui; // if NULL was passed we remove the current gui
 
-  if(gui != m_currgui) return false;  // if a non-NULL-Gui was specified  and is different from the current we do nothing
+  if(gui != m_currgui) 
+    return false;  // if a non-NULL-Gui was specified  and is different from the current we do nothing
 
 	m_panel->Remove(m_currgui);
 	m_currgui->Reparent(mafGetFrame());
   m_currgui->Show(false);
-	m_panel->Layout();    
+	m_panel->Layout();
 	m_currgui = NULL;
 	return true;
 }
