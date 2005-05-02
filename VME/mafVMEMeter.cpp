@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-27 16:27:49 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-02 08:05:32 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -49,6 +49,10 @@ mafCxxTypeMacro(mafVMEMeter)
 mafVMEMeter::mafVMEMeter()
 //-------------------------------------------------------------------------
 {
+  m_StartVmeName  = "";
+  m_EndVme1Name   = "";
+  m_EndVme2Name   = "";
+  
   m_MeterAttributes = NULL;
 
   mafNEW(m_Transform);
@@ -662,13 +666,20 @@ double mafVMEMeter::GetAngle()
 mmgGui* mafVMEMeter::CreateGui()
 //-------------------------------------------------------------------------
 {
-  assert(m_Gui == NULL);
-  m_Gui = new mmgGui(NULL); // replace NULL with 'this' ....  //SIL. 22-4-2005: 
+  //assert(m_Gui == NULL);
+  //m_Gui = new mmgGui(NULL); // commented because mafNode::CreateGui() is called!
 
-  wxString type = GetTypeName(); 
-  m_Gui->Label("type :", type);
-  wxString name = GetName();
-  m_Gui->Label("name :", name);
+  m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
+  m_Gui->Divider();
+  mafVME *start_vme = mafVME::SafeDownCast(GetLink("StartVME"));
+  m_StartVmeName = start_vme ? start_vme->GetName() : "";
+  m_Gui->Label("Start: ", wxString(m_StartVmeName));
+  mafVME *end_vme1   = mafVME::SafeDownCast(GetLink("EndVME1"));
+  m_EndVme1Name = end_vme1 ? end_vme1->GetName() : "";
+  m_Gui->Label("End1: ", wxString(m_EndVme1Name));
+  mafVME *end_vme2   = mafVME::SafeDownCast(GetLink("EndVME2"));
+  m_EndVme2Name = end_vme2 ? end_vme2->GetName() : "";
+  m_Gui->Label("End2: ", wxString(m_EndVme2Name));
 
   return m_Gui;
 }

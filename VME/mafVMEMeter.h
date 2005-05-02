@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-27 16:27:49 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-02 08:05:32 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -49,6 +49,11 @@ public:
     RELATIVE_MEASURE
   };
   mafTypeMacro(mafVMEMeter,mafVME);
+
+  enum {
+    ID_MIO = Superclass::ID_LAST,
+    ID_LAST
+  };
 
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0);
@@ -214,6 +219,10 @@ protected:
   vtkLineSource     *m_LineSource2;
   vtkAppendPolyData *m_Goniometer;
   mafTransform      *m_TmpTransform;
+
+  mafString m_StartVmeName;
+  mafString m_EndVme1Name;
+  mafString m_EndVme2Name;
 
 private:
   mafVMEMeter(const mafVMEMeter&); // Not implemented
