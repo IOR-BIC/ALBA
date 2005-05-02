@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-25 18:28:21 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-02 07:52:04 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden, Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -52,8 +52,6 @@ public:
   mafEvent(void *sender, int id, mafView         *view,   wxWindow *win=NULL);
   mafEvent(void *sender, int id, mafOp					 *op,     long arg=0);
 
-	void*            GetSender()  {return m_sender;}
-  int              GetId()      {return m_id;};
   long             GetArg()     {return m_arg;};
   bool             GetBool()    {return m_bool;};
   float            GetFloat()   {return m_float;};
@@ -62,8 +60,6 @@ public:
   mafNode*         GetVme()     {return m_vme;};
   mafOp*					 GetOp()      {return m_op;};
 
-  void SetSender(void* sender)  { m_sender = sender;};
-  void SetId(int id)            { m_id = id;};
   void SetArg(long arg)         { m_arg = arg;};
   void SetBool(bool b)          { m_bool = b;};
   void SetFloat(float f)        { m_float = f;};
@@ -73,8 +69,6 @@ public:
   void SetOp(mafOp* op)         { m_op = op;};
 
 protected:
-  void            *m_sender;         
-  int              m_id;       
   long             m_arg;        
   bool             m_bool;        
   float            m_float;        
@@ -170,9 +164,7 @@ public:
   virtual void OnEvent(mafEventBase *e)  \
   {                                      \
     if(e->IsMAFType(mafEvent))              \
-        OnEvent( *((mafEvent*)e) );      \
-    else                                 \
-        assert(false);                   \
+        OnEvent( *((mafEvent*)e) );
   };
 };
 

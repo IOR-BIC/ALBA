@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 11:08:46 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-02 07:52:04 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone, Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -71,8 +71,8 @@ void mafEvent::Log()
 //----------------------------------------------------------------------------
 {
   mafString s = "[EV]";
-               s << " sender= "<< (long)m_sender;
-               s << " ID= "    << mafIdString(m_id).c_str();
+               s << " sender= "<< (long)m_Sender;
+               s << " ID= "    << mafIdString(m_Id).c_str();
   if(m_arg)    s << " arg= "   << m_arg;
   if(m_bool)   s << " bool= "  << (int)m_bool;
   if(m_float)  s << " float= " << m_float;
@@ -98,7 +98,7 @@ void mafEvent::Log()
 mafEvent* mafEvent::Copy() 
 //----------------------------------------------------------------------------
 {
-  mafEvent *e	= new mafEvent(m_sender,m_id,m_bool,m_arg);
+  mafEvent *e	= new mafEvent(m_Sender,m_Id,m_bool,m_arg);
   e->m_float		= m_float;
   e->m_string		= m_string;
   e->m_view		  = m_view;
@@ -122,8 +122,8 @@ mafEvent* mafEvent::Copy()
 void mafEvent::Init(void *sender, int id, long arg) 
 //----------------------------------------------------------------------------
 {
-  m_sender = sender;
-  m_id     = id; 
+  m_Sender = sender;
+  m_Id     = id; 
   m_arg    = arg;
   m_bool   = false; 
   m_float  = 0; 
