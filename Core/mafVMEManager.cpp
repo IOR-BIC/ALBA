@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-02 08:48:40 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-05-02 10:31:46 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -397,7 +397,8 @@ void mafVMEManager::VmeAdd(mafNode *v)
 
     //Marco: no more sent: it is the tree which sends the event (see OnEvent())
     //NotifyAdd(v); 
-    //m_Modified = true;
+
+    m_Modified = true;
   }
 }
 //----------------------------------------------------------------------------
@@ -410,8 +411,9 @@ void mafVMEManager::VmeRemove(mafNode *v)
 
     //Marco: no more sent: it is the tree which sends the event (see OnEvent())
     //NotifyRemove(v);
-    //v->ReparentTo(NULL); // may kill the vme
-    //m_Modified = true;
+
+    v->ReparentTo(NULL); // kill the vme
+    m_Modified = true;
   }
 }
 //----------------------------------------------------------------------------
