@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 06:05:56 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-05-02 07:51:25 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -79,7 +79,7 @@ BEGIN_EVENT_TABLE(mmgGui,mmgPanel)
 END_EVENT_TABLE()
 
 //----------------------------------------------------------------------------
-mmgGui::mmgGui(mafEventListener *listener) :
+mmgGui::mmgGui(mafObserver *listener) :
 mmgPanel(mafGetFrame(),-1,dp,wxDefaultSize,wxNO_BORDER | wxCLIP_CHILDREN | wxTAB_TRAVERSAL)
 //----------------------------------------------------------------------------
 {

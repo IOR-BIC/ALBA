@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 06:05:55 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-05-02 07:51:25 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2005
@@ -18,6 +18,7 @@
 #include "mafDecl.h"
 #include "mmgPanel.h"
 #include "mafEvent.h"
+
 //----------------------------------------------------------------------------
 // class forward :
 //----------------------------------------------------------------------------
@@ -71,7 +72,7 @@ two member functions : GetModuleID and GetId. GetId increments an internal ID_co
 class mmgGui: public mmgPanel, public mafEventListener
 {
 public:
-           mmgGui(mafEventListener *listener);
+           mmgGui(mafObserver *listener);
   virtual ~mmgGui();
     
   /** Set the Listener that will receive event-notification, the Listener can be changed any time  */
@@ -234,12 +235,12 @@ public:
   void Reparent(wxWindow *parent);
 
 protected:
-  mafEventListener  *m_Listener;     
-  wxBoxSizer        *m_sizer;
+  mafObserver  *m_Listener;     
+  wxBoxSizer   *m_sizer;
 
-  wxColour          m_bc;
-  bool              m_use_bc;
-  long              m_entry_style;
+  wxColour      m_bc;
+  bool          m_use_bc;
+  long          m_entry_style;
 
   /**  \par implementation details:
   m_bold is the font used for the Bold labels
