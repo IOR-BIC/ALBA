@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 06:04:17 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2005-05-02 08:04:44 $
+  Version:   $Revision: 1.28 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,6 +25,7 @@
 #include "mafNodeIterator.h"
 #include "mafRoot.h"
 #include "mafEventIO.h"
+#include "mafEvent.h"
 #include "mafEventSource.h"
 #include "mafDecl.h"
 #include "mafIndent.h"
@@ -859,14 +860,20 @@ void mafNode::OnEvent(mafEventBase *e)
   {
     switch (e->GetId())
     {
-    case NODE_GET_ROOT:
-    {
-      mafEventIO *event=mafEventIO::SafeDownCast(e);
-      event->SetRoot(GetRoot());
-    }
-    break;
-    default:
-      ForwardUpEvent(e);
+      case NODE_GET_ROOT:
+      {
+        mafEventIO *event=mafEventIO::SafeDownCast(e);
+        event->SetRoot(GetRoot());
+      }
+      break;
+      case ID_NAME:
+      {
+        mafEvent ev(this,VME_MODIFIED,this);
+        ForwardUpEvent(ev);
+      }
+      break;
+      default:
+        ForwardUpEvent(e);
     };
     return;
   }
@@ -1083,9 +1090,9 @@ mmgGui* mafNode::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(NULL); // replace NULL with 'this' ....  //SIL. 22-4-2005: 
+  m_Gui = new mmgGui(this); // replace NULL with 'this' ....  //SIL. 22-4-2005:
   
-  m_Gui->Label("type :", GetTypeName());
+  m_Gui->Label("type :", wxString(GetTypeName()));
   m_Gui->String(ID_NAME,"name :", &m_Name);
 
   return m_Gui;
