@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGuiHolder.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:23 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-02 11:35:21 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,12 +35,12 @@ public:
   bool Put(mmgGui *gui);
 
 	/** Remove the current gui. */
-  bool Remove(mmgGui *gui = NULL);
+  bool RemoveCurrentGui();
 
 protected:
-  mmgGui           *m_currgui;
+  wxWindow *GetCurrentGui();
   mmgScrolledPanel *m_panel;
-  //wxScrolledWindow *m_panel;
+  
 DECLARE_EVENT_TABLE()
 };
 #endif

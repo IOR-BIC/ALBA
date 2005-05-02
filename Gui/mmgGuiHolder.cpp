@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGuiHolder.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-02 10:32:33 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-05-02 11:35:20 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,9 +19,10 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-
 #include "mmgGuiHolder.h"
+#include <wx/list.h>
 //@@@ #include "mmgCheckListBox.h"  //SIL. 29-3-2005: 
+
 //----------------------------------------------------------------------------
 // mmgGuiHolder
 //----------------------------------------------------------------------------
@@ -35,14 +36,9 @@ mmgGuiHolder::mmgGuiHolder(wxWindow* parent,wxWindowID id,bool CloseButton,bool 
 //----------------------------------------------------------------------------
 {
   SetTitle(" module controls area:");
-  //m_panel = new wxScrolledWindow(this,-1);
   m_panel = new mmgScrolledPanel(this,-1);
-  //m_panel->SetBackgroundColour(wxColour(251,251,253)); //SIL. 31-3-2005: 
-  //m_panel->SetBackgroundColour(wxColour(255,0,0)); //SIL. 31-3-2005: 
 
   Add(m_panel,1,wxEXPAND);
-    
-  m_currgui = NULL;
 }
 //----------------------------------------------------------------------------
 mmgGuiHolder::~mmgGuiHolder( ) 
@@ -53,48 +49,46 @@ mmgGuiHolder::~mmgGuiHolder( )
 bool mmgGuiHolder::Put(mmgGui* gui)
 //----------------------------------------------------------------------------
 {
-  if(gui == m_currgui ) return false; //SIL. 22-4-2005: -- if passing the current content, nothing happen
+  if(gui == GetCurrentGui())
+    return false; //SIL. 22-4-2005: -- if passing the current content, nothing happen
 
-  if(m_currgui) Remove(m_currgui); 
-  m_currgui = gui;
-
-  if( m_currgui == NULL ) return false; //SIL. 22-4-2005: -- if passing NULL, the old content is removed 
-
-  m_currgui->FitGui();
-  m_currgui->Reparent(m_panel);
-  m_panel->Add(m_currgui,0,wxEXPAND);
-  m_currgui->Show(true);
-  m_currgui->Update();
+  RemoveCurrentGui();
+  if(gui == NULL)
+    return false; //SIL. 22-4-2005: -- if passing NULL, the old content is removed 
+  gui->FitGui();
+  gui->Reparent(m_panel);
+  m_panel->Add(gui,0,wxEXPAND);
+  gui->Show(true);
+  gui->Update();
   
-  //m_panel->SetScrollbars(0, 10,0, m_currgui->GetMinSize().GetHeight()/10);//SIL. 28-9-2004: 
   m_panel->Layout(); 
   return true;
 }
 //----------------------------------------------------------------------------
-bool mmgGuiHolder::Remove(mmgGui* gui)
+bool mmgGuiHolder::RemoveCurrentGui()
 //----------------------------------------------------------------------------
 {
-	if(m_currgui == NULL) 
+  wxWindow *current_gui = GetCurrentGui();
+  if(current_gui == NULL) 
     return false;  //nothing to remove
 
-  //SIL. 22-4-2005: hack -- vme_show(false) kills a pipe, the pipe kills its gui, and we have an invalid pointer
-  //checking the parent allow to be more robust
-  if(m_currgui->GetParent() != m_panel ) // m_currgui has been deleted, and is now invalid
+  m_panel->Remove(current_gui);
+  current_gui->Reparent(mafGetFrame());
+  current_gui->Show(false);
+  m_panel->Layout();
+  return true;
+}
+//----------------------------------------------------------------------------
+wxWindow *mmgGuiHolder::GetCurrentGui()
+//----------------------------------------------------------------------------
+{
+  int num_children = m_panel->GetChildren().GetCount();
+  assert(num_children <= 1);
+
+  if (num_children == 1)
   {
-    m_currgui = NULL;
-    return false;
+    wxWindowList::Node *node = m_panel->GetChildren().GetFirst();
+    return (wxWindow *)node->GetData();
   }
-
-  if(gui==NULL )
-    gui = m_currgui; // if NULL was passed we remove the current gui
-
-  if(gui != m_currgui) 
-    return false;  // if a non-NULL-Gui was specified  and is different from the current we do nothing
-
-	m_panel->Remove(m_currgui);
-	m_currgui->Reparent(mafGetFrame());
-  m_currgui->Show(false);
-	m_panel->Layout();
-	m_currgui = NULL;
-	return true;
+  return NULL;
 }
