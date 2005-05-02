@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 16:50:47 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-02 08:04:05 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -89,13 +89,10 @@ void mafVMEManager::OnEvent(mafEventBase *event)
           NotifyRemove((mafNode *)event->GetSender());
       }
       break;
+      default:
+        mafEventMacro(e);
     }
   }
-  
-  //if (mafEvent *e=mafEvent::SafeDownCast(event))
-  //{
-  //  e->Log(); 
-  //}
 }
 
 //----------------------------------------------------------------------------
