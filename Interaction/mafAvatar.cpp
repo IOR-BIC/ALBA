@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:53 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-02 15:18:15 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone & Michele Diegoli
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -16,6 +16,9 @@
 // interactors & devices
 #include "mmdTracker.h"
 
+// gui
+#include "mmgGui.h"
+
 // events
 #include "mafEventInteraction.h"
 #include "mafEvent.h"
@@ -26,7 +29,6 @@
 #include "mafTransform.h"
 //#include "mafCameraTransform.h"
 #include "mafOBB.h"
-
 
 // Serialization
 #include "mafStorageElement.h"
@@ -61,6 +63,7 @@ mafAvatar::mafAvatar()
   m_Cursor3DHideCounter   = 0;
   m_Cursor2DHideCounter   = 0;
   m_Mode                  = MODE_3D;
+  m_Gui                   = NULL;
 }
 
 //------------------------------------------------------------------------------
@@ -69,6 +72,44 @@ mafAvatar::~mafAvatar()
 {
   Shutdown();
   SetActor3D(NULL);
+  cppDEL(m_Gui);
+}
+
+//----------------------------------------------------------------------------
+mmgGui *mafAvatar::GetGui()
+//----------------------------------------------------------------------------
+{
+  if (!m_Gui)
+    CreateGui();
+  return m_Gui;
+}
+//----------------------------------------------------------------------------
+void mafAvatar::CreateGui()
+//----------------------------------------------------------------------------
+{
+  assert(m_Gui == NULL);
+  m_Gui = new mmgGui(NULL);
+
+  if (m_Gui==NULL)
+  {
+    m_Gui=new mmgGui(this);
+    assert(m_Gui);
+
+    m_Gui->Divider(2);
+    m_Gui->Label("Avatar Settings", true);
+    m_Gui->Divider();
+    m_Gui->String(ID_NAME,"name",&m_Name);
+    m_Gui->Divider();
+  }
+  
+}
+
+//----------------------------------------------------------------------------
+void mafAvatar::UpdateGui()
+//----------------------------------------------------------------------------
+{
+  if (m_Gui)
+    m_Gui->Update();
 }
 
 //------------------------------------------------------------------------------

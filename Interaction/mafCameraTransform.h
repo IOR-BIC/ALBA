@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafCameraTransform.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:55 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-02 15:18:16 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,7 +13,7 @@
 #ifndef __mafCameraTransform_h
 #define __mafCameraTransform_h
 
-#include "mafTransform.h"
+#include "mafTransformBase.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -23,6 +23,7 @@ class vtkTransform;
 class vtkCamera;
 class mafOBB;
 class vtkCallbackCommand;
+class vtkObject;
 
 /** Implement transform between view coordinates to world coordinates
 
@@ -51,15 +52,18 @@ class vtkCallbackCommand;
   same position when the camera moves. 0,0,0 means in the focus point.
 
 
-  @sa mafTransform 
+  @sa mafTransform
+
+  @todo:
+  - implement issuing of MATRIX_UPDATE (to be done in mafTranformBase)
   */
-class mafCameraTransform:public mafTransform
+class mafCameraTransform:public mafTransformBase
 {
 public:
   mafCameraTransform();
   virtual ~mafCameraTransform();
 
-  mafTypeMacro(mafCameraTransform,mafTransform);
+  mafTypeMacro(mafCameraTransform,mafTransformBase);
   
   enum AutoPositionModalities
   {
@@ -97,19 +101,22 @@ public:
   mafOBB *GetBounds() {return m_Bounds;}
 
   /** Enable/Disable following of the camera position */
-  //vtkBooleanMacro(FollowPosition,int);
   void SetFollowPosition(int flag) {m_FollowPosition=flag;Modified();}
   int GetFollowPosition() {return m_FollowPosition;}
+  void FollowPositionOn() {SetFollowPosition(true);}
+  void FollowPositionOff() {SetFollowPosition(false);}
 
   /** Enable/Disable following of the camera orientation */
-  //vtkBooleanMacro(FollowOrientation,int) ;
   void SetFollowOrientation(int flag) {m_FollowOrientation=flag;Modified();}
   int GetFollowOrientation () {return m_FollowOrientation;}
+  void FollowOrientationOn() {SetFollowOrientation(true);}
+  void FollowOrientationOff() {SetFollowOrientation(false);}
 
   /** Enable/Disable following of the camera scaling */
-  //vtkBooleanMacro(FollowScale,int);
   void SetFollowScale(int flag) {m_FollowScale=flag;Modified();}
-  vtkGetMacro(FollowScale,int) {return m_FollowScale;}
+  int GetFollowScale() {return m_FollowScale;}
+  void FollowScaleOn() {SetFollowScale(true);}
+  void FollowScaleOff() {SetFollowScale(false);}
 
   /** Set the modality to fit the Z coordinate. See class comment. */
   void SetPositionMode(int type) {m_PositionMode=type;Modified();}
@@ -139,36 +146,36 @@ public:
 
   /** set which kind of AutoFitting strategy should be used */
   void SetFittingMode(int mode) {m_FittingMode=mode;Modified();}
-  void GetFittingMode() {return m_FittingMode;}
+  int GetFittingMode() {return m_FittingMode;}
   
   /** 
     Get the MTime: this is the bit of magic that makes everything work.
     This MTime takes in consideration also the camera's MTime */
   virtual unsigned long GetMTime();
 
-//  virtual int DeepCopy(mafCameraTransform *trans);
+  virtual int DeepCopy(mafCameraTransform *trans);
   
   /** Change the given matrix to follow camera movements */
-  void UpdatePoseMatrix(vtkMatrix4x4 *matrix,vtkMatrix4x4 *old_view_matrix, vtkMatrix4x4 *new_view_matrix);
+  void UpdatePoseMatrix(mafMatrix *matrix,mafMatrix *old_view_matrix, mafMatrix *new_view_matrix);
 
   /** change matrix orientation to create a transform making points to be
       oriented according to camera orientation. Translation is left unchanged
       while scale is reset to 1. The input matrix posiiton is used to compute
       the direction, in case call AutoPosition() before of this. */
-  static void AutoOrientation(vtkMatrix4x4 *matrix,vtkRenderer *ren);
+  static void AutoOrientation(mafMatrix *matrix,vtkRenderer *ren);
   void AutoOrientation() {AutoOrientation(m_Matrix,m_Renderer);}
 
   /** change matrix translation to create a transform making points to be
       centered into the camera's focal point. Orientation and scale are 
       left unchanged */
-  static void AutoPosition(vtkMatrix4x4 *matrix,vtkRenderer *ren, int mode=ATTACH_TO_FOCAL_POINT);
+  static void AutoPosition(mafMatrix *matrix,vtkRenderer *ren, int mode=ATTACH_TO_FOCAL_POINT);
   void AutoPosition() {AutoPosition(m_Matrix,m_Renderer,m_PositionMode);}
 
   /** Change matrix scale to create a transform making two boxes 
       to fit.Translation and Orientation are left unchanged.
       Fitting can occur according to different modalities.
       @sa ComputeScaling() */ 
-  static void AutoFitting(vtkMatrix4x4 *matrix,mafOBB *tracked_bounds,vtkRenderer *ren,int mode=MIN_SCALE);  
+  static void AutoFitting(mafMatrix *matrix,mafOBB *tracked_bounds,vtkRenderer *ren,int mode=MIN_SCALE);  
   void AutoFitting() {AutoFitting(m_Matrix,m_Bounds,m_Renderer,m_FittingMode);}
 
   /** Change matrix scale to create a transform making two boxes 
@@ -176,7 +183,7 @@ public:
       is thought to be used with AutoPosition() and ATTACH_TO_FOCAL_POINT mode.
       Fitting can occur according to different modalities.
       @sa ComputeScaling() */
-  static void AutoFitting2(vtkMatrix4x4 *matrix,mafOBB *tracked_bounds,vtkRenderer *ren,int mode=ANISOTROPIC);
+  static void AutoFitting2(mafMatrix *matrix,mafOBB *tracked_bounds,vtkRenderer *ren,int mode=ANISOTROPIC);
   void AutoFitting2() {AutoFitting2(m_Matrix,m_Bounds,m_Renderer,m_FittingMode);}
 
   /** Compute scale between two boxes according to given modality:
@@ -207,10 +214,9 @@ protected:
 
   mafOBB*       m_Bounds; ///< m_Bounds of the object that should follow the camera
 
-  vtkTransform* m_CameraFrame;
   float         m_OldViewAngle;
   double        m_OldDistance;
-  vtkMatrix4x4* m_OldViewMatrix;
+  mafMatrix*    m_OldViewMatrix;
 
   vtkCallbackCommand* m_EventRouter;
 

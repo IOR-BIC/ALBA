@@ -2,22 +2,28 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafCameraTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:55 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-02 15:18:16 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
+
+#include "mafDefines.h"
+
 #include "mafCameraTransform.h"
 
+#include "mafMatrix.h"
+#include "mafOBB.h"
+#include "mafTransform.h"
+#include "mafTransformFrame.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkCamera.h"
-#include "vtkMatrix4x4.h"
+
 #include "vtkMath.h"
 #include "vtkTransform.h"
-#include "mflBounds.h"
 #include "vtkCallbackCommand.h"
 
 #include <assert.h>
@@ -26,26 +32,25 @@
 mafCameraTransform::mafCameraTransform()
 //------------------------------------------------------------------------------
 {
-  Renderer          = NULL;
-  Camera            = NULL;
-  FollowPosition    = 1;
-  FollowOrientation = 1;
-  FollowScale       = 1;
-  OldViewAngle      = -1;
-  OldDistance       = -1;
+  m_Renderer          = NULL;
+  m_Camera            = NULL;
+  m_FollowPosition    = 1;
+  m_FollowOrientation = 1;
+  m_FollowScale       = 1;
+  m_OldViewAngle      = -1;
+  m_OldDistance       = -1;
 
-  vtkNEW(CameraFrame);
-  vtkNEW(OldViewMatrix);
+  mafNEW(m_OldViewMatrix);
 
-  PositionMode      = ATTACH_TO_FOCAL_POINT;
-  ScalingMode       = AUTO_FITTING;
-  FittingMode       = FIT_Y;
-  Bounds            = NULL;
+  m_PositionMode      = ATTACH_TO_FOCAL_POINT;
+  m_ScalingMode       = AUTO_FITTING;
+  m_FittingMode       = FIT_Y;
+  m_Bounds            = NULL;
 
-  EventRouter = NULL;
-  vtkNEW(EventRouter);
-  EventRouter->SetCallback(InternalProcessEvents);
-  EventRouter->SetClientData(this);
+  m_EventRouter = NULL;
+  vtkNEW(m_EventRouter);
+  m_EventRouter->SetCallback(InternalProcessEvents);
+  m_EventRouter->SetClientData(this);
 }
 
 //------------------------------------------------------------------------------
@@ -53,17 +58,17 @@ mafCameraTransform::~mafCameraTransform()
 //------------------------------------------------------------------------------
 {
   SetRenderer(NULL);
-  Camera=NULL;
-  vtkDEL(CameraFrame);
-  vtkDEL(OldViewMatrix);
-  vtkDEL(EventRouter);
+  m_Camera=NULL;
+  mafDEL(m_OldViewMatrix);
+
+  vtkDEL(m_EventRouter);
 }
 
 //------------------------------------------------------------------------------
 int mafCameraTransform::DeepCopy(mafCameraTransform *trans)
 //------------------------------------------------------------------------------
 {
-  if (trans->IsA(GetClassName()))
+  if (trans->IsA(GetTypeId()))
   {
     SetRenderer(trans->GetRenderer());
     return VTK_OK;
@@ -74,35 +79,35 @@ int mafCameraTransform::DeepCopy(mafCameraTransform *trans)
 
 
 //----------------------------------------------------------------------------
-// Get the MTime. Take in consideration Renderer, Camera and Bounds modification time
+// Get the MTime. Take in consideration m_Renderer, m_Camera and m_Bounds modification time
 unsigned long mafCameraTransform::GetMTime()
 //------------------------------------------------------------------------------
 {
   unsigned long mtime = this->Superclass::GetMTime();
 
-  if (Camera)
+  if (m_Camera)
   {
-    unsigned long cameraMTime = Camera->GetMTime();
+    unsigned long cameraMTime = m_Camera->GetMTime();
     if (cameraMTime > mtime)
       mtime=cameraMTime;
   }
   
-  //if (Renderer)
+  //if (m_Renderer)
   //{
-  //  unsigned long renMTime = Renderer->GetMTime();
+  //  unsigned long renMTime = m_Renderer->GetMTime();
   //  if (renMTime > mtime)
   //    mtime=renMTime;
   //}
 
-  if (Renderer&&Camera!=Renderer->GetActiveCamera())
+  if (m_Renderer&&m_Camera!=m_Renderer->GetActiveCamera())
   {
     Modified();
     mtime = this->Superclass::GetMTime();
   }
 
-  if (Bounds)
+  if (m_Bounds)
   {
-    unsigned long boundsMTime = Bounds->GetMTime();
+    unsigned long boundsMTime = m_Bounds->GetMTime();
     if (boundsMTime > mtime)
       mtime=boundsMTime;
   }
@@ -114,36 +119,42 @@ unsigned long mafCameraTransform::GetMTime()
 void mafCameraTransform::SetRenderer(vtkRenderer *ren)
 //------------------------------------------------------------------------------
 {
-  if (Renderer)
-    Renderer->RemoveObserver(EventRouter);
+  if (m_Renderer==ren)
+    return;
 
-  vtkSetObjectBodyMacro(Renderer,vtkRenderer,ren);
-  Camera=NULL;
+  if (m_Renderer)
+    m_Renderer->RemoveObserver(m_EventRouter);
+  
+  vtkDEL(m_Renderer);
+  m_Camera=NULL;
 
-  if (Renderer)
+  m_Renderer=ren;
+  
+  if (m_Renderer)
   {
-    Renderer->AddObserver(vtkCommand::ResetCameraEvent,EventRouter);
-    Renderer->AddObserver(vtkCommand::ResetCameraClippingRangeEvent,EventRouter);
-    Renderer->AddObserver(vtkCommand::StartEvent,EventRouter);
-    Renderer->AddObserver(vtkCommand::EndEvent,EventRouter);
+    m_Renderer->Register(NULL);
+    m_Renderer->AddObserver(vtkCommand::ResetCameraEvent,m_EventRouter);
+    m_Renderer->AddObserver(vtkCommand::ResetCameraClippingRangeEvent,m_EventRouter);
+    m_Renderer->AddObserver(vtkCommand::StartEvent,m_EventRouter);
+    m_Renderer->AddObserver(vtkCommand::EndEvent,m_EventRouter);
     RecomputeAll();
   }
 }
 
 //------------------------------------------------------------------------------
-void mafCameraTransform::UpdatePoseMatrix(vtkMatrix4x4 *matrix,vtkMatrix4x4 *old_view_matrix, vtkMatrix4x4 *new_view_matrix)
+void mafCameraTransform::UpdatePoseMatrix(mafMatrix *matrix,mafMatrix *old_view_matrix, mafMatrix *new_view_matrix)
 //------------------------------------------------------------------------------
 { 
-  mflSmartPointer<mflTransform> new_local_pose;
-  new_local_pose->SetInputFrame(old_view_matrix);
-  new_local_pose->SetTargetFrame(new_view_matrix);
-  new_local_pose->SetInput(matrix);
+  mafTransformFrame new_local_pose;
+  new_local_pose.SetInputFrame(old_view_matrix);
+  new_local_pose.SetTargetFrame(new_view_matrix);
+  new_local_pose.SetInput(matrix);
   
-  matrix->DeepCopy(new_local_pose->GetMatrix());
+  matrix->DeepCopy(new_local_pose.GetMatrixPointer());
 }
 
 //------------------------------------------------------------------------------
-void mafCameraTransform::AutoPosition(vtkMatrix4x4 *matrix,vtkRenderer *ren, int mode)
+void mafCameraTransform::AutoPosition(mafMatrix *matrix,vtkRenderer *ren, int mode)
 //------------------------------------------------------------------------------
 {
    assert(ren);
@@ -152,10 +163,10 @@ void mafCameraTransform::AutoPosition(vtkMatrix4x4 *matrix,vtkRenderer *ren, int
    switch (mode)
    {
    case ATTACH_TO_FOCAL_POINT:
-     mflTransform::SetPosition(matrix,camera->GetFocalPoint());
+     mafTransform::SetPosition(*matrix,camera->GetFocalPoint());
      break;
    case ATTACH_TO_CAMERA:
-     mflTransform::SetPosition(matrix,camera->GetPosition());
+     mafTransform::SetPosition(*matrix,camera->GetPosition());
      break;
    case ATTACH_TO_CLIPPING_PLANE:
      assert (false); // not supported yet
@@ -164,7 +175,7 @@ void mafCameraTransform::AutoPosition(vtkMatrix4x4 *matrix,vtkRenderer *ren, int
 }
 
 //------------------------------------------------------------------------------
-void mafCameraTransform::AutoOrientation(vtkMatrix4x4 *matrix,vtkRenderer *ren)
+void mafCameraTransform::AutoOrientation(mafMatrix *matrix,vtkRenderer *ren)
 //------------------------------------------------------------------------------
 {
   double *campos, *vup;
@@ -179,7 +190,7 @@ void mafCameraTransform::AutoOrientation(vtkMatrix4x4 *matrix,vtkRenderer *ren)
   vtkCamera *camera=ren->GetActiveCamera();
   assert(camera);
 
-  mflTransform::GetPosition(matrix,position);
+  mafTransform::GetPosition(*matrix,position);
 
   // do the rotation
   // first rotate y 
@@ -211,15 +222,15 @@ void mafCameraTransform::AutoOrientation(vtkMatrix4x4 *matrix,vtkRenderer *ren)
 
   // set the rotation matrix
 
-  matrix->Element[0][0] = Rx[0];
-  matrix->Element[1][0] = Rx[1];
-  matrix->Element[2][0] = Rx[2];
-  matrix->Element[0][1] = Ry[0];
-  matrix->Element[1][1] = Ry[1];
-  matrix->Element[2][1] = Ry[2];
-  matrix->Element[0][2] = Rz[0];
-  matrix->Element[1][2] = Rz[1];
-  matrix->Element[2][2] = Rz[2];
+  matrix->GetElements()[0][0] = Rx[0];
+  matrix->GetElements()[1][0] = Rx[1];
+  matrix->GetElements()[2][0] = Rx[2];
+  matrix->GetElements()[0][1] = Ry[0];
+  matrix->GetElements()[1][1] = Ry[1];
+  matrix->GetElements()[2][1] = Ry[2];
+  matrix->GetElements()[0][2] = Rz[0];
+  matrix->GetElements()[1][2] = Rz[1];
+  matrix->GetElements()[2][2] = Rz[2];
 
 }
 
@@ -240,7 +251,7 @@ inline float GetMaxScale(float scalex,float scaley)
 }
 
 //------------------------------------------------------------------------------
-void mafCameraTransform::ComputeScaling(mflBounds *inBox, mflBounds *outBox,double *scale,int mode)
+void mafCameraTransform::ComputeScaling(mafOBB *inBox, mafOBB *outBox,double *scale,int mode)
 //------------------------------------------------------------------------------
 {
   double insize[3],outsize[3];
@@ -298,7 +309,7 @@ void mafCameraTransform::ComputeScaling(mflBounds *inBox, mflBounds *outBox,doub
 
 
 //------------------------------------------------------------------------------
-void mafCameraTransform::AutoFitting(vtkMatrix4x4 *matrix,mflBounds *tracked_bounds,vtkRenderer *ren,int mode)
+void mafCameraTransform::AutoFitting(mafMatrix *matrix,mafOBB *tracked_bounds,vtkRenderer *ren,int mode)
 //------------------------------------------------------------------------------
 {
   vtkCamera *camera=ren->GetActiveCamera();
@@ -350,17 +361,17 @@ void mafCameraTransform::AutoFitting(vtkMatrix4x4 *matrix,mflBounds *tracked_bou
     dims[2] = dims[0];
   }
 
-  mflBounds out_bounds;
+  mafOBB out_bounds;
   out_bounds.SetDimensions(dims);
   
   double scale[3];
   ComputeScaling(tracked_bounds,&out_bounds,scale,mode);
 
-  mflTransform::Scale(matrix,scale[0],scale[1],scale[2],PRE_MULTIPLY);
+  mafTransform::Scale(*matrix,scale[0],scale[1],scale[2],PRE_MULTIPLY);
 }
 
 //------------------------------------------------------------------------------
-void mafCameraTransform::AutoFitting2(vtkMatrix4x4 *matrix,mflBounds *tracked_bounds,vtkRenderer *ren,int mode)
+void mafCameraTransform::AutoFitting2(mafMatrix *matrix,mafOBB *tracked_bounds,vtkRenderer *ren,int mode)
 //------------------------------------------------------------------------------
 {
   // We want to scale the tracked box to make the upper bound fall
@@ -436,53 +447,53 @@ void mafCameraTransform::AutoFitting2(vtkMatrix4x4 *matrix,mflBounds *tracked_bo
   dims[2] = c * d / (k + c);
   dims[0] = dims[1] / w ; // keep the YX aspect ration
 
-  mflBounds out_bounds;
+  mafOBB out_bounds;
   out_bounds.SetDimensions(dims);
 
   double scale[3];
   ComputeScaling(tracked_bounds,&out_bounds,scale,mode);
 
-  mflTransform::Scale(matrix,scale[0],scale[1],scale[2],PRE_MULTIPLY);
+  mafTransform::Scale(*matrix,scale[0],scale[1],scale[2],PRE_MULTIPLY);
 
   
   /*double scalex=x_dim/tdims[0];
   double scaley=y_dim/tdims[1];
   double scalez=z_dim/tdims[2];
 
-  mflTransform::Scale(matrix,scalex,scaley,scalez);
+  mafTransform::Scale(matrix,scalex,scaley,scalez);
   */
 }
 //----------------------------------------------------------------------------
 void mafCameraTransform::RecomputeAll()
 //----------------------------------------------------------------------------
 {
-  if (!Renderer)
+  if (!m_Renderer)
     return;
 
-  Camera=Renderer->GetActiveCamera(); // store active camera
+  m_Camera=m_Renderer->GetActiveCamera(); // store active camera
 
-  if (!Camera)
+  if (!m_Camera)
     return;
 
-  OldViewAngle=Camera->GetViewAngle(); // store current view angle
-  OldDistance=Camera->GetDistance(); 
-  OldViewMatrix->DeepCopy(Camera->GetViewTransformMatrix());
+  m_OldViewAngle=m_Camera->GetViewAngle(); // store current view angle
+  m_OldDistance=m_Camera->GetDistance(); 
+  m_OldViewMatrix->DeepCopy(m_Camera->GetViewTransformMatrix());
 
-  Matrix->Identity();
+  m_Matrix->Identity();
 
-  if (!Bounds)
+  if (!m_Bounds)
     return;
 
 
-  if (FollowPosition)
+  if (m_FollowPosition)
     AutoPosition();
 
-  if (FollowOrientation)
+  if (m_FollowOrientation)
     AutoOrientation();
 
-  if (FollowScale&&Bounds->IsValid())
+  if (m_FollowScale&&m_Bounds->IsValid())
   {
-    switch (ScalingMode)
+    switch (m_ScalingMode)
     {
     case AUTO_FITTING:
       //AutoFitting2();
@@ -501,11 +512,11 @@ void mafCameraTransform::RecomputeAll()
 void mafCameraTransform::InternalUpdate()
 //----------------------------------------------------------------------------
 {
-  if (!Renderer)
+  if (!m_Renderer)
     return;
   
-  vtkCamera *camera=Renderer->GetActiveCamera();
-  if (!Camera)
+  vtkCamera *camera=m_Renderer->GetActiveCamera();
+  if (!m_Camera)
     return;
 
   //double crange[2];
@@ -513,8 +524,8 @@ void mafCameraTransform::InternalUpdate()
 
   // try to not recompute everything if the camera has only moved
   // in space.
-  //if (Camera!=camera||OldViewAngle!=camera->GetViewAngle()||OldDistance!=camera->GetDistance())
-  if (Camera!=camera/*||fabs(OldViewAngle-camera->GetViewAngle())>.001*/)
+  //if (m_Camera!=camera||m_OldViewAngle!=camera->GetViewAngle()||m_OldDistance!=camera->GetDistance())
+  if (m_Camera!=camera/*||fabs(m_OldViewAngle-camera->GetViewAngle())>.001*/)
   {
     RecomputeAll();    
   }
@@ -522,21 +533,22 @@ void mafCameraTransform::InternalUpdate()
   {
     // simply follow view's transform changes    
 
-    UpdatePoseMatrix(Matrix,OldViewMatrix,camera->GetViewTransformMatrix());
-    /*mflSmartPointer<vtkMatrix4x4> new_pose;    
+    mafMatrix view_trans=camera->GetViewTransformMatrix();
+    UpdatePoseMatrix(m_Matrix,m_OldViewMatrix,&view_trans);
+    /*mflSmartPointer<mafMatrix> new_pose;    
 
-    OldViewMatrix->Invert();
-    vtkMatrix4x4::Multiply4x4(OldViewMatrix,camera->GetViewTransformMatrix(), \
+    m_OldViewMatrix->Invert();
+    mafMatrix::Multiply4x4(m_OldViewMatrix,camera->GetViewTransformMatrix(), \
       new_pose);
     new_pose->Invert();
-    vtkMatrix4x4::Multiply4x4(Matrix,new_pose,new_pose);
-    /*if (FollowPosition)
+    mafMatrix::Multiply4x4(Matrix,new_pose,new_pose);
+    /*if (m_FollowPosition)
     {
       // copy the translation vector
       CopyTranslation(new_pose);
     }
 
-    if (FollowOrientation)
+    if (m_FollowOrientation)
     {
       // copy the 3x3 matrix. Notice the view transform doesn't scale!!!
       CopyRotation(new_pose);
@@ -544,10 +556,10 @@ void mafCameraTransform::InternalUpdate()
     */   
 
     //Matrix->DeepCopy(new_pose);
-    OldViewMatrix->DeepCopy(camera->GetViewTransformMatrix());
+    m_OldViewMatrix->DeepCopy(camera->GetViewTransformMatrix());
   }
 
-  InvokeEvent(UpdateEvent);
+  //InvokeEvent(MATRIX_UPDATED);
 }
 
 //------------------------------------------------------------------------------
@@ -555,7 +567,7 @@ void mafCameraTransform::InternalProcessEvents(vtkObject* sender, unsigned long 
 //------------------------------------------------------------------------------
 {
   mafCameraTransform* self = reinterpret_cast<mafCameraTransform *>( clientdata );
-  if (sender==self->Renderer)
+  if (sender==self->m_Renderer)
   {
     switch (id)
     {

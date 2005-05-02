@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:54 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-02 15:18:16 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone & Michele Diegoli
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -20,6 +20,7 @@
 // forward declarations :
 //----------------------------------------------------------------------------
 class mafStorageElement;
+class mmgGui;
 class mafEvent;
 class mafEventBase;
 class mafMatrix;
@@ -47,6 +48,15 @@ public:
   MAF_ID_DEC(AVATAR_SCREEN_PLANE_SETTINGS); ///< Issued to update all the avatar with the same screen plane
   MAF_ID_DEC(AVATAR_WORKING_BOX_SETTINGS);  ///< Issued to update all the avatar with the same working box 
   /** @} */
+  
+  //----------------------------------------------------------------------------
+  //    GUI Constants
+  //----------------------------------------------------------------------------
+  enum 
+  {
+    ID_NAME=MINID,
+    ID_LAST
+  };
 
   enum AvatarModality {MODE_2D=0, MODE_3D};
 
@@ -149,16 +159,20 @@ public:
      */
   virtual vtkAbstractPropPicker *GetPicker(){ return NULL; }
 
+  /** Return pointer to the GUI. */
+  mmgGui *GetGui();
+
+  /** internal function to create device GUI for settings */
+  virtual void CreateGui();
+
+  /** force GUI update */
+  virtual void UpdateGui();
+
 protected:
 
   mafAvatar();
   virtual ~mafAvatar();
-
-  /**  
-    Allocate the settings object. This virtual function can be reimplemented
-    by subclasses to add new settings to the GUI */
-  virtual void CreateSettings();
-
+ 
   /** This is used to allow nested serialization of subclasses.
     This function is called by Store and is reimplemented in subclasses.
     Each subclass can Open/Close its own subelements which are
@@ -185,6 +199,7 @@ protected:
   vtkMAFSmartPointer<vtkProp3D>   m_Actor3D;  ///< 3D representation of the avatar
   vtkMAFSmartPointer<vtkActor2D>  m_Actor2D;  ///< 2D representation of the avatar
 
+  mmgGui*           m_Gui;  ///< the settings Gui
   mafView*          m_View; ///< the selected view
   int               m_Mode; ///< Avatar modality, either 2D or 3D         
 

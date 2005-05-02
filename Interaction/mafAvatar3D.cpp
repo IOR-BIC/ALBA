@@ -2,22 +2,13 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:54 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-02 15:18:16 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-// To be included first because of wxWindows
-#ifdef __GNUG__
-    #pragma implementation "mafAvatar3D.cpp"
-#endif
-
-// For compilers that support precompilation, includes "wx/wx.h".
-#include "wx/wxprec.h"
-
-#include "mmgAvatar3DSettings.h"
 
 // base includes
 #include "mafAvatar3D.h"
@@ -27,24 +18,19 @@
 //#include "mmi6DOFMove.h"
 
 // events
-#include "mafInteractionDecl.h"
 #include "mafEventBase.h"
 
 // factory
 #include "mafInteractionFactory.h"
-#include "mafAttribute.h"
+
 // Input Transformations
-#include "mflMatrix.h"
-#include "mflTransform.h"
-#include "mflCameraTransform.h"
-#include "mflBounds.h"
+#include "mafMatrix.h"
+#include "mafTransform.h"
+#include "mafCameraTransform.h"
+#include "mafOBB.h"
 
 // Serialization
-#include "mflXMLWriter.h"
-#include "mflEventInteraction.h"
-#include "vtkXMLDataElement.h"
-#include "vtkXMLDataParser.h"
-
+#include "mafStorageElement.h"
 
 // Visualization
 #include "vtkProp3D.h"
@@ -56,7 +42,7 @@
 #include "vtkProperty2D.h"
 #include "vtkOutlineSource.h"
 #include "vtkPolydataMapper.h"
-#include "vtkTransform.h"
+//#include "vtkTransform.h"
 #include "vtkAxes.h"
 #include "vtkAssembly.h"
 #include "vtkProperty.h"
@@ -71,76 +57,76 @@
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-vtkStandardNewMacro(mafAvatar3D)
+mafCxxTypeMacro(mafAvatar3D);
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 mafAvatar3D::mafAvatar3D()
 //------------------------------------------------------------------------------
 {
-  vtkNEW(LastPoseMatrix);
-  WorkingBoxActor = NULL;
+  mafNEW(m_LastPoseMatrix);
+  m_WorkingBoxActor = NULL;
   
-  FittingMode       = mflCameraTransform::FIT_Y;
+  m_FittingMode       = mafCameraTransform::FIT_Y;
 
-  vtkNEW(Picker3D);
+  vtkNEW(m_Picker3D);
 
-  vtkNEW(CanonicalToWorldTransform);
-  CanonicalToWorldTransform->SetFittingMode(FittingMode);  
-  CanonicalToWorldTransform->FollowOrientationOn();
-  CanonicalToWorldTransform->FollowPositionOn();
-  CanonicalToWorldTransform->FollowScaleOn();
-  CanonicalToWorldTransform->SetPositionModeToAttachToFocalPoint();
+  vtkNEW(m_CanonicalToWorldTransform);
+  m_CanonicalToWorldTransform->SetFittingMode(m_FittingMode);  
+  m_CanonicalToWorldTransform->FollowOrientationOn();
+  m_CanonicalToWorldTransform->FollowPositionOn();
+  m_CanonicalToWorldTransform->FollowScaleOn();
+  m_CanonicalToWorldTransform->SetPositionModeToAttachToFocalPoint();
 
   // create debug 2D actors for diplaying avatars' coordinates
   const char *textMsg="Waiting for coordinates...";
 
-  vtkNEW(DebugTextMapper);
-  DebugTextMapper->SetFontFamilyToArial();
-  DebugTextMapper->SetFontSize(12);
-  DebugTextMapper->SetInput(textMsg);
+  vtkNEW(m_DebugTextMapper);
+  //m_DebugTextMapper->SetFontFamilyToArial();
+  //m_DebugTextMapper->SetFontSize(12);
+  m_DebugTextMapper->SetInput(textMsg);
     
-  vtkNEW(DebugTextActor);
-  DebugTextActor->VisibilityOn();
-  DebugTextActor->SetMapper(DebugTextMapper);
-  DebugTextActor->GetPositionCoordinate()->SetCoordinateSystemToNormalizedDisplay();
-  //DebugTextActor->GetPositionCoordinate()->SetValue(DebugTextPosition);
-  DebugTextPosition=DebugTextActor->GetPositionCoordinate()->GetValue();
-  DebugTextActor->GetProperty()->SetColor(0, 1, 0);
+  vtkNEW(m_DebugTextActor);
+  m_DebugTextActor->VisibilityOn();
+  m_DebugTextActor->SetMapper(m_DebugTextMapper);
+  m_DebugTextActor->GetPositionCoordinate()->SetCoordinateSystemToNormalizedDisplay();
+  //m_DebugTextActor->GetPositionCoordinate()->SetValue(m_DebugTextPosition);
+  m_DebugTextPosition=m_DebugTextActor->GetPositionCoordinate()->GetValue();
+  m_DebugTextActor->GetProperty()->SetColor(0, 1, 0);
 
   SetDebugTextPosition(0.15,0.15);
 
-  mflSmartPointer<vtkActor> wb_actor;
-  vtkNEW(WorkingBox); // use a member var to be able change size
+  vtkMAFSmartPointer<vtkActor> wb_actor;
+  vtkNEW(m_WorkingBox); // use a member var to be able change size
 
-  mflSmartPointer<vtkPolyDataMapper> wb_mapper;
-  wb_mapper->SetInput(WorkingBox->GetOutput());
+  vtkMAFSmartPointer<vtkPolyDataMapper> wb_mapper;
+  wb_mapper->SetInput(m_WorkingBox->GetOutput());
   wb_actor->SetMapper(wb_mapper);
   wb_actor->SetPickable(0);
 
-  mflSmartPointer<vtkAxes> axes;
-  mflSmartPointer<vtkPolyDataMapper> axes_mapper;
-  mflSmartPointer<vtkActor> axes_actor;
+  vtkMAFSmartPointer<vtkAxes> axes;
+  vtkMAFSmartPointer<vtkPolyDataMapper> axes_mapper;
+  vtkMAFSmartPointer<vtkActor> axes_actor;
   axes->SetScaleFactor(.5); // Set fixed dimensions...
   axes_mapper->SetInput(axes->GetOutput());
   axes_actor->SetMapper(axes_mapper);
   axes_actor->GetProperty()->SetInterpolationToFlat();
   axes_actor->SetPickable(0);
   
-  mflSmartPointer<vtkAssembly> wb_asm;
+  vtkMAFSmartPointer<vtkAssembly> wb_asm;
   wb_asm->AddPart(wb_actor);
   wb_asm->AddPart(axes_actor);
   wb_asm->SetPickable(0);
 
-  WorkingBoxActor = wb_asm;
-  WorkingBoxActor->Register(this);
+  m_WorkingBoxActor = wb_asm;
+  m_WorkingBoxActor->Register(NULL);
 
-  DisplayWorkingBox       = 0;
-  DisplayDebugText        = 0;
-  CoordsFrame             = TRACKER_COORDS;
+  m_DisplayWorkingBox       = 0;
+  m_DisplayDebugText        = 0;
+  m_CoordsFrame             = TRACKER_COORDS;
 
-  WorkingBoxActor->SetVisibility(DisplayWorkingBox);
-  DebugTextActor->SetVisibility(DisplayDebugText);
+  m_WorkingBoxActor->SetVisibility(m_DisplayWorkingBox);
+  m_DebugTextActor->SetVisibility(m_DisplayDebugText);
 }
 
 //------------------------------------------------------------------------------
@@ -149,13 +135,31 @@ mafAvatar3D::~mafAvatar3D()
 {
   Shutdown();
   
-  vtkDEL(Picker3D);
-  vtkDEL(DebugTextActor);
-  vtkDEL(DebugTextMapper);
-  vtkDEL(WorkingBoxActor);
-  vtkDEL(WorkingBox);
-  vtkDEL(CanonicalToWorldTransform);
-  vtkDEL(LastPoseMatrix);
+  mafDEL(m_CanonicalToWorldTransform);
+  mafDEL(m_LastPoseMatrix);
+
+  vtkDEL(m_Picker3D);
+  vtkDEL(m_DebugTextActor);
+  vtkDEL(m_DebugTextMapper);
+  vtkDEL(m_WorkingBoxActor);
+  vtkDEL(m_WorkingBox);
+}
+
+//------------------------------------------------------------------------------
+void mafAvatar3D::SetDebugTextPosition(double posx,double posy)
+//------------------------------------------------------------------------------
+{
+  m_DebugTextPosition[0]=posx;
+  m_DebugTextPosition[1]=posy;
+}
+
+//------------------------------------------------------------------------------
+void mafAvatar3D::SetPicker3D(vtkRayCast3DPicker *picker)
+//------------------------------------------------------------------------------
+{
+  vtkDEL(m_Picker3D);
+  m_Picker3D=picker;
+  m_Picker3D->Register(NULL);
 }
 
 //------------------------------------------------------------------------------
@@ -169,15 +173,15 @@ void mafAvatar3D::SetTracker(mmdTracker *tracker)
     //if (tracker->GetCanonicalBounds()->IsValid())
     //{
       // update the canonical tracked bounds
-      float bounds[6];
-      tracker->GetCanonicalBounds()->CopyTo(bounds);
-      WorkingBox->SetBounds(bounds);
-      CanonicalToWorldTransform->SetBounds(tracker->GetCanonicalBounds());
+      double bounds[6];
+      tracker->GetCanonicalBounds().CopyTo(bounds);
+      m_WorkingBox->SetBounds(bounds);
+      m_CanonicalToWorldTransform->SetBounds(&tracker->GetCanonicalBounds());
     //}
     //else
     //{
-    //  WorkingBox->SetBounds(0,0,0,0,0,0);
-    //  CanonicalToWorldTransform->SetBounds(NULL);
+    //  m_WorkingBox->SetBounds(0,0,0,0,0,0);
+    //  m_CanonicalToWorldTransform->SetBounds(NULL);
     //}
   }
 }
@@ -186,7 +190,7 @@ void mafAvatar3D::SetTracker(mmdTracker *tracker)
 void mafAvatar3D::SetRenderer(vtkRenderer *ren)
 //------------------------------------------------------------------------------
 {
-  CanonicalToWorldTransform->SetRenderer(ren);
+  m_CanonicalToWorldTransform->SetRenderer(ren);
   Superclass::SetRenderer(ren);
 }
 
@@ -194,20 +198,20 @@ void mafAvatar3D::SetRenderer(vtkRenderer *ren)
 void mafAvatar3D::SetFittingMode(int type)
 //------------------------------------------------------------------------------
 {
-  FittingMode=type;
-  CanonicalToWorldTransform->SetFittingMode(type);
-  Modified();
+  m_FittingMode=type;
+  m_CanonicalToWorldTransform->SetFittingMode(type);
+  //Modified();
 }
 
 //------------------------------------------------------------------------------
 int mafAvatar3D::InternalInitialize()
 //------------------------------------------------------------------------------
 {
-  if(Renderer)
+  if(m_Renderer)
   {
-    Renderer->AddActor(DebugTextActor);
-    Renderer->AddActor(WorkingBoxActor);
-    WorkingBoxActor->SetUserTransform(CanonicalToWorldTransform);
+    m_Renderer->AddActor(m_DebugTextActor);
+    m_Renderer->AddActor(m_WorkingBoxActor);
+    m_WorkingBoxActor->SetUserTransform(m_CanonicalToWorldTransform->GetVTKTransform());
   }
   
   return Superclass::InternalInitialize();
@@ -218,37 +222,37 @@ void mafAvatar3D::InternalShutdown()
 {
   Superclass::InternalShutdown();
   
-  if(Renderer)
+  if(m_Renderer)
   {
-    Renderer->RemoveActor(DebugTextActor);
-    Renderer->RemoveActor(WorkingBoxActor);
-    WorkingBoxActor->SetUserTransform(NULL); // detach WBox from interactor
+    m_Renderer->RemoveActor(m_DebugTextActor);
+    m_Renderer->RemoveActor(m_WorkingBoxActor);
+    m_WorkingBoxActor->SetUserTransform(NULL); // detach WBox from interactor
   }
 }
 
 //------------------------------------------------------------------------------
-void mafAvatar3D::SetLastPoseMatrix(mflMatrix *matrix)
+void mafAvatar3D::SetLastPoseMatrix(mafMatrix *matrix)
 //------------------------------------------------------------------------------
 {
-  LastPoseMatrix->DeepCopy(matrix);  
+  m_LastPoseMatrix->DeepCopy(matrix);  
 }
 
 //------------------------------------------------------------------------------
 void mafAvatar3D::SetDisplayWorkingBox(int vis)
 //------------------------------------------------------------------------------
 {
-  DisplayWorkingBox = vis;
-  WorkingBoxActor->SetVisibility(vis);
-  Modified();
+  m_DisplayWorkingBox = vis;
+  m_WorkingBoxActor->SetVisibility(vis);
+  //Modified();
 }
 
 //------------------------------------------------------------------------------
 void mafAvatar3D::SetDisplayDebugText(int vis)
 //------------------------------------------------------------------------------
 {
-  DisplayDebugText = vis;
-  DebugTextActor->SetVisibility(vis);
-  Modified();
+  m_DisplayDebugText = vis;
+  m_DebugTextActor->SetVisibility(vis);
+  //Modified();
 }
 //------------------------------------------------------------------------------
 void mafAvatar3D::Hide()
@@ -256,7 +260,7 @@ void mafAvatar3D::Hide()
 {
   Superclass::Hide();
 
-  WorkingBoxActor->SetVisibility(0);
+  m_WorkingBoxActor->SetVisibility(0);
 }
 
 //------------------------------------------------------------------------------
@@ -265,19 +269,17 @@ void mafAvatar3D::Show()
 {
   Superclass::Show();
   
-  WorkingBoxActor->SetVisibility(DisplayWorkingBox);
+  m_WorkingBoxActor->SetVisibility(m_DisplayWorkingBox);
 }
 
 //------------------------------------------------------------------------------
-void mafAvatar3D::UpdateDebugText(const char *title, vtkMatrix4x4 *pose)
+void mafAvatar3D::UpdateDebugText(const char *title, mafMatrix &pose)
 //------------------------------------------------------------------------------
 {
-  assert(pose);
-
   wxString text;
   double pos[3],rot[3];
-  mflTransform::GetPosition(pose,pos);
-  mflTransform::GetOrientation(pose,rot);
+  mafTransform::GetPosition(pose,pos);
+  mafTransform::GetOrientation(pose,rot);
   text.Printf("%s: Pos=(%.3f,%.3f,%.3f) Rot=(%.3f,%.3f,%.3f)",title,pos[0],pos[1],pos[2],\
     rot[0],rot[1],rot[2]);
   
@@ -294,48 +296,35 @@ void mafAvatar3D::UpdateDebugText(const char *title, vtkMatrix4x4 *pose)
     }
   }
 
-  DebugTextMapper->SetInput(text);
+  m_DebugTextMapper->SetInput(text);
 
 }
 
 //------------------------------------------------------------------------------
-void mafAvatar3D::CanonicalToWorld(vtkMatrix4x4 *source,vtkMatrix4x4 *dest)
+void mafAvatar3D::CanonicalToWorld(const mafMatrix &source,mafMatrix &dest)
 //------------------------------------------------------------------------------
 {
-  assert(source);
-
   if (dest==NULL)
     dest=source;
 
-  vtkMatrix4x4::Multiply4x4(this->CanonicalToWorldTransform->GetMatrix(),
+  mafMatrix::Multiply4x4(this->m_CanonicalToWorldTransform->GetMatrix(),
 			  source,
 			  dest);
 }
 
 //------------------------------------------------------------------------------
-void mafAvatar3D::CanonicalToWorld(vtkTransform *trans)
-//------------------------------------------------------------------------------
-{
-  trans->PostMultiply();
-  trans->Concatenate(this->CanonicalToWorldTransform);
-}
-
-//------------------------------------------------------------------------------
-void mafAvatar3D::CanonicalToWorld(mflTransform *trans)
+void mafAvatar3D::CanonicalToWorld(mafTransform *trans)
 //------------------------------------------------------------------------------
 {
   //trans->PostMultiply();
-  trans->Concatenate(this->CanonicalToWorldTransform->GetMatrix(),POST_MULTIPLY);
+  trans->Concatenate(this->m_CanonicalToWorldTransform->GetMatrix(),POST_MULTIPLY);
 }
 
 //------------------------------------------------------------------------------
-void mafAvatar3D::TrackerToWorld(mflMatrix *tracker_pose,mflMatrix *world_pose,int use_scale,int use_rot, int use_trans)
+void mafAvatar3D::TrackerToWorld(mafMatrix &tracker_pose,mafMatrix &world_pose,int use_scale,int use_rot, int use_trans)
 //------------------------------------------------------------------------------
 {
-  assert(tracker_pose);
-  assert(world_pose);
-  
-  mflSmartPointer<mflMatrix> scaled_world_pose;
+  mafMatrix scaled_world_pose;
   GetTracker()->TrackerToCanonical(tracker_pose,scaled_world_pose);
   CanonicalToWorld(scaled_world_pose);
 
@@ -349,66 +338,51 @@ void mafAvatar3D::TrackerToWorld(mflMatrix *tracker_pose,mflMatrix *world_pose,i
   {
     // First set the 3x3 rot matrix
     double rot[3];
-    mflTransform::GetOrientation(scaled_world_pose,rot);
-    mflTransform::SetOrientation(world_pose,rot);
+    mafTransform::GetOrientation(scaled_world_pose,rot);
+    mafTransform::SetOrientation(world_pose,rot);
   }
 
   if (use_scale)
   {
     // Then apply the scale factor
     double scale[3];
-    GetCanonicalToWorldTransform()->GetScale(scale);
-    mflTransform::Scale(world_pose,scale[0],scale[1],scale[2],PRE_MULTIPLY);
+    mafTransform::GetScale(GetCanonicalToWorldTransform()->GetMatrix(),scale);
+    mafTransform::Scale(world_pose,scale[0],scale[1],scale[2],PRE_MULTIPLY);
   }
 
   if (use_trans)
   {
     // finally set the translation vector
-    mflTransform::CopyTranslation(scaled_world_pose,world_pose);
+    mafTransform::CopyTranslation(scaled_world_pose,world_pose);
   }
   
-  world_pose->SetTimeStamp(tracker_pose->GetTimeStamp());
+  world_pose.SetTimeStamp(tracker_pose.GetTimeStamp());
 }
 
 
 //------------------------------------------------------------------------------
-void mafAvatar3D::WorldToCanonical(vtkMatrix4x4 *source,vtkMatrix4x4 *dest)
+void mafAvatar3D::WorldToCanonical(const mafMatrix &source,mafMatrix &dest)
 //------------------------------------------------------------------------------
 {
-  assert(source);
-
-  mflSmartPointer<vtkMatrix4x4> world_to_canonical;
-  world_to_canonical->DeepCopy(this->CanonicalToWorldTransform->GetMatrix());
-  world_to_canonical->Invert();
+  mafMatrix world_to_canonical;
+  world_to_canonical=m_CanonicalToWorldTransform->GetMatrix();
+  world_to_canonical.Invert();
   
   if (dest==NULL)
     dest=source;
   
-  vtkMatrix4x4::Multiply4x4(world_to_canonical,
+  mafMatrix::Multiply4x4(world_to_canonical,
 			  source,
 			  dest);
 }
 
 //------------------------------------------------------------------------------
-void mafAvatar3D::WorldToCanonical(vtkTransform *trans)
+void mafAvatar3D::WorldToCanonical(mafTransform *trans)
 //------------------------------------------------------------------------------
 {
-  mflSmartPointer<vtkMatrix4x4> world_to_canonical;
-  world_to_canonical->DeepCopy(this->CanonicalToWorldTransform->GetMatrix());
-  world_to_canonical->Invert();
-  
-
-  trans->PostMultiply();
-  trans->Concatenate(world_to_canonical);
-}
-
-//------------------------------------------------------------------------------
-void mafAvatar3D::WorldToCanonical(mflTransform *trans)
-//------------------------------------------------------------------------------
-{
-  mflSmartPointer<vtkMatrix4x4> world_to_canonical;
-  world_to_canonical->DeepCopy(this->CanonicalToWorldTransform->GetMatrix());
-  world_to_canonical->Invert();
+  mafMatrix world_to_canonical;
+  world_to_canonical=m_CanonicalToWorldTransform->GetMatrix();
+  world_to_canonical.Invert();
   
   //trans->PostMultiply();
   trans->Concatenate(world_to_canonical,POST_MULTIPLY);
@@ -416,14 +390,10 @@ void mafAvatar3D::WorldToCanonical(mflTransform *trans)
 
 
 //------------------------------------------------------------------------------
-void mafAvatar3D::WorldToTracker(vtkMatrix4x4 *world_pose,vtkMatrix4x4 *tracker_pose,int use_scale,int use_rot, int use_trans)
+void mafAvatar3D::WorldToTracker(mafMatrix &world_pose,mafMatrix &tracker_pose,int use_scale,int use_rot, int use_trans)
 //------------------------------------------------------------------------------
-{
-  assert(tracker_pose);
-  assert(world_pose);
-
-  
-  mflSmartPointer<vtkMatrix4x4> canonical_pose;
+{ 
+  mafMatrix canonical_pose;
   WorldToCanonical(world_pose,canonical_pose);
    
   if (use_scale&&use_rot&&use_trans)
@@ -438,146 +408,139 @@ void mafAvatar3D::WorldToTracker(vtkMatrix4x4 *world_pose,vtkMatrix4x4 *tracker_
     // allow scaling normalized avatars to the current working
     // box size.
 
-    mflSmartPointer<vtkMatrix4x4> scaled_tracker_pose;
+    mafMatrix scaled_tracker_pose;
     GetTracker()->CanonicalToTracker(canonical_pose,scaled_tracker_pose);
 
     if (use_rot)
     {
       // First set the 3x3 rot matrix
       double rot[3];
-      mflTransform::GetOrientation(scaled_tracker_pose,rot);
-      mflTransform::SetOrientation(tracker_pose,rot);
+      mafTransform::GetOrientation(scaled_tracker_pose,rot);
+      mafTransform::SetOrientation(tracker_pose,rot);
     }
   
     if (use_scale)
     {
       // Then apply the scale factor
       double scale[3];
-      mflSmartPointer<mflTransform> world_to_canonical;
-      world_to_canonical->SetMatrix(this->CanonicalToWorldTransform->GetMatrix());
-      world_to_canonical->Inverse();
-      world_to_canonical->GetScale(scale);
-      mflTransform::Scale(tracker_pose,scale[0],scale[1],scale[2],PRE_MULTIPLY);
+      mafTransform world_to_canonical;
+      world_to_canonical.SetMatrix(m_CanonicalToWorldTransform->GetMatrix());
+      world_to_canonical.Invert();
+      world_to_canonical.GetScale(scale);
+      mafTransform::Scale(tracker_pose,scale[0],scale[1],scale[2],PRE_MULTIPLY);
     }
 
     if (use_trans)
     {
       // finally set the translation vector
-      mflTransform::CopyTranslation(scaled_tracker_pose,tracker_pose);
+      mafTransform::CopyTranslation(scaled_tracker_pose,tracker_pose);
     }
   }
 }
 
 //------------------------------------------------------------------------------
-void mafAvatar3D::WorldToNormalizedDisplay(mflMatrix *world_pose,float xy[2])
+void mafAvatar3D::WorldToNormalizedDisplay(mafMatrix &world_pose,float xy[2])
 //------------------------------------------------------------------------------
 {
   WorldToDisplay(world_pose,xy);
-  Renderer->ViewportToNormalizedViewport(xy[0],xy[1]);
+  m_Renderer->ViewportToNormalizedViewport(xy[0],xy[1]);
 }
 
 //------------------------------------------------------------------------------
-void mafAvatar3D::WorldToDisplay(mflMatrix *world_pose,float xy[2])
+void mafAvatar3D::WorldToDisplay(mafMatrix &world_pose,float xy[2])
 //------------------------------------------------------------------------------
 {
-  if (Renderer)
+  if (m_Renderer)
   {
     float pos[4];
-    mflTransform::GetPosition(world_pose,pos);
+    mafTransform::GetPosition(world_pose,pos);
     pos[3]=1.0;
 
     // compute 2D view coordinates
     float xypos[3];
 
-    Renderer->SetWorldPoint(pos);
-    Renderer->WorldToDisplay();
-    Renderer->GetDisplayPoint(xypos);
+    m_Renderer->SetWorldPoint(pos);
+    m_Renderer->WorldToDisplay();
+    m_Renderer->GetDisplayPoint(xypos);
     xy[0]=xypos[0];
     xy[1]=xypos[1];
   }
 }
 
 //------------------------------------------------------------------------------
-void mafAvatar3D::TrackerToDisplay(mflMatrix *tracker_pose,float xy[2])
+void mafAvatar3D::TrackerToDisplay(mafMatrix &tracker_pose,float xy[2])
 //------------------------------------------------------------------------------
 {
-  assert(tracker_pose);
   assert(xy);
 
-  if (Renderer)
+  if (m_Renderer)
   {
     // retrieve tracker position in world coordinates
-    mflSmartPointer<mflMatrix> world_pose;
+    mafMatrix world_pose;
     TrackerToWorld(tracker_pose,world_pose);
     WorldToDisplay(world_pose,xy);
   }
 }
 
 //------------------------------------------------------------------------------
-int mafAvatar3D::InternalStore(mflXMLWriter *writer)
+int mafAvatar3D::InternalStore(mafStorageElement *node)
 //------------------------------------------------------------------------------
 {
-  if(Superclass::InternalStore(writer))
-    return -1;
-  writer->DisplayTaggedXML("Name",GetName());
-  writer->DisplayTaggedXML("DisplayWorkingBox",GetDisplayWorkingBox());
-  writer->DisplayTaggedXML("DisplayDebugText",GetDisplayDebugText());
+  if(Superclass::InternalStore(node))
+    return MAF_ERROR;
+
+  node->StoreText("Name",GetName());
+  node->StoreInteger("DisplayWorkingBox",GetDisplayWorkingBox());
+  node->StoreInteger("DisplayDebugText",GetDisplayDebugText());
   double coords[2];
   coords[0]=GetDebugTextPosition()[0];
   coords[1]=GetDebugTextPosition()[1];
-  mafAttribute::StoreVectorN(writer,coords,2,"DebugTextPosition");
-  writer->DisplayTaggedXML("CoordsFrame",GetCoordsFrame());
+  node->StoreVectorN("DebugTextPosition",coords,2,);
+  node->StoreInteger("CoordsFrame",GetCoordsFrame());
 
   // write prop3D properties?
-  return 0;
+  return MAF_OK;
 }
 
 //------------------------------------------------------------------------------
-int mafAvatar3D::InternalRestore(vtkXMLDataElement *node,vtkXMLDataParser *parser)
+int mafAvatar3D::InternalRestore(mafStorageElement *node)
 //------------------------------------------------------------------------------
 {
-  if(Superclass::InternalRestore(node,parser))
-    return -1;
+  if(Superclass::InternalRestore(node))
+    return MAF_ERROR;
   
   int display_working_box = 0;
-  mafAttribute::RestoreNumeric(node,parser,display_working_box,"DisplayWorkingBox");
+  node->RestoreInteger("DisplayWorkingBox",display_working_box);
   SetDisplayWorkingBox(display_working_box);
   
   int display_debug_text = 0;
-  mafAttribute::RestoreNumeric(node,parser,display_debug_text,"DisplayDebugText");
+  node->RestoreInteger("DisplayDebugText",display_debug_text);
   SetDisplayDebugText(display_debug_text);
   
   double coords[2]={0,0};
-  mafAttribute::RestoreVectorN(node,parser,coords,2,"DebugTextPosition");
+  node->RestoreVectorN("DebugTextPosition",coords,2);
   SetDebugTextPosition(coords[0],coords[1]);
   
-  mafAttribute::RestoreNumeric(node,parser,CoordsFrame,"CoordsFrame");
+  mafAttribute::RestoreNumeric(node,parser,m_CoordsFrame,"CoordsFrame");
   return 0;
   
 }
 
 //------------------------------------------------------------------------------
-void mafAvatar3D::CreateSettings()
+void mafAvatar3D::OnPostResetCamera(mafEventBase *event)
 //------------------------------------------------------------------------------
 {
-  Settings = new mmgAvatar3DSettings(this); 
-}
-
-//------------------------------------------------------------------------------
-void mafAvatar3D::OnPostResetCamera(mflEvent *event)
-//------------------------------------------------------------------------------
-{
-  CanonicalToWorldTransform->RecomputeAll();
+  m_CanonicalToWorldTransform->RecomputeAll();
   Superclass::OnPostResetCamera(event);
 }
 
 //------------------------------------------------------------------------------
-void mafAvatar3D::OnMove3DEvent(mflEventInteraction *e)
+void mafAvatar3D::OnMove3DEvent(mafEventInteraction *e)
 //------------------------------------------------------------------------------
 {
   // Process tracker coordinates to get World coordinates
-  mflMatrix *tracker_pose=e->GetMatrix();
-  mflSmartPointer<mflMatrix> world_pose;
+  mafMatrix *tracker_pose=e->GetMatrix();
+  mafMatrix world_pose;
 
   TrackerToWorld(tracker_pose,world_pose);
   
@@ -585,30 +548,30 @@ void mafAvatar3D::OnMove3DEvent(mflEventInteraction *e)
 
   // debug...
   double scale[3];
-  mflTransform::GetScale(world_pose,scale);
+  mafTransform::GetScale(world_pose,scale);
 
-  if (Actor3D)
+  if (m_Actor3D)
   {
-    Actor3D->GetUserMatrix()->DeepCopy(world_pose);
+    m_Actor3D->GetUserMatrix()->DeepCopy(world_pose);
   }
   
   // Rendering
-  if (Renderer)
+  if (m_Renderer)
   {
-    if (DisplayDebugText)
+    if (m_DisplayDebugText)
     {
       wxString label = GetTracker()->GetName();
 
-      if (CoordsFrame==WORLD_COORDS)
+      if (m_CoordsFrame==WORLD_COORDS)
       {   
         label << " (World): ";
         UpdateDebugText(label,world_pose);
       }
       else
       {            
-        if (CoordsFrame==CANONICAL_COORDS)
+        if (m_CoordsFrame==CANONICAL_COORDS)
         {
-          mflMatrix normal_pose;
+          mafMatrix normal_pose;
           GetTracker()->TrackerToCanonical(tracker_pose,&normal_pose);
           label << " (Canonical): ";
           UpdateDebugText(label,&normal_pose);
@@ -624,7 +587,7 @@ void mafAvatar3D::OnMove3DEvent(mflEventInteraction *e)
     if (View)
     {
       // ask a rendering only if it has never rendered
-      vtkRenderWindow *rw=Renderer->GetRenderWindow();
+      vtkRenderWindow *rw=m_Renderer->GetRenderWindow();
       if (rw&&!rw->GetNeverRendered())
         ForwardEvent(mafSmartEvent(this,CameraUpdateEvent,View));
     }
@@ -643,58 +606,57 @@ void mafAvatar3D::OnUpdateBoundsEvent(mmdTracker *tracker)
   //{
     float bounds[6];
     tracker->GetCanonicalBounds()->CopyTo(bounds);
-    WorkingBox->SetBounds(bounds);
-    CanonicalToWorldTransform->SetBounds(tracker->GetCanonicalBounds()); 
+    m_WorkingBox->SetBounds(bounds);
+    m_CanonicalToWorldTransform->SetBounds(tracker->GetCanonicalBounds()); 
   //}
   //else
   //{
-  //  WorkingBox->SetBounds(0,0,0,0,0,0);
-  //  CanonicalToWorldTransform->SetBounds(NULL);
+  //  m_WorkingBox->SetBounds(0,0,0,0,0,0);
+  //  m_CanonicalToWorldTransform->SetBounds(NULL);
   //}
 }
 
 //------------------------------------------------------------------------------
-void mafAvatar3D::ProcessEvent(mflEvent *event,mafID ch)
+void mafAvatar3D::OnEvent(mafEventBase *event)
 //------------------------------------------------------------------------------
 {
   assert(event);
 
   mafID id=event->GetID();
-  
-  if (ch==CameraUpdateChannel) //---- ResetCamera and ViewSelected events
-  {
-    if (id==PreResetCameraEvent)
-    {
-      OnPreResetCamera(event);
-    }
-    else if (id==PostResetCameraEvent)
-    {
-      OnPostResetCamera(event);
-    }
-    else if (id==ViewSelectedEvent)
-    {
-      mafEventBase *e=mafEventBase::SafeDownCast(event);
-      OnViewSelected(e);
-    }
-  }
-  else if (ch==mafDevice::DeviceInputChannel) //---- Inputs from the device
+  mafID ch=event->GetChannel();
+
+  if (ch==MCH_INPUT) //---- Inputs from the device
   {
     // Input events should all come from the tracker...
     assert(GetTracker()&&event->GetSender()==GetTracker());
-    
-    mflEventInteraction *e = (mflEventInteraction *)event;
-    
-    if (id==mmdTracker::Move3DEvent) // manage changes in the bounds of the tracker
+
+    mafEventInteraction *e = (mafEventInteraction *)event;
+
+    if (id==mmdTracker::TRACKER_3D_MOVE) // manage changes in the bounds of the tracker
     {
       OnMove3DEvent(e);
     }
-    else if (id==mmdTracker::BoundsUpdatedEvent)
+    else if (id==mmdTracker::TRACKER_BOUNDS_UPDATED)
     {
       OnUpdateBoundsEvent(GetTracker());          
     }
   }
+  
+  if (id==CAMERA_PRE_RESET)
+  {
+    OnPreResetCamera(event);
+  }
+  else if (id==CAMERA_POST_RESET)
+  {
+    OnPostResetCamera(event);
+  }
+  else if (id==VIEW_SELECT)
+  {
+    mafEventBase *e=mafEventBase::SafeDownCast(event);
+    OnViewSelected(e);
+  }
 
-  Superclass::ProcessEvent(event,ch);
+  Superclass::OnEvent(event);
 }
 
 //------------------------------------------------------------------------------
@@ -715,12 +677,71 @@ vtkAbstractPropPicker *mafAvatar3D::GetPicker()
 vtkRayCast3DPicker *mafAvatar3D::GetPicker3D()
 //------------------------------------------------------------------------------
 {
-  return Picker3D;
+  return m_Picker3D;
 }
 
 //------------------------------------------------------------------------------
 vtkCellPicker *mafAvatar3D::GetPicker2D()
 //------------------------------------------------------------------------------
 {
-  return Picker2D;
+  return m_Picker2D;
+}
+
+//----------------------------------------------------------------------------
+void mafAvatar3D::CreateGui()
+//----------------------------------------------------------------------------
+{
+  mmgAvatarSettings::CreateGui();
+  // this should be moved to avatar settings!!!
+  wxString mappings[mafCameraTransform::NUM_OF_MAPPINGS];
+  mappings[mafCameraTransform::MAX_SCALE]="max scale";
+  mappings[mafCameraTransform::MIN_SCALE]="min scale";
+  mappings[mafCameraTransform::FIT_X]="fit X";
+  mappings[mafCameraTransform::FIT_Y]="fit Y";
+  mappings[mafCameraTransform::ANISOTROPIC]="anisotropic";
+
+  wxString coords_system[3];
+  coords_system[mafAvatar3D::WORLD_COORDS]="world coords";
+  coords_system[mafAvatar3D::TRACKER_COORDS]="tracker coords";
+  coords_system[mafAvatar3D::CANONICAL_COORDS]="canonical coords";
+
+  m_Gui->Combo(ID_FITTING_COMBO,"fitting mode",&m_FittingMode,mafCameraTransform::NUM_OF_MAPPINGS,mappings,
+    "select the rule for mapping the tracker coordinates into world coordinates");
+  m_Gui->Bool(ID_WBOX_BOOL,"working box",&m_DisplayWorkingBox,0,"display working box in the scene");
+  m_Gui->Bool(ID_DEBUG_TEXT,"debug text",&m_DisplayDebugText,0,"display working box in the scene");
+  m_Gui->VectorN(ID_DEBUG_TEXT_POSITION,"text pos",m_DebugTextPosition,2,MINFLOAT,MAXFLOAT,2,"where to position the text on the screen");
+  m_Gui->Combo(ID_COORDS_COMBO,"coords frame",&m_CoordsFrame,3,coords_system,"select pose matrix frame");
+  m_Gui->Divider();
+}
+
+//----------------------------------------------------------------------------
+void mafAvatar3D::Update()
+//----------------------------------------------------------------------------
+{  
+  mmgAvatarSettings::Update();
+}
+//----------------------------------------------------------------------------
+void mafAvatar3D::OnEvent(mafEvent& e)
+//----------------------------------------------------------------------------
+{
+  mafAvatar3D *avatar = (mafAvatar3D *)GetAvatar();
+  switch(e.GetId()) 
+  {
+  case ID_FITTING_COMBO:
+    avatar->SetFittingMode(m_FittingMode);
+    break;
+  case ID_COORDS_COMBO:
+    avatar->SetCoordsFrame(m_CoordsFrame);
+    break;
+  case ID_WBOX_BOOL:
+    avatar->SetDisplayWorkingBox(m_DisplayWorkingBox);
+    break;
+  case ID_DEBUG_TEXT:
+    avatar->SetDisplayDebugText(m_DisplayDebugText);
+    break;
+  case ID_DEBUG_TEXT_POSITION:
+    avatar->SetDebugTextPosition(m_DebugTextPosition[0],m_DebugTextPosition[1]);
+    break;
+  }
+  mmgAvatarSettings::OnEvent(e);
 }

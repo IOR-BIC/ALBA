@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3D.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:54 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-02 15:18:16 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,14 +12,6 @@
 
 #ifndef __mafAvatar3D_h
 #define __mafAvatar3D_h
-
-#ifdef __GNUG__
-    #pragma interface "mafAvatar3D.cpp"
-#endif
-
-#ifndef WX_PRECOMP
-    #include "wx/wx.h"
-#endif
 
 #include "mafAvatar.h"
 #include "vtkRayCast3DPicker.h"
@@ -32,24 +24,19 @@ class vtkActor;
 class vtkAssemblyPath;;
 class vtkRenderer;
 class mmi6DOF;
-class vtkMatrix4x4;
-class mflMatrix;
+class mafMatrix;
 class vtkRenderWindowInteractor;
 class mafAttribute;
 class mmdTracker;
-class mflXMLWriter;
-class vtkXMLDataElement;
-class vtkXMLDataParser;
 class vtkTextMapper;
 class vtkActor2D;
 class vtkOutlineSource;
 class vtkTransform;
 class vtkCellPicker;
-class mflTransform;
-class mflCameraTransform;
+class mafTransform;
+class mafCameraTransform;
 class mafView;
 class mafEventBase;
-class mmgAvatarSettings;
 
 /**
   Avatars are entities moving in the virtual world according to user's 
@@ -65,9 +52,19 @@ class mmgAvatarSettings;
  */
 class mafAvatar3D : public mafAvatar
 {
-public:
-  vtkTypeMacro(mafAvatar3D,mafAvatar);
-  static mafAvatar3D *New();
+public:  
+  //----------------------------------------------------------------------------
+  //    GUI Constants
+  //----------------------------------------------------------------------------
+  enum 
+  {
+    ID_FITTING_COMBO = mafAvatar::ID_LAST,
+    ID_WBOX_BOOL,
+    ID_DEBUG_TEXT,
+    ID_DEBUG_TEXT_POSITION,
+    ID_COORDS_COMBO,
+    ID_LAST
+  };
 
   enum 
   {
@@ -75,6 +72,8 @@ public:
     CANONICAL_COORDS,
     WORLD_COORDS,
   };
+
+  mafTypeMacro(mafAvatar3D,mafAvatar);
  
   /**  
     Set/Get the renderer this avatar is attached to. When the rederer is
@@ -106,64 +105,65 @@ public:
       This can be used for debug to understand if the tracker's
       settings and the mapping function are correct */
   void SetDisplayWorkingBox(int vis);
-  vtkGetMacro(DisplayWorkingBox,int);
-  vtkBooleanMacro(DisplayWorkingBox,int);
+  int GetDisplayWorkingBox(){ return m_DisplayWorkingBox;}
+  void DisplayWorkingBoxOn() {SetDisplayWorkingBox(true);}
+  void DisplayWorkingBoxOff() {SetDisplayWorkingBox(false);}
 
   /** 
     Display the debug text showing trackers coordinate. This can 
     be used to debug the code. */
   void SetDisplayDebugText(int vis);
-  vtkGetMacro(DisplayDebugText,int);
-  vtkBooleanMacro(DisplayDebugText,int);
+  int GetDisplayDebugText() {return m_DisplayDebugText;}
 
   /** where to display the text */
-  vtkSetVector2Macro(DebugTextPosition,float);
-  vtkGetVector2Macro(DebugTextPosition,float);
+  void SetDebugTextPosition(double *pos) {SetDebugTextPosition(pos[0],pos[1]);}
+  void SetDebugTextPosition(double posx,double posy);
+  double *GetDebugTextPosition();
   
   /** 
     Display the original tracker's coords in the debug text area.
     This can be used to know the tracked volume size to
     be set in the trackers' settings. */
-  vtkSetMacro(CoordsFrame,int);
-  vtkGetMacro(CoordsFrame,int);
+  void SetCoordsFrame(int frame) {m_CoordsFrame=frame;}
+  int GetCoordsFrame() {return m_CoordsFrame;}
   
 
   /**  Process events coming from tracker */
-  virtual void ProcessEvent(mflEvent *event,mafID ch=mflAgent::DefaultChannel);
+  virtual void OnEvent(mafEventBase *event);
 
   /** return the tracker this avatar is the tracker attached to this avatar */
   virtual void SetTracker(mmdTracker *tracker);
 
   /**  Transform a matrix from Canonical to World space*/
-  void CanonicalToWorld(vtkMatrix4x4 *pose,vtkMatrix4x4 *dest=NULL);
-  void CanonicalToWorld(vtkTransform *trans);
-  void CanonicalToWorld(mflTransform *trans);
+  void CanonicalToWorld(const mafMatrix &pose,mafMatrix &dest);
+  void CanonicalToWorld(mafMatrix &pose) {CanonicalToWorld(pose,pose);}
+  void CanonicalToWorld(mafTransform *trans);
 
-  void WorldToCanonical(vtkMatrix4x4 *pose,vtkMatrix4x4 *dest=NULL);
-  void WorldToCanonical(vtkTransform *trans);
-  void WorldToCanonical(mflTransform *trans);
+  void WorldToCanonical(const mafMatrix &pose,mafMatrix &dest);
+  void WorldToCanonical(mafMatrix &pose) {WorldToCanonical(pose,pose);}
+  void WorldToCanonical(mafTransform *trans);
 
 
   /** 
     Transform a matrix from Tracker frame to World frame, the function
     can optionally avoid to map on the destination matrix some of the 
     6DOF: e.g. not using the scale or the rotational matrix */
-  void TrackerToWorld(mflMatrix *tracker_pose,mflMatrix *world_pose,int use_scale=1,int use_rot=1, int use_trans=1);
-  void WorldToTracker(vtkMatrix4x4 *world_pose,vtkMatrix4x4 *tracker_pose,int use_scale=1,int use_rot=1, int use_trans=1);
+  void TrackerToWorld(mafMatrix &tracker_pose,mafMatrix &world_pose,int use_scale=1,int use_rot=1, int use_trans=1);
+  void WorldToTracker(mafMatrix &world_pose,mafMatrix &tracker_pose,int use_scale=1,int use_rot=1, int use_trans=1);
 
   
   /** map tracker coords to display normalized coords */
-  void TrackerToDisplay(mflMatrix *tracker_pose,float xy[2]);
+  void TrackerToDisplay(mafMatrix &tracker_pose,float xy[2]);
 
   /** map world coords to tracker coords */
-  void WorldToDisplay(mflMatrix *world_pose,float xy[2]);
+  void WorldToDisplay(mafMatrix &world_pose,float xy[2]);
 
   /** map world coords to normalized display coords*/
-  void WorldToNormalizedDisplay(mflMatrix *world_pose,float xy[2]);
+  void WorldToNormalizedDisplay(mafMatrix &world_pose,float xy[2]);
   
 
   /**  return transform between canonical and world space */
-  mflCameraTransform *GetCanonicalToWorldTransform() {return CanonicalToWorldTransform;}
+  mafCameraTransform *GetCanonicalToWorldTransform() {return m_CanonicalToWorldTransform;}
 
    /** 
     Set mapping rule, i.e. the policy to be used for scaling the
@@ -171,12 +171,18 @@ public:
   void SetFittingMode(int type);
 
   /** return the mapping rule currently in use */
-  vtkGetMacro(FittingMode,int);
+  int GetFittingMode() {return m_FittingMode;}
 
   /** 
     return the last pose matrix of the avatar's 3d actor in world coordinates.  
     */
-  mflMatrix *GetLastPoseMatrix() {return LastPoseMatrix;};
+  mafMatrix *GetLastPoseMatrix() {return m_LastPoseMatrix;}
+
+  /** Create the dialog that show the interface for settings. */
+  virtual void CreateGui();
+
+  /** force GUI update */
+  virtual void UpdateGui();
 
 protected:
   mafAvatar3D();
@@ -185,15 +191,10 @@ protected:
   /**
    Internally used to set the last pose matrix.
    @todo: Why should we use this instead of using the tracker's one? I'd like to remove this Marco. 28-10-2004: */
-  void SetLastPoseMatrix(mflMatrix *matrix);
+  void SetLastPoseMatrix(mafMatrix *matrix);
 
-  /**  
-    Allocate the settings object. This virtual function can be reimplemented
-    by subclasses to add new settings to the GUI */
-  virtual void CreateSettings();
-
-  virtual int InternalStore(mflXMLWriter *writer);
-  virtual int InternalRestore(vtkXMLDataElement *node,vtkXMLDataParser *parser);
+  virtual int InternalStore(mafStorageElement *node);
+  virtual int InternalRestore(mafStorageElement *node);
 
   /** redefined to add the Cursor actor into the selected renderer */
   virtual int InternalInitialize();
@@ -202,43 +203,42 @@ protected:
   virtual void InternalShutdown();
 
   /** internally used to update debug text on the screen */
-  virtual void UpdateDebugText(const char *title, vtkMatrix4x4 *pose);
+  virtual void UpdateDebugText(const char *title, mafMatrix &pose);
 
   /** process a move event */
-  virtual void OnMove3DEvent(mflEventInteraction *e);
+  virtual void OnMove3DEvent(mafEventInteraction *e);
   
   /** process an event signaling a change of the tracked bounds */
   void OnUpdateBoundsEvent(mmdTracker *tracker);
 
   /** process event sent after a camera reset */
-  virtual void OnPostResetCamera(mflEvent *event);
+  virtual void OnPostResetCamera(mafEventBase *event);
 
   /** Internally used to redefine the 3D picker class */  
-  vtkSetObjectMacro(Picker3D,vtkRayCast3DPicker);
+  void SetPicker3D(vtkRayCast3DPicker *picker);
 
-  vtkProp3D         *WorkingBoxActor; ///< Prop3D of the working box
-  vtkOutlineSource  *WorkingBox; ///< Working box the tracker coords are mapped to
+  vtkProp3D*          m_WorkingBoxActor; ///< Prop3D of the working box
+  vtkOutlineSource*   m_WorkingBox; ///< Working box the tracker coords are mapped to
 
-  vtkTextMapper     *DebugTextMapper;
-  vtkActor2D        *DebugTextActor;
+  vtkTextMapper*      m_DebugTextMapper;
+  vtkActor2D*         m_DebugTextActor;
 
-  mflMatrix         *LastPoseMatrix;
+  mafMatrix*          m_LastPoseMatrix;
 
-  vtkRayCast3DPicker  *Picker3D; ///< Used to pick in a VTK Render window
-  vtkCellPicker		    *Picker2D;
+  vtkRayCast3DPicker* m_Picker3D; ///< Used to pick in a VTK Render window
+  vtkCellPicker*      m_Picker2D;
 
 
-  mflCameraTransform  *CanonicalToWorldTransform;
+  mafCameraTransform* m_CanonicalToWorldTransform;
   
-  int   FittingMode; ///< specify the current mapping rule from canonical to world
-
-  //mafAttribute *Settings;  ///< Used to save/restore avatar's settings, 
+  int                 m_FittingMode; ///< specify the current mapping rule from canonical to world
   
-  int DisplayWorkingBox; ///< Whether display the working box
-  int DisplayDebugText; ///< Whether display Debug text
-  int CoordsFrame; ///< Whether to display the original tracker's coords 
+  int                 m_DisplayWorkingBox; ///< Whether display the working box
+  int                 m_DisplayDebugText; ///< Whether display Debug text
+  int                 m_CoordsFrame; ///< Whether to display the original tracker's coords 
 
-  float *DebugTextPosition;
+  double*              m_DebugTextPosition;
+
 private:
   mafAvatar3D(const mafAvatar3D&);  // Not implemented.
   void operator=(const mafAvatar3D&);  // Not implemented.

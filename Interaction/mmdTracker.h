@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdTracker.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:57 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-02 15:18:17 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -173,6 +173,12 @@ public:
 
   /** utility function for finding maximum among 3 values */
   inline double GetMax3(double x,double y,double z);
+
+  /** internal function to create device GUI for settings */
+  virtual void CreateGui();
+
+  /** force GUI update */
+  virtual void UpdateGui();
   
 protected:
   mmdTracker();
@@ -186,12 +192,6 @@ protected:
 
   /** add pose matrix to the event */ 
   virtual void SendButtonEvent(mafEventInteraction *event);
-
-  /** internal function to create device settings object */
-  virtual void CreateGui();
-
-  /** force GUI update */
-  virtual void UpdateGui();
 
   int AvatarChooser(wxString &avatar_name,wxString &avatar_type);
 
