@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-23 09:48:38 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-05-02 10:33:09 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -159,6 +159,11 @@ void mafSideBar::VmeRemove(mafNode *vme)
 //----------------------------------------------------------------------------
 {
 	m_Tree->VmeRemove(vme);
+  if (vme == m_SelectedVme)
+  {
+    m_SelectedVme = NULL;
+    UpdateVmePanel();
+  }  
 }
 //----------------------------------------------------------------------------
 void mafSideBar::VmeModified(mafNode *vme)
