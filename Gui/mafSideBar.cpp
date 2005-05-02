@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-02 10:33:09 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-05-02 11:36:14 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -101,7 +101,7 @@ void mafSideBar::OpHideGui(bool view_closed)
 	if(view_closed)
 	{
 		this->m_Notebook->SetSelection(0);
-		this->m_ViewPropertyPanel->Remove();
+		this->m_ViewPropertyPanel->RemoveCurrentGui();
 		this->m_ViewPropertyPanel->SetTitle("");
 	}
 	else
@@ -125,12 +125,12 @@ void mafSideBar::ViewSelect(mafView *view)
 		if(gui) 
 			m_ViewPropertyPanel->Put(gui);
 		else
-			m_ViewPropertyPanel->Remove();
+			m_ViewPropertyPanel->RemoveCurrentGui();
 	}
 	else
 	{
 		m_ViewPropertyPanel->SetTitle("");
-		m_ViewPropertyPanel->Remove();
+		m_ViewPropertyPanel->RemoveCurrentGui();
 	}
   m_SelectedView = view;
   UpdateVmePanel();
