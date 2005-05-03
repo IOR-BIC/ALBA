@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-02 15:18:16 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-03 05:58:10 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone & Michele Diegoli
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -60,7 +60,7 @@ public:
 
   enum AvatarModality {MODE_2D=0, MODE_3D};
 
-  mafTypeMacro(mafAvatar,mafInteractor);
+  mafAbstractTypeMacro(mafAvatar,mafInteractor);
 
   /**  
     Set the renderer this avatar is attached to. When the rederer is
@@ -122,7 +122,7 @@ public:
   virtual void ShowCursor2D();
   
   /** pick in the scene with this avatar, give the avatar pose */
-  virtual int Pick(mafMatrix *pose=NULL) {return false;}
+  virtual int Pick(mafMatrix &pose) {return false;}
   virtual int Pick(double X, double Y) {return false;}  
 
   /**  Process events coming from tracker */

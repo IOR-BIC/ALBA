@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPER.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:58 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-03 05:58:12 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone, originally by Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,20 +12,13 @@
 #ifndef __mmiPER_h
 #define __mmiPER_h
 
-#ifdef __GNUG__
-    #pragma interface "mmiPER.cpp"
-#endif
-
-#ifndef WX_PRECOMP
-    #include "wx/wx.h"
-#endif
-
 #include "mafInteractor.h"
+#include <map>
 
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------
-class mflVME;
+class mafVME;
 class vtkProp3D;
 class mflMatrix;
 class myPIMPL;
@@ -42,19 +35,13 @@ class myPIMPL;
 */
 class mmiPER : public mafInteractor
 {
-public:
-  //------------------------------------------------------------------------------
-  // Events
-  //------------------------------------------------------------------------------
-  //MFL_EVT_DEC(MoveActionEvent); ///< Issued a move action has been performed
- 
-  vtkTypeMacro(mmiPER,mafInteractor);
-  static mmiPER *New();
+public: 
+  mafTypeMacro(mmiPER,mafInteractor);
 
-  virtual void EnableSelect(bool enable) {CanSelect = enable;};
+  virtual void EnableSelect(bool enable) {m_CanSelect = enable;};
 
   /** Enable fly to mode: next click will select where to fly to */
-  virtual void FlyToMode() {FlyToFlag = true;};
+  virtual void FlyToMode() {m_FlyToFlag = true;};
 
   /** Weither to auto adjust camera clipping range */
   virtual void SetAutoAdjustCameraClippingRange( int value );
@@ -71,45 +58,45 @@ public:
   /** Redefined to support multiple input devices */
   virtual int StopInteraction(mafDevice *device, int button);
 
-  virtual void ProcessEvent(mflEvent *event,mafID ch);
+  virtual void OnEvent(mafEventBase *event);
 
-  void OnVmeSelected(mflVME *vme){ SetPickedVME(GetDevice(),vme); }
+  void OnVmeSelected(mafVME *vme){ SetPickedVME(GetDevice(),vme); }
 
   enum modalities {SINGLE_BUTTON=0,MULTI_BUTTON};
 
-  void SetMode(int mode) {Mode=mode;}
-  int GetMode() {return Mode;}
-  void SetModeToSingleButton() {Mode=SINGLE_BUTTON;}
-  void SetModeToMultiButton() {Mode=MULTI_BUTTON;}
+  void SetMode(int mode) {m_Mode=mode;}
+  int GetMode() {return m_Mode;}
+  void SetModeToSingleButton() {m_Mode=SINGLE_BUTTON;}
+  void SetModeToMultiButton() {m_Mode=MULTI_BUTTON;}
 
 protected:
   mmiPER();
   virtual ~mmiPER();
   
   /** redefined to support the three buttons */  
-  virtual int OnStartInteraction(mflEventInteraction *e);
+  virtual int OnStartInteraction(mafEventInteraction *e);
   /** redefined to support the three buttons */
-  virtual int OnStopInteraction(mflEventInteraction *e);
+  virtual int OnStopInteraction(mafEventInteraction *e);
 
   /** 
     Perform a pick on start of interaction to find if the user pointed
     an object in the scene, and in case forward all the following 
     events to its behavior. if the user pointed to the background
     forward events to the camera interactor.*/
-  virtual void OnButtonDown       (mflEventInteraction *e);
+  virtual void OnButtonDown       (mafEventInteraction *e);
   
-  virtual void OnButtonUp         (mflEventInteraction *e);
-  virtual void OnLeftButtonDown   (mflEventInteraction *e);
-  virtual void OnLeftButtonUp     (mflEventInteraction *e);
-  virtual void OnMiddleButtonDown (mflEventInteraction *e);
-  virtual void OnMiddleButtonUp   (mflEventInteraction *e);
-  virtual void OnRightButtonDown  (mflEventInteraction *e);
-  virtual void OnRightButtonUp    (mflEventInteraction *e);
-  virtual void OnMove             (mflEventInteraction *e);
-  virtual void OnChar             (mflEventInteraction *e);
+  virtual void OnButtonUp         (mafEventInteraction *e);
+  virtual void OnLeftButtonDown   (mafEventInteraction *e);
+  virtual void OnLeftButtonUp     (mafEventInteraction *e);
+  virtual void OnMiddleButtonDown (mafEventInteraction *e);
+  virtual void OnMiddleButtonUp   (mafEventInteraction *e);
+  virtual void OnRightButtonDown  (mafEventInteraction *e);
+  virtual void OnRightButtonUp    (mafEventInteraction *e);
+  virtual void OnMove             (mafEventInteraction *e);
+  virtual void OnChar             (mafEventInteraction *e);
 
   /** internally used to fly to a clicked point */
-  virtual void FlyTo(mflEventInteraction *e,int numstep=20, float zoom=1);
+  virtual void FlyTo(mafEventInteraction *e,int numstep=20, double zoom=1);
 
   /** insert a device in the set of devices currently interacting */
   void InsertDevice(mafDevice *device,int button);
@@ -122,23 +109,30 @@ protected:
   mafInteractor *GetCurrentBehavior(mafDevice *device);
 
   /** internally used to set VME picked by device at button down */
-  void SetPickedVME(mafDevice *device,mflVME *vme);
+  void SetPickedVME(mafDevice *device,mafVME *vme);
 
   /** internally used to return the picked VME for given device */
-  mflVME *GetPickedVME(mafDevice *device);
+  mafVME *GetPickedVME(mafDevice *device);
 
  
-  bool            FlyToFlag;
-  bool            DraggingLeft; 
-  bool            CanSelect; 
-  bool		        ShowContextMenu; ///< flag for showing the context menù
+  bool            m_FlyToFlag;
+  bool            m_DraggingLeft; 
+  bool            m_CanSelect; 
+  bool	          m_ShowContextMenu; ///< flag for showing the context men
 
-  int             Mode;
-  int             FirstTime;
-  mafInteractor		*CameraBehavior; ///< the camera interactor
-  mafInteractor		*CameraMouseBehavior; ///< the mouse camera interactor
+  int             m_Mode;
+  int             m_FirstTime;
+  mafInteractor*  m_CameraBehavior; ///< the camera interactor
+  mafInteractor*  m_CameraMouseBehavior; ///< the mouse camera interactor
 
-  myPIMPL         *Devices;        ///< Stores the list of devices currently interacting  
+  class DeviceItem
+  {
+  public:
+    mafVME *VME;
+    int     Button;
+  };
+  
+  std::map<mafID,DeviceItem> m_Devices; ///< Stores the list of devices currently interacting
   
 private:
   mmiPER(const mmiPER&);  // Not implemented.

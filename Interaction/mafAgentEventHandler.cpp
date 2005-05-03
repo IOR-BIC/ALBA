@@ -3,18 +3,10 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: mafAgentEventHandler.cpp,v $
 Language:  C++
-Date:      $Date: 2005-04-29 16:10:17 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2005-05-03 05:58:09 $
+Version:   $Revision: 1.2 $
 
 =========================================================================*/
-/*#ifdef __GNUG__
-    #pragma implementation "mafAgentEventHandler.h"
-#endif
-*/
-// For compilers that support precompilation, includes "wx/wx.h".
-#include "wx/wxprec.h" 
-#include "wx/event.h"
-#pragma hdrstop
 
 #include "mafDecl.h"
 #include "mafAgentEventHandler.h"

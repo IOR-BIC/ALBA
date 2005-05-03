@@ -2,29 +2,19 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3DCone.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:55 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-03 05:58:11 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-// To be included first because of wxWindows
-#ifdef __GNUG__
-    #pragma implementation "mafAvatar3DCone.cpp"
-#endif
-
-// For compilers that support precompilation, includes "wx/wx.h".
-#include "wx/wxprec.h"
 
 #include "mafAvatar3DCone.h"
 
-// factory
-#include "vtkObjectFactory.h"
-
 // VTK classes
-#include "mflTransform.h"
-#include "mflMatrix.h"
+#include "mafTransform.h"
+#include "mafMatrix.h"
 #include "vtkMatrix4x4.h"
 #include "vtkConeSource.h"
 #include "vtkAxes.h"
@@ -43,59 +33,59 @@
 float const CONE_HEIGHT = .1;
 
 //------------------------------------------------------------------------------
-// Events
+mafCxxTypeMacro(mafAvatar3DCone)
 //------------------------------------------------------------------------------
 
-//------------------------------------------------------------------------------
-vtkStandardNewMacro(mafAvatar3DCone)
+
 //------------------------------------------------------------------------------
 mafAvatar3DCone::mafAvatar3DCone()
 //------------------------------------------------------------------------------
 {
-  vtkNEW(ConeCursor);
-  vtkNEW(CursorMapper);
-  vtkNEW(CursorActor);
-  vtkNEW(CursorAxes);
-  vtkNEW(CursorAxesMapper);
-  vtkNEW(CursorAxesActor);
-  //mflSmartPointer<mafActiveAssembly> cursor3D;
-  mflSmartPointer<vtkAssembly> cursor3D;
+  vtkNEW(m_ConeCursor);
+  vtkNEW(m_CursorMapper);
+  vtkNEW(m_CursorActor);
+  vtkNEW(m_CursorAxes);
+  vtkNEW(m_CursorAxesMapper);
+  vtkNEW(m_CursorAxesActor);
+  //vtkMAFSmartPointer<mafActiveAssembly> cursor3D;
+  vtkMAFSmartPointer<vtkAssembly> cursor3D;
   
   SetActor3D(cursor3D);
 
-  ConeCursor->SetResolution(8);
-  //ConeCursor->SetRadius(CONE_HEIGHT/3.5);
-  ConeCursor->SetRadius(CONE_HEIGHT/10);
-  ConeCursor->SetHeight(CONE_HEIGHT);
-  ConeCursor->SetDirection(0,0,-1);
+  m_ConeCursor->SetResolution(8);
+  //m_ConeCursor->SetRadius(CONE_HEIGHT/3.5);
+  m_ConeCursor->SetRadius(CONE_HEIGHT/10);
+  m_ConeCursor->SetHeight(CONE_HEIGHT);
+  m_ConeCursor->SetDirection(0,0,-1);
 
 
-  CursorMapper->SetInput(ConeCursor->GetOutput());
-  CursorActor->SetMapper(CursorMapper);
-  CursorActor->PickableOff();
-  CursorActor->DragableOff();
-  //CursorActor->SetOrientation(0,90,0);
+  m_CursorMapper->SetInput(m_ConeCursor->GetOutput());
+  m_CursorActor->SetMapper(m_CursorMapper);
+  m_CursorActor->PickableOff();
+  m_CursorActor->DragableOff();
+  //m_CursorActor->SetOrientation(0,90,0);
  
-  CursorAxes->SetScaleFactor(CONE_HEIGHT/2);
-  CursorAxesMapper->SetInput(CursorAxes->GetOutput());
-  CursorAxesActor->SetMapper(CursorAxesMapper);
-  CursorAxesActor->PickableOff();
-  CursorAxesActor->DragableOff();
-  CursorAxesActor->GetProperty()->SetAmbient(1);
-  CursorAxesActor->GetProperty()->SetDiffuse(0);
+  m_CursorAxes->SetScaleFactor(CONE_HEIGHT/2);
+  m_CursorAxesMapper->SetInput(m_CursorAxes->GetOutput());
+  m_CursorAxesActor->SetMapper(m_CursorAxesMapper);
+  m_CursorAxesActor->PickableOff();
+  m_CursorAxesActor->DragableOff();
+  m_CursorAxesActor->GetProperty()->SetAmbient(1);
+  m_CursorAxesActor->GetProperty()->SetDiffuse(0);
 
   cursor3D->SetPickable(0);
-  CursorAxesActor->SetPickable(0);
-  CursorActor->SetPickable(0);
+  m_CursorAxesActor->SetPickable(0);
+  m_CursorActor->SetPickable(0);
 
-  cursor3D->AddPart(CursorActor);
-  cursor3D->AddPart(CursorAxesActor);
+  cursor3D->AddPart(m_CursorActor);
+  cursor3D->AddPart(m_CursorAxesActor);
 
   //cursor3D->SetScale(CONE_HEIGHT); // scale down to 10% of canonical volume
 
-  mflSmartPointer<vtkMatrix4x4> pose;
-  mflTransform::SetPosition(pose,0,0,0);
-  cursor3D->SetUserMatrix(pose);
+  mafTransform pose;
+  
+  pose.SetPosition(0,0,0);
+  cursor3D->SetUserMatrix(pose.GetMatrix().GetVTKMatrix());
 
   //cursor3D->SetVisibility(0);
 }
@@ -104,47 +94,46 @@ mafAvatar3DCone::mafAvatar3DCone()
 mafAvatar3DCone::~mafAvatar3DCone()
 //------------------------------------------------------------------------------
 {
-  vtkDEL(ConeCursor);
-  vtkDEL(CursorMapper);
-  vtkDEL(CursorActor);
-  vtkDEL(CursorAxes);
-  vtkDEL(CursorAxesMapper);
-  vtkDEL(CursorAxesActor);
+  vtkDEL(m_ConeCursor);
+  vtkDEL(m_CursorMapper);
+  vtkDEL(m_CursorActor);
+  vtkDEL(m_CursorAxes);
+  vtkDEL(m_CursorAxesMapper);
+  vtkDEL(m_CursorAxesActor);
   // Cursor 3D is removed by parent class after forced shutdown
 }
 
 //------------------------------------------------------------------------------
-int mafAvatar3DCone::Pick(mflMatrix *tracker_pose)
+int mafAvatar3DCone::Pick(mafMatrix &tracker_pose)
 //------------------------------------------------------------------------------
 {
-  if (Renderer)
+  if (m_Renderer)
   {
     // compute pose in the world frame
-    mflSmartPointer<mflMatrix> world_pose;
-    this->TrackerToWorld(tracker_pose,world_pose);
-    
+    mafMatrix world_pose;
+    TrackerToWorld(tracker_pose,world_pose);
       
     // here should call the picker Pick() function
 
     // Compute intersection ray:
-    float p2[4]={ 0,0,-CONE_HEIGHT/2,1}; // canonical homogenous coordinate
-    float p1[4]={ 0,0,CONE_HEIGHT/2,1}; // canonical homogenous coordinate
+    double p2[4]={ 0,0,-CONE_HEIGHT/2,1}; // canonical homogenous coordinate
+    double p1[4]={ 0,0,CONE_HEIGHT/2,1}; // canonical homogenous coordinate
     
     // points in world coordinates
-    float world_p1[4],world_p2[4];
-    world_pose->MultiplyPoint(p1,world_p1);
-    world_pose->MultiplyPoint(p2,world_p2);
+    double world_p1[4],world_p2[4];
+    world_pose.MultiplyPoint(p1,world_p1);
+    world_pose.MultiplyPoint(p2,world_p2);
 
     Hide();
 
-    vtkRendererCollection *rc = Renderer->GetRenderWindow()->GetRenderers();
+    vtkRendererCollection *rc = m_Renderer->GetRenderWindow()->GetRenderers();
     vtkRenderer *r = NULL;
     assert(rc);
 
     rc->InitTraversal();
     while(r = rc->GetNextItem())
     {
-      if( Picker3D->Pick(world_p1,world_p2,r) )
+      if( m_Picker3D->Pick(world_p1,world_p2,r) )
       {
         Show();
         return true;

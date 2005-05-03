@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar2D.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:54 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-03 05:58:10 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,25 +13,12 @@
 #ifndef __mafAvatar2D_h
 #define __mafAvatar2D_h
 
-#ifdef __GNUG__
-    #pragma interface "mafAvatar2D.cpp"
-#endif
-
-#ifndef WX_PRECOMP
-    #include "wx/wx.h"
-#endif
-
-
 #include "mafInteractor.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class mafAttribute;
 class mmdMouse;
-class mflXMLWriter;
-class vtkXMLDataElement;
-class vtkXMLDataParser;
 
 /**
   Avatars are entities moving in the virtual world according to user's 
@@ -41,8 +28,7 @@ class vtkXMLDataParser;
 class mafAvatar2D : public mafInteractor
 {
 public:
-  vtkTypeMacro(mafAvatar2D,mafInteractor);
-  static mafAvatar2D *New() {return new mafAvatar2D;}
+  mafTypeMacro(mafAvatar2D,mafInteractor);
 
   /**  
     Hide the 3D cursor, i.e. remove actor from renderer's list. This is
@@ -55,7 +41,7 @@ public:
   //void Show();
 
   /**  Process events coming from tracker */
-  virtual void ProcessEvent(mflEvent *event,mafID ch=mflAgent::DefaultChannel);
+  virtual void OnEvent(mafEventBase *event);
 
   /** return the Mouse device associated to this avatar */
   mmdMouse *GetMouse();

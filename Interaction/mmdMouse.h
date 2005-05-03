@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdMouse.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:56 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-03 05:58:12 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -56,6 +56,7 @@ public:
 
   /**  Return the last position */
   const double *GetLastPosition() {return m_LastPosition;}
+  void GetLastPosition(double pos[2]) {pos[0]=m_LastPosition[0];pos[1]=m_LastPosition[1];}
 
   /**
   Perform mouse picking and return the selected assembly path picked, otherwise return NULL. */

@@ -2,24 +2,14 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3D2DPicker.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:54 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-03 05:58:10 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-// To be included first because of wxWindows
-#ifdef __GNUG__
-    #pragma implementation "mafAvatar3D2DPicker.cpp"
-#endif
 
-// For compilers that support precompilation, includes "wx/wx.h".
-#include "wx/wxprec.h"
-
-#include "mafAttribute.h"
-
-#include "mmgAvatar3D2DPickerSettings.h"
 #include "mafAvatar3D2DPicker.h"
 
 // factory
@@ -189,7 +179,7 @@ void mafAvatar3D2DPicker::CreateSettings()
   Settings = new mmgAvatar3D2DPickerSettings(this); 
 }
 //------------------------------------------------------------------------------
-int mafAvatar3D2DPicker::Pick(mflMatrix *tracker_pose)
+int mafAvatar3D2DPicker::Pick(mflMatrix &tracker_pose)
 //------------------------------------------------------------------------------
 {
   if (Renderer)

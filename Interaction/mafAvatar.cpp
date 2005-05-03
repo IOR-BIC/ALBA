@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-02 15:18:15 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-03 05:58:09 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone & Michele Diegoli
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -52,7 +52,7 @@
   MAF_ID_IMP(AVATAR_WORKING_BOX_SETTINGS);
 
 //------------------------------------------------------------------------------
-mafCxxTypeMacro(mafAvatar)
+mafCxxAbstractTypeMacro(mafAvatar)
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------

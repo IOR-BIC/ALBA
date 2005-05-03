@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3D2DPicker.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:55 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-03 05:58:11 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -49,7 +49,7 @@ public:
   static vtkObject *NewObjectInstance() {return new mafAvatar3D2DPicker;}
 
   /** pick in the scene with this avatar, give the avatar pose */
-  virtual int Pick(mflMatrix *pose=NULL);
+  virtual int Pick(mflMatrix &pose);
 
   /** Set the extent of the canvas within which the avatar behaves as a 2D avatar */
   vtkSetVector4Macro(Canvas2DExtent,double);

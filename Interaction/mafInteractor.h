@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:53 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-03 05:58:11 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -67,7 +67,7 @@ public:
   MAF_ID_DEC(BUTTON_DOWN);         ///< Issued when a button is pressed
   MAF_ID_DEC(BUTTON_UP);           ///< Issued when a button is released
 
-  mafTypeMacro(mafInteractor,mafAgent);
+  mafAbstractTypeMacro(mafInteractor,mafAgent);
 
   /**  
     Set/Get the renderer this interactor is attached to. This methods is redefined
@@ -181,7 +181,7 @@ protected:
     Find the pocked VME at button down. As argument the function needs
     the device which performed the action, and provides as result pointers
     to piked prop, vme and its behavior if it exists. */
-  virtual bool FindPokedVme(mafDevice *device,mafMatrix *point_pose,vtkProp3D *&picked_prop,mafVME *&picked_vme,mafInteractor *&picked_behavior);
+  virtual bool FindPokedVme(mafDevice *device,mafMatrix &point_pose,vtkProp3D *&picked_prop,mafVME *&picked_vme,mafInteractor *&picked_behavior);
 
 
   mafDevice     *m_Device;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:53 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-03 05:58:11 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -36,6 +36,10 @@ MAF_ID_IMP(mafInteractor::INTERACTION_STARTED);
 MAF_ID_IMP(mafInteractor::INTERACTION_STOPPED);
 MAF_ID_IMP(mafInteractor::BUTTON_DOWN);
 MAF_ID_IMP(mafInteractor::BUTTON_UP);
+
+//------------------------------------------------------------------------------
+mafCxxAbstractTypeMacro(mafInteractor);
+//------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 mafInteractor::mafInteractor()
@@ -342,7 +346,7 @@ void mafInteractor::ComputeWorldToDisplay(double x, double y, double z, double d
 }
 
 //----------------------------------------------------------------------------
-bool mafInteractor::FindPokedVme(mafDevice *device,mafMatrix *point_pose,vtkProp3D *&picked_prop,mafVME *&picked_vme,mafInteractor *&picked_behavior)
+bool mafInteractor::FindPokedVme(mafDevice *device,mafMatrix &point_pose,vtkProp3D *&picked_prop,mafVME *&picked_vme,mafInteractor *&picked_behavior)
 //----------------------------------------------------------------------------
 {
   bool                foundVme = false;
@@ -354,7 +358,7 @@ bool mafInteractor::FindPokedVme(mafDevice *device,mafMatrix *point_pose,vtkProp
   if (mmdTracker *tracker=mmdTracker::SafeDownCast(device))
   { // is it a tracker?
     
-    mafMatrix *tracker_pose = point_pose;
+    mafMatrix &tracker_pose = point_pose;
 
     // extract device avatar's renderer, no avatar == no picking
     mafAvatar *avatar = tracker->GetAvatar();
@@ -377,8 +381,8 @@ bool mafInteractor::FindPokedVme(mafDevice *device,mafMatrix *point_pose,vtkProp
   { 
     // Pick with mouse
     int mouse_pos[2];
-    mouse_pos[0] = (int)point_pose->GetElement(0,3);
-    mouse_pos[1] = (int)point_pose->GetElement(1,3);
+    mouse_pos[0] = (int)point_pose.GetElement(0,3);
+    mouse_pos[1] = (int)point_pose.GetElement(1,3);
     ap = mouse->Pick(mouse_pos);
   }
 

@@ -22,8 +22,8 @@ mafAvatar2D.cpp
 mafAvatar2D.h
 mafAvatar3D.cpp
 mafAvatar3D.h
-mafAvatar3D2DPicker.cpp
-mafAvatar3D2DPicker.h
+#mafAvatar3D2DPicker.cpp
+#mafAvatar3D2DPicker.h
 mafAvatar3DCone.cpp
 mafAvatar3DCone.h
 mafDevice.cpp

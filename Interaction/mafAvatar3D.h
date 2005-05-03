@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3D.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-02 15:18:16 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-03 05:58:10 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,29 +14,28 @@
 #define __mafAvatar3D_h
 
 #include "mafAvatar.h"
-#include "vtkRayCast3DPicker.h"
+#include "mafMatrix.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class vtkProp3D;
-class vtkActor;
-class vtkAssemblyPath;;
-class vtkRenderer;
 class mmi6DOF;
-class mafMatrix;
-class vtkRenderWindowInteractor;
-class mafAttribute;
 class mmdTracker;
+class mafTransform;
+class mafCameraTransform;
+class mafView;
+class mafEventBase;
+class vtkRayCast3DPicker;
 class vtkTextMapper;
 class vtkActor2D;
 class vtkOutlineSource;
 class vtkTransform;
 class vtkCellPicker;
-class mafTransform;
-class mafCameraTransform;
-class mafView;
-class mafEventBase;
+class vtkProp3D;
+class vtkActor;
+class vtkAssemblyPath;;
+class vtkRenderer;
+class vtkRenderWindowInteractor;
 
 /**
   Avatars are entities moving in the virtual world according to user's 
@@ -73,7 +72,7 @@ public:
     WORLD_COORDS,
   };
 
-  mafTypeMacro(mafAvatar3D,mafAvatar);
+  mafAbstractTypeMacro(mafAvatar3D,mafAvatar);
  
   /**  
     Set/Get the renderer this avatar is attached to. When the rederer is
@@ -153,13 +152,13 @@ public:
 
   
   /** map tracker coords to display normalized coords */
-  void TrackerToDisplay(mafMatrix &tracker_pose,float xy[2]);
+  void TrackerToDisplay(mafMatrix &tracker_pose,double xy[2]);
 
   /** map world coords to tracker coords */
-  void WorldToDisplay(mafMatrix &world_pose,float xy[2]);
+  void WorldToDisplay(mafMatrix &world_pose,double xy[2]);
 
   /** map world coords to normalized display coords*/
-  void WorldToNormalizedDisplay(mafMatrix &world_pose,float xy[2]);
+  void WorldToNormalizedDisplay(mafMatrix &world_pose,double xy[2]);
   
 
   /**  return transform between canonical and world space */
@@ -176,7 +175,7 @@ public:
   /** 
     return the last pose matrix of the avatar's 3d actor in world coordinates.  
     */
-  mafMatrix *GetLastPoseMatrix() {return m_LastPoseMatrix;}
+  mafMatrix &GetLastPoseMatrix() {return m_LastPoseMatrix;}
 
   /** Create the dialog that show the interface for settings. */
   virtual void CreateGui();
@@ -191,7 +190,7 @@ protected:
   /**
    Internally used to set the last pose matrix.
    @todo: Why should we use this instead of using the tracker's one? I'd like to remove this Marco. 28-10-2004: */
-  void SetLastPoseMatrix(mafMatrix *matrix);
+  void SetLastPoseMatrix(mafMatrix &matrix);
 
   virtual int InternalStore(mafStorageElement *node);
   virtual int InternalRestore(mafStorageElement *node);
@@ -223,7 +222,7 @@ protected:
   vtkTextMapper*      m_DebugTextMapper;
   vtkActor2D*         m_DebugTextActor;
 
-  mafMatrix*          m_LastPoseMatrix;
+  mafMatrix           m_LastPoseMatrix;
 
   vtkRayCast3DPicker* m_Picker3D; ///< Used to pick in a VTK Render window
   vtkCellPicker*      m_Picker2D;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdTracker.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:57 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-03 05:58:12 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -19,6 +19,7 @@
 // general
 #include "mafSmartPointer.h"
 #include "mafEventInteraction.h"
+#include "mmuIdFactory.h"
 
 // I/O
 #include "mafStorageElement.h"
@@ -87,7 +88,7 @@ int mmdTracker::InternalStore(mafStorageElement *node)
   // store default avatar if present
   if (m_DefaultAvatar)
   {
-    return node->StoreObject("Avatar",m_DefaultAvatar);
+    return (node->StoreObject("Avatar",m_DefaultAvatar)?MAF_OK:MAF_ERROR);
   }
 
   return MAF_OK;
@@ -102,9 +103,9 @@ int mmdTracker::InternalRestore(mafStorageElement *node)
     return MAF_ERROR;
 
 
-  if (node->RestoreVectorN("TrackedBoxBounds",m_TrackedBounds.m_Bounds,6,)==MAF_OK)
+  if (node->RestoreVectorN("TrackedBoxBounds",m_TrackedBounds.m_Bounds,6)==MAF_OK)
   {
-    m_TrackedBounds->Modified();
+    m_TrackedBounds.Modified();
     if (node->RestoreVectorN("TrackedBoxOrientation",m_TrackedBoxOrientation,3))
     {
       if (mafStorageElement *sub_node=node->FindNestedElement("Avatar"))
@@ -116,7 +117,7 @@ int mmdTracker::InternalRestore(mafStorageElement *node)
         }
         else
         {
-          mafErrorMessage("find wrong type of Avatar ("<<obj->GetTypeName()<<"while restoring mmdTracker.");
+          mafErrorMessage("find wrong type of Avatar (%s) while restoring mmdTracker.",obj->GetTypeName());
           obj->Delete();
         }
       }
@@ -161,9 +162,9 @@ void mmdTracker::SetAvatar(mafAvatar *avatar)
 {
   if (m_Avatar)
   {
-    InvokeEvent(AVATAR_REMOVED,m_Avatar);
+    ForwardEvent(AVATAR_REMOVED,MCH_UP,m_Avatar);
  
-    if (Initialized)
+    if (m_Initialized)
     {
       m_Avatar->Shutdown();
     }
@@ -182,7 +183,7 @@ void mmdTracker::SetAvatar(mafAvatar *avatar)
   {
     avatar->SetTracker(this);
     
-    InvokeEvent(AVATAR_ADDED,avatar);
+    ForwardEvent(AVATAR_ADDED,MCH_UP,avatar);
 
     // update gui
     GetGui()->AddGui(avatar->GetGui());
@@ -217,8 +218,8 @@ void mmdTracker::SetLastPoseMatrix(const mafMatrix &matrix)
 { 
   // I had to add a test on elapsed time since it seems sometimes
   // an event gets lost! :-(((
-  m_LastPoseMutex->Lock(); 
-  mafTimeStamp elapsed_time = (m_LastPoseMatrix.GetTimeStamp()-m_LastMoveTime);
+  m_LastPoseMutex.Lock(); 
+  mafTimeStamp elapsed_time = (m_LastPoseMatrix->GetTimeStamp()-m_LastMoveTime);
 
   // This is a very tricky thing: remove a move event after a give timeout
   // The only problem is if some other thread is pushing an event while we 
@@ -261,28 +262,28 @@ void mmdTracker::SetLastPoseMatrix(const mafMatrix &matrix)
     m_LastPose=1;
 
     // update current matrix
-    m_LastPoseMatrix->DeepCopy(matrix);
+    *m_LastPoseMatrix=matrix;
     m_LastPoseMatrix->SetTimeStamp(vtkTimerLog::GetCurrentTime()); // set the time stamp to the current time
 
     mafEventInteraction move_event(this,TRACKER_3D_MOVE,m_LastPoseMatrix);    
 
     m_LastMoveTime=m_LastPoseMatrix->GetTimeStamp();
-    AsyncForwardEvent(move_event,MCH_INPUT);
+    AsyncForwardEvent(&move_event,MCH_INPUT);
    // m_LastMoveEvent = move_event;
-    m_LastPoseMutex->Unlock();
+    m_LastPoseMutex.Unlock();
   }
   else
   {
-    m_LastPoseMutex->Unlock();
-    Sleep(25); // wait for a while to give time to serve last event
+    m_LastPoseMutex.Unlock();
+    mafSleep(25); // wait for a while to give time to serve last event
   }
 }
 
 //------------------------------------------------------------------------------
-mafMatrix *mmdTracker::GetLastPoseMatrix()
+mafMatrix &mmdTracker::GetLastPoseMatrix()
 //------------------------------------------------------------------------------
 {
-  return m_LastPoseMatrix;
+  return *m_LastPoseMatrix;
 }
 
 //------------------------------------------------------------------------------
@@ -306,131 +307,104 @@ void mmdTracker::ComputeTrackerToCanonicalTansform()
 {
 	double scale,center[3],dims[3];
 
-  if (!m_TrackedBounds->IsValid())
+  if (!m_TrackedBounds.IsValid())
   {
     //vtkGenericWarningMacro("Invalid tracked box bounds!");
     return;
   }
 
-  m_TrackedBounds->GetDimensions(dims);
+  m_TrackedBounds.GetDimensions(dims);
 
   double max_dim=GetMax3(dims[0],dims[1],dims[2]);
 
   scale=1.0/(max_dim/2.0);
 
   // normalize and center the tracked volume...
-  m_CanonicalBounds->Bounds[0]=-dims[0]*scale/2;
-  m_CanonicalBounds->Bounds[1]=dims[0]*scale/2;
-  m_CanonicalBounds->Bounds[2]=-dims[1]*scale/2;
-  m_CanonicalBounds->Bounds[3]=dims[1]*scale/2;
-  m_CanonicalBounds->Bounds[4]=-dims[2]*scale/2;
-  m_CanonicalBounds->Bounds[5]=dims[2]*scale/2;
-  m_CanonicalBounds->Modified();
+  m_CanonicalBounds.m_Bounds[0]=-dims[0]*scale/2;
+  m_CanonicalBounds.m_Bounds[1]=dims[0]*scale/2;
+  m_CanonicalBounds.m_Bounds[2]=-dims[1]*scale/2;
+  m_CanonicalBounds.m_Bounds[3]=dims[1]*scale/2;
+  m_CanonicalBounds.m_Bounds[4]=-dims[2]*scale/2;
+  m_CanonicalBounds.m_Bounds[5]=dims[2]*scale/2;
+  m_CanonicalBounds.Modified();
   
-	m_TrackedBounds->GetCenter(center);
+	m_TrackedBounds.GetCenter(center);
 
 	m_TrackerToCanonicalTransform->Identity();
-  //m_TrackerToCanonicalTransform->PreMultiply();
-  m_TrackerToCanonicalTransform->PostMultiply();
 
   // In this release the first inBox is supposed to be
 	// oriented as the main axes: angles=(0,0,0). In next release
 	// the right rotation will be find to map from the inBox c.s.
 	// to the outBox c.s.
-	m_TrackerToCanonicalTransform->Translate(-center[0],-center[1],-center[2]);
-  m_TrackerToCanonicalTransform->RotateY(-m_TrackedBoxOrientation[1]);
-	m_TrackerToCanonicalTransform->RotateX(-m_TrackedBoxOrientation[0]);
-	m_TrackerToCanonicalTransform->RotateZ(-m_TrackedBoxOrientation[2]);
+	m_TrackerToCanonicalTransform->Translate(-center[0],-center[1],-center[2],POST_MULTIPLY);
+  m_TrackerToCanonicalTransform->RotateY(-m_TrackedBoxOrientation[1],POST_MULTIPLY);
+	m_TrackerToCanonicalTransform->RotateX(-m_TrackedBoxOrientation[0],POST_MULTIPLY);
+	m_TrackerToCanonicalTransform->RotateZ(-m_TrackedBoxOrientation[2],POST_MULTIPLY);
 
-	m_TrackerToCanonicalTransform->Scale(scale,scale,scale);
+	m_TrackerToCanonicalTransform->Scale(scale,scale,scale,POST_MULTIPLY);
   
   // inform consumers the m_CanonicalBounds has been recomputed
-  ForwardEvent(TRACKER_BOUNDS_UPDATED,DeviceInputChannel);
+  ForwardEvent(TRACKER_BOUNDS_UPDATED,MCH_INPUT);
 }
 
 //------------------------------------------------------------------------------
-mafOBB *mmdTracker::GetCanonicalBounds()
+mafOBB &mmdTracker::GetCanonicalBounds()
 //------------------------------------------------------------------------------
 {
-  if (m_CanonicalBounds->GetMTime()<m_TrackedBounds->GetMTime())
+  if (m_CanonicalBounds.GetMTime()<m_TrackedBounds.GetMTime())
     ComputeTrackerToCanonicalTansform();
 
   return m_CanonicalBounds;
 }
 
 //------------------------------------------------------------------------------
-vtkTransform *mmdTracker::GetTrackerToCanonicalTransform()
+mafTransform *mmdTracker::GetTrackerToCanonicalTransform()
 //------------------------------------------------------------------------------
 {
-  if (m_CanonicalBounds->GetMTime()<m_TrackedBounds->GetMTime())
+  if (m_CanonicalBounds.GetMTime()<m_TrackedBounds.GetMTime())
     ComputeTrackerToCanonicalTansform();
 
-  return this->m_TrackerToCanonicalTransform;
+  return m_TrackerToCanonicalTransform;
 }
 
 //------------------------------------------------------------------------------
-void mmdTracker::TrackerToCanonical(mafMatrix *source,mafMatrix *dest)
+void mmdTracker::TrackerToCanonical(const mafMatrix &source,mafMatrix &dest)
 //------------------------------------------------------------------------------
 {
-  assert(source);
-  assert(dest);
+  mafMatrix::Multiply4x4(GetTrackerToCanonicalTransform()->GetMatrix(),
+    source,
+    dest);
 
-  vtkMatrix4x4::Multiply4x4(GetTrackerToCanonicalTransform()->GetMatrix(),
-			  source,
-			  dest);
-
-  dest->SetTimeStamp(source->GetTimeStamp());
+  dest.SetTimeStamp(source.GetTimeStamp());
 }
 
 //------------------------------------------------------------------------------
-void mmdTracker::TrackerToCanonical(vtkTransform *trans)
-//------------------------------------------------------------------------------
-{
-  trans->PostMultiply();
-  trans->Concatenate(GetTrackerToCanonicalTransform());
-}
-
-//------------------------------------------------------------------------------
-void mmdTracker::TrackerToCanonical(mflTransform *trans)
+void mmdTracker::TrackerToCanonical(mafTransform *trans)
 //------------------------------------------------------------------------------
 {
   trans->Concatenate(GetTrackerToCanonicalTransform()->GetMatrix(),POST_MULTIPLY);
 }
 
 //------------------------------------------------------------------------------
-void mmdTracker::CanonicalToTracker(vtkMatrix4x4 *source,vtkMatrix4x4 *dest)
+void mmdTracker::CanonicalToTracker(const mafMatrix &source,mafMatrix &dest)
 //------------------------------------------------------------------------------
 {
-  assert(source);
-  assert(dest);
+  mafMatrix canonical_to_tracker;
+  canonical_to_tracker=this->m_TrackerToCanonicalTransform->GetMatrix();
+  canonical_to_tracker.Invert();
 
-  mflSmartPointer<vtkMatrix4x4> canonical_to_tracker;
-  canonical_to_tracker->DeepCopy(this->m_TrackerToCanonicalTransform->GetMatrix());
-  canonical_to_tracker->Invert();
-
-  vtkMatrix4x4::Multiply4x4(canonical_to_tracker,
-			  source,
-			  dest);
+  mafMatrix::Multiply4x4(canonical_to_tracker,
+    source,
+    dest);
 }
 
 //------------------------------------------------------------------------------
-void mmdTracker::CanonicalToTracker(vtkTransform *trans)
+void mmdTracker::CanonicalToTracker(mafTransform *trans)
 //------------------------------------------------------------------------------
 {
-  mflSmartPointer<vtkMatrix4x4> canonical_to_tracker;
-  canonical_to_tracker->DeepCopy(this->m_TrackerToCanonicalTransform->GetMatrix());
-  canonical_to_tracker->Invert();
-  trans->PostMultiply();
-  trans->Concatenate(canonical_to_tracker);
-}
-
-//------------------------------------------------------------------------------
-void mmdTracker::CanonicalToTracker(mflTransform *trans)
-//------------------------------------------------------------------------------
-{
-  mflSmartPointer<vtkMatrix4x4> canonical_to_tracker;
-  canonical_to_tracker->DeepCopy(this->m_TrackerToCanonicalTransform->GetMatrix());
-  canonical_to_tracker->Invert();
+  mafMatrix canonical_to_tracker;
+  canonical_to_tracker=m_TrackerToCanonicalTransform->GetMatrix();
+  canonical_to_tracker.Invert();
   trans->Concatenate(canonical_to_tracker,POST_MULTIPLY);
 }
 
@@ -490,7 +464,7 @@ void mmdTracker::CreateGui()
   m_Gui->Enable(ID_AVATAR_SELECT,false);
 
   m_Gui->Divider(1);
-  m_Gui->VectorN(ID_TB_X_EXTENT,"X extent",	m_TrackedBounds->m_Bounds,2, MINFLOAT, MAXFLOAT, -1);
+  m_Gui->VectorN(ID_TB_X_EXTENT,"X extent",	m_TrackedBounds.m_Bounds,2, MINFLOAT, MAXFLOAT, -1);
   m_Gui->VectorN(ID_TB_Y_EXTENT,"Y extent",	&(GetTrackedBounds()->m_Bounds[2]),2, MINFLOAT, MAXFLOAT, -1);
   m_Gui->VectorN(ID_TB_Z_EXTENT,"Z extent",	&(GetTrackedBounds()->m_Bounds[4]),2, MINFLOAT, MAXFLOAT, -1);
   m_Gui->Divider();
@@ -576,23 +550,23 @@ void mmgTrackerSettings::OnEvent(mafEventBase *event)
 
   if ( event->GetID()==AGENT_ASYNC_DISPATCH && event->GetSender()==this )
   { 
-    m_LastPoseMutex->Lock();
+    m_LastPoseMutex.Lock();
     // avoid concurrent access to the flag
     mafEventBase *async_event=(mafEventBase *)event->GetData();
     mafID id=async_event->GetId();
-    m_LastPoseMutex->Unlock();
+    m_LastPoseMutex.Unlock();
 
     // process the event
     Superclass::OnEvent(event);
 
-    m_LastPoseMutex->Lock();
+    m_LastPoseMutex.Lock();
     // if it was a move event clear the m_LastMoveEvent variable
     if (id==TRACKER_3D_MOVE)
     {
       m_LastPose=0;
       //
     }
-    m_LastPoseMutex->Unlock();
+    m_LastPoseMutex.Unlock();
   }
   else
   {
