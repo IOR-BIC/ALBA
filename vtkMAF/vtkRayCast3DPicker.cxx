@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkRayCast3DPicker.cxx,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:49:25 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-03 05:57:32 $
+  Version:   $Revision: 1.2 $
   Authors:   Michele Diegoli
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -35,7 +35,7 @@
 #include "vtkVolumeMapper.h"
 
 //------------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkRayCast3DPicker, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkRayCast3DPicker, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkRayCast3DPicker);
 //------------------------------------------------------------------------------
 
@@ -78,7 +78,7 @@ vtkRayCast3DPicker::~vtkRayCast3DPicker()
 // Update state when prop3D is picked.
 void vtkRayCast3DPicker::MarkPicked(vtkAssemblyPath *path, vtkProp3D *prop3D, 
                            vtkAbstractMapper3D *m,
-                           float tMin, float mapperPos[3])
+                           double tMin, double mapperPos[3])
 //------------------------------------------------------------------------------
 {
   int i;
@@ -118,7 +118,7 @@ void vtkRayCast3DPicker::MarkPicked(vtkAssemblyPath *path, vtkProp3D *prop3D,
 }
 
 //------------------------------------------------------------------------------
-int vtkRayCast3DPicker::Pick(float selectionX, float selectionY, float selectionZ, vtkRenderer *renderer)
+int vtkRayCast3DPicker::Pick(double selectionX, double selectionY, double selectionZ, vtkRenderer *renderer)
 //------------------------------------------------------------------------------
 {
   return 0;
@@ -127,25 +127,25 @@ int vtkRayCast3DPicker::Pick(float selectionX, float selectionY, float selection
 //------------------------------------------------------------------------------
 // Perform pick operation with a segment provided! Points are expressed in the 
 // world coordinate system. Return non-zero if something was successfully picked.
-int vtkRayCast3DPicker::Pick(float *p1, float *p2, vtkRenderer *renderer)
+int vtkRayCast3DPicker::Pick(double *p1, double *p2, vtkRenderer *renderer)
 //------------------------------------------------------------------------------
 {
   int i;
   vtkProp *prop;
   //vtkCamera *camera;
   vtkAbstractMapper3D *mapper = NULL;
-  float p1World[4], p2World[4], p1Mapper[4], p2Mapper[4];
+  double p1World[4], p2World[4], p1Mapper[4], p2Mapper[4];
   int picked=0;
   int *winSize;
-  float x, y, t;
-  float *viewport;
-  float ray[3]/*, rayLength*/;
+  double x, y, t;
+  double *viewport;
+  double ray[3]/*, rayLength*/;
   int pickable;
   int LODId;
-  float windowLowerLeft[4], windowUpperRight[4];
-  float bounds[6], tol, hitPosition[3];
+  double windowLowerLeft[4], windowUpperRight[4];
+  double bounds[6], tol, hitPosition[3];
 
-  float selectionPoint[3]; // selection point in display coordinates
+  double selectionPoint[3]; // selection point in display coordinates
 
    //  Initialize picking process
   this->Initialize();
@@ -303,10 +303,10 @@ int vtkRayCast3DPicker::Pick(float *p1, float *p2, vtkRenderer *renderer)
         bounds[0] -= tol; bounds[1] += tol; 
         bounds[2] -= tol; bounds[3] += tol; 
         bounds[4] -= tol; bounds[5] += tol;
-        if ( vtkCell::HitBBox(bounds, (float *)p1Mapper, ray, hitPosition, t) )
-        {
-          t = this->IntersectWithLine((float *)p1Mapper, 
-                                      (float *)p2Mapper, tol, path, 
+        //if ( vtkCell::HitBBox(bounds, (double *)p1Mapper, ray, hitPosition, t) )
+        //{
+          t = this->IntersectWithLine((double *)p1Mapper, 
+                                      (double *)p2Mapper, tol, path, 
                                       (vtkProp3D *)propCandidate, mapper);
           if ( t < VTK_LARGE_FLOAT )
           {
@@ -323,7 +323,7 @@ int vtkRayCast3DPicker::Pick(float *p1, float *p2, vtkRenderer *renderer)
               this->Actors->AddItem(actor);
             }
           }
-        }//if HitBBox
+        //}//if HitBBox
       }//if visible and pickable not transparent and has mapper
     }//for all parts
   }//for all actors
@@ -336,7 +336,7 @@ int vtkRayCast3DPicker::Pick(float *p1, float *p2, vtkRenderer *renderer)
 
 //------------------------------------------------------------------------------
 //from vtkCellPicker: now I can select an object when I pick a cell(on the surface)
-float vtkRayCast3DPicker::IntersectWithLine(float p1[3], float p2[3], float tol, 
+double vtkRayCast3DPicker::IntersectWithLine(double p1[3], double p2[3], double tol, 
                                        vtkAssemblyPath *path, 
                                        vtkProp3D *prop3D, 
                                        vtkAbstractMapper3D *m)
@@ -344,7 +344,7 @@ float vtkRayCast3DPicker::IntersectWithLine(float p1[3], float p2[3], float tol,
 {
   vtkIdType numCells, cellId, minCellId;
   int i, minSubId, subId;
-  float tMin, t, pcoords[3], minXYZ[3], minPcoords[3];
+  double tMin, t, pcoords[3], minXYZ[3], minPcoords[3];
   vtkDataSet *input;
   vtkMapper *mapper;
   vtkVolumeMapper *volumeMapper;
