@@ -78,7 +78,8 @@ mmgViewFrame.cpp
 mmgViewFrame.h
 mmgViewWin.cpp
 mmgViewWin.h
-
+mmgVMEChooserAccept.cpp
+mmgVMEChooserAccept.h
 )
 
 # List the kits from VTK that are needed by this project.
