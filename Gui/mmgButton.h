@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgButton.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:20 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-04 11:44:03 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -15,6 +15,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
+#include "mafObserver.h"
 //----------------------------------------------------------------------------
 // mmgButton :
 /**
@@ -36,7 +37,7 @@ public:
   mmgButton(wxWindow *parent, wxWindowID id = 0 );
 
   /** Set the Listener that will receive event-notification. */
-  void SetListener  (mafEventListener *listener)   {m_Listener=listener;}; 
+  void SetListener  (mafObserver *listener)   {m_Listener=listener;}; 
 
 protected:  
 	/** Called to set the button as default. */
@@ -54,7 +55,7 @@ protected:
 	void OnSetFocus(wxFocusEvent& event) {}; 
 
   int m_id;
-  mafEventListener  *m_Listener;     
+  mafObserver  *m_Listener;     
 
   DECLARE_EVENT_TABLE()
 };

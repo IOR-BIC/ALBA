@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-02 10:32:09 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-05-04 11:43:08 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -195,117 +195,120 @@ void mafLogicWithManagers::UpdateFrameTitle()
   m_Win->SetTitle(title);
 }
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::OnEvent(mafEvent& e)
+void mafLogicWithManagers::OnEvent(mafEventBase *event)
 //----------------------------------------------------------------------------
 {
-  if(e.GetId()!= UPDATE_UI)
+  if (mafEvent *e = mafEvent::SafeDownCast(event))
   {
-    e.Log(); // for debugging pourpose
-    int foo=0;
-  }
+    if(e->GetId()!= UPDATE_UI)
+    {
+      e->Log(); // for debugging pourpose
+      int foo=0;
+    }
 
-	switch(e.GetId())
-  {
-  // ###############################################################
-	// commands related to FILE MENU  
-  case MENU_FILE_NEW:
-		OnFileNew();
-	break; 
-  case MENU_FILE_OPEN:
-		OnFileOpen();
-	break; 
-	case wxID_FILE1:
-	case wxID_FILE2:
-	case wxID_FILE3:
-	case wxID_FILE4:
-		OnFileHistory(e.GetId());
-	break;
-  case MENU_FILE_SAVE:
-    OnFileSave();
-  break; 
-  case MENU_FILE_SAVEAS:
-    OnFileSaveAs();
-  break; 
-  case MENU_FILE_QUIT:
-		OnQuit();		
-  break; 
-  // ###############################################################
-	// commands related to VME
-  case VME_SELECT:	
-		VmeSelect(e);		
-  break; 
-  case VME_SELECTED: 
-		VmeSelected(e.GetVme());
-  break;
-	case VME_SHOW:
-		VmeShow(e.GetVme(), e.GetBool());
-	break;
-  case VME_MODIFIED:
-		VmeModified(e.GetVme());
-  break; 
-  case VME_ADD:
-		VmeAdd(e.GetVme());
-  break; 
-  case VME_ADDED:
-		VmeAdded(e.GetVme());
-  break; 
-  case VME_REMOVE:
-		VmeRemove(e.GetVme());
-  break; 
-  case VME_REMOVING:
-		VmeRemoving(e.GetVme());
-  break; 
-  // ###############################################################
-  // commands related to OP
-  case MENU_OP:
-    if(m_OpManager) m_OpManager->OpRun(e.GetArg());
-  break;
-  case OP_RUN_STARTING:
-		OpRunStarting();
-	break; 
-  case OP_RUN_TERMINATED:
-		OpRunTerminated();
-  break; 
-  case OP_SHOW_GUI:
-    OpShowGui(!e.GetBool(), (mmgPanel*)e.GetWin());
-  break; 
-  case OP_HIDE_GUI:
-    OpHideGui(e.GetBool());
-  break; 
-  // ###############################################################
-  // commands related to VIEWS
-  case VIEW_CREATE:
-		ViewCreate(e.GetArg());
-  break;
-  case VIEW_CREATED:
-		ViewCreated(e.GetView());
-  break;
-  case VIEW_DELETE:
-    if(m_PlugSidebar)
-			this->m_SideBar->ViewDeleted(e.GetView());
-  break;	
-  case VIEW_SELECT:
-		ViewSelect();
-  break;
-  case CAMERA_UPDATE:
-    if(m_ViewManager) m_ViewManager->CameraUpdate();
-  break; 
-  case CAMERA_RESET:
-    if(m_ViewManager) m_ViewManager->CameraReset();
-  break; 
-  case CAMERA_FIT:
-    if(m_ViewManager) m_ViewManager->CameraReset(true);
-  break;
-  case CAMERA_FLYTO:
-    //if(m_ViewManager) m_ViewManager->CameraFlyToMode();
-  break;
-  case TIME_SET:
-    TimeSet(e.GetFloat());
-    break; 
-  default:
-    mafLogicWithGUI::OnEvent(e);
-  break; 
-  }
+    switch(e->GetId())
+    {
+      // ###############################################################
+      // commands related to FILE MENU  
+    case MENU_FILE_NEW:
+      OnFileNew();
+      break; 
+    case MENU_FILE_OPEN:
+      OnFileOpen();
+      break; 
+    case wxID_FILE1:
+    case wxID_FILE2:
+    case wxID_FILE3:
+    case wxID_FILE4:
+      OnFileHistory(e->GetId());
+      break;
+    case MENU_FILE_SAVE:
+      OnFileSave();
+      break; 
+    case MENU_FILE_SAVEAS:
+      OnFileSaveAs();
+      break; 
+    case MENU_FILE_QUIT:
+      OnQuit();		
+      break; 
+      // ###############################################################
+      // commands related to VME
+    case VME_SELECT:	
+      VmeSelect(*e);		
+      break; 
+    case VME_SELECTED: 
+      VmeSelected(e->GetVme());
+      break;
+    case VME_SHOW:
+      VmeShow(e->GetVme(), e->GetBool());
+      break;
+    case VME_MODIFIED:
+      VmeModified(e->GetVme());
+      break; 
+    case VME_ADD:
+      VmeAdd(e->GetVme());
+      break; 
+    case VME_ADDED:
+      VmeAdded(e->GetVme());
+      break; 
+    case VME_REMOVE:
+      VmeRemove(e->GetVme());
+      break; 
+    case VME_REMOVING:
+      VmeRemoving(e->GetVme());
+      break; 
+      // ###############################################################
+      // commands related to OP
+    case MENU_OP:
+      if(m_OpManager) m_OpManager->OpRun(e->GetArg());
+      break;
+    case OP_RUN_STARTING:
+      OpRunStarting();
+      break; 
+    case OP_RUN_TERMINATED:
+      OpRunTerminated();
+      break; 
+    case OP_SHOW_GUI:
+      OpShowGui(!e->GetBool(), (mmgPanel*)e->GetWin());
+      break; 
+    case OP_HIDE_GUI:
+      OpHideGui(e->GetBool());
+      break; 
+      // ###############################################################
+      // commands related to VIEWS
+    case VIEW_CREATE:
+      ViewCreate(e->GetArg());
+      break;
+    case VIEW_CREATED:
+      ViewCreated(e->GetView());
+      break;
+    case VIEW_DELETE:
+      if(m_PlugSidebar)
+        this->m_SideBar->ViewDeleted(e->GetView());
+      break;	
+    case VIEW_SELECT:
+      ViewSelect();
+      break;
+    case CAMERA_UPDATE:
+      if(m_ViewManager) m_ViewManager->CameraUpdate();
+      break; 
+    case CAMERA_RESET:
+      if(m_ViewManager) m_ViewManager->CameraReset();
+      break; 
+    case CAMERA_FIT:
+      if(m_ViewManager) m_ViewManager->CameraReset(true);
+      break;
+    case CAMERA_FLYTO:
+      //if(m_ViewManager) m_ViewManager->CameraFlyToMode();
+      break;
+    case TIME_SET:
+      TimeSet(e->GetFloat());
+      break; 
+    default:
+      mafLogicWithGUI::OnEvent(event);
+      break; 
+    } // end switch case
+  } // end if SafeDowncast
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OnFileNew()

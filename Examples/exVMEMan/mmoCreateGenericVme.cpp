@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateGenericVme.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 11:09:57 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-04 11:46:29 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -43,10 +43,10 @@ mafOp* mmoCreateGenericVme::Copy()
   return new mmoCreateGenericVme(m_Label);
 }
 //----------------------------------------------------------------------------
-void mmoCreateGenericVme::OnEvent(mafEvent& e)
+void mmoCreateGenericVme::OnEvent(mafEventBase *event)
 //----------------------------------------------------------------------------
 {
-  mafEventMacro(e);
+  mafEventMacro(*event);
 }
 //----------------------------------------------------------------------------
 void mmoCreateGenericVme::OpRun()

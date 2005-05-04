@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgPicButton.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:26 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-04 11:44:05 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,12 +31,11 @@ class mmgPicButton : public wxBitmapButton
 DECLARE_DYNAMIC_CLASS(mmgPicButton)
 
 public:
-  mmgPicButton() { };
-  
+  mmgPicButton() {};
   mmgPicButton(wxWindow *parent, wxString BitmapId, wxWindowID id = 0 );
 
   /** Set the Listener that will receive event-notification. */
-  void SetListener(mafEventListener *listener)   {m_Listener=listener;}; 
+  void SetListener(mafObserver *listener)   {m_Listener=listener;}; 
   void SetEventId(long EventId); 
 
   /** Link the bitmap to the button through the id. */
@@ -55,7 +54,7 @@ protected:
   void OnSetFocus(wxFocusEvent& event) {}; 
 
   int m_id;
-  mafEventListener  *m_Listener;     
+  mafObserver  *m_Listener;     
 
 DECLARE_EVENT_TABLE()
 };

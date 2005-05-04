@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-02 10:31:46 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-05-04 11:43:11 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -385,34 +385,34 @@ void mafVMEManager::MSFSaveAs()
    MSFSave();
 }
 //----------------------------------------------------------------------------
-void mafVMEManager::VmeAdd(mafNode *v)
+void mafVMEManager::VmeAdd(mafNode *n)
 //----------------------------------------------------------------------------
 {
-  if(v != NULL)
+  if(n != NULL)
   {
-    mafNode *vp = v->GetParent();  
+    mafNode *vp = n->GetParent();  
     assert( vp == NULL || m_Storage->GetRoot()->IsInTree(vp) );
     if(vp == NULL) 
-			v->ReparentTo(m_Storage->GetRoot());
+			n->ReparentTo(m_Storage->GetRoot());
 
     //Marco: no more sent: it is the tree which sends the event (see OnEvent())
-    //NotifyAdd(v); 
+    //NotifyAdd(n); 
 
     m_Modified = true;
   }
 }
 //----------------------------------------------------------------------------
-void mafVMEManager::VmeRemove(mafNode *v)
+void mafVMEManager::VmeRemove(mafNode *n)
 //----------------------------------------------------------------------------
 {
-  if(v != NULL && m_Storage->GetRoot() /*&& m_Storage->GetRoot()->IsInTree(v)*/) 
+  if(n != NULL && m_Storage->GetRoot() /*&& m_Storage->GetRoot()->IsInTree(n)*/) 
   {
-    assert(m_Storage->GetRoot()->IsInTree(v));
+    assert(m_Storage->GetRoot()->IsInTree(n));
 
     //Marco: no more sent: it is the tree which sends the event (see OnEvent())
-    //NotifyRemove(v);
+    //NotifyRemove(n);
 
-    v->ReparentTo(NULL); // kill the vme
+    n->ReparentTo(NULL); // kill the vme
     m_Modified = true;
   }
 }
@@ -441,22 +441,22 @@ void mafVMEManager::TimeGetBounds(float *min, float *max)
   }
 }
 //----------------------------------------------------------------------------
-void mafVMEManager::NotifyRemove(mafNode *v)
+void mafVMEManager::NotifyRemove(mafNode *n)
 //----------------------------------------------------------------------------
 {
-  mafNodeIterator *iter=v->NewIterator();
+  mafNodeIterator *iter = n->NewIterator();
   iter->SetTraversalModeToPostOrder();
-  for (mafNode *vme=iter->GetFirstNode();vme;vme=iter->GetNextNode())
-		mafEventMacro(mafEvent(this,VME_REMOVING,vme));
+  for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+		mafEventMacro(mafEvent(this,VME_REMOVING,node));
   iter->Delete();
 }
 //----------------------------------------------------------------------------
-void mafVMEManager::NotifyAdd(mafNode *v)
+void mafVMEManager::NotifyAdd(mafNode *n)
 //----------------------------------------------------------------------------
 {
-  mafNodeIterator *iter=v->NewIterator();
-  for (mafNode *vme=iter->GetFirstNode();vme;vme=iter->GetNextNode())
-    mafEventMacro(mafEvent(this,VME_ADDED,vme));
+  mafNodeIterator *iter = n->NewIterator();
+  for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+    mafEventMacro(mafEvent(this,VME_ADDED,node));
   iter->Delete();
 }
 //----------------------------------------------------------------------------
@@ -481,22 +481,22 @@ bool mafVMEManager::AskConfirmAndSave()
 	return go;
 }
 //----------------------------------------------------------------------------
-void mafVMEManager::UpdateFromTag(mafNode *vme)
+void mafVMEManager::UpdateFromTag(mafNode *n)
 //----------------------------------------------------------------------------
 {
   /*
-  if (vme)
+  if (n)
   {
-    mafVmeData *vd = (mafVmeData *)vme->GetClientData();
+    mafVmeData *vd = (mafVmeData *)n->GetClientData();
     if (vd)
       vd->UpdateFromTag();
   }
   else
   {
     mafNodeIterator *iter = m_Storage->GetRoot()->NewIterator();
-    for (mafNode *v = iter->GetFirstNode(); v; v = iter->GetNextNode())
+    for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
     {
-      mafVmeData *vd = (mafVmeData *)v->GetClientData();
+      mafVmeData *vd = (mafVmeData *)node->GetClientData();
       if (vd)
         vd->UpdateFromTag();
     }

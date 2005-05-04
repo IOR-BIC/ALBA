@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 17:23:06 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-05-04 11:43:11 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,7 +21,9 @@
 
 #include "mafViewVTK.h"
 #include "vtkCamera.h"
-
+#include "mafVME.h"
+#include "mafPipe.h"
+#include "mafPipeFactory.h"
 
 //----------------------------------------------------------------------------
 mafViewVTK::mafViewVTK(wxString label)
@@ -39,7 +41,7 @@ mafViewVTK::~mafViewVTK( )
   cppDEL(m_Rwi);
 }
 //----------------------------------------------------------------------------
-mafView *mafViewVTK::Copy(mafEventListener *Listener)
+mafView *mafViewVTK::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
   mafViewVTK *v = new mafViewVTK(m_Label);
@@ -95,4 +97,47 @@ mafPipe* mafViewVTK::GetNodePipe(mafNode *vme)
    mafSceneNode *n = m_Sg->Vme2Node(vme);
    if(!n) return NULL;
    return n->m_Pipe;
+}
+//----------------------------------------------------------------------------
+void mafViewVTK::VmeCreatePipe(mafNode *vme)
+//----------------------------------------------------------------------------
+{
+  mafSceneNode *n = m_Sg->Vme2Node(vme);
+  assert(n && !n->m_Pipe);
+  assert(vme->IsA("mafVME"));
+  mafVME *v = ((mafVME*)vme);
+
+  mafObject *obj= NULL;
+  mafString pipe_name = "";
+  mafString vme_type = v->GetTypeName(); // Paolo 2005-04-23 Just to try PlugVisualPipe 
+  // (to be replaced with something that extract the type of the vme)
+
+  mafPipeFactory *pipe_factory  = mafPipeFactory::GetInstance();
+  assert(pipe_factory!=NULL);
+  if (!m_PipeMap.empty() && (m_PipeMap[vme_type].m_Visibility == NODE_VISIBLE_ON))  // Paolo 2005-04-23
+  {
+    // keep the visual pipe from the view's visual pipe map
+    pipe_name = m_PipeMap[vme_type].m_PipeName;
+  }
+  else
+  {
+    // keep the default visual pipe from the vme
+    pipe_name = v->GetVisualPipe();
+  }
+
+  if (pipe_name != "")
+  {
+    obj = pipe_factory->CreateInstance(pipe_name);
+    mafPipe *pipe = (mafPipe*)obj;
+    pipe->Create(n);
+    n->m_Pipe = (mafPipe*)pipe;
+  }
+}
+//----------------------------------------------------------------------------
+void mafViewVTK::VmeDeletePipe(mafNode *vme)
+//----------------------------------------------------------------------------
+{
+  mafSceneNode *n = m_Sg->Vme2Node(vme);
+  assert(n && n->m_Pipe);
+  cppDEL(n->m_Pipe);
 }

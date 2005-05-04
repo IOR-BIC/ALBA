@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:25 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-04 11:44:05 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
-class mafEventListener;
+class mafObserver;
 class vtkProcessObject;
 class vtkViewport;
 class vtkObject;
@@ -33,7 +33,7 @@ class mmgMDIFrame: public wxMDIParentFrame
   mmgMDIFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
  ~mmgMDIFrame(); 
   
-  void SetListener(mafEventListener *Listener) {m_Listener = Listener;};
+  void SetListener(mafObserver *Listener) {m_Listener = Listener;};
   
   /** Set the window shown on the Client Area, (hide the previous contents) */
 	void Put(wxWindow* w);
@@ -128,7 +128,7 @@ protected:
 	/** Create the status bar on main application frame. */
   void CreateStatusbar();
 
-  mafEventListener *m_Listener;
+  mafObserver *m_Listener;
   wxWindow         *m_clientwin;
 
   // added members to handle the progressbar

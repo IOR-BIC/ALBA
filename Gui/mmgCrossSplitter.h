@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCrossSplitter.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:21 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-04 11:44:03 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,6 +19,7 @@
 #include <wx/hash.h>
 #include "mafDecl.h"
 #include "mafEvent.h"
+#include "mafObserver.h"
 #include "mmgPanel.h"
 //----------------------------------------------------------------------------
 // constant :
@@ -56,8 +57,8 @@ public:
   mmgCrossSplitter(wxWindow* parent,wxWindowID id = -1);
   virtual ~mmgCrossSplitter();
 
-  void SetListener(mafEventListener *Listener) {m_Listener = Listener;};
-  void OnEvent(mafEvent& e);
+  void SetListener(mafObserver *Listener) {m_Listener = Listener;};
+  //void OnEvent(mafEventBase *event);
 
   /** Show/Hide the four panel according to a splitting modality. */
 	void Split(CrossSplitterModes mode);
@@ -65,10 +66,10 @@ public:
 	/** Set the split position and redraw the four panels. */
 	void SetSplitPos(int x,int y);
   
-	/** Set the split position in relative coords and redraw the four panels. */
+	/** Set the split position in relative coordinates and redraw the four panels. */
   void SetSplitPosRel(float x,float y);
   
-	/** Maximize the fonsed panel. */
+	/** Maximize the founded panel. */
   void Maximize();
 
   /** Put the window into the panel 'i'. */
@@ -78,7 +79,7 @@ public:
 	void SetFocusedPanel(wxWindow* w);
 
 protected:
-  mafEventListener *m_Listener;
+  mafObserver *m_Listener;
 
   wxCursor *m_CursorWE;
   wxCursor *m_CursorNS;

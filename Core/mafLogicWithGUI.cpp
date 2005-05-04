@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-23 09:48:50 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-04 11:43:08 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -112,57 +112,60 @@ void mafLogicWithGUI::CreateNullLog()
   cppDEL(old_log);
 }
 //----------------------------------------------------------------------------
-void mafLogicWithGUI::OnEvent(mafEvent& e)
+void mafLogicWithGUI::OnEvent(mafEventBase *event)
 //----------------------------------------------------------------------------
 {
-  switch(e.GetId())
+  if (mafEvent *e = mafEvent::SafeDownCast(event))
   {
-  case MENU_FILE_QUIT:
-			OnQuit();		
-  break; 
-  // ###############################################################
-  // commands related to the SASH
-  case MENU_VIEW_LOGBAR:
-    if(m_LogSash) m_LogSash->Show(!m_LogSash->IsShown());
-    break; 
-  case MENU_VIEW_SIDEBAR:
-    if(m_SideSash) m_SideSash->Show(!m_SideSash->IsShown());
-    break; 
-  case MENU_VIEW_TIMEBAR:
-    if(m_TimeSash) m_TimeSash->Show(!m_TimeSash->IsShown());
-    break; 
-  case MENU_VIEW_TOOLBAR:
-    if(m_PlugToolbar)	
+    switch(e->GetId())
     {
-      bool show = !m_TooBar->IsShown();
-      m_TooBar->Show(show);
-      m_MenuBar->FindItem(MENU_VIEW_TOOLBAR)->Check(show);
-      m_Win->Update();
+    case MENU_FILE_QUIT:
+      OnQuit();		
+      break; 
+      // ###############################################################
+      // commands related to the SASH
+    case MENU_VIEW_LOGBAR:
+      if(m_LogSash) m_LogSash->Show(!m_LogSash->IsShown());
+      break; 
+    case MENU_VIEW_SIDEBAR:
+      if(m_SideSash) m_SideSash->Show(!m_SideSash->IsShown());
+      break; 
+    case MENU_VIEW_TIMEBAR:
+      if(m_TimeSash) m_TimeSash->Show(!m_TimeSash->IsShown());
+      break; 
+    case MENU_VIEW_TOOLBAR:
+      if(m_PlugToolbar)	
+      {
+        bool show = !m_TooBar->IsShown();
+        m_TooBar->Show(show);
+        m_MenuBar->FindItem(MENU_VIEW_TOOLBAR)->Check(show);
+        m_Win->Update();
+      }
+      break; 
+      // ###############################################################
+      // commands related to the STATUSBAR
+    case BIND_TO_PROGRESSBAR:
+      m_Win->BindToProgressBar(e->GetVtkObj());
+      break;
+    case PROGRESSBAR_SHOW:
+      m_Win->ProgressBarShow();
+      break;
+    case PROGRESSBAR_HIDE:
+      m_Win->ProgressBarHide();
+      break;
+    case PROGRESSBAR_SET_VALUE:
+      m_Win->ProgressBarSetVal(e->GetArg());
+      break;
+    case PROGRESSBAR_SET_TEXT:
+      m_Win->ProgressBarSetText(&wxString(e->GetString()->GetCStr()));
+      break;
+      // ###############################################################
+    case UPDATE_UI:
+      break; 
+    default:
+      e->Log();
+      break; 
     }
-    break; 
-  // ###############################################################
-  // commands related to the STATUSBAR
-  case BIND_TO_PROGRESSBAR:
-    m_Win->BindToProgressBar(e.GetVtkObj());
-    break;
-  case PROGRESSBAR_SHOW:
-    m_Win->ProgressBarShow();
-    break;
-  case PROGRESSBAR_HIDE:
-    m_Win->ProgressBarHide();
-    break;
-  case PROGRESSBAR_SET_VALUE:
-    m_Win->ProgressBarSetVal(e.GetArg());
-    break;
-  case PROGRESSBAR_SET_TEXT:
-    m_Win->ProgressBarSetText(&wxString(e.GetString()->GetCStr()));
-    break;
-  // ###############################################################
-  case UPDATE_UI:
-    break; 
-  default:
-    e.Log();
-  break; 
   }
 }
 //----------------------------------------------------------------------------

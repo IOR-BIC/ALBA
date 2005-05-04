@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialog.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-20 14:29:47 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-05-04 11:44:03 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 #include "wx/dialog.h"
 #include "mafEvent.h"
+#include "mafObserver.h"
 #include "mmgGui.h"
 //----------------------------------------------------------------------------
 // Const:
@@ -64,13 +65,13 @@ Example:
 
 @sa mmgDialogPreview
 */
-class mmgDialog : public wxDialog, public mafEventListener  
+class mmgDialog : public wxDialog, public mafObserver  
 {
 public:
 	mmgDialog (const wxString& title,	long style = mafCLOSEWINDOW | mafRESIZABLE | mafCLOSE);
 	virtual ~mmgDialog (); 
-  void SetListener(mafEventListener *Listener) {m_Listener = Listener;};
-  void OnEvent(mafEvent& e);
+  void SetListener(mafObserver *Listener) {m_Listener = Listener;};
+  void OnEvent(mafEventBase *event);
 
   /** Add a widget to the dialog. */
   void Add(wxWindow* window,int option = 0, int flag = wxEXPAND, int border = 0)  {window->Reparent(this); m_sizer->Add(window,option,flag,border);};
@@ -120,7 +121,7 @@ public:
   wxButton   *m_cancel_button;  ///< Button used to close the dialog with wxID_CANCEL
   wxButton   *m_close_button;   ///< Button used to close the dialog with wxID_CLOSE
 
-  mafEventListener *m_Listener;
+  mafObserver *m_Listener;
 
 private:
   /** non virtual function, called on Dialog Closing and bound trought the event table */

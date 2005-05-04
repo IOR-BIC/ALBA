@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 11:08:34 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-04 11:43:09 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,6 +16,8 @@
 //----------------------------------------------------------------------------
 #include "mafDefines.h" //important: mafDefines should always be included as first
 #include "mafEvent.h"
+#include "mafObserver.h"
+
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
@@ -40,18 +42,18 @@ enum
 //----------------------------------------------------------------------------
 /**
 */
-class mafOp: public mafEventListener 
+class mafOp: public mafObserver
 {
 public:
 					mafOp();
 					mafOp(wxString label);
 	virtual	~mafOp(); 
-					void		SetListener(mafEventListener *Listener)	{m_Listener = Listener;};
+					void		SetListener(mafObserver *Listener)	{m_Listener = Listener;};
           
 					/** Return the type of the operation: OPTYPE_OP, OPTYPE_IMPORTER, OPTYPE_EXPORTER, OPTYPE_EDIT or OPTYPE_STATECHANGER*/
 					int			GetType();
 
-	virtual void		OnEvent(mafEvent& e);
+	virtual void		OnEvent(mafEventBase *event);
 	virtual mafOp*	Copy();
 
 	/** Builds operation's interface. */
@@ -126,7 +128,7 @@ protected:
 	bool 						m_Canundo;
 	int 						m_OpType;
 	bool						m_NaturalPreserving;
-	mafEventListener *m_Listener;
-  mafAction        *m_MouseAction;
+	mafObserver    *m_Listener;
+  mafAction      *m_MouseAction;
 };
 #endif

@@ -2,38 +2,42 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:18:01 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-04 11:43:09 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
+
 #ifndef __mafNodeManager_H__
 #define __mafNodeManager_H__
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include  "mafEvent.h"
-#include  "mafNode.h"
-#include  "mafVMERoot.h"
-#include  "mafVMERoot.h"
-#include  "mmgFileHistory.h"
+#include "mafEvent.h"
+#include "mafObserver.h"
+#include "mafNode.h"
+#include "mafVMERoot.h"
+#include "mafVMERoot.h"
+#include "mmgFileHistory.h"
+
 //----------------------------------------------------------------------------
 // Forward References :
 //----------------------------------------------------------------------------
 class mafNodeStorage;
+
 //----------------------------------------------------------------------------
 // mafNodeManager :
 //----------------------------------------------------------------------------
-class mafNodeManager: public mafEventListener
+class mafNodeManager: public mafObserver
 {
 public:
-       mafNodeManager();
-      ~mafNodeManager(); 
+    mafNodeManager();
+  ~mafNodeManager(); 
 
-  void SetListener(mafEventListener *Listener) {m_Listener = Listener;};
-  void OnEvent(mafEvent& e);
+  void SetListener(mafObserver *Listener) {m_Listener = Listener;};
+  void OnEvent(mafEventBase *event);
  
   /** 
   Destroy all nodes (olso the root), for each destroyed node the manager send 
@@ -61,10 +65,10 @@ public:
   void MSFModified(bool modified) {m_modified = modified;};
 
 	/** Add the vme to the tree. */
-  void VmeAdd(mafNode *v);
+  void VmeAdd(mafNode *n);
 
 	/** Remove the vme from the tree. */
-  void VmeRemove(mafNode *v);
+  void VmeRemove(mafNode *n);
 
 	/** Get the time bounds of the tree. */
   void TimeGetBounds(float *min, float *max);
@@ -73,10 +77,10 @@ public:
   void TimeSet(float time);
 
 	/** Send the event VME_REMOVING to inform logic that the vme and its subtree are removed from the tree. */
-  void NotifyRemove(mafNode *v);
+  void NotifyRemove(mafNode *n);
 
 	/** Send the event VME_ADDED to inform logic that the vme and its subtree are added to the tree. */
-  void NotifyAdd(mafNode *v);
+  void NotifyAdd(mafNode *n);
   
 	/** Show the dialog to confirm the save of the current tree. */
 	bool AskConfirmAndSave();
@@ -96,27 +100,27 @@ public:
 	/** Set the application stamp; this is the mark of the specific vertical application (must be equal to the application name). */
   void SetApplicationStamp(wxString appstamp) {m_AppStamp = appstamp;};
 
-	/** Set the flag for bak file generation on saving msf file. */
+	/** Set the flag for .bak file generation on saving .msf file. */
 	void MakeBakFileOnSave(bool bakfile = true) {m_make_bak_file = bakfile;}
 
   /** Update vme client data interface from tag. if vme == NULL, the update is propagated from root vme to all the tree. */
-  void UpdateFromTag(mafNode *vme = NULL);
+  void UpdateFromTag(mafNode *n = NULL);
 
 protected:
   bool m_modified;
 
-  mafVMERoot       *m_root;
-  mafEventListener  *m_Listener;
-  wxConfigBase			*m_Config;
-  mmgFileHistory	   m_FileHistory;
+  mafVMERoot      *m_root;
+  mafObserver     *m_Listener;
+  wxConfigBase		*m_Config;
+  mmgFileHistory	 m_FileHistory;
 
-  bool m_make_bak_file;
-  wxString m_msf_dir;
-  wxString m_wildc;
-  wxString m_AppStamp;
-  wxString m_msffile;
-  wxString m_zipfile;
-  wxString m_mergefile;
+  bool      m_make_bak_file;
+  wxString  m_msf_dir;
+  wxString  m_wildc;
+  wxString  m_AppStamp;
+  wxString  m_msffile;
+  wxString  m_zipfile;
+  wxString  m_mergefile;
 
   /*
   bool m_Crypting;

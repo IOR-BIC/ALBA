@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-23 09:48:51 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-04 11:43:08 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 #include "mafDefines.h" //important: mafDefines should always be included as first
 #include "mafEvent.h"
+#include "mafObserver.h"
 #include <wx/notebook.h>
 #include <wx/icon.h>
 //----------------------------------------------------------------------------
@@ -56,14 +57,14 @@ Proper Initialization must follow this order
 4- Show:
 5- Init: Calls FileOpen or FileNew
 */
-class mafLogicWithGUI: public mafEventListener
+class mafLogicWithGUI: public mafObserver
 {
 public:
                mafLogicWithGUI();
 	virtual     ~mafLogicWithGUI(); 
 
 	/** Method that answer at all MAF events. */
-	void OnEvent(mafEvent& e);
+	void OnEvent(mafEventBase *event);
 	/** Visualize all the interface elements of the application.*/
 	virtual void Show();
 	/** Virtual function for plug views into the application.*/

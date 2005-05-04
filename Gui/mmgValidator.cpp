@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgValidator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-02 07:52:49 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-05-04 11:44:06 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,7 +43,7 @@ BEGIN_EVENT_TABLE (mmgValidator, wxValidator)
 END_EVENT_TABLE()
 
 //----------------------------------------------------------------------------
-void mmgValidator::Init(mafEventListener* listener, int mid, wxControl *win)
+void mmgValidator::Init(mafObserver* listener, int mid, wxControl *win)
 //----------------------------------------------------------------------------
 {
   assert(win);
@@ -203,7 +203,7 @@ bool mmgValidator::Copy(const mmgValidator& val)
   return TRUE;
 }
 //----------------------------------------------------------------------------
-mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxStaticText *win,wxString* var) //String
+mmgValidator::mmgValidator(mafObserver* listener, int mid, wxStaticText *win,wxString* var) //String
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);
@@ -213,7 +213,7 @@ mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxStaticText *wi
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxTextCtrl *win,wxString* var) //String
+mmgValidator::mmgValidator(mafObserver* listener, int mid, wxTextCtrl *win,wxString* var) //String
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);  m_mode = VAL_STRING;
@@ -222,7 +222,7 @@ mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxTextCtrl *win,
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxTextCtrl *win,mafString* var) //String
+mmgValidator::mmgValidator(mafObserver* listener, int mid, wxTextCtrl *win,mafString* var) //String
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);  m_mode = VAL_STRING;
@@ -231,7 +231,7 @@ mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxTextCtrl *win,
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxTextCtrl *win,   int*   var,   int min,   int max)//Integer
+mmgValidator::mmgValidator(mafObserver* listener, int mid, wxTextCtrl *win,   int*   var,   int min,   int max)//Integer
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);  m_mode = VAL_INTEGER;
@@ -242,7 +242,7 @@ mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxTextCtrl *win,
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxTextCtrl *win, float* var, float min, float max, int dec_digits)//Float
+mmgValidator::mmgValidator(mafObserver* listener, int mid, wxTextCtrl *win, float* var, float min, float max, int dec_digits)//Float
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);  m_mode = VAL_FLOAT;
@@ -254,7 +254,7 @@ mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxTextCtrl *win,
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxTextCtrl *win, double* var, double min, double max, int dec_digits)//Double
+mmgValidator::mmgValidator(mafObserver* listener, int mid, wxTextCtrl *win, double* var, double min, double max, int dec_digits)//Double
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);  m_mode = VAL_DOUBLE;
@@ -266,7 +266,7 @@ mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxTextCtrl *win,
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxSlider *win, int* var, wxTextCtrl* lab) //Slider     
+mmgValidator::mmgValidator(mafObserver* listener, int mid, wxSlider *win, int* var, wxTextCtrl* lab) //Slider     
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);  m_mode = VAL_SLIDER;
@@ -276,7 +276,7 @@ mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxSlider *win, i
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-mmgValidator::mmgValidator(mafEventListener* listener,int mid,wxTextCtrl *win, int* var, wxSlider* lab, int min, int max)
+mmgValidator::mmgValidator(mafObserver* listener,int mid,wxTextCtrl *win, int* var, wxSlider* lab, int min, int max)
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);  m_mode = VAL_SLIDER_2;
@@ -288,7 +288,7 @@ mmgValidator::mmgValidator(mafEventListener* listener,int mid,wxTextCtrl *win, i
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-mmgValidator::mmgValidator(mafEventListener* listener, int mid, mmgFloatSlider  *win, float*  var, wxTextCtrl* lab) //FloatSlider
+mmgValidator::mmgValidator(mafObserver* listener, int mid, mmgFloatSlider  *win, float*  var, wxTextCtrl* lab) //FloatSlider
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);  m_mode = VAL_FLOAT_SLIDER;
@@ -298,7 +298,7 @@ mmgValidator::mmgValidator(mafEventListener* listener, int mid, mmgFloatSlider  
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-mmgValidator::mmgValidator(mafEventListener* listener,int mid,wxTextCtrl *win, float* var, mmgFloatSlider* lab,float min,float max)
+mmgValidator::mmgValidator(mafObserver* listener,int mid,wxTextCtrl *win, float* var, mmgFloatSlider* lab,float min,float max)
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);  m_mode = VAL_FLOAT_SLIDER_2;
@@ -310,7 +310,7 @@ mmgValidator::mmgValidator(mafEventListener* listener,int mid,wxTextCtrl *win, f
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxCheckBox *win,   int*   var) //CheckBox    
+mmgValidator::mmgValidator(mafObserver* listener, int mid, wxCheckBox *win,   int*   var) //CheckBox    
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);  m_mode = VAL_CHECKBOX;
@@ -319,7 +319,7 @@ mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxCheckBox *win,
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxRadioBox *win,   int*   var) //RadioBox                     
+mmgValidator::mmgValidator(mafObserver* listener, int mid, wxRadioBox *win,   int*   var) //RadioBox                     
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);  m_mode = VAL_RADIOBOX;
@@ -328,7 +328,7 @@ mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxRadioBox *win,
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxComboBox *win,   int*   var) //Combo 
+mmgValidator::mmgValidator(mafObserver* listener, int mid, wxComboBox *win,   int*   var) //Combo 
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);  m_mode = VAL_COMBOBOX;
@@ -337,7 +337,7 @@ mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxComboBox *win,
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxButton *win) //Button
+mmgValidator::mmgValidator(mafObserver* listener, int mid, wxButton *win) //Button
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);  m_mode = VAL_BUTTON;
@@ -345,7 +345,7 @@ mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxButton *win) /
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxButton *win, wxString* var, wxTextCtrl* lab,  bool  openfile, const wxString wildcard)                                                
+mmgValidator::mmgValidator(mafObserver* listener, int mid, wxButton *win, wxString* var, wxTextCtrl* lab,  bool  openfile, const wxString wildcard)                                                
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);  if (openfile) m_mode = VAL_FILEOPEN; else m_mode = VAL_FILESAVE;
@@ -356,7 +356,7 @@ mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxButton *win, w
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxButton *win, wxString* var, wxTextCtrl* lab)
+mmgValidator::mmgValidator(mafObserver* listener, int mid, wxButton *win, wxString* var, wxTextCtrl* lab)
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);  m_mode = VAL_DIROPEN;
@@ -366,7 +366,7 @@ mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxButton *win, w
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-mmgValidator::mmgValidator(mafEventListener* listener, int mid, wxButton *win, wxColour* var, wxTextCtrl* lab)
+mmgValidator::mmgValidator(mafObserver* listener, int mid, wxButton *win, wxColour* var, wxTextCtrl* lab)
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);  m_mode = VAL_COLOR;

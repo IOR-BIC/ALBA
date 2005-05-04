@@ -2,22 +2,26 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-19 12:32:45 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-04 11:43:10 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
+
 #ifndef __mafOpManager_H__
 #define __mafOpManager_H__
+
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
 #include <wx/accel.h>
 #include <wx/menu.h>
 #include "mafEvent.h"
+#include "mafObserver.h"
 #include "mafOpContextStack.h"
+
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
@@ -30,17 +34,18 @@ class mafOpPaste;
 class mafOpTransform;
 class vtkMatrix4x4;
 class mafAction;
+
 //----------------------------------------------------------------------------
 // mafOpManager :
 //----------------------------------------------------------------------------
 /**  */
-class mafOpManager: public mafEventListener
+class mafOpManager: public mafObserver
 {
 public:
 	         mafOpManager();
 	virtual ~mafOpManager(); 
-	virtual void SetListener(mafEventListener *Listener) {m_Listener = Listener;};
-	virtual void OnEvent(mafEvent& e);
+	virtual void SetListener(mafObserver *Listener) {m_Listener = Listener;};
+	virtual void OnEvent(mafEventBase *event);
 
 	/** Add the operation 'op' to the list of available operations. */
 	virtual void OpAdd		(mafOp *op, wxString menuPath = "");
@@ -149,6 +154,6 @@ protected:
   wxMenuBar         *m_menubar;
 	wxToolBar         *m_toolbar;
 
-  mafEventListener  *m_Listener;
+  mafObserver       *m_Listener;
 };
 #endif

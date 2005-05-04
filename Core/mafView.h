@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 17:24:43 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-05-04 11:43:10 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -15,6 +15,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
+#include "mafObserver.h"
 #include "mafDecl.h"
 #include "mafNode.h"
 #include "mmgGuiHolder.h"
@@ -63,15 +64,15 @@ The External Flag has been removed
 mafView can be the base class for composed Views.
 
 */
-class mafView: public mafEventListener
+class mafView: public mafObserver
 {
 public:
   mafView(wxString label, bool external = false);
   virtual ~mafView(); 
 
-  virtual void			SetListener(mafEventListener *Listener) {m_Listener = Listener;};
-  virtual void			OnEvent(mafEvent& e);
-  virtual mafView*  Copy(mafEventListener *Listener) {return NULL;};
+  virtual void			SetListener(mafObserver *Listener) {m_Listener = Listener;};
+  virtual void			OnEvent(mafEventBase *event);
+  virtual mafView*  Copy(mafObserver *Listener) {return NULL;};
   virtual void      Create() {};
 
   virtual void			VmeAdd(mafNode *vme)																		{};
@@ -120,19 +121,19 @@ public:
   mafPipeMap m_PipeMap;
 
 protected:
-  mafEventListener	*m_Listener;
-  wxString           m_Label; 
-  wxString           m_Name;
-  wxWindow					*m_Win;
-  wxFrame					  *m_Frame;
-  mmgGui      			*m_Gui;
-  mmgGuiHolder			*m_Guih;
+  mafObserver   *m_Listener;
+  wxString       m_Label; 
+  wxString       m_Name;
+  wxWindow			*m_Win;
+  wxFrame				*m_Frame;
+  mmgGui      	*m_Gui;
+  mmgGuiHolder	*m_Guih;
 
 public:
-  int                m_Mult;    ///< Used to store the multiplicity of the view type created (e.g. the 3rd view surface created).
-  int                m_Id;      ///< Used to store the view type created (e.g. view surface).
-  bool               m_Plugged; // forget it - it is used from outside 
-  mafView           *m_Next;    // forget it - it is used from outside 
+  int            m_Mult;    ///< Used to store the multiplicity of the view type created (e.g. the 3rd view surface created).
+  int            m_Id;      ///< Used to store the view type created (e.g. view surface).
+  bool           m_Plugged; // forget it - it is used from outside 
+  mafView       *m_Next;    // forget it - it is used from outside 
 
 
   /** IDs for the GUI */

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-27 10:19:29 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-05-04 11:43:10 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -95,34 +95,37 @@ void mafViewManager::SetMouseAction(mafAction *action)
 }
 */
 //----------------------------------------------------------------------------
-void mafViewManager::OnEvent(mafEvent& e)
+void mafViewManager::OnEvent(mafEventBase *event)
 //----------------------------------------------------------------------------
 {
-	switch(e.GetId())
+  if (mafEvent *e = mafEvent::SafeDownCast(event))
 	{
-    case VIEW_CREATE:
-			ViewCreate(e.GetId());
-		break;
-    case VIEW_DELETE:
-			ViewDelete(e.GetView());
-		break;
-		case VIEW_SELECT:
-		{
-			mafView*    view = e.GetView();
-	//		mafRWIBase* rwi = (mafRWIBase*) e.GetWin();   
-	//		if(!rwi) rwi = view->GetDefaultRWI();
-			
-      bool notifylogic = (view != m_selected_view);
+    switch(e->GetId())
+    {
+      case VIEW_CREATE:
+        ViewCreate(e->GetId());
+      break;
+      case VIEW_DELETE:
+        ViewDelete(e->GetView());
+      break;
+      case VIEW_SELECT:
+      {
+        mafView*    view = e->GetView();
+        //		mafRWIBase* rwi = (mafRWIBase*) e->GetWin();   
+        //		if(!rwi) rwi = view->GetDefaultRWI();
 
-			ViewSelected(view/*, rwi*/);
+        bool notifylogic = (view != m_selected_view);
 
-			if(notifylogic )
-				mafEventMacro(mafEvent(this,VIEW_SELECT,(long)e.GetSender())); 
+        ViewSelected(view/*, rwi*/);
+
+        if(notifylogic )
+          mafEventMacro(mafEvent(this,VIEW_SELECT,(long)e->GetSender())); 
+      }
+      break;
+      default:
+        mafEventMacro(*e);
+      break; 
     }
-    break;
-    default:
-      mafEventMacro(e);
-    break; 
 	}
 }
 //----------------------------------------------------------------------------
@@ -380,9 +383,9 @@ void mafViewManager::ViewDelete(mafView *view)
 	
   // Paolo 2005-04-22
   // calculate the view type index
-  //int index = view->m_Id - VIEW_START;
+  int index = view->m_Id - VIEW_START;
   // set to NULL the pointer into the state matrix
-  m_ViewMatrixID[view->m_Id][view->m_Mult] = NULL;
+  m_ViewMatrixID[index][view->m_Mult] = NULL;
 
   if(!m_vlist) return;
   if(m_vlist == view)
@@ -391,7 +394,7 @@ void mafViewManager::ViewDelete(mafView *view)
   }
   else
   {
-    for(mafView* v = m_vlist; v; v = v->m_Next) // find previous(view)
+    for(mafView *v = m_vlist; v; v = v->m_Next) // find previous(view)
     {
       if(v->m_Next == view)
       {

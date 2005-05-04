@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:28 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-05-04 11:44:05 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -102,67 +102,70 @@ m_timer(NULL, ID_TIMER)
   }
 }
 //----------------------------------------------------------------------------
-mmgTimeBar::~mmgTimeBar( ) 
+mmgTimeBar::~mmgTimeBar()
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-void mmgTimeBar::OnEvent(mafEvent& e)
+void mmgTimeBar::OnEvent(mafEventBase *event)
 //----------------------------------------------------------------------------
 {
   bool play = false;
 
-  switch(e.GetId())
+  if (mafEvent *e = mafEvent::SafeDownCast(event))
   {
+    switch(e->GetId())
+    {
     case TIME_PLAY:
       play = true;
-    break; 
+      break; 
     case TIME_STOP:
     case ID_ENTRY:
     case ID_SLIDER:
       // time set is called later on
-    break;
-		case TIME_BAR_VELOCITY:
-		break;
+      break;
+    case TIME_BAR_VELOCITY:
+      break;
     case ID_CLOSE_BUTTON:
-			   //HideGui();
-		break;
+      //HideGui();
+      break;
     case TIME_PREV:
       //m_time -= m_time_step;
-			m_time -= 1.0;
+      m_time -= 1.0;
       m_time = (m_time <= m_time_min) ? m_time_min : m_time;
-    break;
+      break;
     case TIME_NEXT:
       //m_time += m_time_step;
-			m_time += 1.0;
+      m_time += 1.0;
       m_time = (m_time >= m_time_max) ? m_time_max : m_time;
-    break;
+      break;
     case TIME_BEGIN:
       m_time = m_time_min;
-    break;
+      break;
     case TIME_END:
       m_time = m_time_max;
-    break;
+      break;
     default:
-      e.Log();
-    break;
+      e->Log();
+      break;
+    }
+    if(play)
+    {
+      m_b[2]->SetBitmap("TIME_STOP");
+      m_b[2]->SetEventId(TIME_STOP);
+      m_timer.Start(1);
+    }
+    else
+    {
+      m_b[2]->SetBitmap("TIME_PLAY");
+      m_b[2]->SetEventId(TIME_PLAY);
+      m_timer.Stop();
+    }
+
+    if(e->GetId() != TIME_STOP )
+      mafEventMacro(mafEvent(this,TIME_SET,m_time));
+    Update();
   }
-  if(play)
-  {
-    m_b[2]->SetBitmap("TIME_STOP");
-    m_b[2]->SetEventId(TIME_STOP);
-    m_timer.Start(1);
-  }
-  else
-  {
-    m_b[2]->SetBitmap("TIME_PLAY");
-    m_b[2]->SetEventId(TIME_PLAY);
-    m_timer.Stop();
-  }
-  
-  if(e.GetId() != TIME_STOP )
-    mafEventMacro(mafEvent(this,TIME_SET,m_time));
-  Update();
 }
 //----------------------------------------------------------------------------
 void mmgTimeBar::OnTimer(wxTimerEvent &event)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-23 09:48:38 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-05-04 11:44:02 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 #include <wx/notebook.h>
 #include "mafEvent.h"
+#include "mafObserver.h"
 #include "mmgSashPanel.h"
 #include "mmgCheckTree.h"
 //----------------------------------------------------------------------------
@@ -35,7 +36,7 @@ class mafView;
 class mafSideBar
 {
 public:
-	mafSideBar(wxWindow* parent, int id, mafEventListener *Listener);
+	mafSideBar(wxWindow* parent, int id, mafObserver *Listener);
 	~mafSideBar(); 
 
 	// Description:

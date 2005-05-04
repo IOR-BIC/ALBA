@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 10:47:43 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-04 11:44:02 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -27,7 +27,7 @@ class vtkRenderWindow;
 class mafRWIBase;
 class mafSceneGraph;
 class mafAxes;
-class mafEventListener;
+class mafObserver;
 //----------------------------------------------------------------------------
 // constants:
 //----------------------------------------------------------------------------
@@ -45,7 +45,7 @@ public:
 										mafRWI(wxWindow *parent, RWI_LAYERS layers = ONE_LAYER, bool use_grid = false, int stereo = 0);
 	virtual					 ~mafRWI();
 
-  virtual void SetListener(mafEventListener *Listener) {m_Listener = Listener;};
+  virtual void SetListener(mafObserver *Listener) {m_Listener = Listener;};
 
 	/** Reset the camera position. If vme is passed as parameter, the camera is resetted to fill the vme into the view. */
 	void CameraReset(mafNode *vme = NULL);
@@ -103,8 +103,7 @@ protected:
 	/** Compute the bounds for the visible actors; if vme is passed, the bounds of vme are calculated. */
 	double *ComputeVisibleBounds(mafNode *node = NULL);
 	
-  int               m_StereoType;
-
-  mafEventListener *m_Listener;	
+  int          m_StereoType;
+  mafObserver *m_Listener;	
 };
 #endif

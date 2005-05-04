@@ -2,23 +2,26 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-23 09:52:24 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-05-04 11:43:11 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
+
 #ifndef __mafViewManager_H__
 #define __mafViewManager_H__
+
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
+#include "mafObserver.h"
+
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mafEventListener;
 class mafNode;
 class mafVMERoot;
 class mafView;
@@ -29,14 +32,14 @@ class mmgViewPanel;
 // mafViewManager :
 //----------------------------------------------------------------------------
 /** An implementation of mafViewManager with [D]ynamic view [C]reation feature */
-class mafViewManager: public mafEventListener
+class mafViewManager: public mafObserver
 {
 
 public:
   mafViewManager();
  ~mafViewManager(); 
-  void SetListener(mafEventListener *Listener) {m_Listener = Listener;};
-  virtual void OnEvent(mafEvent& e);
+  void SetListener(mafObserver *Listener) {m_Listener = Listener;};
+  virtual void OnEvent(mafEventBase *event);
 
   /** Fill the main menù with plugged views. */
 	void FillMenu (wxMenu* menu);
@@ -110,7 +113,7 @@ public:
   /** Empty. */
   void OnQuit();
 
-  /** Return the view pointer from view's id and multeplicity. */
+  /** Return the view pointer from view's id and multiplicity. */
   mafView *GetView(int id, int mult) {return m_ViewMatrixID[id][mult];};
 
   /** 
@@ -125,12 +128,12 @@ protected:
   mafView            *m_t[MAXVIEW];   // view template vector
   int                 m_tcount;       // number of template
 
-  mafEventListener   *m_Listener;
-  mafVMERoot         *m_root_vme;
-  mafNode            *m_selected_vme;
-  mafView            *m_selected_view;
-//mafRWIBase         *m_selected_rwi;
-	mafView            *m_view_being_created;
-  mafView            *m_ViewMatrixID[MAXVIEW][MAXVIEW];  ///< Matrix to access views directly by (id, multiplicity)
+  mafObserver   *m_Listener;
+  mafVMERoot    *m_root_vme;
+  mafNode       *m_selected_vme;
+  mafView       *m_selected_view;
+//mafRWIBase    *m_selected_rwi;
+	mafView       *m_view_being_created;
+  mafView       *m_ViewMatrixID[MAXVIEW][MAXVIEW];  ///< Matrix to access views directly by (id, multiplicity)
 };
 #endif

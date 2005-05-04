@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgViewFrame.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:30 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-04 11:44:06 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -15,6 +15,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
+#include "mafObserver.h"
 #include <wx/laywin.h>
 //----------------------------------------------------------------------------
 // forward reference
@@ -24,7 +25,7 @@ class mafView;
 //----------------------------------------------------------------------------
 // mmgViewFrame :
 //----------------------------------------------------------------------------
-class mmgViewFrame: public wxFrame , public mafEventListener
+class mmgViewFrame: public wxFrame , public mafObserver
 {
 	public:
 	mmgViewFrame(wxFrame* parent, 
@@ -37,16 +38,16 @@ class mmgViewFrame: public wxFrame , public mafEventListener
        
 	~mmgViewFrame(); 
 	
-	void SetListener(mafEventListener *Listener) {m_Listener = Listener;};
+	void SetListener(mafObserver *Listener) {m_Listener = Listener;};
 	
 	/** Set which is the external view. */
 	void SetView(mafView *view);
 
   /** Answer to the messages coming from bottom classes. */
-	virtual void OnEvent(mafEvent& e);
+	virtual void OnEvent(mafEventBase *event);
 
 protected:
-	/** Send the evenet to destroy the owned view. */
+	/** Send the event to destroy the owned view. */
 	void OnCloseWindow  (wxCloseEvent&	event);
 
 	/** Adjust the child size. */
@@ -58,7 +59,7 @@ protected:
 	/** Send the event to select the owned view. */
   void OnActivate     (wxActivateEvent& event);
 
-	mafEventListener *m_Listener;
+	mafObserver *m_Listener;
 	wxWindow         *m_clientwin;
 	mafView          *m_view;
   static bool       m_quitting;

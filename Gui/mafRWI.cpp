@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 10:47:43 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-05-04 11:44:02 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -143,9 +143,9 @@ mafRWI::~mafRWI( )
 		vtkDEL(m_RenBack);
 		if(m_RenderWindow) 
       m_RenderWindow->SetInteractor(NULL);    //Paolo 23-06-2004
-    vtkDEL(m_RenderWindow);
-    if(m_Rwi) 
-      m_Rwi->SetRenderWindow(NULL); //Paolo 23-06-2004
+    m_RenderWindow->Delete();
+    //if(m_Rwi) 
+      //m_Rwi->SetRenderWindow(NULL); //Paolo 23-06-2004
 		vtkDEL(m_Rwi);  //SIL. 13-11-2003: The renderer has to be Deleted as last
 }
 //-----------------------------------------------------------------------------------------

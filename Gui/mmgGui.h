@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-02 07:51:25 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-05-04 11:44:04 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2005
@@ -18,6 +18,7 @@
 #include "mafDecl.h"
 #include "mmgPanel.h"
 #include "mafEvent.h"
+#include "mafObserver.h"
 
 //----------------------------------------------------------------------------
 // class forward :
@@ -57,7 +58,7 @@ mmgGui take care of:
 - creating and Layout the widgets,
 - filter and validate user input, widget are constrained in range and type. 
 - manage widget initialization user variables updates. 
-- notify the user of gui-events by sending mafEvents to a mafEventListener.
+- notify the user of gui-events by sending mafEvents to a mafObserver.
 
 \par implementation details:
 On creation of widget, the user passes an ID that will be
@@ -69,14 +70,14 @@ two member functions : GetModuleID and GetId. GetId increments an internal ID_co
 \sa GetId GetModuleId m_id m_table
 */
 //----------------------------------------------------------------------------
-class mmgGui: public mmgPanel, public mafEventListener
+class mmgGui: public mmgPanel, public mafObserver
 {
 public:
            mmgGui(mafObserver *listener);
   virtual ~mmgGui();
     
   /** Set the Listener that will receive event-notification, the Listener can be changed any time  */
-  void SetListener(mafEventListener *listener)   {m_Listener=listener;}; 
+  void SetListener(mafObserver *listener)   {m_Listener=listener;}; 
 
   /** Separator widget. */
 	void Divider(long style=0);
@@ -222,7 +223,7 @@ public:
 	/** Return the measure used to layout the widgets - pass one of the GUI_xxx constants. */
   int GetMetrics( int id); 
 
-  void OnEvent(mafEvent& e);
+  void OnEvent(mafEventBase *event);
 
   /**  \par implementation details:
   GetId is used to obtain a new/unique widget_ID. 

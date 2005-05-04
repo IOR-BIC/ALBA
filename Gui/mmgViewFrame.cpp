@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgViewFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-13 13:08:09 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-04 11:44:06 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -107,18 +107,21 @@ void mmgViewFrame::SetView(mafView *view)
    SetTitle(wxStripMenuCodes(m_view->GetLabel()));
 }
 //----------------------------------------------------------------------------
-void mmgViewFrame::OnEvent(mafEvent& e)
+void mmgViewFrame::OnEvent(mafEventBase *event)
 //----------------------------------------------------------------------------
 {
-  switch(e.GetId())
+  if (mafEvent *e = mafEvent::SafeDownCast(event))
   {
-		case VIEW_QUIT:
-			mafEventMacro(mafEvent(this,VIEW_DELETE,m_view));
-			Destroy();
-		break;
-		default:
-			// forward to ViewManager
-			mafEventMacro(e);
-		break;
-	}
+    switch(e->GetId())
+    {
+    case VIEW_QUIT:
+      mafEventMacro(mafEvent(this,VIEW_DELETE,m_view));
+      Destroy();
+      break;
+    default:
+      // forward to ViewManager
+      mafEventMacro(*e);
+      break;
+    }
+  }
 }

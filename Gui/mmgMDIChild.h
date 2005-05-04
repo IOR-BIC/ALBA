@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIChild.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:24 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-04 11:44:04 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,7 +33,7 @@ class mmgMDIChild: public wxMDIChildFrame
 public:
   mmgMDIChild(wxMDIParentFrame* parent, mafView *view); 
   virtual ~mmgMDIChild();
-  void SetListener(mafEventListener *Listener) {m_Listener = Listener;};
+  void SetListener(mafObserver *Listener) {m_Listener = Listener;};
   
 	/** Set the quitting flag. */
 	static void OnQuit () {m_quitting=true;}; 
@@ -53,7 +53,7 @@ protected:
 
   wxWindow						*m_win;
   mafView             *m_view;
-  mafEventListener    *m_Listener;
+  mafObserver    *m_Listener;
   static bool          m_quitting;
 
   DECLARE_EVENT_TABLE()

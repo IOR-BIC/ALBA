@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgFlagSplitter.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:22 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-04 11:44:04 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -11,6 +11,7 @@
 =========================================================================*/
 #ifndef __mmgFlagSplitter_H__
 #define __mmgFlagSplitter_H__
+
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
@@ -19,7 +20,9 @@
 #include <wx/hash.h>
 #include "mafDecl.h"
 #include "mafEvent.h"
+#include "mafObserver.h"
 #include "mmgPanel.h"
+
 //----------------------------------------------------------------------------
 // constant :
 //----------------------------------------------------------------------------
@@ -29,6 +32,7 @@ enum FlagSplitterDragModes
     drag_x1,  
     drag_x2,  
 };
+
 //----------------------------------------------------------------------------
 // mmgFlagSplitter :
 //----------------------------------------------------------------------------
@@ -42,8 +46,8 @@ public:
   mmgFlagSplitter(wxWindow* parent,wxWindowID id = -1);
   virtual ~mmgFlagSplitter();
 
-  void SetListener(mafEventListener *Listener) {m_Listener = Listener;};
-  void OnEvent(mafEvent& e);
+  void SetListener(mafObserver *Listener) {m_Listener = Listener;};
+  //void OnEvent(mafEventBase *event);
   
 	/** Set the split position and redraw the four panels. */
   void SetSplitPos(int x1,int x2);
@@ -52,9 +56,9 @@ public:
   void Put(wxWindow* w,int i);
 
 protected:
-  mafEventListener  *m_Listener;
-  wxCursor          *m_CursorWE;
-  wxPen             *m_Pen;
+  mafObserver  *m_Listener;
+  wxCursor     *m_CursorWE;
+  wxPen        *m_Pen;
   
   FlagSplitterDragModes m_dragging;
 

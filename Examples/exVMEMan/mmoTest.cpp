@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTest.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 11:09:57 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-04 11:46:29 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -50,21 +50,24 @@ mafOp* mmoTest::Copy()
 //----------------------------------------------------------------------------
 void mmoTest::OpStop(int result) {	HideGui();mafEventMacro(mafEvent(this,result));}
 //----------------------------------------------------------------------------
-void mmoTest::OnEvent(mafEvent& e)
+void mmoTest::OnEvent(mafEventBase *event)
 //----------------------------------------------------------------------------
 {
-  switch(e.GetId())
+  if (mafEvent *e = mafEvent::SafeDownCast(event))
   {
-  case wxOK:           // perche non OP_RUN_OK anziche wxOK ?
-    OpStop(OP_RUN_OK);
-    break;
-  case wxCANCEL:
-    OpStop(OP_RUN_CANCEL);
-    break;
-  default:
-    mafEventMacro(e); 
-    break;
-  }  
+    switch(e->GetId())
+    {
+    case wxOK:
+      OpStop(OP_RUN_OK);
+      break;
+    case wxCANCEL:
+      OpStop(OP_RUN_CANCEL);
+      break;
+    default:
+      mafEventMacro(*e); 
+      break;
+    }  
+  }
 }
 //----------------------------------------------------------------------------
 void mmoTest::OpRun()

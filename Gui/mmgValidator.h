@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgValidator.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 06:05:38 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-04 11:44:06 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,7 +20,7 @@
 //forward ref
 //-----------------------------------------------------------------------------
 class mmgFloatSlider;
-class mafEventListener;
+class mafObserver;
 class mafString; 
 
 //-----------------------------------------------------------------------------
@@ -53,23 +53,23 @@ enum validator_modes
 class mmgValidator : public wxValidator
 {
 public:
-  mmgValidator (mafEventListener* listener,int mid,wxStaticText *win,wxString* var);                                             //String
-  mmgValidator (mafEventListener* listener,int mid,wxTextCtrl   *win,wxString* var);   //String
-  mmgValidator (mafEventListener* listener,int mid,wxTextCtrl   *win,mafString* var);  //String
-  mmgValidator (mafEventListener* listener,int mid,wxTextCtrl   *win,   int*		var, int		min=-32000,			 int		max=32000);     //Integer
-  mmgValidator (mafEventListener* listener,int mid,wxTextCtrl   *win,   float*	var, float	min=-2000000000, float	max=2000000000, int dec_digits = 2);//Float
-  mmgValidator (mafEventListener* listener,int mid,wxTextCtrl   *win,   double* var, double min=-2000000000, double max=2000000000, int dec_digits = 2);//Double
-  mmgValidator (mafEventListener* listener,int mid,wxSlider     *win,   int*   var, wxTextCtrl* lab);
-	mmgValidator (mafEventListener* listener,int mid,wxTextCtrl   *win,   int*   var, wxSlider* lab, int min=-32000,	int max=32000);
-  mmgValidator (mafEventListener* listener,int mid,mmgFloatSlider *win, float* var, wxTextCtrl* lab);
-	mmgValidator (mafEventListener* listener,int mid,wxTextCtrl		*win,		float* var, mmgFloatSlider* lab, float min=-2000000000, float	max=2000000000);
-  mmgValidator (mafEventListener* listener,int mid,wxCheckBox   *win,   int*   var);
-  mmgValidator (mafEventListener* listener,int mid,wxRadioBox   *win,   int*   var);
-  mmgValidator (mafEventListener* listener,int mid,wxComboBox   *win,   int*   var);
-  mmgValidator (mafEventListener* listener,int mid,wxButton     *win);
-  mmgValidator (mafEventListener* listener,int mid,wxButton     *win,wxString* var, wxTextCtrl* lab, bool openfile, const wxString wildcard); // FileOpen/Save
-  mmgValidator (mafEventListener* listener,int mid,wxButton     *win,wxString* var, wxTextCtrl* lab); // DirOpen
-  mmgValidator (mafEventListener* listener,int mid,wxButton     *win,wxColour* var, wxTextCtrl* lab);
+  mmgValidator (mafObserver* listener,int mid,wxStaticText *win,wxString* var);                                             //String
+  mmgValidator (mafObserver* listener,int mid,wxTextCtrl   *win,wxString* var);   //String
+  mmgValidator (mafObserver* listener,int mid,wxTextCtrl   *win,mafString* var);  //String
+  mmgValidator (mafObserver* listener,int mid,wxTextCtrl   *win,   int*		var, int		min=-32000,			 int		max=32000);     //Integer
+  mmgValidator (mafObserver* listener,int mid,wxTextCtrl   *win,   float*	var, float	min=-2000000000, float	max=2000000000, int dec_digits = 2);//Float
+  mmgValidator (mafObserver* listener,int mid,wxTextCtrl   *win,   double* var, double min=-2000000000, double max=2000000000, int dec_digits = 2);//Double
+  mmgValidator (mafObserver* listener,int mid,wxSlider     *win,   int*   var, wxTextCtrl* lab);
+	mmgValidator (mafObserver* listener,int mid,wxTextCtrl   *win,   int*   var, wxSlider* lab, int min=-32000,	int max=32000);
+  mmgValidator (mafObserver* listener,int mid,mmgFloatSlider *win, float* var, wxTextCtrl* lab);
+	mmgValidator (mafObserver* listener,int mid,wxTextCtrl		*win,		float* var, mmgFloatSlider* lab, float min=-2000000000, float	max=2000000000);
+  mmgValidator (mafObserver* listener,int mid,wxCheckBox   *win,   int*   var);
+  mmgValidator (mafObserver* listener,int mid,wxRadioBox   *win,   int*   var);
+  mmgValidator (mafObserver* listener,int mid,wxComboBox   *win,   int*   var);
+  mmgValidator (mafObserver* listener,int mid,wxButton     *win);
+  mmgValidator (mafObserver* listener,int mid,wxButton     *win,wxString* var, wxTextCtrl* lab, bool openfile, const wxString wildcard); // FileOpen/Save
+  mmgValidator (mafObserver* listener,int mid,wxButton     *win,wxString* var, wxTextCtrl* lab); // DirOpen
+  mmgValidator (mafObserver* listener,int mid,wxButton     *win,wxColour* var, wxTextCtrl* lab);
 
   mmgValidator(const mmgValidator& val) {Copy(val);};
  ~mmgValidator() {};
@@ -84,7 +84,7 @@ public:
 	float RoundValue(float f_in);
 	double RoundValue(double d_in);
 
-  void Init(mafEventListener* listener, int mid, wxControl *win);
+  void Init(mafObserver* listener, int mid, wxControl *win);
   void OnChar(wxKeyEvent& event);
   void OnKillFocus(wxFocusEvent& event);
   void OnScrollEvent(wxScrollEvent& event);
@@ -119,7 +119,7 @@ protected:
   int         m_imax;
   int         m_imin;
   
-  mafEventListener    *m_Listener;
+  mafObserver    *m_Listener;
   int                  m_mid;
 	int									 m_decimal_digits;
   wxString             m_wildcard;

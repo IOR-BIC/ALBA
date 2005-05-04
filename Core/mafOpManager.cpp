@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 16:09:04 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-05-04 11:43:10 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -87,7 +87,7 @@ mafOpManager::mafOpManager()
     m_opv[i] = NULL;
 }
 //----------------------------------------------------------------------------
-mafOpManager::~mafOpManager( ) 
+mafOpManager::~mafOpManager()
 //----------------------------------------------------------------------------
 {
 	for(int i=0; i<m_numop; i++) delete m_opv[i];
@@ -99,35 +99,40 @@ mafOpManager::~mafOpManager( )
 	//delete m_optransform;
 }
 //----------------------------------------------------------------------------
-void mafOpManager::OnEvent(mafEvent& e)
+void mafOpManager::OnEvent(mafEventBase *event)
 //----------------------------------------------------------------------------
 {
   mafOp* o = NULL; 
 
-  switch (e.GetId())
-	{
-		case OP_EXEC:
-			o = e.GetOp();
-			if(o) OpExec(o);
-		break; 
-		case OP_RUN:
-			o = e.GetOp();
-			if(o) OpRun(o);
-		break; 
-		case OP_RUN_OK:
-			o = (mafOp*) e.GetSender();
-			assert(o == m_context.Caller());
-			OpRunOk(o);
-		break; 
-		case OP_RUN_CANCEL:
-			o = (mafOp*) e.GetSender();
-			assert(o == m_context.Caller());
-			OpRunCancel(o);
-		break;
-		default:
-			mafEventMacro(e);
-		break;
-	}
+  if (mafEvent *e = mafEvent::SafeDownCast(event))
+  {
+    switch (e->GetId())
+    {
+      case OP_EXEC:
+        o = e->GetOp();
+        if(o) 
+          OpExec(o);
+      break; 
+      case OP_RUN:
+        o = e->GetOp();
+        if(o) 
+          OpRun(o);
+      break; 
+      case OP_RUN_OK:
+        o = (mafOp*) e->GetSender();
+        assert(o == m_context.Caller());
+        OpRunOk(o);
+      break; 
+      case OP_RUN_CANCEL:
+        o = (mafOp*) e->GetSender();
+        assert(o == m_context.Caller());
+        OpRunCancel(o);
+      break;
+      default:
+        mafEventMacro(*e);
+      break;
+    }
+  }
 }
 //----------------------------------------------------------------------------
 void mafOpManager::OpAdd(mafOp *op, wxString menuPath)
@@ -299,8 +304,7 @@ void mafOpManager::EnableToolbar(bool CanEnable)
 void mafOpManager::EnableOp(bool CanEnable) 
 //----------------------------------------------------------------------------
 {
-  mafOp* o = NULL;
-
+  mafOp *o = NULL;
 	if(m_menubar)
   {
     if(!CanEnable)
@@ -336,7 +340,6 @@ void mafOpManager::EnableOp(bool CanEnable)
       }
 	  }
   }
-	
 	if(m_toolbar) EnableToolbar(CanEnable);
 }
 //----------------------------------------------------------------------------
@@ -418,7 +421,7 @@ void mafOpManager::OpRun(mafOp *op)
 	EnableOp(false);
   //Notify(OP_RUN_STARTING); //SIL. 17-9-2004: --- moved after m_running_op has been set
 
-	mafOp* o = op->Copy();
+	mafOp *o = op->Copy();
   o->m_Id = op->m_Id;    //Paolo 15/09/2004 The operation ID is not copyed from the Copy() method.
 	o->SetListener(this);
 	o->SetInput(m_selected);
@@ -456,7 +459,8 @@ void mafOpManager::OpRunCancel(mafOp *op)
 
   Notify(OP_RUN_TERMINATED);
 
-	if(m_context.Caller() == NULL) 	EnableOp();
+	if(m_context.Caller() == NULL) 	
+    EnableOp();
 }
 //----------------------------------------------------------------------------
 void mafOpManager::OpExec(mafOp *op)
@@ -557,7 +561,7 @@ void mafOpManager::Notify(int msg)
 bool mafOpManager::StopCurrentOperation()
 //----------------------------------------------------------------------------
 {
-  assert(false); //SIL. 2-7-2004: -- Seems that no-one is using this -- but tell me if the program stop here -- thank
+  assert(false); //SIL. 2-7-2004: -- Seems that no-one is using this -- but tell me if the program stop here -- thanks
   mafOp *prev_running_op = m_running_op;
 	
 	while(m_running_op) //loop danger !!!

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-02 11:36:14 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-05-04 11:44:02 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,7 +31,7 @@
 #include "mmgTree.h"
 #include "mafVME.h"
 //----------------------------------------------------------------------------
-mafSideBar::mafSideBar(wxWindow* parent, int id, mafEventListener *Listener)
+mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
   m_SelectedVme =NULL;

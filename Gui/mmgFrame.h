@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgFrame.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:22 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-04 11:44:04 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
-class mafEventListener;
+class mafObserver;
 
 //----------------------------------------------------------------------------
 // mmgFrame :
@@ -30,7 +30,7 @@ public:
          mmgFrame (const wxString& title, const wxPoint& pos, const wxSize& size);
         ~mmgFrame (); 
   
-	void SetListener (mafEventListener *Listener) {m_Listener = Listener;};
+	void SetListener (mafObserver *Listener) {m_Listener = Listener;};
   
   /** Set the window shown on the Client Area, (hide the previous contents). */
 	void Put (wxWindow* w);
@@ -66,8 +66,8 @@ protected:
   /** Create the status bar into the main frame. */
 	void CreateStatusbar();
 
-  mafEventListener *m_Listener;
-  wxWindow         *m_clientwin;
+  mafObserver *m_Listener;
+  wxWindow    *m_clientwin;
 
 DECLARE_EVENT_TABLE()
 };

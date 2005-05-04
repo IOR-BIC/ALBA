@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:28 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-04 11:44:05 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -15,6 +15,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
+#include "mafObserver.h"
 #include "mmgPanel.h"
 #include "mmgGui.h"
 #include "mmgGuiHolder.h"
@@ -36,14 +37,14 @@ class mmgFloatSlider;
 // mmgTimeBar :
 /** mmgTimeBar is a wxPanel with a set of widget to handle time. */
 //----------------------------------------------------------------------------
-class mmgTimeBar: public mmgPanel , public mafEventListener
+class mmgTimeBar: public mmgPanel , public mafObserver
 {
 public:
   mmgTimeBar(wxWindow* parent,wxWindowID id = -1,bool CloseButton = false); 
   virtual ~mmgTimeBar();
-  void SetListener(mafEventListener *Listener) {m_Listener = Listener;};
+  void SetListener(mafObserver *Listener) {m_Listener = Listener;};
 
-  void OnEvent(mafEvent& e);
+  void OnEvent(mafEventBase *event);
   
 	/** Set the bounds for the time bar. */
 	void SetBounds(float min, float max);
@@ -70,7 +71,7 @@ protected:
   mmgFloatSlider	*m_slider; 
   wxTimer          m_timer;
 
-  mafEventListener *m_Listener;
+  mafObserver *m_Listener;
 	mmgGui      	   *m_gui;
 	mmgGuiHolder     *m_guih;
 

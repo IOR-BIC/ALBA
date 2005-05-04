@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 16:50:48 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-04 11:43:11 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -64,10 +64,10 @@ public:
   void MSFModified(bool modified) {m_Modified = modified;};
 
 	/** Add the vme to the tree. */
-  void VmeAdd(mafNode *v);
+  void VmeAdd(mafNode *n);
 
 	/** Remove the vme from the tree. */
-  void VmeRemove(mafNode *v);
+  void VmeRemove(mafNode *n);
 
 	/** Get the time bounds of the tree. */
   void TimeGetBounds(float *min, float *max);
@@ -76,10 +76,10 @@ public:
   void TimeSet(float time);
 
 	/** Send the event VME_REMOVING to inform logic that the vme and its subtree are removed from the tree. */
-  void NotifyRemove(mafNode *v);
+  void NotifyRemove(mafNode *n);
 
 	/** Send the event VME_ADDED to inform logic that the vme and its subtree are added to the tree. */
-  void NotifyAdd(mafNode *v);
+  void NotifyAdd(mafNode *n);
   
 	/** Show the dialog to confirm the save of the current tree. */
 	bool AskConfirmAndSave();
@@ -103,7 +103,7 @@ public:
 	void MakeBakFileOnSave(bool bakfile = true) {m_MakeBakFile = bakfile;}
 
   /** Update vme client data interface from tag. if vme == NULL, the update is propagated from root vme to all the tree. */
-  void UpdateFromTag(mafNode *vme = NULL);
+  void UpdateFromTag(mafNode *n = NULL);
 
 protected:
   bool              m_Modified;     ///< Used to known when the tree has been modified...

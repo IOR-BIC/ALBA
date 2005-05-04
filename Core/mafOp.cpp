@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 11:08:33 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-04 11:43:09 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,6 +22,7 @@
 
 #include "mafOp.h"
 #include "mafDecl.h"
+#include "mafSmartPointer.h"
 #include "mmgGui.h"
 #include "mmgGuiHolder.h"
 #include "mafNode.h"
@@ -45,14 +46,14 @@ mafOp::mafOp(wxString label)
 mafOp::mafOp()
 //----------------------------------------------------------------------------
 {
-	m_Gui = NULL;
-	m_Listener = NULL;
-	m_Next = NULL;
-	m_OpType = OPTYPE_OP;
-	m_Canundo = false;
-	m_Label = "default op name";
-  m_Guih = NULL;
-	m_Input = NULL;
+	m_Gui       = NULL;
+	m_Listener  = NULL;
+	m_Next      = NULL;
+	m_OpType    = OPTYPE_OP;
+	m_Canundo   = false;
+	m_Label     = "default op name";
+  m_Guih      = NULL;
+	m_Input     = NULL;
 	m_Compatibility = 0xFFFF;
 }
 //----------------------------------------------------------------------------
@@ -61,47 +62,41 @@ mafOp::~mafOp()
 {
 }
 //----------------------------------------------------------------------------
-void mafOp::OnEvent(mafEvent& e)
+void mafOp::OnEvent(mafEventBase *event)
 //----------------------------------------------------------------------------
 {
-	mafEventMacro(e);
+	mafEventMacro(*event);
 }
 //----------------------------------------------------------------------------
 bool mafOp::Accept(mafNode* vme)   
-/**  */
 //----------------------------------------------------------------------------
 {
   return false;
 }
 //----------------------------------------------------------------------------
 void mafOp::OpRun()   
-/**  */
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
 void mafOp::OpDo()   
-/**  */
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
 void mafOp::OpUndo()   
-/**  */
 //----------------------------------------------------------------------------
 {
-  assert(false);
+  //assert(false);
 }
 //----------------------------------------------------------------------------
 mafOp* mafOp::Copy()   
-/** restituisce una copia di se stesso, serve per metterlo nell'undo stack */
 //----------------------------------------------------------------------------
 {
    return NULL;
 }
 //----------------------------------------------------------------------------
 bool mafOp::CanUndo()   
-/**  */
 //----------------------------------------------------------------------------
 {
   return m_Canundo;
@@ -135,14 +130,12 @@ bool mafOp::IsOp()
 */
 //----------------------------------------------------------------------------
 int mafOp::GetType()   
-/**  */
 //----------------------------------------------------------------------------
 {
   return m_OpType;
 }
 //----------------------------------------------------------------------------
 void mafOp::ShowGui()
-/**  */
 //----------------------------------------------------------------------------
 {
   assert(m_Gui); 
@@ -157,14 +150,13 @@ void mafOp::ShowGui()
 }
 //----------------------------------------------------------------------------
 void mafOp::HideGui()
-/**  */
 //----------------------------------------------------------------------------
 {
-   assert(m_Gui); 
-   mafEventMacro(mafEvent(this,OP_HIDE_GUI,(wxWindow *)m_Guih));
-   delete m_Guih;
-   m_Guih = NULL;
-   m_Gui = NULL;
+  assert(m_Gui); 
+  mafEventMacro(mafEvent(this,OP_HIDE_GUI,(wxWindow *)m_Guih));
+  delete m_Guih;
+  m_Guih = NULL;
+  m_Gui = NULL;
 }
 //----------------------------------------------------------------------------
 bool mafOp::OkEnabled()
@@ -179,15 +171,15 @@ bool mafOp::OkEnabled()
 void mafOp::ForceStopWithOk()
 //----------------------------------------------------------------------------
 {
-  mafEvent e(this,wxOK);
-  OnEvent(e);
+  mafEvent e(this, wxOK);
+  OnEvent(&e);
 }
 //----------------------------------------------------------------------------
 void mafOp::ForceStopWithCancel()
 //----------------------------------------------------------------------------
 {
-  mafEvent e(this,wxCANCEL);
-  OnEvent(e);
+  mafEvent e(this, wxCANCEL);
+  OnEvent(&e);
 }
 //----------------------------------------------------------------------------
 void mafOp::SetMouseAction(mafAction *action)

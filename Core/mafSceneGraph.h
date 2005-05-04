@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 12:16:32 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-04 11:43:10 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,6 +16,8 @@
 //----------------------------------------------------------------------------
 #include "mafDecl.h"
 #include "mafEvent.h"
+#include "mafObserver.h"
+
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
@@ -28,12 +30,12 @@ class vtkRenderer;
 //----------------------------------------------------------------------------
 // mafSceneGraph :
 //----------------------------------------------------------------------------
-class mafSceneGraph  /*: public mafEventListener*/
+class mafSceneGraph  /*: public mafObserver*/
 {
 public:
 								mafSceneGraph(mafView	*view, vtkRenderer *ren1, vtkRenderer *ren2=NULL);
 	virtual			 ~mafSceneGraph();
-  virtual void	SetListener(mafEventListener *Listener) {m_Listener = Listener;};
+  virtual void	SetListener(mafObserver *Listener) {m_Listener = Listener;};
 	//virtual void	OnEvent(mafEvent& e);
 
 	/** Add a vme to the scene graph. */
@@ -101,7 +103,7 @@ protected:
 */
 
 	mafSceneNode			*NodeAdd	(mafNode *vme);
-  mafEventListener	*m_Listener;
+  mafObserver	*m_Listener;
 	mmgGui						*m_Gui;
 
 	mafNode            *m_SelectedVme;
