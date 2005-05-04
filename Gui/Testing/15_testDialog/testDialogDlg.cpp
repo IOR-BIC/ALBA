@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testDialogDlg.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-16 10:19:43 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-04 13:03:07 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,19 +50,22 @@ testDialogDlg::~testDialogDlg( )
 {
 }
 //--------------------------------------------------------------------------------
-void testDialogDlg::OnEvent(mafEvent& e)
+void testDialogDlg::OnEvent(mafEventBase *event)
 //--------------------------------------------------------------------------------
 {
-  switch(e.GetId())
+  if(mafEvent *e = mafEvent::SafeDownCast(event))
   {
-  case ID_ENABLE:
-    m_ok_button->Enable(true);
-    break;
-  case ID_DISABLE:
-    m_ok_button->Enable(false);
-    break;
-  default:
-    mmgDialog::OnEvent(e); //pass unhandled evt. throught the SuperClass
+    switch(e->GetId())
+    {
+    case ID_ENABLE:
+      m_ok_button->Enable(true);
+      break;
+    case ID_DISABLE:
+      m_ok_button->Enable(false);
+      break;
+    default:
+      mmgDialog::OnEvent(e); //pass unhandled evt. thorough the SuperClass
+    }
   }
 }
 //----------------------------------------------------------------------------

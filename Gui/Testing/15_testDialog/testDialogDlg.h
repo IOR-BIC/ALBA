@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testDialogDlg.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-16 10:19:43 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-04 13:03:07 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,7 +27,7 @@ class testDialogDlg : public mmgDialog
 public:
 	testDialogDlg (const wxString& title);
 	virtual ~testDialogDlg (); 
-  void OnEvent(mafEvent& e);
+  void OnEvent(mafEventBase *event);
 
 protected:
 	/** Close the dialog */
