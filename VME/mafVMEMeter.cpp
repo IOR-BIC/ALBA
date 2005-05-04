@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-02 08:05:32 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-04 11:50:50 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -94,7 +94,10 @@ int mafVMEMeter::DeepCopy(mafNode *a)
 { 
   if (Superclass::DeepCopy(a)==MAF_OK)
   {
-    mafVMEMeter *meter=mafVMEMeter::SafeDownCast(a);
+    mafVMEMeter *meter = mafVMEMeter::SafeDownCast(a);
+    meter->SetLink("StartVME", a->GetLink("StartVME"));
+    meter->SetLink("EndVME1", a->GetLink("EndVME1"));
+    meter->SetLink("EndVME2", a->GetLink("EndVME2"));
     m_Transform->SetMatrix(m_Transform->GetMatrix());
     return MAF_OK;
   }  
@@ -104,11 +107,15 @@ int mafVMEMeter::DeepCopy(mafNode *a)
 bool mafVMEMeter::Equals(mafVME *vme)
 //-------------------------------------------------------------------------
 {
+  bool ret = false;
   if (Superclass::Equals(vme))
   {
-    return m_Transform->GetMatrix()==((mafVMEMeter *)vme)->m_Transform->GetMatrix();
+    ret = m_Transform->GetMatrix() == ((mafVMEMeter *)vme)->m_Transform->GetMatrix() && \
+          GetLink("StartVME") == ((mafVMEMeter *)vme)->GetLink("StartVME") && \
+          GetLink("EndVME1") == ((mafVMEMeter *)vme)->GetLink("EndVME1") && \
+          GetLink("EndVME2") == ((mafVMEMeter *)vme)->GetLink("EndVME2");
   }
-  return false;
+  return ret;
 }
 //-------------------------------------------------------------------------
 mafVMEOutputPolyline *mafVMEMeter::GetPolylineOutput()

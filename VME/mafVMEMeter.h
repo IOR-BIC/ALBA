@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-02 08:05:32 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-04 11:50:50 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -58,11 +58,14 @@ public:
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0);
 
-  /** Copy the contents of another VME-Slicer into this one. */
+  /** Copy the contents of another VME-Meter into this one. */
   virtual int DeepCopy(mafNode *a);
 
-  /** Compare with another VME-Slicer. */
+  /** Compare with another VME-Meter. */
   virtual bool Equals(mafVME *vme);
+
+  /** Return the suggested pipe-typename for the visualization of this vme */
+  virtual mafString GetVisualPipe() {return mafString("mafPipeMeter");};
 
   /** return the right type of output */  
   mafVMEOutputPolyline *GetPolylineOutput();
