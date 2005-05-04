@@ -26,6 +26,12 @@ mafVMEGroup.cpp
 mafVMEGroup.h
 mafVMEItem.cpp
 mafVMEItem.h
+mafVMELandmark.cpp
+mafVMELandmark.h
+mafVMELandmarkCloud.cpp
+mafVMELandmarkCloud.h
+mafVMEPointSet.cpp
+mafVMEPointSet.h
 )
 
 IF (MAF_USE_CRYPTO)
@@ -54,6 +60,8 @@ IF (MAF_USE_VTK)
   mafVMEMeter.h
   mafVMEOutputImage.cpp
   mafVMEOutputImage.h
+  mafVMEOutputPointSet.cpp
+  mafVMEOutputPointSet.h
   mafVMEOutputPolyline.cpp
   mafVMEOutputPolyline.h
   mafVMEOutputSurface.cpp
