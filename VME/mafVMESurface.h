@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 20:02:54 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-05-04 11:49:46 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -53,7 +53,6 @@ public:
     /** return icon */
     static char** GetIcon();
 
-    //SIL. 21-4-2005: 
     /** Return the suggested pipe-typename for the visualization of this vme */
     virtual mafString GetVisualPipe() {return mafString("mafPipeSurface");};
 
@@ -68,5 +67,4 @@ private:
   /** private to avoid calling by external classes */
   virtual int SetData(vtkDataSet *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
 };
-
 #endif

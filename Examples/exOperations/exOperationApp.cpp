@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 12:27:23 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-04 11:45:54 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -31,7 +31,7 @@
 #include "mafVMERoot.h"
 #include "mafVMESurface.h"
 #include "mafPipeFactory.h"
-#include "mafPipeSurface.h"
+#include "mafPipeMeter.h"
 
 #include "mmoVTKImporter.h"
 #include "mmoCreateMeter.h"
@@ -53,7 +53,7 @@ bool exOperationApp::OnInit()
   // Inizializzazione e Fill della PipeFactory -- potrebbe essere un SideEffect del Plug dei Nodi
   result = mafPipeFactory::Initialize();
   assert(result==MAF_OK);
-  mafPlugPipe<mafPipeSurface>("mafPipeSurface");
+  mafPlugPipe<mafPipeMeter>("mafPipeMeter");
 
   m_logic = new mafLogicWithManagers();
   //m_logic->PlugTimebar(false);
