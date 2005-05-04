@@ -12,6 +12,8 @@ SET(PROJECT_SRCS
 #mafAvatar3D2DPicker.h
 #mmdRemoteMouse.cpp
 #mmdRemoteMouse.h
+mafAction.cpp
+mafAction.h
 mafAgent.cpp
 mafAgent.h
 mafAgentEventHandler.cpp

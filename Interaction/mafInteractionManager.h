@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:56 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-04 16:27:45 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -16,6 +16,8 @@
 #include "mafObserver.h"
 #include "mafEventSender.h"
 #include "mafStorable.h"
+#include "mafString.h"
+#include "mafSmartPointer.h"
 
 #include <map>
 #include <set>
@@ -25,6 +27,7 @@
 // forward declarations
 //----------------------------------------------------------------------------
 class mafEventBase;
+class mafEvent;
 class mafAction;
 class mafInteractor;
 class mafAvatar;

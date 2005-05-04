@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdTracker.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 05:58:12 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-04 16:27:45 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -416,22 +416,22 @@ int mmdTracker::AvatarChooser(wxString &avatar_name,wxString &avatar_type)
 
   assert(iFactory);
   
-  std::set<mafString> &avatars=iFactory->GetAvatarNames();
+  const std::set<std::string> avatars=iFactory->GetAvatarNames();
 
-  if (iFactory->avatars.size()==0)
+  if (avatars.size()==0)
   {
     mafErrorMessage("No avatars available!","Avatar Chooser Error");
     return MAF_ERROR;
   }
 
   wxString *avatar_names = new wxString[avatars.size()];
-  mafCString *avatar_types= new mafCString[avatars.size()];;
+  mafString *avatar_types= new mafString[avatars.size()];
 
-  std::set<mafString>::const_iterator it=avatars.begin();
+  std::set<std::string>::const_iterator it=avatars.begin();
   for (int id=0;it!=avatars.end();id++,it++)
   {
-    avatar_types[id]=*it;
-    avatar_names[id]=iFactory->GetAvatarDescription(*it);
+    avatar_types[id].Set(it->c_str());
+    avatar_names[id]=iFactory->GetAvatarDescription(it->c_str());
   }
 
   int index = -1;
@@ -448,8 +448,8 @@ int mmdTracker::AvatarChooser(wxString &avatar_name,wxString &avatar_type)
     }
   }
 
-  delete [] avatars_names;
-  delete [] avatars_types;
+  delete [] avatar_names;
+  delete [] avatar_types;
   return index;
 }
 //----------------------------------------------------------------------------
@@ -459,14 +459,14 @@ void mmdTracker::CreateGui()
   Superclass::CreateGui();
   m_Gui->Divider(1);
 
-  m_Gui->Bool(ID_AVATAR_CHECK,"avatar",&AvatarFlag,true,"enable the default avatar for the tracker");
+  m_Gui->Bool(ID_AVATAR_CHECK,"avatar",&m_AvatarFlag,true,"enable the default avatar for the tracker");
   m_Gui->Button(ID_AVATAR_SELECT,"set avatar");
   m_Gui->Enable(ID_AVATAR_SELECT,false);
 
   m_Gui->Divider(1);
   m_Gui->VectorN(ID_TB_X_EXTENT,"X extent",	m_TrackedBounds.m_Bounds,2, MINFLOAT, MAXFLOAT, -1);
-  m_Gui->VectorN(ID_TB_Y_EXTENT,"Y extent",	&(GetTrackedBounds()->m_Bounds[2]),2, MINFLOAT, MAXFLOAT, -1);
-  m_Gui->VectorN(ID_TB_Z_EXTENT,"Z extent",	&(GetTrackedBounds()->m_Bounds[4]),2, MINFLOAT, MAXFLOAT, -1);
+  m_Gui->VectorN(ID_TB_Y_EXTENT,"Y extent",	&(GetTrackedBounds().m_Bounds[2]),2, MINFLOAT, MAXFLOAT, -1);
+  m_Gui->VectorN(ID_TB_Z_EXTENT,"Z extent",	&(GetTrackedBounds().m_Bounds[4]),2, MINFLOAT, MAXFLOAT, -1);
   m_Gui->Divider();
   m_Gui->Vector(ID_TB_POSITION,"position",	m_TBPosition, MINFLOAT, MAXFLOAT, -1);
   m_Gui->Vector(ID_TB_ORIENTATION,"orientation",	m_TrackedBoxOrientation, MINFLOAT, MAXFLOAT, -1);
@@ -483,18 +483,18 @@ void mmdTracker::UpdateGui()
     avatar->UpdateGui();
   }
 
-  if (m_Gui) m_Gui->Enable(ID_AVATAR_SELECT,AvatarFlag!=0);
+  if (m_Gui) m_Gui->Enable(ID_AVATAR_SELECT,m_AvatarFlag!=0);
 
   Superclass::UpdateGui(); // must be the last one since the base class calls m_Gui->Update();
 }
 
 //----------------------------------------------------------------------------
-void mmgTrackerSettings::OnEvent(mafEventBase *event)
+void mmdTracker::OnEvent(mafEventBase *event)
 //----------------------------------------------------------------------------
 {
   if (mafEvent *e=mafEvent::SafeDownCast(event))
   {
-    switch(e.GetId()) 
+    switch(e->GetId()) 
     {
       // Recompute the transform from the Tracker to the Canonical coordinate systems
       case ID_TB_POSITION:
@@ -505,14 +505,15 @@ void mmgTrackerSettings::OnEvent(mafEventBase *event)
           // force transform update
           ComputeTrackerToCanonicalTansform();
         }
+        break;
       case ID_TB_ORIENTATION:
-        m_TrackedBounds.Modified();
+        m_TrackedBounds.SetOrientation(m_TrackedBoxOrientation[0],m_TrackedBoxOrientation[1],m_TrackedBoxOrientation[2]);
         // force transform update
         ComputeTrackerToCanonicalTansform();
         break;
       case ID_AVATAR_CHECK:
-        m_Gui->Enable(ID_AVATAR_SELECT,AvatarFlag!=0);
-        if (!AvatarFlag)
+        m_Gui->Enable(ID_AVATAR_SELECT,m_AvatarFlag!=0);
+        if (!m_AvatarFlag)
         {
           SetDefaultAvatar(NULL);
         }
@@ -548,25 +549,22 @@ void mmgTrackerSettings::OnEvent(mafEventBase *event)
     }
   }
 
-  if ( event->GetID()==AGENT_ASYNC_DISPATCH && event->GetSender()==this )
+  if ( event->GetId()==AGENT_ASYNC_DISPATCH && event->GetSender()==this )
   { 
-    m_LastPoseMutex.Lock();
+    m_LastPoseMutex.Lock();                     /// LOCK
     // avoid concurrent access to the flag
     mafEventBase *async_event=(mafEventBase *)event->GetData();
     mafID id=async_event->GetId();
-    m_LastPoseMutex.Unlock();
+    m_LastPoseMutex.Unlock();                   /// UNLOCK
 
     // process the event
     Superclass::OnEvent(event);
 
-    m_LastPoseMutex.Lock();
+    m_LastPoseMutex.Lock();                     /// LOCK
     // if it was a move event clear the m_LastMoveEvent variable
     if (id==TRACKER_3D_MOVE)
-    {
       m_LastPose=0;
-      //
-    }
-    m_LastPoseMutex.Unlock();
+    m_LastPoseMutex.Unlock();                   /// UNLOCK
   }
   else
   {

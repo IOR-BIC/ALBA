@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiCameraMove.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 15:42:35 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-04 16:27:46 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -23,6 +23,7 @@
 #define MOUSE_CAMERA_ZOOM   5
 
 #include "mafInteractor.h"
+#include "mafMTime.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -33,8 +34,7 @@ class vtkCamera;
 /** implements mouse move of camera in the scene.
   This class implements a mouse move of the renderer camera in the scene. The interaction
   modality is a mouse manipulation, where movements of the mouse are mapped
-  into movements of the camera. More details to be written...
-*/
+  into movements of the camera. More details to be written...*/
 class mmiCameraMove : public mafInteractor
 {
 public:
@@ -47,7 +47,7 @@ public:
   virtual void OnEvent(mafEventBase *event);
 
   virtual void OnMouseMove();
-  virtual void OnLeftButtonDown(mflEventInteraction *e);
+  virtual void OnLeftButtonDown(mafEventInteraction *e);
   virtual void OnLeftButtonUp();
   virtual void OnMiddleButtonDown();
   virtual void OnMiddleButtonUp();
@@ -79,19 +79,19 @@ protected:
   mmiCameraMove();
   virtual ~mmiCameraMove();
 
-  virtual void OnButtonDown(mflEventInteraction *e);
+  virtual void OnButtonDown(mafEventInteraction *e);
   
-  virtual void OnButtonUp(mflEventInteraction *e);
+  virtual void OnButtonUp(mafEventInteraction *e);
 
-  float MotionFactor;
-  int State;  
+  float         m_MotionFactor;
+  int           m_State;  
 
-  int MousePose[2];
-  int LastMousePose[2];
-  int ButtonPressed;
-  bool active_camera_to_Current_Camera_flag;
-  vtkCamera *CurrentCamera; ///< Stores camera to which the interaction is currently assigned
-  vtkTimeStamp  UpdateTime; ///< Timestamp of the last update of the tracker to world transformation 
+  int           m_MousePose[2];
+  int           m_LastMousePose[2];
+  int           m_ButtonPressed;
+  bool          m_ActiveCameraToCurrentCameraFlag;
+  vtkCamera*    m_CurrentCamera;  ///< Stores camera to which the interaction is currently assigned
+  mafMTime      m_UpdateTime;     ///< Time stamp of the last update of the tracker to world transformation 
 
 private:
   mmiCameraMove(const mmiCameraMove&);  // Not implemented.

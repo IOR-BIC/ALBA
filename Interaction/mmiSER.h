@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiSER.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:59 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-04 16:27:46 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,27 +12,15 @@
 #ifndef __mmiSER_h
 #define __mmiSER_h
 
-#ifdef __GNUG__
-    #pragma interface "mmiSER.cpp"
-#endif
-
-#ifndef WX_PRECOMP
-    #include "wx/wx.h"
-#endif
-
 #include "mafInteractor.h"
 #include "mafAction.h"
+#include <map>
 
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------
-template <class Key,class T> class vtkTemplatedMap;
 class mafDevice;
-class vtkCollection;
-class wxString;
-class mflXMLWriter;
-class vtkXMLDataElement;
-class vtkXMLDataParser;
+class mafString;
 
 /** Class implementing static routing from devices to interactors passing through actions.
   This class routes events from input devices to interactors according to a static binding
@@ -47,14 +35,8 @@ class vtkXMLDataParser;
   - to implement a type safe static binding mechanims */
 class mmiSER : public mafInteractor
 {
-public:
-  //------------------------------------------------------------------------------
-  // Events
-  //------------------------------------------------------------------------------
-  //MFL_EVT_DEC(MoveActionEvent); ///< Issued a move action has been performed
- 
-  vtkTypeMacro(mmiSER,mafInteractor);
-  static mmiSER *New();
+public: 
+  mafTypeMacro(mmiSER,mafInteractor);
 
    /** Un/Bind a device to an action */
   void BindDeviceToAction(mafDevice *device,mafAction *action);
@@ -86,20 +68,16 @@ public:
   mafAction *GetAction(const char *name);
   
   /** Return the actions container */
-  vtkTemplatedMap<wxString,mafAction> *GetActions();
-  
-  //virtual void ProcessEvent(mflEvent *event,unsigned long channel=mflAgent::DefaultChannel);
-
-    /** store static device bindings to actions */
-  int Store(mflXMLWriter *writer);
-  /** restore static device bindings to actions */
-  int Restore(vtkXMLDataElement *node,vtkXMLDataParser *parser);
+  std::map<mafString,mafAutoPointer<mafAction> > *GetActions();
 
 protected:
+  virtual int InternalStore(mafStorageElement *node);
+  virtual int InternalRestore(mafStorageElement *node);
+
   mmiSER();
   virtual ~mmiSER();
 
-  vtkTemplatedMap<wxString,mafAction>    *Actions;
+  std::map<mafString,mafAutoPointer<mafAction> >  m_Actions; ///< takes a list of the active actions
 
 private:
   mmiSER(const mmiSER&);  // Not implemented.

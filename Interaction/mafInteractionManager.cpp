@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:55 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-04 16:27:45 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -628,7 +628,7 @@ int mafInteractionManager::InternalStore(mafStorageElement *node)
     return MAF_ERROR;
   
   // store bindings
-  if (node->StoreObject("Actions",m_StaticEventRouter));
+  if (node->StoreObject("DeviceBindings",m_StaticEventRouter));
     return MAF_ERROR;
   
   return MAF_OK;
@@ -641,7 +641,7 @@ int mafInteractionManager::InternalRestore(mafStorageElement *node)
   if (node->RestoreObject("DeviceManager",m_DeviceManager))
     return MAF_ERROR;
   
-  if (node->RestoreObject("Actions",m_StaticEventRouter))
+  if (node->RestoreObject("DeviceBindings",m_StaticEventRouter))
     return MAF_ERROR;
   
   return MAF_OK;

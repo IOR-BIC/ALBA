@@ -2,120 +2,85 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiSER.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:58 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-04 16:27:46 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-// To be included first because of wxWindows
-#ifdef __GNUG__
-    #pragma implementation "mmiSER.cpp"
-#endif
-
-// For compilers that support precompilation, includes "wx/wx.h".
-#include "wx/wxprec.h"
 
 #include "mmiSER.h"
 #include "mmdTracker.h"
 #include "mafInteractionDecl.h"
 
-#include "mflEvent.h"
-
-
-#include "vtkObjectFactory.h"
-#include "vtkCollection.h"
-#include "vtkTemplatedMap.txx"
-#include "vtkTemplatedList.txx"
-
-#include "mflXMLWriter.h"
-#include "vtkXMLDataParser.h"
-#include "vtkXMLDataElement.h"
-
 #include <assert.h>
 
 //------------------------------------------------------------------------------
-// Events
+mafCxxTypeMacro(mmiSER)
 //------------------------------------------------------------------------------
-//MFL_EVT_IMP(mmiSER::MoveActionEvent);
 
-//------------------------------------------------------------------------------
-vtkStandardNewMacro(mmiSER)
 //------------------------------------------------------------------------------
 mmiSER::mmiSER()
 //------------------------------------------------------------------------------
 {
-  vtkNEW(Actions); // actions list
 }
 
 //------------------------------------------------------------------------------
 mmiSER::~mmiSER()
 //------------------------------------------------------------------------------
 {
-  vtkDEL(Actions);
 }
 //------------------------------------------------------------------------------
-int mmiSER::Store(mflXMLWriter *writer)
+int mmiSER::InternalStore(mafStorageElement *node)
 //------------------------------------------------------------------------------
 {
-  writer->OpenElement("DeviceBindings");
-  
-  for (mafAction *action=Actions->InitTraversal();action;action=Actions->GetNextItem())
+  for (mafAction *action=m_Actions->InitTraversal();action;action=m_Actions->GetNextItem())
   {
-    action->Store(writer);   
+    node->StoreObject("Action",action);   
   }
-  writer->CloseElement("DeviceBindings");
 
   return 0;
 }
 
 //------------------------------------------------------------------------------
-int mmiSER::Restore(vtkXMLDataElement *parent,vtkXMLDataParser *parser)
+int mmiSER::InternalRestore(mafStorageElement *node)
 //------------------------------------------------------------------------------
 {
-  vtkXMLDataElement *node=parent->FindNestedElementWithName("DeviceBindings");
-  if (node)
+  mafStorageElement::ChildrenVector children=node->GetChildren();
+  for (int i=0;i<children.size();i++)
   {
-    for (int i=0;i<node->GetNumberOfNestedElements();i++)
+    mafStorageElement *subnode=children[i];
+    if (!mafCString(subnode->GetName())=="Action")
     {
-      vtkXMLDataElement *subnode=node->GetNestedElement(i);
-      if (!vtkString::Equals(subnode->GetName(),"Action"))
-      {
-        vtkGenericWarningMacro("Unexpected element <"<<subnode->GetName()<<">");
-        return -1;
-      }
-
-      const char *action_name=subnode->GetAttribute("Name");
-      if (mafAction *action=GetAction(action_name))
-      {
-        action->Restore(subnode,parser);
-      }
-      else
-      {
-        vtkGenericWarningMacro("Action not found: Cannot restore bindings for action "<<action_name);
-      }
-
+      mafErrorMacro("Unexpected element <"<<subnode->GetName()<<">");
+      return MAF_ERROR;
     }
-    return 0;
+   
+    if (mafAction *action = subnode->RestoreObject())
+    {
+       action->Restore(subnode);
+    }
+    else
+    {
+      mafErrorMacro("I/O Error restoring action");
+    }
   }
-
-  vtkErrorMacro("XML Parse error: cannot find <DeviceBindings> element");
-  return -1;
+  return MAF_OK;
 }
 
 //------------------------------------------------------------------------------
 mafAction *mmiSER::GetAction(const char *name)
 //------------------------------------------------------------------------------
 {
-  return Actions->GetItem(name);
+  return m_Actions->GetItem(name);
 }
 
 //------------------------------------------------------------------------------
 vtkTemplatedMap<wxString,mafAction> *mmiSER::GetActions()
 //------------------------------------------------------------------------------
 {
-  return Actions;
+  return m_Actions;
 }
 //------------------------------------------------------------------------------
 int mmiSER::BindAction(const char *action,mafInteractor *agent)
@@ -164,7 +129,7 @@ mafAction *mmiSER::AddAction(const char *name, float priority, int type)
 void mmiSER::AddAction(mafAction *action, float priority)
 //------------------------------------------------------------------------------
 {
-  Actions->SetItem(action->GetName(),action);
+  m_Actions->SetItem(action->GetName(),action);
   
   // attach the action both as a listener and an event source 
   action->PlugListener(this);
@@ -227,7 +192,7 @@ void mmiSER::GetDeviceBindings(mafDevice *device,vtkCollection *actions)
   // Currently there's no way to extract listeners list from a device (or agent),
   // thus I have to search all the actions for the device as an event source 
   
-  for (mafAction *action=Actions->InitTraversal();action;action=Actions->GetNextItem())
+  for (mafAction *action=m_Actions->InitTraversal();action;action=m_Actions->GetNextItem())
   {
     if (action->GetDevices()->IsItemPresent(device))
     {
@@ -235,18 +200,3 @@ void mmiSER::GetDeviceBindings(mafDevice *device,vtkCollection *actions)
     }
   }
 }
-/*
-//------------------------------------------------------------------------------
-void mmiSER::ProcessEvent(mflEvent *event,mafID ch)
-//------------------------------------------------------------------------------
-{
-  assert(event);
-  
-  mafID id=event->GetID();
-
-  if (ch==mafDevice::DeviceInputChannel)
-  {
-    
-  }
-}
-*/

@@ -2,13 +2,15 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiCameraMove.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 15:42:35 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-04 16:27:45 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
+
+#include "mafDefines.h"
 
 #include "mmiCameraMove.h"
 #include "mmdMouse.h"
@@ -16,7 +18,6 @@
 #include "mafInteractor.h"
 
 #include "mafEventInteraction.h"
-#include "mafDefines.h"
 #include "vtkMath.h"
 #include "vtkRendererCollection.h"
 #include "vtkRenderer.h"
@@ -59,13 +60,13 @@ void mmiCameraMove::OnEvent(mafEventBase *event)
   mafID id=event->GetId();
   mafID channel=event->GetChannel();
 
-  if (channel == mafDevice::DeviceInputChannel && m_InteractionFlag)
+  if (channel == MCH_INPUT && m_InteractionFlag)
   {
     mafEventInteraction *e = (mafEventInteraction *)event;
     mmdMouse *mouse = mmdMouse::SafeDownCast(GetDevice());
     
     // if the event comes from tracker which started the interaction continue...
-    if (id == mmdMouse::Move2DEvent && mouse)
+    if (id == mmdMouse::MOUSE_2D_MOVE && mouse)
     {
       if (!m_CurrentCamera)
         return;
@@ -77,25 +78,23 @@ void mmiCameraMove::OnEvent(mafEventBase *event)
       
       OnMouseMove();
 
-      Lastm_MousePose[0] = m_MousePose[0];
-      Lastm_MousePose[1] = m_MousePose[1];
+      m_LastMousePose[0] = m_MousePose[0];
+      m_LastMousePose[1] = m_MousePose[1];
       
       return;
-
     }
-
   }
     
-  Superclass::ProcessEvent(event,channel);
+  Superclass::OnEvent(event);
 }
 //------------------------------------------------------------------------------
 int mmiCameraMove::StartInteraction(mmdMouse *mouse)
 //------------------------------------------------------------------------------
 {
   SetRenderer(mouse->GetRenderer());
-  if (Renderer)
+  if (m_Renderer)
   {
-    m_CurrentCamera = Renderer->GetActiveCamera();
+    m_CurrentCamera = m_Renderer->GetActiveCamera();
     return true;
   }
 
@@ -106,16 +105,16 @@ int mmiCameraMove::StartInteraction(mmdMouse *mouse)
 void mmiCameraMove::OnButtonDown(mafEventInteraction *e)
 //----------------------------------------------------------------------------
 {
-  ButtonPressed = e->GetButton();
+  m_ButtonPressed = e->GetButton();
   double pos[2];
   e->Get2DPosition(pos);
-  Lastm_MousePose[0] = m_MousePose[0] = (int)pos[0];
-  Lastm_MousePose[1] = m_MousePose[1] = (int)pos[1];
+  m_LastMousePose[0] = m_MousePose[0] = (int)pos[0];
+  m_LastMousePose[1] = m_MousePose[1] = (int)pos[1];
 
   mmdMouse *mouse = (mmdMouse *)e->GetSender();
   StartInteraction(mouse);
 
-  switch(ButtonPressed) 
+  switch(m_ButtonPressed) 
   {
     case MAF_LEFT_BUTTON:
       OnLeftButtonDown(e);
@@ -133,9 +132,9 @@ void mmiCameraMove::OnButtonDown(mafEventInteraction *e)
 void mmiCameraMove::OnButtonUp(mafEventInteraction *e)
 //----------------------------------------------------------------------------
 {
-  ButtonPressed = e->GetButton();
+  m_ButtonPressed = e->GetButton();
   
-  switch(ButtonPressed) 
+  switch(m_ButtonPressed) 
   {
     case MAF_LEFT_BUTTON:
       OnLeftButtonUp();
@@ -249,18 +248,18 @@ void mmiCameraMove::OnRightButtonUp()
 void mmiCameraMove::Rotate()
 //----------------------------------------------------------------------------
 {
-  if (Renderer == NULL)
+  if (m_Renderer == NULL)
     return;
 
 	if (m_CurrentCamera->GetParallelProjection()) return; 
 
-  int dx = m_MousePose[0] - Lastm_MousePose[0];
-  int dy = m_MousePose[1] - Lastm_MousePose[1];
+  int dx = m_MousePose[0] - m_LastMousePose[0];
+  int dy = m_MousePose[1] - m_LastMousePose[1];
   
-  int *size = Renderer->GetRenderWindow()->GetSize();
+  int *size = m_Renderer->GetRenderWindow()->GetSize();
 
-  float delta_elevation = -20.0 / size[1];
-  float delta_azimuth = -20.0 / size[0];
+  double delta_elevation = -20.0 / size[1];
+  double delta_azimuth = -20.0 / size[0];
   
   double rxf = (double)dx * delta_azimuth * this->m_MotionFactor;
   double ryf = (double)dy * delta_elevation * this->m_MotionFactor;
@@ -270,26 +269,26 @@ void mmiCameraMove::Rotate()
   m_CurrentCamera->OrthogonalizeViewUp();
 
   ResetClippingRange();
-  Renderer->GetRenderWindow()->Render();
+  m_Renderer->GetRenderWindow()->Render();
 }
 //----------------------------------------------------------------------------
 void mmiCameraMove::Spin()
 //----------------------------------------------------------------------------
 {
-  if (Renderer == NULL)
+  if (m_Renderer == NULL)
     return;
 
 	if (m_CurrentCamera->GetParallelProjection()) return; 
 
-  float *center = Renderer->GetCenter();
+  double *center = m_Renderer->GetCenter();
 
   double newAngle = 
     atan2((double)m_MousePose[1] - (double)center[1],
           (double)m_MousePose[0] - (double)center[0]);
 
   double oldAngle = 
-    atan2((double)Lastm_MousePose[1] - (double)center[1],
-          (double)Lastm_MousePose[0] - (double)center[0]);
+    atan2((double)m_LastMousePose[1] - (double)center[1],
+          (double)m_LastMousePose[0] - (double)center[0]);
   
   newAngle *= vtkMath::RadiansToDegrees();
   oldAngle *= vtkMath::RadiansToDegrees();
@@ -298,17 +297,17 @@ void mmiCameraMove::Spin()
   m_CurrentCamera->OrthogonalizeViewUp();
       
   ResetClippingRange();
-  Renderer->GetRenderWindow()->Render();
+  m_Renderer->GetRenderWindow()->Render();
 }
 //----------------------------------------------------------------------------
 void mmiCameraMove::Pan()
 //----------------------------------------------------------------------------
 {
-  if (this->Renderer == NULL)
+  if (this->m_Renderer == NULL)
     return;
 
   double viewFocus[4], focalDepth, viewPoint[3];
-  float newPickPoint[4], oldPickPoint[4], motionVector[3];
+  double newPickPoint[4], oldPickPoint[4], motionVector[3];
   
   // Calculate the focal depth since we'll be using it a lot
 
@@ -321,8 +320,8 @@ void mmiCameraMove::Pan()
   // Has to recalc old mouse point since the viewport has moved,
   // so can't move it outside the loop
 
-  ComputeDisplayToWorld((double)Lastm_MousePose[0],
-                              (double)Lastm_MousePose[1],
+  ComputeDisplayToWorld((double)m_LastMousePose[0],
+                              (double)m_LastMousePose[1],
                               focalDepth, 
                               oldPickPoint);
   
@@ -343,18 +342,18 @@ void mmiCameraMove::Pan()
                       motionVector[2] + viewPoint[2]);
       
   ResetClippingRange();
-  Renderer->GetRenderWindow()->Render();
+  m_Renderer->GetRenderWindow()->Render();
 }
 //----------------------------------------------------------------------------
 void mmiCameraMove::Dolly()
 //----------------------------------------------------------------------------
 {
-  if (Renderer == NULL)
+  if (m_Renderer == NULL)
     return;
   
-  float *center = Renderer->GetCenter();
+  double *center = m_Renderer->GetCenter();
 
-  int dy = m_MousePose[1] - Lastm_MousePose[1];
+  int dy = m_MousePose[1] - m_LastMousePose[1];
   double dyf = this->m_MotionFactor * (double)(dy) / (double)(center[1]);
   double zoomFactor = pow((double)1.1, dyf);
   
@@ -364,13 +363,13 @@ void mmiCameraMove::Dolly()
     m_CurrentCamera->Dolly(zoomFactor);
   
   ResetClippingRange();
-	Renderer->GetRenderWindow()->Render();
+	m_Renderer->GetRenderWindow()->Render();
 }
 //----------------------------------------------------------------------------
 void mmiCameraMove::ResetClippingRange()
 //----------------------------------------------------------------------------
 {
-  vtkRendererCollection *rc = Renderer->GetRenderWindow()->GetRenderers();
+  vtkRendererCollection *rc = m_Renderer->GetRenderWindow()->GetRenderers();
   rc->InitTraversal();
 	vtkRenderer *r1 = rc->GetNextItem(); 	 
 	vtkRenderer *r2 = rc->GetNextItem(); 	 
@@ -385,7 +384,7 @@ void mmiCameraMove::ResetClippingRange()
   else 
 	{
      // abbiamo anche il background renderer 
-		float b1[6],b2[6];
+		double b1[6],b2[6];
 		r1->ComputeVisiblePropBounds(b1);
 		r2->ComputeVisiblePropBounds(b2);
 
@@ -423,7 +422,7 @@ void mmiCameraMove::StartRotate()
     {
     return;
     }
-  this->Startm_State(MOUSE_CAMERA_ROTATE);
+  this->StartState(MOUSE_CAMERA_ROTATE);
 }
 
 //----------------------------------------------------------------------------
@@ -434,7 +433,7 @@ void mmiCameraMove::EndRotate()
     {
     return;
     }
-  this->Stopm_State();
+  this->StopState();
 }
 
 //----------------------------------------------------------------------------
@@ -445,7 +444,7 @@ void mmiCameraMove::StartZoom()
     {
     return;
     }
-  this->Startm_State(MOUSE_CAMERA_ZOOM);
+  this->StartState(MOUSE_CAMERA_ZOOM);
 }
 
 //----------------------------------------------------------------------------
@@ -456,7 +455,7 @@ void mmiCameraMove::EndZoom()
     {
     return;
     }
-  this->Stopm_State();
+  this->StopState();
 }
 
 //----------------------------------------------------------------------------
@@ -467,7 +466,7 @@ void mmiCameraMove::StartPan()
     {
     return;
     }
-  this->Startm_State(MOUSE_CAMERA_PAN);
+  this->StartState(MOUSE_CAMERA_PAN);
 }
 
 //----------------------------------------------------------------------------
@@ -478,7 +477,7 @@ void mmiCameraMove::EndPan()
     {
     return;
     }
-  this->Stopm_State();
+  this->StopState();
 }
 
 //----------------------------------------------------------------------------
@@ -489,7 +488,7 @@ void mmiCameraMove::StartSpin()
     {
     return;
     }
-  this->Startm_State(MOUSE_CAMERA_SPIN);
+  this->StartState(MOUSE_CAMERA_SPIN);
 }
 
 //----------------------------------------------------------------------------
@@ -500,7 +499,7 @@ void mmiCameraMove::EndSpin()
     {
     return;
     }
-  this->Stopm_State();
+  this->StopState();
 }
 
 //----------------------------------------------------------------------------
@@ -511,7 +510,7 @@ void mmiCameraMove::StartDolly()
     {
     return;
     }
-  this->Startm_State(MOUSE_CAMERA_DOLLY);
+  this->StartState(MOUSE_CAMERA_DOLLY);
 }
 
 //----------------------------------------------------------------------------
@@ -522,18 +521,18 @@ void mmiCameraMove::EndDolly()
       {
       return;
       }
-    this->Stopm_State();
+    this->StopState();
 }
 
 //----------------------------------------------------------------------------
-void mmiCameraMove::Startm_State(int newstate) 
+void mmiCameraMove::StartState(int newstate) 
 //----------------------------------------------------------------------------
 {
   this->m_State = newstate;
 }
 
 //----------------------------------------------------------------------------
-void mmiCameraMove::Stopm_State() 
+void mmiCameraMove::StopState() 
 //----------------------------------------------------------------------------
 {
   this->m_State = MOUSE_CAMERA_NONE;

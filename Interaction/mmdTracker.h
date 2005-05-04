@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdTracker.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-02 15:18:17 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-04 16:27:45 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -117,13 +117,13 @@ public:
   //void TrackerToCanonical(vtkMatrix4x4 *pose,vtkMatrix4x4 *dest=NULL);
   void TrackerToCanonical(const mafMatrix &pose,mafMatrix &dest);
   void TrackerToCanonical(mafMatrix &pose) {TrackerToCanonical(pose,pose);}
-  void TrackerToCanonical(mafTransform &trans);
+  void TrackerToCanonical(mafTransform *trans);
 
   /**
    This is used to map a pose in canonical frame into tracker's frame. */
   void CanonicalToTracker(const mafMatrix &pose, mafMatrix &dest);
   void CanonicalToTracker(mafMatrix &pose) {CanonicalToTracker(pose,pose);}
-  void CanonicalToTracker(mafTransform &trans);
+  void CanonicalToTracker(mafTransform *trans);
 
   /**
     Set/Get the avatar assigned to this device */
@@ -197,7 +197,7 @@ protected:
 
   mafMatrix*            m_LastPoseMatrix; ///< stores the last pose matrix
   int                   m_LastPose;       ///< Flag used when last pose has not been served yet
-  mafTimeStamp          m_LastMoveTime;   ///< Timestamp of last MoveEvent
+  mafTimeStamp          m_LastMoveTime;   ///< Time stamp of last MoveEvent
   mafMutexLock          m_LastPoseMutex;
   //mafEventInteraction*  m_LastMoveEvent;     
   mafTimeStamp          m_MoveEventTimeOut;
