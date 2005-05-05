@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 12:16:32 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-05-05 15:23:34 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,18 +20,20 @@
 //----------------------------------------------------------------------------
 
 
+#include "mafSceneGraph.h"
 #include "mafSceneNode.h"
 #include "mafView.h"
 //#include "mafPipeGizmo.h"
 //#include "mafPipePointSet.h"
 #include "mmgGui.h"
-#include "mafSceneGraph.h"
 #include "mafNode.h"
 #include "mafNodeIterator.h"
 //#include "mflBounds.h"
 //#include "mafNodeLandmark.h"
 //#include "mafNodeGizmo.h"
 //#include "mafNodeLandmarkCloud.h"
+#include "mafVMERoot.h"
+
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkCamera.h"
@@ -471,18 +473,22 @@ void mafSceneGraph::OnOpenCloseEvent(mafSceneNode *node)
 int mafSceneGraph::GetNodeStatus(mafNode *vme)
 //----------------------------------------------------------------------------
 {
+  if (vme->IsMAFType(mafVMERoot))
+  {
+    return NODE_NON_VISIBLE;
+  }
+
   mafSceneNode *n = Vme2Node(vme);
-	if(!n)
+	if(!n )
     return NODE_NON_VISIBLE;
 
-  /*
   bool creatable = n->m_PipeCreatable;
 	//landmark are not creatable
-	if(vme->IsA("mafNodeLandmark")) creatable = false;
-  */
-	//if(!creatable)											return NODE_NON_VISIBLE;
-  //if( n->m_Mutex &&  n->IsVisible())  return NODE_MUTEX_ON;
-  //if( n->m_Mutex && !n->IsVisible())  return NODE_MUTEX_OFF;
+	//if(vme->IsA("mafNodeLandmark")) creatable = false;
+  
+	if(!creatable)											return NODE_NON_VISIBLE;
+  if( n->m_Mutex &&  n->IsVisible())  return NODE_MUTEX_ON;
+  if( n->m_Mutex && !n->IsVisible())  return NODE_MUTEX_OFF;
   if( n->IsVisible())									return NODE_VISIBLE_ON;
   if(!n->IsVisible())									return NODE_VISIBLE_OFF;
 	return NODE_NON_VISIBLE;
