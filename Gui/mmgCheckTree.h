@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 13:22:32 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-05-05 15:26:07 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -59,7 +59,7 @@ public:
 
   /**todo: 
   setting m_enableSelect to false
-  doesnt prevent to changhe the selection using the keyboard !!
+  doesn't prevent to change the selection using the keyboard !!
   //SIL. 7-4-2005: 
   */
   void EnableSelect(bool enable);
@@ -89,19 +89,19 @@ public:
   void OnMouseEvent(wxMouseEvent& event);
 
   /** Called by the Custom-Tree-Event-Handler - via OnMouseDown*/
-  void OnIconClick(wxTreeItemId item);
+  virtual void OnIconClick(wxTreeItemId item);
 
   /** Called by the Custom-Tree-Event-Handler */
-  void ShowContextualMenu(wxMouseEvent& event);
+  virtual void ShowContextualMenu(wxMouseEvent& event);
 
   /** respond to Selection Changed */
   virtual void OnSelectionChanged(wxTreeEvent& event);
 
 protected:
-  mafView  *m_view;
-  mafNode  *m_clicked_vme;
-  bool      m_check_crypto;
-  bool      m_canSelect;
+  mafView  *m_View;
+  mafNode  *m_ClickedVme;
+  //bool      m_CheckCrypto;
+  bool      m_CanSelect;
   wxMenu   *m_RMenu;	
 
   typedef std::map<wxString,int> MapClassNameToIcon;
@@ -110,4 +110,3 @@ protected:
   DECLARE_EVENT_TABLE()
 }; // end of mmgCheckTree
 #endif
-

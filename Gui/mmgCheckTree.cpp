@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 18:14:09 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-05-05 15:26:07 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -92,9 +92,9 @@ mmgCheckTree::mmgCheckTree( wxWindow* parent,wxWindowID id, bool CloseButton, bo
 :mmgTree(parent,id,CloseButton,HideTitle)
 //----------------------------------------------------------------------------
 {
-  m_view = NULL;
-	m_clicked_vme = NULL;
-  m_canSelect	= true;
+  m_View = NULL;
+	m_ClickedVme = NULL;
+  m_CanSelect	= true;
   m_RMenu	= NULL;
 
   m_tree->PushEventHandler( new mmgCheckTreeEvtHandler(this) );
@@ -129,7 +129,7 @@ void mmgCheckTree::ShowContextualMenu(wxMouseEvent& event)
 void mmgCheckTree::EnableSelect(bool enable)
 //----------------------------------------------------------------------------
 {
-  m_canSelect = enable;
+  m_CanSelect = enable;
 }
 //----------------------------------------------------------------------------
 void mmgCheckTree::OnMouseDown( wxMouseEvent& event )
@@ -145,7 +145,7 @@ void mmgCheckTree::OnMouseDown( wxMouseEvent& event )
     OnIconClick(i); 
 		return;//eat message
 	} 
-	if(!this->m_canSelect)	
+	if(!this->m_CanSelect)	
 	  return; //also eat message if selection is disabled
 	event.Skip();//process event as usual
 }
@@ -228,8 +228,8 @@ void mmgCheckTree::VmeShow(mafNode *vme, bool show)
 int mmgCheckTree::GetVmeStatus(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-  if(!m_view) return NODE_NON_VISIBLE;
-  return m_view->GetNodeStatus(vme);
+  if(!m_View) return NODE_NON_VISIBLE;
+  return m_View->GetNodeStatus(vme);
 }
 //----------------------------------------------------------------------------
 void mmgCheckTree::VmeUpdateIcon(mafNode *vme)   
@@ -242,7 +242,7 @@ void mmgCheckTree::VmeUpdateIcon(mafNode *vme)
 void mmgCheckTree::ViewSelected(mafView *view)
 //----------------------------------------------------------------------------
 {
-  m_view=view;
+  m_View=view;
 
 	m_table->BeginFind();
 	while(wxNode* node = m_table->Next())
@@ -258,7 +258,7 @@ void mmgCheckTree::ViewSelected(mafView *view)
 void mmgCheckTree::ViewDeleted(mafView *view)
 //----------------------------------------------------------------------------
 {
-	if(view != m_view) return;
+	if(view != m_View) return;
 	ViewSelected(NULL);
 }
 //----------------------------------------------------------------------------
