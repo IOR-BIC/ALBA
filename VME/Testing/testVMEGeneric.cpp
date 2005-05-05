@@ -95,6 +95,8 @@ int main()
   vcone->SetName("cone");
   vmorph->SetName("morph");
 
+  MAF_TEST(vtitle->GetOutput()->GetVTKData()==NULL);
+
   mafTransform trans;
   
   vtitle->SetData(axes->GetOutput(),0);
