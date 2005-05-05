@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataPipeCustom.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:05:14 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-05 15:29:48 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -41,6 +41,9 @@ public:
 
   /** update the data pipe output */
   virtual void Update();
+
+  /** update bounds of the data pipe copying from VTK filter output bounds */
+  virtual void UpdateBounds();
 
 protected:
   mafDataPipeCustom();

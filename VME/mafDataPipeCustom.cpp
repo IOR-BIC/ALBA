@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataPipeCustom.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:05:14 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-05 15:29:47 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,6 +25,7 @@
 #include "mafVME.h"
 #include "vtkMAFDataPipe.h"
 #include "mafEventBase.h"
+#include "vtkDataSet.h"
 
 #include <assert.h>
 
@@ -69,6 +70,14 @@ void mafDataPipeCustom::Update()
   m_VTKDataPipe->Update();
 }
 
+//------------------------------------------------------------------------------
+void mafDataPipeCustom::UpdateBounds()
+//------------------------------------------------------------------------------
+{
+  m_VTKDataPipe->GetOutput()->Update();
+  m_VTKDataPipe->GetOutput()->ComputeBounds();
+  m_Bounds.DeepCopy(m_VTKDataPipe->GetOutput()->GetBounds());
+}
 //------------------------------------------------------------------------------
 void mafDataPipeCustom::OnEvent(mafEventBase *e)
 //------------------------------------------------------------------------------
