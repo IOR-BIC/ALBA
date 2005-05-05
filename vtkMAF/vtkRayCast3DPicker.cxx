@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkRayCast3DPicker.cxx,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 05:57:32 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-05 15:31:49 $
+  Version:   $Revision: 1.3 $
   Authors:   Michele Diegoli
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -35,7 +35,7 @@
 #include "vtkVolumeMapper.h"
 
 //------------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkRayCast3DPicker, "$Revision: 1.2 $");
+vtkCxxRevisionMacro(vtkRayCast3DPicker, "$Revision: 1.3 $");
 vtkStandardNewMacro(vtkRayCast3DPicker);
 //------------------------------------------------------------------------------
 
@@ -143,7 +143,8 @@ int vtkRayCast3DPicker::Pick(double *p1, double *p2, vtkRenderer *renderer)
   int pickable;
   int LODId;
   double windowLowerLeft[4], windowUpperRight[4];
-  double bounds[6], tol, hitPosition[3];
+  double bounds[6], tol;
+  //double hitPosition[3];
 
   double selectionPoint[3]; // selection point in display coordinates
 

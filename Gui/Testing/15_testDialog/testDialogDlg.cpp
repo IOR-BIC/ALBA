@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testDialogDlg.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 13:03:07 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-05 15:26:57 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -72,7 +72,7 @@ void testDialogDlg::OnEvent(mafEventBase *event)
 void testDialogDlg::OnCloseWindow(wxCloseEvent& event)
 //----------------------------------------------------------------------------
 {
-  int res = wxMessageBox("you are about to close the Window,\n this is the same as choosing CANCEL \n are you shure ?",
+  int res = wxMessageBox("you are about to close the Window,\n this is the same as choosing CANCEL \n are you sure ?",
                           "test",wxYES|wxNO|wxICON_QUESTION);
   if (res == wxNO) 
   {
