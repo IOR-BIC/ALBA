@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVTKInterpolator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 07:41:42 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-05 15:28:57 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -82,7 +82,9 @@ void mafVTKInterpolator::PreExecute()
   // if the current item is changed set the data inside new item as input for the interpolator
   // more specialized interpolators could redefine this to have more inputs (e.g. when 
   // interpolating different items)
-  if ( m_CurrentItem && m_CurrentItem!=m_OldItem || mtime>m_UpdateTime.GetMTime() || mtime>m_VTKDataPipe->GetInformationTime())
+  if ( m_CurrentItem && (m_CurrentItem!=m_OldItem || \
+    mtime>m_UpdateTime.GetMTime() || \
+    mtime>m_VTKDataPipe->GetInformationTime() ))
   {
     m_VTKDataPipe->SetNthInput(0,GetCurrentItem()->GetData());
     m_UpdateTime.Modified();
