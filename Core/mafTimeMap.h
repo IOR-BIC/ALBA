@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTimeMap.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:18 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-05-05 15:22:58 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -150,6 +150,7 @@ public:
 
   mafTimeMap<T>::TimeMap::iterator Begin() {return m_TimeMap.begin();}
   mafTimeMap<T>::TimeMap::iterator End() {return m_TimeMap.end();}
+  mafTimeMap<T>::TimeMap::iterator Last() {return --(m_TimeMap.end());}
 
 protected:
 
