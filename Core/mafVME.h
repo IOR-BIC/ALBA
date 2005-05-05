@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:36:50 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2005-05-05 15:22:23 $
+  Version:   $Revision: 1.19 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -80,7 +80,7 @@ public:
    Set the time for this VME (not for the whole tree). Normaly time 
    of the tree is set by sending an event with id VME_TIME_SET */
   virtual void SetCurrentTime(mafTimeStamp t);
-  mafTimeStamp GetCurrentTime() {return m_CurrentTime;}
+  mafTimeStamp GetCurrentTime();
   
   /**
     Set/Get CurrentTime for this VME and all subtree. Normaly time 

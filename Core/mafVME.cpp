@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 07:40:16 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2005-05-05 15:22:23 $
+  Version:   $Revision: 1.18 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -45,6 +45,7 @@ mafVME::mafVME()
 //-------------------------------------------------------------------------
 {
   m_Output        = NULL;
+  m_Behavior      = NULL;
 
   m_AbsMatrixPipe = mafAbsMatrixPipe::New();
 
@@ -159,14 +160,13 @@ int mafVME::SetParent(mafNode *parent)
 }
 
 //-------------------------------------------------------------------------
-// TODO: to be rewritten
 void mafVME::SetCurrentTime(mafTimeStamp t)
 //-------------------------------------------------------------------------
 {
   if (t<0)
     t=0;
 
-  m_CurrentTime=t;
+  m_CurrentTime = t;
 
   // Must keep a time variable also on the
   // pipes to allow multiple pipes contemporary 
@@ -185,7 +185,13 @@ void mafVME::SetCurrentTime(mafTimeStamp t)
 
   // TODO: consider if to add a flag to disable event issuing
   //GetEventSource()->InvokeEvent(this,VME_TIME_SET);
-  
+}
+
+//-------------------------------------------------------------------------
+mafTimeStamp mafVME::GetCurrentTime() 
+//-------------------------------------------------------------------------
+{
+  return m_CurrentTime;
 }
 
 //-------------------------------------------------------------------------
