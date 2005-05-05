@@ -4,14 +4,22 @@ LINK_LIBRARIES(mafVME vtkRendering vtkGraphics)
 
 ADD_EXECUTABLE(testDataVector testDataVector.cpp)
 ADD_TEST(testDataVector ${EXECUTABLE_OUTPUT_PATH}/testDataVector)
+
 ADD_EXECUTABLE(testMatrixVector testMatrixVector.cpp)
 ADD_TEST(testMatrixVector ${EXECUTABLE_OUTPUT_PATH}/testMatrixVector)
+
 ADD_EXECUTABLE(testVMEGenericPose testVMEGenericPose.cpp)
 ADD_TEST(testVMEGenericPose ${EXECUTABLE_OUTPUT_PATH}/testVMEGenericPose)
+
 ADD_EXECUTABLE(testVMEGenericBounds testVMEGenericBounds.cpp)
 ADD_TEST(testVMEGenericBounds ${EXECUTABLE_OUTPUT_PATH}/testVMEGenericBounds)
+
 ADD_EXECUTABLE(testVMESlicer testVMESlicer.cpp)
 ADD_TEST(testVMESlicer ${EXECUTABLE_OUTPUT_PATH}/testVMESlicer)
+
+ADD_EXECUTABLE(testVMELandmarkCloud testVMELandmarkCloud.cpp)
+ADD_TEST(testVMELandmarkCloud ${EXECUTABLE_OUTPUT_PATH}/testVMELandmarkCloud)
+
 ADD_EXECUTABLE(testCustomDataPipe testCustomDataPipe.cpp)
 ADD_TEST(testCustomDataPipe ${EXECUTABLE_OUTPUT_PATH}/testCustomDataPipe)
 
