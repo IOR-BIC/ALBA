@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:47:58 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-05 15:30:10 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,27 +21,68 @@
 
 #include "mafVMELandmark.h"
 #include "mafVMELandmarkCloud.h"
+#include "mafVMEOutputPointSet.h"
 #include "mafSmartPointer.h"
+#include "mafDataPipeCustom.h"
 #include "mafOBB.h"
 #include "mafIndent.h"
 #include "mafTransform.h"
-
+#include "vtkMAFSmartPointer.h"
+#include "vtkMAFDataPipe.h"
 #include "vtkTransform.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
 #include "vtkPointData.h"
-#include "vtkCharArray.h"
+#include "vtkCellArray.h"
+#include "vtkBitArray.h"
+
+//-------------------------------------------------------------------------
+mafCxxTypeMacro(mafVMELandmark);
+//-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
 mafVMELandmark::mafVMELandmark()
 //-------------------------------------------------------------------------
 {
+  SetOutput(mafVMEOutputPointSet::New()); // create the output
+
+  vtkNEW(m_Polydata);
+  vtkMAFSmartPointer<vtkPoints> points;
+  points->InsertNextPoint(0,0,0);
+  m_Polydata->SetPoints(points);
+
+  // add cellarray for visibility
+  vtkMAFSmartPointer<vtkCellArray> cells;
+  m_Polydata->SetVerts(cells);
+
+  // add scalars for visibility attribute
+  vtkPointData* point_data = m_Polydata->GetPointData();
+  vtkMAFSmartPointer<vtkBitArray> scalars;
+  scalars->SetNumberOfValues(1);
+  point_data->SetScalars(scalars);
+
+  // attach a datapipe which creates a bridge between VTK and MAF
+  mafDataPipeCustom *dpipe = mafDataPipeCustom::New();
+  dpipe->SetDependOnAbsPose(true);
+  SetDataPipe(dpipe);
+
+  dpipe->GetVTKDataPipe()->SetNthInput(0, m_Polydata);
 }
 
 //-------------------------------------------------------------------------
 mafVMELandmark::~mafVMELandmark()
 //-------------------------------------------------------------------------
 {
+  vtkDEL(m_Polydata);
+}
+
+//-----------------------------------------------------------------------
+void mafVMELandmark::InternalPreUpdate()
+//-----------------------------------------------------------------------
+{
+  // update the scalar value according to landmark visibility
+  m_Polydata->GetPointData()->GetScalars()->SetTuple1(0,GetLandmarkVisibility()?1:0);
+  m_Polydata->Modified();
 }
 
 //-------------------------------------------------------------------------

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPointSet.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:47:59 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-05 15:30:11 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,21 +21,27 @@
 
 #include "mafVMEPointSet.h"
 #include "mafDataVector.h"
-//#include "mafDataInterpolator.h"
-//#include "mafMatrixInterpolator.h"
-//#include "mafMatrixVector.h"
 #include "mafVMEOutputPointSet.h"
 #include "mafDataPipe.h"
 #include "mafVMEItemVTK.h"
+#include "vtkMAFSmartPointer.h"
 
 #include "vtkPolyData.h"
 #include "vtkCellArray.h"
 
+//-------------------------------------------------------------------------
+mafCxxAbstractTypeMacro(mafVMEPointSet);
+//-------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------
 mafVMEPointSet::mafVMEPointSet()
+//-------------------------------------------------------------------------
 {
 }
 
+//-------------------------------------------------------------------------
 mafVMEPointSet::~mafVMEPointSet()
+//-------------------------------------------------------------------------
 {
 }
 //-------------------------------------------------------------------------
@@ -88,6 +94,7 @@ void mafVMEPointSet::SetNumberOfPoints(int num,mafTimeStamp t)
 
 //-------------------------------------------------------------------------
 int mafVMEPointSet::AppendPoint(vtkPolyData *polydata,double x,double y,double z,int num)
+//-------------------------------------------------------------------------
 {
   int idx=-1;
 
@@ -152,9 +159,10 @@ vtkPolyData *mafVMEPointSet::GetPolyData(mafTimeStamp t)
 vtkPolyData *mafVMEPointSet::NewPolyData(mafTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  vtkPolyData *polydata = vtkPolyData::New();
-  this->SetData(polydata,t);
-  polydata->Delete();
+  vtkMAFSmartPointer<vtkPolyData> polydata;
+  vtkMAFSmartPointer<vtkPoints> points;
+  polydata->SetPoints(points);
+  this->SetDataByReference(polydata,t);
   return polydata;
 }
 

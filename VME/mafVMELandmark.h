@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:47:58 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-05 15:30:11 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -94,7 +94,13 @@ protected:
   mafVMELandmark();
   virtual ~mafVMELandmark();
 
+  /** called to check if the vme can be re-parented under the new parent */
   virtual bool CanReparentTo(mafNode *parent);
+
+  /** called to prepare the update of the output */
+  virtual void InternalPreUpdate();
+
+  vtkPolyData *m_Polydata; ///< Polydata storing the landmark point
 
 private:
   mafVMELandmark(const mafVMELandmark&); // Not implemented

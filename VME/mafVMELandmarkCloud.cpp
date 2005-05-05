@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:47:59 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-05 15:30:11 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -52,6 +52,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 MAF_ID_IMP(mafVMELandmarkCloud::CLOUDE_OPEN_CLOSE);   // Event rised by Open and Close functions 
 MAF_ID_IMP(mafVMELandmarkCloud::CLOUDE_RADIUS_MODIFIED); // Event rised when the radius is changed with a SetRadius()
 MAF_ID_IMP(mafVMELandmarkCloud::CLOUDE_SPHERE_RES); // Event rised when the sphere resolution is changed with a SetSphereResolution()
+
+//------------------------------------------------------------------------------
+mafCxxTypeMacro(mafVMELandmarkCloud);
+//------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 mafVMELandmarkCloud::mafVMELandmarkCloud()
@@ -266,14 +270,14 @@ int mafVMELandmarkCloud::AppendLandmark(const char *name)
   }
 
   int old = GetNumberOfLandmarks();
-  int ret = SetNumberOfLandmarks(GetNumberOfLandmarks()+1);
+  int ret = SetNumberOfLandmarks(old+1);
 
   if (ret!=MAF_OK)
     return -1;
 
-  SetLandmarkName(GetNumberOfLandmarks()-1,name);
+  SetLandmarkName(old,name);
 
-  return GetNumberOfLandmarks()-1;
+  return old;
 }
 /*
 //-------------------------------------------------------------------------
@@ -628,7 +632,8 @@ void mafVMELandmarkCloud::Close()
   int num = GetNumberOfLandmarks();
   // change the state to closed to disable extra features
   SetState(CLOSED_CLOUD);
-
+  m_NumberOfLandmarks = 0;
+  
   // pre-set the number of landmarks.
   SetNumberOfLandmarks(num);
 
@@ -644,7 +649,7 @@ void mafVMELandmarkCloud::Close()
       SetLandmarkName(idx,lm->GetName());
 
       mafDataVector::Iterator item_id = m_DataVector->Begin();
-      for (mafMatrixVector::Iterator it = m_MatrixVector->Begin(); it != m_MatrixVector->End();)
+      for (mafMatrixVector::Iterator it = lm->GetMatrixVector()->Begin(); it != lm->GetMatrixVector()->End();)
       {
         double xyz[3];
         bool vis;
@@ -659,8 +664,9 @@ void mafVMELandmarkCloud::Close()
 
         vis = mat->GetElements()[0][0] != 0;
         
-        mafVMEItemVTK *item = mafVMEItemVTK::SafeDownCast(item_id->second);
-        assert(item);
+        mafVMEItemVTK *item = NULL;
+        if(item_id != m_DataVector->End())
+          mafVMEItemVTK::SafeDownCast(item_id->second);
         vtkPolyData *polydata;
 
         // All this stuff is to cope with possible open landmark clouds having different
@@ -711,6 +717,7 @@ void mafVMELandmarkCloud::Close()
           {
             polydata->DeepCopy(previous_polydata);
           }
+          item_id = m_DataVector->Last();
         }
         else if (item->GetTimeStamp() == mat->GetTimeStamp())
         { 
@@ -740,7 +747,8 @@ void mafVMELandmarkCloud::Close()
       c++;
     }
   }
-
+  
+  Modified();
   GetEventSource()->InvokeEvent(this, mafVMELandmarkCloud::CLOUDE_OPEN_CLOSE);
 }
 
@@ -759,7 +767,8 @@ void mafVMELandmarkCloud::Open()
     m_State = OPEN_CLOUD;
     Superclass::AddChild(lm);
     m_State = CLOSED_CLOUD;
-    lm->SetCurrentTime(GetCurrentTime());
+    mafTimeStamp ct = GetCurrentTime();
+    lm->SetCurrentTime(ct);
     
 		for (mafDataVector::Iterator it = m_DataVector->Begin(); it != m_DataVector->End() ; it++)
 		{
@@ -798,6 +807,7 @@ void mafVMELandmarkCloud::Open()
 
   // change the state to open to enable extra features
   SetState(OPEN_CLOUD);
+  Modified();
   GetEventSource()->InvokeEvent(this, mafVMELandmarkCloud::CLOUDE_OPEN_CLOSE);
 }
 

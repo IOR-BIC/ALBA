@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPointSet.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:47:59 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-05 15:30:11 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -39,7 +39,7 @@ mafVME mafVMELandmarkCloud
 class MAF_EXPORT mafVMEPointSet : public mafVMEGeneric
 {
 public:
-  mafTypeMacro(mafVMEPointSet,mafVMEGeneric);
+  mafAbstractTypeMacro(mafVMEPointSet,mafVMEGeneric);
 
   /** 
   Set data for the give timestamp. This function automatically creates a
@@ -52,9 +52,6 @@ public:
   Return MAF_OK if succeeded, MAF_ERROR if they kind of data is not accepted by
   this type of VME. */
   virtual int SetData(vtkPolyData *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
-
-  /** Compare with another VME-Slicer. */
-  virtual bool Equals(mafVME *vme);
 
   /** return the right type of output */  
   virtual mafVMEOutput *GetOutput();
