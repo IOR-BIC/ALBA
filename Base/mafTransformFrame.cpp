@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:01:23 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-05-12 16:12:32 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -68,21 +68,21 @@ virtual void Print(std::ostream& os, const int tabs) const;
 }
 */
 //----------------------------------------------------------------------------
-void mafTransformFrame::SetInput(mafTransformBase *matrix)
+void mafTransformFrame::SetInput(mafTransformBase *frame)
 //----------------------------------------------------------------------------
 {
   if (m_Input) m_Input->UnRegister(this);
-  m_Input = matrix;
-  if (matrix)
-    matrix->Register(this);
+  m_Input = frame;
+  if (frame)
+    frame->Register(this);
 }
 
 //----------------------------------------------------------------------------
-void mafTransformFrame::SetInput(mafMatrix *matrix)
+void mafTransformFrame::SetInput(mafMatrix *frame)
 //----------------------------------------------------------------------------
 {
-  mafTransform *trans= new mafTransform;
-  trans->SetMatrix(*matrix);
+  mafTransform *trans= mafTransform::New();
+  trans->SetMatrix(*frame);
   SetInput(trans);
 }
 

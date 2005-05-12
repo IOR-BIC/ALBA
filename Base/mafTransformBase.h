@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformBase.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 20:01:58 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-05-12 16:12:09 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -31,6 +31,7 @@ class vtkMAFToLinearTransform;
   @sa mafTransform
   @todo
   - change SetTimeStamp to apply a Modified(), than change matrix pipes to not call it!!!
+  - implement issuing of a MATRIX_UPDATED event: add an event source member
   */
 class MAF_EXPORT mafTransformBase : public mafReferenceCounted
 {
@@ -141,9 +142,6 @@ protected:
   mafMutexLock m_UpdateMutex; ///< we also need to do mutex locking so updates don't collide.
 
   mafTimeStamp m_TimeStamp;   ///< the timestamp to assign to the output matrix (default=0)
-
-  //mafMutexLock m_InverseMutex;
-  //mafTransformBase *m_MyInverse;
 
   #ifdef MAF_USE_VTK
   vtkMAFToLinearTransform *m_VTKTransform; ///< VTK transform used to link to VTK process objects
