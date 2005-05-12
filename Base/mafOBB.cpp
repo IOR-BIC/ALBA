@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOBB.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-18 19:52:57 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-05-12 16:10:59 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -12,6 +12,7 @@
 #include "mafOBB.h"
 #include "mafMatrix.h"
 #include "mafIndent.h"
+#include "mafTransform.h"
 #include "math.h"
 //-------------------------------------------------------------------------
 mafOBB::mafOBB()
@@ -384,6 +385,21 @@ double mafOBB::GetDepth() const
   return dims[2];
 }
 
+//-------------------------------------------------------------------------
+void mafOBB::SetOrientation(double rx, double ry, double rz)
+//-------------------------------------------------------------------------
+{
+  mafTransform::SetOrientation(m_Matrix,rx,ry,rz);
+  Modified();
+}
+
+//-------------------------------------------------------------------------
+void mafOBB::GetOrientation(double *rxyz)
+//-------------------------------------------------------------------------
+{
+  mafTransform::GetOrientation(m_Matrix,rxyz);
+  Modified();
+}
 //-------------------------------------------------------------------------
 void mafOBB::Print(std::ostream& os, const int tabs) const
 //-------------------------------------------------------------------------

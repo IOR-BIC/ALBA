@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOBB.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-07 20:42:15 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-05-12 16:10:59 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -130,6 +130,12 @@ public:
 
   /** return the Z dimension */
   double GetDepth() const;
+
+  /** set orientation of the internal matrix */
+  void SetOrientation(double rx, double ry, double rz);
+
+  /** extract orientation from internal matrix */
+  void GetOrientation(double rxyz[3]);
 
   /** dump the bounding box */
   virtual void Print(std::ostream& os, const int tabs=0) const;
