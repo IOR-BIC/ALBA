@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 16:27:45 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-12 16:26:45 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -306,11 +306,11 @@ void mafInteractionManager::CameraUpdate(mafView *view)
     if (view)
     {
       // avoid too much renders which would trash the CPU
-      if((vtkTimerLog::GetCurrentTime()-m_LastRenderTime)>m_IntraFrameTime)
+      if((vtkTimerLog::GetTimeStamp()-m_LastRenderTime)>m_IntraFrameTime)
       {
         // render requested view
         view->CameraUpdate();
-        m_LastRenderTime=vtkTimerLog::GetCurrentTime(); // store time at end of rendering
+        m_LastRenderTime=vtkTimerLog::GetTimeStamp(); // store time at end of rendering
       }
       
     }
@@ -318,7 +318,7 @@ void mafInteractionManager::CameraUpdate(mafView *view)
     {
       // ask logic->view_mgr to perform a global update
       mafEventMacro(mafEvent(this,CAMERA_SYNCHRONOUS_UPDATE));
-      m_LastRenderTime=vtkTimerLog::GetCurrentTime(); // store time at end of rendering
+      m_LastRenderTime=vtkTimerLog::GetTimeStamp(); // store time at end of rendering
     }
   }
 }
@@ -464,18 +464,18 @@ void mafInteractionManager::OnEndDispatching()
     m_CameraUpdateRequests.clear();
     
     // avoid too much renderings which would trash the CPU
-    if((vtkTimerLog::GetCurrentTime()-m_LastRenderTime)>m_IntraFrameTime)
+    if((vtkTimerLog::GetTimeStamp()-m_LastRenderTime)>m_IntraFrameTime)
     {
       // ask logic->view_mgr to perform a global update
       mafEventMacro(mafEvent(this,CAMERA_SYNCHRONOUS_UPDATE));
-      m_LastRenderTime=vtkTimerLog::GetCurrentTime(); // store time at end of rendering
+      m_LastRenderTime=vtkTimerLog::GetTimeStamp(); // store time at end of rendering
     }
     
   }
   else
   {
     // avoid too much renderings which would trash the CPU
-    if((vtkTimerLog::GetCurrentTime()-m_LastRenderTime)>m_IntraFrameTime)
+    if((vtkTimerLog::GetTimeStamp()-m_LastRenderTime)>m_IntraFrameTime)
     {
       // traverse the list and perform all requested updates
       for (std::set<mafView *>::iterator it=m_CameraUpdateRequests.begin(); \
@@ -486,7 +486,7 @@ void mafInteractionManager::OnEndDispatching()
       }
       // clear the queue
       m_CameraUpdateRequests.clear();
-      m_LastRenderTime=vtkTimerLog::GetCurrentTime(); // store time at end of rendering
+      m_LastRenderTime=vtkTimerLog::GetTimeStamp(); // store time at end of rendering
     }
   }
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 15:42:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-12 16:26:45 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -916,7 +916,7 @@ void mmiGenericMouse::SendTransformMatrix(vtkMatrix4x4 *matrix, int mouseAction,
   // have to recreate the time stamp :-(
   mflSmartPointer<mflMatrix> tmatrix;
   tmatrix->DeepCopy(matrix);
-  tmatrix->SetTimeStamp(vtkTimerLog::GetCurrentTime());
+  tmatrix->SetTimeStamp(vtkTimerLog::GetTimeStamp());
   event->SetMatrix(tmatrix);
   event->Set2DPosition(MousePose[0],MousePose[1]);
   if (mouseAction == MOUSE_DOWN)
