@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:03:23 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-05-12 16:21:05 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -43,6 +43,7 @@ mafXMLElement::~mafXMLElement()
 {
   // the XML element is destroyed by its creator (the DOMDocument)
   cppDEL(m_DOMElement);
+  cppDEL(m_Name);
 }
 
 //------------------------------------------------------------------------------

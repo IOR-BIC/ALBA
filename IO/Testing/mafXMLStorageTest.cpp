@@ -31,7 +31,7 @@ public:
   mafTypeMacro(mafStorableTestObject,mafObject);
   void Print(std::ostream &os,const int tabs=0);
   mafStorableTestObject();
-  ~mafStorableTestObject() {}
+  ~mafStorableTestObject() {cppDEL(m_Dummy);}
   virtual int InternalStore(mafStorageElement *parent);
   virtual int InternalRestore(mafStorageElement *node);
   double m_FValue;
@@ -135,8 +135,8 @@ int main()
 
   mafStorableTestObject foo;
   
-  mafDummyObject dummy;
-  dummy.m_Name = "myDummyObject";
+  mafDummyObject *dummy = new mafDummyObject;
+  dummy->m_Name = "myDummyObject";
   
   // set the float and integer values
   foo.m_FValue=1.5;
@@ -180,7 +180,7 @@ int main()
 #endif
 
   // set the object pointer
-  foo.m_Dummy=&dummy;
+  foo.m_Dummy=dummy;
 
   // debug print
   foo.Print(std::cerr);
@@ -258,6 +258,8 @@ int main()
   MAF_TEST(new_foo.m_Dummy!=NULL);
   MAF_TEST(new_foo.m_Dummy->IsA(mafDummyObject::GetStaticTypeId()))
   MAF_TEST(new_foo.m_Dummy->m_Name == "myDummyObject");
+
+  //delete dummy; // clean memory
   
   std::cout<<"Test completed successfully!"<<std::endl;
 

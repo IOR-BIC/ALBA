@@ -68,6 +68,9 @@ int main()
   MAF_TEST(!dummy->IsA(mafFooObject::GetStaticTypeName())); // test through static string type 
   MAF_TEST(dummy->GetStaticTypeId()==dummy->GetTypeId()); 
   MAF_TEST(dummy->GetStaticTypeId()==dummy->GetTypeId());
+
+  foo->Delete();
+  dummy->Delete();
   
   std::cout<<"Test completed successfully!"<<std::endl;
 
