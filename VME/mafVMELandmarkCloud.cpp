@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-05 15:30:11 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-12 16:23:02 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -642,7 +642,8 @@ void mafVMELandmarkCloud::Close()
   // when the cloud is open. The only thing out of sync are point positions... this
   // could change in the future having also position to be synchronous.
   int idx = 0;
-	for (int c = 0; c < GetNumberOfChildren();)
+  std::vector<mafVMELandmark *> landmarks;
+	for (int c = 0; c < GetNumberOfChildren();c++)
   {
     if (mafVMELandmark *lm = mafVMELandmark::SafeDownCast(GetChild(c)))
     {
@@ -737,17 +738,16 @@ void mafVMELandmarkCloud::Close()
       }
       idx++;
 
-      // notice that removing the child the tail shifts, so we
-      // don't need to increase the index counter
-      RemoveChild(lm);
-    }
-    else
-    {
-      // go to next child
-      c++;
+      landmarks.push_back(lm); 
     }
   }
   
+  // remove all child landmarks
+  for (int i=0;i<landmarks.size();i++)
+  {
+    RemoveChild(landmarks[i]);
+  }
+    
   Modified();
   GetEventSource()->InvokeEvent(this, mafVMELandmarkCloud::CLOUDE_OPEN_CLOSE);
 }
@@ -767,8 +767,8 @@ void mafVMELandmarkCloud::Open()
     m_State = OPEN_CLOUD;
     Superclass::AddChild(lm);
     m_State = CLOSED_CLOUD;
-    mafTimeStamp ct = GetCurrentTime();
-    lm->SetCurrentTime(ct);
+    mafTimeStamp ct = GetTimeStamp();
+    lm->SetTimeStamp(ct);
     
 		for (mafDataVector::Iterator it = m_DataVector->Begin(); it != m_DataVector->End() ; it++)
 		{
@@ -865,7 +865,7 @@ bool mafVMELandmarkCloud::GetLandmarkVisibility(int idx,mafTimeStamp t)
     if (t != m_CurrentTime)
     {
       // set time to the argument value
-      GetDataPipe()->SetCurrentTime(t);
+      GetDataPipe()->SetTimeStamp(t);
     }
     polydata = GetPointSetOutput()->GetPointSetData();
     if (polydata)
@@ -880,7 +880,7 @@ bool mafVMELandmarkCloud::GetLandmarkVisibility(int idx,mafTimeStamp t)
     // restore current time
     if (t != m_CurrentTime)
     {
-      GetDataPipe()->SetCurrentTime(m_CurrentTime);
+      GetDataPipe()->SetTimeStamp(m_CurrentTime);
       GetDataPipe()->Update();
     }
     return ret;
