@@ -41,6 +41,31 @@ int main()
   num_lm = cloud->GetNumberOfLandmarks();
   MAF_TEST(num_lm == 3);
 
+  double xyz[3];
+
+  // test landmark position 
+  cloud->GetLandmark(0,xyz, 0);
+  MAF_TEST(mafEquals(xyz[0],0));
+  MAF_TEST(mafEquals(xyz[1],0));
+  MAF_TEST(mafEquals(xyz[2],0));
+
+  cloud->GetLandmark(1,xyz, 0);
+  MAF_TEST(mafEquals(xyz[0],5));
+  MAF_TEST(mafEquals(xyz[1],5));
+  MAF_TEST(mafEquals(xyz[2],5));
+
+  cloud->GetLandmark(1,xyz, 1);
+  MAF_TEST(mafEquals(xyz[0],5));
+  MAF_TEST(mafEquals(xyz[1],5));
+  MAF_TEST(mafEquals(xyz[2],5));
+
+
+
+  cloud->GetLandmark(2,xyz, 0);
+  MAF_TEST(mafEquals(xyz[0],-1));
+  MAF_TEST(mafEquals(xyz[1],3));
+  MAF_TEST(mafEquals(xyz[2],-1));
+
   // create windows
   vtkMAFSmartPointer<vtkRenderer> renderer;
   vtkMAFSmartPointer<vtkRenderWindow> renWin;
@@ -105,12 +130,13 @@ int main()
   num_lm = cloud->GetNumberOfLandmarks();
   MAF_TEST(num_lm == 4);
   // set the time stamp
-  cloud->SetCurrentTime(1.0);
+  cloud->SetTimeStamp(1.0);
   // the number of lm should remain the same
   num_lm = cloud->GetNumberOfLandmarks();
   MAF_TEST(num_lm == 4);
+  
   // check the lm's position to the new timestamp
-  double xyz[3];
+  
   // lm1's position should be changed
   cloud->GetLandmark(0,xyz,1.0);
   MAF_TEST(mafEquals(xyz[0],1));
@@ -131,7 +157,7 @@ int main()
   MAF_TEST(mafEquals(xyz[2],2));
 
   // reset the timestamp to 0
-  cloud->SetCurrentTime(0.0);
+  cloud->SetTimeStamp(0.0);
   // set the visibility of lm1 in different timestamp
   cloud->SetLandmarkVisibility("lm1",false,1.0);
   // check the visibility at timestamp 0 that should be true (default visibility)
