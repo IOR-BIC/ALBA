@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafMultiThreader.cpp,v $
 Language:  C++
-Date:      $Date: 2005-04-29 06:02:47 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2005-05-12 16:11:20 $
+Version:   $Revision: 1.4 $
 Authors:   Based on mafMultiThreader (www.vtk.org), adapted by Marco Petrone
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -58,6 +58,11 @@ mafMultiThreader::mafMultiThreader()
 // Destructor. Nothing allocated so nothing needs to be done here.
 mafMultiThreader::~mafMultiThreader()
 {
+  for ( int i = 0; i < MAF_MAX_THREADS; i++ )
+  {
+    if (m_SpawnedThreadActiveFlagLock[i])
+      cppDEL(m_SpawnedThreadActiveFlagLock[i]);
+  }
 }
 
 #ifdef CMAKE_USE_WIN32_THREADS_INIT

@@ -67,7 +67,10 @@ int main()
   MAF_TEST(mafFooObject::SafeDownCast(new_dummy)==NULL); // this cast should be failed
 
   mafDummyObject* tmp_dummy = mafDummyObject::SafeDownCast(new_dummy);
-  MAF_TEST(tmp_dummy!=NULL); // this should have been casted succesfully 
+  MAF_TEST(tmp_dummy!=NULL); // this should have been casted successfully 
+
+  new_foo->Delete(); // clean memory
+  new_dummy->Delete(); // clean memory
 
   std::cout<<"Test completed successfully!"<<std::endl;
 
