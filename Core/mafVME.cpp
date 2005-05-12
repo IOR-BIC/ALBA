@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-05 15:22:23 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2005-05-12 16:19:17 $
+  Version:   $Revision: 1.19 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -107,7 +107,7 @@ int mafVME::DeepCopy(mafNode *a)
 
     // Runtime properties
     //AutoUpdateAbsMatrix=vme->GetAutoUpdateAbsMatrix();
-    SetCurrentTime(vme->GetCurrentTime());
+    SetTimeStamp(vme->GetTimeStamp());
 
     return MAF_OK;
   }
@@ -160,7 +160,7 @@ int mafVME::SetParent(mafNode *parent)
 }
 
 //-------------------------------------------------------------------------
-void mafVME::SetCurrentTime(mafTimeStamp t)
+void mafVME::SetTimeStamp(mafTimeStamp t)
 //-------------------------------------------------------------------------
 {
   if (t<0)
@@ -173,13 +173,13 @@ void mafVME::SetCurrentTime(mafTimeStamp t)
   // working at different times
   // 
   if (m_DataPipe)
-    m_DataPipe->SetCurrentTime(t);
+    m_DataPipe->SetTimeStamp(t);
 
   if (m_MatrixPipe)
-    m_MatrixPipe->SetCurrentTime(t);
+    m_MatrixPipe->SetTimeStamp(t);
   
   if (m_AbsMatrixPipe)
-    m_AbsMatrixPipe->SetCurrentTime(t);
+    m_AbsMatrixPipe->SetTimeStamp(t);
 
   Modified();
 
@@ -188,7 +188,7 @@ void mafVME::SetCurrentTime(mafTimeStamp t)
 }
 
 //-------------------------------------------------------------------------
-mafTimeStamp mafVME::GetCurrentTime() 
+mafTimeStamp mafVME::GetTimeStamp() 
 //-------------------------------------------------------------------------
 {
   return m_CurrentTime;
@@ -198,7 +198,7 @@ mafTimeStamp mafVME::GetCurrentTime()
 void mafVME::SetTreeTime(mafTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  SetCurrentTime(t);
+  SetTimeStamp(t);
   ForwardDownEvent(&mafEventBase(this,VME_TIME_SET,&t));
 }
 
@@ -619,7 +619,7 @@ int mafVME::SetMatrixPipe(mafMatrixPipe *mpipe)
       {
         // detach the old pipe
         m_MatrixPipe->SetVME(NULL);
-        m_MatrixPipe->SetCurrentTime(m_CurrentTime);
+        m_MatrixPipe->SetTimeStamp(m_CurrentTime);
       }
       
       m_MatrixPipe = mpipe;
@@ -627,7 +627,7 @@ int mafVME::SetMatrixPipe(mafMatrixPipe *mpipe)
       if (mpipe)
       {
         mpipe->SetVME(this);
-        mpipe->SetCurrentTime(GetCurrentTime());
+        mpipe->SetTimeStamp(GetTimeStamp());
       }
       
       // this forces the the pipe to Update its input and input frame
@@ -701,7 +701,7 @@ int mafVME::SetDataPipe(mafDataPipe *dpipe)
     if (m_DataPipe)
     {
       m_DataPipe->SetVME(this);
-      m_DataPipe->SetCurrentTime(m_CurrentTime);
+      m_DataPipe->SetTimeStamp(m_CurrentTime);
     }
 
     // advise listeners the data pipe has changed
@@ -724,7 +724,7 @@ void mafVME::OnEvent(mafEventBase *e)
     switch (e->GetId())
     {
     case VME_TIME_SET:
-      SetCurrentTime(*((mafTimeStamp *)e->GetData()));
+      SetTimeStamp(*((mafTimeStamp *)e->GetData()));
     break;
     }
    }

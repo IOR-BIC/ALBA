@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataPipe.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 07:40:16 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-05-12 16:19:16 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -73,8 +73,8 @@ public:
 
 
   /** Set/Get the current time */
-  void SetCurrentTime(mafTimeStamp t);
-  mafTimeStamp GetCurrentTime() {return m_CurrentTime;}
+  void SetTimeStamp(mafTimeStamp t);
+  mafTimeStamp GetTimeStamp() {return m_CurrentTime;}
 
   /** return modification time */
   virtual unsigned long GetMTime();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:43:11 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-05-12 16:19:17 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -162,13 +162,14 @@ void mafVMEManager::MSFOpen(wxString filename)
 		wxString msg("File ");
 		msg += filename;
 		msg += " not found!";
-		wxMessageBox( msg,"Warning", wxOK|wxICON_WARNING , NULL);
+		mafWarningMessage( msg,"Warning");
 		return;
 	}
 
   // insert and select the root - reset m_MSFFile 
   MSFNew(false);
 
+  
   wxString path, name, ext;
   wxSplitPath(filename,&path,&name,&ext);
   if(ext == "zip")
@@ -182,7 +183,7 @@ void mafVMEManager::MSFOpen(wxString filename)
 
   m_MSFFile = unixname; 
 
-  wxBusyInfo wait("Loading MSF: Please wait");
+  //wxBusyInfo wait("Loading MSF: Please wait");
 
   m_Storage->SetURL(m_MSFFile.c_str());
  
@@ -195,6 +196,7 @@ void mafVMEManager::MSFOpen(wxString filename)
   m_Storage->GetRoot()->SetTreeTime(b[0]);
   //m_Storage->GetRoot()->SetName("root"); ///?????
 
+  
 	////////////////////////////////  Application Stamp managing ////////////////////
 	if(!m_Storage->GetRoot()->GetTagArray()->IsTagPresent("APP_STAMP"))
 	{
@@ -209,7 +211,7 @@ void mafVMEManager::MSFOpen(wxString filename)
 	if(app_stamp == "INVALID" || ((app_stamp != m_AppStamp) && (m_AppStamp != "DataManager") && (m_AppStamp != "OPEN_ALL_DATA")))
 	{
 		//Application stamp not valid
-		wxMessageBox("File not valid for this application!","Warning", wxOK, NULL);
+		mafMessage("File not valid for this application!","Warning");
 		m_Modified = false;
 		m_Storage->Delete();
 		m_Storage = NULL;
@@ -217,7 +219,7 @@ void mafVMEManager::MSFOpen(wxString filename)
 		return;
 	}
 	///////////////////////////////////////////////////////////////////////////////// 
-
+  
   NotifyAdd(m_Storage->GetRoot());
 
   // if some problems occurred during import give feedback to the user
@@ -225,11 +227,10 @@ void mafVMEManager::MSFOpen(wxString filename)
   {
     mafErrorMessage("Errors during file parsing! Look the log area for error messages.");
   }
-
-
+  
 	mafEventMacro(mafEvent(this,VME_SELECTED,m_Storage->GetRoot())); 
   mafEventMacro(mafEvent(this,CAMERA_RESET)); 
-
+  
 	m_FileHistory.AddFileToHistory(m_MSFFile);
 	m_FileHistory.Save(*m_Config);
 }

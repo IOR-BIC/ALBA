@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrixInterpolator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 19:35:53 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-12 16:22:02 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -49,10 +49,10 @@ mafMatrixInterpolator::~mafMatrixInterpolator()
 }
 
 //----------------------------------------------------------------------------
-void mafMatrixInterpolator::SetCurrentTime(mafTimeStamp time)
+void mafMatrixInterpolator::SetTimeStamp(mafTimeStamp time)
 //----------------------------------------------------------------------------
 {
-  SetTimeStamp(time);
+  mafTransformBase::SetTimeStamp(time);
   
   // Do not call Modified(), to avoid the pipeline
   // to be automatically updated
@@ -94,9 +94,9 @@ void mafMatrixInterpolator::Update()
   unsigned long mtime=m_UpdateTime.GetMTime();
 
   // if the current time has changed or if this object has been modified...
-  if (m_OldTimeStamp!=GetCurrentTime() || m_CurrentItem&&(m_CurrentItem->GetMTime()>mtime))
+  if (m_OldTimeStamp!=GetTimeStamp() || m_CurrentItem&&(m_CurrentItem->GetMTime()>mtime))
   {
-    m_OldTimeStamp=GetCurrentTime();    
+    m_OldTimeStamp=GetTimeStamp();    
     
     // First of all find the right item to be used as input
     // and update the output bounds
@@ -115,7 +115,7 @@ void mafMatrixInterpolator::InternalItemUpdate()
 
   if (array)
   {
-    mafMatrix *item = array->GetItemBefore(GetCurrentTime());
+    mafMatrix *item = array->GetItemBefore(GetTimeStamp());
     UpdateCurrentItem(item);
   }
   
@@ -164,5 +164,5 @@ void mafMatrixInterpolator::InternalUpdate()
     m_Matrix->Identity();
   }
 
-  m_Matrix->SetTimeStamp(GetCurrentTime());
+  m_Matrix->SetTimeStamp(GetTimeStamp());
 }

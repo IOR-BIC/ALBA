@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGeneric.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-19 08:27:00 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-05-12 16:22:03 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -77,6 +77,7 @@ int mafVMEGeneric::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
     vtkDataSet *new_data=data->NewInstance();
     new_data->DeepCopy(data);
     item->SetData(new_data);
+    new_data->Delete();
   }
   break;
   case MAF_VME_REFERENCE_DATA:

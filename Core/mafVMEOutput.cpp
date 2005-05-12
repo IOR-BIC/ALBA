@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-05 15:22:01 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-05-12 16:19:18 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -158,7 +158,7 @@ void mafVMEOutput::GetVME4DBounds(mafOBB &bounds) const
 
     for (int i=0;i<timestamps.size();i++)
     {
-      dpipe->SetCurrentTime(timestamps[i]);
+      dpipe->SetTimeStamp(timestamps[i]);
       dpipe->UpdateBounds();
 
       // must make a copy, otherwise I would transform the bounds inside the data pipe
@@ -170,7 +170,7 @@ void mafVMEOutput::GetVME4DBounds(mafOBB &bounds) const
       bounds.MergeBounds(transformed_bounds);
     }
 
-    dpipe->SetCurrentTime(m_VME->GetCurrentTime());
+    dpipe->SetTimeStamp(m_VME->GetTimeStamp());
     dpipe->UpdateBounds();
   }
   else
@@ -219,7 +219,7 @@ void mafVMEOutput::GetVMELocalBounds(mafOBB &bounds,mafTimeStamp t, mafNodeItera
 //-------------------------------------------------------------------------
 {
   if (t<0)
-    t=m_VME->GetCurrentTime();
+    t=m_VME->GetTimeStamp();
 
   bounds.Reset();
 
@@ -241,11 +241,11 @@ void mafVMEOutput::GetDataBounds(mafOBB &bounds,mafTimeStamp t) const
     // We must call explicitly UpdateBounds() method, since data pipes
     // do not update automatically the bounds when time changes.
     mafDataPipe *dpipe=m_VME->GetDataPipe();
-    mafTimeStamp old_time=dpipe->GetCurrentTime();
+    mafTimeStamp old_time=dpipe->GetTimeStamp();
     
     //if (t!=old_time)
     //{
-      dpipe->SetCurrentTime(t);
+      dpipe->SetTimeStamp(t);
       dpipe->UpdateBounds();
     //}
 
@@ -255,7 +255,7 @@ void mafVMEOutput::GetDataBounds(mafOBB &bounds,mafTimeStamp t) const
     {
       // Restore the right bounds for current time... 
       // TODO: modify the GetBounds to make it call UpdateCurentBounds explicitly!
-      dpipe->SetCurrentTime(m_VME->GetCurrentTime());
+      dpipe->SetTimeStamp(m_VME->GetTimeStamp());
       dpipe->UpdateBounds();
     }
   }
@@ -280,7 +280,7 @@ void mafVMEOutput::GetBounds(mafOBB &bounds,mafTimeStamp t, mafNodeIterator *ite
   assert(m_VME);
 
   if (t<0)
-    t=m_VME->GetCurrentTime();
+    t=m_VME->GetTimeStamp();
 
   GetVMEBounds(bounds,t,iter);
   
@@ -358,7 +358,7 @@ void mafVMEOutput::GetMatrix(mafMatrix &matrix,mafTimeStamp t) const
   assert(m_VME);
   if (mafMatrixPipe *mpipe=m_VME->GetMatrixPipe()) // check if a matrix pipe is present
   {
-    if (t<0||t==m_VME->GetCurrentTime())
+    if (t<0||t==m_VME->GetTimeStamp())
     {
       matrix.DeepCopy(GetMatrix());
     }
@@ -368,11 +368,11 @@ void mafVMEOutput::GetMatrix(mafMatrix &matrix,mafTimeStamp t) const
       // only a temporary change to the matrix
       bool old_flag=mpipe->GetUpdateMatrixObserverFlag();
       mpipe->UpdateMatrixObserverOff();
-      mpipe->SetCurrentTime(t);
+      mpipe->SetTimeStamp(t);
       matrix=mpipe->GetMatrix();
 
       // restore right time
-      mpipe->SetCurrentTime(m_VME->GetCurrentTime());
+      mpipe->SetTimeStamp(m_VME->GetTimeStamp());
       mpipe->SetUpdateMatrixObserverFlag(old_flag);
     }
   }
@@ -429,7 +429,7 @@ void mafVMEOutput::GetAbsMatrix(mafMatrix &matrix,mafTimeStamp t) const
   assert(m_VME);
 
 
-  if (t<0||t==m_VME->GetCurrentTime())
+  if (t<0||t==m_VME->GetTimeStamp())
   {
     matrix.DeepCopy(GetAbsMatrix());
   }
@@ -440,11 +440,11 @@ void mafVMEOutput::GetAbsMatrix(mafMatrix &matrix,mafTimeStamp t) const
     // only a temporary change to the matrix
     bool old_flag=abspipe->GetUpdateMatrixObserverFlag();
     abspipe->UpdateMatrixObserverOff();
-    abspipe->SetCurrentTime(t);
+    abspipe->SetTimeStamp(t);
     matrix=abspipe->GetMatrix();
     
     // restore right time
-    abspipe->SetCurrentTime(m_VME->GetCurrentTime());
+    abspipe->SetTimeStamp(m_VME->GetTimeStamp());
     abspipe->SetUpdateMatrixObserverFlag(old_flag);
   }
 }
@@ -489,10 +489,10 @@ void mafVMEOutput::GetAbsPose(double &x,double &y,double &z,double &rx,double &r
 
 
 //-------------------------------------------------------------------------
-mafTimeStamp mafVMEOutput::GetCurrentTime() const
+mafTimeStamp mafVMEOutput::GetTimeStamp() const
 //-------------------------------------------------------------------------
 {
-  return m_VME->GetCurrentTime();
+  return m_VME->GetTimeStamp();
 }
 
 //-------------------------------------------------------------------------
@@ -501,7 +501,7 @@ void mafVMEOutput::Print(std::ostream& os, const int tabs) const
 {
   mafIndent indent(tabs);
 
-  os << indent << "Current Time: "<<m_VME->GetCurrentTime()<<"\n";
+  os << indent << "Current Time: "<<m_VME->GetTimeStamp()<<"\n";
 
   os << indent << "Current Matrix:\n";
   GetMatrix()->Print(os,indent.GetNextIndent());

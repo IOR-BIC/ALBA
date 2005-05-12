@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 07:40:16 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-05-12 16:19:16 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -51,7 +51,7 @@ mafDataPipe::~mafDataPipe()
 }
 
 //------------------------------------------------------------------------------
-void mafDataPipe::SetCurrentTime(mafTimeStamp t)
+void mafDataPipe::SetTimeStamp(mafTimeStamp t)
 //------------------------------------------------------------------------------
 {
   if (t!=m_CurrentTime)

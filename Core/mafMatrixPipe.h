@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrixPipe.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:15 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-12 16:19:16 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -50,10 +50,10 @@ public:
   mafVME *GetVME() {return m_VME;}
     
   /** Set the current time. This makes the pipe to be recomputed. */
-  virtual void SetCurrentTime(mafTimeStamp t);
+  virtual void SetTimeStamp(mafTimeStamp t);
 
   /** return the time stamp currently set to the pipe */
-  mafTimeStamp GetCurrentTime();
+  mafTimeStamp GetTimeStamp();
   
   /** Get the MTime: this is the bit of magic that makes everything work. */
   virtual unsigned long GetMTime();

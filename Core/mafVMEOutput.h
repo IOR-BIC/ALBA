@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 20:01:07 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-05-12 16:19:18 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -150,7 +150,7 @@ public:
   virtual void GetVMELocalBounds(mafOBB &bounds,mafTimeStamp t=-1, mafNodeIterator *iter=NULL) const;
 
   /** return the time for which this output was computed */
-  mafTimeStamp GetCurrentTime() const;
+  mafTimeStamp GetTimeStamp() const;
   
   /** 
     Used by source VME to set internal bounds structure: never use this method directly. */

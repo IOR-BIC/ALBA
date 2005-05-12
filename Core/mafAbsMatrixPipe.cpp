@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAbsMatrixPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:13 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-12 16:19:15 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -111,7 +111,7 @@ void mafAbsMatrixPipe::InternalUpdate()
   mafTimeStamp old_vme_time = -1;
   mafTimeStamp old_vme_parent_time = -1;
 
-  m_Transform->SetTimeStamp(GetCurrentTime());
+  m_Transform->SetTimeStamp(GetTimeStamp());
 
   // if the Current time of this transform is different from 
   // the input transforms' ones, force temporary input 
@@ -123,21 +123,21 @@ void mafAbsMatrixPipe::InternalUpdate()
   // will be forced to updated themselves...
   if (input)
   {
-    old_vme_time=input->GetCurrentTime();
+    old_vme_time=input->GetTimeStamp();
 
-    if (GetCurrentTime()!=old_vme_time)
+    if (GetTimeStamp()!=old_vme_time)
     {
-      input->SetCurrentTime(GetCurrentTime());
+      input->SetTimeStamp(GetTimeStamp());
     }
   }
 
   if (input_frame)
   {
-    old_vme_parent_time = input_frame->GetCurrentTime();
+    old_vme_parent_time = input_frame->GetTimeStamp();
 
-    if (old_vme_parent_time != GetCurrentTime())
+    if (old_vme_parent_time != GetTimeStamp())
     {
-      input_frame->SetCurrentTime(GetCurrentTime()); 
+      input_frame->SetTimeStamp(GetTimeStamp()); 
     }
   }
   
@@ -149,14 +149,14 @@ void mafAbsMatrixPipe::InternalUpdate()
     if (m_VME) m_VME->OnEvent(&mafEventBase(this,VME_MATRIX_UPDATE,m_Matrix));
   }
    
-  if (input&&GetCurrentTime()!=old_vme_time)
+  if (input&&GetTimeStamp()!=old_vme_time)
   {
-    input->SetCurrentTime(old_vme_time);
+    input->SetTimeStamp(old_vme_time);
   }
 
-  if (input_frame&&old_vme_parent_time != GetCurrentTime())
+  if (input_frame&&old_vme_parent_time != GetTimeStamp())
   {
-    input_frame->SetCurrentTime(old_vme_parent_time);
+    input_frame->SetTimeStamp(old_vme_parent_time);
   }
 
   m_Updating=0;

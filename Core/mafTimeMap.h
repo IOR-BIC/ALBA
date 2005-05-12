@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTimeMap.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-05 15:22:58 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-05-12 16:19:16 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -98,8 +98,8 @@ public:
   int GetNumberOfItems() const {return m_TimeMap.size();};
   
   /** Set/Get the Current time for this object*/
-  //mafTimeStamp GetCurrentTime() {return m_CurrentTime;}
-  //void SetCurrentTime(mafTimeStamp t);
+  //mafTimeStamp GetTimeStamp() {return m_CurrentTime;}
+  //void SetTimeStamp(mafTimeStamp t);
 
   /** Return the time bounds for this vector, i.e. minimum and maximum time stamps */
   void GetTimeBounds(mafTimeStamp tbounds[2]);

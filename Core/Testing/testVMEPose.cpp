@@ -119,7 +119,7 @@ void mafMatrixPipeTest::InternalUpdate()
 //-------------------------------------------------------------------------
 {
   mafVMETest *vme=(mafVMETest *)m_VME;
-  unsigned long index=(GetCurrentTime()<vme->GetMatrixVector().size())?GetCurrentTime():vme->GetMatrixVector().size()-1;
+  unsigned long index=(GetTimeStamp()<vme->GetMatrixVector().size())?GetTimeStamp():vme->GetMatrixVector().size()-1;
   m_Matrix->DeepCopy(vme->GetMatrixVector()[index]);
 }
 

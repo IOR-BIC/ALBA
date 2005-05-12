@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrixInterpolator.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:21:57 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-12 16:22:02 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -46,7 +46,7 @@ public:
   Set the current time. Overidden to allow the output not to change whem 
   not necessary, e.g. constant data (in time) being interpolated should not
   produce a change in the output data when time is changed.*/
-  virtual void SetCurrentTime(mafTimeStamp time);
+  virtual void SetTimeStamp(mafTimeStamp time);
 
   /**
   Get the MTime: this is the bit of magic that makes everything work.*/

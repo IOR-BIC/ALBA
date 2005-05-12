@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrixPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:57:39 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-05-12 16:19:16 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -49,20 +49,20 @@ mafMatrixPipe::~mafMatrixPipe()
 }
 
 //------------------------------------------------------------------------------
-void mafMatrixPipe::SetCurrentTime(mafTimeStamp t)
+void mafMatrixPipe::SetTimeStamp(mafTimeStamp t)
 //------------------------------------------------------------------------------
 {
   if (t!=m_TimeStamp)
   {
-    SetTimeStamp(t);Modified(); 
+    mafTransformBase::SetTimeStamp(t);Modified(); 
   }
 }
 
 //------------------------------------------------------------------------------
-mafTimeStamp mafMatrixPipe::GetCurrentTime()
+mafTimeStamp mafMatrixPipe::GetTimeStamp()
 //------------------------------------------------------------------------------
 {
-  return GetTimeStamp();
+  return mafTransformBase::GetTimeStamp();
 }
 
 //------------------------------------------------------------------------------

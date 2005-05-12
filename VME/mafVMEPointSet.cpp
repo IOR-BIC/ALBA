@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPointSet.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-05 15:30:11 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-12 16:25:56 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -228,7 +228,7 @@ int mafVMEPointSet::GetPoint(int idx, double xyz[3],mafTimeStamp t)
   if (t!=this->m_CurrentTime)
   {
     // force the pipe to the specified timestamp
-    this->GetDataPipe()->SetCurrentTime(t);
+    this->GetDataPipe()->SetTimeStamp(t);
   }
 
   polydata=(vtkPolyData *)this->GetPointSetOutput()->GetPointSetData();
@@ -242,7 +242,7 @@ int mafVMEPointSet::GetPoint(int idx, double xyz[3],mafTimeStamp t)
   // reset the pipe timestamp and its output
   if (t!=this->m_CurrentTime)
   {
-    this->GetDataPipe()->SetCurrentTime(this->m_CurrentTime);
+    this->GetDataPipe()->SetTimeStamp(this->m_CurrentTime);
     this->GetDataPipe()->Update();
   }
 

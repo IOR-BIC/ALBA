@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTimeVector.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 07:59:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-12 16:19:17 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -115,8 +115,8 @@ public:
   int GetNumberOfItems() const {return m_TimeVector.size();};
   
   /** Set/Get the Current time for this object*/
-  //mafTimeStamp GetCurrentTime() {return m_CurrentTime;}
-  //void SetCurrentTime(mafTimeStamp t);
+  //mafTimeStamp GetTimeStamp() {return m_CurrentTime;}
+  //void SetTimeStamp(mafTimeStamp t);
 
   /** Return the time bounds for this vector, i.e. minimum and maximum time stamps */
   void GetTimeBounds(mafTimeStamp tbounds[2]);
