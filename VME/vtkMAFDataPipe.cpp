@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMAFDataPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 22:04:09 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-12 16:24:59 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -147,7 +147,8 @@ void vtkMAFDataPipe::ExecuteInformation()
     }
   } 
   
-  Superclass::ExecuteInformation(); 
+  if (GetNumberOfInputs()>0&&GetInput()) // work around to skip vtkDataSet bug with zero inputs
+    Superclass::ExecuteInformation(); 
 }
 
 //------------------------------------------------------------------------------
