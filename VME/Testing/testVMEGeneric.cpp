@@ -739,6 +739,8 @@ int main()
   MAF_TEST(!root->GetFirstChild()->CompareTree(badTree));
 
   MAF_TEST(newroot->GetReferenceCount()==1);
+  MAF_TEST(badTree->GetReferenceCount()==1);
+  MAF_TEST(badVME->GetReferenceCount()==2);
 
   std::cerr<<"Test completed successfully!"<<std::endl;
 
