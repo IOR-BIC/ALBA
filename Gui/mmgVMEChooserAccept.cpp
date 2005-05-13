@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooserAccept.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:45:19 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-13 16:15:38 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -19,21 +19,21 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmgVmeChooserAccept.h"
+#include "mmgVMEChooserAccept.h"
 #include "mafNode.h"
 
 //----------------------------------------------------------------------------
-mmgVmeChooserAccept::mmgVmeChooserAccept()
+mmgVMEChooserAccept::mmgVMEChooserAccept()
 //----------------------------------------------------------------------------
 {  
 }
 //----------------------------------------------------------------------------
-mmgVmeChooserAccept::~mmgVmeChooserAccept()
+mmgVMEChooserAccept::~mmgVMEChooserAccept()
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-bool mmgVmeChooserAccept::Validate(mafNode *node)
+bool mmgVMEChooserAccept::Validate(mafNode *node)
 //----------------------------------------------------------------------------
 {
 	return node != NULL;

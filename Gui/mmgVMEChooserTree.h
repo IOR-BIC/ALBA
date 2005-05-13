@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooserTree.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-05 15:24:13 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-13 16:15:39 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,7 +22,7 @@
 // Forward refs:
 //----------------------------------------------------------------------------
 class mafNode;
-class mmgVmeChooserAccept;
+class mmgVMEChooserAccept;
 
 //----------------------------------------------------------------------------
 // mmgVMEChooserTree :
@@ -54,6 +54,6 @@ public:
   /** respond to Selection Changed */
   virtual void OnSelectionChanged(wxTreeEvent& event);
 
-  mmgVmeChooserAccept *m_AcceptFunction;
+  mmgVMEChooserAccept *m_AcceptFunction;
 };
 #endif

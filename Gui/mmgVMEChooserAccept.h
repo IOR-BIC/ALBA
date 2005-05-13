@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooserAccept.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:45:20 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-13 16:15:38 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -11,7 +11,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
 //----------------------------------------------------------------------------
-// mmgVmeChooserAccept :
+// mmgVMEChooserAccept :
 /*
 Display a modal dialog filled with a vme tree and
 return the choosed vme. The tree is filled from
@@ -19,8 +19,8 @@ the vme passed in the constructor with its children.
 */
 //----------------------------------------------------------------------------
 
-#ifndef __mmgVmeChooserAccept_H__
-#define __mmgVmeChooserAccept_H__
+#ifndef __mmgVMEChooserAccept_H__
+#define __mmgVMEChooserAccept_H__
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -28,13 +28,13 @@ the vme passed in the constructor with its children.
 class mafNode;
 
 //----------------------------------------------------------------------------
-// mmgVmeChooserAccept :
+// mmgVMEChooserAccept :
 //----------------------------------------------------------------------------
-class mmgVmeChooserAccept
+class mmgVMEChooserAccept
 {
 public:
-	 mmgVmeChooserAccept();
-	~mmgVmeChooserAccept();
+	 mmgVMEChooserAccept();
+	~mmgVMEChooserAccept();
   
   virtual bool Validate(mafNode *node);
 };

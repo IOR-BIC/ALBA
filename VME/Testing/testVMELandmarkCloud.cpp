@@ -165,7 +165,7 @@ int main()
   // check the visibility at timestamp 1.0 just set
   MAF_TEST(cloud->GetLandmarkVisibility("lm1",1.0) == false);
 
-  Sleep(3000);
+  mafSleep(3000);
 
   std::cerr << "Test completed successfully!" << std::endl;
   return MAF_OK;

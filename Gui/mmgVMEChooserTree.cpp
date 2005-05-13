@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooserTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-05 15:24:13 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-13 16:15:38 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@
 
 
 #include "mmgVMEChooserTree.h" 
-#include "mmgVmeChooserAccept.h"
+#include "mmgVMEChooserAccept.h"
 #include "mafPics.h" 
 #include "mafNode.h"
 #include "mafView.h"
@@ -36,7 +36,7 @@ mmgVMEChooserTree::mmgVMEChooserTree( wxWindow* parent,wxWindowID id, bool Close
   if(vme_accept_function == 0)
     m_AcceptFunction = NULL;
   else
-    m_AcceptFunction = (mmgVmeChooserAccept *)vme_accept_function;
+    m_AcceptFunction = (mmgVMEChooserAccept *)vme_accept_function;
 }
 //----------------------------------------------------------------------------
 mmgVMEChooserTree::~mmgVMEChooserTree()
