@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFToLinearTransform.cxx,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:00:32 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-13 16:53:20 $
+  Version:   $Revision: 1.4 $
 
   Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
   All rights reserved.
@@ -23,7 +23,7 @@
 #include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkMAFToLinearTransform, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(vtkMAFToLinearTransform, "$Revision: 1.4 $");
 vtkStandardNewMacro(vtkMAFToLinearTransform);
 
 //----------------------------------------------------------------------------
@@ -73,9 +73,9 @@ void vtkMAFToLinearTransform::SetInputTransform(mafTransformBase *trans)
 {
   if (trans!=InputTransform)
   {
-    vtkDEL(InputTransform);
+    //vtkDEL(InputTransform);
     InputTransform=trans;
-    trans->Register(this);
+    //trans->Register(this); // do not register to avoid cross-registering since this transform is created by mafTransformBase
     Modified();
   }
 }
