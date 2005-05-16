@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-02 07:52:04 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-16 14:52:39 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden, Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -46,7 +46,7 @@ public:
   mafEvent();                                                         
   mafEvent(void *sender, int id,                          long arg=0);
   mafEvent(void *sender, int id, bool            b,       long arg=0);
-  mafEvent(void *sender, int id, float           f,       long arg=0);
+  mafEvent(void *sender, int id, double           f,       long arg=0);
   mafEvent(void *sender, int id, mafString      *s,       long arg=0);
   mafEvent(void *sender, int id, mafNode         *vme,    bool b=false, long arg=0);
   mafEvent(void *sender, int id, mafView         *view,   wxWindow *win=NULL);
@@ -54,7 +54,7 @@ public:
 
   long             GetArg()     {return m_arg;};
   bool             GetBool()    {return m_bool;};
-  float            GetFloat()   {return m_float;};
+  double            GetDouble()   {return m_double;};
   mafString*       GetString()  {return m_string;};
   mafView*         GetView()    {return m_view;};
   mafNode*         GetVme()     {return m_vme;};
@@ -62,7 +62,7 @@ public:
 
   void SetArg(long arg)         { m_arg = arg;};
   void SetBool(bool b)          { m_bool = b;};
-  void SetFloat(float f)        { m_float = f;};
+  void SetFloat(double f)        { m_double = f;};
   void SetString(mafString *s)  { m_string = s;};
   void SetView(mafView* view)   { m_view = view;};
   void SetVme(mafNode* vme)     { m_vme = vme;};
@@ -71,7 +71,7 @@ public:
 protected:
   long             m_arg;        
   bool             m_bool;        
-  float            m_float;        
+  double            m_double;        
   mafString       *m_string;        
 
   mafNode         *m_vme;

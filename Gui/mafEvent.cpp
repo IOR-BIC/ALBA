@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-02 07:52:04 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-16 14:52:39 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone, Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -49,7 +49,7 @@ enum
   mafEvent::mafEvent()																																		{ Init(NULL,NO_EVENT,0);																Initialized();}
   mafEvent::mafEvent(void *sender, int id,                          long arg)							{ Init(sender, id, arg);																Initialized();}
   mafEvent::mafEvent(void *sender, int id, bool            b,       long arg)							{ Init(sender, id, arg); m_bool =b;											Initialized();}
-  mafEvent::mafEvent(void *sender, int id, float           f,       long arg)							{ Init(sender, id, arg); m_float=f;											Initialized();}
+  mafEvent::mafEvent(void *sender, int id, double           f,       long arg)							{ Init(sender, id, arg); m_double=f;											Initialized();}
   mafEvent::mafEvent(void *sender, int id, mafString      *s,       long arg)							{ Init(sender, id, arg); m_string =s;										Initialized();}
   mafEvent::mafEvent(void *sender, int id, mafView         *view,   wxWindow *win)				{ Init(sender, id, 0);   m_view =view; m_win  =win;			Initialized();}
   mafEvent::mafEvent(void *sender, int id, mafNode          *vme,    bool b,long arg)			{ Init(sender, id, arg); m_vme  =vme; m_bool = b;				Initialized();}
@@ -75,7 +75,7 @@ void mafEvent::Log()
                s << " ID= "    << mafIdString(m_Id).c_str();
   if(m_arg)    s << " arg= "   << m_arg;
   if(m_bool)   s << " bool= "  << (int)m_bool;
-  if(m_float)  s << " float= " << m_float;
+  if(m_double)  s << " double= " << m_double;
   if(m_string) s << " string= "<< *m_string;
   if(m_view)   s << " view= "  << (long)m_view<<" : " << m_view->GetLabel();
   if(m_vme)    s << " vme= "   << (long)m_vme <<" : " << m_vme->GetName();
@@ -99,7 +99,7 @@ mafEvent* mafEvent::Copy()
 //----------------------------------------------------------------------------
 {
   mafEvent *e	= new mafEvent(m_Sender,m_Id,m_bool,m_arg);
-  e->m_float		= m_float;
+  e->m_double		= m_double;
   e->m_string		= m_string;
   e->m_view		  = m_view;
   e->m_vme			= m_vme;
@@ -126,7 +126,7 @@ void mafEvent::Init(void *sender, int id, long arg)
   m_Id     = id; 
   m_arg    = arg;
   m_bool   = false; 
-  m_float  = 0; 
+  m_double  = 0; 
   m_string = NULL; 
   m_view   = NULL; 
   m_vme    = NULL; 
