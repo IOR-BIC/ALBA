@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-16 14:53:09 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-05-16 15:22:33 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -63,6 +63,7 @@ mafVMELandmarkCloud::mafVMELandmarkCloud()
 //-------------------------------------------------------------------------
 {
   m_NumberOfLandmarks = -1;
+  m_NumberOfLandmarksString << m_NumberOfLandmarks;
   m_State             = UNSET_CLOUD;
   m_DefaultVisibility = 1;
   m_Radius            = -1;
@@ -247,6 +248,8 @@ int mafVMELandmarkCloud::SetNumberOfLandmarks(int num)
   }
   m_NumberOfLandmarks = num;
   GetTagArray()->SetTag(mafTagItem(MAF_LMC_ITEMS_NUMBER_TAG,num));
+  m_NumberOfLandmarksString = "";
+  m_NumberOfLandmarksString << m_NumberOfLandmarks;
 
   return MAF_OK;
 }
@@ -1068,9 +1071,10 @@ void mafVMELandmarkCloud::Print(std::ostream &os, const int tabs)
 mmgGui* mafVMELandmarkCloud::CreateGui()
 //-------------------------------------------------------------------------
 {
-  m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
+  m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
   m_Gui->Divider();
+  m_Gui->Label("num lm: ", wxString(m_NumberOfLandmarksString));
   m_Gui->Double(ID_LM_RADIUS, "radius", &m_Radius, 0.0);
 
   return m_Gui;
@@ -1088,7 +1092,7 @@ void mafVMELandmarkCloud::OnEvent(mafEventBase *event)
         SetRadius(e->GetDouble());
       break;
       default:
-        mafNode::OnEvent(event);
+        mafVME::OnEvent(event);
     }
   }
 }

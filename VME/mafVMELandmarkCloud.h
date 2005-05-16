@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-16 14:53:09 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-16 15:22:33 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -220,6 +220,8 @@ protected:
   int m_DefaultVisibility;
   int m_SphereResolution;
   double m_Radius;
+
+  mafString m_NumberOfLandmarksString;
 
 private:
   mafVMELandmarkCloud(const mafVMELandmarkCloud&); // Not implemented

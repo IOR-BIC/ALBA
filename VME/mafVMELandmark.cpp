@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-16 14:55:08 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-05-16 15:22:32 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,6 +27,8 @@
 #include "mafOBB.h"
 #include "mafIndent.h"
 #include "mafTransform.h"
+#include "mmgGui.h"
+
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFDataPipe.h"
 #include "vtkTransform.h"
@@ -281,6 +283,12 @@ void mafVMELandmark::Print(std::ostream &os, const int tabs)
 mmgGui* mafVMELandmark::CreateGui()
 //-------------------------------------------------------------------------
 {
-  m_Gui = GetParent()->GetGui();
+  m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name
+  double xyz[3],rxyz[3];
+  this->GetOutput()->GetAbsPose(xyz,rxyz);
+  m_Gui->Label("abs pose:");
+  m_Gui->Label(wxString::Format("x: %f",xyz[0]));
+  m_Gui->Label(wxString::Format("y: %f",xyz[1]));
+  m_Gui->Label(wxString::Format("z: %f",xyz[2]));
   return m_Gui;
 }
