@@ -35,9 +35,10 @@ int main()
   MAF_TEST(num_lm == 0);
   cloud->Open();
   MAF_TEST(cloud->IsOpen());
-  cloud->AppendLandmark(0,0,0,"lm1");
-  cloud->AppendLandmark(5,5,5,"lm2");
-  cloud->AppendLandmark(-1,3,-1,"lm3");
+  cloud->SetRadius(1.0);
+  cloud->AppendLandmark(0,0,0,"lm0");
+  cloud->AppendLandmark(5,5,5,"lm1");
+  cloud->AppendLandmark(-1,3,-1,"lm2");
   num_lm = cloud->GetNumberOfLandmarks();
   MAF_TEST(num_lm == 3);
 
@@ -53,13 +54,6 @@ int main()
   MAF_TEST(mafEquals(xyz[0],5));
   MAF_TEST(mafEquals(xyz[1],5));
   MAF_TEST(mafEquals(xyz[2],5));
-
-  cloud->GetLandmark(1,xyz, 1);
-  MAF_TEST(mafEquals(xyz[0],5));
-  MAF_TEST(mafEquals(xyz[1],5));
-  MAF_TEST(mafEquals(xyz[2],5));
-
-
 
   cloud->GetLandmark(2,xyz, 0);
   MAF_TEST(mafEquals(xyz[0],-1));
@@ -89,12 +83,16 @@ int main()
   cloud->GetOutput()->GetVMELocalBounds(cloudBounds);
   MAF_TEST(cloudBounds.IsValid()); // now cloud is closed => local bounds should be valid
   cloud->SetRadius(5.0);
-  
   double rad = cloud->GetRadius();
   MAF_TEST(mafEquals(rad,5.0));
 
+  cloud->GetLandmark(1,xyz, 0);
+  MAF_TEST(mafEquals(xyz[0],5));
+  MAF_TEST(mafEquals(xyz[1],5));
+  MAF_TEST(mafEquals(xyz[2],5));
+
   // try to add a landmark when the cloud is closed!
-  cloud->AppendLandmark(2,-2,2,"lm4");
+  cloud->AppendLandmark(2,-2,2,"lm3");
   num_lm = cloud->GetNumberOfLandmarks();
   MAF_TEST(num_lm == 4);
 
@@ -124,6 +122,7 @@ int main()
   renderer->ResetCamera();
   renderer->Render();
 
+  mafTimeStamp ct = cloud->GetTimeStamp();
   cloud->Open();
   // add a landmark to a different time stamp
   cloud->SetLandmark(0,1,1,1,1.0);
