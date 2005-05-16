@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-16 14:53:00 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-05-16 14:55:08 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -281,6 +281,6 @@ void mafVMELandmark::Print(std::ostream &os, const int tabs)
 mmgGui* mafVMELandmark::CreateGui()
 //-------------------------------------------------------------------------
 {
-  m_Gui = GetParent()->CreateGui();
+  m_Gui = GetParent()->GetGui();
   return m_Gui;
 }

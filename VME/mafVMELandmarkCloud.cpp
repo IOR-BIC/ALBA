@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-16 13:42:02 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-16 14:53:09 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -31,6 +31,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVMEItemVTK.h"
 #include "mafEventSource.h"
 #include "mafVMEOutputPointSet.h"
+#include "mmgGui.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkPolyData.h"
@@ -1061,5 +1062,33 @@ void mafVMELandmarkCloud::Print(std::ostream &os, const int tabs)
     os << indent << "LM: \""<<GetLandmarkName(idx)<<"\" (" \
       <<x<<","<<y<<","<<z<<") Visibility=" \
       << GetLandmarkVisibility(idx,m_CurrentTime)<<std::endl;
+  }
+}
+//-------------------------------------------------------------------------
+mmgGui* mafVMELandmarkCloud::CreateGui()
+//-------------------------------------------------------------------------
+{
+  m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
+  m_Gui->SetListener(this);
+  m_Gui->Divider();
+  m_Gui->Double(ID_LM_RADIUS, "radius", &m_Radius, 0.0);
+
+  return m_Gui;
+}
+//-------------------------------------------------------------------------
+void mafVMELandmarkCloud::OnEvent(mafEventBase *event)
+//-------------------------------------------------------------------------
+{
+  // events to be sent up or down in the tree are simply forwarded
+  if (mafEvent *e = mafEvent::SafeDownCast(event))
+  {
+    switch(e->GetId())
+    {
+      case ID_LM_RADIUS:
+        SetRadius(e->GetDouble());
+      break;
+      default:
+        mafNode::OnEvent(event);
+    }
   }
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:47:59 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-16 14:53:09 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -17,6 +17,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // Include:
 //----------------------------------------------------------------------------
 #include "mafVMEPointSet.h"
+#include "mafEvent.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -55,6 +56,9 @@ public:
 
   mafTypeMacro(mafVMELandmarkCloud, mafVMEPointSet);
   
+  /** Precess events coming from other objects */ 
+  virtual void OnEvent(mafEventBase *event);
+
   /**
   Add a new landmark an returns its index. BEWARE: landmark is added to all the
   VME-items, and its position should for each time frame by means SetPoint()
@@ -120,6 +124,11 @@ public:
     UNSET_CLOUD=0,
     CLOSED_CLOUD,
     OPEN_CLOUD
+  };
+
+  enum {
+    ID_LM_RADIUS = Superclass::ID_LAST,
+    ID_LAST
   };
 
   /**
@@ -202,6 +211,9 @@ protected:
   Get set cloud set retrieving it from TAG if necessary*/
   int GetState();
   void SetState(int state);
+
+  /** Internally used to create a new instance of the GUI.*/
+  virtual mmgGui *CreateGui();
 
   int m_NumberOfLandmarks;
   int m_State;
