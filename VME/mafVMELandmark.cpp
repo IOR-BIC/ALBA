@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-16 14:05:47 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-16 14:53:00 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -276,4 +276,11 @@ void mafVMELandmark::Print(std::ostream &os, const int tabs)
   os << indent << "Current Landmark State: (" \
     << x <<", "<< y <<", "<< z <<") Visibility = " \
     << this->GetLandmarkVisibility(this->m_CurrentTime)<<std::endl;
+}
+//-------------------------------------------------------------------------
+mmgGui* mafVMELandmark::CreateGui()
+//-------------------------------------------------------------------------
+{
+  m_Gui = GetParent()->CreateGui();
+  return m_Gui;
 }
