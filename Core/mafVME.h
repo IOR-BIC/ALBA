@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-12 16:19:17 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2005-05-16 15:23:13 $
+  Version:   $Revision: 1.21 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -43,6 +43,11 @@ class MAF_EXPORT mafVME : public mafNode
 {
 public:
   mafAbstractTypeMacro(mafVME,mafNode);
+
+  enum {
+    ID_VME_CRYPTING = Superclass::ID_LAST,
+    ID_LAST
+  };
 
   //typedef std::vector<mafTimeStamp> std::vector<mafTimeStamp>;
 
@@ -233,6 +238,8 @@ protected:
 
   /** Set the abs matrix pipe object, i.e. the source of the output abs matrix. */
   void SetAbsMatrixPipe(mafAbsMatrixPipe *pipe);
+
+  virtual mmgGui  *CreateGui();
 
   mafAutoPointer<mafDataPipe>       m_DataPipe;
   mafAutoPointer<mafMatrixPipe>     m_MatrixPipe;

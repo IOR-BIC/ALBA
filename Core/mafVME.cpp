@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-12 16:19:17 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2005-05-16 15:23:13 $
+  Version:   $Revision: 1.20 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -733,16 +733,19 @@ void mafVME::OnEvent(mafEventBase *e)
   {
     switch (e->GetId())
     {
-    case VME_OUTPUT_DATA_PREUPDATE:      
-      InternalPreUpdate();  // self process the event
-      GetEventSource()->InvokeEvent(e); // forward event to observers
-      return;
-    break;
-    case VME_OUTPUT_DATA_UPDATE:
-      InternalUpdate();   // self process the event
-      GetEventSource()->InvokeEvent(e); // forward event to observers
-      return;
-    break;
+      case VME_OUTPUT_DATA_PREUPDATE:      
+        InternalPreUpdate();  // self process the event
+        GetEventSource()->InvokeEvent(e); // forward event to observers
+        return;
+      break;
+      case VME_OUTPUT_DATA_UPDATE:
+        InternalUpdate();   // self process the event
+        GetEventSource()->InvokeEvent(e); // forward event to observers
+        return;
+      break;
+      case ID_VME_CRYPTING:
+        m_Crypting = ((mafEvent *)e)->GetBool();
+      break;
     }
   }
   Superclass::OnEvent(e);
@@ -776,4 +779,12 @@ int mafVME::InternalRestore(mafStorageElement *node)
   return MAF_ERROR;
 }
 
-
+//-------------------------------------------------------------------------
+mmgGui *mafVME::CreateGui()
+//-------------------------------------------------------------------------
+{
+  m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
+  m_Gui->SetListener(this);
+  m_Gui->Bool(ID_VME_CRYPTING,"crypt",&m_Crypting);
+  return m_Gui;
+}
