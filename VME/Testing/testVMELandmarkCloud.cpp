@@ -68,8 +68,6 @@ int main()
   renWin->SetSize(800,800);
   renderer->SetBackground( 0.1, 0.2, 0.4 );
 
-  // Bounding box surrounding the volume
-  vtkOutlineSource *cloudBoundsBox=vtkOutlineSource::New();
   mafOBB cloudBounds;
   cloud->GetOutput()->GetVMELocalBounds(cloudBounds);
   MAF_TEST(!cloudBounds.IsValid()); // should be invalid: cloud has no data when open
@@ -77,14 +75,12 @@ int main()
   MAF_TEST(cloudBounds.IsValid());
   cloudBounds.Print(std::cerr);
 
-  cloudBoundsBox->SetBounds(cloudBounds.m_Bounds);
-
   cloud->Close();
   cloud->GetOutput()->GetVMELocalBounds(cloudBounds);
   MAF_TEST(cloudBounds.IsValid()); // now cloud is closed => local bounds should be valid
-  cloud->SetRadius(5.0);
+  cloud->SetRadius(0.5);
   double rad = cloud->GetRadius();
-  MAF_TEST(mafEquals(rad,5.0));
+  MAF_TEST(mafEquals(rad,0.5));
 
   cloud->GetLandmark(1,xyz, 0);
   MAF_TEST(mafEquals(xyz[0],5));
@@ -96,14 +92,6 @@ int main()
   num_lm = cloud->GetNumberOfLandmarks();
   MAF_TEST(num_lm == 4);
 
-  vtkMAFSmartPointer<vtkPolyDataMapper> cloud_mapper;
-  cloud_mapper->SetInput(cloudBoundsBox->GetOutput());
-
-  vtkMAFSmartPointer<vtkActor> cloud_actor;
-  cloud_actor->SetMapper(cloud_mapper);
-  cloud_actor->GetProperty()->SetColor(1,0,0);
-  renderer->AddActor(cloud_actor);
-  
   // create actor to display the slicer plane
   vtkMAFSmartPointer<vtkSphereSource> sphere;
   sphere->SetRadius(rad);
@@ -112,15 +100,23 @@ int main()
   glyph_mapper->SetInput(cloud->GetOutput()->GetVTKData());
   glyph_mapper->SetSource(sphere->GetOutput());
 
-  vtkMAFSmartPointer<vtkPolyDataMapper> slicer_mapper;
-  slicer_mapper->SetInput(glyph_mapper->GetOutput());
+  vtkMAFSmartPointer<vtkPolyDataMapper> cloud_mapper;
+  cloud_mapper->SetInput(glyph_mapper->GetOutput());
   
-  vtkMAFSmartPointer<vtkActor> slicer_actor;
-  slicer_actor->SetMapper(slicer_mapper);
+  vtkMAFSmartPointer<vtkActor> cloud_actor;
+  cloud_actor->SetMapper(cloud_mapper);
 
-  renderer->AddActor(slicer_actor);
+  renderer->AddActor(cloud_actor);
   renderer->ResetCamera();
-  renderer->Render();
+  renWin->Render();
+
+  int steps = 50;
+  for (int t = 0; t < steps; t++) 
+  {
+    renderer->GetActiveCamera()->Azimuth(-(180.0/steps));
+    renWin->Render();
+    mafSleep(50);
+  }
 
   mafTimeStamp ct = cloud->GetTimeStamp();
   cloud->Open();
