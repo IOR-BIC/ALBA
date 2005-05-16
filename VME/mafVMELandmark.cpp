@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-12 16:22:23 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-16 14:05:47 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -219,15 +219,12 @@ int mafVMELandmark::SetLandmarkVisibility(bool a,mafTimeStamp t)
 {
   if (this->GetLandmarkVisibility(t)!=a)
   {
-    mafTimeStamp old_time_stamp = GetTimeStamp();
     mafMatrix mat;
     this->GetOutput()->GetMatrix(mat, t);
     mat.GetElements()[0][0]=a;   // Paolo 04-04-05
     mat.GetElements()[1][1]=a;   // added 'a' instead of '0'
     mat.GetElements()[2][2]=a;
-    SetTimeStamp(t);
-    this->SetMatrix(mat); // added 't' otherwise default visibility overwrite this new one
-    SetTimeStamp(old_time_stamp);
+    this->Superclass::SetMatrix(mat); // Call Superclass::SetMatrix(mat) instead SetMatrix(mat) to avoid visibility overwriting
   }
   return MAF_OK;
 }
