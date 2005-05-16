@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-12 16:23:02 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-16 13:42:02 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -667,7 +667,7 @@ void mafVMELandmarkCloud::Close()
         
         mafVMEItemVTK *item = NULL;
         if(item_id != m_DataVector->End())
-          mafVMEItemVTK::SafeDownCast(item_id->second);
+          item = mafVMEItemVTK::SafeDownCast(item_id->second);
         vtkPolyData *polydata;
 
         // All this stuff is to cope with possible open landmark clouds having different
