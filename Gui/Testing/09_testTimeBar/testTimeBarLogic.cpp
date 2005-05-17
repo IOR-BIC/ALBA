@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testTimeBarLogic.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:25:07 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-17 11:21:20 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -155,7 +155,7 @@ void testTimeBarLogic::OnEvent(mafEvent& e)
     case UPDATE_UI:
       break;
     case TIME_SET:
-      wxLogMessage("Time Set to = %g", e.GetFloat());
+      wxLogMessage("Time Set to = %g", e.GetDouble());
       //e.Log();
       break;
     default:
