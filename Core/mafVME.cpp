@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-16 15:23:13 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2005-05-17 08:46:34 $
+  Version:   $Revision: 1.21 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,6 +25,7 @@
 #include "mafMatrixPipe.h"
 #include "mafDataPipe.h"
 #include "mafEventIO.h"
+#include "mafEvent.h"
 #include "mafEventSource.h"
 #include "mafTagArray.h"
 #include "mafOBB.h"
@@ -33,6 +34,7 @@
 #include "mafIndent.h"
 #include "mafDecl.h"
 #include "mafStorageElement.h"
+#include "mmgGui.h"
 
 #include <assert.h>
 

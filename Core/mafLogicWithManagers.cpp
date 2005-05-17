@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:43:08 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-05-17 08:46:34 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -302,7 +302,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *event)
       //if(m_ViewManager) m_ViewManager->CameraFlyToMode();
       break;
     case TIME_SET:
-      TimeSet(e->GetFloat());
+      TimeSet(e->GetDouble());
       break; 
     default:
       mafLogicWithGUI::OnEvent(event);
