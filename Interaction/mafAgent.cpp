@@ -3,8 +3,8 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: mafAgent.cpp,v $
 Language:  C++
-Date:      $Date: 2005-04-30 14:34:51 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2005-05-18 17:29:02 $
+Version:   $Revision: 1.6 $
 
 =========================================================================*/
 #include "mafAgent.h"
@@ -144,23 +144,6 @@ void mafAgent::RemoveAllObservers()
 }
 
 //------------------------------------------------------------------------------
-void mafAgent::SetListener(mafObserver *listener)
-//------------------------------------------------------------------------------
-{
-  for (int i=0;i<m_Channels.size();i++)
-  {
-    if (m_Channels[i]->GetChannel()==MCH_UP)
-    {
-      m_Channels[i]->RemoveAllObservers();
-      if (listener)
-      {
-        m_Channels[i]->AddObserver(listener);
-      }
-    }
-  }
-}
-
-//------------------------------------------------------------------------------
 void mafAgent::UnPlugEventSource(mafAgent *source)
 //------------------------------------------------------------------------------
 {
@@ -247,7 +230,7 @@ void mafAgent::OnEvent(mafEventBase *event)
   if (event->GetSender()!=this) // avoid loops!
   {
     // default behavior is to pass on the event on the same channel
-    ForwardEvent(event,event->GetChannel());
+    InvokeEvent(event,event->GetChannel());
   }
 }
 
@@ -260,18 +243,21 @@ void mafAgent::InternalProcessVTKEvents(vtkObject* sender, unsigned long eventid
 }
 
 //------------------------------------------------------------------------------
-void mafAgent::ForwardEvent(int id, mafID channel,void *data)
+void mafAgent::InvokeEvent(int id, mafID channel,void *data)
 //------------------------------------------------------------------------------
 {
-  this->ForwardEvent(&mafEventBase(this,id,data,channel),channel);
+  this->InvokeEvent(&mafEventBase(this,id,data,channel),channel);
 }
 
 //------------------------------------------------------------------------------
-void mafAgent::ForwardEvent(mafEventBase *event, mafID channel)
+void mafAgent::InvokeEvent(mafEventBase *event, mafID channel)
 //------------------------------------------------------------------------------
 {
   if ( channel == -1 )
     channel=event->GetChannel();
+
+  if (channel==MCH_UP)
+    mafEventSender::InvokeEvent(event); // send event to listener
 
   for (int i=0;i<m_Channels.size();i++)
   {
@@ -281,8 +267,8 @@ void mafAgent::ForwardEvent(mafEventBase *event, mafID channel)
 }
 
 //------------------------------------------------------------------------------
-void mafAgent::ForwardEvent(mafEventBase &event, mafID channel)
+void mafAgent::InvokeEvent(mafEventBase &event, mafID channel)
 //------------------------------------------------------------------------------
 {
-  ForwardEvent(&event,channel);
+  InvokeEvent(&event,channel);
 }

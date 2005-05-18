@@ -3,8 +3,8 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: mafAgentEventQueue.cpp,v $
 Language:  C++
-Date:      $Date: 2005-04-30 14:34:52 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2005-05-18 17:29:03 $
+Version:   $Revision: 1.5 $
 
 =========================================================================*/
 #include "mafAgentEventQueue.h"
@@ -107,7 +107,7 @@ bool mafAgentEventQueue::DispatchEvents()
           }
           else
           {
-            ForwardEvent(event,channel);
+            InvokeEvent(event,channel);
           }
         }
         event->Delete(); // release memory
@@ -149,7 +149,7 @@ bool mafAgentEventQueue::DispatchEvents()
         }
         else
         {
-          this->ForwardEvent(event,channel);
+          this->InvokeEvent(event,channel);
         }
         event->Delete(); // release memory
       }
@@ -209,7 +209,7 @@ int mafAgentEventQueue::PushEvent(mafEventBase *event)
 void mafAgentEventQueue::RequestForDispatching()
 //------------------------------------------------------------------------------
 {
-  ForwardEvent(EVENT_DISPATCH,MCH_UP);
+  InvokeEvent(EVENT_DISPATCH);
 }
 
 //------------------------------------------------------------------------------

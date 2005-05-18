@@ -15,5 +15,5 @@ LINK_LIBRARIES(mafInteraction)
 #IF (MAF_USE_WX AND MAF_USE_VTK)
 #ENDIF (MAF_USE_WX AND MAF_USE_VTK)
 
-#ADD_EXECUTABLE(testNode mafNodeTest.cpp)
-#ADD_TEST(testNode ${EXECUTABLE_OUTPUT_PATH}/testNode)
+ADD_EXECUTABLE(testAgent testAgent.cpp)
+ADD_TEST(testAgent ${EXECUTABLE_OUTPUT_PATH}/testAgent)

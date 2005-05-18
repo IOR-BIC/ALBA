@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdRemoteMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:56 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-18 17:29:05 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -107,13 +107,13 @@ void mmdRemoteMouse::ProcessEvent(mflEvent *event,unsigned long channel)
     e->Get2DPosition(LastPosition);
     SelectedRWI = (mafRWIBase *)event->GetSender();
     e->SetSender(this);
-    ForwardEvent(e,DeviceInputChannel);
+    InvokeEvent(e,DeviceInputChannel);
   }
   else if (id == ButtonUpEvent)
   {
     e->Get2DPosition(LastPosition);
     e->SetSender(this);
-    ForwardEvent(e,DeviceInputChannel);
+    InvokeEvent(e,DeviceInputChannel);
   }
   else if (id == ViewSelectedEvent)
   {
@@ -124,7 +124,7 @@ void mmdRemoteMouse::ProcessEvent(mflEvent *event,unsigned long channel)
     unsigned char key = (unsigned char)((mafEventBase *)event)->GetArg();
     mflSMART(mflEventInteraction,ev)(MOUSE_CHAR_EVENT,this);
     ev->SetKey(key);
-    ForwardEvent(ev,DeviceInputChannel);
+    InvokeEvent(ev,DeviceInputChannel);
   }
 }
 
@@ -138,7 +138,7 @@ void mmdRemoteMouse::SetLastPosition(double x,double y,unsigned long modifiers)
   // create a new event with last position
   mflSMART(mflEventInteraction,e)(MOUSE_2D_MOVE,this,x,y);
   e->SetModifiers(modifiers);
-  ForwardEvent(e,DeviceInputChannel);
+  InvokeEvent(e,DeviceInputChannel);
 }
 
 //------------------------------------------------------------------------------

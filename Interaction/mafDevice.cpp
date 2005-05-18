@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDevice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 06:06:33 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-18 17:29:03 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -51,7 +51,7 @@ void mafDevice::SetName(const char *name)
 //------------------------------------------------------------------------------
 {
   Superclass::SetName(name);
-  ForwardEvent(DEVICE_NAME_CHANGED); // send event to device manager (up)
+  InvokeEvent(DEVICE_NAME_CHANGED); // send event to device manager (up)
 }
 
 //------------------------------------------------------------------------------
@@ -73,7 +73,7 @@ int mafDevice::Start()
     return MAF_ERROR;
 
   // send an event to advise interactors this device has been started
-  ForwardEvent(DEVICE_STARTED,MCH_INPUT);
+  InvokeEvent(DEVICE_STARTED,MCH_INPUT);
 
   return MAF_OK;
 }
@@ -88,7 +88,7 @@ void mafDevice::Stop()
   Shutdown();
 
   // send an event to advise interactors this device has been stopped
-  ForwardEvent(DEVICE_STOPPED,MCH_INPUT);
+  InvokeEvent(DEVICE_STOPPED,MCH_INPUT);
 }
 
 //----------------------------------------------------------------------------

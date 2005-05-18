@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceSet.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:52 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-18 17:29:04 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -182,7 +182,7 @@ void mafDeviceSet::AddDevice(mafDevice *device)
   device->PlugEventSource(this,MCH_DOWN);
   m_DevicesMutex->Unlock();
   
-  ForwardEvent(DEVICE_ADDED,MCH_UP,device);
+  InvokeEvent(DEVICE_ADDED,MCH_UP,device);
 }
 
 //------------------------------------------------------------------------------
@@ -297,7 +297,7 @@ int mafDeviceSet::RemoveDevice(mafDevice *device, bool force)
     if (device->IsPersistent()&&!force) 
       return false;
   
-    ForwardEvent(DEVICE_REMOVING,MCH_UP,device);
+    InvokeEvent(DEVICE_REMOVING,MCH_UP,device);
     m_DevicesMutex->Lock();
     device->Stop();
     device->RemoveObserver(this);
@@ -338,7 +338,7 @@ void mafDeviceSet::RemoveAllDevices(bool force)
       continue;
 
     device->Stop();
-    ForwardEvent(DEVICE_REMOVING,MCH_UP,device);
+    InvokeEvent(DEVICE_REMOVING,MCH_UP,device);
     
     device->Delete();
   }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:56 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-18 17:29:05 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -99,13 +99,13 @@ void mmdMouse::OnEvent(mafEventBase *event)
     e->Get2DPosition(m_LastPosition);
     m_SelectedRWI = (mafRWIBase *)event->GetSender();
     e->SetSender(this);
-    ForwardEvent(e,MCH_INPUT);
+    InvokeEvent(e,MCH_INPUT);
   }
   else if (id == BUTTON_UP)
   {
     e->Get2DPosition(m_LastPosition);
     e->SetSender(this);
-    ForwardEvent(e,MCH_INPUT);
+    InvokeEvent(e,MCH_INPUT);
   }
   else if (id == VIEW_SELECT)
   {
@@ -122,7 +122,7 @@ void mmdMouse::OnEvent(mafEventBase *event)
     unsigned char key = (unsigned char)e->GetArg();
     mafEventInteraction ev(this,MOUSE_CHAR_EVENT);
     ev.SetKey(key);
-    ForwardEvent(&ev,MCH_INPUT);
+    InvokeEvent(&ev,MCH_INPUT);
   }
 }
 
@@ -136,7 +136,7 @@ void mmdMouse::SetLastPosition(double x,double y,unsigned long modifiers)
   // create a new event with last position
   mafEventInteraction e(this,MOUSE_2D_MOVE,x,y);
   e.SetModifiers(modifiers);
-  ForwardEvent(e,MCH_INPUT);
+  InvokeEvent(e,MCH_INPUT);
 }
 
 //------------------------------------------------------------------------------

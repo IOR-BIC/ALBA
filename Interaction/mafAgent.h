@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAgent.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:51 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-05-18 17:29:02 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -15,6 +15,7 @@
 
 #include "mafReferenceCounted.h"
 #include "mafObserver.h"
+#include "mafEventSender.h"
 #include "mafString.h"
 #include "mafEventBase.h"
 
@@ -35,7 +36,7 @@ class vtkCallbackCommand;
   This class support also bridging of events coming from VTK: a mafAgent can be set as observer of VTK events
   which are tunneled inside MAF events.
   @sa mafEventBase mafAgent mafAgentEventQueue mafAgentThreaded */
-class MAF_EXPORT mafAgent: public mafReferenceCounted, public mafObserver
+class MAF_EXPORT mafAgent: public mafReferenceCounted, public mafObserver, public mafEventSender
 {
 public:
   mafAbstractTypeMacro(mafAgent,mafReferenceCounted);
@@ -82,9 +83,6 @@ public:
   void AddObserver(mafObserver *listener,mafID channel=MCH_UP, float priority = 0.0);
   void RemoveObserver(mafObserver *listener);
   void RemoveAllObservers();
-  
-  /** provided for compatibility reasons */
-  void SetListener(mafObserver *listener);
   
   /**
   Process an event: the event is processed immediately and synchronously, i.e.
@@ -133,13 +131,12 @@ protected:
 #endif 
 
   /**
-  This function make an event to be passed to listeners of this class for the specified channel. In case
-  of MCH_UP the message is passed to the object pointed by the "Listener" member variable, otherwise 
-  the event is broad casted by means of the VTK Subject/Observer mechanism on the specified channel,
-  i.e. rising an event with ID equal to the channel.*/
-  void ForwardEvent(mafEventBase &event, mafID channel=-1);
-  void ForwardEvent(mafEventBase *event, mafID channel=-1);
-  void ForwardEvent(int id, mafID channel=MCH_UP,void *data=NULL);
+  This function make an event to be passed to observers of this class for the specified channel. In case
+  of MCH_UP the message is passed to the object pointed by the "m_Listener" member variable, otherwise 
+  the event is broadcasted by means of the Subject/Observer on the specified channel. */
+  void InvokeEvent(mafEventBase &event, mafID channel=-1);
+  void InvokeEvent(mafEventBase *event, mafID channel=-1);
+  void InvokeEvent(int id, mafID channel=MCH_UP,void *data=NULL);
 
   mafString       m_Name;
   bool            m_Initialized; // flag set true by Initialize()

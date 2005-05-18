@@ -2,34 +2,23 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAction.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 16:27:46 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-18 17:29:02 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-// To be included first because of wxWindows
-#ifdef __GNUG__
-    #pragma implementation "mafAction.cpp"
-#endif
 
-// For compilers that support precompilation, includes "wx/wx.h".
-#include "wx/wxprec.h"
-
-#include "mafInteractionDecl.h"
-#include "mafEventBase.h"
 #include "mafDevice.h"
 #include "mafInteractor.h"
 
 #include "mafAction.h"
-#include "vtkObjectFactory.h"
-#include "vtkObjectMap.h"
-#include "vtkTemplatedList.txx"
-#include "mflXMLWriter.h"
-#include "vtkXMLDataElement.h"
-#include "vtkXMLDataParser.h"
-#include "vtkRenderer.h"
+#include "mmuIdFactory.h"
+#include "mafStorageElement.h"
+#include "mafEvent.h"
+
+//#include "vtkRenderer.h"
 
 #include <utility>
 
@@ -37,31 +26,26 @@
 //------------------------------------------------------------------------------
 // Events
 //------------------------------------------------------------------------------
-MFL_EVT_IMP(mafAction::BindDeviceToActionEvent);
-MFL_EVT_IMP(mafAction::QueryForConnectedDeviceEvent);
-MFL_EVT_IMP(mafAction::PluggedDeviceEvent);
-MFL_EVT_IMP(mafAction::UnPluggedDeviceEvent);
+MAF_ID_IMP(mafAction::ACTION_BIND_DEVICE);
+MAF_ID_IMP(mafAction::ACTION_QUERY_CONNECTED_DEVICES);
+MAF_ID_IMP(mafAction::ACTION_DEVICE_PLUGGED);
+MAF_ID_IMP(mafAction::ACTION_DEVICE_UNPLUGGED);
 
 //------------------------------------------------------------------------------
-vtkStandardNewMacro(mafAction)
-vtkCxxSetObjectMacro(mafAction,Renderer,vtkRenderer);
+mafCxxTypeMacro(mafAction)
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 mafAction::mafAction()
 //------------------------------------------------------------------------------
 {
-  Type  = SHARED_ACTION;
-  vtkNEW(Devices);
-  Renderer = NULL;
+  m_Type  = SHARED_ACTION;
 }
 
 //------------------------------------------------------------------------------
 mafAction::~mafAction()
 //------------------------------------------------------------------------------
 {
-  SetRenderer(NULL);
-  vtkDEL(Devices);
 }
 
 //------------------------------------------------------------------------------
@@ -72,22 +56,32 @@ void mafAction::BindDevice(mafDevice *device)
   
   // the device is plugged as a source of events on the
   // device input channel
-  PlugEventSource(device,mafDevice::DeviceInputChannel);
+  PlugEventSource(device,MCH_INPUT);
+  
   // its also plugged as listener on the output channel
-  PlugListener(device,mafDevice::DeviceOutputChannel);
-  Devices->AppendItem(device);
-  //if (device->IsInitialized())
-  //{
-  //}
+  AddObserver(device,MCH_OUTPUT);
+
+  m_Devices.push_back(device);
+
 }
 //------------------------------------------------------------------------------
 void mafAction::UnBindDevice(mafDevice *device)
 //------------------------------------------------------------------------------
 {
   assert(device);
-  UnPlugEventSource(device);
-  UnPlugListener(device);
-  Devices->RemoveItem(device);
+
+  // disconnect the device from this action
+  UnPlugEventSource(device);   
+  this->RemoveObserver(device);  
+  
+  // remove the device from the list
+  for (mmuDeviceList::iterator it=m_Devices.begin();it!=m_Devices.end();it++)
+  {
+    if (it->GetPointer() == device)
+    {
+      m_Devices.erase(it);
+    }
+  }
 }
 
 //------------------------------------------------------------------------------
@@ -96,13 +90,13 @@ void mafAction::BindInteractor(mafInteractor *inter)
 {
   assert(inter);
 
-  // the interactor is plugged as listener on the device
-  // input channel
-  PlugListener(inter,mafDevice::DeviceInputChannel);\
+  // the interactor is added as an observer on the device input channel
+  AddObserver(inter,MCH_INPUT);
+  
   // it is plugged as event source on the output channel
-  PlugEventSource(inter,mafDevice::DeviceOutputChannel);
-  //inter->SetRenderer(Renderer);
-  inter->Initialize();
+  inter->AddObserver(this,MCH_OUTPUT);
+  
+  inter->Initialize(); // force interactor to initialize to be ready for incoming events
 }
 
 //------------------------------------------------------------------------------
@@ -111,108 +105,106 @@ void mafAction::UnBindInteractor(mafInteractor *inter)
 {
   assert(inter);
   inter->Shutdown();
-  UnPlugListener(inter);
-  UnPlugEventSource(inter);
+  RemoveObserver(inter);
+  inter->RemoveObserver(this);
   
 }
 
 //------------------------------------------------------------------------------
-int mafAction::Store(mflXMLWriter *writer)
+int mafAction::InternalStore(mafStorageElement *node)
 //------------------------------------------------------------------------------
 {
-  // Store bindings to devices, not binsings to interactors, 
-  // since these last ones are created at runtime
-  writer->OpenTag("Action");
-  writer->AddAttribute("Name",GetName());
-  writer->CloseTag("Action");
-  writer->DisplayXML("\r");  
-  for (mafDevice *device=Devices->InitTraversal();device;device=Devices->GetNextItem())
+  // Store bindings to devices, not bindings to interactors, 
+  // since the last ones are created at runtime.
+  
+  node->SetAttribute("Name",GetName());
+  mafStorageElement *subnode = node->AppendChild("Device");
+
+  for (mmuDeviceList::iterator it = m_Devices.begin(); it!=m_Devices.end(); it++)
   {
-    writer->OpenTag("Device");
-    writer->AddAttribute("Name",device->GetName());
-    writer->AddAttribute("ID",mflString(device->GetID()-mafDevice::MIN_DEVICE_ID));
-    writer->CloseTag("Device");
-    writer->CloseElement("Device");
+    mafDevice *device=it->GetPointer();
+    subnode->SetAttribute("Name",device->GetName());
+    subnode->SetAttribute("ID",(mafID)(device->GetID()-mafDevice::MIN_DEVICE_ID));
   }
-  writer->CloseElement("Action");
-  return 0;
+
+  return MAF_OK;
 }
 
 //------------------------------------------------------------------------------
-int mafAction::Restore(vtkXMLDataElement *node,vtkXMLDataParser *parser)
+int mafAction::InternalRestore(mafStorageElement *node)
 //------------------------------------------------------------------------------
 {
-  if (vtkString::Equals(node->GetName(),"Action"))
+  mafString name;
+  node->GetAttribute("Name",name);
+
+  assert(name==GetName());
+
+  mafStorageElement::ChildrenVector &children=node->GetChildren();
+  for (int i=0;i<children.size();i++)
   {
-    const char *name=node->GetAttribute("Name");
-    assert(vtkString::Equals(name,GetName()));
-    for (int i=0;i<node->GetNumberOfNestedElements();i++)
+    mafStorageElement *subnode = children[i];
+    assert(subnode);
+    if (mafCString(subnode->GetName()) == "Device")
     {
-      vtkXMLDataElement *subnode=node->GetNestedElement(i);
-      assert(subnode);
-      if (vtkString::Equals(subnode->GetName(),"Device"))
+      mafID id;
+      mafString name;
+
+      if (subnode->GetAttributeAsInteger("ID",id) && subnode->GetAttribute("Name",name))
       {
-        int id;
-        const char *name=subnode->GetAttribute("Name");
-        if (subnode->GetScalarAttribute("ID",id)&&name)
-        {
-          // forward an event to device manager to perform binding...
-          ForwardEvent(mafSmartEvent(this,BindDeviceToActionEvent,(long)(id+mafDevice::MIN_DEVICE_ID)));
-        }
-        else
-        {
-          vtkErrorMacro("Wrong MIS file, cannot found device ID or name parsing <Action>");
-          return -1;
-        }
+        // forward an event to device manager to perform binding...
+        InvokeEvent(mafEvent(this,ACTION_BIND_DEVICE,(long)(id+mafDevice::MIN_DEVICE_ID)));
+      }
+      else
+      {
+        mafErrorMacro("Wrong MIS file, cannot found device ID or name parsing <Action>");
+        return MAF_ERROR;
       }
     }
-    return 0;
   }
-  else
-  {
-    vtkErrorMacro("Error XML parsing error: expected <Action> found <"<<node->GetName()<<">");
-  }
-  return -1;
+
+  return MAF_OK;
 }
 
 
 //------------------------------------------------------------------------------
-void mafAction::ProcessEvent(mflEvent *event,mafID ch)
+void mafAction::OnEvent(mafEventBase *event)
 //------------------------------------------------------------------------------
 {
   assert(event);
 
-  mafID id=event->GetID();
+  mafID id=event->GetId();
+  mafID ch=event->GetChannel();
 
   // for catching view select event
-  if (ch==mafDevice::DeviceOutputChannel && id==QueryForConnectedDeviceEvent)
+  if (ch==MCH_OUTPUT && id==ACTION_QUERY_CONNECTED_DEVICES)
   {
-    mflAgent *sender=mflAgent::SafeDownCast((vtkObject *)event->GetSender());
+    mafAgent *sender=(mafAgent *)event->GetSender();
     assert(sender);
     
-    for (mafDevice *dev=Devices->InitTraversal();dev;dev=Devices->GetNextItem())
+    
+    for (mmuDeviceList::iterator it=m_Devices.begin();it!=m_Devices.end();it++)
     {
+      mafDevice *dev=it->GetPointer();
       if (dev->IsInitialized())
       {
         // send an event only to the inquiring object about all plugged devices
-        mflSmartEvent e(PluggedDeviceEvent,this,dev);
-        sender->ProcessEvent(e,mafDevice::DeviceInputChannel);
+        sender->OnEvent(&mafEventBase(this,ACTION_BIND_DEVICE,dev,MCH_INPUT));
       }      
     }
   }
-  else if (ch==mafDevice::DeviceInputChannel && id==mafDevice::DeviceStartedEvent)
+  else if (ch==MCH_INPUT && id==mafDevice::DEVICE_STARTED)
   {
     // send an event to all observers to advise about a plugged device
-    ForwardEvent(PluggedDeviceEvent,mafDevice::DeviceInputChannel,(mafDevice *)event->GetSender());
+    InvokeEvent(ACTION_BIND_DEVICE,MCH_INPUT,(mafDevice *)event->GetSender());
   }
-  else if (ch==mafDevice::DeviceInputChannel && id==mafDevice::DeviceStoppedEvent)
+  else if (ch==MCH_INPUT && id==mafDevice::DEVICE_STOPPED)
   {
     // send an event to all observers to advise about an unplugged device
-    ForwardEvent(UnPluggedDeviceEvent,mafDevice::DeviceInputChannel,(mafDevice *)event->GetSender());
+    InvokeEvent(ACTION_DEVICE_UNPLUGGED,MCH_INPUT,(mafDevice *)event->GetSender());
   }
   else
   {
     // simply forward the event
-    ForwardEvent(event,ch);
+    InvokeEvent(event,ch);
   }
 }

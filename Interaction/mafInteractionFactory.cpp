@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:53 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-18 17:29:04 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -109,13 +109,6 @@ void mafInteractionFactory::RegisterNewDevice(const char* node_name, const char*
 }
 
 //------------------------------------------------------------------------------
-mafDevice *mafInteractionFactory::CreateAvatarInstance(const char *type_name)
-//------------------------------------------------------------------------------
-{
-  return mafAvatar::SafeDownCast(Superclass::CreateInstance(type_name));
-}
-
-//------------------------------------------------------------------------------
 mafAvatar *mafInteractionFactory::CreateAvatarInstance(const char *type_name)
 //------------------------------------------------------------------------------
 {
@@ -135,12 +128,12 @@ const char *mafInteractionFactory::GetDeviceDescription(const char *device_name)
 //------------------------------------------------------------------------------
 {
   // check if that device exists
-  if (m_DeviceNames.find(device_name))
+  if (m_DeviceNames.find(device_name)!=m_DeviceNames.end())
   {
-    mafOverRideMap::iterator pos = m_OverrideMap->find(device_name);
+    mmuOverRideMap::iterator pos = m_OverrideMap->find(device_name);
     if ( pos != m_OverrideMap->end() )
     {
-      return (*pos).second.m_Description;
+      return (*pos).second.m_Description.c_str();
     }
   }
   
@@ -152,12 +145,12 @@ const char *mafInteractionFactory::GetAvatarDescription(const char *avatar_name)
 //------------------------------------------------------------------------------
 {
   // check if that device exists
-  if (m_AvatarNames.find(avatar_name))
+  if (m_AvatarNames.find(avatar_name)!=m_DeviceNames.end())
   {
-    mafOverRideMap::iterator pos = m_OverrideMap->find(avatar_name);
+    mmuOverRideMap::iterator pos = m_OverrideMap->find(avatar_name);
     if ( pos != m_OverrideMap->end() )
     {
-      return (*pos).second.m_Description;
+      return (*pos).second.m_Description.c_str();
     }
   }
 

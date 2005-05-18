@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-12 16:26:45 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-18 17:29:06 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -936,7 +936,7 @@ void mmiGenericMouse::SendTransformMatrix(vtkMatrix4x4 *matrix, int mouseAction,
     event->SetID(MoveActionEvent);
   }
 
-  ForwardEvent(event);
+  InvokeEvent(event);
   // clean up
   vtkDEL(pickPosMatrix); 
 }

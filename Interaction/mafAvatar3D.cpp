@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 05:58:10 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-18 17:29:03 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -588,7 +588,7 @@ void mafAvatar3D::OnMove3DEvent(mafEventInteraction *e)
       // ask a rendering only if it has never rendered
       vtkRenderWindow *rw=m_Renderer->GetRenderWindow();
       if (rw&&!rw->GetNeverRendered())
-        ForwardEvent(CAMERA_UPDATE,MCH_UP,m_View);
+        InvokeEvent(CAMERA_UPDATE,MCH_UP,m_View);
     }
   }
 }

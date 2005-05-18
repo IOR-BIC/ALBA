@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiSER.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 16:27:46 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-18 17:29:06 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -57,11 +57,9 @@ int mmiSER::InternalRestore(mafStorageElement *node)
       return MAF_ERROR;
     }
    
-    if (mafAction *action = subnode->RestoreObject())
-    {
-       action->Restore(subnode);
-    }
-    else
+    // create the object to be restored mannualy since mafAction is not in the factory
+    mafAction *action = mafAction::New();
+    if (action->Restore(subnode))
     {
       mafErrorMacro("I/O Error restoring action");
     }
@@ -77,10 +75,16 @@ mafAction *mmiSER::GetAction(const char *name)
 }
 
 //------------------------------------------------------------------------------
-vtkTemplatedMap<wxString,mafAction> *mmiSER::GetActions()
+void mmiSER::GetActions(std::vector<mafAction *> &actions)
 //------------------------------------------------------------------------------
 {
-  return m_Actions;
+  actions.clear();
+  actions.resize(m_Actions.size());
+  int i=0;
+  for (std::map<mafString,mafAutoPointer<mafAction> >::iterator it=m_Actions.begin();it!=m_Actions.end();it++,i++)
+  {
+    actions[i]=it->second;
+  }
 }
 //------------------------------------------------------------------------------
 int mmiSER::BindAction(const char *action,mafInteractor *agent)
@@ -117,7 +121,7 @@ mafAction *mmiSER::AddAction(const char *name, float priority, int type)
   if (mafAction *old_action=GetAction(name))
     return old_action;
 
-  mflSmartPointer<mafAction> action;
+  mafSmartPointer<mafAction> action;
   action->SetName(name);
   action->SetType(type);
   AddAction(action,priority);
@@ -132,8 +136,8 @@ void mmiSER::AddAction(mafAction *action, float priority)
   m_Actions->SetItem(action->GetName(),action);
   
   // attach the action both as a listener and an event source 
-  action->PlugListener(this);
-  action->PlugEventSource(this,CameraUpdateChannel);
+  action->AddObserver(this);
+  //action->PlugEventSource(this,MCH_CAMERA CameraUpdateChannel);
 }
 //------------------------------------------------------------------------------
 void mmiSER::BindDeviceToAction(mafDevice *device,mafAction *action)

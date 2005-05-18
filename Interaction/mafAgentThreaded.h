@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAgentThreaded.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 16:10:16 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-18 17:29:03 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -72,9 +72,9 @@ public:
     This function implements asynchronous forward of an event. This happens by queuing 
     the output event wrapped in a AGENT_ASYNC_DISPATCH, which is processed in
     the main thread, by using the original mafAgentEventQueue mechanism for dispatching.
-    @sa ForwardEvent() for general semantic */
-  void AsyncForwardEvent(mafEventBase *event, mafID channel=MCH_UP);
-  void AsyncForwardEvent(mafID id, mafID channel=MCH_UP,void *data=NULL);
+    @sa InvokeEvent() for general semantic */
+  void AsyncInvokeEvent(mafEventBase *event, mafID channel=MCH_UP);
+  void AsyncInvokeEvent(mafID id, mafID channel=MCH_UP,void *data=NULL);
 
 protected:
   mafAgentThreaded();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 05:58:11 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-18 17:29:04 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -80,10 +80,12 @@ void mafInteractor::SetDevice(mafDevice *device)
 //------------------------------------------------------------------------------
 {
   if (m_Device)
-    UnPlugEventSource(m_Device);
+    m_Device->RemoveObserver(this);
+
   m_Device = device; // avoid cross reference counting
+
   if (m_Device)
-    PlugEventSource(device,MCH_INPUT);
+    device->AddObserver(this,MCH_INPUT);
 
   m_DeviceIsSet=(device!=NULL);
 }
@@ -225,23 +227,28 @@ int mafInteractor::OnStopInteraction(mafEventInteraction *e)
 void mafInteractor::OnButtonDown(mafEventInteraction *e)
 //------------------------------------------------------------------------------
 { 
+  // create a new event copying data from the incoming one
   mafEventBase *event=e->NewInstance();
   e->DeepCopy(e);
   e->SetId(BUTTON_DOWN);
   e->SetSender(this);
   e->SetChannel(MCH_UP);
-  ForwardEvent(e);
+  
+  InvokeEvent(e);
+  
 }
 //------------------------------------------------------------------------------
 void mafInteractor::OnButtonUp(mafEventInteraction *e)
 //------------------------------------------------------------------------------
 {
+  // create a new event copying data from the incoming one
   mafEventBase *event=e->NewInstance();
   e->DeepCopy(e);
   e->SetId(BUTTON_UP);
   e->SetSender(this);
   e->SetChannel(MCH_UP);
-  ForwardEvent(e);
+
+  InvokeEvent(e);
 }
 //------------------------------------------------------------------------------
 void mafInteractor::OnEvent(mafEventBase *event)
@@ -276,7 +283,8 @@ void mafInteractor::OnEvent(mafEventBase *event)
         m_CurrentModifier = e->GetModifiers();
         if (OnStartInteraction(e))
         {
-          if (IsInteracting()) ForwardEvent(INTERACTION_STARTED);
+          if (IsInteracting()) 
+            InvokeEvent(INTERACTION_STARTED);
         }
       }
       else if (m_ButtonMode==MULTI_BUTTON_MODE && m_ButtonsCounter > 0)
@@ -297,14 +305,17 @@ void mafInteractor::OnEvent(mafEventBase *event)
       if (e->GetButton()==m_StartButton || (m_StartButton<0))
       {
         if (OnStopInteraction(e))
-          if (!IsInteracting()) ForwardEvent(INTERACTION_STOPPED);
+          if (!IsInteracting()) 
+            InvokeEvent(INTERACTION_STOPPED);
+
       }
       else if (m_ButtonMode==MULTI_BUTTON_MODE && m_ButtonsCounter > 0)
       {
         // in case of MULTI BUTTON and the start button has already started 
         // the interaction we call anyway the OnStopInteraction function
         if (OnStopInteraction(e))
-          if (!IsInteracting()) ForwardEvent(INTERACTION_STOPPED);
+          if (!IsInteracting())
+            InvokeEvent(INTERACTION_STOPPED);
       }
     }
   }

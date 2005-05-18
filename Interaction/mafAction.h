@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAction.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 16:27:46 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-18 17:29:02 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,16 +13,10 @@
 #ifndef __mafAction_h
 #define __mafAction_h
 
-#ifdef __GNUG__
-    #pragma interface "mafAction.cpp"
-#endif
-
-#ifndef WX_PRECOMP
-    #include "wx/wx.h"
-#endif
-
-#include "mflAgent.h"
-#include "vtkCallbackCommand.h"
+#include "mafAction.h"
+#include "mafStorable.h"
+#include "mafSmartPointer.h"
+#include <list>
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -30,47 +24,35 @@
 template <class T> class vtkTemplatedList;
 class mafDevice;
 class mafInteractor;
-class mflXMLWriter;
-class vtkXMLDataElement;
-class vtkXMLDataParser;
 class vtkRenderer;
 
 /** this class routes events from devices to interactors.
     Detailed description not yet written...
  */
-class mafAction : public mflAgent
+class mafAction : public mafAgent, public mafStorable
 {
 public:
-    /** @ingroup Events */
+  /** @ingroup Events */
   /** @{ */
-  /** 
-      Request for binding a device to an action. Event type is
-      mafEventBase and event argument is the device ID to be 
-      resolved in the device pointer by the InteractionManager */
-  MFL_EVT_DEC(BindDeviceToActionEvent);
-  MFL_EVT_DEC(QueryForConnectedDeviceEvent) ///< Issued by interactors to query for connected devices. @sa ConnectedDeviceEvent
-  MFL_EVT_DEC(PluggedDeviceEvent) ///< Issued by devices when connected to actions or when queried.
-  MFL_EVT_DEC(UnPluggedDeviceEvent) ///< Issued by devices when connected to actions or when queried.
+  MAF_ID_DEC(ACTION_BIND_DEVICE);            ///< force the action to bind to the device
+  MAF_ID_DEC(ACTION_QUERY_CONNECTED_DEVICES);///< Issued by interactors to query for connected devices. @sa ConnectedDeviceEvent
+  MAF_ID_DEC(ACTION_DEVICE_PLUGGED);         ///< Issued by devices when connected to actions or when queried.
+  MAF_ID_DEC(ACTION_DEVICE_UNPLUGGED);       ///< Issued by devices when connected to actions or when queried.
 
   enum { SHARED_ACTION = 0, EXCLUSIVE_ACTION };
-  
-  static mafAction *New();
-  vtkTypeMacro(mafAction,mflAgent);
 
-  /**  
-    Set/Get the current renderer. The current renderer is set to each new interactors
-    connected to the action */
-  virtual void SetRenderer(vtkRenderer *ren);
-  vtkRenderer *GetRenderer() {return Renderer;}
+  typedef std::list<mafAutoPointer<mafDevice> > mmuDeviceList;
+  
+  mafTypeMacro(mafAction,mafAgent);
 
   /** 
     Set the type of action. semantic to be defined... */
-  int GetType() {return Type;}
-  void SetType(int t) {if (t==SHARED_ACTION||t==EXCLUSIVE_ACTION) Type=t;Modified();}
+  int GetType() {return m_Type;}
+  void SetType(int t) {if (t==SHARED_ACTION||t==EXCLUSIVE_ACTION) m_Type=t;}
   void SetTypeToShared() {SetType(SHARED_ACTION);}
   void SetTypeToExclusive() {SetType(EXCLUSIVE_ACTION);}
 
-  /** To be called when a new renderer is selected to update all interactors*/
+  /** To be called when a new renderer is selected to update all interactors */
   //void SelectRenderer(vtkRenderer *view)
   
   /** Bind/Unbind a device to this action */
@@ -82,29 +64,23 @@ public:
   void UnBindInteractor(mafInteractor *inter);
 
   /** Get list of devices assigned to this action */
-  vtkTemplatedList<mafDevice> *GetDevices() {return Devices;}
+  const mmuDeviceList *GetDevices() {return &m_Devices;}
 
-  /** 
-    Store of action's bindings to an XML file. To store an XML Writer must 
-    be passed as argument. */
-  virtual int Store(mflXMLWriter *writer);
+  /** Store of action's bindings to an XML file. */
+  virtual int InternalStore(mafStorageElement *node);
 
-  /** 
-    Restore of action's bindings from an XML file. To restore, the node
-    of the XML structure from where starting the restoring must be passed
-    as argument. */
-  virtual int Restore(vtkXMLDataElement *node,vtkXMLDataParser *parser);
+  /** Restore of action's bindings from an XML file.*/
+  virtual int InternalRestore(mafStorageElement *node);
 
-  /**  Redefined to answer queries about connected devices */
-  virtual void ProcessEvent(mflEvent *event,mafID channel=mflAgent::DefaultChannel);
+  /** Redefined to answer incoming queries about connected devices. */
+  virtual void OnEvent(mafEventBase *event);
 
 protected:
   mafAction();
   virtual ~mafAction();
 
-  int   Type;
-  vtkRenderer *Renderer;
-  vtkTemplatedList<mafDevice> *Devices;
+  int   m_Type;
+  std::list<mafAutoPointer<mafDevice> > m_Devices;
 
 private:
   mafAction(const mafAction&);  // Not implemented.

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGeneric6DOF.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 15:42:37 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-18 17:29:06 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -72,7 +72,7 @@ void mmiGeneric6DOF::OnMove(mflEventInteraction *e)
 
     // forward the event with the pose matrix through default channel
     mflSMART(mflEventInteraction,e)(MoveActionEvent,this,(mflMatrix *)OutputTransform->GetMatrix());
-    ForwardEvent(e);
+    InvokeEvent(e);
 
     // send also a mafEvent
     mafEvent ev;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiCompositorDevice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 15:42:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-18 17:29:06 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -182,7 +182,7 @@ void mmiCompositorDevice::ProcessEvent(mflEvent *event,mafID channel)
   }
   else
   {
-    ForwardEvent(event,channel);
+    InvokeEvent(event,channel);
   }
 }
 //------------------------------------------------------------------------------

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdTracker.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-12 16:26:45 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-18 17:29:05 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -162,7 +162,7 @@ void mmdTracker::SetAvatar(mafAvatar *avatar)
 {
   if (m_Avatar)
   {
-    ForwardEvent(AVATAR_REMOVED,MCH_UP,m_Avatar);
+    InvokeEvent(AVATAR_REMOVED,MCH_UP,m_Avatar);
  
     if (m_Initialized)
     {
@@ -183,7 +183,7 @@ void mmdTracker::SetAvatar(mafAvatar *avatar)
   {
     avatar->SetTracker(this);
     
-    ForwardEvent(AVATAR_ADDED,MCH_UP,avatar);
+    InvokeEvent(AVATAR_ADDED,MCH_UP,avatar);
 
     // update gui
     GetGui()->AddGui(avatar->GetGui());
@@ -268,7 +268,7 @@ void mmdTracker::SetLastPoseMatrix(const mafMatrix &matrix)
     mafEventInteraction move_event(this,TRACKER_3D_MOVE,m_LastPoseMatrix);    
 
     m_LastMoveTime=m_LastPoseMatrix->GetTimeStamp();
-    AsyncForwardEvent(&move_event,MCH_INPUT);
+    AsyncInvokeEvent(&move_event,MCH_INPUT);
    // m_LastMoveEvent = move_event;
     m_LastPoseMutex.Unlock();
   }
@@ -299,7 +299,7 @@ void mmdTracker::SendButtonEvent(mafEventInteraction *event)
   last_pose->DeepCopy(m_LastPoseMatrix); // make a copy of current pose to ovoid overwriting
   event->SetMatrix(last_pose);  
   
-  AsyncForwardEvent(event,MCH_INPUT);
+  AsyncInvokeEvent(event,MCH_INPUT);
 }
 //------------------------------------------------------------------------------
 void mmdTracker::ComputeTrackerToCanonicalTansform()
@@ -344,7 +344,7 @@ void mmdTracker::ComputeTrackerToCanonicalTansform()
 	m_TrackerToCanonicalTransform->Scale(scale,scale,scale,POST_MULTIPLY);
   
   // inform consumers the m_CanonicalBounds has been recomputed
-  ForwardEvent(TRACKER_BOUNDS_UPDATED,MCH_INPUT);
+  InvokeEvent(TRACKER_BOUNDS_UPDATED,MCH_INPUT);
 }
 
 //------------------------------------------------------------------------------

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPER.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 05:58:12 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-18 17:29:06 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -196,7 +196,7 @@ void mmiPER::OnChar(mafEventInteraction *e)
       if (mouse)
       {
         mafView *view = mouse->GetView();
-        ForwardEvent(CAMERA_FIT,MCH_UP,view);
+        InvokeEvent(CAMERA_FIT,MCH_UP,view);
       }
     }
     break; 
@@ -273,7 +273,7 @@ void mmiPER::OnRightButtonUp(mafEventInteraction *e)
 	if(m_ShowContextMenu && mouse)
 	{
     mafVME *vme = GetPickedVME(mouse);
-    ForwardEvent(SHOW_CONTEXTUAL_MENU,MCH_UP,vme);
+    InvokeEvent(SHOW_CONTEXTUAL_MENU,MCH_UP,vme);
 	}
 
   OnButtonUp(e);
@@ -308,7 +308,7 @@ void mmiPER::OnButtonDown(mafEventInteraction *e)
       if(m_CanSelect && !picked_vme->IsMAFType(mafVMEGizmo))
       {
         // Send a VME select event to Logic
-        ForwardEvent(VME_SELECT,MCH_UP,picked_vme);
+        InvokeEvent(VME_SELECT,MCH_UP,picked_vme);
       }
     }
 
@@ -342,7 +342,7 @@ void mmiPER::OnButtonDown(mafEventInteraction *e)
       if(m_CanSelect && !picked_vme->IsMAFType(mafVMEGizmo))
       {
         // Send a VME select event to Logic
-        ForwardEvent(VME_SELECT,MCH_UP,picked_vme);
+        InvokeEvent(VME_SELECT,MCH_UP,picked_vme);
       }
     }
 
@@ -599,7 +599,7 @@ void mmiPER::FlyTo(mafEventInteraction *e,int numstep, double zoom)
       cam->SetPosition(p1);
       ren->ResetCameraClippingRange();
       // render at each cycle
-      ForwardEvent(CAMERA_UPDATE,MCH_UP,view);
+      InvokeEvent(CAMERA_UPDATE,MCH_UP,view);
 
     }
     cam->OrthogonalizeViewUp();
@@ -655,7 +655,7 @@ void mmiPER::FlyTo(mafEventInteraction *e,int numstep, double zoom)
       cam->SetPosition(p1);
       ren->ResetCameraClippingRange();
       // render at each cycle
-      ForwardEvent(CAMERA_UPDATE,MCH_UP,view));
+      InvokeEvent(CAMERA_UPDATE,MCH_UP,view));
 
     }
     cam->OrthogonalizeViewUp();

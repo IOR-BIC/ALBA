@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiSER.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 16:27:46 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-18 17:29:07 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -50,7 +50,7 @@ public:
   void UnBindDeviceFromAllActions(mafDevice *device);
 
   /** return list of device bindings to actions */
-  void GetDeviceBindings(mafDevice *device,vtkCollection *actions);
+  void GetDeviceBindings(mafDevice *device,std::vector<mafAction *> &actions);
   /** 
     Bind an agent to the specified action. 
     If the action is not present return -1 */
@@ -68,7 +68,7 @@ public:
   mafAction *GetAction(const char *name);
   
   /** Return the actions container */
-  std::map<mafString,mafAutoPointer<mafAction> > *GetActions();
+  void GetActions(std::vector<mafAction *> &actions);
 
 protected:
   virtual int InternalStore(mafStorageElement *node);

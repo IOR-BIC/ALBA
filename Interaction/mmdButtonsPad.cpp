@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdButtonsPad.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:56 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-18 17:29:05 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -115,7 +115,7 @@ void mmdButtonsPad::SetButtonState(int num, bool value, unsigned long modifiers)
 void mmdButtonsPad::SendButtonEvent(mafEventInteraction *e)
 //------------------------------------------------------------------------------
 {
-  this->ForwardEvent(e,MCH_INPUT);
+  this->InvokeEvent(e,MCH_INPUT);
 }
 
 //------------------------------------------------------------------------------

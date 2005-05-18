@@ -3,8 +3,8 @@
 Program:   Visualization Toolkit
 Module:    $RCSfile: mafAgentThreaded.cpp,v $
 Language:  C++
-Date:      $Date: 2005-04-29 16:10:16 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2005-05-18 17:29:03 $
+Version:   $Revision: 1.6 $
 
 
 
@@ -154,15 +154,15 @@ void mafAgentThreaded::OnEvent(mafEventBase *event)
   {
     if (event->GetSender()==this)
     {
-      // this is used for the asynchronous ForwardEvent
-      this->ForwardEvent((mafEventBase *)event->GetData(),event->GetChannel());
+      // this is used for the asynchronous InvokeEvent
+      this->InvokeEvent((mafEventBase *)event->GetData(),event->GetChannel());
     }
     else
     {
       assert(true); // should not pass from here
       
       // this is used for the asynchronous SendEvent
-      // notice we are using the sender field of the AsyncForwardEvent to store the recipient
+      // notice we are using the sender field of the AsyncInvokeEvent to store the recipient
       //((mafObserver *)event->GetSender())->OnEvent((mafEventBase *)event->GetData());
     }
   }
@@ -192,7 +192,7 @@ void mafAgentThreaded::RequestForDispatching()
 }
 
 //------------------------------------------------------------------------------
-void mafAgentThreaded::AsyncForwardEvent(mafEventBase *event, mafID channel)
+void mafAgentThreaded::AsyncInvokeEvent(mafEventBase *event, mafID channel)
 //------------------------------------------------------------------------------
 {
   mafID old_ch=event->GetChannel();
@@ -216,10 +216,10 @@ void mafAgentThreaded::AsyncSendEvent(mafObserver *target,mafEventBase *event, m
 }
 
 //----------------------------------------------------------------------------
-void mafAgentThreaded::AsyncForwardEvent(mafID id, mafID channel,void *data)
+void mafAgentThreaded::AsyncInvokeEvent(mafID id, mafID channel,void *data)
 //----------------------------------------------------------------------------
 {
-  AsyncForwardEvent(&mafEventBase(this,id,data,channel),channel);
+  AsyncInvokeEvent(&mafEventBase(this,id,data,channel),channel);
 }
 
 //----------------------------------------------------------------------------

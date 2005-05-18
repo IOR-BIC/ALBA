@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:52 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-18 17:29:04 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -223,9 +223,9 @@ bool mafDeviceManager::DispatchEvents()
   if (m_Dispatched)
     return false;
 
-  ForwardEvent(DISPATCH_START); // Advise dispatching is started 
+  InvokeEvent(DISPATCH_START); // Advise dispatching is started 
   bool ret=Superclass::DispatchEvents();
-  ForwardEvent(DISPATCH_END); // Advise dispatching is finished 
+  InvokeEvent(DISPATCH_END); // Advise dispatching is finished 
 
   return ret;
 }
@@ -261,7 +261,7 @@ void mafDeviceManager::OnEvent(mafEventBase *event)
         device->SetID(++m_DeviceIdCounter);
       }
     }
-    ForwardEvent(event); // send also to InteractionManager
+    InvokeEvent(event); // send also to InteractionManager
   }
  
   Superclass::OnEvent(event);

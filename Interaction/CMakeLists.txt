@@ -46,6 +46,8 @@ mafInteractionManager.cpp
 mafInteractionManager.h
 mafInteractor.cpp
 mafInteractor.h
+mafRefSys.cpp
+mafRefSys.h
 mmdButtonsPad.cpp
 mmdButtonsPad.h
 mmdMouse.cpp

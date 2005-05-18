@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi6DOF.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 15:42:34 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-18 17:29:05 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -123,7 +123,7 @@ int mmi6DOF::StartInteraction(mmdTracker *tracker,mflMatrix *pose)
     {
       // store the current renderer: camera cannot be changed during interaction!!!
       SetRenderer(tracker->GetAvatar()->GetRenderer());
-      ForwardEvent(InteractionStartedEvent,DefaultChannel,StartTrackerPoseMatrix);
+      InvokeEvent(InteractionStartedEvent,DefaultChannel,StartTrackerPoseMatrix);
       return true;
     }
     // if wrong type of avatar force unlock device and stop interaction 
@@ -139,7 +139,7 @@ int mmi6DOF::StopInteraction(mmdTracker *tracker,mflMatrix *pose)
   if (Superclass::StopInteraction(tracker))
   {
     // ...do something
-    ForwardEvent(InteractionStoppedEvent);
+    InvokeEvent(InteractionStoppedEvent);
     return true;
   }
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-12 16:26:45 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-18 17:29:04 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -271,7 +271,7 @@ void mafInteractionManager::ViewSelected(mafView *view)
 void mafInteractionManager::PreResetCamera(vtkRenderer *ren)
 //------------------------------------------------------------------------------
 {
-  //ForwardEvent(mflSmartEvent(CAMERA_PRE_RESET,this,ren),CameraUpdateChannel);
+  //InvokeEvent(mflSmartEvent(CAMERA_PRE_RESET,this,ren),CameraUpdateChannel);
   
   // propagate event to all avatars... 
 }
@@ -280,7 +280,7 @@ void mafInteractionManager::PreResetCamera(vtkRenderer *ren)
 void mafInteractionManager::PostResetCamera(vtkRenderer *ren)
 //------------------------------------------------------------------------------
 {
-  //ForwardEvent(mflSmartEvent(PostResetCameraEvent,this,ren),CameraUpdateChannel);
+  //InvokeEvent(mflSmartEvent(PostResetCameraEvent,this,ren),CameraUpdateChannel);
 
   // propagate event to all avatars...
 }
@@ -358,7 +358,7 @@ void mafInteractionManager::OnViewSelected(mafEventBase *event)
   event->SetData(m_CurrentRenderer); 
 
   // propagate event to all Avatars...
-  //ForwardEvent(event,CameraUpdateChannel);
+  //InvokeEvent(event,CameraUpdateChannel);
 
   // propagate to the mouse device too...
   GetMouseDevice()->ProcessEvent(event);
@@ -513,7 +513,7 @@ void mafInteractionManager::OnEvent(mafEventBase *event,unsigned long channel)
   }
   //else
   //{
-  //  ForwardEvent(event,channel);
+  //  InvokeEvent(event,channel);
   //}
   //}
   else if (id==mafDeviceManager::DISPATCH_START)
