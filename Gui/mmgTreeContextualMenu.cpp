@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTreeContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 15:15:49 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-18 15:26:09 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -52,7 +52,7 @@
 //----------------------------------------------------------------------------
 // const
 //----------------------------------------------------------------------------
-enum
+enum TREE_CONTEXTUAL_MENU_ID
 {
   CONTEXTUAL_TREE_MENU_START = MINID,	
 		RMENU_SHOW_VME,				
