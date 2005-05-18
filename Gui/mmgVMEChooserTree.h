@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooserTree.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-13 16:15:39 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-18 15:25:26 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -32,11 +32,10 @@ class mmgVMEChooserAccept;
 class mmgVMEChooserTree: public mmgCheckTree
 {
 public:
-                 mmgVMEChooserTree (wxWindow* parent, wxWindowID id=-1, bool CloseButton = false, bool HideTitle = false, long vme_accept_function = 0); 
+                 mmgVMEChooserTree (wxWindow *parent, mmgCheckTree *tree, long vme_accept_function = 0, wxWindowID id=-1, bool CloseButton = false, bool HideTitle = false); 
   virtual       ~mmgVMEChooserTree();
 
-  /** Fill the VMEChooserTree by taking in account the accept function.*/
-  void FillTree(mmgCheckTree *tree);
+  mafNode *GetChoosedNode() {return m_ChoosedNode;};
 
 protected:
   /** Return the status of the node according to the vme visibility. */
@@ -44,7 +43,6 @@ protected:
 
   void InitializeImageList();
 
-public: 
   /** Called by the Custom-Tree-Event-Handler - via OnMouseDown*/
   void OnIconClick(wxTreeItemId item);
 
@@ -55,5 +53,8 @@ public:
   virtual void OnSelectionChanged(wxTreeEvent& event);
 
   mmgVMEChooserAccept *m_AcceptFunction;
+  mafNode   *m_ChoosedNode;
+
+  DECLARE_EVENT_TABLE()
 };
 #endif

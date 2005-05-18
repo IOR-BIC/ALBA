@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooserTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-13 16:15:38 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-18 15:25:25 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,31 +22,41 @@
 
 #include "mmgVMEChooserTree.h" 
 #include "mmgVMEChooserAccept.h"
+#include "mmgDialog.h"
 #include "mafPics.h" 
+#include "mafEvent.h"
 #include "mafNode.h"
 #include "mafView.h"
+#include "mafVMERoot.h"
 
 #include <vector>
 
 //----------------------------------------------------------------------------
-mmgVMEChooserTree::mmgVMEChooserTree( wxWindow* parent,wxWindowID id, bool CloseButton, bool HideTitle, long vme_accept_function)
+// EVENT_TABLE
+//----------------------------------------------------------------------------
+BEGIN_EVENT_TABLE(mmgVMEChooserTree,wxPanel)
+  EVT_TREE_SEL_CHANGED(ID_TREE, mmgVMEChooserTree::OnSelectionChanged)
+END_EVENT_TABLE()
+
+//----------------------------------------------------------------------------
+mmgVMEChooserTree::mmgVMEChooserTree( wxWindow *parent, mmgCheckTree *tree, long vme_accept_function,wxWindowID id, bool CloseButton, bool HideTitle)
 :mmgCheckTree(parent, id, CloseButton, HideTitle)
 //----------------------------------------------------------------------------
 {
+  m_ChoosedNode = NULL;
+
   if(vme_accept_function == 0)
     m_AcceptFunction = NULL;
   else
     m_AcceptFunction = (mmgVMEChooserAccept *)vme_accept_function;
+  
+  tree->FillTree(this);
 }
 //----------------------------------------------------------------------------
 mmgVMEChooserTree::~mmgVMEChooserTree()
 //----------------------------------------------------------------------------
 {
 }
-//----------------------------------------------------------------------------
-void mmgVMEChooserTree::FillTree(mmgCheckTree *tree)
-//----------------------------------------------------------------------------
-{
 /*  mafVMEIterator *iter=vme_in->NewIterator();
   for(mafVME *vme=iter->GetFirstNode();vme;vme=iter->GetNextNode())
   {
@@ -62,20 +72,24 @@ void mmgVMEChooserTree::FillTree(mmgCheckTree *tree)
     }
   }
   iter->Delete();*/
-}
-//----------------------------------------------------------------------------
-void mmgVMEChooserTree::OnIconClick(wxTreeItemId item)
-//----------------------------------------------------------------------------
-{
-  mafNode* vme = (mafNode*) (NodeFromItem(item));
-  int status = GetVmeStatus(vme); 
-}
 //----------------------------------------------------------------------------
 int mmgVMEChooserTree::GetVmeStatus(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  
-  return 1;
+  if(m_AcceptFunction == NULL)
+  {
+    if (!node->IsMAFType(mafVMERoot))
+    {
+      return NODE_VISIBLE_ON;
+    }
+  }
+  else
+  {
+    if(m_AcceptFunction->Validate(node))
+      return NODE_VISIBLE_ON;
+  }
+
+  return NODE_NON_VISIBLE;
 }
 //----------------------------------------------------------------------------
 void mmgVMEChooserTree::InitializeImageList()
@@ -104,10 +118,10 @@ void mmgVMEChooserTree::InitializeImageList()
   //retrieve state icons
   wxBitmap state_ico[num_of_status];
   state_ico[NODE_NON_VISIBLE] = mafPics.GetBmp("DISABLED");
-  state_ico[NODE_VISIBLE_OFF] = mafPics.GetBmp("CHECK_ON");
-  state_ico[NODE_VISIBLE_ON]  = mafPics.GetBmp("CHECK_ON");
-  state_ico[NODE_MUTEX_OFF]   = mafPics.GetBmp("CHECK_ON");
-  state_ico[NODE_MUTEX_ON]    = mafPics.GetBmp("CHECK_ON");
+  state_ico[NODE_VISIBLE_OFF] = mafPics.GetBmp("DISABLED");
+  state_ico[NODE_VISIBLE_ON]  = mafPics.GetBmp("DISABLED");
+  state_ico[NODE_MUTEX_OFF]   = mafPics.GetBmp("DISABLED");
+  state_ico[NODE_MUTEX_ON]    = mafPics.GetBmp("DISABLED");
   int sw = state_ico[0].GetWidth();
   int sh = state_ico[0].GetHeight();
 
@@ -142,6 +156,27 @@ void mmgVMEChooserTree::InitializeImageList()
 void mmgVMEChooserTree::OnSelectionChanged(wxTreeEvent& event)
 //----------------------------------------------------------------------------
 {
+  wxTreeItemId i;
+  if(m_prevent_notify) return;
+
+  i = event.GetItem();
+  if(i.IsOk())
+  {
+    m_ChoosedNode = (mafNode *)NodeFromItem(i);
+  }
+  event.Skip();
+
+  int status = GetVmeStatus(m_ChoosedNode);
+  mafEventMacro(mafEvent(this,VME_SELECTED,status != NODE_NON_VISIBLE));
+}
+//----------------------------------------------------------------------------
+void mmgVMEChooserTree::OnIconClick(wxTreeItemId item)
+//----------------------------------------------------------------------------
+{
+/*  mafNode* vme = (mafNode*) (NodeFromItem(item));
+  int status = GetVmeStatus(vme);
+
+  mafEventMacro(mafEvent(this,VME_SELECTED,status != NODE_NON_VISIBLE));*/
 }
 //----------------------------------------------------------------------------
 void mmgVMEChooserTree::ShowContextualMenu(wxMouseEvent& event)
