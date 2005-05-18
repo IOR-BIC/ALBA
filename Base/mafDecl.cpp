@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:18:22 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-05-18 17:32:28 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -306,6 +306,40 @@ std::string  mafIdString(int id)
      case TIME_NEXT:	          s="TIME_NEXT"; break; 
      case TIME_BEGIN:	          s="TIME_BEGIN"; break; 
      case TIME_END:	            s="TIME_END"; break; 
+        
+     case MCH_START:            s="MCH_START"; break;
+     case MCH_UP:               s="MCH_UP"; break;
+     case MCH_DOWN:             s="MCH_DOWN"; break;
+     case MCH_INPUT:            s="MCH_INPUT"; break;
+     case MCH_OUTPUT:           s="MCH_OUTPUT"; break;
+     case MCH_NODE:             s="MCH_NODE"; break;
+     case MCH_ANY:              s="MCH_ANY"; break;
+     case MCH_VTK:              s="MCH_VTK"; break;
+     case MCH_END:              s="MCH_END"; break;
+
+     case NODE_START:               s="NODE_START"; break;
+     case NODE_DETACHED_FROM_TREE:  s="NODE_DETACHED_FROM_TREE"; break;
+     case NODE_ATTACHED_TO_TREE:    s="NODE_ATTACHED_TO_TREE"; break;
+     case NODE_DESTROYED:           s="NODE_DESTROYED"; break;
+     case NODE_GET_STORAGE:         s="NODE_GET_STORAGE"; break;
+     case NODE_GET_ROOT:            s="NODE_GET_ROOT"; break;
+     case VME_TIME_SET:             s="VME_TIME_SET"; break;
+     case VME_MATRIX_CHANGED:       s="VME_MATRIX_CHANGED"; break;
+     case VME_MATRIX_PREUPDATE:     s="VME_MATRIX_PREUPDATE"; break;
+     case VME_MATRIX_UPDATE:        s="VME_MATRIX_UPDATE"; break;
+     case VME_ABSMATRIX_UPDATE:     s="VME_ABSMATRIX_UPDATE"; break;
+     case VME_OUTPUT_DATA_PREUPDATE:s="VME_OUTPUT_DATA_PREUPDATE"; break;
+     case VME_OUTPUT_DATA_UPDATE:   s="VME_OUTPUT_DATA_UPDATE"; break;
+     case VME_OUTPUT_DATA_CHANGED:  s="VME_OUTPUT_DATA_CHANGED"; break;
+     case VME_GET_NEWITEM_ID:       s="VME_GET_NEWITEM_ID"; break;
+     case NODE_END:                 s="NODE_END"; break;
+
+     case AVATAR_ADDED:         s="AVATAR_ADDED"; break;
+     case AVATAR_REMOVED:       s="AVATAR_REMOVED"; break;
+
+     case MATRIX_UPDATED:       s="MATRIX_UPDATED"; break;
+
+// const used by mmgGui and mmgGuiValidator
      case MINID:	              s="MINID"; break; 
      case MAXID:	              s="MAXID"; break; 
      case ID_GUI_UPDATE:	      s="ID_GUI_UPDATE"; break; 
