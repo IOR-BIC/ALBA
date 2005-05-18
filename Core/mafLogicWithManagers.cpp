@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-17 08:46:34 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-05-18 15:23:24 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,6 +31,8 @@
 #include "mmgMDIChild.h"
 #include "mafSideBar.h"
 #include "mmgTimeBar.h"
+#include "mmgVMEChooser.h"
+
 //----------------------------------------------------------------------------
 mafLogicWithManagers::mafLogicWithManagers()
 : mafLogicWithGUI()
@@ -257,6 +259,12 @@ void mafLogicWithManagers::OnEvent(mafEventBase *event)
     case VME_REMOVING:
       VmeRemoving(e->GetVme());
       break; 
+    case VME_CHOOSE:
+      {
+        mmgVMEChooser vc(m_SideBar->GetTree());
+        e->SetVme(vc.ShowChooserDialog());
+      }
+      break;
       // ###############################################################
       // commands related to OP
     case MENU_OP:
