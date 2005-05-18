@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 15:25:51 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-05-18 16:15:55 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -82,7 +82,7 @@ protected:
   /** retrieve the icon-index for a vme given the classname */
   int ClassNameToIcon(wxString classname);
 
-  void InitializeImageList();
+  virtual void InitializeImageList();
   wxBitmap MergeIcons(wxBitmap state, wxBitmap vme);
   wxBitmap GrayScale(wxBitmap bmp);
 

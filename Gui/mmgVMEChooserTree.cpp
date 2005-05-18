@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooserTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 15:25:25 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-18 16:15:55 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -48,8 +48,10 @@ mmgVMEChooserTree::mmgVMEChooserTree( wxWindow *parent, mmgCheckTree *tree, long
   if(vme_accept_function == 0)
     m_AcceptFunction = NULL;
   else
-    m_AcceptFunction = (mmgVMEChooserAccept *)vme_accept_function;
+    m_AcceptFunction = (mmgVmeChooserAccept *)vme_accept_function;
   
+  InitializeImageList();
+
   tree->FillTree(this);
 }
 //----------------------------------------------------------------------------
@@ -57,21 +59,6 @@ mmgVMEChooserTree::~mmgVMEChooserTree()
 //----------------------------------------------------------------------------
 {
 }
-/*  mafVMEIterator *iter=vme_in->NewIterator();
-  for(mafVME *vme=iter->GetFirstNode();vme;vme=iter->GetNextNode())
-  {
-    if (vme->GetTagArray()->FindTag("VISIBLE_IN_THE_TREE") == -1 || (vme->GetTagArray()->GetTag("VISIBLE_IN_THE_TREE")->GetValueAsDouble() == 1.0))
-    {
-      if(m_AcceptFunction == NULL)
-        m_Tree->AddNode((long)vme,(long)vme->GetParent(),vme->GetName(),NODE_RED);
-      else
-        if(m_AcceptFunction->Validate(vme))
-          m_Tree->AddNode((long)vme,(long)vme->GetParent(),vme->GetName(),NODE_RED);
-        else
-          m_Tree->AddNode((long)vme,(long)vme->GetParent(),vme->GetName());
-    }
-  }
-  iter->Delete();*/
 //----------------------------------------------------------------------------
 int mmgVMEChooserTree::GetVmeStatus(mafNode *node)
 //----------------------------------------------------------------------------
@@ -134,9 +121,9 @@ void mmgVMEChooserTree::InitializeImageList()
   assert(w>0 && h>0);
 
   // create the ImageList 
-  int mw = sw+w; 
-  int mh = (sh>h) ? sh : h;
-  wxImageList *imgs = new wxImageList(mw,mh,FALSE,num_icons);
+  //int mw = sw+w; 
+  //int mh = (sh>h) ? sh : h;
+  wxImageList *imgs = new wxImageList(w,h,FALSE,num_icons);
 
   for(int i=0; i<num_types; i++)
   {
