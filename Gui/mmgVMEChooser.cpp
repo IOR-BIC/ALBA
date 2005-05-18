@@ -2,12 +2,12 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooser.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-13 16:15:38 $
-  Version:   $Revision: 1.2 $
-  Authors:   Paolo Quadrani
+  Date:      $Date: 2005-05-18 15:24:28 $
+  Version:   $Revision: 1.3 $
+  Authors:   Paolo Quadrani    
 ==========================================================================
-Copyright (c) 2001/2005 
-CINECA - Interuniversity Consortium (www.cineca.it)
+  Copyright (c) 2002/2004
+  CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
 
@@ -20,67 +20,43 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+
+
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
 #include "mmgVMEChooser.h"
-
-#include <wx/laywin.h>
-#include <wx/treectrl.h>
-
 #include "mafDecl.h"
 #include "mmgVMEChooserTree.h"
-#include "mmgDialog.h"
+#include "mmgVmeChooserAccept.h"
 
-#include "mafVME.h"
+#include "mafNode.h"
 
 //----------------------------------------------------------------------------
 mmgVMEChooser::mmgVMEChooser(mmgCheckTree *tree, wxString dialog_title, long vme_accept_function)
+: mmgDialog(dialog_title,mafCLOSEWINDOW | mafRESIZABLE | mafCLOSE | mafOK )
 //----------------------------------------------------------------------------
 {
-  m_ChoosedVME = NULL;
-
-  int x_pos,y_pos,w,h,w1,h1,d;
-  mafGetFrame()->GetPosition(&x_pos,&y_pos);
-  mafGetFrame()->GetSize(&w1,&h1);
-  m_Dialog = new mmgDialog(dialog_title, mafCLOSEWINDOW | mafRESIZABLE );
-  m_Dialog->GetSize(&w,&h);
-  d = w1/2 - w/2;
-  m_Dialog->SetSize(x_pos+d,y_pos+10,w,h);
+  m_ChooserTree = new mmgVMEChooserTree(this,tree,vme_accept_function,-1,false,true);
+  m_ChooserTree->SetListener(this);
+  m_ChooserTree->SetTitle("");
+  m_ChooserTree->SetSize(250,350);
   
-	mmgVMEChooserTree *m_Tree = new mmgVMEChooserTree(m_Dialog, -1, 0, 1, vme_accept_function);
-  m_Tree->SetListener(this);
-  m_Tree->SetSize(wxSize(100,400));
-  m_Tree->SetTitle("");
-  m_Tree->FillTree(tree);
-  
-	m_OkButton = new wxButton(m_Dialog,wxID_OK,"ok",wxDefaultPosition,wxSize(100,25));
-  m_OkButton->Enable(false);
-
-  wxButton *cancel = new wxButton(m_Dialog,wxID_CANCEL,"cancel",wxDefaultPosition,wxSize(100,25));
-
-	wxBoxSizer *h_sizer = new wxBoxSizer(wxHORIZONTAL);
-	h_sizer->Add(m_OkButton,0,wxLEFT);
-	h_sizer->Add(cancel,0,wxLEFT);	
-
-  wxBoxSizer *v_sizer =  new wxBoxSizer( wxVERTICAL );
-  v_sizer->Add(m_Tree,1,wxEXPAND);
-  v_sizer->Add(h_sizer,0,wxCENTRE);
-
-  m_Dialog->SetAutoLayout( TRUE );
-  m_Dialog->SetSizer( v_sizer );
-  v_sizer->Fit(m_Dialog);
+  Add(m_ChooserTree,1,wxEXPAND);
+  m_ok_button->Enable(false);
 }
 //----------------------------------------------------------------------------
 mmgVMEChooser::~mmgVMEChooser()
 //----------------------------------------------------------------------------
 {
-	//destroy gui
-  delete m_Dialog;
+  delete m_ChooserTree;
 }
 //----------------------------------------------------------------------------
-mafVME *mmgVMEChooser::ShowModal()
+mafNode *mmgVMEChooser::ShowChooserDialog()
 //----------------------------------------------------------------------------
 {
-	if(m_Dialog->ShowModal() == wxID_OK)
-		return m_ChoosedVME;
+  if(ShowModal() == wxID_OK)
+		return m_ChooserTree->GetChoosedNode();
 	else
 		return NULL;
 }
@@ -92,21 +68,8 @@ void mmgVMEChooser::OnEvent(mafEventBase *event)
   {
     switch(e->GetId())
     {
-      case VME_SELECT:
-      {
-        /*mafVME *vme = (mafVME*)e->GetArg();
-        if(m_AcceptFunction == NULL)
-          m_ChoosedVME = vme;
-        else
-          if(m_AcceptFunction->Validate(vme))
-            m_ChoosedVME = vme;
-          else
-          {
-            m_OkButton->Enable(false);
-            return;
-          }*/
-          m_OkButton->Enable(true);
-      }
+      case VME_SELECTED:
+        m_ok_button->Enable(e->GetBool());
       break;
       default:
         e->Log();

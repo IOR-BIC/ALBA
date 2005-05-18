@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooser.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-05 15:24:13 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-18 15:24:28 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -16,31 +16,34 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafEvent.h"
-#include "mafObserver.h"
+#include "mmgDialog.h"
 
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mafVME;
-class mmgDialog;
+class mmgVmeChooserAccept;
+class mmgVMEChooserTree;
 class mmgCheckTree;
+class mafNode;
 
-/** mmgVmeChooser : Display a modal dialog filled with a vme tree and
+//----------------------------------------------------------------------------
+// mmgVMEChooser :
+//----------------------------------------------------------------------------
+/**
+Display a modal dialog filled with a vme tree and
 return the choosed vme. The tree is filled from
-the vme passed in the constructor with its children.*/
-class mmgVMEChooser : public mafObserver
+the vme passed in the constructor with its children.
+*/
+class mmgVMEChooser : public mmgDialog
 {
 
 public:
-           mmgVMEChooser(mmgCheckTree *tree, wxString dialog_title = "Vme Chooser", long vme_accept_function = 0);  
+           mmgVMEChooser(mmgCheckTree *tree, wxString dialog_title="Vme Chooser", long vme_accept_function = 0);
           ~mmgVMEChooser();
-	mafVME  *ShowModal();
-  void     OnEvent(mafEventBase *event);
+	mafNode *ShowChooserDialog();
+  void  OnEvent(mafEventBase *event);
 
 protected:
-  mmgDialog *m_Dialog;
-  mafVME    *m_ChoosedVME;
-	wxButton  *m_OkButton;
+  mmgVMEChooserTree *m_ChooserTree;
 };
 #endif
