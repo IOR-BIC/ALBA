@@ -22,6 +22,7 @@ SUBDIRS(15_testDialog)
 SUBDIRS(16_testRWI)
 #SUBDIRS(17_TestWXVTK)
 SUBDIRS(18_testView)
+SUBDIRS(19_testVMEChooser)
 
 # wxWidgets specific classes
 IF (MAF_USE_WX)
