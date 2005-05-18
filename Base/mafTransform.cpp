@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 17:22:13 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-18 17:33:07 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -45,6 +45,19 @@ mafTransform::mafTransform(const mafTransform& copy)
 {
   *m_Matrix=*copy.m_Matrix;
   Modified();
+}
+
+//----------------------------------------------------------------------------
+void mafTransform::SetMatrixPointer(mafMatrix *matrix)
+//----------------------------------------------------------------------------
+{
+  if (matrix!=m_Matrix)
+  {
+    mafDEL(m_Matrix);
+    m_Matrix = matrix;
+    m_Matrix->Register(this);
+    Modified();
+  }
 }
 
 //----------------------------------------------------------------------------

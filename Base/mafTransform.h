@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 17:22:13 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-05-18 17:33:07 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -61,6 +61,9 @@ class MAF_EXPORT mafTransform : public mafTransformBase
     Directly set the internal Matrix. It's overwritten by Update if Input or InputFrame !=NULL
     This function makes a copy of the input matrix. */
   virtual void SetMatrix(const mafMatrix &input) {*m_Matrix=input;SetTimeStamp(input.GetTimeStamp());Modified();}
+
+  /** set the internal matrix pointer to the given matrix. Do not use this if you don't know what you are doing */
+  void SetMatrixPointer(mafMatrix *matrix);
 
 	/**
 	  Polar Decomposition of matrix M in Q * S.*/
