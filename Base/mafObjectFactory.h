@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObjectFactory.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 16:42:50 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-05-18 17:33:29 $
+  Version:   $Revision: 1.13 $
   Authors:   Based on itkObjectFactory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -18,6 +18,7 @@
 
 #include <vector>
 #include <list>
+#include <map>
 #include <string>
 
 /** to be used internally for plugging default objects --- calls a member function directly */
@@ -29,7 +30,6 @@ typedef mafObject* (*mafCreateObjectFunction)();
 //------------------------------------------------------------------------------
 // Forward declarations
 //------------------------------------------------------------------------------
-class mafOverRideMap;
 class mafIndent;
 
 /** Create instances of classes using an object factory.
@@ -163,10 +163,17 @@ protected:
   /** internally used to retrieve args for this factory */
   mafReferenceCounted *GetFactoryArgs(const char *type_name);
 
+  //------------------------------------------------------------------------------
+  /** mafStringOverMap - Internal implementation class for ObjectFactorBase.
+    Create a sub class to shrink the size of the symbols
+    Also, so a forward reference can be put in mafObjectFactory.h
+    and a pointer member can be used.  This avoids other
+    classes including <map> and getting long symbol warnings.*/
+  typedef std::multimap<std::string, mmuOverrideInformation> mmuOverRideMap;
+
+  mmuOverRideMap* m_OverrideMap;
 
 private:
-  mafOverRideMap* m_OverrideMap;
-
   mafObjectFactory(const mafObjectFactory&); //purposely not implemented
   void operator=(const mafObjectFactory&); //purposely not implemented
 

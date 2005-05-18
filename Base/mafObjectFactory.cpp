@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObjectFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:56:37 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-05-18 17:33:29 $
+  Version:   $Revision: 1.12 $
   Authors:   Based on itkObjectFactory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,7 +17,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <algorithm>
-#include <map>
 
 //------------------------------------------------------------------------------
 /** Utility class to clean up factory memory.*/  
@@ -62,24 +61,6 @@ bool operator<(const mafObjectFactory::mmuOverrideInformation& rhs,
   return (rhs.m_Description < lhs.m_Description
     && rhs.m_OverrideWithName < lhs.m_OverrideWithName);
 }
-
-
-//------------------------------------------------------------------------------
-/** mafStringOverMap - Internal implementation class for ObjectFactorBase.
-  Create a sub class to shrink the size of the symbols
-  Also, so a forward reference can be put in mafObjectFactory.h
-  and a pointer member can be used.  This avoids other
-  classes including <map> and getting long symbol warnings.*/
-typedef std::multimap<std::string, mafObjectFactory::mmuOverrideInformation> 
-              mafStringOverMapType;
-
-
-//------------------------------------------------------------------------------
-/** mafOverRideMap - Internal implementation class for ObjectFactorBase. */
-class mafOverRideMap : public mafStringOverMapType
-{
-public:
-};
 
 //------------------------------------------------------------------------------
 /** Initialize static list of factories.*/
@@ -334,7 +315,7 @@ mafObjectFactory::mafObjectFactory()
 {
   m_LibraryHandle = 0;
   m_LibraryDate = 0;
-  m_OverrideMap = new mafOverRideMap;
+  m_OverrideMap = new mmuOverRideMap;
 }
 
 
@@ -388,7 +369,7 @@ void mafObjectFactory::Print(std::ostream& os, const int indent) const
   os << indent << "Factory overrides " << num << " classes:" << std::endl;
 
   mafIndent next_indent = mafIndent(indent).GetNextIndent();
-  for(mafOverRideMap::iterator i = m_OverrideMap->begin();
+  for(mmuOverRideMap::iterator i = m_OverrideMap->begin();
       i != m_OverrideMap->end(); ++i)
     {
     os << next_indent << "Class : " <<  (*i).first.c_str() << "\n";
@@ -450,7 +431,7 @@ void mafObjectFactory::RegisterOverride(const char* classOverride,
   info.m_EnabledFlag = enableFlag;
   info.m_CreateObject = createFunction;
   info.m_Args = args;
-  m_OverrideMap->insert(mafOverRideMap::value_type(classOverride, info));
+  m_OverrideMap->insert(mmuOverRideMap::value_type(classOverride, info));
 }
 
 //------------------------------------------------------------------------------
@@ -464,7 +445,7 @@ void mafObjectFactory::RegisterNewObject(const char* ObjectName, const char* des
 mafObject *mafObjectFactory::CreateObject(const char* classname)
 //------------------------------------------------------------------------------
 {
-  mafOverRideMap::iterator pos = m_OverrideMap->find(classname);
+  mmuOverRideMap::iterator pos = m_OverrideMap->find(classname);
   if ( pos != m_OverrideMap->end() )
   {
     return (*pos).second.m_CreateObject();
@@ -479,9 +460,9 @@ void mafObjectFactory::SetEnableFlag(bool flag,
                 const char* subclassName)
 //------------------------------------------------------------------------------
 {
-  mafOverRideMap::iterator start = m_OverrideMap->lower_bound(className);
-  mafOverRideMap::iterator end = m_OverrideMap->upper_bound(className);
-  for ( mafOverRideMap::iterator i = start; i != end; ++i )
+  mmuOverRideMap::iterator start = m_OverrideMap->lower_bound(className);
+  mmuOverRideMap::iterator end = m_OverrideMap->upper_bound(className);
+  for ( mmuOverRideMap::iterator i = start; i != end; ++i )
   {
     if ( (*i).second.m_OverrideWithName == subclassName )
     {
@@ -495,9 +476,9 @@ void mafObjectFactory::SetEnableFlag(bool flag,
 bool mafObjectFactory::GetEnableFlag(const char* className, const char* subclassName)
 //------------------------------------------------------------------------------
 {
-  mafOverRideMap::iterator start = m_OverrideMap->lower_bound(className);
-  mafOverRideMap::iterator end = m_OverrideMap->upper_bound(className);
-  for ( mafOverRideMap::iterator i = start; i != end; ++i )
+  mmuOverRideMap::iterator start = m_OverrideMap->lower_bound(className);
+  mmuOverRideMap::iterator end = m_OverrideMap->upper_bound(className);
+  for ( mmuOverRideMap::iterator i = start; i != end; ++i )
   {
     if ( (*i).second.m_OverrideWithName == subclassName )
     {
@@ -512,9 +493,9 @@ bool mafObjectFactory::GetEnableFlag(const char* className, const char* subclass
 void mafObjectFactory::Disable(const char* className)
 //------------------------------------------------------------------------------
 {
-  mafOverRideMap::iterator start = m_OverrideMap->lower_bound(className);
-  mafOverRideMap::iterator end = m_OverrideMap->upper_bound(className);
-  for ( mafOverRideMap::iterator i = start; i != end; ++i )
+  mmuOverRideMap::iterator start = m_OverrideMap->lower_bound(className);
+  mmuOverRideMap::iterator end = m_OverrideMap->upper_bound(className);
+  for ( mmuOverRideMap::iterator i = start; i != end; ++i )
     {
     (*i).second.m_EnabledFlag = 0;
     }
@@ -535,7 +516,7 @@ std::list<std::string> mafObjectFactory::GetClassOverrideNames()
 //------------------------------------------------------------------------------
 {
   std::list<std::string> ret;
-  for ( mafOverRideMap::iterator i = m_OverrideMap->begin();
+  for ( mmuOverRideMap::iterator i = m_OverrideMap->begin();
       i != m_OverrideMap->end(); ++i )
   {
     ret.push_back((*i).first);
@@ -550,7 +531,7 @@ std::list<std::string> mafObjectFactory::GetClassOverrideWithNames()
 //------------------------------------------------------------------------------
 {
   std::list<std::string> ret;
-  for ( mafOverRideMap::iterator i = m_OverrideMap->begin();
+  for ( mmuOverRideMap::iterator i = m_OverrideMap->begin();
       i != m_OverrideMap->end(); ++i )
   {
     ret.push_back((*i).second.m_OverrideWithName);
@@ -565,7 +546,7 @@ std::list<std::string> mafObjectFactory::GetClassOverrideDescriptions()
 //------------------------------------------------------------------------------
 { 
   std::list<std::string> ret;
-  for ( mafOverRideMap::iterator i = m_OverrideMap->begin();
+  for ( mmuOverRideMap::iterator i = m_OverrideMap->begin();
       i != m_OverrideMap->end(); ++i )
   {
     ret.push_back((*i).second.m_Description);
@@ -580,7 +561,7 @@ std::list<bool> mafObjectFactory::GetEnableFlags()
 //------------------------------------------------------------------------------
 {
   std::list<bool> ret;
-  for( mafOverRideMap::iterator i = m_OverrideMap->begin();
+  for( mmuOverRideMap::iterator i = m_OverrideMap->begin();
       i != m_OverrideMap->end(); ++i)
   {
     ret.push_back((*i).second.m_EnabledFlag);
@@ -592,7 +573,7 @@ std::list<bool> mafObjectFactory::GetEnableFlags()
 mafReferenceCounted *mafObjectFactory::GetFactoryArgs(const char *type_name)
 //------------------------------------------------------------------------------
 {
-  mafOverRideMap::iterator i=m_OverrideMap->find(type_name);
+  mmuOverRideMap::iterator i=m_OverrideMap->find(type_name);
   if (i!=m_OverrideMap->end())
   {
     return i->second.m_Args;
