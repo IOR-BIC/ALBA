@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-05 15:26:07 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-05-18 15:25:51 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -64,12 +64,20 @@ public:
   */
   void EnableSelect(bool enable);
 
+  wxTreeCtrl *GetTreeCtrl() {return m_tree;};
+  
+  /** Fill the given tree with a copy of this */
+  void FillTree(mmgCheckTree *tree);
+
+  /** clone in tree a subtree of source_item */
+  void CloneSubTree(mmgCheckTree *tree, wxTreeItemId *source_item, wxTreeItemId *dest_parent_item);
+
 protected:
   /** Update the vme nodes icon. */
   void VmeUpdateIcon(mafNode *n);
   
   /** Return the status of the node according to the vme visibility. */
-  int GetVmeStatus(mafNode *vme);
+  virtual int GetVmeStatus(mafNode *vme);
 
   /** retrieve the icon-index for a vme given the classname */
   int ClassNameToIcon(wxString classname);
