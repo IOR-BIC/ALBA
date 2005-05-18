@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooserAccept.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-13 16:15:38 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-18 16:15:41 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -30,11 +30,11 @@ class mafNode;
 //----------------------------------------------------------------------------
 // mmgVMEChooserAccept :
 //----------------------------------------------------------------------------
-class mmgVMEChooserAccept
+class mmgVmeChooserAccept
 {
 public:
-	 mmgVMEChooserAccept();
-	~mmgVMEChooserAccept();
+	 mmgVmeChooserAccept();
+	~mmgVmeChooserAccept();
   
   virtual bool Validate(mafNode *node);
 };
