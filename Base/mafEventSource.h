@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventSource.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 18:31:17 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-18 17:32:45 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,6 +15,8 @@
 // includes :
 //----------------------------------------------------------------------------
 #include "mafObject.h"
+#include <vector>
+
 //------------------------------------------------------------------------------
 // Forward declarations
 //------------------------------------------------------------------------------
@@ -67,6 +69,9 @@ public:
 
   /** return true if this class has observers */
   bool HasObservers();
+
+  /** return a vector with the list of observers of this event source */
+  void GetObservers(std::vector<mafObserver *> &olist);
 
   /** invoke an event of this subject */
   void InvokeEvent(mafEventBase &e);

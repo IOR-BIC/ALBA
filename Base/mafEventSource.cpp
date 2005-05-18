@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventSource.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 18:31:17 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-18 17:32:45 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -126,6 +126,19 @@ bool mafEventSource::HasObservers()
 //------------------------------------------------------------------------------
 {
   return !m_Observers->m_List.empty();
+}
+
+//------------------------------------------------------------------------------
+void mafEventSource::GetObservers(std::vector<mafObserver *> &olist)
+//------------------------------------------------------------------------------
+{
+  olist.clear();
+  olist.resize(m_Observers->m_List.size());
+  int i=0;
+  for (mafObserversListType::iterator it=m_Observers->m_List.begin();it!=m_Observers->m_List.end();it++,i++)
+  {
+    olist[i]=it->second;
+  }
 }
 
 //------------------------------------------------------------------------------
