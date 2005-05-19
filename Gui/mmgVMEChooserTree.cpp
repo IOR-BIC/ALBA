@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooserTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 16:15:55 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-19 11:33:48 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -52,7 +52,7 @@ mmgVMEChooserTree::mmgVMEChooserTree( wxWindow *parent, mmgCheckTree *tree, long
   
   InitializeImageList();
 
-  tree->FillTree(this);
+  CloneSubTree(tree, &tree->GetTree()->GetRootItem(), (wxTreeItemId *)NULL);
 }
 //----------------------------------------------------------------------------
 mmgVMEChooserTree::~mmgVMEChooserTree()
@@ -169,4 +169,38 @@ void mmgVMEChooserTree::OnIconClick(wxTreeItemId item)
 void mmgVMEChooserTree::ShowContextualMenu(wxMouseEvent& event)
 //----------------------------------------------------------------------------
 {
+}
+//----------------------------------------------------------------------------
+void mmgVMEChooserTree::CloneSubTree(mmgCheckTree *tree, wxTreeItemId *source_item, wxTreeItemId *dest_parent_item)
+//----------------------------------------------------------------------------
+{
+  wxString  text  = tree->GetTree()->GetItemText(*source_item);
+  long      node  = tree->NodeFromItem(*source_item);
+  int       image = GetVmeStatus((mafNode *)node);
+
+  wxTreeItemId current_item;
+  bool         expanded = tree->GetTree()->IsExpanded(*source_item);
+
+  if (dest_parent_item == NULL)
+  {
+    m_tree->DeleteAllItems();
+    current_item = m_tree->AddRoot(text,image,image, new mmgTreeItemData(node));
+  }
+  else
+  {
+    current_item = m_tree->AppendItem(*dest_parent_item,text,image,image, new mmgTreeItemData(node));
+  }
+
+  long cookie = 0;
+  wxTreeItemId child = tree->GetTree()->GetFirstChild(*source_item, cookie);
+  while( child.IsOk() )
+  {
+    CloneSubTree(tree, &child, &current_item);
+    child = tree->GetTree()->GetNextChild(*source_item, cookie); 
+  }
+
+  if(expanded) 
+    m_tree->Expand(current_item); 
+  else 
+    m_tree->Collapse(current_item);
 }

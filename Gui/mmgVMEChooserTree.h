@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooserTree.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 16:15:55 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-19 11:33:48 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -42,6 +42,9 @@ protected:
   int GetVmeStatus(mafNode *node);
 
   void InitializeImageList();
+
+  /** clone in tree a subtree of source_item */
+  void CloneSubTree(mmgCheckTree *tree, wxTreeItemId *source_item, wxTreeItemId *dest_parent_item);
 
   /** Called by the Custom-Tree-Event-Handler - via OnMouseDown*/
   void OnIconClick(wxTreeItemId item);
