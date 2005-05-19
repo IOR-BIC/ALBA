@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTestVMEChooser.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-19 11:34:48 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-19 13:37:14 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -55,7 +55,9 @@ void mmoTestVMEChooser::OpStop(int result)
 enum VME_CHOOSER_WIDGET_ID
 {
   ID_VME_CHOOSER = MINID,
+  ID_VME_CHOOSER_FLAT,
   CHOSE_WITH_ACCEPT,
+  CHOSE_WITH_ACCEPT_AND_FLAT
 };
 //----------------------------------------------------------------------------
 void mmoTestVMEChooser::OpRun()
@@ -67,7 +69,10 @@ void mmoTestVMEChooser::OpRun()
   m_Gui->SetListener(this);
 
   m_Gui->Button(ID_VME_CHOOSER, "Choose VME");
-  m_Gui->Button(CHOSE_WITH_ACCEPT, "Choose 'vme generic 1'");
+  m_Gui->Button(ID_VME_CHOOSER_FLAT, "Choose Flat");
+  m_Gui->Button(CHOSE_WITH_ACCEPT, "Accept 'vme generic 1'");
+  m_Gui->Button(CHOSE_WITH_ACCEPT_AND_FLAT, "Accept Flat");
+  m_Gui->Divider();
   m_Gui->OkCancel();
 
   ShowGui();
@@ -93,6 +98,12 @@ void mmoTestVMEChooser::OnEvent(mafEventBase *event)
         m_ChoosedNode = e->GetVme();
       }
       break;
+      case ID_VME_CHOOSER_FLAT:
+        e->SetId(VME_CHOOSE);
+        e->SetBool(true);
+        mafEventMacro(*e);
+        m_ChoosedNode = e->GetVme();
+      break;
       case CHOSE_WITH_ACCEPT:
       {
         mafString title = "Choose 'vme generic 1'";
@@ -103,6 +114,17 @@ void mmoTestVMEChooser::OnEvent(mafEventBase *event)
         m_ChoosedNode = e->GetVme();
       }
       break;
+      case CHOSE_WITH_ACCEPT_AND_FLAT:
+        {
+          mafString title = "Choose 'vme generic 1'";
+          e->SetId(VME_CHOOSE);
+          e->SetString(&title);
+          e->SetArg((long)m_NodeAccept);
+          e->SetBool(true);
+          mafEventMacro(*e);
+          m_ChoosedNode = e->GetVme();
+        }
+        break;
       default:
         mafEventMacro(*e);
       break;
