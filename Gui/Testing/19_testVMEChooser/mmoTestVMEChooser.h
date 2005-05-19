@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTestVMEChooser.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 15:27:20 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-19 11:34:48 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,6 +15,9 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafOp.h"
+#include "mmgVmeChooserAccept.h"
+#include "mafNode.h"
+
 //----------------------------------------------------------------------------
 // Forward Refs:
 //----------------------------------------------------------------------------
@@ -35,6 +38,17 @@ public:
   void OpRun();
   void OpDo();
   void OpUndo();
+
+  class mafNodeAccept : public mmgVmeChooserAccept
+  {
+  public:
+
+    mafNodeAccept() {};
+    ~mafNodeAccept() {};
+
+    bool Validate(mafNode *node) {return(node != NULL && strcmp(node->GetName(),"vme generic 1") == 0);};
+  };
+  mafNodeAccept *m_NodeAccept;
 
 protected:
   void OpStop(int result);

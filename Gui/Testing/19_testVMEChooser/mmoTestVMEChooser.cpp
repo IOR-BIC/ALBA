@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTestVMEChooser.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 15:27:20 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-19 11:34:48 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,7 +22,6 @@
 #include "mmoTestVMEChooser.h"
 #include "mmgGui.h"
 #include "mmgVMEChooserTree.h"
-#include "mafNode.h"
 
 //----------------------------------------------------------------------------
 mmoTestVMEChooser::mmoTestVMEChooser(wxString label)
@@ -44,7 +43,9 @@ mafOp* mmoTestVMEChooser::Copy()
 //----------------------------------------------------------------------------
 void mmoTestVMEChooser::OpStop(int result)
 //----------------------------------------------------------------------------
- {	
+ {
+   delete m_NodeAccept;
+
    HideGui();
    mafEventMacro(mafEvent(this,result));
  }
@@ -54,15 +55,19 @@ void mmoTestVMEChooser::OpStop(int result)
 enum VME_CHOOSER_WIDGET_ID
 {
   ID_VME_CHOOSER = MINID,
+  CHOSE_WITH_ACCEPT,
 };
 //----------------------------------------------------------------------------
 void mmoTestVMEChooser::OpRun()
 //----------------------------------------------------------------------------
 {
+  m_NodeAccept = new mafNodeAccept();
+  
   m_Gui = new mmgGui(this);
   m_Gui->SetListener(this);
 
   m_Gui->Button(ID_VME_CHOOSER, "Choose VME");
+  m_Gui->Button(CHOSE_WITH_ACCEPT, "Choose 'vme generic 1'");
   m_Gui->OkCancel();
 
   ShowGui();
@@ -84,6 +89,16 @@ void mmoTestVMEChooser::OnEvent(mafEventBase *event)
       case ID_VME_CHOOSER:
       {
         e->SetId(VME_CHOOSE);
+        mafEventMacro(*e);
+        m_ChoosedNode = e->GetVme();
+      }
+      break;
+      case CHOSE_WITH_ACCEPT:
+      {
+        mafString title = "Choose 'vme generic 1'";
+        e->SetId(VME_CHOOSE);
+        e->SetString(&title);
+        e->SetArg((long)m_NodeAccept);
         mafEventMacro(*e);
         m_ChoosedNode = e->GetVme();
       }
