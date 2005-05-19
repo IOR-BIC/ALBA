@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 15:25:51 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-05-19 11:33:30 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -397,45 +397,4 @@ void mmgCheckTree::OnSelectionChanged(wxTreeEvent& event)
   if(i.IsOk())
     mafEventMacro(mafEvent(this, VME_SELECT, NodeFromItem(i)));
   event.Skip();
-}
-//----------------------------------------------------------------------------
-void mmgCheckTree::FillTree(mmgCheckTree *tree)
-//----------------------------------------------------------------------------
-{
-  CloneSubTree(tree, &m_tree->GetRootItem(), (wxTreeItemId *)NULL);
-}
-//----------------------------------------------------------------------------
-void mmgCheckTree::CloneSubTree(mmgCheckTree *tree, wxTreeItemId *source_item, wxTreeItemId *dest_parent_item)
-//----------------------------------------------------------------------------
-{
-  wxString     text  = m_tree->GetItemText(*source_item);
-  //int          image = m_tree->GetItemImage(*source_item);
-  long node   = NodeFromItem(*source_item);
-  int image   = tree->GetVmeStatus((mafNode *)node);
- 
-  wxTreeItemId current_item;
-  bool         expanded = m_tree->IsExpanded(*source_item);
-
-  if (dest_parent_item == NULL)
-  {
-    tree->GetTreeCtrl()->DeleteAllItems();
-    current_item = tree->GetTreeCtrl()->AddRoot(text,image,image, new mmgTreeItemData(node));
-  }
-  else
-  {
-    current_item = tree->GetTreeCtrl()->AppendItem(*dest_parent_item,text,image,image, new mmgTreeItemData(node));
-  }
-  
-  long cookie = 0;
-  wxTreeItemId child = m_tree->GetFirstChild(*source_item, cookie);
-  while( child.IsOk() )
-  {
-    CloneSubTree(tree, &child, &current_item);
-    child = m_tree->GetNextChild(*source_item, cookie); 
-  }
-
-  if(expanded) 
-    tree->GetTreeCtrl()->Expand(current_item); 
-  else 
-    tree->GetTreeCtrl()->Collapse(current_item);
 }
