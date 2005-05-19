@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 16:27:45 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-19 16:27:39 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -101,8 +101,14 @@ public:
   /** Get an avatar given its name.*/
   mafAvatar *GetAvatar(const char *name);
 
+  typedef std::map<mafString,mafAutoPointer<mafAvatar> > mmuAvatarsMap;
+  typedef std::vector<mafAvatar *> mmuAvatarsVector;
+
   /** Return the avatars container */
-  std::map<mafString,mafAutoPointer<mafAvatar> > &GetAvatars();
+  const mmuAvatarsMap &GetAvatars();
+
+  /** return an array with the list of avatars currently connected */
+  void GetAvatars(mmuAvatarsVector *avatars);
 
   /** Get an action router.*/
   mafAction *GetAction(const char *name);
@@ -121,7 +127,7 @@ public:
   /** 
   Return the renderer of the currently selected view,
   if its a VTK based view otherwise return NULL.*/
-  vtkRenderer *GetCurrentRenderer() {return CurrentRenderer;}
+  vtkRenderer *GetCurrentRenderer() {return m_CurrentRenderer;}
 
   /** used to propagate PreReset camera event */
   void PreResetCamera(vtkRenderer *ren);
@@ -167,7 +173,7 @@ public:
 	void CameraFlyToMode();
 
   /** return the minimum time to elapse between two subsequent renderings */
-  void GetIntraFrameTime() {return m_IntraFrameTime;}
+  mafTimeStamp GetIntraFrameTime() {return m_IntraFrameTime;}
   /** set the minimum time to elapse between two subsequent renderings */
   void SetIntraFrameTime(mafTimeStamp iftime) {m_IntraFrameTime=iftime;}
 
@@ -189,27 +195,27 @@ protected:
   virtual void OnAddAvatar(mafEventBase *event);
   virtual void OnRemoveAvatar(mafEventBase *event);
   
-  mafDeviceManager        *m_DeviceManager; 
-  mmiPER                  *m_PositionalEventRouter;
-  mmiSER                  *m_StaticEventRouter;
+  mafAutoPointer<mafDeviceManager>    m_DeviceManager; 
+  mafAutoPointer<mmiPER>              m_PositionalEventRouter;
+  mafAutoPointer<mmiSER>              m_StaticEventRouter;
   
-  std::map<mafString,mafAutoPointer<mafAvatar> >   m_Avatars; ///< keeps a list of visible avatars
-  std::list<mmiPER *>                               m_PERList; ///< the interactor devoted to Positional Event Routing
+  mmuAvatarsMap                       m_Avatars; ///< keeps a list of visible avatars
+  std::list<mafAutoPointer<mmiPER> >  m_PERList; ///< the interactor devoted to Positional Event Routing
 
-  std::set<mafView *>                               m_CameraUpdateRequests; ///< requests for Camera update of single views
+  std::set<mafView *>                 m_CameraUpdateRequests; ///< requests for Camera update of single views
   
-  mafView*                                          m_SelectedView;     ///< the view currently selected
-  vtkRenderer*                                      m_CurrentRenderer;  ///< the renderer of selected view: to be removed!
-  int                                               m_LockRenderingFlag;///< 
-  mafTimeStamp                                      m_LastRenderTime;   ///< used to avoid overloading of the GUI process due to rendering
-  mafTimeStamp                                      m_IntraFrameTime;   ///< the minimum time to elapse between two subsequent renderings
+  mafView*                            m_SelectedView;     ///< the view currently selected
+  vtkRenderer*                        m_CurrentRenderer;  ///< the renderer of selected view: to be removed!
+  int                                 m_LockRenderingFlag;///< 
+  mafTimeStamp                        m_LastRenderTime;   ///< used to avoid overloading of the GUI process due to rendering
+  mafTimeStamp                        m_IntraFrameTime;   ///< the minimum time to elapse between two subsequent renderings
 
 private:
   /** hidden to not be called directly */
-  int Store(mafStorageElement *element) {return Superclass::Store(element);}
+  int Store(mafStorageElement *element) {return mafStorable::Store(element);}
   
   /** hidden to not be called directly */
-  int Restore(mafStorageElement *element) {return Superclass::Restore(element);}
+  int Restore(mafStorageElement *element) {return mafStorable::Restore(element);}
 };
 
 #endif 

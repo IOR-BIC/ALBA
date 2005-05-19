@@ -2,19 +2,21 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiConstraint.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 15:42:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-19 16:27:40 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-#include "mmiConstraint.h"
-#include "vtkObjectFactory.h"
 
-#include "mflSmartPointer.h"
-#include "mflMatrixPipeDirectCinematic.h"
-#include "vtkMatrixToLinearTransform.h"
+// include this first to avoid compilation errors in wxWindows
+#include "mafDefines.h"
+
+#include "mmiConstraint.h"
+#include "mafAbsMatrixPipe.h"
+#include "mafIndent.h"
+
 #include "vtkDoubleArray.h"
 #include <assert.h>
 
@@ -22,7 +24,7 @@
 mmiConstraint::mmiConstraint()
 //------------------------------------------------------------------------------
 {
-  RefSys = new mafRefSys;
+  m_RefSys = new mafRefSys;
   Reset();
 }
 
@@ -30,24 +32,24 @@ mmiConstraint::mmiConstraint()
 mmiConstraint::~mmiConstraint()
 //------------------------------------------------------------------------------
 {
-  delete RefSys; RefSys = NULL;
+  delete m_RefSys; m_RefSys = NULL;
 }
 
 //----------------------------------------------------------------------------
 mmiConstraint::mmiConstraint(const mmiConstraint& source)
 //----------------------------------------------------------------------------
 {
-  RefSys = new mafRefSys;
+  m_RefSys = new mafRefSys;
   Reset();
-  *RefSys=*(source.RefSys);
+  *m_RefSys=*(source.m_RefSys);
 
   for (int j = 0; j < 3; j++)
   {
-    ConstraintModality[j] = source.ConstraintModality[j];
-    LowerBound[j] = source.LowerBound[j];
-    Min[j] = source.Min[j];
-    Max[j] = source.Max[j];  
-    SnapArray[j]=source.SnapArray[j];
+    m_ConstraintModality[j] = source.m_ConstraintModality[j];
+    m_LowerBound[j] = source.m_LowerBound[j];
+    m_Min[j] = source.m_Min[j];
+    m_Max[j] = source.m_Max[j];  
+    m_SnapArray[j]=source.m_SnapArray[j];
   }
 }
 
@@ -57,120 +59,120 @@ void mmiConstraint::Reset()
 {
   for (int j = 0; j < 3; j++)
   {
-    ConstraintModality[j] = FREE;
-    LowerBound[j] = 0;
-    Min[j] = Max[j] = Step[j] = 0;  
-    SnapArray[j]=NULL;
+    m_ConstraintModality[j] = FREE;
+    m_LowerBound[j] = 0;
+    m_Min[j] = m_Max[j] = m_Step[j] = 0;  
+    m_SnapArray[j]=NULL;
   }
 
-  RefSys->Reset();
+  m_RefSys->Reset();
 }
 
 //----------------------------------------------------------------------------
 void mmiConstraint::SetRefSys(mafRefSys *ref_sys)
 //----------------------------------------------------------------------------
 {
-  RefSys->DeepCopy(ref_sys);
+  m_RefSys->DeepCopy(ref_sys);
 }
 
 //----------------------------------------------------------------------------
 void mmiConstraint::SetRefSys(mafRefSys &ref_sys)
 //----------------------------------------------------------------------------
 {
-  *RefSys=ref_sys;
+  *m_RefSys=ref_sys;
 }
 
 //----------------------------------------------------------------------------
 void mmiConstraint::SetConstraintModality(int constraintModalityOnX, int constraintModalityOnY, int constraintModalityOnZ)
 //----------------------------------------------------------------------------
 {
-  ConstraintModality[X] = constraintModalityOnX;
-  ConstraintModality[Y] = constraintModalityOnY;
-  ConstraintModality[Z] = constraintModalityOnZ; 
+  m_ConstraintModality[X] = constraintModalityOnX;
+  m_ConstraintModality[Y] = constraintModalityOnY;
+  m_ConstraintModality[Z] = constraintModalityOnZ; 
 }
 
 //----------------------------------------------------------------------------
 void mmiConstraint::SetConstraintModality(int axis, int constraintModality)
 //------------------------------------------------------------------------------
 {
-  ConstraintModality[axis] = constraintModality;
+  m_ConstraintModality[axis] = constraintModality;
 }
 
 //----------------------------------------------------------------------------
 int mmiConstraint::GetConstraintModality(int axis)
 //------------------------------------------------------------------------------
 {
-  return ConstraintModality[axis];
+  return m_ConstraintModality[axis];
 }
   
 //----------------------------------------------------------------------------
 void mmiConstraint::SetLowerBound(int axis, double lbound)
 //------------------------------------------------------------------------------
 {
-  LowerBound[axis] = lbound;
+  m_LowerBound[axis] = lbound;
 }
 
 //----------------------------------------------------------------------------
 double mmiConstraint::GetLowerBound(int axis)
 //------------------------------------------------------------------------------
 {
-  return LowerBound[axis];
+  return m_LowerBound[axis];
 }
 
 //----------------------------------------------------------------------------  
 void mmiConstraint::SetUpperBound(int axis, double ubound)
 //------------------------------------------------------------------------------
 {
-  UpperBound[axis] = ubound;
+  m_UpperBound[axis] = ubound;
 } 
 
 //----------------------------------------------------------------------------    
 double mmiConstraint::GetUpperBound(int axis)
 //------------------------------------------------------------------------------
 {
-  return UpperBound[axis];
+  return m_UpperBound[axis];
 }
 
 //----------------------------------------------------------------------------
 void mmiConstraint::SetMin(int axis, double min)
 //------------------------------------------------------------------------------
 {
-  Min[axis] = min;
+  m_Min[axis] = min;
 }
 
 //----------------------------------------------------------------------------
 double mmiConstraint::GetMin(int axis)
 //------------------------------------------------------------------------------
 {
-  return Min[axis];
+  return m_Min[axis];
 }
 
 //---------------------------------------------------------------------------- 
 void mmiConstraint::SetMax(int axis, double max)
 //------------------------------------------------------------------------------
 {
-  Max[axis] = max;
+  m_Max[axis] = max;
 }
 
 //----------------------------------------------------------------------------      
 double mmiConstraint::GetMax(int axis)
 //------------------------------------------------------------------------------
 {
-  return Max[axis];
+  return m_Max[axis];
 }
 
 //---------------------------------------------------------------------------- 
 void mmiConstraint::SetStep(int axis, double step)
 //------------------------------------------------------------------------------
 {
-  Step[axis] = step;
+  m_Step[axis] = step;
 } 
 
 //----------------------------------------------------------------------------      
 double mmiConstraint::GetStep(int axis)
 //------------------------------------------------------------------------------
 {
-  return Step[axis];
+  return m_Step[axis];
 }
 
 //----------------------------------------------------------------------------      
@@ -179,7 +181,7 @@ void mmiConstraint::SetSnapArray(int axis, vtkDoubleArray *array)
 {
   assert( array );
   assert( axis>=X && axis <=Z );
-  SnapArray[axis]=array;
+  m_SnapArray[axis]=array;
 }   
 
 //----------------------------------------------------------------------------      
@@ -187,7 +189,7 @@ vtkDoubleArray *mmiConstraint::GetSnapArray(int axis)
 //------------------------------------------------------------------------------
 {
   assert( axis>=X && axis <=Z );
-  return SnapArray[axis];
+  return m_SnapArray[axis];
 }
 
 //----------------------------------------------------------------------------
@@ -197,7 +199,7 @@ int mmiConstraint::GetNumberOfDOF()
   int ndof = 0;
   for (int j = 0; j < 3; j++)
   {
-    if (ConstraintModality[j] != LOCK)
+    if (m_ConstraintModality[j] != LOCK)
     {
       ndof++;
     }
@@ -213,7 +215,7 @@ int mmiConstraint::GetConstraintAxis()
   {
     for (int j = 0; j < 3; j++)
     {
-      if (ConstraintModality[j] != LOCK)
+      if (m_ConstraintModality[j] != LOCK)
       {
         return j;
       }
@@ -223,17 +225,18 @@ int mmiConstraint::GetConstraintAxis()
 }
 
 //----------------------------------------------------------------------------
-void mmiConstraint::PrintSelf(ostream& os, vtkIndent indent)
+void mmiConstraint::Print(std::ostream& os, const int tabs)
 //----------------------------------------------------------------------------
 {
   // To be completed
   int j;
+  mafIndent indent(tabs);
 
-  os << indent << "ConstraintModality:\n";
+  os << indent << "m_ConstraintModality:\n";
   os << indent << indent;
   for (j = 0; j < 3; j++) 
   {
-    os << ConstraintModality[j] << " ";
+    os << m_ConstraintModality[j] << " ";
   }
   os << "\n";
 }
@@ -277,7 +280,7 @@ int mmiConstraint::GetConstraintPlane()
     int axesStatus[3] = {AXIS_BLOCKED, AXIS_BLOCKED, AXIS_BLOCKED};
     for (int axisID = 0; axisID < 3; axisID++)
     {
-      if (ConstraintModality[axisID] != LOCK)
+      if (m_ConstraintModality[axisID] != LOCK)
       {
         axesStatus[axisID] = AXIS_ALLOWED;
       }   
@@ -311,7 +314,7 @@ int mmiConstraint::GetConstraintPlaneAxes(int& axis1, int& axis2)
     int axesStatus[3] = {AXIS_BLOCKED, AXIS_BLOCKED, AXIS_BLOCKED};
     for (int axisID = 0; axisID < 3; axisID++)
     {
-      if (ConstraintModality[axisID] != LOCK)
+      if (m_ConstraintModality[axisID] != LOCK)
       {
         axesStatus[axisID] = AXIS_ALLOWED;
       }   

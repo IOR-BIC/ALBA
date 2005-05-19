@@ -2,47 +2,21 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdTrackerSet.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:57 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-19 16:27:40 $
+  Version:   $Revision: 1.2 $
   Authors:   Michele Diegoli & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-// To be included first because of wxWindows
-#ifdef __GNUG__
-    #pragma implementation "mmdTrackerSet.cpp"
-#endif
-
-// For compilers that support precompilation, includes "wx/wx.h".
-#include "wx/wxprec.h"
 
 #include "mmdTrackerSet.h"
 #include "mmdTracker.h"
-#include "mflTransform.h"
-#include "vtkTemplatedList.txx"
-
-#include "vtkObjectFactory.h"
-
-#define NUMBER_OF_VERTEX_FOR_SCREEN_PLANE 2
-
-
-//------------------------------------------------------------------------------
-vtkStandardNewMacro(mmdTrackerSet)
+#include "mafTransform.h"
 
 //------------------------------------------------------------------------------
 mmdTrackerSet::mmdTrackerSet()
 {  
-}
-
-//------------------------------------------------------------------------------
-mmdTrackerSet::~mmdTrackerSet()
-//------------------------------------------------------------------------------
-{
-  if (this->Initialized)
-  { 
-    this->RemoveAllDevices();
-  } 
 }
 
 //------------------------------------------------------------------------------

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceSet.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 17:29:04 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-05-19 16:27:38 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -178,6 +178,7 @@ void mafDeviceSet::AddDevice(mafDevice *device)
   assert (device->GetName()); // all devices must have a name
   m_DevicesMutex->Lock();
   m_Devices.push_back(device);
+  device->Register(this);
   device->SetListener(this);
   device->PlugEventSource(this,MCH_DOWN);
   m_DevicesMutex->Unlock();
@@ -327,11 +328,10 @@ void mafDeviceSet::RemoveAllDevices(bool force)
   m_DevicesMutex->Lock();
 
   // Remove All (non-persistent) devices
-  for (std::list<mafDevice*>::iterator it=m_Devices.begin();it!=m_Devices.end();it++)
+  std::list<mafDevice*>::iterator it;
+  for (it=m_Devices.begin();it!=m_Devices.end();it++)
   {
     mafDevice *device=*it;
-    //it++;
-    //mafDevice *next_device=*it;
 
     // do not remove persistent devices if not forced
     if (device->IsPersistent()&&!force)
@@ -341,10 +341,21 @@ void mafDeviceSet::RemoveAllDevices(bool force)
     InvokeEvent(DEVICE_REMOVING,MCH_UP,device);
     
     device->Delete();
+    *it=NULL;
   }
   
-  m_Devices.clear();
+  // remove cleaned nodes
+  std::list<mafDevice*>::iterator next_it;
 
+  for (it=m_Devices.begin();it!=m_Devices.end();it=next_it)
+  {
+    next_it=it;
+    next_it++;
+
+    if (*it==NULL)
+      m_Devices.erase(it);
+  }
+  
   m_DevicesMutex->Unlock();
 }
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 17:29:04 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-19 16:27:39 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -49,7 +49,7 @@
 #include <set>
 #include <assert.h>
 
-#define MIF_VERSION "2.0"
+#define MIS_VERSION "2.0"
 
 #define DEFAULT_INTRA_FRAME_TIME 0.02 
 
@@ -129,7 +129,7 @@ void mafInteractionManager::SetPER(mmiPER *per)
     m_PositionalEventRouter->SetListener(NULL);
   }
 
-  vtkSetObjectBodyMacro(m_PositionalEventRouter,mmiPER,per);
+  m_PositionalEventRouter = per;
 
   // bind new PER
   m_PositionalEventRouter->SetName("m_PositionalEventRouter");
@@ -142,18 +142,22 @@ void mafInteractionManager::PushPER(mmiPER *per)
 //----------------------------------------------------------------------------
 {
   mmiPER *old_per=GetPER();
-  m_PERList.AppendItem(old_per);
+  m_PERList.push_back(old_per);
   SetPER(per);
 }
 //----------------------------------------------------------------------------
 bool mafInteractionManager::PopPER()
 //----------------------------------------------------------------------------
 {
-  mmiPER *old_per=m_PERList.GetItem(m_PERList.GetNumberOfItems()-1);
-  if (old_per)
+  // retrieve and delete last item
+  mafAutoPointer<mmiPER> old_per=*(m_PERList.rbegin());
+  m_PERList.pop_back(); 
+
+  assert(old_per); // should always be != NULL
+
+  if (old_per) // if not NULL
   {
     SetPER(old_per);
-    m_PERList.RemoveItem(old_per);
     return true;
   }
   
@@ -163,7 +167,8 @@ bool mafInteractionManager::PopPER()
 void mafInteractionManager::CameraFlyToMode()   
 //----------------------------------------------------------------------------
 {
-  if(m_PositionalEventRouter) m_PositionalEventRouter->FlyToMode();
+  if(m_PositionalEventRouter)
+    m_PositionalEventRouter->FlyToMode();
 }
 
 //------------------------------------------------------------------------------
@@ -178,12 +183,6 @@ mmdMouse *mafInteractionManager::GetMouseDevice()
 //------------------------------------------------------------------------------
 {
   return mmdMouse::SafeDownCast(m_DeviceManager->GetDevice("Mouse"));
-}
-//------------------------------------------------------------------------------
-mafAction *mafInteractionManager::GetMouseAction()
-//------------------------------------------------------------------------------
-{
-  return m_StaticEventRouter->GetAction("Mouse");
 }
 
 //------------------------------------------------------------------------------
@@ -215,10 +214,23 @@ mafAction *mafInteractionManager::GetAction(const char *name)
 }
 
 //------------------------------------------------------------------------------
-vtkTemplatedMap<wxString,mafAvatar> &mafInteractionManager::GetAvatars()
+const mafInteractionManager::mmuAvatarsMap &mafInteractionManager::GetAvatars()
 //------------------------------------------------------------------------------
 {
   return m_Avatars;
+}
+
+//------------------------------------------------------------------------------
+void mafInteractionManager::GetAvatars(mmuAvatarsVector *avatars)
+//------------------------------------------------------------------------------
+{
+  avatars->clear();
+  avatars->resize(m_Avatars.size());
+  int i=0;
+  for (mafInteractionManager::mmuAvatarsVector::iterator it=m_Avatars.begin();it!=m_Avatars.end();it++,i++)
+  {
+    avatars[i]=it->second;
+  }
 }
 
 //------------------------------------------------------------------------------

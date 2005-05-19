@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdTracker.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 17:29:05 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-05-19 16:27:39 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -263,7 +263,7 @@ void mmdTracker::SetLastPoseMatrix(const mafMatrix &matrix)
 
     // update current matrix
     *m_LastPoseMatrix=matrix;
-    m_LastPoseMatrix->SetTimeStamp(vtkTimerLog::GetTimeStamp()); // set the time stamp to the current time
+    m_LastPoseMatrix->SetTimeStamp(vtkTimerLog::GetCurrentTime()); // set the time stamp to the current time
 
     mafEventInteraction move_event(this,TRACKER_3D_MOVE,m_LastPoseMatrix);    
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRefSys.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 17:29:07 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-19 16:27:39 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -173,13 +173,16 @@ public:
   DeepCopy the source matrix into the target. The target is the object
   invoking the DeepCopy method */
   void DeepCopy(const mafRefSys *source);
+
+  /** Reset the class to default value.*/
+  void Reset();
   
 protected:
 
-  /** Reset the class to default value.*/
+  /** internally used to set default values */
   void Initialize();
 
-  mafAutoPointer<mafTransformBase>    m_Identity;  
+  mafAutoPointer<mafTransform>        m_Identity;  
   mafAutoPointer<mafTransformBase>    m_Transform;///< the ref sys matrix
   vtkRenderer*                        m_Renderer; ///< ref sys renderer
   mafAutoPointer<mafVME>              m_VME;     ///< reference to VME

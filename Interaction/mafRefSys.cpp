@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRefSys.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 17:29:07 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-19 16:27:39 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -68,6 +68,7 @@ mafRefSys::mafRefSys(vtkRenderer *ren)
 mafRefSys::~mafRefSys()
 //------------------------------------------------------------------------------
 {
+  mafDEL(m_Identity);
   vtkDEL(m_Renderer);
 }
 
@@ -97,11 +98,19 @@ void mafRefSys::DeepCopy(const mafRefSys *source)
 void mafRefSys::Initialize()
 //----------------------------------------------------------------------------
 {
-  m_Identity = mafTransform::New();
+  mafNEW(m_Identity);
   SetTypeToGlobal();
   m_Renderer  = NULL; 
   m_Transform = NULL;
   m_VME       = NULL;
+}
+
+//----------------------------------------------------------------------------
+void mafRefSys::Reset()
+//----------------------------------------------------------------------------
+{
+  mafDEL(m_Identity);
+  Initialize();
 }
 
 //----------------------------------------------------------------------------
@@ -118,13 +127,20 @@ mafTransformBase *mafRefSys::GetTransform()
   switch (m_Type)
   {
   case CUSTOM:
-    return m_Transform.GetPointer()?m_Transform.GetPointer():m_Identity;
+    return m_Transform.GetPointer()?m_Transform.GetPointer():m_Identity.GetPointer();
   case GLOBAL: 
     return m_Identity;
   case PARENT: 
-    return (m_VME&&m_VME->GetParent()?m_VME->GetParent()->GetAbsMatrixPipe():m_Identity);
+    if (m_VME && m_VME->GetParent())
+    {
+      return m_VME->GetParent()->GetAbsMatrixPipe();
+    }
+    return m_Identity;    
   case LOCAL:
-    return m_VME.GetPointer()?m_VME->GetAbsMatrixPipe():m_Identity;
+    if (m_VME.GetPointer())
+      return m_VME->GetAbsMatrixPipe();
+    
+    return m_Identity;
   case VIEW:
     /*
     if (m_Renderer)

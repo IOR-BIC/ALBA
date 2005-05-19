@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiConstraint.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 15:42:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-19 16:27:40 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,13 +13,12 @@
 #define __mmiConstraint_h
 
 #include "mafRefSys.h"
-#include "mflSmartPointer.h"
+#include "vtkMAFSmartPointer.h"
+#include <vector>
 
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-
-class mflMatrixPipeDirectCinematic;
 class vtkDoubleArray;
 
 //----------------------------------------------------------------------------
@@ -29,7 +28,7 @@ class vtkDoubleArray;
   used for constrained interaction. 
   The stored reference system is used as pivot reference system ie:
 
-  - during translation with snap the RefSys position is the point to be snapped in vme
+  - during translation with snap the m_RefSys position is the point to be snapped in vme
   local coordinates system
 
   - during rotation the RefSys is the rotation reference system ie its position is the 
@@ -194,7 +193,7 @@ public:
   
   /** Get the constraint reference system, i.e. the refsys to which the
   transform will be constrained also known as Pivot reference system. */
-  mafRefSys *GetRefSys() {return RefSys;}
+  mafRefSys *GetRefSys() {return m_RefSys;}
 
   /** Copy the contents of another RefSys into the contraint one*/
   void SetRefSys(mafRefSys *ref_sys);
@@ -203,29 +202,29 @@ public:
   //----------------------------------------------------------------------------
 
   /** Debug printing of internal data */
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void Print(std::ostream& os, const int tabs);
 
   void DeepCopy(const mmiConstraint *source) { *this=*source;}
 
 protected:
 
   /** the constraint reference system*/
-  mafRefSys *RefSys;
+  mafRefSys *m_RefSys;
   
   /** Register constraint modality for each axis*/
-  int ConstraintModality[3];
+  int m_ConstraintModality[3];
 
   /** Bounds modality parameters*/
-  double LowerBound[3];
-  double UpperBound[3];
+  double m_LowerBound[3];
+  double m_UpperBound[3];
 
   /** Snap step modality parameters*/
-  double Min[3];
-  double Max[3];
-  double Step[3];
+  double m_Min[3];
+  double m_Max[3];
+  double m_Step[3];
 
   /** Snap array modality*/
-  mflAutoPointer<vtkDoubleArray> SnapArray[3];
+  vtkMAFAutoPointer<vtkDoubleArray> m_SnapArray[3];
   
 };
 

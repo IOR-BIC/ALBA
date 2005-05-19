@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdTrackerSet.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:57 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-19 16:27:40 $
+  Version:   $Revision: 1.2 $
   Authors:   Michele Diegoli & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,14 +12,6 @@
 
 #ifndef __mmdTrackerSet_h
 #define __mmdTrackerSet_h
-
-#ifdef __GNUG__
-    #pragma interface "mmdTrackerSet.cpp"
-#endif
-
-#ifndef WX_PRECOMP
-    #include "wx/wx.h"
-#endif
 
 #include "mafDeviceSet.h"
 
@@ -31,8 +23,8 @@ class vtkPlaneSource;
 
 /** class for managing multiple tracker device
   This class manages multiple track device, e.g. tracker devices producing
-  multiple pose matrixes. Each pose matrix stream is identified as a "subdevice".
-  Subdevices should be created in the InternalInitialize.
+  multiple pose matrices. Each pose matrix stream is identified as a "sub device".
+  Sub devices should be created in the InternalInitialize.
   @sa  mmdTracker mafDevice mflDispatcher mflAgent mflEvent
   @todo
   - add support for setting tracked volume for all sub-trackers
@@ -43,35 +35,27 @@ public:
   //------------------------------------------------------------------------------
   // Events
   //------------------------------------------------------------------------------
-  MFL_EVT_DEC(AddDeviceEvent);
-  MFL_EVT_DEC(RemoveDeviceEvent);
+  MAF_ID_DEC(DEVICE_ADD);
+  MAF_ID_DEC(DEVICE_REMOVE);
 
-  static mmdTrackerSet *New();
-  vtkTypeMacro(mmdTrackerSet,mafDeviceSet);
+  mafTypeMacro(mmdTrackerSet,mafDeviceSet);
 
-  // Description:
-  // Return the numnber of trackers composing this tracker set
+  /** Return the number of trackers composing this tracker set */
   int GetNumberOfTrackers() {return this->GetNumberOfDevices();}
 
-  // Description:
-  // Add a new device, and return an ID. If the returned ID==0 the operation has failed!
+  /**
+   Add a new device, and return an ID. If the returned ID==0 the operation has failed! */
   void AddDevice(mmdTracker *device);
 
-  // Description:
-  // Return a device handler given its ID or name.
+  /** Return a device handler given its ID or name. */
   mmdTracker *GetDevice(unsigned long id);
   mmdTracker *GetDevice(const char *name);
-  
-  // Description:
-  // 
-  //virtual void ProcessEvent(mflEvent *event);
 
 protected:
   mmdTrackerSet();
   virtual ~mmdTrackerSet();
 
-  // Description:
-  // redefined as proteced functions
+  /**  redefined as protected functions */
   void AddDevice(mafDevice *device) {Superclass::AddDevice(device);}
   int RemoveDevice(mafDevice *device) {return this->Superclass::RemoveDevice(device);}
 
