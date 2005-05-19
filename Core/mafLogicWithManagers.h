@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-19 11:27:10 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-05-19 13:36:14 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -11,6 +11,7 @@
 =========================================================================*/
 #ifndef __mafLogicWithManagers_H__
 #define __mafLogicWithManagers_H__
+
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
@@ -18,6 +19,8 @@
 #include "mafEvent.h"
 #include "mafLogicWithGUI.h"
 #include "mmgPanel.h"
+#include "mmgVMEChooser.h"
+
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
@@ -25,6 +28,7 @@ class mafVMEManager;
 class mafViewManager;
 class mafOpManager;
 class mafSideBar;
+
 //----------------------------------------------------------------------------
 // mafLogicWithManagers :
 //----------------------------------------------------------------------------
@@ -133,7 +137,7 @@ protected:
   /** Respond to a VME_REMOVING evt. propagate evt. to SideBar,ViewManager,ecc.. */
 	virtual void VmeRemoving(mafNode *vme);
 	/** Respond to a VME_CHOOSE evt. Build a dialog containing the vme tree and return the vme choosed from the user. */
-	virtual mafNode *VmeChoose(long vme_accept_function = 0, mafString title = "Choose Node");
+	virtual mafNode *VmeChoose(long vme_accept_function = 0, long style = REPRESENTATION_AS_TREE, mafString title = "Choose Node");
 	
   /** Called when an operation starts. Disable all menu and lock the Selection */ 
 	virtual void OpRunStarting();

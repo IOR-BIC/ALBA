@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-19 11:27:10 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-05-19 13:36:14 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,7 +31,6 @@
 #include "mmgMDIChild.h"
 #include "mafSideBar.h"
 #include "mmgTimeBar.h"
-#include "mmgVMEChooser.h"
 
 //----------------------------------------------------------------------------
 mafLogicWithManagers::mafLogicWithManagers()
@@ -263,9 +262,9 @@ void mafLogicWithManagers::OnEvent(mafEventBase *event)
       {
         mafString *s = e->GetString();
         if(s != NULL)
-          e->SetVme(VmeChoose(e->GetArg(), *s));
+          e->SetVme(VmeChoose(e->GetArg(), e->GetBool(), *s));
         else
-          e->SetVme(VmeChoose(e->GetArg()));
+          e->SetVme(VmeChoose(e->GetArg(), e->GetBool()));
       }
       break;
       // ###############################################################
@@ -603,9 +602,9 @@ void mafLogicWithManagers::UpdateTimeBounds()
   if(m_TimeSash)   m_TimeSash->Show(min!=max);
 }
 //----------------------------------------------------------------------------
-mafNode* mafLogicWithManagers::VmeChoose(long vme_accept_function, mafString title)
+mafNode* mafLogicWithManagers::VmeChoose(long vme_accept_function, long style, mafString title)
 //----------------------------------------------------------------------------
 {
-  mmgVMEChooser vc(m_SideBar->GetTree(),title.GetCStr(),vme_accept_function);
+  mmgVMEChooser vc(m_SideBar->GetTree(),title.GetCStr(), vme_accept_function, style);
   return vc.ShowChooserDialog();
 }
