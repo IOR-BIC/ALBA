@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooser.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 15:24:28 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-19 13:36:33 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,17 +27,16 @@
 //----------------------------------------------------------------------------
 #include "mmgVMEChooser.h"
 #include "mafDecl.h"
-#include "mmgVMEChooserTree.h"
 #include "mmgVmeChooserAccept.h"
 
 #include "mafNode.h"
 
 //----------------------------------------------------------------------------
-mmgVMEChooser::mmgVMEChooser(mmgCheckTree *tree, wxString dialog_title, long vme_accept_function)
+mmgVMEChooser::mmgVMEChooser(mmgCheckTree *tree, wxString dialog_title, long vme_accept_function, long style)
 : mmgDialog(dialog_title,mafCLOSEWINDOW | mafRESIZABLE | mafCLOSE | mafOK )
 //----------------------------------------------------------------------------
 {
-  m_ChooserTree = new mmgVMEChooserTree(this,tree,vme_accept_function,-1,false,true);
+  m_ChooserTree = new mmgVMEChooserTree(this,tree,vme_accept_function,-1,false,true,style);
   m_ChooserTree->SetListener(this);
   m_ChooserTree->SetTitle("");
   m_ChooserTree->SetSize(250,350);

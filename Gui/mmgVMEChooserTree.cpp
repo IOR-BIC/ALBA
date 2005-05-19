@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooserTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-19 11:33:48 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-05-19 13:36:33 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -39,11 +39,12 @@ BEGIN_EVENT_TABLE(mmgVMEChooserTree,wxPanel)
 END_EVENT_TABLE()
 
 //----------------------------------------------------------------------------
-mmgVMEChooserTree::mmgVMEChooserTree( wxWindow *parent, mmgCheckTree *tree, long vme_accept_function,wxWindowID id, bool CloseButton, bool HideTitle)
+mmgVMEChooserTree::mmgVMEChooserTree( wxWindow *parent, mmgCheckTree *tree, long vme_accept_function,wxWindowID id, bool CloseButton, bool HideTitle, long style)
 :mmgCheckTree(parent, id, CloseButton, HideTitle)
 //----------------------------------------------------------------------------
 {
-  m_ChoosedNode = NULL;
+  m_ChoosedNode       = NULL;
+  m_ChooserTreeStyle  = style;
 
   if(vme_accept_function == 0)
     m_AcceptFunction = NULL;
@@ -171,15 +172,15 @@ void mmgVMEChooserTree::ShowContextualMenu(wxMouseEvent& event)
 {
 }
 //----------------------------------------------------------------------------
-void mmgVMEChooserTree::CloneSubTree(mmgCheckTree *tree, wxTreeItemId *source_item, wxTreeItemId *dest_parent_item)
+void mmgVMEChooserTree::CloneSubTree(mmgCheckTree *source_tree, wxTreeItemId *source_item, wxTreeItemId *dest_parent_item)
 //----------------------------------------------------------------------------
 {
-  wxString  text  = tree->GetTree()->GetItemText(*source_item);
-  long      node  = tree->NodeFromItem(*source_item);
+  wxString  text  = source_tree->GetTree()->GetItemText(*source_item);
+  long      node  = source_tree->NodeFromItem(*source_item);
   int       image = GetVmeStatus((mafNode *)node);
 
   wxTreeItemId current_item;
-  bool         expanded = tree->GetTree()->IsExpanded(*source_item);
+  bool         expanded = source_tree->GetTree()->IsExpanded(*source_item);
 
   if (dest_parent_item == NULL)
   {
@@ -188,19 +189,40 @@ void mmgVMEChooserTree::CloneSubTree(mmgCheckTree *tree, wxTreeItemId *source_it
   }
   else
   {
-    current_item = m_tree->AppendItem(*dest_parent_item,text,image,image, new mmgTreeItemData(node));
+    if (m_ChooserTreeStyle == REPRESENTATION_AS_TREE)
+    {
+      current_item = m_tree->AppendItem(*dest_parent_item,text,image,image, new mmgTreeItemData(node));
+    }
+    else 
+    {
+      // Flat tree of acceptable VMEs
+      if (image == NODE_VISIBLE_ON)
+      {
+        m_tree->AppendItem(m_tree->GetRootItem(),text,image,image, new mmgTreeItemData(node));
+      }
+      current_item = m_tree->GetRootItem();
+    }
   }
 
   long cookie = 0;
-  wxTreeItemId child = tree->GetTree()->GetFirstChild(*source_item, cookie);
+  wxTreeItemId child = source_tree->GetTree()->GetFirstChild(*source_item, cookie);
   while( child.IsOk() )
   {
-    CloneSubTree(tree, &child, &current_item);
-    child = tree->GetTree()->GetNextChild(*source_item, cookie); 
+    CloneSubTree(source_tree, &child, &current_item);
+    child = source_tree->GetTree()->GetNextChild(*source_item, cookie); 
   }
 
-  if(expanded) 
-    m_tree->Expand(current_item); 
-  else 
-    m_tree->Collapse(current_item);
+  if (m_ChooserTreeStyle == REPRESENTATION_AS_TREE)
+  {
+    if(expanded) 
+      m_tree->Expand(current_item); 
+    else 
+      m_tree->Collapse(current_item);
+  }
+  else
+  {
+    // in flat representation the root's children are sorted
+    m_tree->Expand(current_item);
+    m_tree->SortChildren(current_item);
+  }
 }
