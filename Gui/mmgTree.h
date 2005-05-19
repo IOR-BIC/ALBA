@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTree.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:44:06 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-05-19 11:27:57 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -149,6 +149,12 @@ public:
   /** Set the Listener that will receive event-notification, the Listener can be changed any time  */
   void SetListener(mafObserver *listener)   {m_Listener=listener;}; 
 
+  /** Return the node item from node id. */
+  wxTreeItemId ItemFromNode(long node_id);
+
+  /** Return node id from node item. */
+  long NodeFromItem(wxTreeItemId& item);
+
 protected:
   /** Private function that notify the Listener of node selection and deselection. */
   virtual void OnSelectionChanged(wxTreeEvent& event);
@@ -158,12 +164,6 @@ protected:
 
 	/** Return true if node exist. */
   bool NodeExist(long node_id);
-  
-	/** Return the node item from node id. */
-  wxTreeItemId ItemFromNode(long node_id);
-  
-	/** Return node id from node item. */
-  long NodeFromItem(wxTreeItemId& item);
   
 	/** Delete recursively a node and its subtree. */
 	void DeleteNode2(long node_id);
