@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 15:23:24 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-05-19 11:27:10 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -261,8 +261,11 @@ void mafLogicWithManagers::OnEvent(mafEventBase *event)
       break; 
     case VME_CHOOSE:
       {
-        mmgVMEChooser vc(m_SideBar->GetTree());
-        e->SetVme(vc.ShowChooserDialog());
+        mafString *s = e->GetString();
+        if(s != NULL)
+          e->SetVme(VmeChoose(e->GetArg(), *s));
+        else
+          e->SetVme(VmeChoose(e->GetArg()));
       }
       break;
       // ###############################################################
@@ -600,8 +603,9 @@ void mafLogicWithManagers::UpdateTimeBounds()
   if(m_TimeSash)   m_TimeSash->Show(min!=max);
 }
 //----------------------------------------------------------------------------
-mafNode* mafLogicWithManagers::VmeChoose()
+mafNode* mafLogicWithManagers::VmeChoose(long vme_accept_function, mafString title)
 //----------------------------------------------------------------------------
 {
-  return NULL;
+  mmgVMEChooser vc(m_SideBar->GetTree(),title.GetCStr(),vme_accept_function);
+  return vc.ShowChooserDialog();
 }
