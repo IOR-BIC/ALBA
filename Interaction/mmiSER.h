@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiSER.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 17:29:07 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-21 07:55:52 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -32,7 +32,8 @@ class mafString;
   inputs. Its clear that an interactor will ignore any event coming from incompatible devices.
   Currently there is not device type control implementation.
   @todo
-  - to implement a type safe static binding mechanims */
+  - to implement a type safe static binding mechanims
+   */
 class mmiSER : public mafInteractor
 {
 public: 
@@ -69,6 +70,8 @@ public:
   
   /** Return the actions container */
   void GetActions(std::vector<mafAction *> &actions);
+  
+  typedef std::map<mafString,mafAutoPointer<mafAction> > mmuActionsMap;
 
 protected:
   virtual int InternalStore(mafStorageElement *node);
@@ -77,7 +80,7 @@ protected:
   mmiSER();
   virtual ~mmiSER();
 
-  std::map<mafString,mafAutoPointer<mafAction> >  m_Actions; ///< takes a list of the active actions
+  mmuActionsMap  m_Actions; ///< takes a list of the active actions
 
 private:
   mmiSER(const mmiSER&);  // Not implemented.

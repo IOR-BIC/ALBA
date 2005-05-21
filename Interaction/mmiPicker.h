@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPicker.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:58 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-21 07:55:52 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone, originally by Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -11,14 +11,6 @@
 =========================================================================*/
 #ifndef __mmiPicker_h
 #define __mmiPicker_h
-
-#ifdef __GNUG__
-    #pragma interface "mmiPicker.cpp"
-#endif
-
-#ifndef WX_PRECOMP
-    #include "wx/wx.h"
-#endif
 
 #include "mafInteractor.h"
 
@@ -31,19 +23,14 @@ class mafEventListener;
 class mmiPicker : public mafInteractor
 {
 public:
-  //------------------------------------------------------------------------------
-  // Events
-  //------------------------------------------------------------------------------
- 
-  vtkTypeMacro(mmiPicker,mafInteractor);
-  static mmiPicker *New();
+  mafTypeMacro(mmiPicker,mafInteractor);
 
 protected:
   mmiPicker();
   virtual ~mmiPicker();
   
-  virtual void OnButtonDown   (mflEventInteraction *e);
-  virtual void OnButtonUp     (mflEventInteraction *e);
+  virtual void OnButtonDown   (mafEventInteraction *e);
+  virtual void OnButtonUp     (mafEventInteraction *e);
   
 private:
   mmiPicker(const mmiPicker&);  // Not implemented.

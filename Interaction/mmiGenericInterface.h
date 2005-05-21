@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericInterface.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 15:42:37 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-21 07:55:51 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -20,9 +20,7 @@
 // forward declarations :
 //----------------------------------------------------------------------------
 class mafRefSys;
-class vtkMatrix4x4;
-class mflTransform;
-class vtkAbstractTransform;
+class mafTransform;
 class vtkRenderer;
 
 /** Abstract class for general purpose interactor.
@@ -61,10 +59,9 @@ public:
   // Events
   //------------------------------------------------------------------------------
   
-  MFL_EVT_DEC(MoveActionEvent); ///< Issued a move action has been performed
+  //MAF_ID_DEC(MOVE_EVENT); ///< Issued when a move action has been performed
 
-  static mmiGenericInterface *New();
-  vtkTypeMacro(mmiGenericInterface,mafInteractor);
+  mafAbstractTypeMacro(mmiGenericInterface,mafInteractor);
 
   /**
     Get the Target ref sys, i.e. the object hosting the output matrix 
@@ -88,7 +85,7 @@ public:
   /** 
     Return the Pivot frame. The origin of this frame is used as a pivot point 
     for rotation transform. */
-  mafRefSys *GetPivotRefSys() {return PivotRefSys;}
+  mafRefSys *GetPivotRefSys() {return m_PivotRefSys;}
 
   //----------------------------------------------------------------------------
   // Transform Enabling:
@@ -105,10 +102,10 @@ public:
   /** 
     Return the translation flag
   */
-  bool GetTranslationFlag() {return TranslationFlag;}
-  bool GetRotationFlag() {return RotationFlag;}
-  bool GetScalingFlag() {return ScalingFlag;} 
-  bool GetUniformScalingFlag() {return UniformScalingFlag;}
+  bool GetTranslationFlag() {return m_TranslationFlag;}
+  bool GetRotationFlag() {return m_RotationFlag;}
+  bool GetScalingFlag() {return m_ScalingFlag;} 
+  bool GetUniformScalingFlag() {return m_UniformScalingFlag;}
         
   
   //----------------------------------------------------------------------------
@@ -117,7 +114,7 @@ public:
 
   /**
     Get the translation constraint. To set the constraint retrieve the constrain object and set it.*/
-  mmiConstraint *GetTranslationConstraint() {return TranslationConstraint;}
+  mmiConstraint *GetTranslationConstraint() {return m_TranslationConstraint;}
  
   /** 
     Set the translation constraint. Notice the constraint is copied and not referenced */
@@ -125,7 +122,7 @@ public:
       
   /** 
     Get the rotation constraint. To set the constraint retrieve the constrain object and set it.*/
-  mmiConstraint *GetRotationConstraint() {return RotationConstraint;}
+  mmiConstraint *GetRotationConstraint() {return m_RotationConstraint;}
   
   /** 
     Set the rotation constraint. Notice the constraint is copied and not referenced */
@@ -133,7 +130,7 @@ public:
 
   /**
     Get the scale constraint. To set the constraint retrieve the constrain object and set it.*/
-  mmiConstraint *GetScaleConstraint() {return ScaleConstraint;}
+  mmiConstraint *GetScaleConstraint() {return m_ScaleConstraint;}
   /** 
     Set the scaling constraint. Notice the constraint is copied and
     not referenced */
@@ -146,26 +143,27 @@ public:
     OutputTransform at each interaction. The result matrix is referenced. The USER may set it e.g. 
     to have the interactor implicitly
     control a vme.*/
-  void SetResultMatrix(vtkMatrix4x4 *result);
-  vtkMatrix4x4 *GetResultMatrix();
+  void SetResultMatrix(mafMatrix *result);
+  mafMatrix *GetResultMatrix();
 
   /**
     The Result Transform is an optional transform to which the interactor concatenates the
     OutputTransform at each interaction. The USER may set it to have the interactor implicitly
     control a vme.*/
-  void SetResultTransform(mflTransform *result);
-  mflTransform *GetResultTransform() { return ResultTransform; }
+  void SetResultTransform(mafTransform *result);
+  mafTransform *GetResultTransform() { return m_ResultTransform; }
 
   /** redefined to set the renderer also in the constraint */
   virtual void SetRenderer(vtkRenderer *ren);
 
   /** Set the node to be transformed */
-  virtual void SetVME(mflVME *vme);
+  virtual void SetVME(mafVME *vme);
 
   /** If Surface Snap modifier is on translation and rotation will be constrained to picked surfaces if possible*/
-  vtkSetMacro(SurfaceSnap, bool);
-  vtkGetMacro(SurfaceSnap, bool);
-  vtkBooleanMacro(SurfaceSnap, bool);
+  void SetSurfaceSnap(bool flag) {m_SurfaceSnap=flag;}
+  bool GetSurfaceSnap() {return m_SurfaceSnap;}
+  void SurfaceSnapOn() {SetSurfaceSnap(true);}
+  void SurfaceSnapOff() {SetSurfaceSnap(false);}
 
 protected:
   mmiGenericInterface();
@@ -181,20 +179,20 @@ protected:
   virtual void EnableScalingInternal(bool enable);
   virtual void EnableUniformScalingInternal(bool enable);
 
-  mmiConstraint  *TranslationConstraint; ///< the constrain for translation
-  mmiConstraint  *RotationConstraint;    ///< the constrain for rotation
-  mmiConstraint  *ScaleConstraint;       ///< the constrain for scaling
+  mmiConstraint  *m_TranslationConstraint; ///< the constrain for translation
+  mmiConstraint  *m_RotationConstraint;    ///< the constrain for rotation
+  mmiConstraint  *m_ScaleConstraint;       ///< the constrain for scaling
   
-  mafRefSys      *TargetRefSys; ///< the target ref_sys matrix
-  mafRefSys      *PivotRefSys; ///< the pivot point (only position is considered)
-  mflTransform   *ResultTransform; ///< store the pointer to the matrix to be updated
+  mafRefSys      *m_TargetRefSys; ///< the target ref_sys matrix
+  mafRefSys      *m_PivotRefSys; ///< the pivot point (only position is considered)
+  mafTransform   *m_ResultTransform; ///< store the pointer to the matrix to be updated
 
-  bool            TranslationFlag; 
-  bool            RotationFlag;
-  bool            ScalingFlag;
-  bool            UniformScalingFlag;
+  bool            m_TranslationFlag; 
+  bool            m_RotationFlag;
+  bool            m_ScalingFlag;
+  bool            m_UniformScalingFlag;
 
-  bool SurfaceSnap; //< toggle surface snap
+  bool            m_SurfaceSnap; //< toggle surface snap
     
 private:
   mmiGenericInterface(const mmiGenericInterface&);  // Not implemented.

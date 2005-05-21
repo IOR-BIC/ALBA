@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAction.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 17:29:02 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-21 07:55:49 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -152,7 +152,7 @@ int mafAction::InternalRestore(mafStorageElement *node)
       if (subnode->GetAttributeAsInteger("ID",id) && subnode->GetAttribute("Name",name))
       {
         // forward an event to device manager to perform binding...
-        InvokeEvent(mafEvent(this,ACTION_BIND_DEVICE,(long)(id+mafDevice::MIN_DEVICE_ID)));
+        mafEventMacro(mafEvent(this,ACTION_BIND_DEVICE,(long)(id+mafDevice::MIN_DEVICE_ID)));
       }
       else
       {

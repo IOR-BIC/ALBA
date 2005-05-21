@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi6DOF.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 15:42:34 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-21 07:55:50 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,24 +12,15 @@
 #ifndef __mmi6DOF_h
 #define __mmi6DOF_h
 
-#ifdef __GNUG__
-    #pragma interface "mmi6DOF.cpp"
-#endif
-
-#ifndef WX_PRECOMP
-    #include "wx/wx.h"
-#endif
-
 #include "mmiGenericInterface.h"
 
 class vtkCamera;
 class vtkProp3D;
 class vtkRenderer;
-class mflMatrix;
-class vtkMatrix4x4;
-class mflTransform;
+class mafMatrix;
+class mafTransform;
 class mmdTracker;
-class mflBounds;
+class mafOBB;
 class mafAvatar3D;
 
 /** 
@@ -41,29 +32,27 @@ class mafAvatar3D;
 class mmi6DOF : public mmiGenericInterface
 {
 public:
-  vtkTypeMacro(mmi6DOF,mmiGenericInterface);
-
-  static mmi6DOF *New();
+  mafAbstractTypeMacro(mmi6DOF,mmiGenericInterface);
   
   /**  Start the interaction with the selected object */
-  virtual int StartInteraction(mmdTracker *tracker,mflMatrix *pose=NULL);
+  virtual int StartInteraction(mmdTracker *tracker,mafMatrix *pose=NULL);
   
   /**  Stop the interaction */
-  virtual int StopInteraction(mmdTracker *tracker,mflMatrix *pose=NULL);
+  virtual int StopInteraction(mmdTracker *tracker,mafMatrix *pose=NULL);
   
   /**  Set/Get the current pose matrix */
-  virtual void SetTrackerPoseMatrix(mflMatrix *pose);
-  mflMatrix *GetTrackerPoseMatrix() {return this->TrackerPoseMatrix;}
+  virtual void SetTrackerPoseMatrix(mafMatrix *pose);
+  mafMatrix *GetTrackerPoseMatrix() {return this->m_TrackerPoseMatrix;}
   
-  /**  Stores the current TrackerPoseMatrix. */
-  void TrackerSnapshot(mflMatrix *pose);
+  /**  Stores the current m_TrackerPoseMatrix. */
+  void TrackerSnapshot(mafMatrix *pose);
   
   /**
    Update the delta transform, i.e. transform from last snapshot */
   void UpdateDeltaTransform();
 
   /**  Return pointer to the current input tracker */
-  mmdTracker *GetTracker() {return (mmdTracker *)Device;}
+  mmdTracker *GetTracker() {return (mmdTracker *)m_Device;}
   void SetTracker(mmdTracker *tracker);
 
   /** 
@@ -71,9 +60,10 @@ public:
     and StopInteraction events which are used to start/stop the interaction. If eabled
     this flag makes the interactor to ingore these events and to be continuously active.
     Default is false. */
-  void SetIgnoreTriggerEvents(int flag) {IgnoreTriggerEvents=flag;Modified();}
-  int GetIgnoreTriggerEvents(int flag) {return IgnoreTriggerEvents;}
-  vtkBooleanMacro(IgnoreTriggerEvents,int);
+  void SetIgnoreTriggerEvents(int flag) {m_IgnoreTriggerEvents=flag;}
+  int GetIgnoreTriggerEvents(int flag) {return m_IgnoreTriggerEvents;}
+  void IgnoreTriggerEventsOn() {SetIgnoreTriggerEvents(true);}
+  void IgnoreTriggerEventsOff() {SetIgnoreTriggerEvents(false);}
 
   /** redefined to accomplish specific tasks*/
   virtual void SetRenderer(vtkRenderer *ren);
@@ -90,18 +80,18 @@ protected:
   virtual ~mmi6DOF();
 
   /** reimplemented to manage interaction events from trackers */
-  virtual int OnStartInteraction(mflEventInteraction *event);
+  virtual int OnStartInteraction(mafEventInteraction *event);
   /** reimplemented to manage interaction events from trackers */
-  virtual int OnStopInteraction(mflEventInteraction *event);
+  virtual int OnStopInteraction(mafEventInteraction *event);
   
-  mflMatrix           *TrackerPoseMatrix;  
-  mflMatrix           *StartTrackerPoseMatrix;
-  mflMatrix           *InverseTrackerPoseMatrix;
-  mflMatrix			      *InversePoseMatrix;
-  mflTransform        *DeltaTransform; 
-  mflTransform        *TmpTransform;   
+  mafMatrix           *m_TrackerPoseMatrix;  
+  mafMatrix           *m_StartTrackerPoseMatrix;
+  mafMatrix           *m_InverseTrackerPoseMatrix;
+  mafMatrix			      *m_InversePoseMatrix;
+  mafTransform        *m_DeltaTransform; 
+  mafTransform        *m_TmpTransform;   
   
-  mafAvatar3D         *Avatar;
+  mafAvatar3D         *m_Avatar;
 
 private:
   mmi6DOF(const mmi6DOF&);  // Not implemented.

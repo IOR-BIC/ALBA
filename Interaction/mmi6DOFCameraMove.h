@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi6DOFCameraMove.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 15:42:35 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-21 07:55:51 $
+  Version:   $Revision: 1.2 $
   Authors:   Michele Diegoli & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,15 +13,8 @@
 #ifndef __mmi6DOFCameraMove_h
 #define __mmi6DOFCameraMove_h
 
-#ifdef __GNUG__
-    #pragma interface "mmi6DOFCameraMove.cpp"
-#endif
-
-#ifndef WX_PRECOMP
-    #include "wx/wx.h"
-#endif
-
 #include "mmi6DOF.h"
+#include "mafMTime.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -36,14 +29,13 @@ class vtkCamera;
 class mmi6DOFCameraMove : public mmi6DOF
 {
 public:
-  static mmi6DOFCameraMove *New();
-  vtkTypeMacro(mmi6DOFCameraMove,mmi6DOF);
+  mafTypeMacro(mmi6DOFCameraMove,mmi6DOF);
 
   /** Start the interaction with the selected object */
-  virtual int StartInteraction(mmdTracker *tracker,mflMatrix *pose=NULL);
+  virtual int StartInteraction(mmdTracker *tracker,mafMatrix *pose=NULL);
 
   /**  Process events coming from tracker */
-  virtual void ProcessEvent(mflEvent *event,mafID channel=mflAgent::DefaultChannel);
+  virtual void OnEvent(mafEventBase *event);
 
 protected:
   mmi6DOFCameraMove();
@@ -51,17 +43,17 @@ protected:
 
   virtual void Update();
 
-  //double               ObjectOrientation[3]; ///< orientation of the object at last Update
-  //double               ObjectPosition[3]; ///< position of the object at last Update
-  double               StartCameraPosition[4]; ///< position of the camera at start of interaction
-  double               StartFocalPoint[4]; ///< focal point of the camera at start of interaction
-  double               StartViewUp[4]; ///< viewUp of the camera at start of interaction
-  double			   StartOrientation[4];
-  double			   OldZ;
+  //double               m_ObjectOrientation[3]; ///< orientation of the object at last Update
+  //double               m_ObjectPosition[3]; ///< position of the object at last Update
+  double               m_StartCameraPosition[4]; ///< position of the camera at start of interaction
+  double               m_StartFocalPoint[4]; ///< focal point of the camera at start of interaction
+  double               m_StartViewUp[4]; ///< viewUp of the camera at start of interaction
+  double               m_StartOrientation[4];
+  double               m_OldZ;
 
-  bool active_camera_to_Current_Camera_flag;
-  vtkCamera *CurrentCamera; ///< Stores camera to which the interaction is currently assigned
-  vtkTimeStamp  UpdateTime; ///< Timestamp of the last update of the tracker to world transformation 
+//  bool                 m_ActiveCameraToCurrentCameraFlag;
+  vtkCamera*           m_CurrentCamera; ///< Stores camera to which the interaction is currently assigned
+  mafMTime             m_UpdateTime; ///< Timestamp of the last update of the tracker to world transformation 
 
 private:
   mmi6DOFCameraMove(const mmi6DOFCameraMove&);  // Not implemented.

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGeneric6DOF.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 15:42:37 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-21 07:55:51 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,14 +12,6 @@
 
 #ifndef __mmiGeneric6DOF_h
 #define __mmiGeneric6DOF_h
-
-#ifdef __GNUG__
-    #pragma interface "mmiGeneric6DOF.cpp"
-#endif
-
-#ifndef WX_PRECOMP
-    #include "wx/wx.h"
-#endif
 
 #include "mmi6DOF.h"
 
@@ -36,14 +28,13 @@ class mafEventListener;
 class mmiGeneric6DOF : public mmi6DOF
 {
 public:
-  static mmiGeneric6DOF *New();
-  vtkTypeMacro(mmiGeneric6DOF,mmi6DOF);
+  mafTypeMacro(mmiGeneric6DOF,mmi6DOF);
 
   /**  Process events coming from tracker */
-  virtual void ProcessEvent(mflEvent *event,mafID channel=mflAgent::DefaultChannel);
+  virtual void OnEvent(mafEventBase *event);
 
   /** manage move events */
-  virtual void OnMove(mflEventInteraction *e);
+  virtual void OnMove(mafEventInteraction *e);
 
   /** 
     Enable/Disable differential moving. If enable this interactor moves 
@@ -51,9 +42,10 @@ public:
     pose, i.e. the original pose is retained and only the delta transform
     is applied to it.
     Default is false. */
-  vtkSetMacro(DifferentialMoving,int);
-  vtkGetMacro(DifferentialMoving,int); ///< @sa SetDifferentialMoving()
-  vtkBooleanMacro(DifferentialMoving,int); ///< @sa SetDifferentialMoving()
+  void SetDifferentialMoving(bool flag) {m_DifferentialMoving=flag;}
+  bool GetDifferentialMoving() {return m_DifferentialMoving;} ///< @sa SetDifferentialMoving()
+  void DifferentialMovingOn() {SetDifferentialMoving(true);} ///< @sa SetDifferentialMoving()
+  void DifferentialMovingOff() {SetDifferentialMoving(false);} ///< @sa SetDifferentialMoving()
 
 protected:
   mmiGeneric6DOF();
@@ -62,12 +54,12 @@ protected:
   /** Update the transform */
   void Update();
 
-  mflTransform        *OutputTransform; 
-  double              OutputOrientation[3]; ///< orientation of the output matrix
-  double              OutputPosition[3]; ///< position of the output matrix
-  double              PivotPosition[3]; ///< position of the selected object at start of interaction
+  mafTransform*       m_OutputTransform; 
+  double              m_OutputOrientation[3]; ///< orientation of the output matrix
+  double              m_OutputPosition[3]; ///< position of the output matrix
+  double              m_PivotPosition[3]; ///< position of the selected object at start of interaction
 
-  int                 DifferentialMoving;
+  int                 m_DifferentialMoving;
 
 private:
   mmiGeneric6DOF(const mmiGeneric6DOF&);  // Not implemented.

@@ -2,37 +2,28 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi6DOFCameraMove.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 15:42:35 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-21 07:55:50 $
+  Version:   $Revision: 1.2 $
   Authors:   Michele Diegoli & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-// To be included first because of wxWindows
-#ifdef __GNUG__
-    #pragma implementation "mmi6DOF.cpp"
-#endif
-
-// For compilers that support precompilation, includes "wx/wx.h".
-#include "wx/wxprec.h"
 
 #include "mmi6DOFCameraMove.h"
 #include "mmdTracker.h"
 #include "mafAvatar3D.h"
+#include "mafTransform.h"
+#include "mafCameraTransform.h"
+#include "mafEventInteraction.h"
 
-#include "vtkObjectFactory.h"
-#include "mflEventInteraction.h"
-#include "mflDefines.h"
 #include "vtkRenderer.h"
 #include "vtkCamera.h"
 #include "vtkTransform.h"
-#include "mflTransform.h"
-#include "mflCameraTransform.h"
 #include <assert.h>
 
 //------------------------------------------------------------------------------
-vtkStandardNewMacro(mmi6DOFCameraMove)
+mafCxxTypeMacro(mmi6DOFCameraMove)
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -40,8 +31,8 @@ mmi6DOFCameraMove::mmi6DOFCameraMove()
 //------------------------------------------------------------------------------
 
 {
-  IgnoreTriggerEvents = 0;
-  CurrentCamera = NULL;
+  m_IgnoreTriggerEvents = 0;
+  m_CurrentCamera = NULL;
 }
 
 //------------------------------------------------------------------------------
@@ -51,17 +42,18 @@ mmi6DOFCameraMove::~mmi6DOFCameraMove()
 }
 
 //------------------------------------------------------------------------------
-void mmi6DOFCameraMove::ProcessEvent(mflEvent *event,mafID channel)
+void mmi6DOFCameraMove::OnEvent(mafEventBase *event)
 //------------------------------------------------------------------------------
 {
   assert(event);
   assert(event->GetSender());
   
-  unsigned int id=event->GetID();
+  mafID id=event->GetId();
+  mafID channel=event->GetChannel();
 
-  if (channel==mafDevice::DeviceInputChannel&&InteractionFlag)
+  if (channel==MCH_INPUT && m_InteractionFlag)
   {
-    mflEventInteraction *e=(mflEventInteraction *)event;
+    mafEventInteraction *e=(mafEventInteraction *)event;
     mmdTracker *tracker=GetTracker();
     
     if (tracker==NULL)
@@ -72,12 +64,12 @@ void mmi6DOFCameraMove::ProcessEvent(mflEvent *event,mafID channel)
     }  
     
     // if the event comes from tracker which started the interaction continue...
-    if (id==mmdTracker::Move3DEvent&&tracker)
+    if (id==mmdTracker::TRACKER_3D_MOVE && tracker)
     {
-      if (!CurrentCamera)
+      if (!m_CurrentCamera)
         return;
 
-	    mflMatrix *tracker_pose=e->GetMatrix();
+	    mafMatrix *tracker_pose=e->GetMatrix();
       SetTrackerPoseMatrix(tracker_pose);
       Update();
       return;
@@ -85,10 +77,10 @@ void mmi6DOFCameraMove::ProcessEvent(mflEvent *event,mafID channel)
     }
   }
     
-  Superclass::ProcessEvent(event,channel);
+  Superclass::OnEvent(event,channel);
 }
 //------------------------------------------------------------------------------
-int mmi6DOFCameraMove::StartInteraction(mmdTracker *tracker,mflMatrix *pose)
+int mmi6DOFCameraMove::StartInteraction(mmdTracker *tracker,mafMatrix *pose)
 //------------------------------------------------------------------------------
 {
   //assert(ObjectPoseMatrix);
@@ -102,16 +94,16 @@ int mmi6DOFCameraMove::StartInteraction(mmdTracker *tracker,mflMatrix *pose)
 	    {
         vtkCamera *active_camera=Avatar->GetRenderer()->GetActiveCamera();
         
-        this->CurrentCamera=active_camera;
-        active_camera->GetPosition(this->StartCameraPosition);
-        active_camera->GetFocalPoint(this->StartFocalPoint);
-        active_camera->GetViewUp(this->StartViewUp);
-        active_camera->GetDirectionOfProjection(this->StartOrientation);
-		
-		this->StartCameraPosition[3] = 1.0;
-        this->StartFocalPoint[3] = 1.0;
-        this->StartViewUp[3] = 1.0;
-		this->OldZ=0;
+        m_CurrentCamera=active_camera;
+        active_camera->GetPosition(m_StartCameraPosition);
+        active_camera->GetFocalPoint(m_StartFocalPoint);
+        active_camera->GetViewUp(m_StartViewUp);
+        active_camera->GetDirectionOfProjection(m_StartOrientation);
+        
+        m_StartCameraPosition[3] = 1.0;
+        m_StartFocalPoint[3] = 1.0;
+        m_StartViewUp[3] = 1.0;
+        m_OldZ=0;
 
       }
     }
@@ -129,54 +121,54 @@ void mmi6DOFCameraMove::Update()
   this->UpdateDeltaTransform();
 
   float XYZ[3];
-  this->DeltaTransform->GetPosition(XYZ);
+  m_DeltaTransform->GetPosition(XYZ);
 
   float rotXYZ[3];
-  this->DeltaTransform->GetOrientation(rotXYZ);
+  m_DeltaTransform->GetOrientation(rotXYZ);
 
   vtkTransform *trans = vtkTransform::New();
   trans->PreMultiply();
 
-  trans->Translate(StartFocalPoint[0],StartFocalPoint[1],StartFocalPoint[2]);   
+  trans->Translate(m_StartFocalPoint[0],m_StartFocalPoint[1],m_StartFocalPoint[2]);   
   trans->RotateY(-rotXYZ[1]);
   trans->RotateX(-rotXYZ[0]);
   trans->RotateZ(-rotXYZ[2]);
-  trans->Translate(-StartFocalPoint[0],-StartFocalPoint[1],-StartFocalPoint[2]);
+  trans->Translate(-m_StartFocalPoint[0],-m_StartFocalPoint[1],-m_StartFocalPoint[2]);
 
   trans->Translate(-XYZ[0],-XYZ[1],-XYZ[2]);  
 
   double posNew[4],fpNew[4],vuOld[4], vuNew[4];
 
-  vuOld[0] = this->StartViewUp[0] + this->StartCameraPosition[0];
-  vuOld[1] = this->StartViewUp[1] + this->StartCameraPosition[1];
-  vuOld[2] = this->StartViewUp[2] + this->StartCameraPosition[2];
-  vuOld[3] = this->StartViewUp[3];
+  vuOld[0] = m_StartViewUp[0] + m_StartCameraPosition[0];
+  vuOld[1] = m_StartViewUp[1] + m_StartCameraPosition[1];
+  vuOld[2] = m_StartViewUp[2] + m_StartCameraPosition[2];
+  vuOld[3] = m_StartViewUp[3];
 
-  trans->MultiplyPoint(StartCameraPosition, posNew);
-  trans->MultiplyPoint(this->StartFocalPoint, fpNew);
+  trans->MultiplyPoint(m_StartCameraPosition, posNew);
+  trans->MultiplyPoint(m_StartFocalPoint, fpNew);
   trans->MultiplyPoint(vuOld, vuNew);
 
   vuNew[0] -= posNew[0];
   vuNew[1] -= posNew[1];
   vuNew[2] -= posNew[2];
 
-  CurrentCamera->SetPosition(posNew);
-  CurrentCamera->SetFocalPoint(fpNew);
-  CurrentCamera->SetViewUp(vuNew);
+  m_CurrentCamera->SetPosition(posNew);
+  m_CurrentCamera->SetFocalPoint(fpNew);
+  m_CurrentCamera->SetViewUp(vuNew);
 
   // Let's make it incremental...
   // store new camera parameters
   for (int i=0;i<3;i++)
   {
-    StartCameraPosition[i]=posNew[i];
-    StartFocalPoint[i]=fpNew[i];
-    StartViewUp[i]=vuNew[i];
+    m_StartCameraPosition[i]=posNew[i];
+    m_StartFocalPoint[i]=fpNew[i];
+    m_StartViewUp[i]=vuNew[i];
   }
 
-  //CurrentCamera->OrthogonalizeViewUp();
+  //m_CurrentCamera->OrthogonalizeViewUp();
 
   // Store current pose matrix
-  TrackerSnapshot(TrackerPoseMatrix);
+  TrackerSnapshot(m_TrackerPoseMatrix);
 
 
 

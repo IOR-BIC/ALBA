@@ -2,49 +2,42 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi6DOF.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 17:29:05 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-21 07:55:50 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-// To be included first because of wxWindows
-#ifdef __GNUG__
-    #pragma implementation "mmi6DOF.cpp"
-#endif
-
-// For compilers that support precompilation, includes "wx/wx.h".
-#include "wx/wxprec.h"
 
 #include "mmi6DOF.h"
 #include "mmdTracker.h"
 #include "mafAvatar3D.h"
 
-#include "vtkObjectFactory.h"
-
-#include "mflMatrix.h"
-#include "vtkTransform.h"
-#include "mflCameraTransform.h"
+#include "mafMatrix.h"
+#include "mafEventBase.h"
+#include "mafTransform.h"
+#include "mafCameraTransform.h"
+#include "mafEventInteraction.h"
+#include "mafOBB.h"
 
 #include "vtkMath.h"
-#include "mflEvent.h"
-#include "mflEventInteraction.h"
-#include "mflBounds.h"
 
 #include <assert.h>
 
 //------------------------------------------------------------------------------
-vtkStandardNewMacro(mmi6DOF)
+mafCxxAbstractTypeMacro(mmi6DOF)
+//------------------------------------------------------------------------------
+
 //------------------------------------------------------------------------------
 mmi6DOF::mmi6DOF()
 //------------------------------------------------------------------------------
 {
-  vtkNEW(TrackerPoseMatrix);
-  vtkNEW(InverseTrackerPoseMatrix);
-  vtkNEW(StartTrackerPoseMatrix);
-  vtkNEW(TmpTransform);
-  vtkNEW(DeltaTransform);
+  vtkNEW(m_TrackerPoseMatrix);
+  vtkNEW(m_InverseTrackerPoseMatrix);
+  vtkNEW(m_StartTrackerPoseMatrix);
+  vtkNEW(m_TmpTransform);
+  vtkNEW(m_DeltaTransform);
     
 }
 
@@ -52,11 +45,11 @@ mmi6DOF::mmi6DOF()
 mmi6DOF::~mmi6DOF()
 //------------------------------------------------------------------------------
 {
-  vtkDEL(TrackerPoseMatrix);
-  vtkDEL(InverseTrackerPoseMatrix);
-  vtkDEL(StartTrackerPoseMatrix);
-  vtkDEL(TmpTransform);
-  vtkDEL(DeltaTransform);
+  vtkDEL(m_TrackerPoseMatrix);
+  vtkDEL(m_InverseTrackerPoseMatrix);
+  vtkDEL(m_StartTrackerPoseMatrix);
+  vtkDEL(m_TmpTransform);
+  vtkDEL(m_DeltaTransform);
 }
 
 //------------------------------------------------------------------------------
@@ -104,7 +97,7 @@ void mmi6DOF::ShowAvatar()
 }
 
 //------------------------------------------------------------------------------
-int mmi6DOF::StartInteraction(mmdTracker *tracker,mflMatrix *pose)
+int mmi6DOF::StartInteraction(mmdTracker *tracker,mafMatrix *pose)
 //------------------------------------------------------------------------------
 {
   if (Superclass::StartInteraction(tracker))
@@ -113,17 +106,17 @@ int mmi6DOF::StartInteraction(mmdTracker *tracker,mflMatrix *pose)
       TrackerSnapshot(pose);
     else
     {
-      StartTrackerPoseMatrix->Identity();
-      StartTrackerPoseMatrix->SetTimeStamp(0);
+      m_StartTrackerPoseMatrix->Identity();
+      m_StartTrackerPoseMatrix->SetTimeStamp(0);
     }
     
-    Avatar = mafAvatar3D::SafeDownCast(GetTracker()->GetAvatar());
+    m_Avatar = mafAvatar3D::SafeDownCast(GetTracker()->GetAvatar());
     // mmi6DOF works only with avatar of type mafAvatar3D
-    if (Avatar)
+    if (m_Avatar)
     {
       // store the current renderer: camera cannot be changed during interaction!!!
       SetRenderer(tracker->GetAvatar()->GetRenderer());
-      InvokeEvent(InteractionStartedEvent,DefaultChannel,StartTrackerPoseMatrix);
+      InvokeEvent(INTERACTION_STARTED,MCH_UP,m_StartTrackerPoseMatrix);
       return true;
     }
     // if wrong type of avatar force unlock device and stop interaction 
@@ -133,13 +126,13 @@ int mmi6DOF::StartInteraction(mmdTracker *tracker,mflMatrix *pose)
 }
 
 //------------------------------------------------------------------------------
-int mmi6DOF::StopInteraction(mmdTracker *tracker,mflMatrix *pose)
+int mmi6DOF::StopInteraction(mmdTracker *tracker,mafMatrix *pose)
 //------------------------------------------------------------------------------
 {
   if (Superclass::StopInteraction(tracker))
   {
     // ...do something
-    InvokeEvent(InteractionStoppedEvent);
+    InvokeEvent(INTERACTION_STOPPED);
     return true;
   }
 
@@ -147,95 +140,95 @@ int mmi6DOF::StopInteraction(mmdTracker *tracker,mflMatrix *pose)
 }
 
 //------------------------------------------------------------------------------
-void mmi6DOF::SetTrackerPoseMatrix(mflMatrix *pose)
+void mmi6DOF::SetTrackerPoseMatrix(mafMatrix *pose)
 //------------------------------------------------------------------------------
 {
   assert(pose);
-  this->TrackerPoseMatrix->DeepCopy(pose);
+  m_TrackerPoseMatrix->DeepCopy(pose);
 }
 
 // Raw Pose
 //------------------------------------------------------------------------------
-void mmi6DOF::TrackerSnapshot(mflMatrix *pose)
+void mmi6DOF::TrackerSnapshot(mafMatrix *pose)
 //------------------------------------------------------------------------------
 {
   assert(pose);
-  this->StartTrackerPoseMatrix->DeepCopy(pose);
-  mflMatrix::Invert(StartTrackerPoseMatrix,InverseTrackerPoseMatrix);
+  m_StartTrackerPoseMatrix->DeepCopy(pose);
+  mafMatrix::Invert(*m_StartTrackerPoseMatrix,*m_InverseTrackerPoseMatrix);
 }
 
 //------------------------------------------------------------------------------
 void mmi6DOF::UpdateDeltaTransform()
 //------------------------------------------------------------------------------
 {
-  if (Avatar)
+  if (m_Avatar)
   {
-    assert(Device);
-    TmpTransform->SetMatrix(this->TrackerPoseMatrix);
-    TmpTransform->Concatenate(this->InverseTrackerPoseMatrix,POST_MULTIPLY);
+    assert(m_Device);
+    m_TmpTransform->SetMatrix(*m_TrackerPoseMatrix);
+    m_TmpTransform->Concatenate(*m_InverseTrackerPoseMatrix,POST_MULTIPLY);
 
-    DeltaTransform->Identity();
-    if (RotationFlag) // if rotation is enabled copy rotation
-      DeltaTransform->CopyRotation(TmpTransform->GetMatrix());
+    m_DeltaTransform->Identity();
+    if (m_RotationFlag) // if rotation is enabled copy rotation
+      m_DeltaTransform->CopyRotation(m_TmpTransform->GetMatrix());
 
-    if (TranslationFlag) // if translation is enabled copy translation
-      DeltaTransform->CopyTranslation(TmpTransform->GetMatrix());
+    if (m_TranslationFlag) // if translation is enabled copy translation
+      m_DeltaTransform->CopyTranslation(m_TmpTransform->GetMatrix());
 
     // Rotate and Scale according to calibration matrixes
-    float wscale[3];
-    float wbscale[3];
+    double wscale[3];
+    double wbscale[3];
 
-    // Scale the DeltaTransform accordingly
+    // Scale the m_DeltaTransform accordingly
     GetTracker()->GetTrackerToCanonicalTransform()->GetScale(wscale);
   
     // @todo change here to map to current constrain ref sys
-    Avatar->GetCanonicalToWorldTransform()->GetScale(wbscale);
+    mafTransform::GetScale(m_Avatar->GetCanonicalToWorldTransform()->GetMatrix(), wbscale);
   
-    DeltaTransform->Scale(wscale[0],wscale[1],wscale[2],POST_MULTIPLY);
-    DeltaTransform->Scale(wbscale[0],wbscale[1],wbscale[2],POST_MULTIPLY);
+    m_DeltaTransform->Scale(wscale[0],wscale[1],wscale[2],POST_MULTIPLY);
+    m_DeltaTransform->Scale(wbscale[0],wbscale[1],wbscale[2],POST_MULTIPLY);
   
     // compute the initial tracker pose in world coordinate, do it each iteration
     // to take in consideration possible changes in the two trasformation (tracker 
     // to canonical and canonical to world; e.g. when i move the camera the canonical 
     // to world changes accordingly)
-    TmpTransform->SetMatrix(StartTrackerPoseMatrix);
+    m_TmpTransform->SetMatrix(*m_StartTrackerPoseMatrix);
 
-    GetTracker()->TrackerToCanonical(TmpTransform);
+    GetTracker()->TrackerToCanonical(m_TmpTransform);
 
     // @todo change here to map to current constrain ref sys
-    Avatar->CanonicalToWorld(TmpTransform); // map according to current transformations
+    m_Avatar->CanonicalToWorld(m_TmpTransform); // map according to current transformations
 
     // Use of the initial matrix pose of the tracker in the world coordinate system, but 
     // extract the rotation matrix only
     float start_orientation[3];
-    this->TmpTransform->GetOrientation(start_orientation);
+    this->m_TmpTransform->GetOrientation(start_orientation);
 
     /** to be rewritten */
-    this->DeltaTransform->RotateY(start_orientation[1],POST_MULTIPLY);
-    this->DeltaTransform->RotateX(start_orientation[0],POST_MULTIPLY);
-    this->DeltaTransform->RotateZ(start_orientation[2],POST_MULTIPLY);
+    this->m_DeltaTransform->RotateY(start_orientation[1],POST_MULTIPLY);
+    this->m_DeltaTransform->RotateX(start_orientation[0],POST_MULTIPLY);
+    this->m_DeltaTransform->RotateZ(start_orientation[2],POST_MULTIPLY);
   
-    this->DeltaTransform->RotateY(-start_orientation[1],PRE_MULTIPLY);
-    this->DeltaTransform->RotateX(-start_orientation[0],PRE_MULTIPLY);
-    this->DeltaTransform->RotateZ(-start_orientation[2],PRE_MULTIPLY);
+    this->m_DeltaTransform->RotateY(-start_orientation[1],PRE_MULTIPLY);
+    this->m_DeltaTransform->RotateX(-start_orientation[0],PRE_MULTIPLY);
+    this->m_DeltaTransform->RotateZ(-start_orientation[2],PRE_MULTIPLY);
   }
 }
 
 //------------------------------------------------------------------------------
-int mmi6DOF::OnStartInteraction(mflEventInteraction *event)
+int mmi6DOF::OnStartInteraction(mafEventInteraction *event)
 //------------------------------------------------------------------------------
 {
   mmdTracker *tracker=mmdTracker::SafeDownCast((mafDevice *)event->GetSender());
   assert(tracker);
-  mflMatrix *start_tracker_pose=event->GetMatrix();
+  mafMatrix *start_tracker_pose=event->GetMatrix();
   return StartInteraction(tracker,start_tracker_pose);
 }
 //------------------------------------------------------------------------------
-int mmi6DOF::OnStopInteraction(mflEventInteraction *event)
+int mmi6DOF::OnStopInteraction(mafEventInteraction *event)
 //------------------------------------------------------------------------------
 {
   mmdTracker *tracker=mmdTracker::SafeDownCast((mafDevice *)event->GetSender());
   assert(tracker);
-  mflMatrix *stop_tracker_pose=event->GetMatrix();
+  mafMatrix *stop_tracker_pose=event->GetMatrix();
   return StopInteraction(tracker,stop_tracker_pose);
 }

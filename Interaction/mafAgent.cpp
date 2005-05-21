@@ -3,8 +3,8 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: mafAgent.cpp,v $
 Language:  C++
-Date:      $Date: 2005-05-18 17:29:02 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2005-05-21 07:55:50 $
+Version:   $Revision: 1.7 $
 
 =========================================================================*/
 #include "mafAgent.h"
@@ -89,7 +89,25 @@ void mafAgent::Shutdown()
 }
 
 //------------------------------------------------------------------------------
-void mafAgent::AddObserver(mafObserver *listener,mafID channel, float priority)
+bool mafAgent::HasObservers(mafID channel)
+//------------------------------------------------------------------------------
+{
+  assert(channel>=0);
+  return (m_Channels.size()>channel && m_Channels[channel]!=NULL) ? m_Channels[channel]->HasObservers() : false;
+}
+
+//------------------------------------------------------------------------------
+void mafAgent::GetObservers(mafID channel,std::vector<mafObserver *> &olist)
+//------------------------------------------------------------------------------
+{
+  olist.clear();
+  if (m_Channels.size()>channel && m_Channels[channel]!=NULL)
+  {
+    m_Channels[channel]->GetObservers(olist);
+  }
+}
+//------------------------------------------------------------------------------
+void mafAgent::AddObserver(mafObserver *listener,mafID channel, int priority)
 //------------------------------------------------------------------------------
 {
   assert(listener);
@@ -156,7 +174,7 @@ void mafAgent::UnPlugEventSource(mafAgent *source)
 }
 
 //------------------------------------------------------------------------------
-void mafAgent::PlugEventSource(mafAgent *source,mafID channel, float priority)
+void mafAgent::PlugEventSource(mafAgent *source,mafID channel, int priority)
 //------------------------------------------------------------------------------
 {
   assert(source);
@@ -165,7 +183,7 @@ void mafAgent::PlugEventSource(mafAgent *source,mafID channel, float priority)
 
 #ifdef MAF_USE_VTK
 //------------------------------------------------------------------------------
-void mafAgent::PlugEventSource(vtkObject *source,mafID channel, float priority)
+void mafAgent::PlugEventSource(vtkObject *source,mafID channel, int priority)
 //------------------------------------------------------------------------------
 {
   if (!m_EventCallbackCommand) // Alloc this object only when necessary
@@ -185,7 +203,7 @@ void mafAgent::PlugEventSource(vtkObject *source,mafID channel, float priority)
 }
 
 //------------------------------------------------------------------------------
-int mafAgent::PlugEventSource(vtkObject *source,void (*f)(void *), void *self, mafID channel, float priority)
+int mafAgent::PlugEventSource(vtkObject *source,void (*f)(void *), void *self, mafID channel, int priority)
 //------------------------------------------------------------------------------
 { 
   assert(source);

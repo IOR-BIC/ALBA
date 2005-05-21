@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 15:42:37 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-21 07:55:51 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,108 +13,119 @@
 #include "mafDevice.h"
 
 #include "mmiGenericInterface.h"
- #include "vtkObjectFactory.h"
 
 #include "mmiConstraint.h"
-#include "mflEvent.h"
-#include "mflVME.h"
-#include "vtkMatrix4x4.h"
-#include "mflTransform.h"
+#include "mafEventBase.h"
+#include "mafVME.h"
+#include "mafMatrix.h"
+#include "mafTransform.h"
+#include "mmuIdFactory.h"
+
 #include "vtkRenderer.h"
 
 //------------------------------------------------------------------------------
 // Events
 //------------------------------------------------------------------------------
-MFL_EVT_IMP(mmiGenericInterface::MoveActionEvent);
+//MAF_ID_IMP(mmiGenericInterface::MOVE_EVENT);
 
 //------------------------------------------------------------------------------
-vtkStandardNewMacro(mmiGenericInterface)
-vtkCxxSetObjectMacro(mmiGenericInterface,ResultTransform,mflTransform);
+mafCxxAbstractTypeMacro(mmiGenericInterface)
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 mmiGenericInterface::mmiGenericInterface()
 //------------------------------------------------------------------------------
 {
-  TranslationFlag       = true;
-  RotationFlag          = true;
-  ScalingFlag           = true;
-  UniformScalingFlag    = true;
-  SurfaceSnap           = false;
-  ResultTransform       = NULL;
-  TargetRefSys          = new mafRefSys;
-  TranslationConstraint = new mmiConstraint;
-  RotationConstraint    = new mmiConstraint;
-  ScaleConstraint       = new mmiConstraint;
-  PivotRefSys           = new mafRefSys;
-  RotationConstraint->GetRefSys()->SetTypeToView(); // the Renderer is set later!!!
-  TranslationConstraint->GetRefSys()->SetTypeToView(); // the Renderer is set later!!!
-  PivotRefSys->SetTypeToLocal(); // the VME is set later !!!
+  m_TranslationFlag       = true;
+  m_RotationFlag          = true;
+  m_ScalingFlag           = true;
+  m_UniformScalingFlag    = true;
+  m_SurfaceSnap           = false;
+  m_ResultTransform       = NULL;
+  m_TargetRefSys          = new mafRefSys;
+  m_TranslationConstraint = new mmiConstraint;
+  m_RotationConstraint    = new mmiConstraint;
+  m_ScaleConstraint       = new mmiConstraint;
+  m_PivotRefSys           = new mafRefSys;
+  m_RotationConstraint->GetRefSys()->SetTypeToView(); // the Renderer is set later!!!
+  m_TranslationConstraint->GetRefSys()->SetTypeToView(); // the Renderer is set later!!!
+  m_PivotRefSys->SetTypeToLocal(); // the VME is set later !!!
 }
 
 //------------------------------------------------------------------------------
 mmiGenericInterface::~mmiGenericInterface()
 //------------------------------------------------------------------------------
 {
-  vtkDEL(ResultTransform);
-  delete TargetRefSys; TargetRefSys = NULL;
-  delete PivotRefSys; PivotRefSys = NULL;
-  delete TranslationConstraint; TranslationConstraint = NULL;
-  delete RotationConstraint; RotationConstraint = NULL;
-  delete ScaleConstraint; ScaleConstraint = NULL;
+  mafDEL(m_ResultTransform);
+  delete m_TargetRefSys; m_TargetRefSys = NULL;
+  delete m_PivotRefSys; m_PivotRefSys = NULL;
+  delete m_TranslationConstraint; m_TranslationConstraint = NULL;
+  delete m_RotationConstraint; m_RotationConstraint = NULL;
+  delete m_ScaleConstraint; m_ScaleConstraint = NULL;
 }
 
 //------------------------------------------------------------------------------
-void mmiGenericInterface::SetResultMatrix(vtkMatrix4x4 *result)
+void mmiGenericInterface::SetResultTransform(mafTransform *result)
 //------------------------------------------------------------------------------
 {
-  mflSmartPointer<mflTransform> trans; // create a transform on the fly
-  trans->SetMatrix(result,false); // make it reference the result matrix
+  if (result!=m_ResultTransform)
+  {
+    mafDEL(m_ResultTransform);
+    m_ResultTransform=result;
+    m_ResultTransform->Register(this);
+  }
+}
+//------------------------------------------------------------------------------
+void mmiGenericInterface::SetResultMatrix(mafMatrix *result)
+//------------------------------------------------------------------------------
+{
+  mafSmartPointer<mafTransform> trans; // create a transform on the fly
+  trans->SetMatrixPointer(result); // make it reference the result matrix
   SetResultTransform(trans);
 }
 
 //------------------------------------------------------------------------------
-vtkMatrix4x4 *mmiGenericInterface::GetResultMatrix()
+mafMatrix *mmiGenericInterface::GetResultMatrix()
 //------------------------------------------------------------------------------
 { 
-  return (ResultTransform?ResultTransform->GetMatrix():NULL);
+  return (m_ResultTransform?m_ResultTransform->GetMatrixPointer():NULL);
 }
 
 //------------------------------------------------------------------------------
 void mmiGenericInterface::SetTargetRefSys(mafRefSys &ref_sys)
 //------------------------------------------------------------------------------
 {
-  *TargetRefSys=ref_sys;
+  *m_TargetRefSys=ref_sys;
 }
 //------------------------------------------------------------------------------
 void mmiGenericInterface::SetTargetRefSys(mafRefSys *ref_sys)
 //------------------------------------------------------------------------------
 {
-  TargetRefSys->DeepCopy(ref_sys);
+  m_TargetRefSys->DeepCopy(ref_sys);
 }
 
 //------------------------------------------------------------------------------
 void mmiGenericInterface::SetPivotRefSys(mafRefSys *pivot_frame )
 //------------------------------------------------------------------------------
 {
-  PivotRefSys->DeepCopy(pivot_frame);
+  m_PivotRefSys->DeepCopy(pivot_frame);
 }
 
 //------------------------------------------------------------------------------
 void mmiGenericInterface::SetPivotRefSys(mafRefSys &pivot_frame )
 //------------------------------------------------------------------------------
 {
-  *PivotRefSys=pivot_frame;
+  *m_PivotRefSys=pivot_frame;
 }
 
 //------------------------------------------------------------------------------
 void mmiGenericInterface::SetRenderer(vtkRenderer *ren)
 //------------------------------------------------------------------------------
 {
-  TranslationConstraint->GetRefSys()->SetRenderer(ren);  
-  RotationConstraint->GetRefSys()->SetRenderer(ren);  
-  ScaleConstraint->GetRefSys()->SetRenderer(ren);  
-  PivotRefSys->SetRenderer(ren);
+  m_TranslationConstraint->GetRefSys()->SetRenderer(ren);  
+  m_RotationConstraint->GetRefSys()->SetRenderer(ren);  
+  m_ScaleConstraint->GetRefSys()->SetRenderer(ren);  
+  m_PivotRefSys->SetRenderer(ren);
   Superclass::SetRenderer(ren);
 }
 
@@ -122,32 +133,32 @@ void mmiGenericInterface::SetRenderer(vtkRenderer *ren)
 void mmiGenericInterface::SetTranslationConstraint(mmiConstraint *constrain)
 //------------------------------------------------------------------------------
 {
-  *TranslationConstraint=*constrain;
+  *m_TranslationConstraint=*constrain;
 }
 
 //------------------------------------------------------------------------------
 void mmiGenericInterface::SetRotationConstraint(mmiConstraint *constrain)
 //------------------------------------------------------------------------------
 {
-  *RotationConstraint=*constrain;
+  *m_RotationConstraint=*constrain;
 }
 
 //------------------------------------------------------------------------------
 void mmiGenericInterface::SetScaleConstraint(mmiConstraint *constrain)
 //------------------------------------------------------------------------------
 {
-  *ScaleConstraint=*constrain;
+  *m_ScaleConstraint=*constrain;
 }
  
 //------------------------------------------------------------------------------
-void mmiGenericInterface::SetVME(mflVME *vme)
+void mmiGenericInterface::SetVME(mafVME *vme)
 //------------------------------------------------------------------------------
 {
   Superclass::SetVME(vme);
-  RotationConstraint->GetRefSys()->SetVME(vme);
-  TranslationConstraint->GetRefSys()->SetVME(vme);
-  ScaleConstraint->GetRefSys()->SetVME(vme);
-  PivotRefSys->SetVME(vme);
+  m_RotationConstraint->GetRefSys()->SetVME(vme);
+  m_TranslationConstraint->GetRefSys()->SetVME(vme);
+  m_ScaleConstraint->GetRefSys()->SetVME(vme);
+  m_PivotRefSys->SetVME(vme);
 }
 
 //------------------------------------------------------------------------------
@@ -182,26 +193,26 @@ void mmiGenericInterface::EnableUniformScaling(bool enable)
 void mmiGenericInterface::EnableTranslationInternal(bool enable)
 //------------------------------------------------------------------------------
 {
-  TranslationFlag = enable;
+  m_TranslationFlag = enable;
 }
 
 //------------------------------------------------------------------------------
 void mmiGenericInterface::EnableRotationInternal(bool enable)
 //------------------------------------------------------------------------------
 {
-  RotationFlag = enable;
+  m_RotationFlag = enable;
 }
 
 //------------------------------------------------------------------------------
 void mmiGenericInterface::EnableScalingInternal(bool enable)
 //------------------------------------------------------------------------------
 {
-  ScalingFlag = enable;
+  m_ScalingFlag = enable;
 }
 
 //------------------------------------------------------------------------------
 void mmiGenericInterface::EnableUniformScalingInternal(bool enable)
 //------------------------------------------------------------------------------
 {
-   UniformScalingFlag = enable;
+   m_UniformScalingFlag = enable;
 }

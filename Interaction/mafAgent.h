@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAgent.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 17:29:02 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-05-21 07:55:50 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -54,19 +54,19 @@ public:
   Beware, before destroying the Listener remember to UnPlug the source since the listener
   doesn't keep a list of the sources it is connected to. Otherwise the vtkCallbackCommand used
   as a bridge for the events will remain alive.*/
-  virtual void PlugEventSource(mafAgent *source,mafID channel=MCH_ANY, float priority = 0.0);
+  virtual void PlugEventSource(mafAgent *source,mafID channel=MCH_ANY, int priority = 0);
   virtual void UnPlugEventSource(mafAgent *source);
   
 #ifdef MAF_USE_VTK
   /**
     Plug in a VTK object as source of events, specifying the VTK event ID to be observed.*/
-  virtual void PlugEventSource(vtkObject *source,mafID eventid, float priority = 0.0);
+  virtual void PlugEventSource(vtkObject *source,mafID eventid, int priority = 0);
   
   /**
   This is a commodity function to attach a callback function to a VTK event. 'source' is the vtkObject
   to which attach the event, 'arg' is typically the pointer of the class that wants to link to the event (the 'self')
   and 'f' is the callback function to be attached to the event.*/
-  static int PlugEventSource(vtkObject *source,void (*f)(void *), void *self, mafID eventid, float priority = 0.0);
+  static int PlugEventSource(vtkObject *source,void (*f)(void *), void *self, mafID eventid, int priority = 0);
   
   /**
   Unplug an events source. Remember to explicitly unplug all the source before destroying the
@@ -80,7 +80,7 @@ public:
   one listener can be specified, and a broad cast using the VTK Subject/Observer is performed.
   UnPlugListener works for all channels at the same time.
   NULL listeners are ignored.*/
-  void AddObserver(mafObserver *listener,mafID channel=MCH_UP, float priority = 0.0);
+  void AddObserver(mafObserver *listener,mafID channel=MCH_UP, int priority = 0);
   void RemoveObserver(mafObserver *listener);
   void RemoveAllObservers();
   
@@ -91,8 +91,11 @@ public:
   until it's processed.*/
   virtual void OnEvent(mafEventBase *event);
   
-  /**  return true if there's a listener on the specified channel. (noarg == MCH_UP) */
-  inline int HasObserver(mafID channel);
+  /**  return true if there's an observer on the specified channel. (noarg == MCH_UP) */
+  bool HasObservers(mafID channel);
+  
+  /** return a list of the observers on a channel */
+  void GetObservers(mafID channel,std::vector<mafObserver *> &olist);
 
   /**
     Initialize this agent. Subclasses can redefine InternalInitialize() to customize

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiSER.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 17:29:06 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-21 07:55:52 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,7 +12,7 @@
 
 #include "mmiSER.h"
 #include "mmdTracker.h"
-#include "mafInteractionDecl.h"
+#include "mafStorageElement.h"
 
 #include <assert.h>
 
@@ -35,8 +35,9 @@ mmiSER::~mmiSER()
 int mmiSER::InternalStore(mafStorageElement *node)
 //------------------------------------------------------------------------------
 {
-  for (mafAction *action=m_Actions->InitTraversal();action;action=m_Actions->GetNextItem())
+  for (mmuActionsMap::iterator it=m_Actions.begin();it!=m_Actions.end();it++)
   {
+    mafAction *action=it->second;
     node->StoreObject("Action",action);   
   }
 
@@ -51,7 +52,7 @@ int mmiSER::InternalRestore(mafStorageElement *node)
   for (int i=0;i<children.size();i++)
   {
     mafStorageElement *subnode=children[i];
-    if (!mafCString(subnode->GetName())=="Action")
+    if (mafCString(subnode->GetName())!="Action")
     {
       mafErrorMacro("Unexpected element <"<<subnode->GetName()<<">");
       return MAF_ERROR;
@@ -71,7 +72,8 @@ int mmiSER::InternalRestore(mafStorageElement *node)
 mafAction *mmiSER::GetAction(const char *name)
 //------------------------------------------------------------------------------
 {
-  return m_Actions->GetItem(name);
+  mmuActionsMap::iterator it=m_Actions.find(name);
+  return (it!=m_Actions.end()?it->second:NULL);
 }
 
 //------------------------------------------------------------------------------
@@ -133,7 +135,8 @@ mafAction *mmiSER::AddAction(const char *name, float priority, int type)
 void mmiSER::AddAction(mafAction *action, float priority)
 //------------------------------------------------------------------------------
 {
-  m_Actions->SetItem(action->GetName(),action);
+  assert(action);
+  m_Actions[action->GetName()]=action;
   
   // attach the action both as a listener and an event source 
   action->AddObserver(this);
@@ -173,34 +176,34 @@ void mmiSER::UnBindDeviceFromAllActions(mafDevice *device)
 //------------------------------------------------------------------------------
 {
   assert(device);
-  mflSmartPointer<vtkCollection> device_actions;
+  std::vector<mafAction *> device_actions;
   GetDeviceBindings(device,device_actions);
-  device_actions->InitTraversal();
-  for (mafAction *action=(mafAction *)device_actions->GetNextItemAsObject();action; \
-    action=(mafAction *)device_actions->GetNextItemAsObject())
+
+  for (int i=0;i<device_actions.size();i++)
   {
-    action->UnBindDevice(device);
+    device_actions[i]->UnBindDevice(device);
   }
-  
 }
 
 //------------------------------------------------------------------------------
-void mmiSER::GetDeviceBindings(mafDevice *device,vtkCollection *actions)
+void mmiSER::GetDeviceBindings(mafDevice *device,std::vector<mafAction *> &actions)
 //------------------------------------------------------------------------------
 {
-  assert(actions);
   assert(device);
   
-  actions->RemoveAllItems();
+  actions.clear();
 
-  // Currently there's no way to extract listeners list from a device (or agent),
-  // thus I have to search all the actions for the device as an event source 
+  std::vector<mafObserver *> observers;
+  device->GetObservers(MCH_INPUT,observers);
   
-  for (mafAction *action=m_Actions->InitTraversal();action;action=m_Actions->GetNextItem())
+  for (int i=0;i<observers.size();i++)
   {
-    if (action->GetDevices()->IsItemPresent(device))
+    mafAction *action;
+    try { action=dynamic_cast<mafAction *>(observers[i]); } catch (std::bad_cast) { action=NULL;}
+   
+    if (action)
     {
-      actions->AddItem(action);
-    }
+      actions.push_back(action);
+    }  
   }
 }
