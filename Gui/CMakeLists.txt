@@ -16,6 +16,8 @@ mafSideBar.cpp
 mafSideBar.h
 mafWXLog.cpp
 mafWXLog.h
+mmaMaterial.cpp
+mmaMaterial.h
 mmgButton.cpp
 mmgButton.h
 mmgCheckTree.cpp
