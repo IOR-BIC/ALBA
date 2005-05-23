@@ -18,6 +18,8 @@ vtkProjectSP.cxx
 vtkProjectSP.h
 vtkRGSliceAccumulate.cxx
 vtkRGSliceAccumulate.h
+vtkTransferFunction2D.cxx
+vtkTransferFunction2D.h
 vtkVolumeResample.h
 vtkVolumeResample.cxx
 vtkVolumeSlicer.cxx
