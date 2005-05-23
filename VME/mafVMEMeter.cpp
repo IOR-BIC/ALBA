@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:50:50 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-05-23 12:11:31 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -54,6 +54,7 @@ mafVMEMeter::mafVMEMeter()
   m_EndVme2Name   = "";
   
   m_MeterAttributes = NULL;
+  m_VMEAccept = new mafVMEAccept();
 
   mafNEW(m_Transform);
   mafVMEOutputPolyline *output = mafVMEOutputPolyline::New(); // an output with no data
@@ -69,8 +70,8 @@ mafVMEMeter::mafVMEMeter()
 
   vtkNEW(m_TmpTransform);
 
-  // attach a datapipe which creates a bridge between VTK and MAF
-  mafDataPipeCustom *dpipe=mafDataPipeCustom::New();
+  // attach a data pipe which creates a bridge between VTK and MAF
+  mafDataPipeCustom *dpipe = mafDataPipeCustom::New();
   dpipe->SetDependOnAbsPose(true);
   SetDataPipe(dpipe);
   
@@ -80,6 +81,8 @@ mafVMEMeter::mafVMEMeter()
 mafVMEMeter::~mafVMEMeter()
 //-------------------------------------------------------------------------
 {
+  delete m_VMEAccept;
+  m_VMEAccept = NULL;
   mafDEL(m_MeterAttributes);
   mafDEL(m_Transform);
   vtkDEL(m_LineSource);
@@ -677,16 +680,62 @@ mmgGui* mafVMEMeter::CreateGui()
   //m_Gui = new mmgGui(NULL); // commented because mafNode::CreateGui() is called!
 
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
+  m_Gui->SetListener(this);
   m_Gui->Divider();
   mafVME *start_vme = mafVME::SafeDownCast(GetLink("StartVME"));
-  m_StartVmeName = start_vme ? start_vme->GetName() : "";
-  m_Gui->Label("Start: ", wxString(m_StartVmeName));
+  m_StartVmeName = start_vme ? start_vme->GetName() : "none";
+  //m_Gui->Label("Start: ", wxString(m_StartVmeName));
+  m_Gui->Button(ID_START_METER_LINK,m_StartVmeName.GetCStr(),"Start", "Select the start vme for the meter");
   mafVME *end_vme1   = mafVME::SafeDownCast(GetLink("EndVME1"));
-  m_EndVme1Name = end_vme1 ? end_vme1->GetName() : "";
-  m_Gui->Label("End1: ", wxString(m_EndVme1Name));
+  m_EndVme1Name = end_vme1 ? end_vme1->GetName() : "none";
+  m_Gui->Button(ID_END1_METER_LINK,m_EndVme1Name.GetCStr(),"End 1", "Select the end vme for point distance");
+//  m_Gui->Label("End1: ", wxString(m_EndVme1Name));
   mafVME *end_vme2   = mafVME::SafeDownCast(GetLink("EndVME2"));
-  m_EndVme2Name = end_vme2 ? end_vme2->GetName() : "";
-  m_Gui->Label("End2: ", wxString(m_EndVme2Name));
+  m_EndVme2Name = end_vme2 ? end_vme2->GetName() : "none";
+  m_Gui->Button(ID_END2_METER_LINK,m_EndVme2Name.GetCStr(),"End 2", "Select the vme representing \nthe point for line distance");
+//  m_Gui->Label("End2: ", wxString(m_EndVme2Name));
 
   return m_Gui;
+}
+//-------------------------------------------------------------------------
+void mafVMEMeter::OnEvent(mafEventBase *event)
+//-------------------------------------------------------------------------
+{
+  // events to be sent up or down in the tree are simply forwarded
+  if (mafEvent *e = mafEvent::SafeDownCast(event))
+  {
+    switch(e->GetId())
+    {
+      case ID_START_METER_LINK:
+      case ID_END1_METER_LINK:
+      case ID_END2_METER_LINK:
+      {
+        mafID button_id = e->GetId();
+        mafString title = "Choose the start meter vme";
+        e->SetId(VME_CHOOSE);
+        e->SetArg((long)m_VMEAccept);
+        e->SetString(&title);
+        ForwardUpEvent(e);
+        mafNode *n = e->GetVme();
+        if (n != NULL)
+        {
+          if (button_id == ID_START_METER_LINK)
+          {
+            SetLink("StartVME", n);
+          }
+          else if (button_id == ID_END1_METER_LINK)
+          {
+            SetLink("EndVME1", n);
+          }
+          else
+          {
+            SetLink("EndVME2", n);
+          }
+        }
+      }
+      break;
+      default:
+        mafNode::OnEvent(event);
+    }
+  }
 }

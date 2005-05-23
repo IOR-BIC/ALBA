@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:50:50 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-05-23 12:11:31 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -16,6 +16,9 @@
 //----------------------------------------------------------------------------
 #include "mafVME.h"
 #include "mafVMEOutputPolyline.h"
+#include "mafEvent.h"
+#include "mmgVmeChooserAccept.h"
+
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
@@ -51,9 +54,25 @@ public:
   mafTypeMacro(mafVMEMeter,mafVME);
 
   enum {
-    ID_MIO = Superclass::ID_LAST,
+    ID_START_METER_LINK = Superclass::ID_LAST,
+    ID_END1_METER_LINK,
+    ID_END2_METER_LINK,
     ID_LAST
   };
+
+  class mafVMEAccept : public mmgVmeChooserAccept
+  {
+  public:
+
+    mafVMEAccept() {};
+    ~mafVMEAccept() {};
+
+    bool Validate(mafNode *node) {return(node != NULL && node->IsA("mafVME"));};
+  };
+  mafVMEAccept *m_VMEAccept;
+
+  /** Precess events coming from other objects */ 
+  virtual void OnEvent(mafEventBase *event);
 
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0);
