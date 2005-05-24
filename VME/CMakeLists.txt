@@ -82,8 +82,18 @@ IF (MAF_USE_VTK)
   mafVMEVolumeGray.h
   mafVTKInterpolator.cpp
   mafVTKInterpolator.h
+  mmaMaterial.cpp
+  mmaMaterial.h
   mmaMeter.cpp
   mmaMeter.h
+  mmgMaterialButton.cpp
+  mmgMaterialButton.h
+  mmgVMEChooser.cpp
+  mmgVMEChooser.h
+  mmgVMEChooserAccept.cpp
+  mmgVMEChooserAccept.h
+  mmgVMEChooserTree.cpp
+  mmgVMEChooserTree.h
   vtkMAFDataPipe.cpp
   vtkMAFDataPipe.h
 
