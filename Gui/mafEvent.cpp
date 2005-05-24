@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-16 14:52:39 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-24 17:02:54 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone, Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,12 +25,12 @@
 #include "mafView.h"
 #include "mafOp.h"
 #include "mafNode.h"
+#include "mafMatrix.h"
 
 
 #ifdef MAF_USE_VTK
   #include "vtkObject.h"
   #include "vtkProp.h"
-  #include "vtkMatrix4x4.h"
 #endif
 //----------------------------------------------------------------------------
 // TypeMacro
@@ -54,6 +54,7 @@ enum
   mafEvent::mafEvent(void *sender, int id, mafView         *view,   wxWindow *win)				{ Init(sender, id, 0);   m_view =view; m_win  =win;			Initialized();}
   mafEvent::mafEvent(void *sender, int id, mafNode          *vme,    bool b,long arg)			{ Init(sender, id, arg); m_vme  =vme; m_bool = b;				Initialized();}
   mafEvent::mafEvent(void *sender, int id, mafOp           *op,     long arg)							{ Init(sender, id, arg);   m_op   =op;									Initialized();}
+  mafEvent::mafEvent(void *sender, int id, mafMatrix    *m1,mafMatrix  *m2)					      { Init(sender, id, 0);   m_matrix =m1; m_matrix2 =m2;		Initialized();}
 #ifdef MAF_USE_WX
   mafEvent::mafEvent(void *sender, int id, wxWindow        *win,    long arg)							{ Init(sender, id, arg); m_win  =win;										Initialized();}
   mafEvent::mafEvent(void *sender, int id, wxUpdateUIEvent *e,      long arg)							{ Init(sender, id, arg); m_uiev = e;																	}
@@ -61,7 +62,6 @@ enum
 #endif
 #ifdef MAF_USE_VTK
   mafEvent::mafEvent(void *sender, int id, vtkObject       *vtkobj, long arg)							{ Init(sender, id, arg); m_vtkobj = vtkobj;							Initialized();}
-  mafEvent::mafEvent(void *sender, int id, vtkMatrix4x4    *m1,vtkMatrix4x4  *m2)					{ Init(sender, id, 0);   m_matrix =m1; m_matrix2 =m2;		Initialized();}
   mafEvent::mafEvent(void *sender, int id, vtkObject       *vtkobj, mafString *s)         { Init(sender, id, 0);   m_vtkobj = vtkobj;m_string =s; Initialized();}
   mafEvent::mafEvent(void *sender, int id, vtkProp         *prop,   mafNode *vme)   				{ Init(sender, id, 0);   m_prop =prop; m_vme=vme;				Initialized();}
 #endif
