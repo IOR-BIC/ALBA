@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTest.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 11:09:15 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-24 14:35:55 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -81,14 +81,14 @@ void mmoTest::OpRun()
   m_Gui->SetListener(this);
 
   m_Gui->Label("label");
-  m_Gui->Label("label1",wxString("label2")) ;
+  m_Gui->Label("label1",mafString("label2")) ;
   m_Gui->Divider();
   m_Gui->Divider(1);
   m_Gui->Divider(2);
   m_Gui->Divider(3);
 
   m_Gui->Button  (ID,"button");
-  m_Gui->Button  (ID,"button","label");
+  m_Gui->Button  (ID,"button",mafString("label"));
 
   m_Gui->Vector  (ID, "i vector", m_iv);
   m_Gui->Vector  (ID, "f vector", m_fv);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-21 07:54:45 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-05-24 14:34:28 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2005
@@ -83,16 +83,16 @@ public:
 	void Divider(long style=0);
 
   /** Label widget. */
-  void Label(wxString label,bool bold = false, bool multiline = false);
+  void Label(mafString label,bool bold = false, bool multiline = false);
 
   /** Label widget. */
-  void Label(wxString *var ,bool bold = false, bool multiline = false);
+  void Label(mafString *var ,bool bold = false, bool multiline = false);
 
   /** Double label widget. */
-	void Label(wxString label1,wxString  label2, bool bold = false);
+	void Label(mafString label1,mafString  label2, bool bold = false);
 
   /** Double label widget. */
-  void Label(wxString label1,wxString *var, bool bold = false);
+  void Label(mafString label1,mafString *var, bool bold = false);
 
   //---------------------------------------------
   /** Label widget. */
@@ -115,13 +115,13 @@ public:
   void String(int id,const char *label,mafString *var, const char *tooltip = "");
   
   /** Integer entry widget. */
-  void Integer(int id,wxString label,int *var, int min = MININT, int max = MAXINT, wxString tooltip = "");
+  void Integer(int id,mafString label,int *var, int min = MININT, int max = MAXINT, mafString tooltip = "");
 
   /** Float entry widget. */
-  void Float(int id,wxString label,float *var, float min = MINFLOAT, float max = MAXFLOAT, int flag=0, int decimal_digit = 2, wxString tooltip = "");
+  void Float(int id,mafString label,float *var, float min = MINFLOAT, float max = MAXFLOAT, int flag=0, int decimal_digit = 2, mafString tooltip = "");
 
   /** Double entry widget. */
-  void Double(int id,wxString label,double *var, double	min = MINFLOAT, double max = MAXFLOAT, int flag=0, int decimal_digit = 2, wxString tooltip = "");
+  void Double(int id,mafString label,double *var, double	min = MINFLOAT, double max = MAXFLOAT, int flag=0, int decimal_digit = 2, mafString tooltip = "");
 
   /** Integer vector3 entry widget. */
   void Vector(int id,wxString label, int var[3], int min = MININT, int max = MAXINT, wxString tooltip = "");
@@ -148,31 +148,31 @@ public:
   void VectorN(int id,wxString label, int *var,int num_elem = 3,int min = MININT, int max = MAXINT, wxString tooltip = "");
 
   /** Checkbutton widget. */
-  void Bool (int id, wxString label, int *var, int flag = 0, wxString tooltip = ""	);
+  void Bool (int id, mafString label, int *var, int flag = 0, mafString tooltip = ""	);
 
   /** Radiobutton widget. */
   void Radio(int id,wxString label, int *var, int numchoices = 0, const wxString choices[] = NULL, int dim = 1, wxString tooltip = "");
 
   /** Combo widget. */
-  void Combo(int id,wxString label, int *var, int numchoices = 0, const wxString choices[] = NULL, wxString tooltip = "");
+  void Combo(int id,mafString label, int *var, int numchoices = 0, const wxString choices[] = NULL, mafString tooltip = "");
 
   /** File open dialog widget. */
-  void FileOpen(int id,wxString label,wxString *var, const wxString wildcard = "", wxString tooltip = "");
+  void FileOpen(int id,mafString label,mafString *var, const mafString wildcard = "", mafString tooltip = "");
 
   /** File save dialog widget. */
-  void FileSave(int id,wxString label,wxString *var, const wxString wildcard = "", wxString tooltip = "");
+  void FileSave(int id,mafString label,mafString *var, const mafString wildcard = "", mafString tooltip = "");
 
   /** Dir Open dialog widget. */
-  void DirOpen (int id,wxString label,wxString *var, wxString tooltip = "");
+  void DirOpen (int id,mafString label,mafString *var, mafString tooltip = "");
 
   /** Colour dialog widget. */
   void Color   (int id,wxString label,wxColour *var, wxString tooltip = "");
 
   /** Button widget. */
-  void Button  (int id,wxString button_text,wxString label="", wxString tooltip=""); 
+  void Button  (int id,mafString button_text,mafString label="", mafString tooltip=""); 
   
   /** Button widget with variable label. */
-  void Button  (int id,wxString *label,wxString button_text, wxString tooltip=""); 
+  void Button  (int id,mafString *label,mafString button_text, mafString tooltip=""); 
 
   /** Ok-Cancel Button widget. */
   void OkCancel();

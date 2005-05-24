@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgValidator.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:44:06 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-24 14:34:28 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,12 +16,13 @@
 //----------------------------------------------------------------------------
 #include <wx/validate.h>
 #include "mafDecl.h"
+#include "mafString.h"
+
 //-----------------------------------------------------------------------------
 //forward ref
 //-----------------------------------------------------------------------------
 class mmgFloatSlider;
 class mafObserver;
-class mafString; 
 
 //-----------------------------------------------------------------------------
 // constant :
@@ -53,7 +54,7 @@ enum validator_modes
 class mmgValidator : public wxValidator
 {
 public:
-  mmgValidator (mafObserver* listener,int mid,wxStaticText *win,wxString* var);                                             //String
+  mmgValidator (mafObserver* listener,int mid,wxStaticText *win,mafString* var);                                             //String
   mmgValidator (mafObserver* listener,int mid,wxTextCtrl   *win,wxString* var);   //String
   mmgValidator (mafObserver* listener,int mid,wxTextCtrl   *win,mafString* var);  //String
   mmgValidator (mafObserver* listener,int mid,wxTextCtrl   *win,   int*		var, int		min=-32000,			 int		max=32000);     //Integer
@@ -67,8 +68,8 @@ public:
   mmgValidator (mafObserver* listener,int mid,wxRadioBox   *win,   int*   var);
   mmgValidator (mafObserver* listener,int mid,wxComboBox   *win,   int*   var);
   mmgValidator (mafObserver* listener,int mid,wxButton     *win);
-  mmgValidator (mafObserver* listener,int mid,wxButton     *win,wxString* var, wxTextCtrl* lab, bool openfile, const wxString wildcard); // FileOpen/Save
-  mmgValidator (mafObserver* listener,int mid,wxButton     *win,wxString* var, wxTextCtrl* lab); // DirOpen
+  mmgValidator (mafObserver* listener,int mid,wxButton     *win,mafString* var, wxTextCtrl* lab, bool openfile, const mafString wildcard); // FileOpen/Save
+  mmgValidator (mafObserver* listener,int mid,wxButton     *win,mafString* var, wxTextCtrl* lab); // DirOpen
   mmgValidator (mafObserver* listener,int mid,wxButton     *win,wxColour* var, wxTextCtrl* lab);
 
   mmgValidator(const mmgValidator& val) {Copy(val);};
@@ -120,8 +121,8 @@ protected:
   int         m_imin;
   
   mafObserver    *m_Listener;
-  int                  m_mid;
-	int									 m_decimal_digits;
-  wxString             m_wildcard;
+  int             m_mid;
+	int							m_decimal_digits;
+  mafString       m_wildcard;
 };
 #endif

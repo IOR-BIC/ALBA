@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testTabGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:24:37 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-24 14:35:34 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -46,7 +46,7 @@ testTabGui::testTabGui(wxWindow* parent)
   m_gui = new mmgGui(this);
   
   m_gui->Label("label");
-  m_gui->Label("label1",wxString("label2")) ;
+  m_gui->Label("label1",mafString("label2"));
   m_gui->Divider();
   m_gui->Divider(1);
   m_gui->Divider(2);

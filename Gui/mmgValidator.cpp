@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgValidator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:44:06 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-05-24 14:34:28 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,7 +26,7 @@
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "mmgFloatSlider.h"
-#include "mafString.h"
+
 //----------------------------------------------------------------------------
 // mmgValidator
 //----------------------------------------------------------------------------
@@ -203,13 +203,13 @@ bool mmgValidator::Copy(const mmgValidator& val)
   return TRUE;
 }
 //----------------------------------------------------------------------------
-mmgValidator::mmgValidator(mafObserver* listener, int mid, wxStaticText *win,wxString* var) //String
+mmgValidator::mmgValidator(mafObserver* listener, int mid, wxStaticText *win,mafString* var) //String
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);
   m_mode = VAL_LABEL;
   m_StaticText=win; 
-  m_svar      =var;     
+  m_svar2     =var;     
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
@@ -345,24 +345,24 @@ mmgValidator::mmgValidator(mafObserver* listener, int mid, wxButton *win) //Butt
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-mmgValidator::mmgValidator(mafObserver* listener, int mid, wxButton *win, wxString* var, wxTextCtrl* lab,  bool  openfile, const wxString wildcard)                                                
+mmgValidator::mmgValidator(mafObserver* listener, int mid, wxButton *win, mafString* var, wxTextCtrl* lab,  bool  openfile, const mafString wildcard)
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);  if (openfile) m_mode = VAL_FILEOPEN; else m_mode = VAL_FILESAVE;
   m_Button    =win;
   m_TextCtrl  =lab;
-  m_svar      =var;
+  m_svar2     =var;
   m_wildcard  =wildcard;
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-mmgValidator::mmgValidator(mafObserver* listener, int mid, wxButton *win, wxString* var, wxTextCtrl* lab)
+mmgValidator::mmgValidator(mafObserver* listener, int mid, wxButton *win, mafString* var, wxTextCtrl* lab)
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);  m_mode = VAL_DIROPEN;
   m_Button    =win;
   m_TextCtrl  =lab;
-  m_svar      =var;
+  m_svar2     =var;
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
@@ -872,7 +872,7 @@ void mmgValidator::OnButton(wxCommandEvent& event)
 					name += ".";
 					name += ext;
 				}
-        wxFileDialog dialog(m_Button,"Open File", path, name, m_wildcard, wxOPEN|wxFILE_MUST_EXIST|wxHIDE_READONLY , m_Button->GetPosition());
+        wxFileDialog dialog(m_Button,"Open File", path, name, m_wildcard.GetCStr(), wxOPEN|wxFILE_MUST_EXIST|wxHIDE_READONLY , m_Button->GetPosition());
         dialog.SetReturnCode(wxID_OK);
 				ret_code = dialog.ShowModal();
 				if (ret_code == wxID_OK)
@@ -896,7 +896,7 @@ void mmgValidator::OnButton(wxCommandEvent& event)
 					name += ".";
 					name += ext;
 				}
-        wxFileDialog dialog(m_Button,"Save File", path, name, m_wildcard, wxSAVE|wxOVERWRITE_PROMPT|wxHIDE_READONLY , m_Button->GetPosition());
+        wxFileDialog dialog(m_Button,"Save File", path, name, m_wildcard.GetCStr(), wxSAVE|wxOVERWRITE_PROMPT|wxHIDE_READONLY , m_Button->GetPosition());
         dialog.SetReturnCode(wxID_OK);
 				ret_code = dialog.ShowModal();
 				if (ret_code == wxID_OK)

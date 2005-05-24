@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testSideBarGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 20:03:01 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-24 14:35:42 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -46,7 +46,7 @@ testSideBarGui::testSideBarGui(wxWindow* parent)
   m_gui = new mmgGui(this);
   
   m_gui->Label("bold label",true);
-  m_gui->Label("label",wxString("label"));
+  m_gui->Label("label",mafString("label"));
   m_gui->Divider(0); //spacer
   m_gui->Divider(1); // gray line
   m_gui->Divider(2); // white line
