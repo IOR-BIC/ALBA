@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiCompositorMouse.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 15:42:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-24 16:43:06 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,24 +13,21 @@
 #ifndef __mmiCompositorMouse_h
 #define __mmiCompositorMouse_h
 
-#ifndef WX_PRECOMP
-#include "wx/wx.h"
-#endif
-
 #include "mafInteractor.h"
 #include "mafEvent.h"
 #include "mmiGenericMouse.h"
+#include "mafTransform.h"
+#include "mafMatrix.h"
+#include "mafSmartPointer.h"
 
 #include <map>
 
-#include "vtkMatrix4x4.h"
-#include "mflTransform.h"
-#include "vtkDOFMatrix.h"
+//#include "vtkMatrix4x4.h"
+//#include "vtkDOFMatrix.h"
 
 //----------------------------------------------------------------------------
 //forward ref
 //----------------------------------------------------------------------------
-
 class vtkDoubleArray;
 class vtkCellPicker;
 
@@ -74,14 +71,13 @@ enum MOUSE_BUTTON
 class mmiCompositorMouse : public mafInteractor
 {
 public:
-  static mmiCompositorMouse *New();
-  vtkTypeMacro(mmiCompositorMouse, mafInteractor);
+  mafTypeMacro(mmiCompositorMouse, mafInteractor);
 
-  /** Start the interaction with the selected object; set CurrentCamera and Renderer ivar */
+  /** Start the interaction with the selected object; set m_CurrentCamera and Renderer ivar */
   virtual int StartInteraction(mmdMouse *mouse);
 
   /**  Process events coming from tracker */
-  virtual void ProcessEvent(mflEvent *event,mafID channel=mflAgent::DefaultChannel);
+  virtual void OnEvent(mafEvent *event);
 
   //----------------------------------------------------------------------------
   // Transform Enabling:
@@ -94,33 +90,26 @@ public:
   /**
   Get a behavior given the activator*/
   mmiGenericMouse *GetBehavior(MMI_ACTIVATOR activator);
-
-
-  //----------------------------------------------------------------------------
-  // Listener stuff:
-  //----------------------------------------------------------------------------
-  /**
-  Set the interactor listener*/
-  void SetListener(mafEventListener *listener) {m_listener = listener;};
-  mafEventListener *GetListener() {return m_listener;};
   
 protected:
 
   mmiCompositorMouse();
   ~mmiCompositorMouse();
 
-  virtual void OnButtonDown(mflEventInteraction *e);
+  virtual void OnButtonDown(mafEventInteraction *e);
   
-  virtual void OnButtonUp(mflEventInteraction *e);
+  virtual void OnButtonUp(mafEventInteraction *e);
 
   /** mouse driven events*/
-  void OnLeftButtonDown   (mflEventInteraction *e);
-  void OnLeftButtonUp     (mflEventInteraction *e);
-  void OnMiddleButtonDown (mflEventInteraction *e);
-  void OnMiddleButtonUp   (mflEventInteraction *e);
+  void OnLeftButtonDown   (mafEventInteraction *e);
+  void OnLeftButtonUp     (mafEventInteraction *e);
+  void OnMiddleButtonDown (mafEventInteraction *e);
+  void OnMiddleButtonUp   (mafEventInteraction *e);
   void OnMouseMove        ();
-  void OnRightButtonDown  (mflEventInteraction *e);
-  void OnRightButtonUp    (mflEventInteraction *e);
+  void OnRightButtonDown  (mafEventInteraction *e);
+  void OnRightButtonUp    (mafEventInteraction *e);
+
+  typedef std::map<int, mafAutoPointer<mmiGenericMouse> > mmuActivatorMap;
 
   /**
                     ActivatorMap
@@ -131,14 +120,14 @@ protected:
   |  MOUSE_LEFT_SHIFT    |   pMMI_2
   |  MOUSE_LEFT_CTRL     |   pMMI_3 
   |   ...........        |   .......
-  
+
   map holding activator<->behavior association*/
-  std::map<int, mmiGenericMouse *> ActivatorMap;
+  mmuActivatorMap m_ActivatorMap;
 
   /** 
 	init the interactor for the corresponding pressed button.
 	*/
-	void InitInteraction(int buttonPressed, mflEventInteraction *e);
+	void InitInteraction(int buttonPressed, mafEventInteraction *e);
 	
 	/**
   conversion from mouse-keyboard combo to the corresponding activator value ie
@@ -146,18 +135,18 @@ protected:
   int MouseToActivator(int mouseButton, int shift, int ctrl);
 
   // the active behavior
-  mmiGenericMouse *ActiveMMIGeneric;
+  mmiGenericMouse *m_ActiveMMIGeneric;
 
 private:
 
   mmiCompositorMouse(const mmiCompositorMouse&);  // Not implemented.
   void operator=(const mmiCompositorMouse&);   // Not implemented.
 
-  int MousePose[2];
-  int LastMousePose[2];
-  int ButtonPressed;
+  int m_MousePose[2];
+  int m_LastMousePose[2];
+  int m_ButtonPressed;
 
-  vtkCamera *CurrentCamera; ///< Stores camera to which the interaction is currently assigned
+  vtkCamera *m_CurrentCamera; ///< Stores camera to which the interaction is currently assigned
   
 };
 #endif

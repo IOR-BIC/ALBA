@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAction.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-21 07:55:49 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-24 16:43:04 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -26,10 +26,10 @@
 //------------------------------------------------------------------------------
 // Events
 //------------------------------------------------------------------------------
-MAF_ID_IMP(mafAction::ACTION_BIND_DEVICE);
-MAF_ID_IMP(mafAction::ACTION_QUERY_CONNECTED_DEVICES);
-MAF_ID_IMP(mafAction::ACTION_DEVICE_PLUGGED);
-MAF_ID_IMP(mafAction::ACTION_DEVICE_UNPLUGGED);
+MAF_ID_IMP(mafAction::DEVICE_BIND);
+MAF_ID_IMP(mafAction::QUERY_CONNECTED_DEVICES);
+MAF_ID_IMP(mafAction::DEVICE_PLUGGED);
+MAF_ID_IMP(mafAction::DEVICE_UNPLUGGED);
 
 //------------------------------------------------------------------------------
 mafCxxTypeMacro(mafAction)
@@ -152,7 +152,7 @@ int mafAction::InternalRestore(mafStorageElement *node)
       if (subnode->GetAttributeAsInteger("ID",id) && subnode->GetAttribute("Name",name))
       {
         // forward an event to device manager to perform binding...
-        mafEventMacro(mafEvent(this,ACTION_BIND_DEVICE,(long)(id+mafDevice::MIN_DEVICE_ID)));
+        mafEventMacro(mafEvent(this,DEVICE_BIND,(long)(id+mafDevice::MIN_DEVICE_ID)));
       }
       else
       {
@@ -176,7 +176,7 @@ void mafAction::OnEvent(mafEventBase *event)
   mafID ch=event->GetChannel();
 
   // for catching view select event
-  if (ch==MCH_OUTPUT && id==ACTION_QUERY_CONNECTED_DEVICES)
+  if (ch==MCH_OUTPUT && id==QUERY_CONNECTED_DEVICES)
   {
     mafAgent *sender=(mafAgent *)event->GetSender();
     assert(sender);
@@ -188,19 +188,19 @@ void mafAction::OnEvent(mafEventBase *event)
       if (dev->IsInitialized())
       {
         // send an event only to the inquiring object about all plugged devices
-        sender->OnEvent(&mafEventBase(this,ACTION_BIND_DEVICE,dev,MCH_INPUT));
+        sender->OnEvent(&mafEventBase(this,DEVICE_BIND,dev,MCH_INPUT));
       }      
     }
   }
   else if (ch==MCH_INPUT && id==mafDevice::DEVICE_STARTED)
   {
     // send an event to all observers to advise about a plugged device
-    InvokeEvent(ACTION_BIND_DEVICE,MCH_INPUT,(mafDevice *)event->GetSender());
+    InvokeEvent(DEVICE_BIND,MCH_INPUT,(mafDevice *)event->GetSender());
   }
   else if (ch==MCH_INPUT && id==mafDevice::DEVICE_STOPPED)
   {
     // send an event to all observers to advise about an unplugged device
-    InvokeEvent(ACTION_DEVICE_UNPLUGGED,MCH_INPUT,(mafDevice *)event->GetSender());
+    InvokeEvent(DEVICE_UNPLUGGED,MCH_INPUT,(mafDevice *)event->GetSender());
   }
   else
   {

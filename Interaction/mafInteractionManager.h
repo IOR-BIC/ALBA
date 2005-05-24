@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-19 16:27:39 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-24 16:43:05 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -52,7 +52,11 @@ class mafVME;
   picked VME is delegated to PER (positional event router) object, and low level 
   routing from devices to actions is delegated to the SER (static event router) 
   object.
-  @sa mafDeviceManager mmiPER mmiSER */
+  @sa mafDeviceManager mmiPER mmiSER 
+  
+  @todo
+  - check the renderer to be RenFront
+*/
 class mafInteractionManager : public mafObject, public mafObserver, mafEventSender, mafStorable
 {
 public:
@@ -108,7 +112,7 @@ public:
   const mmuAvatarsMap &GetAvatars();
 
   /** return an array with the list of avatars currently connected */
-  void GetAvatars(mmuAvatarsVector *avatars);
+  void GetAvatars(mmuAvatarsVector &avatars);
 
   /** Get an action router.*/
   mafAction *GetAction(const char *name);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericInterface.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-21 07:55:51 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-24 16:43:06 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -59,7 +59,7 @@ public:
   // Events
   //------------------------------------------------------------------------------
   
-  //MAF_ID_DEC(MOVE_EVENT); ///< Issued when a move action has been performed
+  MAF_ID_DEC(MOVE_EVENT); ///< Issued when a move action has been performed
 
   mafAbstractTypeMacro(mmiGenericInterface,mafInteractor);
 

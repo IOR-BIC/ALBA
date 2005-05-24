@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-19 16:27:39 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-05-24 16:43:04 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -39,12 +39,12 @@
 #include "mmdMouse.h"
 
 #include "mafVME.h"
+#include "mafXMLStorage.h"
+#include "mafStorageElement.h"
 
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkTimerLog.h"
-
-#include "mafXMLStorage.h"
 
 #include <set>
 #include <assert.h>
@@ -69,10 +69,7 @@ mafInteractionManager::mafInteractionManager()
   m_DeviceManager = new mafDeviceManager;
   m_DeviceManager->SetListener(this);
   m_DeviceManager->SetName("DeviceManager");
-  
-  //m_SettingsDialog = new mmgInteractionSettings; // the "Interaction Settings" dialog
-  //m_SettingsDialog->SetInteractionManager(this);
-  
+    
   m_DeviceManager->Initialize();
   //SettingsDialog->AddDeviceToTree(m_DeviceManager->GetDeviceSet()); // add dev_mgr node as root
   
@@ -132,7 +129,7 @@ void mafInteractionManager::SetPER(mmiPER *per)
   m_PositionalEventRouter = per;
 
   // bind new PER
-  m_PositionalEventRouter->SetName("m_PositionalEventRouter");
+  m_PositionalEventRouter->SetName("PositionalEventRouter");
   pointing_action->BindInteractor(m_PositionalEventRouter);
   m_PositionalEventRouter->SetListener(this);
 }
@@ -221,15 +218,15 @@ const mafInteractionManager::mmuAvatarsMap &mafInteractionManager::GetAvatars()
 }
 
 //------------------------------------------------------------------------------
-void mafInteractionManager::GetAvatars(mmuAvatarsVector *avatars)
+void mafInteractionManager::GetAvatars(mmuAvatarsVector &avatars)
 //------------------------------------------------------------------------------
 {
-  avatars->clear();
-  avatars->resize(m_Avatars.size());
+  avatars.clear();
+  avatars.resize(m_Avatars.size());
   int i=0;
-  for (mafInteractionManager::mmuAvatarsVector::iterator it=m_Avatars.begin();it!=m_Avatars.end();it++,i++)
+  for (mmuAvatarsMap::iterator it=m_Avatars.begin();it!=m_Avatars.end();it++,i++)
   {
-    avatars[i]=it->second;
+    avatars[i]=it->second.GetPointer();
   }
 }
 
@@ -237,11 +234,10 @@ void mafInteractionManager::GetAvatars(mmuAvatarsVector *avatars)
 void mafInteractionManager::AddAvatar(mafAvatar *avatar)
 //------------------------------------------------------------------------------
 {
-  this->m_Avatars.SetItem(avatar->GetName(),avatar);
+  m_Avatars[avatar->GetName()] = avatar;
   
   // attach to the avatar both as a listener and an event source
   avatar->SetListener(this);
-  //avatar->PlugEventSource(this,CameraUpdateChannel); // to be removed
 
   // Link the avatar to the current renderer (if present)
   avatar->SetRenderer(m_CurrentRenderer);
@@ -252,54 +248,62 @@ void mafInteractionManager::AddAvatar(mafAvatar *avatar)
 int mafInteractionManager::RemoveAvatar(mafAvatar *avatar)
 //------------------------------------------------------------------------------
 {
-  if (!m_Avatars.IsItemPresent(avatar))
+  assert(avatar);
+
+  mmuAvatarsMap::iterator it=m_Avatars.find(avatar->GetName());
+  if (it==m_Avatars.end())
     return false;
   
   // detach the avatar
   avatar->SetListener(NULL);
-  avatar->UnPlugEventSource(this);
   
   // unlink the avatar from the renderer
   avatar->SetRenderer(NULL);
     
-  return m_Avatars.RemoveItem(avatar);
+  m_Avatars.erase(it);
+
+  return true;
 }
 //------------------------------------------------------------------------------
 mafAvatar *mafInteractionManager::GetAvatar(const char *name)
 //------------------------------------------------------------------------------
 {
-  return m_Avatars.GetItem(name);
+  mmuAvatarsMap::iterator it=m_Avatars.find(name);  
+  return (it!=m_Avatars.end())?it->second:NULL;
 }
 
 //------------------------------------------------------------------------------
 void mafInteractionManager::ViewSelected(mafView *view)
 //------------------------------------------------------------------------------
 {
-  mafEventBase e(this,VIEW_SELECT,view);
-  OnViewSelected(e);
+  mafEvent e(this,VIEW_SELECT,view);
+  OnViewSelected(&e);
 }
 
 //------------------------------------------------------------------------------
 void mafInteractionManager::PreResetCamera(vtkRenderer *ren)
 //------------------------------------------------------------------------------
-{
-  //InvokeEvent(mflSmartEvent(CAMERA_PRE_RESET,this,ren),CameraUpdateChannel);
-  
-  // propagate event to all avatars... 
+{ 
+  // propagate event to all avatars...
+  for (mmuAvatarsMap::iterator it=m_Avatars.begin();it!=m_Avatars.end();it++)
+  {
+    it->second->OnEvent(&mafEventBase(this,CAMERA_PRE_RESET,ren));
+  }
 }
 
 //------------------------------------------------------------------------------
 void mafInteractionManager::PostResetCamera(vtkRenderer *ren)
 //------------------------------------------------------------------------------
 {
-  //InvokeEvent(mflSmartEvent(PostResetCameraEvent,this,ren),CameraUpdateChannel);
-
   // propagate event to all avatars...
+  for (mmuAvatarsMap::iterator it=m_Avatars.begin();it!=m_Avatars.end();it++)
+  {
+    it->second->OnEvent(&mafEventBase(this,CAMERA_POST_RESET,ren));
+  }
 }
 
-
 //------------------------------------------------------------------------------
-void mafInteractionManager::VmeSelected(mflVME *vme)
+void mafInteractionManager::VmeSelected(mafVME *vme)
 //------------------------------------------------------------------------------
 {
   m_PositionalEventRouter->OnVmeSelected(vme);
@@ -317,12 +321,12 @@ void mafInteractionManager::CameraUpdate(mafView *view)
   {
     if (view)
     {
-      // avoid too much renders which would trash the CPU
-      if((vtkTimerLog::GetTimeStamp()-m_LastRenderTime)>m_IntraFrameTime)
+      // avoid too much renderings which would trash the CPU
+      if((vtkTimerLog::GetCurrentTime()-m_LastRenderTime)>m_IntraFrameTime)
       {
         // render requested view
         view->CameraUpdate();
-        m_LastRenderTime=vtkTimerLog::GetTimeStamp(); // store time at end of rendering
+        m_LastRenderTime=vtkTimerLog::GetCurrentTime(); // store time at end of rendering
       }
       
     }
@@ -330,58 +334,37 @@ void mafInteractionManager::CameraUpdate(mafView *view)
     {
       // ask logic->view_mgr to perform a global update
       mafEventMacro(mafEvent(this,CAMERA_SYNCHRONOUS_UPDATE));
-      m_LastRenderTime=vtkTimerLog::GetTimeStamp(); // store time at end of rendering
+      m_LastRenderTime=vtkTimerLog::GetCurrentTime(); // store time at end of rendering
     }
   }
 }
 
 //------------------------------------------------------------------------------
-void mafInteractionManager::OnViewSelected(mafEventBase *event)
+void mafInteractionManager::OnViewSelected(mafEvent *event)
 //------------------------------------------------------------------------------
-{
-  vtkRenderer *ren;
-  mafView *view = event->GetView();
-
-  if (view)
-  {
-    // Here we could manage different kind of views...
-    mafSceneGraph *sg=view->GetSceneGraph();
-    assert(sg);
-    
-    ren=sg->m_ren1;
-    
-    // currently all views should have the renderer
-    //assert(ren);
-  }
-  else
-  {
-    ren=NULL;
-  }
-  
+{  
+  mafView *view = event->GetView(); 
   m_SelectedView = view;
   
-  // Store old render window
-  vtkRenderWindow *old_rw=(m_CurrentRenderer)?m_CurrentRenderer->GetRenderWindow():NULL;
-  if (old_rw)
-    old_rw->Register(this);
-    
-  SetCurrentRenderer(ren);
+  // propagate event to all avatars...
+  for (mmuAvatarsMap::iterator it=m_Avatars.begin();it!=m_Avatars.end();it++)
+  {
+    it->second->OnEvent(&mafEventBase(this,VIEW_SELECT));    
+  }
   
-  event->SetData(m_CurrentRenderer); 
-
-  // propagate event to all Avatars...
-  //InvokeEvent(event,CameraUpdateChannel);
-
-  // propagate to the mouse device too...
-  GetMouseDevice()->ProcessEvent(event);
+  // propagate VIEW_SELECTED event to the mouse device too...
+  GetMouseDevice()->OnEvent(event);
   
+  // TODO: force a render to the view here....
+
+  /*
   // TODO: remove call to Render() and substitute with sending a CameraUpdate event.
   // Force a rendering of the old render window 
   // to update the display after removing the avatars
   if (old_rw&&!old_rw->GetNeverRendered())
   {
     old_rw->Render();
-    old_rw->UnRegister(this);
+    old_rw->UnRegister(NULL);
   }
   
   // retrieve new render window
@@ -392,6 +375,8 @@ void mafInteractionManager::OnViewSelected(mafEventBase *event)
   // to update the display after adding the avatars
   if (rw&&!rw->GetNeverRendered())
     rw->Render();
+
+  */
 }
 
 //------------------------------------------------------------------------------
@@ -432,7 +417,7 @@ void mafInteractionManager::OnBindDeviceToAction(mafEvent *e)
   mafDevice *device=m_DeviceManager->GetDevice(e->GetArg());
   if (device)
   {
-    mafAction *action=mafAction::SafeDownCast((vtkObject *)e->GetSender());
+    mafAction *action=mafAction::SafeDownCast((mafObject *)e->GetSender());
     m_StaticEventRouter->BindDeviceToAction(device,action);
 
   }
@@ -476,18 +461,18 @@ void mafInteractionManager::OnEndDispatching()
     m_CameraUpdateRequests.clear();
     
     // avoid too much renderings which would trash the CPU
-    if((vtkTimerLog::GetTimeStamp()-m_LastRenderTime)>m_IntraFrameTime)
+    if((vtkTimerLog::GetCurrentTime()-m_LastRenderTime)>m_IntraFrameTime)
     {
       // ask logic->view_mgr to perform a global update
       mafEventMacro(mafEvent(this,CAMERA_SYNCHRONOUS_UPDATE));
-      m_LastRenderTime=vtkTimerLog::GetTimeStamp(); // store time at end of rendering
+      m_LastRenderTime=vtkTimerLog::GetCurrentTime(); // store time at end of rendering
     }
     
   }
   else
   {
     // avoid too much renderings which would trash the CPU
-    if((vtkTimerLog::GetTimeStamp()-m_LastRenderTime)>m_IntraFrameTime)
+    if((vtkTimerLog::GetCurrentTime()-m_LastRenderTime)>m_IntraFrameTime)
     {
       // traverse the list and perform all requested updates
       for (std::set<mafView *>::iterator it=m_CameraUpdateRequests.begin(); \
@@ -498,36 +483,30 @@ void mafInteractionManager::OnEndDispatching()
       }
       // clear the queue
       m_CameraUpdateRequests.clear();
-      m_LastRenderTime=vtkTimerLog::GetTimeStamp(); // store time at end of rendering
+      m_LastRenderTime=vtkTimerLog::GetCurrentTime(); // store time at end of rendering
     }
   }
 }
 //------------------------------------------------------------------------------
-void mafInteractionManager::OnCameraUpdate(mafEventBase *e)
+void mafInteractionManager::OnCameraUpdate(mafEvent *e)
 //------------------------------------------------------------------------------
 {
   CameraUpdate(e->GetView());
 }
 //------------------------------------------------------------------------------
-void mafInteractionManager::OnEvent(mafEventBase *event,unsigned long channel)
+void mafInteractionManager::OnEvent(mafEventBase *event)
 //------------------------------------------------------------------------------
 {
   assert(event);
  
-  mafID id=event->GetID();
+  mafID id=event->GetId();
     
-  //if (channel==CameraUpdateChannel)
-  //{
   if (id==VIEW_SELECT)
   {
-    mafEventBase *e=(mafEventBase *)event;
+    mafEvent *e=mafEvent::SafeDownCast(event);
+    assert(event);
     OnViewSelected(e);
-  }
-  //else
-  //{
-  //  InvokeEvent(event,channel);
-  //}
-  //}
+  }  
   else if (id==mafDeviceManager::DISPATCH_START)
   {
     OnStartDispatching();    
@@ -538,12 +517,12 @@ void mafInteractionManager::OnEvent(mafEventBase *event,unsigned long channel)
   }
   else if (id==CAMERA_UPDATE)
   {
-    mafEventBase *e=(mafEventBase *)event;
+    mafEvent *e=mafEvent::SafeDownCast(event);
     OnCameraUpdate(e);
   }
   else if (id==VME_SELECTED)
   {
-    mafEventMacro(mafEvent(event->GetSender(),VME_SELECT,(mflVME *)event->GetData()));
+    mafEventMacro(mafEvent(event->GetSender(),VME_SELECT,(mafVME *)event->GetData()));
   }
   /*
   else if (id==WrapMafEvent)
@@ -555,8 +534,8 @@ void mafInteractionManager::OnEvent(mafEventBase *event,unsigned long channel)
   */
   /*else if (id==ShowContextualMenuEvent)
   {
-    mflVME *vme = ((mafEventBase *)event)->GetVme();
-    bool vme_context_menu = (vme != NULL) && !vme->IsA("mflVMEGizmo");
+    mafVME *vme = ((mafEventBase *)event)->GetVme();
+    bool vme_context_menu = (vme != NULL) && !vme->IsA("mafVMEGizmo");
     mafEventMacro(mafEvent(event->GetSender(),SHOW_CONTEXTUAL_MENU, vme_context_menu));
   }*/
   else if (id==mafDevice::DEVICE_NAME_CHANGED) 
@@ -579,9 +558,9 @@ void mafInteractionManager::OnEvent(mafEventBase *event,unsigned long channel)
   {
     OnRemoveAvatar(event); 
   }
-  else if (id==mafAction::DEVICE_BIND_TO_ACTION)
+  else if (id==mafAction::DEVICE_BIND)
   {
-    mafEvent *e=mafEventBase::SafeDownCast(event);
+    mafEvent *e=mafEvent::SafeDownCast(event);
     OnBindDeviceToAction(e);
   }
   else
@@ -608,8 +587,8 @@ int mafInteractionManager::Store(const char *filename)
   writer.SetFileType("MIS");
   writer.SetVersion(MIS_VERSION);
 
-  writer.SetFileName(filename);
-  writer->SetDocument(this);
+  writer.SetURL(filename);
+  writer.SetDocument(this);
 
   return writer.Store();
 }
@@ -625,10 +604,10 @@ int mafInteractionManager::Restore(const char *filename)
   reader.SetFileType("MIS");
   reader.SetVersion(MIS_VERSION);
 
-  reader.SetFileName(filename);
-  reader->SetDocument(this);
+  reader.SetURL(filename);
+  reader.SetDocument(this);
 
-  return reader->Restore();
+  return reader.Restore();
 }
 
 //------------------------------------------------------------------------------
@@ -640,7 +619,7 @@ int mafInteractionManager::InternalStore(mafStorageElement *node)
     return MAF_ERROR;
   
   // store bindings
-  if (node->StoreObject("DeviceBindings",m_StaticEventRouter));
+  if (node->StoreObject("DeviceBindings",m_StaticEventRouter))
     return MAF_ERROR;
   
   return MAF_OK;
@@ -658,3 +637,4 @@ int mafInteractionManager::InternalRestore(mafStorageElement *node)
   
   return MAF_OK;
 }
+

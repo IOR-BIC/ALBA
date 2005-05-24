@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAction.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 17:29:02 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-24 16:43:04 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -34,10 +34,10 @@ class mafAction : public mafAgent, public mafStorable
 public:
   /** @ingroup Events */
   /** @{ */
-  MAF_ID_DEC(ACTION_BIND_DEVICE);            ///< force the action to bind to the device
-  MAF_ID_DEC(ACTION_QUERY_CONNECTED_DEVICES);///< Issued by interactors to query for connected devices. @sa ConnectedDeviceEvent
-  MAF_ID_DEC(ACTION_DEVICE_PLUGGED);         ///< Issued by devices when connected to actions or when queried.
-  MAF_ID_DEC(ACTION_DEVICE_UNPLUGGED);       ///< Issued by devices when connected to actions or when queried.
+  MAF_ID_DEC(DEVICE_BIND);            ///< force the action to bind to the device
+  MAF_ID_DEC(QUERY_CONNECTED_DEVICES);///< Issued by interactors to query for connected devices. @sa ConnectedDeviceEvent
+  MAF_ID_DEC(DEVICE_PLUGGED);         ///< Issued by devices when connected to actions or when queried.
+  MAF_ID_DEC(DEVICE_UNPLUGGED);       ///< Issued by devices when connected to actions or when queried.
 
   enum { SHARED_ACTION = 0, EXCLUSIVE_ACTION };
 

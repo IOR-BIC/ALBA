@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRefSys.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-19 16:27:39 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-24 16:43:05 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -73,7 +73,7 @@ mafRefSys::~mafRefSys()
 }
 
 //----------------------------------------------------------------------------
-mafRefSys::operator =(const mafRefSys &source)
+void mafRefSys::operator =(const mafRefSys &source)
 //----------------------------------------------------------------------------
 {
   m_Type = source.m_Type;

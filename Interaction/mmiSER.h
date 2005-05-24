@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiSER.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-21 07:55:52 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-24 16:43:07 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,6 +14,7 @@
 
 #include "mafInteractor.h"
 #include "mafAction.h"
+#include "mafStorable.h"
 #include <map>
 
 //----------------------------------------------------------------------------
@@ -34,7 +35,7 @@ class mafString;
   @todo
   - to implement a type safe static binding mechanims
    */
-class mmiSER : public mafInteractor
+class mmiSER : public mafInteractor, public mafStorable
 {
 public: 
   mafTypeMacro(mmiSER,mafInteractor);

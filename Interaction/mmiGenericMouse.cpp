@@ -2,31 +2,27 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 17:29:06 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-24 16:43:06 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#include "wx/wxprec.h" 
-#pragma hdrstop
+#include "mmiGenericMouse.h"
 
 #include "mafDecl.h"
 #include "mafDevice.h"
 
 #include "mmdMouse.h"
 
-#include "mmiGenericMouse.h"
+#include "mafEventInteraction.h"
+#include "mafAbsMatrixPipe.h"
+#include "mafVME.h"
+#include "mafMatrix.h"
+#include "mafTransform.h"
 
-#include "mflDefines.h"
-#include "mflEventInteraction.h"
-#include "mflMatrixPipeDirectCinematic.h"
-#include "mflVME.h"
-
-#include "vtkObjectFactory.h"
-#include "vtkCommand.h"
 #include "vtkDoubleArray.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkCellPicker.h"
@@ -36,42 +32,42 @@
 #include "vtkRenderer.h"
 #include "vtkTimerLog.h"
 
-vtkStandardNewMacro(mmiGenericMouse);
+mafCxxTypeMacro(mmiGenericMouse);
 
 //----------------------------------------------------------------------------
 mmiGenericMouse::mmiGenericMouse() 
 //----------------------------------------------------------------------------
 {
-   ResultMatrixConcatenation = true;
+   m_ResultMatrixConcatenation = true;
 
-   this->SetResultMatrixConcatenationSemanticToPostMultiply();
+   SetResultMatrixConcatenationSemanticToPostMultiply();
   
    // Picking stuff
-   this->Picker = vtkCellPicker::New();
-   this->Picker->SetTolerance(0.005);
+   m_Picker = vtkCellPicker::New();
+   m_Picker->SetTolerance(0.005);
 
    // Projection Accumulator
-   ProjAcc = 0;
+   m_ProjAcc = 0;
 
-   this->LastX = this->LastY = 0;
+   m_LastX = m_LastY = 0;
 
    // default is to translation mode
-   this->EnableTranslation(true);
+   EnableTranslation(true);
 
    // set default constraint axes
    GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
    GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
 
-   CurrentCamera = NULL;
-   MousePose[0] = MousePose[1] = 0;
-   LastMousePose[0] = LastMousePose[1] = 0;
-   ConstrainRefSys = NULL;
+   m_CurrentCamera = NULL;
+   m_MousePose[0] = m_MousePose[1] = 0;
+   m_LastMousePose[0] = m_LastMousePose[1] = 0;
+   m_ConstrainRefSys = NULL;
 }
 //----------------------------------------------------------------------------
 mmiGenericMouse::~mmiGenericMouse() 
 //----------------------------------------------------------------------------
 {
-   this->Picker->Delete();
+   m_Picker->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -79,20 +75,20 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
 //----------------------------------------------------------------------------
 {
   // create matrix to send
-  vtkMatrix4x4 *matr = vtkMatrix4x4::New();
+  mafSmartPointer<mafMatrix> matr;
 
   // motion vector
   double motionVec[3];
 
-  this->BuildVector(p1, p2, motionVec);
+  BuildVector(p1, p2, motionVec);
 
   // get the ref sys type  
   int refSysType = GetTranslationConstraint()->GetRefSys()->GetType();
 
   // set the constraint refsys to translation constraint, the matrix is referenced
-  ConstrainRefSys = GetTranslationConstraint()->GetRefSys()->GetMatrix();
+  m_ConstrainRefSys = GetTranslationConstraint()->GetRefSys()->GetMatrix();
 
-  if (this->GetTranslationConstraint()->GetNumberOfDOF() == 1)
+  if (GetTranslationConstraint()->GetNumberOfDOF() == 1)
   { 
 
     // result point position
@@ -110,16 +106,16 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
     //current axis versor
     double constrainVers[3];
 
-    assert(VME);
+    assert(m_VME);
 
     //get the result point pos
-    mflTransform::GetPosition(VME->GetMatrixPipe()->GetMatrix(), rp); 
+    mafTransform::GetPosition(m_VME->GetMatrixPipe()->GetMatrix(), rp); 
 
     //get the constrain axis
     int axis = GetTranslationConstraint()->GetConstraintAxis();
 
     //project the motion vector on constrain axis    
-    mflTransform::GetVersor(axis, this->ConstrainRefSys, constrainVers);  
+    mafTransform::GetVersor(axis, *m_ConstrainRefSys, constrainVers);  
     projVal = ProjectVectorOnAxis(motionVec, constrainVers, motVecProj);
 
    // project rp on constrain axis; if target refsys is local the projection 
@@ -138,7 +134,7 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
       case (mmiConstraint::FREE):
       { 
         //set the matrix to be send            
-        mflTransform::SetPosition(matr, motVecProj);
+        mafTransform::SetPosition(matr, motVecProj);
          
         //send the transform matrix
         SendTransformMatrix(matr);
@@ -196,35 +192,35 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
       minb = GetTranslationConstraint()->GetLowerBound(axis);
       maxb = GetTranslationConstraint()->GetUpperBound(axis);
     
-      mflTransform::GetPosition(VME->GetMatrixPipe()->GetMatrix(), rp);  
+      mafTransform::GetPosition(m_VME->GetMatrixPipe()->GetMatrix(), rp);  
     
       /*                         projVal  
                              -->
           -----|------------|-----------|------|---------------|----------->
                O          pos_rp      minb   pos_rp           maxb
 
-          ------------------------>ProjAcc
+          ------------------------>m_ProjAcc
       */ 
 
           //update projection accumulator
-          ProjAcc += projVal;
+          m_ProjAcc += projVal;
 
           if (pos_rp < minb)
           {
-            if (pos_rp + ProjAcc > minb)
+            if (pos_rp + m_ProjAcc > minb)
             {
               BuildVector(minb - pos_rp, constrainVers, tmpVec, refSysType, axis);
-              mflTransform::SetPosition(matr, tmpVec);                             
-              ProjAcc = 0;
+              mafTransform::SetPosition(matr, tmpVec);                             
+              m_ProjAcc = 0;
             }
         }
           else if (pos_rp > maxb)
           { 
-            if (pos_rp + ProjAcc < maxb)
+            if (pos_rp + m_ProjAcc < maxb)
             {
               BuildVector(maxb - pos_rp, constrainVers, tmpVec, refSysType, axis);
-              mflTransform::SetPosition(matr, tmpVec);            
-              ProjAcc = 0;
+              mafTransform::SetPosition(matr, tmpVec);            
+              m_ProjAcc = 0;
             }
         }
           else if (minb < pos_rp && pos_rp < maxb)
@@ -232,25 +228,25 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
             if (pos_rp + projVal < minb)
             {              
               BuildVector(minb - pos_rp, constrainVers, tmpVec, refSysType, axis);
-              mflTransform::SetPosition(matr, tmpVec);                           
-              ProjAcc = pos_rp + projVal - minb;
+              mafTransform::SetPosition(matr, tmpVec);                           
+              m_ProjAcc = pos_rp + projVal - minb;
             }
             else if (pos_rp + projVal > maxb)
             {            
               BuildVector(maxb - pos_rp, constrainVers, tmpVec, refSysType, axis);
-              mflTransform::SetPosition(matr, tmpVec);
-              ProjAcc = pos_rp + projVal - maxb;
+              mafTransform::SetPosition(matr, tmpVec);
+              m_ProjAcc = pos_rp + projVal - maxb;
             }
             else
             {
               if (refSysType == mafRefSys::GLOBAL)
               {
-                mflTransform::SetPosition(matr, motVecProj);             
+                mafTransform::SetPosition(matr, motVecProj);             
               }
               else
               {
                 BuildVector(projVal, NULL, tmpVec, refSysType, axis);
-                mflTransform::SetPosition(matr, tmpVec);
+                mafTransform::SetPosition(matr, tmpVec);
               }
             }
           }
@@ -260,7 +256,7 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
       /*                                              
                                                        projVal
                                                     <-------- 
-                                                       ProjAcc
+                                                       m_ProjAcc
                                                     <----|
                                     2   |    1           |  3
           -----|------------------------|----------------|----------->
@@ -270,37 +266,37 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
       */ 
 
 
-            if (pos_rp + ProjAcc >= minb)
+            if (pos_rp + m_ProjAcc >= minb)
             {
-              if (pos_rp + ProjAcc <= maxb)
+              if (pos_rp + m_ProjAcc <= maxb)
               {
-                BuildVector(ProjAcc, constrainVers, tmpVec, refSysType, axis);
-                mflTransform::SetPosition(matr, tmpVec);                         
-                ProjAcc = 0;
+                BuildVector(m_ProjAcc, constrainVers, tmpVec, refSysType, axis);
+                mafTransform::SetPosition(matr, tmpVec);                         
+                m_ProjAcc = 0;
               }
-              else if (pos_rp + ProjAcc > maxb)
+              else if (pos_rp + m_ProjAcc > maxb)
               {
                 BuildVector(maxb - pos_rp, constrainVers, tmpVec, refSysType, axis);
-                mflTransform::SetPosition(matr, tmpVec);                         
-                ProjAcc -= maxb - pos_rp;
+                mafTransform::SetPosition(matr, tmpVec);                         
+                m_ProjAcc -= maxb - pos_rp;
               }
             }
           }
           else if (pos_rp == maxb)
           {
-            if (pos_rp + ProjAcc <= maxb)
+            if (pos_rp + m_ProjAcc <= maxb)
             {
-              if (pos_rp + ProjAcc >= minb)
+              if (pos_rp + m_ProjAcc >= minb)
               {
-                BuildVector(ProjAcc, constrainVers, tmpVec, refSysType, axis);
-                mflTransform::SetPosition(matr, tmpVec);     
-                ProjAcc = 0;
+                BuildVector(m_ProjAcc, constrainVers, tmpVec, refSysType, axis);
+                mafTransform::SetPosition(matr, tmpVec);     
+                m_ProjAcc = 0;
               }
-              else if (pos_rp + ProjAcc < minb)
+              else if (pos_rp + m_ProjAcc < minb)
               {
                 BuildVector(minb - pos_rp, constrainVers, tmpVec, refSysType, axis);
-                mflTransform::SetPosition(matr, tmpVec);     
-                ProjAcc -= minb - pos_rp;
+                mafTransform::SetPosition(matr, tmpVec);     
+                m_ProjAcc -= minb - pos_rp;
               }
 
             }          
@@ -342,12 +338,12 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
         }
 
 
-        ProjAcc += projVal;
+        m_ProjAcc += projVal;
 
         if (HelperPointStatus == ON_GRID_POINT)
         {
 
-//              pos_rp             ProjAcc
+//              pos_rp             m_ProjAcc
 //    ^------------------------->|-------------->        
 //    |                             
 //   -O----------0-------1-------i----------3------N-1---------->
@@ -357,9 +353,9 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
 //    HelperPointStatus = ON_GRID_POINT;
         
           int status;
-          int ind = BinarySearch(pos_rp + ProjAcc, darray, status);    
+          int ind = BinarySearch(pos_rp + m_ProjAcc, darray, status);    
 
-          if (ProjAcc > 0)
+          if (m_ProjAcc > 0)
           {
             if (ind != HelpPIndex)
             {
@@ -369,13 +365,13 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
               SendTransformMatrix(normalizedVectorToSend, trval);  
 
               //UpdateProjAcc  
-              ProjAcc -= trval;
+              m_ProjAcc -= trval;
 
               //update HelpPIndex
               HelpPIndex = ind;
             }
           }
-          else if (ProjAcc < 0)
+          else if (m_ProjAcc < 0)
           {
             if (ind != HelpPIndex - 1)
             {
@@ -385,7 +381,7 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
               SendTransformMatrix(normalizedVectorToSend, trval);  
   
               //UpdateProjAcc  
-              ProjAcc -= trval;
+              m_ProjAcc -= trval;
    
               //update HelpPIndex
               HelpPIndex = ind + 1;
@@ -394,7 +390,7 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
         }
         else if (HelperPointStatus == NOT_ON_GRID_POINT) 
         {
-//              pos_rp             ProjAcc
+//              pos_rp             m_ProjAcc
 //    ^------------------------->|---------->        
 //    |                          |   
 //   -O----------0-------1-------|------2------N-1---------->
@@ -404,17 +400,17 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
 //    HelperPointStatus = NOT_ON_GRID_POINT;
       
           int status;
-          int ind = BinarySearch(pos_rp + ProjAcc, darray, status); 
+          int ind = BinarySearch(pos_rp + m_ProjAcc, darray, status); 
       
           if (ind != HelpPIndex)
           {
-            double trval = darray->GetValue(ProjAcc > 0 ? ind : ind + 1) - pos_rp;
+            double trval = darray->GetValue(m_ProjAcc > 0 ? ind : ind + 1) - pos_rp;
 
             //send translation vector from HelpPIndex to ind
             SendTransformMatrix(normalizedVectorToSend, trval); 
 
             //UpdateProjAcc  
-            ProjAcc -= trval;
+            m_ProjAcc -= trval;
 
             //update HelpPIndex
             HelpPIndex = ind;
@@ -424,13 +420,13 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
       break;
     }
   }
-  else if (this->GetTranslationConstraint()->GetNumberOfDOF() == 2)
+  else if (GetTranslationConstraint()->GetNumberOfDOF() == 2)
   {    
     // the constrain plane
     int constrainPlane;
 
     // get the translation plane
-    constrainPlane = this->GetTranslationConstraint()->GetConstraintPlane();
+    constrainPlane = GetTranslationConstraint()->GetConstraintPlane();
 
     // get constraint axes
     int axis1, axis2;
@@ -455,17 +451,17 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
         {
           case (mmiConstraint::XY):
           {
-            mflTransform::GetVersor(mmiConstraint::Z, ConstrainRefSys, planeNormal);
+            mafTransform::GetVersor(mmiConstraint::Z, m_ConstrainRefSys, planeNormal);
           }
   	      break;
           case (mmiConstraint::XZ):
           {
-            mflTransform::GetVersor(mmiConstraint::Y, ConstrainRefSys, planeNormal);
+            mafTransform::GetVersor(mmiConstraint::Y, m_ConstrainRefSys, planeNormal);
           }
           break;
           case (mmiConstraint::YZ):
           {
-            mflTransform::GetVersor(mmiConstraint::X, ConstrainRefSys, planeNormal);
+            mafTransform::GetVersor(mmiConstraint::X, m_ConstrainRefSys, planeNormal);
           }
           break;
         }
@@ -474,7 +470,7 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
         ProjectVectorOnPlane(motionVec, planeNormal, motVecProj);
 
        //set the matrix to be send
-        mflTransform::SetPosition(matr, motVecProj);
+        mafTransform::SetPosition(matr, motVecProj);
           
         //send the transform matrix
         SendTransformMatrix(matr);
@@ -516,7 +512,7 @@ void mmiGenericMouse::Rotate(double *p1, double *p2, double *viewup)
 //----------------------------------------------------------------------------
 {
   // set the constraint refsys to rotation constraint
-  ConstrainRefSys = GetRotationConstraint()->GetRefSys()->GetMatrix();
+  m_ConstrainRefSys = GetRotationConstraint()->GetRefSys()->GetMatrix();
 
   //motion vector
   double motionVec[3];
@@ -559,13 +555,13 @@ void mmiGenericMouse::Rotate(double *p1, double *p2, double *viewup)
           //get the constrain axis
           int axis = GetRotationConstraint()->GetConstraintAxis();
 
-          mflTransform::GetVersor(axis, ConstrainRefSys, constrainVers);
+          mafTransform::GetVersor(axis, m_ConstrainRefSys, constrainVers);
           
           // centre of rotation in abs coordinates
           double o[3] = {0,0,0};
 
           // get the centre of rotation from PivotRefSys
-          mflTransform::GetPosition(GetPivotRefSys()->GetMatrix(), o);
+          mafTransform::GetPosition(GetPivotRefSys()->GetMatrix(), o);
 
           double op1Vec[3] = {0, 0, 0};
           double op2Vec[3] = {0, 0, 0};
@@ -650,7 +646,7 @@ void mmiGenericMouse::Rotate(double *p1, double *p2, double *viewup)
     int constrainPlane;
 
     // get the translation plane
-    constrainPlane = this->GetRotationConstraint()->GetConstraintPlane();
+    constrainPlane = GetRotationConstraint()->GetConstraintPlane();
 
     // get the constraint axes
     int axis1, axis2;
@@ -840,13 +836,13 @@ void mmiGenericMouse::ConcatenateToResultMatrix(vtkMatrix4x4 *matrix)
   if (GetResultMatrix() && matrix) 
   {
     vtkTransform *tmptr = vtkTransform::New();
-    tmptr->SetMatrix(this->GetResultMatrix());
+    tmptr->SetMatrix(GetResultMatrix());
 
-    if (this->GetResultMatrixConcatenationSemantic() == POSTMULTIPLY)
+    if (GetResultMatrixConcatenationSemantic() == POSTMULTIPLY)
     {
       tmptr->PostMultiply();
     }
-    else if (this->GetResultMatrixConcatenationSemantic() == PREMULTIPLY)
+    else if (GetResultMatrixConcatenationSemantic() == PREMULTIPLY)
     {
       tmptr->PreMultiply();
     }
@@ -862,7 +858,7 @@ void mmiGenericMouse::SendTransformMatrix(double *vector, int mouseAction)
 //----------------------------------------------------------------------------
 {
   vtkMatrix4x4 *mat = vtkMatrix4x4::New();
-  mflTransform::SetPosition(mat, vector);
+  mafTransform::SetPosition(mat, vector);
   SendTransformMatrix(mat, mouseAction);
   vtkDEL(mat);
 }
@@ -881,13 +877,13 @@ void mmiGenericMouse::SendTransformMatrix(double *versor, double translation, in
 }
 
 //----------------------------------------------------------------------------
-void mmiGenericMouse::SendTransformMatrix(vtkMatrix4x4 *matrix, int mouseAction, float rotationAngle)
+void mmiGenericMouse::SendTransformMatrix(mafMatrix *matrix, int mouseAction, float rotationAngle)
 //----------------------------------------------------------------------------
 { 
   // matrix registering the pick position in world coordinates at MOUSE_DOWN
-  vtkMatrix4x4 *pickPosMatrix = vtkMatrix4x4::New();
+  mafMatrix pickPosMatrix;
 
-  if (this->GetResultMatrixConcatenation())
+  if (GetResultMatrixConcatenation())
   {
     ConcatenateToResultMatrix(matrix);
   }
@@ -903,37 +899,41 @@ void mmiGenericMouse::SendTransformMatrix(vtkMatrix4x4 *matrix, int mouseAction,
   // picked position in world coordinates
   if (mouseAction == MOUSE_DOWN)
   {
-    mflTransform::SetPosition(pickPosMatrix, (float) LastPickPosition[0],
-      (float) LastPickPosition[1], (float) LastPickPosition[2]);
-    e.SetVtkObj(pickPosMatrix);
+    mafTransform::SetPosition(pickPosMatrix, (float) m_LastPickPosition[0],
+      (float) m_LastPickPosition[1], (float) m_LastPickPosition[2]);
+    
+    //e.SetVtkObj(pickPosMatrix);  //modified by Marco. 24-5-2005
+    
   }  
 
   mafEventMacro(e);
 
   // send standard event... have to recreate it since original from device is not available :-(
-  mflSmartPointer<mflEventInteraction> event;
-  event->SetSender(this);
+  mafEventInteraction event;
+  event.SetSender(this);
+  
   // have to recreate the time stamp :-(
-  mflSmartPointer<mflMatrix> tmatrix;
+  mafSmartPointer<mafMatrix> tmatrix;
   tmatrix->DeepCopy(matrix);
   tmatrix->SetTimeStamp(vtkTimerLog::GetTimeStamp());
+
   event->SetMatrix(tmatrix);
-  event->Set2DPosition(MousePose[0],MousePose[1]);
+  event->Set2DPosition(m_MousePose[0],m_MousePose[1]);
   if (mouseAction == MOUSE_DOWN)
   {
-    event->SetID(ButtonDownEvent);
+    event->SetID(BUTTON_DOWN);
     event->SetButton(GetStartButton());
     event->SetModifiers(GetModifiers());
   }
   else if (mouseAction == MOUSE_UP)
   {
-    event->SetID(ButtonUpEvent);
+    event->SetID(BUTTON_UP);
     event->SetButton(GetStartButton());
     event->SetModifiers(GetModifiers());
   }
   else
   {
-    event->SetID(MoveActionEvent);
+    event->SetID();
   }
 
   InvokeEvent(event);
@@ -946,28 +946,28 @@ void mmiGenericMouse::OnMouseMoveAction(int X, int Y)
 //----------------------------------------------------------------------------
 {
   // picked X and Y in screen coordinates
-  MousePose[0] = X;
-  MousePose[1] = Y;
+  m_MousePose[0] = X;
+  m_MousePose[1] = Y;
     
    double focalPoint[4], pickPoint[4], prevPickPoint[4], viewUp[3];
    double z;
 
-   assert(CurrentCamera);
+   assert(m_CurrentCamera);
 
    //get the view up vector
-   CurrentCamera->OrthogonalizeViewUp();
-   CurrentCamera->GetViewUp(viewUp);
+   m_CurrentCamera->OrthogonalizeViewUp();
+   m_CurrentCamera->GetViewUp(viewUp);
    vtkMath::Normalize(viewUp);
 
    //get the focal point
-   this->ComputeWorldToDisplay(this->LastPickPosition[0], this->LastPickPosition[1],
-                               this->LastPickPosition[2], focalPoint);
+   ComputeWorldToDisplay(m_LastPickPosition[0], m_LastPickPosition[1],
+                               m_LastPickPosition[2], focalPoint);
    z = focalPoint[2];
 
-   this->ComputeDisplayToWorld((double)LastMousePose[0], (double)LastMousePose[1],
+   ComputeDisplayToWorld((double)m_LastMousePose[0], (double)m_LastMousePose[1],
                                z, prevPickPoint);
  
-   this->ComputeDisplayToWorld(double(X), double(Y), z, pickPoint);
+   ComputeDisplayToWorld(double(X), double(Y), z, pickPoint);
 
    // Now we have prevPickPoint, pickPoint and viewUp;
 
@@ -977,13 +977,13 @@ void mmiGenericMouse::OnMouseMoveAction(int X, int Y)
    if (RotationFlag == true)
    {
       // rotate
-      this->Rotate(prevPickPoint, pickPoint, viewUp);
+      Rotate(prevPickPoint, pickPoint, viewUp);
    }
 
    if (TranslationFlag == true)
    {
      // translate
-     this->Translate(prevPickPoint, pickPoint);
+     Translate(prevPickPoint, pickPoint);
    }
 
    if (ScalingFlag == true)
@@ -998,9 +998,9 @@ void mmiGenericMouse::OnMouseMoveAction(int X, int Y)
      // not yet implemented
    }
 
-  // Update LastMousePose
-  LastMousePose[0] = MousePose[0];
-  LastMousePose[1] = MousePose[1];
+  // Update m_LastMousePose
+  m_LastMousePose[0] = m_MousePose[0];
+  m_LastMousePose[1] = m_MousePose[1];
 
 }
 
@@ -1010,19 +1010,19 @@ void mmiGenericMouse::OnButtonDownAction(int X, int Y)
 {
   // debug
   // set the constraint refsys to translation constraint, the matrix is referenced
-  ConstrainRefSys = GetTranslationConstraint()->GetRefSys()->GetMatrix();
+  m_ConstrainRefSys = GetTranslationConstraint()->GetRefSys()->GetMatrix();
 
 
-  // register MousePose
-  MousePose[0] = LastMousePose[0] = X;
-  MousePose[1] = LastMousePose[1] = Y;
+  // register m_MousePose
+  m_MousePose[0] = m_LastMousePose[0] = X;
+  m_MousePose[1] = m_LastMousePose[1] = Y;
 
   // perform picking on current renderer
-  this->Picker->Pick(X,Y,0.0,Renderer);
-  this->Picker->GetPickPosition(this->LastPickPosition);
+  m_Picker->Pick(X,Y,0.0,Renderer);
+  m_Picker->GetPickPosition(m_LastPickPosition);
  
   //reset projection accumulator   
-    ProjAcc = 0;
+    m_ProjAcc = 0;
 
     /*
             ^
@@ -1043,7 +1043,7 @@ void mmiGenericMouse::OnButtonDownAction(int X, int Y)
     -----|------------|-----------|------|---------------|----------->
         O          pos_rp      minb   pos_rp           maxb
 
-    ------------------------>ProjAcc
+    ------------------------>m_ProjAcc
     */ 
 
 
@@ -1059,7 +1059,7 @@ void mmiGenericMouse::OnButtonDownAction(int X, int Y)
       axis = GetTranslationConstraint()->GetConstraintAxis();
 
       // set constrain refsys to translation constraint 
-      ConstrainRefSys = GetTranslationConstraint()->GetRefSys()->GetMatrix();
+      m_ConstrainRefSys = GetTranslationConstraint()->GetRefSys()->GetMatrix();
 
       if (GetTranslationConstraint()->GetConstraintModality(axis) == mmiConstraint::SNAP_ARRAY)
       {         
@@ -1070,8 +1070,8 @@ void mmiGenericMouse::OnButtonDownAction(int X, int Y)
         double rp[3] = {0, 0, 0}, proj[3] = {0, 0, 0};
         double pos_rp = 0;
 
-        mflTransform::GetVersor(axis, ConstrainRefSys, constrainVers);
-        mflTransform::GetPosition(VME->GetMatrixPipe()->GetMatrix(), rp);
+        mafTransform::GetVersor(axis, m_ConstrainRefSys, constrainVers);
+        mafTransform::GetPosition(m_VME->GetMatrixPipe()->GetMatrix(), rp);
 
         //project rp on constrain axis
         pos_rp = ProjectVectorOnAxis(rp, constrainVers, proj);
@@ -1090,8 +1090,8 @@ void mmiGenericMouse::OnButtonDownAction(int X, int Y)
     }
   }
 
-  LastX = MousePose[0];
-  LastY = MousePose[1];
+  m_LastX = m_MousePose[0];
+  m_LastY = m_MousePose[1];
 
   // notify the listener about the mouse action that has been performed 
   vtkMatrix4x4 *identity = vtkMatrix4x4::New();
@@ -1104,11 +1104,11 @@ void mmiGenericMouse::OnButtonUpAction()
 //----------------------------------------------------------------------------
 {
   // reset projection accumulator
-  this->ProjAcc = 0;
+  m_ProjAcc = 0;
 
-  // register LastX and Last
-  LastX = MousePose[0];
-  LastY = MousePose[1];
+  // register m_LastX and Last
+  m_LastX = m_MousePose[0];
+  m_LastY = m_MousePose[1];
 
   // notify the listener about the mouse action that has been performed 
   vtkMatrix4x4 *identity = vtkMatrix4x4::New();
@@ -1124,33 +1124,33 @@ void mmiGenericMouse::TrackballRotate()
    double v2[3];
 
    // set constraint refsys to rotation constraint
-   ConstrainRefSys = GetRotationConstraint()->GetRefSys()->GetMatrix();
+   m_ConstrainRefSys = GetRotationConstraint()->GetRefSys()->GetMatrix();
 
    // register last mouse position
-   int x = MousePose[0];
-   int y = MousePose[1];
+   int x = m_MousePose[0];
+   int y = m_MousePose[1];
 
    // the pivot center
    double pivotPoint[3];
 
    // get the centre of rotation from Pivot RefSys
-   mflTransform::GetPosition(GetPivotRefSys()->GetMatrix(), pivotPoint);
+   mafTransform::GetPosition(GetPivotRefSys()->GetMatrix(), pivotPoint);
 
    // translate to center of the constrain ref sys
    transform->Identity();
    transform->Translate(pivotPoint[0], pivotPoint[1], pivotPoint[2]);
    
-   float dx = this->LastX - x;
-   float dy = this->LastY - y;
+   float dx = m_LastX - x;
+   float dy = m_LastY - y;
    
    // azimuth
-   CurrentCamera->OrthogonalizeViewUp();
-   double *viewUp = CurrentCamera->GetViewUp();
+   m_CurrentCamera->OrthogonalizeViewUp();
+   double *viewUp = m_CurrentCamera->GetViewUp();
    int *size = Renderer->GetSize();
    transform->RotateWXYZ(-360.0 * dx / size[0], viewUp[0], viewUp[1], viewUp[2]);
    
    // elevation
-   vtkMath::Cross(CurrentCamera->GetDirectionOfProjection(), viewUp, v2);
+   vtkMath::Cross(m_CurrentCamera->GetDirectionOfProjection(), viewUp, v2);
    transform->RotateWXYZ(360.0 * dy / size[1], v2[0], v2[1], v2[2]);
    
    // translate back
@@ -1162,9 +1162,9 @@ void mmiGenericMouse::TrackballRotate()
    // clean up
    transform->Delete();
  
-   // update LastX and LastY
-   this->LastX = x;
-   this->LastY = y;
+   // update m_LastX and m_LastY
+   m_LastX = x;
+   m_LastY = y;
 }
 
 //----------------------------------------------------------------------------
@@ -1177,12 +1177,12 @@ void mmiGenericMouse::TrackballTranslate()
 
   float disp_obj_center[3], new_pick_point[4], old_pick_point[4], motion_vector[3];
   
-  this->ComputeWorldToDisplay(obj_center[0], obj_center[1], obj_center[2], 
+  ComputeWorldToDisplay(obj_center[0], obj_center[1], obj_center[2], 
                               disp_obj_center);
 
-  this->ComputeDisplayToWorld((double)MousePose[0], (double)MousePose[1], disp_obj_center[2], new_pick_point);
+  ComputeDisplayToWorld((double)m_MousePose[0], (double)m_MousePose[1], disp_obj_center[2], new_pick_point);
   
-  this->ComputeDisplayToWorld((double)LastMousePose[0], (double)LastMousePose[1], disp_obj_center[2], old_pick_point);
+  ComputeDisplayToWorld((double)m_LastMousePose[0], (double)m_LastMousePose[1], disp_obj_center[2], old_pick_point);
   
   motion_vector[0] = new_pick_point[0] - old_pick_point[0];
   motion_vector[1] = new_pick_point[1] - old_pick_point[1];
@@ -1204,29 +1204,29 @@ void mmiGenericMouse::TrackballRoll()
 //----------------------------------------------------------------------------
 {
    // get the rotation refsys
-   ConstrainRefSys = GetRotationConstraint()->GetRefSys()->GetMatrix();  
+   m_ConstrainRefSys = GetRotationConstraint()->GetRefSys()->GetMatrix();  
 
    // the refsys center
    double pivotPoint[3];
 
    // get the centre of rotation from PivotRefSys
-   mflTransform::GetPosition(GetPivotRefSys()->GetMatrix(), pivotPoint); 
+   mafTransform::GetPosition(GetPivotRefSys()->GetMatrix(), pivotPoint); 
    
    // Get the axis to rotate around = vector from eye to origin
  
    float motion_vector[3];
    double view_point[3];
  
-   if (CurrentCamera->GetParallelProjection())
+   if (m_CurrentCamera->GetParallelProjection())
    {
      // If parallel projection, want to get the view plane normal...
-     CurrentCamera->ComputeViewPlaneNormal();
-     CurrentCamera->GetViewPlaneNormal(motion_vector);
+     m_CurrentCamera->ComputeViewPlaneNormal();
+     m_CurrentCamera->GetViewPlaneNormal(motion_vector);
    }
    else
    {   
      // Perspective projection, get vector from eye to center of actor
-     CurrentCamera->GetPosition(view_point);
+     m_CurrentCamera->GetPosition(view_point);
      motion_vector[0] = view_point[0] - pivotPoint[0];
      motion_vector[1] = view_point[1] - pivotPoint[1];
      motion_vector[2] = view_point[2] - pivotPoint[2];
@@ -1235,16 +1235,16 @@ void mmiGenericMouse::TrackballRoll()
    
    float disp_refSysCenter[3];
    
-   this->ComputeWorldToDisplay(pivotPoint[0], pivotPoint[1], pivotPoint[2], 
+   ComputeWorldToDisplay(pivotPoint[0], pivotPoint[1], pivotPoint[2], 
                                disp_refSysCenter);
    
    double newAngle = 
-     atan2((double)MousePose[1] - (double)disp_refSysCenter[1],
-           (double)MousePose[0] - (double)disp_refSysCenter[0]);
+     atan2((double)m_MousePose[1] - (double)disp_refSysCenter[1],
+           (double)m_MousePose[0] - (double)disp_refSysCenter[0]);
  
    double oldAngle = 
-     atan2((double)LastMousePose[1] - (double)disp_refSysCenter[1],
-           (double)LastMousePose[0] - (double)disp_refSysCenter[0]);
+     atan2((double)m_LastMousePose[1] - (double)disp_refSysCenter[1],
+           (double)m_LastMousePose[0] - (double)disp_refSysCenter[0]);
    
    newAngle *= vtkMath::RadiansToDegrees();
    oldAngle *= vtkMath::RadiansToDegrees();
@@ -1268,8 +1268,8 @@ void mmiGenericMouse::SnapOnSurface()
 {
   if (Renderer == NULL || Prop == NULL ) return;
 
-  int x = MousePose[0];
-  int y = MousePose[1];
+  int x = m_MousePose[0];
+  int y = m_MousePose[1];
 
 	vtkPropCollection *pc = vtkPropCollection::New();
 	Prop->GetActors(pc); 
@@ -1281,7 +1281,7 @@ void mmiGenericMouse::SnapOnSurface()
 		p = pc->GetNextProp();
 	}
   
-  int picked = Picker->Pick(x,y,0,Renderer);
+  int picked = m_Picker->Pick(x,y,0,Renderer);
 
 	pc->InitTraversal();
 	p = pc->GetNextProp();
@@ -1298,11 +1298,11 @@ void mmiGenericMouse::SnapOnSurface()
 	}
 
   float newAbsPickPos[3];
-  Picker->GetPickPosition(newAbsPickPos);
+  m_Picker->GetPickPosition(newAbsPickPos);
   
   double absPivotPos[3];
-  assert(VME);
-  mflTransform::GetPosition(VME->GetAbsMatrixPipe()->GetMatrix(), absPivotPos);
+  assert(m_VME);
+  mafTransform::GetPosition(m_VME->GetAbsMatrixPipe()->GetMatrix(), absPivotPos);
 
   double absMotionVec[3];
   absMotionVec[0] = newAbsPickPos[0] - absPivotPos[0];

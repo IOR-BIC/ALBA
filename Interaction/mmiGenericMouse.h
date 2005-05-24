@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 15:42:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-24 16:43:07 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,27 +13,16 @@
 #ifndef __mmiGenericMouse_h
 #define __mmiGenericMouse_h
 
-#ifndef WX_PRECOMP
-#include "wx/wx.h"
-#endif
-
 #include "mmiGenericInterface.h"
-#include "mafEvent.h"
-
-#include "mflTransform.h"
-
-#include "vtkCamera.h"
-#include "vtkMatrix4x4.h"
+#include "mmiConstraint.h"
 
 //----------------------------------------------------------------------------
 //forward ref
 //----------------------------------------------------------------------------
-
 class mmdMouse;
+class mafMatrix;
 
-class mflEvent;
-class mflAgent;
-
+class vtkCamera;
 class vtkDoubleArray;
 class vtkCellPicker;
 
@@ -47,14 +36,8 @@ class vtkCellPicker;
 class mmiGenericMouse : public mmiGenericInterface
 {
 public:
-
-  static mmiGenericMouse *New();
-  vtkTypeMacro(mmiGenericMouse, mafInteractor);
+  mafTypeMacro(mmiGenericMouse, mafInteractor);
   
-   /** Set the isa listener */
-  void SetListener(mafEventListener *listener) {m_listener = listener;};
-  mafEventListener *GetListener() {return m_listener;};
-
   //----------------------------------------------------------------------------
   // Actions performed on mouse driven events
   //----------------------------------------------------------------------------
@@ -79,10 +62,10 @@ public:
 
   // modified by Rafael. 9-9-2004
   // Made this function public
-  void SendTransformMatrix(vtkMatrix4x4 *matrix, int mouseAction = MOUSE_MOVE, float rotationAngle = 0);  
+  void SendTransformMatrix(mafMatrix *matrix, int mouseAction = MOUSE_MOVE, float rotationAngle = 0);  
 
   /** Set the current camera */
-  vtkSetObjectMacro(CurrentCamera, vtkCamera);
+  virtual void SetCurrentCamera(vtkCamera *camera);
 
   //----------------------------------------------------------------------------
   // result matrix 
@@ -91,23 +74,23 @@ public:
   /** Set the semantic of the concatenation, default is postmultiply
   ie the transform is concatenated after all the other transformations. */
   void SetResultMatrixConcatenationSemanticToPostMultiply() 
-       { this->ResultMatrixConcatenationSemantic = POSTMULTIPLY; }
+       { this->m_ResultMatrixConcatenationSemantic = POSTMULTIPLY; }
   void SetResultMatrixConcatenationSemanticToPreMultiply()
-       { this->ResultMatrixConcatenationSemantic = POSTMULTIPLY; }
+       { this->m_ResultMatrixConcatenationSemantic = POSTMULTIPLY; }
   int  GetResultMatrixConcatenationSemantic()
-       { return this->ResultMatrixConcatenationSemantic; }
+       { return this->m_ResultMatrixConcatenationSemantic; }
 
   /**
   Set/Get if the concatenation is active */
-  void SetResultMatrixConcatenation(bool active) {this->ResultMatrixConcatenation = active;}
-  bool GetResultMatrixConcatenation() {return this->ResultMatrixConcatenation;};
+  void SetResultMatrixConcatenation(bool active) {this->m_ResultMatrixConcatenation = active;}
+  bool GetResultMatrixConcatenation() {return this->m_ResultMatrixConcatenation;};
 
   /**
   Enable/Disable the concatenation of the transform matrix to be sent 
   to the result matrix     
   */
-  void ResultMatrixConcatenationOn() {this->ResultMatrixConcatenation = true;};
-  void ResultMatrixConcatenationOff() {this->ResultMatrixConcatenation = false;};
+  void ResultMatrixConcatenationOn() {this->m_ResultMatrixConcatenation = true;};
+  void ResultMatrixConcatenationOff() {this->m_ResultMatrixConcatenation = false;};
 
 protected:
 
@@ -162,27 +145,27 @@ protected:
   // If HelperPointStatus is NOT_ON_GRID_POINT this is the  index of the first array 
   // element on the left of the helper point. If HelperPointStatus is ON_GRID_POINT this is 
   // the array index corresponding to the helper point position 
-  int HelpPIndex;
+  int m_HelpPIndex;
 
   //the constrain ref sys matrix
-  vtkMatrix4x4 *ConstrainRefSys;
+  mafMatrix *m_ConstrainRefSys;
 
   // the input refsys matrix
-  vtkMatrix4x4 *InputRefSys;
+  mafMatrix *m_InputRefSys;
   
   //the target refsys type
-  int TargetRefSysType;
+  int m_TargetRefSysType;
 
   //Do the picking
-  vtkCellPicker *Picker;
+  vtkCellPicker *m_Picker;
 
   //----------------------------------------------------------------------------
   // result matrix: the matrix to keep updated 
   //----------------------------------------------------------------------------
   // Register the pointer to the matrix to be updated
-  vtkMatrix4x4 *ResultMatrix;
+  mafMatrix *m_ResultMatrix;
   
-  int ResultMatrixConcatenationSemantic;
+  int m_ResultMatrixConcatenationSemantic;
 
   enum
   {
@@ -210,7 +193,7 @@ private:
   mmiGenericMouse(const mmiGenericMouse&);  // Not implemented.
   void operator=(const mmiGenericMouse&);   // Not implemented.
 
-  float  LastPickPosition[3]; 
+  float  m_LastPickPosition[3]; 
         
   // Build vector with origin in p1 pointing to p2
   void BuildVector(double *p1, double *p2, double *vec)
@@ -224,7 +207,7 @@ private:
   }
 
   // Build vector [coeff * inVector];
-  void BuildVector(double coeff, const double *inVector, double *outVector, int refSysType = mafRefSys::LOCAL, int localAxis = X);
+  void BuildVector(double coeff, const double *inVector, double *outVector, int refSysType = mafRefSys::LOCAL, int localAxis = mmiConstraint::X);
  
 
   // Project in_vector on in_axis direction; in_axis does not need to be 
@@ -241,13 +224,13 @@ private:
   //   
   // P1  P2   P3      PN
   // ->----->----->-------->
-  // -------ProjAcc-------->
+  // -------m_ProjAcc-------->
   //
-  double ProjAcc;
+  double m_ProjAcc;
 
   /**
   Send the transform matrix to the listener. Also concatenate the matrix
-  to ResultMatrix according to current ResultMatrix concatenation semantic. 
+  to m_ResultMatrix according to current m_ResultMatrix concatenation semantic. 
   If the action is MOUSE_DOWN the picked position is send as vtkMatrix in
   the VtkObj field of the event.
   If the action is MOUSE_MOVE and a rotation is performed the angle of
@@ -258,23 +241,23 @@ private:
 
   /** Concatenate the transform matrix to the result matrix 
   according to selected semantic */
-  void ConcatenateToResultMatrix(vtkMatrix4x4 *matrix);
+  void ConcatenateToResultMatrix(mafMatrix *matrix);
 
-  bool ResultMatrixConcatenation;
+  bool m_ResultMatrixConcatenation;
 
   //----------------------------------------------------------------------------
   // trackball interaction style stuff 
   //----------------------------------------------------------------------------
 
-  int LastX, LastY;
+  int m_LastX, m_LastY;
 
   //----------------------------------------------------------------------------
   
-  int MousePose[2];
-  int LastMousePose[2];
-  int ButtonPressed;
+  int m_MousePose[2];
+  int m_LastMousePose[2];
+  int m_ButtonPressed;
   
-  vtkCamera *CurrentCamera; ///< Stores camera to which the interaction is currently assigned
+  vtkCamera *m_CurrentCamera; ///< Stores camera to which the interaction is currently assigned
 
 };
 #endif

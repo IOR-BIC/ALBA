@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPER.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 17:29:06 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-24 16:43:07 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -47,7 +47,7 @@ mmiPER::mmiPER()
 
   m_CameraBehavior  = mmi6DOFCameraMove::New(); // allocate camera behavior
   m_CameraBehavior->SetStartButton(MAF_LEFT_BUTTON); // any button
-  SetModeToSingleButton();
+  Setm_ModeToSingleButton();
   m_FirstTime = 0;
 
   m_CameraMouseBehavior = mmiCameraMove::New(); // allocate mouse camera behavior
@@ -77,7 +77,7 @@ bool mmiPER::IsInteracting(mafDevice *device, int button)
   std::map<mafID,DeviceItem>::iterator iter = m_Devices.find(device->GetID());
   if (iter!=m_Devices.end()&&(*iter).first==device->GetID())
   {
-    if (m_Mode==SINGLE_BUTTON)
+    if (m_m_Mode==SINGLE_BUTTON)
     {
       // if optional button parameter is positive report if interaction
       // has been started by a specific button.
@@ -98,7 +98,7 @@ void mmiPER::InsertDevice(mafDevice *device,int button)
 //----------------------------------------------------------------------------
 {
   
-  if (m_Mode==SINGLE_BUTTON)
+  if (m_m_Mode==SINGLE_BUTTON)
   {
     m_Devices[device->GetID()].Button=button;
     m_Devices[device->GetID()].VME=NULL; // initially set picked VME to NULL
@@ -135,7 +135,7 @@ void mmiPER::RemoveDevice(mafDevice *device)
   
   m_Devices[device->GetID()].VME=NULL; // initially set picked VME to NULL
   
-  if (Mode==SINGLE_BUTTON)
+  if (m_Mode==SINGLE_BUTTON)
   {
     m_Devices.erase(iter);
   }
@@ -302,7 +302,7 @@ void mmiPER::OnButtonDown(mafEventInteraction *e)
 
   if (point_pose && tracker)
   { 
-    if(FindPokedVme(device,point_pose,picked_prop,picked_vme,picked_bh)) 
+    if(FindPokedVme(device,*point_pose,picked_prop,picked_vme,picked_bh)) 
     {
       // if a VME is picked its pointer is written in PickedVME
       if(m_CanSelect && !picked_vme->IsMAFType(mafVMEGizmo))
@@ -380,7 +380,7 @@ int mmiPER::StartInteraction(mafDevice *device, int button)
 
   // Check if already interacting with the same device: it could happen the user
   // contemporary pressed another button...
-  if (Mode==SINGLE_BUTTON)
+  if (m_Mode==SINGLE_BUTTON)
   {
     if (!IsInteracting(device,button))
     {
@@ -401,7 +401,7 @@ int mmiPER::StartInteraction(mafDevice *device, int button)
 int mmiPER::StopInteraction(mafDevice *device, int button)
 //------------------------------------------------------------------------------
 {
-  if (Mode==SINGLE_BUTTON)
+  if (m_Mode==SINGLE_BUTTON)
   {
     if (IsInteracting(device,button))
     {   
@@ -459,7 +459,7 @@ int mmiPER::OnStopInteraction(mafEventInteraction *e)
   assert(device);
 
   int button=e->GetButton();
-  if (Mode==MULTI_BUTTON||IsInteracting(device,button))
+  if (m_Mode==MULTI_BUTTON||IsInteracting(device,button))
   {
     // standard action keys
     switch (button)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi6DOFCameraMove.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-21 07:55:50 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-24 16:43:05 $
+  Version:   $Revision: 1.3 $
   Authors:   Michele Diegoli & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -58,7 +58,7 @@ void mmi6DOFCameraMove::OnEvent(mafEventBase *event)
     
     if (tracker==NULL)
     {
-      tracker=mmdTracker::SafeDownCast((vtkObject *)event->GetSender());
+      tracker=mmdTracker::SafeDownCast((mafObject *)event->GetSender());
       SetTracker(tracker);
       
     }  
@@ -77,7 +77,7 @@ void mmi6DOFCameraMove::OnEvent(mafEventBase *event)
     }
   }
     
-  Superclass::OnEvent(event,channel);
+  Superclass::OnEvent(event);
 }
 //------------------------------------------------------------------------------
 int mmi6DOFCameraMove::StartInteraction(mmdTracker *tracker,mafMatrix *pose)
@@ -90,9 +90,9 @@ int mmi6DOFCameraMove::StartInteraction(mmdTracker *tracker,mafMatrix *pose)
     {
        // if the tracker does not have an avatar we don't
       // know the mapping rule and cannot proceed
-      if (Avatar&&Avatar->GetRenderer())
+      if (m_Avatar&&m_Avatar->GetRenderer())
 	    {
-        vtkCamera *active_camera=Avatar->GetRenderer()->GetActiveCamera();
+        vtkCamera *active_camera=m_Avatar->GetRenderer()->GetActiveCamera();
         
         m_CurrentCamera=active_camera;
         active_camera->GetPosition(m_StartCameraPosition);

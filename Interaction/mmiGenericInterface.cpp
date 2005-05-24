@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-21 07:55:51 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-24 16:43:06 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -26,7 +26,7 @@
 //------------------------------------------------------------------------------
 // Events
 //------------------------------------------------------------------------------
-//MAF_ID_IMP(mmiGenericInterface::MOVE_EVENT);
+MAF_ID_IMP(mmiGenericInterface::MOVE_EVENT);
 
 //------------------------------------------------------------------------------
 mafCxxAbstractTypeMacro(mmiGenericInterface)
