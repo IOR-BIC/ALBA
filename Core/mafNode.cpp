@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-02 08:04:44 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2005-05-24 14:31:10 $
+  Version:   $Revision: 1.29 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1092,7 +1092,8 @@ mmgGui* mafNode::CreateGui()
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this); // replace NULL with 'this' ....  //SIL. 22-4-2005:
   
-  m_Gui->Label("type :", wxString(GetTypeName()));
+  mafString type_name = GetTypeName();
+  m_Gui->Label("type :", type_name);
   m_Gui->String(ID_NAME,"name :", &m_Name);
 
   return m_Gui;

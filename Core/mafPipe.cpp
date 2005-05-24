@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 12:16:32 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-05-24 14:31:44 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -74,7 +74,7 @@ mmgGui* mafPipe::CreateGui()
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(NULL); // replace NULL with 'this' ....  //SIL. 22-4-2005: 
 
-  wxString type = "mafPipe" ;
+  mafString type = "mafPipe" ;
   m_Gui->Label("type :", type);
 
   return m_Gui;
