@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolyline.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-19 08:37:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-24 14:37:32 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,6 +21,7 @@
 //----------------------------------------------------------------------------
 class vtkDataSet;
 class vtkPolyData;
+class mmaMaterial;
 
 /** mafVMEPolyline - a VME featuring an internal array for matrices and VTK datasets.
   mafVMEPolyline is a specialized VME inheriting the VME-Generic features to internally
@@ -49,6 +50,10 @@ public:
 
     /** return the right type of output */  
     virtual mafVMEOutput *GetOutput();
+
+    /** Return pointer to material attribute. */
+    mmaMaterial *GetMaterial();
+
 protected:
   mafVMEPolyline();
   virtual ~mafVMEPolyline();

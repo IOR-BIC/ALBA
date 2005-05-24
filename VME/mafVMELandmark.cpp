@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-16 15:22:32 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-05-24 14:37:31 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,6 +28,7 @@
 #include "mafIndent.h"
 #include "mafTransform.h"
 #include "mmgGui.h"
+#include "mmaMaterial.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFDataPipe.h"
@@ -291,4 +292,17 @@ mmgGui* mafVMELandmark::CreateGui()
   m_Gui->Label(wxString::Format("y: %f",xyz[1]));
   m_Gui->Label(wxString::Format("z: %f",xyz[2]));
   return m_Gui;
+}
+
+//-------------------------------------------------------------------------
+mmaMaterial *mafVMELandmark::GetMaterial()
+//-------------------------------------------------------------------------
+{
+  mmaMaterial *material = (mmaMaterial *)GetAttribute("MaterialAttributes");
+  if (material == NULL)
+  {
+    material = mmaMaterial::New();
+    SetAttribute("MaterialAttributes", material);
+  }
+  return material;
 }

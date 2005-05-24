@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-16 15:22:33 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-24 14:37:32 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -23,6 +23,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // forward declarations :
 //----------------------------------------------------------------------------
 class mafVMELandmark;
+class mmaMaterial;
 
 /** mafVMELandmarkCloud - this class represents a cloud of landmarks
 mafVMELandmarkRigidCloud is a concrete VME object storing a cloud of landmarks whose
@@ -183,6 +184,9 @@ public:
   /**
   Return true if it's a rigid landmark cloud (i.e. it has a single time frame)*/
   bool IsRigid();
+
+  /** Return pointer to material attribute. */
+  mmaMaterial *GetMaterial();
 
   void Print(std::ostream &os, const int tabs);
 

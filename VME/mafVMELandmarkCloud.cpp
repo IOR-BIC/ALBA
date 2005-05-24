@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-16 15:22:33 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-05-24 14:37:32 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -32,6 +32,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafEventSource.h"
 #include "mafVMEOutputPointSet.h"
 #include "mmgGui.h"
+#include "mmaMaterial.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkPolyData.h"
@@ -1074,7 +1075,7 @@ mmgGui* mafVMELandmarkCloud::CreateGui()
   m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
   m_Gui->Divider();
-  m_Gui->Label("num lm: ", wxString(m_NumberOfLandmarksString));
+  m_Gui->Label("num lm: ", m_NumberOfLandmarksString);
   m_Gui->Double(ID_LM_RADIUS, "radius", &m_Radius, 0.0);
 
   return m_Gui;
@@ -1095,4 +1096,16 @@ void mafVMELandmarkCloud::OnEvent(mafEventBase *event)
         mafVME::OnEvent(event);
     }
   }
+}
+//-------------------------------------------------------------------------
+mmaMaterial *mafVMELandmarkCloud::GetMaterial()
+//-------------------------------------------------------------------------
+{
+  mmaMaterial *material = (mmaMaterial *)GetAttribute("MaterialAttributes");
+  if (material == NULL)
+  {
+    material = mmaMaterial::New();
+    SetAttribute("MaterialAttributes", material);
+  }
+  return material;
 }

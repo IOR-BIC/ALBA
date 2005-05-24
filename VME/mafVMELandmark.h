@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-16 14:53:00 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-24 14:37:32 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -23,6 +23,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 class mafNode;
 class vtkPolyData;
+class mmaMaterial;
 
 /** mafVMELandmark - this class represents a single Landmark
  mafVMELandmark is a concrete VME object storing a single landmark, whose
@@ -89,6 +90,9 @@ public:
   /**
   Redefined to avoid chaning landmark scale (i.e. the scale is forced to the visibility value)*/
   virtual void SetMatrix(mafMatrix &mat);
+
+  /** Return pointer to material attribute. */
+  mmaMaterial *GetMaterial();
 
 protected:
   mafVMELandmark();

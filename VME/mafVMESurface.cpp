@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-27 14:08:58 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-05-24 14:37:33 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,6 +27,8 @@
 #include "mafVTKInterpolator.h"
 #include "mafVMEItemVTK.h"
 #include "mafAbsMatrixPipe.h"
+#include "mmaMaterial.h"
+
 #include "vtkDataSet.h"
 #include "vtkPolyData.h"
 #include "vtkCellArray.h"
@@ -87,6 +89,18 @@ int mafVMESurface::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
   return MAF_ERROR;
 }
 
+//-------------------------------------------------------------------------
+mmaMaterial *mafVMESurface::GetMaterial()
+//-------------------------------------------------------------------------
+{
+  mmaMaterial *material = (mmaMaterial *)GetAttribute("MaterialAttributes");
+  if (material == NULL)
+  {
+    material = mmaMaterial::New();
+    SetAttribute("MaterialAttributes", material);
+  }
+  return material;
+}
 //-------------------------------------------------------------------------
 char** mafVMESurface::GetIcon() 
 //-------------------------------------------------------------------------

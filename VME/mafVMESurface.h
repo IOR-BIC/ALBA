@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:49:46 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-05-24 14:37:33 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,6 +21,7 @@
 //----------------------------------------------------------------------------
 class vtkDataSet;
 class vtkPolyData;
+class mmaMaterial;
 
 /** mafVMESurface - a VME featuring an internal array for matrices and VTK datasets.
   mafVMESurface is a specialized VME inheriting the VME-Generic features to internally
@@ -52,6 +53,9 @@ public:
 
     /** return icon */
     static char** GetIcon();
+
+    /** Return pointer to material attribute. */
+    mmaMaterial *GetMaterial();
 
     /** Return the suggested pipe-typename for the visualization of this vme */
     virtual mafString GetVisualPipe() {return mafString("mafPipeSurface");};
