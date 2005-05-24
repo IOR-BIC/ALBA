@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-23 12:11:31 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-05-24 14:37:56 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -67,7 +67,7 @@ public:
     mafVMEAccept() {};
     ~mafVMEAccept() {};
 
-    bool Validate(mafNode *node) {return(node != NULL && node->IsA("mafVME"));};
+    bool Validate(mafNode *node) {return(node != NULL && node->IsMAFType(mafVME));};
   };
   mafVMEAccept *m_VMEAccept;
 

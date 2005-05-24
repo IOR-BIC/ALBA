@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-23 12:11:31 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-05-24 14:37:56 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -685,14 +685,14 @@ mmgGui* mafVMEMeter::CreateGui()
   mafVME *start_vme = mafVME::SafeDownCast(GetLink("StartVME"));
   m_StartVmeName = start_vme ? start_vme->GetName() : "none";
   //m_Gui->Label("Start: ", wxString(m_StartVmeName));
-  m_Gui->Button(ID_START_METER_LINK,m_StartVmeName.GetCStr(),"Start", "Select the start vme for the meter");
+  m_Gui->Button(ID_START_METER_LINK,m_StartVmeName,"Start", "Select the start vme for the meter");
   mafVME *end_vme1   = mafVME::SafeDownCast(GetLink("EndVME1"));
   m_EndVme1Name = end_vme1 ? end_vme1->GetName() : "none";
-  m_Gui->Button(ID_END1_METER_LINK,m_EndVme1Name.GetCStr(),"End 1", "Select the end vme for point distance");
+  m_Gui->Button(ID_END1_METER_LINK,m_EndVme1Name,"End 1", "Select the end vme for point distance");
 //  m_Gui->Label("End1: ", wxString(m_EndVme1Name));
   mafVME *end_vme2   = mafVME::SafeDownCast(GetLink("EndVME2"));
   m_EndVme2Name = end_vme2 ? end_vme2->GetName() : "none";
-  m_Gui->Button(ID_END2_METER_LINK,m_EndVme2Name.GetCStr(),"End 2", "Select the vme representing \nthe point for line distance");
+  m_Gui->Button(ID_END2_METER_LINK,m_EndVme2Name,"End 2", "Select the vme representing \nthe point for line distance");
 //  m_Gui->Label("End2: ", wxString(m_EndVme2Name));
 
   return m_Gui;
@@ -722,15 +722,19 @@ void mafVMEMeter::OnEvent(mafEventBase *event)
           if (button_id == ID_START_METER_LINK)
           {
             SetLink("StartVME", n);
+            m_StartVmeName = n->GetName();
           }
           else if (button_id == ID_END1_METER_LINK)
           {
             SetLink("EndVME1", n);
+            m_EndVme1Name = n->GetName();
           }
           else
           {
             SetLink("EndVME2", n);
+            m_EndVme2Name = n->GetName();
           }
+          m_Gui->Update();
         }
       }
       break;
