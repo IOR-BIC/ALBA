@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 14:34:28 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-05-27 13:48:36 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2005
@@ -38,7 +38,7 @@ class mmgCheckListBox;
 //----------------------------------------------------------------------------
 // Constants to be used with mmgGUI::GetMetrics()
 //----------------------------------------------------------------------------
-enum mmgGUI_constants
+enum GUI_CONSTANTS
 {
   GUI_ROW_MARGIN,
   GUI_LABEL_MARGIN,
@@ -67,7 +67,7 @@ One command may cause the creation of more than one widget, ex:
 the Vector create 3 wxTextCtrl, and I can't use the same ID for every widget.
 So user-ID are translated into widgets-ID using 
 two member functions : GetModuleID and GetId. GetId increments an internal ID_counter.
-\sa GetId GetModuleId m_id m_table
+\sa GetId GetModuleId m_Id m_WidgetTableID
 */
 //----------------------------------------------------------------------------
 class mmgGui: public mmgPanel, public mafObserver
@@ -112,13 +112,13 @@ public:
   void String(int id,wxString label,wxString *var, wxString tooltip = "");
 
   /** String entry widget. */
-  void String(int id,const char *label,mafString *var, const char *tooltip = "");
+  void String(int id,mafString label,mafString *var, mafString tooltip = "");
   
   /** Integer entry widget. */
   void Integer(int id,mafString label,int *var, int min = MININT, int max = MAXINT, mafString tooltip = "");
 
   /** Float entry widget. */
-  void Float(int id,mafString label,float *var, float min = MINFLOAT, float max = MAXFLOAT, int flag=0, int decimal_digit = 2, mafString tooltip = "");
+  //void Float(int id,mafString label,float *var, float min = MINFLOAT, float max = MAXFLOAT, int flag=0, int decimal_digit = 2, mafString tooltip = "");
 
   /** Double entry widget. */
   void Double(int id,mafString label,double *var, double	min = MINFLOAT, double max = MAXFLOAT, int flag=0, int decimal_digit = 2, mafString tooltip = "");
@@ -130,10 +130,10 @@ public:
   void Vector(int id,wxString label, int var[3], int minx, int maxx, int miny, int maxy, int minz, int maxz, wxString tooltip = "");
 
   /** Float vector3 entry widget. */
-  void Vector(int id,wxString label, float var[3], float min = MINFLOAT, float max = MAXFLOAT, int decimal_digit = 2, wxString tooltip = "");
+  //void Vector(int id,wxString label, float var[3], float min = MINFLOAT, float max = MAXFLOAT, int decimal_digit = 2, wxString tooltip = "");
 
   /** Float vector3 entry widget. */
-  void Vector(int id,wxString label, float var[3], float minx, float maxx, float miny, float maxy, float minz, float maxz, int decimal_digit = 2, wxString tooltip = "");
+  //void Vector(int id,wxString label, float var[3], float minx, float maxx, float miny, float maxy, float minz, float maxz, int decimal_digit = 2, wxString tooltip = "");
 
   /** Double vector3 entry widget. */
   void Vector(int id,wxString label, double var[3], double min = MINFLOAT, double max = MAXFLOAT, int decimal_digit = 2, wxString tooltip = "");
@@ -194,19 +194,22 @@ public:
 	wxGrid *Grid(int id, wxString label = "", int height = 60, int row = 2,int cols = 2, wxString tooltip = "");
 
   /** Add window to gui sizer. */
-  void Add(wxWindow* window,int option = 0, int flag = wxEXPAND, int border = 0)  {m_sizer->Add(window,option,flag,border);};
+  void Add(wxWindow* window,int option = 0, int flag = wxEXPAND, int border = 0)  {m_Sizer->Add(window,option,flag,border);};
 
   /** Add sizer to gui sizer. */
-  void Add(wxSizer*  sizer, int option = 0, int flag = wxEXPAND, int border = 0)  {m_sizer->Add(sizer, option,flag,border);};
+  void Add(wxSizer*  sizer, int option = 0, int flag = wxEXPAND, int border = 0)  {m_Sizer->Add(sizer, option,flag,border);};
 
   /** Add gui to gui sizer. */
   void AddGui(mmgGui*  gui, int option = 0, int flag = wxEXPAND, int border = 0);
 
   /** Remove window from gui sizer. */
-  bool Remove(wxWindow* window) {return m_sizer->Remove(window);};
+  bool Remove(wxWindow* window) {return m_Sizer->Remove(window);};
 
   /** Remove sizer from gui sizer. */
-  bool Remove(wxSizer*  sizer ) {return m_sizer->Remove(sizer);};
+  bool Remove(wxSizer*  sizer ) {return m_Sizer->Remove(sizer);};
+
+  /** Remove a nested GUI */
+  void RemoveGui(mmgGui*  gui);
 
   /** Fit the gui widgets to gui sizer. */
   void FitGui();
@@ -218,7 +221,7 @@ public:
   void Enable(int mod_id, bool enable);
   
 	/** Return the font used for bold label. */
-  wxFont GetBoldFont() {return m_bold;}; 
+  wxFont GetBoldFont() {return m_BoldFont;}; 
 
 	/** Return the measure used to layout the widgets - pass one of the GUI_xxx constants. */
   int GetMetrics( int id); 
@@ -227,53 +230,62 @@ public:
 
   /**  \par implementation details:
   GetId is used to obtain a new/unique widget_ID. 
-  As a side effect a new pair widget_ID->module_ID is stored in m_table
-  \sa GetId GetModuleId m_id m_table
+  As a side effect a new pair widget_ID->module_ID is stored in m_WidgetTableID
+  \sa GetId GetModuleId m_Id m_WidgetTableID
   */
-  int GetId(int mod_id)       {m_id++; assert(m_id<MAXID); m_table[m_id-MINID]=mod_id; return m_id;}; 
+  int GetId(int mod_id)       {m_Id++; assert(m_Id<MAXID); m_WidgetTableID[m_Id-MINID]=mod_id; return m_Id;}; 
+
+  /** 
+  Turn On/Off the collaboration status. */
+  void Collaborate(bool status) {m_CollaborateStatus = status;};
+
+  void GetWidgetValue(long widget_id, WidgetDataType &widget_data);
+
+  void SetWidgetValue(int id, WidgetDataType &widget_data);
 
   /** place the GUI on a different parent, and perform the required Resize/Stretch/ and Show */
   void Reparent(wxWindow *parent);
 
 protected:
   mafObserver  *m_Listener;     
-  wxBoxSizer   *m_sizer;
+  wxBoxSizer   *m_Sizer;
 
-  wxColour      m_bc;
-  bool          m_use_bc;
-  long          m_entry_style;
+  wxColour      m_BackgroundColor;
+  bool          m_UseBackgroundColor;
+  long          m_EntryStyle;
 
   /**  \par implementation details:
-  m_bold is the font used for the Bold labels
+  m_BoldFont is the font used for the Bold labels
   */
-  wxFont m_bold;
+  wxFont m_BoldFont;
 
   /**  \par implementation details:
-  m_id is a counter that holds the last generated widget_ID.
+  m_Id is a counter that holds the last generated widget_ID.
   It is used and incremented by GetId.
-  \sa GetId GetModuleId m_id m_table
+  \sa GetId GetModuleId m_Id m_WidgetTableID
   */
+  int m_Id;
 
-  int m_id;                   
   /**  \par implementation details:
-  m_table is an array holding a table of conversion widget_id -> user_id.
-  The range of widget_IDs is between MINID and MAXID (created widget_IDs are <= then m_id)    
+  m_WidgetTableID is an array holding a table of conversion widget_id -> user_id.
+  The range of widget_IDs is between MINID and MAXID (created widget_IDs are <= then m_Id)    
   To obtain the Module ID, widget_ID are shifted by MINID and used to index the array
-  \sa GetId GetModuleId m_id m_table
+  \sa GetId GetModuleId m_Id m_WidgetTableID
   */
-
-  int m_table[MAXWIDGET];     //table widget ids -> module ids
+  int m_WidgetTableID[MAXWIDGET];     //table widget ids -> module ids
 
   /**
   \par implementation details:
-  translate a widget_ID in it's module_ID, accessing m_table
-  \sa GetId GetModuleId m_id m_table
+  translate a widget_ID in it's module_ID, accessing m_WidgetTableID
+  \sa GetId GetModuleId m_Id m_WidgetTableID
   */
-  int GetModuleId(int w_id)   {assert(w_id>0 && w_id<= m_id); return  m_table[w_id-MINID];};
+  int GetModuleId(int w_id)   {assert(w_id>0 && w_id<= m_Id); return  m_WidgetTableID[w_id-MINID];};
 
   void OnSlider			  (wxCommandEvent &event) { }//@@@ this->OnEvent(mafEvent(this, GetModuleId(event.GetId()))); }
 	void OnListBox      (wxCommandEvent &event);
   void OnCheckListBox (wxCommandEvent &event);
+
+  bool m_CollaborateStatus;  ///< Flag set to know if the application is in collaborative mode or no.
 
 DECLARE_EVENT_TABLE()
 };
