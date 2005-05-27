@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:59:49 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-05-27 13:45:11 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,6 +30,7 @@
 #include "mafStorage.h"
 #include "mafStorageElement.h"
 #include "mafEventIO.h"
+#include "mmgGui.h"
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMERoot)
@@ -108,14 +109,14 @@ void mafVMERoot::OnEvent(mafEventBase *e)
   {
     switch (e->GetId())
     {
-    case VME_GET_NEWITEM_ID:
-      if (mafEventIO *event_io=mafEventIO::SafeDownCast(e))
-      {
-        event_io->SetItemId(mafVMERoot::SafeDownCast(GetRoot())->GetNextItemId()); // retrieve and return an item ID
-      }
-    break;
-    default:
-      mafRoot::OnRootEvent(e);
+      case VME_GET_NEWITEM_ID:
+        if (mafEventIO *event_io=mafEventIO::SafeDownCast(e))
+        {
+          event_io->SetItemId(mafVMERoot::SafeDownCast(GetRoot())->GetNextItemId()); // retrieve and return an item ID
+        }
+      break;
+      default:
+        mafRoot::OnRootEvent(e);
     };
   }
   else
@@ -166,4 +167,15 @@ int mafVMERoot::InternalRestore(mafStorageElement *node)
     }
   }
   return MAF_ERROR;
+}
+//-------------------------------------------------------------------------
+mmgGui *mafVMERoot::CreateGui()
+//-------------------------------------------------------------------------
+{
+  assert(m_Gui == NULL);
+  m_Gui = new mmgGui(this);
+
+  mafString type_name = GetTypeName();
+  m_Gui->Label("type :", type_name);
+  return m_Gui;
 }
