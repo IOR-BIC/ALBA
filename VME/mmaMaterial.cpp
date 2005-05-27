@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 14:36:57 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-27 13:51:59 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -36,6 +36,7 @@
 #include "vtkProperty.h"
 #include "vtkTransferFunction2D.h"
 #include "vtkSphereSource.h"
+#include "vtkTexture.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkActor.h"
 #include "vtkRenderer.h"
@@ -45,6 +46,8 @@
 #include "vtkCamera.h"
 #include "vtkLight.h"
 #include "vtkImageExport.h"
+#include "vtkLookupTable.h"
+#include "vtkWindowLevelLookupTable.h"
 
 mafCxxTypeMacro(mmaMaterial)
 
@@ -52,10 +55,15 @@ mafCxxTypeMacro(mmaMaterial)
 mmaMaterial::mmaMaterial()
 //----------------------------------------------------------------------------
 {  
-	m_Name        = "new material";
+	m_MaterialType= USE_VTK_PROPERTY;
+
+  m_Name        = "new material";
+  vtkNEW(m_ColorLut);
+  vtkNEW(m_GrayLut);
   vtkNEW(m_Prop);
   m_VolumeProp  = NULL;
   m_Icon        = NULL;
+  m_TextureImage= NULL;
 
   m_Value            = 1.0;
   m_Ambient[0]       = 1.0;
@@ -74,13 +82,27 @@ mmaMaterial::mmaMaterial()
   m_SpecularPower    = 0.0;
   m_Opacity          = 1.0;
   m_Representation   = 2.0;
-  m_TextureID        = -1;
+
+  m_Level_LUT           = 0.5;
+  m_Window_LUT          = 1.0;
+  m_HueRange[0]         = 0.0;
+  m_HueRange[1]         = 0.6667;
+  m_SaturationRange[0]  = 0;
+  m_SaturationRange[1]  = 1;
+  m_TableRange[0]       = 0.0;
+  m_TableRange[1]       = 1.0;
+  m_NumColors           = 256;
+
+  m_TextureID           = -1;
+
   UpdateProp();
 }
 //----------------------------------------------------------------------------
 mmaMaterial::~mmaMaterial()
 //----------------------------------------------------------------------------
 {
+  vtkDEL(m_ColorLut);
+  vtkDEL(m_GrayLut);
 	vtkDEL(m_Prop); 
   vtkDEL(m_VolumeProp); 
 	cppDEL(m_Icon);
@@ -119,7 +141,7 @@ wxBitmap *mmaMaterial::MakeIcon()
 	ss->SetPhiResolution(20);
 	ss->SetThetaResolution(20);
 	if (this->m_Prop->GetRepresentation() == 1)
-	{ 
+	{
 		ss->SetThetaResolution(10);
 		ss->SetPhiResolution(3);
 	}
@@ -129,13 +151,26 @@ wxBitmap *mmaMaterial::MakeIcon()
 		ss->SetPhiResolution(20);
   } 
 	
-	vtkMAFSmartPointer<vtkPolyDataMapper> pdm;
+	vtkMAFSmartPointer<vtkTexture> texture;
+  if (m_MaterialType == USE_TEXTURE)
+  {
+    texture->SetInput(m_TextureImage);
+  }
+  
+  vtkMAFSmartPointer<vtkPolyDataMapper> pdm;
 	pdm->SetInput(ss->GetOutput());
 	pdm->SetImmediateModeRendering(0);
 
 	vtkMAFSmartPointer<vtkActor> actor;
   actor->SetMapper(pdm);
-  actor->SetProperty(this->m_Prop);
+  if (m_MaterialType == USE_VTK_PROPERTY)
+  {
+    actor->SetProperty(this->m_Prop);
+  }
+  else if (m_MaterialType == USE_TEXTURE)
+  {
+    actor->SetTexture(texture);
+  }
   actor->SetPickable(1);
   actor->SetVisibility(1);
   actor->SetPosition(0,0,0); 
@@ -176,24 +211,33 @@ void mmaMaterial::DeepCopy(const mafAttribute *a)
 //-------------------------------------------------------------------------
 { 
   Superclass::DeepCopy(a);
-  m_Name             = ((mmaMaterial *)a)->m_Name;
-  m_Value            = ((mmaMaterial *)a)->m_Value;
-  m_Ambient[0]       = ((mmaMaterial *)a)->m_Ambient[0];
-  m_Ambient[1]       = ((mmaMaterial *)a)->m_Ambient[1];
-  m_Ambient[2]       = ((mmaMaterial *)a)->m_Ambient[2];
-  m_AmbientIntensity = ((mmaMaterial *)a)->m_AmbientIntensity;
-  m_Diffuse[0]       = ((mmaMaterial *)a)->m_Diffuse[0];
-  m_Diffuse[1]       = ((mmaMaterial *)a)->m_Diffuse[1];
-  m_Diffuse[2]       = ((mmaMaterial *)a)->m_Diffuse[2];
-  m_DiffuseIntensity = ((mmaMaterial *)a)->m_DiffuseIntensity;
-  m_Specular[0]      = ((mmaMaterial *)a)->m_Specular[0];
-  m_Specular[1]      = ((mmaMaterial *)a)->m_Specular[1];
-  m_Specular[2]      = ((mmaMaterial *)a)->m_Specular[2];
-  m_SpecularIntensity= ((mmaMaterial *)a)->m_SpecularIntensity;
-  m_SpecularPower    = ((mmaMaterial *)a)->m_SpecularPower;
-  m_Opacity          = ((mmaMaterial *)a)->m_Opacity;
-  m_Representation   = ((mmaMaterial *)a)->m_Representation;
-  m_TextureID        = ((mmaMaterial *)a)->m_TextureID;
+  m_Name                = ((mmaMaterial *)a)->m_Name;
+  m_Value               = ((mmaMaterial *)a)->m_Value;
+  m_Ambient[0]          = ((mmaMaterial *)a)->m_Ambient[0];
+  m_Ambient[1]          = ((mmaMaterial *)a)->m_Ambient[1];
+  m_Ambient[2]          = ((mmaMaterial *)a)->m_Ambient[2];
+  m_AmbientIntensity    = ((mmaMaterial *)a)->m_AmbientIntensity;
+  m_Diffuse[0]          = ((mmaMaterial *)a)->m_Diffuse[0];
+  m_Diffuse[1]          = ((mmaMaterial *)a)->m_Diffuse[1];
+  m_Diffuse[2]          = ((mmaMaterial *)a)->m_Diffuse[2];
+  m_DiffuseIntensity    = ((mmaMaterial *)a)->m_DiffuseIntensity;
+  m_Specular[0]         = ((mmaMaterial *)a)->m_Specular[0];
+  m_Specular[1]         = ((mmaMaterial *)a)->m_Specular[1];
+  m_Specular[2]         = ((mmaMaterial *)a)->m_Specular[2];
+  m_SpecularIntensity   = ((mmaMaterial *)a)->m_SpecularIntensity;
+  m_SpecularPower       = ((mmaMaterial *)a)->m_SpecularPower;
+  m_Opacity             = ((mmaMaterial *)a)->m_Opacity;
+  m_Representation      = ((mmaMaterial *)a)->m_Representation;
+  m_TextureID           = ((mmaMaterial *)a)->m_TextureID;
+  m_Level_LUT           = ((mmaMaterial *)a)->m_Level_LUT;
+  m_Window_LUT          = ((mmaMaterial *)a)->m_Window_LUT;
+  m_HueRange[0]         = ((mmaMaterial *)a)->m_HueRange[0];
+  m_HueRange[1]         = ((mmaMaterial *)a)->m_HueRange[1];
+  m_SaturationRange[0]  = ((mmaMaterial *)a)->m_SaturationRange[0];
+  m_SaturationRange[1]  = ((mmaMaterial *)a)->m_SaturationRange[1];
+  m_TableRange[0]       = ((mmaMaterial *)a)->m_TableRange[0];
+  m_TableRange[1]       = ((mmaMaterial *)a)->m_TableRange[1];
+  m_NumColors           = ((mmaMaterial *)a)->m_NumColors;
 }
 //----------------------------------------------------------------------------
 bool mmaMaterial::Equals(const mafAttribute *a)
@@ -201,24 +245,33 @@ bool mmaMaterial::Equals(const mafAttribute *a)
 {
   if (Superclass::Equals(a))
   {
-    return (m_Name       == ((mmaMaterial *)a)->m_Name             &&
-      m_Value            == ((mmaMaterial *)a)->m_Value            &&
-      m_Ambient[0]       == ((mmaMaterial *)a)->m_Ambient[0]       &&
-      m_Ambient[1]       == ((mmaMaterial *)a)->m_Ambient[1]       &&
-      m_Ambient[2]       == ((mmaMaterial *)a)->m_Ambient[2]       &&
-      m_AmbientIntensity == ((mmaMaterial *)a)->m_AmbientIntensity &&
-      m_Diffuse[0]       == ((mmaMaterial *)a)->m_Diffuse[0]       &&
-      m_Diffuse[1]       == ((mmaMaterial *)a)->m_Diffuse[1]       &&
-      m_Diffuse[2]       == ((mmaMaterial *)a)->m_Diffuse[2]       &&
-      m_DiffuseIntensity == ((mmaMaterial *)a)->m_DiffuseIntensity &&
-      m_Specular[0]      == ((mmaMaterial *)a)->m_Specular[0]      &&
-      m_Specular[1]      == ((mmaMaterial *)a)->m_Specular[1]      &&
-      m_Specular[2]      == ((mmaMaterial *)a)->m_Specular[2]      &&
-      m_SpecularIntensity== ((mmaMaterial *)a)->m_SpecularIntensity&&
-      m_SpecularPower    == ((mmaMaterial *)a)->m_SpecularPower    &&
-      m_Opacity          == ((mmaMaterial *)a)->m_Opacity          &&
-      m_TextureID        == ((mmaMaterial *)a)->m_TextureID        &&
-      m_Representation   == ((mmaMaterial *)a)->m_Representation);
+    return (m_Name          == ((mmaMaterial *)a)->m_Name               &&
+      m_Value               == ((mmaMaterial *)a)->m_Value              &&
+      m_Ambient[0]          == ((mmaMaterial *)a)->m_Ambient[0]         &&
+      m_Ambient[1]          == ((mmaMaterial *)a)->m_Ambient[1]         &&
+      m_Ambient[2]          == ((mmaMaterial *)a)->m_Ambient[2]         &&
+      m_AmbientIntensity    == ((mmaMaterial *)a)->m_AmbientIntensity   &&
+      m_Diffuse[0]          == ((mmaMaterial *)a)->m_Diffuse[0]         &&
+      m_Diffuse[1]          == ((mmaMaterial *)a)->m_Diffuse[1]         &&
+      m_Diffuse[2]          == ((mmaMaterial *)a)->m_Diffuse[2]         &&
+      m_DiffuseIntensity    == ((mmaMaterial *)a)->m_DiffuseIntensity   &&
+      m_Specular[0]         == ((mmaMaterial *)a)->m_Specular[0]        &&
+      m_Specular[1]         == ((mmaMaterial *)a)->m_Specular[1]        &&
+      m_Specular[2]         == ((mmaMaterial *)a)->m_Specular[2]        &&
+      m_SpecularIntensity   == ((mmaMaterial *)a)->m_SpecularIntensity  &&
+      m_SpecularPower       == ((mmaMaterial *)a)->m_SpecularPower      &&
+      m_Opacity             == ((mmaMaterial *)a)->m_Opacity            &&
+      m_TextureID           == ((mmaMaterial *)a)->m_TextureID          &&
+      m_Level_LUT           == ((mmaMaterial *)a)->m_Level_LUT          &&
+      m_Window_LUT          == ((mmaMaterial *)a)->m_Window_LUT         &&
+      m_HueRange[0]         == ((mmaMaterial *)a)->m_HueRange[0]        &&
+      m_HueRange[1]         == ((mmaMaterial *)a)->m_HueRange[1]        &&
+      m_SaturationRange[0]  == ((mmaMaterial *)a)->m_SaturationRange[0] &&
+      m_SaturationRange[1]  == ((mmaMaterial *)a)->m_SaturationRange[1] &&
+      m_TableRange[0]       == ((mmaMaterial *)a)->m_TableRange[0]      &&
+      m_TableRange[1]       == ((mmaMaterial *)a)->m_TableRange[1]      &&
+      m_NumColors           == ((mmaMaterial *)a)->m_NumColors          &&
+      m_Representation      == ((mmaMaterial *)a)->m_Representation);
   }
   return false;
 }
@@ -230,21 +283,30 @@ int mmaMaterial::InternalStore(mafStorageElement *parent)
   {
     parent->StoreText("Name",m_Name.GetCStr());
     parent->StoreDouble("Value", m_Value);
-    parent->StoreDouble("Ambient[0]", m_Ambient[0]);
-    parent->StoreDouble("Ambient[1]", m_Ambient[1]);
-    parent->StoreDouble("Ambient[2]", m_Ambient[2]);
+    parent->StoreDouble("Ambient0", m_Ambient[0]);
+    parent->StoreDouble("Ambient1", m_Ambient[1]);
+    parent->StoreDouble("Ambient2", m_Ambient[2]);
     parent->StoreDouble("AmbientIntensity", m_AmbientIntensity);
-    parent->StoreDouble("Diffuse[0]", m_Diffuse[0]);
-    parent->StoreDouble("Diffuse[1]", m_Diffuse[1]);
-    parent->StoreDouble("Diffuse[2]", m_Diffuse[2]);
+    parent->StoreDouble("Diffuse0", m_Diffuse[0]);
+    parent->StoreDouble("Diffuse1", m_Diffuse[1]);
+    parent->StoreDouble("Diffuse2", m_Diffuse[2]);
     parent->StoreDouble("DiffuseIntensity", m_DiffuseIntensity);
-    parent->StoreDouble("Specular[0]", m_Specular[0]);
-    parent->StoreDouble("Specular[1]", m_Specular[1]);
-    parent->StoreDouble("Specular[2]", m_Specular[2]);
+    parent->StoreDouble("Specular0", m_Specular[0]);
+    parent->StoreDouble("Specular1", m_Specular[1]);
+    parent->StoreDouble("Specular2", m_Specular[2]);
     parent->StoreDouble("SpecularIntensity", m_SpecularIntensity);
     parent->StoreDouble("SpecularPower", m_SpecularPower);
     parent->StoreDouble("Opacity", m_Opacity);
     parent->StoreDouble("Representation", m_Representation);
+    parent->StoreDouble("Level_LUT", m_Level_LUT);
+    parent->StoreDouble("Window_LUT", m_Window_LUT);
+    parent->StoreDouble("HueRange0", m_HueRange[0]);
+    parent->StoreDouble("HueRange1", m_HueRange[1]);
+    parent->StoreDouble("SaturationRange0", m_SaturationRange[0]);
+    parent->StoreDouble("SaturationRange1", m_SaturationRange[1]);
+    parent->StoreDouble("TableRange0", m_TableRange[0]);
+    parent->StoreDouble("TableRange1", m_TableRange[1]);
+    parent->StoreInteger("NumColors", m_NumColors);
     parent->StoreInteger("TextureID", m_TextureID);
     return MAF_OK;
   }
@@ -258,21 +320,30 @@ int mmaMaterial::InternalRestore(mafStorageElement *node)
   {
     node->RestoreText("Name",m_Name);
     node->RestoreDouble("Value",m_Value);
-    node->RestoreDouble("Ambient[0]", m_Ambient[0]);
-    node->RestoreDouble("Ambient[1]", m_Ambient[1]);
-    node->RestoreDouble("Ambient[2]", m_Ambient[2]);
+    node->RestoreDouble("Ambient0", m_Ambient[0]);
+    node->RestoreDouble("Ambient1", m_Ambient[1]);
+    node->RestoreDouble("Ambient2", m_Ambient[2]);
     node->RestoreDouble("AmbientIntensity", m_AmbientIntensity);
-    node->RestoreDouble("Diffuse[0]", m_Diffuse[0]);
-    node->RestoreDouble("Diffuse[1]", m_Diffuse[1]);
-    node->RestoreDouble("Diffuse[2]", m_Diffuse[2]);
+    node->RestoreDouble("Diffuse0", m_Diffuse[0]);
+    node->RestoreDouble("Diffuse1", m_Diffuse[1]);
+    node->RestoreDouble("Diffuse2", m_Diffuse[2]);
     node->RestoreDouble("DiffuseIntensity", m_DiffuseIntensity);
-    node->RestoreDouble("Specular[0]", m_Specular[0]);
-    node->RestoreDouble("Specular[1]", m_Specular[1]);
-    node->RestoreDouble("Specular[2]", m_Specular[2]);
+    node->RestoreDouble("Specular0", m_Specular[0]);
+    node->RestoreDouble("Specular1", m_Specular[1]);
+    node->RestoreDouble("Specular2", m_Specular[2]);
     node->RestoreDouble("SpecularIntensity", m_SpecularIntensity);
     node->RestoreDouble("SpecularPower", m_SpecularPower);
     node->RestoreDouble("Opacity", m_Opacity);
     node->RestoreDouble("Representation", m_Representation);
+    node->RestoreDouble("Level_LUT", m_Level_LUT);
+    node->RestoreDouble("Window_LUT", m_Window_LUT);
+    node->RestoreDouble("HueRange0", m_HueRange[0]);
+    node->RestoreDouble("HueRange1", m_HueRange[1]);
+    node->RestoreDouble("SaturationRange0", m_SaturationRange[0]);
+    node->RestoreDouble("SaturationRange1", m_SaturationRange[1]);
+    node->RestoreDouble("TableRange0", m_TableRange[0]);
+    node->RestoreDouble("TableRange1", m_TableRange[1]);
+    node->RestoreInteger("NumColors", m_NumColors);
     node->RestoreInteger("TextureID", m_TextureID);
     UpdateProp();
     return MAF_OK;
@@ -292,6 +363,20 @@ void mmaMaterial::UpdateProp()
   m_Prop->SetSpecularPower(m_SpecularPower);
   m_Prop->SetOpacity(m_Opacity);
   m_Prop->SetRepresentation((int)m_Representation);
+
+  m_GrayLut->SetLevel(m_Level_LUT);
+  m_GrayLut->SetWindow(m_Window_LUT);
+
+  m_ColorLut->SetHueRange(m_HueRange);
+  m_ColorLut->SetSaturationRange(m_SaturationRange);
+  m_ColorLut->SetNumberOfColors(m_NumColors);
+  m_ColorLut->SetTableRange(m_TableRange);
+}
+//-----------------------------------------------------------------------
+void mmaMaterial::SetTextureImage(vtkImageData *tex)
+//-----------------------------------------------------------------------
+{
+  m_TextureImage = tex;
 }
 //-----------------------------------------------------------------------
 void mmaMaterial::Print(std::ostream& os, const int tabs)
