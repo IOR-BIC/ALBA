@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMaterialButton.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 14:36:58 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-27 13:52:40 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -36,7 +36,7 @@ This component allow to manage surface materials.
 class mmgMaterialButton : public mafObserver
 {
 public:
-	mmgMaterialButton(wxWindow* parent, mafVME *vme, mafObserver *listener = NULL);
+	mmgMaterialButton(mafVME *vme, mafObserver *listener = NULL);
 	~mmgMaterialButton(); 
 	void OnEvent(mafEventBase *event);
 	void SetListener(mafObserver *listener) {m_Listener = listener;};

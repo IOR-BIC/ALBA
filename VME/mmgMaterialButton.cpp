@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMaterialButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 14:36:58 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-27 13:52:40 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,7 +28,7 @@
 #include "mafVME.h"
 
 //----------------------------------------------------------------------------
-mmgMaterialButton::mmgMaterialButton(wxWindow* parent, mafVME *vme, mafObserver *listener)
+mmgMaterialButton::mmgMaterialButton(mafVME *vme, mafObserver *listener)
 //----------------------------------------------------------------------------
 {
 	m_Listener = listener;
@@ -48,17 +48,19 @@ mmgMaterialButton::~mmgMaterialButton()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_Material);
-	if(m_Gui)	
-    m_Gui->SetListener(NULL);
+	/*if(m_Gui)	
+    m_Gui->SetListener(NULL);*/
 	cppDEL(m_Gui);
 }
+
 //----------------------------------------------------------------------------
 //constants:
 //----------------------------------------------------------------------------
-enum
+enum MATERIAL_WIDGET_ID
 {
   ID_MATERIAL = MINID
 };
+
 //----------------------------------------------------------------------------
 void mmgMaterialButton::CreateGui()
 //----------------------------------------------------------------------------
@@ -71,6 +73,9 @@ void mmgMaterialButton::CreateGui()
   m_MaterialButton = new mmgPicButton(m_Gui, "Material", ID_MATERIAL);
   m_MaterialButton->SetListener(this);
   m_MaterialButton->SetSize(25,25);
+  m_Material->MakeIcon();
+  m_MaterialButton->SetBitmapLabel(*m_Material->m_Icon);
+  m_MaterialButton->Refresh();
 
   m_MaterialLabel = new wxStaticText(m_Gui,ID_MATERIAL,"",wxDefaultPosition, wxSize(100,16), wxST_NO_AUTORESIZE );
   m_MaterialLabel->SetLabel(m_Material->m_Name.GetCStr());

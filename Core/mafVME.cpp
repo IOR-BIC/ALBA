@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-17 08:46:34 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2005-05-27 13:44:57 $
+  Version:   $Revision: 1.22 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 

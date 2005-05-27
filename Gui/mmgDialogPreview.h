@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialogPreview.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 10:27:18 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-05-27 13:47:54 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,7 +24,7 @@ class mafRWI;
 //----------------------------------------------------------------------------
 // Const:
 //----------------------------------------------------------------------------
-enum mmgDIALOG_EXSTYLES
+enum DIALOG_EXSTYLES
 {
   mafUSEGUI = mafCLOSE*2,
   mafUSERWI = mafUSEGUI*2,

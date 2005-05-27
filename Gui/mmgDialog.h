@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialog.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-13 16:15:38 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-05-27 13:47:54 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,13 +21,13 @@
 //----------------------------------------------------------------------------
 // Const:
 //----------------------------------------------------------------------------
-enum mmgDIALOG_STYLES
+enum DIALOG_STYLES
 {
-  mafRESIZABLE    =1,  // make the Dialog Resizable  
-  mafCLOSEWINDOW  =2,  // to enable the close button on the window frame
-  mafOK           =4,  // to create an ok button
-  mafCANCEL       =8,  // to create a cancel button 
-  mafCLOSE        =16, // to create a close button
+  mafRESIZABLE    =  1,  // make the Dialog Resizable  
+  mafCLOSEWINDOW  =  2,  // to enable the close button on the window frame
+  mafOK           =  4,  // to create an ok button
+  mafCANCEL       =  8,  // to create a cancel button 
+  mafCLOSE        = 16, // to create a close button
 };
 //----------------------------------------------------------------------------
 // mmgDialog :

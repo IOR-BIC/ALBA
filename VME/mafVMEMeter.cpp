@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 14:37:56 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-05-27 13:50:43 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -684,16 +684,15 @@ mmgGui* mafVMEMeter::CreateGui()
   m_Gui->Divider();
   mafVME *start_vme = mafVME::SafeDownCast(GetLink("StartVME"));
   m_StartVmeName = start_vme ? start_vme->GetName() : "none";
-  //m_Gui->Label("Start: ", wxString(m_StartVmeName));
-  m_Gui->Button(ID_START_METER_LINK,m_StartVmeName,"Start", "Select the start vme for the meter");
+  m_Gui->Button(ID_START_METER_LINK,&m_StartVmeName,"Start", "Select the start vme for the meter");
+
   mafVME *end_vme1   = mafVME::SafeDownCast(GetLink("EndVME1"));
   m_EndVme1Name = end_vme1 ? end_vme1->GetName() : "none";
   m_Gui->Button(ID_END1_METER_LINK,m_EndVme1Name,"End 1", "Select the end vme for point distance");
-//  m_Gui->Label("End1: ", wxString(m_EndVme1Name));
+
   mafVME *end_vme2   = mafVME::SafeDownCast(GetLink("EndVME2"));
   m_EndVme2Name = end_vme2 ? end_vme2->GetName() : "none";
   m_Gui->Button(ID_END2_METER_LINK,m_EndVme2Name,"End 2", "Select the vme representing \nthe point for line distance");
-//  m_Gui->Label("End2: ", wxString(m_EndVme2Name));
 
   return m_Gui;
 }
@@ -711,7 +710,7 @@ void mafVMEMeter::OnEvent(mafEventBase *event)
       case ID_END2_METER_LINK:
       {
         mafID button_id = e->GetId();
-        mafString title = "Choose the start meter vme";
+        mafString title = "Choose meter vme link";
         e->SetId(VME_CHOOSE);
         e->SetArg((long)m_VMEAccept);
         e->SetString(&title);

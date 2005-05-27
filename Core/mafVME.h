@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-16 15:23:13 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2005-05-27 13:44:57 $
+  Version:   $Revision: 1.22 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -239,6 +239,7 @@ protected:
   /** Set the abs matrix pipe object, i.e. the source of the output abs matrix. */
   void SetAbsMatrixPipe(mafAbsMatrixPipe *pipe);
 
+  /** Create GUI for the VME */
   virtual mmgGui  *CreateGui();
 
   mafAutoPointer<mafDataPipe>       m_DataPipe;
