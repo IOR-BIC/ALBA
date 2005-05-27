@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-19 16:27:16 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-05-27 13:42:43 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -31,6 +31,26 @@ const int MAXWIDGET = 200;
 const int MAXOP = 200; 
 const int MAXVIEW = 200; 
 
+/** Data Type enum that identify data stored in WidgetDataType struct */
+enum WIDGET_DATA_TYPE_ID
+{
+  NULL_DATA,
+  INT_DATA,
+  FLOAT_DATA,
+  DOUBLE_DATA,
+  STRING_DATA,
+};
+
+struct WidgetDataType
+{
+  int    iValue;
+  float  fValue;
+  double dValue;
+  const char *sValue;
+  int    dType;
+};
+
+
 /** conventional device button values */
 enum DEVICE_BUTTONS
 {
@@ -55,7 +75,7 @@ enum DEVICE_MODIFIERS
   These constants must be non-overlapping.
   Constants are grouped by bracket xx_START, xx_END as needed by mmgFrame
 */
-enum
+enum MAIN_EVENT_ID
 {
 MENU_START = 10000,
 MENU_FILE_START,
@@ -196,6 +216,8 @@ EVT_START,
   OP_SHOW_GUI,
   OP_HIDE_GUI,
   OP_FORCE_STOP,
+
+  REMOTE_PARAMETER,
 
   ITEM_SELECTED, //used by mmgListCtrl and Dictionary
 
