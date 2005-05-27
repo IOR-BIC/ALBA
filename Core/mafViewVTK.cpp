@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:43:11 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-05-27 13:44:28 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,15 +26,19 @@
 #include "mafPipeFactory.h"
 
 //----------------------------------------------------------------------------
-mafViewVTK::mafViewVTK(wxString label)
-:mafView(label)
+mafCxxTypeMacro(mafViewVTK);
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+mafViewVTK::mafViewVTK(wxString label, bool external)
+:mafView(label,external)
 //----------------------------------------------------------------------------
 {
   m_Sg  = NULL;
   m_Rwi = NULL;
 }
 //----------------------------------------------------------------------------
-mafViewVTK::~mafViewVTK( ) 
+mafViewVTK::~mafViewVTK() 
 //----------------------------------------------------------------------------
 {
   cppDEL(m_Sg);
