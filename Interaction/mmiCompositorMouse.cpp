@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiCompositorMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 16:43:06 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-27 06:15:14 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
