@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:48:36 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-05-27 14:34:36 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -405,7 +405,7 @@ void mmgGui::Vector(int id,wxString label,int var[3],int minx,int maxx,int miny,
 }
 // float vector form 1
 //----------------------------------------------------------------------------
-/*void mmgGui::Vector(int id,wxString label,float var[3],float min, float max, int decimal_digit, wxString tooltip) // <*> togliere la seconda forma
+void mmgGui::Vector(int id,wxString label,float var[3],float min, float max, int decimal_digit, wxString tooltip) // <*> togliere la seconda forma
 //----------------------------------------------------------------------------
 {   
   int w_id;
@@ -462,7 +462,7 @@ void mmgGui::Vector(int id,wxString label,float var[3],float minx,float maxx,flo
 	sizer->Add( text2,0, wxRIGHT, HM);
 	sizer->Add( text3,0, wxRIGHT, HM);
   Add(sizer,0,wxALL, M); 
-}*/
+}
 // double vector form 1
 //----------------------------------------------------------------------------
 void mmgGui::Vector(int id,wxString label,double var[3],double min, double max, int decimal_digit, wxString tooltip)
@@ -609,7 +609,7 @@ void mmgGui::Integer(int id,mafString label,int* var,int min, int max, mafString
 	}
 }
 //----------------------------------------------------------------------------
-/*void mmgGui::Float(int id,mafString label,float* var,float min, float max, int flag, int decimal_digit, mafString tooltip)
+void mmgGui::Float(int id,mafString label,float* var,float min, float max, int flag, int decimal_digit, mafString tooltip)
 //----------------------------------------------------------------------------
 {
   int w_id;
@@ -637,7 +637,7 @@ void mmgGui::Integer(int id,mafString label,int* var,int min, int max, mafString
 		sizer->Add( text, 0, wxRIGHT, HM);
 		Add(sizer,0,wxALL, M);
 	}
-}*/
+}
 //----------------------------------------------------------------------------
 void mmgGui::Double(int id,mafString label,double* var,double min, double max, int flag, int decimal_digit, mafString tooltip)
 //----------------------------------------------------------------------------
@@ -717,15 +717,15 @@ wxSlider *mmgGui::Slider(int id,wxString label,int* var,int min, int max, wxStri
 	{
     int text_w   = EW/2;
     int slider_w = FW-text_w;
-    //w_id_text = GetId(id);
-		//text = new wxTextCtrl (this, w_id_text, "", dp, wxSize(text_w,  LH), m_EntryStyle);
+    w_id_text = GetId(id);
+		text = new wxTextCtrl (this, w_id_text, "", dp, wxSize(text_w,  LH), m_EntryStyle);
     w_id_sli = GetId(id);
-		sli = new wxSlider(this, w_id_sli,min,min,max, dp, wxSize(slider_w,LH),wxSL_HORIZONTAL | wxSL_LABELS);
+		sli = new wxSlider(this, w_id_sli,min,min,max, dp, wxSize(slider_w,LH));
     if(m_UseBackgroundColor) 
       sli->SetBackgroundColour(m_BackgroundColor);
 
 		wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-		//sizer->Add(text, 0);
+		sizer->Add(text, 0);
 		sizer->Add(sli,  0);
 		Add(sizer,0,wxALL, M); 
 	}
@@ -747,9 +747,9 @@ wxSlider *mmgGui::Slider(int id,wxString label,int* var,int min, int max, wxStri
 		sizer->Add(text, 0);
 		sizer->Add(sli,  0);
 		Add(sizer,0,wxALL, M); 
-    sli->SetValidator(mmgValidator(this,w_id_sli,sli,var,text));
-    text->SetValidator(mmgValidator(this,w_id_text,text,var,sli,min,max)); //- if uncommented, remove also wxTE_READONLY from the text (in both places)
 	}
+  sli->SetValidator(mmgValidator(this,w_id_sli,sli,var,text));
+  text->SetValidator(mmgValidator(this,w_id_text,text,var,sli,min,max)); //- if uncommented, remove also wxTE_READONLY from the text (in both places)
 	if(tooltip != "")	text->SetToolTip(tooltip);
 	return sli;
 }

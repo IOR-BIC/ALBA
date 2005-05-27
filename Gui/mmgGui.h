@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:48:36 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-05-27 14:34:36 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2005
@@ -118,7 +118,7 @@ public:
   void Integer(int id,mafString label,int *var, int min = MININT, int max = MAXINT, mafString tooltip = "");
 
   /** Float entry widget. */
-  //void Float(int id,mafString label,float *var, float min = MINFLOAT, float max = MAXFLOAT, int flag=0, int decimal_digit = 2, mafString tooltip = "");
+  void Float(int id,mafString label,float *var, float min = MINFLOAT, float max = MAXFLOAT, int flag=0, int decimal_digit = 2, mafString tooltip = "");
 
   /** Double entry widget. */
   void Double(int id,mafString label,double *var, double	min = MINFLOAT, double max = MAXFLOAT, int flag=0, int decimal_digit = 2, mafString tooltip = "");
@@ -130,10 +130,10 @@ public:
   void Vector(int id,wxString label, int var[3], int minx, int maxx, int miny, int maxy, int minz, int maxz, wxString tooltip = "");
 
   /** Float vector3 entry widget. */
-  //void Vector(int id,wxString label, float var[3], float min = MINFLOAT, float max = MAXFLOAT, int decimal_digit = 2, wxString tooltip = "");
+  void Vector(int id,wxString label, float var[3], float min = MINFLOAT, float max = MAXFLOAT, int decimal_digit = 2, wxString tooltip = "");
 
   /** Float vector3 entry widget. */
-  //void Vector(int id,wxString label, float var[3], float minx, float maxx, float miny, float maxy, float minz, float maxz, int decimal_digit = 2, wxString tooltip = "");
+  void Vector(int id,wxString label, float var[3], float minx, float maxx, float miny, float maxy, float minz, float maxz, int decimal_digit = 2, wxString tooltip = "");
 
   /** Double vector3 entry widget. */
   void Vector(int id,wxString label, double var[3], double min = MINFLOAT, double max = MAXFLOAT, int decimal_digit = 2, wxString tooltip = "");
