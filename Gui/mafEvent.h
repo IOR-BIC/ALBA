@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 17:02:54 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-27 06:13:10 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden, Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -61,17 +61,19 @@ public:
   mafOp*					  GetOp()      {return m_op;};
   mafMatrix*        GetMatrix()    {return m_matrix;};
   mafMatrix*        GetOldMatrix() {return m_matrix2;};
-
+  mafObject*        GetMafObject() {return m_MafObject;}
+  
 
   void SetArg(long arg)         { m_arg = arg;};
   void SetBool(bool b)          { m_bool = b;};
-  void SetFloat(double f)        { m_double = f;};
+  void SetFloat(double f)       { m_double = f;};
   void SetString(mafString *s)  { m_string = s;};
   void SetView(mafView* view)   { m_view = view;};
   void SetVme(mafNode* vme)     { m_vme = vme;};
   void SetOp(mafOp* op)         { m_op = op;};
   void SetMatrix(mafMatrix* mat)       { m_matrix = mat;};
   void SetOldMatrix(mafMatrix* mat2)   { m_matrix2 =mat2;};
+  void SetMafObject(mafObject* obj)    { m_MafObject = obj;}
 
 
 protected:
@@ -85,6 +87,7 @@ protected:
   mafOp						*m_op;
   mafMatrix       *m_matrix;
   mafMatrix       *m_matrix2;
+  mafObject       *m_MafObject;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #ifdef MAF_USE_WX
