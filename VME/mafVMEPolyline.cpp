@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolyline.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 14:37:32 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-27 13:51:11 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -67,7 +67,7 @@ int mafVMEPolyline::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
 //-------------------------------------------------------------------------
 {
   assert(data);
-  if (data->IsA("vtkPolyData"))
+  if (data->IsA("vtkPolyLine"))
   {
     return Superclass::SetData(data,t,mode);
   }
