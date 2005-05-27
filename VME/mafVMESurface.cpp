@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 14:37:33 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-05-27 13:51:33 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,12 +22,15 @@
 
 
 #include "mafVMESurface.h"
+#include "mafVME.h"
 #include "mafMatrixInterpolator.h"
 #include "mafDataVector.h"
 #include "mafVTKInterpolator.h"
 #include "mafVMEItemVTK.h"
 #include "mafAbsMatrixPipe.h"
 #include "mmaMaterial.h"
+#include "mmgGui.h"
+#include "mmgMaterialButton.h"
 
 #include "vtkDataSet.h"
 #include "vtkPolyData.h"
@@ -42,6 +45,7 @@ mafCxxTypeMacro(mafVMESurface)
 mafVMESurface::mafVMESurface()
 //-------------------------------------------------------------------------
 {
+  m_MaterialButton = NULL;
 }
 
 //-------------------------------------------------------------------------
@@ -50,6 +54,8 @@ mafVMESurface::~mafVMESurface()
 {
   // data pipe destroyed in mafVME
   // data vector destroyed in mafVMEGeneric
+
+  cppDEL(m_MaterialButton);
 }
 
 
@@ -87,6 +93,33 @@ int mafVMESurface::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
   
   mafErrorMacro("Trying to set the wrong type of fata inside a VME Image :"<< (data?data->GetClassName():"NULL"));
   return MAF_ERROR;
+}
+
+//-------------------------------------------------------------------------
+mmgGui* mafVMESurface::CreateGui()
+//-------------------------------------------------------------------------
+{
+  m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name
+  m_Gui->SetListener(this);
+  m_Gui->Divider();
+  m_MaterialButton = new mmgMaterialButton(this,this);
+  m_Gui->AddGui(m_MaterialButton->GetGui());
+  return m_Gui;
+}
+
+//-------------------------------------------------------------------------
+void mafVMESurface::OnEvent(mafEventBase *event)
+//-------------------------------------------------------------------------
+{
+  // events to be sent up or down in the tree are simply forwarded
+  if (mafEvent *e = mafEvent::SafeDownCast(event))
+  {
+    switch(e->GetId())
+    {
+      default:
+        mafVME::OnEvent(event);
+    }
+  }
 }
 
 //-------------------------------------------------------------------------
