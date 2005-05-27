@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPER.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 16:43:07 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-27 06:14:29 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -47,7 +47,7 @@ mmiPER::mmiPER()
 
   m_CameraBehavior  = mmi6DOFCameraMove::New(); // allocate camera behavior
   m_CameraBehavior->SetStartButton(MAF_LEFT_BUTTON); // any button
-  Setm_ModeToSingleButton();
+  SetModeToSingleButton();
   m_FirstTime = 0;
 
   m_CameraMouseBehavior = mmiCameraMove::New(); // allocate mouse camera behavior
@@ -77,7 +77,7 @@ bool mmiPER::IsInteracting(mafDevice *device, int button)
   std::map<mafID,DeviceItem>::iterator iter = m_Devices.find(device->GetID());
   if (iter!=m_Devices.end()&&(*iter).first==device->GetID())
   {
-    if (m_m_Mode==SINGLE_BUTTON)
+    if (m_Mode==SINGLE_BUTTON)
     {
       // if optional button parameter is positive report if interaction
       // has been started by a specific button.
@@ -98,7 +98,7 @@ void mmiPER::InsertDevice(mafDevice *device,int button)
 //----------------------------------------------------------------------------
 {
   
-  if (m_m_Mode==SINGLE_BUTTON)
+  if (m_Mode==SINGLE_BUTTON)
   {
     m_Devices[device->GetID()].Button=button;
     m_Devices[device->GetID()].VME=NULL; // initially set picked VME to NULL

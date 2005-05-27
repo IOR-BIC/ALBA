@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 16:43:06 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-27 06:14:30 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -18,6 +18,7 @@
 #include "mmdMouse.h"
 
 #include "mafEventInteraction.h"
+#include "mafEvent.h"
 #include "mafAbsMatrixPipe.h"
 #include "mafVME.h"
 #include "mafMatrix.h"
@@ -75,7 +76,7 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
 //----------------------------------------------------------------------------
 {
   // create matrix to send
-  mafSmartPointer<mafMatrix> matr;
+  mafMatrix matr;
 
   // motion vector
   double motionVec[3];
@@ -202,105 +203,105 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
           ------------------------>m_ProjAcc
       */ 
 
-          //update projection accumulator
-          m_ProjAcc += projVal;
+      //update projection accumulator
+      m_ProjAcc += projVal;
 
-          if (pos_rp < minb)
-          {
-            if (pos_rp + m_ProjAcc > minb)
-            {
-              BuildVector(minb - pos_rp, constrainVers, tmpVec, refSysType, axis);
-              mafTransform::SetPosition(matr, tmpVec);                             
-              m_ProjAcc = 0;
-            }
+      if (pos_rp < minb)
+      {
+        if (pos_rp + m_ProjAcc > minb)
+        {
+          BuildVector(minb - pos_rp, constrainVers, tmpVec, refSysType, axis);
+          mafTransform::SetPosition(matr, tmpVec);                             
+          m_ProjAcc = 0;
         }
-          else if (pos_rp > maxb)
-          { 
-            if (pos_rp + m_ProjAcc < maxb)
-            {
-              BuildVector(maxb - pos_rp, constrainVers, tmpVec, refSysType, axis);
-              mafTransform::SetPosition(matr, tmpVec);            
-              m_ProjAcc = 0;
-            }
+      }
+      else if (pos_rp > maxb)
+      { 
+        if (pos_rp + m_ProjAcc < maxb)
+        {
+          BuildVector(maxb - pos_rp, constrainVers, tmpVec, refSysType, axis);
+          mafTransform::SetPosition(matr, tmpVec);            
+          m_ProjAcc = 0;
         }
-          else if (minb < pos_rp && pos_rp < maxb)
+      }
+      else if (minb < pos_rp && pos_rp < maxb)
+      {
+        if (pos_rp + projVal < minb)
+        {              
+          BuildVector(minb - pos_rp, constrainVers, tmpVec, refSysType, axis);
+          mafTransform::SetPosition(matr, tmpVec);                           
+          m_ProjAcc = pos_rp + projVal - minb;
+        }
+        else if (pos_rp + projVal > maxb)
+        {            
+          BuildVector(maxb - pos_rp, constrainVers, tmpVec, refSysType, axis);
+          mafTransform::SetPosition(matr, tmpVec);
+          m_ProjAcc = pos_rp + projVal - maxb;
+        }
+        else
+        {
+          if (refSysType == mafRefSys::GLOBAL)
           {
-            if (pos_rp + projVal < minb)
-            {              
-              BuildVector(minb - pos_rp, constrainVers, tmpVec, refSysType, axis);
-              mafTransform::SetPosition(matr, tmpVec);                           
-              m_ProjAcc = pos_rp + projVal - minb;
-            }
-            else if (pos_rp + projVal > maxb)
-            {            
-              BuildVector(maxb - pos_rp, constrainVers, tmpVec, refSysType, axis);
-              mafTransform::SetPosition(matr, tmpVec);
-              m_ProjAcc = pos_rp + projVal - maxb;
-            }
-            else
-            {
-              if (refSysType == mafRefSys::GLOBAL)
-              {
-                mafTransform::SetPosition(matr, motVecProj);             
-              }
-              else
-              {
-                BuildVector(projVal, NULL, tmpVec, refSysType, axis);
-                mafTransform::SetPosition(matr, tmpVec);
-              }
-            }
+            mafTransform::SetPosition(matr, motVecProj);             
           }
-          else if (pos_rp == minb) 
+          else
           {
-                                                                 
-      /*                                              
-                                                       projVal
-                                                    <-------- 
-                                                       m_ProjAcc
-                                                    <----|
-                                    2   |    1           |  3
-          -----|------------------------|----------------|----------->
-               O                       minb             maxb
-                                      pos_rp 
-                                
-      */ 
+            BuildVector(projVal, NULL, tmpVec, refSysType, axis);
+            mafTransform::SetPosition(matr, tmpVec);
+          }
+        }
+      }
+      else if (pos_rp == minb) 
+      {
+                                                                
+    /*                                              
+                                                      projVal
+                                                  <-------- 
+                                                      m_ProjAcc
+                                                  <----|
+                                  2   |    1           |  3
+        -----|------------------------|----------------|----------->
+              O                       minb             maxb
+                                    pos_rp 
+                              
+    */ 
 
 
-            if (pos_rp + m_ProjAcc >= minb)
-            {
-              if (pos_rp + m_ProjAcc <= maxb)
-              {
-                BuildVector(m_ProjAcc, constrainVers, tmpVec, refSysType, axis);
-                mafTransform::SetPosition(matr, tmpVec);                         
-                m_ProjAcc = 0;
-              }
-              else if (pos_rp + m_ProjAcc > maxb)
-              {
-                BuildVector(maxb - pos_rp, constrainVers, tmpVec, refSysType, axis);
-                mafTransform::SetPosition(matr, tmpVec);                         
-                m_ProjAcc -= maxb - pos_rp;
-              }
-            }
-          }
-          else if (pos_rp == maxb)
+          if (pos_rp + m_ProjAcc >= minb)
           {
             if (pos_rp + m_ProjAcc <= maxb)
             {
-              if (pos_rp + m_ProjAcc >= minb)
-              {
-                BuildVector(m_ProjAcc, constrainVers, tmpVec, refSysType, axis);
-                mafTransform::SetPosition(matr, tmpVec);     
-                m_ProjAcc = 0;
-              }
-              else if (pos_rp + m_ProjAcc < minb)
-              {
-                BuildVector(minb - pos_rp, constrainVers, tmpVec, refSysType, axis);
-                mafTransform::SetPosition(matr, tmpVec);     
-                m_ProjAcc -= minb - pos_rp;
-              }
-
-            }          
+              BuildVector(m_ProjAcc, constrainVers, tmpVec, refSysType, axis);
+              mafTransform::SetPosition(matr, tmpVec);                         
+              m_ProjAcc = 0;
+            }
+            else if (pos_rp + m_ProjAcc > maxb)
+            {
+              BuildVector(maxb - pos_rp, constrainVers, tmpVec, refSysType, axis);
+              mafTransform::SetPosition(matr, tmpVec);                         
+              m_ProjAcc -= maxb - pos_rp;
+            }
           }
+        }
+        else if (pos_rp == maxb)
+        {
+          if (pos_rp + m_ProjAcc <= maxb)
+          {
+            if (pos_rp + m_ProjAcc >= minb)
+            {
+              BuildVector(m_ProjAcc, constrainVers, tmpVec, refSysType, axis);
+              mafTransform::SetPosition(matr, tmpVec);     
+              m_ProjAcc = 0;
+            }
+            else if (pos_rp + m_ProjAcc < minb)
+            {
+              BuildVector(minb - pos_rp, constrainVers, tmpVec, refSysType, axis);
+              mafTransform::SetPosition(matr, tmpVec);     
+              m_ProjAcc -= minb - pos_rp;
+            }
+
+          }          
+        }
         
         //send the transform matrix
         SendTransformMatrix(matr);
@@ -308,8 +309,6 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
       }
       case (mmiConstraint::SNAP_STEP):
       {
-        
-    
 
       }
       break;
@@ -333,87 +332,87 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
         } 
         else
         {
-          vtkGenericWarningMacro(<< "Ref sys type:" << refSysType << "is unsupported!");
+          mafWarningMacro(<< "Ref sys type:" << refSysType << "is unsupported!");
           return;
         }
 
 
         m_ProjAcc += projVal;
 
-        if (HelperPointStatus == ON_GRID_POINT)
+        if (m_HelperPointStatus == ON_GRID_POINT)
         {
 
 //              pos_rp             m_ProjAcc
 //    ^------------------------->|-------------->        
 //    |                             
 //   -O----------0-------1-------i----------3------N-1---------->
-//                           HelpPIndex    ind    
+//                           m_HelpPIndex    ind    
 //                               |--------->|--->
-//    HelpPIndex  = i;               trval                
-//    HelperPointStatus = ON_GRID_POINT;
+//    m_HelpPIndex  = i;               trval                
+//    m_HelperPointStatus = ON_GRID_POINT;
         
           int status;
           int ind = BinarySearch(pos_rp + m_ProjAcc, darray, status);    
 
           if (m_ProjAcc > 0)
           {
-            if (ind != HelpPIndex)
+            if (ind != m_HelpPIndex)
             {
-              double trval = darray->GetValue(ind) - darray->GetValue(HelpPIndex);
+              double trval = darray->GetValue(ind) - darray->GetValue(m_HelpPIndex);
 
-              //send translation vector from HelpPIndex to ind
+              //send translation vector from m_HelpPIndex to ind
               SendTransformMatrix(normalizedVectorToSend, trval);  
 
               //UpdateProjAcc  
               m_ProjAcc -= trval;
 
-              //update HelpPIndex
-              HelpPIndex = ind;
+              //update m_HelpPIndex
+              m_HelpPIndex = ind;
             }
           }
           else if (m_ProjAcc < 0)
           {
-            if (ind != HelpPIndex - 1)
+            if (ind != m_HelpPIndex - 1)
             {
-              double trval = darray->GetValue(ind + 1) - darray->GetValue(HelpPIndex);
+              double trval = darray->GetValue(ind + 1) - darray->GetValue(m_HelpPIndex);
    
-              //send translation vector from HelpPIndex to ind
+              //send translation vector from m_HelpPIndex to ind
               SendTransformMatrix(normalizedVectorToSend, trval);  
   
               //UpdateProjAcc  
               m_ProjAcc -= trval;
    
-              //update HelpPIndex
-              HelpPIndex = ind + 1;
+              //update m_HelpPIndex
+              m_HelpPIndex = ind + 1;
             }
           }
         }
-        else if (HelperPointStatus == NOT_ON_GRID_POINT) 
+        else if (m_HelperPointStatus == NOT_ON_GRID_POINT) 
         {
 //              pos_rp             m_ProjAcc
 //    ^------------------------->|---------->        
 //    |                          |   
 //   -O----------0-------1-------|------2------N-1---------->
-//                   HelpPIndex  |----->| 
+//                   m_HelpPIndex  |----->| 
 //                                 trval
-//    HelpPIndex  = i;                               
-//    HelperPointStatus = NOT_ON_GRID_POINT;
+//    m_HelpPIndex  = i;                               
+//    m_HelperPointStatus = NOT_ON_GRID_POINT;
       
           int status;
           int ind = BinarySearch(pos_rp + m_ProjAcc, darray, status); 
       
-          if (ind != HelpPIndex)
+          if (ind != m_HelpPIndex)
           {
             double trval = darray->GetValue(m_ProjAcc > 0 ? ind : ind + 1) - pos_rp;
 
-            //send translation vector from HelpPIndex to ind
+            //send translation vector from m_HelpPIndex to ind
             SendTransformMatrix(normalizedVectorToSend, trval); 
 
             //UpdateProjAcc  
             m_ProjAcc -= trval;
 
-            //update HelpPIndex
-            HelpPIndex = ind;
+            //update m_HelpPIndex
+            m_HelpPIndex = ind;
           }
         }   
       }
@@ -451,17 +450,17 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
         {
           case (mmiConstraint::XY):
           {
-            mafTransform::GetVersor(mmiConstraint::Z, m_ConstrainRefSys, planeNormal);
+            mafTransform::GetVersor(mmiConstraint::Z, *m_ConstrainRefSys, planeNormal);
           }
   	      break;
           case (mmiConstraint::XZ):
           {
-            mafTransform::GetVersor(mmiConstraint::Y, m_ConstrainRefSys, planeNormal);
+            mafTransform::GetVersor(mmiConstraint::Y, *m_ConstrainRefSys, planeNormal);
           }
           break;
           case (mmiConstraint::YZ):
           {
-            mafTransform::GetVersor(mmiConstraint::X, m_ConstrainRefSys, planeNormal);
+            mafTransform::GetVersor(mmiConstraint::X, *m_ConstrainRefSys, planeNormal);
           }
           break;
         }
@@ -479,7 +478,7 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
       {
         if (constrainPlane == mmiConstraint::XY)
         {
-          if (SurfaceSnap == false)
+          if (m_SurfaceSnap == false)
           {
             TrackballTranslate();
           }          
@@ -490,21 +489,19 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
         }
         else
         {
-          vtkGenericWarningMacro(<< "Transaltion on VIEW RefSys is not supported for " << constrainPlane << " plane");
+          mafWarningMacro(<< "Transaltion on VIEW RefSys is not supported for " << constrainPlane << " plane");
         }
       }
       else
       {
-        vtkGenericWarningMacro(<< "Refsys type" << GetTranslationConstraint()->GetRefSys()->GetType() << "is not supported!");
+        mafWarningMacro(<< "Refsys type" << GetTranslationConstraint()->GetRefSys()->GetType() << "is not supported!");
       }
     }
     else
     {
-         vtkGenericWarningMacro(<< "Only supporting free movement on both plane axes!");
+      mafWarningMacro(<< "Only supporting free movement on both plane axes!");
     }
   }
- 
-vtkDEL(matr);
 
 }
 //----------------------------------------------------------------------------
@@ -529,7 +526,7 @@ void mmiGenericMouse::Rotate(double *p1, double *p2, double *viewup)
   double *viewUp = viewup;
 
   //transform
-  vtkTransform *transform = vtkTransform::New();
+  mafTransform transform;
 
   int refSysType = GetRotationConstraint()->GetRefSys()->GetType();
 
@@ -555,13 +552,13 @@ void mmiGenericMouse::Rotate(double *p1, double *p2, double *viewup)
           //get the constrain axis
           int axis = GetRotationConstraint()->GetConstraintAxis();
 
-          mafTransform::GetVersor(axis, m_ConstrainRefSys, constrainVers);
+          mafTransform::GetVersor(axis, *m_ConstrainRefSys, constrainVers);
           
           // centre of rotation in abs coordinates
           double o[3] = {0,0,0};
 
           // get the centre of rotation from PivotRefSys
-          mafTransform::GetPosition(GetPivotRefSys()->GetMatrix(), o);
+          mafTransform::GetPosition(*GetPivotRefSys()->GetMatrix(), o);
 
           double op1Vec[3] = {0, 0, 0};
           double op2Vec[3] = {0, 0, 0};
@@ -602,13 +599,13 @@ void mmiGenericMouse::Rotate(double *p1, double *p2, double *viewup)
             angle = -fabs(angle);
           }
 
-          transform->PostMultiply();
-          transform->Translate(-o[0], -o[1], -o[2]);
-          transform->RotateWXYZ(angle, constrainVers);
-          transform->Translate(o);
+          
+          transform.Translate(-o[0], -o[1], -o[2],POST_MULTIPLY);
+          transform.RotateWXYZ(angle, constrainVers,POST_MULTIPLY);
+          transform.Translate(o,POST_MULTIPLY);
      
           //send the transform matrix along with rotation angle
-          SendTransformMatrix(transform->GetMatrix(), MOUSE_MOVE, angle);
+          SendTransformMatrix(transform.GetMatrix(), MOUSE_MOVE, angle);
           
         }
         else if (refSysType == mafRefSys::VIEW)
@@ -620,7 +617,7 @@ void mmiGenericMouse::Rotate(double *p1, double *p2, double *viewup)
           }
           else
           {
-            vtkGenericWarningMacro(<< "Rotation in VIEW ref sys around" << axis << "axis is not supported yet!");
+            mafWarningMacro(<< "Rotation in VIEW ref sys around" << axis << "axis is not supported yet!");
           }
         }
       }
@@ -663,22 +660,19 @@ void mmiGenericMouse::Rotate(double *p1, double *p2, double *viewup)
         }      
         else
         {
-          vtkGenericWarningMacro(<< "Rotation in VIEW ref sys on" << constrainPlane << "is not supported!");
+          mafWarningMacro(<< "Rotation in VIEW ref sys on" << constrainPlane << "is not supported!");
         }
       }
       else
       {
-        vtkGenericWarningMacro(<< "Only supporting VIEW refsys!");
+        mafWarningMacro(<< "Only supporting VIEW refsys!");
       }
     }
     else
     {
-      vtkGenericWarningMacro(<< "Only supporting FREE movement on both axes!");
+      mafWarningMacro(<< "Only supporting FREE movement on both axes!");
     }
   }
-
-
-  vtkDEL(transform);
 }
 
 
@@ -830,26 +824,24 @@ double mmiGenericMouse::ProjectVectorOnPlane(const double *in_vector, const doub
 }
 
 //----------------------------------------------------------------------------
-void mmiGenericMouse::ConcatenateToResultMatrix(vtkMatrix4x4 *matrix)
+void mmiGenericMouse::ConcatenateToResultMatrix(const mafMatrix &matrix)
 //----------------------------------------------------------------------------
 {
-  if (GetResultMatrix() && matrix) 
+  if (GetResultMatrix()) 
   {
-    vtkTransform *tmptr = vtkTransform::New();
-    tmptr->SetMatrix(GetResultMatrix());
+    mafTransform tmptr;
+    tmptr.SetMatrix(*GetResultMatrix());
 
     if (GetResultMatrixConcatenationSemantic() == POSTMULTIPLY)
     {
-      tmptr->PostMultiply();
+      tmptr.Concatenate(matrix,POST_MULTIPLY);
     }
     else if (GetResultMatrixConcatenationSemantic() == PREMULTIPLY)
     {
-      tmptr->PreMultiply();
+      tmptr.Concatenate(matrix,PRE_MULTIPLY);
     }
-
-    tmptr->Concatenate(matrix);
-    GetResultMatrix()->DeepCopy(tmptr->GetMatrix());
-    vtkDEL(tmptr);
+    
+    GetResultMatrix()->DeepCopy(tmptr.GetMatrixPointer());
   }
 }
 
@@ -857,10 +849,9 @@ void mmiGenericMouse::ConcatenateToResultMatrix(vtkMatrix4x4 *matrix)
 void mmiGenericMouse::SendTransformMatrix(double *vector, int mouseAction)
 //----------------------------------------------------------------------------
 {
-  vtkMatrix4x4 *mat = vtkMatrix4x4::New();
+  mafMatrix mat;
   mafTransform::SetPosition(mat, vector);
   SendTransformMatrix(mat, mouseAction);
-  vtkDEL(mat);
 }
 
 //----------------------------------------------------------------------------
@@ -877,19 +868,22 @@ void mmiGenericMouse::SendTransformMatrix(double *versor, double translation, in
 }
 
 //----------------------------------------------------------------------------
-void mmiGenericMouse::SendTransformMatrix(mafMatrix *matrix, int mouseAction, float rotationAngle)
+void mmiGenericMouse::SendTransformMatrix(const mafMatrix &matrix, int mouseAction, double rotationAngle)
 //----------------------------------------------------------------------------
 { 
   // matrix registering the pick position in world coordinates at MOUSE_DOWN
-  mafMatrix pickPosMatrix;
+  mafSmartPointer<mafMatrix> pickPosMatrix;
 
   if (GetResultMatrixConcatenation())
   {
     ConcatenateToResultMatrix(matrix);
   }
 
+  mafSmartPointer<mafMatrix> matrix_copy;
+  *matrix_copy=matrix;
+  
   mafEvent e;
-  e.SetMatrix(matrix);
+  e.SetMatrix(matrix_copy);
   e.SetId(ID_TRANSFORM);
   e.SetSender(this);
   e.SetArg(mouseAction);
@@ -899,7 +893,7 @@ void mmiGenericMouse::SendTransformMatrix(mafMatrix *matrix, int mouseAction, fl
   // picked position in world coordinates
   if (mouseAction == MOUSE_DOWN)
   {
-    mafTransform::SetPosition(pickPosMatrix, (float) m_LastPickPosition[0],
+    mafTransform::SetPosition(*pickPosMatrix, (float) m_LastPickPosition[0],
       (float) m_LastPickPosition[1], (float) m_LastPickPosition[2]);
     
     //e.SetVtkObj(pickPosMatrix);  //modified by Marco. 24-5-2005
@@ -908,37 +902,35 @@ void mmiGenericMouse::SendTransformMatrix(mafMatrix *matrix, int mouseAction, fl
 
   mafEventMacro(e);
 
-  // send standard event... have to recreate it since original from device is not available :-(
-  mafEventInteraction event;
+  // send standard event too...
+  mafEventInteraction event(this,0);
   event.SetSender(this);
   
   // have to recreate the time stamp :-(
   mafSmartPointer<mafMatrix> tmatrix;
-  tmatrix->DeepCopy(matrix);
-  tmatrix->SetTimeStamp(vtkTimerLog::GetTimeStamp());
+  tmatrix->DeepCopy(&matrix);
+  tmatrix->SetTimeStamp(vtkTimerLog::GetCurrentTime());
 
-  event->SetMatrix(tmatrix);
-  event->Set2DPosition(m_MousePose[0],m_MousePose[1]);
+  event.SetMatrix(tmatrix);
+  event.Set2DPosition(m_MousePose[0],m_MousePose[1]);
   if (mouseAction == MOUSE_DOWN)
   {
-    event->SetID(BUTTON_DOWN);
-    event->SetButton(GetStartButton());
-    event->SetModifiers(GetModifiers());
+    event.SetId(BUTTON_DOWN);
+    event.SetButton(GetStartButton());
+    event.SetModifiers(GetModifiers());
   }
   else if (mouseAction == MOUSE_UP)
   {
-    event->SetID(BUTTON_UP);
-    event->SetButton(GetStartButton());
-    event->SetModifiers(GetModifiers());
+    event.SetId(BUTTON_UP);
+    event.SetButton(GetStartButton());
+    event.SetModifiers(GetModifiers());
   }
   else
   {
-    event->SetID();
+    event.SetId(mmdMouse::MOUSE_2D_MOVE);
   }
 
-  InvokeEvent(event);
-  // clean up
-  vtkDEL(pickPosMatrix); 
+  mafEventMacro(event);
 }
 
 //----------------------------------------------------------------------------
@@ -974,25 +966,25 @@ void mmiGenericMouse::OnMouseMoveAction(int X, int Y)
    // prevPickPoint and pickPoint are the world coordinates of picked points 
    // do different things depending on the state 
 
-   if (RotationFlag == true)
+   if (m_RotationFlag == true)
    {
       // rotate
       Rotate(prevPickPoint, pickPoint, viewUp);
    }
 
-   if (TranslationFlag == true)
+   if (m_TranslationFlag == true)
    {
      // translate
      Translate(prevPickPoint, pickPoint);
    }
 
-   if (ScalingFlag == true)
+   if (m_ScalingFlag == true)
    {
      // scale
      // not yet implemented
    }
 
-   if (UniformScalingFlag == true)
+   if (m_UniformScalingFlag == true)
    {
      // uniform scale
      // not yet implemented
@@ -1018,7 +1010,7 @@ void mmiGenericMouse::OnButtonDownAction(int X, int Y)
   m_MousePose[1] = m_LastMousePose[1] = Y;
 
   // perform picking on current renderer
-  m_Picker->Pick(X,Y,0.0,Renderer);
+  m_Picker->Pick(X,Y,0.0,m_Renderer);
   m_Picker->GetPickPosition(m_LastPickPosition);
  
   //reset projection accumulator   
@@ -1030,7 +1022,7 @@ void mmiGenericMouse::OnButtonDownAction(int X, int Y)
      -------A->----0-------1-----i-----rp-----i+1------N-1-------rp-
                                       pos_rp
                                  |
-            ^                HelpPIndex
+            ^                m_HelpPIndex
             |
     --------C->  
 
@@ -1047,7 +1039,7 @@ void mmiGenericMouse::OnButtonDownAction(int X, int Y)
     */ 
 
 
-  if (TranslationFlag == true)
+  if (m_TranslationFlag == true)
   {
     // if translation is constrained on one axis:
     if (GetTranslationConstraint()->GetNumberOfDOF() == 1)
@@ -1070,16 +1062,16 @@ void mmiGenericMouse::OnButtonDownAction(int X, int Y)
         double rp[3] = {0, 0, 0}, proj[3] = {0, 0, 0};
         double pos_rp = 0;
 
-        mafTransform::GetVersor(axis, m_ConstrainRefSys, constrainVers);
+        mafTransform::GetVersor(axis, *m_ConstrainRefSys, constrainVers);
         mafTransform::GetPosition(m_VME->GetMatrixPipe()->GetMatrix(), rp);
 
         //project rp on constrain axis
         pos_rp = ProjectVectorOnAxis(rp, constrainVers, proj);
 
-        //set HelpPIndex and HelperPointStatus
-        HelpPIndex = BinarySearch(pos_rp, 
+        //set m_HelpPIndex and m_HelperPointStatus
+        m_HelpPIndex = BinarySearch(pos_rp, 
                                   GetTranslationConstraint()->GetSnapArray(axis),
-                                  HelperPointStatus);      
+                                  m_HelperPointStatus);      
       }
     }
     // else if translation is constrained on a plane
@@ -1094,9 +1086,8 @@ void mmiGenericMouse::OnButtonDownAction(int X, int Y)
   m_LastY = m_MousePose[1];
 
   // notify the listener about the mouse action that has been performed 
-  vtkMatrix4x4 *identity = vtkMatrix4x4::New();
+  mafMatrix identity;
   SendTransformMatrix(identity, MOUSE_DOWN);
-  vtkDEL(identity);
 }
 
 //----------------------------------------------------------------------------
@@ -1111,16 +1102,15 @@ void mmiGenericMouse::OnButtonUpAction()
   m_LastY = m_MousePose[1];
 
   // notify the listener about the mouse action that has been performed 
-  vtkMatrix4x4 *identity = vtkMatrix4x4::New();
+  mafMatrix identity;
   SendTransformMatrix(identity, MOUSE_UP);
-  vtkDEL(identity);
 }
 
 //----------------------------------------------------------------------------
 void mmiGenericMouse::TrackballRotate()
 //----------------------------------------------------------------------------
 {   
-   vtkTransform *transform = vtkTransform::New();
+   mafTransform transform;
    double v2[3];
 
    // set constraint refsys to rotation constraint
@@ -1134,11 +1124,11 @@ void mmiGenericMouse::TrackballRotate()
    double pivotPoint[3];
 
    // get the centre of rotation from Pivot RefSys
-   mafTransform::GetPosition(GetPivotRefSys()->GetMatrix(), pivotPoint);
+   mafTransform::GetPosition(*GetPivotRefSys()->GetMatrix(), pivotPoint);
 
    // translate to center of the constrain ref sys
-   transform->Identity();
-   transform->Translate(pivotPoint[0], pivotPoint[1], pivotPoint[2]);
+   transform.Identity();
+   transform.Translate(pivotPoint[0], pivotPoint[1], pivotPoint[2],POST_MULTIPLY);
    
    float dx = m_LastX - x;
    float dy = m_LastY - y;
@@ -1146,21 +1136,21 @@ void mmiGenericMouse::TrackballRotate()
    // azimuth
    m_CurrentCamera->OrthogonalizeViewUp();
    double *viewUp = m_CurrentCamera->GetViewUp();
-   int *size = Renderer->GetSize();
-   transform->RotateWXYZ(-360.0 * dx / size[0], viewUp[0], viewUp[1], viewUp[2]);
+   int *size = m_Renderer->GetSize();
+   transform.RotateWXYZ(-360.0 * dx / size[0], viewUp[0], viewUp[1], viewUp[2],POST_MULTIPLY);
    
    // elevation
    vtkMath::Cross(m_CurrentCamera->GetDirectionOfProjection(), viewUp, v2);
-   transform->RotateWXYZ(360.0 * dy / size[1], v2[0], v2[1], v2[2]);
+   transform.RotateWXYZ(360.0 * dy / size[1], v2[0], v2[1], v2[2],POST_MULTIPLY);
    
    // translate back
-   transform->Translate(-pivotPoint[0], -pivotPoint[1], -pivotPoint[2]);
+   transform.Translate(-pivotPoint[0], -pivotPoint[1], -pivotPoint[2],POST_MULTIPLY);
    
    //send the transform matrix
-   SendTransformMatrix(transform->GetMatrix());
+   SendTransformMatrix(transform.GetMatrix());
 
    // clean up
-   transform->Delete();
+   transform.Delete();
  
    // update m_LastX and m_LastY
    m_LastX = x;
@@ -1173,9 +1163,9 @@ void mmiGenericMouse::TrackballTranslate()
 {  
   // Use initial center as the origin from which to pan
 
-  float *obj_center = Prop->GetCenter();
+  double *obj_center = m_Prop->GetCenter();
 
-  float disp_obj_center[3], new_pick_point[4], old_pick_point[4], motion_vector[3];
+  double disp_obj_center[3], new_pick_point[4], old_pick_point[4], motion_vector[3];
   
   ComputeWorldToDisplay(obj_center[0], obj_center[1], obj_center[2], 
                               disp_obj_center);
@@ -1188,15 +1178,11 @@ void mmiGenericMouse::TrackballTranslate()
   motion_vector[1] = new_pick_point[1] - old_pick_point[1];
   motion_vector[2] = new_pick_point[2] - old_pick_point[2];
     
-  vtkTransform *t = vtkTransform::New();
-  t->Translate(motion_vector[0], motion_vector[1], motion_vector[2]);
+  mafTransform t;
+  t.Translate(motion_vector[0], motion_vector[1], motion_vector[2],POST_MULTIPLY);
   
   //send the transform matrix
-  SendTransformMatrix(t->GetMatrix());
-    
-  // clean up
-  t->Delete();
-
+  SendTransformMatrix(t.GetMatrix());
 }
 
 //----------------------------------------------------------------------------
@@ -1210,11 +1196,11 @@ void mmiGenericMouse::TrackballRoll()
    double pivotPoint[3];
 
    // get the centre of rotation from PivotRefSys
-   mafTransform::GetPosition(GetPivotRefSys()->GetMatrix(), pivotPoint); 
+   mafTransform::GetPosition(*GetPivotRefSys()->GetMatrix(), pivotPoint); 
    
    // Get the axis to rotate around = vector from eye to origin
  
-   float motion_vector[3];
+   double motion_vector[3];
    double view_point[3];
  
    if (m_CurrentCamera->GetParallelProjection())
@@ -1233,7 +1219,7 @@ void mmiGenericMouse::TrackballRoll()
      vtkMath::Normalize(motion_vector);
    }
    
-   float disp_refSysCenter[3];
+   double disp_refSysCenter[3];
    
    ComputeWorldToDisplay(pivotPoint[0], pivotPoint[1], pivotPoint[2], 
                                disp_refSysCenter);
@@ -1249,30 +1235,26 @@ void mmiGenericMouse::TrackballRoll()
    newAngle *= vtkMath::RadiansToDegrees();
    oldAngle *= vtkMath::RadiansToDegrees();
    
-   vtkTransform *t = vtkTransform::New();
-   t->PostMultiply();
-   t->Translate(-pivotPoint[0], -pivotPoint[1], -pivotPoint[2]);
-   t->RotateWXYZ(newAngle - oldAngle, motion_vector);
-   t->Translate(pivotPoint[0], pivotPoint[1], pivotPoint[2]);
+   mafTransform t;
+   t.Translate(-pivotPoint[0], -pivotPoint[1], -pivotPoint[2],POST_MULTIPLY);
+   t.RotateWXYZ(newAngle - oldAngle, motion_vector,POST_MULTIPLY);
+   t.Translate(pivotPoint[0], pivotPoint[1], pivotPoint[2],POST_MULTIPLY);
      
    //send the transform matrix
-   SendTransformMatrix(t->GetMatrix());
-
-   // clean up
-   t->Delete();
+   SendTransformMatrix(t.GetMatrix());
 }
 
 //----------------------------------------------------------------------------
 void mmiGenericMouse::SnapOnSurface()
 //----------------------------------------------------------------------------
 {
-  if (Renderer == NULL || Prop == NULL ) return;
+  if (m_Renderer == NULL || m_Prop == NULL ) return;
 
   int x = m_MousePose[0];
   int y = m_MousePose[1];
 
 	vtkPropCollection *pc = vtkPropCollection::New();
-	Prop->GetActors(pc); 
+	m_Prop->GetActors(pc); 
 	pc->InitTraversal();
 	vtkProp* p = pc->GetNextProp();
 	while(p)
@@ -1281,7 +1263,7 @@ void mmiGenericMouse::SnapOnSurface()
 		p = pc->GetNextProp();
 	}
   
-  int picked = m_Picker->Pick(x,y,0,Renderer);
+  int picked = m_Picker->Pick(x,y,0,m_Renderer);
 
 	pc->InitTraversal();
 	p = pc->GetNextProp();
@@ -1297,7 +1279,7 @@ void mmiGenericMouse::SnapOnSurface()
 		 return;
 	}
 
-  float newAbsPickPos[3];
+  double newAbsPickPos[3];
   m_Picker->GetPickPosition(newAbsPickPos);
   
   double absPivotPos[3];
@@ -1330,17 +1312,17 @@ void mmiGenericMouse::BuildVector(double coeff, const double *inVector, double *
       outVector[0] = outVector[1] = outVector[2];
       switch (localAxis)
       {
-        case (X):
+        case (mmiConstraint::X):
         {
           outVector[0] = coeff;
         }
         break;
-        case (Y):
+        case (mmiConstraint::Y):
         {
           outVector[1] = coeff;
         }
         break;
-        case (Z):
+        case (mmiConstraint::Z):
         {
           outVector[2] = coeff;
         }
@@ -1349,7 +1331,7 @@ void mmiGenericMouse::BuildVector(double coeff, const double *inVector, double *
     }
     else
     {
-      vtkWarningMacro(<< "Ref sys type: " << refSysType << "is not supported!");
+      mafWarningMacro(<< "Ref sys type: " << refSysType << "is not supported!");
     }
   }
 }
@@ -1358,30 +1340,30 @@ void mmiGenericMouse::BuildVector(double coeff, const double *inVector, double *
 void mmiGenericMouse::EnableTranslationInternal(bool enable)
 //------------------------------------------------------------------------------
 {
-  TranslationFlag = enable;
-  RotationFlag = ScalingFlag = UniformScalingFlag = !enable;
+  m_TranslationFlag = enable;
+  m_RotationFlag = m_ScalingFlag = m_UniformScalingFlag = !enable;
 }
 
 //------------------------------------------------------------------------------
 void mmiGenericMouse::EnableRotationInternal(bool enable)
 //------------------------------------------------------------------------------
 {
-  RotationFlag = enable;
-  TranslationFlag = ScalingFlag = UniformScalingFlag = !enable;
+  m_RotationFlag = enable;
+  m_TranslationFlag = m_ScalingFlag = m_UniformScalingFlag = !enable;
 }
 
 //------------------------------------------------------------------------------
 void mmiGenericMouse::EnableScalingInternal(bool enable)
 //------------------------------------------------------------------------------
 {
-  ScalingFlag = enable;
-  TranslationFlag = RotationFlag = UniformScalingFlag = !enable;
+  m_ScalingFlag = enable;
+  m_TranslationFlag = m_RotationFlag = m_UniformScalingFlag = !enable;
 }
 
 //------------------------------------------------------------------------------
 void mmiGenericMouse::EnableUniformScalingInternal(bool enable)
 //------------------------------------------------------------------------------
 {
-  UniformScalingFlag = enable;
-  TranslationFlag = RotationFlag = ScalingFlag = !enable;
+  m_UniformScalingFlag = enable;
+  m_TranslationFlag = m_RotationFlag = m_ScalingFlag = !enable;
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 16:43:07 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-27 06:14:30 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -62,7 +62,7 @@ public:
 
   // modified by Rafael. 9-9-2004
   // Made this function public
-  void SendTransformMatrix(mafMatrix *matrix, int mouseAction = MOUSE_MOVE, float rotationAngle = 0);  
+  void SendTransformMatrix(const mafMatrix &matrix, int mouseAction = MOUSE_MOVE, double rotationAngle = 0);  
 
   /** Set the current camera */
   virtual void SetCurrentCamera(vtkCamera *camera);
@@ -134,7 +134,7 @@ protected:
 
   // Register the status of the helper point: it could be coincident with
   // one of the grid points (ON_GRID_POINT) or not (NOT_ON_GRID_POINT)
-  int HelperPointStatus;
+  int m_HelperPointStatus;
 
   enum HELPER_POINT_STATUS
   {
@@ -142,8 +142,8 @@ protected:
     ON_GRID_POINT,
   };
 
-  // If HelperPointStatus is NOT_ON_GRID_POINT this is the  index of the first array 
-  // element on the left of the helper point. If HelperPointStatus is ON_GRID_POINT this is 
+  // If m_HelperPointStatus is NOT_ON_GRID_POINT this is the  index of the first array 
+  // element on the left of the helper point. If m_HelperPointStatus is ON_GRID_POINT this is 
   // the array index corresponding to the helper point position 
   int m_HelpPIndex;
 
@@ -193,7 +193,7 @@ private:
   mmiGenericMouse(const mmiGenericMouse&);  // Not implemented.
   void operator=(const mmiGenericMouse&);   // Not implemented.
 
-  float  m_LastPickPosition[3]; 
+  double  m_LastPickPosition[3]; 
         
   // Build vector with origin in p1 pointing to p2
   void BuildVector(double *p1, double *p2, double *vec)
@@ -234,14 +234,14 @@ private:
   If the action is MOUSE_DOWN the picked position is send as vtkMatrix in
   the VtkObj field of the event.
   If the action is MOUSE_MOVE and a rotation is performed the angle of
-  rotation in the single move event is send as float in the float field of
+  rotation in the single move event is sent as float in the float field of
   the event*/
   void SendTransformMatrix(double *versor, double translation, int mouseAction = MOUSE_MOVE);
   void SendTransformMatrix(double *vector, int mouseAction = MOUSE_MOVE);
 
   /** Concatenate the transform matrix to the result matrix 
   according to selected semantic */
-  void ConcatenateToResultMatrix(mafMatrix *matrix);
+  void ConcatenateToResultMatrix(const mafMatrix &matrix);
 
   bool m_ResultMatrixConcatenation;
 
