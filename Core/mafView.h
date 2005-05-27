@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:43:10 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-05-27 13:44:01 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
 #include "mafObserver.h"
+#include "mafObject.h"
 #include "mafDecl.h"
 #include "mafNode.h"
 #include "mmgGuiHolder.h"
@@ -32,7 +33,7 @@
 // const :
 //----------------------------------------------------------------------------
 /** status of a SceneNode -- do not change, it is used by mafCheckTree also */
-enum 
+enum NODE_STATUS_ID
 {
   NODE_NON_VISIBLE =0,
   NODE_VISIBLE_OFF,
@@ -41,7 +42,7 @@ enum
   NODE_MUTEX_ON,
 };
 /** VME visibility attribute when plugging visual pipe.*/
-enum 
+enum VME_VISIBILITY_ID
 {
   NON_VISIBLE = 0,
   VISIBLE,
@@ -64,11 +65,13 @@ The External Flag has been removed
 mafView can be the base class for composed Views.
 
 */
-class mafView: public mafObserver
+class mafView: public mafObserver, public mafObject
 {
 public:
-  mafView(wxString label, bool external = false);
+  mafView(wxString label = "View", bool external = false);
   virtual ~mafView(); 
+
+  mafTypeMacro(mafView, mafObject);
 
   virtual void			SetListener(mafObserver *Listener) {m_Listener = Listener;};
   virtual void			OnEvent(mafEventBase *event);
