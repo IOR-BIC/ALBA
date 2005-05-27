@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgValidator.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 14:34:28 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-05-27 13:50:10 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,7 +27,7 @@ class mafObserver;
 //-----------------------------------------------------------------------------
 // constant :
 //-----------------------------------------------------------------------------
-enum validator_modes
+enum VALIDATOR_MODES
 {
   VAL_WRONG =0,
   VAL_LABEL,  
@@ -92,37 +92,45 @@ public:
   void OnCommandEvent(wxCommandEvent& event);
   void OnButton(wxCommandEvent& event);
 
+  /** Fill widget_data with the active widget value */
+  void GetWidgetData(WidgetDataType &widget_data);
+
+  /** Fill m_WidgetData member variable with widget_data information and validate it */
+  void SetWidgetData(WidgetDataType &widget_data);
+
 DECLARE_EVENT_TABLE()
 
 protected:
-  enum validator_modes m_mode;
+  enum VALIDATOR_MODES m_Mode;
                          // associated control (one of these)
-  wxStaticText  *m_StaticText;
-  wxTextCtrl    *m_TextCtrl;
-  wxSlider      *m_Slider;
+  wxStaticText   *m_StaticText;
+  wxTextCtrl     *m_TextCtrl;
+  wxSlider       *m_Slider;
   mmgFloatSlider *m_FloatSlider;
-  wxCheckBox    *m_CheckBox;
-  wxRadioBox    *m_RadioBox;
-  wxComboBox    *m_ComboBox;
-  wxButton      *m_Button;
+  wxCheckBox     *m_CheckBox;
+  wxRadioBox     *m_RadioBox;
+  wxComboBox     *m_ComboBox;
+  wxButton       *m_Button;
                         // associated variable (one of these)
-  float      *m_fvar;
-  double     *m_dvar;
-  int        *m_ivar;
-  wxString   *m_svar;
-  mafString  *m_svar2;
-  wxColour   *m_cvar;
+  float      *m_FloatVar;
+  double     *m_DoubleVar;
+  int        *m_IntVar;
+  wxString   *m_StringVar;
+  mafString  *m_MafStringVar;
+  wxColour   *m_ColorVar;
                         // associated valid range (int or float)
-  float       m_fmax;
-  float       m_fmin;
-  double      m_dmin;
-  double      m_dmax;
-  int         m_imax;
-  int         m_imin;
+  float       m_FloatMax;
+  float       m_FloatMin;
+  double      m_DoubleMin;
+  double      m_DoubleMax;
+  int         m_IntMax;
+  int         m_IntMin;
   
+  WidgetDataType  m_WidgetData; ///< Used in Collaborative Mode and contains the active widget informations
+
   mafObserver    *m_Listener;
-  int             m_mid;
-	int							m_decimal_digits;
-  mafString       m_wildcard;
+  int             m_ModuleId;
+	int							m_DecimalDigits; ///< Number of decimal digits to consider and to show into the widget.
+  mafString       m_Wildcard;
 };
 #endif

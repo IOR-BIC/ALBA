@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgValidator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 14:34:28 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-05-27 13:50:10 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,7 +23,6 @@
 #include "mmgValidator.h"
 #include <wx/colordlg.h>
 #include <math.h>
-#include "mafDecl.h"
 #include "mafEvent.h"
 #include "mmgFloatSlider.h"
 
@@ -48,10 +47,10 @@ void mmgValidator::Init(mafObserver* listener, int mid, wxControl *win)
 {
   assert(win);
   m_Listener = listener;
-  m_mid = mid;
-	m_decimal_digits = -1;
+  m_ModuleId = mid;
+	m_DecimalDigits = -1;
 
-  m_mode = VAL_WRONG;
+  m_Mode = VAL_WRONG;
   m_StaticText = NULL;
   m_TextCtrl   = NULL;
   m_Slider     = NULL;
@@ -62,19 +61,25 @@ void mmgValidator::Init(mafObserver* listener, int mid, wxControl *win)
   m_Button     = NULL;
   m_StaticText = NULL;
 
-  m_fvar = NULL;
-	m_dvar = NULL;
-  m_ivar = NULL;
-  m_svar = NULL;
-  m_svar2= NULL;
-  m_cvar = NULL;
+  m_FloatVar    = NULL;
+	m_DoubleVar   = NULL;
+  m_IntVar      = NULL;
+  m_StringVar   = NULL;
+  m_MafStringVar= NULL;
+  m_ColorVar    = NULL;
 
-  m_fmax =-1; 
-  m_fmin =-1; 
-  m_dmax =-1; 
-  m_dmin =-1; 
-  m_imax =-1;
-  m_imin =-1; 
+  m_FloatMax  = -1; 
+  m_FloatMin  = -1; 
+  m_DoubleMax = -1; 
+  m_DoubleMin = -1; 
+  m_IntMax    = -1;
+  m_IntMin    = -1; 
+
+  m_WidgetData.dType  = NULL_DATA;
+  m_WidgetData.dValue = 0.0;
+  m_WidgetData.fValue = 0.0;
+  m_WidgetData.iValue = 0;
+  m_WidgetData.sValue = "";
 }
 //----------------------------------------------------------------------------
 bool mmgValidator::IsValid()
@@ -88,59 +93,59 @@ bool mmgValidator::IsValid()
   //TODO if ( !(m_gui && m_gui->IsKindOf(CLASSINFO(mmgGui)))   ) return false;
   if ( !m_Listener   ) return false;
 
-  switch (m_mode) 
+  switch (m_Mode) 
 	{
     case VAL_WRONG:
 			return false;
     break;
     case VAL_LABEL:
       if ( !(m_StaticText && m_StaticText->IsKindOf(CLASSINFO(wxStaticText)))  ) return false;
-      if ( !m_svar ) return false;
+      if ( !m_MafStringVar ) return false;
     break;
     case VAL_FLOAT:
       if ( !(m_TextCtrl && m_TextCtrl->IsKindOf(CLASSINFO(wxTextCtrl)))  ) return false;
-      if ( !m_fvar ) return false;
-      if (  m_fmin >= m_fmax  ) return false;
-			if ( m_decimal_digits < -1 ) return false;
+      if ( !m_FloatVar ) return false;
+      if (  m_FloatMin >= m_FloatMax  ) return false;
+			if ( m_DecimalDigits < -1 ) return false;
     break;
     case VAL_DOUBLE:
       if ( !(m_TextCtrl && m_TextCtrl->IsKindOf(CLASSINFO(wxTextCtrl)))  ) return false;
-      if ( !m_dvar ) return false;
-      if (  m_dmin >= m_dmax  ) return false;
-			if ( m_decimal_digits < -1 ) return false;
+      if ( !m_DoubleVar ) return false;
+      if (  m_DoubleMin >= m_DoubleMax  ) return false;
+			if ( m_DecimalDigits < -1 ) return false;
     break;
     case VAL_INTEGER:
       if ( !(m_TextCtrl && m_TextCtrl->IsKindOf(CLASSINFO(wxTextCtrl)))  ) return false;
-      if ( !m_ivar ) return false;
-      if (  m_imin >= m_imax  ) return false;
+      if ( !m_IntVar ) return false;
+      if (  m_IntMin >= m_IntMax  ) return false;
     break;
     case VAL_STRING:
       if ( !(m_TextCtrl && m_TextCtrl->IsKindOf(CLASSINFO(wxTextCtrl)))  ) return false;
-      if ( !m_svar && !m_svar2 ) return false;
+      if ( !m_StringVar && !m_MafStringVar ) return false;
     break;
     case VAL_SLIDER:
 		case VAL_SLIDER_2:
       if ( !(m_Slider && m_Slider->IsKindOf(CLASSINFO(wxSlider)))  ) return false;
       if ( !(m_TextCtrl && m_TextCtrl->IsKindOf(CLASSINFO(wxTextCtrl)))  ) return false;
-      if ( !m_ivar ) return false;
+      if ( !m_IntVar ) return false;
     break;
     case VAL_FLOAT_SLIDER:
 		case VAL_FLOAT_SLIDER_2:
       if ( !(m_FloatSlider && m_FloatSlider->IsKindOf(CLASSINFO(mmgFloatSlider)))  ) return false;
       if ( !(m_TextCtrl && m_TextCtrl->IsKindOf(CLASSINFO(wxTextCtrl)))  ) return false;
-      if ( !m_fvar ) return false;
+      if ( !m_FloatVar ) return false;
     break;
 		case VAL_CHECKBOX:
       if ( !(m_CheckBox && m_CheckBox->IsKindOf(CLASSINFO(wxCheckBox)))  ) return false;
-      if ( !m_ivar ) return false;
+      if ( !m_IntVar ) return false;
     break;
     case VAL_RADIOBOX:
       if ( !(m_RadioBox && m_RadioBox->IsKindOf(CLASSINFO(wxRadioBox)))  ) return false;
-      if ( !m_ivar ) return false;
+      if ( !m_IntVar ) return false;
     break;
     case VAL_COMBOBOX:
       if ( !(m_ComboBox && m_ComboBox->IsKindOf(CLASSINFO(wxComboBox)))  ) return false;
-      if ( !m_ivar ) return false;
+      if ( !m_IntVar ) return false;
     break;
     case VAL_BUTTON:
       if ( !(m_Button && m_Button->IsKindOf(CLASSINFO(wxButton)))  ) return false;
@@ -150,12 +155,12 @@ bool mmgValidator::IsValid()
     case VAL_FILESAVE:
       if ( !(m_Button     && m_Button->IsKindOf(CLASSINFO(wxButton)))  ) return false;
       if ( !(m_TextCtrl && m_TextCtrl->IsKindOf(CLASSINFO(wxTextCtrl)))  ) return false;
-      if ( !m_svar ) return false;
+      if ( !m_MafStringVar ) return false;
     break;
     case VAL_COLOR:
       if ( !(m_Button && m_Button->IsKindOf(CLASSINFO(wxButton)))  ) return false;
       if ( !(m_TextCtrl && m_TextCtrl->IsKindOf(CLASSINFO(wxTextCtrl)))  ) return false;
-      if ( !m_cvar ) return false;
+      if ( !m_ColorVar ) return false;
     break;
     default:
       assert(false);
@@ -168,37 +173,43 @@ bool mmgValidator::Copy(const mmgValidator& val)
 //----------------------------------------------------------------------------
 {
   wxValidator::Copy(val);
-  m_Listener    = val.m_Listener;     
-  m_mid         = val.m_mid;
-	m_decimal_digits = val.m_decimal_digits;
+  m_Listener        = val.m_Listener;     
+  m_ModuleId        = val.m_ModuleId;
+	m_DecimalDigits   = val.m_DecimalDigits;
 
-  m_mode        = val.m_mode;     
+  m_Mode            = val.m_Mode;     
 
-  m_StaticText  = val.m_StaticText; 
-  m_TextCtrl    = val.m_TextCtrl; 
-  m_Slider      = val.m_Slider;   
-  m_FloatSlider	= val.m_FloatSlider;   
-  m_CheckBox    = val.m_CheckBox; 
-  m_RadioBox    = val.m_RadioBox; 
-  m_ComboBox    = val.m_ComboBox; 
-  m_Button      = val.m_Button; 
-  m_StaticText  = val.m_StaticText; 
+  m_StaticText      = val.m_StaticText; 
+  m_TextCtrl        = val.m_TextCtrl; 
+  m_Slider          = val.m_Slider;   
+  m_FloatSlider	    = val.m_FloatSlider;   
+  m_CheckBox        = val.m_CheckBox; 
+  m_RadioBox        = val.m_RadioBox; 
+  m_ComboBox        = val.m_ComboBox; 
+  m_Button          = val.m_Button; 
+  m_StaticText      = val.m_StaticText; 
 
-  m_fvar        = val.m_fvar;
-  m_dvar        = val.m_dvar;
-  m_ivar        = val.m_ivar;
-  m_svar        = val.m_svar;
-  m_svar2       = val.m_svar2;
-  m_cvar        = val.m_cvar;
+  m_FloatVar        = val.m_FloatVar;
+  m_DoubleVar       = val.m_DoubleVar;
+  m_IntVar          = val.m_IntVar;
+  m_StringVar       = val.m_StringVar;
+  m_MafStringVar    = val.m_MafStringVar;
+  m_ColorVar        = val.m_ColorVar;
 
-  m_fmax        = val.m_fmax;
-  m_fmin        = val.m_fmin;
-  m_dmax        = val.m_dmax;
-  m_dmin        = val.m_dmin;
-  m_imax        = val.m_imax;
-  m_imin        = val.m_imin;
+  m_FloatMax        = val.m_FloatMax;
+  m_FloatMin        = val.m_FloatMin;
+  m_DoubleMax       = val.m_DoubleMax;
+  m_DoubleMin       = val.m_DoubleMin;
+  m_IntMax          = val.m_IntMax;
+  m_IntMin          = val.m_IntMin;
 
-  m_wildcard		= val.m_wildcard;
+  m_Wildcard		    = val.m_Wildcard;
+
+  m_WidgetData.dType  = val.m_WidgetData.dType;
+  m_WidgetData.dValue = val.m_WidgetData.dValue;
+  m_WidgetData.fValue = val.m_WidgetData.fValue;
+  m_WidgetData.iValue = val.m_WidgetData.iValue;
+  m_WidgetData.sValue = val.m_WidgetData.sValue;
 
   return TRUE;
 }
@@ -207,172 +218,223 @@ mmgValidator::mmgValidator(mafObserver* listener, int mid, wxStaticText *win,maf
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);
-  m_mode = VAL_LABEL;
-  m_StaticText=win; 
-  m_svar2     =var;     
+  m_Mode        = VAL_LABEL;
+  m_StaticText  = win; 
+  m_MafStringVar= var;     
+  m_WidgetData.dType  = STRING_DATA;
+  m_WidgetData.sValue = var->GetCStr();
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-mmgValidator::mmgValidator(mafObserver* listener, int mid, wxTextCtrl *win,wxString* var) //String
+mmgValidator::mmgValidator(mafObserver* listener, int mid, wxTextCtrl *win, wxString *var) //String
 //----------------------------------------------------------------------------
 {
-  Init(listener,mid,win);  m_mode = VAL_STRING;
-  m_TextCtrl  =win; 
-  m_svar      =var;     
+  Init(listener,mid,win);  
+  m_Mode      = VAL_STRING;
+  m_TextCtrl  = win; 
+  m_StringVar = var;
+  m_WidgetData.dType  = STRING_DATA;
+  m_WidgetData.sValue = var->c_str();
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
 mmgValidator::mmgValidator(mafObserver* listener, int mid, wxTextCtrl *win,mafString* var) //String
 //----------------------------------------------------------------------------
 {
-  Init(listener,mid,win);  m_mode = VAL_STRING;
-  m_TextCtrl  =win; 
-  m_svar2     =var;     
+  Init(listener,mid,win);  
+  m_Mode        = VAL_STRING;
+  m_TextCtrl    = win; 
+  m_MafStringVar= var;     
+  m_WidgetData.dType  = STRING_DATA;
+  m_WidgetData.sValue = var->GetCStr();
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
 mmgValidator::mmgValidator(mafObserver* listener, int mid, wxTextCtrl *win,   int*   var,   int min,   int max)//Integer
 //----------------------------------------------------------------------------
 {
-  Init(listener,mid,win);  m_mode = VAL_INTEGER;
-  m_TextCtrl  =win; 
-  m_ivar      =var;     
-  m_imax      =max;     
-  m_imin      =min;    
+  Init(listener,mid,win);  
+  m_Mode      = VAL_INTEGER;
+  m_TextCtrl  = win; 
+  m_IntVar    = var;     
+  m_IntMax    = max;     
+  m_IntMin    = min;    
+  m_WidgetData.dType  = INT_DATA;
+  m_WidgetData.iValue = *var;
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
 mmgValidator::mmgValidator(mafObserver* listener, int mid, wxTextCtrl *win, float* var, float min, float max, int dec_digits)//Float
 //----------------------------------------------------------------------------
 {
-  Init(listener,mid,win);  m_mode = VAL_FLOAT;
-  m_TextCtrl				= win; 
-  m_fvar						= var;     
-  m_fmax						= max;     
-  m_fmin						= min;
-	m_decimal_digits	= dec_digits;
+  Init(listener,mid,win);  
+  m_Mode          = VAL_FLOAT;
+  m_TextCtrl			= win; 
+  m_FloatVar			= var;     
+  m_FloatMax			= max;     
+  m_FloatMin			= min;
+	m_DecimalDigits	= dec_digits;
+  m_WidgetData.dType  = FLOAT_DATA;
+  m_WidgetData.fValue = *var;
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
 mmgValidator::mmgValidator(mafObserver* listener, int mid, wxTextCtrl *win, double* var, double min, double max, int dec_digits)//Double
 //----------------------------------------------------------------------------
 {
-  Init(listener,mid,win);  m_mode = VAL_DOUBLE;
-  m_TextCtrl				= win;
-  m_dvar						= var;
-  m_dmax						= max;
-  m_dmin						= min;
-	m_decimal_digits	= dec_digits;
+  Init(listener,mid,win);  
+  m_Mode          = VAL_DOUBLE;
+  m_TextCtrl			= win;
+  m_DoubleVar			= var;
+  m_DoubleMax			= max;
+  m_DoubleMin			= min;
+	m_DecimalDigits	= dec_digits;
+  m_WidgetData.dType  = DOUBLE_DATA;
+  m_WidgetData.iValue = *var;
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
 mmgValidator::mmgValidator(mafObserver* listener, int mid, wxSlider *win, int* var, wxTextCtrl* lab) //Slider     
 //----------------------------------------------------------------------------
 {
-  Init(listener,mid,win);  m_mode = VAL_SLIDER;
-  m_TextCtrl  =lab;
-  m_Slider    =win;
-  m_ivar      =var;
+  Init(listener,mid,win);  
+  m_Mode      = VAL_SLIDER;
+  m_TextCtrl  = lab;
+  m_Slider    = win;
+  m_IntVar    = var;
+  m_WidgetData.dType  = INT_DATA;
+  m_WidgetData.iValue = *var;
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
 mmgValidator::mmgValidator(mafObserver* listener,int mid,wxTextCtrl *win, int* var, wxSlider* lab, int min, int max)
 //----------------------------------------------------------------------------
 {
-  Init(listener,mid,win);  m_mode = VAL_SLIDER_2;
-  m_TextCtrl  =win;
-  m_Slider    =lab;
-  m_ivar      =var;
-	m_imin			=min;
-	m_imax			=max;
+  Init(listener,mid,win);
+  m_Mode      = VAL_SLIDER_2;
+  m_TextCtrl  = win;
+  m_Slider    = lab;
+  m_IntVar    = var;
+	m_IntMin		= min;
+	m_IntMax		= max;
+  m_WidgetData.dType  = INT_DATA;
+  m_WidgetData.iValue = *var;
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
 mmgValidator::mmgValidator(mafObserver* listener, int mid, mmgFloatSlider  *win, float*  var, wxTextCtrl* lab) //FloatSlider
 //----------------------------------------------------------------------------
 {
-  Init(listener,mid,win);  m_mode = VAL_FLOAT_SLIDER;
-  m_TextCtrl    =lab;
-  m_FloatSlider =win;
-  m_fvar        =var;
+  Init(listener,mid,win);  
+  m_Mode        = VAL_FLOAT_SLIDER;
+  m_TextCtrl    = lab;
+  m_FloatSlider = win;
+  m_FloatVar    = var;
+  m_WidgetData.dType  = FLOAT_DATA;
+  m_WidgetData.fValue = *var;
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
 mmgValidator::mmgValidator(mafObserver* listener,int mid,wxTextCtrl *win, float* var, mmgFloatSlider* lab,float min,float max)
 //----------------------------------------------------------------------------
 {
-  Init(listener,mid,win);  m_mode = VAL_FLOAT_SLIDER_2;
-  m_FloatSlider	=lab;
-  m_TextCtrl		=win;
-  m_fvar        =var;
-	m_fmin				=min;
-	m_fmax				=max;
+  Init(listener,mid,win);  
+  m_Mode        = VAL_FLOAT_SLIDER_2;
+  m_FloatSlider	= lab;
+  m_TextCtrl		= win;
+  m_FloatVar    = var;
+	m_FloatMin		= min;
+	m_FloatMax		= max;
+  m_WidgetData.dType  = FLOAT_DATA;
+  m_WidgetData.fValue = *var;
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
 mmgValidator::mmgValidator(mafObserver* listener, int mid, wxCheckBox *win,   int*   var) //CheckBox    
 //----------------------------------------------------------------------------
 {
-  Init(listener,mid,win);  m_mode = VAL_CHECKBOX;
-  m_CheckBox  =win; 
-  m_ivar      =var;     
+  Init(listener,mid,win);  
+  m_Mode      = VAL_CHECKBOX;
+  m_CheckBox  = win; 
+  m_IntVar    = var;     
+  m_WidgetData.dType  = INT_DATA;
+  m_WidgetData.iValue = *var;
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
 mmgValidator::mmgValidator(mafObserver* listener, int mid, wxRadioBox *win,   int*   var) //RadioBox                     
 //----------------------------------------------------------------------------
 {
-  Init(listener,mid,win);  m_mode = VAL_RADIOBOX;
-  m_RadioBox  =win; 
-  m_ivar      =var;     
+  Init(listener,mid,win);  
+  m_Mode      = VAL_RADIOBOX;
+  m_RadioBox  = win; 
+  m_IntVar    = var;     
+  m_WidgetData.dType  = INT_DATA;
+  m_WidgetData.iValue = *var;
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
 mmgValidator::mmgValidator(mafObserver* listener, int mid, wxComboBox *win,   int*   var) //Combo 
 //----------------------------------------------------------------------------
 {
-  Init(listener,mid,win);  m_mode = VAL_COMBOBOX;
-  m_ComboBox  =win;
-  m_ivar      =var;
+  Init(listener,mid,win);  
+  m_Mode      = VAL_COMBOBOX;
+  m_ComboBox  = win;
+  m_IntVar    = var;
+  m_WidgetData.dType  = INT_DATA;
+  m_WidgetData.iValue = *var;
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
 mmgValidator::mmgValidator(mafObserver* listener, int mid, wxButton *win) //Button
 //----------------------------------------------------------------------------
 {
-  Init(listener,mid,win);  m_mode = VAL_BUTTON;
-  m_Button    =win; 
+  Init(listener,mid,win);  
+  m_Mode    = VAL_BUTTON;
+  m_Button  = win; 
+  m_WidgetData.dType = NULL_DATA;
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
 mmgValidator::mmgValidator(mafObserver* listener, int mid, wxButton *win, mafString* var, wxTextCtrl* lab,  bool  openfile, const mafString wildcard)
 //----------------------------------------------------------------------------
 {
-  Init(listener,mid,win);  if (openfile) m_mode = VAL_FILEOPEN; else m_mode = VAL_FILESAVE;
-  m_Button    =win;
-  m_TextCtrl  =lab;
-  m_svar2     =var;
-  m_wildcard  =wildcard;
+  Init(listener,mid,win);  
+  if (openfile) 
+    m_Mode = VAL_FILEOPEN; 
+  else 
+    m_Mode = VAL_FILESAVE;
+  m_Button        = win;
+  m_TextCtrl      = lab;
+  m_MafStringVar  = var;
+  m_Wildcard      = wildcard;
+  m_WidgetData.dType  = STRING_DATA;
+  m_WidgetData.sValue = var->GetCStr();
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-mmgValidator::mmgValidator(mafObserver* listener, int mid, wxButton *win, mafString* var, wxTextCtrl* lab)
+mmgValidator::mmgValidator(mafObserver* listener, int mid, wxButton *win, mafString *var, wxTextCtrl* lab)
 //----------------------------------------------------------------------------
 {
-  Init(listener,mid,win);  m_mode = VAL_DIROPEN;
-  m_Button    =win;
-  m_TextCtrl  =lab;
-  m_svar2     =var;
+  Init(listener,mid,win);  
+  m_Mode          = VAL_DIROPEN;
+  m_Button        = win;
+  m_TextCtrl      = lab;
+  m_MafStringVar  = var;
+  m_WidgetData.dType  = STRING_DATA;
+  m_WidgetData.sValue = var->GetCStr();
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
 mmgValidator::mmgValidator(mafObserver* listener, int mid, wxButton *win, wxColour* var, wxTextCtrl* lab)
 //----------------------------------------------------------------------------
 {
-  Init(listener,mid,win);  m_mode = VAL_COLOR;
-  m_Button    =win;
-  m_TextCtrl  =lab;
-  m_cvar      =var;
+  Init(listener,mid,win); 
+  m_Mode      = VAL_COLOR;
+  m_Button    = win;
+  m_TextCtrl  = lab;
+  m_ColorVar  = var;
+  m_WidgetData.dType = NULL_DATA;
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
@@ -381,121 +443,126 @@ bool mmgValidator::Validate(wxWindow *parent)
 {
   assert(IsValid());
 
-  if (m_mode==VAL_FLOAT )
+  if (m_Mode == VAL_FLOAT )
   {
-    double val = m_fmin-1;
+    double val = m_FloatMin-1;
     wxString s = m_TextCtrl->GetValue();
 	  bool res   = s.ToDouble(&val);
     if (!res )
     {
-	    if(this->m_decimal_digits == -1)
-				s.Printf("%g",*m_fvar);
+	    if(this->m_DecimalDigits == -1)
+				s.Printf("%g",*m_FloatVar);
 			else
-				s.Printf("%g",this->RoundValue(*m_fvar));
+				s.Printf("%g",this->RoundValue(*m_FloatVar));
 	    m_TextCtrl->SetValue(s) ;
     }
-    if (val<m_fmin )
+    if (val < m_FloatMin )
     {
-	    s.Printf("%g",m_fmin);
+	    s.Printf("%g",m_FloatMin);
 	    m_TextCtrl->SetValue(s) ;
     }
-    if (val>m_fmax )
+    if (val > m_FloatMax )
     {
-	    s.Printf("%g",m_fmax);
+	    s.Printf("%g",m_FloatMax);
 	    m_TextCtrl->SetValue(s) ;
     }
+    m_WidgetData.fValue = *m_FloatVar;
   }
-  if (m_mode==VAL_FLOAT_SLIDER_2)
+  else if (m_Mode == VAL_FLOAT_SLIDER_2)
 	{
-    double val = m_fmin-1;
+    double val = m_FloatMin-1;
     wxString s = m_TextCtrl->GetValue();
 	  bool res   = s.ToDouble(&val);
     if (!res )
     {
-	    if(this->m_decimal_digits == -1)
-				s.Printf("%g",*m_fvar);
+	    if(this->m_DecimalDigits == -1)
+				s.Printf("%g",*m_FloatVar);
 			else
-				s.Printf("%g",this->RoundValue(*m_fvar));
+				s.Printf("%g",this->RoundValue(*m_FloatVar));
 	    m_TextCtrl->SetValue(s) ;
     }
-    if (val<m_fmin )
+    if (val < m_FloatMin )
     {
-	    s.Printf("%g",m_fmin);
+	    s.Printf("%g",m_FloatMin);
 	    m_TextCtrl->SetValue(s) ;
     }
-    if (val>m_fmax )
+    if (val > m_FloatMax )
     {
-	    s.Printf("%g",m_fmax);
+	    s.Printf("%g",m_FloatMax);
 	    m_TextCtrl->SetValue(s) ;
     }
-		this->m_FloatSlider->SetValue(*m_fvar);
+		this->m_FloatSlider->SetValue(*m_FloatVar);
+    m_WidgetData.fValue = *m_FloatVar;
 	}
-  if (m_mode==VAL_DOUBLE )
+  else if (m_Mode == VAL_DOUBLE )
   {
-    double val = m_dmin-1;
+    double val = m_DoubleMin-1;
     wxString s = m_TextCtrl->GetValue();
 	  bool res   = s.ToDouble(&val);
     if (!res )
     {
-	    if(this->m_decimal_digits == -1)
-				s.Printf("%g",*m_dvar);
+	    if(this->m_DecimalDigits == -1)
+				s.Printf("%g",*m_DoubleVar);
 			else
-				s.Printf("%g",this->RoundValue(*m_dvar));
+				s.Printf("%g",this->RoundValue(*m_DoubleVar));
 	    m_TextCtrl->SetValue(s) ;
     }
-    if (val<m_dmin )
+    if (val < m_DoubleMin )
     {
-	    s.Printf("%g",m_dmin);
+	    s.Printf("%g",m_DoubleMin);
 	    m_TextCtrl->SetValue(s) ;
     }
-    if (val>m_dmax )
+    if (val > m_DoubleMax )
     {
-	    s.Printf("%g",m_dmax);
+	    s.Printf("%g",m_DoubleMax);
 	    m_TextCtrl->SetValue(s) ;
     }
+    m_WidgetData.dValue = *m_DoubleVar;
   }
-  if ( m_mode==VAL_INTEGER )
+  else if ( m_Mode == VAL_INTEGER )
   {
-	  long val   = m_imin-1;
+	  long val   = m_IntMin-1;
     wxString s = m_TextCtrl->GetValue();
 	  bool res   = s.ToLong(&val);
     if (!res )
     {
-	    s.Printf("%d",*m_ivar);
+	    s.Printf("%d",*m_IntVar);
 	    m_TextCtrl->SetValue(s) ;
     }
-    if (val<m_imin )
+    if (val < m_IntMin )
     {
-	    s.Printf("%d",m_imin);
+	    s.Printf("%d",m_IntMin);
 	    m_TextCtrl->SetValue(s) ;
     }
-    if (val>m_imax )
+    if (val > m_IntMax )
     {
-	    s.Printf("%d",m_imax);
+	    s.Printf("%d",m_IntMax);
 	    m_TextCtrl->SetValue(s) ;
     }
+    m_WidgetData.iValue = *m_IntVar;
   }
-	if ( m_mode==VAL_SLIDER_2 )
+	else if ( m_Mode == VAL_SLIDER_2 )
   {
-	  long val   = m_imin-1;
+	  long val   = m_IntMin-1;
     wxString s = m_TextCtrl->GetValue();
 	  bool res   = s.ToLong(&val);
     if (!res )
     {
-	    s.Printf("%d",*m_ivar);
+	    s.Printf("%d",*m_IntVar);
 	    m_TextCtrl->SetValue(s) ;
     }
-    if (val<m_imin )
+    if (val < m_IntMin )
     {
-	    s.Printf("%d",m_imin);
+	    s.Printf("%d",m_IntMin);
 	    m_TextCtrl->SetValue(s) ;
     }
-    if (val>m_imax )
+    if (val > m_IntMax )
     {
-	    s.Printf("%d",m_imax);
+	    s.Printf("%d",m_IntMax);
 	    m_TextCtrl->SetValue(s) ;
     }
-		this->m_Slider->SetValue(*m_ivar);
+		this->m_Slider->SetValue(*m_IntVar);
+    m_WidgetData.iValue = *m_IntVar;
   }
   return true;
 }
@@ -509,78 +576,78 @@ bool mmgValidator::TransferToWindow(void)
   wxString name;
   wxString ext;
   
-  switch (m_mode) 
+  switch (m_Mode) 
 	{
     case VAL_LABEL:
-			m_StaticText->SetLabel(*m_svar);
+			m_StaticText->SetLabel(m_MafStringVar->GetCStr());
     break;
     case VAL_FLOAT:
-      if(*m_fvar < m_fmin ) *m_fvar = m_fmin;
-      if(*m_fvar > m_fmax ) *m_fvar = m_fmax;
-			if(this->m_decimal_digits == -1)
-				s.Printf("%g",*m_fvar);
+      if(*m_FloatVar < m_FloatMin ) *m_FloatVar = m_FloatMin;
+      if(*m_FloatVar > m_FloatMax ) *m_FloatVar = m_FloatMax;
+			if(this->m_DecimalDigits == -1)
+				s.Printf("%g",*m_FloatVar);
 			else
-				s.Printf("%g",this->RoundValue(*m_fvar));
+				s.Printf("%g",this->RoundValue(*m_FloatVar));
       m_TextCtrl->SetValue(s);
     break;
     case VAL_DOUBLE:
-			if(*m_dvar < m_dmin ) *m_dvar = m_dmin;
-			if(*m_dvar > m_dmax ) *m_dvar = m_dmax;
-			if(this->m_decimal_digits == -1)
-				s.Printf("%g",*m_dvar);
+			if(*m_DoubleVar < m_DoubleMin ) *m_DoubleVar = m_DoubleMin;
+			if(*m_DoubleVar > m_DoubleMax ) *m_DoubleVar = m_DoubleMax;
+			if(this->m_DecimalDigits == -1)
+				s.Printf("%g",*m_DoubleVar);
 			else
-				s.Printf("%g",this->RoundValue(*m_dvar));
+				s.Printf("%g",this->RoundValue(*m_DoubleVar));
       m_TextCtrl->SetValue(s);
     break;
     case VAL_INTEGER:
-      if(*m_ivar < m_imin ) *m_ivar = m_imin;
-      if(*m_ivar > m_imax ) *m_ivar = m_imax;
-	    s.Printf("%d",*m_ivar);
+      if(*m_IntVar < m_IntMin ) *m_IntVar = m_IntMin;
+      if(*m_IntVar > m_IntMax ) *m_IntVar = m_IntMax;
+	    s.Printf("%d",*m_IntVar);
       m_TextCtrl->SetValue(s);
     break;
     case VAL_STRING:
-      if (m_svar) m_TextCtrl->SetValue(*m_svar);
-      if (m_svar2) m_TextCtrl->SetValue(wxString(m_svar2->GetCStr()));
+      if (m_StringVar) m_TextCtrl->SetValue(*m_StringVar);
+      if (m_MafStringVar) m_TextCtrl->SetValue(wxString(m_MafStringVar->GetCStr()));
     break;
     case VAL_SLIDER:
-      m_Slider->SetValue(*m_ivar);
-	    s.Printf("%d",*m_ivar);
+      m_Slider->SetValue(*m_IntVar);
+	    s.Printf("%d",*m_IntVar);
       m_TextCtrl->SetValue(s);
     break;
 		case VAL_SLIDER_2:
-      if(*m_ivar < m_imin ) *m_ivar = m_imin;
-      if(*m_ivar > m_imax ) *m_ivar = m_imax;
-	    s.Printf("%d",*m_ivar);
+      if(*m_IntVar < m_IntMin ) *m_IntVar = m_IntMin;
+      if(*m_IntVar > m_IntMax ) *m_IntVar = m_IntMax;
+	    s.Printf("%d",*m_IntVar);
       m_TextCtrl->SetValue(s);
-      m_Slider->SetValue(*m_ivar);
+      m_Slider->SetValue(*m_IntVar);
 		break;
     case VAL_FLOAT_SLIDER:
-      m_FloatSlider->SetValue(*m_fvar);
-	    s.Printf("%g",*m_fvar);
+      m_FloatSlider->SetValue(*m_FloatVar);
+	    s.Printf("%g",*m_FloatVar);
       m_TextCtrl->SetValue(s);
     break;
 		case VAL_FLOAT_SLIDER_2:
-      if(*m_fvar < m_fmin ) *m_fvar = m_fmin;
-      if(*m_fvar > m_fmax ) *m_fvar = m_fmax;
-			if(this->m_decimal_digits == -1)
-				s.Printf("%g",*m_fvar);
+      if(*m_FloatVar < m_FloatMin ) *m_FloatVar = m_FloatMin;
+      if(*m_FloatVar > m_FloatMax ) *m_FloatVar = m_FloatMax;
+			if(this->m_DecimalDigits == -1)
+				s.Printf("%g",*m_FloatVar);
 			else
-				s.Printf("%g",this->RoundValue(*m_fvar));
+				s.Printf("%g",this->RoundValue(*m_FloatVar));
       m_TextCtrl->SetValue(s);
-      m_FloatSlider->SetValue(*m_fvar);
+      m_FloatSlider->SetValue(*m_FloatVar);
     break;
     case VAL_CHECKBOX:
-      m_CheckBox->SetValue(*m_ivar ? true : false);
+      m_CheckBox->SetValue(*m_IntVar ? true : false);
     break;
     case VAL_RADIOBOX:
-      m_RadioBox->SetSelection(*m_ivar);
+      m_RadioBox->SetSelection(*m_IntVar);
     break;
     case VAL_COMBOBOX:
-      m_ComboBox->SetSelection(*m_ivar);
+      m_ComboBox->SetSelection(*m_IntVar);
     break;
     case VAL_DIROPEN:
-			path = m_svar->c_str();
-			if( ! ::wxDirExists(path) ) wxSplitPath(m_svar->c_str(), &path, &name, &ext); // it is a filename
+			path = m_MafStringVar->GetCStr();
+			if( ! ::wxDirExists(path) ) wxSplitPath(m_MafStringVar->GetCStr(), &path, &name, &ext); // it is a filename
 			m_TextCtrl->SetValue(path);
 			if(path != "")
 			{ 
@@ -589,147 +656,161 @@ bool mmgValidator::TransferToWindow(void)
   	break;
     case VAL_FILEOPEN:
     case VAL_FILESAVE:
-			wxSplitPath(m_svar->c_str(), &path, &name, &ext);
+			wxSplitPath(m_MafStringVar->GetCStr(), &path, &name, &ext);
 			if (ext.Len() >0 )
 			{
 				name += ".";
 				name += ext;
 			}
 			m_TextCtrl->SetValue(name);
-			path = m_svar->c_str();
+			path = m_MafStringVar->GetCStr();
 			if(path != "")
 			{ 
 				m_TextCtrl->SetToolTip(path);
 			}
   	break;
     case VAL_COLOR:
-      m_TextCtrl->SetBackgroundColour(*m_cvar);
+      m_TextCtrl->SetBackgroundColour(*m_ColorVar);
       m_TextCtrl->Refresh();
     break;
   }
   return TRUE;
 }
-///////////////////// Paolo
 //----------------------------------------------------------------------------
 float mmgValidator::RoundValue(float f_in)
 //----------------------------------------------------------------------------
 {
-	float f_tmp = f_in * pow(10,m_decimal_digits);
+	float f_tmp = f_in * pow(10,m_DecimalDigits);
 	int b = ( f_tmp >= 0 ) ? static_cast<int>( f_tmp + .5):static_cast<int>( f_tmp - .5);
-	return b / pow(10,m_decimal_digits);
+	return b / pow(10,m_DecimalDigits);
 }
 //----------------------------------------------------------------------------
 double mmgValidator::RoundValue(double d_in)
 //----------------------------------------------------------------------------
 {
-	double d_tmp = d_in * pow(10,m_decimal_digits);
+	double d_tmp = d_in * pow(10,m_DecimalDigits);
 	int b = ( d_tmp >= 0 ) ? static_cast<int>( d_tmp + .5):static_cast<int>( d_tmp - .5);
-	return b / pow(10,m_decimal_digits);
+	return b / pow(10,m_DecimalDigits);
 }
-///////////////////// 
 //----------------------------------------------------------------------------
 bool mmgValidator::TransferFromWindow(void)
 //----------------------------------------------------------------------------
 {
   assert(IsValid());
 
-  wxString s; 
+  wxString s;
+  wxString sf;
   bool   res; 
   long   ival;
   double dval;
+  double f2d;
 
-  switch (m_mode) 
+  switch (m_Mode) 
 	{
     case VAL_FLOAT:
 			s = m_TextCtrl->GetValue();
 			res = s.ToDouble(&dval);
+      sf << *m_FloatVar;
+      sf.ToDouble(&f2d);
 			if (res) 
-        res = *m_fvar != dval;
+        res = !mafEquals(f2d,dval);
 			if (res) 
-        *m_fvar = dval;
+        *m_FloatVar = dval;
+      m_WidgetData.fValue = *m_FloatVar;
 			return res;
     break;
  		case VAL_FLOAT_SLIDER_2:
 			s = m_TextCtrl->GetValue();
 			res = s.ToDouble(&dval);
+      sf << *m_FloatVar;
+      sf.ToDouble(&f2d);
 			if (res) 
-        res = *m_fvar != dval;
+        res = !mafEquals(f2d,dval);
 			if (res) 
-				*m_fvar = dval;
+				*m_FloatVar = dval;
+      m_WidgetData.fValue = *m_FloatVar;
 			return res;
     break;
     case VAL_DOUBLE:
 			s = m_TextCtrl->GetValue();
 			res = s.ToDouble(&dval);
 			if (res) 
-        res = *m_dvar != dval;
+        res = !mafEquals(*m_DoubleVar, dval);
 			if (res) 
-        *m_dvar = dval;
+        *m_DoubleVar = dval;
+      m_WidgetData.dValue = *m_DoubleVar;
 			return res;
     break;
     case VAL_INTEGER:
 			s = m_TextCtrl->GetValue();
 			res = s.ToLong(&ival);
 			if (res) 
-        res = *m_ivar != ival;
+        res = *m_IntVar != ival;
       if (res) 
-        *m_ivar = ival;
+        *m_IntVar = ival;
+      m_WidgetData.iValue = *m_IntVar;
 			return res;
     break;
     case VAL_STRING:
-      if (m_svar)  
+      if (m_StringVar)  
       {
         s = m_TextCtrl->GetValue();
-        res = s != *m_svar;
+        res = s != *m_StringVar;
         if (res)
         {
-          *m_svar = s;
+          *m_StringVar = s;
         }
-        //*m_svar = m_TextCtrl->GetValue();
+        m_WidgetData.sValue = *m_StringVar;
         return res;
       }
-      if (m_svar2)
+      if (m_MafStringVar)
       {
         s = m_TextCtrl->GetValue();
-        res = !m_svar2->Equals(s.c_str());
+        res = !m_MafStringVar->Equals(s.c_str());
         if (res)
         {
-          *m_svar2 = s.c_str();
+          *m_MafStringVar = s.c_str();
         }
-        //*m_svar2 = m_TextCtrl->GetValue().c_str();
+        m_WidgetData.sValue = m_MafStringVar->GetCStr();
         return res;
       }
     break;
     case VAL_SLIDER:
-			*m_ivar = m_Slider->GetValue();
+			*m_IntVar = m_Slider->GetValue();
+      m_WidgetData.iValue = *m_IntVar;
     break;
 		case VAL_SLIDER_2:
 			s = m_TextCtrl->GetValue();
 			res = s.ToLong(&ival);
 			if (res) 
-        res = *m_ivar != ival;
+        res = *m_IntVar != ival;
 			if (res) 
-				*m_ivar = ival;
+				*m_IntVar = ival;
+      m_WidgetData.iValue = *m_IntVar;
 			return res;
 		break;
     case VAL_FLOAT_SLIDER:
-			*m_fvar = m_FloatSlider->GetValue();
+			*m_FloatVar = m_FloatSlider->GetValue();
+      m_WidgetData.fValue = *m_FloatVar;
     break;
     case VAL_CHECKBOX:
-			*m_ivar = m_CheckBox->GetValue();
+			*m_IntVar = m_CheckBox->GetValue();
+      m_WidgetData.iValue = *m_IntVar;
     break;
     case VAL_RADIOBOX:
-			*m_ivar = m_RadioBox->GetSelection();
+			*m_IntVar = m_RadioBox->GetSelection();
+      m_WidgetData.iValue = *m_IntVar;
     break;
     case VAL_COMBOBOX:
-			*m_ivar = m_ComboBox->GetSelection();
+			*m_IntVar = m_ComboBox->GetSelection();
+      m_WidgetData.iValue = *m_IntVar;
     break;
     case VAL_DIROPEN:
     case VAL_FILEOPEN:
     case VAL_FILESAVE:
     break;
     case VAL_COLOR:
-			*m_cvar=m_TextCtrl->GetBackgroundColour();
+			*m_ColorVar = m_TextCtrl->GetBackgroundColour();
     break;
   }
   return TRUE;
@@ -741,12 +822,12 @@ void mmgValidator::OnChar(wxKeyEvent& event)
   //Filter key for TextCtrl used for numeric input
   int keyCode = (int)event.KeyCode();
 
-  if (keyCode == WXK_RETURN && m_mode == VAL_STRING)
+  if (keyCode == WXK_RETURN && m_Mode == VAL_STRING)
   {
     // Return is received only from widget with the wxTE_PROCESS_ENTER style flag enabled
     // i.e. console widget
     TransferFromWindow();
-    mafEventMacro(mafEvent(m_TextCtrl, m_mid));
+    mafEventMacro(mafEvent(m_TextCtrl, m_ModuleId));
     return; // eat message
   }
 
@@ -756,12 +837,12 @@ void mmgValidator::OnChar(wxKeyEvent& event)
 		event.Skip();
 		return;
   }
-  if ( m_mode==VAL_FLOAT || m_mode==VAL_DOUBLE || m_mode==VAL_FLOAT_SLIDER_2 )
+  if ( m_Mode == VAL_FLOAT || m_Mode == VAL_DOUBLE || m_Mode == VAL_FLOAT_SLIDER_2 )
   {
 		if( !(wxIsdigit(keyCode) ||keyCode== '-' ||keyCode== ',' ||keyCode== '.' ||keyCode== 'e' ||keyCode== 'E') )
 			return; // eat message
   }
-  if ( m_mode==VAL_INTEGER || m_mode==VAL_SLIDER_2 )
+  if ( m_Mode == VAL_INTEGER || m_Mode == VAL_SLIDER_2 )
   {
 		if( !(wxIsdigit(keyCode) ||keyCode== '-') )
 			return; // eat message
@@ -772,14 +853,14 @@ void mmgValidator::OnChar(wxKeyEvent& event)
 void mmgValidator::OnKillFocus(wxFocusEvent& event)
 //----------------------------------------------------------------------------
 {
-  if (m_mode == VAL_STRING || m_mode == VAL_INTEGER || m_mode == VAL_FLOAT || 
-			m_mode == VAL_DOUBLE || m_mode == VAL_FLOAT_SLIDER_2 || m_mode == VAL_SLIDER_2)
+  if (m_Mode == VAL_STRING || m_Mode == VAL_INTEGER || m_Mode == VAL_FLOAT || 
+			m_Mode == VAL_DOUBLE || m_Mode == VAL_FLOAT_SLIDER_2 || m_Mode == VAL_SLIDER_2)
     if ( IsValid() )
     {
       Validate(NULL);
       bool send_message = TransferFromWindow();
       if(send_message)
-        mafEventMacro(mafEvent(m_TextCtrl, m_mid));
+        mafEventMacro(mafEvent(m_TextCtrl, m_ModuleId));
     }
   event.Skip();
 }
@@ -790,19 +871,19 @@ void mmgValidator::OnScrollEvent(wxScrollEvent& event)
   wxString s;
   if ( IsValid() )
   {
-    switch (m_mode) 
+    switch (m_Mode) 
 		{
       case VAL_SLIDER:
 				TransferFromWindow();
-				s.Printf("%d",*m_ivar);
+				s.Printf("%d",*m_IntVar);
 				m_TextCtrl->SetValue(s);
-				mafEventMacro(mafEvent(m_Slider, m_mid));
+				mafEventMacro(mafEvent(m_Slider, m_ModuleId));
       break;
       case VAL_FLOAT_SLIDER:
 				TransferFromWindow();
-				s.Printf("%g",*m_fvar);
+				s.Printf("%g",*m_FloatVar);
 				m_TextCtrl->SetValue(s);
-				mafEventMacro(mafEvent(m_FloatSlider, m_mid));
+				mafEventMacro(mafEvent(m_FloatSlider, m_ModuleId));
       break;
 		}
   }
@@ -815,16 +896,16 @@ void mmgValidator::OnCommandEvent(wxCommandEvent& event)
   if ( IsValid() )
   {
     TransferFromWindow();
-    switch (m_mode) 
+    switch (m_Mode) 
 		{
       case VAL_CHECKBOX:
-           mafEventMacro(mafEvent(m_CheckBox, m_mid));
+           mafEventMacro(mafEvent(m_CheckBox, m_ModuleId));
       break;
       case VAL_RADIOBOX:
-           mafEventMacro(mafEvent(m_RadioBox, m_mid));
+           mafEventMacro(mafEvent(m_RadioBox, m_ModuleId));
       break;
       case VAL_COMBOBOX:
-           mafEventMacro(mafEvent(m_ComboBox, m_mid));
+           mafEventMacro(mafEvent(m_ComboBox, m_ModuleId));
       break;
     }
   }
@@ -842,20 +923,20 @@ void mmgValidator::OnButton(wxCommandEvent& event)
   
   if ( IsValid() )
   {
-    switch(m_mode)
+    switch(m_Mode)
     {
       case VAL_BUTTON:
       break;
       case VAL_DIROPEN:
       {
-        wxSplitPath(m_svar->c_str(), &path, &name, &ext);
+        wxSplitPath(m_MafStringVar->GetCStr(), &path, &name, &ext);
         wxDirDialog dialog(m_Button,"", path, 0, m_Button->GetPosition());
 				dialog.SetReturnCode(wxID_OK);
 				ret_code = dialog.ShowModal();
         if (ret_code == wxID_OK)
         {
           path = dialog.GetPath();
-         *m_svar = path;
+          *m_MafStringVar = path.c_str();
           m_TextCtrl->SetLabel(path);
         }
 				else
@@ -866,20 +947,20 @@ void mmgValidator::OnButton(wxCommandEvent& event)
       break;
       case VAL_FILEOPEN:
       {
-        wxSplitPath(m_svar->c_str(), &path, &name, &ext);
+        wxSplitPath(m_MafStringVar->GetCStr(), &path, &name, &ext);
 				if (ext.Len() >0 )
 				{
 					name += ".";
 					name += ext;
 				}
-        wxFileDialog dialog(m_Button,"Open File", path, name, m_wildcard.GetCStr(), wxOPEN|wxFILE_MUST_EXIST|wxHIDE_READONLY , m_Button->GetPosition());
+        wxFileDialog dialog(m_Button,"Open File", path, name, m_Wildcard.GetCStr(), wxOPEN|wxFILE_MUST_EXIST|wxHIDE_READONLY , m_Button->GetPosition());
         dialog.SetReturnCode(wxID_OK);
 				ret_code = dialog.ShowModal();
 				if (ret_code == wxID_OK)
         {
           path = dialog.GetPath();
           name = dialog.GetFilename();
-         *m_svar = path;
+          *m_MafStringVar = path.c_str();
           m_TextCtrl->SetLabel(name);
         }
 				else
@@ -890,18 +971,18 @@ void mmgValidator::OnButton(wxCommandEvent& event)
       break;
       case VAL_FILESAVE:
       {
-        wxSplitPath(m_svar->c_str(), &path, &name, &ext);
+        wxSplitPath(m_MafStringVar->GetCStr(), &path, &name, &ext);
 				if (ext.Len() >0 )
 				{
 					name += ".";
 					name += ext;
 				}
-        wxFileDialog dialog(m_Button,"Save File", path, name, m_wildcard.GetCStr(), wxSAVE|wxOVERWRITE_PROMPT|wxHIDE_READONLY , m_Button->GetPosition());
+        wxFileDialog dialog(m_Button,"Save File", path, name, m_Wildcard.GetCStr(), wxSAVE|wxOVERWRITE_PROMPT|wxHIDE_READONLY , m_Button->GetPosition());
         dialog.SetReturnCode(wxID_OK);
 				ret_code = dialog.ShowModal();
 				if (ret_code == wxID_OK)
         {
-          *m_svar = dialog.GetPath();
+          *m_MafStringVar = dialog.GetPath().c_str();
           m_TextCtrl->SetLabel(dialog.GetFilename());
         }
 				else
@@ -935,6 +1016,38 @@ void mmgValidator::OnButton(wxCommandEvent& event)
 		( (wxPanel*)m_Button->GetParent() )->SetDefaultItem(NULL);
 		mafYield(); 
 
-		if (!cancel) mafEventMacro(mafEvent(m_Button, m_mid));
+		if (!cancel) mafEventMacro(mafEvent(m_Button, m_ModuleId));
 	}
+}
+//----------------------------------------------------------------------------
+void mmgValidator::GetWidgetData(WidgetDataType &widget_data)
+//----------------------------------------------------------------------------
+{
+  widget_data.dType  = m_WidgetData.dType;
+  widget_data.dValue = m_WidgetData.dValue;
+  widget_data.fValue = m_WidgetData.fValue;
+  widget_data.iValue = m_WidgetData.iValue;
+  widget_data.sValue = m_WidgetData.sValue;
+}
+//----------------------------------------------------------------------------
+void mmgValidator::SetWidgetData(WidgetDataType &widget_data)
+//----------------------------------------------------------------------------
+{
+  switch(widget_data.dType) 
+  {
+    case INT_DATA:
+      *m_IntVar = widget_data.iValue;
+    break;
+    case FLOAT_DATA:
+      *m_FloatVar = widget_data.fValue;
+    break;
+    case DOUBLE_DATA:
+      *m_DoubleVar = widget_data.dValue;
+    break;
+    case STRING_DATA:
+      *m_StringVar    = widget_data.sValue;
+      *m_MafStringVar = widget_data.sValue;
+    break;
+  }
+  TransferToWindow();
 }
