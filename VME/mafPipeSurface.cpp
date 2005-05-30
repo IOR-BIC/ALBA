@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 12:17:34 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-30 15:58:20 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,6 +22,7 @@
 #include "mafPipeSurface.h"
 #include "mafSceneNode.h"
 #include "mafVMESurface.h"
+#include "mmaMaterial.h"
 #include "vtkMAFAssembly.h"
 
 //@@@ #include "mafDecl.h"
@@ -40,7 +41,9 @@
 #include "vtkActor.h"
 #include "vtkProperty.h"
 
+//----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeSurface);
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mafPipeSurface::mafPipeSurface() 
@@ -67,11 +70,6 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
   m_sel_p   = NULL;;
   m_sel_a   = NULL;;
 
-	//@@@ m_use_axes = use_axes;
-	//@@@ mafVmeData *data = (mafVmeData*) m_Vme->GetClientData();
-	//@@@ assert(data);
-  //@@@ m_Vme->UpdateCurrentData();
-
   assert(m_Vme->IsA("mafVMESurface"));
   mafVMESurface *vme = ((mafVMESurface*) m_Vme);
   assert(vme->GetSurfaceOutput());
@@ -88,8 +86,8 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
 		m_act_m->ImmediateModeRenderingOff();
 
   m_act_a = vtkActor::New();
-	//@@@ m_act_a->SetProperty(data->m_mat_gui->GetMaterial()->m_prop);
 	m_act_a->SetMapper(m_act_m);
+  m_act_a->SetProperty(vme->GetMaterial()->m_Prop);
 
   m_AssemblyFront->AddPart(m_act_a);
 
