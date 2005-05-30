@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-19 13:36:14 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-05-30 09:11:16 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,6 +23,7 @@
 #include "mafLogicWithManagers.h"
 
 #include "mafView.h"
+#include "mafOp.h"
 #include "mafViewManager.h"
 #include "mafVMEManager.h"
 #include "mafOpManager.h"
@@ -47,6 +48,10 @@ mafLogicWithManagers::mafLogicWithManagers()
   m_RecentFileMenu;
   m_OpMenu;
   m_ViewMenu; 
+
+  m_BuildOpMenu       = false;
+  m_BuildImporterMenu = false;
+  m_BuildExporterMenu = false;
 }
 //----------------------------------------------------------------------------
 mafLogicWithManagers::~mafLogicWithManagers( ) 
@@ -86,13 +91,20 @@ void mafLogicWithManagers::Configure()
 void mafLogicWithManagers::Plug(mafView* view) 
 //----------------------------------------------------------------------------
 {
-  if(m_ViewManager) m_ViewManager->ViewAdd(view);
+  if(m_ViewManager) 
+    m_ViewManager->ViewAdd(view);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Plug(mafOp *op)
 //----------------------------------------------------------------------------
 {
-  if(m_OpManager) m_OpManager->OpAdd(op);
+  if(m_OpManager) 
+  {
+    m_OpManager->OpAdd(op);
+    if(op->GetType() == OPTYPE_OP) m_BuildOpMenu = true;
+    if(op->GetType() == OPTYPE_IMPORTER) m_BuildImporterMenu = true;
+    if(op->GetType() == OPTYPE_EXPORTER) m_BuildExporterMenu = true;
+  }
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Show()
@@ -104,14 +116,15 @@ void mafLogicWithManagers::Show()
   if(m_UseViewManager && m_ViewMenu)
     m_ViewManager->FillMenu(m_ViewMenu);
 
-  if(m_OpManager )
+  if(m_OpManager)
   {
-    if(m_MenuBar && m_ImportMenu && m_OpMenu && m_ExportMenu) 
+    if(m_MenuBar && (m_ImportMenu || m_OpMenu || m_ExportMenu))
     {
       m_OpManager->FillMenu(m_ImportMenu,m_ExportMenu,m_OpMenu);
       m_OpManager->SetMenubar(m_MenuBar);
     }
-    if(m_TooBar)  m_OpManager->SetToolbar(m_TooBar);
+    if(m_TooBar)
+      m_OpManager->SetToolbar(m_TooBar);
   }
 
   mafLogicWithGUI::Show();
@@ -147,15 +160,18 @@ void mafLogicWithManagers::CreateMenu()
   file_menu->Append(MENU_FILE_OPEN,  "&Open ..");
   file_menu->Append(MENU_FILE_SAVE,  "&Save");
   file_menu->Append(MENU_FILE_SAVEAS,"Save &As ..");
-  file_menu->AppendSeparator();
-
-  wxMenu *import_menu = NULL;
-  wxMenu *export_menu = NULL;
 
   m_ImportMenu = new wxMenu;
-  file_menu->Append(0,"Import",m_ImportMenu );
+  if (m_BuildImporterMenu)
+  {
+    file_menu->AppendSeparator();
+    file_menu->Append(0,"Import",m_ImportMenu );
+  } 
   m_ExportMenu = new wxMenu;
-  file_menu->Append(0,"Export",m_ExportMenu);					
+  if (m_BuildExporterMenu)
+  {
+    file_menu->Append(0,"Export",m_ExportMenu);					
+  }
   file_menu->AppendSeparator();
 
   m_RecentFileMenu = new wxMenu;
@@ -178,8 +194,8 @@ void mafLogicWithManagers::CreateMenu()
 
   m_ViewMenu = new wxMenu;
   //m_ViewManager->FillMenu(m_ViewMenu);  
-  m_ViewMenu->AppendSeparator();
-  if(this->m_PlugToolbar) m_ViewMenu->Append(MENU_VIEW_TOOLBAR, "Toolbar","",true);
+  if(this->m_PlugToolbar) 
+    m_ViewMenu->Append(MENU_VIEW_TOOLBAR, "Toolbar","",true);
   m_MenuBar->Append(m_ViewMenu, "&View");
 
   m_OpMenu = new wxMenu;
@@ -203,7 +219,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *event)
   {
     if(e->GetId()!= UPDATE_UI)
     {
-      e->Log(); // for debugging pourpose
+      e->Log(); // for debugging purpose
       int foo=0;
     }
 
