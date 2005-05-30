@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-30 09:11:16 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-05-30 15:51:09 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,6 +28,8 @@ class mafVMEManager;
 class mafViewManager;
 class mafOpManager;
 class mafSideBar;
+class mmgMaterialChooser;
+class mafVME;
 
 //----------------------------------------------------------------------------
 // mafLogicWithManagers :
@@ -138,6 +140,9 @@ protected:
 	virtual void VmeRemoving(mafNode *vme);
 	/** Respond to a VME_CHOOSE evt. Build a dialog containing the vme tree and return the vme choosed from the user. */
 	virtual mafNode *VmeChoose(long vme_accept_function = 0, long style = REPRESENTATION_AS_TREE, mafString title = "Choose Node");
+
+  /** Build a dialog to show all available materials. */	
+  virtual void VmeChooseMaterial(mafVME *vme, bool updateProperty);
 	
   /** Called when an operation starts. Disable all menu and lock the Selection */ 
 	virtual void OpRunStarting();
@@ -163,10 +168,12 @@ protected:
   /** Called after FileOpen or Save operation */
   void UpdateFrameTitle();
 
-  mafSideBar *m_SideBar;
-  mafVMEManager *m_VMEManager;
-  mafViewManager *m_ViewManager;
-  mafOpManager   *m_OpManager;
+  mafSideBar      *m_SideBar;
+  mafVMEManager   *m_VMEManager;
+  mafViewManager  *m_ViewManager;
+  mafOpManager    *m_OpManager;
+
+  mmgMaterialChooser *m_MaterialChooser;
 
   wxMenu *m_ImportMenu; 
   wxMenu *m_ExportMenu; 

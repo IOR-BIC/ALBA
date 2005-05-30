@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-30 09:11:16 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2005-05-30 15:51:09 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,6 +32,7 @@
 #include "mmgMDIChild.h"
 #include "mafSideBar.h"
 #include "mmgTimeBar.h"
+#include "mmgMaterialChooser.h"
 
 //----------------------------------------------------------------------------
 mafLogicWithManagers::mafLogicWithManagers()
@@ -52,12 +53,14 @@ mafLogicWithManagers::mafLogicWithManagers()
   m_BuildOpMenu       = false;
   m_BuildImporterMenu = false;
   m_BuildExporterMenu = false;
+
+  m_MaterialChooser  = new mmgMaterialChooser();
 }
 //----------------------------------------------------------------------------
 mafLogicWithManagers::~mafLogicWithManagers( ) 
 //----------------------------------------------------------------------------
 {
-  // Managers are distructed in the OnClose 
+  // Managers are destruct in the OnClose 
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Configure()
@@ -282,6 +285,9 @@ void mafLogicWithManagers::OnEvent(mafEventBase *event)
         else
           e->SetVme(VmeChoose(e->GetArg(), e->GetBool()));
       }
+      break;
+    case VME_CHOOSE_MATERIAL:
+      VmeChooseMaterial((mafVME *)e->GetVme(), e->GetBool());
       break;
       // ###############################################################
       // commands related to OP
@@ -623,4 +629,15 @@ mafNode* mafLogicWithManagers::VmeChoose(long vme_accept_function, long style, m
 {
   mmgVMEChooser vc(m_SideBar->GetTree(),title.GetCStr(), vme_accept_function, style);
   return vc.ShowChooserDialog();
+}
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::VmeChooseMaterial(mafVME *vme, bool updateProperty)
+//----------------------------------------------------------------------------
+{
+  if(m_MaterialChooser->ShowChooserDialog(vme))
+  {
+    this->m_ViewManager->PropertyUpdate(updateProperty);
+    this->m_ViewManager->CameraUpdate();
+    this->m_VMEManager->MSFModified(true);
+  }
 }
