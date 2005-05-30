@@ -86,8 +86,12 @@ IF (MAF_USE_VTK)
   mmaMaterial.h
   mmaMeter.cpp
   mmaMeter.h
+  mmgListCtrlBitmap.cpp
+  mmgListCtrlBitmap.h
   mmgMaterialButton.cpp
   mmgMaterialButton.h
+  mmgMaterialChooser.cpp
+  mmgMaterialChooser.h
   mmgVMEChooser.cpp
   mmgVMEChooser.h
   mmgVMEChooserAccept.cpp
