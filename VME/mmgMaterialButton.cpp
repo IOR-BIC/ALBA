@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMaterialButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:52:40 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-30 15:53:51 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -37,7 +37,7 @@ mmgMaterialButton::mmgMaterialButton(mafVME *vme, mafObserver *listener)
   m_Material = (mmaMaterial *)m_Vme->GetAttribute("MaterialAttributes");
   if (m_Material == NULL)
   {
-    mafNEW(m_Material);
+    m_Material = mmaMaterial::New();
     m_Vme->SetAttribute("MaterialAttributes", m_Material);
   }
 
@@ -78,7 +78,7 @@ void mmgMaterialButton::CreateGui()
   m_MaterialButton->Refresh();
 
   m_MaterialLabel = new wxStaticText(m_Gui,ID_MATERIAL,"",wxDefaultPosition, wxSize(100,16), wxST_NO_AUTORESIZE );
-  m_MaterialLabel->SetLabel(m_Material->m_Name.GetCStr());
+  m_MaterialLabel->SetLabel(m_Material->m_MaterialName.GetCStr());
 
   wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
   sizer->Add( lab,          0, wxALIGN_CENTRE|wxRIGHT, 5 );
@@ -98,14 +98,10 @@ void mmgMaterialButton::OnEvent(mafEventBase *event)
     {
       case ID_MATERIAL:
         mafEventMacro(mafEvent(this,VME_CHOOSE_MATERIAL,m_Vme));
-        m_MaterialLabel->SetLabel(m_Material->m_Name.GetCStr());
+        m_MaterialLabel->SetLabel(m_Material->m_MaterialName.GetCStr());
         cppDEL(m_Material->m_Icon);
-        m_Material->MakeIcon();
-        //m_Material->StoreToVme();
-        m_MaterialButton->SetBitmapLabel(*m_Material->m_Icon);
-        m_MaterialButton->Refresh();
+        UpdateMaterialIcon();
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-        m_Gui->Update();
       break;
       default:
         e->Log();
@@ -120,6 +116,7 @@ void mmgMaterialButton::UpdateMaterialIcon()
 	{
 		m_Material->MakeIcon();
 		m_MaterialButton->SetBitmapLabel(*m_Material->m_Icon);
+    m_MaterialButton->Refresh();
 	}
   m_Gui->Update();
 }
