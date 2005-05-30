@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:39:08 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-05-30 13:39:30 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -151,7 +151,7 @@ int mafStorageElement::RestoreObjectVector(mafStorageElement *subnode,std::vecto
   mafID numItems=-1;
   if (!subnode->GetAttributeAsInteger("NumberOfItems",numItems))
   {
-    mafWarningMacro("Warning while restoring <"<<GetName()<<"> element: cannot find \"NumberOfItems\" attribute..." );
+    mafWarningMacro("Warning while restoring vector of objects from element <"<<GetName()<<">: cannot find \"NumberOfItems\" attribute..." );
   }
 
   int num=0;
@@ -169,7 +169,9 @@ int mafStorageElement::RestoreObjectVector(mafStorageElement *subnode,std::vecto
       else
       {
         fail=true;
-        mafWarningMacro("Error while restoring element <"<<GetName()<<"> element: cannot restore object");
+        mafString type_name;
+        item->GetAttribute("Type",type_name);
+        mafWarningMacro("Error while restoring vector of objects from element <"<<GetName()<<">: cannot restore object from element <"<<item->GetName()<<">, object's Type=\""<<type_name.GetCStr()<<"\".");
         // try continue restoring other objects
         GetStorage()->SetErrorCode(mafStorage::IO_WRONG_OBJECT_TYPE);
       }
@@ -284,7 +286,7 @@ mafObject *mafStorageElement::RestoreObject()
     }    
     else
     {
-      mafErrorMacro("Cannot restore object of type \""<<type_name<<"\" from element <"<<GetName()<<"> since this object type is unknown.");
+      mafErrorMacro("Cannot restore object of type \""<<type_name.GetCStr()<<"\" from element <"<<GetName()<<"> since this object type is unknown.");
     }
   }
   else
