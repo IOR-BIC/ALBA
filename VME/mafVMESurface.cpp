@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-30 12:54:38 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-05-30 15:55:50 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -55,7 +55,7 @@ mafVMESurface::~mafVMESurface()
   // data pipe destroyed in mafVME
   // data vector destroyed in mafVMEGeneric
 
-  cppDEL(m_MaterialButton);
+  //cppDEL(m_MaterialButton);
 }
 
 
