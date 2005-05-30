@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:49:24 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-05-30 15:57:13 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,6 +30,8 @@
 #include "mafVMEVolume.h"
 #include "mafVMEPolyline.h"
 #include "mafVMEMeter.h"
+#include "mmaMeter.h"
+#include "mmaMaterial.h"
 #include "mafTagArray.h"
 #include "mafIndent.h"
 #include <string>
@@ -70,6 +72,8 @@ mafVMEFactory::mafVMEFactory()
 
   mafPlugObjectMacro(mafTagArray,"a basic kind of attribute used to store key-value pairs");
   mafPlugObjectMacro(mafVMEItemVTK,"a VME item storing VTK datasets");
+  mafPlugObjectMacro(mmaMeter,"Meter attributes");
+  mafPlugObjectMacro(mmaMaterial,"Material attributes");
   mafPlugNodeMacro(mafVMERoot,"root for VME tree");
   mafPlugNodeMacro(mafVMEGroup,"VME used for composing assemblies");
   mafPlugNodeMacro(mafVMEGeneric,"Generic VME storing VTK datasets");
