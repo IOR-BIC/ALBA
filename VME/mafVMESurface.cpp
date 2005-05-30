@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:51:33 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-05-30 12:54:38 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -119,6 +119,10 @@ void mafVMESurface::OnEvent(mafEventBase *event)
       default:
         mafVME::OnEvent(event);
     }
+  }
+  else
+  {
+    Superclass::OnEvent(event);
   }
 }
 

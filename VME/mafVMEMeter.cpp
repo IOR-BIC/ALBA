@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-30 09:12:16 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-05-30 12:54:38 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -740,5 +740,9 @@ void mafVMEMeter::OnEvent(mafEventBase *event)
       default:
         mafNode::OnEvent(event);
     }
+  }
+  else
+  {
+    Superclass::OnEvent(event);
   }
 }

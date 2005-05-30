@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 14:37:32 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-05-30 12:54:37 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -1095,6 +1095,10 @@ void mafVMELandmarkCloud::OnEvent(mafEventBase *event)
       default:
         mafVME::OnEvent(event);
     }
+  }
+  else
+  {
+    Superclass::OnEvent(event);
   }
 }
 //-------------------------------------------------------------------------

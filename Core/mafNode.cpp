@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:43:21 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2005-05-30 12:54:08 $
+  Version:   $Revision: 1.31 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -877,14 +877,13 @@ void mafNode::OnEvent(mafEventBase *e)
     };
     return;
   }
-  if (e->GetChannel()==MCH_DOWN)
+  else if (e->GetChannel()==MCH_DOWN)
   {
     ForwardDownEvent(e);
     return;
   }
-
   // events arriving directly from another node
-  if (e->GetChannel()==MCH_NODE)
+  else if (e->GetChannel()==MCH_NODE)
   {
     switch (e->GetId())
     {

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:44:57 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2005-05-30 12:54:09 $
+  Version:   $Revision: 1.23 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -729,9 +729,8 @@ void mafVME::OnEvent(mafEventBase *e)
       SetTimeStamp(*((mafTimeStamp *)e->GetData()));
     break;
     }
-   }
-  
-  if (e->GetChannel()==MCH_UP)
+  }
+  else if (e->GetChannel()==MCH_UP)
   {
     switch (e->GetId())
     {
@@ -747,6 +746,7 @@ void mafVME::OnEvent(mafEventBase *e)
       break;
       case ID_VME_CRYPTING:
         m_Crypting = ((mafEvent *)e)->GetBool();
+        return;
       break;
     }
   }
