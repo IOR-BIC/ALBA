@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:43:10 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-05-30 09:10:44 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,15 +50,15 @@ mafViewManager::mafViewManager()
   //m_selected_rwi = NULL;
   //m_is=NULL;
 
-  m_vlist              = NULL;
+  m_ViewList              = NULL;
   m_Listener           = NULL;
-  m_selected_vme       = NULL;
-  m_selected_view      = NULL;
-	m_root_vme           = NULL;
-  m_view_being_created = NULL; 
-  m_tcount       = 0;
+  m_SelectedVme       = NULL;
+  m_SelectedView      = NULL;
+	m_RootVme           = NULL;
+  m_ViewBeingCreated = NULL; 
+  m_TemplateNum       = 0;
   for(int i=0; i<MAXVIEW; i++) 
-    m_t[i]=NULL;
+    m_ViewTemplate[i]=NULL;
 
   // Paolo 2005-04-22
   for(int t=0; t<MAXVIEW; t++)
@@ -75,14 +75,14 @@ mafViewManager::~mafViewManager( )
 	*/
 	mafView *v;
 
-  while(m_vlist)
+  while(m_ViewList)
   {
-    v = m_vlist;
-    m_vlist = v->m_Next;
+    v = m_ViewList;
+    m_ViewList = v->m_Next;
     delete v;
   }
 
-  for(int i=0; i<m_tcount; i++) delete m_t[i];
+  for(int i=0; i<m_TemplateNum; i++) delete m_ViewTemplate[i];
 }
 /*
 //----------------------------------------------------------------------------
@@ -90,8 +90,8 @@ void mafViewManager::SetMouseAction(mafAction *action)
 //----------------------------------------------------------------------------
 {
   m_MouseAction = action;
-  if(m_selected_view)
-    m_MouseAction->ProcessEvent(mafSmartEvent(this,ViewSelectedEvent,m_selected_view));
+  if(m_SelectedView)
+    m_MouseAction->ProcessEvent(mafSmartEvent(this,ViewSelectedEvent,m_SelectedView));
 }
 */
 //----------------------------------------------------------------------------
@@ -114,7 +114,7 @@ void mafViewManager::OnEvent(mafEventBase *event)
         //		mafRWIBase* rwi = (mafRWIBase*) e->GetWin();   
         //		if(!rwi) rwi = view->GetDefaultRWI();
 
-        bool notifylogic = (view != m_selected_view);
+        bool notifylogic = (view != m_SelectedView);
 
         ViewSelected(view/*, rwi*/);
 
@@ -132,73 +132,73 @@ void mafViewManager::OnEvent(mafEventBase *event)
 void mafViewManager::ViewAdd(mafView *view)   
 //----------------------------------------------------------------------------
 {
-  m_t[m_tcount] = view;
-	view->m_Id = m_tcount + VIEW_START;
+  m_ViewTemplate[m_TemplateNum] = view;
+	view->m_Id = m_TemplateNum + VIEW_START;
   view->m_Mult = 0; // Paolo 2005-04-22
   view->SetListener(this);
 
-  m_tcount++;    
+  m_TemplateNum++;    
 }
 //----------------------------------------------------------------------------
 void mafViewManager::ViewSelected(mafView *view/*, mafRWIBase *rwi*/)
 //----------------------------------------------------------------------------
 {
-  m_selected_view = view;
+  m_SelectedView = view;
 
   //if(m_selected_rwi)
   //  m_selected_rwi->SetInteractorStyle(NULL);
   //m_selected_rwi = rwi;
 
-  //m_MouseAction->ProcessEvent(mafSmartEvent(this,ViewSelectedEvent,m_selected_view),mafDevice::DeviceOutputChannel);
+  //m_MouseAction->ProcessEvent(mafSmartEvent(this,ViewSelectedEvent,m_SelectedView),mafDevice::DeviceOutputChannel);
 }
 //----------------------------------------------------------------------------
 void mafViewManager::VmeAdd(mafNode *n)   
 //----------------------------------------------------------------------------
 {
-  for(mafView* v = m_vlist; v; v=v->m_Next) 
+  for(mafView* v = m_ViewList; v; v=v->m_Next) 
     v->VmeAdd(n);
 
   wxString s;
   s = n->GetTypeName();
   if(s == "mafVMERoot") 
   {
-    m_root_vme     = (mafVMERoot*)n;
-    m_selected_vme = n;     // Paolo 24-06-2004 Adding new tree, selected vme must be initialized at the root.
+    m_RootVme     = (mafVMERoot*)n;
+    m_SelectedVme = n;     // Paolo 24-06-2004 Adding new tree, selected vme must be initialized at the root.
   }
 }
 //----------------------------------------------------------------------------
 void mafViewManager::VmeRemove(mafNode *n)   
 //----------------------------------------------------------------------------
 {
-  for(mafView* v = m_vlist; v; v=v->m_Next) 
+  for(mafView* v = m_ViewList; v; v=v->m_Next) 
     v->VmeRemove(n);
 
 	wxString s(n->GetTypeName());
 	if(s == "mafVMERoot") 
   {
-    m_root_vme     = NULL;
-    m_selected_vme = NULL;   // Paolo 24-06-2004 Removing the tree, selected vme must be set to NULL.
+    m_RootVme     = NULL;
+    m_SelectedVme = NULL;   // Paolo 24-06-2004 Removing the tree, selected vme must be set to NULL.
   }
 }
 //----------------------------------------------------------------------------
 void mafViewManager::VmeModified(mafNode *vme)
 //---------------------------------------------------------------------------
 {
- //@@@ for(mafView* v = m_vlist; v; v=v->m_next) 
+ //@@@ for(mafView* v = m_ViewList; v; v=v->m_next) 
  //@@@   v->VmeModified(vme);  -- view::vmeModified not exist now -- is this required ?  //SIL. 21-4-2005: 
 }
 //----------------------------------------------------------------------------
 void mafViewManager::VmeSelect(mafNode *n)   
 //----------------------------------------------------------------------------
 {
-	if(n != m_selected_vme)
+	if(n != m_SelectedVme)
 	{
-		if(m_selected_vme)
-			for(mafView* v = m_vlist; v; v=v->m_Next) 
-				v->VmeSelect(m_selected_vme,false); //deselect the previous selected vme
-		m_selected_vme = n;
+		if(m_SelectedVme)
+			for(mafView* v = m_ViewList; v; v=v->m_Next) 
+				v->VmeSelect(m_SelectedVme,false); //deselect the previous selected vme
+		m_SelectedVme = n;
 	}
-	for(mafView* v = m_vlist; v; v=v->m_Next) 
+	for(mafView* v = m_ViewList; v; v=v->m_Next) 
     v->VmeSelect(n,true); //select the new one
 	CameraUpdate();
 }
@@ -206,15 +206,15 @@ void mafViewManager::VmeSelect(mafNode *n)
 void mafViewManager::VmeShow(mafNode *n, bool show)   
 //----------------------------------------------------------------------------
 {
- if(m_view_being_created) // Important - test m_view_being_created first
+ if(m_ViewBeingCreated) // Important - test m_ViewBeingCreated first
  {
-   m_view_being_created->VmeShow(n,show);
+   m_ViewBeingCreated->VmeShow(n,show);
  }
  else
  {
-	 if(m_selected_view)
+	 if(m_SelectedView)
 	 {
-     m_selected_view->VmeShow(n,show);
+     m_SelectedView->VmeShow(n,show);
 	 }
  }
 }
@@ -222,28 +222,28 @@ void mafViewManager::VmeShow(mafNode *n, bool show)
 void mafViewManager::PropertyUpdate(bool fromTag)
 //----------------------------------------------------------------------------
 {
-  for(mafView* v = m_vlist; v; v=v->m_Next) 
-		v->VmeUpdateProperty(this->m_selected_vme, fromTag);
+  for(mafView* v = m_ViewList; v; v=v->m_Next) 
+		v->VmeUpdateProperty(this->m_SelectedVme, fromTag);
 }
 //----------------------------------------------------------------------------
 void mafViewManager::CameraReset(bool sel)   
 //----------------------------------------------------------------------------
 {
-  //@@@ if(m_selected_view) m_selected_view->CameraReset( sel ? m_selected_vme : NULL);
-  if(m_selected_view) m_selected_view->CameraReset();
+  //@@@ if(m_SelectedView) m_SelectedView->CameraReset( sel ? m_SelectedVme : NULL);
+  if(m_SelectedView) m_SelectedView->CameraReset();
 }
 //----------------------------------------------------------------------------
 void mafViewManager::CameraReset(mafNode *vme)   
 //----------------------------------------------------------------------------
 {
-  //@@@ if(m_selected_view) m_selected_view->CameraReset(vme);
-  if(m_selected_view) m_selected_view->CameraReset();
+  //@@@ if(m_SelectedView) m_SelectedView->CameraReset(vme);
+  if(m_SelectedView) m_SelectedView->CameraReset();
 }
 //----------------------------------------------------------------------------
 void mafViewManager::CameraUpdate()   
 //----------------------------------------------------------------------------
 {
-  for(mafView* v = m_vlist; v; v=v->m_Next) 
+  for(mafView* v = m_ViewList; v; v=v->m_Next) 
     v->CameraUpdate();;
 }
 //----------------------------------------------------------------------------
@@ -262,9 +262,13 @@ void mafViewManager::FillMenu (wxMenu* menu)
 //----------------------------------------------------------------------------
 {
   wxString s;
-	for(int i=0; i<m_tcount; i++)
+  if (m_TemplateNum > 0)
+  {
+    menu->AppendSeparator();
+  }
+	for(int i=0; i<m_TemplateNum; i++)
 	{
-    mafView* v = m_t[i];  
+    mafView* v = m_ViewTemplate[i];  
 	  s = wxString::Format("create new %s view",v->GetLabel().c_str());
 	  menu->Append(v->m_Id, s, (wxMenu *)NULL, s );	
   }
@@ -277,12 +281,12 @@ mafView *mafViewManager::ViewCreate(int id)
 	mafView* view = NULL;
   int index = id - VIEW_START;
 
-	if( index <0 || index > m_tcount) 
+	if( index <0 || index > m_TemplateNum) 
 	{
     assert(false); 
 		return NULL;
   }
-	view = m_t[index];
+	view = m_ViewTemplate[index];
   if(!view) return NULL;
 
   // Paolo 2005-04-22
@@ -299,9 +303,9 @@ mafView *mafViewManager::ViewCreate(int id)
   
 	// during ViewInsert the View may send Events that will not be forwarded because 
 	// the view isn't already selected - 
-	m_view_being_created = new_view;
+	m_ViewBeingCreated = new_view;
 	ViewInsert(new_view);
-	m_view_being_created = NULL;
+	m_ViewBeingCreated = NULL;
 
   mafEventMacro(mafEvent(this,VIEW_CREATED,new_view)); // ask Logic to create the frame
 	
@@ -317,12 +321,12 @@ mafView *mafViewManager::ViewCreate(wxString type)
 	mafView* view     = NULL;
 
 	int index = 0;
-  for(; index<m_tcount; index++)
+  for(; index<m_TemplateNum; index++)
 	{
-    wxString t = typeid(*m_t[index]).name();
+    wxString t = typeid(*m_ViewTemplate[index]).name();
 		if(t == type )
 		{
-	    view = m_t[index];
+	    view = m_ViewTemplate[index];
 			break;
 		}
 	}
@@ -340,9 +344,9 @@ mafView *mafViewManager::ViewCreate(wxString type)
   //update the matrix containing all created view
   m_ViewMatrixID[index][view_mult] = new_view;
 
-  m_view_being_created = new_view;
+  m_ViewBeingCreated = new_view;
 	ViewInsert(new_view);
-	m_view_being_created = NULL;
+	m_ViewBeingCreated = NULL;
 
   mafEventMacro(mafEvent(this,VIEW_CREATED,new_view));
 
@@ -355,23 +359,23 @@ void mafViewManager::ViewInsert(mafView *view)
 	view->SetListener(this);
 //@@@  view->SetMouseAction(m_MouseAction);
 
-  if(m_root_vme != NULL)
+  if(m_RootVme != NULL)
   {
-    mafNodeIterator *iter = m_root_vme->NewIterator();
+    mafNodeIterator *iter = m_RootVme->NewIterator();
     for(mafNode *vme = iter->GetFirstNode(); vme; vme = iter->GetNextNode())
 			view->VmeAdd(vme);
     iter->Delete();
   }
 
-  if(m_selected_vme)
-    view->VmeSelect(m_selected_vme,true);
+  if(m_SelectedVme)
+    view->VmeSelect(m_SelectedVme,true);
 
-  if(!m_vlist)
-    m_vlist = view;
+  if(!m_ViewList)
+    m_ViewList = view;
   else
   {
     mafView* v;
-    for(v = m_vlist; v->m_Next; v = v->m_Next) ; // go on until the end of the list is reached.
+    for(v = m_ViewList; v->m_Next; v = v->m_Next) ; // go on until the end of the list is reached.
     v->m_Next = view;
   }
 }
@@ -387,14 +391,14 @@ void mafViewManager::ViewDelete(mafView *view)
   // set to NULL the pointer into the state matrix
   m_ViewMatrixID[index][view->m_Mult] = NULL;
 
-  if(!m_vlist) return;
-  if(m_vlist == view)
+  if(!m_ViewList) return;
+  if(m_ViewList == view)
   {
-    m_vlist = view->m_Next;
+    m_ViewList = view->m_Next;
   }
   else
   {
-    for(mafView *v = m_vlist; v; v = v->m_Next) // find previous(view)
+    for(mafView *v = m_ViewList; v; v = v->m_Next) // find previous(view)
     {
       if(v->m_Next == view)
       {
@@ -404,7 +408,7 @@ void mafViewManager::ViewDelete(mafView *view)
     }
   }
 
-  if(m_selected_view)
+  if(m_SelectedView)
 	{
 /*@@@
     if(m_selected_rwi) 
@@ -414,7 +418,7 @@ void mafViewManager::ViewDelete(mafView *view)
 //old    m_is->SetListener(this); // A. Savenko
     m_selected_rwi = NULL;
     */
-    m_selected_view = NULL;
+    m_SelectedView = NULL;
 	}
 	delete view;
 }
@@ -422,14 +426,14 @@ void mafViewManager::ViewDelete(mafView *view)
 void mafViewManager::ViewDeleteAll()
 //----------------------------------------------------------------------------
 {
-	while(m_vlist)
-    m_vlist->GetFrame()->Close();
+	while(m_ViewList)
+    m_ViewList->GetFrame()->Close();
 }
 //----------------------------------------------------------------------------
 mafView *mafViewManager::GetSelectedView()
 //----------------------------------------------------------------------------
 {
-  return m_selected_view; 
+  return m_SelectedView; 
 }
 /*
 //----------------------------------------------------------------------------

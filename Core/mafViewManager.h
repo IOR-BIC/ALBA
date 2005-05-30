@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:43:11 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-05-30 09:10:44 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -102,13 +102,13 @@ public:
 //  mafRWIBase *GetSelectedRWI();
 
   /** Return the root of the vme tree. */
-  mafNode     *GetCurrentRoot() {return (mafNode*)m_root_vme;};
+  mafNode     *GetCurrentRoot() {return (mafNode*)m_RootVme;};
 
   /** Enable/Disable the selection from the interactor style. */
   void EnableSelect(bool enable);
 
   /** Return the view-list. */
-  mafView* GetList() {return m_vlist;};
+  mafView* GetList() {return m_ViewList;};
 
   /** Empty. */
   void OnQuit();
@@ -123,17 +123,17 @@ public:
 protected:
 //mafISV             *m_is;
 //mafAction          *m_MouseAction;
-  mafView            *m_vlist;  // created view list
+  mafView            *m_ViewList;  // created view list
 
-  mafView            *m_t[MAXVIEW];   // view template vector
-  int                 m_tcount;       // number of template
+  mafView            *m_ViewTemplate[MAXVIEW];   // view template vector
+  int                 m_TemplateNum;       // number of template
 
   mafObserver   *m_Listener;
-  mafVMERoot    *m_root_vme;
-  mafNode       *m_selected_vme;
-  mafView       *m_selected_view;
+  mafVMERoot    *m_RootVme;
+  mafNode       *m_SelectedVme;
+  mafView       *m_SelectedView;
 //mafRWIBase    *m_selected_rwi;
-	mafView       *m_view_being_created;
+	mafView       *m_ViewBeingCreated;
   mafView       *m_ViewMatrixID[MAXVIEW][MAXVIEW];  ///< Matrix to access views directly by (id, multiplicity)
 };
 #endif
