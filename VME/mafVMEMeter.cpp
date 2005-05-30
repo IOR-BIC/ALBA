@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:50:43 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-05-30 09:12:16 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -688,11 +688,11 @@ mmgGui* mafVMEMeter::CreateGui()
 
   mafVME *end_vme1   = mafVME::SafeDownCast(GetLink("EndVME1"));
   m_EndVme1Name = end_vme1 ? end_vme1->GetName() : "none";
-  m_Gui->Button(ID_END1_METER_LINK,m_EndVme1Name,"End 1", "Select the end vme for point distance");
+  m_Gui->Button(ID_END1_METER_LINK,&m_EndVme1Name,"End 1", "Select the end vme for point distance");
 
   mafVME *end_vme2   = mafVME::SafeDownCast(GetLink("EndVME2"));
   m_EndVme2Name = end_vme2 ? end_vme2->GetName() : "none";
-  m_Gui->Button(ID_END2_METER_LINK,m_EndVme2Name,"End 2", "Select the vme representing \nthe point for line distance");
+  m_Gui->Button(ID_END2_METER_LINK,&m_EndVme2Name,"End 2", "Select the vme representing \nthe point for line distance");
 
   return m_Gui;
 }
