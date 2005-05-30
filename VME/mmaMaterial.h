@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:51:59 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-30 15:54:36 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -70,7 +70,7 @@ public:
   vtkLookupTable     *m_ColorLut;
   vtkWindowLevelLookupTable *m_GrayLut;
 
-  mafString m_Name;
+  mafString m_MaterialName;
   wxBitmap *m_Icon;
   double    m_Value;
   double    m_Ambient[3];
