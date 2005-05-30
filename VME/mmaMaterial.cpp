@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:51:59 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-30 15:54:55 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -49,7 +49,9 @@
 #include "vtkLookupTable.h"
 #include "vtkWindowLevelLookupTable.h"
 
+//----------------------------------------------------------------------------
 mafCxxTypeMacro(mmaMaterial)
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mmaMaterial::mmaMaterial()
@@ -57,7 +59,8 @@ mmaMaterial::mmaMaterial()
 {  
 	m_MaterialType= USE_VTK_PROPERTY;
 
-  m_Name        = "new material";
+  m_Name        = "MaterialAttributes";
+  m_MaterialName= "new material";
   vtkNEW(m_ColorLut);
   vtkNEW(m_GrayLut);
   vtkNEW(m_Prop);
@@ -111,6 +114,8 @@ mmaMaterial::~mmaMaterial()
 wxBitmap *mmaMaterial::MakeIcon()
 //----------------------------------------------------------------------------
 {
+  UpdateProp();
+
 	vtkMAFSmartPointer<vtkCamera> camera;
   camera->ParallelProjectionOff();
   camera->SetViewAngle(30);
@@ -211,7 +216,7 @@ void mmaMaterial::DeepCopy(const mafAttribute *a)
 //-------------------------------------------------------------------------
 { 
   Superclass::DeepCopy(a);
-  m_Name                = ((mmaMaterial *)a)->m_Name;
+  m_MaterialName        = ((mmaMaterial *)a)->m_MaterialName;
   m_Value               = ((mmaMaterial *)a)->m_Value;
   m_Ambient[0]          = ((mmaMaterial *)a)->m_Ambient[0];
   m_Ambient[1]          = ((mmaMaterial *)a)->m_Ambient[1];
@@ -245,7 +250,7 @@ bool mmaMaterial::Equals(const mafAttribute *a)
 {
   if (Superclass::Equals(a))
   {
-    return (m_Name          == ((mmaMaterial *)a)->m_Name               &&
+    return (m_MaterialName  == ((mmaMaterial *)a)->m_MaterialName       &&
       m_Value               == ((mmaMaterial *)a)->m_Value              &&
       m_Ambient[0]          == ((mmaMaterial *)a)->m_Ambient[0]         &&
       m_Ambient[1]          == ((mmaMaterial *)a)->m_Ambient[1]         &&
@@ -281,7 +286,7 @@ int mmaMaterial::InternalStore(mafStorageElement *parent)
 {  
   if (Superclass::InternalStore(parent)==MAF_OK)
   {
-    parent->StoreText("Name",m_Name.GetCStr());
+    parent->StoreText("MaterialName",m_MaterialName.GetCStr());
     parent->StoreDouble("Value", m_Value);
     parent->StoreDouble("Ambient0", m_Ambient[0]);
     parent->StoreDouble("Ambient1", m_Ambient[1]);
@@ -318,7 +323,7 @@ int mmaMaterial::InternalRestore(mafStorageElement *node)
 {
   if (Superclass::InternalRestore(node) == MAF_OK)
   {
-    node->RestoreText("Name",m_Name);
+    node->RestoreText("MaterialName",m_MaterialName);
     node->RestoreDouble("Value",m_Value);
     node->RestoreDouble("Ambient0", m_Ambient[0]);
     node->RestoreDouble("Ambient1", m_Ambient[1]);
