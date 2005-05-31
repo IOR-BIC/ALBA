@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 14:37:32 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-31 06:24:54 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -21,7 +21,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class mafNode;
 class vtkPolyData;
 class mmaMaterial;
 

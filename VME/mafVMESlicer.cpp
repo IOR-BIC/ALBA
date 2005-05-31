@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 16:20:26 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-31 06:24:32 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -120,14 +120,12 @@ bool mafVMESlicer::Equals(mafVME *vme)
 
 
 //-------------------------------------------------------------------------
-
-//-------------------------------------------------------------------------
 mafVMEOutputSurface *mafVMESlicer::GetSurfaceOutput()
 //-------------------------------------------------------------------------
 {
   return (mafVMEOutputSurface *)GetOutput();
 }
-
+//-------------------------------------------------------------------------
 void mafVMESlicer::SetMatrix(const mafMatrix &mat)
 //-------------------------------------------------------------------------
 {
