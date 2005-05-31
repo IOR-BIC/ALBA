@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-30 15:51:09 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-05-31 15:15:57 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -153,7 +153,12 @@ protected:
 	/** Hide the setting's gui when a view is destroyed. */
 	virtual void OpHideGui(bool view_closed);
   
-  
+  /** Show contextual menu for tree when right mouse click arrives.*/
+  virtual void TreeContextualMenu(mafEvent &e);
+
+  /** Show contextual menu for views when right mouse click arrives.*/
+  void ViewContextualMenu(bool vme_menu);
+
   /** Create a new view. */
 	virtual void ViewCreate(int viewId);
 	/** A new View has Been Created - Logic must create the View Frame */
@@ -181,14 +186,8 @@ protected:
   wxMenu *m_OpMenu;
   wxMenu *m_ViewMenu; 
 
-  bool m_BuildOpMenu; ///< Flag indicating that operations are plugged.
-  bool m_BuildImporterMenu; ///< Flag indicating that importers are plugged.
-  bool m_BuildExporterMenu; ///< Flag indicating that exporters are plugged.
-
   bool m_UseVMEManager;
   bool m_UseViewManager;
   bool m_UseOpManager;
 };
 #endif
-
-

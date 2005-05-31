@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 09:51:39 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2005-05-31 15:15:56 $
+  Version:   $Revision: 1.19 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,12 +23,13 @@
 #include "mafLogicWithManagers.h"
 
 #include "mafView.h"
-#include "mafOp.h"
 #include "mafViewManager.h"
 #include "mafVMEManager.h"
 #include "mafOpManager.h"
 
 #include "mmgMDIFrame.h"
+#include "mmgCheckTree.h"
+#include "mmgTreeContextualMenu.h"
 #include "mmgMDIChild.h"
 #include "mafSideBar.h"
 #include "mmgTimeBar.h"
@@ -49,10 +50,6 @@ mafLogicWithManagers::mafLogicWithManagers()
   m_RecentFileMenu;
   m_OpMenu;
   m_ViewMenu; 
-
-  m_BuildOpMenu       = false;
-  m_BuildImporterMenu = false;
-  m_BuildExporterMenu = false;
 
   m_MaterialChooser = new mmgMaterialChooser();
 }
@@ -104,17 +101,12 @@ void mafLogicWithManagers::Plug(mafOp *op)
   if(m_OpManager) 
   {
     m_OpManager->OpAdd(op);
-    if(op->GetType() == OPTYPE_OP) m_BuildOpMenu = true;
-    if(op->GetType() == OPTYPE_IMPORTER) m_BuildImporterMenu = true;
-    if(op->GetType() == OPTYPE_EXPORTER) m_BuildExporterMenu = true;
   }
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Show()
 //----------------------------------------------------------------------------
 {
-  if(m_PlugMenu) this->CreateMenu();
-
   if(m_VMEManager && m_RecentFileMenu)
     m_VMEManager->SetFileHistoryMenu(m_RecentFileMenu);
 
@@ -167,18 +159,11 @@ void mafLogicWithManagers::CreateMenu()
   file_menu->Append(MENU_FILE_SAVEAS,"Save &As ..");
 
   m_ImportMenu = new wxMenu;
-  if (m_BuildImporterMenu)
-  {
-    file_menu->AppendSeparator();
-    file_menu->Append(0,"Import",m_ImportMenu );
-  }
+  file_menu->AppendSeparator();
+  file_menu->Append(0,"Import",m_ImportMenu );
 
   m_ExportMenu = new wxMenu;
-  if (m_BuildExporterMenu)
-  {
-    file_menu->AppendSeparator();
-    file_menu->Append(0,"Export",m_ExportMenu);
-  }
+  file_menu->Append(0,"Export",m_ExportMenu);
 
   m_RecentFileMenu = new wxMenu;
   file_menu->AppendSeparator();
@@ -206,10 +191,7 @@ void mafLogicWithManagers::CreateMenu()
   m_MenuBar->Append(m_ViewMenu, "&View");
 
   m_OpMenu = new wxMenu;
-  if (m_BuildOpMenu)
-  {
-    m_MenuBar->Append(m_OpMenu, "&Operations");
-  }
+  m_MenuBar->Append(m_OpMenu, "&Operations");
 
   m_Win->SetMenuBar(m_MenuBar);
 }
@@ -295,6 +277,12 @@ void mafLogicWithManagers::OnEvent(mafEventBase *event)
       break;
     case VME_CHOOSE_MATERIAL:
       VmeChooseMaterial((mafVME *)e->GetVme(), e->GetBool());
+      break;
+    case SHOW_CONTEXTUAL_MENU:
+      if (e->GetSender() == m_SideBar->GetTree())
+        TreeContextualMenu(*e);
+      else
+        ViewContextualMenu(e->GetBool());
       break;
       // ###############################################################
       // commands related to OP
@@ -648,4 +636,32 @@ void mafLogicWithManagers::VmeChooseMaterial(mafVME *vme, bool updateProperty)
     this->m_ViewManager->CameraUpdate();
     this->m_VMEManager->MSFModified(true);
   }
+}
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::ViewContextualMenu(bool vme_menu)
+//----------------------------------------------------------------------------
+{
+/*  mmgContextualMenu *contextMenu = new mmgContextualMenu();
+  contextMenu->SetListener(this);
+  mafView *v = m_ViewManager->GetSelectedView();
+  mmgMDIChild *c = (mmgMDIChild *)m_win->GetActiveChild();
+  if(c != NULL)
+    contextMenu->ShowContextualMenu(c,v,vme_menu);
+  else
+    //m_extern_view->ShowContextualMenu(vme_menu);
+    contextMenu->ShowContextualMenu(m_extern_view,v,vme_menu);
+  wxDEL(contextMenu);*/
+}
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::TreeContextualMenu(mafEvent &e)
+//----------------------------------------------------------------------------
+{
+  mmgTreeContextualMenu *contextMenu = new mmgTreeContextualMenu();
+  contextMenu->SetListener(this);
+  mafView *v = m_ViewManager->GetSelectedView();
+  mafVME  *vme = (mafVME *)e.GetVme();
+  bool vme_menu = e.GetBool();
+  bool autosort = e.GetArg() != 0;
+  contextMenu->ShowContextualMenu((mmgCheckTree *)e.GetSender(),v,vme,vme_menu);
+  cppDEL(contextMenu);
 }
