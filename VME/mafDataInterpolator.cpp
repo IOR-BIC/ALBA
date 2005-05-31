@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataInterpolator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-12 16:22:02 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-05-31 23:49:19 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -174,7 +174,4 @@ void mafDataInterpolator::UpdateCurrentItem(mafVMEItem *item)
 	  SetCurrentItem(NULL);
     //m_UpdateTime.Modified();
   }
-
-  
-
 }
