@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPER.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 06:23:16 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-05-31 23:56:07 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -651,8 +651,8 @@ void mmiPER::FlyTo(mafEventInteraction *e,int numstep, double zoom)
       {
         f1[j] = f0[j] + foc_motion[j]*i*foc_step;
         p1[j] = p0[j] + cam_motion[j]*i*cam_step;
-		  }
-		  cam->SetFocalPoint(f1);
+      }
+      cam->SetFocalPoint(f1);
       cam->SetPosition(p1);
       ren->ResetCameraClippingRange();
       // render at each cycle
