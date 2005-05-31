@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 12:16:32 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-05-31 09:51:16 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -12,8 +12,14 @@
 #ifndef __mafPipe_H__
 #define __mafPipe_H__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
 #include "mafDecl.h" // for MINID
 #include "mafObject.h"
+#include "mafObserver.h"
+#include "mafEvent.h"
+
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
@@ -28,13 +34,16 @@ class mmgGui;
 //----------------------------------------------------------------------------
 // mafPipe :
 //----------------------------------------------------------------------------
-class mafPipe : public mafObject
+class mafPipe : public mafObject, public mafObserver
 {
 public:
   mafTypeMacro(mafPipe,mafObject);
   
   mafPipe();
 	virtual			~mafPipe();
+
+  /** process events coming from gui */
+  virtual void OnEvent(mafEventBase *event)           {};
 
   /** The real setup must be performed here - not in the ctor */
   virtual void Create(mafSceneNode *n);
