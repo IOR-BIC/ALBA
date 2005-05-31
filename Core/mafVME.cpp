@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-30 12:54:09 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2005-05-31 15:15:37 $
+  Version:   $Revision: 1.24 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -671,6 +671,11 @@ void mafVME::SetCrypting(int crypting)
     m_Crypting = 1;
   else
     m_Crypting = 0;
+
+  if (m_Gui != NULL)
+  {
+    m_Gui->Update();
+  }
 
   Modified();
 }
