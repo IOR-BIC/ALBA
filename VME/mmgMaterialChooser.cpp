@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMaterialChooser.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-30 15:51:54 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-31 09:48:45 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -122,7 +122,7 @@ bool mmgMaterialChooser::ShowChooserDialog(mafVME *vme)
 //----------------------------------------------------------------------------
 // constant :
 //----------------------------------------------------------------------------
-enum 
+enum MATERIAL_PROPERTY_ID
 {
 	ID_NAME = MINID,
 	ID_AMBIENT_INTENSITY,
