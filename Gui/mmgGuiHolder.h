@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGuiHolder.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-02 11:35:21 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-31 23:54:05 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
