@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:43:11 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-31 23:46:44 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -90,7 +90,7 @@ public:
 	/** Get the filename of the current tree. */
   wxString& GetFileName () {return m_MSFFile;};
  
-	/** Link to the main menù the file history manager. */
+	/** Link to the main men the file history manager. */
   void SetFileHistoryMenu(wxMenu *menu);
  
 	/** Return the tree's root. */

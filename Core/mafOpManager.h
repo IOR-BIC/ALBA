@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:43:10 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-31 23:47:04 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,7 +50,7 @@ public:
 	/** Add the operation 'op' to the list of available operations. */
 	virtual void OpAdd		(mafOp *op, wxString menuPath = "");
 
-	/** Fill the application menù with the operations name.	*/
+	/** Fill the application men with the operations name.	*/
 	virtual void FillMenu (wxMenu* import, wxMenu* mexport, wxMenu* operations);
 
 	/** Record the selected vme and enable the menu_entries relative to the compatible operations. */
@@ -80,7 +80,7 @@ public:
 	/** Set a reference to the main toolbar. */
   virtual void SetToolbar(wxToolBar *tb) {m_toolbar = tb;};
 
-	/** Set a reference to the main menù. */
+	/** Set a reference to the main men. */
   virtual void SetMenubar(wxMenuBar *mb) {m_menubar = mb;};
 
 	/** return true if there is a running operation. */
@@ -125,7 +125,7 @@ protected:
 	/** Sent a string message to the listener. */
   virtual void Notify	      (int msg);
 
-	/** Enable/Disable the menù items operation. */
+	/** Enable/Disable the men items operation. */
   virtual void EnableOp(bool CanEnable = true);
 
 	/** Enable/Disable the toolbar's buttons. */

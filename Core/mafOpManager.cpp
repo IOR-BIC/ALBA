@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:43:10 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-05-31 23:47:04 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -279,7 +279,7 @@ void mafOpManager::EnableToolbar(bool CanEnable)
 {
 	if(!CanEnable)
 	{
-/*		m_toolbar->EnableTool(MENU_FILE_NEW,false);	//Removed by Paolo 15-9-2003: HAL menù
+/*		m_toolbar->EnableTool(MENU_FILE_NEW,false);	//Removed by Paolo 15-9-2003: HAL men
 		m_toolbar->EnableTool(MENU_FILE_OPEN,false);
 		m_toolbar->EnableTool(MENU_FILE_SAVE,false);*/
 		m_toolbar->EnableTool(OP_UNDO,false);

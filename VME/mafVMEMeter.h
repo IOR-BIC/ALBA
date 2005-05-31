@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 14:37:56 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-05-31 23:50:30 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,7 +17,7 @@
 #include "mafVME.h"
 #include "mafVMEOutputPolyline.h"
 #include "mafEvent.h"
-#include "mmgVmeChooserAccept.h"
+#include "mmgVMEChooserAccept.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -60,7 +60,7 @@ public:
     ID_LAST
   };
 
-  class mafVMEAccept : public mmgVmeChooserAccept
+  class mafVMEAccept : public mmgVMEChooserAccept
   {
   public:
 
@@ -69,6 +69,7 @@ public:
 
     bool Validate(mafNode *node) {return(node != NULL && node->IsMAFType(mafVME));};
   };
+  
   mafVMEAccept *m_VMEAccept;
 
   /** Precess events coming from other objects */ 
@@ -170,8 +171,8 @@ public:
   /** 
   Enable-Disable event generation fo length threshold. */
   void SetGenerateEvent(int generate);
-  void SetGenerateEventOn() {this->SetGenerateEvent(1);}
-  void SetGenerateEventOff() {this->SetGenerateEvent(0);}
+  void SetGenerateEventOn() {SetGenerateEvent(1);}
+  void SetGenerateEventOff() {SetGenerateEvent(0);}
 
   /** 
   Get the length threshold event generation status. */
