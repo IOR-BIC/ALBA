@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolyline.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:51:11 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-05-31 23:50:57 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,6 +24,7 @@
 
 #include "vtkDataSet.h"
 #include "vtkPolyData.h"
+#include "vtkCellArray.h"
 #include <sstream>
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMEPolyline)
@@ -67,7 +68,12 @@ int mafVMEPolyline::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
 //-------------------------------------------------------------------------
 {
   assert(data);
-  if (data->IsA("vtkPolyLine"))
+  vtkPolyData *polydata = vtkPolyData::SafeDownCast(data);
+
+  // check this is a ploydata containing only lines
+  if (polydata && polydata->GetPolys()->GetNumberOfCells()==0 && \
+      polydata->GetStrips()->GetNumberOfCells()==0 && \
+      polydata->GetVerts()->GetNumberOfCells()==0)
   {
     return Superclass::SetData(data,t,mode);
   }
