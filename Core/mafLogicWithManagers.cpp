@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-30 15:51:09 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2005-05-31 09:51:39 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,10 +39,10 @@ mafLogicWithManagers::mafLogicWithManagers()
 : mafLogicWithGUI()
 //----------------------------------------------------------------------------
 {
-  m_SideBar      = NULL;
-  m_VMEManager   = false;
-  m_ViewManager   = false;
-  m_OpManager     = false;
+  m_SideBar     = NULL;
+  m_VMEManager  = false;
+  m_ViewManager = false;
+  m_OpManager   = false;
 
   m_ImportMenu; 
   m_ExportMenu; 
@@ -54,7 +54,7 @@ mafLogicWithManagers::mafLogicWithManagers()
   m_BuildImporterMenu = false;
   m_BuildExporterMenu = false;
 
-  m_MaterialChooser  = new mmgMaterialChooser();
+  m_MaterialChooser = new mmgMaterialChooser();
 }
 //----------------------------------------------------------------------------
 mafLogicWithManagers::~mafLogicWithManagers( ) 
@@ -113,6 +113,8 @@ void mafLogicWithManagers::Plug(mafOp *op)
 void mafLogicWithManagers::Show()
 //----------------------------------------------------------------------------
 {
+  if(m_PlugMenu) this->CreateMenu();
+
   if(m_VMEManager && m_RecentFileMenu)
     m_VMEManager->SetFileHistoryMenu(m_RecentFileMenu);
 
@@ -169,20 +171,22 @@ void mafLogicWithManagers::CreateMenu()
   {
     file_menu->AppendSeparator();
     file_menu->Append(0,"Import",m_ImportMenu );
-  } 
+  }
+
   m_ExportMenu = new wxMenu;
   if (m_BuildExporterMenu)
   {
-    file_menu->Append(0,"Export",m_ExportMenu);					
+    file_menu->AppendSeparator();
+    file_menu->Append(0,"Export",m_ExportMenu);
   }
-  file_menu->AppendSeparator();
 
   m_RecentFileMenu = new wxMenu;
+  file_menu->AppendSeparator();
   file_menu->Append(0,"Recent Files",m_RecentFileMenu);
-  //m_VmeManager->SetFileHistoryMenu(recentFile_menu);
 
   file_menu->AppendSeparator();
   file_menu->Append(MENU_FILE_QUIT,  "&Quit");
+
   m_MenuBar->Append(file_menu, "&File");
 
   wxMenu    *edit_menu = new wxMenu;
@@ -202,7 +206,10 @@ void mafLogicWithManagers::CreateMenu()
   m_MenuBar->Append(m_ViewMenu, "&View");
 
   m_OpMenu = new wxMenu;
-  m_MenuBar->Append(m_OpMenu, "&Operations");
+  if (m_BuildOpMenu)
+  {
+    m_MenuBar->Append(m_OpMenu, "&Operations");
+  }
 
   m_Win->SetMenuBar(m_MenuBar);
 }
@@ -430,6 +437,7 @@ void mafLogicWithManagers::OnQuit()
   */
   mmgMDIChild::OnQuit(); 
 
+  cppDEL(m_MaterialChooser);
   cppDEL(m_VMEManager);
   cppDEL(m_ViewManager);
   cppDEL(m_OpManager);
