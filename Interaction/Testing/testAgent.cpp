@@ -1,5 +1,6 @@
 #include "mafAgent.h"
 #include "mafAgentEventQueue.h"
+#include "mafSmartPointer.h"
 
 #include <iostream>
 
@@ -19,7 +20,8 @@ class mafAgentRouter: public mafAgent
 //-------------------------------------------------------------------------
 {
 public:
-  mafAgent() {m_LastEventId=-1;m_LastChannelId=-1;}
+  mafAgentRouter() {m_LastEventId=-1;m_LastChannelId=-1;}
+  
   mafTypeMacro(mafAgentRouter,mafAgent);
   
   /** process events incoming events */
@@ -30,7 +32,7 @@ public:
 };
 
 //-------------------------------------------------------------------------
-mafCxxTypeMacro(mafAgentRouter);
+mafCxxTypeMacro(mafAgentRouter)
 //-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
@@ -44,10 +46,10 @@ void mafAgentRouter::OnEvent(mafEventBase *event)
     switch (m_LastEventId)
     {
       case TEST_EVENT:
-        cerr<<"agent router received event with ID: MCH_TEST_CHANNEL"<<std::endl;
+        std::cerr<<"agent router received event with ID: MCH_TEST_CHANNEL"<<std::endl;
         break;
       default:
-        cerr<<"unknown event Id on MCH_TEST_CHANNEL channel, Id="<<m_LastEventId<<std::endl;
+        std::cerr<<"unknown event Id on MCH_TEST_CHANNEL channel, Id="<<m_LastEventId<<std::endl;
     }
     ;
   }
@@ -88,10 +90,10 @@ void mafTestAgent::OnEvent(mafEventBase *event)
   switch (m_LastEventId)
   {
     case TEST_EVENT2:
-      cerr<<"agent router received event with ID: MCH_TEST_CHANNEL2"<<std::endl;
+      std::cerr<<"agent router received event with ID: MCH_TEST_CHANNEL2"<<std::endl;
       break;
     default:
-      cerr<<"unknown event Id on MCH_TEST_CHANNEL2 channel, Id="<<m_LastEventId<<std::endl;
+      std::cerr<<"unknown event Id on MCH_TEST_CHANNEL2 channel, Id="<<m_LastEventId<<std::endl;
   }
 
   // do not forward to any other
