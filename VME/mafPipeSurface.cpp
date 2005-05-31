@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-30 15:58:20 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-31 09:48:13 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,6 +23,8 @@
 #include "mafSceneNode.h"
 #include "mafVMESurface.h"
 #include "mmaMaterial.h"
+#include "mmgGui.h"
+
 #include "vtkMAFAssembly.h"
 
 //@@@ #include "mafDecl.h"
@@ -49,12 +51,14 @@ mafCxxTypeMacro(mafPipeSurface);
 mafPipeSurface::mafPipeSurface() 
 //----------------------------------------------------------------------------
 {
-  m_act_m    =NULL;
-  m_act_a    =NULL;
-  m_sel_ocf  =NULL;
-  m_sel_m    =NULL;
-  m_sel_p    =NULL;
-  m_sel_a    =NULL;
+  m_Mapper          = NULL;
+  m_Actor           = NULL;
+  m_OutlineBox      = NULL;
+  m_OutlineMapper   = NULL;
+  m_OutlineProperty = NULL;
+  m_OutlineActor    = NULL;
+
+  m_ScalarVisibility = 0;
 }
 //----------------------------------------------------------------------------
 void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
@@ -63,12 +67,12 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
   Superclass::Create(n);
   
   m_Selected = false;
-  m_act_m   = NULL;
-  m_act_a   = NULL;;
-  m_sel_ocf = NULL;;
-  m_sel_m   = NULL;;
-  m_sel_p   = NULL;;
-  m_sel_a   = NULL;;
+  m_Mapper          = NULL;
+  m_Actor           = NULL;
+  m_OutlineBox      = NULL;
+  m_OutlineMapper   = NULL;
+  m_OutlineProperty = NULL;
+  m_OutlineActor    = NULL;
 
   assert(m_Vme->IsA("mafVMESurface"));
   mafVMESurface *vme = ((mafVMESurface*) m_Vme);
@@ -77,40 +81,41 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
   vtkPolyData *data = vme->GetSurfaceOutput()->GetSurfaceData();
   assert(data);
 
-  m_act_m = vtkPolyDataMapper::New();
-	m_act_m->SetInput(data);
+  m_Mapper = vtkPolyDataMapper::New();
+	m_Mapper->SetInput(data);
+  m_Mapper->SetScalarVisibility(m_ScalarVisibility);
   
 	if(vme->IsAnimated())				
-		m_act_m->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
+		m_Mapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
 	else
-		m_act_m->ImmediateModeRenderingOff();
+		m_Mapper->ImmediateModeRenderingOff();
 
-  m_act_a = vtkActor::New();
-	m_act_a->SetMapper(m_act_m);
-  m_act_a->SetProperty(vme->GetMaterial()->m_Prop);
+  m_Actor = vtkActor::New();
+	m_Actor->SetMapper(m_Mapper);
+  m_Actor->SetProperty(vme->GetMaterial()->m_Prop);
 
-  m_AssemblyFront->AddPart(m_act_a);
+  m_AssemblyFront->AddPart(m_Actor);
 
-  // selection hilight
-	m_sel_ocf = vtkOutlineCornerFilter::New();
-	m_sel_ocf->SetInput(data);  
+  // selection highlight
+	m_OutlineBox = vtkOutlineCornerFilter::New();
+	m_OutlineBox->SetInput(data);  
 
-	m_sel_m = vtkPolyDataMapper::New();
-	m_sel_m->SetInput(m_sel_ocf->GetOutput());
+	m_OutlineMapper = vtkPolyDataMapper::New();
+	m_OutlineMapper->SetInput(m_OutlineBox->GetOutput());
 
-	m_sel_p = vtkProperty::New();
-	m_sel_p->SetColor(1,1,1);
-	m_sel_p->SetAmbient(1);
-	m_sel_p->SetRepresentationToWireframe();
-	m_sel_p->SetInterpolationToFlat();
+	m_OutlineProperty = vtkProperty::New();
+	m_OutlineProperty->SetColor(1,1,1);
+	m_OutlineProperty->SetAmbient(1);
+	m_OutlineProperty->SetRepresentationToWireframe();
+	m_OutlineProperty->SetInterpolationToFlat();
 
-	m_sel_a = vtkActor::New();
-	m_sel_a->SetMapper(m_sel_m);
-	m_sel_a->VisibilityOff();
-	m_sel_a->PickableOff();
-	m_sel_a->SetProperty(m_sel_p);
+	m_OutlineActor = vtkActor::New();
+	m_OutlineActor->SetMapper(m_OutlineMapper);
+	m_OutlineActor->VisibilityOff();
+	m_OutlineActor->PickableOff();
+	m_OutlineActor->SetProperty(m_OutlineProperty);
 
-  m_AssemblyFront->AddPart(m_sel_a);
+  m_AssemblyFront->AddPart(m_OutlineActor);
 
   /*
   m_axes = NULL;
@@ -122,15 +127,15 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
 mafPipeSurface::~mafPipeSurface()
 //----------------------------------------------------------------------------
 {
-  m_AssemblyFront->RemovePart(m_act_a);
-  m_AssemblyFront->RemovePart(m_sel_a);
+  m_AssemblyFront->RemovePart(m_Actor);
+  m_AssemblyFront->RemovePart(m_OutlineActor);
 
-	vtkDEL(m_act_m);
-  vtkDEL(m_act_a);
-  vtkDEL(m_sel_ocf);
-  vtkDEL(m_sel_m);
-  vtkDEL(m_sel_p);
-  vtkDEL(m_sel_a);
+	vtkDEL(m_Mapper);
+  vtkDEL(m_Actor);
+  vtkDEL(m_OutlineBox);
+  vtkDEL(m_OutlineMapper);
+  vtkDEL(m_OutlineProperty);
+  vtkDEL(m_OutlineActor);
 	//@@@ if(m_use_axes) wxDEL(m_axes);  
 }
 /*
@@ -138,10 +143,10 @@ mafPipeSurface::~mafPipeSurface()
 void mafPipeSurface::Show(bool show)
 //----------------------------------------------------------------------------
 {
-	m_act_a->SetVisibility(show);
+	m_Actor->SetVisibility(show);
 	if(m_Selected)
 	{
-	  m_sel_a->SetVisibility(show);
+	  m_OutlineActor->SetVisibility(show);
 		//@@@ if(m_use_axes) m_axes->SetVisibility(show);
 	}
 }
@@ -151,9 +156,9 @@ void mafPipeSurface::Select(bool sel)
 //----------------------------------------------------------------------------
 {
 	m_Selected = sel;
-	if(m_act_a->GetVisibility()) 
+	if(m_Actor->GetVisibility()) 
 	{
-			m_sel_a->SetVisibility(sel);
+			m_OutlineActor->SetVisibility(sel);
 			//@@@ if(m_use_axes) m_axes->SetVisibility(sel);
 	}
 }
@@ -183,6 +188,32 @@ void mafPipeSurface::UpdateProperty(bool fromTag)
       m_axes->SetPose();
   }
   else
-	  m_act_m->SetScalarVisibility(((mafVmeData *)m_Vme->GetClientData())->GetColorByScalar());
+	  m_Mapper->SetScalarVisibility(((mafVmeData *)m_Vme->GetClientData())->GetColorByScalar());
 	*/
+}
+//----------------------------------------------------------------------------
+mmgGui *mafPipeSurface::CreateGui()
+//----------------------------------------------------------------------------
+{
+  assert(m_Gui == NULL);
+  m_Gui = new mmgGui(this);
+  m_Gui->Bool(ID_SCALAR_VISIBILITY,"scalar vis.", &m_ScalarVisibility,0,"turn on/off the scalar visibility");
+
+  return m_Gui;
+}
+//----------------------------------------------------------------------------
+void mafPipeSurface::OnEvent(mafEventBase *event)
+//----------------------------------------------------------------------------
+{
+  if (mafEvent *e = mafEvent::SafeDownCast(event))
+  {
+    switch(e->GetId()) 
+    {
+    case ID_SCALAR_VISIBILITY:
+      m_Mapper->SetScalarVisibility(m_ScalarVisibility);
+    	break;
+    default:
+      break;
+    }
+  }
 }

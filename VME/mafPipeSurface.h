@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 20:02:53 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-31 09:48:13 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,19 +34,32 @@ public:
                mafPipeSurface();
   virtual     ~mafPipeSurface ();
 
+  /** process events coming from gui */
+  virtual void OnEvent(mafEventBase *event);
+
   virtual void Create(mafSceneNode *n /*,bool use_axes = true*/ ); //Can't add parameters - is Virtual
   virtual void Select(bool select); 
 
-  vtkPolyDataMapper	     *m_act_m;
-  vtkActor               *m_act_a;
-  vtkOutlineCornerFilter *m_sel_ocf;
-	vtkPolyDataMapper      *m_sel_m;
-  vtkProperty            *m_sel_p;
-  vtkActor               *m_sel_a;
+  /** IDs for the GUI */
+  enum PIPE_SURFACE_WIDGET_ID
+  {
+    ID_SCALAR_VISIBILITY = Superclass::ID_LAST,
+    ID_LAST
+  };
+
+  vtkPolyDataMapper	     *m_Mapper;
+  vtkActor               *m_Actor;
+  vtkOutlineCornerFilter *m_OutlineBox;
+	vtkPolyDataMapper      *m_OutlineMapper;
+  vtkProperty            *m_OutlineProperty;
+  vtkActor               *m_OutlineActor;
 //@@@	mafAxes                *m_axes;     //SIL. 20-5-2003 added line - 
 
 protected:
+  int  m_ScalarVisibility;
 //@@@  bool                    m_use_axes; //SIL. 22-5-2003 added line - 
   void UpdateProperty(bool fromTag = false);
+
+  virtual mmgGui  *CreateGui();
 };  
 #endif // _mafPipeSurface_H_
