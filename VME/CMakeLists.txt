@@ -82,6 +82,8 @@ IF (MAF_USE_VTK)
   mafVMEVolume.h
   mafVMEVolumeGray.cpp
   mafVMEVolumeGray.h
+  mafVMEVolumeRGB.cpp
+  mafVMEVolumeRGB.h
   mafVTKInterpolator.cpp
   mafVTKInterpolator.h
   mmaMaterial.cpp
