@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-27 14:08:39 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-31 09:49:48 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -63,7 +63,6 @@ mafOp* mmoVTKImporter::Copy()
 {
   //non devo incrementare l'id counter --- vfc le operazioni sono gia inserite nei menu;
   mmoVTKImporter *cp = new mmoVTKImporter(m_Label);
-  cp->m_Canundo		= m_Canundo;
   cp->m_File			= m_File;
   return cp;
 }

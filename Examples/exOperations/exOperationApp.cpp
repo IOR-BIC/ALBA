@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:45:54 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-05-31 09:53:05 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,6 +33,7 @@
 #include "mafPipeFactory.h"
 #include "mafPipeMeter.h"
 
+#include "mmoVTKExporter.h"
 #include "mmoVTKImporter.h"
 #include "mmoCreateMeter.h"
 #include "mafViewVTK.h"
@@ -66,10 +67,11 @@ bool exOperationApp::OnInit()
   //m_logic->PlugVMEManager(false);  // the VmeManager at the moment cause 4 leaks of 200+32+24+56 bytes  //SIL. 20-4-2005: 
   m_logic->Configure();
 
-  m_logic->GetTopWin()->SetTitle("ViewVTK example");
+  m_logic->GetTopWin()->SetTitle("Operations example");
   SetTopWindow(mafGetFrame());  
 
   m_logic->Plug(new mmoVTKImporter("VTK Importer"));
+  m_logic->Plug(new mmoVTKExporter("VTK Exporter"));
   m_logic->Plug(new mmoCreateMeter("Create Meter"));
   
   m_logic->Plug(new mafViewVTK("VTK view"));
