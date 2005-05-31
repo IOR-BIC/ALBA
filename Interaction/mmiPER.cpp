@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPER.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 06:14:29 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-05-31 06:23:16 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -22,6 +22,7 @@
 #include "mafEventInteraction.h"
 
 #include "mafVME.h"
+#include "mafVMEGizmo.h"
 #include "mafTransform.h"
 
 #include "vtkMAFAssembly.h"
@@ -563,7 +564,7 @@ void mmiPER::FlyTo(mafEventInteraction *e,int numstep, double zoom)
 
 	  vtkCamera *cam = ren->GetActiveCamera();
 
-    if(!FindPokedVme(tracker,point_pose,picked_prop,picked_vme,picked_bh)) 
+    if(!FindPokedVme(tracker,*point_pose,picked_prop,picked_vme,picked_bh)) 
       return; // no picking no fly to!
 
 
@@ -655,7 +656,7 @@ void mmiPER::FlyTo(mafEventInteraction *e,int numstep, double zoom)
       cam->SetPosition(p1);
       ren->ResetCameraClippingRange();
       // render at each cycle
-      InvokeEvent(CAMERA_UPDATE,MCH_UP,view));
+      InvokeEvent(CAMERA_UPDATE,MCH_UP,view);
 
     }
     cam->OrthogonalizeViewUp();
