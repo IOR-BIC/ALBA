@@ -3,19 +3,20 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkTransferFunction2D.cxx,v $
   Language:  C++
-  Date:      $Date: 2005-05-23 12:12:05 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-31 23:57:31 $
+  Version:   $Revision: 1.2 $
 
 =========================================================================*/
 #include "vtkObjectFactory.h"
 
 #include "vtkTransferFunction2D.h"
 
-vtkCxxRevisionMacro(vtkTransferFunction2D, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkTransferFunction2D, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkTransferFunction2D);
-vtkCxxRevisionMacro(vtkVolumeProperty2, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkVolumeProperty2, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkVolumeProperty2);
 
+typedef unsigned char u_char;
 
 #define min(x0, x1) (((x0) < (x1)) ? (x0) : (x1))
 #define max(x0, x1) (((x0) > (x1)) ? (x0) : (x1))
@@ -258,7 +259,8 @@ float vtkTransferFunction2D::GetValue(const float val, const float gradient, flo
   // find the widgets
   float attenuations[MAX_NUMBER_OF_WIDGETS];
   float sumOfAttenuations = 0;
-  for (int i = 0; i < this->NumberOfWidgets; i++) {
+  int i;
+  for (i = 0; i < this->NumberOfWidgets; i++) {
     const tfWidget &w = this->Widgets[i];
     attenuations[i] = 0.f;
     if (w.Opacity > 0.f && w.Visible && w.Inside(val, gradient)) {
@@ -335,13 +337,17 @@ bool vtkTransferFunction2D::GetTable(int vsize, const float *vTable, int gsize, 
 
   // find the range
   this->UpdateRanges();
-  for (int vmin = 0; (vmin < (vsize - 1)) && (vTable[vmin] < this->ValueRange[0]); vmin++)
+  int vmin;
+  for (vmin = 0; (vmin < (vsize - 1)) && (vTable[vmin] < this->ValueRange[0]); vmin++)
     { ; }
-  for (int vmax = vsize - 1; (vmax > vmin) && (vTable[vmax] >= this->ValueRange[1]); vmax--)
+  int vmax;
+  for (vmax = vsize - 1; (vmax > vmin) && (vTable[vmax] >= this->ValueRange[1]); vmax--)
     { ; }
-  for (int gmin = 0; (gmin < (gsize - 1)) && (gTable[gmin] < this->GradientRange[0]); gmin++)
+  int gmin;
+  for (gmin = 0; (gmin < (gsize - 1)) && (gTable[gmin] < this->GradientRange[0]); gmin++)
     { ; }
-  for (int gmax = gsize - 1; (gmax > gmin) && (gTable[gmax] >= this->GradientRange[1]); gmax--)
+  int gmax;
+  for (gmax = gsize - 1; (gmax > gmin) && (gTable[gmax] >= this->GradientRange[1]); gmax--)
     { ; }
 
   if (vmin >= vmax || gmin >= gmax)
@@ -361,13 +367,15 @@ bool vtkTransferFunction2D::GetTable(int vsize, const float *vTable, int gsize, 
     int (&indexRange)[2][2] = widgetIndexRange[wi];
 
     // find indeces
-    for (int vi = vmin; (vi < vmax) && (vTable[vi] < w.Range[0][L]); vi++)
+    int vi;
+    for (vi = vmin; (vi < vmax) && (vTable[vi] < w.Range[0][L]); vi++)
       { ; }
     indexRange[0][L] = vi;
     for ( ; (vi < vmax) && (vTable[vi] < w.Range[0][R]); vi++)
       { ; }
     indexRange[0][R] = vi;
-    for (int gi = gmin; (gi < gmax) && (gTable[gi] < w.Range[1][L]); gi++)
+    int gi;
+    for (gi = gmin; (gi < gmax) && (gTable[gi] < w.Range[1][L]); gi++)
       { ; }
     indexRange[1][L] = gi;
     for ( ; (gi < gmax) && (gTable[gi] < w.Range[1][R]); gi++)
@@ -406,7 +414,8 @@ bool vtkTransferFunction2D::GetTable(int vsize, const float *vTable, int gsize, 
   const int newvsize = vmax - vmin + 1, newgsize = gmax - gmin + 1;;
   float * const attenuationSums = new float[newvsize * newgsize];
   memset(attenuationSums, 0, sizeof(float) * newvsize * newgsize);
-  for (int awi = 0; awi < activeWidgetsNumber; awi++) {
+  int awi;
+  for (awi = 0; awi < activeWidgetsNumber; awi++) {
     const int wi = activeWidgets[awi];
     int (&indexRange)[2][2] = widgetIndexRange[wi];
     
@@ -469,7 +478,7 @@ bool vtkTransferFunction2D::GetTable(int vsize, const float *vTable, int gsize, 
         else {
           for (int ci = 0; ci < 4; ci++) {
             const int val = int(float(rgbdTablePtr[ci]) + weight * rgbd[ci]);
-            rgbdTablePtr[ci] = val > 255 ? 255 : unsigned char(val);
+            rgbdTablePtr[ci] = val > 255 ? 255 : u_char(val);
             }
           }
         }
