@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKExporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 09:49:12 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-05-31 15:16:25 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -13,6 +13,9 @@
 #ifndef __mmoVTKExporter_H__
 #define __mmoVTKExporter_H__
 
+//----------------------------------------------------------------------------
+// Include :
+//----------------------------------------------------------------------------
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------

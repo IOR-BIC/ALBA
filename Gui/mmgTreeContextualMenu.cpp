@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTreeContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 15:26:09 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-05-31 15:17:29 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,7 +33,6 @@
 
 #include "mafDecl.h"
 #include "mafEvent.h"
-//#include "mafVmeData.h"
 #include "mafView.h"
 //#include "mafSceneNode.h"
 //#include "mafSceneGraph.h"
