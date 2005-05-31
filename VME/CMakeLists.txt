@@ -46,6 +46,8 @@ IF (MAF_USE_VTK)
   mafPipeSurface.h
   mafVMEGeneric.cpp
   mafVMEGeneric.h
+  mafVMEGizmo.cpp
+  mafVMEGizmo.h
   mafVMEImage.cpp
   mafVMEImage.h
   mafVMEItemVTK.cpp
