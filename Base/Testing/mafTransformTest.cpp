@@ -2,6 +2,7 @@
 #include "mafMatrix.h"
 #include "mafTransform.h"
 #include "mafTransformFrame.h"
+#include "mafSmartPointer.h"
 
 #include "vtkMath.h"
 #include "vtkTransform.h"
@@ -116,6 +117,24 @@ int main()
     double diff = fabs(mat1[idx]-mat2[idx]);
     MAF_TEST(diff<.000000001);
   }
+
+
+  // test mafTransformFrame
+  mafSmartPointer<mafTransform> pose1;
+  pose1->SetPosition(10,10,10);
+
+
+  mafSmartPointer<mafTransform> pose_parent;
+  pose_parent->SetPosition(-10,-10,-10);
+
+  mafSmartPointer<mafTransform> pose2;
+  pose2->SetPosition(20,20,20);
+  
+  mafTransformFrame change_frame;
+  change_frame.SetTargetFrame(pose_parent);
+  change_frame.SetInput(pose1);
+
+  MAF_TEST(change_frame.GetMatrix()==pose2->GetMatrix());
   
   std::cerr << "Test completed succesfully!" << std::endl << std::endl;
 
