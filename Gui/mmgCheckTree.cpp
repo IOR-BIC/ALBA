@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-19 11:33:30 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-06-06 14:49:09 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,13 +25,6 @@
 #include "mafNode.h"
 #include "mafView.h"
 #include <vector>
-
-//#include "mafDecl.h"
-//#include "mafEvent.h"
-//#include "mafVmeData.h"
-//#include "mafSceneNode.h"
-//#include "mafSceneGraph.h" 
-//#include "mafNodeIterator.h" //used in CryptSubTree
 
 //=========================================================================================
 // Helper class to subclass the wxTreeCtrl
@@ -270,8 +263,8 @@ int mmgCheckTree::ClassNameToIcon(wxString classname)
     return int((*it).second);
   else
   {
-    // cercare l'icona della superclasse
-    // se non c'e' neanche quella usare una icona "Unknow"
+    // search superclass's icon
+    // if also this icon is not present, "Unknow" icon is used
     wxLogMessage("mafPictureFactory::ClassNameToIcon: cant find = %s ",classname.c_str());
     return 0;
   }
@@ -282,7 +275,7 @@ void mmgCheckTree::InitializeImageList()
 {
   // pourpose:
   // each vme-picture is combined with each state-picture,
-  // all the combined picture are inserted in the imagelist.
+  // all the combined picture are inserted in the image-list.
   // given a vme-class-name and a vme-state
   // the corresponding icon index can be retrieved as 
   // ClassNameToIcon(vme-class-name) + vme-state
