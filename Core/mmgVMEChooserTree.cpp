@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooserTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:46:21 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-06-06 14:48:02 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -64,20 +64,26 @@ mmgVMEChooserTree::~mmgVMEChooserTree()
 int mmgVMEChooserTree::GetVmeStatus(mafNode *node)
 //----------------------------------------------------------------------------
 {
+  int image_id;
   if(m_AcceptFunction == NULL)
   {
     if (!node->IsMAFType(mafVMERoot))
     {
-      return NODE_VISIBLE_ON;
+      image_id = ClassNameToIcon(node->GetTypeName()) + NODE_VISIBLE_ON;
+      return image_id;
     }
   }
   else
   {
     if(m_AcceptFunction->Validate(node))
-      return NODE_VISIBLE_ON;
+    {
+      image_id = ClassNameToIcon(node->GetTypeName()) + NODE_VISIBLE_ON;
+      return image_id;
+    }
   }
 
-  return NODE_NON_VISIBLE;
+  image_id = ClassNameToIcon(node->GetTypeName()) + NODE_NON_VISIBLE;
+  return image_id;
 }
 //----------------------------------------------------------------------------
 void mmgVMEChooserTree::InitializeImageList()
