@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAbsMatrixPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-12 16:19:15 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-06-06 14:50:48 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -105,8 +105,8 @@ void mafAbsMatrixPipe::InternalUpdate()
   
   m_Updating=1;
 
-  mafMatrixPipe *input = mafMatrixPipe::SafeDownCast(m_Transform->GetInput());
-  mafMatrixPipe *input_frame = mafMatrixPipe::SafeDownCast(m_Transform->GetInputFrame());
+  mafTransformBase *input = mafTransformBase::SafeDownCast(m_Transform->GetInput());
+  mafTransformBase *input_frame = mafTransformBase::SafeDownCast(m_Transform->GetInputFrame());
 
   mafTimeStamp old_vme_time = -1;
   mafTimeStamp old_vme_parent_time = -1;
@@ -143,6 +143,7 @@ void mafAbsMatrixPipe::InternalUpdate()
   
   *m_Matrix = m_Transform->GetMatrix();
 
+  m_Matrix->SetTimeStamp(GetTimeStamp());
 
   if (m_UpdateMatrixObserverFlag)
   {
