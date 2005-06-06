@@ -16,6 +16,8 @@ IF (MAF_USE_VTK)
     ${PROJECT_SRCS}
     mmoCreateMeter.cpp
     mmoCreateMeter.h
+    mmoReparentTo.cpp
+    mmoReparentTo.h
     mmoVTKExporter.cpp
     mmoVTKExporter.h
     mmoVTKImporter.cpp
