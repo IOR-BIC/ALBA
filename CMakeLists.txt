@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2005-04-27 12:35:28 $
-# Version:   $Revision: 1.22 $
+# Date:      $Date: 2005-06-06 15:30:36 $
+# Version:   $Revision: 1.23 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -111,6 +111,7 @@ IF (MAF_CAN_BUILD)
   INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/Base)
   INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/Core)
   INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/Gui)
+  INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/Interaction)
   INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/IO)
   INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/Operations)
   INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/VME)
@@ -121,12 +122,13 @@ IF (MAF_CAN_BUILD)
   DBG_MESSAGE("MAF: Configuring MAF Kits")
   MESSAGE(STATUS "MAF: Configuring MAF Kits")
   SUBDIRS (Base)
-  SUBDIRS (Core)
-  SUBDIRS (IO)
-  SUBDIRS (Operations)
-  SUBDIRS (VME)
-  SUBDIRS (vtkMAF)
+  #SUBDIRS (Interaction)
   SUBDIRS (Gui)
+  SUBDIRS (IO)
+  SUBDIRS (Core)
+  SUBDIRS (vtkMAF)
+  SUBDIRS (VME)
+  SUBDIRS (Operations)
   
   # Configuring Doxygen documentation  
   SUBDIRS (Docs)
@@ -155,11 +157,7 @@ IF (MAF_CAN_BUILD)
         SET (CXX_TEST_PATH .)
     ENDIF (EXECUTABLE_OUTPUT_PATH)
     
-    #IF (WIN32)
-    #  FIND_PROGRAM (PKZIP_COMMAND pkzipc.exe "c:/program files/pkware/pkzipc" "c:/programmi/pkware/pkzipc" DOC "Utility used for packing ditribution files")
-    #  SET(PACKAGES_OUTPUT_PATH "c:/temp" CACHE PATH "Path for distribution zip files" )
-    #  CONFIGURE_FILE(${MAF_SOURCE_DIR}/RunDart.tcl.in ${MAF_SOURCE_DIR}/RunDart.tcl @ONLY)
-    #ENDIF (WIN32)
+    SUBDIRS (Testing)
     
   ENDIF(BUILD_TESTING)
 ELSE (MAF_CAN_BUILD)

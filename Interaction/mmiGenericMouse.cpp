@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 06:14:30 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-06-06 15:39:38 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -897,6 +897,7 @@ void mmiGenericMouse::SendTransformMatrix(const mafMatrix &matrix, int mouseActi
       (float) m_LastPickPosition[1], (float) m_LastPickPosition[2]);
     
     //e.SetVtkObj(pickPosMatrix);  //modified by Marco. 24-5-2005
+    e.SetMafObject(pickPosMatrix);
     
   }  
 

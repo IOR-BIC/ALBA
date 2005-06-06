@@ -79,7 +79,6 @@ IF (MAF_USE_VTK)
   )
 ENDIF (MAF_USE_VTK)
 
-
 # List libraries that are needed by this project.
 #SET(PROJECT_LIBS "" )
 
@@ -98,11 +97,3 @@ ENDIF (MAF_USE_VTK)
 IF (MAF_USE_WX)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_WXWIN_LIBRARY)
 ENDIF (MAF_USE_WX)
-
-# build tests
-IF(BUILD_TESTING)
-  OPTION(BUILD_BASE_TESTING "Enable building of testing for BASE classes" ON)
-  IF (BUILD_BASE_TESTING)
-    SUBDIRS(Testing)
-  ENDIF (BUILD_BASE_TESTING)
-ENDIF(BUILD_TESTING)
