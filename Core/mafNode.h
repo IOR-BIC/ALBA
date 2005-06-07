@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 06:04:17 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2005-06-07 14:46:09 $
+  Version:   $Revision: 1.25 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -336,6 +336,7 @@ public:
   enum 
   {
     ID_NAME = MINID,
+    ID_PRINT,
     ID_LAST
   };
 
@@ -396,7 +397,6 @@ protected:
   mafLinksMap       m_Links;        ///< links to other nodes in the tree
 
   mafString         m_Name;         ///< name of this node
-
   mafID             m_Id;           ///< ID of this node
 
   bool  m_VisibleToTraverse;        ///< enable/disable traversing visit of this node

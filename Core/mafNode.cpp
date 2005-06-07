@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-30 12:54:08 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2005-06-07 14:46:09 $
+  Version:   $Revision: 1.32 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -34,6 +34,11 @@
 #include "mafTagArray.h"
 #include "mmgGui.h"
 #include <assert.h>
+
+#ifdef VTK_USE_ANSI_STDLIB
+  #include <sstream>
+#endif
+#include <strstream>
 
 //-------------------------------------------------------------------------
 mafCxxAbstractTypeMacro(mafNode)
@@ -663,7 +668,6 @@ bool mafNode::CompareTree(mafNode *vme)
       return false;
     }
   }
-
   return true;
 }
 
@@ -673,7 +677,6 @@ mafNode *mafNode::CopyTree(mafNode *vme, mafNode *parent)
 {
   
   mafNode* v = vme->MakeCopy();
-
   v->ReparentTo(parent);
 
   for(unsigned long i=0; i<vme->GetNumberOfChildren(); i++)
@@ -682,7 +685,6 @@ mafNode *mafNode::CopyTree(mafNode *vme, mafNode *parent)
       if (child->IsVisible())
         mafNode::CopyTree(child,v);
   }
-
   return v;
 }
 
@@ -720,14 +722,12 @@ mafTagArray  *mafNode::GetTagArray()
 //-------------------------------------------------------------------------
 {
   mafTagArray *tarray=mafTagArray::SafeDownCast(GetAttribute("TagArray"));
-  
   if (!tarray)
   {
     tarray=mafTagArray::New();
     tarray->SetName("TagArray");
     SetAttribute("TagArray",tarray);
   }
-
   return tarray;
 }
 
@@ -870,6 +870,29 @@ void mafNode::OnEvent(mafEventBase *e)
       {
         mafEvent ev(this,VME_MODIFIED,this);
         ForwardUpEvent(ev);
+      }
+      break;
+      case ID_PRINT:
+      {
+        #ifdef VTK_USE_ANSI_STDLIB
+          std::stringstream ss1;
+
+          Print(ss1);
+          wxString message = ss1.str().c_str();
+
+          wxLogMessage("[VME PRINTOUT:]\n");
+
+          for (int pos = message.Find('\n'); pos >= 0; pos = message.Find('\n'))
+          {
+            wxString tmp = message.Mid(0,pos);
+            wxLogMessage(tmp);
+            message = message.Mid(pos+1);
+          }
+        #else
+          std::strstream ss1,ss2;
+          Print(ss1);
+          wxLogMessage("[VME PRINTOUT:]\n%s\n", ss1.str()); 
+        #endif
       }
       break;
       default:
@@ -1092,7 +1115,7 @@ mmgGui* mafNode::CreateGui()
   m_Gui = new mmgGui(this);
   
   mafString type_name = GetTypeName();
-  m_Gui->Label("type :", type_name);
+  m_Gui->Button(ID_PRINT, type_name, "", "Print node debug information");
   m_Gui->String(ID_NAME,"name :", &m_Name);
 
   return m_Gui;
