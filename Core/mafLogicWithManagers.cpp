@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 15:15:56 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2005-06-07 14:46:27 $
+  Version:   $Revision: 1.20 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -498,6 +498,8 @@ void mafLogicWithManagers::VmeAdd(mafNode *vme)
 void mafLogicWithManagers::VmeAdded(mafNode *vme)
 //----------------------------------------------------------------------------
 {
+  //vme->Initialize();
+
   if(m_ViewManager)
     m_ViewManager->VmeAdd(vme);
 	if(m_SideBar)
@@ -516,6 +518,8 @@ void mafLogicWithManagers::VmeRemove(mafNode *vme)
 void mafLogicWithManagers::VmeRemoving(mafNode *vme)
 //----------------------------------------------------------------------------
 {
+  //vme->Shutdown();
+
 	if(m_SideBar)
     m_SideBar->VmeRemove(vme);
 	if(m_ViewManager)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-01 11:19:39 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2005-06-07 14:45:34 $
+  Version:   $Revision: 1.26 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -457,7 +457,7 @@ void mafVME::Print(std::ostream& os, const int tabs) const
     m_MatrixPipe->Print(os,indent.GetNextIndent());
   }
   else
-    os << "NULL\n";
+    os << std::endl;
   
   os << indent << "DataPipe: ";
   if (m_DataPipe) // allocate data pipe if not done yet
@@ -466,7 +466,7 @@ void mafVME::Print(std::ostream& os, const int tabs) const
     m_DataPipe->Print(os,indent.GetNextIndent());
   }
   else
-    os << "NULL\n";
+    os << std::endl;
 }
 
 /*

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:54:49 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-06-07 14:42:21 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -18,12 +18,11 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "wx/busyinfo.h"
 
+#include "mmoCreateMeter.h"
 #include "mafDecl.h"
 #include "mafEvent.h"
 
-#include "mmoCreateMeter.h"
 #include "mafVMEMeter.h"
 
 //----------------------------------------------------------------------------
