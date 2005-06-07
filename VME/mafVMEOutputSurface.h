@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputSurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:07:11 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-06-07 14:44:10 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -50,8 +50,19 @@ public:
 
   /** used by VME to set the texture */
   void SetTexture(vtkImageData *tex);
+
+  /** IDs for the GUI */
+  /*enum 
+  {
+    ID_NUM_TRIANGLES = Superclass::ID_LAST,
+    ID_LAST
+  };
+  */
 protected: 
   vtkImageData *m_Texture; ///< the optional texture to be applied to the surface
+  mafString     m_NumTriangles;
+
+  mmgGui *CreateGui();
 
 private:
   mafVMEOutputSurface(const mafVMEOutputSurface&); // Not implemented

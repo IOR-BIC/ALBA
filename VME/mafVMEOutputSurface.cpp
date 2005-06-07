@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:07:11 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-06-07 14:44:10 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,6 +25,7 @@
 #include "mafVME.h"
 #include "mafIndent.h"
 #include "mafDataPipe.h"
+#include "mmgGui.h"
 
 #include "vtkPolyData.h"
 #include "vtkImageData.h"
@@ -40,6 +41,7 @@ mafVMEOutputSurface::mafVMEOutputSurface()
 //-------------------------------------------------------------------------
 {
   m_Texture = NULL;
+  m_NumTriangles = "0";
 }
 
 //-------------------------------------------------------------------------
@@ -60,9 +62,9 @@ vtkPolyData *mafVMEOutputSurface::GetSurfaceData()
 void mafVMEOutputSurface::SetTexture(vtkImageData *tex)
 //-------------------------------------------------------------------------
 {
-  if (m_Texture!=tex)
+  if (m_Texture != tex)
   {
-    vtkDEL (m_Texture)
+    vtkDEL(m_Texture);
     m_Texture = tex;
     m_Texture->Register(NULL);
   }
@@ -71,8 +73,21 @@ void mafVMEOutputSurface::SetTexture(vtkImageData *tex)
 vtkImageData *mafVMEOutputSurface::GetTexture()
 //-------------------------------------------------------------------------
 {
-  if (m_VME&&m_VME->GetDataPipe()&&m_VME->GetDataPipe()->GetVTKData())
+  if (m_VME && m_VME->GetDataPipe() && m_VME->GetDataPipe()->GetVTKData())
     m_VME->GetDataPipe()->GetVTKData()->UpdateInformation();
   return m_Texture;
 }
-
+//-------------------------------------------------------------------------
+mmgGui* mafVMEOutputSurface::CreateGui()
+//-------------------------------------------------------------------------
+{
+  assert(m_Gui == NULL);
+  m_Gui = mafVMEOutput::CreateGui();
+  if (m_VME && m_VME->GetDataPipe() && m_VME->GetDataPipe()->GetVTKData())
+  {
+    this->Update();
+    m_NumTriangles << ((vtkPolyData *)m_VME->GetDataPipe()->GetVTKData())->GetNumberOfPolys();
+  }
+  m_Gui->Label("triangles", &m_NumTriangles);
+  return m_Gui;
+}
