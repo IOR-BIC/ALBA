@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-06 14:51:07 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-06-07 14:44:48 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -31,13 +31,14 @@
 #include "mafVMERoot.h"
 #include "mafVMESurface.h"
 #include "mafPipeFactory.h"
-#include "mafPipeMeter.h"
 
 #include "mmoReparentTo.h"
 #include "mmoVTKExporter.h"
 #include "mmoVTKImporter.h"
 #include "mmoCreateMeter.h"
+#include "mmoCreateSlicer.h"
 #include "mafViewVTK.h"
+
 //--------------------------------------------------------------------------------
 // Create the Application
 //--------------------------------------------------------------------------------
@@ -52,10 +53,9 @@ bool exOperationApp::OnInit()
   int result = mafVMEFactory::Initialize();
   assert(result==MAF_OK);
   
-  // Inizializzazione e Fill della PipeFactory -- potrebbe essere un SideEffect del Plug dei Nodi
+  // Initialize and Fill of PipeFactory -- could be a SideEffect of the node plug
   result = mafPipeFactory::Initialize();
   assert(result==MAF_OK);
-  mafPlugPipe<mafPipeMeter>("mafPipeMeter");
 
   m_logic = new mafLogicWithManagers();
   //m_logic->PlugTimebar(false);
@@ -74,6 +74,7 @@ bool exOperationApp::OnInit()
   m_logic->Plug(new mmoVTKImporter("VTK Importer"));
   m_logic->Plug(new mmoVTKExporter("VTK Exporter"));
   m_logic->Plug(new mmoCreateMeter("Create Meter"));
+  m_logic->Plug(new mmoCreateSlicer("Create Slicer"));
   m_logic->Plug(new mmoReparentTo("Reparent to...  \tCtrl+R"));
   
   m_logic->Plug(new mafViewVTK("VTK view"));
