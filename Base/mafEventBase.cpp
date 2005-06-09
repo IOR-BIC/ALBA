@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-28 16:11:47 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-06-09 13:55:43 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -39,14 +39,14 @@ mafEventBase::~mafEventBase()
 }
 
 //------------------------------------------------------------------------------
-void mafEventBase::DeepCopy(const mafEventBase *event)
+void mafEventBase::DeepCopy(const mafEventBase *maf_event)
 //------------------------------------------------------------------------------
 {
-  m_Sender    = event->m_Sender;
-  m_Source    = event->m_Source;
-  m_Data      = event->m_Data;
-  m_Id        = event->m_Id;
-  m_SkipFlag  = event->m_SkipFlag;
+  m_Sender    = maf_event->m_Sender;
+  m_Source    = maf_event->m_Source;
+  m_Data      = maf_event->m_Data;
+  m_Id        = maf_event->m_Id;
+  m_SkipFlag  = maf_event->m_SkipFlag;
 }
 
 //------------------------------------------------------------------------------
