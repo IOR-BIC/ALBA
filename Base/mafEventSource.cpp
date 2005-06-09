@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventSource.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-21 07:53:42 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-06-09 13:55:07 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -86,7 +86,7 @@ bool mafEventSource::RemoveObserver(mafObserver *obj)
     return false;
 
   // an observer could be present more then one time!
-  bool flag=false;
+  bool flag = false;
   mafObserversListType::iterator it;
   for (it=m_Observers->m_List.begin(); it!=m_Observers->m_List.end() ;it++)
   {
@@ -94,6 +94,7 @@ bool mafEventSource::RemoveObserver(mafObserver *obj)
     {
       m_Observers->m_List.erase(it);
       flag=true;
+      break;      // Paolo 08-06-2005
     }
   }
 
