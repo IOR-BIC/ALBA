@@ -107,7 +107,7 @@ IF (MAF_USE_CRYPTO)
 ENDIF (MAF_USE_CRYPTO)
 
 IF (MAF_USE_VTK)
-  SET(PROJECT_LIBS ${PROJECT_LIBS} vtkIO vtkRendering vtkGraphics)
+  SET(PROJECT_LIBS ${PROJECT_LIBS} vtkIO vtkRendering vtkGraphics vtkHybrid)
 ENDIF (MAF_USE_VTK)
 
 # Create the library.
