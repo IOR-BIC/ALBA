@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-07 14:45:34 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2005-06-10 08:45:03 $
+  Version:   $Revision: 1.27 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -723,43 +723,54 @@ int mafVME::SetDataPipe(mafDataPipe *dpipe)
 }
 
 //-------------------------------------------------------------------------
-void mafVME::OnEvent(mafEventBase *e)
+void mafVME::OnEvent(mafEventBase *maf_event)
 //-------------------------------------------------------------------------
 {
-  if (e->GetChannel()==MCH_DOWN)
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
     switch (e->GetId())
     {
-    case VME_TIME_SET:
-      SetTimeStamp(*((mafTimeStamp *)e->GetData()));
-    break;
+      case ID_VME_CRYPTING:
+        m_Crypting = ((mafEvent *)e)->GetBool();
+//        return;
+      break;
+      default:
+        Superclass::OnEvent(maf_event);
     }
   }
-  else if (e->GetChannel()==MCH_UP)
+  else if (maf_event->GetChannel()==MCH_DOWN)
   {
-    switch (e->GetId())
+    switch (maf_event->GetId())
+    {
+      case VME_TIME_SET:
+        SetTimeStamp(*((mafTimeStamp *)maf_event->GetData()));
+        Superclass::OnEvent(maf_event);
+      break;
+    }
+  }
+  else if (maf_event->GetChannel()==MCH_UP)
+  {
+    switch (maf_event->GetId())
     {
       case VME_OUTPUT_DATA_PREUPDATE:      
         InternalPreUpdate();  // self process the event
-        GetEventSource()->InvokeEvent(e); // forward event to observers
-        return;
+        GetEventSource()->InvokeEvent(maf_event); // forward event to observers
+//        return;
       break;
       case VME_OUTPUT_DATA_UPDATE:
         InternalUpdate();   // self process the event
-        GetEventSource()->InvokeEvent(e); // forward event to observers
-        return;
+        GetEventSource()->InvokeEvent(maf_event); // forward event to observers
+//        return;
       break;
       case VME_MATRIX_UPDATE:
-        GetEventSource()->InvokeEvent(e); // forward event to observers
-        return;
+        GetEventSource()->InvokeEvent(maf_event); // forward event to observers
+//        return;
       break;
-      case ID_VME_CRYPTING:
-        m_Crypting = ((mafEvent *)e)->GetBool();
-        return;
-      break;
+      default:
+        Superclass::OnEvent(maf_event);
     }
   }
-  Superclass::OnEvent(e);
+//  Superclass::OnEvent(maf_event);
 }
 
 
