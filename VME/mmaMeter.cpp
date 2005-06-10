@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:54:43 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-06-10 11:32:46 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -35,6 +35,7 @@ mmaMeter::mmaMeter()
 //-------------------------------------------------------------------------
 {
   m_Name           = "MeterAttributes";
+  m_LabelVisibility= 0;
   m_ColorMode      = mafVMEMeter::ONE_COLOR;
   m_Representation = mafVMEMeter::LINE_REPRESENTATION;
   m_Capping        = 0;
