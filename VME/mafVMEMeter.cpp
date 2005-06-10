@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 09:24:48 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-06-10 15:27:36 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -39,7 +39,7 @@
 
 #include <assert.h>
 
-MAF_ID_IMP(mafVMEMeter::LengthThresholdEvent);
+MAF_ID_IMP(mafVMEMeter::LENGTH_THRESHOLD_EVENT);
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMEMeter)
@@ -49,6 +49,9 @@ mafCxxTypeMacro(mafVMEMeter)
 mafVMEMeter::mafVMEMeter()
 //-------------------------------------------------------------------------
 {
+  m_Distance      = -1.0;
+  m_Angle         = 0.0;
+  
   m_StartVmeName  = "";
   m_EndVme1Name   = "";
   m_EndVme2Name   = "";
@@ -163,8 +166,8 @@ void mafVMEMeter::InternalUpdate()
 
   if (GetMeterMode() == mafVMEMeter::POINT_DISTANCE)
   {
-    mafVME *start_vme = mafVME::SafeDownCast(GetLink("StartVME"));
-    mafVME *end_vme   = mafVME::SafeDownCast(GetLink("EndVME1"));
+    mafVME *start_vme = GetStartVME();
+    mafVME *end_vme   = GetEnd1VME();
 
     bool start_ok = true, end_ok = true;
 
@@ -230,16 +233,16 @@ void mafVMEMeter::InternalUpdate()
     else
       m_Distance = -1;
 
-    //this->InvokeEvent(mflDataPipe::OutputUpdateEvent);
+    m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 
     if(GetMeterMeasureType() == mafVMEMeter::ABSOLUTE_MEASURE && m_MeterAttributes->m_ThresholdEvent > 0 && m_Distance >= 0 && m_Distance >= threshold)
-      m_EventSource->InvokeEvent(this,LengthThresholdEvent);
+      m_EventSource->InvokeEvent(this,LENGTH_THRESHOLD_EVENT);
   }
   else if (GetMeterMode() == mafVMEMeter::LINE_DISTANCE)
   {
-    mafVME *start_vme = mafVME::SafeDownCast(GetLink("StartVME"));
-    mafVME *end1_vme  = mafVME::SafeDownCast(GetLink("EndVME1"));
-    mafVME *end2_vme  = mafVME::SafeDownCast(GetLink("EndVME2"));
+    mafVME *start_vme = GetStartVME();
+    mafVME *end1_vme  = GetEnd1VME();
+    mafVME *end2_vme  = GetEnd2VME();
 
     bool start_ok = true, end1_ok = true, end2_ok = true;
     double orientation[3];
@@ -343,16 +346,16 @@ void mafVMEMeter::InternalUpdate()
     else
       m_Distance = -1;
 
-//    this->InvokeEvent(this,mflDataPipe::OutputUpdateEvent);
+    m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 
     if(GetMeterMeasureType() == mafVMEMeter::ABSOLUTE_MEASURE && m_MeterAttributes->m_ThresholdEvent > 0 && m_Distance >= 0 && m_Distance >= threshold)
-      m_EventSource->InvokeEvent(this, LengthThresholdEvent);
+      m_EventSource->InvokeEvent(this, LENGTH_THRESHOLD_EVENT);
   }
   else if (GetMeterMode() == mafVMEMeter::LINE_ANGLE)
   {
-    mafVME *start_vme = mafVME::SafeDownCast(GetLink("StartVME"));
-    mafVME *end1_vme  = mafVME::SafeDownCast(GetLink("EndVME1"));
-    mafVME *end2_vme  = mafVME::SafeDownCast(GetLink("EndVME2"));
+    mafVME *start_vme = GetStartVME();
+    mafVME *end1_vme  = GetEnd1VME();
+    mafVME *end2_vme  = GetEnd2VME();
 
     double orientation[3];
 
@@ -455,10 +458,10 @@ void mafVMEMeter::InternalUpdate()
     else
       m_Angle = 0;
 
-    //this->InvokeEvent(mflDataPipe::OutputUpdateEvent);
+    m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 
     if(GetMeterMeasureType() == mafVMEMeter::ABSOLUTE_MEASURE && m_MeterAttributes->m_ThresholdEvent > 0 && m_Angle > 0 && m_Angle >= threshold)
-      m_EventSource->InvokeEvent(this,LengthThresholdEvent);
+      m_EventSource->InvokeEvent(this,LENGTH_THRESHOLD_EVENT);
   }
 }
 //-----------------------------------------------------------------------
@@ -679,15 +682,15 @@ mmgGui* mafVMEMeter::CreateGui()
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
   m_Gui->Divider();
-  mafVME *start_vme = mafVME::SafeDownCast(GetLink("StartVME"));
+  mafVME *start_vme = GetStartVME();
   m_StartVmeName = start_vme ? start_vme->GetName() : "none";
   m_Gui->Button(ID_START_METER_LINK,&m_StartVmeName,"Start", "Select the start vme for the meter");
 
-  mafVME *end_vme1   = mafVME::SafeDownCast(GetLink("EndVME1"));
+  mafVME *end_vme1   = GetEnd1VME();
   m_EndVme1Name = end_vme1 ? end_vme1->GetName() : "none";
   m_Gui->Button(ID_END1_METER_LINK,&m_EndVme1Name,"End 1", "Select the end vme for point distance");
 
-  mafVME *end_vme2   = mafVME::SafeDownCast(GetLink("EndVME2"));
+  mafVME *end_vme2   = GetEnd2VME();
   m_EndVme2Name = end_vme2 ? end_vme2->GetName() : "none";
   m_Gui->Button(ID_END2_METER_LINK,&m_EndVme2Name,"End 2", "Select the vme representing \nthe point for line distance");
 
@@ -731,6 +734,7 @@ void mafVMEMeter::OnEvent(mafEventBase *maf_event)
             m_EndVme2Name = n->GetName();
           }
           m_Gui->Update();
+          //InternalUpdate();
         }
       }
       break;
@@ -742,4 +746,22 @@ void mafVMEMeter::OnEvent(mafEventBase *maf_event)
   {
     Superclass::OnEvent(maf_event);
   }
+}
+//-------------------------------------------------------------------------
+mafVME *mafVMEMeter::GetStartVME()
+//-------------------------------------------------------------------------
+{
+  return mafVME::SafeDownCast(GetLink("StartVME"));
+}
+//-------------------------------------------------------------------------
+mafVME *mafVMEMeter::GetEnd1VME()
+//-------------------------------------------------------------------------
+{
+  return mafVME::SafeDownCast(GetLink("EndVME1"));
+}
+//-------------------------------------------------------------------------
+mafVME *mafVMEMeter::GetEnd2VME()
+//-------------------------------------------------------------------------
+{
+  return mafVME::SafeDownCast(GetLink("EndVME2"));
 }

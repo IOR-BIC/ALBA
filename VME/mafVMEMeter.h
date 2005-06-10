@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 09:24:48 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-06-10 15:27:36 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -32,7 +32,7 @@ class vtkAppendPolyData;
 class MAF_EXPORT mafVMEMeter : public mafVME
 {
 public:
-  MAF_ID_DEC(LengthThresholdEvent);
+  MAF_ID_DEC(LENGTH_THRESHOLD_EVENT);
 
   enum {
     POINT_DISTANCE=0,
@@ -212,6 +212,10 @@ public:
 
   /** return the meter's attributes */
   mmaMeter *GetMeterAttributes();
+
+  mafVME *GetStartVME();
+  mafVME *GetEnd1VME();
+  mafVME *GetEnd2VME();
 
 protected:
   mafVMEMeter();
