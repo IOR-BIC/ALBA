@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCrossSplitter.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:44:03 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-06-10 08:50:41 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -101,7 +101,7 @@ protected:
   wxWindow *m_vp4;
 
 	/** Adjust the panels size. */
-  void OnSize(wxSizeEvent& event);
+  void OnSize(wxSizeEvent &event);
 
 	/** Intercept the mouse button down and call DrawTracker with mouse position. */
   void OnLeftMouseButtonDown(wxMouseEvent &event);

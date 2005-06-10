@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCrossSplitter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:20 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-06-10 08:50:41 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -67,7 +67,7 @@ mmgCrossSplitter::~mmgCrossSplitter( )
   delete m_Pen;
 }
 //----------------------------------------------------------------------------
-void mmgCrossSplitter::OnSize(wxSizeEvent& event)
+void mmgCrossSplitter::OnSize(wxSizeEvent &event)
 //----------------------------------------------------------------------------
 {
   wxPanel::OnSize(event);
