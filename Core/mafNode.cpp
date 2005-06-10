@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:43:06 $
-  Version:   $Revision: 1.33 $
+  Date:      $Date: 2005-06-10 11:33:45 $
+  Version:   $Revision: 1.34 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -190,6 +190,8 @@ void mafNode::SetName(const char *name)
 {
   m_Name=name; // force string copy
   Modified();
+  mafEvent ev(this,VME_MODIFIED,this);
+  ForwardUpEvent(ev);
 } 
 
 //-------------------------------------------------------------------------
@@ -780,7 +782,8 @@ void mafNode::SetLink(const char *name, mafNode *node)
 
   // attach as observer of the linked node to catch events
   // of de/attachment to the tree and destroy event.
-  node->GetEventSource()->AddObserver(this);    
+  node->GetEventSource()->AddObserver(this); 
+  Modified();
 }
 //-------------------------------------------------------------------------
 void mafNode::RemoveLink(const char *name)
@@ -794,6 +797,7 @@ void mafNode::RemoveLink(const char *name)
     // detach as observer from the linked node
     it->second.m_Node->GetEventSource()->RemoveObserver(this);
     m_Links.erase(it); // remove linked node from links container
+    Modified();
   }
 }
 
@@ -808,6 +812,7 @@ void mafNode::RemoveAllLinks()
     it->second.m_Node->GetEventSource()->RemoveObserver(this);
   }
   m_Links.clear();
+  Modified();
 }
 
 //-------------------------------------------------------------------------
@@ -866,8 +871,9 @@ void mafNode::OnEvent(mafEventBase *e)
         {
           case ID_NAME:
           {
-            mafEvent ev(this,VME_MODIFIED,this);
-            ForwardUpEvent(ev);
+            //mafEvent ev(this,VME_MODIFIED,this);
+            //ForwardUpEvent(ev);
+            SetName(m_Name.GetCStr());
           }
           break;
           case ID_PRINT_INFO:

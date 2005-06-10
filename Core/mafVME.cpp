@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:45:03 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2005-06-10 11:33:45 $
+  Version:   $Revision: 1.28 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -678,6 +678,8 @@ void mafVME::SetCrypting(int crypting)
   }
 
   Modified();
+  mafEvent ev(this,VME_MODIFIED,this);
+  ForwardUpEvent(ev);
 }
 
 //-------------------------------------------------------------------------
@@ -731,8 +733,7 @@ void mafVME::OnEvent(mafEventBase *maf_event)
     switch (e->GetId())
     {
       case ID_VME_CRYPTING:
-        m_Crypting = ((mafEvent *)e)->GetBool();
-//        return;
+        SetCrypting(((mafEvent *)e)->GetBool());
       break;
       default:
         Superclass::OnEvent(maf_event);
@@ -755,24 +756,19 @@ void mafVME::OnEvent(mafEventBase *maf_event)
       case VME_OUTPUT_DATA_PREUPDATE:      
         InternalPreUpdate();  // self process the event
         GetEventSource()->InvokeEvent(maf_event); // forward event to observers
-//        return;
       break;
       case VME_OUTPUT_DATA_UPDATE:
         InternalUpdate();   // self process the event
         GetEventSource()->InvokeEvent(maf_event); // forward event to observers
-//        return;
       break;
       case VME_MATRIX_UPDATE:
         GetEventSource()->InvokeEvent(maf_event); // forward event to observers
-//        return;
       break;
       default:
         Superclass::OnEvent(maf_event);
     }
   }
-//  Superclass::OnEvent(maf_event);
 }
-
 
 //-------------------------------------------------------------------------
 int mafVME::InternalStore(mafStorageElement *parent)
