@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 14:34:36 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-06-10 08:52:57 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -138,7 +138,7 @@ int mmgGui::GetMetrics(int id)
 	}
 }
 //----------------------------------------------------------------------------
-void mmgGui::OnEvent(mafEventBase *event)
+void mmgGui::OnEvent(mafEventBase *maf_event)
 /**  \par implementation details:
 called by the widgets (via a mmgValidator), forward the events to the eventListener 
 \todo 
@@ -146,7 +146,7 @@ make it protected, and make mmgValidator friend
 */
 //----------------------------------------------------------------------------
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(event))
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
     int id = e->GetId();
     if(m_CollaborateStatus)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgFlagSplitter.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:44:04 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-06-10 08:52:57 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -47,7 +47,7 @@ public:
   virtual ~mmgFlagSplitter();
 
   void SetListener(mafObserver *Listener) {m_Listener = Listener;};
-  //void OnEvent(mafEventBase *event);
+  //void OnEvent(mafEventBase *maf_event);
   
 	/** Set the split position and redraw the four panels. */
   void SetSplitPos(int x1,int x2);
@@ -73,7 +73,7 @@ protected:
   wxWindow  *m_vp3; 
   
 	/** Adjust the panels size. */
-  void OnSize(wxSizeEvent& event);
+  void OnSize(wxSizeEvent &event);
 
 	/** Adjust the panels. */
   void OnLayout();

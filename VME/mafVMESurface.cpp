@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-30 15:55:50 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-06-10 08:54:53 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -108,21 +108,21 @@ mmgGui* mafVMESurface::CreateGui()
 }
 
 //-------------------------------------------------------------------------
-void mafVMESurface::OnEvent(mafEventBase *event)
+void mafVMESurface::OnEvent(mafEventBase *maf_event)
 //-------------------------------------------------------------------------
 {
   // events to be sent up or down in the tree are simply forwarded
-  if (mafEvent *e = mafEvent::SafeDownCast(event))
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
     switch(e->GetId())
     {
       default:
-        mafVME::OnEvent(event);
+        mafVME::OnEvent(maf_event);
     }
   }
   else
   {
-    Superclass::OnEvent(event);
+    Superclass::OnEvent(maf_event);
   }
 }
 

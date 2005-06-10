@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:51:33 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-06-10 08:54:53 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -47,7 +47,7 @@ public:
   virtual int SetData(vtkPolyData *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
 
   /** Precess events coming from other objects */ 
-  virtual void OnEvent(mafEventBase *event);
+  virtual void OnEvent(mafEventBase *maf_event);
 
   /** return the right type of output */  
   mafVMEOutputSurface *GetSurfaceOutput() {return (mafVMEOutputSurface *)GetOutput();}

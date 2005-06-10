@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-30 12:54:37 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-06-10 08:54:01 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -1081,11 +1081,11 @@ mmgGui* mafVMELandmarkCloud::CreateGui()
   return m_Gui;
 }
 //-------------------------------------------------------------------------
-void mafVMELandmarkCloud::OnEvent(mafEventBase *event)
+void mafVMELandmarkCloud::OnEvent(mafEventBase *maf_event)
 //-------------------------------------------------------------------------
 {
   // events to be sent up or down in the tree are simply forwarded
-  if (mafEvent *e = mafEvent::SafeDownCast(event))
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
     switch(e->GetId())
     {
@@ -1093,12 +1093,12 @@ void mafVMELandmarkCloud::OnEvent(mafEventBase *event)
         SetRadius(e->GetDouble());
       break;
       default:
-        mafVME::OnEvent(event);
+        mafVME::OnEvent(maf_event);
     }
   }
   else
   {
-    Superclass::OnEvent(event);
+    Superclass::OnEvent(maf_event);
   }
 }
 //-------------------------------------------------------------------------

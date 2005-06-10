@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:44:05 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-06-10 08:52:58 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,7 +44,7 @@ public:
   virtual ~mmgTimeBar();
   void SetListener(mafObserver *Listener) {m_Listener = Listener;};
 
-  void OnEvent(mafEventBase *event);
+  void OnEvent(mafEventBase *maf_event);
   
 	/** Set the bounds for the time bar. */
 	void SetBounds(float min, float max);

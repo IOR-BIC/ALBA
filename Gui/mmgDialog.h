@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialog.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:47:54 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-06-10 08:52:57 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -71,7 +71,7 @@ public:
 	mmgDialog (const wxString& title,	long style = mafCLOSEWINDOW | mafRESIZABLE | mafCLOSE);
 	virtual ~mmgDialog (); 
   void SetListener(mafObserver *Listener) {m_Listener = Listener;};
-  void OnEvent(mafEventBase *event);
+  void OnEvent(mafEventBase *maf_event);
 
   /** Add a widget to the dialog. */
   void Add(wxWindow* window,int option = 0, int flag = wxEXPAND, int border = 0)  {window->Reparent(this); m_sizer->Add(window,option,flag,border);};
@@ -97,17 +97,17 @@ public:
 
   /** 
   Virtual functions called to terminate ShowModal - these can be redefined without providing the Event Table. 
-  called when a ShowModal stage end with ok - tipically is called by an 'OK' button -- */
-  virtual void OnOK(wxCommandEvent& event);
+  called when a ShowModal stage end with ok - in general is called by an 'OK' button -- */
+  virtual void OnOK(wxCommandEvent &event);
   /** 
   Virtual functions called to terminate ShowModal - these can be redefined without providing the Event Table. 
-  called when a ShowModal stage end with Cancel - tipically is called by an 'Cancel' button -- */
-  virtual void OnCancel(wxCommandEvent& event);
+  called when a ShowModal stage end with Cancel - in general is called by an 'Cancel' button -- */
+  virtual void OnCancel(wxCommandEvent &event);
   /** 
   Virtual functions called to terminate ShowModal - these can be redefined without providing the Event Table. 
   called when a ShowModal stage end with because the user press a 'Close' button or the CloseButton on the frame.
   The default behaviur is to call OnCancel() - I recommend not to override this, but OnCancel */
-  virtual void OnCloseWindow(wxCloseEvent& event);
+  virtual void OnCloseWindow(wxCloseEvent &event);
 
 
   // to Paolo
@@ -124,11 +124,11 @@ public:
   mafObserver *m_Listener;
 
 private:
-  /** non virtual function, called on Dialog Closing and bound trought the event table */
-  void nvOnCloseWindow(wxCloseEvent& event) {OnCloseWindow(event);};
-  void nvOnOK(wxCommandEvent& event)        {OnOK(event);};    
-  void nvOnCancel(wxCommandEvent& event)    {OnCancel(event);};    
-  void nvOnClose(wxCommandEvent& event)     {wxDialog::Close();}; //calls nvOnCloseWindow
+  /** non virtual function, called on Dialog Closing and bound through the event table */
+  void nvOnCloseWindow(wxCloseEvent &event) {OnCloseWindow(event);};
+  void nvOnOK(wxCommandEvent &event)        {OnOK(event);};    
+  void nvOnCancel(wxCommandEvent &event)    {OnCancel(event);};    
+  void nvOnClose(wxCommandEvent &event)     {wxDialog::Close();}; //calls nvOnCloseWindow
 
   DECLARE_EVENT_TABLE()
 };

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgViewFrame.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:44:06 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-06-10 08:53:15 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,25 +44,25 @@ class mmgViewFrame: public wxFrame , public mafObserver
 	void SetView(mafView *view);
 
   /** Answer to the messages coming from bottom classes. */
-	virtual void OnEvent(mafEventBase *event);
+	virtual void OnEvent(mafEventBase *maf_event);
 
 protected:
 	/** Send the event to destroy the owned view. */
-	void OnCloseWindow  (wxCloseEvent&	event);
+	void OnCloseWindow  (wxCloseEvent &event);
 
 	/** Adjust the child size. */
-	void OnSize         (wxSizeEvent&		event);
+	void OnSize         (wxSizeEvent &event);
 
 	/** Send the event to select the owned view. */
-	void OnSelect				(wxCommandEvent&event); 
+	void OnSelect				(wxCommandEvent &event); 
 
 	/** Send the event to select the owned view. */
-  void OnActivate     (wxActivateEvent& event);
+  void OnActivate     (wxActivateEvent &event);
 
 	mafObserver *m_Listener;
-	wxWindow         *m_clientwin;
-	mafView          *m_view;
-  static bool       m_quitting;
+	wxWindow    *m_clientwin;
+	mafView     *m_view;
+  static bool  m_quitting;
 
 	DECLARE_EVENT_TABLE()
 };

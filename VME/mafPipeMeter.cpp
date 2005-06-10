@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-27 16:27:11 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-06-10 08:54:00 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,6 +22,8 @@
 #include "mafPipeMeter.h"
 #include "mafSceneNode.h"
 #include "mafVMEMeter.h"
+#include "mmaMeter.h"
+#include "mmgGui.h"
 #include "vtkMAFAssembly.h"
 
 //@@@ #include "mafDecl.h"
@@ -53,6 +55,7 @@ mafPipeMeter::mafPipeMeter()
   m_SelectionProperty = NULL;
   m_SelectionActor    = NULL;
   m_Tube              = NULL;
+  m_MeterVME          = NULL;
 }
 //----------------------------------------------------------------------------
 void mafPipeMeter::Create(mafSceneNode *n/*, bool use_axes*/)
@@ -68,6 +71,7 @@ void mafPipeMeter::Create(mafSceneNode *n/*, bool use_axes*/)
   m_SelectionProperty = NULL;
   m_SelectionActor    = NULL;
   m_Tube              = NULL;
+  m_MeterVME          = NULL;
 
 	//@@@ m_use_axes = use_axes;
 	//@@@ mafVmeData *data = (mafVmeData*) m_Vme->GetClientData();
@@ -75,22 +79,22 @@ void mafPipeMeter::Create(mafSceneNode *n/*, bool use_axes*/)
   //@@@ m_Vme->UpdateCurrentData();
 
   assert(m_Vme->IsA("mafVMEMeter"));
-  mafVMEMeter *vme = mafVMEMeter::SafeDownCast(m_Vme);
-  assert(vme->GetPolylineOutput());
-  vme->GetPolylineOutput()->Update();
-  vtkPolyData *data = vme->GetPolylineOutput()->GetPolylineData();
+  m_MeterVME = mafVMEMeter::SafeDownCast(m_Vme);
+  assert(m_MeterVME->GetPolylineOutput());
+  m_MeterVME->GetPolylineOutput()->Update();
+  vtkPolyData *data = m_MeterVME->GetPolylineOutput()->GetPolylineData();
   assert(data);
 
   vtkNEW(m_Tube);
   m_Tube->UseDefaultNormalOff();
   m_Tube->SetInput(data);
-  m_Tube->SetRadius(vme->GetMeterRadius());
-  m_Tube->SetCapping(vme->GetMeterCapping());
+  m_Tube->SetRadius(m_MeterVME->GetMeterRadius());
+  m_Tube->SetCapping(m_MeterVME->GetMeterCapping());
   m_Tube->SetNumberOfSides(20);
   m_Tube->UseDefaultNormalOff();
 
   m_DataMapper = vtkPolyDataMapper::New();
-  if (vme->GetMeterRepresentation() == mafVMEMeter::LINE_REPRESENTATION)
+  if (m_MeterVME->GetMeterRepresentation() == mafVMEMeter::LINE_REPRESENTATION)
     m_DataMapper->SetInput(data);
   else
   {
@@ -98,7 +102,7 @@ void mafPipeMeter::Create(mafSceneNode *n/*, bool use_axes*/)
     m_DataMapper->SetInput(m_Tube->GetOutput());
   }
     
-	if(vme->IsAnimated())				
+	if(m_MeterVME->IsAnimated())				
 		m_DataMapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
 	else
 		m_DataMapper->ImmediateModeRenderingOff();
@@ -152,6 +156,54 @@ mafPipeMeter::~mafPipeMeter()
   vtkDEL(m_SelectionActor);
 	//@@@ if(m_use_axes) wxDEL(m_axes);  
 }
+//----------------------------------------------------------------------------
+mmgGui *mafPipeMeter::CreateGui()
+//----------------------------------------------------------------------------
+{
+  const wxString type_measure_string[] = {"absolute", "relative"};
+  const wxString representation_string[] = {"line", "tube"};
+  const wxString color_string[] = {"one", "range"};
+  int num_choices = 2;
+
+  mmaMeter *meter_attrib = m_MeterVME->GetMeterAttributes();
+
+  assert(m_Gui == NULL);
+  m_Gui = new mmgGui(this);
+  m_Gui->Bool(ID_SHOW_LABEL,"label", &meter_attrib->m_LabelVisibility);
+  m_Gui->Combo(ID_COLOR_MODE,"color", &meter_attrib->m_ColorMode,num_choices,color_string);
+  m_Gui->VectorN(ID_DISTANCE_RANGE,"range",meter_attrib->m_DistanceRange,2,0);
+  m_Gui->Combo(ID_METER_REPRESENTATION,"",&meter_attrib->m_Representation,num_choices,representation_string);
+  m_Gui->Double(ID_TUBE_RADIUS,"radius",&meter_attrib->m_TubeRadius,0);
+  m_Gui->Bool(ID_TUBE_CAPPING,"capping",&meter_attrib->m_Capping);
+  m_Gui->Combo(ID_METER_MEASURE_TYPE,"",&meter_attrib->m_MeasureType,num_choices,type_measure_string);
+  m_Gui->Double(ID_INIT_MEASURE,"init",&meter_attrib->m_InitMeasure,0);
+  m_Gui->Bool(ID_GENERATE_EVENT,"generate event",&meter_attrib->m_GenerateEvent);
+  m_Gui->Double(ID_DELTA_PERCENT,"delta %",&meter_attrib->m_DeltaPercent,0);
+
+  m_Gui->Enable(ID_DISTANCE_RANGE, meter_attrib->m_ColorMode == mafVMEMeter::ONE_COLOR);
+  m_Gui->Enable(ID_TUBE_RADIUS, meter_attrib->m_Representation == mafVMEMeter::LINE_REPRESENTATION);
+  m_Gui->Enable(ID_TUBE_CAPPING, meter_attrib->m_Representation == mafVMEMeter::LINE_REPRESENTATION);
+
+  return m_Gui;
+}
+//----------------------------------------------------------------------------
+void mafPipeMeter::OnEvent(mafEventBase *maf_event)
+//----------------------------------------------------------------------------
+{
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  {
+    switch(e->GetId()) 
+    {
+      case ID_METER_REPRESENTATION:
+        m_Gui->Enable(ID_TUBE_RADIUS, m_MeterVME->GetMeterAttributes()->m_Representation == mafVMEMeter::LINE_REPRESENTATION);
+        m_Gui->Enable(ID_TUBE_CAPPING, m_MeterVME->GetMeterAttributes()->m_Representation == mafVMEMeter::LINE_REPRESENTATION);
+        UpdateProperty();
+      break;
+      default:
+      break;
+    }
+  }
+}
 /*
 //----------------------------------------------------------------------------
 void mafPipeMeter::Show(bool show)
@@ -190,6 +242,8 @@ void mafPipeMeter::UpdateProperty(bool fromTag)
     m_Tube->Update();
     m_DataMapper->SetInput(m_Tube->GetOutput());
   }
+
+  m_MeterVME->Modified();
 
   /*
 	if(fromTag)

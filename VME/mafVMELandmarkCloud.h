@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 14:37:32 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-06-10 08:54:01 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -58,7 +58,7 @@ public:
   mafTypeMacro(mafVMELandmarkCloud, mafVMEPointSet);
   
   /** Precess events coming from other objects */ 
-  virtual void OnEvent(mafEventBase *event);
+  virtual void OnEvent(mafEventBase *maf_event);
 
   /**
   Add a new landmark an returns its index. BEWARE: landmark is added to all the

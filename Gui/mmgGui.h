@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 14:34:36 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-06-10 08:52:57 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2005
@@ -226,7 +226,7 @@ public:
 	/** Return the measure used to layout the widgets - pass one of the GUI_xxx constants. */
   int GetMetrics( int id); 
 
-  void OnEvent(mafEventBase *event);
+  void OnEvent(mafEventBase *maf_event);
 
   /**  \par implementation details:
   GetId is used to obtain a new/unique widget_ID. 

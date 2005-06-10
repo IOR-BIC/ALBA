@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 09:48:13 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-06-10 08:54:01 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,7 +35,7 @@ public:
   virtual     ~mafPipeSurface ();
 
   /** process events coming from gui */
-  virtual void OnEvent(mafEventBase *event);
+  virtual void OnEvent(mafEventBase *maf_event);
 
   virtual void Create(mafSceneNode *n /*,bool use_axes = true*/ ); //Can't add parameters - is Virtual
   virtual void Select(bool select); 

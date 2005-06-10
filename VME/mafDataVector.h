@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-18 19:55:57 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-06-10 08:54:00 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -72,7 +72,7 @@ public:
     This function also automatically call the UpdateData() member function.*/
   virtual void InsertItem(mafVMEItem *m);
 
-  void OnEvent(mafEventBase *event);
+  void OnEvent(mafEventBase *maf_event);
 
   /** return ID used to store this vector into a file when in SingleFileMode */
   mafID GetVectorID() {return m_VectorID;}

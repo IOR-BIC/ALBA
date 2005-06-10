@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 09:49:12 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-06-10 08:53:28 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -87,10 +87,10 @@ void mmoVTKExporter::OpRun()
 	ShowGui();
 }
 //----------------------------------------------------------------------------
-void mmoVTKExporter::OnEvent(mafEventBase *event)
+void mmoVTKExporter::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(event))
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
 	{
     switch(e->GetId())
     {

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgViewFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:44:06 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-06-10 08:53:15 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -61,14 +61,14 @@ mmgViewFrame::~mmgViewFrame( )
 {
 }
 //----------------------------------------------------------------------------
-void mmgViewFrame::OnCloseWindow(wxCloseEvent& event)
+void mmgViewFrame::OnCloseWindow(wxCloseEvent &event)
 //----------------------------------------------------------------------------
 { 
 	mafEventMacro(mafEvent(this,VIEW_DELETE,m_view));
 	Destroy();
 }
 //----------------------------------------------------------------------------
-void mmgViewFrame::OnSize(wxSizeEvent& event)
+void mmgViewFrame::OnSize(wxSizeEvent &event)
 //----------------------------------------------------------------------------
 { 
    Refresh();
@@ -107,10 +107,10 @@ void mmgViewFrame::SetView(mafView *view)
    SetTitle(wxStripMenuCodes(m_view->GetLabel()));
 }
 //----------------------------------------------------------------------------
-void mmgViewFrame::OnEvent(mafEventBase *event)
+void mmgViewFrame::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(event))
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
     switch(e->GetId())
     {

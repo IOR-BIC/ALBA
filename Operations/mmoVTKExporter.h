@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKExporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 15:16:25 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-06-10 08:53:28 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,7 +34,7 @@ public:
   mmoVTKExporter(wxString label);
  ~mmoVTKExporter(); 
   mafOp* Copy();
-	void OnEvent(mafEventBase *event);
+	void OnEvent(mafEventBase *maf_event);
 
 	/** Return true for the acceptable vme type. */
   bool Accept(mafNode *node);

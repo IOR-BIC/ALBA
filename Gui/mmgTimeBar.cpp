@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:49:18 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-06-10 08:52:58 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -107,12 +107,12 @@ mmgTimeBar::~mmgTimeBar()
 {
 }
 //----------------------------------------------------------------------------
-void mmgTimeBar::OnEvent(mafEventBase *event)
+void mmgTimeBar::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
   bool play = false;
 
-  if (mafEvent *e = mafEvent::SafeDownCast(event))
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
     switch(e->GetId())
     {
