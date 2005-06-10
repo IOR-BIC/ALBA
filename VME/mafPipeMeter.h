@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:54:00 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-06-10 15:27:49 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,6 +23,8 @@ class vtkActor;
 class vtkProperty;
 class vtkTubeFilter;
 class mafVMEMeter;
+class vtkLookupTable;
+class vtkCaptionActor2D;
 
 //----------------------------------------------------------------------------
 // mafPipeMeter :
@@ -57,7 +59,9 @@ public:
     ID_LAST
   };
 
+  vtkCaptionActor2D      *m_Caption;
   vtkTubeFilter          *m_Tube;
+  vtkLookupTable         *m_Lut;
   vtkPolyDataMapper	     *m_DataMapper;
   vtkActor               *m_DataActor;
   vtkOutlineCornerFilter *m_SelectionBox;

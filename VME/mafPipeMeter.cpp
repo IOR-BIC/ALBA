@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:54:00 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-06-10 15:27:49 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,9 +21,12 @@
 
 #include "mafPipeMeter.h"
 #include "mafSceneNode.h"
+#include "mafDataPipe.h"
 #include "mafVMEMeter.h"
+#include "mafEventSource.h"
 #include "mmaMeter.h"
 #include "mmgGui.h"
+#include "mafVMELandmarkCloud.h"
 #include "vtkMAFAssembly.h"
 
 //@@@ #include "mafDecl.h"
@@ -35,12 +38,13 @@
 #include "vtkRenderer.h"
 #include "vtkOutlineCornerFilter.h"
 #include "vtkTubeFilter.h"
-#include "vtkPolyDataNormals.h"
-#include "vtkStripper.h"
+#include "vtkLookupTable.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkPolyData.h"
 #include "vtkActor.h"
 #include "vtkProperty.h"
+#include "vtkProperty2D.h"
+#include "vtkCaptionActor2D.h"
 
 mafCxxTypeMacro(mafPipeMeter);
 
@@ -56,6 +60,8 @@ mafPipeMeter::mafPipeMeter()
   m_SelectionActor    = NULL;
   m_Tube              = NULL;
   m_MeterVME          = NULL;
+  m_Lut               = NULL;
+  m_Caption           = NULL;
 }
 //----------------------------------------------------------------------------
 void mafPipeMeter::Create(mafSceneNode *n/*, bool use_axes*/)
@@ -72,6 +78,8 @@ void mafPipeMeter::Create(mafSceneNode *n/*, bool use_axes*/)
   m_SelectionActor    = NULL;
   m_Tube              = NULL;
   m_MeterVME          = NULL;
+  m_Lut               = NULL;
+  m_Caption           = NULL;
 
 	//@@@ m_use_axes = use_axes;
 	//@@@ mafVmeData *data = (mafVmeData*) m_Vme->GetClientData();
@@ -80,6 +88,7 @@ void mafPipeMeter::Create(mafSceneNode *n/*, bool use_axes*/)
 
   assert(m_Vme->IsA("mafVMEMeter"));
   m_MeterVME = mafVMEMeter::SafeDownCast(m_Vme);
+  m_MeterVME->GetEventSource()->AddObserver(this);
   assert(m_MeterVME->GetPolylineOutput());
   m_MeterVME->GetPolylineOutput()->Update();
   vtkPolyData *data = m_MeterVME->GetPolylineOutput()->GetPolylineData();
@@ -93,7 +102,16 @@ void mafPipeMeter::Create(mafSceneNode *n/*, bool use_axes*/)
   m_Tube->SetNumberOfSides(20);
   m_Tube->UseDefaultNormalOff();
 
-  m_DataMapper = vtkPolyDataMapper::New();
+  double *range;
+  range = m_MeterVME->GetDistanceRange();
+
+  vtkNEW(m_Lut);
+  m_Lut->SetTableRange(range[0],range[1]);
+  m_Lut->SetHueRange(0.7,0);
+  m_Lut->SetNumberOfTableValues(16);
+  m_Lut->Build();
+
+  vtkNEW(m_DataMapper);
   if (m_MeterVME->GetMeterRepresentation() == mafVMEMeter::LINE_REPRESENTATION)
     m_DataMapper->SetInput(data);
   else
@@ -106,27 +124,29 @@ void mafPipeMeter::Create(mafSceneNode *n/*, bool use_axes*/)
 		m_DataMapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
 	else
 		m_DataMapper->ImmediateModeRenderingOff();
+  if(m_MeterVME->GetMeterColorMode() == mafVMEMeter::RANGE_COLOR)
+    m_DataMapper->SetLookupTable(m_Lut);
 
-  m_DataActor = vtkActor::New();
+  vtkNEW(m_DataActor);
 	//@@@ m_DataActor->SetProperty(data->m_mat_gui->GetMaterial()->m_prop);
 	m_DataActor->SetMapper(m_DataMapper);
 
   m_AssemblyFront->AddPart(m_DataActor);
 
   // selection hilight
-	m_SelectionBox = vtkOutlineCornerFilter::New();
+	vtkNEW(m_SelectionBox);
 	m_SelectionBox->SetInput(data);  
 
-	m_SelectionMapper = vtkPolyDataMapper::New();
+	vtkNEW(m_SelectionMapper);
 	m_SelectionMapper->SetInput(m_SelectionBox->GetOutput());
 
-	m_SelectionProperty = vtkProperty::New();
+	vtkNEW(m_SelectionProperty);
 	m_SelectionProperty->SetColor(1,1,1);
 	m_SelectionProperty->SetAmbient(1);
 	m_SelectionProperty->SetRepresentationToWireframe();
 	m_SelectionProperty->SetInterpolationToFlat();
 
-	m_SelectionActor = vtkActor::New();
+	vtkNEW(m_SelectionActor);
 	m_SelectionActor->SetMapper(m_SelectionMapper);
 	m_SelectionActor->VisibilityOff();
 	m_SelectionActor->PickableOff();
@@ -134,6 +154,44 @@ void mafPipeMeter::Create(mafSceneNode *n/*, bool use_axes*/)
 
   m_AssemblyFront->AddPart(m_SelectionActor);
 
+  vtkNEW(m_Caption);
+  m_Caption->SetPosition(25,10);
+  m_Caption->ThreeDimensionalLeaderOff();
+  if(m_MeterVME->GetMeterColorMode() == mafVMEMeter::RANGE_COLOR)
+  {
+    double c[3];
+    m_DataActor->GetProperty()->GetColor(c);
+    m_Caption->GetProperty()->SetColor(c);
+  }
+//  else
+//    Caption->GetProperty()->SetColor(data->m_mat_gui->GetMaterial()->m_prop->GetColor());
+  m_Caption->SetHeight(0.05);
+  m_Caption->SetWidth(0.35);
+  m_Caption->BorderOff();
+  mafString dis;
+  dis << m_MeterVME->GetDistance();
+  m_Caption->SetCaption(dis.GetCStr());
+
+  if(m_MeterVME->GetMeterMode() == mafVMEMeter::LINE_ANGLE)
+    m_Caption->SetVisibility((m_MeterVME->GetAngle() != 0) && m_MeterVME->GetMeterAttributes()->m_LabelVisibility);
+  else
+    m_Caption->SetVisibility((m_MeterVME->GetDistance() > 0 || m_MeterVME->GetMeterMeasureType() == mafVMEMeter::RELATIVE_MEASURE) && m_MeterVME->GetMeterAttributes()->m_LabelVisibility);
+  if(m_MeterVME->GetStartVME())
+  {
+    double pos[3], rot[3];
+    mafVME *linked_vme = m_MeterVME->GetStartVME();
+    /*if(linked_vme && linked_vme->IsA("mafVMELandmarkCloud") && m_MeterVME->GetStartVMELandmarkId() != -1)
+    {
+      ((mafVMELandmarkCloud *)linked_vme)->GetLandmark(m_MeterVME->GetStartVMELandmarkId(),pos,-1);
+      TmpTransform->SetMatrix(linked_vme->GetAbsPose());
+      TmpTransform->TransformPoint(pos,pos);
+    }
+    else*/
+      m_MeterVME->GetStartVME()->GetOutput()->GetAbsPose(pos,rot);
+    m_Caption->SetAttachmentPoint(pos[0],pos[1],pos[2]);
+  } 
+
+  m_RenFront->AddActor2D(m_Caption);
   /*
   m_axes = NULL;
 	if(m_use_axes) m_axes = new mafAxes(m_ren1,m_Vme);
@@ -144,10 +202,15 @@ void mafPipeMeter::Create(mafSceneNode *n/*, bool use_axes*/)
 mafPipeMeter::~mafPipeMeter()
 //----------------------------------------------------------------------------
 {
+  m_MeterVME->GetEventSource()->RemoveObserver(this);
+
   m_AssemblyFront->RemovePart(m_DataActor);
   m_AssemblyFront->RemovePart(m_SelectionActor);
+  m_RenFront->AddActor2D(m_Caption);
 
   vtkDEL(m_Tube);
+  vtkDEL(m_Lut);
+  vtkDEL(m_Caption);
   vtkDEL(m_DataMapper);
   vtkDEL(m_DataActor);
   vtkDEL(m_SelectionBox);
@@ -177,7 +240,7 @@ mmgGui *mafPipeMeter::CreateGui()
   m_Gui->Bool(ID_TUBE_CAPPING,"capping",&meter_attrib->m_Capping);
   m_Gui->Combo(ID_METER_MEASURE_TYPE,"",&meter_attrib->m_MeasureType,num_choices,type_measure_string);
   m_Gui->Double(ID_INIT_MEASURE,"init",&meter_attrib->m_InitMeasure,0);
-  m_Gui->Bool(ID_GENERATE_EVENT,"generate event",&meter_attrib->m_GenerateEvent);
+  m_Gui->Bool(ID_GENERATE_EVENT,"gen. event",&meter_attrib->m_GenerateEvent);
   m_Gui->Double(ID_DELTA_PERCENT,"delta %",&meter_attrib->m_DeltaPercent,0);
 
   m_Gui->Enable(ID_DISTANCE_RANGE, meter_attrib->m_ColorMode == mafVMEMeter::ONE_COLOR);
@@ -192,15 +255,43 @@ void mafPipeMeter::OnEvent(mafEventBase *maf_event)
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
+    mmaMeter *meter_attrib = m_MeterVME->GetMeterAttributes();
     switch(e->GetId()) 
     {
-      case ID_METER_REPRESENTATION:
-        m_Gui->Enable(ID_TUBE_RADIUS, m_MeterVME->GetMeterAttributes()->m_Representation == mafVMEMeter::LINE_REPRESENTATION);
-        m_Gui->Enable(ID_TUBE_CAPPING, m_MeterVME->GetMeterAttributes()->m_Representation == mafVMEMeter::LINE_REPRESENTATION);
+      case ID_SHOW_LABEL:
         UpdateProperty();
+      break;
+      case ID_METER_REPRESENTATION:
+        m_Gui->Enable(ID_TUBE_RADIUS, meter_attrib->m_Representation == mafVMEMeter::LINE_REPRESENTATION);
+        m_Gui->Enable(ID_TUBE_CAPPING, meter_attrib->m_Representation == mafVMEMeter::LINE_REPRESENTATION);
+        UpdateProperty();
+      break;
+      case ID_TUBE_RADIUS:
+        m_Tube->SetRadius(meter_attrib->m_TubeRadius);
+      break;
+      case ID_TUBE_CAPPING:
+        m_Tube->SetCapping(meter_attrib->m_Capping);
+      break;
+      case ID_DISTANCE_RANGE:
+      break;
+      case ID_METER_MEASURE_TYPE:
+      case ID_INIT_MEASURE:
+      case ID_DELTA_PERCENT:
+      case ID_GENERATE_EVENT:
+        m_MeterVME->GetDataPipe()->Update();
       break;
       default:
       break;
+    }
+    mafEvent cam_event(this,CAMERA_UPDATE);
+    m_MeterVME->ForwardUpEvent(cam_event);
+  }
+  else if (maf_event->GetSender() == m_MeterVME)
+  {
+    if(maf_event->GetId() == VME_OUTPUT_DATA_UPDATE)
+        UpdateProperty();
+    else if(maf_event->GetId() == mafVMEMeter::LENGTH_THRESHOLD_EVENT) 
+    {
     }
   }
 }
@@ -232,10 +323,10 @@ void mafPipeMeter::Select(bool sel)
 void mafPipeMeter::UpdateProperty(bool fromTag)
 //----------------------------------------------------------------------------
 {
-  mafVMEMeter *vme = mafVMEMeter::SafeDownCast(m_Vme);
-  vme->GetPolylineOutput()->Update();
-  vtkPolyData *data = vme->GetPolylineOutput()->GetPolylineData();
-  if (vme->GetMeterRepresentation() == mafVMEMeter::LINE_REPRESENTATION)
+  //mafVMEMeter *vme = mafVMEMeter::SafeDownCast(m_Vme);
+  m_MeterVME->GetPolylineOutput()->Update();
+  vtkPolyData *data = m_MeterVME->GetPolylineOutput()->GetPolylineData();
+  if (m_MeterVME->GetMeterRepresentation() == mafVMEMeter::LINE_REPRESENTATION)
     m_DataMapper->SetInput(data);
   else
   {
@@ -243,7 +334,38 @@ void mafPipeMeter::UpdateProperty(bool fromTag)
     m_DataMapper->SetInput(m_Tube->GetOutput());
   }
 
-  m_MeterVME->Modified();
+  mafString dis;
+  dis << m_MeterVME->GetDistance();
+  m_Caption->SetCaption(dis.GetCStr());
+  m_Caption->SetVisibility(m_MeterVME->GetMeterAttributes()->m_LabelVisibility);
+
+  double rgb[3];
+  double v = m_MeterVME->GetDistance();
+  int color_mode = m_MeterVME->GetMeterColorMode();
+  if(color_mode == mafVMEMeter::RANGE_COLOR)
+  {
+    double *range;
+    m_DataMapper->SetLookupTable(m_Lut);
+    range = m_MeterVME->GetDistanceRange();
+    m_Lut->SetTableRange(range[0],range[1]);
+    m_Lut->Build();
+    m_Lut->GetColor(v,rgb);
+    m_DataActor->GetProperty()->SetColor(rgb);
+    m_Caption->GetProperty()->SetColor(rgb);
+  }
+  else
+  {
+    m_DataMapper->SetColorModeToDefault();
+    //data->m_mat_gui->GetMaterial()->m_prop->GetColor(rgb);
+    m_DataActor->GetProperty()->SetColor(rgb);
+    m_Caption->GetProperty()->SetColor(rgb);
+  }
+
+  double pos[3], rot[3];
+  m_MeterVME->GetStartVME()->GetOutput()->GetAbsPose(pos,rot);
+  m_Caption->SetAttachmentPoint(pos[0],pos[1],pos[2]);
+
+  m_Gui->Update();
 
   /*
 	if(fromTag)
