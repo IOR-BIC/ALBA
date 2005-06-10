@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:50:30 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-06-10 09:24:48 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -73,7 +73,7 @@ public:
   mafVMEAccept *m_VMEAccept;
 
   /** Precess events coming from other objects */ 
-  virtual void OnEvent(mafEventBase *event);
+  virtual void OnEvent(mafEventBase *maf_event);
 
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0);
@@ -210,6 +210,9 @@ public:
   return angle extracting it from the connected pipe. */
   double GetAngle();
 
+  /** return the meter's attributes */
+  mmaMeter *GetMeterAttributes();
+
 protected:
   mafVMEMeter();
   virtual ~mafVMEMeter();
@@ -222,9 +225,6 @@ protected:
 
   /** update the output data structure */
   virtual void InternalUpdate();
-
-  /** return the meter's attributes */
-  mmaMeter *GetMeterAttributes();
 
   /** Internally used to create a new instance of the GUI.*/
   virtual mmgGui *CreateGui();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-30 12:54:38 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-06-10 09:24:48 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -676,9 +676,6 @@ double mafVMEMeter::GetAngle()
 mmgGui* mafVMEMeter::CreateGui()
 //-------------------------------------------------------------------------
 {
-  //assert(m_Gui == NULL);
-  //m_Gui = new mmgGui(NULL); // commented because mafNode::CreateGui() is called!
-
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
   m_Gui->Divider();
@@ -697,11 +694,11 @@ mmgGui* mafVMEMeter::CreateGui()
   return m_Gui;
 }
 //-------------------------------------------------------------------------
-void mafVMEMeter::OnEvent(mafEventBase *event)
+void mafVMEMeter::OnEvent(mafEventBase *maf_event)
 //-------------------------------------------------------------------------
 {
   // events to be sent up or down in the tree are simply forwarded
-  if (mafEvent *e = mafEvent::SafeDownCast(event))
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
     switch(e->GetId())
     {
@@ -738,11 +735,11 @@ void mafVMEMeter::OnEvent(mafEventBase *event)
       }
       break;
       default:
-        mafNode::OnEvent(event);
+        mafNode::OnEvent(maf_event);
     }
   }
   else
   {
-    Superclass::OnEvent(event);
+    Superclass::OnEvent(maf_event);
   }
 }
