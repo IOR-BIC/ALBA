@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:47:04 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-06-10 08:43:07 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -99,12 +99,12 @@ mafOpManager::~mafOpManager()
 	//delete m_optransform;
 }
 //----------------------------------------------------------------------------
-void mafOpManager::OnEvent(mafEventBase *event)
+void mafOpManager::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
   mafOp* o = NULL; 
 
-  if (mafEvent *e = mafEvent::SafeDownCast(event))
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
     switch (e->GetId())
     {

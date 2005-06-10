@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:44:01 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-06-10 08:43:07 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,10 +50,10 @@ mafView::~mafView()
   cppDEL(m_Gui);
 }
 //----------------------------------------------------------------------------
-void mafView::OnEvent(mafEventBase *event)
+void mafView::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  mafEventMacro(*event);
+  mafEventMacro(*maf_event);
 }
 /*
 //----------------------------------------------------------------------------

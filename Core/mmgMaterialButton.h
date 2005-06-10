@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMaterialButton.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:46:22 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-06-10 08:44:10 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -38,7 +38,7 @@ class mmgMaterialButton : public mafObserver
 public:
 	mmgMaterialButton(mafVME *vme, mafObserver *listener = NULL);
 	~mmgMaterialButton(); 
-	void OnEvent(mafEventBase *event);
+	void OnEvent(mafEventBase *maf_event);
 	void SetListener(mafObserver *listener) {m_Listener = listener;};
 
 	/** Return mmgMaterialButton User Interface */

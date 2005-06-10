@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 09:50:40 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2005-06-10 08:44:33 $
+  Version:   $Revision: 1.24 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -195,7 +195,7 @@ public:
   virtual mafVMEOutput *GetOutput() {return m_Output;}
 
   /** process events coming from other components */
-  virtual void OnEvent(mafEventBase *e);
+  virtual void OnEvent(mafEventBase *maf_event);
 
   /** Return the suggested pipe-typename for the visualization of this vme */
   virtual mafString GetVisualPipe() {return mafString("");};

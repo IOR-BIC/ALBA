@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-12 16:19:16 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-06-10 08:43:05 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -158,10 +158,10 @@ void mafDataPipe::Execute()
 }
 
 //------------------------------------------------------------------------------
-void mafDataPipe::OnEvent(mafEventBase *event)
+void mafDataPipe::OnEvent(mafEventBase *maf_event)
 //------------------------------------------------------------------------------
 {
-  switch (event->GetId())
+  switch (maf_event->GetId())
   {
   case VME_OUTPUT_DATA_PREUPDATE:
     if (GetMTime()>m_PreExecuteTime.GetMTime())
@@ -169,13 +169,13 @@ void mafDataPipe::OnEvent(mafEventBase *event)
       m_PreExecuteTime.Modified();
       PreExecute();
       // forward event to VME
-      if (m_VME) m_VME->OnEvent(event);
+      if (m_VME) m_VME->OnEvent(maf_event);
     }
   break;
   case VME_OUTPUT_DATA_UPDATE:
     Execute();
     // forward event to VME
-    if (m_VME) m_VME->OnEvent(event);
+    if (m_VME) m_VME->OnEvent(maf_event);
   break;
   }; 
 }

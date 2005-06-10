@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooser.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:46:21 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-06-10 08:44:10 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,10 +60,10 @@ mafNode *mmgVMEChooser::ShowChooserDialog()
 		return NULL;
 }
 //----------------------------------------------------------------------------
-void mmgVMEChooser::OnEvent(mafEventBase *event)
+void mmgVMEChooser::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(event))
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
     switch(e->GetId())
     {

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-12 16:19:17 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-06-10 08:44:09 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -68,29 +68,29 @@ mafVMEManager::~mafVMEManager( )
   delete m_Config;  
 }
 //----------------------------------------------------------------------------
-void mafVMEManager::OnEvent(mafEventBase *event)
+void mafVMEManager::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  if (event->GetChannel()==MCH_UP)
+  if (maf_event->GetChannel()==MCH_UP)
   {
     // events coming from the tree...
 
-    switch (event->GetId())
+    switch (maf_event->GetId())
     {
       case NODE_ATTACHED_TO_TREE:
       {
         if (!m_LoadingFlag)
-          NotifyAdd((mafNode *)event->GetSender());
+          NotifyAdd((mafNode *)maf_event->GetSender());
       }
       break;
       case NODE_DETACHED_FROM_TREE:
       {
         if (!m_LoadingFlag)
-          NotifyRemove((mafNode *)event->GetSender());
+          NotifyRemove((mafNode *)maf_event->GetSender());
       }
       break;
       default:
-        mafEventMacro(*event);
+        mafEventMacro(*maf_event);
     }
   }
 }

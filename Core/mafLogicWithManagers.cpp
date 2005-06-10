@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-07 14:46:27 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2005-06-10 08:43:06 $
+  Version:   $Revision: 1.21 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -68,7 +68,7 @@ void mafLogicWithManagers::Configure()
   if(m_SideSash)
   {
     m_SideBar = new mafSideBar(m_SideSash,-1,this);
-    m_SideSash->Put(m_SideBar->m_Notebook);
+    m_SideSash->Put((wxWindow *)m_SideBar->m_SideSplittedPanel);
   }
 
   if(m_UseVMEManager)
@@ -204,10 +204,10 @@ void mafLogicWithManagers::UpdateFrameTitle()
   m_Win->SetTitle(title);
 }
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::OnEvent(mafEventBase *event)
+void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(event))
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
     if(e->GetId()!= UPDATE_UI)
     {
@@ -332,7 +332,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *event)
       TimeSet(e->GetDouble());
       break; 
     default:
-      mafLogicWithGUI::OnEvent(event);
+      mafLogicWithGUI::OnEvent(maf_event);
       break; 
     } // end switch case
   } // end if SafeDowncast

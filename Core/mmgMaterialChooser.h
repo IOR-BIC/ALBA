@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMaterialChooser.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:46:22 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-06-10 08:44:10 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -53,7 +53,7 @@ public:
   /** Show in modal configuration the material editor. */
 	bool ShowChooserDialog(mafVME *vme);
 
-  void OnEvent(mafEventBase *event);
+  void OnEvent(mafEventBase *maf_event);
 	
   /** Get the material tag from vme and if it is not present, create it. */
   void LoadLibraryFromVme(mafVME *vme);

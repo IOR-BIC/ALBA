@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:47:05 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-06-10 08:43:07 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -62,10 +62,10 @@ mafOp::~mafOp()
 {
 }
 //----------------------------------------------------------------------------
-void mafOp::OnEvent(mafEventBase *event)
+void mafOp::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-	mafEventMacro(*event);
+	mafEventMacro(*maf_event);
 }
 //----------------------------------------------------------------------------
 bool mafOp::Accept(mafNode* vme)   

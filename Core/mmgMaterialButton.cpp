@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMaterialButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:46:22 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-06-10 08:44:10 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -89,10 +89,10 @@ void mmgMaterialButton::CreateGui()
 	m_Gui->Update();
 }
 //----------------------------------------------------------------------------
-void mmgMaterialButton::OnEvent(mafEventBase *event)
+void mmgMaterialButton::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(event))
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
 	{
     switch(e->GetId())
     {

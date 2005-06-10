@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-30 09:10:44 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-06-10 08:43:08 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,7 +39,7 @@ public:
   mafViewManager();
  ~mafViewManager(); 
   void SetListener(mafObserver *Listener) {m_Listener = Listener;};
-  virtual void OnEvent(mafEventBase *event);
+  virtual void OnEvent(mafEventBase *maf_event);
 
   /** Fill the main menù with plugged views. */
 	void FillMenu (wxMenu* menu);

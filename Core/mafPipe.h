@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 09:51:16 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-06-10 08:43:07 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,7 +43,7 @@ public:
 	virtual			~mafPipe();
 
   /** process events coming from gui */
-  virtual void OnEvent(mafEventBase *event)           {};
+  virtual void OnEvent(mafEventBase *maf_event)           {};
 
   /** The real setup must be performed here - not in the ctor */
   virtual void Create(mafSceneNode *n);

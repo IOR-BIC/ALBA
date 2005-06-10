@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-30 09:10:44 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-06-10 08:43:08 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -95,10 +95,10 @@ void mafViewManager::SetMouseAction(mafAction *action)
 }
 */
 //----------------------------------------------------------------------------
-void mafViewManager::OnEvent(mafEventBase *event)
+void mafViewManager::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(event))
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
 	{
     switch(e->GetId())
     {

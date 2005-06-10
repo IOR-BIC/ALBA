@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:43:09 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-06-10 08:43:06 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,7 +37,7 @@ public:
   ~mafNodeManager(); 
 
   void SetListener(mafObserver *Listener) {m_Listener = Listener;};
-  void OnEvent(mafEventBase *event);
+  void OnEvent(mafEventBase *maf_event);
  
   /** 
   Destroy all nodes (olso the root), for each destroyed node the manager send 

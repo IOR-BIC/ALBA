@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:47:05 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-06-10 08:43:07 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -53,7 +53,7 @@ public:
 					/** Return the type of the operation: OPTYPE_OP, OPTYPE_IMPORTER, OPTYPE_EXPORTER, OPTYPE_EDIT or OPTYPE_STATECHANGER*/
 					int			GetType();
 
-	virtual void		OnEvent(mafEventBase *event);
+	virtual void		OnEvent(mafEventBase *maf_event);
 	virtual mafOp*	Copy();
 
 	/** Builds operation's interface. */

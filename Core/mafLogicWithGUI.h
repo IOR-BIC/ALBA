@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:43:08 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-06-10 08:43:05 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -64,7 +64,7 @@ public:
 	virtual     ~mafLogicWithGUI(); 
 
 	/** Method that answer at all MAF events. */
-	void OnEvent(mafEventBase *event);
+	void OnEvent(mafEventBase *maf_event);
 	/** Visualize all the interface elements of the application.*/
 	virtual void Show();
 	/** Virtual function for plug views into the application.*/

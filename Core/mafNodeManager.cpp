@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:43:09 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-06-10 08:43:06 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -66,10 +66,10 @@ mafNodeManager::~mafNodeManager()
   delete m_Config;  
 }
 //----------------------------------------------------------------------------
-void mafNodeManager::OnEvent(mafEventBase *event)
+void mafNodeManager::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-   //event->Log();
+   //maf_event->Log();
 }
 //----------------------------------------------------------------------------
 void mafNodeManager::MSFNew(bool notify_root_creation)   

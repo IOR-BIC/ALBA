@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-07 14:46:09 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2005-06-10 08:43:06 $
+  Version:   $Revision: 1.26 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -325,18 +325,18 @@ public:
   mafLinksMap *GetLinks() {return &m_Links;}
 
   /** used to send an event up in the tree */
-  void ForwardUpEvent(mafEventBase *event);
-  void ForwardUpEvent(mafEventBase &event);
+  void ForwardUpEvent(mafEventBase *maf_event);
+  void ForwardUpEvent(mafEventBase &maf_event);
 
   /** used to send an event down in the tree */
-  void ForwardDownEvent(mafEventBase *event);
-  void ForwardDownEvent(mafEventBase &event);
+  void ForwardDownEvent(mafEventBase *maf_event);
+  void ForwardDownEvent(mafEventBase &maf_event);
 
   /** IDs for the GUI */
   enum 
   {
     ID_NAME = MINID,
-    ID_PRINT,
+    ID_PRINT_INFO,
     ID_LAST
   };
 

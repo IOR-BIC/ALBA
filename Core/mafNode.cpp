@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-07 14:46:09 $
-  Version:   $Revision: 1.32 $
+  Date:      $Date: 2005-06-10 08:43:06 $
+  Version:   $Revision: 1.33 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -147,40 +147,40 @@ int mafNode::InternalInitialize()
   return MAF_OK;
 }
 //-------------------------------------------------------------------------
-void mafNode::ForwardUpEvent(mafEventBase &event)
+void mafNode::ForwardUpEvent(mafEventBase &maf_event)
 //-------------------------------------------------------------------------
 {
-  ForwardUpEvent(&event);
+  ForwardUpEvent(&maf_event);
 }
 
 //-------------------------------------------------------------------------
-void mafNode::ForwardUpEvent(mafEventBase *event)
+void mafNode::ForwardUpEvent(mafEventBase *maf_event)
 //-------------------------------------------------------------------------
 {
   if (m_Parent)
   {
-    event->SetChannel(MCH_UP);
-    m_Parent->OnEvent(event);
+    maf_event->SetChannel(MCH_UP);
+    m_Parent->OnEvent(maf_event);
   }
 }
 //-------------------------------------------------------------------------
-void mafNode::ForwardDownEvent(mafEventBase &event)
+void mafNode::ForwardDownEvent(mafEventBase &maf_event)
 //-------------------------------------------------------------------------
 {
-  ForwardDownEvent(&event);
+  ForwardDownEvent(&maf_event);
 }
 
 //-------------------------------------------------------------------------
-void mafNode::ForwardDownEvent(mafEventBase *event)
+void mafNode::ForwardDownEvent(mafEventBase *maf_event)
 //-------------------------------------------------------------------------
 {
   if (GetNumberOfChildren()>0)
   {
-    event->SetChannel(MCH_DOWN);
+    maf_event->SetChannel(MCH_DOWN);
     for (unsigned int i=0;i<GetNumberOfChildren();i++)
     {
       mafNode *child=m_Children[i];
-      child->OnEvent(event);
+      child->OnEvent(maf_event);
     }
   }
 }
@@ -858,47 +858,61 @@ void mafNode::OnEvent(mafEventBase *e)
   // events to be sent up or down in the tree are simply forwarded
   if (e->GetChannel()==MCH_UP)
   {
-    switch (e->GetId())
+    if (mafEvent *gui_event = mafEvent::SafeDownCast(e))
     {
-      case NODE_GET_ROOT:
+      if (gui_event->GetSender() == m_Gui)
       {
-        mafEventIO *event=mafEventIO::SafeDownCast(e);
-        event->SetRoot(GetRoot());
-      }
-      break;
-      case ID_NAME:
-      {
-        mafEvent ev(this,VME_MODIFIED,this);
-        ForwardUpEvent(ev);
-      }
-      break;
-      case ID_PRINT:
-      {
-        #ifdef VTK_USE_ANSI_STDLIB
-          std::stringstream ss1;
-
-          Print(ss1);
-          wxString message = ss1.str().c_str();
-
-          wxLogMessage("[VME PRINTOUT:]\n");
-
-          for (int pos = message.Find('\n'); pos >= 0; pos = message.Find('\n'))
+        switch(gui_event->GetId()) 
+        {
+          case ID_NAME:
           {
-            wxString tmp = message.Mid(0,pos);
-            wxLogMessage(tmp);
-            message = message.Mid(pos+1);
+            mafEvent ev(this,VME_MODIFIED,this);
+            ForwardUpEvent(ev);
           }
-        #else
-          std::strstream ss1,ss2;
-          Print(ss1);
-          wxLogMessage("[VME PRINTOUT:]\n%s\n", ss1.str()); 
-        #endif
+          break;
+          case ID_PRINT_INFO:
+          {
+          #ifdef VTK_USE_ANSI_STDLIB
+            std::stringstream ss1;
+
+            Print(ss1);
+            wxString message = ss1.str().c_str();
+
+            wxLogMessage("[VME PRINTOUT:]\n");
+
+            for (int pos = message.Find('\n'); pos >= 0; pos = message.Find('\n'))
+            {
+              wxString tmp = message.Mid(0,pos);
+              wxLogMessage(tmp);
+              message = message.Mid(pos+1);
+            }
+          #else
+            std::strstream ss1,ss2;
+            Print(ss1);
+            wxLogMessage("[VME PRINTOUT:]\n%s\n", ss1.str()); 
+          #endif
+          }
+          break;
+        }
       }
-      break;
-      default:
+      else
         ForwardUpEvent(e);
-    };
-    return;
+    }
+    else
+    {
+      switch (e->GetId())
+      {
+        case NODE_GET_ROOT:
+        {
+          mafEventIO *maf_event=mafEventIO::SafeDownCast(e);
+          maf_event->SetRoot(GetRoot());
+        }
+        break;
+        default:
+          ForwardUpEvent(e);
+      }
+    }
+//    return;
   }
   else if (e->GetChannel()==MCH_DOWN)
   {
@@ -921,7 +935,6 @@ void mafNode::OnEvent(mafEventBase *e)
     break;
     }
   }
-  
 }
 
 //-------------------------------------------------------------------------
@@ -1115,7 +1128,8 @@ mmgGui* mafNode::CreateGui()
   m_Gui = new mmgGui(this);
   
   mafString type_name = GetTypeName();
-  m_Gui->Button(ID_PRINT, type_name, "", "Print node debug information");
+  //m_Gui->Button(ID_PRINT_INFO, type_name, "", "Print node debug information");
+  m_Gui->Label("type: ", type_name);
   m_Gui->String(ID_NAME,"name :", &m_Name);
 
   return m_Gui;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMaterialChooser.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:46:22 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-06-10 08:44:10 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -292,10 +292,10 @@ void mmgMaterialChooser::CreatePipe()
 	m_RWI->m_RenFront->AddActor(m_Actor);
 }
 //----------------------------------------------------------------------------
-void mmgMaterialChooser::OnEvent(mafEventBase *event)
+void mmgMaterialChooser::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(event))
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
     double r,g,b;
     switch(e->GetId())

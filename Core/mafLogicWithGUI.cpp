@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 15:15:56 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-06-10 08:43:05 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -111,10 +111,10 @@ void mafLogicWithGUI::CreateNullLog()
   cppDEL(old_log);
 }
 //----------------------------------------------------------------------------
-void mafLogicWithGUI::OnEvent(mafEventBase *event)
+void mafLogicWithGUI::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(event))
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
     switch(e->GetId())
     {

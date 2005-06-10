@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:44:01 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-06-10 08:43:08 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -74,7 +74,7 @@ public:
   mafTypeMacro(mafView, mafObject);
 
   virtual void			SetListener(mafObserver *Listener) {m_Listener = Listener;};
-  virtual void			OnEvent(mafEventBase *event);
+  virtual void			OnEvent(mafEventBase *maf_event);
   virtual mafView*  Copy(mafObserver *Listener) {return NULL;};
   virtual void      Create() {};
 
@@ -108,7 +108,7 @@ public:
   //virtual void			HideGui();
   //virtual void			ShowGui();
 //  virtual void			ShowSettings()							{};
-  virtual void			OnSize(wxSizeEvent &event)	{};
+  virtual void			OnSize(wxSizeEvent &maf_event)	{};
 
   /** Struct containing information regarding visual pipe plugged into the view. */
   struct mafVisualPipeInfo

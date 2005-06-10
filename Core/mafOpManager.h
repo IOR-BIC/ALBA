@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:47:04 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-06-10 08:43:07 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,7 +45,7 @@ public:
 	         mafOpManager();
 	virtual ~mafOpManager(); 
 	virtual void SetListener(mafObserver *Listener) {m_Listener = Listener;};
-	virtual void OnEvent(mafEventBase *event);
+	virtual void OnEvent(mafEventBase *maf_event);
 
 	/** Add the operation 'op' to the list of available operations. */
 	virtual void OpAdd		(mafOp *op, wxString menuPath = "");
