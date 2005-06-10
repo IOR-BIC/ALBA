@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgValidator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:50:10 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-06-10 08:52:40 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1011,12 +1011,17 @@ void mmgValidator::OnButton(wxCommandEvent& event)
       break;
     }
 
-		mafYield(); // update gui to let the dialogs disappear
+		if(m_Mode != VAL_BUTTON) 
+    {
+        mafYield(); // update gui to let the dialogs disappear
 
-		( (wxPanel*)m_Button->GetParent() )->SetDefaultItem(NULL);
-		mafYield(); 
+        ( (wxPanel*)m_Button->GetParent() )->SetDefaultItem(NULL);
 
-		if (!cancel) mafEventMacro(mafEvent(m_Button, m_ModuleId));
+        mafYield(); 
+    }
+
+		if (!cancel) 
+      mafEventMacro(mafEvent(m_Button, m_ModuleId));
 	}
 }
 //----------------------------------------------------------------------------
