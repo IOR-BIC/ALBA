@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:44:02 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-06-10 08:50:08 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,6 +28,8 @@ class mmgPanelStack;
 class mmgPanel;
 class mafNode;
 class mafView;
+class mmgNamedPanel;
+class mmgSplittedPanel;
 //----------------------------------------------------------------------------
 // mafSideBar :
 //----------------------------------------------------------------------------
@@ -95,16 +97,18 @@ public:
   void Show( bool show) {m_Notebook->Show(show);};
 
   wxNotebook        *m_Notebook;
+  mmgSplittedPanel  *m_SideSplittedPanel;
+  
 protected:
   void UpdateVmePanel();  
 
-  mmgPanelStack			*m_OpPanel;
-	mmgGuiHolder			*m_ViewPropertyPanel;
-  mmgCheckTree      *m_Tree;
+  mmgPanelStack	*m_OpPanel;
+	mmgGuiHolder	*m_ViewPropertyPanel;
+  mmgCheckTree  *m_Tree;
 
-  mmgGuiHolder      *m_VmePanel;
-  mmgGuiHolder      *m_VmeOutputPanel;
-  mmgGuiHolder      *m_VmePipePanel;
+  mmgGuiHolder  *m_VmePanel;
+  mmgGuiHolder  *m_VmeOutputPanel;
+  mmgGuiHolder  *m_VmePipePanel;
 
   mafNode *m_SelectedVme;
   mafView *m_SelectedView;

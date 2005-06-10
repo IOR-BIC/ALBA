@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-05 15:24:51 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-06-10 08:50:08 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,34 +34,19 @@
 mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  m_SelectedVme =NULL;
-  m_SelectedView =NULL;
+  m_SelectedVme  = NULL;
+  m_SelectedView = NULL;
   
-	m_Notebook = new wxNotebook(parent,-1);
-  //m_Notebook->SetSize();
-
   //splitted panel  
-  mmgSplittedPanel *sp = new mmgSplittedPanel(m_Notebook,-1,200);  //SIL. 29-4-2003 - 200 is the height of the vme_property panel
-  m_Notebook->AddPage(sp,"vme manager",true);
+  m_SideSplittedPanel = new mmgSplittedPanel(parent,-1,200); //SIL. 29-4-2003 - 200 is the height of the vme_property panel
+  m_Notebook = new wxNotebook(m_SideSplittedPanel,-1);
 
   //tree ----------------------------
-  m_Tree = new mmgCheckTree(sp,-1,true);
+  m_Tree = new mmgCheckTree(m_Notebook,-1,true);
   m_Tree->SetListener(Listener);
   m_Tree->SetTitle(" vme hierarchy: ");
-  sp->PutOnTop(m_Tree);
-  
-  //vme_panel  //SIL. 22-4-2005: refactored
-  mmgNamedPanel *vme_np = new mmgNamedPanel(sp,-1);
-  vme_np->SetTitle("Selected Vme Property");
-  wxNotebook *vme_notebook = new wxNotebook(vme_np,-1);
-  m_VmePanel = new mmgGuiHolder(vme_notebook,-1,false,true);
-  vme_notebook->AddPage(m_VmePanel," vme object ");
-  m_VmeOutputPanel = new mmgGuiHolder(vme_notebook,-1,false,true);
-  vme_notebook->AddPage(m_VmeOutputPanel," vme output ");
-  m_VmePipePanel = new mmgGuiHolder(vme_notebook,-1,false,true);
-  vme_notebook->AddPage(m_VmePipePanel," vme pipe ");
-  vme_np->Add(vme_notebook,1,wxEXPAND);
-  sp->PutOnBottom(vme_np);
+  m_Notebook->AddPage(m_Tree,"vme manager",true);
+  m_SideSplittedPanel->PutOnTop(m_Notebook);
 
   //view property panel
 	m_ViewPropertyPanel = new mmgGuiHolder(m_Notebook,-1,true);
@@ -74,6 +59,22 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener)
   empty_op->SetTitle(" no operation running:");
   m_OpPanel->Push(empty_op);
 	m_Notebook->AddPage(m_OpPanel ," op. parameters");
+  
+  
+  // wxFrame is needed to avoid endless loop in wxNotebook when
+  // a button inside it is pressed and a different notebook tab is pressed suddenly after!! 
+  // (mmgNamedPanel doesn't block the problem)
+  wxFrame *vme_property_frame = new wxFrame(m_SideSplittedPanel,-1,"Vme Property",wxDefaultPosition,wxDefaultSize,wxTHICK_FRAME);
+  wxNotebook *vme_notebook = new wxNotebook(vme_property_frame,-1);
+
+  m_VmeOutputPanel = new mmgGuiHolder(vme_notebook,-1,false,true);
+  vme_notebook->AddPage(m_VmeOutputPanel," vme output ");
+  m_VmePipePanel = new mmgGuiHolder(vme_notebook,-1,false,true);
+  vme_notebook->AddPage(m_VmePipePanel," vme pipe ");
+  m_VmePanel = new mmgGuiHolder(vme_notebook,-1,false,true);
+  vme_notebook->AddPage(m_VmePanel," vme object ");
+
+  m_SideSplittedPanel->PutOnBottom(vme_property_frame);
 
   //m_side_bar->Put(m_Notebook);
 }
@@ -161,8 +162,8 @@ void mafSideBar::VmeRemove(mafNode *vme)
 	m_Tree->VmeRemove(vme);
   if (vme == m_SelectedVme)
   {
+    //UpdateVmePanel();
     m_SelectedVme = NULL;
-    UpdateVmePanel();
   }  
 }
 //----------------------------------------------------------------------------
@@ -176,7 +177,7 @@ void mafSideBar::VmeShow(mafNode *vme, bool visibility)
 //----------------------------------------------------------------------------
 {
 	m_Tree->VmeShow(vme,visibility);
-  UpdateVmePanel();
+  //UpdateVmePanel();
 }
 //----------------------------------------------------------------------------
 void mafSideBar::VmeSelected(mafNode *vme)
@@ -202,13 +203,6 @@ void mafSideBar::Show()
 void mafSideBar::UpdateVmePanel()
 //----------------------------------------------------------------------------
 {
-  //static mafNode       *last_vme = NULL;
-  //static mafVMEOutput  *last_vme_out = NULL;
-  //static mafPipe       *last_vme_pipe = NULL;
-  static mmgGui *last_vme_gui = NULL;
-  static mmgGui *last_vme_out_gui = NULL;
-  static mmgGui *last_vme_pipe_gui = NULL;
-
   mafVMEOutput *vme_out = NULL;
   mafPipe      *vme_pipe = NULL;
   mmgGui       *vme_gui = NULL;
@@ -219,7 +213,7 @@ void mafSideBar::UpdateVmePanel()
   {
     vme_gui = m_SelectedVme->GetGui();
 
-    if(m_SelectedVme->IsA("mafVME"))
+    if(m_SelectedVme->IsMAFType(mafVME))
     {
       mafVME *v = (mafVME*) m_SelectedVme;
       vme_out = v->GetOutput();
@@ -237,8 +231,13 @@ void mafSideBar::UpdateVmePanel()
     }
   }
 
+  m_VmePanel->Put(vme_gui);
+  m_VmeOutputPanel->Put(vme_out_gui);
+  m_VmePipePanel->Put(vme_pipe_gui);
+
+  /* code stub to future support of dynamic creation/destruction of GUI
   // vme_gui changed 
-  if( vme_gui != last_vme_gui ) 
+  if( vme_gui != m_VmePanel->GetCurrentGui() ) 
   {
     m_VmePanel->Put(vme_gui);
     
@@ -247,7 +246,7 @@ void mafSideBar::UpdateVmePanel()
   }
   
   // vme_out changed 
-  if( vme_out_gui != last_vme_out_gui ) 
+  if( vme_out_gui != m_VmeOutputPanel->GetCurrentGui() ) 
   {
     m_VmeOutputPanel->Put(vme_out_gui);
 
@@ -256,18 +255,11 @@ void mafSideBar::UpdateVmePanel()
   }
 
   // vme_pipe changed 
-  if( vme_pipe_gui != last_vme_pipe_gui ) 
+  if( vme_pipe_gui != m_VmePipePanel->GetCurrentGui() ) 
   {
     m_VmePipePanel->Put(vme_pipe_gui);
 
     //if(last_vme_pipe_gui && last_vme_pipe)
       // last_vme_pipe->DeleteGui(); // - what if last_vme_pipe was destroyed ?
-  }
-
-  //last_vme = m_SelectedVme;
-  //last_vme_out = vme_out;
-  //last_vme_pipe = vme_pipe;
-  last_vme_gui = vme_gui;
-  last_vme_out_gui = vme_out_gui;
-  last_vme_pipe_gui = vme_pipe_gui;
+  }*/
 }
