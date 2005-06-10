@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTest.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:45:42 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-06-10 08:47:00 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,6 +21,7 @@
 
 #include "mmoTest.h"
 #include "mmgGui.h"
+#include "mafNode.h"
 
 //----------------------------------------------------------------------------
 mmoTest::mmoTest(wxString label)
@@ -108,6 +109,11 @@ void mmoTest::OnEvent(mafEventBase *event)
       case wxCANCEL:
         OpStop(OP_RUN_CANCEL);
       break;
+      case ID0:
+        event->SetId(VME_CHOOSE);
+        mafEventMacro(*e);
+        wxLogMessage(e->GetVme()->GetName());
+      break;
       default:
         e->Log(); 
       break;
@@ -124,6 +130,9 @@ void mmoTest::OpRun()
   choices[1] = "quo";
   choices[2] = "qua";
 
+  m_ButtonString = "choose";
+
+  
   m_Gui = new mmgGui(this);
 
   m_Gui->Label("label");
@@ -133,7 +142,7 @@ void mmoTest::OpRun()
   m_Gui->Divider(2);
   m_Gui->Divider(3);
 
-  m_Gui->Button  (ID0,"button");
+  m_Gui->Button  (ID0, &m_ButtonString, "button");
   m_Gui->Button  (ID1,"button","label");
 
   m_Gui->Vector  (ID2, "i vector", m_iv1);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTest.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:45:42 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-06-10 08:47:00 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -44,6 +44,7 @@ protected:
   mafString m_sopen;
   mafString m_ssave;
   mafString m_sdir;
+  mafString m_ButtonString;
   int      m_i1;
   int      m_i2;
   int      m_bool1;
