@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 17:27:50 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-06-10 08:54:43 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -42,10 +42,10 @@ public:
   int m_MeasureType;
 
   int m_GenerateEvent;
-  int m_DeltaPercent;
   int m_ThresholdEvent;
 
   double m_InitMeasure;
+  double m_DeltaPercent;
   double m_TubeRadius;
   double m_DistanceRange[2];
 

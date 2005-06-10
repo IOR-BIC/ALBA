@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-30 15:54:55 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-06-10 08:54:43 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -43,7 +43,7 @@ mmaMeter::mmaMeter()
   m_InitMeasure    = 0.0;
   m_GenerateEvent  = 0;
   m_ThresholdEvent = 0;
-  m_DeltaPercent   = 10;
+  m_DeltaPercent   = 10.0;
   m_MeasureType    = mafVMEMeter::ABSOLUTE_MEASURE;
 
   m_DistanceRange[0] = 0.0;
@@ -107,7 +107,7 @@ int mmaMeter::InternalStore(mafStorageElement *parent)
     parent->StoreInteger("Capping", m_Capping);
     parent->StoreInteger("MeasureType", m_MeasureType);
     parent->StoreInteger("GenerateEvent", m_GenerateEvent);
-    parent->StoreInteger("DeltaPercent", m_DeltaPercent);
+    parent->StoreDouble("DeltaPercent", m_DeltaPercent);
     parent->StoreInteger("ThresholdEvent", m_ThresholdEvent);
     parent->StoreInteger("LabelVisibility", m_LabelVisibility);
     parent->StoreDouble("InitMeasure",m_InitMeasure);
@@ -132,7 +132,7 @@ int mmaMeter::InternalRestore(mafStorageElement *node)
       node->RestoreInteger("Capping", m_Capping);
       node->RestoreInteger("MeasureType", m_MeasureType);
       node->RestoreInteger("GenerateEvent", m_GenerateEvent);
-      node->RestoreInteger("DeltaPercent", m_DeltaPercent);
+      node->RestoreDouble("DeltaPercent", m_DeltaPercent);
       node->RestoreInteger("ThresholdEvent", m_ThresholdEvent);
       node->RestoreInteger("LabelVisibility", m_LabelVisibility);
       node->RestoreDouble("InitMeasure",m_InitMeasure);
