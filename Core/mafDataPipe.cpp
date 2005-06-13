@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:43:05 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-06-13 10:33:43 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -185,5 +185,7 @@ void mafDataPipe::Print(std::ostream& os, const int tabs) const
 //------------------------------------------------------------------------------
 {
   mafIndent indent(tabs);
-  os << indent << "VME:" << (m_VME?m_VME->GetName():"(NULL)") << std::endl;
+  mafString dp_name;
+  dp_name = m_VME ? m_VME->GetName() : "(NULL)";
+  os << indent << "VME:" << dp_name.GetCStr() << std::endl;
 }
