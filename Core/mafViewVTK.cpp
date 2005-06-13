@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:44:28 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-06-13 10:34:47 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,6 +34,7 @@ mafViewVTK::mafViewVTK(wxString label, bool external)
 :mafView(label,external)
 //----------------------------------------------------------------------------
 {
+  m_CameraPosition = CAMERA_PERSPECTIVE;
   m_Sg  = NULL;
   m_Rwi = NULL;
 }
@@ -56,12 +57,12 @@ mafView *mafViewVTK::Copy(mafObserver *Listener)
   return v;
 }
 //----------------------------------------------------------------------------
-void mafViewVTK::Create( ) 
+void mafViewVTK::Create()
 //----------------------------------------------------------------------------
 {
   m_Rwi = new mafRWI(mafGetFrame() /*, ONE_LAYER, m_show_grid == 1, m_stereo_type*/);
   m_Rwi->SetListener(this); //SIL. 16-6-2004: 
-  //m_Rwi->CameraSet(m_cam_position);
+  m_Rwi->CameraSet(m_CameraPosition);
   //m_Rwi->SetAxesVisibility(m_show_axes != 0);
   m_Win = m_Rwi->m_Rwi;
 
@@ -89,8 +90,28 @@ void mafViewVTK::VmeSelect(mafNode *vme, bool select)                   {assert(
 void mafViewVTK::VmeShow(mafNode *vme, bool show)												{assert(m_Sg); m_Sg->VmeShow(vme,show);}
 void mafViewVTK::VmeUpdateProperty(mafNode *vme, bool fromTag)	        {assert(m_Sg); m_Sg->VmeUpdateProperty(vme,fromTag);}
 int  mafViewVTK::GetNodeStatus(mafNode *vme)                            {return m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;}
-void mafViewVTK::CameraReset()	{assert(m_Rwi); m_Rwi->CameraReset();}
-void mafViewVTK::CameraUpdate() {assert(m_Rwi); m_Rwi->CameraUpdate();}
+//----------------------------------------------------------------------------
+void mafViewVTK::CameraSet(int camera_position) 
+//----------------------------------------------------------------------------
+{
+  assert(m_Rwi);
+  m_CameraPosition = camera_position; 
+  m_Rwi->CameraSet(camera_position);
+}
+//----------------------------------------------------------------------------
+void mafViewVTK::CameraReset()	
+//----------------------------------------------------------------------------
+{
+  assert(m_Rwi); 
+  m_Rwi->CameraReset();
+}
+//----------------------------------------------------------------------------
+void mafViewVTK::CameraUpdate() 
+//----------------------------------------------------------------------------
+{
+  assert(m_Rwi); 
+  m_Rwi->CameraUpdate();
+}
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
@@ -135,6 +156,7 @@ void mafViewVTK::VmeCreatePipe(mafNode *vme)
     mafPipe *pipe = (mafPipe*)obj;
     pipe->Create(n);
     n->m_Pipe = (mafPipe*)pipe;
+    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
 }
 //----------------------------------------------------------------------------
