@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 11:33:45 $
-  Version:   $Revision: 1.34 $
+  Date:      $Date: 2005-06-13 10:35:13 $
+  Version:   $Revision: 1.35 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -895,6 +895,7 @@ void mafNode::OnEvent(mafEventBase *e)
           #else
             std::strstream ss1,ss2;
             Print(ss1);
+            ss1 << std::ends;   // Paolo 13/06/2005: needed to close correctly the strstream
             wxLogMessage("[VME PRINTOUT:]\n%s\n", ss1.str()); 
           #endif
           }
@@ -1134,8 +1135,8 @@ mmgGui* mafNode::CreateGui()
   m_Gui = new mmgGui(this);
   
   mafString type_name = GetTypeName();
-  //m_Gui->Button(ID_PRINT_INFO, type_name, "", "Print node debug information");
-  m_Gui->Label("type: ", type_name);
+  m_Gui->Button(ID_PRINT_INFO, type_name, "", "Print node debug information");
+  //m_Gui->Label("type: ", type_name);
   m_Gui->String(ID_NAME,"name :", &m_Name);
 
   return m_Gui;
