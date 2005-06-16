@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-13 12:31:20 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-06-16 11:04:36 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -122,7 +122,7 @@ void mafSideBar::ViewSelect(mafView *view)
 	{
 		wxString s = " ";
 		s += wxStripMenuCodes(view->GetLabel());
-		s += " view:";
+		s += " props:";
 		m_ViewPropertyPanel->SetTitle(s);
 		mmgGui *gui = view->GetGui();
 		if(gui) 

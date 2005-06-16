@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:43:08 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-06-16 11:05:18 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -138,13 +138,13 @@ public:
   bool           m_Plugged; // forget it - it is used from outside 
   mafView       *m_Next;    // forget it - it is used from outside 
 
-
   /** IDs for the GUI */
   enum 
   {
     ID_FIRST = MINID,
     ID_LAST
   };
+
   /** destroy the Gui */
   void DeleteGui();
 
