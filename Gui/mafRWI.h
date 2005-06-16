@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:44:02 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-06-16 13:45:46 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -87,7 +87,7 @@ public:
 	void SetAxesVisibility(bool show);
 
   mafSceneGraph    *m_Sg; 
-  mafRWIBase			 *m_Rwi;
+  mafRWIBase			 *m_RwiBase;
   vtkRenderer      *m_RenFront; ///< Renderer used to show actors on the first layer.
   vtkRenderer      *m_RenBack; ///< Renderer used to show actors on the second layer.
   vtkRenderWindow  *m_RenderWindow;

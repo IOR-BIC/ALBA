@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMaterialChooser.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:44:10 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-06-16 13:45:32 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -162,7 +162,7 @@ void mmgMaterialChooser::CreateGUI()
 	// RWI ============================
 	m_RWI = new mafRWI(m_Dialog,ONE_LAYER);
 	m_RWI->SetSize(0,0,50,50);
-	m_RWI->m_Rwi->Show(true);
+	m_RWI->m_RwiBase->Show(true);
 
 	// GUI ============================
 	m_Gui = new mmgGui(this);
@@ -207,7 +207,7 @@ void mmgMaterialChooser::CreateGUI()
 	v1_sizer->Add(m_ListCtrlMaterial,1,wxEXPAND | wxALIGN_LEFT);
 
 	wxBoxSizer *v2_sizer = new wxBoxSizer(wxVERTICAL);
-  v2_sizer->Add(m_RWI->m_Rwi,0,wxALIGN_CENTRE);
+  v2_sizer->Add(m_RWI->m_RwiBase,0,wxALIGN_CENTRE);
   v2_sizer->Add(m_Gui,1,wxEXPAND|wxALIGN_BOTTOM);
 
 	wxBoxSizer *main_sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -237,8 +237,8 @@ void mmgMaterialChooser::CreatePipe()
   m_RWI->m_Camera->SetFocalPoint(0,0,0);
   m_RWI->m_Camera->SetPosition(0,0,2);
   m_RWI->m_Camera->SetViewUp(0,1,0);
-	m_RWI->m_Rwi->GetInteractorStyle()->SetInteractor(NULL);
-	m_RWI->m_Rwi->SetInteractorStyle(NULL);
+	m_RWI->m_RwiBase->GetInteractorStyle()->SetInteractor(NULL);
+	m_RWI->m_RwiBase->SetInteractorStyle(NULL);
 
 	m_Sphere = vtkSphereSource::New();
 	m_Sphere->SetPhiResolution(20);

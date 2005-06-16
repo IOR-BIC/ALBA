@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:44:02 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-06-16 13:45:46 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -80,8 +80,8 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, int stereo)
     m_RenderWindow = vtkRenderWindow::New(); 
   m_RenderWindow->AddRenderer(m_RenFront);
 
-  m_Rwi = new mafRWIBase(parent, -1);
-	m_Rwi->SetRenderWindow(m_RenderWindow);
+  m_RwiBase = new mafRWIBase(parent, -1);
+	m_RwiBase->SetRenderWindow(m_RenderWindow);
   
 	m_RenBack = NULL;
 	if(layers == TWO_LAYER)
@@ -144,9 +144,9 @@ mafRWI::~mafRWI( )
 		if(m_RenderWindow) 
       m_RenderWindow->SetInteractor(NULL);    //Paolo 23-06-2004
     m_RenderWindow->Delete();
-    //if(m_Rwi) 
-      //m_Rwi->SetRenderWindow(NULL); //Paolo 23-06-2004
-		vtkDEL(m_Rwi);  //SIL. 13-11-2003: The renderer has to be Deleted as last
+    //if(m_RwiBase) 
+      //m_RwiBase->SetRenderWindow(NULL); //Paolo 23-06-2004
+		vtkDEL(m_RwiBase);  //SIL. 13-11-2003: The renderer has to be Deleted as last
 }
 //-----------------------------------------------------------------------------------------
 void mafRWI::CameraSet(int cam_position)
@@ -266,13 +266,13 @@ void mafRWI::CameraSet(int cam_position)
 void mafRWI::SetSize(int x, int y, int w,int h)
 //----------------------------------------------------------------------------
 {
-   ((wxWindow*)m_Rwi)->SetSize(x,y,w,h);
+   ((wxWindow*)m_RwiBase)->SetSize(x,y,w,h);
 }
 //----------------------------------------------------------------------------
 void mafRWI::Show(bool show)
 //----------------------------------------------------------------------------
 {
-   m_Rwi->Show(show);
+   m_RwiBase->Show(show);
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetGridNormal(int normal_id)
@@ -347,17 +347,17 @@ void mafRWI::SetStereo(int stereo_type)
 	
 
   //warning: non portable
-  //m_RenderWindow->SetWindowId( (HWND) m_Rwi->GetHWND() );
+  //m_RenderWindow->SetWindowId( (HWND) m_RwiBase->GetHWND() );
 
   //m_RenderWindow->AddRenderer(m_RenFront);
-  //m_Rwi->SetRenderWindow(m_RenderWindow);
-  m_Rwi->ReInitialize();
+  //m_RwiBase->SetRenderWindow(m_RenderWindow);
+  m_RwiBase->ReInitialize();
 }
 //----------------------------------------------------------------------------
 void mafRWI::CameraUpdate()
 //----------------------------------------------------------------------------
 {
-  //if(!m_Rwi->IsShown()) return; //TODO: capire perche' non funziona piu' - risulta sempre nascosta
+  //if(!m_RwiBase->IsShown()) return; //TODO: capire perche' non funziona piu' - risulta sempre nascosta
   if (m_RenderWindow->GetGenericWindowId() == 0) 
 		return;
 
@@ -488,7 +488,7 @@ void mafRWI::CameraReset(double bounds[6])
 	height = (height == 0) ? 1.0 : height;	
   
 	//check aspect ratio - and eventually compensate height
-	double view_aspect  = (m_Rwi->m_Width*1.0)/(m_Rwi->m_Height*1.0);
+	double view_aspect  = (m_RwiBase->m_Width*1.0)/(m_RwiBase->m_Height*1.0);
 	double scene_aspect = (width)/(height);
   if( scene_aspect > view_aspect )
   {
