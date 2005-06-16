@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-16 13:45:32 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-06-16 14:39:37 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -62,7 +62,7 @@ public:
   virtual void	    VmeCreatePipe(mafNode *vme);
   virtual void	    VmeDeletePipe(mafNode *vme);
 
-	virtual void			CameraReset();
+	virtual void			CameraReset(mafNode *node = NULL);
   virtual void      CameraSet(int camera_position);
   virtual void			CameraUpdate();
 

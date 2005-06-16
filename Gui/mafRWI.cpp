@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-16 13:45:46 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-06-16 14:39:48 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,9 +32,9 @@
 #include "mafSceneNode.h"
 #include "mafSceneGraph.h"
 #include "mafVME.h"
-//#include "mafNodeLandmark.h"
-//#include "mafNodeLandmarkCloud.h"
-//#include "mflMatrixPipeDirectCinematic.h"
+#include "mafVMELandmark.h"
+#include "mafVMELandmarkCloud.h"
+#include "mafAbsMatrixPipe.h"
 //#include "mflAssembly.h"
 
 //#include "vtkGridActor.h"  // users must see GRID_XYZ const declared in vtkGridActor
@@ -374,12 +374,12 @@ void mafRWI::CameraReset(mafNode *vme)
 
 //	if(m_Grid && m_ShowGrid) m_Grid->VisibilityOff();
 
-  mafEventMacro(mafEvent(this,CAMERA_PRE_RESET,m_RenFront));  //SIL. 16-6-2004: - Attention - I'm sending m_RenFront, I suppose that m_RenBack is never required 
+  mafEventMacro(mafEvent(this,CAMERA_PRE_RESET,m_RenFront)); //- Attention - I'm sending m_RenFront, I suppose that m_RenBack is never required 
   CameraReset(ComputeVisibleBounds(vme));
 //	if(m_Grid && m_ShowGrid) m_Grid->VisibilityOn();
 
-  mafEventMacro(mafEvent(this,CAMERA_POST_RESET,m_RenFront)); //SIL. 16-6-2004:
-  m_RenFront->ResetCameraClippingRange(); //per la griglia
+  mafEventMacro(mafEvent(this,CAMERA_POST_RESET,m_RenFront));
+  m_RenFront->ResetCameraClippingRange();
   m_RenderWindow->Render();
 }
 //----------------------------------------------------------------------------
@@ -396,7 +396,6 @@ double *mafRWI::ComputeVisibleBounds(mafNode *node)
 					if(mafSceneNode *n = m_Sg->Vme2Node(vme) )
 						if(n->IsVisible())
 	{
-		vme->GetOutput()->GetVTKData();
 		vme->GetOutput()->GetVTKData()->GetBounds(b1);
     float loc_p1[3],loc_p2[3],abs_p1[3], abs_p2[3];
     loc_p1[0] = b1[0];
@@ -407,10 +406,10 @@ double *mafRWI::ComputeVisibleBounds(mafNode *node)
     loc_p2[2] = b1[5];
 
     double r=0;
-/*    if(vme->IsA("mafNodeLandmark"))
-       r = ((mafNodeLandmark*)vme)->GetRadius();
-    if(vme->IsA("mafNodeLandmarkCloud"))
-       r = ((mafNodeLandmarkCloud*)vme)->GetRadius();*/
+    if(vme->IsA("mafVMELandmark"))
+       r = ((mafVMELandmark *)vme)->GetRadius();
+    if(vme->IsA("mafVMELandmarkCloud"))
+       r = ((mafVMELandmarkCloud *)vme)->GetRadius();
 		loc_p1[0] -= r;
 		loc_p1[1] -= r;
 		loc_p1[2] -= r;
@@ -418,7 +417,7 @@ double *mafRWI::ComputeVisibleBounds(mafNode *node)
 		loc_p2[1] += r;
 		loc_p2[2] += r;
     
-    vtkLinearTransform *t = (vtkLinearTransform *)vme->GetAbsMatrixPipe();
+    vtkLinearTransform *t = vme->GetAbsMatrixPipe()->GetVTKTransform();
 		t->TransformPoint(loc_p1,abs_p1);
 		t->TransformPoint(loc_p2,abs_p2);
     // TODO: test the usage of vtkMatrix4x4::MultiplyPoint instead

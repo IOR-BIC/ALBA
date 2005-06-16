@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:43:08 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-06-16 14:39:37 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -229,8 +229,7 @@ void mafViewManager::PropertyUpdate(bool fromTag)
 void mafViewManager::CameraReset(bool sel)   
 //----------------------------------------------------------------------------
 {
-  //@@@ if(m_SelectedView) m_SelectedView->CameraReset( sel ? m_SelectedVme : NULL);
-  if(m_SelectedView) m_SelectedView->CameraReset();
+  if(m_SelectedView) m_SelectedView->CameraReset(sel ? m_SelectedVme : NULL);
 }
 //----------------------------------------------------------------------------
 void mafViewManager::CameraReset(mafNode *vme)   
