@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-07 14:43:02 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-06-16 11:03:35 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,7 +32,7 @@
 //@@@ #include "mafVmeData.h"
 
 #include "vtkRenderer.h"
-#include "vtkOutlineFilter.h"
+#include "vtkOutlineSource.h"
 #include "vtkOutlineCornerFilter.h"
 #include "vtkPolyDataNormals.h"
 #include "vtkStripper.h"
@@ -57,6 +57,8 @@ mafPipeBox::mafPipeBox()
   m_OutlineMapper   = NULL;
   m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
+
+  m_BoundsMode = 0;
 }
 //----------------------------------------------------------------------------
 void mafPipeBox::Create(mafSceneNode *n/*, bool use_axes*/)
@@ -73,12 +75,14 @@ void mafPipeBox::Create(mafSceneNode *n/*, bool use_axes*/)
   m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
 
+  m_BoundsMode = 0;
+
   m_Vme->GetOutput()->Update();
-  vtkDataSet *data = m_Vme->GetOutput()->GetVTKData();
-  assert(data);
+  double b[6];
+  m_Vme->GetOutput()->GetBounds(b);
 
   vtkNEW(m_Box);
-  m_Box->SetInput(data);
+  m_Box->SetBounds(b);
 
   vtkNEW(m_Mapper);
 	m_Mapper->SetInput(m_Box->GetOutput());
@@ -95,7 +99,7 @@ void mafPipeBox::Create(mafSceneNode *n/*, bool use_axes*/)
 
   // selection highlight
 	vtkNEW(m_OutlineBox);
-	m_OutlineBox->SetInput(data);  
+	m_OutlineBox->SetInput(m_Box->GetOutput());
 
 	vtkNEW(m_OutlineMapper);
 	m_OutlineMapper->SetInput(m_OutlineBox->GetOutput());
@@ -188,4 +192,41 @@ void mafPipeBox::UpdateProperty(bool fromTag)
   else
 	  m_Mapper->SetScalarVisibility(((mafVmeData *)m_Vme->GetClientData())->GetColorByScalar());
 	*/
+}
+//-------------------------------------------------------------------------
+mmgGui *mafPipeBox::CreateGui()
+//-------------------------------------------------------------------------
+{
+  const wxString box_type[] = {"3D", "4D"};
+  int num_choices = 2;
+
+  assert(m_Gui == NULL);
+  m_Gui = new mmgGui(this);
+  m_Gui->Combo(ID_BOUNDS_MODE,"bounds", &m_BoundsMode,num_choices,box_type);
+  return m_Gui;
+}
+//----------------------------------------------------------------------------
+void mafPipeBox::OnEvent(mafEventBase *maf_event)
+//----------------------------------------------------------------------------
+{
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  {
+    switch(e->GetId()) 
+    {
+      case ID_BOUNDS_MODE:
+      {
+        double b[6];
+        if (m_BoundsMode == 0)
+          m_Vme->GetOutput()->GetBounds(b);
+        else
+          m_Vme->GetOutput()->Get4DBounds(b);
+        m_Box->SetBounds(b);
+      }
+   	  break;
+      default:
+        e->Log();
+    }
+    mafEvent cam_event(this,CAMERA_UPDATE);
+    m_Vme->ForwardUpEvent(cam_event);
+  }
 }
