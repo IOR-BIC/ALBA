@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGeneric.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-27 14:09:30 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-06-16 11:03:06 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -61,6 +61,9 @@ public:
   /** return icon */
   static char** GetIcon();
   
+  /** Return the suggested pipe-typename for the visualization of this vme */
+  virtual mafString GetVisualPipe() {return mafString("mafPipeBox");};
+
 protected:
   mafVMEGeneric();
   virtual ~mafVMEGeneric();
