@@ -6,6 +6,8 @@ PROJECT(mafGui)
 MESSAGE(STATUS "Configuring project ${PROJECT_NAME}")
 
 SET(PROJECT_SRCS
+mafLightKit.cpp
+mafLightKit.h
 mafPics.cpp
 mafPics.h
 mafRWI.cpp
