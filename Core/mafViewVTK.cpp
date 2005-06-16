@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-13 10:34:47 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-06-16 11:05:31 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,10 +20,15 @@
 //----------------------------------------------------------------------------
 
 #include "mafViewVTK.h"
-#include "vtkCamera.h"
 #include "mafVME.h"
 #include "mafPipe.h"
 #include "mafPipeFactory.h"
+#include "mafLightKit.h"
+
+#include "vtkMAFSmartPointer.h"
+#include "vtkCamera.h"
+#include "vtkTransform.h"
+#include "vtkMatrix4x4.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewVTK);
@@ -35,15 +40,22 @@ mafViewVTK::mafViewVTK(wxString label, bool external)
 //----------------------------------------------------------------------------
 {
   m_CameraPosition = CAMERA_PERSPECTIVE;
-  m_Sg  = NULL;
-  m_Rwi = NULL;
+  m_Sg        = NULL;
+  m_Rwi       = NULL;
+  m_LightKit  = NULL;
+  
+  m_CameraAttach  = 0;
+  m_AttachedVme       = NULL;
+  m_AttachedVmeMatrix = NULL;
 }
 //----------------------------------------------------------------------------
 mafViewVTK::~mafViewVTK() 
 //----------------------------------------------------------------------------
 {
+  cppDEL(m_LightKit);
   cppDEL(m_Sg);
   cppDEL(m_Rwi);
+  vtkDEL(m_AttachedVmeMatrix);
 }
 //----------------------------------------------------------------------------
 mafView *mafViewVTK::Copy(mafObserver *Listener)
@@ -86,10 +98,31 @@ void mafViewVTK::Create()
 //----------------------------------------------------------------------------
 void mafViewVTK::VmeAdd(mafNode *vme)                                   {assert(m_Sg); m_Sg->VmeAdd(vme);}
 void mafViewVTK::VmeRemove(mafNode *vme)                                {assert(m_Sg); m_Sg->VmeRemove(vme);}
-void mafViewVTK::VmeSelect(mafNode *vme, bool select)                   {assert(m_Sg); m_Sg->VmeSelect(vme,select);}
 void mafViewVTK::VmeShow(mafNode *vme, bool show)												{assert(m_Sg); m_Sg->VmeShow(vme,show);}
 void mafViewVTK::VmeUpdateProperty(mafNode *vme, bool fromTag)	        {assert(m_Sg); m_Sg->VmeUpdateProperty(vme,fromTag);}
 int  mafViewVTK::GetNodeStatus(mafNode *vme)                            {return m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;}
+//----------------------------------------------------------------------------
+void mafViewVTK::VmeSelect(mafNode *vme, bool select)
+//----------------------------------------------------------------------------
+{
+  assert(m_Sg); 
+  m_Sg->VmeSelect(vme,select);
+  if (m_CameraAttach && select)
+  {
+    m_AttachedVme = mafVME::SafeDownCast(vme);
+    if (m_AttachedVme == NULL)
+    {
+      m_CameraAttach = 0;
+      m_Gui->Update();
+    }
+    else
+    {
+      if (m_AttachedVmeMatrix == NULL)
+        vtkNEW(m_AttachedVmeMatrix);
+      m_AttachedVmeMatrix->DeepCopy(m_AttachedVme->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+    }
+  }
+}
 //----------------------------------------------------------------------------
 void mafViewVTK::CameraSet(int camera_position) 
 //----------------------------------------------------------------------------
@@ -109,11 +142,11 @@ void mafViewVTK::CameraReset()
 void mafViewVTK::CameraUpdate() 
 //----------------------------------------------------------------------------
 {
+  if(m_AttachedVme != NULL && m_AttachedVmeMatrix != NULL)
+    UpdateCameraMatrix(); 
   assert(m_Rwi); 
   m_Rwi->CameraUpdate();
 }
-//----------------------------------------------------------------------------
-
 //----------------------------------------------------------------------------
 mafPipe* mafViewVTK::GetNodePipe(mafNode *vme)
 //----------------------------------------------------------------------------
@@ -166,4 +199,78 @@ void mafViewVTK::VmeDeletePipe(mafNode *vme)
   mafSceneNode *n = m_Sg->Vme2Node(vme);
   assert(n && n->m_Pipe);
   cppDEL(n->m_Pipe);
+}
+//-------------------------------------------------------------------------
+mmgGui *mafViewVTK::CreateGui()
+//-------------------------------------------------------------------------
+{
+  assert(m_Gui == NULL);
+  m_Gui = new mmgGui(this);
+  
+  /////////////////////////////////////////Attach Camera GUI
+  m_Gui->Label("attach camera to selected object",true);
+  m_Gui->Bool(ID_ATTACH_CAMERA,"attach",&m_CameraAttach,1);
+
+  /////////////////////////////////////////Light GUI
+  m_Gui->Divider(2);
+  m_LightKit = new mafLightKit(m_Gui, this->m_Rwi->m_RenFront, this);
+  m_Gui->AddGui(m_LightKit->GetGui());
+  
+  return m_Gui;
+}
+//----------------------------------------------------------------------------
+void mafViewVTK::OnEvent(mafEventBase *maf_event)
+//----------------------------------------------------------------------------
+{
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  {
+    switch(e->GetId()) 
+    {
+      case ID_ATTACH_CAMERA:
+        if(m_CameraAttach)
+        {
+          if(!m_Sg->GetSelectedVme()) 
+            return;
+          m_AttachedVme = mafVME::SafeDownCast(m_Sg->GetSelectedVme());
+          if (m_AttachedVme == NULL)
+          {
+            m_CameraAttach = 0;
+            m_Gui->Update();
+            return;
+          }
+          if (m_AttachedVmeMatrix == NULL)
+            vtkNEW(m_AttachedVmeMatrix);
+          m_AttachedVmeMatrix->DeepCopy(m_AttachedVme->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+        }
+        else
+        {
+          m_AttachedVme = NULL;
+        }
+      break;
+      default:
+        mafEventMacro(*maf_event);
+      break;
+    }
+  }
+  else
+  {
+    mafEventMacro(*maf_event);
+  }
+}
+//----------------------------------------------------------------------------
+void mafViewVTK::UpdateCameraMatrix()
+//----------------------------------------------------------------------------
+{
+  vtkMAFSmartPointer<vtkTransform> delta;
+
+  vtkMatrix4x4 *new_matrix = m_AttachedVme->GetOutput()->GetAbsMatrix()->GetVTKMatrix();
+
+  m_AttachedVmeMatrix->Invert();
+
+  delta->Concatenate(new_matrix);
+  delta->Concatenate(m_AttachedVmeMatrix);
+
+  m_Rwi->m_Camera->ApplyTransform(delta);
+
+  m_AttachedVmeMatrix->DeepCopy(new_matrix);
 }

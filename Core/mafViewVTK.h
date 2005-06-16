@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-13 10:34:48 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-06-16 11:05:32 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,6 +22,9 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
+class mafLightKit;
+class mafVME;
+class vtkMatrix4x4;
 
 //----------------------------------------------------------------------------
 // mafViewVTK :
@@ -40,6 +43,14 @@ public:
 
   virtual mafView*  Copy(mafObserver *Listener);
   virtual void      Create();
+  virtual void			OnEvent(mafEventBase *maf_event);
+
+  /** IDs for the GUI */
+  enum 
+  {
+    ID_ATTACH_CAMERA = Superclass::ID_LAST,
+    ID_LAST
+  };
 
   virtual void			VmeAdd(mafNode *vme);
   virtual void			VmeRemove(mafNode *vme);
@@ -61,6 +72,16 @@ public:
 protected:
   mafRWI        *m_Rwi; 
   mafSceneGraph *m_Sg;
-  int m_CameraPosition;
+  mafLightKit		*m_LightKit;
+  int            m_CameraPosition;
+  int						 m_CameraAttach;
+  mafVME				*m_AttachedVme;
+  vtkMatrix4x4	*m_AttachedVmeMatrix;
+
+  virtual mmgGui *CreateGui();
+
+  /** Update the camera position when vme's abs matrix change. 
+  This function is called from CameraUpdate when camera is attached to the vme */
+  void UpdateCameraMatrix();
 };
 #endif
