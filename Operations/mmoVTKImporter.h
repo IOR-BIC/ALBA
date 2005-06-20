@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKImporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:54:49 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-06-20 09:17:02 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -13,6 +13,9 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __mmoVTKImporter_H__
 #define __mmoVTKImporter_H__
 
+//----------------------------------------------------------------------------
+// Include :
+//----------------------------------------------------------------------------
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
