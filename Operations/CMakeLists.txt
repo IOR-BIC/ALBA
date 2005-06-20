@@ -20,6 +20,8 @@ IF (MAF_USE_VTK)
     mmoCreateSlicer.h
     mmoReparentTo.cpp
     mmoReparentTo.h
+    mmoSTLImporter.cpp
+    mmoSTLImporter.h
     mmoVTKExporter.cpp
     mmoVTKExporter.h
     mmoVTKImporter.cpp
