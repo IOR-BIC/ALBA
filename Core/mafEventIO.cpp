@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventIO.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-28 16:15:29 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-06-21 11:02:58 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 

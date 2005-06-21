@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:43:06 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-06-21 11:02:58 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
