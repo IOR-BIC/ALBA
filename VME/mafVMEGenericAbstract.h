@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-16 11:23:58 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-06-21 09:48:59 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -66,8 +66,8 @@ public:
     In case of error during operation return NULL, otherwise return
     this node pointer: this is to be compatible with nodes that during
     reparenting make copy of the VME (mafVMEGenericAbstractRoot)*/
-  virtual mafVME *ReparentTo(mafVME *parent);
-   
+  virtual int ReparentTo(mafVME *parent);
+
   /**  
     Return the matrix vector associated with this VME. Matrix vector is an array of
     time stamped 4x4 matrices, used to generate the output VME pose matrix. The matrix
