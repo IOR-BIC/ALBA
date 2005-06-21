@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 15:27:36 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-06-21 09:47:57 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -101,10 +101,22 @@ int mafVMEMeter::DeepCopy(mafNode *a)
   if (Superclass::DeepCopy(a)==MAF_OK)
   {
     mafVMEMeter *meter = mafVMEMeter::SafeDownCast(a);
-    meter->SetLink("StartVME", a->GetLink("StartVME"));
-    meter->SetLink("EndVME1", a->GetLink("EndVME1"));
-    meter->SetLink("EndVME2", a->GetLink("EndVME2"));
-    m_Transform->SetMatrix(m_Transform->GetMatrix());
+    mafNode *linked_node = meter->GetLink("StartVME");
+    if (linked_node)
+    {
+      this->SetLink("StartVME", linked_node);
+    }
+    linked_node = meter->GetLink("EndVME1");
+    if (linked_node)
+    {
+      this->SetLink("EndVME1", linked_node);
+    }
+    linked_node = meter->GetLink("EndVME2");
+    if (linked_node)
+    {
+      this->SetLink("EndVME2", linked_node);
+    }
+    m_Transform->SetMatrix(meter->m_Transform->GetMatrix());
     return MAF_OK;
   }  
   return MAF_ERROR;
