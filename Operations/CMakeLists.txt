@@ -14,12 +14,16 @@ SET(PROJECT_SRCS
 IF (MAF_USE_VTK)
   SET(PROJECT_SRCS
     ${PROJECT_SRCS}
+    mmoCreateGroup.cpp
+    mmoCreateGroup.h
     mmoCreateMeter.cpp
     mmoCreateMeter.h
     mmoCreateSlicer.cpp
     mmoCreateSlicer.h
     mmoReparentTo.cpp
     mmoReparentTo.h
+    mmoSTLExporter.cpp
+    mmoSTLExporter.h
     mmoSTLImporter.cpp
     mmoSTLImporter.h
     mmoVTKExporter.cpp
