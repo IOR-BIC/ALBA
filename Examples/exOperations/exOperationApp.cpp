@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-20 09:16:30 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-06-21 09:43:09 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -32,9 +32,11 @@
 #include "mafVMESurface.h"
 #include "mafPipeFactory.h"
 
+#include "mmoCreateGroup.h"
 #include "mmoCreateMeter.h"
 #include "mmoCreateSlicer.h"
 #include "mmoReparentTo.h"
+#include "mmoSTLExporter.h"
 #include "mmoSTLImporter.h"
 #include "mmoVTKExporter.h"
 #include "mmoVTKImporter.h"
@@ -76,8 +78,10 @@ bool exOperationApp::OnInit()
   m_logic->Plug(new mmoSTLImporter("STL Importer"));
   m_logic->Plug(new mmoVTKImporter("VTK Importer"));
 
+  m_logic->Plug(new mmoSTLExporter("STL Exporter"));
   m_logic->Plug(new mmoVTKExporter("VTK Exporter"));
 
+  m_logic->Plug(new mmoCreateGroup("Create Group"));
   m_logic->Plug(new mmoCreateMeter("Create Meter"));
   m_logic->Plug(new mmoCreateSlicer("Create Slicer"));
   m_logic->Plug(new mmoReparentTo("Reparent to...  \tCtrl+R"));
