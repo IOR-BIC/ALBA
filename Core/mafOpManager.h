@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:43:07 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-06-21 15:16:48 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -75,16 +75,16 @@ public:
 	//virtual void OpTransform(vtkMatrix4x4* new_matrix,vtkMatrix4x4* old_matrix);
 
 	/** Set the flag for warning the user if the operation is undoable. */
-  virtual void WarningIfCantUndo (bool warn) {m_warn = warn;};
+  virtual void WarningIfCantUndo (bool warn) {m_Warn = warn;};
 
 	/** Set a reference to the main toolbar. */
-  virtual void SetToolbar(wxToolBar *tb) {m_toolbar = tb;};
+  virtual void SetToolbar(wxToolBar *tb) {m_ToolBar = tb;};
 
 	/** Set a reference to the main men. */
-  virtual void SetMenubar(wxMenuBar *mb) {m_menubar = mb;};
+  virtual void SetMenubar(wxMenuBar *mb) {m_MenuBar = mb;};
 
 	/** return true if there is a running operation. */
-  virtual bool Running()								 {return m_context.Caller() != NULL;};
+  virtual bool Running()								 {return m_Context.Caller() != NULL;};
 
 	/** Clear the stack of executed operation. */
   virtual void ClearUndoStack(); 
@@ -134,25 +134,25 @@ protected:
   void SetAccelerator(mafOp *op);
 
   mafAction          *m_MouseAction;
-  bool							 m_warn;
-	mafOpContextStack  m_context;
-  mafOp             *m_running_op;
-	wxMenu            *m_menu[3];
-  mafNode						*m_selected;
+  bool							 m_Warn;
+	mafOpContextStack  m_Context;
+  mafOp             *m_RunningOp;
+	wxMenu            *m_Menu[3];
+  mafNode						*m_Selected;
 
-	mafOp             *m_opv[MAXOP];
-  int                m_numop;
+	mafOp             *m_OpList[MAXOP];
+  int                m_NumOp;
   wxAcceleratorEntry m_OpAccelEntries[MAXOP];
-  int                m_numAccel;
+  int                m_NumOfAccelerators;
 
-  mafOpSelect       *m_opselect;
-  mafOpCut          *m_opcut;
-  mafOpCopy         *m_opcopy;
-  mafOpPaste        *m_oppaste;
+  mafOpSelect       *m_OpSelect;
+  mafOpCut          *m_OpCut;
+  mafOpCopy         *m_OpCopy;
+  mafOpPaste        *m_OpPaste;
   //mafOpTransform    *m_optransform;
 
-  wxMenuBar         *m_menubar;
-	wxToolBar         *m_toolbar;
+  wxMenuBar         *m_MenuBar;
+	wxToolBar         *m_ToolBar;
 
   mafObserver       *m_Listener;
 };

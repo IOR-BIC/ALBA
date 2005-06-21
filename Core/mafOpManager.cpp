@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 09:44:25 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-06-21 15:16:48 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -64,38 +64,38 @@ mafOpManager::mafOpManager()
 //----------------------------------------------------------------------------
 {
   m_Listener	= NULL;
-  m_running_op= NULL;
-	m_selected	= NULL;
-	m_warn			= false;
+  m_RunningOp = NULL;
+	m_Selected	= NULL;
+	m_Warn			= false;
   
-	m_menu[OPTYPE_IMPORTER] = NULL;
-  m_menu[OPTYPE_EXPORTER] = NULL;
-  m_menu[OPTYPE_OP] = NULL;
+	m_Menu[OPTYPE_IMPORTER] = NULL;
+  m_Menu[OPTYPE_EXPORTER] = NULL;
+  m_Menu[OPTYPE_OP] = NULL;
 
-  m_opselect    = new mafOpSelect();
-  m_opcut       = new mafOpCut();
-  m_opcopy      = new mafOpCopy();
-  m_oppaste     = new mafOpPaste();
+  m_OpSelect    = new mafOpSelect();
+  m_OpCut       = new mafOpCut();
+  m_OpCopy      = new mafOpCopy();
+  m_OpPaste     = new mafOpPaste();
   //m_optransform = new mafOpTransform();
 
-	m_toolbar = NULL;
-	m_menubar = NULL;
+	m_ToolBar = NULL;
+	m_MenuBar = NULL;
 
-  m_numAccel = 0;
-  m_numop = 0;
+  m_NumOfAccelerators = 0;
+  m_NumOp = 0;
 	for(int i=0; i<MAXOP; i++ ) 
-    m_opv[i] = NULL;
+    m_OpList[i] = NULL;
 }
 //----------------------------------------------------------------------------
 mafOpManager::~mafOpManager()
 //----------------------------------------------------------------------------
 {
-	for(int i=0; i<m_numop; i++) delete m_opv[i];
+	for(int i=0; i<m_NumOp; i++) delete m_OpList[i];
 
-  delete m_opselect;
-  delete m_opcut;
-  delete m_opcopy;
-  delete m_oppaste;
+  cppDEL(m_OpSelect);
+  cppDEL(m_OpCut);
+  cppDEL(m_OpCopy);
+  cppDEL(m_OpPaste);
 	//delete m_optransform;
 }
 //----------------------------------------------------------------------------
@@ -120,12 +120,12 @@ void mafOpManager::OnEvent(mafEventBase *maf_event)
       break; 
       case OP_RUN_OK:
         o = (mafOp*) e->GetSender();
-        assert(o == m_context.Caller());
+        assert(o == m_Context.Caller());
         OpRunOk(o);
       break; 
       case OP_RUN_CANCEL:
         o = (mafOp*) e->GetSender();
-        assert(o == m_context.Caller());
+        assert(o == m_Context.Caller());
         OpRunCancel(o);
       break;
       default:
@@ -138,11 +138,11 @@ void mafOpManager::OnEvent(mafEventBase *maf_event)
 void mafOpManager::OpAdd(mafOp *op, wxString menuPath)
 //----------------------------------------------------------------------------
 {
-  assert(m_numop < MAXOP);
-  m_opv[m_numop] = op;
+  assert(m_NumOp < MAXOP);
+  m_OpList[m_NumOp] = op;
   op->m_OpMenuPath = menuPath;
-	op->m_Id = m_numop + OP_USER;
-  m_numop++;
+	op->m_Id = m_NumOp + OP_USER;
+  m_NumOp++;
 }
 //----------------------------------------------------------------------------
 void mafOpManager::FillMenu (wxMenu* import, wxMenu* mexport, wxMenu* operations)
@@ -150,28 +150,28 @@ void mafOpManager::FillMenu (wxMenu* import, wxMenu* mexport, wxMenu* operations
 {
   int submenu_id = 1;
   
-  m_menu[OPTYPE_IMPORTER] = import;
-  m_menu[OPTYPE_EXPORTER] = mexport;
-  m_menu[OPTYPE_OP] = operations;
+  m_Menu[OPTYPE_IMPORTER] = import;
+  m_Menu[OPTYPE_EXPORTER] = mexport;
+  m_Menu[OPTYPE_OP] = operations;
    
-	for(int i=0; i<m_numop; i++)
+	for(int i=0; i<m_NumOp; i++)
   {
-    mafOp *o = m_opv[i];
+    mafOp *o = m_OpList[i];
     if (o->m_OpMenuPath != "")
     {
       wxMenu *sub_menu = NULL;
         
-      int item = m_menu[o->GetType()]->FindItem(o->m_OpMenuPath);
+      int item = m_Menu[o->GetType()]->FindItem(o->m_OpMenuPath);
       if (item != wxNOT_FOUND)
       {
-         wxMenuItem *menu_item = m_menu[o->GetType()]->FindItem(item);
+         wxMenuItem *menu_item = m_Menu[o->GetType()]->FindItem(item);
          if (menu_item)
            sub_menu = menu_item->GetSubMenu();
       }
       else
       {
         sub_menu = new wxMenu;
-        m_menu[o->GetType()]->Append(submenu_id++,o->m_OpMenuPath,sub_menu);
+        m_Menu[o->GetType()]->Append(submenu_id++,o->m_OpMenuPath,sub_menu);
       }
       
       if(sub_menu)
@@ -181,7 +181,7 @@ void mafOpManager::FillMenu (wxMenu* import, wxMenu* mexport, wxMenu* operations
     }
     else
     {
-      m_menu[o->GetType()]->Append(o->m_Id, o->m_Label, o->m_Label);
+      m_Menu[o->GetType()]->Append(o->m_Id, o->m_Label, o->m_Label);
     }
     SetAccelerator(o);
   }
@@ -230,30 +230,30 @@ void mafOpManager::SetAccelerator(mafOp *op)
     else if(extra_flag == "Shift")
       flag_num |= wxACCEL_SHIFT;
 
-    m_OpAccelEntries[m_numAccel++].Set(flag_num,  (int) *key_code.c_str(), op->m_Id);
+    m_OpAccelEntries[m_NumOfAccelerators++].Set(flag_num,  (int) *key_code.c_str(), op->m_Id);
   }
 }
 //----------------------------------------------------------------------------
 void mafOpManager::VmeSelected(mafNode* v)   
 //----------------------------------------------------------------------------
 {
-  m_selected = v;
+  m_Selected = v;
   EnableOp();
 }
 //----------------------------------------------------------------------------
 mafNode* mafOpManager::GetSelectedVme()
 //----------------------------------------------------------------------------
 {
-	return m_selected;
+	return m_Selected;
 }
 //----------------------------------------------------------------------------
 void mafOpManager::OpSelect(mafNode* vme)   
 //----------------------------------------------------------------------------
 {
-	if(vme == m_selected ) 
+	if(vme == m_Selected ) 
     return;
-	m_opselect->SetNewSel(vme);
-	OpExec(m_opselect);
+	m_OpSelect->SetNewSel(vme);
+	OpExec(m_OpSelect);
 }
 /*
 //----------------------------------------------------------------------------
@@ -269,8 +269,8 @@ void mafOpManager::OpTransform(vtkMatrix4x4* new_matrix,vtkMatrix4x4* old_matrix
 void mafOpManager::ClearUndoStack()
 //----------------------------------------------------------------------------
 {
-   m_context.Clear();
-   m_opcut->ClipboardClear();
+   m_Context.Clear();
+   m_OpCut->ClipboardClear();
 	 EnableOp();
 }
 //----------------------------------------------------------------------------
@@ -279,25 +279,25 @@ void mafOpManager::EnableToolbar(bool CanEnable)
 {
 	if(!CanEnable)
 	{
-/*		m_toolbar->EnableTool(MENU_FILE_NEW,false);	//Removed by Paolo 15-9-2003: HAL men
-		m_toolbar->EnableTool(MENU_FILE_OPEN,false);
-		m_toolbar->EnableTool(MENU_FILE_SAVE,false);*/
-		m_toolbar->EnableTool(OP_UNDO,false);
-		m_toolbar->EnableTool(OP_REDO,false);
-		m_toolbar->EnableTool(OP_CUT,false);
-		m_toolbar->EnableTool(OP_COPY,false);
-		m_toolbar->EnableTool(OP_PASTE,false);
+/*		m_ToolBar->EnableTool(MENU_FILE_NEW,false);	//Removed by Paolo 15-9-2003: HAL men
+		m_ToolBar->EnableTool(MENU_FILE_OPEN,false);
+		m_ToolBar->EnableTool(MENU_FILE_SAVE,false);*/
+		m_ToolBar->EnableTool(OP_UNDO,false);
+		m_ToolBar->EnableTool(OP_REDO,false);
+		m_ToolBar->EnableTool(OP_CUT,false);
+		m_ToolBar->EnableTool(OP_COPY,false);
+		m_ToolBar->EnableTool(OP_PASTE,false);
 	}
 	else
 	{
-/*		m_toolbar->EnableTool(MENU_FILE_NEW,true);
-		m_toolbar->EnableTool(MENU_FILE_OPEN,true);
-		m_toolbar->EnableTool(MENU_FILE_SAVE,true);*/
-		m_toolbar->EnableTool(OP_UNDO,	!m_context.Undo_IsEmpty());
-		m_toolbar->EnableTool(OP_REDO,	!m_context.Redo_IsEmpty());
-		m_toolbar->EnableTool(OP_CUT,		m_opcut->Accept(m_selected) );
-		m_toolbar->EnableTool(OP_COPY,	m_opcopy->Accept(m_selected) );
-		m_toolbar->EnableTool(OP_PASTE,	m_oppaste->Accept(m_selected) );
+/*		m_ToolBar->EnableTool(MENU_FILE_NEW,true);
+		m_ToolBar->EnableTool(MENU_FILE_OPEN,true);
+		m_ToolBar->EnableTool(MENU_FILE_SAVE,true);*/
+		m_ToolBar->EnableTool(OP_UNDO,	!m_Context.Undo_IsEmpty());
+		m_ToolBar->EnableTool(OP_REDO,	!m_Context.Redo_IsEmpty());
+		m_ToolBar->EnableTool(OP_CUT,		m_OpCut->Accept(m_Selected) );
+		m_ToolBar->EnableTool(OP_COPY,	m_OpCopy->Accept(m_Selected) );
+		m_ToolBar->EnableTool(OP_PASTE,	m_OpPaste->Accept(m_Selected) );
 	}
 }
 //----------------------------------------------------------------------------
@@ -305,49 +305,49 @@ void mafOpManager::EnableOp(bool CanEnable)
 //----------------------------------------------------------------------------
 {
   mafOp *o = NULL;
-	if(m_menubar)
+	if(m_MenuBar)
   {
     if(!CanEnable)
 	  {
-		  if(m_menubar->FindItem(OP_DELETE))	m_menubar->Enable(OP_DELETE,false);
-		  if(m_menubar->FindItem(OP_CUT))			m_menubar->Enable(OP_CUT,false);
-		  if(m_menubar->FindItem(OP_COPY))		m_menubar->Enable(OP_COPY,false);
-		  if(m_menubar->FindItem(OP_PASTE))		m_menubar->Enable(OP_PASTE,false);
-		  if(m_menubar->FindItem(OP_UNDO))		m_menubar->Enable(OP_UNDO,false); 
-		  if(m_menubar->FindItem(OP_REDO))		m_menubar->Enable(OP_REDO,false); 
+		  if(m_MenuBar->FindItem(OP_DELETE))	m_MenuBar->Enable(OP_DELETE,false);
+		  if(m_MenuBar->FindItem(OP_CUT))			m_MenuBar->Enable(OP_CUT,false);
+		  if(m_MenuBar->FindItem(OP_COPY))		m_MenuBar->Enable(OP_COPY,false);
+		  if(m_MenuBar->FindItem(OP_PASTE))		m_MenuBar->Enable(OP_PASTE,false);
+		  if(m_MenuBar->FindItem(OP_UNDO))		m_MenuBar->Enable(OP_UNDO,false); 
+		  if(m_MenuBar->FindItem(OP_REDO))		m_MenuBar->Enable(OP_REDO,false); 
 
-		  for(int i=0; i<m_numop; i++)
+		  for(int i=0; i<m_NumOp; i++)
 		  {
-        mafOp *o = m_opv[i]; 
-        if(m_menubar->FindItem(o->m_Id))
-          m_menubar->Enable(o->m_Id,false); 
+        mafOp *o = m_OpList[i]; 
+        if(m_MenuBar->FindItem(o->m_Id))
+          m_MenuBar->Enable(o->m_Id,false); 
       }
 	  }
 	  else
 	  {
-		  if(m_menubar->FindItem(OP_UNDO))		m_menubar->Enable(OP_UNDO,    !m_context.Undo_IsEmpty());
-		  if(m_menubar->FindItem(OP_REDO))		m_menubar->Enable(OP_REDO,    !m_context.Redo_IsEmpty());
-		  if(m_menubar->FindItem(OP_DELETE))	m_menubar->Enable(OP_DELETE,  m_opcut->Accept(m_selected));
-		  if(m_menubar->FindItem(OP_CUT))			m_menubar->Enable(OP_CUT,     m_opcut->Accept(m_selected));
-		  if(m_menubar->FindItem(OP_COPY))		m_menubar->Enable(OP_COPY,    m_opcopy->Accept(m_selected));
-		  if(m_menubar->FindItem(OP_PASTE))		m_menubar->Enable(OP_PASTE,   m_oppaste->Accept(m_selected)); 
+		  if(m_MenuBar->FindItem(OP_UNDO))		m_MenuBar->Enable(OP_UNDO,    !m_Context.Undo_IsEmpty());
+		  if(m_MenuBar->FindItem(OP_REDO))		m_MenuBar->Enable(OP_REDO,    !m_Context.Redo_IsEmpty());
+		  if(m_MenuBar->FindItem(OP_DELETE))	m_MenuBar->Enable(OP_DELETE,  m_OpCut->Accept(m_Selected));
+		  if(m_MenuBar->FindItem(OP_CUT))			m_MenuBar->Enable(OP_CUT,     m_OpCut->Accept(m_Selected));
+		  if(m_MenuBar->FindItem(OP_COPY))		m_MenuBar->Enable(OP_COPY,    m_OpCopy->Accept(m_Selected));
+		  if(m_MenuBar->FindItem(OP_PASTE))		m_MenuBar->Enable(OP_PASTE,   m_OpPaste->Accept(m_Selected)); 
 
-		  for(int i=0; i<m_numop; i++)
+		  for(int i=0; i<m_NumOp; i++)
 		  {
-        mafOp *o = m_opv[i]; 
-        if(m_menubar->FindItem(o->m_Id))
-          m_menubar->Enable(o->m_Id,o->Accept(m_selected)); 
+        mafOp *o = m_OpList[i]; 
+        if(m_MenuBar->FindItem(o->m_Id))
+          m_MenuBar->Enable(o->m_Id,o->Accept(m_Selected)); 
       }
 	  }
   }
-	if(m_toolbar) EnableToolbar(CanEnable);
+	if(m_ToolBar) EnableToolbar(CanEnable);
 }
 //----------------------------------------------------------------------------
 bool mafOpManager::WarnUser(mafOp *op)
 //----------------------------------------------------------------------------
 {
 	bool go = true;
-	if(m_warn && !op->CanUndo())
+	if(m_Warn && !op->CanUndo())
 	{
 		wxMessageDialog dialog(
 							mafGetFrame(),
@@ -373,18 +373,18 @@ void mafOpManager::OpRun(int op_id)
 	  break;
 	  case OP_DELETE:
 	  case OP_CUT:
-			 OpExec(m_opcut);
+			 OpExec(m_OpCut);
 	  break;
 	  case OP_COPY:
-			 OpExec(m_opcopy);
+			 OpExec(m_OpCopy);
 	  break;
 	  case OP_PASTE:
-			 OpExec(m_oppaste);
+			 OpExec(m_OpPaste);
 	  break;
 	  default:
 		{
       int index = op_id - OP_USER;
-		  if(index >=0 && index <m_numop) OpRun(m_opv[index]);
+		  if(index >=0 && index <m_NumOp) OpRun(m_OpList[index]);
 		}
 	  break;
 	}
@@ -396,20 +396,20 @@ void mafOpManager::OpRun(mafOp *op)
 	//Code to manage Natural Preserving
  //SIL. 9-4-2005: should be re-inserted in a new Medical-Oriented OpManager
 	/*
-  if(m_selected->GetTagArray()->FindTag("VME_NATURE") != -1)
+  if(m_Selected->GetTagArray()->FindTag("VME_NATURE") != -1)
 	{
 		wxString nat("NATURAL");
-		if(m_selected->GetTagArray()->GetTag("VME_NATURE")->GetValue() == nat && !op->IsNaturalPreserving())
+		if(m_Selected->GetTagArray()->GetTag("VME_NATURE")->GetValue() == nat && !op->IsNaturalPreserving())
 		{
 			wxString warning_msg = "To presere natural VME a copy is required! This should take a lot of memory and time. continue?";
 			wxString synthetic_name = "Synthetic ";
 			wxMessageDialog dialog(mafGetFrame(),warning_msg, "Natural VME Preserving Warning",wxYES_NO|wxYES_DEFAULT);
 			if(dialog.ShowModal() == wxID_NO) 
 				return;
-      mafNode *synthetic_vme = m_selected->MakeCopy();
+      mafNode *synthetic_vme = m_Selected->MakeCopy();
 			synthetic_vme->GetTagArray()->GetTag("VME_NATURE")->SetValue("SYNTHETIC");
-			synthetic_vme->ReparentTo(m_selected->GetParent());
-			synthetic_name.Append(m_selected->GetName());
+			synthetic_vme->ReparentTo(m_Selected->GetParent());
+			synthetic_name.Append(m_Selected->GetName());
 			synthetic_vme->SetName(synthetic_name);
 			mafEventMacro(mafEvent(this,VME_ADD,synthetic_vme));
       OpSelect(synthetic_vme);
@@ -419,47 +419,47 @@ void mafOpManager::OpRun(mafOp *op)
 	}
   */
 	EnableOp(false);
-  //Notify(OP_RUN_STARTING); //SIL. 17-9-2004: --- moved after m_running_op has been set
+  //Notify(OP_RUN_STARTING); //SIL. 17-9-2004: --- moved after m_RunningOp has been set
 
 	mafOp *o = op->Copy();
   o->m_Id = op->m_Id;    //Paolo 15/09/2004 The operation ID is not copyed from the Copy() method.
 	o->SetListener(this);
-	o->SetInput(m_selected);
+	o->SetInput(m_Selected);
   o->SetMouseAction(m_MouseAction);
-  m_running_op = o;
+  m_RunningOp = o;
 
   Notify(OP_RUN_STARTING);  //SIL. 17-9-2004: - moved here in order to notify which op is started
 
-  m_context.Push(o);
+  m_Context.Push(o);
   o->OpRun();
 }
 //----------------------------------------------------------------------------
 void mafOpManager::OpRunOk(mafOp *op)
 //----------------------------------------------------------------------------
 {	
-  m_context.Pop();
+  m_Context.Pop();
 
-  m_running_op = NULL;
+  m_RunningOp = NULL;
 	if(WarnUser(op))
 	{
 		OpDo(op);
 	}
   Notify(OP_RUN_TERMINATED);
-	if(m_context.Caller() == NULL) 	
+	if(m_Context.Caller() == NULL) 	
     EnableOp();
 }
 //----------------------------------------------------------------------------
 void mafOpManager::OpRunCancel(mafOp *op)
 //----------------------------------------------------------------------------
 {
-  m_context.Pop();
+  m_Context.Pop();
 
-	m_running_op = NULL;
+	m_RunningOp = NULL;
 	delete op;
 
   Notify(OP_RUN_TERMINATED);
 
-	if(m_context.Caller() == NULL) 	
+	if(m_Context.Caller() == NULL) 	
     EnableOp();
 }
 //----------------------------------------------------------------------------
@@ -470,13 +470,13 @@ void mafOpManager::OpExec(mafOp *op)
 	EnableOp(false);
 
 	assert(op);
-	if(op->Accept(m_selected))
+	if(op->Accept(m_Selected))
   {
     if(WarnUser(op))
 	  {
 		  mafOp *o = op->Copy();
 		  o->SetListener(this);
-		  o->SetInput(m_selected);
+		  o->SetInput(m_Selected);
 		  OpDo(o);
 	  }
   }
@@ -492,18 +492,18 @@ void mafOpManager::OpDo(mafOp *op)
 		return;
 	}
   
-  m_context.Redo_Clear();
+  m_Context.Redo_Clear();
   op->OpDo();
   
   wxLogMessage("do=%s",op->m_Label.c_str());
 
   if(op->CanUndo()) 
   {
-	  m_context.Undo_Push(op);
+	  m_Context.Undo_Push(op);
   }
   else
   {
-	  m_context.Undo_Clear();
+	  m_Context.Undo_Clear();
     delete op;  
   }
 }
@@ -511,17 +511,17 @@ void mafOpManager::OpDo(mafOp *op)
 void mafOpManager::OpUndo()
 //----------------------------------------------------------------------------
 {
-  if( m_context.Undo_IsEmpty()) 
+  if( m_Context.Undo_IsEmpty()) 
   {
     wxLogMessage("empty undo stack");
     return;
   }
 	EnableOp(false);
 
-	mafOp* op = m_context.Undo_Pop();
+	mafOp* op = m_Context.Undo_Pop();
 	wxLogMessage("undo=%s",op->m_Label.c_str());
 	op->OpUndo();
-	m_context.Redo_Push(op);
+	m_Context.Redo_Push(op);
 
 	EnableOp();
 }
@@ -529,17 +529,17 @@ void mafOpManager::OpUndo()
 void mafOpManager::OpRedo()   
 //----------------------------------------------------------------------------
 {
-  if( m_context.Redo_IsEmpty())
+  if( m_Context.Redo_IsEmpty())
   {
     wxLogMessage("empty redo stack");
     return;
   }
 	EnableOp(false);
 
-	mafOp* op = m_context.Redo_Pop();
+	mafOp* op = m_Context.Redo_Pop();
 	wxLogMessage("redo=%s",op->m_Label.c_str());
 	op->OpDo();
-	m_context.Undo_Push(op);
+	m_Context.Undo_Push(op);
 
 	EnableOp();
 }
@@ -547,12 +547,12 @@ void mafOpManager::OpRedo()
 void mafOpManager::Notify(int msg)   
 //----------------------------------------------------------------------------
 {
-	if(m_context.Caller() == NULL)
+	if(m_Context.Caller() == NULL)
 	// not a nested operation - notify logic
-		mafEventMacro(mafEvent(this,msg,m_running_op));   //SIL. 17-9-2004: added the m_running_op at the event (may be NULL)
+		mafEventMacro(mafEvent(this,msg,m_RunningOp));   //SIL. 17-9-2004: added the m_RunningOp at the event (may be NULL)
 	//else
 	// nested operation - notify caller
-		    // m_context.Caller()->OnEvent(mafEvent(this,msg));   
+		    // m_Context.Caller()->OnEvent(mafEvent(this,msg));   
         // NO - it is dangerous - if the caller don't handle the msg,
 				// msg will be bounced and then forwarded to Logic
 				// better wait until this feature is really needed 
@@ -562,52 +562,52 @@ bool mafOpManager::StopCurrentOperation()
 //----------------------------------------------------------------------------
 {
   assert(false); //SIL. 2-7-2004: -- Seems that no-one is using this -- but tell me if the program stop here -- thanks
-  mafOp *prev_running_op = m_running_op;
+  mafOp *prev_running_op = m_RunningOp;
 	
-	while(m_running_op) //loop danger !!!
+	while(m_RunningOp) //loop danger !!!
 	{
-    if(m_running_op->OkEnabled())
-		  m_running_op->ForceStopWithOk();
+    if(m_RunningOp->OkEnabled())
+		  m_RunningOp->ForceStopWithOk();
     else
-		  m_running_op->ForceStopWithCancel();
+		  m_RunningOp->ForceStopWithCancel();
 
-    //if(prev_running_op == m_running_op)
+    //if(prev_running_op == m_RunningOp)
 		//{
       //previous try failed, be more bad
-			//OpRunCancel(m_running_op); - wrong: op-gui will be still plugged
+			//OpRunCancel(m_RunningOp); - wrong: op-gui will be still plugged
 		//}
 
-    if(prev_running_op == m_running_op)
+    if(prev_running_op == m_RunningOp)
 		{
 			break; //second try failed, give it up and break to prevent loops
 		}
 	}
-  return (m_running_op == NULL);
+  return (m_RunningOp == NULL);
 }
 //----------------------------------------------------------------------------
 bool mafOpManager::ForceStopWithOk()
 //----------------------------------------------------------------------------
 {
-  if(!m_running_op) 
+  if(!m_RunningOp) 
     return false;
-  mafOp *to_be_killed = m_running_op;
+  mafOp *to_be_killed = m_RunningOp;
 
-  if(m_running_op->OkEnabled())
-    m_running_op->ForceStopWithOk();
+  if(m_RunningOp->OkEnabled())
+    m_RunningOp->ForceStopWithOk();
   
-  return m_running_op != to_be_killed;
+  return m_RunningOp != to_be_killed;
 }
 //----------------------------------------------------------------------------
 bool mafOpManager::ForceStopWithCancel()
 //----------------------------------------------------------------------------
 {
-  if(!m_running_op) 
+  if(!m_RunningOp) 
     return false;
-  mafOp *to_be_killed = m_running_op;
+  mafOp *to_be_killed = m_RunningOp;
 
-  m_running_op->ForceStopWithCancel();
+  m_RunningOp->ForceStopWithCancel();
 
-  return m_running_op != to_be_killed;
+  return m_RunningOp != to_be_killed;
 }
 /* - temporary commented out until mafAction is reintroduced
 //----------------------------------------------------------------------------
