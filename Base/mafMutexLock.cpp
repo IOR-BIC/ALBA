@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMutexLock.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:33:16 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-06-21 15:21:09 $
+  Version:   $Revision: 1.6 $
   Authors:   Based on itkmafMutexLock (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -151,12 +151,14 @@ mafMutexLock::~mafMutexLock()
 void mafMutexLock::Lock() const
 //----------------------------------------------------------------------------
 {
-  m_PIMPLMutexLock->Lock();
+  if (m_PIMPLMutexLock)
+    m_PIMPLMutexLock->Lock();
 }
 
 //----------------------------------------------------------------------------
 void mafMutexLock::Unlock() const
 //----------------------------------------------------------------------------
 {
-  m_PIMPLMutexLock->Unlock();
+  if (m_PIMPLMutexLock)
+    m_PIMPLMutexLock->Unlock();
 }
