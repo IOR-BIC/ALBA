@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-13 10:33:43 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-06-21 11:06:35 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
