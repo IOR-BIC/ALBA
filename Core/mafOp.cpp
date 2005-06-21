@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:43:07 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-06-21 11:34:51 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,17 +30,19 @@
 mafOp::mafOp(wxString label)
 //----------------------------------------------------------------------------
 {
-	m_Gui = NULL;
-	m_Listener = NULL;
-	m_Next = NULL;
-	m_OpType = OPTYPE_OP;
-  m_OpMenuPath = "";
-	m_Canundo = false;
-	m_NaturalPreserving = true;
-	m_Label = label;
-  m_Guih = NULL;
-	m_Input = NULL;
-  m_MenuItem = NULL;
+	m_Gui       = NULL;
+	m_Listener  = NULL;
+	m_Next      = NULL;
+	m_OpType    = OPTYPE_OP;
+  m_OpMenuPath= "";
+	m_Canundo   = false;
+	m_Label     = label;
+  m_Guih      = NULL;
+	m_Input     = NULL;
+  m_Output    = NULL;
+  m_MenuItem  = NULL;
+  m_Compatibility     = 0xFFFF;
+  m_NaturalPreserving = true;
 }
 //----------------------------------------------------------------------------
 mafOp::mafOp()
@@ -52,14 +54,18 @@ mafOp::mafOp()
 	m_OpType    = OPTYPE_OP;
 	m_Canundo   = false;
 	m_Label     = "default op name";
+  m_OpMenuPath= "";
   m_Guih      = NULL;
 	m_Input     = NULL;
-	m_Compatibility = 0xFFFF;
+  m_Output    = NULL;
+	m_Compatibility     = 0xFFFF;
+  m_NaturalPreserving = true;
 }
 //----------------------------------------------------------------------------
 mafOp::~mafOp() 
 //----------------------------------------------------------------------------
 {
+  m_Output = NULL;
 }
 //----------------------------------------------------------------------------
 void mafOp::OnEvent(mafEventBase *maf_event)
@@ -82,12 +88,19 @@ void mafOp::OpRun()
 void mafOp::OpDo()   
 //----------------------------------------------------------------------------
 {
+  if (m_Output)
+  {
+    mafEventMacro(mafEvent(this, VME_ADD, m_Output));
+  }
 }
 //----------------------------------------------------------------------------
 void mafOp::OpUndo()   
 //----------------------------------------------------------------------------
 {
-  //assert(false);
+  if (m_Output)
+  {
+    mafEventMacro(mafEvent(this, VME_REMOVE, m_Output));
+  }
 }
 //----------------------------------------------------------------------------
 mafOp* mafOp::Copy()   

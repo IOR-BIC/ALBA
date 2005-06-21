@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:43:07 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-06-21 11:34:51 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -123,6 +123,7 @@ public:
 
 protected:
 	mafNode				 *m_Input;
+  mafNode        *m_Output;
 	mmgGui      	 *m_Gui;
 	mmgGuiHolder	 *m_Guih;
 	bool 						m_Canundo;
