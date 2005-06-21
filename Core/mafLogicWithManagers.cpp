@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:43:06 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2005-06-21 09:44:03 $
+  Version:   $Revision: 1.22 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,6 +25,7 @@
 #include "mafView.h"
 #include "mafViewManager.h"
 #include "mafVMEManager.h"
+#include "mafOp.h"
 #include "mafOpManager.h"
 
 #include "mmgMDIFrame.h"
@@ -44,12 +45,12 @@ mafLogicWithManagers::mafLogicWithManagers()
   m_VMEManager  = false;
   m_ViewManager = false;
   m_OpManager   = false;
-
-  m_ImportMenu; 
-  m_ExportMenu; 
-  m_RecentFileMenu;
-  m_OpMenu;
-  m_ViewMenu; 
+  
+  m_ImportMenu  = NULL; 
+  m_ExportMenu  = NULL; 
+  m_OpMenu      = NULL;
+  m_ViewMenu    = NULL; 
+  m_RecentFileMenu = NULL;
 
   m_MaterialChooser = new mmgMaterialChooser();
 }
@@ -117,7 +118,7 @@ void mafLogicWithManagers::Show()
   {
     if(m_MenuBar && (m_ImportMenu || m_OpMenu || m_ExportMenu))
     {
-      m_OpManager->FillMenu(m_ImportMenu,m_ExportMenu,m_OpMenu);
+      m_OpManager->FillMenu(m_ImportMenu, m_ExportMenu, m_OpMenu);
       m_OpManager->SetMenubar(m_MenuBar);
     }
     if(m_TooBar)
