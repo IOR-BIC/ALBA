@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 16:43:05 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-06-21 07:57:08 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -43,7 +43,7 @@ class vtkXMLDataElement;
 class vtkXMLDataParser;
 class mmiSER;
 class mmiPER;
-class mafVME;
+class mafNode;
 /** This class takes care of mastering the interaction inside views.
   This class is responsible to coordinate interaction, i.e. 
   resources necessary for interaction (currently devices, actions and avatars)
@@ -57,7 +57,7 @@ class mafVME;
   @todo
   - check the renderer to be RenFront
 */
-class mafInteractionManager : public mafObject, public mafObserver, mafEventSender, mafStorable
+class mafInteractionManager : public mafObject, public mafObserver, public mafEventSender, public mafStorable
 {
 public:
   mafInteractionManager();
@@ -139,7 +139,7 @@ public:
   void PostResetCamera(vtkRenderer *ren);
 
   /** propagate VME_SELECTED event */
-  void  VmeSelected(mafVME *vme);
+  void  NodeSelected(mafNode *node);
 
   /** store all interaction settings to an XML file (Multimod Interaction Settings - MIS - format) */
   int Store(const char *filename);

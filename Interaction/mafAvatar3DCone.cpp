@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3DCone.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 05:58:11 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-06-21 07:57:07 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventInteraction.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:52 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-06-21 07:57:07 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,6 +12,8 @@
 
 #include "mafEventInteraction.h"
 #include "mafMatrix.h"
+
+mafCxxTypeMacro(mafEventInteraction)
 
 //------------------------------------------------------------------------------
 void mafEventInteraction::Set2DPosition(double x,double y)

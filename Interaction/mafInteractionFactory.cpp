@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 17:29:04 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-06-21 07:57:08 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,7 +27,12 @@
 #include <string>
 #include <ostream>
 
+//----------------------------------------------------------------------------
+// static variables
+//----------------------------------------------------------------------------
 mafInteractionFactory *mafInteractionFactory::m_Instance=NULL;
+std::set<std::string> mafInteractionFactory::m_DeviceNames; 
+std::set<std::string> mafInteractionFactory::m_AvatarNames;
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafInteractionFactory);
@@ -155,4 +160,18 @@ const char *mafInteractionFactory::GetAvatarDescription(const char *avatar_name)
   }
 
   return NULL;
+}
+
+//------------------------------------------------------------------------------
+const std::set<std::string> *mafInteractionFactory::GetDeviceNames()
+//------------------------------------------------------------------------------ 
+{
+  return &m_DeviceNames;
+}
+
+//------------------------------------------------------------------------------
+const std::set<std::string> *mafInteractionFactory::GetAvatarNames()
+//------------------------------------------------------------------------------
+{
+  return &m_AvatarNames;
 }

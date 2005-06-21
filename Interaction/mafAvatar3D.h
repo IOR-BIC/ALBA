@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3D.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 05:58:10 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-06-21 07:57:06 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -117,7 +117,7 @@ public:
   /** where to display the text */
   void SetDebugTextPosition(double *pos) {SetDebugTextPosition(pos[0],pos[1]);}
   void SetDebugTextPosition(double posx,double posy);
-  double *GetDebugTextPosition();
+  double *GetDebugTextPosition() {return m_DebugTextPosition;}
   
   /** 
     Display the original tracker's coords in the debug text area.
@@ -179,9 +179,6 @@ public:
 
   /** Create the dialog that show the interface for settings. */
   virtual void CreateGui();
-
-  /** force GUI update */
-  virtual void UpdateGui();
 
 protected:
   mafAvatar3D();

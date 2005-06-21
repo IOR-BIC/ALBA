@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 17:29:03 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-06-21 07:57:06 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -72,7 +72,7 @@ mafAvatar3D::mafAvatar3D()
 
   vtkNEW(m_Picker3D);
 
-  vtkNEW(m_CanonicalToWorldTransform);
+  mafNEW(m_CanonicalToWorldTransform);
   m_CanonicalToWorldTransform->SetFittingMode(m_FittingMode);  
   m_CanonicalToWorldTransform->FollowOrientationOn();
   m_CanonicalToWorldTransform->FollowPositionOn();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDevice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 17:29:03 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-06-21 07:57:07 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -28,6 +28,8 @@
 MAF_ID_IMP(mafDevice::DEVICE_NAME_CHANGED)
 MAF_ID_IMP(mafDevice::DEVICE_STARTED)
 MAF_ID_IMP(mafDevice::DEVICE_STOPPED)
+
+mafCxxTypeMacro(mafDevice)
 
 //------------------------------------------------------------------------------
 mafDevice::mafDevice()

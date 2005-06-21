@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 16:43:04 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-06-21 07:57:08 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -303,10 +303,12 @@ void mafInteractionManager::PostResetCamera(vtkRenderer *ren)
 }
 
 //------------------------------------------------------------------------------
-void mafInteractionManager::VmeSelected(mafVME *vme)
+void mafInteractionManager::NodeSelected(mafNode *node)
 //------------------------------------------------------------------------------
 {
-  m_PositionalEventRouter->OnVmeSelected(vme);
+  mafVME *vme=mafVME::SafeDownCast(node);
+  if (vme)
+    m_PositionalEventRouter->OnVmeSelected(vme);
 }
 
 //------------------------------------------------------------------------------

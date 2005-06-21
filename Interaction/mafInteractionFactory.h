@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionFactory.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:53 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-06-21 07:57:08 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -56,8 +56,9 @@ public:
   void RegisterNewDevice(const char* node_name, const char* description, mafCreateObjectFunction createFunction);
 
   /** return list of names for nodes plugged into this factory */
-  const static std::set<std::string> &GetDeviceNames() {return m_DeviceNames;}
-
+  const static std::set<std::string> *GetDeviceNames();
+  
+  /** return the comment field of the device object plugged in the factory */
   const char *GetDeviceDescription(const char *device_name);
   
   /** create an instance of the node give its type name */
@@ -68,8 +69,9 @@ public:
   void RegisterNewAvatar(const char* node_name, const char* description, mafCreateObjectFunction createFunction);
 
   /** return list of names for nodes plugged into this factory */
-  const static std::set<std::string> &GetAvatarNames() {return m_AvatarNames;}
-
+  const static std::set<std::string> *GetAvatarNames();
+  
+  /** return the comment field of the avatar object plugged in the factory */
   const char *GetAvatarDescription(const char *device_name);
 
 protected:

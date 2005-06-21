@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventInteraction.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:53 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-06-21 07:57:08 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -65,7 +65,7 @@ public:
 
   virtual void DeepCopy(mafEventBase *event);
   
-  mafEventInteraction(void *sender,mafID id,int button=0,unsigned long modifiers=0):
+  mafEventInteraction(void *sender=NULL,mafID id=-1,int button=0,unsigned long modifiers=0):
   mafEventBase(sender,id),m_Button(button),m_Modifiers(modifiers),m_Key(0),m_X(0),m_Y(0),m_XYFlag(false) {}
 
   mafEventInteraction(void *sender,mafID id,mafMatrix *matrix,int button=0,unsigned long modifiers=0):

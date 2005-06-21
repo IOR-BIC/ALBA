@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 17:29:04 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-06-21 07:57:09 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -90,6 +90,12 @@ void mafInteractor::SetDevice(mafDevice *device)
   m_DeviceIsSet=(device!=NULL);
 }
 
+//------------------------------------------------------------------------------
+void mafInteractor::SetRenderer(vtkRenderer *ren)
+//------------------------------------------------------------------------------
+{
+  m_Renderer = ren;
+}
 //------------------------------------------------------------------------------
 void mafInteractor::SetVME(mafVME *vme)
 //------------------------------------------------------------------------------

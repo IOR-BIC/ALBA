@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRefSys.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 16:43:05 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-06-21 07:57:09 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -257,7 +257,7 @@ void mafRefSys::SetTypeToParent(mafVME *vme)
 void mafRefSys::SetTypeToLocal(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-  assert(vme);
+  //assert(vme);
   SetVME(vme);
   SetType(LOCAL);
 }

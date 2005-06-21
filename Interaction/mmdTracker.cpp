@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdTracker.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-19 16:27:39 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-06-21 07:57:09 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -37,13 +37,13 @@
 // VTK
 #include "vtkTimerLog.h"
 
-
-
 //------------------------------------------------------------------------------
 // Events
 //------------------------------------------------------------------------------
 MAF_ID_IMP(mmdTracker::TRACKER_3D_MOVE)
 MAF_ID_IMP(mmdTracker::TRACKER_BOUNDS_UPDATED)
+
+mafCxxTypeMacro(mmdTracker)
 
 //------------------------------------------------------------------------------
 mmdTracker::mmdTracker()
@@ -416,19 +416,19 @@ int mmdTracker::AvatarChooser(wxString &avatar_name,wxString &avatar_type)
 
   assert(iFactory);
   
-  const std::set<std::string> avatars=iFactory->GetAvatarNames();
+  const std::set<std::string> *avatars=iFactory->GetAvatarNames();
 
-  if (avatars.size()==0)
+  if (avatars->size()==0)
   {
     mafErrorMessage("No avatars available!","Avatar Chooser Error");
     return MAF_ERROR;
   }
 
-  wxString *avatar_names = new wxString[avatars.size()];
-  mafString *avatar_types= new mafString[avatars.size()];
+  wxString *avatar_names = new wxString[avatars->size()];
+  mafString *avatar_types= new mafString[avatars->size()];
 
-  std::set<std::string>::const_iterator it=avatars.begin();
-  for (int id=0;it!=avatars.end();id++,it++)
+  std::set<std::string>::const_iterator it=avatars->begin();
+  for (int id=0;it!=avatars->end();id++,it++)
   {
     avatar_types[id].Set(it->c_str());
     avatar_names[id]=iFactory->GetAvatarDescription(it->c_str());
@@ -436,7 +436,7 @@ int mmdTracker::AvatarChooser(wxString &avatar_name,wxString &avatar_type)
 
   int index = -1;
 
-  wxSingleChoiceDialog chooser(m_Gui,"select an avatar","Avatar Chooser",avatars.size(),avatar_names);
+  wxSingleChoiceDialog chooser(m_Gui,"select an avatar","Avatar Chooser",avatars->size(),avatar_names);
 
   if (chooser.ShowModal()==wxID_OK )
   {

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPER.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:56:07 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-06-21 07:57:10 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -306,7 +306,7 @@ void mmiPER::OnButtonDown(mafEventInteraction *e)
     if(FindPokedVme(device,*point_pose,picked_prop,picked_vme,picked_bh)) 
     {
       // if a VME is picked its pointer is written in PickedVME
-      if(m_CanSelect && !picked_vme->IsMAFType(mafVMEGizmo))
+      if(m_CanSelect && !picked_vme->IsA("mafVMEGizmo"))
       {
         // Send a VME select event to Logic
         InvokeEvent(VME_SELECT,MCH_UP,picked_vme);
@@ -340,7 +340,7 @@ void mmiPER::OnButtonDown(mafEventInteraction *e)
     {
       SetPickedVME(device,picked_vme); 
       // if a VME is picked its pointer is written in PickedVME
-      if(m_CanSelect && !picked_vme->IsMAFType(mafVMEGizmo))
+      if(m_CanSelect && !picked_vme->IsA("mafVMEGizmo"))
       {
         // Send a VME select event to Logic
         InvokeEvent(VME_SELECT,MCH_UP,picked_vme);
