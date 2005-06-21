@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgFrame.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:44:04 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-06-21 11:10:06 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004

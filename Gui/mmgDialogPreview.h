@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialogPreview.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:47:54 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-06-21 11:10:06 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004

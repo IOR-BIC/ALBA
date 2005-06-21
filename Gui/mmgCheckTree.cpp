@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-06 14:49:09 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-06-21 11:10:06 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
