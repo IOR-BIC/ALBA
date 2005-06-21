@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:42:43 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-06-21 10:59:26 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -145,22 +145,22 @@ EVT_START,
   VME_PICKED,    // used by mafISALandmark to speak with mmoEditLandmarkCloud
   VME_CHOOSE_MATERIAL,
   VME_CHOOSE_TRANSFER_FUNCTION,
-	VME_CHOOSE_FEM_PROPERTY,
-	VME_REF_SYS_CHOOSED,  //from mmgVMERefSysChooser to a mafOp (to be moved elsewhere Marco)
+  VME_CHOOSE_FEM_PROPERTY,
+  VME_REF_SYS_CHOOSED,  //from mmgVMERefSysChooser to a mafOp (to be moved elsewhere Marco)
   VME_FEM_DATA_CHOOSED, //from mmgVMEFEMDataChooser to a mafOp (to be moved elsewhere Marco)
   VME_CREATE_CLIENT_DATA, // (to be removed Marco)
 
   // events about views
   VIEW_QUIT,		 // from keyboard, used specially to close external views.
-	VIEW_CREATE,   // from menu to mafViewManager
-	VIEW_CREATED,  // from mafViewManager to Logic
+  VIEW_CREATE,   // from menu to mafViewManager
+  VIEW_CREATED,  // from mafViewManager to Logic
   VIEW_DELETE,   // from mmgMDIChild to mafViewManager
   VIEW_SELECT,   // from mmgMDIChild and mmgViewPanel to mafViewManager
   VIEW_CLICKED,  // from mafRWIBase to mmgMDIChild and mmgViewPanel to mafViewManager
-	VIEW_MAXIMIZE, // from mmgGui to mmgCrossSplitter
-	VIEW_SAVE_IMAGE,//from mafMDIChild  to mafViewManager
-  ISV_PUSH,      // from an Operation to mafViewManager // (to be changed Marco)
-  ISV_POP,       // from an Operation to mafViewManager // (to be changed Marco)
+  VIEW_MAXIMIZE, // from mmgGui to mmgCrossSplitter
+  VIEW_SAVE_IMAGE,//from mafMDIChild  to mafViewManager
+  PER_PUSH,       // from an Operation to mafInteractionManager
+  PER_POP,        // from an Operation to mafInteractionManager
 
   CAMERA_FRONT,  // constant used in mafRWIxxx to initialize Camera pos
   CAMERA_BACK,

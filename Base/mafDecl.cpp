@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:42:42 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-06-21 10:59:26 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -158,17 +158,17 @@ std::string  mafIdString(int id)
     wxString s;
     switch(id)
     {
-     case MENU_START:	 	        s="MENU_START"; break; 
-     case MENU_FILE_START:	    s="MENU_FILE_START"; break; 
-     case MENU_FILE_NEW:	      s="MENU_FILE_NEW"; break; 
-     case MENU_FILE_OPEN:	      s="MENU_FILE_OPEN"; break; 
-     case MENU_FILE_SAVE:	      s="MENU_FILE_SAVE"; break; 
-     case MENU_FILE_SAVEAS:	    s="MENU_FILE_SAVEAS"; break; 
-     case MENU_FILE_MERGE:	    s="MENU_FILE_MERGE"; break; 
-     case MENU_FILE_QUIT:	      s="MENU_FILE_QUIT"; break; 
-     case MENU_FILE_END:	      s="MENU_FILE_END"; break; 
-     case MENU_EDIT_START:	    s="MENU_EDIT_START"; break; 
-     case MENU_OP:							s="MENU_OP"; break; 
+     case MENU_START:           s="MENU_START"; break; 
+     case MENU_FILE_START:      s="MENU_FILE_START"; break; 
+     case MENU_FILE_NEW:        s="MENU_FILE_NEW"; break; 
+     case MENU_FILE_OPEN:       s="MENU_FILE_OPEN"; break; 
+     case MENU_FILE_SAVE:       s="MENU_FILE_SAVE"; break; 
+     case MENU_FILE_SAVEAS:     s="MENU_FILE_SAVEAS"; break; 
+     case MENU_FILE_MERGE:      s="MENU_FILE_MERGE"; break; 
+     case MENU_FILE_QUIT:       s="MENU_FILE_QUIT"; break; 
+     case MENU_FILE_END:        s="MENU_FILE_END"; break; 
+     case MENU_EDIT_START:      s="MENU_EDIT_START"; break; 
+     case MENU_OP:              s="MENU_OP"; break; 
      //case MENU_EDIT_UNDO:	      s="MENU_EDIT_UNDO"; break; 
      //case MENU_EDIT_REDO:	      s="MENU_EDIT_REDO"; break; 
      //case MENU_EDIT_DELETE:	    s="MENU_EDIT_DELETE"; break; 
@@ -206,7 +206,7 @@ std::string  mafIdString(int id)
 
      case EVT_START:	          s="EVT_START"; break; 
      case UPDATE_UI:	          s="UPDATE_UI"; break; 
-		 case UPDATE_PROPERTY:			s="UPDATE_PROPERTY"; break; 
+     case UPDATE_PROPERTY:      s="UPDATE_PROPERTY"; break; 
 
      case VME_ADD:	            s="VME_ADD"; break; 
      case VME_ADDED:	          s="VME_ADDED"; break; 
@@ -222,17 +222,17 @@ std::string  mafIdString(int id)
      case VME_FEM_DATA_CHOOSED: s="VME_FEM_DATA_CHOOSED"; break;
      case VME_PICKED:	          s="VME_PICKED"; break; 
 
-     case VIEW_QUIT:						s="VIEW_QUIT"; break;
-		 case VIEW_CREATE:	        s="VIEW_CREATE"; break; 
-     case VIEW_CREATED:	        s="VIEW_CREATED"; break; 
-     case VIEW_DELETE:	        s="VIEW_DELETE"; break; 
-     case VIEW_SELECT:	        s="VIEW_SELECT"; break; 
-     case VIEW_CLICKED:	        s="VIEW_CLICKED"; break; 
-     case VIEW_MAXIMIZE:	      s="VIEW_CLICKED"; break; 
-     case VIEW_SAVE_IMAGE:	    s="VIEW_SAVE_IMAGE"; break; 
+     case VIEW_QUIT:            s="VIEW_QUIT"; break;
+     case VIEW_CREATE:          s="VIEW_CREATE"; break; 
+     case VIEW_CREATED:         s="VIEW_CREATED"; break; 
+     case VIEW_DELETE:          s="VIEW_DELETE"; break; 
+     case VIEW_SELECT:          s="VIEW_SELECT"; break; 
+     case VIEW_CLICKED:         s="VIEW_CLICKED"; break; 
+     case VIEW_MAXIMIZE:        s="VIEW_CLICKED"; break; 
+     case VIEW_SAVE_IMAGE:      s="VIEW_SAVE_IMAGE"; break; 
 
-     case ISV_PUSH:							s="ISV_PUSH"; break; 
-     case ISV_POP:							s="ISV_POP"; break; 
+     case PER_PUSH:             s="PER_PUSH"; break; 
+     case PER_POP:              s="PER_POP"; break; 
      case CAMERA_FRONT:	        s="CAMERA_FRONT"; break; 
      case CAMERA_BACK:	        s="CAMERA_BACK"; break; 
      case CAMERA_LEFT:	        s="CAMERA_LEFT"; break; 
