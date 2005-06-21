@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 11:34:51 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-06-21 15:16:01 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,7 +28,7 @@ class mafAction;
 //----------------------------------------------------------------------------
 // constants :
 //----------------------------------------------------------------------------
-enum
+enum OPERATIONS_TYPE_ID
 {
 	OPTYPE_OP = 0,
 	OPTYPE_IMPORTER,
