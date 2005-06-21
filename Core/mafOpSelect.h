@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpSelect.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 12:16:31 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-06-21 09:45:28 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,8 +40,8 @@ public:
     void OpUndo();
     mafOp* Copy();
 protected:
-    mafNode  *m_old_sel; 
-    mafNode  *m_new_sel; 
+    mafNode *m_OldNodeSelected;
+    mafNode *m_NewNodeSelected;
 };
 //----------------------------------------------------------------------------
 // mafOpEdit :
@@ -51,17 +51,17 @@ class mafOpEdit: public mafOp
 public:
              mafOpEdit(wxString label="");
             ~mafOpEdit(); 
-    void     SetInput(mafNode* vme) {m_selection = vme;};
+    void     SetInput(mafNode* vme) {m_Selection = vme;};
 
     bool     ClipboardIsEmpty();
 		void     ClipboardClear();
 		void     ClipboardBackup();
 		void     ClipboardRestore();
 
-    static   mafAutoPointer<mafNode>  m_clipboard;
+    static   mafAutoPointer<mafNode> m_Clipboard;
 protected:
-             mafAutoPointer<mafNode>  m_backup;
-             mafNode									 *m_selection;
+             mafAutoPointer<mafNode> m_Backup;
+             mafNode								*m_Selection;
 };
 //----------------------------------------------------------------------------
 // mafOpCut :
@@ -103,7 +103,7 @@ public:
     void OpUndo();
     mafOp* Copy(); 
 protected:
-    mafNode *m_pasted_vme;
+    mafNode *m_PastedVme;
 };
 /*
 //----------------------------------------------------------------------------
@@ -129,22 +129,3 @@ protected:
 };
 */
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
