@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoSTLExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 09:47:07 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-06-21 11:35:29 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -65,20 +65,22 @@ enum STL_EXPORTER_ID
 {
   ID_STL_BINARY_FILE = MINID,
 	ID_ABS_MATRIX_TO_STL,
+  ID_CHOOSE_FILENAME,
 };
 //----------------------------------------------------------------------------
 void mmoSTLExporter::OpRun()   
 //----------------------------------------------------------------------------
 {
-	m_Gui = new mmgGui(this);
-  m_Gui->SetListener(this);
-	
-	m_Gui->Label("file type",true);
+  mafString wildc = "Stereo Litography (*.stl)|*.stl";
+
+  m_Gui = new mmgGui(this);
+	m_Gui->FileSave(ID_CHOOSE_FILENAME,"stl file", &m_File, wildc);
+  m_Gui->Label("file type",true);
 	m_Gui->Bool(ID_STL_BINARY_FILE,"binary",&m_Binary,0);
 	m_Gui->Label("absolute matrix",true);
 	m_Gui->Bool(ID_ABS_MATRIX_TO_STL,"apply",&m_ABSMatrixFlag,0);
-	m_Gui->Label("");
 	m_Gui->OkCancel();
+  m_Gui->Enable(wxOK,m_File != "");
 	
 	ShowGui();
 }
@@ -91,7 +93,11 @@ void mmoSTLExporter::OnEvent(mafEventBase *maf_event)
     switch(e->GetId())
     {
       case wxOK:
+        ExportSurface();
         OpStop(OP_RUN_OK);
+      break;
+      case ID_CHOOSE_FILENAME:
+        m_Gui->Enable(wxOK,m_File != "");
       break;
       case wxCANCEL:
         OpStop(OP_RUN_CANCEL);
@@ -110,17 +116,9 @@ void mmoSTLExporter::OpStop(int result)
 	mafEventMacro(mafEvent(this,result));        
 }
 //----------------------------------------------------------------------------
-void mmoSTLExporter::OpDo()   
+void mmoSTLExporter::ExportSurface()
 //----------------------------------------------------------------------------
 {
-  assert(m_Input);
-	m_File = "";
-	mafString wildc = "Stereo Litography (*.stl)|*.stl";
-	m_File = mafGetSaveFile(m_FileDir.GetCStr(), wildc.GetCStr()).c_str();
-
-	if(m_File == "") 
-		return;
-
 	((mafVMESurface *)m_Input)->GetSurfaceOutput()->Update();
 	
 	vtkMAFSmartPointer<vtkTriangleFilter>triangles;
@@ -144,12 +142,6 @@ void mmoSTLExporter::OpDo()
 	else
 		writer->SetFileTypeToASCII();
 	writer->Update();
-}
-//----------------------------------------------------------------------------
-void mmoSTLExporter::OpUndo()
-//----------------------------------------------------------------------------
-{
-  //nothing to do; will you erase the file ?
 }
 //----------------------------------------------------------------------------
 mafOp* mmoSTLExporter::Copy()   

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoSTLImporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-20 09:16:46 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-06-21 11:35:30 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -46,11 +46,8 @@ public:
   /** Builds operation's interface. */
 	void OpRun();
 
-	/** Execute the operation. */
-	void OpDo();
-
-	/** Makes the undo for the operation. */
-	void OpUndo();
+	/** Import the file. */
+	void ImportSTL();
 
 protected:
   /** Check if the STL file is binary */
@@ -65,9 +62,9 @@ protected:
   /** Check if the binary stl needs to be swapped. */
   void CheckSwap(const char *file_name);
 
-	mafString	m_File;
+	mafVMESurface *m_ImportedSTL;
+  mafString	m_File;
 	mafString	m_FileDir;
-	mafVMESurface	 *m_Vme; 
 	int			  m_Swap;	
 };
 #endif

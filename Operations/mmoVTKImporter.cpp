@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:54:49 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-06-21 11:35:30 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -45,10 +45,14 @@ mmoVTKImporter::mmoVTKImporter(wxString label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {
-	m_Vme     = NULL;
   m_OpType  = OPTYPE_IMPORTER;
 	m_Canundo = true;
 	m_File    = "";
+
+  m_VmePolyLine = NULL;
+  m_VmeSurface  = NULL;
+  m_VmeGrayVol  = NULL;
+  m_VmeGeneric  = NULL;
 
   m_FileDir = mafGetApplicationDirectory().c_str();
 }
@@ -56,6 +60,10 @@ mafOp(label)
 mmoVTKImporter::~mmoVTKImporter( ) 
 //----------------------------------------------------------------------------
 {
+  mafDEL(m_VmePolyLine);
+  mafDEL(m_VmeSurface);
+  mafDEL(m_VmeGrayVol);
+  mafDEL(m_VmeGeneric);
 }
 //----------------------------------------------------------------------------
 mafOp* mmoVTKImporter::Copy()   
@@ -79,12 +87,13 @@ void mmoVTKImporter::OpRun()
   if(f != "") 
 	{
 	  m_File = f;
+    ImportVTK();
 	  result = OP_RUN_OK;
 	}
 	mafEventMacro(mafEvent(this,result));
 }
 //----------------------------------------------------------------------------
-void mmoVTKImporter::OpDo()
+void mmoVTKImporter::ImportVTK()
 //----------------------------------------------------------------------------
 {
   bool success = false;
@@ -93,7 +102,7 @@ void mmoVTKImporter::OpDo()
   vtkMAFSmartPointer<vtkDataSetReader> reader;
   reader->SetFileName(m_File);
 
-  vtkDataReader *preader;
+  vtkDataReader *preader = NULL;
   // workaround to avoid double reading
   switch (reader->ReadOutputType())
   {
@@ -125,51 +134,41 @@ void mmoVTKImporter::OpDo()
     wxString path, name, ext;
     wxSplitPath(m_File.c_str(),&path,&name,&ext);
 
-    vtkDataSet *data=vtkDataSet::SafeDownCast(preader->GetOutputs()[0]);
-
+    vtkDataSet *data = vtkDataSet::SafeDownCast(preader->GetOutputs()[0]);
     if (data)
     {
-      mafSmartPointer<mafVMEPolyline>   vme_poly;
-      mafSmartPointer<mafVMESurface>    vme_surf;
-      mafSmartPointer<mafVMEVolumeGray> vme_gray;
-      mafSmartPointer<mafVMEGeneric>    vme_generic;
-      if (vme_poly->SetDataByDetaching(data,0) == MAF_OK)
+      mafNEW(m_VmePolyLine);
+      mafNEW(m_VmeSurface);
+      mafNEW(m_VmeGrayVol);
+      mafNEW(m_VmeGeneric);
+      if (m_VmePolyLine->SetDataByDetaching(data,0) == MAF_OK)
       {
-        m_Vme = vme_poly;
+        m_Output = m_VmePolyLine;
       }
-      else if (vme_surf->SetDataByDetaching(data,0) == MAF_OK)
+      else if (m_VmeSurface->SetDataByDetaching(data,0) == MAF_OK)
       {
-        m_Vme = vme_surf;
+        m_Output = m_VmeSurface;
       }
-      else if (vme_gray->SetDataByDetaching(data,0) == MAF_OK)
+      else if (m_VmeGrayVol->SetDataByDetaching(data,0) == MAF_OK)
       {
-        m_Vme = vme_gray;
+        m_Output = m_VmeGrayVol;
       }
       else
       {
-        vme_generic->SetDataByDetaching(data,0);
-        m_Vme = vme_generic;
+        m_VmeGeneric->SetDataByDetaching(data,0);
+        m_Output = m_VmeGeneric;
       }
 
       mafTagItem tag_Nature;
       tag_Nature.SetName("VME_NATURE");
       tag_Nature.SetValue("NATURAL");
-      m_Vme->GetTagArray()->SetTag(tag_Nature);
-      m_Vme->SetName(name.c_str());
+      m_Output->GetTagArray()->SetTag(tag_Nature);
+      m_Output->SetName(name.c_str());
 
-      mafEventMacro(mafEvent(this,VME_ADD,m_Vme));
       success = true;
     }
   }
   vtkDEL(preader);
   if(!success)
     wxMessageBox("Error reading VTK file.", "I/O Error", wxICON_ERROR );
-}
-//----------------------------------------------------------------------------
-void mmoVTKImporter::OpUndo()
-//----------------------------------------------------------------------------
-{
-  assert(m_Vme);
-  mafEventMacro(mafEvent(this,VME_REMOVE,m_Vme));
-  m_Vme = NULL;
 }

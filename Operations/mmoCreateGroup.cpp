@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateGroup.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 09:47:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-06-21 11:35:28 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -63,6 +63,7 @@ void mmoCreateGroup::OpRun()
 {
   mafNEW(m_Group);
   m_Group->SetName("group");
+  m_Output = m_Group;
   mafEventMacro(mafEvent(this,OP_RUN_OK));
 }
 //----------------------------------------------------------------------------
@@ -73,11 +74,4 @@ void mmoCreateGroup::OpDo()
     m_Group->ReparentTo(mafVME::SafeDownCast(m_Input));
   else
     mafEventMacro(mafEvent(this, VME_ADD, m_Group));
-}
-//----------------------------------------------------------------------------
-void mmoCreateGroup::OpUndo()
-//----------------------------------------------------------------------------
-{
-  assert(m_Group);
-  mafEventMacro(mafEvent(this, VME_REMOVE, m_Group));
 }

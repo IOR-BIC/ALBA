@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKImporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-20 09:17:02 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-06-21 11:35:31 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -22,7 +22,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // forward references :
 //----------------------------------------------------------------------------
 class mafNode;
-class mafVME;
+class mafVMEPolyline;
+class mafVMESurface;
+class mafVMEVolumeGray;
+class mafVMEGeneric;
 
 //----------------------------------------------------------------------------
 // mmoVTKImporter :
@@ -41,11 +44,8 @@ public:
 	/** Builds operation's interface. */
   void OpRun();
 
-	/** Execute the operation. */
-  void OpDo();
-
-	/** Makes the undo for the operation. */
-  void OpUndo();
+	/** Import vtk data. */
+  void ImportVTK();
 
   /** Set the vtk filename to be imported. 
       This is used when the operation is executed not using user interface. */
@@ -54,7 +54,10 @@ public:
 protected:
   wxString m_File;
   wxString m_FileDir;
-
-  mafVME   *m_Vme;
+  
+  mafVMEPolyline   *m_VmePolyLine;
+  mafVMESurface    *m_VmeSurface;
+  mafVMEVolumeGray *m_VmeGrayVol;
+  mafVMEGeneric    *m_VmeGeneric;
 };
 #endif

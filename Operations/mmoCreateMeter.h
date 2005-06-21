@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-27 16:24:21 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-06-21 11:35:29 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -35,7 +35,6 @@ public:
   bool Accept(mafNode *node);
   void OpRun();
   void OpDo();
-  void OpUndo();
 
 protected: 
 	void OpStop(int result);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:53:28 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-06-21 11:35:30 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,6 +28,7 @@
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
 #include "mafVMERoot.h"
+#include "mafTransformBase.h"
 
 #include "vtkDataSetWriter.h"
 #include "vtkTransformPolyDataFilter.h"
@@ -50,7 +51,7 @@ mafOp(label)
 	m_FileDir = mafGetApplicationDirectory().c_str();
 }
 //----------------------------------------------------------------------------
-mmoVTKExporter::~mmoVTKExporter( ) 
+mmoVTKExporter::~mmoVTKExporter()
 //----------------------------------------------------------------------------
 {
 }
@@ -61,18 +62,30 @@ bool mmoVTKExporter::Accept(mafNode *node)
   return (node->IsMAFType(mafVME) && !node->IsMAFType(mafVMERoot));
 }
 //----------------------------------------------------------------------------
+mafOp* mmoVTKExporter::Copy()   
+//----------------------------------------------------------------------------
+{
+  mmoVTKExporter *cp = new mmoVTKExporter(m_Label);
+  cp->m_File = m_File;
+  return cp;
+}
+//----------------------------------------------------------------------------
 // constants
 //----------------------------------------------------------------------------
 enum VTK_EXPORTER_ID
 {
   ID_VTK_BINARY_FILE = MINID,
 	ID_ABS_MATRIX,
+  ID_CHOOSE_FILENAME,
 };
 //----------------------------------------------------------------------------
 void mmoVTKExporter::OpRun()   
 //----------------------------------------------------------------------------
 {
-	m_Gui = new mmgGui(this);
+  mafString wildc = "vtk Data (*.vtk)|*.vtk";
+
+  m_Gui = new mmgGui(this);
+  m_Gui->FileSave(ID_CHOOSE_FILENAME,"vtk file", &m_File, wildc);
 	m_Gui->Label("file type",true);
 	m_Gui->Bool(ID_VTK_BINARY_FILE,"binary",&m_Binary,0);
 	m_Gui->Label("absolute matrix",true);
@@ -81,8 +94,8 @@ void mmoVTKExporter::OpRun()
 		m_Gui->Enable(ID_ABS_MATRIX,true);
 	else
 		m_Gui->Enable(ID_ABS_MATRIX,false);
-	m_Gui->Label("");
 	m_Gui->OkCancel();
+  m_Gui->Enable(wxOK,m_File != "");
 	
 	ShowGui();
 }
@@ -94,13 +107,17 @@ void mmoVTKExporter::OnEvent(mafEventBase *maf_event)
 	{
     switch(e->GetId())
     {
-    case wxOK:
-      OpStop(OP_RUN_OK);
+      case wxOK:
+        ExportVTK();
+        OpStop(OP_RUN_OK);
       break;
-    case wxCANCEL:
-      OpStop(OP_RUN_CANCEL);
+      case ID_CHOOSE_FILENAME:
+        m_Gui->Enable(wxOK,m_File != "");
       break;
-    case VME_ADD:
+      case wxCANCEL:
+        OpStop(OP_RUN_CANCEL);
+      break;
+      case VME_ADD:
       {
         //trap the VME_ADD of the mmoCollapse and mmoExplode to update the
         //m_Input, then forward the message to mafDMLlogicMDI
@@ -108,8 +125,8 @@ void mmoVTKExporter::OnEvent(mafEventBase *maf_event)
         mafEventMacro(mafEvent(this,VME_ADD,this->m_Input));
       }
       break;
-    default:
-      mafEventMacro(*e);
+      default:
+        mafEventMacro(*e);
       break;
     }
 	}
@@ -119,25 +136,13 @@ void mmoVTKExporter::OpStop(int result)
 //----------------------------------------------------------------------------
 {
 	HideGui();
-
 	mafEventMacro(mafEvent(this,result));        
 }
 //----------------------------------------------------------------------------
-void mmoVTKExporter::OpDo()   
+void mmoVTKExporter::ExportVTK()
 //----------------------------------------------------------------------------
 {					
-	assert(m_Input);
-
-	m_File = "";
-
-	mafString wildc = "vtk Data (*.vtk)|*.vtk";
-	m_File = mafGetSaveFile(m_FileDir.GetCStr(),wildc.GetCStr()).c_str(); 
-
-	if(m_File == "") 
-		return;
-
 	((mafVME *)m_Input)->GetOutput()->Update();
-
 	if(this->m_Input->IsA("mafVMELandmarkCloud"))
 	{
     if(((mafVMELandmarkCloud *)m_Input)->GetNumberOfLandmarks() > 0)
@@ -180,11 +185,9 @@ void mmoVTKExporter::SaveVTKData()
 
   if (m_ABSMatrixFlag)
   {
-    vtkMAFSmartPointer<vtkTransform> v_abst;
-
     vtkMAFSmartPointer<vtkTransformPolyDataFilter> v_tpdf;
     v_tpdf->SetInput((vtkPolyData *)((mafVME *)m_Input)->GetOutput()->GetVTKData());
-    v_tpdf->SetTransform((vtkAbstractTransform *)((mafVME *)m_Input)->GetAbsMatrixPipe());
+    v_tpdf->SetTransform(((mafVME *)m_Input)->GetOutput()->GetTransform()->GetVTKTransform());
     v_tpdf->Update();
     writer->SetInput((vtkDataSet *)v_tpdf->GetOutput());
   }
@@ -197,17 +200,4 @@ void mmoVTKExporter::SaveVTKData()
     writer->SetFileTypeToASCII();
   writer->SetFileName(m_File.GetCStr());
   writer->Write();
-}
-//----------------------------------------------------------------------------
-void mmoVTKExporter::OpUndo()   
-//----------------------------------------------------------------------------
-{
-}
-//----------------------------------------------------------------------------
-mafOp* mmoVTKExporter::Copy()   
-//----------------------------------------------------------------------------
-{
-  mmoVTKExporter *cp = new mmoVTKExporter(m_Label);
-  cp->m_File = m_File;
-  return cp;
 }

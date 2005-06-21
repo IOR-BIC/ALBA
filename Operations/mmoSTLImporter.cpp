@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoSTLImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-20 09:16:46 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-06-21 11:35:30 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,6 +26,7 @@
 #include "mafTagArray.h"
 #include "mafVME.h"
 #include "mafVMESurface.h"
+#include "mafSmartPointer.h"
 #include "vtkMAFSmartPointer.h"
 
 #include "vtkSTLReader.h"
@@ -40,7 +41,7 @@ mafOp(label)
   m_OpType  = OPTYPE_IMPORTER;
   m_Canundo = true;
   m_File    = "";
-  m_Vme     = NULL;
+  m_ImportedSTL = NULL;
   m_Swap    = 0;
   m_FileDir = mafGetApplicationDirectory().c_str();
 }
@@ -48,13 +49,21 @@ mafOp(label)
 mmoSTLImporter::~mmoSTLImporter( ) 
 //----------------------------------------------------------------------------
 {
-  mafDEL(m_Vme);
+  mafDEL(m_ImportedSTL);
 }
 //----------------------------------------------------------------------------
 bool mmoSTLImporter::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 {
   return true;
+}
+//----------------------------------------------------------------------------
+mafOp* mmoSTLImporter::Copy()   
+//----------------------------------------------------------------------------
+{
+  mmoSTLImporter *cp = new mmoSTLImporter(m_Label);
+  cp->m_File = m_File;
+  return cp;
 }
 //----------------------------------------------------------------------------
 void mmoSTLImporter::OpRun()   
@@ -72,6 +81,7 @@ void mmoSTLImporter::OpRun()
 		m_File = f;
 		result = OP_RUN_OK;
     CheckSwap(m_File.GetCStr());
+    ImportSTL();
 	}
 
 	mafEventMacro(mafEvent(this,result));
@@ -122,11 +132,10 @@ void mmoSTLImporter::CheckSwap(const char *file_name)
   }
 }
 //----------------------------------------------------------------------------
-void mmoSTLImporter::OpDo()   
+void mmoSTLImporter::ImportSTL()
 //----------------------------------------------------------------------------
 {
 	wxBusyInfo wait("Loading file: ...");  
-	assert(!m_Vme);
 	if (m_Swap != 0)
 	{ //swapping the file
 		mafString swapped;				
@@ -188,39 +197,22 @@ void mmoSTLImporter::OpDo()
   wxString path, name, ext;
   wxSplitPath(m_File.GetCStr(),&path,&name,&ext);
 
-  mafNEW(m_Vme);
-  m_Vme->SetName(name);
-	m_Vme->SetDataByDetaching(reader->GetOutput(),0);
+  mafNEW(m_ImportedSTL);
+  m_ImportedSTL->SetName(name);
+	m_ImportedSTL->SetDataByDetaching(reader->GetOutput(),0);
 
   mafTagItem tag_Nature;
   tag_Nature.SetName("VME_NATURE");
   tag_Nature.SetValue("NATURAL");
-  m_Vme->GetTagArray()->SetTag(tag_Nature);
+  m_ImportedSTL->GetTagArray()->SetTag(tag_Nature);
 
-	mafEventMacro(mafEvent(this,VME_ADD,m_Vme));
-	
 	//delete the swapped file
 	if (m_Swap != 0)
 	{
 		const char* file_name = (m_File);
 		remove(file_name);
 	}
-}
-//----------------------------------------------------------------------------
-void mmoSTLImporter::OpUndo()
-//----------------------------------------------------------------------------
-{
-	assert(m_Vme);
-	mafEventMacro(mafEvent(this,VME_REMOVE,m_Vme)); // unreference the vme
-  mafDEL(m_Vme);
-}
-//----------------------------------------------------------------------------
-mafOp* mmoSTLImporter::Copy()   
-//----------------------------------------------------------------------------
-{
-  mmoSTLImporter *cp = new mmoSTLImporter(m_Label);
-  cp->m_File = m_File;
-  return cp;
+  m_Output = m_ImportedSTL;
 }
 //----------------------------------------------------------------------------
 void mmoSTLImporter::OpStop(int result)

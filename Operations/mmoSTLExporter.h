@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoSTLExporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 09:47:07 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-06-21 11:35:30 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,11 +42,8 @@ public:
 	/** Builds operation's interface. */
   void OpRun();
 
-	/** Execute the operation. */
-  void OpDo();
-
-	/** Makes the undo for the operation. */
-  void OpUndo();
+	/** Export the surface. */
+  void ExportSurface();
 
 protected:
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */

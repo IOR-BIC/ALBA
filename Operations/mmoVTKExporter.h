@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKExporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:53:28 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-06-21 11:35:30 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,12 +42,10 @@ public:
 	/** Builds operation's interface. */
   void OpRun();
 
-	/** Execute the operation. */
-  void OpDo();
+	/** Export vtk data. */
+  void ExportVTK();
 
-	/** Makes the undo for the operation. */
-  void OpUndo();
-
+  /** vtk pipeline to save data on disk. */
   void SaveVTKData();
 
 protected:
