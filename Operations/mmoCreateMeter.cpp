@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-07 14:42:21 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-06-21 09:47:37 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -54,24 +54,21 @@ mafOp* mmoCreateMeter::Copy()
 bool mmoCreateMeter::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 {
-	if(!node) 
-    return false;
-  return true;
+  return (node && node->IsMAFType(mafVME));
 }
 //----------------------------------------------------------------------------
 void mmoCreateMeter::OpRun()   
 //----------------------------------------------------------------------------
 {
+  mafNEW(m_Meter);
+  m_Meter->SetName("meter");
   mafEventMacro(mafEvent(this,OP_RUN_OK));
 }
 //----------------------------------------------------------------------------
 void mmoCreateMeter::OpDo()
 //----------------------------------------------------------------------------
 {
-  mafNEW(m_Meter);
-  m_Meter->SetName("meter");
   m_Meter->ReparentTo(m_Input);
-  mafEventMacro(mafEvent(this, VME_ADD, m_Meter));
   m_Meter->SetLink("StartVME", m_Input);
 }
 //----------------------------------------------------------------------------

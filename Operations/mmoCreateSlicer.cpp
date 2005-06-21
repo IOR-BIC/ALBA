@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-07 14:42:04 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-06-21 09:47:37 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -60,16 +60,15 @@ bool mmoCreateSlicer::Accept(mafNode *node)
 void mmoCreateSlicer::OpRun()
 //----------------------------------------------------------------------------
 {
+  mafNEW(m_Slicer);
+  m_Slicer->SetName("slicer");
   mafEventMacro(mafEvent(this,OP_RUN_OK));
 }
 //----------------------------------------------------------------------------
 void mmoCreateSlicer::OpDo()
 //----------------------------------------------------------------------------
 {
-  mafNEW(m_Slicer);
-  m_Slicer->SetName("slicer");
   m_Slicer->ReparentTo(m_Input);
-  mafEventMacro(mafEvent(this, VME_ADD, m_Slicer));
 }
 //----------------------------------------------------------------------------
 void mmoCreateSlicer::OpUndo()

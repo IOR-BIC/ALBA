@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:54:00 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-06-21 09:49:35 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -73,6 +73,7 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
   m_OutlineMapper   = NULL;
   m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
+  m_ScalarVisibility= 0;
 
   assert(m_Vme->IsA("mafVMESurface"));
   mafVMESurface *vme = ((mafVMESurface*) m_Vme);
@@ -209,10 +210,20 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId()) 
     {
-    case ID_SCALAR_VISIBILITY:
-      m_Mapper->SetScalarVisibility(m_ScalarVisibility);
+      case ID_SCALAR_VISIBILITY:
+      {
+        m_Mapper->SetScalarVisibility(m_ScalarVisibility);
+        if (m_ScalarVisibility)
+        {
+          vtkPolyData *data = (vtkPolyData *)m_Vme->GetOutput()->GetVTKData();
+          assert(data);
+          double range[2];
+          data->GetScalarRange(range);
+          m_Mapper->SetScalarRange(range);
+        }
+      }
     	break;
-    default:
+      default:
       break;
     }
   }
