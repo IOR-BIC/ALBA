@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGroup.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-19 08:27:01 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-06-21 09:48:19 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -11,14 +11,17 @@
 =========================================================================*/
 #ifndef __mafVMEGroup_h
 #define __mafVMEGroup_h
+
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
 #include "mafVMEGenericAbstract.h"
 #include "mafVMEOutputNULL.h"
+
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
+class mmgGui;
 
 /** mafVMEGroup - a VME use to create hierarchical assemblies of VME's.
   mafVMEGroup is a specialized VME inheriting the VME-Generic features to internally
@@ -41,6 +44,9 @@ public:
 protected:
   mafVMEGroup();
   virtual ~mafVMEGroup();
+
+  /** Internally used to create a new instance of the GUI.*/
+  virtual mmgGui *CreateGui();
 
 private:
   mafVMEGroup(const mafVMEGroup&); // Not implemented
