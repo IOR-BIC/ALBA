@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:43:07 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-06-21 09:44:25 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -508,7 +508,7 @@ void mafOpManager::OpDo(mafOp *op)
   }
 }
 //----------------------------------------------------------------------------
-void mafOpManager::OpUndo()   
+void mafOpManager::OpUndo()
 //----------------------------------------------------------------------------
 {
   if( m_context.Undo_IsEmpty()) 
