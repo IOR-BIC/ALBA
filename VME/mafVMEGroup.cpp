@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGroup.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 09:48:19 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-06-21 15:17:47 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -43,7 +43,7 @@ mafVMEGroup::~mafVMEGroup()
 //-------------------------------------------------------------------------
 {
   // data pipe destroyed in mafVME
-  // data vector destroyed in mafVMEGroupAbstract
+  // data vector destroyed in mafVMEGenericAbstract
 }
 
 //-------------------------------------------------------------------------
