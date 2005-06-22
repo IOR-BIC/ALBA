@@ -20,6 +20,8 @@ mafWXLog.cpp
 mafWXLog.h
 mmgButton.cpp
 mmgButton.h
+mmgCheckListBox.cpp
+mmgCheckListBox.h
 mmgCheckTree.cpp
 mmgCheckTree.h
 mmgCrossSplitter.cpp

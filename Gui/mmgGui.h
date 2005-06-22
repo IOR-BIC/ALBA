@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:52:57 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2005-06-22 07:02:28 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2005
@@ -185,7 +185,8 @@ public:
 
   /** Checked listbox widget. */
   //SIL. 24-3-2005: - temporary removed
-  //mmgCheckListBox *CheckList(int id, wxString label = "", int height = 60, wxString tooltip = "");
+  //MARCO: 22-6-2005 - readded 
+  mmgCheckListBox *CheckList(int id, wxString label = "", int height = 60, wxString tooltip = "");
 
   /** Listbox widget. */
 	wxListBox *ListBox(int id, wxString label = "", int height = 60, wxString tooltip = "", long lbox_style = 0);

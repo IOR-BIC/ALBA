@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:52:57 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2005-06-22 07:02:28 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,7 +22,8 @@
 
 #include "mmgFloatSlider.h"
  //SIL. 24-3-2005: temporary removed
-//#include "mmgCheckListBox.h"
+ //MARCO: 22-6-2005 - readded 
+#include "mmgCheckListBox.h"
 
 #include "mmgValidator.h"
 #include "mmgGui.h"
@@ -1013,7 +1014,7 @@ wxGrid *mmgGui::Grid(int id, wxString label,int height, int row, int cols, wxStr
   }
 	return grid;
 }
-/*
+
 //----------------------------------------------------------------------------
 mmgCheckListBox* mmgGui::CheckList(int id,wxString label,int height, wxString tooltip)
 //----------------------------------------------------------------------------
@@ -1039,7 +1040,7 @@ mmgCheckListBox* mmgGui::CheckList(int id,wxString label,int height, wxString to
   }
 	return clb;
 }
-*/
+
 //----------------------------------------------------------------------------
 void mmgGui::VectorN(int id,wxString label, double *var,int num_elem,double min, double max, int decimal_digit, wxString tooltip)
 //----------------------------------------------------------------------------
