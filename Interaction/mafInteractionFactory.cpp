@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 07:57:08 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-06-22 16:44:18 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -174,4 +174,38 @@ const std::set<std::string> *mafInteractionFactory::GetAvatarNames()
 //------------------------------------------------------------------------------
 {
   return &m_AvatarNames;
+}
+
+//------------------------------------------------------------------------------
+int mafInteractionFactory::GetNumberOfDevices()
+//------------------------------------------------------------------------------
+{
+  return m_DeviceNames.size();
+}
+
+//------------------------------------------------------------------------------
+int mafInteractionFactory::GetNumberOfAvatars()
+//------------------------------------------------------------------------------
+{
+  return m_AvatarNames.size();
+}
+
+//------------------------------------------------------------------------------
+const char *mafInteractionFactory::GetDeviceName(int idx)
+//------------------------------------------------------------------------------
+{
+  std::set<std::string>::iterator it = m_DeviceNames.begin();
+  for (int i=0;i<idx;i++)
+    it++;
+  return it->c_str();
+}
+
+//------------------------------------------------------------------------------
+const char *mafInteractionFactory::GetAvatarName(int idx)
+//------------------------------------------------------------------------------
+{
+  std::set<std::string>::iterator it = m_AvatarNames.begin();
+  for (int i=0;i<idx;i++)
+    it++;
+  return it->c_str();
 }

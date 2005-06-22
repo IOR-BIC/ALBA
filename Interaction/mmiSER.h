@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiSER.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 16:43:07 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-06-22 16:44:19 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -69,10 +69,11 @@ public:
   /** Get an action router.*/
   mafAction *GetAction(const char *name);
   
+  typedef std::map<mafString,mafAutoPointer<mafAction> > mmuActionsMap;
+
   /** Return the actions container */
   void GetActions(std::vector<mafAction *> &actions);
-  
-  typedef std::map<mafString,mafAutoPointer<mafAction> > mmuActionsMap;
+  const mmuActionsMap *GetActions() {return &m_Actions;}
 
 protected:
   virtual int InternalStore(mafStorageElement *node);

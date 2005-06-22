@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-22 07:06:19 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-06-22 16:44:18 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -72,9 +72,6 @@ public:
   virtual ~mafInteractionManager();
 
   mafTypeMacro(mafInteractionManager,mafObject);
-
-  /** Display the modal settings dialog */ 
-  void ShowSettingsPanel();
 
   /** Enable/Disable VME selection by picking */
   void EnableSelect(bool enable);
@@ -196,7 +193,6 @@ public:
   void AddDeviceToTree(mafDevice *device,mafDeviceSet *parent=NULL);
   void RemoveDeviceFromTree(mafDevice *device);
 
-
   /** Update names in device list */
   //void UpdateDeviceTree();
 
@@ -206,8 +202,10 @@ public:
   /** update bindings check list */
   void UpdateBindings();
 
-  mmiSER *GetStaticEventRouter() {return m_StaticEventRouter;}
+  /** Show in modal configuration the settings dialog. */
+  bool ShowModal();
 
+  mmiSER *GetStaticEventRouter() {return m_StaticEventRouter;}
 
 protected:
   /** This is called by Store() to store information of this object.  */
@@ -241,9 +239,9 @@ protected:
   mafDevice*              m_CurrentDevice;
   mafString			          m_SettingFileName;
   
-  mafAutoPointer<mafDeviceManager>    m_DeviceManager; 
-  mafAutoPointer<mmiPER>              m_PositionalEventRouter;
-  mafAutoPointer<mmiSER>              m_StaticEventRouter;
+  mafDeviceManager*       m_DeviceManager; 
+  mmiPER*                 m_PositionalEventRouter;
+  mmiSER*                 m_StaticEventRouter;
   
   mmuAvatarsMap                       m_Avatars; ///< keeps a list of visible avatars
   std::list<mafAutoPointer<mmiPER> >  m_PERList; ///< the interactor devoted to Positional Event Routing

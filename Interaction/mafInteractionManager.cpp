@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-22 07:06:19 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-06-22 16:44:18 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -77,13 +77,28 @@ mafInteractionManager::mafInteractionManager()
   m_LockRenderingFlag = false;
   m_LockRenderingFlag = 0;
   m_IntraFrameTime    = DEFAULT_INTRA_FRAME_TIME;
+
+  m_Devices           = NULL;
+  m_DeviceTree        = NULL;
+  m_Dialog            = NULL;
+  m_SettingsPanel     = NULL;
+  m_BindingsPanel     = NULL;
+  m_CurrentDevice     = NULL;
+  m_CurrentRenderer   = NULL;
+  m_ActionsList       = NULL;
+  m_Bindings          = NULL;
+  m_SettingFileName = mafGetApplicationDirectory().c_str();
+  m_SettingFileName.Append("Config/Presets");
+  if(!::wxDirExists(m_SettingFileName)) m_SettingFileName = mafGetApplicationDirectory().c_str();
   
-  m_DeviceManager = new mafDeviceManager;
+  mafNEW(m_DeviceManager);
   m_DeviceManager->SetListener(this);
   m_DeviceManager->SetName("DeviceManager");
-    
+  
+  CreateGUI();
+
   m_DeviceManager->Initialize();
-  //SettingsDialog->AddDeviceToTree(m_DeviceManager->GetDeviceSet()); // add dev_mgr node as root
+  AddDeviceToTree(m_DeviceManager->GetDeviceSet()); // add dev_mgr node as root
   
   // create the static event router and connect it
   mafNEW(m_StaticEventRouter);
@@ -101,7 +116,6 @@ mafInteractionManager::mafInteractionManager()
   pointing_action->BindInteractor(m_PositionalEventRouter);
   m_PositionalEventRouter->SetListener(this);
 
-  
   // create a Mouse device
   // the device is plugged here instead of App::Init() since mouse is plugged 
   // by default in all applications!
@@ -111,19 +125,6 @@ mafInteractionManager::mafInteractionManager()
   //mafAction *mouse_action = m_StaticEventRouter->AddAction("Mouse"); // action for RWIs output
   //mouse_action->BindDevice(mouse_device); // bind mouse to mouse action
   pointing_action->BindDevice(mouse_device); // bind mouse to point&manipulate action
-
-  m_Devices           = NULL;
-  m_DeviceTree        = NULL;
-  m_Dialog            = NULL;
-  m_SettingsPanel     = NULL;
-  m_BindingsPanel     = NULL;
-  m_CurrentDevice     = NULL;
-  m_ActionsList       = NULL;
-  m_Bindings          = NULL;
-  m_SettingFileName = mafGetApplicationDirectory().c_str();
-  m_SettingFileName.Append("Config/Presets");
-  if(!::wxDirExists(m_SettingFileName)) m_SettingFileName = mafGetApplicationDirectory().c_str();
-	CreateGUI();
 }
 
 //------------------------------------------------------------------------------
@@ -131,7 +132,7 @@ mafInteractionManager::~mafInteractionManager()
 //------------------------------------------------------------------------------
 {
   m_DeviceManager->Shutdown();
-  cppDEL(m_DeviceManager);
+  mafDEL(m_DeviceManager);
   mafDEL(m_StaticEventRouter);
   mafDEL(m_PositionalEventRouter);
   vtkDEL(m_CurrentRenderer);
@@ -414,7 +415,7 @@ void mafInteractionManager::OnDeviceAdded(mafEventBase *event)
   mafDeviceSet *parent=(mafDeviceSet *)event->GetSender();
   assert(device);
   // forward device to the GUI
-  //m_SettingsDialog->AddDeviceToTree(device,parent);
+  AddDeviceToTree(device,parent);
 }
 //------------------------------------------------------------------------------
 void mafInteractionManager::OnDeviceRemoving(mafEventBase *event)
@@ -424,7 +425,7 @@ void mafInteractionManager::OnDeviceRemoving(mafEventBase *event)
   assert(device);
   m_StaticEventRouter->UnBindDeviceFromAllActions(device);
   // forward event to the GUI
-  //SettingsDialog->RemoveDeviceFromTree(device);
+  RemoveDeviceFromTree(device);
 }
 //------------------------------------------------------------------------------
 void mafInteractionManager::OnDeviceNameChanged(mafEventBase *event)
@@ -433,7 +434,7 @@ void mafInteractionManager::OnDeviceNameChanged(mafEventBase *event)
   mafDevice *device=(mafDevice *)event->GetSender(); 
   assert(device);
   // forward device to the GUI
-  //SettingsDialog->UpdateDevice(device);
+  UpdateDevice(device);
 }
 //------------------------------------------------------------------------------
 void mafInteractionManager::OnBindDeviceToAction(mafEvent *e)
@@ -446,7 +447,6 @@ void mafInteractionManager::OnBindDeviceToAction(mafEvent *e)
   {
     mafAction *action=mafAction::SafeDownCast((mafObject *)e->GetSender());
     m_StaticEventRouter->BindDeviceToAction(device,action);
-
   }
   else
   {
@@ -691,7 +691,7 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
           assert(gui);
           m_SettingsPanel->Put(gui);
           // force update
-          m_CurrentDevice->GetSettings()->Update();
+          m_CurrentDevice->UpdateGui();
 
           // Update Bindings panel
           UpdateBindings();
@@ -776,13 +776,6 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
 }
 
 //------------------------------------------------------------------------------
-void mafInteractionManager::ShowSettingsPanel()
-//------------------------------------------------------------------------------
-{
-  //SettingsDialog->ShowModal(); 
-}
-
-//------------------------------------------------------------------------------
 int mafInteractionManager::Store(const char *filename)
 //------------------------------------------------------------------------------
 {
@@ -862,9 +855,10 @@ int mafInteractionManager::DeviceChooser(wxString &dev_name,wxString &dev_type)
   {
     wxString *devices = new wxString[iFactory->GetNumberOfDevices()];
 
+
     for (int id=0;id<iFactory->GetNumberOfDevices();id++)
     {
-      devices[id]=iFactory->GetDeviceName(id);
+      devices[id]=iFactory->GetDeviceDescription(iFactory->GetDeviceName(id));
     }
 
     wxSingleChoiceDialog chooser(m_Dialog,"select a device","Device Chooser",iFactory->GetNumberOfDevices(),devices);
@@ -876,8 +870,8 @@ int mafInteractionManager::DeviceChooser(wxString &dev_name,wxString &dev_type)
     
       if (index>=0)
       {
-        dev_type = iFactory->GetDeviceType(index);
-        dev_name = iFactory->GetDeviceName(index);
+        dev_type = iFactory->GetDeviceName(index);
+        dev_name = iFactory->GetDeviceDescription(dev_type);
       }
     }
   
@@ -899,11 +893,21 @@ void mafInteractionManager::UpdateBindings()
     /* Fill in actions' list */
     m_ActionsList->Clear();
     
-    vtkTemplatedMap<wxString,mafAction> *actions=GetStaticEventRouter()->GetActions();
+    const mmiSER::mmuActionsMap *actions=GetSER()->GetActions();
 
     int i=0;
-    for (mafAction *action=actions->InitTraversal();action;action=actions->GetNextItem())
-      m_ActionsList->AddItem(i++,action->GetName(),action->GetDevices()->IsItemPresent(m_CurrentDevice)!=0);
+    for (mmiSER::mmuActionsMap::const_iterator it=actions->begin();it!=actions->end();it++)
+    {
+      mafAction *action = it->second;
+      bool found=false;
+      // search through the list
+      for (mafAction::mmuDeviceList::const_iterator it_list=action->GetDevices()->begin();it_list!=action->GetDevices()->end();it_list++)
+      {
+        if (it_list->GetPointer() == m_CurrentDevice)
+          found = true;
+      }
+      m_ActionsList->AddItem(i++,action->GetName(),found);
+    }
 
     m_Bindings->Update();
   }

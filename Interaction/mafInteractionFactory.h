@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionFactory.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 07:57:08 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-06-22 16:44:18 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -58,6 +58,12 @@ public:
   /** return list of names for nodes plugged into this factory */
   const static std::set<std::string> *GetDeviceNames();
   
+  /** return device name */
+  const char *GetDeviceName(int idx);
+
+  /** return number of devices registered to this factory */
+  int GetNumberOfDevices();
+  
   /** return the comment field of the device object plugged in the factory */
   const char *GetDeviceDescription(const char *device_name);
   
@@ -70,6 +76,12 @@ public:
 
   /** return list of names for nodes plugged into this factory */
   const static std::set<std::string> *GetAvatarNames();
+
+  /** return number of devices registered to this factory */
+  int GetNumberOfAvatars();
+
+  /** return device name */
+  const char *GetAvatarName(int idx);
   
   /** return the comment field of the avatar object plugged in the factory */
   const char *GetAvatarDescription(const char *device_name);
