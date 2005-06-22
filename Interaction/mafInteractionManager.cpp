@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 07:57:08 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-06-22 07:06:19 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -18,7 +18,19 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+#include <wx/tipdlg.h>
+#include <wx/choicdlg.h>
+
 #include "mafInteractionManager.h"
+
+#include "mafDecl.h"
+
+// GUIs
+#include "mmgGui.h"
+#include "mmgDialog.h"
+#include "mmgGuiHolder.h"
+#include "mmgTree.h"
+#include "mmgCheckListBox.h"
 
 #include "mafEvent.h"
 
@@ -99,6 +111,19 @@ mafInteractionManager::mafInteractionManager()
   //mafAction *mouse_action = m_StaticEventRouter->AddAction("Mouse"); // action for RWIs output
   //mouse_action->BindDevice(mouse_device); // bind mouse to mouse action
   pointing_action->BindDevice(mouse_device); // bind mouse to point&manipulate action
+
+  m_Devices           = NULL;
+  m_DeviceTree        = NULL;
+  m_Dialog            = NULL;
+  m_SettingsPanel     = NULL;
+  m_BindingsPanel     = NULL;
+  m_CurrentDevice     = NULL;
+  m_ActionsList       = NULL;
+  m_Bindings          = NULL;
+  m_SettingFileName = mafGetApplicationDirectory().c_str();
+  m_SettingFileName.Append("Config/Presets");
+  if(!::wxDirExists(m_SettingFileName)) m_SettingFileName = mafGetApplicationDirectory().c_str();
+	CreateGUI();
 }
 
 //------------------------------------------------------------------------------
@@ -495,6 +520,92 @@ void mafInteractionManager::OnCameraUpdate(mafEvent *e)
 {
   CameraUpdate(e->GetView());
 }
+//----------------------------------------------------------------------------
+// constants :
+//----------------------------------------------------------------------------
+enum 
+{
+	ID_DEVICE_TREE = MINID,
+	ID_ADD_DEVICE,
+	ID_REMOVE_DEVICE,
+  ID_DEVICE_SETTINGS,
+  ID_DEVICE_BINDINGS,
+  ID_BINDING_LIST,
+  ID_STORE,
+  ID_LOAD,
+  ID_OK
+};
+//----------------------------------------------------------------------------
+void mafInteractionManager::CreateGUI() 
+//----------------------------------------------------------------------------
+{
+  m_Dialog = new mmgDialog("I/O Devices Settings");
+  m_Dialog->SetSize(550,300);
+  m_Dialog->EnableCloseButton(true);
+
+  //m_DeviceList = m_Devices->ListBox(ID_DEVICE_LIST,"",150);
+  m_DeviceTree = new mmgTree(m_Dialog,ID_DEVICE_TREE);
+  m_DeviceTree->SetTitle("connected devices");
+  m_DeviceTree->SetSize(230,400);
+  m_DeviceTree->SetListener(this);
+
+  m_Devices = new mmgGui(this);	
+
+	m_Devices->Divider();
+	m_Devices->Button(ID_ADD_DEVICE,"add");
+	m_Devices->Button(ID_REMOVE_DEVICE,"remove");
+	m_Devices->Divider();
+  m_Devices->FileOpen(ID_LOAD,"",&m_SettingFileName,"Interaction Settings (*.xml)| *.xml","restore interaction settings file from disk");
+  m_Devices->FileSave(ID_STORE,"",&m_SettingFileName,"Interaction Settings (*.xml)| *.xml","save interaction settings file from disk");  
+// marco: in MAF 2.0 the extra parameter is missing!
+//  m_Devices->FileSave(ID_STORE,"",&m_SettingFileName,"Interaction Settings (*.xml)| *.xml","save interaction settings file from disk",true);  
+
+
+  m_Devices->Divider();
+  m_Devices->Button(ID_OK,"close");
+	m_Devices->SetListener(this);
+	m_Devices->Show(true);
+  m_Devices->FitGui();  
+	m_Devices->Reparent(m_Dialog);
+  
+
+	// Holder of Device's settings GUI ==========
+	m_SettingsPanel = new mmgGuiHolder(m_Dialog,ID_DEVICE_SETTINGS);
+  m_SettingsPanel->Show(true);
+	m_SettingsPanel->SetSize(230,300);
+  m_SettingsPanel->SetTitle("device settings");
+
+  // Device's binding GUI =====================
+  m_BindingsPanel = new mmgNamedPanel(m_Dialog,ID_DEVICE_BINDINGS);
+  m_BindingsPanel->SetTitle("device bindings");
+  m_BindingsPanel->Show(true);
+	m_BindingsPanel->SetSize(230,60);
+  
+  m_Bindings = new mmgGui(this);
+  m_Bindings->Label("Bindings to actions");
+  m_ActionsList = m_Bindings->CheckList(ID_BINDING_LIST,"",60,"actions the devices is assigned to");
+	m_Bindings->Show(true);    
+	m_Bindings->FitGui();
+  m_BindingsPanel->Add(m_Bindings);
+  
+	wxBoxSizer *v1_sizer = new wxBoxSizer(wxVERTICAL);
+  v1_sizer->Add(m_DeviceTree,1,wxEXPAND | wxALIGN_LEFT);
+	v1_sizer->Add(m_Devices,1,wxEXPAND | wxALIGN_CENTER);
+  
+	wxBoxSizer *v2_sizer = new wxBoxSizer(wxVERTICAL);
+  v2_sizer->Add(m_SettingsPanel,1,wxEXPAND|wxALIGN_TOP);
+  v2_sizer->Add(m_BindingsPanel,1,wxEXPAND|wxALIGN_BOTTOM);
+  
+	wxBoxSizer *main_sizer = new wxBoxSizer(wxHORIZONTAL);
+	main_sizer->Add(v1_sizer,1,wxEXPAND | wxALIGN_LEFT);
+	main_sizer->Add(v2_sizer,0,wxEXPAND | wxALIGN_RIGHT);
+  
+	// ATTACH SIZER TO DIALOG
+	m_Dialog->SetAutoLayout( TRUE );
+  m_Dialog->SetSizer( main_sizer );
+  main_sizer->Fit(m_Dialog);
+  main_sizer->SetSizeHints(m_Dialog);
+}
 //------------------------------------------------------------------------------
 void mafInteractionManager::OnEvent(mafEventBase *event)
 //------------------------------------------------------------------------------
@@ -502,6 +613,99 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
   assert(event);
  
   mafID id=event->GetId();
+
+  mafString action_name;
+
+  mafEvent *e=mafEvent::SafeDownCast(event);
+ 
+  if (e)
+  {
+    switch(e->GetId())
+    {
+      case ID_OK:
+		  case wxOK:
+  //    case wxClose:
+        m_Dialog->EndModal(wxOK); 
+		  break;
+      case ID_STORE:
+      { 
+        Store(m_SettingFileName);
+      }
+      break;
+      case ID_LOAD:
+      {
+        Restore(m_SettingFileName);
+        //camera reset here?
+      }
+      break;
+      case ID_BINDING_LIST:
+      {
+        assert(m_CurrentDevice);
+        action_name=m_ActionsList->GetItemLabel(m_ActionsList->GetSelection());
+        //action_name=m_ActionsList->GetItemLabel(e->GetArg());
+        //int id=m_ActionsList->FindItemIndex(e->GetArg());
+      
+        if (m_ActionsList->IsItemChecked(m_ActionsList->GetSelection()))
+        {
+          GetSER()->BindDeviceToAction(m_CurrentDevice,action_name);
+        }
+        else
+        {
+          GetSER()->UnBindDeviceFromAction(m_CurrentDevice,action_name);
+        }
+      }
+      break;
+      case ID_ADD_DEVICE:
+      {
+        wxString device_name,device_type;
+        int sel=DeviceChooser(device_name,device_type);
+      
+        if (sel>=0)
+        {
+          // add the new device to the devices manager's pool
+          mafDevice *device = GetDeviceManager()->AddDevice(device_type);
+          // the device is added to the list by an 
+          // event returned by DeviceManager which is
+          // served by InteractionManager by calling
+          // AddDevice of this class.
+        }
+      }
+      break;
+      case ID_REMOVE_DEVICE:
+        if (m_CurrentDevice)
+        {
+          int success = GetDeviceManager()->RemoveDevice(m_CurrentDevice);
+          if (!success)
+          {
+            wxMessageBox("Cannot remove device: I/O manager error");
+          }
+        }
+       break;
+      case VME_SELECT:
+        if (mafDevice *device = GetDeviceManager()->GetDevice(e->GetArg()))
+        {
+          m_CurrentDevice = device;
+          // Show device settings panel
+          assert(m_CurrentDevice->GetGui());
+          mmgGui *gui = m_CurrentDevice->GetGui();
+          assert(gui);
+          m_SettingsPanel->Put(gui);
+          // force update
+          m_CurrentDevice->GetSettings()->Update();
+
+          // Update Bindings panel
+          UpdateBindings();
+        }
+        else
+        {
+          assert(true);
+        }
+      break;
+		  default:
+			  e->Log();
+		  break; 
+    }
+  }
     
   if (id==VIEW_SELECT)
   {
@@ -640,3 +844,107 @@ int mafInteractionManager::InternalRestore(mafStorageElement *node)
   return MAF_OK;
 }
 
+//----------------------------------------------------------------------------
+bool mafInteractionManager::ShowModal()
+//----------------------------------------------------------------------------
+{
+  return m_Dialog->ShowModal() != 0;
+}
+
+//----------------------------------------------------------------------------
+int mafInteractionManager::DeviceChooser(wxString &dev_name,wxString &dev_type)
+//----------------------------------------------------------------------------
+{
+  mafInteractionFactory *iFactory=mafInteractionFactory::GetInstance();
+  
+  assert(iFactory);
+  if (iFactory->GetNumberOfDevices()>0)
+  {
+    wxString *devices = new wxString[iFactory->GetNumberOfDevices()];
+
+    for (int id=0;id<iFactory->GetNumberOfDevices();id++)
+    {
+      devices[id]=iFactory->GetDeviceName(id);
+    }
+
+    wxSingleChoiceDialog chooser(m_Dialog,"select a device","Device Chooser",iFactory->GetNumberOfDevices(),devices);
+
+    int index=-1;
+    if (chooser.ShowModal()==wxID_OK)
+    {
+      index = chooser.GetSelection();
+    
+      if (index>=0)
+      {
+        dev_type = iFactory->GetDeviceType(index);
+        dev_name = iFactory->GetDeviceName(index);
+      }
+    }
+  
+    delete [] devices;
+    return index;
+  }
+  else
+  {
+    return -1;
+  }
+}
+
+//----------------------------------------------------------------------------
+void mafInteractionManager::UpdateBindings()
+//----------------------------------------------------------------------------
+{
+  if (m_CurrentDevice)
+  {
+    /* Fill in actions' list */
+    m_ActionsList->Clear();
+    
+    vtkTemplatedMap<wxString,mafAction> *actions=GetStaticEventRouter()->GetActions();
+
+    int i=0;
+    for (mafAction *action=actions->InitTraversal();action;action=actions->GetNextItem())
+      m_ActionsList->AddItem(i++,action->GetName(),action->GetDevices()->IsItemPresent(m_CurrentDevice)!=0);
+
+    m_Bindings->Update();
+  }
+}
+
+//----------------------------------------------------------------------------
+void mafInteractionManager::AddDeviceToTree(mafDevice *device,mafDeviceSet *parent)
+//----------------------------------------------------------------------------
+{
+  assert(device);
+  mafID parent_id=(parent?parent->GetID():0);
+  m_DeviceTree->AddNode(device->GetID(),parent_id,device->GetName());
+  //m_DeviceTree->Update();
+}
+
+//----------------------------------------------------------------------------
+void mafInteractionManager::RemoveDeviceFromTree(mafDevice *device)
+//----------------------------------------------------------------------------
+{
+  assert(device);
+  m_DeviceTree->DeleteNode(device->GetID());
+}
+/*
+//----------------------------------------------------------------------------
+void mafInteractionManager::UpdateDeviceList()
+//----------------------------------------------------------------------------
+{
+  for (int i=0;i<m_DeviceList->Number();i++)
+  {
+    mafDevice *device=(mafDevice *)m_DeviceList->GetClientData(i);
+    assert(device);
+    m_DeviceList->SetString(i,device->GetName());
+  }
+  
+  m_Devices->Update();
+}
+*/
+//----------------------------------------------------------------------------
+void mafInteractionManager::UpdateDevice(mafDevice *device)
+//----------------------------------------------------------------------------
+{
+  assert(device);
+  m_DeviceTree->SetNodeLabel(device->GetID(),device->GetName());
+}

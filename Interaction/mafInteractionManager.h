@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 07:57:08 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-06-22 07:06:19 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -33,6 +33,7 @@ class mafInteractor;
 class mafAvatar;
 class mafDevice;
 class mafDeviceManager;
+class mafDeviceSet;
 class mmdMouse;
 class mmgInteractionSettings;
 class vtkRenderer;
@@ -44,6 +45,13 @@ class vtkXMLDataParser;
 class mmiSER;
 class mmiPER;
 class mafNode;
+class mmgDialog;
+class mmgGui;
+class mmgTree;
+class mmgCheckListBox;
+class mmgGuiHolder;
+class mmgNamedPanel;
+
 /** This class takes care of mastering the interaction inside views.
   This class is responsible to coordinate interaction, i.e. 
   resources necessary for interaction (currently devices, actions and avatars)
@@ -181,6 +189,26 @@ public:
   /** set the minimum time to elapse between two subsequent renderings */
   void SetIntraFrameTime(mafTimeStamp iftime) {m_IntraFrameTime=iftime;}
 
+    /** Open a dialog to choose among available devices */
+  int DeviceChooser(wxString &dev_name,wxString &dev_type);
+
+  /** This is used to allow also external objects to add devices */
+  void AddDeviceToTree(mafDevice *device,mafDeviceSet *parent=NULL);
+  void RemoveDeviceFromTree(mafDevice *device);
+
+
+  /** Update names in device list */
+  //void UpdateDeviceTree();
+
+  /** Update the name of a device */
+  void UpdateDevice(mafDevice *device);
+
+  /** update bindings check list */
+  void UpdateBindings();
+
+  mmiSER *GetStaticEventRouter() {return m_StaticEventRouter;}
+
+
 protected:
   /** This is called by Store() to store information of this object.  */
   virtual int InternalStore(mafStorageElement *node);
@@ -198,6 +226,20 @@ protected:
   virtual void OnBindDeviceToAction(mafEvent *e);
   virtual void OnAddAvatar(mafEventBase *event);
   virtual void OnRemoveAvatar(mafEventBase *event);
+
+    /** Create the GUI dialog. */
+  void CreateGUI();
+
+  mmgDialog*              m_Dialog;
+  mmgGui*                 m_Devices;
+  mmgTree*                m_DeviceTree;
+  mmgCheckListBox*        m_ActionsList;
+  mmgGuiHolder*           m_SettingsPanel;
+  mmgNamedPanel*          m_BindingsPanel;
+  mmgGui*                 m_Bindings;
+
+  mafDevice*              m_CurrentDevice;
+  mafString			          m_SettingFileName;
   
   mafAutoPointer<mafDeviceManager>    m_DeviceManager; 
   mafAutoPointer<mmiPER>              m_PositionalEventRouter;
