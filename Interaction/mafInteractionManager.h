@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-22 16:44:18 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-06-23 16:57:14 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -144,7 +144,7 @@ public:
   void PostResetCamera(vtkRenderer *ren);
 
   /** propagate VME_SELECTED event */
-  void  NodeSelected(mafNode *node);
+  void  VmeSelected(mafNode *node);
 
   /** store all interaction settings to an XML file (Multimod Interaction Settings - MIS - format) */
   int Store(const char *filename);

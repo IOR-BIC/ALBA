@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDevice.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 06:06:33 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-06-23 16:57:14 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -35,7 +35,7 @@ public:
   /** non persistent device IDs start from MAF_MIN_DEVICE_ID. This means I cannot have more then 
     MIN_DEVICE_ID persistent devices (i.e. devices defined by application, e.g. Mouse
     and remote devices...) */
-  enum {MIN_DEVICE_ID=1000000};
+  enum DEVICE_MINIMUM_ID {MIN_DEVICE_ID=1000000};
 
   //------------------------------------------------------------------------------
   // Events
@@ -50,7 +50,7 @@ public:
   //----------------------------------------------------------------------------
   //    GUI Constants
   //----------------------------------------------------------------------------
-  enum 
+  enum DEVICE_WIDGET_ID
   {
     ID_NAME=MINID,
     ID_ACTIVATE,

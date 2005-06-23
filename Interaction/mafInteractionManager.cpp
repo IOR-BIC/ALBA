@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-22 16:44:18 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-06-23 16:57:14 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -329,7 +329,7 @@ void mafInteractionManager::PostResetCamera(vtkRenderer *ren)
 }
 
 //------------------------------------------------------------------------------
-void mafInteractionManager::NodeSelected(mafNode *node)
+void mafInteractionManager::VmeSelected(mafNode *node)
 //------------------------------------------------------------------------------
 {
   mafVME *vme=mafVME::SafeDownCast(node);
@@ -523,7 +523,7 @@ void mafInteractionManager::OnCameraUpdate(mafEvent *e)
 //----------------------------------------------------------------------------
 // constants :
 //----------------------------------------------------------------------------
-enum 
+enum IMANAGER_WIDGET_ID
 {
 	ID_DEVICE_TREE = MINID,
 	ID_ADD_DEVICE,
@@ -730,14 +730,6 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
   {
     mafEventMacro(mafEvent(event->GetSender(),VME_SELECT,(mafVME *)event->GetData()));
   }
-  /*
-  else if (id==WrapMafEvent)
-  {
-      assert(event->GetPointer());
-	  mafEvent *blob = (mafEvent *)event->GetPointer(); 
-	  mafEventMacro(*blob);
-  }
-  */
   /*else if (id==ShowContextualMenuEvent)
   {
     mafVME *vme = ((mafEventBase *)event)->GetVme();

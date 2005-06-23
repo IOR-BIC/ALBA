@@ -3,8 +3,8 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: mafAgentEventHandler.cpp,v $
 Language:  C++
-Date:      $Date: 2005-05-03 05:58:09 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2005-06-23 16:57:14 $
+Version:   $Revision: 1.3 $
 
 =========================================================================*/
 
@@ -14,8 +14,8 @@ Version:   $Revision: 1.2 $
 //----------------------------------------------------------------------------
 // Constants
 //----------------------------------------------------------------------------
-enum {ID_DISPATCH_EVENT = MINID};
-enum {wxEVT_MAF = wxEVT_USER_FIRST+1234};
+enum DISPATCH_ENUM {ID_DISPATCH_EVENT = MINID};
+enum WX_EVENT_MAF {wxEVT_MAF = wxEVT_USER_FIRST+1234};
 
 //----------------------------------------------------------------------------
 class mafWXEventHandler:public wxEvtHandler

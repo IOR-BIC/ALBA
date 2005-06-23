@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdTracker.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 16:27:45 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-06-23 16:57:15 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -76,7 +76,7 @@ public:
   //----------------------------------------------------------------------------
   //    GUI Constants
   //----------------------------------------------------------------------------
-  enum  
+  enum  TRACKER_WIDGET_ID
   {
     ID_TB_X_EXTENT=Superclass::ID_LAST,
     ID_TB_Y_EXTENT,
