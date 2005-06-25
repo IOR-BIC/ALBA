@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar2D.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 05:58:10 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-06-25 11:53:44 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -25,6 +25,8 @@
 
 // system includes
 #include <assert.h>
+
+mafCxxTypeMacro(mafAvatar2D);
 
 //------------------------------------------------------------------------------
 mafAvatar2D::mafAvatar2D()

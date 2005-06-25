@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar2D.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 05:58:10 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-06-25 11:53:45 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -25,7 +25,7 @@ class mmdMouse;
   movements, and thus representing their presence in the virtual world.
   Currently Avatar2D are empty classes used only to store the renderer...
  */
-class mafAvatar2D : public mafInteractor
+class MAF_EXPORT mafAvatar2D : public mafInteractor
 {
 public:
   mafTypeMacro(mafAvatar2D,mafInteractor);
@@ -60,8 +60,8 @@ protected:
   //virtual void InternalShutdown();
 
 private:
-  mafAvatar2D(const mafAvatar2D&);  // Not implemented.
-  void operator=(const mafAvatar2D&);  // Not implemented.
+  mafAvatar2D(const mafAvatar2D&) {}  // Not implemented.
+  void operator=(const mafAvatar2D&) {}  // Not implemented.
 };
 
 #endif 

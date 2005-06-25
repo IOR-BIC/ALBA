@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-23 16:57:14 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-06-25 11:53:45 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -541,7 +541,7 @@ void mafInteractionManager::CreateGUI()
 {
   m_Dialog = new mmgDialog("I/O Devices Settings");
   m_Dialog->SetSize(550,300);
-  m_Dialog->EnableCloseButton(true);
+  m_Dialog->EnableClose(true);
 
   //m_DeviceList = m_Devices->ListBox(ID_DEVICE_LIST,"",150);
   m_DeviceTree = new mmgTree(m_Dialog,ID_DEVICE_TREE);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoSTLImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 11:35:30 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-06-25 11:55:53 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -104,8 +104,9 @@ void mmoSTLImporter::CheckSwap(const char *file_name)
     unsigned int number, v;
     number = 0;
     v = 0;
-
-    for (int i = 0; i< 80; i++)
+    
+    int i;
+    for (i = 0; i< 80; i++)
     {
       f_in.read (&ch,1);
     } 
@@ -151,7 +152,8 @@ void mmoSTLImporter::ImportSTL()
 		char ch;
 		unsigned int number = 0, v = 0;
 		//reading the header and copying it without swapping
-		for (int i = 0; i< 80; i++)
+    int i;
+		for (i = 0; i< 80; i++)
 		{
 			f_in.read (&ch,1);
 			f_out.write(&ch,1);

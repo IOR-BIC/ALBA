@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 06:14:30 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-06-25 11:53:45 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -65,7 +65,7 @@ public:
   void SendTransformMatrix(const mafMatrix &matrix, int mouseAction = MOUSE_MOVE, double rotationAngle = 0);  
 
   /** Set the current camera */
-  virtual void SetCurrentCamera(vtkCamera *camera);
+  virtual void SetCurrentCamera(vtkCamera *camera) {m_CurrentCamera=camera;}
 
   //----------------------------------------------------------------------------
   // result matrix 
