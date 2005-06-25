@@ -75,7 +75,7 @@ class VTK_vtkMAF_EXPORT vtkProjectSP : public vtkStructuredPointsToStructuredPoi
 
 {
 public:
-  vtkTypeMacro(vtkProjectSP,vtkStructuredPointsToStructuredPointsFilter);
+  vtkTypeRevisionMacro(vtkProjectSP,vtkStructuredPointsToStructuredPointsFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   static vtkProjectSP *New();
@@ -107,8 +107,8 @@ protected:
   
   vtkProjectSP() ;
  ~vtkProjectSP() {};
-  vtkProjectSP(const vtkProjectSP&);
-  void operator=(const vtkProjectSP&);
+  vtkProjectSP(const vtkProjectSP&) {}
+  void operator=(const vtkProjectSP&) {}
 
   void ExecuteInformation();
   void Execute();

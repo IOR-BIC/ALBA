@@ -45,19 +45,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
 
-//=========================================================================
-vtkProjectSP* vtkProjectSP::New()
-//=========================================================================
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkProjectSP");
-  if(ret)
-    {
-    return (vtkProjectSP*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkProjectSP;
-}
+vtkCxxRevisionMacro(vtkProjectSP, "$Revision: 1.3 $");
+vtkStandardNewMacro(vtkProjectSP);
 
 // Construct object to extract all of the input data.
 //=========================================================================

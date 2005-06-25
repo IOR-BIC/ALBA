@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkRGSliceAccumulate.cxx,v $
   Language:  C++
-  Date:      $Date: 2005-04-06 11:08:46 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-06-25 11:56:31 $
+  Version:   $Revision: 1.2 $
 
 
 Copyright (c) 1993-1998 Ken Martin, Will Schroeder, Bill Lorensen.
@@ -45,19 +45,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
 
-//--------------------------------------------------------------------------------------
-vtkRGSliceAccumulate* vtkRGSliceAccumulate::New()
-//--------------------------------------------------------------------------------------
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkRGSliceAccumulate");
-  if(ret)
-    {
-    return (vtkRGSliceAccumulate*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkRGSliceAccumulate;
-}
+vtkCxxRevisionMacro(vtkRGSliceAccumulate, "$Revision: 1.2 $");
+vtkStandardNewMacro(vtkRGSliceAccumulate);
+
 //--------------------------------------------------------------------------------------
 vtkRGSliceAccumulate::vtkRGSliceAccumulate()
 //--------------------------------------------------------------------------------------

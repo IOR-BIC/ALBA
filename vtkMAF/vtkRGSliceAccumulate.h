@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkRGSliceAccumulate.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-06 11:08:46 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-06-25 11:56:31 $
+  Version:   $Revision: 1.2 $
 
 
 Copyright (c) 1993-1998 Ken Martin, Will Schroeder, Bill Lorensen.
@@ -60,7 +60,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 class VTK_vtkMAF_EXPORT vtkRGSliceAccumulate : public vtkRectilinearGridSource
 {
 public:
-  vtkTypeMacro(vtkRGSliceAccumulate,vtkRectilinearGridSource);
+  vtkTypeRevisionMacro(vtkRGSliceAccumulate,vtkRectilinearGridSource);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 	static vtkRGSliceAccumulate *New();
