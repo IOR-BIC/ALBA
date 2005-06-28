@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkVolumeSlicer.cxx,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 16:20:03 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-06-28 09:53:28 $
+  Version:   $Revision: 1.6 $
 
 =========================================================================*/
 #include "vtkObjectFactory.h"
@@ -21,7 +21,7 @@
 
 #include "assert.h"
 
-vtkCxxRevisionMacro(vtkVolumeSlicer, "$Revision: 1.5 $");
+vtkCxxRevisionMacro(vtkVolumeSlicer, "$Revision: 1.6 $");
 vtkStandardNewMacro(vtkVolumeSlicer);
 
 typedef unsigned short u_short;
@@ -62,7 +62,7 @@ vtkVolumeSlicer::~vtkVolumeSlicer() {
 
 
 //----------------------------------------------------------------------------
-void vtkVolumeSlicer::SetPlaneAxisX(float axis[3]) {
+void vtkVolumeSlicer::SetPlaneAxisX(double axis[3]) {
   if (vtkMath::Norm(axis) < 1.e-5f)
     return;
   memcpy(this->PlaneAxisX, axis, sizeof(this->PlaneAxisX));
@@ -71,7 +71,7 @@ void vtkVolumeSlicer::SetPlaneAxisX(float axis[3]) {
   }
 
 //----------------------------------------------------------------------------
-void vtkVolumeSlicer::SetPlaneAxisY(float axis[3]) {
+void vtkVolumeSlicer::SetPlaneAxisY(double axis[3]) {
   if (vtkMath::Norm(axis) < 1.e-5f)
     return;
   memcpy(this->PlaneAxisY, axis, sizeof(this->PlaneAxisY));
