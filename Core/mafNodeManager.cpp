@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 11:02:58 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-06-28 09:49:27 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -376,13 +376,13 @@ void mafNodeManager::VmeRemove(mafNode *n)
   }
 }
 //----------------------------------------------------------------------------
-void mafNodeManager::TimeSet(float time)
+void mafNodeManager::TimeSet(double time)
 //----------------------------------------------------------------------------
 {
   //if(m_root) m_root->SetTreeTime(time);
 }
 //----------------------------------------------------------------------------
-void mafNodeManager::TimeGetBounds(float *min, float *max)
+void mafNodeManager::TimeGetBounds(double *min, double *max)
 //----------------------------------------------------------------------------
 {
   /*

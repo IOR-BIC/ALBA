@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:46:44 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-06-28 09:49:27 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -70,10 +70,10 @@ public:
   void VmeRemove(mafNode *n);
 
 	/** Get the time bounds of the tree. */
-  void TimeGetBounds(float *min, float *max);
+  void TimeGetBounds(double *min, double *max);
 
 	/** Set the time for the tree. */
-  void TimeSet(float time);
+  void TimeSet(double time);
 
 	/** Send the event VME_REMOVING to inform logic that the vme and its subtree are removed from the tree. */
   void NotifyRemove(mafNode *n);

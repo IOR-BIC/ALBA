@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 11:03:55 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-06-28 09:49:27 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -418,13 +418,13 @@ void mafVMEManager::VmeRemove(mafNode *n)
   }
 }
 //----------------------------------------------------------------------------
-void mafVMEManager::TimeSet(float time)
+void mafVMEManager::TimeSet(double time)
 //----------------------------------------------------------------------------
 {
   if(m_Storage->GetRoot()) m_Storage->GetRoot()->SetTreeTime(time);
 }
 //----------------------------------------------------------------------------
-void mafVMEManager::TimeGetBounds(float *min, float *max)
+void mafVMEManager::TimeGetBounds(double *min, double *max)
 //----------------------------------------------------------------------------
 {
   

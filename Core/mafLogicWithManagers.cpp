@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 09:44:03 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2005-06-28 09:49:27 $
+  Version:   $Revision: 1.23 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -619,7 +619,7 @@ void mafLogicWithManagers::TimeSet(float t)
 void mafLogicWithManagers::UpdateTimeBounds()
 //----------------------------------------------------------------------------
 {
-  float min,max; 
+  double min,max; 
   if(m_VMEManager) m_VMEManager->TimeGetBounds(&min,&max);
   if(m_TimePanel)  m_TimePanel->SetBounds(min,max);
   if(m_TimeSash)   m_TimeSash->Show(min!=max);
