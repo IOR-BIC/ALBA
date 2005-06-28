@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 17:02:54 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-06-28 09:49:57 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone, Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -39,7 +39,7 @@ mafCxxTypeMacro(mafEvent);
 //----------------------------------------------------------------------------
 // Constants
 //----------------------------------------------------------------------------
-enum 
+enum HIGHEST_EVENT_ID
 {
   NO_EVENT =9999//= wxID_HIGHEST +1
 };
