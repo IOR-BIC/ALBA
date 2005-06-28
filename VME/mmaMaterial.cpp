@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-30 15:54:55 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-06-28 09:52:49 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -19,12 +19,13 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+#include "mmaMaterial.h"
+
 #include <wx/image.h>
 #include <wx/bitmap.h>
 #include <wx/event.h>
 #include <wx/settings.h>
 
-#include "mmaMaterial.h"
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "vtkMAFSmartPointer.h"

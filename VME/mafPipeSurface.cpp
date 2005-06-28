@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 09:49:35 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-06-28 09:52:14 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -75,7 +75,7 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
   m_OutlineActor    = NULL;
   m_ScalarVisibility= 0;
 
-  assert(m_Vme->IsA("mafVMESurface"));
+  assert(m_Vme->IsMAFType(mafVMESurface));
   mafVMESurface *vme = ((mafVMESurface*) m_Vme);
   assert(vme->GetSurfaceOutput());
   vme->GetSurfaceOutput()->Update();
