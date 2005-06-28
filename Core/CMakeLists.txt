@@ -58,6 +58,10 @@ mafPipe.cpp
 mafPipe.h
 mafRoot.cpp
 mafRoot.h
+mafRWI.cpp
+mafRWI.h
+mafRWIBase.cpp
+mafRWIBase.h
 mafSceneGraph.cpp
 mafSceneGraph.h
 mafSceneNode.cpp
@@ -110,11 +114,20 @@ IF (MAF_USE_VTK)
 ENDIF (MAF_USE_VTK)
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS mafBase mafIO mafGui)
+SET(PROJECT_LIBS mafBase mafIO mafGui mafInteraction)
 
 IF (MAF_USE_VTK)
   SET(PROJECT_LIBS ${PROJECT_LIBS} vtkCommon)
 ENDIF (MAF_USE_VTK)
+
+IF (NOT WIN32)
+  #INCLUDE (${MAF_SOURCE_DIR}/modules/FindGTK20.cmake)
+  INCLUDE (${CMAKE_ROOT}/Modules/FindGTK.cmake)
+  INCLUDE_DIRECTORIES(${GTK_gtk_INCLUDE_PATH})
+  INCLUDE_DIRECTORIES(${GTK_glib_INCLUDE_PATH})
+  INCLUDE_DIRECTORIES(${GTK_glibconfig_INCLUDE_PATH})
+  #INCLUDE_DIRECTORIES(${GTK_gtkgl_INCLUDE_PATH})
+ENDIF (NOT WIN32)
 
 # Create the library.
 ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})

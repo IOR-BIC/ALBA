@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:43:06 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-06-28 10:21:56 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,6 +30,7 @@ class mafOpManager;
 class mafSideBar;
 class mmgMaterialChooser;
 class mafVME;
+class mafInteractionManager;
 
 //----------------------------------------------------------------------------
 // mafLogicWithManagers :
@@ -87,6 +88,7 @@ public:
   void PlugVMEManager(bool b) {m_UseVMEManager =b;};
   void PlugViewManager(bool b){m_UseViewManager=b;};
   void PlugOpManager(bool b){m_UseOpManager=b;};
+  void PlugInteractionManger(bool b){m_UseInteractionManager=b;}
 
   /** Redefined to Fill the menu's */
   virtual void Show();
@@ -173,10 +175,11 @@ protected:
   /** Called after FileOpen or Save operation */
   void UpdateFrameTitle();
 
-  mafSideBar      *m_SideBar;
-  mafVMEManager   *m_VMEManager;
-  mafViewManager  *m_ViewManager;
-  mafOpManager    *m_OpManager;
+  mafSideBar             *m_SideBar;
+  mafVMEManager          *m_VMEManager;
+  mafViewManager         *m_ViewManager;
+  mafOpManager           *m_OpManager;
+  mafInteractionManager  *m_InteractionManager;
 
   mmgMaterialChooser *m_MaterialChooser;
 
@@ -189,5 +192,6 @@ protected:
   bool m_UseVMEManager;
   bool m_UseViewManager;
   bool m_UseOpManager;
+  bool m_UseInteractionManager;
 };
 #endif

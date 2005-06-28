@@ -10,10 +10,6 @@ mafLightKit.cpp
 mafLightKit.h
 mafPics.cpp
 mafPics.h
-mafRWI.cpp
-mafRWI.h
-mafRWIBase.cpp
-mafRWIBase.h
 mafSideBar.cpp
 mafSideBar.h
 mafWXLog.cpp

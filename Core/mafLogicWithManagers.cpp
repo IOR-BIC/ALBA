@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 09:49:27 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2005-06-28 10:21:55 $
+  Version:   $Revision: 1.24 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,6 +27,8 @@
 #include "mafVMEManager.h"
 #include "mafOp.h"
 #include "mafOpManager.h"
+#include "mafInteractionManager.h"
+#include "mafInteractor.h"
 
 #include "mmgMDIFrame.h"
 #include "mmgCheckTree.h"
@@ -35,17 +37,25 @@
 #include "mafSideBar.h"
 #include "mmgTimeBar.h"
 #include "mmgMaterialChooser.h"
-
+#include "mafOp.h"
+#include "mmiPER.h"
 //----------------------------------------------------------------------------
 mafLogicWithManagers::mafLogicWithManagers()
 : mafLogicWithGUI()
 //----------------------------------------------------------------------------
 {
   m_SideBar     = NULL;
-  m_VMEManager  = false;
-  m_ViewManager = false;
-  m_OpManager   = false;
+  m_UseVMEManager  = true;
+  m_UseViewManager = true;
+  m_UseOpManager   = true;
+  m_UseInteractionManager = true;
   
+  
+  m_VMEManager  = NULL;
+  m_ViewManager = NULL;
+  m_OpManager   = NULL;
+  m_InteractionManager = NULL;
+
   m_ImportMenu  = NULL; 
   m_ExportMenu  = NULL; 
   m_OpMenu      = NULL;
@@ -77,11 +87,20 @@ void mafLogicWithManagers::Configure()
     m_VMEManager = new mafVMEManager();
     m_VMEManager->SetListener(this); 
   }
+
+  if (m_UseInteractionManager)
+  {
+    m_InteractionManager = new mafInteractionManager;
+    m_InteractionManager->SetListener(this);
+  }
+
   if(m_UseViewManager)
   {
     m_ViewManager = new mafViewManager();
     m_ViewManager->SetListener(this); 
+    m_ViewManager->SetMouse(m_InteractionManager->GetMouseDevice());
   }
+
   if(m_UseOpManager)
   {
     m_OpManager = new mafOpManager();
@@ -102,6 +121,18 @@ void mafLogicWithManagers::Plug(mafOp *op)
   if(m_OpManager) 
   {
     m_OpManager->OpAdd(op);
+    
+    if (m_InteractionManager)
+    {
+      if (const char **actions = op->GetActions())
+      {
+        const char *action;
+        for (int i=0;action=actions[i];i++)
+        {
+          m_InteractionManager->AddAction(action);
+        }
+      }
+    }
   }
 }
 //----------------------------------------------------------------------------
@@ -158,6 +189,7 @@ void mafLogicWithManagers::CreateMenu()
   file_menu->Append(MENU_FILE_OPEN,  "&Open ..");
   file_menu->Append(MENU_FILE_SAVE,  "&Save");
   file_menu->Append(MENU_FILE_SAVEAS,"Save &As ..");
+  file_menu->Append(MENU_FILE_SAVEAS,"Save &As ..");
 
   m_ImportMenu = new wxMenu;
   file_menu->AppendSeparator();
@@ -193,6 +225,11 @@ void mafLogicWithManagers::CreateMenu()
 
   m_OpMenu = new wxMenu;
   m_MenuBar->Append(m_OpMenu, "&Operations");
+
+  wxMenu    *option_menu = new wxMenu;
+  option_menu->AppendSeparator();
+  option_menu->Append(MENU_OPTION_DEVICE_SETTINGS, "Interaction Settings");
+  m_MenuBar->Append(option_menu, "&Preferences");
 
   m_Win->SetMenuBar(m_MenuBar);
 }
@@ -312,14 +349,13 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       break;
     case VIEW_DELETE:
       if(m_PlugSidebar)
-        this->m_SideBar->ViewDeleted(e->GetView());
+        this->m_SideBar->ViewDeleted(e->GetView()); // changed By Marco (is it correct?)
+      if(m_InteractionManager)
+        m_InteractionManager->ViewSelected(NULL);
       break;	
     case VIEW_SELECT:
       ViewSelect();
       break;
-    case CAMERA_UPDATE:
-      if(m_ViewManager) m_ViewManager->CameraUpdate();
-      break; 
     case CAMERA_RESET:
       if(m_ViewManager) m_ViewManager->CameraReset();
       break; 
@@ -327,11 +363,71 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       if(m_ViewManager) m_ViewManager->CameraReset(true);
       break;
     case CAMERA_FLYTO:
-      //if(m_ViewManager) m_ViewManager->CameraFlyToMode();
+      if(m_ViewManager) m_ViewManager->CameraFlyToMode();
+      if(m_InteractionManager) m_InteractionManager->CameraFlyToMode();  //modified by Marco. 15-9-2004 fly to with devices.
       break;
     case TIME_SET:
       TimeSet(e->GetDouble());
+      break;
+    // ###############################################################
+    // commands related to interaction manager
+    case MENU_OPTION_DEVICE_SETTINGS:
+      m_InteractionManager->ShowModal();
+      break;
+    case CAMERA_PRE_RESET:
+      if(m_InteractionManager) 
+      {
+        vtkRenderer *ren = (vtkRenderer*)e->GetVtkObj();
+        //assert(ren);
+        m_InteractionManager->PreResetCamera(ren);
+        //wxLogMessage("CAMERA_PRE_RESET");
+      }
+      break;
+    case CAMERA_POST_RESET:
+      if(m_InteractionManager) 
+      {
+        vtkRenderer *ren = (vtkRenderer*)e->GetVtkObj();
+        //assert(ren); //modified by Marco. 2-11-2004 Commented out to allow reset camera of all cameras.
+        m_InteractionManager->PostResetCamera(ren);
+        //wxLogMessage("CAMERA_POST_RESET");
+      }
+      break;
+    case CAMERA_UPDATE:
+      if(m_ViewManager) m_ViewManager->CameraUpdate();
+      if(m_InteractionManager) m_InteractionManager->CameraUpdate(e->GetView());
+      break;
+    case CAMERA_SYNCHRONOUS_UPDATE:     
+      m_ViewManager->CameraUpdate();
+      break;
+    case INTERACTOR_ADD:
+      if(m_InteractionManager)
+      {
+        mafInteractor *interactor = mafInteractor::SafeDownCast(e->GetMafObject());
+        assert(interactor);
+        mafString *action_name = e->GetString();
+        m_InteractionManager->BindAction(*action_name,interactor);
+      }
+      break;
+    case INTERACTOR_REMOVE:
+      if(m_InteractionManager) 
+      {
+        mafInteractor *interactor = mafInteractor::SafeDownCast(e->GetMafObject());
+        assert(interactor);
+        mafString *action_name = e->GetString();
+        m_InteractionManager->UnBindAction(*action_name,interactor);
+      }
+      break;
+    case PER_PUSH:
+      if(m_InteractionManager)
+      {        
+        mmiPER *per = mmiPER::SafeDownCast(e->GetMafObject());
+        assert(per);
+        m_InteractionManager->PushPER(per);
+      }
       break; 
+    case PER_POP:
+      if(m_InteractionManager) m_InteractionManager->PopPER();
+      break;
     default:
       mafLogicWithGUI::OnEvent(maf_event);
       break; 
@@ -430,6 +526,7 @@ void mafLogicWithManagers::OnQuit()
   cppDEL(m_VMEManager);
   cppDEL(m_ViewManager);
   cppDEL(m_OpManager);
+  cppDEL(m_InteractionManager);
 
   // must be deleted after m_VMEManager
   cppDEL(m_SideBar);
@@ -440,31 +537,34 @@ void mafLogicWithManagers::OnQuit()
 void mafLogicWithManagers::VmeSelect(mafEvent& e)	//modified by Paolo 10-9-2003
 //----------------------------------------------------------------------------
 {
-  mafNode *vme = NULL;
+  mafNode *node = NULL;
 
 	if(m_PlugSidebar && (e.GetSender() == this->m_SideBar->GetTree()))
-    vme = (mafNode*)e.GetArg();//sender == tree => the vme is in e.arg
+    node = (mafNode*)e.GetArg();//sender == tree => the node is in e.arg
   else
-    vme = e.GetVme();          //sender == ISV  => the vme is in e.vme  
+    node = e.GetVme();          //sender == PER  => the node is in e.node  
 
-	if(vme == NULL)
-	{
-		if(m_VMEManager)
+  if(node == NULL)
+  {
+    if(m_VMEManager)
     {
 /*
-      //vme can be selected by its name
+      //node can be selected by its name
 		  wxString *vme_name = e.GetString()->c_str(); //@@@@@ ????
 		  mafNodeRoot *root = this->m_VMEManager->GetRoot();
 		  if (vme_name && root)
 		  {
-			  vme = root->FindInTreeByName(vme_name->c_str());        // not yet implemented
-			  e.SetVme(vme);
-		  }
+			  node = root->FindInTreeByName(vme_name->c_str());        // not yet implemented
+			  e.SetVme(node);
+      }
 */
     }
-	}
-  if(vme != NULL && m_OpManager)
-		m_OpManager->OpSelect(vme);
+  }
+  if(node != NULL && m_OpManager)
+    m_OpManager->OpSelect(node);
+    
+  if (m_InteractionManager)
+    m_InteractionManager->VmeSelected(node);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeSelected(mafNode *vme)

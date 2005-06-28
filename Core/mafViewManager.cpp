@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 11:03:55 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2005-06-28 10:21:57 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,15 +29,15 @@
 
 #include "mmgMDIFrame.h"
 #include "mmgMDIChild.h"
+#include "mafViewVTK.h"
+
+//#include "wx/busyinfo.h"
+#include "mafEvent.h"
+#include "mafRWIBase.h"
+#include "mmdMouse.h"
 
 /*
-#include "wx/busyinfo.h"
-#include "mafInteractionDecl.h"
-#include "mafEventBase.h"
-#include "mafRWIBase.h"
-#include "mafDevice.h"
 #include "typeinfo.h"
-#include "mafAction.h"
 #include "vtkRenderWindow.h"
 #include "vtkWindowToImageFilter.h"
 #include "vtkBMPWriter.h"
@@ -46,19 +46,19 @@
 mafViewManager::mafViewManager()
 //----------------------------------------------------------------------------
 {
-  //m_MouseAction  = NULL;
-  //m_selected_rwi = NULL;
+  m_Mouse       = NULL;
+  m_SelectedRWI = NULL;
   //m_is=NULL;
 
-  m_ViewList              = NULL;
-  m_Listener           = NULL;
+  m_ViewList          = NULL;
+  m_Listener          = NULL;
   m_SelectedVme       = NULL;
   m_SelectedView      = NULL;
 	m_RootVme           = NULL;
-  m_ViewBeingCreated = NULL; 
+  m_ViewBeingCreated  = NULL; 
   m_TemplateNum       = 0;
   for(int i=0; i<MAXVIEW; i++) 
-    m_ViewTemplate[i]=NULL;
+    m_ViewTemplate[i] = NULL;
 
   // Paolo 2005-04-22
   for(int t=0; t<MAXVIEW; t++)
@@ -68,11 +68,10 @@ mafViewManager::mafViewManager()
 //----------------------------------------------------------------------------
 mafViewManager::~mafViewManager( ) 
 //----------------------------------------------------------------------------
-{
-	/*
-	if(m_selected_rwi)
-    m_selected_rwi->SetMouseAction(NULL);
-	*/
+{	
+	if(m_SelectedRWI)
+    m_SelectedRWI->SetMouse(NULL);
+	
 	mafView *v;
 
   while(m_ViewList)
@@ -84,16 +83,16 @@ mafViewManager::~mafViewManager( )
 
   for(int i=0; i<m_TemplateNum; i++) delete m_ViewTemplate[i];
 }
-/*
+
 //----------------------------------------------------------------------------
-void mafViewManager::SetMouseAction(mafAction *action)
+void mafViewManager::SetMouse(mmdMouse *mouse)
 //----------------------------------------------------------------------------
 {
-  m_MouseAction = action;
-  if(m_SelectedView)
-    m_MouseAction->ProcessEvent(mafSmartEvent(this,ViewSelectedEvent,m_SelectedView));
+  m_Mouse = mouse;
+  if(m_SelectedView && m_Mouse)
+    m_Mouse->OnEvent(&mafEvent(this,VIEW_SELECT,m_SelectedView));
 }
-*/
+
 //----------------------------------------------------------------------------
 void mafViewManager::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
@@ -145,11 +144,21 @@ void mafViewManager::ViewSelected(mafView *view/*, mafRWIBase *rwi*/)
 {
   m_SelectedView = view;
 
-  //if(m_selected_rwi)
-  //  m_selected_rwi->SetInteractorStyle(NULL);
-  //m_selected_rwi = rwi;
+  if(m_SelectedRWI)
+    m_SelectedRWI->SetInteractorStyle(NULL);
 
-  //m_MouseAction->ProcessEvent(mafSmartEvent(this,ViewSelectedEvent,m_SelectedView),mafDevice::DeviceOutputChannel);
+  mafViewVTK *vtk_view=mafViewVTK::SafeDownCast(view);
+  if (vtk_view)
+  {
+    m_SelectedRWI = vtk_view->GetRWI();
+  
+    if (m_Mouse)
+    {
+      mafEvent e(this,VIEW_SELECT,m_SelectedView);
+      e.SetChannel(MCH_OUTPUT);
+      m_Mouse->OnEvent(&e);
+    }
+  }
 }
 //----------------------------------------------------------------------------
 void mafViewManager::VmeAdd(mafNode *n)   
@@ -356,7 +365,12 @@ void mafViewManager::ViewInsert(mafView *view)
 //----------------------------------------------------------------------------
 {
 	view->SetListener(this);
-//@@@  view->SetMouseAction(m_MouseAction);
+
+  mafViewVTK *vtk_view = mafViewVTK::SafeDownCast(view);
+  if (vtk_view)
+  {
+    vtk_view->SetMouse(m_Mouse);
+  }
 
   if(m_RootVme != NULL)
   {
@@ -409,14 +423,12 @@ void mafViewManager::ViewDelete(mafView *view)
 
   if(m_SelectedView)
 	{
-/*@@@
-    if(m_selected_rwi) 
+    if(m_SelectedRWI) 
       //old m_selected_rwi->SetInteractorStyle(NULL); 
-      m_selected_rwi->SetMouseAction(NULL);
+      m_SelectedRWI->SetMouse(NULL);
 //old		m_is->SetInteractor(NULL);
 //old    m_is->SetListener(this); // A. Savenko
-    m_selected_rwi = NULL;
-    */
+    m_SelectedRWI = NULL;
     m_SelectedView = NULL;
 	}
 	delete view;

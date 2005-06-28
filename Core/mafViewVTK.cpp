@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-16 14:39:37 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-06-28 10:21:57 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -93,6 +93,14 @@ void mafViewVTK::Create()
 
   m_Rwi->m_Camera->SetClippingRange(0.1,1000); 
   this->CameraReset();
+}
+
+//----------------------------------------------------------------------------
+void  mafViewVTK::SetMouse(mmdMouse *mouse)
+//----------------------------------------------------------------------------
+{
+  assert(m_Rwi->m_RwiBase);
+  m_Rwi->m_RwiBase->SetMouse(mouse);
 }
 
 //----------------------------------------------------------------------------

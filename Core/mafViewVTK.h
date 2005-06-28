@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-16 14:39:37 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-06-28 10:21:57 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,6 +25,7 @@
 class mafLightKit;
 class mafVME;
 class vtkMatrix4x4;
+class mmdMouse;
 
 //----------------------------------------------------------------------------
 // mafViewVTK :
@@ -46,7 +47,7 @@ public:
   virtual void			OnEvent(mafEventBase *maf_event);
 
   /** IDs for the GUI */
-  enum 
+  enum VIEW_WIDGET_ID
   {
     ID_ATTACH_CAMERA = Superclass::ID_LAST,
     ID_LAST
@@ -68,6 +69,8 @@ public:
 
   virtual mafSceneGraph *GetSceneGraph()	  {return m_Sg;}; 
   virtual mafRWIBase    *GetRWI()           {return m_Rwi->m_RwiBase;};
+
+  void              SetMouse(mmdMouse *mouse);
 
 protected:
   mafRWI        *m_Rwi; 

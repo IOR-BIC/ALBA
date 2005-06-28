@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2005-06-06 15:30:36 $
-# Version:   $Revision: 1.23 $
+# Date:      $Date: 2005-06-28 10:22:15 $
+# Version:   $Revision: 1.24 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -122,7 +122,7 @@ IF (MAF_CAN_BUILD)
   DBG_MESSAGE("MAF: Configuring MAF Kits")
   MESSAGE(STATUS "MAF: Configuring MAF Kits")
   SUBDIRS (Base)
-  #SUBDIRS (Interaction)
+  SUBDIRS (Interaction)
   SUBDIRS (Gui)
   SUBDIRS (IO)
   SUBDIRS (Core)

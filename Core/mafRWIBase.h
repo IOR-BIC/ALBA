@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 10:27:18 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-06-28 10:21:57 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,7 +25,7 @@ class wxKeyEvent;
 class wxSizeEvent;
 class vtkInteractorObserver;
 class vtkCamera;
-//class mafAction;
+class mmdMouse;
 //----------------------------------------------------------------------------
 // Constant:
 //----------------------------------------------------------------------------
@@ -58,6 +58,9 @@ public:
 
 	/** Notify mouse click on a view. */
   void NotifyClick();
+
+  /** set the mouse device to which forward events from the view */
+  void SetMouse(mmdMouse *mouse);
 
   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
   // vtk render window interactor methods
@@ -132,7 +135,7 @@ public:
 protected:
 	wxString   m_SaveDir;
   vtkCamera *m_Camera;
-//mafAction *m_MouseAction;
+  mmdMouse  *m_Mouse;
   bool       m_CustomInteractorStyle;
   
 	DECLARE_EVENT_TABLE()

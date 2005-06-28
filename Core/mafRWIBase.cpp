@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 10:27:18 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-06-28 10:21:56 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,15 +38,12 @@
 #endif
 
 #include "mafDecl.h"
-//#include "mafInteractionDecl.h"
-#include "mafEventBase.h"
-//#include "mafAction.h"
-//#include "mafDevice.h"
-//#include "mmdButtonsPad.h"
-//#include "mmdMouse.h"
+#include "mafDevice.h"
+#include "mmdButtonsPad.h"
+#include "mmdMouse.h"
+#include "mafEventInteraction.h"
+#include "mafEvent.h"
 
-//#include "mflSmartPointer.h"
-//#include "mflEventInteraction.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkCamera.h"
@@ -97,7 +94,7 @@ mafRWIBase::mafRWIBase(wxWindow *parent, wxWindowID id, const wxPoint &pos,
 	m_SaveDir = ::wxGetHomeDir(); m_SaveDir += "\\desktop"; 
   m_Width = m_Height = 10;
   m_Camera = NULL;
-//  m_MouseAction = NULL;
+  m_Mouse = NULL;
   m_CustomInteractorStyle = false;
 }
 //----------------------------------------------------------------------------
@@ -113,11 +110,11 @@ mafRWIBase * mafRWIBase::New()
   return new mafRWIBase();
 }
 //----------------------------------------------------------------------------
-//void mafRWIBase::SetMouseAction(mafAction *action)
+void mafRWIBase::SetMouse(mmdMouse *mouse)
 //----------------------------------------------------------------------------
-//{
-  //m_MouseAction = action;
-//}
+{
+  m_Mouse = mouse;
+}
 //----------------------------------------------------------------------------
 void mafRWIBase::Initialize()
 //----------------------------------------------------------------------------
@@ -262,14 +259,15 @@ void mafRWIBase::OnLeftMouseButtonDown(wxMouseEvent &event)
   }
   else
   {
-    /*
-    mflSMART(mflEventInteraction,e)(mmdButtonsPad::ButtonDownEvent,this,event.GetX(),m_Height - event.GetY() - 1);
-    e->SetButton(MAF_LEFT_BUTTON);
-    e->SetModifier(MAF_SHIFT_KEY,event.ShiftDown());
-    e->SetModifier(MAF_CTRL_KEY,event.ControlDown());
-    e->SetModifier(MAF_ALT_KEY,event.AltDown());
-    if(m_MouseAction) m_MouseAction->ProcessEvent(e,mafDevice::DeviceOutputChannel);
-    */
+    
+    mafEventInteraction e(this,mmdButtonsPad::BUTTON_DOWN);
+    e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
+    e.SetButton(MAF_LEFT_BUTTON);
+    e.SetModifier(MAF_SHIFT_KEY,event.ShiftDown());
+    e.SetModifier(MAF_CTRL_KEY,event.ControlDown());
+    e.SetModifier(MAF_ALT_KEY,event.AltDown());
+    e.SetChannel(MCH_OUTPUT);
+    if(m_Mouse) m_Mouse->OnEvent(&e);
   }
 }
 //----------------------------------------------------------------------------
@@ -288,14 +286,14 @@ void mafRWIBase::OnMiddleMouseButtonDown(wxMouseEvent &event)
   }
   else
   {
-    /*
-    mflSMART(mflEventInteraction,e)(mmdButtonsPad::ButtonDownEvent,this,event.GetX(),m_Height - event.GetY() - 1);
-    e->SetButton(MAF_MIDDLE_BUTTON);
-    e->SetModifier(MAF_SHIFT_KEY,event.ShiftDown());
-    e->SetModifier(MAF_CTRL_KEY,event.ControlDown());
-    e->SetModifier(MAF_ALT_KEY,event.AltDown());
-    if(m_MouseAction) m_MouseAction->ProcessEvent(e,mafDevice::DeviceOutputChannel);
-    */
+    mafEventInteraction e(this,mmdButtonsPad::BUTTON_DOWN);
+    e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
+    e.SetButton(MAF_MIDDLE_BUTTON);
+    e.SetModifier(MAF_SHIFT_KEY,event.ShiftDown());
+    e.SetModifier(MAF_CTRL_KEY,event.ControlDown());
+    e.SetModifier(MAF_ALT_KEY,event.AltDown());
+    e.SetChannel(MCH_OUTPUT);
+    if(m_Mouse) m_Mouse->OnEvent(&e);
   }
 }
 //----------------------------------------------------------------------------
@@ -314,14 +312,14 @@ void mafRWIBase::OnRightMouseButtonDown(wxMouseEvent &event)
   }
   else
   {
-    /*
-    mflSMART(mflEventInteraction,e)(mmdButtonsPad::ButtonDownEvent,this,event.GetX(),m_Height - event.GetY() - 1);
-    e->SetButton(MAF_RIGHT_BUTTON);
-    e->SetModifier(MAF_SHIFT_KEY,event.ShiftDown());
-    e->SetModifier(MAF_CTRL_KEY,event.ControlDown());
-    e->SetModifier(MAF_ALT_KEY,event.AltDown());
-    if(m_MouseAction) m_MouseAction->ProcessEvent(e,mafDevice::DeviceOutputChannel);
-    */
+    mafEventInteraction e(this,mmdButtonsPad::BUTTON_DOWN);
+    e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
+    e.SetButton(MAF_RIGHT_BUTTON);
+    e.SetModifier(MAF_SHIFT_KEY,event.ShiftDown());
+    e.SetModifier(MAF_CTRL_KEY,event.ControlDown());
+    e.SetModifier(MAF_ALT_KEY,event.AltDown());
+    e.SetChannel(MCH_OUTPUT);
+    if(m_Mouse) m_Mouse->OnEvent(&e);
   }
 }
 //----------------------------------------------------------------------------
@@ -337,14 +335,14 @@ void mafRWIBase::OnLeftMouseButtonUp(wxMouseEvent &event)
   }
   else
   {
-    /*
-    mflSMART(mflEventInteraction,e)(mmdButtonsPad::ButtonUpEvent,this,event.GetX(),m_Height - event.GetY() - 1);
-    e->SetButton(MAF_LEFT_BUTTON);
-    e->SetModifier(MAF_SHIFT_KEY,event.ShiftDown());
-    e->SetModifier(MAF_CTRL_KEY,event.ControlDown());
-    e->SetModifier(MAF_ALT_KEY,event.AltDown());
-    if(m_MouseAction) m_MouseAction->ProcessEvent(e,mafDevice::DeviceOutputChannel);
-    */
+    mafEventInteraction e(this,mmdButtonsPad::BUTTON_UP);
+    e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
+    e.SetButton(MAF_LEFT_BUTTON);
+    e.SetModifier(MAF_SHIFT_KEY,event.ShiftDown());
+    e.SetModifier(MAF_CTRL_KEY,event.ControlDown());
+    e.SetModifier(MAF_ALT_KEY,event.AltDown());
+    e.SetChannel(MCH_OUTPUT);
+    if(m_Mouse) m_Mouse->OnEvent(&e);
   }
   
   ReleaseMouse();
@@ -362,14 +360,14 @@ void mafRWIBase::OnMiddleMouseButtonUp(wxMouseEvent &event)
   }
   else
   {
-    /*
-    mflSMART(mflEventInteraction,e)(mmdButtonsPad::ButtonUpEvent,this,event.GetX(),m_Height - event.GetY() - 1);
-    e->SetButton(MAF_MIDDLE_BUTTON);
-    e->SetModifier(MAF_SHIFT_KEY,event.ShiftDown());
-    e->SetModifier(MAF_CTRL_KEY,event.ControlDown());
-    e->SetModifier(MAF_ALT_KEY,event.AltDown());
-    if(m_MouseAction) m_MouseAction->ProcessEvent(e,mafDevice::DeviceOutputChannel);
-    */
+    mafEventInteraction e(this,mmdButtonsPad::BUTTON_UP);
+    e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
+    e.SetButton(MAF_MIDDLE_BUTTON);
+    e.SetModifier(MAF_SHIFT_KEY,event.ShiftDown());
+    e.SetModifier(MAF_CTRL_KEY,event.ControlDown());
+    e.SetModifier(MAF_ALT_KEY,event.AltDown());
+    e.SetChannel(MCH_OUTPUT);
+    if(m_Mouse) m_Mouse->OnEvent(&e);
   }
 
   ReleaseMouse();
@@ -387,14 +385,14 @@ void mafRWIBase::OnRightMouseButtonUp(wxMouseEvent &event)
   }
   else
   {
-    /*
-    mflSMART(mflEventInteraction,e)(mmdButtonsPad::ButtonUpEvent,this,event.GetX(),m_Height - event.GetY() - 1);
-    e->SetButton(MAF_RIGHT_BUTTON);
-    e->SetModifier(MAF_SHIFT_KEY,event.ShiftDown());
-    e->SetModifier(MAF_CTRL_KEY,event.ControlDown());
-    e->SetModifier(MAF_ALT_KEY,event.AltDown());
-    if(m_MouseAction) m_MouseAction->ProcessEvent(e,mafDevice::DeviceOutputChannel);
-    */
+    mafEventInteraction e(this,mmdButtonsPad::BUTTON_UP);
+    e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
+    e.SetButton(MAF_RIGHT_BUTTON);
+    e.SetModifier(MAF_SHIFT_KEY,event.ShiftDown());
+    e.SetModifier(MAF_CTRL_KEY,event.ControlDown());
+    e.SetModifier(MAF_ALT_KEY,event.AltDown());
+    e.SetChannel(MCH_OUTPUT);
+    if(m_Mouse) m_Mouse->OnEvent(&e);
   }
 
   ReleaseMouse();
@@ -412,13 +410,13 @@ void mafRWIBase::OnMouseMotion(wxMouseEvent &event)
   }
   else
   {
-    /*
-    mflSMART(mflEventInteraction,e)(mmdMouse::Move2DEvent,this,event.GetX(),m_Height - event.GetY() - 1);
-    e->SetModifier(MAF_SHIFT_KEY,event.ShiftDown());
-    e->SetModifier(MAF_CTRL_KEY,event.ControlDown());
-    e->SetModifier(MAF_ALT_KEY,event.AltDown());
-    if(m_MouseAction) m_MouseAction->ProcessEvent(e,mafDevice::DeviceOutputChannel);
-    */
+    mafEventInteraction e(this,mmdMouse::MOUSE_2D_MOVE);
+    e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
+    e.SetModifier(MAF_SHIFT_KEY,event.ShiftDown());
+    e.SetModifier(MAF_CTRL_KEY,event.ControlDown());
+    e.SetModifier(MAF_ALT_KEY,event.AltDown());
+    e.SetChannel(MCH_OUTPUT);
+    if(m_Mouse) m_Mouse->OnEvent(&e);
   }
 }
 //----------------------------------------------------------------------------
@@ -473,7 +471,12 @@ void mafRWIBase::OnChar(wxKeyEvent &event)
   }
   else
   {
-    //if(m_MouseAction) m_MouseAction->ProcessEvent(mafSmartEvent(this,mmdMouse::CharEvent,(long) event.GetKeyCode()),mafDevice::DeviceOutputChannel);
+    if(m_Mouse) 
+    {
+      mafEvent e(this,mmdMouse::MOUSE_CHAR_EVENT,(long) event.GetKeyCode());
+      e.SetChannel(MCH_OUTPUT);
+      m_Mouse->OnEvent(&e);
+    }
   }
 
   event.Skip();
