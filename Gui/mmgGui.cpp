@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-22 07:02:28 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2005-06-28 09:51:06 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -755,7 +755,7 @@ wxSlider *mmgGui::Slider(int id,wxString label,int* var,int min, int max, wxStri
 	return sli;
 }
 //----------------------------------------------------------------------------
-mmgFloatSlider *mmgGui::FloatSlider(int id,wxString label,float *var,float min, float max, wxSize size, wxString tooltip) //<*> Si puo Chiamare Slider lo stesso 
+mmgFloatSlider *mmgGui::FloatSlider(int id,wxString label,double *var,double min, double max, wxSize size, wxString tooltip) //<*> Si puo Chiamare Slider lo stesso 
 //----------------------------------------------------------------------------                                            //<*> verificare se le entry erano abilitate o no
 {
   wxTextCtrl     *text = NULL;

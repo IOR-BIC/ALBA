@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMaterialChooser.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:44:10 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-06-28 09:49:06 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -107,15 +107,15 @@ protected:
 
 	mafString	m_MaterialName;
 	wxColour	m_AmbientColor;
-	float			m_AmbientIntensity;
+	double		m_AmbientIntensity;
 	wxColour	m_DiffuseColor;
-	float			m_DiffuseIntensity;
+	double		m_DiffuseIntensity;
 	wxColour	m_SpecularColor;
-	float			m_SpecularIntensity;
+	double		m_SpecularIntensity;
 	int				m_SpecularPower;
-	float			m_Opacity;
+	double		m_Opacity;
 	int				m_Wire;
 
-	mafString  m_Filename;
+	mafString m_Filename;
 };
 #endif // _mmgMaterialChooser_H_

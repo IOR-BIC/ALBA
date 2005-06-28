@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLightKit.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-16 11:04:17 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-06-28 09:51:05 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,7 +60,7 @@ mafLightKit::~mafLightKit()
 //----------------------------------------------------------------------------
 // constants
 //----------------------------------------------------------------------------
-enum 
+enum LIGHTKIT_WIDGET_ID
 {
 	ID_LIGHT_LIST = MINID,
 	ID_ADD_LIGHT,

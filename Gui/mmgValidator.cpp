@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgValidator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:52:40 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-06-28 09:51:07 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -133,7 +133,7 @@ bool mmgValidator::IsValid()
 		case VAL_FLOAT_SLIDER_2:
       if ( !(m_FloatSlider && m_FloatSlider->IsKindOf(CLASSINFO(mmgFloatSlider)))  ) return false;
       if ( !(m_TextCtrl && m_TextCtrl->IsKindOf(CLASSINFO(wxTextCtrl)))  ) return false;
-      if ( !m_FloatVar ) return false;
+      if ( !m_DoubleVar ) return false;
     break;
 		case VAL_CHECKBOX:
       if ( !(m_CheckBox && m_CheckBox->IsKindOf(CLASSINFO(wxCheckBox)))  ) return false;
@@ -322,31 +322,31 @@ mmgValidator::mmgValidator(mafObserver* listener,int mid,wxTextCtrl *win, int* v
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-mmgValidator::mmgValidator(mafObserver* listener, int mid, mmgFloatSlider  *win, float*  var, wxTextCtrl* lab) //FloatSlider
+mmgValidator::mmgValidator(mafObserver* listener, int mid, mmgFloatSlider  *win, double*  var, wxTextCtrl* lab) //FloatSlider
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);  
   m_Mode        = VAL_FLOAT_SLIDER;
   m_TextCtrl    = lab;
   m_FloatSlider = win;
-  m_FloatVar    = var;
-  m_WidgetData.dType  = FLOAT_DATA;
-  m_WidgetData.fValue = *var;
+  m_DoubleVar   = var;
+  m_WidgetData.dType  = DOUBLE_DATA;
+  m_WidgetData.dValue = *var;
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-mmgValidator::mmgValidator(mafObserver* listener,int mid,wxTextCtrl *win, float* var, mmgFloatSlider* lab,float min,float max)
+mmgValidator::mmgValidator(mafObserver* listener,int mid,wxTextCtrl *win, double* var, mmgFloatSlider* lab,double min,double max)
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);  
   m_Mode        = VAL_FLOAT_SLIDER_2;
   m_FloatSlider	= lab;
   m_TextCtrl		= win;
-  m_FloatVar    = var;
-	m_FloatMin		= min;
-	m_FloatMax		= max;
-  m_WidgetData.dType  = FLOAT_DATA;
-  m_WidgetData.fValue = *var;
+  m_DoubleVar   = var;
+	m_DoubleMin		= min;
+	m_DoubleMax		= max;
+  m_WidgetData.dType  = DOUBLE_DATA;
+  m_WidgetData.dValue = *var;
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
@@ -476,23 +476,23 @@ bool mmgValidator::Validate(wxWindow *parent)
     if (!res )
     {
 	    if(this->m_DecimalDigits == -1)
-				s.Printf("%g",*m_FloatVar);
+				s.Printf("%g",*m_DoubleVar);
 			else
-				s.Printf("%g",this->RoundValue(*m_FloatVar));
+				s.Printf("%g",this->RoundValue(*m_DoubleVar));
 	    m_TextCtrl->SetValue(s) ;
     }
-    if (val < m_FloatMin )
+    if (val < m_DoubleMin )
     {
-	    s.Printf("%g",m_FloatMin);
+	    s.Printf("%g",m_DoubleMin);
 	    m_TextCtrl->SetValue(s) ;
     }
-    if (val > m_FloatMax )
+    if (val > m_DoubleMax )
     {
-	    s.Printf("%g",m_FloatMax);
+	    s.Printf("%g",m_DoubleMax);
 	    m_TextCtrl->SetValue(s) ;
     }
-		this->m_FloatSlider->SetValue(*m_FloatVar);
-    m_WidgetData.fValue = *m_FloatVar;
+		this->m_FloatSlider->SetValue(*m_DoubleVar);
+    m_WidgetData.dValue = *m_DoubleVar;
 	}
   else if (m_Mode == VAL_DOUBLE )
   {
@@ -622,19 +622,19 @@ bool mmgValidator::TransferToWindow(void)
       m_Slider->SetValue(*m_IntVar);
 		break;
     case VAL_FLOAT_SLIDER:
-      m_FloatSlider->SetValue(*m_FloatVar);
-	    s.Printf("%g",*m_FloatVar);
+      m_FloatSlider->SetValue(*m_DoubleVar);
+	    s.Printf("%g",*m_DoubleVar);
       m_TextCtrl->SetValue(s);
     break;
 		case VAL_FLOAT_SLIDER_2:
-      if(*m_FloatVar < m_FloatMin ) *m_FloatVar = m_FloatMin;
-      if(*m_FloatVar > m_FloatMax ) *m_FloatVar = m_FloatMax;
+      if(*m_DoubleVar < m_DoubleMin ) *m_DoubleVar = m_DoubleMin;
+      if(*m_DoubleVar > m_DoubleMax ) *m_DoubleVar = m_DoubleMax;
 			if(this->m_DecimalDigits == -1)
-				s.Printf("%g",*m_FloatVar);
+				s.Printf("%g",*m_DoubleVar);
 			else
-				s.Printf("%g",this->RoundValue(*m_FloatVar));
+				s.Printf("%g",this->RoundValue(*m_DoubleVar));
       m_TextCtrl->SetValue(s);
-      m_FloatSlider->SetValue(*m_FloatVar);
+      m_FloatSlider->SetValue(*m_DoubleVar);
     break;
     case VAL_CHECKBOX:
       m_CheckBox->SetValue(*m_IntVar ? true : false);
@@ -722,13 +722,13 @@ bool mmgValidator::TransferFromWindow(void)
  		case VAL_FLOAT_SLIDER_2:
 			s = m_TextCtrl->GetValue();
 			res = s.ToDouble(&dval);
-      sf << *m_FloatVar;
-      sf.ToDouble(&f2d);
+      //sf << *m_DoubleVar;
+      //sf.ToDouble(&f2d);
 			if (res) 
-        res = !mafEquals(f2d,dval);
+        res = !mafEquals(*m_DoubleVar,dval);
 			if (res) 
-				*m_FloatVar = dval;
-      m_WidgetData.fValue = *m_FloatVar;
+				*m_DoubleVar = dval;
+      m_WidgetData.dValue = *m_DoubleVar;
 			return res;
     break;
     case VAL_DOUBLE:
@@ -790,8 +790,8 @@ bool mmgValidator::TransferFromWindow(void)
 			return res;
 		break;
     case VAL_FLOAT_SLIDER:
-			*m_FloatVar = m_FloatSlider->GetValue();
-      m_WidgetData.fValue = *m_FloatVar;
+			*m_DoubleVar = m_FloatSlider->GetValue();
+      m_WidgetData.dValue = *m_DoubleVar;
     break;
     case VAL_CHECKBOX:
 			*m_IntVar = m_CheckBox->GetValue();
@@ -881,7 +881,7 @@ void mmgValidator::OnScrollEvent(wxScrollEvent& event)
       break;
       case VAL_FLOAT_SLIDER:
 				TransferFromWindow();
-				s.Printf("%g",*m_FloatVar);
+				s.Printf("%g",*m_DoubleVar);
 				m_TextCtrl->SetValue(s);
 				mafEventMacro(mafEvent(m_FloatSlider, m_ModuleId));
       break;

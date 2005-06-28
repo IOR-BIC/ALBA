@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLightKit.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-16 11:04:17 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-06-28 09:51:05 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -81,9 +81,9 @@ protected:
 	wxListBox	*m_LightList;
 	LightItem *m_SelectedLight;
 	LightItem *m_LightItemList[MAX_NUM_LIGHT];
-	float			 m_LightAzimuth;
-	float			 m_LightElevation;
-	float			 m_LightIntensity;
+	double		 m_LightAzimuth;
+	double		 m_LightElevation;
+	double		 m_LightIntensity;
 	int				 m_LightOnOff;
 	wxColour	 m_LightColor;
 

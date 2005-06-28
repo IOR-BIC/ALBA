@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgFloatSlider.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:22 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-06-28 09:51:05 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,9 +35,9 @@
 //----------------------------------------------------------------------------
 mmgFloatSlider::mmgFloatSlider( wxWindow *parent, 
 															 wxWindowID id, 
-															 const float &value, 
-															 const float &minvalue, 
-															 const float &maxvalue, 
+															 const double &value, 
+															 const double &minvalue, 
+															 const double &maxvalue, 
 															 const wxPoint &position, 
 															 const wxSize &size, 
 															 long style ):
@@ -59,7 +59,7 @@ void mmgFloatSlider::SetNumberOfSteps(int num)
 	SetRange(this->Min,this->Max);
 }
 //----------------------------------------------------------------------------
-float mmgFloatSlider::GetValue()
+double mmgFloatSlider::GetValue()
 //----------------------------------------------------------------------------
 {
   int pos = wxSlider::GetValue();
@@ -68,7 +68,7 @@ float mmgFloatSlider::GetValue()
   return this->Value;
 }
 //----------------------------------------------------------------------------
-void mmgFloatSlider::SetValue(float value)
+void mmgFloatSlider::SetValue(double value)
 //----------------------------------------------------------------------------
 {
   this->Value = value;
@@ -81,26 +81,26 @@ void mmgFloatSlider::SetValue(float value)
 	wxSlider::SetValue(ceil((value-this->Min)/this->Step));
 }
 //----------------------------------------------------------------------------
-void mmgFloatSlider::SetMin(float min)
+void mmgFloatSlider::SetMin(double min)
 //----------------------------------------------------------------------------
 {
   SetRange(min,this->Max);
 }
 //----------------------------------------------------------------------------
-void mmgFloatSlider::SetMax(float max)
+void mmgFloatSlider::SetMax(double max)
 //----------------------------------------------------------------------------
 {
   SetRange(this->Min,max);
 }
 //----------------------------------------------------------------------------
-void mmgFloatSlider::SetRange(float min, float max, float value)
+void mmgFloatSlider::SetRange(double min, double max, double value)
 //----------------------------------------------------------------------------
 {
 	SetRange(min,max);
   SetValue(value);
 }
 //----------------------------------------------------------------------------
-void mmgFloatSlider::SetRange(float min, float max)
+void mmgFloatSlider::SetRange(double min, double max)
 //----------------------------------------------------------------------------
 {
   //if(abs(min)<1 || abs(max)<1 || (abs(max)-abs(min))<2 )
@@ -115,19 +115,19 @@ void mmgFloatSlider::SetRange(float min, float max)
   wxSlider::SetRange(0,this->Ticks);
 }
 //----------------------------------------------------------------------------
-float	mmgFloatSlider::Pow10(float exponent)
+double	mmgFloatSlider::Pow10(double exponent)
 //----------------------------------------------------------------------------
 {
    //pow dont work with negative exponent -- 
    if(exponent == 0)
      return 1;
    if(exponent > 0)
-     return pow(10.0f,exponent);
+     return pow((double)10.0,exponent);
    else
-     return 1/pow(10.0f,-exponent);
+     return 1/pow((double)10.0,-exponent);
 }
 //----------------------------------------------------------------------------
-float	mmgFloatSlider::Round(float val)
+double	mmgFloatSlider::Round(double val)
 //----------------------------------------------------------------------------
 {
 	if (val == 0) return 1;
@@ -137,7 +137,7 @@ float	mmgFloatSlider::Round(float val)
 
   // strange: (int)(-1f) = 0 --- anyway,it is fixed later
   int   exponent = (int)log10(val);
-  float mantissa = val/Pow10(exponent); 
+  double mantissa = val/Pow10(exponent); 
 
 	if(mantissa <1) // fix for val< 1
 	{
@@ -156,19 +156,19 @@ float	mmgFloatSlider::Round(float val)
   return sign*mantissa*Pow10(exponent);
 }
 //----------------------------------------------------------------------------
-void mmgFloatSlider::DiscretizeRangeRange(float min,float max,float n, float *ra,float *rb,float *rs)
+void mmgFloatSlider::DiscretizeRangeRange(double min,double max,double n, double *ra,double *rb,double *rs)
 //----------------------------------------------------------------------------
 {
-  float step = Round((max-min)/n);
+  double step = Round((max-min)/n);
 
-	float fmin = floor(min/step+0.5);
+	double fmin = floor(min/step+0.5);
 	int   imin = (int)(fmin);
-	float rmin = step*imin;
+	double rmin = step*imin;
 	if(rmin < min) rmin += step;
 
-	float fmax = floor(max/step+0.5);
+	double fmax = floor(max/step+0.5);
 	int   imax = (int)(fmax);
-	float rmax = step*imax;
+	double rmax = step*imax;
 	if(rmax > max) rmax -= step;
 
   *rs = step;

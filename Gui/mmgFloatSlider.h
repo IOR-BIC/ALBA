@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgFloatSlider.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:22 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-06-28 09:51:06 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,7 +25,7 @@
 //----------------------------------------------------------------------------
 // mmgFloatSlider
 /**  
-a Slider that can be used to set float values,
+a Slider that can be used to set double values,
 mmgFloatSlider send usual wxWindows Events;
 Use mmgFloatSlider in combination with a mmgValidator
 to receive notification as mafEvents.
@@ -38,25 +38,25 @@ public:
 	
   mmgFloatSlider::mmgFloatSlider( wxWindow *parent=NULL, 
 																	wxWindowID id=-1, 
-																	const float &value=0, 
-																	const float &minvalue=0, 
-																	const float &maxvalue=1,
+																	const double &value=0, 
+																	const double &minvalue=0, 
+																	const double &maxvalue=1,
 																	const wxPoint &position=wxDefaultPosition, 
 																	const wxSize& size=wxDefaultSize, 
 																	long style=wxSL_HORIZONTAL );
   ~mmgFloatSlider();
   
   /** Set the slider value. */
-	void SetValue(float value);
+	void SetValue(double value);
   
   /** Get the slider value. */
-  float GetValue();
+  double GetValue();
   
   /** Set the slider range and value. */
-	void SetRange(float min,float max,float value);
+	void SetRange(double min,double max,double value);
   
   /** Set the slider range. */
-	void SetRange(float min,float max);
+	void SetRange(double min,double max);
   
   /** Set the number of slider's steps. */
 	void SetNumberOfSteps(int num);
@@ -65,31 +65,31 @@ public:
 	int GetNumberOfSteps() {return this->Ticks;};
   
   /** Get the slider's step value. */
-  float GetStep() {return this->Step;};
+  double GetStep() {return this->Step;};
   
   /** Set the slider's max value. */
-	void SetMax(float max);
+	void SetMax(double max);
   
   /** Get the slider's max value. */
-  float GetMax() {return this->Max;};
+  double GetMax() {return this->Max;};
   
   /** Set the slider's min value. */
-	void SetMin(float min);
+	void SetMin(double min);
   
   /** Get the slider's min value. */
-  float GetMin() {return this->Min;};
+  double GetMin() {return this->Min;};
 
 protected:
-	float	Round(float val);
-  float	Pow10(float exponent);
-	void DiscretizeRangeRange(float min,float max,float n, float *ra,float *rb,float *rs);
+	double	Round(double val);
+  double	Pow10(double exponent);
+	void DiscretizeRangeRange(double min,double max,double n, double *ra,double *rb,double *rs);
 
 	int DesiredTicks;
 	int Ticks;
 	
-	float Value;
-	float Step;
-	float Max;
-	float Min;
+	double Value;
+	double Step;
+	double Max;
+	double Min;
 };
 #endif

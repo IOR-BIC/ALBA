@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:52:58 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-06-28 09:51:07 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -47,7 +47,7 @@ public:
   void OnEvent(mafEventBase *maf_event);
   
 	/** Set the bounds for the time bar. */
-	void SetBounds(float min, float max);
+	void SetBounds(double min, double max);
 	
 	/** Build the time bar settings panel and call ShowGui() method. */
 	//void ShowSettings();
@@ -59,9 +59,9 @@ public:
 	//void HideGui();
 
 protected:
-  float m_time; 
-  float m_time_min; 
-  float m_time_max; 
+  double m_time; 
+  double m_time_min; 
+  double m_time_max; 
   int   m_time_step; 
 
   wxBoxSizer		  *m_sizer;

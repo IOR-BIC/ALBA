@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:52:58 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-06-28 09:51:06 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -184,7 +184,7 @@ void mmgTimeBar::Update()
   mafYield();
 }
 //----------------------------------------------------------------------------
-void mmgTimeBar::SetBounds(float min, float max)
+void mmgTimeBar::SetBounds(double min, double max)
 //----------------------------------------------------------------------------
 {
   if(max <= min) max = min+1;

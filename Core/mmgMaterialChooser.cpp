@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMaterialChooser.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-16 13:45:32 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-06-28 09:49:06 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -70,7 +70,7 @@ mmgMaterialChooser::mmgMaterialChooser(wxString dialog_title)
 
   m_Filename = mafGetApplicationDirectory().c_str();
   m_Filename += "/mat_library.txt";
-
+  
   //initialize first material 
   m_MaterialName      = "new material";
 	m_AmbientColor      = wxColour(0,0,0);
@@ -188,7 +188,7 @@ void mmgMaterialChooser::CreateGUI()
 	m_Gui->FloatSlider(ID_OPACITY,"opacity",&m_Opacity,0.0,1.0);
 	m_Gui->Bool(ID_WIRE,"wireframe",&m_Wire,0);
 
-	m_Gui->Label		("");
+  m_Gui->Label		("");
 	m_Gui->Button(ID_ADD,"store current material in library");
 	m_Gui->Button(ID_REMOVE,"remove selected material from library");
   m_Gui->Enable(ID_REMOVE, false);

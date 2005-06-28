@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgValidator.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:50:10 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-06-28 09:51:07 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -62,8 +62,8 @@ public:
   mmgValidator (mafObserver* listener,int mid,wxTextCtrl   *win,   double* var, double min=-2000000000, double max=2000000000, int dec_digits = 2);//Double
   mmgValidator (mafObserver* listener,int mid,wxSlider     *win,   int*   var, wxTextCtrl* lab);
 	mmgValidator (mafObserver* listener,int mid,wxTextCtrl   *win,   int*   var, wxSlider* lab, int min=-32000,	int max=32000);
-  mmgValidator (mafObserver* listener,int mid,mmgFloatSlider *win, float* var, wxTextCtrl* lab);
-	mmgValidator (mafObserver* listener,int mid,wxTextCtrl		*win,		float* var, mmgFloatSlider* lab, float min=-2000000000, float	max=2000000000);
+  mmgValidator (mafObserver* listener,int mid,mmgFloatSlider *win, double* var, wxTextCtrl* lab);
+	mmgValidator (mafObserver* listener,int mid,wxTextCtrl		*win,	 double* var, mmgFloatSlider* lab, double min=-2000000000, double	max=2000000000);
   mmgValidator (mafObserver* listener,int mid,wxCheckBox   *win,   int*   var);
   mmgValidator (mafObserver* listener,int mid,wxRadioBox   *win,   int*   var);
   mmgValidator (mafObserver* listener,int mid,wxComboBox   *win,   int*   var);
