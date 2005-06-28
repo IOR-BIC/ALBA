@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-07 14:43:02 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-06-28 09:51:39 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,6 +27,7 @@
 #include "mafPipeBox.h"
 #include "mafPipeSurface.h"
 #include "mafPipeMeter.h"
+#include "mafPipeVolumeSlice.h"
 #include <string>
 #include <ostream>
 
@@ -75,6 +76,7 @@ mafPipeFactory::mafPipeFactory()
   mafPlugPipeMacro(mafPipeBox,"General pipe to show box for vtk data");
   mafPlugPipeMacro(mafPipeSurface,"Pipe to render vtk polydata as surface rendering");
   mafPlugPipeMacro(mafPipeMeter,"Pipe for mafVMEMeter");
+  mafPlugPipeMacro(mafPipeVolumeSlice,"Pipe for slicing a volume");
 }
 
 //------------------------------------------------------------------------------
