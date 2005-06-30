@@ -87,7 +87,7 @@ int VolumeSlicerTest()
   data->GetBounds(bounds);
   slicer->SetPlaneOrigin(bounds[0], bounds[2], (bounds[4] + bounds[5])*.5f);
   pslicer->SetPlaneOrigin(slicer->GetPlaneOrigin());
-  double x[3] = {1, 0, 0}, y[3] = {0, 1, 0}, normal[3];
+  float x[3] = {1, 0, 0}, y[3] = {0, 1, 0}, normal[3];
   vtkMath::Normalize(x);
   vtkMath::Normalize(y);
   vtkMath::Cross(y, x, normal);
