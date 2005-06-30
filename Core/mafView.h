@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-16 14:39:36 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2005-06-30 16:24:30 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,8 +23,6 @@
 #include "mmgGui.h"
 #include "mafPipe.h"
 
-#include <map>
-
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
@@ -40,13 +38,6 @@ enum NODE_STATUS_ID
   NODE_VISIBLE_ON,
   NODE_MUTEX_OFF,
   NODE_MUTEX_ON,
-};
-/** VME visibility attribute when plugging visual pipe.*/
-enum VME_VISIBILITY_ID
-{
-  NON_VISIBLE = 0,
-  VISIBLE,
-  MUTEX,
 };
 //----------------------------------------------------------------------------
 // mafView :
@@ -110,19 +101,6 @@ public:
 //  virtual void			ShowSettings()							{};
   virtual void			OnSize(wxSizeEvent &maf_event)	{};
 
-  /** Struct containing information regarding visual pipe plugged into the view. */
-  struct mafVisualPipeInfo
-  {
-    mafString m_PipeName;
-    long      m_Visibility;
-  };
-  typedef std::map<mafString, mafVisualPipeInfo> mafPipeMap;
-
-  /** Plug a visual pipe for a particular vme. It is used also to plug custom pipe.*/
-  void PlugVisualPipe(mafString vme_type, mafString pipe_type, long visibility = VISIBLE);
-  
-  mafPipeMap m_PipeMap;
-
 protected:
   mafObserver   *m_Listener;
   wxString       m_Label; 
@@ -135,6 +113,7 @@ protected:
 public:
   int            m_Mult;    ///< Used to store the multiplicity of the view type created (e.g. the 3rd view surface created).
   int            m_Id;      ///< Used to store the view type created (e.g. view surface).
+  bool           m_ExternalFlag;
   bool           m_Plugged; // forget it - it is used from outside 
   mafView       *m_Next;    // forget it - it is used from outside 
 
