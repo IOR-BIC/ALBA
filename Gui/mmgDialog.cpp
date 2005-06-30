@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialog.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:52:57 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-06-30 16:28:11 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -58,35 +58,35 @@ mmgDialog::mmgDialog(const wxString& title,long style)
 
   Create(mafGetFrame(),-1,title,wxDefaultPosition,wxDefaultSize,s); 
 
-  m_dialog_sizer  =  new wxBoxSizer( wxVERTICAL );
-  m_sizer         =  new wxBoxSizer( wxVERTICAL );
-  m_buttons_sizer =  NULL;
-  m_dialog_sizer->Add(m_sizer,1,wxEXPAND);
+  m_DialogSizer  =  new wxBoxSizer( wxVERTICAL );
+  m_GuiSizer     =  new wxBoxSizer( wxVERTICAL );
+  m_ButtonsSizer =  NULL;
+  m_DialogSizer->Add(m_GuiSizer,1,wxEXPAND);
 
-  m_ok_button    = NULL;
-  m_cancel_button = NULL;
-  m_close_button  = NULL;
+  m_OkButton     = NULL;
+  m_CancelButton = NULL;
+  m_CloseButton  = NULL;
 
   // To Paolo -- il sizer vuoto si setta un MinSize arbitrario -->  se non serve non lo metto
   if(style & mafOK || style & mafCANCEL || style & mafCLOSE )
   {
-    m_buttons_sizer =  new wxBoxSizer( wxHORIZONTAL );
-    m_dialog_sizer->Add(m_buttons_sizer,0,wxCENTRE);
+    m_ButtonsSizer =  new wxBoxSizer( wxHORIZONTAL );
+    m_DialogSizer->Add(m_ButtonsSizer,0,wxEXPAND|wxCENTRE);
   }
   if( style & mafOK )
   {
-    m_ok_button = new wxButton(this,wxID_OK,"ok");
-    m_buttons_sizer->Add(m_ok_button,0);
+    m_OkButton = new wxButton(this,wxID_OK,"ok");
+    m_ButtonsSizer->Add(m_OkButton,0,wxEXPAND);
   }
   if( style & mafCANCEL )
   {
-    m_cancel_button = new wxButton(this,wxID_CANCEL,"cancel");
-    m_buttons_sizer->Add(m_cancel_button ,0);
+    m_CancelButton = new wxButton(this,wxID_CANCEL,"cancel");
+    m_ButtonsSizer->Add(m_CancelButton ,0,wxEXPAND);
   }
   if( (style & mafCLOSE) )
   {
-    m_close_button = new wxButton(this,wxID_CLOSE,"close");
-    m_buttons_sizer->Add(m_close_button ,0);
+    m_CloseButton = new wxButton(this,wxID_CLOSE,"close");
+    m_ButtonsSizer->Add(m_CloseButton ,0,wxEXPAND);
   }
 }
 //----------------------------------------------------------------------------
@@ -98,11 +98,11 @@ mmgDialog::~mmgDialog( )
 int mmgDialog::ShowModal()
 //----------------------------------------------------------------------------
 {
-  m_dialog_sizer->SetMinSize(100,50); // looks ugly when it is empty
+  m_DialogSizer->SetMinSize(100,50); // looks ugly when it is empty
   //this->SetAutoLayout( TRUE ); -- not to be called here
-  this->SetSizer( m_dialog_sizer );
-  //m_dialog_sizer->Fit(this); //-- not to be called, is called by SetSizeHints
-  m_dialog_sizer->SetSizeHints(this);
+  this->SetSizer( m_DialogSizer );
+  //m_DialogSizer->Fit(this); //-- not to be called, is called by SetSizeHints
+  m_DialogSizer->SetSizeHints(this);
   return wxDialog::ShowModal();
 }
 //--------------------------------------------------------------------------------

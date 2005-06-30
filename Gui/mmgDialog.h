@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialog.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:52:57 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-06-30 16:28:11 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -74,26 +74,26 @@ public:
   void OnEvent(mafEventBase *maf_event);
 
   /** Add a widget to the dialog. */
-  void Add(wxWindow* window,int option = 0, int flag = wxEXPAND, int border = 0)  {window->Reparent(this); m_sizer->Add(window,option,flag,border);};
+  void Add(wxWindow* window,int option = 0, int flag = wxEXPAND, int border = 0)  {window->Reparent(this); m_GuiSizer->Add(window,option,flag,border);};
 
   /** Add a mmgGui to the dialog. TECH: this is to force the calling of the correct reparent, is not virtual in wxWindow */
-  void Add(mmgGui* window,int option = 0, int flag = wxEXPAND, int border = 0)  {window->Reparent(this); m_sizer->Add(window,option,flag,border);};
+  void Add(mmgGui* window,int option = 0, int flag = wxEXPAND, int border = 0)  {window->Reparent(this); m_GuiSizer->Add(window,option,flag,border);};
 
   /** Add a sizer to the dialog. */
-  void Add(wxSizer*  sizer, int option = 0, int flag = wxEXPAND, int border = 0)  {m_sizer->Add(sizer, option,flag,border);};
+  void Add(wxSizer*  sizer, int option = 0, int flag = wxEXPAND, int border = 0)  {m_GuiSizer->Add(sizer, option,flag,border);};
 
   /** Remove a widget from the dialog. */
-  bool Remove(wxWindow* window) {return m_sizer->Remove(window);};
+  bool Remove(wxWindow* window) {return m_GuiSizer->Remove(window);};
 
   /** Remove a sizer from the dialog. */
-  bool Remove(wxSizer*  sizer ) {return m_sizer->Remove(sizer);};
+  bool Remove(wxSizer*  sizer ) {return m_GuiSizer->Remove(sizer);};
 
   int ShowModal();
 
   /** Enable/Disable the default buttons -- doesn't apply to user created buttons */
-  void EnableOk(bool enable)     {if(m_ok_button)     m_ok_button->Enable(enable);};
-  void EnableCancel(bool enable) {if(m_cancel_button) m_cancel_button->Enable(enable);};
-  void EnableClose(bool enable)  {if(m_close_button)  m_close_button->Enable(enable);};
+  void EnableOk(bool enable)     {if(m_OkButton)     m_OkButton->Enable(enable);};
+  void EnableCancel(bool enable) {if(m_CancelButton) m_CancelButton->Enable(enable);};
+  void EnableClose(bool enable)  {if(m_CloseButton)  m_CloseButton->Enable(enable);};
 
   /** 
   Virtual functions called to terminate ShowModal - these can be redefined without providing the Event Table. 
@@ -111,15 +111,15 @@ public:
 
 
   // to Paolo
-  // m_sizer         forse sarebbe meglio chiamarlo m_UserSizer - e' dove l'user plugga i suoi widget
+  // m_GuiSizer         forse sarebbe meglio chiamarlo m_UserSizer - e' dove l'user plugga i suoi widget
   // m_PreviewSizer (se lo aggiungi) lo chiamerei m_ClientSizer - di fatto riempira la ClientArea della finestra
 
-  wxBoxSizer *m_sizer;          ///< Sizer for user widgets -- Calling Add() insert a widget in this sizer
-  wxBoxSizer *m_buttons_sizer;  ///< Sizer holding the ok,cancel,close button (if any)
-  wxBoxSizer *m_dialog_sizer;   ///< Dialog sizer -- manage the Dialog initial Size, and the other sizers
-  wxButton   *m_ok_button;      ///< Button used to close the dialog with wxID_OK
-  wxButton   *m_cancel_button;  ///< Button used to close the dialog with wxID_CANCEL
-  wxButton   *m_close_button;   ///< Button used to close the dialog with wxID_CLOSE
+  wxBoxSizer *m_GuiSizer;          ///< Sizer for user widgets -- Calling Add() insert a widget in this sizer
+  wxBoxSizer *m_ButtonsSizer;  ///< Sizer holding the ok,cancel,close button (if any)
+  wxBoxSizer *m_DialogSizer;   ///< Dialog sizer -- manage the Dialog initial Size, and the other sizers
+  wxButton   *m_OkButton;      ///< Button used to close the dialog with wxID_OK
+  wxButton   *m_CancelButton;  ///< Button used to close the dialog with wxID_CANCEL
+  wxButton   *m_CloseButton;   ///< Button used to close the dialog with wxID_CLOSE
 
   mafObserver *m_Listener;
 
