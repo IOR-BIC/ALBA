@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-30 12:41:42 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-06-30 16:31:19 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,6 +49,16 @@ public:
 	mafPipeVolumeSlice();
   virtual ~mafPipeVolumeSlice();
 	
+  /** process events coming from gui */
+  virtual void OnEvent(mafEventBase *maf_event);
+
+  /** IDs for the GUI */
+  enum PIPE_VOLUME_SLICE_WIDGET_ID
+  {
+    ID_RGB_LUT = Superclass::ID_LAST,
+    ID_LAST
+  };
+
   void InitializeSliceParameters(int mode, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox);
   virtual void Create(mafSceneNode *n);
 
@@ -95,6 +105,8 @@ protected:
 	/** Create the slicer pipeline. */
 	void CreateSlice(int mode);
 
+  virtual mmgGui  *CreateGui();
+
 	double m_Origin[3];
 	float  m_Normal[3][3];
 	float  m_XVector[3][3];
@@ -119,7 +131,7 @@ protected:
 
   vtkActor               *m_GhostActor;
 
-  bool                    m_ColorLUTEnabled;
+  int                     m_ColorLUTEnabled;
   bool                    m_ParametersInitialized;
   bool                    m_ShowVolumeBox;
 };  

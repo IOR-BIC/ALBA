@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-30 12:41:41 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-06-30 16:31:18 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,6 +21,7 @@
 
 #include "mafPipeVolumeSlice.h"
 #include "mafDecl.h"
+#include "mmgGui.h"
 #include "mmgMaterialButton.h"
 #include "mafSceneNode.h"
 
@@ -63,11 +64,11 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
     m_SliceActor[i]	      = NULL;
   }
   m_ParametersInitialized = false;
-  m_ColorLUTEnabled       = false;
   m_ShowVolumeBox         = false;
 
   m_SliceMode = SLICE_Z;
 
+  m_ColorLUTEnabled       = 0;
   m_SliceOpacity  = 1.0;
   m_TextureRes    = 512;
 
@@ -455,7 +456,7 @@ void mafPipeVolumeSlice::ColorLookupTable(bool enable)
         m_Texture[i]->MapColorScalarsThroughLookupTableOff();
     }
   }
-  m_ColorLUTEnabled = enable;
+  m_ColorLUTEnabled = enable ? 1 : 0;
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeSlice::SetSliceOpacity(float opacity)
@@ -479,5 +480,35 @@ float mafPipeVolumeSlice::GetSliceOpacity()
 bool mafPipeVolumeSlice::IsColorLookupTable()
 //----------------------------------------------------------------------------
 {
-  return m_ColorLUTEnabled;
+  return m_ColorLUTEnabled != 0;
+}
+
+//----------------------------------------------------------------------------
+mmgGui *mafPipeVolumeSlice::CreateGui()
+//----------------------------------------------------------------------------
+{
+  assert(m_Gui == NULL);
+  m_Gui = new mmgGui(this);
+  m_Gui->Bool(ID_RGB_LUT,"rgb lut", &m_ColorLUTEnabled,0,"turn on/off RGB LUT");
+
+  return m_Gui;
+}
+//----------------------------------------------------------------------------
+void mafPipeVolumeSlice::OnEvent(mafEventBase *maf_event)
+//----------------------------------------------------------------------------
+{
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  {
+    switch(e->GetId()) 
+    {
+      case ID_RGB_LUT:
+      {
+        ColorLookupTable(m_ColorLUTEnabled != 0);
+        m_Vme->ForwardUpEvent(mafEvent(this,CAMERA_UPDATE));
+      }
+      break;
+      default:
+      break;
+    }
+  }
 }
