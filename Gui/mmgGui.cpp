@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 09:51:06 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2005-06-30 16:27:13 $
+  Version:   $Revision: 1.19 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -254,20 +254,20 @@ void mmgGui::Label(mafString *var, bool bold, bool multiline)
 //----------------------------------------------------------------------------
 {
   int h = (multiline) ? -1 : LH;
-	wxStaticText* lab = new wxStaticText(this, -1, *var->GetCStr(),    dp, wxSize(-1,h), wxALIGN_LEFT );
+	wxStaticText* lab = new wxStaticText(this, -1, var->GetCStr(),    dp, wxSize(-1,h), wxALIGN_LEFT );
 	if(m_UseBackgroundColor) lab->SetBackgroundColour(m_BackgroundColor);
   if(bold) lab->SetFont(m_BoldFont);
 	lab->SetValidator( mmgValidator(this,-1,lab,var) );
 	Add(lab,0,wxEXPAND|wxALL, M);
 }
 //----------------------------------------------------------------------------
-void mmgGui::Label(mafString label1, mafString label2, bool bold)
+void mmgGui::Label(mafString label1, mafString label2, bool bold_label, bool bold_var)
 //----------------------------------------------------------------------------
 {
 	wxStaticText* lab1 = new wxStaticText(this, -1, label1.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT ); 
 	wxStaticText* lab2 = new wxStaticText(this, -1, label2.GetCStr(), dp, wxSize(-1,LH), wxALIGN_LEFT ); 
-	if(bold) lab1->SetFont(m_BoldFont);
-	if(bold) lab2->SetFont(m_BoldFont);
+	if(bold_label) lab1->SetFont(m_BoldFont);
+	if(bold_var) lab2->SetFont(m_BoldFont);
   if(m_UseBackgroundColor) lab1->SetBackgroundColour(m_BackgroundColor);
   if(m_UseBackgroundColor) lab2->SetBackgroundColour(m_BackgroundColor);	
   wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -276,16 +276,16 @@ void mmgGui::Label(mafString label1, mafString label2, bool bold)
 	Add(sizer,0,wxALL, M); 
 }
 //----------------------------------------------------------------------------
-void mmgGui::Label(mafString label1,mafString *var, bool bold)
+void mmgGui::Label(mafString label1,mafString *var, bool bold_label, bool bold_var)
 //----------------------------------------------------------------------------
 {
 	wxStaticText* lab1 = new wxStaticText(this, -1, label1.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT );
-	wxStaticText* lab2 = new wxStaticText(this, -1, *var->GetCStr(),   dp, wxSize(-1,LH), wxALIGN_LEFT );
+	wxStaticText* lab2 = new wxStaticText(this, -1, var->GetCStr(),   dp, wxSize(-1,LH), wxALIGN_LEFT );
   if(m_UseBackgroundColor) lab1->SetBackgroundColour(m_BackgroundColor);
   if(m_UseBackgroundColor) lab2->SetBackgroundColour(m_BackgroundColor);	
 	lab2->SetValidator( mmgValidator(this,-1,lab2,var) );
-	if(bold) lab1->SetFont(m_BoldFont);
-	if(bold) lab2->SetFont(m_BoldFont);
+	if(bold_label) lab1->SetFont(m_BoldFont);
+	if(bold_var) lab2->SetFont(m_BoldFont);
 
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 	sizer->Add( lab1, 0, wxRIGHT, LM);
@@ -862,11 +862,21 @@ void mmgGui::FileOpen(int id,mafString label,mafString* var, const mafString wil
 //----------------------------------------------------------------------------
 {
   int text_w = EW+HM+EW;
-	wxStaticText *lab  = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(    LW,BH), wxALIGN_RIGHT );
-  if(m_UseBackgroundColor) lab->SetBackgroundColour(m_BackgroundColor);
+  int butt_w;
+	wxStaticText *lab  = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW,BH), wxALIGN_RIGHT );
+  if(m_UseBackgroundColor) 
+    lab->SetBackgroundColour(m_BackgroundColor);
   int w_id = GetId(id);
-  mmgButton    *butt = new mmgButton   (this, w_id, "open",dp, wxSize(    EW,BH));
-  wxTextCtrl   *text = new wxTextCtrl  (this, GetId(id), ""   , dp, wxSize(text_w,BH),wxTE_READONLY|m_EntryStyle  );
+  if (label.IsEmpty())
+  {
+    butt_w = FW - text_w - HM;
+  }
+  else
+  {
+    butt_w = EW;
+  }
+  mmgButton  *butt = new mmgButton(this, w_id, "open",dp, wxSize(butt_w,BH));
+  wxTextCtrl *text = new wxTextCtrl  (this, GetId(id), ""   , dp, wxSize(text_w,BH),wxTE_READONLY|m_EntryStyle);
 	butt->SetValidator( mmgValidator(this,w_id,butt,var,text,true,wildcard) );
   if(!tooltip.IsEmpty())
 	{
@@ -874,7 +884,10 @@ void mmgGui::FileOpen(int id,mafString label,mafString* var, const mafString wil
 		butt->SetToolTip(tooltip.GetCStr());
 	}
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add( lab,  0, wxRIGHT, LM);
+	if (!label.IsEmpty())
+	{
+    sizer->Add( lab,  0, wxRIGHT, LM);
+	}
 	sizer->Add( butt, 0, wxRIGHT, HM);
 	sizer->Add( text, 0);
   Add(sizer,0,wxALL, M); 
@@ -884,10 +897,19 @@ void mmgGui::DirOpen(int id,mafString label,mafString *var, mafString tooltip)
 //----------------------------------------------------------------------------
 {
   int text_w = EW+HM+EW;
+  int butt_w;
 	wxStaticText *lab  = new wxStaticText(this, GetId(id), label.GetCStr(),   dp, wxSize(    LW,BH), wxALIGN_RIGHT );
   if(m_UseBackgroundColor) lab->SetBackgroundColour(m_BackgroundColor);
   int w_id = GetId(id);
-  mmgButton    *butt = new mmgButton   (this, w_id, "browse",dp, wxSize(    EW,BH));
+  if (label.IsEmpty())
+  {
+    butt_w = FW - text_w - HM;
+  }
+  else
+  {
+    butt_w = EW;
+  }
+  mmgButton    *butt = new mmgButton   (this, w_id, "browse",dp, wxSize(butt_w,BH));
   wxTextCtrl   *text = new wxTextCtrl  (this, GetId(id), "", dp, wxSize(text_w,BH),wxTE_READONLY|m_EntryStyle  );
 	butt->SetValidator( mmgValidator(this,w_id,butt,var,text) );
   if(!tooltip.IsEmpty())
@@ -896,7 +918,10 @@ void mmgGui::DirOpen(int id,mafString label,mafString *var, mafString tooltip)
 		butt->SetToolTip(tooltip.GetCStr());
 	}
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add( lab,  0, wxRIGHT, LM);
+  if (!label.IsEmpty())
+  {
+    sizer->Add( lab,  0, wxRIGHT, LM);
+  }
 	sizer->Add( butt, 0, wxRIGHT, HM);
 	sizer->Add( text, 0);
   Add(sizer,0,wxALL, M); 
@@ -906,10 +931,20 @@ void mmgGui::FileSave(int id,mafString label,mafString* var, const mafString wil
 //----------------------------------------------------------------------------
 {
   int text_w = EW+HM+EW;
+  int butt_w;
 	wxStaticText *lab  = new wxStaticText(this, GetId(id), label.GetCStr(),   dp, wxSize(    LW,BH), wxALIGN_RIGHT );
-  if(m_UseBackgroundColor) lab->SetBackgroundColour(m_BackgroundColor);
+  if(m_UseBackgroundColor) 
+    lab->SetBackgroundColour(m_BackgroundColor);
   int w_id = GetId(id);
-  mmgButton    *butt = new mmgButton   (this, w_id, "save",  dp, wxSize(    EW,BH));
+  if (label.IsEmpty())
+  {
+    butt_w = FW - text_w - HM;
+  }
+  else
+  {
+    butt_w = EW;
+  }
+  mmgButton    *butt = new mmgButton   (this, w_id, "save",  dp, wxSize(butt_w,BH));
   wxTextCtrl   *text = new wxTextCtrl  (this, GetId(id), "",      dp, wxSize(text_w,BH),wxTE_READONLY|m_EntryStyle  );
 	butt->SetValidator( mmgValidator(this,w_id,butt,var,text,false,wildcard) );
   if(!tooltip.IsEmpty())
@@ -918,7 +953,10 @@ void mmgGui::FileSave(int id,mafString label,mafString* var, const mafString wil
 		butt->SetToolTip(tooltip.GetCStr());
 	}
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add( lab,  0, wxRIGHT, LM);
+	if (!label.IsEmpty())
+	{
+    sizer->Add( lab,  0, wxRIGHT, LM);
+	}
 	sizer->Add( butt, 0, wxRIGHT, HM);
 	sizer->Add( text, 0);
   Add(sizer,0,wxALL, M); 
