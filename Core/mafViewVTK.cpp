@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 10:21:57 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-06-30 16:25:27 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,11 +35,12 @@ mafCxxTypeMacro(mafViewVTK);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewVTK::mafViewVTK(wxString label, bool external)
+mafViewVTK::mafViewVTK(wxString label, int camera_position, bool external)
 :mafView(label,external)
 //----------------------------------------------------------------------------
 {
-  m_CameraPosition = CAMERA_PERSPECTIVE;
+  m_CameraPosition  = camera_position;
+  m_ExternalFlag    = external;
   m_Sg        = NULL;
   m_Rwi       = NULL;
   m_LightKit  = NULL;
@@ -52,16 +53,27 @@ mafViewVTK::mafViewVTK(wxString label, bool external)
 mafViewVTK::~mafViewVTK() 
 //----------------------------------------------------------------------------
 {
+  m_PipeMap.clear();
+
   cppDEL(m_LightKit);
   cppDEL(m_Sg);
   cppDEL(m_Rwi);
   vtkDEL(m_AttachedVmeMatrix);
 }
 //----------------------------------------------------------------------------
+void mafViewVTK::PlugVisualPipe(mafString vme_type, mafString pipe_type, long visibility)
+//----------------------------------------------------------------------------
+{
+  mafVisualPipeInfo plugged_pipe;
+  plugged_pipe.m_PipeName=pipe_type;
+  plugged_pipe.m_Visibility=visibility;
+  m_PipeMap[vme_type] = plugged_pipe;
+}
+//----------------------------------------------------------------------------
 mafView *mafViewVTK::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewVTK *v = new mafViewVTK(m_Label);
+  mafViewVTK *v = new mafViewVTK(m_Label, m_CameraPosition, m_ExternalFlag);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
@@ -81,16 +93,6 @@ void mafViewVTK::Create()
   m_Sg  = new mafSceneGraph(this,m_Rwi->m_RenFront,m_Rwi->m_RenBack);
   m_Sg->SetListener(this);
   m_Rwi->m_Sg = m_Sg;
-  /*
-  m_Sg->SetCreatableFlag(VME_SURFACE);
-  m_Sg->SetCreatableFlag(VME_GRAY_VOLUME);
-  m_Sg->SetCreatableFlag(VME_VOLUME);
-  m_Sg->SetCreatableFlag(VME_IMAGE);
-  m_Sg->SetCreatableFlag(VME_POINTSET);
-  m_Sg->SetCreatableFlag(VME_TOOL);
-  m_Sg->SetCreatableFlag(VME_SCALAR);
-  */
-
   m_Rwi->m_Camera->SetClippingRange(0.1,1000); 
   this->CameraReset();
 }
@@ -175,19 +177,18 @@ void mafViewVTK::VmeCreatePipe(mafNode *vme)
 
   mafObject *obj= NULL;
   mafString pipe_name = "";
-  mafString vme_type = v->GetTypeName(); // Paolo 2005-04-23 Just to try PlugVisualPipe 
-  // (to be replaced with something that extract the type of the vme)
+  mafString vme_type = v->GetTypeName();
 
   mafPipeFactory *pipe_factory  = mafPipeFactory::GetInstance();
   assert(pipe_factory!=NULL);
-  if (!m_PipeMap.empty() && (m_PipeMap[vme_type].m_Visibility == NODE_VISIBLE_ON))  // Paolo 2005-04-23
+  if (!m_PipeMap.empty() && (m_PipeMap[vme_type].m_Visibility == VISIBLE))
   {
-    // keep the visual pipe from the view's visual pipe map
+    // pick up the visual pipe from the view's visual pipe map
     pipe_name = m_PipeMap[vme_type].m_PipeName;
   }
   else
   {
-    // keep the default visual pipe from the vme
+    // pick up the default visual pipe from the vme
     pipe_name = v->GetVisualPipe();
   }
 

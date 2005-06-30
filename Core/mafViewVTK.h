@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 10:21:57 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-06-30 16:25:27 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -11,6 +11,7 @@
 =========================================================================*/
 #ifndef __mafViewVTK_H__
 #define __mafViewVTK_H__
+
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
@@ -19,6 +20,8 @@
 #include "mafRWI.h"
 #include "mafSceneGraph.h"
 #include "mafSceneNode.h" //used in subclasses
+#include <map>
+
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
@@ -26,6 +29,14 @@ class mafLightKit;
 class mafVME;
 class vtkMatrix4x4;
 class mmdMouse;
+
+/** VME visibility attribute when plugging visual pipe.*/
+enum VME_VISIBILITY_ID
+{
+  NON_VISIBLE = 0,
+  VISIBLE,
+  MUTEX,
+};
 
 //----------------------------------------------------------------------------
 // mafViewVTK :
@@ -37,7 +48,7 @@ mafViewVTK is a View that got a RenderWindow and a SceneGraph
 class mafViewVTK: public mafView
 {
 public:
-  mafViewVTK(wxString label = "vtkView", bool external = false);
+  mafViewVTK(wxString label = "vtkView", int camera_position = CAMERA_PERSPECTIVE, bool external = false);
   virtual ~mafViewVTK(); 
 
   mafTypeMacro(mafViewVTK, mafView);
@@ -69,6 +80,19 @@ public:
 
   virtual mafSceneGraph *GetSceneGraph()	  {return m_Sg;}; 
   virtual mafRWIBase    *GetRWI()           {return m_Rwi->m_RwiBase;};
+
+  /** Struct containing information regarding visual pipe plugged into the view. */
+  struct mafVisualPipeInfo
+  {
+    mafString m_PipeName;
+    long      m_Visibility;
+  };
+  typedef std::map<mafString, mafVisualPipeInfo> mafPipeMap;
+
+  /** Plug a visual pipe for a particular vme. It is used also to plug custom pipe.*/
+  void PlugVisualPipe(mafString vme_type, mafString pipe_type, long visibility = VISIBLE);
+
+  mafPipeMap m_PipeMap;
 
   void              SetMouse(mmdMouse *mouse);
 
