@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-30 12:41:53 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-06-30 16:30:19 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -222,6 +222,7 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
           data->GetScalarRange(range);
           m_Mapper->SetScalarRange(range);
         }
+        m_Vme->ForwardUpEvent(mafEvent(this,CAMERA_UPDATE));
       }
     	break;
       default:
