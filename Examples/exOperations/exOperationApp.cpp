@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 09:43:09 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-06-30 16:23:27 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,6 +21,7 @@
 
 
 #include "exOperationApp.h"
+#include "mafDecl.h"
 #include "mafVMEFactory.h"
 #include "mafPics.h"
 #include "mmgMDIFrame.h"
@@ -86,6 +87,9 @@ bool exOperationApp::OnInit()
   m_logic->Plug(new mmoCreateSlicer("Create Slicer"));
   m_logic->Plug(new mmoReparentTo("Reparent to...  \tCtrl+R"));
   
+  mafViewVTK *v = new mafViewVTK("Slice view", CAMERA_CT);
+  v->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
+  m_logic->Plug(v);
   m_logic->Plug(new mafViewVTK("VTK view"));
 
   m_logic->Show();
