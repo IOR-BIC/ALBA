@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 09:53:18 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-06-30 12:41:26 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -157,7 +157,7 @@ void mafVMESlicer::InternalPreUpdate()
     if (vtkDataSet *vtkdata=vol->GetOutput()->GetVTKData())
     {
       double pos[3];
-      double vectX[3],vectY[3], n[3];
+      float vectX[3],vectY[3], n[3];
 
       mafTransform trans;
       trans.SetMatrix(*(GetOutput()->GetMatrix()));
@@ -185,7 +185,7 @@ void mafVMESlicer::InternalPreUpdate()
       m_ISlicer->SetInput(vtkdata);
       m_ISlicer->SetPlaneOrigin(pos);
       m_ISlicer->SetPlaneAxisX(vectX);
-      m_ISlicer->SetPlaneAxisY(vectY); 
+      m_ISlicer->SetPlaneAxisY(vectY);
     }
   }
 }

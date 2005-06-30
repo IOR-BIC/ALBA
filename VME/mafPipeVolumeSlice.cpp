@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 09:51:54 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-06-30 12:41:41 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -62,65 +62,114 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
     m_SliceMapper[i]		  = NULL;
     m_SliceActor[i]	      = NULL;
   }
+  m_ParametersInitialized = false;
+  m_ColorLUTEnabled       = false;
+  m_ShowVolumeBox         = false;
+
+  m_SliceMode = SLICE_Z;
+
+  m_SliceOpacity  = 1.0;
+  m_TextureRes    = 512;
+
+  m_XVector[0][0] = 0.0001;	//modified by Paolo 29-10-2003 should be 0 !!! check into Sasha's filter
+  m_XVector[0][1] = 1;
+  m_XVector[0][2] = 0;
+  m_YVector[0][0] = 0;
+  m_YVector[0][1] = 0;
+  m_YVector[0][2] = 1;
+
+  m_XVector[1][0] = 0;
+  m_XVector[1][1] = 0;
+  m_XVector[1][2] = 1;
+  m_YVector[1][0] = 1;
+  m_YVector[1][1] = 0;
+  m_YVector[1][2] = 0;
+
+  m_XVector[2][0] = 1;
+  m_XVector[2][1] = 0;
+  m_XVector[2][2] = 0;
+  m_YVector[2][0] = 0;
+  m_YVector[2][1] = 1;
+  m_YVector[2][2] = 0;
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice::Create(mafSceneNode *n, int mode, double slice_origin[3], double slice_xVect[3], double slice_yVect[3], bool show_vol_bbox)
+void mafPipeVolumeSlice::InitializeSliceParameters(int mode, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox)
 //----------------------------------------------------------------------------
 {
-	int i;
-	m_SliceMode = mode;
+  m_SliceMode     = mode;
+  m_ShowVolumeBox = show_vol_bbox;
 
-  m_SliceOpacity    = 1.0;
-  m_ColorLUTEnabled = false;
-	
+  m_Origin[0] = slice_origin[0];
+  m_Origin[1] = slice_origin[1];
+  m_Origin[2] = slice_origin[2];
+
+  if(m_SliceMode != SLICE_ORTHO)
+  {
+    m_XVector[m_SliceMode][0] = slice_xVect[0];
+    m_XVector[m_SliceMode][1] = slice_xVect[1];
+    m_XVector[m_SliceMode][2] = slice_xVect[2];
+
+    m_YVector[m_SliceMode][0] = slice_yVect[0];
+    m_YVector[m_SliceMode][1] = slice_yVect[1];
+    m_YVector[m_SliceMode][2] = slice_yVect[2];
+
+    vtkMath::Normalize(m_XVector[m_SliceMode]);
+    vtkMath::Normalize(m_YVector[m_SliceMode]);
+    vtkMath::Cross(m_YVector[m_SliceMode], m_XVector[m_SliceMode], m_Normal[m_SliceMode]);
+    vtkMath::Normalize(m_Normal[m_SliceMode]);
+    vtkMath::Cross(m_Normal[m_SliceMode], m_XVector[m_SliceMode], m_YVector[m_SliceMode]);
+    vtkMath::Normalize(m_YVector[m_SliceMode]);
+  }
+}
+//----------------------------------------------------------------------------
+void mafPipeVolumeSlice::Create(mafSceneNode *n)
+//----------------------------------------------------------------------------
+{
+  Superclass::Create(n); // Always call this to initialize m_Vme, m_AssemblyFront, ... vars
+
+  assert(m_Vme->IsMAFType(mafVMEVolume));
+  mafVMEVolume *vme = ((mafVMEVolume *) m_Vme);
+  vme->GetVolumeOutput()->Update();
+  vme->GetVolumeOutput()->GetVTKData()->Update();
+
 	if(m_SliceMode == SLICE_ARB)
 		m_SliceMode = SLICE_X;
 
-	m_TextureRes = 512;
-
-	m_Origin[0] = slice_origin[0];
-	m_Origin[1] = slice_origin[1];
-	m_Origin[2] = slice_origin[2];
-
-	assert(m_Vme->IsMAFType(mafVMEVolume));
-  mafVMEVolume *vme = ((mafVMEVolume *) m_Vme);
-
-  for(i = 0; i<3; i++)
+	if (!m_ParametersInitialized)
 	{
-		m_SlicerPolygonal[i]	= NULL;
-		m_SlicerImage[i]			= NULL;
-		m_Image[i]            = NULL;
-		m_Texture[i]		      = NULL;
-		m_ColourLUT[i]        = NULL;
-    m_SlicePolydata[i]		= NULL;
-		m_SliceMapper[i]		  = NULL;
-		m_SliceActor[i]	      = NULL;
+    double b[6];
+    vme->GetVolumeOutput()->GetBounds(b);
+    m_Origin[0] = (b[0] + b[1])*.5;
+    m_Origin[1] = (b[2] + b[3])*.5;
+    m_Origin[2] = (b[4] + b[5])*.5;
 	}
 
 	if(m_SliceMode == SLICE_ORTHO)
 	{
-		m_XVector[0][0] = 0.0001;	//modified by Paolo 29-10-2003 should be 0 !!! check into Sasha's filter
-		m_XVector[0][1] = 1;
-		m_XVector[0][2] = 0;
-		m_YVector[0][0] = 0;
-		m_YVector[0][1] = 0;
-		m_YVector[0][2] = 1;
+    // overwrite the plane vector, because the slices have to be orthogonal
+    m_XVector[0][0] = 0.0001;	//modified by Paolo 29-10-2003 should be 0 !!! check into Sasha's filter
+    m_XVector[0][1] = 1;
+    m_XVector[0][2] = 0;
+    m_YVector[0][0] = 0;
+    m_YVector[0][1] = 0;
+    m_YVector[0][2] = 1;
 
-		m_XVector[1][0] = 0;
-		m_XVector[1][1] = 0;
-		m_XVector[1][2] = 1;
-		m_YVector[1][0] = 1;
-		m_YVector[1][1] = 0;
-		m_YVector[1][2] = 0;
+    m_XVector[1][0] = 0;
+    m_XVector[1][1] = 0;
+    m_XVector[1][2] = 1;
+    m_YVector[1][0] = 1;
+    m_YVector[1][1] = 0;
+    m_YVector[1][2] = 0;
 
     m_XVector[2][0] = 1;
-		m_XVector[2][1] = 0;
-		m_XVector[2][2] = 0;
-		m_YVector[2][0] = 0;
-		m_YVector[2][1] = 1;
-		m_YVector[2][2] = 0;
+    m_XVector[2][1] = 0;
+    m_XVector[2][2] = 0;
+    m_YVector[2][0] = 0;
+    m_YVector[2][1] = 1;
+    m_YVector[2][2] = 0;
 
-		for(i = 0; i<3; i++)
+    int i;
+    for(i = 0; i<3; i++)
 		{
 			vtkMath::Normalize(m_XVector[i]);
 			vtkMath::Normalize(m_YVector[i]);
@@ -133,25 +182,16 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n, int mode, double slice_origin[3
 	}
 	else
 	{
-		m_XVector[m_SliceMode][0] = slice_xVect[0];
-		m_XVector[m_SliceMode][1] = slice_xVect[1];
-		m_XVector[m_SliceMode][2] = slice_xVect[2];
-
-		m_YVector[m_SliceMode][0] = slice_yVect[0];
-		m_YVector[m_SliceMode][1] = slice_yVect[1];
-		m_YVector[m_SliceMode][2] = slice_yVect[2];
-
 		vtkMath::Normalize(m_XVector[m_SliceMode]);
 		vtkMath::Normalize(m_YVector[m_SliceMode]);
 		vtkMath::Cross(m_YVector[m_SliceMode], m_XVector[m_SliceMode], m_Normal[m_SliceMode]);
 		vtkMath::Normalize(m_Normal[m_SliceMode]);
 		vtkMath::Cross(m_Normal[m_SliceMode], m_XVector[m_SliceMode], m_YVector[m_SliceMode]);
 		vtkMath::Normalize(m_YVector[m_SliceMode]);
-
 		CreateSlice(m_SliceMode);
 	}
 
-	if(show_vol_bbox)
+	if(m_ShowVolumeBox)
 	{
 		m_VolumeBox = vtkOutlineCornerFilter::New();
 		m_VolumeBox->SetInput(vme->GetVolumeOutput()->GetVTKData());
@@ -193,8 +233,8 @@ void mafPipeVolumeSlice::CreateSlice(int mode)
 {
 	double srange[2],w,l, xspc = 0.33, yspc = 0.33;
 
-	m_Vme->GetOutput()->Update();
-  vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();
+	mafVMEVolume *vme = ((mafVMEVolume *) m_Vme);
+  vtkDataSet *vtk_data = vme->GetVolumeOutput()->GetVTKData();
   if (vtk_data)
     vtk_data->GetScalarRange(srange);
   else
@@ -264,12 +304,13 @@ void mafPipeVolumeSlice::CreateSlice(int mode)
 mafPipeVolumeSlice::~mafPipeVolumeSlice()
 //----------------------------------------------------------------------------
 {
-	if(m_VolumeBoxActor)	m_AssemblyFront->RemovePart(m_VolumeBoxActor);
+	if(m_VolumeBoxActor)
+    m_AssemblyFront->RemovePart(m_VolumeBoxActor);
 
 	for(int i = 0; i<3; i++)
 	{
-		if(m_SliceActor[i])		m_AssemblyFront->RemovePart(m_SliceActor[i]);
-
+		if(m_SliceActor[i])
+      m_AssemblyFront->RemovePart(m_SliceActor[i]);
 		vtkDEL(m_SlicerImage[i]);
 		vtkDEL(m_SlicerPolygonal[i]);
 		vtkDEL(m_Image[i]);
@@ -283,7 +324,8 @@ mafPipeVolumeSlice::~mafPipeVolumeSlice()
 	vtkDEL(m_VolumeBoxMapper);
 	vtkDEL(m_VolumeBoxActor);
 
-  if(m_GhostActor) m_AssemblyFront->RemovePart(m_GhostActor);
+  if(m_GhostActor) 
+    m_AssemblyFront->RemovePart(m_GhostActor);
   vtkDEL(m_GhostActor);
 }
 /*
@@ -327,7 +369,7 @@ void mafPipeVolumeSlice::GetLutRange(double range[2])
 		m_SlicerImage[0]->GetOutput()->GetScalarRange(range);
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice::SetSlice(double origin[3], double xVect[3], double yVect[3])
+void mafPipeVolumeSlice::SetSlice(double origin[3], float xVect[3], float yVect[3])
 //----------------------------------------------------------------------------
 {
 	m_Origin[0] = origin[0];

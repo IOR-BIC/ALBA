@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkVolumeSlicer.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 09:53:28 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-06-30 12:41:06 $
+  Version:   $Revision: 1.5 $
   Authors:   Alexander Savenko
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -80,14 +80,12 @@ public:
   vtkSetVector3Macro(PlaneOrigin, double);
   vtkGetVectorMacro(PlaneOrigin, double, 3);
 
-  /**
-  Specify x-axis of the plane*/
-  void SetPlaneAxisX(double axis[3]);
+  /** Specify x-axis of the plane*/
+  void SetPlaneAxisX(float axis[3]);
   vtkGetVectorMacro(PlaneAxisX, float, 3);
 
-  /**
-  Specify x-axis of the plane*/
-  void SetPlaneAxisY(double axis[3]);
+  /** Specify x-axis of the plane*/
+  void SetPlaneAxisY(float axis[3]);
   vtkGetVectorMacro(PlaneAxisY, float, 3);
 
   /**

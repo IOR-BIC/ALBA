@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkVolumeSlicer.cxx,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 09:53:28 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-06-30 12:41:06 $
+  Version:   $Revision: 1.7 $
 
 =========================================================================*/
 #include "vtkObjectFactory.h"
@@ -21,7 +21,7 @@
 
 #include "assert.h"
 
-vtkCxxRevisionMacro(vtkVolumeSlicer, "$Revision: 1.6 $");
+vtkCxxRevisionMacro(vtkVolumeSlicer, "$Revision: 1.7 $");
 vtkStandardNewMacro(vtkVolumeSlicer);
 
 typedef unsigned short u_short;
@@ -41,7 +41,8 @@ static const int SamplingTableSize = 64000;
 
 //----------------------------------------------------------------------------
 // Constructor sets default values
-vtkVolumeSlicer::vtkVolumeSlicer() {
+vtkVolumeSlicer::vtkVolumeSlicer() 
+{
   this->PlaneOrigin[0] = this->PlaneOrigin[1] = this->PlaneOrigin[2] = this->PlaneAxisX[1] = this->PlaneAxisX[2] = this->PlaneAxisY[0] = this->PlaneAxisY[2] = 0.f;
   this->PlaneAxisX[0]  = this->PlaneAxisY[1]  = 1.f;
 
@@ -51,27 +52,30 @@ vtkVolumeSlicer::vtkVolumeSlicer() {
   this->AutoSpacing = true;
 
   this->VoxelCoordinates[0] = this->VoxelCoordinates[1] = this->VoxelCoordinates[2] = NULL;
-  }
+}
 
 
-vtkVolumeSlicer::~vtkVolumeSlicer() {
+vtkVolumeSlicer::~vtkVolumeSlicer() 
+{
   delete [] this->VoxelCoordinates[0];
   delete [] this->VoxelCoordinates[1];
   delete [] this->VoxelCoordinates[2];
-  }
+}
 
 
 //----------------------------------------------------------------------------
-void vtkVolumeSlicer::SetPlaneAxisX(double axis[3]) {
+void vtkVolumeSlicer::SetPlaneAxisX(float axis[3]) 
+{
   if (vtkMath::Norm(axis) < 1.e-5f)
     return;
   memcpy(this->PlaneAxisX, axis, sizeof(this->PlaneAxisX));
   vtkMath::Normalize(this->PlaneAxisX);
   this->Modified();
-  }
+}
 
 //----------------------------------------------------------------------------
-void vtkVolumeSlicer::SetPlaneAxisY(double axis[3]) {
+void vtkVolumeSlicer::SetPlaneAxisY(float axis[3]) 
+{
   if (vtkMath::Norm(axis) < 1.e-5f)
     return;
   memcpy(this->PlaneAxisY, axis, sizeof(this->PlaneAxisY));
@@ -81,7 +85,7 @@ void vtkVolumeSlicer::SetPlaneAxisY(double axis[3]) {
   vtkMath::Cross(this->PlaneAxisZ, this->PlaneAxisX, this->PlaneAxisY);
   vtkMath::Normalize(this->PlaneAxisY);
   this->Modified();
-  }
+}
 
 //----------------------------------------------------------------------------
 void vtkVolumeSlicer::ExecuteInformation() 

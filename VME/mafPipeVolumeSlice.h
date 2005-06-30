@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 09:51:54 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-06-30 12:41:42 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,7 +49,8 @@ public:
 	mafPipeVolumeSlice();
   virtual ~mafPipeVolumeSlice();
 	
-  virtual void Create(mafSceneNode *n, int mode, double slice_origin[3], double slice_xVect[3], double slice_yVect[3], bool show_vol_bbox);
+  void InitializeSliceParameters(int mode, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox);
+  virtual void Create(mafSceneNode *n);
 
   /** Show-Hide the slice actor. */
 	//void Show       (bool show); 
@@ -64,7 +65,7 @@ public:
 	void GetLutRange(double range[2]);
 	
 	/** Set slicer parameter to generate the slice. */
-	void SetSlice(double origin[3], double xVect[3], double yVect[3]);
+	void SetSlice(double origin[3], float xVect[3], float yVect[3]);
 	/** Set slicer parameter to generate the slice. */
 	void SetSlice(double origin[3]);
 	
@@ -95,30 +96,32 @@ protected:
 	void CreateSlice(int mode);
 
 	double m_Origin[3];
-	double m_Normal[3][3];
-	double m_XVector[3][3];
-	double m_YVector[3][3];
-  double m_SliceOpacity;
+	float  m_Normal[3][3];
+	float  m_XVector[3][3];
+	float  m_YVector[3][3];
+  float  m_SliceOpacity;
 
 	int		m_TextureRes;
 	int		m_SliceMode;
 
-	vtkVolumeSlicer						*m_SlicerImage[3];
-	vtkVolumeSlicer						*m_SlicerPolygonal[3];
-	vtkImageData							*m_Image[3];
-	vtkTexture								*m_Texture[3];
-  vtkLookupTable            *m_ColourLUT[3];
-  vtkPolyDataMapper					*m_SliceMapper[3];
-	vtkPolyData								*m_SlicePolydata[3];
-  vtkActor                  *m_SliceActor[3];
+	vtkVolumeSlicer				 *m_SlicerImage[3];
+	vtkVolumeSlicer				 *m_SlicerPolygonal[3];
+	vtkImageData					 *m_Image[3];
+	vtkTexture						 *m_Texture[3];
+  vtkLookupTable         *m_ColourLUT[3];
+  vtkPolyDataMapper			 *m_SliceMapper[3];
+	vtkPolyData						 *m_SlicePolydata[3];
+  vtkActor               *m_SliceActor[3];
 	
-	vtkOutlineCornerFilter		*m_VolumeBox;
-  vtkPolyDataMapper					*m_VolumeBoxMapper;
-  vtkActor                  *m_VolumeBoxActor;
+	vtkOutlineCornerFilter *m_VolumeBox;
+  vtkPolyDataMapper			 *m_VolumeBoxMapper;
+  vtkActor               *m_VolumeBoxActor;
 
-  vtkActor                  *m_GhostActor;
+  vtkActor               *m_GhostActor;
 
-  bool                       m_ColorLUTEnabled;
+  bool                    m_ColorLUTEnabled;
+  bool                    m_ParametersInitialized;
+  bool                    m_ShowVolumeBox;
 };  
 
 #endif // _mafPipeVolumeSlice_H_
