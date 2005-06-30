@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckListBox.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-22 07:02:28 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-06-30 16:28:27 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,7 +26,8 @@ class mafObserver;
 //----------------------------------------------------------------------------
 #define mmgCheckListBox_ArraySize 50
 
-enum {
+enum CHECKLIST_MODE_ID
+{
 	MODE_CHECK,
 	MODE_RADIO
 };

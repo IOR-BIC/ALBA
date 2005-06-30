@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooser.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:44:10 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-06-30 16:26:17 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,7 +42,7 @@ mmgVMEChooser::mmgVMEChooser(mmgCheckTree *tree, wxString dialog_title, long vme
   m_ChooserTree->SetSize(250,350);
   
   Add(m_ChooserTree,1,wxEXPAND);
-  m_ok_button->Enable(false);
+  m_OkButton->Enable(false);
 }
 //----------------------------------------------------------------------------
 mmgVMEChooser::~mmgVMEChooser()
@@ -68,7 +68,7 @@ void mmgVMEChooser::OnEvent(mafEventBase *maf_event)
     switch(e->GetId())
     {
       case VME_SELECTED:
-        m_ok_button->Enable(e->GetBool());
+        m_OkButton->Enable(e->GetBool());
       break;
       default:
         e->Log();
