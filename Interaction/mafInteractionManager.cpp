@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-25 11:53:45 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-06-30 16:29:09 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -535,22 +535,22 @@ enum IMANAGER_WIDGET_ID
   ID_LOAD,
   ID_OK
 };
+
 //----------------------------------------------------------------------------
 void mafInteractionManager::CreateGUI() 
 //----------------------------------------------------------------------------
 {
   m_Dialog = new mmgDialog("I/O Devices Settings");
-  m_Dialog->SetSize(550,300);
+  m_Dialog->SetSize(550,100);
   m_Dialog->EnableClose(true);
 
   //m_DeviceList = m_Devices->ListBox(ID_DEVICE_LIST,"",150);
   m_DeviceTree = new mmgTree(m_Dialog,ID_DEVICE_TREE);
   m_DeviceTree->SetTitle("connected devices");
-  m_DeviceTree->SetSize(230,400);
+  m_DeviceTree->SetSize(230,250);
   m_DeviceTree->SetListener(this);
 
   m_Devices = new mmgGui(this);	
-
 	m_Devices->Divider();
 	m_Devices->Button(ID_ADD_DEVICE,"add");
 	m_Devices->Button(ID_REMOVE_DEVICE,"remove");
@@ -560,52 +560,51 @@ void mafInteractionManager::CreateGUI()
 // marco: in MAF 2.0 the extra parameter is missing!
 //  m_Devices->FileSave(ID_STORE,"",&m_SettingFileName,"Interaction Settings (*.xml)| *.xml","save interaction settings file from disk",true);  
 
-
   m_Devices->Divider();
   m_Devices->Button(ID_OK,"close");
 	m_Devices->SetListener(this);
 	m_Devices->Show(true);
-  m_Devices->FitGui();  
+  m_Devices->FitGui();
 	m_Devices->Reparent(m_Dialog);
   
-
 	// Holder of Device's settings GUI ==========
 	m_SettingsPanel = new mmgGuiHolder(m_Dialog,ID_DEVICE_SETTINGS);
-  m_SettingsPanel->Show(true);
-	m_SettingsPanel->SetSize(230,300);
   m_SettingsPanel->SetTitle("device settings");
+  m_SettingsPanel->SetSize(230,300);
+  m_SettingsPanel->Show(true);
 
   // Device's binding GUI =====================
   m_BindingsPanel = new mmgNamedPanel(m_Dialog,ID_DEVICE_BINDINGS);
   m_BindingsPanel->SetTitle("device bindings");
+  m_BindingsPanel->SetSize(230,100);
   m_BindingsPanel->Show(true);
-	m_BindingsPanel->SetSize(230,60);
   
   m_Bindings = new mmgGui(this);
   m_Bindings->Label("Bindings to actions");
-  m_ActionsList = m_Bindings->CheckList(ID_BINDING_LIST,"",60,"actions the devices is assigned to");
-	m_Bindings->Show(true);    
-	m_Bindings->FitGui();
+  m_ActionsList = m_Bindings->CheckList(ID_BINDING_LIST,"",100,"actions the devices is assigned to");
+  m_Bindings->FitGui();
   m_BindingsPanel->Add(m_Bindings);
+	m_Bindings->Show(true);    
   
 	wxBoxSizer *v1_sizer = new wxBoxSizer(wxVERTICAL);
-  v1_sizer->Add(m_DeviceTree,1,wxEXPAND | wxALIGN_LEFT);
-	v1_sizer->Add(m_Devices,1,wxEXPAND | wxALIGN_CENTER);
+  v1_sizer->Add(m_DeviceTree,1,wxEXPAND | wxALIGN_TOP);
+	v1_sizer->Add(m_Devices   ,1,wxEXPAND | wxALIGN_BOTTOM);
   
 	wxBoxSizer *v2_sizer = new wxBoxSizer(wxVERTICAL);
-  v2_sizer->Add(m_SettingsPanel,1,wxEXPAND|wxALIGN_TOP);
-  v2_sizer->Add(m_BindingsPanel,1,wxEXPAND|wxALIGN_BOTTOM);
+  v2_sizer->Add(m_SettingsPanel,1,wxEXPAND | wxALIGN_TOP);
+  v2_sizer->Add(m_BindingsPanel,1,wxEXPAND | wxALIGN_BOTTOM);
   
 	wxBoxSizer *main_sizer = new wxBoxSizer(wxHORIZONTAL);
 	main_sizer->Add(v1_sizer,1,wxEXPAND | wxALIGN_LEFT);
-	main_sizer->Add(v2_sizer,0,wxEXPAND | wxALIGN_RIGHT);
+	main_sizer->Add(v2_sizer,1,wxEXPAND | wxALIGN_RIGHT);
   
-	// ATTACH SIZER TO DIALOG
+  // ATTACH SIZER TO DIALOG
 	m_Dialog->SetAutoLayout( TRUE );
   m_Dialog->SetSizer( main_sizer );
   main_sizer->Fit(m_Dialog);
   main_sizer->SetSizeHints(m_Dialog);
 }
+
 //------------------------------------------------------------------------------
 void mafInteractionManager::OnEvent(mafEventBase *event)
 //------------------------------------------------------------------------------
@@ -618,13 +617,12 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
 
   mafEvent *e=mafEvent::SafeDownCast(event);
  
-  if (e)
+  if (e && ((e->GetSender() == m_Devices) || (e->GetSender() == m_DeviceTree)))
   {
     switch(e->GetId())
     {
       case ID_OK:
 		  case wxOK:
-  //    case wxClose:
         m_Dialog->EndModal(wxOK); 
 		  break;
       case ID_STORE:
@@ -681,7 +679,7 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
           }
         }
        break;
-      case VME_SELECT:
+      case VME_SELECT: // Event rised by the CheckTree used to show the devices tree
         if (mafDevice *device = GetDeviceManager()->GetDevice(e->GetArg()))
         {
           m_CurrentDevice = device;
@@ -705,6 +703,7 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
 			  e->Log();
 		  break; 
     }
+    return;
   }
     
   if (id==VIEW_SELECT)
@@ -726,7 +725,7 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
     mafEvent *e=mafEvent::SafeDownCast(event);
     OnCameraUpdate(e);
   }
-  else if (id==VME_SELECTED)
+  else if (id==VME_SELECT)
   {
     mafEventMacro(mafEvent(event->GetSender(),VME_SELECT,(mafVME *)event->GetData()));
   }
