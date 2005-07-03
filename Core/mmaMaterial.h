@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-30 15:54:36 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-07-03 15:14:50 $
+  Version:   $Revision: 1.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 

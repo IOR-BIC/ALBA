@@ -1,9 +1,9 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mafPipeFactory.cpp,v $
+  Module:    $RCSfile: mafPipeFactoryVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 09:51:39 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-07-03 15:20:11 $
+  Version:   $Revision: 1.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,31 +20,28 @@
 //----------------------------------------------------------------------------
 
 
-#include "mafPipeFactory.h"
+#include "mafPipeFactoryVME.h"
 #include "mafVersion.h"
 #include "mafIndent.h"
 #include "mafPipe.h"
 #include "mafPipeBox.h"
 #include "mafPipeSurface.h"
 #include "mafPipeMeter.h"
-#include "mafPipeVolumeSlice.h"
 #include <string>
 #include <ostream>
 
-mafPipeFactory *mafPipeFactory::m_Instance=NULL;
+mafPipeFactoryVME *mafPipeFactoryVME::m_Instance=NULL;
 
-mafCxxTypeMacro(mafPipeFactory);
-
-std::vector<std::string> mafPipeFactory::m_PipeNames;
+mafCxxTypeMacro(mafPipeFactoryVME);
 
 //----------------------------------------------------------------------------
 // This is used to register the factory when linking statically
-int mafPipeFactory::Initialize()
+int mafPipeFactoryVME::Initialize()
 //----------------------------------------------------------------------------
 {
   if (m_Instance==NULL)
   {
-    m_Instance=mafPipeFactory::New();
+    m_Instance=mafPipeFactoryVME::New();
 
     if (m_Instance)
     {
@@ -61,7 +58,7 @@ int mafPipeFactory::Initialize()
 }
 
 //------------------------------------------------------------------------
-mafPipeFactory::mafPipeFactory()
+mafPipeFactoryVME::mafPipeFactoryVME()
 //------------------------------------------------------------------------------
 {
   m_Instance = NULL;
@@ -69,41 +66,20 @@ mafPipeFactory::mafPipeFactory()
   //
   // Plug here Pipes in this factory
   //
-  //mafPlugPipeMacro(mafPipeRoot,"root for generic pipes tree");
-  //mafPlugPipeMacro(mafPipeGeneric,"a generic pipe with only basic features");
-  //mafPlugObjectMacro(mafTagArray,"a basic kind of attribute used to store key-value pairs");
-
-  mafPlugPipeMacro(mafPipeBox,"General pipe to show box for vtk data");
   mafPlugPipeMacro(mafPipeSurface,"Pipe to render vtk polydata as surface rendering");
   mafPlugPipeMacro(mafPipeMeter,"Pipe for mafVMEMeter");
-  mafPlugPipeMacro(mafPipeVolumeSlice,"Pipe for slicing a volume");
 }
 
 //------------------------------------------------------------------------------
-const char* mafPipeFactory::GetMAFSourceVersion() const
+const char* mafPipeFactoryVME::GetMAFSourceVersion() const
 //------------------------------------------------------------------------------
 {
   return MAF_SOURCE_VERSION;
 }
 
 //------------------------------------------------------------------------------
-const char* mafPipeFactory::GetDescription() const
+const char* mafPipeFactoryVME::GetDescription() const
 //------------------------------------------------------------------------------
 {
-  return "Factory for MAF Pipes";
-}
-
-//------------------------------------------------------------------------------
-mafPipe *mafPipeFactory::CreatePipeInstance(const char *type_name)
-//------------------------------------------------------------------------------
-{
-  return mafPipe::SafeDownCast(Superclass::CreateInstance(type_name));
-}
-
-//------------------------------------------------------------------------------
-void mafPipeFactory::RegisterNewPipe(const char* pipe_name, const char* description, mafCreateObjectFunction createFunction)
-//------------------------------------------------------------------------------
-{
-  m_PipeNames.push_back(pipe_name);
-  RegisterNewObject(pipe_name,description,createFunction);
+  return "Factory for MAF Pipes of VME library";
 }

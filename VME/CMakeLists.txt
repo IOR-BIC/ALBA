@@ -16,8 +16,8 @@ mafMatrixInterpolator.cpp
 mafMatrixInterpolator.h
 mafMatrixVector.cpp
 mafMatrixVector.h
-mafPipeFactory.cpp
-mafPipeFactory.h
+mafPipeFactoryVME.cpp
+mafPipeFactoryVME.h
 mafVMEFactory.cpp
 mafVMEFactory.h
 mafVMEGenericAbstract.cpp
@@ -40,8 +40,6 @@ IF (MAF_USE_VTK)
   ${PROJECT_SRCS}
   mafDataPipeCustom.cpp
   mafDataPipeCustom.h
-  mafPipeBox.cpp
-  mafPipeBox.h
   mafPipeMeter.cpp
   mafPipeMeter.h
   mafPipeSurface.cpp
@@ -90,8 +88,6 @@ IF (MAF_USE_VTK)
   mafVMEVolumeRGB.h
   mafVTKInterpolator.cpp
   mafVTKInterpolator.h
-  mmaMaterial.cpp
-  mmaMaterial.h
   mmaMeter.cpp
   mmaMeter.h
   vtkMAFDataPipe.cpp

@@ -56,6 +56,8 @@ mafOpStack.cpp
 mafOpStack.h
 mafPipe.cpp
 mafPipe.h
+mafPipeFactory.cpp
+mafPipeFactory.h
 mafRoot.cpp
 mafRoot.h
 mafRWI.cpp
@@ -87,8 +89,6 @@ mafView.cpp
 mafView.h
 mafViewManager.cpp
 mafViewManager.h
-mafViewVTK.cpp
-mafViewVTK.h
 mmgListCtrlBitmap.cpp
 mmgListCtrlBitmap.h
 mmgMaterialButton.cpp
@@ -103,14 +103,20 @@ mmgVMEChooserTree.cpp
 mmgVMEChooserTree.h
 mmuTimeSet.cpp
 mmuTimeSet.h
-vtkMAFAssembly.cpp
-vtkMAFAssembly.h
 )
 
 IF (MAF_USE_VTK)
-  #SET(PROJECT_SRCS
-  #${PROJECT_SRCS}
-  #)
+  SET(PROJECT_SRCS
+  ${PROJECT_SRCS}
+  mafPipeBox.cpp
+  mafPipeBox.h
+  mafViewVTK.cpp
+  mafViewVTK.h
+  mmaMaterial.cpp
+  mmaMaterial.h
+  vtkMAFAssembly.cpp
+  vtkMAFAssembly.h
+  )
 ENDIF (MAF_USE_VTK)
 
 # List libraries that are needed by this project.

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 10:21:56 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-03 15:14:49 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -396,6 +396,7 @@ double *mafRWI::ComputeVisibleBounds(mafNode *node)
 					if(mafSceneNode *n = m_Sg->Vme2Node(vme) )
 						if(n->IsVisible())
 	{
+    /** Modified by Marco 24-6-2005: this is not generic: do ask the VME for its bounds
 		vme->GetOutput()->GetVTKData()->GetBounds(b1);
     float loc_p1[3],loc_p2[3],abs_p1[3], abs_p2[3];
     loc_p1[0] = b1[0];
@@ -404,7 +405,17 @@ double *mafRWI::ComputeVisibleBounds(mafNode *node)
     loc_p2[0] = b1[1];
     loc_p2[1] = b1[3];
     loc_p2[2] = b1[5];
-
+    */
+    
+    /* Modified by Marco 24-6-2005: this creates linking problems: do ask the VME for its bounds
+    float loc_p1[3],loc_p2[3],abs_p1[3], abs_p2[3];
+    loc_p1[0] = b1[0];
+    loc_p1[1] = b1[2];
+    loc_p1[2] = b1[4];
+    loc_p2[0] = b1[1];
+    loc_p2[1] = b1[3];
+    loc_p2[2] = b1[5];
+    
     double r=0;
     if(vme->IsA("mafVMELandmark"))
        r = ((mafVMELandmark *)vme)->GetRadius();
@@ -416,7 +427,8 @@ double *mafRWI::ComputeVisibleBounds(mafNode *node)
 		loc_p2[0] += r;
 		loc_p2[1] += r;
 		loc_p2[2] += r;
-    
+    */
+    /* Modified by Marco 24-6-2005: this is not generic: do ask the VME for its bounds
     vtkLinearTransform *t = vme->GetAbsMatrixPipe()->GetVTKTransform();
 		t->TransformPoint(loc_p1,abs_p1);
 		t->TransformPoint(loc_p2,abs_p2);
@@ -428,7 +440,9 @@ double *mafRWI::ComputeVisibleBounds(mafNode *node)
 		b1[3] = abs_p2[1];
 		b1[4] = abs_p1[2];
 		b1[5] = abs_p2[2];
-
+    */
+  
+    vme->GetOutput()->GetVMEBounds(b1);    
 		return b1;
 	}
 	m_RenFront->ComputeVisiblePropBounds(b1);   

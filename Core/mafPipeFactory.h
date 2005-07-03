@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeFactory.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:59:19 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-03 15:14:49 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 

@@ -29,6 +29,8 @@ vtkVolumeSlicer.h
 # List the kits from VTK that are needed by this project.
 SET(vtkMAF_LIBS
   vtkCommon
+  vtkRendering
+  vtkFiltering
 )
 
 #-----------------------------------------------------------------------------

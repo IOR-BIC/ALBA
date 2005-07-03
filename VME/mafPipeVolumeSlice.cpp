@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-30 16:31:18 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-07-03 15:20:11 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -504,7 +504,7 @@ void mafPipeVolumeSlice::OnEvent(mafEventBase *maf_event)
       case ID_RGB_LUT:
       {
         ColorLookupTable(m_ColorLUTEnabled != 0);
-        m_Vme->ForwardUpEvent(mafEvent(this,CAMERA_UPDATE));
+        m_Vme->ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
       }
       break;
       default:
