@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialog.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-30 16:28:11 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-07-04 17:32:31 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,7 +54,7 @@ user widget or sizer can be added calling the "Add" member function.
 
 It is possible to place a mmgGui on an mmgDialog (call Add).
 Normally a mmgGui send event to it's creator,
-but if you an OkCancel button on the Gui to be able to close the Dialog,
+but if you place an OkCancel button on the Gui, to be able to close the Dialog,
 then events from the Gui must go first to the Dialog.
 Example: 
 -create GUI
