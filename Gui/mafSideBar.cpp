@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-16 11:04:36 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2005-07-04 14:49:29 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -66,7 +66,11 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener)
   // wxFrame is needed to avoid endless loop in wxNotebook when
   // a button inside it is pressed and a different notebook tab is pressed suddenly after!! 
   // (mmgNamedPanel doesn't block the problem)
+#ifdef WIN32
   wxFrame *vme_property_frame = new wxFrame(m_SideSplittedPanel,-1,"Vme Property",wxDefaultPosition,wxDefaultSize,wxNO_BORDER);
+#else
+  mmgNamedPanel *vme_property_frame = new mmgNamedPanel(m_SideSplittedPanel ,-1,false,true);
+#endif
   wxNotebook *vme_notebook = new wxNotebook(vme_property_frame,-1);
 
   m_VmeOutputPanel = new mmgGuiHolder(vme_notebook,-1,false,true);
