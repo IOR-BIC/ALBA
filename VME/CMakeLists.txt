@@ -44,6 +44,8 @@ IF (MAF_USE_VTK)
   mafPipeMeter.h
   mafPipeSurface.cpp
   mafPipeSurface.h
+  mafPipeVolumeProjected.cpp
+  mafPipeVolumeProjected.h
   mafPipeVolumeSlice.cpp
   mafPipeVolumeSlice.h
   mafVMEGeneric.cpp
