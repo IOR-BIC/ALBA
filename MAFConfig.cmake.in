@@ -1,0 +1,27 @@
+# Tell the user project where to find headers and libraries
+SET(MAF_INCLUDE_DIRS
+  "@MAF_SOURCE_DIR@/Base"
+  "@MAF_SOURCE_DIR@/Core"
+  "@MAF_SOURCE_DIR@/Gui"
+  "@MAF_SOURCE_DIR@/Interaction"
+  "@MAF_SOURCE_DIR@/IO"
+  "@MAF_SOURCE_DIR@/Operations"
+  "@MAF_SOURCE_DIR@/VME"
+  "@MAF_SOURCE_DIR@/vtkMAF"
+  "@MAF_BINARY_DIR@"
+  "@MAF_BINARY_DIR@/vtkMAF"
+)
+
+SET(MAF_BUILD_SETTINGS_FILE
+  "@MAF_BINARY_DIR@/MAFBuildSettings.cmake"
+)
+
+INCLUDE(
+  "@MAF_BINARY_DIR@/MAFLibraryDepends.cmake"
+)
+
+SET(MAF_LIBRARY_DIRS "@LIBRARY_OUTPUT_PATH@")
+
+SET(MAF_USE_FILE
+  "@MAF_BINARY_DIR@/MAFUse.cmake"
+)
