@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 10:21:57 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2005-07-04 16:02:02 $
+  Version:   $Revision: 1.19 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,8 +30,8 @@
 #include "mmgMDIFrame.h"
 #include "mmgMDIChild.h"
 #include "mafViewVTK.h"
+#include "mafViewCompound.h"
 
-//#include "wx/busyinfo.h"
 #include "mafEvent.h"
 #include "mafRWIBase.h"
 #include "mmdMouse.h"
@@ -48,7 +48,6 @@ mafViewManager::mafViewManager()
 {
   m_Mouse       = NULL;
   m_SelectedRWI = NULL;
-  //m_is=NULL;
 
   m_ViewList          = NULL;
   m_Listener          = NULL;
@@ -147,17 +146,12 @@ void mafViewManager::ViewSelected(mafView *view/*, mafRWIBase *rwi*/)
   if(m_SelectedRWI)
     m_SelectedRWI->SetInteractorStyle(NULL);
 
-  mafViewVTK *vtk_view=mafViewVTK::SafeDownCast(view);
-  if (vtk_view)
+  m_SelectedRWI = view->GetRWI();
+  if (m_Mouse)
   {
-    m_SelectedRWI = vtk_view->GetRWI();
-  
-    if (m_Mouse)
-    {
-      mafEvent e(this,VIEW_SELECT,m_SelectedView);
-      e.SetChannel(MCH_OUTPUT);
-      m_Mouse->OnEvent(&e);
-    }
+    mafEvent e(this,VIEW_SELECT,m_SelectedView);
+    e.SetChannel(MCH_OUTPUT);
+    m_Mouse->OnEvent(&e);
   }
 }
 //----------------------------------------------------------------------------
@@ -255,18 +249,18 @@ void mafViewManager::CameraUpdate()
     v->CameraUpdate();;
 }
 //----------------------------------------------------------------------------
-void mafViewManager::CameraFlyToMode()   
+void mafViewManager::CameraFlyToMode()
 //----------------------------------------------------------------------------
 {
 //  if(m_is) m_is->FlyToMode();
 }
 //----------------------------------------------------------------------------
-void mafViewManager::OnQuit()   
+void mafViewManager::OnQuit()
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-void mafViewManager::FillMenu (wxMenu* menu)
+void mafViewManager::FillMenu(wxMenu* menu)
 //----------------------------------------------------------------------------
 {
   wxString s;
@@ -276,9 +270,10 @@ void mafViewManager::FillMenu (wxMenu* menu)
   }
 	for(int i=0; i<m_TemplateNum; i++)
 	{
-    mafView* v = m_ViewTemplate[i];  
-	  s = wxString::Format("create new %s view",v->GetLabel().c_str());
-	  menu->Append(v->m_Id, s, (wxMenu *)NULL, s );	
+    mafView* v = m_ViewTemplate[i];
+	  //s = wxString::Format("create new %s view",v->GetLabel().c_str());
+    s = wxString::Format("%s",v->GetLabel().c_str());
+	  menu->Append(v->m_Id, s, (wxMenu *)NULL, s );
   }
 }
 //----------------------------------------------------------------------------
@@ -365,13 +360,7 @@ void mafViewManager::ViewInsert(mafView *view)
 //----------------------------------------------------------------------------
 {
 	view->SetListener(this);
-
-  mafViewVTK *vtk_view = mafViewVTK::SafeDownCast(view);
-  if (vtk_view)
-  {
-    vtk_view->SetMouse(m_Mouse);
-  }
-
+  view->SetMouse(m_Mouse);
   if(m_RootVme != NULL)
   {
     mafNodeIterator *iter = m_RootVme->NewIterator();
