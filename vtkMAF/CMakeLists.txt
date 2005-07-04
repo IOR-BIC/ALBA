@@ -14,8 +14,12 @@ vtkRayCast3DPicker.cxx
 vtkRayCast3DPicker.h
 vtkDistanceFilter.cxx
 vtkDistanceFilter.h
+vtkProjectRG.cxx
+vtkProjectRG.h
 vtkProjectSP.cxx
 vtkProjectSP.h
+vtkRectilinearGridToRectilinearGridFilter.cxx
+vtkRectilinearGridToRectilinearGridFilter.h
 vtkRGSliceAccumulate.cxx
 vtkRGSliceAccumulate.h
 vtkTransferFunction2D.cxx
