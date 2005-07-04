@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 09:49:57 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-07-04 14:50:52 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone, Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -51,19 +51,19 @@ enum HIGHEST_EVENT_ID
   mafEvent::mafEvent(void *sender, int id, bool            b,       long arg)							{ Init(sender, id, arg); m_bool =b;											Initialized();}
   mafEvent::mafEvent(void *sender, int id, double           f,       long arg)							{ Init(sender, id, arg); m_double=f;											Initialized();}
   mafEvent::mafEvent(void *sender, int id, mafString      *s,       long arg)							{ Init(sender, id, arg); m_string =s;										Initialized();}
-  mafEvent::mafEvent(void *sender, int id, mafView         *view,   wxWindow *win)				{ Init(sender, id, 0);   m_view =view; m_win  =win;			Initialized();}
+  mafEvent::mafEvent(void *sender, int id, mafView         *view,   wxWindow *win)				{ Init(sender, id, 0);   m_view =view; m_Win  =win;			Initialized();}
   mafEvent::mafEvent(void *sender, int id, mafNode          *vme,    bool b,long arg)			{ Init(sender, id, arg); m_vme  =vme; m_bool = b;				Initialized();}
   mafEvent::mafEvent(void *sender, int id, mafOp           *op,     long arg)							{ Init(sender, id, arg);   m_op   =op;									Initialized();}
   mafEvent::mafEvent(void *sender, int id, mafMatrix    *m1,mafMatrix  *m2)					      { Init(sender, id, 0);   m_matrix =m1; m_matrix2 =m2;		Initialized();}
 #ifdef MAF_USE_WX
-  mafEvent::mafEvent(void *sender, int id, wxWindow        *win,    long arg)							{ Init(sender, id, arg); m_win  =win;										Initialized();}
-  mafEvent::mafEvent(void *sender, int id, wxUpdateUIEvent *e,      long arg)							{ Init(sender, id, arg); m_uiev = e;																	}
-  mafEvent::mafEvent(void *sender, int id, wxObject        *wxobj,  long arg)							{ Init(sender, id, arg); m_wxobj = wxobj;							  Initialized();}
+  mafEvent::mafEvent(void *sender, int id, wxWindow        *win,    long arg)							{ Init(sender, id, arg); m_Win  =win;										Initialized();}
+  mafEvent::mafEvent(void *sender, int id, wxUpdateUIEvent *e,      long arg)							{ Init(sender, id, arg); m_UpdateUIEvent = e;																	}
+  mafEvent::mafEvent(void *sender, int id, wxObject        *wxobj,  long arg)							{ Init(sender, id, arg); m_WxObj = wxobj;							  Initialized();}
 #endif
 #ifdef MAF_USE_VTK
-  mafEvent::mafEvent(void *sender, int id, vtkObject       *vtkobj, long arg)							{ Init(sender, id, arg); m_vtkobj = vtkobj;							Initialized();}
-  mafEvent::mafEvent(void *sender, int id, vtkObject       *vtkobj, mafString *s)         { Init(sender, id, 0);   m_vtkobj = vtkobj;m_string =s; Initialized();}
-  mafEvent::mafEvent(void *sender, int id, vtkProp         *prop,   mafNode *vme)   				{ Init(sender, id, 0);   m_prop =prop; m_vme=vme;				Initialized();}
+  mafEvent::mafEvent(void *sender, int id, vtkObject       *vtkobj, long arg)							{ Init(sender, id, arg); m_VtkObj = vtkobj;							Initialized();}
+  mafEvent::mafEvent(void *sender, int id, vtkObject       *vtkobj, mafString *s)         { Init(sender, id, 0);   m_VtkObj = vtkobj;m_string =s; Initialized();}
+  mafEvent::mafEvent(void *sender, int id, vtkProp         *prop,   mafNode *vme)   				{ Init(sender, id, 0);   m_VtkProp =prop; m_vme=vme;				Initialized();}
 #endif
 		
 //----------------------------------------------------------------------------
@@ -81,15 +81,15 @@ void mafEvent::Log()
   if(m_vme)    s << " vme= "   << (long)m_vme <<" : " << m_vme->GetName();
   if(m_op)     s << " op= "    << (long)m_op  <<" : " << m_op->m_Label;
 #ifdef MAF_USE_WX
-  if(m_win)    s << " win= "   << (long)m_win;
-  if(m_uiev)   s << " ui_evt= "<< (long)m_uiev;
-  if(m_wxobj)  s << " wxobj= " << (long)m_wxobj;
+  if(m_Win)    s << " win= "   << (long)m_Win;
+  if(m_UpdateUIEvent)   s << " ui_evt= "<< (long)m_UpdateUIEvent;
+  if(m_WxObj)  s << " wxobj= " << (long)m_WxObj;
 #endif
 #ifdef MAF_USE_VTK
-  if(m_prop)   s << " prop= "  << (long)m_prop;
+  if(m_VtkProp)   s << " prop= "  << (long)m_VtkProp;
   if(m_matrix) s << " matrix= "<< (long)m_matrix;
   if(m_matrix2)s << " matrix= "<< (long)m_matrix2;
-  if(m_vtkobj) s << " vtkobj= "<< (long)m_vtkobj << " : " << m_vtkobj->GetClassName();
+  if(m_VtkObj) s << " vtkobj= "<< (long)m_VtkObj << " : " << m_VtkObj->GetClassName();
 #endif
 
   mafLogMessage(s);
@@ -105,15 +105,15 @@ mafEvent* mafEvent::Copy()
   e->m_vme			= m_vme;
   e->m_op		    = m_op;
 #ifdef MAF_USE_WX
-  e->m_win			= m_win;
-  e->m_uiev     = m_uiev;
-  e->m_wxobj    = m_wxobj;
+  e->m_Win			= m_Win;
+  e->m_UpdateUIEvent     = m_UpdateUIEvent;
+  e->m_WxObj    = m_WxObj;
 #endif
 #ifdef MAF_USE_VTK
-  e->m_prop		  = m_prop;
+  e->m_VtkProp		  = m_VtkProp;
   e->m_matrix   = m_matrix;
   e->m_matrix2  = m_matrix2;
-  e->m_vtkobj   = m_vtkobj;
+  e->m_VtkObj   = m_VtkObj;
 #endif
 
   return e;
@@ -132,30 +132,30 @@ void mafEvent::Init(void *sender, int id, long arg)
   m_vme    = NULL; 
   m_op	   = NULL; 
 #ifdef MAF_USE_WX
-  m_win    = NULL;
-  m_uiev   = NULL;
-  m_wxobj  = NULL;
+  m_Win    = NULL;
+  m_UpdateUIEvent   = NULL;
+  m_WxObj  = NULL;
 #endif
 #ifdef MAF_USE_VTK
-  m_prop   = NULL;
+  m_VtkProp   = NULL;
   m_matrix = NULL;
   m_matrix2= NULL;
-  m_vtkobj = NULL;
+  m_VtkObj = NULL;
 #endif
 }
 //----------------------------------------------------------------------------
 void mafEvent::Initialized() 
 //----------------------------------------------------------------------------
 {
-  if(m_logmode) Log();
+  if(m_LogMode) Log();
 }
 //----------------------------------------------------------------------------
 /** turn on/off Auto-Logging of every Event */
 void mafEvent::SetLogMode(int logmode)
 //----------------------------------------------------------------------------
 {
-	m_logmode = logmode;
+	m_LogMode = logmode;
 }
 //----------------------------------------------------------------------------
-int mafEvent::m_logmode = 0;
+int mafEvent::m_LogMode = 0;
 //----------------------------------------------------------------------------

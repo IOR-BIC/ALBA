@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 06:13:10 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-07-04 14:50:52 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden, Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -96,18 +96,18 @@ public:
   mafEvent(void *sender, int id, wxUpdateUIEvent *e,      long arg=0);
   mafEvent(void *sender, int id, wxObject        *wxobj,  long arg=0);
 
-  wxWindow*        GetWin()       {return m_win;};
-  wxUpdateUIEvent* GetUIEvent()   {return m_uiev;};
-  wxObject*        GetWxObj()     {return m_wxobj;};
+  wxWindow*        GetWin()       {return m_Win;};
+  wxUpdateUIEvent* GetUIEvent()   {return m_UpdateUIEvent;};
+  wxObject*        GetWxObj()     {return m_WxObj;};
 
-  void SetWin(wxWindow* win)            { m_win = win;};
-  void SetUIEvent(wxUpdateUIEvent *e)   { m_uiev =e;};
-  void SetWxObj(wxObject *wxobj)        { m_wxobj = wxobj;};
+  void SetWin(wxWindow* win)            { m_Win = win;};
+  void SetUIEvent(wxUpdateUIEvent *e)   { m_UpdateUIEvent =e;};
+  void SetWxObj(wxObject *wxobj)        { m_WxObj = wxobj;};
 
 protected:
-  wxWindow        *m_win;
-  wxUpdateUIEvent *m_uiev; 
-  wxObject        *m_wxobj; 
+  wxWindow        *m_Win;
+  wxUpdateUIEvent *m_UpdateUIEvent; 
+  wxObject        *m_WxObj; 
 #endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -118,15 +118,15 @@ public:
   mafEvent(void *sender, int id, vtkObject       *vtkobj, mafString *s);
   mafEvent(void *sender, int id, mafMatrix    *m1,mafMatrix  *m2=NULL);
 
-  vtkProp*         GetProp()      {return m_prop;};
-  vtkObject*       GetVtkObj()    {return m_vtkobj;};
+  vtkProp*         GetProp()      {return m_VtkProp;};
+  vtkObject*       GetVtkObj()    {return m_VtkObj;};
 
-  void SetProp(vtkProp* prop)             { m_prop = prop;};
-  void SetVtkObj(vtkObject *vtkobj)       { m_vtkobj = vtkobj;};
+  void SetProp(vtkProp* prop)             { m_VtkProp = prop;};
+  void SetVtkObj(vtkObject *vtkobj)       { m_VtkObj = vtkobj;};
 
 protected:
-  vtkProp         *m_prop;
-  vtkObject       *m_vtkobj; 
+  vtkProp         *m_VtkProp;
+  vtkObject       *m_VtkObj; 
 #endif  
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -136,7 +136,7 @@ public:
 
   void Log();
   static void     SetLogMode(int logmode);
-  static int      m_logmode;
+  static int      m_LogMode;
   
 protected:
 
