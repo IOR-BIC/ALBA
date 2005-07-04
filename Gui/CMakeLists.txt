@@ -5,6 +5,8 @@
 PROJECT(mafGui)
 MESSAGE(STATUS "Configuring project ${PROJECT_NAME}")
 
+CONFIGURE_FILE("${MAF_SOURCE_DIR}/Gui/manifest.in" "${MAF_BINARY_DIR}/Gui/manifest.in" COPYONLY)
+
 SET(PROJECT_SRCS
 mafLightKit.cpp
 mafLightKit.h
