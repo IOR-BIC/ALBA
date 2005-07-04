@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2005-07-03 15:14:17 $
-# Version:   $Revision: 1.25 $
+# Date:      $Date: 2005-07-04 13:31:20 $
+# Version:   $Revision: 1.26 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -134,6 +134,29 @@ IF (MAF_CAN_BUILD)
   # Configuring Doxygen documentation  
   SUBDIRS (Docs)
   
+  # Export Build settings and library dependences
+  INCLUDE(CMakeExportBuildSettings)
+  
+  CMAKE_EXPORT_BUILD_SETTINGS(
+  ${MAF_BINARY_DIR}/MAFBuildSettings.cmake
+  )
+  
+  EXPORT_LIBRARY_DEPENDENCIES(
+  ${MAF_BINARY_DIR}/MAFLibraryDepends.cmake
+  )
+
+  CONFIGURE_FILE(
+  ${MAF_SOURCE_DIR}/MAFConfig.cmake.in
+  ${MAF_BINARY_DIR}/MAFConfig.cmake
+  @ONLY IMMEDIATE
+  )
+  
+  CONFIGURE_FILE(
+  ${MAF_SOURCE_DIR}/MAFUse.cmake.in
+  ${MAF_BINARY_DIR}/MAFUse.cmake
+  @ONLY IMMEDIATE
+  )
+
   #-----------------------------------------------------------------------------
   # Build examples too ?
   #-----------------------------------------------------------------------------
