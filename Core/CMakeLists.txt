@@ -87,6 +87,8 @@ mafVMEStorage.cpp
 mafVMEStorage.h
 mafView.cpp
 mafView.h
+mafViewCompound.cpp
+mafViewCompound.h
 mafViewManager.cpp
 mafViewManager.h
 mmgListCtrlBitmap.cpp
@@ -95,6 +97,8 @@ mmgMaterialButton.cpp
 mmgMaterialButton.h
 mmgMaterialChooser.cpp
 mmgMaterialChooser.h
+mmgViewWin.cpp
+mmgViewWin.h
 mmgVMEChooser.cpp
 mmgVMEChooser.h
 mmgVMEChooserAccept.cpp
