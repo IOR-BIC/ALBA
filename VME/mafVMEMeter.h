@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 15:27:36 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-07-04 14:49:55 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -34,26 +34,31 @@ class MAF_EXPORT mafVMEMeter : public mafVME
 public:
   MAF_ID_DEC(LENGTH_THRESHOLD_EVENT);
 
-  enum {
+  enum METER_MEASURE_TYPE_ID
+  {
     POINT_DISTANCE=0,
     LINE_DISTANCE,
     LINE_ANGLE
   };
-  enum {
+  enum METER_COLOR_TYPE_ID
+  {
     ONE_COLOR=0,
     RANGE_COLOR
   };
-  enum {
+  enum METER_REPRESENTATION_ID
+  {
     LINE_REPRESENTATION=0,
     TUBE_REPRESENTATION
   };
-  enum {
+  enum METER_MEASURE_ID
+  {
     ABSOLUTE_MEASURE=0,
     RELATIVE_MEASURE
   };
   mafTypeMacro(mafVMEMeter,mafVME);
 
-  enum {
+  enum METER_WIDGET_ID
+  {
     ID_START_METER_LINK = Superclass::ID_LAST,
     ID_END1_METER_LINK,
     ID_END2_METER_LINK,
