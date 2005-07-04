@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-03 15:20:11 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-07-04 16:08:30 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -129,9 +129,9 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
   Superclass::Create(n); // Always call this to initialize m_Vme, m_AssemblyFront, ... vars
 
   assert(m_Vme->IsMAFType(mafVMEVolume));
-  mafVMEVolume *vme = ((mafVMEVolume *) m_Vme);
-  vme->GetVolumeOutput()->Update();
-  vme->GetVolumeOutput()->GetVTKData()->Update();
+  //mafVMEVolume *vme = ((mafVMEVolume *) m_Vme);
+  m_Vme->GetOutput()->Update();
+  m_Vme->GetOutput()->GetVTKData()->Update();
 
 	if(m_SliceMode == SLICE_ARB)
 		m_SliceMode = SLICE_X;
@@ -139,7 +139,7 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 	if (!m_ParametersInitialized)
 	{
     double b[6];
-    vme->GetVolumeOutput()->GetBounds(b);
+    m_Vme->GetOutput()->GetBounds(b);
     m_Origin[0] = (b[0] + b[1])*.5;
     m_Origin[1] = (b[2] + b[3])*.5;
     m_Origin[2] = (b[4] + b[5])*.5;
@@ -195,7 +195,7 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 	if(m_ShowVolumeBox)
 	{
 		m_VolumeBox = vtkOutlineCornerFilter::New();
-		m_VolumeBox->SetInput(vme->GetVolumeOutput()->GetVTKData());
+		m_VolumeBox->SetInput(m_Vme->GetOutput()->GetVTKData());
 
 		m_VolumeBoxMapper = vtkPolyDataMapper::New();
 		m_VolumeBoxMapper->SetInput(m_VolumeBox->GetOutput());
@@ -234,8 +234,8 @@ void mafPipeVolumeSlice::CreateSlice(int mode)
 {
 	double srange[2],w,l, xspc = 0.33, yspc = 0.33;
 
-	mafVMEVolume *vme = ((mafVMEVolume *) m_Vme);
-  vtkDataSet *vtk_data = vme->GetVolumeOutput()->GetVTKData();
+	//mafVMEVolume *vme = ((mafVMEVolume *) m_Vme);
+  vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();
   if (vtk_data)
     vtk_data->GetScalarRange(srange);
   else
