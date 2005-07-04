@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialog.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-30 16:28:11 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-07-04 17:34:53 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -98,11 +98,17 @@ mmgDialog::~mmgDialog( )
 int mmgDialog::ShowModal()
 //----------------------------------------------------------------------------
 {
-  m_DialogSizer->SetMinSize(100,50); // looks ugly when it is empty
-  //this->SetAutoLayout( TRUE ); -- not to be called here
-  this->SetSizer( m_DialogSizer );
-  //m_DialogSizer->Fit(this); //-- not to be called, is called by SetSizeHints
-  m_DialogSizer->SetSizeHints(this);
+  //SIL. 4-7-2005: begin, do the initialization only once
+  static bool initialized = false;
+  if(! initialized )
+  {
+    m_DialogSizer->SetMinSize(100,50); // looks ugly when it is empty
+    //this->SetAutoLayout( TRUE ); -- not to be called here
+    this->SetSizer( m_DialogSizer );
+    //m_DialogSizer->Fit(this); //-- not to be called, is called by SetSizeHints
+    m_DialogSizer->SetSizeHints(this);
+  }
+  //SIL. 4-7-2005: end
   return wxDialog::ShowModal();
 }
 //--------------------------------------------------------------------------------

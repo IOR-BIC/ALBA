@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-30 16:29:09 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-07-04 17:38:59 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -28,6 +28,7 @@
 // GUIs
 #include "mmgGui.h"
 #include "mmgDialog.h"
+#include "mmgButton.h"
 #include "mmgGuiHolder.h"
 #include "mmgTree.h"
 #include "mmgCheckListBox.h"
@@ -535,76 +536,6 @@ enum IMANAGER_WIDGET_ID
   ID_LOAD,
   ID_OK
 };
-
-//----------------------------------------------------------------------------
-void mafInteractionManager::CreateGUI() 
-//----------------------------------------------------------------------------
-{
-  m_Dialog = new mmgDialog("I/O Devices Settings");
-  m_Dialog->SetSize(550,100);
-  m_Dialog->EnableClose(true);
-
-  //m_DeviceList = m_Devices->ListBox(ID_DEVICE_LIST,"",150);
-  m_DeviceTree = new mmgTree(m_Dialog,ID_DEVICE_TREE);
-  m_DeviceTree->SetTitle("connected devices");
-  m_DeviceTree->SetSize(230,250);
-  m_DeviceTree->SetListener(this);
-
-  m_Devices = new mmgGui(this);	
-	m_Devices->Divider();
-	m_Devices->Button(ID_ADD_DEVICE,"add");
-	m_Devices->Button(ID_REMOVE_DEVICE,"remove");
-	m_Devices->Divider();
-  m_Devices->FileOpen(ID_LOAD,"",&m_SettingFileName,"Interaction Settings (*.xml)| *.xml","restore interaction settings file from disk");
-  m_Devices->FileSave(ID_STORE,"",&m_SettingFileName,"Interaction Settings (*.xml)| *.xml","save interaction settings file from disk");  
-// marco: in MAF 2.0 the extra parameter is missing!
-//  m_Devices->FileSave(ID_STORE,"",&m_SettingFileName,"Interaction Settings (*.xml)| *.xml","save interaction settings file from disk",true);  
-
-  m_Devices->Divider();
-  m_Devices->Button(ID_OK,"close");
-	m_Devices->SetListener(this);
-	m_Devices->Show(true);
-  m_Devices->FitGui();
-	m_Devices->Reparent(m_Dialog);
-  
-	// Holder of Device's settings GUI ==========
-	m_SettingsPanel = new mmgGuiHolder(m_Dialog,ID_DEVICE_SETTINGS);
-  m_SettingsPanel->SetTitle("device settings");
-  m_SettingsPanel->SetSize(230,300);
-  m_SettingsPanel->Show(true);
-
-  // Device's binding GUI =====================
-  m_BindingsPanel = new mmgNamedPanel(m_Dialog,ID_DEVICE_BINDINGS);
-  m_BindingsPanel->SetTitle("device bindings");
-  m_BindingsPanel->SetSize(230,100);
-  m_BindingsPanel->Show(true);
-  
-  m_Bindings = new mmgGui(this);
-  m_Bindings->Label("Bindings to actions");
-  m_ActionsList = m_Bindings->CheckList(ID_BINDING_LIST,"",100,"actions the devices is assigned to");
-  m_Bindings->FitGui();
-  m_BindingsPanel->Add(m_Bindings);
-	m_Bindings->Show(true);    
-  
-	wxBoxSizer *v1_sizer = new wxBoxSizer(wxVERTICAL);
-  v1_sizer->Add(m_DeviceTree,1,wxEXPAND | wxALIGN_TOP);
-	v1_sizer->Add(m_Devices   ,1,wxEXPAND | wxALIGN_BOTTOM);
-  
-	wxBoxSizer *v2_sizer = new wxBoxSizer(wxVERTICAL);
-  v2_sizer->Add(m_SettingsPanel,1,wxEXPAND | wxALIGN_TOP);
-  v2_sizer->Add(m_BindingsPanel,1,wxEXPAND | wxALIGN_BOTTOM);
-  
-	wxBoxSizer *main_sizer = new wxBoxSizer(wxHORIZONTAL);
-	main_sizer->Add(v1_sizer,1,wxEXPAND | wxALIGN_LEFT);
-	main_sizer->Add(v2_sizer,1,wxEXPAND | wxALIGN_RIGHT);
-  
-  // ATTACH SIZER TO DIALOG
-	m_Dialog->SetAutoLayout( TRUE );
-  m_Dialog->SetSizer( main_sizer );
-  main_sizer->Fit(m_Dialog);
-  main_sizer->SetSizeHints(m_Dialog);
-}
-
 //------------------------------------------------------------------------------
 void mafInteractionManager::OnEvent(mafEventBase *event)
 //------------------------------------------------------------------------------
@@ -627,11 +558,25 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
 		  break;
       case ID_STORE:
       { 
+        //SIL. 4-7-2005: begin
+        std::string result = 
+        mafGetSaveFile(m_SettingFileName, "Interaction Settings (*.xml)| *.xml", "Save Interaction Settings");
+        if( result == "") return;
+        m_SettingFileName = result.c_str();
+        //SIL. 4-7-2005: end
+
         Store(m_SettingFileName);
       }
       break;
       case ID_LOAD:
       {
+        //SIL. 4-7-2005: begin
+        std::string result = 
+        mafGetOpenFile(m_SettingFileName, "Interaction Settings (*.xml)| *.xml", "Load Interaction Settings");
+        if( result == "") return;
+        m_SettingFileName = result.c_str();
+        //SIL. 4-7-2005: end
+
         Restore(m_SettingFileName);
         //camera reset here?
       }
@@ -834,7 +779,6 @@ bool mafInteractionManager::ShowModal()
 {
   return m_Dialog->ShowModal() != 0;
 }
-
 //----------------------------------------------------------------------------
 int mafInteractionManager::DeviceChooser(wxString &dev_name,wxString &dev_type)
 //----------------------------------------------------------------------------
@@ -942,4 +886,68 @@ void mafInteractionManager::UpdateDevice(mafDevice *device)
 {
   assert(device);
   m_DeviceTree->SetNodeLabel(device->GetID(),device->GetName());
+}
+//----------------------------------------------------------------------------
+void mafInteractionManager::CreateGUI() 
+//----------------------------------------------------------------------------
+{
+   //SIL. 4-7-2005: 
+   // Changed Layout, Behaviour on Resize, Buttons Implementation
+
+  m_Dialog = new mmgDialog("I/O Devices Settings",mafRESIZABLE | mafCLOSEWINDOW);
+
+  m_DeviceTree = new mmgTree(m_Dialog,ID_DEVICE_TREE);
+  m_DeviceTree->SetTitle("connected devices");
+  m_DeviceTree->SetSize(230,300);
+  m_DeviceTree->SetListener(this);
+
+  // Holder of Device's settings GUI ==========
+  m_SettingsPanel = new mmgGuiHolder(m_Dialog,ID_DEVICE_SETTINGS);
+  m_SettingsPanel->Show(true);
+  m_SettingsPanel->SetSize(215,300); // h era 230
+  m_SettingsPanel->SetTitle("device settings");
+
+  // Device's binding GUI =====================
+  m_BindingsPanel = new mmgNamedPanel(m_Dialog,ID_DEVICE_BINDINGS);
+  m_BindingsPanel->SetTitle("device bindings");
+  m_BindingsPanel->SetSize(215,100); // h era 230
+
+  m_Bindings = new mmgGui(this);
+  m_Bindings->Label("available actions");
+  m_Bindings->Label("available actions");
+  m_ActionsList = m_Bindings->CheckList(ID_BINDING_LIST,"",60,"actions the devices is assigned to");
+  m_Bindings->Show(true);
+  m_Bindings->FitGui();
+  m_BindingsPanel->Add(m_Bindings);
+
+  // Buttons =====================
+  mmgButton *add = new mmgButton(m_Dialog,ID_ADD_DEVICE,"add device",wxPoint(0,0)); 
+  add->SetListener(this);
+  mmgButton *remove = new mmgButton(m_Dialog,ID_REMOVE_DEVICE,"remove device",wxPoint(0,0));
+  remove->SetListener(this);
+  mmgButton *load = new mmgButton(m_Dialog,ID_LOAD,"load",wxPoint(0,0));
+  load->SetListener(this);
+  mmgButton *save = new mmgButton(m_Dialog,ID_STORE,"save as",wxPoint(0,0));
+  save->SetListener(this);
+  mmgButton *close = new mmgButton(m_Dialog,ID_OK,"close",wxPoint(0,0));
+  close->SetListener(this);
+
+  // sizers ====================================
+  wxBoxSizer *v_sizer = new wxBoxSizer(wxVERTICAL);
+  v_sizer->Add(m_SettingsPanel,1,wxEXPAND|wxALL, 1 );
+  v_sizer->Add(m_BindingsPanel,0,wxALL, 1 );
+
+  wxBoxSizer *h_sizer = new wxBoxSizer(wxHORIZONTAL);
+  h_sizer->Add(m_DeviceTree,1,wxEXPAND|wxALL, 1 );
+  h_sizer->Add(v_sizer,0,wxEXPAND);
+
+  wxBoxSizer *h2_sizer = new wxBoxSizer(wxHORIZONTAL);
+  h2_sizer->Add(add);
+  h2_sizer->Add(remove);
+  h2_sizer->Add(load);
+  h2_sizer->Add(save);
+  h2_sizer->Add(close);
+
+  m_Dialog->Add(h_sizer,1,wxEXPAND);
+  m_Dialog->Add(h2_sizer,0,wxCENTRE|wxALL,1);
 }
