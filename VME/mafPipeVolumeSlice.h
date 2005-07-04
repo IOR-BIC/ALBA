@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-30 16:31:19 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-07-04 17:18:36 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -13,6 +13,9 @@
 #ifndef _mafPipeVolumeSlice_H_
 #define _mafPipeVolumeSlice_H_
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
 #include "mafPipe.h"
 
 //----------------------------------------------------------------------------
