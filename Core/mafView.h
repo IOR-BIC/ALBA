@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-30 16:24:30 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2005-07-04 16:01:27 $
+  Version:   $Revision: 1.19 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,6 +26,8 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
+class mmdMouse;
+class mafRWIBase;
 
 //----------------------------------------------------------------------------
 // const :
@@ -80,6 +82,8 @@ public:
 
   virtual void			CameraReset(mafNode *node = NULL)  											{};
   virtual void			CameraUpdate()																					{};
+  virtual void      SetMouse(mmdMouse *mouse)                               {};
+  virtual mafRWIBase *GetRWI()                                              {return NULL;};
 
   /** return the status of the node within this view. es: NON_VISIBLE,VISIBLE_ON, ... */
   //having mafView::GetNodeStatus allow mmgCheckTree to not know about mafSceneGraph
@@ -118,7 +122,7 @@ public:
   mafView       *m_Next;    // forget it - it is used from outside 
 
   /** IDs for the GUI */
-  enum 
+  enum VIEW_WIDGET_ID
   {
     ID_FIRST = MINID,
     ID_LAST
