@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:43:07 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-07-04 16:02:32 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -55,7 +55,7 @@ public:
 	virtual	void UpdateProperty(bool fromTag = false)		{};
 
   /** IDs for the GUI */
-  enum 
+  enum VISUAL_PIPE_WIDGET_ID
   {
     ID_FIRST = MINID,
     ID_LAST
