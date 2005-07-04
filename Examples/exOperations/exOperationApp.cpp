@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-03 15:16:04 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-07-04 14:52:31 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -43,6 +43,7 @@
 #include "mmoVTKImporter.h"
 
 #include "mafViewVTK.h"
+#include "mafViewCompound.h"
 
 //--------------------------------------------------------------------------------
 // Create the Application
@@ -91,6 +92,12 @@ bool exOperationApp::OnInit()
   v->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
   m_logic->Plug(v);
   m_logic->Plug(new mafViewVTK("VTK view"));
+
+  mafViewCompound *vc = new mafViewCompound("view compound",3);
+  mafViewVTK *v2 = new mafViewVTK("Slice view", CAMERA_CT);
+  v2->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
+  vc->PlugChildView(v2);
+  m_logic->Plug(vc);
 
   m_logic->Show();
   m_logic->Init(0,NULL); // calls FileNew - which create the root
