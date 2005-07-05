@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-03 15:20:11 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-07-05 06:01:31 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -76,25 +76,27 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
   m_OutlineActor    = NULL;
   m_ScalarVisibility= 0;
 
-  assert(m_Vme->IsMAFType(mafVMESurface));
-  mafVMESurface *vme = ((mafVMESurface*) m_Vme);
-  assert(vme->GetSurfaceOutput());
-  vme->GetSurfaceOutput()->Update();
-  vtkPolyData *data = vme->GetSurfaceOutput()->GetSurfaceData();
+  assert(m_Vme->GetOutput()->IsMAFType(mafVMEOutputSurface));
+  mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
+  assert(surface_output);
+  surface_output->Update();
+  vtkPolyData *data = surface_output->GetSurfaceData();
   assert(data);
 
   m_Mapper = vtkPolyDataMapper::New();
 	m_Mapper->SetInput(data);
   m_Mapper->SetScalarVisibility(m_ScalarVisibility);
   
-	if(vme->IsAnimated())				
+	if(m_Vme->IsAnimated())				
 		m_Mapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
 	else
 		m_Mapper->ImmediateModeRenderingOff();
 
   m_Actor = vtkActor::New();
 	m_Actor->SetMapper(m_Mapper);
-  m_Actor->SetProperty(vme->GetMaterial()->m_Prop);
+  mmaMaterial *material = surface_output->GetMaterial();
+  if (material)
+    m_Actor->SetProperty(material->m_Prop);
 
   m_AssemblyFront->AddPart(m_Actor);
 
