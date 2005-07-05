@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 15:17:07 $
-  Version:   $Revision: 1.7 $
-  Authors:   Marco Petrone
+  Date:      $Date: 2005-07-05 19:15:14 $
+  Version:   $Revision: 1.8 $
+  Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
