@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-13 10:35:13 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2005-07-05 06:04:04 $
+  Version:   $Revision: 1.36 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -61,6 +61,8 @@ mafNode::mafNode()
 mafNode::~mafNode()
 //-------------------------------------------------------------------------
 {
+  RemoveAllLinks();
+  
   // advise observers this is being destroyed
   m_EventSource->InvokeEvent(this,NODE_DESTROYED);
 
