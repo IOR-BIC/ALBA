@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-12 16:19:18 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-07-05 06:05:44 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -49,7 +49,7 @@ public:
   mafAbstractTypeMacro(mafVMEOutput,mafObject);
 
   /** return the VME connected to this object */
-  mafVME *GetVME() const;
+  mafVME *GetVME() const {return m_VME;}
 
   /** internally used to set the VME connected to this object */
   void SetVME(mafVME *vme) {m_VME=vme;} 
