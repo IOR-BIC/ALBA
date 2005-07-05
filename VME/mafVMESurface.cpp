@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:54:53 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-07-05 06:03:03 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -58,7 +58,6 @@ mafVMESurface::~mafVMESurface()
   //cppDEL(m_MaterialButton);
 }
 
-
 //-------------------------------------------------------------------------
 mafVMEOutput *mafVMESurface::GetOutput()
 //-------------------------------------------------------------------------
@@ -69,6 +68,21 @@ mafVMEOutput *mafVMESurface::GetOutput()
     SetOutput(mafVMEOutputSurface::New()); // create the output
   }
   return m_Output;
+}
+
+//-------------------------------------------------------------------------
+int mafVMESurface::InternalInitialize()
+//-------------------------------------------------------------------------
+{
+  if (Superclass::InternalInitialize()==MAF_OK)
+  {
+    // force material allocation
+    GetMaterial();
+
+    return MAF_OK;
+  }
+
+  return MAF_ERROR;
 }
 
 //-------------------------------------------------------------------------
@@ -117,7 +131,7 @@ void mafVMESurface::OnEvent(mafEventBase *maf_event)
     switch(e->GetId())
     {
       default:
-        mafVME::OnEvent(maf_event);
+        Superclass::OnEvent(maf_event);
     }
   }
   else

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:54:53 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-07-05 06:03:04 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -67,6 +67,9 @@ public:
 protected:
   mafVMESurface();
   virtual ~mafVMESurface();
+
+  /** used to initialize and create the material attribute if not yet present */
+  virtual int InternalInitialize();
 
   /** Internally used to create a new instance of the GUI.*/
   virtual mmgGui *CreateGui();
