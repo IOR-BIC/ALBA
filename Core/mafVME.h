@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:44:33 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2005-07-05 06:05:11 $
+  Version:   $Revision: 1.25 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -217,7 +217,7 @@ protected:
   virtual int InternalRestore(mafStorageElement *node);
 
   /** used to initialize the AbsMatrixPipe */
-  virtual int mafVME::InternalInitialize();
+  virtual int InternalInitialize();
 
   /** called to prepare the update of output */
   virtual void InternalPreUpdate() {}
