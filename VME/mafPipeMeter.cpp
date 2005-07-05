@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 15:27:49 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-07-05 06:00:27 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -362,10 +362,13 @@ void mafPipeMeter::UpdateProperty(bool fromTag)
   }
 
   double pos[3], rot[3];
-  m_MeterVME->GetStartVME()->GetOutput()->GetAbsPose(pos,rot);
-  m_Caption->SetAttachmentPoint(pos[0],pos[1],pos[2]);
-
-  m_Gui->Update();
+  if (m_MeterVME->GetStartVME())
+  {
+    m_MeterVME->GetStartVME()->GetOutput()->GetAbsPose(pos,rot);
+    m_Caption->SetAttachmentPoint(pos[0],pos[1],pos[2]);
+  }
+  
+  GetGui()->Update();
 
   /*
 	if(fromTag)
