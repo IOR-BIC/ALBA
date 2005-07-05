@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 07:18:37 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-05 06:06:17 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -36,7 +36,13 @@ int mmuMSFDocument::InternalRestore(mafStorageElement *node)
 //-------------------------------------------------------
 {
   // here should restore elements specific for the document
-  return node->RestoreObject("Root",m_Root);
+  int ret = node->RestoreObject("Root",m_Root);
+  if (ret==MAF_OK)
+  {
+    return m_Root->Initialize();
+  }
+
+  return MAF_ERROR; 
 }
 
 //------------------------------------------------------------------------------
