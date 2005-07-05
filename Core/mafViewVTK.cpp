@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-30 16:25:27 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-07-05 06:04:39 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -196,9 +196,16 @@ void mafViewVTK::VmeCreatePipe(mafNode *vme)
   {
     obj = pipe_factory->CreateInstance(pipe_name);
     mafPipe *pipe = (mafPipe*)obj;
-    pipe->Create(n);
-    n->m_Pipe = (mafPipe*)pipe;
-    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+    if (pipe)
+    {
+      pipe->Create(n);
+      n->m_Pipe = (mafPipe*)pipe;
+      mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+    }
+    else
+    {
+      mafErrorMessage("Cannot create visual pipe object of type \"%s\"!",pipe_name.GetCStr());
+    }
   }
 }
 //----------------------------------------------------------------------------
