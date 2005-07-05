@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputSurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-07 14:44:10 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-07-05 06:01:57 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,6 +20,7 @@
 //----------------------------------------------------------------------------
 class vtkPolyData;
 class vtkImageData;
+class mmaMaterial;
 
 /** NULL output for VME node with a VTK image output data.
   mafVMEOutputSurface is the output produced by a node generating an output
@@ -51,6 +52,12 @@ public:
   /** used by VME to set the texture */
   void SetTexture(vtkImageData *tex);
 
+  /** return material attribute of this surface if present */
+  mmaMaterial *GetMaterial();
+
+  /** set the material of the surface */ 
+  void SetMaterial(mmaMaterial *material);
+
   /** IDs for the GUI */
   /*enum 
   {
@@ -61,6 +68,7 @@ public:
 protected: 
   vtkImageData *m_Texture; ///< the optional texture to be applied to the surface
   mafString     m_NumTriangles;
+  mmaMaterial  *m_Material; ///< material object used to store shading propertied to render the surface
 
   mmgGui *CreateGui();
 

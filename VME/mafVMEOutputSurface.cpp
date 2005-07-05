@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-30 16:31:02 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-07-05 06:01:57 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,6 +26,7 @@
 #include "mafIndent.h"
 #include "mafDataPipe.h"
 #include "mmgGui.h"
+#include "mmaMaterial.h"
 
 #include "vtkPolyData.h"
 #include "vtkImageData.h"
@@ -40,8 +41,9 @@ mafCxxTypeMacro(mafVMEOutputSurface)
 mafVMEOutputSurface::mafVMEOutputSurface()
 //-------------------------------------------------------------------------
 {
-  m_Texture = NULL;
-  m_NumTriangles = "0";
+  m_Texture       = NULL;
+  m_Material      = NULL;
+  m_NumTriangles  = "0";
 }
 
 //-------------------------------------------------------------------------
@@ -76,6 +78,25 @@ vtkImageData *mafVMEOutputSurface::GetTexture()
   if (m_VME && m_VME->GetDataPipe() && m_VME->GetDataPipe()->GetVTKData())
     m_VME->GetDataPipe()->GetVTKData()->UpdateInformation();
   return m_Texture;
+}
+
+//-------------------------------------------------------------------------
+mmaMaterial *mafVMEOutputSurface::GetMaterial()
+//-------------------------------------------------------------------------
+{
+  // if the VME set the material directly in the output return it
+  if (m_Material)
+    return  m_Material;
+
+  // search for a material attribute in the VME connected to this output
+  return GetVME() ? mmaMaterial::SafeDownCast(GetVME()->GetAttribute("MaterialAttributes")) : NULL;
+}
+
+//-------------------------------------------------------------------------
+void mafVMEOutputSurface::SetMaterial(mmaMaterial *material)
+//-------------------------------------------------------------------------
+{
+  m_Material = material;
 }
 //-------------------------------------------------------------------------
 mmgGui* mafVMEOutputSurface::CreateGui()
