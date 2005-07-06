@@ -10,6 +10,8 @@ PROJECT(vtkMAF)
 SET(vtkMAF_SRCS
 #vtkDicomUnPacker.cxx
 #vtkDicomUnPacker.h
+vtkDOFMatrix.cxx
+vtkDOFMatrix.h
 vtkRayCast3DPicker.cxx
 vtkRayCast3DPicker.h
 vtkDistanceFilter.cxx
