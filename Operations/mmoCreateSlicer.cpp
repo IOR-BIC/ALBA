@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 11:35:29 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-07-06 13:43:25 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -69,5 +69,5 @@ void mmoCreateSlicer::OpRun()
 void mmoCreateSlicer::OpDo()
 //----------------------------------------------------------------------------
 {
-  m_Slicer->ReparentTo(m_Input);
+  m_Slicer->ReparentTo(mafVME::SafeDownCast(m_Input));
 }
