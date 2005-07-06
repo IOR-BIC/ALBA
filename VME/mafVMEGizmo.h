@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGizmo.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:51:46 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-06 13:47:08 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -23,6 +23,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class vtkPolyData;
 class mafTransform;
 class mafVMEOutputSurface;
+class mmaMaterial;
 
 /* mafVMEGizmo - this class represent a non persistent node of the tree.
  mafVMEGizmo is a non persistent node of the tree used by application modules
@@ -56,6 +57,9 @@ public:
   /** return the right type of output */  
   mafVMEOutputSurface *GetSurfaceOutput();
 
+  /** Return pointer to material attribute. */
+  mmaMaterial *GetMaterial();
+
   /**
     Set the Pose matrix of the VME. This function modifies the MatrixVector. You can
     set or get the Pose for a specified time. When setting, if the time does not exist
@@ -74,6 +78,9 @@ public:
   
   /** return an xpm-icon that can be used to represent this node */
   //static char ** GetIcon();
+
+  /** Return the suggested pipe-typename for the visualization of this vme */
+  virtual mafString GetVisualPipe() {return mafString("mafPipeSurface");};
 
 protected:
   mafVMEGizmo();

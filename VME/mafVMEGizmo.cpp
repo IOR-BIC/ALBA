@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGizmo.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:51:47 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-06 13:47:08 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -17,6 +17,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVMEOutputSurface.h"
 #include "mafDataPipeCustom.h"
 #include "mafTagArray.h"
+#include "mmaMaterial.h"
 
 #include "vtkPolyData.h"
 #include "vtkMAFDataPipe.h"
@@ -72,6 +73,19 @@ bool mafVMEGizmo::Equals(mafVME *vme)
   return false;
 }
 //-------------------------------------------------------------------------
+mmaMaterial *mafVMEGizmo::GetMaterial()
+//-------------------------------------------------------------------------
+{
+  mmaMaterial *material = (mmaMaterial *)GetAttribute("MaterialAttributes");
+  if (material == NULL)
+  {
+    material = mmaMaterial::New();
+    SetAttribute("MaterialAttributes", material);
+  }
+  return material;
+}
+
+//-------------------------------------------------------------------------
 void mafVMEGizmo::SetData(vtkPolyData *data)
 //-------------------------------------------------------------------------
 {
@@ -118,5 +132,4 @@ void mafVMEGizmo::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes)
 {
   kframes.clear(); // no timestamps
 }
- 
 #endif
