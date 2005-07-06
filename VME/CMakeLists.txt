@@ -8,24 +8,24 @@ DBG_MESSAGE("Configuring project ${PROJECT_NAME}")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-mafDataInterpolator.cpp
-mafDataInterpolator.h
-mafDataVector.cpp
-mafDataVector.h
-mafMatrixInterpolator.cpp
-mafMatrixInterpolator.h
-mafMatrixVector.cpp
-mafMatrixVector.h
-mafPipeFactoryVME.cpp
-mafPipeFactoryVME.h
-mafVMEFactory.cpp
-mafVMEFactory.h
-mafVMEGenericAbstract.cpp
-mafVMEGenericAbstract.h
-mafVMEGroup.cpp
-mafVMEGroup.h
-mafVMEItem.cpp
-mafVMEItem.h
+  mafDataInterpolator.cpp
+  mafDataInterpolator.h
+  mafDataVector.cpp
+  mafDataVector.h
+  mafMatrixInterpolator.cpp
+  mafMatrixInterpolator.h
+  mafMatrixVector.cpp
+  mafMatrixVector.h
+  mafPipeFactoryVME.cpp
+  mafPipeFactoryVME.h
+  mafVMEFactory.cpp
+  mafVMEFactory.h
+  mafVMEGenericAbstract.cpp
+  mafVMEGenericAbstract.h
+  mafVMEGroup.cpp
+  mafVMEGroup.h
+  mafVMEItem.cpp
+  mafVMEItem.h
 )
 
 IF (MAF_USE_CRYPTO)
@@ -50,8 +50,8 @@ IF (MAF_USE_VTK)
   mafPipeVolumeSlice.h
   mafVMEGeneric.cpp
   mafVMEGeneric.h
-#  mafVMEGizmo.cpp
-#  mafVMEGizmo.h
+  mafVMEGizmo.cpp
+  mafVMEGizmo.h
   mafVMEImage.cpp
   mafVMEImage.h
   mafVMEItemVTK.cpp
@@ -94,7 +94,6 @@ IF (MAF_USE_VTK)
   mmaMeter.h
   vtkMAFDataPipe.cpp
   vtkMAFDataPipe.h
-
   )
 ENDIF (MAF_USE_VTK)
 
