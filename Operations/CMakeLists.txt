@@ -20,12 +20,16 @@ IF (MAF_USE_VTK)
     mmoCreateMeter.h
     mmoCreateSlicer.cpp
     mmoCreateSlicer.h
+    mmoMAFTransform.cpp
+    mmoMAFTransform.h
     mmoReparentTo.cpp
     mmoReparentTo.h
     mmoSTLExporter.cpp
     mmoSTLExporter.h
     mmoSTLImporter.cpp
     mmoSTLImporter.h
+    mmoTransformInterface.cpp
+    mmoTransformInterface.h
     mmoVTKExporter.cpp
     mmoVTKExporter.h
     mmoVTKImporter.cpp
