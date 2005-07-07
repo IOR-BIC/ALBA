@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-04 14:52:31 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-07-07 15:07:08 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -36,6 +36,7 @@
 #include "mmoCreateGroup.h"
 #include "mmoCreateMeter.h"
 #include "mmoCreateSlicer.h"
+#include "mmoMAFTransform.h"
 #include "mmoReparentTo.h"
 #include "mmoSTLExporter.h"
 #include "mmoSTLImporter.h"
@@ -77,17 +78,29 @@ bool exOperationApp::OnInit()
   m_logic->GetTopWin()->SetTitle("Operations example");
   SetTopWindow(mafGetFrame());  
 
+  //------------------------------------------------------------
+  // Importer Menu':
   m_logic->Plug(new mmoSTLImporter("STL Importer"));
   m_logic->Plug(new mmoVTKImporter("VTK Importer"));
+  //------------------------------------------------------------
 
+  //------------------------------------------------------------
+  // Exporter Menu':
   m_logic->Plug(new mmoSTLExporter("STL Exporter"));
   m_logic->Plug(new mmoVTKExporter("VTK Exporter"));
+  //------------------------------------------------------------
 
+  //------------------------------------------------------------
+  // Operation Menu':
   m_logic->Plug(new mmoCreateGroup("Create Group"));
   m_logic->Plug(new mmoCreateMeter("Create Meter"));
   m_logic->Plug(new mmoCreateSlicer("Create Slicer"));
+  m_logic->Plug(new mmoMAFTransform("MAF Transform"));
   m_logic->Plug(new mmoReparentTo("Reparent to...  \tCtrl+R"));
+  //------------------------------------------------------------
   
+  //------------------------------------------------------------
+  // View Menu':
   mafViewVTK *v = new mafViewVTK("Slice view", CAMERA_CT);
   v->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
   m_logic->Plug(v);
@@ -98,6 +111,7 @@ bool exOperationApp::OnInit()
   v2->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
   vc->PlugChildView(v2);
   m_logic->Plug(vc);
+  //------------------------------------------------------------
 
   m_logic->Show();
   m_logic->Init(0,NULL); // calls FileNew - which create the root
