@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-04 14:50:52 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-07-07 15:11:53 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden, Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -66,7 +66,7 @@ public:
 
   void SetArg(long arg)         { m_arg = arg;};
   void SetBool(bool b)          { m_bool = b;};
-  void SetFloat(double f)       { m_double = f;};
+  void SetDouble(double f)      { m_double = f;};
   void SetString(mafString *s)  { m_string = s;};
   void SetView(mafView* view)   { m_view = view;};
   void SetVme(mafNode* vme)     { m_vme = vme;};
