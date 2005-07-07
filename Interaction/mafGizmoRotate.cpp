@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotate.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:24 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-07 15:13:26 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -278,20 +278,20 @@ void mafGizmoRotate::SetAbsPose(mafMatrix *absPose, bool applyPoseToFans)
   mafTransform::GetPosition(*absPose, pos);
   mafTransform::GetOrientation(*absPose, orient);
 
-  mafMatrix tmpMatr;
-  tmpMatr.SetTimeStamp(absPose->GetTimeStamp());
-  mafTransform::SetPosition(tmpMatr, pos);
-  mafTransform::SetOrientation(tmpMatr, orient);
+  mafSmartPointer<mafMatrix> tmpMatr;
+  tmpMatr->SetTimeStamp(absPose->GetTimeStamp());
+  mafTransform::SetPosition(*tmpMatr.GetPointer(), pos);
+  mafTransform::SetOrientation(*tmpMatr.GetPointer(), orient);
 
   for (int i = 0; i < 3; i++)
   {
-    GRCircle[i]->SetAbsPose(&tmpMatr);
+    GRCircle[i]->SetAbsPose(tmpMatr);
     if (applyPoseToFans == true)
     {
-      GRFan[i]->SetAbsPose(&tmpMatr);
+      GRFan[i]->SetAbsPose(tmpMatr);
     }
   }
-  GuiGizmoRotate->SetAbsOrientation(&tmpMatr);
+  GuiGizmoRotate->SetAbsOrientation(tmpMatr);
 }
 
 //----------------------------------------------------------------------------
@@ -331,25 +331,25 @@ void mafGizmoRotate::SendTransformMatrixFromGui(mafEventBase *maf_event)
     // [NewAbsPose] = [M]*[OldAbsPose] => [M] = [NewAbsPose][OldAbsPose]
 
     // build objects
-    mafMatrix M;
+    mafSmartPointer<mafMatrix> M;
     mafMatrix invOldAbsPose;
-    mafMatrix newAbsPose;
+    mafSmartPointer<mafMatrix> newAbsPose;
 
     // incoming matrix is a rotation matrix
-    newAbsPose.DeepCopy(GetAbsPose());
+    newAbsPose->DeepCopy(GetAbsPose());
     // copy rotation from incoming matrix
-    mafTransform::CopyRotation(*e->GetMatrix(), newAbsPose);
+    mafTransform::CopyRotation(*e->GetMatrix(), *newAbsPose.GetPointer());
 
     invOldAbsPose.DeepCopy(this->GetAbsPose());
     invOldAbsPose.Invert();
 
-    mafMatrix::Multiply4x4(newAbsPose,invOldAbsPose,M);
+    mafMatrix::Multiply4x4(*newAbsPose.GetPointer(),invOldAbsPose,*M.GetPointer());
 
     // update gizmo abs pose
-    this->SetAbsPose(&newAbsPose, true);
+    this->SetAbsPose(newAbsPose, true);
 
     // send transfrom to postmultiply to the listener. Events is sent as a transform event
-    SendTransformMatrix(&M, ID_TRANSFORM, mmiGenericMouse::MOUSE_MOVE);   
+    SendTransformMatrix(M, ID_TRANSFORM, mmiGenericMouse::MOUSE_MOVE);
   }
 }
 
