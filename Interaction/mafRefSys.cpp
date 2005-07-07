@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRefSys.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 07:57:09 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-07-07 15:19:12 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -208,7 +208,10 @@ void mafRefSys::SetRenderer(vtkRenderer *renderer)
 {
   if (m_Renderer!=renderer)
   {
-    m_Renderer->UnRegister(NULL);
+    if(m_Renderer)
+    {
+      m_Renderer->UnRegister(NULL);
+    }
     m_Renderer = renderer;
     m_Renderer->Register(NULL);
   }
