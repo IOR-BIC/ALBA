@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMAFTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:51:39 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-07 15:21:53 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -61,7 +61,7 @@ mmoTransformInterface(label)
 //----------------------------------------------------------------------------
 {
   m_OpType = OPTYPE_OP;
-  m_Canundo = false;
+  m_Canundo = true;
 
   GizmoTranslate          = NULL;
   GizmoRotate             = NULL;
@@ -71,7 +71,7 @@ mmoTransformInterface(label)
   GuiTransformTextEntries = NULL;
 }
 //----------------------------------------------------------------------------
-mmoMAFTransform::~mmoMAFTransform( ) 
+mmoMAFTransform::~mmoMAFTransform()
 //----------------------------------------------------------------------------
 {
   cppDEL(GizmoTranslate);
@@ -95,7 +95,7 @@ mafOp* mmoMAFTransform::Copy()
 }
 
 //----------------------------------------------------------------------------
-void mmoMAFTransform::OpRun()   
+void mmoMAFTransform::OpRun()
 //----------------------------------------------------------------------------
 {
   // progress bar stuff
@@ -108,7 +108,7 @@ void mmoMAFTransform::OpRun()
   NewAbsMatrix = *((mafVME *)m_Input)->GetOutput()->GetAbsMatrix();
   OldAbsMatrix = *((mafVME *)m_Input)->GetOutput()->GetAbsMatrix();
 
-  CreateGui();  
+  CreateGui();
   ShowGui();
 }
 
@@ -164,7 +164,8 @@ void mmoMAFTransform::OpDo()
 void mmoMAFTransform::OpUndo()
 //----------------------------------------------------------------------------
 {  
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE)); 
+	((mafVME *)m_Input)->SetAbsMatrix(OldAbsMatrix);
+  mafEventMacro(mafEvent(this,CAMERA_UPDATE)); 
 }
 //----------------------------------------------------------------------------
 void mmoMAFTransform::OpStop(int result)
