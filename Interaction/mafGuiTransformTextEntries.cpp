@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformTextEntries.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:30 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-07 15:18:03 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -192,7 +192,7 @@ void mafGuiTransformTextEntries::SetAbsPose(mafMatrix* absPose, mafTimeStamp tim
 //----------------------------------------------------------------------------
 {
   // express absPose in RefSysVME refsys
-  mafSmartPointer<mafTransformFrame>  mflTr;
+  mafTransformFrame *mflTr = mafTransformFrame::New();
   mflTr->SetInput(absPose);
   mflTr->SetTargetFrame(RefSysVME->GetOutput()->GetAbsMatrix());
   mflTr->Update();
