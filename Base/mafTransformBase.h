@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformBase.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-12 16:12:09 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-07-07 15:08:31 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,6 +17,7 @@
 #include "mafMTime.h"
 #include "mafMutexLock.h"
 #include "mafMatrix.h"
+#include "mafSmartPointer.h"
 
 //------------------------------------------------------------------------------
 // Forward declarations
@@ -136,7 +137,7 @@ public:
 #endif
 
 protected:
-  mafMatrix *m_Matrix;        ///< internally stored matrix.
+  mafAutoPointer<mafMatrix> m_Matrix;        ///< internally stored matrix.
   mafMTime m_MTime;           ///< modification time
   mafMTime m_UpdateTime;      ///< We need to record the time of the last update
   mafMutexLock m_UpdateMutex; ///< we also need to do mutex locking so updates don't collide.
