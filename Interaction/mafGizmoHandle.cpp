@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoHandle.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:23 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-07 15:12:53 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -130,7 +130,7 @@ mafGizmoHandle::~mafGizmoHandle()
   vtkDEL(IsaComp); 
 
   mafEventMacro(mafEvent(this, VME_REMOVE, BoxGizmo));  
-  BoxGizmo->Delete();
+  //BoxGizmo->Delete();
 
   vtkDEL(Cube);
 }

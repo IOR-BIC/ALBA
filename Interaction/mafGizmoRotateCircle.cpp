@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateCircle.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:24 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-07 15:13:43 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -118,7 +118,7 @@ mafGizmoRotateCircle::~mafGizmoRotateCircle()
   vtkDEL(IsaComp); 
   
   mafEventMacro(mafEvent(this, VME_REMOVE, Gizmo));
-  vtkDEL(Gizmo);
+  //vtkDEL(Gizmo);
 }
 
 //----------------------------------------------------------------------------

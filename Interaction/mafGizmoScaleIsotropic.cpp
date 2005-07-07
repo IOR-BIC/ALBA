@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScaleIsotropic.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:26 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-07 15:14:53 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -100,7 +100,7 @@ mafGizmoScaleIsotropic::~mafGizmoScaleIsotropic()
   vtkDEL(IsaComp); 
 
   mafEventMacro(mafEvent(this, VME_REMOVE, CubeGizmo));  
-  CubeGizmo->Delete();
+//  CubeGizmo->Delete();
 }
 
 //----------------------------------------------------------------------------

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslatePlane.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:27 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-07 15:15:49 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -158,7 +158,7 @@ mafGizmoTranslatePlane::~mafGizmoTranslatePlane()
   {
     vtkDEL(RotatePDF[i]);
     mafEventMacro(mafEvent(this, VME_REMOVE, Gizmo[i]));
-    Gizmo[i]->Delete();
+    //Gizmo[i]->Delete();
   }
 }
 

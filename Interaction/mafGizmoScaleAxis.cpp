@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScaleAxis.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:25 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-07 15:14:36 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -120,8 +120,8 @@ mafGizmoScaleAxis::~mafGizmoScaleAxis()
   mafEventMacro(mafEvent(this, VME_REMOVE, CylGizmo));
   mafEventMacro(mafEvent(this, VME_REMOVE, CubeGizmo));  
 
-  CylGizmo->Delete();
-  CubeGizmo->Delete();
+//  CylGizmo->Delete();
+//  CubeGizmo->Delete();
 }
 
 //----------------------------------------------------------------------------
