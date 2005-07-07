@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGizmo.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:47:08 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-07 15:26:15 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -21,6 +21,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "vtkPolyData.h"
 #include "vtkMAFDataPipe.h"
+
+//-------------------------------------------------------------------------
+mafCxxTypeMacro(mafVMEGizmo)
+//-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
 mafVMEGizmo::mafVMEGizmo()
