@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-05 19:15:14 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-07-07 15:09:08 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -101,7 +101,8 @@ void mafTransformFrame::SetInputFrame(mafTransformBase *frame)
 void mafTransformFrame::SetInputFrame(mafMatrix *matrix)
 //----------------------------------------------------------------------------
 {
-  mafTransform *trans= new mafTransform;
+  //mafTransform *trans= new mafTransform;
+  mafTransform *trans= mafTransform::New();
   trans->SetMatrix(*matrix);
   SetInputFrame(trans);
 }
@@ -120,7 +121,8 @@ void mafTransformFrame::SetTargetFrame(mafTransformBase *frame)
 void mafTransformFrame::SetTargetFrame(mafMatrix *matrix)
 //----------------------------------------------------------------------------
 {
-  mafTransform *trans= new mafTransform;
+  //mafTransform *trans= new mafTransform;
+  mafTransform *trans = mafTransform::New();
   trans->SetMatrix(*matrix);
   SetTargetFrame(trans);
 }
