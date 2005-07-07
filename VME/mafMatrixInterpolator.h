@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrixInterpolator.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-12 16:22:02 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-07-07 15:25:37 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,6 +15,8 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafMatrixPipe.h"
+#include "mafSmartPointer.h"
+
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------
@@ -72,9 +74,9 @@ protected:
   void SetCurrentItem(mafMatrix *data);
   void UpdateCurrentItem(mafMatrix *item);
 
-  mafMatrix    *m_CurrentItem; ///< the item currently selected for the current time
+  mafAutoPointer<mafMatrix>    m_CurrentItem; ///< the item currently selected for the current time
 
-  mafMatrix    *m_OldItem;     ///< the item previously selected
+  mafAutoPointer<mafMatrix>    m_OldItem;     ///< the item previously selected
 
   mafTimeStamp  m_OldTimeStamp; ///< previous time
 private:
