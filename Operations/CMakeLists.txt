@@ -8,7 +8,6 @@ DBG_MESSAGE("Configuring project mafOperations")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-
 )
 
 IF (MAF_USE_VTK)
@@ -22,6 +21,8 @@ IF (MAF_USE_VTK)
     mmoCreateSlicer.h
     mmoMAFTransform.cpp
     mmoMAFTransform.h
+    mmoMSFImporter.cpp
+    mmoMSFImporter.h
     mmoReparentTo.cpp
     mmoReparentTo.h
     mmoSTLExporter.cpp
