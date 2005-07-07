@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTransformInterface.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:51:39 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-07 15:24:02 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni        
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,6 +20,7 @@
 #include "mafEvent.h"
 #include "mafOp.h"
 #include "mafMatrix.h"
+#include "mafString.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -106,9 +107,9 @@ protected:
   vme used as reference system */
   mafVME *RefSysVME;
 
-  wxString RefSysVMEName;
+  mafString RefSysVMEName;
 
-  mafMatrix  OldAbsMatrix; // used by Undo()
-  mafMatrix  NewAbsMatrix; // used by Do()
+  mafMatrix OldAbsMatrix; // used by Undo()
+  mafMatrix NewAbsMatrix; // used by Do()
 };
 #endif
