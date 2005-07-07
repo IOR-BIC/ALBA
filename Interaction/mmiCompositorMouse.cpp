@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiCompositorMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 06:15:14 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-07-07 15:19:56 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -348,7 +348,7 @@ void mmiCompositorMouse::OnButtonUp(mafEventInteraction *e)
 }
 
 //------------------------------------------------------------------------------
-void mmiCompositorMouse::OnEvent(mafEvent *event)
+void mmiCompositorMouse::OnEvent(mafEventBase *event)
 //------------------------------------------------------------------------------
 {
   assert(event);

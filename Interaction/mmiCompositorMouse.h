@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiCompositorMouse.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 16:43:06 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-07 15:19:57 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -77,7 +77,7 @@ public:
   virtual int StartInteraction(mmdMouse *mouse);
 
   /**  Process events coming from tracker */
-  virtual void OnEvent(mafEvent *event);
+  virtual void OnEvent(mafEventBase *event);
 
   //----------------------------------------------------------------------------
   // Transform Enabling:
