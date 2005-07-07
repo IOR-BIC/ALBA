@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-30 16:26:17 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2005-07-07 15:11:30 $
+  Version:   $Revision: 1.18 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -454,6 +454,7 @@ mafMatrix *mafVMEOutput::GetAbsMatrix() const
 //-------------------------------------------------------------------------
 {
   assert(m_VME);
+  m_VME->GetAbsMatrixPipe()->Update();
   return m_VME->GetAbsMatrixPipe()->GetMatrixPointer();
 }
 
