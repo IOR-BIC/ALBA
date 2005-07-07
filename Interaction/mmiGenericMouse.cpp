@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-06 15:39:38 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-07-07 15:20:18 $
+  Version:   $Revision: 1.7 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -887,14 +887,13 @@ void mmiGenericMouse::SendTransformMatrix(const mafMatrix &matrix, int mouseActi
   e.SetId(ID_TRANSFORM);
   e.SetSender(this);
   e.SetArg(mouseAction);
-  e.SetFloat(rotationAngle);
+  e.SetDouble(rotationAngle);
 
   // if mouseAction == MOUSE_DOWN notify the listener about the
   // picked position in world coordinates
   if (mouseAction == MOUSE_DOWN)
   {
-    mafTransform::SetPosition(*pickPosMatrix, (float) m_LastPickPosition[0],
-      (float) m_LastPickPosition[1], (float) m_LastPickPosition[2]);
+    mafTransform::SetPosition(*pickPosMatrix, m_LastPickPosition);
     
     //e.SetVtkObj(pickPosMatrix);  //modified by Marco. 24-5-2005
     e.SetMafObject(pickPosMatrix);

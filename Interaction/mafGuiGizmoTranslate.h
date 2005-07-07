@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiGizmoTranslate.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:29 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-07 15:16:29 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,7 +50,7 @@ public:
 
 // this constants must be visible from the owner gizmo  
 
-enum
+enum GUI_GIZMO_TRANSLATE_ID
 {
     ID_TRANSLATE_X = MINID,
     ID_TRANSLATE_Y,

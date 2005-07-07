@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformMouse.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:30 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-07 15:17:24 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,7 +54,7 @@ public:
   //----------------------------------------------------------------------------
 
   // this constants must be visible from the owner object  
-  enum
+  enum GUI_TRANSFORM_MOUSE_ID
   {
       ID_ROTATION_AXES = MINID,
       ID_TRASLATION_AXES,

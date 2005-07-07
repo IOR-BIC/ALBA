@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:30 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-07 15:17:07 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,6 +36,7 @@
 #include "mafVMEOutput.h"
 
 #include "vtkMatrix4x4.h"
+#include "vtkRenderer.h"
 
 // constraints enum
 enum TRANSFORM_MOUSE_WIDGET_ID
@@ -118,113 +119,110 @@ void mafGuiTransformMouse::CreateGui()
 void mafGuiTransformMouse::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  switch(maf_event->GetId())
   {
-    switch(e->GetId())
+    case ID_ROTATION_AXES:
     {
-      case ID_ROTATION_AXES:
+      // set rotation constraint;
+      if (RotationConstraintId == X_AXIS)
       {
-        // set rotation constraint;
-        if (RotationConstraintId == X_AXIS)
-        {
-          IsaRotate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-          IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-          IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK);
-        }
-        else if (RotationConstraintId == Y_AXIS)
-        {
-          IsaRotate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-          IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-          IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::FREE, mmiConstraint::LOCK);
-        }
-        else if (RotationConstraintId == Z_AXIS)
-        {
-          IsaRotate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-          IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-          IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::FREE);
-        }
-        else if (RotationConstraintId == VIEW_PLANE)
-        {
-          IsaRotate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-          IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
-          IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToView();
-        }
+        IsaRotate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK);
       }
-      break;
-      case ID_TRASLATION_AXES:
+      else if (RotationConstraintId == Y_AXIS)
       {
-        // set translation constraint;
-        if (TranslationConstraintId == X_AXIS)
-        {
-          IsaTranslate->SurfaceSnapOff(); 
-          IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-          IsaTranslate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-          IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK);   
-        }
-        else if (TranslationConstraintId == Y_AXIS)
-        {
-          IsaTranslate->SurfaceSnapOff();
-          IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-          IsaTranslate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-          IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::FREE, mmiConstraint::LOCK);        
-        }
-        else if (TranslationConstraintId == Z_AXIS)
-        {                                             
-          IsaTranslate->SurfaceSnapOff(); 
-          IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-          IsaTranslate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-          IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::FREE);        
-        }      
-        else if (TranslationConstraintId == VIEW_PLANE)
-        {
-          IsaTranslate->SurfaceSnapOff();
-          IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
-        }
-
-        if (TranslationConstraintId == XY_PLANE)
-        {
-          IsaTranslate->SurfaceSnapOff();             
-          IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-          IsaTranslate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-          IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
-        }
-        else if (TranslationConstraintId == XZ_PLANE)  
-        {
-          IsaTranslate->SurfaceSnapOff(); 
-          IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-          IsaTranslate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-          IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::FREE);       
-        }
-        else if (TranslationConstraintId == YZ_PLANE)
-        {               
-          IsaTranslate->SurfaceSnapOff();
-          IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-          IsaTranslate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-          IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::FREE, mmiConstraint::FREE);   
-        }
-        // isa gen is sending matrix to the operation
-        else if (TranslationConstraintId == SURFACE_SNAP)
-        {
-          IsaTranslate->SurfaceSnapOn();
-          IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
-        }
+        IsaRotate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::FREE, mmiConstraint::LOCK);
       }
-      break;
-
-      case ID_TRANSFORM:
+      else if (RotationConstraintId == Z_AXIS)
       {
-        // forward transform events to listener operation; the operation will move the vme
-        e->SetSender(this);
-        mafEventMacro(*e);
+        IsaRotate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::FREE);
       }
-      break;
-
-      default:
+      else if (RotationConstraintId == VIEW_PLANE)
       {
-        mafEventMacro(*e);
+        IsaRotate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
+        IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToView();
       }
-      break;
     }
+    break;
+    case ID_TRASLATION_AXES:
+    {
+      // set translation constraint;
+      if (TranslationConstraintId == X_AXIS)
+      {
+        IsaTranslate->SurfaceSnapOff(); 
+        IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaTranslate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK);   
+      }
+      else if (TranslationConstraintId == Y_AXIS)
+      {
+        IsaTranslate->SurfaceSnapOff();
+        IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaTranslate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::FREE, mmiConstraint::LOCK);        
+      }
+      else if (TranslationConstraintId == Z_AXIS)
+      {                                             
+        IsaTranslate->SurfaceSnapOff(); 
+        IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaTranslate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::FREE);        
+      }      
+      else if (TranslationConstraintId == VIEW_PLANE)
+      {
+        IsaTranslate->SurfaceSnapOff();
+        IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
+      }
+
+      if (TranslationConstraintId == XY_PLANE)
+      {
+        IsaTranslate->SurfaceSnapOff();             
+        IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaTranslate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
+      }
+      else if (TranslationConstraintId == XZ_PLANE)  
+      {
+        IsaTranslate->SurfaceSnapOff(); 
+        IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaTranslate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::FREE);       
+      }
+      else if (TranslationConstraintId == YZ_PLANE)
+      {               
+        IsaTranslate->SurfaceSnapOff();
+        IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaTranslate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::FREE, mmiConstraint::FREE);   
+      }
+      // isa gen is sending matrix to the operation
+      else if (TranslationConstraintId == SURFACE_SNAP)
+      {
+        IsaTranslate->SurfaceSnapOn();
+        IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
+      }
+    }
+    break;
+
+    case ID_TRANSFORM:
+    {
+      // forward transform events to listener operation; the operation will move the vme
+      maf_event->SetSender(this);
+      mafEventMacro(*maf_event);
+    }
+    break;
+
+    default:
+    {
+      mafEventMacro(*maf_event);
+    }
+    break;
   }
 }
 

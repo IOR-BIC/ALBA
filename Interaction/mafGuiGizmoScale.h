@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiGizmoScale.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:28 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-07 15:16:16 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,7 +51,7 @@ public:
 
   // this constants must be visible from the owner gizmo  
 
-  enum
+  enum GIZMO_SCALE_ID
   {
       ID_SCALE_X = MINID,
       ID_SCALE_Y,

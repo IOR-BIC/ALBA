@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiSaveRestorePose.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:29 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-07 15:16:42 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,7 +50,7 @@ public:
   //----------------------------------------------------------------------------
 
   // this constants must be visible from the owner object  
-  enum
+  enum GUI_SAVE_RESTORE_ID
   {
     ID_SAVE = MINID,
     ID_REMOVE,
