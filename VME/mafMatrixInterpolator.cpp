@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrixInterpolator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 15:24:37 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-07-07 17:17:55 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -94,7 +94,7 @@ void mafMatrixInterpolator::Update()
   unsigned long mtime=m_UpdateTime.GetMTime();
 
   // if the current time has changed or if this object has been modified...
-  if (m_OldTimeStamp!=GetTimeStamp() || !m_CurrentItem || (m_CurrentItem->GetMTime()>mtime))
+  if (m_OldTimeStamp!=GetTimeStamp() || !m_CurrentItem || (m_CurrentItem->GetMTime()>mtime) || mtime < GetMTime())
   {
     m_OldTimeStamp=GetTimeStamp();    
     
