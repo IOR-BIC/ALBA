@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:42:49 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-07-07 15:27:30 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafVMEGeneric.h"
+#include "mafVME.h"
 #include "mafVMEOutputSurface.h"
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -29,11 +29,11 @@ class mafNode;
   @todo
   - 
   */
-class MAF_EXPORT mafVMESlicer : public mafVMEGeneric
+class MAF_EXPORT mafVMESlicer : public mafVME
 {
 public:
 
-  mafTypeMacro(mafVMESlicer,mafVMEGeneric);
+  mafTypeMacro(mafVMESlicer,mafVME);
 
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0);
