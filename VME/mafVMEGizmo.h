@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGizmo.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:47:08 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-07 15:26:56 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -87,13 +87,13 @@ protected:
   virtual ~mafVMEGizmo();
   
   /** called to prepare the update of the output */
-  virtual void InternalPreUpdate();
+  //virtual void InternalPreUpdate();
 
   /** update the output data structure */
-  virtual void InternalUpdate();
+  //virtual void InternalUpdate();
 
-  mafTransform*     m_Transform; ///< pose matrix for the slicer plane
-  vtkPolyData *m_GizmoData;
+  mafTransform *m_Transform; ///< pose matrix for the slicer plane
+  vtkPolyData  *m_GizmoData;
 
 private:
   mafVMEGizmo(const mafVMEGizmo&); // Not implemented
@@ -101,5 +101,4 @@ private:
 
   /** Hidden VME functions */
 };
-
 #endif
