@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMAFTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 15:21:53 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-08 13:28:47 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -551,7 +551,7 @@ void mmoMAFTransform::CreateGui()
 	m_Gui->Button(ID_AUX_REF_SYS,"choose");
 	if(this->RefSysVME == NULL)
   {
-    RefSysVME = mafVME::SafeDownCast(m_Input);
+    SetRefSysVME(mafVME::SafeDownCast(m_Input));
     RefSysVMEName = m_Input->GetName();
   }
   m_Gui->Label("refsys name: ",&RefSysVMEName);
