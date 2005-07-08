@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslateAxis.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 15:15:36 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-08 13:25:26 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -68,22 +68,12 @@ mafGizmoTranslateAxis::mafGizmoTranslateAxis(mafVME *input, mafObserver *listene
   // cylinder gizmo
   CylGizmo = mafVMEGizmo::New();
   CylGizmo->SetName("CylGizmo");
-  CylGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
   CylGizmo->SetData(RotatePDF[CYLINDER]->GetOutput());
-  
-  // cyl gizmo data
-  //GizmoData[CYLINDER] = new mafVmeData(CylGizmo, this);
-  //CylGizmo->SetClientData(GizmoData[CYLINDER]);
   
   // cone gizmo
   ConeGizmo = mafVMEGizmo::New();  
   ConeGizmo->SetName("ConeGizmo");
-  ConeGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
   ConeGizmo->SetData(RotatePDF[CONE]->GetOutput());
-  
-  // cone gizmo data
-  //GizmoData[CONE] = new mafVmeData(ConeGizmo, this);
-  //ConeGizmo->SetClientData(GizmoData[CONE]);
 
   // assign isa to cylinder and cone
   CylGizmo->SetBehavior(IsaComp[CYLINDER]);
@@ -98,9 +88,12 @@ mafGizmoTranslateAxis::mafGizmoTranslateAxis(mafVME *input, mafObserver *listene
   this->Show(false);
 
   //-----------------
+  // ReparentTo will add also the gizmos to the tree!!
+  CylGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
+  ConeGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
   // add the gizmo to the tree, this should increase reference count 
-  mafEventMacro(mafEvent(this, VME_ADD, CylGizmo));
-  mafEventMacro(mafEvent(this, VME_ADD, ConeGizmo));
+//  mafEventMacro(mafEvent(this, VME_ADD, CylGizmo));
+//  mafEventMacro(mafEvent(this, VME_ADD, ConeGizmo));
 }
 //----------------------------------------------------------------------------
 mafGizmoTranslateAxis::~mafGizmoTranslateAxis() 

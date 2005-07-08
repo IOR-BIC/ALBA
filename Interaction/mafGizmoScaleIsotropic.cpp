@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScaleIsotropic.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 15:14:53 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-08 13:25:43 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -66,7 +66,6 @@ mafGizmoScaleIsotropic::mafGizmoScaleIsotropic(mafVME *input, mafObserver *liste
   // cube gizmo
   CubeGizmo = mafVMEGizmo::New();  
   CubeGizmo->SetName("CubeGizmo");
-  CubeGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
   CubeGizmo->SetData(Cube->GetOutput());
   
   // assign isa to cube
@@ -81,9 +80,9 @@ mafGizmoScaleIsotropic::mafGizmoScaleIsotropic(mafVME *input, mafObserver *liste
   this->Show(false);
 
   //-----------------
-  
+  CubeGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
   // add the gizmo to the tree, this should increase reference count 
-  mafEventMacro(mafEvent(this, VME_ADD, CubeGizmo));
+//  mafEventMacro(mafEvent(this, VME_ADD, CubeGizmo));
 }
 //----------------------------------------------------------------------------
 mafGizmoScaleIsotropic::~mafGizmoScaleIsotropic() 

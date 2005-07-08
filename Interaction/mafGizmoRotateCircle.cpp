@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateCircle.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 15:13:43 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-08 13:26:50 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -76,7 +76,6 @@ mafGizmoRotateCircle::mafGizmoRotateCircle(mafVME *input, mafObserver *listener)
   // the circle gizmo
   Gizmo = mafVMEGizmo::New();
   Gizmo->SetName("circle");
-  Gizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
   Gizmo->SetData(RotatePDF->GetOutput());
 
   // gizmo data
@@ -97,8 +96,9 @@ mafGizmoRotateCircle::mafGizmoRotateCircle(mafVME *input, mafObserver *listener)
   // hide gizmos at creation
   this->Show(false);
   
+  Gizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
   // add the gizmo to the tree, this should increase reference count  
-  mafEventMacro(mafEvent(this, VME_ADD, Gizmo));
+//  mafEventMacro(mafEvent(this, VME_ADD, Gizmo));
 }
 //----------------------------------------------------------------------------
 mafGizmoRotateCircle::~mafGizmoRotateCircle() 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScaleAxis.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 15:14:36 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-08 13:25:58 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -68,13 +68,11 @@ mafGizmoScaleAxis::mafGizmoScaleAxis(mafVME *input, mafObserver *listener)
   // cylinder gizmo
   CylGizmo = mafVMEGizmo::New();
   CylGizmo->SetName("CylGizmo");
-  CylGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
   CylGizmo->SetData(RotatePDF[CYLINDER]->GetOutput());
   
   // cube gizmo
   CubeGizmo = mafVMEGizmo::New();  
   CubeGizmo->SetName("CubeGizmo");
-  CubeGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
   CubeGizmo->SetData(RotatePDF[CUBE]->GetOutput());
 
   // assign isa to cylinder and cube
@@ -90,9 +88,11 @@ mafGizmoScaleAxis::mafGizmoScaleAxis(mafVME *input, mafObserver *listener)
   // hide gizmos at creation
   this->Show(false);
 
+  CylGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
+  CubeGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
   // add the gizmo to the tree, this should increase reference count 
-  mafEventMacro(mafEvent(this, VME_ADD, CylGizmo));
-  mafEventMacro(mafEvent(this, VME_ADD, CubeGizmo));
+//  mafEventMacro(mafEvent(this, VME_ADD, CylGizmo));
+//  mafEventMacro(mafEvent(this, VME_ADD, CubeGizmo));
 }
 //----------------------------------------------------------------------------
 mafGizmoScaleAxis::~mafGizmoScaleAxis() 

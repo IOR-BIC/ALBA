@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslatePlane.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 15:15:49 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-08 13:25:04 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -83,12 +83,7 @@ mafGizmoTranslatePlane::mafGizmoTranslatePlane(mafVME *input, mafObserver *liste
     vmeName = "part";
     vmeName << i;
     Gizmo[i]->SetName(vmeName.GetCStr());
-    Gizmo[i]->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
     Gizmo[i]->SetData(RotatePDF[i]->GetOutput());
-  
-    // gizmo data
-    //GizmoData[i] = new mafVmeData(Gizmo[i], this);
-    //Gizmo[i]->SetClientData(GizmoData[i]);
   }
 
   // assign isa to S1 and S2;
@@ -124,7 +119,8 @@ mafGizmoTranslatePlane::mafGizmoTranslatePlane(mafVME *input, mafObserver *liste
   // add the gizmo to the tree, this should increase reference count 
   for (i = 0; i < 3; i++)
   {
-    mafEventMacro(mafEvent(this, VME_ADD, Gizmo[i]));
+    Gizmo[i]->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
+//    mafEventMacro(mafEvent(this, VME_ADD, Gizmo[i]));
   }
   
 }
