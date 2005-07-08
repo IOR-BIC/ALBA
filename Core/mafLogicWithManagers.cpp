@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 10:21:55 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2005-07-08 13:20:23 $
+  Version:   $Revision: 1.25 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,6 +29,8 @@
 #include "mafOpManager.h"
 #include "mafInteractionManager.h"
 #include "mafInteractor.h"
+#include "mafTagArray.h"
+#include "mafTagItem.h"
 
 #include "mmgMDIFrame.h"
 #include "mmgCheckTree.h"
@@ -603,7 +605,10 @@ void mafLogicWithManagers::VmeAdded(mafNode *vme)
 
   if(m_ViewManager)
     m_ViewManager->VmeAdd(vme);
-	if(m_SideBar)
+	bool add_vme_to_tree = true;
+  add_vme_to_tree = !vme->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") || 
+                    (vme->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") && vme->GetTagArray()->GetTag("VISIBLE_IN_THE_TREE")->GetValueAsDouble() != 0);
+  if(m_SideBar && add_vme_to_tree)
     m_SideBar->VmeAdd(vme);
   UpdateTimeBounds();
 }
