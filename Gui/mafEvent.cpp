@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-04 14:50:52 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-07-08 14:11:18 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone, Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -91,6 +91,7 @@ void mafEvent::Log()
   if(m_matrix2)s << " matrix= "<< (long)m_matrix2;
   if(m_VtkObj) s << " vtkobj= "<< (long)m_VtkObj << " : " << m_VtkObj->GetClassName();
 #endif
+  if(m_MafObject) s << " mafobj= " << (long)m_MafObject << " : " << m_MafObject->GetTypeName();
 
   mafLogMessage(s);
 }
@@ -104,6 +105,7 @@ mafEvent* mafEvent::Copy()
   e->m_view		  = m_view;
   e->m_vme			= m_vme;
   e->m_op		    = m_op;
+  e->m_MafObject= m_MafObject;
 #ifdef MAF_USE_WX
   e->m_Win			= m_Win;
   e->m_UpdateUIEvent     = m_UpdateUIEvent;
@@ -131,6 +133,7 @@ void mafEvent::Init(void *sender, int id, long arg)
   m_view   = NULL; 
   m_vme    = NULL; 
   m_op	   = NULL; 
+  m_MafObject = NULL;
 #ifdef MAF_USE_WX
   m_Win    = NULL;
   m_UpdateUIEvent   = NULL;
