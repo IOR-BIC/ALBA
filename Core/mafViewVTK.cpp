@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-08 15:15:29 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2005-07-08 15:18:13 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -297,4 +297,14 @@ void mafViewVTK::UpdateCameraMatrix()
   m_Rwi->m_Camera->ApplyTransform(delta);
 
   m_AttachedVmeMatrix->DeepCopy(new_matrix);
+}
+//----------------------------------------------------------------------------
+void mafViewVTK::OnPreResetCamera()
+//----------------------------------------------------------------------------
+{
+}
+//----------------------------------------------------------------------------
+void mafViewVTK::OnPostResetCamera()
+//----------------------------------------------------------------------------
+{
 }
