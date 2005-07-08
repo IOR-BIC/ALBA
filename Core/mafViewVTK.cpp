@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-05 06:04:39 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-07-08 15:15:29 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -262,6 +262,14 @@ void mafViewVTK::OnEvent(mafEventBase *maf_event)
         {
           m_AttachedVme = NULL;
         }
+      break;
+      case CAMERA_PRE_RESET:
+        OnPreResetCamera();
+        mafEventMacro(*maf_event);
+      break;
+      case CAMERA_POST_RESET:
+        OnPostResetCamera();
+        mafEventMacro(*maf_event);
       break;
       default:
         mafEventMacro(*maf_event);

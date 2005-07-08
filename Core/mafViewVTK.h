@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-04 16:02:18 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-07-08 15:15:29 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -106,6 +106,9 @@ protected:
   vtkMatrix4x4	*m_AttachedVmeMatrix;
 
   virtual mmgGui *CreateGui();
+
+  virtual void OnPreResetCamera() {};
+  virtual void OnPostResetCamera() {};
 
   /** Update the camera position when vme's abs matrix change. 
   This function is called from CameraUpdate when camera is attached to the vme */
