@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVectorVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:16:31 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-08 16:32:28 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -13,6 +13,7 @@
 #ifndef __mafDataVectorVTK_h
 #define __mafDataVectorVTK_h
 
+#include "mafDataVector.h"
 #include "mafTimeMap.txx"
 #include "mafStorable.h"
 #include "mafVMEItem.h"

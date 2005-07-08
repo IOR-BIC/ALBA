@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 17:26:44 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-08 16:32:29 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,13 +20,17 @@
 // forward declarations :
 //----------------------------------------------------------------------------
 class mafVMERoot;
+class mafVME;
+class mafTagArray;
+class mafMatrixVector;
 
-/** utility class representing the MSF document. */
-class mmuMSFDocument : public mmuUtility, public mafStorable
+/** utility class representing the MSF document.
+ This class is used by mafMSFImporter to restore MSF 1.x files.*/
+class mmuMSF1xDocument : public mmuUtility, public mafStorable
 {
 public:
-  mmuMSFDocument():m_Root(NULL) {}
-  virtual ~mmuMSFDocument() {}
+  mmuMSF1xDocument():m_Root(NULL) {}
+  virtual ~mmuMSF1xDocument() {}
   virtual int InternalStore(mafStorageElement *node);
   virtual int InternalRestore(mafStorageElement *node);
   
@@ -34,6 +38,12 @@ public:
   mafVMERoot *GetRoot();
   
 protected:
+  mafVME *CreateVMEInstance(mafString &name);
+  mafVME *RestoreVME(mafStorageElement *node, mafVME *parent);
+  int RestoreTagArray(mafStorageElement *node, mafTagArray *tarray);
+  int RestoreVItem(mafStorageElement *node, mafVME *vme);
+  int RestoreVMatrix(mafStorageElement *node, mafMatrixVector *vmatrix);
+
   mafVMERoot *m_Root;
 };
 
