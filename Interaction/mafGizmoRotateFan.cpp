@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateFan.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 15:13:57 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-08 13:27:46 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -71,7 +71,6 @@ mafGizmoRotateFan::mafGizmoRotateFan(mafVME *input, mafObserver *listener)
   // the circle gizmo
   Gizmo = mafVMEGizmo::New();
   Gizmo->SetName("fan");
-  Gizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
   Gizmo->SetData(ChangeFanAxisTPDF->GetOutput());
 
   // set the default axis to X axis
@@ -85,8 +84,9 @@ mafGizmoRotateFan::mafGizmoRotateFan(mafVME *input, mafObserver *listener)
   // hide the gizmo after creation
   this->Show(false);
 
+  Gizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
   // add the gizmo to the tree, this should increase reference count  
-  mafEventMacro(mafEvent(this, VME_ADD, Gizmo));
+//  mafEventMacro(mafEvent(this, VME_ADD, Gizmo));
 }
 //----------------------------------------------------------------------------
 mafGizmoRotateFan::~mafGizmoRotateFan() 
@@ -234,7 +234,8 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
 
           // get the picked position from the event
           double pos[3];
-          mafTransform::GetPosition(vtkMatrix4x4::SafeDownCast(e->GetVtkObj()), pos);
+          //mafTransform::GetPosition(vtkMatrix4x4::SafeDownCast(e->GetVtkObj()), pos);
+          mafTransform::GetPosition(*mafMatrix::SafeDownCast(e->GetMafObject()),pos);
 
           // get the start theta
           double offsetAngle = PointPickedToStartTheta(pos[0], pos[1], pos[2]);
