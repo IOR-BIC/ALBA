@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-05 06:01:31 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-07-08 13:30:10 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -80,7 +80,7 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
   mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
   assert(surface_output);
   surface_output->Update();
-  vtkPolyData *data = surface_output->GetSurfaceData();
+  vtkPolyData *data = vtkPolyData::SafeDownCast(surface_output->GetVTKData());
   assert(data);
 
   m_Mapper = vtkPolyDataMapper::New();
