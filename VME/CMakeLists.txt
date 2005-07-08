@@ -42,6 +42,8 @@ IF (MAF_USE_VTK)
   ${PROJECT_SRCS}
   mafDataPipeCustom.cpp
   mafDataPipeCustom.h
+  mafPipeGizmo.cpp
+  mafPipeGizmo.h
   mafPipeMeter.cpp
   mafPipeMeter.h
   mafPipeSurface.cpp

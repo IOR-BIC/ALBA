@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGizmo.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 15:26:56 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-07-08 13:29:34 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -80,7 +80,7 @@ public:
   //static char ** GetIcon();
 
   /** Return the suggested pipe-typename for the visualization of this vme */
-  virtual mafString GetVisualPipe() {return mafString("mafPipeSurface");};
+  virtual mafString GetVisualPipe() {return mafString("mafPipeGizmo");};
 
 protected:
   mafVMEGizmo();
