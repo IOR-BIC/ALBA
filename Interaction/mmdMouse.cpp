@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 07:57:09 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-07-08 13:21:06 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -53,7 +53,7 @@ mmdMouse::mmdMouse()
 mmdMouse::~mmdMouse()
 //------------------------------------------------------------------------------
 {
-  m_Picker->Delete();
+//  m_Picker->Delete();
 }
 
 /*//------------------------------------------------------------------------------
