@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 15:20:18 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-07-11 14:10:24 $
+  Version:   $Revision: 1.8 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -1128,7 +1128,7 @@ void mmiGenericMouse::TrackballRotate()
 
    // translate to center of the constrain ref sys
    transform.Identity();
-   transform.Translate(pivotPoint[0], pivotPoint[1], pivotPoint[2],POST_MULTIPLY);
+   transform.Translate(pivotPoint[0], pivotPoint[1], pivotPoint[2],PRE_MULTIPLY);
    
    float dx = m_LastX - x;
    float dy = m_LastY - y;
@@ -1137,21 +1137,18 @@ void mmiGenericMouse::TrackballRotate()
    m_CurrentCamera->OrthogonalizeViewUp();
    double *viewUp = m_CurrentCamera->GetViewUp();
    int *size = m_Renderer->GetSize();
-   transform.RotateWXYZ(-360.0 * dx / size[0], viewUp[0], viewUp[1], viewUp[2],POST_MULTIPLY);
+   transform.RotateWXYZ(-360.0 * dx / size[0], viewUp[0], viewUp[1], viewUp[2],PRE_MULTIPLY);
    
    // elevation
    vtkMath::Cross(m_CurrentCamera->GetDirectionOfProjection(), viewUp, v2);
-   transform.RotateWXYZ(360.0 * dy / size[1], v2[0], v2[1], v2[2],POST_MULTIPLY);
+   transform.RotateWXYZ(360.0 * dy / size[1], v2[0], v2[1], v2[2],PRE_MULTIPLY);
    
    // translate back
-   transform.Translate(-pivotPoint[0], -pivotPoint[1], -pivotPoint[2],POST_MULTIPLY);
+   transform.Translate(-pivotPoint[0], -pivotPoint[1], -pivotPoint[2],PRE_MULTIPLY);
    
    //send the transform matrix
    SendTransformMatrix(transform.GetMatrix());
-
-   // clean up
-   transform.Delete();
- 
+  
    // update m_LastX and m_LastY
    m_LastX = x;
    m_LastY = y;
