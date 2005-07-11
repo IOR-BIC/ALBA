@@ -41,17 +41,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkRectilinearGridToRectilinearGridFilter.h"
 #include "vtkObjectFactory.h"
 
-vtkRectilinearGridToRectilinearGridFilter *vtkRectilinearGridToRectilinearGridFilter::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkRectilinearGridToRectilinearGridFilter");
-  if(ret)
-    {
-    return (vtkRectilinearGridToRectilinearGridFilter*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkRectilinearGridToRectilinearGridFilter;
-}
+vtkCxxRevisionMacro(vtkRectilinearGridToRectilinearGridFilter, "$Revision: 1.2 $");
+vtkStandardNewMacro(vtkRectilinearGridToRectilinearGridFilter);
 
 
 //----------------------------------------------------------------------------

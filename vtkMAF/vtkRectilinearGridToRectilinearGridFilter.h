@@ -58,7 +58,7 @@ class VTK_vtkMAF_EXPORT vtkRectilinearGridToRectilinearGridFilter : public vtkRe
 {
 public:
   static vtkRectilinearGridToRectilinearGridFilter *New();
-  vtkTypeMacro(vtkRectilinearGridToRectilinearGridFilter,vtkRectilinearGridSource);
+  vtkTypeRevisionMacro(vtkRectilinearGridToRectilinearGridFilter,vtkRectilinearGridSource);
 
   /**
   Set / get the input data or filter.*/

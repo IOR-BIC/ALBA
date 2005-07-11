@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeProjected.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-04 17:18:05 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-11 06:21:09 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -41,7 +41,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkPlaneSource.h"
 #include "vtkTexture.h"
 #include "vtkProbeFilter.h"
-#include "vtkPolydataMapper.h"
+#include "vtkPolyDataMapper.h"
 #include "vtkProjectSP.h"
 #include "vtkProjectRG.h"
 #include "vtkProperty.h"
