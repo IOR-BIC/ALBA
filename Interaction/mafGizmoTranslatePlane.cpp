@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslatePlane.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-08 13:25:04 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-07-11 06:14:14 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -75,7 +75,8 @@ mafGizmoTranslatePlane::mafGizmoTranslatePlane(mafVME *input, mafObserver *liste
   // create vme gizmos stuff
   //-----------------
   mafString vmeName;
-  for (int i = 0; i < 3; i++)
+  int i;
+  for (i = 0; i < 3; i++)
   {
     // the ith gizmo
     Gizmo[i] = mafVMEGizmo::New();
@@ -138,7 +139,8 @@ mafGizmoTranslatePlane::~mafGizmoTranslatePlane()
   vtkDEL(RotationTr);
 
   // clean up
-  for (int i = 0; i < SQ; i++)
+  int i;
+  for (i = 0; i < SQ; i++)
   {
     vtkDEL(LineTF[i]);
 	//----------------------
@@ -205,7 +207,8 @@ void mafGizmoTranslatePlane::CreatePipeline()
   Plane->SetPoint2(0, 0, 1);
 
   // create tube filter for the segments
-  for (int i = 0; i < SQ; i++)
+  int i;
+  for (i = 0; i < SQ; i++)
   {
     LineTF[i] = vtkTubeFilter::New();
     LineTF[i]->SetInput(Line[i]->GetOutput());

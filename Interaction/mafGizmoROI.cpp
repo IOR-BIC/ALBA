@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoROI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:24 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-11 06:14:13 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -381,7 +381,8 @@ void mafGizmoROI::SetBounds(double bounds[6])
   double newBounds[6] = {bounds[0], bounds[1], bounds[2], bounds[3], bounds[4], bounds[5]}; 
 
   // new bounds must be internal do vme bounds
-  for (int i = 0; i < 6; i++)
+  int i;
+  for (i = 0; i < 6; i++)
   {  
     if (i % 2 == 0)
     {
