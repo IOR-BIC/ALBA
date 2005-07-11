@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-08 16:32:29 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-11 06:21:28 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -34,8 +34,8 @@ public:
   virtual int InternalStore(mafStorageElement *node);
   virtual int InternalRestore(mafStorageElement *node);
   
-  void SetRoot(mafVMERoot *root);
-  mafVMERoot *GetRoot();
+  void SetRoot(mafVMERoot *root) {m_Root=root;}
+  mafVMERoot *GetRoot() {return m_Root;}
   
 protected:
   mafVME *CreateVMEInstance(mafString &name);

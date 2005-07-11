@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-08 16:32:29 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-11 06:21:28 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -242,7 +242,7 @@ int mmuMSF1xDocument::RestoreTagArray(mafStorageElement *node, mafTagArray *tarr
   mafStorageElement::ChildrenVector children;
   for (int i = 0;i<children.size();i++)
   {
-    if (mafCString("TItem") == children[i])
+    if (mafCString("TItem") == children[i]->GetName())
     {
       mafID num_of_comps;
       if (children[i]->GetAttributeAsInteger("Mult",num_of_comps))
@@ -254,24 +254,24 @@ int mmuMSF1xDocument::RestoreTagArray(mafStorageElement *node, mafTagArray *tarr
           if (children[i]->GetAttribute("Type",tag_type))
           {
             mafTagItem titem;
-            titem->SetNumberOfComponents(num_of_comps);
-            titem->SetName(tag_name);
+            titem.SetNumberOfComponents(num_of_comps);
+            titem.SetName(tag_name);
     
             if (tag_type=="NUM")
             {
-              titem->SetType(MAF_NUMERIC_TAG);
+              titem.SetType(MAF_NUMERIC_TAG);
             }
             else if (tag_type=="STR")
             {
-              titem->SetType(MAF_STRING_TAG);
+              titem.SetType(MAF_STRING_TAG);
             }
             else if (tag_type=="MIS")
             {
-              titem->SetType(MAF_MISSING_TAG);
+              titem.SetType(MAF_MISSING_TAG);
             }
             else
             {
-              titem->SetType(atof(tag_type));
+              titem.SetType(atof(tag_type));
             }
 
 
@@ -288,7 +288,7 @@ int mmuMSF1xDocument::RestoreTagArray(mafStorageElement *node, mafTagArray *tarr
               }
               else
               {
-                mafErrorMacro("Error parning a TItem element inside a TagArray: expected <TC> sub element, found <"<<tag_comps[n].GetName()<<">");
+                mafErrorMacro("Error parning a TItem element inside a TagArray: expected <TC> sub element, found <"<<tag_comps[n]->GetName()<<">");
               } 
             } 
           } // Type
