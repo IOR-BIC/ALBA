@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-04 17:38:59 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-07-11 06:15:35 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -548,13 +548,14 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
 
   mafEvent *e=mafEvent::SafeDownCast(event);
  
-  if (e && ((e->GetSender() == m_Devices) || (e->GetSender() == m_DeviceTree)))
+  if (e)
   {
     switch(e->GetId())
     {
       case ID_OK:
 		  case wxOK:
-        m_Dialog->EndModal(wxOK); 
+        m_Dialog->EndModal(wxOK);
+        return; 
 		  break;
       case ID_STORE:
       { 
@@ -566,6 +567,8 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
         //SIL. 4-7-2005: end
 
         Store(m_SettingFileName);
+        
+        return;
       }
       break;
       case ID_LOAD:
@@ -579,6 +582,8 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
 
         Restore(m_SettingFileName);
         //camera reset here?
+        
+        return;
       }
       break;
       case ID_BINDING_LIST:
@@ -596,6 +601,7 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
         {
           GetSER()->UnBindDeviceFromAction(m_CurrentDevice,action_name);
         }
+        return;
       }
       break;
       case ID_ADD_DEVICE:
@@ -612,6 +618,7 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
           // served by InteractionManager by calling
           // AddDevice of this class.
         }
+        return;
       }
       break;
       case ID_REMOVE_DEVICE:
@@ -623,29 +630,44 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
             wxMessageBox("Cannot remove device: I/O manager error");
           }
         }
+        return;
        break;
-      case VME_SELECT: // Event rised by the CheckTree used to show the devices tree
-        if (mafDevice *device = GetDeviceManager()->GetDevice(e->GetArg()))
-        {
-          m_CurrentDevice = device;
-          // Show device settings panel
-          assert(m_CurrentDevice->GetGui());
-          mmgGui *gui = m_CurrentDevice->GetGui();
-          assert(gui);
-          m_SettingsPanel->Put(gui);
-          // force update
-          m_CurrentDevice->UpdateGui();
-
-          // Update Bindings panel
-          UpdateBindings();
+      case VME_SELECT:
+        if (e->GetSender() == m_DeviceTree)
+        { 
+          // Event rised by the CheckTree used to show the devices tree
+          if (mafDevice *device = GetDeviceManager()->GetDevice(e->GetArg()))
+          {
+            m_CurrentDevice = device;
+            // Show device settings panel
+            assert(m_CurrentDevice->GetGui());
+            mmgGui *gui = m_CurrentDevice->GetGui();
+            assert(gui);
+            m_SettingsPanel->Put(gui);
+            // force update
+            m_CurrentDevice->UpdateGui();
+  
+            // Update Bindings panel
+            UpdateBindings();
+          }
+          else
+          {
+            assert(true);
+          }
+          return;
         }
         else
         {
-          assert(true);
+          // event rised by PER to advise of VME selection
+          mafEventMacro(mafEvent(event->GetSender(),VME_SELECT,(mafVME *)event->GetData()));
         }
       break;
 		  default:
-			  e->Log();
+        if (e->GetSender() == m_Devices || e->GetSender() == m_DeviceTree)
+        {
+			    e->Log();
+          return;
+        }
 		  break; 
     }
     return;
@@ -669,10 +691,6 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
   {
     mafEvent *e=mafEvent::SafeDownCast(event);
     OnCameraUpdate(e);
-  }
-  else if (id==VME_SELECT)
-  {
-    mafEventMacro(mafEvent(event->GetSender(),VME_SELECT,(mafVME *)event->GetData()));
   }
   /*else if (id==ShowContextualMenuEvent)
   {
