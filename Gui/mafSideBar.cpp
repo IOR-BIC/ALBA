@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-04 14:49:29 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2005-07-11 06:12:47 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -69,10 +69,16 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener)
 #ifdef WIN32
   wxFrame *vme_property_frame = new wxFrame(m_SideSplittedPanel,-1,"Vme Property",wxDefaultPosition,wxDefaultSize,wxNO_BORDER);
 #else
-  mmgNamedPanel *vme_property_frame = new mmgNamedPanel(m_SideSplittedPanel ,-1,false,true);
+  //mmgNamedPanel *vme_property_frame = new mmgNamedPanel(m_SideSplittedPanel ,-1,false,true);
 #endif
-  wxNotebook *vme_notebook = new wxNotebook(vme_property_frame,-1);
+  
 
+#ifdef WIN32
+  wxNotebook *vme_notebook = new wxNotebook(vme_property_frame,-1);
+#else
+  wxNotebook *vme_notebook = new wxNotebook(m_SideSplittedPanel,-1);
+#endif
+  
   m_VmeOutputPanel = new mmgGuiHolder(vme_notebook,-1,false,true);
   vme_notebook->AddPage(m_VmeOutputPanel," vme output ");
   m_VmePipePanel = new mmgGuiHolder(vme_notebook,-1,false,true);
@@ -80,8 +86,11 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener)
   m_VmePanel = new mmgGuiHolder(vme_notebook,-1,false,true);
   vme_notebook->AddPage(m_VmePanel," vme object ");
 
+#ifdef WIN32
   m_SideSplittedPanel->PutOnBottom(vme_property_frame);
-
+#else
+  m_SideSplittedPanel->PutOnBottom(vme_notebook);
+#endif
   //m_side_bar->Put(m_Notebook);
 }
 //----------------------------------------------------------------------------
