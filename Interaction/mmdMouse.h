@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdMouse.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 05:58:12 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-11 06:17:58 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -61,7 +61,7 @@ public:
   /**
   Perform mouse picking and return the selected assembly path picked, otherwise return NULL. */
   vtkAssemblyPath *Pick(int mouse_screen_pos[2]);
-
+  vtkAssemblyPath *Pick(int X, int Y);
   /**
   Return the renderer of the selected view. */
   vtkRenderer *GetRenderer();

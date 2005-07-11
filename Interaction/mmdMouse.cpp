@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-08 13:21:06 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-07-11 06:17:58 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -149,6 +149,15 @@ void mmdMouse::SendButtonEvent(mafEventInteraction *event)
 {
   event->Set2DPosition(GetLastPosition());
   Superclass::SendButtonEvent(event);
+}
+//------------------------------------------------------------------------------
+vtkAssemblyPath *mmdMouse::Pick(int X, int Y)
+//------------------------------------------------------------------------------
+{
+  int pos[2];
+  pos[0]=X;
+  pos[1]=Y;
+  return Pick(pos);
 }
 //------------------------------------------------------------------------------
 vtkAssemblyPath *mmdMouse::Pick(int mouse_screen_pos[2])

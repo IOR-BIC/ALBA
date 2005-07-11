@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 07:57:09 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-07-11 06:16:59 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -398,9 +398,9 @@ bool mafInteractor::FindPokedVme(mafDevice *device,mafMatrix &point_pose,vtkProp
   { 
     // Pick with mouse
     int mouse_pos[2];
-    mouse_pos[0] = (int)point_pose.GetElement(0,3);
     mouse_pos[1] = (int)point_pose.GetElement(1,3);
-    ap = mouse->Pick(mouse_pos);
+    mouse_pos[0] = (int)point_pose.GetElement(0,3);
+    ap = mouse->Pick(mouse_pos[0],mouse_pos[1]);
   }
 
   if(ap)
