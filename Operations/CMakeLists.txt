@@ -21,8 +21,8 @@ IF (MAF_USE_VTK)
     mmoCreateSlicer.h
     mmoMAFTransform.cpp
     mmoMAFTransform.h
-    mmoMSFImporter.cpp
-    mmoMSFImporter.h
+#    mmoMSFImporter.cpp
+#    mmoMSFImporter.h
     mmoReparentTo.cpp
     mmoReparentTo.h
     mmoSTLExporter.cpp

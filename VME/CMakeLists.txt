@@ -26,8 +26,8 @@ SET(PROJECT_SRCS
   mafVMEGroup.h
   mafVMEItem.cpp
   mafVMEItem.h
-  mafMSFImporter.cpp
-  mafMSFImporter.h
+#  mafMSFImporter.cpp
+#  mafMSFImporter.h
 )
 
 IF (MAF_USE_CRYPTO)
