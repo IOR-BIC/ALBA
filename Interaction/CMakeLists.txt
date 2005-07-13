@@ -128,14 +128,28 @@ mmiSER.cpp
 mmiSER.h
 )
 
+IF (MAF_USE_P5_GLOVE)
+  SET(PROJECT_SRCS
+  ${PROJECT_SRCS}
+  mmdP5Glove.cpp
+  mmdP5Glove.h
+  )
+ENDIF (MAF_USE_P5_GLOVE)
+
 #IF (MAF_USE_VTK)
 #  SET(PROJECT_SRCS
 #  ${PROJECT_SRCS}
 #  )
 #ENDIF (MAF_USE_VTK)
 
+IF (WIN32)
+  OPTION(MAF_USE_P5_GLOVE "Link driver for P5 glove device" OFF)
+ENDIF (WIN32)
+
+SUBDIRS(Drivers)
+
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS mafBase mafIO mafGui vtkMAF)
+SET(PROJECT_LIBS mafBase mafIO mafGui vtkMAF mafDrivers)
 
 #IF (MAF_USE_VTK)
 #  SET(PROJECT_LIBS ${PROJECT_LIBS} vtkIO vtkRendering vtkGraphics)
@@ -152,3 +166,5 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
 IF (MAF_USE_WX)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_WXWIN_LIBRARY)
 ENDIF (MAF_USE_WX)
+
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/mafInteractionConfigure.h.in ${PROJECT_BINARY_DIR}/mafInteractionConfigure.h IMMEDIATE)

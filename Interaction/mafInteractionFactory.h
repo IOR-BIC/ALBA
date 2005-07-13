@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionFactory.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-22 16:44:18 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-07-13 13:53:00 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,6 +15,7 @@
 // includes :
 //----------------------------------------------------------------------------
 #include "mafObjectFactory.h"
+#include "mafInteractionConfigure.h"
 #include <set>
 
 /** to be used internally for plugging default devices --- calls a member function directly */

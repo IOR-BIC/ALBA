@@ -1,0 +1,30 @@
+#
+# Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
+# Module:    $RCSfile: UseDevices.cmake.in,v $
+# Language:  CMake 1.2
+# Date:      $Date: 2005-07-13 13:53:02 $
+# Version:   $Revision: 1.1 $
+#
+# Description:
+# This module adds the MAF_DEVICES include paths and libraries to a project and sets:
+# 
+# MAF_DEVICES_FOUND  set to 1 if all necessary directories/libraries are found
+#
+
+#
+# MAF_DEVICES
+#
+IF (MAF_DEVICES_FOUND)
+  IF (MAF_DEVICES_SOURCE_PATH)
+    INCLUDE_DIRECTORIES(${MAF_DEVICES_SOURCE_PATH})
+  ENDIF (MAF_DEVICES_SOURCE_PATH)
+  
+  IF (MAF_DEVICES_BINARY_PATH)
+    # Add binary libs directory to link path (use for binary drivers, e.g. P5 DLL)
+    LINK_DIRECTORIES (${MAF_DEVICES_BINARY_PATH}/lib)    
+    
+    LINK_LIBRARIES (mafDevices)     
+  ELSE (MAF_DEVICES_BINARY_PATH)
+    MESSAGE ("UseMAF_DEVICES: Cannot find MAF_DEVICES binary path.")
+  ENDIF (MAF_DEVICES_BINARY_PATH)
+ENDIF (MAF_DEVICES_FOUND)

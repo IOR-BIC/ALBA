@@ -1,0 +1,9 @@
+#ifndef __mafInteractionConfigure_h
+#define __mafInteractionConfigure_h
+
+//--------------------------------------------------------------------------
+// Special settings for interaction
+//--------------------------------------------------------------------------
+#cmakedefine MAF_USE_P5_GLOVE
+
+#endif // __mafInteractionConfigure_h
