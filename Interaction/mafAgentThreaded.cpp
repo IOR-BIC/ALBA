@@ -3,8 +3,8 @@
 Program:   Visualization Toolkit
 Module:    $RCSfile: mafAgentThreaded.cpp,v $
 Language:  C++
-Date:      $Date: 2005-05-18 17:29:03 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2005-07-13 18:19:13 $
+Version:   $Revision: 1.7 $
 
 
 
@@ -165,6 +165,10 @@ void mafAgentThreaded::OnEvent(mafEventBase *event)
       // notice we are using the sender field of the AsyncInvokeEvent to store the recipient
       //((mafObserver *)event->GetSender())->OnEvent((mafEventBase *)event->GetData());
     }
+  }
+  else
+  {
+    Superclass::OnEvent(event);
   }
 }
 

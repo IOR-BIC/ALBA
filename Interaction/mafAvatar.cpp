@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 05:58:09 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-07-13 18:18:00 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone & Michele Diegoli
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -88,8 +88,6 @@ void mafAvatar::CreateGui()
 //----------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(NULL);
-
   if (m_Gui==NULL)
   {
     m_Gui=new mmgGui(this);

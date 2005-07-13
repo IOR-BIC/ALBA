@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdTracker.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 07:57:09 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-07-13 18:18:52 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -219,7 +219,7 @@ void mmdTracker::SetLastPoseMatrix(const mafMatrix &matrix)
   // I had to add a test on elapsed time since it seems sometimes
   // an event gets lost! :-(((
   m_LastPoseMutex.Lock(); 
-  mafTimeStamp elapsed_time = (m_LastPoseMatrix->GetTimeStamp()-m_LastMoveTime);
+  mafTimeStamp elapsed_time = (vtkTimerLog::GetCurrentTime()-m_LastMoveTime);
 
   // This is a very tricky thing: remove a move event after a give timeout
   // The only problem is if some other thread is pushing an event while we 
@@ -463,7 +463,7 @@ void mmdTracker::CreateGui()
   m_Gui->Button(ID_AVATAR_SELECT,"set avatar");
   m_Gui->Enable(ID_AVATAR_SELECT,false);
 
-  m_Gui->Divider(1);
+  m_Gui->Divider(2);
   m_Gui->VectorN(ID_TB_X_EXTENT,"X extent",	m_TrackedBounds.m_Bounds,2, MINFLOAT, MAXFLOAT, -1);
   m_Gui->VectorN(ID_TB_Y_EXTENT,"Y extent",	&(GetTrackedBounds().m_Bounds[2]),2, MINFLOAT, MAXFLOAT, -1);
   m_Gui->VectorN(ID_TB_Z_EXTENT,"Z extent",	&(GetTrackedBounds().m_Bounds[4]),2, MINFLOAT, MAXFLOAT, -1);
@@ -492,7 +492,8 @@ void mmdTracker::UpdateGui()
 void mmdTracker::OnEvent(mafEventBase *event)
 //----------------------------------------------------------------------------
 {
-  if (mafEvent *e=mafEvent::SafeDownCast(event))
+  mafEvent *e=mafEvent::SafeDownCast(event);
+  if (e && e->GetSender()==m_Gui)
   {
     switch(e->GetId()) 
     {
@@ -547,6 +548,7 @@ void mmdTracker::OnEvent(mafEventBase *event)
         ComputeTrackerToCanonicalTansform();
         break;
     }
+    return;
   }
 
   if ( event->GetId()==AGENT_ASYNC_DISPATCH && event->GetSender()==this )
