@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdP5Glove.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-13 13:53:00 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-13 18:18:39 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,20 +13,12 @@
 #ifndef __mmdP5Glove_h
 #define __mmdP5Glove_h
 
-#ifdef __GNUG__
-    #pragma interface "mmdP5Glove.cpp"
-#endif
-
-#ifndef WX_PRECOMP
-    #include "wx/wx.h"
-#endif
-
 #include "mmdTracker.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class vtkMatrix4x4;
+class mafMatrix;
 class CP5DLL;
 
 /** class supporting device P5 glove from Essential Reality Inc.
@@ -45,46 +37,40 @@ class CP5DLL;
 class mmdP5Glove : public mmdTracker
 {
 public:
-  
-  static mmdP5Glove *New() {return new mmdP5Glove;}
-  vtkTypeMacro(mmdP5Glove,mmdTracker);
-
-  // For factoring purpouses
-  static vtkObject *NewObjectInstance() {return mmdP5Glove::New();}
-  static const char *GetTypeName() {return "mmdP5Glove";}
+  mafTypeMacro(mmdP5Glove,mmdTracker);
 
   /** Get the finger bend sensor current value, range [0,63] */
-  vtkGetMacro(IndexValue,int);
+  int GetIndexValue() {return m_IndexValue;}
   /** Get the finger bend sensor current value, range [0,63] */
-  vtkGetMacro(MiddleValue,int);
+  int GetMiddleValue() {return m_MiddleValue;}
   /** Get the finger bend sensor current value, range [0,63] */
-  vtkGetMacro(RingValue,int);
+  int GetRingValue() {return m_RingValue;}
   /** Get the finger bend sensor current value, range [0,63] */
-  vtkGetMacro(PinkyValue,int);
+  int GetPinkyValue() {return m_PinkyValue;}
   /** Get the finger bend sensor current value, range [0,63] */
-  vtkGetMacro(ThumbValue,int);
+  int GetThumbValue() {return m_ThumbValue;}
 
   /** Set the finger bend sensor sensitivity, range [0,30] */
-  vtkSetMacro(IndexSensitivity,int);
+  void SetIndexSensitivity(int value) {m_IndexSensitivity=value;}
   /** Set the finger bend sensor sensitivity, range [0,30] */
-  vtkSetMacro(MiddleSensitivity,int);
+  void SetMiddleSensitivity(int value) {m_MiddleSensitivity=value;}
   /** Set the finger bend sensor sensitivity, range [0,30] */
-  vtkSetMacro(RingSensitivity,int);
+  void SetRingSensitivity(int value) {m_RingSensitivity=value;}
   /** Set the finger bend sensor sensitivity, range [0,30] */
-  vtkSetMacro(PinkySensitivity,int);
+  void SetPinkySensitivity(int value) {m_PinkySensitivity=value;}
   /** Set the finger bend sensor sensitivity, range [0,30] */
-  vtkSetMacro(ThumbSensitivity,int);
+  void SetThumbSensitivity(int value) {m_ThumbSensitivity=value;}
 
   /** Get the finger bend sensor sensitivity, range [0,30] */
-  vtkGetMacro(IndexSensitivity,int);
+  int GetIndexSensitivity(int value) {m_IndexSensitivity=value;}
   /** Get the finger bend sensor sensitivity, range [0,30] */
-  vtkGetMacro(MiddleSensitivity,int);
+  int GetMiddleSensitivity(int value) {m_MiddleSensitivity=value;}
   /** Get the finger bend sensor sensitivity, range [0,30] */
-  vtkGetMacro(RingSensitivity,int);
+  int GetRingSensitivity(int value) {m_RingSensitivity=value;}
   /** Get the finger bend sensor sensitivity, range [0,30] */
-  vtkGetMacro(PinkySensitivity,int);
+  int GetPinkySensitivity(int value) {m_PinkySensitivity=value;}
   /** Get the finger bend sensor sensitivity, range [0,30] */
-  vtkGetMacro(ThumbSensitivity,int);
+  int GetThumbSensitivity(int value) {m_ThumbSensitivity=value;}
 
 protected:
   mmdP5Glove();
@@ -92,25 +78,26 @@ protected:
 
   /** performs polling of P5 glove */
   int InternalUpdate();
+  
   /** initialize P5DLL */
-  int InternalInitialize();
+  virtual int InternalInitialize();
   /** close P5DLL */
-  void InternalShutdown();
+  virtual void InternalShutdown();
 
-  int IndexValue;
-  int MiddleValue;
-  int RingValue;
-  int PinkyValue;
-  int ThumbValue;
+  int m_IndexValue;
+  int m_MiddleValue;
+  int m_RingValue;
+  int m_PinkyValue;
+  int m_ThumbValue;
   
-  int IndexSensitivity;
-  int MiddleSensitivity;
-  int RingSensitivity;
-  int PinkySensitivity;
-  int ThumbSensitivity;
+  int m_IndexSensitivity;
+  int m_MiddleSensitivity;
+  int m_RingSensitivity;
+  int m_PinkySensitivity;
+  int m_ThumbSensitivity;
   
-  vtkMatrix4x4 *TmpPose;
-  static CP5DLL *P5;
+  mafMatrix  *m_TmpPose;
+  static CP5DLL *m_P5;
 
 private:
   mmdP5Glove(const mmdP5Glove&);  // Not implemented.
