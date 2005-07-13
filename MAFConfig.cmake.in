@@ -4,6 +4,8 @@ SET(MAF_INCLUDE_DIRS
   "@MAF_SOURCE_DIR@/Core"
   "@MAF_SOURCE_DIR@/Gui"
   "@MAF_SOURCE_DIR@/Interaction"
+  "@MAF_SOURCE_DIR@/Interaction/Drivers"
+  "@MAF_BINARY_DIR@/Interaction"
   "@MAF_SOURCE_DIR@/IO"
   "@MAF_SOURCE_DIR@/Operations"
   "@MAF_SOURCE_DIR@/VME"
