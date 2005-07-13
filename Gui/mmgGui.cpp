@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-30 16:27:13 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2005-07-13 18:17:01 $
+  Version:   $Revision: 1.20 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1058,7 +1058,9 @@ mmgCheckListBox* mmgGui::CheckList(int id,wxString label,int height, wxString to
 //----------------------------------------------------------------------------
 {
   int width = (label == "") ? FW : DW;
-	mmgCheckListBox *clb =  new mmgCheckListBox(this, id ,dp,wxSize(width,height));
+	// mmgCheckListBox *clb =  new mmgCheckListBox(this, id ,dp,wxSize(width,height));      //SIL: 13-07-05 removed
+	mmgCheckListBox *clb =  new mmgCheckListBox(this, GetId(id) ,dp,wxSize(width,height));  //SIL: 13-07-05 added
+  
   clb->SetListener(this);
 	if(tooltip != "") clb->SetToolTip(tooltip);
 
