@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-23 16:57:14 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-07-13 18:18:22 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -228,7 +228,8 @@ protected:
     /** Create the GUI dialog. */
   void CreateGUI();
 
-  mmgDialog*              m_Dialog;
+  wxFrame*                m_Frame;
+  //mmgDialog*              m_Dialog;
   mmgGui*                 m_Devices;
   mmgTree*                m_DeviceTree;
   mmgCheckListBox*        m_ActionsList;

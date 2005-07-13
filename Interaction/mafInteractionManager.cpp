@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-11 06:15:35 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-07-13 18:18:22 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -81,7 +81,7 @@ mafInteractionManager::mafInteractionManager()
 
   m_Devices           = NULL;
   m_DeviceTree        = NULL;
-  m_Dialog            = NULL;
+  //m_Dialog            = NULL;
   m_SettingsPanel     = NULL;
   m_BindingsPanel     = NULL;
   m_CurrentDevice     = NULL;
@@ -137,6 +137,7 @@ mafInteractionManager::~mafInteractionManager()
   mafDEL(m_StaticEventRouter);
   mafDEL(m_PositionalEventRouter);
   vtkDEL(m_CurrentRenderer);
+  cppDEL(m_Frame);
 }
 
 //------------------------------------------------------------------------------
@@ -554,7 +555,8 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
     {
       case ID_OK:
 		  case wxOK:
-        m_Dialog->EndModal(wxOK);
+        //m_Dialog->EndModal(wxOK);
+        m_Frame->Show(false);
         return; 
 		  break;
       case ID_STORE:
@@ -795,7 +797,9 @@ int mafInteractionManager::InternalRestore(mafStorageElement *node)
 bool mafInteractionManager::ShowModal()
 //----------------------------------------------------------------------------
 {
-  return m_Dialog->ShowModal() != 0;
+   //modified by Marco. 13-7-2005  return m_Dialog->ShowModal() != 0;
+  m_Frame->Show(true);
+  return true;
 }
 //----------------------------------------------------------------------------
 int mafInteractionManager::DeviceChooser(wxString &dev_name,wxString &dev_type)
@@ -814,7 +818,8 @@ int mafInteractionManager::DeviceChooser(wxString &dev_name,wxString &dev_type)
       devices[id]=iFactory->GetDeviceDescription(iFactory->GetDeviceName(id));
     }
 
-    wxSingleChoiceDialog chooser(m_Dialog,"select a device","Device Chooser",iFactory->GetNumberOfDevices(),devices);
+    //wxSingleChoiceDialog chooser(m_Dialog,"select a device","Device Chooser",iFactory->GetNumberOfDevices(),devices);
+    wxSingleChoiceDialog chooser(m_Frame,"select a device","Device Chooser",iFactory->GetNumberOfDevices(),devices);
 
     int index=-1;
     if (chooser.ShowModal()==wxID_OK)
@@ -909,7 +914,9 @@ void mafInteractionManager::UpdateDevice(mafDevice *device)
 void mafInteractionManager::CreateGUI() 
 //----------------------------------------------------------------------------
 {
-   //SIL. 4-7-2005: 
+  /*****
+  
+  //SIL. 4-7-2005: 
    // Changed Layout, Behaviour on Resize, Buttons Implementation
 
   m_Dialog = new mmgDialog("I/O Devices Settings",mafRESIZABLE | mafCLOSEWINDOW);
@@ -952,7 +959,7 @@ void mafInteractionManager::CreateGUI()
 
   // sizers ====================================
   wxBoxSizer *v_sizer = new wxBoxSizer(wxVERTICAL);
-  v_sizer->Add(m_SettingsPanel,1,wxEXPAND|wxALL, 1 );
+  v_sizer->Add(m_SettingsPanel,1,wxEXPAND|wxALL, 1 );//////////////////////////////
   v_sizer->Add(m_BindingsPanel,0,wxALL, 1 );
 
   wxBoxSizer *h_sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -968,4 +975,66 @@ void mafInteractionManager::CreateGUI()
 
   m_Dialog->Add(h_sizer,1,wxEXPAND);
   m_Dialog->Add(h2_sizer,0,wxCENTRE|wxALL,1);
+
+  *****/
+
+  m_Frame = new wxFrame(NULL,-1,"I/O Devices Settings",wxPoint(-1,-1), wxSize(430,500));
+
+  mmgNamedPanel *FOO = new mmgNamedPanel(m_Frame,-1,false,true);
+  FOO->Show();
+  
+  m_DeviceTree = new mmgTree(FOO,ID_DEVICE_TREE);
+  m_DeviceTree->SetTitle("connected devices");
+  m_DeviceTree->SetSize(230,300);
+  m_DeviceTree->SetListener(this);
+
+  // Holder of Device's settings GUI ==========
+  m_SettingsPanel = new mmgGuiHolder(FOO ,ID_DEVICE_SETTINGS);
+  m_SettingsPanel->Show(true);
+  m_SettingsPanel->SetSize(215,300); // h era 230
+  m_SettingsPanel->SetTitle("device settings");
+
+  // Device's binding GUI =====================
+  m_BindingsPanel = new mmgNamedPanel(FOO,ID_DEVICE_BINDINGS);
+  m_BindingsPanel->SetTitle("device bindings");
+  m_BindingsPanel->SetSize(215,100); // h era 230
+
+  m_Bindings = new mmgGui(this);
+  m_Bindings->Label("available actions");
+  m_Bindings->Label("available actions");
+  m_ActionsList = m_Bindings->CheckList(ID_BINDING_LIST,"",60,"actions the devices is assigned to");
+  m_Bindings->Show(true);
+  m_Bindings->FitGui();
+  m_BindingsPanel->Add(m_Bindings);
+
+  // Buttons =====================
+  mmgButton *add = new mmgButton(FOO,ID_ADD_DEVICE,"add device",wxPoint(0,0)); 
+  add->SetListener(this);
+  mmgButton *remove = new mmgButton(FOO,ID_REMOVE_DEVICE,"remove device",wxPoint(0,0));
+  remove->SetListener(this);
+  mmgButton *load = new mmgButton(FOO,ID_LOAD,"load",wxPoint(0,0));
+  load->SetListener(this);
+  mmgButton *save = new mmgButton(FOO,ID_STORE,"save as",wxPoint(0,0));
+  save->SetListener(this);
+  mmgButton *close = new mmgButton(FOO,ID_OK,"close",wxPoint(0,0));
+  close->SetListener(this);
+
+  // sizers ====================================
+  wxBoxSizer *v_sizer = new wxBoxSizer(wxVERTICAL);
+  v_sizer->Add(m_SettingsPanel,1,wxEXPAND|wxALL, 1 );//////////////////////////////
+  v_sizer->Add(m_BindingsPanel,0,wxALL, 1 );
+
+  wxBoxSizer *h_sizer = new wxBoxSizer(wxHORIZONTAL);
+  h_sizer->Add(m_DeviceTree,1,wxEXPAND|wxALL, 1 );
+  h_sizer->Add(v_sizer,0,wxEXPAND);
+
+  wxBoxSizer *h2_sizer = new wxBoxSizer(wxHORIZONTAL);
+  h2_sizer->Add(add);
+  h2_sizer->Add(remove);
+  h2_sizer->Add(load);
+  h2_sizer->Add(save);
+  h2_sizer->Add(close);
+
+  FOO->Add(h_sizer,1,wxEXPAND);
+  FOO->Add(h2_sizer,0,wxCENTRE|wxALL,1);
 }
