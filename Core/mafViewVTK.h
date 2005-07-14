@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-08 15:18:13 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2005-07-14 17:41:43 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,6 +29,8 @@ class mafLightKit;
 class mafVME;
 class vtkMatrix4x4;
 class mmdMouse;
+class vtkRenderWindow;
+class vtkRenderer;
 
 /** VME visibility attribute when plugging visual pipe.*/
 enum VME_VISIBILITY_ID
@@ -80,6 +82,10 @@ public:
 
   virtual mafSceneGraph *GetSceneGraph()	  {return m_Sg;}; 
   virtual mafRWIBase    *GetRWI()           {return m_Rwi->m_RwiBase;};
+
+  virtual vtkRenderer     *GetFrontRenderer();
+  virtual vtkRenderer     *GetBackRenderer();
+  virtual vtkRenderWindow *GetRendererWindow();
 
   /** Struct containing information regarding visual pipe plugged into the view. */
   struct mafVisualPipeInfo

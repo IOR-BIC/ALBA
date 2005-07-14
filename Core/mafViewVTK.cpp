@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-08 15:18:13 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2005-07-14 17:41:42 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -103,6 +103,26 @@ void  mafViewVTK::SetMouse(mmdMouse *mouse)
 {
   assert(m_Rwi->m_RwiBase);
   m_Rwi->m_RwiBase->SetMouse(mouse);
+}
+
+//----------------------------------------------------------------------------
+vtkRenderWindow *mafViewVTK::GetRendererWindow()
+//----------------------------------------------------------------------------
+{ 
+  return m_Rwi->m_RenderWindow;
+}
+
+//----------------------------------------------------------------------------
+vtkRenderer *mafViewVTK::GetFrontRenderer()
+//----------------------------------------------------------------------------
+{
+  return m_Rwi->m_RenFront;
+}
+//----------------------------------------------------------------------------
+vtkRenderer *mafViewVTK::GetBackRenderer()
+//----------------------------------------------------------------------------
+{
+  return m_Rwi->m_RenBack;
 }
 
 //----------------------------------------------------------------------------
