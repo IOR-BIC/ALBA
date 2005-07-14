@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-04 14:49:55 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-07-14 07:42:17 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,6 +23,7 @@
 // forward declarations :
 //----------------------------------------------------------------------------
 class mmaMeter;
+class mmaMaterial;
 class vtkLineSource;
 class vtkLineSource;
 class vtkAppendPolyData;
@@ -221,6 +222,9 @@ public:
   mafVME *GetStartVME();
   mafVME *GetEnd1VME();
   mafVME *GetEnd2VME();
+
+  /** Return pointer to material attribute. */
+  mmaMaterial *GetMaterial();
 
 protected:
   mafVMEMeter();

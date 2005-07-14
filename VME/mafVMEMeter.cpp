@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 09:47:57 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-07-14 07:42:16 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,7 +20,9 @@
 //----------------------------------------------------------------------------
 
 #include "mafVMEMeter.h"
+#include "mafVMEOutputMeter.h"
 #include "mmaMeter.h"
+#include "mmaMaterial.h"
 #include "mafEventSource.h"
 #include "mafTransform.h"
 #include "mafStorageElement.h"
@@ -60,7 +62,7 @@ mafVMEMeter::mafVMEMeter()
   m_VMEAccept = new mafVMEAccept();
 
   mafNEW(m_Transform);
-  mafVMEOutputPolyline *output = mafVMEOutputPolyline::New(); // an output with no data
+  mafVMEOutputMeter *output = mafVMEOutputMeter::New(); // an output with no data
   output->SetTransform(m_Transform); // force my transform in the output
   SetOutput(output);
 
@@ -134,6 +136,18 @@ bool mafVMEMeter::Equals(mafVME *vme)
           GetLink("EndVME2") == ((mafVMEMeter *)vme)->GetLink("EndVME2");
   }
   return ret;
+}
+//-------------------------------------------------------------------------
+mmaMaterial *mafVMEMeter::GetMaterial()
+//-------------------------------------------------------------------------
+{
+  mmaMaterial *material = (mmaMaterial *)GetAttribute("MaterialAttributes");
+  if (material == NULL)
+  {
+    material = mmaMaterial::New();
+    SetAttribute("MaterialAttributes", material);
+  }
+  return material;
 }
 //-------------------------------------------------------------------------
 mafVMEOutputPolyline *mafVMEMeter::GetPolylineOutput()
