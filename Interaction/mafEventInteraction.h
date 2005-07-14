@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventInteraction.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 07:57:08 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-07-14 17:42:28 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -63,7 +63,7 @@ public:
   void SetModifiers(unsigned long modifiers);
   unsigned long GetModifiers() {return m_Modifiers;}
 
-  virtual void DeepCopy(mafEventBase *event);
+  virtual void DeepCopy(const mafEventBase *event);
   
   mafEventInteraction(void *sender=NULL,mafID id=-1,int button=0,unsigned long modifiers=0):
   mafEventBase(sender,id),m_Button(button),m_Modifiers(modifiers),m_Key(0),m_X(0),m_Y(0),m_XYFlag(false) {}

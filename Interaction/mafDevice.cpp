@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDevice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-13 18:17:36 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-07-14 17:42:27 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -130,27 +130,37 @@ void mafDevice::UpdateGui()
 void mafDevice::OnEvent(mafEventBase *e)
 //----------------------------------------------------------------------------
 {
-  switch(e->GetId()) 
+  mafEvent *ev = mafEvent::SafeDownCast(e);
+
+  if (ev&& ev->GetSender()==m_Gui)
   {
-  case ID_NAME:
-    SetName(m_Name); // force sending an event
-    break;
-  case ID_ACTIVATE:
-    if (Initialize())
+    switch(ev->GetId()) 
     {
-      mafErrorMessage("Cannot Initialize Device","I/O Error");
-      return;
+    case ID_NAME:
+      SetName(m_Name); // force sending an event
+      break;
+    case ID_ACTIVATE:
+      if (Initialize())
+      {
+        mafErrorMessage("Cannot Initialize Device","I/O Error");
+        return;
+      }
+      UpdateGui();
+      break;
+    case ID_SHUTDOWN:
+      Shutdown();
+      UpdateGui();
+      break; 
     }
-    UpdateGui();
-    break;
-  case ID_SHUTDOWN:
-    Shutdown();
-    UpdateGui();
-    break;
-  default:
+    
+    return;
+  }
+  else
+  {
     // pass event to superclass to be processed
     Superclass::OnEvent(e);
   }
+  
 }
 //------------------------------------------------------------------------------
 int mafDevice::InternalStore(mafStorageElement *node)

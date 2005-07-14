@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 07:57:06 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-07-14 17:42:27 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -209,7 +209,7 @@ int mafAvatar3D::InternalInitialize()
 {
   if(m_Renderer)
   {
-    m_Renderer->AddActor(m_DebugTextActor);
+    //m_Renderer->AddActor(m_DebugTextActor);
     m_Renderer->AddActor(m_WorkingBoxActor);
     m_WorkingBoxActor->SetUserTransform(m_CanonicalToWorldTransform->GetVTKTransform());
   }
@@ -224,7 +224,7 @@ void mafAvatar3D::InternalShutdown()
   
   if(m_Renderer)
   {
-    m_Renderer->RemoveActor(m_DebugTextActor);
+    //m_Renderer->RemoveActor(m_DebugTextActor);
     m_Renderer->RemoveActor(m_WorkingBoxActor);
     m_WorkingBoxActor->SetUserTransform(NULL); // detach WBox from interactor
   }
@@ -304,9 +304,6 @@ void mafAvatar3D::UpdateDebugText(const char *title, mafMatrix &pose)
 void mafAvatar3D::CanonicalToWorld(const mafMatrix &source,mafMatrix &dest)
 //------------------------------------------------------------------------------
 {
-  if (dest==NULL)
-    dest=source;
-
   mafMatrix::Multiply4x4(this->m_CanonicalToWorldTransform->GetMatrix(),
 			  source,
 			  dest);
@@ -540,6 +537,8 @@ void mafAvatar3D::OnMove3DEvent(mafEventInteraction *e)
   // Process tracker coordinates to get World coordinates
   mafMatrix *tracker_pose=e->GetMatrix();
   mafMatrix world_pose;
+
+  assert(tracker_pose);
 
   TrackerToWorld(*tracker_pose,world_pose);
   

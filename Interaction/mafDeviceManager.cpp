@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-22 07:06:19 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-07-14 17:42:27 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -246,6 +246,7 @@ void mafDeviceManager::OnEvent(mafEventBase *event)
     // the wxWindows message pump thread. This way this object acts 
     // the synchronization of all the events coming from different sources.
     PushEvent(event);
+    return;
   }
   else if (id==mafDeviceSet::DEVICE_ADDED )
   {
@@ -262,6 +263,7 @@ void mafDeviceManager::OnEvent(mafEventBase *event)
       }
     }
     InvokeEvent(event); // send also to InteractionManager
+    return;
   }
  
   Superclass::OnEvent(event);

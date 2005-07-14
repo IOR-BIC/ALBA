@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdTracker.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-13 18:18:52 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-07-14 17:42:28 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -547,6 +547,8 @@ void mmdTracker::OnEvent(mafEventBase *event)
         // force transform update
         ComputeTrackerToCanonicalTansform();
         break;
+      default:
+        Superclass::OnEvent(e); // pass to parent class for processing Gui events
     }
     return;
   }
@@ -570,7 +572,7 @@ void mmdTracker::OnEvent(mafEventBase *event)
   }
   else
   {
-    Superclass::OnEvent(event);
+    Superclass::OnEvent(event); // for other kinds of events let superclass to precess them
   }
   
 }

@@ -3,8 +3,8 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: mafAgent.cpp,v $
 Language:  C++
-Date:      $Date: 2005-05-21 07:55:50 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2005-07-14 17:42:26 $
+Version:   $Revision: 1.8 $
 
 =========================================================================*/
 #include "mafAgent.h"
@@ -275,7 +275,10 @@ void mafAgent::InvokeEvent(mafEventBase *event, mafID channel)
     channel=event->GetChannel();
 
   if (channel==MCH_UP)
+  {
     mafEventSender::InvokeEvent(event); // send event to listener
+    return;
+  }
 
   for (int i=0;i<m_Channels.size();i++)
   {

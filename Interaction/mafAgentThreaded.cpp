@@ -3,8 +3,8 @@
 Program:   Visualization Toolkit
 Module:    $RCSfile: mafAgentThreaded.cpp,v $
 Language:  C++
-Date:      $Date: 2005-07-13 18:19:13 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2005-07-14 17:42:27 $
+Version:   $Revision: 1.8 $
 
 
 
@@ -155,7 +155,7 @@ void mafAgentThreaded::OnEvent(mafEventBase *event)
     if (event->GetSender()==this)
     {
       // this is used for the asynchronous InvokeEvent
-      this->InvokeEvent((mafEventBase *)event->GetData(),event->GetChannel());
+      this->InvokeEvent((mafEventBase *)event->GetData());
     }
     else
     {
@@ -199,10 +199,10 @@ void mafAgentThreaded::RequestForDispatching()
 void mafAgentThreaded::AsyncInvokeEvent(mafEventBase *event, mafID channel)
 //------------------------------------------------------------------------------
 {
-  mafID old_ch=event->GetChannel();
-  event->SetChannel(channel);
-  PushEvent(AGENT_ASYNC_DISPATCH,this,event); // this make a copy of the event
-  event->SetChannel(old_ch);
+  mafEventBase *copy_of_event = event->NewInstance();
+  copy_of_event->DeepCopy(event);
+  copy_of_event->SetChannel(channel);
+  PushEvent(AGENT_ASYNC_DISPATCH,this,copy_of_event); // this make a copy of the event
 }
 
 //------------------------------------------------------------------------------

@@ -3,8 +3,8 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: mafAgentEventQueue.cpp,v $
 Language:  C++
-Date:      $Date: 2005-05-18 17:29:03 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2005-07-14 17:42:26 $
+Version:   $Revision: 1.6 $
 
 =========================================================================*/
 #include "mafAgentEventQueue.h"
@@ -91,9 +91,10 @@ bool mafAgentEventQueue::DispatchEvents()
     do 
     {
       this->PopEvent(event);
-      channel=event->GetChannel();
+       
       if (event)
       {
+        channel=event->GetChannel();
         if (event->GetId()==EVENT_DISPATCH)
         {
           mafAgentEventQueue *sender=(mafAgentEventQueue *)event->GetSender();
@@ -111,7 +112,7 @@ bool mafAgentEventQueue::DispatchEvents()
           }
         }
         event->Delete(); // release memory
-      }
+      }      
     }
     while (event&&PeekEvent()!=last_event);
 
@@ -179,6 +180,7 @@ int mafAgentEventQueue::PushEvent(mafID event, void *sender,void *data)
 int mafAgentEventQueue::PushEvent(mafEventBase *event)
 //------------------------------------------------------------------------------
 {
+  assert(event);
   if (event)
   {
     m_Mutex->Lock();
@@ -227,6 +229,7 @@ int mafAgentEventQueue::PopEvent(mafEventBase *&event)
     mafAgentEventQueue::EventQueueItem item=m_EventQueue->Q.back();
     m_EventQueue->Q.pop_back();
     event=item.m_Event;
+    assert(event);
     ret=true;
   }
   else
@@ -263,7 +266,7 @@ int mafAgentEventQueue::PopEvent(mafEventBase &event)
 
   if (this->PopEvent(ev))
   {
-    event=*ev;
+    event.DeepCopy(ev);
     ev->Delete(); // destroy the queued event
 
     return true;

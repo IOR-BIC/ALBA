@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-13 18:18:22 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-07-14 17:42:28 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -36,7 +36,8 @@
 #include "mafEvent.h"
 
 #include "mafSceneGraph.h"
-#include "mafView.h"
+#include "mafViewVTK.h"
+#include "mafRWIBase.h"
 
 #include "mmiPER.h"
 #include "mmiSER.h"
@@ -188,6 +189,20 @@ bool mafInteractionManager::PopPER()
   
   return false;
 }
+
+//----------------------------------------------------------------------------
+void mafInteractionManager::SetCurrentRenderer(vtkRenderer *ren)
+//----------------------------------------------------------------------------
+{
+  if (ren)
+    ren->UnRegister(NULL);
+
+  m_CurrentRenderer = ren;
+
+  if (ren)
+    ren->Register(NULL);
+}
+
 //----------------------------------------------------------------------------
 void mafInteractionManager::CameraFlyToMode()   
 //----------------------------------------------------------------------------
@@ -373,13 +388,18 @@ void mafInteractionManager::CameraUpdate(mafView *view)
 void mafInteractionManager::OnViewSelected(mafEvent *event)
 //------------------------------------------------------------------------------
 {  
-  mafView *view = event->GetView(); 
+  mafViewVTK *view = mafViewVTK::SafeDownCast(event->GetView()); 
   m_SelectedView = view;
-  
+
+  vtkRenderer *ren = view->GetFrontRenderer();
+  SetCurrentRenderer(ren);
+  event->SetData(ren); // add the renderer to the event to be sent to avatars
+
   // propagate event to all avatars...
   for (mmuAvatarsMap::iterator it=m_Avatars.begin();it!=m_Avatars.end();it++)
   {
-    it->second->OnEvent(&mafEventBase(this,VIEW_SELECT));    
+    //it->second->OnEvent(&mafEventBase(this,VIEW_SELECT));    
+    it->second->OnEvent(event);
   }
   
   // propagate VIEW_SELECTED event to the mouse device too...
@@ -517,10 +537,18 @@ void mafInteractionManager::OnEndDispatching()
   }
 }
 //------------------------------------------------------------------------------
-void mafInteractionManager::OnCameraUpdate(mafEvent *e)
+void mafInteractionManager::OnCameraUpdate(mafEventBase *event)
 //------------------------------------------------------------------------------
 {
-  CameraUpdate(e->GetView());
+  if (mafEvent *e=mafEvent::SafeDownCast(event))
+  {
+    CameraUpdate(e->GetView());
+  }
+  else
+  {
+    CameraUpdate(NULL);
+  }
+
 }
 //----------------------------------------------------------------------------
 // constants :
@@ -691,7 +719,6 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
   }
   else if (id==CAMERA_UPDATE)
   {
-    mafEvent *e=mafEvent::SafeDownCast(event);
     OnCameraUpdate(e);
   }
   /*else if (id==ShowContextualMenuEvent)

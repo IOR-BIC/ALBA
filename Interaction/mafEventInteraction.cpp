@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventInteraction.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 07:57:07 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-07-14 17:42:28 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -117,16 +117,25 @@ void mafEventInteraction::SetModifiers(unsigned long modifiers)
 }
 
 //------------------------------------------------------------------------------
-void mafEventInteraction::DeepCopy(mafEventBase *event)
+void mafEventInteraction::DeepCopy(const mafEventBase *event)
 //------------------------------------------------------------------------------
 {
-  mafEventInteraction *e=mafEventInteraction::SafeDownCast(event);
-  assert(e);
-  Superclass::DeepCopy(e);
-  m_Matrix=e->m_Matrix;
-  m_XYFlag=e->m_XYFlag;
-  m_X=e->m_X;;
-   m_Y=e->m_Y;
-  m_Modifiers=e->m_Modifiers;
-  m_Key=e->m_Key;
+  typedef const mafEventInteraction const_maf_interaction_event;
+  if (event->IsMAFType(const_maf_interaction_event))
+  {
+    const_maf_interaction_event *e=(const_maf_interaction_event *)event;
+    
+    Superclass::DeepCopy(e);
+    m_Matrix=e->m_Matrix;
+    m_XYFlag=e->m_XYFlag;
+    m_X=e->m_X;;
+    m_Y=e->m_Y;
+    m_Modifiers=e->m_Modifiers;
+    m_Key=e->m_Key;
+  }
+  else
+  {
+    assert(true);
+  }
+  
 }
