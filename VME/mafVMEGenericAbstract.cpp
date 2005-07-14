@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 15:18:04 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-07-14 08:35:39 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -170,7 +170,7 @@ void mafVMEGenericAbstract::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframe
 }
 
 //-----------------------------------------------------------------------
-int mafVMEGenericAbstract::ReparentTo(mafVME *parent)
+int mafVMEGenericAbstract::ReparentTo(mafNode *parent)
 //-----------------------------------------------------------------------
 {
   if (CanReparentTo(parent)&&!IsInTree(parent))
@@ -216,7 +216,7 @@ int mafVMEGenericAbstract::ReparentTo(mafVME *parent)
       }
       iter->Delete();
     }
-    return MAF_OK;
+    return Superclass::ReparentTo(parent);
   }
   return MAF_ERROR;
 }
