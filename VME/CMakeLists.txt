@@ -68,6 +68,8 @@ IF (MAF_USE_VTK)
   mafVMEMeter.h
   mafVMEOutputImage.cpp
   mafVMEOutputImage.h
+  mafVMEOutputMeter.cpp
+  mafVMEOutputMeter.h
   mafVMEOutputPointSet.cpp
   mafVMEOutputPointSet.h
   mafVMEOutputPolyline.cpp
