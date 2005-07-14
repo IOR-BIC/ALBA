@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-05 06:01:57 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-07-14 08:36:04 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -104,10 +104,10 @@ mmgGui* mafVMEOutputSurface::CreateGui()
 {
   assert(m_Gui == NULL);
   m_Gui = mafVMEOutput::CreateGui();
-  if (m_VME && m_VME->GetDataPipe() && m_VME->GetDataPipe()->GetVTKData())
+  if (GetSurfaceData())
   {
     this->Update();
-    int num = ((vtkPolyData *)m_VME->GetDataPipe()->GetVTKData())->GetNumberOfPolys();
+    int num = GetSurfaceData()->GetNumberOfPolys();
     m_NumTriangles = num;
   }
   m_Gui->Label("triangles: ", m_NumTriangles, true);

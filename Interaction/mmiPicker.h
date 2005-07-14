@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPicker.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-21 07:55:52 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-14 08:32:01 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone, originally by Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -17,7 +17,7 @@
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------
-class mafEventListener;
+class mafObserver;
 
 /** interactor implenting a picking operation */
 class mmiPicker : public mafInteractor
