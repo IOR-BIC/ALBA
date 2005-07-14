@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialog.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-13 18:17:01 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-07-14 08:31:10 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -178,9 +178,9 @@ void mmgDialog::OnCloseWindow(wxCloseEvent &event)
 void mmgDialog::OnOK(wxCommandEvent &event)
 //----------------------------------------------------------------------------
 {
-  wxDialog::OnOK(event);
+  //wxDialog::OnOK(event);
   /* --- this is what wxDialog::OnOK does
-   this is what is done 
+  // this is what is done 
   if ( Validate() && TransferDataFromWindow() )
   {
     SetReturnCode(wxID_OK);  
@@ -188,6 +188,18 @@ void mmgDialog::OnOK(wxCommandEvent &event)
   }
   Note that the Window just hidden, is not destroyed.  
   */
+
+  //SIL 12-07-05
+  // redefined because our TransferDataFromWindow
+  // use a different semantic for the return value :
+  //     wxWin - return false mean problem
+  //     maf   - return false mean value not changed 
+  if ( Validate()  )
+  {
+    TransferDataFromWindow();
+    SetReturnCode(wxID_OK);  
+    Show(false);
+  }
 }
 //----------------------------------------------------------------------------
 void mmgDialog::OnCancel(wxCommandEvent &event)
