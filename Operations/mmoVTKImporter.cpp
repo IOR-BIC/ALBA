@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 11:35:30 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-07-14 12:33:00 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,6 +25,7 @@
 #include "mafVME.h"
 #include "mafVMEGeneric.h"
 #include "mafVMEImage.h"
+#include "mafVMEPointSet.h"
 #include "mafVMEPolyline.h"
 #include "mafVMESurface.h"
 #include "mafVMEVolumeGray.h"
@@ -49,6 +50,7 @@ mafOp(label)
 	m_Canundo = true;
 	m_File    = "";
 
+  m_VmePointSet = NULL;
   m_VmePolyLine = NULL;
   m_VmeSurface  = NULL;
   m_VmeGrayVol  = NULL;
@@ -60,6 +62,7 @@ mafOp(label)
 mmoVTKImporter::~mmoVTKImporter( ) 
 //----------------------------------------------------------------------------
 {
+  mafDEL(m_VmePointSet);
   mafDEL(m_VmePolyLine);
   mafDEL(m_VmeSurface);
   mafDEL(m_VmeGrayVol);
@@ -137,11 +140,16 @@ void mmoVTKImporter::ImportVTK()
     vtkDataSet *data = vtkDataSet::SafeDownCast(preader->GetOutputs()[0]);
     if (data)
     {
+      mafNEW(m_VmePointSet);
       mafNEW(m_VmePolyLine);
       mafNEW(m_VmeSurface);
       mafNEW(m_VmeGrayVol);
       mafNEW(m_VmeGeneric);
-      if (m_VmePolyLine->SetDataByDetaching(data,0) == MAF_OK)
+      if (m_VmePointSet->SetDataByDetaching(data,0) == MAF_OK)
+      {
+        m_Output = m_VmePointSet;
+      }
+      else if (m_VmePolyLine->SetDataByDetaching(data,0) == MAF_OK)
       {
         m_Output = m_VmePolyLine;
       }

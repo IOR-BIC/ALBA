@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKImporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 11:35:31 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-07-14 12:33:00 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -22,6 +22,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // forward references :
 //----------------------------------------------------------------------------
 class mafNode;
+class mafVMEPointSet;
 class mafVMEPolyline;
 class mafVMESurface;
 class mafVMEVolumeGray;
@@ -55,6 +56,7 @@ protected:
   wxString m_File;
   wxString m_FileDir;
   
+  mafVMEPointSet   *m_VmePointSet;
   mafVMEPolyline   *m_VmePolyLine;
   mafVMESurface    *m_VmeSurface;
   mafVMEVolumeGray *m_VmeGrayVol;
