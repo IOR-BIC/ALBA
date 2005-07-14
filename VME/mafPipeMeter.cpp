@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-05 06:00:27 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-07-14 07:42:58 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,6 +25,7 @@
 #include "mafVMEMeter.h"
 #include "mafEventSource.h"
 #include "mmaMeter.h"
+#include "mmaMaterial.h"
 #include "mmgGui.h"
 #include "mafVMELandmarkCloud.h"
 #include "vtkMAFAssembly.h"
@@ -82,8 +83,6 @@ void mafPipeMeter::Create(mafSceneNode *n/*, bool use_axes*/)
   m_Caption           = NULL;
 
 	//@@@ m_use_axes = use_axes;
-	//@@@ mafVmeData *data = (mafVmeData*) m_Vme->GetClientData();
-	//@@@ assert(data);
   //@@@ m_Vme->UpdateCurrentData();
 
   assert(m_Vme->IsA("mafVMEMeter"));
@@ -128,7 +127,7 @@ void mafPipeMeter::Create(mafSceneNode *n/*, bool use_axes*/)
     m_DataMapper->SetLookupTable(m_Lut);
 
   vtkNEW(m_DataActor);
-	//@@@ m_DataActor->SetProperty(data->m_mat_gui->GetMaterial()->m_prop);
+	m_DataActor->SetProperty(m_MeterVME->GetMaterial()->m_Prop);
 	m_DataActor->SetMapper(m_DataMapper);
 
   m_AssemblyFront->AddPart(m_DataActor);
