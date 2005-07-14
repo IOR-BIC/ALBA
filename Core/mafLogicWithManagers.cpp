@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-08 13:20:23 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2005-07-14 17:41:14 $
+  Version:   $Revision: 1.26 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -698,6 +698,11 @@ void mafLogicWithManagers::ViewSelect()
     EnableItem(CAMERA_RESET, view!=NULL);
     EnableItem(CAMERA_FIT,   view!=NULL);
     EnableItem(CAMERA_FLYTO, view!=NULL);
+
+    if (m_InteractionManager)
+    {
+      m_InteractionManager->ViewSelected(view);
+    }
   }
 }
 //----------------------------------------------------------------------------
