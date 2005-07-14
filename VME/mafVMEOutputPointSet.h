@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputPointSet.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:47:59 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-14 08:36:38 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -41,6 +41,10 @@ public:
     An event is rised when the output data changes to allow attached classes to 
     update their input.*/
   virtual vtkPolyData *GetPointSetData();
+
+protected:
+  mmgGui *CreateGui();
+  int m_NumPoints;
 
 private:
   mafVMEOutputPointSet(const mafVMEOutputPointSet&); // Not implemented

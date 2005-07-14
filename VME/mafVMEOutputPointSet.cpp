@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputPointSet.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:47:59 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-14 08:36:38 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,8 +20,11 @@
 //----------------------------------------------------------------------------
 
 #include "mafVMEOutputPointSet.h"
+#include "mmgGui.h"
 #include "mafIndent.h"
+
 #include "vtkPolyData.h"
+#include "vtkDataSet.h"
 
 #include <assert.h>
 
@@ -33,6 +36,7 @@ mafCxxTypeMacro(mafVMEOutputPointSet)
 mafVMEOutputPointSet::mafVMEOutputPointSet()
 //-------------------------------------------------------------------------
 {
+  m_NumPoints = 0;
 }
 
 //-------------------------------------------------------------------------
@@ -48,3 +52,18 @@ vtkPolyData *mafVMEOutputPointSet::GetPointSetData()
   return (vtkPolyData *)GetVTKData();
 }
 
+//-------------------------------------------------------------------------
+mmgGui* mafVMEOutputPointSet::CreateGui()
+//-------------------------------------------------------------------------
+{
+  assert(m_Gui == NULL);
+  m_Gui = mafVMEOutput::CreateGui();
+  if (GetPointSetData())
+  {
+    this->Update();
+    int num = GetPointSetData()->GetNumberOfVerts();
+    m_NumPoints = num;
+  }
+  m_Gui->Label("points: ", m_NumPoints, true);
+  return m_Gui;
+}
