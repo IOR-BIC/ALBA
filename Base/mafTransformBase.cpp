@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 10:00:10 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-07-14 11:45:04 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,6 +14,7 @@
 
 #include "mafIndent.h"
 #include "mafMatrix.h"
+#include "mafEventSource.h"
 
 //#include "vtkPoints.h" //SIL. 23-3-2005: 
 #ifdef MAF_USE_VTK
@@ -29,6 +30,7 @@ mafTransformBase::mafTransformBase()
 //----------------------------------------------------------------------------
 {
   mafNEW(m_Matrix); // dynamic allocation to allow reference counting
+  m_EventSource = new mafEventSource;
 #ifdef MAF_USE_VTK
   m_VTKTransform = NULL;
 #endif
@@ -39,6 +41,7 @@ mafTransformBase::mafTransformBase()
 mafTransformBase::~mafTransformBase()
 //----------------------------------------------------------------------------
 {
+  cppDEL(m_EventSource);
   mafDEL(m_Matrix);
 #ifdef MAF_USE_VTK
   vtkDEL(m_VTKTransform);

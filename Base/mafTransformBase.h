@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformBase.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 15:08:31 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-07-14 11:45:04 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,6 +22,7 @@
 //------------------------------------------------------------------------------
 // Forward declarations
 //------------------------------------------------------------------------------
+class mafEventSource;
 class vtkLinearTransform;
 class vtkMAFToLinearTransform;
 
@@ -128,6 +129,10 @@ public:
 
   mafTimeStamp GetTimeStamp() {return m_TimeStamp;}
 
+  /** 
+    return the event source object: the transform can send events through this event source */
+  mafEventSource *GetEventSource() {return m_EventSource;}
+
 #ifdef MAF_USE_VTK
   /** Return a VTK transform connected to this transform */
   vtkLinearTransform *GetVTKTransform();
@@ -138,11 +143,13 @@ public:
 
 protected:
   mafAutoPointer<mafMatrix> m_Matrix;        ///< internally stored matrix.
-  mafMTime m_MTime;           ///< modification time
-  mafMTime m_UpdateTime;      ///< We need to record the time of the last update
-  mafMutexLock m_UpdateMutex; ///< we also need to do mutex locking so updates don't collide.
+  mafMTime        m_MTime;           ///< modification time
+  mafMTime        m_UpdateTime;      ///< We need to record the time of the last update
+  mafMutexLock    m_UpdateMutex; ///< we also need to do mutex locking so updates don't collide.
 
-  mafTimeStamp m_TimeStamp;   ///< the timestamp to assign to the output matrix (default=0)
+  mafTimeStamp    m_TimeStamp;   ///< the timestamp to assign to the output matrix (default=0)
+
+  mafEventSource  *m_EventSource;
 
   #ifdef MAF_USE_VTK
   vtkMAFToLinearTransform *m_VTKTransform; ///< VTK transform used to link to VTK process objects

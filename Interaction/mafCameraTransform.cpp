@@ -2,15 +2,15 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafCameraTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 07:57:07 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-07-14 11:45:20 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#include "mafDefines.h"
+#include "mafDecl.h"
 
 #include "mafCameraTransform.h"
 
@@ -18,6 +18,8 @@
 #include "mafOBB.h"
 #include "mafTransform.h"
 #include "mafTransformFrame.h"
+#include "mafEventSource.h"
+
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkCamera.h"
@@ -458,14 +460,6 @@ void mafCameraTransform::AutoFitting2(mafMatrix *matrix,mafOBB *tracked_bounds,v
   ComputeScaling(tracked_bounds,&out_bounds,scale,mode);
 
   mafTransform::Scale(*matrix,scale[0],scale[1],scale[2],PRE_MULTIPLY);
-
-  
-  /*double scalex=x_dim/tdims[0];
-  double scaley=y_dim/tdims[1];
-  double scalez=z_dim/tdims[2];
-
-  mafTransform::Scale(matrix,scalex,scaley,scalez);
-  */
 }
 //----------------------------------------------------------------------------
 void mafCameraTransform::RecomputeAll()
@@ -523,12 +517,8 @@ void mafCameraTransform::InternalUpdate()
   if (!m_Camera)
     return;
 
-  //double crange[2];
-  //camera->GetClippingRange(crange);
-
   // try to not recompute everything if the camera has only moved
   // in space.
-  //if (m_Camera!=camera||m_OldViewAngle!=camera->GetViewAngle()||m_OldDistance!=camera->GetDistance())
   if (m_Camera!=camera/*||fabs(m_OldViewAngle-camera->GetViewAngle())>.001*/)
   {
     RecomputeAll();    
@@ -536,34 +526,13 @@ void mafCameraTransform::InternalUpdate()
   else
   {
     // simply follow view's transform changes    
-
     mafMatrix view_trans=camera->GetViewTransformMatrix();
     UpdatePoseMatrix(m_Matrix,m_OldViewMatrix,&view_trans);
-    /*mflSmartPointer<mafMatrix> new_pose;    
 
-    m_OldViewMatrix->Invert();
-    mafMatrix::Multiply4x4(m_OldViewMatrix,camera->GetViewTransformMatrix(), \
-      new_pose);
-    new_pose->Invert();
-    mafMatrix::Multiply4x4(Matrix,new_pose,new_pose);
-    /*if (m_FollowPosition)
-    {
-      // copy the translation vector
-      CopyTranslation(new_pose);
-    }
-
-    if (m_FollowOrientation)
-    {
-      // copy the 3x3 matrix. Notice the view transform doesn't scale!!!
-      CopyRotation(new_pose);
-    }
-    */   
-
-    //Matrix->DeepCopy(new_pose);
     m_OldViewMatrix->DeepCopy(camera->GetViewTransformMatrix());
   }
 
-  //InvokeEvent(MATRIX_UPDATED);
+  m_EventSource->InvokeEvent(this,MATRIX_UPDATED);
 }
 
 //------------------------------------------------------------------------------
