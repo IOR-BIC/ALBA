@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialog.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-14 08:31:10 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-07-14 12:32:32 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,6 +22,10 @@
 #include "mmgDialog.h"
 #include "wx/busyinfo.h"
 #include "mafDecl.h"
+
+//SIL. 4-7-2005: begin, do the initialization only once
+static bool dialog_initialized = false;
+
 //----------------------------------------------------------------------------
 // Event Table:
 //----------------------------------------------------------------------------
@@ -90,24 +94,23 @@ mmgDialog::mmgDialog(const wxString& title,long style)
   }
 }
 //----------------------------------------------------------------------------
-mmgDialog::~mmgDialog( ) 
+mmgDialog::~mmgDialog()
 //----------------------------------------------------------------------------
 {
+  dialog_initialized = false;
 }
 //----------------------------------------------------------------------------
 int mmgDialog::ShowModal()
 //----------------------------------------------------------------------------
 {
-  //SIL. 4-7-2005: begin, do the initialization only once
-  static bool initialized = false;
-  if(! initialized )
+  if(! dialog_initialized )
   {
     m_DialogSizer->SetMinSize(100,50); // looks ugly when it is empty
     //this->SetAutoLayout( TRUE ); -- not to be called here
     this->SetSizer( m_DialogSizer );
     //m_DialogSizer->Fit(this); //-- not to be called, is called by SetSizeHints
     m_DialogSizer->SetSizeHints(this);
-    initialized = true;
+    dialog_initialized = true;
   }
   //SIL. 4-7-2005: end
   return wxDialog::ShowModal();
