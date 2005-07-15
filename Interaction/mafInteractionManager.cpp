@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-14 17:42:28 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2005-07-15 11:52:46 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -137,7 +137,7 @@ mafInteractionManager::~mafInteractionManager()
   mafDEL(m_DeviceManager);
   mafDEL(m_StaticEventRouter);
   mafDEL(m_PositionalEventRouter);
-  vtkDEL(m_CurrentRenderer);
+  //vtkDEL(m_CurrentRenderer);
   cppDEL(m_Frame);
 }
 
@@ -391,19 +391,26 @@ void mafInteractionManager::OnViewSelected(mafEvent *event)
   mafViewVTK *view = mafViewVTK::SafeDownCast(event->GetView()); 
   m_SelectedView = view;
 
-  vtkRenderer *ren = view->GetFrontRenderer();
-  SetCurrentRenderer(ren);
-  event->SetData(ren); // add the renderer to the event to be sent to avatars
-
-  // propagate event to all avatars...
-  for (mmuAvatarsMap::iterator it=m_Avatars.begin();it!=m_Avatars.end();it++)
+  if (view)
   {
-    //it->second->OnEvent(&mafEventBase(this,VIEW_SELECT));    
-    it->second->OnEvent(event);
+    vtkRenderer *ren = view->GetFrontRenderer();
+    SetCurrentRenderer(ren);
+    event->SetData(ren); // add the renderer to the event to be sent to avatars
+
+    // propagate event to all avatars...
+    for (mmuAvatarsMap::iterator it=m_Avatars.begin();it!=m_Avatars.end();it++)
+    {
+      //it->second->OnEvent(&mafEventBase(this,VIEW_SELECT));    
+      it->second->OnEvent(event);
+    }
+
+    // propagate VIEW_SELECTED event to the mouse device too...
+    GetMouseDevice()->OnEvent(event);
   }
-  
-  // propagate VIEW_SELECTED event to the mouse device too...
-  GetMouseDevice()->OnEvent(event);
+  else
+  {
+    SetCurrentRenderer(NULL);
+  }
   
   // TODO: force a render to the view here....
 
