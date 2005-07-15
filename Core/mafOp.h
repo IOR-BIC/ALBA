@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 15:16:01 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-07-15 15:19:22 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,7 +24,7 @@
 class mafNode;
 class mmgGui;
 class mmgGuiHolder;
-class mafAction;
+class mmdMouse;
 //----------------------------------------------------------------------------
 // constants :
 //----------------------------------------------------------------------------
@@ -118,8 +118,8 @@ public:
   virtual const char ** GetActions() {return NULL;}; 
 
   /** 
-  Initialize the action for the mouse device. */
-  void SetMouseAction(mafAction *action);
+  Initialize the mouse device. */
+  void SetMouse(mmdMouse *mouse);
 
 protected:
 	mafNode				 *m_Input;
@@ -130,6 +130,6 @@ protected:
 	int 						m_OpType;
 	bool						m_NaturalPreserving;
 	mafObserver    *m_Listener;
-  mafAction      *m_MouseAction;
+  mmdMouse       *m_Mouse;
 };
 #endif
