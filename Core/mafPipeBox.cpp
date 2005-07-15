@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-03 15:14:49 $
-  Version:   $Revision: 1.1 $
-  Authors:   Silvano Imboden
+  Date:      $Date: 2005-07-15 15:20:27 $
+  Version:   $Revision: 1.2 $
+  Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -28,8 +28,6 @@
 //@@@ #include "mafDecl.h"
 //@@@ #include "mafAxes.h"  //SIL. 20-5-2003 added line - 
 //@@@ #include "mafMaterial.h"  //SIL. 30-5-2003 added line -
-//@@@ #include "mmgMaterialButton.h"
-//@@@ #include "mafVmeData.h"
 
 #include "vtkRenderer.h"
 #include "vtkOutlineSource.h"
@@ -77,8 +75,8 @@ void mafPipeBox::Create(mafSceneNode *n/*, bool use_axes*/)
 
   m_BoundsMode = 0;
 
-  m_Vme->GetOutput()->Update();
   double b[6];
+  m_Vme->GetOutput()->Update();
   m_Vme->GetOutput()->GetBounds(b);
 
   vtkNEW(m_Box);
@@ -87,7 +85,7 @@ void mafPipeBox::Create(mafSceneNode *n/*, bool use_axes*/)
   vtkNEW(m_Mapper);
 	m_Mapper->SetInput(m_Box->GetOutput());
   
-	if(m_Vme->IsAnimated())				
+	if(m_Vme->IsAnimated())
 		m_Mapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
 	else
 		m_Mapper->ImmediateModeRenderingOff();
@@ -138,7 +136,7 @@ mafPipeBox::~mafPipeBox()
   vtkDEL(m_OutlineMapper);
   vtkDEL(m_OutlineProperty);
   vtkDEL(m_OutlineActor);
-	//@@@ if(m_use_axes) wxDEL(m_axes);  
+	//@@@ if(m_use_axes) cppDEL(m_axes);
 }
 /*
 //----------------------------------------------------------------------------

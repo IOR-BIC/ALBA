@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeBox.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-03 15:14:49 $
-  Version:   $Revision: 1.1 $
-  Authors:   Silvano Imboden
+  Date:      $Date: 2005-07-15 15:20:27 $
+  Version:   $Revision: 1.2 $
+  Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
