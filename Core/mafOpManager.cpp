@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 15:16:48 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-07-15 15:19:39 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,7 +26,7 @@
 #include "mafOpStack.h"
 #include "mafOpContextStack.h"
 #include "mafOpSelect.h"
-//@@@ #include "mafAction.h"
+#include "mmdMouse.h"
 #include "mafOpManager.h"
 #include "mafNode.h"
 #include "vtkMatrix4x4.h"
@@ -425,7 +425,7 @@ void mafOpManager::OpRun(mafOp *op)
   o->m_Id = op->m_Id;    //Paolo 15/09/2004 The operation ID is not copyed from the Copy() method.
 	o->SetListener(this);
 	o->SetInput(m_Selected);
-  o->SetMouseAction(m_MouseAction);
+  o->SetMouse(m_Mouse);
   m_RunningOp = o;
 
   Notify(OP_RUN_STARTING);  //SIL. 17-9-2004: - moved here in order to notify which op is started
@@ -609,11 +609,9 @@ bool mafOpManager::ForceStopWithCancel()
 
   return m_RunningOp != to_be_killed;
 }
-/* - temporary commented out until mafAction is reintroduced
 //----------------------------------------------------------------------------
-void mafOpManager::SetMouseAction(mafAction *action)
+void mafOpManager::SetMouse(mmdMouse *mouse)
 //----------------------------------------------------------------------------
 {
-  m_MouseAction = action;
+  m_Mouse = mouse;
 }
-*/

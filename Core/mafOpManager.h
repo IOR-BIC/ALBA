@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 15:16:48 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-07-15 15:19:39 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,7 +33,7 @@ class mafOpCopy;
 class mafOpPaste;
 class mafOpTransform;
 class vtkMatrix4x4;
-class mafAction;
+class mmdMouse;
 
 //----------------------------------------------------------------------------
 // mafOpManager :
@@ -100,8 +100,7 @@ public:
 
   /** 
   Initialize the action for the mouse device. */
-  // - temporary commented out until mafAction is reintroduced
-  //void SetMouseAction(mafAction *action);
+  void SetMouse(mmdMouse *mouse);
 
 protected:
 	/** Execute the current operation. */
@@ -133,7 +132,7 @@ protected:
 
   void SetAccelerator(mafOp *op);
 
-  mafAction          *m_MouseAction;
+  mmdMouse          *m_Mouse;
   bool							 m_Warn;
 	mafOpContextStack  m_Context;
   mafOp             *m_RunningOp;
