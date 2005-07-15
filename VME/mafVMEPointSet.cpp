@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPointSet.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-12 16:25:56 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-07-15 15:21:43 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,7 +30,8 @@
 #include "vtkCellArray.h"
 
 //-------------------------------------------------------------------------
-mafCxxAbstractTypeMacro(mafVMEPointSet);
+//mafCxxAbstractTypeMacro(mafVMEPointSet);
+mafCxxTypeMacro(mafVMEPointSet);
 //-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPointSet.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-05 15:30:11 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-15 15:21:43 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -39,7 +39,8 @@ mafVME mafVMELandmarkCloud
 class MAF_EXPORT mafVMEPointSet : public mafVMEGeneric
 {
 public:
-  mafAbstractTypeMacro(mafVMEPointSet,mafVMEGeneric);
+  //mafAbstractTypeMacro(mafVMEPointSet,mafVMEGeneric);
+  mafTypeMacro(mafVMEPointSet,mafVMEGeneric);
 
   /** 
   Set data for the give timestamp. This function automatically creates a
