@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkContourVolumeMapper.cxx,v $
   Language:  C++
-  Date:      $Date: 2005-07-14 07:39:29 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-15 11:50:57 $
+  Version:   $Revision: 1.2 $
 
 
 Copyright (c) 1993-2001 Ken Martin, Will Schroeder, Bill Lorensen 
@@ -68,7 +68,7 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
 
 using namespace vtkContourVolumeMapperNamespace;
 
-vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkContourVolumeMapper);
 
 
@@ -890,8 +890,8 @@ template<typename DataType> void vtkContourVolumeMapper::CreateMCubes(int level,
 
   vtkFloatArray *normals = vtkFloatArray::New();
   normals->SetNumberOfComponents(3);
-  polydata->GetPointData()->SetNormals(normals);
-  normals->UnRegister(NULL);
+//  polydata->GetPointData()->SetNormals(normals);
+//  normals->UnRegister(NULL);
   normals->Allocate(6 * estimatedNumberOfTriangles, 3 * estimatedNumberOfTriangles);
 
   const DataType (* const BlockMinMax)[2] = (DataType (*)[2])this->BlockMinMax;
