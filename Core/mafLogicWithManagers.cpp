@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-14 17:41:14 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2005-07-15 15:19:56 $
+  Version:   $Revision: 1.27 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -106,7 +106,8 @@ void mafLogicWithManagers::Configure()
   if(m_UseOpManager)
   {
     m_OpManager = new mafOpManager();
-    m_OpManager->SetListener(this); 
+    m_OpManager->SetListener(this);
+    m_OpManager->SetMouse(m_InteractionManager->GetMouseDevice());
   }
 }
 //----------------------------------------------------------------------------
