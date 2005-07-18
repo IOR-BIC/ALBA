@@ -112,6 +112,8 @@ mmiCompositorMouse.cpp
 mmiCompositorMouse.h
 mmiConstraint.cpp
 mmiConstraint.h
+mmiExtractIsosurface.cpp
+mmiExtractIsosurface.h
 #mmiGeneric.cpp
 #mmiGeneric.h
 mmiGeneric6DOF.cpp
