@@ -21,6 +21,8 @@ IF (MAF_USE_VTK)
     mmoCreateSlicer.h
     mmoMAFTransform.cpp
     mmoMAFTransform.h
+    mmoExtractIsosurface.cpp
+    mmoExtractIsosurface.h
 #    mmoMSFImporter.cpp
 #    mmoMSFImporter.h
     mmoReparentTo.cpp
@@ -43,7 +45,7 @@ ENDIF (MAF_USE_VTK)
 SET(PROJECT_LIBS "mafVME" "mafInteraction")
 
 IF (MAF_USE_VTK)
-  SET(PROJECT_LIBS ${PROJECT_LIBS} vtkCommon)
+  SET(PROJECT_LIBS ${PROJECT_LIBS} vtkCommon vtkMAF)
 ENDIF (MAF_USE_VTK)
 
 # Create the library.

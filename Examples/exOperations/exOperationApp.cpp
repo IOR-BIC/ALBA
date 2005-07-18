@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-12 11:48:22 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-07-18 10:14:16 $
+  Version:   $Revision: 1.14 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -36,6 +36,7 @@
 #include "mmoCreateGroup.h"
 #include "mmoCreateMeter.h"
 #include "mmoCreateSlicer.h"
+#include "mmoExtractIsosurface.h"
 #include "mmoMAFTransform.h"
 #include "mmoReparentTo.h"
 #include "mmoSTLExporter.h"
@@ -97,6 +98,7 @@ bool exOperationApp::OnInit()
   m_logic->Plug(new mmoCreateGroup("Create Group"));
   m_logic->Plug(new mmoCreateMeter("Create Meter"));
   m_logic->Plug(new mmoCreateSlicer("Create Slicer"));
+  m_logic->Plug(new mmoExtractIsosurface("Extract Isosurface"));
   m_logic->Plug(new mmoMAFTransform("MAF Transform"));
   m_logic->Plug(new mmoReparentTo("Reparent to...  \tCtrl+R"));
   //------------------------------------------------------------
