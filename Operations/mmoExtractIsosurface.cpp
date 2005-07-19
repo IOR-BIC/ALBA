@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoExtractIsosurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-19 11:29:34 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-19 13:16:33 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -79,8 +79,8 @@ mafOp(label), m_IsosurfaceVme(NULL)
 	m_Rwi = NULL;
 	
   m_IsoValue = 0;
-	m_min = 0;
-	m_max = 0;
+	m_MinDensity = 0;
+	m_MaxDensity = 0;
 	
   m_Slice     = 0;
 	m_SliceMin  = 0;
@@ -88,14 +88,14 @@ mafOp(label), m_IsosurfaceVme(NULL)
   m_ShowSlice = 1;
   m_Clean     = 1;
   
-  for(int i=0; i<6; i++) m_bbox[i]=0;
+  for(int i=0; i<6; i++) m_BoundingBox[i]=0;
 
-  v_volume = NULL;
-  v_box    = NULL;
+  m_Volume = NULL;
+  m_Box    = NULL;
 
-  v_contour_mapper  = NULL; 
-  v_outline_filter  = NULL;
-  v_outline_mapper  = NULL;
+  m_ContourVolumeMapper  = NULL; 
+  m_OutlineFilter  = NULL;
+  m_OutlineMapper  = NULL;
 
   m_DensityPicker   = NULL;
 }
@@ -177,9 +177,9 @@ void mmoExtractIsosurface::CreateOpDialog()
   vtkDataSet *dataset = ((mafVME *)m_Input)->GetOutput()->GetVTKData();
   double sr[2];
 	dataset->GetScalarRange(sr);
-  m_min = sr[0];
-  m_max = sr[1];
-  m_IsoValue = (m_min + m_max)*0.5;
+  m_MinDensity = sr[0];
+  m_MaxDensity = sr[1];
+  m_IsoValue = (m_MinDensity + m_MaxDensity)*0.5;
 
   double b[6];
   dataset->GetBounds(b);
@@ -216,11 +216,11 @@ void mmoExtractIsosurface::CreateOpDialog()
   wxStaticText *lab  = new wxStaticText(m_Dialog,-1, "contur value: ");
 	wxStaticText *foo  = new wxStaticText(m_Dialog,-1, "");
 	wxTextCtrl   *text = new wxTextCtrl  (m_Dialog,ID_ISO, "",								 		p,wxSize(50, 16 ), wxNO_BORDER );
-  m_IsoSlider				 = new mmgFloatSlider(m_Dialog,ID_ISO_SLIDER,m_IsoValue,m_min,m_max,p,wxSize(150,20));
+  m_IsoSlider				 = new mmgFloatSlider(m_Dialog,ID_ISO_SLIDER,m_IsoValue,m_MinDensity,m_MaxDensity,p,wxSize(150,20));
 	m_IsoSlider->SetNumberOfSteps(200);
-	m_step = m_IsoSlider->GetStep();
-  //m_min  = m_IsoSlider->GetMin();
-  //m_max  = m_IsoSlider->GetMax();
+	m_StepDensity = m_IsoSlider->GetStep();
+  //m_MinDensity  = m_IsoSlider->GetMin();
+  //m_MaxDensity  = m_IsoSlider->GetMax();
   m_IsoValue  = m_IsoSlider->GetValue();
 
   // slice interface
@@ -247,7 +247,7 @@ void mmoExtractIsosurface::CreateOpDialog()
   mmgButton  *b_cancel  = new mmgButton(m_Dialog,ID_CANCEL,     "cancel",p,wxSize(80,20));
 	
 	// iso interface validator
-  text->SetValidator(mmgValidator(this,ID_ISO,text,&m_IsoValue,m_min,m_max));
+  text->SetValidator(mmgValidator(this,ID_ISO,text,&m_IsoValue,m_MinDensity,m_MaxDensity));
 	m_IsoSlider->SetValidator(mmgValidator(this,ID_ISO_SLIDER,m_IsoSlider,&m_IsoValue,text));
   b_incr->SetValidator(mmgValidator(this,ID_INCREASE_ISO,b_incr));
   b_decr->SetValidator(mmgValidator(this,ID_DECREASE_ISO,b_decr));
@@ -310,54 +310,54 @@ void mmoExtractIsosurface::CreateVolumePipeline()
 {
   mafVMEVolumeGray *vol_vme = mafVMEVolumeGray::SafeDownCast(m_Input);
   vtkDataSet *dataset = vol_vme->GetVolumeOutput()->GetVTKData();
-	v_contour_mapper = vtkContourVolumeMapper::New();
-	v_contour_mapper->SetInput(dataset);
+	m_ContourVolumeMapper = vtkContourVolumeMapper::New();
+	m_ContourVolumeMapper->SetInput(dataset);
 
-//  v_volume = vtkVolume::New();
-//	v_volume->SetMapper(v_contour_mapper);
-//	m_Rwi->m_RenFront->AddActor(v_volume);
+//  m_Volume = vtkVolume::New();
+//	m_Volume->SetMapper(m_ContourVolumeMapper);
+//	m_Rwi->m_RenFront->AddActor(m_Volume);
 
-	double min = m_min;
-	double max = m_max;
+	double min = m_MinDensity;
+	double max = m_MaxDensity;
 
-//	while (m_IsoValue < max && v_contour_mapper->EstimateRelevantVolume(m_IsoValue) > 0.3f)
+//	while (m_IsoValue < max && m_ContourVolumeMapper->EstimateRelevantVolume(m_IsoValue) > 0.3f)
 //		m_IsoValue += 0.05f * (min + max) + 1.f;
-	v_contour_mapper->SetContourValue(m_IsoValue);
+	m_ContourVolumeMapper->SetContourValue(m_IsoValue);
 
   vtkPolyData *contour = vtkPolyData::New();
-  v_contour_mapper->GetOutput(0, contour);
+  m_ContourVolumeMapper->GetOutput(0, contour);
 
-  m_contour_volume_mapper = vtkPolyDataMapper::New();
-  m_contour_volume_mapper->SetInput(contour);
-  m_contour_volume_mapper->ScalarVisibilityOff();
+  m_ContourMapper = vtkPolyDataMapper::New();
+  m_ContourMapper->SetInput(contour);
+  m_ContourMapper->ScalarVisibilityOff();
 
   contour->Delete();
 
-  m_contour_volume_actor = vtkActor::New();
-  m_contour_volume_actor->SetMapper(m_contour_volume_mapper);
+  m_ContourActor = vtkActor::New();
+  m_ContourActor->SetMapper(m_ContourMapper);
 
-  m_Rwi->m_RenFront->AddActor(m_contour_volume_actor);
+  m_Rwi->m_RenFront->AddActor(m_ContourActor);
 
   // bounding box actor
-	v_outline_filter = vtkOutlineCornerFilter::New();
-	v_outline_filter->SetInput(dataset);
+	m_OutlineFilter = vtkOutlineCornerFilter::New();
+	m_OutlineFilter->SetInput(dataset);
 
-	v_outline_mapper = vtkPolyDataMapper::New();
-	v_outline_mapper->SetInput(v_outline_filter->GetOutput());
+	m_OutlineMapper = vtkPolyDataMapper::New();
+	m_OutlineMapper->SetInput(m_OutlineFilter->GetOutput());
 
-	v_box = vtkActor::New();
-	v_box->SetMapper(v_outline_mapper);
-	v_box->VisibilityOn();
-	v_box->PickableOff();
-	v_box->GetProperty()->SetColor(0,0,0.8);
-	v_box->GetProperty()->SetAmbient(1);
-	v_box->GetProperty()->SetRepresentationToWireframe();
-	v_box->GetProperty()->SetInterpolationToFlat();
-	m_Rwi->m_RenFront->AddActor(v_box);
+	m_Box = vtkActor::New();
+	m_Box->SetMapper(m_OutlineMapper);
+	m_Box->VisibilityOn();
+	m_Box->PickableOff();
+	m_Box->GetProperty()->SetColor(0,0,0.8);
+	m_Box->GetProperty()->SetAmbient(1);
+	m_Box->GetProperty()->SetRepresentationToWireframe();
+	m_Box->GetProperty()->SetInterpolationToFlat();
+	m_Rwi->m_RenFront->AddActor(m_Box);
 
-	v_box->GetBounds(m_bbox);
-	m_Rwi->SetGridPosition(m_bbox[4]);
-	m_Rwi->m_RenFront->ResetCamera(m_bbox);
+	m_Box->GetBounds(m_BoundingBox);
+	m_Rwi->SetGridPosition(m_BoundingBox[4]);
+	m_Rwi->m_RenFront->ResetCamera(m_BoundingBox);
 	m_Rwi->m_Camera->Dolly(1.2);
 	m_Rwi->m_RenFront->ResetCameraClippingRange();
 
@@ -375,83 +375,83 @@ void mmoExtractIsosurface::CreateSlicePipeline()
 	w = srange[1] - srange[0];
 	l = (srange[1] + srange[0]) * 0.5;
 
-  dataset->GetCenter(m_origin);
-  m_Slice = m_origin[2];
-  m_xVect[0] = 1.0;
-  m_xVect[1] = 0.0;
-  m_xVect[2] = 0.0;
-  m_yVect[0] = 0.0;
-  m_yVect[1] = 1.0;
-  m_yVect[2] = 0.0;
+  dataset->GetCenter(m_SliceOrigin);
+  m_Slice = m_SliceOrigin[2];
+  m_SliceXVect[0] = 1.0;
+  m_SliceXVect[1] = 0.0;
+  m_SliceXVect[2] = 0.0;
+  m_SliceYVect[0] = 0.0;
+  m_SliceYVect[1] = 1.0;
+  m_SliceYVect[2] = 0.0;
 
-	m_pslicer = vtkVolumeSlicer::New();
-	m_slicer	= vtkVolumeSlicer::New();
-	m_slicer->SetPlaneOrigin(m_origin);
-	m_pslicer->SetPlaneOrigin(m_slicer->GetPlaneOrigin());
-	m_slicer->SetPlaneAxisX(m_xVect);
-	m_slicer->SetPlaneAxisY(m_yVect);
-	m_pslicer->SetPlaneAxisX(m_xVect);
-	m_pslicer->SetPlaneAxisY(m_yVect);
-	m_slicer->SetInput(dataset);
-	m_pslicer->SetInput(dataset);
+	m_PolydataSlicer = vtkVolumeSlicer::New();
+	m_VolumeSlicer	= vtkVolumeSlicer::New();
+	m_VolumeSlicer->SetPlaneOrigin(m_SliceOrigin);
+	m_PolydataSlicer->SetPlaneOrigin(m_VolumeSlicer->GetPlaneOrigin());
+	m_VolumeSlicer->SetPlaneAxisX(m_SliceXVect);
+	m_VolumeSlicer->SetPlaneAxisY(m_SliceYVect);
+	m_PolydataSlicer->SetPlaneAxisX(m_SliceXVect);
+	m_PolydataSlicer->SetPlaneAxisY(m_SliceYVect);
+	m_VolumeSlicer->SetInput(dataset);
+	m_PolydataSlicer->SetInput(dataset);
 
-	m_image_slice = vtkImageData::New();
-  m_image_slice->SetScalarTypeToUnsignedChar();
-	m_image_slice->SetNumberOfScalarComponents(3);
-  m_image_slice->SetExtent(ext[0], ext[1], ext[2], ext[3], 0, 0);
-	m_image_slice->SetSpacing(xspc, yspc, 1.f);
+	m_SliceImage = vtkImageData::New();
+  m_SliceImage->SetScalarTypeToUnsignedChar();
+	m_SliceImage->SetNumberOfScalarComponents(3);
+  m_SliceImage->SetExtent(ext[0], ext[1], ext[2], ext[3], 0, 0);
+	m_SliceImage->SetSpacing(xspc, yspc, 1.f);
 
-  m_slicer->SetOutput(m_image_slice);
-	m_slicer->SetWindow(w);
-	m_slicer->SetLevel(l);
-	m_slicer->Update();
+  m_VolumeSlicer->SetOutput(m_SliceImage);
+	m_VolumeSlicer->SetWindow(w);
+	m_VolumeSlicer->SetLevel(l);
+	m_VolumeSlicer->Update();
 
-  m_texture = vtkTexture::New();
-	m_texture->RepeatOff();
-	m_texture->InterpolateOn();
-	m_texture->SetQualityTo32Bit();
-	m_texture->SetInput(m_image_slice);
+  m_SliceTexture = vtkTexture::New();
+	m_SliceTexture->RepeatOff();
+	m_SliceTexture->InterpolateOn();
+	m_SliceTexture->SetQualityTo32Bit();
+	m_SliceTexture->SetInput(m_SliceImage);
 
-  m_polydata	= vtkPolyData::New();
-	m_pslicer->SetOutput(m_polydata);
-	m_pslicer->SetTexture(m_image_slice);
-	m_pslicer->Update();
+  m_Polydata	= vtkPolyData::New();
+	m_PolydataSlicer->SetOutput(m_Polydata);
+	m_PolydataSlicer->SetTexture(m_SliceImage);
+	m_PolydataSlicer->Update();
 	
-  m_smapper	= vtkPolyDataMapper::New();
-	m_smapper->SetInput(m_polydata);
-	m_smapper->ScalarVisibilityOff();
+  m_SlicerMapper	= vtkPolyDataMapper::New();
+	m_SlicerMapper->SetInput(m_Polydata);
+	m_SlicerMapper->ScalarVisibilityOff();
 
-	m_actorSlice = vtkActor::New();
-	m_actorSlice->SetMapper(m_smapper);
-	m_actorSlice->SetTexture(m_texture);
-	m_actorSlice->GetProperty()->SetAmbient(1.f);
-	m_actorSlice->GetProperty()->SetDiffuse(0.f);
+	m_SlicerActor = vtkActor::New();
+	m_SlicerActor->SetMapper(m_SlicerMapper);
+	m_SlicerActor->SetTexture(m_SliceTexture);
+	m_SlicerActor->GetProperty()->SetAmbient(1.f);
+	m_SlicerActor->GetProperty()->SetDiffuse(0.f);
 
-  m_PIPRen->AddActor(m_actorSlice);
+  m_PIPRen->AddActor(m_SlicerActor);
 
   vtkPolyData *contour = vtkPolyData::New();
-  v_contour_mapper->GetOutput(0, contour);
+  m_ContourVolumeMapper->GetOutput(0, contour);
 
-  m_plane = vtkPlane::New();
-  m_plane->SetOrigin(m_image_slice->GetOrigin());
-  m_plane->SetNormal(0,0,1);
+  m_CutterPlane = vtkPlane::New();
+  m_CutterPlane->SetOrigin(m_SliceImage->GetOrigin());
+  m_CutterPlane->SetNormal(0,0,1);
   
-  m_cutter = vtkFixedCutter::New();
-  m_cutter->SetCutFunction(m_plane);
-  m_cutter->SetInput(contour);
-  m_cutter->Update();
+  m_IsosurfaceCutter = vtkFixedCutter::New();
+  m_IsosurfaceCutter->SetCutFunction(m_CutterPlane);
+  m_IsosurfaceCutter->SetInput(contour);
+  m_IsosurfaceCutter->Update();
 
   contour->Delete();
 
-  m_mapper	= vtkPolyDataMapper::New();
-  m_mapper->SetInput(m_cutter->GetOutput());
-  m_mapper->ScalarVisibilityOff();
+  m_PolydataMapper	= vtkPolyDataMapper::New();
+  m_PolydataMapper->SetInput(m_IsosurfaceCutter->GetOutput());
+  m_PolydataMapper->ScalarVisibilityOff();
 
-  m_actor = vtkActor::New();
-  m_actor->SetMapper(m_mapper);
-	m_actor->GetProperty()->SetColor(1,0,0);
+  m_PolydataActor = vtkActor::New();
+  m_PolydataActor->SetMapper(m_PolydataMapper);
+	m_PolydataActor->GetProperty()->SetColor(1,0,0);
   
-  m_PIPRen->AddActor(m_actor);
+  m_PIPRen->AddActor(m_PolydataActor);
   m_PIPRen->ResetCamera();
 }
 //----------------------------------------------------------------------------
@@ -459,33 +459,33 @@ void mmoExtractIsosurface::DeleteOpDialog()
 //----------------------------------------------------------------------------
 {
 	m_Rwi->m_RenFront->GetVolumes();
-	m_Rwi->m_RenFront->RemoveActor(v_volume);
-  m_Rwi->m_RenFront->RemoveActor(v_box);
+	m_Rwi->m_RenFront->RemoveActor(m_Volume);
+  m_Rwi->m_RenFront->RemoveActor(m_Box);
 
-  //vtkDEL(v_volume);
-  vtkDEL(m_contour_volume_mapper);
-  vtkDEL(m_contour_volume_actor);
-  vtkDEL(v_box);
-  vtkDEL(v_contour_mapper);
-  vtkDEL(v_outline_filter);
-  vtkDEL(v_outline_mapper);
+  //vtkDEL(m_Volume);
+  vtkDEL(m_ContourMapper);
+  vtkDEL(m_ContourActor);
+  vtkDEL(m_Box);
+  vtkDEL(m_ContourVolumeMapper);
+  vtkDEL(m_OutlineFilter);
+  vtkDEL(m_OutlineMapper);
   mafDEL(m_DensityPicker);
 
-  m_PIPRen->RemoveActor(m_actorSlice);
-  m_PIPRen->RemoveActor(m_actor);
+  m_PIPRen->RemoveActor(m_SlicerActor);
+  m_PIPRen->RemoveActor(m_PolydataActor);
 
   vtkDEL(m_PIPRen);
-  vtkDEL(m_slicer);
-  vtkDEL(m_pslicer);
-  vtkDEL(m_image_slice);
-  vtkDEL(m_texture);
-  vtkDEL(m_polydata);
-  vtkDEL(m_smapper);
-  vtkDEL(m_actorSlice);
-  vtkDEL(m_cutter);
-  vtkDEL(m_plane);
-  vtkDEL(m_mapper);
-  vtkDEL(m_actor);
+  vtkDEL(m_VolumeSlicer);
+  vtkDEL(m_PolydataSlicer);
+  vtkDEL(m_SliceImage);
+  vtkDEL(m_SliceTexture);
+  vtkDEL(m_Polydata);
+  vtkDEL(m_SlicerMapper);
+  vtkDEL(m_SlicerActor);
+  vtkDEL(m_IsosurfaceCutter);
+  vtkDEL(m_CutterPlane);
+  vtkDEL(m_PolydataMapper);
+  vtkDEL(m_PolydataActor);
 
   cppDEL(m_Rwi); 
   cppDEL(m_Dialog);
@@ -505,7 +505,7 @@ void mmoExtractIsosurface::OnEvent(mafEventBase *maf_event)
         m_Dialog->EndModal(wxID_CANCEL);
       break;
       case ID_FIT:
-        m_Rwi->m_RenFront->ResetCamera(m_bbox);
+        m_Rwi->m_RenFront->ResetCamera(m_BoundingBox);
         m_Rwi->m_Camera->Dolly(1.2);
         m_Rwi->m_RenFront->ResetCameraClippingRange();
         m_PIPRen->ResetCamera();
@@ -525,12 +525,12 @@ void mmoExtractIsosurface::OnEvent(mafEventBase *maf_event)
         UpdateSurface(true);
       break;
       case ID_INCREASE_ISO:
-        if(m_IsoValue<m_max) m_IsoValue += m_step;
+        if(m_IsoValue<m_MaxDensity) m_IsoValue += m_StepDensity;
         m_Dialog->TransferDataToWindow();  
         UpdateSurface();
       break;
       case ID_DECREASE_ISO:
-        if(m_IsoValue>m_min) m_IsoValue -= m_step;
+        if(m_IsoValue>m_MinDensity) m_IsoValue -= m_StepDensity;
         m_Dialog->TransferDataToWindow();  
         UpdateSurface();
       break;
@@ -589,17 +589,17 @@ void mmoExtractIsosurface::UpdateSurface(bool use_lod)
 //----------------------------------------------------------------------------
 {
   m_Rwi->m_RenderWindow->SetDesiredUpdateRate(0.001f);
-  if (v_contour_mapper->GetContourValue() != m_IsoValue) 
+  if (m_ContourVolumeMapper->GetContourValue() != m_IsoValue) 
 	{
-    v_contour_mapper->SetContourValue(m_IsoValue);
-    v_contour_mapper->Update();
+    m_ContourVolumeMapper->SetContourValue(m_IsoValue);
+    m_ContourVolumeMapper->Update();
     vtkPolyData *contour = vtkPolyData::New();
-    v_contour_mapper->GetOutput(0, contour);
-    m_contour_volume_mapper->SetInput(contour);
+    m_ContourVolumeMapper->GetOutput(0, contour);
+    m_ContourMapper->SetInput(contour);
     if (m_ShowSlice)
     {
-      m_cutter->SetInput(contour);
-      m_cutter->Update();
+      m_IsosurfaceCutter->SetInput(contour);
+      m_IsosurfaceCutter->Update();
     }
     contour->Delete();
     if(use_lod) m_Rwi->m_RenderWindow->SetDesiredUpdateRate(15.0f);
@@ -612,19 +612,19 @@ void mmoExtractIsosurface::UpdateSurface(bool use_lod)
 void mmoExtractIsosurface::UpdateSlice()
 //----------------------------------------------------------------------------
 {
-  m_origin[2] = m_Slice;
-  m_slicer->SetPlaneOrigin(m_origin[0], m_origin[1], m_origin[2]);
-  m_pslicer->SetPlaneOrigin(m_slicer->GetPlaneOrigin());
-  m_slicer->SetPlaneAxisX(m_xVect);
-  m_slicer->SetPlaneAxisY(m_yVect);
-  m_pslicer->SetPlaneAxisX(m_xVect);
-  m_pslicer->SetPlaneAxisY(m_yVect);
+  m_SliceOrigin[2] = m_Slice;
+  m_VolumeSlicer->SetPlaneOrigin(m_SliceOrigin[0], m_SliceOrigin[1], m_SliceOrigin[2]);
+  m_PolydataSlicer->SetPlaneOrigin(m_VolumeSlicer->GetPlaneOrigin());
+  m_VolumeSlicer->SetPlaneAxisX(m_SliceXVect);
+  m_VolumeSlicer->SetPlaneAxisY(m_SliceYVect);
+  m_PolydataSlicer->SetPlaneAxisX(m_SliceXVect);
+  m_PolydataSlicer->SetPlaneAxisY(m_SliceYVect);
 
-  m_slicer->Update();
-  m_pslicer->Update();
+  m_VolumeSlicer->Update();
+  m_PolydataSlicer->Update();
 
-  m_plane->SetOrigin(m_slicer->GetPlaneOrigin());
-  m_cutter->Update();
+  m_CutterPlane->SetOrigin(m_VolumeSlicer->GetPlaneOrigin());
+  m_IsosurfaceCutter->Update();
 
   this->m_PIPRen->ResetCameraClippingRange();
   m_Rwi->m_RenderWindow->Render();
@@ -636,13 +636,13 @@ void mmoExtractIsosurface::ExtractSurface(bool clean)
 {
   wxBusyInfo wait("Extracting Isosurface: please wait ...");
   
-	v_contour_mapper->SetEnableContourAnalysis(clean);
+	m_ContourVolumeMapper->SetEnableContourAnalysis(clean);
   
-	// IMPORTANT, extract the isosurface from v_contour_mapper in this way
+	// IMPORTANT, extract the isosurface from m_ContourVolumeMapper in this way
 	// and then call surface->Delete() when the VME is created
 	vtkPolyData *surface = vtkPolyData::New();
-	v_contour_mapper->GetOutput(0, surface);
-  v_contour_mapper->Update();
+	m_ContourVolumeMapper->GetOutput(0, surface);
+  m_ContourVolumeMapper->Update();
 
   wxString name = wxString::Format( "%s Isosurface %g", m_Input->GetName(),m_IsoValue );
 

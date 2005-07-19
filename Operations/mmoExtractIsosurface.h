@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoExtractIsosurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-19 11:29:34 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-19 13:16:33 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -75,42 +75,42 @@ protected:
 	mafRWI      *m_Rwi;
   vtkRenderer *m_PIPRen;
 	double       m_IsoValue;
-	double       m_max;
-	double       m_min;
-	double       m_step;
+	double       m_MaxDensity;
+	double       m_MinDensity;
+	double       m_StepDensity;
   double       m_Slice;
   double       m_SliceMin;
   double       m_SliceMax;
 	double       m_SliceStep;
   int          m_ShowSlice;
   int          m_Clean;
-  double       m_bbox[6];
-  double       m_origin[3];
-  float        m_xVect[3];
-  float        m_yVect[3];
+  double       m_BoundingBox[6];
+  double       m_SliceOrigin[3];
+  float        m_SliceXVect[3];
+  float        m_SliceYVect[3];
 
   mmgFloatSlider *m_IsoSlider;
   mmgFloatSlider *m_SliceSlider;
   
-  vtkVolume               *v_volume;
-  vtkPolyDataMapper       *m_contour_volume_mapper;
-  vtkActor                *m_contour_volume_actor;
-  vtkActor                *v_box;
-  vtkContourVolumeMapper  *v_contour_mapper; 
-  vtkOutlineCornerFilter  *v_outline_filter;
-  vtkPolyDataMapper       *v_outline_mapper;
+  vtkVolume               *m_Volume;
+  vtkPolyDataMapper       *m_ContourMapper;
+  vtkActor                *m_ContourActor;
+  vtkActor                *m_Box;
+  vtkContourVolumeMapper  *m_ContourVolumeMapper; 
+  vtkOutlineCornerFilter  *m_OutlineFilter;
+  vtkPolyDataMapper       *m_OutlineMapper;
 
-  vtkVolumeSlicer   *m_slicer;
-  vtkVolumeSlicer   *m_pslicer;
-  vtkImageData      *m_image_slice;
-  vtkTexture        *m_texture;
-  vtkPolyData       *m_polydata;
-  vtkPolyDataMapper *m_smapper;
-  vtkActor          *m_actorSlice;
-  vtkPolyDataMapper *m_mapper;
-  vtkActor          *m_actor;
-  vtkPlane          *m_plane;
-  vtkFixedCutter    *m_cutter;
+  vtkVolumeSlicer   *m_VolumeSlicer;
+  vtkVolumeSlicer   *m_PolydataSlicer;
+  vtkImageData      *m_SliceImage;
+  vtkTexture        *m_SliceTexture;
+  vtkPolyData       *m_Polydata;
+  vtkPolyDataMapper *m_SlicerMapper;
+  vtkActor          *m_SlicerActor;
+  vtkPolyDataMapper *m_PolydataMapper;
+  vtkActor          *m_PolydataActor;
+  vtkPlane          *m_CutterPlane;
+  vtkFixedCutter    *m_IsosurfaceCutter;
 
   //mmiPicker         *m_DensityPicker;
   mmiExtractIsosurface *m_DensityPicker;
