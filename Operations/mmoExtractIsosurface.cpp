@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoExtractIsosurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-18 10:12:58 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-19 11:29:34 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,7 +38,8 @@
 #include "mafVME.h"
 #include "mafVMESurface.h"
 #include "mafVMEOutput.h"
-#include "mmiPicker.h"
+//#include "mmiPicker.h"
+#include "mmiExtractIsosurface.h"
 
 #include "vtkLight.h"
 #include "vtkCamera.h"

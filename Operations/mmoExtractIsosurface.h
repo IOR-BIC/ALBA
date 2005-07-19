@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoExtractIsosurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-18 10:12:58 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-19 11:29:34 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,7 +35,8 @@ class vtkPolyDataMapper;
 class vtkOutlineCornerFilter;
 class vtkRenderer;
 
-class mmiPicker;
+//class mmiPicker;
+class mmiExtractIsosurface;
 class vtkImageData;
 class vtkTexture;
 class vtkPolyData;
@@ -111,7 +112,9 @@ protected:
   vtkPlane          *m_plane;
   vtkFixedCutter    *m_cutter;
 
-  mmiPicker         *m_DensityPicker;
+  //mmiPicker         *m_DensityPicker;
+  mmiExtractIsosurface *m_DensityPicker;
+
 
 	/** 
   Builds operation's interface and visualization pipeline. */
