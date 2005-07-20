@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:45:11 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-07-20 15:43:46 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -147,6 +147,8 @@ int mafVMERoot::InternalStore(mafStorageElement *parent)
 {
   if (Superclass::InternalStore(parent)==MAF_OK)
   {
+    StoreRoot(parent);
+    parent->StoreInteger("MaxItemId",m_MaxItemId);
     parent->StoreMatrix("Transform",&m_Transform->GetMatrix());
     return MAF_OK;
   }
@@ -157,8 +159,13 @@ int mafVMERoot::InternalStore(mafStorageElement *parent)
 int mafVMERoot::InternalRestore(mafStorageElement *node)
 //-------------------------------------------------------------------------
 {
+  RestoreRoot(node);
+  int max_item_id;
+  node->RestoreInteger("MaxItemId",max_item_id);
+  m_MaxItemId = max_item_id;
+
   if (Superclass::InternalRestore(node)==MAF_OK)
-  {
+  {  
     mafMatrix matrix;
     if (node->RestoreMatrix("Transform",&matrix)==MAF_OK)
     {
