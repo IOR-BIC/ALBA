@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:06:37 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-07-20 15:48:21 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -55,6 +55,8 @@ mafVMEItem::mafVMEItem()
   m_OutputMemorySize= 0;
   m_InputMemory     = NULL;
   m_InputMemorySize = 0;
+
+  m_ReleaseOldFile  = true;
 }
 
 //-------------------------------------------------------------------------
@@ -233,7 +235,8 @@ void mafVMEItem::SetURL(const char *name)
     mafStorage *storage=e.GetStorage();
     if (storage)
     {
-      storage->ReleaseURL(m_URL); // remove old file
+      if (m_ReleaseOldFile)
+        storage->ReleaseURL(m_URL); // remove old file
       SetDataModified(true); // force rewriting data 
     }
   }

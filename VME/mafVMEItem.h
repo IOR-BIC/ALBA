@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:06:50 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-07-20 15:48:22 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -91,6 +91,12 @@ public:
 
   /** used to set an external URL where this data is stored */
   virtual void SetURL(const char *name);
+
+  /** if set to true this flags make the old data files to be removed */
+  void ReleaseOldFileOn() {m_ReleaseOldFile = true;}
+  
+  /** if set to false this flags avoid old data files to be removed, as is when a SaveAs is performed */
+  void ReleaseOldFileOff() {m_ReleaseOldFile = false;}
 
   /** 
     Return the extension to be used for data file storing data of this item.
@@ -242,6 +248,8 @@ protected:
   mafTagArray * m_TagArray;             ///< meta data attributes attached to this dataset      
   bool          m_DataModified;         ///< true when data has been mofied from last storing
   static bool   m_GlobalCompareDataFlag;///< if true Equals will also compare internal data
+
+  bool          m_ReleaseOldFile;       ///< whether to release the old VTK file when data filename changes (set by mafDataVector::InternalStore() ) 
 
   int           m_Id;         ///< the id assigned to the dataset/file to be stored in the MSF
   bool          m_Crypting;   ///< this flags specify if crypting should be used when saving data
