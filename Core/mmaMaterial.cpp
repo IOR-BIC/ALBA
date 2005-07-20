@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-03 15:14:50 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-20 12:16:59 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -378,10 +378,30 @@ void mmaMaterial::UpdateProp()
   m_ColorLut->SetTableRange(m_TableRange);
 }
 //-----------------------------------------------------------------------
-void mmaMaterial::SetTextureImage(vtkImageData *tex)
+void mmaMaterial::SetMaterialTexture(vtkImageData *tex)
 //-----------------------------------------------------------------------
 {
-  m_TextureImage = tex;
+  m_TextureImage  = tex;
+  m_TextureID     = -1;
+}
+//-----------------------------------------------------------------------
+void mmaMaterial::SetMaterialTexture(int tex_id)
+//-----------------------------------------------------------------------
+{
+  m_TextureID     = tex_id;
+  m_TextureImage  = NULL;
+}
+//-----------------------------------------------------------------------
+vtkImageData *mmaMaterial::GetMaterialTexture()
+//-----------------------------------------------------------------------
+{
+  return m_TextureImage;
+}
+//-----------------------------------------------------------------------
+int mmaMaterial::GetMaterialTextureID()
+//-----------------------------------------------------------------------
+{
+  return m_TextureID;
 }
 //-----------------------------------------------------------------------
 void mmaMaterial::Print(std::ostream& os, const int tabs)
