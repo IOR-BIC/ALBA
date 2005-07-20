@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-14 08:35:39 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-07-20 15:47:42 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,6 +27,7 @@
 #include "mafMatrixInterpolator.h"
 #include "mmuTimeSet.h"
 #include "mafNodeIterator.h"
+#include "mafVMEStorage.h"
 
 #include <assert.h>
 
@@ -264,6 +265,23 @@ int mafVMEGenericAbstract::InternalRestore(mafStorageElement *node)
     }
   }
   return MAF_ERROR;
+}
+
+//-------------------------------------------------------------------------
+void mafVMEGenericAbstract::OnEvent(mafEventBase *maf_event)
+//-------------------------------------------------------------------------
+{
+  if (maf_event->GetChannel()==MCH_DOWN)
+  {
+    if (maf_event->GetId() == mafVMEStorage::MSF_FILENAME_CHANGED)
+    {
+      // force the data vector to save its data to file
+      GetDataVector()->Modified();
+    } 
+    
+  }
+  
+  Superclass::OnEvent(maf_event);
 }
 
 //-----------------------------------------------------------------------
