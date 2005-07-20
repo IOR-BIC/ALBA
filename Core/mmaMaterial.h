@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-03 15:14:50 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-20 12:16:09 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,13 +27,6 @@ class vtkLookupTable;
 class vtkWindowLevelLookupTable;
 class vtkImageData;
 
-enum MATERIAL_TYPE
-{
-  USE_VTK_PROPERTY,
-  USE_LOOKUPTABLE,
-  USE_TEXTURE
-};
-
 //----------------------------------------------------------------------------
 // mmaMaterial:
 //----------------------------------------------------------------------------
@@ -46,6 +39,13 @@ public:
 
   mafTypeMacro(mmaMaterial, mafAttribute);
   
+  enum MATERIAL_TYPE
+  {
+    USE_VTK_PROPERTY,
+    USE_LOOKUPTABLE,
+    USE_TEXTURE
+  };
+
 	/** Build the material icon. */
   wxBitmap *MakeIcon();
   
@@ -59,12 +59,20 @@ public:
   virtual bool Equals(const mafAttribute *a);
 
   /** Set the texture image to map on the surface */
-  void SetTextureImage(vtkImageData *tex);
+  void SetMaterialTexture(vtkImageData *tex);
+
+  /** Return the texture set as vtkImageData */
+  vtkImageData *GetMaterialTexture();
+
+  /** Return the vme's id representing the texture */
+  int GetMaterialTextureID();
+
+  /** Set the mafVMEImage id to use as texture to map on the surface */
+  void SetMaterialTexture(int tex_id);
 
   /** Apply shading parameters to the vtkProperty */
   virtual void UpdateProp();
 
-	vtkImageData       *m_TextureImage;
   vtkProperty        *m_Prop;
   vtkVolumeProperty2 *m_VolumeProp;
   vtkLookupTable     *m_ColorLut;
@@ -89,12 +97,12 @@ public:
   double    m_SaturationRange[2];
   double    m_TableRange[2];
   int       m_NumColors;
-
-  int       m_TextureID;
-
   int       m_MaterialType;
 
 protected:
+  vtkImageData *m_TextureImage;
+  int           m_TextureID;
+
   virtual int InternalStore(mafStorageElement *parent);
   virtual int InternalRestore(mafStorageElement *node);
 };
