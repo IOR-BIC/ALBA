@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-05 06:06:17 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-20 15:44:53 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,6 +17,9 @@
 #include "mmuUtility.h"
 #include "mafStorable.h"
 #include "mafStorageElement.h"
+#include "mmuIdFactory.h"
+
+MAF_ID_IMP(mafVMEStorage::MSF_FILENAME_CHANGED);
 
 //------------------------------------------------------------------------------
 // mmuMSFDocument
@@ -78,6 +81,17 @@ mafVMERoot *mafVMEStorage::GetRoot()
 //------------------------------------------------------------------------------
 {
   return m_Root;
+}
+
+//------------------------------------------------------------------------------
+void mafVMEStorage::SetURL(const char *name)
+//------------------------------------------------------------------------------
+{
+  if (m_URL!=name)
+  {
+    Superclass::SetURL(name);
+    GetRoot()->ForwardDownEvent(mafEventBase(this,MSF_FILENAME_CHANGED));
+  }
 }
 
 //------------------------------------------------------------------------------

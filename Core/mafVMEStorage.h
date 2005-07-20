@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEStorage.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 07:18:37 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-20 15:44:53 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -44,8 +44,7 @@ protected:
 class mafVMEStorage: public mafXMLStorage, public mafObserver, public mafEventSender
 {
 public:
-  
-
+  MAF_ID_DEC(MSF_FILENAME_CHANGED);
   mafTypeMacro(mafVMEStorage,mafXMLStorage)
 
   mafVMEStorage();
@@ -53,6 +52,8 @@ public:
   
   /** return the root node attached to this tree */
   mafVMERoot *GetRoot();
+
+  virtual void SetURL(const char *name);
 
   /** process events coming from tree */
   virtual void OnEvent(mafEventBase *e);
