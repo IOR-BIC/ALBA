@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:54:00 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-07-20 15:46:57 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -98,6 +98,7 @@ protected:
   bool  m_DataModified;   ///< flag set when a new item is inserted/removed
   bool  m_Crypting;       ///< this flags specify if crypting should be used when saving data
   mafString m_LastBaseURL;///< used to store the base URL of the last storing, to know when need to write again
+  bool  m_JustRestored;   ///< flag set when data has just been restored (to be used by InternalStore)
 };
 
 #endif

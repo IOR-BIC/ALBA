@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:54:00 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-07-20 15:46:56 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -42,6 +42,7 @@ mafDataVector::mafDataVector()
   m_Crypting        = false;
   m_DataModified    = false;
   m_SingleFileMode  = false;
+  m_JustRestored    = false;
   m_VectorID        = -1;
 }
 
@@ -155,8 +156,8 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
   }
   
   DataMap::iterator it;
-  
-  if (m_LastBaseURL!=base_url||IsDataModified()) // if some data added or removed...
+  bool base_name_changed = m_LastBaseURL!=base_url && !m_JustRestored;
+  if (base_name_changed||IsDataModified()) // if some data added or removed...
   {
     // store data
     bool new_data=false;
@@ -182,8 +183,18 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
         data_file_url<<base_name<<"."<<mafString(item->GetId())<<"."<<item->GetDataFileExtension(); // extension is defined by the kind of item itself
       }
       
+      // if in SaveAs do not remove old filename...
+      if (base_name_changed)
+      {
+        item->ReleaseOldFileOn();
+      }
+      else
+      {
+        item->ReleaseOldFileOff();
+      }
+
       int ret;
-      
+
       // in single file mode force writing into a local file to merge all files together
       if (m_SingleFileMode)
       {      
@@ -201,6 +212,8 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
         ret=item->StoreData(data_file_url);
       }
       
+      item->ReleaseOldFileOn(); // restore to default
+
       switch (ret)
       {
       case MAF_OK: new_data=true; break;  // new data written on disk
@@ -261,6 +274,7 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
 
     // update the last base name for next time writing
     m_LastBaseURL=base_url;
+    m_JustRestored=false;
   }
 
   parent->SetAttribute("SingleFileMode",m_SingleFileMode?"true":"false");
@@ -280,12 +294,14 @@ int mafDataVector::InternalRestore(mafStorageElement *node)
 //-----------------------------------------------------------------------
 {
   mafString item_type,single_file;
-
   mafID num_items;
+
+  m_JustRestored = true;
 
   if (node->GetAttributeAsInteger("NumberOfItems", num_items) && \
       node->GetAttribute("ItemTypeName", item_type) && \
-      node->GetAttribute("SingleFileMode", single_file) \
+      node->GetAttribute("SingleFileMode", single_file) && \
+      node->GetAttributeAsInteger("VectorID", m_VectorID) \
     )
   {
     SetItemTypeName(item_type);
@@ -315,6 +331,9 @@ int mafDataVector::InternalRestore(mafStorageElement *node)
   }
 
   // data is restored on demand by single items!
+
+  // force the flag to false to avoid data rewriting while storing
+  m_DataModified = false;
 
   return MAF_OK;
 }
