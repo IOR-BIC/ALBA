@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-14 17:42:27 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-07-20 15:50:45 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -83,8 +83,8 @@ mafAvatar3D::mafAvatar3D()
   const char *textMsg="Waiting for coordinates...";
 
   vtkNEW(m_DebugTextMapper);
-  //m_DebugTextMapper->SetFontFamilyToArial();
-  //m_DebugTextMapper->SetFontSize(12);
+//  m_DebugTextMapper->SetFontFamilyToArial();
+//  m_DebugTextMapper->SetFontSize(12);
   m_DebugTextMapper->SetInput(textMsg);
     
   vtkNEW(m_DebugTextActor);
@@ -209,7 +209,7 @@ int mafAvatar3D::InternalInitialize()
 {
   if(m_Renderer)
   {
-    //m_Renderer->AddActor(m_DebugTextActor);
+    m_Renderer->AddActor(m_DebugTextActor); // un commented by bjorn
     m_Renderer->AddActor(m_WorkingBoxActor);
     m_WorkingBoxActor->SetUserTransform(m_CanonicalToWorldTransform->GetVTKTransform());
   }
@@ -224,7 +224,7 @@ void mafAvatar3D::InternalShutdown()
   
   if(m_Renderer)
   {
-    //m_Renderer->RemoveActor(m_DebugTextActor);
+    m_Renderer->RemoveActor(m_DebugTextActor);// un commented by bjorn
     m_Renderer->RemoveActor(m_WorkingBoxActor);
     m_WorkingBoxActor->SetUserTransform(NULL); // detach WBox from interactor
   }
@@ -343,7 +343,8 @@ void mafAvatar3D::TrackerToWorld(mafMatrix &tracker_pose,mafMatrix &world_pose,i
   {
     // Then apply the scale factor
     double scale[3];
-    mafTransform::GetScale(GetCanonicalToWorldTransform()->GetMatrix(),scale);
+    //mafTransform::GetScale(GetCanonicalToWorldTransform()->GetMatrix(),scale);
+    mafTransform::GetScale(scaled_world_pose,scale);
     mafTransform::Scale(world_pose,scale[0],scale[1],scale[2],PRE_MULTIPLY);
   }
 
@@ -486,7 +487,6 @@ int mafAvatar3D::InternalStore(mafStorageElement *node)
   if(Superclass::InternalStore(node))
     return MAF_ERROR;
 
-  node->StoreText("Name",GetName());
   node->StoreInteger("DisplayWorkingBox",GetDisplayWorkingBox());
   node->StoreInteger("DisplayDebugText",GetDisplayDebugText());
   double coords[2];
@@ -541,12 +541,16 @@ void mafAvatar3D::OnMove3DEvent(mafEventInteraction *e)
   assert(tracker_pose);
 
   TrackerToWorld(*tracker_pose,world_pose);
+
+  double scale[3];
+  mafTransform::GetScale(m_CanonicalToWorldTransform->GetMatrix(),scale);
   
+  mafTransform::Scale(world_pose,scale[0],scale[1],scale[2],PRE_MULTIPLY);
+
   SetLastPoseMatrix(world_pose);
 
   // debug...
-  double scale[3];
-  mafTransform::GetScale(world_pose,scale);
+  //mafTransform::GetScale(world_pose,scale);
 
   if (m_Actor3D)
   {
