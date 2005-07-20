@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-25 21:24:45 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-07-20 12:15:15 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -66,7 +66,7 @@ int mafStorage::Restore()
 //------------------------------------------------------------------------------
 {
   SetErrorCode(0);
-  m_ParserURL=m_URL; // set the new filename as current
+  m_ParserURL = m_URL; // set the new filename as current
   return InternalRestore();
 }
 
@@ -75,6 +75,13 @@ void mafStorage::SetURL(const char *name)
 //------------------------------------------------------------------------------
 {
   m_URL=name; // force copying the const char reference
+}
+
+//------------------------------------------------------------------------------
+void mafStorage::ForceParserURL()
+//------------------------------------------------------------------------------
+{
+  m_ParserURL = m_URL; // set the new filename as current
 }
 
 //------------------------------------------------------------------------------

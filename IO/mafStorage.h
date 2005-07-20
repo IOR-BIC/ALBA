@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorage.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:03:23 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-07-20 12:15:15 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -51,6 +51,9 @@ public:
 
   /** Set the URL of the document to be read or written */
   virtual void SetURL(const char *name);
+
+  /** Force Copy storage URL to parser URL (used by the MAF1.x importer) */
+  void ForceParserURL();
 
   /** Return the URL of the document to be read or written */
   const char *GetURL();
