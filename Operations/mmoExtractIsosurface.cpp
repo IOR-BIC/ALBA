@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoExtractIsosurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-19 13:16:33 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-07-20 14:32:28 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,7 +38,6 @@
 #include "mafVME.h"
 #include "mafVMESurface.h"
 #include "mafVMEOutput.h"
-//#include "mmiPicker.h"
 #include "mmiExtractIsosurface.h"
 
 #include "vtkLight.h"
@@ -52,7 +51,6 @@
 #include "vtkPointData.h"
 #include "vtkProperty.h"
 #include "vtkActor.h"
-#include "vtkVolume.h"
 #include "vtkContourVolumeMapper.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkOutlineCornerFilter.h"
@@ -90,7 +88,6 @@ mafOp(label), m_IsosurfaceVme(NULL)
   
   for(int i=0; i<6; i++) m_BoundingBox[i]=0;
 
-  m_Volume = NULL;
   m_Box    = NULL;
 
   m_ContourVolumeMapper  = NULL; 
@@ -313,15 +310,9 @@ void mmoExtractIsosurface::CreateVolumePipeline()
 	m_ContourVolumeMapper = vtkContourVolumeMapper::New();
 	m_ContourVolumeMapper->SetInput(dataset);
 
-//  m_Volume = vtkVolume::New();
-//	m_Volume->SetMapper(m_ContourVolumeMapper);
-//	m_Rwi->m_RenFront->AddActor(m_Volume);
-
 	double min = m_MinDensity;
 	double max = m_MaxDensity;
 
-//	while (m_IsoValue < max && m_ContourVolumeMapper->EstimateRelevantVolume(m_IsoValue) > 0.3f)
-//		m_IsoValue += 0.05f * (min + max) + 1.f;
 	m_ContourVolumeMapper->SetContourValue(m_IsoValue);
 
   vtkPolyData *contour = vtkPolyData::New();
@@ -458,11 +449,9 @@ void mmoExtractIsosurface::CreateSlicePipeline()
 void mmoExtractIsosurface::DeleteOpDialog()
 //----------------------------------------------------------------------------
 {
-	m_Rwi->m_RenFront->GetVolumes();
-	m_Rwi->m_RenFront->RemoveActor(m_Volume);
+	m_Rwi->m_RenFront->RemoveActor(m_ContourActor);
   m_Rwi->m_RenFront->RemoveActor(m_Box);
 
-  //vtkDEL(m_Volume);
   vtkDEL(m_ContourMapper);
   vtkDEL(m_ContourActor);
   vtkDEL(m_Box);
