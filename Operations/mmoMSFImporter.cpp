@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMSFImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 17:27:05 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-20 12:14:29 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,6 +23,7 @@
 #include "mafEvent.h"
 
 #include "mafVME.h"
+#include "mafVMERoot.h"
 #include "mafTagArray.h"
 #include "mafMSFImporter.h"
 
@@ -57,13 +58,14 @@ void mmoMSFImporter::OpRun()
 {
 	m_File = "";
 
-	wxString wildc = "MSF file (*.msf)|*.msf";
-  wxString f = mafGetOpenFile(m_FileDir, wildc, "Choose MSF file").c_str();
+	mafString wildc = "MSF file (*.msf)|*.msf";
+  mafString f = mafGetOpenFile(m_FileDir, wildc.GetCStr(), "Choose MSF file").c_str();
 
   int result = OP_RUN_CANCEL;
-  if(f != "") 
+  if(!f.IsEmpty())
 	{
 	  m_File = f;
+    wxSetWorkingDirectory(wxString(m_File.GetCStr()));
     ImportMSF();
 	  result = OP_RUN_OK;
 	}
@@ -78,6 +80,7 @@ void mmoMSFImporter::ImportMSF()
   
   m_Importer = new mafMSFImporter;
   m_Importer->SetURL(m_File);
+  m_Importer->SetRoot((mafVMERoot *)m_Input->GetRoot());
   
   //mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,preader));
   
@@ -85,6 +88,9 @@ void mmoMSFImporter::ImportMSF()
 
   if(!success)
     mafErrorMessage("I/O Error importing MSF file.");
+
+  ((mafVMERoot *)m_Input->GetRoot())->GetStorage()->SetURL(m_File.GetCStr());
+  ((mafVMERoot *)m_Input->GetRoot())->GetStorage()->ForceParserURL();
 
   cppDEL(m_Importer);
 }

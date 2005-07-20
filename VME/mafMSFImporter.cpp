@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-11 06:21:28 $
-  Version:   $Revision: 1.3 $
-  Authors:   Marco Petrone m.petrone@cineca.it
+  Date:      $Date: 2005-07-20 12:13:35 $
+  Version:   $Revision: 1.4 $
+  Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
@@ -14,8 +14,10 @@
 
 #include "mafMSFImporter.h"
 #include "mafVMERoot.h"
+#include "mafVMEGenericAbstract.h"
 #include "mafVMEGeneric.h"
 #include "mafTagArray.h"
+#include "mafTagItem.h"
 #include "mafVMEItemVTK.h"
 #include "mafDataVectorVTK.h"
 #include "mmuUtility.h"
@@ -23,6 +25,11 @@
 #include "mafStorageElement.h"
 #include "mafMatrixVector.h"
 #include "mafVMEGroup.h"
+#include "mafVMESurface.h"
+#include "mafVMEVolumeGray.h"
+#include "mafVMELandmarkCloud.h"
+#include "mafVMELandmark.h"
+#include "mmaMaterial.h"
 
 //------------------------------------------------------------------------------
 // mmuMSF1xDocument
@@ -38,7 +45,7 @@ int mmuMSF1xDocument::InternalStore(mafStorageElement *node)
 
 //------------------------------------------------------------------------------
 int mmuMSF1xDocument::InternalRestore(mafStorageElement *node)
-//-------------------------------------------------------
+//------------------------------------------------------------------------------
 {
   ///////////////////////////////////////////////
   // code to import the file from old MSF file //
@@ -75,27 +82,28 @@ int mmuMSF1xDocument::InternalRestore(mafStorageElement *node)
 mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
 //------------------------------------------------------------------------------
 {
+  mafVME *vme = NULL;
   // restore due attributes
-  mafString vme_name;
-  if (node->GetAttribute("Name",vme_name))
+  mafString vme_type;
+  if (node->GetAttribute("Type",vme_type))
   {
-    m_Root->SetName(vme_name);
+    vme = CreateVMEInstance(vme_type);
+    assert(vme);
 
-    mafString vme_type;
-    if (node->GetAttribute("Type",vme_type))
+    mafString vme_name;
+    if (node->GetAttribute("Name",vme_name))
     {
-      mafVME *vme = CreateVMEInstance(vme_type);
-      assert(vme);
+      vme->SetName(vme_name);
   
       // traverse children and restore TagArray, MatrixVector and VMEItems 
       mafStorageElement::ChildrenVector children;
+      children = node->GetChildren();
 
       for (int i=0;i<children.size();i++)
       {
         // Restore a TagArray element
         if (mafCString("TArray") == children[i]->GetName())
         {
-          
           if (RestoreTagArray(children[i],vme->GetTagArray()) != MAF_OK)
           {
             mafErrorMacro("MSFImporter: error restoring Tag Array of node: \""<<vme->GetName()<<"\"");
@@ -105,6 +113,10 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
           /////////////////////////////////////////// 
           // here should process VME-specific tags //
           ///////////////////////////////////////////
+          if (vme->GetTagArray()->IsTagPresent("material"))
+          {
+            RestoreMaterial(vme);
+          }
         }
 
         // restore VME-Item element
@@ -120,7 +132,7 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
         // restore MatrixVector element
         else if (mafCString("VMatrix") == children[i]->GetName())
         {
-          mafVMEGeneric *vme_generic= mafVMEGeneric::SafeDownCast(vme);
+          mafVMEGenericAbstract *vme_generic = mafVMEGenericAbstract::SafeDownCast(vme);
           assert(vme_generic);
           if (RestoreVMatrix(children[i],vme_generic->GetMatrixVector()) != MAF_OK)
           {
@@ -152,12 +164,10 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
           // ... to be implemented
         }
       }
-      
-    } // Type
-  } // Name
-
+    } // Name
+  } // Type
   
-  return NULL;
+  return vme;
 }
 
 //------------------------------------------------------------------------------
@@ -177,8 +187,59 @@ mafVME *mmuMSF1xDocument::CreateVMEInstance(mafString &name)
   {
     return mafVMEGroup::New();
   }
+  else if (name == "mflVMESurface")
+  {
+    return mafVMESurface::New();
+  }
+  else if (name == "mflVMEGrayVolume")
+  {
+    return mafVMEVolumeGray::New();
+  }
+  else if (name == "mflVMELandmarkCloud")
+  {
+    return mafVMELandmarkCloud::New();
+  }
+  else if (name == "mflVMELandmark")
+  {
+    return mafVMELandmark::New();
+  }
+  else
+  {
+    mafErrorMacro("Unknown VME type!!");
+    return NULL;
+  }
+}
 
+//------------------------------------------------------------------------------
+void mmuMSF1xDocument::RestoreMaterial(mafVME *vme)
+//------------------------------------------------------------------------------
+{
+  mmaMaterial *material = (mmaMaterial *)vme->GetAttribute("MaterialAttributes");
+  if (material == NULL)
+  {
+    material = mmaMaterial::New();
+    vme->SetAttribute("MaterialAttributes", material);
+  }
 
+  mafTagItem *mat_item = vme->GetTagArray()->GetTag("material");
+  material->m_MaterialName =  mat_item->GetComponent(MAT_NAME);
+  material->m_Ambient[0] = mat_item->GetComponentAsDouble(MAT_AMBIENT_R);
+  material->m_Ambient[1] = mat_item->GetComponentAsDouble(MAT_AMBIENT_G);
+  material->m_Ambient[2] = mat_item->GetComponentAsDouble(MAT_AMBIENT_B);
+  material->m_AmbientIntensity = mat_item->GetComponentAsDouble(MAT_AMBIENT_INTENSITY);
+  material->m_Diffuse[0] = mat_item->GetComponentAsDouble(MAT_DIFFUSE_R);
+  material->m_Diffuse[1] = mat_item->GetComponentAsDouble(MAT_DIFFUSE_G);
+  material->m_Diffuse[2] = mat_item->GetComponentAsDouble(MAT_DIFFUSE_B);
+  material->m_DiffuseIntensity = mat_item->GetComponentAsDouble(MAT_DIFFUSE_INTENSITY);
+  material->m_Specular[0] = mat_item->GetComponentAsDouble(MAT_SPECULAR_R);
+  material->m_Specular[1] = mat_item->GetComponentAsDouble(MAT_SPECULAR_G);
+  material->m_Specular[2] = mat_item->GetComponentAsDouble(MAT_SPECULAR_B);
+  material->m_SpecularIntensity = mat_item->GetComponentAsDouble(MAT_SPECULAR_INTENSITY);
+  material->m_SpecularPower = mat_item->GetComponentAsDouble(MAT_SPECULAR_POWER);
+  material->m_Opacity = mat_item->GetComponentAsDouble(MAT_OPACITY);
+  material->m_Representation = (int)mat_item->GetComponentAsDouble(MAT_REPRESENTATION);
+  material->UpdateProp();
+  vme->GetTagArray()->DeleteTag("material");
 }
 
 //------------------------------------------------------------------------------
@@ -216,23 +277,33 @@ int mmuMSF1xDocument::RestoreVItem(mafStorageElement *node, mafVME *vme)
       } // Id
     } // DataType
   } // TimeStamp
+  return MAF_ERROR;
 }
 
 //------------------------------------------------------------------------------
 int mmuMSF1xDocument::RestoreVMatrix(mafStorageElement *node, mafMatrixVector *vmatrix)
 //------------------------------------------------------------------------------
 {
-
   // restore single matrices
   mafStorageElement::ChildrenVector children;
+  children = node->GetChildren();
+
   for (int i = 0;i<children.size();i++)
   {
     assert(mafCString("Matrix") == children[i]->GetName());
 
     mafSmartPointer<mafMatrix> matrix;
-    children[i]->RestoreMatrix(matrix);
-    vmatrix->AppendKeyMatrix(matrix);
+    int restored_matrix = children[i]->RestoreMatrix(matrix);
+    if (restored_matrix != MAF_ERROR)
+    {
+      vmatrix->AppendKeyMatrix(matrix);
+    }
+    else
+    {
+      return MAF_ERROR;
+    }
   }
+  return MAF_OK;
 }
 
 //------------------------------------------------------------------------------
@@ -240,6 +311,8 @@ int mmuMSF1xDocument::RestoreTagArray(mafStorageElement *node, mafTagArray *tarr
 //------------------------------------------------------------------------------
 {
   mafStorageElement::ChildrenVector children;
+  children = node->GetChildren();
+
   for (int i = 0;i<children.size();i++)
   {
     if (mafCString("TItem") == children[i]->GetName())
@@ -274,10 +347,10 @@ int mmuMSF1xDocument::RestoreTagArray(mafStorageElement *node, mafTagArray *tarr
               titem.SetType(atof(tag_type));
             }
 
-
             mafStorageElement::ChildrenVector tag_comps;
+            tag_comps = children[i]->GetChildren();
             int idx=0;
-            for (int n = 0;n<tag_comps.size();n++,idx++)
+            for (int n = 0;n<tag_comps.size();n++)
             {
               if (mafCString("TC")==tag_comps[n]->GetName())
               {
@@ -291,12 +364,14 @@ int mmuMSF1xDocument::RestoreTagArray(mafStorageElement *node, mafTagArray *tarr
                 mafErrorMacro("Error parning a TItem element inside a TagArray: expected <TC> sub element, found <"<<tag_comps[n]->GetName()<<">");
               } 
             } 
+            tarray->SetTag(titem);
           } // Type
         } // Tag
       } // Mult
-      mafErrorMacro("Error parning a TItem element inside a TagArray: missing required Attribute");
+      //mafErrorMacro("Error parning a TItem element inside a TagArray: missing required Attribute");
     } // TItem
   }
+  return MAF_OK;
 }
 
 //------------------------------------------------------------------------------

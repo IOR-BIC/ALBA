@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-11 06:21:28 $
-  Version:   $Revision: 1.3 $
-  Authors:   Marco Petrone
+  Date:      $Date: 2005-07-20 12:13:36 $
+  Version:   $Revision: 1.4 $
+  Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
@@ -36,13 +36,37 @@ public:
   
   void SetRoot(mafVMERoot *root) {m_Root=root;}
   mafVMERoot *GetRoot() {return m_Root;}
-  
+
+  enum MATERIAL_TAG_ID
+  {
+    MAT_NAME = 0,
+    MAT_AMBIENT_R,
+    MAT_AMBIENT_G,
+    MAT_AMBIENT_B,
+    MAT_AMBIENT_INTENSITY,
+    MAT_DIFFUSE_R,
+    MAT_DIFFUSE_G,
+    MAT_DIFFUSE_B,
+    MAT_DIFFUSE_INTENSITY,
+    MAT_SPECULAR_R,
+    MAT_SPECULAR_G,
+    MAT_SPECULAR_B,
+    MAT_SPECULAR_INTENSITY,
+    MAT_SPECULAR_POWER,
+    MAT_OPACITY,
+    MAT_REPRESENTATION,
+    MAT_NUM_COMP
+  };
+
 protected:
   mafVME *CreateVMEInstance(mafString &name);
   mafVME *RestoreVME(mafStorageElement *node, mafVME *parent);
   int RestoreTagArray(mafStorageElement *node, mafTagArray *tarray);
   int RestoreVItem(mafStorageElement *node, mafVME *vme);
   int RestoreVMatrix(mafStorageElement *node, mafMatrixVector *vmatrix);
+
+  /** Restore material attributes */
+  void RestoreMaterial(mafVME *vme);
 
   mafVMERoot *m_Root;
 };

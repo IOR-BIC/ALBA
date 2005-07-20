@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMSFImporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 17:27:05 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-20 12:14:29 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -17,6 +17,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // Include :
 //----------------------------------------------------------------------------
 #include "mafOp.h"
+#include "mafString.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -53,8 +54,8 @@ public:
   void SetFileName(const char *name) {m_File = name;};
 
 protected:
-  wxString m_File;
-  wxString m_FileDir;
+  mafString m_File;
+  mafString m_FileDir;
   
   mafMSFImporter *m_Importer;
 };
