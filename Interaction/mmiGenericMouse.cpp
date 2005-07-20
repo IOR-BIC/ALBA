@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-11 14:10:24 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-07-20 12:34:52 $
+  Version:   $Revision: 1.9 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -110,7 +110,7 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
     assert(m_VME);
 
     //get the result point pos
-    mafTransform::GetPosition(m_VME->GetMatrixPipe()->GetMatrix(), rp); 
+    mafTransform::GetPosition(*m_VME->GetOutput()->GetMatrix(), rp); 
 
     //get the constrain axis
     int axis = GetTranslationConstraint()->GetConstraintAxis();
@@ -193,7 +193,7 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
       minb = GetTranslationConstraint()->GetLowerBound(axis);
       maxb = GetTranslationConstraint()->GetUpperBound(axis);
     
-      mafTransform::GetPosition(m_VME->GetMatrixPipe()->GetMatrix(), rp);  
+      mafTransform::GetPosition(*m_VME->GetOutput()->GetMatrix(), rp);
     
       /*                         projVal  
                              -->
@@ -1063,7 +1063,7 @@ void mmiGenericMouse::OnButtonDownAction(int X, int Y)
         double pos_rp = 0;
 
         mafTransform::GetVersor(axis, *m_ConstrainRefSys, constrainVers);
-        mafTransform::GetPosition(m_VME->GetMatrixPipe()->GetMatrix(), rp);
+        mafTransform::GetPosition(*m_VME->GetOutput()->GetMatrix(), rp);
 
         //project rp on constrain axis
         pos_rp = ProjectVectorOnAxis(rp, constrainVers, proj);
