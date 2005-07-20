@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-08 13:30:10 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-07-20 12:13:55 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,9 +39,9 @@
 #include "vtkStripper.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkPolyData.h"
-//@@@ #include "vtkMultiResolutionActor.h"
 #include "vtkActor.h"
 #include "vtkProperty.h"
+#include "vtkTexture.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeSurface);
@@ -52,6 +52,7 @@ mafPipeSurface::mafPipeSurface()
 :mafPipe()
 //----------------------------------------------------------------------------
 {
+  m_Texture         = NULL;
   m_Mapper          = NULL;
   m_Actor           = NULL;
   m_OutlineBox      = NULL;
@@ -68,6 +69,7 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
   Superclass::Create(n);
   
   m_Selected = false;
+  m_Texture         = NULL;
   m_Mapper          = NULL;
   m_Actor           = NULL;
   m_OutlineBox      = NULL;
@@ -92,11 +94,40 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
 	else
 		m_Mapper->ImmediateModeRenderingOff();
 
+  mmaMaterial *material = surface_output->GetMaterial();
+  assert(material);  // all vme that use PipeSurface must have the material correctly set
+
+  m_Texture = vtkTexture::New();
+  m_Texture->SetQualityTo32Bit();
+  m_Texture->InterpolateOn();
+  if (material->m_MaterialType == mmaMaterial::USE_TEXTURE)
+  {
+    if (material->GetMaterialTexture() != NULL)
+    {
+      m_Texture->SetInput(material->GetMaterialTexture());
+    }
+    else if (material->GetMaterialTextureID() != -1)
+    {
+      mafVME *texture_vme = mafVME::SafeDownCast(m_Vme->GetRoot()->FindInTreeById(material->GetMaterialTextureID()));
+      texture_vme->GetOutput()->GetVTKData()->Update();
+      m_Texture->SetInput((vtkImageData *)texture_vme->GetOutput()->GetVTKData());
+    }
+    else
+    {
+      mafErrorMacro("texture info not correctly set inside material!! ");
+    }
+  }
+
   m_Actor = vtkActor::New();
 	m_Actor->SetMapper(m_Mapper);
-  mmaMaterial *material = surface_output->GetMaterial();
-  if (material)
+  if (material->m_MaterialType == mmaMaterial::USE_VTK_PROPERTY)
+  {
     m_Actor->SetProperty(material->m_Prop);
+  }
+  else if (material->m_MaterialType == mmaMaterial::USE_TEXTURE)
+  {
+    m_Actor->SetTexture(m_Texture);
+  }
 
   m_AssemblyFront->AddPart(m_Actor);
 
@@ -134,6 +165,7 @@ mafPipeSurface::~mafPipeSurface()
   m_AssemblyFront->RemovePart(m_Actor);
   m_AssemblyFront->RemovePart(m_OutlineActor);
 
+  vtkDEL(m_Texture);
 	vtkDEL(m_Mapper);
   vtkDEL(m_Actor);
   vtkDEL(m_OutlineBox);
