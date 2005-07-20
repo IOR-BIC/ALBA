@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVector.txx,v $
   Language:  C++
-  Date:      $Date: 2005-01-11 17:35:02 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-20 15:42:23 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -153,7 +153,7 @@ bool mafVector<T>::FindAndRemoveItem(const T &object)
   mafID idx;
   if (FindItem(object,idx))
   {   
-    return RemoveItem(m_Items->Vector.begin()+idx);
+    return RemoveItem(idx);
   }
 
   return false;
