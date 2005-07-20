@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceSet.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-19 16:27:38 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-07-20 15:49:48 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -101,7 +101,7 @@ int mafDeviceSet::InternalStore(mafStorageElement *node)
     if (device->IsPersistent()) // do not store persistent devices
       continue;
 
-    if (node->StoreObject("Device",device))
+    if (node->StoreObject("Device",device)==NULL)
     {
       mafErrorMacro("Error Writing "<<device->GetName()<<" device");
       m_DevicesMutex->Unlock();

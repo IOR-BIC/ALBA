@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-14 17:42:27 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-07-20 15:49:48 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -51,12 +51,12 @@ mafDeviceManager::mafDeviceManager()
   m_DeviceIdCounter = mafDevice::MIN_DEVICE_ID;
   m_PersistentDeviceIdCounter = 0;
   vtkNEW(m_DeviceSet);
-  m_DeviceSet->SetPersistentFlag(true);
+  m_DeviceSet->SetPersistentFlag(false);
   m_DeviceSet->SetThreaded(false);
   m_DeviceSet->SetName("DeviceSet");
   m_DeviceSet->AutoStartOn();
   m_DeviceSet->SetListener(this);
-  m_DeviceSet->SetID(++m_PersistentDeviceIdCounter); // ID of the root device
+  m_DeviceSet->SetID(++m_DeviceIdCounter); // ID of the root device
 }
 
 //------------------------------------------------------------------------------
@@ -189,7 +189,7 @@ int mafDeviceManager::InternalStore(mafStorageElement *node)
   assert(node);
   node->SetAttribute("DeviceIdCounter",m_DeviceIdCounter);
   
-  if (node->StoreObject("DeviceSet",m_DeviceSet))
+  if (node->StoreObject("DeviceSet",m_DeviceSet)==NULL)
     return MAF_ERROR;
 
   return MAF_OK;

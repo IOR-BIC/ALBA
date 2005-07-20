@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAction.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 16:43:04 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-07-20 15:49:47 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -124,7 +124,7 @@ int mafAction::InternalStore(mafStorageElement *node)
   {
     mafDevice *device=it->GetPointer();
     subnode->SetAttribute("Name",device->GetName());
-    subnode->SetAttribute("ID",(mafID)(device->GetID()-mafDevice::MIN_DEVICE_ID));
+    subnode->SetAttribute("ID",(mafID)(device->GetID()));
   }
 
   return MAF_OK;
@@ -152,7 +152,7 @@ int mafAction::InternalRestore(mafStorageElement *node)
       if (subnode->GetAttributeAsInteger("ID",id) && subnode->GetAttribute("Name",name))
       {
         // forward an event to device manager to perform binding...
-        mafEventMacro(mafEvent(this,DEVICE_BIND,(long)(id+mafDevice::MIN_DEVICE_ID)));
+        mafEventMacro(mafEvent(this,DEVICE_PLUGGED,(long)id));
       }
       else
       {
@@ -188,7 +188,7 @@ void mafAction::OnEvent(mafEventBase *event)
       if (dev->IsInitialized())
       {
         // send an event only to the inquiring object about all plugged devices
-        sender->OnEvent(&mafEventBase(this,DEVICE_BIND,dev,MCH_INPUT));
+        sender->OnEvent(&mafEventBase(this,DEVICE_PLUGGED,dev,MCH_INPUT));
       }      
     }
   }
