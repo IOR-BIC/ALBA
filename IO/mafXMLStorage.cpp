@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-25 21:24:02 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-07-20 15:45:36 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -434,6 +434,7 @@ int mafXMLStorage::InternalStore()
         {
           DeleteURL(*it);
         }
+        m_GarbageCollector.clear();
       }
     }    
   }
