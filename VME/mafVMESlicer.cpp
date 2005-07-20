@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-30 12:41:26 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-07-20 12:34:12 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,6 +25,7 @@
 #include "mafStorageElement.h"
 #include "mafIndent.h"
 #include "mafDataPipeCustom.h"
+#include "mmaMaterial.h"
 
 #include "vtkMAFDataPipe.h"
 #include "vtkMath.h"
@@ -81,6 +82,8 @@ mafVMESlicer::mafVMESlicer()
 
   // set the texture in the output, must do it here, after setting slicer filter's input
   GetSurfaceOutput()->SetTexture((vtkImageData *)((mafDataPipeCustom *)GetDataPipe())->GetVTKDataPipe()->GetOutput(1));
+  GetMaterial()->SetMaterialTexture(GetSurfaceOutput()->GetTexture());
+  GetMaterial()->m_MaterialType = mmaMaterial::USE_TEXTURE;
 }
 
 //-------------------------------------------------------------------------
@@ -92,6 +95,19 @@ mafVMESlicer::~mafVMESlicer()
 
   vtkDEL(m_PSlicer);
   vtkDEL(m_ISlicer);
+}
+
+//-------------------------------------------------------------------------
+mmaMaterial *mafVMESlicer::GetMaterial()
+//-------------------------------------------------------------------------
+{
+  mmaMaterial *material = (mmaMaterial *)GetAttribute("MaterialAttributes");
+  if (material == NULL)
+  {
+    material = mmaMaterial::New();
+    SetAttribute("MaterialAttributes", material);
+  }
+  return material;
 }
 
 //-------------------------------------------------------------------------
