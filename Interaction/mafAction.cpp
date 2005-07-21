@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAction.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 15:49:47 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-07-21 11:59:35 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -61,8 +61,7 @@ void mafAction::BindDevice(mafDevice *device)
   // its also plugged as listener on the output channel
   AddObserver(device,MCH_OUTPUT);
 
-  m_Devices.push_back(device);
-
+  m_Devices.push_back(mafAutoPointer<mafDevice>(device));
 }
 //------------------------------------------------------------------------------
 void mafAction::UnBindDevice(mafDevice *device)
@@ -136,8 +135,8 @@ int mafAction::InternalRestore(mafStorageElement *node)
 {
   mafString name;
   node->GetAttribute("Name",name);
-
-  assert(name==GetName());
+ 
+  SetName(name);
 
   mafStorageElement::ChildrenVector &children=node->GetChildren();
   for (int i=0;i<children.size();i++)
@@ -152,7 +151,7 @@ int mafAction::InternalRestore(mafStorageElement *node)
       if (subnode->GetAttributeAsInteger("ID",id) && subnode->GetAttribute("Name",name))
       {
         // forward an event to device manager to perform binding...
-        mafEventMacro(mafEvent(this,DEVICE_PLUGGED,(long)id));
+        mafEventMacro(mafEvent(this,DEVICE_BIND,(long)id));
       }
       else
       {
