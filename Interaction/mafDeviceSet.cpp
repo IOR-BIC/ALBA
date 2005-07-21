@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceSet.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 15:49:48 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-07-21 12:01:59 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -213,7 +213,7 @@ mafDevice *mafDeviceSet::GetDevice(mafID id)
   for (it=m_Devices.begin();it!=m_Devices.end();it++)
   {
     mafDevice *device=*it;
-    if (device->GetID()==id)
+    if (device && device->GetID()==id)
     {
       m_DevicesMutex->Unlock();
       return device;
