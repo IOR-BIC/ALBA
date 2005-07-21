@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdTracker.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-14 17:42:28 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-07-21 12:03:10 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -106,7 +106,7 @@ int mmdTracker::InternalRestore(mafStorageElement *node)
   if (node->RestoreVectorN("TrackedBoxBounds",m_TrackedBounds.m_Bounds,6)==MAF_OK)
   {
     m_TrackedBounds.Modified();
-    if (node->RestoreVectorN("TrackedBoxOrientation",m_TrackedBoxOrientation,3))
+    if (node->RestoreVectorN("TrackedBoxOrientation",m_TrackedBoxOrientation,3)==MAF_OK)
     {
       if (mafStorageElement *sub_node=node->FindNestedElement("Avatar"))
       {
@@ -133,12 +133,13 @@ int mmdTracker::InternalRestore(mafStorageElement *node)
 int mmdTracker::InternalInitialize()
 //------------------------------------------------------------------------------
 {
-  if (Superclass::InternalInitialize())
+  if (Superclass::InternalInitialize()!=MAF_OK)
     return MAF_ERROR;
 
   if (m_Avatar)
   {
     m_Avatar->Initialize();
+    InvokeEvent(AVATAR_ADDED,MCH_UP,m_Avatar);
   }
 
   m_LastPose = 0; // initialize last pose flag
@@ -150,6 +151,7 @@ void mmdTracker::InternalShutdown()
 {
   if (m_Avatar)
   {
+    InvokeEvent(AVATAR_REMOVED,MCH_UP,m_Avatar);
     m_Avatar->Shutdown();
   }
 
@@ -162,10 +164,9 @@ void mmdTracker::SetAvatar(mafAvatar *avatar)
 {
   if (m_Avatar)
   {
-    InvokeEvent(AVATAR_REMOVED,MCH_UP,m_Avatar);
- 
     if (m_Initialized)
     {
+      InvokeEvent(AVATAR_REMOVED,MCH_UP,m_Avatar);
       m_Avatar->Shutdown();
     }
 
@@ -182,8 +183,6 @@ void mmdTracker::SetAvatar(mafAvatar *avatar)
   if (avatar)
   {
     avatar->SetTracker(this);
-    
-    InvokeEvent(AVATAR_ADDED,MCH_UP,avatar);
 
     // update gui
     GetGui()->AddGui(avatar->GetGui());

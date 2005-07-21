@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDevice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 15:49:47 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-07-21 12:01:26 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -179,11 +179,14 @@ int mafDevice::InternalRestore(mafStorageElement *node)
 //------------------------------------------------------------------------------
 {  
   // Device Name
-  if (node->RestoreText("Name",m_Name))
+  if (node->RestoreText("Name",m_Name)==MAF_OK)
   {
+    int dev_id;
+    node->RestoreInteger("ID",dev_id);
+    SetID(dev_id+MIN_DEVICE_ID);
     int flag;
     // AutoStart flag (optional)
-    if (node->RestoreInteger("AutoStart",flag))
+    if (node->RestoreInteger("AutoStart",flag)==MAF_OK)
     {
       SetAutoStart(flag!=0);      
     }
