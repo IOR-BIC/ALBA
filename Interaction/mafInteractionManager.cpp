@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 15:49:48 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2005-07-21 12:02:38 $
+  Version:   $Revision: 1.19 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -396,21 +396,22 @@ void mafInteractionManager::OnViewSelected(mafEvent *event)
     vtkRenderer *ren = view->GetFrontRenderer();
     SetCurrentRenderer(ren);
     event->SetData(ren); // add the renderer to the event to be sent to avatars
-
-    // propagate event to all avatars...
-    for (mmuAvatarsMap::iterator it=m_Avatars.begin();it!=m_Avatars.end();it++)
-    {
-      //it->second->OnEvent(&mafEventBase(this,VIEW_SELECT));    
-      it->second->OnEvent(event);
-    }
-
-    // propagate VIEW_SELECTED event to the mouse device too...
-    GetMouseDevice()->OnEvent(event);
   }
   else
   {
     SetCurrentRenderer(NULL);
+
   }
+
+  // propagate event to all avatars...
+  for (mmuAvatarsMap::iterator it=m_Avatars.begin();it!=m_Avatars.end();it++)
+  {
+    //it->second->OnEvent(&mafEventBase(this,VIEW_SELECT));    
+    it->second->OnEvent(event);
+  }
+
+  // propagate VIEW_SELECTED event to the mouse device too...
+  GetMouseDevice()->OnEvent(event);
   
   // TODO: force a render to the view here....
 
@@ -586,131 +587,140 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
  
   if (e)
   {
-    switch(e->GetId())
+    if (id==mafAction::DEVICE_BIND)
     {
-      case ID_OK:
-		  case wxOK:
-        //m_Dialog->EndModal(wxOK);
-        m_Frame->Show(false);
-        return; 
-		  break;
-      case ID_STORE:
-      { 
-        //SIL. 4-7-2005: begin
-        std::string result = 
-        mafGetSaveFile(m_SettingFileName, "Interaction Settings (*.xml)| *.xml", "Save Interaction Settings");
-        if( result == "") return;
-        m_SettingFileName = result.c_str();
-        //SIL. 4-7-2005: end
-
-        Store(m_SettingFileName);
-        
-        return;
-      }
-      break;
-      case ID_LOAD:
+      mafEvent *e=mafEvent::SafeDownCast(event);
+      OnBindDeviceToAction(e);
+    }
+    else
+    {
+      switch(e->GetId())
       {
-        //SIL. 4-7-2005: begin
-        std::string result = 
-        mafGetOpenFile(m_SettingFileName, "Interaction Settings (*.xml)| *.xml", "Load Interaction Settings");
-        if( result == "") return;
-        m_SettingFileName = result.c_str();
-        //SIL. 4-7-2005: end
-
-        Restore(m_SettingFileName);
-        //camera reset here?
-        
-        return;
-      }
-      break;
-      case ID_BINDING_LIST:
-      {
-        assert(m_CurrentDevice);
-        action_name=m_ActionsList->GetItemLabel(m_ActionsList->GetSelection());
-        //action_name=m_ActionsList->GetItemLabel(e->GetArg());
-        //int id=m_ActionsList->FindItemIndex(e->GetArg());
-      
-        if (m_ActionsList->IsItemChecked(m_ActionsList->GetSelection()))
-        {
-          GetSER()->BindDeviceToAction(m_CurrentDevice,action_name);
-        }
-        else
-        {
-          GetSER()->UnBindDeviceFromAction(m_CurrentDevice,action_name);
-        }
-        return;
-      }
-      break;
-      case ID_ADD_DEVICE:
-      {
-        wxString device_name,device_type;
-        int sel=DeviceChooser(device_name,device_type);
-      
-        if (sel>=0)
-        {
-          // add the new device to the devices manager's pool
-          mafDevice *device = GetDeviceManager()->AddDevice(device_type);
-          // the device is added to the list by an 
-          // event returned by DeviceManager which is
-          // served by InteractionManager by calling
-          // AddDevice of this class.
-        }
-        return;
-      }
-      break;
-      case ID_REMOVE_DEVICE:
-        if (m_CurrentDevice)
-        {
-          int success = GetDeviceManager()->RemoveDevice(m_CurrentDevice);
-          if (!success)
-          {
-            wxMessageBox("Cannot remove device: I/O manager error");
-          }
-        }
-        return;
-       break;
-      case VME_SELECT:
-        if (e->GetSender() == m_DeviceTree)
+        case ID_OK:
+		    case wxOK:
+          //m_Dialog->EndModal(wxOK);
+          m_Frame->Show(false);
+          return; 
+		    break;
+        case ID_STORE:
         { 
-          // Event rised by the CheckTree used to show the devices tree
-          if (mafDevice *device = GetDeviceManager()->GetDevice(e->GetArg()))
+          //SIL. 4-7-2005: begin
+          std::string result = 
+          mafGetSaveFile(m_SettingFileName, "Interaction Settings (*.xml)| *.xml", "Save Interaction Settings");
+          if( result == "") return;
+          m_SettingFileName = result.c_str();
+          //SIL. 4-7-2005: end
+
+          Store(m_SettingFileName);
+        
+          return;
+        }
+        break;
+        case ID_LOAD:
+        {
+          //SIL. 4-7-2005: begin
+          std::string result = 
+          mafGetOpenFile(m_SettingFileName, "Interaction Settings (*.xml)| *.xml", "Load Interaction Settings");
+          if( result == "") return;
+          m_SettingFileName = result.c_str();
+          //SIL. 4-7-2005: end
+
+          Restore(m_SettingFileName);
+          //camera reset here?
+        
+          return;
+        }
+        break;
+        case ID_BINDING_LIST:
+        {
+          assert(m_CurrentDevice);
+          action_name=m_ActionsList->GetItemLabel(m_ActionsList->GetSelection());
+          //action_name=m_ActionsList->GetItemLabel(e->GetArg());
+          //int id=m_ActionsList->FindItemIndex(e->GetArg());
+      
+          if (m_ActionsList->IsItemChecked(m_ActionsList->GetSelection()))
           {
-            m_CurrentDevice = device;
-            // Show device settings panel
-            assert(m_CurrentDevice->GetGui());
-            mmgGui *gui = m_CurrentDevice->GetGui();
-            assert(gui);
-            m_SettingsPanel->Put(gui);
-            // force update
-            m_CurrentDevice->UpdateGui();
-  
-            // Update Bindings panel
-            UpdateBindings();
+            GetSER()->BindDeviceToAction(m_CurrentDevice,action_name);
           }
           else
           {
-            assert(true);
+            GetSER()->UnBindDeviceFromAction(m_CurrentDevice,action_name);
           }
           return;
         }
-        else
+        break;
+        case ID_ADD_DEVICE:
         {
-          // event rised by PER to advise of VME selection
-          mafEventMacro(mafEvent(event->GetSender(),VME_SELECT,(mafVME *)event->GetData()));
-        }
-      break;
-		  default:
-        if (e->GetSender() == m_Devices || e->GetSender() == m_DeviceTree)
-        {
-			    e->Log();
+          wxString device_name,device_type;
+          int sel=DeviceChooser(device_name,device_type);
+      
+          if (sel>=0)
+          {
+            // add the new device to the devices manager's pool
+            mafDevice *device = GetDeviceManager()->AddDevice(device_type);
+            // the device is added to the list by an 
+            // event returned by DeviceManager which is
+            // served by InteractionManager by calling
+            // AddDevice of this class.
+          }
           return;
         }
-		  break; 
+        break;
+        case ID_REMOVE_DEVICE:
+          if (m_CurrentDevice)
+          {
+            int success = GetDeviceManager()->RemoveDevice(m_CurrentDevice);
+            if (!success)
+            {
+              wxMessageBox("Cannot remove device: I/O manager error");
+            }
+          }
+          return;
+         break;
+        case VME_SELECT:
+          if (e->GetSender() == m_DeviceTree)
+          { 
+            // Event rised by the CheckTree used to show the devices tree
+            if (mafDevice *device = GetDeviceManager()->GetDevice(e->GetArg()))
+            {
+              m_CurrentDevice = device;
+              // Show device settings panel
+              assert(m_CurrentDevice->GetGui());
+              mmgGui *gui = m_CurrentDevice->GetGui();
+              assert(gui);
+              m_SettingsPanel->Put(gui);
+              // force update
+              m_CurrentDevice->UpdateGui();
+  
+              // Update Bindings panel
+              UpdateBindings();
+            }
+            else
+            {
+              assert(false);
+            }
+            return;
+          }          
+        break;
+		    default:
+          if (e->GetSender() == m_Devices || e->GetSender() == m_DeviceTree)
+          {
+			      e->Log();
+            return;
+          }
+		    break; 
+      }
     }
     return;
   }
-    
-  if (id==VIEW_SELECT)
+  
+  if (id==VME_SELECT)
+  {
+    // event rised by PER to advise of VME selection
+    mafEventMacro(mafEvent(event->GetSender(),VME_SELECT,(mafVME *)event->GetData()));
+    //mafEventMacro(*event);
+  }
+  else if (id==VIEW_SELECT)
   {
     mafEvent *e=mafEvent::SafeDownCast(event);
     assert(event);
@@ -753,11 +763,6 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
   else if (id==AVATAR_REMOVED) 
   {
     OnRemoveAvatar(event); 
-  }
-  else if (id==mafAction::DEVICE_BIND)
-  {
-    mafEvent *e=mafEvent::SafeDownCast(event);
-    OnBindDeviceToAction(e);
   }
   else
   {
@@ -892,6 +897,7 @@ void mafInteractionManager::UpdateBindings()
     {
       mafAction *action = it->second;
       bool found=false;
+
       // search through the list
       for (mafAction::mmuDeviceList::const_iterator it_list=action->GetDevices()->begin();it_list!=action->GetDevices()->end();it_list++)
       {
