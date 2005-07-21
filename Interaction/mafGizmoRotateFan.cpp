@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateFan.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-08 13:27:46 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-07-21 07:16:06 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -259,7 +259,7 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
           // change the sender and forward the event
           e->SetSender(this);
           mafEventMacro(*e);
-          mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+//          mafEventMacro(mafEvent(this, CAMERA_UPDATE));  // Paolo 20-07-2005
         }
         else if (e->GetArg() == mmiGenericMouse::MOUSE_MOVE)
         {
@@ -301,7 +301,7 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
           // change the sender and forward the event
           e->SetSender(this);
           mafEventMacro(*e);
-          mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+//          mafEventMacro(mafEvent(this, CAMERA_UPDATE));  // Paolo 20-07-2005
         }
         else if (e->GetArg() == mmiGenericMouse::MOUSE_UP)
         {
@@ -317,7 +317,7 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
           e->SetSender(this);
           mafEventMacro(*e);
 
-          mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+//          mafEventMacro(mafEvent(this, CAMERA_UPDATE));  // Paolo 20-07-2005
         }
       }
       break;

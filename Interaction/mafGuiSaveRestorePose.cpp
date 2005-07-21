@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiSaveRestorePose.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:29 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-21 07:16:07 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -229,5 +229,5 @@ void mafGuiSaveRestorePose::RestorePose(int sel_pose)
   e2s.SetId(ID_TRANSFORM);
   mafEventMacro(e2s);
   
-  mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+//  mafEventMacro(mafEvent(this, CAMERA_UPDATE));  // Paolo 20-07-2005
 }

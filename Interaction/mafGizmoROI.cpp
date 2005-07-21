@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoROI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-11 06:14:13 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-21 07:16:06 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -179,7 +179,7 @@ void mafGizmoROI::OnEventGizmoComponents(mafEventBase *maf_event)
         else if (arg == mmiGenericMouse::MOUSE_UP)
         {
         }
-        mafEventMacro(mafEvent(this, CAMERA_UPDATE));  
+//        mafEventMacro(mafEvent(this, CAMERA_UPDATE));    // Paolo 20-07-2005
         // forward isa transform events to the listener op
         mafEventMacro(*e);
       }

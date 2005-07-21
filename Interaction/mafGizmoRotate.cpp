@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotate.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 15:13:26 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-21 07:16:06 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -264,7 +264,7 @@ void mafGizmoRotate::Show(bool show)
     GuiGizmoRotate->EnableWidgets(false);
   }
   // update the camera
-  mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+  //mafEventMacro(mafEvent(this, CAMERA_UPDATE));  // Paolo 20-07-2005
 }
 
 //----------------------------------------------------------------------------  
