@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 15:50:45 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-07-21 12:00:48 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -685,18 +685,23 @@ void mafAvatar3D::OnEvent(mafEventBase* event)
   if (ch==MCH_INPUT) //---- Inputs from the device
   {
     // Input events should all come from the tracker...
-    assert(GetTracker()&&event->GetSender()==GetTracker());
-
-    mafEventInteraction *e = (mafEventInteraction *)event;
-
-    if (id==mmdTracker::TRACKER_3D_MOVE) // manage changes in the bounds of the tracker
+    //assert(GetTracker()&&event->GetSender()==GetTracker());
+    
+    if (GetTracker()&&event->GetSender()==GetTracker())
     {
-      OnMove3DEvent(e);
+      mafEventInteraction *e = (mafEventInteraction *)event;
+
+      if (id==mmdTracker::TRACKER_3D_MOVE) // manage changes in the bounds of the tracker
+      {
+        OnMove3DEvent(e);
+      }
+      else if (id==mmdTracker::TRACKER_BOUNDS_UPDATED)
+      {
+        OnUpdateBoundsEvent(GetTracker());          
+      }
     }
-    else if (id==mmdTracker::TRACKER_BOUNDS_UPDATED)
-    {
-      OnUpdateBoundsEvent(GetTracker());          
-    }
+
+    
   }
  
   switch(event->GetId()) 
