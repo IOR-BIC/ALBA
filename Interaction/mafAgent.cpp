@@ -3,8 +3,8 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: mafAgent.cpp,v $
 Language:  C++
-Date:      $Date: 2005-07-14 17:42:26 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2005-07-21 12:00:05 $
+Version:   $Revision: 1.9 $
 
 =========================================================================*/
 #include "mafAgent.h"
@@ -112,6 +112,12 @@ void mafAgent::AddObserver(mafObserver *listener,mafID channel, int priority)
 {
   assert(listener);
   assert(listener!=this); // avoid loops
+
+  if (channel == MCH_UP)
+  {
+    SetListener(listener);
+    return;
+  }
 
   // add as observer of the channel with the right channel ID
   int i;
