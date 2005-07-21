@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiSER.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-21 07:55:52 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-07-21 12:03:50 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -59,8 +59,11 @@ int mmiSER::InternalRestore(mafStorageElement *node)
     }
    
     // create the object to be restored mannualy since mafAction is not in the factory
-    mafAction *action = mafAction::New();
-    if (action->Restore(subnode))
+    mafString action_name;
+    subnode->GetAttribute("Name",action_name);
+    mafAction *action = GetAction(action_name);
+
+    if (action && action->Restore(subnode))
     {
       mafErrorMacro("I/O Error restoring action");
     }
