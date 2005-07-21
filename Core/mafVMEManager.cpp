@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 09:49:27 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-07-21 11:58:48 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -116,6 +116,7 @@ void mafVMEManager::CreateNewStorage()
   m_Storage = mafVMEStorage::New();
   m_Storage->GetRoot()->SetName("root");
   m_Storage->SetListener(this);
+  m_Storage->GetRoot()->Initialize();
 }
 
 //----------------------------------------------------------------------------
