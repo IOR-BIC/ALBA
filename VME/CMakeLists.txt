@@ -44,8 +44,12 @@ IF (MAF_USE_VTK)
   mafDataPipeCustom.h
   mafPipeGizmo.cpp
   mafPipeGizmo.h
+  mafPipeLandmarkCloud.cpp
+  mafPipeLandmarkCloud.h
   mafPipeMeter.cpp
   mafPipeMeter.h
+  mafPipePointSet.cpp
+  mafPipePointSet.h
   mafPipeSurface.cpp
   mafPipeSurface.h
   mafPipeVolumeProjected.cpp
@@ -68,6 +72,8 @@ IF (MAF_USE_VTK)
   mafVMEMeter.h
   mafVMEOutputImage.cpp
   mafVMEOutputImage.h
+  mafVMEOutputLandmarkCloud.cpp
+  mafVMEOutputLandmarkCloud.h
   mafVMEOutputMeter.cpp
   mafVMEOutputMeter.h
   mafVMEOutputPointSet.cpp
