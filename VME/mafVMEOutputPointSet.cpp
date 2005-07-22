@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputPointSet.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-14 08:36:38 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-22 13:50:33 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,8 +20,10 @@
 //----------------------------------------------------------------------------
 
 #include "mafVMEOutputPointSet.h"
+#include "mafVME.h"
 #include "mmgGui.h"
 #include "mafIndent.h"
+#include "mmaMaterial.h"
 
 #include "vtkPolyData.h"
 #include "vtkDataSet.h"
@@ -36,7 +38,7 @@ mafCxxTypeMacro(mafVMEOutputPointSet)
 mafVMEOutputPointSet::mafVMEOutputPointSet()
 //-------------------------------------------------------------------------
 {
-  m_NumPoints = 0;
+  m_NumPoints = "0";
 }
 
 //-------------------------------------------------------------------------
@@ -50,6 +52,25 @@ vtkPolyData *mafVMEOutputPointSet::GetPointSetData()
 //-------------------------------------------------------------------------
 {
   return (vtkPolyData *)GetVTKData();
+}
+
+//-------------------------------------------------------------------------
+mmaMaterial *mafVMEOutputPointSet::GetMaterial()
+//-------------------------------------------------------------------------
+{
+  // if the VME set the material directly in the output return it
+  if (m_Material)
+    return  m_Material;
+
+  // search for a material attribute in the VME connected to this output
+  return GetVME() ? mmaMaterial::SafeDownCast(GetVME()->GetAttribute("MaterialAttributes")) : NULL;
+}
+
+//-------------------------------------------------------------------------
+void mafVMEOutputPointSet::SetMaterial(mmaMaterial *material)
+//-------------------------------------------------------------------------
+{
+  m_Material = material;
 }
 
 //-------------------------------------------------------------------------

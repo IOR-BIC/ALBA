@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputPointSet.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-14 08:36:38 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-22 13:50:33 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -19,6 +19,7 @@
 // forward declarations :
 //----------------------------------------------------------------------------
 class vtkPolyData;
+class mmaMaterial;
 
 /** NULL output for VME node with a VTK image output data.
   mafVMEOutputPointSet is the output produced by a node generating an output
@@ -30,7 +31,7 @@ public:
   mafVMEOutputPointSet();
   virtual ~mafVMEOutputPointSet();
 
-  mafTypeMacro(mafVMEOutputPointSet,mafVMEOutputVTK)
+  mafTypeMacro(mafVMEOutputPointSet,mafVMEOutputVTK);
 
   /**
     Return a VTK dataset corresponding to the current time. This is
@@ -42,9 +43,16 @@ public:
     update their input.*/
   virtual vtkPolyData *GetPointSetData();
 
+  /** return material attribute of this surface if present */
+  mmaMaterial *GetMaterial();
+
+  /** set the material of the surface */ 
+  void SetMaterial(mmaMaterial *material);
+
 protected:
   mmgGui *CreateGui();
-  int m_NumPoints;
+  mafString     m_NumPoints;
+  mmaMaterial  *m_Material; ///< material object used to store shading propertied to render the pointset
 
 private:
   mafVMEOutputPointSet(const mafVMEOutputPointSet&); // Not implemented
