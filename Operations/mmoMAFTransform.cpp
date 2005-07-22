@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMAFTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-08 13:28:47 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-07-22 13:43:44 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -236,6 +236,7 @@ void mmoMAFTransform::OnEventThis(mafEventBase *maf_event)
           GizmoScale->Show(true);
         }
       }
+      mafEventMacro(mafEvent(this, CAMERA_UPDATE));
     }
     break;
     
