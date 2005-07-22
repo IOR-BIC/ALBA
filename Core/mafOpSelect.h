@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpSelect.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 15:17:16 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-07-22 13:54:44 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,8 +40,8 @@ public:
     void OpUndo();
     mafOp* Copy();
 protected:
-    mafNode *m_OldNodeSelected;
-    mafNode *m_NewNodeSelected;
+    mafAutoPointer<mafNode> m_OldNodeSelected;
+    mafAutoPointer<mafNode> m_NewNodeSelected;
 };
 //----------------------------------------------------------------------------
 // mafOpEdit :
@@ -76,7 +76,7 @@ public:
     void OpUndo();
     mafOp* Copy(); 
 protected:
-    mafNode *m_SelectionParent;
+    mafAutoPointer<mafNode> m_SelectionParent;
 };
 //----------------------------------------------------------------------------
 // mafOpCopy :
@@ -103,7 +103,7 @@ public:
     void OpUndo();
     mafOp* Copy(); 
 protected:
-    mafNode *m_PastedVme;
+    mafAutoPointer<mafNode> m_PastedVme;
 };
 /*
 //----------------------------------------------------------------------------
