@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 10:21:56 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-07-22 13:42:05 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -78,20 +78,31 @@ public:
   /**  Plug a new operation */
 	virtual void Plug(mafOp *op);
 	
-  /** Configure */
+  /** Configure the application plugging all the managers and the side-bar panel. */
   virtual void Configure();
 
-  /**  Program Initialization */
+  /** Program Initialization */
 	virtual void Init(int argc, char **argv);
 
-  // must be called before Configure 
+  /** Must be called before Configure */
   void PlugVMEManager(bool b) {m_UseVMEManager =b;};
+
+  /** Must be called before Configure */
   void PlugViewManager(bool b){m_UseViewManager=b;};
+
+  /** Must be called before Configure */
   void PlugOpManager(bool b){m_UseOpManager=b;};
+
+  /** Must be called before Configure */
   void PlugInteractionManger(bool b){m_UseInteractionManager=b;}
 
   /** Redefined to Fill the menu's */
   virtual void Show();
+
+  /** Set the application stamp for the application, 
+  if set to OPEN_ALL_DATA let's the application to open all msf file. 
+  As default the application stamp is the name of the application and it is set into the Show() method. */
+  void SetApplicationStamp(mafString &app_stamp);
 
 protected:
   //---------------------------------------------------------

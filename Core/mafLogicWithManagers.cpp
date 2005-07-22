@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-15 15:19:56 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2005-07-22 13:42:05 $
+  Version:   $Revision: 1.28 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -143,10 +143,14 @@ void mafLogicWithManagers::Show()
 //----------------------------------------------------------------------------
 {
   if(m_VMEManager && m_RecentFileMenu)
+  {
     m_VMEManager->SetFileHistoryMenu(m_RecentFileMenu);
+  }
 
   if(m_UseViewManager && m_ViewMenu)
+  {
     m_ViewManager->FillMenu(m_ViewMenu);
+  }
 
   if(m_OpManager)
   {
@@ -160,6 +164,20 @@ void mafLogicWithManagers::Show()
   }
 
   mafLogicWithGUI::Show();
+
+  if (m_VMEManager) // must be after the mafLogicWithGUI::Show(); because in that method is set the m_AppTitle var
+  {
+    m_VMEManager->SetApplicationStamp(m_AppTitle);
+  }
+}
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::SetApplicationStamp(mafString &app_stamp)
+//----------------------------------------------------------------------------
+{
+  if (m_VMEManager)
+  {
+    m_VMEManager->SetApplicationStamp(app_stamp);
+  }
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Init(int argc, char **argv)
@@ -191,7 +209,6 @@ void mafLogicWithManagers::CreateMenu()
   file_menu->Append(MENU_FILE_NEW,   "&New");
   file_menu->Append(MENU_FILE_OPEN,  "&Open ..");
   file_menu->Append(MENU_FILE_SAVE,  "&Save");
-  file_menu->Append(MENU_FILE_SAVEAS,"Save &As ..");
   file_menu->Append(MENU_FILE_SAVEAS,"Save &As ..");
 
   m_ImportMenu = new wxMenu;
@@ -449,7 +466,7 @@ void mafLogicWithManagers::OnFileNew()
 		  if(m_OpManager) m_OpManager->ClearUndoStack(); 
 	  }
   }
-	m_Win->SetTitle(m_AppTitle);
+	m_Win->SetTitle(wxString(m_AppTitle.GetCStr()));
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OnFileOpen()
