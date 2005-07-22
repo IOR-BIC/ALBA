@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-18 10:14:16 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-07-22 13:43:03 $
+  Version:   $Revision: 1.15 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -84,7 +84,7 @@ bool exOperationApp::OnInit()
   // Importer Menu':
   m_logic->Plug(new mmoSTLImporter("STL Importer"));
   m_logic->Plug(new mmoVTKImporter("VTK Importer"));
-  //m_logic->Plug(new mmoMSFImporter("MSF 1.x Importer"));
+  m_logic->Plug(new mmoMSFImporter("MSF 1.x Importer"));
   //------------------------------------------------------------
 
   //------------------------------------------------------------
@@ -118,6 +118,9 @@ bool exOperationApp::OnInit()
   //------------------------------------------------------------
 
   m_logic->Show();
+  mafString app_stamp;
+  app_stamp = "OPEN_ALL_DATA";
+  m_logic->SetApplicationStamp(app_stamp);
   m_logic->Init(0,NULL); // calls FileNew - which create the root
   return TRUE;
 }
