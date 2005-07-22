@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:54:01 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-07-22 13:52:05 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -30,7 +30,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafMatrixVector.h"
 #include "mafVMEItemVTK.h"
 #include "mafEventSource.h"
-#include "mafVMEOutputPointSet.h"
+#include "mafVMEOutputLandmarkCloud.h"
 #include "mmgGui.h"
 #include "mmaMaterial.h"
 
@@ -63,6 +63,8 @@ mafCxxTypeMacro(mafVMELandmarkCloud);
 mafVMELandmarkCloud::mafVMELandmarkCloud()
 //-------------------------------------------------------------------------
 {
+  SetOutput(mafVMEOutputLandmarkCloud::New()); // create the output
+
   m_NumberOfLandmarks = -1;
   m_NumberOfLandmarksString << m_NumberOfLandmarks;
   m_State             = UNSET_CLOUD;
@@ -71,10 +73,58 @@ mafVMELandmarkCloud::mafVMELandmarkCloud()
   m_SphereResolution  = -1;
 }
 
-//------------------------------------------------------------------------------
+//-------------------------------------------------------------------------
 mafVMELandmarkCloud::~mafVMELandmarkCloud()
 //-------------------------------------------------------------------------
 {
+}
+
+//-------------------------------------------------------------------------
+int mafVMELandmarkCloud::DeepCopy(mafNode *a)
+//-------------------------------------------------------------------------
+{ 
+  if (Superclass::DeepCopy(a)==MAF_OK)
+  {
+    mafVMELandmarkCloud *lc = mafVMELandmarkCloud::SafeDownCast(a);
+    m_Radius            = lc->GetRadius();
+    m_NumberOfLandmarks = lc->GetNumberOfLandmarks();
+    m_State             = lc->IsOpen()? mafVMELandmarkCloud::OPEN_CLOUD : mafVMELandmarkCloud::CLOSED_CLOUD;
+    m_DefaultVisibility = lc->GetDefaultVisibility();
+    m_SphereResolution  = lc->GetSphereResolution();
+    m_NumberOfLandmarksString = m_NumberOfLandmarks;
+
+    return MAF_OK;
+  }  
+  return MAF_ERROR;
+}
+
+//-------------------------------------------------------------------------
+bool mafVMELandmarkCloud::Equals(mafVME *vme)
+//-------------------------------------------------------------------------
+{
+  bool ret = false;
+  if (Superclass::Equals(vme))
+  {
+    mafVMELandmarkCloud *lc = mafVMELandmarkCloud::SafeDownCast(vme);
+    ret = (m_Radius == lc->GetRadius() && 
+           m_NumberOfLandmarks == lc->GetNumberOfLandmarks() &&
+           m_DefaultVisibility == lc->GetDefaultVisibility() &&
+           m_SphereResolution  == lc->GetSphereResolution());
+  }
+  return ret;
+}
+
+//-------------------------------------------------------------------------
+int mafVMELandmarkCloud::InternalInitialize()
+//-------------------------------------------------------------------------
+{
+  if (Superclass::InternalInitialize()==MAF_OK)
+  {
+    // force material allocation
+    GetMaterial();
+    return MAF_OK;
+  }
+  return MAF_ERROR;
 }
 
 //-------------------------------------------------------------------------
@@ -326,6 +376,15 @@ int mafVMELandmarkCloud::SetLandmarkForTimeFrame(int idx,double x,double y,doubl
   }
 }*/
 //-------------------------------------------------------------------------
+int mafVMELandmarkCloud::SetLandmark(mafVMELandmark *lm)
+//-------------------------------------------------------------------------
+{
+  const char *lm_name = lm->GetName();
+  double pos[3], rot[3];
+  lm->GetOutput()->GetPose(pos,rot);
+  return AppendLandmark(pos[0],pos[1],pos[2],lm_name);
+}
+//-------------------------------------------------------------------------
 int mafVMELandmarkCloud::SetLandmark(int idx,double x,double y,double z,mafTimeStamp t)
 //-------------------------------------------------------------------------
 {
@@ -383,7 +442,7 @@ int mafVMELandmarkCloud::GetLandmark(int idx, double &x,double &y,double &z,mafT
     return Superclass::GetPoint(idx,x,y,z,t);
 
   if (mafVMELandmark *lm = GetLandmark(idx))
-    return lm->GetPoint(0,x,y,z,t);
+    return lm->GetPoint(x,y,z,t);
 
   return MAF_ERROR;
 }
@@ -395,7 +454,7 @@ int mafVMELandmarkCloud::GetLandmark(int idx, double xyz[3],mafTimeStamp t)
     return Superclass::GetPoint(idx,xyz,t);
 
   if (mafVMELandmark *lm = GetLandmark(idx))
-    return lm->GetPoint(0,xyz,t);
+    return lm->GetPoint(xyz,t);
 
   return MAF_ERROR;
 }
@@ -1110,6 +1169,10 @@ mmaMaterial *mafVMELandmarkCloud::GetMaterial()
   {
     material = mmaMaterial::New();
     SetAttribute("MaterialAttributes", material);
+    if (m_Output)
+    {
+      ((mafVMEOutputPointSet *)m_Output)->SetMaterial(material);
+    }
   }
   return material;
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:54:01 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-07-22 13:52:05 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -60,6 +60,12 @@ public:
   /** Precess events coming from other objects */ 
   virtual void OnEvent(mafEventBase *maf_event);
 
+  /** Copy the contents of another landmarkcloud into this one. */
+  virtual int DeepCopy(mafNode *a);
+
+  /** Compare with another landmarkcloud. */
+  virtual bool Equals(mafVME *vme);
+
   /**
   Add a new landmark an returns its index. BEWARE: landmark is added to all the
   VME-items, and its position should for each time frame by means SetPoint()
@@ -68,6 +74,9 @@ public:
   int AppendLandmark(const char *name);
   int AppendLandmark(double x,double y,double z,const char *name) {int idx=this->AppendLandmark(name); return this->SetLandmark(idx, x, y, z);}
 
+  /** Insert the landmark into the cloud */
+  int SetLandmark(mafVMELandmark *lm);
+  
   /**
   Set/Get a landmark. In case the specified idx is invalid return MAF_ERROR*/
   int SetLandmark(int idx,double x,double y,double z,mafTimeStamp t=0);
@@ -121,13 +130,15 @@ public:
 
   /**
   Cloud states: Open/Close*/
-  enum {
+  enum LANDMARK_CLOUDE_STATE
+  {
     UNSET_CLOUD=0,
     CLOSED_CLOUD,
     OPEN_CLOUD
   };
 
-  enum {
+  enum LANDMAERK_CLOUD_WIDGET_ID
+  {
     ID_LM_RADIUS = Superclass::ID_LAST,
     ID_LAST
   };
@@ -188,11 +199,17 @@ public:
   /** Return pointer to material attribute. */
   mmaMaterial *GetMaterial();
 
+  /** Return the suggested pipe-typename for the visualization of this vme */
+  virtual mafString GetVisualPipe() {return mafString("mafPipeLandmarkCloud");};
+
   void Print(std::ostream &os, const int tabs);
 
 protected:
   mafVMELandmarkCloud();
   virtual ~mafVMELandmarkCloud();
+
+  /** used to initialize and create the material attribute if not yet present */
+  virtual int InternalInitialize();
 
   /**
   Remove a landmark name from the TagArray*/

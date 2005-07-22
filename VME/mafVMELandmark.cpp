@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 14:37:31 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-07-22 13:52:04 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -78,6 +78,51 @@ mafVMELandmark::~mafVMELandmark()
 {
   vtkDEL(m_Polydata);
 }
+//-------------------------------------------------------------------------
+int mafVMELandmark::DeepCopy(mafNode *a)
+//-------------------------------------------------------------------------
+{ 
+  if (Superclass::DeepCopy(a)==MAF_OK)
+  {
+    mafVMELandmark *lm = mafVMELandmark::SafeDownCast(a);
+    SetRadius(lm->GetRadius());
+    SetSphereResolution(lm->GetSphereResolution());
+    SetLandmarkVisibility(lm->GetLandmarkVisibility());
+    double p[3];
+    lm->GetPoint(p);
+    SetPoint(p);
+    return MAF_OK;
+  }  
+  return MAF_ERROR;
+}
+
+//-------------------------------------------------------------------------
+bool mafVMELandmark::Equals(mafVME *vme)
+//-------------------------------------------------------------------------
+{
+  bool ret = false;
+  if (Superclass::Equals(vme))
+  {
+    mafVMELandmark *lm = mafVMELandmark::SafeDownCast(vme);
+    ret = (GetRadius() == lm->GetRadius() &&
+           GetSphereResolution() == lm->GetSphereResolution() &&
+           GetLandmarkVisibility() == lm->GetLandmarkVisibility());
+  }
+  return ret;
+}
+
+//-------------------------------------------------------------------------
+int mafVMELandmark::InternalInitialize()
+//-------------------------------------------------------------------------
+{
+  if (Superclass::InternalInitialize()==MAF_OK)
+  {
+    // force material allocation
+    GetMaterial();
+    return MAF_OK;
+  }
+  return MAF_ERROR;
+}
 
 //-----------------------------------------------------------------------
 void mafVMELandmark::InternalPreUpdate()
@@ -92,15 +137,12 @@ void mafVMELandmark::InternalPreUpdate()
 bool mafVMELandmark::CanReparentTo(mafNode *parent)
 //-------------------------------------------------------------------------
 {
-  if (parent==NULL)
-    return MAF_OK;
-
-/*  if (mafVMELandmarkCloud *vlmc = mafVMELandmarkCloud::SafeDownCast(parent))
+  if (mafVMELandmarkCloud *vlmc = mafVMELandmarkCloud::SafeDownCast(parent))
   {  
-    if ( vlmc->IsOpen() && vlmc->FindChildIdx(this->GetName())<0  )
+    if ( vlmc->IsOpen() && vlmc->FindLandmarkIndex(this->GetName())<0  )
       return MAF_OK;
   }
-*/
+
   return MAF_ERROR;
 }
 
@@ -172,7 +214,7 @@ void mafVMELandmark::SetMatrix(mafMatrix &mat)
 }
 
 //-------------------------------------------------------------------------
-int mafVMELandmark::SetPoint(int idx,double x,double y,double z,mafTimeStamp t)
+int mafVMELandmark::SetPoint(double x,double y,double z,mafTimeStamp t)
 //-------------------------------------------------------------------------
 {
   t = t < 0 ? this->m_CurrentTime : t;
@@ -181,7 +223,7 @@ int mafVMELandmark::SetPoint(int idx,double x,double y,double z,mafTimeStamp t)
 }
 
 //-------------------------------------------------------------------------
-int mafVMELandmark::SetPoint(int idx,double xyz[3],mafTimeStamp t)
+int mafVMELandmark::SetPoint(double xyz[3],mafTimeStamp t)
 //-------------------------------------------------------------------------
 {
   t = t < 0 ? this->m_CurrentTime : t;
@@ -190,11 +232,9 @@ int mafVMELandmark::SetPoint(int idx,double xyz[3],mafTimeStamp t)
 }
 
 //-------------------------------------------------------------------------
-int mafVMELandmark::GetPoint(int idx, double &x,double &y,double &z,mafTimeStamp t)
+int mafVMELandmark::GetPoint(double &x,double &y,double &z,mafTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  if (idx!=0)
-    return MAF_ERROR;
   t = t < 0 ? this->m_CurrentTime : t;
   
   double ori[3];
@@ -203,17 +243,13 @@ int mafVMELandmark::GetPoint(int idx, double &x,double &y,double &z,mafTimeStamp
 }
 
 //-------------------------------------------------------------------------
-int mafVMELandmark::GetPoint(int idx, double xyz[3],mafTimeStamp t)
+int mafVMELandmark::GetPoint(double xyz[3],mafTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  if (idx!=0)
-    return MAF_ERROR;
-
   t=t<0?this->m_CurrentTime:t;
   double ori[3];
   this->GetOutput()->GetPose(xyz,ori,t);
   return MAF_OK;
-
 }
 
 //-------------------------------------------------------------------------
@@ -298,11 +334,23 @@ mmgGui* mafVMELandmark::CreateGui()
 mmaMaterial *mafVMELandmark::GetMaterial()
 //-------------------------------------------------------------------------
 {
-  mmaMaterial *material = (mmaMaterial *)GetAttribute("MaterialAttributes");
+  mmaMaterial *material;
+  if (m_Parent)
+  {
+    material = (mmaMaterial *)m_Parent->GetAttribute("MaterialAttributes");
+  }
+  else
+  {
+    material = (mmaMaterial *)GetAttribute("MaterialAttributes");
+  }
   if (material == NULL)
   {
     material = mmaMaterial::New();
     SetAttribute("MaterialAttributes", material);
+  }
+  if (m_Output)
+  {
+    ((mafVMEOutputPointSet *)m_Output)->SetMaterial(material);
   }
   return material;
 }

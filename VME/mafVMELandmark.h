@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:50:30 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-07-22 13:52:04 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -44,6 +44,12 @@ public:
 
   void Print(std::ostream &os, const int tabs);
 
+  /** Copy the contents of another landmark into this one. */
+  virtual int DeepCopy(mafNode *a);
+
+  /** Compare with another landmark. */
+  virtual bool Equals(mafVME *vme);
+
   /**
   Set/Get the Radius of this landmark. Notice that Radius is
   currently defines only for a whole cloud of landmarks, thus 
@@ -62,10 +68,10 @@ public:
   /**
   Redefines parent functions. Since this object has by default 1 point this
   functions set/get the VME position.*/
-  int SetPoint(int idx,double x,double y,double z,mafTimeStamp t=-1);
-  int SetPoint(int idx,double xyz[3],mafTimeStamp t=-1); 
-  int GetPoint(int idx, double &x,double &y,double &z,mafTimeStamp t=-1);
-  int GetPoint(int idx, double xyz[3],mafTimeStamp t=-1);
+  int SetPoint(double x,double y,double z,mafTimeStamp t=-1);
+  int SetPoint(double xyz[3],mafTimeStamp t=-1); 
+  int GetPoint(double &x,double &y,double &z,mafTimeStamp t=-1);
+  int GetPoint(double xyz[3],mafTimeStamp t=-1);
 
   /**
   Set/Get the visibility property at a given time frame. The visibility is stored as a scalar attribute of the
@@ -93,12 +99,18 @@ public:
   /** Return pointer to material attribute. */
   mmaMaterial *GetMaterial();
 
+  /** Return the suggested pipe-typename for the visualization of this vme */
+  virtual mafString GetVisualPipe() {return mafString("mafPipePointSet");};
+
 protected:
   mafVMELandmark();
   virtual ~mafVMELandmark();
 
   /** called to check if the vme can be re-parented under the new parent */
   virtual bool CanReparentTo(mafNode *parent);
+
+  /** used to initialize and create the material attribute if not yet present */
+  virtual int InternalInitialize();
 
   /** called to prepare the update of the output */
   virtual void InternalPreUpdate();
