@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-21 11:58:48 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-07-22 13:41:14 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,7 +54,7 @@ mafVMEManager::mafVMEManager()
 	m_MSFFile   = "";
 	m_ZipFile   = "";
 	m_MergeFile = "";
-	m_Wildchar  = "Multimod Storage Format file (*.msf)|*.msf";
+	m_Wildcard  = "Multimod Storage Format file (*.msf)|*.msf";
 
   m_Config = wxConfigBase::Get();
 }
@@ -132,7 +132,7 @@ void mafVMEManager::MSFNew(bool notify_root_creation)
 		//Add the application stamps
 		mafTagItem tag_appstamp;
 		tag_appstamp.SetName("APP_STAMP");
-		tag_appstamp.SetValue(this->m_AppStamp.c_str());
+		tag_appstamp.SetValue(this->m_AppStamp.GetCStr());
 		m_Storage->GetRoot()->GetTagArray()->SetTag(tag_appstamp);
 		mafEventMacro(mafEvent(this,VME_ADDED,m_Storage->GetRoot()));
 		mafEventMacro(mafEvent(this,VME_SELECTED,m_Storage->GetRoot())); 
@@ -204,12 +204,13 @@ void mafVMEManager::MSFOpen(wxString filename)
 		//update the old data files to support Application Stamp
 		mafTagItem tag_appstamp;
 		tag_appstamp.SetName("APP_STAMP");
-		tag_appstamp.SetValue(this->m_AppStamp.c_str());
+		tag_appstamp.SetValue(this->m_AppStamp.GetCStr());
 		m_Storage->GetRoot()->GetTagArray()->SetTag(tag_appstamp);
 	}
 	
-	wxString app_stamp(m_Storage->GetRoot()->GetTagArray()->GetTag("APP_STAMP")->GetValue());
-	if(app_stamp == "INVALID" || ((app_stamp != m_AppStamp) && (m_AppStamp != "DataManager") && (m_AppStamp != "OPEN_ALL_DATA")))
+	mafString app_stamp;
+  app_stamp << m_Storage->GetRoot()->GetTagArray()->GetTag("APP_STAMP")->GetValue();
+	if(app_stamp.Equals("INVALID") || ((!app_stamp.Equals(m_AppStamp.GetCStr())) && (!m_AppStamp.Equals("DataManager")) && (!m_AppStamp.Equals("OPEN_ALL_DATA"))))
 	{
 		//Application stamp not valid
 		mafMessage("File not valid for this application!","Warning");
@@ -346,7 +347,7 @@ void mafVMEManager::MSFSave()
 {
   if(m_MSFFile == "") 
   {
-    mafString file = mafGetSaveFile(m_MSFDir, m_Wildchar).c_str();
+    mafString file = mafGetSaveFile(m_MSFDir, m_Wildcard.GetCStr()).c_str();
    
     if(file == "") return;
 		if(!wxFileExists(file.GetCStr()))
