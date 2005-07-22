@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 15:47:42 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-07-22 13:53:56 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -229,9 +229,9 @@ int mafVMEGenericAbstract::InternalStore(mafStorageElement *parent)
   Superclass::InternalStore(parent);
 
   // sub-element for storing the data vector
-  mafStorageElement *data_vector = parent->AppendChild("DataVector");
   if (m_DataVector)
   {
+    mafStorageElement *data_vector = parent->AppendChild("DataVector");
     if(m_DataVector->Store(data_vector))
       return MAF_ERROR;
   }
@@ -248,23 +248,28 @@ int mafVMEGenericAbstract::InternalStore(mafStorageElement *parent)
 int mafVMEGenericAbstract::InternalRestore(mafStorageElement *node)
 //-----------------------------------------------------------------------
 {
+  int ret_val = MAF_OK;
   Superclass::InternalRestore(node); 
   
   // restore Data Vector
-  mafStorageElement *data_vector=node->FindNestedElement("DataVector");
-  if (data_vector)
+  if (m_DataVector)
   {
-    m_DataVector->Restore(data_vector);
-  
-    // restore Matrix Vector  
+    mafStorageElement *data_vector=node->FindNestedElement("DataVector");
+    if (data_vector)
+    {
+      ret_val = m_DataVector->Restore(data_vector);
+    }
+  }
+  // restore Matrix Vector  
+  if (m_MatrixVector && ret_val == MAF_OK)
+  {
     mafStorageElement *matrix_vector=node->FindNestedElement("MatrixVector");
     if (matrix_vector)
     {
-      m_MatrixVector->Restore(matrix_vector);
-      return MAF_OK;
+      ret_val = m_MatrixVector->Restore(matrix_vector);
     }
   }
-  return MAF_ERROR;
+  return ret_val;
 }
 
 //-------------------------------------------------------------------------
@@ -276,7 +281,10 @@ void mafVMEGenericAbstract::OnEvent(mafEventBase *maf_event)
     if (maf_event->GetId() == mafVMEStorage::MSF_FILENAME_CHANGED)
     {
       // force the data vector to save its data to file
-      GetDataVector()->Modified();
+      if(GetDataVector())
+      {
+        GetDataVector()->Modified();
+      }
     } 
     
   }
