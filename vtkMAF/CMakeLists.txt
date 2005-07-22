@@ -15,6 +15,8 @@ vtkContourVolumeMapperAdv.cxx
 #vtkDicomUnPacker.h
 vtkDOFMatrix.cxx
 vtkDOFMatrix.h
+vtkExtendedGlyph3D.cxx
+vtkExtendedGlyph3D.h
 vtkFixedCutter.cxx
 vtkFixedCutter.h
 vtkRayCast3DPicker.cxx
