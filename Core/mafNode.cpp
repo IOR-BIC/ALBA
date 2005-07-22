@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-05 06:04:04 $
-  Version:   $Revision: 1.36 $
+  Date:      $Date: 2005-07-22 14:00:06 $
+  Version:   $Revision: 1.37 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -680,7 +680,8 @@ mafNode *mafNode::CopyTree(mafNode *vme, mafNode *parent)
 //-------------------------------------------------------------------------
 {
   
-  mafNode* v = vme->MakeCopy();
+  mafNode *v = vme->MakeCopy();
+  v->Register(NULL);
   v->ReparentTo(parent);
 
   for(unsigned long i=0; i<vme->GetNumberOfChildren(); i++)
@@ -689,6 +690,7 @@ mafNode *mafNode::CopyTree(mafNode *vme, mafNode *parent)
       if (child->IsVisible())
         mafNode::CopyTree(child,v);
   }
+  v->SetReferenceCount(0); // this hack avoid that 'v' node die when return
   return v;
 }
 
