@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeFactoryVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-08 13:29:33 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-07-22 13:48:05 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,6 +30,8 @@
 #include "mafPipeVolumeProjected.h"
 #include "mafPipeMeter.h"
 #include "mafPipeGizmo.h"
+#include "mafPipeLandmarkCloud.h"
+#include "mafPipePointSet.h"
 #include <string>
 #include <ostream>
 
@@ -74,6 +76,8 @@ mafPipeFactoryVME::mafPipeFactoryVME()
   mafPlugPipeMacro(mafPipeMeter,"Pipe for mafVMEMeter");
   mafPlugPipeMacro(mafPipeVolumeSlice,"Pipe for render vtk volumes as a slice");
   mafPlugPipeMacro(mafPipeVolumeProjected,"Pipe for render vtk volumes as a projected image along X,Y or Z axes");
+  mafPlugPipeMacro(mafPipePointSet,"Pipe for render vtk pointset");
+  mafPlugPipeMacro(mafPipeLandmarkCloud,"Pipe for render landmark clouds");
 }
 
 //------------------------------------------------------------------------------
