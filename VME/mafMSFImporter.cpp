@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 12:13:35 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-07-22 13:47:42 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -64,7 +64,14 @@ int mmuMSF1xDocument::InternalRestore(mafStorageElement *node)
 
   for (int i=0;i<children.size();i++)
   {
-    if (mafCString("VME") == children[i]->GetName())
+    if (mafCString("TArray") == children[i]->GetName())
+    {
+      if (RestoreTagArray(children[i],m_Root->GetTagArray()) != MAF_OK)
+      {
+        mafErrorMacro("MSFImporter: error restoring Tag Array of node: \""<<m_Root->GetName()<<"\"");
+      }
+    }
+    else if (mafCString("VME") == children[i]->GetName())
     {
       mafVME *child_vme=RestoreVME(children[i],m_Root);
       if (child_vme==NULL)
@@ -113,9 +120,15 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
           /////////////////////////////////////////// 
           // here should process VME-specific tags //
           ///////////////////////////////////////////
-          if (vme->GetTagArray()->IsTagPresent("material"))
+          mafTagArray *ta = vme->GetTagArray();
+          if (ta->IsTagPresent("material"))
           {
             RestoreMaterial(vme);
+          }
+          if (vme_type == "mflVMELandmarkCloud")
+          {
+            int num_lm = ((mafVMELandmarkCloud *)vme)->GetNumberOfLandmarks();
+            double rad = ((mafVMELandmarkCloud *)vme)->GetRadius();
           }
         }
 
@@ -150,19 +163,27 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
             mafErrorMacro("MSFImporter: error restoring child VME (parent=\""<<vme->GetName()<<"\")");
             return NULL;
           }
+          if (vme_type!="mafVMELink" && vme_type!="mafVMEAlias")
+          {
+            // add the new VME as a child of the given parent node
+            if (vme_type == "mflVMELandmarkCloud" && child_vme->IsMAFType(mafVMELandmark))
+            {
+              ((mafVMELandmarkCloud *)vme)->SetLandmark((mafVMELandmark *)child_vme);
+              child_vme->Delete();
+              child_vme = NULL;
+            }
+            else
+            {
+              vme->AddChild(child_vme);
+            }
+          }
+          else
+          {
+            // for VME-link and VME-alias we simply need to create links in current VME
+
+            // ... to be implemented
+          }
         } 
-
-        if (vme_type!="mafVMELink" && vme_type!="mafVMEAlias")
-        {
-          // add the new VME as a child of the given parent node
-          parent->AddChild(vme);
-        }
-        else
-        {
-          // for VME-link and VME-alias we simply need to create links in current VME
-
-          // ... to be implemented
-        }
       }
     } // Name
   } // Type
@@ -259,9 +280,6 @@ int mmuMSF1xDocument::RestoreVItem(mafStorageElement *node, mafVME *vme)
         if (node->GetAttribute("DataFile",data_file))
         {
           mafSmartPointer<mafVMEItemVTK> vitem;
-          vitem->SetTimeStamp(item_time);
-          vitem->SetId(item_id);
-          vitem->SetURL(data_file);
           mafStorageElement *tarray=node->FindNestedElement("TArray");
           if (tarray)
           {
@@ -270,9 +288,33 @@ int mmuMSF1xDocument::RestoreVItem(mafStorageElement *node, mafVME *vme)
               mafVMEGeneric *vme_generic=mafVMEGeneric::SafeDownCast(vme);
               assert(vme_generic);
               vme_generic->GetDataVector()->AppendItem(vitem);
-              return MAF_OK;
+
+              /////////////////////////////////////////////// 
+              // here should process VMEItem-specific tags //
+              ///////////////////////////////////////////////
+              mafTagArray *ta = vitem->GetTagArray();
+              if (ta->IsTagPresent("MFL_CRYPTING"))
+              {
+                mafTagItem *ti = ta->GetTag("MFL_CRYPTING");
+                vme->SetCrypting((int)ti->GetValueAsDouble());
+                ta->DeleteTag("MFL_CRYPTING");
+              }
+              if (ta->IsTagPresent("VTK_DATASET_BOUNDS"))
+              {
+                double *b = vitem->GetBounds();
+                mafTagItem *ti = ta->GetTag("VTK_DATASET_BOUNDS");
+                for (int c=0;c<6;c++)
+                {
+                  b[c] = ti->GetComponentAsDouble(c);
+                }
+                ta->DeleteTag("VTK_DATASET_BOUNDS");
+              }
             }
           } // tarray
+          vitem->SetTimeStamp(item_time);
+          vitem->SetId(item_id);
+          vitem->SetURL(data_file);
+          return MAF_OK;
         } // DataFile
       } // Id
     } // DataType
