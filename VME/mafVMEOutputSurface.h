@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputSurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-05 06:01:57 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-07-22 13:50:44 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -34,7 +34,7 @@ public:
   mafVMEOutputSurface();
   virtual ~mafVMEOutputSurface();
 
-  mafTypeMacro(mafVMEOutputSurface,mafVMEOutputVTK)
+  mafTypeMacro(mafVMEOutputSurface,mafVMEOutputVTK);
 
   /**
     Return a VTK dataset corresponding to the current time. This is

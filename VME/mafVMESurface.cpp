@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-05 06:03:03 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-07-22 13:51:20 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -149,6 +149,10 @@ mmaMaterial *mafVMESurface::GetMaterial()
   {
     material = mmaMaterial::New();
     SetAttribute("MaterialAttributes", material);
+    if (m_Output)
+    {
+      ((mafVMEOutputSurface *)m_Output)->SetMaterial(material);
+    }
   }
   return material;
 }

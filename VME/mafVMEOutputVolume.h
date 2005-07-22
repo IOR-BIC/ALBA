@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputVolume.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-30 16:31:19 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-07-22 13:50:44 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,7 +30,7 @@ public:
   mafVMEOutputVolume();
   virtual ~mafVMEOutputVolume();
 
-  mafTypeMacro(mafVMEOutputVolume,mafVMEOutputVTK)
+  mafTypeMacro(mafVMEOutputVolume,mafVMEOutputVTK);
 
   /** return the output data casting to vtkImageData */
   virtual vtkImageData *GetStructuredData();

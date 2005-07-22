@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputPolyline.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 18:16:22 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-22 13:50:44 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,7 +30,7 @@ public:
   mafVMEOutputPolyline();
   virtual ~mafVMEOutputPolyline();
 
-  mafTypeMacro(mafVMEOutputPolyline,mafVMEOutputVTK)
+  mafTypeMacro(mafVMEOutputPolyline,mafVMEOutputVTK);
 
   /**
     Return a VTK dataset corresponding to the current time. This is

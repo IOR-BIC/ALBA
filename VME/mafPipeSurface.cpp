@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 12:13:55 $
-  Version:   $Revision: 1.14 $
-  Authors:   Silvano Imboden
+  Date:      $Date: 2005-07-22 13:48:31 $
+  Version:   $Revision: 1.15 $
+  Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 

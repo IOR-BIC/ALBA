@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 19:36:49 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-07-22 13:51:11 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,7 +27,7 @@ class mafVMEGerericVTK;
 class MAF_EXPORT mafVMEOutputVTK : public mafVMEOutput
 {
 public:
-  mafTypeMacro(mafVMEOutputVTK,mafVMEOutput)
+  mafTypeMacro(mafVMEOutputVTK,mafVMEOutput);
 
   /**
     Return a VTK dataset corresponding to the current time. This is

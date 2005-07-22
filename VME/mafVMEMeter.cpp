@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-14 07:42:16 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-07-22 13:49:13 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -119,6 +119,7 @@ int mafVMEMeter::DeepCopy(mafNode *a)
       this->SetLink("EndVME2", linked_node);
     }
     m_Transform->SetMatrix(meter->m_Transform->GetMatrix());
+    m_MeterAttributes = meter->GetMeterAttributes();
     return MAF_OK;
   }  
   return MAF_ERROR;
