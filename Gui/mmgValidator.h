@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgValidator.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 09:51:07 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-07-25 11:27:32 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,7 +34,7 @@ enum VALIDATOR_MODES
   VAL_STRING,  //TEXT
   VAL_INTEGER, //TEXT 
   VAL_FLOAT,   //TEXT
-	VAL_DOUBLE,
+	VAL_DOUBLE,  //TEXT
   VAL_SLIDER,
 	VAL_SLIDER_2,
   VAL_FLOAT_SLIDER,
