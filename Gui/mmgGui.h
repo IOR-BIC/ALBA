@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-30 16:27:13 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2005-07-25 13:28:34 $
+  Version:   $Revision: 1.20 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2005
@@ -30,10 +30,12 @@ class mmgCheckListBox;
 // Constants :
 //----------------------------------------------------------------------------
 
-#define   MININT    -32000
-#define   MAXINT     32000
-#define   MINFLOAT  -2000000000 
-#define   MAXFLOAT   2000000000
+#define MININT    -32000
+#define MAXINT     32000
+#define MINFLOAT  -2000000000 
+#define MAXFLOAT   2000000000
+#define MINDOUBLE -1.0e+299
+#define MAXDOUBLE 1.0e+299
 
 //----------------------------------------------------------------------------
 // Constants to be used with mmgGUI::GetMetrics()
@@ -121,7 +123,7 @@ public:
   void Float(int id,mafString label,float *var, float min = MINFLOAT, float max = MAXFLOAT, int flag=0, int decimal_digit = 2, mafString tooltip = "");
 
   /** Double entry widget. */
-  void Double(int id,mafString label,double *var, double	min = MINFLOAT, double max = MAXFLOAT, int flag=0, int decimal_digit = 2, mafString tooltip = "");
+  void Double(int id,mafString label,double *var, double	min = MINDOUBLE, double max = MAXDOUBLE, int decimal_digit = 2, mafString tooltip = "");
 
   /** Integer vector3 entry widget. */
   void Vector(int id,wxString label, int var[3], int min = MININT, int max = MAXINT, wxString tooltip = "");

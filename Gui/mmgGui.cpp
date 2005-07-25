@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-13 18:17:01 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2005-07-25 13:28:34 $
+  Version:   $Revision: 1.21 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -640,7 +640,7 @@ void mmgGui::Float(int id,mafString label,float* var,float min, float max, int f
 	}
 }
 //----------------------------------------------------------------------------
-void mmgGui::Double(int id,mafString label,double* var,double min, double max, int flag, int decimal_digit, mafString tooltip)
+void mmgGui::Double(int id,mafString label,double* var,double min, double max, int decimal_digit, mafString tooltip)
 //----------------------------------------------------------------------------
 {
   int w_id;
