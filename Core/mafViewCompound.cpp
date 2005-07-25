@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-04 14:48:12 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-25 11:28:45 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,7 +22,10 @@
 #include "mafViewCompound.h"
 #include "mafViewVTK.h"
 #include "mafRWI.h"
+#include "mafSceneGraph.h"
+#include "mafSceneNode.h"
 #include "mmgViewWin.h"
+#include "mmgGui.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewCompound);
@@ -35,15 +38,15 @@ mafViewCompound::mafViewCompound( wxString label, int num_row, int num_col, bool
 {
   m_ViewRowNum = num_row;
   m_ViewColNum = num_col;
-  m_NumOfPluggedChildren = 0;
+  m_NumOfPluggedChildren  = 0;
+  m_DefauldChildView      = 0;
 }
 //----------------------------------------------------------------------------
 mafViewCompound::~mafViewCompound()
 //----------------------------------------------------------------------------
 {
   m_PluggedChildViewList.clear();
-
-  for(int i=0; i<m_ChildViewList.size(); i++)
+  for(int i=0; i<m_NumOfChildView; i++)
   {
     cppDEL(m_ChildViewList[i]);
   }
@@ -93,33 +96,34 @@ void mafViewCompound::Create()
     m_ChildViewList[f]->GetWindow()->Reparent(m_Win);
     m_ChildViewList[f]->GetWindow()->Show(true);
   }
+  m_NumOfChildView = m_ChildViewList.size();
 }
 //----------------------------------------------------------------------------
 void mafViewCompound::VmeAdd(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  for(int i=0; i<m_ChildViewList.size(); i++)
+  for(int i=0; i<m_NumOfChildView; i++)
     m_ChildViewList[i]->VmeAdd(node);
 }
 //----------------------------------------------------------------------------
 void mafViewCompound::VmeRemove(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  for(int i=0; i<m_ChildViewList.size(); i++)
+  for(int i=0; i<m_NumOfChildView; i++)
     m_ChildViewList[i]->VmeRemove(node);
 }
 //----------------------------------------------------------------------------
 void mafViewCompound::VmeSelect(mafNode *node, bool select)
 //----------------------------------------------------------------------------
 {
-  for(int i=0; i<m_ChildViewList.size(); i++)
+  for(int i=0; i<m_NumOfChildView; i++)
     m_ChildViewList[i]->VmeSelect(node, select);
 }
 //----------------------------------------------------------------------------
 void mafViewCompound::VmeShow(mafNode *node, bool show)
 //----------------------------------------------------------------------------
 {
-  for(int i=0; i<m_ChildViewList.size(); i++)
+  for(int i=0; i<m_NumOfChildView; i++)
     m_ChildViewList[i]->VmeShow(node, show);
 }
 //----------------------------------------------------------------------------
@@ -127,61 +131,113 @@ int mafViewCompound::GetNodeStatus(mafNode *node)
 //----------------------------------------------------------------------------
 {
   // should be redefined for compounded views
-  return m_ChildViewList[0]->GetNodeStatus(node);
+  return m_ChildViewList[m_DefauldChildView]->GetNodeStatus(node);
 }
 //----------------------------------------------------------------------------
 void mafViewCompound::VmeCreatePipe(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  for(int i=0; i<m_ChildViewList.size(); i++)
+  for(int i=0; i<m_NumOfChildView; i++)
     m_ChildViewList[i]->VmeCreatePipe(node);
 }
 //----------------------------------------------------------------------------
 void mafViewCompound::VmeDeletePipe(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  for(int i=0; i<m_ChildViewList.size(); i++)
+  for(int i=0; i<m_NumOfChildView; i++)
     m_ChildViewList[i]->VmeDeletePipe(node);
 }
 //----------------------------------------------------------------------------
 void mafViewCompound::CameraReset(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  for(int i=0; i<m_ChildViewList.size(); i++)
+  for(int i=0; i<m_NumOfChildView; i++)
     m_ChildViewList[i]->CameraReset(node);
 }
 //----------------------------------------------------------------------------
 void mafViewCompound::CameraUpdate()
 //----------------------------------------------------------------------------
 {
-  for(int i=0; i<m_ChildViewList.size(); i++)
+  for(int i=0; i<m_NumOfChildView; i++)
     m_ChildViewList[i]->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 mafSceneGraph *mafViewCompound::GetSceneGraph()
 //----------------------------------------------------------------------------
 {
-  return ((mafViewVTK *)m_ChildViewList[0])->GetSceneGraph();
+  return ((mafViewVTK *)m_ChildViewList[m_DefauldChildView])->GetSceneGraph();
 }
 //----------------------------------------------------------------------------
 mafRWIBase *mafViewCompound::GetRWI()
 //----------------------------------------------------------------------------
 {
-  return ((mafViewVTK *)m_ChildViewList[0])->GetRWI();
+  return ((mafViewVTK *)m_ChildViewList[m_DefauldChildView])->GetRWI();
+}
+//----------------------------------------------------------------------------
+mafPipe *mafViewCompound::GetNodePipe(mafNode *vme)
+//----------------------------------------------------------------------------
+{
+  mafSceneGraph *sg = ((mafViewVTK *)m_ChildViewList[m_DefauldChildView])->GetSceneGraph();
+  assert(sg);
+  mafSceneNode *n = sg->Vme2Node(vme);
+  if(!n) 
+    return NULL;
+  return n->m_Pipe;
+}
+//----------------------------------------------------------------------------
+mmgGui *mafViewCompound::GetNodePipeGUI(mafNode *vme)
+//----------------------------------------------------------------------------
+{
+  return GetNodePipeGUI(vme, m_DefauldChildView);
+}
+//----------------------------------------------------------------------------
+mmgGui *mafViewCompound::GetNodePipeGUI(mafNode *vme, int view_idx)
+//----------------------------------------------------------------------------
+{
+  mafSceneGraph *sg = ((mafViewVTK *)m_ChildViewList[view_idx])->GetSceneGraph();
+  assert(sg);
+  mafSceneNode *n = sg->Vme2Node(vme);
+  if(!n) 
+    return NULL;
+  if(n->m_Pipe)
+  {
+    return n->m_Pipe->GetGui();
+  }
+  return NULL;
 }
 //----------------------------------------------------------------------------
 void mafViewCompound::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  mafEventMacro(*maf_event);
+  switch(maf_event->GetId()) 
+  {
+    case ID_DEFAULT_CHILD_VIEW:
+    {
+      mafSceneGraph *sg = GetSceneGraph();
+      if(sg)
+      {
+        mafNode *vme = sg->GetSelectedVme();
+        if (vme)
+        {
+          mafEventMacro(mafEvent(this,VME_MODIFIED,vme));
+        }
+      }
+    }
+  	break;
+    default:
+      mafEventMacro(*maf_event);
+  }
 }
 //-------------------------------------------------------------------------
 mmgGui* mafViewCompound::CreateGui()
 //-------------------------------------------------------------------------
 {
+  mafString childview_tooltip;
+  childview_tooltip = "set the default child view";
+
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
-  m_Gui->Label("compound view default gui");
+  m_Gui->Integer(ID_DEFAULT_CHILD_VIEW,"default child", &m_DefauldChildView, 0, m_NumOfChildView, childview_tooltip);
   return m_Gui;
 }
 //----------------------------------------------------------------------------
@@ -226,6 +282,8 @@ void mafViewCompound::OnLayout()
 void mafViewCompound::SetMouse(mmdMouse *mouse)
 //----------------------------------------------------------------------------
 {
-  for(int i=0; i<m_ChildViewList.size(); i++)
+  for(int i=0; i<m_NumOfChildView; i++)
+  {
     ((mafViewVTK *)m_ChildViewList[i])->SetMouse(mouse);
+  }
 }

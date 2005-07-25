@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-04 14:48:12 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-07-25 11:28:45 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,6 +23,7 @@
 //----------------------------------------------------------------------------
 class mmdMouse;
 class mafSceneGraph;
+class mmgGui;
 class mafRWIBase;
 
 //----------------------------------------------------------------------------
@@ -73,7 +74,7 @@ public:
   /** IDs for the GUI */
   enum VIEW_WIDGET_ID
   {
-    ID_FIRST = Superclass::ID_LAST,
+    ID_DEFAULT_CHILD_VIEW = Superclass::ID_LAST,
     ID_LAST
   };
 
@@ -82,8 +83,17 @@ public:
 
   void SetMouse(mmdMouse *mouse);
 
-  virtual mafSceneGraph *GetSceneGraph(); 
+  virtual mafSceneGraph *GetSceneGraph();
   virtual mafRWIBase    *GetRWI();
+
+  /** return the current pipe for the specified vme (if any exist at this moment) */
+  virtual mafPipe*  GetNodePipe(mafNode *vme);
+
+  /** Return the gui for the visual pipe corresponding to the default child view. */
+  virtual mmgGui *GetNodePipeGUI(mafNode *vme);
+
+  /** Return the gui for the visual pipe corresponding to the n-th child view. */
+  virtual mmgGui *GetNodePipeGUI(mafNode *vme, int view_idx);
 
 protected:
   /**
@@ -97,7 +107,10 @@ protected:
 
   int m_ViewRowNum; ///< number of rows to divide the compound view
   int m_ViewColNum; ///< number of cols to divide the compound view
-  int m_NumOfPluggedChildren; ///< number of children view
+  int m_NumOfPluggedChildren; ///< number of plugged children view
+  int m_NumOfChildView; ///< number of child view (is equal or greater then m_NumOfPluggedChildren)
+
+  int m_DefauldChildView;
 
   wxSize m_Size; ///< size of the compound view
 
