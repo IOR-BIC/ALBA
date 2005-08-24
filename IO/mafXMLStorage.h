@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:03:23 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-08-24 16:09:48 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -36,7 +36,7 @@ class mafXMLStorage: public mafStorage
 public:
   mafTypeMacro(mafXMLStorage,mafStorage);
   
-  enum XML_IO_ERRORS {IO_XML_PARSE_ERROR=IO_LAST_ERROR,IO_DOM_XML_ERROR,IO_RESTORE_ERROR,IO_WRONG_FILE_VERSION,IO_WRONG_URL,IO_XML_PARSER_INTRNAL_ERROR};
+  enum XML_IO_ERRORS {IO_XML_PARSE_ERROR=IO_LAST_ERROR,IO_DOM_XML_ERROR,IO_RESTORE_ERROR,IO_WRONG_FILE_TYPE,IO_WRONG_FILE_VERSION,IO_WRONG_URL,IO_XML_PARSER_INTERNAL_ERROR};
 
   mafXMLStorage();
   virtual ~mafXMLStorage();

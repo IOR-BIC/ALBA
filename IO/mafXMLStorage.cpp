@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 15:45:36 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-08-24 16:09:47 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -516,23 +516,31 @@ int mafXMLStorage::InternalRestore()
           assert(root);
           m_DocumentElement = new mafXMLElement(new mmuXMLDOMElement(root),NULL,this);
 
-          mafString doc_version;
-          if (m_DocumentElement->GetAttribute("Version",doc_version))
+          if (m_FileType == m_DocumentElement->GetName())
           {
-            double doc_version_f=atof(doc_version);
-            double my_version_f=atof(m_Version);
+            mafString doc_version;
+            if (m_DocumentElement->GetAttribute("Version",doc_version))
+            {
+              double doc_version_f=atof(doc_version);
+              double my_version_f=atof(m_Version);
             
-            if (my_version_f<=doc_version_f)
-            {
-              // Start tree restoring from root node
-              if (m_Document->Restore(m_DocumentElement)!=MAF_OK)
-                errorCode=IO_RESTORE_ERROR;
+              if (my_version_f<=doc_version_f)
+              {
+                // Start tree restoring from root node
+                if (m_Document->Restore(m_DocumentElement)!=MAF_OK)
+                  errorCode=IO_RESTORE_ERROR;
+              }
+              else
+              {
+                mafErrorMacro("XML parsing error: wrong file version v"<<doc_version.GetCStr()<<", should be > v"<<m_Version.GetCStr());
+                errorCode=IO_WRONG_FILE_VERSION;
+              }
             }
-            else
-            {
-              mafErrorMacro("XML parsing error: wrong file version v"<<doc_version.GetCStr()<<", should be > v"<<m_Version.GetCStr());
-              errorCode=IO_WRONG_FILE_VERSION;
-            }
+          }
+          else
+          {
+            mafErrorMacro("XML parsing error: wrong file type, expected \""<<m_FileType<<"\", found "<<m_DocumentElement->GetName());
+            errorCode=IO_WRONG_FILE_TYPE;
           }
           
 
@@ -589,7 +597,7 @@ int mafXMLStorage::InternalRestore()
   {
     // parser allocation error
     mafErrorMessage("Failed to allocate XML parser");
-    errorCode = IO_XML_PARSER_INTRNAL_ERROR;
+    errorCode = IO_XML_PARSER_INTERNAL_ERROR;
   }
 
   // terminate the XML library
