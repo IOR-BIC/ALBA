@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-21 12:00:48 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-08-24 16:13:31 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -339,12 +339,19 @@ void mafAvatar3D::TrackerToWorld(mafMatrix &tracker_pose,mafMatrix &world_pose,i
     mafTransform::SetOrientation(world_pose,rot);
   }
 
-  if (use_scale)
+  if (use_scale==TRACKER_TO_WORLD_SCALE)
   {
     // Then apply the scale factor
     double scale[3];
     //mafTransform::GetScale(GetCanonicalToWorldTransform()->GetMatrix(),scale);
     mafTransform::GetScale(scaled_world_pose,scale);
+    mafTransform::Scale(world_pose,scale[0],scale[1],scale[2],PRE_MULTIPLY);
+  }
+  else if (use_scale==CANONICAL_TO_WORLD_SCALE)
+  {
+    // ignore the tracker to canonical scaling: used to scale objects from normalized to world scale (e.g. for avatar)
+    double scale[3];
+    mafTransform::GetScale(GetCanonicalToWorldTransform()->GetMatrix(),scale);
     mafTransform::Scale(world_pose,scale[0],scale[1],scale[2],PRE_MULTIPLY);
   }
 
@@ -540,12 +547,7 @@ void mafAvatar3D::OnMove3DEvent(mafEventInteraction *e)
 
   assert(tracker_pose);
 
-  TrackerToWorld(*tracker_pose,world_pose);
-
-  double scale[3];
-  mafTransform::GetScale(m_CanonicalToWorldTransform->GetMatrix(),scale);
-  
-  mafTransform::Scale(world_pose,scale[0],scale[1],scale[2],PRE_MULTIPLY);
+  TrackerToWorld(*tracker_pose,world_pose,CANONICAL_TO_WORLD_SCALE); // do not use scale factor since we don't need tacker to canonical scaling...
 
   SetLastPoseMatrix(world_pose);
 

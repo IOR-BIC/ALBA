@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3D.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 07:57:06 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-08-24 16:13:31 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -70,6 +70,13 @@ public:
     TRACKER_COORDS=0,
     CANONICAL_COORDS,
     WORLD_COORDS,
+  };
+
+  enum 
+  {
+    NO_SCALE=0,
+    TRACKER_TO_WORLD_SCALE,
+    CANONICAL_TO_WORLD_SCALE
   };
 
   mafAbstractTypeMacro(mafAvatar3D,mafAvatar);
