@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 15:49:48 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-08-24 16:14:27 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -160,6 +160,9 @@ mafDevice *mafDeviceManager::GetDevice(const char *name)
 mafDevice *mafDeviceManager::GetDevice(mafID id)
 //------------------------------------------------------------------------------
 {
+  if (id==m_DeviceSet->GetID())
+    return m_DeviceSet;
+  
   return m_DeviceSet->GetDevice(id);
 }
 //------------------------------------------------------------------------------
