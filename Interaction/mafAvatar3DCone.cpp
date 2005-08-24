@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3DCone.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 07:57:07 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-08-24 16:13:54 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -111,7 +111,7 @@ int mafAvatar3DCone::Pick(mafMatrix &tracker_pose)
   {
     // compute pose in the world frame
     mafMatrix world_pose;
-    TrackerToWorld(tracker_pose,world_pose);
+    TrackerToWorld(tracker_pose,world_pose,CANONICAL_TO_WORLD_SCALE);
       
     // here should call the picker Pick() function
 
