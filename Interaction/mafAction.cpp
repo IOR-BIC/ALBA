@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAction.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-21 11:59:35 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-08-24 16:11:54 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -79,6 +79,7 @@ void mafAction::UnBindDevice(mafDevice *device)
     if (it->GetPointer() == device)
     {
       m_Devices.erase(it);
+      return;
     }
   }
 }
