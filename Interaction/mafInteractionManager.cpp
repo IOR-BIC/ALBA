@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-21 12:02:38 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2005-08-24 16:15:15 $
+  Version:   $Revision: 1.20 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -673,6 +673,10 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
             if (!success)
             {
               wxMessageBox("Cannot remove device: I/O manager error");
+            }
+            else
+            {
+              m_StaticEventRouter->UnBindDeviceFromAllActions(m_CurrentDevice);
             }
           }
           return;
