@@ -3,8 +3,8 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: mafAgent.cpp,v $
 Language:  C++
-Date:      $Date: 2005-07-21 12:00:05 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2005-08-24 16:12:41 $
+Version:   $Revision: 1.10 $
 
 =========================================================================*/
 #include "mafAgent.h"
@@ -93,7 +93,11 @@ bool mafAgent::HasObservers(mafID channel)
 //------------------------------------------------------------------------------
 {
   assert(channel>=0);
-  return (m_Channels.size()>channel && m_Channels[channel]!=NULL) ? m_Channels[channel]->HasObservers() : false;
+  for (int i=0;i<m_Channels.size();i++)
+    if (m_Channels[i]->GetChannel() == channel)
+      return m_Channels[i]->HasObservers();
+
+  return false;
 }
 
 //------------------------------------------------------------------------------
@@ -101,10 +105,9 @@ void mafAgent::GetObservers(mafID channel,std::vector<mafObserver *> &olist)
 //------------------------------------------------------------------------------
 {
   olist.clear();
-  if (m_Channels.size()>channel && m_Channels[channel]!=NULL)
-  {
-    m_Channels[channel]->GetObservers(olist);
-  }
+  for (int i=0;i<m_Channels.size();i++)
+    if (m_Channels[i]->GetChannel() == channel)
+      m_Channels[i]->GetObservers(olist);  
 }
 //------------------------------------------------------------------------------
 void mafAgent::AddObserver(mafObserver *listener,mafID channel, int priority)
