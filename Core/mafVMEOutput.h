@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-05 06:05:44 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-08-30 12:52:44 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -157,7 +157,7 @@ public:
   void SetBounds(const mafOBB &bounds);
 
   /** IDs for the GUI */
-  enum 
+  enum VMEOUTPUT_WIDGET_ID
   {
     ID_FIRST = MINID,
     ID_LAST
