@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePointSet.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:45:49 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-08-31 09:14:26 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,9 +29,6 @@
 
 // from mafPipePointSet
 #include "vtkMAFAssembly.h"
-#include "vtkSphereSource.h"
-#include "vtkPolyDataNormals.h"
-#include "vtkExtendedGlyph3D.h"
 #include "vtkOutlineCornerFilter.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkActor.h"
@@ -44,10 +41,8 @@ mafCxxTypeMacro(mafPipePointSet);
 
 //----------------------------------------------------------------------------
 mafPipePointSet::mafPipePointSet()
-:mafPipe()
 //----------------------------------------------------------------------------
 {
-  m_Radius = 1.0;
 }
 //----------------------------------------------------------------------------
 void mafPipePointSet::Create(mafSceneNode *n)
@@ -56,9 +51,6 @@ void mafPipePointSet::Create(mafSceneNode *n)
   Superclass::Create(n);
 
   m_Selected = false;
-
-  int resolution = 15;
-  
   m_Vme->GetOutput()->Update();
 
   assert(m_Vme->GetOutput()->IsMAFType(mafVMEOutputPointSet));
@@ -68,110 +60,68 @@ void mafPipePointSet::Create(mafSceneNode *n)
   vtkPolyData *data = pointset_output->GetPointSetData();
   assert(data);
 
-  // pointset pipeline
-	m_act_s = vtkSphereSource::New();
-	m_act_s->SetRadius(m_Radius);
-	m_act_s->SetThetaResolution(resolution);
-	m_act_s->SetPhiResolution(resolution);
-	m_act_s->Update();
-
-	m_normals = vtkPolyDataNormals::New();
-	m_normals->SetInput(m_act_s->GetOutput());
-	m_normals->Update();
-
-	m_act_g = vtkExtendedGlyph3D::New();
-	m_act_g->SetInput(data);
-	//m_act_g->SetSource(m_act_s->GetOutput());
-	m_act_g->SetSource(m_normals->GetOutput());
-	m_act_g->OrientOff();
-  m_act_g->ScalingOff();
-  m_act_g->ScalarVisibilityOn();
-	m_act_g->Update();
-
-  m_act_m = vtkPolyDataMapper::New();
-	m_act_m->SetInput(m_act_g->GetOutput());
-	m_act_m->ScalarVisibilityOff();
+  m_PointSetMapper = vtkPolyDataMapper::New();
+	m_PointSetMapper->SetInput(data);
+	m_PointSetMapper->ScalarVisibilityOff();
   if(m_Vme->IsAnimated())				
-    m_act_m->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
+    m_PointSetMapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
   else
-    m_act_m->ImmediateModeRenderingOff();
+    m_PointSetMapper->ImmediateModeRenderingOff();
 
-  m_act_a = vtkActor::New();
-	m_act_a->SetProperty(pointset_output->GetMaterial()->m_Prop);
-	m_act_a->GetProperty()->SetInterpolationToGouraud();
-	m_act_a->SetMapper(m_act_m);
+  m_PointSetActor = vtkActor::New();
+	m_PointSetActor->SetProperty(pointset_output->GetMaterial()->m_Prop);
+	m_PointSetActor->GetProperty()->SetInterpolationToGouraud();
+	m_PointSetActor->SetMapper(m_PointSetMapper);
 
-  m_AssemblyFront->AddPart(m_act_a);
+  m_AssemblyFront->AddPart(m_PointSetActor);
 
   // selection hilight
-	m_sel_ocf = vtkOutlineCornerFilter::New();
-	m_sel_ocf->SetInput(m_act_g->GetOutput());  
+	m_OutlineFilter = vtkOutlineCornerFilter::New();
+	m_OutlineFilter->SetInput(data);
 
-	m_sel_m = vtkPolyDataMapper::New();
-	m_sel_m->SetInput(m_sel_ocf->GetOutput());
+	m_OutlineMapper = vtkPolyDataMapper::New();
+	m_OutlineMapper->SetInput(m_OutlineFilter->GetOutput());
 
-	m_sel_p = vtkProperty::New();
-	m_sel_p->SetColor(1,1,1);
-	m_sel_p->SetAmbient(1);
-	m_sel_p->SetRepresentationToWireframe();
-	m_sel_p->SetInterpolationToFlat();
+	m_OutlineProperty = vtkProperty::New();
+	m_OutlineProperty->SetColor(1,1,1);
+	m_OutlineProperty->SetAmbient(1);
+	m_OutlineProperty->SetRepresentationToWireframe();
+	m_OutlineProperty->SetInterpolationToFlat();
 
-	m_sel_a = vtkActor::New();
-	m_sel_a->SetMapper(m_sel_m);
-	m_sel_a->VisibilityOff();
-	m_sel_a->PickableOff();
-	m_sel_a->SetProperty(m_sel_p);
-	m_sel_a->SetScale(1.01,1.01,1.01);
+	m_OutlineActor = vtkActor::New();
+	m_OutlineActor->SetMapper(m_OutlineMapper);
+	m_OutlineActor->VisibilityOff();
+	m_OutlineActor->PickableOff();
+	m_OutlineActor->SetProperty(m_OutlineProperty);
+	m_OutlineActor->SetScale(1.01,1.01,1.01);
 
-  m_AssemblyFront->AddPart(m_sel_a);
+  m_AssemblyFront->AddPart(m_OutlineActor);
 }
 //----------------------------------------------------------------------------
 mafPipePointSet::~mafPipePointSet()
 //----------------------------------------------------------------------------
 {
-  m_AssemblyFront->RemovePart(m_act_a);
-  m_AssemblyFront->RemovePart(m_sel_a);
+  m_AssemblyFront->RemovePart(m_PointSetActor);
+  m_AssemblyFront->RemovePart(m_OutlineActor);
 
-  vtkDEL(m_act_s);
-	vtkDEL(m_normals);
-  vtkDEL(m_act_g);
-  vtkDEL(m_act_m);
-  vtkDEL(m_act_a);
+  vtkDEL(m_PointSetMapper);
+  vtkDEL(m_PointSetActor);
 
-  vtkDEL(m_sel_ocf);
-  vtkDEL(m_sel_m);
-  vtkDEL(m_sel_p);
-  vtkDEL(m_sel_a);
+  vtkDEL(m_OutlineFilter);
+  vtkDEL(m_OutlineMapper);
+  vtkDEL(m_OutlineProperty);
+  vtkDEL(m_OutlineActor);
 }
 //----------------------------------------------------------------------------
 void mafPipePointSet::Select(bool sel)
 //----------------------------------------------------------------------------
 {
 	m_Selected = sel;
-	if(m_act_a->GetVisibility()) 
-    m_sel_a->SetVisibility(sel);
+	if(m_PointSetActor->GetVisibility()) 
+    m_OutlineActor->SetVisibility(sel);
 }
 //----------------------------------------------------------------------------
 void mafPipePointSet::UpdateProperty(bool fromTag)
 //----------------------------------------------------------------------------
 {
-/*	double r = 10;
-  double resolution = 15;
-
-  if(m_Cloud)
-  {
-    r = m_Cloud->GetRadius();
-    resolution = m_Cloud->GetSphereResolution();
-  }
-	else if(m_Landmark)
-  {
-    r = m_Landmark->GetRadius();
-    resolution = ((mafVMELandmarkCloud *)m_Landmark->GetParent())->GetSphereResolution();
-  }
-
-	m_act_s->SetRadius(r);
-	m_act_s->SetThetaResolution(resolution);
-	m_act_s->SetPhiResolution(resolution);
-	m_act_s->Update();
-	m_act_g->Update();*/
 }
