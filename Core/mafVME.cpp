@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-30 16:25:42 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2005-08-31 09:08:01 $
+  Version:   $Revision: 1.30 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -767,6 +767,10 @@ void mafVME::OnEvent(mafEventBase *maf_event)
       default:
         Superclass::OnEvent(maf_event);
     }
+  }
+  else if (maf_event->GetChannel() == MCH_NODE)
+  {
+    Superclass::OnEvent(maf_event);
   }
 }
 
