@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-08-31 09:10:14 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2005-08-31 15:13:05 $
+  Version:   $Revision: 1.30 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -267,12 +267,12 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
-    if(e->GetId()!= UPDATE_UI)
+/*    if(e->GetId()!= UPDATE_UI)
     {
       e->Log(); // for debugging purpose
       int foo=0;
     }
-
+*/
     switch(e->GetId())
     {
       // ###############################################################
