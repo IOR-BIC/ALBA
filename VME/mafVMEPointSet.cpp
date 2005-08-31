@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPointSet.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-15 15:21:43 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-08-31 15:10:07 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,7 +23,9 @@
 #include "mafDataVector.h"
 #include "mafVMEOutputPointSet.h"
 #include "mafDataPipe.h"
+#include "mmaMaterial.h"
 #include "mafVMEItemVTK.h"
+
 #include "vtkMAFSmartPointer.h"
 
 #include "vtkPolyData.h"
@@ -45,6 +47,21 @@ mafVMEPointSet::~mafVMEPointSet()
 //-------------------------------------------------------------------------
 {
 }
+//-------------------------------------------------------------------------
+int mafVMEPointSet::InternalInitialize()
+//-------------------------------------------------------------------------
+{
+  if (Superclass::InternalInitialize()==MAF_OK)
+  {
+    // force material allocation
+    GetMaterial();
+
+    return MAF_OK;
+  }
+
+  return MAF_ERROR;
+}
+
 //-------------------------------------------------------------------------
 int mafVMEPointSet::GetNumberOfPoints(mafTimeStamp t)
 //-------------------------------------------------------------------------
@@ -402,4 +419,20 @@ int mafVMEPointSet::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
 
   mafErrorMacro("Trying to set the wrong type of fata inside a VME Image :"<< (data?data->GetClassName():"NULL"));
   return MAF_ERROR;
+}
+//-------------------------------------------------------------------------
+mmaMaterial *mafVMEPointSet::GetMaterial()
+//-------------------------------------------------------------------------
+{
+  mmaMaterial *material = (mmaMaterial *)GetAttribute("MaterialAttributes");
+  if (material == NULL)
+  {
+    material = mmaMaterial::New();
+    SetAttribute("MaterialAttributes", material);
+    if (m_Output)
+    {
+      ((mafVMEOutputPointSet *)m_Output)->SetMaterial(material);
+    }
+  }
+  return material;
 }

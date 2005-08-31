@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPointSet.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-15 15:21:43 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-08-31 15:10:07 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,6 +23,7 @@
 //----------------------------------------------------------------------------
 class vtkPolyData;
 class mafVMEOutputPointSet;
+class mmaMaterial;
 
 /** mafVMEPointSet - this class stores a set of points as a VME
 mafVMEPointSet is a concrete VME object storing a cloud of Points whose
@@ -87,12 +88,18 @@ public:
   create points in (0,0,0) if necessary, or remove points... */
   virtual void SetNumberOfPoints(int num,mafTimeStamp t=-1);
 
+  /** Return pointer to material attribute. */
+  mmaMaterial *GetMaterial();
+
   /** return icon */
   static char** GetIcon();
 
 protected:
   mafVMEPointSet();
   virtual ~mafVMEPointSet();
+
+  /** used to initialize and create the material attribute if not yet present */
+  virtual int InternalInitialize();
 
   /**
   return the polydata of the VME-item at the given time frame. Return NULL if 
