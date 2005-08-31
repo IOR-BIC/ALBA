@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpSelect.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 09:45:28 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-08-31 15:12:47 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,7 +22,7 @@
 
 #include "mafOpSelect.h"
 #include "mafNode.h"
-#include "mafNodeRoot.h"
+#include "mafVMERoot.h"
 #include "mafString.h"
 #include "vtkMatrix4x4.h"
 #include "vtkMath.h"
@@ -142,7 +142,7 @@ mafOp* mafOpCut::Copy()
 //----------------------------------------------------------------------------
 bool mafOpCut::Accept(mafNode* vme)
 {
-  return ((vme!=NULL) && (!vme->IsA("mafNodeRoot")));
+  return ((vme!=NULL) && (!vme->IsMAFType(mafVMERoot)));
 }
 //----------------------------------------------------------------------------
 void mafOpCut::OpDo()
@@ -198,7 +198,7 @@ mafOp* mafOpCopy::Copy()
 //----------------------------------------------------------------------------
 bool mafOpCopy::Accept(mafNode* vme)
 {
-  return ((vme!=NULL) && (!vme->IsA("mafNodeRoot")));
+  return ((vme!=NULL) && (!vme->IsMAFType(mafVMERoot)));
 }
 //----------------------------------------------------------------------------
 void mafOpCopy::OpDo()
