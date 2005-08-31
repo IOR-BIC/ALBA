@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataPipeCustom.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-05 15:29:47 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-08-31 15:09:12 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -97,4 +97,18 @@ void mafDataPipeCustom::OnEvent(mafEventBase *e)
   }
 */
   Superclass::OnEvent(e); // this also forwards the event to parent class
+}
+
+//------------------------------------------------------------------------------
+void mafDataPipeCustom::SetInput(vtkDataSet *input_dataset)
+//------------------------------------------------------------------------------
+{
+  SetNthInput(0,input_dataset);
+}
+
+//------------------------------------------------------------------------------
+void mafDataPipeCustom::SetNthInput(int n, vtkDataSet *input_dataset)
+//------------------------------------------------------------------------------
+{
+  GetVTKDataPipe()->SetNthInput(n,input_dataset);
 }
