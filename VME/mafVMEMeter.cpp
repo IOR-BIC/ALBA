@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:49:13 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-08-31 09:14:49 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -86,8 +86,7 @@ mafVMEMeter::mafVMEMeter()
 mafVMEMeter::~mafVMEMeter()
 //-------------------------------------------------------------------------
 {
-  delete m_VMEAccept;
-  m_VMEAccept = NULL;
+  cppDEL(m_VMEAccept);
   mafDEL(m_MeterAttributes);
   mafDEL(m_Transform);
   vtkDEL(m_LineSource);
