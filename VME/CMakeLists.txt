@@ -90,6 +90,8 @@ IF (MAF_USE_VTK)
   mafVMEPointSet.h
   mafVMEPolyline.cpp
   mafVMEPolyline.h
+  mafVMEProber.cpp
+  mafVMEProber.h
   mafVMESlicer.cpp
   mafVMESlicer.h
   mafVMESurface.cpp
