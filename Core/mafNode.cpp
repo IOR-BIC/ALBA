@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 14:00:06 $
-  Version:   $Revision: 1.37 $
+  Date:      $Date: 2005-08-31 09:06:50 $
+  Version:   $Revision: 1.38 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -811,9 +811,9 @@ void mafNode::RemoveAllLinks()
 {
   for (mafLinksMap::iterator it=m_Links.begin();it!=m_Links.end();it++)
   {
-    assert(it->second.m_Node);
     // detach as observer from the linked node
-    it->second.m_Node->GetEventSource()->RemoveObserver(this);
+    if(it->second.m_Node)
+      it->second.m_Node->GetEventSource()->RemoveObserver(this);
   }
   m_Links.clear();
   Modified();
