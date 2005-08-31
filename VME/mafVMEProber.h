@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEProber.h,v $
   Language:  C++
-  Date:      $Date: 2005-08-31 09:13:39 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-08-31 15:11:59 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -46,6 +46,8 @@ public:
   {
     ID_VOLUME_LINK = Superclass::ID_LAST,
     ID_SURFACE_LINK,
+    ID_MODALITY,
+    ID_DISTANCE_TYPE,
     ID_LAST
   };
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-08-31 09:13:39 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-08-31 15:11:58 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -32,9 +32,11 @@
 #include "mafMatrix.h"
 #include "mafAbsMatrixPipe.h"
 
+#include "vtkMAFSmartPointer.h"
 #include "vtkMAFDataPipe.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataNormals.h"
+#include "vtkTransformPolyDataFilter.h"
 #include "vtkDistanceFilter.h"
 
 //-------------------------------------------------------------------------
@@ -68,7 +70,12 @@ mafVMEProber::mafVMEProber()
   // attach a data pipe which creates a bridge between VTK and MAF
   mafDataPipeCustom *dpipe = mafDataPipeCustom::New();
   dpipe->SetDependOnAbsPose(true);
-//  dpipe->GetVTKDataPipe()->SetNthInput(0,m_Prober->GetOutput());
+  
+  vtkMAFSmartPointer<vtkTransformPolyDataFilter> back_trans;
+  back_trans->SetInput((vtkPolyData *)m_Prober->GetOutput());
+  back_trans->SetTransform(GetOutput()->GetTransform()->GetVTKTransform()->GetInverse());
+
+  dpipe->SetInput(back_trans->GetOutput());
   SetDataPipe(dpipe);
 }
 
@@ -182,6 +189,14 @@ int mafVMEProber::DeepCopy(mafNode *a)
       this->SetLink("Surface", linked_node);
     }
     m_Transform->SetMatrix(prober->m_Transform->GetMatrix());
+    m_ProberMode      = prober->m_ProberMode;
+    m_DistThreshold   = prober->m_DistThreshold;
+    m_MaxDistance     = prober->m_MaxDistance;
+    m_DistanceModeType= prober->m_DistanceModeType;
+    m_HighDensity     = prober->m_HighDensity;
+    m_LowDensity      = prober->m_LowDensity;
+    m_VolumeName      = prober->m_VolumeName;
+    m_SurfaceName     = prober->m_SurfaceName;
     return MAF_OK;
   }  
   return MAF_ERROR;
@@ -195,7 +210,15 @@ bool mafVMEProber::Equals(mafVME *vme)
   {
     ret = m_Transform->GetMatrix() == ((mafVMEProber *)vme)->m_Transform->GetMatrix() && \
       GetLink("Volume") == ((mafVMEProber *)vme)->GetLink("Volume") && \
-      GetLink("Surface") == ((mafVMEProber *)vme)->GetLink("Surface");
+      GetLink("Surface")== ((mafVMEProber *)vme)->GetLink("Surface") && \
+      m_ProberMode      == ((mafVMEProber *)vme)->m_ProberMode && \
+      m_DistThreshold   == ((mafVMEProber *)vme)->m_DistThreshold && \
+      m_MaxDistance     == ((mafVMEProber *)vme)->m_MaxDistance && \
+      m_DistanceModeType== ((mafVMEProber *)vme)->m_DistanceModeType && \
+      m_HighDensity     == ((mafVMEProber *)vme)->m_HighDensity && \
+      m_LowDensity      == ((mafVMEProber *)vme)->m_LowDensity && \
+      m_VolumeName      == ((mafVMEProber *)vme)->m_VolumeName && \
+      m_SurfaceName     == ((mafVMEProber *)vme)->m_SurfaceName;
   }
   return ret;
 }
@@ -410,6 +433,10 @@ mmgGui* mafVMEProber::CreateGui()
   m_SurfaceName = surf ? surf->GetName() : "none";
   m_Gui->Button(ID_SURFACE_LINK,&m_SurfaceName,"Surface", "Select the polydata to probe the volume");
 
+  m_ProberMode = GetMode();
+  wxString prober_mode[2] = {"density", "distance"};
+  m_Gui->Combo(ID_MODALITY,"modality", &m_ProberMode, 2, prober_mode);
+
   return m_Gui;
 }
 //-------------------------------------------------------------------------
@@ -433,10 +460,6 @@ void mafVMEProber::OnEvent(mafEventBase *maf_event)
         {
           SetVolumeLink(n);
           m_VolumeName = n->GetName();
-          if(GetSurfaceLink())
-          {
-            ((mafDataPipeCustom *)GetDataPipe())->GetVTKDataPipe()->SetNthInput(0,m_Prober->GetOutput());
-          }
           m_Gui->Update();
         }
       }
@@ -453,13 +476,12 @@ void mafVMEProber::OnEvent(mafEventBase *maf_event)
         {
           SetSurfaceLink(n);
           m_SurfaceName = n->GetName();
-          if(GetVolumeLink())
-          {
-            ((mafDataPipeCustom *)GetDataPipe())->GetVTKDataPipe()->SetNthInput(0,m_Prober->GetOutput());
-          }
           m_Gui->Update();
         }
       }
+      break;
+      case ID_MODALITY:
+        SetMode(m_ProberMode);
       break;
       default:
       mafNode::OnEvent(maf_event);
