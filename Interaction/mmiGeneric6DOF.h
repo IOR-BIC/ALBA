@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGeneric6DOF.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-21 07:55:51 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-08-31 09:09:03 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -43,7 +43,7 @@ public:
     is applied to it.
     Default is false. */
   void SetDifferentialMoving(bool flag) {m_DifferentialMoving=flag;}
-  bool GetDifferentialMoving() {return m_DifferentialMoving;} ///< @sa SetDifferentialMoving()
+  bool GetDifferentialMoving() {return m_DifferentialMoving != 0;} ///< @sa SetDifferentialMoving()
   void DifferentialMovingOn() {SetDifferentialMoving(true);} ///< @sa SetDifferentialMoving()
   void DifferentialMovingOff() {SetDifferentialMoving(false);} ///< @sa SetDifferentialMoving()
 
