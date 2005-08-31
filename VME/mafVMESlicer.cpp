@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 12:34:12 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-08-31 09:15:32 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,6 +33,8 @@
 #include "vtkImageData.h"
 #include "vtkPolyData.h"
 #include "vtkVolumeSlicer.h"
+#include "vtkTransformPolyDataFilter.h"
+#include "vtkLinearTransform.h"
 
 #include <assert.h>
 
@@ -77,7 +79,11 @@ mafVMESlicer::mafVMESlicer()
   m_PSlicer->SetTexture(image);
   m_ISlicer->SetOutput(image);
   
-  dpipe->GetVTKDataPipe()->SetNthInput(0,slice);
+  vtkMAFSmartPointer<vtkTransformPolyDataFilter> back_trans;
+  back_trans->SetInput(slice);
+  back_trans->SetTransform(GetOutput()->GetTransform()->GetVTKTransform()->GetInverse());
+
+  dpipe->GetVTKDataPipe()->SetNthInput(0,back_trans->GetOutput());
   dpipe->GetVTKDataPipe()->SetNthInput(1,image);
 
   // set the texture in the output, must do it here, after setting slicer filter's input
