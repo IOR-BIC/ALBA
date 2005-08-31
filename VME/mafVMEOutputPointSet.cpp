@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputPointSet.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:50:33 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-08-31 12:40:59 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -39,6 +39,7 @@ mafVMEOutputPointSet::mafVMEOutputPointSet()
 //-------------------------------------------------------------------------
 {
   m_NumPoints = "0";
+  m_Material = NULL;
 }
 
 //-------------------------------------------------------------------------
