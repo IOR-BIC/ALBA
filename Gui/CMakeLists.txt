@@ -14,6 +14,8 @@ mafPics.cpp
 mafPics.h
 mafSideBar.cpp
 mafSideBar.h
+mafVTKLog.cpp
+mafVTKLog.h
 mafWXLog.cpp
 mafWXLog.h
 mmgButton.cpp

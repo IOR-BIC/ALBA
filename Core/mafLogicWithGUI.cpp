@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:42:25 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-08-31 09:10:50 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,7 +22,7 @@
 
 #include "mafLogicWithGUI.h"
 #include "wx/utils.h"
-#include "wx/time.h"
+#include "wx/datetime.h"
 #include "wx/busyinfo.h"
 #include "mafDecl.h"
 #include "mafView.h"
@@ -37,6 +37,8 @@
 #include "mmgTimeBar.h"
 #include "mafWXLog.h"
 #include "mafPics.h"
+#include "mafVTKLog.h"
+
 //----------------------------------------------------------------------------
 mafLogicWithGUI::mafLogicWithGUI()
 //----------------------------------------------------------------------------
@@ -52,6 +54,7 @@ mafLogicWithGUI::mafLogicWithGUI()
 	m_LogToFile			= false;
 	m_LogAllEvents	= false;
 	m_Logger				= NULL;
+  m_VtkLog        = NULL;
 
 	m_AppTitle      = "";
 
@@ -60,7 +63,6 @@ mafLogicWithGUI::mafLogicWithGUI()
 	m_PlugSidebar	  = true;
 	m_PlugTimebar	  = true;
 	m_PlugLogbar	  = true;
-
 }
 //----------------------------------------------------------------------------
 mafLogicWithGUI::~mafLogicWithGUI( ) 
@@ -104,6 +106,8 @@ void mafLogicWithGUI::CreateMenu()
 void mafLogicWithGUI::CreateNullLog()
 //----------------------------------------------------------------------------
 {
+  m_VtkLog = mafVTKLog::New();
+  m_VtkLog->SetInstance(m_VtkLog);
   wxTextCtrl *log  = new wxTextCtrl( m_Win, -1, "", wxPoint(0,0), wxSize(100,300), wxNO_BORDER | wxTE_MULTILINE );
 	m_Logger = new mafWXLog(log);
 	log->Show(false);
@@ -175,16 +179,33 @@ void mafLogicWithGUI::OnQuit()
 
   cppDEL(m_SideSash); //must be after deleting the vme_manager
   if(m_PlugLogbar) delete wxLog::SetActiveTarget(NULL); 
+  vtkDEL(m_VtkLog);
   m_Win->Destroy();
 }
 //----------------------------------------------------------------------------
 void mafLogicWithGUI::CreateLogbar()
 //----------------------------------------------------------------------------
 {
+  m_VtkLog = mafVTKLog::New();
+  m_VtkLog->SetInstance(m_VtkLog);
+
   wxTextCtrl *log  = new wxTextCtrl( m_Win, -1, "", wxPoint(0,0), wxSize(100,300), wxNO_BORDER | wxTE_MULTILINE );
   mafWXLog *m_Logger = new mafWXLog(log);
+  wxString s = mafGetApplicationDirectory().c_str();
+  wxDateTime *log_time = new wxDateTime();
+  s += "\\";
+  s += m_AppTitle.GetCStr();
+//  s += wxString::Format("_%02d_%02d_%d_%02d_%2d",log_time->GetDay(),log_time->GetMonth() + 1,log_time->GetYear(),log_time->GetHour(),log_time->GetMinute());
+  s += ".log";
+  if(m_LogToFile)
+  {
+    m_Logger->SetFileName(s);
+    m_Logger->LogToFile(m_LogToFile);
+  }
+
   wxLog *old_log = wxLog::SetActiveTarget( m_Logger );
   cppDEL(old_log);
+  cppDEL(log_time);
 
   mmgNamedPanel *log_panel = new mmgNamedPanel(m_Win,-1,true);
   log_panel->SetTitle(" Log Area:");

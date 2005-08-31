@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:42:25 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-08-31 09:10:50 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,6 +28,7 @@ class mmgSashPanel;
 class mmgNamedPanel;
 class mmgTimeBar;
 class mafWXLog;
+class mafVTKLog;
 class mafSideBar;
 //----------------------------------------------------------------------------
 // mafLogicWithGUI :
@@ -75,7 +76,7 @@ public:
   /** Configure */
   virtual void Configure();
 
-  /** Main initalization.*/
+  /** Main initialisation.*/
   virtual void Init(int argc, char **argv) {};
 	/** Returns the pointer to the main panel of the application.*/
 	virtual mmgMDIFrame *GetTopWin()						{return m_Win;};
@@ -134,6 +135,7 @@ protected:
 	bool               m_LogToFile;
 	bool               m_LogAllEvents;
   mafWXLog          *m_Logger;
+  mafVTKLog         *m_VtkLog;
 
 	bool m_PlugMenu;
 	bool m_PlugToolbar;
@@ -142,5 +144,3 @@ protected:
 	bool m_PlugLogbar;
 };
 #endif
-
-
