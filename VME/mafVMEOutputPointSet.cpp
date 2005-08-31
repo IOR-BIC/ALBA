@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputPointSet.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-08-31 12:40:59 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-08-31 15:10:46 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -86,6 +86,6 @@ mmgGui* mafVMEOutputPointSet::CreateGui()
     int num = GetPointSetData()->GetNumberOfVerts();
     m_NumPoints = num;
   }
-  m_Gui->Label("points: ", m_NumPoints, true);
+  m_Gui->Label("points: ", &m_NumPoints, true);
   return m_Gui;
 }
