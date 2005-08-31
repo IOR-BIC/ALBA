@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:42:05 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2005-08-31 09:10:14 $
+  Version:   $Revision: 1.29 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -517,7 +517,11 @@ void mafLogicWithManagers::OnFileSaveAs()
 void mafLogicWithManagers::OnQuit()
 //----------------------------------------------------------------------------
 {
-  /*
+  if (m_OpManager && m_OpManager->Running())
+  {
+    return;
+  }
+
   if(m_VMEManager)
   {
     bool quit = false;
@@ -529,17 +533,19 @@ void mafLogicWithManagers::OnQuit()
           "Confirm", 
           wxYES_NO|wxCANCEL|wxICON_QUESTION , m_Win
           );
-      if(answer == wxYES) m_VMEManager->MSFSave();
+      if(answer == wxYES) 
+        m_VMEManager->MSFSave();
       quit = answer != wxCANCEL;
     }
     else 
     {
-    int answer = wxMessageBox("quit program?", "Confirm", wxYES_NO | wxICON_QUESTION , m_Win);
-    quit = answer == wxYES;
+      int answer = wxMessageBox("quit program?", "Confirm", wxYES_NO | wxICON_QUESTION , m_Win);
+      quit = answer == wxYES;
     }
-    if(!quit) return;
+    if(!quit) 
+      return;
   }
-  */
+  
   mmgMDIChild::OnQuit(); 
 
   cppDEL(m_MaterialChooser);
