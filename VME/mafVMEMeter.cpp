@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-08-31 09:14:49 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2005-08-31 15:09:44 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -80,7 +80,7 @@ mafVMEMeter::mafVMEMeter()
   dpipe->SetDependOnAbsPose(true);
   SetDataPipe(dpipe);
   
-  dpipe->GetVTKDataPipe()->SetNthInput(0,m_LineSource->GetOutput());
+  dpipe->SetInput(m_LineSource->GetOutput());
 }
 //-------------------------------------------------------------------------
 mafVMEMeter::~mafVMEMeter()
