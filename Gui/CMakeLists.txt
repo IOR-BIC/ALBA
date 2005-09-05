@@ -24,6 +24,8 @@ mmgCheckListBox.cpp
 mmgCheckListBox.h
 mmgCheckTree.cpp
 mmgCheckTree.h
+mmgContextualMenu.cpp
+mmgContextualMenu.h
 mmgCrossSplitter.cpp
 mmgCrossSplitter.h
 mmgDialog.cpp
