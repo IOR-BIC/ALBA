@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 16:10:45 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2005-09-05 14:04:31 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -678,19 +678,27 @@ void mafString::SetPathName(mafString *str)
 const char *mafString::BaseName(const char *filename)
 //----------------------------------------------------------------------------
 {
-if (filename==NULL)
-  return NULL;
+  if (filename==NULL)
+    return NULL;
 
-  char *ptr=strrchr(filename,'/');
-
-  return (ptr==NULL?filename:ptr+1);
+  //char *ptr=strrchr(filename,'/');
+  wxString path,name,ext;
+  wxSplitPath(filename,&path,&name,&ext);
+  name = name + "." + ext;
+  return name.c_str();
+  //return (ptr==NULL?filename:ptr+1);
 }
 
 //----------------------------------------------------------------------------
 void mafString::ExtractPathName()
 //----------------------------------------------------------------------------
 {
-  int idx=FindLastChr('/');
+  wxString path, s;
+  s = GetCStr();
+  path = wxPathOnly(s);
+  Set(path.c_str());
+
+/*  int idx=FindLastChr('/');
 
   if (idx>=0)
   { 
@@ -699,7 +707,7 @@ void mafString::ExtractPathName()
   else
   {
     Set("");
-  }
+  }*/
 }
 
 //----------------------------------------------------------------------------
