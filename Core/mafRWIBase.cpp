@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 10:21:56 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-09-05 13:40:51 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,6 +44,7 @@
 #include "mafEventInteraction.h"
 #include "mafEvent.h"
 
+#include "vtkMAFSmartPointer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkCamera.h"
@@ -53,7 +54,7 @@
 #include "vtkMatrix4x4.h"
 #include "vtkRendererCollection.h"
 #include "vtkLight.h"
-//#include "vtkWindowToImageFilter.h"
+#include "vtkWindowToImageFilter.h"
 #include "vtkBMPWriter.h"
 #include "vtkImageData.h"
 
@@ -538,10 +539,9 @@ void mafRWIBase::OnSize(wxSizeEvent &event)
 wxBitmap *mafRWIBase::GetImage()
 //----------------------------------------------------------------------------
 {
-/* @@@
 	int dim[3];
 
-	vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
+	vtkMAFSmartPointer<vtkWindowToImageFilter> w2i;
 	w2i->SetInput(GetRenderWindow());
 	w2i->Update();
 	w2i->GetOutput()->GetDimensions(dim);
@@ -549,46 +549,35 @@ wxBitmap *mafRWIBase::GetImage()
 	wxImage  *img = new wxImage(dim[0],dim[1],data,TRUE);
 	wxBitmap *bmp = new wxBitmap(img->ConvertToBitmap());
   delete img;
-  w2i->Delete();
 	return bmp;
-	*/
-return NULL;
 }
 //----------------------------------------------------------------------------
 void mafRWIBase::SaveImage(wxString view_name, int magnification)
 //---------------------------------------------------------------------------
 {
-/* @@@
 	wxString wildc = "Bitmap Image (*.bmp)|*.bmp";
   wxString name = wxString::Format("%s\\%sSnapshot", m_SaveDir.c_str(),view_name.c_str());
 	wxString file = name + ".bmp";
   int i=1;
-  while(::wxFileExists(file) && i<100 ) file = wxString::Format("%s%d.bmp",name.c_str(), i++);
+  while(::wxFileExists(file) && i<100 ) 
+    file = wxString::Format("%s%d.bmp",name.c_str(), i++);
 	
 	wxString filename = mafGetSaveFile(file,wildc).c_str(); 
-	if(filename == "") return;
+	if(filename == "") 
+    return;
 
-  wxString foo1,foo2;
-  wxSplitPath(filename.c_str(),&m_SaveDir,&foo1,&foo2);  // remember save folder
-		
 	::wxBeginBusyCursor();
 
-	vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
+	vtkMAFSmartPointer<vtkWindowToImageFilter> w2i;
 	w2i->SetInput(GetRenderWindow());
   w2i->SetMagnification(magnification);
 	w2i->Update();
   
-//wxBusyInfo wait("writing file...");
-  
-	vtkBMPWriter *w = vtkBMPWriter::New();
-//  mafProgressMacro(w,"writing image file"); 
+	vtkMAFSmartPointer<vtkBMPWriter> w;
   w->SetInput(w2i->GetOutput());
   w->SetFileName(filename);
 	w->Write();
-	w2i->Delete();
-	w->Delete();
 	::wxEndBusyCursor();
-@@@ */
 }
 //----------------------------------------------------------------------------
 vtkCamera* mafRWIBase::GetCamera()
