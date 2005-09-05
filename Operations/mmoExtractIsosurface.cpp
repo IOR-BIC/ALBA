@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoExtractIsosurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 14:32:28 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-09-05 10:54:18 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -137,7 +137,7 @@ void mmoExtractIsosurface::OpDo()
 //----------------------------------------------------------------------------
 {
   m_IsosurfaceVme->ReparentTo(m_Input);
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+  mafEventMacro(mafEvent(this,VME_ADD,m_IsosurfaceVme));
 }
 //----------------------------------------------------------------------------
 void mmoExtractIsosurface::OpUndo()
@@ -145,7 +145,6 @@ void mmoExtractIsosurface::OpUndo()
 {
   assert(m_IsosurfaceVme);
   mafEventMacro(mafEvent(this,VME_REMOVE,m_IsosurfaceVme));
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
 // widget ID's
@@ -449,7 +448,9 @@ void mmoExtractIsosurface::CreateSlicePipeline()
 void mmoExtractIsosurface::DeleteOpDialog()
 //----------------------------------------------------------------------------
 {
-	m_Rwi->m_RenFront->RemoveActor(m_ContourActor);
+	m_Mouse->RemoveObserver(m_DensityPicker);
+
+  m_Rwi->m_RenFront->RemoveActor(m_ContourActor);
   m_Rwi->m_RenFront->RemoveActor(m_Box);
 
   vtkDEL(m_ContourMapper);
