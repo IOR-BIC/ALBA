@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:43:10 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-09-05 10:52:42 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -58,7 +58,7 @@ public:
 	//@@@ virtual void					VmeShowByType			(mafNodeBaseTypes type,bool show);
 
 	/** Show all the vme subtree. */
-	//@@@ virtual void					VmeShowSubTree		(mafNode *vme,					bool show);
+	virtual void					VmeShowSubTree		(mafNode *vme,					bool show);
 
 	/** Update the vme's properties. */
 	virtual void					VmeUpdateProperty	(mafNode *vme,					bool fromTag = false);
@@ -102,10 +102,10 @@ protected:
 	mafNode  *m_shown_mutex_vme[NUM_OF_BASETYPE];
 */
 
-	mafSceneNode			*NodeAdd	(mafNode *vme);
-  mafObserver	*m_Listener;
-	mmgGui						*m_Gui;
+	mafSceneNode *NodeAdd(mafNode *vme);
 
-	mafNode            *m_SelectedVme;
+  mafObserver	*m_Listener;
+	mmgGui			*m_Gui;
+	mafNode     *m_SelectedVme;
 };
 #endif

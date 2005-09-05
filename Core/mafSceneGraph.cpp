@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-08 13:18:32 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-09-05 10:52:41 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -347,34 +347,28 @@ void mafSceneGraph::VmeShowByType(mafNodeBaseTypes type,	bool show)
 }
 @@@ */
 
-/* @@@
 //----------------------------------------------------------------------------
 // Scan vme subtree and send a VME_SHOW event for each Creatable/non_mutex vme found.
-// Changed behavoir.
+// Changed behavior.
 // Mutex vme may be shown only is no other vme of the same type is currently shown.
 // Mutex vme may always be hidden.
 void mafSceneGraph::VmeShowSubTree(mafNode *vme,  bool show)
 //----------------------------------------------------------------------------
 {
   mafNodeIterator *iter = vme->NewIterator();
-	// attenzione a skippare i Gizmo
-
-	for(mafNode *v=iter->GetFirstNode();v;v=iter->GetNextNode())
+	for(mafNode *v = iter->GetFirstNode(); v; v = iter->GetNextNode())
 	{
     mafSceneNode *n = Vme2Node(v);
-    mafNodeBaseTypes type = mafGetBaseType(v);
-
 		if(n && n->m_PipeCreatable && n->IsVisible() != show )
 		{
 			// Mutex vme may be shown only is no other vme of the same type is currently shown.
-			// Mutex vme may always br hidden.
-			if( !show || m_shown_mutex_vme[type]==NULL)
-					mafEventMacro(mafEvent(this, VME_SHOW, v, show));
+			// Mutex vme may always be hidden.
+			if(!show || !n->m_Mutex)
+        mafEventMacro(mafEvent(this, VME_SHOW, v, show));
 		} 
 	}
 	iter->Delete();
 }
-@@@ */
 
 /* @@@
 //----------------------------------------------------------------------------
