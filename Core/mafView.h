@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-04 16:01:27 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2005-09-05 13:39:56 $
+  Version:   $Revision: 1.20 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -92,8 +92,11 @@ public:
   /** return the current pipe for the specified vme (if any exist at this moment) */
   virtual mafPipe*  GetNodePipe(mafNode *vme) {return NULL;};
 
-  virtual wxString        GetLabel() {return m_Label;};
-  virtual wxString        GetName()  {return m_Name;};
+  wxString  GetLabel() {return m_Label;};
+  wxString  GetName()  {return m_Name;};
+  void      SetLabel(wxString label)  {m_Label = label;};
+  void      SetName(wxString name)    {m_Name = name;};
+
   virtual wxWindow*	      GetWindow(){return m_Win;};
   virtual wxFrame*		    GetFrame() {return m_Frame;};
   virtual mmgGui*		      GetGui()   {if(m_Gui == NULL) CreateGui(); assert(m_Gui); return m_Gui;};
@@ -107,7 +110,7 @@ public:
 
 protected:
   mafObserver   *m_Listener;
-  wxString       m_Label; 
+  wxString       m_Label;
   wxString       m_Name;
   wxWindow			*m_Win;
   wxFrame				*m_Frame;
