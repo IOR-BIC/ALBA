@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-08-31 15:13:05 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2005-09-05 13:41:52 $
+  Version:   $Revision: 1.31 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,6 +23,7 @@
 #include "mafLogicWithManagers.h"
 
 #include "mafView.h"
+#include "mafViewVTK.h"
 #include "mafViewManager.h"
 #include "mafVMEManager.h"
 #include "mafOp.h"
@@ -35,12 +36,14 @@
 #include "mmgMDIFrame.h"
 #include "mmgCheckTree.h"
 #include "mmgTreeContextualMenu.h"
+#include "mmgContextualMenu.h"
 #include "mmgMDIChild.h"
 #include "mafSideBar.h"
 #include "mmgTimeBar.h"
 #include "mmgMaterialChooser.h"
 #include "mafOp.h"
 #include "mmiPER.h"
+
 //----------------------------------------------------------------------------
 mafLogicWithManagers::mafLogicWithManagers()
 : mafLogicWithGUI()
@@ -375,6 +378,15 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       break;	
     case VIEW_SELECT:
       ViewSelect();
+      break;
+    case VIEW_SAVE_IMAGE:
+      {
+        mafViewVTK *v = mafViewVTK::SafeDownCast(m_ViewManager->GetSelectedView());
+        if (v)
+        {
+          v->GetRWI()->SaveImage(v->GetLabel());
+        }
+      }
       break;
     case CAMERA_RESET:
       if(m_ViewManager) m_ViewManager->CameraReset();
@@ -780,16 +792,16 @@ void mafLogicWithManagers::VmeChooseMaterial(mafVME *vme, bool updateProperty)
 void mafLogicWithManagers::ViewContextualMenu(bool vme_menu)
 //----------------------------------------------------------------------------
 {
-/*  mmgContextualMenu *contextMenu = new mmgContextualMenu();
+  mmgContextualMenu *contextMenu = new mmgContextualMenu();
   contextMenu->SetListener(this);
   mafView *v = m_ViewManager->GetSelectedView();
-  mmgMDIChild *c = (mmgMDIChild *)m_win->GetActiveChild();
+  mmgMDIChild *c = (mmgMDIChild *)m_Win->GetActiveChild();
   if(c != NULL)
     contextMenu->ShowContextualMenu(c,v,vme_menu);
-  else
+/*  else
     //m_extern_view->ShowContextualMenu(vme_menu);
-    contextMenu->ShowContextualMenu(m_extern_view,v,vme_menu);
-  wxDEL(contextMenu);*/
+    contextMenu->ShowContextualMenu(m_extern_view,v,vme_menu);*/
+  cppDEL(contextMenu);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::TreeContextualMenu(mafEvent &e)
