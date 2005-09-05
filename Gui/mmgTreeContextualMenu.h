@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTreeContextualMenu.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 11:10:07 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-09-05 10:53:34 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,14 +37,14 @@ public:
   void ShowContextualMenu(mmgCheckTree *tree, mafView *view, mafNode *vme, bool vme_menu);
 
 protected:
-  mafView       *m_view;
-  mafVME        *m_clicked_vme;
-  mafNode       *m_clicked_node;
-  mmgCheckTree  *m_tree;
+  mafView       *m_ViewActive;
+  mafVME        *m_VmeActive;
+  mafNode       *m_NodeActive;
+  mmgCheckTree  *m_NodeTree;
   mafObserver   *m_Listener;
   
-  bool m_autosort;
-  bool m_check_crypto;
+  bool m_Autosort;
+  bool m_CryptoCheck;
 
   /** Enable/disable crypto for a subtree. */
   void CryptSubTree(bool crypt);

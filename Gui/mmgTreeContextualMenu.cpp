@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTreeContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 15:17:29 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-09-05 10:53:34 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,8 +34,9 @@
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "mafView.h"
-//#include "mafSceneNode.h"
-//#include "mafSceneGraph.h"
+#include "mafViewVTK.h"
+#include "mafSceneNode.h"
+#include "mafSceneGraph.h"
 #include "mmgCheckTree.h"
 
 //#include "mmgBitmaps.h"
@@ -43,7 +44,6 @@
 #include "mmgPicButton.h"
 //#include "mafPipe.h"
 
-//#include "mflAssembly.h"
 #include "mafVME.h"
 #include "mafNode.h"
 #include "mafNodeIterator.h"
@@ -79,14 +79,14 @@ mmgTreeContextualMenu::mmgTreeContextualMenu()
 :wxMenu()
 //----------------------------------------------------------------------------
 {
-	m_view        = NULL;
-  m_clicked_vme = NULL;
-  m_clicked_node= NULL;
+	m_ViewActive  = NULL;
+  m_VmeActive   = NULL;
+  m_NodeActive  = NULL;
   m_Listener    = NULL;
-  m_tree        = NULL;
+  m_NodeTree    = NULL;
 
-  m_autosort = false;
-  m_check_crypto = false;
+  m_Autosort    = false;
+  m_CryptoCheck = false;
 }
 //----------------------------------------------------------------------------
 mmgTreeContextualMenu::~mmgTreeContextualMenu()
@@ -97,44 +97,47 @@ mmgTreeContextualMenu::~mmgTreeContextualMenu()
 void mmgTreeContextualMenu::ShowContextualMenu(mmgCheckTree *tree, mafView *view, mafNode *vme, bool vme_menu)
 //----------------------------------------------------------------------------
 {
-  m_view        = view;
-  m_clicked_node= vme;
-  m_clicked_vme = mafVME::SafeDownCast(vme);
+  m_ViewActive  = view;
+  m_NodeActive  = vme;
+  m_VmeActive   = mafVME::SafeDownCast(vme);
 
-  m_tree        = tree;
-  m_autosort    = m_tree->GetAutoSort();
+  m_NodeTree    = tree;
+  m_Autosort    = m_NodeTree->GetAutoSort();
   
   if(vme_menu)
 	{
     bool enable;
 
-    if(m_view != NULL)
+    if(m_ViewActive != NULL && mafViewVTK::SafeDownCast(m_ViewActive))
     {
-/*      mafSceneGraph *sg = NULL;
-	    sg = m_view->GetSceneGraph(); 
-      mafSceneNode *n = sg->Vme2Node(m_clicked_vme);
+      mafSceneGraph *sg = NULL;
+	    sg = ((mafViewVTK *)m_ViewActive)->GetSceneGraph();
+      if (sg != NULL)
+      {
+        mafSceneNode *n = sg->Vme2Node(m_VmeActive);
 
-      this->Append(RMENU_SHOW_VME, "Hide/Show","");
-		  this->AppendSeparator();
-		  this->Append(RMENU_SHOW_SUBTREE,	 "Show sub-tree");
-		  this->Append(RMENU_SHOW_SAMETYPE, "Show same type");
-		  this->AppendSeparator();
-		  this->Append(RMENU_HIDE_SUBTREE,  "Hide sub-tree");
-		  this->Append(RMENU_HIDE_SAMETYPE, "Hide same type");
-		  this->AppendSeparator();
+        this->Append(RMENU_SHOW_VME, "Hide/Show","");
+        this->AppendSeparator();
+        this->Append(RMENU_SHOW_SUBTREE,  "Show sub-tree");
+        this->Append(RMENU_SHOW_SAMETYPE, "Show same type");
+        this->AppendSeparator();
+        this->Append(RMENU_HIDE_SUBTREE,  "Hide sub-tree");
+        this->Append(RMENU_HIDE_SAMETYPE, "Hide same type");
+        this->AppendSeparator();
 
-		  // check visibility 
-		  this->FindItem(RMENU_SHOW_VME)->Enable(n->m_pipe_creatable);  
-		  
-		  // enable show/hide subtree 
-      enable = (m_clicked_vme->GetNumberOfChildren() > 0 );
-		  this->FindItem(RMENU_SHOW_SUBTREE)->Enable(enable);
-		  this->FindItem(RMENU_HIDE_SUBTREE)->Enable(enable);
+        // check visibility 
+        this->FindItem(RMENU_SHOW_VME)->Enable(n->m_PipeCreatable);
 
-		  // enable show/hide same type - must be visualized and not mutex
-		  enable = n->m_pipe_creatable && !n->m_mutex;
-		  this->FindItem(RMENU_SHOW_SAMETYPE)->Enable(enable);
-		  this->FindItem(RMENU_HIDE_SAMETYPE)->Enable(enable);*/
+        // enable show/hide subtree 
+        enable = (m_VmeActive->GetNumberOfChildren() > 0 );
+        this->FindItem(RMENU_SHOW_SUBTREE)->Enable(enable);
+        this->FindItem(RMENU_HIDE_SUBTREE)->Enable(enable);
+
+        // enable show/hide same type - must be visualized and not mutex
+        enable = n->m_PipeCreatable && !n->m_Mutex;
+        this->FindItem(RMENU_SHOW_SAMETYPE)->Enable(enable);
+        this->FindItem(RMENU_HIDE_SAMETYPE)->Enable(enable);
+      }
     }
 
 	  this->Append(RMENU_CRYPT_VME, "Crypt","",true);
@@ -143,69 +146,67 @@ void mmgTreeContextualMenu::ShowContextualMenu(mmgCheckTree *tree, mafView *view
 	  this->AppendSeparator();
     this->Append(RMENU_SORT_TREE,		 "Sort children nodes");
 
-    if (m_clicked_vme != NULL)
+    if (m_VmeActive != NULL)
     {
-      m_check_crypto = m_clicked_vme->GetCrypting() != 0;
+      m_CryptoCheck = m_VmeActive->GetCrypting() != 0;
     }
     else
     {
-      m_check_crypto = false;
+      m_CryptoCheck = false;
     }
     
-    this->FindItem(RMENU_CRYPT_VME)->Check(m_check_crypto);
-    this->FindItem(RMENU_CRYPT_VME)->Enable(m_clicked_vme != NULL);
-		enable = (m_clicked_node->GetNumberOfChildren() > 0 );
+    this->FindItem(RMENU_CRYPT_VME)->Check(m_CryptoCheck);
+    this->FindItem(RMENU_CRYPT_VME)->Enable(m_VmeActive != NULL);
+		enable = (m_NodeActive->GetNumberOfChildren() > 0 );
     this->FindItem(RMENU_ENABLE_CRYPT_SUBTREE)->Enable(enable);
 		this->FindItem(RMENU_DISABLE_CRYPT_SUBTREE)->Enable(enable);
 	}
 
-	this->Append(RMENU_AUTO_SORT,		 "Keep tree nodes sorted","",true);
-	this->FindItem(RMENU_AUTO_SORT)->Check(m_autosort);
+	this->Append(RMENU_AUTO_SORT,	"Keep tree nodes sorted","",true);
+	this->FindItem(RMENU_AUTO_SORT)->Check(m_Autosort);
 
 	int x,y;
 	::wxGetMousePosition(&x, &y);
-  m_tree->ScreenToClient(&x, &y);
-	m_tree->PopupMenu(this, wxPoint(x, y));
+  m_NodeTree->ScreenToClient(&x, &y);
+	m_NodeTree->PopupMenu(this, wxPoint(x, y));
 }
 //----------------------------------------------------------------------------
 void mmgTreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
 //----------------------------------------------------------------------------
 {
-  /*
 	mafSceneGraph *sg = NULL;
-  if(m_view != NULL)
-		sg = m_view->GetSceneGraph();*/
+  if(m_ViewActive != NULL && mafViewVTK::SafeDownCast(m_ViewActive))
+		sg = ((mafViewVTK *)m_ViewActive)->GetSceneGraph();
 	
 	switch(event.GetId())
 	{
-	  /*case RMENU_SHOW_VME:
+	  case RMENU_SHOW_VME:
 		{
       mafSceneNode *n = NULL;
       if(sg)
-        n = sg->Vme2Node(m_clicked_vme);
+        n = sg->Vme2Node(m_VmeActive);
       bool show = true;
       if(n)
-        show = n->m_pipe != NULL;
-			mafEventMacro(mafEvent(this, VME_SHOW, m_clicked_vme, !show));
+        show = !n->IsVisible();
+			mafEventMacro(mafEvent(this, VME_SHOW, m_VmeActive, show));
     }
 		break;
 		case RMENU_SHOW_SUBTREE:
-			sg->VmeShowSubTree(m_clicked_vme, true);
+			sg->VmeShowSubTree(m_VmeActive, true);
 		break;
 		case RMENU_HIDE_SUBTREE:
-			sg->VmeShowSubTree(m_clicked_vme, false);
+			sg->VmeShowSubTree(m_VmeActive, false);
 		break;
 		case RMENU_SHOW_SAMETYPE:
-			sg->VmeShowByType(m_clicked_vme, true);
+			//sg->VmeShowByType(m_VmeActive, true);
 		break;
 		case RMENU_HIDE_SAMETYPE:
-			sg->VmeShowByType(m_clicked_vme, false);
-		break;*/
+			//sg->VmeShowByType(m_VmeActive, false);
+		break;
     case RMENU_CRYPT_VME:
     {
-      m_check_crypto = !m_check_crypto;
-      m_clicked_vme->SetCrypting(m_check_crypto);
-      //((mafVmeData *)m_clicked_vme->GetClientData())->UpdateFromTag();
+      m_CryptoCheck = !m_CryptoCheck;
+      m_VmeActive->SetCrypting(m_CryptoCheck);
     }
     break;
     case RMENU_ENABLE_CRYPT_SUBTREE:
@@ -215,20 +216,20 @@ void mmgTreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
       CryptSubTree(false);
     break;
 		case RMENU_SORT_TREE:
-      m_tree->SortChildren((long)m_clicked_node);
+      m_NodeTree->SortChildren((long)m_NodeActive);
 		break;
 		case RMENU_AUTO_SORT:
- 			m_autosort = !m_autosort;
-      m_tree->SetAutoSort(m_autosort);
-			if(m_autosort) 
-        m_tree->SortChildren();
+ 			m_Autosort = !m_Autosort;
+      m_NodeTree->SetAutoSort(m_Autosort);
+			if(m_Autosort) 
+        m_NodeTree->SortChildren();
 		break;
 		default:
 			assert(false);
 		break;
 	}
 
-  if(m_view != NULL)
+  if(m_ViewActive != NULL)
 		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
@@ -236,7 +237,7 @@ void mmgTreeContextualMenu::CryptSubTree(bool crypt)
 //----------------------------------------------------------------------------
 {
 //  mafVmeData *vd = NULL;
-  mafNodeIterator *iter = m_clicked_node->NewIterator();
+  mafNodeIterator *iter = m_NodeActive->NewIterator();
 
 	for(mafNode *v=iter->GetFirstNode();v;v=iter->GetNextNode())
 	{
