@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:52:04 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-09-06 11:11:43 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -100,7 +100,7 @@ public:
   mmaMaterial *GetMaterial();
 
   /** Return the suggested pipe-typename for the visualization of this vme */
-  virtual mafString GetVisualPipe() {return mafString("mafPipePointSet");};
+  virtual mafString GetVisualPipe() {return mafString("mafPipeLandmarkCloud");};
 
 protected:
   mafVMELandmark();
