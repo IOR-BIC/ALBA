@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-05 13:41:52 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2005-09-06 10:41:43 $
+  Version:   $Revision: 1.32 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -84,7 +84,7 @@ void mafLogicWithManagers::Configure()
   if(m_SideSash)
   {
     m_SideBar = new mafSideBar(m_SideSash,-1,this);
-    m_SideSash->Put((wxWindow *)m_SideBar->m_SideSplittedPanel);
+    m_SideSash->Put(m_SideBar->m_Notebook);
   }
 
   if(m_UseVMEManager)
