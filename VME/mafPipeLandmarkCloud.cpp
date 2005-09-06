@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeLandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:46:02 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-09-06 11:12:02 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,6 +37,7 @@
 #include "vtkActor.h"
 #include "vtkProperty.h"
 #include "vtkPolyData.h"
+#include "vtkDataSet.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeLandmarkCloud);
@@ -73,10 +74,12 @@ void mafPipeLandmarkCloud::Create(mafSceneNode *n)
 
   m_Vme->GetEventSource()->AddObserver(this);
 
-  assert(m_Vme->IsMAFType(mafVMELandmarkCloud));
-  m_Cloud = mafVMELandmarkCloud::SafeDownCast(m_Vme);
+  assert(m_Vme->IsMAFType(mafVMELandmarkCloud) || m_Vme->IsMAFType(mafVMELandmark));
   
-  if (m_Cloud->IsOpen())
+  m_Cloud     = mafVMELandmarkCloud::SafeDownCast(m_Vme);
+  m_Landmark  = mafVMELandmark::SafeDownCast(m_Vme);
+  
+  if (m_Cloud && m_Cloud->IsOpen())
   {
     int num_lm = m_Cloud->GetNumberOfLandmarks();
     for (int i = 0; i < num_lm; i++)
@@ -88,7 +91,14 @@ void mafPipeLandmarkCloud::Create(mafSceneNode *n)
   }
   else
   {
-    CreateClosedCloudPipe();
+    if (m_Cloud)
+    {
+      CreateClosedCloudPipe(m_Cloud->GetOutput()->GetVTKData(), m_Cloud->GetRadius(), m_Cloud->GetSphereResolution());
+    }
+    else
+    {
+      CreateClosedCloudPipe(m_Landmark->GetOutput()->GetVTKData(), m_Landmark->GetRadius(), m_Landmark->GetSphereResolution());
+    }
   }
 }
 //----------------------------------------------------------------------------
@@ -97,7 +107,7 @@ mafPipeLandmarkCloud::~mafPipeLandmarkCloud()
 {
   m_Vme->GetEventSource()->RemoveObserver(this);
 
-  if (m_Cloud->IsOpen())
+  if (m_Cloud && m_Cloud->IsOpen())
   {
     int num_lm = m_Cloud->GetNumberOfLandmarks();
     for (int i = 0; i < num_lm; i++)
@@ -173,7 +183,7 @@ void mafPipeLandmarkCloud::OnEvent(mafEventBase *maf_event)
         mafEvent e(this,VME_SHOW,child_lm,false);
         m_Cloud->ForwardUpEvent(&e);
       }
-      CreateClosedCloudPipe();
+      CreateClosedCloudPipe(m_Cloud->GetOutput()->GetVTKData(), m_Cloud->GetRadius(), m_Cloud->GetSphereResolution());
     }
   }
   else if (maf_event->GetId() == mafVMELandmarkCloud::CLOUDE_RADIUS_MODIFIED)
@@ -193,28 +203,28 @@ void mafPipeLandmarkCloud::OnEvent(mafEventBase *maf_event)
   }
 }
 //----------------------------------------------------------------------------
-void mafPipeLandmarkCloud::CreateClosedCloudPipe()
+void mafPipeLandmarkCloud::CreateClosedCloudPipe(vtkDataSet *data, double radius, double resolution)
 //----------------------------------------------------------------------------
 {
-  m_SphereSource = vtkSphereSource::New();
-  m_SphereSource->SetRadius(m_Cloud->GetRadius());
-  m_SphereSource->SetThetaResolution(m_Cloud->GetSphereResolution());
-  m_SphereSource->SetPhiResolution(m_Cloud->GetSphereResolution());
+  vtkNEW(m_SphereSource);
+  m_SphereSource->SetRadius(radius);
+  m_SphereSource->SetThetaResolution(resolution);
+  m_SphereSource->SetPhiResolution(resolution);
   m_SphereSource->Update();
 
-  m_Normals = vtkPolyDataNormals::New();
+  vtkNEW(m_Normals);
   m_Normals->SetInput(m_SphereSource->GetOutput());
   m_Normals->Update();
 
-  m_Glyph = vtkExtendedGlyph3D::New();
-  m_Glyph->SetInput(m_Cloud->GetPointSetOutput()->GetPointSetData());
+  vtkNEW(m_Glyph);
+  m_Glyph->SetInput(data);
   m_Glyph->SetSource(m_Normals->GetOutput());
   m_Glyph->OrientOff();
   m_Glyph->ScalingOff();
   m_Glyph->ScalarVisibilityOn();
   m_Glyph->Update();
 
-  m_CloudMapper = vtkPolyDataMapper::New();
+  vtkNEW(m_CloudMapper);
   m_CloudMapper->SetInput(m_Glyph->GetOutput());
   m_CloudMapper->ScalarVisibilityOff();
   if(m_Vme->IsAnimated())				
@@ -222,27 +232,34 @@ void mafPipeLandmarkCloud::CreateClosedCloudPipe()
   else
     m_CloudMapper->ImmediateModeRenderingOff();
 
-  m_CloudActor = vtkActor::New();
-  m_CloudActor->SetProperty(m_Cloud->GetPointSetOutput()->GetMaterial()->m_Prop);
+  vtkNEW(m_CloudActor);
+  if (m_Cloud)
+  {
+    m_CloudActor->SetProperty(m_Cloud->GetMaterial()->m_Prop);
+  }
+  else
+  {
+    m_CloudActor->SetProperty(m_Landmark->GetMaterial()->m_Prop);
+  }
   m_CloudActor->GetProperty()->SetInterpolationToGouraud();
   m_CloudActor->SetMapper(m_CloudMapper);
 
   m_AssemblyFront->AddPart(m_CloudActor);
 
   // selection hilight
-  m_OutlineFilter = vtkOutlineCornerFilter::New();
+  vtkNEW(m_OutlineFilter);
   m_OutlineFilter->SetInput(m_Glyph->GetOutput());  
 
-  m_CloudSelectionMapper = vtkPolyDataMapper::New();
+  vtkNEW(m_CloudSelectionMapper);
   m_CloudSelectionMapper->SetInput(m_OutlineFilter->GetOutput());
 
-  m_CloudSelectionProperty = vtkProperty::New();
+  vtkNEW(m_CloudSelectionProperty);
   m_CloudSelectionProperty->SetColor(1,1,1);
   m_CloudSelectionProperty->SetAmbient(1);
   m_CloudSelectionProperty->SetRepresentationToWireframe();
   m_CloudSelectionProperty->SetInterpolationToFlat();
 
-  m_CloudSelectionActor = vtkActor::New();
+  vtkNEW(m_CloudSelectionActor);
   m_CloudSelectionActor->SetMapper(m_CloudSelectionMapper);
   m_CloudSelectionActor->VisibilityOff();
   m_CloudSelectionActor->PickableOff();
