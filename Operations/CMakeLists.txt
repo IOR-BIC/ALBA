@@ -25,8 +25,8 @@ IF (MAF_USE_VTK)
     mmoMAFTransform.h
     mmoExtractIsosurface.cpp
     mmoExtractIsosurface.h
-    mmoMSFImporter.cpp
-    mmoMSFImporter.h
+    mmoMSF1xImporter.cpp
+    mmoMSF1xImporter.h
     mmoReparentTo.cpp
     mmoReparentTo.h
     mmoSTLExporter.cpp
@@ -61,3 +61,4 @@ ENDIF (MAF_USE_VTK)
 IF (MAF_USE_WX)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_WXWIN_LIBRARY)
 ENDIF (MAF_USE_WX)
+
