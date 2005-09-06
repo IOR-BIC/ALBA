@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-25 11:28:04 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2005-09-06 10:41:05 $
+  Version:   $Revision: 1.20 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,47 +40,41 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener)
 {
   m_SelectedVme  = NULL;
   m_SelectedView = NULL;
-  
+
   //splitted panel  
-  m_SideSplittedPanel = new mmgSplittedPanel(parent,-1,200); //SIL. 29-4-2003 - 200 is the height of the vme_property panel
-  m_Notebook = new wxNotebook(m_SideSplittedPanel,-1);
+  m_Notebook = new wxNotebook(parent,-1);
+  m_SideSplittedPanel = new mmgSplittedPanel(m_Notebook,-1,200); //SIL. 29-4-2003 - 200 is the height of the vme_property panel
 
   //tree ----------------------------
-  m_Tree = new mmgCheckTree(m_Notebook,-1,true);
+  m_Tree = new mmgCheckTree(m_SideSplittedPanel,-1,true);
   m_Tree->SetListener(Listener);
   m_Tree->SetTitle(" vme hierarchy: ");
-  m_Notebook->AddPage(m_Tree,"vme manager",true);
-  m_SideSplittedPanel->PutOnTop(m_Notebook);
+  m_SideSplittedPanel->PutOnTop(m_Tree);
+  m_Notebook->AddPage(m_SideSplittedPanel,"vme manager",true);
 
   //view property panel
-	m_ViewPropertyPanel = new mmgGuiHolder(m_Notebook,-1,true);
+  m_ViewPropertyPanel = new mmgGuiHolder(m_Notebook,-1,true);
   m_ViewPropertyPanel->SetTitle(" no view selected:");
-	m_Notebook->AddPage(m_ViewPropertyPanel,"view settings");
-	
-	//op_panel ----------------------------
+  m_Notebook->AddPage(m_ViewPropertyPanel,"view settings");
+
+  //op_panel ----------------------------
   m_OpPanel  = new mmgPanelStack(m_Notebook ,-1);
-	mmgNamedPanel *empty_op = new mmgNamedPanel(m_OpPanel ,-1,true);
+  mmgNamedPanel *empty_op = new mmgNamedPanel(m_OpPanel ,-1,true);
   empty_op->SetTitle(" no operation running:");
   m_OpPanel->Push(empty_op);
-	m_Notebook->AddPage(m_OpPanel ," op. parameters");
-  
-  
+  m_Notebook->AddPage(m_OpPanel ," op. parameters");
+
   // wxFrame is needed to avoid endless loop in wxNotebook when
   // a button inside it is pressed and a different notebook tab is pressed suddenly after!! 
   // (mmgNamedPanel doesn't block the problem)
 #ifdef WIN32
   wxFrame *vme_property_frame = new wxFrame(m_SideSplittedPanel,-1,"Vme Property",wxDefaultPosition,wxDefaultSize,wxNO_BORDER);
-#else
-  //mmgNamedPanel *vme_property_frame = new mmgNamedPanel(m_SideSplittedPanel ,-1,false,true);
-#endif
-  
-
-#ifdef WIN32
   wxNotebook *vme_notebook = new wxNotebook(vme_property_frame,-1);
 #else
+  //mmgNamedPanel *vme_property_frame = new mmgNamedPanel(m_SideSplittedPanel ,-1,false,true);
   wxNotebook *vme_notebook = new wxNotebook(m_SideSplittedPanel,-1);
 #endif
-  
+
   m_VmeOutputPanel = new mmgGuiHolder(vme_notebook,-1,false,true);
   vme_notebook->AddPage(m_VmeOutputPanel," vme output ");
   m_VmePipePanel = new mmgGuiHolder(vme_notebook,-1,false,true);
