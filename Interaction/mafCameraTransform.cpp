@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafCameraTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-14 11:45:20 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-09-15 09:49:23 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -98,17 +98,21 @@ unsigned long mafCameraTransform::GetMTime()
       mtime=cameraMTime;
   }
   
-  //if (m_Renderer)
-  //{
-  //  unsigned long renMTime = m_Renderer->GetMTime();
-  //  if (renMTime > mtime)
-  //    mtime=renMTime;
-  //}
-
   if (m_Renderer&&m_Camera!=m_Renderer->GetActiveCamera())
   {
     Modified();
     mtime = this->Superclass::GetMTime();
+  }
+
+  if (m_Camera)
+  {
+    double delta_angle = fabs(m_OldViewAngle - m_Camera->GetViewAngle());    
+
+    if (delta_angle>.001 || !mafEquals(m_OldDistance,m_Camera->GetDistance()))
+    {
+      Modified();
+      mtime = this->Superclass::GetMTime();
+    }
   }
 
   if (m_Bounds)
@@ -519,7 +523,9 @@ void mafCameraTransform::InternalUpdate()
 
   // try to not recompute everything if the camera has only moved
   // in space.
-  if (m_Camera!=camera/*||fabs(m_OldViewAngle-camera->GetViewAngle())>.001*/)
+  double delta_angle = fabs(m_OldViewAngle - m_Camera->GetViewAngle());    
+
+  if (delta_angle>.001 || !mafEquals(m_OldDistance,m_Camera->GetDistance()))
   {
     RecomputeAll();    
   }

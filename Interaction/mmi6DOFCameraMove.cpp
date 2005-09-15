@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi6DOFCameraMove.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 16:43:05 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-09-15 09:49:23 $
+  Version:   $Revision: 1.4 $
   Authors:   Michele Diegoli & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -20,6 +20,7 @@
 #include "vtkRenderer.h"
 #include "vtkCamera.h"
 #include "vtkTransform.h"
+#include "vtkMath.h"
 #include <assert.h>
 
 //------------------------------------------------------------------------------
@@ -117,13 +118,12 @@ int mmi6DOFCameraMove::StartInteraction(mmdTracker *tracker,mafMatrix *pose)
 void mmi6DOFCameraMove::Update()
 //------------------------------------------------------------------------------
 {
-  // not yet implemented should not be here
   this->UpdateDeltaTransform();
 
-  float XYZ[3];
+  double XYZ[3];
   m_DeltaTransform->GetPosition(XYZ);
 
-  float rotXYZ[3];
+  double rotXYZ[3];
   m_DeltaTransform->GetOrientation(rotXYZ);
 
   vtkTransform *trans = vtkTransform::New();
@@ -135,6 +135,41 @@ void mmi6DOFCameraMove::Update()
   trans->RotateZ(-rotXYZ[2]);
   trans->Translate(-m_StartFocalPoint[0],-m_StartFocalPoint[1],-m_StartFocalPoint[2]);
 
+
+  double vup[3];
+  m_CurrentCamera->GetViewUp(vup);
+
+  // project along the view up
+  double up_trans_mod;
+  up_trans_mod = vtkMath::Dot(XYZ,vup);
+
+  double up_trans[3];
+  up_trans[0] = up_trans_mod * vup[0];
+  up_trans[1] = up_trans_mod * vup[1];
+  up_trans[2] = up_trans_mod * vup[2];
+
+  // compute the horizontal vector with respect to camera
+  double direction[3];
+  m_CurrentCamera->GetViewPlaneNormal(direction);
+
+  double x_vect[3];
+  vtkMath::Cross(vup,direction,x_vect);
+
+  vtkMath::Normalize(x_vect);
+
+  // translation along the X axis of the camera
+  double oriz_trans_mod = vtkMath::Dot(XYZ,x_vect);
+
+  double oriz_trans[3];
+  oriz_trans[0] = oriz_trans_mod * x_vect[0];
+  oriz_trans[1] = oriz_trans_mod * x_vect[1];
+  oriz_trans[2] = oriz_trans_mod * x_vect[2];
+  
+  vtkMAFSmartPointer<vtkTransform> trans2;
+  trans2->DeepCopy(trans);
+  trans2->Translate(-up_trans[0],-up_trans[1],-up_trans[2]);
+  trans2->Translate(-oriz_trans[0],-oriz_trans[1],-oriz_trans[2]);
+
   trans->Translate(-XYZ[0],-XYZ[1],-XYZ[2]);  
 
   double posNew[4],fpNew[4],vuOld[4], vuNew[4];
@@ -145,7 +180,7 @@ void mmi6DOFCameraMove::Update()
   vuOld[3] = m_StartViewUp[3];
 
   trans->MultiplyPoint(m_StartCameraPosition, posNew);
-  trans->MultiplyPoint(m_StartFocalPoint, fpNew);
+  trans2->MultiplyPoint(m_StartFocalPoint, fpNew);
   trans->MultiplyPoint(vuOld, vuNew);
 
   vuNew[0] -= posNew[0];
@@ -164,8 +199,6 @@ void mmi6DOFCameraMove::Update()
     m_StartFocalPoint[i]=fpNew[i];
     m_StartViewUp[i]=vuNew[i];
   }
-
-  //m_CurrentCamera->OrthogonalizeViewUp();
 
   // Store current pose matrix
   TrackerSnapshot(m_TrackerPoseMatrix);
