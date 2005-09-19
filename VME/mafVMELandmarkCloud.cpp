@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-25 13:28:01 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-09-19 11:37:02 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -90,6 +90,7 @@ int mafVMELandmarkCloud::DeepCopy(mafNode *a)
     m_State             = lc->IsOpen()? mafVMELandmarkCloud::OPEN_CLOUD : mafVMELandmarkCloud::CLOSED_CLOUD;
     m_DefaultVisibility = lc->GetDefaultVisibility();
     m_SphereResolution  = lc->GetSphereResolution();
+    lc->SetState(m_State);
 
     return MAF_OK;
   }  
