@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-03 15:14:49 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-09-19 13:40:41 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,7 +23,7 @@
 
 #include "mafDecl.h"  // per CAMERA_POSITIONS
 #include "mafEvent.h"
-//#include "mafAxes.h"
+#include "mafAxes.h"
 //#include "mafPipe.h"
 //#include "mafSceneGraph.h"
 //#include "mafSceneNode.h"
@@ -35,7 +35,6 @@
 #include "mafVMELandmark.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafAbsMatrixPipe.h"
-//#include "mflAssembly.h"
 
 //#include "vtkGridActor.h"  // users must see GRID_XYZ const declared in vtkGridActor
 #include "vtkLight.h"
@@ -52,8 +51,9 @@
 mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, int stereo)
 //----------------------------------------------------------------------------
 {
-  m_Listener = NULL;
-  m_Sg = NULL;
+  m_Listener= NULL;
+  m_Sg      = NULL;
+  m_RenBack = NULL;
 
   m_Light = vtkLight::New();
   m_Light->SetLightTypeToCameraLight();  
@@ -69,21 +69,18 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, int stereo)
   m_RenFront->BackingStoreOff();
   m_RenFront->LightFollowCameraOn(); 
 	
+  m_RwiBase = new mafRWIBase(parent, -1);
+  m_RenderWindow = vtkRenderWindow::New();
   if(stereo)
   {
-    m_RenderWindow = vtkRenderWindow::New(); //SIL. 13-11-2003: - temporary removed - cause error in OpenGLMApper during close
     m_RenderWindow->StereoCapableWindowOn();
     m_RenderWindow->StereoRenderOn();
     SetStereo(stereo);
   }
-  else
-    m_RenderWindow = vtkRenderWindow::New(); 
   m_RenderWindow->AddRenderer(m_RenFront);
 
-  m_RwiBase = new mafRWIBase(parent, -1);
 	m_RwiBase->SetRenderWindow(m_RenderWindow);
   
-	m_RenBack = NULL;
 	if(layers == TWO_LAYER)
 	{
 		m_RenBack = vtkRenderer::New();
@@ -111,42 +108,42 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, int stereo)
 		 m_RenFront->AddActor2D(m_Grid->GetLabelActor());
 	   SetGridNormal(GRID_Y);
 	}
+  */
 
 	m_Axes = new mafAxes(m_RenFront);
   m_Axes->SetVisibility(0);
-  */
 }
 //----------------------------------------------------------------------------
-mafRWI::~mafRWI( ) 
+mafRWI::~mafRWI()
 //----------------------------------------------------------------------------
 {
-	  /*
-    if(m_Grid) m_RenFront->RemoveActor(m_Grid);
-		if(m_Grid) m_RenFront->RemoveActor2D(m_Grid->GetLabelActor());
-		vtkDEL(m_Grid);
-		
-		wxDEL(m_Axes); //SIL. 31-10-2003: must be removed before deleting renderers
-		*/
-    vtkDEL(m_Light);
-		vtkDEL(m_Camera);
-		if(m_RenFront) 
-    {
-      m_RenFront->GetActors();        //Paolo 23-06-2004
-      m_RenderWindow->RemoveRenderer(m_RenFront);
-    }
-    vtkDEL(m_RenFront);
-    if(m_RenBack) 
-    {
-      m_RenBack->GetActors();        //Paolo 23-06-2004
-      m_RenderWindow->RemoveRenderer(m_RenBack);
-    }
-		vtkDEL(m_RenBack);
-		if(m_RenderWindow) 
-      m_RenderWindow->SetInteractor(NULL);    //Paolo 23-06-2004
-    m_RenderWindow->Delete();
-    //if(m_RwiBase) 
-      //m_RwiBase->SetRenderWindow(NULL); //Paolo 23-06-2004
-		vtkDEL(m_RwiBase);  //SIL. 13-11-2003: The renderer has to be Deleted as last
+	/*
+  if(m_Grid) m_RenFront->RemoveActor(m_Grid);
+	if(m_Grid) m_RenFront->RemoveActor2D(m_Grid->GetLabelActor());
+	vtkDEL(m_Grid);
+  */
+	
+	cppDEL(m_Axes); //SIL. 31-10-2003: must be removed before deleting renderers
+  vtkDEL(m_Light);
+	vtkDEL(m_Camera);
+	if(m_RenFront) 
+  {
+    m_RenFront->GetActors();        //Paolo 23-06-2004
+    m_RenderWindow->RemoveRenderer(m_RenFront);
+  }
+  vtkDEL(m_RenFront);
+  if(m_RenBack) 
+  {
+    m_RenBack->GetActors();        //Paolo 23-06-2004
+    m_RenderWindow->RemoveRenderer(m_RenBack);
+  }
+	vtkDEL(m_RenBack);
+	if(m_RenderWindow) 
+    m_RenderWindow->SetInteractor(NULL);    //Paolo 23-06-2004
+  m_RenderWindow->Delete();
+  //if(m_RwiBase) 
+    //m_RwiBase->SetRenderWindow(NULL); //Paolo 23-06-2004
+	vtkDEL(m_RwiBase);  //SIL. 13-11-2003: The renderer has to be Deleted as last
 }
 //-----------------------------------------------------------------------------------------
 void mafRWI::CameraSet(int cam_position)
@@ -303,7 +300,8 @@ void mafRWI::SetGridVisibility(bool show)
 void mafRWI::SetAxesVisibility(bool show)
 //----------------------------------------------------------------------------
 {
-   //if(m_Axes) m_Axes->SetVisibility(show);
+  if(m_Axes) 
+    m_Axes->SetVisibility(show);
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetGridColor(wxColor col)
@@ -315,42 +313,33 @@ void mafRWI::SetGridColor(wxColor col)
 void mafRWI::SetBackgroundColor(wxColor col)
 //----------------------------------------------------------------------------
 {
-            m_RenFront->SetBackground(col.Red()/255.0,col.Green()/255.0,col.Blue()/255.0);
-   if(m_RenBack) m_RenBack->SetBackground(col.Red()/255.0,col.Green()/255.0,col.Blue()/255.0);
+  m_RenFront->SetBackground(col.Red()/255.0,col.Green()/255.0,col.Blue()/255.0);
+  if(m_RenBack) 
+    m_RenBack->SetBackground(col.Red()/255.0,col.Green()/255.0,col.Blue()/255.0);
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetStereo(int stereo_type)
 //----------------------------------------------------------------------------
 {
-  if(m_RenBack) {wxLogMessage("LAL WARNING: SetStereo is disabled for RWI with two layers"); return;}
+  if(m_RenBack) 
+  {
+    wxLogMessage("LAL WARNING: SetStereo is disabled for RWI with two layers"); 
+    return;
+  }
 	
-  if (stereo_type < VTK_STEREO_CRYSTAL_EYES)
-  stereo_type = 0; 
+  if(stereo_type < VTK_STEREO_CRYSTAL_EYES)
+    stereo_type = 0; 
 	  
   if(m_StereoType == stereo_type) 
-	   return;
+    return;
  
   m_StereoType = stereo_type;
   
   //warning: non portable
-  //m_RenderWindow->SetWindowId( (HWND) 0 );
-
-  
   int *size = m_RenderWindow->GetSize();
-	//m_RenderWindow->RemoveRenderer(m_RenFront);
-  //vtkDEL(m_RenderWindow);
-	//m_RenderWindow = vtkRenderWindow::New();
-  //m_RenderWindow->SetSize(size);
   m_RenderWindow->SetStereoCapableWindow(m_StereoType != 0);
   m_RenderWindow->SetStereoType(m_StereoType);
   m_RenderWindow->SetStereoRender(m_StereoType != 0);
-	
-
-  //warning: non portable
-  //m_RenderWindow->SetWindowId( (HWND) m_RwiBase->GetHWND() );
-
-  //m_RenderWindow->AddRenderer(m_RenFront);
-  //m_RwiBase->SetRenderWindow(m_RenderWindow);
   m_RwiBase->ReInitialize();
 }
 //----------------------------------------------------------------------------
@@ -363,7 +352,6 @@ void mafRWI::CameraUpdate()
 
 	m_RenFront->ResetCameraClippingRange(); 
   m_RenderWindow->Render();
-
 }
 //----------------------------------------------------------------------------
 void mafRWI::CameraReset(mafNode *vme)

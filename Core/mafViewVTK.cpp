@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-14 17:41:42 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2005-09-19 13:40:42 $
+  Version:   $Revision: 1.19 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,16 +35,17 @@ mafCxxTypeMacro(mafViewVTK);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewVTK::mafViewVTK(wxString label, int camera_position, bool external)
+mafViewVTK::mafViewVTK(wxString label, int camera_position, bool show_axes, bool external)
 :mafView(label,external)
 //----------------------------------------------------------------------------
 {
   m_CameraPosition  = camera_position;
   m_ExternalFlag    = external;
+  m_ShowAxes        = show_axes;
   m_Sg        = NULL;
   m_Rwi       = NULL;
   m_LightKit  = NULL;
-  
+    
   m_CameraAttach  = 0;
   m_AttachedVme       = NULL;
   m_AttachedVmeMatrix = NULL;
@@ -73,7 +74,7 @@ void mafViewVTK::PlugVisualPipe(mafString vme_type, mafString pipe_type, long vi
 mafView *mafViewVTK::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewVTK *v = new mafViewVTK(m_Label, m_CameraPosition, m_ExternalFlag);
+  mafViewVTK *v = new mafViewVTK(m_Label, m_CameraPosition, m_ShowAxes, m_ExternalFlag);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
@@ -87,7 +88,7 @@ void mafViewVTK::Create()
   m_Rwi = new mafRWI(mafGetFrame() /*, ONE_LAYER, m_show_grid == 1, m_stereo_type*/);
   m_Rwi->SetListener(this); //SIL. 16-6-2004: 
   m_Rwi->CameraSet(m_CameraPosition);
-  //m_Rwi->SetAxesVisibility(m_show_axes != 0);
+  m_Rwi->SetAxesVisibility(m_ShowAxes != 0);
   m_Win = m_Rwi->m_RwiBase;
 
   m_Sg  = new mafSceneGraph(this,m_Rwi->m_RenFront,m_Rwi->m_RenBack);

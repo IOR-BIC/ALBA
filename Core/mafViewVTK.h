@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-14 17:41:43 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2005-09-19 13:40:42 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,7 +50,7 @@ mafViewVTK is a View that got a RenderWindow and a SceneGraph
 class mafViewVTK: public mafView
 {
 public:
-  mafViewVTK(wxString label = "vtkView", int camera_position = CAMERA_PERSPECTIVE, bool external = false);
+  mafViewVTK(wxString label = "vtkView", int camera_position = CAMERA_PERSPECTIVE, bool show_axes = true, bool external = false);
   virtual ~mafViewVTK(); 
 
   mafTypeMacro(mafViewVTK, mafView);
@@ -100,7 +100,7 @@ public:
 
   mafPipeMap m_PipeMap;
 
-  void              SetMouse(mmdMouse *mouse);
+  void SetMouse(mmdMouse *mouse);
 
 protected:
   mafRWI        *m_Rwi; 
@@ -110,6 +110,8 @@ protected:
   int						 m_CameraAttach;
   mafVME				*m_AttachedVme;
   vtkMatrix4x4	*m_AttachedVmeMatrix;
+
+  bool m_ShowAxes;
 
   virtual mmgGui *CreateGui();
 
