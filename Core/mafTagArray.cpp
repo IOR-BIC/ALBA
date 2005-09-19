@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTagArray.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:58:27 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-09-19 11:32:46 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -44,19 +44,29 @@ void mafTagArray::operator=(const mafTagArray &a)
 //-------------------------------------------------------------------------
 {
   Superclass::operator =(a);
-  for (mmuTagsMap::iterator it=m_Tags.begin();it!=m_Tags.end();it++)
-  {
-    mafTagItem &titem=it->second;
-    SetTag(titem);
-  }
 }
 
 //-------------------------------------------------------------------------
 void mafTagArray::DeepCopy(const mafTagArray *a)
 //-------------------------------------------------------------------------
 {
-  assert(a);
-  *this=*a;
+  Superclass::DeepCopy(a);
+  mmuTagsMap::const_iterator it;
+  for (it=a->m_Tags.begin();it!=a->m_Tags.end();it++)
+  {
+    const mafTagItem &titem=it->second;
+    SetTag(titem);
+  }
+}
+
+//-------------------------------------------------------------------------
+void mafTagArray::DeepCopy(const mafAttribute *a)
+//-------------------------------------------------------------------------
+{
+  if (a->IsMAFType(mafTagArray))
+  {
+    DeepCopy((const mafTagArray *)a);
+  }
 }
 
 //-------------------------------------------------------------------------
