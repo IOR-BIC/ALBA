@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-08-31 09:06:50 $
-  Version:   $Revision: 1.38 $
+  Date:      $Date: 2005-09-19 11:33:57 $
+  Version:   $Revision: 1.39 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -690,7 +690,7 @@ mafNode *mafNode::CopyTree(mafNode *vme, mafNode *parent)
       if (child->IsVisible())
         mafNode::CopyTree(child,v);
   }
-  v->SetReferenceCount(0); // this hack avoid that 'v' node die when return
+  v->SetReferenceCount(v->GetReferenceCount()-1); // this hack avoid that 'v' node die when return
   return v;
 }
 
