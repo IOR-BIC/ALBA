@@ -19,6 +19,10 @@ vtkExtendedGlyph3D.cxx
 vtkExtendedGlyph3D.h
 vtkFixedCutter.cxx
 vtkFixedCutter.h
+vtkGlobalAxisCoordinate.cxx
+vtkGlobalAxisCoordinate.h
+vtkLocalAxisCoordinate.cxx
+vtkLocalAxisCoordinate.h
 vtkRayCast3DPicker.cxx
 vtkRayCast3DPicker.h
 vtkDistanceFilter.cxx
