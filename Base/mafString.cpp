@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-05 14:04:31 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2005-09-19 11:31:29 $
+  Version:   $Revision: 1.18 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -681,12 +681,8 @@ const char *mafString::BaseName(const char *filename)
   if (filename==NULL)
     return NULL;
 
-  //char *ptr=strrchr(filename,'/');
-  wxString path,name,ext;
-  wxSplitPath(filename,&path,&name,&ext);
-  name = name + "." + ext;
-  return name.c_str();
-  //return (ptr==NULL?filename:ptr+1);
+  char *ptr=strrchr(filename,'/');
+  return (ptr==NULL?filename:ptr+1);
 }
 
 //----------------------------------------------------------------------------
