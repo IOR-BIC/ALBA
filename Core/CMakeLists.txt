@@ -14,8 +14,8 @@ SET(PROJECT_SRCS
 #mafSceneNode.h
 #mafTimeVector.h
 #mafTimeVector.txx
-#mafVmeData.cpp
-#mafVmeData.h
+mafAxes.cpp
+mafAxes.h
 mafAbsMatrixPipe.cpp
 mafAbsMatrixPipe.h
 mafAttribute.cpp
