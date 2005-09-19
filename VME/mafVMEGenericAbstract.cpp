@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:53:56 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-09-19 11:38:59 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -66,6 +66,7 @@ int mafVMEGenericAbstract::DeepCopy(mafNode *a)
     {
       m_DataVector=vme->GetDataVector()->NewInstance(); // create a new instance of the same type
       m_DataVector->DeepCopy(vme->GetDataVector()); // copy data
+      m_DataVector->SetListener(this);
     }
     return MAF_OK;
   }
@@ -174,7 +175,7 @@ void mafVMEGenericAbstract::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframe
 int mafVMEGenericAbstract::ReparentTo(mafNode *parent)
 //-----------------------------------------------------------------------
 {
-  if (CanReparentTo(parent)&&!IsInTree(parent))
+  if (CanReparentTo(parent) && !IsInTree(parent))
   {
     // When we reparent to a different tree, or we simply
     // cut a tree, pre travers the sub tree to read data into memory
