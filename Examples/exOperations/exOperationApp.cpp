@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-06 11:24:32 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2005-09-19 11:34:29 $
+  Version:   $Revision: 1.19 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -39,12 +39,13 @@
 #include "mmoCreateSlicer.h"
 #include "mmoExtractIsosurface.h"
 #include "mmoMAFTransform.h"
+#include "mmoMSFExporter.h"
+#include "mmoMSF1xImporter.h"
 #include "mmoReparentTo.h"
 #include "mmoSTLExporter.h"
 #include "mmoSTLImporter.h"
 #include "mmoVTKExporter.h"
 #include "mmoVTKImporter.h"
-#include "mmoMSF1xImporter.h"
 
 #include "mafViewVTK.h"
 #include "mafViewCompound.h"
@@ -90,8 +91,9 @@ bool exOperationApp::OnInit()
 
   //------------------------------------------------------------
   // Exporter Menu':
-  m_logic->Plug(new mmoSTLExporter("STL Exporter"));
-  m_logic->Plug(new mmoVTKExporter("VTK Exporter"));
+  m_logic->Plug(new mmoMSFExporter("MSF"));
+  m_logic->Plug(new mmoSTLExporter("STL"));
+  m_logic->Plug(new mmoVTKExporter("VTK"));
   //------------------------------------------------------------
 
   //------------------------------------------------------------
