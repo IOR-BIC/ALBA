@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkContourVolumeMapper.cxx,v $
   Language:  C++
-  Date:      $Date: 2005-07-15 11:50:57 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-09-19 15:13:46 $
+  Version:   $Revision: 1.3 $
 
 
 Copyright (c) 1993-2001 Ken Martin, Will Schroeder, Bill Lorensen 
@@ -68,7 +68,7 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
 
 using namespace vtkContourVolumeMapperNamespace;
 
-vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.2 $");
+vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.3 $");
 vtkStandardNewMacro(vtkContourVolumeMapper);
 
 
@@ -225,7 +225,8 @@ template <typename DataType> bool vtkContourVolumeMapper::PrepareAccelerationDat
       delete [] this->VoxelCoordinates[axis];
       this->VoxelCoordinates[axis] = new float [this->DataDimensions[axis] + VoxelBlockSize + 1];
       float f = this->DataOrigin[axis];
-      for (int i = 0; i < this->DataDimensions[axis]; i++, f += this->DataSpacing[axis])
+      int i;
+      for (i = 0; i < this->DataDimensions[axis]; i++, f += this->DataSpacing[axis])
         this->VoxelCoordinates[axis][i] = f;
       for (i = 0; i < VoxelBlockSize; i++)
         this->VoxelCoordinates[axis][this->DataDimensions[axis] + i] = f;
@@ -244,7 +245,8 @@ template <typename DataType> bool vtkContourVolumeMapper::PrepareAccelerationDat
       delete [] this->VoxelCoordinates[axis];
       this->VoxelCoordinates[axis] = new float [this->DataDimensions[axis] + VoxelBlockSize + 1];
       vtkDataArray *coordinates = (axis == 2) ? gridData->GetZCoordinates() : (axis == 1 ? gridData->GetYCoordinates() : gridData->GetXCoordinates());
-      for (int i = 0; i < this->DataDimensions[axis]; i++)
+      int i;
+      for (i = 0; i < this->DataDimensions[axis]; i++)
         this->VoxelCoordinates[axis][i] = *(coordinates->GetTuple(i));
       for (i = 0; i < VoxelBlockSize; i++)
         this->VoxelCoordinates[axis][this->DataDimensions[axis] + i] = this->VoxelCoordinates[axis][this->DataDimensions[axis] - 1];

@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkContourVolumeMapperAdv.cxx,v $
   Language:  C++
-  Date:      $Date: 2005-07-14 07:39:29 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-09-19 15:15:12 $
+  Version:   $Revision: 1.2 $
 
 
 Copyright (c) 1993-2001 Ken Martin, Will Schroeder, Bill Lorensen 
@@ -125,7 +125,8 @@ template<typename DataType> void vtkContourVolumeMapper::PrepareContoursTemplate
 
             // try to add line to polylines
             const int numOfPolylines = polylines.size();
-            for (int pi = numOfPolylines - 1; pi >= 0; pi--) {
+	    int pi;
+            for (pi = numOfPolylines - 1; pi >= 0; pi--) {
               if (polylines[pi]->AddNextLine(line))
                 break;
               }
@@ -674,7 +675,8 @@ bool ListOfPolyline2D::IsInside(int x, int y, int polylineLengthThreshold) {
     
     if ((intersection % 2) == 1) {
       // test that the point is inside, not on the contour
-      for (int p = polyline->start + 1; p < polyline->end; p++) {
+      int p;
+      for (p = polyline->start + 1; p < polyline->end; p++) {
         const short pointX   = polyline->vertices[p].xy[0];
         const short pointY   = polyline->vertices[p].xy[1];
 
