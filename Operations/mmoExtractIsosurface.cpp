@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoExtractIsosurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-05 10:54:18 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-09-21 09:11:16 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -548,10 +548,10 @@ void mmoExtractIsosurface::OnEvent(mafEventBase *maf_event)
           m_Rwi->m_RenderWindow->AddRenderer(m_PIPRen);
         else
           m_Rwi->m_RenderWindow->RemoveRenderer(m_PIPRen);
-        m_Dialog->FindItem(ID_SLICE)->Enable(m_ShowSlice != 0);
-        m_Dialog->FindItem(ID_SLICE_SLIDER)->Enable(m_ShowSlice != 0);
-        m_Dialog->FindItem(ID_INCREASE_SLICE)->Enable(m_ShowSlice != 0);
-        m_Dialog->FindItem(ID_DECREASE_SLICE)->Enable(m_ShowSlice != 0);
+        //m_Dialog->FindItem(ID_SLICE)->Enable(m_ShowSlice != 0);
+        //m_Dialog->FindItem(ID_SLICE_SLIDER)->Enable(m_ShowSlice != 0);
+        //m_Dialog->FindItem(ID_INCREASE_SLICE)->Enable(m_ShowSlice != 0);
+        //m_Dialog->FindItem(ID_DECREASE_SLICE)->Enable(m_ShowSlice != 0);
 
         m_Rwi->m_RenderWindow->Render();
       break;
