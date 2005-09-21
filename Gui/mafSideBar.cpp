@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-21 09:24:31 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2005-09-21 09:59:41 $
+  Version:   $Revision: 1.22 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -235,7 +235,7 @@ void mafSideBar::UpdateVmePanel()
         vme_out = NULL;
     }
 
-    if(m_SelectedView && m_SelectedView->IsA("mafViewVTK"))
+    if(m_SelectedView && m_SelectedView->IsMAFType(mafViewVTK))
     {
       vme_pipe = m_SelectedView->GetNodePipe(m_SelectedVme);
       if(vme_pipe)
