@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-25 11:28:45 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-09-21 10:11:29 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,9 +50,9 @@ public:
   If the number of child view is less then row x col, the last plugged view will fill the remaining holes.*/
   virtual void PlugChildView(mafView *child);
 
-  virtual void OnEvent(mafEventBase *maf_event);
   virtual mafView *Copy(mafObserver *Listener);
-  virtual void Create();
+  virtual void     Create();
+  virtual void     OnEvent(mafEventBase *maf_event);
 
   virtual void VmeAdd(mafNode *node);
   virtual void VmeRemove(mafNode *node);
