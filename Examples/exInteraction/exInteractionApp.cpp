@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exInteractionApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-15 09:45:49 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-09-21 09:10:13 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -42,7 +42,7 @@
 #include "mmoSTLImporter.h"
 #include "mmoVTKExporter.h"
 #include "mmoVTKImporter.h"
-#include "mmoMSFImporter.h"
+#include "mmoMSF1xImporter.h"
 #include "mmoInteractionOp.h"
 
 #include "mafViewVTK.h"
@@ -116,7 +116,7 @@ bool exInteractionApp::OnInit()
   // Importer Menu':
   m_logic->Plug(new mmoSTLImporter("STL Importer"));
   m_logic->Plug(new mmoVTKImporter("VTK Importer"));
-  //m_logic->Plug(new mmoMSFImporter("MSF 1.x Importer"));
+  //m_logic->Plug(new mmoMSF1xImporter("MSF 1.x Importer"));
   //------------------------------------------------------------
 
   //------------------------------------------------------------
