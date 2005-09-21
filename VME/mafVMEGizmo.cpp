@@ -2,15 +2,23 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGizmo.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 15:26:15 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-09-21 12:04:16 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-#ifndef __mafVMEGizmo_cxx
-#define __mafVMEGizmo_cxx
+
+
+#include "mafDefines.h" 
+//----------------------------------------------------------------------------
+// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// This force to include Window,wxWidgets and VTK exactly in this order.
+// Failing in doing this will result in a run-time error saying:
+// "Failure#0: The value of ESP was not properly saved across a function call"
+//----------------------------------------------------------------------------
+
 
 #include "mafVMEGizmo.h"
 #include "mafTransform.h"
@@ -136,4 +144,3 @@ void mafVMEGizmo::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes)
 {
   kframes.clear(); // no timestamps
 }
-#endif
