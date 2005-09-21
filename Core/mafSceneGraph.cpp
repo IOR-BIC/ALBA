@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-21 09:26:37 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-09-21 12:04:27 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -88,7 +88,7 @@ void mafSceneGraph::VmeAdd(mafNode *vme)
   node->m_PipeCreatable = ( nodestatus != NODE_NON_VISIBLE );
   node->m_Mutex          = ( nodestatus == NODE_MUTEX_ON  || nodestatus == NODE_MUTEX_OFF );
 
-  if (vme->IsA("mafVMEGizmo"))
+  if (vme->IsMAFType(mafVMEGizmo))
   {
     VmeShow(vme,true);
   }
