@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-05 13:43:10 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2005-09-21 09:34:21 $
+  Version:   $Revision: 1.22 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -746,7 +746,7 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
   else if (id==SHOW_CONTEXTUAL_MENU)
   {
     mafVME *vme = (mafVME *)event->GetData();
-    bool vme_context_menu = (vme != NULL) && !vme->IsMAFType(mafVMEGizmo);
+    bool vme_context_menu = (vme != NULL) && !vme->IsA("mafVMEGizmo");
     mafEventMacro(mafEvent(event->GetSender(),SHOW_CONTEXTUAL_MENU, vme_context_menu));
   }
   else if (id==mafDevice::DEVICE_NAME_CHANGED) 
