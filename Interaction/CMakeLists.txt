@@ -148,10 +148,11 @@ IF (WIN32)
   OPTION(MAF_USE_P5_GLOVE "Link driver for P5 glove device" OFF)
 ENDIF (WIN32)
 
-SUBDIRS(Drivers)
+# SUBDIRS(Drivers)
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS mafBase mafIO mafGui vtkMAF mafDrivers)
+#SET(PROJECT_LIBS mafBase mafIO mafGui vtkMAF mafDrivers)
+SET(PROJECT_LIBS mafBase mafIO mafGui vtkMAF)
 
 #IF (MAF_USE_VTK)
 #  SET(PROJECT_LIBS ${PROJECT_LIBS} vtkIO vtkRendering vtkGraphics)
