@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMAFTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:43:44 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-09-21 12:40:42 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -102,7 +102,6 @@ void mmoMAFTransform::OpRun()
   wxBusyInfo wait("creating gui...");
 
   assert(m_Input);
-  ((mafVME *)m_Input)->GetOutput()->GetVTKData()->Update();
   CurrentTime = ((mafVME *)m_Input)->GetTimeStamp();
 
   NewAbsMatrix = *((mafVME *)m_Input)->GetOutput()->GetAbsMatrix();
@@ -263,7 +262,7 @@ void mmoMAFTransform::OnEventThis(mafEventBase *maf_event)
         GizmoScale->SetRefSys(RefSysVME);
         GizmoScale->Show(true);
       }
-
+      mafEventMacro(mafEvent(this, CAMERA_UPDATE));
     }
     break;
 
