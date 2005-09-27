@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-06 10:41:43 $
-  Version:   $Revision: 1.32 $
+  Date:      $Date: 2005-09-27 16:49:47 $
+  Version:   $Revision: 1.33 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -562,9 +562,9 @@ void mafLogicWithManagers::OnQuit()
 
   cppDEL(m_MaterialChooser);
   cppDEL(m_VMEManager);
+  cppDEL(m_InteractionManager);
   cppDEL(m_ViewManager);
   cppDEL(m_OpManager);
-  cppDEL(m_InteractionManager);
 
   // must be deleted after m_VMEManager
   cppDEL(m_SideBar);
