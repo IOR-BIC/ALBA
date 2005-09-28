@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEStorage.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 15:44:53 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-09-28 23:05:34 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -53,6 +53,11 @@ public:
   /** return the root node attached to this tree */
   mafVMERoot *GetRoot();
 
+  /** 
+    Set the root to this Storage. This is usually not necessary
+    since storage creates the root on its own */
+  void SetRoot (mafVMERoot *root);
+
   virtual void SetURL(const char *name);
 
   /** process events coming from tree */
@@ -66,10 +71,5 @@ protected:
   void SetVersion(const char *version) {Superclass::SetVersion(version);}
 
   mafVMERoot *m_Root; ///< the VME root node
-
-private:
-  
-  /** avoid external objects to set the root */
-  void SetRoot (mafStorable *root);
 };
 #endif // _mafVMEStorage_h_

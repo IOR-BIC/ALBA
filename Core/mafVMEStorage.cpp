@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-27 16:50:40 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-09-28 23:05:34 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -39,6 +39,7 @@ int mmuMSFDocument::InternalRestore(mafStorageElement *node)
 //-------------------------------------------------------
 {
   // here should restore elements specific for the document
+  m_Root->Shutdown(); // force shutdown to be then re-initialized...
   int ret = node->RestoreObject("Root",m_Root);
   if (ret==MAF_OK)
   {
@@ -77,6 +78,23 @@ mafVMEStorage::~mafVMEStorage()
   mafDEL(m_Root);
 }
 
+//------------------------------------------------------------------------------
+void mafVMEStorage::SetRoot(mafVMERoot *root)
+//------------------------------------------------------------------------------
+{
+  if (root == m_Root)
+    return;
+  
+  cppDEL(m_Document);
+  mafDEL(m_Root);
+  m_Root = root;
+  m_Root->Register(this);
+  m_Root->SetName("Root");
+  m_Root->SetListener(this);
+  m_Root->Initialize();
+  
+  SetDocument(new mmuMSFDocument(m_Root));
+}
 //------------------------------------------------------------------------------
 mafVMERoot *mafVMEStorage::GetRoot()
 //------------------------------------------------------------------------------
