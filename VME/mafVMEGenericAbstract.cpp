@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-19 11:38:59 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-09-28 23:09:14 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -194,7 +194,7 @@ int mafVMEGenericAbstract::ReparentTo(mafNode *parent)
           {
             for (int i=0;i<dvector->GetNumberOfItems();i++)
             {
-              mafVMEItem *item=dvector->GetItem(i);
+              mafVMEItem *item=dvector->GetItemByIndex(i);
               assert(item);
               if (item)
               {
