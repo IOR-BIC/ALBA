@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 15:27:07 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-09-28 23:10:49 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -124,9 +124,9 @@ int mmaMeter::InternalRestore(mafStorageElement *node)
 {
   if (Superclass::InternalRestore(node)==MAF_OK)
   {
-    mafMatrix matrix;
-    if (node->RestoreMatrix("Transform",&matrix)==MAF_OK)
-    {
+    //mafMatrix matrix;  //modified by Marco. 29-9-2005 It seems this field is not stored...
+    ///if (node->RestoreMatrix("Transform",&matrix)==MAF_OK)
+    //{
       node->RestoreInteger("MeterMode", m_MeterMode);
       node->RestoreInteger("ColorMode", m_ColorMode);
       node->RestoreInteger("Representation", m_Representation);
@@ -140,7 +140,7 @@ int mmaMeter::InternalRestore(mafStorageElement *node)
       node->RestoreDouble("TubeRadius",m_TubeRadius);
       node->RestoreVectorN("DistanceRange",m_DistanceRange,2);
       return MAF_OK;
-    }
+    //}
   }
   return MAF_ERROR;
 }
