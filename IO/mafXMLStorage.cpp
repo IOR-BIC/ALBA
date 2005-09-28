@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-08-24 16:09:47 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-09-28 23:06:39 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -322,6 +322,16 @@ const char *mafXMLStorage::GetVersion()
 }
 
 //------------------------------------------------------------------------------
+void mafXMLStorage::EmptyGarbageCollector()
+//------------------------------------------------------------------------------
+{
+  for (std::set<mafString>::iterator it=m_GarbageCollector.begin();it!=m_GarbageCollector.end();it++)
+  {
+    DeleteURL(*it);
+  }
+  m_GarbageCollector.clear();
+}
+//------------------------------------------------------------------------------
 int mafXMLStorage::InternalStore()
 //------------------------------------------------------------------------------
 {
@@ -429,12 +439,7 @@ int mafXMLStorage::InternalStore()
 
         ReleaseTmpFile(filename); // remove the storage tmp file
 
-        // remove old URLs
-        for (std::set<mafString>::iterator it=m_GarbageCollector.begin();it!=m_GarbageCollector.end();it++)
-        {
-          DeleteURL(*it);
-        }
-        m_GarbageCollector.clear();
+        EmptyGarbageCollector();
       }
     }    
   }

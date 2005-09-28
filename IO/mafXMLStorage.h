@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.h,v $
   Language:  C++
-  Date:      $Date: 2005-08-24 16:09:48 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-09-28 23:06:39 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -76,6 +76,9 @@ public:
   virtual void SetURL(const char *name);
 
   virtual const char* GetTmpFolder();
+
+  /** empty the garbage collector list deleting old files */
+  virtual void EmptyGarbageCollector();
 
 protected:
   /** This is called by Store() and must be reimplemented by subclasses */
