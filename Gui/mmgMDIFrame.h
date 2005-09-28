@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:44:05 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-09-28 14:40:57 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -121,6 +121,9 @@ protected:
 
 	/** Update the memory status on the status bas. */
   void OnIdle(wxIdleEvent& event);
+
+  /** Send an event to open the msf or zip file. */
+  void OnDropFile(wxDropFilesEvent &event);
 
 	/** Redraw widgets on interface. */
   void LayoutWindow();

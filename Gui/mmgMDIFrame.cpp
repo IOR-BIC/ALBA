@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:25 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-09-28 14:40:57 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -86,6 +86,7 @@ class mmgMDIFrameCallback : public vtkCommand
 //----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(mmgMDIFrame, wxMDIParentFrame)
     EVT_CLOSE(mmgMDIFrame::OnCloseWindow)
+    EVT_DROP_FILES(mmgMDIFrame::OnDropFile)
     EVT_MENU_RANGE(MENU_START,MENU_END,mmgMDIFrame::OnMenu)
     EVT_MENU_RANGE(wxID_FILE1,wxID_FILE4,mmgMDIFrame::OnMenu)
 		EVT_MENU_RANGE(OP_START,OP_END,mmgMDIFrame::OnMenuOp)
@@ -213,6 +214,25 @@ void mmgMDIFrame::OnSize(wxSizeEvent& event)
   wxRect r;
 	m_frameStatusBar->GetFieldRect(4,r);
   m_gauge->SetSize(r.x,r.y+2,r.width -4 ,r.height -4);
+}
+//-----------------------------------------------------------
+void mmgMDIFrame::OnDropFile(wxDropFilesEvent &event)
+//-----------------------------------------------------------
+{
+  wxString path, name, ext, *file_list;
+  int num_files = event.GetNumberOfFiles();
+  file_list = event.GetFiles();
+  for (int i=0; i< num_files; i++)
+  {
+    wxSplitPath(file_list[i],&path, &name, &ext);
+    if (ext == "msf" || ext == "zmsf")
+    {
+      mafString file_to_open;
+      file_to_open = file_list[i].c_str();
+      mafEventMacro(mafEvent(this,MENU_FILE_OPEN,&file_to_open));
+      return;
+    }
+  }
 }
 //----------------------------------------------------------------------------
 void mmgMDIFrame::LayoutWindow()
@@ -429,4 +449,3 @@ void mmgMDIFrame::BindToProgressBar(vtkViewport* ren)
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #endif //MAF_USE_VTK
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
