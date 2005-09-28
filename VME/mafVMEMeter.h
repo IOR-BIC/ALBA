@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-14 07:42:17 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-09-28 23:11:47 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -232,6 +232,9 @@ protected:
 
   virtual int InternalStore(mafStorageElement *parent);
   virtual int InternalRestore(mafStorageElement *node);
+
+  /** this creates the Material attribute at the right time... */
+  virtual int InternalInitialize();
 
   /** called to prepare the update of the output */
   virtual void InternalPreUpdate();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-08-31 15:09:44 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2005-09-28 23:11:46 $
+  Version:   $Revision: 1.18 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -87,7 +87,7 @@ mafVMEMeter::~mafVMEMeter()
 //-------------------------------------------------------------------------
 {
   cppDEL(m_VMEAccept);
-  mafDEL(m_MeterAttributes);
+  // mafDEL(m_MeterAttributes);  //modified by Marco. 29-9-2005 Attributes are destroyd automatically!
   mafDEL(m_Transform);
   vtkDEL(m_LineSource);
   vtkDEL(m_LineSource2);
@@ -118,7 +118,10 @@ int mafVMEMeter::DeepCopy(mafNode *a)
       this->SetLink("EndVME2", linked_node);
     }
     m_Transform->SetMatrix(meter->m_Transform->GetMatrix());
-    m_MeterAttributes = meter->GetMeterAttributes();
+    
+    //modified by Marco. 29-9-2005 Mhmm... Poco pulito: se qualcuno risettasse questo attributo il metro 
+    //non se ne accorgerebbe fino al prossimo reload... meglio chiedere sempre l'attributo al nodo...
+    m_MeterAttributes = meter->GetMeterAttributes();  
     return MAF_OK;
   }  
   return MAF_ERROR;
@@ -136,6 +139,20 @@ bool mafVMEMeter::Equals(mafVME *vme)
           GetLink("EndVME2") == ((mafVMEMeter *)vme)->GetLink("EndVME2");
   }
   return ret;
+}
+//-------------------------------------------------------------------------
+int mafVMEMeter::InternalInitialize()
+//-------------------------------------------------------------------------
+{
+  if (Superclass::InternalInitialize()==MAF_OK)
+  {
+    // force material allocation
+    GetMaterial();
+
+    return MAF_OK;
+  }
+
+  return MAF_ERROR;
 }
 //-------------------------------------------------------------------------
 mmaMaterial *mafVMEMeter::GetMaterial()
@@ -544,6 +561,9 @@ mmaMeter *mafVMEMeter::GetMeterAttributes()
     {
       mafNEW(m_MeterAttributes);
       SetAttribute("MeterAttributes", m_MeterAttributes);
+      mafDEL(m_MeterAttributes);  //modified by Marco. 29-9-2005 Materials are kept alive by the Node
+                                  // it cannot be sestroyed later since when loading MSF file the 
+                                  // attribute is created by the mafNode class itself.
     }
   }
   return m_MeterAttributes;
