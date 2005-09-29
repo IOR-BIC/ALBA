@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:42:05 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-09-29 07:01:49 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -125,7 +125,7 @@ protected:
   /** FILE NEW evt. handler */
 	virtual void OnFileNew();
   /** FILE OPEN evt. handler */
-	virtual void OnFileOpen();
+	virtual void OnFileOpen(const char *file_to_open = NULL);
   /** FILE HISTORY evt. handler */
 	virtual void OnFileHistory(int menuId);
   /** FILE SAVE evt. handler */

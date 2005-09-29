@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-27 16:49:47 $
-  Version:   $Revision: 1.33 $
+  Date:      $Date: 2005-09-29 07:01:48 $
+  Version:   $Revision: 1.34 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -284,7 +284,14 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       OnFileNew();
       break; 
     case MENU_FILE_OPEN:
-      OnFileOpen();
+      {
+        mafString *filename = e->GetString();
+        if(filename)
+          OnFileOpen((*filename).GetCStr());
+        else
+          OnFileOpen();
+        UpdateFrameTitle();
+      }
       break; 
     case wxID_FILE1:
     case wxID_FILE2:
@@ -481,18 +488,27 @@ void mafLogicWithManagers::OnFileNew()
 	m_Win->SetTitle(wxString(m_AppTitle.GetCStr()));
 }
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::OnFileOpen()
+void mafLogicWithManagers::OnFileOpen(const char *file_to_open)
 //----------------------------------------------------------------------------
 {
   if(m_VMEManager)
   {
 	  if(m_VMEManager->AskConfirmAndSave())
 	  {
-		  wxString m_wildc    = "Multimod Storage Format file (*.msf)|*.msf";
+		  wxString m_wildc    = "MAF Storage Format file (*.msf)|*.msf";
 		  wxString m_msf_dir  = mafGetApplicationDirectory().c_str();
                m_msf_dir += "/Data/MSF/";
-		  wxString file				= mafGetOpenFile(m_msf_dir, m_wildc).c_str();
-		  if(file == "") return;
+		  wxString file;
+      if (file_to_open != NULL)
+      {
+        file = file_to_open;
+      }
+      else
+      {
+        file = mafGetOpenFile(m_msf_dir, m_wildc).c_str();
+      }
+		  if(file == "") 
+        return;
 
 		  m_VMEManager->MSFOpen(file);
 		  if(m_OpManager) m_OpManager->ClearUndoStack(); 
