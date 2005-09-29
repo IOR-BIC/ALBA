@@ -148,11 +148,18 @@ IF (WIN32)
   OPTION(MAF_USE_P5_GLOVE "Link driver for P5 glove device" OFF)
 ENDIF (WIN32)
 
-# SUBDIRS(Drivers)
+# currently special drivers only supported under WIN32
+IF (WIN32)
+ SUBDIRS(Drivers)
+ENDIF (WIN32)
 
 # List libraries that are needed by this project.
-#SET(PROJECT_LIBS mafBase mafIO mafGui vtkMAF mafDrivers)
 SET(PROJECT_LIBS mafBase mafIO mafGui vtkMAF)
+
+# currently special drivers only supported under WIN32
+IF (WIN32)
+  SET(PROJECT_LIBS ${PROJECT_LIBS} mafDrivers)
+ENDIF (WIN32)
 
 #IF (MAF_USE_VTK)
 #  SET(PROJECT_LIBS ${PROJECT_LIBS} vtkIO vtkRendering vtkGraphics)
@@ -161,10 +168,6 @@ SET(PROJECT_LIBS mafBase mafIO mafGui vtkMAF)
 # Create the library.
 ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
-
-#IF (MAF_USE_VTK)
-#  ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_VTK_LIBRARY)
-#ENDIF (MAF_USE_VTK)
 
 IF (MAF_USE_WX)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_WXWIN_LIBRARY)
