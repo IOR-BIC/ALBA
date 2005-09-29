@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-28 14:40:35 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-09-29 07:19:42 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -47,6 +47,8 @@
 #include "vtkActor2D.h"
 #include "vtkDataSet.h"
 
+#define DEFAULT_BG_COLOR 0.28
+
 //----------------------------------------------------------------------------
 mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, int stereo)
 //----------------------------------------------------------------------------
@@ -63,7 +65,7 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, int stereo)
   m_Camera->ParallelProjectionOn(); 
 
 	m_RenFront = vtkRenderer::New();
-  m_RenFront->SetBackground(0.82,0.82,0.82);
+  m_RenFront->SetBackground(DEFAULT_BG_COLOR,DEFAULT_BG_COLOR,DEFAULT_BG_COLOR);
   m_RenFront->SetActiveCamera(m_Camera);
   m_RenFront->AddLight(m_Light);
   m_RenFront->BackingStoreOff();
@@ -84,7 +86,7 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, int stereo)
 	if(layers == TWO_LAYER)
 	{
 		m_RenBack = vtkRenderer::New();
-		m_RenBack->SetBackground(0.82,0.82,0.82);
+		m_RenBack->SetBackground(DEFAULT_BG_COLOR,DEFAULT_BG_COLOR,DEFAULT_BG_COLOR);
 		m_RenBack->SetActiveCamera(m_Camera);
 		m_RenBack->AddLight(m_Light);
 		m_RenBack->BackingStoreOff();
