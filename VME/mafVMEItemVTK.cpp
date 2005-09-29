@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:06:37 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-09-29 16:18:29 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -110,6 +110,9 @@ bool mafVMEItemVTK::Equals(mafVMEItem *a)
 
     vtkDataSet *data1=GetData();
     vtkDataSet *data2=item->GetData();
+
+    data1->Update();
+    data2->Update();
 
     if (data1&&data2)
     {
@@ -484,7 +487,7 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
 #ifdef MAF_USE_CRYPTO
         writer->WriteToOutputStringOn();
         writer->SetFileTypeToBinary();
-        writer->SetHeader("# MultiMod data file - mflVMEItem output\n");
+        writer->SetHeader("# MAF data file - mafVMEItemVTK output\n");
         writer->Write();
 
         mafDefaultEncryptFromMemory(writer->GetOutputString(), writer->GetOutputStringLength(),filename);
@@ -495,10 +498,10 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
       }
       else if ( m_IOMode == MEMORY)
       {
-        // not yet suported
+        // not yet supported
         writer->WriteToOutputStringOn();
         writer->SetFileTypeToBinary();
-        writer->SetHeader("# MultiMod data file - mflVMEItem output\n");
+        writer->SetHeader("# MAF data file - mafVMEItemVTK output\n");
         writer->Write();
         m_OutputMemory = writer->GetOutputString();
         m_OutputMemorySize = writer->GetOutputStringLength();
@@ -509,7 +512,7 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
       {
         writer->SetFileName(filename);
         writer->SetFileTypeToBinary();
-        writer->SetHeader("# MultiMod data file - mflVMEItem output\n");
+        writer->SetHeader("# MAF data file - mafVMEItemVTK output\n");
         writer->Write();
       }
 
