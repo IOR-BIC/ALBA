@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-28 14:40:57 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-09-29 07:00:38 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -110,6 +110,10 @@ mmgMDIFrame::mmgMDIFrame(const wxString& title, const wxPoint& pos, const wxSize
   m_clientwin= NULL;
   CreateStatusbar();
   Centre();
+
+#ifdef __WIN32__
+  ((wxWindow *)this)->DragAcceptFiles(TRUE);
+#endif
 
   wxIconBundle ib;
   ib.AddIcon( mafPics.GetIcon("FRAME_ICON16x16") );
