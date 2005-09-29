@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:41:14 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-09-29 07:20:24 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,21 +20,18 @@
 //----------------------------------------------------------------------------
 
 
-#ifdef _MSC_FULL_VER
-#include <xiosbase>
-#endif
-
 #include <wx/busyinfo.h>
 #include <wx/fs_zip.h>
 #include <wx/zstream.h>
 #include <wx/ffile.h>
 #include "mafDecl.h"
-//#include "mafVmeData.h"
 #include "mafVMEManager.h"
 #include "mafNode.h"
 #include "mafVMEStorage.h"
 #include "mafNodeIterator.h"
 #include "mafTagArray.h"
+
+#include <fstream>
 
 //----------------------------------------------------------------------------
 mafVMEManager::mafVMEManager()
@@ -173,7 +170,7 @@ void mafVMEManager::MSFOpen(wxString filename)
   
   wxString path, name, ext;
   wxSplitPath(filename,&path,&name,&ext);
-  if(ext == "zip")
+  if(ext == "zmsf")
   {
     ZIPOpen(filename);
     return;
@@ -240,7 +237,6 @@ void mafVMEManager::MSFOpen(wxString filename)
 void mafVMEManager::ZIPOpen(wxString filename)
 //----------------------------------------------------------------------------
 {
-  /*
   wxBusyInfo wait("Unzipping file: Please wait");
 
   m_ZipFile = filename;
@@ -283,11 +279,8 @@ void mafVMEManager::ZIPOpen(wxString filename)
   out_file = working_dir + "\\" + complete_name;
   char *buf;
   int s_size;
-#ifdef _MSC_FULL_VER
-  ofstream out_file_stream;
-#else
   std::ofstream out_file_stream;
-#endif
+
   if(ext == "msf")
   {
     m_MSFFile = out_file;
@@ -333,13 +326,12 @@ void mafVMEManager::ZIPOpen(wxString filename)
   
   if (m_MSFFile == "")
   {
-    wxMessageBox("zip archive is not a valid msf file!", "Error");
+    wxMessageBox("compressed archive is not a valid msf file!", "Error");
     return;
   }
 
   wxSetWorkingDirectory(working_dir);
   MSFOpen(m_MSFFile);
-  */
 }
 //----------------------------------------------------------------------------
 void mafVMEManager::MSFSave()   
