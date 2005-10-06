@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-29 07:01:48 $
-  Version:   $Revision: 1.34 $
+  Date:      $Date: 2005-10-06 12:41:05 $
+  Version:   $Revision: 1.35 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -495,9 +495,9 @@ void mafLogicWithManagers::OnFileOpen(const char *file_to_open)
   {
 	  if(m_VMEManager->AskConfirmAndSave())
 	  {
-		  wxString m_wildc    = "MAF Storage Format file (*.msf)|*.msf";
+		  wxString m_wildc    = "MAF Storage Format file (*.msf)|*.msf|Compressed file (*.zmsf)|*.zmsf";
 		  wxString m_msf_dir  = mafGetApplicationDirectory().c_str();
-               m_msf_dir += "/Data/MSF/";
+               //m_msf_dir += "/Data/MSF/";
 		  wxString file;
       if (file_to_open != NULL)
       {
