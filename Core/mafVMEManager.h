@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:41:14 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-10-06 12:41:46 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,7 +49,11 @@ public:
 	/** Open the msf from file history. */
   void MSFOpen(int file_id);
 
-  void ZIPOpen(wxString filename);
+  /** Open the compressed zmsf filename. */
+  const char *ZIPOpen(wxString filename);
+
+  /** Save the msf tree into a compressed file. */
+  void ZIPSave(wxString file = "");
   
 	/** Save the msf tree. */
   void MSFSave();
@@ -118,6 +122,7 @@ protected:
   mafString         m_AppStamp;     ///< the application stamp for our application
   wxString          m_MSFFile;
   wxString          m_ZipFile;
+  wxString          m_TmpDir;
   wxString          m_MergeFile;
   
   bool              m_LoadingFlag;  ///< used when an MSF is being loaded
