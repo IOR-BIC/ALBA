@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-06 12:41:05 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2005-10-06 16:03:25 $
+  Version:   $Revision: 1.36 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -369,6 +369,9 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
     case OP_HIDE_GUI:
       OpHideGui(e->GetBool());
       break; 
+    case OP_FORCE_STOP:
+      m_OpManager->StopCurrentOperation();
+      break;
       // ###############################################################
       // commands related to VIEWS
     case VIEW_CREATE:
@@ -831,4 +834,16 @@ void mafLogicWithManagers::TreeContextualMenu(mafEvent &e)
   bool autosort = e.GetArg() != 0;
   contextMenu->ShowContextualMenu((mmgCheckTree *)e.GetSender(),v,vme,vme_menu);
   cppDEL(contextMenu);
+}
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::HandleException()
+//----------------------------------------------------------------------------
+{
+  int answare = wxMessageBox("Do you want to try to save the unsaved work?", "Fatal Exception!!", wxYES_NO|wxCENTER);
+  if(answare == wxYES)
+  {
+    OnFileSave();
+    m_OpManager->StopCurrentOperation();
+  }
+  OnQuit();
 }

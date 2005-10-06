@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2005-09-29 07:01:49 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-10-06 16:03:25 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -103,6 +103,9 @@ public:
   if set to OPEN_ALL_DATA let's the application to open all msf file. 
   As default the application stamp is the name of the application and it is set into the Show() method. */
   void SetApplicationStamp(mafString &app_stamp);
+
+  /** Manage application exception and allow to save at least the tree. */
+  void HandleException();
 
 protected:
   //---------------------------------------------------------
