@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-15 15:19:39 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-10-06 16:01:25 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -366,25 +366,26 @@ void mafOpManager::OpRun(int op_id)
   switch(op_id)
   {
 	  case OP_UNDO:
-			 OpUndo();
+			OpUndo();
 	  break;
 	  case OP_REDO:
-			 OpRedo();
+			OpRedo();
 	  break;
 	  case OP_DELETE:
 	  case OP_CUT:
-			 OpExec(m_OpCut);
+			OpExec(m_OpCut);
 	  break;
 	  case OP_COPY:
-			 OpExec(m_OpCopy);
+			OpExec(m_OpCopy);
 	  break;
 	  case OP_PASTE:
-			 OpExec(m_OpPaste);
+			OpExec(m_OpPaste);
 	  break;
 	  default:
 		{
       int index = op_id - OP_USER;
-		  if(index >=0 && index <m_NumOp) OpRun(m_OpList[index]);
+		  if(index >=0 && index <m_NumOp) 
+        OpRun(m_OpList[index]);
 		}
 	  break;
 	}
@@ -561,7 +562,7 @@ void mafOpManager::Notify(int msg)
 bool mafOpManager::StopCurrentOperation()
 //----------------------------------------------------------------------------
 {
-  assert(false); //SIL. 2-7-2004: -- Seems that no-one is using this -- but tell me if the program stop here -- thanks
+//  assert(false); //SIL. 2-7-2004: -- Seems that no-one is using this -- but tell me if the program stop here -- thanks
   mafOp *prev_running_op = m_RunningOp;
 	
 	while(m_RunningOp) //loop danger !!!

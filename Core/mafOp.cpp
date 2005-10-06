@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-15 15:19:22 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-10-06 16:02:58 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -184,14 +184,14 @@ bool mafOp::OkEnabled()
 void mafOp::ForceStopWithOk()
 //----------------------------------------------------------------------------
 {
-  mafEvent e(this, wxOK);
+  mafEvent e(this, OP_RUN_OK);
   OnEvent(&e);
 }
 //----------------------------------------------------------------------------
 void mafOp::ForceStopWithCancel()
 //----------------------------------------------------------------------------
 {
-  mafEvent e(this, wxCANCEL);
+  mafEvent e(this, OP_RUN_CANCEL);
   OnEvent(&e);
 }
 //----------------------------------------------------------------------------
