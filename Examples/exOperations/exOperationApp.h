@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 12:27:23 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-10-06 15:53:24 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,6 +25,8 @@ public:
   int  OnExit();
 protected:
   mafLogicWithManagers *m_logic;
+
+  void OnFatalException();
 };
 DECLARE_APP(exOperationApp)
 #endif //__testViewApp_H__

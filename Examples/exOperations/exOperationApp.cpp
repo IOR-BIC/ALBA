@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-19 11:34:29 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2005-10-06 15:53:24 $
+  Version:   $Revision: 1.20 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -124,6 +124,8 @@ bool exOperationApp::OnInit()
   m_logic->Plug(vc);
   //------------------------------------------------------------
 
+  wxHandleFatalExceptions();
+
   m_logic->Show();
   mafString app_stamp;
   app_stamp = "OPEN_ALL_DATA";
@@ -137,4 +139,10 @@ int exOperationApp::OnExit()
 {
   cppDEL(m_logic);
   return 0;
+}
+//--------------------------------------------------------------------------------
+void exOperationApp::OnFatalException()
+//--------------------------------------------------------------------------------
+{
+  m_logic->HandleException();
 }
