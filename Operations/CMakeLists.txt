@@ -25,6 +25,8 @@ IF (MAF_USE_VTK)
     mmoDICOMImporter.h
     mmoMAFTransform.cpp
     mmoMAFTransform.h
+    mmoExplodeCollapse.cpp
+    mmoExplodeCollapse.h
     mmoExtractIsosurface.cpp
     mmoExtractIsosurface.h
     mmoMSFExporter.cpp
