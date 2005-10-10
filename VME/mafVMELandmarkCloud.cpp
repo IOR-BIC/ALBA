@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-19 11:37:02 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-10-10 15:16:03 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -654,7 +654,7 @@ mafVMELandmark *mafVMELandmarkCloud::GetLandmark(const char *name)
   }
   else
   {
-    mafErrorMacro("GetLandmark by name: this function works only when cloud is Open!");
+    mafErrorMacro("GetLandmark by name: this function works only when cloud is Closed!");
   }
   return NULL;
 }
