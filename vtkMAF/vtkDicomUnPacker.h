@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    vtkDicomUnPacker.h
   Language:  C++
-  Date:      $Date: 2005-04-21 13:53:10 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-10-10 09:35:18 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone m.petrone@cineca.it, Paolo Quadrani p.quadrani@cineca.it
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -59,7 +59,7 @@ POSSIBILITY OF SUCH DAMAGES.
 #include "vtkImageUnPacker.h"
 #include "vtkPackedImage.h"
 
-#include "vtkSVTKWin32Header.h"
+#include "vtkMAFConfigure.h"
 
 #ifndef VTK_IMG_PACK_DICOM
 #define VTK_IMG_PACK_DICOM 2
@@ -80,8 +80,7 @@ typedef unsigned char     uint8;
 
 typedef long int          int32;
 
-class VTK_SVTK_EXPORT vtkDicomUnPacker : public vtkImageUnPacker
-//class vtkDicomUnPacker : public vtkImageUnPacker
+class VTK_vtkMAF_EXPORT vtkDicomUnPacker : public vtkImageUnPacker
 {
 public:
   /************************************************
@@ -98,7 +97,7 @@ public:
 	  char stringa[multeplicity][300];
   } VALUE;
 
-  typedef struct  {     
+  typedef struct  {
 	present  intoDictionary; 
 	int  Group;
 	int  Element;
@@ -110,6 +109,16 @@ public:
 
   } DICOM;
 
+  typedef struct {
+    int  Group;
+    int  Element;
+    std::string Version;
+    std::string Val_Repr;
+    std::string Val_Mult;
+    std::string Keyword;
+    std::string Name;
+  } DICOM_DEFAULT;
+
 public:
 	vtkTypeMacro(vtkDicomUnPacker,vtkImageUnPacker);
 	void PrintSelf(ostream& os, vtkIndent indent);
@@ -118,10 +127,15 @@ public:
   static vtkDicomUnPacker *New();
 
 	/**	Set the dictionary file name*/
-	void SetDictionaryFileName(const char *filename) {DictionaryFileName = filename; this->Modified();};
+	void SetDictionaryFileName(const char *filename);
 	const char * GetDictionaryFileName() {return DictionaryFileName;};
 
-	/**	Get the patient information*/
+  /**	use default dictionary flag*/
+  vtkBooleanMacro(UseDefaultDictionary,int);
+  vtkSetMacro(UseDefaultDictionary,int);
+  vtkGetMacro(UseDefaultDictionary,int);
+
+  /**	Get the patient information*/
 	vtkGetStringMacro(PatientName);
 	vtkGetStringMacro(PatientBirthDate);
 	vtkGetStringMacro(PatientSex);
@@ -133,8 +147,8 @@ public:
 	vtkGetStringMacro(Study);
 
 	/**	Get the image information*/
-//	vtkGetMacro(SliceLocation,float);
-	void GetSliceLocation(float pos[3]) {pos[0] = position[0];pos[1] = position[1];pos[2] = position[2];};
+//	vtkGetMacro(SliceLocation,double);
+	void GetSliceLocation(double pos[3]);
   char *GetImageType(int id_caracrteristic = 0);
   
 	/**	flip the image readed*/
@@ -176,7 +190,9 @@ protected:
   DICOM  DICT[1500]; /* dictionary */ 
   long   DICT_line; // number of lines in the dictionary
 
-	int DebugFlag;
+  bool DictionaryRead;
+  int UseDefaultDictionary;
+  int DebugFlag;
 	int	FlipImage;
 	int Flag;
 	int Status;
@@ -192,7 +208,7 @@ protected:
 	char StudyDate[15];
   char ImageType[3][256];
 
-//	float SliceLocation;
+//	double SliceLocation;
 	
 	/**
 	Read image information contained in the header and neccessary for 
@@ -202,7 +218,7 @@ protected:
 	/**
 	UnPacks the image into the output buffer. */
 	int vtkImageUnPackerUpdate(vtkPackedImage *packed, vtkImageData *data);
-//	int read_dicom_string_image(uint16 *IMAGE, float slope_value, float intercept_value);
+//	int read_dicom_string_image(uint16 *IMAGE, double slope_value, double intercept_value);
 	int read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *size_image, uint32 *result_line);
 
 protected:
@@ -210,26 +226,27 @@ protected:
                             F U N C T I O N S
 ****************************************************************************/
 int load_dictionary(DICOM DICT[]);
+int load_dictionary_from_file(DICOM DICT[]);
 
-/* FROM (Group, Element)  returns the position of rispective pattern into Dictionary */ 
+/* FROM (Group, Element)  returns the m_Position of rispective pattern into Dictionary */ 
 long find (long Group, long Element , DICOM DICT[], long n_line);
 
 //uint16 read16 (FILE* fp, char little_endian) ;
 //uint32 read32 (FILE* fp, char little_endian);
-int bits_allocated;
-int bits_stored;
-int high_bit;
-int pixel_rapresentation;
-int smallest_image_pixel_value;
-int largest_image_pixel_value;
-int dim_x;
-int dim_y;
-char photometric_interpretation[11];
-float intercept;
-float slope;
-float spacing[2];
-float position[3];
-float orientation[3];
+int m_BitsAllocated;
+int m_BitsStored;
+int m_HighBit;
+int m_PixelRepresentation;
+int m_SmallestImagePixelValue;
+int m_LargestImagePixelValue;
+int m_DimX;
+int m_DimY;
+char m_PhotometricInterpretation[11];
+double m_Intercept;
+double m_Slope;
+double m_Spacing[2];
+double m_Position[3];
+double m_Orientation[3];
 
 void  read_dicom_header(char * input, DICOM RESULT[], VALUE VALUES[], uint32 *size_image, uint32 *result_line);
 void  parser_multepl(tipo str , FILE * fp, long Length, VALUE * VALUES);

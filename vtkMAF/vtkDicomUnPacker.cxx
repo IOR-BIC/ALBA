@@ -30,10 +30,12 @@ vtkDicomUnPacker* vtkDicomUnPacker::New()
 vtkDicomUnPacker::vtkDicomUnPacker()
 //----------------------------------------------------------------------------
 {
-	DebugFlag=0;
-	FlipImage=0;
-	Flag=0;
-	DictionaryFileName=NULL;
+	DebugFlag = 0;
+	FlipImage = 0;
+	Flag      = 0;
+  DictionaryRead = false;
+  UseDefaultDictionary = 1;
+	DictionaryFileName = NULL;
 	strcpy(PatientName,"                   ");
 	strcpy(StudyUID,"                   ");
 	strcpy(Study,"                   ");
@@ -44,7 +46,7 @@ vtkDicomUnPacker::vtkDicomUnPacker()
 	strcpy(PatientID, "          ");
 	strcpy(PatientSex," ");
 	strcpy(Modality,"  ");
-	SetDictionaryFileName("dicom3.txt");
+	//SetDictionaryFileName("dicom3.txt");
 	UnPackFromFileOn();
   DICT_line = 0;
 	Status = 0;
@@ -63,15 +65,15 @@ void vtkDicomUnPacker::PrintSelf(ostream& os, vtkIndent indent)
   vtkImageUnPacker::PrintSelf(os,indent);
 }
 //----------------------------------------------------------------------------
-void  vtkDicomUnPacker::parser_multepl(tipo str , FILE * fp, long Length, VALUE * VAL)
+void vtkDicomUnPacker::parser_multepl(tipo str , FILE * fp, long Length, VALUE * VAL)
 //----------------------------------------------------------------------------
 {
   long p,r;
   char c;
 /***********  init  *********/
-  r=0; 
-  VAL->type= str;
-  VAL->mult=0;
+  r = 0; 
+  VAL->type = str;
+  VAL->mult = 0;
 /***************************/ 
 	for (p=0; p< Length; p++)
 	{
@@ -99,7 +101,7 @@ void  vtkDicomUnPacker::parser_multepl(tipo str , FILE * fp, long Length, VALUE 
 long vtkDicomUnPacker::find (long Group, long Element , DICOM DICT[], long n_line)
 //----------------------------------------------------------------------------
 {
-	/* FROM (Group, Element)  returns the position of rispective pattern into Dictionary */ 
+	/* FROM (Group, Element)  returns the m_Position of rispective pattern into Dictionary */ 
   long n;
   long index=-1;
   if ((Group>20479) & (Group<20736)) Group=20480; /*  repeating groups 0x50xx */ 
@@ -108,7 +110,15 @@ long vtkDicomUnPacker::find (long Group, long Element , DICOM DICT[], long n_lin
   return index;
 }
 //----------------------------------------------------------------------------
-int vtkDicomUnPacker::load_dictionary(DICOM DICT[])
+void vtkDicomUnPacker::SetDictionaryFileName(const char *filename)
+//----------------------------------------------------------------------------
+ {
+   DictionaryRead = false;
+   DictionaryFileName = filename; 
+   this->Modified();
+ }
+//----------------------------------------------------------------------------
+int vtkDicomUnPacker::load_dictionary_from_file(DICOM DICT[])
 //----------------------------------------------------------------------------
 {   /* return  N_line and structure DICOM */ 
   char pre=' ', cur=' ';
@@ -117,7 +127,7 @@ int vtkDicomUnPacker::load_dictionary(DICOM DICT[])
   char pt[5];
   FILE *Dictionary;
 	
-	if ((Dictionary=fopen(DictionaryFileName, "rb")) == NULL)
+	if (DictionaryFileName == NULL || (Dictionary=fopen(DictionaryFileName, "rb")) == NULL)
 	{
 		return -1;
 	}
@@ -217,7 +227,29 @@ int vtkDicomUnPacker::load_dictionary(DICOM DICT[])
 		pre=cur;
   }
   fclose(Dictionary);
+  DictionaryRead = true;
   return p_line;
+}
+//----------------------------------------------------------------------------
+int vtkDicomUnPacker::load_dictionary(DICOM DICT[])
+//----------------------------------------------------------------------------
+{
+/*  int num_elem = sizeof(DICOMDefaultDictionary)/sizeof(DICOMDefaultDictionary[0]);
+  int p_line = 0;
+  for (; p_line < num_elem; p_line++)
+  {
+    DICT[p_line].Group    = DICOMDefaultDictionary[p_line].Group;
+    DICT[p_line].Element  = DICOMDefaultDictionary[p_line].Element;
+    strcpy(DICT[p_line].Version,DICOMDefaultDictionary[p_line].Version.c_str());
+    strcpy(DICT[p_line].Val_Repr,DICOMDefaultDictionary[p_line].Val_Repr.c_str());
+    strcpy(DICT[p_line].Val_Mult,DICOMDefaultDictionary[p_line].Val_Mult.c_str());
+    strcpy(DICT[p_line].Keyword,DICOMDefaultDictionary[p_line].Keyword.c_str());
+    strcpy(DICT[p_line].Name,DICOMDefaultDictionary[p_line].Name.c_str());
+  }
+
+  DictionaryRead = true;
+  return p_line;*/
+  return -1;
 }
 //----------------------------------------------------------------------------
 uint16 read16 ( FILE* fp, char little_endian)  
@@ -267,32 +299,59 @@ void read (FILE* fp, char little_endian, long &value)
 int vtkDicomUnPacker::read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *size_image, uint32 *result_line)
 //----------------------------------------------------------------------------
 {
-	char    time_to_exit=1;
-	char    first_one		= 1;
-	char    explicitVR;
-	int			fseek_result= 0;
-	uint8   * t;
-	uint8   * pvr;
-	uint8   vr0,vr1;
-	uint16  groupWord;
-	uint16  elementWord;
-	uint32  elementLength;
+	bool   time_to_exit = false;
+	char   first_one		= 1;
+	char   explicitVR;
+	int		 fseek_result = 0;
+	uint8 *t;
+	uint8 *pvr;
+	uint8  vr0,vr1;
+	uint16 groupWord;
+	uint16 elementWord;
+	uint32 elementLength;
 
-	uint32   RESULT_line;
+	uint32 RESULT_line;
 	long   pos;
-	FILE    *fp;
-	char little_endian = 1;  /* set default little endian */ 
+	FILE  *fp;
+	char   little_endian = 1;  /* set default little endian */ 
 
 /*******************************    INIT    ***************************/
-	if (FileName == NULL) {vtkErrorMacro ("Dicom File Name NULL"); return -1;}
-	if (DictionaryFileName == NULL) {vtkErrorMacro ("Dictionary File Name NULL"); return -1;}
-	t=    (uint8 *) calloc(4,sizeof(uint8));
-	DICT_line=load_dictionary(DICT);  /* LOAD DICTIONARY dict_line = lines number of dictionary DICT */
-	if (DICT_line < 0) {vtkErrorMacro (" Dictionary File Not Open"); return -1;}
-	if ((fp=fopen(FileName, "rb")) == NULL) {vtkErrorMacro (" Dicom File Not Reached \n"); return -1;} 
-	RESULT_line=0;
-/**********************************************************************/
-  while (time_to_exit != 0)
+	if (FileName == NULL) 
+  {
+    vtkErrorMacro("Dicom File Name NULL"); 
+    return -1;
+  }
+	if (DictionaryFileName == NULL) 
+  {
+    vtkErrorMacro ("Dictionary File Name NULL"); 
+    return -1;
+  }
+	t = (uint8 *)calloc(4,sizeof(uint8));
+	if (!DictionaryRead)
+	{
+    if (UseDefaultDictionary)
+    {
+      DICT_line = load_dictionary(DICT);  /* LOAD DICTIONARY dict_line = lines number of dictionary DICT */
+    }
+    else
+    {
+      DICT_line = load_dictionary_from_file(DICT);  /* LOAD DICTIONARY dict_line = lines number of dictionary DICT */
+    }
+	}
+	if (DICT_line < 0) 
+  {
+    vtkErrorMacro(" Error reading DICOM Dictionary"); 
+    return -1;
+  }
+	if ((fp=fopen(FileName, "rb")) == NULL) 
+  {
+    vtkErrorMacro (" Dicom File Not Reached \n"); 
+    return -1;
+  }
+	RESULT_line = 0;
+
+  /**********************************************************************/
+  while (!time_to_exit)
 	{ 
 		explicitVR = 0;
 		groupWord      = read16(fp,little_endian);
@@ -306,13 +365,13 @@ int vtkDicomUnPacker::read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *
 			{
 				first_one = 0;
         little_endian = 1;
-        rewind(fp);/* inizio del file */ 
+        rewind(fp);/* begin of file */ 
 			}
 			else if  (little_endian && elementLength == 0x04000000)     
 			{
 				first_one = 0;
         little_endian = 0;
-				rewind(fp);/* inizio del file */
+				rewind(fp);/* begin of file */
 			}     	               
       else 
 			{
@@ -364,13 +423,14 @@ int vtkDicomUnPacker::read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *
                 (pvr[0]=='U' && pvr[1]=='L') ||
 								(pvr[0]=='U' && pvr[1]=='S') ) 
 			{
-				vr0=pvr[0]; vr1=pvr[1];
-        explicitVR=1;
+				vr0 = pvr[0]; 
+        vr1 = pvr[1];
+        explicitVR = 1;
         elementLength &= 0xffff0000; 
         elementLength >>= 16;      
       }
 		}
-		pos=find(groupWord,elementWord  ,DICT,DICT_line);
+		pos = find(groupWord, elementWord, DICT, DICT_line);
 
 		if (pos<0) 
 		{ /* NO DEFINED into CURRENT DICTIONARY */ 
@@ -385,20 +445,20 @@ int vtkDicomUnPacker::read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *
 		}
 		else
 		{
-			RESULT[RESULT_line]=DICT[pos]; 
-      RESULT[RESULT_line].intoDictionary=yes;
+			RESULT[RESULT_line] = DICT[pos]; 
+      RESULT[RESULT_line].intoDictionary = yes;
     }
 
 		if ( RESULT[RESULT_line].intoDictionary == yes) 
 		{
 			if (explicitVR) 
 			{
-				RESULT[RESULT_line].Val_Repr[0]= vr0;
-        RESULT[RESULT_line].Val_Repr[1]= vr1;
-        RESULT[RESULT_line].Val_Repr[2]='\0';
+				RESULT[RESULT_line].Val_Repr[0] = vr0;
+        RESULT[RESULT_line].Val_Repr[1] = vr1;
+        RESULT[RESULT_line].Val_Repr[2] = '\0';
       }
-      vr0=RESULT[RESULT_line].Val_Repr[0];
-      vr1=RESULT[RESULT_line].Val_Repr[1];
+      vr0 = RESULT[RESULT_line].Val_Repr[0];
+      vr1 = RESULT[RESULT_line].Val_Repr[1];
 
       if( (vr0=='A') && (vr1=='E') || /* string of characters without numerical meaning                */ 
           (vr0=='A') && (vr1=='S') || /* string of characters without numerical meaning 	AGE	     */ 
@@ -413,7 +473,7 @@ int vtkDicomUnPacker::read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *
           (vr0=='T') && (vr1=='M') || /* string of characters without numerical meaning    TIME        */
           (vr0=='U') && (vr1=='I') )  /* string of characters without numerical meaning    UNIQUE IDENTIFIER */
 			{
-				parser_multepl(string, fp, elementLength,& VALUES[RESULT_line]);
+				parser_multepl(string, fp, elementLength, &VALUES[RESULT_line]);
 			}
 			else if( (vr0=='D') && (vr1=='S') || /* string of characters representing floating number */ 
                (vr0=='I') && (vr1=='S') )  /* string of characters representing integer  number */ 
@@ -453,7 +513,7 @@ int vtkDicomUnPacker::read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *
 			{  /* only for size image */ 
 				if ((groupWord == 0x7fe0) & (elementWord == 0x0010)) 
 				{
-					time_to_exit = 0;
+					time_to_exit = true;
           *size_image  = elementLength;
 				}
         else 
@@ -485,30 +545,33 @@ int vtkDicomUnPacker::read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *
 }
 //----------------------------------------------------------------------------
 template <class T>
-int read_dicom_string_image(char *filename, T *IMAGE, float slope_value, float intercept_value, int rows, int cols, int flip=0)
+int read_dicom_string_image(char *filename, T *IMAGE, double slope_value, double intercept_value, int rows, int cols, int flip=0)
 //----------------------------------------------------------------------------
 {
-	char    time_to_exit=1;
-	char    first_one  = 1;
+	bool    time_to_exit = false;
+	char    first_one    = 1;
 	char    explicitVR;
-	uint8   * t;
-	uint8   * pvr;
+	uint8  *t;
+	uint8  *pvr;
 	uint16  groupWord;
 	uint16  elementWord;
 	uint32  elementLength;
-	FILE    *fp;
-	char little_endian = 1;  /* set default little endian */ 
-	float HU_value;
+	FILE   *fp;
+	char    little_endian = 1;  /* set default little endian */ 
+	double  HU_value;
 	T value;
-	// int cols = dim_x;
-	// int rows = dim_y;
+	// int cols = m_DimX;
+	// int rows = m_DimY;
 
-/*********************************   INIT   ***************************/
-   t=    (uint8 *) calloc(4,sizeof(uint8));
-   if ((fp=fopen(filename, "rb")) == NULL) { return -1;} 
-/**********************************************************************/
+  /*********************************   INIT   ***************************/
+  t = (uint8 *) calloc(4,sizeof(uint8));
+  if ((fp = fopen(filename, "rb")) == NULL)
+  {
+    return -1;
+  } 
 
-  while (time_to_exit!=0)
+  /**********************************************************************/
+  while (!time_to_exit)
 	{ 
 		explicitVR = 0;
 		groupWord      = read16(fp,little_endian);
@@ -594,7 +657,7 @@ int read_dicom_string_image(char *filename, T *IMAGE, float slope_value, float i
 					for (c = 0; c < cols; c++)
 					{
 						read(fp,little_endian,value); // data shold be always in lttle endian
-						HU_value = (float) value;
+						HU_value = (double) value;
 						HU_value = HU_value * slope_value + intercept_value;
 						IMAGE[cols*r+c] = (T) HU_value;
 					}
@@ -607,13 +670,13 @@ int read_dicom_string_image(char *filename, T *IMAGE, float slope_value, float i
 					for (c = 0; c < cols; c++)
 					{
 						read(fp,little_endian,value); // data shold be always in lttle endian
-						HU_value = (float) value;
+						HU_value = (double) value;
 						HU_value = HU_value * slope_value + intercept_value;
 						IMAGE[cols*r+c] = (T) HU_value;
 					}
 				}
 			}
-			time_to_exit=0;
+			time_to_exit = true;
 		}
 		fseek(fp,elementLength,SEEK_CUR);
   } /* END  while (time_to_exit) */ 
@@ -655,26 +718,26 @@ int vtkDicomUnPacker::ReadImageInformation(vtkPackedImage *packed)
 		}
 	}	
 
-	bits_allocated=16;
-	bits_stored=16;
-	dim_x=512;
-	dim_y=512;
-	high_bit=15;
-	pixel_rapresentation=0;
-	smallest_image_pixel_value=0;
-	largest_image_pixel_value=0;
-	slope=1;
-	intercept=0;
-	spacing[0]=2.0;
-	spacing[1]=2.0;
-	position[0]=0.0;
-	position[1]=0.0;
-	position[2]=0.0;
+	m_BitsAllocated=16;
+	m_BitsStored=16;
+	m_DimX=512;
+	m_DimY=512;
+	m_HighBit=15;
+	m_PixelRepresentation=0;
+	m_SmallestImagePixelValue=0;
+	m_LargestImagePixelValue=0;
+	m_Slope=1;
+	m_Intercept=0;
+	m_Spacing[0]=2.0;
+	m_Spacing[1]=2.0;
+	m_Position[0]=0.0;
+	m_Position[1]=0.0;
+	m_Position[2]=0.0;
 //	SliceLocation=0.0;
-	orientation[0]=0.0;
-	orientation[1]=0.0;
-	orientation[2]=0.0;
-	strcpy(photometric_interpretation,"          ");
+	m_Orientation[0]=0.0;
+	m_Orientation[1]=0.0;
+	m_Orientation[2]=0.0;
+	strcpy(m_PhotometricInterpretation,"          ");
 
 	for (p=0; p<TAGNumbers; p++)
   {
@@ -724,68 +787,68 @@ int vtkDicomUnPacker::ReadImageInformation(vtkPackedImage *packed)
 			strncpy(Study, (char *)&(VALUES[p].stringa[0]), 79);
 		if ((RESULT[p].Group==32) & (RESULT[p].Element==50)) 
 		{
-			position[0]=(float) VALUES[p].num[0];
-			position[1]=(float) VALUES[p].num[1];
-			position[2]=(float) VALUES[p].num[2];
+			m_Position[0]=(double) VALUES[p].num[0];
+			m_Position[1]=(double) VALUES[p].num[1];
+			m_Position[2]=(double) VALUES[p].num[2];
 		}
 		if ((RESULT[p].Group==32) & (RESULT[p].Element==4161)) 
 		{
-			//SliceLocation=(float) VALUES[p].num[0];
-			position[0]=0.0;
-			position[1]=0.0;
-			//position[2]=SliceLocation;
-			position[2] = VALUES[p].num[0];
+			//SliceLocation=(double) VALUES[p].num[0];
+			m_Position[0]=0.0;
+			m_Position[1]=0.0;
+			//m_Position[2]=SliceLocation;
+			m_Position[2] = VALUES[p].num[0];
 		}
 		if ((RESULT[p].Group==32) & (RESULT[p].Element==55))
 		{	
-			orientation[0]=(float) VALUES[p].num[0];
-			orientation[1]=(float) VALUES[p].num[1];
-			orientation[2]=(float) VALUES[p].num[2];
+			m_Orientation[0]=(double) VALUES[p].num[0];
+			m_Orientation[1]=(double) VALUES[p].num[1];
+			m_Orientation[2]=(double) VALUES[p].num[2];
 		}
 
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==256)) 
-      bits_allocated=(int) VALUES[p].num[0];
+      m_BitsAllocated=(int) VALUES[p].num[0];
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==257)) 
-      bits_stored=(int) VALUES[p].num[0];  
+      m_BitsStored=(int) VALUES[p].num[0];  
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==258)) 
-      high_bit=(int) VALUES[p].num[0];
+      m_HighBit=(int) VALUES[p].num[0];
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==259)) 
-      pixel_rapresentation=(int) VALUES[p].num[0];
+      m_PixelRepresentation=(int) VALUES[p].num[0];
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==262)) 
-      smallest_image_pixel_value=(int) VALUES[p].num[0];
+      m_SmallestImagePixelValue=(int) VALUES[p].num[0];
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==263)) 
-      largest_image_pixel_value=(int) VALUES[p].num[0];
+      m_LargestImagePixelValue=(int) VALUES[p].num[0];
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==16)) 
-      dim_y=(int) VALUES[p].num[0];                       
+      m_DimY=(int) VALUES[p].num[0];                       
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==17)) 
-      dim_x=(int) VALUES[p].num[0];
+      m_DimX=(int) VALUES[p].num[0];
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==4178)) 
-      intercept=(int) VALUES[p].num[0];
+      m_Intercept=(int) VALUES[p].num[0];
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==4179)) 
-      slope=(int) VALUES[p].num[0];
+      m_Slope=(int) VALUES[p].num[0];
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==4)) 
-      strcpy(photometric_interpretation, (char *)&(VALUES[p].stringa[0]));
+      strcpy(m_PhotometricInterpretation, (char *)&(VALUES[p].stringa[0]));
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==48)) 
 		{
-			spacing[0]=(float) VALUES[p].num[0];
-			spacing[1]=(float) VALUES[p].num[1];
+			m_Spacing[0]=(double) VALUES[p].num[0];
+			m_Spacing[1]=(double) VALUES[p].num[1];
 		}
   }
 
-/*	if (bits_stored != 16 && bits_stored != 8 && bits_stored != 12)
+/*	if (m_BitsStored != 16 && m_BitsStored != 8 && m_BitsStored != 12)
 		{
 			vtkErrorMacro("Supports only 8, 12, 16 bits DICOM images.");
 			return -1;
 		}*/
-	if (bits_allocated != 8 && bits_allocated != 16)
+	if (m_BitsAllocated != 8 && m_BitsAllocated != 16)
 		{
 			vtkErrorMacro("Unsupported DICOM image.");
 			return -1;
 		}
 
 	// Set the image parameters necessary for cache allocation
-	SetDataExtent(0,dim_x-1,0,dim_y-1,0,0);
-	switch (bits_allocated)
+	SetDataExtent(0,m_DimX-1,0,m_DimY-1,0,0);
+	switch (m_BitsAllocated)
 	{
 	case 8:
 		SetDataScalarType(VTK_CHAR);
@@ -797,8 +860,8 @@ int vtkDicomUnPacker::ReadImageInformation(vtkPackedImage *packed)
 
 	SetNumberOfScalarComponents(1); // Only gray scale CT images supported
 
-	GetOutput()->SetSpacing(spacing);
-	GetOutput()->SetOrigin(position);
+	GetOutput()->SetSpacing(m_Spacing);
+	GetOutput()->SetOrigin(m_Position);
 
 	return 0;
 }
@@ -827,16 +890,16 @@ int vtkDicomUnPacker::vtkImageUnPackerUpdate(vtkPackedImage *packed, vtkImageDat
 
 	int *ext=data->GetExtent();
 
-	switch (bits_allocated) 
+	switch (m_BitsAllocated) 
 	{
 		case 8:
 		{
-			ret = read_dicom_string_image(FileName, (char *)data->GetScalarPointer(), slope, intercept, dim_y, dim_x,FlipImage);
+			ret = read_dicom_string_image(FileName, (char *)data->GetScalarPointer(), m_Slope, m_Intercept, m_DimY, m_DimX,FlipImage);
 		}
 		break;
 		case 16:
 		{
-			ret = read_dicom_string_image(FileName, (short *)data->GetScalarPointer(), slope, intercept, dim_y, dim_x,FlipImage);
+			ret = read_dicom_string_image(FileName, (short *)data->GetScalarPointer(), m_Slope, m_Intercept, m_DimY, m_DimX,FlipImage);
 		}
 		break;
 	}
@@ -860,4 +923,12 @@ char *vtkDicomUnPacker::GetImageType(int id_caracrteristic)
 {
   char *img_type = (id_caracrteristic >= 0 && id_caracrteristic < 3) ? ImageType[id_caracrteristic] : ImageType[0];
   return img_type;
+}
+//----------------------------------------------------------------------------
+void vtkDicomUnPacker::GetSliceLocation(double pos[3])
+//----------------------------------------------------------------------------
+{
+  pos[0] = m_Position[0];
+  pos[1] = m_Position[1];
+  pos[2] = m_Position[2];
 }

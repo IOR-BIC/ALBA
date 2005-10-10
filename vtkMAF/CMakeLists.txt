@@ -11,8 +11,8 @@ SET(vtkMAF_SRCS
 vtkContourVolumeMapper.cxx
 vtkContourVolumeMapper.h
 vtkContourVolumeMapperAdv.cxx
-#vtkDicomUnPacker.cxx
-#vtkDicomUnPacker.h
+vtkDicomUnPacker.cxx
+vtkDicomUnPacker.h
 vtkDOFMatrix.cxx
 vtkDOFMatrix.h
 vtkExtendedGlyph3D.cxx
@@ -21,12 +21,16 @@ vtkFixedCutter.cxx
 vtkFixedCutter.h
 vtkGlobalAxisCoordinate.cxx
 vtkGlobalAxisCoordinate.h
+vtkImageUnPacker.cxx
+vtkImageUnPacker.h
 vtkLocalAxisCoordinate.cxx
 vtkLocalAxisCoordinate.h
 vtkRayCast3DPicker.cxx
 vtkRayCast3DPicker.h
 vtkDistanceFilter.cxx
 vtkDistanceFilter.h
+vtkPackedImage.cxx
+vtkPackedImage.h
 vtkProjectRG.cxx
 vtkProjectRG.h
 vtkProjectSP.cxx
