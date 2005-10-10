@@ -90,6 +90,7 @@ mafInteractor.cpp
 mafInteractor.h
 mafRefSys.cpp
 mafRefSys.h
+
 mmdButtonsPad.cpp
 mmdButtonsPad.h
 mmdMouse.cpp
@@ -98,6 +99,7 @@ mmdTracker.cpp
 mmdTracker.h
 #mmdTrackerSet.cpp
 #mmdTrackerSet.h
+
 mmi6DOF.cpp
 mmi6DOF.h
 mmi6DOFCameraMove.cpp
@@ -112,6 +114,8 @@ mmiCompositorMouse.cpp
 mmiCompositorMouse.h
 mmiConstraint.cpp
 mmiConstraint.h
+mmiDICOMImporterInteractor.cpp
+mmiDICOMImporterInteractor.h
 mmiExtractIsosurface.cpp
 mmiExtractIsosurface.h
 #mmiGeneric.cpp
