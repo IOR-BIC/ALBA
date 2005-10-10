@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    vtkDicomUnPacker.h
   Language:  C++
-  Date:      $Date: 2005-10-10 09:35:18 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-10-10 13:02:14 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone m.petrone@cineca.it, Paolo Quadrani p.quadrani@cineca.it
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -120,7 +120,7 @@ public:
   } DICOM_DEFAULT;
 
 public:
-	vtkTypeMacro(vtkDicomUnPacker,vtkImageUnPacker);
+	vtkTypeRevisionMacro(vtkDicomUnPacker,vtkImageUnPacker);
 	void PrintSelf(ostream& os, vtkIndent indent);
 
 	/**	Constructor.*/

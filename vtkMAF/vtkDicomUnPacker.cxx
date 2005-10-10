@@ -11,19 +11,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkImageData.h"
 
-//----------------------------------------------------------------------------
-vtkDicomUnPacker* vtkDicomUnPacker::New()
-//----------------------------------------------------------------------------
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkDicomUnPacker");
-  if(ret)
-  {
-    return (vtkDicomUnPacker*)ret;
-  }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkDicomUnPacker;
-}
+vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.3 $");
+vtkStandardNewMacro(vtkDicomUnPacker);
 
 //----------------------------------------------------------------------------
 // Construct an instance of vtkDicomUnPacker with no data.
