@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-06 15:53:24 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2005-10-10 13:06:25 $
+  Version:   $Revision: 1.21 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -37,6 +37,7 @@
 #include "mmoCreateMeter.h"
 #include "mmoCreateProber.h"
 #include "mmoCreateSlicer.h"
+#include "mmoDICOMImporter.h"
 #include "mmoExtractIsosurface.h"
 #include "mmoMAFTransform.h"
 #include "mmoMSFExporter.h"
@@ -84,9 +85,10 @@ bool exOperationApp::OnInit()
 
   //------------------------------------------------------------
   // Importer Menu':
-  m_logic->Plug(new mmoSTLImporter("STL Importer"));
-  m_logic->Plug(new mmoVTKImporter("VTK Importer"));
-  m_logic->Plug(new mmoMSF1xImporter("MSF 1.x Importer"));
+  m_logic->Plug(new mmoSTLImporter("STL"));
+  m_logic->Plug(new mmoVTKImporter("VTK"));
+  m_logic->Plug(new mmoMSF1xImporter("MSF 1.x"));
+  m_logic->Plug(new mmoDICOMImporter("DICOM"));
   //------------------------------------------------------------
 
   //------------------------------------------------------------

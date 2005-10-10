@@ -21,6 +21,8 @@ IF (MAF_USE_VTK)
     mmoCreateProber.h
     mmoCreateSlicer.cpp
     mmoCreateSlicer.h
+    mmoDICOMImporter.cpp
+    mmoDICOMImporter.h
     mmoMAFTransform.cpp
     mmoMAFTransform.h
     mmoExtractIsosurface.cpp
