@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-11 13:01:13 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2005-10-11 15:24:38 $
+  Version:   $Revision: 1.25 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -39,6 +39,7 @@
 #include "mmoCreateSlicer.h"
 #include "mmoExplodeCollapse.h"
 #include "mmoExtractIsosurface.h"
+#include "mmoFilterSurface.h"
 #include "mmoMAFTransform.h"
 #include "mmoMSFExporter.h"
 #include "mmoMSF1xImporter.h"
@@ -107,6 +108,7 @@ bool exOperationApp::OnInit()
   m_logic->Plug(new mmoCreateSlicer("Create Slicer"));
   m_logic->Plug(new mmoExplodeCollapse("Explode/Collapse cloud"));
   m_logic->Plug(new mmoExtractIsosurface("Extract Isosurface"));
+  m_logic->Plug(new mmoFilterSurface("Filter Surface"));
   m_logic->Plug(new mmoMAFTransform("MAF Transform"));
   m_logic->Plug(new mmoReparentTo("Reparent to...  \tCtrl+R"));
   //------------------------------------------------------------

@@ -27,6 +27,8 @@ IF (MAF_USE_VTK)
     mmoExplodeCollapse.h
     mmoExtractIsosurface.cpp
     mmoExtractIsosurface.h
+    mmoFilterSurface.cpp
+    mmoFilterSurface.h
     mmoMSFExporter.cpp
     mmoMSFExporter.h
     mmoMSF1xImporter.cpp
