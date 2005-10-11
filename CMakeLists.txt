@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2005-07-13 13:58:22 $
-# Version:   $Revision: 1.27 $
+# Date:      $Date: 2005-10-11 11:00:30 $
+# Version:   $Revision: 1.28 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -38,13 +38,13 @@ MARK_AS_ADVANCED (
 )
 
 #-----------------------------------------------------------------------------
-# VTK version number.  An even minor number corresponds to releases.
+# MAF version number.  An even minor number corresponds to releases.
 #-----------------------------------------------------------------------------
 SET(MAF_MAJOR_VERSION 2)
 SET(MAF_MINOR_VERSION 0)
 SET(MAF_BUILD_VERSION 0)
 SET(MAF_VERSION
-    "${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION}")
+    "${MAF_MAJOR_VERSION}.${MAF_MINOR_VERSION}.${MAF_BUILD_VERSION}")
 
 #-----------------------------------------------------------------------------
 # this is to enable precompiled headers under VC6.0
