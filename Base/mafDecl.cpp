@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 10:59:26 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-10-11 16:43:42 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -76,7 +76,7 @@ std::string mafGetOpenFile(const char *initial, const char * wild, const char * 
 }
 
 //----------------------------------------------------------------------------
-void mafGetOpenMultiFiles(const char * initial, const char * wild, std::vector<std::string> files, const char * title, wxWindow *parent)
+void mafGetOpenMultiFiles(const char * initial, const char * wild, std::vector<std::string> &files, const char * title, wxWindow *parent)
 //----------------------------------------------------------------------------
 {
   wxString path, name, ext;
