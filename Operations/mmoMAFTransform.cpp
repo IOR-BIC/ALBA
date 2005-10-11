@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMAFTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-21 12:40:42 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-10-11 15:24:04 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -46,7 +46,7 @@
 //----------------------------------------------------------------------------
 // widget id's
 //----------------------------------------------------------------------------
-enum MAFTRANSFORM_WIDGET_ID
+enum MAF_TRANSFORM_ID
 {
 	ID_SHOW_GIZMO = MINID,
   ID_CHOOSE_GIZMO_COMBO,
