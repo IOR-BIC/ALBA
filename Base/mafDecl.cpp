@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-11 16:43:42 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-10-11 17:49:47 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -93,7 +93,7 @@ void mafGetOpenMultiFiles(const char * initial, const char * wild, std::vector<s
   wxArrayString wxfiles;
 	(result == wxID_OK) ? dialog.GetPaths(wxfiles) : wxfiles.Empty();
 	for (int i=0;i<wxfiles.GetCount();i++)
-	  files[i]=wxfiles[i];
+	  files.push_back(wxfiles[i].c_str());
 }
 //----------------------------------------------------------------------------
 std::string mafGetSaveFile(const char * initial, const char * wild, const char * title, wxWindow *parent)
