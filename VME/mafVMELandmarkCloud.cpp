@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-10 15:16:03 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-10-11 10:58:12 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -70,6 +70,7 @@ mafVMELandmarkCloud::mafVMELandmarkCloud()
   m_DefaultVisibility = 1;
   m_Radius            = -1;
   m_SphereResolution  = -1;
+  m_CloudStateCheckbox = 0;
 }
 
 //-------------------------------------------------------------------------
@@ -1132,6 +1133,8 @@ mmgGui* mafVMELandmarkCloud::CreateGui()
   m_Gui->SetListener(this);
   m_Gui->Divider();
   GetRadius(); // Called to update m_Radius var from tag
+  m_CloudStateCheckbox = this->IsOpen() ? 1 : 0;
+  m_Gui->Bool(ID_OPEN_CLOSE_CLOUD,"open",&m_CloudStateCheckbox);
   m_Gui->Double(ID_LM_RADIUS, "radius", &m_Radius, 0.0,MAXDOUBLE,-1);
 
   return m_Gui;
@@ -1147,6 +1150,16 @@ void mafVMELandmarkCloud::OnEvent(mafEventBase *maf_event)
     {
       case ID_LM_RADIUS:
         SetRadius(e->GetDouble());
+      break;
+      case ID_OPEN_CLOSE_CLOUD:
+        if (m_CloudStateCheckbox)
+        {
+          this->Open();
+        }
+        else
+        {
+          this->Close();
+        }
       break;
       default:
         mafVME::OnEvent(maf_event);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-25 13:27:00 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-10-11 10:58:12 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -140,6 +140,7 @@ public:
   enum LANDMAERK_CLOUD_WIDGET_ID
   {
     ID_LM_RADIUS = Superclass::ID_LAST,
+    ID_OPEN_CLOSE_CLOUD,
     ID_LAST
   };
 
@@ -241,6 +242,7 @@ protected:
   int m_DefaultVisibility;
   int m_SphereResolution;
   double m_Radius;
+  int m_CloudStateCheckbox;
 
 private:
   mafVMELandmarkCloud(const mafVMELandmarkCloud&); // Not implemented
