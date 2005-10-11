@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:48:31 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-10-11 17:51:01 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -13,7 +13,11 @@
 #ifndef _mafPipeSurface_H_
 #define _mafPipeSurface_H_
 
+//----------------------------------------------------------------------------
+// Include :
+//----------------------------------------------------------------------------
 #include "mafPipe.h"
+
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
