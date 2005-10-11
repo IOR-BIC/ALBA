@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-06 16:03:25 $
-  Version:   $Revision: 1.36 $
+  Date:      $Date: 2005-10-11 12:32:23 $
+  Version:   $Revision: 1.37 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -514,7 +514,8 @@ void mafLogicWithManagers::OnFileOpen(const char *file_to_open)
         return;
 
 		  m_VMEManager->MSFOpen(file);
-		  if(m_OpManager) m_OpManager->ClearUndoStack(); 
+		  if(m_OpManager) 
+        m_OpManager->ClearUndoStack(); 
 	  }
   }
 }
@@ -787,7 +788,7 @@ void mafLogicWithManagers::UpdateTimeBounds()
   double min,max; 
   if(m_VMEManager) m_VMEManager->TimeGetBounds(&min,&max);
   if(m_TimePanel)  m_TimePanel->SetBounds(min,max);
-  if(m_TimeSash)   m_TimeSash->Show(min!=max);
+  if(m_TimeSash)   m_TimeSash->Show(min<max);
 }
 //----------------------------------------------------------------------------
 mafNode* mafLogicWithManagers::VmeChoose(long vme_accept_function, long style, mafString title)
