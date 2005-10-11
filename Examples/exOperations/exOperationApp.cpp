@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-11 15:24:38 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2005-10-11 17:49:08 $
+  Version:   $Revision: 1.26 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -40,6 +40,7 @@
 #include "mmoExplodeCollapse.h"
 #include "mmoExtractIsosurface.h"
 #include "mmoFilterSurface.h"
+#include "mmoImageImporter.h"
 #include "mmoMAFTransform.h"
 #include "mmoMSFExporter.h"
 #include "mmoMSF1xImporter.h"
@@ -87,6 +88,7 @@ bool exOperationApp::OnInit()
 
   //------------------------------------------------------------
   // Importer Menu':
+  m_logic->Plug(new mmoImageImporter("Images"));
   m_logic->Plug(new mmoSTLImporter("STL"));
   m_logic->Plug(new mmoVRMLImporter("VRML"));
   m_logic->Plug(new mmoVTKImporter("VTK"));

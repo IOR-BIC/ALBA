@@ -29,6 +29,8 @@ IF (MAF_USE_VTK)
     mmoExtractIsosurface.h
     mmoFilterSurface.cpp
     mmoFilterSurface.h
+    mmoImageImporter.cpp
+    mmoImageImporter.h
     mmoMSFExporter.cpp
     mmoMSFExporter.h
     mmoMSF1xImporter.cpp
