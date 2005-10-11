@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEImage.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-19 08:27:01 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-10-11 17:50:43 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -49,6 +49,9 @@ public:
 
     /** return the right type of output */  
     virtual mafVMEOutput *GetOutput();
+
+    /** Return the suggested pipe-typename for the visualization of this vme */
+    virtual mafString GetVisualPipe() {return mafString("mafPipeImage3D");};
 
     /** return icon */
     static char** GetIcon();
