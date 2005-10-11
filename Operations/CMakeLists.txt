@@ -39,6 +39,8 @@ IF (MAF_USE_VTK)
     mmoSTLImporter.h
     mmoTransformInterface.cpp
     mmoTransformInterface.h
+    mmoVRMLImporter.cpp
+    mmoVRMLImporter.h
     mmoVTKExporter.cpp
     mmoVTKExporter.h
     mmoVTKImporter.cpp
