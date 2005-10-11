@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeFactoryVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-06 10:23:49 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-10-11 17:50:25 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,6 +33,7 @@
 #include "mafPipeLandmarkCloud.h"
 #include "mafPipePointSet.h"
 #include "mafPipeIsosurface.h"
+#include "mafPipeImage3D.h"
 
 #include <string>
 #include <ostream>
@@ -81,6 +82,7 @@ mafPipeFactoryVME::mafPipeFactoryVME()
   mafPlugPipeMacro(mafPipePointSet,"Pipe for render vtk pointset");
   mafPlugPipeMacro(mafPipeLandmarkCloud,"Pipe for render landmark clouds");
   mafPlugPipeMacro(mafPipeIsosurface,"Pipe for render vtk volumes as a iso-surface");
+  mafPlugPipeMacro(mafPipeImage3D,"Pipe for render images");
 }
 
 //------------------------------------------------------------------------------

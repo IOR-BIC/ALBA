@@ -44,6 +44,8 @@ IF (MAF_USE_VTK)
   mafDataPipeCustom.h
   mafPipeGizmo.cpp
   mafPipeGizmo.h
+  mafPipeImage3D.cpp
+  mafPipeImage3D.h
   mafPipeIsosurface.cpp
   mafPipeIsosurface.h
   mafPipeLandmarkCloud.cpp
