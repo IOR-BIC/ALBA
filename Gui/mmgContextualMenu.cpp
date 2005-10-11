@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-05 13:42:25 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-10-11 13:44:53 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,6 +38,9 @@
 #include "mafVME.h"
 #include "mafVMELandmark.h"
 
+#include "vtkMAFSmartPointer.h"
+#include "vtkVRMLExporter.h"
+
 //----------------------------------------------------------------------------
 // const
 //----------------------------------------------------------------------------
@@ -53,6 +56,7 @@ enum VIEW_CONTEXTUAL_MENU_ID
 		CONTEXTUAL_MENU_MAXIMIZE_CHILD_VIEW,
 		CONTEXTUAL_MENU_NORMAL_SIZE_CHILD_VIEW,
 		CONTEXTUAL_MENU_SAVE_AS_IMAGE,
+    CONTEXTUAL_MENU_EXPORT_AS_VRML,
     //CONTEXTUAL_MENU_EXTERNAL_INTERNAL_VIEW,
 	CONTEXTUAL_VIEW_MENU_STOP
 };
@@ -98,12 +102,19 @@ void mmgContextualMenu::ShowContextualMenu(wxFrame *child, mafView *view, bool v
 	{
 		this->Append(CONTEXTUAL_MENU_RENAME_VIEW, "Rename View");
 		this->AppendSeparator();
-		this->Append(CONTEXTUAL_MENU_MAXIMIZE_CHILD_VIEW, "Maximize");
-		this->Append(CONTEXTUAL_MENU_NORMAL_SIZE_CHILD_VIEW, "Normal Size");
+    if (m_ChildViewActive->IsMaximized())
+    {
+      this->Append(CONTEXTUAL_MENU_NORMAL_SIZE_CHILD_VIEW, "Normal Size");
+    }
+    else
+    {
+      this->Append(CONTEXTUAL_MENU_MAXIMIZE_CHILD_VIEW, "Maximize");
+    }
     //this->Append(CONTEXTUAL_MENU_EXTERNAL_INTERNAL_VIEW, "External", "Switch view visualization between external/internal", TRUE);
     //this->FindItem(CONTEXTUAL_MENU_EXTERNAL_INTERNAL_VIEW)->Check(m_ViewActive->IsExternal());
 		this->AppendSeparator();
 		this->Append(CONTEXTUAL_MENU_SAVE_AS_IMAGE, "Save as Image");
+    this->Append(CONTEXTUAL_MENU_EXPORT_AS_VRML, "Export as VRML");
   }
 
 	int x,y;
@@ -184,6 +195,22 @@ void mmgContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
 		case CONTEXTUAL_MENU_SAVE_AS_IMAGE:
 			mafEventMacro(mafEvent(this, VIEW_SAVE_IMAGE));
 		break;
+    case CONTEXTUAL_MENU_EXPORT_AS_VRML:
+    {
+      mafString file_dir  = mafGetApplicationDirectory().c_str();
+      mafString wildc     = "VRML (*.wrl)|*.wrl";
+      mafString file      = mafGetSaveFile(file_dir,wildc).c_str();
+      if (!file.IsEmpty())
+      {
+        vtkRenderWindow *renwin = m_ViewActive->GetRWI()->GetRenderWindow();
+        vtkMAFSmartPointer<vtkVRMLExporter> vrml_exporter;
+        vrml_exporter->SetFileName(file);
+        vrml_exporter->SetInput(renwin);
+        vrml_exporter->Update();
+        vrml_exporter->Write();
+      }
+    }
+    break;
 		case CONTEXTUAL_MENU_RENAME_VIEW:
 		{
 			wxTextEntryDialog *dlg = new wxTextEntryDialog(m_ChildViewActive,"please enter a name", "VIEW NAME", m_ViewActive->GetName());
