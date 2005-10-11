@@ -8,43 +8,37 @@ PROJECT(vtkMAF)
 # Set your list of sources here.  Do not change the name of the
 # vtkMAF_SRCS variable.
 SET(vtkMAF_SRCS
-vtkContourVolumeMapper.cxx
-vtkContourVolumeMapper.h
-vtkContourVolumeMapperAdv.cxx
-vtkDicomUnPacker.cxx
-vtkDicomUnPacker.h
-vtkDOFMatrix.cxx
-vtkDOFMatrix.h
-vtkExtendedGlyph3D.cxx
-vtkExtendedGlyph3D.h
-vtkFixedCutter.cxx
-vtkFixedCutter.h
-vtkGlobalAxisCoordinate.cxx
-vtkGlobalAxisCoordinate.h
-vtkImageUnPacker.cxx
-vtkImageUnPacker.h
-vtkLocalAxisCoordinate.cxx
-vtkLocalAxisCoordinate.h
-vtkRayCast3DPicker.cxx
-vtkRayCast3DPicker.h
-vtkDistanceFilter.cxx
-vtkDistanceFilter.h
-vtkPackedImage.cxx
-vtkPackedImage.h
-vtkProjectRG.cxx
-vtkProjectRG.h
-vtkProjectSP.cxx
-vtkProjectSP.h
-vtkRectilinearGridToRectilinearGridFilter.cxx
-vtkRectilinearGridToRectilinearGridFilter.h
-vtkRGSliceAccumulate.cxx
-vtkRGSliceAccumulate.h
-vtkTransferFunction2D.cxx
-vtkTransferFunction2D.h
-vtkVolumeResample.h
-vtkVolumeResample.cxx
-vtkVolumeSlicer.cxx
-vtkVolumeSlicer.h
+  vtkContourVolumeMapper.cxx
+  vtkContourVolumeMapper.h
+  vtkContourVolumeMapperAdv.cxx
+  vtkDOFMatrix.cxx
+  vtkDOFMatrix.h
+  vtkExtendedGlyph3D.cxx
+  vtkExtendedGlyph3D.h
+  vtkFixedCutter.cxx
+  vtkFixedCutter.h
+  vtkGlobalAxisCoordinate.cxx
+  vtkGlobalAxisCoordinate.h
+  vtkLocalAxisCoordinate.cxx
+  vtkLocalAxisCoordinate.h
+  vtkRayCast3DPicker.cxx
+  vtkRayCast3DPicker.h
+  vtkDistanceFilter.cxx
+  vtkDistanceFilter.h
+  vtkProjectRG.cxx
+  vtkProjectRG.h
+  vtkProjectSP.cxx
+  vtkProjectSP.h
+  vtkRectilinearGridToRectilinearGridFilter.cxx
+  vtkRectilinearGridToRectilinearGridFilter.h
+  vtkRGSliceAccumulate.cxx
+  vtkRGSliceAccumulate.h
+  vtkTransferFunction2D.cxx
+  vtkTransferFunction2D.h
+  vtkVolumeResample.h
+  vtkVolumeResample.cxx
+  vtkVolumeSlicer.cxx
+  vtkVolumeSlicer.h
 )
 
 # List the kits from VTK that are needed by this project.
