@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-29 07:00:38 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-10-12 09:44:44 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -88,7 +88,7 @@ BEGIN_EVENT_TABLE(mmgMDIFrame, wxMDIParentFrame)
     EVT_CLOSE(mmgMDIFrame::OnCloseWindow)
     EVT_DROP_FILES(mmgMDIFrame::OnDropFile)
     EVT_MENU_RANGE(MENU_START,MENU_END,mmgMDIFrame::OnMenu)
-    EVT_MENU_RANGE(wxID_FILE1,wxID_FILE4,mmgMDIFrame::OnMenu)
+    //EVT_MENU_RANGE(wxID_FILE1,wxID_FILE4,mmgMDIFrame::OnMenu)
 		EVT_MENU_RANGE(OP_START,OP_END,mmgMDIFrame::OnMenuOp)
     EVT_MENU_RANGE(VIEW_START,VIEW_END,mmgMDIFrame::OnMenuView)
 		EVT_MENU_RANGE(wxID_FILE1, wxID_FILE9, mmgMDIFrame::OnMenu)
