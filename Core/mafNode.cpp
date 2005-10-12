@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-19 11:33:57 $
-  Version:   $Revision: 1.39 $
+  Date:      $Date: 2005-10-12 09:44:08 $
+  Version:   $Revision: 1.40 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -95,15 +95,15 @@ int mafNode::Initialize()
 //------------------------------------------------------------------------------
 {
   if (m_Initialized)
-    return -1;
+    return MAF_OK;
 
-  if (this->InternalInitialize() == 0)
+  if (this->InternalInitialize() == MAF_OK)
   {
     m_Initialized=1;
-    return 0;
+    return MAF_OK;
   }
 
-  return -1;
+  return MAF_ERROR;
 
 }
 
@@ -317,6 +317,10 @@ int mafNode::AddChild(mafNode *node)
   if (node->SetParent(this)==MAF_OK)
   {
     m_Children.push_back(node);
+    // send attachment event from the child node
+    node->ForwardUpEvent(&mafEventBase(node,NODE_ATTACHED_TO_TREE));
+    node->GetEventSource()->InvokeEvent(node,NODE_ATTACHED_TO_TREE);
+
     Modified();
     return MAF_OK;
   }
@@ -337,6 +341,7 @@ void mafNode::RemoveChild(const mafID idx)
   mafNode *oldnode=GetChild(idx);
   if (oldnode)
   {
+    oldnode->Shutdown();
     // when called by ReparentTo the parent is already changed
     if (oldnode->GetParent()==this)
     {
@@ -523,10 +528,6 @@ int mafNode::SetParent(mafNode *parent)
         }
       }
 
-      // send attachment event
-      ForwardUpEvent(&mafEventBase(this,NODE_ATTACHED_TO_TREE));
-      m_EventSource->InvokeEvent(this,NODE_ATTACHED_TO_TREE);
-      
       Modified();
       return MAF_OK;
     }
