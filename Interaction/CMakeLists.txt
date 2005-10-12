@@ -100,6 +100,8 @@ SET(PROJECT_SRCS
   #mmdTrackerSet.cpp
   #mmdTrackerSet.h
   
+  mmi2DMeter.cpp
+  mmi2DMeter.h
   mmi6DOF.cpp
   mmi6DOF.h
   mmi6DOFCameraMove.cpp
