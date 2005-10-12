@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoImageImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-11 17:49:01 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-10-12 09:46:26 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,7 +54,7 @@ bool CompareNumber(std::string first, std::string second)
 	first_name.ToLong(&first_num);
 	second_name.ToLong(&second_num);
 
-  return (first_num - second_num) > 0;   // compare number
+  return (first_num - second_num) < 0;   // compare number
 }
 
 //----------------------------------------------------------------------------
@@ -218,7 +218,8 @@ void mmoImageImporter::BuildImageSequence()
   else
     sort(m_Files.begin(),m_Files.end());
 
-	long progress_value = 0;
+	mafTimeStamp start_time = ((mafVME *)m_Input->GetRoot())->GetTimeStamp();
+  long progress_value = 0;
   mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
   for(int i=0; i<m_NumFiles; i++)
 	{
@@ -270,6 +271,7 @@ void mmoImageImporter::BuildImageSequence()
     m_ImportedImage->SetName(name);
   mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
 
+  m_ImportedImage->SetTimeStamp(start_time);
   m_Output = m_ImportedImage;
 }
 //----------------------------------------------------------------------------
