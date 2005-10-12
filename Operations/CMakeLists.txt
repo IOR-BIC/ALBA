@@ -13,6 +13,8 @@ SET(PROJECT_SRCS
 IF (MAF_USE_VTK)
   SET(PROJECT_SRCS
     ${PROJECT_SRCS}
+    mmo2DMeasure.cpp
+    mmo2DMeasure.h
     mmoCreateGroup.cpp
     mmoCreateGroup.h
     mmoCreateMeter.cpp
