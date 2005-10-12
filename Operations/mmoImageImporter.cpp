@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoImageImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-12 09:46:26 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-10-12 10:07:14 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -223,8 +223,11 @@ void mmoImageImporter::BuildImageSequence()
   mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
   for(int i=0; i<m_NumFiles; i++)
 	{
-    progress_value = i/m_NumFiles*100;
-    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress_value));
+    if (mafFloatEquals(fmod(i,10.0f),0.0f))
+    {
+      progress_value = (i*100)/m_NumFiles;
+      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress_value));
+    }
 
     wxSplitPath(m_Files[i].c_str(),&path,&name,&ext);
 		ext.MakeUpper();
