@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeImage3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-11 17:50:25 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-10-12 10:07:47 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -78,17 +78,16 @@ void mafPipeImage3D::Create(mafSceneNode *n)
   m_Selected = false;
 
   // image pipeline
-  double b[6];
-  m_Vme->Update();
-  m_Vme->GetOutput()->GetVTKData()->GetBounds(b); 
+  m_Vme->GetOutput()->Update();
+  vtkImageData *image_data = (vtkImageData *)m_Vme->GetOutput()->GetVTKData();
+  image_data->Update();
 
+  double b[6];
+  image_data->GetBounds(b);
   m_ImagePlane = vtkPlaneSource::New();
   m_ImagePlane->SetOrigin(b[0],b[2],b[4]);
   m_ImagePlane->SetPoint1(b[1],b[2],b[4]);
   m_ImagePlane->SetPoint2(b[0],b[3],b[4]);
-
-  vtkImageData *image_data = (vtkImageData *)m_Vme->GetOutput()->GetVTKData();
-  image_data->Update();
 
   double w,l, range[2];
   image_data->GetScalarRange(range);
@@ -112,6 +111,7 @@ void mafPipeImage3D::Create(mafSceneNode *n)
     m_ImageTexture->SetLookupTable(m_ImageLUT);
     m_ImageTexture->MapColorScalarsThroughLookupTableOn();
   }
+  m_ImageTexture->Modified();
 
   m_ImageMapper = vtkPolyDataMapper::New();
 	m_ImageMapper->SetInput(m_ImagePlane->GetOutput());
