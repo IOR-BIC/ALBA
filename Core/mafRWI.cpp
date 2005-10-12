@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-29 07:19:42 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-10-12 14:28:26 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -75,8 +75,6 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, int stereo)
   m_RenderWindow = vtkRenderWindow::New();
   if(stereo)
   {
-    m_RenderWindow->StereoCapableWindowOn();
-    m_RenderWindow->StereoRenderOn();
     SetStereo(stereo);
   }
   m_RenderWindow->AddRenderer(m_RenFront);
@@ -340,8 +338,8 @@ void mafRWI::SetStereo(int stereo_type)
   //warning: non portable
   int *size = m_RenderWindow->GetSize();
   m_RenderWindow->SetStereoCapableWindow(m_StereoType != 0);
-  m_RenderWindow->SetStereoType(m_StereoType);
   m_RenderWindow->SetStereoRender(m_StereoType != 0);
+  m_RenderWindow->SetStereoType(m_StereoType);
   m_RwiBase->ReInitialize();
 }
 //----------------------------------------------------------------------------
