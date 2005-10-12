@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgFileHistory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:21 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-10-12 09:45:03 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,7 +26,7 @@
 // local const
 //----------------------------------------------------------------------------
 static const wxChar *s_MRUEntryFormat = wxT("&%d %s");
-#define NUMBER_OF_RECENT_FILE 4
+#define NUMBER_OF_RECENT_FILE 9
 
 //----------------------------------------------------------------------------
 mmgFileHistory::mmgFileHistory() :wxFileHistory(NUMBER_OF_RECENT_FILE)
