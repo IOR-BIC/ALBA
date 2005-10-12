@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-08 14:11:18 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-10-12 13:58:34 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone, Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -55,6 +55,7 @@ enum HIGHEST_EVENT_ID
   mafEvent::mafEvent(void *sender, int id, mafNode          *vme,    bool b,long arg)			{ Init(sender, id, arg); m_vme  =vme; m_bool = b;				Initialized();}
   mafEvent::mafEvent(void *sender, int id, mafOp           *op,     long arg)							{ Init(sender, id, arg);   m_op   =op;									Initialized();}
   mafEvent::mafEvent(void *sender, int id, mafMatrix    *m1,mafMatrix  *m2)					      { Init(sender, id, 0);   m_matrix =m1; m_matrix2 =m2;		Initialized();}
+  mafEvent::mafEvent(void *sender, int id, mafObject        *mafobj,  long arg)						{ Init(sender, id, arg); m_MafObject = mafobj;			    Initialized();}
 #ifdef MAF_USE_WX
   mafEvent::mafEvent(void *sender, int id, wxWindow        *win,    long arg)							{ Init(sender, id, arg); m_Win  =win;										Initialized();}
   mafEvent::mafEvent(void *sender, int id, wxUpdateUIEvent *e,      long arg)							{ Init(sender, id, arg); m_UpdateUIEvent = e;																	}
@@ -63,7 +64,7 @@ enum HIGHEST_EVENT_ID
 #ifdef MAF_USE_VTK
   mafEvent::mafEvent(void *sender, int id, vtkObject       *vtkobj, long arg)							{ Init(sender, id, arg); m_VtkObj = vtkobj;							Initialized();}
   mafEvent::mafEvent(void *sender, int id, vtkObject       *vtkobj, mafString *s)         { Init(sender, id, 0);   m_VtkObj = vtkobj;m_string =s; Initialized();}
-  mafEvent::mafEvent(void *sender, int id, vtkProp         *prop,   mafNode *vme)   				{ Init(sender, id, 0);   m_VtkProp =prop; m_vme=vme;				Initialized();}
+  mafEvent::mafEvent(void *sender, int id, vtkProp         *prop,   mafNode *vme)   			{ Init(sender, id, 0);   m_VtkProp= prop; m_vme = vme;  Initialized();}
 #endif
 		
 //----------------------------------------------------------------------------
