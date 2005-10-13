@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-21 12:41:59 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-10-13 13:39:40 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -251,62 +251,30 @@ void mafSceneGraph::VmeShow(mafNode *vme, bool show)
 	mafSceneNode *node = Vme2Node(vme);
 	if( node == NULL) return;
   
-  /*
-  // Support to LM Handling
-	if(vme->IsA("mafNodeLandmarkCloud"))
-	{
-		mafNodeLandmarkCloud *cloud = (mafNodeLandmarkCloud*)vme;
-		if(  cloud->IsOpen()  )
-    {
-   		 // don't create the pipe for the cloud, 
-			 // but set the Visible flag anyway
-			 node->Show(show);
-
-       // forward the VME_SHOW to the child Landmarks
-			 int nc = cloud->GetNumberOfLandmarks();
-			 for(int i=0;i<nc;i++)
-			 {
-				  VmeShow(cloud->GetLandmark(i),show); 
-       }
-		   return;
-		}
-  }
-  */
   if(!node->m_PipeCreatable) return;
   if( node->IsVisible() == show) return;
 
-	if(vme->IsA("mafVMEGizmo"))
-  {
-    //nothing
-  }
-  else
-  {
-		if(show)
-		{	
-      /* @@@		
-      if(node->m_Mutex)
-			{
-				// find other visible node with the same type and hide it
-				//wxString type = vme->GetClassName();
-        int type = mafGetBaseType(vme);
-				for( mafSceneNode *n = m_List; n; n=n->m_Next)
-					//if(type == n->m_Vme->GetClassName() && n->m_Pipe != NULL )
-          if(type == mafGetBaseType(n->m_Vme) && n->m_Pipe != NULL )
-					  mafEventMacro(mafEvent(this,VME_SHOW,n->m_Vme,false));
-			}
-      @@@ */
-			if(!node->m_Pipe) 
-			{
-				m_View->VmeCreatePipe(vme);
-				VmeSelect(vme,vme == m_SelectedVme);
-			}
-		}
-		else
+	if(show)
+	{	
+    if(node->m_Mutex)
 		{
-			if(node->m_Pipe) m_View->VmeDeletePipe(vme);
+			// find other visible node with the same type and hide it
+			for(mafSceneNode *n = m_List; n; n=n->m_Next)
+        if(vme->GetTypeId() == n->m_Vme->GetTypeId() && n->m_Pipe != NULL && n->m_Vme != vme)
+					mafEventMacro(mafEvent(this,VME_SHOW,n->m_Vme,false));
 		}
-  }
-	//node->Show(show);  //SIL. 21-4-2005: 
+		if(!node->m_Pipe) 
+		{
+			m_View->VmeCreatePipe(vme);
+			VmeSelect(vme,vme == m_SelectedVme);
+		}
+	}
+	else
+	{
+		if(node->m_Pipe) m_View->VmeDeletePipe(vme);
+	}
+
+  //node->Show(show);  //SIL. 21-4-2005: 
   
   /* @@@
   // update m_shown_mutex_vme
@@ -344,6 +312,22 @@ void mafSceneGraph::VmeShowByType(mafNodeBaseTypes type,	bool show)
 }
 @@@ */
 
+//----------------------------------------------------------------------------
+void mafSceneGraph::VmeShowByType(mafNode *vme,  bool show)
+//----------------------------------------------------------------------------
+{
+  for(mafSceneNode *n = m_List; n; n=n->m_Next)
+    if(vme->GetTypeId() == n->m_Vme->GetTypeId() && n->IsVisible() != show)
+    {
+      //- mutex vme may be shown only is no other vme of the same type is currently shown.
+      //- mutex vme may always be hidden.
+      mafEventMacro(mafEvent(this,VME_SHOW,n->m_Vme,show));
+      if (n->m_Mutex)
+      {
+        break;
+      }
+    }
+}
 //----------------------------------------------------------------------------
 // Scan vme subtree and send a VME_SHOW event for each Creatable/non_mutex vme found.
 // Changed behavior.

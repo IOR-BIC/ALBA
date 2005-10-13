@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.h,v $
   Language:  C++
-  Date:      $Date: 2005-09-05 10:52:42 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-10-13 13:39:41 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,32 +39,32 @@ public:
 	//virtual void	OnEvent(mafEvent& e);
 
 	/** Add a vme to the scene graph. */
-	virtual void					VmeAdd						(mafNode *vme);
+	virtual void VmeAdd(mafNode *vme);
 
 	/** Remove a vme from the scene graph. */
-	virtual void					VmeRemove					(mafNode *vme);
+	virtual void VmeRemove(mafNode *vme);
 
 	/** Select a vme and store a reference to it into m_SelectedVme variable. */
-	virtual void					VmeSelect					(mafNode *vme,					bool select);
+	virtual void VmeSelect(mafNode *vme, bool select);
 
-	/** Change the visibility of the vme and if necessary create the vme releted pipe. */
-	virtual void					VmeShow						(mafNode *vme,					bool show);
+	/** Change the visibility of the vme and if necessary create the vme related pipe. */
+	virtual void VmeShow(mafNode *vme, bool show);
 
 	/** Show/Hide the Vme with the same type of the passed vme */
   //SIL. 18-4-2005: - question: Show by type should consider the derived classes or not ?
-	//@@@ virtual void					VmeShowByType			(mafNode *vme,					bool show);
+	virtual void VmeShowByType(mafNode *vme, bool show);
 
 	/** Show all the same vme type. */
 	//@@@ virtual void					VmeShowByType			(mafNodeBaseTypes type,bool show);
 
 	/** Show all the vme subtree. */
-	virtual void					VmeShowSubTree		(mafNode *vme,					bool show);
+	virtual void VmeShowSubTree(mafNode *vme, bool show);
 
 	/** Update the vme's properties. */
-	virtual void					VmeUpdateProperty	(mafNode *vme,					bool fromTag = false);
+	virtual void VmeUpdateProperty(mafNode *vme, bool fromTag = false);
 
 	/** Find the corresponding vme's node. */
-	virtual mafSceneNode *Vme2Node					(mafNode *vme);
+	virtual mafSceneNode *Vme2Node(mafNode *vme);
 
   mafSceneNode	*m_List;
   vtkRenderer		*m_RenFront;
