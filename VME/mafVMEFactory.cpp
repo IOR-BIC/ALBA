@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-08-31 09:13:56 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-10-13 13:43:49 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -19,24 +19,31 @@
 //----------------------------------------------------------------------------
 
 #include "mafVMEFactory.h"
+
 #include "mafVersion.h"
-#include "mafVMERoot.h"
+
 #include "mafVMEGeneric.h"
-#include "mafVMEItemVTK.h"
+#include "mafVMEGizmo.h"
+#include "mafVMEGroup.h"
 #include "mafVMEImage.h"
 #include "mafVMELandmark.h"
 #include "mafVMELandmarkCloud.h"
-#include "mafVMESurface.h"
-#include "mafVMEGroup.h"
-#include "mafVMEVolumeRGB.h"
-#include "mafVMEVolumeGray.h"
-#include "mafVMEVolume.h"
-#include "mafVMEPolyline.h"
 #include "mafVMEMeter.h"
+#include "mafVMEPointSet.h"
+#include "mafVMEPolyline.h"
 #include "mafVMEProber.h"
-#include "mmaMeter.h"
+#include "mafVMERoot.h"
+#include "mafVMESlicer.h"
+#include "mafVMESurface.h"
+#include "mafVMEVolume.h"
+#include "mafVMEVolumeGray.h"
+#include "mafVMEVolumeRGB.h"
+
 #include "mmaMaterial.h"
+#include "mmaMeter.h"
 #include "mafTagArray.h"
+#include "mafVMEItemVTK.h"
+
 #include "mafIndent.h"
 #include <string>
 #include <ostream>
@@ -78,6 +85,7 @@ mafVMEFactory::mafVMEFactory()
   mafPlugObjectMacro(mafVMEItemVTK,"a VME item storing VTK datasets");
   mafPlugObjectMacro(mmaMeter,"Meter attributes");
   mafPlugObjectMacro(mmaMaterial,"Material attributes");
+  
   mafPlugNodeMacro(mafVMERoot,"root for VME tree");
   mafPlugNodeMacro(mafVMEGroup,"VME used for composing assemblies");
   mafPlugNodeMacro(mafVMEGeneric,"Generic VME storing VTK datasets");
@@ -91,6 +99,9 @@ mafVMEFactory::mafVMEFactory()
   mafPlugNodeMacro(mafVMELandmark,"VME representing a marker");
   mafPlugNodeMacro(mafVMELandmarkCloud,"VME representing a cloud of mafVMELandmark");
   mafPlugNodeMacro(mafVMEProber,"VME representing a prober");
+  //mafPlugNodeMacro(mafVMEGizmo,"VME representing a tool");
+  mafPlugNodeMacro(mafVMEPointSet,"VME representing a set of points");
+  mafPlugNodeMacro(mafVMESlicer,"VME representing a slice of a volume");
 }
 
 //------------------------------------------------------------------------------
