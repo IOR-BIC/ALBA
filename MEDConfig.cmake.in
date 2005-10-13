@@ -1,0 +1,26 @@
+# Tell the user project where to find headers and libraries
+SET(MED_INCLUDE_DIRS
+#  "@MED_SOURCE_DIR@/Gui"
+#  "@MED_SOURCE_DIR@/Interaction"
+#  "@MED_SOURCE_DIR@/Interaction/Drivers"
+#  "@MED_BINARY_DIR@/Interaction"
+  "@MED_SOURCE_DIR@/Operations"
+  "@MED_SOURCE_DIR@/VME"
+  "@MED_SOURCE_DIR@/vtkMED"
+  "@MED_BINARY_DIR@"
+  "@MED_BINARY_DIR@/vtkMED"
+)
+
+SET(MED_BUILD_SETTINGS_FILE
+  "@MED_BINARY_DIR@/MEDBuildSettings.cmake"
+)
+
+INCLUDE(
+  "@MED_BINARY_DIR@/MEDLibraryDepends.cmake"
+)
+
+SET(MED_LIBRARY_DIRS "@MED_BINARY_DIR@/bin")
+
+SET(MED_USE_FILE
+  "@MED_BINARY_DIR@/MEDUse.cmake"
+)
