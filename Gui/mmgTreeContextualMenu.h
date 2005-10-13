@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTreeContextualMenu.h,v $
   Language:  C++
-  Date:      $Date: 2005-09-05 10:53:34 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-10-13 13:41:33 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,6 +26,9 @@ class mafVME;
 //----------------------------------------------------------------------------
 // mmgTreeContextualMenu :
 //----------------------------------------------------------------------------
+/** Used to create and manage contextual menu' for tree widget used in side bar
+@sa mmgContextualMenu
+*/
 class mmgTreeContextualMenu : public wxMenu
 {
 public:
