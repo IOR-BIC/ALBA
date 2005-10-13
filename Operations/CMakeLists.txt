@@ -15,6 +15,8 @@ IF (MAF_USE_VTK)
     ${PROJECT_SRCS}
     mmo2DMeasure.cpp
     mmo2DMeasure.h
+    mmoClipSurface.cpp
+    mmoClipSurface.h
     mmoCreateGroup.cpp
     mmoCreateGroup.h
     mmoCreateMeter.cpp

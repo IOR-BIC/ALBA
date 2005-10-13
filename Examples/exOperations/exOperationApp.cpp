@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-12 14:00:03 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2005-10-13 13:40:48 $
+  Version:   $Revision: 1.28 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -34,6 +34,7 @@
 #include "mafPipeFactoryVME.h"
 
 #include "mmo2DMeasure.h"
+#include "mmoClipSurface.h"
 #include "mmoCreateGroup.h"
 #include "mmoCreateMeter.h"
 #include "mmoCreateProber.h"
@@ -106,6 +107,7 @@ bool exOperationApp::OnInit()
   //------------------------------------------------------------
   // Operation Menu':
   m_logic->Plug(new mmo2DMeasure("2D Measure"));
+  m_logic->Plug(new mmoClipSurface("Clip Surface"));
   m_logic->Plug(new mmoCreateGroup("Create Group"));
   m_logic->Plug(new mmoCreateMeter("Create Meter"));
   m_logic->Plug(new mmoCreateProber("Create Prober"));
@@ -113,7 +115,7 @@ bool exOperationApp::OnInit()
   m_logic->Plug(new mmoExplodeCollapse("Explode/Collapse cloud"));
   m_logic->Plug(new mmoExtractIsosurface("Extract Isosurface"));
   m_logic->Plug(new mmoFilterSurface("Filter Surface"));
-  m_logic->Plug(new mmoMAFTransform("MAF Transform"));
+  m_logic->Plug(new mmoMAFTransform("MAF Transform  \tCtrl+T"));
   m_logic->Plug(new mmoReparentTo("Reparent to...  \tCtrl+R"));
   //------------------------------------------------------------
   
