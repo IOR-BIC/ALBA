@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 12:34:12 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-10-13 13:42:41 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -71,7 +71,7 @@ public:
   mmaMaterial *GetMaterial();
 
   /** return an xpm-icon that can be used to represent this node */
-  //static char ** GetIcon();
+  static char ** GetIcon();
 
 protected:
   mafVMESlicer();

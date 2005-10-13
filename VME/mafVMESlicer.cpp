@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-08-31 15:11:05 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-10-13 13:42:40 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -273,9 +273,9 @@ void mafVMESlicer::Print(std::ostream& os, const int tabs)
   m_Transform->GetMatrix().Print(os,indent.GetNextIndent());
 }
 //-------------------------------------------------------------------------
-//char** mafVMESlicer::GetIcon() 
+char** mafVMESlicer::GetIcon() 
 //-------------------------------------------------------------------------
-//{
-//  #include "mafVMESlicer.xpm"
-//  return mafVMESlicer_xpm;
-//}
+{
+  #include "mafVMESurface.xpm"
+  return mafVMESurface_xpm;
+}
