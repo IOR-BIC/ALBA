@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTreeContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-05 10:53:34 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-10-13 13:42:01 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -198,10 +198,10 @@ void mmgTreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
 			sg->VmeShowSubTree(m_VmeActive, false);
 		break;
 		case RMENU_SHOW_SAMETYPE:
-			//sg->VmeShowByType(m_VmeActive, true);
+			sg->VmeShowByType(m_VmeActive, true);
 		break;
 		case RMENU_HIDE_SAMETYPE:
-			//sg->VmeShowByType(m_VmeActive, false);
+			sg->VmeShowByType(m_VmeActive, false);
 		break;
     case RMENU_CRYPT_VME:
     {
