@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPics.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-25 18:30:02 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-10-13 13:41:10 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -150,7 +150,7 @@ wxBitmap mafPictureFactory::GetBmp(wxString id)
     return wxBitmap((*it).second);
   else
   {
-    wxLogMessage("mafPictureFactory: pic with id = %s not found",id.c_str());
+    wxLogMessage("mafPictureFactory: bmp with id = %s not found",id.c_str());
     return wxNullBitmap;
   }
 }
@@ -163,7 +163,7 @@ wxImage mafPictureFactory::GetImg(wxString id)
     return (*it).second;
   else
   {
-    wxLogMessage("mafPictureFactory: pic with id = %s not found",id.c_str());
+    wxLogMessage("mafPictureFactory: img with id = %s not found",id.c_str());
     return wxNullImage;
   }
 }
@@ -181,7 +181,7 @@ wxIcon mafPictureFactory::GetIcon(wxString id)
   }
   else
   {
-    wxLogMessage("mafPictureFactory: pic with id = %s not found",id.c_str());
+    wxLogMessage("mafPictureFactory: icon with id = %s not found",id.c_str());
     return wxNullIcon;
   }
 }

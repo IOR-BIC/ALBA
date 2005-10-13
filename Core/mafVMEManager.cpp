@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-06 12:41:46 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2005-10-13 13:39:05 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -46,7 +46,7 @@ mafVMEManager::mafVMEManager()
   m_Crypting    = false;
   m_LoadingFlag = false;
 
-  mafString MSFDir=mafGetApplicationDirectory().c_str();
+  mafString MSFDir = mafGetApplicationDirectory().c_str();
   MSFDir.ParsePathName();
 	m_MSFDir   = MSFDir;
   m_MSFDir   += "/Data/MSF/";
@@ -54,7 +54,7 @@ mafVMEManager::mafVMEManager()
 	m_ZipFile   = "";
   m_TmpDir   = "";
 	m_MergeFile = "";
-	m_Wildcard  = "Multimod Storage Format file (*.msf)|*.msf|Compressed file (*.zmsf)|*.zmsf";
+	m_Wildcard  = "Multimod Storage Format file |*.msf;*.zmsf";
 
   m_Config = wxConfigBase::Get();
 }
@@ -173,9 +173,7 @@ void mafVMEManager::MSFOpen(int file_id)
 void mafVMEManager::MSFOpen(wxString filename)   
 //----------------------------------------------------------------------------
 {
-	
-  wxWindowDisabler disableAll; //SIL. 17-9-2004: 
-
+  wxWindowDisabler disableAll;
   wxBusyCursor wait_cursor;
   
   if(!::wxFileExists(filename))
@@ -203,20 +201,20 @@ void mafVMEManager::MSFOpen(wxString filename)
   unixname.ParsePathName(); // convert to unix format
 
   m_MSFFile = unixname; 
-
-  //wxBusyInfo wait("Loading MSF: Please wait");
-
   m_Storage->SetURL(m_MSFFile.c_str());
  
   m_LoadingFlag = true;
   int res = m_Storage->Restore();
+  if (res != MAF_OK)
+  {
+    // if some problems occurred during import give feedback to the user
+    mafErrorMessage("Errors during file parsing! Look the log area for error messages.");
+  }
   m_LoadingFlag = false;
 
   mafTimeStamp b[2];
   m_Storage->GetRoot()->GetOutput()->GetTimeBounds(b);
   m_Storage->GetRoot()->SetTreeTime(b[0]);
-  //m_Storage->GetRoot()->SetName("root"); ///?????
-
   
 	////////////////////////////////  Application Stamp managing ////////////////////
 	if(!m_Storage->GetRoot()->GetTagArray()->IsTagPresent("APP_STAMP"))
@@ -241,15 +239,8 @@ void mafVMEManager::MSFOpen(wxString filename)
 		return;
 	}
 	///////////////////////////////////////////////////////////////////////////////// 
-  
   NotifyAdd(m_Storage->GetRoot());
 
-  // if some problems occurred during import give feedback to the user
-  if (res!=MAF_OK)
-  {
-    mafErrorMessage("Errors during file parsing! Look the log area for error messages.");
-  }
-  
 	mafEventMacro(mafEvent(this,VME_SELECTED,m_Storage->GetRoot())); 
   mafEventMacro(mafEvent(this,CAMERA_RESET)); 
   
@@ -401,7 +392,8 @@ void mafVMEManager::MSFSave()
 {
   if(m_MSFFile == "") 
   {
-    mafString file = mafGetSaveFile(m_MSFDir, m_Wildcard.GetCStr()).c_str();
+    mafString save_wildcard  = "Multimod Storage Format file |*.msf";
+    mafString file = mafGetSaveFile(m_MSFDir, save_wildcard.GetCStr()).c_str();
     if(file == "") return;
    
     wxString path, name, ext, file_dir;
@@ -470,9 +462,6 @@ void mafVMEManager::VmeAdd(mafNode *n)
     if(vp == NULL) 
 			n->ReparentTo(m_Storage->GetRoot());
 
-    //Marco: no more sent: it is the tree which sends the event (see OnEvent())
-    //NotifyAdd(n); 
-
     m_Modified = true;
   }
 }
@@ -483,11 +472,7 @@ void mafVMEManager::VmeRemove(mafNode *n)
   if(n != NULL && m_Storage->GetRoot() /*&& m_Storage->GetRoot()->IsInTree(n)*/) 
   {
     assert(m_Storage->GetRoot()->IsInTree(n));
-
-    //Marco: no more sent: it is the tree which sends the event (see OnEvent())
-    //NotifyRemove(n);
-
-    n->ReparentTo(NULL); // kill the vme
+    n->ReparentTo(NULL);
     m_Modified = true;
   }
 }
