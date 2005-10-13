@@ -19,6 +19,8 @@ SET(vtkMAF_SRCS
   vtkFixedCutter.h
   vtkGlobalAxisCoordinate.cxx
   vtkGlobalAxisCoordinate.h
+  vtkImplicitPolyData.cxx
+  vtkImplicitPolyData.h
   vtkLocalAxisCoordinate.cxx
   vtkLocalAxisCoordinate.h
   vtkRayCast3DPicker.cxx
