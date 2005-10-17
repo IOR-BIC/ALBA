@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputPointSet.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:50:33 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-10-17 13:08:12 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -48,6 +48,9 @@ public:
 
   /** set the material of the surface */ 
   void SetMaterial(mmaMaterial *material);
+
+  /** Update all the output data structures (data, bounds, matrix and abs matrix).*/
+  virtual void Update();
 
 protected:
   mmgGui *CreateGui();

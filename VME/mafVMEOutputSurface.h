@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputSurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:50:44 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-10-17 13:08:12 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -65,6 +65,10 @@ public:
     ID_LAST
   };
   */
+
+  /** Update all the output data structures (data, bounds, matrix and abs matrix).*/
+  virtual void Update();
+
 protected: 
   vtkImageData *m_Texture; ///< the optional texture to be applied to the surface
   mafString     m_NumTriangles;
