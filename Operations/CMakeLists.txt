@@ -23,6 +23,8 @@ IF (MAF_USE_VTK)
     mmoCreateMeter.h
     mmoCreateProber.cpp
     mmoCreateProber.h
+    mmoCreateRefSys.cpp
+    mmoCreateRefSys.h
     mmoCreateSlicer.cpp
     mmoCreateSlicer.h
     mmoMAFTransform.cpp

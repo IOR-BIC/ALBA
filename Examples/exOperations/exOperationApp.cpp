@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-13 13:40:48 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2005-10-17 13:10:29 $
+  Version:   $Revision: 1.29 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -38,6 +38,7 @@
 #include "mmoCreateGroup.h"
 #include "mmoCreateMeter.h"
 #include "mmoCreateProber.h"
+#include "mmoCreateRefSys.h"
 #include "mmoCreateSlicer.h"
 #include "mmoExplodeCollapse.h"
 #include "mmoExtractIsosurface.h"
@@ -110,6 +111,7 @@ bool exOperationApp::OnInit()
   m_logic->Plug(new mmoClipSurface("Clip Surface"));
   m_logic->Plug(new mmoCreateGroup("Create Group"));
   m_logic->Plug(new mmoCreateMeter("Create Meter"));
+  m_logic->Plug(new mmoCreateRefSys("Create RefSys"));
   m_logic->Plug(new mmoCreateProber("Create Prober"));
   m_logic->Plug(new mmoCreateSlicer("Create Slicer"));
   m_logic->Plug(new mmoExplodeCollapse("Explode/Collapse cloud"));
@@ -136,7 +138,7 @@ bool exOperationApp::OnInit()
   m_logic->Plug(vc);
   //------------------------------------------------------------
 
-  wxHandleFatalExceptions();
+  //wxHandleFatalExceptions();
 
   m_logic->Show();
   mafString app_stamp;
