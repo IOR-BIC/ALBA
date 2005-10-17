@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGizmo.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-08 13:29:34 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-10-17 13:08:59 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -45,13 +45,13 @@ public:
   to display the node.*/
   void SetData(vtkPolyData *data);
   
-  /** return the ploydata used to display this gizmo */
+  /** return the polydata used to display this gizmo */
   vtkPolyData *GetData() {return m_GizmoData;}
   
-  /** Copy the contents of another VME-Slicer into this one. */
+  /** Copy the contents of another VME-Gizmo into this one. */
   virtual int DeepCopy(mafNode *a);
 
-  /** Compare with another VME-Slicer. */
+  /** Compare with another VME-Gizmo. */
   virtual bool Equals(mafVME *vme);
 
   /** return the right type of output */  

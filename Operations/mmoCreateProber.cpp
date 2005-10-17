@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-08-31 09:12:08 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-10-17 13:10:51 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -61,7 +61,7 @@ void mmoCreateProber::OpRun()
 //----------------------------------------------------------------------------
 {
   mafNEW(m_Prober);
-  m_Prober->SetName("slicer");
+  m_Prober->SetName("prober");
   m_Output = m_Prober;
   mafEventMacro(mafEvent(this,OP_RUN_OK));
 }

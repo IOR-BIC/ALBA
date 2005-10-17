@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-04 16:08:30 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-10-17 13:07:45 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -236,6 +236,7 @@ void mafPipeVolumeSlice::CreateSlice(int mode)
 
 	//mafVMEVolume *vme = ((mafVMEVolume *) m_Vme);
   vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();
+  vtk_data->Update();
   if (vtk_data)
     vtk_data->GetScalarRange(srange);
   else

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateGroup.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 11:35:28 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-10-17 13:11:05 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,10 +25,6 @@
 
 #include "mafVMERoot.h"
 #include "mafVMEGroup.h"
-
-//----------------------------------------------------------------------------
-// Constants :
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mmoCreateGroup::mmoCreateGroup(wxString label) :
@@ -58,7 +54,7 @@ bool mmoCreateGroup::Accept(mafNode *node)
   return (node && node->IsMAFType(mafVME));
 }
 //----------------------------------------------------------------------------
-void mmoCreateGroup::OpRun()   
+void mmoCreateGroup::OpRun()
 //----------------------------------------------------------------------------
 {
   mafNEW(m_Group);
