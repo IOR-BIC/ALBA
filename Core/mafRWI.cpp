@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-12 14:28:26 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-10-17 13:12:16 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -73,6 +73,7 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, int stereo)
 	
   m_RwiBase = new mafRWIBase(parent, -1);
   m_RenderWindow = vtkRenderWindow::New();
+  m_RenderWindow->GlobalWarningDisplayOff();
   if(stereo)
   {
     SetStereo(stereo);
@@ -128,21 +129,21 @@ mafRWI::~mafRWI()
 	vtkDEL(m_Camera);
 	if(m_RenFront) 
   {
-    m_RenFront->GetActors();        //Paolo 23-06-2004
+    m_RenFront->RemoveAllProps();        //Paolo 23-06-2004
     m_RenderWindow->RemoveRenderer(m_RenFront);
   }
   vtkDEL(m_RenFront);
   if(m_RenBack) 
   {
-    m_RenBack->GetActors();        //Paolo 23-06-2004
+    m_RenBack->RemoveAllProps();        //Paolo 23-06-2004
     m_RenderWindow->RemoveRenderer(m_RenBack);
   }
 	vtkDEL(m_RenBack);
 	if(m_RenderWindow) 
     m_RenderWindow->SetInteractor(NULL);    //Paolo 23-06-2004
   m_RenderWindow->Delete();
-  //if(m_RwiBase) 
-    //m_RwiBase->SetRenderWindow(NULL); //Paolo 23-06-2004
+  if(m_RwiBase) 
+    m_RwiBase->SetRenderWindow(NULL); //Paolo 23-06-2004
 	vtkDEL(m_RwiBase);  //SIL. 13-11-2003: The renderer has to be Deleted as last
 }
 //-----------------------------------------------------------------------------------------
