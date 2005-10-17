@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkDistanceFilter.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-06 11:08:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-10-17 13:09:55 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Gori (Cineca), Alexander Savenko (Luton University)
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -72,8 +72,8 @@ class VTK_vtkMAF_EXPORT vtkDistanceFilter : public vtkDataSetToDataSetFilter {
     /**
     Specify the point locations used to Distance input. Any geometry
     can be used.*/
-    void SetSource(vtkDataSet *data) {this->SetNthInput(1, (vtkDataObject*)data);};
-    vtkDataSet *GetSource() { return (vtkDataSet *)(this->Inputs[1]);};
+    void SetSource(vtkDataSet *data);
+    vtkDataSet *GetSource();
     
     /**
     Specify the transformation matrix that should be applied to input points prior to rendering*/

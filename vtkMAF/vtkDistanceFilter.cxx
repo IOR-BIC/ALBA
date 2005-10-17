@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkDistanceFilter.cxx,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 22:07:45 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-10-17 13:09:55 $
+  Version:   $Revision: 1.4 $
 
 =========================================================================*/
 
@@ -23,7 +23,7 @@
 #include "assert.h"
 
 
-vtkCxxRevisionMacro(vtkDistanceFilter, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(vtkDistanceFilter, "$Revision: 1.4 $");
 vtkStandardNewMacro(vtkDistanceFilter);
 
 #define min(x0, x1) (((x0) < (x1)) ? (x0) : (x1))
@@ -61,7 +61,21 @@ vtkDistanceFilter::~vtkDistanceFilter() {
   delete [] this->UniformToRectGridIndex[0];
   }
 
+//----------------------------------------------------------------------------
+void vtkDistanceFilter::SetSource(vtkDataSet *data)
+//----------------------------------------------------------------------------
+{
+  this->SetNthInput(1, (vtkDataObject*)data);
+}
 
+//----------------------------------------------------------------------------
+vtkDataSet *vtkDistanceFilter::GetSource()
+//----------------------------------------------------------------------------
+{
+  if(this->GetNumberOfInputs() < 2)
+    return NULL;
+  return (vtkDataSet *)(this->Inputs[1]);
+}
 //----------------------------------------------------------------------------
 unsigned long int vtkDistanceFilter::GetMTime() {
   unsigned long int time = this->MTime;
