@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-08-31 15:11:58 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-10-17 13:08:39 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -61,6 +61,7 @@ mafVMEProber::mafVMEProber()
   vtkNEW(m_Normals);
   vtkNEW(m_Prober);
   m_Prober->SetInput((vtkDataSet *)m_Normals->GetOutput());
+//  m_Prober->SetSource(NULL);
 
   mafNEW(m_Transform);
   mafVMEOutputSurface *output = mafVMEOutputSurface::New(); // an output with no data
@@ -70,12 +71,7 @@ mafVMEProber::mafVMEProber()
   // attach a data pipe which creates a bridge between VTK and MAF
   mafDataPipeCustom *dpipe = mafDataPipeCustom::New();
   dpipe->SetDependOnAbsPose(true);
-  
-  vtkMAFSmartPointer<vtkTransformPolyDataFilter> back_trans;
-  back_trans->SetInput((vtkPolyData *)m_Prober->GetOutput());
-  back_trans->SetTransform(GetOutput()->GetTransform()->GetVTKTransform()->GetInverse());
-
-  dpipe->SetInput(back_trans->GetOutput());
+  dpipe->SetInput(m_Prober->GetOutput());
   SetDataPipe(dpipe);
 }
 
@@ -86,8 +82,8 @@ mafVMEProber::~mafVMEProber()
   // these links are children, thus it's not our responsibility to
   // destroy them, it's part of the vtkTree one's
   mafDEL(m_Transform);
-  mafDEL(m_Normals);
-  mafDEL(m_Prober);
+  vtkDEL(m_Normals);
+  vtkDEL(m_Prober);
   cppDEL(m_VMEVolumeAccept);
   cppDEL(m_VMESurfaceAccept);
   SetOutput(NULL);
