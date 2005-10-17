@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-13 13:43:49 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-10-17 13:07:00 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -32,6 +32,7 @@
 #include "mafVMEPointSet.h"
 #include "mafVMEPolyline.h"
 #include "mafVMEProber.h"
+#include "mafVMERefSys.h"
 #include "mafVMERoot.h"
 #include "mafVMESlicer.h"
 #include "mafVMESurface.h"
@@ -93,7 +94,6 @@ mafVMEFactory::mafVMEFactory()
   mafPlugNodeMacro(mafVMESurface,"Generic VME storing vtkPolyData surfaces datasets");
   mafPlugNodeMacro(mafVMEVolumeGray,"Generic VME storing vtk volume datasets with one scalar component");
   mafPlugNodeMacro(mafVMEVolumeRGB,"Generic VME storing vtk volume datasets with 3 RGB scalar components");
-  mafPlugNodeMacro(mafVMEVolume,"Generic VME storing generic vtk volume datasets");
   mafPlugNodeMacro(mafVMEPolyline,"Generic VME storing polyline datasets");
   mafPlugNodeMacro(mafVMEMeter,"Generic VME generating meter");
   mafPlugNodeMacro(mafVMELandmark,"VME representing a marker");
@@ -101,6 +101,7 @@ mafVMEFactory::mafVMEFactory()
   mafPlugNodeMacro(mafVMEProber,"VME representing a prober");
   //mafPlugNodeMacro(mafVMEGizmo,"VME representing a tool");
   mafPlugNodeMacro(mafVMEPointSet,"VME representing a set of points");
+  mafPlugNodeMacro(mafVMERefSys,"VME representing a reference system");
   mafPlugNodeMacro(mafVMESlicer,"VME representing a slice of a volume");
 }
 
