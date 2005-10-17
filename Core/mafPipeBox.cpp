@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-15 15:20:27 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-10-17 13:06:26 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,12 +23,9 @@
 #include "mafSceneNode.h"
 #include "mmgGui.h"
 #include "mafVME.h"
+#include "mafAxes.h"
+
 #include "vtkMAFAssembly.h"
-
-//@@@ #include "mafDecl.h"
-//@@@ #include "mafAxes.h"  //SIL. 20-5-2003 added line - 
-//@@@ #include "mafMaterial.h"  //SIL. 30-5-2003 added line -
-
 #include "vtkRenderer.h"
 #include "vtkOutlineSource.h"
 #include "vtkOutlineCornerFilter.h"
@@ -36,7 +33,6 @@
 #include "vtkStripper.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkPolyData.h"
-//@@@ #include "vtkMultiResolutionActor.h"
 #include "vtkActor.h"
 #include "vtkProperty.h"
 
@@ -55,6 +51,7 @@ mafPipeBox::mafPipeBox()
   m_OutlineMapper   = NULL;
   m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
+  m_Axes            = NULL;
 
   m_BoundsMode = 0;
 }
@@ -72,12 +69,13 @@ void mafPipeBox::Create(mafSceneNode *n/*, bool use_axes*/)
   m_OutlineMapper   = NULL;
   m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
+  m_Axes            = NULL;
 
   m_BoundsMode = 0;
 
   double b[6];
   m_Vme->GetOutput()->Update();
-  m_Vme->GetOutput()->GetBounds(b);
+  m_Vme->GetOutput()->GetVMEBounds(b);
 
   vtkNEW(m_Box);
   m_Box->SetBounds(b);
@@ -116,11 +114,8 @@ void mafPipeBox::Create(mafSceneNode *n/*, bool use_axes*/)
 
   m_AssemblyFront->AddPart(m_OutlineActor);
 
-  /*
-  m_axes = NULL;
-	if(m_use_axes) m_axes = new mafAxes(m_ren1,m_Vme);
-	if(m_use_axes) m_axes->SetVisibility(0);
-	*/
+  m_Axes = new mafAxes(m_RenFront,m_Vme);
+  m_Axes->SetVisibility(0);
 }
 //----------------------------------------------------------------------------
 mafPipeBox::~mafPipeBox()
@@ -136,21 +131,8 @@ mafPipeBox::~mafPipeBox()
   vtkDEL(m_OutlineMapper);
   vtkDEL(m_OutlineProperty);
   vtkDEL(m_OutlineActor);
-	//@@@ if(m_use_axes) cppDEL(m_axes);
+	cppDEL(m_Axes);
 }
-/*
-//----------------------------------------------------------------------------
-void mafPipeBox::Show(bool show)
-//----------------------------------------------------------------------------
-{
-	m_Actor->SetVisibility(show);
-	if(m_Selected)
-	{
-	  m_OutlineActor->SetVisibility(show);
-		//@@@ if(m_use_axes) m_axes->SetVisibility(show);
-	}
-}
-*/
 //----------------------------------------------------------------------------
 void mafPipeBox::Select(bool sel)
 //----------------------------------------------------------------------------
@@ -159,7 +141,7 @@ void mafPipeBox::Select(bool sel)
 	if(m_Actor->GetVisibility()) 
 	{
 			m_OutlineActor->SetVisibility(sel);
-			//@@@ if(m_use_axes) m_axes->SetVisibility(sel);
+			m_Axes->SetVisibility(sel);
 	}
 }
 //----------------------------------------------------------------------------
@@ -195,8 +177,8 @@ void mafPipeBox::UpdateProperty(bool fromTag)
 mmgGui *mafPipeBox::CreateGui()
 //-------------------------------------------------------------------------
 {
-  const wxString box_type[] = {"3D", "4D"};
-  int num_choices = 2;
+  const wxString box_type[] = {"3D", "4D","3D Subtree","4D Subtree"};
+  int num_choices = 4;
 
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
@@ -214,10 +196,21 @@ void mafPipeBox::OnEvent(mafEventBase *maf_event)
       case ID_BOUNDS_MODE:
       {
         double b[6];
-        if (m_BoundsMode == 0)
-          m_Vme->GetOutput()->GetBounds(b);
-        else
-          m_Vme->GetOutput()->Get4DBounds(b);
+        switch(m_BoundsMode) 
+        {
+          case 0:
+            m_Vme->GetOutput()->GetVMEBounds(b);
+        	break;
+          case 1:
+            m_Vme->GetOutput()->GetVME4DBounds(b);
+          break;
+          case 2:
+            m_Vme->GetOutput()->GetBounds(b);
+          break;
+          default:
+            m_Vme->GetOutput()->Get4DBounds(b);
+          break;
+        }
         m_Box->SetBounds(b);
       }
    	  break;

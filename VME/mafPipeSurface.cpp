@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:48:31 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-10-17 13:07:15 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,15 +24,9 @@
 #include "mafVMESurface.h"
 #include "mmaMaterial.h"
 #include "mmgGui.h"
+#include "mafAxes.h"
 
 #include "vtkMAFAssembly.h"
-
-//@@@ #include "mafDecl.h"
-//@@@ #include "mafAxes.h"  //SIL. 20-5-2003 added line - 
-//@@@ #include "mafMaterial.h"  //SIL. 30-5-2003 added line -
-//@@@ #include "mmgMaterialButton.h"
-//@@@ #include "mafVmeData.h"
-
 #include "vtkRenderer.h"
 #include "vtkOutlineCornerFilter.h"
 #include "vtkPolyDataNormals.h"
@@ -42,6 +36,7 @@
 #include "vtkActor.h"
 #include "vtkProperty.h"
 #include "vtkTexture.h"
+#include "vtkPointData.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeSurface);
@@ -76,18 +71,27 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
   m_OutlineMapper   = NULL;
   m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
-  m_ScalarVisibility= 0;
+  m_Axes            = NULL;
 
   assert(m_Vme->GetOutput()->IsMAFType(mafVMEOutputSurface));
   mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
   assert(surface_output);
   surface_output->Update();
   vtkPolyData *data = vtkPolyData::SafeDownCast(surface_output->GetVTKData());
+  data->Update();
   assert(data);
+  vtkDataArray *scalars = data->GetPointData()->GetScalars();
+  double sr[2] = {0,1};
+  if(scalars != NULL)
+  {
+    m_ScalarVisibility = 1;
+    scalars->GetRange(sr);
+  }
 
   m_Mapper = vtkPolyDataMapper::New();
 	m_Mapper->SetInput(data);
   m_Mapper->SetScalarVisibility(m_ScalarVisibility);
+  m_Mapper->SetScalarRange(sr);
   
 	if(m_Vme->IsAnimated())				
 		m_Mapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
@@ -152,6 +156,9 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
 
   m_AssemblyFront->AddPart(m_OutlineActor);
 
+  m_Axes = new mafAxes(m_RenFront, m_Vme);
+  m_Axes->SetVisibility(0);
+
   /*
   m_axes = NULL;
 	if(m_use_axes) m_axes = new mafAxes(m_ren1,m_Vme);
@@ -172,6 +179,7 @@ mafPipeSurface::~mafPipeSurface()
   vtkDEL(m_OutlineMapper);
   vtkDEL(m_OutlineProperty);
   vtkDEL(m_OutlineActor);
+  cppDEL(m_Axes);
 	//@@@ if(m_use_axes) wxDEL(m_axes);  
 }
 /*
@@ -195,7 +203,7 @@ void mafPipeSurface::Select(bool sel)
 	if(m_Actor->GetVisibility()) 
 	{
 			m_OutlineActor->SetVisibility(sel);
-			//@@@ if(m_use_axes) m_axes->SetVisibility(sel);
+      m_Axes->SetVisibility(sel);
 	}
 }
 //----------------------------------------------------------------------------
