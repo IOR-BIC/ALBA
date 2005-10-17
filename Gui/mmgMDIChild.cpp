@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIChild.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-17 13:32:22 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-10-17 14:24:42 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -65,6 +65,7 @@ mmgMDIChild::mmgMDIChild(wxMDIParentFrame* parent,mafView *view)
   wxBoxSizer *win_sizer = new wxBoxSizer(wxVERTICAL);
   win_sizer->Add(m_win,1,wxEXPAND);
   m_win->Reparent(this);
+  m_win->Fit();
   m_win->Show(true);
 
   SetIcon(mafPics.GetIcon("MDICHILD_ICON"));
