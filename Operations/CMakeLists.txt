@@ -41,6 +41,8 @@ IF (MAF_USE_VTK)
     mmoMSFExporter.h
     mmoMSF1xImporter.cpp
     mmoMSF1xImporter.h
+    mmoRAWImporterVolume.cpp
+    mmoRAWImporterVolume.h
     mmoReparentTo.cpp
     mmoReparentTo.h
     mmoSTLExporter.cpp
