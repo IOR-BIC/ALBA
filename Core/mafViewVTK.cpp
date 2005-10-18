@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 09:25:03 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2005-10-18 09:39:30 $
+  Version:   $Revision: 1.24 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -331,7 +331,9 @@ void mafViewVTK::OnPostResetCamera()
 //----------------------------------------------------------------------------
 {
 }
+//----------------------------------------------------------------------------
 void mafViewVTK::SetWindowSize(int w, int h)
+//----------------------------------------------------------------------------
 {
 	GetRenderWindow()->SetSize(w,h);
 }

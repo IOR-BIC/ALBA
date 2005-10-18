@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 09:25:24 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2005-10-18 09:39:30 $
+  Version:   $Revision: 1.23 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -87,7 +87,8 @@ public:
   virtual vtkRenderer     *GetBackRenderer();
   virtual vtkRenderWindow *GetRenderWindow();
 	
-	void SetWindowSize(int w, int h);
+	/** Set the vtk RenderWindow size. Used only for Linux (not necessary for Windows) */
+  void SetWindowSize(int w, int h);
 
   /** Struct containing information regarding visual pipe plugged into the view. */
   struct mafVisualPipeInfo
