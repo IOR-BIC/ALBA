@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 09:49:27 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-10-18 14:04:30 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -359,7 +359,6 @@ void mafNodeManager::VmeAdd(mafNode *n)
     assert( vp == NULL || m_root->IsInTree(vp) );
     if(vp == NULL) 
 			n->ReparentTo(m_root);
-     //n->SetTreeTime(m_root->GetTime()); //spostare in mfl
     NotifyAdd(n);
     m_modified = true;
   }

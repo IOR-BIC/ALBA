@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-11 17:49:47 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-10-18 14:04:22 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -31,7 +31,7 @@ void mafYield()
 
 /* to be removed (Marco)
 //----------------------------------------------------------------------------
-mafVmeBaseTypes mafGetBaseType(mflVME* vme)
+mafVmeBaseTypes mafGetBaseType(mafVME* vme)
 //----------------------------------------------------------------------------
 {
   assert(vme);

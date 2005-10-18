@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-11 10:58:12 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-10-18 14:04:46 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -41,7 +41,7 @@ from the cloud and represent them as mafVMELandmarks children (see Open() and Cl
 which determines whether all functions relative to edit and query landmarks acts on vtkPolydata points or
 on external mafVMELandmarks children.
 @sa
-mflVME mafPointSet.*/
+mafVME mafPointSet.*/
 class MAF_EXPORT mafVMELandmarkCloud : public mafVMEPointSet
 {
 public:

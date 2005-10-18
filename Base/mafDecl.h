@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 10:59:26 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-10-18 14:04:22 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -354,7 +354,7 @@ MAF_BASE_ID ///< base numeric ID used by mafIdFactory. This must be the LAST ONE
 extern wxWindow* mafGetFrame();
 
 /** global function to retrieve the vme base type. */
-//mafVmeBaseTypes mafGetBaseType(mflVME* vme); //(to be removed Marco)
+//mafVmeBaseTypes mafGetBaseType(mafVME* vme); //(to be removed Marco)
 
 /** to be used by mmgFrame and derived class only */    
 void      mafSetFrame(wxWindow* frame);

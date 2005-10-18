@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 15:48:22 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-10-18 14:04:46 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -242,7 +242,7 @@ protected:
   /**
   Set the VME to which this item owns. At present the VME object is
   not referenced!!! Also this function should never be called by the
-  user but only by mflVME and mafVMEItemArray functions.*/
+  user but only by mafVME and mafVMEItemArray functions.*/
   //void SetVME(mafVME *vme) {m_VME=vme;}
 
   mafTagArray * m_TagArray;             ///< meta data attributes attached to this dataset      
