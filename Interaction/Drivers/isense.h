@@ -25,9 +25,9 @@
 /* Following defines the flavor of UNIX the program should be compiled for.
    Only one of the 3 lines can be used, the others should be commented out. */
 
-#define IRIX        /* use SGI-specific serial port configuration */
+/*#define IRIX        /* use SGI-specific serial port configuration */
 /* #define SOLARIS */   /* SUN Solaris OS */
-/*#define LINUX*/
+#define LINUX
 
 #ifdef LINUX
 #define USE_RTS_LINE
