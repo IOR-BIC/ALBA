@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-08-31 09:10:50 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-10-18 22:03:07 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -248,7 +248,7 @@ void mafLogicWithGUI::CreateToolbar()
 void mafLogicWithGUI::CreateSidebar()
 //----------------------------------------------------------------------------
 {
-  m_SideSash = new mmgSashPanel(m_Win, MENU_VIEW_SIDEBAR, wxRIGHT,245, "Side Bar \tCtrl+S"); // 245 is the width of the sideBar
+  m_SideSash = new mmgSashPanel(m_Win, MENU_VIEW_SIDEBAR, wxRIGHT,280, "Side Bar \tCtrl+S"); // 280 is the width of the sideBar
 }
 //----------------------------------------------------------------------------
 void mafLogicWithGUI::CreateTimebar()
