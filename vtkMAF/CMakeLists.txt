@@ -10,7 +10,7 @@ PROJECT(vtkMAF)
 SET(vtkMAF_SRCS
   vtkContourVolumeMapper.cxx
   vtkContourVolumeMapper.h
-  vtkContourVolumeMapperAdv.cxx
+#  vtkContourVolumeMapperAdv.cxx
   vtkDOFMatrix.cxx
   vtkDOFMatrix.h
   vtkExtendedGlyph3D.cxx
