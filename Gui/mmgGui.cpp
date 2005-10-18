@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-25 13:28:34 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2005-10-18 21:58:26 $
+  Version:   $Revision: 1.22 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -100,7 +100,9 @@ mmgPanel(mafGetFrame(),-1,dp,wxDefaultSize,wxNO_BORDER | wxCLIP_CHILDREN | wxTAB
    m_Sizer->SetSizeHints(this);
 
    m_BoldFont = wxFont(wxSystemSettings::GetSystemFont(wxSYS_DEFAULT_GUI_FONT));
+#if WIN32   
    m_BoldFont.SetPointSize(9);
+#endif
    m_BoldFont.SetWeight(wxBOLD);
 
    for(int i=0; i<MAXWIDGET; i++) m_WidgetTableID[i] = 0;
