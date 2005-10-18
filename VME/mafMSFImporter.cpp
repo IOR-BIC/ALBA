@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:47:42 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-10-18 21:52:33 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -78,7 +78,10 @@ int mmuMSF1xDocument::InternalRestore(mafStorageElement *node)
       {
         mafErrorMacro("Error while restoring a VME (parent is the root)");
       }
-      m_Root->AddChild(child_vme);
+      else
+      {
+        m_Root->AddChild(child_vme);
+      }
     }    
   }
   
@@ -95,8 +98,10 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
   if (node->GetAttribute("Type",vme_type))
   {
     vme = CreateVMEInstance(vme_type);
-    assert(vme);
-
+    //assert(vme);
+    if (!vme)
+      return NULL;
+    
     mafString vme_name;
     if (node->GetAttribute("Name",vme_name))
     {
@@ -161,7 +166,7 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
           if (child_vme==NULL)
           {
             mafErrorMacro("MSFImporter: error restoring child VME (parent=\""<<vme->GetName()<<"\")");
-            return NULL;
+            continue;
           }
           if (vme_type!="mafVMELink" && vme_type!="mafVMEAlias")
           {
@@ -226,7 +231,7 @@ mafVME *mmuMSF1xDocument::CreateVMEInstance(mafString &name)
   }
   else
   {
-    mafErrorMacro("Unknown VME type!!");
+    mafErrorMacro("Unknown VME type: \""<<name.GetCStr()<<"\"");
     return NULL;
   }
 }
