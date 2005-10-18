@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-30 16:31:19 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-10-18 11:56:56 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -82,14 +82,14 @@ mmgGui* mafVMEOutputVolume::CreateGui()
   m_Gui->Label("vtk type: ", vtk_data_type, true);
   m_Gui->Label(" bounds: ",true);
   mafString b;
-  b << m_VolumeBounds.m_Bounds[0] << "   xmax: " << m_VolumeBounds.m_Bounds[1];
-  m_Gui->Label(" xmin: ", b);
+  b << " xmin: " << m_VolumeBounds.m_Bounds[0] << "   xmax: " << m_VolumeBounds.m_Bounds[1];
+  m_Gui->Label(b);
   b = "";
-  b << m_VolumeBounds.m_Bounds[2] << "   ymax: " << m_VolumeBounds.m_Bounds[3];
-  m_Gui->Label(" ymin: ", b);
+  b << " ymin: " << m_VolumeBounds.m_Bounds[2] << "   ymax: " << m_VolumeBounds.m_Bounds[3];
+  m_Gui->Label(b);
   b = "";
-  b << m_VolumeBounds.m_Bounds[4] << "   zmax: " << m_VolumeBounds.m_Bounds[5];
-  m_Gui->Label(" zmin: ", b);
+  b << " zmin: " << m_VolumeBounds.m_Bounds[4] << "   zmax: " << m_VolumeBounds.m_Bounds[5];
+  m_Gui->Label(b);
   if (m_VME->IsMAFType(mafVMEVolumeGray))
   {
     m_Gui->Label("scalar range:",true);
@@ -97,8 +97,8 @@ mmgGui* mafVMEOutputVolume::CreateGui()
     this->GetVTKData()->Update();
     this->GetVTKData()->GetScalarRange(srange);
     mafString range_text;
-    range_text << srange[0] << "    max: " << srange[1];
-    m_Gui->Label(" min: ",range_text);
+    range_text << " min: " << srange[0] << "    max: " << srange[1];
+    m_Gui->Label(range_text);
   }
   return m_Gui;
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 11:56:44 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-10-18 11:59:43 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -302,7 +302,7 @@ void mmoRAWImporterVolume::UpdateReader()
 			else
 				m_Reader->SetDataByteOrderToLittleEndian();
 			m_NumberOfByte = 8;
-			m_Gui->Enable(ID_SIGNED,true);
+			m_Gui->Enable(ID_SIGNED,false);
 		break;
 		case DOUBLE_SCALAR:
 			m_Reader->SetDataScalarType(VTK_DOUBLE);
@@ -311,7 +311,7 @@ void mmoRAWImporterVolume::UpdateReader()
 			else
 				m_Reader->SetDataByteOrderToLittleEndian();
 			m_NumberOfByte = 8;
-			m_Gui->Enable(ID_SIGNED,true);
+			m_Gui->Enable(ID_SIGNED,false);
 		break;
 	}
 
