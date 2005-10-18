@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-17 14:24:57 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2005-10-18 08:38:16 $
+  Version:   $Revision: 1.21 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -57,7 +57,6 @@ public:
 
   virtual mafView*  Copy(mafObserver *Listener);
   virtual void      Create();
-  virtual void		  SetFrame(wxFrame* f);
   virtual void			OnEvent(mafEventBase *maf_event);
 
   /** IDs for the GUI */
