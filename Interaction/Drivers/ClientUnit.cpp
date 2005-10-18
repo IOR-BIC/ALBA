@@ -1,10 +1,14 @@
-/////////////////////////////////////////////////////////////////////////////
-// Name:        ClientUnit.cpp
-//
-// project:     MULTIMOD (LAL v2.0)
-// Author:      Paolo Quadrani   p.quadrani@cineca.it
-// Date:        19/07/2003
-/////////////////////////////////////////////////////////////////////////////
+/*=========================================================================
+  Program:   Multimod Application Framework
+  Module:    $RCSfile: ClientUnit.cpp,v $
+  Language:  C++
+  Date:      $Date: 2005-10-18 13:46:13 $
+  Version:   $Revision: 1.2 $
+  Authors:   Paolo Quadrani
+==========================================================================
+Copyright (c) 2002/2004
+CINECA - Interuniversity Consortium (www.cineca.it) 
+=========================================================================*/
 
 #include "mafDefines.h"
 
@@ -132,8 +136,8 @@ void ClientUnit::ReadMessageFromServer(wxSocketBase *sock)
   // Read the message
   len = sock->ReadMsg(msg, MAX_MSG_SIZE).LastCount();
 
-  //wxString s = msg;
-  mafEvent e(this,RemoteMessage_ID,msg);
+  mafString s = msg;
+  mafEvent e(this,RemoteMessage_ID,&s);
   InvokeEvent(e);
 
   delete[] msg;

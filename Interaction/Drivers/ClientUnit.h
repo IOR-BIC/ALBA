@@ -1,10 +1,14 @@
-/////////////////////////////////////////////////////////////////////////////
-// Name:        ClientUnit.h
-//
-// Project:     MULTIMOD (LAL v2.0)
-// Author:      Paolo Quadrani   p.quadrani@cineca.it
-// Date:        19/07/2003
-/////////////////////////////////////////////////////////////////////////////
+/*=========================================================================
+  Program:   Multimod Application Framework
+  Module:    $RCSfile: ClientUnit.h,v $
+  Language:  C++
+  Date:      $Date: 2005-10-18 13:46:13 $
+  Version:   $Revision: 1.2 $
+  Authors:   Paolo Quadrani
+==========================================================================
+Copyright (c) 2002/2004
+CINECA - Interuniversity Consortium (www.cineca.it) 
+=========================================================================*/
 
 #ifndef __ClientUnit_H__
 #define __ClientUnit_H__
