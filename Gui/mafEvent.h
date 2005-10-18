@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-12 13:58:34 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-10-18 13:45:12 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden, Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 #include "mafDefines.h"   // mafDefines should alway be included as first
 #include "mafEventBase.h" // base class for mafEvent
-#include "mafObserver.h"  // base class for mafEventListener
+#include "mafObserver.h"
 #include "mafString.h"    // used by mafEvent
 //----------------------------------------------------------------------------
 // Forward References:
@@ -144,35 +144,4 @@ protected:
   void Init(void *sender, int id, long arg=0);
   void Initialized();
 };
-
-
-//------------------------------------------------------------------------------
-// mafEventListener
-//------------------------------------------------------------------------------
-/** 
-SubClass of mafObserver for back-compatibility. 
-mafObserver::OnEvent(mafEventBase *e)  -- the new mafEvent take a pointer to mafEventBase
-mafEventListener::OnEvent(mafEvent &e) -- the previous mafEvent take a pointer to mafEventBase
-*/
-//NOTE: mafEventListener is declared inside mafEvent for back compatibility
-class MAF_EXPORT mafEventListener : public mafObserver
-{
-public:
-  mafEventListener() {}
-  virtual ~mafEventListener() {}
-
-  /** simulate the old OnEvent for backcompatibility.
-      the argument is a reference to a mafEvent  */
-  virtual void OnEvent(mafEvent &e) {} ;
-
-  /** new OnEvent (the argument is a pointer to a mafEventBase),
-      here it is redirected to the old OnEvent */
-  virtual void OnEvent(mafEventBase *e)  \
-  {                                      \
-    if(e->IsMAFType(mafEvent))              \
-        OnEvent( *((mafEvent*)e) );
-  };
-};
-
-
 #endif /* __mafEvent_h */

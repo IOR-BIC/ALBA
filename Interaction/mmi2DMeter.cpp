@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi2DMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-12 13:59:29 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-10-18 13:45:44 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -12,8 +12,6 @@
 
 #include "mmi2DMeter.h"
 #include "mafDecl.h"
-#include "mafEvent.h"
-#include "mafEventBase.h"
 #include "mmdMouse.h"
 
 #include "mafVME.h"

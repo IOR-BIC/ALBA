@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObserver.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 07:16:01 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-10-18 13:44:26 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,10 +15,7 @@
 // includes :
 //----------------------------------------------------------------------------
 #include "mafObject.h"
-//------------------------------------------------------------------------------
-// Forward declarations
-//------------------------------------------------------------------------------
-class mafEventBase;
+#include "mafEvent.h"
 
 //------------------------------------------------------------------------------
 // mafObserver
@@ -29,7 +26,7 @@ class mafEventBase;
   issued by subjects.
   An observer must be registered to a subject to create the communication channel 
   between the two. An observer can "observe" many subjects at the same time.
-  @sa mafEventSource mafEventListener mafObserverCallback
+  @sa mafEventSource mafObserverCallback
 */
 class MAF_EXPORT mafObserver
 {

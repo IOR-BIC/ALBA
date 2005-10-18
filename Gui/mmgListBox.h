@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgListBox.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:24 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-10-18 13:45:13 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,6 +17,7 @@
 #include <wx/laywin.h>
 #include <wx/listctrl.h>
 #include "mafEvent.h"
+#include "mafObserver.h"
 #include "mmgPanel.h"
 
 //----------------------------------------------------------------------------
@@ -48,7 +49,7 @@ public:
     void		SetItemLabel	(wxString label);
 	wxString	GetStringSelection() {return m_lb->GetStringSelection();};
 	int			GetNumberOfItems()	{return m_lb->GetCount();};
-    void		SetListener		(mafEventListener *listener) {m_Listener = listener;};
+    void		SetListener		(mafObserver *listener) {m_Listener = listener;};
 	void		Select			(int id) {m_lb->SetSelection(id);};
 
     wxListBox *m_lb;
@@ -58,7 +59,7 @@ protected:
     void      OnSize         (wxSizeEvent& event);
 
     wxString			m_item_selected;
-	mafEventListener    *m_Listener;
+	mafObserver    *m_Listener;
     bool                m_prevent_notify;
 
     DECLARE_EVENT_TABLE()

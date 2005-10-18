@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgListCtrl.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:24 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-10-18 13:45:13 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,6 +21,7 @@
 #include <wx/hash.h>
 
 #include "mafEvent.h"
+#include "mafObserver.h"
 #include "mmgNamedPanel.h"
 //----------------------------------------------------------------------------
 // Constants :
@@ -45,7 +46,7 @@ class mmgListCtrl: public mmgNamedPanel
 public:
                  mmgListCtrl (wxWindow* parent, wxWindowID id=-1, bool CloseButton = false, bool HideTitle = false); 
   virtual       ~mmgListCtrl();
-  void           SetListener  (mafEventListener *listener)   {m_Listener=listener;}; 
+  void           SetListener  (mafObserver *listener)   {m_Listener=listener;}; 
 
   /** Clear the control list. */
 	void Reset();
@@ -84,7 +85,7 @@ protected:
   bool               m_prevent_notify;
   wxListCtrl        *m_list;         
   wxImageList       *m_images;       
-  mafEventListener  *m_Listener;     
+  mafObserver  *m_Listener;     
 
 DECLARE_EVENT_TABLE()
 }; // end of mmgListCtrl

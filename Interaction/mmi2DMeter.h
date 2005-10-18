@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi2DMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-12 13:59:29 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-10-18 13:45:44 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -14,13 +14,11 @@
 #define __mmi2DMeter_h
 
 #include "mmiPER.h"
+#include "mafEvent.h"
 
 //----------------------------------------------------------------------------
 // forward refs
 //----------------------------------------------------------------------------
-class mflVME;
-class mafEvent;
-class mafEventListener;
 class vtkLineSource;
 class vtkCoordinate;
 class vtkPolyDataMapper2D;

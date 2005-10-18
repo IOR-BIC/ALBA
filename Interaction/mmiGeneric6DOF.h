@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGeneric6DOF.h,v $
   Language:  C++
-  Date:      $Date: 2005-08-31 09:09:03 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-10-18 13:45:44 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,11 +14,6 @@
 #define __mmiGeneric6DOF_h
 
 #include "mmi6DOF.h"
-
-//----------------------------------------------------------------------------
-// forward declarations
-//----------------------------------------------------------------------------
-class mafEventListener;
 
 /** implements 6DOF move of objects in the scene.
   This class implements a 6DOF move of objects in the scene. The interaction

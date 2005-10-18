@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmo2DMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-12 13:59:56 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-10-18 13:44:02 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,7 +21,6 @@
 
 #include "mmi2DMeter.h"
 #include <wx/busyinfo.h>
-#include <wx/file.h>
 
 #include "mafDecl.h"
 #include "mafEvent.h"
