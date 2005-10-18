@@ -8,82 +8,84 @@ MESSAGE(STATUS "Configuring project ${PROJECT_NAME}")
 CONFIGURE_FILE("${MAF_SOURCE_DIR}/Gui/manifest.in" "${MAF_BINARY_DIR}/Gui/manifest.in" COPYONLY)
 
 SET(PROJECT_SRCS
-mafLightKit.cpp
-mafLightKit.h
-mafPics.cpp
-mafPics.h
-mafSideBar.cpp
-mafSideBar.h
-mafVTKLog.cpp
-mafVTKLog.h
-mafWXLog.cpp
-mafWXLog.h
-mmgButton.cpp
-mmgButton.h
-mmgCheckListBox.cpp
-mmgCheckListBox.h
-mmgCheckTree.cpp
-mmgCheckTree.h
-mmgContextualMenu.cpp
-mmgContextualMenu.h
-mmgCrossSplitter.cpp
-mmgCrossSplitter.h
-mmgDialog.cpp
-mmgDialog.h
-mmgDialogPreview.cpp
-mmgDialogPreview.h
-mafEvent.cpp
-mafEvent.h
-mmgFileHistory.cpp
-mmgFileHistory.h
-mmgFlagSplitter.cpp
-mmgFlagSplitter.h
-mmgFloatSlider.cpp
-mmgFloatSlider.h
-mmgFrame.cpp
-mmgFrame.h
-mmgGui.cpp
-mmgGui.h
-mmgGuiHolder.cpp
-mmgGuiHolder.h
-mmgLab.cpp
-mmgLab.h
-mmgListBox.cpp
-mmgListBox.h
-mmgListCtrl.cpp
-mmgListCtrl.h
-mmgMDIChild.cpp
-mmgMDIChild.h
-mmgMDIFrame.cpp
-mmgMDIFrame.h
-mmgNamedPanel.cpp
-mmgNamedPanel.h
-mmgPanel.cpp
-mmgPanel.h
-mmgPanelStack.cpp
-mmgPanelStack.h
-mmgPicButton.cpp
-mmgPicButton.h
-mmgRangeSlider.cpp
-mmgRangeSlider.h
-mmgSashPanel.cpp
-mmgSashPanel.h
-mmgScrolledPanel.cpp
-mmgScrolledPanel.h
-mmgSplittedPanel.cpp
-mmgSplittedPanel.h
-mmgTimeBar.cpp
-mmgTimeBar.h
-mmgTree.cpp
-mmgTree.h
-mmgTreeContextualMenu.cpp
-mmgTreeContextualMenu.h
-mmgValidator.cpp
-mmgValidator.h
-mmgViewFrame.cpp
-mmgViewFrame.h
-mmgViewWin.cpp
-mmgViewWin.h
+  mafEvent.cpp
+  mafEvent.h
+  mafLightKit.cpp
+  mafLightKit.h
+  mafPics.cpp
+  mafPics.h
+  mafSideBar.cpp
+  mafSideBar.h
+  mafVTKLog.cpp
+  mafVTKLog.h
+  mafWXLog.cpp
+  mafWXLog.h
+  mmgButton.cpp
+  mmgButton.h
+  mmgCheckListBox.cpp
+  mmgCheckListBox.h
+  mmgCheckTree.cpp
+  mmgCheckTree.h
+  mmgContextualMenu.cpp
+  mmgContextualMenu.h
+  mmgCrossSplitter.cpp
+  mmgCrossSplitter.h
+  mmgDialog.cpp
+  mmgDialog.h
+  mmgDialogPreview.cpp
+  mmgDialogPreview.h
+  mmgFileHistory.cpp
+  mmgFileHistory.h
+  mmgFlagSplitter.cpp
+  mmgFlagSplitter.h
+  mmgFloatSlider.cpp
+  mmgFloatSlider.h
+  mmgFrame.cpp
+  mmgFrame.h
+  mmgGui.cpp
+  mmgGui.h
+  mmgGuiHolder.cpp
+  mmgGuiHolder.h
+  mmgLab.cpp
+  mmgLab.h
+  mmgListBox.cpp
+  mmgListBox.h
+  mmgListCtrl.cpp
+  mmgListCtrl.h
+  mmgLutSlider.cpp
+  mmgLutSlider.h
+  mmgMDIChild.cpp
+  mmgMDIChild.h
+  mmgMDIFrame.cpp
+  mmgMDIFrame.h
+  mmgNamedPanel.cpp
+  mmgNamedPanel.h
+  mmgPanel.cpp
+  mmgPanel.h
+  mmgPanelStack.cpp
+  mmgPanelStack.h
+  mmgPicButton.cpp
+  mmgPicButton.h
+  mmgRangeSlider.cpp
+  mmgRangeSlider.h
+  mmgSashPanel.cpp
+  mmgSashPanel.h
+  mmgScrolledPanel.cpp
+  mmgScrolledPanel.h
+  mmgSplittedPanel.cpp
+  mmgSplittedPanel.h
+  mmgTimeBar.cpp
+  mmgTimeBar.h
+  mmgTree.cpp
+  mmgTree.h
+  mmgTreeContextualMenu.cpp
+  mmgTreeContextualMenu.h
+  mmgValidator.cpp
+  mmgValidator.h
+  mmgViewFrame.cpp
+  mmgViewFrame.h
+  mmgViewWin.cpp
+  mmgViewWin.h
 )
 
 # List the kits from VTK that are needed by this project.
