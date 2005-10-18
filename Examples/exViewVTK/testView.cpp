@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testView.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-27 13:12:02 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-10-18 15:32:41 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,7 +25,7 @@
 #include "mafPipeFactory.h"
 
 //----------------------------------------------------------------------------
-mafView *testView::Copy(mafEventListener *Listener)
+mafView *testView::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
   testView *v = new testView(m_Label);

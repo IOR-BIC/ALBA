@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testView.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-27 13:12:02 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-10-18 15:32:41 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,6 +18,9 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
+class mafView;
+class mafNode;
+class mafObserver;
 
 //----------------------------------------------------------------------------
 // testView :
@@ -30,7 +33,7 @@ class testView: public mafViewVTK
 public:
   testView(wxString label) : mafViewVTK(label) {};
 
-  virtual mafView*  Copy(mafEventListener *Listener);
+  virtual mafView*  Copy(mafObserver *Listener);
   virtual int 	    GetNodeStatus(mafNode *vme);
   virtual void	    VmeCreatePipe(mafNode *vme);
   virtual void	    VmeDeletePipe(mafNode *vme);
