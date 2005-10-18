@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIChild.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:44:04 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-10-18 08:37:45 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,7 +36,7 @@ public:
   void SetListener(mafObserver *Listener) {m_Listener = Listener;};
   
 	/** Set the quitting flag. */
-	static void OnQuit () {m_quitting=true;}; 
+	static void OnQuit () {m_Quitting=true;}; 
 
 protected:
 	/** Adjust the child size. */
@@ -51,10 +51,10 @@ protected:
 	/** Send the event to select the owned view. */
   void OnActivate (wxActivateEvent& event);
 
-  wxWindow						*m_win;
-  mafView             *m_view;
+  wxWindow						*m_Win;
+  mafView             *m_View;
   mafObserver    *m_Listener;
-  static bool          m_quitting;
+  static bool          m_Quitting;
 
   DECLARE_EVENT_TABLE()
 };

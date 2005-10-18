@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIChild.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-17 14:41:44 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-10-18 08:37:45 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,7 +49,7 @@ BEGIN_EVENT_TABLE(mmgMDIChild,wxMDIChildFrame)
 				EVT_ACTIVATE  (mmgMDIChild::OnActivate)
 END_EVENT_TABLE()
 
-bool mmgMDIChild::m_quitting = false;
+bool mmgMDIChild::m_Quitting = false;
 //----------------------------------------------------------------------------
 mmgMDIChild::mmgMDIChild(wxMDIParentFrame* parent,mafView *view)
 :wxMDIChildFrame(parent,-1, "child",wxDefaultPosition, wxDefaultSize/*, 0*/)
@@ -58,15 +58,15 @@ mmgMDIChild::mmgMDIChild(wxMDIParentFrame* parent,mafView *view)
   this->Show(false);
 
   assert(view);
-  m_view     = view;
+  m_View     = view;
   m_Listener = NULL;
 
-  m_win = m_view->GetWindow();
-  m_win->Reparent(this);
-  m_win->Show(true);
+  m_Win = m_View->GetWindow();
+  m_Win->Reparent(this);
+  m_Win->Show(true);
 
   SetIcon(mafPics.GetIcon("MDICHILD_ICON"));
-	SetTitle(wxStripMenuCodes(m_view->GetLabel()));
+	SetTitle(wxStripMenuCodes(m_View->GetLabel()));
 }
 //----------------------------------------------------------------------------
 mmgMDIChild::~mmgMDIChild( ) 
@@ -79,21 +79,21 @@ void mmgMDIChild::OnSelect(wxCommandEvent &event)
 {
   Activate(); // allow activation with the RMouse too
 	wxWindow *rwi = (wxWindow*)event.GetEventObject();
-  mafEventMacro(mafEvent(this,VIEW_SELECT,m_view,rwi));
+  mafEventMacro(mafEvent(this,VIEW_SELECT,m_View,rwi));
 }
 //----------------------------------------------------------------------------
 void mmgMDIChild::OnSize(wxSizeEvent &event)
 //----------------------------------------------------------------------------
 {
   int w,h;
-  //dont initialize w & h using the event - use GetClientSize instead
+  //don't initialize w & h using the event - use GetClientSize instead
   this->GetClientSize(&w,&h); 
 
   if (h < PH || w < PH) return;
 
-	m_win->Move(0,0);
-	m_win->SetSize(w,h);
-	m_win->Layout();
+	m_Win->Move(0,0);
+	m_Win->SetSize(w,h);
+	m_Win->Layout();
 }
 //----------------------------------------------------------------------------
 void mmgMDIChild::OnCloseWindow(wxCloseEvent& event)
@@ -103,16 +103,16 @@ void mmgMDIChild::OnCloseWindow(wxCloseEvent& event)
 	// otherwise VIEW_DELETE is sent also on the closing of the application
 	// when the listener (the ViewManager) has been already destroied
 
-	mafEventMacro(mafEvent(this,VIEW_DELETE,m_view));
+	mafEventMacro(mafEvent(this,VIEW_DELETE,m_View));
 	Destroy();
 }
 //----------------------------------------------------------------------------
 void mmgMDIChild::OnActivate(wxActivateEvent& event)
 //----------------------------------------------------------------------------
 { 
-  if( event.GetActive() && !m_quitting )
+  if( event.GetActive() && !m_Quitting )
   {
-    mafEventMacro(mafEvent(this,VIEW_SELECT,m_view,(wxWindow*)NULL));
+    mafEventMacro(mafEvent(this,VIEW_SELECT,m_View,(wxWindow*)NULL));
     Layout();
   }
 }
