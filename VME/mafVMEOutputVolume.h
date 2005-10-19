@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputVolume.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:50:44 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-10-19 09:14:58 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -38,8 +38,12 @@ public:
   /** return the output data casting to vtkRectilinearGrid */
   virtual vtkRectilinearGrid *GetRectilinearData();
 
+  /** Update all the output data structures (data, bounds, matrix and abs matrix).*/
+  virtual void Update();
+
 protected:
-  mafOBB m_VolumeBounds;
+  mafString m_VolumeBounds[3];
+  mafString m_ScaralRangeString;
   mmgGui *CreateGui();
 
 private:

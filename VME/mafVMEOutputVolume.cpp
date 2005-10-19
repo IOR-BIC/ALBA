@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 11:56:56 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-10-19 09:14:58 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -71,34 +71,46 @@ mmgGui* mafVMEOutputVolume::CreateGui()
   m_Gui = mafVMEOutput::CreateGui();
 
   wxBusyCursor wait;
-
+  
   if (m_VME && m_VME->GetDataPipe() && m_VME->GetDataPipe()->GetVTKData())
   {
     this->Update();
-    m_VME->GetOutput()->GetVMEBounds(m_VolumeBounds);
   }
   mafString vtk_data_type;
   vtk_data_type << this->GetVTKData()->GetClassName();
   m_Gui->Label("vtk type: ", vtk_data_type, true);
   m_Gui->Label(" bounds: ",true);
-  mafString b;
-  b << " xmin: " << m_VolumeBounds.m_Bounds[0] << "   xmax: " << m_VolumeBounds.m_Bounds[1];
-  m_Gui->Label(b);
-  b = "";
-  b << " ymin: " << m_VolumeBounds.m_Bounds[2] << "   ymax: " << m_VolumeBounds.m_Bounds[3];
-  m_Gui->Label(b);
-  b = "";
-  b << " zmin: " << m_VolumeBounds.m_Bounds[4] << "   zmax: " << m_VolumeBounds.m_Bounds[5];
-  m_Gui->Label(b);
+  m_Gui->Label(&m_VolumeBounds[0]);
+  m_Gui->Label(&m_VolumeBounds[1]);
+  m_Gui->Label(&m_VolumeBounds[2]);
   if (m_VME->IsMAFType(mafVMEVolumeGray))
   {
     m_Gui->Label("scalar range:",true);
+    m_Gui->Label(&m_ScaralRangeString);
+  }
+  return m_Gui;
+}
+//-------------------------------------------------------------------------
+void mafVMEOutputVolume::Update()
+//-------------------------------------------------------------------------
+{
+  assert(m_VME);
+  m_VME->Update();
+  if (m_VME && m_VME->GetDataPipe() && m_VME->GetDataPipe()->GetVTKData())
+  {
+    mafOBB b;
+    m_VME->GetOutput()->GetVMELocalBounds(b);
+    m_VolumeBounds[0] << " xmin: " << b.m_Bounds[0] << "   xmax: " << b.m_Bounds[1];
+    m_VolumeBounds[1] << " ymin: " << b.m_Bounds[2] << "   ymax: " << b.m_Bounds[3];
+    m_VolumeBounds[2] << " zmin: " << b.m_Bounds[4] << "   zmax: " << b.m_Bounds[5];
     double srange[2];
     this->GetVTKData()->Update();
     this->GetVTKData()->GetScalarRange(srange);
-    mafString range_text;
-    range_text << " min: " << srange[0] << "    max: " << srange[1];
-    m_Gui->Label(range_text);
+    m_ScaralRangeString << " min: " << srange[0] << "    max: " << srange[1];
   }
-  return m_Gui;
+  
+  if (m_Gui)
+  {
+    m_Gui->Update();
+  }
 }
