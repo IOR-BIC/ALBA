@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-17 13:06:26 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-10-19 08:52:57 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -75,7 +75,7 @@ void mafPipeBox::Create(mafSceneNode *n/*, bool use_axes*/)
 
   double b[6];
   m_Vme->GetOutput()->Update();
-  m_Vme->GetOutput()->GetVMEBounds(b);
+  m_Vme->GetOutput()->GetVMELocalBounds(b);
 
   vtkNEW(m_Box);
   m_Box->SetBounds(b);
@@ -199,7 +199,7 @@ void mafPipeBox::OnEvent(mafEventBase *maf_event)
         switch(m_BoundsMode) 
         {
           case 0:
-            m_Vme->GetOutput()->GetVMEBounds(b);
+            m_Vme->GetOutput()->GetVMELocalBounds(b);
         	break;
           case 1:
             m_Vme->GetOutput()->GetVME4DBounds(b);
