@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-29 16:18:29 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-10-21 13:13:20 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -64,8 +64,8 @@ mafVMEItemVTK::mafVMEItemVTK()
 mafVMEItemVTK::~mafVMEItemVTK()
 //-------------------------------------------------------------------------
 {
-  mafDEL(m_DataWriter);
-  mafDEL(m_DataReader);
+  vtkDEL(m_DataWriter);
+  vtkDEL(m_DataReader);
 }
 
 //-------------------------------------------------------------------------
@@ -203,7 +203,8 @@ void mafVMEItemVTK::SetData(vtkDataSet *data)
 
     Modified();
 
-    SetDataModified(true);
+    if (!m_IsLoadingData)
+      SetDataModified(true);
   }
 }
 
@@ -227,7 +228,7 @@ void mafVMEItemVTK::UpdateData()
   // to reset the DataModified flag.
   if (m_Data.GetPointer()==NULL)
   {
-    if (InternalRestoreData()==MAF_OK)
+    if (RestoreData()==MAF_OK)
     {
       // Data has been generated internally
       //SetDataModified(false);
@@ -368,6 +369,9 @@ int mafVMEItemVTK::InternalRestoreData()
       data=((vtkDataSetReader *)reader)->GetOutput();
     }
  
+    m_DataReader=reader;
+    m_DataReader->Register(NULL);
+
     if (data==NULL)
     {
       mafErrorMacro("Cannot read data file "<<filename);
@@ -381,7 +385,7 @@ int mafVMEItemVTK::InternalRestoreData()
       //data->SetSource(NULL);
     }
 
-    SetDataModified(false);
+    //SetDataModified(false);
 
     reader->Delete();
 
@@ -458,7 +462,7 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
     **********************************/
 
     m_IOStatus=0;
-
+    int ret=MAF_OK; // value returned by StoreToURL() function at the end of saving to file
     if ((IsDataPresent()&&(!found||(m_URL!=url)))||((IsDataPresent()==found)&&(found==IsDataModified())))
     {       
       //if (!item->IsDataModified()&&found)
@@ -517,6 +521,11 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
       }
 
       //writer->RemoveObserver(tag);
+
+      if (m_IOMode==DEFAULT)
+        SetURL(url);
+
+      ret=storage->StoreToURL(filename,m_URL);
     }
     else
     {
@@ -530,18 +539,16 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
       }
   
       UpdateBounds(); // force updating the bounds
+
     }
 
     if (m_IOStatus!=MAF_OK)
       return MAF_ERROR;
 
-    if (m_IOMode==DEFAULT)
-      SetURL(url);
-
     // reset modified data flag
     SetDataModified(false);
 
-    return storage->StoreToURL(filename,m_URL);
+    return ret;
   }
   
   return MAF_NO_IO;
@@ -560,7 +567,7 @@ void mafVMEItemVTK::ErrorHandler(void *ptr)
 void mafVMEItemVTK::ReleaseData()
 //-------------------------------------------------------------------------
 {
-  mafDEL(m_DataReader); // destroy reader
+  vtkDEL(m_DataReader); // destroy reader
   m_Data = NULL;        // unregister dataset
 }
 
@@ -588,7 +595,12 @@ void mafVMEItemVTK::ReleaseOutputMemory()
 
   if (m_DataWriter) // release also the writer
   {
-    mafDEL(m_DataWriter)
+    vtkDEL(m_DataWriter)
+  }
+
+  if (m_DataReader) // release also the writer
+  {
+    vtkDEL(m_DataReader)
   }
 }
 //-------------------------------------------------------------------------
