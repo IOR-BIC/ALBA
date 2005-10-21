@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:49:52 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-10-21 13:15:43 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -31,6 +31,9 @@ public:
   virtual ~mafVMEOutputMeter();
 
   mafTypeMacro(mafVMEOutputMeter,mafVMEOutputPolyline);
+
+  /** Update all the output data structures (data, bounds, matrix and abs matrix).*/
+  virtual void Update();
 
 protected:
   mmgGui *CreateGui();
