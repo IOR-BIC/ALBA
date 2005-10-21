@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 12:13:36 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-10-21 13:09:45 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -67,6 +67,9 @@ protected:
 
   /** Restore material attributes */
   void RestoreMaterial(mafVME *vme);
+
+  /** Restore meter attributes */
+  void RestoreMeterAttribute(mafVME *vme);
 
   mafVMERoot *m_Root;
 };

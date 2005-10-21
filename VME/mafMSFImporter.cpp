@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 21:52:33 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-10-21 13:09:45 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,13 +23,24 @@
 #include "mmuUtility.h"
 #include "mafStorable.h"
 #include "mafStorageElement.h"
+#include "mmaMaterial.h"
+#include "mmaMeter.h"
 #include "mafMatrixVector.h"
+
 #include "mafVMEGroup.h"
+#include "mafVMEImage.h"
+#include "mafVMELandmark.h"
+#include "mafVMELandmarkCloud.h"
+#include "mafVMEMeter.h"
+#include "mafVMEPointSet.h"
+#include "mafVMEProber.h"
+#include "mafVMERefSys.h"
+#include "mafVMESlicer.h"
 #include "mafVMESurface.h"
 #include "mafVMEVolumeGray.h"
-#include "mafVMELandmarkCloud.h"
-#include "mafVMELandmark.h"
-#include "mmaMaterial.h"
+#include "mafVMEVolumeRGB.h"
+
+#include <vector>
 
 //------------------------------------------------------------------------------
 // mmuMSF1xDocument
@@ -98,7 +109,6 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
   if (node->GetAttribute("Type",vme_type))
   {
     vme = CreateVMEInstance(vme_type);
-    //assert(vme);
     if (!vme)
       return NULL;
     
@@ -106,11 +116,9 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
     if (node->GetAttribute("Name",vme_name))
     {
       vme->SetName(vme_name);
-  
       // traverse children and restore TagArray, MatrixVector and VMEItems 
       mafStorageElement::ChildrenVector children;
       children = node->GetChildren();
-
       for (int i=0;i<children.size();i++)
       {
         // Restore a TagArray element
@@ -130,13 +138,20 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
           {
             RestoreMaterial(vme);
           }
+          if (ta->IsTagPresent("MAF_TOOL_VME"))
+          {
+            ta->DeleteTag("MAF_TOOL_VME");
+          }
+          if (vme_type == "mflVMEMeter")
+          {
+            RestoreMeterAttribute(vme);
+          }
           if (vme_type == "mflVMELandmarkCloud")
           {
             int num_lm = ((mafVMELandmarkCloud *)vme)->GetNumberOfLandmarks();
             double rad = ((mafVMELandmarkCloud *)vme)->GetRadius();
           }
         }
-
         // restore VME-Item element
         else if (mafCString("VItem") == children[i]->GetName())
         {
@@ -203,8 +218,8 @@ mafVME *mmuMSF1xDocument::CreateVMEInstance(mafString &name)
   if (
     name == "mafVMEGeneric"         ||
     name == "mflVMEExternalData"    ||
-    name == "mflVMEAlias"           ||
-    name == "mflVMELink"
+    name == "mflVMEAlias"//           ||
+    //name == "mflVMELink"
     )
   {
     return mafVMEGeneric::New();
@@ -216,6 +231,10 @@ mafVME *mmuMSF1xDocument::CreateVMEInstance(mafString &name)
   else if (name == "mflVMESurface")
   {
     return mafVMESurface::New();
+  }
+  else if (name == "mflVMEGenericVolume")
+  {
+    return mafVMEVolumeRGB::New();
   }
   else if (name == "mflVMEGrayVolume")
   {
@@ -229,10 +248,112 @@ mafVME *mmuMSF1xDocument::CreateVMEInstance(mafString &name)
   {
     return mafVMELandmark::New();
   }
+  else if (name == "mflVMEImage")
+  {
+    return mafVMEImage::New();
+  }
+  else if (name == "mflVMEMeter")
+  {
+    return mafVMEMeter::New();
+  }
+  else if (name == "mflVMEPointSet")
+  {
+    return mafVMEPointSet::New();
+  }
+  else if (name == "mflVMERefSys")
+  {
+    return mafVMERefSys::New();
+  }
+  else if (name == "mflVMEMaps")
+  {
+    return mafVMEProber::New();
+  }
+  else if (name == "mflVMESlicer")
+  {
+    return mafVMESlicer::New();
+  }
   else
   {
     mafErrorMacro("Unknown VME type: \""<<name.GetCStr()<<"\"");
     return NULL;
+  }
+}
+
+//------------------------------------------------------------------------------
+void mmuMSF1xDocument::RestoreMeterAttribute(mafVME *vme)
+//------------------------------------------------------------------------------
+{
+  mafVMEMeter *meter = mafVMEMeter::SafeDownCast(vme);
+  if (meter)
+  {
+    mmaMeter *meter_attrib = meter->GetMeterAttributes();
+    mafTagArray *meter_ta  = meter->GetTagArray();
+    int num_tags = meter_ta->GetNumberOfTags();
+    std::vector<std::string> tag_list;
+    meter_ta->GetTagList(tag_list);
+    mafTagItem *ti = NULL;
+    mafString tag_name;
+    double component;
+    for (int t=0; t<num_tags; t++)
+    {
+      tag_name = tag_list[t].c_str();
+      if (tag_name.Equals("MFL_METER_END_VME_1_ID") || 
+          tag_name.Equals("MFL_METER_START_VME_ID") ||
+          tag_name.Equals("MFL_METER_END_VME_2_ID"))
+      {
+        continue;
+      }
+      ti = meter_ta->GetTag(tag_name.GetCStr());
+      component = ti->GetComponentAsDouble(0);
+      if (tag_name.Equals("MFL_METER_TYPE"))
+      {
+        meter_attrib->m_MeterMode = (int)component;
+      }
+      else if (tag_name.Equals("MFL_METER_COLOR_MODE"))
+      {
+        meter_attrib->m_ColorMode = (int)component;
+      }
+      else if (tag_name.Equals("MFL_METER_MEASURE_TYPE"))
+      {
+        meter_attrib->m_MeasureType = (int)component;
+      }
+      else if (tag_name.Equals("MFL_METER_REPRESENTATION"))
+      {
+        meter_attrib->m_Representation = (int)component;
+      }
+      else if (tag_name.Equals("MFL_METER_TUBE_CAPPING"))
+      {
+        meter_attrib->m_Capping = (int)component;
+      }
+      else if (tag_name.Equals("MFL_METER_EVENT_THRESHOLD"))
+      {
+        meter_attrib->m_GenerateEvent = (int)component;
+      }
+      else if (tag_name.Equals("MFL_METER_INIT_MEASURE"))
+      {
+        meter_attrib->m_InitMeasure = component;
+      }
+      else if (tag_name.Equals("MFL_METER_DELTA_PERCENT"))
+      {
+        meter_attrib->m_DeltaPercent = (int)component;
+      }
+      else if (tag_name.Equals("MFL_METER_LABEL_VISIBILITY"))
+      {
+        meter_attrib->m_LabelVisibility = (int)component;
+      }
+      else if (tag_name.Equals("MFL_METER_RADIUS"))
+      {
+        meter_attrib->m_TubeRadius = component;
+      }
+      else if (tag_name.Equals("MFL_METER_DISTANCE_RANGE"))
+      {
+        meter_attrib->m_DistanceRange[0] = component;
+        meter_attrib->m_DistanceRange[1] = ti->GetComponentAsDouble(1);
+      }
+      else
+        continue;
+      meter_ta->DeleteTag(tag_name.GetCStr());
+    }
   }
 }
 
@@ -436,7 +557,6 @@ mafMSFImporter::mafMSFImporter()
   SetVersion("1.0");
   SetFileType("MSF");
   SetDocument(new mmuMSF1xDocument); // create a MSF doc
-  
 }
 
 //------------------------------------------------------------------------------
@@ -459,4 +579,3 @@ mafVMERoot *mafMSFImporter::GetRoot()
 {
   return ((mmuMSF1xDocument *)m_Document)->GetRoot();
 }
-
