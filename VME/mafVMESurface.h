@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-05 06:03:04 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-10-21 13:15:02 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,7 +22,6 @@
 class vtkDataSet;
 class vtkPolyData;
 class mmaMaterial;
-class mmgMaterialButton;
 
 /** mafVMESurface - a VME featuring an internal array for matrices and VTK datasets.
   mafVMESurface is a specialized VME inheriting the VME-Generic features to internally
@@ -46,9 +45,6 @@ public:
   this type of VME. */
   virtual int SetData(vtkPolyData *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
 
-  /** Precess events coming from other objects */ 
-  virtual void OnEvent(mafEventBase *maf_event);
-
   /** return the right type of output */  
   mafVMEOutputSurface *GetSurfaceOutput() {return (mafVMEOutputSurface *)GetOutput();}
 
@@ -70,10 +66,6 @@ protected:
 
   /** used to initialize and create the material attribute if not yet present */
   virtual int InternalInitialize();
-
-  /** Internally used to create a new instance of the GUI.*/
-  virtual mmgGui *CreateGui();
-  mmgMaterialButton *m_MaterialButton;
 
 private:
   mafVMESurface(const mafVMESurface&); // Not implemented

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:51:20 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-10-21 13:15:02 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -36,7 +36,6 @@
 #include "vtkPolyData.h"
 #include "vtkCellArray.h"
 
-#include "mafPipeSurface.h" //SIL. 21-4-2005: 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMESurface)
 //-------------------------------------------------------------------------
@@ -45,7 +44,6 @@ mafCxxTypeMacro(mafVMESurface)
 mafVMESurface::mafVMESurface()
 //-------------------------------------------------------------------------
 {
-  m_MaterialButton = NULL;
 }
 
 //-------------------------------------------------------------------------
@@ -107,37 +105,6 @@ int mafVMESurface::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
   
   mafErrorMacro("Trying to set the wrong type of fata inside a VME Image :"<< (data?data->GetClassName():"NULL"));
   return MAF_ERROR;
-}
-
-//-------------------------------------------------------------------------
-mmgGui* mafVMESurface::CreateGui()
-//-------------------------------------------------------------------------
-{
-  m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name
-  m_Gui->SetListener(this);
-  m_Gui->Divider();
-  m_MaterialButton = new mmgMaterialButton(this,this);
-  m_Gui->AddGui(m_MaterialButton->GetGui());
-  return m_Gui;
-}
-
-//-------------------------------------------------------------------------
-void mafVMESurface::OnEvent(mafEventBase *maf_event)
-//-------------------------------------------------------------------------
-{
-  // events to be sent up or down in the tree are simply forwarded
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
-  {
-    switch(e->GetId())
-    {
-      default:
-        Superclass::OnEvent(maf_event);
-    }
-  }
-  else
-  {
-    Superclass::OnEvent(maf_event);
-  }
 }
 
 //-------------------------------------------------------------------------
