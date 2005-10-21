@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-13 13:40:28 $
-  Version:   $Revision: 1.38 $
+  Date:      $Date: 2005-10-21 15:08:05 $
+  Version:   $Revision: 1.39 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -297,6 +297,11 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
     case wxID_FILE2:
     case wxID_FILE3:
     case wxID_FILE4:
+    case wxID_FILE5:
+    case wxID_FILE6:
+    case wxID_FILE7:
+    case wxID_FILE8:
+    case wxID_FILE9:
       OnFileHistory(e->GetId());
       break;
     case MENU_FILE_SAVE:
