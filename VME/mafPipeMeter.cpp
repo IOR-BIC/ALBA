@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-21 13:10:12 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-10-21 15:07:16 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -155,7 +155,7 @@ void mafPipeMeter::Create(mafSceneNode *n/*, bool use_axes*/)
   vtkNEW(m_Caption);
   m_Caption->SetPosition(25,10);
   m_Caption->ThreeDimensionalLeaderOff();
-  if(m_MeterVME->GetMeterColorMode() == mafVMEMeter::RANGE_COLOR)
+  if(m_MeterVME->GetMeterColorMode() != mafVMEMeter::RANGE_COLOR)
   {
     double c[3];
     m_DataActor->GetProperty()->GetColor(c);
@@ -174,6 +174,7 @@ void mafPipeMeter::Create(mafSceneNode *n/*, bool use_axes*/)
     m_Caption->SetVisibility((m_MeterVME->GetAngle() != 0) && m_MeterVME->GetMeterAttributes()->m_LabelVisibility);
   else
     m_Caption->SetVisibility((m_MeterVME->GetDistance() > 0 || m_MeterVME->GetMeterMeasureType() == mafVMEMeter::RELATIVE_MEASURE) && m_MeterVME->GetMeterAttributes()->m_LabelVisibility);
+  
   if(m_MeterVME->GetStartVME())
   {
     double pos[3], rot[3];
@@ -364,8 +365,7 @@ void mafPipeMeter::UpdateProperty(bool fromTag)
   else
   {
     m_DataMapper->SetColorModeToDefault();
-    //data->m_mat_gui->GetMaterial()->m_prop->GetColor(rgb);
-    m_DataActor->GetProperty()->SetColor(rgb);
+    m_DataActor->GetProperty()->GetColor(rgb);
     m_Caption->GetProperty()->SetColor(rgb);
   }
 
