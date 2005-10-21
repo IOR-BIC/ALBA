@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 14:04:46 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-10-21 15:06:50 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
