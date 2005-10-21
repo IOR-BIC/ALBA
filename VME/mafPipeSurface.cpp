@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-17 13:07:15 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2005-10-21 13:36:33 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,8 +24,12 @@
 #include "mafVMESurface.h"
 #include "mmaMaterial.h"
 #include "mmgGui.h"
+#include "mmgMaterialButton.h"
 #include "mafAxes.h"
+#include "mafDataVector.h"
+#include "mafVMEGenericAbstract.h"
 
+#include "vtkMAFSmartPointer.h"
 #include "vtkMAFAssembly.h"
 #include "vtkRenderer.h"
 #include "vtkOutlineCornerFilter.h"
@@ -37,6 +41,12 @@
 #include "vtkProperty.h"
 #include "vtkTexture.h"
 #include "vtkPointData.h"
+#include "vtkPolyDataNormals.h"
+#include "vtkCleanPolyData.h"
+#include "vtkTriangleFilter.h"
+#include "vtkStripper.h"
+
+#include <vector>
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeSurface);
@@ -54,8 +64,11 @@ mafPipeSurface::mafPipeSurface()
   m_OutlineMapper   = NULL;
   m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
+  m_MaterialButton  = NULL;
 
   m_ScalarVisibility = 0;
+  m_OptimizedSurfaceFlag = 0;
+  m_RenderingDisplayListFlag = 0;
 }
 //----------------------------------------------------------------------------
 void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
@@ -88,18 +101,38 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
     scalars->GetRange(sr);
   }
 
+  mmaMaterial *material = surface_output->GetMaterial();
+  assert(material);  // all vme that use PipeSurface must have the material correctly set
+
+  vtkNEW(m_CleanPolydata);
+  m_CleanPolydata->PointMergingOff(); 
+  m_CleanPolydata->ConvertLinesToPointsOn();  
+  m_CleanPolydata->ConvertPolysToLinesOn();
+  m_CleanPolydata->ConvertStripsToPolysOn();     
+  vtkNEW(m_NormalFilter);
+  m_NormalFilter->SetInput(m_CleanPolydata->GetOutput());
+  m_NormalFilter->FlipNormalsOff();
+  m_NormalFilter->SetFeatureAngle(30.0);
+  vtkNEW(m_TriangleFilter);
+  m_TriangleFilter->SetInput(m_NormalFilter->GetOutput());
+  vtkNEW(m_Stripper);
+  m_Stripper->SetInput(m_TriangleFilter->GetOutput());
+
   m_Mapper = vtkPolyDataMapper::New();
 	m_Mapper->SetInput(data);
   m_Mapper->SetScalarVisibility(m_ScalarVisibility);
   m_Mapper->SetScalarRange(sr);
   
-	if(m_Vme->IsAnimated())				
-		m_Mapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
+	if(m_Vme->IsAnimated())
+  {
+    m_RenderingDisplayListFlag = 1;
+    m_Mapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
+  }
 	else
-		m_Mapper->ImmediateModeRenderingOff();
-
-  mmaMaterial *material = surface_output->GetMaterial();
-  assert(material);  // all vme that use PipeSurface must have the material correctly set
+  {
+    m_RenderingDisplayListFlag = 0;
+    m_Mapper->ImmediateModeRenderingOff();
+  }
 
   m_Texture = vtkTexture::New();
   m_Texture->SetQualityTo32Bit();
@@ -172,6 +205,10 @@ mafPipeSurface::~mafPipeSurface()
   m_AssemblyFront->RemovePart(m_Actor);
   m_AssemblyFront->RemovePart(m_OutlineActor);
 
+  vtkDEL(m_CleanPolydata);
+  vtkDEL(m_NormalFilter);
+  vtkDEL(m_TriangleFilter);
+  vtkDEL(m_Stripper);
   vtkDEL(m_Texture);
 	vtkDEL(m_Mapper);
   vtkDEL(m_Actor);
@@ -242,6 +279,11 @@ mmgGui *mafPipeSurface::CreateGui()
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
   m_Gui->Bool(ID_SCALAR_VISIBILITY,"scalar vis.", &m_ScalarVisibility,0,"turn on/off the scalar visibility");
+  m_Gui->Divider();
+  m_MaterialButton = new mmgMaterialButton(m_Vme,this);
+  m_Gui->AddGui(m_MaterialButton->GetGui());
+  m_Gui->Bool(ID_RENDERING_DISPLAY_LIST,"displaylist",&m_RenderingDisplayListFlag,0,"turn on/off \nrendering displaylist calculation");
+  m_Gui->Bool(ID_OPTIMIZE_SURFACE,"optimize",&m_OptimizedSurfaceFlag,0,"optimize surface for rendering");
 
   return m_Gui;
 }
@@ -267,8 +309,37 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
         m_Vme->ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
       }
     	break;
+      case ID_OPTIMIZE_SURFACE:
+      {
+        OptimizeSurface(m_OptimizedSurfaceFlag != 0);
+      }
+      break;
+      case ID_RENDERING_DISPLAY_LIST:
+        m_Mapper->SetImmediateModeRendering(m_RenderingDisplayListFlag);
+        m_Vme->ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
+      break;
       default:
+        m_Vme->ForwardUpEvent(*e);
       break;
     }
   }
+}
+//----------------------------------------------------------------------------
+void mafPipeSurface::OptimizeSurface(bool optimize)
+//----------------------------------------------------------------------------
+{
+  wxBusyCursor wait;
+  mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
+
+  if (optimize)
+  {
+    m_CleanPolydata->SetInput(surface_output->GetSurfaceData());
+    m_CleanPolydata->Update();
+    m_NormalFilter->Update();
+    m_TriangleFilter->Update();
+    m_Stripper->Update();
+    m_Mapper->SetInput(m_Stripper->GetOutput());
+  }
+  else
+    m_Mapper->SetInput(surface_output->GetSurfaceData());
 }
