@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 14:04:46 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-10-21 13:11:28 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -56,7 +56,7 @@ public:
 
   mafAbstractTypeMacro(mafVMEItem,mafReferenceCounted);
 
-  enum {MAF_NO_IO=MAF_USER_RETURN_VALUE+1};
+  enum VME_ITEM_IO_ERRORS {MAF_NO_IO=MAF_USER_RETURN_VALUE+1};
 
   /** defined to allow DataVector copy */
   static mafObject *NewObject() {return NULL;}
@@ -257,10 +257,9 @@ protected:
   mafString     m_URL;        ///< the URL of the data file for this dataset
   mafTimeStamp  m_TimeStamp;  ///< time stamp of this dataset
   mafString     m_DataType;   ///< the dataset type expressed as a string 
-  //mafVME *      m_VME;       ///< the VME this dataset is part of
   mafOBB        m_Bounds;     ///< spatial bounds for this dataset
   mafMTime      m_UpdateTime; ///< store modification timestamp for last update
-  //mafMTime      m_MTime;      ///< Last modification time
+  bool          m_IsLoadingData; ///< Set when item is loading data to prevent setting DataModified to true
 
   mafString     m_TmpFileName;///< file name used for local cache
   int           m_IOMode;     ///< IO modality to be used for store/restore data

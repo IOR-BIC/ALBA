@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 15:48:21 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-10-21 13:11:28 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -57,6 +57,7 @@ mafVMEItem::mafVMEItem()
   m_InputMemorySize = 0;
 
   m_ReleaseOldFile  = true;
+  m_IsLoadingData   = false;
 }
 
 //-------------------------------------------------------------------------
@@ -277,7 +278,10 @@ int mafVMEItem::StoreData(const char *url)
 int mafVMEItem::RestoreData()
 //-------------------------------------------------------------------------
 {
-  return InternalRestoreData();
+  m_IsLoadingData = true;
+  int ret = InternalRestoreData();
+  m_IsLoadingData = false;
+  return ret;
 }
 
 //-------------------------------------------------------------------------
