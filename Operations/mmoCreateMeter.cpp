@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 11:35:29 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-10-21 10:07:05 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -70,5 +70,4 @@ void mmoCreateMeter::OpDo()
 //----------------------------------------------------------------------------
 {
   m_Meter->ReparentTo(m_Input);
-  m_Meter->SetLink("StartVME", m_Input);
 }
