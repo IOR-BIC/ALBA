@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-28 23:11:46 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2005-10-21 13:16:21 $
+  Version:   $Revision: 1.19 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,6 +30,7 @@
 #include "mafDataPipeCustom.h"
 #include "mmuIdFactory.h"
 #include "mmgGui.h"
+#include "mafAbsMatrixPipe.h"
 
 #include "vtkMAFDataPipe.h"
 #include "vtkMath.h"
@@ -73,13 +74,12 @@ mafVMEMeter::mafVMEMeter()
   m_Goniometer->AddInput(m_LineSource->GetOutput());
   m_Goniometer->AddInput(m_LineSource2->GetOutput());
 
-  vtkNEW(m_TmpTransform);
+  mafNEW(m_TmpTransform);
 
   // attach a data pipe which creates a bridge between VTK and MAF
   mafDataPipeCustom *dpipe = mafDataPipeCustom::New();
   dpipe->SetDependOnAbsPose(true);
   SetDataPipe(dpipe);
-  
   dpipe->SetInput(m_LineSource->GetOutput());
 }
 //-------------------------------------------------------------------------
@@ -87,12 +87,12 @@ mafVMEMeter::~mafVMEMeter()
 //-------------------------------------------------------------------------
 {
   cppDEL(m_VMEAccept);
-  // mafDEL(m_MeterAttributes);  //modified by Marco. 29-9-2005 Attributes are destroyd automatically!
+  // mafDEL(m_MeterAttributes);  //modified by Marco. 29-9-2005 Attributes are destroyed automatically!
   mafDEL(m_Transform);
   vtkDEL(m_LineSource);
   vtkDEL(m_LineSource2);
   vtkDEL(m_Goniometer);
-  vtkDEL(m_TmpTransform);
+  mafDEL(m_TmpTransform);
   SetOutput(NULL);
 }
 //-------------------------------------------------------------------------
@@ -229,7 +229,8 @@ void mafVMEMeter::InternalUpdate()
         m_TmpTransform->TransformPoint(StartPoint,StartPoint);
       }
       else*/
-        start_vme->GetOutput()->GetAbsPose(m_StartPoint, orientation);
+      start_vme->GetOutput()->Update();  
+      start_vme->GetOutput()->GetAbsPose(m_StartPoint, orientation);
 
       // end is a landmark, consider also visibility
       /*if (mflVMELandmark *end_landmark = mflVMELandmark::SafeDownCast(end_vme))
@@ -242,7 +243,8 @@ void mafVMEMeter::InternalUpdate()
         m_TmpTransform->TransformPoint(EndPoint,EndPoint);
       }
       else*/
-        end_vme->GetOutput()->GetAbsPose(m_EndPoint, orientation);
+      end_vme->GetOutput()->Update();  
+      end_vme->GetOutput()->GetAbsPose(m_EndPoint, orientation);
     }
     else
     {
@@ -303,7 +305,8 @@ void mafVMEMeter::InternalUpdate()
         m_TmpTransform->TransformPoint(StartPoint,StartPoint);
       }
       else*/
-        start_vme->GetOutput()->GetAbsPose(m_StartPoint, orientation);
+      start_vme->GetOutput()->Update();  
+      start_vme->GetOutput()->GetAbsPose(m_StartPoint, orientation);
 
       // end is a landmark, consider also visibility
       /*if (mflVMELandmark *end1_landmark = mflVMELandmark::SafeDownCast(end1_vme))
@@ -316,7 +319,8 @@ void mafVMEMeter::InternalUpdate()
         m_TmpTransform->TransformPoint(EndPoint,EndPoint);
       }
       else*/
-        end1_vme->GetOutput()->GetAbsPose(m_EndPoint, orientation);
+      end1_vme->GetOutput()->Update();
+      end1_vme->GetOutput()->GetAbsPose(m_EndPoint, orientation);
 
       // end is a landmark, consider also visibility
       /*if (mflVMELandmark *end2_landmark = mflVMELandmark::SafeDownCast(end2_vme))
@@ -329,7 +333,8 @@ void mafVMEMeter::InternalUpdate()
         m_TmpTransform->TransformPoint(EndPoint2,EndPoint2);
       }
       else*/
-        end2_vme->GetOutput()->GetAbsPose(m_EndPoint2, orientation);
+      end2_vme->GetOutput()->Update();
+      end2_vme->GetOutput()->GetAbsPose(m_EndPoint2, orientation);
     }
     else
     {
@@ -416,7 +421,8 @@ void mafVMEMeter::InternalUpdate()
         m_TmpTransform->TransformPoint(StartPoint,StartPoint);
       }
       else*/
-        start_vme->GetOutput()->GetAbsPose(m_StartPoint,orientation);
+      start_vme->GetOutput()->Update();
+      start_vme->GetOutput()->GetAbsPose(m_StartPoint,orientation);
 
       /*if(mflVMELandmark *end1_landmark = mflVMELandmark::SafeDownCast(end1_vme))
         end1_ok = end1_landmark->GetLandmarkVisibility();
@@ -428,7 +434,8 @@ void mafVMEMeter::InternalUpdate()
         m_TmpTransform->TransformPoint(EndPoint,EndPoint);
       }
       else*/
-        end1_vme->GetOutput()->GetAbsPose(m_EndPoint,orientation);
+      end1_vme->GetOutput()->Update();
+      end1_vme->GetOutput()->GetAbsPose(m_EndPoint,orientation);
 
       /*if (mflVMELandmark *end2_landmark = mflVMELandmark::SafeDownCast(end2_vme))
         end2_ok = end2_landmark->GetLandmarkVisibility();
@@ -440,7 +447,8 @@ void mafVMEMeter::InternalUpdate()
         m_TmpTransform->TransformPoint(EndPoint2,EndPoint2);
       }
       else*/
-        end2_vme->GetOutput()->GetAbsPose(m_EndPoint2,orientation);
+      end2_vme->GetOutput()->Update();
+      end2_vme->GetOutput()->GetAbsPose(m_EndPoint2,orientation);
     }
     else
     {
