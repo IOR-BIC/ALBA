@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMSF1xImporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-09-06 11:23:55 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-10-21 10:06:07 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -23,10 +23,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // forward references :
 //----------------------------------------------------------------------------
 class mafNode;
-class mafVMEPolyline;
-class mafVMESurface;
-class mafVMEVolumeGray;
-class mafVMEGeneric;
 class mafMSFImporter;
 
 //----------------------------------------------------------------------------
@@ -60,4 +56,3 @@ protected:
   mafMSFImporter *m_Importer;
 };
 #endif
-
