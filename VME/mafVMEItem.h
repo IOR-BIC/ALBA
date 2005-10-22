@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-21 13:11:28 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-10-22 11:41:41 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -154,6 +154,9 @@ public:
     is usually the class string name.*/
   const char *GetDataType() {return m_DataType.GetCStr();};
 
+  /** Set the data type expressed as string name. */
+  void SetDataType(const char *name) {m_DataType=name;};
+
   /**
   Return the Id of this Item. This Id is unique within the tree and
   is used internally for referencing the dataset of this item. The MaxItemId
@@ -229,9 +232,6 @@ protected:
     and MAF_NO_IO in case no I/O is really performed (e.g. data already
     present on storage). */
   virtual int InternalStoreData(const char *url)=0; 
-
-  /** Set the data type expressed as string name. */
-  void SetDataType(const char *name) {m_DataType=name;};
 
   /**
     Internally used to specify if data stored in this object has been
