@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-21 13:09:45 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-10-22 09:49:05 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -39,6 +39,8 @@
 #include "mafVMESurface.h"
 #include "mafVMEVolumeGray.h"
 #include "mafVMEVolumeRGB.h"
+
+#include "mafNodeIterator.h"
 
 #include <vector>
 
@@ -95,7 +97,12 @@ int mmuMSF1xDocument::InternalRestore(mafStorageElement *node)
       }
     }    
   }
-  
+  mafNodeIterator *iter = m_Root->NewIterator();
+  for (mafNode *n = iter->GetFirstNode(); n; n=iter->GetNextNode())
+  {
+    n->UpdateId();
+  }
+  iter->Delete();
   return m_Root->Initialize();
 }
 
@@ -111,7 +118,7 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
     vme = CreateVMEInstance(vme_type);
     if (!vme)
       return NULL;
-    
+
     mafString vme_name;
     if (node->GetAttribute("Name",vme_name))
     {
@@ -207,7 +214,6 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
       }
     } // Name
   } // Type
-  
   return vme;
 }
 
