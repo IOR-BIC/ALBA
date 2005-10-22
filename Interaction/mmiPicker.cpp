@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPicker.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-22 12:44:53 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-10-22 12:45:30 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -111,30 +111,6 @@ void mmiPicker::OnButtonUp(mafEventInteraction *e)
         mafEventMacro(mafEvent(this,VME_PICKED,p.GetPointer()));
       }
     }
-/*    
-    vtkAbstractPropPicker *picker = mouse->GetPicker();
-
-    //modified by Stefano 19-1-2005 (begin)
-    vtkRenderer *r = NULL;
-    vtkRendererCollection *rc = mouse->GetInteractor()->GetRenderWindow()->GetRenderers();
-    
-    assert(rc);
-    rc->InitTraversal();
-    while(r = rc->GetNextItem())
-    {
-      if(picker->Pick(mouse_pos[0],mouse_pos[1],0,r))
-      {
-        double pos_picked[3];
-        picker->GetPickPosition(pos_picked);
-        //mouse->GetPicker()->GetPickPosition(pos_picked);
-        vtkPoints *p = vtkPoints::New();
-        p->SetNumberOfPoints(1);
-        p->SetPoint(0,pos_picked);
-        mafEventMacro(mafEvent(this,VME_PICKED,p));
-        p->Delete();
-      }
-    }
-    */
   }
 }
 
