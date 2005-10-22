@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-22 09:49:05 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-10-22 10:09:05 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -446,6 +446,7 @@ int mmuMSF1xDocument::RestoreVItem(mafStorageElement *node, mafVME *vme)
           vitem->SetTimeStamp(item_time);
           vitem->SetId(item_id);
           vitem->SetURL(data_file);
+          vitem->SetDataType(data_type);
           return MAF_OK;
         } // DataFile
       } // Id
