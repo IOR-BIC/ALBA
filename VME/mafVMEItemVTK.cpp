@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-21 13:13:20 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-10-22 11:44:02 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -183,7 +183,8 @@ void mafVMEItemVTK::SetData(vtkDataSet *data)
   {
     if (data)
     {
-      m_DataType=data->GetClassName();
+      //m_DataType=data->GetClassName();
+      this->SetDataType(data->GetClassName());
 
       double bounds[6];
       data->Update();
@@ -193,7 +194,8 @@ void mafVMEItemVTK::SetData(vtkDataSet *data)
     }
     else
     {
-      m_DataType="";
+      //m_DataType="";
+      this->SetDataType("");
       m_Bounds.Reset();
     }
 
