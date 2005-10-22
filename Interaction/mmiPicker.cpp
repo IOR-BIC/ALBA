@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPicker.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-21 07:55:51 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-10-22 12:44:53 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,6 +14,7 @@
 
 #include "mafEvent.h"
 
+#include "mafViewVTK.h"
 #include "mmdTracker.h"
 #include "mmdMouse.h"
 #include "mafAvatar3D.h"
@@ -23,6 +24,7 @@
 #include "mafVME.h"
 #include "mafTransform.h"
 
+#include "vtkMAFSmartPointer.h"
 #include "vtkCellPicker.h"
 #include "vtkRayCast3DPicker.h"
 #include "vtkObjectFactory.h"
@@ -95,7 +97,21 @@ void mmiPicker::OnButtonUp(mafEventInteraction *e)
     e->Get2DPosition(tmp_pose);
     mouse_pos[0] = (int)tmp_pose[0];
     mouse_pos[1] = (int)tmp_pose[1];
-    
+
+    mafViewVTK *v = mafViewVTK::SafeDownCast(mouse->GetView());
+    if (v)
+    {
+      if(v->Pick(mouse_pos[0],mouse_pos[1]))
+      {
+        double pos_picked[3];
+        v->GetPickedPosition(pos_picked);
+        vtkMAFSmartPointer<vtkPoints> p;
+        p->SetNumberOfPoints(1);
+        p->SetPoint(0,pos_picked);
+        mafEventMacro(mafEvent(this,VME_PICKED,p.GetPointer()));
+      }
+    }
+/*    
     vtkAbstractPropPicker *picker = mouse->GetPicker();
 
     //modified by Stefano 19-1-2005 (begin)
@@ -117,9 +133,8 @@ void mmiPicker::OnButtonUp(mafEventInteraction *e)
         mafEventMacro(mafEvent(this,VME_PICKED,p));
         p->Delete();
       }
-    //picker->Delete();
     }
-    //modified by Stefano 19-1-2005 (end)
+    */
   }
 }
 
