@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-22 09:40:54 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2005-10-22 09:47:22 $
+  Version:   $Revision: 1.28 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -225,8 +225,7 @@ public:
   
   /**
     Return a new Tree iterator already set to traverse 
-    the sub tree starting a this node. The iterator has reference count set to 0; 
-    increase reference count or use mafAutoPointer to avoid problems in memory deallocation.*/
+    the sub tree starting a this node. Remember to delete the iterator after use it.*/
   mafNodeIterator *NewIterator();
 
   /**
