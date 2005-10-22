@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 09:39:30 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2005-10-22 12:43:49 $
+  Version:   $Revision: 1.24 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,6 +31,7 @@ class vtkMatrix4x4;
 class mmdMouse;
 class vtkRenderWindow;
 class vtkRenderer;
+class vtkCellPicker;
 
 /** VME visibility attribute when plugging visual pipe.*/
 enum VME_VISIBILITY_ID
@@ -86,8 +87,25 @@ public:
   virtual vtkRenderer     *GetFrontRenderer();
   virtual vtkRenderer     *GetBackRenderer();
   virtual vtkRenderWindow *GetRenderWindow();
+
+  /** 
+  Perform a picking according to the screen position (x,y) and return true on success*/
+  bool Pick(int x, int y);
+
+  /** 
+  Perform a picking according to the absolute matrix given and return true on success*/
+  bool Pick(mafMatrix &m);
+
+  /** 
+  Write into the double array the position picked during Pick method.*/
+  void GetPickedPosition(double pos[3]);
+
+  /** 
+  Return the picked VME during the Pick method. Return NULL if VME is not found*/
+  mafVME *GetPickedVme() {return m_PickedVME;};
 	
-	/** Set the vtk RenderWindow size. Used only for Linux (not necessary for Windows) */
+	/** 
+    Set the vtk RenderWindow size. Used only for Linux (not necessary for Windows) */
   void SetWindowSize(int w, int h);
 
   /** Struct containing information regarding visual pipe plugged into the view. */
@@ -98,31 +116,39 @@ public:
   };
   typedef std::map<mafString, mafVisualPipeInfo> mafPipeMap;
 
-  /** Plug a visual pipe for a particular vme. It is used also to plug custom pipe.*/
+  /** 
+    Plug a visual pipe for a particular vme. It is used also to plug custom pipe.*/
   void PlugVisualPipe(mafString vme_type, mafString pipe_type, long visibility = VISIBLE);
 
-  mafPipeMap m_PipeMap;
+  mafPipeMap m_PipeMap; ///< Map used to store visual pipeline associated with vme types
 
+  /** 
+    Set the mouse device to use inside the view */
   void SetMouse(mmdMouse *mouse);
 
 protected:
   mafRWI        *m_Rwi; 
   mafSceneGraph *m_Sg;
   mafLightKit		*m_LightKit;
-  int            m_CameraPosition;
-  int						 m_CameraAttach;
-  mafVME				*m_AttachedVme;
-  vtkMatrix4x4	*m_AttachedVmeMatrix;
+  int            m_CameraPosition; 
+  int						 m_CameraAttach; ///< Flag to turn On/Off the camera attaching on a particular VME
+  mafVME				*m_AttachedVme; ///< VME on which the camera is attached when the attach-camera option is 'On'
+  vtkMatrix4x4	*m_AttachedVmeMatrix; ///< Matrix given to the Camera to be moved together with m_AttachedVme
 
-  bool m_ShowAxes;
-  int m_StereoType;
+  vtkCellPicker *m_Picker;  ///< the picker used to pick the in the render window
+  mafVME        *m_PickedVME; ///< Pointer to the picked vme. It is initialized on picking
+  double        m_PickedPosition[3];
+
+  bool m_ShowAxes;  ///< Flag used to show/hide axes in low left cornel of the view
+  int m_StereoType; ///< Indicate the stereo type to use with the view
 
   virtual mmgGui *CreateGui();
 
   virtual void OnPreResetCamera();
   virtual void OnPostResetCamera();
 
-  /** Update the camera position when vme's abs matrix change. 
+  /** 
+  Update the camera position when vme's abs matrix change. 
   This function is called from CameraUpdate when camera is attached to the vme */
   void UpdateCameraMatrix();
 };

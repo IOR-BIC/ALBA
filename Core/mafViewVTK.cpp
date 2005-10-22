@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 09:39:30 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2005-10-22 12:43:49 $
+  Version:   $Revision: 1.25 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,11 +25,16 @@
 #include "mafPipeFactory.h"
 #include "mafLightKit.h"
 
+#include "vtkMAFAssembly.h"
 #include "vtkMAFSmartPointer.h"
 #include "vtkCamera.h"
 #include "vtkTransform.h"
 #include "vtkMatrix4x4.h"
 #include "vtkRenderWindow.h"
+#include "vtkRendererCollection.h"
+#include "vtkCellPicker.h"
+#include "vtkAssemblyPath.h"
+#include "vtkAssemblyNode.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewVTK);
@@ -52,6 +57,10 @@ mafViewVTK::mafViewVTK(wxString label, int camera_position, bool show_axes, int 
   m_CameraAttach  = 0;
   m_AttachedVme       = NULL;
   m_AttachedVmeMatrix = NULL;
+
+  m_Picker            = NULL;
+  m_PickedVME         = NULL;
+  m_PickedPosition[0] = m_PickedPosition[1] = m_PickedPosition[2] = 0.0;
 }
 //----------------------------------------------------------------------------
 mafViewVTK::~mafViewVTK() 
@@ -59,6 +68,7 @@ mafViewVTK::~mafViewVTK()
 {
   m_PipeMap.clear();
 
+  vtkDEL(m_Picker);
   cppDEL(m_LightKit);
   cppDEL(m_Sg);
   cppDEL(m_Rwi);
@@ -99,6 +109,10 @@ void mafViewVTK::Create()
   m_Rwi->m_Sg = m_Sg;
   m_Rwi->m_Camera->SetClippingRange(0.1,1000); 
   this->CameraReset();
+
+  vtkNEW(m_Picker);
+  m_Picker->SetTolerance(0.001);
+  m_Picker->InitializePickList();
 }
 //----------------------------------------------------------------------------
 void mafViewVTK::SetMouse(mmdMouse *mouse)
@@ -336,4 +350,62 @@ void mafViewVTK::SetWindowSize(int w, int h)
 //----------------------------------------------------------------------------
 {
 	GetRenderWindow()->SetSize(w,h);
+}
+//----------------------------------------------------------------------------
+bool mafViewVTK::Pick(int x, int y)
+//----------------------------------------------------------------------------
+{
+  bool foundVme = false;
+  vtkAssemblyPath *ap   = NULL;
+  vtkMAFAssembly  *as   = NULL;
+
+  vtkRendererCollection *rc = m_Rwi->m_RwiBase->GetRenderWindow()->GetRenderers();
+  vtkRenderer *r = NULL;
+  rc->InitTraversal();
+  while(r = rc->GetNextItem())
+  {
+    if(m_Picker->Pick(x,y,0,r))
+    {
+      m_Picker->GetPickPosition(m_PickedPosition);
+      ap = m_Picker->GetPath();
+      break;
+    }
+  }
+  if(ap)
+  {
+    //scan the path from the leaf finding an assembly
+    //which know the related vme.
+    int pathlen = ap->GetNumberOfItems();
+    for (int i=pathlen-1; i>=0; i--)
+    {
+      vtkAssemblyNode *an = (vtkAssemblyNode*)ap->GetItemAsObject(i);
+      if (an)
+      {
+        vtkProp *p = an->GetProp();
+        if(p && p->IsA("vtkMAFAssembly"))
+        {
+          as = (vtkMAFAssembly*)p;
+          m_PickedVME = mafVME::SafeDownCast(as->GetVme());
+          foundVme = true;
+          break;
+        }
+      }
+    }
+  }
+  return foundVme;
+}
+//----------------------------------------------------------------------------
+bool mafViewVTK::Pick(mafMatrix &m)
+//----------------------------------------------------------------------------
+{
+  // to be implemented!!
+  return false;
+}
+//----------------------------------------------------------------------------
+void mafViewVTK::GetPickedPosition(double pos[3])
+//----------------------------------------------------------------------------
+{
+  pos[0] = m_PickedPosition[0];
+  pos[1] = m_PickedPosition[1];
+  pos[2] = m_PickedPosition[2];
 }
