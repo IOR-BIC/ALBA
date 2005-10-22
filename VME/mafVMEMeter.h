@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-09-28 23:11:47 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-10-22 09:48:10 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -252,7 +252,6 @@ protected:
   double m_EndPoint2[3];
 
   mafTransform *m_Transform;
-  mmaMeter     *m_MeterAttributes;
 
   vtkLineSource     *m_LineSource;
   vtkLineSource     *m_LineSource2;

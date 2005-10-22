@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-21 13:16:21 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2005-10-22 09:48:10 $
+  Version:   $Revision: 1.20 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -59,7 +59,6 @@ mafVMEMeter::mafVMEMeter()
   m_EndVme1Name   = "";
   m_EndVme2Name   = "";
   
-  m_MeterAttributes = NULL;
   m_VMEAccept = new mafVMEAccept();
 
   mafNEW(m_Transform);
@@ -87,7 +86,6 @@ mafVMEMeter::~mafVMEMeter()
 //-------------------------------------------------------------------------
 {
   cppDEL(m_VMEAccept);
-  // mafDEL(m_MeterAttributes);  //modified by Marco. 29-9-2005 Attributes are destroyed automatically!
   mafDEL(m_Transform);
   vtkDEL(m_LineSource);
   vtkDEL(m_LineSource2);
@@ -118,10 +116,6 @@ int mafVMEMeter::DeepCopy(mafNode *a)
       this->SetLink("EndVME2", linked_node);
     }
     m_Transform->SetMatrix(meter->m_Transform->GetMatrix());
-    
-    //modified by Marco. 29-9-2005 Mhmm... Poco pulito: se qualcuno risettasse questo attributo il metro 
-    //non se ne accorgerebbe fino al prossimo reload... meglio chiedere sempre l'attributo al nodo...
-    m_MeterAttributes = meter->GetMeterAttributes();  
     return MAF_OK;
   }  
   return MAF_ERROR;
@@ -201,11 +195,11 @@ void mafVMEMeter::InternalPreUpdate()
 void mafVMEMeter::InternalUpdate()
 //-----------------------------------------------------------------------
 {
-  m_MeterAttributes->m_ThresholdEvent = GetGenerateEvent();
-  m_MeterAttributes->m_DeltaPercent   = GetDeltaPercent();
-  m_MeterAttributes->m_InitMeasure    = GetInitMeasure();
+  GetMeterAttributes()->m_ThresholdEvent = GetGenerateEvent();
+  GetMeterAttributes()->m_DeltaPercent   = GetDeltaPercent();
+  GetMeterAttributes()->m_InitMeasure    = GetInitMeasure();
 
-  double threshold = m_MeterAttributes->m_InitMeasure * (1 + m_MeterAttributes->m_DeltaPercent / 100.0);
+  double threshold = GetMeterAttributes()->m_InitMeasure * (1 + GetMeterAttributes()->m_DeltaPercent / 100.0);
 
   if (GetMeterMode() == mafVMEMeter::POINT_DISTANCE)
   {
@@ -258,7 +252,7 @@ void mafVMEMeter::InternalUpdate()
       m_Distance = sqrt(vtkMath::Distance2BetweenPoints(m_StartPoint, m_EndPoint));
 
       if(GetMeterMeasureType() == mafVMEMeter::RELATIVE_MEASURE)
-        m_Distance -= m_MeterAttributes->m_InitMeasure;
+        m_Distance -= GetMeterAttributes()->m_InitMeasure;
 
       // compute start point in local coordinate system
       double local_start[3];
@@ -280,7 +274,7 @@ void mafVMEMeter::InternalUpdate()
 
     m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 
-    if(GetMeterMeasureType() == mafVMEMeter::ABSOLUTE_MEASURE && m_MeterAttributes->m_ThresholdEvent > 0 && m_Distance >= 0 && m_Distance >= threshold)
+    if(GetMeterMeasureType() == mafVMEMeter::ABSOLUTE_MEASURE && GetMeterAttributes()->m_ThresholdEvent > 0 && m_Distance >= 0 && m_Distance >= threshold)
       m_EventSource->InvokeEvent(this,LENGTH_THRESHOLD_EVENT);
   }
   else if (GetMeterMode() == mafVMEMeter::LINE_DISTANCE)
@@ -365,7 +359,7 @@ void mafVMEMeter::InternalUpdate()
       m_Distance = sqrt(vtkMath::Distance2BetweenPoints(start,p3));
 
       if(GetMeterMeasureType() == mafVMEMeter::RELATIVE_MEASURE)
-        m_Distance -= m_MeterAttributes->m_InitMeasure;
+        m_Distance -= GetMeterAttributes()->m_InitMeasure;
 
       // compute start point in local coordinate system
       double local_start[3];
@@ -396,7 +390,7 @@ void mafVMEMeter::InternalUpdate()
 
     m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 
-    if(GetMeterMeasureType() == mafVMEMeter::ABSOLUTE_MEASURE && m_MeterAttributes->m_ThresholdEvent > 0 && m_Distance >= 0 && m_Distance >= threshold)
+    if(GetMeterMeasureType() == mafVMEMeter::ABSOLUTE_MEASURE && GetMeterAttributes()->m_ThresholdEvent > 0 && m_Distance >= 0 && m_Distance >= threshold)
       m_EventSource->InvokeEvent(this, LENGTH_THRESHOLD_EVENT);
   }
   else if (GetMeterMode() == mafVMEMeter::LINE_ANGLE)
@@ -482,7 +476,7 @@ void mafVMEMeter::InternalUpdate()
       {
         m_Angle = acos(s / (vn1 * vn2)) * vtkMath::RadiansToDegrees();
         if(GetMeterMeasureType() == mafVMEMeter::RELATIVE_MEASURE)
-          m_Angle -= m_MeterAttributes->m_InitMeasure;
+          m_Angle -= GetMeterAttributes()->m_InitMeasure;
       }
       else
         m_Angle = 0;
@@ -511,7 +505,7 @@ void mafVMEMeter::InternalUpdate()
 
     m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 
-    if(GetMeterMeasureType() == mafVMEMeter::ABSOLUTE_MEASURE && m_MeterAttributes->m_ThresholdEvent > 0 && m_Angle > 0 && m_Angle >= threshold)
+    if(GetMeterMeasureType() == mafVMEMeter::ABSOLUTE_MEASURE && GetMeterAttributes()->m_ThresholdEvent > 0 && m_Angle > 0 && m_Angle >= threshold)
       m_EventSource->InvokeEvent(this,LENGTH_THRESHOLD_EVENT);
   }
 }
@@ -562,160 +556,134 @@ void mafVMEMeter::Print(std::ostream& os, const int tabs)
 mmaMeter *mafVMEMeter::GetMeterAttributes()
 //-------------------------------------------------------------------------
 {
-  if (m_MeterAttributes == NULL)
+  mmaMeter *meter_attributes = (mmaMeter *)GetAttribute("MeterAttributes");
+  if (meter_attributes == NULL)
   {
-    m_MeterAttributes = (mmaMeter *)GetAttribute("MeterAttributes");
-    if (m_MeterAttributes == NULL)
-    {
-      mafNEW(m_MeterAttributes);
-      SetAttribute("MeterAttributes", m_MeterAttributes);
-      mafDEL(m_MeterAttributes);  //modified by Marco. 29-9-2005 Materials are kept alive by the Node
-                                  // it cannot be sestroyed later since when loading MSF file the 
-                                  // attribute is created by the mafNode class itself.
-    }
+    meter_attributes = mmaMeter::New();
+    SetAttribute("MeterAttributes", meter_attributes);
   }
-  return m_MeterAttributes;
+  return meter_attributes;
 }
 //-------------------------------------------------------------------------
 void mafVMEMeter::SetMeterMode(int mode)
 //-------------------------------------------------------------------------
 {
-  GetMeterAttributes();
-  m_MeterAttributes->m_MeterMode = mode;
+  GetMeterAttributes()->m_MeterMode = mode;
 }
 //-------------------------------------------------------------------------
 int mafVMEMeter::GetMeterMode()
 //-------------------------------------------------------------------------
 {
-  GetMeterAttributes();
-  return m_MeterAttributes->m_MeterMode;
+  return GetMeterAttributes()->m_MeterMode;
 }
 //-------------------------------------------------------------------------
 void mafVMEMeter::SetDistanceRange(double min, double max)
 //-------------------------------------------------------------------------
 {
-  GetMeterAttributes();
-  m_MeterAttributes->m_DistanceRange[0] = min;
-  m_MeterAttributes->m_DistanceRange[1] = max;
+  GetMeterAttributes()->m_DistanceRange[0] = min;
+  GetMeterAttributes()->m_DistanceRange[1] = max;
 }
 //-------------------------------------------------------------------------
 double *mafVMEMeter::GetDistanceRange() 
 //-------------------------------------------------------------------------
 {
-  GetMeterAttributes();
-  return m_MeterAttributes->m_DistanceRange;
+  return GetMeterAttributes()->m_DistanceRange;
 }
 //-------------------------------------------------------------------------
 void mafVMEMeter::SetMeterColorMode(int mode)
 //-------------------------------------------------------------------------
 {
-  GetMeterAttributes();
-  m_MeterAttributes->m_ColorMode = mode;
+  GetMeterAttributes()->m_ColorMode = mode;
 }
 //-------------------------------------------------------------------------
 int mafVMEMeter::GetMeterColorMode()
 //-------------------------------------------------------------------------
 {
-  GetMeterAttributes();
-  return m_MeterAttributes->m_ColorMode;
+  return GetMeterAttributes()->m_ColorMode;
 }
 //-------------------------------------------------------------------------
 void mafVMEMeter::SetMeterMeasureType(int type)
 //-------------------------------------------------------------------------
 {
-  GetMeterAttributes();
-  m_MeterAttributes->m_MeasureType = type;
+  GetMeterAttributes()->m_MeasureType = type;
 }
 //-------------------------------------------------------------------------
 int mafVMEMeter::GetMeterMeasureType()
 //-------------------------------------------------------------------------
 {
-  GetMeterAttributes();
-  return m_MeterAttributes->m_MeasureType;
+  return GetMeterAttributes()->m_MeasureType;
 }
 //-------------------------------------------------------------------------
 void mafVMEMeter::SetMeterRepresentation(int representation)
 //-------------------------------------------------------------------------
 {
-  GetMeterAttributes();
-  m_MeterAttributes->m_Representation = representation;
+  GetMeterAttributes()->m_Representation = representation;
 }
 //-------------------------------------------------------------------------
 int mafVMEMeter::GetMeterRepresentation()
 //-------------------------------------------------------------------------
 {
-  GetMeterAttributes();
-  return m_MeterAttributes->m_Representation;
+  return GetMeterAttributes()->m_Representation;
 }
 //-------------------------------------------------------------------------
 void mafVMEMeter::SetMeterCapping(int capping)
 //-------------------------------------------------------------------------
 {
-  GetMeterAttributes();
-  m_MeterAttributes->m_Capping = capping;
+  GetMeterAttributes()->m_Capping = capping;
 }
 //-------------------------------------------------------------------------
 int mafVMEMeter::GetMeterCapping()
 //-------------------------------------------------------------------------
 {
-  GetMeterAttributes();
-  return m_MeterAttributes->m_Capping;
+  return GetMeterAttributes()->m_Capping;
 }
 //-------------------------------------------------------------------------
 void mafVMEMeter::SetGenerateEvent(int generate)
 //-------------------------------------------------------------------------
 {
-  GetMeterAttributes();
-  m_MeterAttributes->m_GenerateEvent = generate;
+  GetMeterAttributes()->m_GenerateEvent = generate;
 }
 //-------------------------------------------------------------------------
 int mafVMEMeter::GetGenerateEvent()
 //-------------------------------------------------------------------------
 {
-  GetMeterAttributes();
-  return m_MeterAttributes->m_GenerateEvent;
+  return GetMeterAttributes()->m_GenerateEvent;
 }
 //-------------------------------------------------------------------------
 void mafVMEMeter::SetInitMeasure(double init_measure)
 //-------------------------------------------------------------------------
 {
-  GetMeterAttributes();
-  m_MeterAttributes->m_InitMeasure = init_measure;
+  GetMeterAttributes()->m_InitMeasure = init_measure;
 }
 //-------------------------------------------------------------------------
 double mafVMEMeter::GetInitMeasure()
 //-------------------------------------------------------------------------
 {
-  GetMeterAttributes();
-  return m_MeterAttributes->m_InitMeasure;
+  return GetMeterAttributes()->m_InitMeasure;
 }
 //-------------------------------------------------------------------------
 void mafVMEMeter::SetMeterRadius(double radius)
 //-------------------------------------------------------------------------
 {
-  GetMeterAttributes();
-  m_MeterAttributes->m_TubeRadius = radius;
+  GetMeterAttributes()->m_TubeRadius = radius;
 }
 //-------------------------------------------------------------------------
 double mafVMEMeter::GetMeterRadius()
 //-------------------------------------------------------------------------
 {
-  GetMeterAttributes();
-  return m_MeterAttributes->m_TubeRadius;
+  return GetMeterAttributes()->m_TubeRadius;
 }
 //-------------------------------------------------------------------------
 void mafVMEMeter::SetDeltaPercent(int delta_percent)
 //-------------------------------------------------------------------------
 {
-  GetMeterAttributes();
-  m_MeterAttributes->m_DeltaPercent = delta_percent;
+  GetMeterAttributes()->m_DeltaPercent = delta_percent;
 }
 //-------------------------------------------------------------------------
 int mafVMEMeter::GetDeltaPercent()
 //-------------------------------------------------------------------------
 {
-  GetMeterAttributes();
-  return m_MeterAttributes->m_DeltaPercent;
+  return GetMeterAttributes()->m_DeltaPercent;
 }
 //-------------------------------------------------------------------------
 double mafVMEMeter::GetDistance()
