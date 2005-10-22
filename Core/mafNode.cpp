@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-12 09:44:08 $
-  Version:   $Revision: 1.40 $
+  Date:      $Date: 2005-10-22 09:40:53 $
+  Version:   $Revision: 1.41 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1145,4 +1145,17 @@ mmgGui* mafNode::CreateGui()
   m_Gui->String(ID_NAME,"name :", &m_Name);
 
   return m_Gui;
+}
+//-------------------------------------------------------------------------
+void mafNode::UpdateId()
+//-------------------------------------------------------------------------
+{
+  if (this->m_Id == -1)
+  {
+    mafRoot *root=mafRoot::SafeDownCast(GetRoot());
+    if (root)
+    {
+      SetId(root->GetNextNodeId());
+    }
+  }
 }

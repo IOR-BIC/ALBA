@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:43:06 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2005-10-22 09:40:54 $
+  Version:   $Revision: 1.27 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -225,7 +225,8 @@ public:
   
   /**
     Return a new Tree iterator already set to traverse 
-    the sub tree starting a this node*/
+    the sub tree starting a this node. The iterator has reference count set to 0; 
+    increase reference count or use mafAutoPointer to avoid problems in memory deallocation.*/
   mafNodeIterator *NewIterator();
 
   /**
@@ -350,7 +351,10 @@ public:
   mafID GetId() const;
 
   /** return an xpm-icon that can be used to represent this node */
-  static char ** GetIcon();   //SIL. 11-4-2005:  
+  static char ** GetIcon();
+
+  /** Check if m_Id and regenerate it if is invalid (-1) */
+  void UpdateId();
 
 protected:
 
