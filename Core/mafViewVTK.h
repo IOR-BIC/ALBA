@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-22 12:43:49 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2005-10-24 10:53:18 $
+  Version:   $Revision: 1.25 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,6 +32,8 @@ class mmdMouse;
 class vtkRenderWindow;
 class vtkRenderer;
 class vtkCellPicker;
+class vtkRayCast3DPicker;
+class vtkAssemblyPath;
 
 /** VME visibility attribute when plugging visual pipe.*/
 enum VME_VISIBILITY_ID
@@ -135,12 +137,17 @@ protected:
   mafVME				*m_AttachedVme; ///< VME on which the camera is attached when the attach-camera option is 'On'
   vtkMatrix4x4	*m_AttachedVmeMatrix; ///< Matrix given to the Camera to be moved together with m_AttachedVme
 
-  vtkCellPicker *m_Picker;  ///< the picker used to pick the in the render window
+  vtkCellPicker *m_Picker2D;  ///< the picker used to pick the in the render window
+  vtkRayCast3DPicker* m_Picker3D; ///< Used to pick in a VTK Render window
   mafVME        *m_PickedVME; ///< Pointer to the picked vme. It is initialized on picking
   double        m_PickedPosition[3];
 
   bool m_ShowAxes;  ///< Flag used to show/hide axes in low left cornel of the view
   int m_StereoType; ///< Indicate the stereo type to use with the view
+
+  /** 
+  Find the VME picked */
+  void FindPickedVme(vtkAssemblyPath *ap = NULL);
 
   virtual mmgGui *CreateGui();
 
