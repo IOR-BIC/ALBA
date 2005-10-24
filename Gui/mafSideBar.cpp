@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-21 09:59:41 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2005-10-24 11:44:13 $
+  Version:   $Revision: 1.23 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -141,7 +141,7 @@ void mafSideBar::ViewSelect(mafView *view)
 	}
 	else
 	{
-		m_ViewPropertyPanel->SetTitle("");
+    m_ViewPropertyPanel->SetTitle("no view selected:");
 		m_ViewPropertyPanel->RemoveCurrentGui();
 	}
   m_SelectedView = view;
@@ -152,7 +152,7 @@ void mafSideBar::ViewDeleted(mafView *view)
 //----------------------------------------------------------------------------
 {
 	m_Tree->ViewDeleted(view);
-  m_SelectedView = NULL; // Paolo 2005-04-23 m_SelectedView is initialized in ViewSelect
+  ViewSelect(NULL);
 }
 //----------------------------------------------------------------------------
 void mafSideBar::EnableSelect(bool enable)
