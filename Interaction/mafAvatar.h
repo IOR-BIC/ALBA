@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 05:58:10 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-10-24 10:51:58 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone & Michele Diegoli
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -52,7 +52,7 @@ public:
   //----------------------------------------------------------------------------
   //    GUI Constants
   //----------------------------------------------------------------------------
-  enum 
+  enum AVATAR_GUI_ID
   {
     ID_NAME=MINID,
     ID_LAST
