@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoImageImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-12 10:07:14 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-10-25 15:42:40 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -214,9 +214,9 @@ void mmoImageImporter::BuildImageSequence()
   
   wxSplitPath(m_Files[0].c_str(),&path,&name,&ext);
   if(name.IsNumber())
-    sort(m_Files.begin(),m_Files.end(),CompareNumber);
+    std::sort(m_Files.begin(),m_Files.end(),CompareNumber);
   else
-    sort(m_Files.begin(),m_Files.end());
+    std::sort(m_Files.begin(),m_Files.end());
 
 	mafTimeStamp start_time = ((mafVME *)m_Input->GetRoot())->GetTimeStamp();
   long progress_value = 0;
