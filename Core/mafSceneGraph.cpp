@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-13 13:39:40 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-10-25 16:57:45 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -450,19 +450,20 @@ void mafSceneGraph::OnOpenCloseEvent(mafSceneNode *node)
 @@@ */
 
 //----------------------------------------------------------------------------
-int mafSceneGraph::GetNodeStatus(mafNode *vme)
+int mafSceneGraph::GetNodeStatus(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  if (vme->IsMAFType(mafVMERoot))
+  if (node->IsMAFType(mafVMERoot))
   {
     return NODE_NON_VISIBLE;
   }
 
-  mafSceneNode *n = Vme2Node(vme);
+  mafSceneNode *n = Vme2Node(node);
 	if(!n )
     return NODE_NON_VISIBLE;
 
-  bool creatable = n->m_PipeCreatable;
+  mafVME *vme = mafVME::SafeDownCast(node);
+  bool creatable = n->m_PipeCreatable && vme && !vme->GetVisualPipe().IsEmpty();
 	//landmark are not creatable
 	//if(vme->IsA("mafNodeLandmark")) creatable = false;
   
