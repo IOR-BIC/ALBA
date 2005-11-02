@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-24 10:53:18 $
-  Version:   $Revision: 1.25 $
-  Authors:   Silvano Imboden
+  Date:      $Date: 2005-11-02 10:47:55 $
+  Version:   $Revision: 1.26 $
+  Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -31,9 +31,6 @@ class vtkMatrix4x4;
 class mmdMouse;
 class vtkRenderWindow;
 class vtkRenderer;
-class vtkCellPicker;
-class vtkRayCast3DPicker;
-class vtkAssemblyPath;
 
 /** VME visibility attribute when plugging visual pipe.*/
 enum VME_VISIBILITY_ID
@@ -92,20 +89,12 @@ public:
 
   /** 
   Perform a picking according to the screen position (x,y) and return true on success*/
-  bool Pick(int x, int y);
+  virtual bool Pick(int x, int y);
 
   /** 
   Perform a picking according to the absolute matrix given and return true on success*/
-  bool Pick(mafMatrix &m);
+  virtual bool Pick(mafMatrix &m);
 
-  /** 
-  Write into the double array the position picked during Pick method.*/
-  void GetPickedPosition(double pos[3]);
-
-  /** 
-  Return the picked VME during the Pick method. Return NULL if VME is not found*/
-  mafVME *GetPickedVme() {return m_PickedVME;};
-	
 	/** 
     Set the vtk RenderWindow size. Used only for Linux (not necessary for Windows) */
   void SetWindowSize(int w, int h);
@@ -137,17 +126,8 @@ protected:
   mafVME				*m_AttachedVme; ///< VME on which the camera is attached when the attach-camera option is 'On'
   vtkMatrix4x4	*m_AttachedVmeMatrix; ///< Matrix given to the Camera to be moved together with m_AttachedVme
 
-  vtkCellPicker *m_Picker2D;  ///< the picker used to pick the in the render window
-  vtkRayCast3DPicker* m_Picker3D; ///< Used to pick in a VTK Render window
-  mafVME        *m_PickedVME; ///< Pointer to the picked vme. It is initialized on picking
-  double        m_PickedPosition[3];
-
   bool m_ShowAxes;  ///< Flag used to show/hide axes in low left cornel of the view
   int m_StereoType; ///< Indicate the stereo type to use with the view
-
-  /** 
-  Find the VME picked */
-  void FindPickedVme(vtkAssemblyPath *ap = NULL);
 
   virtual mmgGui *CreateGui();
 

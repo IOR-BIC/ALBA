@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-24 10:53:18 $
-  Version:   $Revision: 1.26 $
-  Authors:   Silvano Imboden
+  Date:      $Date: 2005-11-02 10:47:55 $
+  Version:   $Revision: 1.27 $
+  Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -25,17 +25,14 @@
 #include "mafPipeFactory.h"
 #include "mafLightKit.h"
 
-#include "vtkMAFAssembly.h"
 #include "vtkMAFSmartPointer.h"
-#include "vtkRayCast3DPicker.h"
 #include "vtkCamera.h"
 #include "vtkTransform.h"
 #include "vtkMatrix4x4.h"
 #include "vtkRenderWindow.h"
 #include "vtkRendererCollection.h"
+#include "vtkRayCast3DPicker.h"
 #include "vtkCellPicker.h"
-#include "vtkAssemblyPath.h"
-#include "vtkAssemblyNode.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewVTK);
@@ -58,11 +55,6 @@ mafViewVTK::mafViewVTK(wxString label, int camera_position, bool show_axes, int 
   m_CameraAttach  = 0;
   m_AttachedVme       = NULL;
   m_AttachedVmeMatrix = NULL;
-
-  m_Picker2D          = NULL;
-  m_Picker3D          = NULL;
-  m_PickedVME         = NULL;
-  m_PickedPosition[0] = m_PickedPosition[1] = m_PickedPosition[2] = 0.0;
 }
 //----------------------------------------------------------------------------
 mafViewVTK::~mafViewVTK() 
@@ -399,39 +391,4 @@ bool mafViewVTK::Pick(mafMatrix &m)
     }
   }
   return false;
-}
-//----------------------------------------------------------------------------
-void mafViewVTK::FindPickedVme(vtkAssemblyPath *ap)
-//----------------------------------------------------------------------------
-{
-  vtkMAFAssembly *as = NULL;
-
-  if(ap)
-  {
-    //scan the path from the leaf finding an assembly
-    //which know the related vme.
-    int pathlen = ap->GetNumberOfItems();
-    for (int i=pathlen-1; i>=0; i--)
-    {
-      vtkAssemblyNode *an = (vtkAssemblyNode*)ap->GetItemAsObject(i);
-      if (an)
-      {
-        vtkProp *p = an->GetProp();
-        if(p && p->IsA("vtkMAFAssembly"))
-        {
-          as = (vtkMAFAssembly*)p;
-          m_PickedVME = mafVME::SafeDownCast(as->GetVme());
-          break;
-        }
-      }
-    }
-  }
-}
-//----------------------------------------------------------------------------
-void mafViewVTK::GetPickedPosition(double pos[3])
-//----------------------------------------------------------------------------
-{
-  pos[0] = m_PickedPosition[0];
-  pos[1] = m_PickedPosition[1];
-  pos[2] = m_PickedPosition[2];
 }

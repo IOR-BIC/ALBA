@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2005-09-21 10:11:29 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-11-02 10:47:55 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -78,7 +78,8 @@ public:
     ID_LAST
   };
 
-  /** Set the size of the windowing double slider according to the size of the view. */
+  /** 
+  Set the size of the windowing double slider according to the size of the view. */
   void OnLayout();
 
   void SetMouse(mmdMouse *mouse);
@@ -86,14 +87,21 @@ public:
   virtual mafSceneGraph *GetSceneGraph();
   virtual mafRWIBase    *GetRWI();
 
-  /** return the current pipe for the specified vme (if any exist at this moment) */
+  /** 
+  Return the current pipe for the specified vme (if any exist at this moment) */
   virtual mafPipe*  GetNodePipe(mafNode *vme);
 
-  /** Return the gui for the visual pipe corresponding to the default child view. */
+  /** 
+  Return the gui for the visual pipe corresponding to the default child view. */
   virtual mmgGui *GetNodePipeGUI(mafNode *vme);
 
-  /** Return the gui for the visual pipe corresponding to the n-th child view. */
+  /** 
+  Return the gui for the visual pipe corresponding to the n-th child view. */
   virtual mmgGui *GetNodePipeGUI(mafNode *vme, int view_idx);
+
+  /** 
+  Return the sub-view in which the mouse is interacting with. if no parameter is given, default sub-view is returned.*/
+  mafView *GetSubView(mafRWIBase *rwi = NULL);
 
 protected:
   /**

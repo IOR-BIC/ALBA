@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-25 11:28:45 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-11-02 10:47:55 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -286,4 +286,20 @@ void mafViewCompound::SetMouse(mmdMouse *mouse)
   {
     ((mafViewVTK *)m_ChildViewList[i])->SetMouse(mouse);
   }
+}
+//----------------------------------------------------------------------------
+mafView *mafViewCompound::GetSubView(mafRWIBase *rwi)
+//----------------------------------------------------------------------------
+{
+  if (rwi)
+  {
+    for(int i=0; i<m_NumOfChildView; i++)
+    {
+      if (((mafViewVTK *)m_ChildViewList[i])->GetRWI() == rwi)
+      {
+        return m_ChildViewList[i];
+      }
+    }
+  }
+  return m_ChildViewList[m_DefauldChildView];
 }
