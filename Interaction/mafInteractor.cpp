@@ -2,28 +2,37 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-11 06:16:59 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-11-02 10:41:04 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
+
+#include "mafDefines.h" 
+//----------------------------------------------------------------------------
+// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// This force to include Window,wxWidgets and VTK exactly in this order.
+// Failing in doing this will result in a run-time error saying:
+// "Failure#0: The value of ESP was not properly saved across a function call"
+//----------------------------------------------------------------------------
+
+
 #include "mafInteractor.h"
 
 //#include "mmdButtonsPad.h"
 #include "mmdTracker.h"
 #include "mafAvatar.h"
+#include "mafAvatar3D.h"
 #include "mmdMouse.h"
 #include "mafEventInteraction.h"
 #include "mafVME.h"
 #include "mmuIdFactory.h"
+#include "mafView.h"
+#include "mafViewCompound.h"
 
-#include "vtkMAFAssembly.h"
-#include "vtkAssemblyNode.h"
-#include "vtkAssemblyPath.h"
-#include "vtkAbstractPropPicker.h"
 #include "vtkRenderer.h"
 #include "vtkProp3D.h"
 
@@ -361,87 +370,54 @@ void mafInteractor::ComputeWorldToDisplay(double x, double y, double z, double d
   m_Renderer->WorldToDisplay();
   m_Renderer->GetDisplayPoint(displayPt);
 }
-
 //----------------------------------------------------------------------------
 bool mafInteractor::FindPokedVme(mafDevice *device,mafMatrix &point_pose,vtkProp3D *&picked_prop,mafVME *&picked_vme,mafInteractor *&picked_behavior)
 //----------------------------------------------------------------------------
 {
-  bool                foundVme = false;
-  mafVME              *vme = NULL;
-  vtkMAFAssembly         *as = NULL;
-  vtkAssemblyPath     *ap = NULL;
-  mafInteractor       *bh = NULL;
-
-  if (mmdTracker *tracker=mmdTracker::SafeDownCast(device))
-  { // is it a tracker?
-    
+  if (mmdTracker *tracker = mmdTracker::SafeDownCast(device))
+  {
     mafMatrix &tracker_pose = point_pose;
-
-    // extract device avatar's renderer, no avatar == no picking
     mafAvatar *avatar = tracker->GetAvatar();
     if (avatar)
     {
-      int flag=avatar->Pick(tracker_pose);
-      if (flag)
+      mafMatrix world_pose;
+      mafAvatar3D *avatar3D = mafAvatar3D::SafeDownCast(avatar);
+      if (avatar3D)
+        avatar3D->TrackerToWorld(tracker_pose,world_pose,mafAvatar3D::CANONICAL_TO_WORLD_SCALE);
+      else
+        world_pose = tracker_pose;
+      mafView *v = avatar->GetView();
+      if (v)
       {
-        // for debugging purposes
-        //avatar->ShowPickLine();
-        //avatar->Hide();
-
-        // find picked m_VME
-        vtkAbstractPropPicker *picker = avatar->GetPicker();        
-        ap = picker->GetPath(); // extract the assembly path
-      }
-    }
-  }
-  else if (mmdMouse *mouse=mmdMouse::SafeDownCast(device))
-  { 
-    // Pick with mouse
-    int mouse_pos[2];
-    mouse_pos[1] = (int)point_pose.GetElement(1,3);
-    mouse_pos[0] = (int)point_pose.GetElement(0,3);
-    ap = mouse->Pick(mouse_pos[0],mouse_pos[1]);
-  }
-
-  if(ap)
-  {
-    //scan the path from the leaf finding an assembly
-    //which know the related vme.
-    int pathlen = ap->GetNumberOfItems();
-    for (int i=pathlen-1; i>=0; i--)
-    {
-      vtkAssemblyNode *an = (vtkAssemblyNode*)ap->GetItemAsObject(i);
-      if (an)
-      {
-        vtkProp *p = an->GetProp();
-        if(p && p->IsA("vtkMAFAssembly"))
+        if(v->Pick(world_pose))
         {
-          as  = (vtkMAFAssembly*)p;
-          vme  = mafVME::SafeDownCast(as->GetVme());
-          foundVme = true;
-
-          if(vme )
-          {
-            bh = vme->GetBehavior();
-          }
-          break;
+          picked_vme = v->GetPickedVme();
+          picked_behavior = picked_vme->GetBehavior();
+          return true;
         }
       }
     }
-
-    if(foundVme)
+  }
+  else if (mmdMouse *mouse = mmdMouse::SafeDownCast(device))
+  { 
+    int mouse_pos[2];
+    mouse_pos[1] = (int)point_pose.GetElement(1,3);
+    mouse_pos[0] = (int)point_pose.GetElement(0,3);
+    mafView *v = mouse->GetView();
+    if (v)
     {
-      picked_prop     = as;
-      picked_behavior = bh;
-      picked_vme      = vme;
-    }
-    else
-    {
-      picked_prop     = NULL;
-      picked_behavior = NULL;
-      picked_vme      = NULL;
+      mafViewCompound *vc = mafViewCompound::SafeDownCast(v);
+      if (vc)
+      {
+        v = vc->GetSubView(mouse->GetRWI());
+      }
+      if(v->Pick(mouse_pos[0], mouse_pos[1]))
+      {
+        picked_vme = v->GetPickedVme();
+        picked_behavior = picked_vme->GetBehavior();
+        return true;
+      }
     }
   }
-
-  return foundVme;
+  return false;
 }
