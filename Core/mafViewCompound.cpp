@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-02 10:47:55 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-11-02 15:10:31 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,6 +40,9 @@ mafViewCompound::mafViewCompound( wxString label, int num_row, int num_col, bool
   m_ViewColNum = num_col;
   m_NumOfPluggedChildren  = 0;
   m_DefauldChildView      = 0;
+  m_ChildViewList.clear();
+  m_PluggedChildViewList.clear();
+  m_GuiView = NULL;
 }
 //----------------------------------------------------------------------------
 mafViewCompound::~mafViewCompound()
@@ -97,6 +100,16 @@ void mafViewCompound::Create()
     m_ChildViewList[f]->GetWindow()->Show(true);
   }
   m_NumOfChildView = m_ChildViewList.size();
+
+  CreateGuiView();
+}
+//----------------------------------------------------------------------------
+void mafViewCompound::CreateGuiView()
+//----------------------------------------------------------------------------
+{
+  m_GuiView = new mmgGui(this);
+  m_GuiView->Label("Compound View's GUI",true);
+  m_GuiView->Reparent(m_Win);
 }
 //----------------------------------------------------------------------------
 void mafViewCompound::VmeAdd(mafNode *node)
@@ -259,6 +272,10 @@ void mafViewCompound::OnLayout()
 
   int sw = m_Size.GetWidth();
   int sh = m_Size.GetHeight();
+
+  wxSize gui_size = m_GuiView->GetBestSize();
+  sh = sh-gui_size.GetHeight();
+  m_GuiView->SetSize(0,sh,sw,gui_size.GetHeight());
 
   // this implement the Fixed SubViews Layout
   int border = 2;
