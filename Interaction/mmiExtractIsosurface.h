@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiExtractIsosurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-18 14:16:33 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-11-02 10:27:10 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -51,7 +51,6 @@ protected:
   void PickIsoValue();
 
   bool m_PickValue;
-  vtkCellPicker *m_MousePicker;
 
 private:
   mmiExtractIsosurface(const mmiExtractIsosurface&);  // Not implemented.
