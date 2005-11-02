@@ -2,16 +2,27 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPER.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 07:57:10 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-11-02 10:37:48 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
+
+#include "mafDefines.h" 
+//----------------------------------------------------------------------------
+// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// This force to include Window,wxWidgets and VTK exactly in this order.
+// Failing in doing this will result in a run-time error saying:
+// "Failure#0: The value of ESP was not properly saved across a function call"
+//----------------------------------------------------------------------------
+
+
 #include "mmiPER.h"
 
+#include "mafView.h"
 #include "mmdTracker.h"
 #include "mmdMouse.h"
 #include "mafAvatar3D.h"
@@ -90,7 +101,6 @@ bool mmiPER::IsInteracting(mafDevice *device, int button)
       return (*iter).second.Button>0;
     }
   }
-
   return false;
 }
 
@@ -98,20 +108,19 @@ bool mmiPER::IsInteracting(mafDevice *device, int button)
 void mmiPER::InsertDevice(mafDevice *device,int button)
 //----------------------------------------------------------------------------
 {
-  
-  if (m_Mode==SINGLE_BUTTON)
+  if (m_Mode == SINGLE_BUTTON)
   {
-    m_Devices[device->GetID()].Button=button;
-    m_Devices[device->GetID()].VME=NULL; // initially set picked VME to NULL
+    m_Devices[device->GetID()].Button = button;
+    m_Devices[device->GetID()].VME = NULL; // initially set picked VME to NULL
   }
   else
   {
     std::map<mafID,DeviceItem>::iterator iter = m_Devices.find(device->GetID());
-    if (iter==m_Devices.end())
+    if (iter == m_Devices.end())
     {
 //      if ((*iter).first==device->GetID())
-      m_Devices[device->GetID()].VME=NULL; // initially set picked VME to NULL
-      m_Devices[device->GetID()].Button=1;
+      m_Devices[device->GetID()].VME = NULL; // initially set picked VME to NULL
+      m_Devices[device->GetID()].Button = 1;
 
     }
     else
@@ -129,22 +138,22 @@ void mmiPER::RemoveDevice(mafDevice *device)
 {
   std::map<mafID,DeviceItem>::iterator iter = m_Devices.find(device->GetID());
 
-  if (iter == m_Devices.end()||(*iter).first!=device->GetID())
+  if (iter == m_Devices.end() || (*iter).first != device->GetID())
   {
     return;
   }
   
-  m_Devices[device->GetID()].VME=NULL; // initially set picked VME to NULL
+  m_Devices[device->GetID()].VME = NULL; // initially set picked VME to NULL
   
-  if (m_Mode==SINGLE_BUTTON)
+  if(m_Mode == SINGLE_BUTTON)
   {
     m_Devices.erase(iter);
   }
   else
   {
-    // decrease counter, if counter gets to zero delte the item
-    int cnt=(--m_Devices[device->GetID()].Button);
-    if (cnt<=0)
+    // decrease counter, if counter gets to zero delete the item
+    int cnt = (--m_Devices[device->GetID()].Button);
+    if (cnt <= 0)
     {
       m_Devices.erase(iter);
     }
@@ -160,7 +169,7 @@ void mmiPER::SetPickedVME(mafDevice *device,mafVME *vme)
     std::map<mafID,DeviceItem>::iterator iter = m_Devices.find(device->GetID());
     //assert(iter != m_Devices.end()); // check the device has started an interaction
     if (iter != m_Devices.end())
-      (*iter).second.VME=vme;
+      (*iter).second.VME = vme;
   }
   else
   {
@@ -176,7 +185,7 @@ mafVME *mmiPER::GetPickedVME(mafDevice *device)
   {
     std::map<mafID,DeviceItem>::iterator iter = m_Devices.find(device->GetID());
     //assert(iter != m_Devices.end()); // check the device has started an interaction
-    return (iter != m_Devices.end())?(*iter).second.VME:NULL;
+    return (iter != m_Devices.end()) ? (*iter).second.VME : NULL;
   }
   else
   {
@@ -381,7 +390,7 @@ int mmiPER::StartInteraction(mafDevice *device, int button)
 
   // Check if already interacting with the same device: it could happen the user
   // contemporary pressed another button...
-  if (m_Mode==SINGLE_BUTTON)
+  if (m_Mode == SINGLE_BUTTON)
   {
     if (!IsInteracting(device,button))
     {
@@ -402,9 +411,9 @@ int mmiPER::StartInteraction(mafDevice *device, int button)
 int mmiPER::StopInteraction(mafDevice *device, int button)
 //------------------------------------------------------------------------------
 {
-  if (m_Mode==SINGLE_BUTTON)
+  if (m_Mode == SINGLE_BUTTON)
   {
-    if (IsInteracting(device,button))
+    if (IsInteracting(device, button))
     {   
       RemoveDevice(device); // remove from the list of interacting devices
       //device->Unlock(); // it's the specific behavior which is locking the device!!!
@@ -426,27 +435,27 @@ int mmiPER::StopInteraction(mafDevice *device, int button)
 int mmiPER::OnStartInteraction(mafEventInteraction *e)
 //------------------------------------------------------------------------------
 {
-  mafDevice *device=mafDevice::SafeDownCast((mafDevice *)e->GetSender());
+  mafDevice *device = mafDevice::SafeDownCast((mafDevice *)e->GetSender());
   
   assert(device);
-  int button=e->GetButton();
-  if (StartInteraction(device,button))
+  int button = e->GetButton();
+  if (StartInteraction(device, button))
   {
     // standard action keys
     switch (button)
     {
-    case MAF_LEFT_BUTTON:
-      OnLeftButtonDown(e);
-    break;
-    case MAF_MIDDLE_BUTTON:
-      OnMiddleButtonDown(e);
-    break;
-    case MAF_RIGHT_BUTTON:
-      OnRightButtonDown(e);
-    break;
-    default:
-      StopInteraction(device,button); // stop immediatelly and return false
-      return 0;;
+      case MAF_LEFT_BUTTON:
+        OnLeftButtonDown(e);
+      break;
+      case MAF_MIDDLE_BUTTON:
+        OnMiddleButtonDown(e);
+      break;
+      case MAF_RIGHT_BUTTON:
+        OnRightButtonDown(e);
+      break;
+      default:
+        StopInteraction(device,button); // stop immediately and return false
+        return 0;
     }
     return 1;
   }
@@ -456,28 +465,28 @@ int mmiPER::OnStartInteraction(mafEventInteraction *e)
 int mmiPER::OnStopInteraction(mafEventInteraction *e)
 //------------------------------------------------------------------------------
 {
-  mafDevice *device=mafDevice::SafeDownCast((mafDevice *)e->GetSender());
+  mafDevice *device = mafDevice::SafeDownCast((mafDevice *)e->GetSender());
   assert(device);
 
-  int button=e->GetButton();
-  if (m_Mode==MULTI_BUTTON||IsInteracting(device,button))
+  int button = e->GetButton();
+  if (m_Mode == MULTI_BUTTON || IsInteracting(device, button))
   {
     // standard action keys
     switch (button)
     {
-    case MAF_LEFT_BUTTON:
-      OnLeftButtonUp(e);
-    break;
-    case MAF_MIDDLE_BUTTON:
-      OnMiddleButtonUp(e);
-    break;
-    case MAF_RIGHT_BUTTON:
-      OnRightButtonUp(e);
-    break;
-    default:
-      return -1;
+      case MAF_LEFT_BUTTON:
+        OnLeftButtonUp(e);
+      break;
+      case MAF_MIDDLE_BUTTON:
+        OnMiddleButtonUp(e);
+      break;
+      case MAF_RIGHT_BUTTON:
+        OnRightButtonUp(e);
+      break;
+      default:
+        return -1;
     }
-    StopInteraction(device,button);
+    StopInteraction(device, button);
     return 1;
   }
   return 0;
@@ -487,32 +496,30 @@ int mmiPER::OnStopInteraction(mafEventInteraction *e)
 void mmiPER::OnEvent(mafEventBase *event)
 //------------------------------------------------------------------------------
 {
-  mafID ch=event->GetChannel();
+  mafID ch = event->GetChannel();
   
-  if (ch==MCH_INPUT)
+  if (ch == MCH_INPUT)
   {
-    mafID id=event->GetId();
-    mafDevice *device=(mafDevice *)event->GetSender();
+    mafID id = event->GetId();
+    mafDevice *device = (mafDevice *)event->GetSender();
     assert(device);
 
     if (id == mmdMouse::MOUSE_CHAR_EVENT && !IsInteracting(device))
     {
-      mafEventInteraction *e=mafEventInteraction::SafeDownCast(event);
+      mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
       OnChar(e);
     }
-
     // find if this device is one of those currently interacting
     if (IsInteracting(device))
     {
       // process the Move event
-      if (id==mmdTracker::TRACKER_3D_MOVE || id == mmdMouse::MOUSE_2D_MOVE)
+      if (id == mmdTracker::TRACKER_3D_MOVE || id == mmdMouse::MOUSE_2D_MOVE)
       {
-        mafEventInteraction *e=mafEventInteraction::SafeDownCast(event);
+        mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
         OnMove(e);
       }
-
       // In any case, forward the event to the right behavior
-      mafVME *vme=GetPickedVME(device);
+      mafVME *vme = GetPickedVME(device);
       if(vme)
       {
         mafInteractor *bh = vme->GetBehavior(); //can be NULL
@@ -522,22 +529,20 @@ void mmiPER::OnEvent(mafEventBase *event)
         }
       }
       // if no picked behavior...
-      if (m_CameraBehavior&&m_CameraBehavior->IsInteracting(device))
+      if (m_CameraBehavior && m_CameraBehavior->IsInteracting(device))
       {
         m_CameraBehavior->OnEvent(event); // forward to Camera behavior
       }
-      else if (m_CameraMouseBehavior&&m_CameraMouseBehavior->IsInteracting(device))
+      else if (m_CameraMouseBehavior && m_CameraMouseBehavior->IsInteracting(device))
       {
         m_CameraMouseBehavior->OnEvent(event); // forward to Camera behavior
       }
     }
   }
-
   // Make the superclass to manage StartInteractionEvent
   // and StopInteractionEvent: this will make OnStart/StopInteraction()
   // to be called, or eventually the event to be forwarded.
   Superclass::OnEvent(event);
-    
 }
 
 //----------------------------------------------------------------------------
@@ -552,7 +557,6 @@ void mmiPER::FlyTo(mafEventInteraction *e,int numstep, double zoom)
 
   mmdTracker *tracker = mmdTracker::SafeDownCast((mafDevice*)e->GetSender());
   mmdMouse   *mouse   = mmdMouse::SafeDownCast((mafDevice*)e->GetSender());
-  
   assert(tracker || mouse);
 
   if (point_pose && tracker && tracker->GetAvatar())
@@ -575,16 +579,18 @@ void mmiPER::FlyTo(mafEventInteraction *e,int numstep, double zoom)
 	  cam->GetPosition(p0);
     
     // find picked position
-    vtkAbstractPropPicker *picker = tracker->GetAvatar()->GetPicker();
-    double *pos = picker->GetPickPosition();
+    double pos[3];
+    view->GetPickedPosition(pos);
 	  double foc_motion[3];
-    for (i=0; i<3; i++) foc_motion[i] = pos[i] - f0[i];
+    for (i=0; i<3; i++) 
+      foc_motion[i] = pos[i] - f0[i];
     double foc_step = vtkMath::Normalize(foc_motion)/numstep;
 
     if(zoom >  1) zoom = 1;
     if(zoom < -1) zoom =-1;
 	  double cam_motion[3];
-    for (i=0; i<3; i++) cam_motion[i] = (pos[i]-f0[i]) + (f0[i]-p0[i])*zoom/2;
+    for (i=0; i<3; i++) 
+      cam_motion[i] = (pos[i]-f0[i]) + (f0[i]-p0[i])*zoom/2;
     double cam_step = vtkMath::Normalize(cam_motion)/numstep;
     double f1[3]; // new focal point
 	  double p1[3]; // new camera position
@@ -631,16 +637,18 @@ void mmiPER::FlyTo(mafEventInteraction *e,int numstep, double zoom)
 	  cam->GetPosition(p0);
     
     // find picked position
-    vtkAbstractPropPicker *picker = mouse->GetPicker();
-    double *pos = picker->GetPickPosition();
+    double pos[3];
+    view->GetPickedPosition(pos);
 	  double foc_motion[3];
-    for (i=0; i<3; i++) foc_motion[i] = pos[i] - f0[i];
+    for (i=0; i<3; i++) 
+      foc_motion[i] = pos[i] - f0[i];
     double foc_step = vtkMath::Normalize(foc_motion)/numstep;
 
     if(zoom >  1) zoom = 1;
     if(zoom < -1) zoom =-1;
 	  double cam_motion[3];
-    for (i=0; i<3; i++) cam_motion[i] = (pos[i]-f0[i]) + (f0[i]-p0[i])*zoom/2;
+    for (i=0; i<3; i++) 
+      cam_motion[i] = (pos[i]-f0[i]) + (f0[i]-p0[i])*zoom/2;
     double cam_step = vtkMath::Normalize(cam_motion)/numstep;
     double f1[3]; // new focal point
 	  double p1[3]; // new camera position
@@ -657,12 +665,8 @@ void mmiPER::FlyTo(mafEventInteraction *e,int numstep, double zoom)
       ren->ResetCameraClippingRange();
       // render at each cycle
       InvokeEvent(CAMERA_UPDATE,MCH_UP,view);
-
     }
     cam->OrthogonalizeViewUp();
-
     m_FlyToFlag = false;
   }
-
 }
-
