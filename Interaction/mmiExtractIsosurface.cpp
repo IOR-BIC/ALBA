@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiExtractIsosurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-18 14:16:33 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-11-02 10:29:09 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -16,10 +16,11 @@
 #include "mmdMouse.h"
 #include "mafAvatar3D.h"
 #include "mafInteractor.h"
-
+#include "mafRWIBase.h"
 #include "mafEventInteraction.h"
 #include "mafEvent.h"
 
+#include "vtkAbstractPicker.h"
 #include "vtkCellPicker.h"
 #include "vtkPoints.h"
 #include "vtkMath.h"
@@ -40,7 +41,6 @@ mmiExtractIsosurface::mmiExtractIsosurface()
 //------------------------------------------------------------------------------
 {
   m_PickValue = false;
-  m_MousePicker = NULL;
 }
 
 //------------------------------------------------------------------------------
@@ -52,7 +52,6 @@ mmiExtractIsosurface::~mmiExtractIsosurface()
 int mmiExtractIsosurface::StartInteraction(mmdMouse *mouse)
 //------------------------------------------------------------------------------
 {
-  m_MousePicker = (vtkCellPicker *)mouse->GetPicker();
   return Superclass::StartInteraction(mouse);
 }
 
@@ -86,14 +85,18 @@ void mmiExtractIsosurface::PickIsoValue()
   int x = m_LastMousePose[0];
   int y = m_LastMousePose[1];
 
-  if( m_MousePicker && m_Renderer && m_MousePicker->Pick(x,y,0,m_Renderer) )
+  mmdMouse *mouse = mmdMouse::SafeDownCast(m_Device);
+  if( mouse && m_Renderer)
   {
     double pos_picked[3];
-    m_MousePicker->GetPickPosition(pos_picked);
-		vtkPoints *p = vtkPoints::New();
-		p->SetNumberOfPoints(1);
-		p->SetPoint(0,pos_picked);
-		mafEventMacro(mafEvent(this,VME_PICKED,(vtkObject *)p));
-		p->Delete();
+    if (mouse->GetRWI()->GetPicker()->Pick(x,y,0,m_Renderer))
+    {
+      mouse->GetRWI()->GetPicker()->GetPickPosition(pos_picked);
+      vtkPoints *p = vtkPoints::New();
+      p->SetNumberOfPoints(1);
+      p->SetPoint(0,pos_picked);
+      mafEventMacro(mafEvent(this,VME_PICKED,(vtkObject *)p));
+      p->Delete();
+    }
   }
 }
