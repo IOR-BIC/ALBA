@@ -1,0 +1,35 @@
+/* XPM */
+static char *INFO_xpm[] = {
+/* columns rows colors chars-per-pixel */
+"16 16 13 1",
+"X c Black",
+"o c #CDCBBF",
+"& c #2F2F2C",
+"# c #3F3E3B",
+"+ c #5E5E58",
+"= c #6E6D67",
+"@ c #DCDACD",
+". c #7E7D75",
+"$ c #8E8C84",
+"O c #ADACA1",
+"* c #BDBBB0",
+"% c #1F1F1D",
+"  c #ECEADC",
+/* pixels */
+"                ",
+"                ",
+"       .Xo      ",
+"       O+@      ",
+"                ",
+"      o#Xo      ",
+"      +XXo      ",
+"      $%Xo      ",
+"       #Xo      ",
+"       #Xo      ",
+"       &X*      ",
+"      #XXX      ",
+"      .++=      ",
+"                ",
+"                ",
+"                "
+};
