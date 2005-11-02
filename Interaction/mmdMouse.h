@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdMouse.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-11 06:17:58 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-11-02 10:39:28 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -20,10 +20,10 @@
 //----------------------------------------------------------------------------
 class mafView;
 class mafRWIBase;
-class vtkAssemblyPath;
+//class vtkAssemblyPath;
 class vtkRenderer;
-class vtkAbstractPropPicker;
-class vtkCellPicker;
+//class vtkAbstractPropPicker;
+//class vtkCellPicker;
 class vtkRenderWindowInteractor;
 
 
@@ -60,8 +60,8 @@ public:
 
   /**
   Perform mouse picking and return the selected assembly path picked, otherwise return NULL. */
-  vtkAssemblyPath *Pick(int mouse_screen_pos[2]);
-  vtkAssemblyPath *Pick(int X, int Y);
+//  vtkAssemblyPath *Pick(int mouse_screen_pos[2]);
+//  vtkAssemblyPath *Pick(int X, int Y);
   /**
   Return the renderer of the selected view. */
   vtkRenderer *GetRenderer();
@@ -72,11 +72,15 @@ public:
 
   /** 
   Return the default mouse picker. */
-  vtkAbstractPropPicker *GetPicker();
+//  vtkAbstractPropPicker *GetPicker();
 
   /** 
   Return the Interactor. */
   vtkRenderWindowInteractor *GetInteractor();
+
+  /** 
+  Return the RenderWindowInteractor used by mouse device */
+  mafRWIBase *GetRWI();
 
 protected:
   mmdMouse();
@@ -90,9 +94,9 @@ protected:
 
   double          m_LastPosition[2];///< stores the last position
 
-  mafView*        m_SelectedView;   ///< store the selected view to perform the mouse picking
-  mafRWIBase*     m_SelectedRWI;
-  vtkCellPicker*  m_Picker;         ///< the picker used to pick the in the render window (to be moved in the view!)
+  mafView        *m_SelectedView;   ///< store the selected view to perform the mouse picking
+  mafRWIBase     *m_SelectedRWI;
+  //vtkCellPicker*  m_Picker;         ///< the picker used to pick the in the render window (to be moved in the view!)
 
 private:
   mmdMouse(const mmdMouse&);  // Not implemented.

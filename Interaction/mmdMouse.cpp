@@ -2,29 +2,39 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-18 10:12:41 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-11-02 10:39:28 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
+
+#include "mafDefines.h" 
+//----------------------------------------------------------------------------
+// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// This force to include Window,wxWidgets and VTK exactly in this order.
+// Failing in doing this will result in a run-time error saying:
+// "Failure#0: The value of ESP was not properly saved across a function call"
+//----------------------------------------------------------------------------
+
+
+#include "mmdMouse.h"
 #include "mafEventBase.h"
 #include "mafView.h"
 #include "mafSceneGraph.h"
 #include "mafRWIBase.h"
-#include "mmdMouse.h"
 
 #include "mafEventInteraction.h"
 #include "mmuIdFactory.h"
 
-#include "vtkAssemblyPath.h"
+//#include "vtkAssemblyPath.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRendererCollection.h"
 #include "vtkRenderer.h"
-#include "vtkCellPicker.h"
+//#include "vtkCellPicker.h"
 
 //------------------------------------------------------------------------------
 // Events
@@ -45,8 +55,8 @@ mmdMouse::mmdMouse()
   m_ButtonState[0]  = m_ButtonState[1] = m_ButtonState[2] = 0;
   m_SelectedView    = NULL;
   m_SelectedRWI     = NULL;
-  m_Picker = vtkCellPicker::New();
-  m_Picker->SetTolerance(0.001);  //modified by Stefano 19-1-2005
+  //m_Picker = vtkCellPicker::New();
+  //m_Picker->SetTolerance(0.001);  //modified by Stefano 19-1-2005
 }
 
 //------------------------------------------------------------------------------
@@ -114,7 +124,7 @@ void mmdMouse::OnEvent(mafEventBase *event)
   else if (id == VIEW_SELECT)
   {
     // clean picked list...
-    m_Picker->InitializePickList(); 
+//    m_Picker->InitializePickList(); 
     mafEvent *e=mafEvent::SafeDownCast(event);
     assert(e);
     m_SelectedView = e->GetView();    
@@ -150,6 +160,7 @@ void mmdMouse::SendButtonEvent(mafEventInteraction *event)
   event->Set2DPosition(GetLastPosition());
   Superclass::SendButtonEvent(event);
 }
+/*
 //------------------------------------------------------------------------------
 vtkAssemblyPath *mmdMouse::Pick(int X, int Y)
 //------------------------------------------------------------------------------
@@ -183,6 +194,7 @@ vtkAssemblyPath *mmdMouse::Pick(int mouse_screen_pos[2])
 
   return ap;
 }
+*/
 //------------------------------------------------------------------------------
 vtkRenderer *mmdMouse::GetRenderer()
 //------------------------------------------------------------------------------
@@ -198,12 +210,14 @@ mafView *mmdMouse::GetView()
 {
   return m_SelectedView;
 }
+/*
 //------------------------------------------------------------------------------
 vtkAbstractPropPicker *mmdMouse::GetPicker()
 //------------------------------------------------------------------------------
 {
   return (vtkAbstractPropPicker *)m_Picker;
 }
+*/
 //------------------------------------------------------------------------------
 vtkRenderWindowInteractor *mmdMouse::GetInteractor()
 //------------------------------------------------------------------------------
@@ -212,4 +226,10 @@ vtkRenderWindowInteractor *mmdMouse::GetInteractor()
     return m_SelectedRWI->GetRenderWindow()->GetInteractor();
 
   return (vtkRenderWindowInteractor *)NULL;
+}
+//------------------------------------------------------------------------------
+mafRWIBase *mmdMouse::GetRWI()
+//------------------------------------------------------------------------------
+{
+  return m_SelectedRWI;
 }
