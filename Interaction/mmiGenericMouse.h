@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:48:55 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-11-02 10:38:17 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -27,7 +27,6 @@ class mafMatrix;
 
 class vtkCamera;
 class vtkDoubleArray;
-class vtkCellPicker;
 
 /** Constrained interaction with mouse device.
   Use mmiCompositorMouse in order to associate instances of this class
@@ -158,9 +157,6 @@ protected:
   
   //the target refsys type
   int m_TargetRefSysType;
-
-  //Do the picking
-  vtkCellPicker *m_Picker;
 
   //----------------------------------------------------------------------------
   // result matrix: the matrix to keep updated 

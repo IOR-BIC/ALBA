@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 12:34:52 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-11-02 10:38:38 $
+  Version:   $Revision: 1.10 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -17,6 +17,7 @@
 
 #include "mmdMouse.h"
 
+#include "mafView.h"
 #include "mafEventInteraction.h"
 #include "mafEvent.h"
 #include "mafAbsMatrixPipe.h"
@@ -26,7 +27,6 @@
 
 #include "vtkDoubleArray.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkCellPicker.h"
 #include "vtkMath.h"
 #include "vtkTransform.h"
 #include "vtkCamera.h"
@@ -43,10 +43,6 @@ mmiGenericMouse::mmiGenericMouse()
 
    SetResultMatrixConcatenationSemanticToPostMultiply();
   
-   // Picking stuff
-   m_Picker = vtkCellPicker::New();
-   m_Picker->SetTolerance(0.005);
-
    // Projection Accumulator
    m_ProjAcc = 0;
 
@@ -68,7 +64,6 @@ mmiGenericMouse::mmiGenericMouse()
 mmiGenericMouse::~mmiGenericMouse() 
 //----------------------------------------------------------------------------
 {
-   m_Picker->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -1010,9 +1005,15 @@ void mmiGenericMouse::OnButtonDownAction(int X, int Y)
   m_MousePose[1] = m_LastMousePose[1] = Y;
 
   // perform picking on current renderer
-  m_Picker->Pick(X,Y,0.0,m_Renderer);
-  m_Picker->GetPickPosition(m_LastPickPosition);
- 
+  mmdMouse *mouse = mmdMouse::SafeDownCast(m_Device);
+  if (mouse)
+  {
+    mafView *v = mouse->GetView();
+    if (v && v->Pick(X,Y))
+    {
+      v->GetPickedPosition(m_LastPickPosition);
+    }
+  }
   //reset projection accumulator   
     m_ProjAcc = 0;
 
@@ -1260,8 +1261,6 @@ void mmiGenericMouse::SnapOnSurface()
 		p = pc->GetNextProp();
 	}
   
-  int picked = m_Picker->Pick(x,y,0,m_Renderer);
-
 	pc->InitTraversal();
 	p = pc->GetNextProp();
 	while(p)
@@ -1270,15 +1269,26 @@ void mmiGenericMouse::SnapOnSurface()
 		p = pc->GetNextProp();
 	}
 
-	if(picked==0)
-	{
-     TrackballTranslate();
-		 return;
-	}
-
+  bool picked = false;
   double newAbsPickPos[3];
-  m_Picker->GetPickPosition(newAbsPickPos);
-  
+  mmdMouse *mouse = mmdMouse::SafeDownCast(m_Device);
+  if (mouse)
+  {
+    mafView *v = mouse->GetView();
+    if (v)
+    {
+      picked = v->Pick(x,y);
+      if(picked)
+      {
+        v->GetPickedPosition(newAbsPickPos);
+      }
+    }
+  }
+  if (!picked)
+  {
+    TrackballTranslate();
+    return;
+  }
   double absPivotPos[3];
   assert(m_VME);
   mafTransform::GetPosition(m_VME->GetAbsMatrixPipe()->GetMatrix(), absPivotPos);
