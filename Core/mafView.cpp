@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-30 16:24:30 $
-  Version:   $Revision: 1.15 $
-  Authors:   Silvano Imboden
+  Date:      $Date: 2005-11-02 10:47:18 $
+  Version:   $Revision: 1.16 $
+  Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -20,6 +20,15 @@
 //----------------------------------------------------------------------------
 
 #include "mafView.h"
+#include "mafMatrix.h"
+#include "mafVME.h"
+
+#include "vtkMAFAssembly.h"
+#include "vtkRayCast3DPicker.h"
+#include "vtkCellPicker.h"
+#include "vtkRendererCollection.h"
+#include "vtkAssemblyPath.h"
+#include "vtkAssemblyNode.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafView);
@@ -41,6 +50,11 @@ mafView::mafView( wxString label, bool external)
   m_Id            = 0;
   m_Mult          = 0;
 	m_ExternalFlag  = external;
+
+  m_Picker2D          = NULL;
+  m_Picker3D          = NULL;
+  m_PickedVME         = NULL;
+  m_PickedPosition[0] = m_PickedPosition[1] = m_PickedPosition[2] = 0.0;
 }
 //----------------------------------------------------------------------------
 mafView::~mafView()
@@ -88,4 +102,51 @@ mmgGui* mafView::CreateGui()
   m_Gui = new mmgGui(this); // replace NULL with 'this' ....  //SIL. 22-4-2005: 
   m_Gui->Label("view default gui");
   return m_Gui;
+}
+//-------------------------------------------------------------------------
+bool mafView::Pick(int x, int y)
+//-------------------------------------------------------------------------
+{
+  return false;
+}
+//-------------------------------------------------------------------------
+bool mafView::Pick(mafMatrix &m)
+//-------------------------------------------------------------------------
+{
+  return false;
+}
+//----------------------------------------------------------------------------
+void mafView::GetPickedPosition(double pos[3])
+//----------------------------------------------------------------------------
+{
+  pos[0] = m_PickedPosition[0];
+  pos[1] = m_PickedPosition[1];
+  pos[2] = m_PickedPosition[2];
+}
+//----------------------------------------------------------------------------
+void mafView::FindPickedVme(vtkAssemblyPath *ap)
+//----------------------------------------------------------------------------
+{
+  vtkMAFAssembly *as = NULL;
+
+  if(ap)
+  {
+    //scan the path from the leaf finding an assembly
+    //which know the related vme.
+    int pathlen = ap->GetNumberOfItems();
+    for (int i=pathlen-1; i>=0; i--)
+    {
+      vtkAssemblyNode *an = (vtkAssemblyNode*)ap->GetItemAsObject(i);
+      if (an)
+      {
+        vtkProp *p = an->GetProp();
+        if(p && p->IsA("vtkMAFAssembly"))
+        {
+          as = (vtkMAFAssembly*)p;
+          m_PickedVME = mafVME::SafeDownCast(as->GetVme());
+          break;
+        }
+      }
+    }
+  }
 }

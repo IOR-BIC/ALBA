@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2005-09-05 13:39:56 $
-  Version:   $Revision: 1.20 $
-  Authors:   Silvano Imboden
+  Date:      $Date: 2005-11-02 10:47:18 $
+  Version:   $Revision: 1.21 $
+  Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -28,6 +28,9 @@
 //----------------------------------------------------------------------------
 class mmdMouse;
 class mafRWIBase;
+class vtkCellPicker;
+class vtkRayCast3DPicker;
+class vtkAssemblyPath;
 
 //----------------------------------------------------------------------------
 // const :
@@ -108,6 +111,22 @@ public:
 //  virtual void			ShowSettings()							{};
   virtual void			OnSize(wxSizeEvent &maf_event)	{};
 
+  /** 
+  Perform a picking according to the screen position (x,y) and return true on success*/
+  virtual bool Pick(int x, int y);
+
+  /** 
+  Perform a picking according to the absolute matrix given and return true on success*/
+  virtual bool Pick(mafMatrix &m);
+
+  /** 
+  Write into the double array the position picked during Pick method.*/
+  virtual void GetPickedPosition(double pos[3]);
+
+  /** 
+  Return the picked VME during the Pick method. Return NULL if VME is not found*/
+  virtual mafVME *GetPickedVme() {return m_PickedVME;};
+
 protected:
   mafObserver   *m_Listener;
   wxString       m_Label;
@@ -116,6 +135,16 @@ protected:
   wxFrame				*m_Frame;
   mmgGui      	*m_Gui;
   mmgGuiHolder	*m_Guih;
+
+  vtkCellPicker *m_Picker2D;  ///< the picker used to pick the in the render window
+  vtkRayCast3DPicker* m_Picker3D; ///< Used to pick in a VTK Render window
+
+  mafVME        *m_PickedVME; ///< Pointer to the picked vme. It is initialized on picking
+  double         m_PickedPosition[3];
+
+  /** 
+  Find the VME picked */
+  void FindPickedVme(vtkAssemblyPath *ap = NULL);
 
 public:
   int            m_Mult;    ///< Used to store the multiplicity of the view type created (e.g. the 3rd view surface created).
