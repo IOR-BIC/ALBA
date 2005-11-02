@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-02 10:47:55 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-11-02 15:09:40 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,7 +30,7 @@ class mafRWIBase;
 // mafViewCompound :
 //----------------------------------------------------------------------------
 /** 
-mafViewCompound is the base class for Compound Views in maf.
+mafViewCompound is the base class for Compound Views in MAF.
 
 The member function GetNodeStatus(vme) will be called by the mmgCheckTree 
 in order to update it's icons. (Note that mmgCheckTree doesn't know about
@@ -46,12 +46,21 @@ public:
 
   mafTypeMacro(mafViewCompound, mafView);
 
-  /** Plug the child view into the compound view.
-  If the number of child view is less then row x col, the last plugged view will fill the remaining holes.*/
+  /** 
+  Plug the child view into the compound view. If the number of child view is less then row x col, 
+  the last plugged view will fill the remaining holes.*/
   virtual void PlugChildView(mafView *child);
 
   virtual mafView *Copy(mafObserver *Listener);
+  
+  /** 
+  Create the plugged sub-view and call virtual method CreateGuiView() */
   virtual void     Create();
+  
+  /** 
+  Create the GUI on the bottom of the compounded view. */
+  virtual void     CreateGuiView();
+  
   virtual void     OnEvent(mafEventBase *maf_event);
 
   virtual void VmeAdd(mafNode *node);
@@ -120,7 +129,8 @@ protected:
 
   int m_DefauldChildView;
 
-  wxSize m_Size; ///< size of the compound view
+  wxSize  m_Size; ///< size of the compound view
+  mmgGui *m_GuiView;
 
   std::vector<mafView *> m_ChildViewList; ///< Child views vector
   std::vector<mafView *> m_PluggedChildViewList; ///< Plugged Child views vector
