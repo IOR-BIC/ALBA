@@ -4,6 +4,7 @@ SET(MED_INCLUDE_DIRS
 #  "@MED_SOURCE_DIR@/Interaction"
 #  "@MED_SOURCE_DIR@/Interaction/Drivers"
 #  "@MED_BINARY_DIR@/Interaction"
+  "@MED_SOURCE_DIR@/Common"
   "@MED_SOURCE_DIR@/Operations"
   "@MED_SOURCE_DIR@/VME"
   "@MED_SOURCE_DIR@/vtkMED"
