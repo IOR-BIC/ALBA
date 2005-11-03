@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgViewFrame.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:53:15 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-11-03 13:55:03 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,9 +60,9 @@ protected:
   void OnActivate     (wxActivateEvent &event);
 
 	mafObserver *m_Listener;
-	wxWindow    *m_clientwin;
-	mafView     *m_view;
-  static bool  m_quitting;
+	wxWindow    *m_ClientWin;
+	mafView     *m_View;
+  static bool  m_Quitting;
 
 	DECLARE_EVENT_TABLE()
 };

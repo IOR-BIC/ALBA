@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgSashPanel.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-13 13:08:08 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-11-03 13:55:38 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,9 +35,9 @@ mmgSashPanel::mmgSashPanel (wxWindow* parent,wxWindowID id, wxDirection side , i
  : wxSashLayoutWindow(parent,id,wxDefaultPosition,wxSize(100, 100), mmgSashPanelStyle)         
 //----------------------------------------------------------------------------
 {
-  m_currgui = new mmgPanel(this,-1);
-  m_frame = (wxFrame*)parent;
-  m_menubar = NULL;
+  m_CurrentGui = new mmgPanel(this,-1);
+  m_Frame = (wxFrame*)parent;
+  m_MenuBar = NULL;
 
   switch (side)
   {
@@ -78,22 +78,22 @@ mmgSashPanel::mmgSashPanel (wxWindow* parent,wxWindowID id, wxDirection side , i
     SetSashVisible(wxSASH_TOP,   FALSE);
   }
 
-  // store the menu in m_menubar;
+  // store the menu in m_MenuBar;
   // create the menu item 
   if (menu_string != "")
   {
-    if ( m_menubar = m_frame->GetMenuBar() )
+    if ( m_MenuBar = m_Frame->GetMenuBar() )
     {
-      int idx = m_menubar->FindMenu("View");
+      int idx = m_MenuBar->FindMenu("View");
       if( idx != wxNOT_FOUND)
       {
-        wxMenu *m = m_menubar->GetMenu(idx);
+        wxMenu *m = m_MenuBar->GetMenu(idx);
         m->Append(id, menu_string, "", wxITEM_CHECK);
-        m_menubar->Check(id,true);
+        m_MenuBar->Check(id,true);
       }
       else
       {
-        m_menubar=NULL; //prevent later check/uncheck  //SIL. 30-3-2005: 
+        m_MenuBar=NULL; //prevent later check/uncheck  //SIL. 30-3-2005: 
       }
     }
   }
@@ -119,14 +119,14 @@ bool mmgSashPanel::Show(bool show)
   wxSashLayoutWindow::Show(show);   
 
   // check menu item
-  if(m_menubar) 
+  if(m_MenuBar) 
     //SIL. 7-4-2005: 
     // when the application close,
     // when this is about to be destroyed a Show(false) is received
     // at that time the menubar is already there, but the menuitem was destroyed.
     // Calling Check without controlling for the menuitem raise an exception.
-    if(m_menubar->FindItem(this->GetId())) 
-        m_menubar->Check(this->GetId(),show);
+    if(m_MenuBar->FindItem(this->GetId())) 
+        m_MenuBar->Check(this->GetId(),show);
 
   // event for Layout
   wxCommandEvent c(wxEVT_COMMAND_BUTTON_CLICKED ,ID_LAYOUT);
@@ -137,16 +137,16 @@ bool mmgSashPanel::Show(bool show)
 bool mmgSashPanel::Put(wxWindow* win)
 //----------------------------------------------------------------------------
 {
-  assert(m_currgui);
-  m_currgui->Reparent(mafGetFrame());
-  m_currgui->Show(false);
+  assert(m_CurrentGui);
+  m_CurrentGui->Reparent(mafGetFrame());
+  m_CurrentGui->Show(false);
 
-  m_currgui = win;
-  m_currgui->Reparent(this);
-  m_currgui->Show(true);
+  m_CurrentGui = win;
+  m_CurrentGui->Reparent(this);
+  m_CurrentGui->Show(true);
   Refresh();
   wxLayoutAlgorithm layout;
-  layout.LayoutWindow(this,m_currgui);
+  layout.LayoutWindow(this,m_CurrentGui);
 
   return true;
 }

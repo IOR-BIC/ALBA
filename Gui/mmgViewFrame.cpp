@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgViewFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:53:15 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-11-03 13:55:03 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,7 +40,7 @@ BEGIN_EVENT_TABLE(mmgViewFrame, wxFrame)
 	  EVT_ACTIVATE  (mmgViewFrame::OnActivate)
 END_EVENT_TABLE()
 
-bool mmgViewFrame::m_quitting = false;
+bool mmgViewFrame::m_Quitting = false;
 //----------------------------------------------------------------------------
 mmgViewFrame::mmgViewFrame( wxFrame* parent, 
                             wxWindowID id, 
@@ -53,7 +53,7 @@ mmgViewFrame::mmgViewFrame( wxFrame* parent,
 : wxFrame(parent, id, title, pos, size, style)
 {
   m_Listener = NULL;
-  m_clientwin = NULL;
+  m_ClientWin = NULL;
 }
 //----------------------------------------------------------------------------
 mmgViewFrame::~mmgViewFrame( ) 
@@ -64,7 +64,7 @@ mmgViewFrame::~mmgViewFrame( )
 void mmgViewFrame::OnCloseWindow(wxCloseEvent &event)
 //----------------------------------------------------------------------------
 { 
-	mafEventMacro(mafEvent(this,VIEW_DELETE,m_view));
+	mafEventMacro(mafEvent(this,VIEW_DELETE,m_View));
 	Destroy();
 }
 //----------------------------------------------------------------------------
@@ -72,10 +72,10 @@ void mmgViewFrame::OnSize(wxSizeEvent &event)
 //----------------------------------------------------------------------------
 { 
    Refresh();
-   if (m_clientwin)
+   if (m_ClientWin)
    {
      wxLayoutAlgorithm layout;
-     layout.LayoutWindow(this,m_clientwin);
+     layout.LayoutWindow(this,m_ClientWin);
    }
 }
 //----------------------------------------------------------------------------
@@ -83,15 +83,15 @@ void mmgViewFrame::OnSelect(wxCommandEvent &event)
 //----------------------------------------------------------------------------
 {
   wxWindow *rwi = (wxWindow*)event.GetEventObject();
-  mafEventMacro(mafEvent(this,VIEW_SELECT,m_view,rwi));
+  mafEventMacro(mafEvent(this,VIEW_SELECT,m_View,rwi));
 }
 //----------------------------------------------------------------------------
 void mmgViewFrame::OnActivate(wxActivateEvent& event)
 //----------------------------------------------------------------------------
 { 
-	if( event.GetActive() && !m_quitting )
+	if( event.GetActive() && !m_Quitting )
   {
-		mafEventMacro(mafEvent(this,VIEW_SELECT,m_view,(wxWindow*)NULL));
+		mafEventMacro(mafEvent(this,VIEW_SELECT,m_View,(wxWindow*)NULL));
 	  Layout();
 	}
 }
@@ -99,12 +99,12 @@ void mmgViewFrame::OnActivate(wxActivateEvent& event)
 void mmgViewFrame::SetView(mafView *view)
 //----------------------------------------------------------------------------
 {
-   m_view = view;
-   m_clientwin = m_view->GetWindow();
-   m_clientwin->Reparent(this);
-   m_clientwin->Show(true);
+   m_View = view;
+   m_ClientWin = m_View->GetWindow();
+   m_ClientWin->Reparent(this);
+   m_ClientWin->Show(true);
 
-   SetTitle(wxStripMenuCodes(m_view->GetLabel()));
+   SetTitle(wxStripMenuCodes(m_View->GetLabel()));
 }
 //----------------------------------------------------------------------------
 void mmgViewFrame::OnEvent(mafEventBase *maf_event)
@@ -115,7 +115,7 @@ void mmgViewFrame::OnEvent(mafEventBase *maf_event)
     switch(e->GetId())
     {
     case VIEW_QUIT:
-      mafEventMacro(mafEvent(this,VIEW_DELETE,m_view));
+      mafEventMacro(mafEvent(this,VIEW_DELETE,m_View));
       Destroy();
       break;
     default:

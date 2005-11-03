@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgSashPanel.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 15:41:55 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-11-03 13:55:38 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -65,12 +65,12 @@ public:
 
 	/** Show/Hide the Sash panel. */
 	virtual bool Show(bool show);
-  wxWindow *GetCurrGui() {return m_currgui;};
+  wxWindow *GetCurrGui() {return m_CurrentGui;};
 
 protected:
-  wxWindow         *m_currgui;
-  wxMenuBar        *m_menubar;
-  wxFrame          *m_frame;
+  wxWindow         *m_CurrentGui;
+  wxMenuBar        *m_MenuBar;
+  wxFrame          *m_Frame;
 
   virtual void OnHide( wxCommandEvent &event );
 DECLARE_EVENT_TABLE()
