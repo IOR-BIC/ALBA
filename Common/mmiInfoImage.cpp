@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiInfoImage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-02 11:07:18 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-11-03 08:59:27 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -37,6 +37,8 @@
 
 #include "vtkDataSet.h"
 #include "vtkPointData.h"
+#include "vtkRenderer.h"
+#include "vtkCamera.h"
 #include <assert.h>
 
 //------------------------------------------------------------------------------
@@ -119,7 +121,7 @@ void mmiInfoImage::OnEvent(mafEventBase *event)
           {
             mafVME *picked_vme = v->GetPickedVme();
             vtkDataSet *data = picked_vme->GetOutput()->GetVTKData();
-            if (data->IsA("vtkImageData") || data->IsA("vtkRectilinearGrid"))
+            if (data->IsA("vtkImageData") || data->IsA("vtkRectilinearGrid") && m_Renderer->GetActiveCamera()->GetParallelProjection())
             {
               double picked_pos[3], iso_value;
               v->GetPickedPosition(picked_pos);
@@ -128,7 +130,7 @@ void mmiInfoImage::OnEvent(mafEventBase *event)
               scalars->GetTuple(pid,&iso_value);
               mafString info;
               info = "";
-              info << "x = " << pos[0] << " y = " << pos[1] << " d = " << iso_value;
+              info << "x = " << picked_pos[0] << " y = " << picked_pos[1] << " d = " << iso_value;
               picked_vme->ForwardUpEvent(mafEvent(this,PROGRESSBAR_SET_TEXT,&info));
             }
           }
