@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPics.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-13 16:15:38 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-11-03 13:58:22 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,7 +27,7 @@ struct mafPictureFactory_Pimpl;
 //----------------------------------------------------------------------------
 // mafPictureFactory 
 //----------------------------------------------------------------------------
-/** This class is normally istantiated as the "mafPics" singleton. 
+/** This class is normally instantiated as the "mafPics" singleton. 
  icons available by default:    
 
 -FILE_NEW,FILE_OPEN,FILE_SAVE : standard file operation
@@ -52,7 +52,7 @@ struct mafPictureFactory_Pimpl;
 -NODE_YELLOW,NODE_GRAY,NODE_RED,NODE_BLUE : used by ListCtrl
 
 NOTE:
-- Icons for the Toolbar must be 20x20 in size, and with transparent background (using color "None" in the XPM)
+- Icons for the Toolbar must be 20x20 in size, and with transparent background (replacing blank color with "None" in the XPM)
 - Icons to be used in one ImageList (mmgTree,mmgCheckTree,...) must be all the same size, and with white background.
 - Icons to be used in mmgCheckTree (vme icons) must be 16x16 with white background
 */
