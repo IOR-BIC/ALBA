@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-02 15:10:31 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-11-03 08:57:49 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -274,8 +274,12 @@ void mafViewCompound::OnLayout()
   int sh = m_Size.GetHeight();
 
   wxSize gui_size = m_GuiView->GetBestSize();
-  sh = sh-gui_size.GetHeight();
-  m_GuiView->SetSize(0,sh,sw,gui_size.GetHeight());
+  int gh = gui_size.GetHeight();
+
+  if(sw<gh || sh<gh) return;
+
+  sh -= gh;
+  m_GuiView->SetSize(0,sh,sw,gh);
 
   // this implement the Fixed SubViews Layout
   int border = 2;

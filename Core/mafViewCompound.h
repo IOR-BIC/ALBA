@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-02 15:09:40 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-11-03 08:57:49 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,6 +50,10 @@ public:
   Plug the child view into the compound view. If the number of child view is less then row x col, 
   the last plugged view will fill the remaining holes.*/
   virtual void PlugChildView(mafView *child);
+
+  /** 
+  Redefine this method to package the compounded view */
+  virtual void PackageView() {};
 
   virtual mafView *Copy(mafObserver *Listener);
   
