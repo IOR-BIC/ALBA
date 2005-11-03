@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 22:03:07 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-11-03 13:14:37 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -97,8 +97,12 @@ void mafLogicWithGUI::CreateMenu()
   wxMenu *edit_menu = new wxMenu;
   m_MenuBar->Append(edit_menu, "&Edit");
   wxMenu *view_menu = new wxMenu;
-  if(this->m_PlugToolbar) view_menu->Append(MENU_VIEW_TOOLBAR, "Toolbar","",true);
-  m_MenuBar->Append(view_menu, "&View"); //required by he sidebars
+  if(this->m_PlugToolbar) 
+  {
+    view_menu->Append(MENU_VIEW_TOOLBAR, "Toolbar","",wxITEM_CHECK);
+    view_menu->Check(MENU_VIEW_TOOLBAR,true);
+  }
+  m_MenuBar->Append(view_menu, "&View");
 
   m_Win->SetMenuBar(m_MenuBar);
 }

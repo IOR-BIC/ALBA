@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-21 15:08:05 $
-  Version:   $Revision: 1.39 $
+  Date:      $Date: 2005-11-03 13:12:42 $
+  Version:   $Revision: 1.40 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -243,7 +243,10 @@ void mafLogicWithManagers::CreateMenu()
   m_ViewMenu = new wxMenu;
   //m_ViewManager->FillMenu(m_ViewMenu);  
   if(this->m_PlugToolbar) 
-    m_ViewMenu->Append(MENU_VIEW_TOOLBAR, "Toolbar","",true);
+  {
+    m_ViewMenu->Append(MENU_VIEW_TOOLBAR, "Toolbar","",wxITEM_CHECK);
+    m_ViewMenu->Check(MENU_VIEW_TOOLBAR,true);
+  }
   m_MenuBar->Append(m_ViewMenu, "&View");
 
   m_OpMenu = new wxMenu;
