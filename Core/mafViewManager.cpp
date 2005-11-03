@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-04 16:02:02 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2005-11-03 14:21:44 $
+  Version:   $Revision: 1.20 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -434,18 +434,4 @@ mafView *mafViewManager::GetSelectedView()
 //----------------------------------------------------------------------------
 {
   return m_SelectedView; 
-}
-/*
-//----------------------------------------------------------------------------
-mafRWIBase *mafViewManager::GetSelectedRWI()
-//----------------------------------------------------------------------------
-{
-  return m_selected_rwi; 
-}
-*/
-//----------------------------------------------------------------------------
-void mafViewManager::EnableSelect(bool enable)
-//---------------------------------------------------------------------------
-{
-//  m_is->EnableSelect(enable);
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 10:21:57 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-11-03 14:21:44 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -98,14 +98,8 @@ public:
   /** Return the selected view. */
 	mafView *GetSelectedView();
 
-  /** Return the selected render window interactor. */
-//  mafRWIBase *GetSelectedRWI();
-
   /** Return the root of the vme tree. */
   mafNode     *GetCurrentRoot() {return (mafNode*)m_RootVme;};
-
-  /** Enable/Disable the selection from the interactor style. */
-  void EnableSelect(bool enable);
 
   /** Return the view-list. */
   mafView* GetList() {return m_ViewList;};
