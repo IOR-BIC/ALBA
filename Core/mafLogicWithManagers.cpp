@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-03 13:12:42 $
-  Version:   $Revision: 1.40 $
+  Date:      $Date: 2005-11-03 14:23:02 $
+  Version:   $Revision: 1.41 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -709,7 +709,7 @@ void mafLogicWithManagers::OpRunStarting()
 //----------------------------------------------------------------------------
 {
 	EnableMenuAndToolbar(false);
-  if(m_ViewManager) m_ViewManager->EnableSelect(false);
+  if(m_InteractionManager) m_InteractionManager->EnableSelect(false);
 	if(m_SideBar)    m_SideBar->EnableSelect(false);
 }
 //----------------------------------------------------------------------------
@@ -717,7 +717,7 @@ void mafLogicWithManagers::OpRunTerminated()
 //----------------------------------------------------------------------------
 {
 	EnableMenuAndToolbar(true);
-  if(m_ViewManager) m_ViewManager->EnableSelect(true);
+  if(m_InteractionManager) m_InteractionManager->EnableSelect(true);
   if(m_SideBar)    m_SideBar->EnableSelect(true);
 }
 //----------------------------------------------------------------------------
