@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-02 10:47:55 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2005-11-03 14:21:29 $
+  Version:   $Revision: 1.28 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,6 +51,8 @@ mafViewVTK::mafViewVTK(wxString label, int camera_position, bool show_axes, int 
   m_Sg        = NULL;
   m_Rwi       = NULL;
   m_LightKit  = NULL;
+
+  m_NumberOfVisibleVme = 0;
 
   m_CameraAttach  = 0;
   m_AttachedVme       = NULL;
@@ -140,10 +142,16 @@ vtkRenderer *mafViewVTK::GetBackRenderer()
 
 //----------------------------------------------------------------------------
 void mafViewVTK::VmeAdd(mafNode *vme)                                   {assert(m_Sg); m_Sg->VmeAdd(vme);}
-void mafViewVTK::VmeRemove(mafNode *vme)                                {assert(m_Sg); m_Sg->VmeRemove(vme);}
 void mafViewVTK::VmeShow(mafNode *vme, bool show)												{assert(m_Sg); m_Sg->VmeShow(vme,show);}
 void mafViewVTK::VmeUpdateProperty(mafNode *vme, bool fromTag)	        {assert(m_Sg); m_Sg->VmeUpdateProperty(vme,fromTag);}
 int  mafViewVTK::GetNodeStatus(mafNode *vme)                            {return m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;}
+//----------------------------------------------------------------------------
+void mafViewVTK::VmeRemove(mafNode *vme)
+//----------------------------------------------------------------------------
+{
+  assert(m_Sg); 
+  m_Sg->VmeRemove(vme);
+}
 //----------------------------------------------------------------------------
 void mafViewVTK::VmeSelect(mafNode *vme, bool select)
 //----------------------------------------------------------------------------
@@ -175,7 +183,7 @@ void mafViewVTK::CameraSet(int camera_position)
   m_Rwi->CameraSet(camera_position);
 }
 //----------------------------------------------------------------------------
-void mafViewVTK::CameraReset(mafNode *node)	
+void mafViewVTK::CameraReset(mafNode *node)
 //----------------------------------------------------------------------------
 {
   assert(m_Rwi); 
@@ -227,13 +235,21 @@ void mafViewVTK::VmeCreatePipe(mafNode *vme)
 
   if (pipe_name != "")
   {
+    m_NumberOfVisibleVme++;
     obj = pipe_factory->CreateInstance(pipe_name);
     mafPipe *pipe = (mafPipe*)obj;
     if (pipe)
     {
       pipe->Create(n);
       n->m_Pipe = (mafPipe*)pipe;
-      mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+      if (m_NumberOfVisibleVme == 1)
+      {
+        mafEventMacro(mafEvent(this,CAMERA_RESET));
+      }
+      else
+      {
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+      }
     }
     else
     {
@@ -245,6 +261,7 @@ void mafViewVTK::VmeCreatePipe(mafNode *vme)
 void mafViewVTK::VmeDeletePipe(mafNode *vme)
 //----------------------------------------------------------------------------
 {
+  m_NumberOfVisibleVme--;
   mafSceneNode *n = m_Sg->Vme2Node(vme);
   assert(n && n->m_Pipe);
   cppDEL(n->m_Pipe);

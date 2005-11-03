@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-02 10:47:55 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2005-11-03 14:21:30 $
+  Version:   $Revision: 1.27 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -126,8 +126,9 @@ protected:
   mafVME				*m_AttachedVme; ///< VME on which the camera is attached when the attach-camera option is 'On'
   vtkMatrix4x4	*m_AttachedVmeMatrix; ///< Matrix given to the Camera to be moved together with m_AttachedVme
 
-  bool m_ShowAxes;  ///< Flag used to show/hide axes in low left cornel of the view
-  int m_StereoType; ///< Indicate the stereo type to use with the view
+  int   m_NumberOfVisibleVme; ///< perform ResetCamera only for the first vme shown into the view
+  bool  m_ShowAxes;  ///< Flag used to show/hide axes in low left cornel of the view
+  int   m_StereoType; ///< Indicate the stereo type to use with the view
 
   virtual mmgGui *CreateGui();
 
