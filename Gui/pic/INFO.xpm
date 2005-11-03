@@ -70,7 +70,7 @@ static char *INFO_xpm[] = {
 "i c #ACABA0",
 "3 c #BCBAAF",
 "v c #8F8E85",
-"  c #ECEADC",
+"  c None",
 "u c #FCF9EB",
 "I c #B2B0A5",
 "V c #E2E0D3",
