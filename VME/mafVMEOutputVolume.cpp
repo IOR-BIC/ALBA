@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-19 09:14:58 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-11-03 08:56:50 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -100,12 +100,16 @@ void mafVMEOutputVolume::Update()
   {
     mafOBB b;
     m_VME->GetOutput()->GetVMELocalBounds(b);
+    m_VolumeBounds[0] = "";
     m_VolumeBounds[0] << " xmin: " << b.m_Bounds[0] << "   xmax: " << b.m_Bounds[1];
+    m_VolumeBounds[1] = "";
     m_VolumeBounds[1] << " ymin: " << b.m_Bounds[2] << "   ymax: " << b.m_Bounds[3];
+    m_VolumeBounds[2] = "";
     m_VolumeBounds[2] << " zmin: " << b.m_Bounds[4] << "   zmax: " << b.m_Bounds[5];
     double srange[2];
     this->GetVTKData()->Update();
     this->GetVTKData()->GetScalarRange(srange);
+    m_ScaralRangeString = "";
     m_ScaralRangeString << " min: " << srange[0] << "    max: " << srange[1];
   }
   
