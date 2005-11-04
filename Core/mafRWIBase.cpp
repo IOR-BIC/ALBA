@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-05 13:40:51 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-11-04 14:16:05 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -346,7 +346,8 @@ void mafRWIBase::OnLeftMouseButtonUp(wxMouseEvent &event)
     if(m_Mouse) m_Mouse->OnEvent(&e);
   }
   
-  ReleaseMouse();
+  if( GetCapture() == this )
+    ReleaseMouse();
 }
 //----------------------------------------------------------------------------
 void mafRWIBase::OnMiddleMouseButtonUp(wxMouseEvent &event)
@@ -371,7 +372,8 @@ void mafRWIBase::OnMiddleMouseButtonUp(wxMouseEvent &event)
     if(m_Mouse) m_Mouse->OnEvent(&e);
   }
 
-  ReleaseMouse();
+  if( GetCapture() == this )
+    ReleaseMouse();
 }
 //----------------------------------------------------------------------------
 void mafRWIBase::OnRightMouseButtonUp(wxMouseEvent &event)
@@ -396,7 +398,8 @@ void mafRWIBase::OnRightMouseButtonUp(wxMouseEvent &event)
     if(m_Mouse) m_Mouse->OnEvent(&e);
   }
 
-  ReleaseMouse();
+  if( GetCapture() == this )
+    ReleaseMouse();
 }
 //----------------------------------------------------------------------------
 void mafRWIBase::OnMouseMotion(wxMouseEvent &event)
