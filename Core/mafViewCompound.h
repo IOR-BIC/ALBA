@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-03 08:57:49 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-11-04 15:24:08 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -67,21 +67,27 @@ public:
   
   virtual void     OnEvent(mafEventBase *maf_event);
 
+  /** 
+  Add VME into plugged sub-views*/
   virtual void VmeAdd(mafNode *node);
+
+  /** 
+  Remove VME into plugged sub-views*/
   virtual void VmeRemove(mafNode *node);
   virtual void VmeSelect(mafNode *node, bool select);
+  /** 
+  Show/Hide VMEs into plugged sub-views*/
   virtual void VmeShow(mafNode *node, bool show);
 	virtual void VmeUpdateProperty(mafNode *node, bool fromTag = false)		{};
-
-  virtual void VmeCreatePipe(mafNode *node);
-  virtual void VmeDeletePipe(mafNode *node);
 
   virtual void CameraReset(mafNode *node = NULL);
   virtual void CameraUpdate();
 
-  /** return the status of the node within this view. es: NON_VISIBLE,VISIBLE_ON, ... */
-  //having mafViewCompound::GetNodeStatus allow mmgCheckTree to not know about mafSceneGraph
+  /** 
+  return the status of the node within this view. es: NON_VISIBLE,VISIBLE_ON, ... 
+  having mafViewCompound::GetNodeStatus allow mmgCheckTree to not know about mafSceneGraph */
   virtual int  GetNodeStatus(mafNode *vme);
+
   virtual void OnSize(wxSizeEvent &event);
 
   /** IDs for the GUI */
@@ -105,7 +111,7 @@ public:
   virtual mafPipe*  GetNodePipe(mafNode *vme);
 
   /** 
-  Return the gui for the visual pipe corresponding to the default child view. */
+  Return the GUI for the visual pipe corresponding to the default child view. */
   virtual mmgGui *GetNodePipeGUI(mafNode *vme);
 
   /** 
