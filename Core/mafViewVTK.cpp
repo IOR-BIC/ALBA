@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-03 14:21:29 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2005-11-04 09:22:23 $
+  Version:   $Revision: 1.29 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,6 +24,9 @@
 #include "mafPipe.h"
 #include "mafPipeFactory.h"
 #include "mafLightKit.h"
+
+#include "mafVMELandmarkCloud.h"
+#include "mafVMELandmark.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkCamera.h"
@@ -235,7 +238,14 @@ void mafViewVTK::VmeCreatePipe(mafNode *vme)
 
   if (pipe_name != "")
   {
-    m_NumberOfVisibleVme++;
+    if((vme->IsMAFType(mafVMELandmarkCloud) && ((mafVMELandmarkCloud*)vme)->IsOpen()) || vme->IsMAFType(mafVMELandmark) && m_NumberOfVisibleVme == 1)
+    {
+      m_NumberOfVisibleVme = 1;
+    }
+    else
+    {
+      m_NumberOfVisibleVme++;
+    }
     obj = pipe_factory->CreateInstance(pipe_name);
     mafPipe *pipe = (mafPipe*)obj;
     if (pipe)
@@ -261,7 +271,14 @@ void mafViewVTK::VmeCreatePipe(mafNode *vme)
 void mafViewVTK::VmeDeletePipe(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-  m_NumberOfVisibleVme--;
+  if((vme->IsMAFType(mafVMELandmarkCloud) && ((mafVMELandmarkCloud*)vme)->IsOpen()) || vme->IsMAFType(mafVMELandmark) && m_NumberOfVisibleVme == 0)
+  {
+    m_NumberOfVisibleVme = 0;
+  }
+  else
+  {
+    m_NumberOfVisibleVme--;
+  }
   mafSceneNode *n = m_Sg->Vme2Node(vme);
   assert(n && n->m_Pipe);
   cppDEL(n->m_Pipe);
