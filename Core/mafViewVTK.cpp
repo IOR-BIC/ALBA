@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-04 09:22:23 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2005-11-04 15:23:42 $
+  Version:   $Revision: 1.30 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -211,20 +211,13 @@ mafPipe* mafViewVTK::GetNodePipe(mafNode *vme)
    return n->m_Pipe;
 }
 //----------------------------------------------------------------------------
-void mafViewVTK::VmeCreatePipe(mafNode *vme)
+void mafViewVTK::GetVisualPipeName(mafNode *node, mafString &pipe_name)
 //----------------------------------------------------------------------------
 {
-  mafSceneNode *n = m_Sg->Vme2Node(vme);
-  assert(n && !n->m_Pipe);
-  assert(vme->IsA("mafVME"));
-  mafVME *v = ((mafVME*)vme);
+  assert(node->IsA("mafVME"));
+  mafVME *v = ((mafVME*)node);
 
-  mafObject *obj= NULL;
-  mafString pipe_name = "";
   mafString vme_type = v->GetTypeName();
-
-  mafPipeFactory *pipe_factory  = mafPipeFactory::GetInstance();
-  assert(pipe_factory!=NULL);
   if (!m_PipeMap.empty() && (m_PipeMap[vme_type].m_Visibility == VISIBLE))
   {
     // pick up the visual pipe from the view's visual pipe map
@@ -235,6 +228,13 @@ void mafViewVTK::VmeCreatePipe(mafNode *vme)
     // pick up the default visual pipe from the vme
     pipe_name = v->GetVisualPipe();
   }
+}
+//----------------------------------------------------------------------------
+void mafViewVTK::VmeCreatePipe(mafNode *vme)
+//----------------------------------------------------------------------------
+{
+  mafString pipe_name = "";
+  GetVisualPipeName(vme, pipe_name);
 
   if (pipe_name != "")
   {
@@ -246,10 +246,15 @@ void mafViewVTK::VmeCreatePipe(mafNode *vme)
     {
       m_NumberOfVisibleVme++;
     }
+    mafPipeFactory *pipe_factory  = mafPipeFactory::GetInstance();
+    assert(pipe_factory!=NULL);
+    mafObject *obj = NULL;
     obj = pipe_factory->CreateInstance(pipe_name);
     mafPipe *pipe = (mafPipe*)obj;
     if (pipe)
     {
+      mafSceneNode *n = m_Sg->Vme2Node(vme);
+      assert(n && !n->m_Pipe);
       pipe->Create(n);
       n->m_Pipe = (mafPipe*)pipe;
       if (m_NumberOfVisibleVme == 1)

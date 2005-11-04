@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-03 14:21:30 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2005-11-04 15:23:24 $
+  Version:   $Revision: 1.28 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -66,19 +66,44 @@ public:
     ID_LAST
   };
 
-  virtual void			VmeAdd(mafNode *vme);
-  virtual void			VmeRemove(mafNode *vme);
-  virtual void			VmeSelect(mafNode *vme, bool select);
-  virtual void			VmeShow(mafNode *vme, bool show);
-	virtual void      VmeUpdateProperty(mafNode *vme, bool fromTag = false);
-  virtual int 	    GetNodeStatus(mafNode *vme);
-  virtual mafPipe*  GetNodePipe(mafNode *vme);
-  virtual void	    VmeCreatePipe(mafNode *vme);
-  virtual void	    VmeDeletePipe(mafNode *vme);
+  /** 
+  Add the vme to the view's scene-graph*/
+  virtual void VmeAdd(mafNode *vme);
+  /** 
+  Remove the vme from the view's scene-graph*/
+  virtual void VmeRemove(mafNode *vme);
 
-	virtual void			CameraReset(mafNode *node = NULL);
-  virtual void      CameraSet(int camera_position);
-  virtual void			CameraUpdate();
+  virtual void VmeSelect(mafNode *vme, bool select);
+
+  /** 
+  Called to show/hide vme*/
+  virtual void VmeShow(mafNode *vme, bool show);
+
+  /** 
+  Called to update visual pipe properties of the vme passed as argument. If the 'fromTag' flag is true,
+  the update is done by reading the visual parameters from tags.*/
+  virtual void VmeUpdateProperty(mafNode *vme, bool fromTag = false);
+
+  /** 
+  Set the visualization status for the node (visible, not visible, mutex, ...) \sa mafSceneGraph*/
+  virtual int GetNodeStatus(mafNode *vme);
+  /** 
+  Return a pointer to the visual pipe of the node passed as argument. 
+  It is used in mafSideBar to plug the visual pipe's GUI in the tabbed vme panel. \sa mafSideBar*/
+  virtual mafPipe*  GetNodePipe(mafNode *vme);
+  
+  /** 
+  Create the visual pipe for the node passed as argument. 
+  To create visual pipe first check in m_PipeMap if custom visual pipe is defined, 
+  otherwise ask to vme which is its visual pipe. */
+  virtual void VmeCreatePipe(mafNode *vme);
+  /** 
+  Delete vme's visual pipe. It is called when vme is removed from visualization.*/
+  virtual void VmeDeletePipe(mafNode *vme);
+
+	virtual void CameraReset(mafNode *node = NULL);
+  virtual void CameraSet(int camera_position);
+  virtual void CameraUpdate();
 
   virtual mafSceneGraph *GetSceneGraph()	  {return m_Sg;}; 
   virtual mafRWIBase    *GetRWI()           {return m_Rwi->m_RwiBase;};
@@ -134,6 +159,10 @@ protected:
 
   virtual void OnPreResetCamera();
   virtual void OnPostResetCamera();
+
+  /** 
+  Return the visual pipe's name.*/
+  void GetVisualPipeName(mafNode *node, mafString &pipe_name);
 
   /** 
   Update the camera position when vme's abs matrix change. 
