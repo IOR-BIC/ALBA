@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-04 17:18:36 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-11-04 15:26:06 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,6 +21,7 @@
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
+class mmgFloatSlider;
 class vtkOutlineCornerFilter;
 class vtkPolyData;
 class vtkImageData;
@@ -59,15 +60,16 @@ public:
   enum PIPE_VOLUME_SLICE_WIDGET_ID
   {
     ID_RGB_LUT = Superclass::ID_LAST,
+    ID_SLICE_SLIDER_X,
+    ID_SLICE_SLIDER_Y,
+    ID_SLICE_SLIDER_Z,
     ID_LAST
   };
 
   void InitializeSliceParameters(int mode, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox);
+  void InitializeSliceParameters(int mode, double slice_origin[3], bool show_vol_bbox);
   virtual void Create(mafSceneNode *n);
 
-  /** Show-Hide the slice actor. */
-	//void Show       (bool show); 
-	
 	/** Show the slice bounding box actor. */
 	void Select     (bool select); 
 	
@@ -116,8 +118,9 @@ protected:
 	float  m_YVector[3][3];
   float  m_SliceOpacity;
 
-	int		m_TextureRes;
-	int		m_SliceMode;
+	int		  m_TextureRes;
+	int		  m_SliceMode;
+  mmgFloatSlider *m_SliceSlider[3];
 
 	vtkVolumeSlicer				 *m_SlicerImage[3];
 	vtkVolumeSlicer				 *m_SlicerPolygonal[3];

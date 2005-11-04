@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-17 13:07:45 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-11-04 15:26:06 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,6 +42,7 @@
 #include "vtkRectilinearGrid.h"
 #include "vtkVolumeSlicer.h"
 #include "vtkProperty.h"
+#include "vtkDataSet.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeVolumeSlice);
@@ -62,13 +63,14 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
     m_SlicePolydata[i]		= NULL;
     m_SliceMapper[i]		  = NULL;
     m_SliceActor[i]	      = NULL;
+    m_SliceSlider[i]      = NULL;
   }
   m_ParametersInitialized = false;
   m_ShowVolumeBox         = false;
 
   m_SliceMode = SLICE_Z;
 
-  m_ColorLUTEnabled       = 0;
+  m_ColorLUTEnabled = 0;
   m_SliceOpacity  = 1.0;
   m_TextureRes    = 512;
 
@@ -92,6 +94,17 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
   m_YVector[2][0] = 0;
   m_YVector[2][1] = 1;
   m_YVector[2][2] = 0;
+}
+//----------------------------------------------------------------------------
+void mafPipeVolumeSlice::InitializeSliceParameters(int mode, double slice_origin[3], bool show_vol_bbox)
+//----------------------------------------------------------------------------
+{
+  m_SliceMode     = mode;
+  m_ShowVolumeBox = show_vol_bbox;
+
+  m_Origin[0] = slice_origin[0];
+  m_Origin[1] = slice_origin[1];
+  m_Origin[2] = slice_origin[2];
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeSlice::InitializeSliceParameters(int mode, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox)
@@ -330,17 +343,6 @@ mafPipeVolumeSlice::~mafPipeVolumeSlice()
     m_AssemblyFront->RemovePart(m_GhostActor);
   vtkDEL(m_GhostActor);
 }
-/*
-//----------------------------------------------------------------------------
-void mafPipeVolumeSlice::Show(bool show)
-//----------------------------------------------------------------------------
-{
-	if(m_GhostActor) m_GhostActor->SetVisibility(show);
-
-	for(int i=0;i<3;i++)
-		if(m_SliceActor[i]) m_SliceActor[i]->SetVisibility(show);
-}
-*/
 //----------------------------------------------------------------------------
 void mafPipeVolumeSlice::Select(bool sel)
 //----------------------------------------------------------------------------
@@ -374,10 +376,6 @@ void mafPipeVolumeSlice::GetLutRange(double range[2])
 void mafPipeVolumeSlice::SetSlice(double origin[3], float xVect[3], float yVect[3])
 //----------------------------------------------------------------------------
 {
-	m_Origin[0] = origin[0];
-	m_Origin[1] = origin[1];
-	m_Origin[2] = origin[2];
-
 	m_XVector[m_SliceMode][0] = xVect[0];
 	m_XVector[m_SliceMode][1] = xVect[1];
 	m_XVector[m_SliceMode][2] = xVect[2];
@@ -393,15 +391,7 @@ void mafPipeVolumeSlice::SetSlice(double origin[3], float xVect[3], float yVect[
 	vtkMath::Cross(m_Normal[m_SliceMode], m_XVector[m_SliceMode], m_YVector[m_SliceMode]);
 	vtkMath::Normalize(m_YVector[m_SliceMode]);
 
-	m_SlicerImage[m_SliceMode]->SetPlaneOrigin(m_Origin[0], m_Origin[1], m_Origin[2]);
-	m_SlicerPolygonal[m_SliceMode]->SetPlaneOrigin(m_SlicerImage[m_SliceMode]->GetPlaneOrigin());
-	m_SlicerImage[m_SliceMode]->SetPlaneAxisX(m_XVector[m_SliceMode]);
-	m_SlicerImage[m_SliceMode]->SetPlaneAxisY(m_YVector[m_SliceMode]);
-	m_SlicerPolygonal[m_SliceMode]->SetPlaneAxisX(m_XVector[m_SliceMode]);
-	m_SlicerPolygonal[m_SliceMode]->SetPlaneAxisY(m_YVector[m_SliceMode]);
-
-	m_SlicerImage[m_SliceMode]->Update();
-	m_SlicerPolygonal[m_SliceMode]->Update();
+  SetSlice(origin);
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeSlice::SetSlice(double origin[3])
@@ -489,8 +479,27 @@ mmgGui *mafPipeVolumeSlice::CreateGui()
 //----------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
+  double b[6] = {-1,1,-1,1,-1,1};
   m_Gui = new mmgGui(this);
   m_Gui->Bool(ID_RGB_LUT,"rgb lut", &m_ColorLUTEnabled,0,"turn on/off RGB LUT");
+  vtkDataSet *data = m_Vme->GetOutput()->GetVTKData();
+  if (data != NULL)
+  {
+    data->Update();
+    data->GetBounds(b);
+  }
+  if (m_SliceMode == SLICE_X || m_SliceMode == SLICE_ORTHO)
+  {
+    m_SliceSlider[0] = m_Gui->FloatSlider(ID_SLICE_SLIDER_X,"x",&m_Origin[0],b[0],b[1]);
+  }
+  if (m_SliceMode == SLICE_Y || m_SliceMode == SLICE_ORTHO)
+  {
+    m_SliceSlider[1] = m_Gui->FloatSlider(ID_SLICE_SLIDER_Y,"y",&m_Origin[1],b[2],b[3]);
+  }
+  if (m_SliceMode == SLICE_Z || m_SliceMode == SLICE_ORTHO)
+  {
+    m_SliceSlider[2] = m_Gui->FloatSlider(ID_SLICE_SLIDER_Z,"z",&m_Origin[2],b[4],b[5]);
+  }
 
   return m_Gui;
 }
@@ -507,6 +516,12 @@ void mafPipeVolumeSlice::OnEvent(mafEventBase *maf_event)
         ColorLookupTable(m_ColorLUTEnabled != 0);
         m_Vme->ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
       }
+      break;
+      case ID_SLICE_SLIDER_X:
+      case ID_SLICE_SLIDER_Y:
+      case ID_SLICE_SLIDER_Z:
+        SetSlice(m_Origin);
+        m_Vme->ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
       break;
       default:
       break;
