@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-03 08:57:49 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-11-04 15:25:21 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -145,20 +145,6 @@ int mafViewCompound::GetNodeStatus(mafNode *node)
 {
   // should be redefined for compounded views
   return m_ChildViewList[m_DefauldChildView]->GetNodeStatus(node);
-}
-//----------------------------------------------------------------------------
-void mafViewCompound::VmeCreatePipe(mafNode *node)
-//----------------------------------------------------------------------------
-{
-  for(int i=0; i<m_NumOfChildView; i++)
-    m_ChildViewList[i]->VmeCreatePipe(node);
-}
-//----------------------------------------------------------------------------
-void mafViewCompound::VmeDeletePipe(mafNode *node)
-//----------------------------------------------------------------------------
-{
-  for(int i=0; i<m_NumOfChildView; i++)
-    m_ChildViewList[i]->VmeDeletePipe(node);
 }
 //----------------------------------------------------------------------------
 void mafViewCompound::CameraReset(mafNode *node)
