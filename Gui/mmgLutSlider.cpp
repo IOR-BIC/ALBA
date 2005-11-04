@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutSlider.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 13:44:53 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-11-04 14:14:19 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,13 +42,13 @@ public:
         long style = 0)
   {
     Create(parent, id, label, pos, size, style);
-    m_x0 = 0;
+    m_X0 = 0;
   };
 
 protected:  
   void OnMouse(wxMouseEvent &event);
   void OnSetFocus(wxFocusEvent& event) {}; 
-  int m_x0;
+  int m_X0;
 
 DECLARE_EVENT_TABLE()
 };
@@ -57,7 +57,11 @@ DECLARE_EVENT_TABLE()
 // mmgLutButt EVENT_TABLE
 //----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(mmgLutButt,wxButton)
-	EVT_MOUSE_EVENTS(mmgLutButt::OnMouse)  
+	//EVT_MOUSE_EVENTS(mmgLutButt::OnMouse)
+  EVT_LEFT_DOWN(mmgLutButt::OnMouse)
+  EVT_LEFT_UP(mmgLutButt::OnMouse)
+  EVT_RIGHT_DOWN(mmgLutButt::OnMouse)
+  EVT_MOTION(mmgLutButt::OnMouse)
   EVT_SET_FOCUS(mmgLutButt::OnSetFocus) 
 END_EVENT_TABLE()
 //----------------------------------------------------------------------------
@@ -72,17 +76,18 @@ void mmgLutButt::OnMouse(wxMouseEvent &event)
 	if(event.LeftDown())
 	{
 		CaptureMouse();
-		m_x0 = event.GetX();
+		m_X0 = event.GetX();
 		return;
 	}
 	if(event.LeftUp())
 	{
-		ReleaseMouse();
+		if( GetCapture() == this )
+      ReleaseMouse();
 		return;
 	}
 	if(event.LeftIsDown())
 	{
-		int sx = event.GetX() - m_x0,sy = 0;
+		int sx = event.GetX() - m_X0,sy = 0;
 		ClientToScreen(&sx,&sy);
 		GetParent()->ScreenToClient(&sx,&sy);
 		((mmgLutSlider*)GetParent())->MoveButton(GetId(),sx);
@@ -96,20 +101,20 @@ BEGIN_EVENT_TABLE(mmgLutSlider,wxPanel)
 END_EVENT_TABLE()
 //----------------------------------------------------------------------------
 mmgLutSlider::mmgLutSlider(wxWindow *parent, wxWindowID id,const wxPoint& pos, const wxSize& size,long style)
-:wxPanel(parent,id,pos,size,wxSUNKEN_BORDER/*wxCLIP_CHILDREN*/ )         
+:wxPanel(parent,id,pos,size,wxSUNKEN_BORDER | wxCLIP_CHILDREN )
 //----------------------------------------------------------------------------
 {
   m_Listener = NULL;
   m_MinValue = 0;
   m_MaxValue = 100;
   m_LowValue = 0;
-  m_HighValue  = 100;
+  m_HighValue= 100;
 
-  m_MinLabel = new wxStaticText(this,-1,"",					wxPoint(0,0),		wxSize(35, BUTT_H));
-  m_MinButton = new  mmgLutButt(this, 1,"0",				wxPoint(0,0),		wxSize(35, BUTT_H));
-  m_MiddleButton = new  mmgLutButt(this, 3,"windowing",wxPoint(25,0),	wxSize(100,BUTT_H));
-  m_MaxButton = new  mmgLutButt(this, 2,"100",			wxPoint(125,0),	wxSize(35, BUTT_H));
-  m_MaxLabel = new wxStaticText(this,-1,"",					wxPoint(0,0),		wxSize(35, BUTT_H));
+  m_MinLabel      = new wxStaticText(this, -1, "", wxPoint(0,0), wxSize(35, BUTT_H));
+  m_MinButton     = new mmgLutButt(this, 1, "0", wxPoint(0,0), wxSize(35, BUTT_H));
+  m_MiddleButton  = new mmgLutButt(this, 3, "windowing", wxPoint(25,0),	wxSize(100,BUTT_H));
+  m_MaxButton     = new mmgLutButt(this, 2, "100", wxPoint(125,0), wxSize(35, BUTT_H));
+  m_MaxLabel      = new wxStaticText(this, -1, "", wxPoint(0,0), wxSize(35, BUTT_H));
 }
 //----------------------------------------------------------------------------
 mmgLutSlider::~mmgLutSlider()
@@ -297,7 +302,7 @@ void mmgLutSlider::ShowEntry(int id)
 		{
 			msg = wxString::Format("Enter a value in [%d .. %d]",m_MinValue, m_HighValue);
 			s = wxString::Format("%d",m_LowValue);
-			s = wxGetTextFromUser(msg, "Lookuptable Minimum",s,this);
+			s = wxGetTextFromUser(msg, "Lookup table Minimum",s,this);
       if( s.ToLong(&val) ) 
 			{
 				val = (val>=m_MinValue) ? val : m_MinValue;
@@ -311,7 +316,7 @@ void mmgLutSlider::ShowEntry(int id)
 		{
 			msg = wxString::Format("Enter a value in [%d .. %d]",m_LowValue, m_MaxValue);
 			s = wxString::Format("%d",m_HighValue);
-			s = wxGetTextFromUser(msg, "Lookuptable Maximum",s,this);
+			s = wxGetTextFromUser(msg, "Lookup table Maximum",s,this);
       if( s.ToLong(&val) ) 
 			{
 				val = (val> m_LowValue) ? val : m_LowValue;
