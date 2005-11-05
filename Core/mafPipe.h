@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-04 16:02:32 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-11-05 10:13:13 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -48,6 +48,8 @@ public:
   /** The real setup must be performed here - not in the ctor */
   virtual void Create(mafSceneNode *n);
 
+  void SetListener(mafObserver *listener) {m_Listener = listener;};
+
 	/** Change the visibility of the bounding box actor representing the selection for the vme. */
 	virtual	void Select(bool select)										{};
 
@@ -91,5 +93,7 @@ protected:
   subclass to continue the ID enumeration from it. For appending the widgets in the
   same pannel GUI, each CreateGUI() function should first call the superclass' one.*/
   virtual mmgGui  *CreateGui();
+
+  mafObserver *m_Listener;
 };
 #endif
