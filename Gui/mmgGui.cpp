@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 21:58:26 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2005-11-05 11:10:23 $
+  Version:   $Revision: 1.23 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,8 +21,6 @@
 
 
 #include "mmgFloatSlider.h"
- //SIL. 24-3-2005: temporary removed
- //MARCO: 22-6-2005 - readded 
 #include "mmgCheckListBox.h"
 
 #include "mmgValidator.h"
@@ -51,10 +49,10 @@
 		                       <------> <------> <------>    EW: entry width
         <--------------->                                LW: label width
 				                <-->                             LM: label margin
-                                   <->      <->          HM: horizontal margin  
-     <->                                            <->   M: margin alla around a row  
+                                   <->      <->          HM: horizontal margin
+     <->                                            <->   M: margin alla around a row
 	      <------------------------------------------->    FW: full width
-                           <------------------------>    DW: data width   
+                           <------------------------>    DW: data width
 
 */
 const int  M	= 1;											// margin all around a row
@@ -65,7 +63,7 @@ const int LH	= 18;											// label/entry height
 const int BH	= 20;											// button height
 
 const int LW	= 60;											// label width
-const int EW	= 48;											// entry width  - era 45
+const int EW	= 60;											// entry width  - (was 48)
 const int FW	= LW+LM+EW+HM+EW+HM+EW;		// full width
 const int DW	= EW+HM+EW+HM+EW;					// Data Width - Full Width without the Label
 
@@ -334,7 +332,8 @@ void mmgGui::Button  (int id,mafString *label,mafString button_text, mafString t
   if(m_UseBackgroundColor) 
     lab->SetBackgroundColour(m_BackgroundColor);
   w_id = GetId(id);
-  mmgButton    *butt = new mmgButton   (this, w_id, button_text.GetCStr(), dp, wxSize(FW-LW-2*HM, BH) );
+  //mmgButton    *butt = new mmgButton   (this, w_id, button_text.GetCStr(), dp, wxSize(FW-LW-2*HM, BH) );
+  mmgButton    *butt = new mmgButton   (this, w_id, button_text.GetCStr(), dp, wxSize(DW, BH) );
 	butt->SetValidator( mmgValidator(this,w_id,butt) );
 	if(!tooltip.IsEmpty()) 
     butt->SetToolTip(tooltip.GetCStr());
