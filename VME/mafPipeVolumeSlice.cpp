@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-04 15:26:06 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-11-05 10:15:51 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,6 +35,7 @@
 #include "vtkTexture.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkLookupTable.h"
+#include "vtkWindowLevelLookupTable.h"
 #include "vtkPolyData.h"
 #include "vtkActor.h"
 #include "vtkOutlineCornerFilter.h"
@@ -60,6 +61,7 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
     m_Image[i]            = NULL;
     m_Texture[i]		      = NULL;
     m_ColourLUT[i]        = NULL;
+    m_GrayLUT[i]          = NULL;
     m_SlicePolydata[i]		= NULL;
     m_SliceMapper[i]		  = NULL;
     m_SliceActor[i]	      = NULL;
@@ -99,6 +101,7 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
 void mafPipeVolumeSlice::InitializeSliceParameters(int mode, double slice_origin[3], bool show_vol_bbox)
 //----------------------------------------------------------------------------
 {
+  m_ParametersInitialized = true;
   m_SliceMode     = mode;
   m_ShowVolumeBox = show_vol_bbox;
 
@@ -110,6 +113,7 @@ void mafPipeVolumeSlice::InitializeSliceParameters(int mode, double slice_origin
 void mafPipeVolumeSlice::InitializeSliceParameters(int mode, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox)
 //----------------------------------------------------------------------------
 {
+  m_ParametersInitialized = true;
   m_SliceMode     = mode;
   m_ShowVolumeBox = show_vol_bbox;
 
@@ -142,7 +146,6 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
   Superclass::Create(n); // Always call this to initialize m_Vme, m_AssemblyFront, ... vars
 
   assert(m_Vme->IsMAFType(mafVMEVolume));
-  //mafVMEVolume *vme = ((mafVMEVolume *) m_Vme);
   m_Vme->GetOutput()->Update();
   m_Vme->GetOutput()->GetVTKData()->Update();
 
@@ -207,14 +210,13 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 
 	if(m_ShowVolumeBox)
 	{
-		m_VolumeBox = vtkOutlineCornerFilter::New();
+		vtkNEW(m_VolumeBox);
 		m_VolumeBox->SetInput(m_Vme->GetOutput()->GetVTKData());
 
-		m_VolumeBoxMapper = vtkPolyDataMapper::New();
+		vtkNEW(m_VolumeBoxMapper);
 		m_VolumeBoxMapper->SetInput(m_VolumeBox->GetOutput());
 
-		m_VolumeBoxActor = vtkActor::New();
-		//m_VolumeBoxActor->SetProperty(((mafVmeData*)m_vme->GetClientData())->m_mat_gui->GetMaterial()->m_prop);
+		vtkNEW(m_VolumeBoxActor);
 		m_VolumeBoxActor->SetMapper(m_VolumeBoxMapper);
 
 		m_AssemblyFront->AddPart(m_VolumeBoxActor);
@@ -225,14 +227,12 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 		m_VolumeBoxMapper = NULL;
 		m_VolumeBoxActor	= NULL;
 	}
-
-	//ghost - SIL. 26-5-2003 
 	// if the actor is in the background renderer
 	// create something invisible in the front renderer so that ResetCamera will work
   m_GhostActor = NULL;
   if(m_AssemblyBack != NULL)
 	{
-		m_GhostActor = vtkActor::New();
+		vtkNEW(m_GhostActor);
 		m_GhostActor->SetMapper(m_SliceMapper[m_SliceMode]);
 		m_GhostActor->PickableOff();
 		m_GhostActor->GetProperty()->SetOpacity(0);
@@ -247,22 +247,15 @@ void mafPipeVolumeSlice::CreateSlice(int mode)
 {
 	double srange[2],w,l, xspc = 0.33, yspc = 0.33;
 
-	//mafVMEVolume *vme = ((mafVMEVolume *) m_Vme);
   vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();
   vtk_data->Update();
-  if (vtk_data)
-    vtk_data->GetScalarRange(srange);
-  else
-  {
-    srange[0] = 0.0;
-    srange[1] = 1.0;
-  }
+  vtk_data->GetScalarRange(srange);
 
 	w = srange[1] - srange[0];
 	l = (srange[1] + srange[0]) * 0.5;
 
-	m_SlicerPolygonal[mode]= vtkVolumeSlicer::New();
-	m_SlicerImage[mode]	= vtkVolumeSlicer::New();
+	vtkNEW(m_SlicerPolygonal[mode]);
+	vtkNEW(m_SlicerImage[mode]);
 	m_SlicerImage[mode]->SetPlaneOrigin(m_Origin[0], m_Origin[1], m_Origin[2]);
 	m_SlicerPolygonal[mode]->SetPlaneOrigin(m_SlicerImage[mode]->GetPlaneOrigin());
 	m_SlicerImage[mode]->SetPlaneAxisX(m_XVector[mode]);
@@ -272,41 +265,44 @@ void mafPipeVolumeSlice::CreateSlice(int mode)
 	m_SlicerImage[mode]->SetInput(vtk_data);
 	m_SlicerPolygonal[mode]->SetInput(vtk_data);
 
-	m_Image[mode] = vtkImageData::New();
+	vtkNEW(m_Image[mode]);
   m_Image[mode]->SetScalarTypeToUnsignedChar();
 	m_Image[mode]->SetNumberOfScalarComponents(3);
 	m_Image[mode]->SetExtent(0, m_TextureRes - 1, 0, m_TextureRes - 1, 0, 0);
 	m_Image[mode]->SetSpacing(xspc, yspc, 1.f);
 
 	m_SlicerImage[mode]->SetOutput(m_Image[mode]);
+  m_SlicerImage[mode]->SetWindow(w);
+  m_SlicerImage[mode]->SetLevel(l);
 	m_SlicerImage[mode]->Update();
-	m_SlicerImage[mode]->SetWindow(w);
-	m_SlicerImage[mode]->SetLevel(l);
 
-  m_ColourLUT[mode] = vtkLookupTable::New();
+  vtkNEW(m_ColourLUT[mode]);
+  m_ColourLUT[mode]->SetRange(srange);
+  m_ColourLUT[mode]->Build();
+
+  vtkNEW(m_GrayLUT[mode]);
+  m_GrayLUT[mode]->SetWindow(w);
+  m_GrayLUT[mode]->SetLevel(l);
+  m_GrayLUT[mode]->Build();
   
-	m_Texture[mode] = vtkTexture::New();
+	vtkNEW(m_Texture[mode]);
 	m_Texture[mode]->RepeatOff();
 	m_Texture[mode]->InterpolateOn();
 	m_Texture[mode]->SetQualityTo32Bit();
 	m_Texture[mode]->SetInput(m_Image[mode]);
-  m_Texture[mode]->SetLookupTable(m_ColourLUT[mode]);
+  m_Texture[mode]->SetLookupTable(m_GrayLUT[mode]);
+  m_Texture[mode]->MapColorScalarsThroughLookupTableOn();
 
-  m_SlicePolydata[mode]	= vtkPolyData::New();
+  vtkNEW(m_SlicePolydata[mode]);
 	m_SlicerPolygonal[mode]->SetOutput(m_SlicePolydata[mode]);
 	m_SlicerPolygonal[mode]->SetTexture(m_Image[mode]);
 	m_SlicerPolygonal[mode]->Update();
 
-  double sr[2];
-  m_Image[mode]->GetScalarRange(sr);
-  m_ColourLUT[mode]->SetRange(sr);
-  m_ColourLUT[mode]->Build();
-
-	m_SliceMapper[mode]	= vtkPolyDataMapper::New();
+	vtkNEW(m_SliceMapper[mode]);
 	m_SliceMapper[mode]->SetInput(m_SlicePolydata[mode]);
 	m_SliceMapper[mode]->ScalarVisibilityOff();
 
-	m_SliceActor[mode] = vtkActor::New();
+	vtkNEW(m_SliceActor[mode]);
 	m_SliceActor[mode]->SetMapper(m_SliceMapper[mode]);
 	m_SliceActor[mode]->SetTexture(m_Texture[mode]);
 	m_SliceActor[mode]->GetProperty()->SetAmbient(1.f);
@@ -347,7 +343,6 @@ mafPipeVolumeSlice::~mafPipeVolumeSlice()
 void mafPipeVolumeSlice::Select(bool sel)
 //----------------------------------------------------------------------------
 {
-  //slices doesn't hilight
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeSlice::SetLutRange(double low, double hi)
@@ -357,9 +352,9 @@ void mafPipeVolumeSlice::SetLutRange(double low, double hi)
 	{
 		if(m_SlicerImage[i])
 		{
-      m_SlicerImage[i]->SetWindow(hi - low);
-      m_SlicerImage[i]->SetLevel((low + hi)*0.5);
-      m_SlicerImage[i]->Update();
+      m_GrayLUT[i]->SetWindow(hi - low);
+      m_GrayLUT[i]->SetLevel((low + hi)*0.5);
+      m_GrayLUT[i]->Build();
 		}
 	}
 }
@@ -368,9 +363,9 @@ void mafPipeVolumeSlice::GetLutRange(double range[2])
 //----------------------------------------------------------------------------
 {
 	if(m_SliceMode != SLICE_ORTHO)
-		m_SlicerImage[m_SliceMode]->GetOutput()->GetScalarRange(range);
+    m_Image[m_SliceMode]->GetScalarRange(range);
 	else
-		m_SlicerImage[0]->GetOutput()->GetScalarRange(range);
+    m_Image[0]->GetScalarRange(range);
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeSlice::SetSlice(double origin[3], float xVect[3], float yVect[3])
@@ -442,9 +437,13 @@ void mafPipeVolumeSlice::ColorLookupTable(bool enable)
     if(m_Texture[i])
     {
       if(enable)
-        m_Texture[i]->MapColorScalarsThroughLookupTableOn();
+      {
+        m_Texture[i]->SetLookupTable(m_ColourLUT[i]);
+      }
       else
-        m_Texture[i]->MapColorScalarsThroughLookupTableOff();
+      {
+        m_Texture[i]->SetLookupTable(m_GrayLUT[i]);
+      }
     }
   }
   m_ColorLUTEnabled = enable ? 1 : 0;
@@ -514,14 +513,14 @@ void mafPipeVolumeSlice::OnEvent(mafEventBase *maf_event)
       case ID_RGB_LUT:
       {
         ColorLookupTable(m_ColorLUTEnabled != 0);
-        m_Vme->ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       }
       break;
       case ID_SLICE_SLIDER_X:
       case ID_SLICE_SLIDER_Y:
       case ID_SLICE_SLIDER_Z:
         SetSlice(m_Origin);
-        m_Vme->ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
       default:
       break;

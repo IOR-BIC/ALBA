@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-04 15:26:06 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-11-05 10:15:40 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,6 +27,7 @@ class vtkPolyData;
 class vtkImageData;
 class vtkTexture;
 class vtkLookupTable;
+class vtkWindowLevelLookupTable;
 class vtkPolyDataMapper;
 class vtkActor;
 class vtkVolumeSlicer;
@@ -127,6 +128,7 @@ protected:
 	vtkImageData					 *m_Image[3];
 	vtkTexture						 *m_Texture[3];
   vtkLookupTable         *m_ColourLUT[3];
+  vtkWindowLevelLookupTable *m_GrayLUT[3];
   vtkPolyDataMapper			 *m_SliceMapper[3];
 	vtkPolyData						 *m_SlicePolydata[3];
   vtkActor               *m_SliceActor[3];
