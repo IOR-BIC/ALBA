@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-22 09:48:36 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-11-05 10:14:56 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -289,8 +289,7 @@ void mafPipeMeter::OnEvent(mafEventBase *maf_event)
         m_MeterVME->ForwardUpEvent(*e);
       break;
     }
-    mafEvent cam_event(this,CAMERA_UPDATE);
-    m_MeterVME->ForwardUpEvent(cam_event);
+    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
   else if (maf_event->GetSender() == m_MeterVME)
   {
