@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-05 10:13:40 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2005-11-05 11:58:36 $
+  Version:   $Revision: 1.32 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,6 +36,11 @@
 #include "vtkRendererCollection.h"
 #include "vtkRayCast3DPicker.h"
 #include "vtkCellPicker.h"
+#include "vtkTextMapper.h"
+#include "vtkTextProperty.h"
+#include "vtkProperty2D.h"
+#include "vtkActor2D.h"
+#include "vtkRenderer.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewVTK);
@@ -54,6 +59,12 @@ mafViewVTK::mafViewVTK(wxString label, int camera_position, bool show_axes, int 
   m_Sg        = NULL;
   m_Rwi       = NULL;
   m_LightKit  = NULL;
+  m_TextMapper= NULL;
+  m_TextActor = NULL;
+
+  m_TextPosition[0] = m_TextPosition[1] = 3;
+  m_TextColor[0] = m_TextColor[1] = m_TextColor[2] = 1;
+  m_TextInView = "";
 
   m_NumberOfVisibleVme = 0;
 
@@ -67,6 +78,9 @@ mafViewVTK::~mafViewVTK()
 {
   m_PipeMap.clear();
 
+  m_Rwi->m_RenFront->RemoveActor(m_TextActor);
+  vtkDEL(m_TextMapper);
+  vtkDEL(m_TextActor);
   vtkDEL(m_Picker2D);
   vtkDEL(m_Picker3D);
   cppDEL(m_LightKit);
@@ -114,6 +128,17 @@ void mafViewVTK::Create()
   vtkNEW(m_Picker2D);
   m_Picker2D->SetTolerance(0.001);
   m_Picker2D->InitializePickList();
+
+  vtkNEW(m_TextMapper);
+  m_TextMapper->SetInput(m_TextInView.GetCStr());
+  m_TextMapper->GetTextProperty()->AntiAliasingOff();
+
+  vtkNEW(m_TextActor);
+  m_TextActor->SetMapper(m_TextMapper);
+  m_TextActor->SetPosition(m_TextPosition);
+  m_TextActor->GetProperty()->SetColor(m_TextColor);
+
+  m_Rwi->m_RenFront->AddActor(m_TextActor);
 }
 //----------------------------------------------------------------------------
 void mafViewVTK::SetMouse(mmdMouse *mouse)
@@ -431,4 +456,23 @@ bool mafViewVTK::Pick(mafMatrix &m)
     }
   }
   return false;
+}
+//----------------------------------------------------------------------------
+void mafViewVTK::SetText(const char *text, int x, int y)
+//----------------------------------------------------------------------------
+{
+  m_TextInView = text;
+  m_TextPosition[0] = x;
+  m_TextPosition[1] = y;
+}
+//----------------------------------------------------------------------------
+void mafViewVTK::SetTextColor(double textColor[3])
+//----------------------------------------------------------------------------
+{
+  m_TextColor[0] = textColor[0];
+  m_TextColor[1] = textColor[1];
+  m_TextColor[2] = textColor[2];
+
+  if(m_TextActor) 
+    m_TextActor->GetProperty()->SetColor(m_TextColor);
 }

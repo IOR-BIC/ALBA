@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-04 15:23:24 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2005-11-05 11:58:36 $
+  Version:   $Revision: 1.29 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,6 +31,8 @@ class vtkMatrix4x4;
 class mmdMouse;
 class vtkRenderWindow;
 class vtkRenderer;
+class vtkTextMapper;
+class vtkActor2D;
 
 /** VME visibility attribute when plugging visual pipe.*/
 enum VME_VISIBILITY_ID
@@ -113,6 +115,14 @@ public:
   virtual vtkRenderWindow *GetRenderWindow();
 
   /** 
+  Insert a text into the renderwindow at position x,y. */
+  void SetText(const char *text, int x = 3, int y = 3);
+
+  /** 
+  Allow to change the text color.*/
+  void SetTextColor(double textColor[3]);
+
+  /** 
   Perform a picking according to the screen position (x,y) and return true on success*/
   virtual bool Pick(int x, int y);
 
@@ -154,6 +164,13 @@ protected:
   int   m_NumberOfVisibleVme; ///< perform ResetCamera only for the first vme shown into the view
   bool  m_ShowAxes;  ///< Flag used to show/hide axes in low left cornel of the view
   int   m_StereoType; ///< Indicate the stereo type to use with the view
+
+  double m_TextPosition[2]; ///< Position of the text. (0,0) is the lower left corner.
+  mafString m_TextInView; ///< Text visualized inside the view.
+  double m_TextColor[3]; ///< Color applied to text.
+
+  vtkTextMapper	*m_TextMapper;
+  vtkActor2D    *m_TextActor;
 
   virtual mmgGui *CreateGui();
 
