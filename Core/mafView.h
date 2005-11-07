@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-02 10:47:18 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2005-11-07 17:57:38 $
+  Version:   $Revision: 1.22 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -55,8 +55,6 @@ in order to update it's icons. (Note that mmgCheckTree doesn't know about
 the SceneGraph anymore)
 
 mafView doesn't have a Scenegraph, nor knowledge about VTK /sa mafViewVTK.
-
-The External Flag has been removed
 
 mafView can be the base class for composed Views.
 
