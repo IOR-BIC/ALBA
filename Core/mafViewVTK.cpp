@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-05 11:58:36 $
-  Version:   $Revision: 1.32 $
+  Date:      $Date: 2005-11-07 12:15:47 $
+  Version:   $Revision: 1.33 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -78,7 +78,10 @@ mafViewVTK::~mafViewVTK()
 {
   m_PipeMap.clear();
 
-  m_Rwi->m_RenFront->RemoveActor(m_TextActor);
+  if (m_TextActor)
+  {
+    m_Rwi->m_RenFront->RemoveActor(m_TextActor);
+  }
   vtkDEL(m_TextMapper);
   vtkDEL(m_TextActor);
   vtkDEL(m_Picker2D);
