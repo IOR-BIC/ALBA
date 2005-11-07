@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-19 11:38:01 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-11-07 12:13:37 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -141,6 +141,10 @@ bool mafVMELandmark::CanReparentTo(mafNode *parent)
   {  
     if ( vlmc->IsOpen() && vlmc->FindLandmarkIndex(this->GetName())<0  )
       return true;
+  }
+  else if (parent == NULL)
+  {
+    return Superclass::CanReparentTo(parent);
   }
 
   return false;
