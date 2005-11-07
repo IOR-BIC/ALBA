@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-03 09:00:02 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-11-07 13:32:23 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,12 +21,8 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmdMouse;
-class mafSceneGraph;
-class mmgGui;
-class mafRWIBase;
 class mmgLutSlider;
-class mafViewVTK;
+class mafViewSlice;
 
 //----------------------------------------------------------------------------
 // mafViewOrthoSlice :
@@ -41,17 +37,20 @@ public:
   mafTypeMacro(mafViewOrthoSlice, mafViewCompound);
 
   virtual mafView *Copy(mafObserver *Listener);
+  virtual void OnEvent(mafEventBase *maf_event);
   
   /** 
   Create the GUI on the bottom of the compounded view. */
-  virtual void     CreateGuiView();
+  virtual void CreateGuiView();
+
+  /** 
+  Show/Hide VMEs into plugged sub-views*/
+  virtual void VmeShow(mafNode *node, bool show);
 
   /** 
   Create visual pipe and initialize them to build an OrthoSlice visualization */
   void PackageView();
   
-  virtual void     OnEvent(mafEventBase *maf_event);
-
   /** IDs for the GUI */
   enum VIEW_ORTHO_SLICE_WIDGET_ID
   {
@@ -70,7 +69,7 @@ protected:
   virtual mmgGui  *CreateGui();
 
   mmgLutSlider *m_Luts;
-  mafViewVTK   *m_Views[4];
+  mafViewSlice *m_Views[4];
 };
 #endif
 

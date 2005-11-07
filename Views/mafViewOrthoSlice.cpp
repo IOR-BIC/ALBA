@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-03 09:00:02 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-11-07 13:32:23 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,13 +20,12 @@
 //----------------------------------------------------------------------------
 
 #include "mafViewOrthoSlice.h"
-#include "mafViewVTK.h"
-#include "mafRWI.h"
-#include "mafSceneGraph.h"
-#include "mafSceneNode.h"
-#include "mmgViewWin.h"
+#include "mafViewSlice.h"
 #include "mmgGui.h"
 #include "mmgLutSlider.h"
+#include "mafVMEVolume.h"
+
+#include "vtkDataSet.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewOrthoSlice);
@@ -47,6 +46,10 @@ mafViewOrthoSlice::mafViewOrthoSlice(wxString label, int num_row, int num_col, b
 mafViewOrthoSlice::~mafViewOrthoSlice()
 //----------------------------------------------------------------------------
 {
+  for (int v=0;v<4;v++)
+  {
+    cppDEL(m_Views[v]);
+  }
 }
 //----------------------------------------------------------------------------
 mafView *mafViewOrthoSlice::Copy(mafObserver *Listener)
@@ -61,12 +64,30 @@ mafView *mafViewOrthoSlice::Copy(mafObserver *Listener)
   return v;
 }
 //----------------------------------------------------------------------------
+void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
+//----------------------------------------------------------------------------
+{
+  for(int i=0; i<m_NumOfChildView; i++)
+    m_ChildViewList[i]->VmeShow(node, show);
+
+  if (show && node->IsMAFType(mafVMEVolume))
+  {
+    double sr[2];
+    vtkDataSet *data = ((mafVME *)node)->GetOutput()->GetVTKData();
+    data->Update();
+    data->GetScalarRange(sr);
+    m_Luts->SetRange((long)sr[0],(long)sr[1]);
+    m_Luts->SetSubRange((long)sr[0],(long)sr[1]);
+  }
+}
+//----------------------------------------------------------------------------
 void mafViewOrthoSlice::CreateGuiView()
 //----------------------------------------------------------------------------
 {
   m_GuiView = new mmgGui(this);
   m_Luts = new mmgLutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
   m_Luts->SetListener(this);
+  m_GuiView->Add(m_Luts);
   m_GuiView->Reparent(m_Win);
 }
 //----------------------------------------------------------------------------
@@ -81,10 +102,14 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
   	break;
     case ID_RANGE_MODIFIED:
     {
-      int low, hi;
-      m_Luts->GetSubRange(&low,&hi);
-      //SetLutRange(low,hi);
-      CameraUpdate();
+      if(((mafViewSlice *)m_ChildViewList[0])->VolumeIsVisible())
+      {
+        int low, hi;
+        m_Luts->GetSubRange(&low,&hi);
+        for(int i=0; i<4; i++) 
+          ((mafViewSlice *)m_ChildViewList[i])->SetLutRange(low, hi);
+        CameraUpdate();
+      }
     }
     break;
     default:
@@ -104,12 +129,14 @@ mmgGui* mafViewOrthoSlice::CreateGui()
 void mafViewOrthoSlice::PackageView()
 //----------------------------------------------------------------------------
 {
-  int cam_pos[] = {CAMERA_OS_P, CAMERA_OS_X, CAMERA_OS_Y, CAMERA_OS_Z};
+  int cam_pos[] = {CAMERA_OS_X, CAMERA_OS_Y, CAMERA_OS_Z, CAMERA_OS_P};
   for(int v=0; v<4; v++)
   {
-    m_Views[v] = new mafViewVTK("Slice view", cam_pos[v]);
+    m_Views[v] = new mafViewSlice("Slice view", cam_pos[v]);
     m_Views[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
-    PlugChildView(m_Views[v]);
   }
+  PlugChildView(m_Views[SLICE_ORTHO]);
+  PlugChildView(m_Views[SLICE_X]);
+  PlugChildView(m_Views[SLICE_Y]);
+  PlugChildView(m_Views[SLICE_Z]);
 }
-
