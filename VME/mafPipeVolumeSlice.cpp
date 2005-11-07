@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-05 10:15:51 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-11-07 18:08:49 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -276,13 +276,16 @@ void mafPipeVolumeSlice::CreateSlice(int mode)
   m_SlicerImage[mode]->SetLevel(l);
 	m_SlicerImage[mode]->Update();
 
+  double sr[2];
+  m_Image[mode]->GetScalarRange(sr);
+
   vtkNEW(m_ColourLUT[mode]);
-  m_ColourLUT[mode]->SetRange(srange);
+  m_ColourLUT[mode]->SetRange(sr);
   m_ColourLUT[mode]->Build();
 
   vtkNEW(m_GrayLUT[mode]);
-  m_GrayLUT[mode]->SetWindow(w);
-  m_GrayLUT[mode]->SetLevel(l);
+  m_GrayLUT[mode]->SetWindow(sr[1]-sr[0]);
+  m_GrayLUT[mode]->SetLevel((sr[1]-sr[0])*.5);
   m_GrayLUT[mode]->Build();
   
 	vtkNEW(m_Texture[mode]);
@@ -409,7 +412,21 @@ void mafPipeVolumeSlice::SetSlice(double origin[3])
 
 			m_SlicerImage[i]->Update();
 			m_SlicerPolygonal[i]->Update();
-		}
+
+      double sr[2];
+      m_Image[i]->GetScalarRange(sr);
+      if (m_ColorLUTEnabled)
+      {
+        m_ColourLUT[i]->SetRange(sr);
+        m_ColourLUT[i]->Build();
+      }
+      else
+      {
+        m_GrayLUT[i]->SetWindow(sr[1]-sr[0]);
+        m_GrayLUT[i]->SetLevel((sr[1]-sr[0])*.5);
+        m_GrayLUT[i]->Build();
+      }
+    }
 	}
 }
 //----------------------------------------------------------------------------
@@ -436,12 +453,19 @@ void mafPipeVolumeSlice::ColorLookupTable(bool enable)
   {
     if(m_Texture[i])
     {
+      double sr[2];
+      m_Image[i]->GetScalarRange(sr);
       if(enable)
       {
+        m_ColourLUT[i]->SetRange(sr);
+        m_ColourLUT[i]->Build();
         m_Texture[i]->SetLookupTable(m_ColourLUT[i]);
       }
       else
       {
+        m_GrayLUT[i]->SetWindow(sr[1]-sr[0]);
+        m_GrayLUT[i]->SetLevel((sr[1]-sr[0])*.5);
+        m_GrayLUT[i]->Build();
         m_Texture[i]->SetLookupTable(m_GrayLUT[i]);
       }
     }
