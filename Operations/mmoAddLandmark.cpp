@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoAddLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-21 10:05:32 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-11-07 12:14:54 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -101,6 +101,11 @@ void mmoAddLandmark::OpRun()
   {
     m_PickedVme = mafVME::SafeDownCast(m_Input);
     mafNEW(m_Cloud);
+    m_Cloud->Open();
+    m_Cloud->SetName("new landmark cloud");
+    m_Cloud->SetRadius(m_PickedVme->GetOutput()->GetVTKData()->GetLength()/60.0);
+    m_Cloud->ReparentTo(m_PickedVme);
+    mafEventMacro(mafEvent(this,VME_SHOW,m_Cloud,true));
     m_CloudCreatedFlag = true;
   }
   else if(m_Input->IsMAFType(mafVMELandmark))
@@ -118,7 +123,7 @@ void mmoAddLandmark::OpRun()
   {
     assert(false); 
   }
-  // customize m_PickedVme isa
+  // customize m_PickedVme behavior
   m_LandmarkPicker = mmiPicker::New();
   m_LandmarkPicker->SetListener(this);
 
@@ -209,14 +214,6 @@ void mmoAddLandmark::OpStop(int result)
 void mmoAddLandmark::AddLandmark(double pos[3])
 //----------------------------------------------------------------------------
 {
-  if(m_CloudCreatedFlag)
-  {
-    m_Cloud->Open();
-    m_Cloud->SetName("new landmark cloud");
-    m_Cloud->SetRadius(m_PickedVme->GetOutput()->GetVTKData()->GetLength()/60.0);
-    m_Cloud->ReparentTo(m_PickedVme);
-    mafEventMacro(mafEvent(this,VME_SHOW,m_Cloud,true));
-  }
   bool cloud_was_open = m_Cloud->IsOpen();
   if (!cloud_was_open)
   {
@@ -236,6 +233,7 @@ void mmoAddLandmark::AddLandmark(double pos[3])
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
   m_LandmarkAdded.push_back(landmark);
+  m_LandmarkAdded[m_LandmarkAdded.size()-1]->Register(NULL);
 
   if (!cloud_was_open)
   {
@@ -247,15 +245,34 @@ void mmoAddLandmark::AddLandmark(double pos[3])
 void mmoAddLandmark::AddLandmark()
 //----------------------------------------------------------------------------
 {
+  int reparent_result = MAF_OK;
   if(m_CloudCreatedFlag)
   {
-    m_Cloud->ReparentTo(m_PickedVme);
-    mafEventMacro(mafEvent(this,VME_SHOW,m_Cloud,true));
+    reparent_result = m_Cloud->ReparentTo(m_PickedVme);
+    if (reparent_result == MAF_OK)
+    {
+      mafEventMacro(mafEvent(this,VME_SHOW,m_Cloud,true));
+    }
   }
-  for (int l=0; l < m_LandmarkAdded.size(); l++)
+  else
   {
-    m_LandmarkAdded[l]->ReparentTo(m_Cloud);
-    mafEventMacro(mafEvent(this,VME_SHOW,m_LandmarkAdded[l],true));
+    bool cloud_was_open = m_Cloud->IsOpen();
+    if (!cloud_was_open)
+    {
+      m_Cloud->Open();
+    }
+    for (int l=0; l < m_LandmarkAdded.size(); l++)
+    {
+      reparent_result = m_LandmarkAdded[l]->ReparentTo(m_Cloud);
+      if (reparent_result == MAF_OK)
+      {
+        mafEventMacro(mafEvent(this,VME_SHOW,m_LandmarkAdded[l],true));
+      }
+    }
+    if (!cloud_was_open)
+    {
+      m_Cloud->Close();
+    }
   }
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
@@ -271,8 +288,7 @@ void mmoAddLandmark::RemoveLandmark()
   {
     for (int l=0; l < m_LandmarkAdded.size(); l++)
     {
-      m_LandmarkAdded[l]->ReparentTo(m_Cloud);
-      mafEventMacro(mafEvent(this,VME_REMOVE,m_LandmarkAdded[l],true));
+      mafEventMacro(mafEvent(this,VME_REMOVE,m_LandmarkAdded[l]));
     }
   }
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
