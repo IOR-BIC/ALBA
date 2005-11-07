@@ -8,6 +8,8 @@ PROJECT(medViews)
 SET(PROJECT_SRCS
   mafViewOrthoSlice.cpp
   mafViewOrthoSlice.h
+  mafViewSlice.cpp
+  mafViewSlice.h
 )
 
 # List libraries that are needed by this project.
