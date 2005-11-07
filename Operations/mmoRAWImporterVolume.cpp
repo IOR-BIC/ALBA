@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 11:59:43 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-11-07 17:58:41 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -129,6 +129,7 @@ void mmoRAWImporterVolume::OpRun()
 	
 	m_Dialog->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
   m_Dialog->GetRWI()->m_RenFront->AddActor(m_Actor);
+  m_Dialog->GetRWI()->CameraSet(CAMERA_CT);
   
 	//GUI +++++++++++++++++++++++++++++++++++++++++++
 	m_Gui->Show(true);
@@ -165,12 +166,10 @@ void mmoRAWImporterVolume::OpRun()
 	EnableWidgets(false);
 
 	//sizing & positioning +++++++++++++++++++++++++++++++++++++++++++
-//	m_Gui->FitGui();
-//	m_Gui->SetSize(220, 390);
 	m_Gui->Update();
    
   m_Dialog->GetGui()->AddGui(m_Gui);
-  m_Dialog->Add(m_GuiSlider, 0, wxEXPAND);
+  m_Dialog->Add(m_GuiSlider, 0);
 
   int x_pos,y_pos,w,h;
   mafGetFrame()->GetPosition(&x_pos,&y_pos);
@@ -235,13 +234,21 @@ void mmoRAWImporterVolume::	OnEvent(mafEventBase *maf_event)
       case ID_BITS:
       case ID_SCALAR_TYPE:
       case ID_SIGNED:
-      case ID_DIM:
       case ID_SPC:
-      case ID_SLICE:
+        m_Gui->Update();
+        UpdateReader();
+        m_Dialog->GetRWI()->CameraUpdate();
+      break;
+      case ID_DIM:
         if( m_CurrentSlice >= m_DataDimemsion[2] ) 
           m_CurrentSlice = m_DataDimemsion[2]-1;
         m_SliceSlider->SetRange(0,m_DataDimemsion[2] - 1);
         m_Gui->Update();
+        UpdateReader();
+        m_Dialog->GetRWI()->CameraUpdate();
+      break;
+      case ID_SLICE:
+        m_GuiSlider->Update();
         UpdateReader();
         m_Dialog->GetRWI()->CameraUpdate();
       break;
@@ -346,31 +353,39 @@ bool mmoRAWImporterVolume::Import()
 		break;
 		case SHORT_SCALAR:
 			reader->SetDataScalarType( (m_Signed) ? VTK_SHORT : VTK_UNSIGNED_SHORT);
-			if(m_Endian == 1)
+			if(m_Endian == 0)
 				reader->SetDataByteOrderToBigEndian();
-			else if(m_Endian == 2)
+			else
 				reader->SetDataByteOrderToLittleEndian();
 		break;
 		case INT_SCALAR:
 			reader->SetDataScalarType( (m_Signed) ? VTK_INT : VTK_UNSIGNED_INT);
-			if(m_Endian == 1)
+			if(m_Endian == 0)
 				reader->SetDataByteOrderToBigEndian();
-			else if(m_Endian == 2)
+			else
 				reader->SetDataByteOrderToLittleEndian();
 		break;
 		case FLOAT_SCALAR:
 			reader->SetDataScalarType(VTK_FLOAT);
+      if(m_Endian == 0)
+        reader->SetDataByteOrderToBigEndian();
+      else
+        reader->SetDataByteOrderToLittleEndian();
 		break;
 		case DOUBLE_SCALAR:
 			reader->SetDataScalarType(VTK_DOUBLE);
+      if(m_Endian == 0)
+        reader->SetDataByteOrderToBigEndian();
+      else
+        reader->SetDataByteOrderToLittleEndian();
 		break;
 	}
 
 	reader->SetDataExtent(0, m_DataDimemsion[0] - 1, 0, m_DataDimemsion[1] - 1, 0, m_DataDimemsion[2] - 1);
-	reader->SetDataVOI(0, m_DataDimemsion[0] - 1, 0, m_DataDimemsion[1] - 1, 0, m_DataDimemsion[2] - 1);
 	reader->SetDataSpacing(m_DataSpacing);
 	reader->SetHeaderSize(m_FileHeader);
 	reader->SetFileDimensionality(3);
+  reader->SetDataVOI(0, m_DataDimemsion[0] - 1, 0, m_DataDimemsion[1] - 1, 0, m_DataDimemsion[2] - 1);
 	reader->Update();
 
 	mafNEW(m_VolumeGray);
