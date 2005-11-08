@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-25 13:28:34 $
-  Version:   $Revision: 1.20 $
-  Authors:   Silvano Imboden
+  Date:      $Date: 2005-11-08 11:02:37 $
+  Version:   $Revision: 1.21 $
+  Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
   CINECA - Interuniversity Consortium (www.cineca.it) 

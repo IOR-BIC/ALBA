@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-05 11:10:23 $
-  Version:   $Revision: 1.23 $
-  Authors:   Silvano Imboden
+  Date:      $Date: 2005-11-08 11:02:37 $
+  Version:   $Revision: 1.24 $
+  Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -1092,7 +1092,7 @@ void mmgGui::VectorN(int id,wxString label, double *var,int num_elem,double min,
 
 	// the space available for widget is divided in num_elem pieces
 	// and widgetS ARE placed in each piece 
-  int w = space/num_elem -HM; 
+  int w = space/num_elem - M;
 	
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 	if(label != "")
@@ -1121,7 +1121,7 @@ void mmgGui::VectorN(int id,wxString label, int *var,int num_elem,int min, int m
 
 	// the space available for widget is divided in num_elem pieces
 	// and widgetS ARE placed in each piece 
-  int w = space/num_elem -HM; 
+  int w = space/num_elem - M; 
 	
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 	if(label != "")
