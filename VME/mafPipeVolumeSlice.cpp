@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-07 18:08:49 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-11-08 16:08:25 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,7 +35,6 @@
 #include "vtkTexture.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkLookupTable.h"
-#include "vtkWindowLevelLookupTable.h"
 #include "vtkPolyData.h"
 #include "vtkActor.h"
 #include "vtkOutlineCornerFilter.h"
@@ -60,8 +59,7 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
     m_SlicerImage[i]			= NULL;
     m_Image[i]            = NULL;
     m_Texture[i]		      = NULL;
-    m_ColourLUT[i]        = NULL;
-    m_GrayLUT[i]          = NULL;
+    m_ColorLUT[i]        = NULL;
     m_SlicePolydata[i]		= NULL;
     m_SliceMapper[i]		  = NULL;
     m_SliceActor[i]	      = NULL;
@@ -276,25 +274,16 @@ void mafPipeVolumeSlice::CreateSlice(int mode)
   m_SlicerImage[mode]->SetLevel(l);
 	m_SlicerImage[mode]->Update();
 
-  double sr[2];
-  m_Image[mode]->GetScalarRange(sr);
-
-  vtkNEW(m_ColourLUT[mode]);
-  m_ColourLUT[mode]->SetRange(sr);
-  m_ColourLUT[mode]->Build();
-
-  vtkNEW(m_GrayLUT[mode]);
-  m_GrayLUT[mode]->SetWindow(sr[1]-sr[0]);
-  m_GrayLUT[mode]->SetLevel((sr[1]-sr[0])*.5);
-  m_GrayLUT[mode]->Build();
+  vtkNEW(m_ColorLUT[mode]);
+  m_ColorLUT[mode]->SetRange(srange);
+  m_ColorLUT[mode]->Build();
   
 	vtkNEW(m_Texture[mode]);
 	m_Texture[mode]->RepeatOff();
 	m_Texture[mode]->InterpolateOn();
 	m_Texture[mode]->SetQualityTo32Bit();
 	m_Texture[mode]->SetInput(m_Image[mode]);
-  m_Texture[mode]->SetLookupTable(m_GrayLUT[mode]);
-  m_Texture[mode]->MapColorScalarsThroughLookupTableOn();
+  m_Texture[mode]->SetLookupTable(m_ColorLUT[mode]);
 
   vtkNEW(m_SlicePolydata[mode]);
 	m_SlicerPolygonal[mode]->SetOutput(m_SlicePolydata[mode]);
@@ -329,7 +318,7 @@ mafPipeVolumeSlice::~mafPipeVolumeSlice()
 		vtkDEL(m_SlicerPolygonal[i]);
 		vtkDEL(m_Image[i]);
 		vtkDEL(m_Texture[i]);
-    vtkDEL(m_ColourLUT[i]);
+    vtkDEL(m_ColorLUT[i]);
 		vtkDEL(m_SliceMapper[i]);
 		vtkDEL(m_SlicePolydata[i]);
 		vtkDEL(m_SliceActor[i]);
@@ -355,9 +344,9 @@ void mafPipeVolumeSlice::SetLutRange(double low, double hi)
 	{
 		if(m_SlicerImage[i])
 		{
-      m_GrayLUT[i]->SetWindow(hi - low);
-      m_GrayLUT[i]->SetLevel((low + hi)*0.5);
-      m_GrayLUT[i]->Build();
+      m_SlicerImage[i]->SetWindow(hi - low);
+      m_SlicerImage[i]->SetLevel((low + hi)*0.5);
+      m_SlicerImage[i]->Update();
 		}
 	}
 }
@@ -412,20 +401,6 @@ void mafPipeVolumeSlice::SetSlice(double origin[3])
 
 			m_SlicerImage[i]->Update();
 			m_SlicerPolygonal[i]->Update();
-
-      double sr[2];
-      m_Image[i]->GetScalarRange(sr);
-      if (m_ColorLUTEnabled)
-      {
-        m_ColourLUT[i]->SetRange(sr);
-        m_ColourLUT[i]->Build();
-      }
-      else
-      {
-        m_GrayLUT[i]->SetWindow(sr[1]-sr[0]);
-        m_GrayLUT[i]->SetLevel((sr[1]-sr[0])*.5);
-        m_GrayLUT[i]->Build();
-      }
     }
 	}
 }
@@ -453,20 +428,13 @@ void mafPipeVolumeSlice::ColorLookupTable(bool enable)
   {
     if(m_Texture[i])
     {
-      double sr[2];
-      m_Image[i]->GetScalarRange(sr);
       if(enable)
       {
-        m_ColourLUT[i]->SetRange(sr);
-        m_ColourLUT[i]->Build();
-        m_Texture[i]->SetLookupTable(m_ColourLUT[i]);
+        m_Texture[i]->MapColorScalarsThroughLookupTableOn();
       }
       else
       {
-        m_GrayLUT[i]->SetWindow(sr[1]-sr[0]);
-        m_GrayLUT[i]->SetLevel((sr[1]-sr[0])*.5);
-        m_GrayLUT[i]->Build();
-        m_Texture[i]->SetLookupTable(m_GrayLUT[i]);
+        m_Texture[i]->MapColorScalarsThroughLookupTableOff();
       }
     }
   }
