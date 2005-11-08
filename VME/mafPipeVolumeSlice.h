@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-05 10:15:40 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-11-08 16:07:51 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,22 +27,10 @@ class vtkPolyData;
 class vtkImageData;
 class vtkTexture;
 class vtkLookupTable;
-class vtkWindowLevelLookupTable;
 class vtkPolyDataMapper;
 class vtkActor;
 class vtkVolumeSlicer;
 
-//----------------------------------------------------------------------------
-// constant:
-//----------------------------------------------------------------------------
-enum SLICE_DIRECTION_ID
-{
-  SLICE_X = 0,
-  SLICE_Y, 
-  SLICE_Z, 
-  SLICE_ORTHO,
-  SLICE_ARB
-};
 //----------------------------------------------------------------------------
 // mafPipeVolumeSlice :
 //----------------------------------------------------------------------------
@@ -56,6 +44,18 @@ public:
 	
   /** process events coming from gui */
   virtual void OnEvent(mafEventBase *maf_event);
+
+  //----------------------------------------------------------------------------
+  // constant:
+  //----------------------------------------------------------------------------
+  enum SLICE_DIRECTION_ID
+  {
+    SLICE_X = 0,
+    SLICE_Y, 
+    SLICE_Z, 
+    SLICE_ORTHO,
+    SLICE_ARB
+  };
 
   /** IDs for the GUI */
   enum PIPE_VOLUME_SLICE_WIDGET_ID
@@ -127,8 +127,7 @@ protected:
 	vtkVolumeSlicer				 *m_SlicerPolygonal[3];
 	vtkImageData					 *m_Image[3];
 	vtkTexture						 *m_Texture[3];
-  vtkLookupTable         *m_ColourLUT[3];
-  vtkWindowLevelLookupTable *m_GrayLUT[3];
+  vtkLookupTable         *m_ColorLUT[3];
   vtkPolyDataMapper			 *m_SliceMapper[3];
 	vtkPolyData						 *m_SlicePolydata[3];
   vtkActor               *m_SliceActor[3];
