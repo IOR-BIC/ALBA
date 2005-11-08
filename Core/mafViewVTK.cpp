@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-07 12:15:47 $
-  Version:   $Revision: 1.33 $
+  Date:      $Date: 2005-11-08 09:43:52 $
+  Version:   $Revision: 1.34 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -135,6 +135,11 @@ void mafViewVTK::Create()
   vtkNEW(m_TextMapper);
   m_TextMapper->SetInput(m_TextInView.GetCStr());
   m_TextMapper->GetTextProperty()->AntiAliasingOff();
+  m_TextMapper->GetTextProperty()->SetFontFamily(VTK_TIMES);
+  m_TextMapper->GetTextProperty()->SetColor(0.8,0.8,0.8);
+  m_TextMapper->GetTextProperty()->SetLineOffset(0.5);
+  m_TextMapper->GetTextProperty()->SetLineSpacing(1.5);
+  m_TextMapper->GetTextProperty()->SetJustificationToLeft();
 
   vtkNEW(m_TextActor);
   m_TextActor->SetMapper(m_TextMapper);
