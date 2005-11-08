@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-03 13:14:37 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-11-08 09:44:18 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,9 +21,10 @@
 
 
 #include "mafLogicWithGUI.h"
-#include "wx/utils.h"
-#include "wx/datetime.h"
-#include "wx/busyinfo.h"
+#include <wx/utils.h>
+#include <wx/datetime.h>
+#include <wx/busyinfo.h>
+#include <wx/splash.h>
 #include "mafDecl.h"
 #include "mafView.h"
 #include "mmgMDIFrame.h"
@@ -63,9 +64,12 @@ mafLogicWithGUI::mafLogicWithGUI()
 	m_PlugSidebar	  = true;
 	m_PlugTimebar	  = true;
 	m_PlugLogbar	  = true;
+  
+  m_ShowDefaultSplashScreen = false;
+  m_ShowSplashScreen        = false;
 }
 //----------------------------------------------------------------------------
-mafLogicWithGUI::~mafLogicWithGUI( ) 
+mafLogicWithGUI::~mafLogicWithGUI()
 //----------------------------------------------------------------------------
 {
 }
@@ -83,6 +87,21 @@ void mafLogicWithGUI::Configure()
 void mafLogicWithGUI::Show()
 //----------------------------------------------------------------------------
 {
+  if (m_ShowDefaultSplashScreen)
+  {
+    m_SplashImage = mafPics.GetBmp("MAF");
+  }
+
+  if (m_ShowSplashScreen)
+  {
+    long splash_style = wxSIMPLE_BORDER | wxSTAY_ON_TOP;
+    wxSplashScreen* splash = new wxSplashScreen(m_SplashImage,
+      wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_TIMEOUT,
+      4000, NULL, -1, wxDefaultPosition, wxDefaultSize,
+      splash_style);
+  }
+  mafYield();
+
   m_AppTitle = m_Win->GetTitle().c_str();
 	m_Win->Show(TRUE);
 }

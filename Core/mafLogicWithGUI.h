@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.h,v $
   Language:  C++
-  Date:      $Date: 2005-08-31 09:10:50 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-11-08 09:44:18 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -96,6 +96,15 @@ public:
 	/** Sets the flag to know if Log bar should be built.*/
 	void PlugLogbar(bool plug)	{m_PlugLogbar		= plug;};
 
+  /** 
+  Enable to show the default splash screen for the application. 
+  It has to be called before the Show method, because it show the splash screen. */
+  void ShowDefaultSplashScreenOn() {m_ShowDefaultSplashScreen = true; m_ShowSplashScreen = true;};
+
+  /** 
+  Set a custom image for the splash screen. */
+  void SetSplashImage(wxBitmap &splash_image) {m_SplashImage = splash_image; m_ShowSplashScreen = true;};
+
 protected:
 	/** Create the main men.*/
 	virtual void CreateMenu();
@@ -134,8 +143,12 @@ protected:
 	mafString					 m_AppTitle;
 	bool               m_LogToFile;
 	bool               m_LogAllEvents;
+  bool               m_ShowDefaultSplashScreen;
+  bool               m_ShowSplashScreen;
   mafWXLog          *m_Logger;
   mafVTKLog         *m_VtkLog;
+
+  wxBitmap m_SplashImage;
 
 	bool m_PlugMenu;
 	bool m_PlugToolbar;
