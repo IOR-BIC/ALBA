@@ -1,5 +1,5 @@
 /* XPM */
-static char *MAF_xpm[] = {
+static char *SPLASH_SCREEN_xpm[] = {
 /* columns rows colors chars-per-pixel */
 "383 160 6684 2",
 "CU c #747272",
