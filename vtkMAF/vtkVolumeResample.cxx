@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkVolumeResample.cxx,v $
   Language:  C++
-  Date:      $Date: 2005-04-22 11:08:57 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-11-08 16:06:09 $
+  Version:   $Revision: 1.3 $
 
 =========================================================================*/
 #include "vtkObjectFactory.h"
@@ -21,7 +21,7 @@
 
 #include "assert.h"
 
-vtkCxxRevisionMacro(vtkVolumeResample, "$Revision: 1.2 $");
+vtkCxxRevisionMacro(vtkVolumeResample, "$Revision: 1.3 $");
 vtkStandardNewMacro(vtkVolumeResample);
 
 typedef unsigned short u_short;
@@ -41,7 +41,7 @@ inline void clip(float val, u_short & out) { int x = VTK_UNSIGNED_SHORT_MAX * va
 //--------------------------------------------------------------------------
 // The 'floor' function on x86 and mips is many times slower than these
 // and is used a lot in this code, optimize for different CPU architectures
-inline int mflVolumeResliceFloor(double x)
+inline int mafVolumeResliceFloor(double x)
 {
 #if defined mips || defined sparc || defined __ppc__
   return (int)((u_int)(x + 2147483648.0) - 2147483648U);
@@ -54,14 +54,14 @@ inline int mflVolumeResliceFloor(double x)
 #endif
 }
 
-inline int mflVolumeResliceCeil(double x)
+inline int mafVolumeResliceCeil(double x)
 {
-  return -mflVolumeResliceFloor(-x - 1.0) - 1;
+  return -mafVolumeResliceFloor(-x - 1.0) - 1;
 }
 
-inline int mflVolumeResliceRound(double x)
+inline int mafVolumeResliceRound(double x)
 {
-  return mflVolumeResliceFloor(x + 0.5);
+  return mafVolumeResliceFloor(x + 0.5);
 }
 
 static const int SamplingTableSize = 64000;
@@ -458,8 +458,8 @@ template<typename InputDataType, typename OutputDataType> void vtkVolumeResample
     const int lastIndex = this->DataDimensions[c] - 1; // number of points in input data's "c" dimension
     const double coordToIndex = double(SamplingTableSize - 1) / (coords[lastIndex] - coords[0]);
     for (int i = 0, ti0 = 0; i <= lastIndex; i++) {
-      //const int ti1 = mflVolumeResliceRound((i != lastIndex) ? (coords[i] - coords[0]) * coordToIndex : (SamplingTableSize - 1));
-      const int ti1 = mflVolumeResliceFloor((i != lastIndex) ? (coords[i] - coords[0]) * coordToIndex : (SamplingTableSize - 1));
+      //const int ti1 = mafVolumeResliceRound((i != lastIndex) ? (coords[i] - coords[0]) * coordToIndex : (SamplingTableSize - 1));
+      const int ti1 = mafVolumeResliceFloor((i != lastIndex) ? (coords[i] - coords[0]) * coordToIndex : (SamplingTableSize - 1));
       if (ti1 <= ti0)
         continue;
       for (int ti = ti0; ti <= ti1; ti++) {
@@ -503,8 +503,8 @@ template<typename InputDataType, typename OutputDataType> void vtkVolumeResample
       {
         // find index
         //const u_int pi[3] = { u_int(p[0]), u_int(p[1]), u_int(p[2])};
-        const u_int pi[3] = { mflVolumeResliceFloor(p[0]), mflVolumeResliceFloor(p[1]), mflVolumeResliceFloor(p[2])};
-        //const u_int pi[3] = { mflVolumeResliceRound(p[0]), mflVolumeResliceRound(p[1]), mflVolumeResliceRound(p[2])};
+        const u_int pi[3] = { mafVolumeResliceFloor(p[0]), mafVolumeResliceFloor(p[1]), mafVolumeResliceFloor(p[2])};
+        //const u_int pi[3] = { mafVolumeResliceRound(p[0]), mafVolumeResliceRound(p[1]), mafVolumeResliceRound(p[2])};
 
         if (pi[0] >= SamplingTableSize || pi[1] >= SamplingTableSize || pi[2] >= SamplingTableSize)
         {
