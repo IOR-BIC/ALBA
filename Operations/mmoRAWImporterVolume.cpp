@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-07 17:58:41 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-11-08 16:09:45 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -61,6 +61,8 @@ mmoRAWImporterVolume::mmoRAWImporterVolume(wxString label) : mafOp(label)
 	m_DataDimemsion[1] = 512;
 	m_DataDimemsion[2] = 1;
 
+  m_SliceVOI[0] = m_SliceVOI[1] = 0;
+
 	m_NumberOfByte = 0;
 	
 	m_Dialog = NULL;
@@ -93,13 +95,14 @@ enum RAW_IMPORTER_ID
 	ID_SCALAR_TYPE,
 	ID_SIGNED,
 	ID_DIM,
+  ID_VOI_SLICES,
 	ID_SPC,
 	ID_HEADER,
 	ID_GUESS,
 	ID_SLICE,
 };
 //----------------------------------------------------------------------------
-void mmoRAWImporterVolume::OpRun()   
+void mmoRAWImporterVolume::OpRun()
 //----------------------------------------------------------------------------
 {
 	m_Gui = new mmgGui(this);
@@ -147,6 +150,7 @@ void mmoRAWImporterVolume::OpRun()
 	m_Gui->Divider(0);
 	m_Gui->Label("dimensions (x,y,z)");
 	m_Gui->Vector(ID_DIM, "",m_DataDimemsion,1,10000); 
+  m_Gui->VectorN(ID_VOI_SLICES,"slices VOI",m_SliceVOI,2,0,MAXINT,"define the range of slice to import.");
 	
 	m_Gui->Divider(0);
 	m_Gui->Label("spacing in mm/pixel (x,y,z)");
@@ -206,6 +210,7 @@ void mmoRAWImporterVolume::EnableWidgets(bool enable)
 	m_Gui->Enable(ID_SCALAR_TYPE,	enable);
 	m_Gui->Enable(ID_SIGNED,	    enable);
 	m_Gui->Enable(ID_DIM,		      enable); 
+  m_Gui->Enable(ID_VOI_SLICES,  enable); 
 	m_Gui->Enable(ID_SPC,		      enable); 
 	m_Gui->Enable(ID_GUESS,		    enable);
 	m_Gui->Enable(ID_HEADER,	    enable);
@@ -385,7 +390,7 @@ bool mmoRAWImporterVolume::Import()
 	reader->SetDataSpacing(m_DataSpacing);
 	reader->SetHeaderSize(m_FileHeader);
 	reader->SetFileDimensionality(3);
-  reader->SetDataVOI(0, m_DataDimemsion[0] - 1, 0, m_DataDimemsion[1] - 1, 0, m_DataDimemsion[2] - 1);
+  reader->SetDataVOI(0, m_DataDimemsion[0] - 1, 0, m_DataDimemsion[1] - 1, m_SliceVOI[0], m_SliceVOI[1] - 1);
 	reader->Update();
 
 	mafNEW(m_VolumeGray);
