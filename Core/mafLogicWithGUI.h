@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-08 09:44:18 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-11-08 10:38:27 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -97,13 +97,9 @@ public:
 	void PlugLogbar(bool plug)	{m_PlugLogbar		= plug;};
 
   /** 
-  Enable to show the default splash screen for the application. 
-  It has to be called before the Show method, because it show the splash screen. */
-  void ShowDefaultSplashScreenOn() {m_ShowDefaultSplashScreen = true; m_ShowSplashScreen = true;};
-
-  /** 
-  Set a custom image for the splash screen. */
-  void SetSplashImage(wxBitmap &splash_image) {m_SplashImage = splash_image; m_ShowSplashScreen = true;};
+  Show the splash screen for the application. To define your own splash screen image simply
+  overwrite the SPLASH_SCREEN image into the picture factory by plugging your .xpm image. \sa mafPictureFactory*/
+  virtual void ShowSplashScreen();
 
 protected:
 	/** Create the main men.*/
@@ -143,17 +139,13 @@ protected:
 	mafString					 m_AppTitle;
 	bool               m_LogToFile;
 	bool               m_LogAllEvents;
-  bool               m_ShowDefaultSplashScreen;
-  bool               m_ShowSplashScreen;
   mafWXLog          *m_Logger;
   mafVTKLog         *m_VtkLog;
 
-  wxBitmap m_SplashImage;
-
-	bool m_PlugMenu;
-	bool m_PlugToolbar;
-	bool m_PlugSidebar;
-	bool m_PlugTimebar;
-	bool m_PlugLogbar;
+	bool m_PlugMenu;    ///< Flag to plug or not the Menu into the application. Default is true.
+	bool m_PlugToolbar; ///< Flag to plug or not the Toolbar into the application. Default is true.
+	bool m_PlugSidebar; ///< Flag to plug or not the Side-bar into the application. Default is true.
+	bool m_PlugTimebar; ///< Flag to plug or not the Time-bar into the application. Default is true.
+	bool m_PlugLogbar;  ///< Flag to plug or not the Log area into the application. Default is true.
 };
 #endif
