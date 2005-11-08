@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-21 13:17:17 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2005-11-08 09:46:01 $
+  Version:   $Revision: 1.32 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -77,90 +77,91 @@ bool exOperationApp::OnInit()
   result = mafPipeFactoryVME::Initialize();
   assert(result==MAF_OK);
 
-  m_logic = new mafLogicWithManagers();
-  //m_logic->PlugTimebar(false);
-  //m_logic->PlugMenu(false);
-  //m_logic->PlugToolbar(false);
-  //m_logic->PlugLogbar(false);
-  //m_logic->PlugSidebar(false);
-  //m_logic->PlugOpManager(false);
-  //m_logic->PlugViewManager(false);
-  //m_logic->PlugVMEManager(false);  // the VmeManager at the moment cause 4 leaks of 200+32+24+56 bytes  //SIL. 20-4-2005: 
-  m_logic->Configure();
+  m_Logic = new mafLogicWithManagers();
+  //m_Logic->PlugTimebar(false);
+  //m_Logic->PlugMenu(false);
+  //m_Logic->PlugToolbar(false);
+  //m_Logic->PlugLogbar(false);
+  //m_Logic->PlugSidebar(false);
+  //m_Logic->PlugOpManager(false);
+  //m_Logic->PlugViewManager(false);
+  //m_Logic->PlugVMEManager(false);  // the VmeManager at the moment cause 4 leaks of 200+32+24+56 bytes  //SIL. 20-4-2005: 
+  m_Logic->Configure();
 
-  m_logic->GetTopWin()->SetTitle("Operations example");
+  m_Logic->GetTopWin()->SetTitle("Operations example");
   SetTopWindow(mafGetFrame());  
 
   //------------------------------------------------------------
   // Importer Menu':
-  m_logic->Plug(new mmoImageImporter("Images"));
-  m_logic->Plug(new mmoRAWImporterVolume("RAW Volume"));
-  m_logic->Plug(new mmoSTLImporter("STL"));
-  m_logic->Plug(new mmoVRMLImporter("VRML"));
-  m_logic->Plug(new mmoVTKImporter("VTK"));
-  m_logic->Plug(new mmoMSF1xImporter("MSF 1.x"));
+  m_Logic->Plug(new mmoImageImporter("Images"));
+  m_Logic->Plug(new mmoRAWImporterVolume("RAW Volume"));
+  m_Logic->Plug(new mmoSTLImporter("STL"));
+  m_Logic->Plug(new mmoVRMLImporter("VRML"));
+  m_Logic->Plug(new mmoVTKImporter("VTK"));
+  m_Logic->Plug(new mmoMSF1xImporter("MSF 1.x"));
   //------------------------------------------------------------
 
   //------------------------------------------------------------
   // Exporter Menu':
-  m_logic->Plug(new mmoMSFExporter("MSF"));
-  m_logic->Plug(new mmoSTLExporter("STL"));
-  m_logic->Plug(new mmoVTKExporter("VTK"));
+  m_Logic->Plug(new mmoMSFExporter("MSF"));
+  m_Logic->Plug(new mmoSTLExporter("STL"));
+  m_Logic->Plug(new mmoVTKExporter("VTK"));
   //------------------------------------------------------------
 
   //------------------------------------------------------------
   // Operation Menu':
-  m_logic->Plug(new mmo2DMeasure("2D Measure"));
-  m_logic->Plug(new mmoAddLandmark("Add Landmark"));
-  m_logic->Plug(new mmoClipSurface("Clip Surface"));
-  m_logic->Plug(new mmoCreateGroup("Create Group"));
-  m_logic->Plug(new mmoCreateMeter("Create Meter"));
-  m_logic->Plug(new mmoCreateRefSys("Create RefSys"));
-  m_logic->Plug(new mmoCreateProber("Create Prober"));
-  m_logic->Plug(new mmoCreateSlicer("Create Slicer"));
-  m_logic->Plug(new mmoExplodeCollapse("Explode/Collapse cloud"));
-  m_logic->Plug(new mmoExtractIsosurface("Extract Isosurface"));
-  m_logic->Plug(new mmoFilterSurface("Filter Surface"));
-  m_logic->Plug(new mmoMAFTransform("MAF Transform  \tCtrl+T"));
-  m_logic->Plug(new mmoReparentTo("Reparent to...  \tCtrl+R"));
+  m_Logic->Plug(new mmo2DMeasure("2D Measure"));
+  m_Logic->Plug(new mmoAddLandmark("Add Landmark"));
+  m_Logic->Plug(new mmoClipSurface("Clip Surface"));
+  m_Logic->Plug(new mmoCreateGroup("Create Group"));
+  m_Logic->Plug(new mmoCreateMeter("Create Meter"));
+  m_Logic->Plug(new mmoCreateRefSys("Create RefSys"));
+  m_Logic->Plug(new mmoCreateProber("Create Prober"));
+  m_Logic->Plug(new mmoCreateSlicer("Create Slicer"));
+  m_Logic->Plug(new mmoExplodeCollapse("Explode/Collapse cloud"));
+  m_Logic->Plug(new mmoExtractIsosurface("Extract Isosurface"));
+  m_Logic->Plug(new mmoFilterSurface("Filter Surface"));
+  m_Logic->Plug(new mmoMAFTransform("MAF Transform  \tCtrl+T"));
+  m_Logic->Plug(new mmoReparentTo("Reparent to...  \tCtrl+R"));
   //------------------------------------------------------------
   
   //------------------------------------------------------------
   // View Menu':
-  m_logic->Plug(new mafViewVTK("VTK view"));
+  m_Logic->Plug(new mafViewVTK("VTK view"));
   mafViewVTK *v = new mafViewVTK("Slice view", CAMERA_CT);
   v->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
-  m_logic->Plug(v);
+  m_Logic->Plug(v);
   mafViewVTK *viso = new mafViewVTK("Isosurface view");
   viso->PlugVisualPipe("mafVMEVolumeGray", "mafPipeIsosurface");
-  m_logic->Plug(viso);
+  m_Logic->Plug(viso);
 
   mafViewCompound *vc = new mafViewCompound("view compound",3);
   mafViewVTK *v2 = new mafViewVTK("Slice view", CAMERA_CT);
   v2->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
   vc->PlugChildView(v2);
-  m_logic->Plug(vc);
+  m_Logic->Plug(vc);
   //------------------------------------------------------------
 
   //wxHandleFatalExceptions();
 
-  m_logic->Show();
+  m_Logic->ShowDefaultSplashScreenOn();
+  m_Logic->Show();
   mafString app_stamp;
   app_stamp = "OPEN_ALL_DATA";
-  m_logic->SetApplicationStamp(app_stamp);
-  m_logic->Init(0,NULL); // calls FileNew - which create the root
+  m_Logic->SetApplicationStamp(app_stamp);
+  m_Logic->Init(0,NULL); // calls FileNew - which create the root
   return TRUE;
 }
 //--------------------------------------------------------------------------------
 int exOperationApp::OnExit()
 //--------------------------------------------------------------------------------
 {
-  cppDEL(m_logic);
+  cppDEL(m_Logic);
   return 0;
 }
 //--------------------------------------------------------------------------------
 void exOperationApp::OnFatalException()
 //--------------------------------------------------------------------------------
 {
-  m_logic->HandleException();
+  m_Logic->HandleException();
 }
