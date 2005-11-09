@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-09 11:26:21 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-11-09 13:58:34 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -146,14 +146,6 @@ mafView *mmdMouse::GetView()
 {
   return m_SelectedView;
 }
-/*
-//------------------------------------------------------------------------------
-vtkAbstractPropPicker *mmdMouse::GetPicker()
-//------------------------------------------------------------------------------
-{
-  return (vtkAbstractPropPicker *)m_Picker;
-}
-*/
 //------------------------------------------------------------------------------
 vtkRenderWindowInteractor *mmdMouse::GetInteractor()
 //------------------------------------------------------------------------------
