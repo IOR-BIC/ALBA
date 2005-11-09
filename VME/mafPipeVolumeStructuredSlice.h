@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeStructuredSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-08 16:06:53 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-11-09 11:23:42 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,6 +21,7 @@
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
+class mmgFloatSlider;
 class vtkOutlineFilter;
 class vtkPlaneSource;
 class vtkImageData;
@@ -43,17 +44,6 @@ public:
 	mafPipeVolumeStructuredSlice();
   virtual ~mafPipeVolumeStructuredSlice();
 	
-  //----------------------------------------------------------------------------
-  // constant:
-  //----------------------------------------------------------------------------
-  enum STRUCTURED_SLICE_DIRECTION_ID
-  {
-    STRUCTURED_SLICE_X = 0,
-    STRUCTURED_SLICE_Y, 
-    STRUCTURED_SLICE_Z, 
-    STRUCTURED_SLICE_ORTHO,
-  };
-
   /** process events coming from gui */
   virtual void OnEvent(mafEventBase *maf_event);
 
@@ -68,20 +58,24 @@ public:
   };
 
   void InitializeSliceParameters(int mode, bool show_vol_bbox);
-  void InitializeSliceParameters(int mode, int slice_num[3], bool show_vol_bbox);
+  void InitializeSliceParameters(int mode, double slice_origin[3], bool show_vol_bbox);
   virtual void Create(mafSceneNode *n);
 
-	/** Show the slice bounding box actor. */
+	/** 
+  Show the slice bounding box actor. */
 	void Select     (bool select); 
 	
-	/** Set the range to the lookup table for the slice. */
+	/** 
+  Set the range to the lookup table for the slice. */
 	void SetLutRange(double low, double hi);
 	
-	/** Get the range of the slice's lookup table. */
+	/** 
+  Get the range of the slice's lookup table. */
 	void GetLutRange(double range[2]);
 	
-	/** Set slicer parameter to generate the slice. */
-	void SetSlice(int slice_num[3]);
+	/** 
+  Set slicer parameter to generate the slice. */
+	void SetSlice(double origin[3]);
 	
   /** 
   Enable/Disable color lookupTable for volume slice. */
@@ -113,7 +107,7 @@ protected:
   int    m_SliceNumber[3];
   int    m_VolumeExtent[6];
   int		 m_SliceMode;
-  wxSlider *m_SliceSlider[3];
+  mmgFloatSlider *m_SliceSlider[3];
 
 	vtkVolumeResample      *m_VolumeResampler;
   vtkImageData           *m_VolumeData;
