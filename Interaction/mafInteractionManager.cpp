@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-21 09:34:21 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2005-11-09 13:59:29 $
+  Version:   $Revision: 1.23 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -712,6 +712,11 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
           {
 			      e->Log();
             return;
+          }
+          else
+          {
+            // Paolo 9/11/2005: events to be forwarded to logic
+            mafEventMacro(*e);
           }
 		    break; 
       }
