@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-02 10:39:28 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-11-09 11:26:21 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -29,12 +29,8 @@
 #include "mafEventInteraction.h"
 #include "mmuIdFactory.h"
 
-//#include "vtkAssemblyPath.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkRendererCollection.h"
-#include "vtkRenderer.h"
-//#include "vtkCellPicker.h"
 
 //------------------------------------------------------------------------------
 // Events
@@ -55,42 +51,15 @@ mmdMouse::mmdMouse()
   m_ButtonState[0]  = m_ButtonState[1] = m_ButtonState[2] = 0;
   m_SelectedView    = NULL;
   m_SelectedRWI     = NULL;
-  //m_Picker = vtkCellPicker::New();
-  //m_Picker->SetTolerance(0.001);  //modified by Stefano 19-1-2005
+  
+  m_UpdateRwiInOnMoveFlag = false;
 }
 
 //------------------------------------------------------------------------------
 mmdMouse::~mmdMouse()
 //------------------------------------------------------------------------------
 {
-//  m_Picker->Delete();
 }
-
-/*//------------------------------------------------------------------------------
-void mmdMouse::CreateSettings()
-//------------------------------------------------------------------------------
-{
-  return; // NO Gui!
-}*/
-
-/*//------------------------------------------------------------------------------
-int mmdMouse::InternalInitialize()
-//------------------------------------------------------------------------------
-{
-  if (Superclass::InternalInitialize())
-    return -1;
-  return 0;
-}
-*/
-
-/*
-//------------------------------------------------------------------------------
-void mmdMouse::InternalShutdown()
-//------------------------------------------------------------------------------
-{
-  Superclass::InternalShutdown();
-}
-*/
 //------------------------------------------------------------------------------
 void mmdMouse::OnEvent(mafEventBase *event)
 //------------------------------------------------------------------------------
@@ -105,6 +74,10 @@ void mmdMouse::OnEvent(mafEventBase *event)
   {
     double pos[2];
     e->Get2DPosition(pos);
+    if (m_UpdateRwiInOnMoveFlag)
+    {
+      m_SelectedRWI = (mafRWIBase *)event->GetSender();
+    }
     SetLastPosition(pos[0],pos[1],e->GetModifiers());
   }
   else if (id == BUTTON_DOWN)
@@ -123,8 +96,6 @@ void mmdMouse::OnEvent(mafEventBase *event)
   }
   else if (id == VIEW_SELECT)
   {
-    // clean picked list...
-//    m_Picker->InitializePickList(); 
     mafEvent *e=mafEvent::SafeDownCast(event);
     assert(e);
     m_SelectedView = e->GetView();    
@@ -160,41 +131,6 @@ void mmdMouse::SendButtonEvent(mafEventInteraction *event)
   event->Set2DPosition(GetLastPosition());
   Superclass::SendButtonEvent(event);
 }
-/*
-//------------------------------------------------------------------------------
-vtkAssemblyPath *mmdMouse::Pick(int X, int Y)
-//------------------------------------------------------------------------------
-{
-  int pos[2];
-  pos[0]=X;
-  pos[1]=Y;
-  return Pick(pos);
-}
-//------------------------------------------------------------------------------
-vtkAssemblyPath *mmdMouse::Pick(int mouse_screen_pos[2])
-//------------------------------------------------------------------------------
-{
-  vtkAssemblyPath *ap = NULL;
-
-  if (m_SelectedView)
-  {
-    vtkRendererCollection *rc = m_SelectedRWI->GetRenderWindow()->GetRenderers();
-    vtkRenderer *r = NULL;
-    assert(rc);
-    rc->InitTraversal();
-    while(r = rc->GetNextItem())
-    {
-      if( m_Picker->Pick(mouse_screen_pos[0],mouse_screen_pos[1],0,r) )
-      {
-        ap = m_Picker->GetPath();
-        break;
-      }
-    }
-  }
-
-  return ap;
-}
-*/
 //------------------------------------------------------------------------------
 vtkRenderer *mmdMouse::GetRenderer()
 //------------------------------------------------------------------------------

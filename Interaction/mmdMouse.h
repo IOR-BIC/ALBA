@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdMouse.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-02 10:39:28 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-11-09 11:26:21 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -20,12 +20,8 @@
 //----------------------------------------------------------------------------
 class mafView;
 class mafRWIBase;
-//class vtkAssemblyPath;
 class vtkRenderer;
-//class vtkAbstractPropPicker;
-//class vtkCellPicker;
 class vtkRenderWindowInteractor;
-
 
 /** Tracking 2D device, i.e. "Mouse".
   mmdMouse is a class implemnting interface for a Mouse. Current implemantation 
@@ -59,20 +55,12 @@ public:
   void GetLastPosition(double pos[2]) {pos[0]=m_LastPosition[0];pos[1]=m_LastPosition[1];}
 
   /**
-  Perform mouse picking and return the selected assembly path picked, otherwise return NULL. */
-//  vtkAssemblyPath *Pick(int mouse_screen_pos[2]);
-//  vtkAssemblyPath *Pick(int X, int Y);
-  /**
   Return the renderer of the selected view. */
   vtkRenderer *GetRenderer();
 
   /** 
   Return the selected view. */
   mafView *GetView();
-
-  /** 
-  Return the default mouse picker. */
-//  vtkAbstractPropPicker *GetPicker();
 
   /** 
   Return the Interactor. */
@@ -82,25 +70,31 @@ public:
   Return the RenderWindowInteractor used by mouse device */
   mafRWIBase *GetRWI();
 
+  /** 
+  Used to set the flag for updating the m_SelectedRWI during mouse motion and not only on ViewSelected event.*/
+  void SetUpdateRWIDuringMotion(bool update_on_motion) {m_UpdateRwiInOnMoveFlag = update_on_motion;};
+  void UpdateRWIDuringMotionOff() {m_UpdateRwiInOnMoveFlag = true;};
+  void UpdateRWIDuringMotionOn() {m_UpdateRwiInOnMoveFlag = true;};
+
+  /** 
+  Return the status of the m_UpdateRwiInOnMoveFlag flag.*/
+  bool IsUpdateRWIDuringMotion() {return m_UpdateRwiInOnMoveFlag;};
+
 protected:
   mmdMouse();
   virtual ~mmdMouse();
 
-  //virtual int InternalInitialize();
-  //virtual void InternalShutdown();
-
   /** add position to the event */ 
   virtual void SendButtonEvent(mafEventInteraction *event);
 
-  double          m_LastPosition[2];///< stores the last position
+  double      m_LastPosition[2];///< stores the last position
+  bool        m_UpdateRwiInOnMoveFlag; ///< If this flag true the m_SelectedRWI is updated in when the mouse move inside the view (used in compounded views)
 
-  mafView        *m_SelectedView;   ///< store the selected view to perform the mouse picking
-  mafRWIBase     *m_SelectedRWI;
-  //vtkCellPicker*  m_Picker;         ///< the picker used to pick the in the render window (to be moved in the view!)
+  mafView    *m_SelectedView;   ///< store the selected view to perform the mouse picking
+  mafRWIBase *m_SelectedRWI;
 
 private:
   mmdMouse(const mmdMouse&);  // Not implemented.
   void operator=(const mmdMouse&);  // Not implemented.
 };
-
 #endif 
