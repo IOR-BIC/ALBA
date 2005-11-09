@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialogPreview.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 11:10:06 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-11-09 13:17:39 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,6 +44,8 @@ public:
   mafRWI *GetRWI() {return m_Rwi;};
   /** Return the dialog's gui.*/
   mmgGui *GetGui() {return m_Gui;};
+
+  wxBoxSizer *m_RwiSizer; ///< Sizer used for the vtk render window and if you want to plug any gui on bottom of the RWI
 
 protected:
   wxBoxSizer *m_PreviewSizer; ///< Sizer used for the preview render window

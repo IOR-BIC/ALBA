@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialogPreview.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 11:56:27 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-11-09 13:17:38 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,6 +28,7 @@ mmgDialogPreview::mmgDialogPreview(const wxString& title,long style)
 //----------------------------------------------------------------------------
 {
   m_PreviewSizer = new wxBoxSizer( wxHORIZONTAL );
+  m_RwiSizer = new wxBoxSizer( wxVERTICAL );
   m_Rwi = NULL;
   m_Gui = NULL;
 
@@ -36,7 +37,8 @@ mmgDialogPreview::mmgDialogPreview(const wxString& title,long style)
     m_Rwi = new mafRWI(this);
     m_Rwi->SetSize(0,0,500,500);
     m_Rwi->Show(true);
-    m_PreviewSizer->Add(m_Rwi->m_RwiBase,1,wxEXPAND);
+    m_RwiSizer->Add(m_Rwi->m_RwiBase,1,wxEXPAND);
+    m_PreviewSizer->Add(m_RwiSizer,1,wxEXPAND);
   }
   if( style & mafUSEGUI )
   {
