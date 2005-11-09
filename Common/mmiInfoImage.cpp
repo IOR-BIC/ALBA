@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiInfoImage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-09 11:30:47 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-11-09 13:18:46 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -136,7 +136,7 @@ void mmiInfoImage::OnEvent(mafEventBase *event)
                 scalars->GetTuple(pid,&iso_value);
                 mafString info;
                 info = "";
-                info << "x = " << picked_pos[0] << " y = " << picked_pos[1] << " d = " << iso_value;
+                info << "x = " << (int)picked_pos[0] << " y = " << (int)picked_pos[1] << " d = " << iso_value;
                 picked_vme->ForwardUpEvent(mafEvent(this,PROGRESSBAR_SET_TEXT,&info));
               }
             }
