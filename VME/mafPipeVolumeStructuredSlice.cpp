@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeStructuredSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-08 16:06:53 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-11-09 11:24:36 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,7 +22,9 @@
 #include "mafPipeVolumeStructuredSlice.h"
 #include "mafDecl.h"
 #include "mmgGui.h"
+#include "mmgFloatSlider.h"
 #include "mafSceneNode.h"
+#include "mafPipeVolumeSlice.h"
 
 #include "mafVMEVolume.h"
 #include "mafVMEOutputVolume.h"
@@ -71,7 +73,7 @@ mafPipeVolumeStructuredSlice::mafPipeVolumeStructuredSlice()
   m_SliceParametersInitialized = false;
   m_ShowVolumeBox         = 0;
 
-  m_SliceMode = STRUCTURED_SLICE_Z;
+  m_SliceMode = SLICE_Z;
 
   m_ColorLUTEnabled = 0;
   m_SliceOpacity    = 1.0;
@@ -81,23 +83,23 @@ mafPipeVolumeStructuredSlice::mafPipeVolumeStructuredSlice()
   m_SliceNumber[2] = 0;
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeStructuredSlice::InitializeSliceParameters(int mode, int slice_num[3], bool show_vol_bbox)
+void mafPipeVolumeStructuredSlice::InitializeSliceParameters(int mode, bool show_vol_bbox)
+//----------------------------------------------------------------------------
+{
+  m_SliceMode     = mode;
+  m_ShowVolumeBox = show_vol_bbox;
+}
+//----------------------------------------------------------------------------
+void mafPipeVolumeStructuredSlice::InitializeSliceParameters(int mode, double slice_origin[3], bool show_vol_bbox)
 //----------------------------------------------------------------------------
 {
   m_SliceParametersInitialized = true;
   m_SliceMode     = mode;
   m_ShowVolumeBox = show_vol_bbox;
 
-  m_SliceNumber[0] = slice_num[0];
-  m_SliceNumber[1] = slice_num[1];
-  m_SliceNumber[2] = slice_num[2];
-}
-//----------------------------------------------------------------------------
-void mafPipeVolumeStructuredSlice::InitializeSliceParameters(int mode, bool show_vol_bbox)
-//----------------------------------------------------------------------------
-{
-  m_SliceMode     = mode;
-  m_ShowVolumeBox = show_vol_bbox;
+  m_Origin[0] = slice_origin[0];
+  m_Origin[1] = slice_origin[1];
+  m_Origin[2] = slice_origin[2];
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeStructuredSlice::Create(mafSceneNode *n)
@@ -131,7 +133,7 @@ void mafPipeVolumeStructuredSlice::Create(mafSceneNode *n)
 
   m_AssemblyFront->AddPart(m_VolumeBoxActor);
 
-	if(m_SliceMode == STRUCTURED_SLICE_ORTHO)
+	if(m_SliceMode == SLICE_ORTHO)
 	{
     for(int i = 0; i<3; i++)
 		{
@@ -174,13 +176,11 @@ void mafPipeVolumeStructuredSlice::CreateSlice(int mode)
 
   if (!m_SliceParametersInitialized)
   {
-    m_SliceNumber[0] = (m_VolumeExtent[0]+m_VolumeExtent[1])*.5;
-    m_SliceNumber[1] = (m_VolumeExtent[2]+m_VolumeExtent[3])*.5;
-    m_SliceNumber[2] = (m_VolumeExtent[4]+m_VolumeExtent[5])*.5;
+    m_Origin[mode] = (m_VolumeBounds[2*mode]+m_VolumeBounds[2*mode+1])*.5;
   }
 
   memcpy(slice_extent,m_VolumeExtent,6*sizeof(int));
-//	m_SliceNumber[mode] = (int)((m_Origin[mode]-m_VolumeBounds[2*mode])/m_VolumeSpacing[mode]);
+	m_SliceNumber[mode] = (int)((m_Origin[mode]-m_VolumeBounds[2*mode])/m_VolumeSpacing[mode]);
   slice_extent[2*mode]      = m_SliceNumber[mode];
   slice_extent[2*mode + 1]  = m_SliceNumber[mode];
 
@@ -214,12 +214,12 @@ void mafPipeVolumeStructuredSlice::CreateSlice(int mode)
   vtkNEW(m_SlicePolygon[mode]);
   switch(mode) 
   {
-    case STRUCTURED_SLICE_X:
+    case SLICE_X:
       m_SlicePolygon[mode]->SetOrigin(slice_bounds[0],slice_bounds[2],slice_bounds[4]);
       m_SlicePolygon[mode]->SetPoint1(slice_bounds[0],slice_bounds[3],slice_bounds[4]);
       m_SlicePolygon[mode]->SetPoint2(slice_bounds[0],slice_bounds[2],slice_bounds[5]);
   	break;
-    case STRUCTURED_SLICE_Y:
+    case SLICE_Y:
       m_SlicePolygon[mode]->SetOrigin(slice_bounds[0],slice_bounds[2],slice_bounds[4]);
       m_SlicePolygon[mode]->SetPoint1(slice_bounds[1],slice_bounds[2],slice_bounds[4]);
       m_SlicePolygon[mode]->SetPoint2(slice_bounds[0],slice_bounds[2],slice_bounds[5]);
@@ -295,22 +295,24 @@ void mafPipeVolumeStructuredSlice::SetLutRange(double low, double hi)
 void mafPipeVolumeStructuredSlice::GetLutRange(double range[2])
 //----------------------------------------------------------------------------
 {
-	if(m_SliceMode != STRUCTURED_SLICE_ORTHO)
+	if(m_SliceMode != SLICE_ORTHO)
     m_SlicerImage[m_SliceMode]->GetOutput()->GetScalarRange(range);
 	else
     m_SlicerImage[0]->GetOutput()->GetScalarRange(range);
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeStructuredSlice::SetSlice(int slice_num[3])
+void mafPipeVolumeStructuredSlice::SetSlice(double origin[3])
 //----------------------------------------------------------------------------
 {
   double slice_bounds[6],sr[2];
   int slice_extent[6];
+  memcpy(m_Origin,origin,3*sizeof(double));
 
 	for(int i=0;i<3;i++)
 	{
 		if(m_SlicerImage[i])
 		{
+      m_SliceNumber[i] = (int)((m_Origin[i]-m_VolumeBounds[2*i])/m_VolumeSpacing[i]);
       memcpy(slice_extent,m_VolumeExtent,6*sizeof(int));
       slice_extent[2*i]      = m_SliceNumber[i];
       slice_extent[2*i + 1]  = m_SliceNumber[i];
@@ -320,17 +322,17 @@ void mafPipeVolumeStructuredSlice::SetSlice(int slice_num[3])
       m_SlicerImage[i]->GetOutput()->GetScalarRange(sr);
 
       memcpy(slice_bounds,m_VolumeBounds,6*sizeof(double));
-      m_Origin[i] = m_VolumeBounds[2*i] + m_SliceNumber[i]*m_VolumeSpacing[i];
+      //m_Origin[i] = m_VolumeBounds[2*i] + m_SliceNumber[i]*m_VolumeSpacing[i];
       slice_bounds[2*i]      = m_Origin[i];
       slice_bounds[2*i + 1]  = m_Origin[i];
       switch(i) 
       {
-        case STRUCTURED_SLICE_X:
+        case SLICE_X:
           m_SlicePolygon[0]->SetOrigin(slice_bounds[0],slice_bounds[2],slice_bounds[4]);
           m_SlicePolygon[0]->SetPoint1(slice_bounds[0],slice_bounds[3],slice_bounds[4]);
           m_SlicePolygon[0]->SetPoint2(slice_bounds[0],slice_bounds[2],slice_bounds[5]);
         break;
-        case STRUCTURED_SLICE_Y:
+        case SLICE_Y:
           m_SlicePolygon[1]->SetOrigin(slice_bounds[0],slice_bounds[2],slice_bounds[4]);
           m_SlicePolygon[1]->SetPoint1(slice_bounds[1],slice_bounds[2],slice_bounds[4]);
           m_SlicePolygon[1]->SetPoint2(slice_bounds[0],slice_bounds[2],slice_bounds[5]);
@@ -395,26 +397,25 @@ mmgGui *mafPipeVolumeStructuredSlice::CreateGui()
 //----------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  int ext[6] = {-1,1,-1,1,-1,1};
+  double b[6] = {-1,1,-1,1,-1,1};
   m_Gui = new mmgGui(this);
   m_Gui->Bool(ID_RGB_LUT,"rgb lut", &m_ColorLUTEnabled,0,"turn on/off RGB LUT");
-  vtkImageData *data = vtkImageData::SafeDownCast(m_Vme->GetOutput()->GetVTKData());
-  if (data != NULL)
+  if (m_VolumeData != NULL)
   {
-    data->Update();
-    data->GetExtent(ext);
+    m_VolumeData->Update();
+    m_VolumeData->GetBounds(b);
   }
-  if (m_SliceMode == STRUCTURED_SLICE_X || m_SliceMode == STRUCTURED_SLICE_ORTHO)
+  if (m_SliceMode == SLICE_X || m_SliceMode == SLICE_ORTHO)
   {
-    m_SliceSlider[0] = m_Gui->Slider(ID_SLICE_SLIDER_X,"x",&m_SliceNumber[0],ext[0],ext[1]);
+    m_SliceSlider[0] = m_Gui->FloatSlider(ID_SLICE_SLIDER_X,"x",&m_Origin[0],b[0],b[1]);
   }
-  if (m_SliceMode == STRUCTURED_SLICE_Y || m_SliceMode == STRUCTURED_SLICE_ORTHO)
+  if (m_SliceMode == SLICE_Y || m_SliceMode == SLICE_ORTHO)
   {
-    m_SliceSlider[1] = m_Gui->Slider(ID_SLICE_SLIDER_Y,"y",&m_SliceNumber[1],ext[2],ext[3]);
+    m_SliceSlider[1] = m_Gui->FloatSlider(ID_SLICE_SLIDER_Y,"y",&m_Origin[1],b[2],b[3]);
   }
-  if (m_SliceMode == STRUCTURED_SLICE_Z || m_SliceMode == STRUCTURED_SLICE_ORTHO)
+  if (m_SliceMode == SLICE_Z || m_SliceMode == SLICE_ORTHO)
   {
-    m_SliceSlider[2] = m_Gui->Slider(ID_SLICE_SLIDER_Z,"z",&m_SliceNumber[2],ext[4],ext[5]);
+    m_SliceSlider[2] = m_Gui->FloatSlider(ID_SLICE_SLIDER_Z,"z",&m_Origin[2],b[4],b[5]);
   }
 
   return m_Gui;
@@ -436,7 +437,7 @@ void mafPipeVolumeStructuredSlice::OnEvent(mafEventBase *maf_event)
       case ID_SLICE_SLIDER_X:
       case ID_SLICE_SLIDER_Y:
       case ID_SLICE_SLIDER_Z:
-        SetSlice(m_SliceNumber);
+        SetSlice(m_Origin);
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
       default:
