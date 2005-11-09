@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-08 16:07:51 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-11-09 11:25:11 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,6 +32,18 @@ class vtkActor;
 class vtkVolumeSlicer;
 
 //----------------------------------------------------------------------------
+// constant:
+//----------------------------------------------------------------------------
+enum SLICE_DIRECTION_ID
+{
+  SLICE_X = 0,
+  SLICE_Y, 
+  SLICE_Z, 
+  SLICE_ORTHO,
+  SLICE_ARB
+};
+
+//----------------------------------------------------------------------------
 // mafPipeVolumeSlice :
 //----------------------------------------------------------------------------
 class mafPipeVolumeSlice : public mafPipe
@@ -45,18 +57,6 @@ public:
   /** process events coming from gui */
   virtual void OnEvent(mafEventBase *maf_event);
 
-  //----------------------------------------------------------------------------
-  // constant:
-  //----------------------------------------------------------------------------
-  enum SLICE_DIRECTION_ID
-  {
-    SLICE_X = 0,
-    SLICE_Y, 
-    SLICE_Z, 
-    SLICE_ORTHO,
-    SLICE_ARB
-  };
-
   /** IDs for the GUI */
   enum PIPE_VOLUME_SLICE_WIDGET_ID
   {
@@ -67,8 +67,9 @@ public:
     ID_LAST
   };
 
-  void InitializeSliceParameters(int mode, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox);
+  void InitializeSliceParameters(int mode, bool show_vol_bbox);
   void InitializeSliceParameters(int mode, double slice_origin[3], bool show_vol_bbox);
+  void InitializeSliceParameters(int mode, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox);
   virtual void Create(mafSceneNode *n);
 
 	/** Show the slice bounding box actor. */
@@ -139,7 +140,7 @@ protected:
   vtkActor               *m_GhostActor;
 
   int                     m_ColorLUTEnabled;
-  bool                    m_ParametersInitialized;
+  bool                    m_SliceParametersInitialized;
   bool                    m_ShowVolumeBox;
 };  
 

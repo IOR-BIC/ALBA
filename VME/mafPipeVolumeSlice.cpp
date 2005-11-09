@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-08 16:08:25 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-11-09 11:25:30 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -65,7 +65,7 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
     m_SliceActor[i]	      = NULL;
     m_SliceSlider[i]      = NULL;
   }
-  m_ParametersInitialized = false;
+  m_SliceParametersInitialized = false;
   m_ShowVolumeBox         = false;
 
   m_SliceMode = SLICE_Z;
@@ -96,10 +96,17 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
   m_YVector[2][2] = 0;
 }
 //----------------------------------------------------------------------------
+void mafPipeVolumeSlice::InitializeSliceParameters(int mode, bool show_vol_bbox)
+//----------------------------------------------------------------------------
+{
+  m_SliceMode     = mode;
+  m_ShowVolumeBox = show_vol_bbox;
+}
+//----------------------------------------------------------------------------
 void mafPipeVolumeSlice::InitializeSliceParameters(int mode, double slice_origin[3], bool show_vol_bbox)
 //----------------------------------------------------------------------------
 {
-  m_ParametersInitialized = true;
+  m_SliceParametersInitialized = true;
   m_SliceMode     = mode;
   m_ShowVolumeBox = show_vol_bbox;
 
@@ -111,7 +118,7 @@ void mafPipeVolumeSlice::InitializeSliceParameters(int mode, double slice_origin
 void mafPipeVolumeSlice::InitializeSliceParameters(int mode, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox)
 //----------------------------------------------------------------------------
 {
-  m_ParametersInitialized = true;
+  m_SliceParametersInitialized = true;
   m_SliceMode     = mode;
   m_ShowVolumeBox = show_vol_bbox;
 
@@ -150,7 +157,7 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 	if(m_SliceMode == SLICE_ARB)
 		m_SliceMode = SLICE_X;
 
-	if (!m_ParametersInitialized)
+	if (!m_SliceParametersInitialized)
 	{
     double b[6];
     m_Vme->GetOutput()->GetBounds(b);
