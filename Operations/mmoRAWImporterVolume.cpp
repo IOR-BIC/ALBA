@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-08 16:09:45 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-11-09 13:18:09 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -130,10 +130,6 @@ void mmoRAWImporterVolume::OpRun()
 	m_Actor->SetTexture(texture);
 	m_Actor->VisibilityOff();
 	
-	m_Dialog->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
-  m_Dialog->GetRWI()->m_RenFront->AddActor(m_Actor);
-  m_Dialog->GetRWI()->CameraSet(CAMERA_CT);
-  
 	//GUI +++++++++++++++++++++++++++++++++++++++++++
 	m_Gui->Show(true);
 	m_Gui->Divider(0);
@@ -166,6 +162,10 @@ void mmoRAWImporterVolume::OpRun()
 	//slice slider +++++++++++++++++++++++++++++++++++++++++++
   m_GuiSlider = new mmgGui(this);
   m_SliceSlider = m_GuiSlider->Slider(ID_SLICE,"slice num",&m_CurrentSlice,0);
+  m_GuiSlider->Show(true);
+  m_GuiSlider->Reparent(m_Dialog);
+  wxBoxSizer *slider_sizer = new wxBoxSizer( wxHORIZONTAL );
+  slider_sizer->Add(m_GuiSlider, 0, wxEXPAND);
    
 	EnableWidgets(false);
 
@@ -173,7 +173,11 @@ void mmoRAWImporterVolume::OpRun()
 	m_Gui->Update();
    
   m_Dialog->GetGui()->AddGui(m_Gui);
-  m_Dialog->Add(m_GuiSlider, 0);
+  m_Dialog->GetRWI()->SetSize(0,0,400,400);
+  m_Dialog->m_RwiSizer->Add(slider_sizer, 0, wxEXPAND);
+  m_Dialog->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
+  m_Dialog->GetRWI()->m_RenFront->AddActor(m_Actor);
+  m_Dialog->GetRWI()->CameraSet(CAMERA_CT);
 
   int x_pos,y_pos,w,h;
   mafGetFrame()->GetPosition(&x_pos,&y_pos);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialog.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-14 12:32:32 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-11-09 13:17:56 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -71,7 +71,6 @@ mmgDialog::mmgDialog(const wxString& title,long style)
   m_CancelButton = NULL;
   m_CloseButton  = NULL;
 
-  // To Paolo -- il sizer vuoto si setta un MinSize arbitrario -->  se non serve non lo metto
   if(style & mafOK || style & mafCANCEL || style & mafCLOSE )
   {
     m_ButtonsSizer =  new wxBoxSizer( wxHORIZONTAL );
