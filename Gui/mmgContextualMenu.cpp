@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-11 13:44:53 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-11-09 16:31:52 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,7 +31,9 @@
 #include "mafSceneGraph.h"
 #include "mafView.h"
 #include "mafViewVTK.h"
+#include "mafViewCompound.h"
 #include "mmgMDIChild.h"
+#include "mmdMouse.h"
 
 #include "mafPipe.h"
 
@@ -54,7 +56,9 @@ enum VIEW_CONTEXTUAL_MENU_ID
 		CONTEXTUAL_MENU_TRANSFORM,
 		CONTEXTUAL_MENU_QUIT_CHILD_VIEW,
 		CONTEXTUAL_MENU_MAXIMIZE_CHILD_VIEW,
+    CONTEXTUAL_MENU_MAXIMIZE_CHILD_SUB_VIEW,
 		CONTEXTUAL_MENU_NORMAL_SIZE_CHILD_VIEW,
+    CONTEXTUAL_MENU_NORMAL_SIZE_CHILD_SUB_VIEW,
 		CONTEXTUAL_MENU_SAVE_AS_IMAGE,
     CONTEXTUAL_MENU_EXPORT_AS_VRML,
     //CONTEXTUAL_MENU_EXTERNAL_INTERNAL_VIEW,
@@ -109,6 +113,18 @@ void mmgContextualMenu::ShowContextualMenu(wxFrame *child, mafView *view, bool v
     else
     {
       this->Append(CONTEXTUAL_MENU_MAXIMIZE_CHILD_VIEW, "Maximize");
+    }
+    mafViewCompound *vc = mafViewCompound::SafeDownCast(m_ViewActive);
+    if (vc)
+    {
+      if (vc->IsSubViewMaximized())
+      {
+        this->Append(CONTEXTUAL_MENU_NORMAL_SIZE_CHILD_SUB_VIEW, "Normal Size SubView");
+      }
+      else
+      {
+        this->Append(CONTEXTUAL_MENU_MAXIMIZE_CHILD_SUB_VIEW, "Maximize SubView");
+      }
     }
     //this->Append(CONTEXTUAL_MENU_EXTERNAL_INTERNAL_VIEW, "External", "Switch view visualization between external/internal", TRUE);
     //this->FindItem(CONTEXTUAL_MENU_EXTERNAL_INTERNAL_VIEW)->Check(m_ViewActive->IsExternal());
@@ -177,9 +193,28 @@ void mmgContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
 		case CONTEXTUAL_MENU_MAXIMIZE_CHILD_VIEW:
 			m_ChildViewActive->Maximize(true);
 		break;
+    case CONTEXTUAL_MENU_MAXIMIZE_CHILD_SUB_VIEW:
+    {
+      mafViewCompound *vc = mafViewCompound::SafeDownCast(m_ViewActive);
+      if (vc)
+      {
+        int subview_idx = vc->GetSubViewIndex(m_Mouse->GetRWI());
+        vc->MaximizeSubView(subview_idx);
+      }
+    }
+    break;
 		case CONTEXTUAL_MENU_NORMAL_SIZE_CHILD_VIEW:
 			m_ChildViewActive->Maximize(false);
 		break;
+    case CONTEXTUAL_MENU_NORMAL_SIZE_CHILD_SUB_VIEW:
+    {
+      mafViewCompound *vc = mafViewCompound::SafeDownCast(m_ViewActive);
+      if (vc)
+      {
+        vc->MaximizeSubView(0,false);
+      }
+    }
+    break;
 /*    case CONTEXTUAL_MENU_EXTERNAL_INTERNAL_VIEW:
     {
       bool ext = !this->FindItem(CONTEXTUAL_MENU_EXTERNAL_INTERNAL_VIEW)->IsChecked();

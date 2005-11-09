@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgContextualMenu.h,v $
   Language:  C++
-  Date:      $Date: 2005-09-05 13:42:25 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-11-09 16:31:52 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,6 +19,7 @@
 class mafView;
 class mafEvent;
 class mafObserver;
+class mmdMouse;
 
 //----------------------------------------------------------------------------
 // mmgContextualMenu :
@@ -30,16 +31,22 @@ public:
   virtual ~mmgContextualMenu();
   void SetListener(mafObserver *Listener) {m_Listener = Listener;};
 
-	/** Visualize contextual menù for the MDI child and selected view. */
-	//void ShowContextualMenu(mmgMDIChild *child, mafView *view, bool vme_menu);		
+  /** 
+  Set the mouse device. It is used to maximize the sub-view in compounded views.*/
+  void SetMouse(mmdMouse *mouse) {m_Mouse = mouse;};
+
+	/** 
+  Visualize contextual menù for the MDI child and selected view. */
   void ShowContextualMenu(wxFrame *child, mafView *view, bool vme_menu);		
 
 protected:
   wxFrame     *m_ChildViewActive;
   mafView     *m_ViewActive;
   mafObserver *m_Listener;
+  mmdMouse    *m_Mouse;
 
-	/** Answare contextual menù's selection. */
+	/** 
+  Answer contextual menù's selection. */
 	void OnContextualViewMenu(wxCommandEvent& event);
   DECLARE_EVENT_TABLE()
 };
