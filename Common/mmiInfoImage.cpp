@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiInfoImage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-03 08:59:27 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-11-09 11:30:47 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -107,31 +107,38 @@ void mmiInfoImage::OnEvent(mafEventBase *event)
       mmdMouse *mouse = mmdMouse::SafeDownCast(device);
       if (mouse)
       {
-        double pos[2];
-        mouse->GetLastPosition(pos);
-        mafView *v = mouse->GetView();
-        if (v)
+        if (!mouse->IsUpdateRWIDuringMotion())
         {
-          mafViewCompound *vc = mafViewCompound::SafeDownCast(v);
-          if (vc)
+          mouse->UpdateRWIDuringMotionOn();
+        }
+        else
+        {
+          double pos[2];
+          mouse->GetLastPosition(pos);
+          mafView *v = mouse->GetView();
+          if (v)
           {
-            v = vc->GetSubView(mouse->GetRWI());
-          }
-          if(v->Pick((int)pos[0], (int)pos[1]))
-          {
-            mafVME *picked_vme = v->GetPickedVme();
-            vtkDataSet *data = picked_vme->GetOutput()->GetVTKData();
-            if (data->IsA("vtkImageData") || data->IsA("vtkRectilinearGrid") && m_Renderer->GetActiveCamera()->GetParallelProjection())
+            mafViewCompound *vc = mafViewCompound::SafeDownCast(v);
+            if (vc)
             {
-              double picked_pos[3], iso_value;
-              v->GetPickedPosition(picked_pos);
-              int pid = data->FindPoint(picked_pos);
-              vtkDataArray *scalars = data->GetPointData()->GetScalars();
-              scalars->GetTuple(pid,&iso_value);
-              mafString info;
-              info = "";
-              info << "x = " << picked_pos[0] << " y = " << picked_pos[1] << " d = " << iso_value;
-              picked_vme->ForwardUpEvent(mafEvent(this,PROGRESSBAR_SET_TEXT,&info));
+              v = vc->GetSubView(mouse->GetRWI());
+            }
+            if(v->Pick((int)pos[0], (int)pos[1]))
+            {
+              mafVME *picked_vme = v->GetPickedVme();
+              vtkDataSet *data = picked_vme->GetOutput()->GetVTKData();
+              if (data->IsA("vtkImageData") || data->IsA("vtkRectilinearGrid") && m_Renderer->GetActiveCamera()->GetParallelProjection())
+              {
+                double picked_pos[3], iso_value;
+                v->GetPickedPosition(picked_pos);
+                int pid = data->FindPoint(picked_pos);
+                vtkDataArray *scalars = data->GetPointData()->GetScalars();
+                scalars->GetTuple(pid,&iso_value);
+                mafString info;
+                info = "";
+                info << "x = " << picked_pos[0] << " y = " << picked_pos[1] << " d = " << iso_value;
+                picked_vme->ForwardUpEvent(mafEvent(this,PROGRESSBAR_SET_TEXT,&info));
+              }
             }
           }
         }
