@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-04 15:25:21 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-11-09 16:30:42 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,6 +43,7 @@ mafViewCompound::mafViewCompound( wxString label, int num_row, int num_col, bool
   m_ChildViewList.clear();
   m_PluggedChildViewList.clear();
   m_GuiView = NULL;
+  m_SubViewMaximized = -1;
 }
 //----------------------------------------------------------------------------
 mafViewCompound::~mafViewCompound()
@@ -267,21 +268,43 @@ void mafViewCompound::OnLayout()
   sh -= gh;
   m_GuiView->SetSize(0,sh,sw,gh);
 
-  // this implement the Fixed SubViews Layout
-  int border = 2;
-  int step_width  = (sw-border)  / m_ViewColNum;
-  int step_height = (sh-2*border)/ m_ViewRowNum;
-  int x_pos, y_pos;
-
-  int i = 0;
-  for (int r=0; r<m_ViewRowNum; r++)
+  if (m_SubViewMaximized == -1)
   {
-    for (int c=0; c<m_ViewColNum; c++)
+    // this implement the Fixed SubViews Layout
+    int border = 2;
+    int x_pos, y_pos;
+    int step_width  = (sw-border)  / m_ViewColNum;
+    int step_height = (sh-2*border)/ m_ViewRowNum;
+
+    int i = 0;
+    for (int r=0; r<m_ViewRowNum; r++)
     {
-      x_pos = c*(step_width + border);
-      y_pos = r*(step_height + border);
-      m_ChildViewList[i]->GetWindow()->SetSize(x_pos,y_pos,step_width,step_height);
-      i++;
+      for (int c=0; c<m_ViewColNum; c++)
+      {
+        x_pos = c*(step_width + border);
+        y_pos = r*(step_height + border);
+        m_ChildViewList[i]->GetWindow()->SetSize(x_pos,y_pos,step_width,step_height);
+        i++;
+      }
+    }
+  }
+  else
+  {
+    int i = 0;
+    for (int r=0; r<m_ViewRowNum; r++)
+    {
+      for (int c=0; c<m_ViewColNum; c++)
+      {
+        if (i == m_SubViewMaximized)
+        {
+          m_ChildViewList[m_SubViewMaximized]->GetWindow()->SetSize(0,0,sw,sh);
+        }
+        else
+        {
+          m_ChildViewList[i]->GetWindow()->SetSize(0,0,0,0);
+        }
+        i++;
+      }
     }
   }
 }
@@ -309,4 +332,36 @@ mafView *mafViewCompound::GetSubView(mafRWIBase *rwi)
     }
   }
   return m_ChildViewList[m_DefauldChildView];
+}
+//----------------------------------------------------------------------------
+int mafViewCompound::GetSubViewIndex(mafRWIBase *rwi)
+//----------------------------------------------------------------------------
+{
+  if (rwi)
+  {
+    for(int i=0; i<m_NumOfChildView; i++)
+    {
+      if (((mafViewVTK *)m_ChildViewList[i])->GetRWI() == rwi)
+      {
+        return i;
+      }
+    }
+  }
+  return m_DefauldChildView;
+}
+//----------------------------------------------------------------------------
+void mafViewCompound::MaximizeSubView(int subview_id, bool maximize)
+//----------------------------------------------------------------------------
+{
+  if (m_SubViewMaximized != -1 && maximize)
+  {
+    return;
+  }
+  if (subview_id < 0 || subview_id >= m_NumOfChildView)
+  {
+    mafMessage("Wrong sub-view id !!");
+    return;
+  }
+  m_SubViewMaximized = maximize ? subview_id : -1;
+  OnLayout();
 }

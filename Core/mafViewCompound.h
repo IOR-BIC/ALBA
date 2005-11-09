@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-04 15:24:08 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-11-09 16:30:42 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -122,6 +122,18 @@ public:
   Return the sub-view in which the mouse is interacting with. if no parameter is given, default sub-view is returned.*/
   mafView *GetSubView(mafRWIBase *rwi = NULL);
 
+  /** 
+  Return the sub-view num index which the mouse is interacting with. if no parameter is given, default sub-view index is returned.*/
+  int GetSubViewIndex(mafRWIBase *rwi = NULL);
+
+  /** 
+  Let the sub-view to be maximized inside the compounded view. */
+  void MaximizeSubView(int subview_id = 0, bool maximize = true);
+
+  /** 
+  Return true is one of the plugged view is maximized.*/
+  bool IsSubViewMaximized() {return m_SubViewMaximized != -1;};
+
 protected:
   /**
   Internally used to create a new instance of the GUI. This function should be
@@ -138,6 +150,8 @@ protected:
   int m_NumOfChildView; ///< number of child view (is equal or greater then m_NumOfPluggedChildren)
 
   int m_DefauldChildView;
+  
+  int m_SubViewMaximized;  ///< contain the id of the sub-view to be maximized. -1 means that all sub-views are in normal size
 
   wxSize  m_Size; ///< size of the compound view
   mmgGui *m_GuiView;
