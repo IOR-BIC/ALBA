@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-08 10:38:45 $
-  Version:   $Revision: 1.33 $
+  Date:      $Date: 2005-11-09 11:26:54 $
+  Version:   $Revision: 1.34 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -144,7 +144,7 @@ bool exOperationApp::OnInit()
 
   //wxHandleFatalExceptions();
 
-  m_Logic->ShowSplashScreen();
+  //m_Logic->ShowSplashScreen();
   m_Logic->Show();
   mafString app_stamp;
   app_stamp = "OPEN_ALL_DATA";
