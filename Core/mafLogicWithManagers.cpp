@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-03 14:23:02 $
-  Version:   $Revision: 1.41 $
+  Date:      $Date: 2005-11-09 16:31:20 $
+  Version:   $Revision: 1.42 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -833,6 +833,8 @@ void mafLogicWithManagers::ViewContextualMenu(bool vme_menu)
   contextMenu->SetListener(this);
   mafView *v = m_ViewManager->GetSelectedView();
   mmgMDIChild *c = (mmgMDIChild *)m_Win->GetActiveChild();
+  mmdMouse *mouse = m_InteractionManager->GetMouseDevice();
+  contextMenu->SetMouse(mouse);
   if(c != NULL)
     contextMenu->ShowContextualMenu(c,v,vme_menu);
 /*  else
