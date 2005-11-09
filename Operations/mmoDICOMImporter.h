@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-13 14:01:03 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-11-09 13:19:13 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,7 +22,7 @@
 // forward references :
 //----------------------------------------------------------------------------
 class mafNode;
-class mmgDialog;
+class mmgDialogPreview;
 class mmoDICOMImporterListElement;
 class mmiDICOMImporterInteractor;
 class vtkPlaneSource;
@@ -34,7 +34,6 @@ class vtkActor;
 class vtkWindowLevelLookupTable;
 class mafTagArray;
 class mafVMEVolumeGray;
-class mafRWI;
 
 //----------------------------------------------------------------------------
 // constants :
@@ -104,18 +103,17 @@ protected:
   mmiDICOMImporterInteractor *m_DicomInteractor;
 
   // vtk objects
-	vtkDirectory								*m_CTDirectoryReader;
-	vtkDicomUnPacker						*m_DicomReader;
-	vtkWindowLevelLookupTable		*m_SliceLookupTable;
+	vtkDirectory							*m_CTDirectoryReader;
+	vtkDicomUnPacker					*m_DicomReader;
+	vtkWindowLevelLookupTable	*m_SliceLookupTable;
 
-	vtkPlaneSource							*m_SlicePlane;
-	vtkPolyDataMapper						*m_SliceMapper;
-  vtkTexture									*m_SliceTexture;
-	vtkActor										*m_SliceActor;
+	vtkPlaneSource		*m_SlicePlane;
+	vtkPolyDataMapper	*m_SliceMapper;
+  vtkTexture				*m_SliceTexture;
+	vtkActor					*m_SliceActor;
 
-	vtkPlaneSource							*m_CropPlane;
-	vtkActor										*m_CropActor;	
-	mafRWI											*m_RWI;
+	vtkPlaneSource		*m_CropPlane;
+	vtkActor					*m_CropActor;	
 
   // gui related variables
 	mafString									m_DictionaryFilename;
@@ -140,7 +138,7 @@ protected:
 	wxString									m_BuildStepChoices[3];
 
 	mafTagArray							 *m_TagArray;
-	mmgDialog								 *m_DicomDialog;
+	mmgDialogPreview				 *m_DicomDialog;
 	mafVMEVolumeGray				 *m_Volume;
 
 	double									  m_DicomBounds[6];
@@ -150,7 +148,7 @@ protected:
 	mafString                 m_SurgeonName;
 	double									  m_Identifier;
 
-  wxTextCtrl   *m_slice_text;
+  wxTextCtrl   *m_SliceText;
 	wxSlider		 *m_SliceScanner;
 	wxStaticText *m_SliceLabel;
 };

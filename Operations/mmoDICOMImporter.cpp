@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-13 14:01:03 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-11-09 13:19:13 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,7 +28,7 @@
 #include "mmgValidator.h"
 #include "mmgGui.h"
 #include "mafRWI.h"
-#include "mmgDialog.h"
+#include "mmgDialogPreview.h"
 
 #include "mmdMouse.h"
 #include "mmiDICOMImporterInteractor.h"
@@ -70,47 +70,48 @@ mmoDICOMImporter::mmoDICOMImporter(wxString label) : mafOp(label)
 	for (int i = 0; i < 6; i++) 
     m_DicomBounds[i] = 0;
 	m_Volume	= NULL;
-	m_SortAxes						= 2;
-	m_NumberOfStudy			= 0;
-	m_NumberOfSlices		= 0;
+	m_SortAxes				= 2;
+	m_NumberOfStudy		= 0;
+	m_NumberOfSlices	= 0;
 
   m_DictionaryFilename	= "";
   wxString dictionary = mafGetApplicationDirectory().c_str();
-  dictionary += "\\Config\\Dictionary\\";
+//  dictionary += "\\Config\\Dictionary\\";
 	dictionary.Append("dicom3.dic");
 	if(wxFileExists(dictionary)) 
 		m_DictionaryFilename = dictionary;
 
-	m_CTDir						= mafGetApplicationDirectory().c_str();
-  m_CTDir += "\\Data\\External\\";
-	m_CurrentSlice			= 0;
-  m_BuildStepValue				= 0;
-	m_BuildStepChoices[0]		= "1x";
-	m_BuildStepChoices[1]		= "2x";
-	m_BuildStepChoices[2]		= "4x";
-	m_PatientName							= " ";
-	m_SurgeonName      = " ";
-	m_Identifier				= 0;
-  m_slice_text				= NULL;
-	m_SliceScanner			= NULL;
-	m_SliceLabel					= NULL;
+	m_CTDir	= mafGetApplicationDirectory().c_str();
+//  m_CTDir += "\\Data\\External\\";
+	m_CurrentSlice			  = 0;
+  m_BuildStepValue			= 0;
+	m_BuildStepChoices[0]	= "1x";
+	m_BuildStepChoices[1]	= "2x";
+	m_BuildStepChoices[2] = "4x";
+	
+  m_PatientName	= " ";
+	m_SurgeonName = " ";
+	m_Identifier	= 0;
 
-	m_CropMode					= false;
-	m_CropFlag					= false;
+  m_SliceText     = NULL;
+	m_SliceScanner	= NULL;
+	m_SliceLabel		= NULL;
 
-	m_FilesList				= NULL;
-	m_DicomDialog								= NULL;
-	m_RWI								= NULL;
-	m_TagArray 				= NULL;
+	m_CropMode = false;
+	m_CropFlag = false;
 
-  m_SliceTexture						= NULL;
-  m_CTDirectoryReader			= NULL;
-	m_DicomReader			= NULL;
-	m_CropPlane		 						= NULL;
-  m_SlicePlane 						= NULL;
-	m_SliceMapper						= NULL;
-	m_SliceActor							= NULL;
-	m_SliceLookupTable				= NULL;
+	m_FilesList   = NULL;
+	m_DicomDialog	= NULL;
+	m_TagArray 		= NULL;
+
+  m_SliceTexture      = NULL;
+  m_CTDirectoryReader	= NULL;
+	m_DicomReader			  = NULL;
+	m_CropPlane		 			= NULL;
+  m_SlicePlane 				= NULL;
+	m_SliceMapper				= NULL;
+	m_SliceActor				= NULL;
+	m_SliceLookupTable	= NULL;
 	
 	m_GizmoStatus = GIZMO_NOT_EXIST;
 	m_SideToBeDragged = 0;
@@ -147,8 +148,8 @@ void mmoDICOMImporter::OpStop(int result)
 		((ListDicomFiles *)m_StudyListbox->GetClientData(i))->Clear();
 	}
 
-  m_RWI->m_RenFront->RemoveActor(m_SliceActor);   //SIL. 28-11-2003: - you must always remove actors from the Renderer before cleaning
-  m_RWI->m_RenFront->RemoveActor(m_CropActor);   
+  m_DicomDialog->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);   //SIL. 28-11-2003: - you must always remove actors from the Renderer before cleaning
+  m_DicomDialog->GetRWI()->m_RenFront->RemoveActor(m_CropActor);   
 	
 	vtkDEL(m_SliceTexture);
 	vtkDEL(m_CTDirectoryReader);
@@ -163,7 +164,6 @@ void mmoDICOMImporter::OpStop(int result)
 	mafDEL(m_TagArray);
   mafDEL(m_DicomInteractor);
 
-  cppDEL(m_RWI);
 	cppDEL(m_DicomDialog);
 	cppDEL(m_FilesList);
 
@@ -202,7 +202,7 @@ void mmoDICOMImporter::CreatePipeline()
 	
 	vtkNEW(m_SliceMapper);
 	m_SliceMapper->SetInput(m_SlicePlane->GetOutput());
-		
+
 	vtkNEW(m_SliceActor);
 	m_SliceActor->SetMapper(m_SliceMapper);
 	m_SliceActor->SetTexture(m_SliceTexture);
@@ -221,14 +221,6 @@ void mmoDICOMImporter::CreatePipeline()
 	m_CropActor->VisibilityOff();
 	m_CropActor->SetMapper(pdm);
 
-	m_RWI = new mafRWI(mafGetFrame(),ONE_LAYER,true);
-  m_RWI->SetListener(this);
-  m_RWI->SetSize(0,0,500,500);
-	m_RWI->CameraSet(CAMERA_CT);
-  m_RWI->m_RenFront->AddActor(m_SliceActor);
-  m_RWI->m_RenFront->AddActor(m_CropActor);
-  m_RWI->m_RwiBase->SetMouse(m_Mouse);
-	
 	mafNEW(m_DicomInteractor);
 	m_DicomInteractor->SetListener(this);
   m_Mouse->AddObserver(m_DicomInteractor, MCH_INPUT);
@@ -258,7 +250,7 @@ enum DICOM_IMPORTER_ID
 void mmoDICOMImporter::CreateGui()
 //----------------------------------------------------------------------------
 {
-	m_DicomDialog = new mmgDialog("dicom importer", mafCLOSEWINDOW | mafRESIZABLE);
+	m_DicomDialog = new mmgDialogPreview("dicom importer", mafCLOSEWINDOW | mafRESIZABLE | mafUSEGUI | mafUSERWI);
 	int x_init,y_init;
 	x_init = mafGetFrame()->GetPosition().x;
 	y_init = mafGetFrame()->GetPosition().y;
@@ -299,44 +291,34 @@ void mmoDICOMImporter::CreateGui()
 	m_Gui->Enable(ID_BUILD_BUTTON,0);
 	
 	m_Gui->Show(true);
-	m_Gui->Reparent(m_DicomDialog);
-	m_Gui->FitGui();
-	m_Gui->SetSize(220, 430);
-	m_Gui->Update();
+  m_Gui->Update();
 
 	wxPoint dp = wxDefaultPosition;
-	m_SliceLabel     = new wxStaticText(m_DicomDialog, -1, " slice num. ",dp, wxSize(-1,16));
-	m_slice_text    = new wxTextCtrl  (m_DicomDialog, -1, "",					   dp, wxSize(30,16), wxNO_BORDER);
-	m_SliceScanner = new wxSlider    (m_DicomDialog, -1,0,0,100,			   dp, wxSize(200,22));
-	m_SliceLabel     ->Enable(false);
-	m_slice_text    ->Enable(false);
-	m_SliceScanner ->Enable(false);
+	m_SliceLabel = new wxStaticText(m_DicomDialog, -1, " slice num. ",dp, wxSize(-1,16));
+	m_SliceText = new wxTextCtrl(m_DicomDialog, -1, "", dp, wxSize(30,16), wxNO_BORDER);
+	m_SliceScanner = new wxSlider(m_DicomDialog, -1, 0, 0, 100, dp, wxSize(200,22));
+	m_SliceLabel->Enable(false);
+	m_SliceText->Enable(false);
+	m_SliceScanner->Enable(false);
 
-	m_SliceScanner->SetValidator(mmgValidator(this,ID_SCAN_SLICE,m_SliceScanner,&m_CurrentSlice,m_slice_text));
-  m_slice_text->   SetValidator(mmgValidator(this,ID_SCAN_SLICE,m_slice_text,&m_CurrentSlice,m_SliceScanner,0,100));
+	m_SliceScanner->SetValidator(mmgValidator(this,ID_SCAN_SLICE,m_SliceScanner,&m_CurrentSlice,m_SliceText));
+  m_SliceText->SetValidator(mmgValidator(this,ID_SCAN_SLICE,m_SliceText,&m_CurrentSlice,m_SliceScanner,0,100));
 
 	wxBoxSizer *slice_sizer = new wxBoxSizer(wxHORIZONTAL);
-	slice_sizer->Add(m_SliceLabel,      0, wxALIGN_CENTER|wxRIGHT, 5);
-	slice_sizer->Add(m_slice_text,		 0, wxALIGN_CENTER|wxRIGHT, 5);
-	slice_sizer->Add(m_SliceScanner,  1, wxALIGN_CENTER|wxEXPAND);
+	slice_sizer->Add(m_SliceLabel, 0, wxALIGN_CENTER|wxRIGHT, 5);
+	slice_sizer->Add(m_SliceText, 0, wxALIGN_CENTER|wxRIGHT, 5);
+	slice_sizer->Add(m_SliceScanner, 1, wxALIGN_CENTER|wxEXPAND);
 
-	m_RWI->SetSize(0,0,380,200);
-	m_RWI->m_RwiBase->Reparent(m_DicomDialog);
-	m_RWI->m_RwiBase->Show(true);
+  m_DicomDialog->GetGui()->AddGui(m_Gui);
+	m_DicomDialog->GetRWI()->SetSize(0,0,380,200);
+  m_DicomDialog->m_RwiSizer->Add(slice_sizer, 0, wxEXPAND);
+  m_DicomDialog->GetRWI()->SetListener(this);
+  m_DicomDialog->GetRWI()->SetSize(0,0,500,500);
+  m_DicomDialog->GetRWI()->CameraSet(CAMERA_CT);
+  m_DicomDialog->GetRWI()->m_RenFront->AddActor(m_SliceActor);
+  m_DicomDialog->GetRWI()->m_RenFront->AddActor(m_CropActor);
+  m_DicomDialog->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
 
-	wxBoxSizer *v_sizer = new wxBoxSizer(wxVERTICAL);
-	v_sizer->Add(m_RWI->m_RwiBase,1, wxEXPAND);
-	v_sizer->Add(slice_sizer, 0, wxEXPAND);
-	
-	wxBoxSizer *h_sizer = new wxBoxSizer(wxHORIZONTAL);
-	h_sizer->Add(v_sizer, 1, wxEXPAND);
-	h_sizer->Add(m_Gui,   0, wxLEFT, 5);
-
-	//m_DicomDialog->SetSizer(h_sizer);
-	//m_DicomDialog->SetAutoLayout(TRUE);
-	//h_sizer->Fit(m_DicomDialog);
-  m_DicomDialog->Add(h_sizer);
-  
   int w,h;
   m_DicomDialog->GetSize(&w,&h);
   m_DicomDialog->SetSize(x_init+10,y_init+10,w,h);
@@ -636,7 +618,7 @@ void mmoDICOMImporter::ResetStructure()
 	// disable the scan slider
 	//m_Gui->Enable(ID_SCAN_SLICE,0);
 	m_SliceLabel->Enable(false);
-	m_slice_text->Enable(false);
+	m_SliceText->Enable(false);
 	m_SliceScanner->Enable(false);
 	
 	// disable the button modality
@@ -740,7 +722,7 @@ void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event)
       {
         //m_Gui->Enable(ID_SCAN_SLICE,1);
         m_SliceLabel->Enable(true);
-        m_slice_text->Enable(true);
+        m_SliceText->Enable(true);
         m_SliceScanner->Enable(true);
 
         m_Gui->Enable(ID_CROP_MODE_BUTTON,1);
@@ -791,9 +773,9 @@ void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event)
         // show the selected slice
         ShowSlice(m_CurrentSlice);
 
-        m_RWI->CameraReset();
+        m_DicomDialog->GetRWI()->CameraReset();
         ResetSliders();
-        m_RWI->CameraUpdate();
+        m_DicomDialog->GetRWI()->CameraUpdate();
 
         //modified by STEFY 9-7-2003(begin)
         ImportDicomTags();
@@ -832,7 +814,7 @@ void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event)
       case ID_SCAN_SLICE:
         // show the current slice
         ShowSlice(m_CurrentSlice);
-        m_RWI->CameraUpdate();
+        m_DicomDialog->GetRWI()->CameraUpdate();
       break;
       case ID_CROP_MODE_BUTTON:
         m_CropMode = true;		
@@ -843,24 +825,24 @@ void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event)
           m_Gui->Enable(ID_UNDO_CROP_BUTTON,0);
         m_Gui->Enable(ID_BUILD_STEP,0);
         m_Gui->Enable(ID_BUILD_BUTTON,0);
-        m_RWI->CameraUpdate();
+        m_DicomDialog->GetRWI()->CameraUpdate();
       break;
       case ID_CROP_BUTTON:
         m_CropFlag = true;
         ShowSlice(m_CurrentSlice);
-        m_RWI->CameraUpdate();
+        m_DicomDialog->GetRWI()->CameraUpdate();
         m_Gui->Enable(ID_UNDO_CROP_BUTTON,1);
       break;
       case ID_UNDO_CROP_BUTTON:
         m_CropFlag = false;
         ShowSlice(m_CurrentSlice);
-        m_RWI->CameraUpdate();
+        m_DicomDialog->GetRWI()->CameraUpdate();
         m_Gui->Enable(ID_UNDO_CROP_BUTTON,0);
       break;
       case ID_BUILDVOLUME_MODE_BUTTON:
         m_CropMode = false;
         m_CropActor->VisibilityOff();
-        m_RWI->CameraUpdate();
+        m_DicomDialog->GetRWI()->CameraUpdate();
         m_Gui->Enable(ID_CROP_BUTTON,0);
         m_Gui->Enable(ID_UNDO_CROP_BUTTON,0);
         m_Gui->Enable(ID_BUILD_STEP,1);
@@ -964,7 +946,7 @@ void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event)
               m_CropPlane->SetPoint2(pos[0], pos[1], pos[2]);
             }
           }
-          m_RWI->CameraUpdate();
+          m_DicomDialog->GetRWI()->CameraUpdate();
         }
       }
       break;
@@ -1025,7 +1007,7 @@ void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event)
             m_CropPlane->SetPoint1(pos[0], pos[1], oldP1[2]);
           }
         }
-        m_RWI->CameraUpdate();
+        m_DicomDialog->GetRWI()->CameraUpdate();
       }
       break;
       case MOUSE_UP:  //blocca il gizmo
@@ -1041,5 +1023,3 @@ void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event)
     }	
   }
 }
-
-
