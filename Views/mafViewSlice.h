@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-08 16:11:03 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-11-09 11:27:52 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,7 +16,6 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafViewVTK.h"
-#include "mafPipeVolumeStructuredSlice.h"
 
 //----------------------------------------------------------------------------
 // forward references :
