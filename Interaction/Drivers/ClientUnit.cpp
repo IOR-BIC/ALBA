@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: ClientUnit.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 13:46:13 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-11-10 15:48:22 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -54,18 +54,18 @@ ClientUnit::~ClientUnit()
 bool ClientUnit::ConnectClient(wxIPV4address &addr)
 //----------------------------------------------------------------------------
 {
-  wxLogMessage(_("\nTrying to connect (timeout = 10 sec) ...\n"));
+  mafLogMessage(_("\nTrying to connect (timeout = 10 sec) ...\n"));
   m_sock->Connect(addr, FALSE);
   m_sock->WaitOnConnect(10);
 
   bool status = m_sock->IsConnected();
 
   if(status)
-    wxLogMessage(_("Succeeded ! Connection established\n"));
+    mafLogMessage(_("Succeeded ! Connection established\n"));
   else
   {
     m_sock->Close();
-    wxLogMessage(_("Failed ! Unable to connect\n"));
+    mafLogMessage(_("Failed ! Unable to connect\n"));
     wxMessageBox(_("Can't connect to the specified host"), _("Alert !"));
   }
 
@@ -94,7 +94,7 @@ void ClientUnit::SendMessageToServer(wxString cmd)
   msg2 = new char[len];
 
   m_sock->WriteMsg(msg1, len);
-  wxLogMessage(m_sock->Error() ? _("failed !\n") : _("done\n"));
+  mafLogMessage(m_sock->Error() ? _("failed !\n") : _("done\n"));
 
   delete[] msg2;
   m_busy = FALSE;
@@ -118,7 +118,7 @@ void ClientUnit::OnSocketEvent(wxSocketEvent& event)
     default                  : s.Append(_("Unexpected event !\n")); break;
   }
 
-  wxLogMessage(s);
+  mafLogMessage(s.c_str());
 }
 //----------------------------------------------------------------------------
 void ClientUnit::ReadMessageFromServer(wxSocketBase *sock)
