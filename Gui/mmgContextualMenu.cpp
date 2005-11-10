@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-09 16:31:52 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-11-10 09:30:49 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -101,37 +101,35 @@ void mmgContextualMenu::ShowContextualMenu(wxFrame *child, mafView *view, bool v
 		this->Append(CONTEXTUAL_MENU_DELETE_VME, "Delete");
 		this->Append(CONTEXTUAL_MENU_CHANGE_PROPERTIES, "Change properties");
 		this->Append(CONTEXTUAL_MENU_TRANSFORM, "Maf Transform");
+    this->AppendSeparator();
   }
-	else
-	{
-		this->Append(CONTEXTUAL_MENU_RENAME_VIEW, "Rename View");
-		this->AppendSeparator();
-    if (m_ChildViewActive->IsMaximized())
+	this->Append(CONTEXTUAL_MENU_RENAME_VIEW, "Rename View");
+	this->AppendSeparator();
+  if (m_ChildViewActive->IsMaximized())
+  {
+    this->Append(CONTEXTUAL_MENU_NORMAL_SIZE_CHILD_VIEW, "Normal Size");
+  }
+  else
+  {
+    this->Append(CONTEXTUAL_MENU_MAXIMIZE_CHILD_VIEW, "Maximize");
+  }
+  mafViewCompound *vc = mafViewCompound::SafeDownCast(m_ViewActive);
+  if (vc)
+  {
+    if (vc->IsSubViewMaximized())
     {
-      this->Append(CONTEXTUAL_MENU_NORMAL_SIZE_CHILD_VIEW, "Normal Size");
+      this->Append(CONTEXTUAL_MENU_NORMAL_SIZE_CHILD_SUB_VIEW, "Normal Size SubView");
     }
     else
     {
-      this->Append(CONTEXTUAL_MENU_MAXIMIZE_CHILD_VIEW, "Maximize");
+      this->Append(CONTEXTUAL_MENU_MAXIMIZE_CHILD_SUB_VIEW, "Maximize SubView");
     }
-    mafViewCompound *vc = mafViewCompound::SafeDownCast(m_ViewActive);
-    if (vc)
-    {
-      if (vc->IsSubViewMaximized())
-      {
-        this->Append(CONTEXTUAL_MENU_NORMAL_SIZE_CHILD_SUB_VIEW, "Normal Size SubView");
-      }
-      else
-      {
-        this->Append(CONTEXTUAL_MENU_MAXIMIZE_CHILD_SUB_VIEW, "Maximize SubView");
-      }
-    }
-    //this->Append(CONTEXTUAL_MENU_EXTERNAL_INTERNAL_VIEW, "External", "Switch view visualization between external/internal", TRUE);
-    //this->FindItem(CONTEXTUAL_MENU_EXTERNAL_INTERNAL_VIEW)->Check(m_ViewActive->IsExternal());
-		this->AppendSeparator();
-		this->Append(CONTEXTUAL_MENU_SAVE_AS_IMAGE, "Save as Image");
-    this->Append(CONTEXTUAL_MENU_EXPORT_AS_VRML, "Export as VRML");
   }
+  //this->Append(CONTEXTUAL_MENU_EXTERNAL_INTERNAL_VIEW, "External", "Switch view visualization between external/internal", TRUE);
+  //this->FindItem(CONTEXTUAL_MENU_EXTERNAL_INTERNAL_VIEW)->Check(m_ViewActive->IsExternal());
+	this->AppendSeparator();
+	this->Append(CONTEXTUAL_MENU_SAVE_AS_IMAGE, "Save as Image");
+  this->Append(CONTEXTUAL_MENU_EXPORT_AS_VRML, "Export as VRML");
 
 	int x,y;
 	::wxGetMousePosition(&x, &y);
