@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-07 13:32:23 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-11-10 15:44:08 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,7 +22,9 @@
 // forward references :
 //----------------------------------------------------------------------------
 class mmgLutSlider;
+class mmgFloatSlider;
 class mafViewSlice;
+class mafVMEVolume;
 
 //----------------------------------------------------------------------------
 // mafViewOrthoSlice :
@@ -54,7 +56,9 @@ public:
   /** IDs for the GUI */
   enum VIEW_ORTHO_SLICE_WIDGET_ID
   {
-    ID_ORTHO_CHILD_VIEW = Superclass::ID_LAST,
+    ID_ORTHO_SLICE_X = Superclass::ID_LAST,
+    ID_ORTHO_SLICE_Y,
+    ID_ORTHO_SLICE_Z,
     ID_LAST
   };
 
@@ -68,8 +72,18 @@ protected:
   same pannel GUI, each CreateGUI() function should first call the superclass' one.*/
   virtual mmgGui  *CreateGui();
 
-  mmgLutSlider *m_Luts;
+  /** 
+  Enable/disable view widgets.*/
+  void EnableWidgets(bool enable = true);
+
+  mmgFloatSlider *m_SliderX;
+  mmgFloatSlider *m_SliderY;
+  mmgFloatSlider *m_SliderZ;
+
+  double m_Origin[3];
+
+  mafVMEVolume *m_CurrentVolume; ///< Current visualized volume
+  mmgLutSlider *m_Luts; ///< Double slider used to change brightness and contrast of the image
   mafViewSlice *m_Views[4];
 };
 #endif
-
