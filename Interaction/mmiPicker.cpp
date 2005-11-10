@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPicker.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-02 10:37:05 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-11-10 11:46:54 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -120,7 +120,7 @@ void mmiPicker::OnButtonUp(mafEventInteraction *e)
       mafViewCompound *vc = mafViewCompound::SafeDownCast(v);
       if (vc)
       {
-        v = vc->GetSubView(mouse->GetRWI());
+        v = vc->GetSubView();
       }
       if(v->Pick(mouse_pos[0],mouse_pos[1]))
       {
