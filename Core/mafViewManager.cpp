@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-03 14:21:44 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2005-11-10 11:42:56 $
+  Version:   $Revision: 1.21 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -59,7 +59,6 @@ mafViewManager::mafViewManager()
   for(int i=0; i<MAXVIEW; i++) 
     m_ViewTemplate[i] = NULL;
 
-  // Paolo 2005-04-22
   for(int t=0; t<MAXVIEW; t++)
     for(int v=0; v<MAXVIEW; v++)
       m_ViewMatrixID[t][v] = NULL;
@@ -108,7 +107,7 @@ void mafViewManager::OnEvent(mafEventBase *maf_event)
       break;
       case VIEW_SELECT:
       {
-        mafView*    view = e->GetView();
+        mafView *view = e->GetView();
         //		mafRWIBase* rwi = (mafRWIBase*) e->GetWin();   
         //		if(!rwi) rwi = view->GetDefaultRWI();
 
@@ -116,7 +115,7 @@ void mafViewManager::OnEvent(mafEventBase *maf_event)
 
         ViewSelected(view/*, rwi*/);
 
-        if(notifylogic )
+        if(notifylogic)
           mafEventMacro(mafEvent(this,VIEW_SELECT,(long)e->GetSender())); 
       }
       break;
@@ -132,7 +131,7 @@ void mafViewManager::ViewAdd(mafView *view)
 {
   m_ViewTemplate[m_TemplateNum] = view;
 	view->m_Id = m_TemplateNum + VIEW_START;
-  view->m_Mult = 0; // Paolo 2005-04-22
+  view->m_Mult = 0;
   view->SetListener(this);
 
   m_TemplateNum++;    
@@ -166,7 +165,7 @@ void mafViewManager::VmeAdd(mafNode *n)
   if(s == "mafVMERoot") 
   {
     m_RootVme     = (mafVMERoot*)n;
-    m_SelectedVme = n;     // Paolo 24-06-2004 Adding new tree, selected vme must be initialized at the root.
+    m_SelectedVme = n;     // Adding new tree, selected vme must be initialized at the root.
   }
 }
 //----------------------------------------------------------------------------
@@ -180,7 +179,7 @@ void mafViewManager::VmeRemove(mafNode *n)
 	if(s == "mafVMERoot") 
   {
     m_RootVme     = NULL;
-    m_SelectedVme = NULL;   // Paolo 24-06-2004 Removing the tree, selected vme must be set to NULL.
+    m_SelectedVme = NULL;   // Removing the tree, selected vme must be set to NULL.
   }
 }
 //----------------------------------------------------------------------------
@@ -188,7 +187,7 @@ void mafViewManager::VmeModified(mafNode *vme)
 //---------------------------------------------------------------------------
 {
  //@@@ for(mafView* v = m_ViewList; v; v=v->m_next) 
- //@@@   v->VmeModified(vme);  -- view::vmeModified not exist now -- is this required ?  //SIL. 21-4-2005: 
+ //@@@   v->VmeModified(vme);  -- view::vmeModified not exist now -- is this required ?
 }
 //----------------------------------------------------------------------------
 void mafViewManager::VmeSelect(mafNode *n)   

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-09 16:31:20 $
-  Version:   $Revision: 1.42 $
+  Date:      $Date: 2005-11-10 11:41:21 $
+  Version:   $Revision: 1.43 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -754,15 +754,16 @@ void mafLogicWithManagers::ViewCreate(int viewId)
 	if(m_ViewManager)
   {
     mafView* v = m_ViewManager->ViewCreate(viewId);
-    if(m_OpManager) VmeShow(m_OpManager->GetSelectedVme(),true);
+    if(m_OpManager) 
+    {
+      VmeShow(m_OpManager->GetSelectedVme(),true);
+    }
   }
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::ViewSelect()
 //----------------------------------------------------------------------------
 {
-	// non e' corretto nel caso non ci sia il viewManager 
-  // --- fornire modo diverso di ottenere la SelectedView
   if(m_ViewManager) 
   {
     mafView *view = m_ViewManager->GetSelectedView();
@@ -782,7 +783,7 @@ void mafLogicWithManagers::ViewSelect()
 void mafLogicWithManagers::ViewCreated(mafView *v)
 //----------------------------------------------------------------------------
 {
-  // tolto il supporto alle View esterne -- per il momento
+  // removed temporarily support for external Views
   if(v) 
 	{
       mmgMDIChild *c = new mmgMDIChild(m_Win,v);   
@@ -833,8 +834,6 @@ void mafLogicWithManagers::ViewContextualMenu(bool vme_menu)
   contextMenu->SetListener(this);
   mafView *v = m_ViewManager->GetSelectedView();
   mmgMDIChild *c = (mmgMDIChild *)m_Win->GetActiveChild();
-  mmdMouse *mouse = m_InteractionManager->GetMouseDevice();
-  contextMenu->SetMouse(mouse);
   if(c != NULL)
     contextMenu->ShowContextualMenu(c,v,vme_menu);
 /*  else

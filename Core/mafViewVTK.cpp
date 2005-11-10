@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-08 09:43:52 $
-  Version:   $Revision: 1.34 $
+  Date:      $Date: 2005-11-10 11:43:55 $
+  Version:   $Revision: 1.35 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -124,8 +124,6 @@ void mafViewVTK::Create()
   m_Sg  = new mafSceneGraph(this,m_Rwi->m_RenFront,m_Rwi->m_RenBack);
   m_Sg->SetListener(this);
   m_Rwi->m_Sg = m_Sg;
-  m_Rwi->m_Camera->SetClippingRange(0.1,1000); 
-  this->CameraReset();
 
   vtkNEW(m_Picker3D);
   vtkNEW(m_Picker2D);
@@ -293,11 +291,11 @@ void mafViewVTK::VmeCreatePipe(mafNode *vme)
       n->m_Pipe = (mafPipe*)pipe;
       if (m_NumberOfVisibleVme == 1)
       {
-        mafEventMacro(mafEvent(this,CAMERA_RESET));
+        CameraReset();
       }
       else
       {
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+        CameraUpdate();
       }
     }
     else

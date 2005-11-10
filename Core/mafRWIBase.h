@@ -2,19 +2,22 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 10:21:57 $
-  Version:   $Revision: 1.2 $
-  Authors:   Silvano Imboden
+  Date:      $Date: 2005-11-10 11:38:51 $
+  Version:   $Revision: 1.3 $
+  Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
+
 #ifndef _mafRWIBase_H_
 #define _mafRWIBase_H_ 1
+
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
 #include "vtkRenderWindowInteractor.h"
+
 //----------------------------------------------------------------------------
 // Forward References :
 //----------------------------------------------------------------------------
@@ -26,10 +29,12 @@ class wxSizeEvent;
 class vtkInteractorObserver;
 class vtkCamera;
 class mmdMouse;
+
 //----------------------------------------------------------------------------
 // Constant:
 //----------------------------------------------------------------------------
 #define ID_mafRWIBase_TIMER 1001
+
 //----------------------------------------------------------------------------
 // mafRWIBase :
 //----------------------------------------------------------------------------
@@ -66,23 +71,32 @@ public:
   // vtk render window interactor methods
   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-	/** Initialize the render window interactor. */
+	/** 
+  Initialize the render window interactor. */
   void Initialize();
-	/** Enable the render window interactor. */
+	/** 
+  Enable the render window interactor. */
   void Enable();
-	/** Disable the render window interactor. */
+	/** 
+  Disable the render window interactor. */
   void Disable();
-	/** Redefined method to take the control on event loop. */
+	/** 
+  Redefined method to take the control on event loop. */
   void Start();
-	/** Update the size of the render window. */
+	/** 
+  Update the size of the render window. */
   void UpdateSize(int x, int y);
-	/** Redefined method to terminate the application. */
+	/** 
+  Redefined method to terminate the application. */
   void TerminateApp();
-	/** Return an image of the render window. */
+	/** 
+  Return an image of the render window. */
   wxBitmap* GetImage();
-	/** Save an image of the render window. */
+	/** 
+  Save an image of the render window. */
   void SaveImage(wxString view_name = "", int magnification = 1);
-	/** Return the current used camera */
+	/** 
+  Return the current used camera */
 	vtkCamera* GetCamera();
 
   int CreateTimer(int timertype);
@@ -92,38 +106,50 @@ public:
   // event handlers 
   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	
-	/** Method called whe the render window as to be repainted. */
+	/** 
+  Method called whe the render window as to be repainted. */
   void OnPaint(wxPaintEvent &event);
 	/**  */
   void OnEraseBackground (wxEraseEvent& event);
-	/** Capture mouse and notify the mouse click. */
+	/** 
+  Capture mouse and notify the mouse click. */
   void OnLeftMouseButtonDown(wxMouseEvent &event);
-  /** Release the mouse and send an event with mouse position. */
+  /** 
+  Release the mouse and send an event with mouse position. */
   void OnLeftMouseButtonUp(wxMouseEvent &event);
-	/** Capture mouse and notify the mouse click. */
+	/** 
+  Capture mouse and notify the mouse click. */
   void OnMiddleMouseButtonDown(wxMouseEvent &event);
-	/** Release the mouse and send an event with mouse position. */
+	/** 
+  Release the mouse and send an event with mouse position. */
   void OnMiddleMouseButtonUp(wxMouseEvent &event);
-	/** Capture mouse and notify the mouse click. */
+	/** 
+  Capture mouse and notify the mouse click. */
   void OnRightMouseButtonDown(wxMouseEvent &event);
-	/** Release the mouse and send an event with mouse position. */
+	/** 
+  Release the mouse and send an event with mouse position. */
   void OnRightMouseButtonUp(wxMouseEvent &event);
-	/** Send an event with mouse position. */
+	/** 
+  Send an event with mouse position. */
   void OnMouseMotion(wxMouseEvent &event);
-	/** Send an event with timer information. */
+	/** 
+  Send an event with timer information. */
   void OnTimer(wxTimerEvent &event);
-	/** Send an event with key code information. */
+	/** 
+  Send an event with key code information. */
   void OnKeyDown(wxKeyEvent &event);
-	/** Send an event with key code information. */
+	/** 
+  Send an event with key code information. */
   void OnKeyUp(wxKeyEvent &event);
-	/** Send an event with key code information. */
+	/** 
+  Send an event with key code information. */
   void OnChar(wxKeyEvent &event);
-	/** find the current camera and set UseHorizontalViewAngle depending on the win aspect ratio */
+	/** 
+  Find the current camera and set UseHorizontalViewAngle depending on the win aspect ratio */
   void OnSize(wxSizeEvent &event);
-	/** Do nothing. */
+	/** 
+  Do nothing. */
 	void OnIdle(wxIdleEvent& event);
-  /** Initialize the action for the mouse device. */
-  //void SetMouseAction(mafAction *action);
 
   /** Redefined to set the m_CustomInteractorStyle flag. */
   void SetInteractorStyle(vtkInteractorObserver *o);
