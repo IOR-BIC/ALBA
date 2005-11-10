@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-09 16:30:42 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-11-10 11:42:32 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,6 +26,7 @@
 #include "mafSceneNode.h"
 #include "mmgViewWin.h"
 #include "mmgGui.h"
+#include "mmdMouse.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewCompound);
@@ -44,6 +45,7 @@ mafViewCompound::mafViewCompound( wxString label, int num_row, int num_col, bool
   m_PluggedChildViewList.clear();
   m_GuiView = NULL;
   m_SubViewMaximized = -1;
+  m_Mouse = NULL;
 }
 //----------------------------------------------------------------------------
 mafViewCompound::~mafViewCompound()
@@ -173,7 +175,7 @@ mafRWIBase *mafViewCompound::GetRWI()
 {
   return ((mafViewVTK *)m_ChildViewList[m_DefauldChildView])->GetRWI();
 }
-//----------------------------------------------------------------------------
+/*//----------------------------------------------------------------------------
 mafPipe *mafViewCompound::GetNodePipe(mafNode *vme)
 //----------------------------------------------------------------------------
 {
@@ -204,7 +206,7 @@ mmgGui *mafViewCompound::GetNodePipeGUI(mafNode *vme, int view_idx)
     return n->m_Pipe->GetGui();
   }
   return NULL;
-}
+}*/
 //----------------------------------------------------------------------------
 void mafViewCompound::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
@@ -312,15 +314,17 @@ void mafViewCompound::OnLayout()
 void mafViewCompound::SetMouse(mmdMouse *mouse)
 //----------------------------------------------------------------------------
 {
+  m_Mouse = mouse;
   for(int i=0; i<m_NumOfChildView; i++)
   {
     ((mafViewVTK *)m_ChildViewList[i])->SetMouse(mouse);
   }
 }
 //----------------------------------------------------------------------------
-mafView *mafViewCompound::GetSubView(mafRWIBase *rwi)
+mafView *mafViewCompound::GetSubView()
 //----------------------------------------------------------------------------
 {
+  mafRWIBase *rwi = m_Mouse->GetRWI();
   if (rwi)
   {
     for(int i=0; i<m_NumOfChildView; i++)
@@ -334,9 +338,10 @@ mafView *mafViewCompound::GetSubView(mafRWIBase *rwi)
   return m_ChildViewList[m_DefauldChildView];
 }
 //----------------------------------------------------------------------------
-int mafViewCompound::GetSubViewIndex(mafRWIBase *rwi)
+int mafViewCompound::GetSubViewIndex()
 //----------------------------------------------------------------------------
 {
+  mafRWIBase *rwi = m_Mouse->GetRWI();
   if (rwi)
   {
     for(int i=0; i<m_NumOfChildView; i++)

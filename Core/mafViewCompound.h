@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-09 16:30:42 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-11-10 11:42:33 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -91,7 +91,7 @@ public:
   virtual void OnSize(wxSizeEvent &event);
 
   /** IDs for the GUI */
-  enum VIEW_WIDGET_ID
+  enum VIEWCOMPOUND_WIDGET_ID
   {
     ID_DEFAULT_CHILD_VIEW = Superclass::ID_LAST,
     ID_LAST
@@ -108,23 +108,23 @@ public:
 
   /** 
   Return the current pipe for the specified vme (if any exist at this moment) */
-  virtual mafPipe*  GetNodePipe(mafNode *vme);
+//  virtual mafPipe*  GetNodePipe(mafNode *vme);
 
   /** 
   Return the GUI for the visual pipe corresponding to the default child view. */
-  virtual mmgGui *GetNodePipeGUI(mafNode *vme);
+//  virtual mmgGui *GetNodePipeGUI(mafNode *vme);
 
   /** 
   Return the gui for the visual pipe corresponding to the n-th child view. */
-  virtual mmgGui *GetNodePipeGUI(mafNode *vme, int view_idx);
+//  virtual mmgGui *GetNodePipeGUI(mafNode *vme, int view_idx);
 
   /** 
-  Return the sub-view in which the mouse is interacting with. if no parameter is given, default sub-view is returned.*/
-  mafView *GetSubView(mafRWIBase *rwi = NULL);
+  Return the sub-view in which the mouse is interacting with.*/
+  mafView *GetSubView();
 
   /** 
-  Return the sub-view num index which the mouse is interacting with. if no parameter is given, default sub-view index is returned.*/
-  int GetSubViewIndex(mafRWIBase *rwi = NULL);
+  Return the sub-view num index which the mouse is interacting with.*/
+  int GetSubViewIndex();
 
   /** 
   Let the sub-view to be maximized inside the compounded view. */
@@ -155,6 +155,7 @@ protected:
 
   wxSize  m_Size; ///< size of the compound view
   mmgGui *m_GuiView;
+  mmdMouse *m_Mouse;
 
   std::vector<mafView *> m_ChildViewList; ///< Child views vector
   std::vector<mafView *> m_PluggedChildViewList; ///< Plugged Child views vector
