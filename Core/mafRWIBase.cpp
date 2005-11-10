@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-04 14:16:05 $
-  Version:   $Revision: 1.4 $
-  Authors:   Silvano Imboden
+  Date:      $Date: 2005-11-10 11:39:53 $
+  Version:   $Revision: 1.5 $
+  Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -92,10 +92,12 @@ mafRWIBase::mafRWIBase(wxWindow *parent, wxWindowID id, const wxPoint &pos,
 {
   m_Hidden = true;
   this->Show(false);
-	m_SaveDir = ::wxGetHomeDir(); m_SaveDir += "\\desktop"; 
+	m_SaveDir = ::wxGetHomeDir(); 
   m_Width = m_Height = 10;
-  m_Camera = NULL;
-  m_Mouse = NULL;
+  
+  m_Camera  = NULL;
+  m_Mouse   = NULL;
+  
   m_CustomInteractorStyle = false;
 }
 //----------------------------------------------------------------------------
@@ -123,9 +125,22 @@ void mafRWIBase::Initialize()
   // if don't have render window then stuck
   if (!RenderWindow)
   {
-   // wxLogMessage("mafRWIBase::Initialize has no render window");
+   // mafLogMessage("mafRWIBase::Initialize has no render window");
     return;
   }
+
+#ifdef __WXMSW__
+  if (RenderWindow->GetGenericWindowId() == 0)
+    RenderWindow->SetWindowId( (HWND) this->GetHWND() );
+#endif
+#ifdef __WXGTK__
+  if (RenderWindow->GetGenericWindowId() == 0)
+    RenderWindow->SetParentId( (void *)(((GdkWindowPrivate *)GTK_PIZZA(m_wxwindow)->bin_window)->xwindow) );
+#endif
+#ifdef __WXMOTIF__
+  if (RenderWindow->GetGenericWindowId() == 0)
+    RenderWindow->SetWindowId( this->GetXWindow() );
+#endif
 
   // set minimum size of window
   int *size = RenderWindow->GetSize();
@@ -172,7 +187,7 @@ void mafRWIBase::Start()
 //----------------------------------------------------------------------------
 {
   // the interactor cannot control the event loop
-  wxLogMessage("mafRWIBase::Start() interactor cannot control event loop.");
+  mafLogMessage("mafRWIBase::Start() interactor cannot control event loop.");
 }
 //----------------------------------------------------------------------------
 void mafRWIBase::UpdateSize(int x, int y)
@@ -219,23 +234,10 @@ void mafRWIBase::OnPaint(wxPaintEvent &event)
   //RenderWindow->SetSize(w, h);
   //vtkRenderWindowInteractor::SetSize(w, h);
   
-  if(!RenderWindow) return; //SIL. 13-11-2003: - rare - may happen during Debug
-
-#ifdef __WXMSW__
-  if (RenderWindow->GetGenericWindowId() == 0)
-    RenderWindow->SetWindowId( (HWND) this->GetHWND() );
-#endif
-#ifdef __WXGTK__
-  if (RenderWindow->GetGenericWindowId() == 0)
-    RenderWindow->SetParentId( (void *)(((GdkWindowPrivate *)GTK_PIZZA(m_wxwindow)->bin_window)->xwindow) );
-#endif
-#ifdef __WXMOTIF__
-  if (RenderWindow->GetGenericWindowId() == 0)
-    RenderWindow->SetWindowId( this->GetXWindow() );
-#endif
-
-  if(!Initialized) Initialize();
-
+  if(!RenderWindow) 
+    return; //rare - may happen during Debug
+  if(!Initialized) 
+    Initialize();
   Render();
 }
 //----------------------------------------------------------------------------
@@ -268,7 +270,8 @@ void mafRWIBase::OnLeftMouseButtonDown(wxMouseEvent &event)
     e.SetModifier(MAF_CTRL_KEY,event.ControlDown());
     e.SetModifier(MAF_ALT_KEY,event.AltDown());
     e.SetChannel(MCH_OUTPUT);
-    if(m_Mouse) m_Mouse->OnEvent(&e);
+    if(m_Mouse) 
+      m_Mouse->OnEvent(&e);
   }
 }
 //----------------------------------------------------------------------------
@@ -294,7 +297,8 @@ void mafRWIBase::OnMiddleMouseButtonDown(wxMouseEvent &event)
     e.SetModifier(MAF_CTRL_KEY,event.ControlDown());
     e.SetModifier(MAF_ALT_KEY,event.AltDown());
     e.SetChannel(MCH_OUTPUT);
-    if(m_Mouse) m_Mouse->OnEvent(&e);
+    if(m_Mouse) 
+      m_Mouse->OnEvent(&e);
   }
 }
 //----------------------------------------------------------------------------
@@ -320,7 +324,8 @@ void mafRWIBase::OnRightMouseButtonDown(wxMouseEvent &event)
     e.SetModifier(MAF_CTRL_KEY,event.ControlDown());
     e.SetModifier(MAF_ALT_KEY,event.AltDown());
     e.SetChannel(MCH_OUTPUT);
-    if(m_Mouse) m_Mouse->OnEvent(&e);
+    if(m_Mouse) 
+      m_Mouse->OnEvent(&e);
   }
 }
 //----------------------------------------------------------------------------
@@ -343,7 +348,8 @@ void mafRWIBase::OnLeftMouseButtonUp(wxMouseEvent &event)
     e.SetModifier(MAF_CTRL_KEY,event.ControlDown());
     e.SetModifier(MAF_ALT_KEY,event.AltDown());
     e.SetChannel(MCH_OUTPUT);
-    if(m_Mouse) m_Mouse->OnEvent(&e);
+    if(m_Mouse) 
+      m_Mouse->OnEvent(&e);
   }
   
   if( GetCapture() == this )
@@ -369,7 +375,8 @@ void mafRWIBase::OnMiddleMouseButtonUp(wxMouseEvent &event)
     e.SetModifier(MAF_CTRL_KEY,event.ControlDown());
     e.SetModifier(MAF_ALT_KEY,event.AltDown());
     e.SetChannel(MCH_OUTPUT);
-    if(m_Mouse) m_Mouse->OnEvent(&e);
+    if(m_Mouse) 
+      m_Mouse->OnEvent(&e);
   }
 
   if( GetCapture() == this )
@@ -395,7 +402,8 @@ void mafRWIBase::OnRightMouseButtonUp(wxMouseEvent &event)
     e.SetModifier(MAF_CTRL_KEY,event.ControlDown());
     e.SetModifier(MAF_ALT_KEY,event.AltDown());
     e.SetChannel(MCH_OUTPUT);
-    if(m_Mouse) m_Mouse->OnEvent(&e);
+    if(m_Mouse) 
+      m_Mouse->OnEvent(&e);
   }
 
   if( GetCapture() == this )
@@ -420,7 +428,8 @@ void mafRWIBase::OnMouseMotion(wxMouseEvent &event)
     e.SetModifier(MAF_CTRL_KEY,event.ControlDown());
     e.SetModifier(MAF_ALT_KEY,event.AltDown());
     e.SetChannel(MCH_OUTPUT);
-    if(m_Mouse) m_Mouse->OnEvent(&e);
+    if(m_Mouse) 
+      m_Mouse->OnEvent(&e);
   }
 }
 //----------------------------------------------------------------------------
