@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-17 13:12:16 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-11-10 11:40:57 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -81,6 +81,7 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, int stereo)
   m_RenderWindow->AddRenderer(m_RenFront);
 
 	m_RwiBase->SetRenderWindow(m_RenderWindow);
+  m_RwiBase->Initialize();
   
 	if(layers == TWO_LAYER)
 	{
@@ -124,27 +125,27 @@ mafRWI::~mafRWI()
 	vtkDEL(m_Grid);
   */
 	
-	cppDEL(m_Axes); //SIL. 31-10-2003: must be removed before deleting renderers
+	cppDEL(m_Axes); //Must be removed before deleting renderers
   vtkDEL(m_Light);
 	vtkDEL(m_Camera);
 	if(m_RenFront) 
   {
-    m_RenFront->RemoveAllProps();        //Paolo 23-06-2004
+    m_RenFront->RemoveAllProps();
     m_RenderWindow->RemoveRenderer(m_RenFront);
   }
   vtkDEL(m_RenFront);
   if(m_RenBack) 
   {
-    m_RenBack->RemoveAllProps();        //Paolo 23-06-2004
+    m_RenBack->RemoveAllProps();
     m_RenderWindow->RemoveRenderer(m_RenBack);
   }
 	vtkDEL(m_RenBack);
 	if(m_RenderWindow) 
-    m_RenderWindow->SetInteractor(NULL);    //Paolo 23-06-2004
+    m_RenderWindow->SetInteractor(NULL);
   m_RenderWindow->Delete();
   if(m_RwiBase) 
-    m_RwiBase->SetRenderWindow(NULL); //Paolo 23-06-2004
-	vtkDEL(m_RwiBase);  //SIL. 13-11-2003: The renderer has to be Deleted as last
+    m_RwiBase->SetRenderWindow(NULL);
+	vtkDEL(m_RwiBase);  //The renderer has to be Deleted as last
 }
 //-----------------------------------------------------------------------------------------
 void mafRWI::CameraSet(int cam_position)
@@ -256,6 +257,7 @@ void mafRWI::CameraSet(int cam_position)
   m_Camera->SetFocalPoint(0,0,0);
   m_Camera->SetPosition(x*100,y*100,z*100);
   m_Camera->SetViewUp(vx,vy,vz);
+  m_Camera->SetClippingRange(0.1,1000);
   
 	CameraReset();
 
@@ -347,7 +349,7 @@ void mafRWI::SetStereo(int stereo_type)
 void mafRWI::CameraUpdate()
 //----------------------------------------------------------------------------
 {
-  //if(!m_RwiBase->IsShown()) return; //TODO: capire perche' non funziona piu' - risulta sempre nascosta
+  //if(!m_RwiBase->IsShown()) return;
   if (m_RenderWindow->GetGenericWindowId() == 0) 
 		return;
 
