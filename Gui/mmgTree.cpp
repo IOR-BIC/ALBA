@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 14:02:35 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-11-10 12:03:08 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -356,12 +356,12 @@ int mmgTree::CheckIconId(int icon)
   if(!m_images) return 0;
   if( icon <0 )
   {
-    wxLogMessage("mmgTree: icon id = %d out of range ", icon);
+    mafLogMessage("mmgTree: icon id = %d out of range ", icon);
     return 0;
   }
   if( icon >= m_images->GetImageCount() ) 
   {
-    wxLogMessage("mmgTree: icon id = %d out of range ", icon);
+    mafLogMessage("mmgTree: icon id = %d out of range ", icon);
     return m_images->GetImageCount()-1;
   }
   return icon;
@@ -372,7 +372,7 @@ void mmgTree::SetImageList(wxImageList *img)
 {
   if(m_root != 0)
   {
-    wxLogMessage("warning: mmgTree::SetImageList must be called before adding any node");
+    mafLogMessage("warning: mmgTree::SetImageList must be called before adding any node");
     // if you replace the imagelist with a shorter one 
     // the icon-index actually in use by the existing nodes 
     // can become inconsistent 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 11:41:21 $
-  Version:   $Revision: 1.43 $
+  Date:      $Date: 2005-11-10 12:02:52 $
+  Version:   $Revision: 1.44 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -430,7 +430,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
         vtkRenderer *ren = (vtkRenderer*)e->GetVtkObj();
         //assert(ren);
         m_InteractionManager->PreResetCamera(ren);
-        //wxLogMessage("CAMERA_PRE_RESET");
+        //mafLogMessage("CAMERA_PRE_RESET");
       }
       break;
     case CAMERA_POST_RESET:
@@ -439,7 +439,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
         vtkRenderer *ren = (vtkRenderer*)e->GetVtkObj();
         //assert(ren); //modified by Marco. 2-11-2004 Commented out to allow reset camera of all cameras.
         m_InteractionManager->PostResetCamera(ren);
-        //wxLogMessage("CAMERA_POST_RESET");
+        //mafLogMessage("CAMERA_POST_RESET");
       }
       break;
     case CAMERA_UPDATE:

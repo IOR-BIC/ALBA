@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgSashPanel.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-03 13:55:38 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-11-10 12:03:08 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -66,7 +66,7 @@ mmgSashPanel::mmgSashPanel (wxWindow* parent,wxWindowID id, wxDirection side , i
   		SetDefaultSize(wxSize(1000, defaultsize));
 		break;
 		default:
-			wxLogMessage("mmgSashPanel: unrecognized side");
+			mafLogMessage("mmgSashPanel: unrecognized side");
   }
   SetExtraBorderSize(0);
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 14:04:30 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-11-10 12:02:52 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -333,7 +333,7 @@ void mafNodeManager::MSFSave()
   m_storage->SetFileName(m_msffile.c_str());
   if (m_storage->Write()!=0)
   {
-    wxLogMessage("Error during MSF saving");
+    mafLogMessage("Error during MSF saving");
   }
 	m_FileHistory.AddFileToHistory(m_msffile );
 	m_FileHistory.Save(*m_Config);

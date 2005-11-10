@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckListBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-22 07:02:27 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-11-10 12:03:07 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -70,7 +70,7 @@ void mmgCheckListBox::AddItem(int id, wxString label)
 {
   if( m_clb->Number() == mmgCheckListBox_ArraySize ) 
   {
-    wxLogMessage("mmgCheckListBox:overflow");
+    mafLogMessage("mmgCheckListBox:overflow");
     return;
   }
   
@@ -83,7 +83,7 @@ void mmgCheckListBox::AddItem(int id, wxString label, bool check)
 {
   if( m_clb->Number() == mmgCheckListBox_ArraySize ) 
   {
-    wxLogMessage("mmgCheckListBox:overflow");
+    mafLogMessage("mmgCheckListBox:overflow");
     return;
   }
 
@@ -172,7 +172,7 @@ int mmgCheckListBox::FindItemIndex(int id)
     i++;
   }
 
-  wxLogMessage("mmgCheckListBox: ItemNotFound: %d",id);
+  mafLogMessage("mmgCheckListBox: ItemNotFound: %d",id);
   return -1;
 }
 //----------------------------------------------------------------------------

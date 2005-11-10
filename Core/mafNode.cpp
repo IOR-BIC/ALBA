@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-22 09:40:53 $
-  Version:   $Revision: 1.41 $
+  Date:      $Date: 2005-11-10 12:02:52 $
+  Version:   $Revision: 1.42 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -889,19 +889,19 @@ void mafNode::OnEvent(mafEventBase *e)
             Print(ss1);
             wxString message = ss1.str().c_str();
 
-            wxLogMessage("[VME PRINTOUT:]\n");
+            mafLogMessage("[VME PRINTOUT:]\n");
 
             for (int pos = message.Find('\n'); pos >= 0; pos = message.Find('\n'))
             {
               wxString tmp = message.Mid(0,pos);
-              wxLogMessage(tmp);
+              mafLogMessage(tmp.c_str());
               message = message.Mid(pos+1);
             }
           #else
             std::strstream ss1,ss2;
             Print(ss1);
             ss1 << std::ends;   // Paolo 13/06/2005: needed to close correctly the strstream
-            wxLogMessage("[VME PRINTOUT:]\n%s\n", ss1.str()); 
+            mafLogMessage("[VME PRINTOUT:]\n%s\n", ss1.str()); 
           #endif
           }
           break;

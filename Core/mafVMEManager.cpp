@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-13 13:39:05 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2005-11-10 12:02:53 $
+  Version:   $Revision: 1.19 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -426,7 +426,7 @@ void mafVMEManager::MSFSave()
   m_Storage->SetURL(m_MSFFile.c_str());
   if (m_Storage->Store()!=0)
   {
-    wxLogMessage("Error during MSF saving");
+    mafLogMessage("Error during MSF saving");
   }
   if (m_TmpDir != "")
   {

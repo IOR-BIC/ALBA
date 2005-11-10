@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoReparentTo.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-06 14:48:35 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-11-10 12:03:20 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -149,7 +149,7 @@ void mmoReparentTo::OpDo()
   }
   else
   {
-    wxLogMessage("Something went wrong while reparenting (bad pointer or memory errors)"); 
+    mafLogMessage("Something went wrong while reparenting (bad pointer or memory errors)"); 
   }
 }
 //----------------------------------------------------------------------------

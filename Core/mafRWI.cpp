@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 11:40:57 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-11-10 12:02:53 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -326,7 +326,7 @@ void mafRWI::SetStereo(int stereo_type)
 {
   if(m_RenBack) 
   {
-    wxLogMessage("LAL WARNING: SetStereo is disabled for RWI with two layers"); 
+    mafLogMessage("LAL WARNING: SetStereo is disabled for RWI with two layers"); 
     return;
   }
 	

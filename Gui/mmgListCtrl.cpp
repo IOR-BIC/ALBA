@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgListCtrl.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:24 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-11-10 12:03:07 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -131,7 +131,7 @@ ITEM_ICONS mmgListCtrl::GetItemIcon (long item_id)
   int icon = -1;
   if( li.m_mask & wxLIST_MASK_IMAGE )
     icon = li.m_image;
-  wxLogMessage("icon = %d",icon);
+  mafLogMessage("icon = %d",icon);
   mafYield();
   return (ITEM_ICONS) icon;
 }

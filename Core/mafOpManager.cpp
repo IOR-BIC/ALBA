@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-06 16:01:25 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-11-10 12:02:52 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -177,7 +177,7 @@ void mafOpManager::FillMenu (wxMenu* import, wxMenu* mexport, wxMenu* operations
       if(sub_menu)
         sub_menu->Append(o->m_Id, o->m_Label, o->m_Label);
       else
-        wxLogMessage("error in FillMenu");
+        mafLogMessage("error in FillMenu");
     }
     else
     {
@@ -496,7 +496,7 @@ void mafOpManager::OpDo(mafOp *op)
   m_Context.Redo_Clear();
   op->OpDo();
   
-  wxLogMessage("do=%s",op->m_Label.c_str());
+  mafLogMessage("do=%s",op->m_Label.c_str());
 
   if(op->CanUndo()) 
   {
@@ -514,13 +514,13 @@ void mafOpManager::OpUndo()
 {
   if( m_Context.Undo_IsEmpty()) 
   {
-    wxLogMessage("empty undo stack");
+    mafLogMessage("empty undo stack");
     return;
   }
 	EnableOp(false);
 
 	mafOp* op = m_Context.Undo_Pop();
-	wxLogMessage("undo=%s",op->m_Label.c_str());
+	mafLogMessage("undo=%s",op->m_Label.c_str());
 	op->OpUndo();
 	m_Context.Redo_Push(op);
 
@@ -532,13 +532,13 @@ void mafOpManager::OpRedo()
 {
   if( m_Context.Redo_IsEmpty())
   {
-    wxLogMessage("empty redo stack");
+    mafLogMessage("empty redo stack");
     return;
   }
 	EnableOp(false);
 
 	mafOp* op = m_Context.Redo_Pop();
-	wxLogMessage("redo=%s",op->m_Label.c_str());
+	mafLogMessage("redo=%s",op->m_Label.c_str());
 	op->OpDo();
 	m_Context.Undo_Push(op);
 

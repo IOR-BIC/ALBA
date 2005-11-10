@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoImageImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-25 15:42:40 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-11-10 12:03:20 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -390,7 +390,7 @@ void mmoImageImporter::BuildVolume()
     r->Delete();
 	}
 	else
-		wxLogMessage("unable to import %s, unrecognized type", m_Files[0].c_str());
+		mafLogMessage("unable to import %s, unrecognized type", m_Files[0].c_str());
   
   mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
   if(convert)

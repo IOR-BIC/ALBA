@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-08 10:38:27 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-11-10 12:02:52 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -231,7 +231,7 @@ void mafLogicWithGUI::CreateLogbar()
   m_LogSash = new mmgSashPanel(m_Win, MENU_VIEW_LOGBAR, wxBOTTOM,80,"Log Bar \tCtrl+L");
   m_LogSash->Put(log_panel);
   //m_LogSash->Show(false);
-  wxLogMessage("welcome");
+  mafLogMessage("welcome");
 }
 
 //----------------------------------------------------------------------------

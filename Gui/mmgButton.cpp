@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:44:02 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-11-10 12:03:07 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,7 +44,7 @@ mmgButton::mmgButton(wxWindow* parent, wxWindowID id, const wxString& label,
 void mmgButton::Command(wxCommandEvent& event)
 //----------------------------------------------------------------------------
 {
-  wxLogMessage("mmgButton::cmd");
+  mafLogMessage("mmgButton::cmd");
 }
 #ifdef __WIN32__
     //----------------------------------------------------------------------------

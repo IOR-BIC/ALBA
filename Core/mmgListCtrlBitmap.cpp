@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgListCtrlBitmap.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:46:22 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-11-10 12:02:53 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -147,7 +147,7 @@ ITEM_ICONS mmgListCtrlBitmap::GetItemIcon(long item_id)
   int icon = -1;
   if( li.m_mask & wxLIST_MASK_IMAGE )
      icon = li.m_image;
-  wxLogMessage("icon = %d",icon);
+  mafLogMessage("icon = %d",icon);
   mafYield();
   return (ITEM_ICONS) icon;
 }

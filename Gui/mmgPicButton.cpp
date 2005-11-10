@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgPicButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:48:58 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-11-10 12:03:08 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -56,7 +56,7 @@ void mmgPicButton::SetEventId(long EventId)
 void mmgPicButton::Command(wxCommandEvent& event)
 //----------------------------------------------------------------------------
 {
-  wxLogMessage("cmd");
+  mafLogMessage("cmd");
 }
 #ifdef __WIN32__
 //----------------------------------------------------------------------------

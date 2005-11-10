@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooserTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-06 14:48:02 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-11-10 12:02:53 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -105,7 +105,7 @@ void mmgVMEChooserTree::InitializeImageList()
 
   if(num_types <= 0)
   {
-    wxLogMessage("mmgVMEChooserTree:  Warning - no vme-icons defined");
+    mafLogMessage("mmgVMEChooserTree:  Warning - no vme-icons defined");
     return;
   }
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-12 09:44:44 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-11-10 12:03:07 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,7 +50,7 @@ class mmgMDIFrameCallback : public vtkCommand
         if(m_mode==0) // ProgressEvent-Callback
         {
           m_frame->ProgressBarSetVal(po->GetProgress()*100);
-          //wxLogMessage("progress = %g", po->GetProgress()*100);
+          //mafLogMessage("progress = %g", po->GetProgress()*100);
         }
         else if(m_mode==1) // StartEvent-Callback
         {
@@ -368,7 +368,7 @@ void mmgMDIFrame::BindToProgressBar(vtkObject* vtkobj)
   else if(vtkobj->IsA("vtkProcessObject")) 
 		BindToProgressBar((vtkProcessObject*)vtkobj);
 	else 
-    wxLogMessage("wrong vtkObject passed to BindToProgressBar");
+    mafLogMessage("wrong vtkObject passed to BindToProgressBar");
 }
 /* --- used for vtk v.4.2
 //----------------------------------------------------------------------------
