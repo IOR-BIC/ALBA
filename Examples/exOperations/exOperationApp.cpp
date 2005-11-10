@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-09 11:26:54 $
-  Version:   $Revision: 1.34 $
+  Date:      $Date: 2005-11-10 12:20:10 $
+  Version:   $Revision: 1.35 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -93,6 +93,7 @@ bool exOperationApp::OnInit()
 
   //------------------------------------------------------------
   // Importer Menu':
+  //------------------------------------------------------------
   m_Logic->Plug(new mmoImageImporter("Images"));
   m_Logic->Plug(new mmoRAWImporterVolume("RAW Volume"));
   m_Logic->Plug(new mmoSTLImporter("STL"));
@@ -103,6 +104,7 @@ bool exOperationApp::OnInit()
 
   //------------------------------------------------------------
   // Exporter Menu':
+  //------------------------------------------------------------
   m_Logic->Plug(new mmoMSFExporter("MSF"));
   m_Logic->Plug(new mmoSTLExporter("STL"));
   m_Logic->Plug(new mmoVTKExporter("VTK"));
@@ -110,6 +112,7 @@ bool exOperationApp::OnInit()
 
   //------------------------------------------------------------
   // Operation Menu':
+  //------------------------------------------------------------
   m_Logic->Plug(new mmo2DMeasure("2D Measure"));
   m_Logic->Plug(new mmoAddLandmark("Add Landmark"));
   m_Logic->Plug(new mmoClipSurface("Clip Surface"));
@@ -127,6 +130,7 @@ bool exOperationApp::OnInit()
   
   //------------------------------------------------------------
   // View Menu':
+  //------------------------------------------------------------
   m_Logic->Plug(new mafViewVTK("VTK view"));
   mafViewVTK *v = new mafViewVTK("Slice view", CAMERA_CT);
   v->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
