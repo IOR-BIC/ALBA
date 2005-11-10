@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 09:30:49 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-11-10 11:46:08 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,7 +33,6 @@
 #include "mafViewVTK.h"
 #include "mafViewCompound.h"
 #include "mmgMDIChild.h"
-#include "mmdMouse.h"
 
 #include "mafPipe.h"
 
@@ -196,7 +195,7 @@ void mmgContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
       mafViewCompound *vc = mafViewCompound::SafeDownCast(m_ViewActive);
       if (vc)
       {
-        int subview_idx = vc->GetSubViewIndex(m_Mouse->GetRWI());
+        int subview_idx = vc->GetSubViewIndex();
         vc->MaximizeSubView(subview_idx);
       }
     }
