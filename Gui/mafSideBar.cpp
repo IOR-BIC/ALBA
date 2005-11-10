@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-24 11:44:13 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2005-11-10 11:45:04 $
+  Version:   $Revision: 1.24 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,7 +23,6 @@
 #include "mafSideBar.h"
 #include "mafView.h"
 #include "mafViewVTK.h"
-#include "mafViewCompound.h"
 #include "mmgSashPanel.h"
 #include "mmgGui.h"
 #include "mmgGuiHolder.h"
@@ -235,17 +234,11 @@ void mafSideBar::UpdateVmePanel()
         vme_out = NULL;
     }
 
-    if(m_SelectedView && m_SelectedView->IsMAFType(mafViewVTK))
+    if(m_SelectedView)
     {
       vme_pipe = m_SelectedView->GetNodePipe(m_SelectedVme);
       if(vme_pipe)
         vme_pipe_gui = vme_pipe->GetGui();
-    }
-    else if(m_SelectedView && m_SelectedView->IsA("mafViewCompound"))
-    {
-      // by default this plug the gui for the default child view, use compound view's settings
-      // to change the default child view
-      vme_pipe_gui = ((mafViewCompound *)m_SelectedView)->GetNodePipeGUI(m_SelectedVme);
     }
   }
 
