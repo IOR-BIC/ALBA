@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-09 13:19:13 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-11-10 12:04:47 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -488,7 +488,7 @@ void mmoDICOMImporter::ImportDicomTags()
 		  keyword=(char *)tag->Keyword;
 		  if (tag->intoDictionary==vtkDicomUnPacker::no)
 		  {
-			  wxLogMessage("Hmmm Keyword not in dictionary???");
+			  mafLogMessage("Hmmm Keyword not in dictionary???");
 		  }
 	  }
 
