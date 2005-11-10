@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiInfoImage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-09 15:13:08 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-11-10 11:47:22 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -121,7 +121,7 @@ void mmiInfoImage::OnEvent(mafEventBase *event)
             mafViewCompound *vc = mafViewCompound::SafeDownCast(v);
             if (vc)
             {
-              v = vc->GetSubView(mouse->GetRWI());
+              v = vc->GetSubView();
             }
             mafString info;
             info = "";
