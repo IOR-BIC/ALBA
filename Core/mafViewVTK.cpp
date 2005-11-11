@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 11:43:55 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2005-11-11 13:57:57 $
+  Version:   $Revision: 1.36 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -327,6 +327,10 @@ mmgGui *mafViewVTK::CreateGui()
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
   
+  /////////////////////////////////////////View GUI
+  m_Gui->String(ID_TEXT_IN_VIEW,"view text",&m_TextInView,"Text visualized into the view");
+  m_Gui->Divider(2);
+
   /////////////////////////////////////////Attach Camera GUI
   m_Gui->Label("attach camera to selected object",true);
   m_Gui->Bool(ID_ATTACH_CAMERA,"attach",&m_CameraAttach,1);
@@ -374,6 +378,10 @@ void mafViewVTK::OnEvent(mafEventBase *maf_event)
       case CAMERA_POST_RESET:
         OnPostResetCamera();
         mafEventMacro(*maf_event);
+      break;
+      case ID_TEXT_IN_VIEW:
+        m_TextMapper->SetInput(m_TextInView.GetCStr());
+        CameraUpdate();
       break;
       default:
         mafEventMacro(*maf_event);

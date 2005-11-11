@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-05 11:58:36 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2005-11-11 13:57:57 $
+  Version:   $Revision: 1.30 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -65,6 +65,7 @@ public:
   enum VIEW_VTK_WIDGET_ID
   {
     ID_ATTACH_CAMERA = Superclass::ID_LAST,
+    ID_TEXT_IN_VIEW,
     ID_LAST
   };
 
