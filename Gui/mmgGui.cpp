@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-08 11:02:37 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2005-11-11 13:54:31 $
+  Version:   $Revision: 1.25 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -89,7 +89,7 @@ mmgPanel(mafGetFrame(),-1,dp,wxDefaultSize,wxNO_BORDER | wxCLIP_CHILDREN | wxTAB
    m_BackgroundColor = wxColour(251,251,253);
    if(m_UseBackgroundColor) this->SetBackgroundColour(m_BackgroundColor);
 
-   m_EntryStyle = wxSUNKEN_BORDER; // sotto XP - usando wxSUNKEN_BORDER si ha il bordo azzurro come nei combo
+   m_EntryStyle = wxSUNKEN_BORDER /*| wxTE_PROCESS_TAB*/;
 
    m_Sizer =  new wxBoxSizer( wxVERTICAL );
    this->SetAutoLayout( TRUE );
@@ -559,7 +559,7 @@ void mmgGui::String(int id,mafString label, mafString *var, mafString tooltip)
 	if(label.IsEmpty())
 	{
     int w_id = GetId(id);
-		wxTextCtrl  *text = new wxTextCtrl  (this, w_id, "", dp, wxSize(FW,LH), m_EntryStyle  );
+		wxTextCtrl  *text = new wxTextCtrl  (this, w_id, "", dp, wxSize(FW,LH), m_EntryStyle );
 		text->SetValidator( mmgValidator(this,w_id,text,var) );
 		if(!tooltip.IsEmpty())
       text->SetToolTip(tooltip.GetCStr());
@@ -570,7 +570,7 @@ void mmgGui::String(int id,mafString label, mafString *var, mafString tooltip)
 		wxStaticText *lab = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT );
     if(m_UseBackgroundColor) lab->SetBackgroundColour(m_BackgroundColor);
     int w_id = GetId(id);
-		wxTextCtrl  *text = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(DW,LH), m_EntryStyle  );
+		wxTextCtrl  *text = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(DW,LH), m_EntryStyle );
 		text->SetValidator( mmgValidator(this,w_id,text,var) );
 		if(!tooltip.IsEmpty())
 			text->SetToolTip(tooltip.GetCStr());
