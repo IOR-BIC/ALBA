@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgValidator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-25 11:27:32 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-11-11 13:54:11 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -121,7 +121,11 @@ bool mmgValidator::IsValid()
     break;
     case VAL_STRING:
       if ( !(m_TextCtrl && m_TextCtrl->IsKindOf(CLASSINFO(wxTextCtrl)))  ) return false;
-      if ( !m_StringVar && !m_MafStringVar ) return false;
+      if ( !m_StringVar ) return false;
+    break;
+    case VAL_MAF_STRING:
+      if ( !(m_TextCtrl && m_TextCtrl->IsKindOf(CLASSINFO(wxTextCtrl)))  ) return false;
+      if ( !m_MafStringVar ) return false;
     break;
     case VAL_SLIDER:
 		case VAL_SLIDER_2:
@@ -242,7 +246,7 @@ mmgValidator::mmgValidator(mafObserver* listener, int mid, wxTextCtrl *win,mafSt
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);  
-  m_Mode        = VAL_STRING;
+  m_Mode        = VAL_MAF_STRING;
   m_TextCtrl    = win; 
   m_MafStringVar= var;     
   m_WidgetData.dType  = STRING_DATA;
@@ -607,6 +611,8 @@ bool mmgValidator::TransferToWindow(void)
     break;
     case VAL_STRING:
       if (m_StringVar) m_TextCtrl->SetValue(*m_StringVar);
+    break;
+    case VAL_MAF_STRING:
       if (m_MafStringVar) m_TextCtrl->SetValue(wxString(m_MafStringVar->GetCStr()));
     break;
     case VAL_SLIDER:
@@ -763,6 +769,8 @@ bool mmgValidator::TransferFromWindow(void)
         m_WidgetData.sValue = *m_StringVar;
         return res;
       }
+    break;
+    case VAL_MAF_STRING:
       if (m_MafStringVar)
       {
         s = m_TextCtrl->GetValue();
@@ -822,10 +830,10 @@ void mmgValidator::OnChar(wxKeyEvent& event)
   //Filter key for TextCtrl used for numeric input
   int keyCode = (int)event.KeyCode();
 
-  if (keyCode == WXK_RETURN && (m_Mode == VAL_STRING  || 
-                                m_Mode == VAL_INTEGER || 
-                                m_Mode == VAL_FLOAT   || 
-                                m_Mode == VAL_DOUBLE))
+  if ((keyCode == WXK_RETURN || keyCode == WXK_TAB) &&
+      (m_Mode == VAL_STRING  || m_Mode == VAL_MAF_STRING || 
+       m_Mode == VAL_INTEGER || m_Mode == VAL_FLOAT || 
+m_Mode == VAL_DOUBLE))
   {
     // Return is received only from widget with the wxTE_PROCESS_ENTER style flag enabled
     // i.e. console widget
@@ -856,7 +864,7 @@ void mmgValidator::OnChar(wxKeyEvent& event)
 void mmgValidator::OnKillFocus(wxFocusEvent& event)
 //----------------------------------------------------------------------------
 {
-  if (m_Mode == VAL_STRING || m_Mode == VAL_INTEGER || m_Mode == VAL_FLOAT || 
+  if (m_Mode == VAL_STRING || m_Mode == VAL_MAF_STRING || m_Mode == VAL_INTEGER || m_Mode == VAL_FLOAT || 
 			m_Mode == VAL_DOUBLE || m_Mode == VAL_FLOAT_SLIDER_2 || m_Mode == VAL_SLIDER_2)
     if ( IsValid() )
     {
