@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-11 13:57:57 $
-  Version:   $Revision: 1.36 $
+  Date:      $Date: 2005-11-11 15:50:07 $
+  Version:   $Revision: 1.37 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,6 +24,7 @@
 #include "mafPipe.h"
 #include "mafPipeFactory.h"
 #include "mafLightKit.h"
+#include "mafAttachCamera.h"
 
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
@@ -61,16 +62,13 @@ mafViewVTK::mafViewVTK(wxString label, int camera_position, bool show_axes, int 
   m_LightKit  = NULL;
   m_TextMapper= NULL;
   m_TextActor = NULL;
+  m_AttachCamera = NULL;
 
   m_TextPosition[0] = m_TextPosition[1] = 3;
   m_TextColor[0] = m_TextColor[1] = m_TextColor[2] = 1;
   m_TextInView = "";
 
   m_NumberOfVisibleVme = 0;
-
-  m_CameraAttach  = 0;
-  m_AttachedVme       = NULL;
-  m_AttachedVmeMatrix = NULL;
 }
 //----------------------------------------------------------------------------
 mafViewVTK::~mafViewVTK() 
@@ -86,10 +84,10 @@ mafViewVTK::~mafViewVTK()
   vtkDEL(m_TextActor);
   vtkDEL(m_Picker2D);
   vtkDEL(m_Picker3D);
+  cppDEL(m_AttachCamera);
   cppDEL(m_LightKit);
   cppDEL(m_Sg);
   cppDEL(m_Rwi);
-  vtkDEL(m_AttachedVmeMatrix);
 }
 //----------------------------------------------------------------------------
 void mafViewVTK::PlugVisualPipe(mafString vme_type, mafString pipe_type, long visibility)
@@ -192,21 +190,6 @@ void mafViewVTK::VmeSelect(mafNode *vme, bool select)
 {
   assert(m_Sg); 
   m_Sg->VmeSelect(vme,select);
-  if (m_CameraAttach && select)
-  {
-    m_AttachedVme = mafVME::SafeDownCast(vme);
-    if (m_AttachedVme == NULL)
-    {
-      m_CameraAttach = 0;
-      m_Gui->Update();
-    }
-    else
-    {
-      if (m_AttachedVmeMatrix == NULL)
-        vtkNEW(m_AttachedVmeMatrix);
-      m_AttachedVmeMatrix->DeepCopy(m_AttachedVme->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
-    }
-  }
 }
 //----------------------------------------------------------------------------
 void mafViewVTK::CameraSet(int camera_position) 
@@ -227,8 +210,10 @@ void mafViewVTK::CameraReset(mafNode *node)
 void mafViewVTK::CameraUpdate() 
 //----------------------------------------------------------------------------
 {
-  if(m_AttachedVme != NULL && m_AttachedVmeMatrix != NULL)
-    UpdateCameraMatrix(); 
+  if (m_AttachCamera != NULL)
+  {
+    m_AttachCamera->UpdateCameraMatrix();
+  }
   assert(m_Rwi); 
   m_Rwi->CameraUpdate();
 }
@@ -332,8 +317,8 @@ mmgGui *mafViewVTK::CreateGui()
   m_Gui->Divider(2);
 
   /////////////////////////////////////////Attach Camera GUI
-  m_Gui->Label("attach camera to selected object",true);
-  m_Gui->Bool(ID_ATTACH_CAMERA,"attach",&m_CameraAttach,1);
+  m_AttachCamera = new mafAttachCamera(m_Gui, m_Rwi, this);
+  m_Gui->AddGui(m_AttachCamera->GetGui());
 
   /////////////////////////////////////////Light GUI
   m_Gui->Divider(2);
@@ -350,27 +335,6 @@ void mafViewVTK::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId()) 
     {
-      case ID_ATTACH_CAMERA:
-        if(m_CameraAttach)
-        {
-          if(!m_Sg->GetSelectedVme()) 
-            return;
-          m_AttachedVme = mafVME::SafeDownCast(m_Sg->GetSelectedVme());
-          if (m_AttachedVme == NULL)
-          {
-            m_CameraAttach = 0;
-            m_Gui->Update();
-            return;
-          }
-          if (m_AttachedVmeMatrix == NULL)
-            vtkNEW(m_AttachedVmeMatrix);
-          m_AttachedVmeMatrix->DeepCopy(m_AttachedVme->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
-        }
-        else
-        {
-          m_AttachedVme = NULL;
-        }
-      break;
       case CAMERA_PRE_RESET:
         OnPreResetCamera();
         mafEventMacro(*maf_event);
@@ -392,23 +356,6 @@ void mafViewVTK::OnEvent(mafEventBase *maf_event)
   {
     mafEventMacro(*maf_event);
   }
-}
-//----------------------------------------------------------------------------
-void mafViewVTK::UpdateCameraMatrix()
-//----------------------------------------------------------------------------
-{
-  vtkMAFSmartPointer<vtkTransform> delta;
-
-  vtkMatrix4x4 *new_matrix = m_AttachedVme->GetOutput()->GetAbsMatrix()->GetVTKMatrix();
-
-  m_AttachedVmeMatrix->Invert();
-
-  delta->Concatenate(new_matrix);
-  delta->Concatenate(m_AttachedVmeMatrix);
-
-  m_Rwi->m_Camera->ApplyTransform(delta);
-
-  m_AttachedVmeMatrix->DeepCopy(new_matrix);
 }
 //----------------------------------------------------------------------------
 void mafViewVTK::OnPreResetCamera()

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-11 13:57:57 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2005-11-11 15:50:07 $
+  Version:   $Revision: 1.31 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,12 +27,12 @@
 //----------------------------------------------------------------------------
 class mafLightKit;
 class mafVME;
-class vtkMatrix4x4;
 class mmdMouse;
 class vtkRenderWindow;
 class vtkRenderer;
 class vtkTextMapper;
 class vtkActor2D;
+class mafAttachCamera;
 
 /** VME visibility attribute when plugging visual pipe.*/
 enum VME_VISIBILITY_ID
@@ -64,8 +64,8 @@ public:
   /** IDs for the GUI */
   enum VIEW_VTK_WIDGET_ID
   {
-    ID_ATTACH_CAMERA = Superclass::ID_LAST,
-    ID_TEXT_IN_VIEW,
+//    ID_ATTACH_CAMERA,
+    ID_TEXT_IN_VIEW = Superclass::ID_LAST,
     ID_LAST
   };
 
@@ -157,10 +157,8 @@ protected:
   mafRWI        *m_Rwi; 
   mafSceneGraph *m_Sg;
   mafLightKit		*m_LightKit;
+  mafAttachCamera *m_AttachCamera;
   int            m_CameraPosition; 
-  int						 m_CameraAttach; ///< Flag to turn On/Off the camera attaching on a particular VME
-  mafVME				*m_AttachedVme; ///< VME on which the camera is attached when the attach-camera option is 'On'
-  vtkMatrix4x4	*m_AttachedVmeMatrix; ///< Matrix given to the Camera to be moved together with m_AttachedVme
 
   int   m_NumberOfVisibleVme; ///< perform ResetCamera only for the first vme shown into the view
   bool  m_ShowAxes;  ///< Flag used to show/hide axes in low left cornel of the view
@@ -181,10 +179,5 @@ protected:
   /** 
   Return the visual pipe's name.*/
   void GetVisualPipeName(mafNode *node, mafString &pipe_name);
-
-  /** 
-  Update the camera position when vme's abs matrix change. 
-  This function is called from CameraUpdate when camera is attached to the vme */
-  void UpdateCameraMatrix();
 };
 #endif
