@@ -8,6 +8,8 @@ MESSAGE(STATUS "Configuring project ${PROJECT_NAME}")
 CONFIGURE_FILE("${MAF_SOURCE_DIR}/Gui/manifest.in" "${MAF_BINARY_DIR}/Gui/manifest.in" COPYONLY)
 
 SET(PROJECT_SRCS
+  mafAttachCamera.cpp
+  mafAttachCamera.h
   mafEvent.cpp
   mafEvent.h
   mafLightKit.cpp
