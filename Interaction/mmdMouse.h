@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdMouse.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-09 11:26:21 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-11-13 14:55:51 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -24,8 +24,8 @@ class vtkRenderer;
 class vtkRenderWindowInteractor;
 
 /** Tracking 2D device, i.e. "Mouse".
-  mmdMouse is a class implemnting interface for a Mouse. Current implemantation 
-  recevices its inputs by means of ProcessEvent and forward to all listeners. Any 
+  mmdMouse is a class implementing interface for a Mouse. Current implementation 
+  receive its inputs by means of ProcessEvent and forward to all listeners. Any 
   widget or windows toolkit can inject events into this centralized mouse.
   @sa mmdButtonsPad mafRWI
 */
