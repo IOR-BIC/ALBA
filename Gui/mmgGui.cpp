@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-11 13:54:31 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2005-11-14 16:53:53 $
+  Version:   $Revision: 1.26 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -526,13 +526,17 @@ void mmgGui::Vector(int id,wxString label,double var[3],double minx,double maxx,
   Add(sizer,0,wxALL, M); 
 }
 //----------------------------------------------------------------------------
-void mmgGui::String(int id,wxString label,wxString* var, wxString tooltip)
+void mmgGui::String(int id,wxString label,wxString* var, wxString tooltip, bool multiline)
 //----------------------------------------------------------------------------
 {
 	if(label == "")
 	{
     int w_id = GetId(id);
-		wxTextCtrl  *text = new wxTextCtrl  (this, w_id, "", dp, wxSize(FW,LH), m_EntryStyle  );
+		wxTextCtrl *text = NULL;
+    if(multiline)
+      text = new wxTextCtrl  (this, w_id, "", dp, wxSize(FW,2*LH), m_EntryStyle|wxTE_MULTILINE|wxTE_WORDWRAP);
+    else
+      text = new wxTextCtrl  (this, w_id, "", dp, wxSize(FW,LH), m_EntryStyle);
 		text->SetValidator( mmgValidator(this,w_id,text,var) );
 		if(tooltip != "") text->SetToolTip(tooltip);
 	  Add(text,0,wxALL, M);
@@ -540,9 +544,14 @@ void mmgGui::String(int id,wxString label,wxString* var, wxString tooltip)
 	else
 	{
 		wxStaticText *lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT );
-    if(m_UseBackgroundColor) lab->SetBackgroundColour(m_BackgroundColor);
+    if(m_UseBackgroundColor) 
+      lab->SetBackgroundColour(m_BackgroundColor);
     int w_id = GetId(id);
-		wxTextCtrl  *text = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(DW,LH), m_EntryStyle  );
+		wxTextCtrl *text = NULL;
+    if(multiline)
+      text = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(DW,2*LH), m_EntryStyle|wxTE_MULTILINE|wxTE_WORDWRAP);
+    else
+      text = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(DW,LH), m_EntryStyle  );
 		text->SetValidator( mmgValidator(this,w_id,text,var) );
 		if(tooltip != "")
 			text->SetToolTip(tooltip);
@@ -553,13 +562,17 @@ void mmgGui::String(int id,wxString label,wxString* var, wxString tooltip)
 	}
 }
 //----------------------------------------------------------------------------
-void mmgGui::String(int id,mafString label, mafString *var, mafString tooltip)
+void mmgGui::String(int id,mafString label, mafString *var, mafString tooltip, bool multiline)
 //----------------------------------------------------------------------------
 {
 	if(label.IsEmpty())
 	{
     int w_id = GetId(id);
-		wxTextCtrl  *text = new wxTextCtrl  (this, w_id, "", dp, wxSize(FW,LH), m_EntryStyle );
+		wxTextCtrl  *text = NULL;
+    if(multiline)
+      text = new wxTextCtrl  (this, w_id, "", dp, wxSize(FW,2*LH), m_EntryStyle|wxTE_MULTILINE|wxTE_WORDWRAP );
+    else
+      text = new wxTextCtrl  (this, w_id, "", dp, wxSize(FW,LH), m_EntryStyle );
 		text->SetValidator( mmgValidator(this,w_id,text,var) );
 		if(!tooltip.IsEmpty())
       text->SetToolTip(tooltip.GetCStr());
@@ -570,7 +583,11 @@ void mmgGui::String(int id,mafString label, mafString *var, mafString tooltip)
 		wxStaticText *lab = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT );
     if(m_UseBackgroundColor) lab->SetBackgroundColour(m_BackgroundColor);
     int w_id = GetId(id);
-		wxTextCtrl  *text = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(DW,LH), m_EntryStyle );
+		wxTextCtrl  *text = NULL;
+    if(multiline)
+      text = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(DW,2*LH), m_EntryStyle|wxTE_MULTILINE|wxTE_WORDWRAP );
+    else
+      text = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(DW,LH), m_EntryStyle );
 		text->SetValidator( mmgValidator(this,w_id,text,var) );
 		if(!tooltip.IsEmpty())
 			text->SetToolTip(tooltip.GetCStr());

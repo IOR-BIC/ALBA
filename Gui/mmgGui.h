@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-08 11:02:37 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2005-11-14 16:53:53 $
+  Version:   $Revision: 1.22 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -111,10 +111,10 @@ public:
   //---------------------------------------------
 
   /** String entry widget. */
-  void String(int id,wxString label,wxString *var, wxString tooltip = "");
+  void String(int id,wxString label,wxString *var, wxString tooltip = "", bool multiline = false);
 
   /** String entry widget. */
-  void String(int id,mafString label,mafString *var, mafString tooltip = "");
+  void String(int id,mafString label,mafString *var, mafString tooltip = "", bool multiline = false);
   
   /** Integer entry widget. */
   void Integer(int id,mafString label,int *var, int min = MININT, int max = MAXINT, mafString tooltip = "");
