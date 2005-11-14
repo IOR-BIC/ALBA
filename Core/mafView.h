@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-07 17:57:38 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2005-11-14 16:54:18 $
+  Version:   $Revision: 1.23 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -107,7 +107,7 @@ public:
   //virtual void			HideGui();
   //virtual void			ShowGui();
 //  virtual void			ShowSettings()							{};
-  virtual void			OnSize(wxSizeEvent &maf_event)	{};
+  virtual void			OnSize(wxSizeEvent &size_event)	{};
 
   /** 
   Perform a picking according to the screen position (x,y) and return true on success*/
