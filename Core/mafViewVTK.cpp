@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-11 15:50:07 $
-  Version:   $Revision: 1.37 $
+  Date:      $Date: 2005-11-14 16:54:46 $
+  Version:   $Revision: 1.38 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,6 +25,7 @@
 #include "mafPipeFactory.h"
 #include "mafLightKit.h"
 #include "mafAttachCamera.h"
+#include "mafTextKit.h"
 
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
@@ -37,11 +38,6 @@
 #include "vtkRendererCollection.h"
 #include "vtkRayCast3DPicker.h"
 #include "vtkCellPicker.h"
-#include "vtkTextMapper.h"
-#include "vtkTextProperty.h"
-#include "vtkProperty2D.h"
-#include "vtkActor2D.h"
-#include "vtkRenderer.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewVTK);
@@ -60,13 +56,7 @@ mafViewVTK::mafViewVTK(wxString label, int camera_position, bool show_axes, int 
   m_Sg        = NULL;
   m_Rwi       = NULL;
   m_LightKit  = NULL;
-  m_TextMapper= NULL;
-  m_TextActor = NULL;
   m_AttachCamera = NULL;
-
-  m_TextPosition[0] = m_TextPosition[1] = 3;
-  m_TextColor[0] = m_TextColor[1] = m_TextColor[2] = 1;
-  m_TextInView = "";
 
   m_NumberOfVisibleVme = 0;
 }
@@ -76,12 +66,6 @@ mafViewVTK::~mafViewVTK()
 {
   m_PipeMap.clear();
 
-  if (m_TextActor)
-  {
-    m_Rwi->m_RenFront->RemoveActor(m_TextActor);
-  }
-  vtkDEL(m_TextMapper);
-  vtkDEL(m_TextActor);
   vtkDEL(m_Picker2D);
   vtkDEL(m_Picker3D);
   cppDEL(m_AttachCamera);
@@ -127,22 +111,6 @@ void mafViewVTK::Create()
   vtkNEW(m_Picker2D);
   m_Picker2D->SetTolerance(0.001);
   m_Picker2D->InitializePickList();
-
-  vtkNEW(m_TextMapper);
-  m_TextMapper->SetInput(m_TextInView.GetCStr());
-  m_TextMapper->GetTextProperty()->AntiAliasingOff();
-  m_TextMapper->GetTextProperty()->SetFontFamily(VTK_TIMES);
-  m_TextMapper->GetTextProperty()->SetColor(0.8,0.8,0.8);
-  m_TextMapper->GetTextProperty()->SetLineOffset(0.5);
-  m_TextMapper->GetTextProperty()->SetLineSpacing(1.5);
-  m_TextMapper->GetTextProperty()->SetJustificationToLeft();
-
-  vtkNEW(m_TextActor);
-  m_TextActor->SetMapper(m_TextMapper);
-  m_TextActor->SetPosition(m_TextPosition);
-  m_TextActor->GetProperty()->SetColor(m_TextColor);
-
-  m_Rwi->m_RenFront->AddActor(m_TextActor);
 }
 //----------------------------------------------------------------------------
 void mafViewVTK::SetMouse(mmdMouse *mouse)
@@ -312,8 +280,9 @@ mmgGui *mafViewVTK::CreateGui()
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
   
-  /////////////////////////////////////////View GUI
-  m_Gui->String(ID_TEXT_IN_VIEW,"view text",&m_TextInView,"Text visualized into the view");
+  /////////////////////////////////////////Text GUI
+  m_TextKit = new mafTextKit(m_Gui, m_Rwi, this);
+  m_Gui->AddGui(m_TextKit->GetGui());
   m_Gui->Divider(2);
 
   /////////////////////////////////////////Attach Camera GUI
@@ -342,10 +311,6 @@ void mafViewVTK::OnEvent(mafEventBase *maf_event)
       case CAMERA_POST_RESET:
         OnPostResetCamera();
         mafEventMacro(*maf_event);
-      break;
-      case ID_TEXT_IN_VIEW:
-        m_TextMapper->SetInput(m_TextInView.GetCStr());
-        CameraUpdate();
       break;
       default:
         mafEventMacro(*maf_event);
@@ -417,23 +382,4 @@ bool mafViewVTK::Pick(mafMatrix &m)
     }
   }
   return false;
-}
-//----------------------------------------------------------------------------
-void mafViewVTK::SetText(const char *text, int x, int y)
-//----------------------------------------------------------------------------
-{
-  m_TextInView = text;
-  m_TextPosition[0] = x;
-  m_TextPosition[1] = y;
-}
-//----------------------------------------------------------------------------
-void mafViewVTK::SetTextColor(double textColor[3])
-//----------------------------------------------------------------------------
-{
-  m_TextColor[0] = textColor[0];
-  m_TextColor[1] = textColor[1];
-  m_TextColor[2] = textColor[2];
-
-  if(m_TextActor) 
-    m_TextActor->GetProperty()->SetColor(m_TextColor);
 }
