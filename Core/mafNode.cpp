@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 12:02:52 $
-  Version:   $Revision: 1.42 $
+  Date:      $Date: 2005-11-15 15:24:31 $
+  Version:   $Revision: 1.43 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -50,6 +50,7 @@ mafNode::mafNode()
 {
   m_Parent              = NULL;
   m_Initialized         = false;
+  m_DependsOnLinkedNode = false;
   m_VisibleToTraverse   = true;
   m_Id                  = -1; // invalid ID
   m_Gui                 = NULL;
@@ -757,24 +758,36 @@ mafNode *mafNode::GetLink(const char *name)
   return NULL;
 }
 //-------------------------------------------------------------------------
-void mafNode::SetLink(const char *name, mafNode *node)
+mafID mafNode::GetLinkSubId(const char *name)
+//-------------------------------------------------------------------------
+{
+  assert(name);
+  mafLinksMap::iterator it = m_Links.find(mafCString(name));
+  if (it != m_Links.end())
+  {
+    return it->second.m_NodeSubId;
+  }
+  return -1;
+}
+//-------------------------------------------------------------------------
+void mafNode::SetLink(const char *name, mafNode *node, mafID sub_id)
 //-------------------------------------------------------------------------
 {
   assert(name);
   assert(node);
 
   mmuNodeLink newlink;
-  if (node->GetRoot()==GetRoot())
+  if (node->GetRoot() == GetRoot())
   {
-    newlink.m_NodeId=node->GetId();
+    newlink.m_NodeId = node->GetId();
   }
 
-  mafLinksMap::iterator it=m_Links.find(mafString().Set(name));
+  mafLinksMap::iterator it = m_Links.find(mafString().Set(name));
 
-  if (it!=m_Links.end())
+  if (it != m_Links.end())
   {
     // if already linked simply return
-    if (it->second.m_Node==node)
+    if (it->second.m_Node == node && it->second.m_NodeSubId == sub_id)
       return;
    
     // detach old linked node, if present
@@ -783,7 +796,7 @@ void mafNode::SetLink(const char *name, mafNode *node)
   }
 
   // set the link to the new node
-  m_Links[name]=mmuNodeLink(node->GetId(),node);
+  m_Links[name] = mmuNodeLink(node->GetId(),node,sub_id);
 
   // attach as observer of the linked node to catch events
   // of de/attachment to the tree and destroy event.
@@ -818,6 +831,26 @@ void mafNode::RemoveAllLinks()
   }
   m_Links.clear();
   Modified();
+}
+//-------------------------------------------------------------------------
+unsigned long mafNode::GetMTime()
+//-------------------------------------------------------------------------
+{
+  unsigned long mtime = this->mafTimeStamped::GetMTime();
+  if (m_DependsOnLinkedNode)
+  {
+    unsigned long mtimelink;
+    for (mafLinksMap::iterator it=m_Links.begin();it!=m_Links.end();it++)
+    {
+      // check linked node timestamp
+      if(it->second.m_Node)
+      {
+        mtimelink = it->second.m_Node->GetMTime();
+        mtime = (mtimelink > mtime) ? mtimelink : mtime;
+      }
+    }
+  }
+  return mtime;
 }
 
 //-------------------------------------------------------------------------
@@ -972,7 +1005,8 @@ int mafNode::InternalStore(mafStorageElement *parent)
     mmuNodeLink &link=links_it->second;
     mafStorageElement *link_item_element=links_element->AppendChild("Link");
     link_item_element->SetAttribute("Name",links_it->first);
-    link_item_element->SetAttribute("NodeId",mafString(link.m_NodeId));
+    link_item_element->SetAttribute("NodeId",link.m_NodeId);
+    link_item_element->SetAttribute("NodeSubId",link.m_NodeSubId);
   }
 
   // store the visible children into a tmp array
@@ -1039,9 +1073,10 @@ int mafNode::InternalRestore(mafStorageElement *node)
         {
           mafString link_name;
           links_vector[i]->GetAttribute("Name",link_name);
-          mafID link_node_id;
+          mafID link_node_id, link_node_subid;
           links_vector[i]->GetAttributeAsInteger("NodeId",link_node_id);
-          m_Links[link_name]=mmuNodeLink(link_node_id);
+          links_vector[i]->GetAttributeAsInteger("NodeSubId",link_node_subid);
+          m_Links[link_name] = mmuNodeLink(link_node_id,NULL,link_node_subid);
         }
 
         // restore children

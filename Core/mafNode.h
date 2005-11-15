@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-22 09:47:22 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2005-11-15 15:24:24 $
+  Version:   $Revision: 1.29 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -298,9 +298,10 @@ public:
   class mmuNodeLink :public mmuUtility
   {
   public:
-    mmuNodeLink(mafID id=-1,mafNode *node=NULL):m_NodeId(id),m_Node(node) {}
+    mmuNodeLink(mafID id=-1,mafNode *node=NULL, mafID sub_id=-1):m_NodeId(id),m_Node(node),m_NodeSubId(sub_id) {}
     mafNode *m_Node;
     mafID   m_NodeId;
+    mafID   m_NodeSubId;
   };
   typedef std::map<mafString,mmuNodeLink> mafLinksMap;
 
@@ -309,8 +310,12 @@ public:
     such a name exists return NULL. */
   mafNode *GetLink(const char *name);
 
+  /** 
+  Return the subId associated with the link (used for mafVMELandmark)*/
+  mafID GetLinkSubId(const char *name);
+
   /** set a link to another node in the tree */
-  void SetLink(const char *name, mafNode *node);
+  void SetLink(const char *name, mafNode *node, mafID sub_id = -1);
 
   /** remove a link */
   void RemoveLink(const char *name);
@@ -333,7 +338,7 @@ public:
   void ForwardDownEvent(mafEventBase &maf_event);
 
   /** IDs for the GUI */
-  enum 
+  enum NODE_WIDGET_ID
   {
     ID_NAME = MINID,
     ID_PRINT_INFO,
@@ -354,6 +359,18 @@ public:
 
   /** Check if m_Id and regenerate it if is invalid (-1) */
   void UpdateId();
+
+  /**
+  Return the modification time.*/
+  virtual unsigned long GetMTime();
+
+  /** 
+  Turn on the flag to calculate the timestamp considering also the linked nodes*/
+  void DependsOnLinkedNodeOn() {m_DependsOnLinkedNode = true;};
+
+  /** 
+  Turn off the flag to calculate the timestamp considering also the linked nodes*/
+  void DependsOnLinkedNodeOff() {m_DependsOnLinkedNode = false;};
 
 protected:
 
@@ -402,8 +419,9 @@ protected:
   mafString         m_Name;         ///< name of this node
   mafID             m_Id;           ///< ID of this node
 
-  bool  m_VisibleToTraverse;        ///< enable/disable traversing visit of this node
-  bool  m_Initialized;              ///< set true by Initialize()
+  bool m_VisibleToTraverse;         ///< enable/disable traversing visit of this node
+  bool m_Initialized;               ///< set true by Initialize()
+  bool m_DependsOnLinkedNode;       ///< enable/disable calculation of MTime considering links
 
   mafEventSource    *m_EventSource; ///< source of events issued by the node
 };
