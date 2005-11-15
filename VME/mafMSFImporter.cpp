@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-22 10:09:05 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-11-15 15:30:41 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -97,13 +97,91 @@ int mmuMSF1xDocument::InternalRestore(mafStorageElement *node)
       }
     }    
   }
+  mafNode *n = NULL;
+  std::vector<mafNode *> link_list;
   mafNodeIterator *iter = m_Root->NewIterator();
-  for (mafNode *n = iter->GetFirstNode(); n; n=iter->GetNextNode())
+  // iteration for updating VME's ID
+  for (n = iter->GetFirstNode(); n; n=iter->GetNextNode())
   {
     n->UpdateId();
   }
+  // iteration for setting up linked vme
+  for (n = iter->GetFirstNode(); n;n=iter->GetNextNode())
+  {
+    if (n->IsMAFType(mafVMEGeneric) && n->GetTagArray()->IsTagPresent("mflVMELink"))
+    {
+      link_list.push_back(n);
+      mafTagItem *tag = n->GetTagArray()->GetTag("VME_ALIAS_PATH");
+      mafNode *linkedVME = this->ParsePath(m_Root, tag->GetValue());
+      if (linkedVME != NULL)
+      {
+        mafID sub_id = -1;
+        if (n->GetTagArray()->IsTagPresent("SUBLINK_ID"))
+        {
+          sub_id = (mafID)n->GetTagArray()->GetTag("SUBLINK_ID")->GetValueAsDouble();
+        }
+        n->GetParent()->SetLink(n->GetName(), linkedVME, sub_id);
+      }
+    }
+  }
   iter->Delete();
+  // remove all mafVMEGeneric representing links
+  for (int i=0;i<link_list.size();i++)
+  {
+    link_list[i]->ReparentTo(NULL);
+  }
+  link_list.clear();
   return m_Root->Initialize();
+}
+//------------------------------------------------------------------------------
+mafNode *mmuMSF1xDocument::ParsePath(mafVMERoot *root,const char *path)
+//------------------------------------------------------------------------------
+{
+  const char *str=path;
+  mafNode *node=NULL;
+
+  if (mafString::StartsWith(str,"/MSF"))
+  {
+    str+=4; // jump to next token
+
+    node=root;
+    for (;mafString::StartsWith(str,"/VME[");)
+    {
+      int idx;
+      if (sscanf(str,"/VME[%d]",&idx)==EOF)
+      {
+        mafErrorMacro("Error Parsing XPATH string: \""<<str<<"\"");
+        return NULL;
+      }
+      node=node->GetChild(idx);  
+
+      if (node==NULL)
+      {
+        mafWarningMacro("Corrupted Link");
+        return NULL;
+      }
+
+      // OK... this is not a true Regular Expression pareser!
+      const char *next=strchr(str,']');
+      if (next)
+      {
+        str=next+1;
+      }
+      else
+      {
+        mafErrorMacro("Error Parsing XPATH string");
+        return NULL;
+      }
+    }
+
+    // if string was not yet finished... parse error!!!
+    if ((*str!=0)&&(!mafString::Compare(str,"/")))
+    {
+      mafErrorMacro("Error Parsing XPATH string: \""<<str<<"\"");
+      return NULL;
+    }
+  }
+  return node;
 }
 
 //------------------------------------------------------------------------------
@@ -190,25 +268,56 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
             mafErrorMacro("MSFImporter: error restoring child VME (parent=\""<<vme->GetName()<<"\")");
             continue;
           }
-          if (vme_type!="mafVMELink" && vme_type!="mafVMEAlias")
+          // add the new VME as a child of the given parent node
+          if (vme_type == "mflVMELandmarkCloud" && child_vme->IsMAFType(mafVMELandmark))
           {
-            // add the new VME as a child of the given parent node
-            if (vme_type == "mflVMELandmarkCloud" && child_vme->IsMAFType(mafVMELandmark))
+            ((mafVMELandmarkCloud *)vme)->SetLandmark((mafVMELandmark *)child_vme);
+            child_vme->Delete();
+            child_vme = NULL;
+          }
+          else if ((vme->IsMAFType(mafVMEMeter) || vme->IsMAFType(mafVMEProber)) && child_vme->GetTagArray()->IsTagPresent("mflVMELink"))
+          {
+            // this is a particular case for mafVMEMeter, in which the links are changed name
+            if (mafCString(child_vme->GetName()) == "StartLink")
             {
-              ((mafVMELandmarkCloud *)vme)->SetLandmark((mafVMELandmark *)child_vme);
-              child_vme->Delete();
-              child_vme = NULL;
+              child_vme->SetName("StartVME");
+              if (vme->GetTagArray()->IsTagPresent("MFL_METER_START_VME_ID"))
+              {
+                child_vme->GetTagArray()->SetTag("SUBLINK_ID",vme->GetTagArray()->GetTag("MFL_METER_START_VME_ID")->GetValue());
+                vme->GetTagArray()->DeleteTag("MFL_METER_START_VME_ID");
+              }
             }
-            else
+            else if (mafCString(child_vme->GetName()) == "EndLink1")
             {
-              vme->AddChild(child_vme);
+              child_vme->SetName("EndVME1");
+              if (vme->GetTagArray()->IsTagPresent("MFL_METER_END_VME_1_ID"))
+              {
+                child_vme->GetTagArray()->SetTag("SUBLINK_ID",vme->GetTagArray()->GetTag("MFL_METER_END_VME_1_ID")->GetValue());
+                vme->GetTagArray()->DeleteTag("MFL_METER_END_VME_1_ID");
+              }
             }
+            else if (mafCString(child_vme->GetName()) == "EndLink2")
+            {
+              child_vme->SetName("EndVME2");
+              if (vme->GetTagArray()->IsTagPresent("MFL_METER_END_VME_2_ID"))
+              {
+                child_vme->GetTagArray()->SetTag("SUBLINK_ID",vme->GetTagArray()->GetTag("MFL_METER_END_VME_2_ID")->GetValue());
+                vme->GetTagArray()->DeleteTag("MFL_METER_END_VME_2_ID");
+              }
+            }
+            else if (mafCString(child_vme->GetName()) == "SurfaceLink")
+            {
+              child_vme->SetName("Surface");
+            }
+            else if (mafCString(child_vme->GetName()) == "VolumeLink")
+            {
+              child_vme->SetName("Volume");
+            }
+            vme->AddChild(child_vme);
           }
           else
           {
-            // for VME-link and VME-alias we simply need to create links in current VME
-
-            // ... to be implemented
+            vme->AddChild(child_vme);
           }
         } 
       }
@@ -224,11 +333,16 @@ mafVME *mmuMSF1xDocument::CreateVMEInstance(mafString &name)
   if (
     name == "mafVMEGeneric"         ||
     name == "mflVMEExternalData"    ||
-    name == "mflVMEAlias"//           ||
-    //name == "mflVMELink"
+    name == "mflVMEAlias"
     )
   {
     return mafVMEGeneric::New();
+  }
+  else if (name == "mflVMELink")
+  {
+    mafVME *link = mafVMEGeneric::New();
+    link->GetTagArray()->SetTag("mflVMELink","1");
+    return link;
   }
   else if (name == "mflVMEGroup")
   {

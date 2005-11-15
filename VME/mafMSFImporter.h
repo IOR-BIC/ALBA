@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-21 13:09:45 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-11-15 15:30:41 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,6 +21,7 @@
 //----------------------------------------------------------------------------
 class mafVMERoot;
 class mafVME;
+class mafNode;
 class mafTagArray;
 class mafMatrixVector;
 
@@ -64,6 +65,10 @@ protected:
   int RestoreTagArray(mafStorageElement *node, mafTagArray *tarray);
   int RestoreVItem(mafStorageElement *node, mafVME *vme);
   int RestoreVMatrix(mafStorageElement *node, mafMatrixVector *vmatrix);
+
+  /** 
+  Parse the path string to rebuild links*/
+  mafNode *ParsePath(mafVMERoot *root,const char *path);
 
   /** Restore material attributes */
   void RestoreMaterial(mafVME *vme);
