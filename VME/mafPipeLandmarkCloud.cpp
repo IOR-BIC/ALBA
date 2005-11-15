@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeLandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-10 15:16:55 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-11-15 15:26:37 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -171,7 +171,8 @@ void mafPipeLandmarkCloud::OnEvent(mafEventBase *maf_event)
       {
         mafVME *child_lm = m_Cloud->GetLandmark(i);
         mafEvent e(this,VME_SHOW,child_lm,true);
-        m_Cloud->ForwardUpEvent(&e);
+        //m_Cloud->ForwardUpEvent(&e);
+        mafEventMacro(e);
       }
     }
     else
@@ -185,6 +186,7 @@ void mafPipeLandmarkCloud::OnEvent(mafEventBase *maf_event)
       }*/
       CreateClosedCloudPipe(m_Cloud->GetOutput()->GetVTKData(), m_Cloud->GetRadius(), m_Cloud->GetSphereResolution());
     }
+    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
   else if (maf_event->GetId() == mafVMELandmarkCloud::CLOUDE_RADIUS_MODIFIED)
   {
