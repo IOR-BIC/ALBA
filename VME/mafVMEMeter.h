@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-22 09:48:10 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-11-15 15:29:05 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -222,6 +222,10 @@ public:
   mafVME *GetStartVME();
   mafVME *GetEnd1VME();
   mafVME *GetEnd2VME();
+
+  /** 
+  Set links for the meter*/
+  void SetMeterLink(const char *link_name, mafNode *n);
 
   /** Return pointer to material attribute. */
   mmaMaterial *GetMaterial();
