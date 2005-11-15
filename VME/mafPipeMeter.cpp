@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-05 10:14:56 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-11-15 15:27:25 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,13 +29,15 @@
 #include "mmaMaterial.h"
 #include "mmgMaterialButton.h"
 #include "mafVMELandmarkCloud.h"
+#include "mafTransform.h"
+#include "mafSmartPointer.h"
+
 #include "vtkMAFAssembly.h"
 
 //@@@ #include "mafDecl.h"
 //@@@ #include "mafAxes.h"  //SIL. 20-5-2003 added line - 
 //@@@ #include "mafMaterial.h"  //SIL. 30-5-2003 added line -
 //@@@ #include "mmgMaterialButton.h"
-//@@@ #include "mafVmeData.h"
 
 #include "vtkRenderer.h"
 #include "vtkOutlineCornerFilter.h"
@@ -179,13 +181,14 @@ void mafPipeMeter::Create(mafSceneNode *n/*, bool use_axes*/)
   {
     double pos[3], rot[3];
     mafVME *linked_vme = m_MeterVME->GetStartVME();
-    /*if(linked_vme && linked_vme->IsA("mafVMELandmarkCloud") && m_MeterVME->GetStartVMELandmarkId() != -1)
+    mafSmartPointer<mafTransform> TmpTransform;
+    if(linked_vme && linked_vme->IsMAFType(mafVMELandmarkCloud) && m_MeterVME->GetLinkSubId("StartVME") != -1)
     {
-      ((mafVMELandmarkCloud *)linked_vme)->GetLandmark(m_MeterVME->GetStartVMELandmarkId(),pos,-1);
-      TmpTransform->SetMatrix(linked_vme->GetAbsPose());
+      ((mafVMELandmarkCloud *)linked_vme)->GetLandmark(m_MeterVME->GetLinkSubId("StartVME"),pos,-1);
+      TmpTransform->SetMatrix(*linked_vme->GetOutput()->GetAbsMatrix());
       TmpTransform->TransformPoint(pos,pos);
     }
-    else*/
+    else
       m_MeterVME->GetStartVME()->GetOutput()->GetAbsPose(pos,rot);
     m_Caption->SetAttachmentPoint(pos[0],pos[1],pos[2]);
   } 
@@ -355,9 +358,17 @@ void mafPipeMeter::UpdateProperty(bool fromTag)
   }
 
   double pos[3], rot[3];
-  if (m_MeterVME->GetStartVME())
+  mafVME *linked_vme = m_MeterVME->GetStartVME();
+  mafSmartPointer<mafTransform> TmpTransform;
+  if(linked_vme && linked_vme->IsMAFType(mafVMELandmarkCloud) && m_MeterVME->GetLinkSubId("StartVME") != -1)
   {
-    m_MeterVME->GetStartVME()->GetOutput()->GetAbsPose(pos,rot);
+    ((mafVMELandmarkCloud *)linked_vme)->GetLandmark(m_MeterVME->GetLinkSubId("StartVME"),pos,-1);
+    TmpTransform->SetMatrix(*linked_vme->GetOutput()->GetAbsMatrix());
+    TmpTransform->TransformPoint(pos,pos);
+  }
+  else if(linked_vme)
+  {
+    linked_vme->GetOutput()->GetAbsPose(pos,rot);
     m_Caption->SetAttachmentPoint(pos[0],pos[1],pos[2]);
   }
   
