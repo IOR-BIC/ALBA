@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-02 10:38:38 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-11-15 15:24:59 $
+  Version:   $Revision: 1.11 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -1162,11 +1162,9 @@ void mmiGenericMouse::TrackballTranslate()
   // Use initial center as the origin from which to pan
 
   double *obj_center = m_Prop->GetCenter();
-
   double disp_obj_center[3], new_pick_point[4], old_pick_point[4], motion_vector[3];
   
-  ComputeWorldToDisplay(obj_center[0], obj_center[1], obj_center[2], 
-                              disp_obj_center);
+  ComputeWorldToDisplay(obj_center[0], obj_center[1], obj_center[2], disp_obj_center);
 
   ComputeDisplayToWorld((double)m_MousePose[0], (double)m_MousePose[1], disp_obj_center[2], new_pick_point);
   
