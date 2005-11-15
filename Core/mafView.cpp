@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-02 10:47:18 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2005-11-15 15:22:51 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,6 +29,7 @@
 #include "vtkRendererCollection.h"
 #include "vtkAssemblyPath.h"
 #include "vtkAssemblyNode.h"
+#include "vtkProp3D.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafView);
@@ -54,6 +55,7 @@ mafView::mafView( wxString label, bool external)
   m_Picker2D          = NULL;
   m_Picker3D          = NULL;
   m_PickedVME         = NULL;
+  m_PickedProp        = NULL;
   m_PickedPosition[0] = m_PickedPosition[1] = m_PickedPosition[2] = 0.0;
 }
 //----------------------------------------------------------------------------
@@ -144,6 +146,7 @@ void mafView::FindPickedVme(vtkAssemblyPath *ap)
         {
           as = (vtkMAFAssembly*)p;
           m_PickedVME = mafVME::SafeDownCast(as->GetVme());
+          m_PickedProp = vtkProp3D::SafeDownCast(p);
           break;
         }
       }

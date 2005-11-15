@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-14 16:54:18 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2005-11-15 15:22:51 $
+  Version:   $Revision: 1.24 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,6 +31,7 @@ class mafRWIBase;
 class vtkCellPicker;
 class vtkRayCast3DPicker;
 class vtkAssemblyPath;
+class vtkProp3D;
 
 //----------------------------------------------------------------------------
 // const :
@@ -125,6 +126,10 @@ public:
   Return the picked VME during the Pick method. Return NULL if VME is not found*/
   virtual mafVME *GetPickedVme() {return m_PickedVME;};
 
+  /** 
+  Return the corresponding vtkProp3D of the picked VME*/
+  virtual vtkProp3D *GetPickedProp() {return m_PickedProp;};
+
 protected:
   mafObserver   *m_Listener;
   wxString       m_Label;
@@ -137,7 +142,8 @@ protected:
   vtkCellPicker *m_Picker2D;  ///< the picker used to pick the in the render window
   vtkRayCast3DPicker* m_Picker3D; ///< Used to pick in a VTK Render window
 
-  mafVME        *m_PickedVME; ///< Pointer to the picked vme. It is initialized on picking
+  mafVME        *m_PickedVME;   ///< Pointer to the picked vme. It is initialized on picking
+  vtkProp3D     *m_PickedProp;  ///< Pointer to the picked vme Prop3D. It is initialized on picking
   double         m_PickedPosition[3];
 
   /** 
