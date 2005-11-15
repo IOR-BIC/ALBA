@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-21 15:06:50 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-11-15 15:27:51 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -65,6 +65,10 @@ public:
 
   /** Compare with another landmarkcloud. */
   virtual bool Equals(mafVME *vme);
+
+  /**
+  Return the modification time.*/
+  virtual unsigned long GetMTime();
 
   /**
   Add a new landmark an returns its index. BEWARE: landmark is added to all the
