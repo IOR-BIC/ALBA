@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-21 13:14:20 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-11-15 15:28:31 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -142,6 +142,26 @@ int mafVMELandmarkCloud::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
     return MAF_OK;
   }
   return MAF_ERROR;
+}
+//-------------------------------------------------------------------------
+unsigned long mafVMELandmarkCloud::GetMTime()
+//-------------------------------------------------------------------------
+{
+  unsigned long mtime = Superclass::GetMTime();
+  if (IsOpen())
+  {
+    unsigned long mtimelm;
+    for (int i = 0; i < GetNumberOfChildren(); i++)
+    {
+      mafVMELandmark *vme = mafVMELandmark::SafeDownCast(GetChild(i));
+      if (vme)
+      {
+        mtimelm = vme->GetMTime();
+        mtime = (mtimelm > mtime) ? mtimelm : mtime;
+      }
+    }
+  }
+  return mtime;
 }
 //-------------------------------------------------------------------------
 int mafVMELandmarkCloud::GetNumberOfLandmarks()
