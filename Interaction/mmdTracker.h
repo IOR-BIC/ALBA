@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdTracker.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-23 16:57:15 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-11-15 21:40:01 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -32,8 +32,8 @@ class mafOBB;
   InternalInitialize and InternalShutdow to activate/stop the device.
   Tracked pose is expressed by means of a 4x4 matrix. This class issues 
   events each time a new coordinate is available, but if a new coordinate
-  arrives and the last pose hase not been consumed (i.e. the last MoveEvent
-  has not been despatched yet, no event is issued, but the LastPoseMatrix is
+  arrives and the last pose has not been consumed (i.e. the last MoveEvent
+  has not been dispatched yet, no event is issued, but the LastPoseMatrix is
   overwritten. This allows consumer classes to always have last tracked pose.
   MoveEvent's are mafActionEvent objects, which stores a pose and state of buttons.
   This class also gives support to transforming from the tracker coordinate
@@ -54,7 +54,7 @@ class mafOBB;
   The mmdTracker is also a mmdButtonsPad supporting buttons.
   @sa mmdButtonsPad mmgTrackerSettings mafAvatar
   @todo 
-    - manage fusion of position matrixes (not working any more)
+    - manage fusion of position matrices (not working any more)
     - manage multiple button press (rewrite mflActionEvent)
     - use an action event also for move events (rewrite SetLastPoseMatrix() ). 
 */
