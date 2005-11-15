@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-22 09:48:10 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2005-11-15 15:30:16 $
+  Version:   $Revision: 1.21 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,6 +21,8 @@
 
 #include "mafVMEMeter.h"
 #include "mafVMEOutputMeter.h"
+#include "mafVMELandmarkCloud.h"
+#include "mafVMELandmark.h"
 #include "mmaMeter.h"
 #include "mmaMaterial.h"
 #include "mafEventSource.h"
@@ -74,6 +76,8 @@ mafVMEMeter::mafVMEMeter()
   m_Goniometer->AddInput(m_LineSource2->GetOutput());
 
   mafNEW(m_TmpTransform);
+
+  DependsOnLinkedNodeOn();
 
   // attach a data pipe which creates a bridge between VTK and MAF
   mafDataPipeCustom *dpipe = mafDataPipeCustom::New();
@@ -214,31 +218,35 @@ void mafVMEMeter::InternalUpdate()
     {
       // start is a landmark, consider also visibility
       /*if (mflVMELandmark *start_landmark = mflVMELandmark::SafeDownCast(start_vme))
-        start_ok = start_landmark->GetLandmarkVisibility();
+        start_ok = start_landmark->GetLandmarkVisibility();*/
 
-      if(start_vme->IsA("mflVMELandmarkCloud") && GetStartVMELandmarkId() != -1)
+      if(start_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("StartVME") != -1)
       {
-        ((mflVMELandmarkCloud *)start_vme)->GetLandmark(GetStartVMELandmarkId(),StartPoint,-1);
-        m_TmpTransform->SetMatrix(start_vme->GetAbsPose());
-        m_TmpTransform->TransformPoint(StartPoint,StartPoint);
+        ((mafVMELandmarkCloud *)start_vme)->GetLandmark(GetLinkSubId("StartVME"),m_StartPoint,-1);
+        m_TmpTransform->SetMatrix(*start_vme->GetOutput()->GetAbsMatrix());
+        m_TmpTransform->TransformPoint(m_StartPoint,m_StartPoint);
       }
-      else*/
-      start_vme->GetOutput()->Update();  
-      start_vme->GetOutput()->GetAbsPose(m_StartPoint, orientation);
+      else
+      {
+        start_vme->GetOutput()->Update();  
+        start_vme->GetOutput()->GetAbsPose(m_StartPoint, orientation);
+      }
 
       // end is a landmark, consider also visibility
       /*if (mflVMELandmark *end_landmark = mflVMELandmark::SafeDownCast(end_vme))
-        end_ok = end_landmark->GetLandmarkVisibility();
+        end_ok = end_landmark->GetLandmarkVisibility();*/
 
-      if(end_vme->IsA("mflVMELandmarkCloud") && GetEndVME1LandmarkId() != -1)
+      if(end_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("EndVME1") != -1)
       {
-        ((mflVMELandmarkCloud *)end_vme)->GetLandmark(GetEndVME1LandmarkId(),EndPoint,-1);
-        m_TmpTransform->SetMatrix(end_vme->GetAbsPose());
-        m_TmpTransform->TransformPoint(EndPoint,EndPoint);
+        ((mafVMELandmarkCloud *)end_vme)->GetLandmark(GetLinkSubId("EndVME1"),m_EndPoint,-1);
+        m_TmpTransform->SetMatrix(*end_vme->GetOutput()->GetAbsMatrix());
+        m_TmpTransform->TransformPoint(m_EndPoint,m_EndPoint);
       }
-      else*/
-      end_vme->GetOutput()->Update();  
-      end_vme->GetOutput()->GetAbsPose(m_EndPoint, orientation);
+      else
+      {
+        end_vme->GetOutput()->Update();  
+        end_vme->GetOutput()->GetAbsPose(m_EndPoint, orientation);
+      }
     }
     else
     {
@@ -290,45 +298,51 @@ void mafVMEMeter::InternalUpdate()
     {
       // start is a landmark, consider also visibility
       /*if (mflVMELandmark *start_landmark = mflVMELandmark::SafeDownCast(start_vme))
-        start_ok = start_landmark->GetLandmarkVisibility();
+        start_ok = start_landmark->GetLandmarkVisibility();*/
 
-      if(start_vme->IsA("mflVMELandmarkCloud") && GetStartVMELandmarkId() != -1)
+      if(start_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("StartVME") != -1)
       {
-        ((mflVMELandmarkCloud *)start_vme)->GetLandmark(GetStartVMELandmarkId(),StartPoint,-1);
-        m_TmpTransform->SetMatrix(start_vme->GetAbsPose());
-        m_TmpTransform->TransformPoint(StartPoint,StartPoint);
+        ((mafVMELandmarkCloud *)start_vme)->GetLandmark(GetLinkSubId("StartVME"),m_StartPoint,-1);
+        m_TmpTransform->SetMatrix(*start_vme->GetOutput()->GetAbsMatrix());
+        m_TmpTransform->TransformPoint(m_StartPoint,m_StartPoint);
       }
-      else*/
-      start_vme->GetOutput()->Update();  
-      start_vme->GetOutput()->GetAbsPose(m_StartPoint, orientation);
+      else
+      {
+        start_vme->GetOutput()->Update();  
+        start_vme->GetOutput()->GetAbsPose(m_StartPoint, orientation);
+      }
 
       // end is a landmark, consider also visibility
       /*if (mflVMELandmark *end1_landmark = mflVMELandmark::SafeDownCast(end1_vme))
-        end1_ok = end1_landmark->GetLandmarkVisibility();
+        end1_ok = end1_landmark->GetLandmarkVisibility();*/
 
-      if(end1_vme->IsA("mflVMELandmarkCloud") && GetEndVME1LandmarkId() != -1)
+      if(end1_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("EndVME1") != -1)
       {
-        ((mflVMELandmarkCloud *)end1_vme)->GetLandmark(GetEndVME1LandmarkId(),EndPoint,-1);
-        m_TmpTransform->SetMatrix(end1_vme->GetAbsPose());
-        m_TmpTransform->TransformPoint(EndPoint,EndPoint);
+        ((mafVMELandmarkCloud *)end1_vme)->GetLandmark(GetLinkSubId("EndVME1"),m_EndPoint,-1);
+        m_TmpTransform->SetMatrix(*end1_vme->GetOutput()->GetAbsMatrix());
+        m_TmpTransform->TransformPoint(m_EndPoint,m_EndPoint);
       }
-      else*/
-      end1_vme->GetOutput()->Update();
-      end1_vme->GetOutput()->GetAbsPose(m_EndPoint, orientation);
+      else
+      {
+        end1_vme->GetOutput()->Update();  
+        end1_vme->GetOutput()->GetAbsPose(m_EndPoint, orientation);
+      }
 
       // end is a landmark, consider also visibility
       /*if (mflVMELandmark *end2_landmark = mflVMELandmark::SafeDownCast(end2_vme))
-        end2_ok = end2_landmark->GetLandmarkVisibility();
+        end2_ok = end2_landmark->GetLandmarkVisibility();*/
 
-      if(end2_vme->IsA("mflVMELandmarkCloud") && GetEndVME2LandmarkId() != -1)
+      if(end2_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("EndVME2") != -1)
       {
-        ((mflVMELandmarkCloud *)end2_vme)->GetLandmark(GetEndVME2LandmarkId(),EndPoint2,-1);
-        m_TmpTransform->SetMatrix(end2_vme->GetAbsPose());
-        m_TmpTransform->TransformPoint(EndPoint2,EndPoint2);
+        ((mafVMELandmarkCloud *)end2_vme)->GetLandmark(GetLinkSubId("EndVME2"),m_EndPoint2,-1);
+        m_TmpTransform->SetMatrix(*end2_vme->GetOutput()->GetAbsMatrix());
+        m_TmpTransform->TransformPoint(m_EndPoint2,m_EndPoint2);
       }
-      else*/
-      end2_vme->GetOutput()->Update();
-      end2_vme->GetOutput()->GetAbsPose(m_EndPoint2, orientation);
+      else
+      {
+        end2_vme->GetOutput()->Update();  
+        end2_vme->GetOutput()->GetAbsPose(m_EndPoint2, orientation);
+      }
     }
     else
     {
@@ -406,43 +420,49 @@ void mafVMEMeter::InternalUpdate()
     {
       // start is a landmark, consider also visibility
       /*if (mflVMELandmark *start_landmark = mflVMELandmark::SafeDownCast(start_vme))
-        start_ok = start_landmark->GetLandmarkVisibility();
+        start_ok = start_landmark->GetLandmarkVisibility();*/
 
-      if(start_vme->IsA("mflVMELandmarkCloud") && GetStartVMELandmarkId() != -1)
+      if(start_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("StartVME") != -1)
       {
-        ((mflVMELandmarkCloud *)start_vme)->GetLandmark(GetStartVMELandmarkId(),StartPoint,-1);
-        m_TmpTransform->SetMatrix(start_vme->GetAbsPose());
-        m_TmpTransform->TransformPoint(StartPoint,StartPoint);
+        ((mafVMELandmarkCloud *)start_vme)->GetLandmark(GetLinkSubId("StartVME"),m_StartPoint,-1);
+        m_TmpTransform->SetMatrix(*start_vme->GetOutput()->GetAbsMatrix());
+        m_TmpTransform->TransformPoint(m_StartPoint,m_StartPoint);
       }
-      else*/
-      start_vme->GetOutput()->Update();
-      start_vme->GetOutput()->GetAbsPose(m_StartPoint,orientation);
+      else
+      {
+        start_vme->GetOutput()->Update();  
+        start_vme->GetOutput()->GetAbsPose(m_StartPoint, orientation);
+      }
 
       /*if(mflVMELandmark *end1_landmark = mflVMELandmark::SafeDownCast(end1_vme))
-        end1_ok = end1_landmark->GetLandmarkVisibility();
+        end1_ok = end1_landmark->GetLandmarkVisibility();*/
 
-      if(end1_vme->IsA("mflVMELandmarkCloud") && GetEndVME1LandmarkId() != -1)
+      if(end1_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("EndVME1") != -1)
       {
-        ((mflVMELandmarkCloud *)end1_vme)->GetLandmark(GetEndVME1LandmarkId(),EndPoint,-1);
-        m_TmpTransform->SetMatrix(end1_vme->GetAbsPose());
-        m_TmpTransform->TransformPoint(EndPoint,EndPoint);
+        ((mafVMELandmarkCloud *)end1_vme)->GetLandmark(GetLinkSubId("EndVME1"),m_EndPoint,-1);
+        m_TmpTransform->SetMatrix(*end1_vme->GetOutput()->GetAbsMatrix());
+        m_TmpTransform->TransformPoint(m_EndPoint,m_EndPoint);
       }
-      else*/
-      end1_vme->GetOutput()->Update();
-      end1_vme->GetOutput()->GetAbsPose(m_EndPoint,orientation);
+      else
+      {
+        end1_vme->GetOutput()->Update();  
+        end1_vme->GetOutput()->GetAbsPose(m_EndPoint, orientation);
+      }
 
       /*if (mflVMELandmark *end2_landmark = mflVMELandmark::SafeDownCast(end2_vme))
-        end2_ok = end2_landmark->GetLandmarkVisibility();
+        end2_ok = end2_landmark->GetLandmarkVisibility();*/
 
-      if(end2_vme->IsA("mflVMELandmarkCloud") && GetEndVME2LandmarkId() != -1)
+      if(end2_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("EndVME2") != -1)
       {
-        ((mflVMELandmarkCloud *)end2_vme)->GetLandmark(GetEndVME2LandmarkId(),EndPoint2,-1);
-        m_TmpTransform->SetMatrix(end2_vme->GetAbsPose());
-        m_TmpTransform->TransformPoint(EndPoint2,EndPoint2);
+        ((mafVMELandmarkCloud *)end2_vme)->GetLandmark(GetLinkSubId("EndVME2"),m_EndPoint2,-1);
+        m_TmpTransform->SetMatrix(*end2_vme->GetOutput()->GetAbsMatrix());
+        m_TmpTransform->TransformPoint(m_EndPoint2,m_EndPoint2);
       }
-      else*/
-      end2_vme->GetOutput()->Update();
-      end2_vme->GetOutput()->GetAbsPose(m_EndPoint2,orientation);
+      else
+      {
+        end2_vme->GetOutput()->Update();  
+        end2_vme->GetOutput()->GetAbsPose(m_EndPoint2, orientation);
+      }
     }
     else
     {
@@ -701,19 +721,38 @@ double mafVMEMeter::GetAngle()
 mmgGui* mafVMEMeter::CreateGui()
 //-------------------------------------------------------------------------
 {
+  mafID sub_id = -1;
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
   m_Gui->Divider();
   mafVME *start_vme = GetStartVME();
-  m_StartVmeName = start_vme ? start_vme->GetName() : "none";
+  if (start_vme && start_vme->IsMAFType(mafVMELandmarkCloud))
+  {
+    sub_id = GetLinkSubId("StartVME");
+    m_StartVmeName = (sub_id != -1) ? ((mafVMELandmarkCloud *)start_vme)->GetLandmarkName(sub_id) : "none";
+  }
+  else
+    m_StartVmeName = start_vme ? start_vme->GetName() : "none";
   m_Gui->Button(ID_START_METER_LINK,&m_StartVmeName,"Start", "Select the start vme for the meter");
 
-  mafVME *end_vme1   = GetEnd1VME();
-  m_EndVme1Name = end_vme1 ? end_vme1->GetName() : "none";
+  mafVME *end_vme1 = GetEnd1VME();
+  if (end_vme1 && end_vme1->IsMAFType(mafVMELandmarkCloud))
+  {
+    sub_id = GetLinkSubId("EndVME1");
+    m_EndVme1Name = (sub_id != -1) ? ((mafVMELandmarkCloud *)end_vme1)->GetLandmarkName(sub_id) : "none";
+  }
+  else
+    m_EndVme1Name = end_vme1 ? end_vme1->GetName() : "none";
   m_Gui->Button(ID_END1_METER_LINK,&m_EndVme1Name,"End 1", "Select the end vme for point distance");
 
-  mafVME *end_vme2   = GetEnd2VME();
-  m_EndVme2Name = end_vme2 ? end_vme2->GetName() : "none";
+  mafVME *end_vme2 = GetEnd2VME();
+  if (end_vme2 && end_vme2->IsMAFType(mafVMELandmarkCloud))
+  {
+    sub_id = GetLinkSubId("EndVME2");
+    m_EndVme2Name = (sub_id != -1) ? ((mafVMELandmarkCloud *)end_vme2)->GetLandmarkName(sub_id) : "none";
+  }
+  else
+    m_EndVme2Name = end_vme2 ? end_vme2->GetName() : "none";
   m_Gui->Button(ID_END2_METER_LINK,&m_EndVme2Name,"End 2", "Select the vme representing \nthe point for line distance");
 
   return m_Gui;
@@ -742,17 +781,17 @@ void mafVMEMeter::OnEvent(mafEventBase *maf_event)
         {
           if (button_id == ID_START_METER_LINK)
           {
-            SetLink("StartVME", n);
+            SetMeterLink("StartVME", n);
             m_StartVmeName = n->GetName();
           }
           else if (button_id == ID_END1_METER_LINK)
           {
-            SetLink("EndVME1", n);
+            SetMeterLink("EndVME1", n);
             m_EndVme1Name = n->GetName();
           }
           else
           {
-            SetLink("EndVME2", n);
+            SetMeterLink("EndVME2", n);
             m_EndVme2Name = n->GetName();
           }
           m_Gui->Update();
@@ -768,6 +807,17 @@ void mafVMEMeter::OnEvent(mafEventBase *maf_event)
   {
     Superclass::OnEvent(maf_event);
   }
+}
+//-------------------------------------------------------------------------
+void mafVMEMeter::SetMeterLink(const char *link_name, mafNode *n)
+//-------------------------------------------------------------------------
+{
+  if (n->IsMAFType(mafVMELandmark))
+  {
+    SetLink(link_name,n->GetParent(),((mafVMELandmarkCloud *)n->GetParent())->FindLandmarkIndex(n->GetName()));
+  }
+  else
+    SetLink(link_name, n);
 }
 //-------------------------------------------------------------------------
 mafVME *mafVMEMeter::GetStartVME()
