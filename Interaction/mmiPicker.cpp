@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPicker.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 11:46:54 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-11-16 13:35:49 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -42,6 +42,9 @@
 #include "vtkRendererCollection.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderWindow.h"
+#include "vtkDataSet.h"
+#include "vtkPointData.h"
+#include "vtkDataArray.h"
 
 #include <assert.h>
 
@@ -89,18 +92,14 @@ void mmiPicker::OnButtonUp(mafEventInteraction *e)
         }
         else
           world_pose = *tracker_pose;
-        double pos_picked[3];
         if (v->Pick(world_pose))
         {
-          vtkPoints *p = vtkPoints::New();
-          p->SetNumberOfPoints(1);
-          p->SetPoint(0,pos_picked);
-          mafEventMacro(mafEvent(this,VME_PICKED,p));
-          p->Delete();
+          SendPickingInformation(v);
         }
         else if (avatar3D)
         {
           // in case of 3D avatar return 3D position
+          double pos_picked[3];
           mafTransform::GetPosition(avatar3D->GetLastPoseMatrix(),pos_picked);
         }
       }
@@ -124,13 +123,34 @@ void mmiPicker::OnButtonUp(mafEventInteraction *e)
       }
       if(v->Pick(mouse_pos[0],mouse_pos[1]))
       {
-        double pos_picked[3];
-        v->GetPickedPosition(pos_picked);
-        vtkMAFSmartPointer<vtkPoints> p;
-        p->SetNumberOfPoints(1);
-        p->SetPoint(0,pos_picked);
-        mafEventMacro(mafEvent(this,VME_PICKED,p.GetPointer()));
+        SendPickingInformation(v);
       }
     }
   }
+}
+//----------------------------------------------------------------------------
+void mmiPicker::SendPickingInformation(mafView *v)
+//----------------------------------------------------------------------------
+{
+  double pos_picked[3];
+  v->GetPickedPosition(pos_picked);
+  vtkPoints *p = vtkPoints::New();
+  p->SetNumberOfPoints(1);
+  p->SetPoint(0,pos_picked);
+
+  double scalar_value = 0;
+  mafVME *pickedVME = v->GetPickedVme();
+  vtkDataSet *vtk_data = pickedVME->GetOutput()->GetVTKData();
+  vtk_data->SetUpdateExtentToWholeExtent();
+  vtk_data->Update();
+  int pid = vtk_data->FindPoint(pos_picked);
+  vtkDataArray *scalars = vtk_data->GetPointData()->GetScalars();
+  if (scalars)
+  {
+    scalars->GetTuple(pid,&scalar_value);
+  }
+  mafEvent pick_event(this,VME_PICKED,p);
+  pick_event.SetDouble(scalar_value);
+  mafEventMacro(pick_event);
+  p->Delete();
 }

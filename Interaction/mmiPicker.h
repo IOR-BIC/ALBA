@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPicker.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-14 08:32:01 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-11-16 13:35:49 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone, originally by Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -31,6 +31,10 @@ protected:
   
   virtual void OnButtonDown   (mafEventInteraction *e);
   virtual void OnButtonUp     (mafEventInteraction *e);
+
+  /** 
+  Send to the listener picked point coordinate through vtkPoint and the corresponding scalar value found in that position. */
+  void SendPickingInformation(mafView *v);
   
 private:
   mmiPicker(const mmiPicker&);  // Not implemented.
