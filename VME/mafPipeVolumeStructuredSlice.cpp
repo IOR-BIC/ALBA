@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeStructuredSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-09 11:24:36 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-11-16 13:38:07 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -120,6 +120,9 @@ void mafPipeVolumeStructuredSlice::Create(mafSceneNode *n)
     m_VolumeResampler->Update();
     m_VolumeData = vtkImageData::SafeDownCast(m_VolumeResampler->GetOutput());
   }
+
+  m_VolumeData->SetUpdateExtentToWholeExtent();
+  m_VolumeData->Update();
 
   vtkNEW(m_VolumeBox);
   m_VolumeBox->SetInput(m_Vme->GetOutput()->GetVTKData());
@@ -243,7 +246,7 @@ void mafPipeVolumeStructuredSlice::CreateSlice(int mode)
 	m_SliceActor[mode]->GetProperty()->SetDiffuse(0.f);
   m_SliceActor[mode]->GetProperty()->SetOpacity(m_SliceOpacity);
 
-	m_AssemblyFront->AddPart(m_SliceActor[mode]);
+  m_AssemblyFront->AddPart(m_SliceActor[mode]);
 }
 //----------------------------------------------------------------------------
 mafPipeVolumeStructuredSlice::~mafPipeVolumeStructuredSlice()
