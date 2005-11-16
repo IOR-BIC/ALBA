@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoExtractIsosurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-16 14:06:58 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-11-16 15:16:58 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -195,12 +195,12 @@ void mmoExtractIsosurface::CreateOpDialog()
 	//m_Rwi->SetAxesVisibility(true);
   //m_Rwi->SetGridVisibility(false);
 	m_Rwi->SetSize(0,0,500,500);
+  m_Rwi->m_RenderWindow->AddRenderer(m_PIPRen);
 	m_Rwi->Show(true);
   m_Rwi->m_RwiBase->SetMouse(m_Mouse);
   mafNEW(m_DensityPicker);
   m_DensityPicker->SetListener(this);
   m_Mouse->AddObserver(m_DensityPicker, MCH_INPUT);
-  m_Rwi->m_RenderWindow->AddRenderer(m_PIPRen);
   m_PIPRen->SetViewport(.6, .01, .99, .4);
   m_PIPRen->GetActiveCamera()->SetFocalPoint(0,0,0);
   m_PIPRen->GetActiveCamera()->SetPosition(0,0,-70);
