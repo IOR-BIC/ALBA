@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-06 16:02:58 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-11-16 13:34:38 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -91,6 +91,7 @@ void mafOp::OpDo()
   if (m_Output)
   {
     mafEventMacro(mafEvent(this, VME_ADD, m_Output));
+    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
 }
 //----------------------------------------------------------------------------
@@ -100,6 +101,7 @@ void mafOp::OpUndo()
   if (m_Output)
   {
     mafEventMacro(mafEvent(this, VME_REMOVE, m_Output));
+    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
 }
 //----------------------------------------------------------------------------
