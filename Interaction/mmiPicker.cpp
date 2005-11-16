@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPicker.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-16 13:35:49 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-11-16 14:30:32 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -80,77 +80,58 @@ void mmiPicker::OnButtonUp(mafEventInteraction *e)
     mafAvatar *avatar = tracker->GetAvatar();
     if (avatar)
     {
-      mafView *v = avatar->GetView();
-      if (v)
-      {
-        // compute pose in the world frame
-        mafMatrix world_pose;
-        mafAvatar3D *avatar3D=mafAvatar3D::SafeDownCast(avatar);
-        if (avatar3D)
-        {
-          avatar3D->TrackerToWorld(*tracker_pose,world_pose,mafAvatar3D::CANONICAL_TO_WORLD_SCALE);
-        }
-        else
-          world_pose = *tracker_pose;
-        if (v->Pick(world_pose))
-        {
-          SendPickingInformation(v);
-        }
-        else if (avatar3D)
-        {
-          // in case of 3D avatar return 3D position
-          double pos_picked[3];
-          mafTransform::GetPosition(avatar3D->GetLastPoseMatrix(),pos_picked);
-        }
-      }
+      // compute pose in the world frame
+      mafMatrix world_pose;
+      mafAvatar3D *avatar3D=mafAvatar3D::SafeDownCast(avatar);
+      if (avatar3D)
+        avatar3D->TrackerToWorld(*tracker_pose,world_pose,mafAvatar3D::CANONICAL_TO_WORLD_SCALE);
+      else
+        world_pose = *tracker_pose;
+      SendPickingInformation(avatar->GetView(),NULL,&world_pose,false);
     }
   }
   else if (mmdMouse *mouse=mmdMouse::SafeDownCast((mafDevice *)e->GetSender()))
   { 
-    double tmp_pose[2];
-    int mouse_pos[2];
-    e->Get2DPosition(tmp_pose);
-    mouse_pos[0] = (int)tmp_pose[0];
-    mouse_pos[1] = (int)tmp_pose[1];
-
-    mafView *v = mouse->GetView();
-    if (v)
-    {
-      mafViewCompound *vc = mafViewCompound::SafeDownCast(v);
-      if (vc)
-      {
-        v = vc->GetSubView();
-      }
-      if(v->Pick(mouse_pos[0],mouse_pos[1]))
-      {
-        SendPickingInformation(v);
-      }
-    }
+    double mouse_pos[2];
+    e->Get2DPosition(mouse_pos);
+    SendPickingInformation(mouse->GetView(), mouse_pos);
   }
 }
 //----------------------------------------------------------------------------
-void mmiPicker::SendPickingInformation(mafView *v)
+void mmiPicker::SendPickingInformation(mafView *v, double *mouse_pos, mafMatrix *tracker_pos, bool mouse_flag)
 //----------------------------------------------------------------------------
 {
-  double pos_picked[3];
-  v->GetPickedPosition(pos_picked);
-  vtkPoints *p = vtkPoints::New();
-  p->SetNumberOfPoints(1);
-  p->SetPoint(0,pos_picked);
+  bool picked_something = false;
 
-  double scalar_value = 0;
-  mafVME *pickedVME = v->GetPickedVme();
-  vtkDataSet *vtk_data = pickedVME->GetOutput()->GetVTKData();
-  vtk_data->SetUpdateExtentToWholeExtent();
-  vtk_data->Update();
-  int pid = vtk_data->FindPoint(pos_picked);
-  vtkDataArray *scalars = vtk_data->GetPointData()->GetScalars();
-  if (scalars)
+  if (v)
   {
-    scalars->GetTuple(pid,&scalar_value);
+    mafViewCompound *vc = mafViewCompound::SafeDownCast(v);
+    if (vc)
+      v = vc->GetSubView();
+    if(mouse_flag)
+      picked_something = v->Pick(mouse_pos[0],mouse_pos[1]);
+    else
+      picked_something = v->Pick(*tracker_pos);
+    if (picked_something)
+    {
+      double pos_picked[3];
+      v->GetPickedPosition(pos_picked);
+      vtkPoints *p = vtkPoints::New();
+      p->SetNumberOfPoints(1);
+      p->SetPoint(0,pos_picked);
+      double scalar_value = 0;
+      mafVME *pickedVME = v->GetPickedVme();
+      vtkDataSet *vtk_data = pickedVME->GetOutput()->GetVTKData();
+      vtk_data->SetUpdateExtentToWholeExtent();
+      vtk_data->Update();
+      int pid = vtk_data->FindPoint(pos_picked);
+      vtkDataArray *scalars = vtk_data->GetPointData()->GetScalars();
+      if (scalars)
+        scalars->GetTuple(pid,&scalar_value);
+      mafEvent pick_event(this,VME_PICKED,p);
+      pick_event.SetDouble(scalar_value);
+      mafEventMacro(pick_event);
+      p->Delete();
+    }
   }
-  mafEvent pick_event(this,VME_PICKED,p);
-  pick_event.SetDouble(scalar_value);
-  mafEventMacro(pick_event);
-  p->Delete();
 }
