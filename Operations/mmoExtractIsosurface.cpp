@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoExtractIsosurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-16 13:34:04 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-11-16 14:06:58 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -562,8 +562,19 @@ void mmoExtractIsosurface::OnEvent(mafEventBase *maf_event)
         vtkPoints *pts = NULL; 
         pts = (vtkPoints *)e->GetVtkObj();
         pts->GetPoint(0,pos);
-        m_IsoValue = e->GetDouble();
-        OnEvent(&mafEvent(this,ID_ISO));
+        vol->SetUpdateExtentToWholeExtent();
+        vol->Update();
+        int pid = vol->FindPoint(pos);
+        vtkDataArray *scalars = vol->GetPointData()->GetScalars();
+        if (scalars && pid != -1)
+        {
+          scalars->GetTuple(pid,&m_IsoValue);
+          OnEvent(&mafEvent(this,ID_ISO));
+        }
+        else
+        {
+          wxMessageBox("Invalid picked point!!", "Warning");
+        }
       }
       break;
       default:

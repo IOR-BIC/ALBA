@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-15 15:25:26 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-11-16 14:06:45 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -374,51 +374,48 @@ void mafInteractor::ComputeWorldToDisplay(double x, double y, double z, double d
 bool mafInteractor::FindPokedVme(mafDevice *device,mafMatrix &point_pose,vtkProp3D *&picked_prop,mafVME *&picked_vme,mafInteractor *&picked_behavior)
 //----------------------------------------------------------------------------
 {
-  if (mmdTracker *tracker = mmdTracker::SafeDownCast(device))
+  mafView *v = NULL;
+  mmdTracker *tracker = NULL;
+  mmdMouse   *mouse   = NULL;
+  mafMatrix world_pose;
+  int mouse_pos[2];
+
+  if (tracker = mmdTracker::SafeDownCast(device))
   {
     mafMatrix &tracker_pose = point_pose;
     mafAvatar *avatar = tracker->GetAvatar();
     if (avatar)
     {
-      mafMatrix world_pose;
       mafAvatar3D *avatar3D = mafAvatar3D::SafeDownCast(avatar);
       if (avatar3D)
         avatar3D->TrackerToWorld(tracker_pose,world_pose,mafAvatar3D::CANONICAL_TO_WORLD_SCALE);
       else
         world_pose = tracker_pose;
-      mafView *v = avatar->GetView();
-      if (v)
-      {
-        if(v->Pick(world_pose))
-        {
-          picked_vme = v->GetPickedVme();
-          picked_prop = v->GetPickedProp();
-          picked_behavior = picked_vme->GetBehavior();
-          return true;
-        }
-      }
+      v = avatar->GetView();
     }
   }
-  else if (mmdMouse *mouse = mmdMouse::SafeDownCast(device))
+  else if (mouse = mmdMouse::SafeDownCast(device))
   { 
-    int mouse_pos[2];
     mouse_pos[1] = (int)point_pose.GetElement(1,3);
     mouse_pos[0] = (int)point_pose.GetElement(0,3);
-    mafView *v = mouse->GetView();
-    if (v)
+    v = mouse->GetView();
+  }
+  if (v)
+  {
+    mafViewCompound *vc = mafViewCompound::SafeDownCast(v);
+    if (vc)
+      v = vc->GetSubView();
+    bool picked_something = false;
+    if (tracker)
+      picked_something = v->Pick(world_pose);
+    else
+      picked_something = v->Pick(mouse_pos[0], mouse_pos[1]);
+    if(picked_something)
     {
-      mafViewCompound *vc = mafViewCompound::SafeDownCast(v);
-      if (vc)
-      {
-        v = vc->GetSubView();
-      }
-      if(v->Pick(mouse_pos[0], mouse_pos[1]))
-      {
-        picked_vme = v->GetPickedVme();
-        picked_prop = v->GetPickedProp();
-        picked_behavior = picked_vme->GetBehavior();
-        return true;
-      }
+      picked_vme = v->GetPickedVme();
+      picked_prop = v->GetPickedProp();
+      picked_behavior = picked_vme->GetBehavior();
+      return true;
     }
   }
   return false;
