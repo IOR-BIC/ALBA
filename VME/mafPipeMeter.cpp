@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-15 15:27:25 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-11-16 13:37:11 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -175,7 +175,7 @@ void mafPipeMeter::Create(mafSceneNode *n/*, bool use_axes*/)
   if(m_MeterVME->GetMeterMode() == mafVMEMeter::LINE_ANGLE)
     m_Caption->SetVisibility((m_MeterVME->GetAngle() != 0) && m_MeterVME->GetMeterAttributes()->m_LabelVisibility);
   else
-    m_Caption->SetVisibility((m_MeterVME->GetDistance() > 0 || m_MeterVME->GetMeterMeasureType() == mafVMEMeter::RELATIVE_MEASURE) && m_MeterVME->GetMeterAttributes()->m_LabelVisibility);
+    m_Caption->SetVisibility((m_MeterVME->GetDistance() >= 0 || m_MeterVME->GetMeterMeasureType() == mafVMEMeter::RELATIVE_MEASURE) && m_MeterVME->GetMeterAttributes()->m_LabelVisibility);
   
   if(m_MeterVME->GetStartVME())
   {
