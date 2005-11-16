@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiExtractIsosurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-02 10:27:10 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-11-16 15:16:20 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -41,14 +41,14 @@ public:
   virtual void OnLeftButtonDown(mafEventInteraction *e);
 
   /** redefined to set the picking iso-value flag and if it is true, call PickIsoValue() */
-  virtual void OnLeftButtonUp();
+  virtual void OnButtonUp(mafEventInteraction *e);
 
 protected:
   mmiExtractIsosurface();
   virtual ~mmiExtractIsosurface();
   
   /** send the picked point to the listener */
-  void PickIsoValue();
+  void PickIsoValue(mafDevice *device);
 
   bool m_PickValue;
 

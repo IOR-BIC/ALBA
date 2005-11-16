@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiExtractIsosurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-02 10:29:09 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-11-16 15:16:20 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -70,22 +70,34 @@ void mmiExtractIsosurface::OnLeftButtonDown(mafEventInteraction *e)
   Superclass::OnLeftButtonDown(e);
 }
 //----------------------------------------------------------------------------
-void mmiExtractIsosurface::OnLeftButtonUp()
+void mmiExtractIsosurface::OnButtonUp(mafEventInteraction *e)
 //----------------------------------------------------------------------------
 {
-	if(m_PickValue)
-    this->PickIsoValue();
-    
-  Superclass::OnLeftButtonUp();
+  m_ButtonPressed = e->GetButton();
+
+  switch(m_ButtonPressed) 
+  {
+    case MAF_LEFT_BUTTON:
+      if(m_PickValue)
+        this->PickIsoValue((mafDevice *)e->GetSender());
+      OnLeftButtonUp();
+    break;
+    case MAF_MIDDLE_BUTTON:
+      OnMiddleButtonUp();
+    break;
+    case MAF_RIGHT_BUTTON:
+      OnRightButtonUp();
+    break;
+  }
 }
 //----------------------------------------------------------------------------
-void mmiExtractIsosurface::PickIsoValue()
+void mmiExtractIsosurface::PickIsoValue(mafDevice *device)
 //----------------------------------------------------------------------------
 {
   int x = m_LastMousePose[0];
   int y = m_LastMousePose[1];
 
-  mmdMouse *mouse = mmdMouse::SafeDownCast(m_Device);
+  mmdMouse *mouse = mmdMouse::SafeDownCast(device);
   if( mouse && m_Renderer)
   {
     double pos_picked[3];
