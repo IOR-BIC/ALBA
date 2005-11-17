@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-09 11:27:52 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-11-17 20:19:44 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -67,6 +67,10 @@ public:
   /** 
   Change the range of the WindowLevel Lookup table.*/
   void SetLutRange(double low_val, double high_val);
+
+  /** 
+  Set the slice coordinates.*/
+  void SetSlice(double origin[3]);
 
   /** 
   Return true if a there is a volume inside the view.*/
