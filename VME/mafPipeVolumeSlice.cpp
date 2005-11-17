@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-09 11:25:30 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-11-17 20:23:48 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -480,12 +480,13 @@ mmgGui *mafPipeVolumeSlice::CreateGui()
   double b[6] = {-1,1,-1,1,-1,1};
   m_Gui = new mmgGui(this);
   m_Gui->Bool(ID_RGB_LUT,"rgb lut", &m_ColorLUTEnabled,0,"turn on/off RGB LUT");
-  vtkDataSet *data = m_Vme->GetOutput()->GetVTKData();
+  /*vtkDataSet *data = m_Vme->GetOutput()->GetVTKData();
   if (data != NULL)
   {
     data->Update();
     data->GetBounds(b);
-  }
+  }*/
+  m_Vme->GetOutput()->GetVMELocalBounds(b);
   if (m_SliceMode == SLICE_X || m_SliceMode == SLICE_ORTHO)
   {
     m_SliceSlider[0] = m_Gui->FloatSlider(ID_SLICE_SLIDER_X,"x",&m_Origin[0],b[0],b[1]);
