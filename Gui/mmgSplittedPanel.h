@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgSplittedPanel.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:28 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-11-17 21:03:58 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,8 +39,8 @@ public:
 
 protected:
   wxSashLayoutWindow   *m_Bottom;
-  wxWindow             *m_topw;
-  wxWindow             *m_bottomw;
+  wxWindow             *m_TopPanel;
+  wxWindow             *m_BottomPanel;
 
   /** Call Dolayout. */
   void OnSize(wxSizeEvent& event);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgSplittedPanel.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:28 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-11-17 21:03:58 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,8 +45,8 @@ mmgSplittedPanel::mmgSplittedPanel(wxWindow* parent, wxWindowID id, int size)
   m_Bottom->SetSashVisible(wxSASH_TOP, TRUE);
   m_Bottom->SetExtraBorderSize(0);
 
-  m_bottomw    = NULL;
-  m_topw = NULL;
+  m_BottomPanel    = NULL;
+  m_TopPanel = NULL;
 }
 //----------------------------------------------------------------------------
 mmgSplittedPanel::~mmgSplittedPanel( ) 
@@ -74,23 +74,23 @@ void mmgSplittedPanel::DoLayout()
 //----------------------------------------------------------------------------
 {
   wxLayoutAlgorithm layout;
-  layout.LayoutWindow(this,m_topw);
+  layout.LayoutWindow(this,m_TopPanel);
 }
 //----------------------------------------------------------------------------
 void mmgSplittedPanel::PutOnTop(wxWindow *w)
 //----------------------------------------------------------------------------
 {
-  if (m_topw) m_bottomw->Show(false);
+  if (m_TopPanel) m_BottomPanel->Show(false);
   w->Reparent(this);
-  m_topw = w;
+  m_TopPanel = w;
   w->Show(true);
 }
 //----------------------------------------------------------------------------
 void mmgSplittedPanel::PutOnBottom(wxWindow *w)
 //----------------------------------------------------------------------------
 {
-  if (m_bottomw) m_bottomw->Show(false);
+  if (m_BottomPanel) m_BottomPanel->Show(false);
   w->Reparent(m_Bottom);
-  m_bottomw = w;
+  m_BottomPanel = w;
   w->Show(true);
 }
