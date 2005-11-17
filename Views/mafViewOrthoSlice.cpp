@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 15:44:08 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-11-17 20:20:46 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -129,8 +129,7 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
     {
       for(int i=0; i<4; i++)
       {
-        mafPipeVolumeStructuredSlice *p = mafPipeVolumeStructuredSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume));
-        p->SetSlice(m_Origin);
+        ((mafViewSlice *)m_ChildViewList[i])->SetSlice(m_Origin);
       }
       CameraUpdate();
     }
@@ -173,7 +172,8 @@ void mafViewOrthoSlice::PackageView()
   for(int v=0; v<4; v++)
   {
     m_Views[v] = new mafViewSlice("Slice view", cam_pos[v]);
-    m_Views[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeStructuredSlice");
+    //m_Views[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeStructuredSlice");
+    m_Views[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
   }
   PlugChildView(m_Views[SLICE_ORTHO]);
   PlugChildView(m_Views[SLICE_X]);
