@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGuiHolder.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 11:10:06 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-11-17 20:39:59 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -57,7 +57,7 @@ bool mmgGuiHolder::Put(mmgGui* gui)
     return false; //SIL. 22-4-2005: -- if passing NULL, the old content is removed 
   gui->FitGui();
   gui->Reparent(m_panel);
-  m_panel->Add(gui,0,wxEXPAND);
+  m_panel->Add(gui,1,wxEXPAND);
   gui->Show(true);
   gui->Update();
   
