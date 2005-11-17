@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-09 13:18:09 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-11-17 20:22:24 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -399,11 +399,11 @@ bool mmoRAWImporterVolume::Import()
 
 	mafNEW(m_VolumeGray);
   mafNEW(m_VolumeRGB);
-  if (m_VolumeGray->SetData(reader->GetOutput(),0) == MAF_OK)
+  if (m_VolumeGray->SetDataByDetaching(reader->GetOutput(),0) == MAF_OK)
   {
     m_Output = m_VolumeGray;
   }
-  else if (m_VolumeRGB->SetData(reader->GetOutput(),0) == MAF_OK)
+  else if (m_VolumeRGB->SetDataByDetaching(reader->GetOutput(),0) == MAF_OK)
   {
     m_Output = m_VolumeRGB;
   }
