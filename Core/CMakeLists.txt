@@ -54,14 +54,6 @@ SET(PROJECT_SRCS
   mafPipeFactory.h
   mafRoot.cpp
   mafRoot.h
-  mafRWI.cpp
-  mafRWI.h
-  mafRWIBase.cpp
-  mafRWIBase.h
-  mafSceneGraph.cpp
-  mafSceneGraph.h
-  mafSceneNode.cpp
-  mafSceneNode.h
   mafTagArray.cpp
   mafTagArray.h
   mafTagItem.cpp
