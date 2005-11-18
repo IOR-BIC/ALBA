@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-17 20:19:44 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-11-18 10:56:08 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,7 +20,6 @@
 //----------------------------------------------------------------------------
 
 #include "mafViewSlice.h"
-#include "mafPipeVolumeStructuredSlice.h"
 #include "mafPipeVolumeSlice.h"
 #include "mafVME.h"
 #include "mafVMEVolume.h"
@@ -86,7 +85,7 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
     pipe->SetListener(this);
     if (pipe)
     {
-      if (pipe_name.Equals("mafPipeVolumeStructuredSlice") || pipe_name.Equals("mafPipeVolumeSlice"))
+      if (pipe_name.Equals("mafPipeVolumeSlice"))
       {
         m_CurrentVolume = n;
         int slice_mode;
@@ -110,14 +109,7 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
           default:
             slice_mode = SLICE_Z;
         }
-        if (pipe_name.Equals("mafPipeVolumeStructuredSlice"))
-        {
-          ((mafPipeVolumeStructuredSlice *)pipe)->InitializeSliceParameters(slice_mode,false);
-        }
-        else
-        {
-          ((mafPipeVolumeSlice *)pipe)->InitializeSliceParameters(slice_mode,false);
-        }
+        ((mafPipeVolumeSlice *)pipe)->InitializeSliceParameters(slice_mode,false);
       }
       pipe->Create(n);
       n->m_Pipe = (mafPipe*)pipe;
@@ -205,12 +197,7 @@ void mafViewSlice::SetLutRange(double low_val, double high_val)
   if(!m_CurrentVolume) 
     return;
   mafString pipe_name = m_CurrentVolume->m_Pipe->GetTypeName();
-  if (pipe_name.Equals("mafPipeVolumeStructuredSlice"))
-  {
-    mafPipeVolumeStructuredSlice *pipe = (mafPipeVolumeStructuredSlice *)m_CurrentVolume->m_Pipe;
-    pipe->SetLutRange(low_val, high_val); 
-  }
-  else if (pipe_name.Equals("mafPipeVolumeSlice"))
+  if (pipe_name.Equals("mafPipeVolumeSlice"))
   {
     mafPipeVolumeSlice *pipe = (mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe;
     pipe->SetLutRange(low_val, high_val); 
@@ -223,12 +210,7 @@ void mafViewSlice::SetSlice(double origin[3])
   if(!m_CurrentVolume) 
     return;
   mafString pipe_name = m_CurrentVolume->m_Pipe->GetTypeName();
-  if (pipe_name.Equals("mafPipeVolumeStructuredSlice"))
-  {
-    mafPipeVolumeStructuredSlice *pipe = (mafPipeVolumeStructuredSlice *)m_CurrentVolume->m_Pipe;
-    pipe->SetSlice(origin);
-  }
-  else if (pipe_name.Equals("mafPipeVolumeSlice"))
+  if (pipe_name.Equals("mafPipeVolumeSlice"))
   {
     mafPipeVolumeSlice *pipe = (mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe;
     pipe->SetSlice(origin); 
