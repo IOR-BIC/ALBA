@@ -8,105 +8,97 @@ DBG_MESSAGE("Configuring project mafCore")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-#mafSceneGraph.cpp
-#mafSceneGraph.h
-#mafSceneNode.cpp
-#mafSceneNode.h
-#mafTimeVector.h
-#mafTimeVector.txx
-mafAxes.cpp
-mafAxes.h
-mafAbsMatrixPipe.cpp
-mafAbsMatrixPipe.h
-mafAttribute.cpp
-mafAttribute.h
-mafCoreFactory.cpp
-mafCoreFactory.h
-mafDataPipe.cpp
-mafDataPipe.h
-mafEventIO.cpp
-mafEventIO.h
-mafLogicWithGUI.cpp
-mafLogicWithGUI.h
-mafLogicWithManagers.cpp
-mafLogicWithManagers.h
-mafMatrixPipe.cpp
-mafMatrixPipe.h
-mafNode.cpp
-mafNode.h
-mafNodeFactory.cpp
-mafNodeFactory.h
-mafNodeGeneric.cpp
-mafNodeGeneric.h
-mafNodeIterator.cpp
-mafNodeIterator.h
-mafNodeManager.cpp
-mafNodeManager.h
-mafNodeRoot.cpp
-mafNodeRoot.h
-mafOp.cpp
-mafOp.h
-mafOpContextStack.cpp
-mafOpContextStack.h
-mafOpManager.cpp
-mafOpManager.h
-mafOpSelect.cpp
-mafOpSelect.h
-mafOpStack.cpp
-mafOpStack.h
-mafPipe.cpp
-mafPipe.h
-mafPipeFactory.cpp
-mafPipeFactory.h
-mafRoot.cpp
-mafRoot.h
-mafRWI.cpp
-mafRWI.h
-mafRWIBase.cpp
-mafRWIBase.h
-mafSceneGraph.cpp
-mafSceneGraph.h
-mafSceneNode.cpp
-mafSceneNode.h
-mafTagArray.cpp
-mafTagArray.h
-mafTagItem.cpp
-mafTagItem.h
-mafTimeMap.h
-mafVME.cpp
-mafVME.h
-mafVMEManager.cpp
-mafVMEManager.h
-mafVMEOutput.cpp
-mafVMEOutput.h
-mafVMEOutputNULL.cpp
-mafVMEOutputNULL.h
-mafVMERoot.cpp
-mafVMERoot.h
-mafVMEStorage.cpp
-mafVMEStorage.h
-mafView.cpp
-mafView.h
-mafViewCompound.cpp
-mafViewCompound.h
-mafViewManager.cpp
-mafViewManager.h
-mmgListCtrlBitmap.cpp
-mmgListCtrlBitmap.h
-mmgMaterialButton.cpp
-mmgMaterialButton.h
-mmgMaterialChooser.cpp
-mmgMaterialChooser.h
-mmgViewWin.cpp
-mmgViewWin.h
-mmgVMEChooser.cpp
-mmgVMEChooser.h
-mmgVMEChooserAccept.cpp
-mmgVMEChooserAccept.h
-mmgVMEChooserTree.cpp
-mmgVMEChooserTree.h
-mmuTimeSet.cpp
-mmuTimeSet.h
+  mafAxes.cpp
+  mafAxes.h
+  mafAbsMatrixPipe.cpp
+  mafAbsMatrixPipe.h
+  mafAttribute.cpp
+  mafAttribute.h
+  mafCoreFactory.cpp
+  mafCoreFactory.h
+  mafDataPipe.cpp
+  mafDataPipe.h
+  mafEventIO.cpp
+  mafEventIO.h
+  mafLogicWithGUI.cpp
+  mafLogicWithGUI.h
+  mafLogicWithManagers.cpp
+  mafLogicWithManagers.h
+  mafMatrixPipe.cpp
+  mafMatrixPipe.h
+  mafNode.cpp
+  mafNode.h
+  mafNodeFactory.cpp
+  mafNodeFactory.h
+  mafNodeGeneric.cpp
+  mafNodeGeneric.h
+  mafNodeIterator.cpp
+  mafNodeIterator.h
+  mafNodeManager.cpp
+  mafNodeManager.h
+  mafNodeRoot.cpp
+  mafNodeRoot.h
+  mafOp.cpp
+  mafOp.h
+  mafOpContextStack.cpp
+  mafOpContextStack.h
+  mafOpManager.cpp
+  mafOpManager.h
+  mafOpSelect.cpp
+  mafOpSelect.h
+  mafOpStack.cpp
+  mafOpStack.h
+  mafPipe.cpp
+  mafPipe.h
+  mafPipeFactory.cpp
+  mafPipeFactory.h
+  mafRoot.cpp
+  mafRoot.h
+  mafRWI.cpp
+  mafRWI.h
+  mafRWIBase.cpp
+  mafRWIBase.h
+  mafSceneGraph.cpp
+  mafSceneGraph.h
+  mafSceneNode.cpp
+  mafSceneNode.h
+  mafTagArray.cpp
+  mafTagArray.h
+  mafTagItem.cpp
+  mafTagItem.h
+  mafTimeMap.h
+  mafVME.cpp
+  mafVME.h
+  mafVMEManager.cpp
+  mafVMEManager.h
+  mafVMEOutput.cpp
+  mafVMEOutput.h
+  mafVMEOutputNULL.cpp
+  mafVMEOutputNULL.h
+  mafVMERoot.cpp
+  mafVMERoot.h
+  mafVMEStorage.cpp
+  mafVMEStorage.h
+  mafViewCompound.cpp
+  mafViewCompound.h
+  mafViewManager.cpp
+  mafViewManager.h
+  mmgListCtrlBitmap.cpp
+  mmgListCtrlBitmap.h
+  mmgMaterialButton.cpp
+  mmgMaterialButton.h
+  mmgMaterialChooser.cpp
+  mmgMaterialChooser.h
+  mmgViewWin.cpp
+  mmgViewWin.h
+  mmgVMEChooser.cpp
+  mmgVMEChooser.h
+  mmgVMEChooserAccept.cpp
+  mmgVMEChooserAccept.h
+  mmgVMEChooserTree.cpp
+  mmgVMEChooserTree.h
+  mmuTimeSet.cpp
+  mmuTimeSet.h
 )
 
 IF (MAF_USE_VTK)
