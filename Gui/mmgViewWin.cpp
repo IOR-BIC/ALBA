@@ -2,14 +2,13 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgViewWin.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:30 $
-  Version:   $Revision: 1.2 $
-  Authors:   Silvano Imboden
+  Date:      $Date: 2005-11-18 13:31:39 $
+  Version:   $Revision: 1.3 $
+  Authors:   Paolo Quadrani
 ==========================================================================
-  Copyright (c) 2002/2004
-  CINECA - Interuniversity Consortium (www.cineca.it) 
+Copyright (c) 2002/2004
+CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
-
 
 
 #include "mafDefines.h" 
@@ -20,9 +19,9 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-
 #include "mmgViewWin.h"
 #include "mafView.h"
+
 //----------------------------------------------------------------------------
 // mmgViewWin EVENT_TABLE
 //----------------------------------------------------------------------------
@@ -34,11 +33,12 @@ mmgViewWin::mmgViewWin(wxWindow *parent, wxWindowID id,const wxPoint& pos, const
 :wxPanel(parent,id,pos,size,wxTAB_TRAVERSAL)//SIL. 10-11-2003: added wxTAB_TRAVERSAL to intercept 'Enter' in the text widgets
 //----------------------------------------------------------------------------
 {
-  m_owner = NULL;
+  m_Owner = NULL;
 }
 //----------------------------------------------------------------------------
 void mmgViewWin::OnSize(wxSizeEvent &event)
 //----------------------------------------------------------------------------
 {
-  if(m_owner) m_owner->OnSize(event);
+  if(m_Owner) 
+    m_Owner->OnSize(event);
 }

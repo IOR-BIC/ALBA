@@ -26,6 +26,12 @@ IF (MAF_USE_VTK)
     mafViewCompound.h
     mafViewVTK.cpp
     mafViewVTK.h
+    mmgContextualMenu.cpp
+    mmgContextualMenu.h
+    mmgTreeContextualMenu.cpp
+    mmgTreeContextualMenu.h
+    vtkMAFAssembly.cpp
+    vtkMAFAssembly.h
   )
 ENDIF (MAF_USE_VTK)
 

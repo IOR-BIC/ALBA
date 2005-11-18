@@ -79,8 +79,6 @@ SET(PROJECT_SRCS
   mmgMaterialButton.h
   mmgMaterialChooser.cpp
   mmgMaterialChooser.h
-  mmgViewWin.cpp
-  mmgViewWin.h
   mmgVMEChooser.cpp
   mmgVMEChooser.h
   mmgVMEChooserAccept.cpp
@@ -98,13 +96,11 @@ IF (MAF_USE_VTK)
   mafPipeBox.h
   mmaMaterial.cpp
   mmaMaterial.h
-  vtkMAFAssembly.cpp
-  vtkMAFAssembly.h
   )
 ENDIF (MAF_USE_VTK)
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS mafBase mafIO mafGui mafInteraction)
+SET(PROJECT_LIBS mafBase mafIO mafGui mafInteraction mafViews)
 
 IF (MAF_USE_VTK)
   SET(PROJECT_LIBS ${PROJECT_LIBS} vtkCommon)

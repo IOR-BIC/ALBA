@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMAFAssembly.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:18:02 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-11-18 13:32:14 $
+  Version:   $Revision: 1.1 $
   Authors:   Sivano Imboden 
 ==========================================================================
   Copyright (c) 2002/2004 
