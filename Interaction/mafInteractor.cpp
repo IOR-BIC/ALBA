@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-16 14:06:45 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-11-18 10:54:20 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -371,7 +371,7 @@ void mafInteractor::ComputeWorldToDisplay(double x, double y, double z, double d
   m_Renderer->GetDisplayPoint(displayPt);
 }
 //----------------------------------------------------------------------------
-bool mafInteractor::FindPokedVme(mafDevice *device,mafMatrix &point_pose,vtkProp3D *&picked_prop,mafVME *&picked_vme,mafInteractor *&picked_behavior)
+/*bool mafInteractor::FindPokedVme(mafDevice *device,mafMatrix &point_pose,vtkProp3D *&picked_prop,mafVME *&picked_vme,mafInteractor *&picked_behavior)
 //----------------------------------------------------------------------------
 {
   mafView *v = NULL;
@@ -420,3 +420,4 @@ bool mafInteractor::FindPokedVme(mafDevice *device,mafMatrix &point_pose,vtkProp
   }
   return false;
 }
+*/

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPER.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-02 10:37:48 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-11-18 10:54:21 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -301,6 +301,7 @@ void mmiPER::OnButtonDown(mafEventInteraction *e)
 {
   mafDevice *device = mafDevice::SafeDownCast((mafDevice*)e->GetSender());
 
+  mafView       *v;
   mafVME        *picked_vme  = NULL;
   vtkProp3D     *picked_prop = NULL;
   mafInteractor *picked_bh   = NULL;
@@ -311,14 +312,19 @@ void mmiPER::OnButtonDown(mafEventInteraction *e)
   mmdTracker *tracker = mmdTracker::SafeDownCast(device);
 
   if (point_pose && tracker)
-  { 
-    if(FindPokedVme(device,*point_pose,picked_prop,picked_vme,picked_bh)) 
+  {
+    mafAvatar *avatar = tracker->GetAvatar();
+    if (avatar)
     {
-      // if a VME is picked its pointer is written in PickedVME
-      if(m_CanSelect && !picked_vme->IsA("mafVMEGizmo"))
+      v = avatar->GetView();
+      if(v && v->FindPokedVme(device,*point_pose, picked_prop,picked_vme,picked_bh)) 
       {
-        // Send a VME select event to Logic
-        InvokeEvent(VME_SELECT,MCH_UP,picked_vme);
+        // if a VME is picked its pointer is written in PickedVME
+        if(m_CanSelect && !picked_vme->IsA("mafVMEGizmo"))
+        {
+          // Send a VME select event to Logic
+          InvokeEvent(VME_SELECT,MCH_UP,picked_vme);
+        }
       }
     }
 
@@ -344,8 +350,9 @@ void mmiPER::OnButtonDown(mafEventInteraction *e)
     mafMatrix point_pose;
     point_pose.SetElement(0,3,pos_2d[0]);
     point_pose.SetElement(1,3,pos_2d[1]);
+    v = mouse->GetView();
 
-    if(FindPokedVme(device,point_pose,picked_prop,picked_vme,picked_bh))
+    if(v && v->FindPokedVme(device,point_pose,picked_prop,picked_vme,picked_bh))
     {
       SetPickedVME(device,picked_vme); 
       // if a VME is picked its pointer is written in PickedVME
@@ -568,7 +575,7 @@ void mmiPER::FlyTo(mafEventInteraction *e,int numstep, double zoom)
 
 	  vtkCamera *cam = ren->GetActiveCamera();
 
-    if(!FindPokedVme(tracker,*point_pose,picked_prop,picked_vme,picked_bh)) 
+    if(view && !view->FindPokedVme(tracker,*point_pose,picked_prop,picked_vme,picked_bh)) 
       return; // no picking no fly to!
 
 
@@ -627,7 +634,7 @@ void mmiPER::FlyTo(mafEventInteraction *e,int numstep, double zoom)
 
 	  vtkCamera *cam = ren->GetActiveCamera();
 
-    if(!FindPokedVme(mouse,point_pose,picked_prop,picked_vme,picked_bh)) 
+    if(view && !view->FindPokedVme(mouse,point_pose,picked_prop,picked_vme,picked_bh)) 
       return; // no picking no fly to!
 
     int i, j;

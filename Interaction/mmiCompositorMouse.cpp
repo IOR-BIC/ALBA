@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiCompositorMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 15:19:56 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-11-18 10:54:20 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -15,6 +15,7 @@
 #include "mmdMouse.h"
 #include "mafDecl.h"
 #include "mafEventInteraction.h"
+#include "mafView.h"
 #include "mafVME.h"
 
 #include "vtkDoubleArray.h"
@@ -246,7 +247,9 @@ void mmiCompositorMouse::InitInteraction(int buttonPressed, mafEventInteraction 
   point_pose.SetElement(0,3,m_MousePose[0]);
   point_pose.SetElement(1,3,m_MousePose[1]);
 
-  FindPokedVme(mouse,point_pose,picked_prop,picked_vme,picked_bh);
+  mafView *v = mouse->GetView();
+  assert(v);
+  v->FindPokedVme(mouse,point_pose,picked_prop,picked_vme,picked_bh);
 
   // Set the m_Renderer and m_CurrentCamera ivar
   StartInteraction(mouse);
