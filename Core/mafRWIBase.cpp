@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 11:39:53 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-11-18 10:52:04 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -56,6 +56,7 @@
 #include "vtkLight.h"
 #include "vtkWindowToImageFilter.h"
 #include "vtkBMPWriter.h"
+#include "vtkJPEGWriter.h"
 #include "vtkImageData.h"
 
 //----------------------------------------------------------------------------
@@ -567,12 +568,8 @@ wxBitmap *mafRWIBase::GetImage()
 void mafRWIBase::SaveImage(wxString view_name, int magnification)
 //---------------------------------------------------------------------------
 {
-	wxString wildc = "Bitmap Image (*.bmp)|*.bmp";
-  wxString name = wxString::Format("%s\\%sSnapshot", m_SaveDir.c_str(),view_name.c_str());
-	wxString file = name + ".bmp";
-  int i=1;
-  while(::wxFileExists(file) && i<100 ) 
-    file = wxString::Format("%s%d.bmp",name.c_str(), i++);
+	wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg";
+  wxString file = wxString::Format("%s\\%sSnapshot", m_SaveDir.c_str(),view_name.c_str());
 	
 	wxString filename = mafGetSaveFile(file,wildc).c_str(); 
 	if(filename == "") 
@@ -580,15 +577,29 @@ void mafRWIBase::SaveImage(wxString view_name, int magnification)
 
 	::wxBeginBusyCursor();
 
-	vtkMAFSmartPointer<vtkWindowToImageFilter> w2i;
+  vtkMAFSmartPointer<vtkWindowToImageFilter> w2i;
 	w2i->SetInput(GetRenderWindow());
   w2i->SetMagnification(magnification);
 	w2i->Update();
   
-	vtkMAFSmartPointer<vtkBMPWriter> w;
-  w->SetInput(w2i->GetOutput());
-  w->SetFileName(filename);
-	w->Write();
+  wxString path, name, ext;
+  wxSplitPath(filename,&path,&name,&ext);
+
+	ext.MakeLower();
+  if (ext == "bmp")
+	{
+    vtkMAFSmartPointer<vtkBMPWriter> w;
+    w->SetInput(w2i->GetOutput());
+    w->SetFileName(filename);
+    w->Write();
+	}
+  else if (ext == "jpg")
+  {
+    vtkMAFSmartPointer<vtkJPEGWriter> w;
+    w->SetInput(w2i->GetOutput());
+    w->SetFileName(filename);
+    w->Write();
+  }
 	::wxEndBusyCursor();
 }
 //----------------------------------------------------------------------------
