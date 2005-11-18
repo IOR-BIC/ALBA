@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 10:56:08 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-11-18 11:08:22 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,7 +22,6 @@
 #include "mafViewOrthoSlice.h"
 #include "mafViewSlice.h"
 #include "mafPipeVolumeSlice.h"
-#include "mafPipeVolumeStructuredSlice.h"
 #include "mmgGui.h"
 #include "mmgFloatSlider.h"
 #include "mmgLutSlider.h"
