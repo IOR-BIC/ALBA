@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2005-10-11 11:00:30 $
-# Version:   $Revision: 1.28 $
+# Date:      $Date: 2005-11-18 12:25:21 $
+# Version:   $Revision: 1.29 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -116,6 +116,7 @@ IF (MAF_CAN_BUILD)
   INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/Gui)
   INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/IO)
   INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/Operations)
+  INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/Views)
   INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/VME)
   INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/vtkMAF)
   INCLUDE_DIRECTORIES(${MAF_BINARY_DIR}/vtkMAF)
@@ -131,6 +132,7 @@ IF (MAF_CAN_BUILD)
   SUBDIRS (vtkMAF)
   SUBDIRS (VME)
   SUBDIRS (Operations)
+  SUBDIRS (Views)
   
   # Configuring Doxygen documentation  
   SUBDIRS (Docs)
