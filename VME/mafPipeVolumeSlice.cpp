@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-17 20:23:48 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-11-18 10:55:54 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -59,20 +59,20 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
     m_SlicerImage[i]			= NULL;
     m_Image[i]            = NULL;
     m_Texture[i]		      = NULL;
-    m_ColorLUT[i]        = NULL;
+    m_ColorLUT[i]         = NULL;
     m_SlicePolydata[i]		= NULL;
     m_SliceMapper[i]		  = NULL;
     m_SliceActor[i]	      = NULL;
     m_SliceSlider[i]      = NULL;
   }
-  m_SliceParametersInitialized = false;
-  m_ShowVolumeBox         = false;
+  m_SliceParametersInitialized  = false;
+  m_ShowVolumeBox               = false;
 
   m_SliceMode = SLICE_Z;
 
   m_ColorLUTEnabled = 0;
   m_SliceOpacity  = 1.0;
-  m_TextureRes    = 512;
+  m_TextureRes    = 256;
 
   m_XVector[0][0] = 0.0001;	//modified by Paolo 29-10-2003 should be 0 !!! check into Sasha's filter
   m_XVector[0][1] = 1;
@@ -160,7 +160,8 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 	if (!m_SliceParametersInitialized)
 	{
     double b[6];
-    m_Vme->GetOutput()->GetBounds(b);
+    //m_Vme->GetOutput()->GetBounds(b);
+    m_Vme->GetOutput()->GetVMELocalBounds(b);
     m_Origin[0] = (b[0] + b[1])*.5;
     m_Origin[1] = (b[2] + b[3])*.5;
     m_Origin[2] = (b[4] + b[5])*.5;
@@ -480,12 +481,6 @@ mmgGui *mafPipeVolumeSlice::CreateGui()
   double b[6] = {-1,1,-1,1,-1,1};
   m_Gui = new mmgGui(this);
   m_Gui->Bool(ID_RGB_LUT,"rgb lut", &m_ColorLUTEnabled,0,"turn on/off RGB LUT");
-  /*vtkDataSet *data = m_Vme->GetOutput()->GetVTKData();
-  if (data != NULL)
-  {
-    data->Update();
-    data->GetBounds(b);
-  }*/
   m_Vme->GetOutput()->GetVMELocalBounds(b);
   if (m_SliceMode == SLICE_X || m_SliceMode == SLICE_ORTHO)
   {

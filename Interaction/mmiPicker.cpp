@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPicker.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-16 14:30:32 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-11-18 10:53:57 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -122,8 +122,6 @@ void mmiPicker::SendPickingInformation(mafView *v, double *mouse_pos, mafMatrix 
       double scalar_value = 0;
       mafVME *pickedVME = v->GetPickedVme();
       vtkDataSet *vtk_data = pickedVME->GetOutput()->GetVTKData();
-      vtk_data->SetUpdateExtentToWholeExtent();
-      vtk_data->Update();
       int pid = vtk_data->FindPoint(pos_picked);
       vtkDataArray *scalars = vtk_data->GetPointData()->GetScalars();
       if (scalars)
