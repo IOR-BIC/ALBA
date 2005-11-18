@@ -8,7 +8,6 @@ SET(MAF_INCLUDE_DIRS
   "@MAF_BINARY_DIR@/Interaction"
   "@MAF_SOURCE_DIR@/IO"
   "@MAF_SOURCE_DIR@/Operations"
-  "@MAF_SOURCE_DIR@/Views"
   "@MAF_SOURCE_DIR@/VME"
   "@MAF_SOURCE_DIR@/vtkMAF"
   "@MAF_BINARY_DIR@"
