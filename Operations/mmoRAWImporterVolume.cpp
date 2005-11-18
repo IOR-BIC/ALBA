@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 07:56:27 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-11-18 10:54:52 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,7 +38,7 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkWindowLevelLookupTable.h"
 #include "vtkPlaneSource.h"
-#include "vtkExtractVOI.h"
+#include "vtkImageToStructuredPoints.h"
 
 //----------------------------------------------------------------------------
 mmoRAWImporterVolume::mmoRAWImporterVolume(wxString label) : mafOp(label)
@@ -62,7 +62,8 @@ mmoRAWImporterVolume::mmoRAWImporterVolume(wxString label) : mafOp(label)
 	m_DataDimemsion[1] = 512;
 	m_DataDimemsion[2] = 1;
 
-  m_SliceVOI[0] = m_SliceVOI[1] = 0;
+  m_SliceVOI[0] = 0;
+  m_SliceVOI[1] = 1;
 
 	m_NumberOfByte = 0;
 	
@@ -252,6 +253,7 @@ void mmoRAWImporterVolume::	OnEvent(mafEventBase *maf_event)
       case ID_DIM:
         if( m_CurrentSlice >= m_DataDimemsion[2] ) 
           m_CurrentSlice = m_DataDimemsion[2]-1;
+        m_SliceVOI[1] = m_DataDimemsion[2];
         m_SliceSlider->SetRange(0,m_DataDimemsion[2] - 1);
         m_Gui->Update();
         UpdateReader();
@@ -396,20 +398,21 @@ bool mmoRAWImporterVolume::Import()
 	reader->SetHeaderSize(m_FileHeader);
 	reader->SetFileDimensionality(3);
   reader->SetDataVOI(0, m_DataDimemsion[0] - 1, 0, m_DataDimemsion[1] - 1, m_SliceVOI[0], m_SliceVOI[1] - 1);
+//  reader->SetDataVOI(0, m_DataDimemsion[0] - 1, 0, m_DataDimemsion[1] - 1, 0, m_SliceVOI[1] - m_SliceVOI[0] - 1);
+//  reader->SetDataOrigin(0.0,0.0,m_SliceVOI[0]*m_DataSpacing[2]);
 	reader->Update();
 
-/*  vtkMAFSmartPointer<vtkExtractVOI> extract_VOI;
-  extract_VOI->SetInput(reader->GetOutput());
-  extract_VOI->SetVOI(0, m_DataDimemsion[0] - 1, 0, m_DataDimemsion[1] - 1, m_SliceVOI[0], m_SliceVOI[1] - 1);
-  extract_VOI->Update();
-*/
-	mafNEW(m_VolumeGray);
+  vtkMAFSmartPointer<vtkImageToStructuredPoints> image_to_sp;
+  image_to_sp->SetInput(reader->GetOutput());
+  image_to_sp->Update();
+
+  mafNEW(m_VolumeGray);
   mafNEW(m_VolumeRGB);
-  if (m_VolumeGray->SetDataByDetaching(reader->GetOutput(),0) == MAF_OK)
+  if (m_VolumeGray->SetDataByDetaching((vtkDataSet *)image_to_sp->GetOutput(),0) == MAF_OK)
   {
     m_Output = m_VolumeGray;
   }
-  else if (m_VolumeRGB->SetDataByDetaching(reader->GetOutput(),0) == MAF_OK)
+  else if (m_VolumeRGB->SetDataByDetaching((vtkDataSet *)image_to_sp->GetOutput(),0) == MAF_OK)
   {
     m_Output = m_VolumeRGB;
   }
