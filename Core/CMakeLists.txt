@@ -87,6 +87,24 @@ SET(PROJECT_SRCS
   mmgVMEChooserTree.h
   mmuTimeSet.cpp
   mmuTimeSet.h
+	mafRWI.cpp
+	mafRWI.h
+	mafRWIBase.cpp
+	mafRWIBase.h
+	mafSceneGraph.cpp
+	mafSceneGraph.h
+	mafSceneNode.cpp
+	mafSceneNode.h
+	mafViewCompound.cpp
+	mafViewCompound.h
+	mafViewVTK.cpp
+	mafViewVTK.h
+	mmgContextualMenu.cpp
+	mmgContextualMenu.h
+	mmgTreeContextualMenu.cpp
+	mmgTreeContextualMenu.h
+	vtkMAFAssembly.cpp
+	vtkMAFAssembly.h
 )
 
 IF (MAF_USE_VTK)
@@ -100,7 +118,7 @@ IF (MAF_USE_VTK)
 ENDIF (MAF_USE_VTK)
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS mafBase mafIO mafGui mafInteraction mafViews)
+SET(PROJECT_LIBS mafBase mafIO mafGui mafInteraction)
 
 IF (MAF_USE_VTK)
   SET(PROJECT_LIBS ${PROJECT_LIBS} vtkCommon)

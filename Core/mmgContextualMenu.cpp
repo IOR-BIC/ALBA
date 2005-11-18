@@ -2,7 +2,7 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 13:32:14 $
+  Date:      $Date: 2005-11-18 14:51:25 $
   Version:   $Revision: 1.1 $
   Authors:   Paolo Quadrani    
 ==========================================================================

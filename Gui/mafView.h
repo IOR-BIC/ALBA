@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 12:25:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-11-18 14:52:08 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMAFAssembly.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 13:32:14 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-11-18 14:51:26 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,7 +29,7 @@
 #include "vtkActor.h"
 #include "vtkVolume.h"
 
-vtkCxxRevisionMacro(vtkMAFAssembly, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkMAFAssembly, "$Revision: 1.4 $");
 vtkStandardNewMacro(vtkMAFAssembly);
 
 // Construct object with no children.

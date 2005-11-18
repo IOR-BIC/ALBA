@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 12:25:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-11-18 14:51:24 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004

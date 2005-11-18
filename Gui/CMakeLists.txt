@@ -20,6 +20,8 @@ SET(PROJECT_SRCS
   mafSideBar.h
   mafTextKit.cpp
   mafTextKit.h
+  mafView.cpp
+  mafView.h
   mafVTKLog.cpp
   mafVTKLog.h
   mafWXLog.cpp
