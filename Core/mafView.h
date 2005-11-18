@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-15 15:22:51 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2005-11-18 10:53:13 $
+  Version:   $Revision: 1.25 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,6 +27,9 @@
 // forward references :
 //----------------------------------------------------------------------------
 class mmdMouse;
+class mafDevice;
+class mafInteractor;
+
 class mafRWIBase;
 class vtkCellPicker;
 class vtkRayCast3DPicker;
@@ -86,6 +89,12 @@ public:
   virtual void			CameraUpdate()																					{};
   virtual void      SetMouse(mmdMouse *mouse)                               {};
   virtual mafRWIBase *GetRWI()                                              {return NULL;};
+
+  /** 
+  Find the pocked VME at button down. As argument the function needs
+  the device which performed the action, and provides as result pointers
+  to piked prop, vme and its behavior if it exists. */
+  virtual bool FindPokedVme(mafDevice *device,mafMatrix &point_pose,vtkProp3D *&picked_prop,mafVME *&picked_vme,mafInteractor *&picked_behavior) {return false;};
 
   /** return the status of the node within this view. es: NON_VISIBLE,VISIBLE_ON, ... */
   //having mafView::GetNodeStatus allow mmgCheckTree to not know about mafSceneGraph

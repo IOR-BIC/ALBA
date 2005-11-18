@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-14 16:54:46 $
-  Version:   $Revision: 1.38 $
+  Date:      $Date: 2005-11-18 10:53:14 $
+  Version:   $Revision: 1.39 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,6 +29,12 @@
 
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
+
+#include "mafInteractor.h"
+#include "mafAvatar.h"
+#include "mafAvatar3D.h"
+#include "mmdTracker.h"
+#include "mmdMouse.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkCamera.h"
@@ -337,6 +343,44 @@ void mafViewVTK::SetWindowSize(int w, int h)
 //----------------------------------------------------------------------------
 {
 	GetRenderWindow()->SetSize(w,h);
+}
+//----------------------------------------------------------------------------
+bool mafViewVTK::FindPokedVme(mafDevice *device,mafMatrix &point_pose,vtkProp3D *&picked_prop,mafVME *&picked_vme,mafInteractor *&picked_behavior)
+//----------------------------------------------------------------------------
+{
+  mmdTracker *tracker = mmdTracker::SafeDownCast(device);
+  mmdMouse   *mouse   = mmdMouse::SafeDownCast(device);
+  int mouse_pos[2];
+  bool picked_something = false;
+
+  if (tracker)
+  {
+    mafAvatar *avatar = tracker->GetAvatar();
+    mafMatrix world_pose;
+    if (avatar)
+    {
+      mafAvatar3D *avatar3D = mafAvatar3D::SafeDownCast(avatar);
+      if (avatar3D)
+        avatar3D->TrackerToWorld(point_pose,world_pose,mafAvatar3D::CANONICAL_TO_WORLD_SCALE);
+      else
+        world_pose = point_pose;
+      picked_something = Pick(world_pose);
+    }
+  }
+  else if (mouse)
+  { 
+    mouse_pos[1] = (int)point_pose.GetElement(1,3);
+    mouse_pos[0] = (int)point_pose.GetElement(0,3);
+    picked_something = Pick(mouse_pos[0], mouse_pos[1]);
+  }
+  if(picked_something)
+  {
+    picked_vme = GetPickedVme();
+    picked_prop = GetPickedProp();
+    picked_behavior = picked_vme->GetBehavior();
+    return true;
+  }
+  return false;
 }
 //----------------------------------------------------------------------------
 bool mafViewVTK::Pick(int x, int y)

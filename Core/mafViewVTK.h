@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-14 16:54:46 $
-  Version:   $Revision: 1.32 $
+  Date:      $Date: 2005-11-18 10:53:14 $
+  Version:   $Revision: 1.33 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -112,6 +112,12 @@ public:
   virtual vtkRenderer     *GetFrontRenderer();
   virtual vtkRenderer     *GetBackRenderer();
   virtual vtkRenderWindow *GetRenderWindow();
+
+  /** 
+  Find the pocked VME at button down. As argument the function needs
+  the device which performed the action, and provides as result pointers
+  to piked prop, vme and its behavior if it exists. */
+  virtual bool FindPokedVme(mafDevice *device,mafMatrix &point_pose,vtkProp3D *&picked_prop,mafVME *&picked_vme,mafInteractor *&picked_behavior);
 
   /** 
   Perform a picking according to the screen position (x,y) and return true on success*/

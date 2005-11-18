@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 11:42:32 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-11-18 10:53:13 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,6 +26,10 @@
 #include "mafSceneNode.h"
 #include "mmgViewWin.h"
 #include "mmgGui.h"
+#include "mafInteractor.h"
+#include "mafAvatar.h"
+#include "mafAvatar3D.h"
+#include "mmdTracker.h"
 #include "mmdMouse.h"
 
 //----------------------------------------------------------------------------
@@ -173,7 +177,18 @@ mafSceneGraph *mafViewCompound::GetSceneGraph()
 mafRWIBase *mafViewCompound::GetRWI()
 //----------------------------------------------------------------------------
 {
-  return ((mafViewVTK *)m_ChildViewList[m_DefauldChildView])->GetRWI();
+  //return ((mafViewVTK *)m_ChildViewList[m_DefauldChildView])->GetRWI();
+  return GetSubView()->GetRWI();
+}
+//----------------------------------------------------------------------------
+bool mafViewCompound::FindPokedVme(mafDevice *device,mafMatrix &point_pose,vtkProp3D *&picked_prop,mafVME *&picked_vme,mafInteractor *&picked_behavior)
+//----------------------------------------------------------------------------
+{
+  mafViewVTK *v = mafViewVTK::SafeDownCast(GetSubView());
+  if (v)
+    return v->FindPokedVme(device,point_pose,picked_prop,picked_vme,picked_behavior);
+  else
+    return false;
 }
 /*//----------------------------------------------------------------------------
 mafPipe *mafViewCompound::GetNodePipe(mafNode *vme)

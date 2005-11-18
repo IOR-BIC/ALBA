@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-15 15:22:51 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2005-11-18 10:53:13 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -101,7 +101,7 @@ mmgGui* mafView::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this); // replace NULL with 'this' ....  //SIL. 22-4-2005: 
+  m_Gui = new mmgGui(this);
   m_Gui->Label("view default gui");
   return m_Gui;
 }

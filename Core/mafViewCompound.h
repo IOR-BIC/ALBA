@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 11:42:33 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-11-18 10:53:14 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -105,6 +105,12 @@ public:
 
   virtual mafSceneGraph *GetSceneGraph();
   virtual mafRWIBase    *GetRWI();
+
+  /** 
+  Find the pocked VME at button down. As argument the function needs
+  the device which performed the action, and provides as result pointers
+  to piked prop, vme and its behavior if it exists. */
+  virtual bool FindPokedVme(mafDevice *device,mafMatrix &point_pose,vtkProp3D *&picked_prop,mafVME *&picked_vme,mafInteractor *&picked_behavior);
 
   /** 
   Return the current pipe for the specified vme (if any exist at this moment) */
