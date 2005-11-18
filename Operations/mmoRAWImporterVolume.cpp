@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-17 20:22:24 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-11-18 07:56:27 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,6 +38,7 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkWindowLevelLookupTable.h"
 #include "vtkPlaneSource.h"
+#include "vtkExtractVOI.h"
 
 //----------------------------------------------------------------------------
 mmoRAWImporterVolume::mmoRAWImporterVolume(wxString label) : mafOp(label)
@@ -390,13 +391,18 @@ bool mmoRAWImporterVolume::Import()
 		break;
 	}
 
-	reader->SetDataExtent(0, m_DataDimemsion[0] - 1, 0, m_DataDimemsion[1] - 1, 0, m_DataDimemsion[2] - 1);
+  reader->SetDataExtent(0, m_DataDimemsion[0] - 1, 0, m_DataDimemsion[1] - 1, 0, m_DataDimemsion[2] - 1);
 	reader->SetDataSpacing(m_DataSpacing);
 	reader->SetHeaderSize(m_FileHeader);
 	reader->SetFileDimensionality(3);
   reader->SetDataVOI(0, m_DataDimemsion[0] - 1, 0, m_DataDimemsion[1] - 1, m_SliceVOI[0], m_SliceVOI[1] - 1);
 	reader->Update();
 
+/*  vtkMAFSmartPointer<vtkExtractVOI> extract_VOI;
+  extract_VOI->SetInput(reader->GetOutput());
+  extract_VOI->SetVOI(0, m_DataDimemsion[0] - 1, 0, m_DataDimemsion[1] - 1, m_SliceVOI[0], m_SliceVOI[1] - 1);
+  extract_VOI->Update();
+*/
 	mafNEW(m_VolumeGray);
   mafNEW(m_VolumeRGB);
   if (m_VolumeGray->SetDataByDetaching(reader->GetOutput(),0) == MAF_OK)
