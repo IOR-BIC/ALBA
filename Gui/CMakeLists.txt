@@ -22,6 +22,10 @@ SET(PROJECT_SRCS
   mafTextKit.h
   mafView.cpp
   mafView.h
+  mafViewCompound.cpp
+  mafViewCompound.h
+  mafViewVTK.cpp
+  mafViewVTK.h
   mafVTKLog.cpp
   mafVTKLog.h
   mafWXLog.cpp

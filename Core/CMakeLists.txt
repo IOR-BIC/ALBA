@@ -79,8 +79,6 @@ SET(PROJECT_SRCS
   mafVMERoot.h
   mafVMEStorage.cpp
   mafVMEStorage.h
-  mafViewCompound.cpp
-  mafViewCompound.h
   mafViewManager.cpp
   mafViewManager.h
   mmgListCtrlBitmap.cpp
@@ -106,8 +104,6 @@ IF (MAF_USE_VTK)
   ${PROJECT_SRCS}
   mafPipeBox.cpp
   mafPipeBox.h
-  mafViewVTK.cpp
-  mafViewVTK.h
   mmaMaterial.cpp
   mmaMaterial.h
   vtkMAFAssembly.cpp
