@@ -30,8 +30,6 @@ SET(PROJECT_SRCS
   mmgCheckListBox.h
   mmgCheckTree.cpp
   mmgCheckTree.h
-  mmgContextualMenu.cpp
-  mmgContextualMenu.h
   mmgCrossSplitter.cpp
   mmgCrossSplitter.h
   mmgDialog.cpp
@@ -82,8 +80,6 @@ SET(PROJECT_SRCS
   mmgTimeBar.h
   mmgTree.cpp
   mmgTree.h
-  mmgTreeContextualMenu.cpp
-  mmgTreeContextualMenu.h
   mmgValidator.cpp
   mmgValidator.h
   mmgViewFrame.cpp
