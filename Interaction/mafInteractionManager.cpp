@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-09 13:59:29 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2005-11-18 11:36:58 $
+  Version:   $Revision: 1.24 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -36,6 +36,7 @@
 #include "mafEvent.h"
 
 #include "mafSceneGraph.h"
+#include "mafView.h"
 #include "mafViewVTK.h"
 #include "mafRWIBase.h"
 
@@ -389,7 +390,8 @@ void mafInteractionManager::CameraUpdate(mafView *view)
 void mafInteractionManager::OnViewSelected(mafEvent *event)
 //------------------------------------------------------------------------------
 {  
-  mafViewVTK *view = mafViewVTK::SafeDownCast(event->GetView()); 
+  mafView *v = event->GetView();
+	mafViewVTK *view = mafViewVTK::SafeDownCast(v); 
   m_SelectedView = view;
 
   if (view)
