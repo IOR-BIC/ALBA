@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmo2DMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 13:44:02 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-11-21 18:22:15 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,11 +36,12 @@ mafOp(label)
 	m_OpType	= OPTYPE_OP;
 	m_Canundo	= true;
 
-  m_measure_type = 0;
-  m_acute_angle  = "0";
-  m_obtuse_angle = "0";
-  m_dist         = "0";
-  m_measure_text = "";
+  m_GenerateHistogramFlag = 0;
+  m_MeasureType = 0;
+  m_AcuteAngle  = "0";
+  m_ObtuseAngle = "0";
+  m_DistanceMeasure = "0";
+  m_MeasureText = "";
 }
 //----------------------------------------------------------------------------
 mmo2DMeasure::~mmo2DMeasure()
@@ -59,6 +60,7 @@ mafOp* mmo2DMeasure::Copy()
 enum MEASURE2D_ID
 {
   ID_MEASURE_TYPE = MINID,
+  ID_HISTOGRAM,
   ID_STORE_MEASURE,
   ID_REMOVE_MEASURE,
   ID_MEASURE_LIST,
@@ -67,9 +69,9 @@ enum MEASURE2D_ID
 void mmo2DMeasure::OpRun()   
 //----------------------------------------------------------------------------
 {
-  m_per2DMeter = mmi2DMeter::New();
-  mafEventMacro(mafEvent(this,PER_PUSH,(mafObject *)m_per2DMeter));
-  m_per2DMeter->SetListener(this);
+  m_2DMeterInteractor = mmi2DMeter::New();
+  mafEventMacro(mafEvent(this,PER_PUSH,(mafObject *)m_2DMeterInteractor));
+  m_2DMeterInteractor->SetListener(this);
   
   wxString measure[3] = {"points", "lines", "angle"};
 
@@ -78,24 +80,26 @@ void mmo2DMeasure::OpRun()
 	m_Gui->SetListener(this);
 
   m_Gui->Label("measure type",true);
-  m_Gui->Combo(ID_MEASURE_TYPE,"",&m_measure_type,3,measure);
+  m_Gui->Combo(ID_MEASURE_TYPE,"",&m_MeasureType,3,measure);
+  m_Gui->Bool(ID_HISTOGRAM,"histogram",&m_GenerateHistogramFlag);
   m_Gui->Divider();
-  m_Gui->Label("distance: ",&m_dist);
-  m_Gui->Label("acute angle: ",&m_acute_angle);
-  m_Gui->Label("obtuse angle: ",&m_obtuse_angle);
+  m_Gui->Label("distance: ",&m_DistanceMeasure);
+  m_Gui->Label("acute angle: ",&m_AcuteAngle);
+  m_Gui->Label("obtuse angle: ",&m_ObtuseAngle);
   m_Gui->Divider();
   m_Gui->Label("Measure description.",true);
   m_Gui->Button(ID_STORE_MEASURE,"Store");
   //m_Gui->Button(ID_ADD_TO_VME_TREE,"Add to msf");
   m_Gui->Button(ID_REMOVE_MEASURE,"Remove");
-  m_measure_list = m_Gui->ListBox(ID_MEASURE_LIST);
+  m_MeasureList = m_Gui->ListBox(ID_MEASURE_LIST);
 	m_Gui->OkCancel();
 
-  if(m_measure_list->Number() == 0)
+  if(m_MeasureList->Number() == 0)
   {
     //m_Gui->Enable(ID_ADD_TO_VME_TREE,false);
     m_Gui->Enable(ID_REMOVE_MEASURE,false);
   }
+  m_Gui->Enable(ID_HISTOGRAM, m_MeasureType == 0);
 
   ShowGui();
 }
@@ -110,29 +114,33 @@ void mmo2DMeasure::OnEvent(mafEventBase *maf_event)
       switch(e->GetId())
       {
         case ID_MEASURE_TYPE:
-          m_per2DMeter->SetMeasureType(m_measure_type);
+          m_2DMeterInteractor->SetMeasureType(m_MeasureType);
+          m_Gui->Enable(ID_HISTOGRAM, m_MeasureType == 0);
+        break;
+        case ID_HISTOGRAM:
+          m_2DMeterInteractor->GenerateHistogram(m_GenerateHistogramFlag != 0);
         break;
         case ID_STORE_MEASURE:
         {
-          while(m_measure_text == "")
-            m_measure_text = wxGetTextFromUser("","Insert measure description", m_measure_text);
+          while(m_MeasureText == "")
+            m_MeasureText = wxGetTextFromUser("","Insert measure description", m_MeasureText);
           wxString t;
-          if(m_measure_type == 0 || m_measure_type == 1)
-            t = m_dist + " " + m_measure_text;
+          if(m_MeasureType == 0 || m_MeasureType == 1)
+            t = m_DistanceMeasure + " " + m_MeasureText;
           else
-            t = m_acute_angle + "° (" + m_obtuse_angle + "°) " + m_measure_text;
-          m_measure_list->Append(t);
-          m_measure_text = "";
+            t = m_AcuteAngle + "° (" + m_ObtuseAngle + "°) " + m_MeasureText;
+          m_MeasureList->Append(t);
+          m_MeasureText = "";
           m_Gui->Enable(ID_REMOVE_MEASURE,true);
           //m_Gui->Enable(ID_ADD_TO_VME_TREE,true);
         }
         break;
         case ID_REMOVE_MEASURE:
         {
-          int sel = m_measure_list->GetSelection();
+          int sel = m_MeasureList->GetSelection();
           if(sel != -1)
-            m_measure_list->Delete(sel);
-          if(m_measure_list->Number() == 0)
+            m_MeasureList->Delete(sel);
+          if(m_MeasureList->Number() == 0)
           {
             m_Gui->Enable(ID_REMOVE_MEASURE,false);
           }
@@ -149,15 +157,15 @@ void mmo2DMeasure::OnEvent(mafEventBase *maf_event)
       switch(e->GetId())
       {
         case mmi2DMeter::ID_RESULT_MEASURE:
-          m_dist = wxString::Format("%g",e->GetDouble());
-          m_acute_angle = "0";
-          m_obtuse_angle = "0";
+          m_DistanceMeasure = wxString::Format("%g",e->GetDouble());
+          m_AcuteAngle = "0";
+          m_ObtuseAngle = "0";
           m_Gui->Update();
         break;
         case mmi2DMeter::ID_RESULT_ANGLE:
-          m_dist = "0";
-          m_acute_angle = wxString::Format("%g",e->GetDouble());
-          m_obtuse_angle = wxString::Format("%g", 180.0 - e->GetDouble());
+          m_DistanceMeasure = "0";
+          m_AcuteAngle = wxString::Format("%g",e->GetDouble());
+          m_ObtuseAngle = wxString::Format("%g", 180.0 - e->GetDouble());
           m_Gui->Update();
         break;
         default:
@@ -171,10 +179,10 @@ void mmo2DMeasure::OnEvent(mafEventBase *maf_event)
 void mmo2DMeasure::OpStop(int result)
 //----------------------------------------------------------------------------
 {
-  m_per2DMeter->RemoveMeter();  
+  m_2DMeterInteractor->RemoveMeter();  
 	HideGui();
   mafEventMacro(mafEvent(this,PER_POP));
-  mafDEL(m_per2DMeter);
+  mafDEL(m_2DMeterInteractor);
 
 	mafEventMacro(mafEvent(this,result));
 }

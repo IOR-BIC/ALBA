@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmo2DMeasure.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 13:44:02 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-11-21 18:22:15 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -46,12 +46,14 @@ protected:
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   void OpStop(int result);
 
-  mmi2DMeter *m_per2DMeter;
-  mafString m_dist;
-  mafString m_acute_angle;
-  mafString m_obtuse_angle;
-  wxString m_measure_text;
-  int m_measure_type;
-  wxListBox *m_measure_list;
+  mmi2DMeter *m_2DMeterInteractor;
+  mafString m_DistanceMeasure;
+  mafString m_AcuteAngle;
+  mafString m_ObtuseAngle;
+  wxString m_MeasureText;
+  int m_MeasureType;
+  wxListBox *m_MeasureList;
+
+  int m_GenerateHistogramFlag;
 };
 #endif
