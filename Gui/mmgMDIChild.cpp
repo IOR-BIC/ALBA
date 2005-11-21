@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIChild.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-21 10:51:00 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-11-21 12:03:29 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -68,15 +68,6 @@ mmgMDIChild::mmgMDIChild(wxMDIParentFrame* parent,mafView *view)
 
   SetIcon(mafPics.GetIcon("MDICHILD_ICON"));
 	SetTitle(wxStripMenuCodes(m_View->GetLabel()));
-
-  wxBoxSizer *sizer  =  new wxBoxSizer( wxVERTICAL );
-  sizer->Add(m_Win,1,wxEXPAND);
-  sizer->SetMinSize(50,50); // looks ugly when it is empty
-  //this->SetAutoLayout( TRUE ); -- not to be called here
-  this->SetSizer( sizer );
-  
-  //sizer->Fit(this); //-- not to be called, is called by SetSizeHints
-  //sizer->SetSizeHints(this); // removed to prevent the child to be shrinked to the initial view size
 }
 //----------------------------------------------------------------------------
 mmgMDIChild::~mmgMDIChild( ) 
@@ -104,12 +95,12 @@ void mmgMDIChild::OnSize(wxSizeEvent &event)
 	m_Win->Move(0,0);
 	m_Win->SetSize(w,h);
 	m_Win->Layout();
-/*#ifndef WIN32
+#ifndef WIN32
   if(mafViewVTK::SafeDownCast(m_View))
   {
     ((mafViewVTK *)m_View)->SetWindowSize(w,h);
   }
-#endif*/
+#endif
 }
 //----------------------------------------------------------------------------
 void mmgMDIChild::OnCloseWindow(wxCloseEvent& event)
