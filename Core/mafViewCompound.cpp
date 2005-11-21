@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 14:51:24 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-11-21 18:21:19 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -384,4 +384,47 @@ void mafViewCompound::MaximizeSubView(int subview_id, bool maximize)
   }
   m_SubViewMaximized = maximize ? subview_id : -1;
   OnLayout();
+}
+//----------------------------------------------------------------------------
+bool mafViewCompound::Pick(int x, int y)
+//----------------------------------------------------------------------------
+{
+  mafView *sub_view = GetSubView();
+  if (sub_view)
+  {
+    return sub_view->Pick(x,y);
+  }
+  return false;
+}
+//----------------------------------------------------------------------------
+bool mafViewCompound::Pick(mafMatrix &m)
+//----------------------------------------------------------------------------
+{
+  mafView *sub_view = GetSubView();
+  if (sub_view)
+  {
+    return sub_view->Pick(m);
+  }
+  return false;
+}
+//----------------------------------------------------------------------------
+void mafViewCompound::GetPickedPosition(double pos[3])
+//----------------------------------------------------------------------------
+{
+  mafView *sub_view = GetSubView();
+  if (sub_view)
+  {
+    sub_view->GetPickedPosition(pos);
+  }
+}
+//----------------------------------------------------------------------------
+mafVME *mafViewCompound::GetPickedVme()
+//----------------------------------------------------------------------------
+{
+  mafView *sub_view = GetSubView();
+  if (sub_view)
+  {
+    return sub_view->GetPickedVme();
+  }
+  return NULL;
 }

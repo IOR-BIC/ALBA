@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 14:51:25 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-11-21 18:21:19 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -111,6 +111,22 @@ public:
   the device which performed the action, and provides as result pointers
   to piked prop, vme and its behavior if it exists. */
   virtual bool FindPokedVme(mafDevice *device,mafMatrix &point_pose,vtkProp3D *&picked_prop,mafVME *&picked_vme,mafInteractor *&picked_behavior);
+
+  /** 
+  Perform a picking according to the screen position (x,y) and return true on success*/
+  virtual bool Pick(int x, int y);
+
+  /** 
+  Perform a picking according to the absolute matrix given and return true on success*/
+  virtual bool Pick(mafMatrix &m);
+
+  /** 
+  Write into the double array the position picked during Pick method.*/
+  virtual void GetPickedPosition(double pos[3]);
+
+  /** 
+  Return the picked VME during the Pick method. Return NULL if VME is not found*/
+  virtual mafVME *GetPickedVme();
 
   /** 
   Return the current pipe for the specified vme (if any exist at this moment) */
