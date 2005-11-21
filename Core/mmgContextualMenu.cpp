@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 14:51:25 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-11-21 18:20:10 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -103,6 +103,7 @@ void mmgContextualMenu::ShowContextualMenu(wxFrame *child, mafView *view, bool v
     this->AppendSeparator();
   }
 	this->Append(CONTEXTUAL_MENU_RENAME_VIEW, "Rename View");
+#ifdef WIN32  
 	this->AppendSeparator();
   if (m_ChildViewActive->IsMaximized())
   {
@@ -124,6 +125,7 @@ void mmgContextualMenu::ShowContextualMenu(wxFrame *child, mafView *view, bool v
       this->Append(CONTEXTUAL_MENU_MAXIMIZE_CHILD_SUB_VIEW, "Maximize SubView");
     }
   }
+#endif
   //this->Append(CONTEXTUAL_MENU_EXTERNAL_INTERNAL_VIEW, "External", "Switch view visualization between external/internal", TRUE);
   //this->FindItem(CONTEXTUAL_MENU_EXTERNAL_INTERNAL_VIEW)->Check(m_ViewActive->IsExternal());
 	this->AppendSeparator();
