@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 14:51:22 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-11-21 11:41:43 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -134,14 +134,6 @@ void mafRWIBase::Initialize()
   if (RenderWindow->GetGenericWindowId() == 0)
     RenderWindow->SetWindowId( (HWND) this->GetHWND() );
 #endif
-#ifdef __WXGTK__
-  if (RenderWindow->GetGenericWindowId() == 0)
-    RenderWindow->SetParentId( (void *)(((GdkWindowPrivate *)GTK_PIZZA(m_wxwindow)->bin_window)->xwindow) );
-#endif
-#ifdef __WXMOTIF__
-  if (RenderWindow->GetGenericWindowId() == 0)
-    RenderWindow->SetWindowId( this->GetXWindow() );
-#endif
 
   // set minimum size of window
   int *size = RenderWindow->GetSize();
@@ -237,6 +229,16 @@ void mafRWIBase::OnPaint(wxPaintEvent &event)
   
   if(!RenderWindow) 
     return; //rare - may happen during Debug
+
+#ifdef __WXGTK__
+  if (RenderWindow->GetGenericWindowId() == 0)
+    RenderWindow->SetParentId( (void *)(((GdkWindowPrivate *)GTK_PIZZA(m_wxwindow)->bin_window)->xwindow) );
+#endif
+#ifdef __WXMOTIF__
+  if (RenderWindow->GetGenericWindowId() == 0)
+    RenderWindow->SetWindowId( this->GetXWindow() );
+#endif
+
   if(!Initialized) 
     Initialize();
   Render();
