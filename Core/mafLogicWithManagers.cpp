@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 10:52:52 $
-  Version:   $Revision: 1.45 $
+  Date:      $Date: 2005-11-21 11:32:31 $
+  Version:   $Revision: 1.46 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -67,7 +67,7 @@ mafLogicWithManagers::mafLogicWithManagers()
   m_ViewMenu    = NULL; 
   m_RecentFileMenu = NULL;
 
-  m_MaterialChooser = new mmgMaterialChooser();
+  m_MaterialChooser = NULL;
 }
 //----------------------------------------------------------------------------
 mafLogicWithManagers::~mafLogicWithManagers( ) 
@@ -819,6 +819,10 @@ mafNode* mafLogicWithManagers::VmeChoose(long vme_accept_function, long style, m
 void mafLogicWithManagers::VmeChooseMaterial(mafVME *vme, bool updateProperty)
 //----------------------------------------------------------------------------
 {
+  if (m_MaterialChooser == NULL)
+  {
+    m_MaterialChooser = new mmgMaterialChooser();
+  }
   if(m_MaterialChooser->ShowChooserDialog(vme))
   {
     this->m_ViewManager->PropertyUpdate(updateProperty);
