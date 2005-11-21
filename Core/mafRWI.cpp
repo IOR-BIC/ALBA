@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 14:51:23 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-11-21 12:01:49 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -81,7 +81,9 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, int stereo)
   m_RenderWindow->AddRenderer(m_RenFront);
 
 	m_RwiBase->SetRenderWindow(m_RenderWindow);
+#ifdef WIN32
   m_RwiBase->Initialize();
+#endif
   
 	if(layers == TWO_LAYER)
 	{
