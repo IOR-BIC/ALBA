@@ -166,7 +166,7 @@ IF (WIN32)
 ENDIF (WIN32)
 
 #IF (MAF_USE_VTK)
-#  SET(PROJECT_LIBS ${PROJECT_LIBS} vtkIO vtkRendering vtkGraphics)
+  SET(PROJECT_LIBS ${PROJECT_LIBS} vtkHybrid)
 #ENDIF (MAF_USE_VTK)
 
 # Create the library.
