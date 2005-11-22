@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-21 12:02:47 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-11-22 09:42:28 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -336,7 +336,10 @@ void mafRWIBase::OnLeftMouseButtonUp(wxMouseEvent &event)
 {
   if (!Enabled) return;
 
-  if (m_CustomInteractorStyle)
+  if( GetCapture() == this )
+    ReleaseMouse();
+  
+	if (m_CustomInteractorStyle)
   {
 	  SetEventInformation(event.GetX(),m_Height - event.GetY() - 1,event.ControlDown(),event.ShiftDown());
 	  InvokeEvent(vtkCommand::LeftButtonReleaseEvent,NULL);
@@ -353,15 +356,15 @@ void mafRWIBase::OnLeftMouseButtonUp(wxMouseEvent &event)
     if(m_Mouse) 
       m_Mouse->OnEvent(&e);
   }
-  
-  if( GetCapture() == this )
-    ReleaseMouse();
 }
 //----------------------------------------------------------------------------
 void mafRWIBase::OnMiddleMouseButtonUp(wxMouseEvent &event)
 //----------------------------------------------------------------------------
 {
   if (!Enabled) return;
+
+  if( GetCapture() == this )
+    ReleaseMouse();
 
   if (m_CustomInteractorStyle)
   {
@@ -380,15 +383,15 @@ void mafRWIBase::OnMiddleMouseButtonUp(wxMouseEvent &event)
     if(m_Mouse) 
       m_Mouse->OnEvent(&e);
   }
-
-  if( GetCapture() == this )
-    ReleaseMouse();
 }
 //----------------------------------------------------------------------------
 void mafRWIBase::OnRightMouseButtonUp(wxMouseEvent &event)
 //----------------------------------------------------------------------------
 {
   if (!Enabled) return;
+
+  if( GetCapture() == this )
+    ReleaseMouse();
 
   if (m_CustomInteractorStyle)
   {
@@ -407,9 +410,6 @@ void mafRWIBase::OnRightMouseButtonUp(wxMouseEvent &event)
     if(m_Mouse) 
       m_Mouse->OnEvent(&e);
   }
-
-  if( GetCapture() == this )
-    ReleaseMouse();
 }
 //----------------------------------------------------------------------------
 void mafRWIBase::OnMouseMotion(wxMouseEvent &event)
