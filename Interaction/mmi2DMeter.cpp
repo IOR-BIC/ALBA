@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi2DMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-21 18:21:49 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-11-22 09:01:06 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -88,7 +88,7 @@ mmi2DMeter::mmi2DMeter()
   int x_init,y_init;
   x_init = mafGetFrame()->GetPosition().x;
   y_init = mafGetFrame()->GetPosition().y;
-  m_HistogramDialog = new wxDialog(mafGetFrame(),"Histogram",false,x_init+10,y_init+10,width,height,wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP);
+  m_HistogramDialog = new wxDialog(mafGetFrame(),-1,"Histogram",wxDefaultPosition,wxDefaultSize,wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP);
   m_HistogramRWI = new mafRWI(mafGetFrame());
   m_HistogramRWI->SetListener(this);
   m_HistogramRWI->m_RenFront->AddActor2D(m_PlotActor);
@@ -103,7 +103,8 @@ mmi2DMeter::mmi2DMeter()
   m_HistogramDialog->SetAutoLayout(TRUE);
   sizer->Fit(m_HistogramDialog);
   
-  m_HistogramDialog->Show(FALSE);
+  m_HistogramDialog->SetSize(x_init,y_init,width,height);
+	m_HistogramDialog->Show(FALSE);
 
   m_CurrentRenderer  = NULL;
   m_LastRenderer     = NULL;
