@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-22 09:42:28 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-11-23 15:43:57 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -99,6 +99,9 @@ mafRWIBase::mafRWIBase(wxWindow *parent, wxWindowID id, const wxPoint &pos,
   m_Camera  = NULL;
   m_Mouse   = NULL;
   
+  m_LastX = 0;
+  m_LastY = 0;
+
   m_CustomInteractorStyle = false;
 }
 //----------------------------------------------------------------------------
@@ -416,6 +419,13 @@ void mafRWIBase::OnMouseMotion(wxMouseEvent &event)
 //----------------------------------------------------------------------------
 {
   if (!Enabled) return;
+
+  if (m_LastX == event.GetX() && m_LastY == event.GetY())
+  {
+    return;
+  }
+  m_LastX = event.GetX();
+  m_LastY = event.GetY();
 
   if (m_CustomInteractorStyle)
   {

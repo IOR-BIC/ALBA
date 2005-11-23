@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 14:51:22 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-11-23 15:43:57 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -163,6 +163,9 @@ protected:
   vtkCamera *m_Camera;
   mmdMouse  *m_Mouse;
   bool       m_CustomInteractorStyle;
+
+  int m_LastX;
+  int m_LastY;
   
 	DECLARE_EVENT_TABLE()
 };
