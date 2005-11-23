@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 11:42:56 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2005-11-23 15:45:15 $
+  Version:   $Revision: 1.22 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -70,16 +70,18 @@ mafViewManager::~mafViewManager( )
 	if(m_SelectedRWI)
     m_SelectedRWI->SetMouse(NULL);
 	
-	mafView *v;
+	mafView *v = NULL;
 
   while(m_ViewList)
   {
     v = m_ViewList;
     m_ViewList = v->m_Next;
-    delete v;
+    v->SetMouse(NULL);
+    cppDEL(v);
   }
 
-  for(int i=0; i<m_TemplateNum; i++) delete m_ViewTemplate[i];
+  for(int i=0; i<m_TemplateNum; i++)
+    cppDEL(m_ViewTemplate[i]);
 }
 
 //----------------------------------------------------------------------------
@@ -412,14 +414,11 @@ void mafViewManager::ViewDelete(mafView *view)
   if(m_SelectedView)
 	{
     if(m_SelectedRWI) 
-      //old m_selected_rwi->SetInteractorStyle(NULL); 
       m_SelectedRWI->SetMouse(NULL);
-//old		m_is->SetInteractor(NULL);
-//old    m_is->SetListener(this); // A. Savenko
     m_SelectedRWI = NULL;
     m_SelectedView = NULL;
 	}
-	delete view;
+	cppDEL(view);
 }
 //----------------------------------------------------------------------------
 void mafViewManager::ViewDeleteAll()
