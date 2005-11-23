@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi2DMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-22 09:01:06 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-11-23 15:46:26 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,6 +35,8 @@
 #include "vtkProbeFilter.h"
 #include "vtkXYPlotActor.h"
 #include "vtkTextProperty.h"
+#include "vtkImageImport.h"
+#include "vtkImageAccumulate.h"
 
 //------------------------------------------------------------------------------
 mafCxxTypeMacro(mmi2DMeter)
@@ -67,8 +69,8 @@ mmi2DMeter::mmi2DMeter()
   m_PlotActor->SetPosition(0.03,0.03);
   m_PlotActor->SetPosition2(0.9,0.9);
   m_PlotActor->SetLabelFormat("%g");
-  m_PlotActor->SetXRange(0,512);
-  m_PlotActor->SetPlotCoordinate(0,512);
+  m_PlotActor->SetXRange(0,300);
+  m_PlotActor->SetPlotCoordinate(0,300);
   m_PlotActor->SetNumberOfXLabels(10);
   m_PlotActor->SetXValuesToIndex();
   m_PlotActor->SetTitle("Density vs. Point ID");
@@ -80,7 +82,7 @@ mmi2DMeter::mmi2DMeter()
   tprop->ItalicOff();
   tprop->BoldOff();
   tprop->SetFontSize(12);
-  m_PlotActor->SetPlotColor(0,.4,.4,.4);
+  m_PlotActor->SetPlotColor(0,.8,.3,.3);
 
   // Histogram dialog
   int width = 400;
@@ -490,7 +492,21 @@ void mmi2DMeter::CreateHistogram()
     m_PlotActor->RemoveAllInputs();
 
     vtkPolyData *probimg_result = prober->GetPolyDataOutput();
-    m_PlotActor->AddInput(probimg_result);
+    
+    vtkMAFSmartPointer<vtkImageImport> importer;
+    importer->SetWholeExtent(1,512,1,1,1,1); 
+    importer->SetDataExtentToWholeExtent(); 
+    importer->SetDataOrigin(0,0,0);
+    importer->SetDataSpacing(1,1,1);
+    importer->SetDataScalarType(probimg_result->GetPointData()->GetScalars()->GetDataType());
+    importer->SetImportVoidPointer(probimg_result->GetPointData()->GetScalars()->GetVoidPointer(0));
+
+    vtkMAFSmartPointer<vtkImageAccumulate> accumulate;
+    accumulate->SetInput(importer->GetOutput());
+    accumulate->Update();
+
+    //m_PlotActor->AddInput(probimg_result);
+    m_PlotActor->AddInput((vtkDataSet *)accumulate->GetOutput());
     m_HistogramRWI->m_RwiBase->Render();
   }
 }
