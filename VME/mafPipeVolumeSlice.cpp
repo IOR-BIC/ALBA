@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 10:55:54 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-11-23 11:52:45 $
+  Version:   $Revision: 1.14 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,6 +28,7 @@
 #include "mafVMEVolume.h"
 #include "mafVMEOutputVolume.h"
 
+#include "vtkMAFSmartPointer.h"
 #include "vtkMAFAssembly.h"
 #include "vtkMath.h"
 #include "vtkPointData.h"
@@ -42,6 +43,11 @@
 #include "vtkRectilinearGrid.h"
 #include "vtkVolumeSlicer.h"
 #include "vtkProperty.h"
+#include "vtkDataSet.h"
+#include "vtkLineSource.h"
+#include "vtkAppendPolyData.h"
+#include "vtkFollower.h"
+#include "vtkCamera.h"
 #include "vtkDataSet.h"
 
 //----------------------------------------------------------------------------
@@ -67,6 +73,12 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
   }
   m_SliceParametersInitialized  = false;
   m_ShowVolumeBox               = false;
+  
+  m_AssemblyUsed = NULL;
+
+  m_UnitLength = 10; // 10 mm
+  m_ShowUnit = false;
+  m_CameraToFollow = NULL;
 
   m_SliceMode = SLICE_Z;
 
@@ -74,7 +86,7 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
   m_SliceOpacity  = 1.0;
   m_TextureRes    = 256;
 
-  m_XVector[0][0] = 0.0001;	//modified by Paolo 29-10-2003 should be 0 !!! check into Sasha's filter
+  m_XVector[0][0] = 0.0001;	//should be 0 !!! but there is a bug into vtkVolumeSlicer filter
   m_XVector[0][1] = 1;
   m_XVector[0][2] = 0;
   m_YVector[0][0] = 0;
@@ -145,23 +157,32 @@ void mafPipeVolumeSlice::InitializeSliceParameters(int mode, double slice_origin
   }
 }
 //----------------------------------------------------------------------------
+void mafPipeVolumeSlice::ShowUnit(bool show_unit, vtkCamera *camera_to_follow)
+//----------------------------------------------------------------------------
+{
+  m_ShowUnit = show_unit;
+  m_CameraToFollow = camera_to_follow;
+}
+
+//----------------------------------------------------------------------------
 void mafPipeVolumeSlice::Create(mafSceneNode *n)
 //----------------------------------------------------------------------------
 {
   Superclass::Create(n); // Always call this to initialize m_Vme, m_AssemblyFront, ... vars
 
+  m_AssemblyUsed = m_AssemblyBack ? m_AssemblyBack : m_AssemblyFront;
+
   assert(m_Vme->IsMAFType(mafVMEVolume));
+  double b[6];
   m_Vme->GetOutput()->Update();
   m_Vme->GetOutput()->GetVTKData()->Update();
+  m_Vme->GetOutput()->GetVMELocalBounds(b);
 
 	if(m_SliceMode == SLICE_ARB)
 		m_SliceMode = SLICE_X;
 
 	if (!m_SliceParametersInitialized)
 	{
-    double b[6];
-    //m_Vme->GetOutput()->GetBounds(b);
-    m_Vme->GetOutput()->GetVMELocalBounds(b);
     m_Origin[0] = (b[0] + b[1])*.5;
     m_Origin[1] = (b[2] + b[3])*.5;
     m_Origin[2] = (b[4] + b[5])*.5;
@@ -233,6 +254,41 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 		m_VolumeBoxMapper = NULL;
 		m_VolumeBoxActor	= NULL;
 	}
+
+  if (m_ShowUnit)
+  {
+    vtkMAFSmartPointer<vtkLineSource> cursor_line1;
+    cursor_line1->SetPoint1(0,0,0);
+    cursor_line1->SetPoint2(m_UnitLength, 0, 0);
+
+    vtkMAFSmartPointer<vtkLineSource> cursor_line2;
+    cursor_line2->SetPoint1(0, -(m_UnitLength/10.0), 0);
+    cursor_line2->SetPoint2(0, (m_UnitLength/10.0), 0);
+
+    vtkMAFSmartPointer<vtkLineSource> cursor_line3;
+    cursor_line3->SetPoint1(m_UnitLength, -(m_UnitLength/10.0), 0);
+    cursor_line3->SetPoint2(m_UnitLength, (m_UnitLength/10.0), 0);
+
+    vtkMAFSmartPointer<vtkAppendPolyData> cursor_data;
+    cursor_data->AddInput(cursor_line1->GetOutput());
+    cursor_data->AddInput(cursor_line2->GetOutput());
+    cursor_data->AddInput(cursor_line3->GetOutput());
+
+    vtkMAFSmartPointer<vtkPolyDataMapper> cursor_mapper;
+    cursor_mapper->SetInput(cursor_data->GetOutput());
+
+    vtkNEW(m_UnitCubeActor);
+    m_UnitCubeActor->SetCamera(m_CameraToFollow);
+    m_UnitCubeActor->SetMapper(cursor_mapper.GetPointer());
+    m_UnitCubeActor->SetPosition(b[0],b[2],b[4]);
+
+    m_AssemblyFront->AddPart(m_UnitCubeActor);
+  }
+  else
+  {
+    m_UnitCubeActor   = NULL;
+  }
+
 	// if the actor is in the background renderer
 	// create something invisible in the front renderer so that ResetCamera will work
   m_GhostActor = NULL;
@@ -309,7 +365,7 @@ void mafPipeVolumeSlice::CreateSlice(int mode)
 	m_SliceActor[mode]->GetProperty()->SetDiffuse(0.f);
   m_SliceActor[mode]->GetProperty()->SetOpacity(m_SliceOpacity);
 
-	m_AssemblyFront->AddPart(m_SliceActor[mode]);
+	m_AssemblyUsed->AddPart(m_SliceActor[mode]);
 }
 //----------------------------------------------------------------------------
 mafPipeVolumeSlice::~mafPipeVolumeSlice()
@@ -317,11 +373,13 @@ mafPipeVolumeSlice::~mafPipeVolumeSlice()
 {
 	if(m_VolumeBoxActor)
     m_AssemblyFront->RemovePart(m_VolumeBoxActor);
+  if(m_UnitCubeActor)
+    m_AssemblyFront->RemovePart(m_UnitCubeActor);
 
 	for(int i = 0; i<3; i++)
 	{
 		if(m_SliceActor[i])
-      m_AssemblyFront->RemovePart(m_SliceActor[i]);
+      m_AssemblyUsed->RemovePart(m_SliceActor[i]);
 		vtkDEL(m_SlicerImage[i]);
 		vtkDEL(m_SlicerPolygonal[i]);
 		vtkDEL(m_Image[i]);
@@ -334,6 +392,8 @@ mafPipeVolumeSlice::~mafPipeVolumeSlice()
 	vtkDEL(m_VolumeBox);
 	vtkDEL(m_VolumeBoxMapper);
 	vtkDEL(m_VolumeBoxActor);
+
+  vtkDEL(m_UnitCubeActor);
 
   if(m_GhostActor) 
     m_AssemblyFront->RemovePart(m_GhostActor);

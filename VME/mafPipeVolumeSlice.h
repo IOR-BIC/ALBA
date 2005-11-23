@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-09 11:25:11 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-11-23 11:52:45 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,7 +29,10 @@ class vtkTexture;
 class vtkLookupTable;
 class vtkPolyDataMapper;
 class vtkActor;
+class vtkFollower;
 class vtkVolumeSlicer;
+class vtkCamera;
+class vtkMAFAssembly;
 
 //----------------------------------------------------------------------------
 // constant:
@@ -83,7 +86,8 @@ public:
 	
 	/** Set slicer parameter to generate the slice. */
 	void SetSlice(double origin[3], float xVect[3], float yVect[3]);
-	/** Set slicer parameter to generate the slice. */
+	
+  /** Set slicer parameter to generate the slice. */
 	void SetSlice(double origin[3]);
 	
 	/** Get slice parameters: origin and normal */
@@ -107,6 +111,11 @@ public:
   /** 
   Get the opacity of the slice. */
   float GetSliceOpacity();
+
+  /** 
+  Allow to show/hide the cursor unit with length 1 cm. 
+  Passing the camera as second parameter, allow the cursor to follow the camera orientation.*/
+  void ShowUnit(bool show_unit, vtkCamera *camera_to_follow = NULL);
 					
 protected:
 	/** Create the slicer pipeline. */
@@ -124,6 +133,8 @@ protected:
 	int		  m_SliceMode;
   mmgFloatSlider *m_SliceSlider[3];
 
+  vtkMAFAssembly *m_AssemblyUsed;
+
 	vtkVolumeSlicer				 *m_SlicerImage[3];
 	vtkVolumeSlicer				 *m_SlicerPolygonal[3];
 	vtkImageData					 *m_Image[3];
@@ -137,11 +148,15 @@ protected:
   vtkPolyDataMapper			 *m_VolumeBoxMapper;
   vtkActor               *m_VolumeBoxActor;
 
+  int                     m_UnitLength;
+  vtkFollower            *m_UnitCubeActor;
+  vtkCamera              *m_CameraToFollow;
+
   vtkActor               *m_GhostActor;
 
   int                     m_ColorLUTEnabled;
   bool                    m_SliceParametersInitialized;
   bool                    m_ShowVolumeBox;
-};  
-
+  bool                    m_ShowUnit;
+};
 #endif // _mafPipeVolumeSlice_H_
