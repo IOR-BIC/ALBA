@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 14:51:23 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-11-23 18:11:40 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -69,7 +69,7 @@ public:
 	void SetGridNormal(int normal_id);
 
 	/** Set the position for the grid actor. */
-	void SetGridPosition(float position);
+	void SetGridPosition(double position);
 
 	/** Set the visibility for the grid actor. */
 	void SetGridVisibility(bool show);

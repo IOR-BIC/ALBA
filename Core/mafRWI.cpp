@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-23 11:50:56 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-11-23 18:11:40 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,7 +36,7 @@
 #include "mafVMELandmarkCloud.h"
 #include "mafAbsMatrixPipe.h"
 
-//#include "vtkGridActor.h"  // users must see GRID_XYZ const declared in vtkGridActor
+#include "vtkGridActor.h"  // users must see GRID_XYZ const declared in vtkGridActor
 #include "vtkLight.h"
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
@@ -102,17 +102,17 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, int stereo)
   }
 
 	m_Grid = NULL;
-/*
+
   m_ShowGrid = use_grid;
 
-  if(use_grid)
-	{
-     m_Grid= vtkGridActor::New();
+//  if(use_grid)
+//	{
+     m_Grid = vtkGridActor::New();
 		 m_RenFront->AddActor(m_Grid);
 		 m_RenFront->AddActor2D(m_Grid->GetLabelActor());
 	   SetGridNormal(GRID_Y);
-	}
-  */
+     SetGridVisibility(m_ShowGrid);
+//	}
 
 	m_Axes = new mafAxes(m_RenFront);
   m_Axes->SetVisibility(0);
@@ -121,11 +121,9 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, int stereo)
 mafRWI::~mafRWI()
 //----------------------------------------------------------------------------
 {
-	/*
   if(m_Grid) m_RenFront->RemoveActor(m_Grid);
 	if(m_Grid) m_RenFront->RemoveActor2D(m_Grid->GetLabelActor());
 	vtkDEL(m_Grid);
-  */
 	
 	cppDEL(m_Axes); //Must be removed before deleting renderers
   vtkDEL(m_Light);
@@ -283,26 +281,24 @@ void mafRWI::Show(bool show)
 void mafRWI::SetGridNormal(int normal_id)
 //----------------------------------------------------------------------------
 {
-//   if(m_Grid) m_Grid->SetGridNormal(normal_id);
+   if(m_Grid) m_Grid->SetGridNormal(normal_id);
 }
 //----------------------------------------------------------------------------
-void mafRWI::SetGridPosition(float position)
+void mafRWI::SetGridPosition(double position)
 //----------------------------------------------------------------------------
 {
-//   if(m_Grid) m_Grid->SetGridPosition(position);
+   if(m_Grid) m_Grid->SetGridPosition(position);
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetGridVisibility(bool show)
 //----------------------------------------------------------------------------
 {
-/* 
   if(m_Grid)
-	 {
-	   m_ShowGrid = show;
-		 m_Grid->SetVisibility(m_ShowGrid );
-	   m_Grid->GetLabelActor()->SetVisibility(m_ShowGrid );
-	 }
-   */
+  {
+	  m_ShowGrid = show;
+	  m_Grid->SetVisibility(m_ShowGrid );
+	  m_Grid->GetLabelActor()->SetVisibility(m_ShowGrid);
+  }
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetAxesVisibility(bool show)
@@ -315,7 +311,8 @@ void mafRWI::SetAxesVisibility(bool show)
 void mafRWI::SetGridColor(wxColor col)
 //----------------------------------------------------------------------------
 {
-   //if(m_Grid) m_Grid->SetGridColor(col.Red()/255.0,col.Green()/255.0,col.Blue()/255.0);
+   if(m_Grid) 
+     m_Grid->SetGridColor(col.Red()/255.0,col.Green()/255.0,col.Blue()/255.0);
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetBackgroundColor(wxColor col)
@@ -368,11 +365,13 @@ void mafRWI::CameraReset(mafNode *vme)
   if (m_RenderWindow->GetGenericWindowId() == 0) 
 		return;
 
-//	if(m_Grid && m_ShowGrid) m_Grid->VisibilityOff();
+	if(m_Grid && m_ShowGrid) 
+    m_Grid->VisibilityOff();
 
   mafEventMacro(mafEvent(this,CAMERA_PRE_RESET,m_RenFront)); //- Attention - I'm sending m_RenFront, I suppose that m_RenBack is never required 
   CameraReset(ComputeVisibleBounds(vme));
-//	if(m_Grid && m_ShowGrid) m_Grid->VisibilityOn();
+	if(m_Grid && m_ShowGrid) 
+    m_Grid->VisibilityOn();
 
   mafEventMacro(mafEvent(this,CAMERA_POST_RESET,m_RenFront));
   m_RenFront->ResetCameraClippingRange();
