@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTransformInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 15:22:19 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-11-23 12:32:29 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,6 +24,7 @@
 #include <wx/busyinfo.h>
 
 #include "mafDecl.h"
+#include "mmgGui.h"
 #include "mafGizmoTranslate.h"
 #include "mafGizmoRotate.h"
 #include "mafGuiTransformMouse.h"
