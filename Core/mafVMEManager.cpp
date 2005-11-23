@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 12:02:53 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2005-11-23 15:44:20 $
+  Version:   $Revision: 1.20 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,7 +49,7 @@ mafVMEManager::mafVMEManager()
   mafString MSFDir = mafGetApplicationDirectory().c_str();
   MSFDir.ParsePathName();
 	m_MSFDir   = MSFDir;
-  m_MSFDir   += "/Data/MSF/";
+  //m_MSFDir   += "/Data/MSF/";
 	m_MSFFile   = "";
 	m_ZipFile   = "";
   m_TmpDir   = "";
@@ -59,13 +59,14 @@ mafVMEManager::mafVMEManager()
   m_Config = wxConfigBase::Get();
 }
 //----------------------------------------------------------------------------
-mafVMEManager::~mafVMEManager( ) 
+mafVMEManager::~mafVMEManager()
 //----------------------------------------------------------------------------
 {
-  if(m_Storage) NotifyRemove( m_Storage->GetRoot() ); // //SIL. 11-4-2005:  - cast root to node -- maybe to be removed
+  if(m_Storage) 
+    NotifyRemove( m_Storage->GetRoot() ); // //SIL. 11-4-2005:  - cast root to node -- maybe to be removed
 
-  if(m_Storage)	m_Storage->Delete();
-  delete m_Config;  
+  mafDEL(m_Storage);
+  cppDEL(m_Config);
 }
 //----------------------------------------------------------------------------
 void mafVMEManager::OnEvent(mafEventBase *maf_event)
@@ -486,7 +487,6 @@ void mafVMEManager::TimeSet(double time)
 void mafVMEManager::TimeGetBounds(double *min, double *max)
 //----------------------------------------------------------------------------
 {
-  
   mafTimeStamp b[2];
   if(m_Storage->GetRoot()) 
   {
