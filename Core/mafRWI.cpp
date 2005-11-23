@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-21 12:01:49 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-11-23 11:50:56 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -219,17 +219,20 @@ void mafRWI::CameraSet(int cam_position)
 			m_Camera->ParallelProjectionOff();
 			x=-1;y=0; z=0; vx=0; vy=0; vz=1;	//modified by Paolo 10-6-2003
 		break;
-		case CAMERA_CT:
-			x=0; y=0; z=-1; vx=0; vy=-1; vz=0;
-		break;
+//		case CAMERA_CT:
+			//x=0; y=0; z=-1; vx=0; vy=-1; vz=0;
+//		break;
 		case CAMERA_OS_X:
-			x=-1 ;y=0; z=0; vx=0; vy=0; vz=1;
+			//x=-1 ;y=0; z=0; vx=0; vy=0; vz=1;
+      x=1 ;y=0; z=0; vx=0; vy=0; vz=1;
 		break;
 		case CAMERA_OS_Y:
 			x=0; y=-1; z=0; vx=0; vy=0; vz=1;
 		break;
+    case CAMERA_CT:
 		case CAMERA_OS_Z:
-			x=0; y=0; z=-1; vx=0; vy=-1; vz=0;
+			//x=0; y=0; z=-1; vx=0; vy=-1; vz=0;
+      x=0; y=0; z=1; vx=0; vy=1; vz=0;
 		break;
 		case CAMERA_OS_P:
       m_Camera->ParallelProjectionOff();     // Paolo 09/06/2004
