@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-15 15:30:41 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-11-23 18:11:12 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -126,9 +126,9 @@ int mmuMSF1xDocument::InternalRestore(mafStorageElement *node)
   }
   iter->Delete();
   // remove all mafVMEGeneric representing links
-  for (int i=0;i<link_list.size();i++)
+  for (int l=0;l<link_list.size();l++)
   {
-    link_list[i]->ReparentTo(NULL);
+    link_list[l]->ReparentTo(NULL);
   }
   link_list.clear();
   return m_Root->Initialize();
