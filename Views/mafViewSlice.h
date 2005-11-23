@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-17 20:19:44 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-11-23 11:53:32 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,8 +42,11 @@ public:
   virtual mafView*  Copy(mafObserver *Listener);
   virtual void			OnEvent(mafEventBase *maf_event);
 
+  void Create();
+
   /** 
-  Set the visualization status for the node (visible, not visible, mutex, ...) \sa mafSceneGraph*/
+  Set the visualization status for the node (visible, not visible, mutex, ...) 
+  \sa mafSceneGraph mafView*/
   virtual int GetNodeStatus(mafNode *vme);
 
   /** IDs for the GUI */

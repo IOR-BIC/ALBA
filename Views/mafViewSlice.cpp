@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 10:56:08 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-11-23 11:53:31 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,12 +23,17 @@
 #include "mafPipeVolumeSlice.h"
 #include "mafVME.h"
 #include "mafVMEVolume.h"
+#include "mafVMESlicer.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
 #include "mafPipeFactory.h"
 #include "mafPipe.h"
+#include "mafRWI.h"
+#include "mafSceneGraph.h"
 
 #include "vtkDataSet.h"
+#include "vtkRayCast3DPicker.h"
+#include "vtkCellPicker.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewSlice);
@@ -56,6 +61,27 @@ mafView *mafViewSlice::Copy(mafObserver *Listener)
   v->m_PipeMap = m_PipeMap;
   v->Create();
   return v;
+}
+//----------------------------------------------------------------------------
+void mafViewSlice::Create()
+//----------------------------------------------------------------------------
+{
+  RWI_LAYERS num_layers = m_CameraPosition != CAMERA_OS_P ? TWO_LAYER : ONE_LAYER;
+  
+  m_Rwi = new mafRWI(mafGetFrame(), num_layers, false, m_StereoType);
+  m_Rwi->SetListener(this);
+  m_Rwi->CameraSet(m_CameraPosition);
+  m_Rwi->SetAxesVisibility(m_ShowAxes != 0);
+  m_Win = m_Rwi->m_RwiBase;
+
+  m_Sg  = new mafSceneGraph(this,m_Rwi->m_RenFront,m_Rwi->m_RenBack);
+  m_Sg->SetListener(this);
+  m_Rwi->m_Sg = m_Sg;
+
+  vtkNEW(m_Picker3D);
+  vtkNEW(m_Picker2D);
+  m_Picker2D->SetTolerance(0.001);
+  m_Picker2D->InitializePickList();
 }
 //----------------------------------------------------------------------------
 void mafViewSlice::VmeCreatePipe(mafNode *vme)
@@ -110,6 +136,7 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
             slice_mode = SLICE_Z;
         }
         ((mafPipeVolumeSlice *)pipe)->InitializeSliceParameters(slice_mode,false);
+        ((mafPipeVolumeSlice *)pipe)->ShowUnit(slice_mode != SLICE_ORTHO,m_Rwi->m_Camera);
       }
       pipe->Create(n);
       n->m_Pipe = (mafPipe*)pipe;
@@ -152,12 +179,18 @@ void mafViewSlice::VmeDeletePipe(mafNode *vme)
 int mafViewSlice::GetNodeStatus(mafNode *vme)
 //-------------------------------------------------------------------------
 {
-  if (vme->IsMAFType(mafVMEVolume))
+  mafSceneNode *n = NULL;
+  if (m_Sg != NULL)
   {
-    if (m_Sg != NULL)
+    if (vme->IsMAFType(mafVMEVolume))
     {
-      mafSceneNode *n = m_Sg->Vme2Node(vme);
+      n = m_Sg->Vme2Node(vme);
       n->m_Mutex = true;
+    }
+    else if (vme->IsMAFType(mafVMESlicer))
+    {
+      n = m_Sg->Vme2Node(vme);
+      n->m_PipeCreatable = false;
     }
   }
 
