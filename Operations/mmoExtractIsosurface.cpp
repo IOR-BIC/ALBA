@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoExtractIsosurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-16 15:16:58 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-11-23 15:52:33 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -94,13 +94,14 @@ mafOp(label), m_IsosurfaceVme(NULL)
   m_OutlineFilter  = NULL;
   m_OutlineMapper  = NULL;
 
-  m_DensityPicker   = NULL;
+  m_DensityPicker  = NULL;
+  m_IsosurfaceVme  = NULL;
 }
 //----------------------------------------------------------------------------
 mmoExtractIsosurface::~mmoExtractIsosurface()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_IsosurfaceVme);
+  mafDEL(m_IsosurfaceVme);
 }
 //----------------------------------------------------------------------------
 mafOp* mmoExtractIsosurface::Copy()
@@ -137,7 +138,7 @@ void mmoExtractIsosurface::OpDo()
 //----------------------------------------------------------------------------
 {
   m_IsosurfaceVme->ReparentTo(m_Input);
-  mafEventMacro(mafEvent(this,VME_ADD,m_IsosurfaceVme));
+  //mafEventMacro(mafEvent(this,VME_ADD,m_IsosurfaceVme));
 }
 //----------------------------------------------------------------------------
 void mmoExtractIsosurface::OpUndo()
@@ -463,6 +464,7 @@ void mmoExtractIsosurface::DeleteOpDialog()
 
   m_PIPRen->RemoveActor(m_SlicerActor);
   m_PIPRen->RemoveActor(m_PolydataActor);
+  m_Rwi->m_RenderWindow->RemoveRenderer(m_PIPRen);
 
   vtkDEL(m_PIPRen);
   vtkDEL(m_VolumeSlicer);
