@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 14:51:25 $
-  Version:   $Revision: 1.41 $
+  Date:      $Date: 2005-11-23 11:51:38 $
+  Version:   $Revision: 1.42 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -62,6 +62,7 @@ mafViewVTK::mafViewVTK(wxString label, int camera_position, bool show_axes, int 
   m_Sg        = NULL;
   m_Rwi       = NULL;
   m_LightKit  = NULL;
+  m_TextKit   = NULL;
   m_AttachCamera = NULL;
 
   m_NumberOfVisibleVme = 0;
@@ -76,6 +77,7 @@ mafViewVTK::~mafViewVTK()
   vtkDEL(m_Picker3D);
   cppDEL(m_AttachCamera);
   cppDEL(m_LightKit);
+  cppDEL(m_TextKit);
   cppDEL(m_Sg);
   cppDEL(m_Rwi);
 }
