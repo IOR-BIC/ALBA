@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 14:51:25 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2005-11-23 18:12:06 $
+  Version:   $Revision: 1.36 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -61,12 +61,13 @@ public:
   virtual void			OnEvent(mafEventBase *maf_event);
 
   /** IDs for the GUI */
-/*  enum VIEW_VTK_WIDGET_ID
+  enum VIEW_VTK_WIDGET_ID
   {
-    ID = Superclass::ID_LAST,
+    ID_SHOW_GRID = Superclass::ID_LAST,
+    ID_GRID_NORMAL,
     ID_LAST
   };
-*/
+
   /** 
   Add the vme to the view's scene-graph*/
   virtual void VmeAdd(mafNode *vme);
@@ -160,6 +161,8 @@ protected:
   int   m_NumberOfVisibleVme; ///< perform ResetCamera only for the first vme shown into the view
   bool  m_ShowAxes;  ///< Flag used to show/hide axes in low left cornel of the view
   int   m_StereoType; ///< Indicate the stereo type to use with the view
+  int   m_ShowGrid;
+  int   m_GridNormal;
 
   virtual mmgGui *CreateGui();
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-23 11:51:38 $
-  Version:   $Revision: 1.42 $
+  Date:      $Date: 2005-11-23 18:12:05 $
+  Version:   $Revision: 1.43 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -58,6 +58,9 @@ mafViewVTK::mafViewVTK(wxString label, int camera_position, bool show_axes, int 
   m_ExternalFlag    = external;
   m_ShowAxes        = show_axes;
   m_StereoType      = stereo;
+  
+  m_ShowGrid        = 0;
+  m_GridNormal      = 1;
 
   m_Sg        = NULL;
   m_Rwi       = NULL;
@@ -105,7 +108,7 @@ mafView *mafViewVTK::Copy(mafObserver *Listener)
 void mafViewVTK::Create()
 //----------------------------------------------------------------------------
 {
-  m_Rwi = new mafRWI(mafGetFrame(), ONE_LAYER, false, m_StereoType);
+  m_Rwi = new mafRWI(mafGetFrame(), ONE_LAYER, m_ShowGrid != 0, m_StereoType);
   m_Rwi->SetListener(this);
   m_Rwi->CameraSet(m_CameraPosition);
   m_Rwi->SetAxesVisibility(m_ShowAxes != 0);
@@ -285,8 +288,13 @@ void mafViewVTK::VmeDeletePipe(mafNode *vme)
 mmgGui *mafViewVTK::CreateGui()
 //-------------------------------------------------------------------------
 {
+  wxString grid_normal[3] = {"X axes","Y axes","Z axes"};
+
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
+  m_Gui->Bool(ID_SHOW_GRID,"grid",&m_ShowGrid,0,"Turn On/Off the grid");
+  m_Gui->Combo(ID_GRID_NORMAL,"grid normal",&m_GridNormal,3,grid_normal,"orientation axes for the grid");
+  m_Gui->Divider(2);
   
   /////////////////////////////////////////Text GUI
   m_TextKit = new mafTextKit(m_Gui, m_Rwi, this);
@@ -319,6 +327,14 @@ void mafViewVTK::OnEvent(mafEventBase *maf_event)
       case CAMERA_POST_RESET:
         OnPostResetCamera();
         mafEventMacro(*maf_event);
+      break;
+      case ID_SHOW_GRID:
+        m_Rwi->SetGridVisibility(m_ShowGrid != 0);
+        CameraUpdate();
+      break;
+      case ID_GRID_NORMAL:
+        m_Rwi->SetGridNormal(m_GridNormal);
+        CameraUpdate();
       break;
       default:
         mafEventMacro(*maf_event);
