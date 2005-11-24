@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiCameraMove.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 16:27:45 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-11-24 14:46:05 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -146,6 +146,8 @@ void mmiCameraMove::OnButtonUp(mafEventInteraction *e)
       OnRightButtonUp();
   	break;
   }
+  m_Renderer->GetRenderWindow()->SetDesiredUpdateRate(0.001);
+  m_Renderer->GetRenderWindow()->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -167,6 +169,8 @@ void mmiCameraMove::OnMouseMove()
       this->Spin();
     break;
   }
+  m_Renderer->GetRenderWindow()->SetDesiredUpdateRate(15.0);
+  m_Renderer->GetRenderWindow()->Render();
 }
 //----------------------------------------------------------------------------
 void mmiCameraMove::OnLeftButtonDown(mafEventInteraction *e) 
