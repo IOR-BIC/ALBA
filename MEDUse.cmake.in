@@ -6,4 +6,4 @@ INCLUDE_DIRECTORIES(${MED_INCLUDE_DIRS})
 
 LINK_DIRECTORIES(${MED_LIBRARY_DIRS})
 
-LINK_LIBRARIES(medCommon medOperations medViews vtkMED)
+LINK_LIBRARIES(medCommon medOperations medViews medVME vtkMED)
