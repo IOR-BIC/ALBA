@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-23 18:11:40 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-11-24 14:53:04 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -105,14 +105,11 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, int stereo)
 
   m_ShowGrid = use_grid;
 
-//  if(use_grid)
-//	{
-     m_Grid = vtkGridActor::New();
-		 m_RenFront->AddActor(m_Grid);
-		 m_RenFront->AddActor2D(m_Grid->GetLabelActor());
-	   SetGridNormal(GRID_Y);
-     SetGridVisibility(m_ShowGrid);
-//	}
+  m_Grid = vtkGridActor::New();
+	m_RenFront->AddActor(m_Grid);
+	m_RenFront->AddActor2D(m_Grid->GetLabelActor());
+	SetGridNormal(GRID_Y);
+  SetGridVisibility(m_ShowGrid);
 
 	m_Axes = new mafAxes(m_RenFront);
   m_Axes->SetVisibility(0);
@@ -296,8 +293,9 @@ void mafRWI::SetGridVisibility(bool show)
   if(m_Grid)
   {
 	  m_ShowGrid = show;
-	  m_Grid->SetVisibility(m_ShowGrid );
+	  m_Grid->SetVisibility(m_ShowGrid);
 	  m_Grid->GetLabelActor()->SetVisibility(m_ShowGrid);
+    m_RenFront->ResetCameraClippingRange();
   }
 }
 //----------------------------------------------------------------------------
