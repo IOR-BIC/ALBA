@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-23 18:12:05 $
-  Version:   $Revision: 1.43 $
+  Date:      $Date: 2005-11-24 14:51:16 $
+  Version:   $Revision: 1.44 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -155,7 +155,27 @@ vtkRenderer *mafViewVTK::GetBackRenderer()
 void mafViewVTK::VmeAdd(mafNode *vme)                                   {assert(m_Sg); m_Sg->VmeAdd(vme);}
 void mafViewVTK::VmeShow(mafNode *vme, bool show)												{assert(m_Sg); m_Sg->VmeShow(vme,show);}
 void mafViewVTK::VmeUpdateProperty(mafNode *vme, bool fromTag)	        {assert(m_Sg); m_Sg->VmeUpdateProperty(vme,fromTag);}
-int  mafViewVTK::GetNodeStatus(mafNode *vme)                            {return m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;}
+//----------------------------------------------------------------------------
+int  mafViewVTK::GetNodeStatus(mafNode *vme)
+//----------------------------------------------------------------------------
+{
+  int status = m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;
+  if (!m_PipeMap.empty())
+  {
+    mafString vme_type = vme->GetTypeName();
+    if(m_PipeMap[vme_type].m_Visibility == NON_VISIBLE)
+    {
+      status = NODE_NON_VISIBLE;
+    }
+    else if (m_PipeMap[vme_type].m_Visibility == MUTEX)
+    {
+      mafSceneNode *n = m_Sg->Vme2Node(vme);
+      n->m_Mutex = true;
+      status = m_Sg->GetNodeStatus(vme);
+    }
+  }
+  return status;
+}
 //----------------------------------------------------------------------------
 void mafViewVTK::VmeRemove(mafNode *vme)
 //----------------------------------------------------------------------------
@@ -213,7 +233,7 @@ void mafViewVTK::GetVisualPipeName(mafNode *node, mafString &pipe_name)
   mafVME *v = ((mafVME*)node);
 
   mafString vme_type = v->GetTypeName();
-  if (!m_PipeMap.empty() && (m_PipeMap[vme_type].m_Visibility == VISIBLE))
+  if (!m_PipeMap.empty() && m_PipeMap.find(vme_type) != m_PipeMap.end())
   {
     // pick up the visual pipe from the view's visual pipe map
     pipe_name = m_PipeMap[vme_type].m_PipeName;
