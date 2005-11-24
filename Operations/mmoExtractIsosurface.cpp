@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoExtractIsosurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-23 15:52:33 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-11-24 14:46:32 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -190,7 +190,7 @@ void mmoExtractIsosurface::CreateOpDialog()
 
   m_PIPRen = vtkRenderer::New();
 
-  m_Rwi = new mafRWI(m_Dialog,ONE_LAYER,true);
+  m_Rwi = new mafRWI(m_Dialog,ONE_LAYER,false);
   m_Rwi->SetListener(this);//SIL. 16-6-2004: 
 	m_Rwi->CameraSet(CAMERA_PERSPECTIVE);
 	//m_Rwi->SetAxesVisibility(true);
