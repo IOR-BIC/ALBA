@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLightKit.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 09:51:05 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-11-24 14:45:16 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -90,8 +90,7 @@ void mafLightKit::CreateGui()
   wxSize ls(lw,bh);
 	wxPoint dp = wxDefaultPosition;
 	
-	wxStaticText *lab = new wxStaticText(m_Gui,-1,"lights list",dp,ls);
-  lab->SetFont(m_Gui->GetBoldFont());
+  wxStaticText *lab = new wxStaticText(m_Gui,-1,"lights list",dp,ls, wxALIGN_RIGHT);
 	
 	m_ButtonAdd = new mmgButton (m_Gui,ID_ADD_LIGHT,"add",dp,bs);
   m_ButtonRemove = new mmgButton (m_Gui,ID_REMOVE_LIGHT,"remove",dp,bs);
@@ -99,7 +98,7 @@ void mafLightKit::CreateGui()
 	m_ButtonRemove->SetListener(this);
 
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add( lab,        0, wxRIGHT, lm);
+	sizer->Add( lab,        0, wxALIGN_CENTRE|wxRIGHT, lm);
 	sizer->Add( m_ButtonAdd, 0, wxRIGHT, wm);
 	sizer->Add( m_ButtonRemove, 0, wxRIGHT, wm);
   m_Gui->Add(sizer,0,wxALL,rm); 

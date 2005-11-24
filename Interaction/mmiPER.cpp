@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPER.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 10:54:21 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-11-24 14:45:36 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -39,9 +39,7 @@
 #include "vtkMAFAssembly.h"
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
-#include "vtkAbstractPropPicker.h"
-#include "vtkAssemblyPath.h"
-#include "vtkAssemblyNode.h"
+#include "vtkRenderWindow.h"
 #include "vtkMath.h"
 #include <map>
 #include <assert.h>

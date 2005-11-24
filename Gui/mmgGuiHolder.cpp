@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGuiHolder.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-17 20:39:59 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-11-24 14:44:00 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -73,8 +73,9 @@ bool mmgGuiHolder::RemoveCurrentGui()
     return false;  //nothing to remove
 
   m_panel->Remove(current_gui);
-  current_gui->Reparent(mafGetFrame());
   current_gui->Show(false);
+  current_gui->Reparent(mafGetFrame());
+//  current_gui->Show(false);
   m_panel->Layout();
   return true;
 }
