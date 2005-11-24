@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2005-09-06 10:23:49 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2005-11-24 14:50:19 $
+Version:   $Revision: 1.2 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -72,9 +72,11 @@ void mafPipeIsosurface::Create(mafSceneNode *n)
   // contour pipeline
   vtkNEW(m_ContourMapper);
   m_ContourMapper->SetInput(dataset);
+  m_ContourMapper->EnableAutoLODOn();
   
   vtkNEW(m_Volume);
   m_Volume->SetMapper(m_ContourMapper);
+  m_Volume->PickableOff();
   
   m_AssemblyFront->AddPart(m_Volume);
 
