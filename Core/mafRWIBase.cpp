@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-23 15:43:57 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-11-28 13:01:33 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -58,6 +58,7 @@
 #include "vtkBMPWriter.h"
 #include "vtkJPEGWriter.h"
 #include "vtkImageData.h"
+#include "vtkImageExport.h"
 
 //----------------------------------------------------------------------------
 IMPLEMENT_DYNAMIC_CLASS(mafRWIBase, wxScrolledWindow)
@@ -560,20 +561,35 @@ void mafRWIBase::OnSize(wxSizeEvent &event)
   }
 }
 //----------------------------------------------------------------------------
-wxBitmap *mafRWIBase::GetImage()
+wxBitmap *mafRWIBase::GetImage(int magnification)
 //----------------------------------------------------------------------------
 {
 	int dim[3];
+  GetRenderWindow()->OffScreenRenderingOn();
+    GetRenderWindow()->Render();
+	  vtkMAFSmartPointer<vtkWindowToImageFilter> w2i;
+	  w2i->SetInput(GetRenderWindow());
+    w2i->SetMagnification(magnification);
+	  w2i->Update();
+    w2i->GetOutput()->GetDimensions(dim);
+  GetRenderWindow()->OffScreenRenderingOff();
 
-	vtkMAFSmartPointer<vtkWindowToImageFilter> w2i;
-	w2i->SetInput(GetRenderWindow());
-	w2i->Update();
-	w2i->GetOutput()->GetDimensions(dim);
-	unsigned char *data = (unsigned char *)w2i->GetOutput()->GetScalarPointer();
-	wxImage  *img = new wxImage(dim[0],dim[1],data,TRUE);
-	wxBitmap *bmp = new wxBitmap(img->ConvertToBitmap());
+  assert( dim[0]>0 && dim[1]>0 );
+  unsigned char *buffer = new unsigned char [dim[0]*dim[1]*3];
+
+  //flip it - windows Bitmap are upside-down
+  vtkMAFSmartPointer<vtkImageExport> ie;
+  ie->SetInput(w2i->GetOutput());
+  ie->ImageLowerLeftOff();
+  ie->SetExportVoidPointer(buffer);
+  ie->Export();
+
+  //translate to a wxBitmap
+  wxImage  *img = new wxImage(dim[0],dim[1],buffer,TRUE);
+  wxBitmap *bmp = new wxBitmap(img->ConvertToBitmap());
   delete img;
-	return bmp;
+  delete buffer;
+  return bmp;
 }
 //----------------------------------------------------------------------------
 void mafRWIBase::SaveImage(wxString view_name, int magnification)

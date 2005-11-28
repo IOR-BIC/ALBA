@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-23 15:43:57 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-11-28 13:01:08 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -91,7 +91,7 @@ public:
   void TerminateApp();
 	/** 
   Return an image of the render window. */
-  wxBitmap* GetImage();
+  wxBitmap* GetImage(int magnification = 1);
 	/** 
   Save an image of the render window. */
   void SaveImage(wxString view_name = "", int magnification = 1);
