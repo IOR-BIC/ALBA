@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 12:16:59 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-11-28 13:02:09 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -35,7 +35,7 @@
 
 #include "vtkProperty.h"
 #include "vtkTransferFunction2D.h"
-#include "vtkSphereSource.h"
+#include "vtkTexturedSphereSource.h"
 #include "vtkTexture.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkActor.h"
@@ -142,7 +142,7 @@ wxBitmap *mmaMaterial::MakeIcon()
   renwin->OffScreenRenderingOn(); 
 	renwin->SetSize(25, 25);
 
-	vtkMAFSmartPointer<vtkSphereSource> ss;
+	vtkMAFSmartPointer<vtkTexturedSphereSource> ss;
 	ss->SetPhiResolution(20);
 	ss->SetThetaResolution(20);
 	if (this->m_Prop->GetRepresentation() == 1)
