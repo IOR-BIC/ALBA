@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 14:04:22 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-11-28 13:05:06 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -165,6 +165,10 @@ std::string  mafIdString(int id)
      case MENU_FILE_SAVE:       s="MENU_FILE_SAVE"; break; 
      case MENU_FILE_SAVEAS:     s="MENU_FILE_SAVEAS"; break; 
      case MENU_FILE_MERGE:      s="MENU_FILE_MERGE"; break; 
+     case MENU_FILE_PRINT:      s="MENU_FILE_PRINT"; break;
+     case MENU_FILE_PRINT_PREVIEW:s="MENU_FILE_PRINT_PREVIEW"; break;
+     case MENU_FILE_PRINT_SETUP:s="MENU_FILE_PRINT_SETUP"; break;
+     case MENU_FILE_PRINT_PAGE_SETUP:s="MENU_FILE_PRINT_PAGE_SETUP"; break;
      case MENU_FILE_QUIT:       s="MENU_FILE_QUIT"; break; 
      case MENU_FILE_END:        s="MENU_FILE_END"; break; 
      case MENU_EDIT_START:      s="MENU_EDIT_START"; break; 
