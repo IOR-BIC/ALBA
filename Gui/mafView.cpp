@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 14:52:08 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-11-28 13:05:48 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,6 +22,7 @@
 #include "mafView.h"
 #include "mafMatrix.h"
 #include "mafVME.h"
+#include <wx/print.h>
 
 #include "vtkMAFAssembly.h"
 #include "vtkRayCast3DPicker.h"
@@ -51,6 +52,8 @@ mafView::mafView( wxString label, bool external)
   m_Id            = 0;
   m_Mult          = 0;
 	m_ExternalFlag  = external;
+
+  m_PrintData = (wxPrintData*) NULL ;
 
   m_Picker2D          = NULL;
   m_Picker3D          = NULL;
@@ -152,4 +155,44 @@ void mafView::FindPickedVme(vtkAssemblyPath *ap)
       }
     }
   }
+}
+//----------------------------------------------------------------------------
+void mafView::PrintBitmap(wxDC *dc, wxRect margins, wxBitmap *bmp)
+//----------------------------------------------------------------------------
+{
+  assert(dc);
+  assert(bmp);
+  float iw = bmp->GetWidth();
+  float ih = bmp->GetHeight();
+  float maxX = iw;
+  float maxY = ih;
+
+  // Add the margin to the graphic size
+  maxX += (margins.GetLeft() + margins.GetRight());
+  maxY += (margins.GetTop() + margins.GetBottom());
+
+  // Get the size of the DC in pixels
+  int w,h;
+  dc->GetSize(&w, &h);
+
+  // Calculate a suitable scaling factor
+  float scaleX=(float)(w/maxX);
+  float scaleY=(float)(h/maxY);
+
+  // Use x or y scaling factor, whichever fits on the DC
+  float actualScale = wxMin(scaleX,scaleY);
+
+  // Calculate the position on the DC for centring the graphic
+  float posX = (float)((w - (iw*actualScale))/2.0);
+  float posY = (float)((h - (ih*actualScale))/2.0);
+
+  // Set the scale and origin
+  dc->SetUserScale(actualScale, actualScale);
+  dc->SetDeviceOrigin( (long)posX, (long)posY );
+
+  wxMemoryDC mdc; 
+  mdc.SelectObject(*bmp);
+  dc->SetBackground(*wxWHITE_BRUSH);
+  dc->Clear();
+  dc->Blit(0, 0, maxX, maxY, &mdc, 0, 0);
 }

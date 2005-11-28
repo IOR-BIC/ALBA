@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-06 16:03:25 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2005-11-28 13:03:31 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,6 +31,7 @@ class mafSideBar;
 class mmgMaterialChooser;
 class mafVME;
 class mafInteractionManager;
+class mafPrintSupport;
 
 //----------------------------------------------------------------------------
 // mafLogicWithManagers :
@@ -195,7 +196,8 @@ protected:
   mafOpManager           *m_OpManager;
   mafInteractionManager  *m_InteractionManager;
 
-  mmgMaterialChooser *m_MaterialChooser;
+  mmgMaterialChooser  *m_MaterialChooser;
+  mafPrintSupport     *m_PrintSupport;
 
   wxMenu *m_ImportMenu; 
   wxMenu *m_ExportMenu; 

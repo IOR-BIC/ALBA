@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-21 12:10:10 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-11-28 13:05:48 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -120,6 +120,14 @@ public:
   virtual void			OnSize(wxSizeEvent &size_event)	{};
 
   /** 
+  Print this view.*/
+  virtual void Print(wxDC *dc, wxRect margins) {};
+  
+  /** 
+  Print the bitmap filling the paper size considering margins.*/
+  virtual void PrintBitmap(wxDC *dc, wxRect margins, wxBitmap *bmp);
+
+  /** 
   Set the vtk RenderWindow size. Used only for Linux (not necessary for Windows) */
   virtual void SetWindowSize(int w, int h) {};
 
@@ -158,6 +166,8 @@ protected:
   mafVME        *m_PickedVME;   ///< Pointer to the picked vme. It is initialized on picking
   vtkProp3D     *m_PickedProp;  ///< Pointer to the picked vme Prop3D. It is initialized on picking
   double         m_PickedPosition[3];
+
+  wxPrintData   *m_PrintData;
 
   /** 
   Find the VME picked */

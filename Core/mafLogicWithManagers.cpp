@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-24 14:53:48 $
-  Version:   $Revision: 1.47 $
+  Date:      $Date: 2005-11-28 13:03:30 $
+  Version:   $Revision: 1.48 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,6 +32,7 @@
 #include "mafInteractor.h"
 #include "mafTagArray.h"
 #include "mafTagItem.h"
+#include "mafPrintSupport.h"
 
 #include "mmgMDIFrame.h"
 #include "mmgCheckTree.h"
@@ -68,12 +69,15 @@ mafLogicWithManagers::mafLogicWithManagers()
   m_RecentFileMenu = NULL;
 
   m_MaterialChooser = NULL;
+
+  m_PrintSupport = new mafPrintSupport();
 }
 //----------------------------------------------------------------------------
 mafLogicWithManagers::~mafLogicWithManagers( ) 
 //----------------------------------------------------------------------------
 {
   // Managers are destruct in the OnClose 
+  cppDEL(m_PrintSupport);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Configure()
@@ -162,8 +166,8 @@ void mafLogicWithManagers::Show()
       m_OpManager->FillMenu(m_ImportMenu, m_ExportMenu, m_OpMenu);
       m_OpManager->SetMenubar(m_MenuBar);
     }
-    if(m_TooBar)
-      m_OpManager->SetToolbar(m_TooBar);
+    if(m_ToolBar)
+      m_OpManager->SetToolbar(m_ToolBar);
   }
 
   mafLogicWithGUI::Show();
@@ -221,6 +225,13 @@ void mafLogicWithManagers::CreateMenu()
   m_ExportMenu = new wxMenu;
   file_menu->Append(0,"Export",m_ExportMenu);
 
+  // Print menu item
+  file_menu->AppendSeparator();
+  file_menu->Append(MENU_FILE_PRINT, "&Print");
+  file_menu->Append(MENU_FILE_PRINT_PREVIEW, "Print Preview");
+  file_menu->Append(MENU_FILE_PRINT_SETUP, "Printer Setup");
+  file_menu->Append(MENU_FILE_PRINT_PAGE_SETUP, "Page Setup");
+
   m_RecentFileMenu = new wxMenu;
   file_menu->AppendSeparator();
   file_menu->Append(0,"Recent Files",m_RecentFileMenu);
@@ -258,6 +269,11 @@ void mafLogicWithManagers::CreateMenu()
   m_MenuBar->Append(option_menu, "&Preferences");
 
   m_Win->SetMenuBar(m_MenuBar);
+
+  EnableItem(MENU_FILE_PRINT, false);
+  EnableItem(MENU_FILE_PRINT_PREVIEW, false);
+  EnableItem(MENU_FILE_PRINT_SETUP, false);
+  EnableItem(MENU_FILE_PRINT_PAGE_SETUP, false);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::UpdateFrameTitle()
@@ -313,6 +329,22 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
     case MENU_FILE_SAVEAS:
       OnFileSaveAs();
       break; 
+    case MENU_FILE_PRINT:
+      if (m_ViewManager && m_PrintSupport)
+        m_PrintSupport->OnPrint(m_ViewManager->GetSelectedView());
+      break;
+    case MENU_FILE_PRINT_PREVIEW:
+      if (m_ViewManager && m_PrintSupport)
+        m_PrintSupport->OnPrintPreview(m_ViewManager->GetSelectedView());
+      break;
+    case MENU_FILE_PRINT_SETUP:
+      if (m_PrintSupport)
+        m_PrintSupport->OnPrintSetup();
+      break;
+    case MENU_FILE_PRINT_PAGE_SETUP:
+      if (m_PrintSupport)
+        m_PrintSupport->OnPageSetup();
+      break;
     case MENU_FILE_QUIT:
       OnQuit();		
       break; 
@@ -393,6 +425,17 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
         this->m_SideBar->ViewDeleted(e->GetView()); // changed By Marco (is it correct?)
       if(m_InteractionManager)
         m_InteractionManager->ViewSelected(NULL);
+      if (m_ViewManager)
+      {
+        EnableItem(CAMERA_RESET, false);
+        EnableItem(CAMERA_FIT,   false);
+        EnableItem(CAMERA_FLYTO, false);
+
+        EnableItem(MENU_FILE_PRINT, false);
+        EnableItem(MENU_FILE_PRINT_PREVIEW, false);
+        EnableItem(MENU_FILE_PRINT_SETUP, false);
+        EnableItem(MENU_FILE_PRINT_PAGE_SETUP, false);
+      }
       break;	
     case VIEW_SELECT:
       ViewSelect();
@@ -756,10 +799,10 @@ void mafLogicWithManagers::ViewCreate(int viewId)
 	if(m_ViewManager)
   {
     mafView* v = m_ViewManager->ViewCreate(viewId);
-    if(m_OpManager) 
+/*    if(m_OpManager) 
     {
       VmeShow(m_OpManager->GetSelectedVme(),true);
-    }
+    }*/
   }
 }
 //----------------------------------------------------------------------------
@@ -774,6 +817,11 @@ void mafLogicWithManagers::ViewSelect()
     EnableItem(CAMERA_RESET, view!=NULL);
     EnableItem(CAMERA_FIT,   view!=NULL);
     EnableItem(CAMERA_FLYTO, view!=NULL);
+
+    EnableItem(MENU_FILE_PRINT, view != NULL);
+    EnableItem(MENU_FILE_PRINT_PREVIEW, view != NULL);
+    EnableItem(MENU_FILE_PRINT_SETUP, view != NULL);
+    EnableItem(MENU_FILE_PRINT_PAGE_SETUP, view != NULL);
 
     if (m_InteractionManager)
     {
