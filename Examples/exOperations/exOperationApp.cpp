@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 12:20:10 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2005-11-28 13:05:32 $
+  Version:   $Revision: 1.36 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -133,15 +133,15 @@ bool exOperationApp::OnInit()
   //------------------------------------------------------------
   m_Logic->Plug(new mafViewVTK("VTK view"));
   mafViewVTK *v = new mafViewVTK("Slice view", CAMERA_CT);
-  v->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
+  v->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice",MUTEX);
   m_Logic->Plug(v);
   mafViewVTK *viso = new mafViewVTK("Isosurface view");
-  viso->PlugVisualPipe("mafVMEVolumeGray", "mafPipeIsosurface");
+  viso->PlugVisualPipe("mafVMEVolumeGray", "mafPipeIsosurface",MUTEX);
   m_Logic->Plug(viso);
 
   mafViewCompound *vc = new mafViewCompound("view compound",3);
   mafViewVTK *v2 = new mafViewVTK("Slice view", CAMERA_CT);
-  v2->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
+  v2->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice",MUTEX);
   vc->PlugChildView(v2);
   m_Logic->Plug(vc);
   //------------------------------------------------------------

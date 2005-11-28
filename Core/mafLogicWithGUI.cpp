@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-21 10:51:28 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2005-11-28 13:03:52 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,6 +51,9 @@ mafLogicWithGUI::mafLogicWithGUI()
   m_TimeSash			= NULL;
   m_TimePanel  	  = NULL;
   m_SideSash	    = NULL;
+
+  m_ToolBar       = NULL;
+  m_MenuBar       = NULL;
 
 	m_LogToFile			= false;
 	m_LogAllEvents	= false;
@@ -156,8 +159,8 @@ void mafLogicWithGUI::OnEvent(mafEventBase *maf_event)
     case MENU_VIEW_TOOLBAR:
       if(m_PlugToolbar)	
       {
-        bool show = !m_TooBar->IsShown();
-        m_TooBar->Show(show);
+        bool show = !m_ToolBar->IsShown();
+        m_ToolBar->Show(show);
         m_MenuBar->FindItem(MENU_VIEW_TOOLBAR)->Check(show);
         m_Win->Update();
       }
@@ -238,28 +241,32 @@ void mafLogicWithGUI::CreateLogbar()
 void mafLogicWithGUI::CreateToolbar()
 //----------------------------------------------------------------------------
 {
-  m_TooBar = new wxToolBar(m_Win,-1,wxPoint(0,0),wxSize(-1,-1),wxHORIZONTAL|wxNO_BORDER|wxTB_FLAT  );
-  m_TooBar->SetMargins(0,0);
-  m_TooBar->SetToolSeparation(2);
-  m_TooBar->SetToolBitmapSize(wxSize(20,20));
-  m_TooBar->AddTool(MENU_FILE_NEW,mafPics.GetBmp("FILE_NEW"),    "new msf storage file");
-  m_TooBar->AddTool(MENU_FILE_OPEN,mafPics.GetBmp("FILE_OPEN"),  "open msf storage file");
-  m_TooBar->AddTool(MENU_FILE_SAVE,mafPics.GetBmp("FILE_SAVE"),  "save current msf storage file");
-  m_TooBar->AddSeparator();
+  m_ToolBar = new wxToolBar(m_Win,-1,wxPoint(0,0),wxSize(-1,-1),wxHORIZONTAL|wxNO_BORDER|wxTB_FLAT  );
+  m_ToolBar->SetMargins(0,0);
+  m_ToolBar->SetToolSeparation(2);
+  m_ToolBar->SetToolBitmapSize(wxSize(20,20));
+  m_ToolBar->AddTool(MENU_FILE_NEW,mafPics.GetBmp("FILE_NEW"),    "new msf storage file");
+  m_ToolBar->AddTool(MENU_FILE_OPEN,mafPics.GetBmp("FILE_OPEN"),  "open msf storage file");
+  m_ToolBar->AddTool(MENU_FILE_SAVE,mafPics.GetBmp("FILE_SAVE"),  "save current msf storage file");
+  m_ToolBar->AddSeparator();
 
-  m_TooBar->AddTool(OP_UNDO,mafPics.GetBmp("OP_UNDO"),  "undo (ctrl+z)"); //correggere tooltip - shortcut sbagliati
-  m_TooBar->AddTool(OP_REDO,mafPics.GetBmp("OP_REDO"),  "redo (ctrl+shift+z)");
-  m_TooBar->AddSeparator();
+  m_ToolBar->AddTool(OP_UNDO,mafPics.GetBmp("OP_UNDO"),  "undo (ctrl+z)"); //correggere tooltip - shortcut sbagliati
+  m_ToolBar->AddTool(OP_REDO,mafPics.GetBmp("OP_REDO"),  "redo (ctrl+shift+z)");
+  m_ToolBar->AddSeparator();
 
-  m_TooBar->AddTool(OP_CUT,  mafPics.GetBmp("OP_CUT"),  "cut selected vme (ctrl+x)");
-  m_TooBar->AddTool(OP_COPY, mafPics.GetBmp("OP_COPY"), "copy selected vme (ctrl+c)");
-  m_TooBar->AddTool(OP_PASTE,mafPics.GetBmp("OP_PASTE"),"paste vme (ctrl+v)");
-  m_TooBar->AddSeparator();
-  m_TooBar->AddTool(CAMERA_RESET,mafPics.GetBmp("ZOOM_ALL"),"reset camera to fit all (ctrl+f)");
-  m_TooBar->AddTool(CAMERA_FIT,  mafPics.GetBmp("ZOOM_SEL"),"reset camera to fit selected object (ctrl+shift+f)");
-  m_TooBar->AddTool(CAMERA_FLYTO,mafPics.GetBmp("FLYTO"),"fly to object under mouse (press f inside a 3Dview)");
-  m_TooBar->Realize();
-  m_Win->SetToolBar(m_TooBar);
+  m_ToolBar->AddTool(OP_CUT,  mafPics.GetBmp("OP_CUT"),  "cut selected vme (ctrl+x)");
+  m_ToolBar->AddTool(OP_COPY, mafPics.GetBmp("OP_COPY"), "copy selected vme (ctrl+c)");
+  m_ToolBar->AddTool(OP_PASTE,mafPics.GetBmp("OP_PASTE"),"paste vme (ctrl+v)");
+  m_ToolBar->AddSeparator();
+  m_ToolBar->AddTool(CAMERA_RESET,mafPics.GetBmp("ZOOM_ALL"),"reset camera to fit all (ctrl+f)");
+  m_ToolBar->AddTool(CAMERA_FIT,  mafPics.GetBmp("ZOOM_SEL"),"reset camera to fit selected object (ctrl+shift+f)");
+  m_ToolBar->AddTool(CAMERA_FLYTO,mafPics.GetBmp("FLYTO"),"fly to object under mouse (press f inside a 3Dview)");
+  m_ToolBar->Realize();
+  m_Win->SetToolBar(m_ToolBar);
+
+  EnableItem(CAMERA_RESET, false);
+  EnableItem(CAMERA_FIT,   false);
+  EnableItem(CAMERA_FLYTO, false);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithGUI::CreateSidebar()
@@ -285,6 +292,6 @@ void mafLogicWithGUI::EnableItem(int item, bool enable)
      // during application shutdown it is not guaranteed
      if(m_MenuBar->FindItem(item))	
         m_MenuBar->Enable(item,enable );
-  if(m_TooBar) 
-     m_TooBar->EnableTool(item,enable );
+  if(m_ToolBar)
+     m_ToolBar->EnableTool(item,enable );
 }
