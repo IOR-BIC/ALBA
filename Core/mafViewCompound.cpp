@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-21 18:21:19 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-11-28 13:04:44 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -427,4 +427,40 @@ mafVME *mafViewCompound::GetPickedVme()
     return sub_view->GetPickedVme();
   }
   return NULL;
+}
+//----------------------------------------------------------------------------
+void mafViewCompound::Print(wxDC *dc, wxRect margins)
+//----------------------------------------------------------------------------
+{
+  if (m_NumOfPluggedChildren == 0)
+  {
+    return;
+  }
+
+  int magnification = 2;
+  wxSize vsz = this->GetWindow()->GetSize();
+  wxBitmap compoundImage = wxBitmap(magnification*vsz.GetWidth(),magnification*vsz.GetHeight());
+  wxMemoryDC compoundDC;
+  compoundDC.SelectObject(compoundImage);
+  compoundDC.SetBackground(*wxWHITE_BRUSH);
+  compoundDC.Clear();
+  // this implement the Fixed SubViews Print
+
+  int x_pos, y_pos;
+  wxMemoryDC subViewDC;
+  for (int i=0; i<m_NumOfChildView; i++)
+  {
+    wxSize win_size = m_ChildViewList[i]->GetWindow()->GetSize();
+    if (win_size.GetWidth() == 0 || win_size.GetHeight() == 0) continue;
+    wxBitmap *image = m_ChildViewList[i]->GetRWI()->GetImage(magnification);
+    float iw = image->GetWidth();
+    float ih = image->GetHeight();
+    m_ChildViewList[i]->GetRWI()->GetPosition(&x_pos,&y_pos);
+    subViewDC.SelectObject(*image);
+    compoundDC.Blit(magnification * x_pos,magnification * y_pos,iw,ih,&subViewDC,0,0);
+    cppDEL(image);
+  }
+
+  compoundDC.SelectObject(wxNullBitmap);
+  PrintBitmap(dc, margins, &compoundImage);
 }

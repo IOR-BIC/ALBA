@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-21 18:21:19 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-11-28 13:04:44 $
+  Version:   $Revision: 1.14 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -155,6 +155,10 @@ public:
   /** 
   Return true is one of the plugged view is maximized.*/
   bool IsSubViewMaximized() {return m_SubViewMaximized != -1;};
+
+  /** 
+  Print the sub-view.*/
+  virtual void Print(wxDC *dc, wxRect margins);
 
 protected:
   /**

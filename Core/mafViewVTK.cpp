@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-24 14:51:16 $
-  Version:   $Revision: 1.44 $
+  Date:      $Date: 2005-11-28 13:04:44 $
+  Version:   $Revision: 1.45 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,6 +20,7 @@
 //----------------------------------------------------------------------------
 
 #include "mafViewVTK.h"
+#include <wx/dc.h>
 #include "mafVME.h"
 #include "mafPipe.h"
 #include "mafPipeFactory.h"
@@ -233,12 +234,12 @@ void mafViewVTK::GetVisualPipeName(mafNode *node, mafString &pipe_name)
   mafVME *v = ((mafVME*)node);
 
   mafString vme_type = v->GetTypeName();
-  if (!m_PipeMap.empty() && m_PipeMap.find(vme_type) != m_PipeMap.end())
+  if (!m_PipeMap.empty())
   {
     // pick up the visual pipe from the view's visual pipe map
     pipe_name = m_PipeMap[vme_type].m_PipeName;
   }
-  else
+  if(pipe_name.IsEmpty())
   {
     // pick up the default visual pipe from the vme
     pipe_name = v->GetVisualPipe();
@@ -464,4 +465,12 @@ bool mafViewVTK::Pick(mafMatrix &m)
     }
   }
   return false;
+}
+//----------------------------------------------------------------------------
+void mafViewVTK::Print(wxDC *dc, wxRect margins)
+//----------------------------------------------------------------------------
+{
+  wxBitmap *image = m_Rwi->m_RwiBase->GetImage(2);
+  PrintBitmap(dc, margins, image);
+  cppDEL(image);
 }

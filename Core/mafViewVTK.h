@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-23 18:12:06 $
-  Version:   $Revision: 1.36 $
+  Date:      $Date: 2005-11-28 13:04:44 $
+  Version:   $Revision: 1.37 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -149,6 +149,10 @@ public:
   /** 
     Set the mouse device to use inside the view */
   void SetMouse(mmdMouse *mouse);
+
+  /** 
+  Print this view.*/
+  virtual void Print(wxDC *dc, wxRect margins);
 
 protected:
   mafRWI        *m_Rwi; 
