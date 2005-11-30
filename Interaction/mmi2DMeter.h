@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi2DMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-30 11:33:31 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-11-30 13:09:58 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,6 +20,7 @@
 // forward refs
 //----------------------------------------------------------------------------
 class mafRWI;
+class mmdMouse;
 
 class vtkLineSource;
 class vtkCoordinate;
@@ -131,6 +132,8 @@ protected:
   bool m_EndMeasure;
   bool m_ParallelView;
   int  m_MeasureType;
+
+  mmdMouse *m_Mouse;
 
   double  m_Distance;
   double  m_PickedPoint[3]; ///< 3D position of the picked point; used to assign position to the m_ProbingLine
