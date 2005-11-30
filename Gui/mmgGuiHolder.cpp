@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGuiHolder.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-28 14:40:09 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-11-30 22:52:22 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -62,7 +62,7 @@ bool mmgGuiHolder::Put(mmgGui* gui)
   gui->Update();
   
   m_panel->Layout();
-  gui->SetFocus();
+  gui->GetParent()->SetFocus();
   return true;
 }
 //----------------------------------------------------------------------------
