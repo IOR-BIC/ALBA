@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi2DMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-30 11:33:30 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-11-30 13:10:30 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -62,6 +62,7 @@ mmi2DMeter::mmi2DMeter()
   m_ProbingLine->SetResolution(512);
   
   m_ProbedVME = NULL;
+  m_Mouse     = NULL;
 
   vtkNEW(m_PlotActor);
   m_PlotActor->GetProperty()->SetColor(0.02,0.06,0.62);	
@@ -169,14 +170,18 @@ void mmi2DMeter::OnLeftButtonDown(mafEventInteraction *e)
   
   mafDevice *device = mafDevice::SafeDownCast((mafDevice*)e->GetSender());
   mmdMouse  *mouse  = mmdMouse::SafeDownCast(device);
-  m_CurrentRenderer = mouse->GetRenderer();
+  if (m_Mouse == NULL)
+  {
+    m_Mouse = mouse;
+  }
+  m_CurrentRenderer = m_Mouse->GetRenderer();
   m_ParallelView = m_CurrentRenderer->GetActiveCamera()->GetParallelProjection();
   if (m_ParallelView)
   {
     OnButtonDown(e);  
     if (m_GenerateHistogram)
     {
-      mafView *v = mouse->GetView();
+      mafView *v = m_Mouse->GetView();
       if(v->Pick(pos_2d[0],pos_2d[1]))
       {
         v->GetPickedPosition(m_PickedPoint);
@@ -224,9 +229,13 @@ void mmi2DMeter::OnLeftButtonUp(mafEventInteraction *e)
       {
         mafDevice *device = mafDevice::SafeDownCast((mafDevice*)e->GetSender());
         mmdMouse  *mouse  = mmdMouse::SafeDownCast(device);
+        if (m_Mouse == NULL)
+        {
+          m_Mouse = mouse;
+        }
         double pos_2d[2];
         e->Get2DPosition(pos_2d);
-        mafView *v = mouse->GetView();
+        mafView *v = m_Mouse->GetView();
         if(v->Pick(pos_2d[0],pos_2d[1]))
         {
           v->GetPickedPosition(m_PickedPoint);
@@ -309,13 +318,16 @@ void mmi2DMeter::DrawMeasureTool(double x, double y)
   {
     m_Line->SetPoint2(x,y,0);
     m_Line->Update();
+    if(m_MeasureType == DISTANCE_BETWEEN_POINTS)
+    {
+      CalculateMeasure();
+    }
   }
   // finished dragging the second point
   else if(counter == 1)
   {
     if(m_MeasureType == DISTANCE_BETWEEN_POINTS)
     {
-      CalculateMeasure();
       m_EndMeasure = true;
     }
     else
@@ -527,7 +539,7 @@ void mmi2DMeter::RemoveMeter()
 //----------------------------------------------------------------------------
 {
   //if the current render window is not null remove the two actors 
-  if (m_CurrentRenderer == NULL) 
+  if (m_CurrentRenderer == NULL || m_Mouse->GetRenderer() == NULL) 
     return;
   m_CurrentRenderer->RemoveActor2D(m_LineActor);
   m_CurrentRenderer->RemoveActor2D(m_LineActor2);
