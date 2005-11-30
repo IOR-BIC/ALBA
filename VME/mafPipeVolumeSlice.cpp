@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-23 11:52:45 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-11-30 11:35:14 $
+  Version:   $Revision: 1.15 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -257,32 +257,7 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 
   if (m_ShowUnit)
   {
-    vtkMAFSmartPointer<vtkLineSource> cursor_line1;
-    cursor_line1->SetPoint1(0,0,0);
-    cursor_line1->SetPoint2(m_UnitLength, 0, 0);
-
-    vtkMAFSmartPointer<vtkLineSource> cursor_line2;
-    cursor_line2->SetPoint1(0, -(m_UnitLength/10.0), 0);
-    cursor_line2->SetPoint2(0, (m_UnitLength/10.0), 0);
-
-    vtkMAFSmartPointer<vtkLineSource> cursor_line3;
-    cursor_line3->SetPoint1(m_UnitLength, -(m_UnitLength/10.0), 0);
-    cursor_line3->SetPoint2(m_UnitLength, (m_UnitLength/10.0), 0);
-
-    vtkMAFSmartPointer<vtkAppendPolyData> cursor_data;
-    cursor_data->AddInput(cursor_line1->GetOutput());
-    cursor_data->AddInput(cursor_line2->GetOutput());
-    cursor_data->AddInput(cursor_line3->GetOutput());
-
-    vtkMAFSmartPointer<vtkPolyDataMapper> cursor_mapper;
-    cursor_mapper->SetInput(cursor_data->GetOutput());
-
-    vtkNEW(m_UnitCubeActor);
-    m_UnitCubeActor->SetCamera(m_CameraToFollow);
-    m_UnitCubeActor->SetMapper(cursor_mapper.GetPointer());
-    m_UnitCubeActor->SetPosition(b[0],b[2],b[4]);
-
-    m_AssemblyFront->AddPart(m_UnitCubeActor);
+    DrawUnit();
   }
   else
   {
@@ -301,6 +276,59 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 		m_GhostActor->GetProperty()->SetRepresentationToPoints();
 		m_GhostActor->GetProperty()->SetInterpolationToFlat();
 		m_AssemblyFront->AddPart(m_GhostActor);
+  }
+}
+//----------------------------------------------------------------------------
+void mafPipeVolumeSlice::DrawUnit()
+//----------------------------------------------------------------------------
+{
+  double b[6];
+  m_Vme->GetOutput()->GetVMELocalBounds(b);
+
+  vtkMAFSmartPointer<vtkLineSource> cursor_line1;
+  cursor_line1->SetPoint1(0,0,0);
+  cursor_line1->SetPoint2(m_UnitLength, 0, 0);
+
+  vtkMAFSmartPointer<vtkAppendPolyData> cursor_data;
+  cursor_data->AddInput(cursor_line1->GetOutput());
+
+  vtkLineSource *cursor_line_segments[11];
+  cursor_line_segments[0] = vtkLineSource::New();
+  cursor_line_segments[0]->SetPoint1(0, -(m_UnitLength/5.0), 0);
+  cursor_line_segments[0]->SetPoint2(0, (m_UnitLength/5.0), 0);
+
+  cursor_data->AddInput(cursor_line_segments[0]->GetOutput());
+
+  double divisor = 12.0;
+  int u=1;
+  for (;u<10;u++)
+  {
+    cursor_line_segments[u] = vtkLineSource::New();
+    divisor = u == 5 ? 7 : 10;
+    cursor_line_segments[u]->SetPoint1(u, -(m_UnitLength/divisor), 0);
+    cursor_line_segments[u]->SetPoint2(u, (m_UnitLength/divisor), 0);
+    cursor_data->AddInput(cursor_line_segments[u]->GetOutput());
+  }
+
+  cursor_line_segments[10] = vtkLineSource::New();
+  cursor_line_segments[10]->SetPoint1(m_UnitLength, -(m_UnitLength/5.0), 0);
+  cursor_line_segments[10]->SetPoint2(m_UnitLength, (m_UnitLength/5.0), 0);
+
+  cursor_data->AddInput(cursor_line_segments[10]->GetOutput());
+
+  vtkMAFSmartPointer<vtkPolyDataMapper> cursor_mapper;
+  cursor_mapper->SetInput(cursor_data->GetOutput());
+
+  vtkNEW(m_UnitCubeActor);
+  m_UnitCubeActor->SetCamera(m_CameraToFollow);
+  m_UnitCubeActor->SetMapper(cursor_mapper.GetPointer());
+  m_UnitCubeActor->SetPosition(b[0],b[2],b[4]);
+
+  m_AssemblyFront->AddPart(m_UnitCubeActor);
+
+  for (u=1;u<11;u++)
+  {
+    vtkDEL(cursor_line_segments[u]);
   }
 }
 //----------------------------------------------------------------------------

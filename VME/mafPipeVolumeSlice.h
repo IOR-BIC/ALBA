@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-23 11:52:45 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-11-30 11:35:14 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -120,6 +120,10 @@ public:
 protected:
 	/** Create the slicer pipeline. */
 	void CreateSlice(int mode);
+
+  /** 
+  Draw unit segment */
+  void DrawUnit();
 
   virtual mmgGui  *CreateGui();
 
