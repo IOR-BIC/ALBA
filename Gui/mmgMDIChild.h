@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIChild.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 09:24:12 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-11-30 13:22:50 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,6 +38,11 @@ public:
 	/** Set the quitting flag. */
 	static void OnQuit () {m_Quitting=true;}; 
 
+  /** 
+  Allow to set the flag to avoid closing the view. 
+  For instance when an operation is running or something else the vertical application don't want that the view must stay open. */
+  void SetAllowCloseWindow(bool allow_close) {m_AllowCloseFlag = allow_close;};
+
 protected:
 	/** Adjust the child size. */
   void OnSize(wxSizeEvent &event); 
@@ -45,16 +50,17 @@ protected:
 	/** Send the event to select the owned view. */
   void OnSelect(wxCommandEvent &event); 
 
-	/** Send the evenet to destroy the owned view. */
+	/** Send the event to destroy the owned view. */
   void OnCloseWindow  (wxCloseEvent& event);
 
 	/** Send the event to select the owned view. */
   void OnActivate (wxActivateEvent& event);
 
-  wxWindow						*m_Win;
-  mafView             *m_View;
-  mafObserver    *m_Listener;
-  static bool          m_Quitting;
+  wxWindow		*m_Win;
+  mafView     *m_View;
+  mafObserver *m_Listener;
+  static bool  m_Quitting;
+  bool         m_AllowCloseFlag;
 
   DECLARE_EVENT_TABLE()
 };

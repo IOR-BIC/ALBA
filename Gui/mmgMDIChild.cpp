@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIChild.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-22 09:43:05 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2005-11-30 13:22:50 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,6 +60,7 @@ mmgMDIChild::mmgMDIChild(wxMDIParentFrame* parent,mafView *view)
   assert(view);
   m_View     = view;
   m_Listener = NULL;
+  m_AllowCloseFlag = true;
 
   m_Win = m_View->GetWindow();
   m_Win->Reparent(this);
@@ -105,6 +106,8 @@ void mmgMDIChild::OnSize(wxSizeEvent &event)
 void mmgMDIChild::OnCloseWindow(wxCloseEvent& event)
 //----------------------------------------------------------------------------
 { 
+  if (!m_AllowCloseFlag) {return;}
+
   // VIEW_DELETE must be sent from here and not from the destructor
 	// otherwise VIEW_DELETE is sent also on the closing of the application
 	// when the listener (the ViewManager) has been already destroied
