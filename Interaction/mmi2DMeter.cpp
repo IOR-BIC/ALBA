@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi2DMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-23 15:46:26 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-11-30 11:33:30 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,7 +60,7 @@ mmi2DMeter::mmi2DMeter()
   // Probing tool
   vtkNEW(m_ProbingLine);
   m_ProbingLine->SetResolution(512);
-
+  
   m_ProbedVME = NULL;
 
   vtkNEW(m_PlotActor);
@@ -128,8 +128,10 @@ mmi2DMeter::mmi2DMeter()
   m_LineActor2->GetProperty()->SetColor(1.0,0.0,0.0);
 
 	m_GenerateHistogram = false;
-  m_DraggingLine = false;
-  m_EndMeasure  = false;
+  m_DraggingLine  = false;
+  m_DraggingLeft  = false;
+  m_EndMeasure    = false;
+  m_ParallelView  = false;
   m_MeasureType = DISTANCE_BETWEEN_POINTS;
 }
 //---------------------------------------------------------------------
@@ -158,9 +160,6 @@ void mmi2DMeter::OnLeftButtonDown(mafEventInteraction *e)
   double pos_2d[2];
   e->Get2DPosition(pos_2d);
   
-  mafDevice *device = mafDevice::SafeDownCast((mafDevice*)e->GetSender());
-  mmdMouse  *mouse  = mmdMouse::SafeDownCast(device);
-
   mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 
   if(m_EndMeasure)
@@ -168,10 +167,13 @@ void mmi2DMeter::OnLeftButtonDown(mafEventInteraction *e)
     RemoveMeter();
   }
   
+  mafDevice *device = mafDevice::SafeDownCast((mafDevice*)e->GetSender());
+  mmdMouse  *mouse  = mmdMouse::SafeDownCast(device);
   m_CurrentRenderer = mouse->GetRenderer();
-  OnButtonDown(e);  
-  if (m_CurrentRenderer->GetActiveCamera()->GetParallelProjection())
+  m_ParallelView = m_CurrentRenderer->GetActiveCamera()->GetParallelProjection();
+  if (m_ParallelView)
   {
+    OnButtonDown(e);  
     if (m_GenerateHistogram)
     {
       mafView *v = mouse->GetView();
@@ -212,25 +214,28 @@ void mmi2DMeter::OnLeftButtonUp(mafEventInteraction *e)
 	m_DraggingLine = false;
   OnButtonUp(e);
 
-  DrawMeasureTool(pos_2d[0], pos_2d[1]);
-  if(m_EndMeasure)
+  if(m_ParallelView)
   {
-    CalculateMeasure();
-    if (m_GenerateHistogram)
+    DrawMeasureTool(pos_2d[0], pos_2d[1]);
+    if(m_EndMeasure)
     {
-      mafDevice *device = mafDevice::SafeDownCast((mafDevice*)e->GetSender());
-      mmdMouse  *mouse  = mmdMouse::SafeDownCast(device);
-      double pos_2d[2];
-      e->Get2DPosition(pos_2d);
-      mafView *v = mouse->GetView();
-      if(v->Pick(pos_2d[0],pos_2d[1]))
+      CalculateMeasure();
+      if (m_GenerateHistogram)
       {
-        v->GetPickedPosition(m_PickedPoint);
-        m_ProbingLine->SetPoint2(m_PickedPoint);
-        m_ProbingLine->Update();
-        m_ProbedVME = v->GetPickedVme();
+        mafDevice *device = mafDevice::SafeDownCast((mafDevice*)e->GetSender());
+        mmdMouse  *mouse  = mmdMouse::SafeDownCast(device);
+        double pos_2d[2];
+        e->Get2DPosition(pos_2d);
+        mafView *v = mouse->GetView();
+        if(v->Pick(pos_2d[0],pos_2d[1]))
+        {
+          v->GetPickedPosition(m_PickedPoint);
+          m_ProbingLine->SetPoint2(m_PickedPoint);
+          m_ProbingLine->Update();
+          m_ProbedVME = v->GetPickedVme();
+        }
+        CreateHistogram();
       }
-      CreateHistogram();
     }
   }
 }
@@ -254,7 +259,7 @@ void mmi2DMeter::OnMove(mafEventInteraction *e)
 	
   if (!m_DraggingMouse) return;
 
-  if(m_DraggingLeft || m_DraggingLine)
+  if((m_DraggingLeft || m_DraggingLine) && m_ParallelView)
   {
     e->Get2DPosition(pos_2d);
     DrawMeasureTool(pos_2d[0], pos_2d[1]);
@@ -310,6 +315,7 @@ void mmi2DMeter::DrawMeasureTool(double x, double y)
   {
     if(m_MeasureType == DISTANCE_BETWEEN_POINTS)
     {
+      CalculateMeasure();
       m_EndMeasure = true;
     }
     else
@@ -389,7 +395,7 @@ void mmi2DMeter::DrawMeasureTool(double x, double y)
 void mmi2DMeter::CalculateMeasure()
 //----------------------------------------------------------------------------
 {
-  double p1_1[3],p2_1[3],p1_2[3],p2_2[3],vx,vy,vz,d;
+  double p1_1[3],p2_1[3],p1_2[3],p2_2[3],vx,vy,vz;
 
   m_Line->GetPoint1(p1_1);
   m_Line->GetPoint2(p2_1);
@@ -414,8 +420,8 @@ void mmi2DMeter::CalculateMeasure()
 
   if(m_MeasureType == DISTANCE_BETWEEN_POINTS)
   {
-    d = sqrt(vtkMath::Distance2BetweenPoints(p1_1,p2_1));
-    mafEventMacro(mafEvent(this,ID_RESULT_MEASURE,d));
+    m_Distance = sqrt(vtkMath::Distance2BetweenPoints(p1_1,p2_1));
+    mafEventMacro(mafEvent(this,ID_RESULT_MEASURE,m_Distance));
     return;
   }
 
@@ -442,8 +448,8 @@ void mmi2DMeter::CalculateMeasure()
 
   if(m_MeasureType == DISTANCE_BETWEEN_LINES)
   {
-    d = sqrt(vtkLine::DistanceToLine(p1_2,p1_1,p2_1));
-    mafEventMacro(mafEvent(this,ID_RESULT_MEASURE,d));
+    m_Distance = sqrt(vtkLine::DistanceToLine(p1_2,p1_1,p2_1));
+    mafEventMacro(mafEvent(this,ID_RESULT_MEASURE,m_Distance));
     return;
   }
 
@@ -484,6 +490,12 @@ void mmi2DMeter::CreateHistogram()
     vtkDataSet *probed_data = m_ProbedVME->GetOutput()->GetVTKData();
     probed_data->Update();
 
+    m_PlotActor->SetXRange(0,m_Distance);
+    m_PlotActor->SetPlotCoordinate(0,m_Distance);
+
+    m_ProbingLine->SetResolution((int)m_Distance);
+    m_ProbingLine->Update();
+
     vtkMAFSmartPointer<vtkProbeFilter> prober;
     prober->SetInput(m_ProbingLine->GetOutput());
     prober->SetSource(probed_data);
@@ -492,7 +504,7 @@ void mmi2DMeter::CreateHistogram()
     m_PlotActor->RemoveAllInputs();
 
     vtkPolyData *probimg_result = prober->GetPolyDataOutput();
-    
+  /*  
     vtkMAFSmartPointer<vtkImageImport> importer;
     importer->SetWholeExtent(1,512,1,1,1,1); 
     importer->SetDataExtentToWholeExtent(); 
@@ -504,9 +516,9 @@ void mmi2DMeter::CreateHistogram()
     vtkMAFSmartPointer<vtkImageAccumulate> accumulate;
     accumulate->SetInput(importer->GetOutput());
     accumulate->Update();
-
-    //m_PlotActor->AddInput(probimg_result);
-    m_PlotActor->AddInput((vtkDataSet *)accumulate->GetOutput());
+*/
+    m_PlotActor->AddInput(probimg_result);
+    //m_PlotActor->AddInput((vtkDataSet *)accumulate->GetOutput());
     m_HistogramRWI->m_RwiBase->Render();
   }
 }

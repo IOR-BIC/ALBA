@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi2DMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-21 18:21:49 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-11-30 11:33:31 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -129,8 +129,10 @@ protected:
   bool m_DraggingLeft;
   bool m_DraggingMouse;
   bool m_EndMeasure;
+  bool m_ParallelView;
   int  m_MeasureType;
 
+  double  m_Distance;
   double  m_PickedPoint[3]; ///< 3D position of the picked point; used to assign position to the m_ProbingLine
   mafVME *m_ProbedVME; ///< VME probed by the m_ProbingLine
   
