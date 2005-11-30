@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmo2DMeasure.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-21 18:22:15 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-11-30 11:34:44 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,7 +37,7 @@ public:
 	mafOp* Copy();
 	
 	/** Return true for the acceptable vme type. */
-  bool Accept(mafNode *node) {return true;};
+  bool Accept(mafNode *node);
 
 	/** Set the input vme for the operation. */
 	void OpRun();

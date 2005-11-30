@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmo2DMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-21 18:22:15 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-11-30 11:34:43 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,11 +42,21 @@ mafOp(label)
   m_ObtuseAngle = "0";
   m_DistanceMeasure = "0";
   m_MeasureText = "";
+  m_MeasureList = NULL;
+  m_2DMeterInteractor = NULL;
 }
 //----------------------------------------------------------------------------
 mmo2DMeasure::~mmo2DMeasure()
 //----------------------------------------------------------------------------
 {
+}
+//----------------------------------------------------------------------------
+bool mmo2DMeasure::Accept(mafNode *node)
+//----------------------------------------------------------------------------
+{
+  mafEvent e(this,VIEW_SELECTED);
+  mafEventMacro(e);
+  return e.GetBool();
 }
 //----------------------------------------------------------------------------
 mafOp* mmo2DMeasure::Copy()
@@ -60,7 +70,7 @@ mafOp* mmo2DMeasure::Copy()
 enum MEASURE2D_ID
 {
   ID_MEASURE_TYPE = MINID,
-  ID_HISTOGRAM,
+  ID_PLOT_PROFILE,
   ID_STORE_MEASURE,
   ID_REMOVE_MEASURE,
   ID_MEASURE_LIST,
@@ -81,7 +91,7 @@ void mmo2DMeasure::OpRun()
 
   m_Gui->Label("measure type",true);
   m_Gui->Combo(ID_MEASURE_TYPE,"",&m_MeasureType,3,measure);
-  m_Gui->Bool(ID_HISTOGRAM,"histogram",&m_GenerateHistogramFlag);
+  m_Gui->Bool(ID_PLOT_PROFILE,"plot profile",&m_GenerateHistogramFlag);
   m_Gui->Divider();
   m_Gui->Label("distance: ",&m_DistanceMeasure);
   m_Gui->Label("acute angle: ",&m_AcuteAngle);
@@ -99,7 +109,7 @@ void mmo2DMeasure::OpRun()
     //m_Gui->Enable(ID_ADD_TO_VME_TREE,false);
     m_Gui->Enable(ID_REMOVE_MEASURE,false);
   }
-  m_Gui->Enable(ID_HISTOGRAM, m_MeasureType == 0);
+  m_Gui->Enable(ID_PLOT_PROFILE, m_MeasureType == 0);
 
   ShowGui();
 }
@@ -115,9 +125,9 @@ void mmo2DMeasure::OnEvent(mafEventBase *maf_event)
       {
         case ID_MEASURE_TYPE:
           m_2DMeterInteractor->SetMeasureType(m_MeasureType);
-          m_Gui->Enable(ID_HISTOGRAM, m_MeasureType == 0);
+          m_Gui->Enable(ID_PLOT_PROFILE, m_MeasureType == 0);
         break;
-        case ID_HISTOGRAM:
+        case ID_PLOT_PROFILE:
           m_2DMeterInteractor->GenerateHistogram(m_GenerateHistogramFlag != 0);
         break;
         case ID_STORE_MEASURE:
