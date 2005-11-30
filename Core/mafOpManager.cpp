@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 12:02:52 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-11-30 11:26:32 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -142,6 +142,7 @@ void mafOpManager::OpAdd(mafOp *op, wxString menuPath)
   m_OpList[m_NumOp] = op;
   op->m_OpMenuPath = menuPath;
 	op->m_Id = m_NumOp + OP_USER;
+  op->SetListener(this);
   m_NumOp++;
 }
 //----------------------------------------------------------------------------
