@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.h,v $
 Language:  C++
-Date:      $Date: 2005-09-06 10:23:49 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2005-11-30 14:49:56 $
+Version:   $Revision: 1.2 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -19,9 +19,9 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // forward refs :
 //----------------------------------------------------------------------------
 class vtkActor;
-class vtkVolume;
 class vtkContourVolumeMapper;
 class vtkPolyDataMapper;
+class vtkPolyData;
 class vtkOutlineCornerFilter;
 class mafVME;
 class mmgFloatSlider;
@@ -54,14 +54,17 @@ public:
   enum PIPE_ISOSURFACE_WIDGET_ID
   {
     ID_CONTOUR_VALUE = Superclass::ID_LAST,
+    ID_ISOSURFACE_OPACITY,
     ID_LAST
   };
 
 protected:
   virtual mmgGui  *CreateGui();
 
+  vtkPolyData              *m_Isosurface;
   vtkContourVolumeMapper   *m_ContourMapper; 
-  vtkVolume                *m_Volume;
+  vtkPolyDataMapper        *m_IsosurfaceMapper;
+  vtkActor                 *m_IsosurfaceActor;
 
   vtkOutlineCornerFilter   *m_OutlineBox;
   vtkPolyDataMapper        *m_OutlineMapper;
@@ -69,5 +72,6 @@ protected:
 
   mmgFloatSlider  *m_ContourSlider;
   double m_ContourValue;
+  double m_Opacity;
 };  
 #endif // _mafPipeIsosurface_H_
