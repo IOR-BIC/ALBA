@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-28 13:03:30 $
-  Version:   $Revision: 1.48 $
+  Date:      $Date: 2005-11-30 11:27:35 $
+  Version:   $Revision: 1.49 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -125,12 +125,12 @@ void mafLogicWithManagers::Plug(mafView* view)
     m_ViewManager->ViewAdd(view);
 }
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::Plug(mafOp *op)
+void mafLogicWithManagers::Plug(mafOp *op, wxString menuPath)
 //----------------------------------------------------------------------------
 {
   if(m_OpManager) 
   {
-    m_OpManager->OpAdd(op);
+    m_OpManager->OpAdd(op, menuPath);
     
     if (m_InteractionManager)
     {
@@ -276,6 +276,43 @@ void mafLogicWithManagers::CreateMenu()
   EnableItem(MENU_FILE_PRINT_PAGE_SETUP, false);
 }
 //----------------------------------------------------------------------------
+void mafLogicWithManagers::CreateToolbar()
+//----------------------------------------------------------------------------
+{
+  m_ToolBar = new wxToolBar(m_Win,-1,wxPoint(0,0),wxSize(-1,-1),wxHORIZONTAL|wxNO_BORDER|wxTB_FLAT  );
+  m_ToolBar->SetMargins(0,0);
+  m_ToolBar->SetToolSeparation(2);
+  m_ToolBar->SetToolBitmapSize(wxSize(20,20));
+  m_ToolBar->AddTool(MENU_FILE_NEW,mafPics.GetBmp("FILE_NEW"),    "new msf storage file");
+  m_ToolBar->AddTool(MENU_FILE_OPEN,mafPics.GetBmp("FILE_OPEN"),  "open msf storage file");
+  m_ToolBar->AddTool(MENU_FILE_SAVE,mafPics.GetBmp("FILE_SAVE"),  "save current msf storage file");
+  m_ToolBar->AddSeparator();
+
+  m_ToolBar->AddTool(MENU_FILE_PRINT,mafPics.GetBmp("PRINT"),  "print the selected view");
+  m_ToolBar->AddTool(MENU_FILE_PRINT_PREVIEW,mafPics.GetBmp("PRINT_PREVIEW"),  "show the print preview for the selected view");
+  m_ToolBar->AddSeparator();
+
+  m_ToolBar->AddTool(OP_UNDO,mafPics.GetBmp("OP_UNDO"),  "undo (ctrl+z)"); //correggere tooltip - shortcut sbagliati
+  m_ToolBar->AddTool(OP_REDO,mafPics.GetBmp("OP_REDO"),  "redo (ctrl+shift+z)");
+  m_ToolBar->AddSeparator();
+
+  m_ToolBar->AddTool(OP_CUT,  mafPics.GetBmp("OP_CUT"),  "cut selected vme (ctrl+x)");
+  m_ToolBar->AddTool(OP_COPY, mafPics.GetBmp("OP_COPY"), "copy selected vme (ctrl+c)");
+  m_ToolBar->AddTool(OP_PASTE,mafPics.GetBmp("OP_PASTE"),"paste vme (ctrl+v)");
+  m_ToolBar->AddSeparator();
+  m_ToolBar->AddTool(CAMERA_RESET,mafPics.GetBmp("ZOOM_ALL"),"reset camera to fit all (ctrl+f)");
+  m_ToolBar->AddTool(CAMERA_FIT,  mafPics.GetBmp("ZOOM_SEL"),"reset camera to fit selected object (ctrl+shift+f)");
+  m_ToolBar->AddTool(CAMERA_FLYTO,mafPics.GetBmp("FLYTO"),"fly to object under mouse (press f inside a 3Dview)");
+  m_ToolBar->Realize();
+  m_Win->SetToolBar(m_ToolBar);
+
+  EnableItem(CAMERA_RESET, false);
+  EnableItem(CAMERA_FIT,   false);
+  EnableItem(CAMERA_FLYTO, false);
+  EnableItem(MENU_FILE_PRINT, false);
+  EnableItem(MENU_FILE_PRINT_PREVIEW, false);
+}
+//----------------------------------------------------------------------------
 void mafLogicWithManagers::UpdateFrameTitle()
 //----------------------------------------------------------------------------
 {
@@ -299,148 +336,151 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
     {
       // ###############################################################
       // commands related to FILE MENU  
-    case MENU_FILE_NEW:
-      OnFileNew();
+      case MENU_FILE_NEW:
+        OnFileNew();
       break; 
-    case MENU_FILE_OPEN:
-      {
-        mafString *filename = e->GetString();
-        if(filename)
-          OnFileOpen((*filename).GetCStr());
+      case MENU_FILE_OPEN:
+        {
+          mafString *filename = e->GetString();
+          if(filename)
+            OnFileOpen((*filename).GetCStr());
+          else
+            OnFileOpen();
+          UpdateFrameTitle();
+        }
+      break; 
+      case wxID_FILE1:
+      case wxID_FILE2:
+      case wxID_FILE3:
+      case wxID_FILE4:
+      case wxID_FILE5:
+      case wxID_FILE6:
+      case wxID_FILE7:
+      case wxID_FILE8:
+      case wxID_FILE9:
+        OnFileHistory(e->GetId());
+      break;
+      case MENU_FILE_SAVE:
+        OnFileSave();
+      break; 
+      case MENU_FILE_SAVEAS:
+        OnFileSaveAs();
+      break; 
+      case MENU_FILE_PRINT:
+        if (m_ViewManager && m_PrintSupport)
+          m_PrintSupport->OnPrint(m_ViewManager->GetSelectedView());
+      break;
+      case MENU_FILE_PRINT_PREVIEW:
+        if (m_ViewManager && m_PrintSupport)
+          m_PrintSupport->OnPrintPreview(m_ViewManager->GetSelectedView());
+      break;
+      case MENU_FILE_PRINT_SETUP:
+        if (m_PrintSupport)
+          m_PrintSupport->OnPrintSetup();
+      break;
+      case MENU_FILE_PRINT_PAGE_SETUP:
+        if (m_PrintSupport)
+          m_PrintSupport->OnPageSetup();
+      break;
+      case MENU_FILE_QUIT:
+        OnQuit();		
+      break; 
+        // ###############################################################
+        // commands related to VME
+      case VME_SELECT:	
+        VmeSelect(*e);		
+      break; 
+      case VME_SELECTED: 
+        VmeSelected(e->GetVme());
+      break;
+      case VME_SHOW:
+        VmeShow(e->GetVme(), e->GetBool());
+      break;
+      case VME_MODIFIED:
+        VmeModified(e->GetVme());
+      break; 
+      case VME_ADD:
+        VmeAdd(e->GetVme());
+      break; 
+      case VME_ADDED:
+        VmeAdded(e->GetVme());
+      break; 
+      case VME_REMOVE:
+        VmeRemove(e->GetVme());
+      break; 
+      case VME_REMOVING:
+        VmeRemoving(e->GetVme());
+      break; 
+      case VME_CHOOSE:
+        {
+          mafString *s = e->GetString();
+          if(s != NULL)
+            e->SetVme(VmeChoose(e->GetArg(), e->GetBool(), *s));
+          else
+            e->SetVme(VmeChoose(e->GetArg(), e->GetBool()));
+        }
+      break;
+      case VME_CHOOSE_MATERIAL:
+        VmeChooseMaterial((mafVME *)e->GetVme(), e->GetBool());
+      break;
+      case SHOW_CONTEXTUAL_MENU:
+        if (e->GetSender() == m_SideBar->GetTree())
+          TreeContextualMenu(*e);
         else
-          OnFileOpen();
-        UpdateFrameTitle();
-      }
-      break; 
-    case wxID_FILE1:
-    case wxID_FILE2:
-    case wxID_FILE3:
-    case wxID_FILE4:
-    case wxID_FILE5:
-    case wxID_FILE6:
-    case wxID_FILE7:
-    case wxID_FILE8:
-    case wxID_FILE9:
-      OnFileHistory(e->GetId());
+          ViewContextualMenu(e->GetBool());
       break;
-    case MENU_FILE_SAVE:
-      OnFileSave();
-      break; 
-    case MENU_FILE_SAVEAS:
-      OnFileSaveAs();
-      break; 
-    case MENU_FILE_PRINT:
-      if (m_ViewManager && m_PrintSupport)
-        m_PrintSupport->OnPrint(m_ViewManager->GetSelectedView());
+        // ###############################################################
+        // commands related to OP
+      case MENU_OP:
+        if(m_OpManager) m_OpManager->OpRun(e->GetArg());
       break;
-    case MENU_FILE_PRINT_PREVIEW:
-      if (m_ViewManager && m_PrintSupport)
-        m_PrintSupport->OnPrintPreview(m_ViewManager->GetSelectedView());
-      break;
-    case MENU_FILE_PRINT_SETUP:
-      if (m_PrintSupport)
-        m_PrintSupport->OnPrintSetup();
-      break;
-    case MENU_FILE_PRINT_PAGE_SETUP:
-      if (m_PrintSupport)
-        m_PrintSupport->OnPageSetup();
-      break;
-    case MENU_FILE_QUIT:
-      OnQuit();		
+      case OP_RUN_STARTING:
+        OpRunStarting();
       break; 
-      // ###############################################################
-      // commands related to VME
-    case VME_SELECT:	
-      VmeSelect(*e);		
+      case OP_RUN_TERMINATED:
+        OpRunTerminated();
       break; 
-    case VME_SELECTED: 
-      VmeSelected(e->GetVme());
+      case OP_SHOW_GUI:
+        OpShowGui(!e->GetBool(), (mmgPanel*)e->GetWin());
+      break; 
+      case OP_HIDE_GUI:
+        OpHideGui(e->GetBool());
+      break; 
+      case OP_FORCE_STOP:
+        m_OpManager->StopCurrentOperation();
       break;
-    case VME_SHOW:
-      VmeShow(e->GetVme(), e->GetBool());
+        // ###############################################################
+        // commands related to VIEWS
+      case VIEW_CREATE:
+        ViewCreate(e->GetArg());
       break;
-    case VME_MODIFIED:
-      VmeModified(e->GetVme());
-      break; 
-    case VME_ADD:
-      VmeAdd(e->GetVme());
-      break; 
-    case VME_ADDED:
-      VmeAdded(e->GetVme());
-      break; 
-    case VME_REMOVE:
-      VmeRemove(e->GetVme());
-      break; 
-    case VME_REMOVING:
-      VmeRemoving(e->GetVme());
-      break; 
-    case VME_CHOOSE:
-      {
-        mafString *s = e->GetString();
-        if(s != NULL)
-          e->SetVme(VmeChoose(e->GetArg(), e->GetBool(), *s));
-        else
-          e->SetVme(VmeChoose(e->GetArg(), e->GetBool()));
-      }
+      case VIEW_CREATED:
+        ViewCreated(e->GetView());
       break;
-    case VME_CHOOSE_MATERIAL:
-      VmeChooseMaterial((mafVME *)e->GetVme(), e->GetBool());
-      break;
-    case SHOW_CONTEXTUAL_MENU:
-      if (e->GetSender() == m_SideBar->GetTree())
-        TreeContextualMenu(*e);
-      else
-        ViewContextualMenu(e->GetBool());
-      break;
-      // ###############################################################
-      // commands related to OP
-    case MENU_OP:
-      if(m_OpManager) m_OpManager->OpRun(e->GetArg());
-      break;
-    case OP_RUN_STARTING:
-      OpRunStarting();
-      break; 
-    case OP_RUN_TERMINATED:
-      OpRunTerminated();
-      break; 
-    case OP_SHOW_GUI:
-      OpShowGui(!e->GetBool(), (mmgPanel*)e->GetWin());
-      break; 
-    case OP_HIDE_GUI:
-      OpHideGui(e->GetBool());
-      break; 
-    case OP_FORCE_STOP:
-      m_OpManager->StopCurrentOperation();
-      break;
-      // ###############################################################
-      // commands related to VIEWS
-    case VIEW_CREATE:
-      ViewCreate(e->GetArg());
-      break;
-    case VIEW_CREATED:
-      ViewCreated(e->GetView());
-      break;
-    case VIEW_DELETE:
-      if(m_PlugSidebar)
-        this->m_SideBar->ViewDeleted(e->GetView()); // changed By Marco (is it correct?)
-      if(m_InteractionManager)
-        m_InteractionManager->ViewSelected(NULL);
-      if (m_ViewManager)
-      {
-        EnableItem(CAMERA_RESET, false);
-        EnableItem(CAMERA_FIT,   false);
-        EnableItem(CAMERA_FLYTO, false);
+      case VIEW_DELETE:
+        if(m_PlugSidebar)
+          this->m_SideBar->ViewDeleted(e->GetView()); // changed By Marco (is it correct?)
+        if(m_InteractionManager)
+          m_InteractionManager->ViewSelected(NULL);
+        if (m_ViewManager)
+        {
+          EnableItem(CAMERA_RESET, false);
+          EnableItem(CAMERA_FIT,   false);
+          EnableItem(CAMERA_FLYTO, false);
 
-        EnableItem(MENU_FILE_PRINT, false);
-        EnableItem(MENU_FILE_PRINT_PREVIEW, false);
-        EnableItem(MENU_FILE_PRINT_SETUP, false);
-        EnableItem(MENU_FILE_PRINT_PAGE_SETUP, false);
-      }
+          EnableItem(MENU_FILE_PRINT, false);
+          EnableItem(MENU_FILE_PRINT_PREVIEW, false);
+          EnableItem(MENU_FILE_PRINT_SETUP, false);
+          EnableItem(MENU_FILE_PRINT_PAGE_SETUP, false);
+        }
       break;	
-    case VIEW_SELECT:
-      ViewSelect();
+      case VIEW_SELECT:
+        ViewSelect();
       break;
-    case VIEW_SAVE_IMAGE:
+      case VIEW_SELECTED:
+        e->SetBool(m_ViewManager->GetSelectedView() != NULL);
+      break;
+      case VIEW_SAVE_IMAGE:
       {
         mafView *v = m_ViewManager->GetSelectedView();
         if (v)
@@ -449,80 +489,80 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
         }
       }
       break;
-    case CAMERA_RESET:
-      if(m_ViewManager) m_ViewManager->CameraReset();
+      case CAMERA_RESET:
+        if(m_ViewManager) m_ViewManager->CameraReset();
       break; 
-    case CAMERA_FIT:
-      if(m_ViewManager) m_ViewManager->CameraReset(true);
+      case CAMERA_FIT:
+        if(m_ViewManager) m_ViewManager->CameraReset(true);
       break;
-    case CAMERA_FLYTO:
-      if(m_ViewManager) m_ViewManager->CameraFlyToMode();
-      if(m_InteractionManager) m_InteractionManager->CameraFlyToMode();  //modified by Marco. 15-9-2004 fly to with devices.
+      case CAMERA_FLYTO:
+        if(m_ViewManager) m_ViewManager->CameraFlyToMode();
+        if(m_InteractionManager) m_InteractionManager->CameraFlyToMode();  //modified by Marco. 15-9-2004 fly to with devices.
       break;
-    case TIME_SET:
-      TimeSet(e->GetDouble());
+      case TIME_SET:
+        TimeSet(e->GetDouble());
       break;
-    // ###############################################################
-    // commands related to interaction manager
-    case MENU_OPTION_DEVICE_SETTINGS:
-      m_InteractionManager->ShowModal();
+      // ###############################################################
+      // commands related to interaction manager
+      case MENU_OPTION_DEVICE_SETTINGS:
+        m_InteractionManager->ShowModal();
       break;
-    case CAMERA_PRE_RESET:
-      if(m_InteractionManager) 
-      {
-        vtkRenderer *ren = (vtkRenderer*)e->GetVtkObj();
-        //assert(ren);
-        m_InteractionManager->PreResetCamera(ren);
-        //mafLogMessage("CAMERA_PRE_RESET");
-      }
+      case CAMERA_PRE_RESET:
+        if(m_InteractionManager) 
+        {
+          vtkRenderer *ren = (vtkRenderer*)e->GetVtkObj();
+          //assert(ren);
+          m_InteractionManager->PreResetCamera(ren);
+          //mafLogMessage("CAMERA_PRE_RESET");
+        }
       break;
-    case CAMERA_POST_RESET:
-      if(m_InteractionManager) 
-      {
-        vtkRenderer *ren = (vtkRenderer*)e->GetVtkObj();
-        //assert(ren); //modified by Marco. 2-11-2004 Commented out to allow reset camera of all cameras.
-        m_InteractionManager->PostResetCamera(ren);
-        //mafLogMessage("CAMERA_POST_RESET");
-      }
+      case CAMERA_POST_RESET:
+        if(m_InteractionManager) 
+        {
+          vtkRenderer *ren = (vtkRenderer*)e->GetVtkObj();
+          //assert(ren); //modified by Marco. 2-11-2004 Commented out to allow reset camera of all cameras.
+          m_InteractionManager->PostResetCamera(ren);
+          //mafLogMessage("CAMERA_POST_RESET");
+        }
       break;
-    case CAMERA_UPDATE:
-      if(m_ViewManager) m_ViewManager->CameraUpdate();
-      if(m_InteractionManager) m_InteractionManager->CameraUpdate(e->GetView());
+      case CAMERA_UPDATE:
+        if(m_ViewManager) m_ViewManager->CameraUpdate();
+        if(m_InteractionManager) m_InteractionManager->CameraUpdate(e->GetView());
       break;
-    case CAMERA_SYNCHRONOUS_UPDATE:     
-      m_ViewManager->CameraUpdate();
+      case CAMERA_SYNCHRONOUS_UPDATE:     
+        m_ViewManager->CameraUpdate();
       break;
-    case INTERACTOR_ADD:
-      if(m_InteractionManager)
-      {
-        mafInteractor *interactor = mafInteractor::SafeDownCast(e->GetMafObject());
-        assert(interactor);
-        mafString *action_name = e->GetString();
-        m_InteractionManager->BindAction(*action_name,interactor);
-      }
+      case INTERACTOR_ADD:
+        if(m_InteractionManager)
+        {
+          mafInteractor *interactor = mafInteractor::SafeDownCast(e->GetMafObject());
+          assert(interactor);
+          mafString *action_name = e->GetString();
+          m_InteractionManager->BindAction(*action_name,interactor);
+        }
       break;
-    case INTERACTOR_REMOVE:
-      if(m_InteractionManager) 
-      {
-        mafInteractor *interactor = mafInteractor::SafeDownCast(e->GetMafObject());
-        assert(interactor);
-        mafString *action_name = e->GetString();
-        m_InteractionManager->UnBindAction(*action_name,interactor);
-      }
+      case INTERACTOR_REMOVE:
+        if(m_InteractionManager) 
+        {
+          mafInteractor *interactor = mafInteractor::SafeDownCast(e->GetMafObject());
+          assert(interactor);
+          mafString *action_name = e->GetString();
+          m_InteractionManager->UnBindAction(*action_name,interactor);
+        }
       break;
-    case PER_PUSH:
-      if(m_InteractionManager)
-      {        
-        mmiPER *per = mmiPER::SafeDownCast(e->GetMafObject());
-        assert(per);
-        m_InteractionManager->PushPER(per);
-      }
+      case PER_PUSH:
+        if(m_InteractionManager)
+        {
+          mmiPER *per = mmiPER::SafeDownCast(e->GetMafObject());
+          assert(per);
+          m_InteractionManager->PushPER(per);
+        }
       break; 
-    case PER_POP:
-      if(m_InteractionManager) m_InteractionManager->PopPER();
+      case PER_POP:
+        if(m_InteractionManager) m_InteractionManager->PopPER();
       break;
-    default:
-      mafLogicWithGUI::OnEvent(maf_event);
+      default:
+        mafLogicWithGUI::OnEvent(maf_event);
       break; 
     } // end switch case
   } // end if SafeDowncast
@@ -826,6 +866,11 @@ void mafLogicWithManagers::ViewSelect()
     if (m_InteractionManager)
     {
       m_InteractionManager->ViewSelected(view);
+    }
+    if(m_OpManager) 
+    {
+      // needed to update all the operations that will be enabled on View Creation
+      m_OpManager->VmeSelected(m_OpManager->GetSelectedVme());
     }
   }
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-28 13:03:31 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2005-11-30 11:27:35 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -77,7 +77,7 @@ public:
 	virtual void Plug(mafView* view);
 
   /**  Plug a new operation */
-	virtual void Plug(mafOp *op);
+	virtual void Plug(mafOp *op, wxString menuPath = "");
 	
   /** Configure the application plugging all the managers and the side-bar panel. */
   virtual void Configure();
@@ -120,8 +120,13 @@ protected:
   virtual void TimeSet(float t);
 //---------------------------------------------------------
   
-  /**  Redefined to add View,Op,Import,Export menu */
+  /**
+  Redefined to add View,Op,Import,Export menu */
   virtual void CreateMenu();
+
+  /**
+  Redefined to add Print buttons */
+  virtual void CreateToolbar();
 
 
   // EVENT HANDLERS
