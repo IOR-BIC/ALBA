@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-09 13:58:34 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-11-30 13:09:32 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -136,7 +136,10 @@ vtkRenderer *mmdMouse::GetRenderer()
 //------------------------------------------------------------------------------
 {
   vtkRenderer *r = NULL;
-  r = m_SelectedRWI->FindPokedRenderer((int)m_LastPosition[0],(int)m_LastPosition[1]);
+  if (m_SelectedView)
+  {
+    r = m_SelectedRWI->FindPokedRenderer((int)m_LastPosition[0],(int)m_LastPosition[1]);
+  }
 
   return r;
 }
