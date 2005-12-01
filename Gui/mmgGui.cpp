@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-14 16:53:53 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2005-12-01 15:21:07 $
+  Version:   $Revision: 1.27 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,7 +27,18 @@
 #include "mmgGui.h"
 #include "mmgButton.h"
 #include "mmgPicButton.h"
+#include "mmgLutSwatch.h"
+
 #include "mafString.h"
+
+// ugly hack to make FindWindow Work
+// if you remove this line you will have a Compile-Error "FindWindowA is not defined for wxWindow"
+// .... waiting a better workaround. SIL 30/11/05 
+#include <wx/msw/winundef.h> 
+// end of hack
+
+
+
 //----------------------------------------------------------------------------
 // constant
 //----------------------------------------------------------------------------
@@ -995,6 +1006,23 @@ void mmgGui::Color(int id,wxString label,wxColour* var, wxString tooltip)
 	sizer->Add( lab,  0, wxRIGHT, LM);
 	sizer->Add( text, 0, wxRIGHT, HM);
 	sizer->Add( butt, 0);
+  Add(sizer,0,wxALL, M); 
+}
+//----------------------------------------------------------------------------
+void mmgGui::Lut(int id,wxString label,vtkLookupTable *lut)
+//----------------------------------------------------------------------------
+{
+  wxStaticText	*lab  = new wxStaticText(this, GetId(id), label,dp, wxSize(LW,LH), wxALIGN_RIGHT );
+  if(m_UseBackgroundColor) lab->SetBackgroundColour(m_BackgroundColor);
+
+  mmgLutSwatch *luts = new mmgLutSwatch (this,GetId(id), dp, wxSize(DW,18), wxTAB_TRAVERSAL | wxSIMPLE_BORDER );
+  luts->SetLut(lut);
+  luts->SetEditable(true);
+  luts->SetListener(this);
+
+  wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
+  sizer->Add( lab,  0, wxRIGHT, LM);
+  sizer->Add( luts, 0, wxEXPAND, HM);
   Add(sizer,0,wxALL, M); 
 }
 //----------------------------------------------------------------------------

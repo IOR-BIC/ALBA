@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-14 16:53:53 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2005-12-01 15:21:07 $
+  Version:   $Revision: 1.23 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -25,7 +25,7 @@
 //----------------------------------------------------------------------------
 class mmgFloatSlider;
 class mmgCheckListBox;
-
+class vtkLookupTable;
 //----------------------------------------------------------------------------
 // Constants :
 //----------------------------------------------------------------------------
@@ -169,6 +169,9 @@ public:
 
   /** Colour dialog widget. */
   void Color   (int id,wxString label,wxColour *var, wxString tooltip = "");
+
+  /** LookupTable dialog widget. */
+  void Lut(int id,wxString label,vtkLookupTable *lut);
 
   /** Button widget. */
   void Button  (int id,mafString button_text,mafString label="", mafString tooltip=""); 
