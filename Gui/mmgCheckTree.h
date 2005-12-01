@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:54:05 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-12-01 12:14:45 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -100,11 +100,11 @@ public:
   virtual void OnSelectionChanged(wxTreeEvent& event);
 
 protected:
-  mafView  *m_View;
-  mafNode  *m_ClickedVme;
+  mafView *m_View;
+  mafNode *m_SelectedNode;
   //bool      m_CheckCrypto;
-  bool      m_CanSelect;
-  wxMenu   *m_RMenu;	
+  bool     m_CanSelect;
+  wxMenu  *m_RMenu;	
 
   typedef std::map<wxString,int> MapClassNameToIcon;
   MapClassNameToIcon m_MapClassNameToIcon;
@@ -112,5 +112,3 @@ protected:
   DECLARE_EVENT_TABLE()
 }; // end of mmgCheckTree
 #endif
-
-

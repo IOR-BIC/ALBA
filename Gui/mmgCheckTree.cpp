@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 11:10:06 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-12-01 12:14:44 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -86,8 +86,8 @@ mmgCheckTree::mmgCheckTree( wxWindow* parent,wxWindowID id, bool CloseButton, bo
 //----------------------------------------------------------------------------
 {
   m_View = NULL;
-	m_ClickedVme = NULL;
   m_CanSelect	= true;
+  m_SelectedNode = NULL;
   m_RMenu	= NULL;
 
   m_tree->PushEventHandler( new mmgCheckTreeEvtHandler(this) );
@@ -181,6 +181,10 @@ void mmgCheckTree::OnIconClick(wxTreeItemId item)
   if(status != NODE_NON_VISIBLE)		
   {
     bool show = !(status == NODE_VISIBLE_ON || status == NODE_MUTEX_ON ); 
+    if (!show && !this->m_CanSelect && m_SelectedNode && m_SelectedNode == vme)
+    {
+      return;
+    }
     mafEventMacro(mafEvent(this, VME_SHOW, vme, show));
     mafEventMacro(mafEvent(this, CAMERA_UPDATE));
   }
@@ -197,12 +201,17 @@ void mmgCheckTree::VmeRemove(mafNode *vme)
 //----------------------------------------------------------------------------
 {
   this->DeleteNode((long)vme);
+  if (m_SelectedNode == vme)
+  {
+    m_SelectedNode = NULL;
+  }
 }
 //----------------------------------------------------------------------------
 void mmgCheckTree::VmeSelected(mafNode *vme)   
 //----------------------------------------------------------------------------
 {
   this->SelectNode((long)vme);
+  m_SelectedNode = vme;
 }
 //----------------------------------------------------------------------------
 void mmgCheckTree::VmeModified(mafNode *vme)
