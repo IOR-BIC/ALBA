@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-30 11:26:32 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-12-01 11:14:12 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,6 +20,7 @@
 //----------------------------------------------------------------------------
 
 
+#include "mafOpManager.h"
 #include <wx/tokenzr.h>
 #include "mafDecl.h"
 #include "mafOp.h"
@@ -27,8 +28,8 @@
 #include "mafOpContextStack.h"
 #include "mafOpSelect.h"
 #include "mmdMouse.h"
-#include "mafOpManager.h"
 #include "mafNode.h"
+
 #include "vtkMatrix4x4.h"
 
 /**
@@ -395,31 +396,23 @@ void mafOpManager::OpRun(int op_id)
 void mafOpManager::OpRun(mafOp *op)   
 //----------------------------------------------------------------------------
 {
-	//Code to manage Natural Preserving
- //SIL. 9-4-2005: should be re-inserted in a new Medical-Oriented OpManager
-	/*
-  if(m_Selected->GetTagArray()->FindTag("VME_NATURE") != -1)
+	//Code to manage operation's Input Preserving
+	if(!op->IsInputPreserving())
 	{
-		wxString nat("NATURAL");
-		if(m_Selected->GetTagArray()->GetTag("VME_NATURE")->GetValue() == nat && !op->IsNaturalPreserving())
-		{
-			wxString warning_msg = "To presere natural VME a copy is required! This should take a lot of memory and time. continue?";
-			wxString synthetic_name = "Synthetic ";
-			wxMessageDialog dialog(mafGetFrame(),warning_msg, "Natural VME Preserving Warning",wxYES_NO|wxYES_DEFAULT);
-			if(dialog.ShowModal() == wxID_NO) 
-				return;
-      mafNode *synthetic_vme = m_Selected->MakeCopy();
-			synthetic_vme->GetTagArray()->GetTag("VME_NATURE")->SetValue("SYNTHETIC");
-			synthetic_vme->ReparentTo(m_Selected->GetParent());
-			synthetic_name.Append(m_Selected->GetName());
-			synthetic_vme->SetName(synthetic_name);
-			mafEventMacro(mafEvent(this,VME_ADD,synthetic_vme));
+		wxString warning_msg = "The operation do not preserve input VME integrity, a copy is required! \nThis should take a lot of memory and time depending on data dimension. \nDo you want to make a copy?";
+		wxMessageDialog dialog(mafGetFrame(),warning_msg, "VME Preserving Warning",wxYES_NO|wxYES_DEFAULT);
+		if(dialog.ShowModal() == wxID_YES)
+    {
+      wxString synthetic_name = "Copyed ";
+      mafAutoPointer<mafNode> synthetic_vme = m_Selected->MakeCopy();
+      synthetic_vme->ReparentTo(m_Selected->GetParent());
+      synthetic_name.Append(m_Selected->GetName());
+      synthetic_vme->SetName(synthetic_name);
       OpSelect(synthetic_vme);
-			mafEventMacro(mafEvent(this,VME_SHOW,synthetic_vme,true));
-			synthetic_vme->Delete();
-		}
+      mafEventMacro(mafEvent(this,VME_SHOW,synthetic_vme,true));
+    }
 	}
-  */
+
 	EnableOp(false);
   //Notify(OP_RUN_STARTING); //SIL. 17-9-2004: --- moved after m_RunningOp has been set
 
