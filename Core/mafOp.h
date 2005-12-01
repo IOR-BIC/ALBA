@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-15 15:19:22 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-12-01 11:13:43 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -87,7 +87,7 @@ public:
 	//bool IsOp();
 
 	/** Return true if the operation preserve the input vme. */
-	bool IsNaturalPreserving() {return m_NaturalPreserving;};
+	bool IsInputPreserving() {return m_InputPreserving;};
 
 	/** Puts the operation's interface into the gui holder and send the event to plug the interface on the side bar. */
 	void ShowGui();
@@ -128,7 +128,7 @@ protected:
 	mmgGuiHolder	 *m_Guih;
 	bool 						m_Canundo;
 	int 						m_OpType;
-	bool						m_NaturalPreserving;
+	bool						m_InputPreserving;
 	mafObserver    *m_Listener;
   mmdMouse       *m_Mouse;
 };

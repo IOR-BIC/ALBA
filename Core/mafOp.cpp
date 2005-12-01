@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-30 11:26:50 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-12-01 11:13:42 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,7 +43,7 @@ mafOp::mafOp(wxString label)
   m_MenuItem  = NULL;
   m_Mouse     = NULL;
   m_Compatibility     = 0xFFFF;
-  m_NaturalPreserving = true;
+  m_InputPreserving = true;
 }
 //----------------------------------------------------------------------------
 mafOp::mafOp()
@@ -61,7 +61,7 @@ mafOp::mafOp()
   m_Output    = NULL;
   m_Mouse     = NULL;
 	m_Compatibility     = 0xFFFF;
-  m_NaturalPreserving = true;
+  m_InputPreserving = true;
 }
 //----------------------------------------------------------------------------
 mafOp::~mafOp() 

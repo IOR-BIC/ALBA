@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoFilterSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-11 15:24:27 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-12-01 11:13:32 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -44,7 +44,7 @@ mafOp(label)
 	m_OpType	= OPTYPE_OP;
 	m_Canundo	= true;
 
-	m_NaturalPreserving = false;
+	m_InputPreserving = false;
 
   m_PreviewResultFlag	= false;
 	m_ClearInterfaceFlag= false;
