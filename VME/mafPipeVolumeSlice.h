@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-30 11:35:14 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-12-01 16:33:40 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -64,6 +64,7 @@ public:
   enum PIPE_VOLUME_SLICE_WIDGET_ID
   {
     ID_RGB_LUT = Superclass::ID_LAST,
+    ID_LUT_CHOOSER,
     ID_SLICE_SLIDER_X,
     ID_SLICE_SLIDER_Y,
     ID_SLICE_SLIDER_Z,
@@ -143,7 +144,7 @@ protected:
 	vtkVolumeSlicer				 *m_SlicerPolygonal[3];
 	vtkImageData					 *m_Image[3];
 	vtkTexture						 *m_Texture[3];
-  vtkLookupTable         *m_ColorLUT[3];
+  vtkLookupTable         *m_ColorLUT;
   vtkPolyDataMapper			 *m_SliceMapper[3];
 	vtkPolyData						 *m_SlicePolydata[3];
   vtkActor               *m_SliceActor[3];

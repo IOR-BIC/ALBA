@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-30 11:35:14 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-12-01 16:33:39 $
+  Version:   $Revision: 1.16 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -65,7 +65,6 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
     m_SlicerImage[i]			= NULL;
     m_Image[i]            = NULL;
     m_Texture[i]		      = NULL;
-    m_ColorLUT[i]         = NULL;
     m_SlicePolydata[i]		= NULL;
     m_SliceMapper[i]		  = NULL;
     m_SliceActor[i]	      = NULL;
@@ -75,6 +74,7 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
   m_ShowVolumeBox               = false;
   
   m_AssemblyUsed = NULL;
+  m_ColorLUT = NULL;
 
   m_UnitLength = 10; // 10 mm
   m_ShowUnit = false;
@@ -177,6 +177,13 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
   m_Vme->GetOutput()->Update();
   m_Vme->GetOutput()->GetVTKData()->Update();
   m_Vme->GetOutput()->GetVMELocalBounds(b);
+
+  double srange[2];
+  m_Vme->GetOutput()->GetVTKData()->GetScalarRange(srange);
+  
+  vtkNEW(m_ColorLUT);
+  m_ColorLUT->SetRange(srange);
+  m_ColorLUT->Build();
 
 	if(m_SliceMode == SLICE_ARB)
 		m_SliceMode = SLICE_X;
@@ -366,16 +373,12 @@ void mafPipeVolumeSlice::CreateSlice(int mode)
   m_SlicerImage[mode]->SetLevel(l);
 	m_SlicerImage[mode]->Update();
 
-  vtkNEW(m_ColorLUT[mode]);
-  m_ColorLUT[mode]->SetRange(srange);
-  m_ColorLUT[mode]->Build();
-  
 	vtkNEW(m_Texture[mode]);
 	m_Texture[mode]->RepeatOff();
 	m_Texture[mode]->InterpolateOn();
 	m_Texture[mode]->SetQualityTo32Bit();
 	m_Texture[mode]->SetInput(m_Image[mode]);
-  m_Texture[mode]->SetLookupTable(m_ColorLUT[mode]);
+  m_Texture[mode]->SetLookupTable(m_ColorLUT);
 
   vtkNEW(m_SlicePolydata[mode]);
 	m_SlicerPolygonal[mode]->SetOutput(m_SlicePolydata[mode]);
@@ -384,7 +387,7 @@ void mafPipeVolumeSlice::CreateSlice(int mode)
 
 	vtkNEW(m_SliceMapper[mode]);
 	m_SliceMapper[mode]->SetInput(m_SlicePolydata[mode]);
-	m_SliceMapper[mode]->ScalarVisibilityOff();
+	m_SliceMapper[mode]->ScalarVisibilityOn();
 
 	vtkNEW(m_SliceActor[mode]);
 	m_SliceActor[mode]->SetMapper(m_SliceMapper[mode]);
@@ -412,11 +415,11 @@ mafPipeVolumeSlice::~mafPipeVolumeSlice()
 		vtkDEL(m_SlicerPolygonal[i]);
 		vtkDEL(m_Image[i]);
 		vtkDEL(m_Texture[i]);
-    vtkDEL(m_ColorLUT[i]);
 		vtkDEL(m_SliceMapper[i]);
 		vtkDEL(m_SlicePolydata[i]);
 		vtkDEL(m_SliceActor[i]);
 	}
+  vtkDEL(m_ColorLUT);
 	vtkDEL(m_VolumeBox);
 	vtkDEL(m_VolumeBoxMapper);
 	vtkDEL(m_VolumeBoxActor);
@@ -569,6 +572,7 @@ mmgGui *mafPipeVolumeSlice::CreateGui()
   double b[6] = {-1,1,-1,1,-1,1};
   m_Gui = new mmgGui(this);
   m_Gui->Bool(ID_RGB_LUT,"rgb lut", &m_ColorLUTEnabled,0,"turn on/off RGB LUT");
+  m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
   m_Vme->GetOutput()->GetVMELocalBounds(b);
   if (m_SliceMode == SLICE_X || m_SliceMode == SLICE_ORTHO)
   {
@@ -598,6 +602,9 @@ void mafPipeVolumeSlice::OnEvent(mafEventBase *maf_event)
         ColorLookupTable(m_ColorLUTEnabled != 0);
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       }
+      break;
+      case ID_LUT_CHOOSER:
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
       case ID_SLICE_SLIDER_X:
       case ID_SLICE_SLIDER_Y:
