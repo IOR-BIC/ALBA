@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-21 18:19:28 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-12-01 11:41:06 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -89,7 +89,6 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
     if (m_SliderX)
     {
       double b[6];
-      //data->GetBounds(b);
       m_CurrentVolume->GetOutput()->GetVMELocalBounds(b);
       m_Origin[0] = (b[0]+b[1])*.5;
       m_Origin[1] = (b[2]+b[3])*.5;
@@ -154,9 +153,12 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
 mmgGui* mafViewOrthoSlice::CreateGui()
 //-------------------------------------------------------------------------
 {
+  wxString layout_choices[3] = {"default","layout 1","layout 2"};
+
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
-  m_Gui->Label("OS GUI", true);
+  m_Gui->Combo(ID_LAYOUT_CHOOSER,"layout",&m_LayoutConfiguration,3,layout_choices);
+  m_Gui->Divider();
   m_SliderX = m_Gui->FloatSlider(ID_ORTHO_SLICE_X, "x", &m_Origin[0],MINDOUBLE,MAXDOUBLE);
   m_SliderY = m_Gui->FloatSlider(ID_ORTHO_SLICE_Y, "y", &m_Origin[1],MINDOUBLE,MAXDOUBLE);
   m_SliderZ = m_Gui->FloatSlider(ID_ORTHO_SLICE_Z, "z", &m_Origin[2],MINDOUBLE,MAXDOUBLE);
