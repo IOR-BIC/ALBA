@@ -10,6 +10,8 @@ CONFIGURE_FILE("${MAF_SOURCE_DIR}/Gui/manifest.in" "${MAF_BINARY_DIR}/Gui/manife
 SET(PROJECT_SRCS
   mafAttachCamera.cpp
   mafAttachCamera.h
+  mafColor.cpp
+  mafColor.h
   mafEvent.cpp
   mafEvent.h
   mafLightKit.cpp
@@ -20,10 +22,10 @@ SET(PROJECT_SRCS
   mafSideBar.h
   mafTextKit.cpp
   mafTextKit.h
-  mafView.cpp
-  mafView.h
   mafVTKLog.cpp
   mafVTKLog.h
+  mafView.cpp
+  mafView.h
   mafWXLog.cpp
   mafWXLog.h
   mmgButton.cpp
@@ -32,6 +34,10 @@ SET(PROJECT_SRCS
   mmgCheckListBox.h
   mmgCheckTree.cpp
   mmgCheckTree.h
+  mmgColorSwatch.cpp
+  mmgColorSwatch.h
+  mmgColorWidget.cpp
+  mmgColorWidget.h
   mmgCrossSplitter.cpp
   mmgCrossSplitter.h
   mmgDialog.cpp
@@ -56,8 +62,16 @@ SET(PROJECT_SRCS
   mmgListBox.h
   mmgListCtrl.cpp
   mmgListCtrl.h
+  mmgLutEditor.cpp
+  mmgLutEditor.h
+  mmgLutPreset.cpp
+  mmgLutPreset.h
   mmgLutSlider.cpp
   mmgLutSlider.h
+  mmgLutSwatch.cpp
+  mmgLutSwatch.h
+  mmgLutWidget.cpp
+  mmgLutWidget.h
   mmgMDIChild.cpp
   mmgMDIChild.h
   mmgMDIFrame.cpp
