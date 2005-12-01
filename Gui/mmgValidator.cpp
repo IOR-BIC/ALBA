@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgValidator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-11 13:54:11 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-12-01 15:20:25 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -100,7 +100,7 @@ bool mmgValidator::IsValid()
     break;
     case VAL_LABEL:
       if ( !(m_StaticText && m_StaticText->IsKindOf(CLASSINFO(wxStaticText)))  ) return false;
-      if ( !m_MafStringVar ) return false;
+      if ( !m_MafStringVar && !m_StringVar  ) return false;
     break;
     case VAL_FLOAT:
       if ( !(m_TextCtrl && m_TextCtrl->IsKindOf(CLASSINFO(wxTextCtrl)))  ) return false;
@@ -227,6 +227,18 @@ mmgValidator::mmgValidator(mafObserver* listener, int mid, wxStaticText *win,maf
   m_MafStringVar= var;     
   m_WidgetData.dType  = STRING_DATA;
   m_WidgetData.sValue = var->GetCStr();
+  assert(IsValid());
+}
+//----------------------------------------------------------------------------
+mmgValidator::mmgValidator(mafObserver* listener, int mid, wxStaticText *win, wxString* var) //String
+//----------------------------------------------------------------------------
+{
+  Init(listener,mid,win);
+  m_Mode        = VAL_LABEL;
+  m_StaticText  = win; 
+  m_StringVar= var;     
+  m_WidgetData.dType  = STRING_DATA;
+  m_WidgetData.sValue = var->c_str();
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
@@ -583,7 +595,10 @@ bool mmgValidator::TransferToWindow(void)
   switch (m_Mode) 
 	{
     case VAL_LABEL:
-			m_StaticText->SetLabel(m_MafStringVar->GetCStr());
+			if(m_MafStringVar)
+        m_StaticText->SetLabel(m_MafStringVar->GetCStr());
+      if(m_StringVar)
+        m_StaticText->SetLabel(m_StringVar->c_str());
     break;
     case VAL_FLOAT:
       if(*m_FloatVar < m_FloatMin ) *m_FloatVar = m_FloatMin;

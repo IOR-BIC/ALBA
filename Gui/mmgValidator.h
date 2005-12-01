@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgValidator.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-11 13:54:11 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-12-01 15:20:25 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -55,7 +55,8 @@ enum VALIDATOR_MODES
 class mmgValidator : public wxValidator
 {
 public:
-  mmgValidator (mafObserver* listener,int mid,wxStaticText *win,mafString* var);                                             //String
+  mmgValidator (mafObserver* listener,int mid,wxStaticText *win, wxString* var);   //String
+  mmgValidator (mafObserver* listener,int mid,wxStaticText *win, mafString* var);  //String
   mmgValidator (mafObserver* listener,int mid,wxTextCtrl   *win,wxString* var);   //String
   mmgValidator (mafObserver* listener,int mid,wxTextCtrl   *win,mafString* var);  //String
   mmgValidator (mafObserver* listener,int mid,wxTextCtrl   *win,   int*		var, int		min=-32000,			 int		max=32000);     //Integer
