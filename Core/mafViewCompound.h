@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-28 13:04:44 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-12-01 09:28:14 $
+  Version:   $Revision: 1.15 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,6 +45,14 @@ public:
   virtual ~mafViewCompound(); 
 
   mafTypeMacro(mafViewCompound, mafView);
+
+  enum LAYOUT_CONFIGURATION_ID
+  {
+    GRID_LAYOUT = 0,
+    LAYOUT_1,
+    LAYOUT_2,
+    LAYOUT_3
+  };
 
   /** 
   Plug the child view into the compound view. If the number of child view is less then row x col, 
@@ -94,6 +102,7 @@ public:
   enum VIEWCOMPOUND_WIDGET_ID
   {
     ID_DEFAULT_CHILD_VIEW = Superclass::ID_LAST,
+    ID_LAYOUT_CHOOSER,
     ID_LAST
   };
 
@@ -170,11 +179,15 @@ protected:
   same pannel GUI, each CreateGUI() function should first call the superclass' one.*/
   virtual mmgGui  *CreateGui();
 
+  /** Arrange sub-view into the defined layout configuration.*/
+  void LayoutSubView(int width, int height);
+
   int m_ViewRowNum; ///< number of rows to divide the compound view
   int m_ViewColNum; ///< number of cols to divide the compound view
   int m_NumOfPluggedChildren; ///< number of plugged children view
   int m_NumOfChildView; ///< number of child view (is equal or greater then m_NumOfPluggedChildren)
 
+  int m_LayoutConfiguration; ///< Arrange the subviews on different layout configuration.
   int m_DefauldChildView;
   
   int m_SubViewMaximized;  ///< contain the id of the sub-view to be maximized. -1 means that all sub-views are in normal size

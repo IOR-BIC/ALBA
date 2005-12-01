@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-28 13:04:44 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-12-01 09:28:14 $
+  Version:   $Revision: 1.14 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,6 +50,7 @@ mafViewCompound::mafViewCompound( wxString label, int num_row, int num_col, bool
   m_GuiView = NULL;
   m_SubViewMaximized = -1;
   m_Mouse = NULL;
+  m_LayoutConfiguration = GRID_LAYOUT;
 }
 //----------------------------------------------------------------------------
 mafViewCompound::~mafViewCompound()
@@ -241,6 +242,9 @@ void mafViewCompound::OnEvent(mafEventBase *maf_event)
       }
     }
   	break;
+    case ID_LAYOUT_CHOOSER:
+      OnLayout();
+    break;
     default:
       mafEventMacro(*maf_event);
   }
@@ -252,9 +256,12 @@ mmgGui* mafViewCompound::CreateGui()
   mafString childview_tooltip;
   childview_tooltip = "set the default child view";
 
+  wxString layout_choices[3] = {"default","layout 1","layout 2"};
+
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
   m_Gui->Integer(ID_DEFAULT_CHILD_VIEW,"default child", &m_DefauldChildView, 0, m_NumOfChildView, childview_tooltip);
+  m_Gui->Combo(ID_LAYOUT_CHOOSER,"layout",&m_LayoutConfiguration,3,layout_choices);
   return m_Gui;
 }
 //----------------------------------------------------------------------------
@@ -287,23 +294,7 @@ void mafViewCompound::OnLayout()
 
   if (m_SubViewMaximized == -1)
   {
-    // this implement the Fixed SubViews Layout
-    int border = 2;
-    int x_pos, y_pos;
-    int step_width  = (sw-border)  / m_ViewColNum;
-    int step_height = (sh-2*border)/ m_ViewRowNum;
-
-    int i = 0;
-    for (int r=0; r<m_ViewRowNum; r++)
-    {
-      for (int c=0; c<m_ViewColNum; c++)
-      {
-        x_pos = c*(step_width + border);
-        y_pos = r*(step_height + border);
-        m_ChildViewList[i]->GetWindow()->SetSize(x_pos,y_pos,step_width,step_height);
-        i++;
-      }
-    }
+    LayoutSubView(sw,sh);
   }
   else
   {
@@ -322,6 +313,60 @@ void mafViewCompound::OnLayout()
         }
         i++;
       }
+    }
+  }
+}
+//----------------------------------------------------------------------------
+void mafViewCompound::LayoutSubView(int width, int height)
+//----------------------------------------------------------------------------
+{
+  // this implement the Fixed SubViews Layout
+  int border = 2;
+  int x_pos, y_pos, r, c, i;
+
+  if (m_LayoutConfiguration == GRID_LAYOUT)
+  {
+    int step_width  = (width-border)  / m_ViewColNum;
+    int step_height = (height-2*border)/ m_ViewRowNum;
+
+    i = 0;
+    for (r=0; r<m_ViewRowNum; r++)
+    {
+      for (c=0; c<m_ViewColNum; c++)
+      {
+        x_pos = c*(step_width + border);
+        y_pos = r*(step_height + border);
+        m_ChildViewList[i]->GetWindow()->SetSize(x_pos,y_pos,step_width,step_height);
+        i++;
+      }
+    }
+  }
+  else if (m_LayoutConfiguration == LAYOUT_1)
+  {
+    int step_width  = (width-border)  / (m_NumOfChildView - 1);
+    int step_height = (height-2*border)/ 3*2;
+    m_ChildViewList[0]->GetWindow()->SetSize(0,0,width,step_height);
+    i = 1;
+    for (c = 0; c < m_NumOfChildView - 1; c++)
+    {
+      x_pos = c*(step_width + border);
+      y_pos = step_height;
+      m_ChildViewList[i]->GetWindow()->SetSize(x_pos,y_pos,step_width,height - step_height);
+      i++;
+    }
+  }
+  else if (m_LayoutConfiguration == LAYOUT_2)
+  {
+    int step_width  = (width-border)  / 3*2;
+    int step_height = (height-2*border)/ (m_NumOfChildView - 1);
+    m_ChildViewList[0]->GetWindow()->SetSize(0,0,step_width, height);
+    i = 1;
+    for (r = 0; r < m_NumOfChildView - 1; r++)
+    {
+      x_pos = step_width;
+      y_pos = r*(step_height + border);
+      m_ChildViewList[i]->GetWindow()->SetSize(x_pos,y_pos,width - step_width,step_height);
+      i++;
     }
   }
 }
