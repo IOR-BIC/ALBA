@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-28 13:05:32 $
-  Version:   $Revision: 1.36 $
+  Date:      $Date: 2005-12-01 11:32:59 $
+  Version:   $Revision: 1.37 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -44,6 +44,7 @@
 #include "mmoExplodeCollapse.h"
 #include "mmoExtractIsosurface.h"
 #include "mmoFilterSurface.h"
+#include "mmoFilterVolume.h"
 #include "mmoImageImporter.h"
 #include "mmoMAFTransform.h"
 #include "mmoMSFExporter.h"
@@ -124,6 +125,7 @@ bool exOperationApp::OnInit()
   m_Logic->Plug(new mmoExplodeCollapse("Explode/Collapse cloud"));
   m_Logic->Plug(new mmoExtractIsosurface("Extract Isosurface"));
   m_Logic->Plug(new mmoFilterSurface("Filter Surface"));
+  m_Logic->Plug(new mmoFilterVolume("Filter Volume"));
   m_Logic->Plug(new mmoMAFTransform("MAF Transform  \tCtrl+T"));
   m_Logic->Plug(new mmoReparentTo("Reparent to...  \tCtrl+R"));
   //------------------------------------------------------------
