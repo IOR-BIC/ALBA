@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTransformInterface.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-23 12:32:30 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-12-01 13:03:01 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni        
 ==========================================================================
   Copyright (c) 2002/2004
@@ -66,14 +66,14 @@ public:
   
   /** Set/Get the vme used as refsys, the vme is referenced*/
   void SetRefSysVME(mafVME *refSysVme);
-  mafVME *GetRefSysVME() {return RefSysVME;};
+  mafVME *GetRefSysVME() {return m_RefSysVME;};
 
   /**
   Enable/disable scaling. If scaling is enable scaling part of the transformation matrix is applied to vme 
   data while roto-translation is applied to vme pose matrix. If Disabled only roto-translation is applied 
   while scaling is discarded */
-  void EnableScalingOn(int enable) {EnableScaling = enable;};
-  int GetEnableScaling() {return EnableScaling;};
+  void EnableScalingOn(int enable) {m_EnableScaling = enable;};
+  int GetEnableScaling() {return m_EnableScaling;};
 
 protected:
   
@@ -89,25 +89,25 @@ protected:
   /** Internal actions to be performed when RefSys vme has changed */
   virtual void RefSysVmeChanged() {};
 
-  /** Postmultiply event matrix to vme abs matrix; also update Redo ivar NewAbsMatrix */;
+  /** Postmultiply event matrix to vme abs matrix; also update Redo ivar m_NewAbsMatrix */;
   virtual void PostMultiplyEventMatrix(mafEventBase *maf_event);
   
   enum ACTIVE_GIZMO {TR_GIZMO = 0, ROT_GIZMO, SCAL_GIZMO};
 
-  int EnableScaling;
+  int m_EnableScaling;
 
-  int UseGizmo;
-  int ActiveGizmo;
+  int m_UseGizmo;
+  int m_ActiveGizmo;
 
-  mafTimeStamp CurrentTime;
+  mafTimeStamp m_CurrentTime;
   
   /** 
   vme used as reference system */
-  mafVME *RefSysVME;
+  mafVME *m_RefSysVME;
 
-  mafString RefSysVMEName;
+  mafString m_RefSysVMEName;
 
-  mafMatrix OldAbsMatrix; // used by Undo()
-  mafMatrix NewAbsMatrix; // used by Do()
+  mafMatrix m_OldAbsMatrix; // used by Undo()
+  mafMatrix m_NewAbsMatrix; // used by Do()
 };
 #endif

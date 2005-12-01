@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMAFTransform.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-23 12:32:29 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-12-01 13:03:01 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni        
 ==========================================================================
   Copyright (c) 2002/2004
@@ -74,12 +74,12 @@ protected:
 
   /** 
   plugged objects */
-  mafGizmoTranslate *GizmoTranslate;  
-  mafGizmoRotate *GizmoRotate;
-  mafGizmoScale *GizmoScale;
-  mafGuiTransformMouse *GuiTransform;
-  mafGuiSaveRestorePose *GuiSaveRestorePose;
-  mafGuiTransformTextEntries *GuiTransformTextEntries;
+  mafGizmoTranslate           *m_GizmoTranslate;  
+  mafGizmoRotate              *m_GizmoRotate;
+  mafGizmoScale               *m_GizmoScale;
+  mafGuiTransformMouse        *m_GuiTransform;
+  mafGuiSaveRestorePose       *m_GuiSaveRestorePose;
+  mafGuiTransformTextEntries  *m_GuiTransformTextEntries;
 
   /** 
   Override superclass*/

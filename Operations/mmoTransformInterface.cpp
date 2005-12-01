@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTransformInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-23 12:32:29 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-12-01 13:03:01 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -53,19 +53,19 @@ mafOp(label)
   m_OpType = OPTYPE_OP;
   m_Canundo = true;
 
-  CurrentTime = -1;
-  OldAbsMatrix.Identity();
-  NewAbsMatrix.Identity();
+  m_CurrentTime = -1;
+  m_OldAbsMatrix.Identity();
+  m_NewAbsMatrix.Identity();
 
   // gizmo not active by default
-  UseGizmo = 0;
-  ActiveGizmo = TR_GIZMO;
+  m_UseGizmo = 0;
+  m_ActiveGizmo = TR_GIZMO;
 
-  RefSysVME = NULL;
-  RefSysVMEName = "unassigned";
+  m_RefSysVME = NULL;
+  m_RefSysVMEName = "unassigned";
 
   // operation involve scaling by default; override this behavior in derived class constructor
-  EnableScaling = 1;
+  m_EnableScaling = 1;
 }
 //----------------------------------------------------------------------------
 mmoTransformInterface::~mmoTransformInterface( ) 
@@ -89,14 +89,14 @@ void mmoTransformInterface::PostMultiplyEventMatrix(mafEventBase *maf_event)
 
     mafSmartPointer<mafMatrix> absPose;
     absPose->DeepCopy(tr->GetMatrix());
-    absPose->SetTimeStamp(CurrentTime);
+    absPose->SetTimeStamp(m_CurrentTime);
 
     if (arg == mmiGenericMouse::MOUSE_MOVE)
     {
       // move vme
       ((mafVME *)m_Input)->SetAbsMatrix(*absPose.GetPointer());
       // update matrix for OpDo()
-      NewAbsMatrix = *absPose.GetPointer();
+      m_NewAbsMatrix = *absPose.GetPointer();
     } 
     mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 
@@ -127,7 +127,7 @@ void mmoTransformInterface::OpDo()
   double position[3];
   double scaling[3] = {0,0,0};
 
-  mafTransform::PolarDecomp(NewAbsMatrix, *rotMat, *scaleMat, position);
+  mafTransform::PolarDecomp(m_NewAbsMatrix, *rotMat, *scaleMat, position);
 
   for (int i = 0;i < 3; i++)
   {
@@ -143,7 +143,7 @@ void mmoTransformInterface::OpDo()
   vtkMAFSmartPointer<vtkRectilinearGrid> rg;
   vtkMAFSmartPointer<vtkStructuredPoints> sp;
 
-  if (EnableScaling == 1)
+  if (m_EnableScaling == 1)
   {
     // apply scale to data
     
@@ -235,7 +235,7 @@ void mmoTransformInterface::OpDo()
     }
   }
   // apply roto-translation to abs pose
-  ((mafVME *)m_Input)->SetAbsMatrix(*rotoTraslMatrix, CurrentTime);
+  ((mafVME *)m_Input)->SetAbsMatrix(*rotoTraslMatrix, m_CurrentTime);
   
   mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
@@ -248,6 +248,6 @@ void mmoTransformInterface::SetRefSysVME(mafVME* refSysVME)
   if(refSysVME == NULL)
 	return;
 
-  RefSysVME = refSysVME;
+  m_RefSysVME = refSysVME;
   RefSysVmeChanged();
 }
