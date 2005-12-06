@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-30 11:25:42 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-12-06 10:37:07 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -225,6 +225,7 @@ std::string  mafIdString(int id)
      case VME_REF_SYS_CHOOSED:  s="VME_REF_SYS_CHOOSED"; break;
      case VME_FEM_DATA_CHOOSED: s="VME_FEM_DATA_CHOOSED"; break;
      case VME_PICKED:	          s="VME_PICKED"; break; 
+     case VME_PICKING:	        s="VME_PICKING"; break; 
 
      case VIEW_QUIT:            s="VIEW_QUIT"; break;
      case VIEW_CREATE:          s="VIEW_CREATE"; break; 

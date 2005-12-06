@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-30 11:25:42 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-12-06 10:37:07 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -146,7 +146,8 @@ EVT_START,
   VME_TRANSFORM, // from mafISV to mafLogic
   VME_MODIFIED,  // from a generic mafOp to mafLogic (to be removed Marco)
   VME_CHOOSE,    // from a mafOp to receive more operands
-  VME_PICKED,    // used by mafISALandmark to speak with mmoEditLandmarkCloud
+  VME_PICKED,    // used sent to the listener a vtkPoint positioned at the picked position
+  VME_PICKING,   // same as above, but send point position in continuous configuration (at each mouse motion)
   VME_CHOOSE_MATERIAL,
   VME_CHOOSE_TRANSFER_FUNCTION,
   VME_CHOOSE_FEM_PROPERTY,
