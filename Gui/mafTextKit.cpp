@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTextKit.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-14 16:53:21 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-12-06 10:36:21 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -96,6 +96,7 @@ void mafTextKit::CreateGui()
   
   m_Gui = new mmgGui(this);
 	m_Gui->Show(true);
+  m_Gui->Label("Text kit",true);
   m_Gui->Bool(ID_SHOW_TEXT,"show",&m_ShowText,0,"Show/hide text");
   m_Gui->String(ID_TEXT_IN_VIEW,"view text",&m_TextInView,"Text visualized into the view");
   m_Gui->Button(ID_NLINE_TEXT_IN_VIEW,"edit","n-line text");
