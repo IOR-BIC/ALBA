@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPicker.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 10:53:57 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-12-06 10:35:43 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -54,6 +54,7 @@ mafCxxTypeMacro(mmiPicker)
 mmiPicker::mmiPicker()
 //------------------------------------------------------------------------------
 {
+  m_ContinuousPickingFlag = false;
 }
 
 //------------------------------------------------------------------------------
@@ -62,15 +63,23 @@ mmiPicker::~mmiPicker()
 {
 }
 
-
+//------------------------------------------------------------------------------
+void mmiPicker::OnEvent(mafEventBase *event)
+//------------------------------------------------------------------------------
+{
+  Superclass::OnEvent(event);
+  if (m_ContinuousPickingFlag)
+  {
+    if (mmdMouse *mouse=mmdMouse::SafeDownCast((mafDevice *)event->GetSender()))
+    { 
+      double mouse_pos[2];
+      ((mafEventInteraction *)event)->Get2DPosition(mouse_pos);
+      SendPickingInformation(mouse->GetView(), mouse_pos,VME_PICKING);
+    }
+  }
+}
 //----------------------------------------------------------------------------
 void mmiPicker::OnButtonDown(mafEventInteraction *e)
-//----------------------------------------------------------------------------
-{
-}
-
-//----------------------------------------------------------------------------
-void mmiPicker::OnButtonUp(mafEventInteraction *e) 
 //----------------------------------------------------------------------------
 {
   if (mmdTracker *tracker=mmdTracker::SafeDownCast((mafDevice *)e->GetSender()))
@@ -87,7 +96,7 @@ void mmiPicker::OnButtonUp(mafEventInteraction *e)
         avatar3D->TrackerToWorld(*tracker_pose,world_pose,mafAvatar3D::CANONICAL_TO_WORLD_SCALE);
       else
         world_pose = *tracker_pose;
-      SendPickingInformation(avatar->GetView(),NULL,&world_pose,false);
+      SendPickingInformation(avatar->GetView(),NULL,VME_PICKED,&world_pose,false);
     }
   }
   else if (mmdMouse *mouse=mmdMouse::SafeDownCast((mafDevice *)e->GetSender()))
@@ -97,8 +106,40 @@ void mmiPicker::OnButtonUp(mafEventInteraction *e)
     SendPickingInformation(mouse->GetView(), mouse_pos);
   }
 }
+
 //----------------------------------------------------------------------------
-void mmiPicker::SendPickingInformation(mafView *v, double *mouse_pos, mafMatrix *tracker_pos, bool mouse_flag)
+void mmiPicker::OnButtonUp(mafEventInteraction *e) 
+//----------------------------------------------------------------------------
+{
+  if (m_ContinuousPickingFlag)
+  {
+    if (mmdTracker *tracker=mmdTracker::SafeDownCast((mafDevice *)e->GetSender()))
+    { // is it a tracker?
+      mafMatrix *tracker_pose = e->GetMatrix();
+      // extract device avatar's renderer, no avatar == no picking
+      mafAvatar *avatar = tracker->GetAvatar();
+      if (avatar)
+      {
+        // compute pose in the world frame
+        mafMatrix world_pose;
+        mafAvatar3D *avatar3D=mafAvatar3D::SafeDownCast(avatar);
+        if (avatar3D)
+          avatar3D->TrackerToWorld(*tracker_pose,world_pose,mafAvatar3D::CANONICAL_TO_WORLD_SCALE);
+        else
+          world_pose = *tracker_pose;
+        SendPickingInformation(avatar->GetView(),NULL,VME_PICKED,&world_pose,false);
+      }
+    }
+    else if (mmdMouse *mouse=mmdMouse::SafeDownCast((mafDevice *)e->GetSender()))
+    { 
+      double mouse_pos[2];
+      e->Get2DPosition(mouse_pos);
+      SendPickingInformation(mouse->GetView(), mouse_pos);
+    }
+  }
+}
+//----------------------------------------------------------------------------
+void mmiPicker::SendPickingInformation(mafView *v, double *mouse_pos, int msg_id, mafMatrix *tracker_pos, bool mouse_flag)
 //----------------------------------------------------------------------------
 {
   bool picked_something = false;
@@ -126,7 +167,7 @@ void mmiPicker::SendPickingInformation(mafView *v, double *mouse_pos, mafMatrix 
       vtkDataArray *scalars = vtk_data->GetPointData()->GetScalars();
       if (scalars)
         scalars->GetTuple(pid,&scalar_value);
-      mafEvent pick_event(this,VME_PICKED,p);
+      mafEvent pick_event(this,msg_id,p);
       pick_event.SetDouble(scalar_value);
       mafEventMacro(pick_event);
       p->Delete();
