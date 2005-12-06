@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-23 11:53:32 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-12-06 10:37:40 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,12 +50,12 @@ public:
   virtual int GetNodeStatus(mafNode *vme);
 
   /** IDs for the GUI */
-/*  enum VIEW_VTK_WIDGET_ID
+  enum VIEW_SLICE_WIDGET_ID
   {
-    ID_ATTACH_CAMERA = Superclass::ID_LAST,
+    ID_NONE = Superclass::ID_LAST,
     ID_LAST
   };
-*/
+
 
   /** 
   Create the visual pipe for the node passed as argument. 
