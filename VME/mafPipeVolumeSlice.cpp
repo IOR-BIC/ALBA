@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 16:33:39 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2005-12-06 10:34:39 $
+  Version:   $Revision: 1.17 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -75,6 +75,7 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
   
   m_AssemblyUsed = NULL;
   m_ColorLUT = NULL;
+  m_CustomColorLUT = NULL;
 
   m_UnitLength = 10; // 10 mm
   m_ShowUnit = false;
@@ -616,4 +617,26 @@ void mafPipeVolumeSlice::OnEvent(mafEventBase *maf_event)
       break;
     }
   }
+}
+//----------------------------------------------------------------------------
+void mafPipeVolumeSlice::SetColorLookupTable(vtkLookupTable *lut)
+//----------------------------------------------------------------------------
+{
+  int i;
+  if (lut == NULL)
+  {
+    for (i=0;i<3;i++)
+    {
+      if(m_Texture[i])
+        m_Texture[i]->SetLookupTable(m_ColorLUT);
+    }
+    return;
+  }
+  m_CustomColorLUT = lut;
+  for (i=0;i<3;i++)
+  {
+    if(m_Texture[i])
+      m_Texture[i]->SetLookupTable(m_CustomColorLUT);
+  }
+  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }

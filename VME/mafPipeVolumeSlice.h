@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 16:33:40 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-12-06 10:34:39 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -100,7 +100,15 @@ public:
   /** 
   Enable/Disable color lookupTable for volume slice. */
   void ColorLookupTable(bool enable);
-					
+
+  /** 
+  Assign a color lookup table to the slices*/
+  void SetColorLookupTable(vtkLookupTable *lut);
+
+  /** 
+  Return the color lookup table of the slices*/
+  vtkLookupTable *GetColorLookupTable() {return m_ColorLUT;};
+
   /** 
   return true/false if color lookupTable for volume slice is Enabled/Disabled. */
   bool IsColorLookupTable();
@@ -145,6 +153,7 @@ protected:
 	vtkImageData					 *m_Image[3];
 	vtkTexture						 *m_Texture[3];
   vtkLookupTable         *m_ColorLUT;
+  vtkLookupTable         *m_CustomColorLUT;
   vtkPolyDataMapper			 *m_SliceMapper[3];
 	vtkPolyData						 *m_SlicePolydata[3];
   vtkActor               *m_SliceActor[3];
