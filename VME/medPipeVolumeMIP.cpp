@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeMIP.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-24 14:54:40 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-12-06 14:21:39 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -22,7 +22,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "medPipeVolumeMIP.h"
 
 #include "mafDecl.h"
-
+#include "mmgGui.h"
+#include "mmgLutPreset.h"
 #include "mafVME.h"
 
 #include "vtkMAFAssembly.h"
@@ -39,6 +40,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkActor.h"
 #include "vtkProperty.h"
 #include "vtkOutlineCornerFilter.h"
+#include "vtkLookupTable.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medPipeVolumeMIP);
@@ -57,6 +59,7 @@ medPipeVolumeMIP::medPipeVolumeMIP()
   m_VolumeMapperLow   = NULL;
   m_VolumeLOD         = NULL;
   m_SelectionActor    = NULL;
+  m_ColorLUT          = NULL;
 }
 //----------------------------------------------------------------------------
 void medPipeVolumeMIP::Create(mafSceneNode *n)
@@ -66,23 +69,27 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
 
   m_Selected = false;
 
+  wxBusyCursor wait;
+
   // image pipeline
+  double sr[2];
   m_Vme->GetOutput()->Update();
   vtkImageData *image_data = vtkImageData::SafeDownCast(m_Vme->GetOutput()->GetVTKData());
   assert(image_data);
   image_data->Update();
+  image_data->GetScalarRange(sr);
 
   vtkNEW(m_Caster);
   m_Caster->SetInput(image_data);
-  m_Caster->SetInputMemoryLimit(0);
   m_Caster->SetNumberOfThreads(1);
-  m_Caster->SetOutputScalarTypeToUnsignedChar();
+  m_Caster->SetOutputScalarType(image_data->GetScalarType());
   m_Caster->BypassOff();
   m_Caster->ClampOverflowOff();
 
+  vtkNEW(m_ColorLUT);
+  m_ColorLUT->SetTableRange(sr);
+
   vtkNEW(m_OpacityTransferFunction);
-  m_OpacityTransferFunction->AddPoint(10.0, 0.0);
-  m_OpacityTransferFunction->AddPoint(20.0, 1.0);
 
   vtkNEW(m_VolumeProperty);
   m_VolumeProperty->SetScalarOpacity(m_OpacityTransferFunction);
@@ -90,7 +97,7 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
   m_VolumeProperty->SetInterpolationTypeToLinear();
 
   vtkNEW(m_MIPFunction);
-  m_MIPFunction->SetMaximizeMethodToScalarValue();
+  m_MIPFunction->SetMaximizeMethodToOpacity();
 
   vtkNEW(m_VolumeMapper);
   m_VolumeMapper->SetInput(m_Caster->GetOutput());
@@ -101,9 +108,6 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
   m_VolumeMapper->SetMinimumImageSampleDistance(1);
   m_VolumeMapper->SetNumberOfThreads(1);
   m_VolumeMapper->SetSampleDistance(1);
-//  m_VolumeMapper->AutoAdjustSampleDistancesOn();
-  //m_VolumeMapper->SetComponentBlendModeToAdd();
-  //m_VolumeMapper->IndependentComponentsOn();
 
   vtkNEW(m_VolumeMapperLow);
   m_VolumeMapperLow->SetInput(m_Caster->GetOutput());
@@ -148,6 +152,7 @@ medPipeVolumeMIP::~medPipeVolumeMIP()
   m_AssemblyFront->RemovePart(m_VolumeLOD);
   m_AssemblyFront->RemovePart(m_SelectionActor);
 
+  vtkDEL(m_ColorLUT);
   vtkDEL(m_Caster);
   vtkDEL(m_OpacityTransferFunction);
   vtkDEL(m_VolumeProperty);
@@ -164,4 +169,48 @@ void medPipeVolumeMIP::Select(bool sel)
 	m_Selected = sel;
 	if(m_VolumeLOD->GetVisibility())
 			m_SelectionActor->SetVisibility(sel);
+}
+//----------------------------------------------------------------------------
+mmgGui *medPipeVolumeMIP::CreateGui()
+//----------------------------------------------------------------------------
+{
+  assert(m_Gui == NULL);
+  m_Gui = new mmgGui(this);
+  lutPreset(15,m_ColorLUT);
+  m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
+  UpdateMIPFromLUT();
+
+  return m_Gui;
+}
+//----------------------------------------------------------------------------
+void medPipeVolumeMIP::OnEvent(mafEventBase *maf_event)
+//----------------------------------------------------------------------------
+{
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  {
+    switch(e->GetId()) 
+    {
+      case ID_LUT_CHOOSER:
+        UpdateMIPFromLUT();
+      break;
+    }
+  }
+}
+//----------------------------------------------------------------------------
+void medPipeVolumeMIP::UpdateMIPFromLUT()
+//----------------------------------------------------------------------------
+{
+  m_OpacityTransferFunction->RemoveAllPoints();
+  int tv = m_ColorLUT->GetNumberOfTableValues();
+  double rgba[4], sr[2],w,p;
+  m_Caster->GetOutput()->GetScalarRange(sr);
+  w = sr[1] - sr[0];
+  for (int v=0;v<tv;v++)
+  {
+    m_ColorLUT->GetTableValue(v,rgba);
+    p = v*w/tv+sr[0];
+    m_OpacityTransferFunction->AddPoint(p,rgba[3]);
+  }
+  m_OpacityTransferFunction->Update();
+  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
