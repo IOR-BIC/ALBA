@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 15:44:08 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-12-06 10:38:07 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,7 +25,7 @@ class mmgLutSlider;
 class mmgFloatSlider;
 class mafViewSlice;
 class mafVMEVolume;
-
+class vtkLookupTable;
 //----------------------------------------------------------------------------
 // mafViewOrthoSlice :
 //----------------------------------------------------------------------------
@@ -59,6 +59,8 @@ public:
     ID_ORTHO_SLICE_X = Superclass::ID_LAST,
     ID_ORTHO_SLICE_Y,
     ID_ORTHO_SLICE_Z,
+    ID_RGB_LUT,
+    ID_LUT_CHOOSER,
     ID_LAST
   };
 
@@ -84,6 +86,8 @@ protected:
 
   mafVMEVolume *m_CurrentVolume; ///< Current visualized volume
   mmgLutSlider *m_Luts; ///< Double slider used to change brightness and contrast of the image
+  vtkLookupTable *m_ColorLUT;
+  int m_ColorLUTEnabled;
   mafViewSlice *m_Views[4];
 };
 #endif
