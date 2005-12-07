@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPER.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 05:58:12 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-12-07 11:20:10 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone, originally by Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -118,7 +118,7 @@ protected:
   bool            m_FlyToFlag;
   bool            m_DraggingLeft; 
   bool            m_CanSelect; 
-  bool	          m_ShowContextMenu; ///< flag for showing the context men
+  bool	          m_ShowContextMenu; ///< flag for showing the context menu
 
   int             m_Mode;
   int             m_FirstTime;
