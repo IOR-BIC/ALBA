@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMAFTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 13:03:01 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-12-07 11:21:55 $
+  Version:   $Revision: 1.9 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,6 +51,9 @@ enum MAF_TRANSFORM_ID
 {
 	ID_SHOW_GIZMO = MINID,
   ID_CHOOSE_GIZMO_COMBO,
+  ID_ROTATION_STEP,
+  ID_TRANSLATION_STEP,
+  ID_ENABLE_STEP,
   ID_ROT_SNAP,
   ID_RESET,
   ID_AUX_REF_SYS,
@@ -63,6 +66,10 @@ mmoTransformInterface(label)
 {
   m_OpType = OPTYPE_OP;
   m_Canundo = true;
+
+  m_RotationStep    = 10.0;
+  m_TranslationStep = 2.0;
+  m_EnableStep      = 0;
 
   m_GizmoTranslate          = NULL;
   m_GizmoRotate             = NULL;
@@ -201,7 +208,10 @@ void mmoMAFTransform::OnEventThis(mafEventBase *maf_event)
     {
       // update gizmo choose gui
       m_Gui->Enable(ID_CHOOSE_GIZMO_COMBO, m_UseGizmo ? true : false);
-     
+      m_Gui->Enable(ID_ROTATION_STEP, m_UseGizmo?true:false);
+      m_Gui->Enable(ID_TRANSLATION_STEP, m_UseGizmo?true:false);
+      m_Gui->Enable(ID_ENABLE_STEP, m_UseGizmo?true:false);
+      
       if (m_UseGizmo == 0)
       {
         m_GizmoRotate->Show(false);
@@ -272,7 +282,42 @@ void mmoMAFTransform::OnEventThis(mafEventBase *maf_event)
       Reset();
 	  }
     break;
-
+    case ID_ROTATION_STEP:
+      m_GizmoRotate->GetInteractor(0)->GetRotationConstraint()->SetStep(0,m_RotationStep);
+      m_GizmoRotate->GetInteractor(1)->GetRotationConstraint()->SetStep(1,m_RotationStep);
+      m_GizmoRotate->GetInteractor(2)->GetRotationConstraint()->SetStep(2,m_RotationStep);
+    break;
+    case ID_TRANSLATION_STEP:
+      m_GizmoTranslate->SetStep(0,m_TranslationStep);
+      m_GizmoTranslate->SetStep(1,m_TranslationStep);
+      m_GizmoTranslate->SetStep(2,m_TranslationStep);
+    break;
+    case ID_ENABLE_STEP:
+      if (m_EnableStep != 0)
+      {
+        m_GizmoRotate->GetInteractor(0)->GetRotationConstraint()->SetConstraintModality(0,mmiConstraint::SNAP_STEP);
+        m_GizmoRotate->GetInteractor(1)->GetRotationConstraint()->SetConstraintModality(1,mmiConstraint::SNAP_STEP);
+        m_GizmoRotate->GetInteractor(2)->GetRotationConstraint()->SetConstraintModality(2,mmiConstraint::SNAP_STEP);
+        m_GizmoRotate->GetInteractor(0)->GetRotationConstraint()->SetStep(0,m_RotationStep);
+        m_GizmoRotate->GetInteractor(1)->GetRotationConstraint()->SetStep(1,m_RotationStep);
+        m_GizmoRotate->GetInteractor(2)->GetRotationConstraint()->SetStep(2,m_RotationStep);
+        m_GizmoTranslate->SetConstraintModality(0,mmiConstraint::SNAP_STEP);
+        m_GizmoTranslate->SetConstraintModality(1,mmiConstraint::SNAP_STEP);
+        m_GizmoTranslate->SetConstraintModality(2,mmiConstraint::SNAP_STEP);
+        m_GizmoTranslate->SetStep(0,m_TranslationStep);
+        m_GizmoTranslate->SetStep(1,m_TranslationStep);
+        m_GizmoTranslate->SetStep(2,m_TranslationStep);
+      }
+      else
+      {
+        m_GizmoRotate->GetInteractor(0)->GetRotationConstraint()->SetConstraintModality(0,mmiConstraint::FREE);
+        m_GizmoRotate->GetInteractor(1)->GetRotationConstraint()->SetConstraintModality(1,mmiConstraint::FREE);
+        m_GizmoRotate->GetInteractor(2)->GetRotationConstraint()->SetConstraintModality(2,mmiConstraint::FREE);
+        m_GizmoTranslate->SetConstraintModality(0,mmiConstraint::FREE);
+        m_GizmoTranslate->SetConstraintModality(1,mmiConstraint::FREE);
+        m_GizmoTranslate->SetConstraintModality(2,mmiConstraint::FREE);
+      }
+    break;
     // move this to opgui; both gizmos and gui should know ref sys
     case ID_AUX_REF_SYS:
     {
@@ -485,7 +530,15 @@ void mmoMAFTransform::CreateGui()
   // choose active gizmo
   wxString available_gizmos[3] = {"translate", "rotate", "scale"};
   m_Gui->Combo(ID_CHOOSE_GIZMO_COMBO, "", &m_ActiveGizmo, 3, available_gizmos);
+  m_Gui->Divider(2);
+  m_Gui->Label("step parameters:",true);
+  m_Gui->Double(ID_TRANSLATION_STEP,"translation",&m_TranslationStep,0.01);
+  m_Gui->Double(ID_ROTATION_STEP,"rotation",&m_RotationStep,0.01);
+  m_Gui->Bool(ID_ENABLE_STEP,"on/off",&m_EnableStep);
   m_Gui->Enable(ID_CHOOSE_GIZMO_COMBO, m_UseGizmo?true:false);
+  m_Gui->Enable(ID_ROTATION_STEP, m_UseGizmo?true:false);
+  m_Gui->Enable(ID_TRANSLATION_STEP, m_UseGizmo?true:false);
+  m_Gui->Enable(ID_ENABLE_STEP, m_UseGizmo?true:false);
 
   //---------------------------------
   // Transform gui
