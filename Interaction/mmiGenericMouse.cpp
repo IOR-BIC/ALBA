@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-15 15:24:59 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-12-07 11:21:02 $
+  Version:   $Revision: 1.12 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -70,79 +70,44 @@ mmiGenericMouse::~mmiGenericMouse()
 void mmiGenericMouse::Translate(double *p1, double *p2)
 //----------------------------------------------------------------------------
 {
-  // create matrix to send
-  mafMatrix matr;
-
-  // motion vector
-  double motionVec[3];
-
+  mafMatrix matr;     // create matrix to send
+  double motionVec[3];// motion vector
   BuildVector(p1, p2, motionVec);
+  int refSysType = GetTranslationConstraint()->GetRefSys()->GetType();// get the ref sys type  
 
-  // get the ref sys type  
-  int refSysType = GetTranslationConstraint()->GetRefSys()->GetType();
-
-  // set the constraint refsys to translation constraint, the matrix is referenced
+  // set the constraint ref-sys to translation constraint, the matrix is referenced
   m_ConstrainRefSys = GetTranslationConstraint()->GetRefSys()->GetMatrix();
-
   if (GetTranslationConstraint()->GetNumberOfDOF() == 1)
   { 
-
-    // result point position
-    double rp[3];
-
-    // result point projected on constrain axis
-    double pos_rp;
-
-    // projection of motion vector on constrain axis 
-    double motVecProj[3];
-
-    // projection value along constrain axis
-    double projVal;
-
-    //current axis versor
-    double constrainVers[3];
-
+    double rp[3];         // result point position
+    double pos_rp;        // result point projected on constrain axis
+    double motVecProj[3]; // projection of motion vector on constrain axis 
+    double projVal;       // projection value along constrain axis
+    double constrainVers[3];//current axis versor
     assert(m_VME);
-
-    //get the result point pos
-    mafTransform::GetPosition(*m_VME->GetOutput()->GetMatrix(), rp); 
-
-    //get the constrain axis
-    int axis = GetTranslationConstraint()->GetConstraintAxis();
-
-    //project the motion vector on constrain axis    
-    mafTransform::GetVersor(axis, *m_ConstrainRefSys, constrainVers);  
+    mafTransform::GetPosition(*m_VME->GetOutput()->GetMatrix(), rp);    //get the result point pos
+    int axis = GetTranslationConstraint()->GetConstraintAxis();         //get the constrain axis
+    mafTransform::GetVersor(axis, *m_ConstrainRefSys, constrainVers);   //project the motion vector on constrain axis
     projVal = ProjectVectorOnAxis(motionVec, constrainVers, motVecProj);
 
-   // project rp on constrain axis; if target refsys is local the projection 
-   // is the value along the constrain axis
+    // project rp on constrain axis; if target ref-sys is local the projection 
+    // is the value along the constrain axis
     if (refSysType == mafRefSys::GLOBAL)
-    {
       pos_rp = ProjectVectorOnAxis(rp, constrainVers);
-    }
     else
-    {
       pos_rp = rp[axis];
-    }
 
     switch(GetTranslationConstraint()->GetConstraintModality(axis)) 
     {
       case (mmiConstraint::FREE):
       { 
-        //set the matrix to be send            
-        mafTransform::SetPosition(matr, motVecProj);
-         
-        //send the transform matrix
-        SendTransformMatrix(matr);
+        mafTransform::SetPosition(matr, motVecProj);//set the matrix to be send
+        SendTransformMatrix(matr);                  //send the transform matrix
       }
       break;
-
       case (mmiConstraint::BOUNDS):
       {
-    
   /*
-
-                            
       ------------proj-------->  
       
       0-------minb-------------rp------------------maxb------->      
@@ -154,10 +119,8 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
       // C:  constrain ref sys center
       // rp: result point
   */
-  
 
   /*
-
                                           >
                                         /
                                       /
@@ -304,7 +267,11 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
       }
       case (mmiConstraint::SNAP_STEP):
       {
-
+        double step = GetTranslationConstraint()->GetStep(axis);
+        int motion_direction = motVecProj[axis] > 0 ? 1 : -1;
+        motVecProj[axis] = motion_direction * step;
+        mafTransform::SetPosition(matr, motVecProj);//set the matrix to be send
+        SendTransformMatrix(matr);                  //send the transform matrix
       }
       break;
   
@@ -620,7 +587,55 @@ void mmiGenericMouse::Rotate(double *p1, double *p2, double *viewup)
   
       case (mmiConstraint::SNAP_STEP):
       {
-    
+        if (refSysType == mafRefSys::CUSTOM)
+        {
+          //current axis versor
+          double constrainVers[3];
+
+          //get the constrain axis
+          int axis = GetRotationConstraint()->GetConstraintAxis();
+
+          mafTransform::GetVersor(axis, *m_ConstrainRefSys, constrainVers);
+          // centre of rotation in abs coordinates
+          double o[3] = {0,0,0};
+          // get the centre of rotation from PivotRefSys
+          mafTransform::GetPosition(*GetPivotRefSys()->GetMatrix(), o);
+
+          double op1Vec[3] = {0, 0, 0};
+          double op2Vec[3] = {0, 0, 0};
+
+          BuildVector(o, p1, op1Vec);
+          BuildVector(o, p2, op2Vec);
+
+          // op1 X op2
+          double op1Vec_X_op2Vec[3] = {0, 0, 0};
+          vtkMath::Cross(op1Vec, op2Vec, op1Vec_X_op2Vec);
+
+          // rotation angle should be positive or negative?
+          bool angleIsPositive = (vtkMath::Dot(op1Vec_X_op2Vec, constrainVers) >= 0 ? true : false);
+
+          double p1p2Squared = vtkMath::Distance2BetweenPoints(p1, p2);
+          double p2oSquared = vtkMath::Distance2BetweenPoints(p2, o);
+          double p1oSquared = vtkMath::Distance2BetweenPoints(p1, o);
+
+          double angle = GetRotationConstraint()->GetStep(axis);
+
+          if (angleIsPositive) 
+          {
+            angle = fabs(angle);
+          }
+          else
+          {
+            angle = -fabs(angle);
+          }
+
+          transform.Translate(-o[0], -o[1], -o[2],POST_MULTIPLY);
+          transform.RotateWXYZ(angle, constrainVers,POST_MULTIPLY);
+          transform.Translate(o,POST_MULTIPLY);
+
+          //send the transform matrix along with rotation angle
+          SendTransformMatrix(transform.GetMatrix(), MOUSE_MOVE, angle);
+        }
       }
       break;
   
