@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslate.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:26 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-12-07 11:21:32 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -108,6 +108,14 @@ public:
   mafVME* GetRefSys();
 
   mmgGui *GetGui() {return (GuiGizmoTranslate->GetGui());};
+
+  /**
+  Set the constraint modality for the given axis; allowed constraint modality are:
+  LOCK, FREE, BOUNDS, SNAP_STEP, SNAP_ARRAY.*/
+  void SetConstraintModality(int axis, int constrainModality);
+
+  /** Set the step value for snap step constraint type for the given axis*/
+  void SetStep(int axis, double step);
 
 protected:
 

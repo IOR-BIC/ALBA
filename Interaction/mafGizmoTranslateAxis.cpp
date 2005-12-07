@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslateAxis.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-08 13:25:26 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-12-07 11:21:32 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -499,4 +499,22 @@ void mafGizmoTranslateAxis::SetInput(mafVME *vme)
   this->InputVme = vme; 
   SetAbsPose(vme->GetOutput()->GetAbsMatrix()); 
   SetRefSysMatrix(vme->GetOutput()->GetAbsMatrix());
+}
+//----------------------------------------------------------------------------
+void mafGizmoTranslateAxis::SetConstraintModality(int axis, int constrainModality)
+//----------------------------------------------------------------------------
+{
+  for (int i = 0; i < 2; i++)
+  {
+    IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(axis,constrainModality);
+  } 
+}
+//----------------------------------------------------------------------------
+void mafGizmoTranslateAxis::SetStep(int axis, double step)
+//----------------------------------------------------------------------------
+{
+  for (int i = 0; i < 2; i++)
+  {
+    IsaGen[i]->GetTranslationConstraint()->SetStep(axis,step);
+  } 
 }

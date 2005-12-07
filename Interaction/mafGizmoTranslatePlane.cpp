@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslatePlane.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-11 06:14:14 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-12-07 11:21:33 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -514,4 +514,22 @@ void mafGizmoTranslatePlane::SetInput(mafVME *vme)
   this->InputVme = vme; 
   SetAbsPose(vme->GetOutput()->GetAbsMatrix()); 
   SetConstrainRefSys(vme->GetOutput()->GetAbsMatrix());
+}
+//----------------------------------------------------------------------------
+void mafGizmoTranslatePlane::SetConstraintModality(int axis, int constrainModality)
+//----------------------------------------------------------------------------
+{
+  for (int i = 0; i < SQ; i++)
+  {
+    IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(axis,constrainModality);
+  }
+}
+//----------------------------------------------------------------------------
+void mafGizmoTranslatePlane::SetStep(int axis, double step)
+//----------------------------------------------------------------------------
+{
+  for (int i = 0; i < SQ; i++)
+  {
+    IsaGen[i]->GetTranslationConstraint()->SetStep(axis,step);
+  }
 }

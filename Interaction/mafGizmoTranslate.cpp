@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslate.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-21 07:16:07 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-12-07 11:21:31 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -455,7 +455,7 @@ void mafGizmoTranslate::SetRefSys(mafVME *refSys)
     SetModalityToLocal();
 
     // if the gizmo is visible set the widgets visibility to true
-    // if the refsys is local
+    // if the ref-sys is local
     if (Visibility == true)
     {
       GuiGizmoTranslate->EnableWidgets(true);
@@ -463,13 +463,27 @@ void mafGizmoTranslate::SetRefSys(mafVME *refSys)
   }
   else
   {
-    SetModalityToGlobal();    
+    SetModalityToGlobal();
 
     // if the gizmo is visible set the widgets visibility to false
-    // if the refsys is global since this refsys cannot be changed
+    // if the ref-sys is global since this ref-sys cannot be changed
     if (Visibility == true)
     {
       GuiGizmoTranslate->EnableWidgets(false);
     }
   }
+}
+//----------------------------------------------------------------------------
+void mafGizmoTranslate::SetConstraintModality(int axis, int constrainModality)
+//----------------------------------------------------------------------------
+{
+  GTAxis[axis]->SetConstraintModality(axis,constrainModality);
+  GTPlane[axis]->SetConstraintModality(axis,constrainModality);
+}
+//----------------------------------------------------------------------------
+void mafGizmoTranslate::SetStep(int axis, double step)
+//----------------------------------------------------------------------------
+{
+  GTAxis[axis]->SetStep(axis,step);
+  GTPlane[axis]->SetStep(axis,step);
 }
