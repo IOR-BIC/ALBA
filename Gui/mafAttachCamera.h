@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttachCamera.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-11 15:49:26 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-12-09 15:10:41 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,6 +51,10 @@ public:
   /** 
   Update the camera according to the absolute position of the attached VME.*/
   void UpdateCameraMatrix();
+
+  /** Set the vme to follow with camera. 
+  This method is optional; in alternative the vme to follow is set on the attach camera activation keeping the selected vme.*/
+  void SetVme(mafNode *node);
 
 protected:
   /** 
