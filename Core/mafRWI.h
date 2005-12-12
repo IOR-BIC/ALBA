@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-23 18:11:40 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-12-12 11:24:27 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -15,6 +15,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // Include :
 //----------------------------------------------------------------------------
 #include "mafRWIBase.h"
+#include "mafObserver.h"
+
 //----------------------------------------------------------------------------
 // Forward References :
 //----------------------------------------------------------------------------
@@ -27,7 +29,8 @@ class vtkRenderWindow;
 class mafRWIBase;
 class mafSceneGraph;
 class mafAxes;
-class mafObserver;
+class mmgGui;
+
 //----------------------------------------------------------------------------
 // constants:
 //----------------------------------------------------------------------------
@@ -39,13 +42,15 @@ enum RWI_LAYERS
 //----------------------------------------------------------------------------
 // mafRWI :
 //----------------------------------------------------------------------------
-class mafRWI
+class mafRWI : public mafObserver
 {
 public:
-										mafRWI(wxWindow *parent, RWI_LAYERS layers = ONE_LAYER, bool use_grid = false, int stereo = 0);
+										mafRWI(wxWindow *parent, RWI_LAYERS layers = ONE_LAYER, bool use_grid = false, bool show_axes = false, int stereo = 0);
 	virtual					 ~mafRWI();
 
   virtual void SetListener(mafObserver *Listener) {m_Listener = Listener;};
+
+  void OnEvent(mafEventBase *maf_event);
 
 	/** Reset the camera position. If vme is passed as parameter, the camera is resetted to fill the vme into the view. */
 	void CameraReset(mafNode *vme = NULL);
@@ -86,6 +91,8 @@ public:
 	/** Set the visibility for the axes actor. */
 	void SetAxesVisibility(bool show);
 
+  mmgGui *GetGui();
+
   mafSceneGraph    *m_Sg; 
   mafRWIBase			 *m_RwiBase;
   vtkRenderer      *m_RenFront; ///< Renderer used to show actors on the first layer.
@@ -97,13 +104,22 @@ public:
   
 	mafAxes          *m_Axes; ///< Actor representing a global reference system.
 	vtkGridActor     *m_Grid; ///< Actor representing a grid showed into the render window.
-	bool              m_ShowGrid; ///< Flag used to show/hide the grid.
+	int               m_ShowGrid; ///< Flag used to show/hide the grid.
+  int               m_GridNormal;
+  int               m_ShowAxes;  ///< Flag used to show/hide axes in low left cornel of the view
 
 protected:
 	/** Compute the bounds for the visible actors; if vme is passed, the bounds of vme are calculated. */
 	double *ComputeVisibleBounds(mafNode *node = NULL);
+
+  mmgGui *CreateGui();
+
+  mmgGui *m_Gui;
+  wxColour	m_BGColour;
+  wxColour	m_GridColour;
+  double    m_GridPosition;
 	
   int          m_StereoType;
-  mafObserver *m_Listener;	
+  mafObserver *m_Listener;
 };
 #endif

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-24 14:53:04 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2005-12-12 11:24:27 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,10 +24,7 @@
 #include "mafDecl.h"  // per CAMERA_POSITIONS
 #include "mafEvent.h"
 #include "mafAxes.h"
-//#include "mafPipe.h"
-//#include "mafSceneGraph.h"
-//#include "mafSceneNode.h"
-
+#include "mmgGui.h"
 #include "mafNode.h"
 #include "mafSceneNode.h"
 #include "mafSceneGraph.h"
@@ -50,12 +47,16 @@
 #define DEFAULT_BG_COLOR 0.28
 
 //----------------------------------------------------------------------------
-mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, int stereo)
+mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axes, int stereo)
 //----------------------------------------------------------------------------
 {
   m_Listener= NULL;
   m_Sg      = NULL;
   m_RenBack = NULL;
+  m_Gui     = NULL;
+  m_GridPosition = 0;
+  m_BGColour  = wxColour(DEFAULT_BG_COLOR * 255,DEFAULT_BG_COLOR * 255,DEFAULT_BG_COLOR * 255);
+  m_GridColour= wxColour(DEFAULT_GRID_COLOR * 255,DEFAULT_GRID_COLOR * 255,DEFAULT_GRID_COLOR * 255);
 
   m_Light = vtkLight::New();
   m_Light->SetLightTypeToCameraLight();  
@@ -103,16 +104,18 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, int stereo)
 
 	m_Grid = NULL;
 
-  m_ShowGrid = use_grid;
+  m_ShowGrid    = use_grid;
+  m_GridNormal  = GRID_Z;
 
   m_Grid = vtkGridActor::New();
 	m_RenFront->AddActor(m_Grid);
 	m_RenFront->AddActor2D(m_Grid->GetLabelActor());
-	SetGridNormal(GRID_Y);
+	SetGridNormal(m_GridNormal);
   SetGridVisibility(m_ShowGrid);
 
-	m_Axes = new mafAxes(m_RenFront);
-  m_Axes->SetVisibility(0);
+	m_ShowAxes = show_axes;
+  m_Axes = new mafAxes(m_RenFront);
+  m_Axes->SetVisibility(show_axes);
 }
 //----------------------------------------------------------------------------
 mafRWI::~mafRWI()
@@ -515,4 +518,85 @@ void mafRWI::CameraReset(double bounds[6])
   m_Camera->SetParallelScale(height);
 	
 	//m_RenFront->ResetCameraClippingRange(bounds);
+}
+//-------------------------------------------------------------------------
+/** IDs for the GUI */
+//-------------------------------------------------------------------------
+enum RWI_WIDGET_ID
+{
+  ID_SHOW_GRID = MINID,
+  ID_GRID_NORMAL,
+  ID_GRID_POS,
+  ID_GRID_COLOR,
+  ID_SHOW_AXES,
+  ID_BG_COLOR
+};
+//-------------------------------------------------------------------------
+mmgGui *mafRWI::CreateGui()
+//-------------------------------------------------------------------------
+{
+  wxString grid_normal[3] = {"X axes","Y axes","Z axes"};
+
+  assert(m_Gui == NULL);
+  m_Gui = new mmgGui(this);
+  m_Gui->Bool(ID_SHOW_GRID,"grid",&m_ShowGrid,0,"Turn On/Off the grid");
+  m_Gui->Combo(ID_GRID_NORMAL,"grid normal",&m_GridNormal,3,grid_normal,"orientation axes for the grid");
+  m_Gui->Double(ID_GRID_POS,"grid pos",	&m_GridPosition);
+  m_Gui->Color(ID_GRID_COLOR,"grid color",&m_GridColour);
+  m_Gui->Divider(2);
+  m_Gui->Bool(ID_SHOW_AXES,"show axes",&m_ShowAxes,0);
+  m_Gui->Color(ID_BG_COLOR,"back color",&m_BGColour);
+
+  return m_Gui;
+}
+//-------------------------------------------------------------------------
+mmgGui *mafRWI::GetGui()
+//-------------------------------------------------------------------------
+{
+  if(m_Gui == NULL)
+    return CreateGui();
+  else
+    return m_Gui;
+}
+//----------------------------------------------------------------------------
+void mafRWI::OnEvent(mafEventBase *maf_event)
+//----------------------------------------------------------------------------
+{
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  {
+    switch(e->GetId()) 
+    {
+      case ID_SHOW_GRID:
+        SetGridVisibility(m_ShowGrid != 0);
+        CameraUpdate();
+      break;
+      case ID_GRID_NORMAL:
+        SetGridNormal(m_GridNormal);
+        CameraUpdate();
+      break;
+      case ID_SHOW_AXES:
+        SetAxesVisibility(m_ShowAxes != 0); 
+        CameraUpdate();
+      break;
+      case ID_GRID_POS:
+        SetGridPosition(m_GridPosition);
+        CameraUpdate();
+      break;
+      case ID_GRID_COLOR:
+        SetGridColor(m_GridColour);
+        CameraUpdate();
+      break;
+      case ID_BG_COLOR:
+        SetBackgroundColor(m_BGColour);
+        CameraUpdate();
+      break;
+      default:
+        mafEventMacro(*maf_event);
+      break;
+    }
+  }
+  else
+  {
+    mafEventMacro(*maf_event);
+  }
 }
