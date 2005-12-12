@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-28 13:04:44 $
-  Version:   $Revision: 1.37 $
+  Date:      $Date: 2005-12-12 11:25:22 $
+  Version:   $Revision: 1.38 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,7 +51,7 @@ mafViewVTK is a View that got a RenderWindow and a SceneGraph
 class mafViewVTK: public mafView
 {
 public:
-  mafViewVTK(wxString label = "vtkView", int camera_position = CAMERA_PERSPECTIVE, bool show_axes = true, int stereo = 0, bool external = false);
+  mafViewVTK(wxString label = "vtkView", int camera_position = CAMERA_PERSPECTIVE, bool show_axes = true, bool show_grid = false, int stereo = 0, bool external = false);
   virtual ~mafViewVTK(); 
 
   mafTypeMacro(mafViewVTK, mafView);
@@ -61,12 +61,12 @@ public:
   virtual void			OnEvent(mafEventBase *maf_event);
 
   /** IDs for the GUI */
-  enum VIEW_VTK_WIDGET_ID
+/*  enum VIEW_VTK_WIDGET_ID
   {
     ID_SHOW_GRID = Superclass::ID_LAST,
     ID_GRID_NORMAL,
     ID_LAST
-  };
+  };*/
 
   /** 
   Add the vme to the view's scene-graph*/
@@ -165,8 +165,7 @@ protected:
   int   m_NumberOfVisibleVme; ///< perform ResetCamera only for the first vme shown into the view
   bool  m_ShowAxes;  ///< Flag used to show/hide axes in low left cornel of the view
   int   m_StereoType; ///< Indicate the stereo type to use with the view
-  int   m_ShowGrid;
-  int   m_GridNormal;
+  bool  m_ShowGrid;
 
   virtual mmgGui *CreateGui();
 

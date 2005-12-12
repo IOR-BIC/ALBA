@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-28 13:04:44 $
-  Version:   $Revision: 1.45 $
+  Date:      $Date: 2005-12-12 11:25:22 $
+  Version:   $Revision: 1.46 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,18 +51,16 @@ mafCxxTypeMacro(mafViewVTK);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewVTK::mafViewVTK(wxString label, int camera_position, bool show_axes, int stereo, bool external)
+mafViewVTK::mafViewVTK(wxString label, int camera_position, bool show_axes, bool show_grid, int stereo, bool external)
 :mafView(label,external)
 //----------------------------------------------------------------------------
 {
   m_CameraPosition  = camera_position;
   m_ExternalFlag    = external;
   m_ShowAxes        = show_axes;
+  m_ShowGrid        = show_grid;
   m_StereoType      = stereo;
   
-  m_ShowGrid        = 0;
-  m_GridNormal      = 1;
-
   m_Sg        = NULL;
   m_Rwi       = NULL;
   m_LightKit  = NULL;
@@ -98,7 +96,7 @@ void mafViewVTK::PlugVisualPipe(mafString vme_type, mafString pipe_type, long vi
 mafView *mafViewVTK::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewVTK *v = new mafViewVTK(m_Label, m_CameraPosition, m_ShowAxes, m_StereoType, m_ExternalFlag);
+  mafViewVTK *v = new mafViewVTK(m_Label, m_CameraPosition, m_ShowAxes, m_ShowGrid, m_StereoType, m_ExternalFlag);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
@@ -109,10 +107,9 @@ mafView *mafViewVTK::Copy(mafObserver *Listener)
 void mafViewVTK::Create()
 //----------------------------------------------------------------------------
 {
-  m_Rwi = new mafRWI(mafGetFrame(), ONE_LAYER, m_ShowGrid != 0, m_StereoType);
+  m_Rwi = new mafRWI(mafGetFrame(), ONE_LAYER, m_ShowGrid, m_ShowAxes, m_StereoType);
   m_Rwi->SetListener(this);
   m_Rwi->CameraSet(m_CameraPosition);
-  m_Rwi->SetAxesVisibility(m_ShowAxes != 0);
   m_Win = m_Rwi->m_RwiBase;
 
   m_Sg  = new mafSceneGraph(this,m_Rwi->m_RenFront,m_Rwi->m_RenBack);
@@ -309,12 +306,9 @@ void mafViewVTK::VmeDeletePipe(mafNode *vme)
 mmgGui *mafViewVTK::CreateGui()
 //-------------------------------------------------------------------------
 {
-  wxString grid_normal[3] = {"X axes","Y axes","Z axes"};
-
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
-  m_Gui->Bool(ID_SHOW_GRID,"grid",&m_ShowGrid,0,"Turn On/Off the grid");
-  m_Gui->Combo(ID_GRID_NORMAL,"grid normal",&m_GridNormal,3,grid_normal,"orientation axes for the grid");
+  m_Gui->AddGui(m_Rwi->GetGui());
   m_Gui->Divider(2);
   
   /////////////////////////////////////////Text GUI
@@ -348,14 +342,6 @@ void mafViewVTK::OnEvent(mafEventBase *maf_event)
       case CAMERA_POST_RESET:
         OnPostResetCamera();
         mafEventMacro(*maf_event);
-      break;
-      case ID_SHOW_GRID:
-        m_Rwi->SetGridVisibility(m_ShowGrid != 0);
-        CameraUpdate();
-      break;
-      case ID_GRID_NORMAL:
-        m_Rwi->SetGridNormal(m_GridNormal);
-        CameraUpdate();
       break;
       default:
         mafEventMacro(*maf_event);
