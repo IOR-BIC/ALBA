@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkVolumeSlicer.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-30 12:41:06 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-12-12 11:40:29 $
+  Version:   $Revision: 1.6 $
   Authors:   Alexander Savenko
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -69,6 +69,7 @@ POSSIBILITY OF SUCH DAMAGES.
 class vtkPolyData;
 class vtkImageData;
 class vtkRectilinearGrid;
+class vtkLinearTransform;
 
 class VTK_vtkMAF_EXPORT vtkVolumeSlicer : public vtkDataSetToDataSetFilter {
 public:
@@ -77,7 +78,9 @@ public:
 
   /**
   Specify a point defining the origin of the plane.*/
-  vtkSetVector3Macro(PlaneOrigin, double);
+//  vtkSetVector3Macro(PlaneOrigin, double);
+  void SetPlaneOrigin(double origin[3]);
+  void SetPlaneOrigin(double x, double y, double z);
   vtkGetVectorMacro(PlaneOrigin, double, 3);
 
   /** Specify x-axis of the plane*/
@@ -114,6 +117,10 @@ public:
   void SetTexture(vtkImageData *data) {this->SetNthInput(1, (vtkDataObject*)data);};
   vtkImageData *GetTexture() { return vtkImageData::SafeDownCast(this->Inputs[1]);};
 
+  /** 
+  Transform slicer plane according to the given transformation before slicing.*/
+  void SetSliceTransform(vtkLinearTransform *trans);
+
 protected:
   vtkVolumeSlicer();
   ~vtkVolumeSlicer();
@@ -138,6 +145,13 @@ protected:
   float PlaneAxisX[3];
   float PlaneAxisY[3];
   float PlaneAxisZ[3];
+  
+  double GlobalPlaneOrigin[3];
+  float GlobalPlaneAxisX[3];
+  float GlobalPlaneAxisY[3];
+  float GlobalPlaneAxisZ[3];
+
+  vtkLinearTransform *TransformSlice;
 
   // color mapping
   double Window;
