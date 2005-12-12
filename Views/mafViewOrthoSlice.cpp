@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-06 10:38:07 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-12-12 11:43:42 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -198,7 +198,10 @@ mmgGui* mafViewOrthoSlice::CreateGui()
   m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
 
   EnableWidgets(m_CurrentVolume != NULL);
-
+  for(int i=1; i<m_NumOfChildView; i++)
+  {
+    m_ChildViewList[i]->GetGui();
+  }
   return m_Gui;
 }
 //----------------------------------------------------------------------------
