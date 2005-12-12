@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkGridActor.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-23 18:10:33 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-12-12 11:39:53 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -47,6 +47,8 @@ POSSIBILITY OF SUCH DAMAGES.
 
 #ifndef __vtkGridActor_h
 #define __vtkGridActor_h
+
+#define DEFAULT_GRID_COLOR 0.5
 
 #include "vtkMAFConfigure.h"
 

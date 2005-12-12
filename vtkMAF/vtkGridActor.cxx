@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkGridActor.cxx,v $
   Language:  C++
-  Date:      $Date: 2005-11-23 18:10:32 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-12-12 11:39:53 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -30,7 +30,7 @@
 #include "vtkTextActor.h"
 #include "vtkTextProperty.h"
 
-vtkCxxRevisionMacro(vtkGridActor, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkGridActor, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkGridActor);
 //------------------------------------------------------------------------------
 vtkGridActor::vtkGridActor()
@@ -125,7 +125,7 @@ void vtkGridActor::GridCreate()
   g_pdm->SetInput(g_grid);
 
   vtkProperty *g_p = vtkProperty::New();
-  g_p->SetColor(0.5,0.5,0.5);
+  g_p->SetColor(DEFAULT_GRID_COLOR,DEFAULT_GRID_COLOR,DEFAULT_GRID_COLOR);
   g_p->SetAmbient(1);
   g_p->SetDiffuse(0);
   g_p->SetSpecular(0);
