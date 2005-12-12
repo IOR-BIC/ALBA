@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-06 10:34:39 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2005-12-12 11:41:24 $
+  Version:   $Revision: 1.18 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,9 +24,9 @@
 #include "mmgGui.h"
 #include "mmgMaterialButton.h"
 #include "mafSceneNode.h"
-
 #include "mafVMEVolume.h"
 #include "mafVMEOutputVolume.h"
+#include "mafTransformBase.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFAssembly.h"
@@ -49,6 +49,7 @@
 #include "vtkFollower.h"
 #include "vtkCamera.h"
 #include "vtkDataSet.h"
+#include "vtkTransform.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeVolumeSlice);
@@ -81,7 +82,7 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
   m_ShowUnit = false;
   m_CameraToFollow = NULL;
 
-  m_SliceMode = SLICE_Z;
+  m_SliceDirection  = SLICE_Z;
 
   m_ColorLUTEnabled = 0;
   m_SliceOpacity  = 1.0;
@@ -109,18 +110,18 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
   m_YVector[2][2] = 0;
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice::InitializeSliceParameters(int mode, bool show_vol_bbox)
+void mafPipeVolumeSlice::InitializeSliceParameters(int direction, bool show_vol_bbox)
 //----------------------------------------------------------------------------
 {
-  m_SliceMode     = mode;
+  m_SliceDirection= direction;
   m_ShowVolumeBox = show_vol_bbox;
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice::InitializeSliceParameters(int mode, double slice_origin[3], bool show_vol_bbox)
+void mafPipeVolumeSlice::InitializeSliceParameters(int direction, double slice_origin[3], bool show_vol_bbox)
 //----------------------------------------------------------------------------
 {
   m_SliceParametersInitialized = true;
-  m_SliceMode     = mode;
+  m_SliceDirection= direction;
   m_ShowVolumeBox = show_vol_bbox;
 
   m_Origin[0] = slice_origin[0];
@@ -128,33 +129,33 @@ void mafPipeVolumeSlice::InitializeSliceParameters(int mode, double slice_origin
   m_Origin[2] = slice_origin[2];
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice::InitializeSliceParameters(int mode, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox)
+void mafPipeVolumeSlice::InitializeSliceParameters(int direction, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox)
 //----------------------------------------------------------------------------
 {
   m_SliceParametersInitialized = true;
-  m_SliceMode     = mode;
+  m_SliceDirection= direction;
   m_ShowVolumeBox = show_vol_bbox;
 
   m_Origin[0] = slice_origin[0];
   m_Origin[1] = slice_origin[1];
   m_Origin[2] = slice_origin[2];
 
-  if(m_SliceMode != SLICE_ORTHO)
+  if(m_SliceDirection != SLICE_ORTHO)
   {
-    m_XVector[m_SliceMode][0] = slice_xVect[0];
-    m_XVector[m_SliceMode][1] = slice_xVect[1];
-    m_XVector[m_SliceMode][2] = slice_xVect[2];
+    m_XVector[m_SliceDirection][0] = slice_xVect[0];
+    m_XVector[m_SliceDirection][1] = slice_xVect[1];
+    m_XVector[m_SliceDirection][2] = slice_xVect[2];
 
-    m_YVector[m_SliceMode][0] = slice_yVect[0];
-    m_YVector[m_SliceMode][1] = slice_yVect[1];
-    m_YVector[m_SliceMode][2] = slice_yVect[2];
+    m_YVector[m_SliceDirection][0] = slice_yVect[0];
+    m_YVector[m_SliceDirection][1] = slice_yVect[1];
+    m_YVector[m_SliceDirection][2] = slice_yVect[2];
 
-    vtkMath::Normalize(m_XVector[m_SliceMode]);
-    vtkMath::Normalize(m_YVector[m_SliceMode]);
-    vtkMath::Cross(m_YVector[m_SliceMode], m_XVector[m_SliceMode], m_Normal[m_SliceMode]);
-    vtkMath::Normalize(m_Normal[m_SliceMode]);
-    vtkMath::Cross(m_Normal[m_SliceMode], m_XVector[m_SliceMode], m_YVector[m_SliceMode]);
-    vtkMath::Normalize(m_YVector[m_SliceMode]);
+    vtkMath::Normalize(m_XVector[m_SliceDirection]);
+    vtkMath::Normalize(m_YVector[m_SliceDirection]);
+    vtkMath::Cross(m_YVector[m_SliceDirection], m_XVector[m_SliceDirection], m_Normal[m_SliceDirection]);
+    vtkMath::Normalize(m_Normal[m_SliceDirection]);
+    vtkMath::Cross(m_Normal[m_SliceDirection], m_XVector[m_SliceDirection], m_YVector[m_SliceDirection]);
+    vtkMath::Normalize(m_YVector[m_SliceDirection]);
   }
 }
 //----------------------------------------------------------------------------
@@ -186,8 +187,8 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
   m_ColorLUT->SetRange(srange);
   m_ColorLUT->Build();
 
-	if(m_SliceMode == SLICE_ARB)
-		m_SliceMode = SLICE_X;
+	if(m_SliceDirection == SLICE_ARB)
+		m_SliceDirection = SLICE_X;
 
 	if (!m_SliceParametersInitialized)
 	{
@@ -196,7 +197,7 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
     m_Origin[2] = (b[4] + b[5])*.5;
 	}
 
-	if(m_SliceMode == SLICE_ORTHO)
+	if(m_SliceDirection == SLICE_ORTHO)
 	{
     // overwrite the plane vector, because the slices have to be orthogonal
     m_XVector[0][0] = 0.0001;	//modified by Paolo 29-10-2003 should be 0 !!! check into Sasha's filter
@@ -234,13 +235,13 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 	}
 	else
 	{
-		vtkMath::Normalize(m_XVector[m_SliceMode]);
-		vtkMath::Normalize(m_YVector[m_SliceMode]);
-		vtkMath::Cross(m_YVector[m_SliceMode], m_XVector[m_SliceMode], m_Normal[m_SliceMode]);
-		vtkMath::Normalize(m_Normal[m_SliceMode]);
-		vtkMath::Cross(m_Normal[m_SliceMode], m_XVector[m_SliceMode], m_YVector[m_SliceMode]);
-		vtkMath::Normalize(m_YVector[m_SliceMode]);
-		CreateSlice(m_SliceMode);
+		vtkMath::Normalize(m_XVector[m_SliceDirection]);
+		vtkMath::Normalize(m_YVector[m_SliceDirection]);
+		vtkMath::Cross(m_YVector[m_SliceDirection], m_XVector[m_SliceDirection], m_Normal[m_SliceDirection]);
+		vtkMath::Normalize(m_Normal[m_SliceDirection]);
+		vtkMath::Cross(m_Normal[m_SliceDirection], m_XVector[m_SliceDirection], m_YVector[m_SliceDirection]);
+		vtkMath::Normalize(m_YVector[m_SliceDirection]);
+		CreateSlice(m_SliceDirection);
 	}
 
 	if(m_ShowVolumeBox)
@@ -278,7 +279,7 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
   if(m_AssemblyBack != NULL)
 	{
 		vtkNEW(m_GhostActor);
-		m_GhostActor->SetMapper(m_SliceMapper[m_SliceMode]);
+		m_GhostActor->SetMapper(m_SliceMapper[m_SliceDirection]);
 		m_GhostActor->PickableOff();
 		m_GhostActor->GetProperty()->SetOpacity(0);
 		m_GhostActor->GetProperty()->SetRepresentationToPoints();
@@ -340,7 +341,7 @@ void mafPipeVolumeSlice::DrawUnit()
   }
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice::CreateSlice(int mode)
+void mafPipeVolumeSlice::CreateSlice(int direction)
 //----------------------------------------------------------------------------
 {
 	double srange[2],w,l, xspc = 0.33, yspc = 0.33;
@@ -352,52 +353,54 @@ void mafPipeVolumeSlice::CreateSlice(int mode)
 	w = srange[1] - srange[0];
 	l = (srange[1] + srange[0]) * 0.5;
 
-	vtkNEW(m_SlicerPolygonal[mode]);
-	vtkNEW(m_SlicerImage[mode]);
-	m_SlicerImage[mode]->SetPlaneOrigin(m_Origin[0], m_Origin[1], m_Origin[2]);
-	m_SlicerPolygonal[mode]->SetPlaneOrigin(m_SlicerImage[mode]->GetPlaneOrigin());
-	m_SlicerImage[mode]->SetPlaneAxisX(m_XVector[mode]);
-	m_SlicerImage[mode]->SetPlaneAxisY(m_YVector[mode]);
-	m_SlicerPolygonal[mode]->SetPlaneAxisX(m_XVector[mode]);
-	m_SlicerPolygonal[mode]->SetPlaneAxisY(m_YVector[mode]);
-	m_SlicerImage[mode]->SetInput(vtk_data);
-	m_SlicerPolygonal[mode]->SetInput(vtk_data);
+	vtkNEW(m_SlicerPolygonal[direction]);
+	vtkNEW(m_SlicerImage[direction]);
+	m_SlicerImage[direction]->SetPlaneOrigin(m_Origin[0], m_Origin[1], m_Origin[2]);
+	m_SlicerPolygonal[direction]->SetPlaneOrigin(m_SlicerImage[direction]->GetPlaneOrigin());
+	m_SlicerImage[direction]->SetPlaneAxisX(m_XVector[direction]);
+	m_SlicerImage[direction]->SetPlaneAxisY(m_YVector[direction]);
+	m_SlicerPolygonal[direction]->SetPlaneAxisX(m_XVector[direction]);
+	m_SlicerPolygonal[direction]->SetPlaneAxisY(m_YVector[direction]);
+	m_SlicerImage[direction]->SetInput(vtk_data);
+	m_SlicerPolygonal[direction]->SetInput(vtk_data);
+  m_SlicerImage[direction]->SetSliceTransform(m_Vme->GetOutput()->GetTransform()->GetVTKTransform()->GetLinearInverse());
+  m_SlicerPolygonal[direction]->SetSliceTransform(m_Vme->GetOutput()->GetTransform()->GetVTKTransform()->GetLinearInverse());
+  
+	vtkNEW(m_Image[direction]);
+  m_Image[direction]->SetScalarTypeToUnsignedChar();
+	m_Image[direction]->SetNumberOfScalarComponents(3);
+	m_Image[direction]->SetExtent(0, m_TextureRes - 1, 0, m_TextureRes - 1, 0, 0);
+	m_Image[direction]->SetSpacing(xspc, yspc, 1.f);
 
-	vtkNEW(m_Image[mode]);
-  m_Image[mode]->SetScalarTypeToUnsignedChar();
-	m_Image[mode]->SetNumberOfScalarComponents(3);
-	m_Image[mode]->SetExtent(0, m_TextureRes - 1, 0, m_TextureRes - 1, 0, 0);
-	m_Image[mode]->SetSpacing(xspc, yspc, 1.f);
+	m_SlicerImage[direction]->SetOutput(m_Image[direction]);
+  m_SlicerImage[direction]->SetWindow(w);
+  m_SlicerImage[direction]->SetLevel(l);
+	m_SlicerImage[direction]->Update();
 
-	m_SlicerImage[mode]->SetOutput(m_Image[mode]);
-  m_SlicerImage[mode]->SetWindow(w);
-  m_SlicerImage[mode]->SetLevel(l);
-	m_SlicerImage[mode]->Update();
+	vtkNEW(m_Texture[direction]);
+	m_Texture[direction]->RepeatOff();
+	m_Texture[direction]->InterpolateOn();
+	m_Texture[direction]->SetQualityTo32Bit();
+	m_Texture[direction]->SetInput(m_Image[direction]);
+  m_Texture[direction]->SetLookupTable(m_ColorLUT);
 
-	vtkNEW(m_Texture[mode]);
-	m_Texture[mode]->RepeatOff();
-	m_Texture[mode]->InterpolateOn();
-	m_Texture[mode]->SetQualityTo32Bit();
-	m_Texture[mode]->SetInput(m_Image[mode]);
-  m_Texture[mode]->SetLookupTable(m_ColorLUT);
+  vtkNEW(m_SlicePolydata[direction]);
+	m_SlicerPolygonal[direction]->SetOutput(m_SlicePolydata[direction]);
+	m_SlicerPolygonal[direction]->SetTexture(m_Image[direction]);
+	m_SlicerPolygonal[direction]->Update();
 
-  vtkNEW(m_SlicePolydata[mode]);
-	m_SlicerPolygonal[mode]->SetOutput(m_SlicePolydata[mode]);
-	m_SlicerPolygonal[mode]->SetTexture(m_Image[mode]);
-	m_SlicerPolygonal[mode]->Update();
+	vtkNEW(m_SliceMapper[direction]);
+	m_SliceMapper[direction]->SetInput(m_SlicePolydata[direction]);
+	m_SliceMapper[direction]->ScalarVisibilityOn();
 
-	vtkNEW(m_SliceMapper[mode]);
-	m_SliceMapper[mode]->SetInput(m_SlicePolydata[mode]);
-	m_SliceMapper[mode]->ScalarVisibilityOn();
+	vtkNEW(m_SliceActor[direction]);
+	m_SliceActor[direction]->SetMapper(m_SliceMapper[direction]);
+	m_SliceActor[direction]->SetTexture(m_Texture[direction]);
+	m_SliceActor[direction]->GetProperty()->SetAmbient(1.f);
+	m_SliceActor[direction]->GetProperty()->SetDiffuse(0.f);
+  m_SliceActor[direction]->GetProperty()->SetOpacity(m_SliceOpacity);
 
-	vtkNEW(m_SliceActor[mode]);
-	m_SliceActor[mode]->SetMapper(m_SliceMapper[mode]);
-	m_SliceActor[mode]->SetTexture(m_Texture[mode]);
-	m_SliceActor[mode]->GetProperty()->SetAmbient(1.f);
-	m_SliceActor[mode]->GetProperty()->SetDiffuse(0.f);
-  m_SliceActor[mode]->GetProperty()->SetOpacity(m_SliceOpacity);
-
-	m_AssemblyUsed->AddPart(m_SliceActor[mode]);
+	m_AssemblyUsed->AddPart(m_SliceActor[direction]);
 }
 //----------------------------------------------------------------------------
 mafPipeVolumeSlice::~mafPipeVolumeSlice()
@@ -412,7 +415,15 @@ mafPipeVolumeSlice::~mafPipeVolumeSlice()
 	{
 		if(m_SliceActor[i])
       m_AssemblyUsed->RemovePart(m_SliceActor[i]);
-		vtkDEL(m_SlicerImage[i]);
+		if (m_SlicerImage[i])
+		{
+      m_SlicerImage[i]->SetSliceTransform(NULL);
+		}
+    if (m_SlicerPolygonal[i])
+    {
+      m_SlicerPolygonal[i]->SetSliceTransform(NULL);
+    }
+    vtkDEL(m_SlicerImage[i]);
 		vtkDEL(m_SlicerPolygonal[i]);
 		vtkDEL(m_Image[i]);
 		vtkDEL(m_Texture[i]);
@@ -454,8 +465,8 @@ void mafPipeVolumeSlice::SetLutRange(double low, double hi)
 void mafPipeVolumeSlice::GetLutRange(double range[2])
 //----------------------------------------------------------------------------
 {
-	if(m_SliceMode != SLICE_ORTHO)
-    m_Image[m_SliceMode]->GetScalarRange(range);
+	if(m_SliceDirection != SLICE_ORTHO)
+    m_Image[m_SliceDirection]->GetScalarRange(range);
 	else
     m_Image[0]->GetScalarRange(range);
 }
@@ -463,20 +474,20 @@ void mafPipeVolumeSlice::GetLutRange(double range[2])
 void mafPipeVolumeSlice::SetSlice(double origin[3], float xVect[3], float yVect[3])
 //----------------------------------------------------------------------------
 {
-	m_XVector[m_SliceMode][0] = xVect[0];
-	m_XVector[m_SliceMode][1] = xVect[1];
-	m_XVector[m_SliceMode][2] = xVect[2];
+	m_XVector[m_SliceDirection][0] = xVect[0];
+	m_XVector[m_SliceDirection][1] = xVect[1];
+	m_XVector[m_SliceDirection][2] = xVect[2];
 
-	m_YVector[m_SliceMode][0] = yVect[0];
-	m_YVector[m_SliceMode][1] = yVect[1];
-	m_YVector[m_SliceMode][2] = yVect[2];
+	m_YVector[m_SliceDirection][0] = yVect[0];
+	m_YVector[m_SliceDirection][1] = yVect[1];
+	m_YVector[m_SliceDirection][2] = yVect[2];
 
-	vtkMath::Normalize(m_XVector[m_SliceMode]);
-	vtkMath::Normalize(m_YVector[m_SliceMode]);
-	vtkMath::Cross(m_YVector[m_SliceMode], m_XVector[m_SliceMode], m_Normal[m_SliceMode]);
-	vtkMath::Normalize(m_Normal[m_SliceMode]);
-	vtkMath::Cross(m_Normal[m_SliceMode], m_XVector[m_SliceMode], m_YVector[m_SliceMode]);
-	vtkMath::Normalize(m_YVector[m_SliceMode]);
+	vtkMath::Normalize(m_XVector[m_SliceDirection]);
+	vtkMath::Normalize(m_YVector[m_SliceDirection]);
+	vtkMath::Cross(m_YVector[m_SliceDirection], m_XVector[m_SliceDirection], m_Normal[m_SliceDirection]);
+	vtkMath::Normalize(m_Normal[m_SliceDirection]);
+	vtkMath::Cross(m_Normal[m_SliceDirection], m_XVector[m_SliceDirection], m_YVector[m_SliceDirection]);
+	vtkMath::Normalize(m_YVector[m_SliceDirection]);
 
   SetSlice(origin);
 }
@@ -516,9 +527,9 @@ void mafPipeVolumeSlice::GetSliceOrigin(double origin[3])
 void mafPipeVolumeSlice::GetSliceNormal(double normal[3])
 //----------------------------------------------------------------------------
 {
-	normal[0] = m_Normal[m_SliceMode][0];
-	normal[1] = m_Normal[m_SliceMode][1];
-	normal[2] = m_Normal[m_SliceMode][2];
+	normal[0] = m_Normal[m_SliceDirection][0];
+	normal[1] = m_Normal[m_SliceDirection][1];
+	normal[2] = m_Normal[m_SliceDirection][2];
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeSlice::ColorLookupTable(bool enable)
@@ -575,15 +586,15 @@ mmgGui *mafPipeVolumeSlice::CreateGui()
   m_Gui->Bool(ID_RGB_LUT,"rgb lut", &m_ColorLUTEnabled,0,"turn on/off RGB LUT");
   m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
   m_Vme->GetOutput()->GetVMELocalBounds(b);
-  if (m_SliceMode == SLICE_X || m_SliceMode == SLICE_ORTHO)
+  if (m_SliceDirection == SLICE_X || m_SliceDirection == SLICE_ORTHO)
   {
     m_SliceSlider[0] = m_Gui->FloatSlider(ID_SLICE_SLIDER_X,"x",&m_Origin[0],b[0],b[1]);
   }
-  if (m_SliceMode == SLICE_Y || m_SliceMode == SLICE_ORTHO)
+  if (m_SliceDirection == SLICE_Y || m_SliceDirection == SLICE_ORTHO)
   {
     m_SliceSlider[1] = m_Gui->FloatSlider(ID_SLICE_SLIDER_Y,"y",&m_Origin[1],b[2],b[3]);
   }
-  if (m_SliceMode == SLICE_Z || m_SliceMode == SLICE_ORTHO)
+  if (m_SliceDirection == SLICE_Z || m_SliceDirection == SLICE_ORTHO)
   {
     m_SliceSlider[2] = m_Gui->FloatSlider(ID_SLICE_SLIDER_Z,"z",&m_Origin[2],b[4],b[5]);
   }
@@ -616,6 +627,10 @@ void mafPipeVolumeSlice::OnEvent(mafEventBase *maf_event)
       default:
       break;
     }
+  }
+  else
+  {
+    mafEventMacro(*maf_event);
   }
 }
 //----------------------------------------------------------------------------

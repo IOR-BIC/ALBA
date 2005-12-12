@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-06 10:34:39 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-12-12 11:41:25 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,7 +45,6 @@ enum SLICE_DIRECTION_ID
   SLICE_ORTHO,
   SLICE_ARB
 };
-
 //----------------------------------------------------------------------------
 // mafPipeVolumeSlice :
 //----------------------------------------------------------------------------
@@ -71,9 +70,9 @@ public:
     ID_LAST
   };
 
-  void InitializeSliceParameters(int mode, bool show_vol_bbox);
-  void InitializeSliceParameters(int mode, double slice_origin[3], bool show_vol_bbox);
-  void InitializeSliceParameters(int mode, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox);
+  void InitializeSliceParameters(int direction, bool show_vol_bbox);
+  void InitializeSliceParameters(int direction, double slice_origin[3], bool show_vol_bbox);
+  void InitializeSliceParameters(int direction, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox);
   virtual void Create(mafSceneNode *n);
 
 	/** Show the slice bounding box actor. */
@@ -125,10 +124,10 @@ public:
   Allow to show/hide the cursor unit with length 1 cm. 
   Passing the camera as second parameter, allow the cursor to follow the camera orientation.*/
   void ShowUnit(bool show_unit, vtkCamera *camera_to_follow = NULL);
-					
+
 protected:
 	/** Create the slicer pipeline. */
-	void CreateSlice(int mode);
+	void CreateSlice(int direction);
 
   /** 
   Draw unit segment */
@@ -142,10 +141,10 @@ protected:
 	float  m_YVector[3][3];
   float  m_SliceOpacity;
 
-	int		  m_TextureRes;
-	int		  m_SliceMode;
-  mmgFloatSlider *m_SliceSlider[3];
+	int		 m_TextureRes;
+	int		 m_SliceDirection; ///< Store the slicing direction: SLICE_X, SLICE_Y or SLICE_)
 
+  mmgFloatSlider *m_SliceSlider[3];
   vtkMAFAssembly *m_AssemblyUsed;
 
 	vtkVolumeSlicer				 *m_SlicerImage[3];
