@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslate.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-07 11:21:31 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-12-12 11:34:56 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -54,26 +54,24 @@ mafGizmoTranslate::mafGizmoTranslate(mafVME* input, mafObserver *listener)
   this->ActiveGizmoComponent = -1;
   this->SetModalityToLocal();
 
+  mafMatrix *absInputMatrix = InputVME->GetOutput()->GetAbsMatrix();
   PivotPose = mafMatrix::New();
-  PivotPose->DeepCopy(InputVME->GetOutput()->GetAbsMatrix());
+  PivotPose->DeepCopy(absInputMatrix);
 
   for (int i = 0; i < 3; i++)
   {
     // Create mafGizmoTranslateAxis and send events to this
     GTAxis[i] = new mafGizmoTranslateAxis(input, this);
 	  GTAxis[i]->SetAxis(i);
-
     // Create mafGTranslateAPlane 
     GTPlane[i] = new mafGizmoTranslatePlane(input, this);
     GTPlane[i]->SetPlane(i);
   }
-  
   // create the gizmo gui
   // gui is sending events to this
   GuiGizmoTranslate = new mafGuiGizmoTranslate(this);
   // initialize gizmo gui
-  GuiGizmoTranslate->SetAbsPosition(InputVME->GetOutput()->GetAbsMatrix());
-
+  GuiGizmoTranslate->SetAbsPosition(absInputMatrix);
   Show(false);
 }
 //----------------------------------------------------------------------------
@@ -88,7 +86,6 @@ mafGizmoTranslate::~mafGizmoTranslate()
     cppDEL(GTAxis[i]);
     cppDEL(GTPlane[i]);
   }
-
   PivotPose->Delete();  
   cppDEL(GuiGizmoTranslate);
 }
@@ -112,7 +109,6 @@ void mafGizmoTranslate::OnEvent(mafEventBase *maf_event)
     mafEventMacro(*maf_event);
   }
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoTranslate::OnEventGizmoComponents(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
@@ -160,10 +156,8 @@ void mafGizmoTranslate::OnEventGizmoComponents(mafEventBase *maf_event)
             this->Highlight(ZN_PLANE);
             ActiveGizmoComponent = ZN_PLANE;
           }
-
           // Store pivot position
           PivotPose->DeepCopy(GTAxis[ActiveGizmoComponent]->GetAbsPose());
-
         }
         else if (arg == mmiGenericMouse::MOUSE_MOVE)
         {     
@@ -185,7 +179,6 @@ void mafGizmoTranslate::OnEventGizmoComponents(mafEventBase *maf_event)
 
             // set the new pose to the gizmo
             SetAbsPose(newAbsMatr);
-
             currTr->Delete();
           }          
           else
@@ -193,7 +186,6 @@ void mafGizmoTranslate::OnEventGizmoComponents(mafEventBase *maf_event)
             // gizmo working in global mode; only one axis/plane is moving in a single mouse move event
             if (ActiveGizmoComponent == X ||  ActiveGizmoComponent == Y || ActiveGizmoComponent == Z)
             {
-
               // forward to active axis gizmo              
               vtkTransform *currTr = vtkTransform::New();
               currTr->PostMultiply();
@@ -206,7 +198,6 @@ void mafGizmoTranslate::OnEventGizmoComponents(mafEventBase *maf_event)
 
               // set the new pose to the gizmo
               GTAxis[ActiveGizmoComponent]->SetAbsPose(newAbsMatr);
-
               currTr->Delete();
             }
             else if (ActiveGizmoComponent == XN_PLANE ||  ActiveGizmoComponent == YN_PLANE || ActiveGizmoComponent == ZN_PLANE)
@@ -223,11 +214,9 @@ void mafGizmoTranslate::OnEventGizmoComponents(mafEventBase *maf_event)
 
               // set the new pose to the gizmo
               GTPlane[ActiveGizmoComponent - 3]->SetAbsPose(newAbsMatr);
-
               currTr->Delete();
             }     
           }
-
           // update only gui with gizmo abs position
           GuiGizmoTranslate->SetAbsPosition(newAbsMatr);
         }
@@ -239,7 +228,6 @@ void mafGizmoTranslate::OnEventGizmoComponents(mafEventBase *maf_event)
             SetAbsPose(PivotPose);
           }
         }
-
         // forward event to the listener ie the operation
         // instanciating the gizmo; the sender is changed to "this" so that the operation can check for
         // gizmo sending events
@@ -286,7 +274,6 @@ void mafGizmoTranslate::OnEventGizmoGui(mafEventBase *maf_event)
     break;
   }
 }
- 
 //----------------------------------------------------------------------------
 void mafGizmoTranslate::Highlight (int component) 
 //----------------------------------------------------------------------------
@@ -307,11 +294,9 @@ void mafGizmoTranslate::Highlight (int component)
   }       
   else if (XN_PLANE <= component && component <= ZN_PLANE)
   {
-
     int PlaneToHighlight = component - offset; 
     GTPlane[PlaneToHighlight]->Highlight(true);
     GTAxis[PlaneToHighlight]->Highlight(false);
-
     for (int i = 0; i < 3; i++)
     {
       if (i != PlaneToHighlight)
@@ -325,29 +310,25 @@ void mafGizmoTranslate::Highlight (int component)
   {
     for (int i = 0; i < 3; i++)
     {
-        // DeHighlight everything;
-        GTAxis[i]->Highlight(false);
-        GTPlane[i]->Highlight(false);
+      // DeHighlight everything;
+      GTAxis[i]->Highlight(false);
+      GTPlane[i]->Highlight(false);
     }
   }
 }
-
 //----------------------------------------------------------------------------  
 void mafGizmoTranslate::Show(bool show)
 //----------------------------------------------------------------------------
 {
   // set visibility ivar
   Visibility = show;
-
   for (int i = 0; i < 3; i++)
   {
     GTAxis[i]->Show(show);
     GTPlane[i]->Show(show);
   }
-
   // if auxiliary ref sys is different from vme its orientation cannot be changed
   // so gui must not be keyable. Otherwise set gui keyability to show.
-
   if (RefSysVME == InputVME)
   {
     GuiGizmoTranslate->EnableWidgets(show);
@@ -356,18 +337,13 @@ void mafGizmoTranslate::Show(bool show)
   {
     GuiGizmoTranslate->EnableWidgets(false);
   }
-
-  // update the camera
-  //mafEventMacro(mafEvent(this, CAMERA_UPDATE));  // Paolo 20-07-2005
 }
-
 //----------------------------------------------------------------------------
 mafMatrix *mafGizmoTranslate::GetAbsPose()
 //----------------------------------------------------------------------------
 {
   return GTAxis[0]->GetAbsPose();
 }
-
 //----------------------------------------------------------------------------  
 void mafGizmoTranslate::SetInput(mafVME *input)
 //----------------------------------------------------------------------------
@@ -379,7 +355,6 @@ void mafGizmoTranslate::SetInput(mafVME *input)
     GTPlane[i]->SetInput(input);
   }
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoTranslate::SendTransformMatrixFromGui(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
@@ -387,7 +362,6 @@ void mafGizmoTranslate::SendTransformMatrixFromGui(mafEventBase *maf_event)
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
     // send matrix to be postmultiplied to listener
-    //                                                                  -1    
     // [NewAbsPose] = [M]*[OldAbsPose] => [M] = [NewAbsPose][OldAbsPose]
 
     // build objects
@@ -397,23 +371,17 @@ void mafGizmoTranslate::SendTransformMatrixFromGui(mafEventBase *maf_event)
 
     // incoming matrix is a translation matrix
     newAbsPose->DeepCopy(e->GetMatrix()); // abs position from gui
-
     // copy rotation part from OldAbsPose into NewAbsPose
     mafTransform::CopyRotation(*this->GetAbsPose(), *newAbsPose.GetPointer()); // abs orientation from old pose
-
     invOldAbsPose.DeepCopy(this->GetAbsPose());
     invOldAbsPose.Invert();
-
     mafMatrix::Multiply4x4(*newAbsPose.GetPointer(), invOldAbsPose, *M.GetPointer());
-
     // update gizmo abs pose
     this->SetAbsPose(newAbsPose, InputVME->GetTimeStamp());
-
     // send transfrom to postmultiply to the listener. Events is sent as a transform event
     SendTransformMatrix(M, ID_TRANSFORM, mmiGenericMouse::MOUSE_MOVE);
   }
 }
-
 //----------------------------------------------------------------------------  
 void mafGizmoTranslate::SetAbsPose(mafMatrix *absPose, mafTimeStamp ts)
 //----------------------------------------------------------------------------
@@ -436,10 +404,8 @@ void mafGizmoTranslate::SetAbsPose(mafMatrix *absPose, mafTimeStamp ts)
     GTPlane[i]->SetAbsPose(tmpMatr);
     GTAxis[i]->SetAbsPose(tmpMatr);
   }
-
   GuiGizmoTranslate->SetAbsPosition(tmpMatr);
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoTranslate::SetRefSys(mafVME *refSys)
 //----------------------------------------------------------------------------
@@ -449,11 +415,9 @@ void mafGizmoTranslate::SetRefSys(mafVME *refSys)
 
   RefSysVME = refSys;
   SetAbsPose(RefSysVME->GetOutput()->GetAbsMatrix());
-
   if (RefSysVME == InputVME)
   {
     SetModalityToLocal();
-
     // if the gizmo is visible set the widgets visibility to true
     // if the ref-sys is local
     if (Visibility == true)

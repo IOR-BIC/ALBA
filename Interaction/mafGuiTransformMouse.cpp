@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 15:17:07 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-12-12 11:27:42 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -238,6 +238,8 @@ void mafGuiTransformMouse::CreateISA()
   // default aux ref sys is the vme ref sys
   RefSysVME = InputVME;
 
+  mafMatrix *absMatrix;
+  absMatrix = RefSysVME->GetOutput()->GetAbsMatrix();
   //----------------------------------------------------------------------------
 	// create the rotate behavior
 	//----------------------------------------------------------------------------
@@ -247,7 +249,7 @@ void mafGuiTransformMouse::CreateISA()
   IsaRotate->SetListener(this); 
   IsaRotate->SetVME(InputVME);
   IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToView();
-  IsaRotate->GetRotationConstraint()->GetRefSys()->SetMatrix(RefSysVME->GetOutput()->GetAbsMatrix());
+  IsaRotate->GetRotationConstraint()->GetRefSys()->SetMatrix(absMatrix);
   
   IsaRotate->GetPivotRefSys()->SetTypeToView();
   IsaRotate->GetPivotRefSys()->SetMatrix(RefSysVME->GetOutput()->GetMatrix());
@@ -265,8 +267,8 @@ void mafGuiTransformMouse::CreateISA()
   IsaTranslate->SetVME(InputVME);
   IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
   // set the pivot point
-  IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(RefSysVME->GetOutput()->GetAbsMatrix());
-  IsaTranslate->GetPivotRefSys()->SetTypeToCustom(InputVME->GetOutput()->GetAbsMatrix());
+  IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(absMatrix);
+  IsaTranslate->GetPivotRefSys()->SetTypeToCustom(absMatrix);
 
   IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
   IsaTranslate->EnableTranslation(true);
@@ -278,14 +280,13 @@ void mafGuiTransformMouse::CreateISA()
   IsaRoll = IsaCompositor->CreateBehavior(MOUSE_LEFT_CONTROL);
   
   // isa gen is sending matrix to the operation
-  
   IsaRoll->SetListener(this);
   IsaRoll->SetVME(InputVME);
   IsaRoll->GetRotationConstraint()->GetRefSys()->SetTypeToView();
-  IsaRoll->GetRotationConstraint()->GetRefSys()->SetMatrix(RefSysVME->GetOutput()->GetAbsMatrix());
+  IsaRoll->GetRotationConstraint()->GetRefSys()->SetMatrix(absMatrix);
   
   IsaRoll->GetPivotRefSys()->SetTypeToView();
-  IsaRoll->GetPivotRefSys()->SetMatrix(RefSysVME->GetOutput()->GetAbsMatrix());
+  IsaRoll->GetPivotRefSys()->SetMatrix(absMatrix);
   
   IsaRoll->GetRotationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::FREE);
   IsaRoll->EnableRotation(true);

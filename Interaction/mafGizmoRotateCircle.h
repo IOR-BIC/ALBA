@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateCircle.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:25 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-12-12 11:39:12 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -18,6 +18,7 @@
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
 #include "mafObserver.h"
+#include "mafSmartPointer.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -116,6 +117,8 @@ protected:
   Both reference system type are set to CUSTOM.*/
   void SetRefSysMatrix(mafMatrix *matrix);
 
+  mafAutoPointer<mafMatrix> m_AbsInputMatrix;
+  
   /** Circle gizmo */
   mafVMEGizmo *Gizmo;
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateFan.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-21 07:16:06 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-12-12 11:37:09 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -54,12 +54,12 @@ mafGizmoRotateFan::mafGizmoRotateFan(mafVME *input, mafObserver *listener)
   MirrorStatus = false;
 
   // default axis is X
-  ActiveAxis = X;
+  ActiveAxis  = X;
+  m_Listener  = listener;
+  InputVme    = input;
 
-  m_Listener = listener;
-  InputVme = input;
-
-  RefSys = new mafRefSys(InputVme->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+  mafMatrix *absInputMatrix = InputVme->GetOutput()->GetAbsMatrix();
+  RefSys = new mafRefSys(absInputMatrix->GetVTKMatrix());
 
   // create pipeline stuff
   CreatePipeline();
@@ -67,7 +67,6 @@ mafGizmoRotateFan::mafGizmoRotateFan(mafVME *input, mafObserver *listener)
   //-----------------
   // create vme gizmo stuff
   //-----------------
-  
   // the circle gizmo
   Gizmo = mafVMEGizmo::New();
   Gizmo->SetName("fan");
@@ -79,14 +78,13 @@ mafGizmoRotateFan::mafGizmoRotateFan(mafVME *input, mafObserver *listener)
   // set gizmo color to yellow
   this->SetColor(1, 1, 0);
 
-  SetAbsPose(InputVme->GetOutput()->GetAbsMatrix());
+  SetAbsPose(absInputMatrix);
   
   // hide the gizmo after creation
   this->Show(false);
 
-  Gizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
   // add the gizmo to the tree, this should increase reference count  
-//  mafEventMacro(mafEvent(this, VME_ADD, Gizmo));
+  Gizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
 }
 //----------------------------------------------------------------------------
 mafGizmoRotateFan::~mafGizmoRotateFan() 
@@ -105,12 +103,9 @@ mafGizmoRotateFan::~mafGizmoRotateFan()
   
 	//----------------------
 	// No leaks so somebody is performing this...
-	// cppDEL(GizmoData[i]);
 	//----------------------
   mafEventMacro(mafEvent(this, VME_REMOVE, Gizmo));
-  //vtkDEL(Gizmo);
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoRotateFan::CreatePipeline() 
 //----------------------------------------------------------------------------
@@ -163,7 +158,6 @@ void mafGizmoRotateFan::CreatePipeline()
   ChangeFanAxisTPDF->SetInput(MirrorTPDF->GetOutput());
 	ChangeFanAxisTPDF->SetTransform(ChangeFanAxisTr);
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoRotateFan::SetAxis(int axis) 
 //----------------------------------------------------------------------------
@@ -175,7 +169,6 @@ void mafGizmoRotateFan::SetAxis(int axis)
   ActiveAxis = axis;
   
   // rotate the gizmo components to match the specified axis
-  
     /**
 
       z               x              y
@@ -187,7 +180,6 @@ void mafGizmoRotateFan::SetAxis(int axis)
   
           X               Y            Z
   */
-
   ChangeFanAxisTr->Identity();
   
   // splat the sphere on XY plane; the
@@ -207,14 +199,12 @@ void mafGizmoRotateFan::SetAxis(int axis)
     ChangeFanAxisTr->RotateY(-90);
   }
 }
-
 //----------------------------------------------------------------------------
 void  mafGizmoRotateFan::SetRadius(double radius)
 //----------------------------------------------------------------------------
 {
   Sphere->SetRadius(radius);
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
@@ -234,14 +224,12 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
 
           // get the picked position from the event
           double pos[3];
-          //mafTransform::GetPosition(vtkMatrix4x4::SafeDownCast(e->GetVtkObj()), pos);
           mafTransform::GetPosition(*mafMatrix::SafeDownCast(e->GetMafObject()),pos);
 
           // get the start theta
           double offsetAngle = PointPickedToStartTheta(pos[0], pos[1], pos[2]);
 
           //----------------------------------------
-
           // rotate the fan of theta around its axis 
           RotateFanTr->Identity();
           RotateFanTr->RotateZ(offsetAngle);
@@ -259,7 +247,6 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
           // change the sender and forward the event
           e->SetSender(this);
           mafEventMacro(*e);
-//          mafEventMacro(mafEvent(this, CAMERA_UPDATE));  // Paolo 20-07-2005
         }
         else if (e->GetArg() == mmiGenericMouse::MOUSE_MOVE)
         {
@@ -301,7 +288,6 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
           // change the sender and forward the event
           e->SetSender(this);
           mafEventMacro(*e);
-//          mafEventMacro(mafEvent(this, CAMERA_UPDATE));  // Paolo 20-07-2005
         }
         else if (e->GetArg() == mmiGenericMouse::MOUSE_UP)
         {
@@ -316,8 +302,6 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
           // change the sender and forward the event
           e->SetSender(this);
           mafEventMacro(*e);
-
-//          mafEventMacro(mafEvent(this, CAMERA_UPDATE));  // Paolo 20-07-2005
         }
       }
       break;
@@ -328,7 +312,6 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
     }
   }
 } 
-
 /** Gizmo color */
 //----------------------------------------------------------------------------
 void mafGizmoRotateFan::SetColor(double col[3])
@@ -339,7 +322,6 @@ void mafGizmoRotateFan::SetColor(double col[3])
 	Gizmo->GetMaterial()->m_Prop->SetDiffuse(1);
 	Gizmo->GetMaterial()->m_Prop->SetSpecular(0);
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoRotateFan::SetColor(double colR, double colG, double colB)
 //----------------------------------------------------------------------------
@@ -347,7 +329,6 @@ void mafGizmoRotateFan::SetColor(double colR, double colG, double colB)
   double col[3] = {colR, colG, colB};
   this->SetColor(col);
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoRotateFan::Show(bool show)
 //----------------------------------------------------------------------------
@@ -361,12 +342,10 @@ void mafGizmoRotateFan::Show(bool show)
     Gizmo->GetMaterial()->m_Prop->SetOpacity(0);
   }
 }
-
 //----------------------------------------------------------------------------
 double mafGizmoRotateFan::PointPickedToStartTheta(double xp, double yp, double zp)
 //----------------------------------------------------------------------------
 {
-
   // Get the abs matrix
   mafMatrix invParentAbsMat;
   invParentAbsMat.Invert(*RefSys->GetMatrix(), invParentAbsMat);
@@ -403,11 +382,9 @@ double mafGizmoRotateFan::PointPickedToStartTheta(double xp, double yp, double z
 	  }
 	  break;
   }
-
   double startThetaDeg = startThetaRad * vtkMath::RadiansToDegrees();
   return ((startThetaDeg > 0) ? startThetaDeg : (360 + startThetaDeg));  
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoRotateFan::SetAbsPose(mafMatrix *absPose )
 //----------------------------------------------------------------------------
@@ -415,7 +392,6 @@ void mafGizmoRotateFan::SetAbsPose(mafMatrix *absPose )
   Gizmo->SetAbsMatrix(*absPose);
   SetRefSysMatrix(absPose);
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoRotateFan::SetInput(mafVME *vme)
 //----------------------------------------------------------------------------
@@ -423,7 +399,6 @@ void mafGizmoRotateFan::SetInput(mafVME *vme)
  this->InputVme = vme;
  SetAbsPose(vme->GetOutput()->GetAbsMatrix());
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoRotateFan::SetRefSysMatrix(mafMatrix *matrix)
 //----------------------------------------------------------------------------

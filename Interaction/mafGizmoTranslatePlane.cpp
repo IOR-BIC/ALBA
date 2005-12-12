@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslatePlane.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-07 11:21:33 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-12-12 11:29:53 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -49,10 +49,9 @@ mafGizmoTranslatePlane::mafGizmoTranslatePlane(mafVME *input, mafObserver *liste
 {
   this->SetIsActive(false);
   
-  IsaComp[0] = IsaComp[1] =  NULL;
-
-  m_Listener = listener;
-  InputVme = input;
+  IsaComp[0]  = IsaComp[1] =  NULL;
+  m_Listener  = listener;
+  InputVme    = input;
   
   // default plane is YZ
   ActivePlane = YZ;
@@ -60,11 +59,9 @@ mafGizmoTranslatePlane::mafGizmoTranslatePlane(mafVME *input, mafObserver *liste
   //-----------------
   // pivot stuff
   //-----------------
-
   // pivotTransform is useless for this operation but required by isa generic
   PivotTransform = vtkTransform::New();
 
-  ////-----------------
   // create pipeline stuff
   CreatePipeline();
 
@@ -80,19 +77,18 @@ mafGizmoTranslatePlane::mafGizmoTranslatePlane(mafVME *input, mafObserver *liste
   {
     // the ith gizmo
     Gizmo[i] = mafVMEGizmo::New();
-  
     vmeName = "part";
     vmeName << i;
     Gizmo[i]->SetName(vmeName.GetCStr());
     Gizmo[i]->SetData(RotatePDF[i]->GetOutput());
   }
-
   // assign isa to S1 and S2;
   Gizmo[S1]->SetBehavior(IsaComp[S1]);
   Gizmo[S2]->SetBehavior(IsaComp[S2]);
 
-  SetAbsPose(InputVme->GetOutput()->GetAbsMatrix());
-  SetConstrainRefSys(InputVme->GetOutput()->GetAbsMatrix());
+  mafMatrix *absInputMatrix = InputVme->GetOutput()->GetAbsMatrix();
+  SetAbsPose(absInputMatrix);
+  SetConstrainRefSys(absInputMatrix);
 
   /*
       z
@@ -102,9 +98,7 @@ mafGizmoTranslatePlane::mafGizmoTranslatePlane(mafVME *input, mafObserver *liste
       | SQ  |S1: green         
       |     |         
        --------> y   
-
       SQ: yellow
-
   */
 
   // set come gizmo material property and initial color 
@@ -115,13 +109,10 @@ mafGizmoTranslatePlane::mafGizmoTranslatePlane(mafVME *input, mafObserver *liste
   // hide gizmos at creation
   this->Show(false);
   
-  //-----------------
-  
   // add the gizmo to the tree, this should increase reference count 
   for (i = 0; i < 3; i++)
   {
     Gizmo[i]->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
-//    mafEventMacro(mafEvent(this, VME_ADD, Gizmo[i]));
   }
   
 }
@@ -219,11 +210,9 @@ void mafGizmoTranslatePlane::CreatePipeline()
   //-----------------
   // update segments and square dimension based on vme bb diagonal
   //-----------------
-
   this->SetSizeLength(d / 8);
 
   //-----------------
-
   RotationTr = vtkTransform::New();
   RotationTr->Identity();
 
@@ -234,7 +223,6 @@ void mafGizmoTranslatePlane::CreatePipeline()
     RotatePDF[i]->SetTransform(RotationTr);
     RotatePDF[i]->SetInput(LineTF[i]->GetOutput());
   }
-
   RotatePDF[SQ] = vtkTransformPolyDataFilter::New();
   RotatePDF[SQ]->SetTransform(RotationTr);
   RotatePDF[SQ]->SetInput(Plane->GetOutput());
@@ -244,10 +232,8 @@ void mafGizmoTranslatePlane::CreatePipeline()
 void mafGizmoTranslatePlane::CreateISA()
 //----------------------------------------------------------------------------
 {
-  
   // Create isa compositor and assign behaviors to IsaGen ivar.
   // Default isa is constrained to plane XZ.
-
   for (int i = 0; i < SQ; i++)
   {
     IsaComp[i] = mmiCompositorMouse::New();
@@ -274,7 +260,6 @@ void mafGizmoTranslatePlane::SetPlane(int plane)
   ActivePlane = plane;
   
   // rotate the gizmo components to match the specified plane
-  
   if (ActivePlane == YZ)
   {
     // reset cyl and cone rotation
@@ -380,9 +365,7 @@ void  mafGizmoTranslatePlane::SetSizeLength(double length)
 
                 (0,L,0)
   */
-
   double L = length;
- 
   // update S1
   Line[S1]->SetPoint1(0, L, 0);
   Line[S1]->SetPoint2(0, L, L);
@@ -395,9 +378,7 @@ void  mafGizmoTranslatePlane::SetSizeLength(double length)
   Plane->SetOrigin(0, 0, 0);
   Plane->SetPoint1(0, L, 0);
   Plane->SetPoint2(0, 0, L);
-
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoTranslatePlane::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
@@ -417,8 +398,6 @@ void mafGizmoTranslatePlane::OnEvent(mafEventBase *maf_event)
     mafEventMacro(*e);
   }
 }
-
-
 /** Gizmo color */
 //----------------------------------------------------------------------------
 void mafGizmoTranslatePlane::SetColor(int part, double col[3])
@@ -432,7 +411,6 @@ void mafGizmoTranslatePlane::SetColor(int part, double col[3])
 	  Gizmo[part]->GetMaterial()->m_Prop->SetSpecular(0);
   }
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoTranslatePlane::SetColor(int part, double colR, double colG, double colB)
 //----------------------------------------------------------------------------
@@ -440,12 +418,10 @@ void mafGizmoTranslatePlane::SetColor(int part, double colR, double colG, double
   double col[3] = {colR, colG, colB};
   this->SetColor(part, col);
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoTranslatePlane::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  
   if (show == TRUE)
   {  
     Gizmo[S1]->GetMaterial()->m_Prop->SetOpacity(1);
@@ -468,7 +444,6 @@ void mafGizmoTranslatePlane::Show(bool show)
     }
   }
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoTranslatePlane::ShowSquare(bool show)
 //----------------------------------------------------------------------------
@@ -476,7 +451,6 @@ void mafGizmoTranslatePlane::ShowSquare(bool show)
   double opacity = ((show == TRUE) ? 0.5 : 0);
   Gizmo[SQ]->GetMaterial()->m_Prop->SetOpacity(opacity);
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoTranslatePlane::SetAbsPose(mafMatrix *absPose)
 //----------------------------------------------------------------------------
@@ -488,25 +462,21 @@ void mafGizmoTranslatePlane::SetAbsPose(mafMatrix *absPose)
   
   SetConstrainRefSys(absPose);
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoTranslatePlane::SetConstrainRefSys(mafMatrix *constrain)
 //----------------------------------------------------------------------------
 {  
   for (int i = 0; i < SQ; i++)
   {
-    //IsaGen[i]->SetConstrainRefSys(constrain);
     IsaGen[i]->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(constrain);
   }
 }
-
 //----------------------------------------------------------------------------
 mafMatrix *mafGizmoTranslatePlane::GetAbsPose()
 //----------------------------------------------------------------------------
 {
   return Gizmo[S1]->GetOutput()->GetAbsMatrix();
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoTranslatePlane::SetInput(mafVME *vme)
 //----------------------------------------------------------------------------

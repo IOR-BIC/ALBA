@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslateAxis.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-07 11:21:32 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-12-12 11:32:11 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -64,7 +64,6 @@ mafGizmoTranslateAxis::mafGizmoTranslateAxis(mafVME *input, mafObserver *listene
   //-----------------
   // create vme gizmos stuff
   //-----------------
-
   // cylinder gizmo
   CylGizmo = mafVMEGizmo::New();
   CylGizmo->SetName("CylGizmo");
@@ -89,11 +88,9 @@ mafGizmoTranslateAxis::mafGizmoTranslateAxis(mafVME *input, mafObserver *listene
 
   //-----------------
   // ReparentTo will add also the gizmos to the tree!!
+  // add the gizmo to the tree, this should increase reference count 
   CylGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
   ConeGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
-  // add the gizmo to the tree, this should increase reference count 
-//  mafEventMacro(mafEvent(this, VME_ADD, CylGizmo));
-//  mafEventMacro(mafEvent(this, VME_ADD, ConeGizmo));
 }
 //----------------------------------------------------------------------------
 mafGizmoTranslateAxis::~mafGizmoTranslateAxis() 
@@ -118,12 +115,8 @@ mafGizmoTranslateAxis::~mafGizmoTranslateAxis()
 	//----------------------
     vtkDEL(IsaComp[i]); 
   }
-
   mafEventMacro(mafEvent(this, VME_REMOVE, CylGizmo));
   mafEventMacro(mafEvent(this, VME_REMOVE, ConeGizmo));  
-
-//  CylGizmo->Delete();
-//  ConeGizmo->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -158,7 +151,6 @@ void mafGizmoTranslateAxis::CreatePipeline()
 
   /*
    vtk coord
-
       y
       ^
       |
@@ -170,10 +162,8 @@ void mafGizmoTranslateAxis::CreatePipeline()
    */
   
   //-----------------
-
   // create the cone
   Cone = vtkConeSource::New();
-  //Cone->SetRadius(InputVme->GetCurrentData()->GetLength() / 30);
   Cone->SetRadius(d / 40);
   Cone->SetResolution(20);
 
@@ -192,7 +182,6 @@ void mafGizmoTranslateAxis::CreatePipeline()
   //-----------------
   // update translate transform
   //-----------------
-
   // place the cone; default cone length is 1/4 of vme bb diagonal
   this->SetConeLength(d / 4);
 
@@ -200,7 +189,6 @@ void mafGizmoTranslateAxis::CreatePipeline()
   this->SetCylinderLength(d / 4);
 
   //-----------------
-
   // translate transform setting
   TranslatePDF[CONE]->SetTransform(TranslateTr[CONE]);
   TranslatePDF[CYLINDER]->SetTransform(TranslateTr[CYLINDER]);
@@ -235,9 +223,9 @@ void mafGizmoTranslateAxis::CreatePipeline()
 
   //clean up
   cylInitTr->Delete();
+  cylInitTrPDF->SetTransform(NULL); // Paolo 9/12/05
   cylInitTrPDF->Delete();
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoTranslateAxis::CreateISA()
 //----------------------------------------------------------------------------
@@ -259,7 +247,6 @@ void mafGizmoTranslateAxis::CreateISA()
     IsaGen[i]->SetListener(this);
   }
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoTranslateAxis::SetAxis(int axis) 
 //----------------------------------------------------------------------------
@@ -315,7 +302,6 @@ void mafGizmoTranslateAxis::SetAxis(int axis)
     }
   }  
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoTranslateAxis::Highlight(bool highlight)
 //----------------------------------------------------------------------------
@@ -345,7 +331,6 @@ void mafGizmoTranslateAxis::Highlight(bool highlight)
    } 
   }
 }
-
 //----------------------------------------------------------------------------
 void  mafGizmoTranslateAxis::SetConeLength(double length)
 //----------------------------------------------------------------------------
@@ -362,7 +347,6 @@ void  mafGizmoTranslateAxis::SetConeLength(double length)
   <---------><-------->
      cylLen    conLen
   */  
-
   // set the cone length
   Cone->SetHeight(length);
 
@@ -370,7 +354,6 @@ void  mafGizmoTranslateAxis::SetConeLength(double length)
   TranslateTr[CONE]->Identity();
   TranslateTr[CONE]->Translate(Cylinder->GetHeight() + length / 2, 0, 0);
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoTranslateAxis::SetCylinderLength(double length)
 //----------------------------------------------------------------------------
@@ -400,7 +383,6 @@ void mafGizmoTranslateAxis::SetCylinderLength(double length)
   TranslateTr[CONE]->Translate(length + Cone->GetHeight() / 2, 0, 0);
 
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoTranslateAxis::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
@@ -409,7 +391,6 @@ void mafGizmoTranslateAxis::OnEvent(mafEventBase *maf_event)
 	maf_event->SetSender(this);
   mafEventMacro(*maf_event);
 }
-
 /** Gizmo color */
 //----------------------------------------------------------------------------
 void mafGizmoTranslateAxis::SetColor(int part, double col[3])
@@ -430,7 +411,6 @@ void mafGizmoTranslateAxis::SetColor(int part, double col[3])
     CylGizmo->GetMaterial()->m_Prop->SetSpecular(0);
   }
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoTranslateAxis::SetColor(int part, double colR, double colG, double colB)
 //----------------------------------------------------------------------------
@@ -438,7 +418,6 @@ void mafGizmoTranslateAxis::SetColor(int part, double colR, double colG, double 
   double col[3] = {colR, colG, colB};
   this->SetColor(part, col);
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoTranslateAxis::SetColor(double cylCol[3], double coneCol[3])
 //----------------------------------------------------------------------------
@@ -446,7 +425,6 @@ void mafGizmoTranslateAxis::SetColor(double cylCol[3], double coneCol[3])
   this->SetColor(CYLINDER, cylCol);
   this->SetColor(CONE, coneCol);
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoTranslateAxis::SetColor(double cylR, double cylG, double cylB, double coneR, double coneG, double coneB)
 //----------------------------------------------------------------------------
@@ -454,8 +432,6 @@ void mafGizmoTranslateAxis::SetColor(double cylR, double cylG, double cylB, doub
   this->SetColor(CYLINDER, cylR, cylG, cylB);
   this->SetColor(CONE, coneR, coneG, coneB);
 }
-
-
 //----------------------------------------------------------------------------
 void mafGizmoTranslateAxis::Show(bool show)
 //----------------------------------------------------------------------------
@@ -464,7 +440,6 @@ void mafGizmoTranslateAxis::Show(bool show)
   CylGizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
   ConeGizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoTranslateAxis::SetAbsPose(mafMatrix *absPose)
 //----------------------------------------------------------------------------
@@ -473,7 +448,6 @@ void mafGizmoTranslateAxis::SetAbsPose(mafMatrix *absPose)
   CylGizmo->SetAbsMatrix(*absPose); 
   SetRefSysMatrix(absPose);
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoTranslateAxis::SetRefSysMatrix(mafMatrix *matrix)
 //----------------------------------------------------------------------------
@@ -484,14 +458,12 @@ void mafGizmoTranslateAxis::SetRefSysMatrix(mafMatrix *matrix)
     IsaGen[i]->GetPivotRefSys()->SetTypeToCustom(matrix);
   } 
 }
-
 //----------------------------------------------------------------------------
 mafMatrix *mafGizmoTranslateAxis::GetAbsPose()
 //----------------------------------------------------------------------------
 {
   return CylGizmo->GetOutput()->GetAbsMatrix();
 }
-
 //----------------------------------------------------------------------------
 void mafGizmoTranslateAxis::SetInput(mafVME *vme)
 //----------------------------------------------------------------------------
