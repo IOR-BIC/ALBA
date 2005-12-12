@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-06 10:37:40 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-12-12 11:42:52 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,6 +22,7 @@
 //----------------------------------------------------------------------------
 class mafVME;
 class mafSceneNode;
+class mafAttachCamera;
 
 //----------------------------------------------------------------------------
 // mafViewSlice :
@@ -34,7 +35,7 @@ initialize the visual pipe according to the camera position that is passed throu
 class mafViewSlice: public mafViewVTK
 {
 public:
-  mafViewSlice(wxString label = "Slice", int camera_position = CAMERA_CT, bool show_axes = false, int stereo = 0, bool external = false);
+  mafViewSlice(wxString label = "Slice", int camera_position = CAMERA_CT, bool show_axes = false, bool show_grid = false, int stereo = 0, bool external = false);
   virtual ~mafViewSlice(); 
 
   mafTypeMacro(mafViewSlice, mafViewVTK);
@@ -67,6 +68,8 @@ public:
   Delete vme's visual pipe. It is called when vme is removed from visualization.*/
   virtual void VmeDeletePipe(mafNode *vme);
 
+  void CameraUpdate();
+
   /** 
   Change the range of the WindowLevel Lookup table.*/
   void SetLutRange(double low_val, double high_val);
@@ -82,5 +85,6 @@ public:
 protected:
   virtual mmgGui *CreateGui();
   mafSceneNode *m_CurrentVolume; ///< Current visualized volume
+  mafAttachCamera *m_AttachCamera;
 };
 #endif

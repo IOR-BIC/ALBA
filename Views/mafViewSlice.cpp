@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-23 11:53:31 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-12-12 11:42:51 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,6 +30,7 @@
 #include "mafPipe.h"
 #include "mafRWI.h"
 #include "mafSceneGraph.h"
+#include "mafAttachCamera.h"
 
 #include "vtkDataSet.h"
 #include "vtkRayCast3DPicker.h"
@@ -40,22 +41,24 @@ mafCxxTypeMacro(mafViewSlice);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewSlice::mafViewSlice(wxString label, int camera_position, bool show_axes, int stereo, bool external)
-:mafViewVTK(label,camera_position,show_axes,stereo,external)
+mafViewSlice::mafViewSlice(wxString label, int camera_position, bool show_axes, bool show_grid, int stereo, bool external)
+:mafViewVTK(label,camera_position,show_axes,show_grid,stereo,external)
 //----------------------------------------------------------------------------
 {
   m_CurrentVolume = NULL;
+  m_AttachCamera  = NULL;
 }
 //----------------------------------------------------------------------------
 mafViewSlice::~mafViewSlice()
 //----------------------------------------------------------------------------
 {
+  cppDEL(m_AttachCamera);
 }
 //----------------------------------------------------------------------------
 mafView *mafViewSlice::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewSlice *v = new mafViewSlice(m_Label, m_CameraPosition, m_ShowAxes, m_StereoType, m_ExternalFlag);
+  mafViewSlice *v = new mafViewSlice(m_Label, m_CameraPosition, m_ShowAxes,m_ShowGrid, m_StereoType, m_ExternalFlag);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
@@ -82,6 +85,17 @@ void mafViewSlice::Create()
   vtkNEW(m_Picker2D);
   m_Picker2D->SetTolerance(0.001);
   m_Picker2D->InitializePickList();
+}
+//----------------------------------------------------------------------------
+void mafViewSlice::CameraUpdate()
+//----------------------------------------------------------------------------
+{
+  if (m_AttachCamera != NULL)
+  {
+    m_AttachCamera->UpdateCameraMatrix();
+  }
+  assert(m_Rwi); 
+  m_Rwi->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafViewSlice::VmeCreatePipe(mafNode *vme)
@@ -114,11 +128,13 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
       if (pipe_name.Equals("mafPipeVolumeSlice"))
       {
         m_CurrentVolume = n;
+        if (m_AttachCamera)
+          m_AttachCamera->SetVme(m_CurrentVolume->m_Vme);
         int slice_mode;
         vtkDataSet *data = ((mafVME *)vme)->GetOutput()->GetVTKData();
         assert(data);
         data->Update();
-        switch(m_CameraPosition) 
+        switch(m_CameraPosition)
         {
           case CAMERA_OS_X:
             slice_mode = SLICE_X;
@@ -150,28 +166,26 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
       }
     }
     else
-    {
       mafErrorMessage("Cannot create visual pipe object of type \"%s\"!",pipe_name.GetCStr());
-    }
   }
 }
 //----------------------------------------------------------------------------
 void mafViewSlice::VmeDeletePipe(mafNode *vme)
 //----------------------------------------------------------------------------
 {
+  mafSceneNode *n = m_Sg->Vme2Node(vme);
   if((vme->IsMAFType(mafVMELandmarkCloud) && ((mafVMELandmarkCloud*)vme)->IsOpen()) || vme->IsMAFType(mafVMELandmark) && m_NumberOfVisibleVme == 0)
-  {
     m_NumberOfVisibleVme = 0;
-  }
   else
-  {
     m_NumberOfVisibleVme--;
-  }
   if (vme->IsMAFType(mafVMEVolume))
   {
     m_CurrentVolume = NULL;
+    if (m_AttachCamera)
+    {
+      m_AttachCamera->SetVme(NULL);
+    }
   }
-  mafSceneNode *n = m_Sg->Vme2Node(vme);
   assert(n && n->m_Pipe);
   cppDEL(n->m_Pipe);
 }
@@ -202,7 +216,8 @@ mmgGui *mafViewSlice::CreateGui()
 {
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
-  
+  m_AttachCamera = new mafAttachCamera(m_Gui, m_Rwi, this);
+  m_Gui->AddGui(m_AttachCamera->GetGui());
   return m_Gui;
 }
 //----------------------------------------------------------------------------
