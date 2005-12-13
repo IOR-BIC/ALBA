@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoBoundingBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 15:12:36 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-12-13 16:44:43 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -59,8 +59,8 @@ mafGizmoBoundingBox::mafGizmoBoundingBox(mafVME *input, mafObserver *listener)
   BoxGizmo->SetName("BoxGizmo");
   
   // since i'm working in local mode i reparent to input vme the gizmo
-  BoxGizmo->ReparentTo(InputVme);
   BoxGizmo->SetData(BoxOutline->GetOutput());
+  BoxGizmo->ReparentTo(InputVme);
   
   // set cone gizmo material property and initial color to red
   this->SetColor(1, 0, 0);
@@ -69,7 +69,7 @@ mafGizmoBoundingBox::mafGizmoBoundingBox(mafVME *input, mafObserver *listener)
   this->Show(false);
 
   // add the gizmo to the tree
-  mafEventMacro(mafEvent(this, VME_ADD, BoxGizmo));
+  //mafEventMacro(mafEvent(this, VME_ADD, BoxGizmo));
 }
 //----------------------------------------------------------------------------
 mafGizmoBoundingBox::~mafGizmoBoundingBox() 
