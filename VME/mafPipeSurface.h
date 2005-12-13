@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-21 13:36:33 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-12-13 16:33:06 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,6 +17,8 @@
 // Include :
 //----------------------------------------------------------------------------
 #include "mafPipe.h"
+#include "mmgVMEChooserAccept.h"
+#include "mafVMEImage.h"
 
 //----------------------------------------------------------------------------
 // forward refs :
@@ -57,8 +59,21 @@ public:
     ID_SCALAR_VISIBILITY = Superclass::ID_LAST,
     ID_OPTIMIZE_SURFACE,
     ID_RENDERING_DISPLAY_LIST,
+    ID_CHOOSE_TEXTURE,
     ID_LAST
   };
+
+  class mafTextureAccept : public mmgVMEChooserAccept
+  {
+  public:
+
+    mafTextureAccept() {};
+    ~mafTextureAccept() {};
+
+    bool Validate(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEImage));};
+  };
+
+  mafTextureAccept *m_TextureAccept;
 
 protected:
   vtkCleanPolyData        *m_CleanPolydata;

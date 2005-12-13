@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-21 13:36:33 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2005-12-13 16:33:06 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,6 +45,8 @@
 #include "vtkCleanPolyData.h"
 #include "vtkTriangleFilter.h"
 #include "vtkStripper.h"
+#include "vtkImageData.h"
+#include "vtkTextureMapToCylinder.h"
 
 #include <vector>
 
@@ -65,6 +67,7 @@ mafPipeSurface::mafPipeSurface()
   m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
   m_MaterialButton  = NULL;
+  m_TextureAccept   = NULL;
 
   m_ScalarVisibility = 0;
   m_OptimizedSurfaceFlag = 0;
@@ -118,8 +121,12 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
   vtkNEW(m_Stripper);
   m_Stripper->SetInput(m_TriangleFilter->GetOutput());
 
+  vtkMAFSmartPointer<vtkTextureMapToCylinder> texture_mapper;
+  texture_mapper->SetInput(data);
+  texture_mapper->PreventSeamOff();
+
   m_Mapper = vtkPolyDataMapper::New();
-	m_Mapper->SetInput(data);
+	m_Mapper->SetInput((vtkPolyData *)texture_mapper->GetOutput());
   m_Mapper->SetScalarVisibility(m_ScalarVisibility);
   m_Mapper->SetScalarRange(sr);
   
@@ -205,6 +212,8 @@ mafPipeSurface::~mafPipeSurface()
   m_AssemblyFront->RemovePart(m_Actor);
   m_AssemblyFront->RemovePart(m_OutlineActor);
 
+  cppDEL(m_TextureAccept);
+
   vtkDEL(m_CleanPolydata);
   vtkDEL(m_NormalFilter);
   vtkDEL(m_TriangleFilter);
@@ -276,6 +285,8 @@ void mafPipeSurface::UpdateProperty(bool fromTag)
 mmgGui *mafPipeSurface::CreateGui()
 //----------------------------------------------------------------------------
 {
+  m_TextureAccept = new mafTextureAccept();
+
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
   m_Gui->Bool(ID_SCALAR_VISIBILITY,"scalar vis.", &m_ScalarVisibility,0,"turn on/off the scalar visibility");
@@ -283,7 +294,8 @@ mmgGui *mafPipeSurface::CreateGui()
   m_MaterialButton = new mmgMaterialButton(m_Vme,this);
   m_Gui->AddGui(m_MaterialButton->GetGui());
   m_Gui->Bool(ID_RENDERING_DISPLAY_LIST,"displaylist",&m_RenderingDisplayListFlag,0,"turn on/off \nrendering displaylist calculation");
-  m_Gui->Bool(ID_OPTIMIZE_SURFACE,"optimize",&m_OptimizedSurfaceFlag,0,"optimize surface for rendering");
+  //m_Gui->Bool(ID_OPTIMIZE_SURFACE,"optimize",&m_OptimizedSurfaceFlag,0,"optimize surface for rendering");
+  m_Gui->Button(ID_CHOOSE_TEXTURE,"texture");
 
   return m_Gui;
 }
@@ -306,7 +318,7 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
           data->GetScalarRange(range);
           m_Mapper->SetScalarRange(range);
         }
-        m_Vme->ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       }
     	break;
       case ID_OPTIMIZE_SURFACE:
@@ -314,12 +326,36 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
         OptimizeSurface(m_OptimizedSurfaceFlag != 0);
       }
       break;
+      case ID_CHOOSE_TEXTURE:
+      {
+        mafString title = "Choose texture";
+        e->SetId(VME_CHOOSE);
+        e->SetArg((long)m_TextureAccept);
+        e->SetString(&title);
+        mafEventMacro(*e);
+        mafNode *n = e->GetVme();
+        if (n != NULL)
+        {
+          vtkImageData *image = vtkImageData::SafeDownCast(((mafVME *)n)->GetOutput()->GetVTKData());
+          if (image)
+          {
+            image->Update();
+            mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
+            surface_output->GetMaterial()->SetMaterialTexture(n->GetId());
+            surface_output->GetMaterial()->m_MaterialType = mmaMaterial::USE_TEXTURE;
+            m_Texture->SetInput(image);
+            m_Actor->SetTexture(m_Texture);
+            mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+          }
+        }
+      }
+      break;
       case ID_RENDERING_DISPLAY_LIST:
         m_Mapper->SetImmediateModeRendering(m_RenderingDisplayListFlag);
-        m_Vme->ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
       default:
-        m_Vme->ForwardUpEvent(*e);
+        mafEventMacro(*e);
       break;
     }
   }
