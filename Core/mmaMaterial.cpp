@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-28 13:02:09 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-12-13 16:31:59 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -243,6 +243,7 @@ void mmaMaterial::DeepCopy(const mafAttribute *a)
   m_TableRange[0]       = ((mmaMaterial *)a)->m_TableRange[0];
   m_TableRange[1]       = ((mmaMaterial *)a)->m_TableRange[1];
   m_NumColors           = ((mmaMaterial *)a)->m_NumColors;
+  m_MaterialType        = ((mmaMaterial *)a)->m_MaterialType;
 }
 //----------------------------------------------------------------------------
 bool mmaMaterial::Equals(const mafAttribute *a)
@@ -276,7 +277,8 @@ bool mmaMaterial::Equals(const mafAttribute *a)
       m_TableRange[0]       == ((mmaMaterial *)a)->m_TableRange[0]      &&
       m_TableRange[1]       == ((mmaMaterial *)a)->m_TableRange[1]      &&
       m_NumColors           == ((mmaMaterial *)a)->m_NumColors          &&
-      m_Representation      == ((mmaMaterial *)a)->m_Representation);
+      m_Representation      == ((mmaMaterial *)a)->m_Representation     &&
+      m_MaterialType        == ((mmaMaterial *)a)->m_MaterialType);
   }
   return false;
 }
@@ -313,6 +315,7 @@ int mmaMaterial::InternalStore(mafStorageElement *parent)
     parent->StoreDouble("TableRange1", m_TableRange[1]);
     parent->StoreInteger("NumColors", m_NumColors);
     parent->StoreInteger("TextureID", m_TextureID);
+    parent->StoreInteger("MaterialType", m_MaterialType);
     return MAF_OK;
   }
   return MAF_ERROR;
@@ -350,6 +353,7 @@ int mmaMaterial::InternalRestore(mafStorageElement *node)
     node->RestoreDouble("TableRange1", m_TableRange[1]);
     node->RestoreInteger("NumColors", m_NumColors);
     node->RestoreInteger("TextureID", m_TextureID);
+    node->RestoreInteger("MaterialType", m_MaterialType);
     UpdateProp();
     return MAF_OK;
   }
