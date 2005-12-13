@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeProjected.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-11 06:21:09 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-12-13 16:32:40 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -56,7 +56,6 @@ mafPipeVolumeProjected::mafPipeVolumeProjected()
 :mafPipe()
 //----------------------------------------------------------------------------
 {
-  m_UsedAssembly = m_AssemblyFront ? m_AssemblyFront : m_AssemblyBack;
   m_CamPosition = CAMERA_RX_FRONT;
 }
 //----------------------------------------------------------------------------
@@ -73,6 +72,7 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 //----------------------------------------------------------------------------
 {
   Superclass::Create(n); // Always call this to initialize m_Vme, m_AssemblyFront, ... vars
+  m_UsedAssembly = m_AssemblyBack ? m_AssemblyBack : m_AssemblyFront;
 
 	assert(m_Vme->IsMAFType(mafVMEVolumeGray));
 
@@ -103,6 +103,7 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
   double range[2]; // used with lut
 	double bounds[6];
   m_Vme->GetOutput()->GetBounds(bounds);
+  //m_Vme->GetOutput()->GetVTKData()->GetScalarRange(range);
 
 	double xmin, xmax, ymin, ymax, zmin, zmax;
 	xmin = bounds[0];
