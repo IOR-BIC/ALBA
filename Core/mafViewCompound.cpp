@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 09:28:14 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-12-13 16:37:10 $
+  Version:   $Revision: 1.15 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -115,9 +115,9 @@ void mafViewCompound::Create()
 void mafViewCompound::CreateGuiView()
 //----------------------------------------------------------------------------
 {
-  m_GuiView = new mmgGui(this);
+  /*m_GuiView = new mmgGui(this);
   m_GuiView->Label("Compound View's GUI",true);
-  m_GuiView->Reparent(m_Win);
+  m_GuiView->Reparent(m_Win);*/
 }
 //----------------------------------------------------------------------------
 void mafViewCompound::VmeAdd(mafNode *node)
@@ -256,12 +256,12 @@ mmgGui* mafViewCompound::CreateGui()
   mafString childview_tooltip;
   childview_tooltip = "set the default child view";
 
-  wxString layout_choices[3] = {"default","layout 1","layout 2"};
+  wxString layout_choices[4] = {"default","layout 1","layout 2", "custom"};
 
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
   m_Gui->Integer(ID_DEFAULT_CHILD_VIEW,"default child", &m_DefauldChildView, 0, m_NumOfChildView, childview_tooltip);
-  m_Gui->Combo(ID_LAYOUT_CHOOSER,"layout",&m_LayoutConfiguration,3,layout_choices);
+  m_Gui->Combo(ID_LAYOUT_CHOOSER,"layout",&m_LayoutConfiguration,4,layout_choices);
   return m_Gui;
 }
 //----------------------------------------------------------------------------
@@ -283,14 +283,16 @@ void mafViewCompound::OnLayout()
 
   int sw = m_Size.GetWidth();
   int sh = m_Size.GetHeight();
+  int gh = 0;
 
-  wxSize gui_size = m_GuiView->GetBestSize();
-  int gh = gui_size.GetHeight();
-
-  if(sw<gh || sh<gh) return;
-
-  sh -= gh;
-  m_GuiView->SetSize(0,sh,sw,gh);
+  if (m_GuiView)
+  {
+    wxSize gui_size = m_GuiView->GetBestSize();
+    gh = gui_size.GetHeight();
+    if(sw<gh || sh<gh) return;
+    sh -= gh;
+    m_GuiView->SetSize(0,sh,sw,gh);
+  }
 
   if (m_SubViewMaximized == -1)
   {
@@ -369,6 +371,10 @@ void mafViewCompound::LayoutSubView(int width, int height)
       i++;
     }
   }
+  else
+  {
+    LayoutSubViewCustom(width,height);
+  }
 }
 //----------------------------------------------------------------------------
 void mafViewCompound::SetMouse(mmdMouse *mouse)
@@ -394,6 +400,16 @@ mafView *mafViewCompound::GetSubView()
         return m_ChildViewList[i];
       }
     }
+  }
+  return m_ChildViewList[m_DefauldChildView];
+}
+//----------------------------------------------------------------------------
+mafView *mafViewCompound::GetSubView(int idx)
+//----------------------------------------------------------------------------
+{
+  if (idx >= 0 && idx < m_NumOfChildView)
+  {
+    return m_ChildViewList[idx];
   }
   return m_ChildViewList[m_DefauldChildView];
 }

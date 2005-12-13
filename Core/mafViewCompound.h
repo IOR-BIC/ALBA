@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 09:28:14 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-12-13 16:37:11 $
+  Version:   $Revision: 1.16 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,7 +51,8 @@ public:
     GRID_LAYOUT = 0,
     LAYOUT_1,
     LAYOUT_2,
-    LAYOUT_3
+    LAYOUT_3,
+    LAYOUT_CUSTOM
   };
 
   /** 
@@ -154,8 +155,16 @@ public:
   mafView *GetSubView();
 
   /** 
+  Return the sub-view with index idx.*/
+  mafView *GetSubView(int idx);
+
+  /** 
   Return the sub-view num index which the mouse is interacting with.*/
   int GetSubViewIndex();
+
+  /** 
+  Return the number of child view.*/
+  int GetNumberOfSubView() {return m_NumOfChildView;};
 
   /** 
   Let the sub-view to be maximized inside the compounded view. */
@@ -181,6 +190,10 @@ protected:
 
   /** Arrange sub-view into the defined layout configuration.*/
   void LayoutSubView(int width, int height);
+
+  /** 
+  Redefine this method to define a custom layout.*/
+  virtual void LayoutSubViewCustom(int width, int height) {};
 
   int m_ViewRowNum; ///< number of rows to divide the compound view
   int m_ViewColNum; ///< number of cols to divide the compound view
