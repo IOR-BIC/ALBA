@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslateAxis.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-12 11:32:11 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-12-16 17:40:57 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -223,7 +223,6 @@ void mafGizmoTranslateAxis::CreatePipeline()
 
   //clean up
   cylInitTr->Delete();
-  cylInitTrPDF->SetTransform(NULL); // Paolo 9/12/05
   cylInitTrPDF->Delete();
 }
 //----------------------------------------------------------------------------

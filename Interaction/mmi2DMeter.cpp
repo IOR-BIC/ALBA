@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi2DMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-30 13:10:30 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-12-16 17:40:50 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -74,8 +74,8 @@ mmi2DMeter::mmi2DMeter()
   m_PlotActor->SetPlotCoordinate(0,300);
   m_PlotActor->SetNumberOfXLabels(10);
   m_PlotActor->SetXValuesToIndex();
-  m_PlotActor->SetTitle("Density vs. Point ID");
-  m_PlotActor->SetXTitle("ID");
+  m_PlotActor->SetTitle("Density vs. Length (mm)");
+  m_PlotActor->SetXTitle("mm");
   m_PlotActor->SetYTitle("Dens.");
   vtkTextProperty* tprop = m_PlotActor->GetTitleTextProperty();
   tprop->SetColor(0.02,0.06,0.62);
