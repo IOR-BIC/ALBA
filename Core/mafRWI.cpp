@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-12 11:24:27 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2005-12-16 17:16:28 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -111,7 +111,7 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axe
 	m_RenFront->AddActor(m_Grid);
 	m_RenFront->AddActor2D(m_Grid->GetLabelActor());
 	SetGridNormal(m_GridNormal);
-  SetGridVisibility(m_ShowGrid);
+  SetGridVisibility(m_ShowGrid != 0);
 
 	m_ShowAxes = show_axes;
   m_Axes = new mafAxes(m_RenFront);
