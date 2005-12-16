@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 11:45:04 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2005-12-16 17:40:24 $
+  Version:   $Revision: 1.25 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,7 +18,6 @@
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
-
 
 #include "mafSideBar.h"
 #include "mafView.h"
@@ -42,13 +41,15 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener)
 
   //splitted panel  
   m_Notebook = new wxNotebook(parent,-1);
-  m_SideSplittedPanel = new mmgSplittedPanel(m_Notebook,-1,200); //SIL. 29-4-2003 - 200 is the height of the vme_property panel
+  //m_SideSplittedPanel = new mmgNamedPanel(m_Notebook,-1,false,true); //SIL. 29-4-2003 - 200 is the height of the vme_property panel
+  m_SideSplittedPanel = new wxSplitterWindow(m_Notebook, -1,wxDefaultPosition,wxSize(-1,-1),/*wxSP_3DSASH |*/ wxSP_FULLSASH);
 
   //tree ----------------------------
   m_Tree = new mmgCheckTree(m_SideSplittedPanel,-1,true);
   m_Tree->SetListener(Listener);
+  m_Tree->SetSize(-1,300);
   m_Tree->SetTitle(" vme hierarchy: ");
-  m_SideSplittedPanel->PutOnTop(m_Tree);
+  //m_SideSplittedPanel->Add(m_Tree);
   m_Notebook->AddPage(m_SideSplittedPanel,"vme manager",true);
 
   //view property panel
@@ -63,16 +64,7 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener)
   m_OpPanel->Push(empty_op);
   m_Notebook->AddPage(m_OpPanel ," op. parameters");
 
-  // wxFrame is needed to avoid endless loop in wxNotebook when
-  // a button inside it is pressed and a different notebook tab is pressed suddenly after!! 
-  // (mmgNamedPanel doesn't block the problem)
-#ifdef WIN32
-  wxFrame *vme_property_frame = new wxFrame(m_SideSplittedPanel,-1,"Vme Property",wxDefaultPosition,wxDefaultSize,wxNO_BORDER);
-  wxNotebook *vme_notebook = new wxNotebook(vme_property_frame,-1);
-#else
-  //mmgNamedPanel *vme_property_frame = new mmgNamedPanel(m_SideSplittedPanel ,-1,false,true);
   wxNotebook *vme_notebook = new wxNotebook(m_SideSplittedPanel,-1);
-#endif
 
   m_VmeOutputPanel = new mmgGuiHolder(vme_notebook,-1,false,true);
   vme_notebook->AddPage(m_VmeOutputPanel," vme output ");
@@ -81,12 +73,10 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener)
   m_VmePanel = new mmgGuiHolder(vme_notebook,-1,false,true);
   vme_notebook->AddPage(m_VmePanel," vme object ");
 
-#ifdef WIN32
-  m_SideSplittedPanel->PutOnBottom(vme_property_frame);
-#else
-  m_SideSplittedPanel->PutOnBottom(vme_notebook);
-#endif
+  //m_SideSplittedPanel->Add(vme_notebook,1);
   //m_side_bar->Put(m_Notebook);
+  m_SideSplittedPanel->SetMinimumPaneSize(50);
+  m_SideSplittedPanel->SplitHorizontally(m_Tree,vme_notebook);
 }
 //----------------------------------------------------------------------------
 mafSideBar::~mafSideBar() 

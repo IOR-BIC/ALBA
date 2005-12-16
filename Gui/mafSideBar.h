@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:50:08 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-12-16 17:40:25 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -15,6 +15,8 @@
 // Include:
 //----------------------------------------------------------------------------
 #include <wx/notebook.h>
+#include <wx/splitter.h>
+
 #include "mafEvent.h"
 #include "mafObserver.h"
 #include "mmgSashPanel.h"
@@ -97,8 +99,8 @@ public:
   void Show( bool show) {m_Notebook->Show(show);};
 
   wxNotebook        *m_Notebook;
-  mmgSplittedPanel  *m_SideSplittedPanel;
-  
+  //mmgNamedPanel    *m_SideSplittedPanel;
+  wxSplitterWindow *m_SideSplittedPanel;
 protected:
   void UpdateVmePanel();  
 
