@@ -76,6 +76,8 @@ SET(PROJECT_SRCS
   mmgMDIChild.h
   mmgMDIFrame.cpp
   mmgMDIFrame.h
+  mmgMutexPanel.cpp
+  mmgMutexPanel.h
   mmgNamedPanel.cpp
   mmgNamedPanel.h
   mmgPanel.cpp
