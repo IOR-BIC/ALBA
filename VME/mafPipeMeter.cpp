@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-16 13:37:11 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2005-12-16 18:55:07 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -266,7 +266,7 @@ void mafPipeMeter::OnEvent(mafEventBase *maf_event)
         UpdateProperty();
       break;
       case ID_COLOR_MODE:
-        m_Gui->Enable(ID_DISTANCE_RANGE,meter_attrib->m_ColorMode);
+        m_Gui->Enable(ID_DISTANCE_RANGE,meter_attrib->m_ColorMode == mafVMEMeter::ONE_COLOR);
         m_MaterialButton->Enable(!meter_attrib->m_ColorMode);
       break;
       case ID_METER_REPRESENTATION:
