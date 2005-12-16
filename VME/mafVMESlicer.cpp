@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-13 13:42:40 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-12-16 17:42:38 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -90,6 +90,7 @@ mafVMESlicer::mafVMESlicer()
   GetSurfaceOutput()->SetTexture((vtkImageData *)((mafDataPipeCustom *)GetDataPipe())->GetVTKDataPipe()->GetOutput(1));
   GetMaterial()->SetMaterialTexture(GetSurfaceOutput()->GetTexture());
   GetMaterial()->m_MaterialType = mmaMaterial::USE_TEXTURE;
+  GetMaterial()->m_TextureMappingMode = mmaMaterial::PLANE_MAPPING;
 }
 
 //-------------------------------------------------------------------------
