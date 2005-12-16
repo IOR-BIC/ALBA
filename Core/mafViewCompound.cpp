@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-13 16:37:10 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-12-16 17:47:20 $
+  Version:   $Revision: 1.16 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,6 +45,7 @@ mafViewCompound::mafViewCompound( wxString label, int num_row, int num_col, bool
   m_ViewColNum = num_col;
   m_NumOfPluggedChildren  = 0;
   m_DefauldChildView      = 0;
+  m_NumOfChildView        = 0;
   m_ChildViewList.clear();
   m_PluggedChildViewList.clear();
   m_GuiView = NULL;
@@ -56,11 +57,16 @@ mafViewCompound::mafViewCompound( wxString label, int num_row, int num_col, bool
 mafViewCompound::~mafViewCompound()
 //----------------------------------------------------------------------------
 {
-  m_PluggedChildViewList.clear();
-  for(int i=0; i<m_NumOfChildView; i++)
+  for(int i=0; i<m_NumOfPluggedChildren; i++)
   {
-    cppDEL(m_ChildViewList[i]);
+    cppDEL(m_PluggedChildViewList[i]);
   }
+  for (int cv = 0; cv<m_NumOfChildView; cv++)
+  {
+    cppDEL(m_ChildViewList[cv]);
+  }
+  m_PluggedChildViewList.clear();
+  m_ChildViewList.clear();
   m_ChildViewList.clear();
 }
 //----------------------------------------------------------------------------
@@ -70,7 +76,10 @@ mafView *mafViewCompound::Copy(mafObserver *Listener)
   mafViewCompound *v = new mafViewCompound(m_Label, m_ViewRowNum, m_ViewColNum, m_ExternalFlag);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
-  v->m_PluggedChildViewList = m_PluggedChildViewList;
+  for (int i=0;i<m_PluggedChildViewList.size();i++)
+  {
+    v->m_PluggedChildViewList.push_back(m_PluggedChildViewList[i]->Copy(this));
+  }
   v->m_NumOfPluggedChildren = m_NumOfPluggedChildren;
   v->Create();
   return v;
