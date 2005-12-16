@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-06 10:37:07 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2005-12-16 17:16:59 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,6 +15,7 @@
 #include "mmuIdFactory.h"
 #include <vector>
 #include <string>
+#include <math.h>
 
 static bool yelding;
 //----------------------------------------------------------------------------
@@ -123,6 +124,22 @@ std::string mafGetApplicationDirectory()
 		wxSetWorkingDirectory(cd);
 	}
 	return app_dir.c_str();
+}
+//----------------------------------------------------------------------------
+float RoundValue(float f_in, int decimal_digits)
+//----------------------------------------------------------------------------
+{
+  float f_tmp = f_in * pow(10,decimal_digits);
+  int b = ( f_tmp >= 0 ) ? static_cast<int>( f_tmp + .5):static_cast<int>( f_tmp - .5);
+  return b / pow(10,decimal_digits);
+}
+//----------------------------------------------------------------------------
+double RoundValue(double d_in, int decimal_digits)
+//----------------------------------------------------------------------------
+{
+  double d_tmp = d_in * pow(10,decimal_digits);
+  int b = ( d_tmp >= 0 ) ? static_cast<int>( d_tmp + .5):static_cast<int>( d_tmp - .5);
+  return b / pow(10,decimal_digits);
 }
 //----------------------------------------------------------------------------
 wxColour mafRandomColor()

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-06 10:37:07 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-12-16 17:16:59 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -386,13 +386,7 @@ std::string  mafGetApplicationDirectory();
 /** translate an event-id into a readable string */
 std::string  mafIdString(int id);
 
+float RoundValue(float f_in, int decimal_digits = 2);
+double RoundValue(double d_in, int decimal_digits = 2);
+
 #endif
-
-
-
-
-
-
-
-
-
