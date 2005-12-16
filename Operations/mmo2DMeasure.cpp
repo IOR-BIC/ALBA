@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmo2DMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-30 11:34:43 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-12-16 17:42:08 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -94,8 +94,8 @@ void mmo2DMeasure::OpRun()
   m_Gui->Bool(ID_PLOT_PROFILE,"plot profile",&m_GenerateHistogramFlag);
   m_Gui->Divider();
   m_Gui->Label("distance: ",&m_DistanceMeasure);
-  m_Gui->Label("acute angle: ",&m_AcuteAngle);
-  m_Gui->Label("obtuse angle: ",&m_ObtuseAngle);
+  m_Gui->Label("angle: ",&m_AcuteAngle);
+  //m_Gui->Label("obtuse angle: ",&m_ObtuseAngle);
   m_Gui->Divider();
   m_Gui->Label("Measure description.",true);
   m_Gui->Button(ID_STORE_MEASURE,"Store");
@@ -138,11 +138,11 @@ void mmo2DMeasure::OnEvent(mafEventBase *maf_event)
           if(m_MeasureType == 0 || m_MeasureType == 1)
             t = m_DistanceMeasure + " " + m_MeasureText;
           else
-            t = m_AcuteAngle + "° (" + m_ObtuseAngle + "°) " + m_MeasureText;
+            //t = m_AcuteAngle + "° (" + m_ObtuseAngle + "°) " + m_MeasureText;
+            t = m_AcuteAngle + "° (" + m_MeasureText;
           m_MeasureList->Append(t);
           m_MeasureText = "";
           m_Gui->Enable(ID_REMOVE_MEASURE,true);
-          //m_Gui->Enable(ID_ADD_TO_VME_TREE,true);
         }
         break;
         case ID_REMOVE_MEASURE:
@@ -167,16 +167,22 @@ void mmo2DMeasure::OnEvent(mafEventBase *maf_event)
       switch(e->GetId())
       {
         case mmi2DMeter::ID_RESULT_MEASURE:
-          m_DistanceMeasure = wxString::Format("%g",e->GetDouble());
+        {
+          double measure = RoundValue(e->GetDouble());
+          m_DistanceMeasure = wxString::Format("%g", measure);
           m_AcuteAngle = "0";
           m_ObtuseAngle = "0";
           m_Gui->Update();
+        }
         break;
         case mmi2DMeter::ID_RESULT_ANGLE:
+        {
+          double measure = RoundValue(e->GetDouble());
           m_DistanceMeasure = "0";
-          m_AcuteAngle = wxString::Format("%g",e->GetDouble());
-          m_ObtuseAngle = wxString::Format("%g", 180.0 - e->GetDouble());
+          m_AcuteAngle = wxString::Format("%g",measure);
+          m_ObtuseAngle = wxString::Format("%g", 180.0 - measure);
           m_Gui->Update();
+        }
         break;
         default:
           mafEventMacro(*e);
