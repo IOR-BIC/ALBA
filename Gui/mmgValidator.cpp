@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgValidator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 15:20:25 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-12-16 17:18:22 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,7 +22,7 @@
 
 #include "mmgValidator.h"
 #include <wx/colordlg.h>
-#include <math.h>
+//#include <math.h>
 #include "mafEvent.h"
 #include "mmgFloatSlider.h"
 
@@ -469,7 +469,7 @@ bool mmgValidator::Validate(wxWindow *parent)
 	    if(this->m_DecimalDigits == -1)
 				s.Printf("%g",*m_FloatVar);
 			else
-				s.Printf("%g",this->RoundValue(*m_FloatVar));
+				s.Printf("%g",RoundValue(*m_FloatVar,m_DecimalDigits));
 	    m_TextCtrl->SetValue(s) ;
     }
     if (val < m_FloatMin )
@@ -494,7 +494,7 @@ bool mmgValidator::Validate(wxWindow *parent)
 	    if(this->m_DecimalDigits == -1)
 				s.Printf("%g",*m_DoubleVar);
 			else
-				s.Printf("%g",this->RoundValue(*m_DoubleVar));
+				s.Printf("%g",RoundValue(*m_DoubleVar,m_DecimalDigits));
 	    m_TextCtrl->SetValue(s) ;
     }
     if (val < m_DoubleMin )
@@ -520,7 +520,7 @@ bool mmgValidator::Validate(wxWindow *parent)
 	    if(this->m_DecimalDigits == -1)
 				s.Printf("%g",*m_DoubleVar);
 			else
-				s.Printf("%g",this->RoundValue(*m_DoubleVar));
+				s.Printf("%g",RoundValue(*m_DoubleVar,m_DecimalDigits));
 	    m_TextCtrl->SetValue(s) ;
     }
     if (val < m_DoubleMin )
@@ -606,7 +606,7 @@ bool mmgValidator::TransferToWindow(void)
 			if(this->m_DecimalDigits == -1)
 				s.Printf("%g",*m_FloatVar);
 			else
-				s.Printf("%g",this->RoundValue(*m_FloatVar));
+				s.Printf("%g",RoundValue(*m_FloatVar,m_DecimalDigits));
       m_TextCtrl->SetValue(s);
     break;
     case VAL_DOUBLE:
@@ -615,7 +615,7 @@ bool mmgValidator::TransferToWindow(void)
 			if(this->m_DecimalDigits == -1)
 				s.Printf("%g",*m_DoubleVar);
 			else
-				s.Printf("%g",this->RoundValue(*m_DoubleVar));
+				s.Printf("%g",RoundValue(*m_DoubleVar,m_DecimalDigits));
       m_TextCtrl->SetValue(s);
     break;
     case VAL_INTEGER:
@@ -653,7 +653,7 @@ bool mmgValidator::TransferToWindow(void)
 			if(this->m_DecimalDigits == -1)
 				s.Printf("%g",*m_DoubleVar);
 			else
-				s.Printf("%g",this->RoundValue(*m_DoubleVar));
+				s.Printf("%g",RoundValue(*m_DoubleVar,m_DecimalDigits));
       m_TextCtrl->SetValue(s);
       m_FloatSlider->SetValue(*m_DoubleVar);
     break;
@@ -697,7 +697,7 @@ bool mmgValidator::TransferToWindow(void)
   }
   return TRUE;
 }
-//----------------------------------------------------------------------------
+/*//----------------------------------------------------------------------------
 float mmgValidator::RoundValue(float f_in)
 //----------------------------------------------------------------------------
 {
@@ -712,7 +712,7 @@ double mmgValidator::RoundValue(double d_in)
 	double d_tmp = d_in * pow(10,m_DecimalDigits);
 	int b = ( d_tmp >= 0 ) ? static_cast<int>( d_tmp + .5):static_cast<int>( d_tmp - .5);
 	return b / pow(10,m_DecimalDigits);
-}
+}*/
 //----------------------------------------------------------------------------
 bool mmgValidator::TransferFromWindow(void)
 //----------------------------------------------------------------------------

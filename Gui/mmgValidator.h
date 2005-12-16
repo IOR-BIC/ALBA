@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgValidator.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 15:20:25 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-12-16 17:18:22 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -84,8 +84,8 @@ public:
   virtual bool TransferToWindow(void);
   virtual bool TransferFromWindow(void);
 
-	float RoundValue(float f_in);
-	double RoundValue(double d_in);
+//	float RoundValue(float f_in);
+//	double RoundValue(double d_in);
 
   void Init(mafObserver* listener, int mid, wxControl *win);
   void OnChar(wxKeyEvent& event);
