@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 12:16:09 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-12-16 17:15:57 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -44,6 +44,13 @@ public:
     USE_VTK_PROPERTY,
     USE_LOOKUPTABLE,
     USE_TEXTURE
+  };
+
+  enum TEXTURE_MAP_MODE
+  {
+    PLANE_MAPPING = 0,
+    CYLINDER_MAPPING,
+    SPHERE_MAPPING
   };
 
 	/** Build the material icon. */
@@ -98,6 +105,7 @@ public:
   double    m_TableRange[2];
   int       m_NumColors;
   int       m_MaterialType;
+  int       m_TextureMappingMode;
 
 protected:
   vtkImageData *m_TextureImage;

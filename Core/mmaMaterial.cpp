@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-13 16:31:59 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-12-16 17:15:56 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -67,6 +67,8 @@ mmaMaterial::mmaMaterial()
   m_VolumeProp  = NULL;
   m_Icon        = NULL;
   m_TextureImage= NULL;
+
+  m_TextureMappingMode = PLANE_MAPPING;
 
   m_Value            = 1.0;
   m_Ambient[0]       = 1.0;
@@ -244,6 +246,7 @@ void mmaMaterial::DeepCopy(const mafAttribute *a)
   m_TableRange[1]       = ((mmaMaterial *)a)->m_TableRange[1];
   m_NumColors           = ((mmaMaterial *)a)->m_NumColors;
   m_MaterialType        = ((mmaMaterial *)a)->m_MaterialType;
+  m_TextureMappingMode  = ((mmaMaterial *)a)->m_TextureMappingMode;
 }
 //----------------------------------------------------------------------------
 bool mmaMaterial::Equals(const mafAttribute *a)
@@ -278,7 +281,8 @@ bool mmaMaterial::Equals(const mafAttribute *a)
       m_TableRange[1]       == ((mmaMaterial *)a)->m_TableRange[1]      &&
       m_NumColors           == ((mmaMaterial *)a)->m_NumColors          &&
       m_Representation      == ((mmaMaterial *)a)->m_Representation     &&
-      m_MaterialType        == ((mmaMaterial *)a)->m_MaterialType);
+      m_MaterialType        == ((mmaMaterial *)a)->m_MaterialType       &&
+      m_TextureMappingMode  == ((mmaMaterial *)a)->m_TextureMappingMode);
   }
   return false;
 }
@@ -316,6 +320,7 @@ int mmaMaterial::InternalStore(mafStorageElement *parent)
     parent->StoreInteger("NumColors", m_NumColors);
     parent->StoreInteger("TextureID", m_TextureID);
     parent->StoreInteger("MaterialType", m_MaterialType);
+    parent->StoreInteger("TextureMappingMode", m_TextureMappingMode);
     return MAF_OK;
   }
   return MAF_ERROR;
@@ -354,6 +359,7 @@ int mmaMaterial::InternalRestore(mafStorageElement *node)
     node->RestoreInteger("NumColors", m_NumColors);
     node->RestoreInteger("TextureID", m_TextureID);
     node->RestoreInteger("MaterialType", m_MaterialType);
+    node->RestoreInteger("TextureMappingMode", m_TextureMappingMode);
     UpdateProp();
     return MAF_OK;
   }
