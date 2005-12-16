@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-03 08:56:50 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-12-16 17:45:02 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -98,14 +98,14 @@ void mafVMEOutputVolume::Update()
   m_VME->Update();
   if (m_VME && m_VME->GetDataPipe() && m_VME->GetDataPipe()->GetVTKData())
   {
-    mafOBB b;
+    double b[6];
     m_VME->GetOutput()->GetVMELocalBounds(b);
     m_VolumeBounds[0] = "";
-    m_VolumeBounds[0] << " xmin: " << b.m_Bounds[0] << "   xmax: " << b.m_Bounds[1];
+    m_VolumeBounds[0] << " xmin: " << wxString::Format("%g",RoundValue(b[0])).c_str() << "   xmax: " << wxString::Format("%g",RoundValue(b[1])).c_str();
     m_VolumeBounds[1] = "";
-    m_VolumeBounds[1] << " ymin: " << b.m_Bounds[2] << "   ymax: " << b.m_Bounds[3];
+    m_VolumeBounds[1] << " ymin: " << wxString::Format("%g",RoundValue(b[2])).c_str() << "   ymax: " << wxString::Format("%g",RoundValue(b[3])).c_str();
     m_VolumeBounds[2] = "";
-    m_VolumeBounds[2] << " zmin: " << b.m_Bounds[4] << "   zmax: " << b.m_Bounds[5];
+    m_VolumeBounds[2] << " zmin: " << wxString::Format("%g",RoundValue(b[4])).c_str() << "   zmax: " << wxString::Format("%g",RoundValue(b[5])).c_str();
     double srange[2];
     this->GetVTKData()->Update();
     this->GetVTKData()->GetScalarRange(srange);
