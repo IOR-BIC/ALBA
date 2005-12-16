@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-13 16:33:06 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2005-12-16 17:45:35 $
+  Version:   $Revision: 1.19 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -47,6 +47,8 @@
 #include "vtkStripper.h"
 #include "vtkImageData.h"
 #include "vtkTextureMapToCylinder.h"
+#include "vtkTextureMapToPlane.h"
+#include "vtkTextureMapToSphere.h"
 
 #include <vector>
 
@@ -121,12 +123,17 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
   vtkNEW(m_Stripper);
   m_Stripper->SetInput(m_TriangleFilter->GetOutput());
 
-  vtkMAFSmartPointer<vtkTextureMapToCylinder> texture_mapper;
-  texture_mapper->SetInput(data);
-  texture_mapper->PreventSeamOff();
-
   m_Mapper = vtkPolyDataMapper::New();
-	m_Mapper->SetInput((vtkPolyData *)texture_mapper->GetOutput());
+
+  if (material->m_MaterialType == mmaMaterial::USE_TEXTURE)
+  {
+    GenerateTextureMapCoordinate();
+  }
+  else
+  {
+    m_Mapper->SetInput(data);
+  }
+
   m_Mapper->SetScalarVisibility(m_ScalarVisibility);
   m_Mapper->SetScalarRange(sr);
   
@@ -285,6 +292,7 @@ void mafPipeSurface::UpdateProperty(bool fromTag)
 mmgGui *mafPipeSurface::CreateGui()
 //----------------------------------------------------------------------------
 {
+  wxString mapping_mode[3] = {"Plane", "Cylinder","Sphere"};
   m_TextureAccept = new mafTextureAccept();
 
   assert(m_Gui == NULL);
@@ -296,6 +304,9 @@ mmgGui *mafPipeSurface::CreateGui()
   m_Gui->Bool(ID_RENDERING_DISPLAY_LIST,"displaylist",&m_RenderingDisplayListFlag,0,"turn on/off \nrendering displaylist calculation");
   //m_Gui->Bool(ID_OPTIMIZE_SURFACE,"optimize",&m_OptimizedSurfaceFlag,0,"optimize surface for rendering");
   m_Gui->Button(ID_CHOOSE_TEXTURE,"texture");
+  mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
+  m_Gui->Combo(ID_TEXTURE_MAPPING_MODE,"mapping",&surface_output->GetMaterial()->m_TextureMappingMode,3,mapping_mode);
+  m_Gui->Enable(ID_TEXTURE_MAPPING_MODE,surface_output->GetMaterial()->m_MaterialType == mmaMaterial::USE_TEXTURE);
 
   return m_Gui;
 }
@@ -346,9 +357,14 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
             m_Texture->SetInput(image);
             m_Actor->SetTexture(m_Texture);
             mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+            m_Gui->Enable(ID_TEXTURE_MAPPING_MODE,true);
           }
         }
       }
+      break;
+      case ID_TEXTURE_MAPPING_MODE:
+        GenerateTextureMapCoordinate();
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
       case ID_RENDERING_DISPLAY_LIST:
         m_Mapper->SetImmediateModeRendering(m_RenderingDisplayListFlag);
@@ -378,4 +394,38 @@ void mafPipeSurface::OptimizeSurface(bool optimize)
   }
   else
     m_Mapper->SetInput(surface_output->GetSurfaceData());
+}
+//----------------------------------------------------------------------------
+void mafPipeSurface::GenerateTextureMapCoordinate()
+//----------------------------------------------------------------------------
+{
+  mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
+  mmaMaterial *material = surface_output->GetMaterial();
+  vtkPolyData *data = vtkPolyData::SafeDownCast(surface_output->GetVTKData());
+  data->Update();
+
+  if (material->m_TextureMappingMode == mmaMaterial::PLANE_MAPPING)
+  {
+    vtkMAFSmartPointer<vtkTextureMapToPlane> plane_texture_mapper;
+    plane_texture_mapper->SetInput(data);
+    m_Mapper->SetInput((vtkPolyData *)plane_texture_mapper->GetOutput());
+  }
+  else if (material->m_TextureMappingMode == mmaMaterial::CYLINDER_MAPPING)
+  {
+    vtkMAFSmartPointer<vtkTextureMapToCylinder> cylinder_texture_mapper;
+    cylinder_texture_mapper->SetInput(data);
+    cylinder_texture_mapper->PreventSeamOff();
+    m_Mapper->SetInput((vtkPolyData *)cylinder_texture_mapper->GetOutput());
+  }
+  else if (material->m_TextureMappingMode == mmaMaterial::SPHERE_MAPPING)
+  {
+    vtkMAFSmartPointer<vtkTextureMapToSphere> sphere_texture_mapper;
+    sphere_texture_mapper->SetInput(data);
+    sphere_texture_mapper->PreventSeamOff();
+    m_Mapper->SetInput((vtkPolyData *)sphere_texture_mapper->GetOutput());
+  }
+  else
+  {
+    m_Mapper->SetInput(data);
+  }
 }

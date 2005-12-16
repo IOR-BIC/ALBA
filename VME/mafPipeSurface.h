@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-13 16:33:06 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-12-16 17:45:35 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,6 +60,7 @@ public:
     ID_OPTIMIZE_SURFACE,
     ID_RENDERING_DISPLAY_LIST,
     ID_CHOOSE_TEXTURE,
+    ID_TEXTURE_MAPPING_MODE,
     ID_LAST
   };
 
@@ -100,6 +101,10 @@ protected:
   /** Optimize polydata for rendering. If vme is animated on data, 
   will be asked to optimize for all time stamps. */
   void OptimizeSurface(bool optimize = true);
+
+  /** 
+  Generate texture coordinate for polydata according to the mapping mode*/
+  void GenerateTextureMapCoordinate();
 
   virtual mmgGui  *CreateGui();
 };  
