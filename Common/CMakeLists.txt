@@ -8,6 +8,8 @@ PROJECT(medCommon)
 SET(PROJECT_SRCS
   mmiDICOMImporterInteractor.cpp
   mmiDICOMImporterInteractor.h
+  mafGizmoSlice.cpp
+  mafGizmoSlice.h
   mmiInfoImage.cpp
   mmiInfoImage.h
 )
