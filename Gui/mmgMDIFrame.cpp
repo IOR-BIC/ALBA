@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 12:03:07 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-12-16 17:19:04 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,7 +37,6 @@ class mmgMDIFrameCallback : public vtkCommand
   public:
     static mmgMDIFrameCallback *New() {return new mmgMDIFrameCallback;}
     mmgMDIFrameCallback() {m_mode=0; m_frame=NULL;};
-    void Delete() {delete this;};
     void SetMode(int mode){m_mode=mode;};
     void SetFrame(mmgMDIFrame *frame){m_frame=frame;};
     virtual void Execute(vtkObject *caller, unsigned long, void*)
