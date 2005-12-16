@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-12 11:42:51 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-12-16 18:44:03 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,6 +35,13 @@
 #include "vtkDataSet.h"
 #include "vtkRayCast3DPicker.h"
 #include "vtkCellPicker.h"
+#include "vtkPlaneSource.h"
+#include "vtkOutlineFilter.h"
+#include "vtkCoordinate.h"
+#include "vtkPolyDataMapper2D.h"
+#include "vtkProperty2D.h"
+#include "vtkActor2D.h"
+#include "vtkRenderer.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewSlice);
@@ -47,11 +54,16 @@ mafViewSlice::mafViewSlice(wxString label, int camera_position, bool show_axes, 
 {
   m_CurrentVolume = NULL;
   m_AttachCamera  = NULL;
+  m_Border        = NULL;
+  
+  m_Slice[0] = m_Slice[1] = m_Slice[2] = 0.0;
+  m_SliceInitialized = false;
 }
 //----------------------------------------------------------------------------
 mafViewSlice::~mafViewSlice()
 //----------------------------------------------------------------------------
 {
+  BorderDelete();
   cppDEL(m_AttachCamera);
 }
 //----------------------------------------------------------------------------
@@ -71,10 +83,9 @@ void mafViewSlice::Create()
 {
   RWI_LAYERS num_layers = m_CameraPosition != CAMERA_OS_P ? TWO_LAYER : ONE_LAYER;
   
-  m_Rwi = new mafRWI(mafGetFrame(), num_layers, false, m_StereoType);
+  m_Rwi = new mafRWI(mafGetFrame(), num_layers, false, true, m_StereoType);
   m_Rwi->SetListener(this);
   m_Rwi->CameraSet(m_CameraPosition);
-  m_Rwi->SetAxesVisibility(m_ShowAxes != 0);
   m_Win = m_Rwi->m_RwiBase;
 
   m_Sg  = new mafSceneGraph(this,m_Rwi->m_RenFront,m_Rwi->m_RenBack);
@@ -96,6 +107,13 @@ void mafViewSlice::CameraUpdate()
   }
   assert(m_Rwi); 
   m_Rwi->CameraUpdate();
+}
+//----------------------------------------------------------------------------
+void mafViewSlice::InitializeSlice(double slice[3])
+//----------------------------------------------------------------------------
+{
+  memcpy(m_Slice,slice,sizeof(m_Slice));
+  m_SliceInitialized = true;
 }
 //----------------------------------------------------------------------------
 void mafViewSlice::VmeCreatePipe(mafNode *vme)
@@ -151,7 +169,14 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
           default:
             slice_mode = SLICE_Z;
         }
-        ((mafPipeVolumeSlice *)pipe)->InitializeSliceParameters(slice_mode,false);
+        if (m_SliceInitialized)
+        {
+          ((mafPipeVolumeSlice *)pipe)->InitializeSliceParameters(slice_mode,m_Slice,false);
+        }
+        else
+        {
+          ((mafPipeVolumeSlice *)pipe)->InitializeSliceParameters(slice_mode,false);
+        }
         ((mafPipeVolumeSlice *)pipe)->ShowUnit(slice_mode != SLICE_ORTHO,m_Rwi->m_Camera);
       }
       pipe->Create(n);
@@ -255,12 +280,63 @@ void mafViewSlice::SetLutRange(double low_val, double high_val)
 void mafViewSlice::SetSlice(double origin[3])
 //----------------------------------------------------------------------------
 {
-  if(!m_CurrentVolume) 
+  if(!m_CurrentVolume)
     return;
+  memcpy(m_Slice,origin,sizeof(m_Slice));
   mafString pipe_name = m_CurrentVolume->m_Pipe->GetTypeName();
   if (pipe_name.Equals("mafPipeVolumeSlice"))
   {
     mafPipeVolumeSlice *pipe = (mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe;
     pipe->SetSlice(origin); 
   }
+}
+//----------------------------------------------------------------------------
+void mafViewSlice::BorderCreate(double col[3])
+//----------------------------------------------------------------------------
+{
+  if(m_Border) BorderDelete();
+
+  vtkPlaneSource *ps = vtkPlaneSource::New();
+  ps->SetOrigin(0, 0, 0);
+  ps->SetPoint1(1, 0, 0);
+  ps->SetPoint2(0, 1, 0);
+
+  vtkOutlineFilter *of = vtkOutlineFilter::New();
+  of->SetInput((vtkDataSet *)ps->GetOutput());
+
+  vtkCoordinate *coord = vtkCoordinate::New();
+  coord->SetCoordinateSystemToNormalizedViewport();
+  coord->SetValue(1, 1, 0);
+
+  vtkPolyDataMapper2D *pdmd = vtkPolyDataMapper2D::New();
+  pdmd->SetInput(of->GetOutput());
+  pdmd->SetTransformCoordinate(coord);
+
+  vtkProperty2D *pd = vtkProperty2D::New();
+  pd->SetDisplayLocationToForeground();
+  pd->SetLineWidth(3);
+  pd->SetColor(col[0],col[1],col[2]);
+
+  m_Border = vtkActor2D::New();
+  m_Border->SetMapper(pdmd);
+  m_Border->SetProperty(pd);
+  m_Border->SetPosition(0,0);
+
+  m_Rwi->m_RenFront->AddActor(m_Border);
+
+  vtkDEL(ps);
+  vtkDEL(of);
+  vtkDEL(coord);
+  vtkDEL(pdmd);
+  vtkDEL(pd);
+}
+//----------------------------------------------------------------------------
+void mafViewSlice::BorderDelete()
+//----------------------------------------------------------------------------
+{
+  if(m_Border)
+  {
+    m_Rwi->m_RenFront->RemoveActor(m_Border);
+    vtkDEL(m_Border);
+  }  
 }

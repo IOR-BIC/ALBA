@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-12 11:42:52 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-12-16 18:44:03 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,6 +23,7 @@
 class mafVME;
 class mafSceneNode;
 class mafAttachCamera;
+class vtkActor2D;
 
 //----------------------------------------------------------------------------
 // mafViewSlice :
@@ -57,7 +58,6 @@ public:
     ID_LAST
   };
 
-
   /** 
   Create the visual pipe for the node passed as argument. 
   To create visual pipe first check in m_PipeMap if custom visual pipe is defined, 
@@ -82,9 +82,23 @@ public:
   Return true if a there is a volume inside the view.*/
   bool VolumeIsVisible() {return m_CurrentVolume != NULL;};
 
+  /** Create the background for the slice. */
+  void BorderCreate(double col[3]);
+
+  /** Delete the background of the slice. */
+  void BorderDelete();
+
+  /** 
+  Give an initial origin for the slice.*/
+  void InitializeSlice(double slice[3]);
+
 protected:
   virtual mmgGui *CreateGui();
-  mafSceneNode *m_CurrentVolume; ///< Current visualized volume
+
+  mafSceneNode    *m_CurrentVolume; ///< Current visualized volume
   mafAttachCamera *m_AttachCamera;
+  vtkActor2D      *m_Border;
+  double           m_Slice[3];
+  bool             m_SliceInitialized;
 };
 #endif
