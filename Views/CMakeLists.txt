@@ -8,6 +8,10 @@ PROJECT(medViews)
 SET(PROJECT_SRCS
   mafViewOrthoSlice.cpp
   mafViewOrthoSlice.h
+  mafViewRX.cpp
+  mafViewRX.h
+  mafViewRXCT.cpp
+  mafViewRXCT.h
   mafViewSlice.cpp
   mafViewSlice.h
 )
