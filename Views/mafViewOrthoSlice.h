@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-06 10:38:07 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-12-16 18:42:47 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,7 +33,7 @@ class vtkLookupTable;
 class mafViewOrthoSlice: public mafViewCompound
 {
 public:
-  mafViewOrthoSlice(wxString label = "View OrthoSlice", int num_row = 2, int num_col = 2, bool external = false);
+  mafViewOrthoSlice(wxString label = "View OrthoSlice", bool external = false);
   virtual ~mafViewOrthoSlice(); 
 
   mafTypeMacro(mafViewOrthoSlice, mafViewCompound);
