@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgLutWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2005-12-01 15:22:06 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2005-12-19 15:46:07 $
+Version:   $Revision: 1.2 $
 Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -377,7 +377,8 @@ void mmgLutWidget::OnMouseMotion(wxMouseEvent &event)
     int idx = MouseToIndex(event);
     if (idx != -1 && idx != m_drag_begin_idx)
     {
-      for(int i=0; i<m_numEntry; i++ )
+      int i;
+			for(i=0; i<m_numEntry; i++ )
         m_lutEntry[i].m_selected = false; 
 
       int min = (idx < m_drag_begin_idx) ? idx : m_drag_begin_idx;
