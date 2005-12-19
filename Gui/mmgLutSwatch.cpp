@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutSwatch.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 15:22:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-12-19 15:26:31 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -31,7 +31,9 @@
 // ugly hack to make DrawText Work
 // if you remove this line you will have a Compile-Error "DrawTextA is not defined for wxPaintDC"
 // .... waiting a better workaround. SIL 30/11/05 
-#include <wx/msw/winundef.h> 
+#ifdef WIN32
+	#include <wx/msw/winundef.h> 
+#endif
 // end of hack
 
 //----------------------------------------------------------------------------
