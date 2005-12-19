@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 16:19:22 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-12-19 16:49:12 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -142,7 +142,8 @@ mmgMDIFrame::~mmgMDIFrame( )
   vtkDEL(m_EndCallback); 
 #endif 
 
-  mafSetFrame( NULL);
+  Destroy();
+//  mafSetFrame(NULL);
 }
 //----------------------------------------------------------------------------
 void mmgMDIFrame::OnMenu(wxCommandEvent& e)
