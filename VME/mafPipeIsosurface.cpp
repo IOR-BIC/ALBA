@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2005-12-19 11:00:09 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2005-12-19 11:15:48 $
+Version:   $Revision: 1.5 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -30,6 +30,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
+#include "mafVMESurface.h"
 
 #include "vtkMAFAssembly.h"
 #include "vtkMAFSmartPointer.h"
@@ -55,6 +56,8 @@ mafPipeIsosurface::mafPipeIsosurface()
   m_OutlineBox      = NULL;
   m_OutlineMapper   = NULL;
   m_ContourSlider   = NULL;
+
+  m_IsosurfaceVme   = NULL;
 
   m_ContourValue    = 300.0;
 }
@@ -123,6 +126,8 @@ mafPipeIsosurface::~mafPipeIsosurface()
   vtkDEL(m_ContourMapper);
   vtkDEL(m_OutlineBox);
   vtkDEL(m_OutlineMapper);
+
+  mafDEL(m_IsosurfaceVme);
 }
 
 //----------------------------------------------------------------------------
@@ -164,6 +169,7 @@ mmgGui *mafPipeIsosurface::CreateGui()
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
   m_ContourSlider = m_Gui->FloatSlider(ID_CONTOUR_VALUE,"contour", &m_ContourValue,range[0],range[1]);
+  m_Gui->Button(ID_GENERATE_ISOSURFACE,"generate iso");
 
   return m_Gui;
 }
@@ -175,13 +181,30 @@ void mafPipeIsosurface::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId()) 
     {
-    case ID_CONTOUR_VALUE:
+      case ID_CONTOUR_VALUE:
       {
         SetContourValue((float)m_ContourValue);
         m_Vme->ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
       }
       break;
-    default:
+      case ID_GENERATE_ISOSURFACE:
+      {
+        vtkPolyData *surface = vtkPolyData::New();
+        m_ContourMapper->GetOutput(0, surface);
+        m_ContourMapper->Update();
+
+        wxString name = wxString::Format("%s Isosurface %g", m_Vme->GetName(),m_ContourValue);
+
+        mafNEW(m_IsosurfaceVme);
+        m_IsosurfaceVme->SetName(name.c_str());
+        m_IsosurfaceVme->SetDataByDetaching(surface,0);
+
+        m_IsosurfaceVme->ReparentTo(m_Vme);
+
+        surface->Delete(); 
+      }
+      break;
+      default:
       break;
     }
   }

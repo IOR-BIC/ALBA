@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.h,v $
 Language:  C++
-Date:      $Date: 2005-12-19 11:00:09 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2005-12-19 11:15:48 $
+Version:   $Revision: 1.4 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -26,6 +26,7 @@ class vtkOutlineCornerFilter;
 class mafVME;
 class mmgFloatSlider;
 class mafEventBase;
+class mafVMESurface;
 
 //----------------------------------------------------------------------------
 // mafPipeIsosurface :
@@ -54,11 +55,14 @@ public:
   enum PIPE_ISOSURFACE_WIDGET_ID
   {
     ID_CONTOUR_VALUE = Superclass::ID_LAST,
+    ID_GENERATE_ISOSURFACE,
     ID_LAST
   };
 
 protected:
   virtual mmgGui  *CreateGui();
+
+  mafVMESurface            *m_IsosurfaceVme;
 
   vtkContourVolumeMapper   *m_ContourMapper; 
   vtkVolume                *m_Volume;
