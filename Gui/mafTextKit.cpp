@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTextKit.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-06 10:36:21 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-12-19 14:54:13 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,10 +32,10 @@
 #include "vtkRenderer.h"
 
 //----------------------------------------------------------------------------
-mafTextKit::mafTextKit(wxWindow* parent, mafRWI *rwi, mafObserver *Listener)
+mafTextKit::mafTextKit(wxWindow* parent, vtkRenderer *renderer, mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-	m_Rwi = rwi;
+	m_TextRenderer = renderer;
 	
 	m_Listener		= Listener;
 	m_ParentPanel = parent;
@@ -55,7 +55,7 @@ mafTextKit::mafTextKit(wxWindow* parent, mafRWI *rwi, mafObserver *Listener)
   vtkNEW(m_TextActor);
   m_TextActor->SetMapper(m_TextMapper);
   m_TextActor->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
-  m_Rwi->m_RenFront->AddActor(m_TextActor);
+  m_TextRenderer->AddActor(m_TextActor);
 
   SetTextAlignment();
   SetTextColor(240,240,240);
@@ -71,7 +71,7 @@ mafTextKit::~mafTextKit()
 
   if (m_TextActor)
   {
-    m_Rwi->m_RenFront->RemoveActor(m_TextActor);
+    m_TextRenderer->RemoveActor(m_TextActor);
   }
   vtkDEL(m_TextMapper);
   vtkDEL(m_TextActor);
