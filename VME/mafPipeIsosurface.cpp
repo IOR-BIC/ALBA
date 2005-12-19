@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2005-12-19 11:15:48 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2005-12-19 11:21:35 $
+Version:   $Revision: 1.6 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -126,8 +126,6 @@ mafPipeIsosurface::~mafPipeIsosurface()
   vtkDEL(m_ContourMapper);
   vtkDEL(m_OutlineBox);
   vtkDEL(m_OutlineMapper);
-
-  mafDEL(m_IsosurfaceVme);
 }
 
 //----------------------------------------------------------------------------
@@ -202,6 +200,7 @@ void mafPipeIsosurface::OnEvent(mafEventBase *maf_event)
         m_IsosurfaceVme->ReparentTo(m_Vme);
 
         surface->Delete(); 
+        mafDEL(m_IsosurfaceVme);
       }
       break;
       default:
