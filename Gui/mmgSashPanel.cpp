@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgSashPanel.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 12:03:08 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2005-12-19 17:08:07 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -129,8 +129,11 @@ bool mmgSashPanel::Show(bool show)
         m_MenuBar->Check(this->GetId(),show);
 
   // event for Layout
-  wxCommandEvent c(wxEVT_COMMAND_BUTTON_CLICKED ,ID_LAYOUT);
-	ProcessEvent(c);
+  if(m_MenuBar->FindItem(this->GetId()))
+  {
+    wxCommandEvent c(wxEVT_COMMAND_BUTTON_CLICKED ,ID_LAYOUT);
+    ProcessEvent(c);
+  }
   return true;
 }
 //----------------------------------------------------------------------------
