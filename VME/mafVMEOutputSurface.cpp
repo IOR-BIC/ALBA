@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-17 13:08:12 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-12-19 14:56:17 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -50,7 +50,6 @@ mafVMEOutputSurface::mafVMEOutputSurface()
 mafVMEOutputSurface::~mafVMEOutputSurface()
 //-------------------------------------------------------------------------
 {
-  vtkDEL(m_Texture);
 }
 
 //-------------------------------------------------------------------------
@@ -66,7 +65,6 @@ void mafVMEOutputSurface::SetTexture(vtkImageData *tex)
 {
   if (m_Texture != tex)
   {
-    vtkDEL(m_Texture);
     m_Texture = tex;
     m_Texture->Register(NULL);
   }
