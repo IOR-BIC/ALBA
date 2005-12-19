@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 15:22:05 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-12-19 15:24:34 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -246,14 +246,16 @@ void mmgLutEditor::OnEvent( mafEventBase *event )
         if(m_parent->IsKindOf(CLASSINFO(wxDialog)))
         {
           wxDialog *dlg = (wxDialog *)m_parent;
-          dlg->OnOK( wxCommandEvent(0, wxID_OK) );
+					wxCommandEvent cmd(0, wxID_OK);
+          dlg->OnOK( cmd );
         }
       break; 
       case ID_CANCEL:
         if(m_parent->IsKindOf(CLASSINFO(wxDialog)))
         {
           wxDialog *dlg = (wxDialog *)m_parent;
-          dlg->OnCancel( wxCommandEvent(0, wxID_CANCEL) );
+					wxCommandEvent cmd(0, wxID_CANCEL);
+          dlg->OnCancel( cmd );
         }
       break; 
       case ID_APPLY:
