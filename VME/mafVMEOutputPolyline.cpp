@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputPolyline.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 18:16:22 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-12-19 14:55:27 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,7 +20,10 @@
 //----------------------------------------------------------------------------
 
 #include "mafVMEOutputPolyline.h"
+#include "mafVME.h"
 #include "mafIndent.h"
+#include "mmaMaterial.h"
+
 #include "vtkPolyData.h"
 
 #include <assert.h>
@@ -33,6 +36,7 @@ mafCxxTypeMacro(mafVMEOutputPolyline)
 mafVMEOutputPolyline::mafVMEOutputPolyline()
 //-------------------------------------------------------------------------
 {
+  m_Material = NULL;
 }
 
 //-------------------------------------------------------------------------
@@ -46,4 +50,21 @@ vtkPolyData *mafVMEOutputPolyline::GetPolylineData()
 //-------------------------------------------------------------------------
 {
   return (vtkPolyData *)GetVTKData();
+}
+//-------------------------------------------------------------------------
+void mafVMEOutputPolyline::SetMaterial(mmaMaterial *material)
+//-------------------------------------------------------------------------
+{
+  m_Material = material;
+}
+//-------------------------------------------------------------------------
+mmaMaterial *mafVMEOutputPolyline::GetMaterial()
+//-------------------------------------------------------------------------
+{
+  // if the VME set the material directly in the output return it
+  if (m_Material)
+    return  m_Material;
+
+  // search for a material attribute in the VME connected to this output
+  return GetVME() ? mmaMaterial::SafeDownCast(GetVME()->GetAttribute("MaterialAttributes")) : NULL;
 }

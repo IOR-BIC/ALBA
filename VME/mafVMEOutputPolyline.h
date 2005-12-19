@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputPolyline.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:50:44 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-12-19 14:55:27 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -19,6 +19,7 @@
 // forward declarations :
 //----------------------------------------------------------------------------
 class vtkPolyData;
+class mmaMaterial;
 
 /** NULL output for VME node with a VTK image output data.
   mafVMEOutputPolyline is the output produced by a node generating an output
@@ -41,6 +42,15 @@ public:
     An event is rised when the output data changes to allow attached classes to 
     update their input.*/
   virtual vtkPolyData *GetPolylineData();
+
+  /** return material attribute of this polyline if present */
+  mmaMaterial *GetMaterial();
+
+  /** set the material of the polyline.*/ 
+  void SetMaterial(mmaMaterial *material);
+
+protected:
+  mmaMaterial *m_Material; ///< material object used to store shading propertied to render the polyline
 
 private:
   mafVMEOutputPolyline(const mafVMEOutputPolyline&); // Not implemented
