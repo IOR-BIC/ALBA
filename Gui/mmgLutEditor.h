@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutEditor.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 15:22:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-12-19 16:19:21 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -56,22 +56,22 @@ protected:
   void UpdateInfo();
   void CopyLut(vtkLookupTable *from, vtkLookupTable *to);
   
-  mafObserver              *m_Listener;
+  mafObserver *m_Listener;
 
-  int m_preset;
+  int          m_Preset;
   //wxString m_presets[2];
   //int m_num_preset;
 
-  int m_numEntry;
-  double m_valueRange[2]; 
-  wxString m_info; // selected indexes
+  int          m_NumEntry;
+  double       m_ValueRange[2]; 
+  wxString     m_Info; // selected indexes
   
-  mmgLutSwatch   *m_ls;
-  mmgLutWidget   *m_lw;
-  mmgColorWidget *m_cw;
+  mmgLutSwatch   *m_LutSwatch;
+  mmgLutWidget   *m_LutWidget;
+  mmgColorWidget *m_ColorWidget;
 
-  vtkLookupTable *m_external_lut;  // given lut that will be modified by "ok" or "apply"
-  vtkLookupTable *m_lut;           // internal lut -- initialized in SetLut
+  vtkLookupTable *m_ExternalLut;  // given lut that will be modified by "ok" or "apply"
+  vtkLookupTable *m_Lut;           // internal lut -- initialized in SetLut
 };
 #endif
 

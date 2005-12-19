@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.h,v $
   Language:  C++
-  Date:      $Date: 2005-09-28 14:40:57 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-12-19 16:19:23 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -132,14 +132,13 @@ protected:
   void CreateStatusbar();
 
   mafObserver *m_Listener;
-  wxWindow         *m_clientwin;
+  wxWindow    *m_ClientWin;
 
-  // added members to handle the progressbar
-  bool         *m_busy;
-  wxPanel      *m_busyp;
-  wxStaticText *m_busyl;
-  wxGauge      *m_gauge;
-
+  // added members to handle the progress bar
+  bool         *m_Busy;
+  wxPanel      *m_BusyPanel;
+  wxStaticText *m_BusyLabel;
+  wxGauge      *m_Gauge;
 
   DECLARE_EVENT_TABLE()
 };

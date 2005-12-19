@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutWidget.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 15:22:07 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-12-19 16:19:22 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -37,9 +37,9 @@ public:
   void     GetSelection(int *min, int *max, int *num=NULL); 
   
   struct LutEntry {
-    mafColor      m_c;
-    bool          m_selected;
-  } m_lutEntry[257];
+    mafColor      m_Color;
+    bool          m_Selected;
+  } m_LutEntry[257];
 
   void SetNumEntry( int num );
 
@@ -48,20 +48,23 @@ public:
   void SetLut(vtkLookupTable *lut);
 
 protected:
-  mafObserver *m_Listener;
-  vtkLookupTable *m_lut;
+  mafObserver     *m_Listener;
+  vtkLookupTable  *m_Lut;
   
-  bool     m_dragging;
-  int      m_drag_begin_idx;
+  bool     m_Dragging;
+  int      m_DragBeginIdx;
 
-  int m_r1,m_c1,m_r2,m_c2; //selection rectangle expressed using row/cols coord -- used during drag operation
+  int m_SelectionRowMin;
+  int m_SelectionColMin;
+  int m_SelectionRowMax;
+  int m_SelectionColMax; //selection rectangle expressed using row/cols coord -- used during drag operation
 
-  wxBitmap m_bmp;      //the bitmap with the LUT
-  wxBitmap m_bmp2;     //the bitmap with the LUT and the Selection Indicator
-  wxPoint  m_bp;       //position of the bitmap
-  wxSize   m_bs;       //size of the bitmap
+  wxBitmap m_Bmp;      //the bitmap with the LUT
+  wxBitmap m_Bmp2;     //the bitmap with the LUT and the Selection Indicator
+  wxPoint  m_BmpPosition;       //position of the bitmap
+  wxSize   m_BmpSize;       //size of the bitmap
 
-  int m_numEntry;
+  int m_NumEntry;
   int m_EntryW;
   int m_EntryH;
   int m_EntryM; // margin
@@ -82,4 +85,3 @@ protected:
   DECLARE_EVENT_TABLE()
 };
 #endif
-

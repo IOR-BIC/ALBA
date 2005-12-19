@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgLutWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2005-12-19 15:46:07 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2005-12-19 16:19:22 $
+Version:   $Revision: 1.3 $
 Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -54,36 +54,36 @@ mmgLutWidget::mmgLutWidget(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 //----------------------------------------------------------------------------
 {
 	m_Listener = NULL;
-  m_lut = NULL;
+  m_Lut = NULL;
 
-  m_dragging = false;
-  m_r1=m_c1=m_r2=m_c2=0;
+  m_Dragging = false;
+  m_SelectionRowMin=m_SelectionColMin=m_SelectionRowMax=m_SelectionColMax=0;
   
-  m_numEntry    = 256;
+  m_NumEntry    = 256;
   m_EntryW      = 15;
   m_EntryH      = 15;
   m_EntryM      = 3;
   m_EntryPerRow = 16;
 
-  m_bp = wxPoint(0,0);
-  m_bs = wxSize((m_EntryW + m_EntryM)*m_EntryPerRow + m_EntryM, (m_EntryH + m_EntryM)*16 + m_EntryM);      
+  m_BmpPosition = wxPoint(0,0);
+  m_BmpSize = wxSize((m_EntryW + m_EntryM)*m_EntryPerRow + m_EntryM, (m_EntryH + m_EntryM)*16 + m_EntryM);      
   
-  float s = 255.0/m_numEntry;
-  for(int i=0; i<m_numEntry; i++)
+  float s = 255.0/m_NumEntry;
+  for(int i=0; i<m_NumEntry; i++)
   {
-    m_lutEntry[i].m_c = mafColor(i*s,i*s,i*s);
-    m_lutEntry[i].m_selected = false;
+    m_LutEntry[i].m_Color = mafColor(i*s,i*s,i*s);
+    m_LutEntry[i].m_Selected = false;
   }
 
   int m = 255;
-  m_lutEntry[0].m_c = mafColor(0,0,0);
-  m_lutEntry[1].m_c = mafColor(m,m,m);
-  m_lutEntry[2].m_c = mafColor(m,0,0);
-  m_lutEntry[3].m_c = mafColor(m,m,0);
-  m_lutEntry[4].m_c = mafColor(0,m,0);
-  m_lutEntry[5].m_c = mafColor(0,m,m);
-  m_lutEntry[6].m_c = mafColor(0,0,m);
-  m_lutEntry[7].m_c = mafColor(m,0,m);
+  m_LutEntry[0].m_Color = mafColor(0,0,0);
+  m_LutEntry[1].m_Color = mafColor(m,m,m);
+  m_LutEntry[2].m_Color = mafColor(m,0,0);
+  m_LutEntry[3].m_Color = mafColor(m,m,0);
+  m_LutEntry[4].m_Color = mafColor(0,m,0);
+  m_LutEntry[5].m_Color = mafColor(0,m,m);
+  m_LutEntry[6].m_Color = mafColor(0,0,m);
+  m_LutEntry[7].m_Color = mafColor(m,0,m);
 
   InitBitmaps();
   DrawEntries();
@@ -95,9 +95,9 @@ void mmgLutWidget::SetNumEntry( int num )
 {
   if(num<1)   num=1;
   if(num>256) num=256;
-  m_numEntry = num;
+  m_NumEntry = num;
 
-  if(m_lut) m_lut->SetNumberOfTableValues(m_numEntry);
+  if(m_Lut) m_Lut->SetNumberOfTableValues(m_NumEntry);
 
   InitBitmaps();        
   DrawEntries(); 
@@ -108,11 +108,11 @@ void mmgLutWidget::SetNumEntry( int num )
 void mmgLutWidget::InitBitmaps()
 //----------------------------------------------------------------------------
 {
-  m_bmp = wxBitmap(m_bs.GetWidth(), m_bs.GetHeight() );
-  m_bmp2= wxBitmap(m_bs.GetWidth(), m_bs.GetHeight() );
+  m_Bmp = wxBitmap(m_BmpSize.GetWidth(), m_BmpSize.GetHeight() );
+  m_Bmp2= wxBitmap(m_BmpSize.GetWidth(), m_BmpSize.GetHeight() );
   
   wxMemoryDC dc;  
-  dc.SelectObject(m_bmp);
+  dc.SelectObject(m_Bmp);
 
   wxBrush brush( GetBackgroundColour(),wxSOLID );
   dc.SetBackground(brush);
@@ -124,14 +124,14 @@ void mmgLutWidget::OnPaint(wxPaintEvent &event)
 {
   wxPaintDC pdc(this);
   wxMemoryDC mdc;
-  mdc.SelectObject(m_bmp2);
-  pdc.Blit(m_bp.x, m_bp.y, m_bs.GetWidth(), m_bs.GetHeight(), &mdc, 0,0);
+  mdc.SelectObject(m_Bmp2);
+  pdc.Blit(m_BmpPosition.x, m_BmpPosition.y, m_BmpSize.GetWidth(), m_BmpSize.GetHeight(), &mdc, 0,0);
 }
 //----------------------------------------------------------------------------
 void mmgLutWidget::DrawEntries()
 //----------------------------------------------------------------------------
 {
-  for( int i=0; i<m_numEntry; i++ )
+  for( int i=0; i<m_NumEntry; i++ )
    DrawEntry(i);
 }
 //----------------------------------------------------------------------------
@@ -150,7 +150,7 @@ void mmgLutWidget::DrawEntry(int idx)
   {
     for(x=0; x<w; x++)
     {
-      mafColor c = mafColor::CheckeredColor(m_lutEntry[idx].m_c, x,y);
+      mafColor c = mafColor::CheckeredColor(m_LutEntry[idx].m_Color, x,y);
       *p++ = c.m_r;
       *p++ = c.m_g;
       *p++ = c.m_b;
@@ -164,7 +164,7 @@ void mmgLutWidget::DrawEntry(int idx)
   dc1.SelectObject(bmp);
 
   wxMemoryDC dc2;
-  dc2.SelectObject(m_bmp);
+  dc2.SelectObject(m_Bmp);
   
   int x0 = m + (w+m) * (idx - m_EntryPerRow * (idx/m_EntryPerRow) );
   int y0 = m + (h+m) * (idx/m_EntryPerRow);
@@ -173,11 +173,11 @@ void mmgLutWidget::DrawEntry(int idx)
 
 
   // here LUT is kept in sync
-  if(m_lut)
+  if(m_Lut)
   {
     double r,g,b,a;
-    m_lutEntry[idx].m_c.GetFloatRGB(&r,&g,&b,&a);
-    m_lut->SetTableValue(idx,r,g,b,a);
+    m_LutEntry[idx].m_Color.GetFloatRGB(&r,&g,&b,&a);
+    m_Lut->SetTableValue(idx,r,g,b,a);
   }
 }
 //----------------------------------------------------------------------------
@@ -185,20 +185,20 @@ void mmgLutWidget::DrawSelection()
 //----------------------------------------------------------------------------
 {
   wxMemoryDC dc1;
-  dc1.SelectObject(m_bmp);
+  dc1.SelectObject(m_Bmp);
 
   wxMemoryDC dc2;
-  dc2.SelectObject(m_bmp2);
+  dc2.SelectObject(m_Bmp2);
   
-  dc2.Blit(0, 0, m_bs.GetWidth(), m_bs.GetHeight(), &dc1, 0, 0);
+  dc2.Blit(0, 0, m_BmpSize.GetWidth(), m_BmpSize.GetHeight(), &dc1, 0, 0);
 
   wxPen pen(*wxBLACK,1,wxSOLID);
   dc2.SetPen(*wxBLACK_PEN);
   dc2.SetBrush(*wxWHITE_BRUSH);
 
-  for( int i=0; i<m_numEntry; i++ )
+  for( int i=0; i<m_NumEntry; i++ )
   {
-    if(m_lutEntry[i].m_selected)
+    if(m_LutEntry[i].m_Selected)
     {
       int h  = m_EntryH;
       int w  = m_EntryW;
@@ -220,10 +220,10 @@ void mmgLutWidget::DrawSelection()
 int mmgLutWidget::MouseToIndex(wxMouseEvent &event)
 //----------------------------------------------------------------------------
 {
-  int r = (event.m_y - m_bp.x )/(m_EntryH+m_EntryM);
-  int c = (event.m_x - m_bp.y )/(m_EntryW+m_EntryM);
+  int r = (event.m_y - m_BmpPosition.x )/(m_EntryH+m_EntryM);
+  int c = (event.m_x - m_BmpPosition.y )/(m_EntryW+m_EntryM);
   int idx = c + m_EntryPerRow*r;
-  if( idx<0 || idx>m_numEntry) idx =-1;
+  if( idx<0 || idx>m_NumEntry) idx =-1;
   return idx;
 }
 //----------------------------------------------------------------------------
@@ -245,11 +245,11 @@ void mmgLutWidget::OnEvent( mafEventBase *event )
 void mmgLutWidget::SetSelectionColor(mafColor col)
 //----------------------------------------------------------------------------
 {
-  for( int i=0; i<m_numEntry; i++ )
+  for( int i=0; i<m_NumEntry; i++ )
   {
-    if(m_lutEntry[i].m_selected)
+    if(m_LutEntry[i].m_Selected)
     {
-      m_lutEntry[i].m_c = col;
+      m_LutEntry[i].m_Color = col;
       DrawEntry(i);
     }
   }
@@ -261,9 +261,9 @@ mafColor mmgLutWidget::GetSelectionColor()
 //----------------------------------------------------------------------------
 {
   mafColor c;
-  for( int i=0; i<m_numEntry; i++ )
-    if(m_lutEntry[i].m_selected)
-      c = m_lutEntry[i].m_c;
+  for( int i=0; i<m_NumEntry; i++ )
+    if(m_LutEntry[i].m_Selected)
+      c = m_LutEntry[i].m_Color;
   return c;
 }
 //----------------------------------------------------------------------------
@@ -274,17 +274,17 @@ void mmgLutWidget::ShadeSelectionInHSV()
   GetSelection(&min, &max, &num);
   if( num < 2) return; //nothing to do
 
-  mafColor c1 = m_lutEntry[min].m_c;
-  mafColor c2 = m_lutEntry[max].m_c;
+  mafColor c1 = m_LutEntry[min].m_Color;
+  mafColor c2 = m_LutEntry[max].m_Color;
   
   int i;
   int counter = 0;
   for( i=min; i<=max; i++ )
   {
-    if(m_lutEntry[i].m_selected)
+    if(m_LutEntry[i].m_Selected)
     {
       float t = (1.0*counter)/num;
-      m_lutEntry[i].m_c = mafColor::InterpolateHSV(c1,c2,t);
+      m_LutEntry[i].m_Color = mafColor::InterpolateHSV(c1,c2,t);
       DrawEntry(i);
       counter++;
     }
@@ -300,17 +300,17 @@ void mmgLutWidget::ShadeSelectionInRGB()
   GetSelection(&min, &max, &num);
   if( num < 2) return; //nothing to do
 
-  mafColor c1 = m_lutEntry[min].m_c;
-  mafColor c2 = m_lutEntry[max].m_c;
+  mafColor c1 = m_LutEntry[min].m_Color;
+  mafColor c2 = m_LutEntry[max].m_Color;
   
   int i;
   int counter = 0;
   for( i=min; i<=max; i++ )
   {
-    if(m_lutEntry[i].m_selected)
+    if(m_LutEntry[i].m_Selected)
     {
       float t = (1.0*counter)/num;
-      m_lutEntry[i].m_c = mafColor::InterpolateRGB(c1,c2,t);
+      m_LutEntry[i].m_Color = mafColor::InterpolateRGB(c1,c2,t);
       DrawEntry(i);
       counter++;
     }
@@ -330,9 +330,9 @@ void mmgLutWidget::GetSelection(int *min, int *max, int *num)
   if(num != NULL) *num =0;
   int i;
 
-  for( i=0; i<m_numEntry; i++ )
+  for( i=0; i<m_NumEntry; i++ )
   {
-    if(m_lutEntry[i].m_selected)
+    if(m_LutEntry[i].m_Selected)
     {
         if(num != NULL) (*num)++;
         if(*min == -1) *min = i; 
@@ -345,47 +345,47 @@ void mmgLutWidget::OnLeftMouseButtonDown(wxMouseEvent &event)
 //----------------------------------------------------------------------------
 {
   CaptureMouse();
-  m_dragging = true;
+  m_Dragging = true;
 
   int idx = MouseToIndex(event);
   if (idx != -1)
   {
     if(! event.ControlDown() )
     {
-      for(int i=0; i<m_numEntry; i++ )
-        m_lutEntry[i].m_selected = false; 
+      for(int i=0; i<m_NumEntry; i++ )
+        m_LutEntry[i].m_Selected = false; 
     }
 
     if(! event.ControlDown() )
-       m_lutEntry[idx].m_selected = true; 
+       m_LutEntry[idx].m_Selected = true; 
     else
-       m_lutEntry[idx].m_selected = ! m_lutEntry[idx].m_selected; 
+       m_LutEntry[idx].m_Selected = ! m_LutEntry[idx].m_Selected; 
 
     DrawSelection();
     Refresh();
-    m_drag_begin_idx = idx;
+    m_DragBeginIdx = idx;
   }
   else
-    m_drag_begin_idx = -1;
+    m_DragBeginIdx = -1;
 }
 //----------------------------------------------------------------------------
 void mmgLutWidget::OnMouseMotion(wxMouseEvent &event)
 //----------------------------------------------------------------------------
 {
-  if(m_dragging)
+  if(m_Dragging)
   {
     int idx = MouseToIndex(event);
-    if (idx != -1 && idx != m_drag_begin_idx)
+    if (idx != -1 && idx != m_DragBeginIdx)
     {
       int i;
-			for(i=0; i<m_numEntry; i++ )
-        m_lutEntry[i].m_selected = false; 
+			for(i=0; i<m_NumEntry; i++ )
+        m_LutEntry[i].m_Selected = false; 
 
-      int min = (idx < m_drag_begin_idx) ? idx : m_drag_begin_idx;
-      int max = (idx > m_drag_begin_idx) ? idx : m_drag_begin_idx;
+      int min = (idx < m_DragBeginIdx) ? idx : m_DragBeginIdx;
+      int max = (idx > m_DragBeginIdx) ? idx : m_DragBeginIdx;
 
       for( i=min; i<=max; i++ )
-           m_lutEntry[i].m_selected = true; 
+           m_LutEntry[i].m_Selected = true; 
       
       DrawSelection();
       Refresh();
@@ -397,11 +397,11 @@ void mmgLutWidget::OnLeftMouseButtonUp(wxMouseEvent &event)
 //----------------------------------------------------------------------------
 {
   ReleaseMouse();
-  m_r1=m_c1=m_r2=m_c2=-1;
+  m_SelectionRowMin=m_SelectionColMin=m_SelectionRowMax=m_SelectionColMax=-1;
 
-  if(m_dragging)
+  if(m_Dragging)
   {
-    m_dragging = false;
+    m_Dragging = false;
 
     // signal to Listener that the selection has changed
     mafEventMacro(mafEvent(this,GetId()));
@@ -411,14 +411,14 @@ void mmgLutWidget::OnLeftMouseButtonUp(wxMouseEvent &event)
 void mmgLutWidget::SetLut(vtkLookupTable *lut)
 //----------------------------------------------------------------------------
 {
-  m_lut = lut;
-  if(m_lut == NULL)
+  m_Lut = lut;
+  if(m_Lut == NULL)
   {
     SetNumEntry(0);
     return;
   }
 
-  int n = m_lut->GetNumberOfTableValues();
+  int n = m_Lut->GetNumberOfTableValues();
   if (n>256) n=256;
 
   mafColor c;
@@ -428,7 +428,7 @@ void mmgLutWidget::SetLut(vtkLookupTable *lut)
     p = lut->GetTableValue(i);
     assert(p != NULL);
     c.SetFloatRGB(p[0], p[1], p[2], p[3]);
-    m_lutEntry[i].m_c = c; 
+    m_LutEntry[i].m_Color = c; 
   }
   SetNumEntry(n);
 }

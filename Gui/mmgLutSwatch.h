@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutSwatch.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 15:22:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-12-19 16:19:22 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,13 +33,13 @@ public:
   -the user is notified anyway
   -default = false
   */
-  void     SetEditable(bool b) {m_editable = b;};  
+  void     SetEditable(bool b) {m_Editable = b;};  
 
   virtual void SetListener(mafObserver *Listener) {m_Listener = Listener;};
 protected:
   mafObserver *m_Listener;
 
-  wxBitmap m_bmp;      
+  wxBitmap m_Bmp;      
   void OnEraseBackground(wxEraseEvent& event) {};  // overrided to prevent flickering
   void OnPaint(wxPaintEvent &event);                
   void Update();                
@@ -49,14 +49,13 @@ protected:
   void OnMouseMotion(wxMouseEvent &event);
   
   // widgets
-  vtkLookupTable *m_lut;
-  bool            m_mouse_in_window;
-  wxString        m_tip;
-  int             m_mouse_x;
-  unsigned long   m_updatetime;
-  bool            m_editable;
-  wxFont m_font;
+  vtkLookupTable *m_Lut;
+  bool            m_MouseInWindow;
+  wxString        m_Tip;
+  int             m_MouseX;
+  unsigned long   m_UpdateTime;
+  bool            m_Editable;
+  wxFont          m_Font;
   DECLARE_EVENT_TABLE()
 };
 #endif
-

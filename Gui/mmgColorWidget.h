@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgColorWidget.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 15:22:05 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-12-19 16:19:20 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -37,23 +37,23 @@ public:
 protected:
   mafObserver *m_Listener;
 
-  wxBitmap m_hsv_bmp; //the bitmap with the hsv chooser
-  wxPoint  m_h_pos;   //position of the hsv chooser  
-  int      m_h_sz;    //size     of the hsv chooser  
-  int      m_h_r1;    //inner radius of the h cirle 
-  int      m_h_r2;    //outer radius of the h cirle 
-  wxPoint  m_sv_pos;  //position of the sv chooser within the hsv bmp 
-  int      m_sv_sz;   //size     of the sv chooser  
+  wxBitmap m_HsvBmp; //the bitmap with the hsv chooser
+  wxPoint  m_HsvPosition;   //position of the hsv chooser  
+  int      m_HsvSize;    //size     of the hsv chooser  
+  int      m_HsvInnerRadius;    //inner radius of the h cirle 
+  int      m_HsvOuterRadius;    //outer radius of the h cirle 
+  wxPoint  m_SvPosition;  //position of the sv chooser within the hsv bmp 
+  int      m_SvSize;   //size     of the sv chooser  
 
-  wxBitmap m_alpha_bmp; //the bitmap with the alpha chooser
-  wxPoint  m_a_pos;     //position of the alpha chooser
-  wxSize   m_a_sz;      //size of the alpha chooser
+  wxBitmap m_AlphaBmp; //the bitmap with the alpha chooser
+  wxPoint  m_AlphaBmpPosition;     //position of the alpha chooser
+  wxSize   m_AlphaBmpSize;      //size of the alpha chooser
 
-  int      m_cursor_size;  //cursor size
-  wxPoint  m_acursor;      //position of the a cursor
-  wxPoint  m_hcursor;      //position of the h cursor
-  wxPoint  m_svcursor;     //position of the sv cursor
-  int      m_dragging;     //= DRAG_NONE | DRAG_H | DRAG_SV
+  int      m_CursorSize;  //cursor size
+  wxPoint  m_AlphaCursorPosition;      //position of the a cursor
+  wxPoint  m_HsvCursorPosition;      //position of the h cursor
+  wxPoint  m_SvCursorPosition;     //position of the sv cursor
+  int      m_Dragging;     //= DRAG_NONE | DRAG_H | DRAG_SV
 
   void InitBitmap();         // create the bitmaps, draw the h circle
   void UpdateHSVBitmap();    // update the sv square (H changed)
@@ -68,13 +68,12 @@ protected:
   void OnColorChanged(bool notify = true);
   
   // widgets
-  mafColor         m_color;
+  mafColor         m_Color;
   mafColor         m_clipboard;
 
-  mmgColorSwatch  *m_col_swatch;
-  mmgColorSwatch  *m_prevcol_swatch;
+  mmgColorSwatch  *m_ColorSwatch;
+  mmgColorSwatch  *m_PrevColorSwatch;
 
   DECLARE_EVENT_TABLE()
 };
 #endif
-

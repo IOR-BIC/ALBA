@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 17:19:04 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-12-19 16:19:22 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -106,7 +106,7 @@ mmgMDIFrame::mmgMDIFrame(const wxString& title, const wxPoint& pos, const wxSize
 {
   mafSetFrame( this );
   m_Listener = NULL;
-  m_clientwin= NULL;
+  m_ClientWin= NULL;
   CreateStatusbar();
   Centre();
 
@@ -216,7 +216,7 @@ void mmgMDIFrame::OnSize(wxSizeEvent& event)
 		return;
   wxRect r;
 	m_frameStatusBar->GetFieldRect(4,r);
-  m_gauge->SetSize(r.x,r.y+2,r.width -4 ,r.height -4);
+  m_Gauge->SetSize(r.x,r.y+2,r.width -4 ,r.height -4);
 }
 //-----------------------------------------------------------
 void mmgMDIFrame::OnDropFile(wxDropFilesEvent &event)
@@ -253,10 +253,10 @@ void mmgMDIFrame::LayoutWindow()
 void mmgMDIFrame::Put( wxWindow* w)
 //----------------------------------------------------------------------------
 {
-  if(m_clientwin) m_clientwin->Show(false);
-  m_clientwin = w;
-  m_clientwin->Reparent(this);
-  m_clientwin->Show(true);
+  if(m_ClientWin) m_ClientWin->Show(false);
+  m_ClientWin = w;
+  m_ClientWin->Reparent(this);
+  m_ClientWin->Show(true);
   LayoutWindow();
 }
 //----------------------------------------------------------------------------
@@ -271,10 +271,10 @@ void mmgMDIFrame::CreateStatusbar ()
 	SetStatusText( " ",2);
 	SetStatusText( " ",3);
 
-	m_busy=FALSE;
-	m_gauge = new wxGauge(m_frameStatusBar, -1, 100,wxDefaultPosition,wxDefaultSize,wxGA_SMOOTH);
-	m_gauge->SetForegroundColour( *wxRED );
-  m_gauge->Show(FALSE);
+	m_Busy=FALSE;
+	m_Gauge = new wxGauge(m_frameStatusBar, -1, 100,wxDefaultPosition,wxDefaultSize,wxGA_SMOOTH);
+	m_Gauge->SetForegroundColour( *wxRED );
+  m_Gauge->Show(FALSE);
 }
 //----------------------------------------------------------------------------
 void mmgMDIFrame::OnLayout(wxCommandEvent& event)
@@ -301,8 +301,8 @@ void mmgMDIFrame::Busy()
   {
   SetStatusText("Busy",2);
   SetStatusText("",3);
-  m_gauge->Show(TRUE);
-  m_gauge->SetValue(0);
+  m_Gauge->Show(TRUE);
+  m_Gauge->SetValue(0);
   Refresh(FALSE);
   }
 //-----------------------------------------------------------
@@ -311,7 +311,7 @@ void mmgMDIFrame::Ready()
   {
   SetStatusText("",2);
   SetStatusText("",3);
-  m_gauge->Show(FALSE);
+  m_Gauge->Show(FALSE);
   Refresh(FALSE);
   }
 //-----------------------------------------------------------
@@ -332,7 +332,7 @@ void mmgMDIFrame::ProgressBarHide()
 void mmgMDIFrame::ProgressBarSetVal(int progress)
 //-----------------------------------------------------------
   {
-  m_gauge->SetValue(progress);
+  m_Gauge->SetValue(progress);
   SetStatusText(wxString::Format(" %d%% ",progress),3);
   }
 //-----------------------------------------------------------
@@ -393,7 +393,7 @@ void mmgMDIFrame::ProgressUpdate(void* a)
 {
   mafProgressArgs *args = (mafProgressArgs *)a;
   int prg = (int)(args->f->GetProgress()*100);
-  args->t->m_gauge->SetValue(prg);
+  args->t->m_Gauge->SetValue(prg);
   args->t->SetStatusText(wxString::Format(" %d%% ",prg),3);
 }
 //-----------------------------------------------------------

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:22 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-12-19 16:19:20 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,7 +23,6 @@
 #include "mmgFrame.h"
 #include "mafDecl.h"
 #include "mafEvent.h"
-//#include "vtkVersion.h"
 
 static wxWindow* TheFrame = NULL;
 //----------------------------------------------------------------------------
@@ -61,7 +60,7 @@ mmgFrame::mmgFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 {
   mafSetFrame( this );
   m_Listener = NULL;
-  m_clientwin= NULL;
+  m_ClientWin= NULL;
   CreateStatusbar();
   Centre();
 }
@@ -139,10 +138,10 @@ void mmgFrame::LayoutWindow()
 //----------------------------------------------------------------------------
 {
 	Refresh();
-	if(m_clientwin)
+	if(m_ClientWin)
 	{
 		wxLayoutAlgorithm layout;
-		layout.LayoutWindow(this,m_clientwin);
+		layout.LayoutWindow(this,m_ClientWin);
 		Refresh(false);
 	}
 }
@@ -150,10 +149,10 @@ void mmgFrame::LayoutWindow()
 void mmgFrame::Put( wxWindow* w)
 //----------------------------------------------------------------------------
 {
-  if(m_clientwin) m_clientwin->Show(false);
-  m_clientwin = w;
-  m_clientwin->Reparent(this);
-  m_clientwin->Show(true);
+  if(m_ClientWin) m_ClientWin->Show(false);
+  m_ClientWin = w;
+  m_ClientWin->Reparent(this);
+  m_ClientWin->Show(true);
   LayoutWindow();
 }
 //----------------------------------------------------------------------------
@@ -167,12 +166,6 @@ void mmgFrame::CreateStatusbar ()
 	SetStatusText( " ",1);
 	SetStatusText( " ",2);
 	SetStatusText( " ",3);
-
-  //vtkVersion *v = vtkVersion::New();
-  //wxString s;
-  //s << "vtk" << v->GetVTKVersion();
-  //SetStatusText(s,5);
-  //v->Delete();
 }
 //----------------------------------------------------------------------------
 void mmgFrame::OnLayout(wxCommandEvent& event)

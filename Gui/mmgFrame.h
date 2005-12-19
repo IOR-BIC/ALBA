@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgFrame.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 11:10:06 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-12-19 16:19:21 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -67,7 +67,7 @@ protected:
 	void CreateStatusbar();
 
   mafObserver *m_Listener;
-  wxWindow    *m_clientwin;
+  wxWindow    *m_ClientWin;
 
 DECLARE_EVENT_TABLE()
 };

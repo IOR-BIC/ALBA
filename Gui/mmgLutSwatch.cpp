@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutSwatch.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 15:26:31 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-12-19 16:19:21 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -54,15 +54,15 @@ mmgLutSwatch::mmgLutSwatch(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 //----------------------------------------------------------------------------
 {
 	m_Listener = NULL;
-  m_editable = false;
+  m_Editable = false;
   SetLut(NULL);
 
-  m_mouse_in_window = false;
-  m_tip = "";
+  m_MouseInWindow = false;
+  m_Tip = "";
   SetCursor(*wxCROSS_CURSOR);
 
-  m_font = wxFont(wxSystemSettings::GetSystemFont(wxSYS_DEFAULT_GUI_FONT));
-  m_font.SetPointSize(9);
+  m_Font = wxFont(wxSystemSettings::GetSystemFont(wxSYS_DEFAULT_GUI_FONT));
+  m_Font.SetPointSize(9);
 }
 //----------------------------------------------------------------------------
 void mmgLutSwatch::OnPaint(wxPaintEvent &event)
@@ -70,32 +70,32 @@ void mmgLutSwatch::OnPaint(wxPaintEvent &event)
 {
   wxPaintDC pdc(this);
 
-  if(!m_lut) return;
-  if(m_lut->GetMTime() > m_updatetime ) Update();
+  if(!m_Lut) return;
+  if(m_Lut->GetMTime() > m_UpdateTime ) Update();
 
   int w = GetSize().GetWidth();   
   int h = GetSize().GetHeight();   
 
   wxMemoryDC mdc;
-  mdc.SelectObject(m_bmp);
+  mdc.SelectObject(m_Bmp);
   pdc.Blit(0, 0, w, h, &mdc, 0,0);
   mdc.SelectObject(wxNullBitmap);
  
-  if(m_lut && m_mouse_in_window)
+  if(m_Lut && m_MouseInWindow)
   {
-    pdc.SetFont(m_font);
+    pdc.SetFont(m_Font);
     pdc.SetTextForeground(*wxBLACK);
     pdc.SetTextBackground(*wxWHITE);
     pdc.SetBackgroundMode(wxSOLID);
     
     wxCoord tw,th;
-    pdc.GetTextExtent(m_tip, &tw, &th);
+    pdc.GetTextExtent(m_Tip, &tw, &th);
    
     //******************  SIL 29/11/05 - to be reinserted
-    if(m_mouse_x < w/2)
-      pdc.DrawText(m_tip,wxPoint(m_mouse_x,1) );
+    if(m_MouseX < w/2)
+      pdc.DrawText(m_Tip,wxPoint(m_MouseX,1) );
     else
-      pdc.DrawText(m_tip,wxPoint(m_mouse_x-tw,1));
+      pdc.DrawText(m_Tip,wxPoint(m_MouseX-tw,1));
     //******************/
   }
 }
@@ -103,9 +103,9 @@ void mmgLutSwatch::OnPaint(wxPaintEvent &event)
 void mmgLutSwatch::OnLeftMouseButtonDown(wxMouseEvent &event)
 //----------------------------------------------------------------------------
 {
-  if( m_lut && m_editable  )
+  if( m_Lut && m_Editable  )
   {
-    mmgLutEditor::ShowLutDialog(m_lut);
+    mmgLutEditor::ShowLutDialog(m_Lut);
     Update();
     Refresh();
   }
@@ -132,28 +132,28 @@ void mmgLutSwatch::OnMouseMotion(wxMouseEvent &event)
 
 
   // this is to simulate the non-existing event "MouseLeave"
-  if(! m_mouse_in_window )
+  if(! m_MouseInWindow )
   {
     CaptureMouse();
-    m_mouse_in_window = true;
+    m_MouseInWindow = true;
   }
   else
   {
     if( x<0 || x>w || y<0 || y>h )
     {
       ReleaseMouse();  
-      m_mouse_in_window = false;
+      m_MouseInWindow = false;
       Refresh();
     }
   }
 
   //alter the tooltip text according to mouse position
-  if(m_lut && m_mouse_in_window ) 
+  if(m_Lut && m_MouseInWindow ) 
   {
-    double *range = m_lut->GetRange();
+    double *range = m_Lut->GetRange();
     double v = range[0] + ((range[1]-range[0]) * x ) / w;
-    m_tip = wxString::Format(" value=%g ",v);
-    m_mouse_x = x;
+    m_Tip = wxString::Format(" value=%g ",v);
+    m_MouseX = x;
     Refresh();
   }
 }
@@ -161,7 +161,7 @@ void mmgLutSwatch::OnMouseMotion(wxMouseEvent &event)
 void mmgLutSwatch::SetLut(vtkLookupTable *lut)
 //----------------------------------------------------------------------------
 {
-  m_lut = lut;
+  m_Lut = lut;
   Update();
   Refresh();
 }
@@ -172,13 +172,13 @@ void mmgLutSwatch::Update()
   int w = GetSize().GetWidth();   
   int h = GetSize().GetHeight();   
 
-  if( m_lut == NULL )
+  if( m_Lut == NULL )
   {
-    m_bmp = wxBitmap(w,h);
+    m_Bmp = wxBitmap(w,h);
     return;
   }
   
-  float num = m_lut->GetNumberOfTableValues();
+  float num = m_Lut->GetNumberOfTableValues();
 
   unsigned char *data = new unsigned char[w*h*3];
   unsigned char *p = data;
@@ -189,7 +189,7 @@ void mmgLutSwatch::Update()
     for(x=0; x<w; x++)
     {
       float i = ( num * x ) / w;
-      mafColor col  = mafColor( m_lut->GetTableValue(i) );
+      mafColor col  = mafColor( m_Lut->GetTableValue(i) );
       mafColor col2 = mafColor::CheckeredColor(col,x,y);
 
       *p++ = col2.m_r;
@@ -198,7 +198,7 @@ void mmgLutSwatch::Update()
     }
   }
   wxImage img(w,h,data); // data will be freed by the image
-  m_bmp = img.ConvertToBitmap();
+  m_Bmp = img.ConvertToBitmap();
 
-  m_updatetime = m_lut->GetMTime();
+  m_UpdateTime = m_Lut->GetMTime();
 }
