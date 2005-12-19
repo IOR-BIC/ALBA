@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 18:48:40 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-12-19 14:57:53 $
+  Version:   $Revision: 1.14 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -219,7 +219,7 @@ void mafViewOrthoSlice::PackageView()
   for(int v=0; v<4; v++)
   {
     m_Views[v] = new mafViewSlice("Slice view", cam_pos[v]);
-    m_Views[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
+    m_Views[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice", MUTEX);
   }
   PlugChildView(m_Views[SLICE_ORTHO]);
   PlugChildView(m_Views[SLICE_X]);
