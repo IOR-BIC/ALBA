@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolyline.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:50:57 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-12-19 14:57:20 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -56,6 +56,18 @@ mafVMEOutput *mafVMEPolyline::GetOutput()
   }
   return m_Output;
 }
+//-------------------------------------------------------------------------
+int mafVMEPolyline::InternalInitialize()
+//-------------------------------------------------------------------------
+{
+  if (Superclass::InternalInitialize()==MAF_OK)
+  {
+    // force material allocation
+    GetMaterial();
+    return MAF_OK;
+  }
+  return MAF_ERROR;
+}
 
 //-------------------------------------------------------------------------
 int mafVMEPolyline::SetData(vtkPolyData *data, mafTimeStamp t, int mode)
@@ -91,6 +103,10 @@ mmaMaterial *mafVMEPolyline::GetMaterial()
   {
     material = mmaMaterial::New();
     SetAttribute("MaterialAttributes", material);
+    if (m_Output)
+    {
+      ((mafVMEOutputPolyline *)m_Output)->SetMaterial(material);
+    }
   }
   return material;
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolyline.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:50:30 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-12-19 14:57:20 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -54,9 +54,15 @@ public:
     /** Return pointer to material attribute. */
     mmaMaterial *GetMaterial();
 
+    /** Return the suggested pipe-typename for the visualization of this vme */
+    virtual mafString GetVisualPipe() {return mafString("mafPipePolyline");};
+
 protected:
   mafVMEPolyline();
   virtual ~mafVMEPolyline();
+
+  /** used to initialize and create the material attribute if not yet present */
+  virtual int InternalInitialize();
 
 private:
   mafVMEPolyline(const mafVMEPolyline&); // Not implemented
