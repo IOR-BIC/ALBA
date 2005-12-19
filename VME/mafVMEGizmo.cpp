@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGizmo.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-21 12:04:16 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-12-19 14:31:54 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -56,7 +56,6 @@ mafVMEGizmo::mafVMEGizmo()
 mafVMEGizmo::~mafVMEGizmo()
 //-------------------------------------------------------------------------
 {
-  vtkDEL(m_GizmoData);
   mafDEL(m_Transform);
   SetOutput(NULL);
 }
@@ -104,7 +103,6 @@ void mafVMEGizmo::SetData(vtkPolyData *data)
   assert(data);  // just check if data is set to NULL...
   if (data!=m_GizmoData)
   {
-    vtkDEL(m_GizmoData);
     m_GizmoData = data;
     m_GizmoData->Register(NULL);
     
