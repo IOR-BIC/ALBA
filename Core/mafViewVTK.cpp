@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-12 11:25:22 $
-  Version:   $Revision: 1.46 $
+  Date:      $Date: 2005-12-19 14:54:32 $
+  Version:   $Revision: 1.47 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -312,7 +312,7 @@ mmgGui *mafViewVTK::CreateGui()
   m_Gui->Divider(2);
   
   /////////////////////////////////////////Text GUI
-  m_TextKit = new mafTextKit(m_Gui, m_Rwi, this);
+  m_TextKit = new mafTextKit(m_Gui, m_Rwi->m_RenFront, this);
   m_Gui->AddGui(m_TextKit->GetGui());
   m_Gui->Divider(2);
 
@@ -322,7 +322,7 @@ mmgGui *mafViewVTK::CreateGui()
 
   /////////////////////////////////////////Light GUI
   m_Gui->Divider(2);
-  m_LightKit = new mafLightKit(m_Gui, this->m_Rwi->m_RenFront, this);
+  m_LightKit = new mafLightKit(m_Gui, m_Rwi->m_RenFront, this);
   m_Gui->AddGui(m_LightKit->GetGui());
   
   return m_Gui;
