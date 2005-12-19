@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 15:21:07 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2005-12-19 15:18:49 $
+  Version:   $Revision: 1.28 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,7 +34,9 @@
 // ugly hack to make FindWindow Work
 // if you remove this line you will have a Compile-Error "FindWindowA is not defined for wxWindow"
 // .... waiting a better workaround. SIL 30/11/05 
-#include <wx/msw/winundef.h> 
+#if WIN32  
+  #include <wx/msw/winundef.h> 
+#endif
 // end of hack
 
 
