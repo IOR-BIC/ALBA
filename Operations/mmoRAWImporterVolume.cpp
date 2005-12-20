@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 10:54:52 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-12-20 11:23:57 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -353,7 +353,7 @@ void mmoRAWImporterVolume::UpdateReader()
 bool mmoRAWImporterVolume::Import()
 //----------------------------------------------------------------------------
 {
-	wxBusyInfo wait("Reading File, please wait...");
+	wxBusyInfo wait("Importing RAW data, please wait...");
 
  	vtkMAFSmartPointer<vtkImageReader> reader;
 	reader->SetFileName(m_RawFile);  
@@ -444,4 +444,63 @@ int mmoRAWImporterVolume::GetFileLength(const char * filename)
 	file.close();
 	len = (m-l);
 	return len;
+}
+//----------------------------------------------------------------------------
+void mmoRAWImporterVolume::SetFileName(const char *raw_file)
+//----------------------------------------------------------------------------
+{
+  m_RawFile = raw_file;
+}
+//----------------------------------------------------------------------------
+void mmoRAWImporterVolume::SetScalarType(int scalar_type)
+//----------------------------------------------------------------------------
+{
+  if (scalar_type < CHAR_SCALAR || scalar_type > DOUBLE_SCALAR)
+  {
+    return;
+  }
+  m_ScalarType = scalar_type;
+}
+//----------------------------------------------------------------------------
+void mmoRAWImporterVolume::ScalarSignedOn()
+//----------------------------------------------------------------------------
+{
+  m_Signed = 1;
+}
+//----------------------------------------------------------------------------
+void mmoRAWImporterVolume::ScalarSignedOff()
+//----------------------------------------------------------------------------
+{
+  m_Signed = 0;
+}
+//----------------------------------------------------------------------------
+void mmoRAWImporterVolume::SetDataDimensions(int dims[3])
+//----------------------------------------------------------------------------
+{
+  memcpy(m_DataDimemsion,dims,sizeof(m_DataDimemsion));
+  m_SliceVOI[1] = m_DataDimemsion[2];
+}
+//----------------------------------------------------------------------------
+void mmoRAWImporterVolume::SetDataSpacing(double spc[3])
+//----------------------------------------------------------------------------
+{
+  memcpy(m_DataSpacing,spc,sizeof(m_DataSpacing));
+}
+//----------------------------------------------------------------------------
+void mmoRAWImporterVolume::SetScalarDataToBigEndian()
+//----------------------------------------------------------------------------
+{
+  m_Endian = 0;
+}
+//----------------------------------------------------------------------------
+void mmoRAWImporterVolume::SetScalarDataToLittleEndian()
+//----------------------------------------------------------------------------
+{
+  m_Endian = 1;
+}
+//----------------------------------------------------------------------------
+void mmoRAWImporterVolume::SetDataVOI(int zVOI[2])
+//----------------------------------------------------------------------------
+{
+  memcpy(m_SliceVOI,zVOI,sizeof(m_SliceVOI));
 }
