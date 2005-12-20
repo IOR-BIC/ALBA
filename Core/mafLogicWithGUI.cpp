@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 16:59:19 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2005-12-20 11:23:11 $
+  Version:   $Revision: 1.20 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -197,8 +197,8 @@ void mafLogicWithGUI::OnQuit()
 {
   // if OnQuit is redefined in a deriver class,  mafLogicWithGUI::OnQuit() must be clalled last
 
-  cppDEL(m_SideSash); //must be after deleting the vme_manager
   mafYield();
+  cppDEL(m_SideSash); //must be after deleting the vme_manager
   if(m_PlugLogbar) delete wxLog::SetActiveTarget(NULL); 
   vtkDEL(m_VtkLog);
   m_Win->Destroy();
