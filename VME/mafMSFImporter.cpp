@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-23 18:11:12 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-12-21 15:44:19 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -527,14 +527,12 @@ int mmuMSF1xDocument::RestoreVItem(mafStorageElement *node, mafVME *vme)
         {
           mafSmartPointer<mafVMEItemVTK> vitem;
           mafStorageElement *tarray=node->FindNestedElement("TArray");
+          mafVMEGeneric *vme_generic=mafVMEGeneric::SafeDownCast(vme);
+          assert(vme_generic);
           if (tarray)
           {
             if (RestoreTagArray(tarray,vitem->GetTagArray())==MAF_OK)
             {
-              mafVMEGeneric *vme_generic=mafVMEGeneric::SafeDownCast(vme);
-              assert(vme_generic);
-              vme_generic->GetDataVector()->AppendItem(vitem);
-
               /////////////////////////////////////////////// 
               // here should process VMEItem-specific tags //
               ///////////////////////////////////////////////
@@ -561,6 +559,7 @@ int mmuMSF1xDocument::RestoreVItem(mafStorageElement *node, mafVME *vme)
           vitem->SetId(item_id);
           vitem->SetURL(data_file);
           vitem->SetDataType(data_type);
+          vme_generic->GetDataVector()->AppendItem(vitem);
           return MAF_OK;
         } // DataFile
       } // Id
