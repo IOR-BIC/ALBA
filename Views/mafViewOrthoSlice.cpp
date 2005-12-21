@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 14:57:53 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-12-21 13:55:24 $
+  Version:   $Revision: 1.15 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,6 +22,7 @@
 #include "mafViewOrthoSlice.h"
 #include "mafViewSlice.h"
 #include "mafPipeVolumeSlice.h"
+#include "mmgLutPreset.h"
 #include "mmgGui.h"
 #include "mmgFloatSlider.h"
 #include "mmgLutSlider.h"
@@ -50,7 +51,6 @@ mafViewOrthoSlice::mafViewOrthoSlice(wxString label, bool external)
   m_ColorLUT= NULL;
   m_CurrentVolume = NULL;
   m_Origin[0] = m_Origin[1] = m_Origin[2] = 0.0;
-  m_ColorLUTEnabled = 0;
 }
 //----------------------------------------------------------------------------
 mafViewOrthoSlice::~mafViewOrthoSlice()
@@ -92,11 +92,11 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
       data->GetScalarRange(sr);
       m_Luts->SetRange((long)sr[0],(long)sr[1]);
       m_Luts->SetSubRange((long)sr[0],(long)sr[1]);
-//      m_ColorLUT->SetRange(sr);
-//      m_ColorLUT->Build();
+      m_ColorLUT->SetRange(sr);
+      m_ColorLUT->Build();
+      lutPreset(4,m_ColorLUT);
       for(int i=0; i<m_NumOfChildView; i++)
       {
-        //((mafViewSlice *)m_ChildViewList[i])->SetSlice(center);
         mafPipeVolumeSlice *p = (mafPipeVolumeSlice *)((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
         p->SetColorLookupTable(m_ColorLUT);
       }
@@ -116,7 +116,7 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
     else
     {
       m_CurrentVolume = NULL;
-      m_ColorLUTEnabled = 0;
+      lutPreset(4,m_ColorLUT);
     }
   }
   EnableWidgets(m_CurrentVolume != NULL);
@@ -149,21 +149,18 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
       CameraUpdate();
     }
   	break;
-    case ID_RGB_LUT:
-      for(int i=0; i<m_NumOfChildView; i++)
-      {
-        mafPipeVolumeSlice *p = (mafPipeVolumeSlice *)((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
-        p->ColorLookupTable(m_ColorLUTEnabled != 0);
-      }
-      CameraUpdate();
-    break;
     case ID_LUT_CHOOSER:
+    {
       for(int i=0; i<m_NumOfChildView; i++)
       {
         mafPipeVolumeSlice *p = (mafPipeVolumeSlice *)((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
         p->SetColorLookupTable(m_ColorLUT);
       }
+      double *sr;
+      sr = m_ColorLUT->GetRange();
+      m_Luts->SetSubRange((long)sr[0],(long)sr[1]);
       CameraUpdate();
+    }
     break;
     case ID_RANGE_MODIFIED:
     {
@@ -195,12 +192,11 @@ mmgGui* mafViewOrthoSlice::CreateGui()
   m_SliderY = m_Gui->FloatSlider(ID_ORTHO_SLICE_Y, "y", &m_Origin[1],MINDOUBLE,MAXDOUBLE);
   m_SliderZ = m_Gui->FloatSlider(ID_ORTHO_SLICE_Z, "z", &m_Origin[2],MINDOUBLE,MAXDOUBLE);
 
-  m_Gui->Bool(ID_RGB_LUT,"rgb lut", &m_ColorLUTEnabled,0,"turn on/off RGB LUT");
   if (m_ColorLUT == NULL)
   {
     vtkNEW(m_ColorLUT);
-    m_ColorLUT->SetRange(0.0,255.0);
     m_ColorLUT->Build();
+    lutPreset(4,m_ColorLUT);
   }
   m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
 
@@ -235,7 +231,6 @@ void mafViewOrthoSlice::EnableWidgets(bool enable)
     m_Gui->Enable(ID_ORTHO_SLICE_X,enable);
     m_Gui->Enable(ID_ORTHO_SLICE_Y,enable);
     m_Gui->Enable(ID_ORTHO_SLICE_Z,enable);
-    m_Gui->Enable(ID_RGB_LUT,enable);
     m_Gui->Enable(ID_LUT_CHOOSER,enable);
   }
   m_Luts->Enable(enable);

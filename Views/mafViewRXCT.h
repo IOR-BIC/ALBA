@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 18:49:16 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2005-12-21 13:55:14 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -52,8 +52,7 @@ public:
   /** IDs for the GUI */
   enum VIEW_RXCT_WIDGET_ID
   {
-    ID_RGB_LUT = Superclass::ID_LAST,
-    ID_LUT_CHOOSER,
+    ID_LUT_CHOOSER = Superclass::ID_LAST,
     ID_LAST
   };
 
@@ -85,7 +84,6 @@ protected:
   mafGizmoSlice *m_gizmo[6];
   mafVMEVolume *m_CurrentVolume; ///< Current visualized volume
   vtkLookupTable *m_ColorLUT;
-  int m_ColorLUTEnabled;
   mafViewRX *m_ViewsRX[2];
   mafViewCompound *m_ViewCT;
 };
