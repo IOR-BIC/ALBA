@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeMIP.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-21 14:41:26 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-12-21 15:43:39 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -145,14 +145,14 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
   m_SelectionActor->SetProperty(selection_property);
   m_SelectionActor->SetScale(1.01,1.01,1.01);
 
-//  m_AssemblyFront->AddPart(m_SelectionActor);
+//  m_AssemblyFront->AddPart(m_SelectionActor); // commented to avoid problems on ray cast volume rendering
 }
 //----------------------------------------------------------------------------
 medPipeVolumeMIP::~medPipeVolumeMIP()
 //----------------------------------------------------------------------------
 {
   m_AssemblyFront->RemovePart(m_VolumeLOD);
-  m_AssemblyFront->RemovePart(m_SelectionActor);
+  //m_AssemblyFront->RemovePart(m_SelectionActor);
 
   vtkDEL(m_ColorLUT);
   vtkDEL(m_Caster);
