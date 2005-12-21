@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 16:19:21 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-12-21 13:52:31 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -260,6 +260,7 @@ void mmgLutEditor::OnEvent( mafEventBase *event )
       break; 
       case ID_APPLY:
         CopyLut(m_Lut, m_ExternalLut);
+        mafEventMacro(mafEvent(this,GetId()));
       break; 
       default:
 			  e->Log();
@@ -332,13 +333,14 @@ void mmgLutEditor::CopyLut(vtkLookupTable *from, vtkLookupTable *to)
   }
 }
 //----------------------------------------------------------------------------
-void mmgLutEditor::ShowLutDialog(vtkLookupTable *lut)
+void mmgLutEditor::ShowLutDialog(vtkLookupTable *lut, mafObserver *listener, int id)
 //----------------------------------------------------------------------------
 {
   long style = wxDIALOG_MODAL | wxDEFAULT_DIALOG_STYLE /*| wxTHICK_FRAME*/ | wxNO_FULL_REPAINT_ON_RESIZE | wxCLIP_CHILDREN;
   wxDialog *dlg = new wxDialog(NULL, -1, "LutEditor", wxDefaultPosition, wxSize(300,670),	style);
   
-  mmgLutEditor *led = new mmgLutEditor(dlg,-1);
+  mmgLutEditor *led = new mmgLutEditor(dlg, id);
+  led->SetListener(listener);
   led->SetLut(lut);
   dlg->ShowModal();
   delete dlg;

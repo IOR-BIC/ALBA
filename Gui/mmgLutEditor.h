@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutEditor.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 16:19:21 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2005-12-21 13:52:31 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -49,7 +49,7 @@ public:
 
   void SetLut(vtkLookupTable *lut);
 
-  static void ShowLutDialog(vtkLookupTable *lut);
+  static void ShowLutDialog(vtkLookupTable *lut, mafObserver *listener = NULL, int id = MINID);
 
 protected:
 
