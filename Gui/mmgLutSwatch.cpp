@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutSwatch.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 16:19:21 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-12-21 13:51:46 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -105,7 +105,7 @@ void mmgLutSwatch::OnLeftMouseButtonDown(wxMouseEvent &event)
 {
   if( m_Lut && m_Editable  )
   {
-    mmgLutEditor::ShowLutDialog(m_Lut);
+    mmgLutEditor::ShowLutDialog(m_Lut,m_Listener, GetId() );
     Update();
     Refresh();
   }
