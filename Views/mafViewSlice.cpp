@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 18:44:03 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2005-12-21 13:54:35 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -249,7 +249,7 @@ mmgGui *mafViewSlice::CreateGui()
 void mafViewSlice::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  /*if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
     switch(e->GetId()) 
     {
@@ -261,7 +261,8 @@ void mafViewSlice::OnEvent(mafEventBase *maf_event)
   else
   {
     mafEventMacro(*maf_event);
-  }
+  }*/
+  mafEventMacro(*maf_event);
 }
 //----------------------------------------------------------------------------
 void mafViewSlice::SetLutRange(double low_val, double high_val)
