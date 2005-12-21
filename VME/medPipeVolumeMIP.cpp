@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeMIP.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-21 14:38:42 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-12-21 14:41:26 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -145,7 +145,7 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
   m_SelectionActor->SetProperty(selection_property);
   m_SelectionActor->SetScale(1.01,1.01,1.01);
 
-  m_AssemblyFront->AddPart(m_SelectionActor);
+//  m_AssemblyFront->AddPart(m_SelectionActor);
 }
 //----------------------------------------------------------------------------
 medPipeVolumeMIP::~medPipeVolumeMIP()
