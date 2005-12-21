@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-12 11:41:25 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-12-21 13:54:05 $
+  Version:   $Revision: 1.14 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -62,8 +62,7 @@ public:
   /** IDs for the GUI */
   enum PIPE_VOLUME_SLICE_WIDGET_ID
   {
-    ID_RGB_LUT = Superclass::ID_LAST,
-    ID_LUT_CHOOSER,
+    ID_LUT_CHOOSER = Superclass::ID_LAST,
     ID_SLICE_SLIDER_X,
     ID_SLICE_SLIDER_Y,
     ID_SLICE_SLIDER_Z,
@@ -75,11 +74,8 @@ public:
   void InitializeSliceParameters(int direction, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox);
   virtual void Create(mafSceneNode *n);
 
-	/** Show the slice bounding box actor. */
-	void Select     (bool select); 
-	
 	/** Set the range to the lookup table for the slice. */
-	void SetLutRange(double low, double hi);
+	void SetLutRange(double low, double high);
 	
 	/** Get the range of the slice's lookup table. */
 	void GetLutRange(double range[2]);
@@ -97,20 +93,12 @@ public:
 	void GetSliceNormal(double normal[3]);
 
   /** 
-  Enable/Disable color lookupTable for volume slice. */
-  void ColorLookupTable(bool enable);
-
-  /** 
   Assign a color lookup table to the slices*/
   void SetColorLookupTable(vtkLookupTable *lut);
 
   /** 
   Return the color lookup table of the slices*/
   vtkLookupTable *GetColorLookupTable() {return m_ColorLUT;};
-
-  /** 
-  return true/false if color lookupTable for volume slice is Enabled/Disabled. */
-  bool IsColorLookupTable();
 
   /** 
   Set the opacity of the slice. */
@@ -167,7 +155,6 @@ protected:
 
   vtkActor               *m_GhostActor;
 
-  int                     m_ColorLUTEnabled;
   bool                    m_SliceParametersInitialized;
   bool                    m_ShowVolumeBox;
   bool                    m_ShowUnit;
