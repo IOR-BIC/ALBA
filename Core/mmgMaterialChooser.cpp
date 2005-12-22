@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMaterialChooser.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 09:49:06 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2005-12-22 13:28:50 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -162,7 +162,7 @@ void mmgMaterialChooser::CreateGUI()
 	// RWI ============================
 	m_RWI = new mafRWI(m_Dialog,ONE_LAYER);
 	m_RWI->SetSize(0,0,50,50);
-	m_RWI->m_RwiBase->Show(true);
+	//m_RWI->m_RwiBase->Show(true);
 
 	// GUI ============================
 	m_Gui = new mmgGui(this);
@@ -199,9 +199,9 @@ void mmgMaterialChooser::CreateGUI()
   m_Gui->OkCancel();
 
 	m_Gui->Update();
-	m_Gui->Show(true);
 	m_Gui->SetSize(220,520);
 	m_Gui->Reparent(m_Dialog);
+  m_Gui->Show(true);
   
 	wxBoxSizer *v1_sizer = new wxBoxSizer(wxVERTICAL);
 	v1_sizer->Add(m_ListCtrlMaterial,1,wxEXPAND | wxALIGN_LEFT);
@@ -213,6 +213,7 @@ void mmgMaterialChooser::CreateGUI()
 	wxBoxSizer *main_sizer = new wxBoxSizer(wxHORIZONTAL);
 	main_sizer->Add(v1_sizer,1,wxEXPAND | wxALIGN_LEFT);
 	main_sizer->Add(v2_sizer,0,wxALIGN_LEFT);
+  m_RWI->m_RwiBase->Show(true);
 
 	// ATTACH SIZER TO DIALOG
 	m_Dialog->SetAutoLayout( TRUE );
@@ -225,9 +226,9 @@ void mmgMaterialChooser::CreatePipe()
 //----------------------------------------------------------------------------
 {
   wxColour col = wxSystemSettings::GetSystemColour(wxSYS_COLOUR_3DLIGHT);
-  float br = col.Red()/255.0;
-  float bg = col.Green()/255.0;
-  float bb = col.Blue()/255.0;
+  double br = col.Red()/255.0;
+  double bg = col.Green()/255.0;
+  double bb = col.Blue()/255.0;
 
 	m_RWI->m_RenFront->SetBackground(br,bg,bb);
 	m_RWI->m_RenFront->LightFollowCameraOff();

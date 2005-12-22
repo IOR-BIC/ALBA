@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 18:55:07 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-12-22 13:29:37 $
+  Version:   $Revision: 1.14 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -85,9 +85,6 @@ void mafPipeMeter::Create(mafSceneNode *n/*, bool use_axes*/)
   m_MeterVME          = NULL;
   m_Lut               = NULL;
   m_Caption           = NULL;
-
-	//@@@ m_use_axes = use_axes;
-  //@@@ m_Vme->UpdateCurrentData();
 
   assert(m_Vme->IsA("mafVMEMeter"));
   m_MeterVME = mafVMEMeter::SafeDownCast(m_Vme);
@@ -247,7 +244,8 @@ mmgGui *mafPipeMeter::CreateGui()
   m_Gui->Bool(ID_GENERATE_EVENT,"gen. event",&meter_attrib->m_GenerateEvent);
   m_Gui->Double(ID_DELTA_PERCENT,"delta %",&meter_attrib->m_DeltaPercent,0);
 
-  m_Gui->Enable(ID_DISTANCE_RANGE, meter_attrib->m_ColorMode == mafVMEMeter::ONE_COLOR);
+  m_MaterialButton->Enable(meter_attrib->m_ColorMode == mafVMEMeter::ONE_COLOR);
+  m_Gui->Enable(ID_DISTANCE_RANGE,meter_attrib->m_ColorMode == mafVMEMeter::RANGE_COLOR);
   m_Gui->Enable(ID_TUBE_RADIUS, meter_attrib->m_Representation == mafVMEMeter::LINE_REPRESENTATION);
   m_Gui->Enable(ID_TUBE_CAPPING, meter_attrib->m_Representation == mafVMEMeter::LINE_REPRESENTATION);
 
@@ -266,8 +264,9 @@ void mafPipeMeter::OnEvent(mafEventBase *maf_event)
         UpdateProperty();
       break;
       case ID_COLOR_MODE:
-        m_Gui->Enable(ID_DISTANCE_RANGE,meter_attrib->m_ColorMode == mafVMEMeter::ONE_COLOR);
-        m_MaterialButton->Enable(!meter_attrib->m_ColorMode);
+        m_Gui->Enable(ID_DISTANCE_RANGE,meter_attrib->m_ColorMode == mafVMEMeter::RANGE_COLOR);
+        m_MaterialButton->Enable(meter_attrib->m_ColorMode == mafVMEMeter::ONE_COLOR);
+        UpdateProperty();
       break;
       case ID_METER_REPRESENTATION:
         m_Gui->Enable(ID_TUBE_RADIUS, meter_attrib->m_Representation == mafVMEMeter::LINE_REPRESENTATION);
@@ -297,7 +296,9 @@ void mafPipeMeter::OnEvent(mafEventBase *maf_event)
   else if (maf_event->GetSender() == m_MeterVME)
   {
     if(maf_event->GetId() == VME_OUTPUT_DATA_UPDATE)
-        UpdateProperty();
+    {
+      UpdateProperty();
+    }
     else if(maf_event->GetId() == mafVMEMeter::LENGTH_THRESHOLD_EVENT) 
     {
     }
@@ -331,9 +332,11 @@ void mafPipeMeter::UpdateProperty(bool fromTag)
     m_DataMapper->SetInput(m_Tube->GetOutput());
   }
 
-  mafString dis;
-  dis << m_MeterVME->GetDistance();
-  m_Caption->SetCaption(dis.GetCStr());
+  double distance_value = m_MeterVME->GetDistance();
+  distance_value = RoundValue(distance_value);
+  wxString dis;
+  dis = wxString::Format("%g",distance_value);
+  m_Caption->SetCaption(dis.c_str());
   m_Caption->SetVisibility(m_MeterVME->GetMeterAttributes()->m_LabelVisibility);
 
   double rgb[3];
@@ -357,7 +360,8 @@ void mafPipeMeter::UpdateProperty(bool fromTag)
     m_Caption->GetProperty()->SetColor(rgb);
   }
 
-  double pos[3], rot[3];
+  double pos[3] = {0,0,0};
+  double rot[3] = {0,0,0};
   mafVME *linked_vme = m_MeterVME->GetStartVME();
   mafSmartPointer<mafTransform> TmpTransform;
   if(linked_vme && linked_vme->IsMAFType(mafVMELandmarkCloud) && m_MeterVME->GetLinkSubId("StartVME") != -1)
@@ -369,9 +373,9 @@ void mafPipeMeter::UpdateProperty(bool fromTag)
   else if(linked_vme)
   {
     linked_vme->GetOutput()->GetAbsPose(pos,rot);
-    m_Caption->SetAttachmentPoint(pos[0],pos[1],pos[2]);
   }
-  
+  m_Caption->SetAttachmentPoint(pos[0],pos[1],pos[2]);
+
   GetGui()->Update();
 
   /*
