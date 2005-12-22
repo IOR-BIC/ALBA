@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgPicButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-22 12:10:22 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2005-12-22 13:12:36 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -63,8 +63,8 @@ void mmgPicButton::Command(wxCommandEvent& event)
     case ID_MATERIAL:
       if(m_Listener) 
         m_Listener->OnEvent(&mafEvent(this, ID_MATERIAL));
-      else
-        SendClickEvent();
+//      else
+//        SendClickEvent();
   	break;
     default:
       mafLogMessage("cmd");
