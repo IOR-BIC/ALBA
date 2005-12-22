@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-28 13:01:33 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2005-12-22 14:05:36 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -566,7 +566,6 @@ wxBitmap *mafRWIBase::GetImage(int magnification)
 {
 	int dim[3];
   GetRenderWindow()->OffScreenRenderingOn();
-    GetRenderWindow()->Render();
 	  vtkMAFSmartPointer<vtkWindowToImageFilter> w2i;
 	  w2i->SetInput(GetRenderWindow());
     w2i->SetMagnification(magnification);
