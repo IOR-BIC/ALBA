@@ -2,23 +2,23 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 09:51:07 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2005-12-23 11:59:45 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
+
 #ifndef __mmgTimeBar_H__
 #define __mmgTimeBar_H__
+
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
 #include "mafObserver.h"
 #include "mmgPanel.h"
-#include "mmgGui.h"
-#include "mmgGuiHolder.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -26,6 +26,7 @@
 class mmgPicButton;    
 class mmgValidator; 
 class mmgFloatSlider;
+
 //----------------------------------------------------------------------------
 // Constants :
 //----------------------------------------------------------------------------
@@ -48,32 +49,21 @@ public:
   
 	/** Set the bounds for the time bar. */
 	void SetBounds(double min, double max);
-	
-	/** Build the time bar settings panel and call ShowGui() method. */
-	//void ShowSettings();
-
-	/** Show the time bar settings. */
-	//void ShowGui();
-	
-	/** Hide the time bar settings. */
-	//void HideGui();
 
 protected:
-  double m_time; 
-  double m_time_min; 
-  double m_time_max; 
-  int   m_time_step; 
+  double m_Time; 
+  double m_TimeMin; 
+  double m_TimeMax; 
+  int   m_TimeStep; 
 
-  wxBoxSizer		  *m_sizer;
-  mmgPicButton		*m_b[5];
-  wxTextCtrl		  *m_entry;
-  wxTextCtrl		  *m_entry2;
-  mmgFloatSlider	*m_slider; 
-  wxTimer          m_timer;
+  wxBoxSizer		  *m_Sizer;
+  mmgPicButton		*m_TimeBarButtons[5];
+  wxTextCtrl		  *m_TimeBarEntry;
+  wxTextCtrl		  *m_TimeBarEntryVelocity;
+  mmgFloatSlider	*m_TimeBarSlider; 
+  wxTimer          m_Timer;
 
-  mafObserver *m_Listener;
-	mmgGui      	   *m_gui;
-	mmgGuiHolder     *m_guih;
+  mafObserver     *m_Listener;
 
   /** Update the time and send the TIME_SET event to synchronize all the application. */
 	void OnTimer(wxTimerEvent &event);

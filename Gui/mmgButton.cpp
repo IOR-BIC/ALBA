@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 12:03:07 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2005-12-23 12:00:07 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,7 +38,7 @@ mmgButton::mmgButton(wxWindow* parent, wxWindowID id, const wxString& label,
 //----------------------------------------------------------------------------
 {
   m_Listener = NULL;
-  m_id = id;
+  m_Id = id;
 };
 //----------------------------------------------------------------------------
 void mmgButton::Command(wxCommandEvent& event)
@@ -58,7 +58,7 @@ void mmgButton::Command(wxCommandEvent& event)
         case BN_CLICKED:            // normal buttons send this
         //SIL. 23-3-2005: case BN_DOUBLECLICKED:      // owner-drawn ones also send this 
           if(m_Listener) 
-            m_Listener->OnEvent(&mafEvent(this, m_id));
+            m_Listener->OnEvent(&mafEvent(this, m_Id));
           else
             processed = SendClickEvent();
         break;
