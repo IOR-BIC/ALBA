@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgPicButton.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-22 12:10:22 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2005-12-23 11:59:11 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,24 +32,14 @@ DECLARE_DYNAMIC_CLASS(mmgPicButton)
 
 public:
   mmgPicButton() {};
-  //mmgPicButton(wxWindow *parent, wxString BitmapId, wxWindowID id = 0);
-  mmgPicButton(wxWindow *parent, wxString BitmapId, wxWindowID id = ID_MATERIAL);
-
-  //----------------------------------------------------------------------------
-  //constants:
-  //----------------------------------------------------------------------------
-  enum MATERIAL_BUTTON_WIDGET_ID
-  {
-    ID_MATERIAL = MINID
-  };
+  mmgPicButton(wxWindow *parent, wxString BitmapId, wxWindowID id = 0, mafObserver *listener = NULL);
 
   /** Set the Listener that will receive event-notification. */
   void SetListener(mafObserver *listener)   {m_Listener=listener;}; 
   void SetEventId(long EventId); 
 
   /** Link the bitmap to the button through the id. */
-  //void SetBitmap(wxString BitmapId, wxWindowID id = 0); 
-  void SetBitmap(wxString BitmapId, wxWindowID id = ID_MATERIAL); 
+  void SetBitmap(wxString BitmapId, wxWindowID id = 0); 
 
 protected:  
   virtual void SetDefault() {};

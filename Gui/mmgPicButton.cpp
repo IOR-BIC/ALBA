@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgPicButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-22 13:12:36 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2005-12-23 11:59:10 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,6 +21,7 @@
 
 
 #include "mmgPicButton.h"
+#include "mafDecl.h"
 #include "mafPics.h"
 
 //#define BN_CLICKED 0  //SIL. 23-3-2005:  Hack to be Removed
@@ -29,23 +30,23 @@
 //----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(mmgPicButton,wxBitmapButton)
      EVT_SET_FOCUS(mmgPicButton::OnSetFocus) 
-     EVT_BUTTON(ID_MATERIAL, mmgPicButton::Command)
+     EVT_COMMAND_RANGE(MINID,MAXID,wxEVT_COMMAND_BUTTON_CLICKED,   mmgPicButton::Command)
+     EVT_COMMAND_RANGE(PIC_START,PIC_END,wxEVT_COMMAND_BUTTON_CLICKED,   mmgPicButton::Command)
 END_EVENT_TABLE()
 
 IMPLEMENT_DYNAMIC_CLASS(mmgPicButton,wxBitmapButton)
 //----------------------------------------------------------------------------
-mmgPicButton::mmgPicButton(wxWindow *parent, wxString BitmapId, wxWindowID id)
+mmgPicButton::mmgPicButton(wxWindow *parent, wxString BitmapId, wxWindowID id, mafObserver *listener)
 //----------------------------------------------------------------------------
 {
-  m_Listener = NULL;
+  m_Listener = listener;
   //if(id == 0) m_Id = BitmapId; else m_Id = id;
-  //m_Id = id; //Paolo. 22-12-2005: 
+  m_Id = id;
 
   wxBitmap b = mafPics.GetBmp(BitmapId);
   wxSize size(b.GetWidth(),b.GetHeight());
 
-  //Create(parent, m_Id, b, wxDefaultPosition, size,0);
-  Create(parent, ID_MATERIAL, b, wxDefaultPosition, size,0);
+  Create(parent, m_Id, b, wxDefaultPosition, size,0);
   //SetBitmapFocus(b);
 };
 //----------------------------------------------------------------------------
@@ -58,17 +59,7 @@ void mmgPicButton::SetEventId(long EventId)
 void mmgPicButton::Command(wxCommandEvent& event)
 //----------------------------------------------------------------------------
 {
-  switch(event.GetId()) 
-  {
-    case ID_MATERIAL:
-      if(m_Listener) 
-        m_Listener->OnEvent(&mafEvent(this, ID_MATERIAL));
-//      else
-//        SendClickEvent();
-  	break;
-    default:
-      mafLogMessage("cmd");
-  }
+  mafEventMacro(mafEvent(this, m_Id));
 }
 /*#ifdef __WIN32__
 //----------------------------------------------------------------------------
