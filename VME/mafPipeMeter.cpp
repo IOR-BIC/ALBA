@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-22 13:29:37 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2005-12-23 12:00:34 $
+  Version:   $Revision: 1.15 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -246,8 +246,8 @@ mmgGui *mafPipeMeter::CreateGui()
 
   m_MaterialButton->Enable(meter_attrib->m_ColorMode == mafVMEMeter::ONE_COLOR);
   m_Gui->Enable(ID_DISTANCE_RANGE,meter_attrib->m_ColorMode == mafVMEMeter::RANGE_COLOR);
-  m_Gui->Enable(ID_TUBE_RADIUS, meter_attrib->m_Representation == mafVMEMeter::LINE_REPRESENTATION);
-  m_Gui->Enable(ID_TUBE_CAPPING, meter_attrib->m_Representation == mafVMEMeter::LINE_REPRESENTATION);
+  m_Gui->Enable(ID_TUBE_RADIUS, meter_attrib->m_Representation == mafVMEMeter::TUBE_REPRESENTATION);
+  m_Gui->Enable(ID_TUBE_CAPPING, meter_attrib->m_Representation == mafVMEMeter::TUBE_REPRESENTATION);
 
   return m_Gui;
 }
@@ -269,8 +269,8 @@ void mafPipeMeter::OnEvent(mafEventBase *maf_event)
         UpdateProperty();
       break;
       case ID_METER_REPRESENTATION:
-        m_Gui->Enable(ID_TUBE_RADIUS, meter_attrib->m_Representation == mafVMEMeter::LINE_REPRESENTATION);
-        m_Gui->Enable(ID_TUBE_CAPPING, meter_attrib->m_Representation == mafVMEMeter::LINE_REPRESENTATION);
+        m_Gui->Enable(ID_TUBE_RADIUS, meter_attrib->m_Representation == mafVMEMeter::TUBE_REPRESENTATION);
+        m_Gui->Enable(ID_TUBE_CAPPING, meter_attrib->m_Representation == mafVMEMeter::TUBE_REPRESENTATION);
         UpdateProperty();
       break;
       case ID_TUBE_RADIUS:
