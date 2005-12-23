@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMaterialButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-22 12:10:49 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2005-12-23 11:58:41 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,10 +22,19 @@
 #include "mmgMaterialButton.h"
 #include "mafDecl.h"
 #include "mmgGui.h"
+#include "mmgValidator.h"
 #include "mmaMaterial.h"
 #include "mmgPicButton.h"
 
 #include "mafVME.h"
+
+//----------------------------------------------------------------------------
+//constants:
+//----------------------------------------------------------------------------
+enum MATERIAL_BUTTON_WIDGET_ID
+{
+  ID_MATERIAL = MINID
+};
 
 //----------------------------------------------------------------------------
 mmgMaterialButton::mmgMaterialButton(mafVME *vme, mafObserver *listener)
@@ -62,8 +71,7 @@ void mmgMaterialButton::CreateGui()
 
   wxStaticText *lab = new wxStaticText(m_Gui, -1, "material", wxDefaultPosition, wxSize(60,16), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   
-  m_MaterialButton = new mmgPicButton(m_Gui, "Material");
-  m_MaterialButton->SetListener(this);
+  m_MaterialButton = new mmgPicButton(m_Gui, "Material", ID_MATERIAL, this);
   m_MaterialButton->SetSize(25,25);
   m_Material->MakeIcon();
   m_MaterialButton->SetBitmapLabel(*m_Material->m_Icon);
@@ -89,7 +97,7 @@ void mmgMaterialButton::OnEvent(mafEventBase *maf_event)
 	{
     switch(e->GetId())
     {
-      case mmgPicButton::ID_MATERIAL:
+      case ID_MATERIAL:
         mafEventMacro(mafEvent(this,VME_CHOOSE_MATERIAL,m_Vme));
         m_MaterialLabel->SetLabel(m_Material->m_MaterialName.GetCStr());
         cppDEL(m_Material->m_Icon);
