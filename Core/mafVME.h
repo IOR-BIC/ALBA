@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-21 10:08:05 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2006-01-09 10:21:52 $
+  Version:   $Revision: 1.27 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -180,7 +180,7 @@ public:
   /** Return the number of time stamps in the whole tree*/
   int GetNumberOfTimeStamps();
   
-  /** Return the number of time stamps in the whole tree*/
+  /** Return the number of time stamps local to the vme*/
   int GetNumberOfLocalTimeStamps();
   
   /** Return true if the number of local time stamps is > 1*/
