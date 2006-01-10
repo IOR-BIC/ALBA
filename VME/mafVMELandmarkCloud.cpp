@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-15 15:28:31 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-01-10 16:13:42 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -349,6 +349,7 @@ int mafVMELandmarkCloud::AppendLandmark(const char *name)
     return -1;
 
   SetLandmarkName(old,name);
+  GetOutput()->Update();
 
   return old;
 }
@@ -510,6 +511,7 @@ int mafVMELandmarkCloud::RemoveLandmark(int idx)
   //update internal structure to avoid dummy landmark
   m_NumberOfLandmarks = num_landmarks - 1; //modified by Vladik Aranov 25-03-2005
   GetTagArray()->SetTag(mafTagItem(MAF_LMC_ITEMS_NUMBER_TAG, m_NumberOfLandmarks));
+  GetOutput()->Update();
   return MAF_OK;
 }
 //-------------------------------------------------------------------------
