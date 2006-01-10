@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-21 13:54:35 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-01-10 16:12:28 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -140,9 +140,9 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
     mafObject *obj= NULL;
     obj = pipe_factory->CreateInstance(pipe_name);
     mafPipe *pipe = (mafPipe*)obj;
-    pipe->SetListener(this);
     if (pipe)
     {
+      pipe->SetListener(this);
       if (pipe_name.Equals("mafPipeVolumeSlice"))
       {
         m_CurrentVolume = n;
