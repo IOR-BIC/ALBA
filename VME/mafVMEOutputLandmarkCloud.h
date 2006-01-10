@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputLandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:45:24 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-01-10 16:13:09 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -45,6 +45,9 @@ public:
   An event is rised when the output data changes to allow attached classes to 
   update their input.*/
   virtual vtkDataSet *GetVTKData();
+
+  /** Redefined to update gui.*/
+  virtual void Update();
 
 protected:
   mmgGui *CreateGui();
