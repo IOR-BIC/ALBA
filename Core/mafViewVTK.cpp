@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 14:54:32 $
-  Version:   $Revision: 1.47 $
+  Date:      $Date: 2006-01-10 10:04:57 $
+  Version:   $Revision: 1.48 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -264,9 +264,9 @@ void mafViewVTK::VmeCreatePipe(mafNode *vme)
     mafObject *obj = NULL;
     obj = pipe_factory->CreateInstance(pipe_name);
     mafPipe *pipe = (mafPipe*)obj;
-    pipe->SetListener(this);
     if (pipe)
     {
+      pipe->SetListener(this);
       mafSceneNode *n = m_Sg->Vme2Node(vme);
       assert(n && !n->m_Pipe);
       pipe->Create(n);
