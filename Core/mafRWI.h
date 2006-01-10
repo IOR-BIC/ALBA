@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-12 11:24:27 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-01-10 13:34:04 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -111,7 +111,6 @@ public:
 protected:
 	/** Compute the bounds for the visible actors; if vme is passed, the bounds of vme are calculated. */
 	double *ComputeVisibleBounds(mafNode *node = NULL);
-
   mmgGui *CreateGui();
 
   mmgGui *m_Gui;
@@ -121,5 +120,8 @@ protected:
 	
   int          m_StereoType;
   mafObserver *m_Listener;
+
+  mafString m_StereoMovieDir;
+  int       m_StereoMovieEnable;
 };
 #endif

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 17:16:28 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2006-01-10 13:34:10 $
+  Version:   $Revision: 1.19 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -58,8 +58,11 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axe
   m_BGColour  = wxColour(DEFAULT_BG_COLOR * 255,DEFAULT_BG_COLOR * 255,DEFAULT_BG_COLOR * 255);
   m_GridColour= wxColour(DEFAULT_GRID_COLOR * 255,DEFAULT_GRID_COLOR * 255,DEFAULT_GRID_COLOR * 255);
 
+  m_StereoMovieDir    = "";
+  m_StereoMovieEnable = 0;
+
   m_Light = vtkLight::New();
-  m_Light->SetLightTypeToCameraLight();  
+  m_Light->SetLightTypeToCameraLight();
 
   m_Camera = vtkCamera::New();
 	m_Camera->SetViewAngle(20); 
@@ -125,7 +128,7 @@ mafRWI::~mafRWI()
 	if(m_Grid) m_RenFront->RemoveActor2D(m_Grid->GetLabelActor());
 	vtkDEL(m_Grid);
 	
-	cppDEL(m_Axes); //Must be removed before deleting renderers
+  cppDEL(m_Axes); //Must be removed before deleting renderers
   vtkDEL(m_Light);
 	vtkDEL(m_Camera);
 	if(m_RenFront) 
@@ -134,7 +137,7 @@ mafRWI::~mafRWI()
     m_RenderWindow->RemoveRenderer(m_RenFront);
   }
   vtkDEL(m_RenFront);
-  if(m_RenBack) 
+  if(m_RenBack)
   {
     m_RenBack->RemoveAllProps();
     m_RenderWindow->RemoveRenderer(m_RenBack);
@@ -341,8 +344,6 @@ void mafRWI::SetStereo(int stereo_type)
  
   m_StereoType = stereo_type;
   
-  //warning: non portable
-  int *size = m_RenderWindow->GetSize();
   m_RenderWindow->SetStereoCapableWindow(m_StereoType != 0);
   m_RenderWindow->SetStereoRender(m_StereoType != 0);
   m_RenderWindow->SetStereoType(m_StereoType);
@@ -358,6 +359,10 @@ void mafRWI::CameraUpdate()
 
 	m_RenFront->ResetCameraClippingRange(); 
   m_RenderWindow->Render();
+  if (m_StereoMovieEnable!=0)
+  {
+    m_RwiBase->GenerateStereoFrames();
+  }
 }
 //----------------------------------------------------------------------------
 void mafRWI::CameraReset(mafNode *vme)
@@ -529,7 +534,9 @@ enum RWI_WIDGET_ID
   ID_GRID_POS,
   ID_GRID_COLOR,
   ID_SHOW_AXES,
-  ID_BG_COLOR
+  ID_BG_COLOR,
+  ID_STERO_MOVIE_DIR,
+  ID_STERO_MOVIE
 };
 //-------------------------------------------------------------------------
 mmgGui *mafRWI::CreateGui()
@@ -546,6 +553,13 @@ mmgGui *mafRWI::CreateGui()
   m_Gui->Divider(2);
   m_Gui->Bool(ID_SHOW_AXES,"show axes",&m_ShowAxes,0);
   m_Gui->Color(ID_BG_COLOR,"back color",&m_BGColour);
+
+  m_Gui->Divider(2);
+  m_Gui->Label("stero movie");
+  m_Gui->DirOpen(ID_STERO_MOVIE_DIR,"dir",&m_StereoMovieDir);
+  m_Gui->Bool(ID_STERO_MOVIE,"Start rec",&m_StereoMovieEnable);
+  m_Gui->Enable(ID_STERO_MOVIE_DIR,m_StereoType != 0);
+  m_Gui->Enable(ID_STERO_MOVIE,false);
 
   return m_Gui;
 }
@@ -589,6 +603,13 @@ void mafRWI::OnEvent(mafEventBase *maf_event)
       case ID_BG_COLOR:
         SetBackgroundColor(m_BGColour);
         CameraUpdate();
+      break;
+      case ID_STERO_MOVIE_DIR:
+        m_Gui->Enable(ID_STERO_MOVIE,!m_StereoMovieDir.IsEmpty());
+        m_RwiBase->SetStereoMovieDirectory(m_StereoMovieDir.GetCStr());
+      break;
+      case ID_STERO_MOVIE:
+        m_RwiBase->EnableStereoMovie(m_StereoMovieEnable != 0);
       break;
       default:
         mafEventMacro(*maf_event);
