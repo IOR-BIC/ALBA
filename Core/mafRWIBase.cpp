@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-22 14:05:36 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2006-01-10 13:36:24 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -57,8 +57,10 @@
 #include "vtkWindowToImageFilter.h"
 #include "vtkBMPWriter.h"
 #include "vtkJPEGWriter.h"
+#include "vtkPNGWriter.h"
 #include "vtkImageData.h"
 #include "vtkImageExport.h"
+#include "vtkImageAppend.h"
 
 //----------------------------------------------------------------------------
 IMPLEMENT_DYNAMIC_CLASS(mafRWIBase, wxScrolledWindow)
@@ -100,6 +102,15 @@ mafRWIBase::mafRWIBase(wxWindow *parent, wxWindowID id, const wxPoint &pos,
   m_Camera  = NULL;
   m_Mouse   = NULL;
   
+  m_StereoMovieDir     = "";
+  m_StereoMovieFrameCounter = 0;
+  m_StereoMovieLeftEye      = NULL;
+  m_StereoMovieRightEye     = NULL;
+  m_StereoImage             = NULL;
+  m_StereoMoviewFrameWriter = NULL;
+  m_StereoMovieEnable   = false;
+  m_StereoFrameGenerate = false;
+
   m_LastX = 0;
   m_LastY = 0;
 
@@ -109,7 +120,12 @@ mafRWIBase::mafRWIBase(wxWindow *parent, wxWindowID id, const wxPoint &pos,
 mafRWIBase::~mafRWIBase()
 //----------------------------------------------------------------------------
 {
-	this->SetRenderWindow(NULL);
+  vtkDEL(m_StereoMovieLeftEye);
+  vtkDEL(m_StereoMovieRightEye);
+  vtkDEL(m_StereoImage);
+  vtkDEL(m_StereoMoviewFrameWriter);
+
+  this->SetRenderWindow(NULL);
 }
 //----------------------------------------------------------------------------
 mafRWIBase * mafRWIBase::New()
@@ -340,6 +356,8 @@ void mafRWIBase::OnLeftMouseButtonUp(wxMouseEvent &event)
 {
   if (!Enabled) return;
 
+  m_StereoFrameGenerate = false;
+
   if( GetCapture() == this )
     ReleaseMouse();
   
@@ -367,6 +385,8 @@ void mafRWIBase::OnMiddleMouseButtonUp(wxMouseEvent &event)
 {
   if (!Enabled) return;
 
+  m_StereoFrameGenerate = false;
+
   if( GetCapture() == this )
     ReleaseMouse();
 
@@ -393,6 +413,8 @@ void mafRWIBase::OnRightMouseButtonUp(wxMouseEvent &event)
 //----------------------------------------------------------------------------
 {
   if (!Enabled) return;
+
+  m_StereoFrameGenerate = false;
 
   if( GetCapture() == this )
     ReleaseMouse();
@@ -427,6 +449,11 @@ void mafRWIBase::OnMouseMotion(wxMouseEvent &event)
   }
   m_LastX = event.GetX();
   m_LastY = event.GetY();
+
+  if (m_StereoMovieEnable && m_StereoFrameGenerate)
+  {
+    GenerateStereoFrames();
+  }
 
   if (m_CustomInteractorStyle)
   {
@@ -521,6 +548,8 @@ void mafRWIBase::OnIdle(wxIdleEvent& event)
 void mafRWIBase::NotifyClick()
 //----------------------------------------------------------------------------
 {
+  m_StereoFrameGenerate = m_StereoMovieEnable;
+
   wxCommandEvent e(wxEVT_COMMAND_BUTTON_CLICKED, VIEW_CLICKED);
   e.SetEventObject(this);
   ProcessEvent(e);
@@ -657,4 +686,56 @@ void mafRWIBase::SetInteractorStyle(vtkInteractorObserver *o)
 {
   vtkRenderWindowInteractor::SetInteractorStyle(o);
   m_CustomInteractorStyle = o != NULL;
+}
+//----------------------------------------------------------------------------
+void mafRWIBase::SetStereoMovieDirectory(const char *dir)
+//----------------------------------------------------------------------------
+{
+  m_StereoMovieDir = dir;
+}
+//----------------------------------------------------------------------------
+void mafRWIBase::GenerateStereoFrames()
+//----------------------------------------------------------------------------
+{
+  RenderWindow->SetStereoTypeToLeft();
+  RenderWindow->Render();
+  m_StereoMovieLeftEye->Modified();
+  m_StereoMovieLeftEye->Update();
+  RenderWindow->SetStereoTypeToRight();
+  RenderWindow->Render();
+  m_StereoMovieRightEye->Modified();
+  m_StereoMovieRightEye->Update();
+  m_StereoImage->Modified();
+  m_StereoImage->Update();
+  mafString filename;
+  filename = m_StereoMovieDir;
+  filename += "\\movie_";
+  filename += wxString::Format("%05d",m_StereoMovieFrameCounter);
+  filename += ".png";
+  m_StereoMoviewFrameWriter->SetFileName(filename.GetCStr());
+  m_StereoMoviewFrameWriter->Write();
+  m_StereoMovieFrameCounter++;
+}
+//----------------------------------------------------------------------------
+void mafRWIBase::EnableStereoMovie(bool enable)
+//----------------------------------------------------------------------------
+{
+  m_StereoMovieEnable = enable;
+
+  if (m_StereoMovieEnable && m_StereoMovieLeftEye == NULL)
+  {
+    // Build Stereo Movie pipeline
+    vtkNEW(m_StereoMovieLeftEye);
+    m_StereoMovieLeftEye->SetInput(RenderWindow);
+
+    vtkNEW(m_StereoMovieRightEye);
+    m_StereoMovieRightEye->SetInput(RenderWindow);
+
+    vtkNEW(m_StereoImage);
+    m_StereoImage->AddInput(m_StereoMovieLeftEye->GetOutput());
+    m_StereoImage->AddInput(m_StereoMovieRightEye->GetOutput());
+
+    vtkNEW(m_StereoMoviewFrameWriter);
+    m_StereoMoviewFrameWriter->SetInput(m_StereoImage->GetOutput());
+  }
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-28 13:01:08 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-01-10 13:36:24 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "mafString.h"
 #include "vtkRenderWindowInteractor.h"
 
 //----------------------------------------------------------------------------
@@ -29,6 +30,9 @@ class wxSizeEvent;
 class vtkInteractorObserver;
 class vtkCamera;
 class mmdMouse;
+class vtkImageAppend;
+class vtkPNGWriter;
+class vtkWindowToImageFilter;
 
 //----------------------------------------------------------------------------
 // Constant:
@@ -66,6 +70,13 @@ public:
 
   /** set the mouse device to which forward events from the view */
   void SetMouse(mmdMouse *mouse);
+
+  /** Set the directory for the Stereo Movie*/
+  void SetStereoMovieDirectory(const char *dir);
+
+  /** 
+  Enable/disable stereo movie frames generation.*/
+  void EnableStereoMovie(bool enable = true);
 
   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
   // vtk render window interactor methods
@@ -158,8 +169,21 @@ public:
   int  m_Width;
   int  m_Height;
 
+  /** 
+  Generate stereo frames for movie.*/
+  void GenerateStereoFrames();
+
 protected:
-	wxString   m_SaveDir;
+  mafString m_StereoMovieDir;
+  int       m_StereoMovieFrameCounter;
+  bool      m_StereoMovieEnable;
+  bool      m_StereoFrameGenerate;
+  vtkWindowToImageFilter *m_StereoMovieLeftEye;
+  vtkWindowToImageFilter *m_StereoMovieRightEye;
+  vtkImageAppend *m_StereoImage;
+  vtkPNGWriter   *m_StereoMoviewFrameWriter;
+  
+  wxString   m_SaveDir;
   vtkCamera *m_Camera;
   mmdMouse  *m_Mouse;
   bool       m_CustomInteractorStyle;
