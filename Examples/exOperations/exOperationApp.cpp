@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 11:32:59 $
-  Version:   $Revision: 1.37 $
+  Date:      $Date: 2006-01-10 13:27:27 $
+  Version:   $Revision: 1.38 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -53,6 +53,7 @@
 #include "mmoReparentTo.h"
 #include "mmoSTLExporter.h"
 #include "mmoSTLImporter.h"
+#include "mmoVolumeResample.h"
 #include "mmoVRMLImporter.h"
 #include "mmoVTKExporter.h"
 #include "mmoVTKImporter.h"
@@ -128,12 +129,14 @@ bool exOperationApp::OnInit()
   m_Logic->Plug(new mmoFilterVolume("Filter Volume"));
   m_Logic->Plug(new mmoMAFTransform("MAF Transform  \tCtrl+T"));
   m_Logic->Plug(new mmoReparentTo("Reparent to...  \tCtrl+R"));
+  m_Logic->Plug(new mmoVolumeResample("Resample Volume"));
   //------------------------------------------------------------
   
   //------------------------------------------------------------
   // View Menu':
   //------------------------------------------------------------
   m_Logic->Plug(new mafViewVTK("VTK view"));
+  m_Logic->Plug(new mafViewVTK("VTK stereo view",CAMERA_PERSPECTIVE,true,false,1));
   mafViewVTK *v = new mafViewVTK("Slice view", CAMERA_CT);
   v->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice",MUTEX);
   m_Logic->Plug(v);
