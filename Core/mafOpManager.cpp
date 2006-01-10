@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 11:14:12 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2006-01-10 16:11:43 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -91,7 +91,11 @@ mafOpManager::mafOpManager()
 mafOpManager::~mafOpManager()
 //----------------------------------------------------------------------------
 {
-	for(int i=0; i<m_NumOp; i++) delete m_OpList[i];
+  // clear clipboard to avoid crash if some VME is still into the clipboard.
+  m_Context.Clear();
+  m_OpCut->ClipboardClear();
+
+  for(int i=0; i<m_NumOp; i++) delete m_OpList[i];
 
   cppDEL(m_OpSelect);
   cppDEL(m_OpCut);
