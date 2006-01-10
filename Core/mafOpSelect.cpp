@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpSelect.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-08-31 15:12:47 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-01-10 16:10:45 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,6 +23,7 @@
 #include "mafOpSelect.h"
 #include "mafNode.h"
 #include "mafVMERoot.h"
+#include "mafVMELandmarkCloud.h"
 #include "mafString.h"
 #include "vtkMatrix4x4.h"
 #include "vtkMath.h"
@@ -156,8 +157,12 @@ Select the vme parent
 	ClipboardBackup();
 	m_SelectionParent = m_Selection->GetParent(); 
 	m_Clipboard = m_Selection;
-	mafEventMacro(mafEvent(this,VME_REMOVE,m_Selection));
+  mafEventMacro(mafEvent(this,VME_REMOVE,m_Selection));
 	mafEventMacro(mafEvent(this,VME_SELECTED,m_SelectionParent));
+  if (mafVME::SafeDownCast(m_SelectionParent.GetPointer()))
+  {
+    ((mafVME *)m_SelectionParent.GetPointer())->GetOutput()->Update();
+  }
 }
 //----------------------------------------------------------------------------
 void mafOpCut::OpUndo()
@@ -169,9 +174,20 @@ Restore the Selection
 */
 {
 	m_Selection = m_Clipboard.GetPointer();
-	
-	m_Selection->ReparentTo(m_SelectionParent);
-	//mafEventMacro(mafEvent(this,VME_ADD,m_Selection));
+  if (m_SelectionParent->IsMAFType(mafVMELandmarkCloud) && !((mafVMELandmarkCloud *)m_SelectionParent.GetPointer())->IsOpen())
+  {
+    ((mafVMELandmarkCloud *)m_SelectionParent.GetPointer())->Open();
+    m_Selection->ReparentTo(m_SelectionParent);
+    ((mafVMELandmarkCloud *)m_SelectionParent.GetPointer())->Close();
+  }
+  else
+  {
+    m_Selection->ReparentTo(m_SelectionParent);
+  }
+  if (mafVME::SafeDownCast(m_SelectionParent.GetPointer()))
+  {
+    ((mafVME *)m_SelectionParent.GetPointer())->GetOutput()->Update();
+  }
 	mafEventMacro(mafEvent(this,VME_SELECTED,m_Selection));
 	ClipboardRestore();
 }
