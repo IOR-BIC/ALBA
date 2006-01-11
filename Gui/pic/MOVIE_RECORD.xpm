@@ -1,0 +1,33 @@
+/* XPM */
+static char *MOVIE_RECORD_xpm[] = {
+/* columns rows colors chars-per-pixel */
+"20 20 7 1",
+"X c #800000",
+"  c None",
+". c #EBE8D7",
+"o c #800101",
+"+ c #EAE7D6",
+"O c #E9E6D5",
+"@ c #E8E5D5",
+/* pixels */
+"                    ",
+"  .   .   . . . .   ",
+"                    ",
+"                    ",
+"        XXXX        ",
+"      XXXXXXXX      ",
+"     XXXXXXXXXX     ",
+"     XXXXXXXXXX     ",
+"    XXXXXXXXXXXX    ",
+"    XXXXXXXXXXXX    ",
+"    XXXXXXXXXXXX    ",
+"    XXXXXXXXXXXX    ",
+"     XXXXXXXXXX     ",
+"     XXXXXXXXXX     ",
+"      XXXXXXXX      ",
+"        oooo        ",
+"                    ",
+"O O O + @ @ @ O O + ",
+"                    ",
+"                    "
+};
