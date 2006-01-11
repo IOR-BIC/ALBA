@@ -6,8 +6,20 @@ PROJECT(medOperations)
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
+  mmoBonemat.cpp
+  mmoBonemat.h
   mmoDICOMImporter.cpp
   mmoDICOMImporter.h
+#  bonemat.cxx
+  dataset.cxx
+  dataset.h
+  elements.cxx
+  elements.h
+  hashtable.cxx
+  hashtable.h
+  mesh.cxx
+  mesh.h
+  types.h
 )
 
 # List libraries that are needed by this project.
