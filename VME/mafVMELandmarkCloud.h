@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-15 15:27:51 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-01-11 10:46:03 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -200,6 +200,9 @@ public:
   /**
   Return true if it's a rigid landmark cloud (i.e. it has a single time frame)*/
   bool IsRigid();
+
+  /** return icon */
+  static char** GetIcon();
 
   /** Return pointer to material attribute. */
   mmaMaterial *GetMaterial();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-10 16:13:42 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2006-01-11 10:46:03 $
+  Version:   $Revision: 1.18 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -1219,4 +1219,11 @@ mmaMaterial *mafVMELandmarkCloud::GetMaterial()
     }
   }
   return material;
+}
+//-------------------------------------------------------------------------
+char** mafVMELandmarkCloud::GetIcon() 
+//-------------------------------------------------------------------------
+{
+#include "mafVMELandmarkCloud.xpm"
+  return mafVMELandmarkCloud_xpm;
 }

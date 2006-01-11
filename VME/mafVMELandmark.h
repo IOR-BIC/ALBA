@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.h,v $
   Language:  C++
-  Date:      $Date: 2005-09-06 11:11:43 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-01-11 10:46:02 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -95,6 +95,9 @@ public:
   /**
   Redefined to avoid chaning landmark scale (i.e. the scale is forced to the visibility value)*/
   virtual void SetMatrix(mafMatrix &mat);
+
+  /** return icon */
+  static char** GetIcon();
 
   /** Return pointer to material attribute. */
   mmaMaterial *GetMaterial();

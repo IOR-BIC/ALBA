@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-07 12:13:37 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-01-11 10:46:02 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -357,4 +357,11 @@ mmaMaterial *mafVMELandmark::GetMaterial()
     ((mafVMEOutputPointSet *)m_Output)->SetMaterial(material);
   }
   return material;
+}
+//-------------------------------------------------------------------------
+char** mafVMELandmark::GetIcon() 
+//-------------------------------------------------------------------------
+{
+#include "mafVMELandmark.xpm"
+  return mafVMELandmark_xpm;
 }
