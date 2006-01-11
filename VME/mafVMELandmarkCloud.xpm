@@ -44,7 +44,7 @@ static char *mafVMELandmarkCloud_xpm[] = {
 "- c #EFF0F1",
 "x c #485763",
 "f c #EFF3F6",
-"  c None",
+"  c #FFFFFF",
 "n c #6288A7",
 "g c #A5BCCF",
 "l c #587B97",

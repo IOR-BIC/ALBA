@@ -47,7 +47,7 @@ static char *mafVMELandmark_xpm[] = {
 "D c #929AA0",
 "z c #79A9CE",
 "p c #86BAE3",
-"  c None",
+"  c #FFFFFF",
 "; c #E2E5E6",
 "n c #788188",
 "e c #6288A6",
