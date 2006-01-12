@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-12 11:15:29 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2006-01-12 11:42:56 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -11,10 +11,9 @@
 =========================================================================*/
 
 #include "mafDecl.h"
+#include <wx/image.h>
 #include "mafIncludeWX.h"
 #include "mmuIdFactory.h"
-#include <vector>
-#include <string>
 #include <math.h>
 
 static bool yelding;
