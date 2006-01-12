@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgPicButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-23 11:59:10 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-01-12 10:30:57 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,14 +40,13 @@ mmgPicButton::mmgPicButton(wxWindow *parent, wxString BitmapId, wxWindowID id, m
 //----------------------------------------------------------------------------
 {
   m_Listener = listener;
-  //if(id == 0) m_Id = BitmapId; else m_Id = id;
   m_Id = id;
 
   wxBitmap b = mafPics.GetBmp(BitmapId);
   wxSize size(b.GetWidth(),b.GetHeight());
 
   Create(parent, m_Id, b, wxDefaultPosition, size,0);
-  //SetBitmapFocus(b);
+  SetBitmap(BitmapId,id);
 };
 //----------------------------------------------------------------------------
 void mmgPicButton::SetEventId(long EventId)
@@ -85,9 +84,28 @@ bool mmgPicButton::MSWCommand(WXUINT param, WXWORD id)
 void mmgPicButton::SetBitmap(wxString BitmapId, wxWindowID id )
 //----------------------------------------------------------------------------
 {
-  SetBitmapLabel(mafPics.GetBmp(BitmapId));
-  SetBitmapFocus(mafPics.GetBmp(BitmapId));
-  //if(id == 0) m_Id = BitmapId; else  //SIL. 7-4-2005: 
-    m_Id = id;
+  wxBitmap b = mafPics.GetBmp(BitmapId);
+  SetBitmapLabel(b);
+  SetBitmapDisabled(GrayScale(b));
+  m_Id = id;
   Refresh();
+}
+//----------------------------------------------------------------------------
+wxBitmap mmgPicButton::GrayScale(wxBitmap bmp)
+//----------------------------------------------------------------------------
+{
+  wxImage img = bmp.ConvertToImage();
+  unsigned char *p = img.GetData();
+  unsigned char *max = p + img.GetWidth() * img.GetHeight() * 3;
+  unsigned char *r, *g, *b;
+  unsigned int gray ;
+  while( p < max )
+  {
+    r = p++;
+    g = p++;
+    b = p++;
+    gray = *r + *g + *b;
+    *r = *g = *b = gray / 3;
+  }
+  return wxBitmap(img);
 }
