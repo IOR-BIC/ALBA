@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgPicButton.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-12 10:30:58 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-01-12 11:16:31 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -52,9 +52,6 @@ protected:
 	virtual bool MSWCommand(WXUINT param, WXWORD id);
   #endif*/
   void OnSetFocus(wxFocusEvent& event) {}; 
-
-  /** Create gray scale button icon used when button is disabled.*/
-  wxBitmap GrayScale(wxBitmap bmp);
 
   int m_Id;
   mafObserver  *m_Listener;

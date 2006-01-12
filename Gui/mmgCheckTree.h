@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 12:14:45 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-01-12 11:16:31 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -78,7 +78,6 @@ protected:
 
   virtual void InitializeImageList();
   wxBitmap MergeIcons(wxBitmap state, wxBitmap vme);
-  wxBitmap GrayScale(wxBitmap bmp);
 
 public: 
   /** Called by the Custom-Tree-Event-Handler */

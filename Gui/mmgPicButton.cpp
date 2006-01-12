@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgPicButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-12 10:30:57 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2006-01-12 11:16:31 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -89,23 +89,4 @@ void mmgPicButton::SetBitmap(wxString BitmapId, wxWindowID id )
   SetBitmapDisabled(GrayScale(b));
   m_Id = id;
   Refresh();
-}
-//----------------------------------------------------------------------------
-wxBitmap mmgPicButton::GrayScale(wxBitmap bmp)
-//----------------------------------------------------------------------------
-{
-  wxImage img = bmp.ConvertToImage();
-  unsigned char *p = img.GetData();
-  unsigned char *max = p + img.GetWidth() * img.GetHeight() * 3;
-  unsigned char *r, *g, *b;
-  unsigned int gray ;
-  while( p < max )
-  {
-    r = p++;
-    g = p++;
-    b = p++;
-    gray = *r + *g + *b;
-    *r = *g = *b = gray / 3;
-  }
-  return wxBitmap(img);
 }

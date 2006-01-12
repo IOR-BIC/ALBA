@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 12:14:44 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2006-01-12 11:16:30 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -368,25 +368,6 @@ wxBitmap mmgCheckTree::MergeIcons(wxBitmap state, wxBitmap vme)
   mergedc.Blit(sw, 0, vw, vh, &vmedc, 0, 0);
   mergedc.SelectObject(wxNullBitmap); //merge must be removed from the DC at the end
   return merge;
-}
-//----------------------------------------------------------------------------
-wxBitmap mmgCheckTree::GrayScale(wxBitmap bmp)
-//----------------------------------------------------------------------------
-{
-  wxImage img = bmp.ConvertToImage();
-  unsigned char *p = img.GetData();
-  unsigned char *max = p + img.GetWidth() * img.GetHeight() * 3;
-  unsigned char *r, *g, *b;
-  unsigned int gray ;
-  while( p < max )
-  {
-     r = p++;
-     g = p++;
-     b = p++;
-     gray = *r + *g + *b;
-     *r = *g = *b = gray / 3;
-  }
-  return wxBitmap(img);
 }
 //----------------------------------------------------------------------------
 void mmgCheckTree::OnSelectionChanged(wxTreeEvent& event)
