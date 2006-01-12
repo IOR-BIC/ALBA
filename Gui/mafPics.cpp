@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPics.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-30 11:24:05 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2006-01-12 10:31:50 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -105,16 +105,18 @@ void mafPictureFactory::Initialize()
     mafADDPIC(TIME_NEXT);    
     #include <pic/TIME_PLAY.xpm>       
     mafADDPIC(TIME_PLAY);    
-    #include <pic/TIME_PREV.xpm>       
-    mafADDPIC(TIME_PREV);    
-    #include <pic/TIME_STOP.xpm>       
-    mafADDPIC(TIME_STOP);    
-    #include <pic/ZOOM.xpm>            
-    mafADDPIC(ZOOM);         
-    #include <pic/ZOOM_ALL.xpm>        
-    mafADDPIC(ZOOM_ALL);     
-    #include <pic/ZOOM_SEL.xpm>        
-    mafADDPIC(ZOOM_SEL);     
+    #include <pic/TIME_PREV.xpm>
+    mafADDPIC(TIME_PREV);
+    #include <pic/TIME_STOP.xpm>
+    mafADDPIC(TIME_STOP);
+    #include <pic/MOVIE_RECORD.xpm>
+    mafADDPIC(MOVIE_RECORD);
+    #include <pic/ZOOM.xpm>
+    mafADDPIC(ZOOM);
+    #include <pic/ZOOM_ALL.xpm>
+    mafADDPIC(ZOOM_ALL);
+    #include <pic/ZOOM_SEL.xpm>
+    mafADDPIC(ZOOM_SEL);
 
     // these are used by the ListCtrl
     #include <pic/NODE_YELLOW.xpm>        
