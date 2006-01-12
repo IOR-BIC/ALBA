@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 17:16:59 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2006-01-12 11:15:29 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -290,6 +290,7 @@ PIC_START,
   TIME_NEXT,
   TIME_BEGIN,
   TIME_END,
+  MOVIE_RECORD,
   /*
   APP_ICON, 
   PIC_NODE_BLUE,   //picture used by the tree
@@ -379,6 +380,9 @@ std::string  mafGetSaveFile(const char * initial, const char * wildcard, const c
 
 /** return a random wxColour from a palette of 16 */
 wxColour  mafRandomColor();
+
+/** Used to generate gray scale bitmap given a colored one.*/
+wxBitmap GrayScale(wxBitmap bmp);
 
 /** return the application start-up directory */
 std::string  mafGetApplicationDirectory();

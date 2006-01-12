@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 17:16:59 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-01-12 11:15:29 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -140,6 +140,25 @@ double RoundValue(double d_in, int decimal_digits)
   double d_tmp = d_in * pow(10,decimal_digits);
   int b = ( d_tmp >= 0 ) ? static_cast<int>( d_tmp + .5):static_cast<int>( d_tmp - .5);
   return b / pow(10,decimal_digits);
+}
+//----------------------------------------------------------------------------
+wxBitmap GrayScale(wxBitmap bmp)
+//----------------------------------------------------------------------------
+{
+  wxImage img = bmp.ConvertToImage();
+  unsigned char *p = img.GetData();
+  unsigned char *max = p + img.GetWidth() * img.GetHeight() * 3;
+  unsigned char *r, *g, *b;
+  unsigned int gray ;
+  while( p < max )
+  {
+    r = p++;
+    g = p++;
+    b = p++;
+    gray = *r + *g + *b;
+    *r = *g = *b = gray / 3;
+  }
+  return wxBitmap(img);
 }
 //----------------------------------------------------------------------------
 wxColour mafRandomColor()
@@ -326,6 +345,7 @@ std::string  mafIdString(int id)
      case TIME_NEXT:	          s="TIME_NEXT"; break; 
      case TIME_BEGIN:	          s="TIME_BEGIN"; break; 
      case TIME_END:	            s="TIME_END"; break; 
+     case MOVIE_RECORD:         s="MOVIE_RECORD"; break; 
         
      case MCH_START:            s="MCH_START"; break;
      case MCH_UP:               s="MCH_UP"; break;
