@@ -72,6 +72,8 @@ SET(PROJECT_SRCS
   mmgLutSwatch.h
   mmgLutWidget.cpp
   mmgLutWidget.h
+  mmgMovieCtrl.cpp
+  mmgMovieCtrl.h
   mmgMDIChild.cpp
   mmgMDIChild.h
   mmgMDIFrame.cpp
