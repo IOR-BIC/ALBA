@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooserTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 12:02:53 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-01-12 11:15:55 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,6 +22,7 @@
 
 #include "mmgVMEChooserTree.h" 
 #include "mmgVMEChooserAccept.h"
+#include "mafDecl.h"
 #include "mmgDialog.h"
 #include "mafPics.h" 
 #include "mafEvent.h"
