@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRX.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 18:49:15 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-01-12 12:34:17 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -120,9 +120,9 @@ void mafViewRX::VmeCreatePipe(mafNode *vme)
     mafObject *obj= NULL;
     obj = pipe_factory->CreateInstance(pipe_name);
     mafPipe *pipe = (mafPipe*)obj;
-    pipe->SetListener(this);
     if (pipe)
     {
+      pipe->SetListener(this);
       if (pipe_name.Equals("mafPipeVolumeProjected"))
       {
         m_CurrentVolume = n;
