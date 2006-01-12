@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-12 11:25:22 $
-  Version:   $Revision: 1.38 $
+  Date:      $Date: 2006-01-12 12:32:48 $
+  Version:   $Revision: 1.39 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -109,6 +109,10 @@ public:
 
   virtual mafSceneGraph *GetSceneGraph()	  {return m_Sg;}; 
   virtual mafRWIBase    *GetRWI()           {return m_Rwi->m_RwiBase;};
+
+  /** 
+  Return a pointer to the image of the renderwindow.*/
+  void GetImage(wxBitmap &bmp, int magnification = 1);
 
   virtual vtkRenderer     *GetFrontRenderer();
   virtual vtkRenderer     *GetBackRenderer();

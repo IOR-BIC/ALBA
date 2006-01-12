@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-13 16:37:11 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-01-12 12:32:48 $
+  Version:   $Revision: 1.17 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -115,6 +115,10 @@ public:
 
   virtual mafSceneGraph *GetSceneGraph();
   virtual mafRWIBase    *GetRWI();
+
+  /** 
+  Return a pointer to the image of all subviews.*/
+  void GetImage(wxBitmap &bmp, int magnification = 1);
 
   /** 
   Find the pocked VME at button down. As argument the function needs

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 17:47:20 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-01-12 12:32:47 $
+  Version:   $Revision: 1.17 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -507,7 +507,14 @@ void mafViewCompound::Print(wxDC *dc, wxRect margins)
     return;
   }
 
-  int magnification = 2;
+  wxBitmap image;
+  GetImage(image, 2);
+  PrintBitmap(dc, margins, &image);
+}
+//----------------------------------------------------------------------------
+void mafViewCompound::GetImage(wxBitmap &bmp, int magnification)
+//----------------------------------------------------------------------------
+{
   wxSize vsz = this->GetWindow()->GetSize();
   wxBitmap compoundImage = wxBitmap(magnification*vsz.GetWidth(),magnification*vsz.GetHeight());
   wxMemoryDC compoundDC;
@@ -522,15 +529,15 @@ void mafViewCompound::Print(wxDC *dc, wxRect margins)
   {
     wxSize win_size = m_ChildViewList[i]->GetWindow()->GetSize();
     if (win_size.GetWidth() == 0 || win_size.GetHeight() == 0) continue;
-    wxBitmap *image = m_ChildViewList[i]->GetRWI()->GetImage(magnification);
-    float iw = image->GetWidth();
-    float ih = image->GetHeight();
-    m_ChildViewList[i]->GetRWI()->GetPosition(&x_pos,&y_pos);
-    subViewDC.SelectObject(*image);
+    wxBitmap image;
+    m_ChildViewList[i]->GetImage(image, magnification);
+    float iw = image.GetWidth();
+    float ih = image.GetHeight();
+    m_ChildViewList[i]->GetWindow()->GetPosition(&x_pos,&y_pos);
+    subViewDC.SelectObject(image);
     compoundDC.Blit(magnification * x_pos,magnification * y_pos,iw,ih,&subViewDC,0,0);
-    cppDEL(image);
   }
 
   compoundDC.SelectObject(wxNullBitmap);
-  PrintBitmap(dc, margins, &compoundImage);
+  bmp = compoundImage;
 }

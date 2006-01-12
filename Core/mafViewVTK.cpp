@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-10 10:04:57 $
-  Version:   $Revision: 1.48 $
+  Date:      $Date: 2006-01-12 12:32:48 $
+  Version:   $Revision: 1.49 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -456,7 +456,13 @@ bool mafViewVTK::Pick(mafMatrix &m)
 void mafViewVTK::Print(wxDC *dc, wxRect margins)
 //----------------------------------------------------------------------------
 {
-  wxBitmap *image = m_Rwi->m_RwiBase->GetImage(2);
-  PrintBitmap(dc, margins, image);
-  cppDEL(image);
+  wxBitmap image;
+  GetImage(image, 2);
+  PrintBitmap(dc, margins, &image);
+}
+//----------------------------------------------------------------------------
+void mafViewVTK::GetImage(wxBitmap &bmp, int magnification)
+//----------------------------------------------------------------------------
+{
+  bmp = *m_Rwi->m_RwiBase->GetImage(magnification);
 }
