@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-28 13:05:48 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-01-12 12:33:24 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -89,6 +89,7 @@ public:
   virtual void			CameraUpdate()																					{};
   virtual void      SetMouse(mmdMouse *mouse)                               {};
   virtual mafRWIBase *GetRWI()                                              {return NULL;};
+  virtual void      GetImage(wxBitmap &bmp, int magnification = 1)          {};
 
   /** 
   Find the pocked VME at button down. As argument the function needs
