@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPrintSupport.cpp,v $
 Language:  C++
-Date:      $Date: 2005-11-28 13:00:28 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2006-01-12 10:29:36 $
+Version:   $Revision: 1.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -63,7 +63,7 @@ protected:
 
 //----------------------------------------------------------------------------
 mafPrintout::mafPrintout(mafView *v, wxRect margins)
-: wxPrintout("MAF Printout")
+: wxPrintout("Printout")
 //----------------------------------------------------------------------------
 {
   m_View = v;
@@ -146,7 +146,7 @@ void mafPrintSupport::OnPrintPreview(mafView *v)
     return;
   }
 
-  wxPreviewFrame *frame = new wxPreviewFrame(preview, (wxFrame *)mafGetFrame(), "MAF Print Preview", wxPoint(100, 100), wxSize(600, 650));
+  wxPreviewFrame *frame = new wxPreviewFrame(preview, (wxFrame *)mafGetFrame(), "Print Preview", wxPoint(100, 100), wxSize(600, 650));
   frame->Centre(wxBOTH);
   frame->Initialize();
   frame->Show(TRUE);
