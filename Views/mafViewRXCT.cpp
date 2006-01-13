@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-21 13:55:13 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-01-13 15:46:11 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -136,6 +136,7 @@ void mafViewRXCT::OnEvent(mafEventBase *maf_event)
   switch(maf_event->GetId()) 
   {
     case ID_LUT_CHOOSER:
+    {
       for(int i=0; i<6; i++)
       {
         mafPipeVolumeSlice *p = NULL;
@@ -143,6 +144,7 @@ void mafViewRXCT::OnEvent(mafEventBase *maf_event)
         p->SetColorLookupTable(m_ColorLUT);
       }
       CameraUpdate();
+    }
     break;
     default:
       mafViewCompound::OnEvent(maf_event);
