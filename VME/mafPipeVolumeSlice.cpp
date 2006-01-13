@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-21 13:54:05 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2006-01-13 16:24:00 $
+  Version:   $Revision: 1.20 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,6 +51,7 @@
 #include "vtkCamera.h"
 #include "vtkDataSet.h"
 #include "vtkTransform.h"
+#include "vtkRenderer.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeVolumeSlice);
@@ -333,7 +334,8 @@ void mafPipeVolumeSlice::DrawUnit()
   m_UnitCubeActor->SetMapper(cursor_mapper.GetPointer());
   m_UnitCubeActor->SetPosition(b[0],b[2],b[4]);
 
-  m_AssemblyFront->AddPart(m_UnitCubeActor);
+  m_RenFront->AddActor(m_UnitCubeActor);
+  //m_AssemblyFront->AddPart(m_UnitCubeActor);
 
   for (u=1;u<11;u++)
   {
@@ -412,7 +414,8 @@ mafPipeVolumeSlice::~mafPipeVolumeSlice()
 	if(m_VolumeBoxActor)
     m_AssemblyFront->RemovePart(m_VolumeBoxActor);
   if(m_UnitCubeActor)
-    m_AssemblyFront->RemovePart(m_UnitCubeActor);
+    //m_AssemblyFront->RemovePart(m_UnitCubeActor);
+    m_RenFront->RemoveActor(m_UnitCubeActor);
 
 	for(int i = 0; i<3; i++)
 	{
