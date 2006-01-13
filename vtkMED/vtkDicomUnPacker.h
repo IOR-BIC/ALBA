@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    vtkDicomUnPacker.h
   Language:  C++
-  Date:      $Date: 2005-10-13 14:01:04 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-01-13 15:46:32 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone m.petrone@cineca.it, Paolo Quadrani p.quadrani@cineca.it
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -60,6 +60,8 @@ POSSIBILITY OF SUCH DAMAGES.
 #include "vtkPackedImage.h"
 
 #include "vtkMAFConfigure.h"
+
+#include <string>
 
 #ifndef VTK_IMG_PACK_DICOM
 #define VTK_IMG_PACK_DICOM 2
