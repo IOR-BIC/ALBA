@@ -1,6 +1,6 @@
 PROJECT (Medical_TEST)
 
-LINK_LIBRARIES(medTesting)
+LINK_LIBRARIES(medOperations)
 
 # build tests
 IF(BUILD_TESTING)
