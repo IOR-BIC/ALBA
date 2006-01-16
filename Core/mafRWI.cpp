@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-10 13:34:10 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2006-01-16 12:41:08 $
+  Version:   $Revision: 1.20 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,6 +60,8 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axe
 
   m_StereoMovieDir    = "";
   m_StereoMovieEnable = 0;
+
+  m_StereoType = 0;
 
   m_Light = vtkLight::New();
   m_Light->SetLightTypeToCameraLight();
@@ -554,12 +556,15 @@ mmgGui *mafRWI::CreateGui()
   m_Gui->Bool(ID_SHOW_AXES,"show axes",&m_ShowAxes,0);
   m_Gui->Color(ID_BG_COLOR,"back color",&m_BGColour);
 
-  m_Gui->Divider(2);
-  m_Gui->Label("stero movie");
-  m_Gui->DirOpen(ID_STERO_MOVIE_DIR,"dir",&m_StereoMovieDir);
-  m_Gui->Bool(ID_STERO_MOVIE,"Start rec",&m_StereoMovieEnable);
-  m_Gui->Enable(ID_STERO_MOVIE_DIR,m_StereoType != 0);
-  m_Gui->Enable(ID_STERO_MOVIE,false);
+  if (m_StereoType)
+  {
+    m_Gui->Divider(2);
+    m_Gui->Label("stero movie");
+    m_Gui->DirOpen(ID_STERO_MOVIE_DIR,"dir",&m_StereoMovieDir);
+    m_Gui->Bool(ID_STERO_MOVIE,"Start rec",&m_StereoMovieEnable);
+    m_Gui->Enable(ID_STERO_MOVIE_DIR,m_StereoType != 0);
+    m_Gui->Enable(ID_STERO_MOVIE,false);
+  }
 
   return m_Gui;
 }
