@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoFilterVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 11:13:14 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-01-16 11:29:39 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -175,7 +175,6 @@ void mmoFilterVolume::OpStop(int result)
 //----------------------------------------------------------------------------
 {
 	HideGui();
-	delete m_Gui;
 	mafEventMacro(mafEvent(this,result));        
 }
 //----------------------------------------------------------------------------
