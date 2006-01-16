@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVolumeResample.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-10 13:27:04 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-01-16 12:12:02 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -54,7 +54,7 @@ protected:
 
 	//gizmo's functions
 	void CreateGizmoCube();
-  void CreateGui();
+  virtual void CreateGui();
 	void UpdateGizmoData();
 	void UpdateGui();
 	void GizmoDelete();
