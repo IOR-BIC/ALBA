@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-21 13:52:31 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-01-17 11:15:39 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -105,9 +105,9 @@ mmgLutEditor::mmgLutEditor(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 
 	lab = new wxStaticText (this, -1, "mapped value range",  dp, wxSize(LW,LH), wxALIGN_RIGHT );
 	text = new wxTextCtrl  (this, -1, ""   ,        dp, wxSize(DW/2-HM,LH), wxNO_BORDER  );
-	text->SetValidator( mmgValidator(this,ID_VALUE_RANGE,text,&m_ValueRange[0]) );
-	text2 = new wxTextCtrl  (this, -1, ""   ,       dp, wxSize(DW/2,LH), wxNO_BORDER  );
-	text2->SetValidator( mmgValidator(this,ID_VALUE_RANGE,text2,&m_ValueRange[1]) );
+	text->SetValidator( mmgValidator(this,ID_VALUE_RANGE,text,&m_ValueRange[0], -1e200, 1e200, -1 ) ); //SIL: 17-01-06 - removed number of digits -- introduce errors on big numbers
+	text2 = new wxTextCtrl  (this, -1, ""   ,       dp, wxSize(DW/2,LH), wxNO_BORDER);
+	text2->SetValidator( mmgValidator(this,ID_VALUE_RANGE,text2,&m_ValueRange[1] ,-1e200, 1e200, -1 ) ); //SIL: 17-01-06 - removed number of digits -- introduce errors on big numbers
   sz = new wxBoxSizer(wxHORIZONTAL);
 	sz->Add( lab,   0, wxRIGHT, LM);
 	sz->Add( text,  0, wxRIGHT, HM);

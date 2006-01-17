@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutEditor.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-21 13:52:31 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-01-17 11:15:39 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,7 +28,7 @@
   FEATURES:
   - 20 preset available @sa mafLutPreset
   - editable number of LUT entries - limited to [1..256]
-  - scalars range editing
+  - scalars range editing  --- ( 4 programmers - Set and Get it by calling Set/GetRange on your vtkLookupTable )
   - LUT Entry selection:
     - single selection -- mouse left click
     - range selection  -- mouse left click + drag
