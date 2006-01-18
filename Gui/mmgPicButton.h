@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgPicButton.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-12 11:16:31 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-01-18 16:17:04 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,9 +22,12 @@ mmgPicButton inherit from wxBitmapButton.
 It override SetDefault and SetFocus to prevent the button to
 display the frame typical of the selected buttons.
 
-mmgPicButton is able to send both wxWindows messages and mafEvents.
-mafEvents are sent if m_Listener in not NULL otherwise wxWindows messages are sent.
-*/
+
+To create a mmgPicButton you must specify
+- parent
+- Bitmap_ID : which should be a valid pic-index in the pic-factory (see mmgPics)
+- ID: the ID of the Event that will be sent to the mafListener --- must be in the range MINID-MAXID or PIC_START-PIC-STOP (see mafDecl.h)
+- obviously you must also specify a Listener 
 //----------------------------------------------------------------------------
 class mmgPicButton : public wxBitmapButton
 {
@@ -36,9 +39,13 @@ public:
 
   /** Set the Listener that will receive event-notification. */
   void SetListener(mafObserver *listener)   {m_Listener=listener;}; 
+
+  /** allow to change the Event-Id at run time */
   void SetEventId(long EventId); 
 
-  /** Link the bitmap to the button through the id. */
+  /**  Used to change Bitmap and Event-ID at run time.
+  Example: the Time Bar Play button once pressed become a Stop Button 
+  which send a Stop-Event-Id, when pressed again is reverted to Play. */
   void SetBitmap(wxString BitmapId, wxWindowID id = 0); 
 
 protected:  
