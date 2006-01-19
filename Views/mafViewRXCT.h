@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-21 13:55:14 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-01-19 14:15:33 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -81,10 +81,11 @@ protected:
   void EnableWidgets(bool enable = true);
 
   double m_BorderColor[6][3];
-  mafGizmoSlice *m_gizmo[6];
-  mafVMEVolume *m_CurrentVolume; ///< Current visualized volume
-  vtkLookupTable *m_ColorLUT;
-  mafViewRX *m_ViewsRX[2];
+
+  mafGizmoSlice   *m_Gizmo[6];
+  mafVMEVolume    *m_CurrentVolume; ///< Current visualized volume
+  vtkLookupTable  *m_ColorLUT;
+  mafViewRX       *m_ViewsRX[2];
   mafViewCompound *m_ViewCT;
 };
 #endif

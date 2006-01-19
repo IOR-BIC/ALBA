@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 18:54:17 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-01-19 14:14:50 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -22,7 +22,7 @@
 class mmiCompositorMouse;
 class mmiGenericMouse;
 class mafVME;
-class mafVMEGizmo;
+class mafVMESurface;
 class vtkPoints;
 class vtkDoubleArray;
 
@@ -44,13 +44,13 @@ public:
 	void SetListener(mafObserver *listener);
   void OnEvent(mafEventBase *maf_event);
 
-  /** return the mflVMEGizmo */
+  /** return the mafVMEGizmo */
 	mafVME *GetOutput(); 
 
   /** Set/Get the gizmo moving modality, default is Snap */
   void SetGizmoModalityToBound(); 
   void SetGizmoModalityToSnap(); 
-  int  GetGizmoMovingModality() {return this->MovingModality; };
+  int  GetGizmoMovingModality() {return this->m_MovingModality;};
 
   enum GISMO_SLICE_AXIS_ID
   {
@@ -64,14 +64,14 @@ protected:
 	void InitSnapArray(mafVME *vol, int axis);
 
   long                m_id;
-  mafVME             *m_vme_input;
-	mafVMEGizmo        *m_vme_gizmo;
-  mmiCompositorMouse *m_behavior;
-	vtkDoubleArray     *m_snapArray;
+  mafVME             *m_VmeInput;
+  mafVMESurface      *m_VmeGizmo;
+  mmiCompositorMouse *m_GizmoBehavior;
+	vtkDoubleArray     *m_SnapArray;
 
   mafObserver   *m_Listener;
-  mafMatrix      GizmoHandleCenterMatrix;
-  vtkPoints		  *m_point;
+  mafMatrix     *m_GizmoHandleCenterMatrix;
+  vtkPoints		  *m_Point;
 
   /** Register the gizmo axis, default is z */
   int m_axis;
@@ -79,13 +79,13 @@ protected:
   /** 
   Register the gizmo behavior: BOUND means gizmo movement is free
   in an interval while SNAP snaps on a given array */
-  int MovingModality;
+  int m_MovingModality;
 
   enum MOVING_MODALITY_ID
   {
     BOUND,
     SNAP,
   };
-  mmiGenericMouse *MouseBH;
+  mmiGenericMouse *m_MouseBH;
 };
 #endif

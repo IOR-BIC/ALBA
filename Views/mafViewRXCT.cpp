@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-13 15:46:11 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-01-19 14:15:33 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,6 +31,7 @@
 
 #include "vtkDataSet.h"
 #include "vtkLookupTable.h"
+#include "vtkPoints.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewRXCT);
@@ -52,7 +53,7 @@ mafViewRXCT::mafViewRXCT(wxString label, bool external)
   m_BorderColor[4][0] = 0; m_BorderColor[4][1] = 1; m_BorderColor[4][2] = 1;
   m_BorderColor[5][0] = 1; m_BorderColor[5][1] = 0; m_BorderColor[5][2] = 1;
 
-  for(int j=0; j<6; j++) m_gizmo[j] = NULL;
+  for(int j=0; j<6; j++) m_Gizmo[j] = NULL;
 
   m_ViewCT = NULL;
   m_ColorLUT= NULL;
@@ -63,7 +64,10 @@ mafViewRXCT::mafViewRXCT(wxString label, bool external)
 mafViewRXCT::~mafViewRXCT()
 //----------------------------------------------------------------------------
 {
-  GizmoDelete();
+  m_ViewsRX[0] = NULL;
+  m_ViewsRX[1] = NULL;
+  m_ViewCT = NULL;
+
   vtkDEL(m_ColorLUT);
 }
 //----------------------------------------------------------------------------
@@ -113,13 +117,14 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
         p->SetColorLookupTable(m_ColorLUT);
       }
       m_CurrentVolume = mafVMEVolume::SafeDownCast(node);
-//      GizmoCreate();
+      GizmoCreate();
     }
     else
     {
       lutPreset(4,m_ColorLUT);
       m_ChildViewList[2]->VmeShow(node, show);
       m_CurrentVolume = NULL;
+      GizmoDelete();
     }
   }
   else
@@ -133,21 +138,43 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
 void mafViewRXCT::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  switch(maf_event->GetId()) 
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
-    case ID_LUT_CHOOSER:
+    switch(maf_event->GetId()) 
     {
-      for(int i=0; i<6; i++)
+      case ID_LUT_CHOOSER:
       {
-        mafPipeVolumeSlice *p = NULL;
-        p = mafPipeVolumeSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(i))->GetNodePipe(m_CurrentVolume));
-        p->SetColorLookupTable(m_ColorLUT);
+        for(int i=0; i<6; i++)
+        {
+          mafPipeVolumeSlice *p = NULL;
+          p = mafPipeVolumeSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(i))->GetNodePipe(m_CurrentVolume));
+          p->SetColorLookupTable(m_ColorLUT);
+        }
+        CameraUpdate();
       }
-      CameraUpdate();
+      break;
+      case MOUSE_UP:
+      case MOUSE_MOVE:
+      {
+        long slice = e->GetArg();
+        //float pos = e->GetDouble();        //modified by Paolo 26-5-2003
+        double pos[3];
+        vtkPoints *p = (vtkPoints *)e->GetVtkObj();
+        if(p == NULL) return;
+        p->GetPoint(0,pos);
+        ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(slice))->SetSlice(pos);
+        ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(slice))->CameraUpdate();
+        m_ChildViewList[0]->CameraUpdate();
+        m_ChildViewList[1]->CameraUpdate();
+      }
+      break;
+      default:
+        mafViewCompound::OnEvent(maf_event);
     }
-    break;
-    default:
-      mafViewCompound::OnEvent(maf_event);
+  }
+  else
+  {
+    mafViewCompound::OnEvent(maf_event);
   }
 }
 //-------------------------------------------------------------------------
@@ -217,28 +244,31 @@ void mafViewRXCT::LayoutSubViewCustom(int width, int height)
 void mafViewRXCT::GizmoCreate()
 //----------------------------------------------------------------------------
 {
-/*  for(int i=0; i<6; i++) 
+  for(int i=0; i<6; i++) 
   {
-    m_gizmo[i] = new mafGizmoSlice(m_CurrentVolume, this);
-    m_gizmo[i]->SetSlice(i,mafGizmoSlice::GIZMO_SLICE_Z);
-    m_gizmo[i]->SetColor();
+    double slice[3];
+    mafPipeVolumeSlice *p = NULL;
+    p = mafPipeVolumeSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(i))->GetNodePipe(m_CurrentVolume));
+    p->GetSliceOrigin(slice);
+    m_Gizmo[i] = new mafGizmoSlice(m_CurrentVolume, this);
+    m_Gizmo[i]->SetSlice(i,mafGizmoSlice::GIZMO_SLICE_Z,slice[2]);
+    m_Gizmo[i]->SetColor(m_BorderColor[i]);
 
-    m_ChildViewList[0]->VmeAdd(m_gizmo[i]);
-    m_ChildViewList[1]->VmeAdd(m_gizmo[i]);
-  }*/
+    m_ChildViewList[0]->VmeShow(m_Gizmo[i]->GetOutput(), true);
+    m_ChildViewList[1]->VmeShow(m_Gizmo[i]->GetOutput(), true);
+  }
 }
 //----------------------------------------------------------------------------
 void mafViewRXCT::GizmoDelete()
 //----------------------------------------------------------------------------
 {
-/*  for(int i=0; i<6; i++) 
+  for(int i=0; i<6; i++) 
   {
-    if(m_gizmo[i])
+    if(m_Gizmo[i])
     {
-      mafEventMacro(mafEvent(this,VME_REMOVE,m_gizmo[i]));
-      m_ChildViewList[0]->VmeRemove(m_gizmo[i]);
-      m_ChildViewList[1]->VmeAdd(m_gizmo[i]);
-      cppDEL(m_gizmo[i]);
+      m_ChildViewList[0]->VmeShow(m_Gizmo[i]->GetOutput(),false);
+      m_ChildViewList[1]->VmeShow(m_Gizmo[i]->GetOutput(),false);
+      cppDEL(m_Gizmo[i]);
     }
-  }*/
+  }
 }

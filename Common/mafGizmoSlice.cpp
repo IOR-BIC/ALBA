@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 18:54:16 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-01-19 14:14:50 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -28,10 +28,11 @@
 #include "mmiCompositorMouse.h"
 #include "mmiGenericMouse.h"
 
-#include "mafSmartPointer.h"
-#include "mafVME.h"
-#include "mafVMEGizmo.h"
 #include "mafTransform.h"
+#include "mafSmartPointer.h"
+#include "mafTagArray.h"
+#include "mafVME.h"
+#include "mafVMESurface.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkProperty.h"
@@ -53,40 +54,47 @@ mafGizmoSlice::mafGizmoSlice(mafNode* vme, mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
   // register the input vme
-  m_vme_input = mafVME::SafeDownCast(vme);
+  m_VmeInput = mafVME::SafeDownCast(vme);
+
+  mafNEW(m_GizmoHandleCenterMatrix);
 
   // default gizmo modality set to SNAP
-  MovingModality = SNAP;
+  m_MovingModality = SNAP;
   m_axis      = GIZMO_SLICE_Z;
-  m_snapArray = NULL;
+  m_SnapArray = NULL;
 	m_Listener  = Listener;
   m_id        = 0;
 
-	mafNEW(m_vme_gizmo);
-	m_vme_gizmo->SetName("GizmoSlice");
-  m_vme_gizmo->ReparentTo(vme);
+  mafNEW(m_VmeGizmo);
+	m_VmeGizmo->SetName("GizmoSlice");
+  m_VmeGizmo->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
+  m_VmeGizmo->ReparentTo(vme);
 
-	mafNEW(m_behavior);
-  MouseBH = m_behavior->CreateBehavior(MOUSE_LEFT); 
-	MouseBH->SetListener(this);
-  MouseBH->SetVME(m_vme_gizmo);
-  MouseBH->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal(m_vme_input);
-  MouseBH->EnableTranslation(true);
-  MouseBH->ResultMatrixConcatenationOn();
+	mafNEW(m_GizmoBehavior);
+  m_MouseBH = m_GizmoBehavior->CreateBehavior(MOUSE_LEFT); 
+	m_MouseBH->SetListener(this);
+  m_MouseBH->SetVME(m_VmeGizmo);
+  m_MouseBH->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal(m_VmeInput);
+  m_MouseBH->EnableTranslation(true);
+  m_MouseBH->ResultMatrixConcatenationOn();
+
+  m_VmeGizmo->SetBehavior(m_GizmoBehavior);
 	
-  vtkNEW(m_point);
-	m_point->SetNumberOfPoints(1);
+  vtkNEW(m_Point);
+	m_Point->SetNumberOfPoints(1);
 }
 //----------------------------------------------------------------------------
 mafGizmoSlice::~mafGizmoSlice()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_behavior);
+  mafDEL(m_GizmoHandleCenterMatrix);
+  m_VmeGizmo->SetBehavior(NULL);
+  vtkDEL(m_GizmoBehavior);
 
-	m_vme_gizmo->ReparentTo(NULL);
-	mafDEL(m_vme_gizmo);
-	vtkDEL(m_snapArray);
-	vtkDEL(m_point);
+	m_VmeGizmo->ReparentTo(NULL);
+	mafDEL(m_VmeGizmo);
+	vtkDEL(m_SnapArray);
+	vtkDEL(m_Point);
 }
 //----------------------------------------------------------------------------
 void mafGizmoSlice::SetSlice(int id, int axis, double pos)
@@ -99,7 +107,7 @@ void mafGizmoSlice::SetSlice(int id, int axis, double pos)
   m_id = id;
 	
 	double b[6];
-  if (vtkDataSet *vol_data = m_vme_input->GetOutput()->GetVTKData())
+  if (vtkDataSet *vol_data = m_VmeInput->GetOutput()->GetVTKData())
   {
     vol_data->Update();
 	  vol_data->GetBounds(b);
@@ -122,9 +130,9 @@ void mafGizmoSlice::SetSlice(int id, int axis, double pos)
 
     double interval[3][2] ={{b[0], b[1]}, {b[2], b[3]}, {b[4], b[5]}};
 
-	  this->InitSnapArray(m_vme_input,axis);
-    MouseBH->GetTranslationConstraint()->SetSnapArray(axis, m_snapArray);
-    MouseBH->GetTranslationConstraint()->SetConstraintModality(axis, mmiConstraint::BOUNDS);
+	  this->InitSnapArray(m_VmeInput,axis);
+    m_MouseBH->GetTranslationConstraint()->SetSnapArray(axis, m_SnapArray);
+    m_MouseBH->GetTranslationConstraint()->SetConstraintModality(axis, mmiConstraint::BOUNDS);
 
 	  switch(axis)
 	  {
@@ -133,7 +141,7 @@ void mafGizmoSlice::SetSlice(int id, int axis, double pos)
 			  org[0] = pos;
 			  ps->SetPoint1(0,wy,0);
 			  ps->SetPoint2(0,0,wz);
-        MouseBH->GetTranslationConstraint()->SetBounds(mmiConstraint::X, interval[0]);
+        m_MouseBH->GetTranslationConstraint()->SetBounds(mmiConstraint::X, interval[0]);
       }
 		  break;
 		  case GIZMO_SLICE_Y:
@@ -141,7 +149,7 @@ void mafGizmoSlice::SetSlice(int id, int axis, double pos)
 			  org[1] = pos;
 			  ps->SetPoint1(wx,0,0);
 			  ps->SetPoint2(0,0,wz); 
-        MouseBH->GetTranslationConstraint()->SetBounds(mmiConstraint::Y, interval[1]);
+        m_MouseBH->GetTranslationConstraint()->SetBounds(mmiConstraint::Y, interval[1]);
       } 
 		  break;
 		  case GIZMO_SLICE_Z:
@@ -150,7 +158,7 @@ void mafGizmoSlice::SetSlice(int id, int axis, double pos)
 			  org[2] = pos;
 			  ps->SetPoint1(wx,0,0);
 			  ps->SetPoint2(0,wy,0);
-        MouseBH->GetTranslationConstraint()->SetBounds(mmiConstraint::Z, interval[2]);
+        m_MouseBH->GetTranslationConstraint()->SetBounds(mmiConstraint::Z, interval[2]);
       }
 		  break;
 	  }
@@ -169,22 +177,22 @@ void mafGizmoSlice::SetSlice(int id, int axis, double pos)
 
     // append outline and handle
 	  vtkMAFSmartPointer<vtkAppendPolyData> apd;
-	  apd->AddInput(cs->GetOutput());
+    apd->AddInput(cs->GetOutput());
 	  apd->AddInput(of->GetOutput());
 	  apd->Update();
 
-	  m_vme_gizmo->SetData(apd->GetOutput());
+    m_VmeGizmo->SetData(apd->GetOutput(),m_VmeInput->GetTimeStamp());
 
     // position the gizmo 
 	  mafSmartPointer<mafTransform> t;
     t->Translate(org, PRE_MULTIPLY);
-	  m_vme_gizmo->SetMatrix(t->GetMatrix());   
+	  m_VmeGizmo->SetMatrix(t->GetMatrix());   
   
-    // GizmoHandleCenterMatrix holds the gizmo handle pose
-    mafTransform::SetPosition(GizmoHandleCenterMatrix, org);
+    // m_GizmoHandleCenterMatrix holds the gizmo handle pose
+    mafTransform::SetPosition(*m_GizmoHandleCenterMatrix, org);
     
     // this matrix is keeped updated by the interactor with the gizmo handle position
-    MouseBH->SetResultMatrix(&GizmoHandleCenterMatrix);
+    m_MouseBH->SetResultMatrix(m_GizmoHandleCenterMatrix);
 
     //Default moving modality
     this->SetGizmoModalityToSnap();
@@ -194,11 +202,10 @@ void mafGizmoSlice::SetSlice(int id, int axis, double pos)
 void mafGizmoSlice::SetColor(double col[3])
 //----------------------------------------------------------------------------
 {
-	memcpy(m_vme_gizmo->GetMaterial()->m_Ambient,col,sizeof(col));
-  m_vme_gizmo->GetMaterial()->m_AmbientIntensity = 1;
-	m_vme_gizmo->GetMaterial()->m_DiffuseIntensity = 0;
-	m_vme_gizmo->GetMaterial()->m_SpecularIntensity = 0;
-  m_vme_gizmo->GetMaterial()->UpdateProp();
+  m_VmeGizmo->GetMaterial()->m_Diffuse[0] = col[0];
+  m_VmeGizmo->GetMaterial()->m_Diffuse[1] = col[1];
+  m_VmeGizmo->GetMaterial()->m_Diffuse[2] = col[2];
+  m_VmeGizmo->GetMaterial()->UpdateProp();
 }
 //----------------------------------------------------------------------------
 void mafGizmoSlice::SetListener(mafObserver *listener)
@@ -210,7 +217,7 @@ void mafGizmoSlice::SetListener(mafObserver *listener)
 mafVME *mafGizmoSlice::GetOutput()
 //----------------------------------------------------------------------------
 {
-	return m_vme_gizmo;
+	return m_VmeGizmo;
 }
 //----------------------------------------------------------------------------
 void mafGizmoSlice::InitSnapArray(mafVME *vol, int axis)
@@ -223,13 +230,13 @@ void mafGizmoSlice::InitSnapArray(mafVME *vol, int axis)
     vol_data->GetBounds(b);
     if(vol_data->IsA("vtkRectilinearGrid"))
     {
-	    this->m_snapArray = vtkDoubleArray::New();
+	    this->m_SnapArray = vtkDoubleArray::New();
 	    if(axis == GIZMO_SLICE_X)
-		    this->m_snapArray->DeepCopy((vtkDoubleArray *)((vtkRectilinearGrid *)vol_data)->GetXCoordinates());
+		    this->m_SnapArray->DeepCopy((vtkDoubleArray *)((vtkRectilinearGrid *)vol_data)->GetXCoordinates());
 	    else if(axis == GIZMO_SLICE_Y)
-		    this->m_snapArray->DeepCopy((vtkDoubleArray *)((vtkRectilinearGrid *)vol_data)->GetYCoordinates());
+		    this->m_SnapArray->DeepCopy((vtkDoubleArray *)((vtkRectilinearGrid *)vol_data)->GetYCoordinates());
 	    else if(axis == GIZMO_SLICE_Z)
-		    this->m_snapArray->DeepCopy((vtkDoubleArray *)((vtkRectilinearGrid *)vol_data)->GetZCoordinates());
+		    this->m_SnapArray->DeepCopy((vtkDoubleArray *)((vtkRectilinearGrid *)vol_data)->GetZCoordinates());
     }
     if(vol_data->IsA("vtkStructuredPoints"))
     {
@@ -237,12 +244,12 @@ void mafGizmoSlice::InitSnapArray(mafVME *vol, int axis)
 	    double spc[3];
 	    ((vtkStructuredPoints *)vol_data)->GetDimensions(dim);
 	    ((vtkStructuredPoints *)vol_data)->GetSpacing(spc);
-	    this->m_snapArray = vtkDoubleArray::New();
-	    this->m_snapArray->SetNumberOfValues(dim[axis]);
+	    this->m_SnapArray = vtkDoubleArray::New();
+	    this->m_SnapArray->SetNumberOfValues(dim[axis]);
 	    for(int i=0;i<dim[axis];i++)
 	    {
 		    z = b[2*axis] + i * spc[axis];
-		    this->m_snapArray->SetValue(i,z);
+		    this->m_SnapArray->SetValue(i,z);
 	    }
     }
   }
@@ -258,18 +265,18 @@ void mafGizmoSlice::OnEvent(mafEventBase *maf_event)
       case ID_TRANSFORM:
       {
         mafSmartPointer<mafTransform> tr;
-        tr->SetMatrix(*m_vme_gizmo->GetOutput()->GetMatrix());
+        tr->SetMatrix(*m_VmeGizmo->GetOutput()->GetMatrix());
         tr->Concatenate(*e->GetMatrix(), PRE_MULTIPLY);
 
-        m_vme_gizmo->SetMatrix(tr->GetMatrix());		 
+        m_VmeGizmo->SetMatrix(tr->GetMatrix());		 
 
         //local position of gizmo cube handle centre
         double locPos[3];
-        mafTransform::GetPosition(GizmoHandleCenterMatrix, locPos);
+        mafTransform::GetPosition(*m_GizmoHandleCenterMatrix, locPos);
 
         // position sent as vtk point
-        m_point->SetPoint(0,locPos);
-        mafEventMacro(mafEvent(this,MOUSE_MOVE, m_point, m_id));
+        m_Point->SetPoint(0,locPos);
+        mafEventMacro(mafEvent(this,MOUSE_MOVE, m_Point, m_id));
       }
       break;
       default:
@@ -283,23 +290,23 @@ void mafGizmoSlice::OnEvent(mafEventBase *maf_event)
 void mafGizmoSlice::SetGizmoModalityToBound() 
 //----------------------------------------------------------------------------
 {
-  this->MovingModality = BOUND;
+  this->m_MovingModality = BOUND;
  
   switch(m_axis)  
   {
     case GIZMO_SLICE_X:
     {
-      MouseBH->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::BOUNDS, mmiConstraint::LOCK, mmiConstraint::LOCK);   
+      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::BOUNDS, mmiConstraint::LOCK, mmiConstraint::LOCK);   
     }    
 	  break;
     case GIZMO_SLICE_Y:
     {
-      MouseBH->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::BOUNDS, mmiConstraint::LOCK);    
+      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::BOUNDS, mmiConstraint::LOCK);    
     }
     break;   
     case GIZMO_SLICE_Z:
     {
-      MouseBH->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::BOUNDS);  
+      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::BOUNDS);  
     }
 	  break;
   }
@@ -309,23 +316,23 @@ void mafGizmoSlice::SetGizmoModalityToBound()
 void mafGizmoSlice::SetGizmoModalityToSnap() 
 //----------------------------------------------------------------------------
 {
-  this->MovingModality = SNAP; 
+  this->m_MovingModality = SNAP; 
 
   switch(m_axis)  
   {
     case GIZMO_SLICE_X:
     {
-      MouseBH->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::SNAP_ARRAY, mmiConstraint::LOCK, mmiConstraint::LOCK);   
+      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::SNAP_ARRAY, mmiConstraint::LOCK, mmiConstraint::LOCK);   
     }    
 	  break;
     case GIZMO_SLICE_Y:
     {
-      MouseBH->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::SNAP_ARRAY, mmiConstraint::LOCK);  
+      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::SNAP_ARRAY, mmiConstraint::LOCK);  
     }
     break;   
     case GIZMO_SLICE_Z:
     {
-      MouseBH->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::SNAP_ARRAY);  
+      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::SNAP_ARRAY);  
     }
 	  break;
   }
