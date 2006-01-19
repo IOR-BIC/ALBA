@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-10 13:36:24 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2006-01-19 14:55:44 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,6 +21,7 @@
 
 
 #include "mafRWIBase.h"
+#include "mafDecl.h"
 
 #include <wx/event.h>
 #include <wx/utils.h>
@@ -37,7 +38,6 @@
   #include "wx/gtk/win_gtk.h"
 #endif
 
-#include "mafDecl.h"
 #include "mafDevice.h"
 #include "mmdButtonsPad.h"
 #include "mmdMouse.h"
