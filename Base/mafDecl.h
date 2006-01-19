@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-12 11:15:29 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-01-19 14:55:04 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -16,13 +16,16 @@
 // because force most of the MAF to be rebuilt
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #include "mafDefines.h"
+#include <wx/bitmap.h>
 #include <string>
 #include <vector>
+
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 class wxColour;
 class wxWindow;
+
 //----------------------------------------------------------------------------
 // constant
 //----------------------------------------------------------------------------
