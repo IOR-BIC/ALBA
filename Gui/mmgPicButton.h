@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgPicButton.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-18 16:17:04 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-01-19 13:10:20 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -15,6 +15,8 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
+#include "mafObserver.h"
+
 //----------------------------------------------------------------------------
 // mmgPicButton :
 /**
@@ -27,7 +29,7 @@ To create a mmgPicButton you must specify
 - parent
 - Bitmap_ID : which should be a valid pic-index in the pic-factory (see mmgPics)
 - ID: the ID of the Event that will be sent to the mafListener --- must be in the range MINID-MAXID or PIC_START-PIC-STOP (see mafDecl.h)
-- obviously you must also specify a Listener 
+- obviously you must also specify a Listener */
 //----------------------------------------------------------------------------
 class mmgPicButton : public wxBitmapButton
 {
@@ -38,7 +40,7 @@ public:
   mmgPicButton(wxWindow *parent, wxString BitmapId, wxWindowID id = 0, mafObserver *listener = NULL);
 
   /** Set the Listener that will receive event-notification. */
-  void SetListener(mafObserver *listener)   {m_Listener=listener;}; 
+  void SetListener(mafObserver *listener);
 
   /** allow to change the Event-Id at run time */
   void SetEventId(long EventId); 
@@ -63,6 +65,6 @@ protected:
   int m_Id;
   mafObserver  *m_Listener;
 
-DECLARE_EVENT_TABLE()
+	DECLARE_EVENT_TABLE()
 };
 #endif // __mmgPicButton_H__
