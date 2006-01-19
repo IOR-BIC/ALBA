@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 17:15:56 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-01-19 11:05:37 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -378,14 +378,17 @@ void mmaMaterial::UpdateProp()
   m_Prop->SetSpecularPower(m_SpecularPower);
   m_Prop->SetOpacity(m_Opacity);
   m_Prop->SetRepresentation((int)m_Representation);
+  m_Prop->Modified();
 
   m_GrayLut->SetLevel(m_Level_LUT);
   m_GrayLut->SetWindow(m_Window_LUT);
+  m_GrayLut->Build();
 
   m_ColorLut->SetHueRange(m_HueRange);
   m_ColorLut->SetSaturationRange(m_SaturationRange);
   m_ColorLut->SetNumberOfColors(m_NumColors);
   m_ColorLut->SetTableRange(m_TableRange);
+  m_ColorLut->Build();
 }
 //-----------------------------------------------------------------------
 void mmaMaterial::SetMaterialTexture(vtkImageData *tex)
