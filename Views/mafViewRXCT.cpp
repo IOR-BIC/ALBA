@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-19 15:19:29 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-01-19 16:03:03 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -186,6 +186,7 @@ mmgGui* mafViewRXCT::CreateGui()
   {
     vtkNEW(m_ColorLUT);
   }
+  lutPreset(4,m_ColorLUT);
   m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
 
   EnableWidgets(m_CurrentVolume != NULL);
