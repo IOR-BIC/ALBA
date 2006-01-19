@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 17:45:35 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2006-01-19 11:22:00 $
+  Version:   $Revision: 1.20 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,18 +33,12 @@
 #include "vtkMAFAssembly.h"
 #include "vtkRenderer.h"
 #include "vtkOutlineCornerFilter.h"
-#include "vtkPolyDataNormals.h"
-#include "vtkStripper.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkPolyData.h"
 #include "vtkActor.h"
 #include "vtkProperty.h"
 #include "vtkTexture.h"
 #include "vtkPointData.h"
-#include "vtkPolyDataNormals.h"
-#include "vtkCleanPolyData.h"
-#include "vtkTriangleFilter.h"
-#include "vtkStripper.h"
 #include "vtkImageData.h"
 #include "vtkTextureMapToCylinder.h"
 #include "vtkTextureMapToPlane.h"
@@ -72,7 +66,6 @@ mafPipeSurface::mafPipeSurface()
   m_TextureAccept   = NULL;
 
   m_ScalarVisibility = 0;
-  m_OptimizedSurfaceFlag = 0;
   m_RenderingDisplayListFlag = 0;
 }
 //----------------------------------------------------------------------------
@@ -108,20 +101,6 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
 
   mmaMaterial *material = surface_output->GetMaterial();
   assert(material);  // all vme that use PipeSurface must have the material correctly set
-
-  vtkNEW(m_CleanPolydata);
-  m_CleanPolydata->PointMergingOff(); 
-  m_CleanPolydata->ConvertLinesToPointsOn();  
-  m_CleanPolydata->ConvertPolysToLinesOn();
-  m_CleanPolydata->ConvertStripsToPolysOn();     
-  vtkNEW(m_NormalFilter);
-  m_NormalFilter->SetInput(m_CleanPolydata->GetOutput());
-  m_NormalFilter->FlipNormalsOff();
-  m_NormalFilter->SetFeatureAngle(30.0);
-  vtkNEW(m_TriangleFilter);
-  m_TriangleFilter->SetInput(m_NormalFilter->GetOutput());
-  vtkNEW(m_Stripper);
-  m_Stripper->SetInput(m_TriangleFilter->GetOutput());
 
   m_Mapper = vtkPolyDataMapper::New();
 
@@ -221,10 +200,6 @@ mafPipeSurface::~mafPipeSurface()
 
   cppDEL(m_TextureAccept);
 
-  vtkDEL(m_CleanPolydata);
-  vtkDEL(m_NormalFilter);
-  vtkDEL(m_TriangleFilter);
-  vtkDEL(m_Stripper);
   vtkDEL(m_Texture);
 	vtkDEL(m_Mapper);
   vtkDEL(m_Actor);
@@ -235,19 +210,6 @@ mafPipeSurface::~mafPipeSurface()
   cppDEL(m_Axes);
 	//@@@ if(m_use_axes) wxDEL(m_axes);  
 }
-/*
-//----------------------------------------------------------------------------
-void mafPipeSurface::Show(bool show)
-//----------------------------------------------------------------------------
-{
-	m_Actor->SetVisibility(show);
-	if(m_Selected)
-	{
-	  m_OutlineActor->SetVisibility(show);
-		//@@@ if(m_use_axes) m_axes->SetVisibility(show);
-	}
-}
-*/
 //----------------------------------------------------------------------------
 void mafPipeSurface::Select(bool sel)
 //----------------------------------------------------------------------------
@@ -302,7 +264,6 @@ mmgGui *mafPipeSurface::CreateGui()
   m_MaterialButton = new mmgMaterialButton(m_Vme,this);
   m_Gui->AddGui(m_MaterialButton->GetGui());
   m_Gui->Bool(ID_RENDERING_DISPLAY_LIST,"displaylist",&m_RenderingDisplayListFlag,0,"turn on/off \nrendering displaylist calculation");
-  //m_Gui->Bool(ID_OPTIMIZE_SURFACE,"optimize",&m_OptimizedSurfaceFlag,0,"optimize surface for rendering");
   m_Gui->Button(ID_CHOOSE_TEXTURE,"texture");
   mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
   m_Gui->Combo(ID_TEXTURE_MAPPING_MODE,"mapping",&surface_output->GetMaterial()->m_TextureMappingMode,3,mapping_mode);
@@ -332,11 +293,6 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       }
     	break;
-      case ID_OPTIMIZE_SURFACE:
-      {
-        OptimizeSurface(m_OptimizedSurfaceFlag != 0);
-      }
-      break;
       case ID_CHOOSE_TEXTURE:
       {
         mafString title = "Choose texture";
@@ -375,25 +331,6 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
       break;
     }
   }
-}
-//----------------------------------------------------------------------------
-void mafPipeSurface::OptimizeSurface(bool optimize)
-//----------------------------------------------------------------------------
-{
-  wxBusyCursor wait;
-  mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
-
-  if (optimize)
-  {
-    m_CleanPolydata->SetInput(surface_output->GetSurfaceData());
-    m_CleanPolydata->Update();
-    m_NormalFilter->Update();
-    m_TriangleFilter->Update();
-    m_Stripper->Update();
-    m_Mapper->SetInput(m_Stripper->GetOutput());
-  }
-  else
-    m_Mapper->SetInput(surface_output->GetSurfaceData());
 }
 //----------------------------------------------------------------------------
 void mafPipeSurface::GenerateTextureMapCoordinate()
