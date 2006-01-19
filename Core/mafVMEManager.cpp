@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-23 15:44:20 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2006-01-19 11:06:09 $
+  Version:   $Revision: 1.21 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -65,6 +65,7 @@ mafVMEManager::~mafVMEManager()
   if(m_Storage) 
     NotifyRemove( m_Storage->GetRoot() ); // //SIL. 11-4-2005:  - cast root to node -- maybe to be removed
 
+  m_Listener = NULL;
   mafDEL(m_Storage);
   cppDEL(m_Config);
 }
