@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-19 14:15:33 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-01-19 15:19:29 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -111,7 +111,6 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
         center[2] = b[5]-step*(i+1);
         ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(i))->InitializeSlice(center);
         ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(i))->VmeShow(node,show);
-        ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(i))->BorderCreate(m_BorderColor[i]);
         mafPipeVolumeSlice *p = NULL;
         p = mafPipeVolumeSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(i))->GetNodePipe(node));
         p->SetColorLookupTable(m_ColorLUT);
@@ -253,6 +252,7 @@ void mafViewRXCT::GizmoCreate()
     m_Gizmo[i] = new mafGizmoSlice(m_CurrentVolume, this);
     m_Gizmo[i]->SetSlice(i,mafGizmoSlice::GIZMO_SLICE_Z,slice[2]);
     m_Gizmo[i]->SetColor(m_BorderColor[i]);
+    ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(i))->BorderCreate(m_BorderColor[i]);
 
     m_ChildViewList[0]->VmeShow(m_Gizmo[i]->GetOutput(), true);
     m_ChildViewList[1]->VmeShow(m_Gizmo[i]->GetOutput(), true);
@@ -266,6 +266,7 @@ void mafViewRXCT::GizmoDelete()
   {
     if(m_Gizmo[i])
     {
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(i))->BorderCreate(m_BorderColor[i]);
       m_ChildViewList[0]->VmeShow(m_Gizmo[i]->GetOutput(),false);
       m_ChildViewList[1]->VmeShow(m_Gizmo[i]->GetOutput(),false);
       cppDEL(m_Gizmo[i]);
