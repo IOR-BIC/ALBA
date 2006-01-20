@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMaterialButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-23 11:58:41 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-01-20 14:05:15 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -71,11 +71,8 @@ void mmgMaterialButton::CreateGui()
 
   wxStaticText *lab = new wxStaticText(m_Gui, -1, "material", wxDefaultPosition, wxSize(60,16), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   
-  m_MaterialButton = new mmgPicButton(m_Gui, "Material", ID_MATERIAL, this);
-  m_MaterialButton->SetSize(25,25);
   m_Material->MakeIcon();
-  m_MaterialButton->SetBitmapLabel(*m_Material->m_Icon);
-  m_MaterialButton->Refresh();
+  m_MaterialButton = new mmgPicButton(m_Gui, m_Material->m_Icon, ID_MATERIAL, this);
 
   //m_MaterialLabel = new wxStaticText(m_Gui,ID_MATERIAL,"",wxDefaultPosition, wxSize(100,16), wxST_NO_AUTORESIZE );
   m_MaterialLabel = new wxStaticText(m_Gui,-1,"",wxDefaultPosition, wxSize(100,16), wxST_NO_AUTORESIZE );
