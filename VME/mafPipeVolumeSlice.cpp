@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-13 16:24:00 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2006-01-20 14:07:34 $
+  Version:   $Revision: 1.21 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -293,7 +293,8 @@ void mafPipeVolumeSlice::DrawUnit()
 //----------------------------------------------------------------------------
 {
   double b[6];
-  m_Vme->GetOutput()->GetVMELocalBounds(b);
+  //m_Vme->GetOutput()->GetVMELocalBounds(b);
+  m_Vme->GetOutput()->GetVMEBounds(b);
 
   vtkMAFSmartPointer<vtkLineSource> cursor_line1;
   cursor_line1->SetPoint1(0,0,0);
