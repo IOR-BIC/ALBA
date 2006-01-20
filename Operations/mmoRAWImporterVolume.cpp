@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-20 11:23:57 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-01-20 16:59:16 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -398,6 +398,8 @@ bool mmoRAWImporterVolume::Import()
 	reader->SetHeaderSize(m_FileHeader);
 	reader->SetFileDimensionality(3);
   reader->SetDataVOI(0, m_DataDimemsion[0] - 1, 0, m_DataDimemsion[1] - 1, m_SliceVOI[0], m_SliceVOI[1] - 1);
+  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+  mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,reader));
 //  reader->SetDataVOI(0, m_DataDimemsion[0] - 1, 0, m_DataDimemsion[1] - 1, 0, m_SliceVOI[1] - m_SliceVOI[0] - 1);
 //  reader->SetDataOrigin(0.0,0.0,m_SliceVOI[0]*m_DataSpacing[2]);
 	reader->Update();
@@ -430,6 +432,7 @@ bool mmoRAWImporterVolume::Import()
   wxSplitPath(m_RawFile.GetCStr(),&path,&name,&ext);
   m_Output->SetName(name.c_str());
   m_Output->GetTagArray()->SetTag(tag_Nature);
+  mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
 	return true;
 }
 //----------------------------------------------------------------------------
