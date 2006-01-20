@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-28 13:03:52 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-01-20 16:48:36 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -100,6 +100,10 @@ public:
   Show the splash screen for the application. To define your own splash screen image simply
   overwrite the SPLASH_SCREEN image into the picture factory by plugging your .xpm image. \sa mafPictureFactory*/
   virtual void ShowSplashScreen();
+
+  /** 
+  Used to give a splash screen image directly from the bitmap without converting it in xpm.*/
+  virtual void ShowSplashScreen(wxBitmap &splashImage);
 
 protected:
 	/** Create the main men.*/
