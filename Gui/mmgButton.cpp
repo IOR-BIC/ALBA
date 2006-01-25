@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-23 12:00:07 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-01-25 16:21:47 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,6 +29,7 @@
 //----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(mmgButton,wxButton)
      EVT_SET_FOCUS(mmgButton::OnSetFocus) 
+     EVT_COMMAND_RANGE(MINID,MAXID,wxEVT_COMMAND_BUTTON_CLICKED,   mmgButton::Command)
 END_EVENT_TABLE()
 
 //----------------------------------------------------------------------------
@@ -44,25 +45,5 @@ mmgButton::mmgButton(wxWindow* parent, wxWindowID id, const wxString& label,
 void mmgButton::Command(wxCommandEvent& event)
 //----------------------------------------------------------------------------
 {
-  mafLogMessage("mmgButton::cmd");
+  mafEventMacro(mafEvent(this, m_Id));
 }
-#ifdef __WIN32__
-    //----------------------------------------------------------------------------
-    bool mmgButton::MSWCommand(WXUINT param, WXWORD id)
-    //----------------------------------------------------------------------------
-    {
-      bool processed = FALSE;
-      switch ( param )
-      {
-        case 1:                     // message came from an accelerator
-        case BN_CLICKED:            // normal buttons send this
-        //SIL. 23-3-2005: case BN_DOUBLECLICKED:      // owner-drawn ones also send this 
-          if(m_Listener) 
-            m_Listener->OnEvent(&mafEvent(this, m_Id));
-          else
-            processed = SendClickEvent();
-        break;
-      }
-      return processed;
-    }
-#endif

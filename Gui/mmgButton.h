@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgButton.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-23 12:00:07 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-01-25 16:21:47 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -46,11 +46,6 @@ protected:
 	/** Overriden function member to intercept event generation and forward it to the Listener. */
   virtual void Command(wxCommandEvent& event);
   
-	#ifdef __WIN32__
-	/** Overriden function member to intercept event generation and forward it to the Listener (MSW Version). */
-  virtual bool MSWCommand(WXUINT param, WXWORD id);
-  #endif
-	
 	/** Called when the button take the focus. */
 	void OnSetFocus(wxFocusEvent& event) {}; 
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgPicButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-20 14:05:56 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-01-25 16:21:47 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -74,26 +74,6 @@ void mmgPicButton::Command(wxCommandEvent& event)
 {
   mafEventMacro(mafEvent(this, m_Id));
 }
-/*#ifdef __WIN32__
-//----------------------------------------------------------------------------
-bool mmgPicButton::MSWCommand(WXUINT param, WXWORD id)
-//----------------------------------------------------------------------------
-{
-  bool processed = FALSE;
-  switch ( param )
-  {
-    case 1:                     // message came from an accelerator
-    case BN_CLICKED:            // normal buttons send this.
-    //case BN_DOUBLECLICKED:    // 
-			if(m_Listener) 
-				m_Listener->OnEvent(&mafEvent(this, m_Id));
-			else
-				processed = SendClickEvent();
-    break;
-  }
-  return processed;
-}
-#endif*/
 //----------------------------------------------------------------------------
 void mmgPicButton::SetBitmap(wxString BitmapId, wxWindowID id )
 //----------------------------------------------------------------------------
