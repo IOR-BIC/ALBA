@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-25 15:45:29 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2006-01-25 15:58:42 $
+  Version:   $Revision: 1.23 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -659,22 +659,22 @@ void mafRWI::OnEvent(mafEventBase *maf_event)
         m_RwiBase->EnableStereoMovie(m_StereoMovieEnable != 0);
       break;
       case ID_CAMERA_FRONT:
-        CameraSet(CAMERA_FRONT);
+        CameraSet(CAMERA_PERSPECTIVE_FRONT);
       break;
       case ID_CAMERA_BACK:
-        CameraSet(CAMERA_BACK);
+        CameraSet(CAMERA_PERSPECTIVE_BACK);
       break;
       case ID_CAMERA_LEFT:
-        CameraSet(CAMERA_LEFT);
+        CameraSet(CAMERA_PERSPECTIVE_LEFT);
       break;
       case ID_CAMERA_RIGHT:
-        CameraSet(CAMERA_RIGHT);
+        CameraSet(CAMERA_PERSPECTIVE_RIGHT);
       break;
       case ID_CAMERA_TOP:
-        CameraSet(CAMERA_TOP);
+        CameraSet(CAMERA_PERSPECTIVE_TOP);
       break;
       case ID_CAMERA_BOTTOM:
-        CameraSet(CAMERA_BOTTOM);
+        CameraSet(CAMERA_PERSPECTIVE_BOTTOM);
       break;
       default:
         mafEventMacro(*maf_event);
