@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-10 13:34:04 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-01-25 15:45:29 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -30,6 +30,7 @@ class mafRWIBase;
 class mafSceneGraph;
 class mafAxes;
 class mmgGui;
+class mmgPicButton;
 
 //----------------------------------------------------------------------------
 // constants:
@@ -117,6 +118,8 @@ protected:
   wxColour	m_BGColour;
   wxColour	m_GridColour;
   double    m_GridPosition;
+  mmgPicButton *m_CameraButtons[6];
+  wxBoxSizer	 *m_Sizer;
 	
   int          m_StereoType;
   mafObserver *m_Listener;

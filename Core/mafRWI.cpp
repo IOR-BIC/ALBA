@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-25 12:01:55 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2006-01-25 15:45:29 $
+  Version:   $Revision: 1.22 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,6 +28,8 @@
 #include "mafNode.h"
 #include "mafSceneNode.h"
 #include "mafSceneGraph.h"
+#include "mmgPicButton.h"
+
 #include "mafVME.h"
 #include "mafVMELandmark.h"
 #include "mafVMELandmarkCloud.h"
@@ -54,6 +56,12 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axe
   m_Sg      = NULL;
   m_RenBack = NULL;
   m_Gui     = NULL;
+  for (int b=0; b<6; b++)
+  {
+    m_CameraButtons[b] = NULL;
+  }
+  m_Sizer = NULL;
+
   m_GridPosition = 0;
   m_BGColour  = wxColour(DEFAULT_BG_COLOR * 255,DEFAULT_BG_COLOR * 255,DEFAULT_BG_COLOR * 255);
   m_GridColour= wxColour(DEFAULT_GRID_COLOR * 255,DEFAULT_GRID_COLOR * 255,DEFAULT_GRID_COLOR * 255);
@@ -550,7 +558,13 @@ enum RWI_WIDGET_ID
   ID_SHOW_AXES,
   ID_BG_COLOR,
   ID_STERO_MOVIE_DIR,
-  ID_STERO_MOVIE
+  ID_STERO_MOVIE,
+  ID_CAMERA_FRONT,
+  ID_CAMERA_BACK,
+  ID_CAMERA_LEFT,
+  ID_CAMERA_RIGHT,
+  ID_CAMERA_TOP,
+  ID_CAMERA_BOTTOM,
 };
 //-------------------------------------------------------------------------
 mmgGui *mafRWI::CreateGui()
@@ -560,6 +574,22 @@ mmgGui *mafRWI::CreateGui()
 
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
+  // constant used in mafRWIxxx to initialize Camera pos
+  if (m_Camera->GetParallelProjection() == 0)
+  {
+    m_Sizer =  new wxBoxSizer( wxHORIZONTAL );
+    m_CameraButtons[0] = new mmgPicButton(m_Gui, "PIC_BOTTOM",ID_CAMERA_BOTTOM, this);
+    m_CameraButtons[1] = new mmgPicButton(m_Gui, "PIC_TOP",   ID_CAMERA_TOP,    this);
+    m_CameraButtons[2] = new mmgPicButton(m_Gui, "PIC_BACK",  ID_CAMERA_BACK,   this);
+    m_CameraButtons[3] = new mmgPicButton(m_Gui, "PIC_FRONT", ID_CAMERA_FRONT,  this);
+    m_CameraButtons[4] = new mmgPicButton(m_Gui, "PIC_LEFT",  ID_CAMERA_LEFT,   this);
+    m_CameraButtons[5] = new mmgPicButton(m_Gui, "PIC_RIGHT", ID_CAMERA_RIGHT,  this);
+    for(int i = 0; i < 6; i++)
+      m_Sizer->Add(m_CameraButtons[i],0,0);
+    m_Gui->Add(m_Sizer);
+    m_Gui->Divider(2);
+  }
+
   m_Gui->Bool(ID_SHOW_GRID,"grid",&m_ShowGrid,0,"Turn On/Off the grid");
   m_Gui->Combo(ID_GRID_NORMAL,"grid normal",&m_GridNormal,3,grid_normal,"orientation axes for the grid");
   m_Gui->Double(ID_GRID_POS,"grid pos",	&m_GridPosition);
@@ -627,6 +657,24 @@ void mafRWI::OnEvent(mafEventBase *maf_event)
       break;
       case ID_STERO_MOVIE:
         m_RwiBase->EnableStereoMovie(m_StereoMovieEnable != 0);
+      break;
+      case ID_CAMERA_FRONT:
+        CameraSet(CAMERA_FRONT);
+      break;
+      case ID_CAMERA_BACK:
+        CameraSet(CAMERA_BACK);
+      break;
+      case ID_CAMERA_LEFT:
+        CameraSet(CAMERA_LEFT);
+      break;
+      case ID_CAMERA_RIGHT:
+        CameraSet(CAMERA_RIGHT);
+      break;
+      case ID_CAMERA_TOP:
+        CameraSet(CAMERA_TOP);
+      break;
+      case ID_CAMERA_BOTTOM:
+        CameraSet(CAMERA_BOTTOM);
       break;
       default:
         mafEventMacro(*maf_event);
