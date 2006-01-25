@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-27 13:45:11 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-01-25 12:00:24 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -37,6 +37,12 @@ public:
 
   /** compare two VME-Root. */
   virtual bool Equals(mafVME *vme);
+
+  enum ROOT_GUI_ID
+  {
+    ID_APPLICATION_STAMP = Superclass::ID_LAST,
+    ID_LAST
+  };
 
   virtual int DeepCopy(mafNode *a);
 
@@ -72,7 +78,10 @@ public:
   /** allow only a NULL parent */
   virtual bool CanReparentTo(mafNode *parent) {return mafRoot::CanReparentTo(parent);}
 
-  void OnEvent(mafEventBase *e);
+  void OnEvent(mafEventBase *maf_event);
+
+  /** Redefined to update the gui. */
+  virtual void Update();
 
   /** return an xpm-icon that can be used to represent this node */
   static char ** GetIcon();   //SIL. 11-4-2005:  
@@ -90,9 +99,11 @@ protected:
 
   mafID         m_MaxItemId; ///< id counter for VME items
   mafTransform* m_Transform; ///< pose matrix for the root
+
+  mafString m_ApplicationStamp;
+
 private:
   mafVMERoot(const mafVMERoot&); // Not implemented
   void operator=(const mafVMERoot&); // Not implemented
 };
-
 #endif

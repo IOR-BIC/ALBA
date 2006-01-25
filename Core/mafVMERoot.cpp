@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 15:43:46 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2006-01-25 12:00:23 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,6 +22,9 @@
 
 
 #include "mafVMERoot.h"
+#include "mmgGui.h"
+#include "mafTagArray.h"
+#include "mafTagItem.h"
 #include "mafAbsMatrixPipe.h"
 #include "mafAttribute.h"
 #include "mafTransform.h"
@@ -30,7 +33,6 @@
 #include "mafStorage.h"
 #include "mafStorageElement.h"
 #include "mafEventIO.h"
-#include "mmgGui.h"
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMERoot)
@@ -40,11 +42,12 @@ mafCxxTypeMacro(mafVMERoot)
 mafVMERoot::mafVMERoot()
 //-------------------------------------------------------------------------
 {
-   m_MaxItemId=-1;
-   mafNEW(m_Transform);
-   mafVMEOutputNULL *output=mafVMEOutputNULL::New(); // an output with no data
-   output->SetTransform(m_Transform); // force my transform in the output
-   SetOutput(output);
+  m_ApplicationStamp = "";
+  m_MaxItemId=-1;
+  mafNEW(m_Transform);
+  mafVMEOutputNULL *output=mafVMEOutputNULL::New(); // an output with no data
+  output->SetTransform(m_Transform); // force my transform in the output
+  SetOutput(output);
 }
 
 //-------------------------------------------------------------------------
@@ -102,26 +105,47 @@ void mafVMERoot::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes)
 }
 
 //-------------------------------------------------------------------------
-void mafVMERoot::OnEvent(mafEventBase *e)
+void mafVMERoot::OnEvent(mafEventBase *maf_event)
 //-------------------------------------------------------------------------
 {
-  if (e->GetChannel()==MCH_UP)
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
-    switch (e->GetId())
+    if (e->GetId() == ID_APPLICATION_STAMP)
+    {
+      if(GetTagArray()->IsTagPresent("APP_STAMP"))
+      {
+        GetTagArray()->GetTag("APP_STAMP")->SetValue(m_ApplicationStamp);
+      }
+      else
+      {
+        mafTagItem app_stamp_item;
+        app_stamp_item.SetName("APP_STAMP");
+        app_stamp_item.SetValue(m_ApplicationStamp);
+        GetTagArray()->SetTag(app_stamp_item);
+      }
+    }
+    else
+    {
+      mafNode::OnEvent(e);
+    }
+  }
+  else if (maf_event->GetChannel()==MCH_UP)
+  {
+    switch (maf_event->GetId())
     {
       case VME_GET_NEWITEM_ID:
-        if (mafEventIO *event_io=mafEventIO::SafeDownCast(e))
+        if (mafEventIO *event_io=mafEventIO::SafeDownCast(maf_event))
         {
           event_io->SetItemId(mafVMERoot::SafeDownCast(GetRoot())->GetNextItemId()); // retrieve and return an item ID
         }
       break;
       default:
-        mafRoot::OnRootEvent(e);
+        mafRoot::OnRootEvent(maf_event);
     };
   }
   else
   {
-    Superclass::OnEvent(e);
+    Superclass::OnEvent(maf_event);
   }
 }
 
@@ -176,13 +200,31 @@ int mafVMERoot::InternalRestore(mafStorageElement *node)
   return MAF_ERROR;
 }
 //-------------------------------------------------------------------------
+void mafVMERoot::Update()
+//-------------------------------------------------------------------------
+{
+  mafVME::Update();
+  if(GetTagArray()->IsTagPresent("APP_STAMP"))
+  {
+    m_ApplicationStamp = GetTagArray()->GetTag("APP_STAMP")->GetValue();
+    if (m_Gui)
+    {
+      m_Gui->Update();
+    }
+  }
+}
+
+//-------------------------------------------------------------------------
 mmgGui *mafVMERoot::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  mafNode::CreateGui();
 
-  mafString type_name = GetTypeName();
-  m_Gui->Label("type :", type_name);
+  if(GetTagArray()->IsTagPresent("APP_STAMP"))
+  {
+    m_ApplicationStamp = GetTagArray()->GetTag("APP_STAMP")->GetValue();
+  }
+  m_Gui->String(ID_APPLICATION_STAMP, "app stamp", &m_ApplicationStamp, "Tag to associate a msf file \nto a particular application.");
   return m_Gui;
 }
