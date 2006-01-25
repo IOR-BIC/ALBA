@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-12 12:32:48 $
-  Version:   $Revision: 1.39 $
+  Date:      $Date: 2006-01-25 12:00:50 $
+  Version:   $Revision: 1.40 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,6 +32,7 @@ class vtkRenderWindow;
 class vtkRenderer;
 class mafAttachCamera;
 class mafTextKit;
+class mafAnimate;
 
 /** VME visibility attribute when plugging visual pipe.*/
 enum VME_VISIBILITY_ID
@@ -164,8 +165,9 @@ protected:
   mafLightKit		*m_LightKit;
   mafTextKit    *m_TextKit;
   mafAttachCamera *m_AttachCamera;
-  int            m_CameraPosition; 
+  mafAnimate      *m_AnimateKit;
 
+  int   m_CameraPosition; 
   int   m_NumberOfVisibleVme; ///< perform ResetCamera only for the first vme shown into the view
   bool  m_ShowAxes;  ///< Flag used to show/hide axes in low left cornel of the view
   int   m_StereoType; ///< Indicate the stereo type to use with the view

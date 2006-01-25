@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-12 12:32:48 $
-  Version:   $Revision: 1.49 $
+  Date:      $Date: 2006-01-25 12:00:49 $
+  Version:   $Revision: 1.50 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,6 +27,7 @@
 #include "mafLightKit.h"
 #include "mafAttachCamera.h"
 #include "mafTextKit.h"
+#include "mafAnimate.h"
 
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
@@ -66,6 +67,7 @@ mafViewVTK::mafViewVTK(wxString label, int camera_position, bool show_axes, bool
   m_LightKit  = NULL;
   m_TextKit   = NULL;
   m_AttachCamera = NULL;
+  m_AnimateKit = NULL;
 
   m_NumberOfVisibleVme = 0;
 }
@@ -80,6 +82,7 @@ mafViewVTK::~mafViewVTK()
   cppDEL(m_AttachCamera);
   cppDEL(m_LightKit);
   cppDEL(m_TextKit);
+  cppDEL(m_AnimateKit);
   cppDEL(m_Sg);
   cppDEL(m_Rwi);
 }
@@ -325,6 +328,10 @@ mmgGui *mafViewVTK::CreateGui()
   m_LightKit = new mafLightKit(m_Gui, m_Rwi->m_RenFront, this);
   m_Gui->AddGui(m_LightKit->GetGui());
   
+  // Animate kit
+  m_AnimateKit = new mafAnimate(m_Rwi->m_RenFront,m_Sg->GetSelectedVme(),this);
+  m_Gui->AddGui(m_AnimateKit->GetGui());
+
   return m_Gui;
 }
 //----------------------------------------------------------------------------
