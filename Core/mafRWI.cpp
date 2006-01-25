@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-16 12:41:08 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2006-01-25 12:01:55 $
+  Version:   $Revision: 1.21 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -389,7 +389,7 @@ void mafRWI::CameraReset(mafNode *vme)
 double *mafRWI::ComputeVisibleBounds(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  static double b1[6],b2[6]; // static so it is possible to return it
+  static double b[6],b1[6],b2[6]; // static so it is possible to return it
   mafVME *vme = NULL;
   
   if(node && (vme = mafVME::SafeDownCast(node)))
@@ -448,8 +448,20 @@ double *mafRWI::ComputeVisibleBounds(mafNode *node)
     vme->GetOutput()->GetVMEBounds(b1);    
 		return b1;
 	}
-	m_RenFront->ComputeVisiblePropBounds(b1);   
-	return b1;
+	m_RenFront->ComputeVisiblePropBounds(b1);
+  if (m_RenBack)
+  {
+    m_RenBack->ComputeVisiblePropBounds(b2);
+    b[0] = (b2[0] < b1[0]) ? b2[0] : b1[0];
+    b[2] = (b2[2] < b1[2]) ? b2[2] : b1[2];
+    b[4] = (b2[4] < b1[4]) ? b2[4] : b1[4];
+    b[1] = (b2[1] > b1[1]) ? b2[1] : b1[1];
+    b[3] = (b2[3] > b1[3]) ? b2[3] : b1[3];
+    b[5] = (b2[5] > b1[5]) ? b2[5] : b1[5];
+    return b;
+  }
+  else
+	  return b1;
 }
 //----------------------------------------------------------------------------
 void mafRWI::CameraReset(double bounds[6])
