@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeImage3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-12 10:07:47 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-01-25 12:04:08 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -24,8 +24,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafDecl.h"
 
 #include "mafVME.h"
-#include "vtkMAFAssembly.h"
 
+#include "vtkMAFAssembly.h"
 #include "vtkPlaneSource.h"
 #include "vtkTexture.h"
 #include "vtkWindowLevelLookupTable.h"
@@ -62,6 +62,8 @@ void mafPipeImage3D::Create(mafSceneNode *n)
 //----------------------------------------------------------------------------
 {
   Superclass::Create(n);
+  m_UsedAssembly = m_AssemblyBack ? m_AssemblyBack : m_AssemblyFront;
+
   m_ImagePlane        = NULL;
   m_ImageTexture      = NULL;
   m_ImageLUT          = NULL;
@@ -125,6 +127,7 @@ void mafPipeImage3D::Create(mafSceneNode *n)
 	m_ImageActor->SetMapper(m_ImageMapper);
 	m_ImageActor->SetTexture(m_ImageTexture);
 
+  m_UsedAssembly->AddPart(m_ImageActor);
 
   // selection hilight
 	m_SelectionFilter = vtkOutlineCornerFilter::New();
@@ -146,12 +149,10 @@ void mafPipeImage3D::Create(mafSceneNode *n)
 	m_SelectionActor->SetProperty(m_SelectionProperty);
 	m_SelectionActor->SetScale(1.01,1.01,1.01);
 
-  m_AssemblyFront->AddPart(m_SelectionActor);
+  m_UsedAssembly->AddPart(m_SelectionActor);
 
 	if(m_AssemblyBack)
 	{
-    m_AssemblyBack->AddPart(m_ImageActor);
-
 		m_GhostActor = vtkActor::New();
 		m_GhostActor->SetMapper(m_ImageMapper);
 		m_GhostActor->VisibilityOff();
@@ -163,7 +164,6 @@ void mafPipeImage3D::Create(mafSceneNode *n)
   }
 	else
 	{
-    m_AssemblyFront->AddPart(m_ImageActor);
 		m_GhostActor = NULL;
 	}
 }
@@ -171,13 +171,11 @@ void mafPipeImage3D::Create(mafSceneNode *n)
 mafPipeImage3D::~mafPipeImage3D()
 //----------------------------------------------------------------------------
 {
-  if(m_AssemblyBack)
-    m_AssemblyBack->RemovePart(m_ImageActor); 
-  else 
-    m_AssemblyFront->RemovePart(m_ImageActor);
+  m_UsedAssembly->RemovePart(m_ImageActor); 
+  m_UsedAssembly->RemovePart(m_SelectionActor);
+
   if(m_GhostActor) 
     m_AssemblyFront->RemovePart(m_GhostActor);
-	m_AssemblyFront->RemovePart(m_SelectionActor);
 
   vtkDEL(m_ImagePlane);
   vtkDEL(m_ImageLUT);
