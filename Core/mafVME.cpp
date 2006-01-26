@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-08-31 09:08:01 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2006-01-26 08:52:19 $
+  Version:   $Revision: 1.31 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -807,7 +807,9 @@ mmgGui *mafVME::CreateGui()
 {
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
+#ifdef MAF_USE_CRYPTO
   m_Gui->Bool(ID_VME_CRYPTING,"crypt",&m_Crypting);
+#endif
   mafString anim_text;
   anim_text = "not animated";
   if (IsAnimated())
