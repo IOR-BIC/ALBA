@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-25 12:00:49 $
-  Version:   $Revision: 1.50 $
+  Date:      $Date: 2006-01-26 08:50:02 $
+  Version:   $Revision: 1.51 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,6 +31,7 @@
 
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
+#include "mafVMERoot.h"
 
 #include "mafInteractor.h"
 #include "mafAvatar.h"
@@ -153,7 +154,17 @@ vtkRenderer *mafViewVTK::GetBackRenderer()
 }
 
 //----------------------------------------------------------------------------
-void mafViewVTK::VmeAdd(mafNode *vme)                                   {assert(m_Sg); m_Sg->VmeAdd(vme);}
+void mafViewVTK::VmeAdd(mafNode *vme)
+//----------------------------------------------------------------------------
+{
+  assert(m_Sg); 
+  m_Sg->VmeAdd(vme);
+  if (m_AnimateKit && vme->IsMAFType(mafVMERoot))
+  {
+    m_AnimateKit->SetInputVME(vme);
+  }
+}
+//----------------------------------------------------------------------------
 void mafViewVTK::VmeShow(mafNode *vme, bool show)												{assert(m_Sg); m_Sg->VmeShow(vme,show);}
 void mafViewVTK::VmeUpdateProperty(mafNode *vme, bool fromTag)	        {assert(m_Sg); m_Sg->VmeUpdateProperty(vme,fromTag);}
 //----------------------------------------------------------------------------
@@ -183,6 +194,10 @@ void mafViewVTK::VmeRemove(mafNode *vme)
 {
   assert(m_Sg); 
   m_Sg->VmeRemove(vme);
+  if (m_AnimateKit && vme->IsMAFType(mafVMERoot))
+  {
+    m_AnimateKit->ResetKit();
+  }
 }
 //----------------------------------------------------------------------------
 void mafViewVTK::VmeSelect(mafNode *vme, bool select)
@@ -329,7 +344,7 @@ mmgGui *mafViewVTK::CreateGui()
   m_Gui->AddGui(m_LightKit->GetGui());
   
   // Animate kit
-  m_AnimateKit = new mafAnimate(m_Rwi->m_RenFront,m_Sg->GetSelectedVme(),this);
+  m_AnimateKit = new mafAnimate(m_Rwi->m_RenFront,m_Sg->GetSelectedVme()->GetRoot(),this);
   m_Gui->AddGui(m_AnimateKit->GetGui());
 
   return m_Gui;
