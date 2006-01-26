@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-25 12:02:23 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-01-26 08:53:03 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,6 +45,9 @@ public:
 
 	/** Read root node's tags to retrieve previous stored camera positions.  */
 	void RetrieveStoredPositions();
+
+  /** delete All entries in listbox.*/
+  void ResetKit();
 
 protected:
 	/** Move the camera to the target position */

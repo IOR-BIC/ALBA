@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-25 12:02:23 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-01-26 08:53:03 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -61,8 +61,7 @@ void mafAnimate::SetInputVME(mafNode *vme)
 {
   assert(m_Gui && m_PositionList && m_StorePositionButton && m_RenamePositionButton && m_DeletePositionButton);
 
-	m_Tags = NULL;
-  EnableWidgets(); // disable all
+  ResetKit();
 
   if(!vme) return;
   mafVME *root = mafVME::SafeDownCast(vme->GetRoot());
@@ -425,4 +424,17 @@ void mafAnimate::DeleteViewPoint()
 	  m_SelectedPosition = m_PositionList->GetStringSelection();
 	}
 	m_Gui->Update();
+}
+//----------------------------------------------------------------------------
+void mafAnimate::ResetKit()
+//----------------------------------------------------------------------------
+{
+  int num_items = m_PositionList->Number();
+  for (int i=0; i<num_items;i++)
+  {
+    m_PositionList->Delete(0);
+  }
+  m_Tags = NULL;
+  EnableWidgets(); // disable all
+  m_Gui->Update();
 }
