@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-10 13:36:24 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-01-27 16:01:52 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "mafObserver.h"
 #include "mafString.h"
 #include "vtkRenderWindowInteractor.h"
 
@@ -64,6 +65,8 @@ public:
 	      const wxSize &size = wxDefaultSize, long style = wxWANTS_CHARS , const wxString &name = wxPanelNameStr);
   ~mafRWIBase();
   static mafRWIBase * New();
+
+  void SetListener(mafObserver *listener) {m_Listener = listener;};
 
 	/** Notify mouse click on a view. */
   void NotifyClick();
@@ -187,6 +190,7 @@ protected:
   vtkCamera *m_Camera;
   mmdMouse  *m_Mouse;
   bool       m_CustomInteractorStyle;
+  mafObserver *m_Listener;
 
   int m_LastX;
   int m_LastY;

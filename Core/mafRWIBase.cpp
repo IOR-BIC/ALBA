@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-19 14:55:44 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-01-27 16:01:52 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -99,8 +99,9 @@ mafRWIBase::mafRWIBase(wxWindow *parent, wxWindowID id, const wxPoint &pos,
 	m_SaveDir = ::wxGetHomeDir(); 
   m_Width = m_Height = 10;
   
-  m_Camera  = NULL;
-  m_Mouse   = NULL;
+  m_Camera    = NULL;
+  m_Mouse     = NULL;
+  m_Listener  = NULL;
   
   m_StereoMovieDir     = "";
   m_StereoMovieFrameCounter = 0;
@@ -294,6 +295,10 @@ void mafRWIBase::OnLeftMouseButtonDown(wxMouseEvent &event)
     e.SetChannel(MCH_OUTPUT);
     if(m_Mouse) 
       m_Mouse->OnEvent(&e);
+    else if (m_Listener)
+    {
+      m_Listener->OnEvent(&e);
+    }
   }
 }
 //----------------------------------------------------------------------------
@@ -321,6 +326,10 @@ void mafRWIBase::OnMiddleMouseButtonDown(wxMouseEvent &event)
     e.SetChannel(MCH_OUTPUT);
     if(m_Mouse) 
       m_Mouse->OnEvent(&e);
+    else if (m_Listener)
+    {
+      m_Listener->OnEvent(&e);
+    }
   }
 }
 //----------------------------------------------------------------------------
@@ -348,6 +357,10 @@ void mafRWIBase::OnRightMouseButtonDown(wxMouseEvent &event)
     e.SetChannel(MCH_OUTPUT);
     if(m_Mouse) 
       m_Mouse->OnEvent(&e);
+    else if (m_Listener)
+    {
+      m_Listener->OnEvent(&e);
+    }
   }
 }
 //----------------------------------------------------------------------------
@@ -377,6 +390,10 @@ void mafRWIBase::OnLeftMouseButtonUp(wxMouseEvent &event)
     e.SetChannel(MCH_OUTPUT);
     if(m_Mouse) 
       m_Mouse->OnEvent(&e);
+    else if (m_Listener)
+    {
+      m_Listener->OnEvent(&e);
+    }
   }
 }
 //----------------------------------------------------------------------------
@@ -406,6 +423,10 @@ void mafRWIBase::OnMiddleMouseButtonUp(wxMouseEvent &event)
     e.SetChannel(MCH_OUTPUT);
     if(m_Mouse) 
       m_Mouse->OnEvent(&e);
+    else if (m_Listener)
+    {
+      m_Listener->OnEvent(&e);
+    }
   }
 }
 //----------------------------------------------------------------------------
@@ -435,6 +456,10 @@ void mafRWIBase::OnRightMouseButtonUp(wxMouseEvent &event)
     e.SetChannel(MCH_OUTPUT);
     if(m_Mouse) 
       m_Mouse->OnEvent(&e);
+    else if (m_Listener)
+    {
+      m_Listener->OnEvent(&e);
+    }
   }
 }
 //----------------------------------------------------------------------------
@@ -470,6 +495,10 @@ void mafRWIBase::OnMouseMotion(wxMouseEvent &event)
     e.SetChannel(MCH_OUTPUT);
     if(m_Mouse) 
       m_Mouse->OnEvent(&e);
+    else if (m_Listener)
+    {
+      m_Listener->OnEvent(&e);
+    }
   }
 }
 //----------------------------------------------------------------------------
