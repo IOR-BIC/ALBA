@@ -90,6 +90,8 @@ SET(PROJECT_SRCS
   mmgPanelStack.h
   mmgPicButton.cpp
   mmgPicButton.h
+  mmgHistogramWidget.cpp
+  mmgHistogramWidget.h
   mmgRangeSlider.cpp
   mmgRangeSlider.h
   mmgSashPanel.cpp
@@ -156,3 +158,4 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
 # this is necessaty to force MFL compilation....
 ##MESSAGE ("${PROJECT_NAME} dependencies: ${MFL_BUILD_TARGETS}")
 ##ADD_DEPENDENCIES(${PROJECT_NAME} ${MFL_BUILD_TARGETS})
+
