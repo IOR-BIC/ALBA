@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-21 13:55:24 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2006-01-27 16:02:49 $
+  Version:   $Revision: 1.16 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,13 +23,14 @@
 #include "mafViewSlice.h"
 #include "mafPipeVolumeSlice.h"
 #include "mmgLutPreset.h"
+#include "mmgHistogramWidget.h"
 #include "mmgGui.h"
 #include "mmgFloatSlider.h"
 #include "mmgLutSlider.h"
 #include "mafVMEVolume.h"
 
 #include "vtkDataSet.h"
-#include "vtkLookupTable.h"
+#include "vtkImageData.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewOrthoSlice);
@@ -41,6 +42,7 @@ mafViewOrthoSlice::mafViewOrthoSlice(wxString label, bool external)
 //----------------------------------------------------------------------------
 {
   m_Luts = NULL;
+  m_Histogram = NULL;
   for (int v=0;v<4;v++)
   {
     m_Views[v] = NULL;
@@ -51,6 +53,7 @@ mafViewOrthoSlice::mafViewOrthoSlice(wxString label, bool external)
   m_ColorLUT= NULL;
   m_CurrentVolume = NULL;
   m_Origin[0] = m_Origin[1] = m_Origin[2] = 0.0;
+  m_ScaleFactor = 0.05;
 }
 //----------------------------------------------------------------------------
 mafViewOrthoSlice::~mafViewOrthoSlice()
@@ -103,7 +106,7 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
       if (m_SliderX)
       {
         double b[6];
-        m_CurrentVolume->GetOutput()->GetVMELocalBounds(b);
+        m_CurrentVolume->GetOutput()->GetVMEBounds(b);
         m_Origin[0] = (b[0]+b[1])*.5;
         m_Origin[1] = (b[2]+b[3])*.5;
         m_Origin[2] = (b[4]+b[5])*.5;
@@ -111,6 +114,12 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
         m_SliderY->SetRange(b[2],b[3],m_Origin[1]);
         m_SliderZ->SetRange(b[4],b[5],m_Origin[2]);
         m_Gui->Update();
+      }
+      vtkImageData *vol = vtkImageData::SafeDownCast(data);
+      if (vol)
+      {
+        m_Histogram->SetData(vol);
+        //m_Histogram->SetScaleFactor(m_ScaleFactor);
       }
     }
     else
@@ -126,9 +135,13 @@ void mafViewOrthoSlice::CreateGuiView()
 //----------------------------------------------------------------------------
 {
   m_GuiView = new mmgGui(this);
+  m_Histogram = new mmgHistogramWidget(m_GuiView,-1,wxPoint(0,0),wxSize(500,100));
+  m_Histogram->SetListener(this);
+  
   m_Luts = new mmgLutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
   EnableWidgets(m_CurrentVolume != NULL);
   m_Luts->SetListener(this);
+  m_GuiView->Add(m_Histogram);
   m_GuiView->Add(m_Luts);
   m_GuiView->Reparent(m_Win);
 }
@@ -149,6 +162,9 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
       CameraUpdate();
     }
   	break;
+    case ID_HISTOGRAM_SCALE_FACTOR:
+      m_Histogram->SetScaleFactor(m_ScaleFactor);
+    break;
     case ID_LUT_CHOOSER:
     {
       for(int i=0; i<m_NumOfChildView; i++)
@@ -199,6 +215,7 @@ mmgGui* mafViewOrthoSlice::CreateGui()
     lutPreset(4,m_ColorLUT);
   }
   m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
+  m_Gui->Double(ID_HISTOGRAM_SCALE_FACTOR,"scale",&m_ScaleFactor,0.0000000001,MAXDOUBLE,-1);
 
   EnableWidgets(m_CurrentVolume != NULL);
   for(int i=1; i<m_NumOfChildView; i++)
@@ -232,6 +249,9 @@ void mafViewOrthoSlice::EnableWidgets(bool enable)
     m_Gui->Enable(ID_ORTHO_SLICE_Y,enable);
     m_Gui->Enable(ID_ORTHO_SLICE_Z,enable);
     m_Gui->Enable(ID_LUT_CHOOSER,enable);
+    m_Gui->Enable(ID_HISTOGRAM_SCALE_FACTOR,enable);
   }
   m_Luts->Enable(enable);
+  m_Histogram->Enable(enable);
+  m_Histogram->Show(enable);
 }
