@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIChild.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-30 13:22:50 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2006-01-30 15:00:39 $
+  Version:   $Revision: 1.19 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -98,7 +98,7 @@ void mmgMDIChild::OnSize(wxSizeEvent &event)
 #ifndef WIN32
   if(m_View)
   {
-    m_View->SetWindowSize(w-15,h-15);
+    m_View->SetWindowSize(w,h);
   }
 #endif
 }
