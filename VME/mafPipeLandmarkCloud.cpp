@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeLandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-15 15:26:37 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-01-30 12:08:08 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,8 +21,11 @@
 
 #include "mafPipeLandmarkCloud.h"
 #include "mafSceneNode.h"
-#include "mmaMaterial.h"
+#include "mmgGui.h"
+#include "mmgMaterialButton.h"
 #include "mafEventSource.h"
+#include "mmaMaterial.h"
+
 #include "mafVMELandmark.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMEOutput.h"
@@ -50,7 +53,11 @@ mafPipeLandmarkCloud::mafPipeLandmarkCloud()
 {
   m_Landmark = NULL;
   m_Cloud    = NULL;
+  m_MaterialButton  = NULL;
+
   m_Radius = 1.0;
+  m_ScalarVisibility = 0;
+  m_RenderingDisplayListFlag = 0;
 }
 //----------------------------------------------------------------------------
 void mafPipeLandmarkCloud::Create(mafSceneNode *n)
@@ -131,6 +138,20 @@ void mafPipeLandmarkCloud::Select(bool sel)
     m_CloudSelectionActor->SetVisibility(sel);
 }
 //----------------------------------------------------------------------------
+mmgGui *mafPipeLandmarkCloud::CreateGui()
+//----------------------------------------------------------------------------
+{
+  assert(m_Gui == NULL);
+  m_Gui = new mmgGui(this);
+  m_Gui->Bool(ID_SCALAR_VISIBILITY,"scalar vis.", &m_ScalarVisibility,0,"turn on/off the scalar visibility");
+  m_Gui->Divider();
+  m_MaterialButton = new mmgMaterialButton(m_Vme,this);
+  m_Gui->AddGui(m_MaterialButton->GetGui());
+  m_Gui->Bool(ID_RENDERING_DISPLAY_LIST,"display list",&m_RenderingDisplayListFlag,0,"turn on/off \nrendering displaylist calculation");
+
+  return m_Gui;
+}
+//----------------------------------------------------------------------------
 void mafPipeLandmarkCloud::UpdateProperty(bool fromTag)
 //----------------------------------------------------------------------------
 {
@@ -160,6 +181,30 @@ void mafPipeLandmarkCloud::OnEvent(mafEventBase *maf_event)
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
+    switch(e->GetId()) 
+    {
+      case ID_SCALAR_VISIBILITY:
+      {
+        m_CloudMapper->SetScalarVisibility(m_ScalarVisibility);
+        if (m_ScalarVisibility)
+        {
+          vtkPolyData *data = (vtkPolyData *)m_Vme->GetOutput()->GetVTKData();
+          if(data == NULL) return;
+          double range[2];
+          data->GetScalarRange(range);
+          m_CloudMapper->SetScalarRange(range);
+        }
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+      }
+      break;
+      case ID_RENDERING_DISPLAY_LIST:
+        m_CloudMapper->SetImmediateModeRendering(m_RenderingDisplayListFlag);
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+      break;
+      default:
+        mafEventMacro(*e);
+      break;
+    }
   }
   else if (maf_event->GetId() == mafVMELandmarkCloud::CLOUDE_OPEN_CLOSE)
   {
