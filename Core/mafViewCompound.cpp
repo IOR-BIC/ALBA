@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-20 16:49:21 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2006-01-30 15:01:14 $
+  Version:   $Revision: 1.19 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -317,10 +317,16 @@ void mafViewCompound::OnLayout()
         if (i == m_SubViewMaximized)
         {
           m_ChildViewList[m_SubViewMaximized]->GetWindow()->SetSize(0,0,sw,sh);
+					#ifndef WIN32
+						m_ChildViewList[m_SubViewMaximized]->SetWindowSize(sw,sh);
+					#endif
         }
         else
         {
           m_ChildViewList[i]->GetWindow()->SetSize(0,0,0,0);
+					#ifndef WIN32
+						m_ChildViewList[i]->SetWindowSize(0,0);
+					#endif
         }
         i++;
       }
@@ -348,6 +354,9 @@ void mafViewCompound::LayoutSubView(int width, int height)
         x_pos = c*(step_width + border);
         y_pos = r*(step_height + border);
         m_ChildViewList[i]->GetWindow()->SetSize(x_pos,y_pos,step_width,step_height);
+				#ifndef WIN32
+					m_ChildViewList[i]->SetWindowSize(step_width,step_height);
+				#endif
         i++;
       }
     }
@@ -357,12 +366,18 @@ void mafViewCompound::LayoutSubView(int width, int height)
     int step_width  = (width-border)  / (m_NumOfChildView - 1);
     int step_height = (height-2*border)/ 3*2;
     m_ChildViewList[0]->GetWindow()->SetSize(0,0,width,step_height);
+		#ifndef WIN32
+			m_ChildViewList[0]->SetWindowSize(step_width,step_height);
+		#endif
     i = 1;
     for (c = 0; c < m_NumOfChildView - 1; c++)
     {
       x_pos = c*(step_width + border);
       y_pos = step_height;
       m_ChildViewList[i]->GetWindow()->SetSize(x_pos,y_pos,step_width,height - step_height);
+			#ifndef WIN32
+				m_ChildViewList[i]->SetWindowSize(step_width,step_height);
+			#endif
       i++;
     }
   }
@@ -371,12 +386,18 @@ void mafViewCompound::LayoutSubView(int width, int height)
     int step_width  = (width-border)  / 3*2;
     int step_height = (height-2*border)/ (m_NumOfChildView - 1);
     m_ChildViewList[0]->GetWindow()->SetSize(0,0,step_width, height);
+		#ifndef WIN32
+			m_ChildViewList[0]->SetWindowSize(step_width,step_height);
+		#endif
     i = 1;
     for (r = 0; r < m_NumOfChildView - 1; r++)
     {
       x_pos = step_width;
       y_pos = r*(step_height + border);
       m_ChildViewList[i]->GetWindow()->SetSize(x_pos,y_pos,width - step_width,step_height);
+				#ifndef WIN32
+					m_ChildViewList[i]->SetWindowSize(step_width,step_height);
+				#endif
       i++;
     }
   }
