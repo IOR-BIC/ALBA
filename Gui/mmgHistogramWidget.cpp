@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgHistogramWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2006-01-27 16:02:23 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2006-01-30 08:22:49 $
+Version:   $Revision: 1.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -39,6 +39,9 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkRenderer.h"
 #include "vtkDataArray.h"
 #include "vtkPointData.h"
+#include "vtkTextMapper.h"
+#include "vtkTextProperty.h"
+#include "vtkProperty2D.h"
 
 //----------------------------------------------------------------------------
 mmgHistogramWidget::mmgHistogramWidget(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
@@ -49,12 +52,30 @@ mmgHistogramWidget::mmgHistogramWidget(wxWindow* parent, wxWindowID id, const wx
   m_PlotActor   = NULL;
   m_Accumulate  = NULL;
   m_Glyph       = NULL;
+  m_TextMapper  = NULL;
+  m_TextActor   = NULL;
 
-  m_ScaleFactor = 1.0;
-  m_NumberOfBins= 1;
+  m_ScaleFactor     = 1.0;
+  m_NumberOfBins    = 1;
+  m_HisctogramValue = 0;
   
   m_AutoscaleHistogram = true;
   
+  vtkNEW(m_TextMapper);
+  m_TextMapper->SetInput(mafString(m_HisctogramValue).GetCStr());
+  m_TextMapper->GetTextProperty()->AntiAliasingOff();
+  m_TextMapper->GetTextProperty()->SetFontFamily(VTK_TIMES);
+  m_TextMapper->GetTextProperty()->SetColor(0,0,0.8);
+  m_TextMapper->GetTextProperty()->SetLineOffset(0.5);
+  m_TextMapper->GetTextProperty()->SetLineSpacing(1.5);
+  m_TextMapper->GetTextProperty()->SetJustificationToRight();
+  m_TextMapper->GetTextProperty()->SetVerticalJustificationToTop();
+
+  vtkNEW(m_TextActor);
+  m_TextActor->SetMapper(m_TextMapper);
+  m_TextActor->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
+  m_TextActor->SetPosition(1, 1);
+
   // Create Histogram pipeline
   vtkNEW(m_Accumulate);
   vtkNEW(m_ChangeInfo);
@@ -86,6 +107,8 @@ mmgHistogramWidget::mmgHistogramWidget(wxWindow* parent, wxWindowID id, const wx
   m_HistogramRWI->m_RwiBase->SetListener(this);
   m_HistogramRWI->m_RwiBase->Show(true);
 
+  m_HistogramRWI->m_RenFront->AddActor(m_TextActor);
+
   wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
   sizer->Add(m_HistogramRWI->m_RwiBase,1, wxEXPAND);
 
@@ -100,6 +123,9 @@ mmgHistogramWidget::~mmgHistogramWidget()
 //----------------------------------------------------------------------------
 {
   m_HistogramRWI->m_RenFront->RemoveActor(m_PlotActor);
+  m_HistogramRWI->m_RenFront->RemoveActor(m_TextActor);
+  vtkDEL(m_TextMapper);
+  vtkDEL(m_TextActor);
   vtkDEL(m_Accumulate);
   vtkDEL(m_Glyph);
   vtkDEL(m_PlotActor);
@@ -120,8 +146,14 @@ void mmgHistogramWidget::OnEvent( mafEventBase *event )
   }
   else if (mafEventInteraction *ei = mafEventInteraction::SafeDownCast(event))
   {
+    int x_size, idx;
     double pos[2];
     ei->Get2DPosition(pos);
+    x_size = GetSize().GetWidth();
+    idx = (pos[0]/x_size) * m_NumberOfBins;
+    m_HisctogramValue = m_Accumulate->GetOutput()->GetPointData()->GetScalars()->GetTuple1(idx);
+    m_TextMapper->SetInput(mafString(m_HisctogramValue).GetCStr());
+    m_HistogramRWI->CameraUpdate();
   }
 }
 //----------------------------------------------------------------------------
