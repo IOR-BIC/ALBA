@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutSwatch.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-21 13:51:46 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-01-30 13:53:11 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -44,7 +44,7 @@ BEGIN_EVENT_TABLE(mmgLutSwatch,wxPanel)
   EVT_ERASE_BACKGROUND(mmgLutSwatch::OnEraseBackground) 
 
   EVT_LEFT_DOWN(mmgLutSwatch::OnLeftMouseButtonDown)
-  //EVT_LEFT_UP(mmgLutSwatch::OnLeftMouseButtonUp)
+  EVT_LEFT_UP(mmgLutSwatch::OnLeftMouseButtonUp)
   EVT_MOTION(mmgLutSwatch::OnMouseMotion)
 END_EVENT_TABLE()
 
@@ -113,14 +113,12 @@ void mmgLutSwatch::OnLeftMouseButtonDown(wxMouseEvent &event)
   //notify the user
   mafEventMacro(mafEvent(this,GetId()));
 }
-/*
 //----------------------------------------------------------------------------
 void mmgLutSwatch::OnLeftMouseButtonUp(wxMouseEvent &event)
 //----------------------------------------------------------------------------
 {
-  ReleaseMouse();  
+  if(GetCapture() == this) ReleaseMouse();  
 }
-*/
 //----------------------------------------------------------------------------
 void mmgLutSwatch::OnMouseMotion(wxMouseEvent &event)
 //----------------------------------------------------------------------------
@@ -134,20 +132,20 @@ void mmgLutSwatch::OnMouseMotion(wxMouseEvent &event)
   // this is to simulate the non-existing event "MouseLeave"
   if(! m_MouseInWindow )
   {
-    CaptureMouse();
+//    CaptureMouse();   // Paolo 30/01/2006 
     m_MouseInWindow = true;
   }
   else
   {
     if( x<0 || x>w || y<0 || y>h )
     {
-      ReleaseMouse();  
+//      if(GetCapture() == this) ReleaseMouse();  // Paolo 30/01/2006 
       m_MouseInWindow = false;
       Refresh();
     }
   }
-
-  //alter the tooltip text according to mouse position
+  
+	//alter the tooltip text according to mouse position
   if(m_Lut && m_MouseInWindow ) 
   {
     double *range = m_Lut->GetRange();

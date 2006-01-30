@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutSwatch.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 16:19:22 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-01-30 13:53:11 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -45,7 +45,7 @@ protected:
   void Update();                
 
   void OnLeftMouseButtonDown(wxMouseEvent &event);
-  //void OnLeftMouseButtonUp(wxMouseEvent &event);
+  void OnLeftMouseButtonUp(wxMouseEvent &event);
   void OnMouseMotion(wxMouseEvent &event);
   
   // widgets
