@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTextKit.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 14:54:13 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-01-30 18:21:45 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,11 +43,13 @@ mafTextKit::mafTextKit(wxWindow* parent, vtkRenderer *renderer, mafObserver *Lis
   m_TextAlign = 0;
   m_TextOffset = 0;
   m_TextInView = "";
+  m_TextSize = 12;
   
   vtkNEW(m_TextMapper);
   m_TextMapper->SetInput(m_TextInView.GetCStr());
-  m_TextMapper->GetTextProperty()->AntiAliasingOff();
-  m_TextMapper->GetTextProperty()->SetFontFamily(VTK_TIMES);
+  m_TextMapper->GetTextProperty()->AntiAliasingOn();
+  m_TextMapper->GetTextProperty()->SetFontFamily(VTK_ARIAL);
+  m_TextMapper->GetTextProperty()->SetFontSize(24);
   m_TextMapper->GetTextProperty()->SetColor(0.8,0.8,0.8);
   m_TextMapper->GetTextProperty()->SetLineOffset(0.5);
   m_TextMapper->GetTextProperty()->SetLineSpacing(1.5);
@@ -86,14 +88,17 @@ enum TEXT_KIT_WIDGET_ID
   ID_SHOW_TEXT,
   ID_TEXT_POSITION,
   ID_TEXT_COLOR,
-  ID_TEXT_ALIGN
+  ID_TEXT_ALIGN,
+  ID_TEXT_SIZE
 };
 //----------------------------------------------------------------------------
 void mafTextKit::CreateGui()
 //----------------------------------------------------------------------------
 {
-  wxString align[4] = {"upper left","upper right","lower left","lower right"};
-  
+  wxString align[9] = {"upper left","upper center","upper right",
+                       "center left","center","center right",
+                       "lower left","lower center","lower right"};
+
   m_Gui = new mmgGui(this);
 	m_Gui->Show(true);
   m_Gui->Label("Text kit",true);
@@ -102,7 +107,8 @@ void mafTextKit::CreateGui()
   m_Gui->Button(ID_NLINE_TEXT_IN_VIEW,"edit","n-line text");
 
   m_Gui->Color(ID_TEXT_COLOR,"color",&m_TextColor);
-  m_Gui->Combo(ID_TEXT_ALIGN,"align",&m_TextAlign,4,align,"Align text inside the view");
+  m_Gui->Combo(ID_TEXT_ALIGN,"align",&m_TextAlign,9,align,"Align text inside the view");
+  m_Gui->Integer(ID_TEXT_SIZE,"font size",&m_TextSize,1,300);
 	m_Gui->Update();
 }
 //----------------------------------------------------------------------------
@@ -136,6 +142,11 @@ void mafTextKit::OnEvent(mafEventBase *maf_event)
       case ID_TEXT_ALIGN:
         SetTextAlignment(m_TextAlign);
       break;
+      case ID_TEXT_SIZE:
+        SetTextSize(m_TextSize);
+      break;
+      
+
     }
     mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 	}
@@ -178,32 +189,68 @@ void mafTextKit::SetTextPosition(double nv_x, double nv_y)
 void mafTextKit::SetTextAlignment(int align)
 //----------------------------------------------------------------------------
 {
+  m_TextAlign = align;
+
   switch(align)
   {
+    case UPPER_LEFT:
+      m_TextMapper->GetTextProperty()->SetJustificationToLeft();
+      m_TextMapper->GetTextProperty()->SetVerticalJustificationToTop();
+      SetTextPosition(0.01,1);
+    break;
+    case UPPER_CENTER:
+      m_TextMapper->GetTextProperty()->SetJustificationToCentered ();
+      m_TextMapper->GetTextProperty()->SetVerticalJustificationToTop();
+      SetTextPosition(0.5,1);
+    break;
     case UPPER_RIGHT:
-      m_TextAlign = align;
       m_TextMapper->GetTextProperty()->SetJustificationToRight();
       m_TextMapper->GetTextProperty()->SetVerticalJustificationToTop();
       SetTextPosition(1,1);
-  	break;
+    break;
+
+    case CENTER_LEFT:
+      m_TextMapper->GetTextProperty()->SetJustificationToLeft();
+      m_TextMapper->GetTextProperty()->SetVerticalJustificationToCentered();
+      SetTextPosition(0.01,0.5);
+    break;
+    case CENTER_CENTER:
+      m_TextMapper->GetTextProperty()->SetJustificationToCentered ();
+      m_TextMapper->GetTextProperty()->SetVerticalJustificationToCentered();
+      SetTextPosition(0.5,0.5);
+    break;
+    case CENTER_RIGHT:
+      m_TextMapper->GetTextProperty()->SetJustificationToRight();
+      m_TextMapper->GetTextProperty()->SetVerticalJustificationToCentered();
+      SetTextPosition(1,0.5);
+    break;
+
     case LOWER_LEFT:
-      m_TextAlign = align;
       m_TextMapper->GetTextProperty()->SetJustificationToLeft();
       m_TextMapper->GetTextProperty()->SetVerticalJustificationToBottom();
-      SetTextPosition(0,0.01);
-    break;
+      SetTextPosition(0.01,0.01);
+      break;
+    case LOWER_CENTER:
+      m_TextMapper->GetTextProperty()->SetJustificationToCentered ();
+      m_TextMapper->GetTextProperty()->SetVerticalJustificationToBottom();
+      SetTextPosition(0.5,0.01);
+      break;
     case LOWER_RIGHT:
-      m_TextAlign = align;
       m_TextMapper->GetTextProperty()->SetJustificationToRight();
       m_TextMapper->GetTextProperty()->SetVerticalJustificationToBottom();
       SetTextPosition(1,0.01);
-    break;
+      break;
+
     default:
-      // UPPER_LEFT
-      m_TextAlign = align;
-      m_TextMapper->GetTextProperty()->SetJustificationToLeft();
-      m_TextMapper->GetTextProperty()->SetVerticalJustificationToTop();
-      SetTextPosition(0,1);
+      // incorrect value passed -> set to default 
+      SetTextAlignment(UPPER_LEFT);
     break;
   }
+}
+//----------------------------------------------------------------------------
+void mafTextKit::SetTextSize(int size)
+//----------------------------------------------------------------------------
+{
+    m_TextSize = size;
+    m_TextMapper->GetTextProperty()->SetFontSize(size);
 }

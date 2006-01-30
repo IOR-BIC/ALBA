@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTextKit.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 14:54:13 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-01-30 18:21:45 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -46,8 +46,13 @@ public:
   enum TEXT_KIT_ALIGN_MODALITY
   {
     UPPER_LEFT = 0,
+    UPPER_CENTER,
     UPPER_RIGHT,
+    CENTER_LEFT,
+    CENTER_CENTER,
+    CENTER_RIGHT,
     LOWER_LEFT,
+    LOWER_CENTER,
     LOWER_RIGHT
   };
 
@@ -65,6 +70,10 @@ public:
   void SetTextColor(int textColorRed,int textColorGreen,int textColorBlue );
 
   /** 
+  Allow to change the font size */
+  void SetTextSize(int size);
+
+  /** 
   Align text into the render window.*/
   void SetTextAlignment(int align = UPPER_LEFT);
 
@@ -79,6 +88,7 @@ protected:
 
   int m_ShowText;
   int m_TextAlign;
+  int m_TextSize; 
   double m_TextPosition[2]; ///< Position of the text in normalized view coordinate system. (0,0) is the lower left corner.
   mafString m_TextInView; ///< Text visualized inside the view.
   double m_TextOffset; ///< Offset in positioning the text
