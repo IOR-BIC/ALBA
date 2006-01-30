@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutSwatch.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-30 13:53:11 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-01-30 14:17:52 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -105,6 +105,13 @@ void mmgLutSwatch::OnLeftMouseButtonDown(wxMouseEvent &event)
 {
   if( m_Lut && m_Editable  )
   {
+    if(m_MouseInWindow )
+    {
+      if(GetCapture() == this) ReleaseMouse();  
+      m_MouseInWindow = false;
+      Refresh();
+    }
+
     mmgLutEditor::ShowLutDialog(m_Lut,m_Listener, GetId() );
     Update();
     Refresh();
@@ -117,7 +124,6 @@ void mmgLutSwatch::OnLeftMouseButtonDown(wxMouseEvent &event)
 void mmgLutSwatch::OnLeftMouseButtonUp(wxMouseEvent &event)
 //----------------------------------------------------------------------------
 {
-  if(GetCapture() == this) ReleaseMouse();  
 }
 //----------------------------------------------------------------------------
 void mmgLutSwatch::OnMouseMotion(wxMouseEvent &event)
@@ -132,14 +138,14 @@ void mmgLutSwatch::OnMouseMotion(wxMouseEvent &event)
   // this is to simulate the non-existing event "MouseLeave"
   if(! m_MouseInWindow )
   {
-//    CaptureMouse();   // Paolo 30/01/2006 
+    CaptureMouse();   // Paolo 30/01/2006 
     m_MouseInWindow = true;
   }
   else
   {
     if( x<0 || x>w || y<0 || y>h )
     {
-//      if(GetCapture() == this) ReleaseMouse();  // Paolo 30/01/2006 
+      if(GetCapture() == this) ReleaseMouse();  // Paolo 30/01/2006 
       m_MouseInWindow = false;
       Refresh();
     }
