@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgLutWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2005-12-19 16:19:22 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2006-01-30 13:54:41 $
+Version:   $Revision: 1.4 $
 Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -396,7 +396,7 @@ void mmgLutWidget::OnMouseMotion(wxMouseEvent &event)
 void mmgLutWidget::OnLeftMouseButtonUp(wxMouseEvent &event)
 //----------------------------------------------------------------------------
 {
-  ReleaseMouse();
+  if(GetCapture() == this) ReleaseMouse();
   m_SelectionRowMin=m_SelectionColMin=m_SelectionRowMax=m_SelectionColMax=-1;
 
   if(m_Dragging)
