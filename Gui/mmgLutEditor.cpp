@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-17 11:15:39 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-01-30 13:52:21 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -61,6 +61,14 @@ enum
   ID_CANCEL,
   ID_APPLY,
 };
+
+//----------------------------------------------------------------------------
+// mmgLutEditor
+//----------------------------------------------------------------------------
+BEGIN_EVENT_TABLE(mmgLutEditor,wxPanel)
+  EVT_COMBOBOX(ID_PRESET, mmgLutEditor::OnComboSelection)
+END_EVENT_TABLE()
+
 //----------------------------------------------------------------------------
 mmgLutEditor::mmgLutEditor(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
 :wxPanel(parent,id,pos,size,style)         
@@ -199,8 +207,22 @@ mmgLutEditor::mmgLutEditor(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 mmgLutEditor::~mmgLutEditor()
 //----------------------------------------------------------------------------
 {
-  if(m_Lut) m_Lut->Delete();
+  if(m_Lut) 
+	{
+		m_Lut->Delete();
+		m_Lut = NULL;
+	}
 }
+//----------------------------------------------------------------------------
+void mmgLutEditor::OnComboSelection(wxCommandEvent &event)
+//----------------------------------------------------------------------------
+{
+	lutPreset( m_Preset, m_Lut);
+	m_NumEntry      = m_Lut->GetNumberOfTableValues();
+	m_LutWidget->SetLut(m_Lut);
+	m_LutSwatch->SetLut(m_Lut);
+}
+
 //----------------------------------------------------------------------------
 void mmgLutEditor::OnEvent( mafEventBase *event )
 //----------------------------------------------------------------------------
@@ -211,11 +233,8 @@ void mmgLutEditor::OnEvent( mafEventBase *event )
 	  {
       case ID_PRESET:
       {
-        lutPreset( m_Preset, m_Lut);
-        m_NumEntry      = m_Lut->GetNumberOfTableValues();
-        m_LutWidget->SetLut(m_Lut);
-        m_LutSwatch->SetLut(m_Lut);
-        TransferDataToWindow();
+				//Paolo 30/01/2006
+				//code moved into OnComboSelection to avoid application stuck on preset selection
       }
       break; 
       case ID_NUMENTRY:
@@ -336,7 +355,7 @@ void mmgLutEditor::CopyLut(vtkLookupTable *from, vtkLookupTable *to)
 void mmgLutEditor::ShowLutDialog(vtkLookupTable *lut, mafObserver *listener, int id)
 //----------------------------------------------------------------------------
 {
-  long style = wxDIALOG_MODAL | wxDEFAULT_DIALOG_STYLE /*| wxTHICK_FRAME*/ | wxNO_FULL_REPAINT_ON_RESIZE | wxCLIP_CHILDREN;
+  long style = /*wxDIALOG_MODAL |*/ wxDEFAULT_DIALOG_STYLE | /*wxSTAY_ON_TOP |*/ wxNO_FULL_REPAINT_ON_RESIZE | wxCLIP_CHILDREN;
   wxDialog *dlg = new wxDialog(NULL, -1, "LutEditor", wxDefaultPosition, wxSize(300,670),	style);
   
   mmgLutEditor *led = new mmgLutEditor(dlg, id);

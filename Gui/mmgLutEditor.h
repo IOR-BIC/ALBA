@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutEditor.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-17 11:15:39 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-01-30 13:52:21 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -55,6 +55,7 @@ protected:
 
   void UpdateInfo();
   void CopyLut(vtkLookupTable *from, vtkLookupTable *to);
+	void OnComboSelection(wxCommandEvent &event);
   
   mafObserver *m_Listener;
 
@@ -72,6 +73,6 @@ protected:
 
   vtkLookupTable *m_ExternalLut;  // given lut that will be modified by "ok" or "apply"
   vtkLookupTable *m_Lut;           // internal lut -- initialized in SetLut
+  DECLARE_EVENT_TABLE()
 };
 #endif
-
