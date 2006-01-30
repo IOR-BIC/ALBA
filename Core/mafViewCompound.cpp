@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-30 15:01:14 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2006-01-30 15:13:39 $
+  Version:   $Revision: 1.20 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -367,7 +367,7 @@ void mafViewCompound::LayoutSubView(int width, int height)
     int step_height = (height-2*border)/ 3*2;
     m_ChildViewList[0]->GetWindow()->SetSize(0,0,width,step_height);
 		#ifndef WIN32
-			m_ChildViewList[0]->SetWindowSize(step_width,step_height);
+			m_ChildViewList[0]->SetWindowSize(width,step_height);
 		#endif
     i = 1;
     for (c = 0; c < m_NumOfChildView - 1; c++)
@@ -376,7 +376,7 @@ void mafViewCompound::LayoutSubView(int width, int height)
       y_pos = step_height;
       m_ChildViewList[i]->GetWindow()->SetSize(x_pos,y_pos,step_width,height - step_height);
 			#ifndef WIN32
-				m_ChildViewList[i]->SetWindowSize(step_width,step_height);
+				m_ChildViewList[i]->SetWindowSize(step_width,height - step_height);
 			#endif
       i++;
     }
@@ -387,7 +387,7 @@ void mafViewCompound::LayoutSubView(int width, int height)
     int step_height = (height-2*border)/ (m_NumOfChildView - 1);
     m_ChildViewList[0]->GetWindow()->SetSize(0,0,step_width, height);
 		#ifndef WIN32
-			m_ChildViewList[0]->SetWindowSize(step_width,step_height);
+			m_ChildViewList[0]->SetWindowSize(step_width,height);
 		#endif
     i = 1;
     for (r = 0; r < m_NumOfChildView - 1; r++)
@@ -396,7 +396,7 @@ void mafViewCompound::LayoutSubView(int width, int height)
       y_pos = r*(step_height + border);
       m_ChildViewList[i]->GetWindow()->SetSize(x_pos,y_pos,width - step_width,step_height);
 				#ifndef WIN32
-					m_ChildViewList[i]->SetWindowSize(step_width,step_height);
+					m_ChildViewList[i]->SetWindowSize(width - step_width,step_height);
 				#endif
       i++;
     }
