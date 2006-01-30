@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-26 08:53:03 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-01-30 11:46:54 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -52,6 +52,7 @@ public:
 protected:
 	/** Move the camera to the target position */
 	void FlyTo();
+  void FlyTo2(); /// silvano backup
 
 	/** Store a view position into the root's tag array */
 	void StoreViewPoint();

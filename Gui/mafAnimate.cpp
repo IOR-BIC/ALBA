@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-26 08:53:03 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-01-30 11:46:54 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -28,6 +28,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafTagArray.h"
 #include "mafTagItem.h"
 
+#include "vtkMath.h"
 #include "vtkCamera.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
@@ -174,6 +175,84 @@ void mafAnimate::EnableWidgets()
 void mafAnimate::FlyTo()
 //----------------------------------------------------------------------------
 {
+  assert(m_Tags && m_Renderer && m_PositionList);
+  m_SelectedPosition = m_PositionList->GetStringSelection();
+  wxString flyto_tagName = "FLY_TO_" + m_SelectedPosition;
+  mafTagItem *item = m_Tags->GetTag(flyto_tagName.c_str());
+  if(item == NULL)
+    item = m_Tags->GetTag(m_SelectedPosition.c_str()); // support old style
+
+  vtkCamera *camera = m_Renderer->GetActiveCamera();
+  m_Renderer->GetRenderWindow()->SetSize(800,600);  // to be removed
+
+  double fly0[10]; // from
+  double fly1[10]; // to
+  double fly [10]; // interpolated position
+
+  fly0[0] = camera->GetFocalPoint()[0];
+  fly0[1] = camera->GetFocalPoint()[1];
+  fly0[2] = camera->GetFocalPoint()[2];
+  fly0[3] = camera->GetPosition()[0];
+  fly0[4] = camera->GetPosition()[1];
+  fly0[5] = camera->GetPosition()[2];
+  fly0[6] = camera->GetViewUp()[0];
+  fly0[7] = camera->GetViewUp()[1];
+  fly0[8] = camera->GetViewUp()[2];
+  fly0[9] = camera->GetParallelScale();
+
+  fly1[0] = item->GetComponentAsDouble(0);
+  fly1[1] = item->GetComponentAsDouble(1);
+  fly1[2] = item->GetComponentAsDouble(2);
+  fly1[3] = item->GetComponentAsDouble(3);
+  fly1[4] = item->GetComponentAsDouble(4);
+  fly1[5] = item->GetComponentAsDouble(5);
+  fly1[6] = item->GetComponentAsDouble(6);
+  fly1[7] = item->GetComponentAsDouble(7);
+  fly1[8] = item->GetComponentAsDouble(8);
+  fly1[9] =(item->GetNumberOfComponents() == 10) ? item->GetComponentAsDouble(9) : fly0[9];
+
+  int numSteps = 30;
+  int rate = 15;
+  double pi = vtkMath::Pi();
+
+  if(m_AnimateFlag)
+  {
+    //m_Renderer->GetRenderWindow()->SetDesiredUpdateRate(rate);  // SIL ??
+
+    for (int i = 0; i <= numSteps; i++)
+    {
+      double t  = ( i * 1.0 ) / numSteps;
+      double t2 = 0.5 + 0.5 * sin( t*pi - pi/2 );
+      //wxLogMessage("t=%g; \t t2=%g",t,t2);
+
+      for(int j = 0; j < 10 ; j ++ ) 
+      {
+        fly[j] = (1-t2) * fly0[j] + t2 * fly1[j];
+      }
+
+      camera->SetFocalPoint(fly[0],fly[1],fly[2]);
+      camera->SetPosition(fly[3],fly[4],fly[5]);
+      camera->SetViewUp(fly[6],fly[7],fly[8]);
+      camera->SetParallelScale(fly[9]);
+
+      mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+    }
+  }
+  else
+  {
+    camera->SetFocalPoint(fly1[0],fly1[1],fly1[2]);
+    camera->SetPosition(fly1[3],fly1[4],fly1[5]);
+    camera->SetViewUp(fly1[6],fly1[7],fly1[8]);
+    camera->SetParallelScale(fly1[9]);
+    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+  }
+  m_Renderer->ResetCameraClippingRange();
+}
+/*
+//----------------------------------------------------------------------------
+void mafAnimate::FlyTo()
+//----------------------------------------------------------------------------
+{
 	assert(m_Tags && m_Renderer && m_PositionList);
 	m_SelectedPosition = m_PositionList->GetStringSelection();
 	wxString flyto_tagName = "FLY_TO_" + m_SelectedPosition;
@@ -239,6 +318,7 @@ void mafAnimate::FlyTo()
 		dy_pos = fly[4] - camFrom[1];
 		dz_pos = fly[5] - camFrom[2];
 		distance_pos = sqrt(dx_pos * dx_pos + dy_pos * dy_pos + dz_pos * dz_pos); 
+
     if (mafEquals(distance_pos, 0.0))
     {
       dx_pos = 0.0;
@@ -256,6 +336,7 @@ void mafAnimate::FlyTo()
 		dy_vup = fly[7] - viewUpFrom[1];
 		dz_vup = fly[8] - viewUpFrom[2];
 		distance_vup = sqrt(dx_vup * dx_vup + dy_vup * dy_vup + dz_vup * dz_vup); 
+
     if (mafEquals(distance_vup, 0.0))
     {
       dx_vup = 0.0;
@@ -277,14 +358,18 @@ void mafAnimate::FlyTo()
 			double focalX = flyFrom[0] + dx_fp * i * delta_fp;
 			double focalY = flyFrom[1] + dy_fp * i * delta_fp;
 			double focalZ = flyFrom[2] + dz_fp * i * delta_fp;
-			double posX = camFrom[0] + dx_pos * i * delta_pos;
+
+      double posX = camFrom[0] + dx_pos * i * delta_pos;
 			double posY = camFrom[1] + dy_pos * i * delta_pos;
 			double posZ = camFrom[2] + dz_pos * i * delta_pos;
-			double vx = viewUpFrom[0] + dx_vup * i * delta_vup;
+
+      double vx = viewUpFrom[0] + dx_vup * i * delta_vup;
 			double vy = viewUpFrom[1] + dy_vup * i * delta_vup;
 			double vz = viewUpFrom[2] + dz_vup * i * delta_vup;
+
       double ps = parScaleFrom + i * delta_par_scale;
-			camera->SetFocalPoint(focalX, focalY, focalZ);
+
+      camera->SetFocalPoint(focalX, focalY, focalZ);
 			camera->SetPosition(posX, posY, posZ); 
 			camera->SetViewUp(vx, vy, vz);
       camera->SetParallelScale(ps);
@@ -301,6 +386,7 @@ void mafAnimate::FlyTo()
 	}
   m_Renderer->ResetCameraClippingRange();
 }
+*/
 //----------------------------------------------------------------------------
 void mafAnimate::StoreViewPoint()
 //----------------------------------------------------------------------------
