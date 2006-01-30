@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-27 16:01:52 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-01-30 14:31:22 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -52,7 +52,7 @@ mafRWIBase behave differently, and you
 must explicitly destroy them by calling "Delete()"
 BEFORE wxWindow destroy it (using "delete"). 
 */
-class mafRWIBase : public wxScrolledWindow, virtual public vtkRenderWindowInteractor
+class mafRWIBase : public wxWindow, virtual public vtkRenderWindowInteractor
 {
   DECLARE_DYNAMIC_CLASS(mafRWIBase)
 

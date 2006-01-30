@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-27 16:01:52 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2006-01-30 14:31:22 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -63,9 +63,9 @@
 #include "vtkImageAppend.h"
 
 //----------------------------------------------------------------------------
-IMPLEMENT_DYNAMIC_CLASS(mafRWIBase, wxScrolledWindow)
+IMPLEMENT_DYNAMIC_CLASS(mafRWIBase, wxWindow)
 //----------------------------------------------------------------------------
-BEGIN_EVENT_TABLE(mafRWIBase, wxScrolledWindow)
+BEGIN_EVENT_TABLE(mafRWIBase, wxWindow)
   EVT_PAINT(mafRWIBase::OnPaint)
   EVT_ERASE_BACKGROUND(mafRWIBase::OnEraseBackground)
   EVT_LEFT_DOWN(mafRWIBase::OnLeftMouseButtonDown)
@@ -83,14 +83,14 @@ BEGIN_EVENT_TABLE(mafRWIBase, wxScrolledWindow)
   EVT_IDLE(mafRWIBase::OnIdle)
 END_EVENT_TABLE()
 //----------------------------------------------------------------------------
-mafRWIBase::mafRWIBase() : wxScrolledWindow(), vtkRenderWindowInteractor(), timer(this, ID_mafRWIBase_TIMER)
+mafRWIBase::mafRWIBase() : wxWindow(), vtkRenderWindowInteractor(), timer(this, ID_mafRWIBase_TIMER)
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
 mafRWIBase::mafRWIBase(wxWindow *parent, wxWindowID id, const wxPoint &pos,
 			 const wxSize &size, long style, const wxString &name)
-  : wxScrolledWindow(parent, id, pos, size, style, name), vtkRenderWindowInteractor(), 
+  : wxWindow(parent, id, pos, size, style, name), vtkRenderWindowInteractor(), 
     timer(this, ID_mafRWIBase_TIMER)
 //----------------------------------------------------------------------------
 {
