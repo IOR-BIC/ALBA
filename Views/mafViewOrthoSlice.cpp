@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-27 16:02:49 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-01-30 08:23:55 $
+  Version:   $Revision: 1.17 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -119,7 +119,8 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
       if (vol)
       {
         m_Histogram->SetData(vol);
-        //m_Histogram->SetScaleFactor(m_ScaleFactor);
+        m_ScaleFactor = m_Histogram->GetScaleFactor();
+        m_Gui->Update();
       }
     }
     else
