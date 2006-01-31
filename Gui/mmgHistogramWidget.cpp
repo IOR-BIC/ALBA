@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgHistogramWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2006-01-30 08:22:49 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2006-01-31 15:29:08 $
+Version:   $Revision: 1.3 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -30,6 +30,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkPolyData.h"
 #include "vtkImageData.h"
 #include "vtkImageAccumulate.h"
+#include "vtkImageLogarithmicScale.h"
 #include "vtkImageChangeInformation.h"
 #include "vtkGlyph3D.h"
 #include "vtkLineSource.h"
@@ -51,6 +52,7 @@ mmgHistogramWidget::mmgHistogramWidget(wxWindow* parent, wxWindowID id, const wx
 	m_Listener    = NULL;
   m_PlotActor   = NULL;
   m_Accumulate  = NULL;
+  m_LogScale    = NULL;
   m_Glyph       = NULL;
   m_TextMapper  = NULL;
   m_TextActor   = NULL;
@@ -58,8 +60,10 @@ mmgHistogramWidget::mmgHistogramWidget(wxWindow* parent, wxWindowID id, const wx
   m_ScaleFactor     = 1.0;
   m_NumberOfBins    = 1;
   m_HisctogramValue = 0;
+  m_LogScaleConstant= 10.0;
   
   m_AutoscaleHistogram = true;
+  m_LogHistogramFlag   = false;
   
   vtkNEW(m_TextMapper);
   m_TextMapper->SetInput(mafString(m_HisctogramValue).GetCStr());
@@ -78,6 +82,10 @@ mmgHistogramWidget::mmgHistogramWidget(wxWindow* parent, wxWindowID id, const wx
 
   // Create Histogram pipeline
   vtkNEW(m_Accumulate);
+
+  vtkNEW(m_LogScale);
+  m_LogScale->SetConstant(m_LogScaleConstant);
+
   vtkNEW(m_ChangeInfo);
   m_ChangeInfo->SetOutputOrigin(0,0,0);
   vtkMAFSmartPointer<vtkLineSource> line;
@@ -127,6 +135,8 @@ mmgHistogramWidget::~mmgHistogramWidget()
   vtkDEL(m_TextMapper);
   vtkDEL(m_TextActor);
   vtkDEL(m_Accumulate);
+  vtkDEL(m_LogScale);
+  vtkDEL(m_ChangeInfo);
   vtkDEL(m_Glyph);
   vtkDEL(m_PlotActor);
   cppDEL(m_HistogramRWI);
@@ -161,10 +171,7 @@ void mmgHistogramWidget::SetData(vtkImageData *data)
 //----------------------------------------------------------------------------
 {
   m_Data = data;
-  if (m_Data)
-  {
-    UpdateHistogram();
-  }
+  UpdateHistogram();
 }
 //----------------------------------------------------------------------------
 void mmgHistogramWidget::UpdateHistogram()
@@ -203,29 +210,29 @@ void mmgHistogramWidget::UpdateHistogram()
   m_Accumulate->SetComponentSpacing(srw/m_NumberOfBins,0,0);
   m_Accumulate->Update();
 
-  assert( m_Accumulate->GetOutput() );
-  assert( m_Accumulate->GetOutput()->GetPointData() );
-  assert( m_Accumulate->GetOutput()->GetPointData()->GetScalars() );
-  vtkDataArray *scalars = m_Accumulate->GetOutput()->GetPointData()->GetScalars();
-
-  //n.b. compute max_scalar avoiding the first bin - usually the AIR
-  double max_scalar = 1; // avoid divide by 0
-  for(int i=1; i<m_NumberOfBins; i++ ) 
-  {
-    double v = scalars->GetTuple1(i);
-    if(v > max_scalar ) max_scalar = v;
-  }
   if (m_AutoscaleHistogram)
   {
-    m_ScaleFactor = 3.0 / max_scalar;
+    m_ScaleFactor = .5 / m_Accumulate->GetMean()[0];
   }
 
   m_ChangeInfo->SetInput(m_Accumulate->GetOutput());
   m_ChangeInfo->SetOutputSpacing(1.0/m_NumberOfBins,1,1);
   m_ChangeInfo->Update();
-  
-  m_Glyph->SetInput(m_ChangeInfo->GetOutput());
+
+  m_LogScale->SetConstant(m_LogScaleConstant);
+  m_LogScale->SetInput(m_ChangeInfo->GetOutput());
+  m_LogScale->Update();
+
+  if (m_LogHistogramFlag)
+  {
+    m_Glyph->SetInput(m_LogScale->GetOutput());
+  }
+  else
+  {
+    m_Glyph->SetInput(m_ChangeInfo->GetOutput());
+  }
   m_Glyph->SetScaleFactor(m_ScaleFactor);
+  m_Glyph->Modified();
   m_Glyph->Update();
 
   m_HistogramRWI->m_RwiBase->Render();
@@ -235,10 +242,25 @@ void mmgHistogramWidget::SetScaleFactor(double factor)
 //----------------------------------------------------------------------------
 {
   m_ScaleFactor = factor;
-  if (m_Glyph)
-  {
-    m_Glyph->SetScaleFactor(m_ScaleFactor);
-    m_Glyph->Update();
-    m_HistogramRWI->m_RwiBase->Render();
-  }
+  UpdateHistogram();
+}
+//----------------------------------------------------------------------------
+void mmgHistogramWidget::LogarithmicScale(bool enable)
+//----------------------------------------------------------------------------
+{
+  m_LogHistogramFlag = enable;
+  UpdateHistogram();
+}
+//----------------------------------------------------------------------------
+void mmgHistogramWidget::SetLogScaleConstant(double c)
+//----------------------------------------------------------------------------
+{
+  m_LogScaleConstant = c;
+  UpdateHistogram();
+}
+//----------------------------------------------------------------------------
+void mmgHistogramWidget::AutoscaleHistogram(bool autoscale)
+//----------------------------------------------------------------------------
+{
+  m_AutoscaleHistogram = autoscale;
 }

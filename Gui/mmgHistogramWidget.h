@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgHistogramWidget.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-30 08:22:49 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-01-31 15:29:08 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,6 +27,7 @@ class vtkImageData;
 class vtkImageChangeInformation;
 class vtkTextMapper;
 class vtkActor2D;
+class vtkImageLogarithmicScale;
 
 //----------------------------------------------------------------------------
 /** mmgHistogramWidget : widget that encapsulate render window into a gui*/
@@ -51,12 +52,38 @@ public:
   /** Return scale factor from the widget.*/
   double GetScaleFactor() {return m_ScaleFactor;};
 
+  /** Enable/disable logarithmic scale for histogram.*/
+  void LogarithmicScale(bool enable = true);
+
+  /** Turn On log scale.*/
+  void LogarithmicScaleOn() {LogarithmicScale();};
+
+  /** Turn Off log scale.*/
+  void LogarithmicScaleOff() {LogarithmicScale(false);};
+
+  /** Enable/Disable autoscaling for drawing histogram.*/
+  void AutoscaleHistogram(bool autoscale = true);
+
+  /** Enable autoscaling for drawing histogram.*/
+  void AutoscaleHistogramOn() {AutoscaleHistogram();};
+
+  /** Disable autoscaling for drawing histogram.*/
+  void AutoscaleHistogramOff() {AutoscaleHistogram(false);};
+
+  /** Set the multiplicative constant for logarithmic scale histogram.*/
+  void SetLogScaleConstant(double c);
+
+  /** Return the value of the multiplicative constant for logarithmic scale histogram.*/
+  double GetLogScaleConstant() {return m_LogScaleConstant;};
+
 protected:
   mafObserver   *m_Listener;
   double         m_ScaleFactor;
+  double         m_LogScaleConstant;
   int            m_HisctogramValue;
   int            m_NumberOfBins;
   bool           m_AutoscaleHistogram;
+  bool           m_LogHistogramFlag;
 
   vtkTextMapper	*m_TextMapper;
   vtkActor2D    *m_TextActor;
@@ -64,6 +91,7 @@ protected:
   vtkImageData  *m_Data;
   vtkImageAccumulate *m_Accumulate;
   vtkImageChangeInformation *m_ChangeInfo;
+  vtkImageLogarithmicScale  *m_LogScale;
   vtkGlyph3D         *m_Glyph;
   mafRWI        *m_HistogramRWI;
   vtkActor2D    *m_PlotActor;
