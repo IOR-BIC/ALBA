@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-27 16:02:48 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-01-31 15:31:21 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -62,7 +62,10 @@ public:
     ID_ORTHO_SLICE_Y,
     ID_ORTHO_SLICE_Z,
     ID_LUT_CHOOSER,
+    ID_AUTOSCALE_HISTOGRAM,
     ID_HISTOGRAM_SCALE_FACTOR,
+    ID_HISTOGRAM_LOGSCALE,
+    ID_HISTOGRAM_LOGFACTOR,
     ID_LAST
   };
 
@@ -86,6 +89,9 @@ protected:
 
   double m_Origin[3];
   double m_ScaleFactor;
+  int    m_LogScaleFlag;
+  int    m_Autoscale;
+  double m_LogConstant;
 
   mafVMEVolume *m_CurrentVolume; ///< Current visualized volume
   mmgLutSlider *m_Luts; ///< Double slider used to change brightness and contrast of the image

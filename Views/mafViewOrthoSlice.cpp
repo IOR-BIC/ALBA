@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-30 08:23:55 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2006-01-31 15:31:21 $
+  Version:   $Revision: 1.18 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,6 +54,9 @@ mafViewOrthoSlice::mafViewOrthoSlice(wxString label, bool external)
   m_CurrentVolume = NULL;
   m_Origin[0] = m_Origin[1] = m_Origin[2] = 0.0;
   m_ScaleFactor = 0.05;
+  m_LogScaleFlag= 0;
+  m_LogConstant = 10.0;
+  m_Autoscale = true;
 }
 //----------------------------------------------------------------------------
 mafViewOrthoSlice::~mafViewOrthoSlice()
@@ -120,6 +123,7 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
       {
         m_Histogram->SetData(vol);
         m_ScaleFactor = m_Histogram->GetScaleFactor();
+        m_LogConstant = m_Histogram->GetLogScaleConstant();
         m_Gui->Update();
       }
     }
@@ -165,6 +169,17 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
   	break;
     case ID_HISTOGRAM_SCALE_FACTOR:
       m_Histogram->SetScaleFactor(m_ScaleFactor);
+    break;
+    case ID_HISTOGRAM_LOGSCALE:
+      m_Gui->Enable(ID_HISTOGRAM_LOGFACTOR,m_LogScaleFlag != 0);
+      m_Histogram->LogarithmicScale(m_LogScaleFlag != 0);
+    break;
+    case ID_AUTOSCALE_HISTOGRAM:
+      m_Histogram->AutoscaleHistogram(m_Autoscale != 0);
+      m_Gui->Enable(ID_HISTOGRAM_SCALE_FACTOR,m_Autoscale == 0);
+    break;
+    case ID_HISTOGRAM_LOGFACTOR:
+      m_Histogram->SetLogScaleConstant(m_LogConstant);
     break;
     case ID_LUT_CHOOSER:
     {
@@ -216,7 +231,12 @@ mmgGui* mafViewOrthoSlice::CreateGui()
     lutPreset(4,m_ColorLUT);
   }
   m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
+  m_Gui->Divider(2);
+  m_Gui->Bool(ID_AUTOSCALE_HISTOGRAM,"autoscale", &m_Autoscale);
   m_Gui->Double(ID_HISTOGRAM_SCALE_FACTOR,"scale",&m_ScaleFactor,0.0000000001,MAXDOUBLE,-1);
+  m_Gui->Bool(ID_HISTOGRAM_LOGSCALE,"log",&m_LogScaleFlag,0,"Enable/Disable log scale for histogram");
+  m_Gui->Double(ID_HISTOGRAM_LOGFACTOR,"log constant",&m_LogConstant,0.0000000001,MAXDOUBLE,-1,"multiplicative factor for log scale histogram");
+  m_Gui->Divider(2);
 
   EnableWidgets(m_CurrentVolume != NULL);
   for(int i=1; i<m_NumOfChildView; i++)
@@ -250,7 +270,10 @@ void mafViewOrthoSlice::EnableWidgets(bool enable)
     m_Gui->Enable(ID_ORTHO_SLICE_Y,enable);
     m_Gui->Enable(ID_ORTHO_SLICE_Z,enable);
     m_Gui->Enable(ID_LUT_CHOOSER,enable);
-    m_Gui->Enable(ID_HISTOGRAM_SCALE_FACTOR,enable);
+    m_Gui->Enable(ID_HISTOGRAM_SCALE_FACTOR,enable && m_Autoscale == 0);
+    m_Gui->Enable(ID_HISTOGRAM_LOGSCALE,enable);
+    m_Gui->Enable(ID_AUTOSCALE_HISTOGRAM,enable);
+    m_Gui->Enable(ID_HISTOGRAM_LOGFACTOR,m_LogScaleFlag != 0);
   }
   m_Luts->Enable(enable);
   m_Histogram->Enable(enable);
