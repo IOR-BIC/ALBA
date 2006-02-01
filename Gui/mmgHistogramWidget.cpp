@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgHistogramWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2006-01-31 15:29:08 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2006-02-01 08:22:14 $
+Version:   $Revision: 1.4 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -22,8 +22,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mmgHistogramWidget.h"
 #include "mafDecl.h"
 #include "mafRWI.h"
-#include "mafEventInteraction.h"
 #include "mmdButtonsPad.h"
+#include "mmdMouse.h"
+#include "mafEventInteraction.h"
+#include "mmuIdFactory.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkDataSet.h"
@@ -44,6 +46,11 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkTextProperty.h"
 #include "vtkProperty2D.h"
 
+//------------------------------------------------------------------------------
+// Events
+//------------------------------------------------------------------------------
+MAF_ID_IMP(mmgHistogramWidget::HISTOGRAM_UPDATED)
+
 //----------------------------------------------------------------------------
 mmgHistogramWidget::mmgHistogramWidget(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
 :wxPanel(parent,id,pos,size,style)
@@ -61,12 +68,14 @@ mmgHistogramWidget::mmgHistogramWidget(wxWindow* parent, wxWindowID id, const wx
   m_NumberOfBins    = 1;
   m_HisctogramValue = 0;
   m_LogScaleConstant= 10.0;
+  m_DragStart       = 0;
   
   m_AutoscaleHistogram = true;
   m_LogHistogramFlag   = false;
+  m_Dragging           = false;
   
   vtkNEW(m_TextMapper);
-  m_TextMapper->SetInput(mafString(m_HisctogramValue).GetCStr());
+  m_TextMapper->SetInput("");
   m_TextMapper->GetTextProperty()->AntiAliasingOff();
   m_TextMapper->GetTextProperty()->SetFontFamily(VTK_TIMES);
   m_TextMapper->GetTextProperty()->SetColor(0,0,0.8);
@@ -147,23 +156,56 @@ void mmgHistogramWidget::OnEvent( mafEventBase *event )
 {
   if (mafEvent *e = mafEvent::SafeDownCast(event))
   {
-    switch(e->GetId())
+/*    switch(e->GetId())
     {
       default:
         e->Log();
       break; 
-    }
+    }*/
   }
   else if (mafEventInteraction *ei = mafEventInteraction::SafeDownCast(event))
   {
-    int x_size, idx;
-    double pos[2];
-    ei->Get2DPosition(pos);
-    x_size = GetSize().GetWidth();
-    idx = (pos[0]/x_size) * m_NumberOfBins;
-    m_HisctogramValue = m_Accumulate->GetOutput()->GetPointData()->GetScalars()->GetTuple1(idx);
-    m_TextMapper->SetInput(mafString(m_HisctogramValue).GetCStr());
-    m_HistogramRWI->CameraUpdate();
+    if (ei->GetId() == mmdMouse::MOUSE_2D_MOVE)
+    {
+      int x_size, idx;
+      double pos[2];
+      ei->Get2DPosition(pos);
+      if (m_Dragging)
+      {
+        int dy = pos[1]-m_DragStart;
+        m_ScaleFactor *= ( 1 + dy/100.0 );
+        SetScaleFactor(m_ScaleFactor);
+      }
+      else
+      {
+        x_size = GetSize().GetWidth();
+        idx = (pos[0]/x_size) * m_NumberOfBins;
+        m_HisctogramValue = m_Accumulate->GetOutput()->GetPointData()->GetScalars()->GetTuple1(idx);
+        m_TextMapper->SetInput(mafString(m_HisctogramValue).GetCStr());
+      }
+      m_HistogramRWI->CameraUpdate();
+    }
+    else if (ei->GetId() == mmdButtonsPad::BUTTON_DOWN)
+    {
+      if (ei->GetButton() == MAF_RIGHT_BUTTON)
+      {
+        double pos[2];
+        m_Dragging = true;
+        ei->Get2DPosition(pos);
+        m_DragStart = (int)pos[1];
+        if(m_AutoscaleHistogram)
+        {
+          AutoscaleHistogramOff();
+        }
+      }
+    }
+    else if (ei->GetId() == mmdButtonsPad::BUTTON_UP)
+    {
+      if (ei->GetButton() == MAF_RIGHT_BUTTON)
+      {
+        m_Dragging = false;
+      }
+    }
   }
 }
 //----------------------------------------------------------------------------
@@ -210,9 +252,13 @@ void mmgHistogramWidget::UpdateHistogram()
   m_Accumulate->SetComponentSpacing(srw/m_NumberOfBins,0,0);
   m_Accumulate->Update();
 
+  double acc_min[3], acc_max[3];
+  m_Accumulate->GetMin(acc_min);
+  m_Accumulate->GetMax(acc_max);
+
   if (m_AutoscaleHistogram)
   {
-    m_ScaleFactor = .5 / m_Accumulate->GetMean()[0];
+    m_ScaleFactor = .05 / m_Accumulate->GetMean()[0];
   }
 
   m_ChangeInfo->SetInput(m_Accumulate->GetOutput());
@@ -225,6 +271,10 @@ void mmgHistogramWidget::UpdateHistogram()
 
   if (m_LogHistogramFlag)
   {
+    if (m_AutoscaleHistogram)
+    {
+      m_ScaleFactor = .5 / log(1 + m_Accumulate->GetMean()[0]);
+    }
     m_Glyph->SetInput(m_LogScale->GetOutput());
   }
   else
@@ -236,6 +286,11 @@ void mmgHistogramWidget::UpdateHistogram()
   m_Glyph->Update();
 
   m_HistogramRWI->m_RwiBase->Render();
+  if (m_Listener)
+  {
+    mafEventInteraction e(this,mmgHistogramWidget::HISTOGRAM_UPDATED);
+    m_Listener->OnEvent(&e);
+  }
 }
 //----------------------------------------------------------------------------
 void mmgHistogramWidget::SetScaleFactor(double factor)
@@ -263,4 +318,5 @@ void mmgHistogramWidget::AutoscaleHistogram(bool autoscale)
 //----------------------------------------------------------------------------
 {
   m_AutoscaleHistogram = autoscale;
+  UpdateHistogram();
 }
