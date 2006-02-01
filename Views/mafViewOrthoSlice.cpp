@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-31 15:31:21 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2006-02-01 08:23:51 $
+  Version:   $Revision: 1.19 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,6 +27,8 @@
 #include "mmgGui.h"
 #include "mmgFloatSlider.h"
 #include "mmgLutSlider.h"
+#include "mafEventInteraction.h"
+
 #include "mafVMEVolume.h"
 
 #include "vtkDataSet.h"
@@ -154,60 +156,75 @@ void mafViewOrthoSlice::CreateGuiView()
 void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  switch(maf_event->GetId()) 
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
-    case ID_ORTHO_SLICE_X:
-    case ID_ORTHO_SLICE_Y:
-    case ID_ORTHO_SLICE_Z:
+    switch(e->GetId()) 
     {
-      for(int i=0; i<m_NumOfChildView; i++)
+      case ID_ORTHO_SLICE_X:
+      case ID_ORTHO_SLICE_Y:
+      case ID_ORTHO_SLICE_Z:
       {
-        ((mafViewSlice *)m_ChildViewList[i])->SetSlice(m_Origin);
-      }
-      CameraUpdate();
-    }
-  	break;
-    case ID_HISTOGRAM_SCALE_FACTOR:
-      m_Histogram->SetScaleFactor(m_ScaleFactor);
-    break;
-    case ID_HISTOGRAM_LOGSCALE:
-      m_Gui->Enable(ID_HISTOGRAM_LOGFACTOR,m_LogScaleFlag != 0);
-      m_Histogram->LogarithmicScale(m_LogScaleFlag != 0);
-    break;
-    case ID_AUTOSCALE_HISTOGRAM:
-      m_Histogram->AutoscaleHistogram(m_Autoscale != 0);
-      m_Gui->Enable(ID_HISTOGRAM_SCALE_FACTOR,m_Autoscale == 0);
-    break;
-    case ID_HISTOGRAM_LOGFACTOR:
-      m_Histogram->SetLogScaleConstant(m_LogConstant);
-    break;
-    case ID_LUT_CHOOSER:
-    {
-      for(int i=0; i<m_NumOfChildView; i++)
-      {
-        mafPipeVolumeSlice *p = (mafPipeVolumeSlice *)((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
-        p->SetColorLookupTable(m_ColorLUT);
-      }
-      double *sr;
-      sr = m_ColorLUT->GetRange();
-      m_Luts->SetSubRange((long)sr[0],(long)sr[1]);
-      CameraUpdate();
-    }
-    break;
-    case ID_RANGE_MODIFIED:
-    {
-      if(((mafViewSlice *)m_ChildViewList[0])->VolumeIsVisible())
-      {
-        int low, hi;
-        m_Luts->GetSubRange(&low,&hi);
-        for(int i=0; i<4; i++) 
-          ((mafViewSlice *)m_ChildViewList[i])->SetLutRange(low, hi);
+        for(int i=0; i<m_NumOfChildView; i++)
+        {
+          ((mafViewSlice *)m_ChildViewList[i])->SetSlice(m_Origin);
+        }
         CameraUpdate();
       }
+      break;
+      case ID_HISTOGRAM_SCALE_FACTOR:
+        m_Histogram->SetScaleFactor(m_ScaleFactor);
+      break;
+      case ID_HISTOGRAM_LOGSCALE:
+        m_Gui->Enable(ID_HISTOGRAM_LOGFACTOR,m_LogScaleFlag != 0);
+        m_Histogram->LogarithmicScale(m_LogScaleFlag != 0);
+      break;
+      case ID_AUTOSCALE_HISTOGRAM:
+        m_Histogram->AutoscaleHistogram(m_Autoscale != 0);
+        m_Gui->Enable(ID_HISTOGRAM_SCALE_FACTOR,m_Autoscale == 0);
+      break;
+      case ID_HISTOGRAM_LOGFACTOR:
+        m_Histogram->SetLogScaleConstant(m_LogConstant);
+      break;
+      case ID_LUT_CHOOSER:
+      {
+        for(int i=0; i<m_NumOfChildView; i++)
+        {
+          mafPipeVolumeSlice *p = (mafPipeVolumeSlice *)((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
+          p->SetColorLookupTable(m_ColorLUT);
+        }
+        double *sr;
+        sr = m_ColorLUT->GetRange();
+        m_Luts->SetSubRange((long)sr[0],(long)sr[1]);
+        CameraUpdate();
+      }
+      break;
+      case ID_RANGE_MODIFIED:
+      {
+        if(((mafViewSlice *)m_ChildViewList[0])->VolumeIsVisible())
+        {
+          int low, hi;
+          m_Luts->GetSubRange(&low,&hi);
+          for(int i=0; i<4; i++) 
+            ((mafViewSlice *)m_ChildViewList[i])->SetLutRange(low, hi);
+          CameraUpdate();
+        }
+      }
+      break;
+      default:
+        mafViewCompound::OnEvent(maf_event);
     }
-    break;
-    default:
-      mafViewCompound::OnEvent(maf_event);
+  }
+  else if (mafEventInteraction *ei = mafEventInteraction::SafeDownCast(maf_event))
+  {
+    if (ei->GetId() == mmgHistogramWidget::HISTOGRAM_UPDATED)
+    {
+      m_ScaleFactor = m_Histogram->GetScaleFactor();
+      m_LogConstant = m_Histogram->GetLogScaleConstant();
+      m_Autoscale = m_Histogram->IsAutoScaled() ? 1 : 0;
+      m_LogScaleFlag = m_Histogram->IsLogarithmicScale() ? 1 : 0;
+      EnableWidgets();
+      m_Gui->Update();
+    }
   }
 }
 //-------------------------------------------------------------------------
