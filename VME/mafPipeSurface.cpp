@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-19 11:22:00 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2006-02-02 16:42:57 $
+  Version:   $Revision: 1.21 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -106,13 +106,20 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
 
   if (material->m_MaterialType == mmaMaterial::USE_TEXTURE)
   {
-    GenerateTextureMapCoordinate();
+    if (data->GetPointData()->GetTCoords() == NULL)
+    {
+      GenerateTextureMapCoordinate();
+    }
+    else
+    {
+      m_Mapper->SetInput(data);
+    }
   }
   else
   {
     m_Mapper->SetInput(data);
   }
-
+  
   m_Mapper->SetScalarVisibility(m_ScalarVisibility);
   m_Mapper->SetScalarRange(sr);
   
