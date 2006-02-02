@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-25 12:00:23 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2006-02-02 10:36:29 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -126,7 +126,7 @@ void mafVMERoot::OnEvent(mafEventBase *maf_event)
     }
     else
     {
-      mafNode::OnEvent(e);
+      mafRoot::OnRootEvent(maf_event);
     }
   }
   else if (maf_event->GetChannel()==MCH_UP)
