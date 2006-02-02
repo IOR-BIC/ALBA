@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-15 15:24:31 $
-  Version:   $Revision: 1.43 $
+  Date:      $Date: 2006-02-02 09:46:45 $
+  Version:   $Revision: 1.44 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -909,9 +909,9 @@ void mafNode::OnEvent(mafEventBase *e)
         {
           case ID_NAME:
           {
-            //mafEvent ev(this,VME_MODIFIED,this);
-            //ForwardUpEvent(ev);
             SetName(m_Name.GetCStr());
+            mafEvent ev(this,VME_MODIFIED,this);
+            ForwardUpEvent(&ev);
           }
           break;
           case ID_PRINT_INFO:
