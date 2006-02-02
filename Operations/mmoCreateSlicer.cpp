@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-30 13:22:10 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-02-02 16:41:08 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,6 +22,7 @@
 #include "mmoCreateSlicer.h"
 #include "mafDecl.h"
 #include "mafEvent.h"
+
 #include "mafVMEVolume.h"
 #include "mafVMESlicer.h"
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 17:42:38 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-02-02 16:41:51 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,16 +20,17 @@
 //----------------------------------------------------------------------------
 
 #include "mafVMESlicer.h"
-#include "mafVMEVolume.h"
 #include "mafTransform.h"
 #include "mafStorageElement.h"
 #include "mafIndent.h"
 #include "mafDataPipeCustom.h"
+#include "mafVMEVolume.h"
+#include "mafVMEOutputSurface.h"
 #include "mmaMaterial.h"
 
+#include "vtkMAFSmartPointer.h"
 #include "vtkMAFDataPipe.h"
 #include "vtkMath.h"
-#include "vtkMAFSmartPointer.h"
 #include "vtkImageData.h"
 #include "vtkPolyData.h"
 #include "vtkVolumeSlicer.h"
@@ -57,12 +58,6 @@ mafVMESlicer::mafVMESlicer()
 
   m_TextureRes = 256;
   m_Xspc = m_Yspc = 0.3;
-
-  //vtkMAFSmartPointer<vtkImageData> image_data;
-  //this->SetNthOutput(0,image_data);
-
-  //vtkMAFSmartPointer<vtkPolyData> slice_data;
-  //this->SetNthOutput(1,slice_data);
 
   vtkMAFSmartPointer<vtkImageData> image;
   image->SetScalarTypeToUnsignedChar();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-13 13:42:41 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-02-02 16:41:29 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,13 +15,14 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafVME.h"
-#include "mafVMEOutputSurface.h"
+
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 class vtkVolumeSlicer;
 class mafNode;
 class mmaMaterial;
+class mafVMEOutputSurface;
 
 /** mafVMESlicer - a procedural VME computing the slice of its parent VME.
   mafVMESlicer is a node implementing a slicer of a VME (currently only VME-Volume).
