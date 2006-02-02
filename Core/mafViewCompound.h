@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-12 12:32:48 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2006-02-02 10:35:12 $
+  Version:   $Revision: 1.18 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -111,7 +111,7 @@ public:
   Set the size of the windowing double slider according to the size of the view. */
   void OnLayout();
 
-  void SetMouse(mmdMouse *mouse);
+  virtual void SetMouse(mmdMouse *mouse);
 
   virtual mafSceneGraph *GetSceneGraph();
   virtual mafRWIBase    *GetRWI();
