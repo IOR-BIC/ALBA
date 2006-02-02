@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkVolumeSlicer.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-12 11:40:29 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-02-02 16:43:36 $
+  Version:   $Revision: 1.7 $
   Authors:   Alexander Savenko
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -66,6 +66,9 @@ POSSIBILITY OF SUCH DAMAGES.
 #include "vtkMAFConfigure.h"
 #include "vtkDataSetToDataSetFilter.h"
 
+//----------------------------------------------------------------------------
+// forward declarations :
+//----------------------------------------------------------------------------
 class vtkPolyData;
 class vtkImageData;
 class vtkRectilinearGrid;
@@ -146,11 +149,6 @@ protected:
   float PlaneAxisY[3];
   float PlaneAxisZ[3];
   
-  double GlobalPlaneOrigin[3];
-  float GlobalPlaneAxisX[3];
-  float GlobalPlaneAxisY[3];
-  float GlobalPlaneAxisZ[3];
-
   vtkLinearTransform *TransformSlice;
 
   // color mapping
@@ -162,16 +160,14 @@ protected:
   // look-up tables and caches
   vtkTimeStamp PreprocessingTime;
 
-  float*       VoxelCoordinates[3];
-  double       DataOrigin[3];
-  double        DataBounds[3][2];
-  int          DataDimensions[3];
-  double        SamplingTableMultiplier[3];
+  float   *VoxelCoordinates[3];
+  double   DataOrigin[3];
+  double   DataBounds[3][2];
+  int      DataDimensions[3];
+  double   SamplingTableMultiplier[3];
 
 private:
   vtkVolumeSlicer(const vtkVolumeSlicer&);  // Not implemented.
   void operator=(const vtkVolumeSlicer&);  // Not implemented.
 };
-
 #endif
-

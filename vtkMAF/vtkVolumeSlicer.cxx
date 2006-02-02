@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkVolumeSlicer.cxx,v $
   Language:  C++
-  Date:      $Date: 2005-12-12 11:40:29 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-02-02 16:43:36 $
+  Version:   $Revision: 1.9 $
 
 =========================================================================*/
 #include "vtkObjectFactory.h"
@@ -22,7 +22,7 @@
 
 #include "assert.h"
 
-vtkCxxRevisionMacro(vtkVolumeSlicer, "$Revision: 1.8 $");
+vtkCxxRevisionMacro(vtkVolumeSlicer, "$Revision: 1.9 $");
 vtkStandardNewMacro(vtkVolumeSlicer);
 
 typedef unsigned short u_short;
@@ -51,12 +51,6 @@ vtkVolumeSlicer::vtkVolumeSlicer()
   PlaneAxisY[0] = PlaneAxisY[2] = 0.f;
   PlaneAxisY[1] = 1.f;
 
-  GlobalPlaneOrigin[0] = GlobalPlaneOrigin[1] = GlobalPlaneOrigin[2] = 0.f;
-  GlobalPlaneAxisX[0] = 1.f;
-  GlobalPlaneAxisX[1] = GlobalPlaneAxisX[2] = 0.f;
-  GlobalPlaneAxisY[0] = GlobalPlaneAxisY[2] = 0.f;
-  GlobalPlaneAxisY[1]  = 1.f;
-
   TransformSlice = NULL;
 
   this->Window = 1.f;
@@ -84,11 +78,7 @@ void vtkVolumeSlicer::SetPlaneAxisX(float axis[3])
   vtkMath::Normalize(this->PlaneAxisX);
   if (TransformSlice)
   {
-    TransformSlice->TransformNormal(PlaneAxisX, GlobalPlaneAxisX);
-  }
-  else
-  {
-    memcpy(GlobalPlaneAxisX, PlaneAxisX, sizeof(this->PlaneAxisX));
+    TransformSlice->TransformNormal(PlaneAxisX, PlaneAxisX);
   }
   this->Modified();
 }
@@ -106,11 +96,7 @@ void vtkVolumeSlicer::SetPlaneAxisY(float axis[3])
   vtkMath::Normalize(this->PlaneAxisY);
   if (TransformSlice)
   {
-    TransformSlice->TransformNormal(PlaneAxisY, GlobalPlaneAxisY);
-  }
-  else
-  {
-    memcpy(GlobalPlaneAxisY, PlaneAxisY, sizeof(this->PlaneAxisY));
+    TransformSlice->TransformNormal(PlaneAxisY, PlaneAxisY);
   }
   this->Modified();
 }
@@ -121,11 +107,7 @@ void vtkVolumeSlicer::SetPlaneOrigin(double origin[3])
   memcpy(PlaneOrigin, origin, sizeof(PlaneOrigin));
   if (TransformSlice)
   {
-    TransformSlice->TransformPoint(PlaneOrigin, GlobalPlaneOrigin);
-  }
-  else
-  {
-    memcpy(GlobalPlaneOrigin, PlaneOrigin, sizeof(PlaneOrigin));
+    TransformSlice->TransformPoint(PlaneOrigin, PlaneOrigin);
   }
   this->Modified();
 }
@@ -165,18 +147,12 @@ void vtkVolumeSlicer::ExecuteInformation()
       { // select spacing
         if (TransformSlice)
         {
-          TransformSlice->TransformPoint(PlaneOrigin, GlobalPlaneOrigin);
-          TransformSlice->TransformNormal(PlaneAxisX, GlobalPlaneAxisX);
-          TransformSlice->TransformNormal(PlaneAxisY, GlobalPlaneAxisY);
-        }
-        else
-        {
-          memcpy(GlobalPlaneOrigin, PlaneOrigin, sizeof(PlaneOrigin));
-          memcpy(GlobalPlaneAxisX, PlaneAxisX, sizeof(PlaneAxisX));
-          memcpy(GlobalPlaneAxisY, PlaneAxisY, sizeof(PlaneAxisY));
+          TransformSlice->TransformPoint(PlaneOrigin, PlaneOrigin);
+          TransformSlice->TransformNormal(PlaneAxisX, PlaneAxisX);
+          TransformSlice->TransformNormal(PlaneAxisY, PlaneAxisY);
         }
         this->PrepareVolume();
-        const float d = -(this->GlobalPlaneAxisZ[0] * this->GlobalPlaneOrigin[0] + this->GlobalPlaneAxisZ[1] * this->GlobalPlaneOrigin[1] + this->GlobalPlaneAxisZ[2] * this->GlobalPlaneOrigin[2]);
+        const float d = -(this->PlaneAxisZ[0] * this->PlaneOrigin[0] + this->PlaneAxisZ[1] * this->PlaneOrigin[1] + this->PlaneAxisZ[2] * this->PlaneOrigin[2]);
   
         // intersect plane with the bounding box
         double spacing[3] = {1.f, 1.f, 1.f};
@@ -193,11 +169,11 @@ void vtkVolumeSlicer::ExecuteInformation()
               float p[3];
               p[j] = this->DataBounds[j][jj];
               p[k] = this->DataBounds[k][kk];
-              p[i] = -(d + this->GlobalPlaneAxisZ[j] * p[j] + this->GlobalPlaneAxisZ[k] * p[k]);
+              p[i] = -(d + this->PlaneAxisZ[j] * p[j] + this->PlaneAxisZ[k] * p[k]);
               
-              if (fabs(this->GlobalPlaneAxisZ[i]) < 1.e-10)
+              if (fabs(this->PlaneAxisZ[i]) < 1.e-10)
                 continue;
-              p[i] /= this->GlobalPlaneAxisZ[i];
+              p[i] /= this->PlaneAxisZ[i];
               if (p[i] >= this->DataBounds[i][0] && p[i] <= this->DataBounds[i][1]) 
               {
                 this->CalculateTextureCoordinates(p, (int*)dims, spacing, t[numberOfPoints]);
@@ -221,13 +197,13 @@ void vtkVolumeSlicer::ExecuteInformation()
         output->SetSpacing(spacing);
         if (fabs(minT) > 1.e-3 || fabs(minS) > 1.e-3) 
         {
-          this->GlobalPlaneOrigin[0] += minT * this->GlobalPlaneAxisX[0] * dims[0] + minS * this->GlobalPlaneAxisY[0] * dims[1];
-          this->GlobalPlaneOrigin[1] += minT * this->GlobalPlaneAxisX[1] * dims[0] + minS * this->GlobalPlaneAxisY[1] * dims[1];
-          this->GlobalPlaneOrigin[2] += minT * this->GlobalPlaneAxisX[2] * dims[0] + minS * this->GlobalPlaneAxisY[2] * dims[1];
+          this->PlaneOrigin[0] += minT * this->PlaneAxisX[0] * dims[0] + minS * this->PlaneAxisY[0] * dims[1];
+          this->PlaneOrigin[1] += minT * this->PlaneAxisX[1] * dims[0] + minS * this->PlaneAxisY[1] * dims[1];
+          this->PlaneOrigin[2] += minT * this->PlaneAxisX[2] * dims[0] + minS * this->PlaneAxisY[2] * dims[1];
           this->Modified();
         }
       }
-      output->SetOrigin(this->GlobalPlaneOrigin);
+      output->SetOrigin(this->PlaneOrigin);
     }
     else 
     {
@@ -253,10 +229,10 @@ void vtkVolumeSlicer::ExecuteData(vtkDataObject *outputData)
 void vtkVolumeSlicer::PrepareVolume() 
 //----------------------------------------------------------------------------
 {
-  assert(fabs(vtkMath::Norm(this->GlobalPlaneAxisX) - 1.f) < 1.e-5);
-  assert(fabs(vtkMath::Norm(this->GlobalPlaneAxisY) - 1.f) < 1.e-5);
-  vtkMath::Cross(this->GlobalPlaneAxisX, this->GlobalPlaneAxisY, this->GlobalPlaneAxisZ);
-  vtkMath::Normalize(this->GlobalPlaneAxisZ);
+  assert(fabs(vtkMath::Norm(this->PlaneAxisX) - 1.f) < 1.e-5);
+  assert(fabs(vtkMath::Norm(this->PlaneAxisY) - 1.f) < 1.e-5);
+  vtkMath::Cross(this->PlaneAxisX, this->PlaneAxisY, this->PlaneAxisZ);
+  vtkMath::Normalize(this->PlaneAxisZ);
 
   if (PreprocessingTime > this->GetInput()->GetMTime() && PreprocessingTime > this->GetMTime())
     return;
@@ -343,10 +319,12 @@ void vtkVolumeSlicer::ExecuteData(vtkPolyData *output)
   if (this->GetTexture()) 
   {
     this->GetTexture()->Update();
-    memcpy(this->GlobalPlaneOrigin, this->GetTexture()->GetOrigin(), sizeof(this->GlobalPlaneOrigin));
+    double tex_orig[3];
+    this->GetTexture()->GetOrigin(tex_orig);
+    memcpy(this->PlaneOrigin, tex_orig, sizeof(this->PlaneOrigin));
   }
 
-  const float d = -(this->GlobalPlaneAxisZ[0] * this->GlobalPlaneOrigin[0] + this->GlobalPlaneAxisZ[1] * this->GlobalPlaneOrigin[1] + this->GlobalPlaneAxisZ[2] * this->GlobalPlaneOrigin[2]);
+  const float d = -(this->PlaneAxisZ[0] * this->PlaneOrigin[0] + this->PlaneAxisZ[1] * this->PlaneOrigin[1] + this->PlaneAxisZ[2] * this->PlaneOrigin[2]);
 
   // intersect plane with the bounding box
   float points[12][3];
@@ -354,7 +332,7 @@ void vtkVolumeSlicer::ExecuteData(vtkPolyData *output)
   bool  processedPoints[12];
   memset(processedPoints, 0, sizeof(processedPoints));
 
-  int i=0;
+  int i = 0;
   for (i = 0; i < 3; i++) 
   {
     const int j = (i + 1) % 3, k = (i + 2) % 3;
@@ -366,11 +344,11 @@ void vtkVolumeSlicer::ExecuteData(vtkPolyData *output)
         float (&p)[3] = points[numberOfPoints];
         p[j] = this->DataBounds[j][jj];
         p[k] = this->DataBounds[k][kk];
-        p[i] = -(d + this->GlobalPlaneAxisZ[j] * p[j] + this->GlobalPlaneAxisZ[k] * p[k]);
+        p[i] = -(d + this->PlaneAxisZ[j] * p[j] + this->PlaneAxisZ[k] * p[k]);
 
-        if (fabs(this->GlobalPlaneAxisZ[i]) < 1.e-10)
+        if (fabs(this->PlaneAxisZ[i]) < 1.e-10)
           continue; // a special case (0 / 0) should be handled automatically in another iteration
-        p[i] /= this->GlobalPlaneAxisZ[i];
+        p[i] /= this->PlaneAxisZ[i];
 
         // check that p[i] is in inside the box
         if (p[i] < this->DataBounds[i][0] || p[i] > this->DataBounds[i][1])
@@ -476,7 +454,7 @@ void vtkVolumeSlicer::ExecuteData(vtkPolyData *output)
     {
 			float angleVector[3];
 			vtkMath::Cross(points[longestVector], points[j], angleVector);
-			double norm = vtkMath::Norm(angleVector) * (vtkMath::Dot(angleVector, this->GlobalPlaneAxisZ) > 0. ? -1. : 1.);
+			double norm = vtkMath::Norm(angleVector) * (vtkMath::Dot(angleVector, this->PlaneAxisZ) > 0. ? -1. : 1.);
 			if (!processedPoints[j] && norm <= minSAngle) 
       {
 				minSAngle = norm;
@@ -640,11 +618,11 @@ template<typename InputDataType, typename OutputDataType> void vtkVolumeSlicer::
   const int numComp = outputObject->GetNumberOfScalarComponents();
   assert(numComp == this->NumComponents);
   const float dx = outputObject->GetSpacing()[0], dy = outputObject->GetSpacing()[1];
-  const float xaxis[3] = { this->GlobalPlaneAxisX[0] * dx * this->SamplingTableMultiplier[0], this->GlobalPlaneAxisX[1] * dx * this->SamplingTableMultiplier[1], this->GlobalPlaneAxisX[2] * dx * this->SamplingTableMultiplier[2]};
-  const float yaxis[3] = { this->GlobalPlaneAxisY[0] * dy * this->SamplingTableMultiplier[0], this->GlobalPlaneAxisY[1] * dy * this->SamplingTableMultiplier[1], this->GlobalPlaneAxisY[2] * dy * this->SamplingTableMultiplier[2]};
-  const float offset[3] = {(this->GlobalPlaneOrigin[0] - this->DataOrigin[0]) * this->SamplingTableMultiplier[0],
-			   (this->GlobalPlaneOrigin[1] - this->DataOrigin[1]) * this->SamplingTableMultiplier[1],
-			   (this->GlobalPlaneOrigin[2] - this->DataOrigin[2]) * this->SamplingTableMultiplier[2]};
+  const float xaxis[3] = { this->PlaneAxisX[0] * dx * this->SamplingTableMultiplier[0], this->PlaneAxisX[1] * dx * this->SamplingTableMultiplier[1], this->PlaneAxisX[2] * dx * this->SamplingTableMultiplier[2]};
+  const float yaxis[3] = { this->PlaneAxisY[0] * dy * this->SamplingTableMultiplier[0], this->PlaneAxisY[1] * dy * this->SamplingTableMultiplier[1], this->PlaneAxisY[2] * dy * this->SamplingTableMultiplier[2]};
+  const float offset[3] = {(this->PlaneOrigin[0] - this->DataOrigin[0]) * this->SamplingTableMultiplier[0],
+			                     (this->PlaneOrigin[1] - this->DataOrigin[1]) * this->SamplingTableMultiplier[1],
+			                     (this->PlaneOrigin[2] - this->DataOrigin[2]) * this->SamplingTableMultiplier[2]};
   
   // prepare sampling table
   int   *stIndices[3];
@@ -723,13 +701,13 @@ template<typename InputDataType, typename OutputDataType> void vtkVolumeSlicer::
 void vtkVolumeSlicer::CalculateTextureCoordinates(const float point[3], const int size[2], const double spacing[2], float ts[2]) 
 //----------------------------------------------------------------------------
 {
-  const float c[3]  = { point[0] - this->GlobalPlaneOrigin[0], point[1] - this->GlobalPlaneOrigin[1], point[2] - this->GlobalPlaneOrigin[2] };
+  const float c[3]  = { point[0] - this->PlaneOrigin[0], point[1] - this->PlaneOrigin[1], point[2] - this->PlaneOrigin[2] };
 		
-	float tx = (c[0] * GlobalPlaneAxisY[1] - c[1] * GlobalPlaneAxisY[0]) / (GlobalPlaneAxisX[0] * GlobalPlaneAxisY[1] - GlobalPlaneAxisX[1] * GlobalPlaneAxisY[0]);
-	float ty = (c[0] * GlobalPlaneAxisX[1] - c[1] * GlobalPlaneAxisX[0]) / (GlobalPlaneAxisX[0] * GlobalPlaneAxisY[1] - GlobalPlaneAxisX[1] * GlobalPlaneAxisY[0]);
-	if (fabs(GlobalPlaneAxisX[0] * GlobalPlaneAxisY[1] - GlobalPlaneAxisX[1] * GlobalPlaneAxisY[0]) < 1.e-10f) {
-		tx = (c[0] * GlobalPlaneAxisY[2] - c[2] * GlobalPlaneAxisY[0]) / (GlobalPlaneAxisX[0] * GlobalPlaneAxisY[2] - GlobalPlaneAxisX[2] * GlobalPlaneAxisY[0]);
-		ty = (c[0] * GlobalPlaneAxisX[2] - c[2] * GlobalPlaneAxisX[0]) / (GlobalPlaneAxisX[0] * GlobalPlaneAxisY[2] - GlobalPlaneAxisX[2] * GlobalPlaneAxisY[0]);
+	float tx = (c[0] * PlaneAxisY[1] - c[1] * PlaneAxisY[0]) / (PlaneAxisX[0] * PlaneAxisY[1] - PlaneAxisX[1] * PlaneAxisY[0]);
+	float ty = (c[0] * PlaneAxisX[1] - c[1] * PlaneAxisX[0]) / (PlaneAxisX[0] * PlaneAxisY[1] - PlaneAxisX[1] * PlaneAxisY[0]);
+	if (fabs(PlaneAxisX[0] * PlaneAxisY[1] - PlaneAxisX[1] * PlaneAxisY[0]) < 1.e-10f) {
+		tx = (c[0] * PlaneAxisY[2] - c[2] * PlaneAxisY[0]) / (PlaneAxisX[0] * PlaneAxisY[2] - PlaneAxisX[2] * PlaneAxisY[0]);
+		ty = (c[0] * PlaneAxisX[2] - c[2] * PlaneAxisX[0]) / (PlaneAxisX[0] * PlaneAxisY[2] - PlaneAxisX[2] * PlaneAxisY[0]);
 		}
 		ts[0] =  tx / (size[0] * spacing[0]);
 		ts[1] = -ty / (size[1] * spacing[1]);
