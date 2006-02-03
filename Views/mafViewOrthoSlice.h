@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-31 15:31:21 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-02-03 09:55:30 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -82,6 +82,9 @@ protected:
   /** 
   Enable/disable view widgets.*/
   void EnableWidgets(bool enable = true);
+
+  /** Update slider range according to the bounds of the current visualized volume.*/
+  void UpdateSliderRange();
 
   mmgFloatSlider *m_SliderX;
   mmgFloatSlider *m_SliderY;
