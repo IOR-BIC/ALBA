@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-01 08:23:51 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2006-02-03 09:56:33 $
+  Version:   $Revision: 1.20 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,6 +28,7 @@
 #include "mmgFloatSlider.h"
 #include "mmgLutSlider.h"
 #include "mafEventInteraction.h"
+#include "mafEventSource.h"
 
 #include "mafVMEVolume.h"
 
@@ -64,6 +65,10 @@ mafViewOrthoSlice::mafViewOrthoSlice(wxString label, bool external)
 mafViewOrthoSlice::~mafViewOrthoSlice()
 //----------------------------------------------------------------------------
 {
+  if (m_CurrentVolume)
+  {
+    m_CurrentVolume->GetEventSource()->RemoveObserver(this);
+  }
   vtkDEL(m_ColorLUT);
 }
 //----------------------------------------------------------------------------
@@ -110,15 +115,8 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
       }
       if (m_SliderX)
       {
-        double b[6];
-        m_CurrentVolume->GetOutput()->GetVMEBounds(b);
-        m_Origin[0] = (b[0]+b[1])*.5;
-        m_Origin[1] = (b[2]+b[3])*.5;
-        m_Origin[2] = (b[4]+b[5])*.5;
-        m_SliderX->SetRange(b[0],b[1],m_Origin[0]);
-        m_SliderY->SetRange(b[2],b[3],m_Origin[1]);
-        m_SliderZ->SetRange(b[4],b[5],m_Origin[2]);
-        m_Gui->Update();
+        UpdateSliderRange();
+        m_CurrentVolume->GetEventSource()->AddObserver(this);
       }
       vtkImageData *vol = vtkImageData::SafeDownCast(data);
       if (vol)
@@ -131,6 +129,7 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
     }
     else
     {
+      m_CurrentVolume->GetEventSource()->RemoveObserver(this);
       m_CurrentVolume = NULL;
       lutPreset(4,m_ColorLUT);
     }
@@ -226,6 +225,13 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
       m_Gui->Update();
     }
   }
+  else if(maf_event->GetSender() == m_CurrentVolume)
+  {
+    if(maf_event->GetId() == VME_ABSMATRIX_UPDATE)
+    {
+      UpdateSliderRange();
+    }
+  }
 }
 //-------------------------------------------------------------------------
 mmgGui* mafViewOrthoSlice::CreateGui()
@@ -295,4 +301,18 @@ void mafViewOrthoSlice::EnableWidgets(bool enable)
   m_Luts->Enable(enable);
   m_Histogram->Enable(enable);
   m_Histogram->Show(enable);
+}
+//----------------------------------------------------------------------------
+void mafViewOrthoSlice::UpdateSliderRange()
+//----------------------------------------------------------------------------
+{
+  double b[6];
+  m_CurrentVolume->GetOutput()->GetVMEBounds(b);
+  m_Origin[0] = (b[0]+b[1])*.5;
+  m_Origin[1] = (b[2]+b[3])*.5;
+  m_Origin[2] = (b[4]+b[5])*.5;
+  m_SliderX->SetRange(b[0],b[1],m_Origin[0]);
+  m_SliderY->SetRange(b[2],b[3],m_Origin[1]);
+  m_SliderZ->SetRange(b[4],b[5],m_Origin[2]);
+  m_Gui->Update();
 }
