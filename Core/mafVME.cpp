@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-26 08:52:19 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2006-02-03 09:54:45 $
+  Version:   $Revision: 1.32 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -762,7 +762,13 @@ void mafVME::OnEvent(mafEventBase *maf_event)
         GetEventSource()->InvokeEvent(maf_event); // forward event to observers
       break;
       case VME_MATRIX_UPDATE:
-        GetEventSource()->InvokeEvent(maf_event); // forward event to observers
+        if (maf_event->GetSender() == m_AbsMatrixPipe)
+        {
+          mafEventBase absEvent(this, VME_ABSMATRIX_UPDATE);
+          GetEventSource()->InvokeEvent(&absEvent);
+        }
+        else
+          GetEventSource()->InvokeEvent(maf_event); // forward event to observers
       break;
       default:
         Superclass::OnEvent(maf_event);
