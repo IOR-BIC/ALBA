@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 11:36:58 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2006-02-07 12:36:49 $
+  Version:   $Revision: 1.25 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -136,11 +136,11 @@ mafInteractionManager::~mafInteractionManager()
 //------------------------------------------------------------------------------
 {
   m_DeviceManager->Shutdown();
+  cppDEL(m_Frame);
   mafDEL(m_DeviceManager);
   mafDEL(m_StaticEventRouter);
   mafDEL(m_PositionalEventRouter);
   //vtkDEL(m_CurrentRenderer);
-  cppDEL(m_Frame);
 }
 
 //------------------------------------------------------------------------------
@@ -966,71 +966,7 @@ void mafInteractionManager::UpdateDevice(mafDevice *device)
 void mafInteractionManager::CreateGUI() 
 //----------------------------------------------------------------------------
 {
-  /*****
-  
-  //SIL. 4-7-2005: 
-   // Changed Layout, Behaviour on Resize, Buttons Implementation
-
-  m_Dialog = new mmgDialog("I/O Devices Settings",mafRESIZABLE | mafCLOSEWINDOW);
-
-  m_DeviceTree = new mmgTree(m_Dialog,ID_DEVICE_TREE);
-  m_DeviceTree->SetTitle("connected devices");
-  m_DeviceTree->SetSize(230,300);
-  m_DeviceTree->SetListener(this);
-
-  // Holder of Device's settings GUI ==========
-  m_SettingsPanel = new mmgGuiHolder(m_Dialog,ID_DEVICE_SETTINGS);
-  m_SettingsPanel->Show(true);
-  m_SettingsPanel->SetSize(215,300); // h era 230
-  m_SettingsPanel->SetTitle("device settings");
-
-  // Device's binding GUI =====================
-  m_BindingsPanel = new mmgNamedPanel(m_Dialog,ID_DEVICE_BINDINGS);
-  m_BindingsPanel->SetTitle("device bindings");
-  m_BindingsPanel->SetSize(215,100); // h era 230
-
-  m_Bindings = new mmgGui(this);
-  m_Bindings->Label("available actions");
-  m_Bindings->Label("available actions");
-  m_ActionsList = m_Bindings->CheckList(ID_BINDING_LIST,"",60,"actions the devices is assigned to");
-  m_Bindings->Show(true);
-  m_Bindings->FitGui();
-  m_BindingsPanel->Add(m_Bindings);
-
-  // Buttons =====================
-  mmgButton *add = new mmgButton(m_Dialog,ID_ADD_DEVICE,"add device",wxPoint(0,0)); 
-  add->SetListener(this);
-  mmgButton *remove = new mmgButton(m_Dialog,ID_REMOVE_DEVICE,"remove device",wxPoint(0,0));
-  remove->SetListener(this);
-  mmgButton *load = new mmgButton(m_Dialog,ID_LOAD,"load",wxPoint(0,0));
-  load->SetListener(this);
-  mmgButton *save = new mmgButton(m_Dialog,ID_STORE,"save as",wxPoint(0,0));
-  save->SetListener(this);
-  mmgButton *close = new mmgButton(m_Dialog,ID_OK,"close",wxPoint(0,0));
-  close->SetListener(this);
-
-  // sizers ====================================
-  wxBoxSizer *v_sizer = new wxBoxSizer(wxVERTICAL);
-  v_sizer->Add(m_SettingsPanel,1,wxEXPAND|wxALL, 1 );//////////////////////////////
-  v_sizer->Add(m_BindingsPanel,0,wxALL, 1 );
-
-  wxBoxSizer *h_sizer = new wxBoxSizer(wxHORIZONTAL);
-  h_sizer->Add(m_DeviceTree,1,wxEXPAND|wxALL, 1 );
-  h_sizer->Add(v_sizer,0,wxEXPAND);
-
-  wxBoxSizer *h2_sizer = new wxBoxSizer(wxHORIZONTAL);
-  h2_sizer->Add(add);
-  h2_sizer->Add(remove);
-  h2_sizer->Add(load);
-  h2_sizer->Add(save);
-  h2_sizer->Add(close);
-
-  m_Dialog->Add(h_sizer,1,wxEXPAND);
-  m_Dialog->Add(h2_sizer,0,wxCENTRE|wxALL,1);
-
-  *****/
-
-  m_Frame = new wxFrame(NULL,-1,"I/O Devices Settings",wxPoint(-1,-1), wxSize(430,500));
+  m_Frame = new wxFrame(NULL,-1,"I/O Devices Settings",wxPoint(-1,-1), wxSize(550,500),wxRESIZE_BORDER | wxCAPTION );
 
   mmgNamedPanel *FOO = new mmgNamedPanel(m_Frame,-1,false,true);
   FOO->Show();
@@ -1040,18 +976,20 @@ void mafInteractionManager::CreateGUI()
   m_DeviceTree->SetSize(230,300);
   m_DeviceTree->SetListener(this);
 
+  m_Bindings = new mmgGui(this);
+
   // Holder of Device's settings GUI ==========
   m_SettingsPanel = new mmgGuiHolder(FOO ,ID_DEVICE_SETTINGS);
   m_SettingsPanel->Show(true);
-  m_SettingsPanel->SetSize(215,300); // h era 230
+  //m_SettingsPanel->SetSize(215,300); // h era 230
+  m_SettingsPanel->SetSize(m_Bindings->GetMetrics(GUI_HOLDER_WIDTH),300); // h era 230
   m_SettingsPanel->SetTitle("device settings");
 
   // Device's binding GUI =====================
   m_BindingsPanel = new mmgNamedPanel(FOO,ID_DEVICE_BINDINGS);
   m_BindingsPanel->SetTitle("device bindings");
-  m_BindingsPanel->SetSize(215,100); // h era 230
+  m_BindingsPanel->SetSize(m_Bindings->GetMetrics(GUI_HOLDER_WIDTH),100); // h era 230
 
-  m_Bindings = new mmgGui(this);
   m_Bindings->Label("available actions");
   m_Bindings->Label("available actions");
   m_ActionsList = m_Bindings->CheckList(ID_BINDING_LIST,"",60,"actions the devices is assigned to");
