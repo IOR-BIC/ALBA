@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exInteractionApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-21 09:10:13 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-02-07 12:33:44 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -77,7 +77,7 @@ bool exInteractionApp::OnInit()
   assert(result==MAF_OK);
 
   // Initialize Interaction factory
-  result = mafPipeFactoryVME::Initialize();
+  result = mafInteractionFactory::Initialize();
   assert(result==MAF_OK);
 
 

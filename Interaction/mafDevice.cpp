@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDevice.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-21 12:01:26 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-02-07 12:34:45 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -106,7 +106,7 @@ void mafDevice::CreateGui()
 //----------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(NULL);
+  m_Gui = new mmgGui(this);
   m_Gui->String(ID_NAME,"name",&m_Name);
   m_Gui->Divider();
   m_Gui->Button(ID_ACTIVATE,"activate device");
@@ -114,24 +114,24 @@ void mafDevice::CreateGui()
   m_Gui->Bool(ID_AUTO_START,"auto start",&m_AutoStart,0,"automatically start device on application startup");
   m_Gui->Enable(ID_ACTIVATE,!IsInitialized());
   m_Gui->Enable(ID_SHUTDOWN,IsInitialized()!=0);
-  m_Gui->SetListener(this);
 }
 
 //----------------------------------------------------------------------------
 void mafDevice::UpdateGui()
 //----------------------------------------------------------------------------
 {
-  m_Gui->Enable(ID_ACTIVATE,!IsInitialized());
-  m_Gui->Enable(ID_SHUTDOWN,IsInitialized()!=0);
   if (m_Gui)
+  {
+    m_Gui->Enable(ID_ACTIVATE,!IsInitialized());
+    m_Gui->Enable(ID_SHUTDOWN,IsInitialized()!=0);
     m_Gui->Update();
+  }
 }
 //----------------------------------------------------------------------------
 void mafDevice::OnEvent(mafEventBase *e)
 //----------------------------------------------------------------------------
 {
   mafEvent *ev = mafEvent::SafeDownCast(e);
-
   if (ev&& ev->GetSender()==m_Gui)
   {
     switch(ev->GetId()) 
