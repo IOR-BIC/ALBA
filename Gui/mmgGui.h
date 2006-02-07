@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 15:21:07 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2006-02-07 12:34:18 $
+  Version:   $Revision: 1.24 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -50,7 +50,8 @@ enum GUI_CONSTANTS
   GUI_LABEL_WIDTH,
   GUI_WIDGET_WIDTH,
   GUI_FULL_WIDTH,
-  GUI_DATA_WIDTH
+  GUI_DATA_WIDTH,
+  GUI_HOLDER_WIDTH,
 };
 //----------------------------------------------------------------------------
 // mmgGui :

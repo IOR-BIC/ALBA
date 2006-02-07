@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 15:18:49 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2006-02-07 12:34:18 $
+  Version:   $Revision: 1.29 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -68,17 +68,17 @@
                            <------------------------>    DW: data width
 
 */
-const int  M	= 1;											// margin all around a row
-const int LM	= 5;											// label margin
-const int HM	= 2*M;										// horizontal margin
+const int  M	= 1;											// margin all around a row  
+const int LM	= 5;											// label margin             
+const int HM	= 2*M;										// horizontal margin        (2)
 
-const int LH	= 18;											// label/entry height
-const int BH	= 20;											// button height
+const int LH	= 18;											// label/entry height       
+const int BH	= 20;											// button height            
 
 const int LW	= 60;											// label width
-const int EW	= 60;											// entry width  - (was 48)
-const int FW	= LW+LM+EW+HM+EW+HM+EW;		// full width
-const int DW	= EW+HM+EW+HM+EW;					// Data Width - Full Width without the Label
+const int EW	= 60;											// entry width  - (was 48)  
+const int FW	= LW+LM+EW+HM+EW+HM+EW;		// full width               (304)
+const int DW	= EW+HM+EW+HM+EW;					// Data Width - Full Width without the Label (184)
 
 static wxPoint dp = wxDefaultPosition; 
 //----------------------------------------------------------------------------
@@ -148,6 +148,7 @@ int mmgGui::GetMetrics(int id)
   case GUI_WIDGET_WIDTH:	return EW; break;
   case GUI_FULL_WIDTH:		return FW; break;
   case GUI_DATA_WIDTH:		return DW; break;
+  case GUI_HOLDER_WIDTH:  return FW + 18; break; // 18 is the scrollbar width
   default: return 0;
 	}
 }
