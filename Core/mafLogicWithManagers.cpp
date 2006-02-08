@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-19 11:07:19 $
-  Version:   $Revision: 1.50 $
+  Date:      $Date: 2006-02-08 11:50:49 $
+  Version:   $Revision: 1.51 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -156,7 +156,10 @@ void mafLogicWithManagers::Show()
 
   if(m_UseViewManager && m_ViewMenu)
   {
-    m_ViewManager->FillMenu(m_ViewMenu);
+    wxMenu *view_list = new wxMenu;
+    m_ViewMenu->AppendSeparator();
+    m_ViewMenu->Append(0,"Add View",view_list);
+    m_ViewManager->FillMenu(view_list);
   }
 
   if(m_OpManager)
