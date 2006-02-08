@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-07 12:34:18 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2006-02-08 16:12:57 $
+  Version:   $Revision: 1.30 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,7 +27,10 @@
 #include "mmgGui.h"
 #include "mmgButton.h"
 #include "mmgPicButton.h"
+
+#ifdef MAF_USE_VTK //:::::::::::::::::::::::::::::::::
 #include "mmgLutSwatch.h"
+#endif             //:::::::::::::::::::::::::::::::::
 
 #include "mafString.h"
 
@@ -1011,6 +1014,7 @@ void mmgGui::Color(int id,wxString label,wxColour* var, wxString tooltip)
 	sizer->Add( butt, 0);
   Add(sizer,0,wxALL, M); 
 }
+#ifdef MAF_USE_VTK //:::::::::::::::::::::::::::::::::
 //----------------------------------------------------------------------------
 void mmgGui::Lut(int id,wxString label,vtkLookupTable *lut)
 //----------------------------------------------------------------------------
@@ -1028,6 +1032,8 @@ void mmgGui::Lut(int id,wxString label,vtkLookupTable *lut)
   sizer->Add( luts, 0, wxEXPAND, HM);
   Add(sizer,0,wxALL, M); 
 }
+#endif             //:::::::::::::::::::::::::::::::::
+
 //----------------------------------------------------------------------------
 void mmgGui::OkCancel()
 //----------------------------------------------------------------------------

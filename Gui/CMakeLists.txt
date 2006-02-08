@@ -8,26 +8,10 @@ MESSAGE(STATUS "Configuring project ${PROJECT_NAME}")
 CONFIGURE_FILE("${MAF_SOURCE_DIR}/Gui/manifest.in" "${MAF_BINARY_DIR}/Gui/manifest.in" COPYONLY)
 
 SET(PROJECT_SRCS
-  mafAnimate.cpp
-  mafAnimate.h
-  mafAttachCamera.cpp
-  mafAttachCamera.h
-  mafColor.cpp
-  mafColor.h
   mafEvent.cpp
   mafEvent.h
-  mafLightKit.cpp
-  mafLightKit.h
   mafPics.cpp
   mafPics.h
-  mafSideBar.cpp
-  mafSideBar.h
-  mafTextKit.cpp
-  mafTextKit.h
-  mafVTKLog.cpp
-  mafVTKLog.h
-  mafView.cpp
-  mafView.h
   mafWXLog.cpp
   mafWXLog.h
   mmgButton.cpp
@@ -44,8 +28,6 @@ SET(PROJECT_SRCS
   mmgCrossSplitter.h
   mmgDialog.cpp
   mmgDialog.h
-  mmgDialogPreview.cpp
-  mmgDialogPreview.h
   mmgFileHistory.cpp
   mmgFileHistory.h
   mmgFlagSplitter.cpp
@@ -64,16 +46,6 @@ SET(PROJECT_SRCS
   mmgListBox.h
   mmgListCtrl.cpp
   mmgListCtrl.h
-  mmgLutEditor.cpp
-  mmgLutEditor.h
-  mmgLutPreset.cpp
-  mmgLutPreset.h
-  mmgLutSlider.cpp
-  mmgLutSlider.h
-  mmgLutSwatch.cpp
-  mmgLutSwatch.h
-  mmgLutWidget.cpp
-  mmgLutWidget.h
   mmgMovieCtrl.cpp
   mmgMovieCtrl.h
   mmgMDIChild.cpp
@@ -90,8 +62,6 @@ SET(PROJECT_SRCS
   mmgPanelStack.h
   mmgPicButton.cpp
   mmgPicButton.h
-  mmgHistogramWidget.cpp
-  mmgHistogramWidget.h
   mmgRangeSlider.cpp
   mmgRangeSlider.h
   mmgSashPanel.cpp
@@ -111,6 +81,53 @@ SET(PROJECT_SRCS
   mmgViewWin.cpp
   mmgViewWin.h
 )
+
+
+IF (MAF_USE_VTK)
+  SET(PROJECT_SRCS
+  ${PROJECT_SRCS}
+  mafLightKit.cpp
+  mafLightKit.h
+
+  mmgDialogPreview.cpp
+  mmgDialogPreview.h
+
+  mafAnimate.cpp
+  mafAnimate.h
+  mafAttachCamera.cpp
+  mafAttachCamera.h
+
+  mafSideBar.cpp
+  mafSideBar.h
+  mafTextKit.cpp
+  mafTextKit.h
+  mafVTKLog.cpp
+  mafVTKLog.h
+
+  # depends on mafAssembly -> mafRWIBase
+  mafView.cpp
+  mafView.h
+
+  # these depends on vtkLookupTable
+  mafColor.cpp
+  mafColor.h
+  mmgLutEditor.cpp
+  mmgLutEditor.h
+  mmgLutPreset.cpp
+  mmgLutPreset.h
+  mmgLutSlider.cpp
+  mmgLutSlider.h
+  mmgLutSwatch.cpp
+  mmgLutSwatch.h
+  mmgLutWidget.cpp
+  mmgLutWidget.h
+
+  mmgHistogramWidget.cpp
+  mmgHistogramWidget.h
+  )
+ENDIF (MAF_USE_VTK)
+
+
 
 # List the kits from VTK that are needed by this project.
 SET(PROJECT_LIBS
