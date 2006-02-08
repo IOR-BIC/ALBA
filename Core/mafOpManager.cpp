@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-10 16:11:43 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-02-08 11:51:28 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -151,7 +151,7 @@ void mafOpManager::OpAdd(mafOp *op, wxString menuPath)
   m_NumOp++;
 }
 //----------------------------------------------------------------------------
-void mafOpManager::FillMenu (wxMenu* import, wxMenu* mexport, wxMenu* operations)
+/*void mafOpManager::FillMenu (wxMenu* import, wxMenu* mexport, wxMenu* operations)
 //----------------------------------------------------------------------------
 {
   int submenu_id = 1;
@@ -166,7 +166,7 @@ void mafOpManager::FillMenu (wxMenu* import, wxMenu* mexport, wxMenu* operations
     if (o->m_OpMenuPath != "")
     {
       wxMenu *sub_menu = NULL;
-        
+
       int item = m_Menu[o->GetType()]->FindItem(o->m_OpMenuPath);
       if (item != wxNOT_FOUND)
       {
@@ -180,6 +180,61 @@ void mafOpManager::FillMenu (wxMenu* import, wxMenu* mexport, wxMenu* operations
         m_Menu[o->GetType()]->Append(submenu_id++,o->m_OpMenuPath,sub_menu);
       }
       
+      if(sub_menu)
+        sub_menu->Append(o->m_Id, o->m_Label, o->m_Label);
+      else
+        mafLogMessage("error in FillMenu");
+    }
+    else
+    {
+      m_Menu[o->GetType()]->Append(o->m_Id, o->m_Label, o->m_Label);
+    }
+    SetAccelerator(o);
+  }
+  wxAcceleratorTable accel(MAXOP, m_OpAccelEntries);
+  if (accel.Ok())
+    mafGetFrame()->SetAcceleratorTable(accel);
+}*/
+//----------------------------------------------------------------------------
+void mafOpManager::FillMenu (wxMenu* import, wxMenu* mexport, wxMenu* operations)
+//----------------------------------------------------------------------------
+{
+  int submenu_id = 1;
+
+  m_Menu[OPTYPE_IMPORTER] = import;
+  m_Menu[OPTYPE_EXPORTER] = mexport;
+  m_Menu[OPTYPE_OP] = operations;
+
+  for(int i=0; i<m_NumOp; i++)
+  {
+    mafOp *o = m_OpList[i];
+    if (o->m_OpMenuPath != "")
+    {
+      wxMenu *sub_menu = NULL;
+      wxMenu *path_menu = m_Menu[o->GetType()];
+      wxString op_path = "";
+      wxStringTokenizer path_tkz(o->m_OpMenuPath, "/");
+      while ( path_tkz.HasMoreTokens() )
+      {
+        op_path = path_tkz.GetNextToken();
+        int item = path_menu->FindItem(op_path);
+        if (item != wxNOT_FOUND)
+        {
+          wxMenuItem *menu_item = path_menu->FindItem(item);
+          if (menu_item)
+            sub_menu = menu_item->GetSubMenu();
+        }
+        else
+        {
+          if (sub_menu)
+          {
+            path_menu = sub_menu;
+          }
+          sub_menu = new wxMenu;
+          path_menu->Append(submenu_id++,op_path,sub_menu);
+        }
+      }
+
       if(sub_menu)
         sub_menu->Append(o->m_Id, o->m_Label, o->m_Label);
       else
