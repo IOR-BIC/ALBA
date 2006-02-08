@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-21 18:20:10 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-02-08 11:49:57 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,7 +51,6 @@ enum VIEW_CONTEXTUAL_MENU_ID
 		CONTEXTUAL_MENU_RENAME_VIEW,				
 		CONTEXTUAL_MENU_HIDE_VME,				
 		CONTEXTUAL_MENU_DELETE_VME,
-		CONTEXTUAL_MENU_CHANGE_PROPERTIES,
 		CONTEXTUAL_MENU_TRANSFORM,
 		CONTEXTUAL_MENU_QUIT_CHILD_VIEW,
 		CONTEXTUAL_MENU_MAXIMIZE_CHILD_VIEW,
@@ -98,7 +97,6 @@ void mmgContextualMenu::ShowContextualMenu(wxFrame *child, mafView *view, bool v
 	{
 		this->Append(CONTEXTUAL_MENU_HIDE_VME, "Hide");
 		this->Append(CONTEXTUAL_MENU_DELETE_VME, "Delete");
-		this->Append(CONTEXTUAL_MENU_CHANGE_PROPERTIES, "Change properties");
 		this->Append(CONTEXTUAL_MENU_TRANSFORM, "Maf Transform");
     this->AppendSeparator();
   }
@@ -175,12 +173,6 @@ void mmgContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
 		case CONTEXTUAL_MENU_DELETE_VME:
 			//send the event to simulate the cut started by the menu button.
 			mafEventMacro(mafEvent(this, MENU_OP, (long)OP_CUT));
-		break;
-		case CONTEXTUAL_MENU_CHANGE_PROPERTIES:
-		{
-			mafString s = "Open attributes window";
-			mafEventMacro(mafEvent(this, PARSE_STRING, &s));
-		}
 		break;
 		case CONTEXTUAL_MENU_TRANSFORM:
 		{
