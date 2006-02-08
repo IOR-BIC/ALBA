@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-10 13:27:27 $
-  Version:   $Revision: 1.38 $
+  Date:      $Date: 2006-02-08 11:52:04 $
+  Version:   $Revision: 1.39 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -118,15 +118,15 @@ bool exOperationApp::OnInit()
   m_Logic->Plug(new mmo2DMeasure("2D Measure"));
   m_Logic->Plug(new mmoAddLandmark("Add Landmark"));
   m_Logic->Plug(new mmoClipSurface("Clip Surface"));
-  m_Logic->Plug(new mmoCreateGroup("Create Group"));
-  m_Logic->Plug(new mmoCreateMeter("Create Meter"));
-  m_Logic->Plug(new mmoCreateRefSys("Create RefSys"));
-  m_Logic->Plug(new mmoCreateProber("Create Prober"));
-  m_Logic->Plug(new mmoCreateSlicer("Create Slicer"));
+  m_Logic->Plug(new mmoCreateGroup("Group"),"Create");
+  m_Logic->Plug(new mmoCreateMeter("Meter"),"Create");
+  m_Logic->Plug(new mmoCreateRefSys("RefSys"),"Create");
+  m_Logic->Plug(new mmoCreateProber("Prober"),"Create");
+  m_Logic->Plug(new mmoCreateSlicer("Slicer"),"Create");
   m_Logic->Plug(new mmoExplodeCollapse("Explode/Collapse cloud"));
   m_Logic->Plug(new mmoExtractIsosurface("Extract Isosurface"));
-  m_Logic->Plug(new mmoFilterSurface("Filter Surface"));
-  m_Logic->Plug(new mmoFilterVolume("Filter Volume"));
+  m_Logic->Plug(new mmoFilterSurface("Surface"),"Filter");
+  m_Logic->Plug(new mmoFilterVolume("Volume"),"Filter/Volume");
   m_Logic->Plug(new mmoMAFTransform("MAF Transform  \tCtrl+T"));
   m_Logic->Plug(new mmoReparentTo("Reparent to...  \tCtrl+R"));
   m_Logic->Plug(new mmoVolumeResample("Resample Volume"));
