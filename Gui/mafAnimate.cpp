@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-30 11:46:54 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-02-09 11:07:33 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -183,7 +183,6 @@ void mafAnimate::FlyTo()
     item = m_Tags->GetTag(m_SelectedPosition.c_str()); // support old style
 
   vtkCamera *camera = m_Renderer->GetActiveCamera();
-  m_Renderer->GetRenderWindow()->SetSize(800,600);  // to be removed
 
   double fly0[10]; // from
   double fly1[10]; // to
