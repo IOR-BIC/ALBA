@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi2DMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 17:40:50 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-02-09 11:35:31 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -467,13 +467,13 @@ void mmi2DMeter::CalculateMeasure()
 
   if(m_MeasureType == ANGLE_BETWEEN_LINES)
   {
-    float angle, v1[3], vn1, v2[3], vn2, s;
-    v1[0] = fabs(p2_1[0] - p1_1[0]);
-	  v1[1] = fabs(p2_1[1] - p1_1[1]);
-	  v1[2] = fabs(p2_1[2] - p1_1[2]);
-    v2[0] = fabs(p2_2[0] - p1_2[0]);
-	  v2[1] = fabs(p2_2[1] - p1_2[1]);
-	  v2[2] = fabs(p2_2[2] - p1_2[2]);
+    double angle, v1[3], vn1, v2[3], vn2, s;
+    v1[0] = p2_1[0] - p1_1[0];
+    v1[1] = p2_1[1] - p1_1[1];
+    v1[2] = p2_1[2] - p1_1[2];
+    v2[0] = p2_2[0] - p1_2[0];
+    v2[1] = p2_2[1] - p1_2[1];
+    v2[2] = p2_2[2] - p1_2[2];
 
     vn1 = vtkMath::Norm(v1);
     vn2 = vtkMath::Norm(v2);
@@ -488,7 +488,8 @@ void mmi2DMeter::CalculateMeasure()
     }
     
     angle *= vtkMath::RadiansToDegrees();
-    angle = fabs(angle);
+    if(angle >= 90.0) 
+      angle = 180.0 - angle; 
     mafEventMacro(mafEvent(this,ID_RESULT_ANGLE,angle));
     return;
   } 
