@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-03 09:56:33 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2006-02-09 11:10:08 $
+  Version:   $Revision: 1.21 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -115,6 +115,9 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
       }
       if (m_SliderX)
       {
+        m_Origin[0] = center[0];
+        m_Origin[1] = center[1];
+        m_Origin[2] = center[2];
         UpdateSliderRange();
         m_CurrentVolume->GetEventSource()->AddObserver(this);
       }
@@ -308,9 +311,6 @@ void mafViewOrthoSlice::UpdateSliderRange()
 {
   double b[6];
   m_CurrentVolume->GetOutput()->GetVMEBounds(b);
-  m_Origin[0] = (b[0]+b[1])*.5;
-  m_Origin[1] = (b[2]+b[3])*.5;
-  m_Origin[2] = (b[4]+b[5])*.5;
   m_SliderX->SetRange(b[0],b[1],m_Origin[0]);
   m_SliderY->SetRange(b[2],b[3],m_Origin[1]);
   m_SliderZ->SetRange(b[4],b[5],m_Origin[2]);
