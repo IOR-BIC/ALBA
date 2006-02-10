@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-10 16:16:29 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2006-02-10 16:23:13 $
+  Version:   $Revision: 1.25 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -310,7 +310,7 @@ void mafLogicWithGUI::EnableItem(int item, bool enable)
 void mafLogicWithGUI::InitializeLanguage()
 //----------------------------------------------------------------------------
 {
-  wxConfig *config = new wxConfig();
+  wxConfig *config = new wxConfig(wxEmptyString);
   long lang;
   wxString dict;
   if(config->Read("Language", &lang))
