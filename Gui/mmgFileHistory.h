@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgFileHistory.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:21 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-02-10 15:43:12 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -14,9 +14,10 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "mafEvent.h"
 #include <wx/docview.h>
 #include <wx/confbase.h>
-#include "mafEvent.h"
+
 //----------------------------------------------------------------------------
 // mmgFileHistory :
 //----------------------------------------------------------------------------

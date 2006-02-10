@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-08 11:52:04 $
-  Version:   $Revision: 1.39 $
+  Date:      $Date: 2006-02-10 15:42:41 $
+  Version:   $Revision: 1.40 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,6 +22,7 @@
 
 #include "exOperationApp.h"
 #include "mafDecl.h"
+
 #include "mafVMEFactory.h"
 #include "mafPics.h"
 #include "mmgMDIFrame.h"
@@ -127,7 +128,7 @@ bool exOperationApp::OnInit()
   m_Logic->Plug(new mmoExtractIsosurface("Extract Isosurface"));
   m_Logic->Plug(new mmoFilterSurface("Surface"),"Filter");
   m_Logic->Plug(new mmoFilterVolume("Volume"),"Filter/Volume");
-  m_Logic->Plug(new mmoMAFTransform("MAF Transform  \tCtrl+T"));
+  m_Logic->Plug(new mmoMAFTransform("Transform  \tCtrl+T"));
   m_Logic->Plug(new mmoReparentTo("Reparent to...  \tCtrl+R"));
   m_Logic->Plug(new mmoVolumeResample("Resample Volume"));
   //------------------------------------------------------------
