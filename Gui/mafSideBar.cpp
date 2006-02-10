@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 17:40:24 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2006-02-10 13:02:08 $
+  Version:   $Revision: 1.26 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -41,6 +41,7 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener)
 
   //splitted panel  
   m_Notebook = new wxNotebook(parent,-1);
+  m_Notebook->SetFont(wxFont(wxSystemSettings::GetSystemFont(wxSYS_DEFAULT_GUI_FONT)));
   //m_SideSplittedPanel = new mmgNamedPanel(m_Notebook,-1,false,true); //SIL. 29-4-2003 - 200 is the height of the vme_property panel
   m_SideSplittedPanel = new wxSplitterWindow(m_Notebook, -1,wxDefaultPosition,wxSize(-1,-1),/*wxSP_3DSASH |*/ wxSP_FULLSASH);
 
@@ -65,6 +66,7 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener)
   m_Notebook->AddPage(m_OpPanel ," op. parameters");
 
   wxNotebook *vme_notebook = new wxNotebook(m_SideSplittedPanel,-1);
+  vme_notebook->SetFont(wxFont(wxSystemSettings::GetSystemFont(wxSYS_DEFAULT_GUI_FONT)));
 
   m_VmeOutputPanel = new mmgGuiHolder(vme_notebook,-1,false,true);
   vme_notebook->AddPage(m_VmeOutputPanel," vme output ");

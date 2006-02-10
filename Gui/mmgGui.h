@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-08 16:12:57 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2006-02-10 13:02:09 $
+  Version:   $Revision: 1.26 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -236,7 +236,9 @@ public:
 	/** Return the font used for bold label. */
   wxFont GetBoldFont() {return m_BoldFont;}; 
 
-	/** Return the measure used to layout the widgets - pass one of the GUI_xxx constants. */
+  wxFont GetGuiFont() {return m_Font;}; 
+
+  /** Return the measure used to layout the widgets - pass one of the GUI_xxx constants. */
   int GetMetrics( int id); 
 
   void OnEvent(mafEventBase *maf_event);
@@ -271,6 +273,7 @@ protected:
   m_BoldFont is the font used for the Bold labels
   */
   wxFont m_BoldFont;
+  wxFont m_Font;
 
   /**  \par implementation details:
   m_Id is a counter that holds the last generated widget_ID.
