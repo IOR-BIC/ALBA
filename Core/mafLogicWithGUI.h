@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-20 16:48:36 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-02-10 15:41:56 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -145,6 +145,9 @@ protected:
 	bool               m_LogAllEvents;
   mafWXLog          *m_Logger;
   mafVTKLog         *m_VtkLog;
+  wxLocale           m_Locale;
+  wxLanguage         m_Language;
+  mafString          m_LanguageDictionary;
 
 	bool m_PlugMenu;    ///< Flag to plug or not the Menu into the application. Default is true.
 	bool m_PlugToolbar; ///< Flag to plug or not the Toolbar into the application. Default is true.
