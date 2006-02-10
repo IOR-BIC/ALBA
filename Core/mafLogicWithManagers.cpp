@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-08 11:50:49 $
-  Version:   $Revision: 1.51 $
+  Date:      $Date: 2006-02-10 12:59:50 $
+  Version:   $Revision: 1.52 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -158,7 +158,7 @@ void mafLogicWithManagers::Show()
   {
     wxMenu *view_list = new wxMenu;
     m_ViewMenu->AppendSeparator();
-    m_ViewMenu->Append(0,"Add View",view_list);
+    m_ViewMenu->Append(0,_("Add View"),view_list);
     m_ViewManager->FillMenu(view_list);
   }
 
@@ -216,60 +216,60 @@ void mafLogicWithManagers::CreateMenu()
 {
   m_MenuBar  = new wxMenuBar;
   wxMenu    *file_menu = new wxMenu;
-  file_menu->Append(MENU_FILE_NEW,   "&New");
-  file_menu->Append(MENU_FILE_OPEN,  "&Open ..");
-  file_menu->Append(MENU_FILE_SAVE,  "&Save");
-  file_menu->Append(MENU_FILE_SAVEAS,"Save &As ..");
+  file_menu->Append(MENU_FILE_NEW,   _("&New"));
+  file_menu->Append(MENU_FILE_OPEN,  _("&Open"));
+  file_menu->Append(MENU_FILE_SAVE,  _("&Save"));
+  file_menu->Append(MENU_FILE_SAVEAS,_("Save &As"));
 
   m_ImportMenu = new wxMenu;
   file_menu->AppendSeparator();
-  file_menu->Append(0,"Import",m_ImportMenu );
+  file_menu->Append(0,_("Import"),m_ImportMenu );
 
   m_ExportMenu = new wxMenu;
-  file_menu->Append(0,"Export",m_ExportMenu);
+  file_menu->Append(0,_("Export"),m_ExportMenu);
 
   // Print menu item
   file_menu->AppendSeparator();
-  file_menu->Append(MENU_FILE_PRINT, "&Print");
-  file_menu->Append(MENU_FILE_PRINT_PREVIEW, "Print Preview");
-  file_menu->Append(MENU_FILE_PRINT_SETUP, "Printer Setup");
-  file_menu->Append(MENU_FILE_PRINT_PAGE_SETUP, "Page Setup");
+  file_menu->Append(MENU_FILE_PRINT, _("&Print"));
+  file_menu->Append(MENU_FILE_PRINT_PREVIEW, _("Print Preview"));
+  file_menu->Append(MENU_FILE_PRINT_SETUP, _("Printer Setup"));
+  file_menu->Append(MENU_FILE_PRINT_PAGE_SETUP, _("Page Setup"));
 
   m_RecentFileMenu = new wxMenu;
   file_menu->AppendSeparator();
-  file_menu->Append(0,"Recent Files",m_RecentFileMenu);
+  file_menu->Append(0,_("Recent Files"),m_RecentFileMenu);
 
   file_menu->AppendSeparator();
-  file_menu->Append(MENU_FILE_QUIT,  "&Quit");
+  file_menu->Append(MENU_FILE_QUIT,  _("&Quit"));
 
-  m_MenuBar->Append(file_menu, "&File");
+  m_MenuBar->Append(file_menu, _("&File"));
 
   wxMenu    *edit_menu = new wxMenu;
-  edit_menu->Append(OP_UNDO,   "Undo  \tCtrl+Z");
-  edit_menu->Append(OP_REDO,   "Redo  \tCtrl+Shift+Z");
+  edit_menu->Append(OP_UNDO,   _("Undo  \tCtrl+Z"));
+  edit_menu->Append(OP_REDO,   _("Redo  \tCtrl+Shift+Z"));
   edit_menu->AppendSeparator();
-  edit_menu->Append(OP_DELETE, "Delete");
-  edit_menu->Append(OP_CUT,   "Cut   \tCtrl+Shift+X");
-  edit_menu->Append(OP_COPY,  "Copy  \tCtrl+Shift+C");
-  edit_menu->Append(OP_PASTE, "Paste \tCtrl+Shift+V");
-  m_MenuBar->Append(edit_menu, "&Edit");
+  edit_menu->Append(OP_DELETE, _("Delete"));
+  edit_menu->Append(OP_CUT,   _("Cut   \tCtrl+Shift+X"));
+  edit_menu->Append(OP_COPY,  _("Copy  \tCtrl+Shift+C"));
+  edit_menu->Append(OP_PASTE, _("Paste \tCtrl+Shift+V"));
+  m_MenuBar->Append(edit_menu, _("&Edit"));
 
   m_ViewMenu = new wxMenu;
   //m_ViewManager->FillMenu(m_ViewMenu);  
   if(this->m_PlugToolbar) 
   {
-    m_ViewMenu->Append(MENU_VIEW_TOOLBAR, "Toolbar","",wxITEM_CHECK);
+    m_ViewMenu->Append(MENU_VIEW_TOOLBAR, _("Toolbar"),"",wxITEM_CHECK);
     m_ViewMenu->Check(MENU_VIEW_TOOLBAR,true);
   }
-  m_MenuBar->Append(m_ViewMenu, "&View");
+  m_MenuBar->Append(m_ViewMenu, _("&View"));
 
   m_OpMenu = new wxMenu;
-  m_MenuBar->Append(m_OpMenu, "&Operations");
+  m_MenuBar->Append(m_OpMenu, _("&Operations"));
 
   wxMenu    *option_menu = new wxMenu;
   option_menu->AppendSeparator();
-  option_menu->Append(MENU_OPTION_DEVICE_SETTINGS, "Interaction Settings");
-  m_MenuBar->Append(option_menu, "&Preferences");
+  option_menu->Append(MENU_OPTION_DEVICE_SETTINGS, _("Interaction Settings"));
+  m_MenuBar->Append(option_menu, _("&Preferences"));
 
   m_Win->SetMenuBar(m_MenuBar);
 
@@ -286,26 +286,26 @@ void mafLogicWithManagers::CreateToolbar()
   m_ToolBar->SetMargins(0,0);
   m_ToolBar->SetToolSeparation(2);
   m_ToolBar->SetToolBitmapSize(wxSize(20,20));
-  m_ToolBar->AddTool(MENU_FILE_NEW,mafPics.GetBmp("FILE_NEW"),    "new msf storage file");
-  m_ToolBar->AddTool(MENU_FILE_OPEN,mafPics.GetBmp("FILE_OPEN"),  "open msf storage file");
-  m_ToolBar->AddTool(MENU_FILE_SAVE,mafPics.GetBmp("FILE_SAVE"),  "save current msf storage file");
+  m_ToolBar->AddTool(MENU_FILE_NEW,mafPics.GetBmp("FILE_NEW"),    _("new msf storage file"));
+  m_ToolBar->AddTool(MENU_FILE_OPEN,mafPics.GetBmp("FILE_OPEN"),  _("open msf storage file"));
+  m_ToolBar->AddTool(MENU_FILE_SAVE,mafPics.GetBmp("FILE_SAVE"),  _("save current msf storage file"));
   m_ToolBar->AddSeparator();
 
-  m_ToolBar->AddTool(MENU_FILE_PRINT,mafPics.GetBmp("PRINT"),  "print the selected view");
-  m_ToolBar->AddTool(MENU_FILE_PRINT_PREVIEW,mafPics.GetBmp("PRINT_PREVIEW"),  "show the print preview for the selected view");
+  m_ToolBar->AddTool(MENU_FILE_PRINT,mafPics.GetBmp("PRINT"),  _("print the selected view"));
+  m_ToolBar->AddTool(MENU_FILE_PRINT_PREVIEW,mafPics.GetBmp("PRINT_PREVIEW"),  _("show the print preview for the selected view"));
   m_ToolBar->AddSeparator();
 
-  m_ToolBar->AddTool(OP_UNDO,mafPics.GetBmp("OP_UNDO"),  "undo (ctrl+z)"); //correggere tooltip - shortcut sbagliati
-  m_ToolBar->AddTool(OP_REDO,mafPics.GetBmp("OP_REDO"),  "redo (ctrl+shift+z)");
+  m_ToolBar->AddTool(OP_UNDO,mafPics.GetBmp("OP_UNDO"),  _("undo (ctrl+z)"));
+  m_ToolBar->AddTool(OP_REDO,mafPics.GetBmp("OP_REDO"),  _("redo (ctrl+shift+z)"));
   m_ToolBar->AddSeparator();
 
-  m_ToolBar->AddTool(OP_CUT,  mafPics.GetBmp("OP_CUT"),  "cut selected vme (ctrl+x)");
-  m_ToolBar->AddTool(OP_COPY, mafPics.GetBmp("OP_COPY"), "copy selected vme (ctrl+c)");
-  m_ToolBar->AddTool(OP_PASTE,mafPics.GetBmp("OP_PASTE"),"paste vme (ctrl+v)");
+  m_ToolBar->AddTool(OP_CUT,  mafPics.GetBmp("OP_CUT"),  _("cut selected vme (ctrl+x)"));
+  m_ToolBar->AddTool(OP_COPY, mafPics.GetBmp("OP_COPY"), _("copy selected vme (ctrl+c)"));
+  m_ToolBar->AddTool(OP_PASTE,mafPics.GetBmp("OP_PASTE"),_("paste vme (ctrl+v)"));
   m_ToolBar->AddSeparator();
-  m_ToolBar->AddTool(CAMERA_RESET,mafPics.GetBmp("ZOOM_ALL"),"reset camera to fit all (ctrl+f)");
-  m_ToolBar->AddTool(CAMERA_FIT,  mafPics.GetBmp("ZOOM_SEL"),"reset camera to fit selected object (ctrl+shift+f)");
-  m_ToolBar->AddTool(CAMERA_FLYTO,mafPics.GetBmp("FLYTO"),"fly to object under mouse (press f inside a 3Dview)");
+  m_ToolBar->AddTool(CAMERA_RESET,mafPics.GetBmp("ZOOM_ALL"),_("reset camera to fit all (ctrl+f)"));
+  m_ToolBar->AddTool(CAMERA_FIT,  mafPics.GetBmp("ZOOM_SEL"),_("reset camera to fit selected object (ctrl+shift+f)"));
+  m_ToolBar->AddTool(CAMERA_FLYTO,mafPics.GetBmp("FLYTO"),_("fly to object under mouse"));
   m_ToolBar->Realize();
   m_Win->SetToolBar(m_ToolBar);
 
@@ -592,9 +592,8 @@ void mafLogicWithManagers::OnFileOpen(const char *file_to_open)
   {
 	  if(m_VMEManager->AskConfirmAndSave())
 	  {
-		  wxString m_wildc    = "MAF Storage Format file (*.msf)|*.msf|Compressed file (*.zmsf)|*.zmsf";
+		  wxString m_wildc    = _("MAF Storage Format file (*.msf)|*.msf|Compressed file (*.zmsf)|*.zmsf");
 		  wxString m_msf_dir  = mafGetApplicationDirectory().c_str();
-               //m_msf_dir += "/Data/MSF/";
 		  wxString file;
       if (file_to_open != NULL)
       {
@@ -655,8 +654,8 @@ void mafLogicWithManagers::OnQuit()
     {
       int answer = wxMessageBox
           (
-          "would you like to save your work before quitting ?",
-          "Confirm", 
+          _("would you like to save your work before quitting ?"),
+          _("Confirm"), 
           wxYES_NO|wxCANCEL|wxICON_QUESTION , m_Win
           );
       if(answer == wxYES) 
@@ -665,7 +664,7 @@ void mafLogicWithManagers::OnQuit()
     }
     else 
     {
-      int answer = wxMessageBox("quit program?", "Confirm", wxYES_NO | wxICON_QUESTION , m_Win);
+      int answer = wxMessageBox(_("quit program ?"), _("Confirm"), wxYES_NO | wxICON_QUESTION , m_Win);
       quit = answer == wxYES;
     }
     if(!quit) 
@@ -960,7 +959,7 @@ void mafLogicWithManagers::TreeContextualMenu(mafEvent &e)
 void mafLogicWithManagers::HandleException()
 //----------------------------------------------------------------------------
 {
-  int answare = wxMessageBox("Do you want to try to save the unsaved work?", "Fatal Exception!!", wxYES_NO|wxCENTER);
+  int answare = wxMessageBox(_("Do you want to try to save the unsaved work ?"), _("Fatal Exception!!"), wxYES_NO|wxCENTER);
   if(answare == wxYES)
   {
     OnFileSave();

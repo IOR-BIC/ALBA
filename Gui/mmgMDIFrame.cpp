@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 16:59:10 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2006-02-10 13:01:18 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -266,7 +266,7 @@ void mmgMDIFrame::CreateStatusbar ()
   static const int widths[]={-1,60,60,60,210,100}; // enlarged the last tab for the "free mem watch" information
 	CreateStatusBar(6); 
   m_frameStatusBar->SetStatusWidths(6,widths);
-	SetStatusText( "Welcome",0);
+	SetStatusText( _("welcome"),0);
 	SetStatusText( " ",1);
 	SetStatusText( " ",2);
 	SetStatusText( " ",3);

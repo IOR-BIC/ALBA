@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-20 16:48:36 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2006-02-10 13:00:18 $
+  Version:   $Revision: 1.22 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -114,17 +114,17 @@ void mafLogicWithGUI::CreateMenu()
 {
   m_MenuBar  = new wxMenuBar;
   wxMenu *file_menu = new wxMenu;
-  file_menu->Append(MENU_FILE_QUIT,  "&Quit");
-  m_MenuBar->Append(file_menu, "&File");
+  file_menu->Append(MENU_FILE_QUIT,  _("&Quit"));
+  m_MenuBar->Append(file_menu, _("&File"));
   wxMenu *edit_menu = new wxMenu;
-  m_MenuBar->Append(edit_menu, "&Edit");
+  m_MenuBar->Append(edit_menu, _("&Edit"));
   wxMenu *view_menu = new wxMenu;
   if(this->m_PlugToolbar) 
   {
-    view_menu->Append(MENU_VIEW_TOOLBAR, "Toolbar","",wxITEM_CHECK);
+    view_menu->Append(MENU_VIEW_TOOLBAR, _("Toolbar"),"",wxITEM_CHECK);
     view_menu->Check(MENU_VIEW_TOOLBAR,true);
   }
-  m_MenuBar->Append(view_menu, "&View");
+  m_MenuBar->Append(view_menu, _("&View"));
 
   m_Win->SetMenuBar(m_MenuBar);
 }
@@ -238,10 +238,10 @@ void mafLogicWithGUI::CreateLogbar()
   log_panel->SetTitle(" Log Area:");
   log_panel->Add(log,1,wxEXPAND);
 
-  m_LogSash = new mmgSashPanel(m_Win, MENU_VIEW_LOGBAR, wxBOTTOM,80,"Log Bar \tCtrl+L");
+  m_LogSash = new mmgSashPanel(m_Win, MENU_VIEW_LOGBAR, wxBOTTOM,80,_("Log Bar \tCtrl+L"));
   m_LogSash->Put(log_panel);
   //m_LogSash->Show(false);
-  mafLogMessage("welcome");
+  mafLogMessage(_("welcome"));
 }
 
 //----------------------------------------------------------------------------
@@ -252,22 +252,22 @@ void mafLogicWithGUI::CreateToolbar()
   m_ToolBar->SetMargins(0,0);
   m_ToolBar->SetToolSeparation(2);
   m_ToolBar->SetToolBitmapSize(wxSize(20,20));
-  m_ToolBar->AddTool(MENU_FILE_NEW,mafPics.GetBmp("FILE_NEW"),    "new msf storage file");
-  m_ToolBar->AddTool(MENU_FILE_OPEN,mafPics.GetBmp("FILE_OPEN"),  "open msf storage file");
-  m_ToolBar->AddTool(MENU_FILE_SAVE,mafPics.GetBmp("FILE_SAVE"),  "save current msf storage file");
+  m_ToolBar->AddTool(MENU_FILE_NEW,mafPics.GetBmp("FILE_NEW"),    _("new msf storage file"));
+  m_ToolBar->AddTool(MENU_FILE_OPEN,mafPics.GetBmp("FILE_OPEN"),  _("open msf storage file"));
+  m_ToolBar->AddTool(MENU_FILE_SAVE,mafPics.GetBmp("FILE_SAVE"),  _("save current msf storage file"));
   m_ToolBar->AddSeparator();
 
-  m_ToolBar->AddTool(OP_UNDO,mafPics.GetBmp("OP_UNDO"),  "undo (ctrl+z)"); //correggere tooltip - shortcut sbagliati
-  m_ToolBar->AddTool(OP_REDO,mafPics.GetBmp("OP_REDO"),  "redo (ctrl+shift+z)");
+  m_ToolBar->AddTool(OP_UNDO,mafPics.GetBmp("OP_UNDO"),  _("undo (ctrl+z)")); //correggere tooltip - shortcut sbagliati
+  m_ToolBar->AddTool(OP_REDO,mafPics.GetBmp("OP_REDO"),  _("redo (ctrl+shift+z)"));
   m_ToolBar->AddSeparator();
 
-  m_ToolBar->AddTool(OP_CUT,  mafPics.GetBmp("OP_CUT"),  "cut selected vme (ctrl+x)");
-  m_ToolBar->AddTool(OP_COPY, mafPics.GetBmp("OP_COPY"), "copy selected vme (ctrl+c)");
-  m_ToolBar->AddTool(OP_PASTE,mafPics.GetBmp("OP_PASTE"),"paste vme (ctrl+v)");
+  m_ToolBar->AddTool(OP_CUT,  mafPics.GetBmp("OP_CUT"),  _("cut selected vme (ctrl+x)"));
+  m_ToolBar->AddTool(OP_COPY, mafPics.GetBmp("OP_COPY"), _("copy selected vme (ctrl+c)"));
+  m_ToolBar->AddTool(OP_PASTE,mafPics.GetBmp("OP_PASTE"),_("paste vme (ctrl+v)"));
   m_ToolBar->AddSeparator();
-  m_ToolBar->AddTool(CAMERA_RESET,mafPics.GetBmp("ZOOM_ALL"),"reset camera to fit all (ctrl+f)");
-  m_ToolBar->AddTool(CAMERA_FIT,  mafPics.GetBmp("ZOOM_SEL"),"reset camera to fit selected object (ctrl+shift+f)");
-  m_ToolBar->AddTool(CAMERA_FLYTO,mafPics.GetBmp("FLYTO"),"fly to object under mouse (press f inside a 3Dview)");
+  m_ToolBar->AddTool(CAMERA_RESET,mafPics.GetBmp("ZOOM_ALL"),_("reset camera to fit all (ctrl+f)"));
+  m_ToolBar->AddTool(CAMERA_FIT,  mafPics.GetBmp("ZOOM_SEL"),_("reset camera to fit selected object (ctrl+shift+f)"));
+  m_ToolBar->AddTool(CAMERA_FLYTO,mafPics.GetBmp("FLYTO"),_("fly to object under mouse (press f inside a 3Dview)"));
   m_ToolBar->Realize();
   m_Win->SetToolBar(m_ToolBar);
 
@@ -279,13 +279,13 @@ void mafLogicWithGUI::CreateToolbar()
 void mafLogicWithGUI::CreateSidebar()
 //----------------------------------------------------------------------------
 {
-  m_SideSash = new mmgSashPanel(m_Win, MENU_VIEW_SIDEBAR, wxRIGHT,280, "Side Bar \tCtrl+S", false); // 280 is the width of the sideBar
+  m_SideSash = new mmgSashPanel(m_Win, MENU_VIEW_SIDEBAR, wxRIGHT,280, _("Side Bar \tCtrl+S"), false); // 280 is the width of the sideBar
 }
 //----------------------------------------------------------------------------
 void mafLogicWithGUI::CreateTimebar()
 //----------------------------------------------------------------------------
 {
-  m_TimeSash = new mmgSashPanel(m_Win,MENU_VIEW_TIMEBAR,wxBOTTOM,22,"Time Bar \tCtrl+T",false);
+  m_TimeSash = new mmgSashPanel(m_Win,MENU_VIEW_TIMEBAR,wxBOTTOM,22,_("Time Bar \tCtrl+T"),false);
   m_TimePanel = new mmgTimeBar(m_TimeSash,-1,true);
   m_TimePanel->SetListener(this);
   m_TimeSash->Put(m_TimePanel);

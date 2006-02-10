@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-08 11:51:28 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2006-02-10 12:59:17 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -217,7 +217,7 @@ void mafOpManager::FillMenu (wxMenu* import, wxMenu* mexport, wxMenu* operations
       while ( path_tkz.HasMoreTokens() )
       {
         op_path = path_tkz.GetNextToken();
-        int item = path_menu->FindItem(op_path);
+        int item = path_menu->FindItem(_(op_path));
         if (item != wxNOT_FOUND)
         {
           wxMenuItem *menu_item = path_menu->FindItem(item);
@@ -231,18 +231,18 @@ void mafOpManager::FillMenu (wxMenu* import, wxMenu* mexport, wxMenu* operations
             path_menu = sub_menu;
           }
           sub_menu = new wxMenu;
-          path_menu->Append(submenu_id++,op_path,sub_menu);
+          path_menu->Append(submenu_id++,_(op_path),sub_menu);
         }
       }
 
       if(sub_menu)
-        sub_menu->Append(o->m_Id, o->m_Label, o->m_Label);
+        sub_menu->Append(o->m_Id, _(o->m_Label), _(o->m_Label));
       else
-        mafLogMessage("error in FillMenu");
+        mafLogMessage(_("error in FillMenu"));
     }
     else
     {
-      m_Menu[o->GetType()]->Append(o->m_Id, o->m_Label, o->m_Label);
+      m_Menu[o->GetType()]->Append(o->m_Id, _(o->m_Label), _(o->m_Label));
     }
     SetAccelerator(o);
   }

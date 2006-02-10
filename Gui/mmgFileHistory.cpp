@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgFileHistory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-12 09:45:03 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-02-10 13:01:34 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -92,7 +92,7 @@ void mmgFileHistory::AddFileToHistory(const wxString& file)
 void mmgFileHistory::RemoveFileFromHistory(int i)
 //----------------------------------------------------------------------------
 {
-  wxCHECK_RET( i < m_fileHistoryN, wxT("invalid index in mmgFileHistory  ::RemoveFileFromHistory") );
+  wxCHECK_RET( i < m_fileHistoryN, _("invalid index in mmgFileHistory::RemoveFileFromHistory") );
 
   wxNode* node = m_fileMenus.First();
   while ( node )
