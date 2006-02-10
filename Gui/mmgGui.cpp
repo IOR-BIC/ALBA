@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-10 13:02:09 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2006-02-10 14:28:46 $
+  Version:   $Revision: 1.32 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -288,7 +288,7 @@ void mmgGui::Label(mafString *var, bool bold, bool multiline)
 void mmgGui::Label(mafString label1, mafString label2, bool bold_label, bool bold_var)
 //----------------------------------------------------------------------------
 {
-	wxStaticText* lab1 = new wxStaticText(this, -1, label1.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT ); 
+	wxStaticText* lab1 = new wxStaticText(this, -1, label1.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT  | wxST_NO_AUTORESIZE ); 
 	wxStaticText* lab2 = new wxStaticText(this, -1, label2.GetCStr(), dp, wxSize(-1,LH), wxALIGN_LEFT ); 
 	if(bold_label) 
     lab1->SetFont(m_BoldFont);
@@ -309,7 +309,7 @@ void mmgGui::Label(mafString label1, mafString label2, bool bold_label, bool bol
 void mmgGui::Label(mafString label1,mafString *var, bool bold_label, bool bold_var)
 //----------------------------------------------------------------------------
 {
-	wxStaticText* lab1 = new wxStaticText(this, -1, label1.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT );
+	wxStaticText* lab1 = new wxStaticText(this, -1, label1.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
 	wxStaticText* lab2 = new wxStaticText(this, -1, var->GetCStr(),   dp, wxSize(-1,LH), wxALIGN_LEFT );
   if(m_UseBackgroundColor) lab1->SetBackgroundColour(m_BackgroundColor);
   if(m_UseBackgroundColor) lab2->SetBackgroundColour(m_BackgroundColor);	
@@ -344,7 +344,7 @@ void mmgGui::Button(int id,mafString button_text,mafString label, mafString tool
 	}
   else
 	{
-		wxStaticText *lab  = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW, LH), wxALIGN_RIGHT );
+		wxStaticText *lab  = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW, LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
@@ -366,7 +366,7 @@ void mmgGui::Button  (int id,mafString *label,mafString button_text, mafString t
 //----------------------------------------------------------------------------
 {
   int w_id = GetId(id);
-	wxStaticText *lab  = new wxStaticText(this, w_id, label->GetCStr(), dp, wxSize(LW, LH), wxALIGN_RIGHT );
+	wxStaticText *lab  = new wxStaticText(this, w_id, label->GetCStr(), dp, wxSize(LW, LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   lab->SetValidator( mmgValidator(this,w_id,lab,label) );
   lab->SetFont(m_Font);
   if(m_UseBackgroundColor) 
@@ -390,7 +390,7 @@ void mmgGui::Vector(int id,wxString label,int var[3],int min, int max, wxString 
 //----------------------------------------------------------------------------
 {
   int w_id;
-	wxStaticText *lab  = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT );
+	wxStaticText *lab  = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   if(m_UseBackgroundColor) 
     lab->SetBackgroundColour(m_BackgroundColor);
   lab->SetFont(m_Font);
@@ -425,7 +425,7 @@ void mmgGui::Vector(int id,wxString label,int var[3],int minx,int maxx,int miny,
 //----------------------------------------------------------------------------
 {
 	int w_id;
-  wxStaticText *lab  = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT );
+  wxStaticText *lab  = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   if(m_UseBackgroundColor) 
     lab->SetBackgroundColour(m_BackgroundColor);
 	w_id = GetId(id);
@@ -459,7 +459,7 @@ void mmgGui::Vector(int id,wxString label,float var[3],float min, float max, int
 //----------------------------------------------------------------------------
 {   
   int w_id;
-	wxStaticText *lab  = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT );
+	wxStaticText *lab  = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   if(m_UseBackgroundColor) lab->SetBackgroundColour(m_BackgroundColor);
   w_id = GetId(id);
 	wxTextCtrl  *text1 = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(EW,LH), m_EntryStyle );
@@ -492,7 +492,7 @@ void mmgGui::Vector(int id,wxString label,float var[3],float minx,float maxx,flo
 //----------------------------------------------------------------------------
 {
   int w_id;
-	wxStaticText *lab  = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT );
+	wxStaticText *lab  = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   if(m_UseBackgroundColor) 
     lab->SetBackgroundColour(m_BackgroundColor);
   lab->SetFont(m_Font);
@@ -527,7 +527,7 @@ void mmgGui::Vector(int id,wxString label,double var[3],double min, double max, 
 //----------------------------------------------------------------------------
 {   
   int w_id;
-	wxStaticText *lab  = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT );
+	wxStaticText *lab  = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   if(m_UseBackgroundColor) 
     lab->SetBackgroundColour(m_BackgroundColor);
   lab->SetFont(m_Font);
@@ -550,11 +550,11 @@ void mmgGui::Vector(int id,wxString label,double var[3],double min, double max, 
 		text3->SetToolTip(tooltip);
 	}
   wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add( lab,  0, wxRIGHT, LM);
-	sizer->Add( text1,0, wxRIGHT, HM);
-	sizer->Add( text2,0, wxRIGHT, HM);
-	sizer->Add( text3,0, wxRIGHT, HM);
-  Add(sizer,0,wxALL, M); 
+  sizer->Add( lab,  0, wxRIGHT, LM);
+  sizer->Add( text1,0, wxRIGHT, HM);
+  sizer->Add( text2,0, wxRIGHT, HM);
+  sizer->Add( text3,0, wxRIGHT, HM);
+  Add(sizer,0,wxEXPAND, M); 
 }
 // double vector form 2
 //----------------------------------------------------------------------------
@@ -562,7 +562,7 @@ void mmgGui::Vector(int id,wxString label,double var[3],double minx,double maxx,
 //----------------------------------------------------------------------------
 {
   int w_id;
-	wxStaticText *lab  = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT );
+	wxStaticText *lab  = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   if(m_UseBackgroundColor) 
     lab->SetBackgroundColour(m_BackgroundColor);
   lab->SetFont(m_Font);
@@ -589,7 +589,7 @@ void mmgGui::Vector(int id,wxString label,double var[3],double minx,double maxx,
 	sizer->Add( text1,0, wxRIGHT, HM);
 	sizer->Add( text2,0, wxRIGHT, HM);
 	sizer->Add( text3,0, wxRIGHT, HM);
-  Add(sizer,0,wxALL, M); 
+  Add(sizer,0,wxEXPAND, M); 
 }
 //----------------------------------------------------------------------------
 void mmgGui::String(int id,wxString label,wxString* var, wxString tooltip, bool multiline)
@@ -610,7 +610,7 @@ void mmgGui::String(int id,wxString label,wxString* var, wxString tooltip, bool 
 	}
 	else
 	{
-		wxStaticText *lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT );
+		wxStaticText *lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
@@ -650,7 +650,7 @@ void mmgGui::String(int id,mafString label, mafString *var, mafString tooltip, b
 	}
 	else
 	{
-		wxStaticText *lab = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT );
+		wxStaticText *lab = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
@@ -687,7 +687,7 @@ void mmgGui::Integer(int id,mafString label,int* var,int min, int max, mafString
 	}
 	else
 	{
-		wxStaticText *lab = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT );
+		wxStaticText *lab = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
@@ -720,7 +720,7 @@ void mmgGui::Float(int id,mafString label,float* var,float min, float max, int f
 	}
 	else
 	{
-		wxStaticText *lab = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT );
+		wxStaticText *lab = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
@@ -754,7 +754,7 @@ void mmgGui::Double(int id,mafString label,double* var,double min, double max, i
 	}
 	else
 	{
-		wxStaticText *lab = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT );
+		wxStaticText *lab = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
@@ -789,7 +789,7 @@ void mmgGui::Bool(int id,mafString label,int* var, int flag, mafString tooltip) 
   } 
 	else      // text on right
 	{
-		wxStaticText *lab = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT );
+		wxStaticText *lab = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
@@ -839,7 +839,7 @@ wxSlider *mmgGui::Slider(int id,wxString label,int* var,int min, int max, wxStri
 	{
     int text_w   = EW/2;
 		int slider_w = DW-text_w;
-		lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT );
+		lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
@@ -893,7 +893,7 @@ mmgFloatSlider *mmgGui::FloatSlider(int id,wxString label,double *var,double min
 	{
     int text_w   = EW/2;
 		int slider_w = DW-text_w;
-		lab = new wxStaticText  (this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT );
+		lab = new wxStaticText  (this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
@@ -925,7 +925,7 @@ void mmgGui::Radio(int id,wxString label,int* var, int numchoices, const wxStrin
 	// that it break the correct tab-ordering - and there's is no workaround
 	// workaround: - use combo instead
 
-  wxStaticText *lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT );
+  wxStaticText *lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   if(m_UseBackgroundColor) 
     lab->SetBackgroundColour(m_BackgroundColor);
   lab->SetFont(m_Font);
@@ -953,7 +953,7 @@ void mmgGui::Combo(int id,mafString label,int* var,int numchoices, const wxStrin
 
   if(!label.IsEmpty())
   {
-    wxStaticText *lab = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW,-1), wxALIGN_RIGHT );
+    wxStaticText *lab = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW,-1), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
@@ -982,7 +982,7 @@ void mmgGui::FileOpen(int id,mafString label,mafString* var, const mafString wil
 {
   int text_w = EW+HM+EW;
   int butt_w;
-	wxStaticText *lab  = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW,BH), wxALIGN_RIGHT );
+	wxStaticText *lab  = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW,BH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   if(m_UseBackgroundColor) 
     lab->SetBackgroundColour(m_BackgroundColor);
   lab->SetFont(m_Font);
@@ -1020,7 +1020,7 @@ void mmgGui::DirOpen(int id,mafString label,mafString *var, mafString tooltip)
 {
   int text_w = EW+HM+EW;
   int butt_w;
-	wxStaticText *lab  = new wxStaticText(this, GetId(id), label.GetCStr(),   dp, wxSize(    LW,BH), wxALIGN_RIGHT );
+	wxStaticText *lab  = new wxStaticText(this, GetId(id), label.GetCStr(),   dp, wxSize(LW,BH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   if(m_UseBackgroundColor) 
     lab->SetBackgroundColour(m_BackgroundColor);
   lab->SetFont(m_Font);
@@ -1058,7 +1058,7 @@ void mmgGui::FileSave(int id,mafString label,mafString* var, const mafString wil
 {
   int text_w = EW+HM+EW;
   int butt_w;
-	wxStaticText *lab  = new wxStaticText(this, GetId(id), label.GetCStr(),   dp, wxSize(    LW,BH), wxALIGN_RIGHT );
+	wxStaticText *lab  = new wxStaticText(this, GetId(id), label.GetCStr(),   dp, wxSize(LW,BH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   if(m_UseBackgroundColor) 
     lab->SetBackgroundColour(m_BackgroundColor);
   lab->SetFont(m_Font);
@@ -1094,7 +1094,7 @@ void mmgGui::FileSave(int id,mafString label,mafString* var, const mafString wil
 void mmgGui::Color(int id,wxString label,wxColour* var, wxString tooltip)
 //----------------------------------------------------------------------------
 {
-	wxStaticText	*lab  = new wxStaticText(this, GetId(id), label,dp, wxSize(LW,LH), wxALIGN_RIGHT );
+	wxStaticText	*lab  = new wxStaticText(this, GetId(id), label,dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   if(m_UseBackgroundColor) 
     lab->SetBackgroundColour(m_BackgroundColor);
   lab->SetFont(m_Font);
@@ -1117,7 +1117,7 @@ void mmgGui::Color(int id,wxString label,wxColour* var, wxString tooltip)
 void mmgGui::Lut(int id,wxString label,vtkLookupTable *lut)
 //----------------------------------------------------------------------------
 {
-  wxStaticText	*lab  = new wxStaticText(this, GetId(id), label,dp, wxSize(LW,LH), wxALIGN_RIGHT );
+  wxStaticText	*lab  = new wxStaticText(this, GetId(id), label,dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   if(m_UseBackgroundColor) 
     lab->SetBackgroundColour(m_BackgroundColor);
   lab->SetFont(m_Font);
@@ -1164,7 +1164,7 @@ wxListBox *mmgGui::ListBox(int id,wxString label,int height, wxString tooltip, l
 	}
 	else
   {
-		wxStaticText *lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT );
+		wxStaticText *lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
@@ -1203,7 +1203,7 @@ wxGrid *mmgGui::Grid(int id, wxString label,int height, int row, int cols, wxStr
 	}
 	else
   {
-		wxStaticText *lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT );
+		wxStaticText *lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
@@ -1233,7 +1233,7 @@ mmgCheckListBox* mmgGui::CheckList(int id,wxString label,int height, wxString to
 	}
 	else
   {
-		wxStaticText *lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT );
+		wxStaticText *lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
@@ -1261,7 +1261,7 @@ void mmgGui::VectorN(int id,wxString label, double *var,int num_elem,double min,
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 	if(label != "")
 	{
-		wxStaticText *lab  = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT );
+		wxStaticText *lab  = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
@@ -1276,7 +1276,7 @@ void mmgGui::VectorN(int id,wxString label, double *var,int num_elem,double min,
 		if(tooltip != "") tex->SetToolTip(tooltip);
   	sizer->Add(tex,0,wxRIGHT,HM);
 	}
-	Add(sizer,0,wxALL,M);
+	Add(sizer,0,wxEXPAND,M);
 }
 //----------------------------------------------------------------------------
 void mmgGui::VectorN(int id,wxString label, int *var,int num_elem,int min, int max, wxString tooltip)
@@ -1293,7 +1293,7 @@ void mmgGui::VectorN(int id,wxString label, int *var,int num_elem,int min, int m
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 	if(label != "")
 	{
-		wxStaticText *lab  = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT );
+		wxStaticText *lab  = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
@@ -1308,7 +1308,7 @@ void mmgGui::VectorN(int id,wxString label, int *var,int num_elem,int min, int m
 		if(tooltip != "") tex->SetToolTip(tooltip);
   	sizer->Add(tex,0,wxRIGHT,HM);
 	}
-	Add(sizer,0,wxALL,M);
+	Add(sizer,0,wxEXPAND,M);
 }
 //----------------------------------------------------------------------------
 void mmgGui::OnListBox (wxCommandEvent &event)
