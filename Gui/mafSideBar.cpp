@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-10 13:02:08 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2006-02-13 09:38:54 $
+  Version:   $Revision: 1.27 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,29 +51,29 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener)
   m_Tree->SetSize(-1,300);
   m_Tree->SetTitle(" vme hierarchy: ");
   //m_SideSplittedPanel->Add(m_Tree);
-  m_Notebook->AddPage(m_SideSplittedPanel,"vme manager",true);
+  m_Notebook->AddPage(m_SideSplittedPanel,_("vme manager"),true);
 
   //view property panel
   m_ViewPropertyPanel = new mmgGuiHolder(m_Notebook,-1,true);
-  m_ViewPropertyPanel->SetTitle(" no view selected:");
-  m_Notebook->AddPage(m_ViewPropertyPanel,"view settings");
+  m_ViewPropertyPanel->SetTitle(_("no view selected:"));
+  m_Notebook->AddPage(m_ViewPropertyPanel,_("view settings"));
 
   //op_panel ----------------------------
   m_OpPanel  = new mmgPanelStack(m_Notebook ,-1);
   mmgNamedPanel *empty_op = new mmgNamedPanel(m_OpPanel ,-1,true);
-  empty_op->SetTitle(" no operation running:");
+  empty_op->SetTitle(_(" no operation running:"));
   m_OpPanel->Push(empty_op);
-  m_Notebook->AddPage(m_OpPanel ," op. parameters");
+  m_Notebook->AddPage(m_OpPanel ,_(" op. parameters"));
 
   wxNotebook *vme_notebook = new wxNotebook(m_SideSplittedPanel,-1);
   vme_notebook->SetFont(wxFont(wxSystemSettings::GetSystemFont(wxSYS_DEFAULT_GUI_FONT)));
 
   m_VmeOutputPanel = new mmgGuiHolder(vme_notebook,-1,false,true);
-  vme_notebook->AddPage(m_VmeOutputPanel," vme output ");
+  vme_notebook->AddPage(m_VmeOutputPanel,_(" vme output "));
   m_VmePipePanel = new mmgGuiHolder(vme_notebook,-1,false,true);
-  vme_notebook->AddPage(m_VmePipePanel," vme pipe ");
+  vme_notebook->AddPage(m_VmePipePanel,_(" vme pipe "));
   m_VmePanel = new mmgGuiHolder(vme_notebook,-1,false,true);
-  vme_notebook->AddPage(m_VmePanel," vme object ");
+  vme_notebook->AddPage(m_VmePanel,_(" vme object "));
 
   //m_SideSplittedPanel->Add(vme_notebook,1);
   //m_side_bar->Put(m_Notebook);
@@ -132,7 +132,7 @@ void mafSideBar::ViewSelect(mafView *view)
 	}
 	else
 	{
-    m_ViewPropertyPanel->SetTitle("no view selected:");
+    m_ViewPropertyPanel->SetTitle(_("no view selected:"));
 		m_ViewPropertyPanel->RemoveCurrentGui();
 	}
   m_SelectedView = view;
