@@ -36,6 +36,7 @@
 #cmakedefine MAF_USE_WX
 #cmakedefine MAF_USE_ITK
 #cmakedefine MAF_USE_CRYPTO
+#cmakedefine MAF_USE_WXMOZILLA
 
 //--------------------------------------------------------------------------
 // MAF Versioning
