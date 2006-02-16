@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-30 11:27:35 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2006-02-16 12:07:48 $
+  Version:   $Revision: 1.19 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -123,6 +123,9 @@ protected:
   /**
   Redefined to add View,Op,Import,Export menu */
   virtual void CreateMenu();
+
+  /** create a new storage object */
+  virtual void CreateLocalStorage(mafEvent *e);
 
   /**
   Redefined to add Print buttons */

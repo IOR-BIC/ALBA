@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-10 12:59:50 $
-  Version:   $Revision: 1.52 $
+  Date:      $Date: 2006-02-16 12:07:48 $
+  Version:   $Revision: 1.53 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,6 +44,7 @@
 #include "mmgMaterialChooser.h"
 #include "mafOp.h"
 #include "mmiPER.h"
+#include "mafVMEStorage.h"
 
 //----------------------------------------------------------------------------
 mafLogicWithManagers::mafLogicWithManagers()
@@ -564,6 +565,9 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       case PER_POP:
         if(m_InteractionManager) m_InteractionManager->PopPER();
       break;
+      case CREATE_LOCAL_STORAGE:
+        CreateLocalStorage(e);
+      break;
       default:
         mafLogicWithGUI::OnEvent(maf_event);
       break; 
@@ -966,4 +970,21 @@ void mafLogicWithManagers::HandleException()
     m_OpManager->StopCurrentOperation();
   }
   OnQuit();
+}
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::CreateLocalStorage(mafEvent *e)
+//----------------------------------------------------------------------------
+{
+  mafVMEStorage *storage;
+  storage = (mafVMEStorage *)e->GetMafObject();
+  if (storage)
+  {
+    m_VMEManager->NotifyRemove(storage->GetRoot());
+    storage->Delete();
+  }
+  storage = mafVMEStorage::New();
+  storage->GetRoot()->SetName("root");
+  storage->SetListener(m_VMEManager);
+  storage->GetRoot()->Initialize();
+  e->SetMafObject(storage);
 }
