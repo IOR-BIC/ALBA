@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-06 12:41:46 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-02-16 12:07:00 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,7 +36,7 @@ public:
   void OnEvent(mafEventBase *e);
  
   /** create a new storage object */
-  virtual void CreateNewStorage();
+//  virtual void CreateNewStorage();
 
   /** 
   Destroy all nodes (also the root), for each destroyed node the manager send 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-19 11:06:09 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2006-02-16 12:06:59 $
+  Version:   $Revision: 1.22 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -103,7 +103,7 @@ mafVMERoot *mafVMEManager::GetRoot()
 {
   return (m_Storage?m_Storage->GetRoot():NULL);
 }
-
+/*
 //----------------------------------------------------------------------------
 void mafVMEManager::CreateNewStorage()
 //----------------------------------------------------------------------------
@@ -120,7 +120,7 @@ void mafVMEManager::CreateNewStorage()
   m_Storage->SetListener(this);
   m_Storage->GetRoot()->Initialize();
 }
-
+*/
 //----------------------------------------------------------------------------
 void mafVMEManager::MSFNew(bool notify_root_creation)   
 //----------------------------------------------------------------------------
@@ -147,7 +147,12 @@ void mafVMEManager::MSFNew(bool notify_root_creation)
 
   m_Modified = false;
   
-  CreateNewStorage();
+  //CreateNewStorage();
+  m_LoadingFlag = true;
+  mafEvent e(this,CREATE_LOCAL_STORAGE,m_Storage);
+  mafEventMacro(e);
+  m_Storage = (mafVMEStorage *)e.GetMafObject();
+  m_LoadingFlag = false;
 
   if(notify_root_creation)
 	{
