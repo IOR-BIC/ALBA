@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTreeContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 14:51:26 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-02-16 12:05:18 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -236,7 +236,6 @@ void mmgTreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
 void mmgTreeContextualMenu::CryptSubTree(bool crypt)
 //----------------------------------------------------------------------------
 {
-//  mafVmeData *vd = NULL;
   mafNodeIterator *iter = m_NodeActive->NewIterator();
 
 	for(mafNode *v=iter->GetFirstNode();v;v=iter->GetNextNode())
@@ -244,13 +243,6 @@ void mmgTreeContextualMenu::CryptSubTree(bool crypt)
     if(!v->IsA("mafVME"))
       continue;
     ((mafVME *)v)->SetCrypting(crypt);
-//    vd = (mafVmeData *)v->GetClientData();
-//    if (vd == NULL)
-//    {
-//      mafEventMacro(mafEvent(this,VME_CREATE_CLIENT_DATA,v));
-//      vd = (mafVmeData *)v->GetClientData();
-//    }
-//    vd->UpdateFromTag();
 	}
 	iter->Delete();
 }
