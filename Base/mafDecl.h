@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-19 14:55:04 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2006-02-16 12:06:17 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -156,7 +156,8 @@ EVT_START,
   VME_CHOOSE_FEM_PROPERTY,
   VME_REF_SYS_CHOOSED,  //from mmgVMERefSysChooser to a mafOp (to be moved elsewhere Marco)
   VME_FEM_DATA_CHOOSED, //from mmgVMEFEMDataChooser to a mafOp (to be moved elsewhere Marco)
-  VME_CREATE_CLIENT_DATA, // (to be removed Marco)
+  CREATE_LOCAL_STORAGE,
+  CREATE_REMOTE_STORAGE,
 
   // events about views
   VIEW_QUIT,		 // from keyboard, used specially to close external views.
