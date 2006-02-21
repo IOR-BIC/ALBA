@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-16 12:07:48 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2006-02-21 13:21:36 $
+  Version:   $Revision: 1.20 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,7 +60,7 @@ USAGE - member function MUST be called in this order:
   -- call PlugXXX:          to customize the GUI and the Managers
   -- call Configure:        to create the GUI and the managers
   -- call Plug              to plug-in operations and views
-  -- call Show              it is before Init, to eventually show the Progressbar during a Load
+  -- call Show              it is before Init, to eventually show the Progress-bar during a Load
   -- call Init(argc,argv)   will call MSFNew or MSFLoad
 
 */
@@ -104,6 +104,12 @@ public:
   if set to OPEN_ALL_DATA let's the application to open all msf file. 
   As default the application stamp is the name of the application and it is set into the Show() method. */
   void SetApplicationStamp(mafString &app_stamp);
+
+  /** Allow to set the flag for views to by External to the main frame or to by child of parent frame. */
+  void SetExternalViewFlag(bool external = false);
+
+  /** Retrieve the value for the external view flag.*/
+  bool GetExternalViewFlag();
 
   /** Manage application exception and allow to save at least the tree. */
   void HandleException();
@@ -212,6 +218,8 @@ protected:
   wxMenu *m_RecentFileMenu;
   wxMenu *m_OpMenu;
   wxMenu *m_ViewMenu; 
+
+  bool m_ExternalViewFlag;
 
   bool m_UseVMEManager;
   bool m_UseViewManager;

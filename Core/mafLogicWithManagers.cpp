@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-16 12:07:48 $
-  Version:   $Revision: 1.53 $
+  Date:      $Date: 2006-02-21 13:21:36 $
+  Version:   $Revision: 1.54 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,6 +21,7 @@
 
 
 #include "mafLogicWithManagers.h"
+#include <wx/config.h>
 
 #include "mafView.h"
 #include "mafViewVTK.h"
@@ -34,16 +35,17 @@
 #include "mafTagItem.h"
 #include "mafPrintSupport.h"
 
+#include "mafSideBar.h"
 #include "mmgMDIFrame.h"
+#include "mmgMDIChild.h"
 #include "mmgCheckTree.h"
 #include "mmgTreeContextualMenu.h"
 #include "mmgContextualMenu.h"
-#include "mmgMDIChild.h"
-#include "mafSideBar.h"
 #include "mmgTimeBar.h"
 #include "mmgMaterialChooser.h"
-#include "mafOp.h"
+#include "mmgViewFrame.h"
 #include "mmiPER.h"
+
 #include "mafVMEStorage.h"
 
 //----------------------------------------------------------------------------
@@ -57,6 +59,7 @@ mafLogicWithManagers::mafLogicWithManagers()
   m_UseOpManager   = true;
   m_UseInteractionManager = true;
   
+  m_ExternalViewFlag  = false;
   
   m_VMEManager  = NULL;
   m_ViewManager = NULL;
@@ -887,10 +890,23 @@ void mafLogicWithManagers::ViewCreated(mafView *v)
   // removed temporarily support for external Views
   if(v) 
 	{
+    if (GetExternalViewFlag())
+    {
+      // external views
+      mmgViewFrame *extern_view = new mmgViewFrame(m_Win, -1, v->GetLabel(), wxPoint(10,10),wxSize(800,600)/*, wxSIMPLE_BORDER|wxMAXIMIZE*/);
+      extern_view->SetView(v);
+      extern_view->SetListener(m_ViewManager);
+      v->SetListener(extern_view);
+      v->SetFrame(extern_view);
+      extern_view->Refresh();
+    }
+    else
+    {
+      // child views
       mmgMDIChild *c = new mmgMDIChild(m_Win,v);   
-			c->SetListener(m_ViewManager);
-			v->SetFrame(c);
- 			//v->ShowSettings();
+      c->SetListener(m_ViewManager);
+      v->SetFrame(c);
+    }
 	}
 }
 //----------------------------------------------------------------------------
@@ -987,4 +1003,22 @@ void mafLogicWithManagers::CreateLocalStorage(mafEvent *e)
   storage->SetListener(m_VMEManager);
   storage->GetRoot()->Initialize();
   e->SetMafObject(storage);
+}
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::SetExternalViewFlag(bool external)
+//----------------------------------------------------------------------------
+{
+  m_ExternalViewFlag = external;
+  wxConfig *config = new wxConfig(wxEmptyString);
+  config->Write("ExternalViewFlag",m_ExternalViewFlag);
+  cppDEL(config);
+}
+//----------------------------------------------------------------------------
+bool mafLogicWithManagers::GetExternalViewFlag()
+//----------------------------------------------------------------------------
+{
+  wxConfig *config = new wxConfig(wxEmptyString);
+  config->Read("ExternalViewFlag", &m_ExternalViewFlag, false);
+  cppDEL(config);
+  return m_ExternalViewFlag;
 }
