@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-09 11:07:33 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-02-21 12:18:30 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -170,6 +170,18 @@ void mafAnimate::EnableWidgets()
 	m_DeletePositionButton->Enable( m_Tags != NULL && m_PositionList->Number()>0 && m_SelectedPosition != "" );
 	m_RenamePositionButton->Enable( m_Tags != NULL && m_PositionList->Number()>0 && m_SelectedPosition != "" );
 	m_Gui->Enable( ID_ANIMATE, m_Tags != NULL && m_PositionList->Number()>0 );
+}
+//----------------------------------------------------------------------------
+void mafAnimate::FlyTo(const char *fly_position)
+//----------------------------------------------------------------------------
+{
+  wxString fly_pos(fly_position);
+  int pos = m_PositionList->FindString(fly_pos);
+  if (pos != -1)
+  {
+    m_PositionList->Select(pos);
+    FlyTo();
+  }
 }
 //----------------------------------------------------------------------------
 void mafAnimate::FlyTo()

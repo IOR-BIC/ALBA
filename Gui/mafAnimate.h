@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-09 11:07:33 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-02-21 12:18:31 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,15 +43,18 @@ public:
   /** set the vme that hold the tagarray where the ViewPoint are stored */
 	void SetInputVME(mafNode *vme);
 
-	/** Read root node's tags to retrieve previous stored camera positions.  */
-	void RetrieveStoredPositions();
-
   /** delete All entries in listbox.*/
   void ResetKit();
+
+  /** Allow to fly on specified position present into the stored positions. */
+  void FlyTo(const char *fly_position);
 
 protected:
 	/** Move the camera to the target position */
 	void FlyTo();
+
+  /** Read root node's tags to retrieve previous stored camera positions.  */
+  void RetrieveStoredPositions();
 
 	/** Store a view position into the root's tag array */
 	void StoreViewPoint();
