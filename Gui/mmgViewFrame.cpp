@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgViewFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-03 13:55:03 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-02-21 14:23:38 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -71,12 +71,24 @@ void mmgViewFrame::OnCloseWindow(wxCloseEvent &event)
 void mmgViewFrame::OnSize(wxSizeEvent &event)
 //----------------------------------------------------------------------------
 { 
-   Refresh();
-   if (m_ClientWin)
-   {
-     wxLayoutAlgorithm layout;
-     layout.LayoutWindow(this,m_ClientWin);
-   }
+	Refresh();
+  if (m_ClientWin)
+  {
+    wxLayoutAlgorithm layout;
+    layout.LayoutWindow(this,m_ClientWin);
+  }
+
+#ifndef WIN32
+  int w,h;
+  //don't initialize w & h using the event - use GetClientSize instead
+  this->GetClientSize(&w,&h); 
+  
+  if(m_View)
+  {
+    m_View->SetWindowSize(w,h);
+  }
+#endif
+
 }
 //----------------------------------------------------------------------------
 void mmgViewFrame::OnSelect(wxCommandEvent &event) 
