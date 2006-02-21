@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-03 09:55:30 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-02-21 13:20:49 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,7 +35,7 @@ class mmgHistogramWidget;
 class mafViewOrthoSlice: public mafViewCompound
 {
 public:
-  mafViewOrthoSlice(wxString label = "View OrthoSlice", bool external = false);
+  mafViewOrthoSlice(wxString label = "View OrthoSlice");
   virtual ~mafViewOrthoSlice(); 
 
   mafTypeMacro(mafViewOrthoSlice, mafViewCompound);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-10 16:12:28 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-02-21 13:20:49 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -48,8 +48,8 @@ mafCxxTypeMacro(mafViewSlice);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewSlice::mafViewSlice(wxString label, int camera_position, bool show_axes, bool show_grid, int stereo, bool external)
-:mafViewVTK(label,camera_position,show_axes,show_grid,stereo,external)
+mafViewSlice::mafViewSlice(wxString label, int camera_position, bool show_axes, bool show_grid, int stereo)
+:mafViewVTK(label,camera_position,show_axes,show_grid,stereo)
 //----------------------------------------------------------------------------
 {
   m_CurrentVolume = NULL;
@@ -70,7 +70,7 @@ mafViewSlice::~mafViewSlice()
 mafView *mafViewSlice::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewSlice *v = new mafViewSlice(m_Label, m_CameraPosition, m_ShowAxes,m_ShowGrid, m_StereoType, m_ExternalFlag);
+  mafViewSlice *v = new mafViewSlice(m_Label, m_CameraPosition, m_ShowAxes,m_ShowGrid, m_StereoType);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;

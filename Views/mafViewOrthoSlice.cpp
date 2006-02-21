@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-09 11:10:08 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2006-02-21 13:20:49 $
+  Version:   $Revision: 1.22 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,8 +40,8 @@ mafCxxTypeMacro(mafViewOrthoSlice);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewOrthoSlice::mafViewOrthoSlice(wxString label, bool external)
-: mafViewCompound(label, 2, 2, external)
+mafViewOrthoSlice::mafViewOrthoSlice(wxString label)
+: mafViewCompound(label, 2, 2)
 //----------------------------------------------------------------------------
 {
   m_Luts = NULL;
@@ -75,7 +75,7 @@ mafViewOrthoSlice::~mafViewOrthoSlice()
 mafView *mafViewOrthoSlice::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewOrthoSlice *v = new mafViewOrthoSlice(m_Label, m_ExternalFlag);
+  mafViewOrthoSlice *v = new mafViewOrthoSlice(m_Label);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   for (int i=0;i<m_PluggedChildViewList.size();i++)

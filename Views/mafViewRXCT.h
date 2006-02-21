@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-19 14:15:33 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-02-21 13:20:49 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,7 +33,7 @@ class mafGizmoSlice;
 class mafViewRXCT: public mafViewCompound
 {
 public:
-  mafViewRXCT(wxString label = "View RXCT", bool external = false);
+  mafViewRXCT(wxString label = "View RXCT");
   virtual ~mafViewRXCT(); 
 
   mafTypeMacro(mafViewRXCT, mafViewCompound);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-19 16:03:03 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-02-21 13:20:49 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,8 +38,8 @@ mafCxxTypeMacro(mafViewRXCT);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewRXCT::mafViewRXCT(wxString label, bool external)
-: mafViewCompound(label, 1, 3, external)
+mafViewRXCT::mafViewRXCT(wxString label)
+: mafViewCompound(label, 1, 3)
 //----------------------------------------------------------------------------
 {
   for (int v=0;v<2;v++)
@@ -74,7 +74,7 @@ mafViewRXCT::~mafViewRXCT()
 mafView *mafViewRXCT::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewRXCT *v = new mafViewRXCT(m_Label, m_ExternalFlag);
+  mafViewRXCT *v = new mafViewRXCT(m_Label);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   for (int i=0;i<m_PluggedChildViewList.size();i++)
