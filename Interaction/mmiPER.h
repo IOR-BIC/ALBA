@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPER.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-07 11:20:10 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-02-21 12:18:58 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone, originally by Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -43,7 +43,7 @@ public:
   /** Enable fly to mode: next click will select where to fly to */
   virtual void FlyToMode() {m_FlyToFlag = true;};
 
-  /** Weither to auto adjust camera clipping range */
+  /** Waiter to auto adjust camera clipping range */
   virtual void SetAutoAdjustCameraClippingRange( int value );
 
   /** 
@@ -114,7 +114,6 @@ protected:
   /** internally used to return the picked VME for given device */
   mafVME *GetPickedVME(mafDevice *device);
 
- 
   bool            m_FlyToFlag;
   bool            m_DraggingLeft; 
   bool            m_CanSelect; 

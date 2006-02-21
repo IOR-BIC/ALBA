@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-08-24 16:13:31 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-02-21 12:20:37 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -146,7 +146,7 @@ mafAvatar3D::~mafAvatar3D()
 }
 
 //------------------------------------------------------------------------------
-void mafAvatar3D::SetDebugTextPosition(double posx,double posy)
+void mafAvatar3D::SetDebugTextPosition(double posx, double posy)
 //------------------------------------------------------------------------------
 {
   m_DebugTextPosition[0]=posx;

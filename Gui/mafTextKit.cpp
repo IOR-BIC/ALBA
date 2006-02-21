@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTextKit.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-30 18:21:45 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-02-21 12:17:44 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,8 +49,6 @@ mafTextKit::mafTextKit(wxWindow* parent, vtkRenderer *renderer, mafObserver *Lis
   m_TextMapper->SetInput(m_TextInView.GetCStr());
   m_TextMapper->GetTextProperty()->AntiAliasingOn();
   m_TextMapper->GetTextProperty()->SetFontFamily(VTK_ARIAL);
-  m_TextMapper->GetTextProperty()->SetFontSize(24);
-  m_TextMapper->GetTextProperty()->SetColor(0.8,0.8,0.8);
   m_TextMapper->GetTextProperty()->SetLineOffset(0.5);
   m_TextMapper->GetTextProperty()->SetLineSpacing(1.5);
 
@@ -61,6 +59,7 @@ mafTextKit::mafTextKit(wxWindow* parent, vtkRenderer *renderer, mafObserver *Lis
 
   SetTextAlignment();
   SetTextColor(240,240,240);
+  SetTextSize(m_TextSize);
   CreateGui();
 }
 //----------------------------------------------------------------------------
@@ -251,6 +250,6 @@ void mafTextKit::SetTextAlignment(int align)
 void mafTextKit::SetTextSize(int size)
 //----------------------------------------------------------------------------
 {
-    m_TextSize = size;
-    m_TextMapper->GetTextProperty()->SetFontSize(size);
+  m_TextSize = size;
+  m_TextMapper->GetTextProperty()->SetFontSize(size);
 }
