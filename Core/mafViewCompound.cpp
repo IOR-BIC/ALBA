@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-30 15:13:39 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2006-02-21 13:20:35 $
+  Version:   $Revision: 1.21 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,8 +37,8 @@ mafCxxTypeMacro(mafViewCompound);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewCompound::mafViewCompound( wxString label, int num_row, int num_col, bool external)
-: mafView(label, external)
+mafViewCompound::mafViewCompound( wxString label, int num_row, int num_col)
+: mafView(label)
 //----------------------------------------------------------------------------
 {
   m_ViewRowNum = num_row;
@@ -73,7 +73,7 @@ mafViewCompound::~mafViewCompound()
 mafView *mafViewCompound::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewCompound *v = new mafViewCompound(m_Label, m_ViewRowNum, m_ViewColNum, m_ExternalFlag);
+  mafViewCompound *v = new mafViewCompound(m_Label, m_ViewRowNum, m_ViewColNum);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   for (int i=0;i<m_PluggedChildViewList.size();i++)

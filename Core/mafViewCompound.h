@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-02 10:35:12 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2006-02-21 13:20:35 $
+  Version:   $Revision: 1.19 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -41,7 +41,7 @@ mafViewCompound doesn't have a Scenegraph, nor knowledge about VTK /sa mafViewVT
 class mafViewCompound: public mafView
 {
 public:
-  mafViewCompound(wxString label = "View Compound", int num_row = 1, int num_col = 2, bool external = false);
+  mafViewCompound(wxString label = "View Compound", int num_row = 1, int num_col = 2);
   virtual ~mafViewCompound(); 
 
   mafTypeMacro(mafViewCompound, mafView);

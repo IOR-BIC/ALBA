@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-12 12:33:24 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-02-21 13:19:59 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -66,7 +66,7 @@ mafView can be the base class for composed Views.
 class mafView: public mafObserver, public mafObject
 {
 public:
-  mafView(wxString label = "View", bool external = false);
+  mafView(wxString label = "View");
   virtual ~mafView(); 
 
   mafTypeMacro(mafView, mafObject);
@@ -177,7 +177,6 @@ protected:
 public:
   int            m_Mult;    ///< Used to store the multiplicity of the view type created (e.g. the 3rd view surface created).
   int            m_Id;      ///< Used to store the view type created (e.g. view surface).
-  bool           m_ExternalFlag;
   bool           m_Plugged; // forget it - it is used from outside 
   mafView       *m_Next;    // forget it - it is used from outside 
 

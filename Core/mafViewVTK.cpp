@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-26 08:50:02 $
-  Version:   $Revision: 1.51 $
+  Date:      $Date: 2006-02-21 13:20:35 $
+  Version:   $Revision: 1.52 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -53,12 +53,11 @@ mafCxxTypeMacro(mafViewVTK);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewVTK::mafViewVTK(wxString label, int camera_position, bool show_axes, bool show_grid, int stereo, bool external)
-:mafView(label,external)
+mafViewVTK::mafViewVTK(wxString label, int camera_position, bool show_axes, bool show_grid, int stereo)
+:mafView(label)
 //----------------------------------------------------------------------------
 {
   m_CameraPosition  = camera_position;
-  m_ExternalFlag    = external;
   m_ShowAxes        = show_axes;
   m_ShowGrid        = show_grid;
   m_StereoType      = stereo;
@@ -100,7 +99,7 @@ void mafViewVTK::PlugVisualPipe(mafString vme_type, mafString pipe_type, long vi
 mafView *mafViewVTK::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewVTK *v = new mafViewVTK(m_Label, m_CameraPosition, m_ShowAxes, m_ShowGrid, m_StereoType, m_ExternalFlag);
+  mafViewVTK *v = new mafViewVTK(m_Label, m_CameraPosition, m_ShowAxes, m_ShowGrid, m_StereoType);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
