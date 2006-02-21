@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3D.h,v $
   Language:  C++
-  Date:      $Date: 2005-08-24 16:13:31 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-02-21 12:20:11 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -55,7 +55,7 @@ public:
   //----------------------------------------------------------------------------
   //    GUI Constants
   //----------------------------------------------------------------------------
-  enum 
+  enum AVATAR_3D_GUI_ID
   {
     ID_FITTING_COMBO = mafAvatar::ID_LAST,
     ID_WBOX_BOOL,
@@ -65,14 +65,14 @@ public:
     ID_LAST
   };
 
-  enum 
+  enum AVATAR_COORDS_TYPE
   {
     TRACKER_COORDS=0,
     CANONICAL_COORDS,
     WORLD_COORDS,
   };
 
-  enum 
+  enum AVATAR_COORDS_SCALING
   {
     NO_SCALE=0,
     TRACKER_TO_WORLD_SCALE,
