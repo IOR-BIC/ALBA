@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-08 11:49:57 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-02-22 11:05:30 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -97,7 +97,7 @@ void mmgContextualMenu::ShowContextualMenu(wxFrame *child, mafView *view, bool v
 	{
 		this->Append(CONTEXTUAL_MENU_HIDE_VME, "Hide");
 		this->Append(CONTEXTUAL_MENU_DELETE_VME, "Delete");
-		this->Append(CONTEXTUAL_MENU_TRANSFORM, "Maf Transform");
+		this->Append(CONTEXTUAL_MENU_TRANSFORM, "Transform  \tCtrl+T");
     this->AppendSeparator();
   }
 	this->Append(CONTEXTUAL_MENU_RENAME_VIEW, "Rename View");
@@ -176,8 +176,7 @@ void mmgContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
 		break;
 		case CONTEXTUAL_MENU_TRANSFORM:
 		{
-      //modified by Stefano 9-11-2004
-			mafString s = "Maf Transform \tCtrl+T";
+			mafString s = "Transform  \tCtrl+T";
 			mafEventMacro(mafEvent(this, PARSE_STRING, &s));
 		}
 		break;
