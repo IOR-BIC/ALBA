@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-30 14:31:22 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2006-02-22 10:50:36 $
+  Version:   $Revision: 1.19 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -96,7 +96,7 @@ mafRWIBase::mafRWIBase(wxWindow *parent, wxWindowID id, const wxPoint &pos,
 {
   m_Hidden = true;
   this->Show(false);
-	m_SaveDir = ::wxGetHomeDir(); 
+	m_SaveDir = ::wxGetHomeDir().c_str(); 
   m_Width = m_Height = 10;
   
   m_Camera    = NULL;
@@ -649,16 +649,24 @@ wxBitmap *mafRWIBase::GetImage(int magnification)
   return bmp;
 }
 //----------------------------------------------------------------------------
-void mafRWIBase::SaveImage(wxString view_name, int magnification)
+void mafRWIBase::SaveImage(mafString filename, int magnification)
 //---------------------------------------------------------------------------
 {
-	wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg";
-  wxString file = wxString::Format("%s\\%sSnapshot", m_SaveDir.c_str(),view_name.c_str());
-	
-	wxString filename = mafGetSaveFile(file,wildc).c_str(); 
-	if(filename == "") 
-    return;
-
+	if (filename.IsEmpty())
+	{
+    wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg";
+    wxString file = wxString::Format("%s\\%sSnapshot", m_SaveDir.GetCStr(),filename.GetCStr());
+    file = mafGetSaveFile(file,wildc).c_str(); 
+    if(file == "") 
+      return;
+    filename = file.c_str();
+	}
+  mafString basename = filename.BaseName();
+  if (basename.IsEmpty())
+  {
+    filename = m_SaveDir << "\\" << filename;
+  }
+  
 	::wxBeginBusyCursor();
 
   vtkMAFSmartPointer<vtkWindowToImageFilter> w2i;
@@ -667,21 +675,21 @@ void mafRWIBase::SaveImage(wxString view_name, int magnification)
 	w2i->Update();
   
   wxString path, name, ext;
-  wxSplitPath(filename,&path,&name,&ext);
+  wxSplitPath(filename.GetCStr(),&path,&name,&ext);
 
 	ext.MakeLower();
   if (ext == "bmp")
 	{
     vtkMAFSmartPointer<vtkBMPWriter> w;
     w->SetInput(w2i->GetOutput());
-    w->SetFileName(filename);
+    w->SetFileName(filename.GetCStr());
     w->Write();
 	}
   else if (ext == "jpg")
   {
     vtkMAFSmartPointer<vtkJPEGWriter> w;
     w->SetInput(w2i->GetOutput());
-    w->SetFileName(filename);
+    w->SetFileName(filename.GetCStr());
     w->Write();
   }
 	::wxEndBusyCursor();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-30 14:31:22 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-02-22 10:50:36 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -108,7 +108,7 @@ public:
   wxBitmap* GetImage(int magnification = 1);
 	/** 
   Save an image of the render window. */
-  void SaveImage(wxString view_name = "", int magnification = 1);
+  void SaveImage(mafString filename = "", int magnification = 1);
 	/** 
   Return the current used camera */
 	vtkCamera* GetCamera();
@@ -186,7 +186,7 @@ protected:
   vtkImageAppend *m_StereoImage;
   vtkPNGWriter   *m_StereoMoviewFrameWriter;
   
-  wxString   m_SaveDir;
+  mafString  m_SaveDir;
   vtkCamera *m_Camera;
   mmdMouse  *m_Mouse;
   bool       m_CustomInteractorStyle;
