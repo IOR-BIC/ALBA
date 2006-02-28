@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-21 13:20:49 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-02-28 15:36:37 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -290,6 +290,18 @@ void mafViewSlice::SetSlice(double origin[3])
     mafPipeVolumeSlice *pipe = (mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe;
     pipe->SetSlice(origin); 
   }
+}
+//----------------------------------------------------------------------------
+void mafViewSlice::GetSlice(double slice[3])
+//----------------------------------------------------------------------------
+{
+  memcpy(slice,m_Slice,sizeof(m_Slice));
+}
+//----------------------------------------------------------------------------
+double *mafViewSlice::GetSlice()
+//----------------------------------------------------------------------------
+{
+  return m_Slice;
 }
 //----------------------------------------------------------------------------
 void mafViewSlice::BorderCreate(double col[3])

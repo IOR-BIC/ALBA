@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-21 13:20:50 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-02-28 15:36:37 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -77,6 +77,12 @@ public:
   /** 
   Set the slice coordinates.*/
   void SetSlice(double origin[3]);
+
+  /** Get the Slice coordinates.*/
+  void GetSlice(double slice[3]);
+
+  /** Get the Slice coordinates.*/
+  double *GetSlice();
 
   /** 
   Return true if a there is a volume inside the view.*/
