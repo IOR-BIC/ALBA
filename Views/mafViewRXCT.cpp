@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-21 13:20:49 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-02-28 15:38:02 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -59,6 +59,8 @@ mafViewRXCT::mafViewRXCT(wxString label)
   m_ColorLUT= NULL;
   m_CurrentVolume = NULL;
   m_LayoutConfiguration = LAYOUT_CUSTOM;
+
+  m_MoveAllSlices = 0;
 }
 //----------------------------------------------------------------------------
 mafViewRXCT::~mafViewRXCT()
@@ -161,8 +163,32 @@ void mafViewRXCT::OnEvent(mafEventBase *maf_event)
         vtkPoints *p = (vtkPoints *)e->GetVtkObj();
         if(p == NULL) return;
         p->GetPoint(0,pos);
-        ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(slice))->SetSlice(pos);
-        ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(slice))->CameraUpdate();
+        if (m_MoveAllSlices)
+        {
+          double old_slice[3], delta[3], b[6];
+          ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(slice))->GetSlice(old_slice);
+          delta[0] = pos[0] - old_slice[0];
+          delta[1] = pos[1] - old_slice[1];
+          delta[2] = pos[2] - old_slice[2];
+          for (int sv=0; sv<((mafViewCompound *)m_ChildViewList[2])->GetNumberOfSubView(); sv++)
+          {
+            m_CurrentVolume->GetOutput()->GetVMEBounds(b);
+            ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(sv))->GetSlice(old_slice);
+            pos[0] = old_slice[0] + delta[0];
+            pos[1] = old_slice[1] + delta[1];
+            pos[2] = old_slice[2] + delta[2];
+            pos[2] = pos[2] > b[5] ? b[5] : pos[2];
+            pos[2] = pos[2] < b[4] ? b[4] : pos[2];
+            m_Gizmo[sv]->SetSlice(sv,mafGizmoSlice::GIZMO_SLICE_Z,pos[2]);
+            ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(sv))->SetSlice(pos);
+            ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(sv))->CameraUpdate();
+          }
+        }
+        else
+        {
+          ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(slice))->SetSlice(pos);
+          ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(slice))->CameraUpdate();
+        }
         m_ChildViewList[0]->CameraUpdate();
         m_ChildViewList[1]->CameraUpdate();
       }
@@ -182,6 +208,8 @@ mmgGui* mafViewRXCT::CreateGui()
 {
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
+  m_Gui->Bool(ID_MOVE_ALL_SLICES,"move all",&m_MoveAllSlices);
+
   if (m_ColorLUT == NULL)
   {
     vtkNEW(m_ColorLUT);

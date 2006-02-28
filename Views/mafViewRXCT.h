@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-21 13:20:49 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-02-28 15:38:02 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -53,6 +53,7 @@ public:
   enum VIEW_RXCT_WIDGET_ID
   {
     ID_LUT_CHOOSER = Superclass::ID_LAST,
+    ID_MOVE_ALL_SLICES,
     ID_LAST
   };
 
@@ -87,5 +88,7 @@ protected:
   vtkLookupTable  *m_ColorLUT;
   mafViewRX       *m_ViewsRX[2];
   mafViewCompound *m_ViewCT;
+
+  int m_MoveAllSlices;
 };
 #endif
