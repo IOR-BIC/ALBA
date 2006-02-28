@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-19 11:05:37 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-02-28 14:49:15 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -96,7 +96,7 @@ mmaMaterial::mmaMaterial()
   m_SaturationRange[1]  = 1;
   m_TableRange[0]       = 0.0;
   m_TableRange[1]       = 1.0;
-  m_NumColors           = 256;
+  m_NumValues           = 256;
 
   m_TextureID           = -1;
 
@@ -208,9 +208,9 @@ wxBitmap *mmaMaterial::MakeIcon()
 	wxBitmap *bmp = new wxBitmap(img->ConvertToBitmap());
   delete img;
 
-  cppDEL(this->m_Icon);
+  cppDEL(m_Icon);
 
-	this->m_Icon = bmp;
+	m_Icon = bmp;
 	return bmp;
 }
 //-------------------------------------------------------------------------
@@ -218,6 +218,7 @@ void mmaMaterial::DeepCopy(const mafAttribute *a)
 //-------------------------------------------------------------------------
 { 
   Superclass::DeepCopy(a);
+  // property
   m_MaterialName        = ((mmaMaterial *)a)->m_MaterialName;
   m_Value               = ((mmaMaterial *)a)->m_Value;
   m_Ambient[0]          = ((mmaMaterial *)a)->m_Ambient[0];
@@ -235,7 +236,10 @@ void mmaMaterial::DeepCopy(const mafAttribute *a)
   m_SpecularPower       = ((mmaMaterial *)a)->m_SpecularPower;
   m_Opacity             = ((mmaMaterial *)a)->m_Opacity;
   m_Representation      = ((mmaMaterial *)a)->m_Representation;
+  // texture
   m_TextureID           = ((mmaMaterial *)a)->m_TextureID;
+  m_TextureMappingMode  = ((mmaMaterial *)a)->m_TextureMappingMode;
+  // lut
   m_Level_LUT           = ((mmaMaterial *)a)->m_Level_LUT;
   m_Window_LUT          = ((mmaMaterial *)a)->m_Window_LUT;
   m_HueRange[0]         = ((mmaMaterial *)a)->m_HueRange[0];
@@ -244,9 +248,9 @@ void mmaMaterial::DeepCopy(const mafAttribute *a)
   m_SaturationRange[1]  = ((mmaMaterial *)a)->m_SaturationRange[1];
   m_TableRange[0]       = ((mmaMaterial *)a)->m_TableRange[0];
   m_TableRange[1]       = ((mmaMaterial *)a)->m_TableRange[1];
-  m_NumColors           = ((mmaMaterial *)a)->m_NumColors;
+  m_NumValues           = ((mmaMaterial *)a)->m_NumValues;
+  
   m_MaterialType        = ((mmaMaterial *)a)->m_MaterialType;
-  m_TextureMappingMode  = ((mmaMaterial *)a)->m_TextureMappingMode;
 }
 //----------------------------------------------------------------------------
 bool mmaMaterial::Equals(const mafAttribute *a)
@@ -279,7 +283,7 @@ bool mmaMaterial::Equals(const mafAttribute *a)
       m_SaturationRange[1]  == ((mmaMaterial *)a)->m_SaturationRange[1] &&
       m_TableRange[0]       == ((mmaMaterial *)a)->m_TableRange[0]      &&
       m_TableRange[1]       == ((mmaMaterial *)a)->m_TableRange[1]      &&
-      m_NumColors           == ((mmaMaterial *)a)->m_NumColors          &&
+      m_NumValues           == ((mmaMaterial *)a)->m_NumValues          &&
       m_Representation      == ((mmaMaterial *)a)->m_Representation     &&
       m_MaterialType        == ((mmaMaterial *)a)->m_MaterialType       &&
       m_TextureMappingMode  == ((mmaMaterial *)a)->m_TextureMappingMode);
@@ -292,6 +296,7 @@ int mmaMaterial::InternalStore(mafStorageElement *parent)
 {  
   if (Superclass::InternalStore(parent)==MAF_OK)
   {
+    // property
     parent->StoreText("MaterialName",m_MaterialName.GetCStr());
     parent->StoreDouble("Value", m_Value);
     parent->StoreDouble("Ambient0", m_Ambient[0]);
@@ -309,18 +314,34 @@ int mmaMaterial::InternalStore(mafStorageElement *parent)
     parent->StoreDouble("SpecularPower", m_SpecularPower);
     parent->StoreDouble("Opacity", m_Opacity);
     parent->StoreDouble("Representation", m_Representation);
-    parent->StoreDouble("Level_LUT", m_Level_LUT);
-    parent->StoreDouble("Window_LUT", m_Window_LUT);
-    parent->StoreDouble("HueRange0", m_HueRange[0]);
-    parent->StoreDouble("HueRange1", m_HueRange[1]);
-    parent->StoreDouble("SaturationRange0", m_SaturationRange[0]);
-    parent->StoreDouble("SaturationRange1", m_SaturationRange[1]);
-    parent->StoreDouble("TableRange0", m_TableRange[0]);
-    parent->StoreDouble("TableRange1", m_TableRange[1]);
-    parent->StoreInteger("NumColors", m_NumColors);
-    parent->StoreInteger("TextureID", m_TextureID);
+    if (m_MaterialType == USE_LOOKUPTABLE)
+    {
+      // lut
+      parent->StoreDouble("Level_LUT", m_Level_LUT);
+      parent->StoreDouble("Window_LUT", m_Window_LUT);
+      parent->StoreDouble("HueRange0", m_HueRange[0]);
+      parent->StoreDouble("HueRange1", m_HueRange[1]);
+      parent->StoreDouble("SaturationRange0", m_SaturationRange[0]);
+      parent->StoreDouble("SaturationRange1", m_SaturationRange[1]);
+      parent->StoreDouble("TableRange0", m_TableRange[0]);
+      parent->StoreDouble("TableRange1", m_TableRange[1]);
+      parent->StoreInteger("NumValues", m_NumValues);
+      mafString lutvalues;
+      lutvalues = "LUT_VALUE_#";
+      for (int v = 0; v < m_NumValues; v++)
+      {
+        lutvalues << v;
+        double *rgba = m_ColorLut->GetTableValue(v);
+        parent->StoreVectorN(lutvalues.GetCStr(),rgba,4);
+      }
+    }
+    else if (m_MaterialType == USE_TEXTURE)
+    {
+      // texture
+      parent->StoreInteger("TextureID", m_TextureID);
+      parent->StoreInteger("TextureMappingMode", m_TextureMappingMode);
+    }
     parent->StoreInteger("MaterialType", m_MaterialType);
-    parent->StoreInteger("TextureMappingMode", m_TextureMappingMode);
     return MAF_OK;
   }
   return MAF_ERROR;
@@ -331,6 +352,7 @@ int mmaMaterial::InternalRestore(mafStorageElement *node)
 {
   if (Superclass::InternalRestore(node) == MAF_OK)
   {
+    // property
     node->RestoreText("MaterialName",m_MaterialName);
     node->RestoreDouble("Value",m_Value);
     node->RestoreDouble("Ambient0", m_Ambient[0]);
@@ -348,18 +370,36 @@ int mmaMaterial::InternalRestore(mafStorageElement *node)
     node->RestoreDouble("SpecularPower", m_SpecularPower);
     node->RestoreDouble("Opacity", m_Opacity);
     node->RestoreDouble("Representation", m_Representation);
-    node->RestoreDouble("Level_LUT", m_Level_LUT);
-    node->RestoreDouble("Window_LUT", m_Window_LUT);
-    node->RestoreDouble("HueRange0", m_HueRange[0]);
-    node->RestoreDouble("HueRange1", m_HueRange[1]);
-    node->RestoreDouble("SaturationRange0", m_SaturationRange[0]);
-    node->RestoreDouble("SaturationRange1", m_SaturationRange[1]);
-    node->RestoreDouble("TableRange0", m_TableRange[0]);
-    node->RestoreDouble("TableRange1", m_TableRange[1]);
-    node->RestoreInteger("NumColors", m_NumColors);
-    node->RestoreInteger("TextureID", m_TextureID);
     node->RestoreInteger("MaterialType", m_MaterialType);
-    node->RestoreInteger("TextureMappingMode", m_TextureMappingMode);
+    if (m_MaterialType == USE_LOOKUPTABLE)
+    {
+      // lut
+      node->RestoreDouble("Level_LUT", m_Level_LUT);
+      node->RestoreDouble("Window_LUT", m_Window_LUT);
+      node->RestoreDouble("HueRange0", m_HueRange[0]);
+      node->RestoreDouble("HueRange1", m_HueRange[1]);
+      node->RestoreDouble("SaturationRange0", m_SaturationRange[0]);
+      node->RestoreDouble("SaturationRange1", m_SaturationRange[1]);
+      node->RestoreDouble("TableRange0", m_TableRange[0]);
+      node->RestoreDouble("TableRange1", m_TableRange[1]);
+      node->RestoreInteger("NumValues", m_NumValues);
+      m_ColorLut->SetNumberOfTableValues(m_NumValues);
+      mafString lutvalues;
+      lutvalues = "LUT_VALUE_#";
+      for (int v = 0; v < m_NumValues; v++)
+      {
+        lutvalues << v;
+        double rgba[4];
+        node->RestoreVectorN(lutvalues,rgba,4);
+        m_ColorLut->SetTableValue(v,rgba);
+      }
+    }
+    else if (m_MaterialType == USE_TEXTURE)
+    {
+      // texture
+      node->RestoreInteger("TextureID", m_TextureID);
+      node->RestoreInteger("TextureMappingMode", m_TextureMappingMode);
+    }
     UpdateProp();
     return MAF_OK;
   }
@@ -386,7 +426,7 @@ void mmaMaterial::UpdateProp()
 
   m_ColorLut->SetHueRange(m_HueRange);
   m_ColorLut->SetSaturationRange(m_SaturationRange);
-  m_ColorLut->SetNumberOfColors(m_NumColors);
+  m_ColorLut->SetNumberOfTableValues(m_NumValues);
   m_ColorLut->SetTableRange(m_TableRange);
   m_ColorLut->Build();
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 17:15:57 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-02-28 14:49:15 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -103,7 +103,7 @@ public:
   double    m_HueRange[2];
   double    m_SaturationRange[2];
   double    m_TableRange[2];
-  int       m_NumColors;
+  int       m_NumValues;
   int       m_MaterialType;
   int       m_TextureMappingMode;
 
