@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-16 12:06:17 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2006-02-28 16:33:51 $
+  Version:   $Revision: 1.19 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -168,6 +168,7 @@ EVT_START,
   VIEW_SELECTED, // used to ask to logic if there is at least a view selected.
   VIEW_CLICKED,  // from mafRWIBase to mmgMDIChild and mmgViewPanel to mafViewManager
   VIEW_MAXIMIZE, // from mmgGui to mmgCrossSplitter
+  VIEW_RESIZE,   // from anyone that want to block the view's size.
   VIEW_SAVE_IMAGE,//from mafMDIChild  to mafViewManager
   PER_PUSH,       // from an Operation to mafInteractionManager
   PER_POP,        // from an Operation to mafInteractionManager
