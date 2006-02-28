@@ -10,8 +10,6 @@ DBG_MESSAGE("Configuring project ${PROJECT_NAME}")
 SET(PROJECT_SRCS
   #mafAvatar3D2DPicker.cpp
   #mafAvatar3D2DPicker.h
-  #mmdRemoteMouse.cpp
-  #mmdRemoteMouse.h
   mafAction.cpp
   mafAction.h
   mafAgent.cpp
@@ -95,6 +93,8 @@ SET(PROJECT_SRCS
   mmdButtonsPad.h
   mmdMouse.cpp
   mmdMouse.h
+  mmdRemoteMouse.cpp
+  mmdRemoteMouse.h
   mmdTracker.cpp
   mmdTracker.h
   #mmdTrackerSet.cpp
