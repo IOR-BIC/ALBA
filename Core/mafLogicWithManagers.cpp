@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-21 13:21:36 $
-  Version:   $Revision: 1.54 $
+  Date:      $Date: 2006-02-28 16:21:45 $
+  Version:   $Revision: 1.55 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -442,10 +442,24 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
         if(m_OpManager) m_OpManager->OpRun(e->GetArg());
       break;
       case OP_RUN_STARTING:
+      {
+        mmgMDIChild *c = (mmgMDIChild *)m_Win->GetActiveChild();
+        if (c != NULL)
+        {
+          c->SetAllowCloseWindow(false);
+        }
         OpRunStarting();
+      }
       break; 
       case OP_RUN_TERMINATED:
+      {
+        mmgMDIChild *c = (mmgMDIChild *)m_Win->GetActiveChild();
+        if (c != NULL)
+        {
+          c->SetAllowCloseWindow(true);
+        }
         OpRunTerminated();
+      }
       break; 
       case OP_SHOW_GUI:
         OpShowGui(!e->GetBool(), (mmgPanel*)e->GetWin());
@@ -482,7 +496,17 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
         }
       break;	
       case VIEW_SELECT:
+      {
         ViewSelect();
+        if (m_OpManager)
+        {
+          mmgMDIChild *c = (mmgMDIChild *)m_Win->GetActiveChild();
+          if (c != NULL)
+          {
+            c->SetAllowCloseWindow(!m_OpManager->Running());
+          }
+        }
+      }
       break;
       case VIEW_SELECTED:
         e->SetBool(m_ViewManager->GetSelectedView() != NULL);
