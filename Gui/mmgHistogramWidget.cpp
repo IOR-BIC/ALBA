@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgHistogramWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2006-02-01 08:22:14 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2006-02-28 14:47:12 $
+Version:   $Revision: 1.5 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -97,6 +97,7 @@ mmgHistogramWidget::mmgHistogramWidget(wxWindow* parent, wxWindowID id, const wx
 
   vtkNEW(m_ChangeInfo);
   m_ChangeInfo->SetOutputOrigin(0,0,0);
+
   vtkMAFSmartPointer<vtkLineSource> line;
   line->SetPoint1(0,0,0);
   line->SetPoint2(0,1,0);
@@ -180,6 +181,8 @@ void mmgHistogramWidget::OnEvent( mafEventBase *event )
       {
         x_size = GetSize().GetWidth();
         idx = (pos[0]/x_size) * m_NumberOfBins;
+        float line_width = 0.5 + x_size / (float)m_NumberOfBins;
+        m_PlotActor->GetProperty()->SetLineWidth(line_width);
         m_HisctogramValue = m_Accumulate->GetOutput()->GetPointData()->GetScalars()->GetTuple1(idx);
         m_TextMapper->SetInput(mafString(m_HisctogramValue).GetCStr());
       }
@@ -285,6 +288,8 @@ void mmgHistogramWidget::UpdateHistogram()
   m_Glyph->Modified();
   m_Glyph->Update();
 
+  float line_width = m_HistogramRWI->m_RenFront->GetSize()[0] / (float)(m_NumberOfBins - 1);
+  m_PlotActor->GetProperty()->SetLineWidth(line_width);
   m_HistogramRWI->m_RwiBase->Render();
   if (m_Listener)
   {

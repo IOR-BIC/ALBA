@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgHistogramWidget.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-01 08:22:14 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-02-28 14:47:12 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -103,8 +103,8 @@ protected:
   vtkImageAccumulate *m_Accumulate;
   vtkImageChangeInformation *m_ChangeInfo;
   vtkImageLogarithmicScale  *m_LogScale;
-  vtkGlyph3D         *m_Glyph;
-  mafRWI        *m_HistogramRWI;
-  vtkActor2D    *m_PlotActor;
+  vtkGlyph3D      *m_Glyph;
+  mafRWI          *m_HistogramRWI;
+  vtkActor2D      *m_PlotActor;
 };
 #endif
