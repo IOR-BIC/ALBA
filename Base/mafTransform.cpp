@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 17:33:07 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-03-02 21:58:06 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -691,7 +691,7 @@ mafTransform::mmuQuat mafTransform::Snuggle(mmuQuat q, HVect *k)
 	    if (neg[i] = (qa[i]<0.0)) qa[i] = -qa[i];
 	    par ^= neg[i];
 	}
-	/* Find two largest components, indices in hi and lo */
+	/* Find two largest components, indexes in hi and low */
 	if (qa[0]>qa[1]) lo = 0; else lo = 1;
 	if (qa[2]>qa[3]) hi = 2; else hi = 3;
 	if (qa[lo]>qa[hi]) {

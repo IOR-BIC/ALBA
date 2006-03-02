@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgLutWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2006-01-30 13:54:41 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2006-03-02 21:59:45 $
+Version:   $Revision: 1.5 $
 Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -42,12 +42,6 @@ BEGIN_EVENT_TABLE(mmgLutWidget,wxPanel)
 
 END_EVENT_TABLE()
 
-//----------------------------------------------------------------------------
-// Widgets ID's
-//----------------------------------------------------------------------------
-enum 
-{
-};
 //----------------------------------------------------------------------------
 mmgLutWidget::mmgLutWidget(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
 :wxPanel(parent,id,pos,size,style)         

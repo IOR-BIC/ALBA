@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-30 12:11:25 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-03-02 21:58:06 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,7 +25,11 @@ class vtkMatrix4x4;
 //----------------------------------------------------------------------------	
 //  Constants:
 //----------------------------------------------------------------------------	
-enum { POST_MULTIPLY=0, PRE_MULTIPLY };
+enum MATRIX_MULTIPLICATION_ID
+{ 
+  POST_MULTIPLY = 0, 
+  PRE_MULTIPLY 
+};
 //#define MAF_FLT_MAX		3.40282346638528860e38F
 
 /** mafTransform - class for homogeneous transformations.
@@ -38,7 +42,7 @@ enum { POST_MULTIPLY=0, PRE_MULTIPLY };
 
   @sa mafTransformBase
   @todo 
-  - Aggiornare il test della mafTransform per testare le funzioni di conversione degli angoli
+  - Update test for mafTransform to test functions to transform angles
 */
 class MAF_EXPORT mafTransform : public mafTransformBase
 {
