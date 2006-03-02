@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgColorWidget.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 16:19:20 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-03-02 22:00:14 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -51,7 +51,7 @@ END_EVENT_TABLE()
 //----------------------------------------------------------------------------
 // Widgets ID's
 //----------------------------------------------------------------------------
-enum 
+enum COLOR_WIDGET_ID
 {
   ID_R = MINID,
   ID_G,

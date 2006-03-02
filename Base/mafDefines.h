@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 22:05:37 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2006-03-02 21:58:31 $
+  Version:   $Revision: 1.20 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -45,10 +45,24 @@ typedef std::type_info mafTypeID; ///< type for mafObject's class type IDs
 //------------------------------------------------------------------------------
 // Constants
 //------------------------------------------------------------------------------
-enum {MAF_OK=0, MAF_ERROR,MAF_USER_RETURN_VALUE};
-enum {ID_NO_EVENT=0};
-enum {MAF_STRING_BUFFER_SIZE=2048};
-
+enum MAF_RETURN_VALUES_ID
+{
+  MAF_OK = 0,
+  MAF_ERROR,
+  MAF_USER_RETURN_VALUE
+};
+#define ID_NO_EVENT 0
+/*enum MAF_NO_EVENT_ID
+{
+  ID_NO_EVENT = 0
+};
+*/
+#define MAF_STRING_BUFFER_SIZE 2048
+/*enum MAF_DEFAULT_BUFFER_SIZE
+{
+  MAF_STRING_BUFFER_SIZE = 2048
+};
+*/
 //------------------------------------------------------------------------------
 // Global Variables
 //------------------------------------------------------------------------------

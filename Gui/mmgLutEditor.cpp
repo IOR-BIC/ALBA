@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-30 13:52:21 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-03-02 22:00:14 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -45,10 +45,9 @@ static wxPoint dp = wxDefaultPosition;
 //----------------------------------------------------------------------------
 // Widgets ID's
 //----------------------------------------------------------------------------
-enum 
+enum LUT_EDITOR_WIDGET_ID
 {
-  ID_FOO = MINID,
-  ID_PRESET,
+  ID_PRESET = MINID,
   ID_NUMENTRY,
   ID_VALUE_RANGE,
   ID_LW,
