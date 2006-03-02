@@ -2,16 +2,16 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-21 13:54:05 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2006-03-02 22:00:52 $
+  Version:   $Revision: 1.15 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef _mafPipeVolumeSlice_H_
-#define _mafPipeVolumeSlice_H_
+#ifndef __mafPipeVolumeSlice_H__
+#define __mafPipeVolumeSlice_H__
 
 //----------------------------------------------------------------------------
 // Include:
@@ -159,4 +159,4 @@ protected:
   bool                    m_ShowVolumeBox;
   bool                    m_ShowUnit;
 };
-#endif // _mafPipeVolumeSlice_H_
+#endif // __mafPipeVolumeSlice_H__

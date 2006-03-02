@@ -2,16 +2,16 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.h,v $
 Language:  C++
-Date:      $Date: 2005-12-19 11:15:48 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2006-03-02 22:00:51 $
+Version:   $Revision: 1.5 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef _mafPipeIsosurface_H_
-#define _mafPipeIsosurface_H_
+#ifndef __mafPipeIsosurface_H__
+#define __mafPipeIsosurface_H__
 
 #include "mafPipe.h"
 
@@ -74,4 +74,4 @@ protected:
   mmgFloatSlider  *m_ContourSlider;
   double m_ContourValue;
 };  
-#endif // _mafPipeIsosurface_H_
+#endif // __mafPipeIsosurface_H__

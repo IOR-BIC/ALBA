@@ -2,16 +2,16 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeImage3D.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-25 12:04:08 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-03-02 22:00:51 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef _mafPipeImage3D_H_
-#define _mafPipeImage3D_H_
+#ifndef __mafPipeImage3D_H__
+#define __mafPipeImage3D_H__
 
 //----------------------------------------------------------------------------
 // Include :
@@ -59,4 +59,4 @@ protected:
   vtkActor               *m_GhostActor;
   vtkMAFAssembly         *m_UsedAssembly;
 };
-#endif // _mafPipeImage3D_H_
+#endif // __mafPipeImage3D_H__

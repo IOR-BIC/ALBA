@@ -2,16 +2,16 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeGizmo.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-08 13:29:33 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-03-02 22:00:50 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef _mafPipeGizmo_H_
-#define _mafPipeGizmo_H_
+#ifndef __mafPipeGizmo_H__
+#define __mafPipeGizmo_H__
 
 #include "mafPipe.h"
 //----------------------------------------------------------------------------
@@ -45,4 +45,4 @@ public:
 
 protected:
 };  
-#endif // _mafPipeGizmo_H_
+#endif // __mafPipeGizmo_H__

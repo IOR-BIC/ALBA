@@ -2,16 +2,16 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePointSet.h,v $
   Language:  C++
-  Date:      $Date: 2005-08-31 09:14:26 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-03-02 22:00:51 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef _mafPipePointSet_H_
-#define _mafPipePointSet_H_
+#ifndef __mafPipePointSet_H__
+#define __mafPipePointSet_H__
 
 #include "mafPipe.h"
 //----------------------------------------------------------------------------
@@ -50,4 +50,4 @@ protected:
 	/** Update the properties according to the vme's tags. */
 	void										UpdateProperty(bool fromTag = false);
 };
-#endif // _mafPipePointSet_H_
+#endif // __mafPipePointSet_H__

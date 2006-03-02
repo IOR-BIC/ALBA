@@ -2,16 +2,16 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-21 13:10:12 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-03-02 22:00:51 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef _mafPipeMeter_H_
-#define _mafPipeMeter_H_
+#ifndef __mafPipeMeter_H__
+#define __mafPipeMeter_H__
 
 #include "mafPipe.h"
 //----------------------------------------------------------------------------
@@ -78,4 +78,4 @@ protected:
   void UpdateProperty(bool fromTag = false);
   virtual mmgGui  *CreateGui();
 };
-#endif // _mafPipeMeter_H_
+#endif // __mafPipeMeter_H__

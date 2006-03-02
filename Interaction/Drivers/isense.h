@@ -15,8 +15,8 @@
 *
 *                       
 ************************************************************************/
-#ifndef _ISD_isenseh
-#define _ISD_isenseh
+#ifndef __ISD_isense_h__
+#define __ISD_isense_h__
 
 /* if not Win32 then it must be UNIX, no other OS is supported  */
 #if !defined __WIN32__ && !defined WIN32 && !defined _Windows && !defined _WIN32

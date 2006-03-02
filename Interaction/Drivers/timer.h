@@ -11,8 +11,8 @@
 *
 *
 ************************************************************************/
-#ifndef _ISD_timerh
-#define _ISD_timerh
+#ifndef __ISD_timer_h__
+#define __ISD_timer_h__
 
 float timeNow( void );
 void  initTimer( void );

@@ -11,8 +11,8 @@
 *
 *
 ************************************************************************/
-#ifndef _ISD_isdriverh
-#define _ISD_isdriverh
+#ifndef __ISD_isdriver_h__
+#define __ISD_isdriver_h__
 
 #include "isense.h"
 #include "serial.h"

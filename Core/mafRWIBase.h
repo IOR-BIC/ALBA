@@ -2,16 +2,16 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-22 10:50:36 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-03-02 21:59:09 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef _mafRWIBase_H_
-#define _mafRWIBase_H_ 1
+#ifndef __mafRWIBase_H__
+#define __mafRWIBase_H__
 
 //----------------------------------------------------------------------------
 // Include :

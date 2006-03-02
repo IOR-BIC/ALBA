@@ -11,8 +11,8 @@
 *
 *
 ************************************************************************/
-#ifndef _ISD_serialh
-#define _ISD_serialh
+#ifndef __ISD_serial_h__
+#define __ISD_serial_h__
 
 #include "isense.h"
 

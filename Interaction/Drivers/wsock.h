@@ -11,8 +11,8 @@
 *
 *
 ************************************************************************/
-#ifndef _ISD_wsockh
-#define _ISD_wsockh
+#ifndef __ISD_wsock_h__
+#define __ISD_wsock_h__
 
 #if defined _Windows || defined __WIN32__ || defined WINDOWS || defined WIN32
 #include <winsock.h>

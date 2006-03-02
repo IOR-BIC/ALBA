@@ -2,16 +2,16 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolyline.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 14:55:09 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-03-02 22:00:51 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef _mafPipePolyline_H_
-#define _mafPipePolyline_H_
+#ifndef __mafPipePolyline_H__
+#define __mafPipePolyline_H__
 
 #include "mafPipe.h"
 //----------------------------------------------------------------------------
@@ -45,4 +45,4 @@ public:
 
 protected:
 };  
-#endif // _mafPipePolyline_H_
+#endif // __mafPipePolyline_H__

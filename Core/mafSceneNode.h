@@ -2,15 +2,15 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneNode.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 14:51:24 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-03-02 21:59:09 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
-#ifndef _mafSceneNode_H_
-#define _mafSceneNode_H_
+#ifndef __mafSceneNode_H__
+#define __mafSceneNode_H__
 //----------------------------------------------------------------------------
 // forward declarations:
 //----------------------------------------------------------------------------
@@ -99,4 +99,4 @@ protected:
   
   //bool m_visible;   // a SceneNode is visible if a pipe has been created
 };  
-#endif // _mafSceneNode_H_
+#endif // __mafSceneNode_H__

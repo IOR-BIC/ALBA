@@ -2,16 +2,16 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeBox.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-17 13:06:27 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-03-02 21:59:09 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef _mafPipeBox_H_
-#define _mafPipeBox_H_
+#ifndef __mafPipeBox_H__
+#define __mafPipeBox_H__
 
 #include "mafPipe.h"
 //----------------------------------------------------------------------------
@@ -64,4 +64,4 @@ protected:
   void UpdateProperty(bool fromTag = false);
   virtual mmgGui *CreateGui();
 };  
-#endif // _mafPipeBox_H_
+#endif // __mafPipeBox_H__

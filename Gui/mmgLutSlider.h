@@ -2,16 +2,16 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutSlider.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 13:44:53 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-03-02 21:59:25 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef _mmgLutSlider_H_
-#define _mmgLutSlider_H_
+#ifndef __mmgLutSlider_H__
+#define __mmgLutSlider_H__
 
 //----------------------------------------------------------------------------
 // Include:
@@ -94,4 +94,4 @@ protected:
   mafObserver  *m_Listener;     
 DECLARE_EVENT_TABLE()
 };
-#endif    // _mmgLutSlider_H_
+#endif    // __mmgLutSlider_H__

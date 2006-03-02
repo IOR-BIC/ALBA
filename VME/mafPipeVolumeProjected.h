@@ -2,16 +2,16 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeProjected.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-04 17:18:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-03-02 22:00:52 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef _mafPipeVolumeProjected_H_
-#define _mafPipeVolumeProjected_H_
+#ifndef __mafPipeVolumeProjected_H__
+#define __mafPipeVolumeProjected_H__
 
 //----------------------------------------------------------------------------
 // Include:
@@ -62,4 +62,4 @@ protected:
   vtkWindowLevelLookupTable *m_Lut;
   vtkMAFAssembly            *m_UsedAssembly;
 };  
-#endif // _mafPipeVolumeProjected_H_
+#endif // __mafPipeVolumeProjected_H__

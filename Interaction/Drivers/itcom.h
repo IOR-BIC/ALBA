@@ -11,8 +11,8 @@
 *
 *
 ************************************************************************/
-#ifndef _ISD_itcomh
-#define _ISD_itcomh
+#ifndef __ISD_itcom_h__
+#define __ISD_itcom_h__
 
 #include "isense.h"
 
@@ -117,9 +117,3 @@ unsigned long byteOrderULong(char *value);
 short         byteOrderShort(char *value);
 
 #endif
-
-
-
-
-
-

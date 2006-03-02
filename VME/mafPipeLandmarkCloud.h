@@ -2,16 +2,16 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeLandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-30 12:08:08 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-03-02 22:00:51 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef _mafPipeLandmarkCloud_H_
-#define _mafPipeLandmarkCloud_H_
+#ifndef __mafPipeLandmarkCloud_H__
+#define __mafPipeLandmarkCloud_H__
 
 #include "mafPipe.h"
 //----------------------------------------------------------------------------
@@ -87,6 +87,4 @@ protected:
   /** Update the properties according to the vme's tags. */
 	void										UpdateProperty(bool fromTag = false);
 };
-
-#endif // _mafPipeLandmarkCloud_H_
-
+#endif // __mafPipeLandmarkCloud_H__
