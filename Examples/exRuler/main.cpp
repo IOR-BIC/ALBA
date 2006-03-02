@@ -31,8 +31,9 @@ vtkCamera *C = vtkCamera::New();
    C->SetFocalPoint(0, 0, 0);
    C->SetPosition(0 ,0, 1);
    C->SetViewUp(0 , 1 , 0);
-   //C->SetPosition(0 ,1, 0);
-   //C->SetViewUp(0 , 0 , 1);
+   
+   //C->SetPosition(0 ,0, -1);
+   //C->SetViewUp(0 , 1 , 0);
    C->SetParallelProjection(1);
 
 vtkRenderer *ren1 = vtkRenderer::New();
@@ -60,7 +61,7 @@ vtkPlaneSource *PS = vtkPlaneSource::New();
    PS->SetOrigin(0 , 0 , 0);
    PS->SetPoint1(2 , 0 , 0);
    PS->SetPoint2(0 , 2 , 0);
-   PS->SetXResolution(20);
+   PS->SetXResolution(10);
    PS->SetYResolution(10);
 
 vtkPolyDataMapper *PDM2 = vtkPolyDataMapper::New();
@@ -69,11 +70,19 @@ vtkPolyDataMapper *PDM2 = vtkPolyDataMapper::New();
 vtkActor *A2 = vtkActor::New();
    A2->SetMapper(PDM2);
    A2->GetProperty()->SetRepresentation(1);
+   A2->GetProperty()->SetColor(1,0,0);
+   A2->GetProperty()->SetInterpolationToFlat();
+   A2->SetScale(10);
+
    
 vtkRulerActor2D *A2D = vtkRulerActor2D::New();
    A2D->SetLabelAxesVisibility();
    A2D->SetLabelScaleVisibility();
+   //A2D->SetAxesVisibility(false);
+   A2D->SetTickVisibility(true);
    A2D->SetLegend("mm");
+   A2D->SetColor(1,1,1);
+
    //A2D->SetLegend("inch");
    //A2D->SetScaleFactor(25.4);
 

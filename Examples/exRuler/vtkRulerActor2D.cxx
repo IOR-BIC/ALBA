@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkRulerActor2D.cxx,v $
   Language:  C++
-  Date:      $Date: 2006-03-02 07:51:12 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-03-02 19:13:11 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -34,37 +34,41 @@
 #include "vtkProperty2D.h"
 #include "vtkPolyDataMapper2D.h"
 
-vtkCxxRevisionMacro(vtkRulerActor2D, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkRulerActor2D, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkRulerActor2D);
 //------------------------------------------------------------------------------
 vtkRulerActor2D::vtkRulerActor2D()
 //------------------------------------------------------------------------------
 {
-  Axis = Tick = Label = NULL;
-  Points = NULL;
-
-  margin   = 15; 
-  tickLen  = 5;
-  ntick    = 400; // enough for a tick spacing = 15 on a 1600x1200 screen
+  margin   = 35; 
+  shortTickLen = 5;
+  midTickLen   = 10;
+  longTickLen  = 15;
+  DesiredTickSpacing = 15;
+  ntick    = 800; // enough for a tick spacing = 15 on a 1600x1200 screen
   ScaleFactor = 1.0;
-  x_index = 0;
-  y_index = 1;
-  
-  Legend = NULL;
 
   ScaleLabelVisibility  = true;
   AxesLabelVisibility   = true;
+  AxesVisibility        = true;
+  TickVisibility        = true;
+
+  Legend = NULL;
+  Axis = Tick = Label = NULL;
+  Points = NULL;
+  x_index = 0;
+  y_index = 1;
 
 	RulerCreate();
 
   // 'this' is an actor and he is unhappy without a mapper
-	this->PickableOff();
   vtkLineSource *a = vtkLineSource::New();
   a->SetPoint1(10,10,10);
   a->SetPoint1(10,10,10);
   vtkPolyDataMapper2D *a_pdm = vtkPolyDataMapper2D::New();
   a_pdm->SetInput(a->GetOutput());
   this->SetMapper(a_pdm); 
+  this->PickableOff();
   a->Delete();
   a_pdm->Delete();
 }
@@ -72,9 +76,9 @@ vtkRulerActor2D::vtkRulerActor2D()
 vtkRulerActor2D::~vtkRulerActor2D()
 //------------------------------------------------------------------------------
 {
-  if(Axis)  Axis->Delete();
-  if(Tick)  Tick->Delete();
-  if(Label) Label->Delete();
+  if(Axis)   Axis->Delete();
+  if(Tick)   Tick->Delete();
+  if(Label)  Label->Delete();
   if(Label1) Label1->Delete();
   if(Label2) Label2->Delete();
 }
@@ -100,14 +104,34 @@ int vtkRulerActor2D::RenderOverlay(vtkViewport *viewport)
   RulerUpdate(cam, ren);
   this->Modified();
 
-  Axis->RenderOverlay(viewport);
-  Tick->RenderOverlay(viewport);
-  
-  if (ScaleLabelVisibility) Label->RenderOverlay(viewport);
-  if (AxesLabelVisibility) Label1->RenderOverlay(viewport);
-  if (AxesLabelVisibility) Label2->RenderOverlay(viewport);
+  if (AxesVisibility)       Axis->  RenderOverlay(viewport);
+  if (TickVisibility)       Tick->  RenderOverlay(viewport);
+  if (ScaleLabelVisibility) Label-> RenderOverlay(viewport);
+  if (AxesLabelVisibility)  Label1->RenderOverlay(viewport);
+  if (AxesLabelVisibility)  Label2->RenderOverlay(viewport);
 
+  for(int i=0; i<NUM_LAB; i++)
+  {
+    Labx[i]->RenderOverlay(viewport);
+    Laby[i]->RenderOverlay(viewport);
+  }
   return 1;
+}
+//----------------------------------------------------------------------------
+int vtkRulerActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
+//----------------------------------------------------------------------------
+{
+  if (ScaleLabelVisibility) Label->RenderOpaqueGeometry(viewport);
+  if (AxesLabelVisibility) Label1->RenderOpaqueGeometry(viewport);
+  if (AxesLabelVisibility) Label2->RenderOpaqueGeometry(viewport);
+
+  for(int i=0; i<NUM_LAB; i++)
+  {
+    Labx[i]->RenderOpaqueGeometry(viewport);
+    Laby[i]->RenderOpaqueGeometry(viewport);
+  }
+
+  return 0;
 }
 //----------------------------------------------------------------------------
 bool vtkRulerActor2D::CheckProjectionPlane(vtkCamera *cam)
@@ -182,7 +206,7 @@ void vtkRulerActor2D::RulerCreate()
   tick_cell->Allocate(tick_cell->EstimateSize(2*ntick,2));
 
   double m0 = margin;
-  double m1 = margin-tickLen;
+  double m1 = margin - 2;
 
   int i, id=0, cp[2];
   for(i=0; i<ntick; i++)
@@ -278,60 +302,32 @@ void vtkRulerActor2D::RulerCreate()
   Label2->ScaledTextOff();
   Label2->SetDisplayPosition(0,0);
   Label2->SetInput("");
-}
-//----------------------------------------------------------------------------
-double vtkRulerActor2D::Round(double val)
-//----------------------------------------------------------------------------
-{
-	if (val == 0) 
-    return 1;
 
-	int sign = (val > 0) ? 1 : -1;
-	val = fabs(val);
-
-	int    exponent = (int)(log10(val));
-	double mantissa = val/pow(10.0,exponent);   // note 10.0 --- .0 is relevant
-
-  if(mantissa <1) // fix for val< 1
-	{
-     mantissa *= 10;
-		 exponent --;
-	}
-  
-  if(mantissa<2) 
-		mantissa=1;
-  else if(mantissa<5)
-	  mantissa=2;
-  else 
-	  mantissa=5;
-	return sign*mantissa*pow(10.0,exponent);  // note 10.0 --- .0 is relevant
-}
-//----------------------------------------------------------------------------
-double vtkRulerActor2D::Round2(double val)
-//----------------------------------------------------------------------------
-{
-  if (val == 0) 
-    return 1;
-
-  int sign = (val > 0) ? 1 : -1;
-  val = fabs(val);
-
-  int    exponent = (int)(log10(val));
-  double mantissa = val/pow(10.0,exponent);   // note 10.0 --- .0 is relevant
-
-  if(mantissa <1) // fix for val< 1
+  for(int i=0; i<NUM_LAB; i++)
   {
-    mantissa *= 10;
-    exponent --;
-  }
+    Labx[i] = vtkTextActor::New();
+    Labx[i]->GetProperty()->SetColor(1,1,1);
+    Labx[i]->GetTextProperty()->AntiAliasingOff();
+    Labx[i]->GetTextProperty()->SetFontSize(12);
+    Labx[i]->GetTextProperty()->SetFontFamilyToArial();
+    Labx[i]->GetTextProperty()->SetJustificationToCentered();
+    Labx[i]->GetTextProperty()->SetVerticalJustificationToTop();
+    Labx[i]->ScaledTextOff();
+    Labx[i]->SetDisplayPosition(0,0);
+    Labx[i]->SetInput("");
 
-  if(mantissa<2) 
-    mantissa=5;
-  else if(mantissa<5)
-    mantissa=10;
-  else 
-    mantissa=10;
-  return sign*mantissa*pow(10.0,exponent);  // note 10.0 --- .0 is relevant
+
+    Laby[i] = vtkTextActor::New();
+    Laby[i]->GetProperty()->SetColor(1,1,1);
+    Laby[i]->GetTextProperty()->AntiAliasingOff();
+    Laby[i]->GetTextProperty()->SetFontSize(12);
+    Laby[i]->GetTextProperty()->SetFontFamilyToArial();
+    Laby[i]->GetTextProperty()->SetJustificationToRight();
+    Laby[i]->GetTextProperty()->SetVerticalJustificationToCentered();
+    Laby[i]->ScaledTextOff();
+    Laby[i]->SetDisplayPosition(0,0);
+    Laby[i]->SetInput("");
+  }
 }
 //----------------------------------------------------------------------------
 void vtkRulerActor2D::SetColor(double r,double g,double b)
@@ -340,129 +336,15 @@ void vtkRulerActor2D::SetColor(double r,double g,double b)
 	Axis->GetProperty()->SetColor(r,g,b);
   Tick->GetProperty()->SetColor(r,g,b);
   Label->GetProperty()->SetColor(r,g,b);
-}
-//----------------------------------------------------------------------------
-void vtkRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
-//----------------------------------------------------------------------------
-{
-  double p[4],p0[4],p1[4];
+  Label1->GetProperty()->SetColor(r,g,b);
+  Label2->GetProperty()->SetColor(r,g,b);
 
-  ren->SetDisplayPoint(margin,margin,0);
-  ren->DisplayToWorld();
-  ren->GetWorldPoint(p);
-
-  ren->SetDisplayPoint(0,0,0);
-  ren->DisplayToWorld();
-  ren->GetWorldPoint(p0);
-
-  ren->SetDisplayPoint(rwWidth, rwHeight, 0);
-  ren->DisplayToWorld();
-  ren->GetWorldPoint(p1);
-
-  for(int i=0; i<3; i++)
-  {
-    p[i] /= ScaleFactor; 
-    p0[i] /= ScaleFactor; 
-    p1[i] /= ScaleFactor; 
-  }
-
-  double wDeltaX   = (p1[x_index]-p0[x_index]);
-  double w2dx = rwWidth / wDeltaX;    // display to word - for x axis
-  double d2wx = 1 / w2dx;             // word to display - for x axis  
-
-  double wDeltaY   = (p1[y_index]-p0[y_index]);   
-  double w2dy = rwHeight / wDeltaY;   // display to word - for y axis
-  double d2wy = 1 / w2dy;             // word to display - for y axis  
-
-  int signDeltaX = (wDeltaX >= 0) ? 1 : -1;
-  int signDeltaY = (wDeltaY >= 0) ? 1 : -1;
-
-  char *alab[] = {"x","y","z","-x","-y","-z"};
-  Label1->SetInput(alab[(signDeltaX > 0) ? x_index  : x_index + 3]);
-  Label2->SetInput(alab[(signDeltaY > 0) ? y_index  : y_index + 3]);
-  Label1->SetDisplayPosition(rwWidth - margin , margin + 4);
-  Label2->SetDisplayPosition(margin + 4, rwHeight - margin );
-
-  double desiredDisplayTickSpacing = 10;
-  double desiredWorldTickSpacing = desiredDisplayTickSpacing * d2wx;
-
-  double worldTickSpacingABS = Round( desiredWorldTickSpacing );  // unique for both axis 
-  double worldTickSpacingX = worldTickSpacingABS * signDeltaX;         // unique for both axis 
-  double worldTickSpacingY = worldTickSpacingABS * signDeltaY;         // unique for both axis 
-  double worldFirstTickX = (worldTickSpacingX) * (int)(p[x_index] / worldTickSpacingX);
-  double worldFirstTickY = (worldTickSpacingY) * (int)(p[y_index] / worldTickSpacingY);
-
-  double worldTickSpacing2ABS = Round2( desiredWorldTickSpacing ); // unique for both axis 
-  double worldTickSpacing2X = worldTickSpacing2ABS * signDeltaX;
-  double worldTickSpacing2Y = worldTickSpacing2ABS * signDeltaY;
-
-  int urk = (int)(worldTickSpacing2ABS / worldTickSpacingABS);
-  double worldFirstTick2X = (worldTickSpacing2X) * (int)(p[x_index] / worldTickSpacing2X);
-  double worldFirstTick2Y = (worldTickSpacing2Y) * (int)(p[y_index] / worldTickSpacing2Y);
-  int IndexOfFirstLongTickX = (int)((worldFirstTick2X - worldFirstTickX) / worldTickSpacingX);
-  int IndexOfFirstLongTickY = (int)((worldFirstTick2Y - worldFirstTickY) / worldTickSpacingY);
-
-  double dispTickSpacingX = worldTickSpacingX * w2dx;
-  double dispTickSpacingY = worldTickSpacingY * w2dy;
-  double dispFirstTickX  = (worldFirstTickX - p0[x_index]) * w2dx;
-  double dispFirstTickY  = (worldFirstTickY - p0[y_index]) * w2dy;
-  while(dispFirstTickX < margin) dispFirstTickX += dispTickSpacingX;
-  while(dispFirstTickY < margin) dispFirstTickY += dispTickSpacingY;
-
-  char lab[50];
-  sprintf(lab,"%g %s",worldTickSpacingABS,Legend);
-  Label->SetInput(lab);
-
-  double m0 = margin;
-  double ma = margin-tickLen;
-  double mb = margin-tickLen-8;
-  double m1x,m1y;
-  int id=0;
-
-  // this is to avoid the Axis to go outside the render-window
-  int max_i_x = (rwWidth  - dispTickSpacingX - dispFirstTickX ) / dispTickSpacingX;
-  double max_x = dispFirstTickX + max_i_x * dispTickSpacingX;
-  int max_i_y = (rwHeight - dispTickSpacingY - dispFirstTickY) / dispTickSpacingY;
-  double max_y = dispFirstTickY + max_i_y * dispTickSpacingY;
-
-  // Update Axis and Ticks Points
-  for(int i=0; i<ntick; i++)
-  {
-    m1x = m1y = ma;
-    if( (i-IndexOfFirstLongTickX) % urk == 0 ) m1x = mb;
-    if( (i-IndexOfFirstLongTickY) % urk == 0 ) m1y = mb;
-
-    double x = dispFirstTickX + i*dispTickSpacingX;
-    double y = dispFirstTickY + i*dispTickSpacingY;
-    
-    if( x > max_x ) {x = max_x; m1x = m0; }
-    if( y > max_y ) {y = max_y; m1y = m0; }
-
-    Points->SetPoint(id,   x,   m0,  0);
-    Points->SetPoint(id+1, x,	  m1x, 0);
-    Points->SetPoint(id+2, m0,  y,   0);
-    Points->SetPoint(id+3, m1y, y,   0);
-
-    id +=4;    
-  }
 }
 //----------------------------------------------------------------------------
 void vtkRulerActor2D::SetScaleFactor(double factor)
 //----------------------------------------------------------------------------
 {
-  if (factor != 0)
-  {
-    ScaleFactor = factor;
-  }
-}
-//----------------------------------------------------------------------------
-int vtkRulerActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
-//----------------------------------------------------------------------------
-{
-  if (ScaleLabelVisibility) Label->RenderOpaqueGeometry(viewport);
-  if (AxesLabelVisibility) Label1->RenderOpaqueGeometry(viewport);
-  if (AxesLabelVisibility) Label2->RenderOpaqueGeometry(viewport);
-  return 0;
+  if (factor != 0) ScaleFactor = factor;
 }
 //----------------------------------------------------------------------------
 void vtkRulerActor2D::SetLegend(const char *legend)
@@ -485,4 +367,317 @@ void vtkRulerActor2D::SetLegend(const char *legend)
   {
     this->Legend = NULL;
   }
+}
+//----------------------------------------------------------------------------
+void vtkRulerActor2D::DecomposeValue(double val, int *sign, double *mantissa, int *exponent)
+//----------------------------------------------------------------------------
+{
+  // val == 0  ---> mantissa = 0
+  // val != 0  ---> mantissa = 1.....1.9999
+  
+  *sign = (val > 0) ? 1 : -1;
+
+  if (val == 0) 
+  {
+    *mantissa = 0;
+    *exponent = 0;
+    return;
+  }
+
+  val = fabs(val);
+  *exponent = (int)(log10(val));
+  *mantissa = val/pow(10.0f,*exponent);  // base in pow must be float
+
+  if( *mantissa <1 ) 
+  {
+    *mantissa *= 10;
+    *exponent --;
+  }
+}
+//----------------------------------------------------------------------------
+double vtkRulerActor2D::RicomposeValue(int sign, double mantissa, int exponent)
+//----------------------------------------------------------------------------
+{
+  return sign*mantissa*pow(10.0f,exponent); // base in pow must be float
+}
+//----------------------------------------------------------------------------
+double vtkRulerActor2D::GetTickSpacing(double val)
+//----------------------------------------------------------------------------
+{
+  if( val == 0 ) return 0;
+  int sign, exponent;
+  double mantissa;
+  DecomposeValue(val,&sign,&mantissa,&exponent);
+
+  /*
+  if(mantissa<2)       // 1.00 ... 1.99  -> 1    // -1.99 ... -1.00  -> -1
+    mantissa=1;
+  else if(mantissa<5)  // 2.00 ... 4.99  -> 2    // -4.99 ... -2.00  -> -2
+    mantissa=2;
+  else                 // 5.00 ... 9.99  -> 5    // -9.99 ... -5.00  -> -5
+    mantissa=5;
+  */
+  /*
+  if(mantissa<5)
+    mantissa=1;
+  else 
+    mantissa=5;
+  */
+  mantissa =1;
+  return RicomposeValue(sign,mantissa,exponent);
+}
+//----------------------------------------------------------------------------
+double vtkRulerActor2D::GetMidTickSpacing(double val)
+//----------------------------------------------------------------------------
+{
+  if( val == 0 ) return 0;
+  int sign, exponent;
+  double mantissa;
+  DecomposeValue(val,&sign,&mantissa,&exponent);
+  /*
+  if(mantissa<2)       // 1.00 ... 1.99  -> 1    // -1.99 ... -1.00  -> -1
+    mantissa=5;
+  else if(mantissa<5)  // 2.00 ... 4.99  -> 2    // -4.99 ... -2.00  -> -2
+    mantissa=5;
+  else                 // 5.00 ... 9.99  -> 5    // -9.99 ... -5.00  -> -5
+    mantissa=10;
+  */
+  /*
+  if(mantissa<5)
+    mantissa=5;
+  else 
+    mantissa=10;
+  */
+  mantissa =5;
+  return RicomposeValue(sign,mantissa,exponent);
+}
+//----------------------------------------------------------------------------
+double vtkRulerActor2D::GetLongTickSpacing(double val)
+//----------------------------------------------------------------------------
+{
+  if( val == 0 ) return 0;
+  int sign, exponent;
+  double mantissa;
+  DecomposeValue(val,&sign,&mantissa,&exponent);
+  /*
+  if(mantissa<2)       // 1.00 ... 1.99  -> 1    // -1.99 ... -1.00  -> -1
+    mantissa=5;
+  else if(mantissa<5)  // 2.00 ... 4.99  -> 2    // -4.99 ... -2.00  -> -2
+    mantissa=10;
+  else                 // 5.00 ... 9.99  -> 5    // -9.99 ... -5.00  -> -5
+    mantissa=20;
+  */
+  /*
+  if(mantissa<5)
+    mantissa=10;
+  else 
+    mantissa=20;
+  */
+  mantissa =10;
+  return RicomposeValue(sign,mantissa,exponent);
+}
+//----------------------------------------------------------------------------
+int vtkRulerActor2D::round(double val)
+//----------------------------------------------------------------------------
+{
+  int sign = ( val >= 0 ) ? 1 : -1 ;
+  return sign * (int)( abs(val) + 0.5 );
+}
+//----------------------------------------------------------------------------
+bool vtkRulerActor2D::IsMultiple(double val, double multiplier)
+//----------------------------------------------------------------------------
+{
+  double ratio = val/multiplier; 
+  double fractionalPart = ratio - (int)(ratio);
+  return fractionalPart == 0;
+}
+//----------------------------------------------------------------------------
+double vtkRulerActor2D::NearestTick(double val, double TickSpacing)
+//----------------------------------------------------------------------------
+{
+  // if tickSpacing > 0
+  // return the first multiple of tickSpacing  that is greater than val
+
+  // if tickSpacing < 0
+  // return the first multiple of tickSpacing  that is smaller than val
+
+  val = val + TickSpacing / 2.0f; 
+  return  TickSpacing * round( val / TickSpacing );
+}
+//----------------------------------------------------------------------------
+void vtkRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
+//----------------------------------------------------------------------------
+{
+  //    given P,P0,P1 in Display coordinate ....
+  //
+  //              rwWidth
+  //    -----------------------p1
+  //    |                      |  
+  //    |                      |
+  //    |        Display       | rwHeight
+  //    |                      | 
+  //    | p                    |
+  //   p0-----------------------
+  //
+  //    convert them in world coord - resulting in w,w0,w1
+  // 
+  //             w1x-w0x
+  //    -----------------------w1
+  //    |                      |  
+  //    |                      |
+  //    |        World         | w1y-w0y
+  //    |                      | 
+  //    | w                    |
+  //   w0-----------------------
+  //
+  //   
+  //   thus -- conversion from World to Display is
+  //   (d0 is = 0) 
+  //
+  //                   ( w1 - w0 )  
+  //   d =    (w-w0) * -----------   =   (w - w0) * w2d;
+  //                   ( d1 - d0 )  
+  //
+  //   and viceversa is
+  //
+  //   (w - wo) =    d * 1/w2d   =   d * d2w;
+  //
+
+  double p[4],p0[4],p1[4];
+
+  ren->SetDisplayPoint(margin,margin,0);
+  ren->DisplayToWorld();
+  ren->GetWorldPoint(p);
+
+  ren->SetDisplayPoint(0,0,0);
+  ren->DisplayToWorld();
+  ren->GetWorldPoint(p0);
+
+  ren->SetDisplayPoint(rwWidth, rwHeight, 0);
+  ren->DisplayToWorld();
+  ren->GetWorldPoint(p1);
+
+  for(int i=0; i<3; i++)
+  {
+    p[i]  /= ScaleFactor; 
+    p0[i] /= ScaleFactor; 
+    p1[i] /= ScaleFactor; 
+  }
+
+  double w0X =  p0[x_index], w0Y =  p0[y_index];
+  double w1X =  p1[x_index], w1Y =  p1[y_index];
+  double wpX =   p[x_index], wpY =   p[y_index];
+
+  double w2dX = rwWidth /(w1X-w0X), w2dY = rwHeight/(w1Y-w0Y);  // world to display
+  double d2wX = 1/w2dX,             d2wY = 1/w2dY;              // display to world along Y
+  
+  // determine tick spacing
+  double desiredWorldTickSpacingX = DesiredTickSpacing * d2wX;
+  double worldTickSpacingX        = GetTickSpacing( desiredWorldTickSpacingX );  
+  double worldMidTickSpacingX     = GetMidTickSpacing( desiredWorldTickSpacingX );  
+  double worldLongTickSpacingX    = GetLongTickSpacing( desiredWorldTickSpacingX );  
+  double worldFirstTickX          = NearestTick( wpX, worldTickSpacingX );
+  double worldFirstLongTickX      = NearestTick( wpX, worldLongTickSpacingX );
+
+  double desiredWorldTickSpacingY = DesiredTickSpacing * d2wY;
+  double worldTickSpacingY        = GetTickSpacing( desiredWorldTickSpacingY );  
+  double worldMidTickSpacingY     = GetMidTickSpacing( desiredWorldTickSpacingY );  
+  double worldLongTickSpacingY    = GetLongTickSpacing( desiredWorldTickSpacingY );  
+  double worldFirstTickY          = NearestTick( wpY, worldTickSpacingY );
+  double worldFirstLongTickY      = NearestTick( wpY, worldLongTickSpacingY );
+
+  //double worldLastTickPoseX = NearestTick(  (rwWidth - margin) *d2wX, worldTickSpacingX );
+  //double dx0 = (worldLastTickPoseX - w0X ) * w2dX;
+  //double worldLastTickPoseY = NearestTick(  (rwHeight - margin) *d2wY, worldTickSpacingY );
+  //double dy0 = (worldLastTickPoseX - w0Y ) * w2dY;
+  
+  //double dx0 = rwWidth - margin;//(worldFirstTickX - w0X ) * w2dX; // --- discarded tick are drawn here
+  //double dy0 = rwHeight- margin;//(worldFirstTickY - w0Y ) * w2dY; // 
+
+  //double dx0 = NearestTick( rwWidth - margin, worldTickSpacingX * w2dX );
+  //double dy0 = NearestTick( rwHeight - margin, worldTickSpacingY * w2dY );
+
+
+  // find last tick pos
+  double dx_max;
+  double dy_max;
+  for(int i=0; i<ntick; i++)
+  {
+    double wx = worldFirstTickX + i * worldTickSpacingX;
+    double wy = worldFirstTickY + i * worldTickSpacingY;
+    double dx = (wx - w0X ) * w2dX;  
+    double dy = (wy - w0Y ) * w2dY;
+    if( dx < rwWidth  - margin ) dx_max = dx;
+    if( dy < rwHeight - margin ) dy_max = dy;
+  }
+
+  double t0 = margin;              // tick begin
+  double t1x, t1y;                 // tick end
+  double ta = margin-shortTickLen; // short tick end 
+  double tb = margin-midTickLen;   // mid   tick end 
+  double tc = margin-longTickLen;  // long  tick end 
+  int id=0;
+
+  // Update Axis and Ticks Points
+  for(int i=0; i<ntick; i++)
+  {
+    double wx = worldFirstTickX + i * worldTickSpacingX;
+    double wy = worldFirstTickY + i * worldTickSpacingY;
+
+    // decide lenght of tick
+    if     ( IsMultiple( wx, worldLongTickSpacingX ) ) t1x = tc; 
+    else if( IsMultiple( wx, worldMidTickSpacingX  ) ) t1x = tb; 
+    else t1x = ta; 
+
+    if     ( IsMultiple( wy, worldLongTickSpacingY ) ) t1y = tc; 
+    else if( IsMultiple( wy, worldMidTickSpacingY  ) ) t1y = tb; 
+    else t1y = ta; 
+
+
+    double dx = (wx - w0X ) * w2dX;  // bring to Display coords
+    double dy = (wy - w0Y ) * w2dY;
+
+    if( dx > rwWidth  - margin ) { dx = dx_max ; t1x = t0; } // discard tick
+    if( dy > rwHeight - margin ) { dy = dy_max ; t1y = t0; } 
+
+    Points->SetPoint(id++, dx,  t0,   0);
+    Points->SetPoint(id++, dx,	t1x,  0);
+    Points->SetPoint(id++, t0,  dy,   0);
+    Points->SetPoint(id++, t1y, dy,   0);
+ }
+  
+  char labxtex[50];
+  char labytex[50];
+  for(int i=0; i<NUM_LAB; i++)
+  {
+    double wx = worldFirstLongTickX + i * worldLongTickSpacingX;
+    double wy = worldFirstLongTickY + i * worldLongTickSpacingY;
+    
+    double dx = (wx - w0X ) * w2dX;  // bring to Display coords
+    double dy = (wy - w0Y ) * w2dY;
+   
+    if( dx < rwWidth  - margin ) sprintf(labxtex, "%g",wx ); else sprintf(labxtex, "" );
+    if( dy < rwHeight - margin ) sprintf(labytex, "%g",wy ); else sprintf(labytex, "" );
+
+    Labx[i]->SetInput(labxtex);
+    Labx[i]->SetDisplayPosition(dx , margin - longTickLen -2 );
+
+    Laby[i]->SetInput(labytex);
+    Laby[i]->SetDisplayPosition(margin - longTickLen -2, dy );
+  }
+
+
+  char *alab[] = {"x","y","z","-x","-y","-z"};
+  int direction = ( w1X-w0X > 0 ) ? 0 : 3;
+  Label1->SetInput(alab[ x_index + direction]);
+  Label1->SetDisplayPosition(rwWidth - margin , margin + 4);
+
+  direction = ( w1Y-w0Y > 0 ) ? 0 : 3;
+  Label2->SetInput(alab[ y_index + direction]);
+  Label2->SetDisplayPosition( margin + 4, rwHeight - margin );
+
+  char lab[50];
+  sprintf(lab,"%g %s", abs( worldTickSpacingX ) ,Legend);
+  Label->SetInput(lab);
+
 }

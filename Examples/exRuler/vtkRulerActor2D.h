@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkRulerActor2D.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-02 07:51:12 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-03-02 19:13:11 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -36,6 +36,9 @@ class vtkPoints;
 -- an actor displaying X and Y axes as Actor2D
 -- work only with ParallelCamera, and with a camera looking down-to Z -- should be generalized
 */
+
+# define NUM_LAB 30
+
 //-----------------------------------------------------------------------------
 class VTK_vtkMAF_EXPORT vtkRulerActor2D : public vtkActor2D
 //-----------------------------------------------------------------------------
@@ -46,18 +49,20 @@ class VTK_vtkMAF_EXPORT vtkRulerActor2D : public vtkActor2D
   static	vtkRulerActor2D *New();
 
 				   void			SetColor    (double r,double g,double b);
-	vtkTextActor		 *GetScaleFactorLabelActor() {return Label;};
-  vtkTextActor		 *GetXAxesLabelActor() {return Label1;};
-  vtkTextActor		 *GetYAxesLabelActor() {return Label2;};
+	//vtkTextActor		 *GetScaleFactorLabelActor() {return Label;};
+  //vtkTextActor		 *GetXAxesLabelActor() {return Label1;};
+  //vtkTextActor		 *GetYAxesLabelActor() {return Label2;};
 
   void SetLabelScaleVisibility(bool visibility = true) {ScaleLabelVisibility = visibility;};
   void SetLabelAxesVisibility(bool visibility = true) {AxesLabelVisibility = visibility;};
+  void SetAxesVisibility(bool visibility = true) {AxesVisibility = visibility;};
+  void SetTickVisibility(bool visibility = true) {TickVisibility = visibility;};
 
-  virtual  int			RenderOverlay(vtkViewport *viewport);
-  virtual  int			RenderOpaqueGeometry(vtkViewport *viewport);      
-  virtual  int			RenderTranslucentGeometry(vtkViewport *viewport)  {return 0;};
-  virtual  void 		AdjustClippingRange(vtkViewport *viewport)        {};
-  void    SetScaleFactor(double factor);
+  int	 RenderOverlay(vtkViewport *viewport);
+  int	 RenderOpaqueGeometry(vtkViewport *viewport);      
+  int	 RenderTranslucentGeometry(vtkViewport *viewport)  {return 0;};
+  void AdjustClippingRange(vtkViewport *viewport)        {};
+  void SetScaleFactor(double factor);
   double  GetScaleFactor() {return ScaleFactor;};
 
   void SetLegend(const char *legend);
@@ -68,9 +73,16 @@ protected:
 
 					 void			RulerCreate();
            void			RulerUpdate(vtkCamera *camera, vtkRenderer *ren);
-          double		Round(double val);
-          double		Round2(double val);
+          // void			RulerUpdate_old(vtkCamera *camera, vtkRenderer *ren);
+          // void			RulerUpdate_2(vtkCamera *camera, vtkRenderer *ren);
+          //double		Round(double val);
+          //double		Round2(double val);
+             int		round(double val);
+          double		GetTickSpacing(double val);
+          double    GetMidTickSpacing(double val);
+          double    GetLongTickSpacing(double val);
            bool     CheckProjectionPlane(vtkCamera *cam);
+           bool     IsMultiple(double val, double multiplier);
 
   vtkPoints        *Points;
   vtkActor2D			 *Axis;  
@@ -79,9 +91,16 @@ protected:
   vtkTextActor     *Label1;
   vtkTextActor     *Label2;
 
+  vtkTextActor     *Labx[NUM_LAB];
+  vtkTextActor     *Laby[NUM_LAB];
+
   int rwWidth;
   int rwHeight;
-  int tickLen;
+  int shortTickLen;
+  int midTickLen;
+  int longTickLen;
+  double DesiredTickSpacing;
+
   int margin;
   int ntick;
   int x_index;
@@ -89,9 +108,17 @@ protected:
   
   bool   ScaleLabelVisibility;
   bool   AxesLabelVisibility;
+  bool   AxesVisibility;
+  bool   TickVisibility;
   double ScaleFactor;
 
   char *Legend;
+
+
+  inline void   DecomposeValue(double val, int *sign, double *mantissa, int *exponent);
+  inline double RicomposeValue(int sign, double mantissa, int exponent);
+  inline double NearestTick(double val, double TickSpacing);
+
 
 private:
   // hide the two parameter Render() method from the user and the compiler.
