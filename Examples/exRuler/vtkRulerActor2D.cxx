@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkRulerActor2D.cxx,v $
   Language:  C++
-  Date:      $Date: 2006-03-03 12:22:56 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-03-03 15:31:18 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -34,13 +34,13 @@
 #include "vtkProperty2D.h"
 #include "vtkPolyDataMapper2D.h"
 
-vtkCxxRevisionMacro(vtkRulerActor2D, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(vtkRulerActor2D, "$Revision: 1.4 $");
 vtkStandardNewMacro(vtkRulerActor2D);
 //------------------------------------------------------------------------------
 vtkRulerActor2D::vtkRulerActor2D()
 //------------------------------------------------------------------------------
 {
-  margin   = 35; 
+  margin   = 30; 
   shortTickLen = 5;
   midTickLen   = 10;
   longTickLen  = 15;
@@ -50,7 +50,7 @@ vtkRulerActor2D::vtkRulerActor2D()
 
   ScaleLabelVisibility  = true;
   AxesLabelVisibility   = true;
-  AxesVisibility        = true;
+  AxesVisibility        = false;
   TickVisibility        = true;
 
   Legend = NULL;
@@ -59,7 +59,8 @@ vtkRulerActor2D::vtkRulerActor2D()
   x_index = 0;
   y_index = 1;
 
-	RulerCreate();
+  SetLegend("");
+  RulerCreate();
 
   // 'this' is an actor and he is unhappy without a mapper
   vtkLineSource *a = vtkLineSource::New();
@@ -366,7 +367,8 @@ void vtkRulerActor2D::SetLegend(const char *legend)
   }
   else
   {
-    this->Legend = NULL;
+    SetLegend(" ");
+    //this->Legend = NULL;
   }
 }
 //----------------------------------------------------------------------------
@@ -669,14 +671,17 @@ void vtkRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
   }
 
 
-  char *alab[] = {"x","y","z","-x","-y","-z"};
-  int direction = ( w1X-w0X > 0 ) ? 0 : 3;
-  HorizontalAxeLabel->SetInput(alab[ x_index + direction]);
-  HorizontalAxeLabel->SetDisplayPosition(rwWidth - margin +4, margin + 4);
+  char *letter[] = {"x","y","z"};
+  char *sign = (w1X-w0X > 0) ? " " : "-";
+  char caption[100];
+  sprintf(caption, "%s%s %s", sign ,  letter[x_index],   Legend );
+  HorizontalAxeLabel->SetInput(caption);
+  HorizontalAxeLabel->SetDisplayPosition(rwWidth - margin, margin + 4);
 
-  direction = ( w1Y-w0Y > 0 ) ? 0 : 3;
-  VerticalAxeLabel->SetInput(alab[ y_index + direction]);
-  VerticalAxeLabel->SetDisplayPosition( margin + 4, rwHeight - margin +4);
+  sign = (w1Y-w0Y > 0) ? " " : "-";
+  sprintf(caption, "%s%s %s", sign,    letter[y_index],   Legend );
+  VerticalAxeLabel->SetInput(caption);
+  VerticalAxeLabel->SetDisplayPosition( margin , rwHeight - margin/2);
 
   char lab[50];
   sprintf(lab,"%g %s", abs( worldTickSpacingX ) ,Legend);

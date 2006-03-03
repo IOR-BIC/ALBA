@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkSimpleRulerActor2D.cxx,v $
   Language:  C++
-  Date:      $Date: 2006-03-03 12:22:56 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-03-03 15:31:18 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -34,7 +34,7 @@
 #include "vtkProperty2D.h"
 #include "vtkPolyDataMapper2D.h"
 
-vtkCxxRevisionMacro(vtkSimpleRulerActor2D, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkSimpleRulerActor2D, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkSimpleRulerActor2D);
 //------------------------------------------------------------------------------
 vtkSimpleRulerActor2D::vtkSimpleRulerActor2D()
@@ -485,6 +485,11 @@ void vtkSimpleRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
     p0[i] /= ScaleFactor; 
     p1[i] /= ScaleFactor; 
   }
+
+  /* 
+     (volendo) qua si possono proiettare P,P0,P1 in un altro spazio 
+     ergo - moltiplicarli per l'inversa della matrice(assoluta) di posa di un vme
+  */
 
   double w0X =  p0[x_index], w0Y =  p0[y_index];
   double w1X =  p1[x_index], w1Y =  p1[y_index];
