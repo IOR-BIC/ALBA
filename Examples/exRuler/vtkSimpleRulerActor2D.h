@@ -1,10 +1,10 @@
 /*=========================================================================
 
   Program:   Multimod Fundation Library
-  Module:    $RCSfile: vtkRulerActor2D.h,v $
+  Module:    $RCSfile: vtkSimpleRulerActor2D.h,v $
   Language:  C++
   Date:      $Date: 2006-03-03 12:22:56 $
-  Version:   $Revision: 1.3 $
+  Version:   $Revision: 1.1 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -17,8 +17,8 @@
   ph. +39-051-6171411 (90 lines) - Fax +39-051-6132198
 ========================================================================= */
 
-#ifndef __vtkRulerActor2D_h
-#define __vtkRulerActor2D_h
+#ifndef __vtkSimpleRulerActor2D_h
+#define __vtkSimpleRulerActor2D_h
 
 #define DEFAULT_GRID_COLOR 0.5
 
@@ -33,29 +33,27 @@ class vtkCamera;
 class vtkPoints;
 
 /**
--- an actor displaying X and Y axes as Actor2D
--- work only with ParallelCamera, and with a camera looking down-to Z -- should be generalized
+an actor displaying world X and Y axes as an Actor2D.
+Camera must be in ParallelProjection and aligned with world axis
 */
 
-# define NUM_LAB 30
-
 //-----------------------------------------------------------------------------
-class VTK_vtkMAF_EXPORT vtkRulerActor2D : public vtkActor2D
+class VTK_vtkMAF_EXPORT vtkSimpleRulerActor2D : public vtkActor2D
 //-----------------------------------------------------------------------------
 {
  public:
-  vtkTypeRevisionMacro(vtkRulerActor2D,vtkActor2D);
+  vtkTypeRevisionMacro(vtkSimpleRulerActor2D,vtkActor2D);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static	vtkRulerActor2D *New();
+  static	vtkSimpleRulerActor2D *New();
 
 	void SetColor(double r,double g,double b);
   void SetLabelScaleVisibility(bool visibility = true) {ScaleLabelVisibility = visibility;};
   void SetLabelAxesVisibility(bool visibility = true) {AxesLabelVisibility = visibility;};
   void SetAxesVisibility(bool visibility = true) {AxesVisibility = visibility;};
   void SetTickVisibility(bool visibility = true) {TickVisibility = visibility;};
-  void SetLegend(const char *legend);
   void SetScaleFactor(double factor);
-  double  GetScaleFactor() {return ScaleFactor;};
+  double GetScaleFactor() {return ScaleFactor;};
+  void SetLegend(const char *legend);
 
   int	 RenderOverlay(vtkViewport *viewport);
   int	 RenderOpaqueGeometry(vtkViewport *viewport);      
@@ -63,17 +61,16 @@ class VTK_vtkMAF_EXPORT vtkRulerActor2D : public vtkActor2D
   void AdjustClippingRange(vtkViewport *viewport)        {};
 
 protected:
-										vtkRulerActor2D();
-									 ~vtkRulerActor2D();
+										vtkSimpleRulerActor2D();
+									 ~vtkSimpleRulerActor2D();
 
 					 void			RulerCreate();
            void			RulerUpdate(vtkCamera *camera, vtkRenderer *ren);
              int		round(double val);
           double		GetTickSpacing(double val);
-          double    GetMidTickSpacing(double val);
           double    GetLongTickSpacing(double val);
-           bool     CheckProjectionPlane(vtkCamera *cam);
-           bool     IsMultiple(double val, double multiplier);
+            bool    CheckProjectionPlane(vtkCamera *cam);
+            bool    IsMultiple(double val, double multiplier);
 
   vtkPoints        *Points;
   vtkActor2D			 *Axis;  
@@ -82,13 +79,9 @@ protected:
   vtkTextActor     *HorizontalAxeLabel;
   vtkTextActor     *VerticalAxeLabel;
 
-  vtkTextActor     *Labx[NUM_LAB];
-  vtkTextActor     *Laby[NUM_LAB];
-
   int rwWidth;
   int rwHeight;
   int shortTickLen;
-  int midTickLen;
   int longTickLen;
   double DesiredTickSpacing;
 
@@ -97,6 +90,7 @@ protected:
   int x_index;
   int y_index;
   
+  bool   CenterAxes;
   bool   ScaleLabelVisibility;
   bool   AxesLabelVisibility;
   bool   AxesVisibility;
@@ -108,12 +102,13 @@ protected:
   inline double RicomposeValue(int sign, double mantissa, int exponent);
   inline double NearestTick(double val, double TickSpacing);
 
+
 private:
   // hide the two parameter Render() method from the user and the compiler.
   virtual void Render(vtkRenderer *, vtkMapper *) {};
 private:
-  vtkRulerActor2D(const vtkRulerActor2D&);  	// Not implemented.
-  void operator=(const vtkRulerActor2D&);  // Not implemented.
+  vtkSimpleRulerActor2D(const vtkSimpleRulerActor2D&);  	// Not implemented.
+  void operator=(const vtkSimpleRulerActor2D&);  // Not implemented.
 };
 #endif
 

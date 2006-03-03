@@ -20,6 +20,7 @@
 #include "vtkPlaneSource.h"
 
 #include "vtkRulerActor2D.h"
+#include "vtkSimpleRulerActor2D.h"
 
 int main( int argc, char *argv[] ) { 
 
@@ -72,10 +73,10 @@ vtkActor *A2 = vtkActor::New();
    A2->GetProperty()->SetRepresentation(1);
    A2->GetProperty()->SetColor(1,0,0);
    A2->GetProperty()->SetInterpolationToFlat();
-   A2->SetScale(10);
+   //A2->SetScale(10);
 
    
-vtkRulerActor2D *A2D = vtkRulerActor2D::New();
+vtkSimpleRulerActor2D *A2D = vtkSimpleRulerActor2D::New();
    A2D->SetLabelAxesVisibility();
    A2D->SetLabelScaleVisibility();
    //A2D->SetAxesVisibility(false);
@@ -86,12 +87,26 @@ vtkRulerActor2D *A2D = vtkRulerActor2D::New();
    //A2D->SetLegend("inch");
    //A2D->SetScaleFactor(25.4);
 
+vtkRulerActor2D *A2D2 = vtkRulerActor2D::New();
+   A2D2->SetLabelAxesVisibility();
+   A2D2->SetLabelScaleVisibility(false);
+   //A2D2->SetAxesVisibility(false);
+   A2D2->SetTickVisibility(true);
+   A2D2->SetLegend("mm");
+   A2D2->SetColor(1,1,1);
+
+   //A2D2->SetLegend("inch");
+   //A2D2->SetScaleFactor(25.4);
+
+   
+   
 // -----------------------------------
 // Insert all actors into the renderer
 // -----------------------------------
 
    ren1->AddActor( A2 );
    ren1->AddActor2D( A2D );
+   ren1->AddActor2D( A2D2 );
 /*   ren1->AddActor2D( A2D->GetScaleFactorLabelActor() );
    ren1->AddActor2D( A2D->GetXAxesLabelActor() );
    ren1->AddActor2D( A2D->GetYAxesLabelActor() );
@@ -118,3 +133,5 @@ renWin->Delete();
 
 return 0;
 }
+
+

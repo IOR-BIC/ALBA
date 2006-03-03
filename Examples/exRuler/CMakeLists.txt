@@ -1,9 +1,11 @@
-PROJECT (ex_no_wx)
+PROJECT (exRuler)
 
 SET(PROJECT_SRCS 
 main.cpp
 vtkRulerActor2D.h
 vtkRulerActor2D.cxx
+vtkSimpleRulerActor2D.h
+vtkSimpleRulerActor2D.cxx
 )
 
 IF (WIN32)
