@@ -11,6 +11,8 @@ SET(vtkMAF_SRCS
   vtkContourVolumeMapper.cxx
   vtkContourVolumeMapper.h
 #  vtkContourVolumeMapperAdv.cxx
+  vtkDistanceFilter.cxx
+  vtkDistanceFilter.h
   vtkDOFMatrix.cxx
   vtkDOFMatrix.h
   vtkExtendedGlyph3D.cxx
@@ -25,18 +27,18 @@ SET(vtkMAF_SRCS
   vtkImplicitPolyData.h
   vtkLocalAxisCoordinate.cxx
   vtkLocalAxisCoordinate.h
-  vtkRayCast3DPicker.cxx
-  vtkRayCast3DPicker.h
-  vtkDistanceFilter.cxx
-  vtkDistanceFilter.h
   vtkProjectRG.cxx
   vtkProjectRG.h
   vtkProjectSP.cxx
   vtkProjectSP.h
+  vtkRayCast3DPicker.cxx
+  vtkRayCast3DPicker.h
   vtkRectilinearGridToRectilinearGridFilter.cxx
   vtkRectilinearGridToRectilinearGridFilter.h
   vtkRGSliceAccumulate.cxx
   vtkRGSliceAccumulate.h
+  vtkRulerActor2D.cxx
+  vtkRulerActor2D.h
   vtkTransferFunction2D.cxx
   vtkTransferFunction2D.h
   vtkVolumeResample.h
