@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi2DMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-09 11:35:31 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-03-03 15:57:04 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,6 +27,7 @@
 #include "vtkPolyDataMapper2D.h"
 #include "vtkProperty2D.h"
 #include "vtkActor2D.h"
+#include "vtkTextActor.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderWindow.h"
@@ -56,6 +57,7 @@ mmi2DMeter::mmi2DMeter()
   vtkNEW(m_Line2);
   vtkNEW(m_LineMapper2);
   vtkNEW(m_LineActor2);
+  vtkNEW(m_Text);
 
   // Probing tool
   vtkNEW(m_ProbingLine);
@@ -134,6 +136,10 @@ mmi2DMeter::mmi2DMeter()
   m_EndMeasure    = false;
   m_ParallelView  = false;
   m_MeasureType = DISTANCE_BETWEEN_POINTS;
+
+  m_Distance = 0;
+  m_Angle = 0;
+  m_ExceptionFlag = false;
 }
 //---------------------------------------------------------------------
 mmi2DMeter::~mmi2DMeter() 
@@ -150,6 +156,24 @@ mmi2DMeter::~mmi2DMeter()
   vtkDEL(m_LineMapper2);
   vtkDEL(m_LineActor2);
   vtkDEL(m_Coordinate);
+  vtkDEL(m_Text);
+
+  while(m_TextVector.size() != 0)
+    {
+      //wxMessageBox(wxString::Format("%d",m_TextVector.size()));
+      m_CurrentRenderer->RemoveActor2D(m_TextVector[m_TextVector.size()-1]);
+      m_TextVector.pop_back();
+
+      m_CurrentRenderer->RemoveActor2D(m_LineActorVector1[m_LineActorVector1.size()-1]);
+      m_LineSourceVector1.pop_back();
+      m_LineMapperVector1.pop_back();
+      m_LineActorVector1.pop_back();
+
+      m_CurrentRenderer->RemoveActor2D(m_LineActorVector2[m_LineActorVector2.size()-1]);
+      m_LineSourceVector2.pop_back();
+      m_LineMapperVector2.pop_back();
+      m_LineActorVector2.pop_back();
+    }
 
   cppDEL(m_HistogramRWI);
   cppDEL(m_HistogramDialog);
@@ -213,8 +237,8 @@ void mmi2DMeter::OnRightButtonDown(mafEventInteraction *e)
 void mmi2DMeter::OnLeftButtonUp(mafEventInteraction *e)
 //----------------------------------------------------------------------------
 {
-  double pos_2d[2] = {0,0};
-  
+  double pos_2d[2] = {-1,-1};
+
   m_DraggingLeft = false;
 	m_DraggingLine = false;
   OnButtonUp(e);
@@ -271,6 +295,7 @@ void mmi2DMeter::OnMove(mafEventInteraction *e)
   if((m_DraggingLeft || m_DraggingLine) && m_ParallelView)
   {
     e->Get2DPosition(pos_2d);
+     
     DrawMeasureTool(pos_2d[0], pos_2d[1]);
   }
 }
@@ -290,118 +315,317 @@ void mmi2DMeter::OnButtonUp(mafEventInteraction *e)
 void mmi2DMeter::DrawMeasureTool(double x, double y)
 //----------------------------------------------------------------------------
 {
-  static long counter = 0;
+	static long counter = 0;
 	static double dx, dy, dz;
+  static double tmp_xDisplay;
+  static double tmp_yDisplay; 
+  //text on Render Window (control if there's an onLeftButtonUpEvent)
+  if(x != -1) tmp_xDisplay = x;
+  if(y != -1) tmp_yDisplay = y;
+  
+  //text on Render Window (storing points)
+  static double tmp_Pt1L1[3];
+  static double tmp_Pt2L1[3];
+  static double tmp_Pt1L2[3];
 
-  if (m_CurrentRenderer == NULL)
-  {
-    return;
+	if (m_CurrentRenderer == NULL)
+	{
+		return;
+	}
+
+	m_CurrentRenderer->SetDisplayPoint(x,y,0);
+	m_CurrentRenderer->DisplayToView();
+	m_CurrentRenderer->ViewportToNormalizedViewport(x,y);
+  
+  //text on Render Window (remove the actor)
+  //m_CurrentRenderer->RemoveActor2D(m_Text);
+
+	// no point has yet been picked
+	if(counter == 0)
+	{
+		m_EndMeasure = false;
+		m_CurrentRenderer->RemoveActor2D(m_LineActor2);
+		m_Line->SetPoint1(x,y,0);
+		m_Line->SetPoint2(x,y,0);
+		m_Line->Update();
+		m_CurrentRenderer->AddActor2D(m_LineActor);
+		counter++;
+    
+   //text on Render Window (storing screen position for line 1 point 1)
+    tmp_Pt1L1[0] = tmp_xDisplay;
+    tmp_Pt1L1[1] = tmp_yDisplay;
+    
+	}
+	// first point has been picked and the second one is being dragged
+	else if(counter == 1 && m_DraggingLeft)
+	{
+		m_Line->SetPoint2(x,y,0);
+		m_Line->Update();
+
+		if(m_MeasureType == DISTANCE_BETWEEN_POINTS)
+		{
+			CalculateMeasure();
+		}
+	}
+	// finished dragging the second point
+	else if(counter == 1)
+	{
+    //text on Render Window (storing screen position for line 1 point 2)
+    tmp_Pt2L1[0] = tmp_xDisplay;
+    tmp_Pt2L1[1] = tmp_yDisplay;
+    
+		if(m_MeasureType == DISTANCE_BETWEEN_POINTS)
+		{
+			m_EndMeasure = true;
+		}
+		else
+		{
+			counter++;
+		}
+
+		if(m_MeasureType == DISTANCE_BETWEEN_LINES || m_MeasureType == ANGLE_BETWEEN_POINTS) 
+			m_DraggingLine = true;
+	}
+	else if (counter == 2 && (m_CurrentRenderer != m_LastRenderer))
+	{
+		// remove the first line
+		m_LastRenderer->RemoveActor2D(m_LineActor);
+		m_LastRenderer->GetRenderWindow()->Render(); 
+		// reset the counter
+		counter = 0;   
+	} 
+	// add the  second line for the distance between lines mode
+	else if(counter == 2 && m_DraggingLine)
+	{
+		if(m_MeasureType == ANGLE_BETWEEN_POINTS) 
+		{
+			double tmpPt[3];
+			m_Line->GetPoint1(tmpPt);
+			m_Line2->SetPoint1(tmpPt);
+			m_Line2->SetPoint2(x,y,0);
+			m_Line2->Update();
+			m_CurrentRenderer->AddActor2D(m_LineActor2);
+			counter++;
+		}
+		else
+		{
+			assert(m_MeasureType = DISTANCE_BETWEEN_LINES);
+			// add the second line 
+			double tmpPt[3];
+			m_Line->GetPoint1(tmpPt);
+			m_Line2->SetPoint1(tmpPt);
+			dx=tmpPt[0];
+			dy=tmpPt[1];
+			dz=tmpPt[2];
+			m_Line->GetPoint2(tmpPt);
+			m_Line2->SetPoint2(tmpPt);
+			dx-=tmpPt[0];
+			dy-=tmpPt[1];
+			dz-=tmpPt[2];
+			m_Line2->Update();
+			m_CurrentRenderer->AddActor2D(m_LineActor2);
+			counter++;
+		}
+	}
+	// add the  second line for the angle between lines mode
+	else if(counter == 2 && !m_DraggingLeft)
+	{ 
+      //text on Render Window (storing screen position for line 2 point 1)
+      tmp_Pt1L2[0] = tmp_xDisplay;
+      tmp_Pt1L2[1] = tmp_yDisplay;
+   
+			assert(m_MeasureType == ANGLE_BETWEEN_LINES);
+			m_Line2->SetPoint1(x,y,0);
+			m_Line2->SetPoint2(x,y,0);
+			m_Line2->Update();
+			m_CurrentRenderer->AddActor2D(m_LineActor2);
+			counter++; 
+		
+	}
+	else if(counter == 3 && m_MeasureType == ANGLE_BETWEEN_POINTS && m_DraggingLeft)
+	{
+		double tmpPt[3];
+		m_Line->GetPoint1(tmpPt);
+		m_Line2->SetPoint1(tmpPt);
+		m_Line2->SetPoint2(x,y,0);
+		m_Line2->Update();
+	}
+	else if(counter == 3 && m_MeasureType == ANGLE_BETWEEN_POINTS)
+	{
+		m_EndMeasure = true;
+	}
+	else if(counter == 3 && m_MeasureType == DISTANCE_BETWEEN_LINES && m_DraggingLine)
+	{
+		m_Line2->SetPoint2(x,y,0);
+		m_Line2->SetPoint1(x+dx,y+dy,dz);
+		m_Line2->Update();
+	}
+	else if(counter == 3 && m_MeasureType == DISTANCE_BETWEEN_LINES)
+	{
+		m_EndMeasure = true;
+	}
+	else if(counter == 3 && m_MeasureType == ANGLE_BETWEEN_LINES && m_DraggingLeft)
+	{
+		m_Line2->SetPoint2(x,y,0);
+		m_Line2->Update();
+	}
+	else if(counter == 3 && m_MeasureType == ANGLE_BETWEEN_LINES)
+	{
+		m_EndMeasure = true;
+	}
+
+  // text in Render Window (if series for writing text)
+  if(m_MeasureType == DISTANCE_BETWEEN_POINTS)
+  { 
+    double tmp_Shift = 20;
+    m_DisplayPositionText[0] = (tmp_xDisplay + tmp_Pt1L1[0])/2 ;
+    m_DisplayPositionText[1] = (tmp_yDisplay + tmp_Pt1L1[1])/2 +  tmp_Shift;
+    m_Text->SetInput(wxString::Format("%.2f" , m_Distance));
+    m_Text->SetDisplayPosition((tmp_xDisplay + tmp_Pt1L1[0])/2 ,(tmp_yDisplay + tmp_Pt1L1[1])/2 +  tmp_Shift);
+	  m_CurrentRenderer->AddActor2D(m_Text);
   }
-
-  m_CurrentRenderer->SetDisplayPoint(x,y,0);
-  m_CurrentRenderer->DisplayToView();
-  m_CurrentRenderer->ViewportToNormalizedViewport(x,y);
-
-  // no point has yet been picked
-  if(counter == 0)
+  else if (m_MeasureType == DISTANCE_BETWEEN_LINES && counter > 2)
   {
-    m_EndMeasure = false;
-    m_CurrentRenderer->RemoveActor2D(m_LineActor2);
-    m_Line->SetPoint1(x,y,0);
-    m_Line->SetPoint2(x,y,0);
-    m_Line->Update();
-    m_CurrentRenderer->AddActor2D(m_LineActor);
-    counter++;
-  }
-  // first point has been picked and the second one is being dragged
-  else if(counter == 1 && m_DraggingLeft)
-  {
-    m_Line->SetPoint2(x,y,0);
-    m_Line->Update();
-    if(m_MeasureType == DISTANCE_BETWEEN_POINTS)
+    CalculateMeasure();
+    //calculate the middle point of copied line
+    double diffX = (tmp_Pt2L1[0] - tmp_Pt1L1[0])/2;
+    double diffY = (tmp_Pt2L1[1] - tmp_Pt1L1[1])/2;
+    
+   
+    m_Text->SetInput(wxString::Format("%.2f", m_Distance));
+    if(m_Distance > 0.15)
     {
-      CalculateMeasure();
-    }
-  }
-  // finished dragging the second point
-  else if(counter == 1)
-  {
-    if(m_MeasureType == DISTANCE_BETWEEN_POINTS)
-    {
-      m_EndMeasure = true;
+      m_Text->SetDisplayPosition( (tmp_xDisplay - diffX +  (tmp_Pt2L1[0] + tmp_Pt1L1[0])/2)/2 ,(tmp_yDisplay - diffY +  (tmp_Pt2L1[1] + tmp_Pt1L1[1])/2)/2);
+      m_DisplayPositionText[0] = (tmp_xDisplay - diffX +  (tmp_Pt2L1[0] + tmp_Pt1L1[0])/2)/2;
+      m_DisplayPositionText[1] = (tmp_yDisplay - diffY +  (tmp_Pt2L1[1] + tmp_Pt1L1[1])/2)/2;
     }
     else
     {
-      counter++;
+      m_Text->SetDisplayPosition(tmp_xDisplay ,tmp_yDisplay);
+      m_DisplayPositionText[0] = tmp_xDisplay;
+      m_DisplayPositionText[1] = tmp_yDisplay;
     }
-
-		if(m_MeasureType == DISTANCE_BETWEEN_LINES) 
-      m_DraggingLine = true;
+    m_CurrentRenderer->AddActor2D(m_Text);
   }
-  else if (counter == 2 && (m_CurrentRenderer != m_LastRenderer))
-  {
-    // remove the first line
-    m_LastRenderer->RemoveActor2D(m_LineActor);
-    m_LastRenderer->GetRenderWindow()->Render(); 
-    // reset the counter
-    counter = 0;   
-  } 
-  // add the  second line for the distance between lines mode
-  else if(counter == 2 && m_DraggingLine)
-  {
-    assert(m_MeasureType = DISTANCE_BETWEEN_LINES);
-    // add the second line 
-		double tmpPt[3];
-		m_Line->GetPoint1(tmpPt);
-    m_Line2->SetPoint1(tmpPt);
-		dx=tmpPt[0];
-		dy=tmpPt[1];
-		dz=tmpPt[2];
-		m_Line->GetPoint2(tmpPt);
-    m_Line2->SetPoint2(tmpPt);
-		dx-=tmpPt[0];
-		dy-=tmpPt[1];
-		dz-=tmpPt[2];
-    m_Line2->Update();
-    m_CurrentRenderer->AddActor2D(m_LineActor2);
-    counter++;
-  }
-  // add the  second line for the angle between lines mode
-  else if(counter == 2 && !m_DraggingLeft)
+  else if(m_MeasureType == ANGLE_BETWEEN_LINES && counter == 3)
   { 
-    assert(m_MeasureType == ANGLE_BETWEEN_LINES);
-    m_Line2->SetPoint1(x,y,0);
-    m_Line2->SetPoint2(x,y,0);
-    m_Line2->Update();
-    m_CurrentRenderer->AddActor2D(m_LineActor2);
-    counter++; 
+    //calculate the lenght to avoid zero lenght message of CalculateMeasure
+    double p1_2[3],p2_2[3],v2[3];
+    m_Line2->GetPoint1(p1_2);
+    m_Line2->GetPoint2(p2_2);
+    v2[0] = p2_2[0] - p1_2[0];
+    v2[1] = p2_2[1] - p1_2[1];
+    v2[2] = p2_2[2] - p1_2[2];
+
+    m_DisplayPositionText[0] = (tmp_xDisplay + tmp_Pt1L1[0] + tmp_Pt2L1[0] + tmp_Pt1L2[0])/4;
+    m_DisplayPositionText[1] = (tmp_yDisplay + tmp_Pt1L1[1] + tmp_Pt2L1[1] + tmp_Pt1L2[1])/4;
+
+    if(vtkMath::Norm(v2))
+    {
+      CalculateMeasure();
+      m_Text->SetInput(wxString::Format("%.2f°", m_Angle));
+      m_Text->SetDisplayPosition((tmp_xDisplay + tmp_Pt1L1[0] + tmp_Pt2L1[0] + tmp_Pt1L2[0])/4 ,
+                                 (tmp_yDisplay + tmp_Pt1L1[1] + tmp_Pt2L1[1] + tmp_Pt1L2[1])/4 );
+	    m_CurrentRenderer->AddActor2D(m_Text);
+    }
   }
-  else if(counter == 3 && m_MeasureType == DISTANCE_BETWEEN_LINES && m_DraggingLine)
+  else if(m_MeasureType == ANGLE_BETWEEN_POINTS && counter == 3)
   {
-    m_Line2->SetPoint2(x,y,0);
-    m_Line2->SetPoint1(x+dx,y+dy,dz);
-    m_Line2->Update();
-  }
-  else if(counter == 3 && m_MeasureType == DISTANCE_BETWEEN_LINES)
-  {
-    m_EndMeasure = true;
-  }
-  else if(counter == 3 && m_MeasureType == ANGLE_BETWEEN_LINES && m_DraggingLeft)
-  {
-    m_Line2->SetPoint2(x,y,0);
-    m_Line2->Update();
-  }
-  else if(counter == 3 && m_MeasureType == ANGLE_BETWEEN_LINES)
-  {
-    m_EndMeasure = true;
+    CalculateMeasure();
+
+    m_DisplayPositionText[0] = (tmp_xDisplay +  (tmp_Pt2L1[0] + tmp_Pt2L1[0])/2)/2;
+    m_DisplayPositionText[1] =  (tmp_yDisplay +  tmp_Pt2L1[1])/2;
+    
+    m_Text->SetInput(wxString::Format("%.2f°", m_Angle));
+    m_Text->SetDisplayPosition((tmp_xDisplay +  (tmp_Pt2L1[0] + tmp_Pt2L1[0])/2)/2 ,(tmp_yDisplay +  tmp_Pt2L1[1])/2);
+	  m_CurrentRenderer->AddActor2D(m_Text);
   }
 
-  if(m_EndMeasure)
-  {
-    counter = 0; 
-  }
+	if(m_EndMeasure)
+	{
+		counter = 0;
+    CalculateMeasure();
+    // persistent TEXT
+    m_TextVector.push_back(NULL);
+    m_TextVector[m_TextVector.size()-1] = vtkTextActor::New();
+    if(!m_ExceptionFlag)
+      m_TextVector[m_TextVector.size()-1]->SetInput(m_Text->GetInput());
+    else
+    {
+      m_TextVector[m_TextVector.size()-1]->SetInput("Error\n");
+      wxMessageBox("Impossible to measure the angle.\n Both the lines must have length > 0!");
+    }  
+    m_TextVector[m_TextVector.size()-1]->SetDisplayPosition(m_DisplayPositionText[0],m_DisplayPositionText[1]);
+    m_CurrentRenderer->AddActor2D(m_TextVector[m_TextVector.size()-1]);
 
-  m_CurrentRenderer->GetRenderWindow()->Render();
+    // persistent LINE1
+    double tmpPt[3];
+    m_LineSourceVector1.push_back(NULL);
+    m_LineSourceVector1[m_LineSourceVector1.size()-1] = vtkLineSource::New();
+    m_Line->GetPoint1(tmpPt);
+    m_LineSourceVector1[m_LineSourceVector1.size()-1]->SetPoint1(tmpPt);
+    m_Line->GetPoint2(tmpPt);
+    m_LineSourceVector1[m_LineSourceVector1.size()-1]->SetPoint2(tmpPt);
+    m_LineSourceVector1[m_LineSourceVector1.size()-1]->Update();
+
+    m_LineMapperVector1.push_back(NULL);
+    m_LineMapperVector1[m_LineMapperVector1.size()-1] = vtkPolyDataMapper2D::New();
+    m_LineMapperVector1[m_LineMapperVector1.size()-1]->SetTransformCoordinate(m_Coordinate);
+    m_LineMapperVector1[m_LineMapperVector1.size()-1]->SetInput(m_LineSourceVector1[m_LineMapperVector1.size()-1]->GetOutput());
+
+    m_LineActorVector1.push_back(NULL);
+    m_LineActorVector1[m_LineActorVector1.size()-1] = vtkActor2D::New();
+    m_LineActorVector1[m_LineActorVector1.size()-1]->SetMapper(m_LineMapperVector1[m_LineMapperVector1.size()-1]);
+    m_LineActorVector1[m_LineActorVector1.size()-1]->GetProperty()->SetColor(0.0,1.0,0.0);
+    m_CurrentRenderer->AddActor2D(m_LineActorVector1[m_LineActorVector1.size()-1]);
+
+    // persistent LINE2
+    double tmpPt2[3];
+    m_LineSourceVector2.push_back(NULL);
+    m_LineSourceVector2[m_LineSourceVector2.size()-1] = vtkLineSource::New();
+    m_Line2->GetPoint1(tmpPt2);
+     if(m_MeasureType == DISTANCE_BETWEEN_POINTS)
+      {
+         tmpPt2[0] = tmpPt[0];
+         tmpPt2[1] = tmpPt[1];
+      }
+    m_LineSourceVector2[m_LineSourceVector2.size()-1]->SetPoint1(tmpPt2);
+    m_Line2->GetPoint2(tmpPt2);
+    if(m_MeasureType == DISTANCE_BETWEEN_POINTS)
+      {
+         tmpPt2[0] = tmpPt[0];
+         tmpPt2[1] = tmpPt[1];
+      }
+    m_LineSourceVector2[m_LineSourceVector2.size()-1]->SetPoint2(tmpPt2);
+    m_LineSourceVector2[m_LineSourceVector2.size()-1]->Update();
+
+    m_LineMapperVector2.push_back(NULL);
+    m_LineMapperVector2[m_LineMapperVector2.size()-1] = vtkPolyDataMapper2D::New();
+    m_LineMapperVector2[m_LineMapperVector2.size()-1]->SetTransformCoordinate(m_Coordinate);
+    m_LineMapperVector2[m_LineMapperVector2.size()-1]->SetInput(m_LineSourceVector2[m_LineMapperVector2.size()-1]->GetOutput());
+
+    m_LineActorVector2.push_back(NULL);
+    m_LineActorVector2[m_LineActorVector2.size()-1] = vtkActor2D::New();
+    m_LineActorVector2[m_LineActorVector2.size()-1]->SetMapper(m_LineMapperVector2[m_LineMapperVector2.size()-1]);
+    m_LineActorVector2[m_LineActorVector2.size()-1]->GetProperty()->SetColor(0.0,1.0,0.0);
+    m_CurrentRenderer->AddActor2D(m_LineActorVector2[m_LineActorVector2.size()-1]);
+
+    //measure , measure type vectors
+    if(m_MeasureType == DISTANCE_BETWEEN_LINES || m_MeasureType == DISTANCE_BETWEEN_POINTS)
+    {
+       m_Measure.push_back(m_Distance);
+       m_FlagMeasureType.push_back(ID_RESULT_MEASURE);
+    }
+    else
+    {
+       m_Measure.push_back(m_Angle);
+       m_FlagMeasureType.push_back(ID_RESULT_ANGLE);
+    }
+    
+	}
+  
+  m_ExceptionFlag = false;
+	m_CurrentRenderer->GetRenderWindow()->Render();
 }
 //----------------------------------------------------------------------------
 void mmi2DMeter::CalculateMeasure()
@@ -432,6 +656,7 @@ void mmi2DMeter::CalculateMeasure()
 
   if(m_MeasureType == DISTANCE_BETWEEN_POINTS)
   {
+    
     m_Distance = sqrt(vtkMath::Distance2BetweenPoints(p1_1,p2_1));
     mafEventMacro(mafEvent(this,ID_RESULT_MEASURE,m_Distance));
     return;
@@ -465,7 +690,7 @@ void mmi2DMeter::CalculateMeasure()
     return;
   }
 
-  if(m_MeasureType == ANGLE_BETWEEN_LINES)
+  if(m_MeasureType == ANGLE_BETWEEN_LINES || m_MeasureType == ANGLE_BETWEEN_POINTS)
   {
     double angle, v1[3], vn1, v2[3], vn2, s;
     v1[0] = p2_1[0] - p1_1[0];
@@ -483,13 +708,16 @@ void mmi2DMeter::CalculateMeasure()
       angle = acos(s / (vn1 * vn2));
     else
     {
-      wxMessageBox("Is not possible to measure the angle. Both the lines must have length > 0!","Warning");
+      //wxMessageBox("Is not possible to measure the angle. Both the lines must have length > 0!","Warning");
       angle = 0;
+      m_ExceptionFlag = true;
     }
     
     angle *= vtkMath::RadiansToDegrees();
-    if(angle >= 90.0) 
+    if(angle >= 90.0 && m_MeasureType == ANGLE_BETWEEN_LINES) 
       angle = 180.0 - angle; 
+
+    m_Angle = angle;
     mafEventMacro(mafEvent(this,ID_RESULT_ANGLE,angle));
     return;
   } 
@@ -544,6 +772,7 @@ void mmi2DMeter::RemoveMeter()
     return;
   m_CurrentRenderer->RemoveActor2D(m_LineActor);
   m_CurrentRenderer->RemoveActor2D(m_LineActor2);
+  m_CurrentRenderer->RemoveActor2D(m_Text);
   m_CurrentRenderer->GetRenderWindow()->Render();
 }
 //----------------------------------------------------------------------------
@@ -561,9 +790,60 @@ void mmi2DMeter::GenerateHistogram(bool generate)
   m_HistogramDialog->Show(m_GenerateHistogram);
 }
 //----------------------------------------------------------------------------
+void mmi2DMeter::UndoMeasure()
+//----------------------------------------------------------------------------
+{
+  if(m_TextVector.size() != 0)
+  {
+    //wxMessageBox(wxString::Format("%d",m_TextVector.size()));
+      m_CurrentRenderer->RemoveActor2D(m_TextVector[m_TextVector.size()-1]);
+      m_TextVector.pop_back();
+
+      m_CurrentRenderer->RemoveActor2D(m_LineActorVector1[m_LineActorVector1.size()-1]);
+      m_LineSourceVector1.pop_back();
+      m_LineMapperVector1.pop_back();
+      m_LineActorVector1.pop_back();
+
+      m_CurrentRenderer->RemoveActor2D(m_LineActorVector2[m_LineActorVector2.size()-1]);
+      m_LineSourceVector2.pop_back();
+      m_LineMapperVector2.pop_back();
+      m_LineActorVector2.pop_back();
+
+      m_CurrentRenderer->RemoveActor2D(m_LineActor);
+      m_CurrentRenderer->RemoveActor2D(m_LineActor2);
+      m_CurrentRenderer->RemoveActor2D(m_Text);
+
+      //gui
+      m_Measure.pop_back();
+      m_FlagMeasureType.pop_back();
+
+      if(m_FlagMeasureType[m_FlagMeasureType.size()-1] == ID_RESULT_MEASURE)
+      {
+         m_Distance = m_Measure[m_Measure.size()-1];
+      }
+      else if (m_FlagMeasureType[m_FlagMeasureType.size()-1] == ID_RESULT_ANGLE)
+      {
+        m_Angle = m_Measure[m_Measure.size()-1];
+      }
+      
+      if(m_Measure.size() == 0)
+      {
+        mafEventMacro(mafEvent(this,ID_RESULT_MEASURE,0.0));
+      }
+      else
+      {
+        mafEventMacro(mafEvent(this,m_FlagMeasureType[m_FlagMeasureType.size()-1],m_Measure[m_Measure.size()-1]));
+      }
+      mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+      
+  }
+}
+//----------------------------------------------------------------------------
 void mmi2DMeter::SetMeasureType(int t)
 //----------------------------------------------------------------------------
 {
+  
+  
   switch(t) 
   {
     case DISTANCE_BETWEEN_LINES:
@@ -574,6 +854,10 @@ void mmi2DMeter::SetMeasureType(int t)
       m_MeasureType = ANGLE_BETWEEN_LINES;
       GenerateHistogramOff();
     break;
+	case ANGLE_BETWEEN_POINTS:
+		m_MeasureType = ANGLE_BETWEEN_POINTS;
+		GenerateHistogramOff();
+		break;
     default:
       m_MeasureType = DISTANCE_BETWEEN_POINTS;
   }
