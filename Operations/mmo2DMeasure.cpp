@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmo2DMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 17:42:08 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-03-03 15:57:40 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -71,6 +71,7 @@ enum MEASURE2D_ID
 {
   ID_MEASURE_TYPE = MINID,
   ID_PLOT_PROFILE,
+  ID_UNDO_MEASURE,
   ID_STORE_MEASURE,
   ID_REMOVE_MEASURE,
   ID_MEASURE_LIST,
@@ -83,15 +84,17 @@ void mmo2DMeasure::OpRun()
   mafEventMacro(mafEvent(this,PER_PUSH,(mafObject *)m_2DMeterInteractor));
   m_2DMeterInteractor->SetListener(this);
   
-  wxString measure[3] = {"points", "lines", "angle"};
+  wxString measure[4] = {"points", "lines", "angle by lines", "angle by points"};
 
   // setup Gui
 	m_Gui = new mmgGui(this);
 	m_Gui->SetListener(this);
 
   m_Gui->Label("measure type",true);
-  m_Gui->Combo(ID_MEASURE_TYPE,"",&m_MeasureType,3,measure);
+  m_Gui->Combo(ID_MEASURE_TYPE,"",&m_MeasureType,4,measure);
   m_Gui->Bool(ID_PLOT_PROFILE,"plot profile",&m_GenerateHistogramFlag);
+  m_Gui->Divider();
+  m_Gui->Button(ID_UNDO_MEASURE,"Undo Measure");
   m_Gui->Divider();
   m_Gui->Label("distance: ",&m_DistanceMeasure);
   m_Gui->Label("angle: ",&m_AcuteAngle);
@@ -110,6 +113,7 @@ void mmo2DMeasure::OpRun()
     m_Gui->Enable(ID_REMOVE_MEASURE,false);
   }
   m_Gui->Enable(ID_PLOT_PROFILE, m_MeasureType == 0);
+  m_Gui->Enable(ID_UNDO_MEASURE, m_2DMeterInteractor->SizeMeasureVector() != 0);
 
   ShowGui();
 }
@@ -129,6 +133,9 @@ void mmo2DMeasure::OnEvent(mafEventBase *maf_event)
         break;
         case ID_PLOT_PROFILE:
           m_2DMeterInteractor->GenerateHistogram(m_GenerateHistogramFlag != 0);
+        break;
+        case ID_UNDO_MEASURE:
+          m_2DMeterInteractor->UndoMeasure();
         break;
         case ID_STORE_MEASURE:
         {
@@ -172,6 +179,7 @@ void mmo2DMeasure::OnEvent(mafEventBase *maf_event)
           m_DistanceMeasure = wxString::Format("%g", measure);
           m_AcuteAngle = "0";
           m_ObtuseAngle = "0";
+          m_Gui->Enable(ID_UNDO_MEASURE, m_2DMeterInteractor->SizeMeasureVector() != 0);
           m_Gui->Update();
         }
         break;
@@ -181,6 +189,7 @@ void mmo2DMeasure::OnEvent(mafEventBase *maf_event)
           m_DistanceMeasure = "0";
           m_AcuteAngle = wxString::Format("%g",measure);
           m_ObtuseAngle = wxString::Format("%g", 180.0 - measure);
+          m_Gui->Enable(ID_UNDO_MEASURE, m_2DMeterInteractor->SizeMeasureVector() != 0);
           m_Gui->Update();
         }
         break;
