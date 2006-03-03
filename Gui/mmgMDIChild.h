@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIChild.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-30 13:22:50 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-03-03 15:58:10 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,6 +43,9 @@ public:
   For instance when an operation is running or something else the vertical application don't want that the view must stay open. */
   void SetAllowCloseWindow(bool allow_close) {m_AllowCloseFlag = allow_close;};
 
+  /** Enable/disable resizing of the view.*/
+  void EnableResize(bool enable = true);
+
 protected:
 	/** Adjust the child size. */
   void OnSize(wxSizeEvent &event); 
@@ -61,6 +64,7 @@ protected:
   mafObserver *m_Listener;
   static bool  m_Quitting;
   bool         m_AllowCloseFlag;
+  bool         m_EnableResize;
 
   DECLARE_EVENT_TABLE()
 };

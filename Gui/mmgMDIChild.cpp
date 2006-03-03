@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIChild.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-30 15:00:39 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2006-03-03 15:58:10 $
+  Version:   $Revision: 1.20 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,7 +60,8 @@ mmgMDIChild::mmgMDIChild(wxMDIParentFrame* parent,mafView *view)
   assert(view);
   m_View     = view;
   m_Listener = NULL;
-  m_AllowCloseFlag = true;
+  m_AllowCloseFlag  = true;
+  m_EnableResize    = true;
 
   m_Win = m_View->GetWindow();
   m_Win->Reparent(this);
@@ -70,7 +71,7 @@ mmgMDIChild::mmgMDIChild(wxMDIParentFrame* parent,mafView *view)
 	SetTitle(wxStripMenuCodes(m_View->GetLabel()));
 }
 //----------------------------------------------------------------------------
-mmgMDIChild::~mmgMDIChild( ) 
+mmgMDIChild::~mmgMDIChild()
 //----------------------------------------------------------------------------
 {
 }
@@ -86,6 +87,11 @@ void mmgMDIChild::OnSelect(wxCommandEvent &event)
 void mmgMDIChild::OnSize(wxSizeEvent &event)
 //----------------------------------------------------------------------------
 {
+  if (!m_EnableResize)
+  {
+    return;
+  }
+
   int w,h;
   //don't initialize w & h using the event - use GetClientSize instead
   this->GetClientSize(&w,&h); 
@@ -101,6 +107,12 @@ void mmgMDIChild::OnSize(wxSizeEvent &event)
     m_View->SetWindowSize(w,h);
   }
 #endif
+}
+//----------------------------------------------------------------------------
+void mmgMDIChild::EnableResize(bool enable)
+//----------------------------------------------------------------------------
+{
+  m_EnableResize = enable;
 }
 //----------------------------------------------------------------------------
 void mmgMDIChild::OnCloseWindow(wxCloseEvent& event)
