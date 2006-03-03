@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-21 13:20:35 $
-  Version:   $Revision: 1.52 $
+  Date:      $Date: 2006-03-03 15:55:03 $
+  Version:   $Revision: 1.53 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -478,7 +478,7 @@ void mafViewVTK::Print(wxDC *dc, wxRect margins)
 //----------------------------------------------------------------------------
 {
   wxBitmap image;
-  GetImage(image, 2);
+  GetImage(image/*, 2*/);
   PrintBitmap(dc, margins, &image);
 }
 //----------------------------------------------------------------------------

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-21 13:20:35 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2006-03-03 15:55:02 $
+  Version:   $Revision: 1.22 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -533,7 +533,7 @@ void mafViewCompound::Print(wxDC *dc, wxRect margins)
   }
 
   wxBitmap image;
-  GetImage(image, 2);
+  GetImage(image/*, 2*/);
   PrintBitmap(dc, margins, &image);
 }
 //----------------------------------------------------------------------------
