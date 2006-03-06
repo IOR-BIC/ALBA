@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkSimpleRulerActor2D.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-03 15:53:44 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-03-06 13:22:01 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -55,6 +55,9 @@ class VTK_vtkMAF_EXPORT vtkSimpleRulerActor2D : public vtkActor2D
   double GetScaleFactor() {return ScaleFactor;};
   void SetLegend(const char *legend);
 
+  /** Draw the ruler at the center of the screen. */
+  void CenterAxesOnScreen(bool center = true);
+
   int	 RenderOverlay(vtkViewport *viewport);
   int	 RenderOpaqueGeometry(vtkViewport *viewport);      
   int	 RenderTranslucentGeometry(vtkViewport *viewport)  {return 0;};
@@ -76,8 +79,8 @@ protected:
   vtkActor2D			 *Axis;  
   vtkActor2D			 *Tick;  
   vtkTextActor     *ScaleLabel; 
-  vtkTextActor     *HorizontalAxeLabel;
-  vtkTextActor     *VerticalAxeLabel;
+  vtkTextActor     *HorizontalAxesLabel;
+  vtkTextActor     *VerticalAxesLabel;
 
   int rwWidth;
   int rwHeight;
@@ -102,7 +105,6 @@ protected:
   inline double RicomposeValue(int sign, double mantissa, int exponent);
   inline double NearestTick(double val, double TickSpacing);
 
-
 private:
   // hide the two parameter Render() method from the user and the compiler.
   virtual void Render(vtkRenderer *, vtkMapper *) {};
@@ -111,6 +113,3 @@ private:
   void operator=(const vtkSimpleRulerActor2D&);  // Not implemented.
 };
 #endif
-
-
-
