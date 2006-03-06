@@ -39,6 +39,8 @@ SET(vtkMAF_SRCS
   vtkRGSliceAccumulate.h
   vtkRulerActor2D.cxx
   vtkRulerActor2D.h
+  vtkSimpleRulerActor2D.cxx
+  vtkSimpleRulerActor2D.h
   vtkTransferFunction2D.cxx
   vtkTransferFunction2D.h
   vtkVolumeResample.h
