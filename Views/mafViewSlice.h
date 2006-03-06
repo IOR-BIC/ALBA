@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-28 15:36:37 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-03-06 13:23:18 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,7 +36,7 @@ initialize the visual pipe according to the camera position that is passed throu
 class mafViewSlice: public mafViewVTK
 {
 public:
-  mafViewSlice(wxString label = "Slice", int camera_position = CAMERA_CT, bool show_axes = false, bool show_grid = false, int stereo = 0);
+  mafViewSlice(wxString label = "Slice", int camera_position = CAMERA_CT, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0);
   virtual ~mafViewSlice(); 
 
   mafTypeMacro(mafViewSlice, mafViewVTK);

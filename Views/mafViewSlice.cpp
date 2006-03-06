@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-28 15:36:37 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-03-06 13:23:18 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -48,8 +48,8 @@ mafCxxTypeMacro(mafViewSlice);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewSlice::mafViewSlice(wxString label, int camera_position, bool show_axes, bool show_grid, int stereo)
-:mafViewVTK(label,camera_position,show_axes,show_grid,stereo)
+mafViewSlice::mafViewSlice(wxString label, int camera_position, bool show_axes, bool show_grid, bool show_ruler, int stereo)
+:mafViewVTK(label,camera_position,show_axes,show_grid, show_ruler, stereo)
 //----------------------------------------------------------------------------
 {
   m_CurrentVolume = NULL;
@@ -70,7 +70,7 @@ mafViewSlice::~mafViewSlice()
 mafView *mafViewSlice::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewSlice *v = new mafViewSlice(m_Label, m_CameraPosition, m_ShowAxes,m_ShowGrid, m_StereoType);
+  mafViewSlice *v = new mafViewSlice(m_Label, m_CameraPosition, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
@@ -83,7 +83,7 @@ void mafViewSlice::Create()
 {
   RWI_LAYERS num_layers = m_CameraPosition != CAMERA_OS_P ? TWO_LAYER : ONE_LAYER;
   
-  m_Rwi = new mafRWI(mafGetFrame(), num_layers, false, true, m_StereoType);
+  m_Rwi = new mafRWI(mafGetFrame(), num_layers, m_ShowGrid, m_ShowAxes, m_ShowRuler, m_StereoType);
   m_Rwi->SetListener(this);
   m_Rwi->CameraSet(m_CameraPosition);
   m_Win = m_Rwi->m_RwiBase;

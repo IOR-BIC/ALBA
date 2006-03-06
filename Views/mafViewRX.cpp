@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRX.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-21 13:20:49 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-03-06 13:23:17 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,8 +42,8 @@ mafCxxTypeMacro(mafViewRX);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewRX::mafViewRX(wxString label, int camera_position, bool show_axes, bool show_grid, int stereo)
-:mafViewVTK(label,camera_position,show_axes,show_grid,stereo)
+mafViewRX::mafViewRX(wxString label, int camera_position, bool show_axes, bool show_grid, bool show_ruler, int stereo)
+:mafViewVTK(label,camera_position,show_axes,show_grid,show_ruler,stereo)
 //----------------------------------------------------------------------------
 {
   m_CurrentVolume = NULL;
@@ -59,7 +59,7 @@ mafViewRX::~mafViewRX()
 mafView *mafViewRX::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewRX *v = new mafViewRX(m_Label, m_CameraPosition, m_ShowAxes,m_ShowGrid, m_StereoType);
+  mafViewRX *v = new mafViewRX(m_Label, m_CameraPosition, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
@@ -70,7 +70,7 @@ mafView *mafViewRX::Copy(mafObserver *Listener)
 void mafViewRX::Create()
 //----------------------------------------------------------------------------
 {
-  m_Rwi = new mafRWI(mafGetFrame(), TWO_LAYER, false, true, m_StereoType);
+  m_Rwi = new mafRWI(mafGetFrame(), TWO_LAYER, m_ShowGrid, m_ShowAxes, m_ShowRuler, m_StereoType);
   m_Rwi->SetListener(this);
   m_Rwi->CameraSet(m_CameraPosition);
   m_Win = m_Rwi->m_RwiBase;
