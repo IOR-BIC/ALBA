@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-21 13:20:49 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-03-06 16:30:44 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,7 +35,7 @@ class mmgHistogramWidget;
 class mafViewOrthoSlice: public mafViewCompound
 {
 public:
-  mafViewOrthoSlice(wxString label = "View OrthoSlice");
+  mafViewOrthoSlice(wxString label = "View OrthoSlice", bool show_ruler = false);
   virtual ~mafViewOrthoSlice(); 
 
   mafTypeMacro(mafViewOrthoSlice, mafViewCompound);
@@ -95,6 +95,8 @@ protected:
   int    m_LogScaleFlag;
   int    m_Autoscale;
   double m_LogConstant;
+
+  bool   m_ShowRuler;
 
   mafVMEVolume *m_CurrentVolume; ///< Current visualized volume
   mmgLutSlider *m_Luts; ///< Double slider used to change brightness and contrast of the image

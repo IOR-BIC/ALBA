@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-21 13:20:49 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2006-03-06 16:30:43 $
+  Version:   $Revision: 1.23 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,12 +40,13 @@ mafCxxTypeMacro(mafViewOrthoSlice);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewOrthoSlice::mafViewOrthoSlice(wxString label)
+mafViewOrthoSlice::mafViewOrthoSlice(wxString label, bool show_ruler)
 : mafViewCompound(label, 2, 2)
 //----------------------------------------------------------------------------
 {
   m_Luts = NULL;
   m_Histogram = NULL;
+  m_ShowRuler = show_ruler;
   for (int v=0;v<4;v++)
   {
     m_Views[v] = NULL;
@@ -75,7 +76,7 @@ mafViewOrthoSlice::~mafViewOrthoSlice()
 mafView *mafViewOrthoSlice::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewOrthoSlice *v = new mafViewOrthoSlice(m_Label);
+  mafViewOrthoSlice *v = new mafViewOrthoSlice(m_Label,m_ShowRuler);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   for (int i=0;i<m_PluggedChildViewList.size();i++)
@@ -278,7 +279,7 @@ void mafViewOrthoSlice::PackageView()
   int cam_pos[4] = {CAMERA_OS_X, CAMERA_OS_Y, CAMERA_OS_Z, CAMERA_OS_P};
   for(int v=0; v<4; v++)
   {
-    m_Views[v] = new mafViewSlice("Slice view", cam_pos[v]);
+    m_Views[v] = new mafViewSlice("Slice view", cam_pos[v],false,false,m_ShowRuler);
     m_Views[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice", MUTEX);
   }
   PlugChildView(m_Views[SLICE_ORTHO]);
