@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi2DMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-03 15:57:04 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-03-06 13:22:16 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -199,7 +199,7 @@ void mmi2DMeter::OnLeftButtonDown(mafEventInteraction *e)
     m_Mouse = mouse;
   }
   m_CurrentRenderer = m_Mouse->GetRenderer();
-  m_ParallelView = m_CurrentRenderer->GetActiveCamera()->GetParallelProjection();
+  m_ParallelView = m_CurrentRenderer->GetActiveCamera()->GetParallelProjection() != 0;
   if (m_ParallelView)
   {
     OnButtonDown(e);  

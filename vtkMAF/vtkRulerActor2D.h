@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkRulerActor2D.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-03 15:53:44 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-03-06 13:21:31 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -79,8 +79,8 @@ protected:
   vtkActor2D			 *Axis;  
   vtkActor2D			 *Tick;  
   vtkTextActor     *ScaleLabel; 
-  vtkTextActor     *HorizontalAxeLabel;
-  vtkTextActor     *VerticalAxeLabel;
+  vtkTextActor     *HorizontalAxesLabel;
+  vtkTextActor     *VerticalAxesLabel;
 
   vtkTextActor     *Labx[NUM_LAB];
   vtkTextActor     *Laby[NUM_LAB];
@@ -116,6 +116,3 @@ private:
   void operator=(const vtkRulerActor2D&);  // Not implemented.
 };
 #endif
-
-
-
