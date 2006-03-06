@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-25 15:58:42 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2006-03-06 13:22:39 $
+  Version:   $Revision: 1.24 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,11 +45,12 @@
 #include "vtkActor.h"
 #include "vtkActor2D.h"
 #include "vtkDataSet.h"
+#include "vtkSimpleRulerActor2D.h"
 
 #define DEFAULT_BG_COLOR 0.28
 
 //----------------------------------------------------------------------------
-mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axes, int stereo)
+mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axes, bool show_ruler, int stereo)
 //----------------------------------------------------------------------------
 {
   m_Listener= NULL;
@@ -115,7 +116,21 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axe
     m_RenderWindow->AddRenderer(m_RenBack);
   }
 
-	m_Grid = NULL;
+  m_ShowRuler = show_ruler;
+
+  m_RulerScaleFactor = 1.0;
+  m_RulerLegend = "mm";
+  vtkNEW(m_Ruler);
+  m_Ruler->SetLabelAxesVisibility();
+  m_Ruler->SetLabelScaleVisibility(true);
+  m_Ruler->SetAxesVisibility(false);
+  m_Ruler->SetTickVisibility(true);
+  m_Ruler->CenterAxesOnScreen(false);
+  m_Ruler->SetLegend(m_RulerLegend.GetCStr());
+  m_Ruler->SetScaleFactor(m_RulerScaleFactor);
+  m_Ruler->SetColor(1,1,1);
+  m_RenFront->AddActor2D(m_Ruler);
+  m_Ruler->SetVisibility(m_ShowRuler);
 
   m_ShowGrid    = use_grid;
   m_GridNormal  = GRID_Z;
@@ -138,6 +153,9 @@ mafRWI::~mafRWI()
 	if(m_Grid) m_RenFront->RemoveActor2D(m_Grid->GetLabelActor());
 	vtkDEL(m_Grid);
 	
+  if(m_Ruler) m_RenFront->RemoveActor2D(m_Ruler);
+  vtkDEL(m_Ruler);
+
   cppDEL(m_Axes); //Must be removed before deleting renderers
   vtkDEL(m_Light);
 	vtkDEL(m_Camera);
@@ -322,11 +340,34 @@ void mafRWI::SetAxesVisibility(bool show)
     m_Axes->SetVisibility(show);
 }
 //----------------------------------------------------------------------------
+void mafRWI::SetRuleVisibility(bool show)
+//----------------------------------------------------------------------------
+{
+  if(m_Ruler) 
+    m_Ruler->SetVisibility(show);
+}
+//----------------------------------------------------------------------------
+void mafRWI::SetRulerScaleFactor(double scale_factor)
+//----------------------------------------------------------------------------
+{
+  m_RulerScaleFactor = scale_factor;
+  m_Ruler->SetScaleFactor(m_RulerScaleFactor);
+  m_Gui->Update();
+}
+//----------------------------------------------------------------------------
+void mafRWI::SetRulerLegend(mafString &ruler_legend)
+//----------------------------------------------------------------------------
+{
+  m_RulerLegend = ruler_legend;
+  m_Ruler->SetLegend(m_RulerLegend.GetCStr());
+  m_Gui->Update();
+}
+//----------------------------------------------------------------------------
 void mafRWI::SetGridColor(wxColor col)
 //----------------------------------------------------------------------------
 {
-   if(m_Grid) 
-     m_Grid->SetGridColor(col.Red()/255.0,col.Green()/255.0,col.Blue()/255.0);
+  if(m_Grid) 
+    m_Grid->SetGridColor(col.Red()/255.0,col.Green()/255.0,col.Blue()/255.0);
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetBackgroundColor(wxColor col)
@@ -565,6 +606,9 @@ enum RWI_WIDGET_ID
   ID_CAMERA_RIGHT,
   ID_CAMERA_TOP,
   ID_CAMERA_BOTTOM,
+  ID_SHOW_RULER,
+  ID_RULER_SCALE_FACTOR,
+  ID_RULER_LEGEND
 };
 //-------------------------------------------------------------------------
 mmgGui *mafRWI::CreateGui()
@@ -597,6 +641,12 @@ mmgGui *mafRWI::CreateGui()
   m_Gui->Divider(2);
   m_Gui->Bool(ID_SHOW_AXES,"show axes",&m_ShowAxes,0);
   m_Gui->Color(ID_BG_COLOR,"back color",&m_BGColour);
+
+  //////// ruler gui
+  m_Gui->Divider(2);
+  m_Gui->Bool(ID_SHOW_RULER,"show ruler",&m_ShowRuler);
+  m_Gui->Double(ID_RULER_SCALE_FACTOR,"scale factor",&m_RulerScaleFactor,1.0e-299,MAXDOUBLE,-1);
+  m_Gui->String(ID_RULER_LEGEND,"legend",&m_RulerLegend);
 
   if (m_StereoType)
   {
@@ -634,6 +684,15 @@ void mafRWI::OnEvent(mafEventBase *maf_event)
       case ID_GRID_NORMAL:
         SetGridNormal(m_GridNormal);
         CameraUpdate();
+      break;
+      case ID_SHOW_RULER:
+        SetRuleVisibility(m_ShowRuler!= 0);
+      break;
+      case ID_RULER_SCALE_FACTOR:
+        SetRulerScaleFactor(m_RulerScaleFactor);
+      break;
+      case ID_RULER_LEGEND:
+        SetRulerLegend(m_RulerLegend);
       break;
       case ID_SHOW_AXES:
         SetAxesVisibility(m_ShowAxes != 0); 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-25 15:45:29 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-03-06 13:22:40 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -31,6 +31,7 @@ class mafSceneGraph;
 class mafAxes;
 class mmgGui;
 class mmgPicButton;
+class vtkSimpleRulerActor2D;
 
 //----------------------------------------------------------------------------
 // constants:
@@ -46,7 +47,7 @@ enum RWI_LAYERS
 class mafRWI : public mafObserver
 {
 public:
-										mafRWI(wxWindow *parent, RWI_LAYERS layers = ONE_LAYER, bool use_grid = false, bool show_axes = false, int stereo = 0);
+										mafRWI(wxWindow *parent, RWI_LAYERS layers = ONE_LAYER, bool use_grid = false, bool show_axes = false, bool show_ruler = false, int stereo = 0);
 	virtual					 ~mafRWI();
 
   virtual void SetListener(mafObserver *Listener) {m_Listener = Listener;};
@@ -92,6 +93,16 @@ public:
 	/** Set the visibility for the axes actor. */
 	void SetAxesVisibility(bool show);
 
+  /** Set the visibility for the rule actor. */
+  void SetRuleVisibility(bool show = true);
+
+  /** Set the scale factor to convert the data scale to the visualized scale of the rule. 
+      By default the ruler shows the same scale of the data. */
+  void SetRulerScaleFactor(double scale_factor);
+
+  /** Set the label of the ruler. Example the unit measure of the data. */
+  void SetRulerLegend(mafString &ruler_legend);
+
   mmgGui *GetGui();
 
   mafSceneGraph    *m_Sg; 
@@ -103,26 +114,30 @@ public:
   vtkCamera				 *m_Camera;
   int               m_CameraPosition; ///< Used to store camera position ID.
   
-	mafAxes          *m_Axes; ///< Actor representing a global reference system.
-	vtkGridActor     *m_Grid; ///< Actor representing a grid showed into the render window.
-	int               m_ShowGrid; ///< Flag used to show/hide the grid.
-  int               m_GridNormal;
-  int               m_ShowAxes;  ///< Flag used to show/hide axes in low left cornel of the view
-
 protected:
 	/** Compute the bounds for the visible actors; if vme is passed, the bounds of vme are calculated. */
 	double *ComputeVisibleBounds(mafNode *node = NULL);
   mmgGui *CreateGui();
 
-  mmgGui *m_Gui;
-  wxColour	m_BGColour;
-  wxColour	m_GridColour;
-  double    m_GridPosition;
+  mmgGui       *m_Gui;
+  wxColour	    m_BGColour;
+  wxColour	    m_GridColour;
+  double        m_GridPosition;
   mmgPicButton *m_CameraButtons[6];
   wxBoxSizer	 *m_Sizer;
 	
-  int          m_StereoType;
-  mafObserver *m_Listener;
+  mafAxes          *m_Axes; ///< Actor representing a global reference system.
+  vtkGridActor     *m_Grid; ///< Actor representing a grid showed into the render window.
+  int               m_ShowGrid; ///< Flag used to show/hide the grid.
+  int               m_GridNormal;
+  int               m_ShowAxes;  ///< Flag used to show/hide axes in low left cornel of the view
+
+  double        m_RulerScaleFactor;
+  mafString     m_RulerLegend;
+  vtkSimpleRulerActor2D *m_Ruler;
+  int           m_ShowRuler; ///< Flag used to show/hide ruler actor into a parallel view
+  int           m_StereoType;
+  mafObserver  *m_Listener;
 
   mafString m_StereoMovieDir;
   int       m_StereoMovieEnable;
