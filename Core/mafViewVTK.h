@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-21 13:20:35 $
-  Version:   $Revision: 1.41 $
+  Date:      $Date: 2006-03-06 13:22:59 $
+  Version:   $Revision: 1.42 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -52,7 +52,7 @@ mafViewVTK is a View that got a RenderWindow and a SceneGraph
 class mafViewVTK: public mafView
 {
 public:
-  mafViewVTK(wxString label = "vtkView", int camera_position = CAMERA_PERSPECTIVE, bool show_axes = true, bool show_grid = false, int stereo = 0);
+  mafViewVTK(wxString label = "vtkView", int camera_position = CAMERA_PERSPECTIVE, bool show_axes = true, bool show_grid = false, bool show_ruler = false, int stereo = 0);
   virtual ~mafViewVTK(); 
 
   mafTypeMacro(mafViewVTK, mafView);
@@ -171,6 +171,7 @@ protected:
   int   m_NumberOfVisibleVme; ///< perform ResetCamera only for the first vme shown into the view
   bool  m_ShowAxes;  ///< Flag used to show/hide axes in low left cornel of the view
   int   m_StereoType; ///< Indicate the stereo type to use with the view
+  bool  m_ShowRuler;
   bool  m_ShowGrid;
 
   virtual mmgGui *CreateGui();
