@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttachCamera.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-19 11:20:42 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-03-07 15:08:37 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -124,20 +124,13 @@ void mafAttachCamera::UpdateCameraMatrix()
   {
     return;
   }
-  //mafVME *sel_vme = mafVME::SafeDownCast(m_Rwi->m_Sg->GetSelectedVme());
-  if(m_AttachedVme /*!= sel_vme && sel_vme*/)
-  {
-    //m_AttachedVme = sel_vme;
-    if (m_AttachedVmeMatrix == NULL)
-      vtkNEW(m_AttachedVmeMatrix);
-    m_AttachedVmeMatrix->DeepCopy(m_AttachedVme->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
-  }
-  vtkMAFSmartPointer<vtkTransform> delta;
 
   vtkMatrix4x4 *new_matrix = m_AttachedVme->GetOutput()->GetAbsMatrix()->GetVTKMatrix();
 
   m_AttachedVmeMatrix->Invert();
 
+  vtkMAFSmartPointer<vtkTransform> delta;
+  delta->PreMultiply();
   delta->Concatenate(new_matrix);
   delta->Concatenate(m_AttachedVmeMatrix);
 
