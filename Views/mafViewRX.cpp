@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRX.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-06 13:23:17 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-03-07 18:58:39 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -125,10 +125,13 @@ void mafViewRX::VmeCreatePipe(mafNode *vme)
       pipe->SetListener(this);
       if (pipe_name.Equals("mafPipeVolumeProjected"))
       {
+        ((mafPipeVolumeProjected *)pipe)->InitializeProjectParameters(m_CameraPosition);
         m_CurrentVolume = n;
         if (m_AttachCamera)
+        {
           m_AttachCamera->SetVme(m_CurrentVolume->m_Vme);
-        ((mafPipeVolumeProjected *)pipe)->InitializeProjectParameters(m_CameraPosition);
+          CameraUpdate();
+        }
       }
       pipe->Create(n);
       n->m_Pipe = (mafPipe*)pipe;
