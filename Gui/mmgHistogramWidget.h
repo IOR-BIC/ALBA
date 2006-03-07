@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgHistogramWidget.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-28 14:47:12 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-03-07 09:16:11 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -67,13 +67,13 @@ public:
   /** Return the status of log scale flag.*/
   bool IsLogarithmicScale() {return m_LogHistogramFlag;};
 
-  /** Enable/Disable autoscaling for drawing histogram.*/
+  /** Enable/Disable auto-scaling for drawing histogram.*/
   void AutoscaleHistogram(bool autoscale = true);
 
-  /** Enable autoscaling for drawing histogram.*/
+  /** Enable auto-scaling for drawing histogram.*/
   void AutoscaleHistogramOn() {AutoscaleHistogram();};
 
-  /** Disable autoscaling for drawing histogram.*/
+  /** Disable auto-scaling for drawing histogram.*/
   void AutoscaleHistogramOff() {AutoscaleHistogram(false);};
 
   /** Return the status of autoscale flag.*/

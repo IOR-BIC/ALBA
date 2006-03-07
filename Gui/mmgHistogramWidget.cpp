@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgHistogramWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2006-02-28 14:47:12 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2006-03-07 09:16:11 $
+Version:   $Revision: 1.6 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -78,7 +78,7 @@ mmgHistogramWidget::mmgHistogramWidget(wxWindow* parent, wxWindowID id, const wx
   m_TextMapper->SetInput("");
   m_TextMapper->GetTextProperty()->AntiAliasingOff();
   m_TextMapper->GetTextProperty()->SetFontFamily(VTK_TIMES);
-  m_TextMapper->GetTextProperty()->SetColor(0,0,0.8);
+  m_TextMapper->GetTextProperty()->SetColor(1,1,1);
   m_TextMapper->GetTextProperty()->SetLineOffset(0.5);
   m_TextMapper->GetTextProperty()->SetLineSpacing(1.5);
   m_TextMapper->GetTextProperty()->SetJustificationToRight();
@@ -112,14 +112,16 @@ mmgHistogramWidget::mmgHistogramWidget(wxWindow* parent, wxWindowID id, const wx
   vtkMAFSmartPointer<vtkPolyDataMapper2D> mapper2d;
   mapper2d->SetInput(m_Glyph->GetOutput());
   mapper2d->SetTransformCoordinate(coordinate);
+  mapper2d->ScalarVisibilityOff();
 
   vtkNEW(m_PlotActor);
   m_PlotActor->SetMapper(mapper2d);
+  m_PlotActor->GetProperty()->SetColor(1,1,1);
 
   m_HistogramRWI = new mafRWI(mafGetFrame());
   m_HistogramRWI->SetListener(this);
   m_HistogramRWI->m_RenFront->AddActor2D(m_PlotActor);
-  m_HistogramRWI->m_RenFront->SetBackground(1,1,1);
+  m_HistogramRWI->m_RenFront->SetBackground(0.28,0.28,0.28);
   m_HistogramRWI->SetSize(pos.x,pos.y,size.GetWidth(),size.GetHeight());
   m_HistogramRWI->m_RwiBase->Reparent(this);
   m_HistogramRWI->m_RwiBase->SetListener(this);
