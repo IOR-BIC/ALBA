@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-06 13:23:18 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2006-03-07 09:16:42 $
+  Version:   $Revision: 1.14 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -177,7 +177,6 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
         {
           ((mafPipeVolumeSlice *)pipe)->InitializeSliceParameters(slice_mode,false);
         }
-        ((mafPipeVolumeSlice *)pipe)->ShowUnit(slice_mode != SLICE_ORTHO,m_Rwi->m_Camera);
       }
       pipe->Create(n);
       n->m_Pipe = (mafPipe*)pipe;
