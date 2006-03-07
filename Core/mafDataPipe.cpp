@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 11:06:35 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-03-07 18:54:15 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -40,6 +40,7 @@ mafDataPipe::mafDataPipe()
   m_VME=NULL;
   m_DependOnAbsPose=0;
   m_DependOnPose=0;
+  m_DependOnVMETime = 1; //Paolo
 }
 
 //------------------------------------------------------------------------------
@@ -113,10 +114,13 @@ unsigned long mafDataPipe::GetMTime()
 
   if (m_VME)
   {
-    unsigned long vmeMTime = m_VME->GetMTime();
-    if (vmeMTime > mtime)
+    if (m_DependOnVMETime) 
     {
-      mtime = vmeMTime;
+      unsigned long vmeMTime = m_VME->GetMTime();
+      if (vmeMTime > mtime)
+      {
+        mtime = vmeMTime;
+      }
     }
 
     if (m_DependOnAbsPose)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataPipe.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:43:05 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-03-07 18:54:16 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -103,6 +103,10 @@ public:
   void SetDependOnPose(int flag) {m_DependOnPose=flag;Modified();}
   int GetDependOnPose() {return m_DependOnPose;}
 
+  /** enable/disable the dependence of this data pipe from VME's pose matrix */
+  void SetDependOnVMETime(int flag) {m_DependOnVMETime=flag;Modified();}
+  int GetDependOnVMETime() {return m_DependOnVMETime;}
+
   /** enable/disable the dependence of this data pipe from VME's ABS pose matrix */
   void SetDependOnAbsPose(int flag) {m_DependOnAbsPose=flag;Modified();}
   int GetDependOnAbsPose() {return m_DependOnAbsPose;}
@@ -126,6 +130,7 @@ protected:
 
   int           m_DependOnPose;
   int           m_DependOnAbsPose;
+  int           m_DependOnVMETime;
 
 private:
   mafDataPipe(const mafDataPipe&);   //Not implemented
