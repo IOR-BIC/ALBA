@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-28 15:38:02 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-03-07 18:57:51 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -218,9 +218,18 @@ mmgGui* mafViewRXCT::CreateGui()
   m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
 
   EnableWidgets(m_CurrentVolume != NULL);
-  for(int i=1; i<m_NumOfChildView; i++)
+/*  for(int i=1; i<m_NumOfChildView; i++)
   {
     m_ChildViewList[i]->GetGui();
+  }*/
+  int sub_gui;
+  for (sub_gui=0; sub_gui<2; sub_gui++) 
+  {
+    m_ChildViewList[sub_gui]->GetGui();
+  }
+  for (sub_gui=0; sub_gui<6; sub_gui++) 
+  {
+    ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(sub_gui))->GetGui();
   }
   return m_Gui;
 }
