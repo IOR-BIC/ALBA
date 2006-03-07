@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeProjected.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-07 15:06:54 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-03-07 18:56:18 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -77,18 +77,7 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 	assert(m_Vme->IsMAFType(mafVMEVolumeGray));
 
 	m_Vme->GetOutput()->Update();
-/*  mafMatrix local_matrix;
-  local_matrix.DeepCopy(m_Vme->GetMatrixPipe()->GetMatrixPointer());
 
-  mafSmartPointer<mafTransformFrame> transform_to_local;
-  transform_to_local->SetInput(m_Vme->GetMatrixPipe());
-  //transform_to_local->SetInputFrame(m_Vme->GetParent()->GetAbsMatrixPipe()->GetMatrixPointer());
-  transform_to_local->SetInputFrame(m_Vme->GetAbsMatrixPipe()->GetMatrixPointer());
-  transform_to_local->SetTargetFrame(((mafVME *)m_Vme->GetRoot())->GetAbsMatrixPipe()->GetMatrixPointer());
-	transform_to_local->Update();
-
-	m_Vme->SetMatrix(transform_to_local->GetMatrix());
-*/
 	m_Lut = vtkWindowLevelLookupTable::New();
 
   //--volume pipeline-------------------------------
@@ -103,7 +92,6 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 
   double range[2]; // used with lut
 	double bounds[6];
-  //m_Vme->GetOutput()->GetVMEBounds(bounds);
   vtk_data->GetBounds(bounds);
 
 	double xmin, xmax, ymin, ymax, zmin, zmax;
@@ -146,6 +134,7 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 	if (vtk_data->IsA("vtkStructuredPoints"))
 	{
 		SPProjection = vtkProjectSP::New();
+    mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,SPProjection));
 		SPProjection->SetInput(((vtkStructuredPoints *)vtk_data));
 		if (m_CamPosition == CAMERA_RX_FRONT )
 			SPProjection->SetProjectionModeToY();
@@ -156,9 +145,10 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 		RXTexture->SetInput(SPProjection->GetOutput());
 	}
 
-	if (vtk_data->IsA("vtkRectilinearGrid"))
+  if (vtk_data->IsA("vtkRectilinearGrid"))
 	{
 		RGProjection = vtkProjectRG::New();
+    mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,RGProjection));
 		RGProjection->SetInput(((vtkRectilinearGrid *)vtk_data));
 		vtkStructuredPoints *SP = vtkStructuredPoints::New();
 		if (m_CamPosition == CAMERA_RX_FRONT)
@@ -200,8 +190,6 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 	m_RXActor->SetMapper(RXPlaneMapper);
 	m_RXActor->SetTexture(RXTexture);
   
-//  m_Vme->SetMatrix(local_matrix);
-
 	//---- TICKs creation --------------------------
 	vtkPolyData  *CTLinesPD      = vtkPolyData::New();	
 	vtkPoints    *CTLinesPoints  = vtkPoints::New();	
