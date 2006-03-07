@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttachCamera.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-07 15:08:37 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-03-07 18:57:02 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -114,7 +114,6 @@ void mafAttachCamera::SetVme(mafNode *node)
   }
   if (m_AttachedVmeMatrix == NULL)
     vtkNEW(m_AttachedVmeMatrix);
-  m_AttachedVmeMatrix->DeepCopy(m_AttachedVme->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 }
 //----------------------------------------------------------------------------
 void mafAttachCamera::UpdateCameraMatrix()
