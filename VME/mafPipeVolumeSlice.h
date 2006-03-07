@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-02 22:00:52 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2006-03-07 09:15:50 $
+  Version:   $Revision: 1.16 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -108,18 +108,9 @@ public:
   Get the opacity of the slice. */
   float GetSliceOpacity();
 
-  /** 
-  Allow to show/hide the cursor unit with length 1 cm. 
-  Passing the camera as second parameter, allow the cursor to follow the camera orientation.*/
-  void ShowUnit(bool show_unit, vtkCamera *camera_to_follow = NULL);
-
 protected:
 	/** Create the slicer pipeline. */
 	void CreateSlice(int direction);
-
-  /** 
-  Draw unit segment */
-  void DrawUnit();
 
   virtual mmgGui  *CreateGui();
 
@@ -149,14 +140,9 @@ protected:
   vtkPolyDataMapper			 *m_VolumeBoxMapper;
   vtkActor               *m_VolumeBoxActor;
 
-  int                     m_UnitLength;
-  vtkFollower            *m_UnitCubeActor;
-  vtkCamera              *m_CameraToFollow;
-
   vtkActor               *m_GhostActor;
 
   bool                    m_SliceParametersInitialized;
   bool                    m_ShowVolumeBox;
-  bool                    m_ShowUnit;
 };
 #endif // __mafPipeVolumeSlice_H__
