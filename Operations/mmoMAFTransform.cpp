@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMAFTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-07 11:21:55 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-03-07 15:07:37 $
+  Version:   $Revision: 1.10 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -360,7 +360,7 @@ void mmoMAFTransform::OnEventGizmoTranslate(mafEventBase *maf_event)
 	{
     case ID_TRANSFORM:
   	{    
-      // post multipliying matrixes coming from the gizmo to the vme
+      // post multiplying matrixes coming from the gizmo to the vme
       // gizmo does not set vme pose  since they cannot scale
       PostMultiplyEventMatrix(maf_event);
       
@@ -385,7 +385,7 @@ void mmoMAFTransform::OnEventGizmoRotate(mafEventBase *maf_event)
     case ID_TRANSFORM:
   	{ 
       
-      // post multipliying matrixes coming from the gizmo to the vme
+      // post multiplying matrix coming from the gizmo to the vme
       // gizmo does not set vme pose  since they cannot scale
       PostMultiplyEventMatrix(maf_event);
 

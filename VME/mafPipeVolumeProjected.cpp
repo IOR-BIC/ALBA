@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeProjected.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-13 16:32:40 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-03-07 15:06:54 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -77,17 +77,18 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 	assert(m_Vme->IsMAFType(mafVMEVolumeGray));
 
 	m_Vme->GetOutput()->Update();
-  mafSmartPointer<mafMatrix> local_matrix;
-  local_matrix->DeepCopy(m_Vme->GetMatrixPipe()->GetMatrixPointer());
+/*  mafMatrix local_matrix;
+  local_matrix.DeepCopy(m_Vme->GetMatrixPipe()->GetMatrixPointer());
 
   mafSmartPointer<mafTransformFrame> transform_to_local;
   transform_to_local->SetInput(m_Vme->GetMatrixPipe());
-  transform_to_local->SetInputFrame(m_Vme->GetParent()->GetAbsMatrixPipe()->GetMatrixPointer());
+  //transform_to_local->SetInputFrame(m_Vme->GetParent()->GetAbsMatrixPipe()->GetMatrixPointer());
+  transform_to_local->SetInputFrame(m_Vme->GetAbsMatrixPipe()->GetMatrixPointer());
   transform_to_local->SetTargetFrame(((mafVME *)m_Vme->GetRoot())->GetAbsMatrixPipe()->GetMatrixPointer());
 	transform_to_local->Update();
 
 	m_Vme->SetMatrix(transform_to_local->GetMatrix());
-  
+*/
 	m_Lut = vtkWindowLevelLookupTable::New();
 
   //--volume pipeline-------------------------------
@@ -102,8 +103,8 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 
   double range[2]; // used with lut
 	double bounds[6];
-  m_Vme->GetOutput()->GetBounds(bounds);
-  //m_Vme->GetOutput()->GetVTKData()->GetScalarRange(range);
+  //m_Vme->GetOutput()->GetVMEBounds(bounds);
+  vtk_data->GetBounds(bounds);
 
 	double xmin, xmax, ymin, ymax, zmin, zmax;
 	xmin = bounds[0];
@@ -199,7 +200,7 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 	m_RXActor->SetMapper(RXPlaneMapper);
 	m_RXActor->SetTexture(RXTexture);
   
-  m_Vme->SetMatrix(*local_matrix.GetPointer());
+//  m_Vme->SetMatrix(local_matrix);
 
 	//---- TICKs creation --------------------------
 	vtkPolyData  *CTLinesPD      = vtkPolyData::New();	
@@ -252,10 +253,10 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
   TickMapper->SetInput(CTLinesPD);
 
 	vtkProperty	*TickProperty = vtkProperty::New();
-	TickProperty ->SetColor(1,0,0);
-	TickProperty ->SetAmbient(1);
-	TickProperty ->SetRepresentationToWireframe();
-	TickProperty ->SetInterpolationToFlat();
+	TickProperty->SetColor(1,0,0);
+	TickProperty->SetAmbient(1);
+	TickProperty->SetRepresentationToWireframe();
+	TickProperty->SetInterpolationToFlat();
 
 	m_TickActor = vtkActor::New();
 	m_TickActor->SetMapper(TickMapper);
@@ -306,21 +307,11 @@ mafPipeVolumeProjected::~mafPipeVolumeProjected()
 	vtkDEL(m_RXActor);
   vtkDEL(m_ghost);
 }
-/*
-//----------------------------------------------------------------------------
-void mafPipeVolumeProjected::Show(bool show)
-//----------------------------------------------------------------------------
-{
-	m_RXActor->SetVisibility(show);
-	if(m_ghost) 
-    m_ghost->SetVisibility(show);
-	m_TickActor->SetVisibility(show);
-}*/
 //----------------------------------------------------------------------------
 void mafPipeVolumeProjected::Select(bool sel)
 //----------------------------------------------------------------------------
 {
-  //there's no selection hilight for volume in rx-view
+  //there's no selection highlight for volume in rx-view
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeProjected::SetLutRange(double low, double hi)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-19 11:06:40 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-03-07 15:09:11 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -74,8 +74,7 @@ public:
   /** destroy the Gui */
   void DeleteGui();
 
-  mmgGui         *m_Gui;      ///< user inteface
-	//mafNode        *m_MafNode;
+  mmgGui         *m_Gui;      ///< user interface
   mafVME         *m_Vme;
 	vtkMAFAssembly *m_AssemblyFront;
 	vtkMAFAssembly *m_AssemblyBack;
@@ -91,7 +90,7 @@ protected:
   its own widgets and define the enum of IDs for the widgets as an extension of
   the superclass enum. The last id value must be defined as "LAST_ID" to allow the 
   subclass to continue the ID enumeration from it. For appending the widgets in the
-  same pannel GUI, each CreateGUI() function should first call the superclass' one.*/
+  same panel GUI, each CreateGUI() function should first call the superclass' one.*/
   virtual mmgGui  *CreateGui();
 
   mafObserver *m_Listener;

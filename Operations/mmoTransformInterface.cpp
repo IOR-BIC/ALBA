@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTransformInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 13:03:01 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-03-07 15:07:37 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -87,16 +87,16 @@ void mmoTransformInterface::PostMultiplyEventMatrix(mafEventBase *maf_event)
     tr->Concatenate(e->GetMatrix()->GetVTKMatrix());
     tr->Update();
 
-    mafSmartPointer<mafMatrix> absPose;
-    absPose->DeepCopy(tr->GetMatrix());
-    absPose->SetTimeStamp(m_CurrentTime);
+    mafMatrix absPose;
+    absPose.DeepCopy(tr->GetMatrix());
+    absPose.SetTimeStamp(m_CurrentTime);
 
     if (arg == mmiGenericMouse::MOUSE_MOVE)
     {
       // move vme
-      ((mafVME *)m_Input)->SetAbsMatrix(*absPose.GetPointer());
+      ((mafVME *)m_Input)->SetAbsMatrix(absPose);
       // update matrix for OpDo()
-      m_NewAbsMatrix = *absPose.GetPointer();
+      m_NewAbsMatrix = absPose;
     } 
     mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 
@@ -122,22 +122,22 @@ void mmoTransformInterface::OpDo()
   }
 
   // decompose matrix
-  mafSmartPointer<mafMatrix> rotMat;
-  mafSmartPointer<mafMatrix> scaleMat;
+  mafMatrix rotMat;
+  mafMatrix scaleMat;
   double position[3];
   double scaling[3] = {0,0,0};
 
-  mafTransform::PolarDecomp(m_NewAbsMatrix, *rotMat, *scaleMat, position);
+  mafTransform::PolarDecomp(m_NewAbsMatrix, rotMat, scaleMat, position);
 
   for (int i = 0;i < 3; i++)
   {
-    scaling[i] = scaleMat->GetElement(i,i);
+    scaling[i] = scaleMat.GetElement(i,i);
   }
 
-  // create the rototranslation matrix to be set as vme abs pose
-  mafSmartPointer<mafMatrix> rotoTraslMatrix;
-  *rotoTraslMatrix = *rotMat;
-  mafTransform::SetPosition(*rotoTraslMatrix, position);
+  // create the roto-translation matrix to be set as vme abs pose
+  mafMatrix rotoTraslMatrix;
+  rotoTraslMatrix = rotMat;
+  mafTransform::SetPosition(rotoTraslMatrix, position);
 
   vtkMAFSmartPointer<vtkPolyData> pd;
   vtkMAFSmartPointer<vtkRectilinearGrid> rg;
@@ -197,7 +197,6 @@ void mmoTransformInterface::OpDo()
     }
     else if (((mafVME *)m_Input)->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
     {
-      // get the dicom files from the directory
 	    wxBusyInfo wait_info("Applying scaling to data...");
   
       //mafProgressBarShowMacro();
@@ -235,7 +234,7 @@ void mmoTransformInterface::OpDo()
     }
   }
   // apply roto-translation to abs pose
-  ((mafVME *)m_Input)->SetAbsMatrix(*rotoTraslMatrix, m_CurrentTime);
+  ((mafVME *)m_Input)->SetAbsMatrix(rotoTraslMatrix, m_CurrentTime);
   
   mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }

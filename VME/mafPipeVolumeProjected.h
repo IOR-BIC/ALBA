@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeProjected.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-02 22:00:52 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-03-07 15:06:54 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -41,13 +41,10 @@ public:
   
   virtual void Create(mafSceneNode *n);
 
-	/** Show-Hide the rx actor. */
-//	void Show       (bool show); 
-
-	/** Show-Hide the rx bounding box actor. */
+	/** Show-Hide the RX bounding box actor. */
   void Select     (bool select);
 
-	/** Set the range to the lookup table for the rx texture. */
+	/** Set the range to the lookup table for the RX texture. */
 	void SetLutRange(double low, double hi);
 
 	/** Get the range of the texture's lookup table. */
