@@ -83,6 +83,7 @@ vtkSimpleRulerActor2D *A2D = vtkSimpleRulerActor2D::New();
    A2D->SetTickVisibility(true);
    A2D->SetLegend("mm");
    A2D->SetColor(1,1,1);
+//   A2D->UseGlobalAxesOff(); //Paolo 08-03-2006
 
    //A2D->SetLegend("inch");
    //A2D->SetScaleFactor(25.4);
@@ -94,6 +95,7 @@ vtkRulerActor2D *A2D2 = vtkRulerActor2D::New();
    A2D2->SetTickVisibility(true);
    A2D2->SetLegend("mm");
    A2D2->SetColor(1,1,1);
+//   A2D2->UseGlobalAxesOff();  //Paolo 08-03-2006
 
    //A2D2->SetLegend("inch");
    //A2D2->SetScaleFactor(25.4);
