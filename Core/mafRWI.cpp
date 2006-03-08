@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-06 13:22:39 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2006-03-08 10:35:42 $
+  Version:   $Revision: 1.25 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -126,6 +126,7 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axe
   m_Ruler->SetAxesVisibility(false);
   m_Ruler->SetTickVisibility(true);
   m_Ruler->CenterAxesOnScreen(false);
+  m_Ruler->UseGlobalAxesOff();
   m_Ruler->SetLegend(m_RulerLegend.GetCStr());
   m_Ruler->SetScaleFactor(m_RulerScaleFactor);
   m_Ruler->SetColor(1,1,1);
