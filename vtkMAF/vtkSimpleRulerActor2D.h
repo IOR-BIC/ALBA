@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkSimpleRulerActor2D.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-06 13:22:01 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-03-08 10:36:09 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -63,6 +63,10 @@ class VTK_vtkMAF_EXPORT vtkSimpleRulerActor2D : public vtkActor2D
   int	 RenderTranslucentGeometry(vtkViewport *viewport)  {return 0;};
   void AdjustClippingRange(vtkViewport *viewport)        {};
 
+  void UseGlobalAxes(bool globalAxes) {GlobalAxes = globalAxes; Modified();};
+  void UseGlobalAxesOff() {GlobalAxes = false; Modified();};
+  void UseGlobalAxesOn() {GlobalAxes = true; Modified();};
+
 protected:
 										vtkSimpleRulerActor2D();
 									 ~vtkSimpleRulerActor2D();
@@ -93,6 +97,7 @@ protected:
   int x_index;
   int y_index;
   
+  bool   GlobalAxes;
   bool   CenterAxes;
   bool   ScaleLabelVisibility;
   bool   AxesLabelVisibility;
