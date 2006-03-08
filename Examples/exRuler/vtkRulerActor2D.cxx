@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkRulerActor2D.cxx,v $
   Language:  C++
-  Date:      $Date: 2006-03-03 15:31:18 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-03-08 10:21:39 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -34,7 +34,7 @@
 #include "vtkProperty2D.h"
 #include "vtkPolyDataMapper2D.h"
 
-vtkCxxRevisionMacro(vtkRulerActor2D, "$Revision: 1.4 $");
+vtkCxxRevisionMacro(vtkRulerActor2D, "$Revision: 1.5 $");
 vtkStandardNewMacro(vtkRulerActor2D);
 //------------------------------------------------------------------------------
 vtkRulerActor2D::vtkRulerActor2D()
@@ -52,6 +52,7 @@ vtkRulerActor2D::vtkRulerActor2D()
   AxesLabelVisibility   = true;
   AxesVisibility        = false;
   TickVisibility        = true;
+  GlobalAxes            = true;
 
   Legend = NULL;
   Axis = Tick = ScaleLabel = NULL;
@@ -80,8 +81,8 @@ vtkRulerActor2D::~vtkRulerActor2D()
   if(Axis)   Axis->Delete();
   if(Tick)   Tick->Delete();
   if(ScaleLabel)  ScaleLabel->Delete();
-  if(HorizontalAxeLabel) HorizontalAxeLabel->Delete();
-  if(VerticalAxeLabel) VerticalAxeLabel->Delete();
+  if(HorizontalAxesLabel) HorizontalAxesLabel->Delete();
+  if(VerticalAxesLabel) VerticalAxesLabel->Delete();
 }
 //------------------------------------------------------------------------------
 void vtkRulerActor2D::PrintSelf(ostream& os, vtkIndent indent)
@@ -101,15 +102,15 @@ int vtkRulerActor2D::RenderOverlay(vtkViewport *viewport)
   vtkCamera *cam = ren->GetActiveCamera();
   if(!cam->GetParallelProjection()) return 0;
 
-  if(!CheckProjectionPlane(cam)) return 0;
+  if(!CheckProjectionPlane(cam) && GlobalAxes) return 0;
   RulerUpdate(cam, ren);
   this->Modified();
 
-  if (AxesVisibility)       Axis->  RenderOverlay(viewport);
-  if (TickVisibility)       Tick->  RenderOverlay(viewport);
-  if (ScaleLabelVisibility) ScaleLabel-> RenderOverlay(viewport);
-  if (AxesLabelVisibility)  HorizontalAxeLabel->RenderOverlay(viewport);
-  if (AxesLabelVisibility)  VerticalAxeLabel->RenderOverlay(viewport);
+  if (AxesVisibility)       Axis->RenderOverlay(viewport);
+  if (TickVisibility)       Tick->RenderOverlay(viewport);
+  if (ScaleLabelVisibility) ScaleLabel->RenderOverlay(viewport);
+  if (AxesLabelVisibility && GlobalAxes)  HorizontalAxesLabel->RenderOverlay(viewport);
+  if (AxesLabelVisibility && GlobalAxes)  VerticalAxesLabel->RenderOverlay(viewport);
 
   for(int i=0; i<NUM_LAB; i++)
   {
@@ -123,8 +124,8 @@ int vtkRulerActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
 //----------------------------------------------------------------------------
 {
   if (ScaleLabelVisibility) ScaleLabel->RenderOpaqueGeometry(viewport);
-  if (AxesLabelVisibility) HorizontalAxeLabel->RenderOpaqueGeometry(viewport);
-  if (AxesLabelVisibility) VerticalAxeLabel->RenderOpaqueGeometry(viewport);
+  if (AxesLabelVisibility && GlobalAxes) HorizontalAxesLabel->RenderOpaqueGeometry(viewport);
+  if (AxesLabelVisibility && GlobalAxes) VerticalAxesLabel->RenderOpaqueGeometry(viewport);
 
   for(int i=0; i<NUM_LAB; i++)
   {
@@ -284,25 +285,25 @@ void vtkRulerActor2D::RulerCreate()
 	ScaleLabel->SetDisplayPosition(margin + 4,margin + 4);
 	ScaleLabel->SetInput("");
 
-  HorizontalAxeLabel = vtkTextActor::New();
-  HorizontalAxeLabel->GetProperty()->SetColor(1,0,0);
-  HorizontalAxeLabel->GetTextProperty()->AntiAliasingOff();
-  HorizontalAxeLabel->GetTextProperty()->SetFontSize(12);
-  HorizontalAxeLabel->GetTextProperty()->SetFontFamilyToArial();
-  HorizontalAxeLabel->GetTextProperty()->SetJustificationToRight();
-  HorizontalAxeLabel->ScaledTextOff();
-  HorizontalAxeLabel->SetDisplayPosition(0,0);
-  HorizontalAxeLabel->SetInput("");
+  HorizontalAxesLabel = vtkTextActor::New();
+  HorizontalAxesLabel->GetProperty()->SetColor(1,0,0);
+  HorizontalAxesLabel->GetTextProperty()->AntiAliasingOff();
+  HorizontalAxesLabel->GetTextProperty()->SetFontSize(12);
+  HorizontalAxesLabel->GetTextProperty()->SetFontFamilyToArial();
+  HorizontalAxesLabel->GetTextProperty()->SetJustificationToRight();
+  HorizontalAxesLabel->ScaledTextOff();
+  HorizontalAxesLabel->SetDisplayPosition(0,0);
+  HorizontalAxesLabel->SetInput("");
 
-  VerticalAxeLabel = vtkTextActor::New();
-  VerticalAxeLabel->GetProperty()->SetColor(1,0,0);
-  VerticalAxeLabel->GetTextProperty()->AntiAliasingOff();
-  VerticalAxeLabel->GetTextProperty()->SetFontSize(12);
-  VerticalAxeLabel->GetTextProperty()->SetFontFamilyToArial();
-  VerticalAxeLabel->GetTextProperty()->SetJustificationToLeft();
-  VerticalAxeLabel->ScaledTextOff();
-  VerticalAxeLabel->SetDisplayPosition(0,0);
-  VerticalAxeLabel->SetInput("");
+  VerticalAxesLabel = vtkTextActor::New();
+  VerticalAxesLabel->GetProperty()->SetColor(1,0,0);
+  VerticalAxesLabel->GetTextProperty()->AntiAliasingOff();
+  VerticalAxesLabel->GetTextProperty()->SetFontSize(12);
+  VerticalAxesLabel->GetTextProperty()->SetFontFamilyToArial();
+  VerticalAxesLabel->GetTextProperty()->SetJustificationToLeft();
+  VerticalAxesLabel->ScaledTextOff();
+  VerticalAxesLabel->SetDisplayPosition(0,0);
+  VerticalAxesLabel->SetInput("");
 
   for(int i=0; i<NUM_LAB; i++)
   {
@@ -338,15 +339,19 @@ void vtkRulerActor2D::SetColor(double r,double g,double b)
 	Axis->GetProperty()->SetColor(r,g,b);
   Tick->GetProperty()->SetColor(r,g,b);
   ScaleLabel->GetProperty()->SetColor(r,g,b);
-  HorizontalAxeLabel->GetProperty()->SetColor(r,g,b);
-  VerticalAxeLabel->GetProperty()->SetColor(r,g,b);
+  HorizontalAxesLabel->GetProperty()->SetColor(r,g,b);
+  VerticalAxesLabel->GetProperty()->SetColor(r,g,b);
 
 }
 //----------------------------------------------------------------------------
 void vtkRulerActor2D::SetScaleFactor(double factor)
 //----------------------------------------------------------------------------
 {
-  if (factor != 0) ScaleFactor = factor;
+  if (factor != 0) 
+  {
+    ScaleFactor = factor;
+    Modified();
+  }
 }
 //----------------------------------------------------------------------------
 void vtkRulerActor2D::SetLegend(const char *legend)
@@ -364,11 +369,12 @@ void vtkRulerActor2D::SetLegend(const char *legend)
   {
     this->Legend = new char[strlen(legend)+1];
     strcpy(this->Legend,legend);
+    Modified();
   }
   else
   {
     SetLegend(" ");
-    //this->Legend = NULL;
+    Modified();
   }
 }
 //----------------------------------------------------------------------------
@@ -567,9 +573,29 @@ void vtkRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
     p1[i] /= ScaleFactor; 
   }
 
-  double w0X =  p0[x_index], w0Y =  p0[y_index];
-  double w1X =  p1[x_index], w1Y =  p1[y_index];
-  double wpX =   p[x_index], wpY =   p[y_index];
+  double w0X, w0Y, w1X, w1Y, wpX, wpY, vx[3], vy[3];
+  if (GlobalAxes) 
+  {
+    w0X =  p0[x_index];
+    w0Y =  p0[y_index];
+    w1X =  p1[x_index];
+    w1Y =  p1[y_index];
+    wpX =   p[x_index];
+    wpY =   p[y_index];
+  }
+  else
+  {
+    double vpn[3];
+    camera->GetViewUp(vy);
+    camera->GetViewPlaneNormal(vpn);
+    vtkMath::Cross(vy,vpn,vx);
+    w0X = vtkMath::Dot(vx,p0);
+    w0Y = vtkMath::Dot(vy,p0);
+    w1X = vtkMath::Dot(vx,p1);
+    w1Y = vtkMath::Dot(vy,p1);
+    wpX = vtkMath::Dot(vx,p);
+    wpY = vtkMath::Dot(vy,p);
+  }
 
   double w2dX = rwWidth /(w1X-w0X), w2dY = rwHeight/(w1Y-w0Y);  // world to display
   double d2wX = 1/w2dX,             d2wY = 1/w2dY;              // display to world along Y
@@ -588,18 +614,6 @@ void vtkRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
   double worldLongTickSpacingY    = GetLongTickSpacing( desiredWorldTickSpacingY );  
   double worldFirstTickY          = NearestTick( wpY, worldTickSpacingY );
   double worldFirstLongTickY      = NearestTick( wpY, worldLongTickSpacingY );
-
-  //double worldLastTickPoseX = NearestTick(  (rwWidth - margin) *d2wX, worldTickSpacingX );
-  //double dx0 = (worldLastTickPoseX - w0X ) * w2dX;
-  //double worldLastTickPoseY = NearestTick(  (rwHeight - margin) *d2wY, worldTickSpacingY );
-  //double dy0 = (worldLastTickPoseX - w0Y ) * w2dY;
-  
-  //double dx0 = rwWidth - margin;//(worldFirstTickX - w0X ) * w2dX; // --- discarded tick are drawn here
-  //double dy0 = rwHeight- margin;//(worldFirstTickY - w0Y ) * w2dY; // 
-
-  //double dx0 = NearestTick( rwWidth - margin, worldTickSpacingX * w2dX );
-  //double dy0 = NearestTick( rwHeight - margin, worldTickSpacingY * w2dY );
-
 
   // find last tick pos
   double dx_max;
@@ -666,27 +680,26 @@ void vtkRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
     Labx[i]->SetDisplayPosition(dx , margin - longTickLen -2 );
 
     Laby[i]->SetInput(labytex);
-  //Laby[i]->SetDisplayPosition(margin - longTickLen -2, dy );
     Laby[i]->SetDisplayPosition(margin +4, dy );
   }
 
 
-  char *letter[] = {"x","y","z"};
-  char *sign = (w1X-w0X > 0) ? " " : "-";
-  char caption[100];
-  sprintf(caption, "%s%s %s", sign ,  letter[x_index],   Legend );
-  HorizontalAxeLabel->SetInput(caption);
-  HorizontalAxeLabel->SetDisplayPosition(rwWidth - margin, margin + 4);
+  if (GlobalAxes) 
+  {
+    char *letter[] = {"x","y","z"};
+    char *sign = (w1X-w0X > 0) ? " " : "-";
+    char caption[100];
+    sprintf(caption, "%s%s %s", sign,  letter[x_index], Legend);
+    HorizontalAxesLabel->SetInput(caption);
+    HorizontalAxesLabel->SetDisplayPosition(rwWidth - margin, margin + 4);
 
-  sign = (w1Y-w0Y > 0) ? " " : "-";
-  sprintf(caption, "%s%s %s", sign,    letter[y_index],   Legend );
-  VerticalAxeLabel->SetInput(caption);
-  VerticalAxeLabel->SetDisplayPosition( margin , rwHeight - margin/2);
+    sign = (w1Y-w0Y > 0) ? " " : "-";
+    sprintf(caption, "%s%s %s", sign, letter[y_index], Legend);
+    VerticalAxesLabel->SetInput(caption);
+    VerticalAxesLabel->SetDisplayPosition( margin, rwHeight - margin/2);
+  }
 
   char lab[50];
-  sprintf(lab,"%g %s", abs( worldTickSpacingX ) ,Legend);
+  sprintf(lab,"%g %s", abs( worldTickSpacingX ), Legend);
   ScaleLabel->SetInput(lab);
-
 }
-
-

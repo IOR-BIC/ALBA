@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkRulerActor2D.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-03 12:22:56 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-03-08 10:21:40 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -22,7 +22,7 @@
 
 #define DEFAULT_GRID_COLOR 0.5
 
-#include "vtkMAFConfigure.h" //??
+#include "vtkMAFConfigure.h"
 
 #include "vtkActor.h"
 #include "vtkActor2D.h"
@@ -62,6 +62,10 @@ class VTK_vtkMAF_EXPORT vtkRulerActor2D : public vtkActor2D
   int	 RenderTranslucentGeometry(vtkViewport *viewport)  {return 0;};
   void AdjustClippingRange(vtkViewport *viewport)        {};
 
+  void UseGlobalAxes(bool globalAxes) {GlobalAxes = globalAxes; Modified();};
+  void UseGlobalAxesOff() {GlobalAxes = false; Modified();};
+  void UseGlobalAxesOn() {GlobalAxes = true; Modified();};
+
 protected:
 										vtkRulerActor2D();
 									 ~vtkRulerActor2D();
@@ -79,8 +83,8 @@ protected:
   vtkActor2D			 *Axis;  
   vtkActor2D			 *Tick;  
   vtkTextActor     *ScaleLabel; 
-  vtkTextActor     *HorizontalAxeLabel;
-  vtkTextActor     *VerticalAxeLabel;
+  vtkTextActor     *HorizontalAxesLabel;
+  vtkTextActor     *VerticalAxesLabel;
 
   vtkTextActor     *Labx[NUM_LAB];
   vtkTextActor     *Laby[NUM_LAB];
@@ -97,6 +101,7 @@ protected:
   int x_index;
   int y_index;
   
+  bool   GlobalAxes;
   bool   ScaleLabelVisibility;
   bool   AxesLabelVisibility;
   bool   AxesVisibility;
@@ -116,6 +121,3 @@ private:
   void operator=(const vtkRulerActor2D&);  // Not implemented.
 };
 #endif
-
-
-
