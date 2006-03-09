@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmi2DMeter.h,v $
 Language:  C++
-Date:      $Date: 2006-03-03 15:57:04 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2006-03-09 14:45:10 $
+Version:   $Revision: 1.7 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -135,6 +135,8 @@ protected:
 
   std::vector<vtkTextActor *> m_TextVector;
   int m_DisplayPositionText[2];
+
+  std::vector<vtkRenderer *> m_RendererVector;
   //persistent measure END
   
   vtkLineSource       *m_ProbingLine;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi2DMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-06 13:22:16 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-03-09 14:45:10 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -158,21 +158,24 @@ mmi2DMeter::~mmi2DMeter()
   vtkDEL(m_Coordinate);
   vtkDEL(m_Text);
 
-  while(m_TextVector.size() != 0)
+  while(m_RendererVector.size() != 0)
     {
-      //wxMessageBox(wxString::Format("%d",m_TextVector.size()));
-      m_CurrentRenderer->RemoveActor2D(m_TextVector[m_TextVector.size()-1]);
+      //wxMessageBox(wxString::Format("%d",m_RendererVector.size()));
+      m_RendererVector[m_RendererVector.size()-1]->RemoveActor2D(m_TextVector[m_TextVector.size()-1]);
       m_TextVector.pop_back();
 
-      m_CurrentRenderer->RemoveActor2D(m_LineActorVector1[m_LineActorVector1.size()-1]);
+      m_RendererVector[m_RendererVector.size()-1]->RemoveActor2D(m_LineActorVector1[m_LineActorVector1.size()-1]);
       m_LineSourceVector1.pop_back();
       m_LineMapperVector1.pop_back();
       m_LineActorVector1.pop_back();
 
-      m_CurrentRenderer->RemoveActor2D(m_LineActorVector2[m_LineActorVector2.size()-1]);
+      m_RendererVector[m_RendererVector.size()-1]->RemoveActor2D(m_LineActorVector2[m_LineActorVector2.size()-1]);
       m_LineSourceVector2.pop_back();
       m_LineMapperVector2.pop_back();
       m_LineActorVector2.pop_back();
+
+      m_RendererVector[m_RendererVector.size()-1]->GetRenderWindow()->Render();
+      m_RendererVector.pop_back();
     }
 
   cppDEL(m_HistogramRWI);
@@ -344,6 +347,12 @@ void mmi2DMeter::DrawMeasureTool(double x, double y)
 	if(counter == 0)
 	{
 		m_EndMeasure = false;
+    
+    // initialization
+    m_Distance = 0.0;
+    m_Angle = 0.0;
+    m_Text->SetInput("");
+
 		m_CurrentRenderer->RemoveActor2D(m_LineActor2);
 		m_Line->SetPoint1(x,y,0);
 		m_Line->SetPoint2(x,y,0);
@@ -545,6 +554,7 @@ void mmi2DMeter::DrawMeasureTool(double x, double y)
 	{
 		counter = 0;
     CalculateMeasure();
+    m_RendererVector.push_back(m_CurrentRenderer);
     // persistent TEXT
     m_TextVector.push_back(NULL);
     m_TextVector[m_TextVector.size()-1] = vtkTextActor::New();
@@ -610,6 +620,7 @@ void mmi2DMeter::DrawMeasureTool(double x, double y)
     m_LineActorVector2[m_LineActorVector2.size()-1]->GetProperty()->SetColor(0.0,1.0,0.0);
     m_CurrentRenderer->AddActor2D(m_LineActorVector2[m_LineActorVector2.size()-1]);
 
+
     //measure , measure type vectors
     if(m_MeasureType == DISTANCE_BETWEEN_LINES || m_MeasureType == DISTANCE_BETWEEN_POINTS)
     {
@@ -622,6 +633,11 @@ void mmi2DMeter::DrawMeasureTool(double x, double y)
        m_FlagMeasureType.push_back(ID_RESULT_ANGLE);
     }
     
+    //delete temporary measure
+    m_CurrentRenderer->RemoveActor2D(m_Text);
+    m_CurrentRenderer->RemoveActor2D(m_LineActor);
+    m_CurrentRenderer->RemoveActor2D(m_LineActor2);
+
 	}
   
   m_ExceptionFlag = false;
@@ -793,26 +809,25 @@ void mmi2DMeter::GenerateHistogram(bool generate)
 void mmi2DMeter::UndoMeasure()
 //----------------------------------------------------------------------------
 {
-  if(m_TextVector.size() != 0)
+  if(m_RendererVector.size() != 0)
   {
     //wxMessageBox(wxString::Format("%d",m_TextVector.size()));
-      m_CurrentRenderer->RemoveActor2D(m_TextVector[m_TextVector.size()-1]);
+      m_RendererVector[m_RendererVector.size()-1]->RemoveActor2D(m_TextVector[m_TextVector.size()-1]);
       m_TextVector.pop_back();
 
-      m_CurrentRenderer->RemoveActor2D(m_LineActorVector1[m_LineActorVector1.size()-1]);
+      m_RendererVector[m_RendererVector.size()-1]->RemoveActor2D(m_LineActorVector1[m_LineActorVector1.size()-1]);
       m_LineSourceVector1.pop_back();
       m_LineMapperVector1.pop_back();
       m_LineActorVector1.pop_back();
 
-      m_CurrentRenderer->RemoveActor2D(m_LineActorVector2[m_LineActorVector2.size()-1]);
+      m_RendererVector[m_RendererVector.size()-1]->RemoveActor2D(m_LineActorVector2[m_LineActorVector2.size()-1]);
       m_LineSourceVector2.pop_back();
       m_LineMapperVector2.pop_back();
       m_LineActorVector2.pop_back();
 
-      m_CurrentRenderer->RemoveActor2D(m_LineActor);
-      m_CurrentRenderer->RemoveActor2D(m_LineActor2);
-      m_CurrentRenderer->RemoveActor2D(m_Text);
-
+      m_RendererVector[m_RendererVector.size()-1]->GetRenderWindow()->Render();
+      m_RendererVector.pop_back();
+      
       //gui
       m_Measure.pop_back();
       m_FlagMeasureType.pop_back();
