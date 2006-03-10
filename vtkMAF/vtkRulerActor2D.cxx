@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkRulerActor2D.cxx,v $
   Language:  C++
-  Date:      $Date: 2006-03-08 10:36:08 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-03-10 16:14:29 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -34,7 +34,7 @@
 #include "vtkProperty2D.h"
 #include "vtkPolyDataMapper2D.h"
 
-vtkCxxRevisionMacro(vtkRulerActor2D, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(vtkRulerActor2D, "$Revision: 1.4 $");
 vtkStandardNewMacro(vtkRulerActor2D);
 //------------------------------------------------------------------------------
 vtkRulerActor2D::vtkRulerActor2D()
@@ -305,7 +305,7 @@ void vtkRulerActor2D::RulerCreate()
   VerticalAxesLabel->SetDisplayPosition(0,0);
   VerticalAxesLabel->SetInput("");
 
-  for(int i=0; i<NUM_LAB; i++)
+  for(i=0; i<NUM_LAB; i++)
   {
     Labx[i] = vtkTextActor::New();
     Labx[i]->GetProperty()->SetColor(1,1,1);
@@ -566,7 +566,8 @@ void vtkRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
   ren->DisplayToWorld();
   ren->GetWorldPoint(p1);
 
-  for(int i=0; i<3; i++)
+  int i;
+  for(i=0; i<3; i++)
   {
     p[i]  /= ScaleFactor; 
     p0[i] /= ScaleFactor; 
@@ -618,7 +619,7 @@ void vtkRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
   // find last tick pos
   double dx_max;
   double dy_max;
-  for(int i=0; i<ntick; i++)
+  for(i=0; i<ntick; i++)
   {
     double wx = worldFirstTickX + i * worldTickSpacingX;
     double wy = worldFirstTickY + i * worldTickSpacingY;
@@ -636,12 +637,12 @@ void vtkRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
   int id=0;
 
   // Update Axis and Ticks Points
-  for(int i=0; i<ntick; i++)
+  for(i=0; i<ntick; i++)
   {
     double wx = worldFirstTickX + i * worldTickSpacingX;
     double wy = worldFirstTickY + i * worldTickSpacingY;
 
-    // decide lenght of tick
+    // decide length of tick
     if     ( IsMultiple( wx, worldLongTickSpacingX ) ) t1x = tc; 
     else if( IsMultiple( wx, worldMidTickSpacingX  ) ) t1x = tb; 
     else t1x = ta; 
@@ -665,7 +666,7 @@ void vtkRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
   
   char labxtex[50];
   char labytex[50];
-  for(int i=0; i<NUM_LAB; i++)
+  for(i=0; i<NUM_LAB; i++)
   {
     double wx = worldFirstLongTickX + i * worldLongTickSpacingX;
     double wy = worldFirstLongTickY + i * worldLongTickSpacingY;

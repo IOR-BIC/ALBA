@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkSimpleRulerActor2D.cxx,v $
   Language:  C++
-  Date:      $Date: 2006-03-10 16:14:29 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-03-10 16:17:05 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -34,7 +34,7 @@
 #include "vtkProperty2D.h"
 #include "vtkPolyDataMapper2D.h"
 
-vtkCxxRevisionMacro(vtkSimpleRulerActor2D, "$Revision: 1.4 $");
+vtkCxxRevisionMacro(vtkSimpleRulerActor2D, "$Revision: 1.5 $");
 vtkStandardNewMacro(vtkSimpleRulerActor2D);
 //------------------------------------------------------------------------------
 vtkSimpleRulerActor2D::vtkSimpleRulerActor2D()
@@ -493,7 +493,8 @@ void vtkSimpleRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
   ren->DisplayToWorld();
   ren->GetWorldPoint(p1);
 
-  for(int i=0; i<3; i++)
+  int i;
+  for(i=0; i<3; i++)
   {
     p[i]  /= ScaleFactor; 
     p0[i] /= ScaleFactor; 
@@ -543,7 +544,6 @@ void vtkSimpleRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
   // find last tick pos
   double dx_max;
   double dy_max;
-  int i;
   for(i=0; i<ntick; i++)
   {
     double wx = worldFirstTickX + i * worldTickSpacingX;
