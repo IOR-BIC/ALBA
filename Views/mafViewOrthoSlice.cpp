@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-06 16:30:43 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2006-03-10 15:21:13 $
+  Version:   $Revision: 1.24 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -57,10 +57,6 @@ mafViewOrthoSlice::mafViewOrthoSlice(wxString label, bool show_ruler)
   m_ColorLUT= NULL;
   m_CurrentVolume = NULL;
   m_Origin[0] = m_Origin[1] = m_Origin[2] = 0.0;
-  m_ScaleFactor = 0.05;
-  m_LogScaleFlag= 0;
-  m_LogConstant = 10.0;
-  m_Autoscale = true;
 }
 //----------------------------------------------------------------------------
 mafViewOrthoSlice::~mafViewOrthoSlice()
@@ -126,9 +122,6 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
       if (vol)
       {
         m_Histogram->SetData(vol);
-        m_ScaleFactor = m_Histogram->GetScaleFactor();
-        m_LogConstant = m_Histogram->GetLogScaleConstant();
-        m_Gui->Update();
       }
     }
     else
@@ -147,6 +140,7 @@ void mafViewOrthoSlice::CreateGuiView()
   m_GuiView = new mmgGui(this);
   m_Histogram = new mmgHistogramWidget(m_GuiView,-1,wxPoint(0,0),wxSize(500,100));
   m_Histogram->SetListener(this);
+  m_Histogram->SetRepresentation(vtkHistogram::BAR_REPRESENTATION);
   
   m_Luts = new mmgLutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
   EnableWidgets(m_CurrentVolume != NULL);
@@ -173,20 +167,6 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
         }
         CameraUpdate();
       }
-      break;
-      case ID_HISTOGRAM_SCALE_FACTOR:
-        m_Histogram->SetScaleFactor(m_ScaleFactor);
-      break;
-      case ID_HISTOGRAM_LOGSCALE:
-        m_Gui->Enable(ID_HISTOGRAM_LOGFACTOR,m_LogScaleFlag != 0);
-        m_Histogram->LogarithmicScale(m_LogScaleFlag != 0);
-      break;
-      case ID_AUTOSCALE_HISTOGRAM:
-        m_Histogram->AutoscaleHistogram(m_Autoscale != 0);
-        m_Gui->Enable(ID_HISTOGRAM_SCALE_FACTOR,m_Autoscale == 0);
-      break;
-      case ID_HISTOGRAM_LOGFACTOR:
-        m_Histogram->SetLogScaleConstant(m_LogConstant);
       break;
       case ID_LUT_CHOOSER:
       {
@@ -215,18 +195,6 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
       break;
       default:
         mafViewCompound::OnEvent(maf_event);
-    }
-  }
-  else if (mafEventInteraction *ei = mafEventInteraction::SafeDownCast(maf_event))
-  {
-    if (ei->GetId() == mmgHistogramWidget::HISTOGRAM_UPDATED)
-    {
-      m_ScaleFactor = m_Histogram->GetScaleFactor();
-      m_LogConstant = m_Histogram->GetLogScaleConstant();
-      m_Autoscale = m_Histogram->IsAutoScaled() ? 1 : 0;
-      m_LogScaleFlag = m_Histogram->IsLogarithmicScale() ? 1 : 0;
-      EnableWidgets();
-      m_Gui->Update();
     }
   }
   else if(maf_event->GetSender() == m_CurrentVolume)
@@ -259,10 +227,7 @@ mmgGui* mafViewOrthoSlice::CreateGui()
   }
   m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
   m_Gui->Divider(2);
-  m_Gui->Bool(ID_AUTOSCALE_HISTOGRAM,"autoscale", &m_Autoscale);
-  m_Gui->Double(ID_HISTOGRAM_SCALE_FACTOR,"scale",&m_ScaleFactor,0.0000000001,MAXDOUBLE,-1);
-  m_Gui->Bool(ID_HISTOGRAM_LOGSCALE,"log",&m_LogScaleFlag,0,"Enable/Disable log scale for histogram");
-  m_Gui->Double(ID_HISTOGRAM_LOGFACTOR,"log constant",&m_LogConstant,0.0000000001,MAXDOUBLE,-1,"multiplicative factor for log scale histogram");
+  m_Gui->AddGui(m_Histogram->GetGui());
   m_Gui->Divider(2);
 
   EnableWidgets(m_CurrentVolume != NULL);
@@ -297,10 +262,6 @@ void mafViewOrthoSlice::EnableWidgets(bool enable)
     m_Gui->Enable(ID_ORTHO_SLICE_Y,enable);
     m_Gui->Enable(ID_ORTHO_SLICE_Z,enable);
     m_Gui->Enable(ID_LUT_CHOOSER,enable);
-    m_Gui->Enable(ID_HISTOGRAM_SCALE_FACTOR,enable && m_Autoscale == 0);
-    m_Gui->Enable(ID_HISTOGRAM_LOGSCALE,enable);
-    m_Gui->Enable(ID_AUTOSCALE_HISTOGRAM,enable);
-    m_Gui->Enable(ID_HISTOGRAM_LOGFACTOR,m_LogScaleFlag != 0);
   }
   m_Luts->Enable(enable);
   m_Histogram->Enable(enable);

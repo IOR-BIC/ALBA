@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-06 16:30:44 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-03-10 15:21:13 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -62,10 +62,6 @@ public:
     ID_ORTHO_SLICE_Y,
     ID_ORTHO_SLICE_Z,
     ID_LUT_CHOOSER,
-    ID_AUTOSCALE_HISTOGRAM,
-    ID_HISTOGRAM_SCALE_FACTOR,
-    ID_HISTOGRAM_LOGSCALE,
-    ID_HISTOGRAM_LOGFACTOR,
     ID_LAST
   };
 
@@ -76,11 +72,10 @@ protected:
   its own widgets and define the enum of IDs for the widgets as an extension of
   the superclass enum. The last id value must be defined as "LAST_ID" to allow the 
   subclass to continue the ID enumeration from it. For appending the widgets in the
-  same pannel GUI, each CreateGUI() function should first call the superclass' one.*/
+  same panel GUI, each CreateGUI() function should first call the superclass' one.*/
   virtual mmgGui  *CreateGui();
 
-  /** 
-  Enable/disable view widgets.*/
+  /** Enable/disable view widgets.*/
   void EnableWidgets(bool enable = true);
 
   /** Update slider range according to the bounds of the current visualized volume.*/
@@ -91,10 +86,6 @@ protected:
   mmgFloatSlider *m_SliderZ;
 
   double m_Origin[3];
-  double m_ScaleFactor;
-  int    m_LogScaleFlag;
-  int    m_Autoscale;
-  double m_LogConstant;
 
   bool   m_ShowRuler;
 
