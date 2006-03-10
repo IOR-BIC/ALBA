@@ -23,6 +23,8 @@ SET(vtkMAF_SRCS
   vtkGlobalAxisCoordinate.h
   vtkGridActor.cxx
   vtkGridActor.h
+  vtkHistogram.cxx
+  vtkHistogram.h
   vtkImplicitPolyData.cxx
   vtkImplicitPolyData.h
   vtkLocalAxisCoordinate.cxx
