@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkSimpleRulerActor2D.cxx,v $
   Language:  C++
-  Date:      $Date: 2006-03-08 10:36:09 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-03-10 16:14:29 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -34,7 +34,7 @@
 #include "vtkProperty2D.h"
 #include "vtkPolyDataMapper2D.h"
 
-vtkCxxRevisionMacro(vtkSimpleRulerActor2D, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(vtkSimpleRulerActor2D, "$Revision: 1.4 $");
 vtkStandardNewMacro(vtkSimpleRulerActor2D);
 //------------------------------------------------------------------------------
 vtkSimpleRulerActor2D::vtkSimpleRulerActor2D()
@@ -500,11 +500,6 @@ void vtkSimpleRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
     p1[i] /= ScaleFactor; 
   }
 
-  /* 
-     (volendo) qua si possono proiettare P,P0,P1 in un altro spazio 
-     ergo - moltiplicarli per l'inversa della matrice(assoluta) di posa di un vme
-  */
-
   double w0X, w0Y, w1X, w1Y, wpX, wpY, vx[3], vy[3];
   if (GlobalAxes) 
   {
@@ -548,7 +543,8 @@ void vtkSimpleRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
   // find last tick pos
   double dx_max;
   double dy_max;
-  for(int i=0; i<ntick; i++)
+  int i;
+  for(i=0; i<ntick; i++)
   {
     double wx = worldFirstTickX + i * worldTickSpacingX;
     double wy = worldFirstTickY + i * worldTickSpacingY;
@@ -568,17 +564,17 @@ void vtkSimpleRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
   int id=0;
 
   // Update Axis and Ticks Points
-  for(int i=0; i<ntick; i++)
+  for(i=0; i<ntick; i++)
   {
     double wx = worldFirstTickX + i * worldTickSpacingX;
     double wy = worldFirstTickY + i * worldTickSpacingY;
 
-    // decide lenght of tick
+    // decide length of tick
     if ( IsMultiple( wx, worldLongTickSpacingX ) ) t1x = tc; else t1x = ta; 
 
     if ( IsMultiple( wy, worldLongTickSpacingY ) ) t1y = tc; else t1y = ta; 
 
-    double dx = (wx - w0X ) * w2dX;  // bring to Display coords
+    double dx = (wx - w0X ) * w2dX;  // bring to Display coordinates
     double dy = (wy - w0Y ) * w2dY;
 
     if( dx > rwWidth  - margin ) { dx = dx_max ; t1x = t0; } // discard tick
