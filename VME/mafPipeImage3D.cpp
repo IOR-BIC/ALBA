@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeImage3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-25 12:04:08 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-03-10 15:51:58 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -197,4 +197,13 @@ void mafPipeImage3D::Select(bool sel)
 	m_Selected = sel;
 	if(m_ImageActor->GetVisibility()) 
 			m_SelectionActor->SetVisibility(sel);
+}
+//----------------------------------------------------------------------------
+void mafPipeImage3D::SetProperty(vtkProperty *p)
+//----------------------------------------------------------------------------
+{
+  if (p) 
+  {
+    m_ImageActor->SetProperty(p);
+  }
 }
