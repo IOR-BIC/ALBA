@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgHistogramWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2006-03-07 09:16:11 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2006-03-10 15:18:07 $
+Version:   $Revision: 1.7 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -22,34 +22,18 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mmgHistogramWidget.h"
 #include "mafDecl.h"
 #include "mafRWI.h"
+#include "mmgGui.h"
+
 #include "mmdButtonsPad.h"
 #include "mmdMouse.h"
 #include "mafEventInteraction.h"
 #include "mmuIdFactory.h"
 
-#include "vtkMAFSmartPointer.h"
 #include "vtkDataSet.h"
-#include "vtkPolyData.h"
 #include "vtkImageData.h"
-#include "vtkImageAccumulate.h"
-#include "vtkImageLogarithmicScale.h"
-#include "vtkImageChangeInformation.h"
-#include "vtkGlyph3D.h"
-#include "vtkLineSource.h"
-#include "vtkCoordinate.h"
-#include "vtkPolyDataMapper2D.h"
-#include "vtkActor2D.h"
 #include "vtkRenderer.h"
 #include "vtkDataArray.h"
 #include "vtkPointData.h"
-#include "vtkTextMapper.h"
-#include "vtkTextProperty.h"
-#include "vtkProperty2D.h"
-
-//------------------------------------------------------------------------------
-// Events
-//------------------------------------------------------------------------------
-MAF_ID_IMP(mmgHistogramWidget::HISTOGRAM_UPDATED)
 
 //----------------------------------------------------------------------------
 mmgHistogramWidget::mmgHistogramWidget(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
@@ -57,77 +41,32 @@ mmgHistogramWidget::mmgHistogramWidget(wxWindow* parent, wxWindowID id, const wx
 //----------------------------------------------------------------------------
 {
 	m_Listener    = NULL;
-  m_PlotActor   = NULL;
-  m_Accumulate  = NULL;
-  m_LogScale    = NULL;
-  m_Glyph       = NULL;
-  m_TextMapper  = NULL;
-  m_TextActor   = NULL;
+  m_Histogram   = NULL;
+  m_Gui         = NULL;
+  m_Data        = NULL;
 
   m_ScaleFactor     = 1.0;
-  m_NumberOfBins    = 1;
   m_HisctogramValue = 0;
   m_LogScaleConstant= 10.0;
   m_DragStart       = 0;
+  m_Representation  = 0;
   
   m_AutoscaleHistogram = true;
   m_LogHistogramFlag   = false;
   m_Dragging           = false;
   
-  vtkNEW(m_TextMapper);
-  m_TextMapper->SetInput("");
-  m_TextMapper->GetTextProperty()->AntiAliasingOff();
-  m_TextMapper->GetTextProperty()->SetFontFamily(VTK_TIMES);
-  m_TextMapper->GetTextProperty()->SetColor(1,1,1);
-  m_TextMapper->GetTextProperty()->SetLineOffset(0.5);
-  m_TextMapper->GetTextProperty()->SetLineSpacing(1.5);
-  m_TextMapper->GetTextProperty()->SetJustificationToRight();
-  m_TextMapper->GetTextProperty()->SetVerticalJustificationToTop();
-
-  vtkNEW(m_TextActor);
-  m_TextActor->SetMapper(m_TextMapper);
-  m_TextActor->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
-  m_TextActor->SetPosition(1, 1);
-
-  // Create Histogram pipeline
-  vtkNEW(m_Accumulate);
-
-  vtkNEW(m_LogScale);
-  m_LogScale->SetConstant(m_LogScaleConstant);
-
-  vtkNEW(m_ChangeInfo);
-  m_ChangeInfo->SetOutputOrigin(0,0,0);
-
-  vtkMAFSmartPointer<vtkLineSource> line;
-  line->SetPoint1(0,0,0);
-  line->SetPoint2(0,1,0);
-  line->Update();
-  vtkNEW(m_Glyph);
-  m_Glyph->SetSource(line->GetOutput());
-  m_Glyph->SetScaleModeToScaleByScalar();
-  m_Glyph->OrientOn();
-  vtkMAFSmartPointer<vtkCoordinate> coordinate;
-  coordinate->SetCoordinateSystemToNormalizedDisplay();
-
-  vtkMAFSmartPointer<vtkPolyDataMapper2D> mapper2d;
-  mapper2d->SetInput(m_Glyph->GetOutput());
-  mapper2d->SetTransformCoordinate(coordinate);
-  mapper2d->ScalarVisibilityOff();
-
-  vtkNEW(m_PlotActor);
-  m_PlotActor->SetMapper(mapper2d);
-  m_PlotActor->GetProperty()->SetColor(1,1,1);
+  vtkNEW(m_Histogram);
+  m_Histogram->SetColor(1,1,1);
+  m_Histogram->SetHisctogramRepresentation(vtkHistogram::BAR_REPRESENTATION);
 
   m_HistogramRWI = new mafRWI(mafGetFrame());
   m_HistogramRWI->SetListener(this);
-  m_HistogramRWI->m_RenFront->AddActor2D(m_PlotActor);
+  m_HistogramRWI->m_RenFront->AddActor2D(m_Histogram);
   m_HistogramRWI->m_RenFront->SetBackground(0.28,0.28,0.28);
   m_HistogramRWI->SetSize(pos.x,pos.y,size.GetWidth(),size.GetHeight());
   m_HistogramRWI->m_RwiBase->Reparent(this);
   m_HistogramRWI->m_RwiBase->SetListener(this);
   m_HistogramRWI->m_RwiBase->Show(true);
-
-  m_HistogramRWI->m_RenFront->AddActor(m_TextActor);
 
   wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
   sizer->Add(m_HistogramRWI->m_RwiBase,1, wxEXPAND);
@@ -137,20 +76,14 @@ mmgHistogramWidget::mmgHistogramWidget(wxWindow* parent, wxWindowID id, const wx
   sizer->Fit(this);
 
   SetSize(pos.x,pos.y,size.GetWidth(),size.GetHeight());
+  CreateGui();
 }
 //----------------------------------------------------------------------------
 mmgHistogramWidget::~mmgHistogramWidget() 
 //----------------------------------------------------------------------------
 {
-  m_HistogramRWI->m_RenFront->RemoveActor(m_PlotActor);
-  m_HistogramRWI->m_RenFront->RemoveActor(m_TextActor);
-  vtkDEL(m_TextMapper);
-  vtkDEL(m_TextActor);
-  vtkDEL(m_Accumulate);
-  vtkDEL(m_LogScale);
-  vtkDEL(m_ChangeInfo);
-  vtkDEL(m_Glyph);
-  vtkDEL(m_PlotActor);
+  m_HistogramRWI->m_RenFront->RemoveActor(m_Histogram);
+  vtkDEL(m_Histogram);
   cppDEL(m_HistogramRWI);
 }
 //----------------------------------------------------------------------------
@@ -159,34 +92,46 @@ void mmgHistogramWidget::OnEvent( mafEventBase *event )
 {
   if (mafEvent *e = mafEvent::SafeDownCast(event))
   {
-/*    switch(e->GetId())
+    switch(e->GetId())
     {
+      case ID_REPRESENTATION:
+        SetRepresentation(m_Representation);
+      break;
+      case ID_AUTOSCALE:
+        AutoscaleHistogram(m_AutoscaleHistogram);
+      break;
+      case ID_SCALE_FACTOR:
+        SetScaleFactor(m_ScaleFactor);
+      break;
+      case ID_LOGSCALE:
+        LogarithmicScale(m_LogHistogramFlag);
+      break;
+      case ID_LOGFACTOR:
+        SetLogScaleConstant(m_LogScaleConstant);
+      break;
       default:
         e->Log();
       break; 
-    }*/
+    }
+    m_HistogramRWI->CameraUpdate();
   }
   else if (mafEventInteraction *ei = mafEventInteraction::SafeDownCast(event))
   {
     if (ei->GetId() == mmdMouse::MOUSE_2D_MOVE)
     {
-      int x_size, idx;
       double pos[2];
       ei->Get2DPosition(pos);
       if (m_Dragging)
       {
         int dy = pos[1]-m_DragStart;
         m_ScaleFactor *= ( 1 + dy/100.0 );
-        SetScaleFactor(m_ScaleFactor);
+        m_Gui->Update();
+        m_Histogram->SetScaleFactor(m_ScaleFactor);
       }
       else
       {
-        x_size = GetSize().GetWidth();
-        idx = (pos[0]/x_size) * m_NumberOfBins;
-        float line_width = 0.5 + x_size / (float)m_NumberOfBins;
-        m_PlotActor->GetProperty()->SetLineWidth(line_width);
-        m_HisctogramValue = m_Accumulate->GetOutput()->GetPointData()->GetScalars()->GetTuple1(idx);
-        m_TextMapper->SetInput(mafString(m_HisctogramValue).GetCStr());
+        m_HisctogramValue = m_Histogram->GetHistogramValue(pos[0],pos[1]);
+        m_Histogram->SetLabel(mafString(m_HisctogramValue).GetCStr());
       }
       m_HistogramRWI->CameraUpdate();
     }
@@ -218,112 +163,90 @@ void mmgHistogramWidget::SetData(vtkImageData *data)
 //----------------------------------------------------------------------------
 {
   m_Data = data;
-  UpdateHistogram();
-}
-//----------------------------------------------------------------------------
-void mmgHistogramWidget::UpdateHistogram()
-//----------------------------------------------------------------------------
-{
-  if (m_Data == NULL)
-  {
-    return;
-  }
-  double sr[2];
-  m_Data->Update();
-  m_Data->GetScalarRange(sr);
-  double srw = sr[1]-sr[0];
-
-  if (m_Data->GetScalarType() == VTK_CHAR || m_Data->GetScalarType() == VTK_UNSIGNED_CHAR )
-  {
-    m_NumberOfBins = srw; 
-  }
-  else if ( m_Data->GetScalarType() >= VTK_SHORT && m_Data->GetScalarType() <= VTK_UNSIGNED_INT )
-  {
-    m_NumberOfBins = srw;
-    int i=1;
-    while(m_NumberOfBins > 500 )
-    {
-       m_NumberOfBins = srw / i++;
-    }
-  }
-  else 
-  {
-    m_NumberOfBins = ( srw > 500 ) ? 500 : srw ; 
-  }
-
-  m_Accumulate->SetInput(m_Data);
-  m_Accumulate->SetComponentOrigin(sr[0],0,0);  
-  m_Accumulate->SetComponentExtent(0,m_NumberOfBins,0,0,0,0);
-  m_Accumulate->SetComponentSpacing(srw/m_NumberOfBins,0,0);
-  m_Accumulate->Update();
-
-  double acc_min[3], acc_max[3];
-  m_Accumulate->GetMin(acc_min);
-  m_Accumulate->GetMax(acc_max);
-
-  if (m_AutoscaleHistogram)
-  {
-    m_ScaleFactor = .05 / m_Accumulate->GetMean()[0];
-  }
-
-  m_ChangeInfo->SetInput(m_Accumulate->GetOutput());
-  m_ChangeInfo->SetOutputSpacing(1.0/m_NumberOfBins,1,1);
-  m_ChangeInfo->Update();
-
-  m_LogScale->SetConstant(m_LogScaleConstant);
-  m_LogScale->SetInput(m_ChangeInfo->GetOutput());
-  m_LogScale->Update();
-
-  if (m_LogHistogramFlag)
-  {
-    if (m_AutoscaleHistogram)
-    {
-      m_ScaleFactor = .5 / log(1 + m_Accumulate->GetMean()[0]);
-    }
-    m_Glyph->SetInput(m_LogScale->GetOutput());
-  }
-  else
-  {
-    m_Glyph->SetInput(m_ChangeInfo->GetOutput());
-  }
-  m_Glyph->SetScaleFactor(m_ScaleFactor);
-  m_Glyph->Modified();
-  m_Glyph->Update();
-
-  float line_width = m_HistogramRWI->m_RenFront->GetSize()[0] / (float)(m_NumberOfBins - 1);
-  m_PlotActor->GetProperty()->SetLineWidth(line_width);
-  m_HistogramRWI->m_RwiBase->Render();
-  if (m_Listener)
-  {
-    mafEventInteraction e(this,mmgHistogramWidget::HISTOGRAM_UPDATED);
-    m_Listener->OnEvent(&e);
-  }
+  m_Histogram->SetImageData(m_Data);
+  UpdateGui();
 }
 //----------------------------------------------------------------------------
 void mmgHistogramWidget::SetScaleFactor(double factor)
 //----------------------------------------------------------------------------
 {
-  m_ScaleFactor = factor;
-  UpdateHistogram();
+  m_Histogram->SetScaleFactor(factor);
+  UpdateGui();
 }
 //----------------------------------------------------------------------------
-void mmgHistogramWidget::LogarithmicScale(bool enable)
+void mmgHistogramWidget::LogarithmicScale(int enable)
 //----------------------------------------------------------------------------
 {
-  m_LogHistogramFlag = enable;
-  UpdateHistogram();
+  m_Histogram->SetLogHistogram(enable);
+  UpdateGui();
 }
 //----------------------------------------------------------------------------
 void mmgHistogramWidget::SetLogScaleConstant(double c)
 //----------------------------------------------------------------------------
 {
-  m_LogScaleConstant = c;
-  UpdateHistogram();
+  m_Histogram->SetLogScaleConstant(c);
+  UpdateGui();
 }
 //----------------------------------------------------------------------------
-void mmgHistogramWidget::AutoscaleHistogram(bool autoscale)
+void mmgHistogramWidget::AutoscaleHistogram(int autoscale)
 //----------------------------------------------------------------------------
 {
-  m_AutoscaleHistogram = autoscale;
-  UpdateHistogram();
+  m_Histogram->SetAutoscaleHistogram(autoscale);
+  UpdateGui();
+}
+//----------------------------------------------------------------------------
+void mmgHistogramWidget::CreateGui()
+//----------------------------------------------------------------------------
+{
+  m_Gui = new mmgGui(this);
+  m_Gui->Show(true);
+
+  wxString represent[3] = {"points", "lines", "bar"};
+  m_Gui->Combo(ID_REPRESENTATION,"represent",&m_Representation,3,represent);
+  m_Gui->Bool(ID_AUTOSCALE,"autoscale", &m_AutoscaleHistogram);
+  m_Gui->Double(ID_SCALE_FACTOR,"scale",&m_ScaleFactor,1.0e-299,MAXDOUBLE,-1);
+  m_Gui->Bool(ID_LOGSCALE,"log",&m_LogHistogramFlag,0,"Enable/Disable log scale for histogram");
+  m_Gui->Double(ID_LOGFACTOR,"log constant",&m_LogScaleConstant,1.0e-299,MAXDOUBLE,-1,"multiplicative factor for log scale histogram");
+
+  EnableWidgets(m_Data != NULL);
+}
+//----------------------------------------------------------------------------
+void mmgHistogramWidget::UpdateGui()
+//----------------------------------------------------------------------------
+{
+  m_HistogramRWI->CameraUpdate();
+  m_ScaleFactor         = m_Histogram->GetScaleFactor();
+  m_LogScaleConstant    = m_Histogram->GetLogScaleConstant();
+  m_LogHistogramFlag    = m_Histogram->GetLogHistogram();
+  m_AutoscaleHistogram  = m_Histogram->GetAutoscaleHistogram();
+  m_Representation      = m_Histogram->GetHisctogramRepresentation();
+  m_Gui->Update();
+  EnableWidgets(m_Data != NULL);
+}
+//----------------------------------------------------------------------------
+void mmgHistogramWidget::SetRepresentation(int represent)
+//----------------------------------------------------------------------------
+{
+  switch(represent) 
+  {
+    case vtkHistogram::POINT_REPRESENTATION:
+    case vtkHistogram::LINE_REPRESENTATION:
+    case vtkHistogram::BAR_REPRESENTATION:
+      m_Representation = represent;
+  	break;
+    default:
+      m_Representation = vtkHistogram::POINT_REPRESENTATION;
+  }
+  m_Histogram->SetHisctogramRepresentation(m_Representation);
+  m_Gui->Update();
+}
+//----------------------------------------------------------------------------
+void mmgHistogramWidget::EnableWidgets(bool enable)
+//----------------------------------------------------------------------------
+{
+  m_Gui->Enable(mmgHistogramWidget::ID_REPRESENTATION, enable);
+  m_Gui->Enable(mmgHistogramWidget::ID_AUTOSCALE,enable);
+  m_Gui->Enable(mmgHistogramWidget::ID_SCALE_FACTOR,enable && m_AutoscaleHistogram == 0);
+  m_Gui->Enable(mmgHistogramWidget::ID_LOGSCALE,enable);
+  m_Gui->Enable(mmgHistogramWidget::ID_LOGFACTOR,m_LogHistogramFlag != 0);
 }

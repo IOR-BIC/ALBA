@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgHistogramWidget.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-07 09:16:11 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-03-10 15:18:07 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -16,18 +16,14 @@
 #include "mafDecl.h"
 #include "mafEvent.h"
 
+#include "vtkHistogram.h"
+
 //----------------------------------------------------------------------------
 // forward refs
 //----------------------------------------------------------------------------
 class mafRWI;
-class vtkActor2D;
-class vtkImageAccumulate;
-class vtkGlyph3D;
 class vtkImageData;
-class vtkImageChangeInformation;
-class vtkTextMapper;
-class vtkActor2D;
-class vtkImageLogarithmicScale;
+class mmgGui;
 
 //----------------------------------------------------------------------------
 /** mmgHistogramWidget : widget that encapsulate render window into a gui*/
@@ -38,13 +34,17 @@ public:
            const wxSize& size = wxSize(400,300), long style = wxTAB_TRAVERSAL /*| wxSUNKEN_BORDER */);
   virtual ~mmgHistogramWidget();
 
-  MAF_ID_DEC(HISTOGRAM_UPDATED);
-
   virtual void SetListener(mafObserver *Listener) {m_Listener = Listener;};
   void OnEvent( mafEventBase *event );
 
-  /** Update Histogram pipeline and send to the listener an update UI event.*/
-  void UpdateHistogram();
+  enum HISTOGRAM_WIDGET_ID
+  {
+    ID_AUTOSCALE = MINID,
+    ID_SCALE_FACTOR,
+    ID_LOGSCALE,
+    ID_LOGFACTOR,
+    ID_REPRESENTATION
+  };
 
   /** Input data from which generate histogram.*/
   void SetData(vtkImageData *data);
@@ -56,28 +56,28 @@ public:
   double GetScaleFactor() {return m_ScaleFactor;};
 
   /** Enable/disable logarithmic scale for histogram.*/
-  void LogarithmicScale(bool enable = true);
+  void LogarithmicScale(int enable = 1);
 
   /** Turn On log scale.*/
   void LogarithmicScaleOn() {LogarithmicScale();};
 
   /** Turn Off log scale.*/
-  void LogarithmicScaleOff() {LogarithmicScale(false);};
+  void LogarithmicScaleOff() {LogarithmicScale(0);};
 
   /** Return the status of log scale flag.*/
-  bool IsLogarithmicScale() {return m_LogHistogramFlag;};
+  bool IsLogarithmicScale() {return m_LogHistogramFlag != 0;};
 
   /** Enable/Disable auto-scaling for drawing histogram.*/
-  void AutoscaleHistogram(bool autoscale = true);
+  void AutoscaleHistogram(int autoscale = 1);
 
   /** Enable auto-scaling for drawing histogram.*/
   void AutoscaleHistogramOn() {AutoscaleHistogram();};
 
   /** Disable auto-scaling for drawing histogram.*/
-  void AutoscaleHistogramOff() {AutoscaleHistogram(false);};
+  void AutoscaleHistogramOff() {AutoscaleHistogram(0);};
 
   /** Return the status of autoscale flag.*/
-  bool IsAutoScaled() {return m_AutoscaleHistogram;};
+  bool IsAutoScaled() {return m_AutoscaleHistogram != 0;};
 
   /** Set the multiplicative constant for logarithmic scale histogram.*/
   void SetLogScaleConstant(double c);
@@ -85,26 +85,37 @@ public:
   /** Return the value of the multiplicative constant for logarithmic scale histogram.*/
   double GetLogScaleConstant() {return m_LogScaleConstant;};
 
+  /** Allow to set the histogram representation.
+  Possible values are: vtkHistogram::POINT_REPRESENTATION, vtkHistogram::LINE_REPRESENTATION or vtkHistogram::BAR_REPRESENTATION*/
+  void SetRepresentation(int represent);
+
+  mmgGui *GetGui() {return m_Gui;};
+
 protected:
+  /** Create GUI for histogram widget.*/
+  void CreateGui();
+
+  /** Update gui parameters according to the vtkHistogram.*/
+  void UpdateGui();
+
+  /** Enable/disable view widgets.*/
+  void EnableWidgets(bool enable = true);
+
   mafObserver   *m_Listener;
   double         m_ScaleFactor;
   double         m_LogScaleConstant;
   int            m_HisctogramValue;
   int            m_NumberOfBins;
-  bool           m_AutoscaleHistogram;
-  bool           m_LogHistogramFlag;
+  int            m_Representation;
+  int            m_AutoscaleHistogram;
+  int            m_LogHistogramFlag;
   bool           m_Dragging;
   int            m_DragStart;
 
-  vtkTextMapper	*m_TextMapper;
-  vtkActor2D    *m_TextActor;
+  mmgGui        *m_Gui;
 
   vtkImageData  *m_Data;
-  vtkImageAccumulate *m_Accumulate;
-  vtkImageChangeInformation *m_ChangeInfo;
-  vtkImageLogarithmicScale  *m_LogScale;
-  vtkGlyph3D      *m_Glyph;
-  mafRWI          *m_HistogramRWI;
-  vtkActor2D      *m_PlotActor;
+  mafRWI        *m_HistogramRWI;
+  vtkHistogram  *m_Histogram;
 };
 #endif
