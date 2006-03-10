@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkHistogram.cxx,v $
   Language:  C++
-  Date:      $Date: 2006-03-10 09:42:41 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-03-10 15:19:33 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
   Project:   MultiMod Project
 
@@ -32,7 +32,7 @@
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
 
-vtkCxxRevisionMacro(vtkHistogram, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkHistogram, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkHistogram);
 //------------------------------------------------------------------------------
 vtkHistogram::vtkHistogram()
@@ -262,6 +262,7 @@ void vtkHistogram::HistogramUpdate(vtkRenderer *ren)
   else
   {
     Glyph->SetSource(LineRepresentation->GetOutput());
+    HistActor->GetProperty()->SetLineWidth(1);
   }
 
   Glyph->Modified();
