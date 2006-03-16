@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-21 13:20:35 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2006-03-16 09:18:08 $
+  Version:   $Revision: 1.20 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -104,6 +104,7 @@ public:
   {
     ID_DEFAULT_CHILD_VIEW = Superclass::ID_LAST,
     ID_LAYOUT_CHOOSER,
+    ID_LINK_SUBVIEW,
     ID_LAST
   };
 
@@ -117,7 +118,7 @@ public:
   virtual mafRWIBase    *GetRWI();
 
   /** 
-  Return a pointer to the image of all subviews.*/
+  Return a pointer to the image of all sub-views.*/
   void GetImage(wxBitmap &bmp, int magnification = 1);
 
   /** 
@@ -182,6 +183,9 @@ public:
   Print the sub-view.*/
   virtual void Print(wxDC *dc, wxRect margins);
 
+  /** Allow to link the camera of the sub-views.*/
+  virtual void LinkView(bool link_camera = true);
+
 protected:
   /**
   Internally used to create a new instance of the GUI. This function should be
@@ -208,10 +212,12 @@ protected:
   int m_DefauldChildView;
   
   int m_SubViewMaximized;  ///< contain the id of the sub-view to be maximized. -1 means that all sub-views are in normal size
+  int m_LinkSubView;
 
   wxSize  m_Size; ///< size of the compound view
   mmgGui *m_GuiView;
   mmdMouse *m_Mouse;
+
 
   std::vector<mafView *> m_ChildViewList; ///< Child views vector
   std::vector<mafView *> m_PluggedChildViewList; ///< Plugged Child views vector

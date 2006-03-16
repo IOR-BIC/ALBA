@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-06 13:22:59 $
-  Version:   $Revision: 1.54 $
+  Date:      $Date: 2006-03-16 09:18:08 $
+  Version:   $Revision: 1.55 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -487,4 +487,10 @@ void mafViewVTK::GetImage(wxBitmap &bmp, int magnification)
 //----------------------------------------------------------------------------
 {
   bmp = *m_Rwi->m_RwiBase->GetImage(magnification);
+}
+//----------------------------------------------------------------------------
+void mafViewVTK::LinkView(bool link_camera)
+//----------------------------------------------------------------------------
+{
+  m_Rwi->LinkCamera(link_camera);
 }
