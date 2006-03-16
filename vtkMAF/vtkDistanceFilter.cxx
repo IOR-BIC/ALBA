@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkDistanceFilter.cxx,v $
   Language:  C++
-  Date:      $Date: 2005-10-17 13:09:55 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-03-16 13:59:49 $
+  Version:   $Revision: 1.5 $
 
 =========================================================================*/
 
@@ -23,7 +23,7 @@
 #include "assert.h"
 
 
-vtkCxxRevisionMacro(vtkDistanceFilter, "$Revision: 1.4 $");
+vtkCxxRevisionMacro(vtkDistanceFilter, "$Revision: 1.5 $");
 vtkStandardNewMacro(vtkDistanceFilter);
 
 #define min(x0, x1) (((x0) < (x1)) ? (x0) : (x1))
@@ -77,8 +77,10 @@ vtkDataSet *vtkDistanceFilter::GetSource()
   return (vtkDataSet *)(this->Inputs[1]);
 }
 //----------------------------------------------------------------------------
-unsigned long int vtkDistanceFilter::GetMTime() {
-  unsigned long int time = this->MTime;
+unsigned long int vtkDistanceFilter::GetMTime() 
+//----------------------------------------------------------------------------
+{
+  unsigned long int time = Superclass::GetMTime();
   if (this->GetSource() && this->GetSource()->GetMTime() > time)
     time = this->GetSource()->GetMTime();
   if (this->GetInput() && this->GetInput()->GetMTime() > time)
@@ -88,7 +90,7 @@ unsigned long int vtkDistanceFilter::GetMTime() {
   if (this->InputTransform && this->InputTransform->GetMTime() > time)
     time = this->InputTransform->GetMTime();
   return time;
-  }
+}
 
 //----------------------------------------------------------------------------
 void vtkDistanceFilter::ComputeInputUpdateExtents(vtkDataObject *output) {
