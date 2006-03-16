@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-07 09:16:42 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2006-03-16 14:01:08 $
+  Version:   $Revision: 1.15 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -96,17 +96,6 @@ void mafViewSlice::Create()
   vtkNEW(m_Picker2D);
   m_Picker2D->SetTolerance(0.001);
   m_Picker2D->InitializePickList();
-}
-//----------------------------------------------------------------------------
-void mafViewSlice::CameraUpdate()
-//----------------------------------------------------------------------------
-{
-  if (m_AttachCamera != NULL)
-  {
-    m_AttachCamera->UpdateCameraMatrix();
-  }
-  assert(m_Rwi); 
-  m_Rwi->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafViewSlice::InitializeSlice(double slice[3])

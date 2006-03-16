@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-06 13:23:18 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-03-16 14:01:08 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -47,11 +47,10 @@ public:
   void Create();
 
   /** 
-  Set the visualization status for the node (visible, not visible, mutex, ...) 
-  \sa mafSceneGraph mafView*/
+  Set the visualization status for the node (visible, not visible, mutex, ...) \sa mafSceneGraph mafView*/
   virtual int GetNodeStatus(mafNode *vme);
 
-  /** IDs for the GUI */
+  /** IDs for the view GUI */
   enum VIEW_SLICE_WIDGET_ID
   {
     ID_NONE = Superclass::ID_LAST,
@@ -67,8 +66,6 @@ public:
   /** 
   Delete vme's visual pipe. It is called when vme is removed from visualization.*/
   virtual void VmeDeletePipe(mafNode *vme);
-
-  void CameraUpdate();
 
   /** 
   Change the range of the WindowLevel Lookup table.*/
