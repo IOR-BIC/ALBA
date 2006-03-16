@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-28 16:33:51 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2006-03-16 09:15:57 $
+  Version:   $Revision: 1.20 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -205,6 +205,8 @@ EVT_START,
 	CAMERA_FLYTO,
   CAMERA_PRE_RESET,
   CAMERA_POST_RESET,
+
+  LINK_CAMERA_TO_INTERACTOR,
 
   // modified by Stefano 21-9-2004 (begin)
   CAMERA_RXFEM_XNEG, //(to be moved elsewhere Marco)
