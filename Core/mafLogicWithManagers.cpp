@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-28 16:21:45 $
-  Version:   $Revision: 1.55 $
+  Date:      $Date: 2006-03-16 09:19:07 $
+  Version:   $Revision: 1.56 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -48,6 +48,8 @@
 
 #include "mafVMEStorage.h"
 
+#include "vtkCamera.h"
+
 //----------------------------------------------------------------------------
 mafLogicWithManagers::mafLogicWithManagers()
 : mafLogicWithGUI()
@@ -60,6 +62,8 @@ mafLogicWithManagers::mafLogicWithManagers()
   m_UseInteractionManager = true;
   
   m_ExternalViewFlag  = false;
+
+  m_CameraLinkingObserverFlag = false;
   
   m_VMEManager  = NULL;
   m_ViewManager = NULL;
@@ -529,6 +533,41 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       case CAMERA_FLYTO:
         if(m_ViewManager) m_ViewManager->CameraFlyToMode();
         if(m_InteractionManager) m_InteractionManager->CameraFlyToMode();  //modified by Marco. 15-9-2004 fly to with devices.
+      break;
+      case LINK_CAMERA_TO_INTERACTOR:
+      {
+        if (m_InteractionManager == NULL || m_InteractionManager->GetPER() == NULL)
+        {
+          return;
+        }
+        vtkCamera *cam = vtkCamera::SafeDownCast(e->GetVtkObj());
+        bool link_camera = e->GetBool();
+        if (!link_camera) 
+        {
+          if (cam) 
+          {
+            m_InteractionManager->GetPER()->LinkCameraRemove(cam);
+          }
+          else
+          {
+            m_InteractionManager->GetPER()->LinkCameraRemoveAll();
+          }
+          if (m_CameraLinkingObserverFlag) 
+          {
+            m_InteractionManager->GetPER()->GetCameraMouseInteractor()->RemoveObserver(this);
+            m_CameraLinkingObserverFlag = false;
+          }
+        }
+        else if (cam) 
+        {
+          if (!m_CameraLinkingObserverFlag) 
+          {
+            m_InteractionManager->GetPER()->GetCameraMouseInteractor()->AddObserver(this);
+            m_CameraLinkingObserverFlag = true;
+          }
+          m_InteractionManager->GetPER()->LinkCameraAdd(cam);
+        }
+      }
       break;
       case TIME_SET:
         TimeSet(e->GetDouble());

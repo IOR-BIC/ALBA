@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-21 13:21:36 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2006-03-16 09:19:07 $
+  Version:   $Revision: 1.21 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -219,6 +219,7 @@ protected:
   wxMenu *m_OpMenu;
   wxMenu *m_ViewMenu; 
 
+  bool m_CameraLinkingObserverFlag;
   bool m_ExternalViewFlag;
 
   bool m_UseVMEManager;
