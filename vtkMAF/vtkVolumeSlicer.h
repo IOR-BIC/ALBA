@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkVolumeSlicer.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-02 17:04:58 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-03-16 14:00:21 $
+  Version:   $Revision: 1.9 $
   Authors:   Alexander Savenko
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -127,6 +127,8 @@ public:
 protected:
   vtkVolumeSlicer();
   ~vtkVolumeSlicer();
+
+  unsigned long int GetMTime();
 
   void ExecuteInformation();
   void ExecuteData(vtkDataObject *output);

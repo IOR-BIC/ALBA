@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkVolumeSlicer.cxx,v $
   Language:  C++
-  Date:      $Date: 2006-02-02 17:04:58 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-03-16 14:00:21 $
+  Version:   $Revision: 1.11 $
 
 =========================================================================*/
 #include "vtkObjectFactory.h"
@@ -22,7 +22,7 @@
 
 #include "assert.h"
 
-vtkCxxRevisionMacro(vtkVolumeSlicer, "$Revision: 1.10 $");
+vtkCxxRevisionMacro(vtkVolumeSlicer, "$Revision: 1.11 $");
 vtkStandardNewMacro(vtkVolumeSlicer);
 
 typedef unsigned short u_short;
@@ -138,6 +138,15 @@ void vtkVolumeSlicer::SetPlaneOrigin(double x, double y, double z)
   plane_origin[1] = y;
   plane_origin[2] = z;
   SetPlaneOrigin(plane_origin);
+}
+//----------------------------------------------------------------------------
+unsigned long int vtkVolumeSlicer::GetMTime() 
+//----------------------------------------------------------------------------
+{
+  unsigned long int time = Superclass::GetMTime();
+  if (this->TransformSlice && this->TransformSlice->GetMTime() > time)
+    time = this->TransformSlice->GetMTime();
+  return time;
 }
 //----------------------------------------------------------------------------
 void vtkVolumeSlicer::ExecuteInformation() 
