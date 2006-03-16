@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-08 10:35:42 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2006-03-16 09:17:22 $
+  Version:   $Revision: 1.26 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -63,6 +63,7 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axe
   }
   m_Sizer = NULL;
 
+  m_LinkCamera   = 0;
   m_GridPosition = 0;
   m_BGColour  = wxColour(DEFAULT_BG_COLOR * 255,DEFAULT_BG_COLOR * 255,DEFAULT_BG_COLOR * 255);
   m_GridColour= wxColour(DEFAULT_GRID_COLOR * 255,DEFAULT_GRID_COLOR * 255,DEFAULT_GRID_COLOR * 255);
@@ -150,6 +151,10 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axe
 mafRWI::~mafRWI()
 //----------------------------------------------------------------------------
 {
+  if (m_LinkCamera != 0) 
+  {
+    LinkCamera(false);
+  }
   if(m_Grid) m_RenFront->RemoveActor(m_Grid);
 	if(m_Grid) m_RenFront->RemoveActor2D(m_Grid->GetLabelActor());
 	vtkDEL(m_Grid);
@@ -607,6 +612,7 @@ enum RWI_WIDGET_ID
   ID_CAMERA_RIGHT,
   ID_CAMERA_TOP,
   ID_CAMERA_BOTTOM,
+  ID_LINK_CAMERA,
   ID_SHOW_RULER,
   ID_RULER_SCALE_FACTOR,
   ID_RULER_LEGEND
@@ -635,6 +641,8 @@ mmgGui *mafRWI::CreateGui()
     m_Gui->Divider(2);
   }
 
+  m_Gui->Bool(ID_LINK_CAMERA,"link camera",&m_LinkCamera,0,"Turn On/Off camera interaction synchronization");
+  m_Gui->Divider(2);
   m_Gui->Bool(ID_SHOW_GRID,"grid",&m_ShowGrid,0,"Turn On/Off the grid");
   m_Gui->Combo(ID_GRID_NORMAL,"grid normal",&m_GridNormal,3,grid_normal,"orientation axes for the grid");
   m_Gui->Double(ID_GRID_POS,"grid pos",	&m_GridPosition);
@@ -685,6 +693,11 @@ void mafRWI::OnEvent(mafEventBase *maf_event)
       case ID_GRID_NORMAL:
         SetGridNormal(m_GridNormal);
         CameraUpdate();
+      break;
+      case ID_LINK_CAMERA:
+      {
+        LinkCamera(m_LinkCamera);
+      }
       break;
       case ID_SHOW_RULER:
         SetRuleVisibility(m_ShowRuler!= 0);
@@ -745,4 +758,19 @@ void mafRWI::OnEvent(mafEventBase *maf_event)
   {
     mafEventMacro(*maf_event);
   }
+}
+//----------------------------------------------------------------------------
+void mafRWI::LinkCamera(bool linc_camera)
+//----------------------------------------------------------------------------
+{
+  m_LinkCamera = linc_camera;
+  if (m_Gui) 
+  {
+    m_Gui->Update();
+  }
+
+  mafEvent e(this,LINK_CAMERA_TO_INTERACTOR);
+  e.SetVtkObj(m_Camera);
+  e.SetBool(m_LinkCamera != 0);
+  mafEventMacro(e);
 }

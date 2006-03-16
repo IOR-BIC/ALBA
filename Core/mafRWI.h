@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-06 13:22:40 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-03-16 09:17:22 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -105,6 +105,8 @@ public:
 
   mmgGui *GetGui();
 
+  void LinkCamera(bool linc_camera = true);
+
   mafSceneGraph    *m_Sg; 
   mafRWIBase			 *m_RwiBase;
   vtkRenderer      *m_RenFront; ///< Renderer used to show actors on the first layer.
@@ -130,7 +132,8 @@ protected:
   vtkGridActor     *m_Grid; ///< Actor representing a grid showed into the render window.
   int               m_ShowGrid; ///< Flag used to show/hide the grid.
   int               m_GridNormal;
-  int               m_ShowAxes;  ///< Flag used to show/hide axes in low left cornel of the view
+  int               m_ShowAxes;  ///< Flag used to show/hide axes in low left corner of the view
+  int               m_LinkCamera;///< Flag that enable to synchronize camera interaction to other camera
 
   double        m_RulerScaleFactor;
   mafString     m_RulerLegend;
