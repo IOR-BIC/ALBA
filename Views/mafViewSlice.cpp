@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-16 14:01:08 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2006-03-16 18:26:07 $
+  Version:   $Revision: 1.16 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -53,7 +53,6 @@ mafViewSlice::mafViewSlice(wxString label, int camera_position, bool show_axes, 
 //----------------------------------------------------------------------------
 {
   m_CurrentVolume = NULL;
-  m_AttachCamera  = NULL;
   m_Border        = NULL;
   
   m_Slice[0] = m_Slice[1] = m_Slice[2] = 0.0;
@@ -64,7 +63,6 @@ mafViewSlice::~mafViewSlice()
 //----------------------------------------------------------------------------
 {
   BorderDelete();
-  cppDEL(m_AttachCamera);
 }
 //----------------------------------------------------------------------------
 mafView *mafViewSlice::Copy(mafObserver *Listener)

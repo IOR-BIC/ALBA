@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRX.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-06 13:23:17 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-03-16 18:26:07 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,7 +22,6 @@
 //----------------------------------------------------------------------------
 class mafVME;
 class mafSceneNode;
-class mafAttachCamera;
 class mmgGui;
 
 //----------------------------------------------------------------------------
@@ -68,8 +67,6 @@ public:
   Delete vme's visual pipe. It is called when vme is removed from visualization.*/
   virtual void VmeDeletePipe(mafNode *vme);
 
-  void CameraUpdate();
-
   /** 
   Change the range of the WindowLevel Lookup table.*/
   void SetLutRange(double low_val, double high_val);
@@ -82,6 +79,5 @@ protected:
   virtual mmgGui *CreateGui();
 
   mafSceneNode *m_CurrentVolume; ///< Current visualized volume
-  mafAttachCamera *m_AttachCamera;
 };
 #endif

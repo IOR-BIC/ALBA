@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-16 14:01:08 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-03-16 18:26:07 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,7 +22,6 @@
 //----------------------------------------------------------------------------
 class mafVME;
 class mafSceneNode;
-class mafAttachCamera;
 class vtkActor2D;
 
 //----------------------------------------------------------------------------
@@ -99,7 +98,6 @@ protected:
   virtual mmgGui *CreateGui();
 
   mafSceneNode    *m_CurrentVolume; ///< Current visualized volume
-  mafAttachCamera *m_AttachCamera;
   vtkActor2D      *m_Border;
   double           m_Slice[3];
   bool             m_SliceInitialized;

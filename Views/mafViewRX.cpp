@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRX.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-07 18:58:39 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-03-16 18:26:06 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -47,13 +47,11 @@ mafViewRX::mafViewRX(wxString label, int camera_position, bool show_axes, bool s
 //----------------------------------------------------------------------------
 {
   m_CurrentVolume = NULL;
-  m_AttachCamera  = NULL;
 }
 //----------------------------------------------------------------------------
 mafViewRX::~mafViewRX()
 //----------------------------------------------------------------------------
 {
-  cppDEL(m_AttachCamera);
 }
 //----------------------------------------------------------------------------
 mafView *mafViewRX::Copy(mafObserver *Listener)
@@ -83,17 +81,6 @@ void mafViewRX::Create()
   vtkNEW(m_Picker2D);
   m_Picker2D->SetTolerance(0.001);
   m_Picker2D->InitializePickList();
-}
-//----------------------------------------------------------------------------
-void mafViewRX::CameraUpdate()
-//----------------------------------------------------------------------------
-{
-  if (m_AttachCamera != NULL)
-  {
-    m_AttachCamera->UpdateCameraMatrix();
-  }
-  assert(m_Rwi); 
-  m_Rwi->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafViewRX::VmeCreatePipe(mafNode *vme)
