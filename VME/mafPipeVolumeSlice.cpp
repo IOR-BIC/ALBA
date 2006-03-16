@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-07 18:55:43 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2006-03-16 13:58:53 $
+  Version:   $Revision: 1.25 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -287,8 +287,8 @@ void mafPipeVolumeSlice::CreateSlice(int direction)
 	m_SlicerPolygonal[direction]->SetInput(vtk_data);
 //  m_SlicerImage[direction]->SetSliceTransform(m_Vme->GetOutput()->GetTransform()->GetVTKTransform()->GetLinearInverse());
 //  m_SlicerPolygonal[direction]->SetSliceTransform(m_Vme->GetOutput()->GetTransform()->GetVTKTransform()->GetLinearInverse());
-//  m_SlicerImage[direction]->SetSliceTransform(m_Vme->GetOutput()->GetAbsTransform()->GetVTKTransform());
-//  m_SlicerPolygonal[direction]->SetSliceTransform(m_Vme->GetOutput()->GetAbsTransform()->GetVTKTransform());
+  m_SlicerImage[direction]->SetSliceTransform(m_Vme->GetOutput()->GetAbsTransform()->GetVTKTransform()->GetLinearInverse());
+  m_SlicerPolygonal[direction]->SetSliceTransform(m_Vme->GetOutput()->GetAbsTransform()->GetVTKTransform()->GetLinearInverse());
   
 	vtkNEW(m_Image[direction]);
   m_Image[direction]->SetScalarType(vtk_data->GetPointData()->GetScalars()->GetDataType());
