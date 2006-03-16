@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPER.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-24 14:45:36 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-03-16 09:19:42 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -674,4 +674,22 @@ void mmiPER::FlyTo(mafEventInteraction *e,int numstep, double zoom)
     cam->OrthogonalizeViewUp();
     m_FlyToFlag = false;
   }
+}
+//----------------------------------------------------------------------------
+void mmiPER::LinkCameraAdd(vtkCamera *cam)
+//----------------------------------------------------------------------------
+{
+  ((mmiCameraMove *)m_CameraMouseBehavior)->AddLinkedCamera(cam);
+}
+//----------------------------------------------------------------------------
+void mmiPER::LinkCameraRemove(vtkCamera *cam)
+//----------------------------------------------------------------------------
+{
+  ((mmiCameraMove *)m_CameraMouseBehavior)->RemoveLinkedCamera(cam);
+}
+//----------------------------------------------------------------------------
+void mmiPER::LinkCameraRemoveAll()
+//----------------------------------------------------------------------------
+{
+  ((mmiCameraMove *)m_CameraMouseBehavior)->RemoveAllLinkedCamera();
 }

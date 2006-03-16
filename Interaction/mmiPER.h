@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPER.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-21 12:18:58 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-03-16 09:19:42 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone, originally by Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -19,12 +19,11 @@
 // forward declarations
 //----------------------------------------------------------------------------
 class mafVME;
-class vtkProp3D;
-class mflMatrix;
 class myPIMPL;
+class vtkCamera;
 
 /** Class implementing routing of events based on picking.
-  This class routes events from input devices depending on picking infromation.
+  This class routes events from input devices depending on picking information.
   After first picking events are routed to interactor assigned to picked node
   until interaction is finished. To be completed... 
   This is a refactoring of mafISV class by Silvano Imboden
@@ -68,6 +67,19 @@ public:
   int GetMode() {return m_Mode;}
   void SetModeToSingleButton() {m_Mode=SINGLE_BUTTON;}
   void SetModeToMultiButton() {m_Mode=MULTI_BUTTON;}
+
+  /** Add vtkCamera to linked camera vector of the mouse camera interactor.*/
+  void LinkCameraAdd(vtkCamera *cam);
+
+  /** Remove vtkCamera to linked camera vector of the mouse camera interactor.*/
+  void LinkCameraRemove(vtkCamera *cam);
+
+  /** Remove all vtkCamera to linked camera vector of the mouse camera interactor.*/
+  void LinkCameraRemoveAll();
+
+  mafInteractor *GetCameraMouseInteractor() {return m_CameraMouseBehavior;};
+
+  mafInteractor *GetCameraInteractor() {return m_CameraBehavior;};
 
 protected:
   mmiPER();
