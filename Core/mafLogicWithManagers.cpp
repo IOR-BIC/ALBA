@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-16 09:19:07 $
-  Version:   $Revision: 1.56 $
+  Date:      $Date: 2006-03-17 11:16:54 $
+  Version:   $Revision: 1.57 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -793,16 +793,16 @@ void mafLogicWithManagers::VmeSelected(mafNode *vme)
 {
   if(m_ViewManager) m_ViewManager->VmeSelect(vme);
   if(m_OpManager)   m_OpManager->VmeSelected(vme);
-	if(m_SideBar)    m_SideBar->VmeSelected(vme);
+	if(m_SideBar)     m_SideBar->VmeSelected(vme);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeShow(mafNode *vme, bool visibility)
 //----------------------------------------------------------------------------
 {
 	if(m_ViewManager) m_ViewManager->VmeShow(vme, visibility);
-  bool vme_in_tree = true;
-  vme_in_tree = !vme->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") || 
-    (vme->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") && vme->GetTagArray()->GetTag("VISIBLE_IN_THE_TREE")->GetValueAsDouble() != 0);
+  bool vme_in_tree = vme->IsVisible(); //check VisibleToTraverse flag.
+/*  vme_in_tree = !vme->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") || 
+    (vme->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") && vme->GetTagArray()->GetTag("VISIBLE_IN_THE_TREE")->GetValueAsDouble() != 0);*/
   if(m_SideBar && vme_in_tree)
     m_SideBar->VmeShow(vme,visibility);
 }
@@ -811,9 +811,9 @@ void mafLogicWithManagers::VmeModified(mafNode *vme)
 //----------------------------------------------------------------------------
 {
   if(m_PlugTimebar) UpdateTimeBounds();
-  bool vme_in_tree = true;
-  vme_in_tree = !vme->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") || 
-    (vme->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") && vme->GetTagArray()->GetTag("VISIBLE_IN_THE_TREE")->GetValueAsDouble() != 0);
+  bool vme_in_tree = vme->IsVisible();
+/*  vme_in_tree = !vme->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") || 
+    (vme->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") && vme->GetTagArray()->GetTag("VISIBLE_IN_THE_TREE")->GetValueAsDouble() != 0);*/
   if(m_SideBar && vme_in_tree)
     m_SideBar->VmeModified(vme);
 	if(m_VMEManager) m_VMEManager->MSFModified(true);
