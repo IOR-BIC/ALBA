@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-16 12:06:59 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2006-03-17 11:14:27 $
+  Version:   $Revision: 1.23 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -511,6 +511,7 @@ void mafVMEManager::NotifyRemove(mafNode *n)
 //----------------------------------------------------------------------------
 {
   mafNodeIterator *iter = n->NewIterator();
+  iter->IgnoreVisibleToTraverse(true);
   iter->SetTraversalModeToPostOrder();
   for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 		mafEventMacro(mafEvent(this,VME_REMOVING,node));
@@ -521,6 +522,7 @@ void mafVMEManager::NotifyAdd(mafNode *n)
 //----------------------------------------------------------------------------
 {
   mafNodeIterator *iter = n->NewIterator();
+  iter->IgnoreVisibleToTraverse(true);
   for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
     mafEventMacro(mafEvent(this,VME_ADDED,node));
   iter->Delete();
