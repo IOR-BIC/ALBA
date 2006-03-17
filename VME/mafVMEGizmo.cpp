@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGizmo.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 14:31:54 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-03-17 11:12:38 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -50,6 +50,8 @@ mafVMEGizmo::mafVMEGizmo()
   
   // modified by Stefano 14-3-2005: gizmos set to not visible in the tree and node chooser
   GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
+
+  SetVisibleToTraverse(false);
 }
 
 //-------------------------------------------------------------------------
