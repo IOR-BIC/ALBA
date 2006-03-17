@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeIterator.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:16 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-03-17 11:13:38 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -51,6 +51,9 @@ public:
     Return true if the VME is visible. This function can be overridden to implement
     different visibility rules.*/
   virtual bool IsVisible(mafNode *node) { return node->IsVisible();}
+
+  /** Allow to ignore m_VisibleToTraverse flag for the iterator. */
+  virtual void IgnoreVisibleToTraverse(bool ignore) {m_IgnoreVisibleToTraverse = ignore;};
 
   /**
   Set the root node of the (sub)tree to be traversed. Used to set the start 
@@ -143,6 +146,7 @@ protected:
   mafNode         *m_CurrentNode;
   int             m_TraversalMode;
   int             m_TraversalDone;
+  bool            m_IgnoreVisibleToTraverse;
 
   mafVector<mafID> m_CurrentIdx;
 

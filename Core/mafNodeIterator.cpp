@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeIterator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:58:27 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2006-03-17 11:13:38 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,11 +30,14 @@ mafCxxTypeMacro(mafNodeIterator)
 mafNodeIterator::mafNodeIterator(mafNode *root)
 //----------------------------------------------------------------------------
 { 
-  m_CurrentNode=NULL;
-  m_RootNode=NULL; // initialize
+  m_CurrentNode = NULL;
+  m_RootNode    = NULL; // initialize
+  
   SetRootNode(root);
-  m_TraversalMode=0;
-  m_TraversalDone=0;
+  
+  m_TraversalMode = 0;
+  m_TraversalDone = 0;
+  m_IgnoreVisibleToTraverse = false;
 }
 
 //----------------------------------------------------------------------------
@@ -445,7 +448,7 @@ int mafNodeIterator::GoToFirstNode()
   {
     m_TraversalDone=0; // reset the traversal flag
     PreExecute(); // Call the pre-callback
-    return IsVisible(m_CurrentNode)?MAF_OK:GoToNextNode();
+    return IsVisible(m_CurrentNode)||m_IgnoreVisibleToTraverse?MAF_OK:GoToNextNode();
   }
   else
   {
