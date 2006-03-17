@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrixInterpolator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 17:17:55 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-03-17 17:29:26 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -125,6 +125,9 @@ void mafMatrixInterpolator::InternalItemUpdate()
 void mafMatrixInterpolator::SetCurrentItem(mafMatrix *data)
 //------------------------------------------------------------------------------
 {
+  if (data==m_CurrentItem.GetPointer())
+    return;
+
   m_CurrentItem=data;
   Modified(); // change modification time to force internal update
 }
