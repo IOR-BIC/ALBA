@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-19 14:14:50 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-03-17 11:18:27 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -32,7 +32,7 @@
 #include "mafSmartPointer.h"
 #include "mafTagArray.h"
 #include "mafVME.h"
-#include "mafVMESurface.h"
+#include "mafVMEGizmo.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkProperty.h"
@@ -67,7 +67,7 @@ mafGizmoSlice::mafGizmoSlice(mafNode* vme, mafObserver *Listener)
 
   mafNEW(m_VmeGizmo);
 	m_VmeGizmo->SetName("GizmoSlice");
-  m_VmeGizmo->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
+//  m_VmeGizmo->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
   m_VmeGizmo->ReparentTo(vme);
 
 	mafNEW(m_GizmoBehavior);
@@ -89,7 +89,7 @@ mafGizmoSlice::~mafGizmoSlice()
 {
   mafDEL(m_GizmoHandleCenterMatrix);
   m_VmeGizmo->SetBehavior(NULL);
-  vtkDEL(m_GizmoBehavior);
+  mafDEL(m_GizmoBehavior);
 
 	m_VmeGizmo->ReparentTo(NULL);
 	mafDEL(m_VmeGizmo);
@@ -181,7 +181,7 @@ void mafGizmoSlice::SetSlice(int id, int axis, double pos)
 	  apd->AddInput(of->GetOutput());
 	  apd->Update();
 
-    m_VmeGizmo->SetData(apd->GetOutput(),m_VmeInput->GetTimeStamp());
+    m_VmeGizmo->SetData(apd->GetOutput());
 
     // position the gizmo 
 	  mafSmartPointer<mafTransform> t;
