@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrixPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-12 16:19:16 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-03-17 11:15:50 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -142,7 +142,7 @@ void mafMatrixPipe::InternalUpdate()
 void mafMatrixPipe::Update()
 //----------------------------------------------------------------------------
 {
-  if (m_VME) m_VME->OnEvent(&mafEventBase(this,VME_MATRIX_PREUPDATE));
+//  if (m_VME) m_VME->OnEvent(&mafEventBase(this,VME_MATRIX_PREUPDATE));
   
   Superclass::Update();
 }
