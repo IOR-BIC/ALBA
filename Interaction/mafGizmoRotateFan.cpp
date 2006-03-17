@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateFan.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-12 11:37:09 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-03-17 11:17:38 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -81,7 +81,7 @@ mafGizmoRotateFan::mafGizmoRotateFan(mafVME *input, mafObserver *listener)
   SetAbsPose(absInputMatrix);
   
   // hide the gizmo after creation
-  this->Show(false);
+//  this->Show(false);
 
   // add the gizmo to the tree, this should increase reference count  
   Gizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
@@ -333,14 +333,9 @@ void mafGizmoRotateFan::SetColor(double colR, double colG, double colB)
 void mafGizmoRotateFan::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  if (show == TRUE)
-  {  
-    Gizmo->GetMaterial()->m_Prop->SetOpacity(0.2);
-  }
-  else
-  {
-    Gizmo->GetMaterial()->m_Prop->SetOpacity(0);
-  }
+  mafEventMacro(mafEvent(this,VME_SHOW,Gizmo,show));
+  double opacity = show ? 0.2 : 0;
+  Gizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
 }
 //----------------------------------------------------------------------------
 double mafGizmoRotateFan::PointPickedToStartTheta(double xp, double yp, double zp)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotate.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-21 07:16:06 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-03-17 11:17:38 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -66,8 +66,6 @@ mafGizmoRotate::mafGizmoRotate(mafVME* input, mafObserver *listener)
   
   // initialize gizmo gui
   GuiGizmoRotate->SetAbsOrientation(InputVME->GetOutput()->GetAbsMatrix());
-
-  Show(false);
 }
 //----------------------------------------------------------------------------
 mafGizmoRotate::~mafGizmoRotate() 

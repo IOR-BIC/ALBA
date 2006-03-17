@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-12 11:27:42 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-03-17 11:17:40 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -74,16 +74,14 @@ mafGuiTransformMouse::mafGuiTransformMouse(mafVME *input, mafObserver *listener)
   CreateISA();
   CreateGui();
   
-  EnableWidgets(false);
+  AttachInteractorToVme();
 }
 //----------------------------------------------------------------------------
 mafGuiTransformMouse::~mafGuiTransformMouse() 
 //----------------------------------------------------------------------------
 { 
   DetachInteractorFromVme();    
-  vtkDEL(IsaCompositor); 
-
-  // m_Gui already destroyed?
+  mafDEL(IsaCompositor); 
 }
 
 //----------------------------------------------------------------------------

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoHandle.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-13 16:44:43 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-03-17 11:17:37 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -79,7 +79,7 @@ mafGizmoHandle::mafGizmoHandle(mafVME *input, mafObserver *listener)
   this->SetColor(1, 0, 0);
 
   // hide gizmo at creation
-  this->Show(false);
+//  this->Show(false);
 
   //-----------------
   // create isa stuff
@@ -108,9 +108,6 @@ mafGizmoHandle::mafGizmoHandle(mafVME *input, mafObserver *listener)
   InputVme->GetOutput()->GetBounds(b);
   SetBBCenters(b);
   SetTranslationIntervals(b);
-
-  // add the gizmo to the tree
-//  mafEventMacro(mafEvent(this, VME_ADD, BoxGizmo));
 }
 //----------------------------------------------------------------------------
 mafGizmoHandle::~mafGizmoHandle() 
@@ -123,15 +120,9 @@ mafGizmoHandle::~mafGizmoHandle()
   vtkDEL(RotateBoxTr);
   vtkDEL(RotateBoxPDF);
 	
-  //----------------------
-	// No leaks so somebody is performing this...
-	// wxDEL(GizmoData );
-	//----------------------
-  vtkDEL(IsaComp); 
+  mafDEL(IsaComp); 
 
   mafEventMacro(mafEvent(this, VME_REMOVE, BoxGizmo));  
-  //BoxGizmo->Delete();
-
   vtkDEL(Cube);
 }
 
@@ -188,7 +179,6 @@ void mafGizmoHandle::SetType(int type)
   
   // register the type
   GizmoType = type;
-   
   Update();
 }
 
@@ -210,16 +200,8 @@ void mafGizmoHandle::SetLength(double length)
 void mafGizmoHandle::Highlight(bool highlight)
 //----------------------------------------------------------------------------
 {
-  if (highlight == true)
-  {
-     // Highlight the box by setting its color to yellow 
-     this->SetColor(1, 1, 0);
-  } 
-  else
-  {   
-     // set box col to red
-     this->SetColor(1, 0, 0);
-  }
+  double hl = highlight ? 1 : 0;
+  this->SetColor(1, hl, 0);
 }
 
 //----------------------------------------------------------------------------
@@ -236,10 +218,10 @@ void mafGizmoHandle::OnEvent(mafEventBase *maf_event)
 void mafGizmoHandle::SetColor(double col[3])
 //----------------------------------------------------------------------------
 {
-    BoxGizmo->GetMaterial()->m_Prop->SetColor(col);
-	  BoxGizmo->GetMaterial()->m_Prop->SetAmbient(0);
-	  BoxGizmo->GetMaterial()->m_Prop->SetDiffuse(1);
-	  BoxGizmo->GetMaterial()->m_Prop->SetSpecular(0);
+  BoxGizmo->GetMaterial()->m_Prop->SetColor(col);
+	BoxGizmo->GetMaterial()->m_Prop->SetAmbient(0);
+	BoxGizmo->GetMaterial()->m_Prop->SetDiffuse(1);
+	BoxGizmo->GetMaterial()->m_Prop->SetSpecular(0);
 }
 
 //----------------------------------------------------------------------------
@@ -250,12 +232,12 @@ void mafGizmoHandle::SetColor(double colR, double colG, double colB)
   this->SetColor(col);
 }
 
-
 //----------------------------------------------------------------------------
 void mafGizmoHandle::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  double opacity = ((show == TRUE) ? 1 : 0);
+  mafEventMacro(mafEvent(this,VME_SHOW,BoxGizmo,show));
+  double opacity = show ? 1 : 0;
   BoxGizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
 }
 
@@ -299,7 +281,6 @@ void mafGizmoHandle::SetInput(mafVME *vme)
 //----------------------------------------------------------------------------
 { 
   this->InputVme = vme; 
-  
   SetType(GizmoType); 
 }
 

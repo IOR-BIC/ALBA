@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateCircle.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-12 11:39:11 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-03-17 11:17:38 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -88,7 +88,7 @@ mafGizmoRotateCircle::mafGizmoRotateCircle(mafVME *input, mafObserver *listener)
   SetRefSysMatrix(m_AbsInputMatrix);
 
   // hide gizmos at creation
-  this->Show(false);
+//  this->Show(false);
   
   // add the gizmo to the tree, this should increase reference count  
   Gizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
@@ -297,14 +297,9 @@ void mafGizmoRotateCircle::SetColor(double colR, double colG, double colB)
 void mafGizmoRotateCircle::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  if (show == TRUE)
-  {  
-    Gizmo->GetMaterial()->m_Prop->SetOpacity(1);
-  }
-  else
-  {
-    Gizmo->GetMaterial()->m_Prop->SetOpacity(0);
-  }
+  mafEventMacro(mafEvent(this,VME_SHOW,Gizmo,show));
+  double opacity = show ? 1 : 0;
+  Gizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateCircle::SetAbsPose(mafMatrix *absPose)

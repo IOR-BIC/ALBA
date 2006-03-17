@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformTextEntries.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-21 07:16:07 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-03-17 11:17:40 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -59,8 +59,6 @@ mafGuiTransformTextEntries::mafGuiTransformTextEntries(mafVME *input, mafObserve
 
   CreateGui();
   SetAbsPose(InputVME->GetOutput()->GetAbsMatrix());
-  
-  EnableWidgets(false);
 }
 //----------------------------------------------------------------------------
 mafGuiTransformTextEntries::~mafGuiTransformTextEntries() 
@@ -183,8 +181,6 @@ void mafGuiTransformTextEntries::TextEntriesChanged()
   e2s.SetMatrix(tran->GetMatrixPointer());
   e2s.SetId(ID_TRANSFORM);
   mafEventMacro(e2s);
-  
-//  mafEventMacro(mafEvent(this, CAMERA_UPDATE)); // Paolo 20-07-2005
 }
 
 //----------------------------------------------------------------------------

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslateAxis.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 17:40:57 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-03-17 11:17:39 $
+  Version:   $Revision: 1.7 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -84,7 +84,7 @@ mafGizmoTranslateAxis::mafGizmoTranslateAxis(mafVME *input, mafObserver *listene
   this->SetColor(1, 0, 0, 1, 0, 0);
 
   // hide gizmos at creation
-  this->Show(false);
+//  this->Show(false);
 
   //-----------------
   // ReparentTo will add also the gizmos to the tree!!
@@ -435,7 +435,10 @@ void mafGizmoTranslateAxis::SetColor(double cylR, double cylG, double cylB, doub
 void mafGizmoTranslateAxis::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  double opacity = ((show == TRUE) ? 1 : 0);
+  mafEventMacro(mafEvent(this,VME_SHOW,CylGizmo,show));
+  mafEventMacro(mafEvent(this,VME_SHOW,ConeGizmo,show));
+
+  double opacity = show ? 1 : 0;
   CylGizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
   ConeGizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
 }

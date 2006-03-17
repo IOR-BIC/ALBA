@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslatePlane.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-12 11:29:53 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-03-17 11:17:39 $
+  Version:   $Revision: 1.7 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -107,14 +107,13 @@ mafGizmoTranslatePlane::mafGizmoTranslatePlane(mafVME *input, mafObserver *liste
   this->SetColor(SQ, 1, 1, 0);
 
   // hide gizmos at creation
-  this->Show(false);
+//  this->Show(false);
   
   // add the gizmo to the tree, this should increase reference count 
   for (i = 0; i < 3; i++)
   {
     Gizmo[i]->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
   }
-  
 }
 //----------------------------------------------------------------------------
 mafGizmoTranslatePlane::~mafGizmoTranslatePlane() 
@@ -134,10 +133,6 @@ mafGizmoTranslatePlane::~mafGizmoTranslatePlane()
   for (i = 0; i < SQ; i++)
   {
     vtkDEL(LineTF[i]);
-	//----------------------
-	// No leaks so somebody is performing this...
-	// wxDEL(GizmoData[i]);
-	//----------------------
     vtkDEL(IsaComp[i]); 
   }
 
@@ -147,7 +142,6 @@ mafGizmoTranslatePlane::~mafGizmoTranslatePlane()
   {
     vtkDEL(RotatePDF[i]);
     mafEventMacro(mafEvent(this, VME_REMOVE, Gizmo[i]));
-    //Gizmo[i]->Delete();
   }
 }
 
@@ -422,12 +416,15 @@ void mafGizmoTranslatePlane::SetColor(int part, double colR, double colG, double
 void mafGizmoTranslatePlane::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  if (show == TRUE)
+  for (int i = 0; i < 3; i++)
+    mafEventMacro(mafEvent(this,VME_SHOW,Gizmo[i],show));
+
+  if (show)
   {  
     Gizmo[S1]->GetMaterial()->m_Prop->SetOpacity(1);
     Gizmo[S2]->GetMaterial()->m_Prop->SetOpacity(1);
     
-    if (IsActive == TRUE)
+    if (IsActive)
     {
       Gizmo[SQ]->GetMaterial()->m_Prop->SetOpacity(0.5);  
     }

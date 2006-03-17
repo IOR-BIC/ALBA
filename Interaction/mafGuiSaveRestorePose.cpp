@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiSaveRestorePose.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-21 07:16:07 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-03-17 11:17:40 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,8 +45,6 @@ mafGuiSaveRestorePose::mafGuiSaveRestorePose(mafVME *input, mafObserver *listene
   m_Gui = NULL;
   
   CreateGui();
-  
-  EnableWidgets(false);
 }
 //----------------------------------------------------------------------------
 mafGuiSaveRestorePose::~mafGuiSaveRestorePose() 
@@ -69,6 +67,7 @@ void mafGuiSaveRestorePose::CreateGui()
   m_PositionsList->Clear();
   ReadSavedPoses();
 
+  EnableWidgets(true);
   m_Gui->Update();
 }
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScaleAxis.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-08 13:25:58 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-03-17 11:17:38 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -86,13 +86,10 @@ mafGizmoScaleAxis::mafGizmoScaleAxis(mafVME *input, mafObserver *listener)
   this->SetColor(1, 0, 0, 1, 0, 0);
 
   // hide gizmos at creation
-  this->Show(false);
+//  this->Show(false);
 
   CylGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
   CubeGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
-  // add the gizmo to the tree, this should increase reference count 
-//  mafEventMacro(mafEvent(this, VME_ADD, CylGizmo));
-//  mafEventMacro(mafEvent(this, VME_ADD, CubeGizmo));
 }
 //----------------------------------------------------------------------------
 mafGizmoScaleAxis::~mafGizmoScaleAxis() 
@@ -472,8 +469,10 @@ void mafGizmoScaleAxis::SetColor(double cylR, double cylG, double cylB, double c
 void mafGizmoScaleAxis::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  double opacity = ((show == TRUE) ? 1 : 0);
+  mafEventMacro(mafEvent(this,VME_SHOW,CylGizmo,show));
+  mafEventMacro(mafEvent(this,VME_SHOW,CubeGizmo,show));
 
+  double opacity = show ? 1 : 0;
   CylGizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
   CubeGizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
 }

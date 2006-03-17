@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScaleIsotropic.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-08 13:25:43 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-03-17 11:17:39 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -77,12 +77,10 @@ mafGizmoScaleIsotropic::mafGizmoScaleIsotropic(mafVME *input, mafObserver *liste
   this->SetColor(0, 1, 1);
 
   // hide gizmos at creation
-  this->Show(false);
+//  this->Show(false);
 
   //-----------------
   CubeGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
-  // add the gizmo to the tree, this should increase reference count 
-//  mafEventMacro(mafEvent(this, VME_ADD, CubeGizmo));
 }
 //----------------------------------------------------------------------------
 mafGizmoScaleIsotropic::~mafGizmoScaleIsotropic() 
@@ -90,16 +88,9 @@ mafGizmoScaleIsotropic::~mafGizmoScaleIsotropic()
 {
   CubeGizmo->SetBehavior(NULL);
   vtkDEL(Cube);
-  
-  // clean up
-	//----------------------
-	// No leaks so somebody is performing this...
-	// wxDEL(GizmoData);
-	//----------------------
   vtkDEL(IsaComp); 
 
   mafEventMacro(mafEvent(this, VME_REMOVE, CubeGizmo));  
-//  CubeGizmo->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -211,7 +202,8 @@ void mafGizmoScaleIsotropic::SetColor(double colR, double colG, double colB)
 void mafGizmoScaleIsotropic::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  double opacity = ((show == TRUE) ? 1 : 0);
+  mafEventMacro(mafEvent(this,VME_SHOW,CubeGizmo,show));
+  double opacity = show ? 1 : 0;
   CubeGizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
 }
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoBoundingBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-13 16:44:43 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-03-17 11:17:37 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -64,12 +64,6 @@ mafGizmoBoundingBox::mafGizmoBoundingBox(mafVME *input, mafObserver *listener)
   
   // set cone gizmo material property and initial color to red
   this->SetColor(1, 0, 0);
-
-  // hide gizmo at creation
-  this->Show(false);
-
-  // add the gizmo to the tree
-  //mafEventMacro(mafEvent(this, VME_ADD, BoxGizmo));
 }
 //----------------------------------------------------------------------------
 mafGizmoBoundingBox::~mafGizmoBoundingBox() 
@@ -77,12 +71,7 @@ mafGizmoBoundingBox::~mafGizmoBoundingBox()
 {
   BoxGizmo->SetBehavior(NULL);
   	
-  //----------------------
-	// No leaks so somebody is performing this...
-	// wxDEL(BoxGizmoData[i]);
-	//----------------------
   mafEventMacro(mafEvent(this, VME_REMOVE, BoxGizmo));  
-  //BoxGizmo->Delete();
   BoxOutline->Delete();
 }
 
@@ -90,16 +79,8 @@ mafGizmoBoundingBox::~mafGizmoBoundingBox()
 void mafGizmoBoundingBox::Highlight(bool highlight)
 //----------------------------------------------------------------------------
 {
-  if (highlight == true)
-  {
-     // Highlight the box by setting its color to yellow 
-     this->SetColor(1, 1, 0);
-  } 
-  else
-  {   
-     // set box col to red
-     this->SetColor(1, 0, 0);
-  }
+  double hl = highlight ? 1 : 0;
+  this->SetColor(1, hl, 0);
 }
 
 //----------------------------------------------------------------------------
@@ -131,6 +112,7 @@ void mafGizmoBoundingBox::SetColor(double colR, double colG, double colB)
 void mafGizmoBoundingBox::Show(bool show)
 //----------------------------------------------------------------------------
 {
+  mafEventMacro(mafEvent(this,VME_SHOW,BoxGizmo,show));
   float opacity = show ? 1 : 0;
   BoxGizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
 }

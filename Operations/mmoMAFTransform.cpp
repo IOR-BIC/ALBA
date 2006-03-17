@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMAFTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-07 15:07:37 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-03-17 11:17:52 $
+  Version:   $Revision: 1.11 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -541,47 +541,45 @@ void mmoMAFTransform::CreateGui()
   m_Gui->Enable(ID_ENABLE_STEP, m_UseGizmo?true:false);
 
   //---------------------------------
-  // Transform gui
+  // Transform Gui
   //---------------------------------
-  // create the tranform gui
+  // create the transform Gui
   m_GuiTransform = new mafGuiTransformMouse(mafVME::SafeDownCast(m_Input), this);
-  m_GuiTransform->EnableWidgets(true);
 
   // add transform gui to operation
   m_Gui->AddGui(m_GuiTransform->GetGui());
 
   //---------------------------------
-  // Text transform gui
+  // Text transform Gui
   //---------------------------------
-  // create the tranform gui
+  // create the transform Gui
   m_GuiTransformTextEntries = new mafGuiTransformTextEntries(mafVME::SafeDownCast(m_Input), this);
-  m_GuiTransformTextEntries->EnableWidgets(true);
 
-  // add transform gui to operation
+  // add transform Gui to operation
   m_Gui->AddGui(m_GuiTransformTextEntries->GetGui());
 
   //---------------------------------
-  // Translation Gizmo gui
+  // Translation Gizmo Gui
   //---------------------------------
 	
   // create the gizmos
   m_GizmoTranslate = new mafGizmoTranslate(mafVME::SafeDownCast(m_Input), this);
   m_GizmoTranslate->Show(false);
 
-  // add translation gizmo gui to operation
+  // add translation gizmo Gui to operation
   m_Gui->AddGui(m_GizmoTranslate->GetGui());
   
   //---------------------------------
-  // Rotation Gizmo gui
+  // Rotation Gizmo Gui
   //---------------------------------
   m_GizmoRotate = new mafGizmoRotate(mafVME::SafeDownCast(m_Input), this);
   m_GizmoRotate->Show(false);
 
-  // add rotation gizmo gui to operation
+  // add rotation gizmo Gui to operation
   m_Gui->AddGui(m_GizmoRotate->GetGui());
   
   //---------------------------------
-  // Scaling Gizmo gui
+  // Scaling Gizmo Gui
   //---------------------------------
   m_GizmoScale = new mafGizmoScale(mafVME::SafeDownCast(m_Input), this);
   m_GizmoScale->Show(false);
@@ -590,12 +588,11 @@ void mmoMAFTransform::CreateGui()
   m_Gui->AddGui(m_GizmoScale->GetGui());
 
   //---------------------------------
-  // Store/Restore position gui
+  // Store/Restore position Gui
   //---------------------------------
   m_GuiSaveRestorePose = new mafGuiSaveRestorePose(mafVME::SafeDownCast(m_Input), this);
-  m_GuiSaveRestorePose->EnableWidgets(true);
   
-  // add gui to operation
+  // add Gui to operation
   m_Gui->AddGui(m_GuiSaveRestorePose->GetGui());
 
   //--------------------------------- 

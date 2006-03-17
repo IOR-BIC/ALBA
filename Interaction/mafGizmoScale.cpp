@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScale.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-21 07:16:07 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-03-17 11:17:38 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -54,11 +54,11 @@ mafGizmoScale::mafGizmoScale(mafVME* input, mafObserver *listener)
   this->ActiveGizmoComponent = NONE;
   this->SetModalityToLocal();
 
-  InitialGizmoPose = mafMatrix::New();
+  mafNEW(InitialGizmoPose);
   InitialGizmoPose->DeepCopy(InputVME->GetOutput()->GetAbsMatrix());
 
-  VmeMatrixRelativeToRefSysVME = mafMatrix::New();
-  RefSysVMEAbsMatrixAtMouseDown = mafMatrix::New();
+  mafNEW(VmeMatrixRelativeToRefSysVME);
+  mafNEW(RefSysVMEAbsMatrixAtMouseDown);
 
   for (int i = 0; i < 3; i++)
   {
@@ -75,8 +75,6 @@ mafGizmoScale::mafGizmoScale(mafVME* input, mafObserver *listener)
   // initialize gizmo gui
   GuiGizmoScale->SetAbsScaling(InputVME->GetOutput()->GetAbsMatrix());
   GuiGizmoScale->EnableWidgets(false);
-
-  Show(false);
 }
 //----------------------------------------------------------------------------
 mafGizmoScale::~mafGizmoScale() 
@@ -89,9 +87,9 @@ mafGizmoScale::~mafGizmoScale()
     cppDEL(GSAxis[i]);
   }
   cppDEL(GSIsotropic);
-  InitialGizmoPose->Delete();  
-  VmeMatrixRelativeToRefSysVME->Delete();
-  RefSysVMEAbsMatrixAtMouseDown->Delete();
+  mafDEL(InitialGizmoPose);
+  mafDEL(VmeMatrixRelativeToRefSysVME);
+  mafDEL(RefSysVMEAbsMatrixAtMouseDown);
   cppDEL(GuiGizmoScale);
 }
 //----------------------------------------------------------------------------
