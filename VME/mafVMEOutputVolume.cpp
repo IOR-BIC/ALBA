@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 17:45:02 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-03-21 12:19:09 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,6 +30,7 @@
 
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
+#include "vtkUnstructuredGrid.h"
 
 #include <assert.h>
 
@@ -62,6 +63,12 @@ vtkRectilinearGrid *mafVMEOutputVolume::GetRectilinearData()
 {
   return vtkRectilinearGrid::SafeDownCast(GetVTKData());
 }
+//-------------------------------------------------------------------------
+vtkUnstructuredGrid *mafVMEOutputVolume::GetUnstructuredData()
+//-------------------------------------------------------------------------
+{
+  return vtkUnstructuredGrid::SafeDownCast(GetVTKData());
+}
 
 //-------------------------------------------------------------------------
 mmgGui* mafVMEOutputVolume::CreateGui()
@@ -83,11 +90,8 @@ mmgGui* mafVMEOutputVolume::CreateGui()
   m_Gui->Label(&m_VolumeBounds[0]);
   m_Gui->Label(&m_VolumeBounds[1]);
   m_Gui->Label(&m_VolumeBounds[2]);
-  if (m_VME->IsMAFType(mafVMEVolumeGray))
-  {
-    m_Gui->Label("scalar range:",true);
-    m_Gui->Label(&m_ScaralRangeString);
-  }
+  m_Gui->Label("scalar range:",true);
+  m_Gui->Label(&m_ScaralRangeString);
   return m_Gui;
 }
 //-------------------------------------------------------------------------
