@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkSimpleRulerActor2D.cxx,v $
   Language:  C++
-  Date:      $Date: 2006-03-10 16:17:05 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-03-21 12:17:39 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -34,7 +34,7 @@
 #include "vtkProperty2D.h"
 #include "vtkPolyDataMapper2D.h"
 
-vtkCxxRevisionMacro(vtkSimpleRulerActor2D, "$Revision: 1.5 $");
+vtkCxxRevisionMacro(vtkSimpleRulerActor2D, "$Revision: 1.6 $");
 vtkStandardNewMacro(vtkSimpleRulerActor2D);
 //------------------------------------------------------------------------------
 vtkSimpleRulerActor2D::vtkSimpleRulerActor2D()
@@ -554,9 +554,9 @@ void vtkSimpleRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
     if( dy < rwHeight - margin ) dy_max = dy;
   }
 
-  double axesOffsetX = (CenterAxes) ? rwWidth/2 -margin : 0;
-  double axesOffsetY = (CenterAxes) ? rwHeight/2 -margin : 0;
-
+  double axesOffsetX = (CenterAxes) ? rwWidth/2 -margin : ren->GetOrigin()[0];
+  double axesOffsetY = (CenterAxes) ? rwHeight/2 -margin : ren->GetOrigin()[1];
+  
   double t0  = margin;              // tick begin
   double t1x, t1y; // tick end 
   double ta  = margin-shortTickLen; // short tick end 
