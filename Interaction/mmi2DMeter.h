@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmi2DMeter.h,v $
 Language:  C++
-Date:      $Date: 2006-03-09 14:45:10 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2006-03-21 12:16:28 $
+Version:   $Revision: 1.8 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -149,8 +149,6 @@ protected:
   vtkLineSource       *m_Line2; ///< Second line of the measure tool (used for angle measures)
 	vtkPolyDataMapper2D *m_LineMapper2;
 	vtkActor2D          *m_LineActor2;
-  vtkTextActor        *m_Text;
-	//  vtkRenderWindow     *LastRenderWindow;
 	vtkRenderer         *m_LastRenderer; ///< Renderer used for the first line
 	vtkRenderer         *m_CurrentRenderer;
 
