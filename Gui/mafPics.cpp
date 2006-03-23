@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPics.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-12 10:31:50 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2006-03-23 15:42:58 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,6 +23,7 @@
 #include "mafPics.h" 
 #include <map>
 #include <string>
+
 //----------------------------------------------------------------------------
 // mafPictureFactory_Pimpl
 //----------------------------------------------------------------------------
@@ -233,3 +234,67 @@ NOTE FOR SILVANO
 mafAddPic(vme_xpm);            //syntax error
 int foo = mafAddPic(vme_xpm);  //correct, but will be called before ThePicMap has been created
 */
+
+#ifdef MAF_USE_VTK
+    #include "vtkUnsignedCharArray.h"
+    #include "vtkPointData.h"
+
+    //----------------------------------------------------------------------------
+    vtkImageData* mafPictureFactory::GetVTKImg(wxString id)
+    //----------------------------------------------------------------------------
+    {
+      mafPicMap::iterator it=m_p->map.find(id.c_str());
+      if (it == m_p->map.end())
+      {
+        mafLogMessage("mafPictureFactory: icon with id = %s not found",id.c_str());
+        return NULL;
+      }
+
+      wxBitmap bmp = wxBitmap((*it).second);
+      wxImage  img = bmp.ConvertToImage();
+      wxImage  flipped = img.Mirror(false); // flip vertical
+
+      bool HasMask = img.HasMask();
+      unsigned char maskR, maskG, maskB;
+      int NumberOfComponents = 3;
+      if(HasMask)
+      {
+        maskR = img.GetMaskRed();
+        maskG = img.GetMaskGreen();
+        maskB = img.GetMaskBlue();
+        NumberOfComponents = 4;
+      }
+
+      vtkUnsignedCharArray *buffer;
+      vtkNEW(buffer);
+      buffer->SetNumberOfComponents(NumberOfComponents);
+
+      unsigned char *p = flipped.GetData();
+      assert(p);
+      for(int i=0; i < img.GetWidth() * img.GetHeight(); i++)
+      {
+        unsigned char r = *p++;
+        unsigned char g = *p++;
+        unsigned char b = *p++;
+        unsigned char alpha = 255;
+
+        if(HasMask)
+        {
+          if( r == maskR && g == maskG && b == maskB ) alpha = 0;
+          buffer->InsertNextTuple4( r, g, b, alpha );
+        }
+        else
+          buffer->InsertNextTuple3( r, g, b );
+      }
+
+      vtkImageData *vtkimg;
+      vtkNEW(vtkimg);
+      vtkimg->SetNumberOfScalarComponents(NumberOfComponents);
+      vtkimg->SetScalarTypeToUnsignedChar();
+      vtkimg->SetDimensions( img.GetWidth(), img.GetHeight(), 1 );
+      vtkimg->SetUpdateExtentToWholeExtent();
+      assert( vtkimg->GetPointData() );
+      vtkimg->GetPointData()->SetScalars(buffer);
+      return  vtkimg; // SHOULD BE DELETED BY THE CALLER 
+    }
+#endif  //MAF_USE_VTK

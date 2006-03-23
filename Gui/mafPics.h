@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPics.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-03 13:58:22 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-03-23 15:42:58 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,6 +20,9 @@
 #include <wx/icon.h>
 #include <vector>
 
+#ifdef MAF_USE_VTK
+  #include "vtkImageData.h"
+#endif
 //----------------------------------------------------------------------------
 // Forward refs:
 //----------------------------------------------------------------------------
@@ -76,6 +79,11 @@ public:
   /** retrieve a picture from the Factory as a wxIcon */
   wxIcon GetIcon(wxString id);
 
+#ifdef MAF_USE_VTK
+  /** retrieve a picture from the Factory as a vtkImageData -- this picture must be deleted by the user */
+  vtkImageData* GetVTKImg(wxString id);
+#endif
+
   /** Fills the given vectors with the available Pic Id's */
   void GetPicIds(std::vector<wxString>& v);
 
@@ -90,6 +98,7 @@ public:
 
   /** retrieve the names of the registered vme-pics */
   void GetVmeNames( std::vector<wxString>& v );
+
 
 protected:
   mafPictureFactory_Pimpl *m_p;
