@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeImage3D.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-10 15:51:58 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-03-24 11:48:01 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -44,7 +44,7 @@ public:
   virtual void Create(mafSceneNode *n);
   virtual void Select(bool select); 
 
-  void SetProperty(vtkProperty *p);
+  vtkProperty *GetProperty();
 
 protected:
   vtkPlaneSource			   *m_ImagePlane;

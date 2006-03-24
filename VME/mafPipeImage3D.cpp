@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeImage3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-10 15:51:58 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-03-24 11:48:00 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -129,7 +129,7 @@ void mafPipeImage3D::Create(mafSceneNode *n)
 
   m_UsedAssembly->AddPart(m_ImageActor);
 
-  // selection hilight
+  // selection highlight
 	m_SelectionFilter = vtkOutlineCornerFilter::New();
 	m_SelectionFilter->SetInput(m_Vme->GetOutput()->GetVTKData());  
 
@@ -199,11 +199,8 @@ void mafPipeImage3D::Select(bool sel)
 			m_SelectionActor->SetVisibility(sel);
 }
 //----------------------------------------------------------------------------
-void mafPipeImage3D::SetProperty(vtkProperty *p)
+vtkProperty *mafPipeImage3D::GetProperty()
 //----------------------------------------------------------------------------
 {
-  if (p) 
-  {
-    m_ImageActor->SetProperty(p);
-  }
+  return m_ImageActor->GetProperty();
 }
