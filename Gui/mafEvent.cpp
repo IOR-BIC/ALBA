@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-12 13:58:34 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-03-24 16:22:06 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone, Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -122,6 +122,30 @@ mafEvent* mafEvent::Copy()
   return e;
 }
 //----------------------------------------------------------------------------
+void mafEvent::DeepCopy(const mafEventBase *maf_event)
+//----------------------------------------------------------------------------
+{
+  m_Sender  = ((mafEvent *)maf_event)->GetSender();
+  m_Id      = ((mafEvent *)maf_event)->GetId();
+  m_arg     = ((mafEvent *)maf_event)->GetArg();
+  m_bool    = ((mafEvent *)maf_event)->GetBool();
+  m_double  = ((mafEvent *)maf_event)->GetDouble();
+  m_string  = ((mafEvent *)maf_event)->GetString();
+  m_vme     = ((mafEvent *)maf_event)->GetVme();
+  m_view    = ((mafEvent *)maf_event)->GetView();
+  m_op      = ((mafEvent *)maf_event)->GetOp();
+  m_matrix  = ((mafEvent *)maf_event)->GetMatrix();
+  m_matrix2 = ((mafEvent *)maf_event)->GetOldMatrix();
+  m_MafObject = ((mafEvent *)maf_event)->GetMafObject();
+#ifdef MAF_USE_WX
+  m_WxObj   = ((mafEvent *)maf_event)->GetWxObj();
+  m_Win     = ((mafEvent *)maf_event)->GetWin();
+#endif
+#ifdef MAF_USE_VTK
+  m_VtkObj  = ((mafEvent *)maf_event)->GetVtkObj();
+#endif
+}
+//----------------------------------------------------------------------------
 void mafEvent::Init(void *sender, int id, long arg) 
 //----------------------------------------------------------------------------
 {
@@ -135,6 +159,8 @@ void mafEvent::Init(void *sender, int id, long arg)
   m_vme    = NULL; 
   m_op	   = NULL; 
   m_MafObject = NULL;
+  m_matrix = NULL;
+  m_matrix2= NULL;
 #ifdef MAF_USE_WX
   m_Win    = NULL;
   m_UpdateUIEvent   = NULL;
@@ -142,8 +168,6 @@ void mafEvent::Init(void *sender, int id, long arg)
 #endif
 #ifdef MAF_USE_VTK
   m_VtkProp   = NULL;
-  m_matrix = NULL;
-  m_matrix2= NULL;
   m_VtkObj = NULL;
 #endif
 }

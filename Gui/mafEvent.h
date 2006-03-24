@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 13:45:12 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-03-24 16:22:06 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden, Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -53,6 +53,8 @@ public:
   mafEvent(void *sender, int id, mafOp					 *op,     long arg=0);
   mafEvent(void *sender, int id, mafObject       *mafobj, long arg=0);
 
+  virtual void DeepCopy(const mafEventBase *maf_event);
+
   long              GetArg()     {return m_arg;};
   bool              GetBool()    {return m_bool;};
   double            GetDouble()   {return m_double;};
@@ -78,10 +80,10 @@ public:
 
 
 protected:
-  long             m_arg;        
-  bool             m_bool;        
-  double           m_double;        
-  mafString       *m_string;       
+  long             m_arg;
+  bool             m_bool;
+  double           m_double;
+  mafString       *m_string;
 
   mafNode         *m_vme;
   mafView         *m_view;
