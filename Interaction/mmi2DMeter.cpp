@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi2DMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-21 12:16:28 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2006-03-24 11:48:47 $
+  Version:   $Revision: 1.14 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -465,7 +465,7 @@ void mmi2DMeter::DrawMeasureTool(double x, double y)
     double tmp_pos[3];
     m_Line->GetPoint2(tmp_pos);
     m_TextVector[m_TextVector.size()-1]->SetInput(wxString::Format("%.2f" , m_Distance));
-    m_TextVector[m_TextVector.size()-1]->SetPosition(tmp_pos);
+    m_TextVector[m_TextVector.size()-1]->SetPosition(tmp_pos[0],tmp_pos[1]);
     m_CurrentRenderer->AddActor2D(m_TextVector[m_TextVector.size()-1]);
   }
   else if (m_MeasureType == DISTANCE_BETWEEN_LINES && counter > 2)
