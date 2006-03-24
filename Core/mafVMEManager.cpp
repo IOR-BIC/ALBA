@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-17 11:14:27 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2006-03-24 11:50:22 $
+  Version:   $Revision: 1.24 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -82,13 +82,19 @@ void mafVMEManager::OnEvent(mafEventBase *maf_event)
       case NODE_ATTACHED_TO_TREE:
       {
         if (!m_LoadingFlag)
+        {
           NotifyAdd((mafNode *)maf_event->GetSender());
+          MSFModified(true);
+        }
       }
       break;
       case NODE_DETACHED_FROM_TREE:
       {
         if (!m_LoadingFlag)
+        {
           NotifyRemove((mafNode *)maf_event->GetSender());
+          MSFModified(true);
+        }
       }
       break;
       default:
