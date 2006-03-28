@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-07 12:36:49 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2006-03-28 16:56:53 $
+  Version:   $Revision: 1.26 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -52,6 +52,7 @@
 #include "mafAction.h"
 #include "mafDeviceSet.h"
 #include "mmdMouse.h"
+#include "mmdClientMAF.h"
 
 #include "mafVME.h"
 #include "mafVMEGizmo.h"
@@ -129,6 +130,9 @@ mafInteractionManager::mafInteractionManager()
   //mafAction *mouse_action = m_StaticEventRouter->AddAction("Mouse"); // action for RWIs output
   //mouse_action->BindDevice(mouse_device); // bind mouse to mouse action
   pointing_action->BindDevice(mouse_device); // bind mouse to point&manipulate action
+
+  mafPlugDevice<mmdClientMAF>("Client MAF");
+  m_ClientDevice = (mmdClientMAF *)m_DeviceManager->AddDevice("mmdClientMAF",true);
 }
 
 //------------------------------------------------------------------------------
@@ -226,7 +230,12 @@ mmdMouse *mafInteractionManager::GetMouseDevice()
 {
   return mmdMouse::SafeDownCast(m_DeviceManager->GetDevice("Mouse"));
 }
-
+//------------------------------------------------------------------------------
+mmdClientMAF *mafInteractionManager::GetClientDevice()
+//------------------------------------------------------------------------------
+{
+  return m_ClientDevice;
+}
 //------------------------------------------------------------------------------
 int mafInteractionManager::BindAction(const char *action,mafInteractor *agent)
 //------------------------------------------------------------------------------

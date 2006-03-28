@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-14 17:42:28 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-03-28 16:56:53 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -51,6 +51,7 @@ class mmgTree;
 class mmgCheckListBox;
 class mmgGuiHolder;
 class mmgNamedPanel;
+class mmdClientMAF;
 
 /** This class takes care of mastering the interaction inside views.
   This class is responsible to coordinate interaction, i.e. 
@@ -84,6 +85,9 @@ public:
 
   /** return the mouse device */
   mmdMouse *GetMouseDevice();
+
+  /** return the ClientMAF device */
+  mmdClientMAF *GetClientDevice();
   
   /** return the mouse action, an action to which mouse is bound by default */
   //mafAction *GetMouseAction();
@@ -243,6 +247,8 @@ protected:
   mafDeviceManager*       m_DeviceManager; 
   mmiPER*                 m_PositionalEventRouter;
   mmiSER*                 m_StaticEventRouter;
+
+  mmdClientMAF           *m_ClientDevice;
   
   mmuAvatarsMap                       m_Avatars; ///< keeps a list of visible avatars
   std::list<mafAutoPointer<mmiPER> >  m_PERList; ///< the interactor devoted to Positional Event Routing
