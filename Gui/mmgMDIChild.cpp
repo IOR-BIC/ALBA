@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIChild.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-03 15:58:10 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2006-03-28 09:34:17 $
+  Version:   $Revision: 1.21 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -107,6 +107,7 @@ void mmgMDIChild::OnSize(wxSizeEvent &event)
     m_View->SetWindowSize(w,h);
   }
 #endif
+  m_View->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mmgMDIChild::EnableResize(bool enable)
