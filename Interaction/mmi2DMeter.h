@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmi2DMeter.h,v $
 Language:  C++
-Date:      $Date: 2006-03-21 12:16:28 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2006-03-28 08:32:41 $
+Version:   $Revision: 1.9 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -30,6 +30,8 @@ class vtkRenderWindow;
 class vtkRenderer;
 class vtkXYPlotActor;
 class vtkTextActor;
+
+class vtkTextActorMeter;
 
 /**  Class implementing an interactor for creating 2D measure tool.
 This interactor build a line from picked points on VME and draw a 2D line on the renderwindow.
@@ -133,8 +135,8 @@ protected:
   std::vector<vtkPolyDataMapper2D *> m_LineMapperVector2;
   std::vector<vtkLineSource *> m_LineSourceVector2;
 
-  std::vector<vtkTextActor *> m_TextVector;
-  int m_DisplayPositionText[2];
+  std::vector<vtkTextActorMeter *> m_MeterVector;
+  
 
   std::vector<vtkRenderer *> m_RendererVector;
   //persistent measure END
@@ -169,7 +171,7 @@ protected:
   std::vector<int> m_FlagMeasureType;
   std::vector<double> m_Measure;
   
-  bool m_ExceptionFlag;
+  
 	double  m_Distance;
   double  m_Angle;
 	double  m_PickedPoint[3]; ///< 3D position of the picked point; used to assign position to the m_ProbingLine
