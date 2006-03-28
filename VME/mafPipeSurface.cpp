@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-02 16:42:57 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2006-03-28 17:31:57 $
+  Version:   $Revision: 1.22 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -157,11 +157,12 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
 
   m_Actor = vtkActor::New();
 	m_Actor->SetMapper(m_Mapper);
-  if (material->m_MaterialType == mmaMaterial::USE_VTK_PROPERTY)
-  {
+//  if (material->m_MaterialType == mmaMaterial::USE_VTK_PROPERTY)
+//  {
     m_Actor->SetProperty(material->m_Prop);
-  }
-  else if (material->m_MaterialType == mmaMaterial::USE_TEXTURE)
+//  }
+//  else if (material->m_MaterialType == mmaMaterial::USE_TEXTURE)
+  if (material->m_MaterialType == mmaMaterial::USE_TEXTURE)
   {
     m_Actor->SetTexture(m_Texture);
   }
