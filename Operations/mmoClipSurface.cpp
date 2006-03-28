@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 11:13:32 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-03-28 08:34:42 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -123,7 +123,6 @@ void mmoClipSurface::OpRun()
   m_SurfaceAccept = new mafSurfaceAccept;
 
   m_Gui = new mmgGui(this);
-	m_Gui->SetListener(this);
   m_Gui->Divider();
   m_Gui->Combo(ID_CLIP_BY,"clip by",&m_ClipModality,2,clip_by_choices);
   m_Gui->Button(ID_CHOOSE_SURFACE,"clipper surface");

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-10 13:27:04 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-03-28 08:34:42 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -412,7 +412,6 @@ void mmoVolumeResample::CreateGui()
 //----------------------------------------------------------------------------
 {
 	m_Gui = new mmgGui(this);
-	m_Gui->SetListener(this);
 
   m_Gui->Button(ID_VOLUME_VMELOCALBOUNDS,"VME Local Bounds","","set the crop bounding box to the oriented VME bounds (default option)");
   m_Gui->Button(ID_VOLUME_VMEBOUNDS,"VME Global Bounds","","set the crop bounding box to the VME global bounds");
