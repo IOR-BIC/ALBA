@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-17 11:16:54 $
-  Version:   $Revision: 1.57 $
+  Date:      $Date: 2006-03-28 09:07:15 $
+  Version:   $Revision: 1.58 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -939,7 +939,7 @@ void mafLogicWithManagers::ViewSelect()
     {
       m_InteractionManager->ViewSelected(view);
     }
-    if(m_OpManager) 
+    if(m_OpManager && !m_OpManager->Running()) 
     {
       // needed to update all the operations that will be enabled on View Creation
       m_OpManager->VmeSelected(m_OpManager->GetSelectedVme());
