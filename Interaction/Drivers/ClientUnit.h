@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: ClientUnit.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 13:46:13 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-03-28 16:55:46 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -42,6 +42,9 @@ public:
   /** 
   Connect the client to the server at the given IP address.*/
   bool ConnectClient(wxIPV4address &addr);
+
+  /** Close the connection with the server.*/
+  bool DisconnectClient();
 
   /** 
   Send the message to the server.*/

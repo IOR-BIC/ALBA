@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: ClientUnit.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 15:48:22 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-03-28 16:55:46 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -70,6 +70,12 @@ bool ClientUnit::ConnectClient(wxIPV4address &addr)
   }
 
   return status;
+}
+//----------------------------------------------------------------------------
+bool ClientUnit::DisconnectClient()
+//----------------------------------------------------------------------------
+{
+  return m_sock->Close();
 }
 //----------------------------------------------------------------------------
 void ClientUnit::SendMessageToServer(wxString cmd)
@@ -145,4 +151,3 @@ void ClientUnit::ReadMessageFromServer(wxSocketBase *sock)
 
 #undef MAX_MSG_SIZE
 }
-
