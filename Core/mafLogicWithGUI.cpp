@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-10 16:23:13 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2006-03-28 09:53:23 $
+  Version:   $Revision: 1.26 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -321,7 +321,7 @@ void mafLogicWithGUI::InitializeLanguage()
   }
   else
   {
-    // no language set; use default language: english
+    // no language set; use default language: English
     config->Write("Language",wxLANGUAGE_ENGLISH);
     config->Write("Dictionary","en");
     m_Language = wxLANGUAGE_ENGLISH;
@@ -329,7 +329,11 @@ void mafLogicWithGUI::InitializeLanguage()
   }
   cppDEL(config);
 
+  wxString prefix;
+  prefix = wxGetWorkingDirectory();
+  prefix += "\\Language\\";
   m_Locale.Init(m_Language);
+  m_Locale.AddCatalogLookupPathPrefix(prefix);
   m_Locale.AddCatalog(wxT(m_LanguageDictionary.GetCStr()));
 #ifndef WIN32
   m_Locale.AddCatalog("fileutils");
