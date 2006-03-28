@@ -43,6 +43,8 @@ SET(vtkMAF_SRCS
   vtkRulerActor2D.h
   vtkSimpleRulerActor2D.cxx
   vtkSimpleRulerActor2D.h
+  vtkTextActorMeter.cxx
+  vtkTextActorMeter.h
   vtkTransferFunction2D.cxx
   vtkTransferFunction2D.h
   vtkVolumeResample.h
