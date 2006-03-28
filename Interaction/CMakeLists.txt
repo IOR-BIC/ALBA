@@ -91,6 +91,8 @@ SET(PROJECT_SRCS
   
   mmdButtonsPad.cpp
   mmdButtonsPad.h
+  mmdClientMAF.cpp
+  mmdClientMAF.h
   mmdMouse.cpp
   mmdMouse.h
   mmdRemoteMouse.cpp
