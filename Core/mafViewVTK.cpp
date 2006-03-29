@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-16 09:18:08 $
-  Version:   $Revision: 1.55 $
+  Date:      $Date: 2006-03-29 13:45:18 $
+  Version:   $Revision: 1.56 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -441,8 +441,7 @@ bool mafViewVTK::Pick(int x, int y)
     if(m_Picker2D->Pick(x,y,0,r))
     {
       m_Picker2D->GetPickPosition(m_PickedPosition);
-      FindPickedVme(m_Picker2D->GetPath());
-      return true;
+      return FindPickedVme(m_Picker2D->GetPath());
     }
   }
   return false;
@@ -468,8 +467,7 @@ bool mafViewVTK::Pick(mafMatrix &m)
     if( m_Picker3D->Pick(world_p1,world_p2,r) )
     {
       m_Picker3D->GetPickPosition(m_PickedPosition);
-      FindPickedVme(m_Picker3D->GetPath());
-      return true;
+      return FindPickedVme(m_Picker3D->GetPath());
     }
   }
   return false;
