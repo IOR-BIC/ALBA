@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-21 13:19:58 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-03-29 13:44:33 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -128,7 +128,7 @@ void mafView::GetPickedPosition(double pos[3])
   pos[2] = m_PickedPosition[2];
 }
 //----------------------------------------------------------------------------
-void mafView::FindPickedVme(vtkAssemblyPath *ap)
+bool mafView::FindPickedVme(vtkAssemblyPath *ap)
 //----------------------------------------------------------------------------
 {
   vtkMAFAssembly *as = NULL;
@@ -149,11 +149,13 @@ void mafView::FindPickedVme(vtkAssemblyPath *ap)
           as = (vtkMAFAssembly*)p;
           m_PickedVME = mafVME::SafeDownCast(as->GetVme());
           m_PickedProp = vtkProp3D::SafeDownCast(p);
+          return true;
           break;
         }
       }
     }
   }
+  return false;
 }
 //----------------------------------------------------------------------------
 void mafView::PrintBitmap(wxDC *dc, wxRect margins, wxBitmap *bmp)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-21 13:19:59 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-03-29 13:44:33 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -172,7 +172,7 @@ protected:
 
   /** 
   Find the VME picked */
-  void FindPickedVme(vtkAssemblyPath *ap = NULL);
+  bool FindPickedVme(vtkAssemblyPath *ap = NULL);
 
 public:
   int            m_Mult;    ///< Used to store the multiplicity of the view type created (e.g. the 3rd view surface created).
