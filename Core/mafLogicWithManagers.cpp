@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-28 09:07:15 $
-  Version:   $Revision: 1.58 $
+  Date:      $Date: 2006-03-30 10:48:15 $
+  Version:   $Revision: 1.59 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,7 +44,9 @@
 #include "mmgTimeBar.h"
 #include "mmgMaterialChooser.h"
 #include "mmgViewFrame.h"
+#include "mmgLocaleSettings.h"
 #include "mmiPER.h"
+#include "mmdClientMAF.h"
 
 #include "mafVMEStorage.h"
 
@@ -109,6 +111,7 @@ void mafLogicWithManagers::Configure()
   {
     m_InteractionManager = new mafInteractionManager;
     m_InteractionManager->SetListener(this);
+    m_InteractionManager->GetClientDevice()->AddObserver(this, MCH_INPUT);
   }
 
   if(m_UseViewManager)
@@ -124,6 +127,7 @@ void mafLogicWithManagers::Configure()
     m_OpManager->SetListener(this);
     m_OpManager->SetMouse(m_InteractionManager->GetMouseDevice());
   }
+
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Plug(mafView* view) 
@@ -277,6 +281,7 @@ void mafLogicWithManagers::CreateMenu()
   wxMenu    *option_menu = new wxMenu;
   option_menu->AppendSeparator();
   option_menu->Append(MENU_OPTION_DEVICE_SETTINGS, _("Interaction Settings"));
+  option_menu->Append(MENU_OPTION_LOCALE_SETTINGS, _("Locale Settings"));
   m_MenuBar->Append(option_menu, _("&Preferences"));
 
   m_Win->SetMenuBar(m_MenuBar);
@@ -576,6 +581,9 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       // commands related to interaction manager
       case MENU_OPTION_DEVICE_SETTINGS:
         m_InteractionManager->ShowModal();
+      break;
+      case MENU_OPTION_LOCALE_SETTINGS:
+        m_LocaleSettings->ChooseLocale();
       break;
       case CAMERA_PRE_RESET:
         if(m_InteractionManager) 
