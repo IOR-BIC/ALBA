@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-10 16:16:29 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2006-03-30 10:47:46 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,6 +30,8 @@ class mmgTimeBar;
 class mafWXLog;
 class mafVTKLog;
 class mafSideBar;
+class mmgLocaleSettings;
+
 //----------------------------------------------------------------------------
 // mafLogicWithGUI :
 //----------------------------------------------------------------------------
@@ -132,9 +134,6 @@ protected:
   /** Enable/disable a Toolbar or Menu Item */
   void EnableItem(int item, bool enable);
 
-  /** Initialize language used into the application.*/
-  void InitializeLanguage();
-
   mmgMDIFrame       *m_Win;
   wxToolBar         *m_ToolBar;
   mmgSashPanel      *m_LogSash;
@@ -148,9 +147,7 @@ protected:
 	bool               m_LogAllEvents;
   mafWXLog          *m_Logger;
   mafVTKLog         *m_VtkLog;
-  wxLocale           m_Locale;
-  wxLanguage         m_Language;
-  mafString          m_LanguageDictionary;
+  mmgLocaleSettings *m_LocaleSettings;
 
 	bool m_PlugMenu;    ///< Flag to plug or not the Menu into the application. Default is true.
 	bool m_PlugToolbar; ///< Flag to plug or not the Toolbar into the application. Default is true.

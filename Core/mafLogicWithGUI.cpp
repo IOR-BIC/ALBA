@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-28 09:53:23 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2006-03-30 10:47:45 $
+  Version:   $Revision: 1.27 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,8 +21,6 @@
 
 
 #include "mafLogicWithGUI.h"
-#include <wx/intl.h>
-#include <wx/config.h>
 #include <wx/utils.h>
 #include <wx/datetime.h>
 #include <wx/busyinfo.h>
@@ -38,6 +36,7 @@
 #include "mmgNamedPanel.h"
 #include "mmgCrossSplitter.h"
 #include "mmgTimeBar.h"
+#include "mmgLocaleSettings.h"
 #include "mafWXLog.h"
 #include "mafPics.h"
 #include "mafVTKLog.h"
@@ -49,7 +48,8 @@ mafLogicWithGUI::mafLogicWithGUI()
   m_Win = new mmgMDIFrame("maf", wxDefaultPosition, wxSize(800, 600));
   m_Win->SetListener(this);
 
-  InitializeLanguage();
+  m_LocaleSettings = new mmgLocaleSettings(this);
+  m_LocaleSettings->InitializeLanguage();
 
   m_LogSash				= NULL;
   m_TimeSash			= NULL;
@@ -76,6 +76,7 @@ mafLogicWithGUI::mafLogicWithGUI()
 mafLogicWithGUI::~mafLogicWithGUI()
 //----------------------------------------------------------------------------
 {
+  cppDEL(m_LocaleSettings);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithGUI::Configure()
@@ -305,37 +306,4 @@ void mafLogicWithGUI::EnableItem(int item, bool enable)
         m_MenuBar->Enable(item,enable );
   if(m_ToolBar)
      m_ToolBar->EnableTool(item,enable );
-}
-//----------------------------------------------------------------------------
-void mafLogicWithGUI::InitializeLanguage()
-//----------------------------------------------------------------------------
-{
-  wxConfig *config = new wxConfig(wxEmptyString);
-  long lang;
-  wxString dict;
-  if(config->Read("Language", &lang))
-  {
-    m_Language = (wxLanguage)lang;
-    config->Read("Dictionary", &dict);
-    m_LanguageDictionary = dict;
-  }
-  else
-  {
-    // no language set; use default language: English
-    config->Write("Language",wxLANGUAGE_ENGLISH);
-    config->Write("Dictionary","en");
-    m_Language = wxLANGUAGE_ENGLISH;
-    m_LanguageDictionary = "en";
-  }
-  cppDEL(config);
-
-  wxString prefix;
-  prefix = wxGetWorkingDirectory();
-  prefix += "\\Language\\";
-  m_Locale.Init(m_Language);
-  m_Locale.AddCatalogLookupPathPrefix(prefix);
-  m_Locale.AddCatalog(wxT(m_LanguageDictionary.GetCStr()));
-#ifndef WIN32
-  m_Locale.AddCatalog("fileutils");
-#endif
 }
