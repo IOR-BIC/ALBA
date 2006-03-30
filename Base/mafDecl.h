@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-16 09:15:57 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2006-03-30 10:46:43 $
+  Version:   $Revision: 1.21 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -120,6 +120,7 @@ MENU_LAYOUT_END,
 MENU_VIEW_END,
 MENU_SETTINGS_START,
   MENU_OPTION_DEVICE_SETTINGS,
+  MENU_OPTION_LOCALE_SETTINGS,
   PRINT_TREE,
 	ID_APP_SETTINGS,     // calls the Application-Settings-Panel - not implemented yet
 	ID_TIMEBAR_SETTINGS, // calls the TimeBar-Settings-Panel
