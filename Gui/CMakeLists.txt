@@ -46,6 +46,8 @@ SET(PROJECT_SRCS
   mmgListBox.h
   mmgListCtrl.cpp
   mmgListCtrl.h
+  mmgLocaleSettings.cpp
+  mmgLocaleSettings.h
   mmgMovieCtrl.cpp
   mmgMovieCtrl.h
   mmgMDIChild.cpp
