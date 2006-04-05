@@ -11,7 +11,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkDicomUnPacker);
 
 //----------------------------------------------------------------------------
@@ -365,6 +365,7 @@ int vtkDicomUnPacker::read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *
       else 
 			{
 				first_one= 0 ;
+        elementLength = 0;  //2006-04-04 by danno
 	      fseek_result = fseek(fp,128,0); /* skip preamble bytes next 4 bytes should be "DICM" */ 
 	      fread(t, 1 , 4, fp);
 	      if (t[0] != 'D' || t[1] != 'I' || t[2] != 'C' || t[3] != 'M')  
@@ -585,6 +586,7 @@ int read_dicom_string_image(char *filename, T *IMAGE, double slope_value, double
 			else 
 			{
 				first_one= 0 ;
+        elementLength = 0;  //2006-04-04 by danno
 				fseek(fp,128,0); /* skip preamble bytes next 4 bytes should be "DICM" */ 
 				fread(t, 1 , 4, fp);
 				if (t[0] != 'D' || t[1] != 'I' || t[2] != 'C' || t[3] != 'M')  

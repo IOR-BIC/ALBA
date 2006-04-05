@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 12:04:47 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-04-05 08:01:02 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,6 +34,7 @@
 #include "mmiDICOMImporterInteractor.h"
 
 #include "mafVMEVolumeGray.h"
+#include "mafVMEImage.h"
 #include "mafTagArray.h"
 #include "mafVMEItem.h"
 
@@ -70,6 +71,7 @@ mmoDICOMImporter::mmoDICOMImporter(wxString label) : mafOp(label)
 	for (int i = 0; i < 6; i++) 
     m_DicomBounds[i] = 0;
 	m_Volume	= NULL;
+  m_Image	= NULL;
 	m_SortAxes				= 2;
 	m_NumberOfStudy		= 0;
 	m_NumberOfSlices	= 0;
@@ -121,6 +123,7 @@ mmoDICOMImporter::~mmoDICOMImporter()
 //----------------------------------------------------------------------------
 {
 	vtkDEL(m_Volume);
+  vtkDEL(m_Image);
 }
 //----------------------------------------------------------------------------
 mafOp *mmoDICOMImporter::Copy()
@@ -173,15 +176,24 @@ void mmoDICOMImporter::OpStop(int result)
 void mmoDICOMImporter::OpDo()
 //----------------------------------------------------------------------------
 {
-	assert(m_Volume != NULL);
-	mafEventMacro(mafEvent(this,VME_ADD,m_Volume));
+	//assert(m_Volume != NULL);
+  //assert(m_Image != NULL);
+  if(m_Image != NULL)
+	  mafEventMacro(mafEvent(this,VME_ADD,m_Image));
+  if(m_Volume != NULL)
+    mafEventMacro(mafEvent(this,VME_ADD,m_Volume));
+
 }
 //----------------------------------------------------------------------------
 void mmoDICOMImporter::OpUndo()
 //----------------------------------------------------------------------------
 {   
-	assert(m_Volume != NULL);
-  mafEventMacro(mafEvent(this,VME_REMOVE,m_Volume));
+	//assert(m_Volume != NULL);
+  //assert(m_Image != NULL);
+  if(m_Image != NULL)
+	  mafEventMacro(mafEvent(this,VME_REMOVE,m_Image));
+  if(m_Volume != NULL)
+    mafEventMacro(mafEvent(this,VME_REMOVE,m_Volume));
 }
 //----------------------------------------------------------------------------
 void mmoDICOMImporter::CreatePipeline()
@@ -436,28 +448,54 @@ void mmoDICOMImporter::BuildVolume()
 	}
 	
   ImportDicomTags();
+  if(m_NumberOfSlices == 1)
+  {
+    //imageCase
+    mafNEW(m_Image);
+    m_Image->GetTagArray()->DeepCopy(m_TagArray);
+	  mafDEL(m_TagArray);
 
-	//Copy inside the first VME item of m_Volume the CT volume and Dicom's tags
-	mafNEW(m_Volume);
-	m_Volume->GetTagArray()->DeepCopy(m_TagArray);
-	mafDEL(m_TagArray);
+    accumulate->Update();
+    m_Image->SetData(m_SliceTexture->GetInput(),0);
 
-	accumulate->Update();
-  m_Volume->SetDataByDetaching(accumulate->GetOutput(),0);
-	
-	mafTagItem tag_Nature;
-	tag_Nature.SetName("VME_NATURE");
-	tag_Nature.SetValue("NATURAL");
-	m_Volume->GetTagArray()->SetTag(tag_Nature);
+    mafTagItem tag_Nature;
+	  tag_Nature.SetName("VME_NATURE");
+	  tag_Nature.SetValue("NATURAL");
+	  m_Image->GetTagArray()->SetTag(tag_Nature);
 
-	mafTagItem tag_Surgeon;
-	tag_Surgeon.SetName("SURGEON_NAME");
-	tag_Surgeon.SetValue(m_SurgeonName.GetCStr());
-	m_Volume->GetTagArray()->SetTag(tag_Surgeon);
+	  mafTagItem tag_Surgeon;
+	  tag_Surgeon.SetName("SURGEON_NAME");
+	  tag_Surgeon.SetValue(m_SurgeonName.GetCStr());
+	  m_Image->GetTagArray()->SetTag(tag_Surgeon);
 
-	//Nome VME = CTDir + IDStudio
-	wxString name = m_CTDir + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());			
-	m_Volume->SetName(name.c_str());
+	  //Nome VME = CTDir + IDStudio
+	  wxString name = m_CTDir + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());			
+	  m_Image->SetName(name.c_str());
+  }
+  else if(m_NumberOfSlices > 1)
+  {
+	  //Copy inside the first VME item of m_Volume the CT volume and Dicom's tags
+	  mafNEW(m_Volume);
+	  m_Volume->GetTagArray()->DeepCopy(m_TagArray);
+	  mafDEL(m_TagArray);
+
+	  accumulate->Update();
+    m_Volume->SetDataByDetaching(accumulate->GetOutput(),0);
+	  
+	  mafTagItem tag_Nature;
+	  tag_Nature.SetName("VME_NATURE");
+	  tag_Nature.SetValue("NATURAL");
+	  m_Volume->GetTagArray()->SetTag(tag_Nature);
+
+	  mafTagItem tag_Surgeon;
+	  tag_Surgeon.SetName("SURGEON_NAME");
+	  tag_Surgeon.SetValue(m_SurgeonName.GetCStr());
+	  m_Volume->GetTagArray()->SetTag(tag_Surgeon);
+
+	  //Nome VME = CTDir + IDStudio
+	  wxString name = m_CTDir + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());			
+	  m_Volume->SetName(name.c_str());
+  }
 }
 //----------------------------------------------------------------------------
 void mmoDICOMImporter::ImportDicomTags()
@@ -805,7 +843,7 @@ void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event)
           m_PatientName = p_name;
 
         int tmp = m_PatientName.FindChr('^');
-        if(tmp != -1)
+        if(tmp != -1 && tmp >= 0 && tmp < m_PatientName.GetSize())
           m_PatientName[tmp] = ' ';
 
         m_Gui->Update();

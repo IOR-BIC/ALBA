@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-09 13:19:13 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-04-05 08:01:02 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,6 +34,7 @@ class vtkActor;
 class vtkWindowLevelLookupTable;
 class mafTagArray;
 class mafVMEVolumeGray;
+class mafVMEImage;
 
 //----------------------------------------------------------------------------
 // constants :
@@ -140,6 +141,7 @@ protected:
 	mafTagArray							 *m_TagArray;
 	mmgDialogPreview				 *m_DicomDialog;
 	mafVMEVolumeGray				 *m_Volume;
+  mafVMEImage              *m_Image;
 
 	double									  m_DicomBounds[6];
 	int											  m_GizmoStatus;
