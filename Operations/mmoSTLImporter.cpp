@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoSTLImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-25 11:55:53 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-04-10 16:07:48 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -94,7 +94,7 @@ void mmoSTLImporter::CheckSwap(const char *file_name)
   if(IsFileBinary(file_name))
   {
     std::ifstream f_in;
-    f_in.open (file_name, ifstream::in| ifstream::binary);
+    f_in.open (file_name, std::ifstream::in| std::ifstream::binary);
 
     //check if the file needs swapping
     //reading the header
