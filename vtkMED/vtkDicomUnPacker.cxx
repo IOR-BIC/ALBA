@@ -11,7 +11,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.2 $");
+vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.3 $");
 vtkStandardNewMacro(vtkDicomUnPacker);
 
 //----------------------------------------------------------------------------
@@ -19,7 +19,9 @@ vtkStandardNewMacro(vtkDicomUnPacker);
 vtkDicomUnPacker::vtkDicomUnPacker()
 //----------------------------------------------------------------------------
 {
-	DebugFlag = 0;
+  setlocale(LC_ALL, "C");
+
+  DebugFlag = 0;
 	FlipImage = 0;
 	Flag      = 0;
   DictionaryRead = false;
