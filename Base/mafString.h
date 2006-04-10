@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 16:10:45 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2006-04-10 16:07:22 $
+  Version:   $Revision: 1.16 $
   Authors:   originally based on vtkString (www.vtk.org), rewritten Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -252,14 +252,14 @@ protected:
   /** Allocate space for the internal c-string. */
   int SetSize(mafID size);
 
-//  void Initialize() {m_CStr=NULL;m_ConstCStr="";m_Size=0;};
+  void Initialize() {m_CStr=NULL;m_ConstCStr="";m_Size=0;};
 
   char *m_CStr;
   const char *m_ConstCStr;
   mafID m_Size;
 };
 
-/** this string class is thought to simply wrap a c-string: no memory copy. */
+// this string class is thought to simply wrap a c-string: no memory copy.
 class mafCString : public mafString
 {
 public:
