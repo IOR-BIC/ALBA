@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTransformInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-07 15:07:37 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-04-11 10:47:28 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -201,7 +201,7 @@ void mmoTransformInterface::OpDo()
   
       //mafProgressBarShowMacro();
       //mafProgressBarSetTextMacro("Applying scaling to data...");
-      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_TEXT));
+      //mafEventMacro(mafEvent(this,PROGRESSBAR_SET_TEXT,&mafString("transform")));
       long progress = 0;
 
       vtkRectilinearGrid *currentRG = vtkRectilinearGrid::SafeDownCast(((mafVME *)m_Input)->GetOutput()->GetVTKData());
