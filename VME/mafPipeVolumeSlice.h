@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-07 09:15:50 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-05-03 10:20:19 $
+  Version:   $Revision: 1.17 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -126,7 +126,7 @@ protected:
   mmgFloatSlider *m_SliceSlider[3];
   vtkMAFAssembly *m_AssemblyUsed;
 
-	vtkVolumeSlicer				 *m_SlicerImage[3];
+  vtkVolumeSlicer				 *m_SlicerImage[3];
 	vtkVolumeSlicer				 *m_SlicerPolygonal[3];
 	vtkImageData					 *m_Image[3];
 	vtkTexture						 *m_Texture[3];

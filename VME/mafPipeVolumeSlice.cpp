@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-16 18:27:41 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2006-05-03 10:20:18 $
+  Version:   $Revision: 1.27 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -72,7 +72,7 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
   m_ShowVolumeBox               = false;
   
   m_AssemblyUsed = NULL;
-  m_ColorLUT = NULL;
+  m_ColorLUT  = NULL;
   m_CustomColorLUT = NULL;
 
   m_SliceDirection  = SLICE_Z;
@@ -124,6 +124,7 @@ void mafPipeVolumeSlice::InitializeSliceParameters(int direction, double slice_o
 //----------------------------------------------------------------------------
 {
   m_SliceParametersInitialized = true;
+  
   m_SliceDirection= direction;
   m_ShowVolumeBox = show_vol_bbox;
 
@@ -289,15 +290,17 @@ void mafPipeVolumeSlice::CreateSlice(int direction)
 //  m_SlicerPolygonal[direction]->SetSliceTransform(m_Vme->GetOutput()->GetAbsTransform()->GetVTKTransform()->GetLinearInverse());
   
 	vtkNEW(m_Image[direction]);
-  m_Image[direction]->SetScalarType(vtk_data->GetPointData()->GetScalars()->GetDataType());
-	m_Image[direction]->SetNumberOfScalarComponents(vtk_data->GetPointData()->GetScalars()->GetNumberOfComponents());
+  //m_Image[direction]->SetScalarType(vtk_data->GetPointData()->GetScalars()->GetDataType());
+  m_Image[direction]->SetScalarTypeToUnsignedChar();
+	//m_Image[direction]->SetNumberOfScalarComponents(vtk_data->GetPointData()->GetScalars()->GetNumberOfComponents());
+  m_Image[direction]->SetNumberOfScalarComponents(3);
 	m_Image[direction]->SetExtent(0, m_TextureRes - 1, 0, m_TextureRes - 1, 0, 0);
 	m_Image[direction]->SetSpacing(xspc, yspc, 1.f);
 
 	m_SlicerImage[direction]->SetOutput(m_Image[direction]);
+  m_SlicerImage[direction]->Update();
   m_SlicerImage[direction]->SetWindow(w);
   m_SlicerImage[direction]->SetLevel(l);
-	m_SlicerImage[direction]->Update();
 
 	vtkNEW(m_Texture[direction]);
 	m_Texture[direction]->RepeatOff();
@@ -305,7 +308,7 @@ void mafPipeVolumeSlice::CreateSlice(int direction)
 	m_Texture[direction]->SetQualityTo32Bit();
 	m_Texture[direction]->SetInput(m_Image[direction]);
   m_Texture[direction]->SetLookupTable(m_ColorLUT);
-  m_Texture[direction]->MapColorScalarsThroughLookupTableOn();
+  //m_Texture[direction]->MapColorScalarsThroughLookupTableOn();
 
   vtkNEW(m_SlicePolydata[direction]);
 	m_SlicerPolygonal[direction]->SetOutput(m_SlicePolydata[direction]);
@@ -314,7 +317,7 @@ void mafPipeVolumeSlice::CreateSlice(int direction)
 
 	vtkNEW(m_SliceMapper[direction]);
 	m_SliceMapper[direction]->SetInput(m_SlicePolydata[direction]);
-	m_SliceMapper[direction]->ScalarVisibilityOn();
+	m_SliceMapper[direction]->ScalarVisibilityOff();
 
 	vtkNEW(m_SliceActor[direction]);
 	m_SliceActor[direction]->SetMapper(m_SliceMapper[direction]);
@@ -369,8 +372,11 @@ void mafPipeVolumeSlice::SetLutRange(double low, double high)
 	{
 		if(m_SlicerImage[i])
 		{
-      m_Texture[i]->GetLookupTable()->SetRange(low,high);
-      m_Texture[i]->GetLookupTable()->Build();
+      m_SlicerImage[i]->SetWindow(high-low);
+      m_SlicerImage[i]->SetLevel((low+high)*.5);
+      m_SlicerImage[i]->Update();
+      //m_Texture[i]->GetLookupTable()->SetRange(low,high);
+      //m_Texture[i]->GetLookupTable()->Build();
 		}
 	}
 }
