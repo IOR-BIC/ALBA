@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkHistogram.cxx,v $
   Language:  C++
-  Date:      $Date: 2006-03-10 15:19:33 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-05-03 09:45:54 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
   Project:   MultiMod Project
 
@@ -32,7 +32,7 @@
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
 
-vtkCxxRevisionMacro(vtkHistogram, "$Revision: 1.2 $");
+vtkCxxRevisionMacro(vtkHistogram, "$Revision: 1.3 $");
 vtkStandardNewMacro(vtkHistogram);
 //------------------------------------------------------------------------------
 vtkHistogram::vtkHistogram()
@@ -213,13 +213,17 @@ void vtkHistogram::HistogramUpdate(vtkRenderer *ren)
   Accumulate->SetComponentSpacing(srw/NumberOfBins,0,0); // bins maps all the Scalars Range
   Accumulate->Update();
 
-  double acc_min[3], acc_max[3];
+  double acc_min[3];
+  double acc_max[3];
   Accumulate->GetMin(acc_min);
   Accumulate->GetMax(acc_max);
 
+
   if (AutoscaleHistogram)
   {
-    ScaleFactor = .05 / Accumulate->GetMean()[0];
+    double mean = Accumulate->GetMean()[0];
+    if (mean < 0) mean = -mean;
+    ScaleFactor = .05 / mean;
   }
 
   ChangeInfo->SetInput(Accumulate->GetOutput());
@@ -234,7 +238,9 @@ void vtkHistogram::HistogramUpdate(vtkRenderer *ren)
   {
     if (AutoscaleHistogram)
     {
-      ScaleFactor = .5 / log(1 + Accumulate->GetMean()[0]);
+      double mean = Accumulate->GetMean()[0];
+      if (mean < 0) mean = -mean;
+      ScaleFactor = .5 / log(1 + mean);
     }
     Glyph->SetInput(LogScale->GetOutput());
   }
