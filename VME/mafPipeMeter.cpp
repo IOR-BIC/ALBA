@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-23 12:00:34 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2006-05-04 11:49:58 $
+  Version:   $Revision: 1.16 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -333,6 +333,7 @@ void mafPipeMeter::UpdateProperty(bool fromTag)
   }
 
   double distance_value = m_MeterVME->GetDistance();
+  if(m_MeterVME->GetMeterMode() == mafVMEMeter::LINE_ANGLE) distance_value = m_MeterVME->GetAngle();
   distance_value = RoundValue(distance_value);
   wxString dis;
   dis = wxString::Format("%g",distance_value);
@@ -377,7 +378,7 @@ void mafPipeMeter::UpdateProperty(bool fromTag)
   m_Caption->SetAttachmentPoint(pos[0],pos[1],pos[2]);
 
   GetGui()->Update();
-
+  
   /*
 	if(fromTag)
   {
