@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgListCtrl.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 12:03:07 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-05-04 11:48:41 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,10 +43,10 @@ mmgListCtrl::mmgListCtrl( wxWindow* parent,wxWindowID id, bool CloseButton, bool
   m_Listener = NULL;
 
   m_images = new wxImageList(15,15,FALSE,4);
-  m_images->Add(mafPics.GetBmp("PIC_NODE_YELLOW"));
-  m_images->Add(mafPics.GetBmp("PIC_NODE_GRAY"));
-  m_images->Add(mafPics.GetBmp("PIC_NODE_RED"));
-  m_images->Add(mafPics.GetBmp("PIC_NODE_BLUE"));
+  m_images->Add(mafPics.GetBmp("NODE_YELLOW"));
+  m_images->Add(mafPics.GetBmp("NODE_GRAY"));
+  m_images->Add(mafPics.GetBmp("NODE_RED"));
+  m_images->Add(mafPics.GetBmp("NODE_BLUE"));
 
   m_list = new wxListCtrl(this,ID_LIST,wxDefaultPosition,wxSize(100,100) ,wxLC_REPORT);
   
