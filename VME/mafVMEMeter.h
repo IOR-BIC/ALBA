@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-15 15:29:05 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2006-05-04 11:50:45 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -63,6 +63,7 @@ public:
     ID_START_METER_LINK = Superclass::ID_LAST,
     ID_END1_METER_LINK,
     ID_END2_METER_LINK,
+	  ID_METER_MODE,
     ID_LAST
   };
 

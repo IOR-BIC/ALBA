@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-15 15:30:16 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2006-05-04 11:50:45 $
+  Version:   $Revision: 1.22 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -83,7 +83,7 @@ mafVMEMeter::mafVMEMeter()
   mafDataPipeCustom *dpipe = mafDataPipeCustom::New();
   dpipe->SetDependOnAbsPose(true);
   SetDataPipe(dpipe);
-  dpipe->SetInput(m_LineSource->GetOutput());
+  dpipe->SetInput(m_Goniometer->GetOutput());
 }
 //-------------------------------------------------------------------------
 mafVMEMeter::~mafVMEMeter()
@@ -273,9 +273,13 @@ void mafVMEMeter::InternalUpdate()
       double local_end[3];
       m_TmpTransform->TransformPoint(m_EndPoint,local_end);
 
+      m_LineSource2->SetPoint1(local_start[0],local_start[1],local_start[2]);
+      m_LineSource2->SetPoint2(local_start[0],local_start[1],local_start[2]);
+      m_LineSource2->Update();
       m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
       m_LineSource->SetPoint2(local_end[0],local_end[1],local_end[2]);
       m_LineSource->Update();
+      m_Goniometer->Modified();
     }
     else
       m_Distance = -1;
@@ -398,6 +402,8 @@ void mafVMEMeter::InternalUpdate()
       m_LineSource2->SetPoint1(local_p1);
       m_LineSource2->SetPoint2(local_p2);
       m_LineSource2->Update();
+
+      m_Goniometer->Modified();
     }
     else
       m_Distance = -1;
@@ -519,6 +525,8 @@ void mafVMEMeter::InternalUpdate()
       m_LineSource2->SetPoint1(local_start);
       m_LineSource2->SetPoint2(local_end2);
       m_LineSource2->Update();
+
+      m_Goniometer->Modified();
     }
     else
       m_Angle = 0;
@@ -722,8 +730,15 @@ mmgGui* mafVMEMeter::CreateGui()
 //-------------------------------------------------------------------------
 {
   mafID sub_id = -1;
+  
+
+  int num_mode = 3;
+  const wxString mode_choices_string[] = {"point distance", "line distance", "line angle"};
+
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
+  m_Gui->Divider();
+  m_Gui->Combo(ID_METER_MODE,"mode",&(GetMeterAttributes()->m_MeterMode),num_mode,mode_choices_string,"Choose the meter mode");
   m_Gui->Divider();
   mafVME *start_vme = GetStartVME();
   if (start_vme && start_vme->IsMAFType(mafVMELandmarkCloud))
@@ -754,6 +769,9 @@ mmgGui* mafVMEMeter::CreateGui()
   else
     m_EndVme2Name = end_vme2 ? end_vme2->GetName() : "none";
   m_Gui->Button(ID_END2_METER_LINK,&m_EndVme2Name,"End 2", "Select the vme representing \nthe point for line distance");
+
+  if(GetMeterAttributes()->m_MeterMode == POINT_DISTANCE)
+    m_Gui->Enable(ID_END2_METER_LINK,false);
 
   return m_Gui;
 }
@@ -799,6 +817,27 @@ void mafVMEMeter::OnEvent(mafEventBase *maf_event)
         }
       }
       break;
+	  case ID_METER_MODE:
+	  {
+		  if(GetMeterAttributes()->m_MeterMode == POINT_DISTANCE)
+		  {  
+        m_Gui->Enable(ID_END2_METER_LINK,false);
+		  }
+		  else if(GetMeterAttributes()->m_MeterMode ==  LINE_DISTANCE)
+		  { 
+			  m_Gui->Enable(ID_END2_METER_LINK,true);
+		  }
+		  else if(GetMeterAttributes()->m_MeterMode ==  LINE_ANGLE)
+		  {       
+			  m_Gui->Enable(ID_END2_METER_LINK,true);
+		  }
+      this->Modified();
+      mafID button_id = e->GetId();
+      e->SetId(CAMERA_UPDATE);
+      ForwardUpEvent(e);
+     
+	  }
+	  break;
       default:
         mafNode::OnEvent(maf_event);
     }
