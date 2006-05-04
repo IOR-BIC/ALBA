@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-15 15:25:52 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-05-04 11:51:11 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -46,8 +46,13 @@ mmgGui *mafVMEOutputMeter::CreateGui()
 {
   assert(m_Gui == NULL);
   m_Gui = mafVMEOutput::CreateGui();
+  
   m_Distance = ((mafVMEMeter *)m_VME)->GetDistance();
   m_Gui->Label("distance: ", &m_Distance, true);
+
+  m_Angle = ((mafVMEMeter *)m_VME)->GetAngle();
+  m_Gui->Label("angle: ", &m_Angle, true);
+
   return m_Gui;
 }
 //-------------------------------------------------------------------------
@@ -56,7 +61,17 @@ void mafVMEOutputMeter::Update()
 {
   assert(m_VME);
   m_VME->Update();
+
+  if(((mafVMEMeter *)m_VME)->GetMeterMode() == mafVMEMeter::POINT_DISTANCE || ((mafVMEMeter *)m_VME)->GetMeterMode() == mafVMEMeter::LINE_DISTANCE)
+  {
   m_Distance = ((mafVMEMeter *)m_VME)->GetDistance();
+  m_Angle ="";
+  }
+  else if(((mafVMEMeter *)m_VME)->GetMeterMode() == mafVMEMeter::LINE_ANGLE)
+  {
+    m_Distance ="";
+    m_Angle= ((mafVMEMeter *)m_VME)->GetAngle();
+  }
   if (m_Gui)
   {
     m_Gui->Update();

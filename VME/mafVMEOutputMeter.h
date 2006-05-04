@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-21 13:15:43 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-05-04 11:51:11 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -39,6 +39,7 @@ protected:
   mmgGui *CreateGui();
 
   mafString m_Distance;
+  mafString m_Angle;
 
 private:
   mafVMEOutputMeter(const mafVMEOutputMeter&); // Not implemented
