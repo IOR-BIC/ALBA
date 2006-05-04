@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-16 09:18:08 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2006-05-04 11:47:46 $
+  Version:   $Revision: 1.24 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -67,7 +67,6 @@ mafViewCompound::~mafViewCompound()
     cppDEL(m_ChildViewList[cv]);
   }
   m_PluggedChildViewList.clear();
-  m_ChildViewList.clear();
   m_ChildViewList.clear();
 }
 //----------------------------------------------------------------------------
