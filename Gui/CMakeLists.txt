@@ -28,6 +28,8 @@ SET(PROJECT_SRCS
   mmgCrossSplitter.h
   mmgDialog.cpp
   mmgDialog.h
+  mmgDictionaryWidget.cpp
+  mmgDictionaryWidget.h
   mmgFileHistory.cpp
   mmgFileHistory.h
   mmgFlagSplitter.cpp
