@@ -116,6 +116,8 @@ IF (MAF_USE_VTK)
   mafPipeBox.h
   mmaMaterial.cpp
   mmaMaterial.h
+  mmaVolumeMaterial.cpp
+  mmaVolumeMaterial.h
   )
 ENDIF (MAF_USE_VTK)
 
