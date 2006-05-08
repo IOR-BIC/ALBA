@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-03 10:20:18 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2006-05-08 14:41:03 $
+  Version:   $Revision: 1.28 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,13 +21,12 @@
 
 #include "mafPipeVolumeSlice.h"
 #include "mafDecl.h"
-#include "mmgLutPreset.h"
 #include "mmgGui.h"
-#include "mmgMaterialButton.h"
 #include "mafSceneNode.h"
 #include "mafVMEVolume.h"
 #include "mafVMEOutputVolume.h"
 #include "mafTransformBase.h"
+#include "mmaVolumeMaterial.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFAssembly.h"
@@ -164,13 +163,11 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
   m_Vme->GetOutput()->GetVTKData()->Update();
   m_Vme->GetOutput()->GetVMELocalBounds(b);
 
-  double srange[2];
-  m_Vme->GetOutput()->GetVTKData()->GetScalarRange(srange);
+  mmaVolumeMaterial *material = ((mafVMEVolume *)m_Vme)->GetMaterial();
+  m_Vme->GetOutput()->GetVTKData()->GetScalarRange(material->m_TableRange);
   
-  vtkNEW(m_ColorLUT);
-  m_ColorLUT->SetRange(srange);
-  m_ColorLUT->Build();
-  lutPreset(4,m_ColorLUT);
+  m_ColorLUT = material->m_ColorLut;
+  material->UpdateProp();
 
 	if(m_SliceDirection == SLICE_ARB)
 		m_SliceDirection = SLICE_X;
@@ -267,15 +264,16 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 void mafPipeVolumeSlice::CreateSlice(int direction)
 //----------------------------------------------------------------------------
 {
-	double srange[2],w,l, xspc = 0.33, yspc = 0.33;
+	double xspc = 0.33, yspc = 0.33;
 
+//  mmaVolumeMaterial *material = ((mafVMEVolume *)m_Vme)->GetMaterial();
   vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();
   vtk_data->Update();
-  vtk_data->GetScalarRange(srange);
+/*  vtk_data->GetScalarRange(material->m_TableRange);
 
-	w = srange[1] - srange[0];
-	l = (srange[1] + srange[0]) * 0.5;
-
+  material->m_Level_LUT = (material->m_TableRange[1] + material->m_TableRange[0]) * 0.5;
+  material->m_Window_LUT = material->m_TableRange[1] - material->m_TableRange[0];
+*/
 	vtkNEW(m_SlicerPolygonal[direction]);
 	vtkNEW(m_SlicerImage[direction]);
 	m_SlicerImage[direction]->SetPlaneOrigin(m_Origin[0], m_Origin[1], m_Origin[2]);
@@ -290,17 +288,17 @@ void mafPipeVolumeSlice::CreateSlice(int direction)
 //  m_SlicerPolygonal[direction]->SetSliceTransform(m_Vme->GetOutput()->GetAbsTransform()->GetVTKTransform()->GetLinearInverse());
   
 	vtkNEW(m_Image[direction]);
-  //m_Image[direction]->SetScalarType(vtk_data->GetPointData()->GetScalars()->GetDataType());
-  m_Image[direction]->SetScalarTypeToUnsignedChar();
-	//m_Image[direction]->SetNumberOfScalarComponents(vtk_data->GetPointData()->GetScalars()->GetNumberOfComponents());
-  m_Image[direction]->SetNumberOfScalarComponents(3);
+  m_Image[direction]->SetScalarType(vtk_data->GetPointData()->GetScalars()->GetDataType());
+  //m_Image[direction]->SetScalarTypeToUnsignedChar();
+	m_Image[direction]->SetNumberOfScalarComponents(vtk_data->GetPointData()->GetScalars()->GetNumberOfComponents());
+  //m_Image[direction]->SetNumberOfScalarComponents(3);
 	m_Image[direction]->SetExtent(0, m_TextureRes - 1, 0, m_TextureRes - 1, 0, 0);
 	m_Image[direction]->SetSpacing(xspc, yspc, 1.f);
 
 	m_SlicerImage[direction]->SetOutput(m_Image[direction]);
   m_SlicerImage[direction]->Update();
-  m_SlicerImage[direction]->SetWindow(w);
-  m_SlicerImage[direction]->SetLevel(l);
+//  m_SlicerImage[direction]->SetWindow(w);
+//  m_SlicerImage[direction]->SetLevel(l);
 
 	vtkNEW(m_Texture[direction]);
 	m_Texture[direction]->RepeatOff();
@@ -308,7 +306,7 @@ void mafPipeVolumeSlice::CreateSlice(int direction)
 	m_Texture[direction]->SetQualityTo32Bit();
 	m_Texture[direction]->SetInput(m_Image[direction]);
   m_Texture[direction]->SetLookupTable(m_ColorLUT);
-  //m_Texture[direction]->MapColorScalarsThroughLookupTableOn();
+  m_Texture[direction]->MapColorScalarsThroughLookupTableOn();
 
   vtkNEW(m_SlicePolydata[direction]);
 	m_SlicerPolygonal[direction]->SetOutput(m_SlicePolydata[direction]);
@@ -355,7 +353,7 @@ mafPipeVolumeSlice::~mafPipeVolumeSlice()
 		vtkDEL(m_SlicePolydata[i]);
 		vtkDEL(m_SliceActor[i]);
 	}
-  vtkDEL(m_ColorLUT);
+  //vtkDEL(m_ColorLUT);
 	vtkDEL(m_VolumeBox);
 	vtkDEL(m_VolumeBoxMapper);
 	vtkDEL(m_VolumeBoxActor);
@@ -368,7 +366,14 @@ mafPipeVolumeSlice::~mafPipeVolumeSlice()
 void mafPipeVolumeSlice::SetLutRange(double low, double high)
 //----------------------------------------------------------------------------
 {
-	for(int i=0;i<3;i++)
+	mmaVolumeMaterial *material = ((mafVMEVolume *)m_Vme)->GetMaterial();
+  material->m_Window_LUT = high-low;
+  material->m_Level_LUT  = (low+high)*.5;
+  material->m_TableRange[0] = low;
+  material->m_TableRange[1] = high;
+  material->UpdateProp();
+  /*
+  for(int i=0;i<3;i++)
 	{
 		if(m_SlicerImage[i])
 		{
@@ -378,16 +383,19 @@ void mafPipeVolumeSlice::SetLutRange(double low, double high)
       //m_Texture[i]->GetLookupTable()->SetRange(low,high);
       //m_Texture[i]->GetLookupTable()->Build();
 		}
-	}
+	}*/
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeSlice::GetLutRange(double range[2])
 //----------------------------------------------------------------------------
 {
+  mmaVolumeMaterial *material = ((mafVMEVolume *)m_Vme)->GetMaterial();
+  material->m_ColorLut->GetTableRange(range);
+  /*
 	if(m_SliceDirection != SLICE_ORTHO)
     m_Texture[m_SliceDirection]->GetLookupTable()->GetRange();
 	else
-    m_Texture[0]->GetLookupTable()->GetRange();
+    m_Texture[0]->GetLookupTable()->GetRange();*/
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeSlice::SetSlice(double origin[3], float xVect[3], float yVect[3])
