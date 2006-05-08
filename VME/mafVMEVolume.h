@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEVolume.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-07 14:43:26 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-05-08 14:40:25 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,6 +21,7 @@
 //----------------------------------------------------------------------------
 class vtkDataSet;
 class vtkVolumeData;
+class mmaVolumeMaterial;
 
 /** mafVMEVolume - a VME featuring an internal array for matrices and VTK datasets.
   mafVMEVolume is a specialized VME inheriting the VME-Generic features to internally
@@ -44,12 +45,18 @@ public:
   /** return icon */
   static char** GetIcon();
 
+  /** Return pointer to material attribute. */
+  mmaVolumeMaterial *GetMaterial();
+
   /** Return the suggested pipe-typename for the visualization of this vme */
   virtual mafString GetVisualPipe() {return mafString("mafPipeBox");};
 
 protected:
   mafVMEVolume();
   virtual ~mafVMEVolume();
+
+  /** used to initialize and create the material attribute if not yet present */
+  virtual int InternalInitialize();
 
 private:
   mafVMEVolume(const mafVMEVolume&); // Not implemented

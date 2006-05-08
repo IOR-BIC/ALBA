@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:05:14 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-05-08 14:40:25 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,6 +25,8 @@
 #include "mafVTKInterpolator.h"
 #include "mafVMEItemVTK.h"
 #include "mafAbsMatrixPipe.h"
+#include "mmaVolumeMaterial.h"
+
 #include "vtkDataSet.h"
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
@@ -46,6 +48,18 @@ mafVMEVolume::~mafVMEVolume()
   // data vector destroyed in mafVMEGeneric
 }
 
+//-------------------------------------------------------------------------
+int mafVMEVolume::InternalInitialize()
+//-------------------------------------------------------------------------
+{
+  if (Superclass::InternalInitialize()==MAF_OK)
+  {
+    // force material allocation
+    GetMaterial();
+    return MAF_OK;
+  }
+  return MAF_ERROR;
+}
 
 //-------------------------------------------------------------------------
 mafVMEOutput *mafVMEVolume::GetOutput()
@@ -57,6 +71,22 @@ mafVMEOutput *mafVMEVolume::GetOutput()
     SetOutput(mafVMEOutputVolume::New()); // create the output
   }
   return m_Output;
+}
+//-------------------------------------------------------------------------
+mmaVolumeMaterial *mafVMEVolume::GetMaterial()
+//-------------------------------------------------------------------------
+{
+  mmaVolumeMaterial *material = (mmaVolumeMaterial *)GetAttribute("VolumeMaterialAttributes");
+  if (material == NULL)
+  {
+    material = mmaVolumeMaterial::New();
+    SetAttribute("VolumeMaterialAttributes", material);
+    if (m_Output)
+    {
+      ((mafVMEOutputVolume *)m_Output)->SetMaterial(material);
+    }
+  }
+  return material;
 }
 
 //-------------------------------------------------------------------------

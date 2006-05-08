@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-21 12:19:09 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-05-08 14:40:25 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,6 +27,7 @@
 #include "mafVMEVolumeGray.h"
 #include "mafDataPipe.h"
 #include "mmgGui.h"
+#include "mmaVolumeMaterial.h"
 
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
@@ -42,6 +43,7 @@ mafCxxTypeMacro(mafVMEOutputVolume)
 mafVMEOutputVolume::mafVMEOutputVolume()
 //-------------------------------------------------------------------------
 {
+  m_Material = NULL;
 }
 
 //-------------------------------------------------------------------------
@@ -68,6 +70,23 @@ vtkUnstructuredGrid *mafVMEOutputVolume::GetUnstructuredData()
 //-------------------------------------------------------------------------
 {
   return vtkUnstructuredGrid::SafeDownCast(GetVTKData());
+}
+//-------------------------------------------------------------------------
+mmaVolumeMaterial *mafVMEOutputVolume::GetMaterial()
+//-------------------------------------------------------------------------
+{
+  // if the VME set the material directly in the output return it
+  if (m_Material)
+    return  m_Material;
+
+  // search for a material attribute in the VME connected to this output
+  return GetVME() ? mmaVolumeMaterial::SafeDownCast(GetVME()->GetAttribute("VolumeMaterialAttributes")) : NULL;
+}
+//-------------------------------------------------------------------------
+void mafVMEOutputVolume::SetMaterial(mmaVolumeMaterial *material)
+//-------------------------------------------------------------------------
+{
+  m_Material = material;
 }
 
 //-------------------------------------------------------------------------

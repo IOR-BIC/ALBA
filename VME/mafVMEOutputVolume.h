@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputVolume.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-21 12:19:09 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-05-08 14:40:25 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,6 +21,7 @@
 class vtkImageData;
 class vtkRectilinearGrid;
 class vtkUnstructuredGrid;
+class mmaVolumeMaterial;
 
 /** NULL output for VME node with a VTK image output data.
   mafVMEOutputVolume is the output produced by a node generating an output
@@ -42,12 +43,20 @@ public:
   /** return the output data casting to vtkUnstructuredGrid */
   virtual vtkUnstructuredGrid *GetUnstructuredData();
 
+  /** return material attribute of this surface if present */
+  mmaVolumeMaterial *GetMaterial();
+
+  /** set the material of the surface */ 
+  void SetMaterial(mmaVolumeMaterial *material);
+
   /** Update all the output data structures (data, bounds, matrix and abs matrix).*/
   virtual void Update();
 
 protected:
   mafString m_VolumeBounds[3];
   mafString m_ScaralRangeString;
+  mmaVolumeMaterial *m_Material;
+
   mmgGui *CreateGui();
 
 private:
