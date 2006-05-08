@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-02 22:00:14 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-05-08 14:43:01 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -220,6 +220,7 @@ void mmgLutEditor::OnComboSelection(wxCommandEvent &event)
 	m_NumEntry      = m_Lut->GetNumberOfTableValues();
 	m_LutWidget->SetLut(m_Lut);
 	m_LutSwatch->SetLut(m_Lut);
+  TransferDataToWindow();
 }
 
 //----------------------------------------------------------------------------
