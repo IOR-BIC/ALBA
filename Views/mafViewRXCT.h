@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-07 15:09:35 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-05-08 15:49:42 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,6 +25,7 @@ class mafViewRX;
 class mafVMEVolume;
 class vtkLookupTable;
 class mafGizmoSlice;
+class mmgLutSwatch;
 
 //----------------------------------------------------------------------------
 // mafViewRXCT :
@@ -44,6 +45,9 @@ public:
   /** 
   Show/Hide VMEs into plugged sub-views*/
   virtual void VmeShow(mafNode *node, bool show);
+
+  /** Remove VME into plugged sub-views*/
+  virtual void VmeRemove(mafNode *node);
 
   /** 
   Create visual pipe and initialize them to build an RXCT visualization */
@@ -85,6 +89,7 @@ protected:
 
   mafGizmoSlice   *m_Gizmo[6];
   mafVMEVolume    *m_CurrentVolume; ///< Current visualized volume
+  mmgLutSwatch    *m_LutSwatch;
   vtkLookupTable  *m_ColorLUT;
   mafViewRX       *m_ViewsRX[2];
   mafViewCompound *m_ViewCT;

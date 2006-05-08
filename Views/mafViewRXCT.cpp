@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-07 18:57:51 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-05-08 15:49:42 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,8 +26,10 @@
 #include "mafPipeVolumeSlice.h"
 #include "mmgLutPreset.h"
 #include "mmgGui.h"
-#include "mafVMEVolume.h"
+#include "mmgLutSwatch.h"
 #include "mafGizmoSlice.h"
+#include "mmaVolumeMaterial.h"
+#include "mafVMEVolume.h"
 
 #include "vtkDataSet.h"
 #include "vtkLookupTable.h"
@@ -55,8 +57,9 @@ mafViewRXCT::mafViewRXCT(wxString label)
 
   for(int j=0; j<6; j++) m_Gizmo[j] = NULL;
 
-  m_ViewCT = NULL;
-  m_ColorLUT= NULL;
+  m_ViewCT    = NULL;
+  m_ColorLUT  = NULL;
+  m_LutSwatch = NULL;
   m_CurrentVolume = NULL;
   m_LayoutConfiguration = LAYOUT_CUSTOM;
 
@@ -69,8 +72,6 @@ mafViewRXCT::~mafViewRXCT()
   m_ViewsRX[0] = NULL;
   m_ViewsRX[1] = NULL;
   m_ViewCT = NULL;
-
-  vtkDEL(m_ColorLUT);
 }
 //----------------------------------------------------------------------------
 mafView *mafViewRXCT::Copy(mafObserver *Listener)
@@ -98,16 +99,15 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
   {
     if (show)
     {
-      double sr[2],center[3],b[6],step;
+      double center[3],b[6],step;
       vtkDataSet *data = ((mafVME *)node)->GetOutput()->GetVTKData();
+      mmaVolumeMaterial *material = ((mafVMEVolume *)node)->GetMaterial();
+      m_ColorLUT = material->m_ColorLut;
+      m_LutSwatch->SetLut(m_ColorLUT);
       data->Update();
       data->GetCenter(center);
       data->GetBounds(b);
       step = (b[5]-b[4])/7.0;
-      data->GetScalarRange(sr);
-      m_ColorLUT->SetRange(sr);
-      m_ColorLUT->Build();
-      lutPreset(4,m_ColorLUT);
       for(int i=0; i<6; i++)
       {
         center[2] = b[5]-step*(i+1);
@@ -122,7 +122,6 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
     }
     else
     {
-      lutPreset(4,m_ColorLUT);
       m_ChildViewList[2]->VmeShow(node, show);
       m_CurrentVolume = NULL;
       GizmoDelete();
@@ -134,6 +133,17 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
   }
 
   EnableWidgets(m_CurrentVolume != NULL);
+}
+//----------------------------------------------------------------------------
+void mafViewRXCT::VmeRemove(mafNode *node)
+//----------------------------------------------------------------------------
+{
+  if (m_CurrentVolume && node == m_CurrentVolume) 
+  {
+    m_CurrentVolume = NULL;
+    GizmoDelete();
+  }
+  Superclass::VmeRemove(node);
 }
 //----------------------------------------------------------------------------
 void mafViewRXCT::OnEvent(mafEventBase *maf_event)
@@ -210,18 +220,9 @@ mmgGui* mafViewRXCT::CreateGui()
   m_Gui = new mmgGui(this);
   m_Gui->Bool(ID_MOVE_ALL_SLICES,"move all",&m_MoveAllSlices);
 
-  if (m_ColorLUT == NULL)
-  {
-    vtkNEW(m_ColorLUT);
-  }
-  lutPreset(4,m_ColorLUT);
-  m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
+  m_LutSwatch = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
 
   EnableWidgets(m_CurrentVolume != NULL);
-/*  for(int i=1; i<m_NumOfChildView; i++)
-  {
-    m_ChildViewList[i]->GetGui();
-  }*/
   int sub_gui;
   for (sub_gui=0; sub_gui<2; sub_gui++) 
   {
