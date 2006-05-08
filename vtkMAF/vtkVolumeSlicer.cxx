@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkVolumeSlicer.cxx,v $
   Language:  C++
-  Date:      $Date: 2006-03-16 14:00:21 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-05-08 14:38:59 $
+  Version:   $Revision: 1.12 $
 
 =========================================================================*/
 #include "vtkObjectFactory.h"
@@ -12,7 +12,7 @@
 #include "vtkRectilinearGrid.h"
 #include "vtkPolyData.h"
 #include "vtkCellArray.h"
-#include "vtkFloatArray.h"
+#include "vtkDoubleArray.h"
 #include "vtkPointData.h"
 #include "vtkLinearTransform.h"
 
@@ -22,19 +22,19 @@
 
 #include "assert.h"
 
-vtkCxxRevisionMacro(vtkVolumeSlicer, "$Revision: 1.11 $");
+vtkCxxRevisionMacro(vtkVolumeSlicer, "$Revision: 1.12 $");
 vtkStandardNewMacro(vtkVolumeSlicer);
 
 typedef unsigned short u_short;
 typedef unsigned char u_char;
 typedef unsigned int u_int;
-
+/*
 inline void clip(float val, float& out) { out = val; }
 inline void clip(float val, char&  out) { int x = float(VTK_CHAR_MAX) * (val - 0.5f); if (x < VTK_CHAR_MIN) out = VTK_CHAR_MIN; else if (x > VTK_CHAR_MAX) out = VTK_CHAR_MAX; else out = char(x); }
-inline void clip(float val, short& out) { int x = float(VTK_SHORT_MAX) * (val - 0.5f);; if (x < VTK_SHORT_MIN) out = VTK_SHORT_MIN; else if (x > VTK_SHORT_MAX) out = VTK_SHORT_MAX; else out = short(x); }
+inline void clip(float val, short& out) { int x = float(VTK_SHORT_MAX) * (val - 0.5f); if (x < VTK_SHORT_MIN) out = VTK_SHORT_MIN; else if (x > VTK_SHORT_MAX) out = VTK_SHORT_MAX; else out = short(x); }
 inline void clip(float val, u_char &  out) { int x = VTK_UNSIGNED_CHAR_MAX * val; if (x < VTK_UNSIGNED_CHAR_MIN) out = VTK_UNSIGNED_CHAR_MIN; else if (x > VTK_UNSIGNED_CHAR_MAX) out = VTK_UNSIGNED_CHAR_MAX; else out = u_char(x); }
 inline void clip(float val, u_short & out) { int x = VTK_UNSIGNED_SHORT_MAX * val; if (x < VTK_UNSIGNED_SHORT_MIN) out = VTK_UNSIGNED_SHORT_MIN; else if (x > VTK_UNSIGNED_SHORT_MAX) out = VTK_UNSIGNED_SHORT_MAX; else out = u_short(x); }
-
+*/
 #define min(x0, x1) (((x0) < (x1)) ? (x0) : (x1))
 #define max(x0, x1) (((x0) > (x1)) ? (x0) : (x1))
 
@@ -435,10 +435,10 @@ void vtkVolumeSlicer::ExecuteData(vtkPolyData *output)
     pointsObj->Delete();
   }
   pointsObj->Allocate(numberOfPoints, 1);
-  vtkFloatArray *tsObj = NULL;//vtkFloatArray::SafeDownCast(output->GetPointData()->GetTCoords());
+  vtkDoubleArray *tsObj = NULL;//vtkDoubleArray::SafeDownCast(output->GetPointData()->GetTCoords());
   if (tsObj == NULL) 
   {
-    tsObj = vtkFloatArray::New();
+    tsObj = vtkDoubleArray::New();
     tsObj->SetNumberOfComponents(2);
   }
   tsObj->Allocate(2 * numberOfPoints, 1);
@@ -717,7 +717,8 @@ template<typename InputDataType, typename OutputDataType> void vtkVolumeSlicer::
         }
 					
         // mapping
-        clip(((sample + shift) * scale), pixel[comp]);
+        //clip(((sample + shift) * scale), pixel[comp]);
+        pixel[comp] = sample;
       }
     }	
   }
