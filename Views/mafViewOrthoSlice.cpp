@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-10 15:21:13 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2006-05-08 14:58:57 $
+  Version:   $Revision: 1.25 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,6 +22,7 @@
 #include "mafViewOrthoSlice.h"
 #include "mafViewSlice.h"
 #include "mafPipeVolumeSlice.h"
+#include "mmgLutSwatch.h"
 #include "mmgLutPreset.h"
 #include "mmgHistogramWidget.h"
 #include "mmgGui.h"
@@ -30,6 +31,7 @@
 #include "mafEventInteraction.h"
 #include "mafEventSource.h"
 
+#include "mmaVolumeMaterial.h"
 #include "mafVMEVolume.h"
 
 #include "vtkDataSet.h"
@@ -66,7 +68,6 @@ mafViewOrthoSlice::~mafViewOrthoSlice()
   {
     m_CurrentVolume->GetEventSource()->RemoveObserver(this);
   }
-  vtkDEL(m_ColorLUT);
 }
 //----------------------------------------------------------------------------
 mafView *mafViewOrthoSlice::Copy(mafObserver *Listener)
@@ -95,16 +96,16 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
     if (show)
     {
       m_CurrentVolume = mafVMEVolume::SafeDownCast(node);
+      mmaVolumeMaterial *material = m_CurrentVolume->GetMaterial();
       double sr[2],center[3];
       vtkDataSet *data = m_CurrentVolume->GetOutput()->GetVTKData();
       data->Update();
       data->GetCenter(center);
       data->GetScalarRange(sr);
+      m_ColorLUT = material->m_ColorLut;
+      m_LutSwatch->SetLut(m_ColorLUT);
       m_Luts->SetRange((long)sr[0],(long)sr[1]);
-      m_Luts->SetSubRange((long)sr[0],(long)sr[1]);
-      m_ColorLUT->SetRange(sr);
-      m_ColorLUT->Build();
-      lutPreset(4,m_ColorLUT);
+      m_Luts->SetSubRange((long)material->m_TableRange[0],(long)material->m_TableRange[1]);
       for(int i=0; i<m_NumOfChildView; i++)
       {
         mafPipeVolumeSlice *p = (mafPipeVolumeSlice *)((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
@@ -123,15 +124,35 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
       {
         m_Histogram->SetData(vol);
       }
+      else
+      {
+        wxMessageBox(_("Unable to show the Histogram for this data type! \n You should resample it into a structured data type."),_("Warning!"));
+        m_Histogram->SetData(NULL);
+        m_Histogram->Refresh();
+      }
     }
     else
     {
       m_CurrentVolume->GetEventSource()->RemoveObserver(this);
       m_CurrentVolume = NULL;
-      lutPreset(4,m_ColorLUT);
+      m_Histogram->SetData(NULL);
+      m_Histogram->Refresh();
     }
   }
   EnableWidgets(m_CurrentVolume != NULL);
+}
+//----------------------------------------------------------------------------
+void mafViewOrthoSlice::VmeRemove(mafNode *node)
+//----------------------------------------------------------------------------
+{
+  if (m_CurrentVolume && node == m_CurrentVolume) 
+  {
+    m_CurrentVolume->GetEventSource()->RemoveObserver(this);
+    m_CurrentVolume = NULL;
+    m_Histogram->SetData(NULL);
+    m_Histogram->Refresh();
+  }
+  Superclass::VmeRemove(node);
 }
 //----------------------------------------------------------------------------
 void mafViewOrthoSlice::CreateGuiView()
@@ -187,8 +208,7 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
         {
           int low, hi;
           m_Luts->GetSubRange(&low,&hi);
-          for(int i=0; i<4; i++) 
-            ((mafViewSlice *)m_ChildViewList[i])->SetLutRange(low, hi);
+          m_ColorLUT->SetRange(low,hi);
           CameraUpdate();
         }
       }
@@ -219,12 +239,6 @@ mmgGui* mafViewOrthoSlice::CreateGui()
   m_SliderY = m_Gui->FloatSlider(ID_ORTHO_SLICE_Y, "y", &m_Origin[1],MINDOUBLE,MAXDOUBLE);
   m_SliderZ = m_Gui->FloatSlider(ID_ORTHO_SLICE_Z, "z", &m_Origin[2],MINDOUBLE,MAXDOUBLE);
 
-  if (m_ColorLUT == NULL)
-  {
-    vtkNEW(m_ColorLUT);
-    m_ColorLUT->Build();
-    lutPreset(4,m_ColorLUT);
-  }
   m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
   m_Gui->Divider(2);
   m_Gui->AddGui(m_Histogram->GetGui());

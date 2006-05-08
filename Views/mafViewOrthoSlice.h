@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-10 15:21:13 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-05-08 14:58:57 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,6 +27,7 @@ class mafViewSlice;
 class mafVMEVolume;
 class vtkLookupTable;
 class mmgHistogramWidget;
+class mmgLutSwatch;
 
 //----------------------------------------------------------------------------
 // mafViewOrthoSlice :
@@ -50,6 +51,9 @@ public:
   /** 
   Show/Hide VMEs into plugged sub-views*/
   virtual void VmeShow(mafNode *node, bool show);
+
+  /** Remove VME into plugged sub-views*/
+  virtual void VmeRemove(mafNode *node);
 
   /** 
   Create visual pipe and initialize them to build an OrthoSlice visualization */
@@ -92,6 +96,7 @@ protected:
   mafVMEVolume *m_CurrentVolume; ///< Current visualized volume
   mmgLutSlider *m_Luts; ///< Double slider used to change brightness and contrast of the image
   mmgHistogramWidget*m_Histogram; ///< Widget in which plot the histogram of the volume
+  mmgLutSwatch *m_LutSwatch;
   vtkLookupTable *m_ColorLUT;
   mafViewSlice *m_Views[4];
 };

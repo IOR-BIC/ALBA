@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeMIP.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-21 15:43:39 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-05-08 14:58:38 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -24,7 +24,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafDecl.h"
 #include "mmgGui.h"
 #include "mmgLutPreset.h"
+
+#include "mmaVolumeMaterial.h"
 #include "mafVME.h"
+#include "mafVMEVolume.h"
 
 #include "vtkMAFAssembly.h"
 #include "vtkMAFSmartPointer.h"
@@ -89,11 +92,12 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
   vtkNEW(m_ColorLUT);
   m_ColorLUT->SetTableRange(sr);
 
-  vtkNEW(m_OpacityTransferFunction);
+  //vtkNEW(m_OpacityTransferFunction);
+  mmaVolumeMaterial *material = ((mafVMEVolume *)m_Vme)->GetMaterial();
+  m_OpacityTransferFunction = material->m_OpacityTransferFunction;
 
   vtkNEW(m_VolumeProperty);
   m_VolumeProperty->SetScalarOpacity(m_OpacityTransferFunction);
-  m_VolumeProperty->ShadeOn();
   m_VolumeProperty->SetInterpolationTypeToLinear();
 
   vtkNEW(m_MIPFunction);
@@ -152,11 +156,9 @@ medPipeVolumeMIP::~medPipeVolumeMIP()
 //----------------------------------------------------------------------------
 {
   m_AssemblyFront->RemovePart(m_VolumeLOD);
-  //m_AssemblyFront->RemovePart(m_SelectionActor);
 
   vtkDEL(m_ColorLUT);
   vtkDEL(m_Caster);
-  vtkDEL(m_OpacityTransferFunction);
   vtkDEL(m_VolumeProperty);
   vtkDEL(m_MIPFunction);
   vtkDEL(m_VolumeMapper);
