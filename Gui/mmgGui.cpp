@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-10 14:28:46 $
-  Version:   $Revision: 1.32 $
+  Date:      $Date: 2006-05-08 14:41:57 $
+  Version:   $Revision: 1.33 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1114,7 +1114,7 @@ void mmgGui::Color(int id,wxString label,wxColour* var, wxString tooltip)
 }
 #ifdef MAF_USE_VTK //:::::::::::::::::::::::::::::::::
 //----------------------------------------------------------------------------
-void mmgGui::Lut(int id,wxString label,vtkLookupTable *lut)
+mmgLutSwatch *mmgGui::Lut(int id,wxString label,vtkLookupTable *lut)
 //----------------------------------------------------------------------------
 {
   wxStaticText	*lab  = new wxStaticText(this, GetId(id), label,dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
@@ -1131,6 +1131,7 @@ void mmgGui::Lut(int id,wxString label,vtkLookupTable *lut)
   sizer->Add( lab,  0, wxRIGHT, LM);
   sizer->Add( luts, 0, wxEXPAND, HM);
   Add(sizer,0,wxALL, M); 
+  return luts;
 }
 #endif             //:::::::::::::::::::::::::::::::::
 
