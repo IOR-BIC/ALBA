@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-08 15:49:42 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-05-09 08:27:13 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -301,11 +301,11 @@ void mafViewRXCT::GizmoCreate()
 void mafViewRXCT::GizmoDelete()
 //----------------------------------------------------------------------------
 {
-  for(int i=0; i<6; i++) 
+  for(int i=0; i<6; i++)
   {
     if(m_Gizmo[i])
     {
-      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(i))->BorderCreate(m_BorderColor[i]);
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(i))->BorderDelete();
       m_ChildViewList[0]->VmeShow(m_Gizmo[i]->GetOutput(),false);
       m_ChildViewList[1]->VmeShow(m_Gizmo[i]->GetOutput(),false);
       cppDEL(m_Gizmo[i]);
