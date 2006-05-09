@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-09 09:21:03 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2006-05-09 10:09:05 $
+  Version:   $Revision: 1.28 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -211,6 +211,8 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
           int low, hi;
           m_Luts->GetSubRange(&low,&hi);
           m_ColorLUT->SetRange(low,hi);
+          mmaVolumeMaterial *material = m_CurrentVolume->GetMaterial();
+          material->UpdateFromTables();
           CameraUpdate();
         }
       }
