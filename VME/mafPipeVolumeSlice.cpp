@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-08 14:41:03 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2006-05-09 09:21:39 $
+  Version:   $Revision: 1.29 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -509,7 +509,11 @@ void mafPipeVolumeSlice::OnEvent(mafEventBase *maf_event)
     switch(e->GetId()) 
     {
       case ID_LUT_CHOOSER:
+      {
+        mmaVolumeMaterial *material = ((mafVMEVolume *)m_Vme)->GetMaterial();
+        material->UpdateFromTables();
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+      }
       break;
       case ID_SLICE_SLIDER_X:
       case ID_SLICE_SLIDER_Y:
