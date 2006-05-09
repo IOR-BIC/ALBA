@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-09 08:27:13 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-05-09 09:21:26 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -155,6 +155,8 @@ void mafViewRXCT::OnEvent(mafEventBase *maf_event)
     {
       case ID_LUT_CHOOSER:
       {
+        mmaVolumeMaterial *material = m_CurrentVolume->GetMaterial();
+        material->UpdateFromTables();
         for(int i=0; i<6; i++)
         {
           mafPipeVolumeSlice *p = NULL;
