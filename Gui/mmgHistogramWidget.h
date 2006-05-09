@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgHistogramWidget.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-10 15:18:07 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-05-09 12:11:29 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,7 +22,7 @@
 // forward refs
 //----------------------------------------------------------------------------
 class mafRWI;
-class vtkImageData;
+class vtkDataArray;
 class mmgGui;
 
 //----------------------------------------------------------------------------
@@ -47,7 +47,7 @@ public:
   };
 
   /** Input data from which generate histogram.*/
-  void SetData(vtkImageData *data);
+  void SetData(vtkDataArray *data);
 
   /** Set the scale factor for the histogram.*/
   void SetScaleFactor(double factor);
@@ -114,7 +114,7 @@ protected:
 
   mmgGui        *m_Gui;
 
-  vtkImageData  *m_Data;
+  vtkDataArray  *m_Data;
   mafRWI        *m_HistogramRWI;
   vtkHistogram  *m_Histogram;
 };

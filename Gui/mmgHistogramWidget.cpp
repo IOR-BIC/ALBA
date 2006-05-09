@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgHistogramWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2006-03-10 15:18:07 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2006-05-09 12:11:29 $
+Version:   $Revision: 1.8 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -30,7 +30,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mmuIdFactory.h"
 
 #include "vtkDataSet.h"
-#include "vtkImageData.h"
+#include "vtkDataArray.h"
 #include "vtkRenderer.h"
 #include "vtkDataArray.h"
 #include "vtkPointData.h"
@@ -119,6 +119,7 @@ void mmgHistogramWidget::OnEvent( mafEventBase *event )
   {
     if (ei->GetId() == mmdMouse::MOUSE_2D_MOVE)
     {
+      if(m_Histogram->GetInputData() == NULL) return;
       double pos[2];
       ei->Get2DPosition(pos);
       if (m_Dragging)
@@ -159,11 +160,11 @@ void mmgHistogramWidget::OnEvent( mafEventBase *event )
   }
 }
 //----------------------------------------------------------------------------
-void mmgHistogramWidget::SetData(vtkImageData *data)
+void mmgHistogramWidget::SetData(vtkDataArray *data)
 //----------------------------------------------------------------------------
 {
   m_Data = data;
-  m_Histogram->SetImageData(m_Data);
+  m_Histogram->SetInputData(m_Data);
   UpdateGui();
 }
 //----------------------------------------------------------------------------

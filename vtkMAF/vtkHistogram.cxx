@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkHistogram.cxx,v $
   Language:  C++
-  Date:      $Date: 2006-05-03 09:45:54 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-05-09 12:11:18 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
   Project:   MultiMod Project
 
@@ -30,9 +30,8 @@
 #include "vtkPoints.h"
 #include "vtkCellArray.h"
 #include "vtkPointData.h"
-#include "vtkDataArray.h"
 
-vtkCxxRevisionMacro(vtkHistogram, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(vtkHistogram, "$Revision: 1.4 $");
 vtkStandardNewMacro(vtkHistogram);
 //------------------------------------------------------------------------------
 vtkHistogram::vtkHistogram()
@@ -45,6 +44,7 @@ vtkHistogram::vtkHistogram()
   ChangeInfo  = NULL;
   LogScale    = NULL;
   Glyph       = NULL;
+  InputData   = NULL;
   ImageData   = NULL;
   
   PointsRepresentation  = NULL;
@@ -71,6 +71,7 @@ vtkHistogram::~vtkHistogram()
 {
   if(TextMapper)  TextMapper->Delete();
   if(TextActor)   TextActor->Delete();
+  if(ImageData)   ImageData->Delete();
   if(Accumulate)  Accumulate->Delete();
   if(ChangeInfo)  ChangeInfo->Delete();
   if(LogScale)    LogScale->Delete();
@@ -89,7 +90,7 @@ void vtkHistogram::PrintSelf(ostream& os, vtkIndent indent)
 int vtkHistogram::RenderOverlay(vtkViewport *viewport)
 //------------------------------------------------------------------------------
 {
-  if (ImageData == NULL) {return 0;};
+  if (InputData == NULL) {return 0;};
 
   vtkRenderer *ren = static_cast<vtkRenderer *>(viewport);
   HistogramUpdate(ren);
@@ -103,7 +104,7 @@ int vtkHistogram::RenderOverlay(vtkViewport *viewport)
 int vtkHistogram::RenderOpaqueGeometry(vtkViewport *viewport)
 //----------------------------------------------------------------------------
 {
-  if (ImageData == NULL) {return 0;};
+  if (InputData == NULL) {return 0;};
 
   if (LabelVisibility) TextActor->RenderOpaqueGeometry(viewport);
   return 0;
@@ -126,6 +127,10 @@ void vtkHistogram::HistogramCreate()
   TextActor->SetMapper(TextMapper);
   TextActor->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
   TextActor->SetPosition(1, 1);
+
+  ImageData  = vtkImageData::New();
+  ImageData->Initialize();
+  ImageData->SetSpacing(1.0,0.0,0.0);
 
   Accumulate = vtkImageAccumulate::New();
 
@@ -180,9 +185,12 @@ void vtkHistogram::HistogramCreate()
 void vtkHistogram::HistogramUpdate(vtkRenderer *ren)
 //----------------------------------------------------------------------------
 {
-  if (ImageData == NULL) {return;}
+  if (InputData == NULL) {return;}
 
   double sr[2];
+  ImageData->SetDimensions(InputData->GetNumberOfTuples(),1,1);
+  ImageData->SetScalarType(InputData->GetDataType());
+  ImageData->GetPointData()->SetScalars(InputData);
   ImageData->Update();
   ImageData->GetScalarRange(sr);
   double srw = sr[1]-sr[0];
@@ -217,7 +225,6 @@ void vtkHistogram::HistogramUpdate(vtkRenderer *ren)
   double acc_max[3];
   Accumulate->GetMin(acc_min);
   Accumulate->GetMax(acc_max);
-
 
   if (AutoscaleHistogram)
   {
