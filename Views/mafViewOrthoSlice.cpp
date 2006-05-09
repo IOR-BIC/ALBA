@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-09 08:27:28 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2006-05-09 09:21:03 $
+  Version:   $Revision: 1.27 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -64,10 +64,10 @@ mafViewOrthoSlice::mafViewOrthoSlice(wxString label, bool show_ruler)
 mafViewOrthoSlice::~mafViewOrthoSlice()
 //----------------------------------------------------------------------------
 {
-/*  if (m_CurrentVolume)
+  if (m_CurrentVolume)
   {
     m_CurrentVolume->GetEventSource()->RemoveObserver(this);
-  }*/
+  }
 }
 //----------------------------------------------------------------------------
 mafView *mafViewOrthoSlice::Copy(mafObserver *Listener)
@@ -191,6 +191,8 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
       break;
       case ID_LUT_CHOOSER:
       {
+        mmaVolumeMaterial *material = m_CurrentVolume->GetMaterial();
+        material->UpdateFromTables();
         for(int i=0; i<m_NumOfChildView; i++)
         {
           mafPipeVolumeSlice *p = (mafPipeVolumeSlice *)((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
