@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-08 14:58:57 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2006-05-09 08:27:28 $
+  Version:   $Revision: 1.26 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -64,10 +64,10 @@ mafViewOrthoSlice::mafViewOrthoSlice(wxString label, bool show_ruler)
 mafViewOrthoSlice::~mafViewOrthoSlice()
 //----------------------------------------------------------------------------
 {
-  if (m_CurrentVolume)
+/*  if (m_CurrentVolume)
   {
     m_CurrentVolume->GetEventSource()->RemoveObserver(this);
-  }
+  }*/
 }
 //----------------------------------------------------------------------------
 mafView *mafViewOrthoSlice::Copy(mafObserver *Listener)
