@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaVolumeMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-09 09:23:17 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-05-09 10:42:42 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -59,7 +59,8 @@ mmaVolumeMaterial::mmaVolumeMaterial()
   m_SaturationRange[0]  = 0;
   m_SaturationRange[1]  = 1;
   m_TableRange[0]       = 0.0;
-  m_TableRange[1]       = 1.0;
+  m_TableRange[1]       = -1.0; // this is an invalid range, needed to be checked by visual pipe, 
+                                // that if them found it invalid, initialize with data range
   m_NumValues           = 128;
   m_InterpolationType   = 0;
   m_Shade               = 0;
