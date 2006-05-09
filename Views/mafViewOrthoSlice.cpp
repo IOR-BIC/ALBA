@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-09 10:45:04 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2006-05-09 12:11:49 $
+  Version:   $Revision: 1.30 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,7 +35,7 @@
 #include "mafVMEVolume.h"
 
 #include "vtkDataSet.h"
-#include "vtkImageData.h"
+#include "vtkPointData.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewOrthoSlice);
@@ -47,6 +47,7 @@ mafViewOrthoSlice::mafViewOrthoSlice(wxString label, bool show_ruler)
 //----------------------------------------------------------------------------
 {
   m_Luts = NULL;
+  m_LutSwatch = NULL;
   m_Histogram = NULL;
   m_ShowRuler = show_ruler;
   for (int v=0;v<4;v++)
@@ -119,14 +120,13 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
         UpdateSliderRange();
         m_CurrentVolume->GetEventSource()->AddObserver(this);
       }
-      vtkImageData *vol = vtkImageData::SafeDownCast(data);
-      if (vol)
+      if (data)
       {
-        m_Histogram->SetData(vol);
+        m_Histogram->SetData(data->GetPointData()->GetScalars());
       }
       else
       {
-        wxMessageBox(_("Unable to show the Histogram for this data type! \n You should resample it into a structured data type."),_("Warning!"));
+        wxMessageBox(_("Unable to show the Histogram for this data!"),_("Warning!"));
         m_Histogram->SetData(NULL);
         m_Histogram->Refresh();
       }
