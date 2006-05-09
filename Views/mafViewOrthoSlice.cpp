@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-09 12:11:49 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2006-05-09 15:51:56 $
+  Version:   $Revision: 1.31 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -243,7 +243,7 @@ mmgGui* mafViewOrthoSlice::CreateGui()
   m_SliderY = m_Gui->FloatSlider(ID_ORTHO_SLICE_Y, "y", &m_Origin[1],MINDOUBLE,MAXDOUBLE);
   m_SliderZ = m_Gui->FloatSlider(ID_ORTHO_SLICE_Z, "z", &m_Origin[2],MINDOUBLE,MAXDOUBLE);
 
-  m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
+  m_LutSwatch = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
   m_Gui->Divider(2);
   m_Gui->AddGui(m_Histogram->GetGui());
   m_Gui->Divider(2);
