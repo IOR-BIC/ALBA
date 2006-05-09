@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaVolumeMaterial.h,v $
   Language:  C++
-  Date:      $Date: 2006-05-08 14:39:48 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-05-09 09:23:17 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,7 +22,6 @@
 // forward refs :
 //----------------------------------------------------------------------------
 class vtkLookupTable;
-class vtkWindowLevelLookupTable;
 class vtkPiecewiseFunction;
 class vtkColorTransferFunction;
 class vtkVolumeProperty;
@@ -51,8 +50,10 @@ public:
   /** Call to update volume properties.*/
   void UpdateProp();
 
+  /** Used to update all member variables from LUT or Transfer Functions.*/
+  void UpdateFromTables();
+
   vtkLookupTable            *m_ColorLut;
-  vtkWindowLevelLookupTable *m_GrayLut;
   vtkPiecewiseFunction      *m_OpacityTransferFunction;
   vtkPiecewiseFunction      *m_GradientTransferFunction;
   vtkColorTransferFunction  *m_ColorTransferFunction;

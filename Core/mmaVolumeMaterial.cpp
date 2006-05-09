@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaVolumeMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-08 14:39:48 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-05-09 09:23:17 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -31,7 +31,6 @@
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkLookupTable.h"
-#include "vtkWindowLevelLookupTable.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkColorTransferFunction.h"
 #include "vtkVolumeProperty.h"
@@ -47,8 +46,6 @@ mmaVolumeMaterial::mmaVolumeMaterial()
   m_Name        = "VolumeMaterialAttributes";
   m_MaterialName= "new material";
   vtkNEW(m_ColorLut);
-
-  vtkNEW(m_GrayLut);
 
   vtkNEW(m_OpacityTransferFunction);
   vtkNEW(m_GradientTransferFunction);
@@ -78,7 +75,6 @@ mmaVolumeMaterial::~mmaVolumeMaterial()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_ColorLut);
-  vtkDEL(m_GrayLut);
 
   vtkDEL(m_OpacityTransferFunction);
   vtkDEL(m_GradientTransferFunction);
@@ -132,8 +128,7 @@ int mmaVolumeMaterial::InternalStore(mafStorageElement *parent)
 {  
   if (Superclass::InternalStore(parent)==MAF_OK)
   {
-    m_NumValues = m_ColorLut->GetNumberOfTableValues();
-    m_ColorLut->GetTableRange(m_TableRange);
+    UpdateFromTables();
     // property
     parent->StoreText("MaterialName",m_MaterialName);
     // lut
@@ -218,12 +213,21 @@ int mmaVolumeMaterial::InternalRestore(mafStorageElement *node)
     node->RestoreInteger("Shade", m_Shade);
     node->RestoreInteger("NumOpacityValues", m_NumOpacityValues);
     double point[2];
-    for (int p = 0; p < m_NumOpacityValues; p++)
+    int p;
+    for (p = 0; p < m_NumOpacityValues; p++)
     {
       lutvalues = "OPACITY_VALUE_";
       lutvalues << p;
       node->RestoreVectorN(lutvalues,point,2);
       m_OpacityTransferFunction->AddPoint(point[0],point[1]);
+    }
+    node->RestoreInteger("NumGradientValues", m_NumGradientValues);
+    for (p = 0; p < m_NumGradientValues; p++)
+    {
+      lutvalues = "GRADIENT_VALUE_";
+      lutvalues << p;
+      node->RestoreVectorN(lutvalues,point,2);
+      m_GradientTransferFunction->AddPoint(point[0],point[1]);
     }
     return MAF_OK;
   }
@@ -239,15 +243,22 @@ void mmaVolumeMaterial::UpdateProp()
   m_VolumeProperty->SetInterpolationType(m_InterpolationType);
   m_VolumeProperty->SetShade(m_Shade);
 
-  m_GrayLut->SetLevel(m_Level_LUT);
-  m_GrayLut->SetWindow(m_Window_LUT);
-  m_GrayLut->Build();
-
   m_ColorLut->SetHueRange(m_HueRange);
   m_ColorLut->SetSaturationRange(m_SaturationRange);
   m_ColorLut->SetNumberOfTableValues(m_NumValues);
   m_ColorLut->SetTableRange(m_TableRange);
   m_ColorLut->Build();
+}
+//-----------------------------------------------------------------------
+void mmaVolumeMaterial::UpdateFromTables()
+//-----------------------------------------------------------------------
+{
+  m_ColorLut->GetHueRange(m_HueRange);
+  m_ColorLut->GetSaturationRange(m_SaturationRange);
+  m_NumValues = m_ColorLut->GetNumberOfTableValues();
+  m_ColorLut->GetTableRange(m_TableRange);
+  m_Window_LUT = m_TableRange[1] - m_TableRange[0];
+  m_Level_LUT  = (m_TableRange[1] + m_TableRange[0])* .5;
 }
 //-----------------------------------------------------------------------
 void mmaVolumeMaterial::Print(std::ostream& os, const int tabs)
