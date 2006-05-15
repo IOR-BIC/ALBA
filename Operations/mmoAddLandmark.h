@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoAddLandmark.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-21 10:05:32 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-05-15 13:02:01 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,7 +30,8 @@ class mafVMELandmark;
 class mafVMELandmarkCloud;
 class mafInteractor;
 class mmiPicker;
-
+class mmgNamedPanel;
+class mmgDictionaryWidget;
 //----------------------------------------------------------------------------
 // mmoAddLandmark :
 //----------------------------------------------------------------------------
@@ -85,5 +86,8 @@ protected:
   mafInteractor       *m_OldBehavior;
 
 	double							 m_LandmarkPosition[3];
+
+  mmgNamedPanel			  *m_GuiPanel;
+  mmgDictionaryWidget *m_Dict;
 };
 #endif

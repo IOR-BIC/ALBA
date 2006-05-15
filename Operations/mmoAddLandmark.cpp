@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoAddLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-07 12:14:54 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-05-15 13:02:01 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,12 +18,19 @@
 #include "mafInteractor.h"
 #include "mmgGui.h"
 
+//dictionary
+#include "mmgGUIHolder.h"
+#include "mmgSplittedPanel.h"
+#include "mmgNamedPanel.h"
+#include "mmgDictionaryWidget.h"
+#include "mmoExplodeCollapse.h"
+#include "mafSmartPointer.h"
+
 #include "mafVME.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
 #include "mafVMESurface.h"
 #include "mafVMEVolumeGray.h"
-#include "mafSmartPointer.h"
 
 #include "vtkDataSet.h"
 #include "vtkPoints.h"
@@ -91,7 +98,8 @@ bool mmoAddLandmark::Accept(mafNode *node)
 enum ADD_LANDMARK_ID
 {
   ID_LM_NAME = MINID,
-  ID_ADD_TO_CURRENT_TIME
+  ID_ADD_TO_CURRENT_TIME,
+  ID_LOAD,
 };
 //----------------------------------------------------------------------------
 void mmoAddLandmark::OpRun()
@@ -131,7 +139,7 @@ void mmoAddLandmark::OpRun()
   m_PickedVme->SetBehavior(m_LandmarkPicker);
 
   mafString tooltip("If checked, add the landmark to the current time. \nOtherwise add the landmark at time = 0");
-
+/*
   // setup Gui
   m_Gui = new mmgGui(this);
   m_Gui->Label("landmark name");
@@ -143,6 +151,46 @@ void mmoAddLandmark::OpRun()
   m_Gui->Enable(wxOK, false);
 
   ShowGui();
+*/
+  // setup gui_panel
+	m_GuiPanel = new mmgNamedPanel(mafGetFrame(),-1);
+	m_GuiPanel->SetTitle("Add Landmark:");
+
+  // setup splitter
+	mmgSplittedPanel *sp = new mmgSplittedPanel(m_GuiPanel,-1,155);
+	m_GuiPanel->Add(sp,1,wxEXPAND);
+
+	// setup dict
+	m_Dict = new mmgDictionaryWidget(sp,-1);
+  m_Dict->SetListener(this);
+  m_Dict->SetCloud(m_Cloud);
+	sp->PutOnTop(m_Dict->GetWidget());
+
+	// setup GuiHolder
+	m_Guih = new mmgGuiHolder(sp,-1,false,true);
+	sp->PutOnBottom(m_Guih);
+  
+  // setup Gui
+	m_Gui = new mmgGui(this);
+	m_Gui->SetListener(this);
+	m_Gui->Button(ID_LOAD,"load dictionary");
+	m_Gui->Label("");
+	m_Gui->Label("landmark name");
+	m_Gui->String(ID_LM_NAME,"",&m_LandmarkName);
+	m_Gui->Label("");
+	m_Gui->Bool(ID_ADD_TO_CURRENT_TIME,"current time",&m_AddToCurrentTime,0,tooltip);
+	m_Gui->Label("");
+	m_Gui->Label("choose a name from the dictionary");
+	m_Gui->Label("and place landmark by");
+	m_Gui->Label("clicking on the parent surface");
+	m_Gui->Label("");
+  m_Gui->OkCancel();
+	m_Gui->Enable(wxOK, false);
+	
+	// Show Gui
+	m_Guih->Put(m_Gui);
+	mafEventMacro(mafEvent(this,OP_SHOW_GUI,(wxWindow *)m_GuiPanel));
+
 }
 //----------------------------------------------------------------------------
 void mmoAddLandmark::OpDo()
@@ -165,6 +213,21 @@ void mmoAddLandmark::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId())
     {
+      case ID_LOAD:
+		  m_Dict->LoadDictionary();
+		  break;
+      
+      case ITEM_SELECTED:
+		  m_LandmarkName = *(e->GetString());
+			if(this->m_Cloud && this->m_Cloud->FindInTreeByName(m_LandmarkName.GetCStr()))
+			{
+				wxString msg("Landmark with that name already exist, Please change it!");
+				wxMessageBox( msg,"Warning", wxOK|wxICON_WARNING , NULL);
+				m_LandmarkName = "";
+			}
+			m_Gui->Update();
+		  break;
+
       case VME_PICKED:
         if(this->m_Cloud && this->m_Cloud->FindInTreeByName(m_LandmarkName.GetCStr()))
         {
@@ -206,7 +269,10 @@ void mmoAddLandmark::OnEvent(mafEventBase *maf_event)
 void mmoAddLandmark::OpStop(int result)
 //----------------------------------------------------------------------------
 {
-  HideGui();
+  mafEventMacro(mafEvent(this,OP_HIDE_GUI,(wxWindow *)m_GuiPanel));
+	cppDEL(m_Dict);
+	cppDEL(m_GuiPanel)
+
   m_PickedVme->SetBehavior(m_OldBehavior);
 	mafEventMacro(mafEvent(this,result));
 }
