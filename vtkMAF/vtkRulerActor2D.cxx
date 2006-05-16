@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkRulerActor2D.cxx,v $
   Language:  C++
-  Date:      $Date: 2006-03-10 16:14:29 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-05-16 11:16:52 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -34,7 +34,7 @@
 #include "vtkProperty2D.h"
 #include "vtkPolyDataMapper2D.h"
 
-vtkCxxRevisionMacro(vtkRulerActor2D, "$Revision: 1.4 $");
+vtkCxxRevisionMacro(vtkRulerActor2D, "$Revision: 1.5 $");
 vtkStandardNewMacro(vtkRulerActor2D);
 //------------------------------------------------------------------------------
 vtkRulerActor2D::vtkRulerActor2D()
@@ -688,13 +688,13 @@ void vtkRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
   if (GlobalAxes) 
   {
     char *letter[] = {"x","y","z"};
-    char *sign = (w1X-w0X > 0) ? " " : "-";
+    char *sign = (w1X-w0X > 0) ? (char *)" " : (char *)"-";
     char caption[100];
     sprintf(caption, "%s%s %s", sign,  letter[x_index], Legend);
     HorizontalAxesLabel->SetInput(caption);
     HorizontalAxesLabel->SetDisplayPosition(rwWidth - margin, margin + 4);
 
-    sign = (w1Y-w0Y > 0) ? " " : "-";
+    sign = (w1Y-w0Y > 0) ? (char *)" " : (char *)"-";
     sprintf(caption, "%s%s %s", sign, letter[y_index], Legend);
     VerticalAxesLabel->SetInput(caption);
     VerticalAxesLabel->SetDisplayPosition( margin, rwHeight - margin/2);
