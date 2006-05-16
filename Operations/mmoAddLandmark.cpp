@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoAddLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-15 13:02:01 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-05-16 13:05:46 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,7 +19,7 @@
 #include "mmgGui.h"
 
 //dictionary
-#include "mmgGUIHolder.h"
+#include "mmgGuiHolder.h"
 #include "mmgSplittedPanel.h"
 #include "mmgNamedPanel.h"
 #include "mmgDictionaryWidget.h"
