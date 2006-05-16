@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-30 10:48:15 $
-  Version:   $Revision: 1.59 $
+  Date:      $Date: 2006-05-16 09:27:00 $
+  Version:   $Revision: 1.60 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,6 +45,7 @@
 #include "mmgMaterialChooser.h"
 #include "mmgViewFrame.h"
 #include "mmgLocaleSettings.h"
+#include "mmgMeasureUnitSettings.h"
 #include "mmiPER.h"
 #include "mmdClientMAF.h"
 
@@ -79,6 +80,10 @@ mafLogicWithManagers::mafLogicWithManagers()
   m_RecentFileMenu = NULL;
 
   m_MaterialChooser = NULL;
+
+  // this is needed to manage events coming from the widget
+  // when the user change the unit settings.
+  m_MeasureUnitSettings->SetListener(this);
 
   m_PrintSupport = new mafPrintSupport();
 }
@@ -282,6 +287,7 @@ void mafLogicWithManagers::CreateMenu()
   option_menu->AppendSeparator();
   option_menu->Append(MENU_OPTION_DEVICE_SETTINGS, _("Interaction Settings"));
   option_menu->Append(MENU_OPTION_LOCALE_SETTINGS, _("Locale Settings"));
+  option_menu->Append(MENU_OPTION_MEASURE_UNIT_SETTINGS, _("Measure Unit Settings"));
   m_MenuBar->Append(option_menu, _("&Preferences"));
 
   m_Win->SetMenuBar(m_MenuBar);
@@ -584,6 +590,12 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       break;
       case MENU_OPTION_LOCALE_SETTINGS:
         m_LocaleSettings->ChooseLocale();
+      break;
+      case MENU_OPTION_MEASURE_UNIT_SETTINGS:
+        m_MeasureUnitSettings->ChooseMeasureUnit();
+      break;
+      case mmgMeasureUnitSettings::MEASURE_UNIT_UPDATED:
+        UpdateMeasureUnit();
       break;
       case CAMERA_PRE_RESET:
         if(m_InteractionManager) 
@@ -1092,4 +1104,11 @@ bool mafLogicWithManagers::GetExternalViewFlag()
   config->Read("ExternalViewFlag", &m_ExternalViewFlag, false);
   cppDEL(config);
   return m_ExternalViewFlag;
+}
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::UpdateMeasureUnit()
+//----------------------------------------------------------------------------
+{
+  for(mafView* v = m_ViewManager->GetList(); v; v=v->m_Next) 
+    v->OptionsUpdate();
 }

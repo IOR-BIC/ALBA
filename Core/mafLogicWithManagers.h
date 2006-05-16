@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-16 09:19:07 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2006-05-16 09:27:00 $
+  Version:   $Revision: 1.22 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -197,6 +197,8 @@ protected:
 	/** Select a view and update the display list for the tree. */
 	virtual void ViewSelect();
 
+  /** Called when user change the measure unit from menù Options.*/
+  void UpdateMeasureUnit();
 
   /** Enable/Disable menu items when an operation start/end running. */
   void EnableMenuAndToolbar(bool enable);
