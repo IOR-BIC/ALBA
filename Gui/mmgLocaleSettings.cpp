@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgLocaleSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2006-03-30 10:47:13 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2006-05-16 09:29:39 $
+Version:   $Revision: 1.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -31,6 +31,7 @@ mmgLocaleSettings::mmgLocaleSettings(mafObserver *Listener)
 {
 	m_Listener   = Listener;
   m_LanguageId = 0;
+  InitializeLanguage();
 }
 //----------------------------------------------------------------------------
 mmgLocaleSettings::~mmgLocaleSettings() 

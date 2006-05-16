@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgLocaleSettings.h,v $
 Language:  C++
-Date:      $Date: 2006-03-30 10:47:13 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2006-05-16 09:29:39 $
+Version:   $Revision: 1.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -42,13 +42,13 @@ public:
 
   void SetListener(mafObserver *Listener) {m_Listener = Listener;};
 
-  /** Initialize language used into the application.*/
-  void InitializeLanguage();
-
   /** Show/Hide the settings interface.*/
 	void ChooseLocale();
 
 protected:
+  /** Initialize language used into the application.*/
+  void InitializeLanguage();
+
   mafObserver *m_Listener;
   int          m_LanguageId;
   wxLocale     m_Locale;
