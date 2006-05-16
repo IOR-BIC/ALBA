@@ -155,17 +155,17 @@ IF (WIN32)
 ENDIF (WIN32)
 
 # currently special drivers only supported under WIN32
-IF (WIN32)
+#IF (WIN32)
  SUBDIRS(Drivers)
-ENDIF (WIN32)
+#ENDIF (WIN32)
 
 # List libraries that are needed by this project.
 SET(PROJECT_LIBS mafBase mafIO mafGui vtkMAF)
 
 # currently special drivers only supported under WIN32
-IF (WIN32)
+#IF (WIN32)
   SET(PROJECT_LIBS ${PROJECT_LIBS} mafDrivers)
-ENDIF (WIN32)
+#ENDIF (WIN32)
 
 #IF (MAF_USE_VTK)
   SET(PROJECT_LIBS ${PROJECT_LIBS} vtkHybrid)
