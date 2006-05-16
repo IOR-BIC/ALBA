@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 1.2
-# Date:      $Date: 2005-07-13 13:53:01 $
-# Version:   $Revision: 1.1 $
+# Date:      $Date: 2006-05-16 15:30:34 $
+# Version:   $Revision: 1.2 $
 #
 # Description: MAF_DRIVERS Cmake project file.
 #
@@ -22,6 +22,7 @@ LINK_DIRECTORIES(${MAF_DRIVERS_BINARY_DIR}/lib)
 # Here is where you can add the name of your local common classes.
 #
 
+IF (WIN32)
 SET (DRIVERS_SRCS
 # Intersense driver
   isdriver.c
@@ -36,10 +37,14 @@ SET (DRIVERS_SRCS
   timer.h
   wsock.c
   wsock.h
-  
+)
+ENDIF (WIN32)
+
+SET (DRIVERS_SRCS
+  ${DRIVERS_SRCS}
   ClientUnit.cpp
   ClientUnit.h  
-)
+  )
 
 IF (WIN32)
 SET (DRIVERS_SRCS
