@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-16 09:17:22 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-05-16 09:27:47 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -102,6 +102,10 @@ public:
 
   /** Set the label of the ruler. Example the unit measure of the data. */
   void SetRulerLegend(mafString &ruler_legend);
+
+  /** Update scale factor and legend.
+  This method is called from logic to update measure unit according to the application settings.*/
+  void UpdateRulerUnit();
 
   mmgGui *GetGui();
 

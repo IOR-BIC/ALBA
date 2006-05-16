@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-16 09:17:22 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2006-05-16 09:27:47 $
+  Version:   $Revision: 1.27 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,6 +29,7 @@
 #include "mafSceneNode.h"
 #include "mafSceneGraph.h"
 #include "mmgPicButton.h"
+#include "mmgMeasureUnitSettings.h"
 
 #include "mafVME.h"
 #include "mafVMELandmark.h"
@@ -119,8 +120,10 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axe
 
   m_ShowRuler = show_ruler;
 
-  m_RulerScaleFactor = 1.0;
-  m_RulerLegend = "mm";
+  mmgMeasureUnitSettings *unit_settings = new mmgMeasureUnitSettings(this);
+  m_RulerScaleFactor = unit_settings->GetScaleFactor();
+  m_RulerLegend = unit_settings->GetUnitName();
+  cppDEL(unit_settings);
   vtkNEW(m_Ruler);
   m_Ruler->SetLabelAxesVisibility();
   m_Ruler->SetLabelScaleVisibility(true);
@@ -773,4 +776,20 @@ void mafRWI::LinkCamera(bool linc_camera)
   e.SetVtkObj(m_Camera);
   e.SetBool(m_LinkCamera != 0);
   mafEventMacro(e);
+}
+//----------------------------------------------------------------------------
+void mafRWI::UpdateRulerUnit()
+//----------------------------------------------------------------------------
+{
+  mmgMeasureUnitSettings *unit_settings = new mmgMeasureUnitSettings(this);
+  m_RulerScaleFactor = unit_settings->GetScaleFactor();
+  m_RulerLegend = unit_settings->GetUnitName();
+  cppDEL(unit_settings);
+  m_Ruler->SetScaleFactor(m_RulerScaleFactor);
+  m_Ruler->SetLegend(m_RulerLegend);
+  if (m_Gui != NULL) 
+  {
+    m_Gui->Update();
+  }
+  CameraUpdate();
 }
