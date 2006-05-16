@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-29 13:44:33 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-05-16 09:24:35 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -90,6 +90,9 @@ public:
   virtual void      SetMouse(mmdMouse *mouse)                               {};
   virtual mafRWIBase *GetRWI()                                              {return NULL;};
   virtual void      GetImage(wxBitmap &bmp, int magnification = 1)          {};
+
+  /** Called to update all components that depends on Application Options.*/
+  virtual void      OptionsUpdate()                                         {};
 
   /** 
   Find the pocked VME at button down. As argument the function needs
