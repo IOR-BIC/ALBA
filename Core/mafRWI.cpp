@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-16 09:27:47 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2006-05-16 11:48:56 $
+  Version:   $Revision: 1.28 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -699,7 +699,7 @@ void mafRWI::OnEvent(mafEventBase *maf_event)
       break;
       case ID_LINK_CAMERA:
       {
-        LinkCamera(m_LinkCamera);
+        LinkCamera(m_LinkCamera != 0);
       }
       break;
       case ID_SHOW_RULER:
