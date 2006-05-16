@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDictionaryWidget.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-04 11:48:14 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-05-16 10:56:39 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -110,7 +110,7 @@ void mmgDictionaryWidget::LoadDictionary(wxString file)
   restore.SetDocument(storeDict);
   restore.Restore();
   
-	if(m_NumItem) delete [m_NumItem] m_Items;			//modified by Paolo 16-6-2003
+	if(m_NumItem) delete [] m_Items;			//modified by Paolo 16-6-2003
   m_NumItem = storeDict->m_StrVector.size();
   m_Items = new wxString*[m_NumItem];
 
