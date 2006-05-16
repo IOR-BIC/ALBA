@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-30 10:47:45 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2006-05-16 09:25:56 $
+  Version:   $Revision: 1.28 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,6 +37,7 @@
 #include "mmgCrossSplitter.h"
 #include "mmgTimeBar.h"
 #include "mmgLocaleSettings.h"
+#include "mmgMeasureUnitSettings.h"
 #include "mafWXLog.h"
 #include "mafPics.h"
 #include "mafVTKLog.h"
@@ -49,7 +50,7 @@ mafLogicWithGUI::mafLogicWithGUI()
   m_Win->SetListener(this);
 
   m_LocaleSettings = new mmgLocaleSettings(this);
-  m_LocaleSettings->InitializeLanguage();
+  m_MeasureUnitSettings = new mmgMeasureUnitSettings(this);
 
   m_LogSash				= NULL;
   m_TimeSash			= NULL;
@@ -77,6 +78,7 @@ mafLogicWithGUI::~mafLogicWithGUI()
 //----------------------------------------------------------------------------
 {
   cppDEL(m_LocaleSettings);
+  cppDEL(m_MeasureUnitSettings);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithGUI::Configure()
