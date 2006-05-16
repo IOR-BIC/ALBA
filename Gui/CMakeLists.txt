@@ -50,6 +50,8 @@ SET(PROJECT_SRCS
   mmgListCtrl.h
   mmgLocaleSettings.cpp
   mmgLocaleSettings.h
+  mmgMeasureUnitSettings.cpp
+  mmgMeasureUnitSettings.h
   mmgMovieCtrl.cpp
   mmgMovieCtrl.h
   mmgMDIChild.cpp
