@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-04 11:47:46 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2006-05-16 09:25:29 $
+  Version:   $Revision: 1.25 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -586,4 +586,11 @@ void mafViewCompound::LinkView(bool link_camera)
       ((mafViewCompound *)cv)->LinkView(link_camera);
     }
   }
+}
+//----------------------------------------------------------------------------
+void mafViewCompound::OptionsUpdate()
+//----------------------------------------------------------------------------
+{
+  for(int i=0; i<m_NumOfChildView; i++)
+    m_ChildViewList[i]->OptionsUpdate();
 }

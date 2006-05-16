@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-29 13:45:18 $
-  Version:   $Revision: 1.56 $
+  Date:      $Date: 2006-05-16 09:25:29 $
+  Version:   $Revision: 1.57 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -491,4 +491,10 @@ void mafViewVTK::LinkView(bool link_camera)
 //----------------------------------------------------------------------------
 {
   m_Rwi->LinkCamera(link_camera);
+}
+//----------------------------------------------------------------------------
+void mafViewVTK::OptionsUpdate()
+//----------------------------------------------------------------------------
+{
+  m_Rwi->UpdateRulerUnit();
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-16 09:18:08 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2006-05-16 09:25:29 $
+  Version:   $Revision: 1.21 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -185,6 +185,9 @@ public:
 
   /** Allow to link the camera of the sub-views.*/
   virtual void LinkView(bool link_camera = true);
+
+  /** Called to update all components that depends on Application Options.*/
+  virtual void OptionsUpdate();
 
 protected:
   /**

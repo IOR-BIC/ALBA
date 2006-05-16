@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-16 09:18:08 $
-  Version:   $Revision: 1.43 $
+  Date:      $Date: 2006-05-16 09:25:29 $
+  Version:   $Revision: 1.44 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -103,6 +103,9 @@ public:
   /** 
   Delete vme's visual pipe. It is called when vme is removed from visualization.*/
   virtual void VmeDeletePipe(mafNode *vme);
+
+  /** Called to update all components that depends on Application Options.*/
+  virtual void OptionsUpdate();
 
 	virtual void CameraReset(mafNode *node = NULL);
   virtual void CameraSet(int camera_position);
