@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgMeasureUnitSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2006-05-16 11:41:31 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2006-05-16 11:45:28 $
+Version:   $Revision: 1.4 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -113,6 +113,10 @@ void mmgMeasureUnitSettings::OnEvent(mafEventBase *maf_event)
         case 3:
           m_ScaleFactor = 330.0;
           m_UnitName = "feet";
+        break;
+        case 4:
+          m_ScaleFactor = 1.0;
+          m_UnitName = "custom";
         break;
       }
       m_Gui->Enable(MEASURE_SCALE_FACTOR_ID,m_ChoosedUnit == 4);

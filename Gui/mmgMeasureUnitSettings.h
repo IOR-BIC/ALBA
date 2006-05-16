@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgMeasureUnitSettings.h,v $
 Language:  C++
-Date:      $Date: 2006-05-16 09:24:06 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2006-05-16 11:41:31 $
+Version:   $Revision: 1.3 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -18,7 +18,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
-
+class mmgGui;
 
 //----------------------------------------------------------------------------
 // mmgMeasureUnitSettings :
@@ -35,6 +35,7 @@ public:
   {
     MEASURE_STRING_ID = MINID,
     MEASURE_SCALE_FACTOR_ID,
+    MEASURE_DEFAULT_UNIT_ID,
     MEASURE_UNIT_UPDATED
   };
 
@@ -56,9 +57,11 @@ public:
 protected:
   /** Initialize measure unit used into the application.*/
   void InitializeMeasureUnit();
+  mmgGui      *m_Gui;
 
   mafObserver *m_Listener;
   double       m_ScaleFactor;
   mafString    m_UnitName;
+  int          m_ChoosedUnit;
 };
 #endif
