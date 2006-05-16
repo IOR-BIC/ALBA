@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-30 10:46:42 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2006-05-16 09:29:10 $
+  Version:   $Revision: 1.23 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -224,6 +224,8 @@ std::string  mafIdString(int id)
      case MENU_VIEW_LOGBAR:	    s="MENU_VIEW_LOGBAR"; break; 
      case MENU_VIEW_SIDEBAR:	  s="MENU_VIEW_SIDEBAR"; break; 
      case MENU_VIEW_TIMEBAR:	  s="MENU_VIEW_TIMEBAR"; break; 
+     case MENU_OPTION_APPLICATION_SETTINGS: s = "MENU_OPTION_APPLICATION_SETTINGS"; break;
+     case MENU_OPTION_MEASURE_UNIT_SETTINGS: s = "MENU_OPTION_MEASURE_UNIT_SETTINGS"; break;
      case SASH_END:	            s="SASH_END"; break; 
      case MENU_LAYOUT_START:	  s="MENU_LAYOUT_START"; break; 
      case LAYOUT_ONE:	          s="LAYOUT_ONE"; break; 
