@@ -66,6 +66,15 @@ IF (MAF_USE_VTK)
   )
 ENDIF (MAF_USE_VTK)
 
+IF (MAF_USE_ITK)
+  SET(PROJECT_SRCS
+    ${PROJECT_SRCS}
+    mafASCIIImporterUtility.cpp
+    mafASCIIImporterUtility.h
+    mmoASCIIImporter.cpp
+    mmoASCIIImporter.h
+  )
+ENDIF (MAF_USE_ITK)
 
 # List libraries that are needed by this project.
 SET(PROJECT_LIBS "mafVME" "mafInteraction")
