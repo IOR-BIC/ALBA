@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateRefSys.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-17 13:10:20 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-05-18 10:26:47 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,8 +37,6 @@ public:
   void OpDo();
 
 protected: 
-	void OpStop(int result);
-
   mafVMERefSys *m_RefSys;
 };
 #endif

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateGroup.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-17 13:11:05 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-05-18 10:26:47 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -36,7 +36,7 @@ mafOp(label)
   m_Group   = NULL;
 }
 //----------------------------------------------------------------------------
-mmoCreateGroup::~mmoCreateGroup( ) 
+mmoCreateGroup::~mmoCreateGroup()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_Group);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateRefSys.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-17 13:10:20 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-05-18 10:26:47 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -66,15 +66,9 @@ void mmoCreateRefSys::OpRun()
   mafNEW(m_RefSys);
   m_RefSys->SetName("ref_sys");
   m_Output = m_RefSys;
-  OpStop(OP_RUN_OK);
+  mafEventMacro(mafEvent(this,OP_RUN_OK));
 }
 
-//----------------------------------------------------------------------------
-void mmoCreateRefSys::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-  mafEventMacro(mafEvent(this,result));
-}
 //----------------------------------------------------------------------------
 void mmoCreateRefSys::OpDo()
 //----------------------------------------------------------------------------
