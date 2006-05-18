@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-20 11:22:43 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-05-18 10:28:01 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -126,6 +126,9 @@ public:
   void SetMouse(mmdMouse *mouse);
 
 protected:
+  /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
+  virtual void OpStop(int result);
+
 	mafNode				 *m_Input;
   mafNode        *m_Output;
 	mmgGui      	 *m_Gui;

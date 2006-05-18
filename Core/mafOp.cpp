@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 11:13:42 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2006-05-18 10:28:01 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -203,4 +203,11 @@ void mafOp::SetMouse(mmdMouse *mouse)
 //----------------------------------------------------------------------------
 {
   m_Mouse = mouse;
+}
+//----------------------------------------------------------------------------
+void mafOp::OpStop(int result)
+//----------------------------------------------------------------------------
+{
+  HideGui();
+  mafEventMacro(mafEvent(this,result));        
 }
