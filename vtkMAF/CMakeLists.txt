@@ -191,7 +191,7 @@ IF(VTK_FOUND)
       ENABLE_TESTING()
     ENDIF (NOT MAKECOMMAND)
     
-    OPTION(BUILD_vtkMAF_TESTING "Enable building of testing for vtkMAF classes" ON)
+    OPTION(BUILD_vtkMAF_TESTING "Enable building of testing for vtkMAF classes" OFF)
     IF (BUILD_vtkMAF_TESTING)
       SUBDIRS(Testing)
     ENDIF (BUILD_vtkMAF_TESTING)
