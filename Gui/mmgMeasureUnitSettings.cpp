@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgMeasureUnitSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2006-05-16 11:45:28 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2006-05-30 11:26:01 $
+Version:   $Revision: 1.5 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -30,9 +30,24 @@ mmgMeasureUnitSettings::mmgMeasureUnitSettings(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
 	m_Listener    = Listener;
-  m_ScaleFactor = 1.0;
-  m_UnitName    = "mm";
-  m_ChoosedUnit = 0;
+  m_DefaultUnits[0] = "mm";
+  m_DefaultUnits[1] = "m";
+  m_DefaultUnits[2] = "inch";
+  m_DefaultUnits[3] = "feet";
+  m_DefaultUnits[4] = "custom";
+
+  m_DefaultFactors[0] = 1.0;
+  m_DefaultFactors[1] = 1000.0;
+  m_DefaultFactors[2] = 25.4;
+  m_DefaultFactors[3] = 330.0;
+  m_DefaultFactors[4] = 1.0;
+
+  m_ChoosedDataUnit = 0;
+  m_ChoosedVisualUnit = 0;
+
+  m_DataUnitName  = m_DefaultUnits[m_ChoosedDataUnit];
+  m_VisualUnitName= m_DefaultUnits[m_ChoosedVisualUnit];
+  m_ScaleFactor = m_DefaultFactors[m_ChoosedVisualUnit] / m_DefaultFactors[m_ChoosedDataUnit];
   m_Gui         = NULL;
   InitializeMeasureUnit();
 }
@@ -46,30 +61,33 @@ mmgMeasureUnitSettings::~mmgMeasureUnitSettings()
 void mmgMeasureUnitSettings::ChooseMeasureUnit()
 //----------------------------------------------------------------------------
 {
-  wxString default_unit[5] = {"mm","m","inch","feet", "custom"};
-  
   double current_scale = m_ScaleFactor;
-  mafString current_unit_name = m_UnitName;
-  int current_unit_selected = m_ChoosedUnit;
+  int current_data_unit_selected = m_ChoosedDataUnit;
+  int current_visual_unit_selected = m_ChoosedVisualUnit;
 
   m_Gui = new mmgGui(this);
   m_Gui->Label(_("main units"));
-  m_Gui->Combo(MEASURE_DEFAULT_UNIT_ID,"",&m_ChoosedUnit,5,default_unit);
+  m_Gui->Combo(MEASURE_DEFAULT_DATA_UNIT_ID,_("data"),&m_ChoosedDataUnit,5,m_DefaultUnits);
+  m_Gui->Combo(MEASURE_DEFAULT_VISUAL_UNIT_ID,_("visual"),&m_ChoosedVisualUnit,5,m_DefaultUnits);
   m_Gui->Divider(2);
   m_Gui->Label(_("custom"));
+  m_Gui->String(MEASURE_DATA_STRING_ID,_("data unit"),&m_DataUnitName);
+  m_Gui->String(MEASURE_VISUAL_STRING_ID,_("visual unit"),&m_VisualUnitName);
   m_Gui->Double(MEASURE_SCALE_FACTOR_ID,_("scale"),&m_ScaleFactor, MINDOUBLE, MAXDOUBLE,-1,_("scale factor of new unit referred to mm"));
-  m_Gui->String(MEASURE_STRING_ID,_("unit name"),&m_UnitName);
-  m_Gui->Enable(MEASURE_SCALE_FACTOR_ID,m_ChoosedUnit == 4);
-  m_Gui->Enable(MEASURE_STRING_ID,m_ChoosedUnit == 4);
+  m_Gui->Enable(MEASURE_SCALE_FACTOR_ID,m_ChoosedDataUnit == 4 || m_ChoosedVisualUnit == 4);
+  m_Gui->Enable(MEASURE_DATA_STRING_ID,m_ChoosedDataUnit == 4);
+  m_Gui->Enable(MEASURE_VISUAL_STRING_ID,m_ChoosedDataUnit == 4);
 
   mmgDialog dlg(_("Settings"),mafOK | mafCANCEL);
   dlg.Add(m_Gui,1,wxEXPAND);
   int answere = dlg.ShowModal();
   if (answere == wxID_CANCEL)
   {
-    m_ScaleFactor = current_scale;
-    m_UnitName = current_unit_name;
-    m_ChoosedUnit = current_unit_selected;
+    m_ScaleFactor       = current_scale;
+    m_ChoosedDataUnit   = current_data_unit_selected;
+    m_ChoosedVisualUnit = current_visual_unit_selected;
+    m_DataUnitName      = m_DefaultUnits[m_ChoosedDataUnit];
+    m_VisualUnitName    = m_DefaultUnits[m_ChoosedVisualUnit];
     return;
   }
   if (m_ScaleFactor == 0.0) 
@@ -77,7 +95,7 @@ void mmgMeasureUnitSettings::ChooseMeasureUnit()
     m_ScaleFactor = 1.0;
   }
   wxConfig *config = new wxConfig(wxEmptyString);
-  config->Write("UnitName",m_UnitName.GetCStr());
+  config->Write("UnitName",m_VisualUnitName.GetCStr());
   config->Write("UnitFactor",m_ScaleFactor);
   cppDEL(config);
 
@@ -92,35 +110,20 @@ void mmgMeasureUnitSettings::OnEvent(mafEventBase *maf_event)
 {
 	switch(maf_event->GetId())
   {
-    case MEASURE_STRING_ID:
+    case MEASURE_DATA_STRING_ID:
     case MEASURE_SCALE_FACTOR_ID:
     break;
-    case MEASURE_DEFAULT_UNIT_ID:
-      switch(m_ChoosedUnit) 
+    case MEASURE_DEFAULT_VISUAL_UNIT_ID:
+    case MEASURE_DEFAULT_DATA_UNIT_ID:
+      if (m_DefaultFactors[m_ChoosedDataUnit] != 0.0)
       {
-        case 0:
-          m_ScaleFactor = 1.0;
-          m_UnitName = "mm";
-      	break;
-        case 1:
-          m_ScaleFactor = 1000.0;
-          m_UnitName = "m";
-        break;
-        case 2:
-          m_ScaleFactor = 25.4;
-          m_UnitName = "inch";
-        break;
-        case 3:
-          m_ScaleFactor = 330.0;
-          m_UnitName = "feet";
-        break;
-        case 4:
-          m_ScaleFactor = 1.0;
-          m_UnitName = "custom";
-        break;
+        m_ScaleFactor = m_DefaultFactors[m_ChoosedVisualUnit] / m_DefaultFactors[m_ChoosedDataUnit];
       }
-      m_Gui->Enable(MEASURE_SCALE_FACTOR_ID,m_ChoosedUnit == 4);
-      m_Gui->Enable(MEASURE_STRING_ID,m_ChoosedUnit == 4);
+      m_VisualUnitName  = m_DefaultUnits[m_ChoosedVisualUnit];
+      m_DataUnitName    = m_DefaultUnits[m_ChoosedDataUnit];
+      m_Gui->Enable(MEASURE_SCALE_FACTOR_ID,m_ChoosedDataUnit == 4 || m_ChoosedVisualUnit == 4);
+      m_Gui->Enable(MEASURE_DATA_STRING_ID,m_ChoosedDataUnit == 4);
+      m_Gui->Enable(MEASURE_VISUAL_STRING_ID,m_ChoosedVisualUnit == 4);
       m_Gui->Update();
     break;
     default:
@@ -135,18 +138,31 @@ void mmgMeasureUnitSettings::InitializeMeasureUnit()
   wxConfig *config = new wxConfig(wxEmptyString);
   double factor;
   wxString unit_name;
-  if(config->Read(L"UnitName", &unit_name))
+  if(config->Read(L"VisualUnitName", &unit_name))
   {
-    m_UnitName = unit_name;
-    config->Read(L"UnitFactor", &factor);
+    m_VisualUnitName = unit_name;
+  }
+  else
+  {
+    config->Write(L"VisualUnitName",m_VisualUnitName.GetCStr());
+  }
+  if(config->Read(L"DataUnitName", &unit_name))
+  {
+    m_DataUnitName = unit_name;
+  }
+  else
+  {
+    config->Write(L"DataUnitName",m_DataUnitName.GetCStr());
+  }
+  if(config->Read(L"ScaleFactor", &factor))
+  {
     m_ScaleFactor = factor;
   }
   else
   {
-    // no measure unit set; use default: "mm"
-    config->Write(L"UnitName",m_UnitName.GetCStr());
-    config->Write(L"UnitFactor",m_ScaleFactor);
+    config->Write(L"ScaleFactor",m_ScaleFactor);
   }
+
   cppDEL(config);
 }
 //----------------------------------------------------------------------------
@@ -159,5 +175,5 @@ double mmgMeasureUnitSettings::GetScaleFactor()
 mafString mmgMeasureUnitSettings::GetUnitName()
 //----------------------------------------------------------------------------
 {
-  return m_UnitName;
+  return m_VisualUnitName;
 }

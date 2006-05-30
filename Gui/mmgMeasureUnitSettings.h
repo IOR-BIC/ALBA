@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgMeasureUnitSettings.h,v $
 Language:  C++
-Date:      $Date: 2006-05-16 11:41:31 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2006-05-30 11:26:01 $
+Version:   $Revision: 1.4 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -33,9 +33,11 @@ public:
 
   enum MEASURE_UNIT_WIDGET_ID
   {
-    MEASURE_STRING_ID = MINID,
+    MEASURE_DATA_STRING_ID = MINID,
+    MEASURE_VISUAL_STRING_ID,
     MEASURE_SCALE_FACTOR_ID,
-    MEASURE_DEFAULT_UNIT_ID,
+    MEASURE_DEFAULT_DATA_UNIT_ID,
+    MEASURE_DEFAULT_VISUAL_UNIT_ID,
     MEASURE_UNIT_UPDATED
   };
 
@@ -61,7 +63,11 @@ protected:
 
   mafObserver *m_Listener;
   double       m_ScaleFactor;
-  mafString    m_UnitName;
-  int          m_ChoosedUnit;
+  mafString    m_DataUnitName;
+  mafString    m_VisualUnitName;
+  wxString     m_DefaultUnits[5];
+  double       m_DefaultFactors[5];
+  int          m_ChoosedDataUnit;
+  int          m_ChoosedVisualUnit;
 };
 #endif
