@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-18 10:28:01 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2006-06-03 10:58:03 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,6 +44,7 @@ mafOp::mafOp(wxString label)
   m_Mouse     = NULL;
   m_Compatibility     = 0xFFFF;
   m_InputPreserving = true;
+  m_CollaborateStatus = false;
 }
 //----------------------------------------------------------------------------
 mafOp::mafOp()
@@ -62,6 +63,7 @@ mafOp::mafOp()
   m_Mouse     = NULL;
 	m_Compatibility     = 0xFFFF;
   m_InputPreserving = true;
+  m_CollaborateStatus = false;
 }
 //----------------------------------------------------------------------------
 mafOp::~mafOp() 
@@ -210,4 +212,12 @@ void mafOp::OpStop(int result)
 {
   HideGui();
   mafEventMacro(mafEvent(this,result));        
+}
+//----------------------------------------------------------------------------
+void mafOp::Collaborate(bool status)
+//----------------------------------------------------------------------------
+{
+  m_CollaborateStatus = status; 
+  if(m_Gui != NULL) 
+    m_Gui->Collaborate(status);
 }

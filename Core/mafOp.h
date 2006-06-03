@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.h,v $
   Language:  C++
-  Date:      $Date: 2006-05-18 10:28:01 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-06-03 10:58:03 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -125,6 +125,9 @@ public:
   Initialize the mouse device. */
   void SetMouse(mmdMouse *mouse);
 
+  /** Turn On/Off the collaboration status. */
+  void Collaborate(bool status);
+
 protected:
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   virtual void OpStop(int result);
@@ -138,5 +141,6 @@ protected:
 	bool						m_InputPreserving;
 	mafObserver    *m_Listener;
   mmdMouse       *m_Mouse;
+  bool            m_CollaborateStatus;
 };
 #endif
