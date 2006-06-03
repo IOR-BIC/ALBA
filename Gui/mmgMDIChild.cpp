@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIChild.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-28 09:34:17 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2006-06-03 11:01:08 $
+  Version:   $Revision: 1.22 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -55,14 +55,13 @@ mmgMDIChild::mmgMDIChild(wxMDIParentFrame* parent,mafView *view)
 :wxMDIChildFrame(parent,-1, "child",wxDefaultPosition, wxDefaultSize/*, 0*/)
 //----------------------------------------------------------------------------
 {
-  this->Show(false);
-
   assert(view);
   m_View     = view;
   m_Listener = NULL;
   m_AllowCloseFlag  = true;
   m_EnableResize    = true;
 
+  this->Show(false);
   m_Win = m_View->GetWindow();
   m_Win->Reparent(this);
   m_Win->Show(true);
