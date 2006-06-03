@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-28 16:56:53 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-06-03 11:03:33 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -35,6 +35,7 @@ class mafDevice;
 class mafDeviceManager;
 class mafDeviceSet;
 class mmdMouse;
+class mmdRemoteMouse;
 class mmgInteractionSettings;
 class vtkRenderer;
 class vtkRendererWindow;
@@ -85,6 +86,9 @@ public:
 
   /** return the mouse device */
   mmdMouse *GetMouseDevice();
+
+  /** return the remote mouse device */
+  mmdRemoteMouse *GetRemoteMouseDevice();
 
   /** return the ClientMAF device */
   mmdClientMAF *GetClientDevice();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-28 16:56:53 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2006-06-03 11:03:33 $
+  Version:   $Revision: 1.27 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -52,6 +52,7 @@
 #include "mafAction.h"
 #include "mafDeviceSet.h"
 #include "mmdMouse.h"
+#include "mmdRemoteMouse.h"
 #include "mmdClientMAF.h"
 
 #include "mafVME.h"
@@ -133,6 +134,12 @@ mafInteractionManager::mafInteractionManager()
 
   mafPlugDevice<mmdClientMAF>("Client MAF");
   m_ClientDevice = (mmdClientMAF *)m_DeviceManager->AddDevice("mmdClientMAF",true);
+/*
+  mafPlugDevice<mmdRemoteMouse>("RemoteMouse");
+  mmdRemoteMouse *remote_mouse_device = (mmdRemoteMouse *)m_DeviceManager->AddDevice("mmdRemoteMouse",true); // add as persistent device
+  assert(remote_mouse_device);
+  pointing_action->BindDevice(remote_mouse_device); // bind mouse to point&manipulate action
+*/
 }
 
 //------------------------------------------------------------------------------
@@ -229,6 +236,12 @@ mmdMouse *mafInteractionManager::GetMouseDevice()
 //------------------------------------------------------------------------------
 {
   return mmdMouse::SafeDownCast(m_DeviceManager->GetDevice("Mouse"));
+}
+//------------------------------------------------------------------------------
+mmdRemoteMouse *mafInteractionManager::GetRemoteMouseDevice()
+//------------------------------------------------------------------------------
+{
+  return mmdRemoteMouse::SafeDownCast(m_DeviceManager->GetDevice("RemoteMouse"));
 }
 //------------------------------------------------------------------------------
 mmdClientMAF *mafInteractionManager::GetClientDevice()
