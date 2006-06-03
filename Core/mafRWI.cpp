@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-16 11:48:56 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2006-06-03 10:58:37 $
+  Version:   $Revision: 1.29 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -655,10 +655,13 @@ mmgGui *mafRWI::CreateGui()
   m_Gui->Color(ID_BG_COLOR,"back color",&m_BGColour);
 
   //////// ruler gui
-  m_Gui->Divider(2);
-  m_Gui->Bool(ID_SHOW_RULER,"show ruler",&m_ShowRuler);
-  m_Gui->Double(ID_RULER_SCALE_FACTOR,"scale factor",&m_RulerScaleFactor,1.0e-299,MAXDOUBLE,-1);
-  m_Gui->String(ID_RULER_LEGEND,"legend",&m_RulerLegend);
+  if (m_Camera->GetParallelProjection())
+  {
+    m_Gui->Divider(2);
+    m_Gui->Bool(ID_SHOW_RULER,"show ruler",&m_ShowRuler);
+    m_Gui->Double(ID_RULER_SCALE_FACTOR,"scale factor",&m_RulerScaleFactor,1.0e-299,MAXDOUBLE,-1);
+    m_Gui->String(ID_RULER_LEGEND,"legend",&m_RulerLegend);
+  }
 
   if (m_StereoType)
   {
