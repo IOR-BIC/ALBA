@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolyline.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 14:55:09 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-06-03 11:04:18 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,14 +20,19 @@
 //----------------------------------------------------------------------------
 
 #include "mafPipePolyline.h"
+#include "mafPipePolyline.h"
+#include "mafDecl.h"
 #include "mafSceneNode.h"
+#include "mmgGui.h"
+#include "mmaMaterial.h"
+
 #include "mafVME.h"
 #include "mafVMEOutputPolyline.h"
-#include "mmaMaterial.h"
 
 #include "vtkMAFAssembly.h"
 #include "vtkRenderer.h"
 #include "vtkOutlineCornerFilter.h"
+#include "vtkTubeFilter.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkPolyData.h"
 #include "vtkActor.h"
@@ -42,6 +47,11 @@ mafPipePolyline::mafPipePolyline()
 :mafPipe()
 //----------------------------------------------------------------------------
 {
+  m_Representation  = 0; // line by default
+  m_TubeRadius      = 1.0;
+  m_Capping         = 0;
+
+  m_Tube            = NULL;
   m_Mapper          = NULL;
   m_Actor           = NULL;
   m_OutlineBox      = NULL;
@@ -56,20 +66,30 @@ void mafPipePolyline::Create(mafSceneNode *n)
   Superclass::Create(n);
   
   m_Selected = false;
-  m_Mapper          = NULL;
-  m_Actor           = NULL;
-  m_OutlineBox      = NULL;
-  m_OutlineMapper   = NULL;
-  m_OutlineProperty = NULL;
-  m_OutlineActor    = NULL;
 
   mafVMEOutputPolyline *out_polyline = mafVMEOutputPolyline::SafeDownCast(m_Vme->GetOutput());
   assert(out_polyline);
   vtkPolyData *data = vtkPolyData::SafeDownCast(out_polyline->GetVTKData());
   assert(data);
 
+  vtkNEW(m_Tube);
+  m_Tube->UseDefaultNormalOff();
+  m_Tube->SetInput(data);
+  m_Tube->SetRadius(m_TubeRadius);
+  m_Tube->SetCapping(m_Capping);
+  m_Tube->SetNumberOfSides(20);
+  m_Tube->UseDefaultNormalOff();
+
   m_Mapper = vtkPolyDataMapper::New();
-	m_Mapper->SetInput(data);
+
+  if (m_Representation)
+  {
+    m_Tube->Update();
+    m_Mapper->SetInput(m_Tube->GetOutput());
+  }
+  else
+    m_Mapper->SetInput(data);
+
 	m_Mapper->ImmediateModeRenderingOff();
 
   m_Actor = vtkActor::New();
@@ -108,6 +128,7 @@ mafPipePolyline::~mafPipePolyline()
   m_AssemblyFront->RemovePart(m_Actor);
   m_AssemblyFront->RemovePart(m_OutlineActor);
 
+  vtkDEL(m_Tube);
 	vtkDEL(m_Mapper);
   vtkDEL(m_Actor);
   vtkDEL(m_OutlineBox);
@@ -124,4 +145,57 @@ void mafPipePolyline::Select(bool sel)
 	{
 			m_OutlineActor->SetVisibility(sel);
 	}
+}
+//----------------------------------------------------------------------------
+mmgGui *mafPipePolyline::CreateGui()
+//----------------------------------------------------------------------------
+{
+  const wxString representation_string[] = {_("line"), _("tube")};
+  int num_choices = 2;
+  m_Gui = new mmgGui(this);
+  m_Gui->Combo(ID_POLYLINE_REPRESENTATION,"",&m_Representation,num_choices,representation_string);
+  m_Gui->Double(ID_TUBE_RADIUS,_("radius"),&m_TubeRadius,0);
+  m_Gui->Bool(ID_TUBE_CAPPING,_("capping"),&m_Capping);
+
+  m_Gui->Enable(ID_TUBE_RADIUS, m_Representation != 0);
+  m_Gui->Enable(ID_TUBE_CAPPING, m_Representation != 0);
+
+  return m_Gui;
+}
+//----------------------------------------------------------------------------
+void mafPipePolyline::OnEvent(mafEventBase *maf_event)
+//----------------------------------------------------------------------------
+{
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  {
+    switch(e->GetId())
+    {
+    case ID_POLYLINE_REPRESENTATION:
+      m_Gui->Enable(ID_TUBE_RADIUS, m_Representation != 0);
+      m_Gui->Enable(ID_TUBE_CAPPING, m_Representation != 0);
+      UpdateProperty();
+      break;
+    case ID_TUBE_RADIUS:
+      m_Tube->SetRadius(m_TubeRadius);
+      break;
+    case ID_TUBE_CAPPING:
+      m_Tube->SetCapping(m_Capping);
+      break;
+    }
+    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+  }
+}
+//----------------------------------------------------------------------------
+void mafPipePolyline::UpdateProperty(bool fromTag)
+//----------------------------------------------------------------------------
+{
+  mafVMEOutputPolyline *out_polyline = mafVMEOutputPolyline::SafeDownCast(m_Vme->GetOutput());
+  vtkPolyData *data = vtkPolyData::SafeDownCast(out_polyline->GetVTKData());
+  if (m_Representation)
+  {
+    m_Tube->Update();
+    m_Mapper->SetInput(m_Tube->GetOutput());
+  }
+  else
+    m_Mapper->SetInput(data);
 }
