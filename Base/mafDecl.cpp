@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-16 09:29:10 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2006-06-03 10:57:13 $
+  Version:   $Revision: 1.24 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,6 +15,8 @@
 #include "mafIncludeWX.h"
 #include "mmuIdFactory.h"
 #include <math.h>
+
+MAF_ID_IMP(REMOTE_COMMAND_CHANNEL)
 
 static bool yelding;
 //----------------------------------------------------------------------------
@@ -186,7 +188,6 @@ wxColour mafRandomColor()
   };
 }
 //----------------------------------------------------------------------------
- //SIL. 21-3-2005: - perche non ritorna una mafString ?
 std::string  mafIdString(int id)
 //----------------------------------------------------------------------------
 {
@@ -226,6 +227,8 @@ std::string  mafIdString(int id)
      case MENU_VIEW_TIMEBAR:	  s="MENU_VIEW_TIMEBAR"; break; 
      case MENU_OPTION_APPLICATION_SETTINGS: s = "MENU_OPTION_APPLICATION_SETTINGS"; break;
      case MENU_OPTION_MEASURE_UNIT_SETTINGS: s = "MENU_OPTION_MEASURE_UNIT_SETTINGS"; break;
+     case COLLABORATE_ENABLE:   s = "COLLABORATE_ENABLE"; break;
+     case SEND_VIEW_LAYOUT:     s = "SEND_VIEW_LAYOUT"; break;
      case SASH_END:	            s="SASH_END"; break; 
      case MENU_LAYOUT_START:	  s="MENU_LAYOUT_START"; break; 
      case LAYOUT_ONE:	          s="LAYOUT_ONE"; break; 

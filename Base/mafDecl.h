@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2006-05-16 09:29:10 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2006-06-03 10:57:13 $
+  Version:   $Revision: 1.23 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -131,6 +131,10 @@ MENU_SETTINGS_END,
 MENU_HELP_START,
   ABOUT_APPLICATION,
 MENU_HELP_END,
+COLLABORATION_EVENT_BEGIN,
+  COLLABORATE_ENABLE,
+  SEND_VIEW_LAYOUT,
+COLLABORATION_EVENT_END,
 EVT_START,
   UPDATE_UI,           // update menu and toolbar widgets
 	UPDATE_PROPERTY,     // update vme property widgets
@@ -364,6 +368,8 @@ MAF_BASE_ID ///< base numeric ID used by mafIdFactory. This must be the LAST ONE
 //----------------------------------------------------------------------------
 // global functions
 //----------------------------------------------------------------------------
+
+MAF_ID_GLOBAL(REMOTE_COMMAND_CHANNEL)
 
 /** 
   return the application frame window.
