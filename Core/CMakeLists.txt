@@ -54,6 +54,8 @@ SET(PROJECT_SRCS
   mafPipeFactory.h
   mafPrintSupport.cpp
   mafPrintSupport.h
+  mafRemoteLogic.cpp
+  mafRemoteLogic.h
   mafRoot.cpp
   mafRoot.h
   mafTagArray.cpp
