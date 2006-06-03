@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-24 16:22:06 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-06-03 11:00:50 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone, Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -48,14 +48,24 @@ enum HIGHEST_EVENT_ID
 //----------------------------------------------------------------------------
   mafEvent::mafEvent()																																		{ Init(NULL,NO_EVENT,0);																Initialized();}
   mafEvent::mafEvent(void *sender, int id,                          long arg)							{ Init(sender, id, arg);																Initialized();}
-  mafEvent::mafEvent(void *sender, int id, bool            b,       long arg)							{ Init(sender, id, arg); m_bool =b;											Initialized();}
-  mafEvent::mafEvent(void *sender, int id, double           f,       long arg)							{ Init(sender, id, arg); m_double=f;											Initialized();}
-  mafEvent::mafEvent(void *sender, int id, mafString      *s,       long arg)							{ Init(sender, id, arg); m_string =s;										Initialized();}
-  mafEvent::mafEvent(void *sender, int id, mafView         *view,   wxWindow *win)				{ Init(sender, id, 0);   m_view =view; m_Win  =win;			Initialized();}
-  mafEvent::mafEvent(void *sender, int id, mafNode          *vme,    bool b,long arg)			{ Init(sender, id, arg); m_vme  =vme; m_bool = b;				Initialized();}
-  mafEvent::mafEvent(void *sender, int id, mafOp           *op,     long arg)							{ Init(sender, id, arg);   m_op   =op;									Initialized();}
-  mafEvent::mafEvent(void *sender, int id, mafMatrix    *m1,mafMatrix  *m2)					      { Init(sender, id, 0);   m_matrix =m1; m_matrix2 =m2;		Initialized();}
+  mafEvent::mafEvent(void *sender, int id, bool            b,       long arg)							{ Init(sender, id, arg); m_Bool =b;											Initialized();}
+  mafEvent::mafEvent(void *sender, int id, double           f,       long arg)							{ Init(sender, id, arg); m_Double=f;											Initialized();}
+  mafEvent::mafEvent(void *sender, int id, mafString      *s,       long arg)							{ Init(sender, id, arg); m_MAFString =s;										Initialized();}
+  mafEvent::mafEvent(void *sender, int id, mafView         *view,   wxWindow *win)				{ Init(sender, id, 0);   m_View =view; m_Win  =win;			Initialized();}
+  mafEvent::mafEvent(void *sender, int id, mafNode          *vme,    bool b,long arg)			{ Init(sender, id, arg); m_Vme  =vme; m_Bool = b;				Initialized();}
+  mafEvent::mafEvent(void *sender, int id, mafOp           *op,     long arg)							{ Init(sender, id, arg);   m_Op   =op;									Initialized();}
+  mafEvent::mafEvent(void *sender, int id, mafMatrix    *m1,mafMatrix  *m2)					      { Init(sender, id, 0);   m_Matrix =m1; m_OldMatrix =m2;		Initialized();}
   mafEvent::mafEvent(void *sender, int id, mafObject        *mafobj,  long arg)						{ Init(sender, id, arg); m_MafObject = mafobj;			    Initialized();}
+  mafEvent::mafEvent(void *sender, int id, WidgetDataType  &widget_data,  long arg)
+  {
+    Init(sender, id, arg);
+    m_WidgetData.dType = widget_data.dType;
+    m_WidgetData.dValue= widget_data.dValue;
+    m_WidgetData.fValue= widget_data.fValue;
+    m_WidgetData.iValue= widget_data.iValue;
+    m_WidgetData.sValue= widget_data.sValue;
+    Initialized();
+  }
 #ifdef MAF_USE_WX
   mafEvent::mafEvent(void *sender, int id, wxWindow        *win,    long arg)							{ Init(sender, id, arg); m_Win  =win;										Initialized();}
   mafEvent::mafEvent(void *sender, int id, wxUpdateUIEvent *e,      long arg)							{ Init(sender, id, arg); m_UpdateUIEvent = e;																	}
@@ -63,8 +73,8 @@ enum HIGHEST_EVENT_ID
 #endif
 #ifdef MAF_USE_VTK
   mafEvent::mafEvent(void *sender, int id, vtkObject       *vtkobj, long arg)							{ Init(sender, id, arg); m_VtkObj = vtkobj;							Initialized();}
-  mafEvent::mafEvent(void *sender, int id, vtkObject       *vtkobj, mafString *s)         { Init(sender, id, 0);   m_VtkObj = vtkobj;m_string =s; Initialized();}
-  mafEvent::mafEvent(void *sender, int id, vtkProp         *prop,   mafNode *vme)   			{ Init(sender, id, 0);   m_VtkProp= prop; m_vme = vme;  Initialized();}
+  mafEvent::mafEvent(void *sender, int id, vtkObject       *vtkobj, mafString *s)         { Init(sender, id, 0);   m_VtkObj = vtkobj;m_MAFString =s; Initialized();}
+  mafEvent::mafEvent(void *sender, int id, vtkProp         *prop,   mafNode *vme)   			{ Init(sender, id, 0);   m_VtkProp= prop; m_Vme = vme;  Initialized();}
 #endif
 		
 //----------------------------------------------------------------------------
@@ -74,13 +84,13 @@ void mafEvent::Log()
   mafString s = "[EV]";
                s << " sender= "<< (long)m_Sender;
                s << " ID= "    << mafIdString(m_Id).c_str();
-  if(m_arg)    s << " arg= "   << m_arg;
-  if(m_bool)   s << " bool= "  << (int)m_bool;
-  if(m_double)  s << " double= " << m_double;
-  if(m_string) s << " string= "<< *m_string;
-  if(m_view)   s << " view= "  << (long)m_view<<" : " << m_view->GetLabel();
-  if(m_vme)    s << " vme= "   << (long)m_vme <<" : " << m_vme->GetName();
-  if(m_op)     s << " op= "    << (long)m_op  <<" : " << m_op->m_Label;
+  if(m_Arg)    s << " arg= "   << m_Arg;
+  if(m_Bool)   s << " bool= "  << (int)m_Bool;
+  if(m_Double)  s << " double= " << m_Double;
+  if(m_MAFString) s << " string= "<< *m_MAFString;
+  if(m_View)   s << " view= "  << (long)m_View<<" : " << m_View->GetLabel();
+  if(m_Vme)    s << " vme= "   << (long)m_Vme <<" : " << m_Vme->GetName();
+  if(m_Op)     s << " op= "    << (long)m_Op  <<" : " << m_Op->m_Label;
 #ifdef MAF_USE_WX
   if(m_Win)    s << " win= "   << (long)m_Win;
   if(m_UpdateUIEvent)   s << " ui_evt= "<< (long)m_UpdateUIEvent;
@@ -88,8 +98,8 @@ void mafEvent::Log()
 #endif
 #ifdef MAF_USE_VTK
   if(m_VtkProp)   s << " prop= "  << (long)m_VtkProp;
-  if(m_matrix) s << " matrix= "<< (long)m_matrix;
-  if(m_matrix2)s << " matrix= "<< (long)m_matrix2;
+  if(m_Matrix) s << " matrix= "<< (long)m_Matrix;
+  if(m_OldMatrix)s << " matrix= "<< (long)m_OldMatrix;
   if(m_VtkObj) s << " vtkobj= "<< (long)m_VtkObj << " : " << m_VtkObj->GetClassName();
 #endif
   if(m_MafObject) s << " mafobj= " << (long)m_MafObject << " : " << m_MafObject->GetTypeName();
@@ -100,13 +110,18 @@ void mafEvent::Log()
 mafEvent* mafEvent::Copy() 
 //----------------------------------------------------------------------------
 {
-  mafEvent *e	= new mafEvent(m_Sender,m_Id,m_bool,m_arg);
-  e->m_double		= m_double;
-  e->m_string		= m_string;
-  e->m_view		  = m_view;
-  e->m_vme			= m_vme;
-  e->m_op		    = m_op;
+  mafEvent *e	= new mafEvent(m_Sender,m_Id,m_Bool,m_Arg);
+  e->m_Double		= m_Double;
+  e->m_MAFString= m_MAFString;
+  e->m_View		  = m_View;
+  e->m_Vme			= m_Vme;
+  e->m_Op		    = m_Op;
   e->m_MafObject= m_MafObject;
+  e->m_WidgetData.dType = m_WidgetData.dType;
+  e->m_WidgetData.dValue= m_WidgetData.dValue;
+  e->m_WidgetData.fValue= m_WidgetData.fValue;
+  e->m_WidgetData.iValue= m_WidgetData.iValue;
+  e->m_WidgetData.sValue= m_WidgetData.sValue;
 #ifdef MAF_USE_WX
   e->m_Win			= m_Win;
   e->m_UpdateUIEvent     = m_UpdateUIEvent;
@@ -114,8 +129,8 @@ mafEvent* mafEvent::Copy()
 #endif
 #ifdef MAF_USE_VTK
   e->m_VtkProp		  = m_VtkProp;
-  e->m_matrix   = m_matrix;
-  e->m_matrix2  = m_matrix2;
+  e->m_Matrix   = m_Matrix;
+  e->m_OldMatrix  = m_OldMatrix;
   e->m_VtkObj   = m_VtkObj;
 #endif
 
@@ -127,16 +142,17 @@ void mafEvent::DeepCopy(const mafEventBase *maf_event)
 {
   m_Sender  = ((mafEvent *)maf_event)->GetSender();
   m_Id      = ((mafEvent *)maf_event)->GetId();
-  m_arg     = ((mafEvent *)maf_event)->GetArg();
-  m_bool    = ((mafEvent *)maf_event)->GetBool();
-  m_double  = ((mafEvent *)maf_event)->GetDouble();
-  m_string  = ((mafEvent *)maf_event)->GetString();
-  m_vme     = ((mafEvent *)maf_event)->GetVme();
-  m_view    = ((mafEvent *)maf_event)->GetView();
-  m_op      = ((mafEvent *)maf_event)->GetOp();
-  m_matrix  = ((mafEvent *)maf_event)->GetMatrix();
-  m_matrix2 = ((mafEvent *)maf_event)->GetOldMatrix();
+  m_Arg     = ((mafEvent *)maf_event)->GetArg();
+  m_Bool    = ((mafEvent *)maf_event)->GetBool();
+  m_Double  = ((mafEvent *)maf_event)->GetDouble();
+  m_MAFString  = ((mafEvent *)maf_event)->GetString();
+  m_Vme     = ((mafEvent *)maf_event)->GetVme();
+  m_View    = ((mafEvent *)maf_event)->GetView();
+  m_Op      = ((mafEvent *)maf_event)->GetOp();
+  m_Matrix  = ((mafEvent *)maf_event)->GetMatrix();
+  m_OldMatrix = ((mafEvent *)maf_event)->GetOldMatrix();
   m_MafObject = ((mafEvent *)maf_event)->GetMafObject();
+  ((mafEvent *)maf_event)->GetWidgetData(m_WidgetData);
 #ifdef MAF_USE_WX
   m_WxObj   = ((mafEvent *)maf_event)->GetWxObj();
   m_Win     = ((mafEvent *)maf_event)->GetWin();
@@ -151,16 +167,16 @@ void mafEvent::Init(void *sender, int id, long arg)
 {
   m_Sender = sender;
   m_Id     = id; 
-  m_arg    = arg;
-  m_bool   = false; 
-  m_double  = 0; 
-  m_string = NULL; 
-  m_view   = NULL; 
-  m_vme    = NULL; 
-  m_op	   = NULL; 
+  m_Arg    = arg;
+  m_Bool   = false; 
+  m_Double  = 0; 
+  m_MAFString = NULL; 
+  m_View   = NULL; 
+  m_Vme    = NULL; 
+  m_Op	   = NULL; 
   m_MafObject = NULL;
-  m_matrix = NULL;
-  m_matrix2= NULL;
+  m_Matrix = NULL;
+  m_OldMatrix= NULL;
 #ifdef MAF_USE_WX
   m_Win    = NULL;
   m_UpdateUIEvent   = NULL;
@@ -183,6 +199,26 @@ void mafEvent::SetLogMode(int logmode)
 //----------------------------------------------------------------------------
 {
 	m_LogMode = logmode;
+}
+//----------------------------------------------------------------------------
+void mafEvent::GetWidgetData(WidgetDataType &widget_data)
+//----------------------------------------------------------------------------
+{
+  widget_data.dType = m_WidgetData.dType;
+  widget_data.dValue= m_WidgetData.dValue;
+  widget_data.fValue= m_WidgetData.fValue;
+  widget_data.iValue= m_WidgetData.iValue;
+  widget_data.sValue= m_WidgetData.sValue;
+}
+//----------------------------------------------------------------------------
+void mafEvent::SetWidgetData(WidgetDataType &widget_data)
+//----------------------------------------------------------------------------
+{
+  m_WidgetData.dType = widget_data.dType;
+  m_WidgetData.dValue= widget_data.dValue;
+  m_WidgetData.fValue= widget_data.fValue;
+  m_WidgetData.iValue= widget_data.iValue;
+  m_WidgetData.sValue= widget_data.sValue;
 }
 //----------------------------------------------------------------------------
 int mafEvent::m_LogMode = 0;

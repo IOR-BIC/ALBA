@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-24 16:22:06 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-06-03 11:00:50 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden, Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,6 +15,7 @@
 // includes:
 //----------------------------------------------------------------------------
 #include "mafDefines.h"   // mafDefines should alway be included as first
+#include "mafDecl.h"
 #include "mafEventBase.h" // base class for mafEvent
 #include "mafObserver.h"
 #include "mafString.h"    // used by mafEvent
@@ -44,53 +45,55 @@ public:
   mafTypeMacro(mafEvent,mafEventBase);
 
   mafEvent();                                                         
-  mafEvent(void *sender, int id,                          long arg=0);
-  mafEvent(void *sender, int id, bool            b,       long arg=0);
+  mafEvent(void *sender, int id,                           long arg=0);
+  mafEvent(void *sender, int id, bool             b,       long arg=0);
   mafEvent(void *sender, int id, double           f,       long arg=0);
-  mafEvent(void *sender, int id, mafString      *s,       long arg=0);
-  mafEvent(void *sender, int id, mafNode         *vme,    bool b=false, long arg=0);
-  mafEvent(void *sender, int id, mafView         *view,   wxWindow *win=NULL);
-  mafEvent(void *sender, int id, mafOp					 *op,     long arg=0);
-  mafEvent(void *sender, int id, mafObject       *mafobj, long arg=0);
+  mafEvent(void *sender, int id, mafString       *s,       long arg=0);
+  mafEvent(void *sender, int id, mafNode         *vme,     bool b=false, long arg=0);
+  mafEvent(void *sender, int id, mafView         *view,    wxWindow *win=NULL);
+  mafEvent(void *sender, int id, mafOp					 *op,      long arg=0);
+  mafEvent(void *sender, int id, mafObject       *mafobj,  long arg=0);
+  mafEvent(void *sender, int id, WidgetDataType  &widget_data,  long arg=0);
 
   virtual void DeepCopy(const mafEventBase *maf_event);
 
-  long              GetArg()     {return m_arg;};
-  bool              GetBool()    {return m_bool;};
-  double            GetDouble()   {return m_double;};
-  mafString*        GetString()  {return m_string;};
-  mafView*          GetView()    {return m_view;};
-  mafNode*          GetVme()     {return m_vme;};
-  mafOp*					  GetOp()      {return m_op;};
-  mafMatrix*        GetMatrix()    {return m_matrix;};
-  mafMatrix*        GetOldMatrix() {return m_matrix2;};
+  long              GetArg()     {return m_Arg;};
+  bool              GetBool()    {return m_Bool;};
+  double            GetDouble()   {return m_Double;};
+  mafString*        GetString()  {return m_MAFString;};
+  mafView*          GetView()    {return m_View;};
+  mafNode*          GetVme()     {return m_Vme;};
+  mafOp*					  GetOp()      {return m_Op;};
+  mafMatrix*        GetMatrix()    {return m_Matrix;};
+  mafMatrix*        GetOldMatrix() {return m_OldMatrix;};
   mafObject*        GetMafObject() {return m_MafObject;}
-  
+  void GetWidgetData(WidgetDataType &widget_data);
 
-  void SetArg(long arg)         { m_arg = arg;};
-  void SetBool(bool b)          { m_bool = b;};
-  void SetDouble(double f)      { m_double = f;};
-  void SetString(mafString *s)  { m_string = s;};
-  void SetView(mafView* view)   { m_view = view;};
-  void SetVme(mafNode* vme)     { m_vme = vme;};
-  void SetOp(mafOp* op)         { m_op = op;};
-  void SetMatrix(mafMatrix* mat)       { m_matrix = mat;};
-  void SetOldMatrix(mafMatrix* mat2)   { m_matrix2 =mat2;};
+  void SetArg(long arg)         { m_Arg = arg;};
+  void SetBool(bool b)          { m_Bool = b;};
+  void SetDouble(double f)      { m_Double = f;};
+  void SetString(mafString *s)  { m_MAFString = s;};
+  void SetView(mafView* view)   { m_View = view;};
+  void SetVme(mafNode* vme)     { m_Vme = vme;};
+  void SetOp(mafOp* op)         { m_Op = op;};
+  void SetMatrix(mafMatrix* mat)       { m_Matrix = mat;};
+  void SetOldMatrix(mafMatrix* mat2)   { m_OldMatrix =mat2;};
   void SetMafObject(mafObject* obj)    { m_MafObject = obj;}
-
+  void SetWidgetData(WidgetDataType &widget_data);
 
 protected:
-  long             m_arg;
-  bool             m_bool;
-  double           m_double;
-  mafString       *m_string;
+  long             m_Arg;
+  bool             m_Bool;
+  double           m_Double;
+  mafString       *m_MAFString;
 
-  mafNode         *m_vme;
-  mafView         *m_view;
-  mafOp						*m_op;
-  mafMatrix       *m_matrix;
-  mafMatrix       *m_matrix2;
+  mafNode         *m_Vme;
+  mafView         *m_View;
+  mafOp						*m_Op;
+  mafMatrix       *m_Matrix;
+  mafMatrix       *m_OldMatrix;
   mafObject       *m_MafObject;
+  WidgetDataType   m_WidgetData;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #ifdef MAF_USE_WX
