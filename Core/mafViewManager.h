@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-03 14:21:44 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-06-03 10:59:22 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,6 +39,7 @@ public:
   mafViewManager();
  ~mafViewManager(); 
   void SetListener(mafObserver *Listener) {m_Listener = Listener;};
+  void SetRemoteListener(mafObserver *Listener) {m_RemoteListener = Listener;};
   virtual void OnEvent(mafEventBase *maf_event);
 
   /** Fill the main menù with plugged views. */
@@ -65,6 +66,9 @@ public:
 	/** Pass the selected render window to the mouse device. */
   void ViewSelected(mafView *view /*, mafRWIBase *rwi*/);
   
+  /** Activate the view from software to simulate the click on the view (used by remote). */
+  void Activate(mafView *view);
+
 	/** Create a view at index 'id' of the view-list. */
   virtual mafView *ViewCreate(int id);
   
@@ -101,8 +105,11 @@ public:
   /** Return the root of the vme tree. */
   mafNode     *GetCurrentRoot() {return (mafNode*)m_RootVme;};
 
-  /** Return the view-list. */
+  /** Return the created view-list. */
   mafView* GetList() {return m_ViewList;};
+
+  /** Return the plugged view-list. */
+  mafView **GetListTemplate() {return m_ViewTemplate;};
 
   /** Empty. */
   void OnQuit();
@@ -114,20 +121,27 @@ public:
   Initialize the action for the mouse device. */
   void SetMouse(mmdMouse *mouse);
 
+  /** Turn On/Off the collaboration status. */
+  void Collaborate(bool status) {m_CollaborateStatus = status;};
+
+  bool m_FromRemote;  ///< Flag used from RemoteLogic to avoid loop
+
 protected:
+  mmdMouse      *m_Mouse;
+  mafView       *m_ViewList;  // created view list
 
-  mmdMouse           *m_Mouse;
-  mafView            *m_ViewList;  // created view list
-
-  mafView            *m_ViewTemplate[MAXVIEW];   // view template vector
-  int                 m_TemplateNum;       // number of template
+  mafView       *m_ViewTemplate[MAXVIEW];   // view template vector
+  int            m_TemplateNum;       // number of template
 
   mafObserver   *m_Listener;
+  mafObserver   *m_RemoteListener;
   mafVMERoot    *m_RootVme;
   mafNode       *m_SelectedVme;
   mafView       *m_SelectedView;
   mafRWIBase    *m_SelectedRWI;
 	mafView       *m_ViewBeingCreated;
   mafView       *m_ViewMatrixID[MAXVIEW][MAXVIEW];  ///< Matrix to access views directly by (id, multiplicity)
+
+  bool m_CollaborateStatus;
 };
 #endif

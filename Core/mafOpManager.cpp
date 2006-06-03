@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-10 12:59:17 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2006-06-03 10:59:22 $
+  Version:   $Revision: 1.19 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,15 +22,25 @@
 
 #include "mafOpManager.h"
 #include <wx/tokenzr.h>
+#include "mmuIdFactory.h"
 #include "mafDecl.h"
 #include "mafOp.h"
+#include "mmgGui.h"
 #include "mafOpStack.h"
 #include "mafOpContextStack.h"
 #include "mafOpSelect.h"
+
 #include "mmdMouse.h"
+
 #include "mafNode.h"
 
 #include "vtkMatrix4x4.h"
+
+//------------------------------------------------------------------------------
+// Events
+//------------------------------------------------------------------------------
+MAF_ID_IMP(mafOpManager::OPERATION_INTERFACE_EVENT)
+MAF_ID_IMP(mafOpManager::RUN_OPERATION_EVENT)
 
 /**
 There are 4 paths in OpProcessor
@@ -53,21 +63,23 @@ the nested operations can be cancelled individually.
 the nested operations send OP_RUN_STARTING and OP_RUN_TERMINATED to the caller operation.
 instead to Logic - in Logic don't need any more running_op_counter, in theory.
 In practice it needs for View-Settings.
-
 No is dangerous - if the operations don't manage OP_RUN_STARTING and OP_RUN_TERMINATED 
 these return and reach logic - is better to avoid.
 
 During the Exec, can be run nested operations
 but could not be done the undo.
 */
+
 //----------------------------------------------------------------------------
 mafOpManager::mafOpManager()
 //----------------------------------------------------------------------------
 {
   m_Listener	= NULL;
+  m_RemoteListener = NULL;
   m_RunningOp = NULL;
 	m_Selected	= NULL;
 	m_Warn			= false;
+  m_FromRemote= false;
   
 	m_Menu[OPTYPE_IMPORTER] = NULL;
   m_Menu[OPTYPE_EXPORTER] = NULL;
@@ -81,6 +93,8 @@ mafOpManager::mafOpManager()
 
 	m_ToolBar = NULL;
 	m_MenuBar = NULL;
+
+  m_CollaborateStatus = false;
 
   m_NumOfAccelerators = 0;
   m_NumOp = 0;
@@ -101,7 +115,6 @@ mafOpManager::~mafOpManager()
   cppDEL(m_OpCut);
   cppDEL(m_OpCopy);
   cppDEL(m_OpPaste);
-	//delete m_optransform;
 }
 //----------------------------------------------------------------------------
 void mafOpManager::OnEvent(mafEventBase *maf_event)
@@ -132,6 +145,22 @@ void mafOpManager::OnEvent(mafEventBase *maf_event)
         o = (mafOp*) e->GetSender();
         assert(o == m_Context.Caller());
         OpRunCancel(o);
+      break;
+      case REMOTE_PARAMETER:
+        if(m_CollaborateStatus && m_RemoteListener)
+        {
+          // Send the event to synchronize the remote application in case of collaboration modality
+          long w_id = e->GetArg();
+          WidgetDataType w_data;
+          w_data.dValue  = 0.0;
+          w_data.fValue  = 0.0;
+          w_data.iValue  = 0;
+          w_data.sValue  = "";
+          w_data.dType = NULL_DATA;
+          m_RunningOp->OpGui()->GetWidgetValue(w_id, w_data);
+          mafEvent ev(this,OPERATION_INTERFACE_EVENT,w_data,w_id);
+          m_RemoteListener->OnEvent(&ev);
+        }
       break;
       default:
         mafEventMacro(*e);
@@ -447,6 +476,11 @@ void mafOpManager::OpRun(int op_id)
       int index = op_id - OP_USER;
 		  if(index >=0 && index <m_NumOp) 
         OpRun(m_OpList[index]);
+      if(m_CollaborateStatus && m_RemoteListener && !m_FromRemote && m_RunningOp->GetType() == OPTYPE_OP)
+      {
+        mafEvent e(this,RUN_OPERATION_EVENT,m_RunningOp);
+        m_RemoteListener->OnEvent(&e);
+      }
 		}
 	  break;
 	}
@@ -476,7 +510,7 @@ void mafOpManager::OpRun(mafOp *op)
   //Notify(OP_RUN_STARTING); //SIL. 17-9-2004: --- moved after m_RunningOp has been set
 
 	mafOp *o = op->Copy();
-  o->m_Id = op->m_Id;    //Paolo 15/09/2004 The operation ID is not copyed from the Copy() method.
+  o->m_Id = op->m_Id;    //Paolo 15/09/2004 The operation ID is not copied from the Copy() method.
 	o->SetListener(this);
 	o->SetInput(m_Selected);
   o->SetMouse(m_Mouse);
@@ -639,6 +673,12 @@ bool mafOpManager::StopCurrentOperation()
   return (m_RunningOp == NULL);
 }
 //----------------------------------------------------------------------------
+mafOp *mafOpManager::GetRunningOperation()
+//----------------------------------------------------------------------------
+{
+  return m_RunningOp;
+}
+//----------------------------------------------------------------------------
 bool mafOpManager::ForceStopWithOk()
 //----------------------------------------------------------------------------
 {
@@ -668,4 +708,13 @@ void mafOpManager::SetMouse(mmdMouse *mouse)
 //----------------------------------------------------------------------------
 {
   m_Mouse = mouse;
+}
+//----------------------------------------------------------------------------
+void mafOpManager::Collaborate(bool status)
+//----------------------------------------------------------------------------
+{
+  m_CollaborateStatus = status;
+
+  for(int index = 0; index < m_NumOp; index++)
+    m_OpList[index]->Collaborate(status);
 }

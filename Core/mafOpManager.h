@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-15 15:19:39 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-06-03 10:59:22 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,7 +45,12 @@ public:
 	         mafOpManager();
 	virtual ~mafOpManager(); 
 	virtual void SetListener(mafObserver *Listener) {m_Listener = Listener;};
+  virtual void SetRemoteListener(mafObserver *Listener) {m_RemoteListener = Listener;};
 	virtual void OnEvent(mafEventBase *maf_event);
+
+  /** Event IDs used in collaborative modality.*/
+  MAF_ID_DEC(OPERATION_INTERFACE_EVENT)
+  MAF_ID_DEC(RUN_OPERATION_EVENT)
 
 	/** Add the operation 'op' to the list of available operations. */
 	virtual void OpAdd		(mafOp *op, wxString menuPath = "");
@@ -98,9 +103,17 @@ public:
 	/** Stop the current operation in any case - to be used as last resort. */
   virtual bool StopCurrentOperation();
 
+  /** Return the current running operation. Return NULL if no operation is running.*/
+  mafOp *GetRunningOperation();
+
   /** 
   Initialize the action for the mouse device. */
   void SetMouse(mmdMouse *mouse);
+
+  /** Turn On/Off the collaboration status. */
+  void Collaborate(bool status);
+
+  bool m_FromRemote; ///< Flag used to check if a command comes from local or remote application.
 
 protected:
 	/** Execute the current operation. */
@@ -153,6 +166,9 @@ protected:
   wxMenuBar         *m_MenuBar;
 	wxToolBar         *m_ToolBar;
 
+  bool m_CollaborateStatus;  ///< Flag set to know if the application is in collaborative mode or no.
+
   mafObserver       *m_Listener;
+  mafObserver       *m_RemoteListener; ///< Listener used to send messages to remote applications
 };
 #endif

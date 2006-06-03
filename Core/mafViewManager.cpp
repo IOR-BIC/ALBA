@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-08 11:50:19 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2006-06-03 10:59:22 $
+  Version:   $Revision: 1.24 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,6 +21,7 @@
 
 
 #include "mafViewManager.h"
+#include <wx/config.h>
 #include "mafDecl.h"
 #include "mafView.h"
 #include "mafNode.h"
@@ -29,6 +30,7 @@
 
 #include "mmgMDIFrame.h"
 #include "mmgMDIChild.h"
+#include "mmgViewFrame.h"
 #include "mafViewVTK.h"
 #include "mafViewCompound.h"
 
@@ -51,11 +53,14 @@ mafViewManager::mafViewManager()
 
   m_ViewList          = NULL;
   m_Listener          = NULL;
+  m_RemoteListener    = NULL;
   m_SelectedVme       = NULL;
   m_SelectedView      = NULL;
 	m_RootVme           = NULL;
   m_ViewBeingCreated  = NULL; 
   m_TemplateNum       = 0;
+  m_CollaborateStatus = false;
+  m_FromRemote        = false;
   for(int i=0; i<MAXVIEW; i++) 
     m_ViewTemplate[i] = NULL;
 
@@ -119,6 +124,13 @@ void mafViewManager::OnEvent(mafEventBase *maf_event)
 
         if(notifylogic)
           mafEventMacro(mafEvent(this,VIEW_SELECT,(long)e->GetSender())); 
+
+        if(m_CollaborateStatus && m_RemoteListener && !m_FromRemote)
+        {
+          // Send the event to synchronize the remote application in case of collaboration modality
+          mafEvent ev(this,VIEW_SELECTED,view);
+          m_RemoteListener->OnEvent(&ev);
+        }
       }
       break;
       default:
@@ -381,6 +393,13 @@ void mafViewManager::ViewInsert(mafView *view)
 void mafViewManager::ViewDelete(mafView *view)
 //----------------------------------------------------------------------------
 {
+  if(m_CollaborateStatus && m_RemoteListener && !m_FromRemote)
+  {
+    // Send the event to synchronize the remote application in case of collaboration modality
+    mafEvent e(this,VIEW_DELETE,view);
+    m_RemoteListener->OnEvent(&e);
+  }
+
   mafEventMacro(mafEvent(this,VIEW_DELETE,view)); // inform the sidebar
 	
   // Paolo 2005-04-22
@@ -427,4 +446,18 @@ mafView *mafViewManager::GetSelectedView()
 //----------------------------------------------------------------------------
 {
   return m_SelectedView; 
+}
+//----------------------------------------------------------------------------
+void mafViewManager::Activate(mafView *view)
+//----------------------------------------------------------------------------
+{
+  bool externalViewFlag;
+  wxConfig *config = new wxConfig(wxEmptyString);
+  config->Read("ExternalViewFlag", &externalViewFlag, false);
+  cppDEL(config);
+
+  if(externalViewFlag)
+    ((mmgViewFrame *)view->GetFrame())->SetFocus();
+  else
+    ((mmgMDIChild *)view->GetFrame())->Activate();
 }
