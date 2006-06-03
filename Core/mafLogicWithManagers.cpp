@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-16 09:27:00 $
-  Version:   $Revision: 1.60 $
+  Date:      $Date: 2006-06-03 10:59:54 $
+  Version:   $Revision: 1.61 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,7 +35,14 @@
 #include "mafTagItem.h"
 #include "mafPrintSupport.h"
 
+#include "mafDeviceManager.h"
+#include "mafAction.h"
+#include "mmdMouse.h"
+#include "mmdClientMAF.h"
+#include "mmiPER.h"
+
 #include "mafSideBar.h"
+
 #include "mmgMDIFrame.h"
 #include "mmgMDIChild.h"
 #include "mmgCheckTree.h"
@@ -46,8 +53,8 @@
 #include "mmgViewFrame.h"
 #include "mmgLocaleSettings.h"
 #include "mmgMeasureUnitSettings.h"
-#include "mmiPER.h"
-#include "mmdClientMAF.h"
+
+#include "mafRemoteLogic.h"
 
 #include "mafVMEStorage.h"
 
@@ -72,6 +79,7 @@ mafLogicWithManagers::mafLogicWithManagers()
   m_ViewManager = NULL;
   m_OpManager   = NULL;
   m_InteractionManager = NULL;
+  m_RemoteLogic = NULL;
 
   m_ImportMenu  = NULL; 
   m_ExportMenu  = NULL; 
@@ -114,25 +122,30 @@ void mafLogicWithManagers::Configure()
 
   if (m_UseInteractionManager)
   {
-    m_InteractionManager = new mafInteractionManager;
+    m_InteractionManager = new mafInteractionManager();
     m_InteractionManager->SetListener(this);
-    m_InteractionManager->GetClientDevice()->AddObserver(this, MCH_INPUT);
+    m_Mouse = m_InteractionManager->GetMouseDevice();
   }
 
   if(m_UseViewManager)
   {
     m_ViewManager = new mafViewManager();
-    m_ViewManager->SetListener(this); 
-    m_ViewManager->SetMouse(m_InteractionManager->GetMouseDevice());
+    m_ViewManager->SetListener(this);
+    m_ViewManager->SetMouse(m_Mouse);
   }
 
   if(m_UseOpManager)
   {
     m_OpManager = new mafOpManager();
     m_OpManager->SetListener(this);
-    m_OpManager->SetMouse(m_InteractionManager->GetMouseDevice());
+    m_OpManager->SetMouse(m_Mouse);
   }
 
+  if (m_UseInteractionManager && m_UseViewManager && m_UseOpManager)
+  {
+    m_RemoteLogic = new mafRemoteLogic(this, m_ViewManager, m_OpManager);
+    m_RemoteLogic->SetClientUnit(m_InteractionManager->GetClientDevice());
+  }
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Plug(mafView* view) 
@@ -654,6 +667,32 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       case CREATE_LOCAL_STORAGE:
         CreateLocalStorage(e);
       break;
+      case COLLABORATE_ENABLE:
+      {
+        bool collaborate = e->GetBool();
+        if (collaborate)
+        {
+          //m_RemoteLogic->SetRemoteMouse(m_InteractionManager->GetRemoteMouseDevice());
+          m_Mouse->AddObserver(m_RemoteLogic, REMOTE_COMMAND_CHANNEL);
+          if(m_RemoteLogic->IsSocketConnected())  //check again, because if no server is present
+          {                                       //no synchronization is necessary
+            m_RemoteLogic->SynchronizeApplication();
+          }
+        }
+        else
+        {
+          if (m_RemoteLogic != NULL)
+          {
+            m_RemoteLogic->SetRemoteMouse(NULL);
+            m_RemoteLogic->Disconnect();
+            m_Mouse->RemoveObserver(m_RemoteLogic);
+          }
+        }
+        m_ViewManager->Collaborate(collaborate);
+        m_OpManager->Collaborate(collaborate);
+        m_Mouse->Collaborate(collaborate);
+      }
+      break;
       default:
         mafLogicWithGUI::OnEvent(maf_event);
       break; 
@@ -763,6 +802,7 @@ void mafLogicWithManagers::OnQuit()
   
   mmgMDIChild::OnQuit(); 
 
+  cppDEL(m_RemoteLogic);
   cppDEL(m_VMEManager);
   cppDEL(m_MaterialChooser);
   cppDEL(m_InteractionManager);
@@ -787,18 +827,16 @@ void mafLogicWithManagers::VmeSelect(mafEvent& e)	//modified by Paolo 10-9-2003
 
   if(node == NULL)
   {
+    //node can be selected by its ID
     if(m_VMEManager)
     {
-/*
-      //node can be selected by its name
-		  wxString *vme_name = e.GetString()->c_str(); //@@@@@ ????
-		  mafNodeRoot *root = this->m_VMEManager->GetRoot();
-		  if (vme_name && root)
+		  long vme_id = e.GetArg();
+		  mafVMERoot *root = this->m_VMEManager->GetRoot();
+		  if (root)
 		  {
-			  node = root->FindInTreeByName(vme_name->c_str());        // not yet implemented
+			  node = root->FindInTreeById(vme_id);
 			  e.SetVme(node);
       }
-*/
     }
   }
   if(node != NULL && m_OpManager)
@@ -806,6 +844,11 @@ void mafLogicWithManagers::VmeSelect(mafEvent& e)	//modified by Paolo 10-9-2003
     
   if (m_InteractionManager)
     m_InteractionManager->VmeSelected(node);
+
+  if(m_RemoteLogic && (e.GetSender() != m_RemoteLogic) && m_RemoteLogic->IsSocketConnected())
+  {
+    m_RemoteLogic->VmeSelected(node);
+  }
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeSelected(mafNode *vme)
@@ -931,10 +974,19 @@ void mafLogicWithManagers::ViewCreate(int viewId)
 	if(m_ViewManager)
   {
     mafView* v = m_ViewManager->ViewCreate(viewId);
-/*    if(m_OpManager) 
+    if(m_RemoteLogic && m_RemoteLogic->IsSocketConnected() && !m_ViewManager->m_FromRemote)
+    {
+      mafString cmd = "VIEW_CREATE:";
+      cmd << v->m_Id - VIEW_START;
+      m_RemoteLogic->RemoteMessage(cmd);
+    }
+
+    /*
+    if(m_OpManager) 
     {
       VmeShow(m_OpManager->GetSelectedVme(),true);
-    }*/
+    }
+    */
   }
 }
 //----------------------------------------------------------------------------
