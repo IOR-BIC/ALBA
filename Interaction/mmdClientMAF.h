@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmdClientMAF.h,v $
 Language:  C++
-Date:      $Date: 2006-03-28 16:56:32 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2006-06-03 11:02:29 $
+Version:   $Revision: 1.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -14,6 +14,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #define __mmdClientMAF_h
 
 #include "mafDevice.h"
+#include "ClientUnit.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -21,7 +22,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class ClientUnit;
 
 /** Device implementing interface for PLASTIC hub.
-  mmdClientMAF is a class providing interface for MAFServer (socket comunication).
+  mmdClientMAF is a class providing interface for MAFServer (socket communication).
   @sa mafDevice
 */
 
@@ -45,6 +46,21 @@ public:
   /** internal function to create device GUI for settings */
   virtual void CreateGui();
 
+  /** Connect the client to the specified address and return MAF_OK on success, otherwise MAF_ERROR is returned.*/
+  int ConnectClient(wxIPV4address &addr);
+
+  /** Disconnect client form remote connection and return MAF_OK on success otherwise MAF_ERROR is returned*/
+  int DisconnectClient();
+
+  /** Send the command to the server.*/
+  void SendMessageToServer(mafString &cmd);
+
+  /** Return connection status flag.*/
+  bool IsConnected() {return m_Connected;};
+
+  /** Return client busy status.*/
+  bool IsBusy() {return m_Client->IsBusy();};
+
 protected:
   mmdClientMAF();
   virtual ~mmdClientMAF();
@@ -55,9 +71,9 @@ protected:
   ClientUnit *m_Client;
   mafString   m_ServerHost;
   int         m_PortNumber;
+  bool        m_Connected;
 private:
   mmdClientMAF(const mmdClientMAF&);  // Not implemented.
   void operator=(const mmdClientMAF&);  // Not implemented.
-
 };
 #endif

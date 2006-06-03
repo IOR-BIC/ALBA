@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmdClientMAF.cpp,v $
 Language:  C++
-Date:      $Date: 2006-03-28 16:56:32 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2006-06-03 11:02:29 $
+Version:   $Revision: 1.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -21,7 +21,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mmdClientMAF.h"
 #include "mmuIdFactory.h"
 #include "mmgGui.h"
-#include "ClientUnit.h"
 
 #include "mafEventSender.h"
 
@@ -36,6 +35,7 @@ mmdClientMAF::mmdClientMAF()
   m_Client->SetListener(this);
   m_ServerHost = wxGetHostName().c_str();
   m_PortNumber = 50000;
+  m_Connected  = false;
 }
 
 //------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ void mmdClientMAF::OnEvent(mafEventBase *maf_event)
   {
     if (maf_event->GetId() == ClientUnit::RemoteMessage_ID) 
     {
-      AsyncInvokeEvent(maf_event,MCH_INPUT);
+      InvokeEvent(maf_event,MCH_INPUT);
     }
   }
   else if (maf_event->GetSender() == m_Gui) 
@@ -95,16 +95,47 @@ int mmdClientMAF::InternalInitialize()
   wxIPV4address server_address;
   server_address.Service(m_PortNumber);
   server_address.Hostname(hn);
-  if (m_Client->ConnectClient(server_address)) 
+  m_Connected = (ConnectClient(server_address) == MAF_OK);
+  mafEvent e(this,COLLABORATE_ENABLE,m_Connected);
+  InvokeEvent(&e);
+  return m_Connected ? MAF_OK : MAF_ERROR;
+}
+//------------------------------------------------------------------------------
+void mmdClientMAF::InternalShutdown()
+//------------------------------------------------------------------------------
+{
+  m_Connected = !(DisconnectClient() == MAF_OK);
+  mafEvent e(this,COLLABORATE_ENABLE,m_Connected);
+  InvokeEvent(&e);
+
+  Superclass::InternalShutdown();
+}
+//------------------------------------------------------------------------------
+int mmdClientMAF::ConnectClient(wxIPV4address &addr)
+//------------------------------------------------------------------------------
+{
+  if (m_Client->ConnectClient(addr)) 
   {
     return MAF_OK;
   }
   return MAF_ERROR;
 }
 //------------------------------------------------------------------------------
-void mmdClientMAF::InternalShutdown()
+int mmdClientMAF::DisconnectClient()
 //------------------------------------------------------------------------------
 {
-  m_Client->DisconnectClient();
-  return;
+  if (m_Client->DisconnectClient()) 
+  {
+    return MAF_OK;
+  }
+  return MAF_ERROR;
+}
+//------------------------------------------------------------------------------
+void mmdClientMAF::SendMessageToServer(mafString &cmd)
+//------------------------------------------------------------------------------
+{
+  if (m_Connected)
+  {
+    m_Client->SendMessageToServer(cmd);
+  }
 }
