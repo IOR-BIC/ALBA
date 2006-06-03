@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdRemoteMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-28 14:47:40 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-06-03 11:02:53 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -87,18 +87,16 @@ void mmdRemoteMouse::OnEvent(mafEventBase *event)
   }
   else if (id == VIEW_SELECT)
   {
-    mafEvent *e=mafEvent::SafeDownCast(event);
-    assert(e);
-    m_SelectedView = e->GetView();    
+    mafEvent *ev=mafEvent::SafeDownCast(event);
+    m_SelectedView = ev->GetView();    
   }
   else if (id == MOUSE_CHAR_EVENT)
   {
-    mafEvent *e=mafEvent::SafeDownCast(event);
-    assert(e);
-    unsigned char key = (unsigned char)e->GetArg();
-    mafEventInteraction ev(this,MOUSE_CHAR_EVENT);
-    ev.SetKey(key);
-    InvokeEvent(ev,MCH_INPUT);
+    mafEvent *ev=mafEvent::SafeDownCast(event);
+    unsigned char key = (unsigned char)ev->GetArg();
+    mafEventInteraction ei(this,MOUSE_CHAR_EVENT);
+    ei.SetKey(key);
+    InvokeEvent(ei,MCH_INPUT);
   }
 }
 
