@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: ClientUnit.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-28 16:55:46 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-06-05 09:24:24 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -48,7 +48,7 @@ public:
 
   /** 
   Send the message to the server.*/
-  void SendMessageToServer(wxString cmd);
+  void SendMessageToServer(mafString &cmd);
 
   /** 
   Function called when the server sends a message.*/

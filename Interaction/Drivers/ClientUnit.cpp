@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: ClientUnit.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-28 16:55:46 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-06-05 09:24:24 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -78,11 +78,10 @@ bool ClientUnit::DisconnectClient()
   return m_sock->Close();
 }
 //----------------------------------------------------------------------------
-void ClientUnit::SendMessageToServer(wxString cmd)
+void ClientUnit::SendMessageToServer(mafString &cmd)
 //----------------------------------------------------------------------------
 {
   char *msg1;
-  char *msg2;
   size_t len;
 
   m_busy = TRUE;
@@ -94,15 +93,13 @@ void ClientUnit::SendMessageToServer(wxString cmd)
   // We need to set no flags here (ReadMsg and WriteMsg are
   // not affected by flags)
 
-  m_sock->SetFlags(wxSOCKET_WAITALL);
-  msg1 = (char *)cmd.c_str();
-  len  = wxStrlen(msg1) + 1;
-  msg2 = new char[len];
+  //m_sock->SetFlags(wxSOCKET_WAITALL);
+  msg1 = (char *)cmd.GetCStr();
+  len  = cmd.Length() + 1;
 
-  m_sock->WriteMsg(msg1, len);
-  mafLogMessage(m_sock->Error() ? _("failed !\n") : _("done\n"));
+  m_sock->Write(msg1, len);
+  m_sock->Discard();
 
-  delete[] msg2;
   m_busy = FALSE;
 }
 //----------------------------------------------------------------------------
@@ -124,13 +121,13 @@ void ClientUnit::OnSocketEvent(wxSocketEvent& event)
     default                  : s.Append(_("Unexpected event !\n")); break;
   }
 
-  mafLogMessage(s.c_str());
+  //mafLogMessage(s.c_str());
 }
 //----------------------------------------------------------------------------
 void ClientUnit::ReadMessageFromServer(wxSocketBase *sock)
 //----------------------------------------------------------------------------
 {
-#define MAX_MSG_SIZE 10000
+#define MAX_MSG_SIZE 256
 
   m_busy = TRUE;
   char *msg = new char[MAX_MSG_SIZE];
@@ -140,11 +137,14 @@ void ClientUnit::ReadMessageFromServer(wxSocketBase *sock)
   // are not affected by them anyway.
 
   // Read the message
-  len = sock->ReadMsg(msg, MAX_MSG_SIZE).LastCount();
-
-  mafString s = msg;
-  mafEvent e(this,RemoteMessage_ID,&s);
-  InvokeEvent(e);
+  len = sock->Read(msg, MAX_MSG_SIZE).LastCount();
+  
+  if (len > 0) 
+  {
+    mafString s = msg;
+    mafEvent e(this,RemoteMessage_ID,&s);
+    InvokeEvent(e);
+  }
 
   delete[] msg;
   m_busy = FALSE;
