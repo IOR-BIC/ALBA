@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataPipe.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-07 18:54:16 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-06-08 14:10:46 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -18,7 +18,9 @@
 #include "mafObserver.h"
 #include "mafTimeStamped.h"
 #include "mafOBB.h"
-
+#ifdef MAF_USE_ITK
+  #include "vnl/vnl_matrix.h"
+#endif
 //----------------------------------------------------------------------------
 //  forward declarations
 //----------------------------------------------------------------------------
@@ -71,6 +73,10 @@ public:
   virtual vtkDataSet *GetVTKData() {return NULL;}
 #endif
 
+#ifdef MAF_USE_ITK
+  /** return the vnl_matrix data corresponding to the current time*/
+  virtual vnl_matrix<double> &GetScalarData() {return m_ScalarData;};
+#endif
 
   /** Set/Get the current time */
   void SetTimeStamp(mafTimeStamp t);
@@ -83,7 +89,7 @@ public:
   virtual bool Accept(mafVME *vme) {return vme!=NULL;}
 
   /**
-    Make a copy of this pipe, also copying all parameters. This equivalente to
+    Make a copy of this pipe, also copying all parameters. This is equivalent to
     NewInstance + DeepCopy.
     BEWARE: the returned object has reference counter already set to 0. This avoid the 
     to do an extra Delete(), but requires to Register it before passing it
@@ -91,7 +97,7 @@ public:
   mafDataPipe *MakeACopy();
 
   /**
-    Copy from another pipe, the function return VTK_ERROR if the specied pipe 
+    Copy from another pipe, the function return VTK_ERROR if the specifyed pipe 
     is not compatible. */
   virtual int DeepCopy(mafDataPipe *pipe);
 
@@ -123,6 +129,9 @@ protected:
   /** function called to updated the data pipe output */
   virtual void Execute();
 
+#ifdef MAF_USE_ITK
+  vnl_matrix<double> m_ScalarData;
+#endif
   mafOBB        m_Bounds;///< bounds of the output data
   mafTimeStamp  m_CurrentTime;  ///< time for which data is computed
   mafVME        *m_VME;         ///< pointer to the VME for which output is computed
@@ -136,6 +145,4 @@ private:
   mafDataPipe(const mafDataPipe&);   //Not implemented
   void operator=(const mafDataPipe&);   //Not implemented  
 };
-
 #endif /* __mafDataPipe_h */
- 
