@@ -26,6 +26,8 @@ SET(PROJECT_SRCS
   mafVMEGroup.h
   mafVMEItem.cpp
   mafVMEItem.h
+  mafVMEItemScalar.cpp
+  mafVMEItemScalar.h
   mafMSFImporter.cpp
   mafMSFImporter.h
 )
@@ -36,6 +38,17 @@ SET(PROJECT_SRCS  ${PROJECT_SRCS}
   mafCrypt.h
   )
 ENDIF (MAF_USE_CRYPTO)
+
+IF (MAF_USE_ITK)
+SET(PROJECT_SRCS  ${PROJECT_SRCS}
+  mafScalarInterpolator.cpp
+  mafScalarInterpolator.h
+  mafVMEOutputScalar.cpp
+  mafVMEOutputScalar.h
+  mafVMEScalar.cpp
+  mafVMEScalar.h
+  )
+ENDIF (MAF_USE_ITK)
 
 IF (MAF_USE_VTK)
   SET(PROJECT_SRCS
