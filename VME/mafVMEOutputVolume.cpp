@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-08 14:40:25 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-06-08 14:06:34 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,7 +21,6 @@
 
 
 #include "mafVMEOutputVolume.h"
-#include <wx/busyinfo.h>
 #include "mafVMEOutputVTK.h"
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
@@ -96,8 +95,6 @@ mmgGui* mafVMEOutputVolume::CreateGui()
   assert(m_Gui == NULL);
   m_Gui = mafVMEOutput::CreateGui();
 
-  wxBusyCursor wait;
-  
   if (m_VME && m_VME->GetDataPipe() && m_VME->GetDataPipe()->GetVTKData())
   {
     this->Update();
