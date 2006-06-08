@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-08 10:22:01 $
-  Version:   $Revision: 1.41 $
+  Date:      $Date: 2006-06-08 14:10:15 $
+  Version:   $Revision: 1.42 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -59,6 +59,10 @@
 #include "mmoVTKExporter.h"
 #include "mmoVTKImporter.h"
 
+#ifdef MAF_USE_ITK
+  #include "mmoASCIIImporter.h"
+#endif
+
 #include "mafViewVTK.h"
 #include "mafViewCompound.h"
 
@@ -103,6 +107,9 @@ bool exOperationApp::OnInit()
   m_Logic->Plug(new mmoVRMLImporter("VRML"));
   m_Logic->Plug(new mmoVTKImporter("VTK"));
   m_Logic->Plug(new mmoMSF1xImporter("MSF 1.x"));
+#ifdef MAF_USE_ITK
+  m_Logic->Plug(new mmoASCIIImporter("ASCII"));
+#endif
   //------------------------------------------------------------
 
   //------------------------------------------------------------
