@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoASCIIImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-18 10:29:00 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-06-08 14:09:10 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,6 +25,7 @@
 
 #include "mafASCIIImporterUtility.h"
 #include "mafVME.h"
+#include "mafVMEScalar.h"
 
 #include "mafTagArray.h"
 
@@ -36,14 +37,15 @@ mafOp(label)
   m_OpType  = OPTYPE_IMPORTER;
 	m_Canundo = true;
 	m_Files.clear();
-  m_DataOrder = DATA_ORDER_ROW;
 
   m_FileDir = mafGetApplicationDirectory().c_str();
+  m_ScalarData = NULL;
 }
 //----------------------------------------------------------------------------
 mmoASCIIImporter::~mmoASCIIImporter()
 //----------------------------------------------------------------------------
 {
+  mafDEL(m_ScalarData);
 }
 //----------------------------------------------------------------------------
 mafOp* mmoASCIIImporter::Copy()   
@@ -65,13 +67,9 @@ enum ASCII_IMPORTER_ID
 void mmoASCIIImporter::OpRun()   
 //----------------------------------------------------------------------------
 {
-  wxString order_choices[3] = {"row","column","matrix"};
-
   m_Gui = new mmgGui(this);
   m_Gui->Button(ID_ASCII_FILE,"ASCII data","","Choose single or multiple file ASCII.");
-  m_Gui->Radio(ID_DATA_ORDER,"data order",&m_DataOrder,3,order_choices);
   m_Gui->OkCancel();
-  m_Gui->Enable(ID_DATA_ORDER,m_Files.size()>0);
   ShowGui();
 }
 //----------------------------------------------------------------------------
@@ -86,12 +84,19 @@ void mmoASCIIImporter::OnEvent(mafEventBase *maf_event)
       {
         wxString wildc = "(*.*)|*.*";
         mafGetOpenMultiFiles("",wildc.c_str(),m_Files);
-        m_Gui->Enable(ID_DATA_ORDER,m_Files.size()>0);
       }
       break;
       case wxOK:
-        ImportASCII();
-        OpStop(OP_RUN_OK);        
+        if (ImportASCII() == MAF_OK) 
+        {
+          m_Output = m_ScalarData;
+          OpStop(OP_RUN_OK);        
+        }
+        else
+        {
+          wxMessageBox("Some errors occurs during the import phase! Data can not be imported.", "Warning");
+          OpStop(OP_RUN_CANCEL);
+        }
       break;
       case wxCANCEL:
         OpStop(OP_RUN_CANCEL);        
@@ -100,12 +105,30 @@ void mmoASCIIImporter::OnEvent(mafEventBase *maf_event)
   }
 }
 //----------------------------------------------------------------------------
-void mmoASCIIImporter::ImportASCII()
+int mmoASCIIImporter::ImportASCII()
 //----------------------------------------------------------------------------
 {
-  bool success = false;
-	wxBusyInfo wait("Loading file: ...");
-  
+	wxBusyInfo wait("Loading file/s: ...");
+  mafNEW(m_ScalarData);
+  m_ScalarData->SetName("scalar");
+
+  int import_result = MAF_ERROR;
+
+  mafASCIIImporterUtility utility;
+  for (int t=0; t<m_Files.size(); t++)
+  {
+    if(utility.ReadFile(m_Files[t].c_str()) == MAF_OK)
+    {
+      import_result = MAF_OK;
+      m_ScalarData->SetData(utility.GetMatrix(),t);
+    }
+    else
+    {
+      import_result = MAF_ERROR;
+    }
+    //Add the scalar array to the mafVMEScalar at the current time 't'.
+  }
+  return import_result;
 }
 //----------------------------------------------------------------------------
 void mmoASCIIImporter::SetFileName(std::string &file)
