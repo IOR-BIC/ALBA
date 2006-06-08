@@ -26,8 +26,6 @@ SET(PROJECT_SRCS
   mafVMEGroup.h
   mafVMEItem.cpp
   mafVMEItem.h
-  mafVMEItemScalar.cpp
-  mafVMEItemScalar.h
   mafMSFImporter.cpp
   mafMSFImporter.h
 )
@@ -47,6 +45,8 @@ SET(PROJECT_SRCS  ${PROJECT_SRCS}
   mafVMEOutputScalar.h
   mafVMEScalar.cpp
   mafVMEScalar.h
+  mafVMEItemScalar.cpp
+  mafVMEItemScalar.h
   )
 ENDIF (MAF_USE_ITK)
 
