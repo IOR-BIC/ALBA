@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafRemoteLogic.cpp,v $
 Language:  C++
-Date:      $Date: 2006-06-03 10:57:37 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2006-06-08 14:11:06 $
+Version:   $Revision: 1.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -379,8 +379,7 @@ void mafRemoteLogic::RemoteMessage(mafString &cmd, bool to_server)
     else if(command == "CameraReset")
     {
       m_ViewManager->m_FromRemote = true;
-      if(data_cmd == "")
-        m_ViewManager->CameraReset();
+      m_ViewManager->CameraReset(data_cmd != "");
       m_ViewManager->m_FromRemote = false;
     }
     else if(command == "RunOperation")
