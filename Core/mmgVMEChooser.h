@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooser.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:44:10 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-06-09 11:42:44 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -45,5 +45,6 @@ public:
 
 protected:
   mmgVMEChooserTree *m_ChooserTree;
+  mmgVMEChooserAccept *m_VmeAcceptFunction;
 };
 #endif
