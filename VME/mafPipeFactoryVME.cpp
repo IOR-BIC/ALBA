@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeFactoryVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 14:55:09 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-06-13 11:03:57 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,6 +26,8 @@
 
 #include "mafPipe.h"
 #include "mafPipeSurface.h"
+#include "mafPipeSurfaceSlice.h"
+
 #include "mafPipeVolumeSlice.h"
 #include "mafPipeVolumeProjected.h"
 #include "mafPipeMeter.h"
