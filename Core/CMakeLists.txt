@@ -8,12 +8,30 @@ DBG_MESSAGE("Configuring project mafCore")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-  mafAxes.cpp
-  mafAxes.h
+	mafRWI.cpp
+	mafRWI.h
+	mafRWIBase.cpp
+	mafRWIBase.h
+	mafSceneGraph.cpp
+	mafSceneGraph.h
+	mafSceneNode.cpp
+	mafSceneNode.h
+	mafViewCompound.cpp
+	mafViewCompound.h
+	mafViewVTK.cpp
+	mafViewVTK.h
+	mmgContextualMenu.cpp
+	mmgContextualMenu.h
+	mmgTreeContextualMenu.cpp
+	mmgTreeContextualMenu.h
+	vtkMAFAssembly.cpp
+	vtkMAFAssembly.h
   mafAbsMatrixPipe.cpp
   mafAbsMatrixPipe.h
   mafAttribute.cpp
   mafAttribute.h
+  mafAxes.cpp
+  mafAxes.h
   mafCoreFactory.cpp
   mafCoreFactory.h
   mafDataPipe.cpp
@@ -91,24 +109,6 @@ SET(PROJECT_SRCS
   mmgVMEChooserTree.h
   mmuTimeSet.cpp
   mmuTimeSet.h
-	mafRWI.cpp
-	mafRWI.h
-	mafRWIBase.cpp
-	mafRWIBase.h
-	mafSceneGraph.cpp
-	mafSceneGraph.h
-	mafSceneNode.cpp
-	mafSceneNode.h
-	mafViewCompound.cpp
-	mafViewCompound.h
-	mafViewVTK.cpp
-	mafViewVTK.h
-	mmgContextualMenu.cpp
-	mmgContextualMenu.h
-	mmgTreeContextualMenu.cpp
-	mmgTreeContextualMenu.h
-	vtkMAFAssembly.cpp
-	vtkMAFAssembly.h
 )
 
 IF (MAF_USE_VTK)
@@ -130,13 +130,17 @@ IF (MAF_USE_VTK)
   SET(PROJECT_LIBS ${PROJECT_LIBS} vtkCommon)
 ENDIF (MAF_USE_VTK)
 
+
+
+# ------------------------------------
+# Find GTK include Dirs 
+# as required by mafRWIBase
+# ------------------------------------
+#INCLUDE_DIRECTORIES(/usr/include/gtk-2.0 /usr/lib/gtk-2.0/include /usr/include/atk-1.0 /usr/X11R6/include /usr/include/glib-2.0 #/usr/lib/glib-2.0/include /usr/include/pango-1.0 /usr/include/freetype2 /usr/include/freetype2/config )
+
 IF (NOT WIN32)
-  #INCLUDE (${MAF_SOURCE_DIR}/modules/FindGTK20.cmake)
-  INCLUDE (${CMAKE_ROOT}/Modules/FindGTK.cmake)
-  INCLUDE_DIRECTORIES(${GTK_gtk_INCLUDE_PATH})
-  INCLUDE_DIRECTORIES(${GTK_glib_INCLUDE_PATH})
-  INCLUDE_DIRECTORIES(${GTK_glibconfig_INCLUDE_PATH})
-  #INCLUDE_DIRECTORIES(${GTK_gtkgl_INCLUDE_PATH})
+  INCLUDE (${MAF_SOURCE_DIR}/modules/FindGTK2.cmake)
+  INCLUDE_DIRECTORIES(${GTK_INCLUDE_DIRECTORIES})
 ENDIF (NOT WIN32)
 
 # Create the library.

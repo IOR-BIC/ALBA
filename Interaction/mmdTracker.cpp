@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdTracker.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-21 12:03:10 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -171,7 +171,7 @@ void mmdTracker::SetAvatar(mafAvatar *avatar)
     }
 
     GetGui()->Remove(m_Avatar->GetGui());
-    GetGui()->GetSizer()->Remove(m_Avatar->GetGui());
+    GetGui()->GetSizer()->Detach(m_Avatar->GetGui());
     //m_Avatar->GetGui()->SetParent(NULL);
     m_Avatar->GetGui()->Show(false);
     m_Avatar->GetGui()->Refresh();

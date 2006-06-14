@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDevice.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-23 16:57:14 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -155,6 +155,7 @@ protected:
   mmgGui*             m_Gui;
   mafID               m_ID;
   int                 m_AutoStart;
+  int                 m_Start;  //SIL. 07-jun-2006 : -- connected to a Bool in the Gui
   bool                m_Locked;
   bool                m_PersistentFalg;
 

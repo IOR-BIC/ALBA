@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-22 10:50:36 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.20 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,9 +33,15 @@
 #include "wx/timer.h"
 
 #ifdef __WXGTK__
-//  #include <glib/gmacros.h>
-  #include <gdk/gdkprivate.h>
-  #include "wx/gtk/win_gtk.h"
+  
+  //#include <glib/gmacros.h>
+  //#include <gdk/gdkprivate.h>
+  //#include "wx/gtk/win_gtk.h"
+  
+  
+  //#include "gdk/gdkprivate.h"
+  #include <wx/gtk/win_gtk.h> // ok c'e'
+
 #endif
 
 #include "mafDevice.h"
@@ -156,13 +162,19 @@ void mafRWIBase::Initialize()
     RenderWindow->SetWindowId( (HWND) this->GetHWND() );
 #endif
 #ifdef __WXGTK__
+  // SIL ---- if (RenderWindow->GetGenericWindowId() == 0)
+  // SIL ----   RenderWindow->SetParentId( (void *)(((GdkWindowPrivate *)GTK_PIZZA(m_wxwindow)->bin_window)->xwindow) );
+  
   if (RenderWindow->GetGenericWindowId() == 0)
-    RenderWindow->SetParentId( (void *)(((GdkWindowPrivate *)GTK_PIZZA(m_wxwindow)->bin_window)->xwindow) );
+    RenderWindow->SetWindowId(  
+      (void*) GDK_WINDOW_XWINDOW(GTK_PIZZA(m_wxwindow)->bin_window)     
+    );    
 #endif
-#ifdef __WXMOTIF__
-  if (RenderWindow->GetGenericWindowId() == 0)
-    RenderWindow->SetWindowId( this->GetXWindow() );
-#endif
+
+//  #ifdef __WXMOTIF__
+//     if (RenderWindow->GetGenericWindowId() == 0)
+//     RenderWindow->SetWindowId( this->GetXWindow() );
+//  #endif
 
   // set minimum size of window
   int *size = RenderWindow->GetSize();
@@ -643,7 +655,7 @@ wxBitmap *mafRWIBase::GetImage(int magnification)
 
   //translate to a wxBitmap
   wxImage  *img = new wxImage(dim[0],dim[1],buffer,TRUE);
-  wxBitmap *bmp = new wxBitmap(img->ConvertToBitmap());
+  wxBitmap *bmp = new wxBitmap(img);
   delete img;
   delete buffer;
   return bmp;

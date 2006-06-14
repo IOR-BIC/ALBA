@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-28 14:49:15 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -128,7 +128,7 @@ wxBitmap *mmaMaterial::MakeIcon()
 	vtkMAFSmartPointer<vtkLight> light;
   light->SetPosition(-1,1,1);
 
-  wxColour col = wxSystemSettings::GetSystemColour(wxSYS_COLOUR_3DLIGHT);
+  wxColour col = wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT);
   float r = col.Red()  / 255.0;
   float g = col.Green()/ 255.0;
   float b = col.Blue() / 255.0;
@@ -205,7 +205,7 @@ wxBitmap *mmaMaterial::MakeIcon()
 
 	//translate to a wxBitmap
 	wxImage  *img = new wxImage(dim[0],dim[1],buffer,TRUE);
-	wxBitmap *bmp = new wxBitmap(img->ConvertToBitmap());
+	wxBitmap *bmp = new wxBitmap(img);
   delete img;
 
   cppDEL(m_Icon);

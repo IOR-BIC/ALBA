@@ -8,6 +8,8 @@ MESSAGE(STATUS "Configuring project ${PROJECT_NAME}")
 CONFIGURE_FILE("${MAF_SOURCE_DIR}/Gui/manifest.in" "${MAF_BINARY_DIR}/Gui/manifest.in" COPYONLY)
 
 SET(PROJECT_SRCS
+  #mmgSashPanel.cpp
+  #mmgSashPanel.h
   mafEvent.cpp
   mafEvent.h
   mafPics.cpp
@@ -30,6 +32,10 @@ SET(PROJECT_SRCS
   mmgDialog.h
   mmgDictionaryWidget.cpp
   mmgDictionaryWidget.h
+  mmgDockManager.cpp
+  mmgDockManager.h
+  mmgDockSettings.cpp
+  mmgDockSettings.h
   mmgFileHistory.cpp
   mmgFileHistory.h
   mmgFlagSplitter.cpp
@@ -58,6 +64,8 @@ SET(PROJECT_SRCS
   mmgMDIChild.h
   mmgMDIFrame.cpp
   mmgMDIFrame.h
+  mmgMovieCtrl.cpp
+  mmgMovieCtrl.h
   mmgMutexPanel.cpp
   mmgMutexPanel.h
   mmgNamedPanel.cpp
@@ -70,10 +78,10 @@ SET(PROJECT_SRCS
   mmgPicButton.h
   mmgRangeSlider.cpp
   mmgRangeSlider.h
-  mmgSashPanel.cpp
-  mmgSashPanel.h
   mmgScrolledPanel.cpp
   mmgScrolledPanel.h
+  mmgSettingsDialog.cpp
+  mmgSettingsDialog.h
   mmgSplittedPanel.cpp
   mmgSplittedPanel.h
   mmgTimeBar.cpp
@@ -160,14 +168,14 @@ SET(PROJECT_LIBS
 #--------------------------------------------------------
 # Do not change anything below this line.
 
-IF (NOT WIN32)
-  #INCLUDE (${MAF_SOURCE_DIR}/modules/FindGTK20.cmake)
-  INCLUDE (${CMAKE_ROOT}/Modules/FindGTK.cmake)
-  INCLUDE_DIRECTORIES(${GTK_gtk_INCLUDE_PATH})
-  INCLUDE_DIRECTORIES(${GTK_glib_INCLUDE_PATH})
-  INCLUDE_DIRECTORIES(${GTK_glibconfig_INCLUDE_PATH})
-  #INCLUDE_DIRECTORIES(${GTK_gtkgl_INCLUDE_PATH})
-ENDIF (NOT WIN32)
+##### SIL ------------ IF (NOT WIN32)
+##### SIL ------------   #INCLUDE (${MAF_SOURCE_DIR}/modules/FindGTK20.cmake)
+##### SIL ------------ INCLUDE (${CMAKE_ROOT}/Modules/FindGTK.cmake)
+##### SIL ------------   INCLUDE_DIRECTORIES(${GTK_gtk_INCLUDE_PATH})
+##### SIL ------------   INCLUDE_DIRECTORIES(${GTK_glib_INCLUDE_PATH})
+##### SIL ------------   INCLUDE_DIRECTORIES(${GTK_glibconfig_INCLUDE_PATH})
+##### SIL ------------   #INCLUDE_DIRECTORIES(${GTK_gtkgl_INCLUDE_PATH})
+##### SIL ------------ ENDIF (NOT WIN32)
 
 # Need to include class headers and the configuration header.
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR})
@@ -182,3 +190,5 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
 ##MESSAGE ("${PROJECT_NAME} dependencies: ${MFL_BUILD_TARGETS}")
 ##ADD_DEPENDENCIES(${PROJECT_NAME} ${MFL_BUILD_TARGETS})
 
+#--------------------------------------------------------
+#SUBDIRS(examples)

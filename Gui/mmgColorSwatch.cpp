@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgColorSwatch.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 15:22:05 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -80,7 +80,8 @@ void mmgColorSwatch::SetColor(mafColor c)
     }
   }
   wxImage img(w,h,data); // data will be freed by the image
-  m_bmp = img.ConvertToBitmap();
+  //m_bmp = img.ConvertToBitmap(); // changed in passing from wx242 -> wx263
+  m_bmp = wxBitmap(img);
 }
 //----------------------------------------------------------------------------
 void mmgColorSwatch::OnPaint(wxPaintEvent &event)

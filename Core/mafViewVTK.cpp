@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-16 09:25:29 $
-  Version:   $Revision: 1.57 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.58 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -327,25 +327,28 @@ mmgGui *mafViewVTK::CreateGui()
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
   m_Gui->AddGui(m_Rwi->GetGui());
-  m_Gui->Divider(2);
+  //m_Gui->Divider(2);
   
+  /////////////////////////////////////////Attach Camera GUI
+  m_AttachCamera = new mafAttachCamera(m_Gui, m_Rwi, this);
+  m_Gui->AddGui(m_AttachCamera->GetGui());
+  m_Gui->Divider(2);
+
   /////////////////////////////////////////Text GUI
   m_TextKit = new mafTextKit(m_Gui, m_Rwi->m_RenFront, this);
   m_Gui->AddGui(m_TextKit->GetGui());
   m_Gui->Divider(2);
 
-  /////////////////////////////////////////Attach Camera GUI
-  m_AttachCamera = new mafAttachCamera(m_Gui, m_Rwi, this);
-  m_Gui->AddGui(m_AttachCamera->GetGui());
-
   /////////////////////////////////////////Light GUI
-  m_Gui->Divider(2);
   m_LightKit = new mafLightKit(m_Gui, m_Rwi->m_RenFront, this);
+  m_Gui->Label("Lights",true);
   m_Gui->AddGui(m_LightKit->GetGui());
+  m_Gui->Divider(2);
   
   // Animate kit
   m_AnimateKit = new mafAnimate(m_Rwi->m_RenFront,m_Sg->GetSelectedVme()->GetRoot(),this);
   m_Gui->AddGui(m_AnimateKit->GetGui());
+  m_Gui->Divider();
 
   return m_Gui;
 }

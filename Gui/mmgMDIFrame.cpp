@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-10 13:01:18 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,6 +25,7 @@
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "mafPics.h"
+#include "mmgDockSettings.h"
 
 #ifdef MAF_USE_VTK //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
   #include "vtkVersion.h"
@@ -87,16 +88,14 @@ BEGIN_EVENT_TABLE(mmgMDIFrame, wxMDIParentFrame)
     EVT_CLOSE(mmgMDIFrame::OnCloseWindow)
     EVT_DROP_FILES(mmgMDIFrame::OnDropFile)
     EVT_MENU_RANGE(MENU_START,MENU_END,mmgMDIFrame::OnMenu)
-    //EVT_MENU_RANGE(wxID_FILE1,wxID_FILE4,mmgMDIFrame::OnMenu)
 		EVT_MENU_RANGE(OP_START,OP_END,mmgMDIFrame::OnMenuOp)
     EVT_MENU_RANGE(VIEW_START,VIEW_END,mmgMDIFrame::OnMenuView)
 		EVT_MENU_RANGE(wxID_FILE1, wxID_FILE9, mmgMDIFrame::OnMenu)
     EVT_UPDATE_UI_RANGE(MENU_START,MENU_END,mmgMDIFrame::OnUpdateUI)
     EVT_UPDATE_UI_RANGE(OP_START,OP_END,mmgMDIFrame::OnUpdateUI)
-    EVT_SASH_DRAGGED_RANGE(SASH_START, SASH_END, mmgMDIFrame::OnSashDrag)
-    EVT_BUTTON (ID_LAYOUT, mmgMDIFrame::OnLayout)
-    EVT_SIZE(mmgMDIFrame::OnSize)
-		EVT_IDLE(mmgMDIFrame::OnIdle)  
+    EVT_SIZE(mmgMDIFrame::OnSize) //SIL. 23-may-2006 : 
+
+    EVT_IDLE(mmgMDIFrame::OnIdle)  
 END_EVENT_TABLE()
 
 //----------------------------------------------------------------------------
@@ -105,8 +104,17 @@ mmgMDIFrame::mmgMDIFrame(const wxString& title, const wxPoint& pos, const wxSize
 : wxMDIParentFrame((wxFrame *)NULL, -1, title, pos, size, wxDEFAULT_FRAME_STYLE|wxHSCROLL|wxVSCROLL)
 {
   mafSetFrame( this );
+
+  this->SetMinSize( wxSize(600,500)); // m_DockManager cant handle correctly the frame MinSize (yet)
+  m_DockManager.SetFrame(this);
+  m_DockManager.GetArtProvider()->SetMetric(wxAUI_ART_PANE_BORDER_SIZE,0 );
+  m_DockManager.GetArtProvider()->SetColor(wxAUI_ART_INACTIVE_CAPTION_COLOUR, m_DockManager.GetArtProvider()->GetColor(wxAUI_ART_ACTIVE_CAPTION_COLOUR));
+  m_DockManager.GetArtProvider()->SetColor(wxAUI_ART_INACTIVE_CAPTION_GRADIENT_COLOUR, m_DockManager.GetArtProvider()->GetColor(wxAUI_ART_ACTIVE_CAPTION_GRADIENT_COLOUR));
+  m_DockManager.GetArtProvider()->SetColor(wxAUI_ART_INACTIVE_CAPTION_TEXT_COLOUR, m_DockManager.GetArtProvider()->GetColor(wxAUI_ART_ACTIVE_CAPTION_TEXT_COLOUR));
+  m_DockManager.Update();
+  m_DockSettings = new mmgDockSettings(m_DockManager);
+
   m_Listener = NULL;
-  m_ClientWin= NULL;
   CreateStatusbar();
   Centre();
 
@@ -142,13 +150,22 @@ mmgMDIFrame::~mmgMDIFrame( )
   vtkDEL(m_EndCallback); 
 #endif 
 
+  //m_DockManager.UnInit(); - must be done in OnQuit
+  cppDEL(m_DockSettings);
+
   mafSetFrame(NULL);
 }
 //----------------------------------------------------------------------------
 void mmgMDIFrame::OnMenu(wxCommandEvent& e)
 //----------------------------------------------------------------------------
 { 
-	mafEventMacro(mafEvent(this,e.GetId()));
+	 //SIL. 30-may-2006 : to be cleaned
+	 //cosi non va -- ho l'ID del Dock ma mi serve il puntatore 
+	
+	//if(e.GetId() > SASH_START && e.GetId() < SASH_END )
+	//  ShowDockPane(e.GetId(), !DockPaneIsShown( (wxWindow*)(e.GetEventObject())) );
+	// else
+	  mafEventMacro(mafEvent(this,e.GetId()));
 }
 //----------------------------------------------------------------------------
 void mmgMDIFrame::OnMenuOp(wxCommandEvent& e)
@@ -175,48 +192,16 @@ void mmgMDIFrame::OnCloseWindow(wxCloseEvent& event)
   mafEventMacro(mafEvent(this,MENU_FILE_QUIT));
 }
 //----------------------------------------------------------------------------
-void mmgMDIFrame::OnSashDrag(wxSashEvent& event)
-//----------------------------------------------------------------------------
-{
-	
-	//Seems that there is no way to handle sash-messages from
-	//the guiSashPanel itself. So every window using Sashes
-	//have to implement OnSashDrag like this.
-	//You can avoid to use specific sash names here, but you have 
-	//still to be aware of the existing guiSashPanel's to 
-	//write the entry in the Event-Table.
- 
-	if(event.GetDragStatus() == wxSASH_STATUS_OUT_OF_RANGE)
-    return;
-
-  wxSashLayoutWindow *w = (wxSashLayoutWindow*) event.GetEventObject();
-
-  switch( event.GetEdge() )
-  {
-		case wxSASH_TOP:
-		case wxSASH_BOTTOM:
-			w->SetDefaultSize(wxSize(1000,event.GetDragRect().height));
-		break;
-		case wxSASH_RIGHT:
-		case wxSASH_LEFT:
-			w->SetDefaultSize(wxSize(event.GetDragRect().width, 1000));
-		break;
-  }        
-  
-	LayoutWindow();
-}
-//----------------------------------------------------------------------------
 void mmgMDIFrame::OnSize(wxSizeEvent& event)
 //----------------------------------------------------------------------------
 { 
-	LayoutWindow();	
-	Refresh(false);
-
-  if(m_frameStatusBar==NULL) 
-		return;
-  wxRect r;
-	m_frameStatusBar->GetFieldRect(4,r);
-  m_Gauge->SetSize(r.x,r.y+2,r.width -4 ,r.height -4);
+  if(m_frameStatusBar) 
+  {
+    wxRect r;
+    m_frameStatusBar->GetFieldRect(4,r);
+    m_Gauge->SetSize(r.x,r.y+2,r.width -4 ,r.height -4);
+  }
+  event.Skip();
 }
 //-----------------------------------------------------------
 void mmgMDIFrame::OnDropFile(wxDropFilesEvent &event)
@@ -238,28 +223,6 @@ void mmgMDIFrame::OnDropFile(wxDropFilesEvent &event)
   }
 }
 //----------------------------------------------------------------------------
-void mmgMDIFrame::LayoutWindow()
-//----------------------------------------------------------------------------
-{
-	Refresh();
-	if (GetClientWindow())
-	{
-		wxLayoutAlgorithm layout;
-		layout.LayoutWindow(this,GetClientWindow());
-		Refresh(false);
-	}
-}
-//----------------------------------------------------------------------------
-void mmgMDIFrame::Put( wxWindow* w)
-//----------------------------------------------------------------------------
-{
-  if(m_ClientWin) m_ClientWin->Show(false);
-  m_ClientWin = w;
-  m_ClientWin->Reparent(this);
-  m_ClientWin->Show(true);
-  LayoutWindow();
-}
-//----------------------------------------------------------------------------
 void mmgMDIFrame::CreateStatusbar ()
 //----------------------------------------------------------------------------
 {
@@ -275,12 +238,6 @@ void mmgMDIFrame::CreateStatusbar ()
 	m_Gauge = new wxGauge(m_frameStatusBar, -1, 100,wxDefaultPosition,wxDefaultSize,wxGA_SMOOTH);
 	m_Gauge->SetForegroundColour( *wxRED );
   m_Gauge->Show(FALSE);
-}
-//----------------------------------------------------------------------------
-void mmgMDIFrame::OnLayout(wxCommandEvent& event)
-//----------------------------------------------------------------------------
-{ 
-  LayoutWindow();
 }
 //----------------------------------------------------------------------------
 void mmgMDIFrame::OnIdle(wxIdleEvent& event)
@@ -353,8 +310,6 @@ void mmgMDIFrame::RenderEnd()
   {
     SetStatusText( " ",1);
   }
-
-
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #ifdef MAF_USE_VTK
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -369,86 +324,99 @@ void mmgMDIFrame::BindToProgressBar(vtkObject* vtkobj)
 	else 
     mafLogMessage("wrong vtkObject passed to BindToProgressBar");
 }
-/* --- used for vtk v.4.2
-//----------------------------------------------------------------------------
-//struct mafProgressArgs
-//----------------------------------------------------------------------------
-struct mafProgressArgs {
-vtkProcessObject* f;   //filter
-wxString m;            //message 
-mmgMDIFrame* t;        //this  
-bool ren;              //ProgressArg of a Renderer  
-};
-//-----------------------------------------------------------
-void mmgMDIFrame::ProgressStart(void* a)
-//-----------------------------------------------------------
-{
-  mafProgressArgs *args = (mafProgressArgs *)a;
-  args->t->Busy();
-  args->t->SetStatusText(args->m,0);
-}
-//-----------------------------------------------------------
-void mmgMDIFrame::ProgressUpdate(void* a)
-//-----------------------------------------------------------
-{
-  mafProgressArgs *args = (mafProgressArgs *)a;
-  int prg = (int)(args->f->GetProgress()*100);
-  args->t->m_Gauge->SetValue(prg);
-  args->t->SetStatusText(wxString::Format(" %d%% ",prg),3);
-}
-//-----------------------------------------------------------
-void mmgMDIFrame::ProgressEnd(void* a)
-//-----------------------------------------------------------
-{
-  mafProgressArgs *args = (mafProgressArgs *)a;
-  args->t->SetStatusText( " ",0);
-  args->t->SetStatusText( " ",2);
-  args->t->SetStatusText( " ",3);
-  args->t->Ready();
-}
-//-----------------------------------------------------------
-void mmgMDIFrame::ProgressDeleteArgs(void* a)
-//-----------------------------------------------------------
-{
-  mafProgressArgs *args = (mafProgressArgs *)a;
-  cppDEL(args);
-}
-*/
-
 //-----------------------------------------------------------
 void mmgMDIFrame::BindToProgressBar(vtkProcessObject* filter)
 //-----------------------------------------------------------
 {
-  // - syntax for vtk v.4.4
   filter->AddObserver(vtkCommand::ProgressEvent,m_ProgressCallback);
   filter->AddObserver(vtkCommand::StartEvent,m_StartCallback);
   filter->AddObserver(vtkCommand::EndEvent,m_EndCallback);
-
-  // - syntax for vtk v.4.2 or less
-  //mafProgressArgs *args = new mafProgressArgs;
-  //args->f = filter;
-  //args->m = *msg;
-  //args->t = this;
-  //args->ren = false;
-  //filter->SetStartMethod(	   this->ProgressStart, (void*)args);
-  //filter->SetProgressMethod( this->ProgressUpdate,(void*)args);
-  //filter->SetEndMethod(	     this->ProgressEnd,   (void*)args);
-  // link only one ArgDelete - the object arg is only one !!
-  //filter->SetEndMethodArgDelete(this->ProgressDeleteArgs);
 }
 //-----------------------------------------------------------
 void mmgMDIFrame::BindToProgressBar(vtkViewport* ren)
 //-----------------------------------------------------------
 {
-  // - syntax for vtk v.4.4
   ren->AddObserver(vtkCommand::StartEvent,m_StartCallback);
   ren->AddObserver(vtkCommand::EndEvent,m_EndCallback);
-
-  // - syntax for vtk v.4.2 or less
-  //ren->SetStartRenderMethod(	this->RenderStart, this);
-  //ren->SetEndRenderMethod(	this->RenderEnd,   this);
+}
+//-----------------------------------------------------------
+void mmgMDIFrame::OnQuit()
+//-----------------------------------------------------------
+{
+  m_DockManager.UnInit();
 }
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #endif //MAF_USE_VTK
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+/*
+//-----------------------------------------------------------
+void mmgMDIFrame::ShowDockSettings()
+//-----------------------------------------------------------
+{
+  m_DockSettings->ShowModal();
+}
+*/
+//-----------------------------------------------------------
+void mmgMDIFrame::AddDockPane(wxWindow *window, wxPaneInfo& pane_info)
+//-----------------------------------------------------------
+{
+  m_DockManager.AddPane(window,pane_info);
+  // devo creare la voce di menu ?  --- non adesso, e' gia nel DockManager
+  // magari si - ma poi mi devo anche rispondere
+  m_DockManager.Update();
+}
+//-----------------------------------------------------------
+void mmgMDIFrame::RemoveDockPane(wxString pane_name)
+//-----------------------------------------------------------
+{
+  wxPaneInfo& pi = m_DockManager.GetPane(pane_name);
+  if(pi.IsOk())
+  {
+    m_DockManager.DetachPane(pi.window);
+    m_DockManager.Update();
+  }
+}
+//-----------------------------------------------------------
+void mmgMDIFrame::ShowDockPane(wxString pane_name, bool show)
+//-----------------------------------------------------------
+{
+  wxPaneInfo& pi = m_DockManager.GetPane(pane_name);
+  if(pi.IsOk())
+  {
+    pi.Show( show );
+    m_DockManager.Update();
+  }
+}
+//-----------------------------------------------------------
+void mmgMDIFrame::ShowDockPane(wxWindow *window, bool show)
+//-----------------------------------------------------------
+{
+  wxPaneInfo& pi = m_DockManager.GetPane(window);
+  if(pi.IsOk())
+  {
+    pi.Show( show );
+    m_DockManager.Update(); // sync the MenuItems check 
+  }
+}
+//-----------------------------------------------------------
+bool mmgMDIFrame::DockPaneIsShown(wxString pane_name)
+//-----------------------------------------------------------
+{
+  wxPaneInfo& pi = m_DockManager.GetPane(pane_name);
+  if(pi.IsOk())
+    return pi.IsShown();
+  return false;
+}
+//-----------------------------------------------------------
+bool mmgMDIFrame::DockPaneIsShown(wxWindow *window)
+//-----------------------------------------------------------
+{
+  wxPaneInfo& pi = m_DockManager.GetPane(window);
+  if(pi.IsOk())
+    return pi.IsShown();
+  return false;
+}
+
+

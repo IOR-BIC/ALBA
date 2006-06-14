@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLightKit.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-24 14:45:16 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -120,7 +120,8 @@ void mafLightKit::CreateGui()
 	}
 	m_Gui->Update();
 
- 	if(m_LightList->Number() == 0)
+  //if(m_LightList->Number() == 0)
+ 	if(m_LightList->GetCount() == 0)
 	{
 		//let enabled only add light button
 		EnableWidget(false);
@@ -165,7 +166,8 @@ void mafLightKit::OnEvent(mafEventBase *maf_event)
           RemoveLight(sel);
 
         //select the first light of the list if there is almost one light
-        if(m_LightList->Number() > 0)
+        //if(m_LightList->Number() > 0)
+        if(m_LightList->GetCount() > 0)
         {
           m_LightList->SetSelection(0,true);
           OnEvent(&mafEvent(m_Gui,ID_LIGHT_LIST));
@@ -211,7 +213,8 @@ void mafLightKit::AddLight()
 //----------------------------------------------------------------------------
 {
 //	static int m_LightCounter = 0;
-	if(m_LightList->Number() >= MAX_NUM_LIGHT) return;
+	//if(m_LightList->Number() >= MAX_NUM_LIGHT) return;
+  if(m_LightList->GetCount() >= MAX_NUM_LIGHT) return;
 
 	//initialize light parameters
 //	ParametersInit();
@@ -227,8 +230,9 @@ void mafLightKit::AddLight()
 	//build LightItem and add it to the list
 	m_SelectedLight = new LightItem(light_name,m_LightOnOff,m_LightAzimuth,m_LightElevation,m_LightIntensity,m_LightColor,Light);
 	m_LightItemList[m_LightCounter] = m_SelectedLight;
-	m_LightList->Append(light_name,m_SelectedLight);
-	m_LightList->SetSelection(m_LightList->Number() - 1,true);
+	m_LightList->Append(light_name,m_SelectedLight);  
+  //m_LightList->SetSelection(m_LightList->Number() - 1,true);
+  m_LightList->SetSelection(m_LightList->GetCount() - 1,true);
 	m_LightRenderer->AddLight(m_SelectedLight->light);
 
 	m_LightCounter++;
@@ -252,7 +256,8 @@ void mafLightKit::RemoveLight(int sel)
 	delete m_SelectedLight;
 	m_SelectedLight = NULL;
 	
-	if(m_LightList->Number() == 0)
+	//if(m_LightList->Number() == 0)
+  if(m_LightList->GetCount() == 0)
 	{
 		EnableWidget(false);
 		ParametersInit();

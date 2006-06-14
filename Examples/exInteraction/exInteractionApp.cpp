@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exInteractionApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-07 12:33:44 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -160,3 +160,4 @@ int exInteractionApp::OnExit()
   cppDEL(m_logic);
   return 0;
 }
+

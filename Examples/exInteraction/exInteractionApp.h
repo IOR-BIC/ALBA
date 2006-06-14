@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exInteractionApp.h,v $
   Language:  C++
-  Date:      $Date: 2005-09-15 09:45:49 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 

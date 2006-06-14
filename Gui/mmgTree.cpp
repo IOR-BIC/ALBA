@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 12:03:08 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -144,14 +144,15 @@ bool mmgTree::DeleteNode  (long node_id)
   wxTreeItemId item = ItemFromNode(node_id);
   wxTreeItemId parent_item = m_tree->GetItemParent(item);
 
-  // move the selection
-  if (m_tree->IsSelected(item))
+  // move the selection (if not deleting the root => parent=NULL)
+  if (parent_item && m_tree->IsSelected(item))
   {
     m_tree->SelectItem(parent_item);
   }
 
   // if the old parent has no other children, set HasChildren to false => hide the widget to expand the subtree
-  if( m_tree->GetChildrenCount(parent_item,false) <= 1 )
+  // but skip if we are deleting the root => parent=NULL
+  if( parent_item && m_tree->GetChildrenCount(parent_item,false) <= 1 )
   {
     m_tree->SetItemHasChildren(parent_item,false);
   }
@@ -172,15 +173,14 @@ void mmgTree::DeleteNode2 (long node_id)
 	- keep m_table consistent
 	*/
 
-  long cookie;
+  wxTreeItemIdValue cookie;
   wxTreeItemId item  = ItemFromNode(node_id);
   wxTreeItemId child = m_tree->GetFirstChild(item, cookie);
   while(child.IsOk())
-	{
+  {
     DeleteNode2(NodeFromItem(child)); 
     child = m_tree->GetNextChild(item, cookie);
   }
-
   m_tree->Delete(item);
 
   wxObject *el = m_table->Delete(node_id);
@@ -241,6 +241,7 @@ bool mmgTree::SetNodeParent(long node_id, long parent_id )
   i = ItemFromNode(parent_id);;
   m_tree->SetItemHasChildren(i,true);
 	m_tree->SortChildren(i);
+
   m_tree->Expand(i);
 
   return true;
@@ -271,7 +272,7 @@ void mmgTree::SetNodeParent2(long node_id, long parent_id )
   el->SetItem(new_item);
 
   // move recursively the sub tree under new_item
-  long cookie;
+  wxTreeItemIdValue cookie;
   wxTreeItemId child = m_tree->GetFirstChild(item, cookie);
   while(child.IsOk())
   {
@@ -293,7 +294,7 @@ bool mmgTree::SetNodeIcon (long node_id, int icon)
   if( !NodeExist(node_id) ) return false;
   wxTreeItemId  item = ItemFromNode(node_id);
   m_tree->SetItemImage(item,icon);
-  m_tree->SetItemSelectedImage(item,icon);
+  m_tree->SetItemImage(item,icon,wxTreeItemIcon_Selected);
   return true;
 }
 //----------------------------------------------------------------------------

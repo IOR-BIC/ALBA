@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgNamedPanel.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 13:44:57 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,10 +42,10 @@ public:
   void Add(wxSizer*  sizer, int option = 0, int flag = wxEXPAND, int border = 0)  {m_sizer->Add(sizer, option,flag,border);};
   
 	/** Remove a widget from the panel. */
-  bool Remove(wxWindow* window) {return m_sizer->Remove(window);};
+  bool Remove(wxWindow* window) {return m_sizer->Detach(window);};
   
 	/** Remove a sizer from the panel. */
-  bool Remove(wxSizer*  sizer ) {return m_sizer->Remove(sizer);};
+  bool Remove(wxSizer*  sizer ) {return m_sizer->Detach(sizer);};
 
   /** Set the text shown on the title-bar. */
   void SetTitle(wxString label) {if(m_lab) m_lab->SetLabel(label);};

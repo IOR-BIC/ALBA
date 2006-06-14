@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateVmeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:46:18 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 

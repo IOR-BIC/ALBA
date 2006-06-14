@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkRulerActor2D.cxx,v $
   Language:  C++
-  Date:      $Date: 2006-05-16 11:16:52 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-06-14 14:46:34 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -34,7 +34,7 @@
 #include "vtkProperty2D.h"
 #include "vtkPolyDataMapper2D.h"
 
-vtkCxxRevisionMacro(vtkRulerActor2D, "$Revision: 1.5 $");
+vtkCxxRevisionMacro(vtkRulerActor2D, "$Revision: 1.6 $");
 vtkStandardNewMacro(vtkRulerActor2D);
 //------------------------------------------------------------------------------
 vtkRulerActor2D::vtkRulerActor2D()
@@ -689,6 +689,7 @@ void vtkRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
   {
     char *letter[] = {"x","y","z"};
     char *sign = (w1X-w0X > 0) ? (char *)" " : (char *)"-";
+
     char caption[100];
     sprintf(caption, "%s%s %s", sign,  letter[x_index], Legend);
     HorizontalAxesLabel->SetInput(caption);

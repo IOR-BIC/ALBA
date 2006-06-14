@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-03 10:59:54 $
-  Version:   $Revision: 1.61 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.62 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -53,11 +53,15 @@
 #include "mmgViewFrame.h"
 #include "mmgLocaleSettings.h"
 #include "mmgMeasureUnitSettings.h"
-
 #include "mafRemoteLogic.h"
+#include "mmiPER.h"
+#include "mmgSettingsDialog.h"
+
+#ifdef WIN32
+  #include "mmdClientMAF.h"
+#endif
 
 #include "mafVMEStorage.h"
-
 #include "vtkCamera.h"
 
 //----------------------------------------------------------------------------
@@ -94,6 +98,8 @@ mafLogicWithManagers::mafLogicWithManagers()
   m_MeasureUnitSettings->SetListener(this);
 
   m_PrintSupport = new mafPrintSupport();
+  
+  m_SettingsDialog = new mmgSettingsDialog();
 }
 //----------------------------------------------------------------------------
 mafLogicWithManagers::~mafLogicWithManagers( ) 
@@ -101,6 +107,7 @@ mafLogicWithManagers::~mafLogicWithManagers( )
 {
   // Managers are destruct in the OnClose 
   cppDEL(m_PrintSupport);
+  cppDEL(m_SettingsDialog); 
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Configure()
@@ -110,8 +117,16 @@ void mafLogicWithManagers::Configure()
 
   if(m_SideSash)
   {
-    m_SideBar = new mafSideBar(m_SideSash,-1,this);
-    m_SideSash->Put(m_SideBar->m_Notebook);
+    m_SideBar = new mafSideBar(m_Win,MENU_VIEW_SIDEBAR,this);
+    m_Win->AddDockPane(m_SideBar->m_Notebook , wxPaneInfo()
+      .Name("sidebar")
+      .Caption(wxT("SideBar"))
+      .Right()
+      .Layer(2)
+      .MinSize(275,450)
+      .TopDockable(false)
+      .BottomDockable(false)
+      );
   }
 
   if(m_UseVMEManager)
@@ -124,7 +139,9 @@ void mafLogicWithManagers::Configure()
   {
     m_InteractionManager = new mafInteractionManager();
     m_InteractionManager->SetListener(this);
+
     m_Mouse = m_InteractionManager->GetMouseDevice();
+    //SIL m_InteractionManager->GetClientDevice()->AddObserver(this, MCH_INPUT);
   }
 
   if(m_UseViewManager)
@@ -140,12 +157,21 @@ void mafLogicWithManagers::Configure()
     m_OpManager->SetListener(this);
     m_OpManager->SetMouse(m_Mouse);
   }
-
   if (m_UseInteractionManager && m_UseViewManager && m_UseOpManager)
   {
     m_RemoteLogic = new mafRemoteLogic(this, m_ViewManager, m_OpManager);
     m_RemoteLogic->SetClientUnit(m_InteractionManager->GetClientDevice());
   }
+  
+  // Fill the SettingsDialog //SIL. 09-jun-2006 : 
+  
+  m_SettingsDialog->AddPage( m_Win->GetDockSettingGui(), "User Interface Preferences"); 
+  
+  if(m_InteractionManager)
+    m_SettingsDialog->AddPage( m_InteractionManager->GetGui(), "Interaction Manager");
+    
+  if(m_LocaleSettings)
+    m_SettingsDialog->AddPage( m_LocaleSettings->GetGui(), "Interface language");
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Plug(mafView* view) 
@@ -285,23 +311,15 @@ void mafLogicWithManagers::CreateMenu()
   m_MenuBar->Append(edit_menu, _("&Edit"));
 
   m_ViewMenu = new wxMenu;
-  //m_ViewManager->FillMenu(m_ViewMenu);  
-  if(this->m_PlugToolbar) 
-  {
-    m_ViewMenu->Append(MENU_VIEW_TOOLBAR, _("Toolbar"),"",wxITEM_CHECK);
-    m_ViewMenu->Check(MENU_VIEW_TOOLBAR,true);
-  }
   m_MenuBar->Append(m_ViewMenu, _("&View"));
 
   m_OpMenu = new wxMenu;
   m_MenuBar->Append(m_OpMenu, _("&Operations"));
 
   wxMenu    *option_menu = new wxMenu;
-  option_menu->AppendSeparator();
-  option_menu->Append(MENU_OPTION_DEVICE_SETTINGS, _("Interaction Settings"));
-  option_menu->Append(MENU_OPTION_LOCALE_SETTINGS, _("Locale Settings"));
   option_menu->Append(MENU_OPTION_MEASURE_UNIT_SETTINGS, _("Measure Unit Settings"));
-  m_MenuBar->Append(option_menu, _("&Preferences"));
+  option_menu->Append(ID_APP_SETTINGS, _("Application Preferences"));
+  m_MenuBar->Append(option_menu, _("Options"));
 
   m_Win->SetMenuBar(m_MenuBar);
 
@@ -314,7 +332,9 @@ void mafLogicWithManagers::CreateMenu()
 void mafLogicWithManagers::CreateToolbar()
 //----------------------------------------------------------------------------
 {
-  m_ToolBar = new wxToolBar(m_Win,-1,wxPoint(0,0),wxSize(-1,-1),wxHORIZONTAL|wxNO_BORDER|wxTB_FLAT  );
+  
+  //m_ToolBar = new wxToolBar(m_Win,-1,wxPoint(0,0),wxSize(-1,-1),wxHORIZONTAL|wxNO_BORDER|wxTB_FLAT  );
+  m_ToolBar = new wxToolBar(m_Win,MENU_VIEW_TOOLBAR,wxPoint(0,0),wxSize(-1,-1),wxTB_FLAT | wxTB_NODIVIDER );
   m_ToolBar->SetMargins(0,0);
   m_ToolBar->SetToolSeparation(2);
   m_ToolBar->SetToolBitmapSize(wxSize(20,20));
@@ -338,14 +358,29 @@ void mafLogicWithManagers::CreateToolbar()
   m_ToolBar->AddTool(CAMERA_RESET,mafPics.GetBmp("ZOOM_ALL"),_("reset camera to fit all (ctrl+f)"));
   m_ToolBar->AddTool(CAMERA_FIT,  mafPics.GetBmp("ZOOM_SEL"),_("reset camera to fit selected object (ctrl+shift+f)"));
   m_ToolBar->AddTool(CAMERA_FLYTO,mafPics.GetBmp("FLYTO"),_("fly to object under mouse"));
-  m_ToolBar->Realize();
-  m_Win->SetToolBar(m_ToolBar);
+
 
   EnableItem(CAMERA_RESET, false);
   EnableItem(CAMERA_FIT,   false);
   EnableItem(CAMERA_FLYTO, false);
   EnableItem(MENU_FILE_PRINT, false);
   EnableItem(MENU_FILE_PRINT_PREVIEW, false);
+
+  m_ToolBar->Realize();
+
+  //SIL. 23-may-2006 : 
+  m_Win->AddDockPane(m_ToolBar,  wxPaneInfo()
+    .Name("toolbar")
+    .Caption(wxT("ToolBar"))
+    .Top()
+    .Layer(2)
+    .ToolbarPane()
+    .LeftDockable(false)
+    .RightDockable(false)
+    .Floatable(false)
+    .Movable(false)
+    .Gripper(false)
+    );
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::UpdateFrameTitle()
@@ -361,12 +396,6 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
-/*    if(e->GetId()!= UPDATE_UI)
-    {
-      e->Log(); // for debugging purpose
-      int foo=0;
-    }
-*/
     switch(e->GetId())
     {
       // ###############################################################
@@ -473,9 +502,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       {
         mmgMDIChild *c = (mmgMDIChild *)m_Win->GetActiveChild();
         if (c != NULL)
-        {
           c->SetAllowCloseWindow(false);
-        }
         OpRunStarting();
       }
       break; 
@@ -483,9 +510,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       {
         mmgMDIChild *c = (mmgMDIChild *)m_Win->GetActiveChild();
         if (c != NULL)
-        {
           c->SetAllowCloseWindow(true);
-        }
         OpRunTerminated();
       }
       break; 
@@ -530,9 +555,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
         {
           mmgMDIChild *c = (mmgMDIChild *)m_Win->GetActiveChild();
           if (c != NULL)
-          {
             c->SetAllowCloseWindow(!m_OpManager->Running());
-          }
         }
       }
       break;
@@ -543,9 +566,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       {
         mafView *v = m_ViewManager->GetSelectedView();
         if (v)
-        {
           v->GetRWI()->SaveImage(v->GetLabel());
-        }
       }
       break;
       case CAMERA_RESET:
@@ -561,21 +582,17 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       case LINK_CAMERA_TO_INTERACTOR:
       {
         if (m_InteractionManager == NULL || m_InteractionManager->GetPER() == NULL)
-        {
           return;
-        }
+
         vtkCamera *cam = vtkCamera::SafeDownCast(e->GetVtkObj());
         bool link_camera = e->GetBool();
         if (!link_camera) 
         {
           if (cam) 
-          {
             m_InteractionManager->GetPER()->LinkCameraRemove(cam);
-          }
           else
-          {
             m_InteractionManager->GetPER()->LinkCameraRemoveAll();
-          }
+
           if (m_CameraLinkingObserverFlag) 
           {
             m_InteractionManager->GetPER()->GetCameraMouseInteractor()->RemoveObserver(this);
@@ -598,11 +615,8 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       break;
       // ###############################################################
       // commands related to interaction manager
-      case MENU_OPTION_DEVICE_SETTINGS:
-        m_InteractionManager->ShowModal();
-      break;
-      case MENU_OPTION_LOCALE_SETTINGS:
-        m_LocaleSettings->ChooseLocale();
+      case ID_APP_SETTINGS:
+        m_SettingsDialog->ShowModal();
       break;
       case MENU_OPTION_MEASURE_UNIT_SETTINGS:
         m_MeasureUnitSettings->ChooseMeasureUnit();
@@ -801,6 +815,7 @@ void mafLogicWithManagers::OnQuit()
   }
   
   mmgMDIChild::OnQuit(); 
+  m_Win->OnQuit(); 
 
   cppDEL(m_RemoteLogic);
   cppDEL(m_VMEManager);
@@ -1057,8 +1072,11 @@ void mafLogicWithManagers::UpdateTimeBounds()
 {
   double min,max; 
   if(m_VMEManager) m_VMEManager->TimeGetBounds(&min,&max);
-  if(m_TimePanel)  m_TimePanel->SetBounds(min,max);
-  if(m_TimeSash)   m_TimeSash->Show(min<max);
+  if(m_TimePanel)
+  {
+    m_TimePanel->SetBounds(min,max);
+    m_Win->ShowDockPane("timebar", min<max);
+  }
 }
 //----------------------------------------------------------------------------
 mafNode* mafLogicWithManagers::VmeChoose(long vme_accept_function, long style, mafString title)

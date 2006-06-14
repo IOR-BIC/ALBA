@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-03 11:03:33 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -52,7 +52,10 @@ class mmgTree;
 class mmgCheckListBox;
 class mmgGuiHolder;
 class mmgNamedPanel;
-class mmdClientMAF;
+
+#ifdef WIN32
+  class mmdClientMAF;
+#endif
 
 /** This class takes care of mastering the interaction inside views.
   This class is responsible to coordinate interaction, i.e. 
@@ -91,8 +94,9 @@ public:
   mmdRemoteMouse *GetRemoteMouseDevice();
 
   /** return the ClientMAF device */
-  mmdClientMAF *GetClientDevice();
-  
+  #ifdef WIN32
+    mmdClientMAF *GetClientDevice();
+  #endif
   /** return the mouse action, an action to which mouse is bound by default */
   //mafAction *GetMouseAction();
 
@@ -211,7 +215,8 @@ public:
   void UpdateBindings();
 
   /** Show in modal configuration the settings dialog. */
-  bool ShowModal();
+  //bool ShowModal(); //SIL. 07-jun-2006 : 
+  mmgGui* GetGui();  //SIL. 07-jun-2006 : 
 
   mmiSER *GetStaticEventRouter() {return m_StaticEventRouter;}
 
@@ -236,13 +241,14 @@ protected:
     /** Create the GUI dialog. */
   void CreateGUI();
 
+  mmgGui*                 m_gui;  //SIL. 07-jun-2006 : 
   wxFrame*                m_Frame;
   //mmgDialog*              m_Dialog;
   mmgGui*                 m_Devices;
   mmgTree*                m_DeviceTree;
   mmgCheckListBox*        m_ActionsList;
   mmgGuiHolder*           m_SettingsPanel;
-  mmgNamedPanel*          m_BindingsPanel;
+  //mmgNamedPanel*          m_BindingsPanel;
   mmgGui*                 m_Bindings;
 
   mafDevice*              m_CurrentDevice;
@@ -251,8 +257,10 @@ protected:
   mafDeviceManager*       m_DeviceManager; 
   mmiPER*                 m_PositionalEventRouter;
   mmiSER*                 m_StaticEventRouter;
-
+  
+  #ifdef WIN32
   mmdClientMAF           *m_ClientDevice;
+  #endif
   
   mmuAvatarsMap                       m_Avatars; ///< keeps a list of visible avatars
   std::list<mafAutoPointer<mmiPER> >  m_PERList; ///< the interactor devoted to Positional Event Routing

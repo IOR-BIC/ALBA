@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgFileHistory.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-10 15:43:12 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -57,12 +57,12 @@ void mmgFileHistory::AddFileToHistory(const wxString& file)
 
   if(m_fileHistoryN < m_fileMaxFiles)
   {
-    wxNode* node = m_fileMenus.First();
+    wxNode* node = m_fileMenus.GetFirst();
     while (node)
     {
-      wxMenu* menu = (wxMenu*) node->Data();
+      wxMenu* menu = (wxMenu*) node->GetData();
       menu->Append(wxID_FILE1+m_fileHistoryN, _("[EMPTY]"));
-      node = node->Next();
+      node = node->GetNext();
     }
     m_fileHistoryN ++;
   }
@@ -79,12 +79,12 @@ void mmgFileHistory::AddFileToHistory(const wxString& file)
     {
       wxString buf;
       buf.Printf(s_MRUEntryFormat, i+1, m_fileHistory[i]);
-      wxNode* node = m_fileMenus.First();
+      wxNode* node = m_fileMenus.GetFirst();
       while (node)
       {
-        wxMenu* menu = (wxMenu*) node->Data();
+        wxMenu* menu = (wxMenu*) node->GetData();
         menu->SetLabel(wxID_FILE1+i, buf);
-        node = node->Next();
+        node = node->GetNext();
       }
     }
 }
@@ -94,10 +94,10 @@ void mmgFileHistory::RemoveFileFromHistory(int i)
 {
   wxCHECK_RET( i < m_fileHistoryN, _("invalid index in mmgFileHistory::RemoveFileFromHistory") );
 
-  wxNode* node = m_fileMenus.First();
+  wxNode* node = m_fileMenus.GetFirst();
   while ( node )
   {
-    wxMenu* menu = (wxMenu*) node->Data();
+    wxMenu* menu = (wxMenu*) node->GetData();
 
     // delete the element from the array (could use memmove() too...)
     delete [] m_fileHistory[i];
@@ -116,7 +116,7 @@ void mmgFileHistory::RemoveFileFromHistory(int i)
       menu->SetLabel(wxID_FILE1 + j, buf);
     }
 
-    node = node->Next();
+    node = node->GetNext();
 
     // delete the last menu item which is unused now
     menu->Delete(wxID_FILE1 + m_fileHistoryN - 1);
@@ -130,10 +130,10 @@ void mmgFileHistory::AddFilesToMenu()
 {
   if (m_fileHistoryN > 0)
   {
-    wxNode* node = m_fileMenus.First();
+    wxNode* node = m_fileMenus.GetFirst();
     while(node)
     {
-      wxMenu* menu = (wxMenu*) node->Data();
+      wxMenu* menu = (wxMenu*) node->GetData();
       int i;
       for(i = 0; i < m_fileHistoryN; i++)
       {
@@ -144,7 +144,7 @@ void mmgFileHistory::AddFilesToMenu()
           menu->Append(wxID_FILE1+i, buf);
         }
       }
-      node = node->Next();
+      node = node->GetNext();
     }
   }
 }

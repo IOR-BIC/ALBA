@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuXMLDOM.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:43:19 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,7 +22,9 @@
 #include <xercesc/parsers/XercesDOMParser.hpp>
 
 #ifdef XERCES_CPP_NAMESPACE_USE
-XERCES_CPP_NAMESPACE_USE
+// XERCES_CPP_NAMESPACE_USE
+// SIL 12-apr-2006
+// removed XERCES_CPP_NAMESPACE_USE and added XERCES_CPP_NAMESPACE_QUALIFIER where required
 #endif
 
 /** mmuXMLDOM utility class for PIMPL of XML DOM types.
@@ -40,13 +42,14 @@ public:
   mmuXMLDOM(): m_XMLDoctype(NULL),m_XMLDoc(NULL),m_XMLNode(NULL), \
     m_XMLImplement(NULL),m_XMLSerializer(NULL), \
     m_XMLTarget(NULL),m_XMLParser(NULL) {}
-  DOMDocumentType   *m_XMLDoctype;
-  DOMDocument       *m_XMLDoc;
-  DOMNode           *m_XMLNode;
-  DOMImplementation *m_XMLImplement;
-  DOMWriter         *m_XMLSerializer;
-  XMLFormatTarget   *m_XMLTarget;
-  XercesDOMParser   *m_XMLParser;
+
+  XERCES_CPP_NAMESPACE_QUALIFIER DOMDocumentType   *m_XMLDoctype;
+  XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument       *m_XMLDoc;  
+  XERCES_CPP_NAMESPACE_QUALIFIER DOMNode           *m_XMLNode;
+  XERCES_CPP_NAMESPACE_QUALIFIER DOMImplementation *m_XMLImplement;
+  XERCES_CPP_NAMESPACE_QUALIFIER DOMWriter         *m_XMLSerializer;
+  XERCES_CPP_NAMESPACE_QUALIFIER XMLFormatTarget   *m_XMLTarget;
+  XERCES_CPP_NAMESPACE_QUALIFIER XercesDOMParser   *m_XMLParser;
 };
 
 #endif // _mmuXMLDOM_h_

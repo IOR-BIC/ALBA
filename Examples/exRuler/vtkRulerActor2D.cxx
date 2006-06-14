@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkRulerActor2D.cxx,v $
   Language:  C++
-  Date:      $Date: 2006-03-08 10:21:39 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -34,7 +34,7 @@
 #include "vtkProperty2D.h"
 #include "vtkPolyDataMapper2D.h"
 
-vtkCxxRevisionMacro(vtkRulerActor2D, "$Revision: 1.5 $");
+vtkCxxRevisionMacro(vtkRulerActor2D, "$Revision: 1.6 $");
 vtkStandardNewMacro(vtkRulerActor2D);
 //------------------------------------------------------------------------------
 vtkRulerActor2D::vtkRulerActor2D()
@@ -686,15 +686,15 @@ void vtkRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
 
   if (GlobalAxes) 
   {
-    char *letter[] = {"x","y","z"};
-    char *sign = (w1X-w0X > 0) ? " " : "-";
+    const char *letter[] = {"x","y","z"};
+    const char *sign = (w1X-w0X > 0) ? " " : "-";
     char caption[100];
     sprintf(caption, "%s%s %s", sign,  letter[x_index], Legend);
     HorizontalAxesLabel->SetInput(caption);
     HorizontalAxesLabel->SetDisplayPosition(rwWidth - margin, margin + 4);
 
-    sign = (w1Y-w0Y > 0) ? " " : "-";
-    sprintf(caption, "%s%s %s", sign, letter[y_index], Legend);
+    const char *sign2 = (w1Y-w0Y > 0) ? " " : "-";
+    sprintf(caption, "%s%s %s", sign2, letter[y_index], Legend);
     VerticalAxesLabel->SetInput(caption);
     VerticalAxesLabel->SetDisplayPosition( margin, rwHeight - margin/2);
   }

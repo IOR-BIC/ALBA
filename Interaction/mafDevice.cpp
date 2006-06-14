@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDevice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-07 12:34:45 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -37,6 +37,7 @@ mafDevice::mafDevice()
 {
   m_Gui       = NULL;
   m_ID        = 0;
+  m_Start     = false;
   m_AutoStart = false; // auto is enabled when device is started the first time
   m_Locked    = false;
   m_PersistentFalg = false;
@@ -105,6 +106,7 @@ mmgGui *mafDevice::GetGui()
 void mafDevice::CreateGui()
 //----------------------------------------------------------------------------
 {
+  /*  //SIL. 07-jun-2006 : 
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
   m_Gui->String(ID_NAME,"name",&m_Name);
@@ -114,6 +116,16 @@ void mafDevice::CreateGui()
   m_Gui->Bool(ID_AUTO_START,"auto start",&m_AutoStart,0,"automatically start device on application startup");
   m_Gui->Enable(ID_ACTIVATE,!IsInitialized());
   m_Gui->Enable(ID_SHUTDOWN,IsInitialized()!=0);
+  */
+
+  assert(m_Gui == NULL);
+  m_Gui = new mmgGui(this);
+  m_Gui->String(ID_NAME,"name",&m_Name);
+  m_Gui->Divider();
+  m_Gui->Bool(ID_ACTIVATE,"start",&m_Start,0,"activate/deactivate this device");
+  m_Gui->Bool(ID_AUTO_START,"auto start",&m_AutoStart,0,"automatically activate device on application startup");
+  //m_Gui->Enable(ID_ACTIVATE,!IsInitialized());
+  //m_Gui->Enable(ID_SHUTDOWN,IsInitialized()!=0);
 }
 
 //----------------------------------------------------------------------------
@@ -122,8 +134,9 @@ void mafDevice::UpdateGui()
 {
   if (m_Gui)
   {
-    m_Gui->Enable(ID_ACTIVATE,!IsInitialized());
-    m_Gui->Enable(ID_SHUTDOWN,IsInitialized()!=0);
+    //m_Gui->Enable(ID_ACTIVATE,!IsInitialized());
+    //m_Gui->Enable(ID_SHUTDOWN,IsInitialized()!=0);
+    m_Start = IsInitialized();
     m_Gui->Update();
   }
 }
@@ -140,17 +153,23 @@ void mafDevice::OnEvent(mafEventBase *e)
       SetName(m_Name); // force sending an event
       break;
     case ID_ACTIVATE:
-      if (Initialize())
+      if(m_Start) // user request to Start
       {
-        mafErrorMessage("Cannot Initialize Device","I/O Error");
-        return;
+          if (Initialize())
+            mafErrorMessage("Cannot Initialize Device","I/O Error");
+      }
+      else // user request to Stop
+      {
+        Shutdown();
       }
       UpdateGui();
       break;
+    /*  //SIL. 07-jun-2006 : 
     case ID_SHUTDOWN:
       Shutdown();
       UpdateGui();
       break; 
+    */  
     }
     
     return;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiSaveRestorePose.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-17 11:17:40 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -88,7 +88,7 @@ void mafGuiSaveRestorePose::OnEvent(mafEventBase *maf_event)
         int sel_pose = m_PositionsList->GetSelection();
         if (sel_pose != -1)
           RemovePose(sel_pose);
-        if (m_PositionsList->Number() == 0)
+        if (m_PositionsList->GetCount() == 0)
           m_Gui->Enable(ID_REMOVE, false);
       }
       break;
@@ -112,7 +112,7 @@ void mafGuiSaveRestorePose::OnEvent(mafEventBase *maf_event)
 void mafGuiSaveRestorePose::EnableWidgets(bool enable)
 //----------------------------------------------------------------------------
 {
-  int num_stored_poses = m_PositionsList->Number();
+  int num_stored_poses = m_PositionsList->GetCount();
 
   m_Gui->Enable(ID_SAVE, enable);
   m_Gui->Enable(ID_REMOVE, enable && num_stored_poses > 0);

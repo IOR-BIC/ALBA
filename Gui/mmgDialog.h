@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialog.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-04 17:32:31 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -83,10 +83,10 @@ public:
   void Add(wxSizer*  sizer, int option = 0, int flag = wxEXPAND, int border = 0)  {m_GuiSizer->Add(sizer, option,flag,border);};
 
   /** Remove a widget from the dialog. */
-  bool Remove(wxWindow* window) {return m_GuiSizer->Remove(window);};
+  bool Remove(wxWindow* window) {return m_GuiSizer->Detach(window);};
 
   /** Remove a sizer from the dialog. */
-  bool Remove(wxSizer*  sizer ) {return m_GuiSizer->Remove(sizer);};
+  bool Remove(wxSizer*  sizer ) {return m_GuiSizer->Detach(sizer);};
 
   int ShowModal();
 
@@ -130,6 +130,7 @@ private:
   void nvOnCancel(wxCommandEvent &event)    {OnCancel(event);};    
   void nvOnClose(wxCommandEvent &event)     {wxDialog::Close();}; //calls nvOnCloseWindow
 
+  bool m_dialog_initialized;
   DECLARE_EVENT_TABLE()
 };
 #endif

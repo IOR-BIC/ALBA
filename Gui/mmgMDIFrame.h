@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 16:19:23 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,6 +16,10 @@
 //----------------------------------------------------------------------------
 #include <wx/laywin.h>
 #include <wx/mdi.h>
+
+#include "mmgDockManager.h"
+#include "mmgDockSettings.h" // tmp //SIL. 05-jun-2006 : 
+
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
@@ -24,6 +28,8 @@ class vtkProcessObject;
 class vtkViewport;
 class vtkObject;
 class mmgMDIFrameCallback; 
+//class mmgDockSettings;
+class mmgGui;
 //----------------------------------------------------------------------------
 // mmgMDIFrame :
 //----------------------------------------------------------------------------
@@ -35,11 +41,30 @@ class mmgMDIFrame: public wxMDIParentFrame
   
   void SetListener(mafObserver *Listener) {m_Listener = Listener;};
   
-  /** Set the window shown on the Client Area, (hide the previous contents) */
-	void Put(wxWindow* w);
 
-	/** . */
-  void Update() {LayoutWindow();};
+  /** Show the Docking Settings Dialog */
+  mmgGui* GetDockSettingGui() {return m_DockSettings->GetGui();};  
+
+  /** Retrieve the Docking Manager */
+  mmgDockManager& GetDockManager()  {return m_DockManager;};
+
+  /** must be called @ shutdown*/
+  void OnQuit();
+
+  /** add a new Dockable Pane containig the given Window.
+  pane_info specify the Pane settings */
+  void AddDockPane(wxWindow *window, wxPaneInfo& pane_info);
+  
+  /** remove a Dockable Pane  - the contained window is not destroyed */
+  void RemoveDockPane(wxString pane_name);
+
+  /** Show/Hide a Dockable Pane -- the Pane can be specified by name or by its contents */
+  void ShowDockPane(wxString pane_name, bool show = true);
+  void ShowDockPane(wxWindow *window, bool show = true);
+
+  /** tell if a given Dockable Pane is shown -- the Pane can be specified by name or by its contents */
+  bool DockPaneIsShown(wxString pane_name);
+  bool DockPaneIsShown(wxWindow *window);
 
 	/** Show the 'Busy' text on the status bar. */
   void Busy();
@@ -77,13 +102,6 @@ class mmgMDIFrame: public wxMDIParentFrame
 
   /** Link a vtkViewport to the progress bar. */
   void BindToProgressBar(vtkViewport* ren);
-
-  /* - used for vtk4.2  
-  static void ProgressStart(void*);
-  static void ProgressUpdate(void*);
-  static void ProgressEnd(void*);
-  static void ProgressDeleteArgs(void*);
-  */
 
 protected:
   mmgMDIFrameCallback *m_StartCallback; 
@@ -132,13 +150,16 @@ protected:
   void CreateStatusbar();
 
   mafObserver *m_Listener;
-  wxWindow    *m_ClientWin;
 
   // added members to handle the progress bar
   bool         *m_Busy;
   wxPanel      *m_BusyPanel;
   wxStaticText *m_BusyLabel;
   wxGauge      *m_Gauge;
+
+  // AUI Layout Manager -  //SIL. 23-may-2006 : 
+  mmgDockManager    m_DockManager;
+  mmgDockSettings  *m_DockSettings;
 
   DECLARE_EVENT_TABLE()
 };

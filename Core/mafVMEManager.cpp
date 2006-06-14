@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-24 11:50:22 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.25 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -322,7 +322,7 @@ const char *mafVMEManager::ZIPOpen(wxString filename)
   {
     out_file_stream.open(out_file, std::ios_base::binary);
   }
-  s_size = zip_is->StreamSize();
+  s_size = zip_is->GetSize();
   buf = new char[s_size];
   zip_is->Read(buf,s_size);
   out_file_stream.write(buf, s_size);
@@ -345,7 +345,7 @@ const char *mafVMEManager::ZIPOpen(wxString filename)
     }
     else
       out_file_stream.open(out_file, std::ios_base::binary);
-    s_size = zip_is->StreamSize();
+    s_size = zip_is->GetSize();
     buf = new char[s_size];
     zip_is->Read(buf,s_size);
     out_file_stream.write(buf, s_size);

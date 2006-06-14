@@ -3,8 +3,8 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: mafAgentEventQueue.cpp,v $
 Language:  C++
-Date:      $Date: 2005-07-14 17:42:26 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2006-06-14 14:46:33 $
+Version:   $Revision: 1.7 $
 
 =========================================================================*/
 #include "mafAgentEventQueue.h"
@@ -318,3 +318,4 @@ int mafAgentEventQueue::GetQueueSize()
   return m_EventQueue->Q.size();
   m_Mutex->Unlock();
 }
+

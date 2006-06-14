@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooserTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-12 11:15:55 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -211,7 +211,7 @@ void mmgVMEChooserTree::CloneSubTree(mmgCheckTree *source_tree, wxTreeItemId *so
     }
   }
 
-  long cookie = 0;
+  wxTreeItemIdValue cookie = 0;
   wxTreeItemId child = source_tree->GetTree()->GetFirstChild(*source_item, cookie);
   while( child.IsOk() )
   {

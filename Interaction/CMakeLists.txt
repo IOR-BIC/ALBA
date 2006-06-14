@@ -8,8 +8,18 @@ DBG_MESSAGE("Configuring project ${PROJECT_NAME}")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
+  
   #mafAvatar3D2DPicker.cpp
   #mafAvatar3D2DPicker.h
+  #mmdTrackerSet.cpp
+  #mmdTrackerSet.h
+  #mmi6DOFMove.cpp
+  #mmi6DOFMove.h
+  #mmiCompositorDevice.cpp
+  #mmiCompositorDevice.h
+  #mmiGeneric.cpp
+  #mmiGeneric.h
+  
   mafAction.cpp
   mafAction.h
   mafAgent.cpp
@@ -91,16 +101,12 @@ SET(PROJECT_SRCS
   
   mmdButtonsPad.cpp
   mmdButtonsPad.h
-  mmdClientMAF.cpp
-  mmdClientMAF.h
   mmdMouse.cpp
   mmdMouse.h
   mmdRemoteMouse.cpp
   mmdRemoteMouse.h
   mmdTracker.cpp
   mmdTracker.h
-  #mmdTrackerSet.cpp
-  #mmdTrackerSet.h
   
   mmi2DMeter.cpp
   mmi2DMeter.h
@@ -108,20 +114,14 @@ SET(PROJECT_SRCS
   mmi6DOF.h
   mmi6DOFCameraMove.cpp
   mmi6DOFCameraMove.h
-  #mmi6DOFMove.cpp
-  #mmi6DOFMove.h
   mmiCameraMove.cpp
   mmiCameraMove.h
-  #mmiCompositorDevice.cpp
-  #mmiCompositorDevice.h
   mmiCompositorMouse.cpp
   mmiCompositorMouse.h
   mmiConstraint.cpp
   mmiConstraint.h
   mmiExtractIsosurface.cpp
   mmiExtractIsosurface.h
-  #mmiGeneric.cpp
-  #mmiGeneric.h
   mmiGeneric6DOF.cpp
   mmiGeneric6DOF.h
   mmiGenericInterface.cpp
@@ -135,6 +135,16 @@ SET(PROJECT_SRCS
   mmiSER.cpp
   mmiSER.h
 )
+
+## SIL == removed under Linux - since it requires mafDrivers - which seems to be Win32 only
+IF(WIN32)
+  SET(PROJECT_SRCS
+  ${PROJECT_SRCS}
+  mmdClientMAF.cpp
+  mmdClientMAF.h
+  )
+ENDIF(WIN32)
+
 
 IF (MAF_USE_P5_GLOVE)
   SET(PROJECT_SRCS

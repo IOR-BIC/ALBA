@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-21 12:18:30 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -165,11 +165,22 @@ void mafAnimate::OnEvent(mafEventBase *maf_event)
 void mafAnimate::EnableWidgets()
 //----------------------------------------------------------------------------
 {
-	m_StorePositionButton->Enable( m_Tags != NULL ); 
-	m_PositionList->Enable( m_Tags != NULL && m_PositionList->Number()>0 );
-	m_DeletePositionButton->Enable( m_Tags != NULL && m_PositionList->Number()>0 && m_SelectedPosition != "" );
-	m_RenamePositionButton->Enable( m_Tags != NULL && m_PositionList->Number()>0 && m_SelectedPosition != "" );
-	m_Gui->Enable( ID_ANIMATE, m_Tags != NULL && m_PositionList->Number()>0 );
+  // SIL: 05-may-06
+  // in passing from wx242 -> wx263
+  // Number() become GetCount()
+
+  m_StorePositionButton->Enable( m_Tags != NULL ); 
+	//m_PositionList->Enable( m_Tags != NULL && m_PositionList->Number()>0 );
+  //m_PositionList->Enable( m_Tags != NULL && m_PositionList->Number()>0 );
+	//m_DeletePositionButton->Enable( m_Tags != NULL && m_PositionList->Number()>0 && m_SelectedPosition != "" );
+	//m_RenamePositionButton->Enable( m_Tags != NULL && m_PositionList->Number()>0 && m_SelectedPosition != "" );
+	//m_Gui->Enable( ID_ANIMATE, m_Tags != NULL && m_PositionList->Number()>0 );
+
+  m_PositionList->Enable( m_Tags != NULL && m_PositionList->GetCount()>0 );
+  m_PositionList->Enable( m_Tags != NULL && m_PositionList->GetCount()>0 );
+  m_DeletePositionButton->Enable( m_Tags != NULL && m_PositionList->GetCount()>0 && m_SelectedPosition != "" );
+  m_RenamePositionButton->Enable( m_Tags != NULL && m_PositionList->GetCount()>0 && m_SelectedPosition != "" );
+  m_Gui->Enable( ID_ANIMATE, m_Tags != NULL && m_PositionList->GetCount()>0 );
 }
 //----------------------------------------------------------------------------
 void mafAnimate::FlyTo(const char *fly_position)
@@ -457,7 +468,8 @@ void mafAnimate::StoreViewPoint()
 	m_Tags->SetTag(item);
 
 	m_PositionList->Append(m_SelectedPosition);
-	m_PositionList->SetSelection(m_PositionList->Number() - 1);
+	//m_PositionList->SetSelection(m_PositionList->Number() - 1);
+  m_PositionList->SetSelection(m_PositionList->GetCount() - 1);
 	m_Gui->Update();
 }
 //----------------------------------------------------------------------------
@@ -515,7 +527,8 @@ void mafAnimate::DeleteViewPoint()
 	  m_Tags->DeleteTag(flyto_tagName);
 
 	m_SelectedPosition = "";
-	if(m_PositionList->Number()) 
+	//if(m_PositionList->Number()) 
+  if(m_PositionList->GetCount()) 
 	{
 		m_PositionList->SetSelection(0);
 	  m_SelectedPosition = m_PositionList->GetStringSelection();
@@ -526,7 +539,8 @@ void mafAnimate::DeleteViewPoint()
 void mafAnimate::ResetKit()
 //----------------------------------------------------------------------------
 {
-  int num_items = m_PositionList->Number();
+  //int num_items = m_PositionList->Number();
+  int num_items = m_PositionList->GetCount();
   for (int i=0; i<num_items;i++)
   {
     m_PositionList->Delete(0);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLElement.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 16:45:03 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -150,3 +150,4 @@ protected:
 
 };
 #endif // _mafXMLElement_h_
+

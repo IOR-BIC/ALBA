@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMaterialChooser.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-22 13:28:50 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -152,22 +152,23 @@ void mmgMaterialChooser::CreateGUI()
 	wxDefaultPosition,wxDefaultSize,wxDIALOG_MODAL | wxCAPTION | wxTHICK_FRAME );
   m_Dialog->GetSize(&w,&h);
   m_Dialog->SetSize(x_pos+5,y_pos+5,w,h);
+  //m_Dialog->SetMinSize(wxSize(w,h));
 
 	m_ListCtrlMaterial = new mmgListCtrlBitmap(m_Dialog,-1,0,1); 
 	m_ListCtrlMaterial->SetTitle("material library"); 
 	m_ListCtrlMaterial->SetListener(this); 
 	m_ListCtrlMaterial->Reset();
-	m_ListCtrlMaterial->SetSize(wxSize(150,20));
+	//m_ListCtrlMaterial->SetSize(wxSize(200,500));
+  m_ListCtrlMaterial->SetMinSize(wxSize(200,500));
 
 	// RWI ============================
 	m_RWI = new mafRWI(m_Dialog,ONE_LAYER);
 	m_RWI->SetSize(0,0,50,50);
-	//m_RWI->m_RwiBase->Show(true);
-
+  m_RWI->m_RwiBase->Show(true);
 	// GUI ============================
 	m_Gui = new mmgGui(this);
   
-  m_Gui->Label		(""); 
+  //m_Gui->Label		(""); 
 	m_Gui->Label("current material",1);
 	m_Gui->String(ID_NAME,"name",&m_MaterialName);
 
@@ -198,17 +199,19 @@ void mmgMaterialChooser::CreateGUI()
 	m_Gui->Label		("");
   m_Gui->OkCancel();
 
-	m_Gui->Update();
-	m_Gui->SetSize(220,520);
+	//m_Gui->Update();
+	//m_Gui->SetSize(wxSize(220,520));
+  //m_Gui->SetMinSize(wxSize(220,520));
 	m_Gui->Reparent(m_Dialog);
   m_Gui->Show(true);
+  m_Gui->Fit();
   
 	wxBoxSizer *v1_sizer = new wxBoxSizer(wxVERTICAL);
-	v1_sizer->Add(m_ListCtrlMaterial,1,wxEXPAND | wxALIGN_LEFT);
+	v1_sizer->Add(m_ListCtrlMaterial,1,wxEXPAND | wxALL, 6);
 
 	wxBoxSizer *v2_sizer = new wxBoxSizer(wxVERTICAL);
   v2_sizer->Add(m_RWI->m_RwiBase,0,wxALIGN_CENTRE);
-  v2_sizer->Add(m_Gui,1,wxEXPAND|wxALIGN_BOTTOM);
+  v2_sizer->Add(m_Gui,0,wxALL, 6);
 
 	wxBoxSizer *main_sizer = new wxBoxSizer(wxHORIZONTAL);
 	main_sizer->Add(v1_sizer,1,wxEXPAND | wxALIGN_LEFT);
@@ -216,16 +219,14 @@ void mmgMaterialChooser::CreateGUI()
   m_RWI->m_RwiBase->Show(true);
 
 	// ATTACH SIZER TO DIALOG
-	m_Dialog->SetAutoLayout( TRUE );
   m_Dialog->SetSizer( main_sizer );
-  main_sizer->Fit(m_Dialog);
   main_sizer->SetSizeHints(m_Dialog);
 }
 //----------------------------------------------------------------------------
 void mmgMaterialChooser::CreatePipe()
 //----------------------------------------------------------------------------
 {
-  wxColour col = wxSystemSettings::GetSystemColour(wxSYS_COLOUR_3DLIGHT);
+  wxColour col = wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT);
   double br = col.Red()/255.0;
   double bg = col.Green()/255.0;
   double bb = col.Blue()/255.0;

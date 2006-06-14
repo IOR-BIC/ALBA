@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-13 09:38:54 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.28 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,7 +22,6 @@
 #include "mafSideBar.h"
 #include "mafView.h"
 #include "mafViewVTK.h"
-#include "mmgSashPanel.h"
 #include "mmgGui.h"
 #include "mmgGuiHolder.h"
 #include "mmgPanelStack.h"
@@ -40,13 +39,14 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener)
   m_SelectedView = NULL;
 
   //splitted panel  
-  m_Notebook = new wxNotebook(parent,-1);
-  m_Notebook->SetFont(wxFont(wxSystemSettings::GetSystemFont(wxSYS_DEFAULT_GUI_FONT)));
+  m_Notebook = new wxNotebook(parent,id);
+  m_Notebook->SetFont(wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT)));
   //m_SideSplittedPanel = new mmgNamedPanel(m_Notebook,-1,false,true); //SIL. 29-4-2003 - 200 is the height of the vme_property panel
   m_SideSplittedPanel = new wxSplitterWindow(m_Notebook, -1,wxDefaultPosition,wxSize(-1,-1),/*wxSP_3DSASH |*/ wxSP_FULLSASH);
 
   //tree ----------------------------
-  m_Tree = new mmgCheckTree(m_SideSplittedPanel,-1,true);
+  //m_Tree = new mmgCheckTree(m_SideSplittedPanel,-1,true);  //SIL. 23-may-2006 : 
+  m_Tree = new mmgCheckTree(m_SideSplittedPanel,-1,false,true);
   m_Tree->SetListener(Listener);
   m_Tree->SetSize(-1,300);
   m_Tree->SetTitle(" vme hierarchy: ");
@@ -54,19 +54,21 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener)
   m_Notebook->AddPage(m_SideSplittedPanel,_("vme manager"),true);
 
   //view property panel
-  m_ViewPropertyPanel = new mmgGuiHolder(m_Notebook,-1,true);
+  //m_ViewPropertyPanel = new mmgGuiHolder(m_Notebook,-1,true);  //SIL. 23-may-2006 : 
+  m_ViewPropertyPanel = new mmgGuiHolder(m_Notebook,-1,false,true);
   m_ViewPropertyPanel->SetTitle(_("no view selected:"));
   m_Notebook->AddPage(m_ViewPropertyPanel,_("view settings"));
 
   //op_panel ----------------------------
   m_OpPanel  = new mmgPanelStack(m_Notebook ,-1);
-  mmgNamedPanel *empty_op = new mmgNamedPanel(m_OpPanel ,-1,true);
+  //mmgNamedPanel *empty_op = new mmgNamedPanel(m_OpPanel ,-1,true);  //SIL. 23-may-2006 : 
+  mmgNamedPanel *empty_op = new mmgNamedPanel(m_OpPanel ,-1,false,true);
   empty_op->SetTitle(_(" no operation running:"));
   m_OpPanel->Push(empty_op);
-  m_Notebook->AddPage(m_OpPanel ,_(" op. parameters"));
+  m_Notebook->AddPage(m_OpPanel ,_(" op.params"));
 
   wxNotebook *vme_notebook = new wxNotebook(m_SideSplittedPanel,-1);
-  vme_notebook->SetFont(wxFont(wxSystemSettings::GetSystemFont(wxSYS_DEFAULT_GUI_FONT)));
+  vme_notebook->SetFont(wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT)));
 
   m_VmeOutputPanel = new mmgGuiHolder(vme_notebook,-1,false,true);
   vme_notebook->AddPage(m_VmeOutputPanel,_(" vme output "));

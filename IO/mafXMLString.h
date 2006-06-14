@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLString.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:43:19 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.6 $
   Authors:   Rick Parrish (rfmobile@swbell.net) adapted by Marco Petrone (CINECA)
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,10 +14,14 @@
 #define __mafXMLString_h__
 
 #include "mafConfigure.h"
+
+
 #include <xercesc/util/XMLString.hpp>
 
 #ifdef XERCES_CPP_NAMESPACE_USE
-XERCES_CPP_NAMESPACE_USE
+// XERCES_CPP_NAMESPACE_USE
+// SIL 12-apr-2006
+// removed XERCES_CPP_NAMESPACE_USE and added XERCES_CPP_NAMESPACE_QUALIFIER where required
 #endif
 
 /** string type for converting const char * to and from XMLString types

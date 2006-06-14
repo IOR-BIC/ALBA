@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgNamedPanel.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 21:59:52 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -58,7 +58,7 @@ mmgNamedPanel::mmgNamedPanel( wxWindow* parent,wxWindowID id,bool CloseButton,bo
 
 	  m_lab = new mmgLab( m_top, ID_LABEL_CLICK, " Panel Title:");
 
-	  wxFont font = wxFont(wxSystemSettings::GetSystemFont(wxSYS_DEFAULT_GUI_FONT));
+	  wxFont font = wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
 #if WIN32
 	  font.SetPointSize(9);
 #endif

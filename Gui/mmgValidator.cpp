@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgValidator.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 17:18:22 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -843,7 +843,7 @@ void mmgValidator::OnChar(wxKeyEvent& event)
 //----------------------------------------------------------------------------
 {
   //Filter key for TextCtrl used for numeric input
-  int keyCode = (int)event.KeyCode();
+  int keyCode = (int)event.GetKeyCode();
 
   if ((keyCode == WXK_RETURN || keyCode == WXK_TAB) &&
       (m_Mode == VAL_STRING  || m_Mode == VAL_MAF_STRING || 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPointSet.h,v $
   Language:  C++
-  Date:      $Date: 2005-08-31 15:10:07 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-06-14 14:46:34 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMutexPanel.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 17:17:56 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -76,7 +76,7 @@ bool mmgMutexPanel::RemoveCurrentClient()
   if(current_gui == NULL) 
     return false;  //nothing to remove
 
-  m_sizer->Remove(current_gui);
+  m_sizer->Detach(current_gui);
   current_gui->Show(false);
   current_gui->Reparent(mafGetFrame());
   this->Layout();

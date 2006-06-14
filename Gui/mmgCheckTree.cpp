@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-12 11:43:24 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -250,7 +250,7 @@ void mmgCheckTree::ViewSelected(mafView *view)
 	m_table->BeginFind();
 	while(wxNode* node = m_table->Next())
 	{
-		mmgTreeTableElement* el = (mmgTreeTableElement*)node->Data();
+		mmgTreeTableElement* el = (mmgTreeTableElement*)node->GetData();
 		assert(el);
 		wxTreeItemId i = el->GetItem(); 
 		if(i.IsOk())

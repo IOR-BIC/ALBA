@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutSwatch.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-30 14:17:52 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -61,7 +61,7 @@ mmgLutSwatch::mmgLutSwatch(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
   m_Tip = "";
   SetCursor(*wxCROSS_CURSOR);
 
-  m_Font = wxFont(wxSystemSettings::GetSystemFont(wxSYS_DEFAULT_GUI_FONT));
+  m_Font = wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
   m_Font.SetPointSize(9);
 }
 //----------------------------------------------------------------------------
@@ -202,7 +202,8 @@ void mmgLutSwatch::Update()
     }
   }
   wxImage img(w,h,data); // data will be freed by the image
-  m_Bmp = img.ConvertToBitmap();
+  //m_Bmp = img.ConvertToBitmap(); // changed in passing from wx242 -> wx263
+  m_Bmp = wxBitmap(img);
 
   m_UpdateTime = m_Lut->GetMTime();
 }

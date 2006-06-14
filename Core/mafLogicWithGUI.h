@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.h,v $
   Language:  C++
-  Date:      $Date: 2006-05-16 09:25:56 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -114,7 +114,7 @@ protected:
 	/** Virtual method to create the toolbar.*/
 	virtual void CreateToolbar();
 	/** Virtual method to create the side panel, where visualize the tree representation.*/
-	virtual void CreateSidebar();
+	virtual void CreateSidebar() {};
 	/** Virtual method to create the time bar.*/
 	virtual void CreateTimebar();
 	/** Virtual method to create the log bar.*/

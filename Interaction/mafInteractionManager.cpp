@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-03 11:03:33 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.28 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -55,6 +55,10 @@
 #include "mmdRemoteMouse.h"
 #include "mmdClientMAF.h"
 
+#ifdef WIN32
+  #include "mmdClientMAF.h"
+#endif
+  
 #include "mafVME.h"
 #include "mafVMEGizmo.h"
 #include "mafXMLStorage.h"
@@ -79,6 +83,8 @@ mafCxxTypeMacro(mafInteractionManager);
 mafInteractionManager::mafInteractionManager()
 //------------------------------------------------------------------------------
 {
+  m_gui = NULL;  //SIL. 07-jun-2006 : 
+  m_Frame = NULL;  //SIL. 07-jun-2006 : 
   m_SelectedView      = NULL;
   m_LockRenderingFlag = false;
   m_LockRenderingFlag = 0;
@@ -88,7 +94,7 @@ mafInteractionManager::mafInteractionManager()
   m_DeviceTree        = NULL;
   //m_Dialog            = NULL;
   m_SettingsPanel     = NULL;
-  m_BindingsPanel     = NULL;
+  //m_BindingsPanel     = NULL;
   m_CurrentDevice     = NULL;
   m_CurrentRenderer   = NULL;
   m_ActionsList       = NULL;
@@ -132,14 +138,17 @@ mafInteractionManager::mafInteractionManager()
   //mouse_action->BindDevice(mouse_device); // bind mouse to mouse action
   pointing_action->BindDevice(mouse_device); // bind mouse to point&manipulate action
 
+  #ifdef WIN32
   mafPlugDevice<mmdClientMAF>("Client MAF");
   m_ClientDevice = (mmdClientMAF *)m_DeviceManager->AddDevice("mmdClientMAF",true);
+
 /*
   mafPlugDevice<mmdRemoteMouse>("RemoteMouse");
   mmdRemoteMouse *remote_mouse_device = (mmdRemoteMouse *)m_DeviceManager->AddDevice("mmdRemoteMouse",true); // add as persistent device
   assert(remote_mouse_device);
   pointing_action->BindDevice(remote_mouse_device); // bind mouse to point&manipulate action
 */
+  #endif
 }
 
 //------------------------------------------------------------------------------
@@ -237,6 +246,8 @@ mmdMouse *mafInteractionManager::GetMouseDevice()
 {
   return mmdMouse::SafeDownCast(m_DeviceManager->GetDevice("Mouse"));
 }
+
+#ifdef WIN32
 //------------------------------------------------------------------------------
 mmdRemoteMouse *mafInteractionManager::GetRemoteMouseDevice()
 //------------------------------------------------------------------------------
@@ -249,6 +260,7 @@ mmdClientMAF *mafInteractionManager::GetClientDevice()
 {
   return m_ClientDevice;
 }
+#endif
 //------------------------------------------------------------------------------
 int mafInteractionManager::BindAction(const char *action,mafInteractor *agent)
 //------------------------------------------------------------------------------
@@ -621,12 +633,14 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
     {
       switch(e->GetId())
       {
+        /*
         case ID_OK:
 		    case wxOK:
           //m_Dialog->EndModal(wxOK);
-          m_Frame->Show(false);
+          if(m_Frame) m_Frame->Show(false);
           return; 
 		    break;
+		    */
         case ID_STORE:
         { 
           //SIL. 4-7-2005: begin
@@ -712,16 +726,27 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
             // Event rised by the CheckTree used to show the devices tree
             if (mafDevice *device = GetDeviceManager()->GetDevice(e->GetArg()))
             {
+              // remove the GUI and Bindings-GUI for the previous seleced device (if any)
+              if(m_CurrentDevice)
+              {
+                mmgGui *previous_gui = m_CurrentDevice->GetGui();
+                m_gui->Remove(previous_gui);
+                m_gui->Remove(m_Bindings);
+              }
+              // Set the current device
               m_CurrentDevice = device;
-              // Show device settings panel
-              assert(m_CurrentDevice->GetGui());
+              m_CurrentDevice->UpdateGui();
+
+              // Insert the current device GUI and append the m_Bindings Gui
               mmgGui *gui = m_CurrentDevice->GetGui();
               assert(gui);
-              m_SettingsPanel->Put(gui);
-              // force update
-              m_CurrentDevice->UpdateGui();
-  
-              // Update Bindings panel
+              
+              m_gui->AddGui(gui,0,0);
+              m_gui->AddGui(m_Bindings,0,0);
+              m_gui->FitGui(); // update the size of m_gui
+              m_gui->GetParent()->FitInside(); // update the (mmgGuiHolder) ScrollBar settings
+              
+              //Update Bindings panel
               UpdateBindings();
             }
             else
@@ -866,6 +891,7 @@ int mafInteractionManager::InternalRestore(mafStorageElement *node)
   return MAF_OK;
 }
 
+/* removed  //SIL. 07-jun-2006 : 
 //----------------------------------------------------------------------------
 bool mafInteractionManager::ShowModal()
 //----------------------------------------------------------------------------
@@ -874,6 +900,7 @@ bool mafInteractionManager::ShowModal()
   m_Frame->Show(true);
   return true;
 }
+*/
 //----------------------------------------------------------------------------
 int mafInteractionManager::DeviceChooser(wxString &dev_name,wxString &dev_type)
 //----------------------------------------------------------------------------
@@ -892,7 +919,7 @@ int mafInteractionManager::DeviceChooser(wxString &dev_name,wxString &dev_type)
     }
 
     //wxSingleChoiceDialog chooser(m_Dialog,"select a device","Device Chooser",iFactory->GetNumberOfDevices(),devices);
-    wxSingleChoiceDialog chooser(m_Frame,"select a device","Device Chooser",iFactory->GetNumberOfDevices(),devices);
+    wxSingleChoiceDialog chooser(mafGetFrame(),"select a device","Device Chooser",iFactory->GetNumberOfDevices(),devices);
 
     int index=-1;
     if (chooser.ShowModal()==wxID_OK)
@@ -940,8 +967,6 @@ void mafInteractionManager::UpdateBindings()
       }
       m_ActionsList->AddItem(i++,action->GetName(),found);
     }
-
-    m_Bindings->Update();
   }
 }
 
@@ -984,69 +1009,37 @@ void mafInteractionManager::UpdateDevice(mafDevice *device)
   assert(device);
   m_DeviceTree->SetNodeLabel(device->GetID(),device->GetName());
 }
+//SIL. 07-jun-2006 : -- heavily changed
 //----------------------------------------------------------------------------
 void mafInteractionManager::CreateGUI() 
 //----------------------------------------------------------------------------
 {
-  m_Frame = new wxFrame(NULL,-1,"I/O Devices Settings",wxPoint(-1,-1), wxSize(550,500),wxRESIZE_BORDER | wxCAPTION );
+  m_gui = new mmgGui(this);
 
-  mmgNamedPanel *FOO = new mmgNamedPanel(m_Frame,-1,false,true);
-  FOO->Show();
-  
-  m_DeviceTree = new mmgTree(FOO,ID_DEVICE_TREE);
-  m_DeviceTree->SetTitle("connected devices");
-  m_DeviceTree->SetSize(230,300);
+  m_DeviceTree = new mmgTree(m_gui,ID_DEVICE_TREE,false,true);
+  m_DeviceTree->SetMinSize(wxSize(250,100));
   m_DeviceTree->SetListener(this);
 
-  m_Bindings = new mmgGui(this);
+  m_gui->Button(ID_ADD_DEVICE,"Add Device");
+  m_gui->Button(ID_REMOVE_DEVICE,"Remove Device");
+  m_gui->Button(ID_LOAD,"Load");
+  m_gui->Button(ID_STORE,"Save as");
+  m_gui->Label("installed devices");
+  m_gui->Add(m_DeviceTree,0,0);
+  m_gui->Label("selected device options");
 
-  // Holder of Device's settings GUI ==========
-  m_SettingsPanel = new mmgGuiHolder(FOO ,ID_DEVICE_SETTINGS);
-  m_SettingsPanel->Show(true);
-  //m_SettingsPanel->SetSize(215,300); // h era 230
-  m_SettingsPanel->SetSize(m_Bindings->GetMetrics(GUI_HOLDER_WIDTH),300); // h era 230
-  m_SettingsPanel->SetTitle("device settings");
+  m_Bindings = new mmgGui(this); // bindings will be added to m_gui later (at the device selection)
+  m_Bindings->Divider(1);
+  m_Bindings->Label("actions associated to this device",false);
+  m_ActionsList = m_Bindings->CheckList(ID_BINDING_LIST,"",60);
+  m_ActionsList->SetSize(250,100);
+  m_ActionsList->SetMinSize(wxSize(250,100));
+} 
 
-  // Device's binding GUI =====================
-  m_BindingsPanel = new mmgNamedPanel(FOO,ID_DEVICE_BINDINGS);
-  m_BindingsPanel->SetTitle("device bindings");
-  m_BindingsPanel->SetSize(m_Bindings->GetMetrics(GUI_HOLDER_WIDTH),100); // h era 230
-
-  m_Bindings->Label("available actions");
-  m_Bindings->Label("available actions");
-  m_ActionsList = m_Bindings->CheckList(ID_BINDING_LIST,"",60,"actions the devices is assigned to");
-  m_Bindings->Show(true);
-  m_Bindings->FitGui();
-  m_BindingsPanel->Add(m_Bindings);
-
-  // Buttons =====================
-  mmgButton *add = new mmgButton(FOO,ID_ADD_DEVICE,"add device",wxPoint(0,0)); 
-  add->SetListener(this);
-  mmgButton *remove = new mmgButton(FOO,ID_REMOVE_DEVICE,"remove device",wxPoint(0,0));
-  remove->SetListener(this);
-  mmgButton *load = new mmgButton(FOO,ID_LOAD,"load",wxPoint(0,0));
-  load->SetListener(this);
-  mmgButton *save = new mmgButton(FOO,ID_STORE,"save as",wxPoint(0,0));
-  save->SetListener(this);
-  mmgButton *close = new mmgButton(FOO,ID_OK,"close",wxPoint(0,0));
-  close->SetListener(this);
-
-  // sizers ====================================
-  wxBoxSizer *v_sizer = new wxBoxSizer(wxVERTICAL);
-  v_sizer->Add(m_SettingsPanel,1,wxEXPAND|wxALL, 1 );//////////////////////////////
-  v_sizer->Add(m_BindingsPanel,0,wxALL, 1 );
-
-  wxBoxSizer *h_sizer = new wxBoxSizer(wxHORIZONTAL);
-  h_sizer->Add(m_DeviceTree,1,wxEXPAND|wxALL, 1 );
-  h_sizer->Add(v_sizer,0,wxEXPAND);
-
-  wxBoxSizer *h2_sizer = new wxBoxSizer(wxHORIZONTAL);
-  h2_sizer->Add(add);
-  h2_sizer->Add(remove);
-  h2_sizer->Add(load);
-  h2_sizer->Add(save);
-  h2_sizer->Add(close);
-
-  FOO->Add(h_sizer,1,wxEXPAND);
-  FOO->Add(h2_sizer,0,wxCENTRE|wxALL,1);
+//SIL. 07-jun-2006 : -- new
+//----------------------------------------------------------------------------
+mmgGui* mafInteractionManager::GetGui()
+//----------------------------------------------------------------------------
+{
+  return m_gui;
 }

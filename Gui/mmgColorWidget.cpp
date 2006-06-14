@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgColorWidget.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-02 22:00:14 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -252,7 +252,8 @@ void mmgColorWidget::InitBitmap()
   }
   
   wxImage img(m_HsvSize,m_HsvSize,data); // data will be freed by the image
-  m_HsvBmp = img.ConvertToBitmap();
+  //m_HsvBmp = img.ConvertToBitmap(); // changed in passing from wx242 -> wx263
+  m_HsvBmp = wxBitmap(img);
 
 
   m_AlphaBmp = wxBitmap( m_AlphaBmpSize.GetWidth(), m_AlphaBmpSize.GetHeight() );

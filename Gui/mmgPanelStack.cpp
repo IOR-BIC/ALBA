@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgPanelStack.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:26 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -79,7 +79,7 @@ void mmgPanelStack::Push(mmgPanel* p)
   assert(m_curr_panel);
   m_curr_panel->Reparent(mafGetFrame());
   m_curr_panel->Show(false);
-  m_sizer->Remove(m_curr_panel);
+  m_sizer->Detach(m_curr_panel);
 
   p->m_next = m_curr_panel;
   m_curr_panel= p;
@@ -98,7 +98,7 @@ void mmgPanelStack::Pop()
 
   m_curr_panel->Show(false);
   m_curr_panel->Reparent(mafGetFrame());
-  m_sizer->Remove(m_curr_panel);
+  m_sizer->Detach(m_curr_panel);
 
   m_curr_panel= m_curr_panel->m_next;
   assert(m_curr_panel);

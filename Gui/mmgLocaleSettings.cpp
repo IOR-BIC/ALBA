@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgLocaleSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2006-05-16 09:29:39 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2006-06-14 14:46:33 $
+Version:   $Revision: 1.3 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -32,60 +32,19 @@ mmgLocaleSettings::mmgLocaleSettings(mafObserver *Listener)
 	m_Listener   = Listener;
   m_LanguageId = 0;
   InitializeLanguage();
+  
+  //SIL. 09-jun-2006 :
+  wxString lang_array[5] = {"English","French","German","Italian","Spanish"};
+
+  m_Gui = new mmgGui(this);   
+  m_Gui->Label("User Interface Language");
+  m_Gui->Radio(LANGUAGE_ID,"", &m_LanguageId,5,lang_array);
+  m_Gui->Label("changes will take effect when the application restart");
 }
 //----------------------------------------------------------------------------
 mmgLocaleSettings::~mmgLocaleSettings() 
 //----------------------------------------------------------------------------
 {
-}
-//----------------------------------------------------------------------------
-void mmgLocaleSettings::ChooseLocale()
-//----------------------------------------------------------------------------
-{
-  wxString lang_array[5] = {"English","French","German","Italian","Spanish"};
-  int current_lang_id = m_LanguageId;
-
-  mmgGui *gui = new mmgGui(this);
-  gui->Combo(LANGUAGE_ID,"language", &m_LanguageId,5,lang_array);
-
-  mmgDialog dlg("Settings",mafOK | mafCANCEL);
-  dlg.Add(gui,1,wxEXPAND);
-  int answere = dlg.ShowModal();
-  if (answere == wxID_CANCEL)
-  {
-    m_LanguageId = current_lang_id;
-    return;
-  }
-  switch(m_LanguageId) 
-  {
-    case 1:
-      m_Language = wxLANGUAGE_FRENCH;
-      m_LanguageDictionary = "fr";
-    break;
-    case 2:
-      m_Language = wxLANGUAGE_GERMAN;
-      m_LanguageDictionary = "de";
-    break;
-    case 3:
-      m_Language = wxLANGUAGE_ITALIAN;
-      m_LanguageDictionary = "it";
-  	break;
-    case 4:
-      m_Language = wxLANGUAGE_SPANISH;
-      m_LanguageDictionary = "es";
-    break;
-    default:
-      m_Language = wxLANGUAGE_ENGLISH;
-      m_LanguageDictionary = "en";
-  }
-  wxConfig *config = new wxConfig(wxEmptyString);
-  config->Write("Language",m_Language);
-  config->Write("Dictionary",m_LanguageDictionary);
-  cppDEL(config);
-
-  wxString msg = _("Restart application to make new settings available!");
-  wxString caption = _("Warning");
-  wxMessageBox(msg, caption);
 }
 //----------------------------------------------------------------------------
 void mmgLocaleSettings::OnEvent(mafEventBase *maf_event)
@@ -94,6 +53,34 @@ void mmgLocaleSettings::OnEvent(mafEventBase *maf_event)
 	switch(maf_event->GetId())
   {
     case LANGUAGE_ID:
+    {
+      switch(m_LanguageId) 
+      {
+      case 1:
+        m_Language = wxLANGUAGE_FRENCH;
+        m_LanguageDictionary = "fr";
+        break;
+      case 2:
+        m_Language = wxLANGUAGE_GERMAN;
+        m_LanguageDictionary = "de";
+        break;
+      case 3:
+        m_Language = wxLANGUAGE_ITALIAN;
+        m_LanguageDictionary = "it";
+        break;
+      case 4:
+        m_Language = wxLANGUAGE_SPANISH;
+        m_LanguageDictionary = "es";
+        break;
+      default:
+        m_Language = wxLANGUAGE_ENGLISH;
+        m_LanguageDictionary = "en";
+      }
+      wxConfig *config = new wxConfig(wxEmptyString);
+      config->Write("Language",m_Language);
+      config->Write("Dictionary",m_LanguageDictionary);
+      cppDEL(config);
+    }
     break;
     default:
       mafEventMacro(*maf_event);
@@ -132,4 +119,22 @@ void mmgLocaleSettings::InitializeLanguage()
 #ifndef WIN32
   m_Locale.AddCatalog("fileutils");
 #endif
+
+  switch(m_Language) 
+  {
+  case wxLANGUAGE_FRENCH:
+    m_LanguageId =1;
+    break;
+  case wxLANGUAGE_GERMAN:
+    m_LanguageId =2;
+    break;
+  case wxLANGUAGE_ITALIAN:
+    m_LanguageId =3;
+    break;
+  case wxLANGUAGE_SPANISH:
+    m_LanguageId =4;
+    break;
+  default: //wxLANGUAGE_ENGLISH;
+    m_LanguageId =0; 
+  }
 }

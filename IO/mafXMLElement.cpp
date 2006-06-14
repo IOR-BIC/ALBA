@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-12 16:21:05 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -181,13 +181,13 @@ mafStorageElement::ChildrenVector &mafXMLElement::GetChildren()
   {
     // create and fill in new children list with element nodes
     m_Children = new ChildrenVector;
-    DOMNodeList *children=m_DOMElement->m_XMLElement->getChildNodes();
+    XERCES_CPP_NAMESPACE_QUALIFIER DOMNodeList *children=m_DOMElement->m_XMLElement->getChildNodes();
     for (unsigned int i = 0; i<children->getLength();i++)
     {
-      DOMNode *child_element=children->item(i);
-      if (children->item(i)->getNodeType()==DOMNode::ELEMENT_NODE)
+      XERCES_CPP_NAMESPACE_QUALIFIER DOMNode *child_element=children->item(i);
+      if (children->item(i)->getNodeType()==XERCES_CPP_NAMESPACE_QUALIFIER DOMNode::ELEMENT_NODE)
       {
-        mafXMLElement *child=new mafXMLElement(new mmuXMLDOMElement((DOMElement *)child_element),this,GetXMLStorage());
+        mafXMLElement *child=new mafXMLElement(new mmuXMLDOMElement((XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *)child_element),this,GetXMLStorage());
         m_Children->push_back(child);
       }      
     }
@@ -206,7 +206,7 @@ mafStorageElement *mafXMLElement::AppendChild(const char *name)
 mafXMLElement *mafXMLElement::AppendXMLChild(const char *name)
 //------------------------------------------------------------------------------
 {
-  DOMElement *child_element=GetXMLStorage()->GetXMLDOM()->m_XMLDoc->createElement(mafXMLString(name));
+  XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *child_element=GetXMLStorage()->GetXMLDOM()->m_XMLDoc->createElement(mafXMLString(name));
   m_DOMElement->m_XMLElement->appendChild(child_element);
   mafXMLElement *child=new mafXMLElement(new mmuXMLDOMElement(child_element),this,GetXMLStorage());
   GetChildren().push_back(child);
@@ -241,7 +241,7 @@ bool mafXMLElement::GetAttribute(const char *name, mafString &value)
 void mafXMLElement::WriteXMLText(const char *text)
 //------------------------------------------------------------------------------
 {
-  DOMText *text_node=GetXMLStorage()->GetXMLDOM()->m_XMLDoc->createTextNode(mafXMLString(text));
+  XERCES_CPP_NAMESPACE_QUALIFIER DOMText *text_node=GetXMLStorage()->GetXMLDOM()->m_XMLDoc->createTextNode(mafXMLString(text));
   m_DOMElement->m_XMLElement->appendChild(text_node);
 }
 

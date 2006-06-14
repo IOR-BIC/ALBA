@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMAFTransform.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-07 11:21:55 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-06-14 14:46:34 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni        
 ==========================================================================
   Copyright (c) 2002/2004
@@ -91,3 +91,5 @@ protected:
 };
 #endif
   
+
+

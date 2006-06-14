@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2006-05-08 14:41:57 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.28 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -208,8 +208,8 @@ public:
 	wxGrid *Grid(int id, wxString label = "", int height = 60, int row = 2,int cols = 2, wxString tooltip = "");
 
   /** Add window to gui sizer. */
-  void Add(wxWindow* window,int option = 0, int flag = wxEXPAND, int border = 0)  {m_Sizer->Add(window,option,flag,border);};
-
+  void Add(wxWindow* window,int option = 0, int flag = wxEXPAND, int border = 0)  {window->Reparent(this); window->Show(true); m_Sizer->Add(window,option,flag,border);};
+  
   /** Add sizer to gui sizer. */
   void Add(wxSizer*  sizer, int option = 0, int flag = wxEXPAND, int border = 0)  {m_Sizer->Add(sizer, option,flag,border);};
 
@@ -217,15 +217,14 @@ public:
   void AddGui(mmgGui*  gui, int option = 0, int flag = wxEXPAND, int border = 0);
 
   /** Remove window from gui sizer. */
-  bool Remove(wxWindow* window) {return m_Sizer->Remove(window);};
+  bool Remove(wxWindow* window) {window->Show(false); window->Reparent(mafGetFrame()); return m_Sizer->Detach(window);};
 
   /** Remove sizer from gui sizer. */
-  bool Remove(wxSizer*  sizer ) {return m_Sizer->Remove(sizer);};
+  bool Remove(wxSizer*  sizer ) {return m_Sizer->Detach(sizer);};
 
-  /** Remove a nested GUI */
-  void RemoveGui(mmgGui*  gui);
-
-  /** Fit the gui widgets to gui sizer. */
+  /** Recalc 'this' Gui Size and MinSize considering the space required by the children widgets.
+      FitGui is called inplicitly when a gui is inserted in a mmgGuiHolder or mmgPanel.
+      FitGui must call explicitly when children widget are changed dinamically. */
   void FitGui();
 
 	/** Update gui widget. */

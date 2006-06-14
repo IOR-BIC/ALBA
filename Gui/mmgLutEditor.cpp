@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-08 14:43:01 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -81,7 +81,7 @@ mmgLutEditor::mmgLutEditor(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
   m_Preset = 0;
   m_Info = "" ;
 
-  wxFont bold_font = wxFont(wxSystemSettings::GetSystemFont(wxSYS_DEFAULT_GUI_FONT));
+  wxFont bold_font = wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
   bold_font.SetPointSize(9);
   bold_font.SetWeight(wxBOLD);
   

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgLocaleSettings.h,v $
 Language:  C++
-Date:      $Date: 2006-05-16 09:29:39 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2006-06-14 14:46:33 $
+Version:   $Revision: 1.3 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -18,7 +18,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
-
+class mmgGui;
 
 //----------------------------------------------------------------------------
 // mmgLocaleSettings :
@@ -43,7 +43,9 @@ public:
   void SetListener(mafObserver *Listener) {m_Listener = Listener;};
 
   /** Show/Hide the settings interface.*/
-	void ChooseLocale();
+	//void ChooseLocale();
+	
+	mmgGui* GetGui() {return m_Gui;};
 
 protected:
   /** Initialize language used into the application.*/
@@ -54,5 +56,7 @@ protected:
   wxLocale     m_Locale;
   wxLanguage   m_Language;
   mafString    m_LanguageDictionary;
+
+  mmgGui*      m_Gui;
 };
 #endif

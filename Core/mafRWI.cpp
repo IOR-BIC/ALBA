@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-03 10:58:37 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.30 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -644,10 +644,8 @@ mmgGui *mafRWI::CreateGui()
     m_Gui->Divider(2);
   }
 
-  m_Gui->Bool(ID_LINK_CAMERA,"link camera",&m_LinkCamera,0,"Turn On/Off camera interaction synchronization");
-  m_Gui->Divider(2);
   m_Gui->Bool(ID_SHOW_GRID,"grid",&m_ShowGrid,0,"Turn On/Off the grid");
-  m_Gui->Combo(ID_GRID_NORMAL,"grid normal",&m_GridNormal,3,grid_normal,"orientation axes for the grid");
+  m_Gui->Combo(ID_GRID_NORMAL,"grid norm",&m_GridNormal,3,grid_normal,"orientation axes for the grid");
   m_Gui->Double(ID_GRID_POS,"grid pos",	&m_GridPosition);
   m_Gui->Color(ID_GRID_COLOR,"grid color",&m_GridColour);
   m_Gui->Divider(2);
@@ -672,6 +670,9 @@ mmgGui *mafRWI::CreateGui()
     m_Gui->Enable(ID_STERO_MOVIE_DIR,m_StereoType != 0);
     m_Gui->Enable(ID_STERO_MOVIE,false);
   }
+
+  m_Gui->Divider(2);
+  m_Gui->Bool(ID_LINK_CAMERA,"link camera",&m_LinkCamera,0,"Turn On/Off camera interaction synchronization");
 
   return m_Gui;
 }

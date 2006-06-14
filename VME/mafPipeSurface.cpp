@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-28 17:31:57 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2006-06-14 14:46:34 $
+  Version:   $Revision: 1.23 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -89,8 +89,8 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
   assert(surface_output);
   surface_output->Update();
   vtkPolyData *data = vtkPolyData::SafeDownCast(surface_output->GetVTKData());
-  data->Update();
   assert(data);
+  data->Update();
   vtkDataArray *scalars = data->GetPointData()->GetScalars();
   double sr[2] = {0,1};
   if(scalars != NULL)
@@ -276,6 +276,7 @@ mmgGui *mafPipeSurface::CreateGui()
   mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
   m_Gui->Combo(ID_TEXTURE_MAPPING_MODE,"mapping",&surface_output->GetMaterial()->m_TextureMappingMode,3,mapping_mode);
   m_Gui->Enable(ID_TEXTURE_MAPPING_MODE,surface_output->GetMaterial()->m_MaterialType == mmaMaterial::USE_TEXTURE);
+  m_Gui->Label(""); //SIL. 18-may-2006 : 
 
   return m_Gui;
 }

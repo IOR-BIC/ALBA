@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmo2DMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-03 15:57:40 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-06-14 14:46:34 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -107,7 +107,7 @@ void mmo2DMeasure::OpRun()
   m_MeasureList = m_Gui->ListBox(ID_MEASURE_LIST);
 	m_Gui->OkCancel();
 
-  if(m_MeasureList->Number() == 0)
+  if(m_MeasureList->GetCount() == 0)
   {
     //m_Gui->Enable(ID_ADD_TO_VME_TREE,false);
     m_Gui->Enable(ID_REMOVE_MEASURE,false);
@@ -157,7 +157,7 @@ void mmo2DMeasure::OnEvent(mafEventBase *maf_event)
           int sel = m_MeasureList->GetSelection();
           if(sel != -1)
             m_MeasureList->Delete(sel);
-          if(m_MeasureList->Number() == 0)
+          if(m_MeasureList->GetCount() == 0)
           {
             m_Gui->Enable(ID_REMOVE_MEASURE,false);
           }

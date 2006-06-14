@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 17:40:25 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,7 +19,6 @@
 
 #include "mafEvent.h"
 #include "mafObserver.h"
-#include "mmgSashPanel.h"
 #include "mmgCheckTree.h"
 //----------------------------------------------------------------------------
 // forward reference

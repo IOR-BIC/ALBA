@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-16 09:25:56 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.29 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,7 +32,6 @@
 #include "mmgFrame.h"
 #include "mmgPicButton.h"
 #include "mmgSplittedPanel.h"
-#include "mmgSashPanel.h"
 #include "mmgNamedPanel.h"
 #include "mmgCrossSplitter.h"
 #include "mmgTimeBar.h"
@@ -52,10 +51,6 @@ mafLogicWithGUI::mafLogicWithGUI()
   m_LocaleSettings = new mmgLocaleSettings(this);
   m_MeasureUnitSettings = new mmgMeasureUnitSettings(this);
 
-  m_LogSash				= NULL;
-  m_TimeSash			= NULL;
-  m_TimePanel  	  = NULL;
-  m_SideSash	    = NULL;
 
   m_ToolBar       = NULL;
   m_MenuBar       = NULL;
@@ -86,8 +81,7 @@ void mafLogicWithGUI::Configure()
 {
   if(m_PlugMenu)		this->CreateMenu();
   if(m_PlugToolbar) this->CreateToolbar();
-  if(m_PlugSidebar) this->CreateSidebar();
-  if(m_PlugTimebar) this->CreateTimebar();
+  if(m_PlugTimebar) this->CreateTimebar(); //SIL. 23-may-2006 : 
   if(m_PlugLogbar)	this->CreateLogbar();	else this->CreateNullLog();
 }
 //----------------------------------------------------------------------------
@@ -159,25 +153,19 @@ void mafLogicWithGUI::OnEvent(mafEventBase *maf_event)
       OnQuit();		
       break; 
       // ###############################################################
-      // commands related to the SASH
+      // commands related to the Dockable Panes
     case MENU_VIEW_LOGBAR:
-      if(m_LogSash) m_LogSash->Show(!m_LogSash->IsShown());
-      break; 
+        m_Win->ShowDockPane("logbar",!m_Win->DockPaneIsShown("logbar") );
+    break; 
     case MENU_VIEW_SIDEBAR:
-      if(m_SideSash) m_SideSash->Show(!m_SideSash->IsShown());
-      break; 
+      m_Win->ShowDockPane("sidebar",!m_Win->DockPaneIsShown("sidebar") );
+    break; 
     case MENU_VIEW_TIMEBAR:
-      if(m_TimeSash) m_TimeSash->Show(!m_TimeSash->IsShown());
-      break; 
+      m_Win->ShowDockPane("timebar",!m_Win->DockPaneIsShown("timebar") );
+    break; 
     case MENU_VIEW_TOOLBAR:
-      if(m_PlugToolbar)	
-      {
-        bool show = !m_ToolBar->IsShown();
-        m_ToolBar->Show(show);
-        m_MenuBar->FindItem(MENU_VIEW_TOOLBAR)->Check(show);
-        m_Win->Update();
-      }
-      break; 
+      m_Win->ShowDockPane("toolbar",!m_Win->DockPaneIsShown("toolbar") );
+    break; 
       // ###############################################################
       // commands related to the STATUSBAR
     case BIND_TO_PROGRESSBAR:
@@ -208,10 +196,9 @@ void mafLogicWithGUI::OnEvent(mafEventBase *maf_event)
 void mafLogicWithGUI::OnQuit()
 //----------------------------------------------------------------------------
 {
-  // if OnQuit is redefined in a deriver class,  mafLogicWithGUI::OnQuit() must be clalled last
+  // if OnQuit is redefined in a derived class,  mafLogicWithGUI::OnQuit() must be clalled last
 
   mafYield();
-  cppDEL(m_SideSash); //must be after deleting the vme_manager
   if(m_PlugLogbar) delete wxLog::SetActiveTarget(NULL); 
   vtkDEL(m_VtkLog);
   m_Win->Destroy();
@@ -223,8 +210,8 @@ void mafLogicWithGUI::CreateLogbar()
   m_VtkLog = mafVTKLog::New();
   m_VtkLog->SetInstance(m_VtkLog);
 
-  wxTextCtrl *log  = new wxTextCtrl( m_Win, -1, "", wxPoint(0,0), wxSize(100,300), wxNO_BORDER | wxTE_MULTILINE );
-  mafWXLog *m_Logger = new mafWXLog(log);
+  //wxTextCtrl *log  = new wxTextCtrl( m_Win, -1, "", wxPoint(0,0), wxSize(100,300), /*wxNO_BORDER |*/ wxTE_MULTILINE );
+  wxTextCtrl *log  = new wxTextCtrl( m_Win, MENU_VIEW_LOGBAR, "", wxPoint(0,0), wxSize(100,300), /*wxNO_BORDER |*/ wxTE_MULTILINE );mafWXLog *m_Logger = new mafWXLog(log);
   wxString s = mafGetApplicationDirectory().c_str();
   wxDateTime *log_time = new wxDateTime();
   s += "\\";
@@ -241,13 +228,15 @@ void mafLogicWithGUI::CreateLogbar()
   cppDEL(old_log);
   cppDEL(log_time);
 
-  mmgNamedPanel *log_panel = new mmgNamedPanel(m_Win,-1,true);
-  log_panel->SetTitle(" Log Area:");
-  log_panel->Add(log,1,wxEXPAND);
-
-  m_LogSash = new mmgSashPanel(m_Win, MENU_VIEW_LOGBAR, wxBOTTOM,80,_("Log Bar \tCtrl+L"));
-  m_LogSash->Put(log_panel);
-  //m_LogSash->Show(false);
+  m_Win->AddDockPane(log, wxPaneInfo()
+    .Name("logbar")
+    .Caption(wxT("LogBar"))
+    .Bottom()
+    .Layer(0)
+    .MinSize(100,10)
+    .TopDockable(false) // prevent docking on top side - otherwise may dock also beside the toolbar -- and it's hugly
+  );
+  
   mafLogMessage(_("welcome"));
 }
 
@@ -283,19 +272,29 @@ void mafLogicWithGUI::CreateToolbar()
   EnableItem(CAMERA_FLYTO, false);
 }
 //----------------------------------------------------------------------------
-void mafLogicWithGUI::CreateSidebar()
-//----------------------------------------------------------------------------
-{
-  m_SideSash = new mmgSashPanel(m_Win, MENU_VIEW_SIDEBAR, wxRIGHT,280, _("Side Bar \tCtrl+S"), false); // 280 is the width of the sideBar
-}
-//----------------------------------------------------------------------------
 void mafLogicWithGUI::CreateTimebar()
 //----------------------------------------------------------------------------
 {
-  m_TimeSash = new mmgSashPanel(m_Win,MENU_VIEW_TIMEBAR,wxBOTTOM,22,_("Time Bar \tCtrl+T"),false);
-  m_TimePanel = new mmgTimeBar(m_TimeSash,-1,true);
+  //SIL. 23-may-2006 : 
+  m_TimeSash = NULL;
+  m_TimePanel = new mmgTimeBar(m_Win,MENU_VIEW_TIMEBAR,true);
   m_TimePanel->SetListener(this);
-  m_TimeSash->Put(m_TimePanel);
+
+  m_Win->AddDockPane(m_TimePanel, wxPaneInfo()
+    .Name("timebar")
+    .Caption(wxT("TimeBar"))
+    .Bottom()
+    .Row(1)
+    .Layer(2)
+    .ToolbarPane()
+    .LeftDockable(false)
+    .RightDockable(false)
+    .MinSize(100,22)
+    .Floatable(false)
+    .Gripper(false)
+    .Resizable(false)
+    .Movable(false)
+    );
 }
 //----------------------------------------------------------------------------
 void mafLogicWithGUI::EnableItem(int item, bool enable)

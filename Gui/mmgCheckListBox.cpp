@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckListBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 12:03:07 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -68,37 +68,52 @@ void mmgCheckListBox::Clear()
 void mmgCheckListBox::AddItem(int id, wxString label)
 //----------------------------------------------------------------------------
 {
-  if( m_clb->Number() == mmgCheckListBox_ArraySize ) 
+  // SIL: 05-may-06
+  // in passing from wx242 -> wx263
+  // Number() become GetCount()
+
+  //if( m_clb->Number() == mmgCheckListBox_ArraySize ) 
+  if( m_clb->GetCount() == mmgCheckListBox_ArraySize ) 
   {
     mafLogMessage("mmgCheckListBox:overflow");
     return;
   }
   
   m_clb->Append(label);
-  m_array[m_clb->Number()-1] = id;
+
+  //m_array[m_clb->Number()-1] = id;
+  m_array[m_clb->GetCount()-1] = id;
 }
 //----------------------------------------------------------------------------
 void mmgCheckListBox::AddItem(int id, wxString label, bool check)
 //----------------------------------------------------------------------------
 {
-  if( m_clb->Number() == mmgCheckListBox_ArraySize ) 
+  // SIL: 05-may-06
+  // in passing from wx242 -> wx263
+  // Number() become GetCount()
+
+  //if( m_clb->Number() == mmgCheckListBox_ArraySize ) 
+  if( m_clb->GetCount() == mmgCheckListBox_ArraySize ) 
   {
     mafLogMessage("mmgCheckListBox:overflow");
     return;
   }
 
   m_clb->Append(label);
-  m_array[m_clb->Number()-1] = id;
+  //m_array[m_clb->Number()-1] = id;
+  m_array[m_clb->GetCount()-1] = id;
 
   m_prevent_notify = true;
-  m_clb->Check(m_clb->Number()-1,check);
+  //m_clb->Check(m_clb->Number()-1,check);
+  m_clb->Check(m_clb->GetCount()-1,check);
   m_prevent_notify = false;
 }
 //----------------------------------------------------------------------------
 void mmgCheckListBox::RemoveItem(int id)
 //----------------------------------------------------------------------------
 {
-  int index,i,n = m_clb->Number(); // number prior to delete
+  //int index,i,n = m_clb->Number(); // number prior to delete
+  int index,i,n = m_clb->GetCount(); // number prior to delete
 
   if( index=FindItemIndex(id) == -1 ) return;
   m_clb->Delete(index);
@@ -164,8 +179,10 @@ int mmgCheckListBox::FindItem(wxString label)
 int mmgCheckListBox::FindItemIndex(int id)
 //----------------------------------------------------------------------------
 {
+
   int i = 0;
-  int n = m_clb->Number();
+  //int n = m_clb->Number();
+  int n = m_clb->GetCount();
   while(i<n)
   {
     if (m_array[i] == id) return i;
@@ -189,7 +206,8 @@ void mmgCheckListBox::OnCheck(wxCommandEvent &event)
 	
 	if(m_check_mode == MODE_RADIO)
 	{
-	  for(int i=0; i<m_clb->Number(); i++)
+    //for(int i=0; i<m_clb->Number(); i++)
+	  for(int i=0; i<m_clb->GetCount(); i++)
 	    m_clb->Check(i,FALSE);
 		m_clb->Check(index);
 	}

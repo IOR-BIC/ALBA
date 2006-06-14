@@ -2,15 +2,15 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-28 23:06:39 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#include "mafIncludeWX.h" // to be removed
+//#include "mafIncludeWX.h" // to be removed
 
 #include "mafXMLStorage.h"
 #include "mafXMLElement.h"
@@ -41,16 +41,16 @@
 // mmuDOMTreeErrorReporter
 //------------------------------------------------------------------------------
 /** Utility class to catch XML error rised while parsing XML */
-class mmuDOMTreeErrorReporter : public ErrorHandler
+class mmuDOMTreeErrorReporter : public XERCES_CPP_NAMESPACE_QUALIFIER ErrorHandler
 {
 public:
     mmuDOMTreeErrorReporter() : m_SawErrors(false) {}
     ~mmuDOMTreeErrorReporter() {}
 
     /** Implementation of the error handler interface */
-    void warning(const SAXParseException& toCatch);
-    void error(const SAXParseException& toCatch);
-    void fatalError(const SAXParseException& toCatch);
+    void warning(const XERCES_CPP_NAMESPACE_QUALIFIER SAXParseException& toCatch);
+    void error(const XERCES_CPP_NAMESPACE_QUALIFIER SAXParseException& toCatch);
+    void fatalError(const XERCES_CPP_NAMESPACE_QUALIFIER SAXParseException& toCatch);
     void resetErrors();
 
     bool GetSawErrors() const {return m_SawErrors;}
@@ -59,13 +59,13 @@ private:
 };
 
 //------------------------------------------------------------------------------
-void mmuDOMTreeErrorReporter::warning(const SAXParseException&)
+void mmuDOMTreeErrorReporter::warning(const XERCES_CPP_NAMESPACE_QUALIFIER SAXParseException&)
 //------------------------------------------------------------------------------
 {
   // Ignore all warnings.
 }
 //------------------------------------------------------------------------------
-void mmuDOMTreeErrorReporter::error(const SAXParseException& toCatch)
+void mmuDOMTreeErrorReporter::error(const XERCES_CPP_NAMESPACE_QUALIFIER SAXParseException& toCatch)
 //------------------------------------------------------------------------------
 {
   m_SawErrors = true;
@@ -76,7 +76,7 @@ void mmuDOMTreeErrorReporter::error(const SAXParseException& toCatch)
   );
 }
 //------------------------------------------------------------------------------
-void mmuDOMTreeErrorReporter::fatalError(const SAXParseException& toCatch)
+void mmuDOMTreeErrorReporter::fatalError(const XERCES_CPP_NAMESPACE_QUALIFIER SAXParseException& toCatch)
 //------------------------------------------------------------------------------
 {
   m_SawErrors = true;
@@ -339,37 +339,37 @@ int mafXMLStorage::InternalStore()
   // initialize the XML library
   try
   {
-      XMLPlatformUtils::Initialize();
+      XERCES_CPP_NAMESPACE_QUALIFIER XMLPlatformUtils::Initialize();
   }
 
-  catch(const XMLException& toCatch)
+  catch(const XERCES_CPP_NAMESPACE_QUALIFIER XMLException& toCatch)
   {
       mafErrorMessageMacro("Error during Xerces-C Initialization.\nException message:" << mafXMLString(toCatch.getMessage()));      
       return MAF_ERROR;
   }
 
   // get a serializer, an instance of DOMWriter (the "LS" stands for load-save).
-  m_DOM->m_XMLImplement = DOMImplementationRegistry::getDOMImplementation(mafXMLString("LS"));
+  m_DOM->m_XMLImplement = XERCES_CPP_NAMESPACE_QUALIFIER DOMImplementationRegistry::getDOMImplementation(mafXMLString("LS"));
 
   if (m_DOM->m_XMLImplement)
   {
-    m_DOM->m_XMLSerializer = ( (DOMImplementationLS*)m_DOM->m_XMLImplement )->createDOMWriter();
+    m_DOM->m_XMLSerializer = ( (XERCES_CPP_NAMESPACE_QUALIFIER DOMImplementationLS*)m_DOM->m_XMLImplement )->createDOMWriter();
 
     mafString filename;
 
     // initially store to a tmp file
     GetTmpFile(filename);
 
-    m_DOM->m_XMLTarget = new LocalFileFormatTarget(filename);
+    m_DOM->m_XMLTarget = new XERCES_CPP_NAMESPACE_QUALIFIER LocalFileFormatTarget(filename);
 
     // set user specified end of line sequence and output encoding
     m_DOM->m_XMLSerializer->setNewLine( mafXMLString("\r") );
 
     // set serializer features 
- 	  m_DOM->m_XMLSerializer->setFeature(XMLUni::fgDOMWRTSplitCdataSections, false);
-  	m_DOM->m_XMLSerializer->setFeature(XMLUni::fgDOMWRTDiscardDefaultContent, false);
-  	m_DOM->m_XMLSerializer->setFeature(XMLUni::fgDOMWRTFormatPrettyPrint, true);
-  	m_DOM->m_XMLSerializer->setFeature(XMLUni::fgDOMWRTBOM, false);
+ 	  m_DOM->m_XMLSerializer->setFeature(XERCES_CPP_NAMESPACE_QUALIFIER XMLUni::fgDOMWRTSplitCdataSections, false);
+  	m_DOM->m_XMLSerializer->setFeature(XERCES_CPP_NAMESPACE_QUALIFIER XMLUni::fgDOMWRTDiscardDefaultContent, false);
+  	m_DOM->m_XMLSerializer->setFeature(XERCES_CPP_NAMESPACE_QUALIFIER XMLUni::fgDOMWRTFormatPrettyPrint, true);
+  	m_DOM->m_XMLSerializer->setFeature(XERCES_CPP_NAMESPACE_QUALIFIER XMLUni::fgDOMWRTBOM, false);
 
     try
     {
@@ -384,7 +384,7 @@ int mafXMLStorage::InternalStore()
 	      m_DOM->m_XMLDoc->setVersion( mafXMLString("1.0") );
 
         // extract root element and wrap it with an mafXMLElement object
-        DOMElement *root = m_DOM->m_XMLDoc->getDocumentElement();
+        XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *root = m_DOM->m_XMLDoc->getDocumentElement();
         assert(root);
         m_DocumentElement = new mafXMLElement(new mmuXMLDOMElement(root),NULL,this);
 
@@ -408,7 +408,7 @@ int mafXMLStorage::InternalStore()
         errorCode=0;
       }    
     }
-    catch (const DOMException& e)
+    catch (const XERCES_CPP_NAMESPACE_QUALIFIER DOMException& e)
     {
       mafErrorMessageMacro( "XML error, DOMException code is:  " << e.code );
       errorCode = 2;
@@ -451,7 +451,7 @@ int mafXMLStorage::InternalStore()
   }
  
   // terminate the XML library
-  XMLPlatformUtils::Terminate();
+  XERCES_CPP_NAMESPACE_QUALIFIER XMLPlatformUtils::Terminate();
 
   return errorCode;
 }
@@ -470,10 +470,10 @@ int mafXMLStorage::InternalRestore()
   // initialize the XML library
   try
   {
-      XMLPlatformUtils::Initialize();
+      XERCES_CPP_NAMESPACE_QUALIFIER XMLPlatformUtils::Initialize();
   }
 
-  catch(const XMLException& toCatch)
+  catch(const XERCES_CPP_NAMESPACE_QUALIFIER XMLException& toCatch)
   {
     mafErrorMessageMacro( "Error during Xerces-C Initialization.\nException message:" <<mafXMLString(toCatch.getMessage()));
     return MAF_ERROR;
@@ -484,11 +484,11 @@ int mafXMLStorage::InternalRestore()
   //  The parser will call back to methods of the ErrorHandler if it
   //  discovers errors during the course of parsing the XML document.
   //
-  m_DOM->m_XMLParser = new XercesDOMParser;
+  m_DOM->m_XMLParser = new XERCES_CPP_NAMESPACE_QUALIFIER XercesDOMParser;
 
   if (m_DOM->m_XMLParser)
   {
-    m_DOM->m_XMLParser->setValidationScheme(XercesDOMParser::Val_Auto);
+    m_DOM->m_XMLParser->setValidationScheme(XERCES_CPP_NAMESPACE_QUALIFIER XercesDOMParser::Val_Auto);
     m_DOM->m_XMLParser->setDoNamespaces(false);
     m_DOM->m_XMLParser->setDoSchema(false);
     m_DOM->m_XMLParser->setCreateEntityReferenceNodes(false);
@@ -517,7 +517,7 @@ int mafXMLStorage::InternalRestore()
         {
           // extract the root element and wrap inside a mafXMLElement
           m_DOM->m_XMLDoc = m_DOM->m_XMLParser->getDocument();
-          DOMElement *root = m_DOM->m_XMLDoc->getDocumentElement();
+          XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *root = m_DOM->m_XMLDoc->getDocumentElement();
           assert(root);
           m_DocumentElement = new mafXMLElement(new mmuXMLDOMElement(root),NULL,this);
 
@@ -554,7 +554,7 @@ int mafXMLStorage::InternalRestore()
         }
       }
 
-      catch (const XMLException& e)
+      catch (const XERCES_CPP_NAMESPACE_QUALIFIER XMLException& e)
       {
         mafString err;
         err << "An error occurred during XML parsing.\n Message: " << mafXMLString(e.getMessage());
@@ -562,7 +562,7 @@ int mafXMLStorage::InternalRestore()
         errorCode = IO_XML_PARSE_ERROR;
       }
 
-      catch (const DOMException& e)
+      catch (const XERCES_CPP_NAMESPACE_QUALIFIER DOMException& e)
       { 
         mafString err;
         err << "DOM-XML Error while parsing file '" << m_ParserURL << "'\n";
@@ -606,7 +606,7 @@ int mafXMLStorage::InternalRestore()
   }
 
   // terminate the XML library
-  XMLPlatformUtils::Terminate();
+  XERCES_CPP_NAMESPACE_QUALIFIER XMLPlatformUtils::Terminate();
   
   if (GetErrorCode()==0)
     SetErrorCode(errorCode);

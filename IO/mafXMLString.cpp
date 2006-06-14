@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLString.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:43:19 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.6 $
   Authors:   Rick Parrish (rfmobile@swbell.net) adapted by Marco Petrone (CINECA)
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,14 +15,16 @@
 #include <stdlib.h>
 
 #ifdef XERCES_CPP_NAMESPACE_USE
-XERCES_CPP_NAMESPACE_USE
+// XERCES_CPP_NAMESPACE_USE
+// SIL 12-apr-2006
+// removed XERCES_CPP_NAMESPACE_USE and added XERCES_CPP_NAMESPACE_QUALIFIER where required
 #endif
 
 //------------------------------------------------------------------------------
 mafXMLString::mafXMLString(const char *str) : m_WStr(NULL) , m_CStr(NULL)
 //------------------------------------------------------------------------------
 {
-  m_WStr = XMLString::transcode(str);
+  m_WStr = XERCES_CPP_NAMESPACE_QUALIFIER XMLString::transcode(str);
 }
 
 //------------------------------------------------------------------------------
@@ -33,14 +35,14 @@ mafXMLString::mafXMLString(XMLCh *wstr) : m_WStr(wstr) , m_CStr(NULL) { };
 mafXMLString::mafXMLString(const XMLCh *wstr) : m_WStr(NULL) , m_CStr (NULL)
 //------------------------------------------------------------------------------
 {
-  m_WStr = XMLString::replicate(wstr);
+  m_WStr = XERCES_CPP_NAMESPACE_QUALIFIER XMLString::replicate(wstr);
 }
 
 //------------------------------------------------------------------------------
 mafXMLString::mafXMLString(const mafXMLString &right) : m_WStr(NULL) , m_CStr(NULL)
 //------------------------------------------------------------------------------
 {
-  m_WStr = XMLString::replicate(right.m_WStr);
+  m_WStr = XERCES_CPP_NAMESPACE_QUALIFIER XMLString::replicate(right.m_WStr);
 }
 
 //------------------------------------------------------------------------------
@@ -48,27 +50,27 @@ mafXMLString::~mafXMLString()
 //------------------------------------------------------------------------------
 {
   // thanks tinny!!
-  if (m_WStr) XMLString::release(&m_WStr);
-  if (m_CStr) XMLString::release(&m_CStr);
+  if (m_WStr) XERCES_CPP_NAMESPACE_QUALIFIER XMLString::release(&m_WStr);
+  if (m_CStr) XERCES_CPP_NAMESPACE_QUALIFIER XMLString::release(&m_CStr);
 }
 
 //------------------------------------------------------------------------------
 bool mafXMLString::Append(const XMLCh *tail)
 //------------------------------------------------------------------------------
 {
-  int iTailLen = XMLString::stringLen(tail);
-  int iWorkLen = XMLString::stringLen(m_WStr);
+  int iTailLen = XERCES_CPP_NAMESPACE_QUALIFIER XMLString::stringLen(tail);
+  int iWorkLen = XERCES_CPP_NAMESPACE_QUALIFIER XMLString::stringLen(m_WStr);
   XMLCh *result = new XMLCh[ iWorkLen + iTailLen + 1 ];
   bool bOK = result != NULL;
   if (bOK)
   {
     XMLCh *target = result;
-    XMLString::moveChars(target, m_WStr, iWorkLen);
+    XERCES_CPP_NAMESPACE_QUALIFIER XMLString::moveChars(target, m_WStr, iWorkLen);
     target += iWorkLen;
-    XMLString::moveChars(target, tail, iTailLen);
+    XERCES_CPP_NAMESPACE_QUALIFIER XMLString::moveChars(target, tail, iTailLen);
     target += iTailLen;
     *target++ = 0;
-    XMLString::release(&m_WStr);
+    XERCES_CPP_NAMESPACE_QUALIFIER XMLString::release(&m_WStr);
     m_WStr = result;
   }
   return bOK;
@@ -92,7 +94,7 @@ bool mafXMLString::Erase(const XMLCh *head, const XMLCh *tail)
       cursor = tail;
       while ( cursor != End() ) *target++ = *cursor++;
       *target ++ = 0;
-      XMLString::release(&m_WStr);
+      XERCES_CPP_NAMESPACE_QUALIFIER XMLString::release(&m_WStr);
       m_WStr = result;
     }
   }
@@ -117,7 +119,7 @@ const XMLCh* mafXMLString::End() const
 int mafXMLString::Size() const
 //------------------------------------------------------------------------------
 {
-  return XMLString::stringLen(m_WStr);
+  return XERCES_CPP_NAMESPACE_QUALIFIER XMLString::stringLen(m_WStr);
 }
 
 //------------------------------------------------------------------------------
@@ -142,7 +144,7 @@ const char *mafXMLString::GetCStr()
   {
     if (m_CStr==NULL)
     {
-      m_CStr = XMLString::transcode(m_WStr);
+      m_CStr = XERCES_CPP_NAMESPACE_QUALIFIER XMLString::transcode(m_WStr);
     }
 
     return m_CStr;

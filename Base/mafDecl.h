@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-03 10:57:13 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.24 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -99,11 +99,13 @@ MENU_EDIT_END,
 MENU_VIEW_START,
   MENU_VIEW_LAYOUT,        // call the Load/Save Layout Dialog
   MENU_VIEW_LAYOUT_MSF,    // call the Load/Save Layout_Msf Dialog 
-SASH_START,                // ids of mmgSashPanel - must be Menu events too
+SASH_START,                // ids of mmgSashPanel/ ids of Dockable Panes - must be Menu events too
 	MENU_VIEW_TOOLBAR,
 	MENU_VIEW_LOGBAR,
   MENU_VIEW_SIDEBAR,
   MENU_VIEW_TIMEBAR,
+  MENU_VIEW_USER_FIRST,
+  MENU_VIEW_USER_LAST = MENU_VIEW_USER_FIRST+20,
 SASH_END,
 MENU_LAYOUT_START,     // used by mmgCrossSplitter
   LAYOUT_ONE,          

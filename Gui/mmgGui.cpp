@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-08 14:41:57 $
-  Version:   $Revision: 1.33 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.34 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,6 +19,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+#include <wx/statline.h>
 
 #include "mmgFloatSlider.h"
 #include "mmgCheckListBox.h"
@@ -101,8 +102,8 @@ mmgPanel(mafGetFrame(),-1,dp,wxDefaultSize,wxNO_BORDER | wxCLIP_CHILDREN | wxTAB
 	 m_Listener = listener;
    m_Id= MINID;
 
-   m_UseBackgroundColor = false;
-   m_BackgroundColor = wxColour(251,251,253);
+   m_UseBackgroundColor = false;  
+   m_BackgroundColor = wxColour(251,251,253); 
    if(m_UseBackgroundColor) this->SetBackgroundColour(m_BackgroundColor);
 
    m_EntryStyle = wxSUNKEN_BORDER /*| wxTE_PROCESS_TAB*/;
@@ -113,8 +114,8 @@ mmgPanel(mafGetFrame(),-1,dp,wxDefaultSize,wxNO_BORDER | wxCLIP_CHILDREN | wxTAB
    m_Sizer->Fit(this);
    m_Sizer->SetSizeHints(this);
 
-   m_BoldFont = wxFont(wxSystemSettings::GetSystemFont(wxSYS_DEFAULT_GUI_FONT));
-   m_Font     = wxFont(wxSystemSettings::GetSystemFont(wxSYS_DEFAULT_GUI_FONT));
+   m_BoldFont = wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
+   m_Font     = wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
 #if WIN32   
    m_BoldFont.SetPointSize(9);
 #endif
@@ -135,7 +136,8 @@ mmgGui::~mmgGui()
 void mmgGui::FitGui() 
 //----------------------------------------------------------------------------
 {
-  this->SetSize(FW+M+M,m_Sizer->GetMinSize().GetHeight());
+  this->SetMinSize( wxSize(FW+M+M , m_Sizer->GetMinSize().GetHeight() ));  //SIL. 22-may-2006 : 
+  this->SetSize( wxSize(FW+M+M , m_Sizer->GetMinSize().GetHeight() )); 
 }
 //----------------------------------------------------------------------------
 int mmgGui::GetMetrics(int id)
@@ -186,14 +188,6 @@ void mmgGui::AddGui(mmgGui*  gui, int option, int flag, int border)
 	Add(gui,option,flag,border);
 }
 //----------------------------------------------------------------------------
-void mmgGui::RemoveGui(mmgGui*  gui)
-//----------------------------------------------------------------------------
-{
-  gui->Show(false);
-  gui->Reparent(NULL);
-  Remove(gui);
-}
-//----------------------------------------------------------------------------
 void mmgGui::Update()
 //----------------------------------------------------------------------------
 {
@@ -233,6 +227,19 @@ void mmgGui::Enable(int mod_id, bool enable)
 void mmgGui::Divider (long style)
 //----------------------------------------------------------------------------
 {
+  if(style == 0) //simple empty space
+  {
+    wxStaticText* div = new wxStaticText(this, -1, "",dp, wxSize(FW,4), 0);
+    Add(div,0,wxALL, M);
+  }
+  else
+  {
+    wxStaticLine *div = new wxStaticLine(this,-1,dp,wxSize(FW,1));
+    Add(div,0,wxALL, 2*M);
+  }
+
+
+  /*
 	if(style == 0) //simple empty space
 	{
 		wxStaticText* div = new wxStaticText(this, -1, "",dp, wxSize(FW,4), 0);
@@ -256,8 +263,10 @@ void mmgGui::Divider (long style)
 		wxTextCtrl* div   = new wxTextCtrl(this, -1, "",dp, wxSize(FW,6), wxSUNKEN_BORDER);
 		Add(div,0,wxALL, 2*M);
 	}
+  */
 }
 //----------------------------------------------------------------------------
+/** in the multiline case - explicit newline must be inserted in the string - also append a newline at the end */
 void mmgGui::Label(mafString label, bool bold, bool multiline ) 
 //----------------------------------------------------------------------------
 {
@@ -924,24 +933,36 @@ void mmgGui::Radio(int id,wxString label,int* var, int numchoices, const wxStrin
 	// wxWindows assign by itself the RadioButtons id's in a way 
 	// that it break the correct tab-ordering - and there's is no workaround
 	// workaround: - use combo instead
+  // SIL. 23-may-2006 : -- fixed with wxWidgets 2.6.3
 
-  wxStaticText *lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
-  if(m_UseBackgroundColor) 
-    lab->SetBackgroundColour(m_BackgroundColor);
-  lab->SetFont(m_Font);
-  int w_id = GetId(id);
-  wxRadioBox *radio = new wxRadioBox  (this, w_id, "",    dp, wxSize(DW,-1), numchoices, choices,dim,wxRA_SPECIFY_COLS|m_EntryStyle|wxTAB_TRAVERSAL );
-  if(m_UseBackgroundColor) 
-    radio->SetBackgroundColour(m_BackgroundColor);
-  radio->SetFont(m_Font);
+  wxRadioBox *radio = NULL;
+  wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
+  int w_id;
+
+  if(!label.IsEmpty())
+  {
+    wxStaticText *lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,-1), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+    if(m_UseBackgroundColor) lab->SetBackgroundColour(m_BackgroundColor);
+    lab->SetFont(m_Font);
+
+    w_id = GetId(id);
+    radio = new wxRadioBox  (this, w_id, "",dp, wxSize(DW,-1), numchoices, choices,dim,wxRA_SPECIFY_COLS|m_EntryStyle|wxTAB_TRAVERSAL );
+
+    sizer->Add( lab,  0, wxRIGHT, LM);
+    sizer->Add( radio,0, wxRIGHT, HM);
+    Add(sizer,0,wxALL, M); 
+  }
+  else
+  {
+    w_id = GetId(id);
+    radio = new wxRadioBox  (this, w_id, "",dp, wxSize(FW,-1), numchoices, choices,dim,wxRA_SPECIFY_COLS|m_EntryStyle|wxTAB_TRAVERSAL );
+    Add(radio,0, wxRIGHT, HM);
+  }
+
+  if(m_UseBackgroundColor) radio->SetBackgroundColour(m_BackgroundColor);
   radio->SetValidator( mmgValidator(this,w_id,radio,var) );
-	if(tooltip != "") radio->SetToolTip(tooltip);
-
-	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add( lab,  0, wxRIGHT, LM);
-	sizer->Add( radio,0, wxRIGHT, HM);
-	Add(sizer,0,wxALL, M); 
-	return;
+  radio->SetFont(m_Font);
+  if(tooltip != "") radio->SetToolTip(tooltip);
 }
 //----------------------------------------------------------------------------
 void mmgGui::Combo(int id,mafString label,int* var,int numchoices, const wxString choices[], mafString tooltip)

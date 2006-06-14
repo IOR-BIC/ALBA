@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgScrolledPanel.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:27 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,9 +29,6 @@ public:
   mmgScrolledPanel(wxWindow* parent,wxWindowID id = -1);
   virtual ~mmgScrolledPanel();
     
-	/** Redraw the scrolled window. */
-	virtual bool Layout();
-
 	/** Add a window into the scrolled panel. */
   void Add(wxWindow* window,int option = 0, int flag = wxEXPAND, int border = 0);  
 
@@ -43,6 +40,15 @@ public:
 
 	/** Remove a sizer from the scrolled panel. */
   bool Remove(wxSizer*  sizer );
+
+  /** Adjust the ScrollBar Settings.
+      Must be called explicitly if the size of the contents change at runtime.      
+  */
+  void FitInside();
+
+  /** Redraw the scrolled window. */
+  virtual bool Layout();
+
 
 protected:
   wxBoxSizer *m_sizer;

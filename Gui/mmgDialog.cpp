@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialog.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-09 13:17:56 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,13 +18,11 @@
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
+#include <wx/statline.h>
 
 #include "mmgDialog.h"
 #include "wx/busyinfo.h"
 #include "mafDecl.h"
-
-//SIL. 4-7-2005: begin, do the initialization only once
-static bool dialog_initialized = false;
 
 //----------------------------------------------------------------------------
 // Event Table:
@@ -53,65 +51,76 @@ mmgDialog::mmgDialog(const wxString& title,long style)
 //----------------------------------------------------------------------------
 {
   m_Listener = NULL;
+  m_dialog_initialized = false;
   
   long s = wxCAPTION;
   if(style & mafRESIZABLE) 
     s |= wxRESIZE_BORDER;
   if(style & mafCLOSEWINDOW) 
+  {
     s |= wxSYSTEM_MENU;
+    s |= wxCLOSE_BOX;
+  }
 
   Create(mafGetFrame(),-1,title,wxDefaultPosition,wxDefaultSize,s); 
 
   m_DialogSizer  =  new wxBoxSizer( wxVERTICAL );
   m_GuiSizer     =  new wxBoxSizer( wxVERTICAL );
-  m_ButtonsSizer =  NULL;
   m_DialogSizer->Add(m_GuiSizer,1,wxEXPAND);
 
+  m_ButtonsSizer =  NULL;
   m_OkButton     = NULL;
   m_CancelButton = NULL;
   m_CloseButton  = NULL;
 
+  m_DialogSizer->SetMinSize(wxSize(100,50)); // looks ugly when it is empty
+
   if(style & mafOK || style & mafCANCEL || style & mafCLOSE )
   {
     m_ButtonsSizer =  new wxBoxSizer( wxHORIZONTAL );
-    m_DialogSizer->Add(m_ButtonsSizer,0,wxEXPAND|wxCENTRE);
+
+    wxBoxSizer *vsz = new wxBoxSizer(wxVERTICAL);
+    vsz->Add(new wxStaticLine(this,-1),0,wxEXPAND | wxALL, 3);
+    vsz->Add(m_ButtonsSizer,0,wxALIGN_CENTRE);
+
+    m_DialogSizer->Add(vsz,0,wxEXPAND);
   }
   if( style & mafOK )
   {
     m_OkButton = new wxButton(this,wxID_OK,"ok");
-    m_ButtonsSizer->Add(m_OkButton,0,wxEXPAND);
+    m_ButtonsSizer->Add(m_OkButton);
   }
   if( style & mafCANCEL )
   {
     m_CancelButton = new wxButton(this,wxID_CANCEL,"cancel");
-    m_ButtonsSizer->Add(m_CancelButton ,0,wxEXPAND);
+    m_ButtonsSizer->Add(m_CancelButton);
   }
   if( (style & mafCLOSE) )
   {
     m_CloseButton = new wxButton(this,wxID_CLOSE,"close");
-    m_ButtonsSizer->Add(m_CloseButton ,0,wxEXPAND);
+    m_ButtonsSizer->Add(m_CloseButton);
   }
+  this->SetSizer( m_DialogSizer );
 }
 //----------------------------------------------------------------------------
 mmgDialog::~mmgDialog()
 //----------------------------------------------------------------------------
 {
-  dialog_initialized = false;
+  m_dialog_initialized = false;
 }
 //----------------------------------------------------------------------------
 int mmgDialog::ShowModal()
 //----------------------------------------------------------------------------
 {
-  if(! dialog_initialized )
+  if(! m_dialog_initialized )
   {
-    m_DialogSizer->SetMinSize(100,50); // looks ugly when it is empty
-    //this->SetAutoLayout( TRUE ); -- not to be called here
-    this->SetSizer( m_DialogSizer );
-    //m_DialogSizer->Fit(this); //-- not to be called, is called by SetSizeHints
-    m_DialogSizer->SetSizeHints(this);
-    dialog_initialized = true;
+    // these operations are delayed from the Ctor,
+    // to allow the user to Add other gui in the meanwhile
+    
+    m_DialogSizer->Layout();           // resize & fit the contents
+    m_DialogSizer->SetSizeHints(this); // resize the dialog accordingly 
+    m_dialog_initialized = true;
   }
-  //SIL. 4-7-2005: end
   return wxDialog::ShowModal();
 }
 //--------------------------------------------------------------------------------

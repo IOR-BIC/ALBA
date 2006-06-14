@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTest.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:47:00 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-06-14 14:46:33 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -194,3 +194,4 @@ void mmoTest::OpUndo()
 //----------------------------------------------------------------------------
 {
 }
+
