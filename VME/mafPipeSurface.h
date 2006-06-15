@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-02 22:00:51 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2006-06-15 17:30:12 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,6 +31,7 @@ class vtkActor;
 class vtkProperty;
 class mafAxes;
 class mmgMaterialButton;
+class mmaMaterial;
 
 //----------------------------------------------------------------------------
 // mafPipeSurface :
@@ -56,6 +57,9 @@ public:
     ID_RENDERING_DISPLAY_LIST,
     ID_CHOOSE_TEXTURE,
     ID_TEXTURE_MAPPING_MODE,
+    ID_USE_VTK_PROPERTY,
+    ID_USE_TEXTURE,
+    ID_USE_LOOKUP_TABLE,
     ID_LAST
   };
 
@@ -81,8 +85,13 @@ protected:
   vtkActor                *m_OutlineActor;
   mafAxes                 *m_Axes;
 
+  int m_UseVTKProperty;
+  int m_UseTexture;
+  int m_UseLookupTable;
+
   int m_ScalarVisibility;
   int m_RenderingDisplayListFlag;
+  mmaMaterial *m_SurfaceMaterial;
   mmgMaterialButton *m_MaterialButton;
 
 //@@@  bool                    m_use_axes; //SIL. 22-5-2003 added line - 
