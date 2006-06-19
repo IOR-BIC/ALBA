@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoSTLExporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 11:35:30 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-06-19 12:00:34 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,7 +42,18 @@ public:
 	/** Builds operation's interface. */
   void OpRun();
 
-	/** Export the surface. */
+  /** Set the filename for the .stl to export */
+  void SetFileName(const char *file_name) {m_File = file_name;};
+
+  void ApplyABSMatrixOn() {m_ABSMatrixFlag = 1;};
+  void ApplyABSMatrixOff() {m_ABSMatrixFlag = 0;};
+  void SetApplyABSMatrix(int apply_matrix) {m_ABSMatrixFlag = apply_matrix;};
+
+  void ExportAsBynaryOn() {m_Binary = 1;};
+  void ExportAsBynaryOff() {m_Binary = 0;};
+  void SetExportAsBynary(int binary_file) {m_Binary = binary_file;};
+
+  /** Export the surface. */
   void ExportSurface();
 
 protected:
