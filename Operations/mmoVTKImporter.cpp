@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-14 12:33:00 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-06-19 12:21:55 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -72,7 +72,6 @@ mmoVTKImporter::~mmoVTKImporter( )
 mafOp* mmoVTKImporter::Copy()   
 //----------------------------------------------------------------------------
 {
-  //non devo incrementare l'id counter --- vfc le operazioni sono gia inserite nei menu;
   mmoVTKImporter *cp = new mmoVTKImporter(m_Label);
   cp->m_File			= m_File;
   return cp;
@@ -81,15 +80,17 @@ mafOp* mmoVTKImporter::Copy()
 void mmoVTKImporter::OpRun()   
 //----------------------------------------------------------------------------
 {
-	m_File = "";
-
 	wxString wildc = "vtk Data (*.vtk)|*.vtk";
-  wxString f = mafGetOpenFile(m_FileDir, wildc, "Choose VTK file").c_str();
+  mafString f;
+  if (m_File.IsEmpty())
+  {
+    f = mafGetOpenFile(m_FileDir, wildc, "Choose VTK file").c_str();
+    m_File = f;
+  }
 
   int result = OP_RUN_CANCEL;
-  if(f != "") 
+  if(!m_File.IsEmpty()) 
 	{
-	  m_File = f;
     ImportVTK();
 	  result = OP_RUN_OK;
 	}

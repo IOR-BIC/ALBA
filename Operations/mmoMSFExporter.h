@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMSFExporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-09-19 11:35:58 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-06-19 12:20:00 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -42,10 +42,13 @@ public:
 	/** Builds operation's interface. */
   void OpRun();
 
-protected:
+  /** Set the filename for the .msf to export */
+  void SetFileName(const char *file_name) {m_MSFFile = file_name;};
+
   /** Export selected subtree-tree to a .msf file*/
   void ExportMSF();
 
+protected:
   mafString m_MSFFile;
 	mafString m_MSFFileDir;
 };

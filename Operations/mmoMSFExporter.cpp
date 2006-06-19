@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMSFExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-19 11:35:58 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-06-19 12:20:00 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,17 +49,19 @@ mmoMSFExporter::~mmoMSFExporter()
 void mmoMSFExporter::OpRun()   
 //----------------------------------------------------------------------------
 {
-	m_MSFFile = "";
-	
 	mafString wildc = "MAF Storage Format (*.msf)|*.msf";
-	mafString f = mafGetSaveFile(m_MSFFileDir.GetCStr(),wildc.GetCStr()).c_str(); 
+	mafString f;
+  if (m_MSFFile.IsEmpty())
+  {
+    f = mafGetSaveFile(m_MSFFileDir.GetCStr(),wildc.GetCStr()).c_str(); 
+    m_MSFFile = f;
+  }
 
   int result = OP_RUN_CANCEL;
-  if(f != "") 
+  if(!m_MSFFile.IsEmpty()) 
 	{
-	   m_MSFFile = f;
-     ExportMSF();
-		 result = OP_RUN_OK;
+    ExportMSF();
+		result = OP_RUN_OK;
 	}
 	mafEventMacro(mafEvent(this,result));
 }
