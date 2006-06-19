@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoReparentTo.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 12:03:20 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-06-19 11:28:57 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -41,6 +41,7 @@ mmoReparentTo::mmoReparentTo(wxString label) : mafOp(label)
   m_OpType    = OPTYPE_OP;
   m_Canundo   = true;
   m_OldParent = NULL;
+  m_TargetVme = NULL;
 }
 //----------------------------------------------------------------------------
 mmoReparentTo::~mmoReparentTo( ) 
@@ -65,9 +66,12 @@ mafOp* mmoReparentTo::Copy()
 void mmoReparentTo::OpRun()   
 //----------------------------------------------------------------------------
 {
-	mafEvent e(this,VME_CHOOSE);
-	mafEventMacro(e);
-  m_TargetVme = mafVME::SafeDownCast(e.GetVme());
+  if (m_TargetVme == NULL)
+  {
+    mafEvent e(this,VME_CHOOSE);
+    mafEventMacro(e);
+    m_TargetVme = mafVME::SafeDownCast(e.GetVme());
+  }
 	
 	int result = OP_RUN_CANCEL;
 	if((m_TargetVme != NULL) && (m_Input->CanReparentTo(m_TargetVme)))
