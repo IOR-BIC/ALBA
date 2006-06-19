@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterVolume.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-20 11:23:57 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-06-19 12:34:56 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -52,46 +52,37 @@ public:
   };
 
 	bool Accept(mafNode *node) {return true;};
+
 	void OpRun();
 
-  /** 
-  Set the RAW volume filename to import.*/
+  /** Set the RAW volume filename to import.*/
   void SetFileName(const char *raw_file);
 
-  /** 
-  Set the scalar type according to enum defined into the importer.*/
+  /** Set the scalar type according to enum defined into the importer.*/
   void SetScalarType(int scalar_type = mmoRAWImporterVolume::SHORT_SCALAR);
 
-  /** 
-  Turn On the flag to read the data scalars as signed. (Default is not signed)*/
+  /** Turn On the flag to read the data scalars as signed. (Default is not signed)*/
   void ScalarSignedOn();
 
-  /** 
-  Turn Off the flag to read the data scalars as not signed.  (Default is not signed)*/
+  /** Turn Off the flag to read the data scalars as not signed.  (Default is not signed)*/
   void ScalarSignedOff();
 
-  /** 
-  Set the scalar data to be read as Big Endian. (Default is Little Endian)*/
+  /** Set the scalar data to be read as Big Endian. (Default is Little Endian)*/
   void SetScalarDataToBigEndian();
   
-  /** 
-  Set the scalar data to be read as Little Endian. (Default)*/
+  /** Set the scalar data to be read as Little Endian. (Default)*/
   void SetScalarDataToLittleEndian();
 
-  /** 
-  Set the dimensions of the data to import.*/
+  /** Set the dimensions of the data to import.*/
   void SetDataDimensions(int dims[3]);
 
-  /** 
-  Allow to define a sub extent on z axes. (Default is imported all the volume)*/
+  /** Allow to define a sub extent on z axes. (Default is imported all the volume)*/
   void SetDataVOI(int zVOI[2]);
 
-  /** 
-  Set the spacing of the data to import.*/
+  /** Set the spacing of the data to import.*/
   void SetDataSpacing(double spc[3]);
 
-  /** 
-  Import RAW data according to the parameters set. Return true on success.*/
+  /** Import RAW data according to the parameters set. Return true on success.*/
   bool Import();
 
 protected:

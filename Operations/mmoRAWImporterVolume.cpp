@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-20 16:59:16 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-06-19 12:34:56 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -152,7 +152,7 @@ void mmoRAWImporterVolume::OpRun()
 	
 	m_Gui->Divider(0);
 	m_Gui->Label("spacing in mm/pixel (x,y,z)");
-	m_Gui->Vector(ID_SPC, "",m_DataSpacing,0.0000001, 100000); 
+	m_Gui->Vector(ID_SPC, "",m_DataSpacing,0.0000001, 100000,-1); 
 
 	m_Gui->Divider(0);
 	m_Gui->Button(ID_GUESS,"guess","header size");
