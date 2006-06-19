@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoSTLImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-04-10 16:07:48 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-06-19 11:44:08 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -69,16 +69,19 @@ mafOp* mmoSTLImporter::Copy()
 void mmoSTLImporter::OpRun()   
 //----------------------------------------------------------------------------
 {
-	m_File = "";
-
 	mafString wildc = "Stereo Litography (*.stl)|*.stl";
-	mafString f = mafGetOpenFile(m_FileDir.GetCStr(),wildc.GetCStr()).c_str(); 	
+	mafString f;
+  
+  if (m_File.IsEmpty())
+  {
+    f = mafGetOpenFile(m_FileDir.GetCStr(),wildc.GetCStr()).c_str(); 	
+    m_File = f;
+  }
 	
 	int result = OP_RUN_CANCEL;
 
-	if(f != "") 
+	if(!m_File.IsEmpty()) 
 	{
-		m_File = f;
 		result = OP_RUN_OK;
     CheckSwap(m_File.GetCStr());
     ImportSTL();
