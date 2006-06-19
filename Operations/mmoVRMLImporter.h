@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVRMLImporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-11 13:01:05 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-06-19 12:29:12 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -48,8 +48,8 @@ public:
   void ImportVRML();
 
 protected:
-	wxString m_File;
-	wxString m_FileDir;
+	mafString m_File;
+	mafString m_FileDir;
   
 	mafVMEGroup *m_Group;
 };

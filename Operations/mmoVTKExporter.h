@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKExporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-11 12:32:55 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-06-19 12:25:09 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -41,7 +41,18 @@ public:
 	/** Builds operation's interface. */
   void OpRun();
 
-	/** Export vtk data. */
+  void ApplyABSMatrixOn() {m_ABSMatrixFlag = 1;};
+  void ApplyABSMatrixOff() {m_ABSMatrixFlag = 0;};
+  void SetApplyABSMatrix(int apply_matrix) {m_ABSMatrixFlag = apply_matrix;};
+
+  void ExportAsBynaryOn() {m_Binary = 1;};
+  void ExportAsBynaryOff() {m_Binary = 0;};
+  void SetExportAsBynary(int binary_file) {m_Binary = binary_file;};
+
+  /** Set the filename for the .stl to export */
+  void SetFileName(const char *file_name) {m_File = file_name;};
+
+  /** Export vtk data. */
   void ExportVTK();
 
   /** vtk pipeline to save data on disk. */

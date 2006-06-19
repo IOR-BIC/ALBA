@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVRMLImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-11 15:24:04 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-06-19 12:29:12 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -68,17 +68,24 @@ mafOp * mmoVRMLImporter::Copy()
 void  mmoVRMLImporter::OpRun()   
 //----------------------------------------------------------------------------
 {
-	wxString vrml_wildc	= "VRML Data (*.wrl)|*.wrl";
+	mafString vrml_wildc	= "VRML Data (*.wrl)|*.wrl";
+  mafString f;
 
-	wxString f = mafGetOpenFile(m_FileDir,vrml_wildc).c_str(); 
-	if(f == "")
-	{
-		mafEventMacro(mafEvent(this,OP_RUN_CANCEL));
-    return;
-	}
-	m_File = f;
-  ImportVRML();
-  mafEventMacro(mafEvent(this,OP_RUN_OK));
+  if (m_File.IsEmpty())
+  {
+    f = mafGetOpenFile(m_FileDir.GetCStr(),vrml_wildc.GetCStr()).c_str(); 	
+    m_File = f;
+  }
+
+  int result = OP_RUN_CANCEL;
+
+  if(!m_File.IsEmpty()) 
+  {
+    result = OP_RUN_OK;
+    ImportVRML();
+  }
+
+  mafEventMacro(mafEvent(this,result));
 }
 //----------------------------------------------------------------------------
 void  mmoVRMLImporter::SetFileName(const char *file_name)
@@ -91,7 +98,7 @@ void  mmoVRMLImporter::ImportVRML()
 //----------------------------------------------------------------------------
 {
   wxString path, name, ext;
-  wxSplitPath(m_File.c_str(),&path,&name,&ext);
+  wxSplitPath(m_File.GetCStr(),&path,&name,&ext);
 
   mafNEW(m_Group);
   m_Group->SetName(name.c_str());
@@ -100,7 +107,7 @@ void  mmoVRMLImporter::ImportVRML()
 
   vtkMAFSmartPointer<vtkVRMLImporter> importer;
   importer->SetRenderWindow(rw.GetPointer());
-  importer->SetFileName(m_File.c_str());
+  importer->SetFileName(m_File.GetCStr());
   importer->Update();
 
   mafMatrix matrix;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 11:35:30 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-06-19 12:25:09 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -19,11 +19,9 @@
 //----------------------------------------------------------------------------
 
 #include "mmoVTKExporter.h"
-#include "wx/busyinfo.h"
 
 #include "mafDecl.h"
 #include "mmgGui.h"
-//#include "mmoExplodeCollapse.h"
 #include "vtkMAFSmartPointer.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
@@ -147,23 +145,17 @@ void mmoVTKExporter::ExportVTK()
 	{
     if(((mafVMELandmarkCloud *)m_Input)->GetNumberOfLandmarks() > 0)
 		{
-      bool oldstate=((mafVMELandmarkCloud *)m_Input)->IsOpen();
+      bool oldstate = ((mafVMELandmarkCloud *)m_Input)->IsOpen();
 
 	    if (oldstate)
       {
-        /*mafOp *close_op = new mmoExplodeCollapse("close cloud");
-        close_op->SetInput(((mafVMELandmarkCloud *)m_Input));
-        close_op->SetListener(m_Listener);
-        close_op->OpDo();*/
+        ((mafVMELandmarkCloud *)m_Input)->Close();
       }
       SaveVTKData();
 		  
       if (oldstate)
       {
-        /*mafOp *open_op = new mmoExplodeCollapse("open cloud");
-        open_op->SetInput(((mafVMELandmarkCloud *)m_Input));
-        open_op->SetListener(m_Listener);
-        open_op->OpDo();*/
+        ((mafVMELandmarkCloud *)m_Input)->Open();
       }
     }
 		else
