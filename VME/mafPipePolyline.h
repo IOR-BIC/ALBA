@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolyline.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-03 11:04:18 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-06-21 17:25:52 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,6 +22,8 @@ class vtkPolyDataMapper;
 class vtkActor;
 class vtkProperty;
 class vtkTubeFilter;
+class vtkGlyph3D;
+class vtkSphereSource;
 
 //----------------------------------------------------------------------------
 // mafPipePolyline :
@@ -40,16 +42,41 @@ public:
   virtual void Create(mafSceneNode *n);
   virtual void Select(bool select); 
 
+  /** Set the visual representation of the polyline.
+  Acceptable values are 0 (POLYLINE), 1 (TUBE) or 2 (SPHERE GLYPHED).*/
+  void SetRepresentation(int representation);
+
+  /** Set the polyline representation as simple polyline.*/
+  void SetRepresentationToPolyline() {SetRepresentation(POLYLINE);};
+
+  /** Set the polyline representation as tube.*/
+  void SetRepresentationToTube() {SetRepresentation(TUBE);};
+
+  /** Set the polyline representation as sphere glyphed polyline.*/
+  void SetRepresentationToGlyph() {SetRepresentation(GLYPH);};
+
   /** IDs for the GUI */
   enum PIPE_POLYLINE_WIDGET_ID
   {
     ID_POLYLINE_REPRESENTATION = Superclass::ID_LAST,
     ID_TUBE_RADIUS,
+    ID_TUBE_RESOLUTION,
     ID_TUBE_CAPPING,
+    ID_SPHERE_RADIUS,
+    ID_SPHERE_RESOLUTION,
     ID_LAST
   };
 
+  enum POLYLINE_REPRESENTATION
+  {
+    POLYLINE = 0,
+    TUBE,
+    GLYPH
+  };
+
 protected:
+  vtkSphereSource        *m_Sphere;
+  vtkGlyph3D             *m_Glyph;
   vtkTubeFilter          *m_Tube;
   vtkPolyDataMapper	     *m_Mapper;
   vtkActor               *m_Actor;
@@ -61,6 +88,12 @@ protected:
   int m_Representation;
   int m_Capping;
   double m_TubeRadius;
+  double m_TubeResolution;
+  double m_SphereRadius;
+  double m_SphereResolution;
+
+  /** Initialize representation, capping, radius and resolution variables.*/
+  void InitializeFromTag();
 
   /** Update visual properties*/
   void UpdateProperty(bool fromTag = false);
