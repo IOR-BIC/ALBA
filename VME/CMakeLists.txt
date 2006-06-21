@@ -39,6 +39,8 @@ ENDIF (MAF_USE_CRYPTO)
 
 IF (MAF_USE_ITK)
 SET(PROJECT_SRCS  ${PROJECT_SRCS}
+  mafPipeScalar.cpp
+  mafPipeScalar.h
   mafScalarInterpolator.cpp
   mafScalarInterpolator.h
   mafVMEOutputScalar.cpp
