@@ -128,6 +128,10 @@ class VTK_vtkMAF_EXPORT vtkContourVolumeMapper : public vtkVolumeMapper {
     /**
     This method is useful for initial selection of contour value. If the volume is close to 1 than the surface will contain too much noise.*/
     float        EstimateRelevantVolume(const double value);
+		
+		/**
+		To set the value of trasparecy*/
+		void SetAlpha(double alpha){m_Alpha=alpha;};
 
   protected:
     vtkContourVolumeMapper();
@@ -170,6 +174,9 @@ class VTK_vtkMAF_EXPORT vtkContourVolumeMapper : public vtkVolumeMapper {
     float          ContourValue;
     int            EnableAutoLOD;          // shall we use multiresolution?
     int            EnableContourAnalysis;  // shall we optimize the surface?
+		
+		//to set the alpha parameter
+		double				 m_Alpha;
 
     // volume info
     double         DataOrigin[3];

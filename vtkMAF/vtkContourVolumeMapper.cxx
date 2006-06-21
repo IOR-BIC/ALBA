@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkContourVolumeMapper.cxx,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 18:03:03 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-06-21 15:55:12 $
+  Version:   $Revision: 1.5 $
 
 
 Copyright (c) 1993-2001 Ken Martin, Will Schroeder, Bill Lorensen 
@@ -69,12 +69,15 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
 
 using namespace vtkContourVolumeMapperNamespace;
 
-vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.4 $");
+vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.5 $");
 vtkStandardNewMacro(vtkContourVolumeMapper);
 
 
 //------------------------------------------------------------------------------
 vtkContourVolumeMapper::vtkContourVolumeMapper() {
+
+	m_Alpha=1.0;
+
   this->EnableAutoLOD = true;
   this->EnableContourAnalysis = false;
 
@@ -337,6 +340,10 @@ void vtkContourVolumeMapper::InitializeRender(bool setup, vtkRenderer *renderer,
 
     EnableClipPlanes(true);
     
+		//Matteo
+		glEnable(GL_BLEND);
+		//End
+
     glEnable(GL_LIGHTING);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_TEXTURE_2D);
@@ -383,9 +390,9 @@ void vtkContourVolumeMapper::InitializeRender(bool setup, vtkRenderer *renderer,
     float ambientColor  = volume->GetProperty()->GetAmbient();
     float diffuseColor  = volume->GetProperty()->GetDiffuse();
     float specularColor = volume->GetProperty()->GetSpecular();
-    float ambientColor3[4] = { ambientColor, ambientColor, ambientColor, 1};
-    float diffuseColor3[4] = { diffuseColor, diffuseColor, diffuseColor, 1};
-    float specularColor3[4] = { specularColor, specularColor, specularColor, 1};
+    float ambientColor3[4] = { ambientColor, ambientColor, ambientColor, m_Alpha};
+    float diffuseColor3[4] = { diffuseColor, diffuseColor, diffuseColor, m_Alpha};
+    float specularColor3[4] = { specularColor, specularColor, specularColor, m_Alpha};
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,  ambientColor3);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,  diffuseColor3);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specularColor3);
