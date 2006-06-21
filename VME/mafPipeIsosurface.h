@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.h,v $
 Language:  C++
-Date:      $Date: 2006-03-02 22:00:51 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2006-06-21 15:55:47 $
+Version:   $Revision: 1.6 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -56,6 +56,13 @@ public:
   {
     ID_CONTOUR_VALUE = Superclass::ID_LAST,
     ID_GENERATE_ISOSURFACE,
+		ID_ALPHA_VALUE,
+		ID_CAMERA_FRONT,
+		ID_CAMERA_BACK,
+		ID_CAMERA_LEFT,
+		ID_CAMERA_RIGHT,
+		ID_CAMERA_TOP,
+		ID_CAMERA_BOTTOM,
     ID_LAST
   };
 
@@ -72,6 +79,8 @@ protected:
   vtkActor                 *m_OutlineActor;
 
   mmgFloatSlider  *m_ContourSlider;
+	mmgFloatSlider  *m_AlphaSlider;
   double m_ContourValue;
+	double m_AlphaValue;
 };  
 #endif // __mafPipeIsosurface_H__

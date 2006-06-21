@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2005-12-19 11:21:35 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2006-06-21 15:55:47 $
+Version:   $Revision: 1.7 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -60,6 +60,8 @@ mafPipeIsosurface::mafPipeIsosurface()
   m_IsosurfaceVme   = NULL;
 
   m_ContourValue    = 300.0;
+
+	m_AlphaValue			= 1.0;
 }
 //----------------------------------------------------------------------------
 void mafPipeIsosurface::Create(mafSceneNode *n)
@@ -76,6 +78,7 @@ void mafPipeIsosurface::Create(mafSceneNode *n)
   vtkNEW(m_ContourMapper);
   m_ContourMapper->SetInput(dataset);
   m_ContourMapper->EnableAutoLODOn();
+	m_ContourMapper->SetAlpha(m_AlphaValue);
   
   vtkNEW(m_Volume);
   m_Volume->SetMapper(m_ContourMapper);
@@ -167,7 +170,8 @@ mmgGui *mafPipeIsosurface::CreateGui()
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
   m_ContourSlider = m_Gui->FloatSlider(ID_CONTOUR_VALUE,"contour", &m_ContourValue,range[0],range[1]);
-  m_Gui->Button(ID_GENERATE_ISOSURFACE,"generate iso");
+  m_AlphaSlider = m_Gui->FloatSlider(ID_ALPHA_VALUE,"alpha", &m_AlphaValue,0.0,1.0);
+	m_Gui->Button(ID_GENERATE_ISOSURFACE,"generate iso");
 
   return m_Gui;
 }
@@ -203,6 +207,13 @@ void mafPipeIsosurface::OnEvent(mafEventBase *maf_event)
         mafDEL(m_IsosurfaceVme);
       }
       break;
+			case ID_ALPHA_VALUE:
+				{
+					m_ContourMapper->SetAlpha(m_AlphaValue);
+					m_ContourMapper->Modified();
+					m_Vme->ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
+				}
+			break;
       default:
       break;
     }
