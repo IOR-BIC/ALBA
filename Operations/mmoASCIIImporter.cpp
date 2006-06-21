@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoASCIIImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-08 14:09:10 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-06-21 15:23:39 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -52,7 +52,8 @@ mafOp* mmoASCIIImporter::Copy()
 //----------------------------------------------------------------------------
 {
   mmoASCIIImporter *cp = new mmoASCIIImporter(m_Label);
-  cp->m_Files			= m_Files;
+  cp->m_Files	= m_Files;
+  cp->m_FileDir = m_FileDir;
   return cp;
 }
 //----------------------------------------------------------------------------
@@ -67,9 +68,13 @@ enum ASCII_IMPORTER_ID
 void mmoASCIIImporter::OpRun()   
 //----------------------------------------------------------------------------
 {
+  wxString scalar_order[2] = {"row", "columns"};
+  
   m_Gui = new mmgGui(this);
   m_Gui->Button(ID_ASCII_FILE,"ASCII data","","Choose single or multiple file ASCII.");
+  m_Gui->Radio(ID_DATA_ORDER,"order",&m_ScalarOrder,2,scalar_order,1,"Select the order of how are stored the scalars.");
   m_Gui->OkCancel();
+  
   ShowGui();
 }
 //----------------------------------------------------------------------------
@@ -83,7 +88,7 @@ void mmoASCIIImporter::OnEvent(mafEventBase *maf_event)
       case ID_ASCII_FILE:
       {
         wxString wildc = "(*.*)|*.*";
-        mafGetOpenMultiFiles("",wildc.c_str(),m_Files);
+        mafGetOpenMultiFiles(m_FileDir.GetCStr(),wildc.c_str(),m_Files);
       }
       break;
       case wxOK:
@@ -128,6 +133,12 @@ int mmoASCIIImporter::ImportASCII()
     }
     //Add the scalar array to the mafVMEScalar at the current time 't'.
   }
+
+  mafTagItem item;
+  item.SetName("SCALAR_ORDER");
+  item.SetValue(m_ScalarOrder);
+  m_ScalarData->GetTagArray()->SetTag(item);
+
   return import_result;
 }
 //----------------------------------------------------------------------------

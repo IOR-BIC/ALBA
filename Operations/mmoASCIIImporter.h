@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoASCIIImporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-08 14:09:10 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-06-21 15:23:39 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -56,9 +56,15 @@ public:
   void SetFileName(std::string &file);
 
 protected:
+  enum SCALAR_DATA_ORDER {
+    ROW_DATA = 0,
+    COLUMN_DAtA
+  };
+
   std::vector<std::string> m_Files;
-  wxString m_FileDir;
+  mafString m_FileDir;
 
   mafVMEScalar *m_ScalarData;
+  int m_ScalarOrder;
 };
 #endif
