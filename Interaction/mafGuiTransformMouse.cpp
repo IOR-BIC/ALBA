@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-17 11:17:40 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-06-21 15:57:31 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,6 +45,7 @@ enum TRANSFORM_MOUSE_WIDGET_ID
   Y_AXIS, 
   Z_AXIS,
   VIEW_PLANE, 
+	NORMAL_VIEW_PLANE,
   XY_PLANE, 
   XZ_PLANE, 
   YZ_PLANE,
@@ -97,18 +98,18 @@ void mafGuiTransformMouse::CreateGui()
   m_Gui->Divider();
 
   // rotation axes
-  wxString rot_axes[4] = {"x", "y", "z", "view"};
+  wxString rot_axes[5] = {"x", "y", "z", "view","normal view"};
 
   // translation axes
-	wxString translation_type[8] = {"x", "y", "z", "view", "xy", "xz", "yz", "surface snap"}; 
+	wxString translation_type[9] = {"x", "y", "z", "view","normal view", "xy", "xz", "yz", "surface snap"}; 
 
   // rotation constraints
   m_Gui->Label("rotation constraints");
-	m_Gui->Combo(ID_ROTATION_AXES,"",&RotationConstraintId,4,rot_axes);
+	m_Gui->Combo(ID_ROTATION_AXES,"",&RotationConstraintId,5,rot_axes);
 
   // translation constraints
   m_Gui->Label("translation constraints");
-	m_Gui->Combo(ID_TRASLATION_AXES,"",&TranslationConstraintId,8,translation_type);
+	m_Gui->Combo(ID_TRASLATION_AXES,"",&TranslationConstraintId,9,translation_type);
 
   m_Gui->Update();
 }
@@ -144,8 +145,20 @@ void mafGuiTransformMouse::OnEvent(mafEventBase *maf_event)
       {
         IsaRotate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
         IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
-        IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToView();
+				//Modified by Matteo 30-05-2006
+				//IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::FREE);
+        //End Matteo
+				IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToView();
       }
+			else if (RotationConstraintId == NORMAL_VIEW_PLANE)
+			{
+				IsaRotate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        //IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
+				//Modified by Matteo 30-05-2006
+				IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::FREE);
+        //End Matteo
+				IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToView();
+			}
     }
     break;
     case ID_TRASLATION_AXES:
@@ -176,7 +189,22 @@ void mafGuiTransformMouse::OnEvent(mafEventBase *maf_event)
       {
         IsaTranslate->SurfaceSnapOff();
         IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
-      }
+				//Modified by Matteo 30-05-2006
+				//IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(RefSysVME->GetOutput()->GetAbsMatrix());
+				//IsaTranslate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+				//IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
+				//End Matteo
+			}
+			else if (TranslationConstraintId == NORMAL_VIEW_PLANE)
+      {
+        IsaTranslate->SurfaceSnapOff();
+        IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
+				//Modified by Matteo 30-05-2006
+				IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(RefSysVME->GetOutput()->GetAbsMatrix());
+				IsaTranslate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+				IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
+				//End Matteo
+			}
 
       if (TranslationConstraintId == XY_PLANE)
       {
@@ -204,6 +232,11 @@ void mafGuiTransformMouse::OnEvent(mafEventBase *maf_event)
       {
         IsaTranslate->SurfaceSnapOn();
         IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
+				//Modified by Matteo 30-05-2006
+				IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(RefSysVME->GetOutput()->GetAbsMatrix());
+				IsaTranslate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+				IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
+				//End Matteo
       }
     }
     break;
@@ -252,7 +285,10 @@ void mafGuiTransformMouse::CreateISA()
   IsaRotate->GetPivotRefSys()->SetTypeToView();
   IsaRotate->GetPivotRefSys()->SetMatrix(RefSysVME->GetOutput()->GetMatrix());
   
-  IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
+  //IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
+	//Modified by Matteo 30-05-2006
+	IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::FREE);
+  //End Matteo
   IsaRotate->EnableRotation(true);
   
 	//----------------------------------------------------------------------------
