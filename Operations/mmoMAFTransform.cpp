@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMAFTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-17 11:17:52 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-06-21 15:57:43 $
+  Version:   $Revision: 1.12 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -149,10 +149,12 @@ void mmoMAFTransform::OnEvent(mafEventBase *maf_event)
   else if (maf_event->GetSender() == this->m_GuiSaveRestorePose) // from save/restore gui
   {
     OnEventGuiSaveRestorePose(maf_event); 
+		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
   else if (maf_event->GetSender() == this->m_GuiTransformTextEntries)
   {
     OnEventGuiTransformTextEntries(maf_event);
+		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
   else
   {
