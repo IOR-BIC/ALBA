@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataPipe.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-08 14:10:46 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-06-23 08:09:42 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -18,15 +18,16 @@
 #include "mafObserver.h"
 #include "mafTimeStamped.h"
 #include "mafOBB.h"
-#ifdef MAF_USE_ITK
-  #include "vnl/vnl_matrix.h"
-#endif
+
 //----------------------------------------------------------------------------
 //  forward declarations
 //----------------------------------------------------------------------------
 class mafVMEItem;
 class mafVME;
-class vtkDataSet;
+
+#ifdef MAF_USE_VTK
+  class vtkDataSet;
+#endif
 
 /** abstract class for process objects producing data as output of a VME.
   mafDataPipe is the base class for process objects producing data as output 
@@ -71,11 +72,6 @@ public:
   /**
     Return a VTK dataset corresponding to the current time.*/
   virtual vtkDataSet *GetVTKData() {return NULL;}
-#endif
-
-#ifdef MAF_USE_ITK
-  /** return the vnl_matrix data corresponding to the current time*/
-  virtual vnl_matrix<double> &GetScalarData() {return m_ScalarData;};
 #endif
 
   /** Set/Get the current time */
@@ -129,9 +125,6 @@ protected:
   /** function called to updated the data pipe output */
   virtual void Execute();
 
-#ifdef MAF_USE_ITK
-  vnl_matrix<double> m_ScalarData;
-#endif
   mafOBB        m_Bounds;///< bounds of the output data
   mafTimeStamp  m_CurrentTime;  ///< time for which data is computed
   mafVME        *m_VME;         ///< pointer to the VME for which output is computed

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-08 14:07:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-06-23 08:09:32 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,7 +26,7 @@
 
 #include "mafVMEScalar.h"
 #include "mafVMEItemScalar.h"
-#include "mafDataPipe.h"
+#include "mafScalarInterpolator.h"
 #include "mafIndent.h"
 
 #include <assert.h>
@@ -54,7 +54,7 @@ vnl_matrix<double> &mafVMEOutputScalar::GetScalarData()
 //-------------------------------------------------------------------------
 {
   assert(m_VME);
-  return m_VME->GetDataPipe()->GetScalarData();
+  return ((mafScalarInterpolator *)m_VME->GetDataPipe())->GetScalarData();
 }
 //-------------------------------------------------------------------------
 mmgGui* mafVMEOutputScalar::CreateGui()
