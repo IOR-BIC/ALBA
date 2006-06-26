@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-04-05 08:01:02 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-06-26 16:39:30 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -769,7 +769,7 @@ void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event)
         int sel = m_StudyListbox->GetSelection();
         m_ListSelected = (ListDicomFiles *)m_StudyListbox->GetClientData(sel);
         // sort dicom slices
-        if(m_ListSelected->Number() > 1)
+        if(m_ListSelected->GetCount() > 1)
         {
           double item1_pos[3],item2_pos[3],d[3];
           mmoDICOMImporterListElement *element1;
@@ -804,7 +804,7 @@ void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event)
           m_ListSelected->Sort(compareZ);
           break;
         }
-        m_NumberOfSlices = m_ListSelected->Number();
+        m_NumberOfSlices = m_ListSelected->GetCount();
         // reset the current slice number to view the first slice
         m_CurrentSlice = 0;
         m_CropFlag = false;
