@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeDensityDistance.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-16 13:09:09 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-06-26 16:39:54 $
+  Version:   $Revision: 1.2 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -284,7 +284,7 @@ void medPipeDensityDistance::Create(mafSceneNode *n/*, bool use_axes*/)
 	m_Actor->SetMapper(m_Mapper);
 
   m_ScalarBar->SetLookupTable(m_Mapper->GetLookupTable());
-  ((vtkActor2D*)m_ScalarBar)->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport;
+  ((vtkActor2D*)m_ScalarBar)->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
   ((vtkActor2D*)m_ScalarBar)->GetPositionCoordinate()->SetValue(0.1,0.01);
   m_ScalarBar->SetOrientationToHorizontal();
   m_ScalarBar->SetWidth(0.8);
