@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-26 13:40:45 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2006-06-26 13:50:26 $
+  Version:   $Revision: 1.22 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -665,7 +665,7 @@ void mafRWIBase::SaveImage(mafString filename, int magnification)
 //---------------------------------------------------------------------------
 {
   wxString path, name, ext;
-
+  wxSplitPath(filename.GetCStr(),&path,&name,&ext);
 	if (filename.IsEmpty() || ext.IsEmpty())
 	{
     wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg";
@@ -706,7 +706,7 @@ void mafRWIBase::SaveImage(mafString filename, int magnification)
   }
   else
   {
-    wxMessageBox("Image can not be saved. Not valid file!", "Warning");
+    wxMessageBox(_("Image can not be saved. Not valid file!"), _("Warning"));
   }
 	::wxEndBusyCursor();
 }
