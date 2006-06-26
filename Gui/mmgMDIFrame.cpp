@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2006-06-26 15:34:42 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -208,17 +208,23 @@ void mmgMDIFrame::OnDropFile(wxDropFilesEvent &event)
 //-----------------------------------------------------------
 {
   wxString path, name, ext, *file_list;
+  mafString file_to_open;
+
   int num_files = event.GetNumberOfFiles();
   file_list = event.GetFiles();
   for (int i=0; i< num_files; i++)
   {
+    file_to_open = file_list[i].c_str();
+
     wxSplitPath(file_list[i],&path, &name, &ext);
     if (ext == "msf" || ext == "zmsf")
     {
-      mafString file_to_open;
-      file_to_open = file_list[i].c_str();
       mafEventMacro(mafEvent(this,MENU_FILE_OPEN,&file_to_open));
       return;
+    }
+    else
+    {
+      mafEventMacro(mafEvent(this,IMPORT_FILE,&file_to_open));
     }
   }
 }
