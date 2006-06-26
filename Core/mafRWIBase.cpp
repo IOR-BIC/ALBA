@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2006-06-26 13:40:45 $
+  Version:   $Revision: 1.21 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -664,7 +664,9 @@ wxBitmap *mafRWIBase::GetImage(int magnification)
 void mafRWIBase::SaveImage(mafString filename, int magnification)
 //---------------------------------------------------------------------------
 {
-	if (filename.IsEmpty())
+  wxString path, name, ext;
+
+	if (filename.IsEmpty() || ext.IsEmpty())
 	{
     wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg";
     wxString file = wxString::Format("%s\\%sSnapshot", m_SaveDir.GetCStr(),filename.GetCStr());
@@ -686,9 +688,7 @@ void mafRWIBase::SaveImage(mafString filename, int magnification)
   w2i->SetMagnification(magnification);
 	w2i->Update();
   
-  wxString path, name, ext;
   wxSplitPath(filename.GetCStr(),&path,&name,&ext);
-
 	ext.MakeLower();
   if (ext == "bmp")
 	{
@@ -703,6 +703,10 @@ void mafRWIBase::SaveImage(mafString filename, int magnification)
     w->SetInput(w2i->GetOutput());
     w->SetFileName(filename.GetCStr());
     w->Write();
+  }
+  else
+  {
+    wxMessageBox("Image can not be saved. Not valid file!", "Warning");
   }
 	::wxEndBusyCursor();
 }
