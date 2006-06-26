@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2006-06-26 13:41:09 $
+  Version:   $Revision: 1.31 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -310,6 +310,7 @@ void mafRWI::SetSize(int x, int y, int w,int h)
 //----------------------------------------------------------------------------
 {
    ((wxWindow*)m_RwiBase)->SetSize(x,y,w,h);
+   ((wxWindow*)m_RwiBase)->SetMinSize(wxSize(w,h));
 }
 //----------------------------------------------------------------------------
 void mafRWI::Show(bool show)
