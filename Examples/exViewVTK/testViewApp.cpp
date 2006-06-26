@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testViewApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-06-26 16:09:32 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -34,8 +34,10 @@
 #include "mafPipeSurface.h"
 
 #include "mmoCreateVmeSurface.h"
+
 #include "mafViewVTK.h"
 #include "testView.h"
+
 //--------------------------------------------------------------------------------
 // Create the Application
 //--------------------------------------------------------------------------------
@@ -53,35 +55,34 @@ bool testViewApp::OnInit()
   // Inizializzazione e Fill della PipeFactory -- potrebbe essere un SideEffect del Plug dei Nodi
   result = mafPipeFactoryVME::Initialize();
   assert(result==MAF_OK);
-  mafPlugPipe<mafPipeSurface>("mafPipeSurface");
 
-  m_logic = new mafLogicWithManagers();
-  //m_logic->PlugTimebar(false);
-  //m_logic->PlugMenu(false);
-  //m_logic->PlugToolbar(false);
-  //m_logic->PlugLogbar(false);
-  //m_logic->PlugSidebar(false);
-  //m_logic->PlugOpManager(false);
-  //m_logic->PlugViewManager(false);
-  //m_logic->PlugVMEManager(false);  // the VmeManager at the moment cause 4 leaks of 200+32+24+56 bytes  //SIL. 20-4-2005: 
-  m_logic->Configure();
+  m_Logic = new mafLogicWithManagers();
+  //m_Logic->PlugTimebar(false);
+  //m_Logic->PlugMenu(false);
+  //m_Logic->PlugToolbar(false);
+  //m_Logic->PlugLogbar(false);
+  //m_Logic->PlugSidebar(false);
+  //m_Logic->PlugOpManager(false);
+  //m_Logic->PlugViewManager(false);
+  //m_Logic->PlugVMEManager(false);  // the VmeManager at the moment cause 4 leaks of 200+32+24+56 bytes  //SIL. 20-4-2005: 
+  m_Logic->Configure();
 
-  m_logic->GetTopWin()->SetTitle("ViewVTK example");
+  m_Logic->GetTopWin()->SetTitle("ViewVTK example");
   SetTopWindow(mafGetFrame());  
 
-  m_logic->Plug(new mmoCreateVmeSurface("Add Vme Surface \tCtrl+A"));
+  m_Logic->Plug(new mmoCreateVmeSurface("Add Vme Surface \tCtrl+A"));
   testView *tv = new testView("testView");
   tv->PlugVisualPipe("mafVMESurface", "mafPipeSurface");
-  m_logic->Plug(tv);
+  m_Logic->Plug(tv);
 
-  m_logic->Show();
-  m_logic->Init(0,NULL); // calls FileNew - which create the root
+  m_Logic->Show();
+  m_Logic->Init(0,NULL); // calls FileNew - which create the root
   return TRUE;
 }
 //--------------------------------------------------------------------------------
 int testViewApp::OnExit()
 //--------------------------------------------------------------------------------
 {
-  cppDEL(m_logic);
+  cppDEL(m_Logic);
   return 0;
 }
