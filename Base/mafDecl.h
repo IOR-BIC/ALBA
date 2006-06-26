@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2006-06-26 15:32:58 $
+  Version:   $Revision: 1.25 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -242,6 +242,8 @@ EVT_START,
   REMOTE_PARAMETER,
 
   ITEM_SELECTED, //used by mmgListCtrl and Dictionary
+
+  IMPORT_FILE, // used when drag a non msf or zmsf file into the application as a VTK file.
 
   LOG_ALL_EVENT,
 	LOG_TO_FILE,
