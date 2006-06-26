@@ -1,14 +1,21 @@
 PROJECT (Medical_TEST)
 
-LINK_LIBRARIES(medOperations)
+# Load CppUnit stuff
+INCLUDE(${MED_SOURCE_DIR}/FindCppUnit.cmake)
+IF (CPPUNIT_FOUND)
+  #MESSAGE("Found Cppunit library")
+  INCLUDE_DIRECTORIES(${CPPUNIT_INCLUDE_DIR})
+  LINK_LIBRARIES(${CPPUNIT_LIBRARIES})
+  
+ELSE (CPPUNIT_FOUND)
+  MESSAGE("Cppunit library not found! Please fill the corresponding cache entries")
+ENDIF (CPPUNIT_FOUND)
+  
+OPTION(BUILD_VIEWS_TESTING "Enable building of testing for BASE classes" ON)
+IF (BUILD_VIEWS_TESTING)
+  SUBDIRS(Views)
+ENDIF (BUILD_VIEWS_TESTING)
 
-# build tests
-IF(BUILD_TESTING)
-  OPTION(BUILD_MEDICAL_TESTING "Enable building medical library testing classes" ON)
-  IF (BUILD_MEDICAL_TESTING)
-    
-  ENDIF (BUILD_MEDICAL_TESTING)
-ENDIF(BUILD_TESTING)
 
 # wxWidgets specific classes
 IF (MAF_USE_WX)

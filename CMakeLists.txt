@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2005-10-13 14:01:02 $
-# Version:   $Revision: 1.1 $
+# Date:      $Date: 2006-06-26 13:17:50 $
+# Version:   $Revision: 1.2 $
 #
 # Description:
 # CMake Project file for the Medical Library.
@@ -124,22 +124,22 @@ IF(MAF_FOUND)
   #-----------------------------------------------------------------------------
   # Testing stuff
   #-----------------------------------------------------------------------------
-#  IF(BUILD_TESTING)
-#    FIND_PATH(MED_DATA_ROOT "TestingDataRoot.txt" "${MED_SOURCE_DIR}/../TestingData" "${MED_SOURCE_DIR}/../mmData/TestingData" "${MED_SOURCE_DIR}/../../TestingData" DOC "Test data repository")
-#    INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
-#    ENABLE_TESTING()
+  IF(BUILD_TESTING)
+    FIND_PATH(MED_DATA_ROOT "TestingDataRoot.txt" "${MED_SOURCE_DIR}/../TestingData" "${MED_SOURCE_DIR}/../mmData/TestingData" "${MED_SOURCE_DIR}/../../TestingData" DOC "Test data repository")
+    INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
+    ENABLE_TESTING()
   
-#    INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
+    INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
     
     # where will executable tests be written ?
-#    IF (EXECUTABLE_OUTPUT_PATH)
-#        SET (CXX_TEST_PATH ${EXECUTABLE_OUTPUT_PATH})
-#    ELSE (EXECUTABLE_OUTPUT_PATH)
-#        SET (CXX_TEST_PATH .)
-#    ENDIF (EXECUTABLE_OUTPUT_PATH)
+    IF (EXECUTABLE_OUTPUT_PATH)
+        SET (CXX_TEST_PATH ${EXECUTABLE_OUTPUT_PATH})
+    ELSE (EXECUTABLE_OUTPUT_PATH)
+        SET (CXX_TEST_PATH .)
+    ENDIF (EXECUTABLE_OUTPUT_PATH)
     
-#    SUBDIRS (Testing)
-#  ENDIF(BUILD_TESTING)
+    SUBDIRS (Testing)
+  ENDIF(BUILD_TESTING)
 ELSE (MAF_FOUND)
   MESSAGE (FATAL_ERROR "MAF library not found or configuration error, cannot build MED")
 ENDIF (MAF_FOUND)
