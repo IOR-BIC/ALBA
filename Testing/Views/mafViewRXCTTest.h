@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewRXCTTest.h,v $
 Language:  C++
-Date:      $Date: 2006-06-26 13:18:40 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2006-06-26 13:53:05 $
+Version:   $Revision: 1.2 $
 Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -26,8 +26,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class mafViewRXCTTest : public CPPUNIT_NS::TestFixture
 {
   CPPUNIT_TEST_SUITE( mafViewRXCTTest );
-  //CPPUNIT_TEST( CreateDestroyTest );
-  CPPUNIT_TEST( VmeShowTest );
+  CPPUNIT_TEST( CreateDestroyTest );
+  //CPPUNIT_TEST( VmeShowTest );
   CPPUNIT_TEST_SUITE_END();
 
   protected:
