@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.62 $
+  Date:      $Date: 2006-06-26 15:33:47 $
+  Version:   $Revision: 1.63 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,6 +34,9 @@
 #include "mafTagArray.h"
 #include "mafTagItem.h"
 #include "mafPrintSupport.h"
+
+#include "mmoVTKImporter.h"
+#include "mmoSTLImporter.h"
 
 #include "mafDeviceManager.h"
 #include "mafAction.h"
@@ -404,15 +407,24 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
         OnFileNew();
       break; 
       case MENU_FILE_OPEN:
-        {
-          mafString *filename = e->GetString();
-          if(filename)
-            OnFileOpen((*filename).GetCStr());
-          else
-            OnFileOpen();
-          UpdateFrameTitle();
-        }
+      {
+        mafString *filename = e->GetString();
+        if(filename)
+          OnFileOpen((*filename).GetCStr());
+        else
+          OnFileOpen();
+        UpdateFrameTitle();
+      }
       break; 
+      case IMPORT_FILE:
+      {
+        mafString *filename = e->GetString();
+        if(filename)
+        {
+          ImportExternalFile(*filename);
+        }
+      }
+      break;
       case wxID_FILE1:
       case wxID_FILE2:
       case wxID_FILE3:
@@ -1181,4 +1193,32 @@ void mafLogicWithManagers::UpdateMeasureUnit()
 {
   for(mafView* v = m_ViewManager->GetList(); v; v=v->m_Next) 
     v->OptionsUpdate();
+}
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::ImportExternalFile(mafString &filename)
+//----------------------------------------------------------------------------
+{
+  wxString path, name, ext;
+  wxSplitPath(filename.GetCStr(),&path,&name,&ext);
+  ext.MakeLower();
+  if (ext == "vtk")
+  {
+    mmoVTKImporter *vtkImporter = new mmoVTKImporter("importer");
+    vtkImporter->SetListener(m_OpManager);
+    vtkImporter->SetFileName(filename.GetCStr());
+    vtkImporter->ImportVTK();
+    vtkImporter->GetOutput()->ReparentTo(m_VMEManager->GetRoot());
+    cppDEL(vtkImporter);
+  }
+  else if (ext == "stl")
+  {
+    mmoSTLImporter *stlImporter = new mmoSTLImporter("importer");
+    stlImporter->SetListener(m_OpManager);
+    stlImporter->SetFileName(filename.GetCStr());
+    stlImporter->ImportSTL();
+    stlImporter->GetOutput()->ReparentTo(m_VMEManager->GetRoot());
+    cppDEL(stlImporter);
+  }
+  else
+    wxMessageBox(_("Can not import this type of file!"), _("Warning"));
 }

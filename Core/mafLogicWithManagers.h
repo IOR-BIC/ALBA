@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2006-06-26 15:33:47 $
+  Version:   $Revision: 1.25 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -155,6 +155,10 @@ protected:
   virtual void OnFileSaveAs();
   /** Called on Quit event. */
   virtual void OnQuit();
+
+  /** Called when a user drag a non msf or zmsf file over the application.
+  Example: dragging a VTK file over the application cause the application to inport it through the importer.*/
+  virtual void ImportExternalFile(mafString &filename);
 
   /** Respond to a VME_SELECT evt. Instantiate the 'Select' operation. */
 	virtual void VmeSelect(mafEvent& e);
