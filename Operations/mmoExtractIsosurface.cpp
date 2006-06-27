@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoExtractIsosurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-24 14:46:32 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-06-27 10:10:41 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -171,6 +171,8 @@ enum EXTRACT_ISOSURFACE_ID
 void mmoExtractIsosurface::CreateOpDialog()
 //----------------------------------------------------------------------------
 {
+  wxBusyCursor wait;
+
   vtkDataSet *dataset = ((mafVME *)m_Input)->GetOutput()->GetVTKData();
   double sr[2];
 	dataset->GetScalarRange(sr);
