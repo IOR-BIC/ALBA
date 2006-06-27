@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-26 15:33:47 $
-  Version:   $Revision: 1.63 $
+  Date:      $Date: 2006-06-27 15:14:29 $
+  Version:   $Revision: 1.64 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -118,7 +118,7 @@ void mafLogicWithManagers::Configure()
 {
   mafLogicWithGUI::Configure(); // create the GUI - and calls CreateMenu
 
-  if(m_SideSash)
+  if(m_SideSash && this->m_PlugSidebar)
   {
     m_SideBar = new mafSideBar(m_Win,MENU_VIEW_SIDEBAR,this);
     m_Win->AddDockPane(m_SideBar->m_Notebook , wxPaneInfo()
