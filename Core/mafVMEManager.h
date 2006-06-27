@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-16 12:07:00 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-06-27 16:48:19 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -14,15 +14,17 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include  "mafObserver.h"
-#include  "mafNode.h"
-#include  "mafNodeRoot.h"
-#include  "mafVMERoot.h"
-#include  "mmgFileHistory.h"
+#include "mafObserver.h"
+#include "mafNode.h"
+#include "mafNodeRoot.h"
+#include "mafVMERoot.h"
+#include "mmgFileHistory.h"
+
 //----------------------------------------------------------------------------
 // Forward References :
 //----------------------------------------------------------------------------
 class mafVMEStorage;
+
 //----------------------------------------------------------------------------
 // mafVMEManager :
 //----------------------------------------------------------------------------
@@ -110,6 +112,9 @@ public:
   void UpdateFromTag(mafNode *n = NULL);
 
 protected:
+  /** Create a compressed msf file.*/
+  bool MakeZip(const wxString& zipname, wxArrayString *files);
+
   bool              m_Modified;     ///< Used to known when the tree has been modified...
 
   mafObserver*      m_Listener;
@@ -118,7 +123,6 @@ protected:
 
   bool              m_MakeBakFile;
   wxString          m_MSFDir;
-  mafString         m_Wildcard;
   mafString         m_AppStamp;     ///< the application stamp for our application
   wxString          m_MSFFile;
   wxString          m_ZipFile;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2006-06-27 16:48:19 $
+  Version:   $Revision: 1.26 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,10 +21,12 @@
 
 
 #include <wx/busyinfo.h>
-#include <wx/fs_zip.h>
+#include <wx/zipstrm.h>
 #include <wx/zstream.h>
 #include <wx/ffile.h>
 #include <wx/wfstream.h>
+#include <wx/fs_zip.h>
+#include <wx/dir.h>
 
 #include "mafDecl.h"
 #include "mafVMEManager.h"
@@ -54,7 +56,6 @@ mafVMEManager::mafVMEManager()
 	m_ZipFile   = "";
   m_TmpDir   = "";
 	m_MergeFile = "";
-	m_Wildcard  = "Multimod Storage Format file |*.msf;*.zmsf";
 
   m_Config = wxConfigBase::Get();
 }
@@ -344,7 +345,7 @@ const char *mafVMEManager::ZIPOpen(wxString filename)
       out_file_stream.open(out_file, std::ios_base::out);
     }
     else
-      out_file_stream.open(out_file, std::ios_base::binary);
+    out_file_stream.open(out_file, std::ios_base::binary);
     s_size = zip_is->GetSize();
     buf = new char[s_size];
     zip_is->Read(buf,s_size);
@@ -371,7 +372,6 @@ const char *mafVMEManager::ZIPOpen(wxString filename)
 void mafVMEManager::ZIPSave(wxString filename)
 //----------------------------------------------------------------------------
 {
-/* Not working with 2.4.2 (wxZipOutputStream is available only on wxWidgets 2.6.2)
   if (filename != "")
   {
     m_ZipFile = filename;
@@ -381,23 +381,53 @@ void mafVMEManager::ZIPSave(wxString filename)
     return;
   }
 
-  wxString path, name, ext, complete_name, zfile, input_file;
-  wxSplitPath(m_ZipFile,&path,&name,&ext);
-  complete_name = name + "." + ext + "#zip";
+  wxArrayString files;
+  wxDir::GetAllFiles(m_TmpDir,&files);
 
-  wxFileOutputStream fileOutStream(m_ZipFile);
-  wxZlibOutputStream zipostr(fileOutStream);
+  if (!MakeZip(m_ZipFile,&files))
+  {
+    wxMessageBox(_("Filed to create compressed archive!"),_("Error"));
+  }
+}
+//----------------------------------------------------------------------------
+bool mafVMEManager::MakeZip(const wxString& zipname, wxArrayString *files)
+//----------------------------------------------------------------------------
+{
+  wxString name, path, short_name, ext;
+  wxFileOutputStream out(zipname);
+  wxZipOutputStream zip(out);
 
-  char *buf;
-  int s_size;
-  wxFileInputStream infile(m_MSFFile);
-  s_size = infile.StreamSize();
-  buf = new char[s_size];
-  infile.Read(buf,s_size);
-  zipostr.Write(buf,s_size);
-  zipostr.GetFilterOutputStream()->Sync();
-  delete[] buf;
-*/
+  if (!out || !zip)
+    return false;
+
+  for (size_t i = 0; i < files->GetCount(); i++) 
+  {
+    name = files->Item(i);
+    wxSplitPath(name.c_str(), &path, &short_name, &ext);
+    short_name += ".";
+    short_name += ext;
+    //mafLogMessage(_T("adding %s"), short_name.c_str());
+
+    if (wxDirExists(name)) 
+    {
+      if (!zip.PutNextDirEntry(name))
+        return false;
+    }
+    else 
+    {
+      wxFFileInputStream in(name);
+
+      if (in.Ok()) 
+      {
+        wxDateTime dt(wxFileModificationTime(name));
+
+        if (!zip.PutNextEntry(short_name, dt, in.GetLength()) || !zip.Write(in) || !in.Eof())
+          return false;
+      }
+    }
+  }
+
+  return zip.Close() && out.Close();
 }
 //----------------------------------------------------------------------------
 void mafVMEManager::MSFSave()
@@ -405,8 +435,8 @@ void mafVMEManager::MSFSave()
 {
   if(m_MSFFile == "") 
   {
-    mafString save_wildcard  = "Multimod Storage Format file |*.msf";
-    mafString file = mafGetSaveFile(m_MSFDir, save_wildcard.GetCStr()).c_str();
+    wxString wildc    = _("MAF Storage Format file (*.msf)|*.msf|Compressed file (*.zmsf)|*.zmsf");
+    mafString file = mafGetSaveFile(m_MSFDir, wildc.c_str()).c_str();
     if(file == "") return;
    
     wxString path, name, ext, file_dir;
@@ -419,7 +449,8 @@ void mafVMEManager::MSFSave()
 				wxMkdir(file_dir);
       if (ext == "zmsf")
       {
-        m_TmpDir = path;
+        m_ZipFile = file.GetCStr();
+        m_TmpDir = path + "/" + name;
         ext = "msf";
       }
 			file = file_dir + "/" + name + "." + ext;
@@ -443,16 +474,12 @@ void mafVMEManager::MSFSave()
   }
   if (m_TmpDir != "")
   {
-    wxString path, name, ext, file_dir;
-    wxSplitPath(m_MSFFile,&path,&name,&ext);
-    ext = "zmsf";
-    m_ZipFile = m_TmpDir + "/" + name + "." + ext;
     ZIPSave();
     m_FileHistory.AddFileToHistory(m_ZipFile);
   }
   else
   {
-    m_FileHistory.AddFileToHistory(m_MSFFile );
+    m_FileHistory.AddFileToHistory(m_MSFFile);
   }
 	m_FileHistory.Save(*m_Config);
   m_Modified = false;
