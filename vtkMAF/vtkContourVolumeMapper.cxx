@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkContourVolumeMapper.cxx,v $
   Language:  C++
-  Date:      $Date: 2006-06-21 15:55:12 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-06-28 10:19:52 $
+  Version:   $Revision: 1.6 $
 
 
 Copyright (c) 1993-2001 Ken Martin, Will Schroeder, Bill Lorensen 
@@ -69,7 +69,7 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
 
 using namespace vtkContourVolumeMapperNamespace;
 
-vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.5 $");
+vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.6 $");
 vtkStandardNewMacro(vtkContourVolumeMapper);
 
 
@@ -110,6 +110,9 @@ void vtkContourVolumeMapper::PrintSelf(ostream& os, vtkIndent indent) {
 //------------------------------------------------------------------------------
 void vtkContourVolumeMapper::SetInput(vtkDataSet *input) {
   this->ReleaseData();
+	double b[2];
+	input->GetScalarRange(b);
+	m_MAXScalar=b[1];
   this->vtkProcessObject::SetNthInput(0, input);
   }
 
@@ -917,7 +920,8 @@ template<typename DataType> void vtkContourVolumeMapper::CreateMCubes(int level,
   const int plDims[2]    = {this->DataDimensions[0] + 1, this->DataDimensions[1] + 1};
   const int plOffsets[3] = {3, 3 * plDims[0], 3 * plDims[0] * plDims[1]};
   vtkIdType * const pointLocator = new vtkIdType[2 * plOffsets[2]];
-  memset(pointLocator, 0, 2 * sizeof(vtkIdType) * plOffsets[2]);
+	//Modified by Matteo 27/06/06
+  memset(pointLocator, -1, 2 * sizeof(vtkIdType) * plOffsets[2]);
 
   ListOfPolyline2D polylines[2];
   
@@ -945,7 +949,8 @@ template<typename DataType> void vtkContourVolumeMapper::CreateMCubes(int level,
     // reset locator: copy the last slice to the top and reset all other slices
     if (z != 0) {
       memcpy(pointLocator, pointLocator + plOffsets[2], sizeof(vtkIdType) * plOffsets[2]);
-      memset(pointLocator + plOffsets[2], 0, sizeof(vtkIdType) * plOffsets[2]);
+			//Modified by Matteo 27/06/06
+      memset(pointLocator + plOffsets[2], -1, sizeof(vtkIdType) * plOffsets[2]);
       }
     
     for (int byi = 0; byi < this->NumBlocks[1]; byi++) {
@@ -982,14 +987,31 @@ template<typename DataType> void vtkContourVolumeMapper::CreateMCubes(int level,
             // find the case
             const DataType voxelVals[8] = {voxelPtr[0], voxelPtr[VoxelOffsets[1]], voxelPtr[VoxelOffsets[2]], voxelPtr[VoxelOffsets[3]],
               voxelPtr[VoxelOffsets[4]], voxelPtr[VoxelOffsets[5]], voxelPtr[VoxelOffsets[6]], voxelPtr[VoxelOffsets[7]]};
-            int caseIndex = voxelVals[0] > ContourValue; 
-            caseIndex |= (voxelVals[1] > ContourValue) << 1;
-            caseIndex |= (voxelVals[2] > ContourValue) << 2;
-            caseIndex |= (voxelVals[3] > ContourValue) << 3;
-            caseIndex |= (voxelVals[4] > ContourValue) << 4;
-            caseIndex |= (voxelVals[5] > ContourValue) << 5;
-            caseIndex |= (voxelVals[6] > ContourValue) << 6;
-            caseIndex |= (voxelVals[7] > ContourValue) << 7;
+            //Check if the scalar value is greter or equal then the threshold
+						int caseIndex;
+						//Modified by Matteo 27/06/06
+						if(m_MAXScalar==ContourValue)
+						{
+							caseIndex = voxelVals[0] != ContourValue; 
+							caseIndex |= (voxelVals[1] != ContourValue) << 1;
+							caseIndex |= (voxelVals[2] != ContourValue) << 2;
+							caseIndex |= (voxelVals[3] != ContourValue) << 3;
+							caseIndex |= (voxelVals[4] != ContourValue) << 4;
+							caseIndex |= (voxelVals[5] != ContourValue) << 5;
+							caseIndex |= (voxelVals[6] != ContourValue) << 6;
+							caseIndex |= (voxelVals[7] != ContourValue) << 7;
+						}//End
+						else
+						{
+							caseIndex = voxelVals[0] > ContourValue; 
+							caseIndex |= (voxelVals[1] > ContourValue) << 1;
+							caseIndex |= (voxelVals[2] > ContourValue) << 2;
+							caseIndex |= (voxelVals[3] > ContourValue) << 3;
+							caseIndex |= (voxelVals[4] > ContourValue) << 4;
+							caseIndex |= (voxelVals[5] > ContourValue) << 5;
+							caseIndex |= (voxelVals[6] > ContourValue) << 6;
+							caseIndex |= (voxelVals[7] > ContourValue) << 7;
+						}
             const EDGE_LIST *edge = marchingCubesCases[caseIndex].edges;
             if (*edge < 0)
               continue;
@@ -1007,7 +1029,7 @@ template<typename DataType> void vtkContourVolumeMapper::CreateMCubes(int level,
                 
                 // was this edge created?
                 vtkIdType (&pointLocatorRef) = pointLocator[plOffsets[0] * (x + vertIndeces[0][0]) + plOffsets[1] * (y + vertIndeces[0][1]) + plOffsets[2] * vertIndeces[0][2] + edgeAxis[*edge]];
-                if (pointLocatorRef != 0) {
+                if (pointLocatorRef != -1) {
                   pointIds[ii] = pointLocatorRef;
                   continue;
                   }
@@ -1017,7 +1039,7 @@ template<typename DataType> void vtkContourVolumeMapper::CreateMCubes(int level,
                 point[edgeAxis[*edge]] += edgeRatio * fxyzSize[edgeAxis[*edge]];
                 // add new point
                 pointIds[ii] = points->InsertNextPoint(point);
-                
+
                 // estimate gradient
                 int gradient[2][3];
                 for (int vi = 0; vi < 2; vi++) {//!!!
@@ -1047,8 +1069,8 @@ template<typename DataType> void vtkContourVolumeMapper::CreateMCubes(int level,
                 normals->InsertNextTuple(normal);
                 pointLocatorRef = pointIds[ii];
                 }
-              // add triangle
-              triangles->InsertNextCell(3, pointIds);
+								// add triangle
+								triangles->InsertNextCell(3, pointIds);
               } //for each triangle
             
             }

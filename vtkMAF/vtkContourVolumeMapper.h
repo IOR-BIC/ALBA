@@ -133,6 +133,8 @@ class VTK_vtkMAF_EXPORT vtkContourVolumeMapper : public vtkVolumeMapper {
 		To set the value of trasparecy*/
 		void SetAlpha(double alpha){m_Alpha=alpha;};
 
+		void SetMaxScalar(double scalar){m_MAXScalar=scalar;};
+
   protected:
     vtkContourVolumeMapper();
     ~vtkContourVolumeMapper();
@@ -177,6 +179,8 @@ class VTK_vtkMAF_EXPORT vtkContourVolumeMapper : public vtkVolumeMapper {
 		
 		//to set the alpha parameter
 		double				 m_Alpha;
+
+		double				 m_MAXScalar;
 
     // volume info
     double         DataOrigin[3];
