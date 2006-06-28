@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2006-05-16 09:25:29 $
-  Version:   $Revision: 1.44 $
+  Date:      $Date: 2006-06-28 16:32:59 $
+  Version:   $Revision: 1.45 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,14 +33,6 @@ class vtkRenderer;
 class mafAttachCamera;
 class mafTextKit;
 class mafAnimate;
-
-/** VME visibility attribute when plugging visual pipe.*/
-enum VME_VISIBILITY_ID
-{
-  NON_VISIBLE = 0,
-  VISIBLE,
-  MUTEX,
-};
 
 //----------------------------------------------------------------------------
 // mafViewVTK :
