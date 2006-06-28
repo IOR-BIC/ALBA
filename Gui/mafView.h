@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2006-05-16 09:24:35 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-06-28 16:32:40 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -48,6 +48,14 @@ enum NODE_STATUS_ID
   NODE_MUTEX_OFF,
   NODE_MUTEX_ON,
 };
+/** VME visibility attribute when plugging visual pipe.*/
+enum VME_VISIBILITY_ID
+{
+  NON_VISIBLE = 0,
+  VISIBLE,
+  MUTEX,
+};
+
 //----------------------------------------------------------------------------
 // mafView :
 //----------------------------------------------------------------------------
