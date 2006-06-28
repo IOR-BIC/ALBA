@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-23 08:09:32 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-06-28 16:35:01 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -56,6 +56,19 @@ vnl_matrix<double> &mafVMEOutputScalar::GetScalarData()
   assert(m_VME);
   return ((mafScalarInterpolator *)m_VME->GetDataPipe())->GetScalarData();
 }
+
+#ifdef MAF_USE_VTK
+//-------------------------------------------------------------------------
+vtkDataSet *mafVMEOutputScalar::GetVTKData()
+//-------------------------------------------------------------------------
+{
+  assert(m_VME);
+
+  //build a vtk data with the selected scalar data.
+  return NULL;
+}
+#endif
+
 //-------------------------------------------------------------------------
 mmgGui* mafVMEOutputScalar::CreateGui()
 //-------------------------------------------------------------------------
