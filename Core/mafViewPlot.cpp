@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewPlot.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-28 16:33:19 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-06-28 17:08:35 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,7 +27,6 @@
 #include "mmdMouse.h"
 
 #include "mafVME.h"
-#include "mafVMEScalar.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewPlot);
@@ -94,7 +93,7 @@ void mafViewPlot::VmeUpdateProperty(mafNode *vme, bool fromTag)	        {assert(
 int  mafViewPlot::GetNodeStatus(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-  int status = vme->IsMAFType(mafVMEScalar) ? NODE_VISIBLE_ON : NODE_NON_VISIBLE;
+  int status = m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;
   if (!m_PipeMap.empty())
   {
     mafString vme_type = vme->GetTypeName();
