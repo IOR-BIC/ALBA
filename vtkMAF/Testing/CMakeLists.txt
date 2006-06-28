@@ -15,5 +15,5 @@ ENDIF (CPPUNIT_FOUND)
 # ADD_EXECUTABLE(testVTKVolumeSlicer testVTKVolumeSlicer.cxx)
 # ADD_TEST(testVTKVolumeSlicer ${EXECUTABLE_OUTPUT_PATH}/testVTKVolumeSlicer)
 
-ADD_EXECUTABLE(vtkContourVolumeMapperTest vtkContourVolumeMapperTest.cpp)
-ADD_TEST(testVTKVolumeSlicer ${EXECUTABLE_OUTPUT_PATH}/vtkContourVolumeMapperTest)
+ADD_EXECUTABLE(vtkContourVolumeMapperTest vtkContourVolumeMapperTest.h vtkContourVolumeMapperTest.cpp)
+ADD_TEST(vtkContourVolumeMapperTest ${EXECUTABLE_OUTPUT_PATH}/vtkContourVolumeMapperTest)
