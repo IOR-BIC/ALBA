@@ -185,7 +185,7 @@ IF(VTK_FOUND)
   ENDIF(VTK_WRAP_JAVA)
   
   # build testing if necessary
-  OPTION(BUILD_TESTING "Build the testing tree." OFF)
+  OPTION(BUILD_TESTING "Build the testing tree." ON)
   IF (BUILD_TESTING)
     IF (NOT MAKECOMMAND)
       INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
