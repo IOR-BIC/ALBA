@@ -1,4 +1,13 @@
 LINK_LIBRARIES(vtkMAF vtkGraphics vtkRendering)
+
+INCLUDE(${MAF_SOURCE_DIR}/Libraries/modules/FindCppUnit.cmake)
+IF (CPPUNIT_FOUND)
+  #MESSAGE("Found Cppunit library")
+  INCLUDE_DIRECTORIES(${CPPUNIT_INCLUDE_DIR})
+  LINK_LIBRARIES(${CPPUNIT_LIBRARIES})
+
+ENDIF (CPPUNIT_FOUND)
+
 #ADD_EXECUTABLE(vtkMAFTest vtkMAFTest.cxx)
 #ADD_EXECUTABLE(testDicom testDicom.cxx)
 #ADD_TEST(testDicom ${EXECUTABLE_OUTPUT_PATH}/testDicom)
