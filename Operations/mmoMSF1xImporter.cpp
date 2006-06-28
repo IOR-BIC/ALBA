@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMSF1xImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-25 12:02:51 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-06-28 10:22:47 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -56,15 +56,17 @@ mafOp* mmoMSF1xImporter::Copy()
 void mmoMSF1xImporter::OpRun()   
 //----------------------------------------------------------------------------
 {
-	m_File = "";
-
 	mafString wildc = "MSF file (*.msf)|*.msf";
-  mafString f = mafGetOpenFile(m_FileDir, wildc.GetCStr(), "Choose MSF file").c_str();
+	mafString f;
+  if(m_File.IsEmpty())
+	{
+		f = mafGetOpenFile(m_FileDir, wildc.GetCStr(), "Choose MSF file").c_str();
+		m_File = f;
+	}
 
   int result = OP_RUN_CANCEL;
-  if(!f.IsEmpty())
+  if(!m_File.IsEmpty())
 	{
-	  m_File = f;
     wxSetWorkingDirectory(wxString(m_File.GetCStr()));
     ImportMSF();
 	  result = OP_RUN_OK;
@@ -76,7 +78,7 @@ void mmoMSF1xImporter::ImportMSF()
 //----------------------------------------------------------------------------
 {
   bool success = false;
-	wxBusyInfo wait("Loading file: ...");
+//	wxBusyInfo wait("Loading file: ...");
   
   m_Importer = new mafMSFImporter;
   m_Importer->SetURL(m_File);
