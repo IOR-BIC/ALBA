@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-21 15:24:04 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-06-28 16:34:18 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -58,11 +58,12 @@ mafPipeScalar::mafPipeScalar()
 //----------------------------------------------------------------------------
 {
   m_LineSource    = NULL;
-  m_WrapScalar    = NULL;
+  m_WarpScalar    = NULL;
   m_Mapper        = NULL;
   m_Actor         = NULL;
   m_ActiveScalar  = 0;
   m_Order         = 1;
+  m_ScalarFactor = .001;
 }
 //----------------------------------------------------------------------------
 void mafPipeScalar::Create(mafSceneNode *n)
@@ -101,8 +102,8 @@ void mafPipeScalar::Create(mafSceneNode *n)
   double sr[2];
   vtkNEW(m_LineSource);
   m_LineSource->SetPoint1(0,0,0);
-  m_LineSource->SetPoint2(num_on_scalars,0,0);
-  m_LineSource->SetResolution(num_on_scalars);
+  m_LineSource->SetPoint2(num_on_scalars-1,0,0);
+  m_LineSource->SetResolution(num_on_scalars-1);
   m_LineSource->Update();
   m_LineSource->GetOutput()->GetPointData()->SetScalars(scalar_array);
   m_LineSource->GetOutput()->GetScalarRange(sr);
@@ -111,16 +112,18 @@ void mafPipeScalar::Create(mafSceneNode *n)
   lt->SetTableRange(sr);
   lt->Build();
 
-  vtkNEW(m_WrapScalar);
-  m_WrapScalar->SetInput((vtkPointSet *) m_LineSource->GetOutput());
-  m_WrapScalar->SetNormal(0 , 0 , 1);
-  m_WrapScalar->SetScaleFactor(1);
-  m_WrapScalar->SetUseNormal(0);
-  m_WrapScalar->SetXYPlane(0);
-  m_WrapScalar->Update();
+  vtkNEW(m_WarpScalar);
+  m_WarpScalar->SetInput((vtkPointSet *) m_LineSource->GetOutput());
+  m_WarpScalar->SetNormal(0 , 1 , 0);
+  m_WarpScalar->SetScaleFactor(m_ScalarFactor);
+  m_WarpScalar->SetUseNormal(1);
+  m_WarpScalar->SetXYPlane(0);
+  m_WarpScalar->Update();
+
+  int nop = ((vtkPolyData *)m_WarpScalar->GetOutput())->GetNumberOfPoints();
 
   vtkNEW(m_Mapper);
-  m_Mapper->SetInput((vtkPolyData *)m_WrapScalar->GetOutput());
+  m_Mapper->SetInput((vtkPolyData *)m_WarpScalar->GetOutput());
   //m_Mapper->SetInput(m_LineSource->GetOutput());
   m_Mapper->SetScalarRange(sr);
   m_Mapper->ScalarVisibilityOn();
@@ -142,7 +145,7 @@ mafPipeScalar::~mafPipeScalar()
   m_AssemblyFront->RemovePart(m_Actor);
 
   vtkDEL(m_LineSource);
-  vtkDEL(m_WrapScalar);
+  vtkDEL(m_WarpScalar);
   vtkDEL(m_Mapper);
   vtkDEL(m_Actor);
 }
@@ -158,6 +161,7 @@ mmgGui *mafPipeScalar::CreateGui()
 {
   m_Gui = new mmgGui(this);
   m_Gui->Integer(ID_ACTIVE_SCALAR,"active scalar",&m_ActiveScalar,0,10);
+  m_Gui->Double(ID_SCALAR_FACTOR,"factor",&m_ScalarFactor,.0000001,MAXDOUBLE,-1);
   return m_Gui;
 }
 //----------------------------------------------------------------------------
@@ -170,6 +174,10 @@ void mafPipeScalar::OnEvent(mafEventBase *maf_event)
     {
       case ID_ACTIVE_SCALAR:
         UpdateProperty();
+      break;
+      case ID_SCALAR_FACTOR:
+        m_WarpScalar->SetScaleFactor(m_ScalarFactor);
+        m_WarpScalar->Update();
       break;
     }
     mafEventMacro(mafEvent(this,CAMERA_UPDATE));
@@ -217,7 +225,7 @@ void mafPipeScalar::UpdateProperty(bool fromTag)
     lt->Build();
   }
   
-  m_WrapScalar->Update();
+  m_WarpScalar->Update();
   m_Mapper->SetScalarRange(sr);
 
   cppDEL(active_scalar);
