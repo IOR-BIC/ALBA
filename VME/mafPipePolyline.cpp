@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolyline.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-21 17:25:52 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-07-05 11:13:19 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,6 +54,7 @@ mafPipePolyline::mafPipePolyline()
 {
   m_Representation  = 0; // line by default
   m_TubeRadius      = 1.0;
+  m_SphereRadius      = 1.0;
   m_Capping         = 0;
 
   m_Sphere          = NULL;
@@ -375,4 +376,17 @@ void mafPipePolyline::SetRepresentation(int representation)
     m_Gui->Enable(ID_SPHERE_RESOLUTION, m_Representation == GLYPH);
   }
   UpdateProperty();
+}
+//----------------------------------------------------------------------------
+void mafPipePolyline::SetRadius(double radius)
+//----------------------------------------------------------------------------
+{
+  m_TubeRadius = radius; 
+  m_SphereRadius = radius;
+
+  m_Sphere->SetRadius(m_SphereRadius);
+  mafTagItem *item = m_Vme->GetTagArray()->GetTag("SPHERE_RADIUS");
+  item->SetValue(m_SphereRadius);
+
+  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }

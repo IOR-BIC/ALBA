@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolyline.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-21 17:25:52 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-07-05 11:13:19 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -55,6 +55,9 @@ public:
   /** Set the polyline representation as sphere glyphed polyline.*/
   void SetRepresentationToGlyph() {SetRepresentation(GLYPH);};
 
+  /** Set The Radius */
+  void SetRadius(double radius);
+
   /** IDs for the GUI */
   enum PIPE_POLYLINE_WIDGET_ID
   {
@@ -88,8 +91,8 @@ protected:
   int m_Representation;
   int m_Capping;
   double m_TubeRadius;
-  double m_TubeResolution;
   double m_SphereRadius;
+  double m_TubeResolution;
   double m_SphereResolution;
 
   /** Initialize representation, capping, radius and resolution variables.*/
