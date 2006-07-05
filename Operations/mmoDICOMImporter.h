@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-04-05 08:01:02 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-07-05 10:15:50 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -48,6 +48,7 @@ enum DICOM_IMPORTER_MODALITY
 	GIZMO_DONE
 };
 
+//WX_DECLARE_LIST(mmoCineMRIImporterListElement, ListDicomCineMRIFiles);
 WX_DECLARE_LIST(mmoDICOMImporterListElement, ListDicomFiles);
 //----------------------------------------------------------------------------
 // mmoDICOMImporter :
@@ -89,6 +90,9 @@ protected:
 	/** Build the volume starting from the list of dicom files. */
 	void BuildVolume();
 
+	/** Build the volume starting from the list of CineMRI files. */
+	void BuildVolumeCineMRI();
+
 	/** Reset the list of files and all the structures that own images information. */
 	void ResetStructure();
 
@@ -100,6 +104,9 @@ protected:
 
 	/** Import dicom tags into vme tags. */
 	void ImportDicomTags();
+
+	/** Return the slice number from the heightId and sliceId*/
+  int GetImageId(int heightId, int timeId);
 
   mmiDICOMImporterInteractor *m_DicomInteractor;
 
@@ -118,18 +125,23 @@ protected:
 
   // gui related variables
 	mafString									m_DictionaryFilename;
-	mafString									m_CTDir;
+	mafString									m_DICOMDir;
 	mafString									m_current_slice_name;
+	int												m_DICOM;
 
 	// slices related informations
 	wxListBox								 *m_StudyListbox;
 	wxString									m_StudySelected;
 	ListDicomFiles					 *m_ListSelected;
 	ListDicomFiles					 *m_FilesList;
+	//ListDicomCineMRIFiles		 *m_FilesListCineMRI;
 	int												m_NumberOfStudy;
 	int												m_NumberOfSlices;
 	int												m_CurrentSlice;
+	int												m_CurrentTime;
 	int												m_SortAxes;
+	int												m_NumberOfTimeFrames;
+
 	// crop mode variables
 	bool											m_CropFlag;
   bool										  m_CropMode;
@@ -149,13 +161,18 @@ protected:
 	mafString 							  m_PatientName;
 	mafString                 m_SurgeonName;
 	double									  m_Identifier;
+	int												m_DICOMType;
 
   wxTextCtrl   *m_SliceText;
 	wxSlider		 *m_SliceScanner;
 	wxStaticText *m_SliceLabel;
+
+	wxTextCtrl   *m_TimeText;
+	wxSlider		 *m_TimeScanner;
+	wxStaticText *m_TimeLabel;
 };
 
-class mmoDICOMImporterListElement
+/*class mmoDICOMImporterListElement
 {
 public:
 	mmoDICOMImporterListElement() {m_SliceFilename = ""; m_SlicePosition[0] = 0.0;m_SlicePosition[1] = 0.0;m_SlicePosition[2] = 0.0;};
@@ -163,16 +180,82 @@ public:
 	~mmoDICOMImporterListElement() {m_SliceFilename = ""; m_SlicePosition[0] = 0.0;m_SlicePosition[1] = 0.0;m_SlicePosition[2] = 0.0;};
 
 	/** Add the filename and the image coordinates to the list. */
-	void SetListElement(const char *filename, double coord[3]) {m_SliceFilename = filename; m_SlicePosition[0] = coord[0];m_SlicePosition[1] = coord[1];m_SlicePosition[2] = coord[2];};
+	//void SetListElement(const char *filename, double coord[3]) {m_SliceFilename = filename; m_SlicePosition[0] = coord[0];m_SlicePosition[1] = coord[1];m_SlicePosition[2] = coord[2];};
 	
 	/** Return the filename of the corresponding dicom slice. */
-	const char*GetFileName() {return m_SliceFilename.GetCStr();};
+	//const char*GetFileName() {return m_SliceFilename.GetCStr();};
 	
 	/**	Return the Coordinate along a specified axes of the dicom slice	*/
-	double GetCoordinate(int i) {return m_SlicePosition[i];};
+	//double GetCoordinate(int i) {return m_SlicePosition[i];};
 
-protected:
+/*protected:
 	float m_SlicePosition[3];
 	mafString m_SliceFilename;
+};*/
+
+class mmoDICOMImporterListElement
+{
+public:
+	mmoDICOMImporterListElement() 
+  {
+    m_SliceFilename = "";
+    m_Pos[0] = -9999;
+    m_Pos[1] = -9999;
+    m_Pos[2] = -9999;
+    m_ImageNumber = -1;
+    m_TriggerTime = -1.0;
+    m_CardiacNumberOfImages = -1;
+  };
+
+	mmoDICOMImporterListElement(mafString filename,double coord[3], int imageNumber=-1, int cardNumImages=-1, double trigTime=-1.0)  
+  {
+    m_SliceFilename = filename;
+    m_Pos[0] = coord[0];
+    m_Pos[1] = coord[1];
+    m_Pos[2] = coord[2];
+    m_ImageNumber = imageNumber;
+    m_CardiacNumberOfImages = cardNumImages;
+    m_TriggerTime = trigTime;
+  };
+
+  ~mmoDICOMImporterListElement() {};
+
+	/** Add the filename and the image coordinates to the list. */
+	void SetListElement(mafString filename,double coord[3], int imageNumber=-1, int cardNumImages=-1, double trigTime=-1.0) 
+  {
+    m_SliceFilename = filename; 
+    m_Pos[0] = coord[0];
+    m_Pos[1] = coord[1];
+    m_Pos[2] = coord[2];
+    m_ImageNumber = imageNumber;
+    m_CardiacNumberOfImages = cardNumImages;
+    m_TriggerTime = trigTime;
+  };
+	
+	/** Return the filename of the corresponding dicom slice. */
+	const char *GetFileName() const {return m_SliceFilename.GetCStr();};
+	
+	/**	Return the Coordinate along a specified axes of the dicom slice	*/
+	double	GetCoordinate(int i) const {return m_Pos[i];};
+
+  /** Return the image number of the dicom slice*/
+  int GetImageNumber() const {return m_ImageNumber;};
+
+  /** Return the image number of the dicom slice*/
+  int GetCardiacNumberOfImages() const {return m_CardiacNumberOfImages;};
+
+  /** Return the trigger time of the dicom slice*/
+  int GetTriggerTime() const {return m_TriggerTime;};
+
+  
+
+protected:
+	double m_Pos[3];
+	mafString m_SliceFilename;
+  
+  double m_TriggerTime;
+  int m_ImageNumber;
+  int m_CardiacNumberOfImages;
+
 };
 #endif

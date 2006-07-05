@@ -11,7 +11,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.4 $");
 vtkStandardNewMacro(vtkDicomUnPacker);
 
 //----------------------------------------------------------------------------
@@ -38,6 +38,9 @@ vtkDicomUnPacker::vtkDicomUnPacker()
 	strcpy(PatientSex," ");
 	strcpy(Modality,"  ");
 	//SetDictionaryFileName("dicom3.txt");
+	int InstanceNumber = -1;
+  int CardiacNumberOfImages = -1;
+  double TriggerTime = -1.0;
 	UnPackFromFileOn();
   DICT_line = 0;
 	Status = 0;
@@ -774,6 +777,15 @@ int vtkDicomUnPacker::ReadImageInformation(vtkPackedImage *packed)
     if ((RESULT[p].Group==24) & (RESULT[p].Element==34)) 
       strncpy(CTMode[0], (char *)&(VALUES[p].stringa[0]), 14);
 		
+		//Modified by Matteo 03/07/06
+		if ((RESULT[p].Group==24) & (RESULT[p].Element==4192)) 
+			TriggerTime = (double) VALUES[p].num[0];
+		if ((RESULT[p].Group==24) & (RESULT[p].Element==4240)) 
+			CardiacNumberOfImages = (double) VALUES[p].num[0];
+		if ((RESULT[p].Group==32) & (RESULT[p].Element==19)) 
+			InstanceNumber = (int) VALUES[p].num[0];
+		//End Matteo
+
     if ((RESULT[p].Group==32) & (RESULT[p].Element==13)) 
 			strncpy(StudyUID, (char *)&(VALUES[p].stringa[0]), 255);
 		if ((RESULT[p].Group==32) & (RESULT[p].Element==16)) 

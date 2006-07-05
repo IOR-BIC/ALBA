@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    vtkDicomUnPacker.h
   Language:  C++
-  Date:      $Date: 2006-01-13 15:46:32 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-07-05 10:16:17 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone m.petrone@cineca.it, Paolo Quadrani p.quadrani@cineca.it
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -158,6 +158,17 @@ public:
 	vtkSetMacro(FlipImage,int);
 	vtkGetMacro(FlipImage,int);
 
+	//modified by Matteo 30-6-2006 (begin)
+  /** Get the image number*/
+  vtkGetMacro(InstanceNumber, int);
+
+  /** Get the cardiac number of images ie the number of time stamps for a time varying dicom*/
+  vtkGetMacro(CardiacNumberOfImages, int);
+  
+  /** Get the time stamp of the dicom slice*/
+  vtkGetMacro(TriggerTime, double);
+  //modified by Stefano 30-6-2006 (end)
+
 	/**	return the status of the reader: 0 if ok, -1 if there is an error*/
 	int GetStatus() {return Status;};
 	
@@ -209,6 +220,16 @@ protected:
 	char Study[80];
 	char StudyDate[15];
   char ImageType[3][256];
+
+	//modified by Matteo 30-6-2006
+  // Image number
+  int InstanceNumber;
+
+  // Number of time stamp for the image
+  int CardiacNumberOfImages;
+
+  // Image time stamp
+  double TriggerTime;
 
 //	double SliceLocation;
 	

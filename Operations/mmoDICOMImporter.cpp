@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-26 16:39:30 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-07-05 10:15:57 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,6 +60,9 @@
 int compareX(const mmoDICOMImporterListElement **arg1,const mmoDICOMImporterListElement **arg2);
 int compareY(const mmoDICOMImporterListElement **arg1,const mmoDICOMImporterListElement **arg2);
 int compareZ(const mmoDICOMImporterListElement **arg1,const mmoDICOMImporterListElement **arg2);
+int compareTriggerTime(const mmoDICOMImporterListElement **arg1,const mmoDICOMImporterListElement **arg2);
+int compareImageNumber(const mmoDICOMImporterListElement **arg1,const mmoDICOMImporterListElement **arg2);
+
 WX_DEFINE_LIST(ListDicomFiles);
 //----------------------------------------------------------------------------
 mmoDICOMImporter::mmoDICOMImporter(wxString label) : mafOp(label)
@@ -69,12 +72,15 @@ mmoDICOMImporter::mmoDICOMImporter(wxString label) : mafOp(label)
 	m_Canundo	= true;
 
 	for (int i = 0; i < 6; i++) 
-    m_DicomBounds[i] = 0;
+		m_DicomBounds[i] = 0;
 	m_Volume	= NULL;
   m_Image	= NULL;
 	m_SortAxes				= 2;
 	m_NumberOfStudy		= 0;
 	m_NumberOfSlices	= 0;
+	m_NumberOfTimeFrames = 0;
+	m_DICOM = 0;
+	m_DICOMType = -1;
 
   m_DictionaryFilename	= "";
   wxString dictionary = mafGetApplicationDirectory().c_str();
@@ -83,9 +89,10 @@ mmoDICOMImporter::mmoDICOMImporter(wxString label) : mafOp(label)
 	if(wxFileExists(dictionary)) 
 		m_DictionaryFilename = dictionary;
 
-	m_CTDir	= mafGetApplicationDirectory().c_str();
-//  m_CTDir += "\\Data\\External\\";
+	m_DICOMDir	= mafGetApplicationDirectory().c_str();
+//  m_DICOMDir += "\\Data\\External\\";
 	m_CurrentSlice			  = 0;
+	m_CurrentTime				  = 0;
   m_BuildStepValue			= 0;
 	m_BuildStepChoices[0]	= "1x";
 	m_BuildStepChoices[1]	= "2x";
@@ -99,10 +106,15 @@ mmoDICOMImporter::mmoDICOMImporter(wxString label) : mafOp(label)
 	m_SliceScanner	= NULL;
 	m_SliceLabel		= NULL;
 
+	m_TimeText     = NULL;
+	m_TimeScanner	= NULL;
+	m_TimeLabel		= NULL;
+
 	m_CropMode = false;
 	m_CropFlag = false;
 
 	m_FilesList   = NULL;
+	//m_FilesListCineMRI = NULL;
 	m_DicomDialog	= NULL;
 	m_TagArray 		= NULL;
 
@@ -142,7 +154,8 @@ void mmoDICOMImporter::OpRun()
 void mmoDICOMImporter::OpStop(int result)
 //----------------------------------------------------------------------------
 {
-  m_Mouse->RemoveObserver(m_DicomInteractor);
+	if(m_DicomInteractor)
+		m_Mouse->RemoveObserver(m_DicomInteractor);
 
   //close dialog
 	for (int i=0; i < m_NumberOfStudy;i++)
@@ -257,6 +270,11 @@ enum DICOM_IMPORTER_ID
 	ID_PATIENT_NAME,
 	ID_PATIENT_ID,
 	ID_SURGEON_NAME,
+	ID_TYPE_DICOM,
+	ID_SCAN_TIME,
+	ID_CT,
+	ID_MRI,
+	ID_CMRI,
 };
 //----------------------------------------------------------------------------
 void mmoDICOMImporter::CreateGui()
@@ -272,9 +290,12 @@ void mmoDICOMImporter::CreateGui()
 	m_Gui = new mmgGui(this);
 	m_Gui->SetListener(this);
 
+	wxString TypeOfDICOM[2]={"CT","MRI"};
+	m_Gui->Label("Type of DICOM",true);
+	m_Gui->Combo(ID_TYPE_DICOM,"",&m_DICOM,2,TypeOfDICOM);
 	m_Gui->Label("data files:",true);
 	m_Gui->FileOpen (ID_DICTIONARY,	"dictionary",	&m_DictionaryFilename, wildcard);
-	m_Gui->DirOpen(ID_OPEN_DIR, "ct folder",	&m_CTDir);
+	m_Gui->DirOpen(ID_OPEN_DIR, "ct folder",	&m_DICOMDir);
 	m_Gui->Divider();
 	m_Gui->Label("patient info:",true);		
 	m_Gui->String(ID_PATIENT_NAME,"name ",&m_PatientName);
@@ -305,6 +326,7 @@ void mmoDICOMImporter::CreateGui()
 	m_Gui->Show(true);
   m_Gui->Update();
 
+	// slice scanner
 	wxPoint dp = wxDefaultPosition;
 	m_SliceLabel = new wxStaticText(m_DicomDialog, -1, " slice num. ",dp, wxSize(-1,16));
 	m_SliceText = new wxTextCtrl(m_DicomDialog, -1, "", dp, wxSize(30,16), wxNO_BORDER);
@@ -320,10 +342,27 @@ void mmoDICOMImporter::CreateGui()
 	slice_sizer->Add(m_SliceLabel, 0, wxALIGN_CENTER|wxRIGHT, 5);
 	slice_sizer->Add(m_SliceText, 0, wxALIGN_CENTER|wxRIGHT, 5);
 	slice_sizer->Add(m_SliceScanner, 1, wxALIGN_CENTER|wxEXPAND);
+	
+	// time scanner
+	m_TimeLabel = new wxStaticText(m_DicomDialog, -1, " time num. ",dp, wxSize(-1,16));
+	m_TimeText = new wxTextCtrl(m_DicomDialog, -1, "", dp, wxSize(30,16), wxNO_BORDER);
+	m_TimeScanner = new wxSlider(m_DicomDialog, -1, 0, 0, 100, dp, wxSize(200,22));
+	m_TimeLabel->Enable(false);
+	m_TimeText->Enable(false);
+	m_TimeScanner->Enable(false);
+
+	m_TimeScanner->SetValidator(mmgValidator(this,ID_SCAN_TIME,m_TimeScanner,&m_CurrentTime,m_TimeText));
+  m_TimeText->SetValidator(mmgValidator(this,ID_SCAN_TIME,m_TimeText,&m_CurrentTime,m_TimeScanner,0,100));
+
+	wxBoxSizer *time_sizer = new wxBoxSizer(wxHORIZONTAL);
+	time_sizer->Add(m_TimeLabel, 0, wxALIGN_CENTER|wxRIGHT, 5);
+	time_sizer->Add(m_TimeText, 0, wxALIGN_CENTER|wxRIGHT, 5);
+	time_sizer->Add(m_TimeScanner, 1, wxALIGN_CENTER|wxEXPAND);
 
   m_DicomDialog->GetGui()->AddGui(m_Gui);
 	m_DicomDialog->GetRWI()->SetSize(0,0,380,200);
   m_DicomDialog->m_RwiSizer->Add(slice_sizer, 0, wxEXPAND);
+	m_DicomDialog->m_RwiSizer->Add(time_sizer, 0, wxEXPAND);
   m_DicomDialog->GetRWI()->SetListener(this);
   m_DicomDialog->GetRWI()->SetSize(0,0,500,500);
   m_DicomDialog->GetRWI()->CameraSet(CAMERA_CT);
@@ -347,71 +386,176 @@ void mmoDICOMImporter::BuildDicomFileList(const char *dir)
 {
 	int row, i;
 	double slice_pos[3];
+	int imageNumber = -1;
+  int cardNumImages = -1;
+  double trigTime = -1.0;
+	m_DICOMType = -1;
+
 	if (m_CTDirectoryReader->Open(dir) == 0)
 	{
 		wxMessageBox(wxString::Format("Directory <%s> can not be opened",dir),"Warning!!");
 		return;
 	}
 	// get the dicom files from the directory
-	wxBusyInfo wait_info("Reading CT directory: please wait");
-	
-	for (i=0; i < m_CTDirectoryReader->GetNumberOfFiles(); i++)
+	if(m_DICOM==0)
+		wxBusyInfo wait_info("Reading CT directory: please wait");
+	if(m_DICOM==1)
+		wxBusyInfo wait_info("Reading MRI directory: please wait");
+	if(m_DICOM==0)//CT
 	{
-		if ((strcmp(m_CTDirectoryReader->GetFile(i),".") == 0) || (strcmp(m_CTDirectoryReader->GetFile(i),"..") == 0)) 
+		m_DICOMType=ID_CT;
+		for (i=0; i < m_CTDirectoryReader->GetNumberOfFiles(); i++)
 		{
-			continue;
-		}
-		else
-		{
-			m_current_slice_name = m_CTDirectoryReader->GetFile(i);
-			// Append of the path at the dicom file
-			wxString str_tmp, ct_mode;
-			str_tmp.Append(dir);
-			str_tmp.Append("\\");
-			str_tmp.Append(m_current_slice_name);
-			
-      vtkDicomUnPacker *reader = vtkDicomUnPacker::New();
-			reader->SetFileName((char *)str_tmp.c_str());
-      reader->UseDefaultDictionaryOff();
-			reader->SetDictionaryFileName(m_DictionaryFilename.GetCStr());
-			reader->UpdateInformation();
-
-			ct_mode = reader->GetCTMode();
-			ct_mode.MakeUpper();
-			ct_mode.Trim(FALSE);
-			ct_mode.Trim();
-
-			//if (strcmp(reader->GetCTMode(),"SCOUT MODE") == 0 || reader->GetStatus() == -1)
-			if(ct_mode.Find("SCOUT") != -1 || reader->GetStatus() == -1)
+			if ((strcmp(m_CTDirectoryReader->GetFile(i),".") == 0) || (strcmp(m_CTDirectoryReader->GetFile(i),"..") == 0)) 
 			{
-				reader->Delete();
 				continue;
 			}
-			
-			//row = m_StudyListbox->FindString(reader->GetStudy());
-      row = m_StudyListbox->FindString(reader->GetStudyUID());
-			if (row == -1)
+			else
 			{
-				// the study is not present into the listbox, so need to create new
-				// list of files related to the new studyID
-				m_FilesList = new ListDicomFiles;
-				//m_StudyListbox->Append(reader->GetStudy());
-        m_StudyListbox->Append(reader->GetStudyUID());
-				m_StudyListbox->SetClientData(m_NumberOfStudy,(void *)m_FilesList);
-				reader->GetSliceLocation(slice_pos);
-				//mmoDICOMImporterListElement *element = new mmoDICOMImporterListElement(str_tmp,slice_pos);
-				//m_FilesList->Append(element);
-				m_FilesList->Append(new mmoDICOMImporterListElement(str_tmp,slice_pos));
-				m_NumberOfStudy++;
+				m_current_slice_name = m_CTDirectoryReader->GetFile(i);
+				// Append of the path at the dicom file
+				wxString str_tmp, ct_mode;
+				str_tmp.Append(dir);
+				str_tmp.Append("\\");
+				str_tmp.Append(m_current_slice_name);
+				
+				vtkDicomUnPacker *reader = vtkDicomUnPacker::New();
+				reader->SetFileName((char *)str_tmp.c_str());
+				reader->UseDefaultDictionaryOff();
+				reader->SetDictionaryFileName(m_DictionaryFilename.GetCStr());
+				reader->UpdateInformation();
+
+				ct_mode = reader->GetCTMode();
+				ct_mode.MakeUpper();
+				ct_mode.Trim(FALSE);
+				ct_mode.Trim();
+				if (strcmp( reader->GetModality(), "CT" ) == 0 )
+				{
+				//if (strcmp(reader->GetCTMode(),"SCOUT MODE") == 0 || reader->GetStatus() == -1)
+				if(ct_mode.Find("SCOUT") != -1 || reader->GetStatus() == -1)
+				{
+					reader->Delete();
+					continue;
+				}
+				
+				//row = m_StudyListbox->FindString(reader->GetStudy());
+				row = m_StudyListbox->FindString(reader->GetStudyUID());
+				if (row == -1)
+				{
+					// the study is not present into the listbox, so need to create new
+					// list of files related to the new studyID
+					m_FilesList = new ListDicomFiles;
+					//m_StudyListbox->Append(reader->GetStudy());
+					m_StudyListbox->Append(reader->GetStudyUID());
+					m_StudyListbox->SetClientData(m_NumberOfStudy,(void *)m_FilesList);
+					reader->GetSliceLocation(slice_pos);
+					//mmoDICOMImporterListElement *element = new mmoDICOMImporterListElement(str_tmp,slice_pos);
+					//m_FilesList->Append(element);
+					m_FilesList->Append(new mmoDICOMImporterListElement(str_tmp,slice_pos));
+					m_NumberOfStudy++;
+				}
+				else 
+				{
+					reader->GetSliceLocation(slice_pos);
+					//mmoDICOMImporterListElement *element = new mmoDICOMImporterListElement(str_tmp,SlicePos);
+					//((ListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(element);
+					((ListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new mmoDICOMImporterListElement(str_tmp,slice_pos));
+				}
+				}
+				reader->Delete();
 			}
-			else 
+		}
+	}
+	else if(m_DICOM==1) //if MRI
+	{
+		for (i=0; i < m_CTDirectoryReader->GetNumberOfFiles(); i++)
+		{
+			if ((strcmp(m_CTDirectoryReader->GetFile(i),".") == 0) || (strcmp(m_CTDirectoryReader->GetFile(i),"..") == 0)) 
 			{
-				reader->GetSliceLocation(slice_pos);
-				//mmoDICOMImporterListElement *element = new mmoDICOMImporterListElement(str_tmp,SlicePos);
-				//((ListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(element);
-				((ListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new mmoDICOMImporterListElement(str_tmp,slice_pos));
+				continue;
 			}
-      reader->Delete();
+			else
+			{
+				m_current_slice_name = m_CTDirectoryReader->GetFile(i);
+				// Append of the path at the dicom file
+				wxString str_tmp, ct_mode;
+				str_tmp.Append(dir);
+				str_tmp.Append("\\");
+				str_tmp.Append(m_current_slice_name);
+				
+				vtkDicomUnPacker *reader = vtkDicomUnPacker::New();
+				reader->SetFileName((char *)str_tmp.c_str());
+				reader->UseDefaultDictionaryOff();
+				reader->SetDictionaryFileName(m_DictionaryFilename.GetCStr());
+				reader->UpdateInformation();
+
+				//ct_mode = reader->GetCTMode();
+				//ct_mode.MakeUpper();
+				//ct_mode.Trim(FALSE);
+				//ct_mode.Trim();
+				if ( strcmp( reader->GetModality(), "MR" ) == 0)
+				{
+				//if (strcmp(reader->GetCTMode(),"SCOUT MODE") == 0 || reader->GetStatus() == -1)
+					if(/*ct_mode.Find("SCOUT") != -1 || */ reader->GetStatus() == -1)
+					{
+						reader->Delete();
+						continue;
+					}
+				
+					//row = m_StudyListbox->FindString(reader->GetStudy());
+					row = m_StudyListbox->FindString(reader->GetStudyUID());
+					if (row == -1)
+					{
+						// the study is not present into the listbox, so need to create new
+						// list of files related to the new studyID
+						m_FilesList = new ListDicomFiles;
+						//m_StudyListbox->Append(reader->GetStudy());
+						m_StudyListbox->Append(reader->GetStudyUID());
+						m_StudyListbox->SetClientData(m_NumberOfStudy,(void *)m_FilesList);
+						reader->GetSliceLocation(slice_pos);
+						imageNumber=reader->GetInstanceNumber();
+						cardNumImages = reader->GetCardiacNumberOfImages();
+						if(cardNumImages>1)
+						{
+							if (m_DICOMType==-1)
+								m_DICOMType=ID_CMRI;
+							else if(m_DICOMType!=ID_CMRI)
+							{
+								wxString msg = "cMRI damaged !";
+								wxMessageBox(msg,"Confirm", wxOK , NULL);
+								return;
+							}
+						}
+						else
+						{
+							if (m_DICOMType==-1)
+								m_DICOMType=ID_MRI;
+							else if(m_DICOMType!=ID_MRI)
+							{
+								wxString msg = "cMRI damaged !";
+								wxMessageBox(msg,"Confirm", wxOK , NULL);
+								return;
+							}
+						}
+						trigTime = reader->GetTriggerTime();
+						//mmoDICOMImporterListElement *element = new mmoDICOMImporterListElement(str_tmp,slice_pos);
+						//m_FilesList->Append(element);
+						m_FilesList->Append(new mmoDICOMImporterListElement(str_tmp,slice_pos,imageNumber, cardNumImages, trigTime));
+						m_NumberOfStudy++;
+					}
+					else 
+					{
+						reader->GetSliceLocation(slice_pos);
+						imageNumber=reader->GetInstanceNumber();
+						cardNumImages = reader->GetCardiacNumberOfImages();
+						trigTime = reader->GetTriggerTime();
+						//mmoDICOMImporterListElement *element = new mmoDICOMImporterListElement(str_tmp,SlicePos);
+						//((ListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(element);
+						((ListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new mmoDICOMImporterListElement(str_tmp,slice_pos,imageNumber,cardNumImages,trigTime));
+					}
+				}
+				reader->Delete();
+			}
 		}
 	}
 	if(m_NumberOfStudy == 0)
@@ -419,6 +563,95 @@ void mmoDICOMImporter::BuildDicomFileList(const char *dir)
 		wxString msg = "No study found!";
 		wxMessageBox(msg,"Confirm", wxOK , NULL);
 	}
+}
+//----------------------------------------------------------------------------
+void mmoDICOMImporter::BuildVolumeCineMRI()
+//----------------------------------------------------------------------------
+{
+	int step;
+
+	if(m_BuildStepValue == 0)
+		step = 1;
+	else 
+		step = m_BuildStepValue << 1;
+
+	int n_slices = m_NumberOfSlices / step;
+
+	wxBusyInfo wait_info("Building volume: please wait");
+
+  // create the time varying vme
+  mafNEW(m_Volume);
+
+  // for every timestamp
+  for (int ts = 0; ts < m_NumberOfTimeFrames; ts++)
+  {
+    // Build item at timestamp ts    
+    vtkMAFSmartPointer<vtkRGSliceAccumulate> accumulate;
+		accumulate->SetNumberOfSlices(n_slices);
+
+    // always build the volume on z-axis
+    accumulate->BuildVolumeOnAxes(2);
+    
+    // get the time stamp from the dicom tag;
+    // timestamp is in ms
+    int probeHeigthId = 0;    
+    int tsImageId = GetImageId(ts, probeHeigthId);
+    if (tsImageId == -1) 
+    {
+      assert(FALSE);
+    }
+    
+    mmoDICOMImporterListElement *element0;
+    element0 = (mmoDICOMImporterListElement *)m_ListSelected->Item(tsImageId)->GetData();
+    //double tsDouble = ((double) (element0->GetTriggerTime())) / 1000.0;
+    mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetTriggerTime());
+
+	  for (int sourceVolumeSliceId = 0, targetVolumeSliceId = 0; sourceVolumeSliceId < m_NumberOfSlices; sourceVolumeSliceId += step)
+	  {
+		  if (targetVolumeSliceId == n_slices) {break;}
+      
+      // show the current slice
+			int currImageId = GetImageId(ts, sourceVolumeSliceId);
+      if (currImageId != -1) 
+      {
+        // update v_texture ivar
+        ShowSlice(currImageId);
+      }
+
+      accumulate->SetSlice(targetVolumeSliceId, m_SliceTexture->GetInput());
+      targetVolumeSliceId++;
+	  }
+  
+		/*mafVME *cTItem =new mafVME;
+	  cTItem->SetData(accumulate->GetOutput());
+    cTItem->SetTimeStamp(tsDouble);*/
+		accumulate->Update();
+	  m_Volume->SetDataByDetaching(accumulate->GetOutput(),tsDouble);
+
+    // clean up
+	  //vtkDEL(cTItem);
+    //vtkDEL(accumulate);
+  }
+  
+  // update m_tag_array ivar
+  ImportDicomTags();
+	m_Volume->GetTagArray()->DeepCopy(m_TagArray);
+	vtkDEL(m_TagArray);
+
+	mafTagItem tag_Nature;
+	tag_Nature.SetName("VME_NATURE");
+	tag_Nature.SetValue("NATURAL");
+	m_Volume->GetTagArray()->SetTag(tag_Nature);
+
+	mafTagItem tag_Surgeon;
+	tag_Surgeon.SetName("SURGEON_NAME");
+	tag_Surgeon.SetValue(m_SurgeonName.GetCStr());
+	m_Volume->GetTagArray()->SetTag(tag_Surgeon);
+
+	//Nome VME = CTDir + IDStudio
+	wxString name = m_DICOMDir + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());			
+	m_Volume->SetName(name.c_str());
+	
 }
 //----------------------------------------------------------------------------
 void mmoDICOMImporter::BuildVolume()
@@ -469,7 +702,7 @@ void mmoDICOMImporter::BuildVolume()
 	  m_Image->GetTagArray()->SetTag(tag_Surgeon);
 
 	  //Nome VME = CTDir + IDStudio
-	  wxString name = m_CTDir + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());			
+	  wxString name = m_DICOMDir + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());			
 	  m_Image->SetName(name.c_str());
   }
   else if(m_NumberOfSlices > 1)
@@ -493,7 +726,7 @@ void mmoDICOMImporter::BuildVolume()
 	  m_Volume->GetTagArray()->SetTag(tag_Surgeon);
 
 	  //Nome VME = CTDir + IDStudio
-	  wxString name = m_CTDir + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());			
+	  wxString name = m_DICOMDir + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());			
 	  m_Volume->SetName(name.c_str());
   }
 }
@@ -647,6 +880,7 @@ void mmoDICOMImporter::ResetSliders()
 //----------------------------------------------------------------------------
 {
 	m_SliceScanner->SetRange(0,m_NumberOfSlices - 1);
+	m_TimeScanner->SetRange(0, m_NumberOfTimeFrames -1);
 	m_Gui->Update();
 }
 //----------------------------------------------------------------------------
@@ -658,6 +892,10 @@ void mmoDICOMImporter::ResetStructure()
 	m_SliceLabel->Enable(false);
 	m_SliceText->Enable(false);
 	m_SliceScanner->Enable(false);
+
+	m_TimeLabel->Enable(false);
+	m_TimeText->Enable(false);
+	m_TimeScanner->Enable(false);
 	
 	// disable the button modality
 	m_Gui->Enable(ID_CROP_MODE_BUTTON,0);
@@ -678,6 +916,9 @@ void mmoDICOMImporter::ResetStructure()
 	m_NumberOfStudy		= 0;
 	m_NumberOfSlices	= 0;
 	m_CurrentSlice		= 0;
+  m_NumberOfTimeFrames = 0;
+  m_CurrentTime      = 0; 
+	m_DICOMType				 = -1;
 
 	m_CropFlag				= false;
 	
@@ -730,6 +971,37 @@ int compareZ(const mmoDICOMImporterListElement **arg1,const mmoDICOMImporterList
 		return 0;
 }
 //----------------------------------------------------------------------------
+int compareTriggerTime(const mmoDICOMImporterListElement **arg1,const mmoDICOMImporterListElement **arg2)
+//----------------------------------------------------------------------------
+{
+	// compare the trigger time of both arguments
+	// return:
+	float t1 = (*(mmoDICOMImporterListElement **)arg1)->GetTriggerTime();
+	float t2 = (*(mmoDICOMImporterListElement **)arg2)->GetTriggerTime();;
+	if (t1 > t2)
+		return 1;
+	if (t1 < t2)
+		return -1;
+	else
+		return 0;
+}
+
+//----------------------------------------------------------------------------
+int compareImageNumber(const mmoDICOMImporterListElement **arg1,const mmoDICOMImporterListElement **arg2)
+//----------------------------------------------------------------------------
+{
+	// compare the trigger time of both arguments
+	// return:
+	float i1 = (*(mmoDICOMImporterListElement **)arg1)->GetImageNumber();
+	float i2 = (*(mmoDICOMImporterListElement **)arg2)->GetImageNumber();;
+	if (i1 > i2)
+		return 1;
+	if (i1 < i2)
+		return -1;
+	else
+		return 0;
+}
+//----------------------------------------------------------------------------
 void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event) 
 //----------------------------------------------------------------------------
 {
@@ -749,7 +1021,7 @@ void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event)
         m_Gui->Update();
         ResetStructure();
         // scan dicom directory
-        BuildDicomFileList(m_CTDir.GetCStr());
+        BuildDicomFileList(m_DICOMDir.GetCStr());
         if(m_NumberOfStudy == 1)
         {
           m_StudyListbox->SetSelection(0);
@@ -762,6 +1034,12 @@ void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event)
         m_SliceLabel->Enable(true);
         m_SliceText->Enable(true);
         m_SliceScanner->Enable(true);
+				if(m_DICOMType == ID_CMRI)//If cMRI
+				{
+					m_TimeLabel->Enable(true);
+					m_TimeText->Enable(true);
+					m_TimeScanner->Enable(true);
+				}
 
         m_Gui->Enable(ID_CROP_MODE_BUTTON,1);
         m_Gui->Enable(ID_UNDO_CROP_BUTTON,0);
@@ -804,12 +1082,21 @@ void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event)
           m_ListSelected->Sort(compareZ);
           break;
         }
-        m_NumberOfSlices = m_ListSelected->GetCount();
-        // reset the current slice number to view the first slice
+				m_NumberOfTimeFrames = ((mmoDICOMImporterListElement *)m_ListSelected->Item(0)->GetData())->GetCardiacNumberOfImages();
+        if(m_DICOMType == ID_CMRI) //If cMRI
+					m_NumberOfSlices = m_ListSelected->GetCount() / m_NumberOfTimeFrames;
+				else
+					m_NumberOfSlices = m_ListSelected->GetCount();
+				// reset the current slice number to view the first slice
         m_CurrentSlice = 0;
+				m_CurrentTime = 0;
         m_CropFlag = false;
-        // show the selected slice
-        ShowSlice(m_CurrentSlice);
+				int currImageId = GetImageId(m_CurrentTime, m_CurrentSlice);
+				if (currImageId != -1) 
+				{
+					// show the selected slice
+					ShowSlice(currImageId);
+				}
 
         m_DicomDialog->GetRWI()->CameraReset();
         ResetSliders();
@@ -850,9 +1137,26 @@ void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event)
       }
       break;
       case ID_SCAN_SLICE:
-        // show the current slice
-        ShowSlice(m_CurrentSlice);
-        m_DicomDialog->GetRWI()->CameraUpdate();
+				{
+					// show the current slice
+					int currImageId = GetImageId(m_CurrentTime, m_CurrentSlice);
+					if (currImageId != -1) 
+					{
+						ShowSlice(currImageId);
+						m_DicomDialog->GetRWI()->CameraUpdate();
+					}
+				}
+      break;
+			case ID_SCAN_TIME:
+				{
+					// show the current slice
+					int currImageId = GetImageId(m_CurrentTime, m_CurrentSlice);
+					if (currImageId != -1) 
+					{
+						ShowSlice(currImageId);
+						m_DicomDialog->GetRWI()->CameraUpdate();
+					}
+				}
       break;
       case ID_CROP_MODE_BUTTON:
         m_CropMode = true;		
@@ -887,7 +1191,12 @@ void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event)
         m_Gui->Enable(ID_BUILD_BUTTON,1);
       break;
       case ID_BUILD_BUTTON:
-        BuildVolume();
+				if(m_DICOMType == ID_CT || m_DICOMType == ID_MRI)
+					BuildVolume();
+				else if(m_DICOMType == ID_CMRI)
+					BuildVolumeCineMRI();
+				else
+					break;;
         m_DicomDialog->EndModal(wxID_OK);
         //OpStop(OP_RUN_OK); 
       break;	
@@ -1055,9 +1364,89 @@ void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event)
           else if (m_GizmoStatus == GIZMO_DONE)
             m_SideToBeDragged = 0;
       break;
+			case ID_TYPE_DICOM:
+				/*if(m_DICOM==0)
+				{
+					m_TimeLabel->Enable(false);
+					m_TimeText->Enable(false);
+					m_TimeScanner->Enable(false);
+				}
+				else if(m_DICOM==1)
+				{
+					m_TimeLabel->Enable(false);
+					m_TimeText->Enable(false);
+					m_TimeScanner->Enable(false);
+				}
+				else if(m_DICOM==2)
+				{
+					m_TimeLabel->Enable(true);
+					m_TimeText->Enable(true);
+					m_TimeScanner->Enable(true);
+				}*/
+				break;
       default:
         mafEventMacro(*e);
       break;
     }	
   }
+}
+//----------------------------------------------------------------------------
+int mmoDICOMImporter::GetImageId(int timeId, int heigthId)
+//----------------------------------------------------------------------------
+{
+  /* 
+
+  test:
+  ListDicomCineMRIFiles: [0 .. 11] : 12 elements
+
+  heightId
+
+      ^
+    2 | 8 9 10 11
+    1 | 4 5  6  7
+    0 | 0 1  2  3
+    --------------> timeId
+      | 0 1  2  3  
+
+   cardiacNumberOfImages = 4 (from wxList element);
+   maxTimeId = cardiacNumberOfImages - 1 = 3;
+   
+   numberOfDicomSlices = 12 (from wxList);
+
+   numSlicesPerTS = numberOfDicomSlices / cardiacNumberOfImages = 12 / 4 = 3;
+   maxHeigthId = numSlicesPerTS - 1;    
+  
+    test:                
+    GetImageId(3,2) =    4 * hId + tId = 4*2 + 3 = 11 :) 
+    GetImageId(1,2) =    4 * 2 + 1 = 9 :)
+  
+  */
+
+
+	if (m_DICOMType == ID_CT || m_DICOMType == ID_MRI) //If CT o MRI
+		return heigthId;
+
+  assert(m_StudyListbox);
+
+  m_ListSelected = (ListDicomFiles *)m_StudyListbox->GetClientData(m_StudyListbox->GetSelection());
+  
+  mmoDICOMImporterListElement *element0;
+  element0 = (mmoDICOMImporterListElement *)m_ListSelected->Item(0)->GetData();
+  
+  int cardiacNumberOfImages =  element0->GetCardiacNumberOfImages();
+
+  int numberOfDicomSlices = m_ListSelected->GetCount();
+    
+  int numSlicesPerTS = numberOfDicomSlices / cardiacNumberOfImages;
+  assert(numberOfDicomSlices % cardiacNumberOfImages == 0);
+
+  int maxHeigthId = numSlicesPerTS - 1; // 
+  int maxTimeId = cardiacNumberOfImages - 1; // cardiacNumberOfImages - 1;
+
+  if (heigthId < 0 || heigthId > maxHeigthId || timeId < 0 || timeId > maxTimeId )
+  {
+    return -1;
+  }
+
+  return (heigthId * cardiacNumberOfImages + timeId); 
 }
