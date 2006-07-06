@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoFilterVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-28 08:34:42 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-07-06 11:38:49 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -90,8 +90,6 @@ enum FILTER_SURFACE_ID
 void mmoFilterVolume::OpRun()   
 //----------------------------------------------------------------------------
 {  
-	wxBusyInfo wait("initializing volume please wait...");
-
   vtkNEW(m_ResultImageData);
 	m_ResultImageData->DeepCopy((vtkImageData*)((mafVME *)m_Input)->GetOutput()->GetVTKData());
 	
