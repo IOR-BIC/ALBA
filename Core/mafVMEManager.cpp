@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-27 16:48:19 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2006-07-06 13:38:32 $
+  Version:   $Revision: 1.27 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -489,6 +489,7 @@ void mafVMEManager::MSFSaveAs()
 //----------------------------------------------------------------------------
 {
    m_MSFFile = "";
+   m_MakeBakFile = false;
    MSFSave();
 }
 //----------------------------------------------------------------------------
