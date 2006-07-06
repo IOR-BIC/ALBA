@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoFilterVolume.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 11:13:14 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-07-06 12:26:09 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -45,6 +45,12 @@ public:
 	/** Makes the undo for the operation. */
 	void OpUndo();
 
+  void ApplyFiltersToInputData(bool apply) {m_ApplyDirectlyOnInput = apply;};
+
+  void ApplyFiltersToInputDataOn() {ApplyFiltersToInputData(true);};
+
+  void ApplyFiltersToInputDataOff() {ApplyFiltersToInputData(false);};
+
 protected:
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	void OpStop(int result);
@@ -54,12 +60,15 @@ protected:
 
 	vtkImageData	*m_ResultImageData;
 	vtkImageData	*m_OriginalImageData;
+  vtkImageData  *m_InputData;
 
 	int    m_Dimensionality;
   double m_SmoothRadius[3];
   double m_StandardDeviation[3];
 
   int m_KernelSize[3];
+
+  int m_ApplyDirectlyOnInput; ///< For big volume data, torn on this flag to save memory and apply filters directly to the input data.
 
   /** Smooth the surface. */
 	void OnSmooth();
