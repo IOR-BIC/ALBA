@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoFilterVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-06 13:37:27 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-07-06 14:31:27 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -156,8 +156,9 @@ void mmoFilterVolume::OnEvent(mafEventBase *maf_event)
       case ID_APPLY_ON_INPUT:
         if (m_ApplyDirectlyOnInput)
         {
-          //vtkDEL(m_OriginalImageData);
+          wxMessageBox(_("Filters are applied directly to the input volume. No undo can be done to retrieve previous volume."),_("Warning"));
           vtkDEL(m_ResultImageData);
+          vtkDEL(m_OriginalImageData);
         }
         else
         {
@@ -165,8 +166,8 @@ void mmoFilterVolume::OnEvent(mafEventBase *maf_event)
           vtkNEW(m_ResultImageData);
           m_ResultImageData->DeepCopy(m_InputData);
 
-          //vtkNEW(m_OriginalImageData);
-          //m_OriginalImageData->DeepCopy(m_InputData);
+          vtkNEW(m_OriginalImageData);
+          m_OriginalImageData->DeepCopy(m_InputData);
         }
       break;
       case ID_SMOOTH:
@@ -187,10 +188,6 @@ void mmoFilterVolume::OnEvent(mafEventBase *maf_event)
         OpStop(OP_RUN_OK);        
       break;
       case wxCANCEL:
-        if (m_ApplyDirectlyOnInput)
-        {
-          OpUndo();
-        }
         if(m_ClearInterfaceFlag)
           OnClear();
         OpStop(OP_RUN_CANCEL);        
@@ -240,8 +237,9 @@ void mmoFilterVolume::OnSmooth()
   m_Gui->Enable(ID_RADIUS_FACTOR,true);
 
 	m_Gui->Enable(ID_PREVIEW,m_PreviewResultFlag);
-	m_Gui->Enable(ID_CLEAR,true);
+	m_Gui->Enable(ID_CLEAR,m_PreviewResultFlag);
 	m_Gui->Enable(wxOK,true);
+  m_Gui->Enable(wxCANCEL,m_PreviewResultFlag);
 }
 //----------------------------------------------------------------------------
 void mmoFilterVolume::OnMedian()
@@ -274,8 +272,9 @@ void mmoFilterVolume::OnMedian()
   m_Gui->Enable(ID_KERNEL_SIZE,true);
 
   m_Gui->Enable(ID_PREVIEW,m_PreviewResultFlag);
-  m_Gui->Enable(ID_CLEAR,true);
+  m_Gui->Enable(ID_CLEAR,m_PreviewResultFlag);
   m_Gui->Enable(wxOK,true);
+  m_Gui->Enable(wxCANCEL,m_PreviewResultFlag);
 }
 //----------------------------------------------------------------------------
 void mmoFilterVolume::OnPreview()
