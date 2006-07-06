@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoFilterVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-06 12:26:09 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-07-06 13:37:27 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -187,6 +187,10 @@ void mmoFilterVolume::OnEvent(mafEventBase *maf_event)
         OpStop(OP_RUN_OK);        
       break;
       case wxCANCEL:
+        if (m_ApplyDirectlyOnInput)
+        {
+          OpUndo();
+        }
         if(m_ClearInterfaceFlag)
           OnClear();
         OpStop(OP_RUN_CANCEL);        
@@ -222,7 +226,10 @@ void mmoFilterVolume::OnSmooth()
 	smoothFilter->Update();
 
   if (m_ApplyDirectlyOnInput)
+  {
     ((mafVMEVolumeGray *)m_Input)->SetData(smoothFilter->GetOutput(),((mafVME *)m_Input)->GetTimeStamp());
+    mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+  }
   else
     m_ResultImageData->DeepCopy(smoothFilter->GetOutput());
 
@@ -233,7 +240,7 @@ void mmoFilterVolume::OnSmooth()
   m_Gui->Enable(ID_RADIUS_FACTOR,true);
 
 	m_Gui->Enable(ID_PREVIEW,m_PreviewResultFlag);
-	m_Gui->Enable(ID_CLEAR,m_PreviewResultFlag);
+	m_Gui->Enable(ID_CLEAR,true);
 	m_Gui->Enable(wxOK,true);
 }
 //----------------------------------------------------------------------------
@@ -254,7 +261,10 @@ void mmoFilterVolume::OnMedian()
   medianFilter->Update();
 
   if (m_ApplyDirectlyOnInput)
+  {
     ((mafVMEVolumeGray *)m_Input)->SetData(medianFilter->GetOutput(),((mafVME *)m_Input)->GetTimeStamp());
+    mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+  }
   else
     m_ResultImageData->DeepCopy(medianFilter->GetOutput());
 
@@ -264,7 +274,7 @@ void mmoFilterVolume::OnMedian()
   m_Gui->Enable(ID_KERNEL_SIZE,true);
 
   m_Gui->Enable(ID_PREVIEW,m_PreviewResultFlag);
-  m_Gui->Enable(ID_CLEAR,m_PreviewResultFlag);
+  m_Gui->Enable(ID_CLEAR,true);
   m_Gui->Enable(wxOK,true);
 }
 //----------------------------------------------------------------------------
@@ -292,7 +302,10 @@ void mmoFilterVolume::OnClear()
 
   ((mafVMEVolumeGray *)m_Input)->SetData(m_OriginalImageData,((mafVME *)m_Input)->GetTimeStamp());
 	
-	m_ResultImageData->DeepCopy(m_OriginalImageData);
+  if (!m_ApplyDirectlyOnInput)
+  {
+    m_ResultImageData->DeepCopy(m_OriginalImageData);
+  }
 
 	m_Gui->Enable(ID_SMOOTH,true);
 	m_Gui->Enable(ID_RADIUS_FACTOR,true);

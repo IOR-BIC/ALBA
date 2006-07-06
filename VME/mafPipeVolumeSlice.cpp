@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-09 10:43:33 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2006-07-06 13:37:15 $
+  Version:   $Revision: 1.31 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -269,14 +269,9 @@ void mafPipeVolumeSlice::CreateSlice(int direction)
 {
 	double xspc = 0.33, yspc = 0.33;
 
-//  mmaVolumeMaterial *material = ((mafVMEVolume *)m_Vme)->GetMaterial();
   vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();
   vtk_data->Update();
-/*  vtk_data->GetScalarRange(material->m_TableRange);
 
-  material->m_Level_LUT = (material->m_TableRange[1] + material->m_TableRange[0]) * 0.5;
-  material->m_Window_LUT = material->m_TableRange[1] - material->m_TableRange[0];
-*/
 	vtkNEW(m_SlicerPolygonal[direction]);
 	vtkNEW(m_SlicerImage[direction]);
 	m_SlicerImage[direction]->SetPlaneOrigin(m_Origin[0], m_Origin[1], m_Origin[2]);
@@ -300,8 +295,6 @@ void mafPipeVolumeSlice::CreateSlice(int direction)
 
 	m_SlicerImage[direction]->SetOutput(m_Image[direction]);
   m_SlicerImage[direction]->Update();
-//  m_SlicerImage[direction]->SetWindow(w);
-//  m_SlicerImage[direction]->SetLevel(l);
 
 	vtkNEW(m_Texture[direction]);
 	m_Texture[direction]->RepeatOff();
