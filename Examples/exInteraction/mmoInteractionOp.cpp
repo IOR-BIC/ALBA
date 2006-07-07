@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoInteractionOp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-15 09:45:49 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-07-07 08:18:26 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -105,14 +105,13 @@ void mmoInteractionOp::OpRun()
   /******************************************************************************/
   /** UNCOMMENT HERE TO ATTACH THE INTERACTOR TO THE ACTION    (PASS 3)         */
 	/* *
-  mafEventMacro( mafEvent( this, INTERACTOR_ADD, m_MouseInteractor, &wxString(m_Actions[0]) ) );
+  mafEventMacro( mafEvent( this, INTERACTOR_ADD, m_MouseInteractor, &mafString(m_Actions[0]) ) );
   /******************************************************************************/
 
   /******************************************************************************/
   /** UNCOMMENT HERE TO ATTACH THE INTERACTOR TO THE VME       (PASS 4)        */
 	/* *
-  mafVmeData *toolData = (mafVmeData*)m_Gizmo->GetClientData();
-  toolData->m_behavior = m_MouseInteractor;
+  m_Gizmo->SetBehavior(m_MouseInteractor);
   /******************************************************************************/
   
   
@@ -120,7 +119,7 @@ void mmoInteractionOp::OpRun()
   m_Gui = new mmgGui(this);
   m_Gui->SetListener(this);
   m_Gui->OkCancel();
-	m_Gui->Label("");
+
 	ShowGui(); // display the GUI
 }
 //----------------------------------------------------------------------------
@@ -136,21 +135,21 @@ void mmoInteractionOp::OpUndo()
 
 //----------------------------------------------------------------------------
 void mmoInteractionOp::OpStop(int result)
+//----------------------------------------------------------------------------
 {	
   HideGui();
   
   /******************************************************************************/
   /** UNCOMMENT HERE TO DETACH THE INTERACTOR FROM THE ACTION      (PASS 3)     */
 	/* *
-  mafEventMacro( mafEvent( this, INTERACTOR_REMOVE, m_MouseInteractor, &wxString(m_Actions[0]) ) );
+  mafEventMacro( mafEvent( this, INTERACTOR_REMOVE, m_MouseInteractor, &mafString(m_Actions[0]) ) );
   /******************************************************************************/
 
 
   /******************************************************************************/
   /** UNCOMMENT HERE TO DETACH THE INTERACTOR FROM THE VME         (PASS 4)     */
 	/* *
-  mafVmeData *toolData = (mafVmeData*)m_Gizmo->GetClientData();
-  toolData->m_behavior = NULL;
+  m_Gizmo->SetBehavior(NULL);
   /******************************************************************************/
 
   /******************************************************************************/
@@ -162,7 +161,7 @@ void mmoInteractionOp::OpStop(int result)
 
   // REMOVE VME-GIZMO FROM THE TREE
   mafEventMacro( mafEvent( this, VME_REMOVE, m_Gizmo ) );
-  vtkDEL(m_Gizmo);
+  mafDEL(m_Gizmo);
 
   mafEventMacro(mafEvent(this,result));
 }
@@ -174,29 +173,22 @@ void mmoInteractionOp::OnEvent(mafEventBase *e)
 
   switch(e->GetId())
 	{
-	case wxOK:
-		OpStop(OP_RUN_OK);
-	break;
-	case wxCANCEL:
-		OpStop(OP_RUN_CANCEL);
-  break;
-  case ID_TRANSFORM:
-  {
-    mafEvent *event=mafEvent::SafeDownCast(e);
-    assert(event);
-    m_Gizmo->ApplyMatrix(*(event->GetMatrix()),POST_MULTIPLY);
-    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-  }    
-  break;
-	default:
-		mafEventMacro(*e); 
-  break;
+	  case wxOK:
+		  OpStop(OP_RUN_OK);
+	  break;
+	  case wxCANCEL:
+		  OpStop(OP_RUN_CANCEL);
+    break;
+    case ID_TRANSFORM:
+    {
+      mafEvent *event = mafEvent::SafeDownCast(e);
+      assert(event);
+      m_Gizmo->ApplyMatrix(*(event->GetMatrix()),POST_MULTIPLY);
+      mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+    }    
+    break;
+	  default:
+		  mafEventMacro(*e); 
+    break;
 	}
 }
-
-
-
-
-
-
-
