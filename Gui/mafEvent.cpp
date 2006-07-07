@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-03 11:00:50 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-07-07 08:21:30 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone, Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -46,17 +46,18 @@ enum HIGHEST_EVENT_ID
 //----------------------------------------------------------------------------
 // mafEvent CTOR's
 //----------------------------------------------------------------------------
-  mafEvent::mafEvent()																																		{ Init(NULL,NO_EVENT,0);																Initialized();}
-  mafEvent::mafEvent(void *sender, int id,                          long arg)							{ Init(sender, id, arg);																Initialized();}
-  mafEvent::mafEvent(void *sender, int id, bool            b,       long arg)							{ Init(sender, id, arg); m_Bool =b;											Initialized();}
-  mafEvent::mafEvent(void *sender, int id, double           f,       long arg)							{ Init(sender, id, arg); m_Double=f;											Initialized();}
-  mafEvent::mafEvent(void *sender, int id, mafString      *s,       long arg)							{ Init(sender, id, arg); m_MAFString =s;										Initialized();}
-  mafEvent::mafEvent(void *sender, int id, mafView         *view,   wxWindow *win)				{ Init(sender, id, 0);   m_View =view; m_Win  =win;			Initialized();}
-  mafEvent::mafEvent(void *sender, int id, mafNode          *vme,    bool b,long arg)			{ Init(sender, id, arg); m_Vme  =vme; m_Bool = b;				Initialized();}
-  mafEvent::mafEvent(void *sender, int id, mafOp           *op,     long arg)							{ Init(sender, id, arg);   m_Op   =op;									Initialized();}
-  mafEvent::mafEvent(void *sender, int id, mafMatrix    *m1,mafMatrix  *m2)					      { Init(sender, id, 0);   m_Matrix =m1; m_OldMatrix =m2;		Initialized();}
-  mafEvent::mafEvent(void *sender, int id, mafObject        *mafobj,  long arg)						{ Init(sender, id, arg); m_MafObject = mafobj;			    Initialized();}
-  mafEvent::mafEvent(void *sender, int id, WidgetDataType  &widget_data,  long arg)
+  mafEvent::mafEvent()																																		  { Init(NULL,NO_EVENT,0);                                        Initialized();}
+  mafEvent::mafEvent(void *sender, int id,                            long arg)							{ Init(sender, id, arg);                                        Initialized();}
+  mafEvent::mafEvent(void *sender, int id, bool             b,        long arg)							{ Init(sender, id, arg); m_Bool =b;                             Initialized();}
+  mafEvent::mafEvent(void *sender, int id, double           f,        long arg)             { Init(sender, id, arg); m_Double=f;                            Initialized();}
+  mafEvent::mafEvent(void *sender, int id, mafString        *s,       long arg)							{ Init(sender, id, arg); m_MAFString =s;                        Initialized();}
+  mafEvent::mafEvent(void *sender, int id, mafView          *view,    wxWindow *win)				{ Init(sender, id, 0);   m_View =view; m_Win  =win;             Initialized();}
+  mafEvent::mafEvent(void *sender, int id, mafNode          *vme,     bool b,long arg)			{ Init(sender, id, arg); m_Vme  =vme; m_Bool = b;               Initialized();}
+  mafEvent::mafEvent(void *sender, int id, mafOp            *op,      long arg)							{ Init(sender, id, arg);   m_Op   =op;                          Initialized();}
+  mafEvent::mafEvent(void *sender, int id, mafMatrix        *m1,mafMatrix  *m2)					    { Init(sender, id, 0);   m_Matrix =m1; m_OldMatrix =m2;         Initialized();}
+  mafEvent::mafEvent(void *sender, int id, mafObject        *mafobj,  long arg)						  { Init(sender, id, arg); m_MafObject = mafobj;                  Initialized();}
+  mafEvent::mafEvent(void *sender, int id, mafObject        *mafobj,  mafString *s,long arg){ Init(sender, id, arg); m_MafObject = mafobj; m_MAFString =s;  Initialized();}
+  mafEvent::mafEvent(void *sender, int id, WidgetDataType   &widget_data,  long arg)
   {
     Init(sender, id, arg);
     m_WidgetData.dType = widget_data.dType;
