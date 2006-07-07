@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgMeasureUnitSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2006-05-30 11:26:01 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2006-07-07 12:42:22 $
+Version:   $Revision: 1.6 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -23,7 +23,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <wx/config.h>
 #include "mafDecl.h"
 #include "mmgGui.h"
-#include "mmgDialog.h"
 
 //----------------------------------------------------------------------------
 mmgMeasureUnitSettings::mmgMeasureUnitSettings(mafObserver *Listener)
@@ -48,22 +47,8 @@ mmgMeasureUnitSettings::mmgMeasureUnitSettings(mafObserver *Listener)
   m_DataUnitName  = m_DefaultUnits[m_ChoosedDataUnit];
   m_VisualUnitName= m_DefaultUnits[m_ChoosedVisualUnit];
   m_ScaleFactor = m_DefaultFactors[m_ChoosedVisualUnit] / m_DefaultFactors[m_ChoosedDataUnit];
-  m_Gui         = NULL;
+  
   InitializeMeasureUnit();
-}
-//----------------------------------------------------------------------------
-mmgMeasureUnitSettings::~mmgMeasureUnitSettings() 
-//----------------------------------------------------------------------------
-{
-  m_Gui = NULL; // gui is destroyed by the dialog.
-}
-//----------------------------------------------------------------------------
-void mmgMeasureUnitSettings::ChooseMeasureUnit()
-//----------------------------------------------------------------------------
-{
-  double current_scale = m_ScaleFactor;
-  int current_data_unit_selected = m_ChoosedDataUnit;
-  int current_visual_unit_selected = m_ChoosedVisualUnit;
 
   m_Gui = new mmgGui(this);
   m_Gui->Label(_("main units"));
@@ -77,32 +62,12 @@ void mmgMeasureUnitSettings::ChooseMeasureUnit()
   m_Gui->Enable(MEASURE_SCALE_FACTOR_ID,m_ChoosedDataUnit == 4 || m_ChoosedVisualUnit == 4);
   m_Gui->Enable(MEASURE_DATA_STRING_ID,m_ChoosedDataUnit == 4);
   m_Gui->Enable(MEASURE_VISUAL_STRING_ID,m_ChoosedDataUnit == 4);
-
-  mmgDialog dlg(_("Settings"),mafOK | mafCANCEL);
-  dlg.Add(m_Gui,1,wxEXPAND);
-  int answere = dlg.ShowModal();
-  if (answere == wxID_CANCEL)
-  {
-    m_ScaleFactor       = current_scale;
-    m_ChoosedDataUnit   = current_data_unit_selected;
-    m_ChoosedVisualUnit = current_visual_unit_selected;
-    m_DataUnitName      = m_DefaultUnits[m_ChoosedDataUnit];
-    m_VisualUnitName    = m_DefaultUnits[m_ChoosedVisualUnit];
-    return;
-  }
-  if (m_ScaleFactor == 0.0) 
-  {
-    m_ScaleFactor = 1.0;
-  }
-  wxConfig *config = new wxConfig(wxEmptyString);
-  config->Write("UnitName",m_VisualUnitName.GetCStr());
-  config->Write("UnitFactor",m_ScaleFactor);
-  cppDEL(config);
-
-  /*wxString msg = _("Restart application to make new settings available!");
-  wxString caption = _("Warning");
-  wxMessageBox(msg, caption);*/
-  mafEventMacro(mafEvent(this,MEASURE_UNIT_UPDATED));
+}
+//----------------------------------------------------------------------------
+mmgMeasureUnitSettings::~mmgMeasureUnitSettings() 
+//----------------------------------------------------------------------------
+{
+  m_Gui = NULL; // gui is destroyed by the dialog.
 }
 //----------------------------------------------------------------------------
 void mmgMeasureUnitSettings::OnEvent(mafEventBase *maf_event)
@@ -129,7 +94,17 @@ void mmgMeasureUnitSettings::OnEvent(mafEventBase *maf_event)
     default:
       mafEventMacro(*maf_event);
     break; 
+    if (m_ScaleFactor == 0.0) 
+    {
+      m_ScaleFactor = 1.0;
+    }
   }
+  wxConfig *config = new wxConfig(wxEmptyString);
+  config->Write("VisualUnitName",m_VisualUnitName.GetCStr());
+  config->Write("DataUnitName",m_DataUnitName.GetCStr());
+  config->Write("ScaleFactor",m_ScaleFactor);
+  cppDEL(config);
+  mafEventMacro(mafEvent(this,MEASURE_UNIT_UPDATED));
 }
 //----------------------------------------------------------------------------
 void mmgMeasureUnitSettings::InitializeMeasureUnit()
@@ -138,32 +113,70 @@ void mmgMeasureUnitSettings::InitializeMeasureUnit()
   wxConfig *config = new wxConfig(wxEmptyString);
   double factor;
   wxString unit_name;
-  if(config->Read(L"VisualUnitName", &unit_name))
+  if(config->Read("VisualUnitName", &unit_name))
   {
     m_VisualUnitName = unit_name;
   }
   else
   {
-    config->Write(L"VisualUnitName",m_VisualUnitName.GetCStr());
+    config->Write("VisualUnitName",m_VisualUnitName.GetCStr());
   }
-  if(config->Read(L"DataUnitName", &unit_name))
+  if(config->Read("DataUnitName", &unit_name))
   {
     m_DataUnitName = unit_name;
   }
   else
   {
-    config->Write(L"DataUnitName",m_DataUnitName.GetCStr());
+    config->Write("DataUnitName",m_DataUnitName.GetCStr());
   }
-  if(config->Read(L"ScaleFactor", &factor))
+  if(config->Read("ScaleFactor", &factor))
   {
     m_ScaleFactor = factor;
   }
   else
   {
-    config->Write(L"ScaleFactor",m_ScaleFactor);
+    config->Write("ScaleFactor",m_ScaleFactor);
   }
 
   cppDEL(config);
+
+  if (m_DataUnitName == "mm")
+  {
+    m_ChoosedDataUnit = 0;
+  }
+  else if (m_DataUnitName == "m")
+  {
+    m_ChoosedDataUnit = 1;
+  }
+  else if (m_DataUnitName == "inch")
+  {
+    m_ChoosedDataUnit = 2;
+  }
+  else if (m_DataUnitName == "feet")
+  {
+    m_ChoosedDataUnit = 3;
+  }
+  else
+    m_ChoosedDataUnit = 4;
+
+  if (m_VisualUnitName == "mm")
+  {
+    m_ChoosedVisualUnit = 0;
+  }
+  else if (m_VisualUnitName == "m")
+  {
+    m_ChoosedVisualUnit = 1;
+  }
+  else if (m_VisualUnitName == "inch")
+  {
+    m_ChoosedVisualUnit = 2;
+  }
+  else if (m_VisualUnitName == "feet")
+  {
+    m_ChoosedVisualUnit = 3;
+  }
+  else
+    m_ChoosedVisualUnit = 4;
 }
 //----------------------------------------------------------------------------
 double mmgMeasureUnitSettings::GetScaleFactor()

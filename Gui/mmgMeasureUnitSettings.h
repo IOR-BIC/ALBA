@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgMeasureUnitSettings.h,v $
 Language:  C++
-Date:      $Date: 2006-05-30 11:26:01 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2006-07-07 12:42:22 $
+Version:   $Revision: 1.5 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -41,20 +41,18 @@ public:
     MEASURE_UNIT_UPDATED
   };
 
-  /** 
-  Answer to the messages coming from interface. */
+  /** Answer to the messages coming from interface. */
   void OnEvent(mafEventBase *maf_event);
 
   void SetListener(mafObserver *Listener) {m_Listener = Listener;};
-
-  /** Show/Hide the settings interface.*/
-	void ChooseMeasureUnit();
 
   /** Return the Scale factor to map mm into new unit.*/
   double GetScaleFactor();
 
   /** Return measure unit name.*/
   mafString GetUnitName();
+
+  mmgGui* GetGui() {return m_Gui;};
 
 protected:
   /** Initialize measure unit used into the application.*/
