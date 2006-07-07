@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmo2DMeasure.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-30 11:34:44 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-07-07 08:17:22 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,7 +19,9 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmi2DMeter;
+class mmi2DDistance;
+class mmi2DAngle;
+class mmi2DIndicator;
 class mafEvent;
 
 //----------------------------------------------------------------------------
@@ -46,14 +48,25 @@ protected:
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   void OpStop(int result);
 
-  mmi2DMeter *m_2DMeterInteractor;
+	mmi2DDistance *m_2DDistanceInteractor;
+  mmi2DAngle *m_2DAngleInteractor;
+  mmi2DIndicator *m_2DIndicatorInteractor;
+
   mafString m_DistanceMeasure;
   mafString m_AcuteAngle;
   mafString m_ObtuseAngle;
-  wxString m_MeasureText;
+  mafString m_MeasureText;
   int m_MeasureType;
+  std::vector<int> m_FirstPositionInteractor;
   wxListBox *m_MeasureList;
 
   int m_GenerateHistogramFlag;
+  mafString m_ManualDistance;
+  mafString m_ManualAngle;
+  mafString m_ManualIndicator;
+
+	double m_Unused[1]; //< particular variable to store unused value; it serves for ToDouble function of wxString
+
+	std::vector<int> m_InteractorType;
 };
 #endif
