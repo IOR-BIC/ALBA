@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkHistogram.cxx,v $
   Language:  C++
-  Date:      $Date: 2006-05-09 12:11:18 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-07-07 13:09:44 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
   Project:   MultiMod Project
 
@@ -31,7 +31,7 @@
 #include "vtkCellArray.h"
 #include "vtkPointData.h"
 
-vtkCxxRevisionMacro(vtkHistogram, "$Revision: 1.4 $");
+vtkCxxRevisionMacro(vtkHistogram, "$Revision: 1.5 $");
 vtkStandardNewMacro(vtkHistogram);
 //------------------------------------------------------------------------------
 vtkHistogram::vtkHistogram()
@@ -63,6 +63,8 @@ vtkHistogram::vtkHistogram()
   LogHistogram        = 0;
   LabelVisibility     = 1;
 
+  AutoscaleCalculated = false;
+
   HistogramCreate();
 }
 //------------------------------------------------------------------------------
@@ -79,6 +81,19 @@ vtkHistogram::~vtkHistogram()
   if(HistActor)   HistActor->Delete();
   if(PointsRepresentation) PointsRepresentation->Delete();
   if(LineRepresentation)   LineRepresentation->Delete();
+}
+//------------------------------------------------------------------------------
+void vtkHistogram::SetInputData(vtkDataArray* inputData)
+//------------------------------------------------------------------------------
+{
+  if (InputData != inputData)
+  {
+    if (this->InputData != NULL) { this->InputData->UnRegister(this); }
+    this->InputData = inputData;
+    if (this->InputData != NULL) { this->InputData->Register(this); }
+    this->Modified();
+    AutoscaleCalculated = false;
+  }
 }
 //------------------------------------------------------------------------------
 void vtkHistogram::PrintSelf(ostream& os, vtkIndent indent)
@@ -221,16 +236,20 @@ void vtkHistogram::HistogramUpdate(vtkRenderer *ren)
   Accumulate->SetComponentSpacing(srw/NumberOfBins,0,0); // bins maps all the Scalars Range
   Accumulate->Update();
 
-  double acc_min[3];
-  double acc_max[3];
-  Accumulate->GetMin(acc_min);
-  Accumulate->GetMax(acc_max);
-
-  if (AutoscaleHistogram)
+  if (AutoscaleHistogram && !AutoscaleCalculated)
   {
-    double mean = Accumulate->GetMean()[0];
+    AutoscaleCalculated = true;
+    double m = VTK_DOUBLE_MIN;
+    double as;
+    vtkDataArray *arr = Accumulate->GetOutput()->GetPointData()->GetScalars();
+    for (int s = 1; s < arr->GetNumberOfTuples(); s++)
+    {
+      arr->GetTuple(s,&as);
+      m = as>m ? as : m;
+    }
+    double mean = m;
     if (mean < 0) mean = -mean;
-    ScaleFactor = .05 / mean;
+    ScaleFactor = 1.0 / mean;
   }
 
   ChangeInfo->SetInput(Accumulate->GetOutput());
