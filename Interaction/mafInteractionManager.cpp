@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2006-07-07 12:42:56 $
+  Version:   $Revision: 1.29 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -83,7 +83,7 @@ mafCxxTypeMacro(mafInteractionManager);
 mafInteractionManager::mafInteractionManager()
 //------------------------------------------------------------------------------
 {
-  m_gui = NULL;  //SIL. 07-jun-2006 : 
+  m_Gui = NULL;  //SIL. 07-jun-2006 : 
   m_Frame = NULL;  //SIL. 07-jun-2006 : 
   m_SelectedView      = NULL;
   m_LockRenderingFlag = false;
@@ -730,8 +730,8 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
               if(m_CurrentDevice)
               {
                 mmgGui *previous_gui = m_CurrentDevice->GetGui();
-                m_gui->Remove(previous_gui);
-                m_gui->Remove(m_Bindings);
+                m_Gui->Remove(previous_gui);
+                m_Gui->Remove(m_Bindings);
               }
               // Set the current device
               m_CurrentDevice = device;
@@ -741,10 +741,10 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
               mmgGui *gui = m_CurrentDevice->GetGui();
               assert(gui);
               
-              m_gui->AddGui(gui,0,0);
-              m_gui->AddGui(m_Bindings,0,0);
-              m_gui->FitGui(); // update the size of m_gui
-              m_gui->GetParent()->FitInside(); // update the (mmgGuiHolder) ScrollBar settings
+              m_Gui->AddGui(gui,0,0);
+              m_Gui->AddGui(m_Bindings,0,0);
+              m_Gui->FitGui(); // update the size of m_Gui
+              m_Gui->GetParent()->FitInside(); // update the (mmgGuiHolder) ScrollBar settings
               
               //Update Bindings panel
               UpdateBindings();
@@ -1014,21 +1014,21 @@ void mafInteractionManager::UpdateDevice(mafDevice *device)
 void mafInteractionManager::CreateGUI() 
 //----------------------------------------------------------------------------
 {
-  m_gui = new mmgGui(this);
+  m_Gui = new mmgGui(this);
 
-  m_DeviceTree = new mmgTree(m_gui,ID_DEVICE_TREE,false,true);
+  m_DeviceTree = new mmgTree(m_Gui,ID_DEVICE_TREE,false,true);
   m_DeviceTree->SetMinSize(wxSize(250,100));
   m_DeviceTree->SetListener(this);
 
-  m_gui->Button(ID_ADD_DEVICE,"Add Device");
-  m_gui->Button(ID_REMOVE_DEVICE,"Remove Device");
-  m_gui->Button(ID_LOAD,"Load");
-  m_gui->Button(ID_STORE,"Save as");
-  m_gui->Label("installed devices");
-  m_gui->Add(m_DeviceTree,0,0);
-  m_gui->Label("selected device options");
+  m_Gui->Button(ID_ADD_DEVICE,"Add Device");
+  m_Gui->Button(ID_REMOVE_DEVICE,"Remove Device");
+  m_Gui->Button(ID_LOAD,"Load");
+  m_Gui->Button(ID_STORE,"Save as");
+  m_Gui->Label("installed devices");
+  m_Gui->Add(m_DeviceTree,0,0);
+  m_Gui->Label("selected device options");
 
-  m_Bindings = new mmgGui(this); // bindings will be added to m_gui later (at the device selection)
+  m_Bindings = new mmgGui(this); // bindings will be added to m_Gui later (at the device selection)
   m_Bindings->Divider(1);
   m_Bindings->Label("actions associated to this device",false);
   m_ActionsList = m_Bindings->CheckList(ID_BINDING_LIST,"",60);
@@ -1041,5 +1041,5 @@ void mafInteractionManager::CreateGUI()
 mmgGui* mafInteractionManager::GetGui()
 //----------------------------------------------------------------------------
 {
-  return m_gui;
+  return m_Gui;
 }
