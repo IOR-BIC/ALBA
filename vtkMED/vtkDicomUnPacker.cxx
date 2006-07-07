@@ -11,7 +11,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.4 $");
+vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.5 $");
 vtkStandardNewMacro(vtkDicomUnPacker);
 
 //----------------------------------------------------------------------------
@@ -372,7 +372,7 @@ int vtkDicomUnPacker::read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *
 				first_one= 0 ;
         elementLength = 0;  //2006-04-04 by danno
 	      fseek_result = fseek(fp,128,0); /* skip preamble bytes next 4 bytes should be "DICM" */ 
-	      fread(t, 1 , 4, fp);
+	      int a=fread(t, 1 , 4, fp);
 	      if (t[0] != 'D' || t[1] != 'I' || t[2] != 'C' || t[3] != 'M')  
 				{
 					/* it's not proper part 10 - try w/out the 128 byte preamble */ 
@@ -427,6 +427,8 @@ int vtkDicomUnPacker::read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *
 		}
 		pos = find(groupWord, elementWord, DICT, DICT_line);
 
+		if(((long)elementLength)==-1) 
+			elementLength=0;
 		if (pos<0) 
 		{ /* NO DEFINED into CURRENT DICTIONARY */ 
 			RESULT[RESULT_line].intoDictionary=no;
@@ -643,6 +645,8 @@ int read_dicom_string_image(char *filename, T *IMAGE, double slope_value, double
 				elementLength >>= 16;      
       }
 		}
+		if(((long)elementLength)==-1) 
+			elementLength=0;
 		if ((groupWord == 0x7fe0) & (elementWord == 0x0010)) 
 		{
 			int r,c;
