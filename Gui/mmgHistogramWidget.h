@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgHistogramWidget.h,v $
   Language:  C++
-  Date:      $Date: 2006-05-09 12:11:29 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-07-07 13:17:26 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -13,6 +13,10 @@
 #ifndef __mmgHistogramWidget_H__
 #define __mmgHistogramWidget_H__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "mmgPanel.h"
 #include "mafDecl.h"
 #include "mafEvent.h"
 
@@ -27,7 +31,7 @@ class mmgGui;
 
 //----------------------------------------------------------------------------
 /** mmgHistogramWidget : widget that encapsulate render window into a gui*/
-class mmgHistogramWidget: public wxPanel, public mafObserver
+class mmgHistogramWidget: public mmgPanel, public mafObserver
 {
 public:
   mmgHistogramWidget(wxWindow* parent, wxWindowID id = -1, const wxPoint& pos = wxDefaultPosition, 

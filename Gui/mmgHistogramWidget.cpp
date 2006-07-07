@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgHistogramWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2006-05-09 12:11:29 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2006-07-07 13:17:26 $
+Version:   $Revision: 1.9 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -37,7 +37,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 //----------------------------------------------------------------------------
 mmgHistogramWidget::mmgHistogramWidget(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
-:wxPanel(parent,id,pos,size,style)
+:mmgPanel(parent,id,pos,size,style)
 //----------------------------------------------------------------------------
 {
 	m_Listener    = NULL;
@@ -64,6 +64,8 @@ mmgHistogramWidget::mmgHistogramWidget(wxWindow* parent, wxWindowID id, const wx
   m_HistogramRWI->m_RenFront->AddActor2D(m_Histogram);
   m_HistogramRWI->m_RenFront->SetBackground(0.28,0.28,0.28);
   m_HistogramRWI->SetSize(pos.x,pos.y,size.GetWidth(),size.GetHeight());
+  ((wxWindow *)m_HistogramRWI->m_RwiBase)->SetSize(size.GetWidth(),size.GetHeight());
+  m_HistogramRWI->m_RwiBase->SetMinSize(wxSize(size.GetWidth(),size.GetHeight()));
   m_HistogramRWI->m_RwiBase->Reparent(this);
   m_HistogramRWI->m_RwiBase->SetListener(this);
   m_HistogramRWI->m_RwiBase->Show(true);
@@ -72,10 +74,13 @@ mmgHistogramWidget::mmgHistogramWidget(wxWindow* parent, wxWindowID id, const wx
   sizer->Add(m_HistogramRWI->m_RwiBase,1, wxEXPAND);
 
   SetSizer(sizer);
+
+  sizer->Layout();           // resize & fit the contents
+  sizer->SetSizeHints(this); // resize the dialog accordingly 
+
   SetAutoLayout(TRUE);
   sizer->Fit(this);
 
-  SetSize(pos.x,pos.y,size.GetWidth(),size.GetHeight());
   CreateGui();
 }
 //----------------------------------------------------------------------------
