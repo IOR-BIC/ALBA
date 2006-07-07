@@ -97,7 +97,11 @@ VERBATIM_HEADERS       = NO
 ALPHABETICAL_INDEX     = YES
 COLS_IN_ALPHA_INDEX    = 4
 IGNORE_PREFIX          = maf \
-                         mm
+                         mmi \
+                         mmo \
+                         mmg \
+                         mmu \
+                         mmd 
 #---------------------------------------------------------------------------
 # configuration options related to the HTML output
 #---------------------------------------------------------------------------
