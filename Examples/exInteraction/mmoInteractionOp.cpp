@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoInteractionOp.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-07 08:18:26 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-07-07 09:18:05 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,7 +33,7 @@
 
 /******************************************************************************/
 /** UNCOMMENT HERE TO DECLARE THE ACTIONS               (PASS 1)              */
-/* *
+/* */
 //----------------------------------------------------------------------------
 const char *mmoInteractionOp::m_Actions[] = {"MyCustomAction",NULL};
 //----------------------------------------------------------------------------
@@ -84,7 +84,7 @@ void mmoInteractionOp::OpRun()
 
   /******************************************************************************/
   /** UNCOMMENT HERE TO CREATE INTERACTORS TO MOVE THE GIZMO  WITH MOUSE (PASS 2)*/
-  /* *
+  /* */
   //----------------------------------------------------------------------------
 	// compositor
 	//----------------------------------------------------------------------------
@@ -104,8 +104,8 @@ void mmoInteractionOp::OpRun()
 
   /******************************************************************************/
   /** UNCOMMENT HERE TO ATTACH THE INTERACTOR TO THE ACTION    (PASS 3)         */
-	/* *
-  mafEventMacro( mafEvent( this, INTERACTOR_ADD, m_MouseInteractor, &mafString(m_Actions[0]) ) );
+	/* */
+  mafEventMacro( mafEvent( this, INTERACTOR_ADD, m_MouseInteractor, &mafString(m_Actions[0])) );
   /******************************************************************************/
 
   /******************************************************************************/
@@ -141,7 +141,7 @@ void mmoInteractionOp::OpStop(int result)
   
   /******************************************************************************/
   /** UNCOMMENT HERE TO DETACH THE INTERACTOR FROM THE ACTION      (PASS 3)     */
-	/* *
+	/* */
   mafEventMacro( mafEvent( this, INTERACTOR_REMOVE, m_MouseInteractor, &mafString(m_Actions[0]) ) );
   /******************************************************************************/
 
@@ -154,7 +154,7 @@ void mmoInteractionOp::OpStop(int result)
 
   /******************************************************************************/
   /** UNCOMMENT HERE TO DESTROY THE INTERACTOR                     (PASS 2)     */
-	/* *
+	/* */
   mafDEL(m_MouseInteractor);
   /******************************************************************************/
   

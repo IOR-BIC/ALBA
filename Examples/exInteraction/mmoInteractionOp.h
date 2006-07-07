@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoInteractionOp.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-07 08:18:26 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-07-07 09:18:05 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -39,7 +39,7 @@ public:
 
 /******************************************************************************/
 /** UNCOMMENT HERE TO DECLARE THE ACTIONS                  (PASS 1)           */
-/* *
+/* */
   static const char *m_Actions[];
   virtual const char ** GetActions();
 /******************************************************************************/
