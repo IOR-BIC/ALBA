@@ -108,8 +108,13 @@ SET(PROJECT_SRCS
   mmdTracker.cpp
   mmdTracker.h
   
-  mmi2DMeter.cpp
-  mmi2DMeter.h
+  mmi2DAngle.cpp
+  mmi2DAngle.h
+  mmi2DDistance.cpp
+  mmi2DDistance.h
+  mmi2DIndicator.cpp
+  mmi2DIndicator.h
+
   mmi6DOF.cpp
   mmi6DOF.h
   mmi6DOFCameraMove.cpp

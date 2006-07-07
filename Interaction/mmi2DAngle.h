@@ -1,37 +1,36 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mmi2DMeter.h,v $
+Module:    $RCSfile: mmi2DAngle.h,v $
 Language:  C++
-Date:      $Date: 2006-03-28 08:32:41 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2006-07-07 08:17:49 $
+Version:   $Revision: 1.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef __mmi2DMeter_h
-#define __mmi2DMeter_h
+#ifndef __mmi2DAngle_h
+#define __mmi2DAngle_h
 
 #include "mmiPER.h"
 #include "mafEvent.h"
+#include "vtkTextActorMeter.h"
 
 //----------------------------------------------------------------------------
 // forward refs
 //----------------------------------------------------------------------------
 class mafRWI;
 class mmdMouse;
-
 class vtkLineSource;
 class vtkCoordinate;
 class vtkPolyDataMapper2D;
 class vtkActor2D;
 class vtkRenderWindow;
 class vtkRenderer;
-class vtkXYPlotActor;
 class vtkTextActor;
 
-class vtkTextActorMeter;
+
 
 /**  Class implementing an interactor for creating 2D measure tool.
 This interactor build a line from picked points on VME and draw a 2D line on the renderwindow.
@@ -43,17 +42,16 @@ the histogram of the probed points on VME. This interactor works in renderwindow
 maintaining measure persistence at button up
 */
 //----------------------------------------------------------------------------
-class mmi2DMeter : public mmiPER
+class mmi2DAngle : public mmiPER
 	//----------------------------------------------------------------------------
 {
 public:
-	mafTypeMacro(mmi2DMeter, mmiPER);
+	mafTypeMacro(mmi2DAngle, mmiPER);
 
 	enum METER_2D_MODALITY
 	{
-		DISTANCE_BETWEEN_POINTS = 0,
-		DISTANCE_BETWEEN_LINES,
-		ANGLE_BETWEEN_LINES,
+		
+		ANGLE_BETWEEN_LINES = 0,
 		ANGLE_BETWEEN_POINTS,
 		ID_RESULT_MEASURE,
 		ID_RESULT_ANGLE,
@@ -62,12 +60,8 @@ public:
 	/** 
 	Set the type of the measure, selectable from DISTANCE_BETWEEN_POINTS, DISTANCE_BETWEEN_LINES and ANGLE_BETWEEN_LINES.*/
 	void SetMeasureType(int t);
-	/** 
-	Set the type of the measure to DISTANCE_BETWEEN_POINTS.*/
-	void SetMeasureTypeToDistanceBetweenPoints() {SetMeasureType(DISTANCE_BETWEEN_POINTS);};
-	/** 
-	Set the type of the measure to DISTANCE_BETWEEN_LINES.*/
-	void SetMeasureTypeToDistanceBetweenLines()  {SetMeasureType(DISTANCE_BETWEEN_LINES);};
+	
+	
 	/** 
 	Set the type of the measure to ANGLE_BETWEEN_LINES.*/
 	void SetMeasureTypeToAngleBetweenLines()     {SetMeasureType(ANGLE_BETWEEN_LINES);};
@@ -80,29 +74,51 @@ public:
 	Remove the meters from the render window*/
 	void RemoveMeter();
 
-	/** 
-	Turn On/Off the creation of the histogram.*/
-	void GenerateHistogram(bool generate);
-
-	/** 
-	Turn On the generation of the histogram from the measured line. It force the measure to be on DISTANCE_BETWEEN_POINTS.*/
-	void GenerateHistogramOn() {GenerateHistogram(true);};
-
-	/** 
-	Turn Off the generation of the histogram.*/
-	void GenerateHistogramOff() {GenerateHistogram(false);};
-
   /** 
 	Undo the last measure*/
 	void UndoMeasure();
+
   
+  /** 
+	Control if disabling various buttons*/
+	bool IsDisableUndoAndOkCancel();
+  
+  /** 
+	Set manually the angle*/
+	void SetManualAngle(double manualAngle);
+
+	/**
+	Get Last Angle */
+	double GetLastAngle() {
+													if(m_Measure.size()) 
+														return m_Measure[m_Measure.size()-1];
+													else
+														return 0;
+												}
+
+	/**
+	Get the boolean value of end measure*/
+	bool GetRegisterMeasure(){return m_RegisterMeasure;}
+
+	/**
+	Set the label*/
+	void SetLabel(mafString label);
+
+	/**
+	Get the label*/
+	mafString GetLabel() { if(m_MeterVector.size()) 
+													 return mafString(m_MeterVector[m_MeterVector.size()-1]->GetText());
+												 else 
+													 return mafString("");
+												}
+
   /**
   Return the dimension of Measure Vector
   */
   int SizeMeasureVector(){ return m_Measure.size(); }
 protected:
-	mmi2DMeter();
-	virtual ~mmi2DMeter();
+	mmi2DAngle();
+	virtual ~mmi2DAngle();
 
 	virtual void OnLeftButtonDown   (mafEventInteraction *e);
 	virtual void OnLeftButtonUp     (mafEventInteraction *e);
@@ -122,9 +138,6 @@ protected:
 	Calculate the measure according to the measure type selected*/
 	void CalculateMeasure();
   
-	/** 
-	Create the histogram*/
-	void CreateHistogram();
 
   //persistent measure BEGIN
   std::vector<vtkActor2D *> m_LineActorVector1;
@@ -153,33 +166,34 @@ protected:
 	vtkActor2D          *m_LineActor2;
 	vtkRenderer         *m_LastRenderer; ///< Renderer used for the first line
 	vtkRenderer         *m_CurrentRenderer;
+  vtkRenderer         *m_PreviousRenderer;
 
-	wxDialog  *m_HistogramDialog;
-	mafRWI    *m_HistogramRWI;
-	vtkXYPlotActor *m_PlotActor;
 
-	bool m_GenerateHistogram;
+	
 	bool m_DraggingLine;
 	bool m_DraggingLeft;
 	bool m_DraggingMouse;
 	bool m_EndMeasure;
 	bool m_ParallelView;
 	int  m_MeasureType;
-
+  bool m_Clockwise;
+  bool m_DisableUndoAndOkCancel;
+	bool m_RegisterMeasure;
 	mmdMouse *m_Mouse;
 
   std::vector<int> m_FlagMeasureType;
   std::vector<double> m_Measure;
   
   
-	double  m_Distance;
+
   double  m_Angle;
+  double m_AbsoluteAngle ;
 	double  m_PickedPoint[3]; ///< 3D position of the picked point; used to assign position to the m_ProbingLine
 	mafVME *m_ProbedVME; ///< VME probed by the m_ProbingLine
   
 private:
-	mmi2DMeter(const mmi2DMeter&);   // Not implemented.
-	void operator=(const mmi2DMeter&);  // Not implemented.
+	mmi2DAngle(const mmi2DAngle&);   // Not implemented.
+	void operator=(const mmi2DAngle&);  // Not implemented.
 };
 #endif
 
