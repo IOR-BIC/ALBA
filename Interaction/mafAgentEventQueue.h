@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAgentEventQueue.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:52 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-07-07 08:22:03 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -21,30 +21,30 @@
 //----------------------------------------------------------------------------
 class mafMutexLock;
 
-/** Base class for managing events queueing and synchronized dispatching.
+/** Base class for managing event queueing and synchronized dispatching.
   This class is thought to manage events queueing and synchronized dispatching in a multithreaded 
   events oriented architecture. An EventQueue is a mafAgent (i.e. able to
-  listen to events coming from children as argument of the ProcessEvent() function), but also process
-  events in the queue. Events in the queue are also processed by ProcessEvent()
-  To queue events you can use the PushEvent() function. Queued events are dispatched when the
-  DispatchEvents() function is called. Dispatching an event means either, to pass the dequeued event to the
-  ProcessEvent() function (SelfProcessMode) or to rise a broadcast event having as "callData" the event itself
-  (BroadcastMode). The default ProcessEvent() function forwards the event to the queue listener, but subclasses 
+  listen to events coming from other objects and passed as arguments of the OnEvent() function), but it can
+  also process events in its queue. Events in the queue are also processed by OnEvent(), while
+  to queue events you can use the PushEvent() function. Queued events are dispatched when the
+  DispatchEvents() function is called. Dispatching an event means either to pass the dequeued events to the
+  OnEvent() function (SelfProcessMode) or to rise a broadcast event having as "callData" the event itself
+  (BroadcastMode). The default OnEvent() function forwards the event to the queue listener, but subclasses 
   can override this virtual method.
   The EventQueue class is also the base class for managing the synchronization. To do this, 
   when the first event is queued (i.e. the queue was previously empty), the mafAgentEventQueue creates
   a new event with ID "mafAgentEventQueue::EVENT_DISPATCH", (it's a request for dispatching) and
-  sends it to its Listener (if present). This events should be managed by a dispatched object, usually
+  sends it to its Listener (if present). This event should be managed by a dispatcher object, usually
   another queue or better a threaded agent (@sa mflThreadedAgent and mafEventHandler).
-  While dispatching events in the queue if a mafAgentEventQueue::EVENT_DISPATCH is found it not processed
-  by ProcessEvent neither broadcasted, but DispatchEvents() of the sender is called. This way a manager
-  can manage dispatching of events in a separate thread by simpling calling PushEvent() when it finds
-  a mafAgentEventQueue::EVENT_DISPATCH during ProcessEvent() (see mafDeviceManager).
+  If a mafAgentEventQueue::EVENT_DISPATCH is found, while dispatching events in the queue, it's not processed
+  by OnEvent and neither broadcasted, but the DispatchEvents() function of the sender object is called.
+  Dispatching of events in a separate thread can be performed by calling PushEvent() when an incoming event
+  is found to be a mafAgentEventQueue::EVENT_DISPATCH during the OnEvent() (see mafDeviceManager).
 
   When dispatching events (i.e. when DispatchEvents() is called), if the EventQueue finds
   a request for dispatching in the queue it calls the DispatchEvents() function of the sender
   (i.e. triggers the dispatching of events in that queue).
-  As already stated, each dispatched event is either self processed by means of the ProcessEvent()
+  As already stated, each dispatched event is either self processed by means of the OnEvent()
   function or broadcasted rising a broadcasting event on the original queue on the original channel.
   Whether self process or broadcast depends on SelfProcessMode flag (default is broadcasting).
   
@@ -52,7 +52,7 @@ class mafMutexLock;
   synchronizations (i.e. a basic form of data fusion). More complex data fusions can be
   performed redefining the DispacthEvents function.
 
-  @sa mafAgent mflThreadedAgent mafEventHandler*/
+  @sa mafAgent mafAgentThreaded mafAgentEventHandler*/
 class MAF_EXPORT mafAgentEventQueue : public mafAgent
 {
 public:

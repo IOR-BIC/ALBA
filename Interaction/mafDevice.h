@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDevice.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-07-07 08:22:03 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -22,12 +22,15 @@ class mmgGui;
 
 /** 
   This abstract class manages function calls coming from devices and 
-  issue specific events to interactors. Usually device's events are synchronized
-  with the application by sending a request for dispatching to the device manager.  
+  issue specific events to interactors. Usually all evetns sent by devices are synchronized
+  with the application by sending a request for dispatching to the device manager.
+  Devices are typically managed by the device manager object, whose responsible for keeping a list
+  of the allocated devices, storing this list and all devices configurations, and restoring all devices
+  from a saved file. Devices are devided in two cathegories, persistent and non persistent. The first 
+  ones are not saved and restored, but have a life span corresponding to the application's one.
   @sa mafDeviceManger
   @todo
    - check about ID restoring
-
  */
 class mafDevice : public mafAgentThreaded, public mafStorable
 {

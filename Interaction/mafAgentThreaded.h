@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAgentThreaded.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-18 17:29:03 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-07-07 08:22:03 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -21,13 +21,19 @@
 //------------------------------------------------------------------------------
 class mafMutexLock;
 
-/** An agent processing queued events on a separate thread.
-  This is a special case of agent, able to run a separate thread to process
+/** An agent processing the queued events on a separate thread.
+  This is a special case of agent, able to run a separate thread for processing
   queued events. The class also features an asynchronous mechanism for
-  forwarding (or sending) events allowing the precessing thread to send
+  sending events to observers, allowing the internal thread to send
   an event to be processed by a separate thread. This happens by queuing 
-  the output event wrapped in a AGENT_ASYNC_DISPATCH, which is processed in
+  the output event wrapped in a AGENT_ASYNC_DISPATCH, which is later on processed in
   the main thread, by using the original mafAgentEventQueue mechanism for dispatching.
+  Notice that, the asnycronous mechanism requires the  of this class 
+  to be called on a different thread. Dispatching on another thread is therefore 
+  responsability of a different class, specifically designed to process it incoming events
+  on a different tread (e.g. mafAgentEventHandler).
+  The mafAgentThreaded DispatchEvents() will take care of extracting the message contained 
+  inside a AGENT_ASYNC_DISPATCH event type and dispatch it.
   @sa mafAgent mafAgentEventQueue mafEventBase
 */
 class MAF_EXPORT mafAgentThreaded : public mafAgentEventQueue

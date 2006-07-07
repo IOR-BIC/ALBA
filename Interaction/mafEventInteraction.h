@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventInteraction.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-14 17:42:28 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-07-07 08:22:03 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -17,7 +17,7 @@
 #include "mafMatrix.h"
 #include "mafSmartPointer.h"
 
-/** Event class to transport a triggering button.
+/** Event class to transport a triggering button and a position from pointing devices.
   Evant issue by 2D and 3D tracking devices in correspondace to
   MoveEvent, ButtonDownEvent and ButtonUpevent. 2D devices set the 
   X and Y coordinates, while 3D devices set the pose matrix. The event

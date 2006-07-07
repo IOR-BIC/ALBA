@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceSet.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-29 06:06:33 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-07-07 08:22:03 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -20,13 +20,11 @@
 //----------------------------------------------------------------------------
 class mafMutexLock;
 /**
-  This class manages a set of devices storing the list of device pointers and 
-  dispatching commands to strored devices, e.g. initializzation commands. Being an event 
-  queue it gathers events coming from all devices (e.g. running on different threads) and
+  This class manages a set of usb-devices, and stores a list of all child devices' pointers. It also
+  dispatches some commands to child devices, e.g. initializzation commands. Being also an event 
+  queue, this class gathers events coming from all devices (e.g. running on different threads) and
   serializes their dispatching.
-  @sa mafDevice mflDispatcher mflEvent
-  @todo
-  - Improve Add/Remove device to manage the device tear up and shut down
+  @sa mafDeviceManager mafEvent
   */
 class mafDeviceSet : public mafDevice
 {
@@ -35,16 +33,16 @@ public:
   // Events
   //------------------------------------------------------------------------------
   /** @ingroup Events 
-      Adds a device (in Data argument) to this set (to be removed) */
+      Adds a device (passed in the Data argument) to this set (to be removed) */
   MAF_ID_DEC(DEVICE_ADD);
   /** @ingroup Events 
-      Remove a device (in Data argument) from this set (to be removed) */
+      Remove a device (passed in the Data argument) from this set (to be removed) */
   MAF_ID_DEC(DEVICE_REMOVE);
   /** @ingroup Events 
-      Issued when a new device (in Data argument) is added to this set */
+      Issued when a new device (passed in the Data argument) is added to this set */
   MAF_ID_DEC(DEVICE_ADDED);
   /** @ingroup Events 
-      Issued when a device (in Data argument) is being removed from this set */
+      Issued when a device (passed in the Data argument) is being removed from this set */
   MAF_ID_DEC(DEVICE_REMOVING); 
   /** @ingroup channel
       New channel for settings */

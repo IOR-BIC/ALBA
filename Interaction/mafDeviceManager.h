@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 16:43:04 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-07-07 08:22:03 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -24,10 +24,23 @@ class mafDevice;
 class mafDeviceSet;
 
 /**
-  Class managing the devices and the synchronization with wxWindows message pump.
+  Class managing the devices inside a MAF application and the synchronization with wxWindows message pump.
   This class is used both as a container for all active devices and manages synchronization
-  of events coming from input devices with wxWindows message pump. To store devices
-  a mafDeviceSet object is used.
+  of events coming from input devices with wxWindows message pump.
+  The synchronization mechanisms is accomplished by executing the "dispatching" on a separate thread, and this is 
+  currently imlemented by sending an event on the GUI message pump with a request for dispatching the events. This
+  make dispatching to occurs on the right thread @sa mafAgentEventThreaded.
+
+  Device instances can be of two different types: persistent and non-persistent. The first class of devices are
+  typically created by the application code, while the seconds are created by user using the Interaction Settings
+  configuration dialog. Persistent devices are not stored to disk and neither they are stopped or destroyed when
+  a new device configuration is loaded from disk. Typically a non persistent device object pointer should not be
+  stored by other componenents, since when loading new configuration these devices are destroyed a new one are 
+  created.  An example of persistent device is the mouse, which is created at application start.
+  
+  To store devices a mafDeviceSet object is internally used as the root of the devices tree. Devices that could have
+  subdevices can inherit from mafDeviceSet to correctly manage the start/stop mechanisms of all subdevices.
+  
   @sa mafDevice mafDeviceSet
   @todo 
   - implement AddDevice()
