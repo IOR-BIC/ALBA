@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-27 16:47:15 $
-  Version:   $Revision: 1.65 $
+  Date:      $Date: 2006-07-07 12:43:23 $
+  Version:   $Revision: 1.66 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -171,10 +171,15 @@ void mafLogicWithManagers::Configure()
   m_SettingsDialog->AddPage( m_Win->GetDockSettingGui(), "User Interface Preferences"); 
   
   if(m_InteractionManager)
-    m_SettingsDialog->AddPage( m_InteractionManager->GetGui(), "Interaction Manager");
+    m_SettingsDialog->AddPage(m_InteractionManager->GetGui(), "Interaction Manager");
     
   if(m_LocaleSettings)
-    m_SettingsDialog->AddPage( m_LocaleSettings->GetGui(), "Interface language");
+    m_SettingsDialog->AddPage(m_LocaleSettings->GetGui(), "Interface language");
+
+  if (m_MeasureUnitSettings)
+  {
+    m_SettingsDialog->AddPage(m_MeasureUnitSettings->GetGui(), "Measure Unit");
+  }
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Plug(mafView* view) 
@@ -320,9 +325,8 @@ void mafLogicWithManagers::CreateMenu()
   m_MenuBar->Append(m_OpMenu, _("&Operations"));
 
   wxMenu    *option_menu = new wxMenu;
-  option_menu->Append(MENU_OPTION_MEASURE_UNIT_SETTINGS, _("Measure Unit Settings"));
-  option_menu->Append(ID_APP_SETTINGS, _("Application Preferences"));
-  m_MenuBar->Append(option_menu, _("Options"));
+  option_menu->Append(ID_APP_SETTINGS, _("Options..."));
+  m_MenuBar->Append(option_menu, _("Tools"));
 
   m_Win->SetMenuBar(m_MenuBar);
 
@@ -629,9 +633,6 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       // commands related to interaction manager
       case ID_APP_SETTINGS:
         m_SettingsDialog->ShowModal();
-      break;
-      case MENU_OPTION_MEASURE_UNIT_SETTINGS:
-        m_MeasureUnitSettings->ChooseMeasureUnit();
       break;
       case mmgMeasureUnitSettings::MEASURE_UNIT_UPDATED:
         UpdateMeasureUnit();
