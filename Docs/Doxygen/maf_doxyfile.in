@@ -3,7 +3,7 @@
 #---------------------------------------------------------------------------
 # Project related configuration options
 #---------------------------------------------------------------------------
-PROJECT_NAME           = "MAF 2.0 (Reloaded)"
+PROJECT_NAME           = "MAF 2.2"
 PROJECT_NUMBER         = 
 OUTPUT_DIRECTORY       = "@PROJECT_BINARY_DIR@"
 OUTPUT_LANGUAGE        = English
