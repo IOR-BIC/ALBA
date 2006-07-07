@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-09 15:51:56 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2006-07-07 13:17:53 $
+  Version:   $Revision: 1.32 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -162,10 +162,14 @@ void mafViewOrthoSlice::CreateGuiView()
   m_Histogram = new mmgHistogramWidget(m_GuiView,-1,wxPoint(0,0),wxSize(500,100));
   m_Histogram->SetListener(this);
   m_Histogram->SetRepresentation(vtkHistogram::BAR_REPRESENTATION);
+  m_Histogram->SetSize(500,100);
+  m_Histogram->SetMinSize(wxSize(500,100));
   
   m_Luts = new mmgLutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
-  EnableWidgets(m_CurrentVolume != NULL);
   m_Luts->SetListener(this);
+  m_Luts->SetSize(500,24);
+  m_Luts->SetMinSize(wxSize(500,24));
+  EnableWidgets(m_CurrentVolume != NULL);
   m_GuiView->Add(m_Histogram);
   m_GuiView->Add(m_Luts);
   m_GuiView->Reparent(m_Win);
