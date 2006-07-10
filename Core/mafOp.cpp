@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-03 10:58:03 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2006-07-10 14:16:24 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,6 +45,7 @@ mafOp::mafOp(wxString label)
   m_Compatibility     = 0xFFFF;
   m_InputPreserving = true;
   m_CollaborateStatus = false;
+  m_TestMode = false;
 }
 //----------------------------------------------------------------------------
 mafOp::mafOp()

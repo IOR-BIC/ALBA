@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-03 10:58:03 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2006-07-10 14:16:24 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -128,6 +128,13 @@ public:
   /** Turn On/Off the collaboration status. */
   void Collaborate(bool status);
 
+  /** Turn On m_TestMode flag. 
+  The m_TestMode flag is used to exclude the execution of splash screen or wxBusyInfo that conflicts with test machine.*/
+  void TestModeOn() {m_TestMode = true;};
+
+  /** Used to turn off m_TestMode flag.*/
+  void TestModeOff() {m_TestMode = false;};
+
 protected:
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   virtual void OpStop(int result);
@@ -142,5 +149,6 @@ protected:
 	mafObserver    *m_Listener;
   mmdMouse       *m_Mouse;
   bool            m_CollaborateStatus;
+  bool            m_TestMode; ///< Flag used with cppunitTest: put this flag at true when executing tests to avoid busyinfo or splash screen to be created, default is false.
 };
 #endif
