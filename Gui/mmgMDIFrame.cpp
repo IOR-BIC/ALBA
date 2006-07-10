@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-26 15:34:42 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-07-10 15:22:20 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -240,8 +240,11 @@ void mmgMDIFrame::CreateStatusbar ()
 	SetStatusText( " ",2);
 	SetStatusText( " ",3);
 
-	m_Busy=FALSE;
-	m_Gauge = new wxGauge(m_frameStatusBar, -1, 100,wxDefaultPosition,wxDefaultSize,wxGA_SMOOTH);
+  // Paolo 10 Jul 2006: due to position correctly the progress bar.
+	wxRect pr;
+  m_frameStatusBar->GetFieldRect(4,pr);
+  m_Busy=FALSE;
+	m_Gauge = new wxGauge(m_frameStatusBar, -1, 100,pr.GetPosition(),pr.GetSize(),wxGA_SMOOTH);
 	m_Gauge->SetForegroundColour( *wxRED );
   m_Gauge->Show(FALSE);
 }
@@ -261,61 +264,61 @@ void mmgMDIFrame::OnIdle(wxIdleEvent& event)
 //-----------------------------------------------------------
 void mmgMDIFrame::Busy()
 //-----------------------------------------------------------
-  {
+{
   SetStatusText("Busy",2);
   SetStatusText("",3);
   m_Gauge->Show(TRUE);
   m_Gauge->SetValue(0);
   Refresh(FALSE);
-  }
+}
 //-----------------------------------------------------------
 void mmgMDIFrame::Ready()
 //-----------------------------------------------------------
-  {
+{
   SetStatusText("",2);
   SetStatusText("",3);
   m_Gauge->Show(FALSE);
   Refresh(FALSE);
-  }
+}
 //-----------------------------------------------------------
 void mmgMDIFrame::ProgressBarShow()
 //-----------------------------------------------------------
-  {
+{
   SetStatusText("",0);
   Busy();
-  }
+}
 //-----------------------------------------------------------
 void mmgMDIFrame::ProgressBarHide()
 //-----------------------------------------------------------
-  {
+{
   SetStatusText("",0);
   Ready();
-  }
+}
 //-----------------------------------------------------------
 void mmgMDIFrame::ProgressBarSetVal(int progress)
 //-----------------------------------------------------------
-  {
+{
   m_Gauge->SetValue(progress);
   SetStatusText(wxString::Format(" %d%% ",progress),3);
-  }
+}
 //-----------------------------------------------------------
 void mmgMDIFrame::ProgressBarSetText(wxString *msg)
 //-----------------------------------------------------------
-  {
+{
   if(msg) SetStatusText(*msg,0);
-  }
+}
 //-----------------------------------------------------------
 void mmgMDIFrame::RenderStart()
 //-----------------------------------------------------------
-  {
+{
     SetStatusText( "Rendering",1);
-  }
+}
 //-----------------------------------------------------------
 void mmgMDIFrame::RenderEnd()
 //-----------------------------------------------------------
-  {
+{
     SetStatusText( " ",1);
-  }
+}
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #ifdef MAF_USE_VTK
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -369,8 +372,6 @@ void mmgMDIFrame::AddDockPane(wxWindow *window, wxPaneInfo& pane_info)
 //-----------------------------------------------------------
 {
   m_DockManager.AddPane(window,pane_info);
-  // devo creare la voce di menu ?  --- non adesso, e' gia nel DockManager
-  // magari si - ma poi mi devo anche rispondere
   m_DockManager.Update();
 }
 //-----------------------------------------------------------
