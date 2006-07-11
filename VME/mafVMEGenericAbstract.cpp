@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-28 23:09:14 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-07-11 09:28:01 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,6 +22,8 @@
 
 
 #include "mafVMEGenericAbstract.h"
+#include "mmgGui.h"
+
 #include "mafDataVector.h"
 #include "mafMatrixVector.h"
 #include "mafMatrixInterpolator.h"
@@ -177,8 +179,8 @@ int mafVMEGenericAbstract::ReparentTo(mafNode *parent)
 {
   if (CanReparentTo(parent) && !IsInTree(parent))
   {
-    // When we reparent to a different tree, or we simply
-    // cut a tree, pre travers the sub tree to read data into memory
+    // When we re-parent to a different tree, or we simply
+    // cut a tree, before traverse the sub tree to read data into memory
     // future release should read one item at once, write it
     // to disk and then release the data, or better simply copy the file
     // into the new place, this to be able to manage HUGE datasets.
@@ -232,14 +234,15 @@ int mafVMEGenericAbstract::InternalStore(mafStorageElement *parent)
   // sub-element for storing the data vector
   if (m_DataVector)
   {
+    m_DataVector->SetCrypting(this->m_Crypting);
     mafStorageElement *data_vector = parent->AppendChild("DataVector");
-    if(m_DataVector->Store(data_vector))
+    if(m_DataVector->Store(data_vector) == MAF_ERROR)
       return MAF_ERROR;
   }
 
   // sub-element for storing the matrix vector
   mafStorageElement *matrix_vector = parent->AppendChild("MatrixVector");
-  if(m_MatrixVector->Store(matrix_vector))
+  if(m_MatrixVector->Store(matrix_vector) == MAF_ERROR)
     return MAF_ERROR;
 
   return MAF_OK;
@@ -250,7 +253,7 @@ int mafVMEGenericAbstract::InternalRestore(mafStorageElement *node)
 //-----------------------------------------------------------------------
 {
   int ret_val = MAF_OK;
-  Superclass::InternalRestore(node); 
+  Superclass::InternalRestore(node);
   
   // restore Data Vector
   if (m_DataVector)
@@ -272,12 +275,34 @@ int mafVMEGenericAbstract::InternalRestore(mafStorageElement *node)
   }
   return ret_val;
 }
+//-------------------------------------------------------------------------
+mmgGui *mafVMEGenericAbstract::CreateGui()
+//-------------------------------------------------------------------------
+{
+  m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name
+  m_Gui->SetListener(this);
+#ifdef MAF_USE_CRYPTO
+  m_Gui->Bool(ID_VME_CRYPTING,"crypt",&m_Crypting);
+#endif
+  return m_Gui;
+}
 
 //-------------------------------------------------------------------------
 void mafVMEGenericAbstract::OnEvent(mafEventBase *maf_event)
 //-------------------------------------------------------------------------
 {
-  if (maf_event->GetChannel()==MCH_DOWN)
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  {
+    switch (e->GetId())
+    {
+      case ID_VME_CRYPTING:
+        SetCrypting(m_Crypting);
+      break;
+      default:
+        Superclass::OnEvent(maf_event);
+    }
+  }
+  else if (maf_event->GetChannel()==MCH_DOWN)
   {
     if (maf_event->GetId() == mafVMEStorage::MSF_FILENAME_CHANGED)
     {
@@ -287,9 +312,8 @@ void mafVMEGenericAbstract::OnEvent(mafEventBase *maf_event)
         GetDataVector()->Modified();
       }
     } 
-    
   }
-  
+
   Superclass::OnEvent(maf_event);
 }
 
@@ -299,6 +323,10 @@ void mafVMEGenericAbstract::Print(std::ostream& os, const int tabs)
 {
   Superclass::Print(os,tabs);
   mafIndent indent(tabs);
+
+  os << indent << "Encryption: ";
+  os << (m_Crypting != 0) ? "On" : "Off";
+  os << "\n";
 
   os << indent << "DataVector:"; 
   if (m_DataVector)
