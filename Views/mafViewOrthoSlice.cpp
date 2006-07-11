@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-07 13:17:53 $
-  Version:   $Revision: 1.32 $
-  Authors:   Paolo Quadrani
+  Date:      $Date: 2006-07-11 17:27:02 $
+  Version:   $Revision: 1.33 $
+  Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -24,7 +24,6 @@
 #include "mafPipeVolumeSlice.h"
 #include "mmgLutSwatch.h"
 #include "mmgLutPreset.h"
-#include "mmgHistogramWidget.h"
 #include "mmgGui.h"
 #include "mmgFloatSlider.h"
 #include "mmgLutSlider.h"
@@ -32,15 +31,48 @@
 #include "mafEventSource.h"
 
 #include "mmaVolumeMaterial.h"
+#include "mafVMESurface.h"
 #include "mafVMEVolume.h"
+#include "mafGizmoSlice.h"
 
 #include "vtkDataSet.h"
 #include "vtkPointData.h"
+#include "vtkPoints.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewOrthoSlice);
 //----------------------------------------------------------------------------
 
+//----------------------------------------------------------------------------
+// constants:
+//----------------------------------------------------------------------------
+
+enum
+{
+  PERSPECTIVE_VIEW = 0,
+  XN_VIEW,
+  YN_VIEW,
+  ZN_VIEW,
+  VIEWS_NUMBER,
+};
+
+
+enum
+{
+  CHILD_PERSPECTIVE_VIEW = 0,
+  CHILD_ZN_VIEW,
+  CHILD_XN_VIEW,
+  CHILD_YN_VIEW,
+  CHILD_VIEWS_NUMBER,
+};
+
+enum
+{
+  GIZMO_XN = 0,
+  GIZMO_YN,
+  GIZMO_ZN,
+  GIZMOS_NUMBER,
+};
 //----------------------------------------------------------------------------
 mafViewOrthoSlice::mafViewOrthoSlice(wxString label, bool show_ruler)
 : mafViewCompound(label, 2, 2)
@@ -48,23 +80,27 @@ mafViewOrthoSlice::mafViewOrthoSlice(wxString label, bool show_ruler)
 {
   m_Luts = NULL;
   m_LutSwatch = NULL;
-  m_Histogram = NULL;
-  m_ShowRuler = show_ruler;
   for (int v=0;v<4;v++)
   {
     m_Views[v] = NULL;
   }
-  m_SliderX = NULL;
-  m_SliderY = NULL;
-  m_SliderZ = NULL;
   m_ColorLUT= NULL;
   m_CurrentVolume = NULL;
-  m_Origin[0] = m_Origin[1] = m_Origin[2] = 0.0;
+  m_GizmoHandlePosition[0] = m_GizmoHandlePosition[1] = m_GizmoHandlePosition[2] = 0.0;
+
+  for(int j=0; j<3; j++) 
+  {
+    m_Gizmo[j] = NULL;
+  }
+
+  m_Side = 0;
 }
 //----------------------------------------------------------------------------
 mafViewOrthoSlice::~mafViewOrthoSlice()
 //----------------------------------------------------------------------------
 {
+  if( m_Gizmo[0] || m_Gizmo[1] || m_Gizmo[2] ) GizmoDelete();
+  
   if (m_CurrentVolume)
   {
     m_CurrentVolume->GetEventSource()->RemoveObserver(this);
@@ -74,7 +110,7 @@ mafViewOrthoSlice::~mafViewOrthoSlice()
 mafView *mafViewOrthoSlice::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewOrthoSlice *v = new mafViewOrthoSlice(m_Label,m_ShowRuler);
+  mafViewOrthoSlice *v = new mafViewOrthoSlice(m_Label);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   for (int i=0;i<m_PluggedChildViewList.size();i++)
@@ -97,48 +133,31 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
     if (show)
     {
       m_CurrentVolume = mafVMEVolume::SafeDownCast(node);
-      mmaVolumeMaterial *material = m_CurrentVolume->GetMaterial();
-      double sr[2],center[3];
-      vtkDataSet *data = m_CurrentVolume->GetOutput()->GetVTKData();
-      data->Update();
-      data->GetCenter(center);
-      data->GetScalarRange(sr);
-      m_ColorLUT = material->m_ColorLut;
+      mmaVolumeMaterial *currentVolumeMaterial = m_CurrentVolume->GetMaterial();
+      double sr[2],vtkDataCenter[3];
+      vtkDataSet *vtkData = m_CurrentVolume->GetOutput()->GetVTKData();
+      vtkData->Update();
+      vtkData->GetCenter(vtkDataCenter);
+      vtkData->GetScalarRange(sr);
+      m_ColorLUT = currentVolumeMaterial->m_ColorLut;
       m_LutSwatch->SetLut(m_ColorLUT);
       m_Luts->SetRange((long)sr[0],(long)sr[1]);
-      m_Luts->SetSubRange((long)material->m_TableRange[0],(long)material->m_TableRange[1]);
+      m_Luts->SetSubRange((long)currentVolumeMaterial->m_TableRange[0],(long)currentVolumeMaterial->m_TableRange[1]);
       for(int i=0; i<m_NumOfChildView; i++)
       {
         mafPipeVolumeSlice *p = (mafPipeVolumeSlice *)((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
         p->SetColorLookupTable(m_ColorLUT);
       }
-      if (m_SliderX)
-      {
-        m_Origin[0] = center[0];
-        m_Origin[1] = center[1];
-        m_Origin[2] = center[2];
-        UpdateSliderRange();
-        m_CurrentVolume->GetEventSource()->AddObserver(this);
-      }
-      if (data)
-      {
-        m_Histogram->SetData(data->GetPointData()->GetScalars());
-      }
-      else
-      {
-        wxMessageBox(_("Unable to show the Histogram for this data!"),_("Warning!"));
-        m_Histogram->SetData(NULL);
-        m_Histogram->Refresh();
-      }
+      GizmoCreate();
     }
     else
     {
       m_CurrentVolume->GetEventSource()->RemoveObserver(this);
       m_CurrentVolume = NULL;
-      m_Histogram->SetData(NULL);
-      m_Histogram->Refresh();
+      GizmoDelete();
     }
   }
+  
   EnableWidgets(m_CurrentVolume != NULL);
 }
 //----------------------------------------------------------------------------
@@ -149,8 +168,6 @@ void mafViewOrthoSlice::VmeRemove(mafNode *node)
   {
     m_CurrentVolume->GetEventSource()->RemoveObserver(this);
     m_CurrentVolume = NULL;
-    m_Histogram->SetData(NULL);
-    m_Histogram->Refresh();
   }
   Superclass::VmeRemove(node);
 }
@@ -159,18 +176,13 @@ void mafViewOrthoSlice::CreateGuiView()
 //----------------------------------------------------------------------------
 {
   m_GuiView = new mmgGui(this);
-  m_Histogram = new mmgHistogramWidget(m_GuiView,-1,wxPoint(0,0),wxSize(500,100));
-  m_Histogram->SetListener(this);
-  m_Histogram->SetRepresentation(vtkHistogram::BAR_REPRESENTATION);
-  m_Histogram->SetSize(500,100);
-  m_Histogram->SetMinSize(wxSize(500,100));
   
+  m_GuiView->Label("");
   m_Luts = new mmgLutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
   m_Luts->SetListener(this);
   m_Luts->SetSize(500,24);
   m_Luts->SetMinSize(wxSize(500,24));
   EnableWidgets(m_CurrentVolume != NULL);
-  m_GuiView->Add(m_Histogram);
   m_GuiView->Add(m_Luts);
   m_GuiView->Reparent(m_Win);
 }
@@ -182,21 +194,24 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId()) 
     {
-      case ID_ORTHO_SLICE_X:
-      case ID_ORTHO_SLICE_Y:
-      case ID_ORTHO_SLICE_Z:
-      {
-        for(int i=0; i<m_NumOfChildView; i++)
+  /*    case ID_SIDE_ORTHO:
+      {          
+        if (m_Side == 1)
         {
-          ((mafViewSlice *)m_ChildViewList[i])->SetSlice(m_Origin);
+          ((mafViewSlice *)m_ChildViewList[CHILD_XN_VIEW])->CameraSet(CAMERA_RX_RIGHT);
+          ((mafViewSlice*)m_ChildViewList[CHILD_XN_VIEW])->CameraUpdate();
         }
-        CameraUpdate();
+        else
+        {
+          ((mafViewSlice *)m_ChildViewList[CHILD_XN_VIEW])->CameraSet(CAMERA_RX_LEFT);
+          ((mafViewSlice*)m_ChildViewList[CHILD_XN_VIEW])->CameraUpdate();
+        }
       }
-      break;
+      break;*/
       case ID_LUT_CHOOSER:
       {
-        mmaVolumeMaterial *material = m_CurrentVolume->GetMaterial();
-        material->UpdateFromTables();
+        mmaVolumeMaterial *currentVolumeMaterial = m_CurrentVolume->GetMaterial();
+        currentVolumeMaterial->UpdateFromTables();
         for(int i=0; i<m_NumOfChildView; i++)
         {
           mafPipeVolumeSlice *p = (mafPipeVolumeSlice *)((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
@@ -215,21 +230,26 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
           int low, hi;
           m_Luts->GetSubRange(&low,&hi);
           m_ColorLUT->SetTableRange(low,hi);
-          mmaVolumeMaterial *material = m_CurrentVolume->GetMaterial();
-          material->UpdateFromTables();
+          mmaVolumeMaterial *currentVolumeMaterial = m_CurrentVolume->GetMaterial();
+          currentVolumeMaterial->UpdateFromTables();
           CameraUpdate();
         }
       }
       break;
+      case MOUSE_UP:
+      case MOUSE_MOVE:
+      {
+        // get the gizmo that is being moved
+        long gizmoId = e->GetArg();
+        double pos[3];
+        vtkPoints *p = (vtkPoints *)e->GetVtkObj();
+        if(p == NULL) return;
+        p->GetPoint(0,pos);
+        this->UpdateSlice(gizmoId, p);
+      }
+      break;
       default:
         mafViewCompound::OnEvent(maf_event);
-    }
-  }
-  else if(maf_event->GetSender() == m_CurrentVolume)
-  {
-    if(maf_event->GetId() == VME_ABSMATRIX_UPDATE)
-    {
-      UpdateSliderRange();
     }
   }
 }
@@ -241,16 +261,17 @@ mmgGui* mafViewOrthoSlice::CreateGui()
 
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
+
   m_Gui->Combo(ID_LAYOUT_CHOOSER,"layout",&m_LayoutConfiguration,3,layout_choices);
   m_Gui->Divider();
-  m_SliderX = m_Gui->FloatSlider(ID_ORTHO_SLICE_X, "x", &m_Origin[0],MINDOUBLE,MAXDOUBLE);
-  m_SliderY = m_Gui->FloatSlider(ID_ORTHO_SLICE_Y, "y", &m_Origin[1],MINDOUBLE,MAXDOUBLE);
-  m_SliderZ = m_Gui->FloatSlider(ID_ORTHO_SLICE_Z, "z", &m_Origin[2],MINDOUBLE,MAXDOUBLE);
-
   m_LutSwatch = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
   m_Gui->Divider(2);
-  m_Gui->AddGui(m_Histogram->GetGui());
-  m_Gui->Divider(2);
+
+  wxString sidesName[2];
+  sidesName[0] = "left";
+  sidesName[1] = "right";
+  // m_Gui->Radio(ID_SIDE_ORTHO, "side", &m_Side, 2, sidesName, 2);
+
 
   EnableWidgets(m_CurrentVolume != NULL);
   for(int i=1; i<m_NumOfChildView; i++)
@@ -263,16 +284,26 @@ mmgGui* mafViewOrthoSlice::CreateGui()
 void mafViewOrthoSlice::PackageView()
 //----------------------------------------------------------------------------
 {
-  int cam_pos[4] = {CAMERA_OS_X, CAMERA_OS_Y, CAMERA_OS_Z, CAMERA_OS_P};
-  for(int v=0; v<4; v++)
+  int cam_pos[4] = {CAMERA_OS_P, CAMERA_OS_X, CAMERA_OS_Y, CAMERA_OS_Z};
+  
+  for(int v=PERSPECTIVE_VIEW; v<VIEWS_NUMBER; v++)
   {
-    m_Views[v] = new mafViewSlice("Slice view", cam_pos[v],false,false,m_ShowRuler);
+    m_Views[v] = new mafViewSlice("Slice view", cam_pos[v],false,false);
     m_Views[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice", MUTEX);
+    // plug surface slice visual pipe in not perspective views
+    //if (v != PERSPECTIVE_VIEW)
+    //{
+    //  m_Views[v]->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice",MUTEX);
+    //}
+    //else
+    //{
+    //  m_Views[v]->PlugVisualPipe("mafVMESurface", "mafPipeSurface",MUTEX);
+    //}
   }
-  PlugChildView(m_Views[SLICE_ORTHO]);
-  PlugChildView(m_Views[SLICE_X]);
-  PlugChildView(m_Views[SLICE_Y]);
-  PlugChildView(m_Views[SLICE_Z]);
+  PlugChildView(m_Views[PERSPECTIVE_VIEW]);
+  PlugChildView(m_Views[ZN_VIEW]);
+  PlugChildView(m_Views[XN_VIEW]);
+  PlugChildView(m_Views[YN_VIEW]);
 }
 //----------------------------------------------------------------------------
 void mafViewOrthoSlice::EnableWidgets(bool enable)
@@ -280,23 +311,139 @@ void mafViewOrthoSlice::EnableWidgets(bool enable)
 {
   if (m_Gui)
   {
-    m_Gui->Enable(ID_ORTHO_SLICE_X,enable);
-    m_Gui->Enable(ID_ORTHO_SLICE_Y,enable);
-    m_Gui->Enable(ID_ORTHO_SLICE_Z,enable);
     m_Gui->Enable(ID_LUT_CHOOSER,enable);
   }
   m_Luts->Enable(enable);
-  m_Histogram->Enable(enable);
-  m_Histogram->Show(enable);
+
 }
+
 //----------------------------------------------------------------------------
-void mafViewOrthoSlice::UpdateSliderRange()
+void mafViewOrthoSlice::GizmoCreate()
 //----------------------------------------------------------------------------
 {
-  double b[6];
-  m_CurrentVolume->GetOutput()->GetVMEBounds(b);
-  m_SliderX->SetRange(b[0],b[1],m_Origin[0]);
-  m_SliderY->SetRange(b[2],b[3],m_Origin[1]);
-  m_SliderZ->SetRange(b[4],b[5],m_Origin[2]);
-  m_Gui->Update();
+  if( m_Gizmo[0] || m_Gizmo[1] || m_Gizmo[2] ) GizmoDelete();
+
+  int gizmoId;
+  double colors[]    = {1,0,0,  0,1,0,  0,0,1};
+  double direction[] = {mafGizmoSlice::GIZMO_SLICE_X,mafGizmoSlice::GIZMO_SLICE_Y,mafGizmoSlice::GIZMO_SLICE_Z};
+
+  // creates the gizmos
+  for(gizmoId=GIZMO_XN; gizmoId<GIZMOS_NUMBER; gizmoId++) 
+  {
+    double slice[3];
+    mafPipeVolumeSlice *p = NULL;
+    p = mafPipeVolumeSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[0]))->GetNodePipe(m_CurrentVolume));
+    p->GetSliceOrigin(slice);
+
+    m_Gizmo[gizmoId] = new mafGizmoSlice(m_CurrentVolume, this);
+    m_Gizmo[gizmoId]->SetSlice(gizmoId, direction[gizmoId], slice[gizmoId]);
+    m_Gizmo[gizmoId]->SetColor(&colors[gizmoId*3]);
+    m_Gizmo[gizmoId]->SetGizmoModalityToBound();
+  }
+
+  // put them in the right views:
+  // perspective view
+  m_ChildViewList[0]->VmeShow(m_Gizmo[GIZMO_XN]->GetOutput(), true);
+  m_ChildViewList[0]->VmeShow(m_Gizmo[GIZMO_YN]->GetOutput(), true);
+  m_ChildViewList[0]->VmeShow(m_Gizmo[GIZMO_ZN]->GetOutput(), true);
+
+  // ZN view
+  m_ChildViewList[1]->VmeShow(m_Gizmo[GIZMO_XN]->GetOutput(), true);
+  m_ChildViewList[1]->VmeShow(m_Gizmo[GIZMO_YN]->GetOutput(), true);
+
+  // YN view
+  m_ChildViewList[3]->VmeShow(m_Gizmo[GIZMO_XN]->GetOutput(), true);
+  m_ChildViewList[3]->VmeShow(m_Gizmo[GIZMO_ZN]->GetOutput(), true);
+
+  // ZN view
+  m_ChildViewList[2]->VmeShow(m_Gizmo[GIZMO_YN]->GetOutput(), true);
+  m_ChildViewList[2]->VmeShow(m_Gizmo[GIZMO_ZN]->GetOutput(), true);
+
+
+}
+//----------------------------------------------------------------------------
+void mafViewOrthoSlice::GizmoDelete()
+//----------------------------------------------------------------------------
+{
+  // set gizmos visibility to false
+  // perspective view
+  m_ChildViewList[0]->VmeShow(m_Gizmo[GIZMO_XN]->GetOutput(), false);
+  m_ChildViewList[0]->VmeShow(m_Gizmo[GIZMO_YN]->GetOutput(), false);
+  m_ChildViewList[0]->VmeShow(m_Gizmo[GIZMO_ZN]->GetOutput(), false);
+
+  // ZN view
+  m_ChildViewList[1]->VmeShow(m_Gizmo[GIZMO_XN]->GetOutput(), false);
+  m_ChildViewList[1]->VmeShow(m_Gizmo[GIZMO_YN]->GetOutput(), false);
+
+  // YN view
+  m_ChildViewList[3]->VmeShow(m_Gizmo[GIZMO_XN]->GetOutput(), false);
+  m_ChildViewList[3]->VmeShow(m_Gizmo[GIZMO_ZN]->GetOutput(), false);
+
+  // XN view
+  m_ChildViewList[2]->VmeShow(m_Gizmo[GIZMO_YN]->GetOutput(), false);
+  m_ChildViewList[2]->VmeShow(m_Gizmo[GIZMO_ZN]->GetOutput(), false);
+
+
+  for(int i=0; i<3; i++)
+  {
+    cppDEL(m_Gizmo[i]);
+  }
+}
+
+//----------------------------------------------------------------------------
+void mafViewOrthoSlice::UpdateSlice(long activeGizmoId, vtkPoints *p)
+//----------------------------------------------------------------------------
+{
+  // gizmos update correctly in every views so this method is needed to update slice also
+  /*  */
+  
+  // always update the perspective view
+
+  
+  mafVME *g[3];
+  double pos[3], orient[3];
+
+  p->GetPoint(0,m_GizmoHandlePosition);
+  
+  switch(activeGizmoId)
+  {
+    case (GIZMO_XN)	:
+    {
+      // update the X normal child view
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSlice(m_GizmoHandlePosition);
+    }
+    break;
+   
+
+    case (GIZMO_YN)	:
+    {
+      // update the Y normal child view
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetSlice(m_GizmoHandlePosition);    
+    }
+    break;
+
+    case (GIZMO_ZN)	:
+    {
+      // update the Z normal child view
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetSlice(m_GizmoHandlePosition);
+    }
+    break;
+
+  }
+
+  for (int gizmoId = GIZMO_XN; gizmoId < GIZMOS_NUMBER; gizmoId++)
+  {
+    // get the moved gizmo pose
+    if (gizmoId == activeGizmoId) continue;
+
+    g[gizmoId] = this->m_Gizmo[gizmoId]->GetOutput();
+    g[gizmoId]->GetOutput()->GetPose(pos,orient);
+    m_GizmoHandlePosition[gizmoId] = (double)pos[gizmoId];
+  }
+
+  // always update the child perspective view
+  ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_PERSPECTIVE_VIEW]))->SetSlice(m_GizmoHandlePosition);
+  
+
+  this->CameraUpdate();
 }

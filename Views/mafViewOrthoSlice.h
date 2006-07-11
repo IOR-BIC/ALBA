@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-05-08 14:58:57 $
-  Version:   $Revision: 1.13 $
-  Authors:   Paolo Quadrani
+  Date:      $Date: 2006-07-11 17:27:21 $
+  Version:   $Revision: 1.14 $
+  Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -21,18 +21,20 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
+class mafGizmoSlice;
 class mmgLutSlider;
 class mmgFloatSlider;
 class mafViewSlice;
 class mafVMEVolume;
 class vtkLookupTable;
-class mmgHistogramWidget;
 class mmgLutSwatch;
+class vtkPoints;
 
 //----------------------------------------------------------------------------
 // mafViewOrthoSlice :
 //----------------------------------------------------------------------------
-/** */
+/** 
+  This compound view is made of four child views used to analyze different orthogonal slices of the volume*/
 class mafViewOrthoSlice: public mafViewCompound
 {
 public:
@@ -62,10 +64,8 @@ public:
   /** IDs for the GUI */
   enum VIEW_ORTHO_SLICE_WIDGET_ID
   {
-    ID_ORTHO_SLICE_X = Superclass::ID_LAST,
-    ID_ORTHO_SLICE_Y,
-    ID_ORTHO_SLICE_Z,
-    ID_LUT_CHOOSER,
+    ID_LUT_CHOOSER = Superclass::ID_LAST,
+    ID_SIDE_ORTHO,
     ID_LAST
   };
 
@@ -82,22 +82,25 @@ protected:
   /** Enable/disable view widgets.*/
   void EnableWidgets(bool enable = true);
 
-  /** Update slider range according to the bounds of the current visualized volume.*/
-  void UpdateSliderRange();
+  /** Create the gizmos to move the slices. */
+  void GizmoCreate();
 
-  mmgFloatSlider *m_SliderX;
-  mmgFloatSlider *m_SliderY;
-  mmgFloatSlider *m_SliderZ;
+  /** Delete the gizmos. */
+  void GizmoDelete();
 
-  double m_Origin[3];
+  /** Update the slices according to the new position. */
+  void UpdateSlice(long gizmoId, vtkPoints *p);
 
-  bool   m_ShowRuler;
+  mafGizmoSlice   *m_Gizmo[3];
+
+  double m_GizmoHandlePosition[3];
 
   mafVMEVolume *m_CurrentVolume; ///< Current visualized volume
   mmgLutSlider *m_Luts; ///< Double slider used to change brightness and contrast of the image
-  mmgHistogramWidget*m_Histogram; ///< Widget in which plot the histogram of the volume
   mmgLutSwatch *m_LutSwatch;
   vtkLookupTable *m_ColorLUT;
-  mafViewSlice *m_Views[4];
+  mafViewSlice *m_Views[4]; ///< Child views
+  int	m_Side; ///< change Azimuth of the camera
+
 };
 #endif
