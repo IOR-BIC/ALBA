@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-22 11:41:41 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2006-07-11 09:25:45 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -164,7 +164,7 @@ public:
   int GetId() {return m_Id;}
 
   /**
-    Set the Id of this dataset. (this is typically set by the when storing the 
+    Set the Id of this dataset. (this is typically set by the datavector when storing the 
     dataset and is used to select a file name for the data to be saved. To obtain
     a unique Id it use the mafVMERoot::GetNextItemId()*/
   void SetId(mafID id) {m_Id=id;Modified();}
