@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-21 15:44:19 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-07-11 12:09:27 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -251,8 +251,7 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
         else if (mafCString("VMatrix") == children[i]->GetName())
         {
           mafVMEGenericAbstract *vme_generic = mafVMEGenericAbstract::SafeDownCast(vme);
-          assert(vme_generic);
-          if (RestoreVMatrix(children[i],vme_generic->GetMatrixVector()) != MAF_OK)
+          if (vme_generic && RestoreVMatrix(children[i],vme_generic->GetMatrixVector()) != MAF_OK)
           {
             mafErrorMacro("MSFImporter: error restoring VME-Item of node: \""<<vme->GetName()<<"\"");
             return NULL;
