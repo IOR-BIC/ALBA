@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 15:47:43 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-07-11 09:27:25 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,6 +21,7 @@
 class mafDataVector;
 class mafMatrixVector;
 class mafNode;
+class mmgGui;
 
 /** mafVMEGenericAbstract - a VME featuring an internal array for matrices and data.
   mafVMEGenericAbstract is a node featuring a standard way for managing 4D data, featuring
@@ -34,8 +35,13 @@ class mafNode;
 class MAF_EXPORT mafVMEGenericAbstract : public mafVME
 {
 public:
-
   mafTypeMacro(mafVMEGenericAbstract,mafVME);
+
+  enum VME_GUI_ID
+  {
+    ID_VME_CRYPTING = Superclass::ID_LAST,
+    ID_LAST
+  };
 
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0);
@@ -103,7 +109,7 @@ public:
     return true is this VME has more than one time stamp, either  for
     data or matrices */
   virtual bool IsAnimated();
-  
+
   /** return an xpm-icon that can be used to represent this node */
   static char ** GetIcon();   //SIL. 11-4-2005:
 
@@ -116,11 +122,13 @@ protected:
   virtual int InternalStore(mafStorageElement *parent);
   virtual int InternalRestore(mafStorageElement *node);
 
-  mafMatrixVector   *m_MatrixVector;
-  mafDataVector     *m_DataVector;
+  /** Create GUI for the VME */
+  virtual mmgGui *CreateGui();
+
+  mafMatrixVector *m_MatrixVector;
+  mafDataVector   *m_DataVector;
 private:
   mafVMEGenericAbstract(const mafVMEGenericAbstract&); // Not implemented
   void operator=(const mafVMEGenericAbstract&); // Not implemented
 };
-
 #endif
