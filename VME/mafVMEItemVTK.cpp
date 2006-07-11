@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-22 11:44:02 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-07-11 09:26:17 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -488,7 +488,7 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
 
       writer->SetInput(data);
 
-      if (m_Crypting)
+      if (GetCrypting())
       {
 #ifdef MAF_USE_CRYPTO
         writer->WriteToOutputStringOn();
