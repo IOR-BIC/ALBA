@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-11 12:09:27 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2006-07-11 12:45:09 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -540,6 +540,7 @@ int mmuMSF1xDocument::RestoreVItem(mafStorageElement *node, mafVME *vme)
               {
                 mafTagItem *ti = ta->GetTag("MFL_CRYPTING");
                 vme->SetCrypting((int)ti->GetValueAsDouble());
+                vitem->SetCrypting((int)ti->GetValueAsDouble() != 0);
                 ta->DeleteTag("MFL_CRYPTING");
               }
               if (ta->IsTagPresent("VTK_DATASET_BOUNDS"))
@@ -559,6 +560,7 @@ int mmuMSF1xDocument::RestoreVItem(mafStorageElement *node, mafVME *vme)
           vitem->SetURL(data_file);
           vitem->SetDataType(data_type);
           vme_generic->GetDataVector()->AppendItem(vitem);
+          vme_generic->GetDataVector()->SetCrypting(vitem->GetCrypting());
           return MAF_OK;
         } // DataFile
       } // Id
