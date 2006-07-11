@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.34 $
+  Date:      $Date: 2006-07-11 09:23:35 $
+  Version:   $Revision: 1.35 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -601,17 +601,24 @@ void mmgGui::Vector(int id,wxString label,double var[3],double minx,double maxx,
   Add(sizer,0,wxEXPAND, M); 
 }
 //----------------------------------------------------------------------------
-void mmgGui::String(int id,wxString label,wxString* var, wxString tooltip, bool multiline)
+void mmgGui::String(int id,wxString label,wxString* var, wxString tooltip, bool multiline, bool password)
 //----------------------------------------------------------------------------
 {
-	if(label == "")
+  int sw = LH;
+  if(multiline)
+  {
+    sw *= 2;
+    m_EntryStyle |= wxTE_MULTILINE|wxTE_WORDWRAP;
+  }
+  if(password)
+    m_EntryStyle |= wxTE_PASSWORD;
+
+  if(label == "")
 	{
     int w_id = GetId(id);
 		wxTextCtrl *text = NULL;
-    if(multiline)
-      text = new wxTextCtrl  (this, w_id, "", dp, wxSize(FW,2*LH), m_EntryStyle|wxTE_MULTILINE|wxTE_WORDWRAP);
-    else
-      text = new wxTextCtrl  (this, w_id, "", dp, wxSize(FW,LH), m_EntryStyle);
+
+    text = new wxTextCtrl  (this, w_id, "", dp, wxSize(FW,sw), m_EntryStyle);
 		text->SetValidator( mmgValidator(this,w_id,text,var) );
     text->SetFont(m_Font);
 		if(tooltip != "") text->SetToolTip(tooltip);
@@ -625,10 +632,8 @@ void mmgGui::String(int id,wxString label,wxString* var, wxString tooltip, bool 
     lab->SetFont(m_Font);
     int w_id = GetId(id);
 		wxTextCtrl *text = NULL;
-    if(multiline)
-      text = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(DW,2*LH), m_EntryStyle|wxTE_MULTILINE|wxTE_WORDWRAP);
-    else
-      text = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(DW,LH), m_EntryStyle  );
+    
+    text = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(DW,sw), m_EntryStyle  );
 		text->SetValidator( mmgValidator(this,w_id,text,var) );
     text->SetFont(m_Font);
 		if(tooltip != "")
@@ -640,17 +645,23 @@ void mmgGui::String(int id,wxString label,wxString* var, wxString tooltip, bool 
 	}
 }
 //----------------------------------------------------------------------------
-void mmgGui::String(int id,mafString label, mafString *var, mafString tooltip, bool multiline)
+void mmgGui::String(int id,mafString label, mafString *var, mafString tooltip, bool multiline, bool password)
 //----------------------------------------------------------------------------
 {
-	if(label.IsEmpty())
+  int sw = LH;
+  if(multiline)
+  {
+    sw *= 2;
+    m_EntryStyle |= wxTE_MULTILINE|wxTE_WORDWRAP;
+  }
+  if(password)
+    m_EntryStyle |= wxTE_PASSWORD;
+
+  if(label.IsEmpty())
 	{
     int w_id = GetId(id);
 		wxTextCtrl  *text = NULL;
-    if(multiline)
-      text = new wxTextCtrl  (this, w_id, "", dp, wxSize(FW,2*LH), m_EntryStyle|wxTE_MULTILINE|wxTE_WORDWRAP );
-    else
-      text = new wxTextCtrl  (this, w_id, "", dp, wxSize(FW,LH), m_EntryStyle );
+    text = new wxTextCtrl  (this, w_id, "", dp, wxSize(FW,sw), m_EntryStyle );
 		text->SetValidator( mmgValidator(this,w_id,text,var) );
     text->SetFont(m_Font);
 		if(!tooltip.IsEmpty())
@@ -665,10 +676,7 @@ void mmgGui::String(int id,mafString label, mafString *var, mafString tooltip, b
     lab->SetFont(m_Font);
     int w_id = GetId(id);
 		wxTextCtrl  *text = NULL;
-    if(multiline)
-      text = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(DW,2*LH), m_EntryStyle|wxTE_MULTILINE|wxTE_WORDWRAP );
-    else
-      text = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(DW,LH), m_EntryStyle );
+    text = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(DW,sw), m_EntryStyle );
 		text->SetValidator( mmgValidator(this,w_id,text,var) );
     text->SetFont(m_Font);
 		if(!tooltip.IsEmpty())
