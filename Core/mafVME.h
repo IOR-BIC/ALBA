@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-09 10:21:52 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2006-07-11 09:03:16 $
+  Version:   $Revision: 1.28 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -43,12 +43,6 @@ class MAF_EXPORT mafVME : public mafNode
 {
 public:
   mafAbstractTypeMacro(mafVME,mafNode);
-
-  enum VME_GUI_ID
-  {
-    ID_VME_CRYPTING = Superclass::ID_LAST,
-    ID_LAST
-  };
 
   //typedef std::vector<mafTimeStamp> std::vector<mafTimeStamp>;
 

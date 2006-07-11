@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-03 09:54:45 $
-  Version:   $Revision: 1.32 $
+  Date:      $Date: 2006-07-11 09:03:16 $
+  Version:   $Revision: 1.33 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -51,8 +51,8 @@ mafVME::mafVME()
 
   m_AbsMatrixPipe = mafAbsMatrixPipe::New();
 
-  m_CurrentTime         = 0.0;
-  m_Crypting            = 0;
+  m_CurrentTime   = 0.0;
+  m_Crypting      = 0;
 }
 
 //-------------------------------------------------------------------------
@@ -65,7 +65,7 @@ mafVME::~mafVME()
 
   m_DataPipe=NULL; // smart pointer
   
-  m_AbsMatrixPipe->SetVME(NULL); // ???
+  m_AbsMatrixPipe->SetVME(NULL);
   m_AbsMatrixPipe=NULL; // smart pointer
     
   m_MatrixPipe=NULL; // smart pointer
@@ -377,7 +377,6 @@ void mafVME::SetAbsMatrix(const mafMatrix &matrix)
   
   SetMatrix(matrix);
 }
-
 
 //----------------------------------------------------------------------------
 void mafVME::ApplyAbsMatrix(const mafMatrix &matrix,int premultiply,mafTimeStamp t)
@@ -730,14 +729,7 @@ void mafVME::OnEvent(mafEventBase *maf_event)
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
-    switch (e->GetId())
-    {
-      case ID_VME_CRYPTING:
-        SetCrypting(((mafEvent *)e)->GetBool());
-      break;
-      default:
-        Superclass::OnEvent(maf_event);
-    }
+    Superclass::OnEvent(maf_event);
   }
   else if (maf_event->GetChannel()==MCH_DOWN)
   {
@@ -801,7 +793,7 @@ int mafVME::InternalRestore(mafStorageElement *node)
     mafID crypt;
     node->GetAttributeAsInteger("Crypting",crypt);
     SetCrypting(crypt);
-    
+
     return MAF_OK;
   }
   return MAF_ERROR;
@@ -813,9 +805,7 @@ mmgGui *mafVME::CreateGui()
 {
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
-#ifdef MAF_USE_CRYPTO
-  m_Gui->Bool(ID_VME_CRYPTING,"crypt",&m_Crypting);
-#endif
+
   mafString anim_text;
   anim_text = "not animated";
   if (IsAnimated())
