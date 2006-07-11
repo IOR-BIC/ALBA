@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-28 23:08:00 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-07-11 09:24:36 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -53,7 +53,7 @@ mafDataVector::~mafDataVector()
   Iterator it;
   for (it=Begin();it!=End();it++)
   {
-    it->second->SetListener(NULL); // detach items before destoying
+    it->second->SetListener(NULL); // detach items before destroying
   }
 }
 
@@ -71,7 +71,6 @@ void mafDataVector::SetCrypting(bool flag)
   m_Crypting = flag;
   Modified();
 }
-
 
 //-----------------------------------------------------------------------
 void mafDataVector::ShallowCopy(mafDataVector *array)
@@ -193,6 +192,8 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
         data_file_url<<base_name<<"."<<mafString(item->GetId())<<"."<<item->GetDataFileExtension(); // extension is defined by the kind of item itself
       }
       
+      item->SetCrypting(m_Crypting);
+
       // if in SaveAs do not remove old filename...
       if (!base_name_changed && !m_LastBaseURL.IsEmpty())
       {
