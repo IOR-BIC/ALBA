@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutSlider.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-04 14:14:19 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-07-12 14:37:30 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -75,23 +75,41 @@ void mmgLutButt::OnMouse(wxMouseEvent &event)
 	}
 	if(event.LeftDown())
 	{
-		CaptureMouse();
-		m_X0 = event.GetX();
+    /*if( GetCapture() == this )
+      mafLogMessage("mouse already captured !! - strange");
+    else*/
+      CaptureMouse();
+    m_X0 = event.GetX();
 		return;
 	}
 	if(event.LeftUp())
 	{
 		if( GetCapture() == this )
+    {
       ReleaseMouse();
+      //mafLogMessage("mouse Released");
+    }
 		return;
 	}
-	if(event.LeftIsDown())
+
+  
+  if(event.LeftIsDown())
 	{
 		int sx = event.GetX() - m_X0,sy = 0;
 		ClientToScreen(&sx,&sy);
 		GetParent()->ScreenToClient(&sx,&sy);
 		((mmgLutSlider*)GetParent())->MoveButton(GetId(),sx);
 	}
+  else
+  {
+    if( GetCapture() == this )
+    {
+      //the mouse is captured and the button isn't pressed anymore -- so we lost a LeftMouseUp
+      // >> force ReleaseMouse
+      ReleaseMouse();
+      //mafLogMessage("mouse Released (forced)");
+    }
+  }
 }
 //----------------------------------------------------------------------------
 // mmgLutSlider EVENT_TABLE
