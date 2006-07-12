@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-05 10:15:57 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-07-12 17:09:44 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -56,6 +56,7 @@
 #include "vtkRenderer.h"
 #include "vtkOutlineFilter.h"
 #include "vtkRGSliceAccumulate.h"
+#include "vtkImageFlip.h"
 
 int compareX(const mmoDICOMImporterListElement **arg1,const mmoDICOMImporterListElement **arg2);
 int compareY(const mmoDICOMImporterListElement **arg1,const mmoDICOMImporterListElement **arg2);
@@ -295,7 +296,7 @@ void mmoDICOMImporter::CreateGui()
 	m_Gui->Combo(ID_TYPE_DICOM,"",&m_DICOM,2,TypeOfDICOM);
 	m_Gui->Label("data files:",true);
 	m_Gui->FileOpen (ID_DICTIONARY,	"dictionary",	&m_DictionaryFilename, wildcard);
-	m_Gui->DirOpen(ID_OPEN_DIR, "ct folder",	&m_DICOMDir);
+	m_Gui->DirOpen(ID_OPEN_DIR, "Folder",	&m_DICOMDir);
 	m_Gui->Divider();
 	m_Gui->Label("patient info:",true);		
 	m_Gui->String(ID_PATIENT_NAME,"name ",&m_PatientName);
@@ -671,11 +672,13 @@ void mmoDICOMImporter::BuildVolume()
 	vtkMAFSmartPointer<vtkRGSliceAccumulate> accumulate;
 	accumulate->SetNumberOfSlices(n_slices);
 	accumulate->BuildVolumeOnAxes(m_SortAxes);
-	
-	for (int count = 0, s_count = 0; count < m_NumberOfSlices; count += step)
+	int count,s_count;
+	for (count = 0, s_count = 0; count < m_NumberOfSlices; count += step)
 	{
 		if (s_count == n_slices) {break;}
     ShowSlice(count);
+		double b[6];
+		m_SliceTexture->GetInput()->GetBounds(b);
     accumulate->SetSlice(s_count, m_SliceTexture->GetInput());
     s_count++;
 	}
@@ -819,6 +822,11 @@ void mmoDICOMImporter::ShowSlice(int slice_num)
 	m_DicomReader->Modified();
 	m_DicomReader->Update();
 	
+	vtkMAFSmartPointer<vtkImageFlip> m_Flip;
+	m_Flip->SetFilteredAxis(1);
+	m_Flip->SetInput(m_DicomReader->GetOutput());
+	m_Flip->Update();
+	
 	m_DicomReader->GetSliceLocation(loc);
 	//double bounds[6];
   
@@ -849,18 +857,19 @@ void mmoDICOMImporter::ShowSlice(int slice_num)
 
 		vtkMAFSmartPointer<vtkProbeFilter> probe;
     probe->SetInput(clip);
-		probe->SetSource(m_DicomReader->GetOutput());
+		probe->SetSource(m_Flip->GetOutput());
 		probe->Update();
 		probe->GetOutput()->GetBounds(m_DicomBounds);
 		probe->GetOutput()->GetScalarRange(range);
-		
 		m_SliceTexture->SetInput((vtkImageData *)probe->GetOutput());
 	} 
 	else 
 	{
     m_DicomReader->GetOutput()->GetScalarRange(range);
-		m_SliceTexture->SetInput(m_DicomReader->GetOutput());
+		m_SliceTexture->SetInput(m_Flip->GetOutput());
 	}
+	
+	m_SliceTexture->Modified();
 
 	m_SliceLookupTable->SetTableRange(range);
 	m_SliceLookupTable->SetWindow(range[1] - range[0]);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-05 10:15:50 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-07-12 17:08:49 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,6 +35,7 @@ class vtkWindowLevelLookupTable;
 class mafTagArray;
 class mafVMEVolumeGray;
 class mafVMEImage;
+class vtkImageData;
 
 //----------------------------------------------------------------------------
 // constants :
@@ -119,6 +120,7 @@ protected:
 	vtkPolyDataMapper	*m_SliceMapper;
   vtkTexture				*m_SliceTexture;
 	vtkActor					*m_SliceActor;
+	vtkImageData			*m_Flip;
 
 	vtkPlaneSource		*m_CropPlane;
 	vtkActor					*m_CropActor;	
