@@ -2,16 +2,16 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewOrthoSliceTest.h,v $
 Language:  C++
-Date:      $Date: 2006-06-27 15:07:18 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2006-07-12 07:51:07 $
+Version:   $Revision: 1.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#ifndef CPP_UNIT_MAFVIEWRXCTTEST_H
-#define CPP_UNIT_MAFVIEWRXCTTEST_H
+#ifndef __CPP_UNIT_MAFVIEWRXCTTEST_H__
+#define __CPP_UNIT_MAFVIEWRXCTTEST_H__
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/BriefTestProgressListener.h>

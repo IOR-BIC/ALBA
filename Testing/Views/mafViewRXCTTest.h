@@ -2,16 +2,16 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewRXCTTest.h,v $
 Language:  C++
-Date:      $Date: 2006-06-26 13:53:05 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2006-07-12 07:51:07 $
+Version:   $Revision: 1.3 $
 Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#ifndef CPP_UNIT_MAFVIEWRXCTTEST_H
-#define CPP_UNIT_MAFVIEWRXCTTEST_H
+#ifndef __CPP_UNIT_MAFVIEWRXCTTEST_H__
+#define __CPP_UNIT_MAFVIEWRXCTTEST_H__
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/BriefTestProgressListener.h>
@@ -20,8 +20,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <cppunit/TestResult.h>
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TestRunner.h>
-
-
 
 class mafViewRXCTTest : public CPPUNIT_NS::TestFixture
 {
@@ -34,7 +32,6 @@ class mafViewRXCTTest : public CPPUNIT_NS::TestFixture
     void CreateDestroyTest();
     void VmeShowTest();
 };
-
 
 int
 main( int argc, char* argv[] )
