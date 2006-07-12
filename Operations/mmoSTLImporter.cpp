@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoSTLImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-10 14:25:01 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-07-12 14:47:57 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -101,7 +101,10 @@ void mmoSTLImporter::CheckSwap(const char *file_name)
 
     //check if the file needs swapping
     //reading the header
-    wxBusyInfo wait("Checking if the file needs swapping: ...");
+    if (!m_TestMode)
+    {
+      wxBusyInfo wait("Checking if the file needs swapping: ...");
+    }
 
     char ch;
     unsigned int number, v;
