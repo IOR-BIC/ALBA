@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2006-07-13 10:11:54 $
+  Version:   $Revision: 1.30 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,7 +50,6 @@ mafLogicWithGUI::mafLogicWithGUI()
 
   m_LocaleSettings = new mmgLocaleSettings(this);
   m_MeasureUnitSettings = new mmgMeasureUnitSettings(this);
-
 
   m_ToolBar       = NULL;
   m_MenuBar       = NULL;
@@ -275,8 +274,6 @@ void mafLogicWithGUI::CreateToolbar()
 void mafLogicWithGUI::CreateTimebar()
 //----------------------------------------------------------------------------
 {
-  //SIL. 23-may-2006 : 
-  m_TimeSash = NULL;
   m_TimePanel = new mmgTimeBar(m_Win,MENU_VIEW_TIMEBAR,true);
   m_TimePanel->SetListener(this);
 
