@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 14:56:37 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2006-07-13 10:26:09 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -85,7 +85,18 @@ int mafVMESurface::InternalInitialize()
 int mafVMESurface::SetData(vtkPolyData *data, mafTimeStamp t, int mode)
 //-------------------------------------------------------------------------
 {
-  return Superclass::SetData(data,t,mode);
+  vtkPolyData *polydata = vtkPolyData::SafeDownCast(data);
+
+  if(polydata)
+  {
+    if (polydata->GetPoints() && polydata->GetVerts()->GetNumberOfCells()==0 && \
+      (polydata->GetPolys()->GetNumberOfCells() > 0 || polydata->GetStrips()->GetNumberOfCells() > 0) && \
+      polydata->GetLines()->GetNumberOfCells() == 0)
+    {
+      return Superclass::SetData(polydata,t,mode);
+    }
+  }
+  return MAF_ERROR;
 }
 //-------------------------------------------------------------------------
 int mafVMESurface::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
