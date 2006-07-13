@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-11 10:46:03 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-07-13 09:08:55 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -210,7 +210,7 @@ public:
   /** Return the suggested pipe-typename for the visualization of this vme */
   virtual mafString GetVisualPipe() {return mafString("mafPipeLandmarkCloud");};
 
-  void Print(std::ostream &os, const int tabs);
+  void Print(std::ostream &os, const int tabs=0);
 
 protected:
   mafVMELandmarkCloud();

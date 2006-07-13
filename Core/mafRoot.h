@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRoot.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 18:08:59 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-07-13 09:08:41 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -41,7 +41,7 @@ class MAF_EXPORT mafRoot: public mafEventSender
 public:
 
   /** print a dump of this object */
-  virtual void Print(std::ostream& os, const int tabs=0) const;
+  virtual void Print(std::ostream& os, const int tabs=0);// const;
 
   /** 
     Return highest NodeId assigned for this tree. Return -1 if no one has

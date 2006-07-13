@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataPipe.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-23 08:09:42 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-07-13 09:08:41 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -114,7 +114,7 @@ public:
   int GetDependOnAbsPose() {return m_DependOnAbsPose;}
 
   /** print a dump of this object */
-  virtual void Print(std::ostream& os, const int tabs=0) const;
+  virtual void Print(std::ostream& os, const int tabs=0);// const;
 
   void OnEvent(mafEventBase *maf_event);
   

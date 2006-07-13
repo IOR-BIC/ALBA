@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-25 12:00:24 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-07-13 09:08:41 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -70,7 +70,7 @@ public:
   virtual void SetMatrix(const mafMatrix &mat);
 
   /** print a dump of this object */
-  virtual void Print(std::ostream& os, const int tabs=0) const;
+  virtual void Print(std::ostream& os, const int tabs=0);// const;
 
   /** return no timestamps */
   virtual void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes);

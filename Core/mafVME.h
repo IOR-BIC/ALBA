@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-11 09:03:16 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2006-07-13 09:08:41 $
+  Version:   $Revision: 1.29 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -47,7 +47,7 @@ public:
   //typedef std::vector<mafTimeStamp> std::vector<mafTimeStamp>;
 
   /** print a dump of this object */
-  virtual void Print(std::ostream& os, const int tabs=0) const;
+  virtual void Print(std::ostream& os, const int tabs=0);// const;
 
   /** 
     return the parent VME Node. Notice that a VME can only reparented 

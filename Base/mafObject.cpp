@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObject.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:33:17 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-07-13 09:08:22 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -130,7 +130,7 @@ mafObject* mafObject::SafeDownCast(mafObject *o)
 }
 
 //------------------------------------------------------------------------------
-void mafObject::Print(std::ostream &os, const int indent) const
+void mafObject::Print(std::ostream &os, const int indent)// const
 //------------------------------------------------------------------------------
 {
   os << mafIndent(indent) << "Object Type Name: " << GetTypeName() << std::endl;

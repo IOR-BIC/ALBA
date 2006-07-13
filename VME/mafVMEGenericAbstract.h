@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-11 09:27:25 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-07-13 09:08:54 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -44,7 +44,7 @@ public:
   };
 
   /** print a dump of this object */
-  virtual void Print(std::ostream& os, const int tabs=0);
+  virtual void Print(std::ostream& os, const int tabs=0);// const;
 
   /**
     Copy the contents of another VME into this one. Notice that subtrees

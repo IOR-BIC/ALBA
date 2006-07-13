@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.h,v $
   Language:  C++
-  Date:      $Date: 2005-08-30 12:52:44 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-07-13 09:08:41 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -55,7 +55,7 @@ public:
   void SetVME(mafVME *vme) {m_VME=vme;} 
 
   /** print a dump of this object */
-  virtual void Print(std::ostream& os, const int tabs=0) const;
+  virtual void Print(std::ostream& os, const int tabs=0);// const;
 
   /** Return the VME pose, this function queries the MatrixPipe for producing a matrix */
   void GetPose(double &x,double &y,double &z,double &rx,double &ry,double &rz,mafTimeStamp t=-1) const;

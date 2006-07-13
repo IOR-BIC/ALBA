@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeRoot.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:58:27 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-07-13 09:08:41 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -45,7 +45,7 @@ void mafNodeRoot::OnEvent(mafEventBase *e)
 }
 
 //-------------------------------------------------------------------------
-void mafNodeRoot::Print(std::ostream& os, const int tabs) const
+void mafNodeRoot::Print(std::ostream& os, const int tabs)// const
 //-------------------------------------------------------------------------
 {
   mafNode::Print(os,tabs);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:56:26 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-07-13 09:08:22 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -203,7 +203,7 @@ mafMatrixElements mafMatrix::GetElements() const
 }
 
 //------------------------------------------------------------------------------
-void mafMatrix::Print (std::ostream& os, const int indent) const
+void mafMatrix::Print (std::ostream& os, const int indent)// const
 //------------------------------------------------------------------------------
 {
   this->Superclass::Print(os, indent);

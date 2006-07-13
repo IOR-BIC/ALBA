@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-15 15:24:24 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2006-07-13 09:08:41 $
+  Version:   $Revision: 1.30 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -83,11 +83,11 @@ public:
   mafNode *NewInstance() {return SafeDownCast(NewObjectInstance());}
   
   /** print a dump of this object */
-  virtual void Print(std::ostream& os, const int tabs=0) const;
+  virtual void Print(std::ostream& os, const int tabs=0);// const;
 
   /**
     Initialize this node. Subclasses can redefine InternalInitialize() to customize
-    the initialisation. A node is typically initialized when added to the tree, or
+    the initialization. A node is typically initialized when added to the tree, or
     just after tree loading in case of load from storage. */
   int Initialize();
   

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOBB.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-21 07:53:22 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-07-13 09:08:22 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -401,7 +401,7 @@ void mafOBB::GetOrientation(double *rxyz)
   Modified();
 }
 //-------------------------------------------------------------------------
-void mafOBB::Print(std::ostream& os, const int tabs) const
+void mafOBB::Print(std::ostream& os, const int tabs)// const
 //-------------------------------------------------------------------------
 {
   mafIndent indent(tabs);

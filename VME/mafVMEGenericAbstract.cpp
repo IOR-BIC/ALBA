@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-11 09:28:01 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-07-13 09:08:54 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -234,7 +234,7 @@ int mafVMEGenericAbstract::InternalStore(mafStorageElement *parent)
   // sub-element for storing the data vector
   if (m_DataVector)
   {
-    m_DataVector->SetCrypting(this->m_Crypting);
+    m_DataVector->SetCrypting(this->m_Crypting != 0);
     mafStorageElement *data_vector = parent->AppendChild("DataVector");
     if(m_DataVector->Store(data_vector) == MAF_ERROR)
       return MAF_ERROR;
@@ -318,7 +318,7 @@ void mafVMEGenericAbstract::OnEvent(mafEventBase *maf_event)
 }
 
 //-----------------------------------------------------------------------
-void mafVMEGenericAbstract::Print(std::ostream& os, const int tabs)
+void mafVMEGenericAbstract::Print(std::ostream& os, const int tabs)// const
 //-----------------------------------------------------------------------
 {
   Superclass::Print(os,tabs);

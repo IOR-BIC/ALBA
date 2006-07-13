@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix3x3.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-01 09:55:57 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-07-13 09:08:22 $
+  Version:   $Revision: 1.4 $
   Authors:   Based on vtkMath code (www.vtk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -29,7 +29,7 @@ class MAF_EXPORT mafMatrix3x3: public mafObject, public mafTimeStamped
 {
 public:
   mafTypeMacro(mafMatrix3x3,mafObject);
-  virtual void mafMatrix3x3::Print (std::ostream& os, const int indent=0) const;
+  virtual void mafMatrix3x3::Print (std::ostream& os, const int indent=0);// const;
 
   mafMatrix3x3();
   virtual ~mafMatrix3x3();

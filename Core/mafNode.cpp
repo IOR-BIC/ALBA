@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-02 09:46:45 $
-  Version:   $Revision: 1.44 $
+  Date:      $Date: 2006-07-13 09:08:41 $
+  Version:   $Revision: 1.45 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1121,7 +1121,7 @@ int mafNode::InternalRestore(mafStorageElement *node)
 }
 
 //-------------------------------------------------------------------------
-void mafNode::Print(std::ostream& os, const int tabs) const
+void mafNode::Print(std::ostream& os, const int tabs)// const
 //-------------------------------------------------------------------------
 {
   mafIndent indent(tabs);

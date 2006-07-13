@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-11 09:25:45 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2006-07-13 09:08:54 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -63,7 +63,7 @@ public:
   /** defined to allow DataVector copy */
   mafVMEItem *NewInstance() {return (mafVMEItem *)NewObjectInstance();}
 
-  virtual void Print(std::ostream& os, const int indent=0) const;
+  virtual void Print(std::ostream& os, const int indent=0);// const;
 
   /** Get the TimeStamp of this dataset*/
   mafTimeStamp GetTimeStamp() const {return m_TimeStamp;}

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 15:11:30 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2006-07-13 09:08:41 $
+  Version:   $Revision: 1.19 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -497,7 +497,7 @@ mafTimeStamp mafVMEOutput::GetTimeStamp() const
 }
 
 //-------------------------------------------------------------------------
-void mafVMEOutput::Print(std::ostream& os, const int tabs) const
+void mafVMEOutput::Print(std::ostream& os, const int tabs)// const
 //-------------------------------------------------------------------------
 {
   mafIndent indent(tabs);
@@ -508,7 +508,8 @@ void mafVMEOutput::Print(std::ostream& os, const int tabs) const
   GetMatrix()->Print(os,indent.GetNextIndent());
 
   os << indent << "Current Absolute Matrix:\n";
-  m_VME->GetAbsMatrixPipe()->GetMatrix().Print(os,indent.GetNextIndent());
+  mafMatrix m = m_VME->GetAbsMatrixPipe()->GetMatrix();
+  m.Print(os,indent.GetNextIndent());
 
   mafTimeStamp tbounds[2];
   GetLocalTimeBounds(tbounds);

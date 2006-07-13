@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERefSys.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-17 13:07:00 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-07-13 09:08:55 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -356,7 +356,8 @@ void mafVMERefSys::Print(std::ostream& os, const int tabs)
   Superclass::Print(os,tabs);
   mafIndent indent(tabs);
 
-  m_Transform->GetMatrix().Print(os,indent.GetNextIndent());
+  mafMatrix m = m_Transform->GetMatrix();
+  m.Print(os,indent.GetNextIndent());
 }
 //-------------------------------------------------------------------------
 char **mafVMERefSys::GetIcon()

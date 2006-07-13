@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRoot.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 18:09:30 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-07-13 09:08:41 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -99,7 +99,7 @@ mafStorage *mafRoot::GetStorage()
 }
 
 //-------------------------------------------------------------------------
-void mafRoot::Print(std::ostream& os, const int tabs) const 
+void mafRoot::Print(std::ostream& os, const int tabs)// const 
 //-------------------------------------------------------------------------
 {
   os << mafIndent(tabs) << "MaxNodeId: " << m_MaxNodeId << "\n";

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTagArray.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-19 11:32:46 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-07-13 09:08:41 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -251,7 +251,7 @@ int mafTagArray::InternalRestore(mafStorageElement *node)
 }
 
 //-------------------------------------------------------------------------
-void mafTagArray::Print(std::ostream& os, const int tabs) const
+void mafTagArray::Print(std::ostream& os, const int tabs)// const
 //-------------------------------------------------------------------------
 {
   Superclass::Print(os,tabs);
@@ -260,8 +260,10 @@ void mafTagArray::Print(std::ostream& os, const int tabs) const
   os << indent << "Tags:"<<std::endl;
   mafIndent next_indent(indent.GetNextIndent());
 
+  mafTagItem item;
   for (mmuTagsMap::const_iterator it=m_Tags.begin();it!=m_Tags.end();it++)
   {
-    it->second.Print(os,next_indent);
+    item = it->second;
+    item.Print(os,next_indent);
   }
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeRoot.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 12:59:56 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-07-13 09:08:41 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,7 +33,7 @@ public:
   };
 
   /** print a dump of this object */
-  virtual void Print(std::ostream& os, const int tabs=0) const;
+  virtual void Print(std::ostream& os, const int tabs=0);// const;
 
   /** allow only a NULL parent */
   virtual bool CanReparentTo(mafNode *parent) {return mafRoot::CanReparentTo(parent);}

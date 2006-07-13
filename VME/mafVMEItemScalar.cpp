@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-08 14:07:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-07-13 09:08:54 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005
@@ -497,7 +497,7 @@ void mafVMEItemScalar::ReleaseOutputMemory()
   m_OutputMemory = NULL;
 }
 //-------------------------------------------------------------------------
-void mafVMEItemScalar::Print(std::ostream& os, const int tabs) const
+void mafVMEItemScalar::Print(std::ostream& os, const int tabs)// const
 //-------------------------------------------------------------------------
 {
   mafIndent indent(tabs);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-11 10:46:03 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2006-07-13 09:08:55 $
+  Version:   $Revision: 1.19 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -1139,8 +1139,8 @@ void mafVMELandmarkCloud::Print(std::ostream &os, const int tabs)
 {
   mafIndent indent(tabs);
   Superclass::Print(os,indent);
-  os << indent << "Cloud m_State: ";
-  switch (GetState()) 
+  os << indent << "Cloud State: ";
+  switch (m_State) 
   {
     case CLOSED_CLOUD: os <<"CLOSED"; break;
     case OPEN_CLOUD: os <<"OPEN"; break;
@@ -1149,7 +1149,7 @@ void mafVMELandmarkCloud::Print(std::ostream &os, const int tabs)
 
   os << std::endl;
 
-  os << indent << "Current Landmarks m_State:"<<std::endl;
+  os << indent << "Current Landmarks State:"<<std::endl;
   for (int idx = 0; idx < GetNumberOfLandmarks();idx++)
   {
     double x,y,z;

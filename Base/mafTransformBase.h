@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformBase.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-14 11:45:04 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-07-13 09:08:22 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -45,7 +45,7 @@ public:
   mafTransformBase(const mafTransformBase&);
 
   mafAbstractTypeMacro(mafTransformBase,mafReferenceCounted);
-  virtual void Print(std::ostream& os, const int indent=0) const;
+  virtual void Print(std::ostream& os, const int indent=0);// const;
 
   /** update and return internal transform matrix */
   virtual const mafMatrix &GetMatrix() {Update();return *m_Matrix;}

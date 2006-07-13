@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-11 09:03:16 $
-  Version:   $Revision: 1.33 $
+  Date:      $Date: 2006-07-13 09:08:41 $
+  Version:   $Revision: 1.34 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -437,7 +437,7 @@ void mafVME::AbsMatrixUpdateCallback(void *arg)
 }
 */
 //-------------------------------------------------------------------------
-void mafVME::Print(std::ostream& os, const int tabs) const
+void mafVME::Print(std::ostream& os, const int tabs)// const
 //-------------------------------------------------------------------------
 {
   Superclass::Print(os,tabs);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-02 10:36:29 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2006-07-13 09:08:41 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -150,7 +150,7 @@ void mafVMERoot::OnEvent(mafEventBase *maf_event)
 }
 
 //-------------------------------------------------------------------------
-void mafVMERoot::Print(std::ostream& os, const int tabs) const
+void mafVMERoot::Print(std::ostream& os, const int tabs)// const
 //-------------------------------------------------------------------------
 {
   mafNode::Print(os,tabs);

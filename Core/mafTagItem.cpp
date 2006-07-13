@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTagItem.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:18 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-07-13 09:08:41 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -452,7 +452,7 @@ bool mafTagItem::Equals(const mafTagItem *item) const
 }
 
 //-------------------------------------------------------------------------
-void mafTagItem::Print(std::ostream& os, const int tabs) const
+void mafTagItem::Print(std::ostream& os, const int tabs)// const
 //-------------------------------------------------------------------------
 {
   mafIndent indent(tabs);

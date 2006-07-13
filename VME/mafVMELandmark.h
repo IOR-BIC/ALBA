@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-11 10:46:02 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-07-13 09:08:54 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -42,7 +42,7 @@ class MAF_EXPORT mafVMELandmark : public mafVMEGenericAbstract
 public:
   mafTypeMacro(mafVMELandmark, mafVMEGenericAbstract);
 
-  void Print(std::ostream &os, const int tabs);
+  void Print(std::ostream &os, const int tabs=0);
 
   /** Copy the contents of another landmark into this one. */
   virtual int DeepCopy(mafNode *a);

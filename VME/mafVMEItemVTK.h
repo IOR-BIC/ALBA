@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:06:51 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-07-13 09:08:54 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -56,7 +56,7 @@ class MAF_EXPORT mafVMEItemVTK : public mafVMEItem
 public:  
   mafTypeMacro(mafVMEItemVTK,mafVMEItem);
 
-  virtual void Print(std::ostream& os, const int indent=0) const;
+  virtual void Print(std::ostream& os, const int indent=0);// const;
 
   /** copy data from another dataset */
   virtual void DeepCopy(mafVMEItem *a);

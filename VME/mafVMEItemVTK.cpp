@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-11 09:26:17 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-07-13 09:08:54 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -606,7 +606,7 @@ void mafVMEItemVTK::ReleaseOutputMemory()
   }
 }
 //-------------------------------------------------------------------------
-void mafVMEItemVTK::Print(std::ostream& os, const int tabs) const
+void mafVMEItemVTK::Print(std::ostream& os, const int tabs)// const
 //-------------------------------------------------------------------------
 {
   mafIndent indent(tabs);
