@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-07 12:43:23 $
-  Version:   $Revision: 1.66 $
+  Date:      $Date: 2006-07-13 10:12:44 $
+  Version:   $Revision: 1.67 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -118,7 +118,7 @@ void mafLogicWithManagers::Configure()
 {
   mafLogicWithGUI::Configure(); // create the GUI - and calls CreateMenu
 
-  if(m_SideSash && this->m_PlugSidebar)
+  if(this->m_PlugSidebar)
   {
     m_SideBar = new mafSideBar(m_Win,MENU_VIEW_SIDEBAR,this);
     m_Win->AddDockPane(m_SideBar->m_Notebook , wxPaneInfo()
@@ -928,7 +928,8 @@ void mafLogicWithManagers::VmeAdded(mafNode *vme)
     (vme->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") && vme->GetTagArray()->GetTag("VISIBLE_IN_THE_TREE")->GetValueAsDouble() != 0);
   if(m_SideBar && vme_in_tree)
     m_SideBar->VmeAdd(vme);
-  UpdateTimeBounds();
+  if(m_PlugTimebar)
+    UpdateTimeBounds();
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeRemove(mafNode *vme)
