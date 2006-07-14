@@ -16,6 +16,8 @@ SET(PROJECT_SRCS
   mafPics.h
   mafWXLog.cpp
   mafWXLog.h
+  mmgApplicationSettings.cpp
+  mmgApplicationSettings.h
   mmgButton.cpp
   mmgButton.h
   mmgCheckListBox.cpp
