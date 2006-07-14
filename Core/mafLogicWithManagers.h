@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-26 15:33:47 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2006-07-14 16:53:50 $
+  Version:   $Revision: 1.26 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -82,7 +82,9 @@ public:
   /**  Plug a new operation */
 	virtual void Plug(mafOp *op, wxString menuPath = "");
 	
-  /** Configure the application plugging all the managers and the side-bar panel. */
+  /** Configure the application.
+  At this point are plugged all the managers, the side-bar docking panel. 
+  Are plugged also all the setting to the dialogs interface. */
   virtual void Configure();
 
   /** Program Initialization */
@@ -100,7 +102,7 @@ public:
   /** Must be called before Configure */
   void PlugInteractionManger(bool b){m_UseInteractionManager=b;}
 
-  /** Redefined to Fill the menu's */
+  /** Fill the View and operation menu's and set the application stamp to the VMEManager.*/
   virtual void Show();
 
   /** Set the application stamp for the application, 
