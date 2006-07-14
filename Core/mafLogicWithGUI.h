@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 10:11:54 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2006-07-14 16:53:26 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,6 +31,7 @@ class mafVTKLog;
 class mafSideBar;
 class mmgLocaleSettings;
 class mmgMeasureUnitSettings;
+class mmgApplicationSettings;
 
 //----------------------------------------------------------------------------
 // mafLogicWithGUI :
@@ -75,10 +76,10 @@ public:
 	/** Virtual function for plug operations into the application.*/
 	//SIL. 27-9-2004: virtual void Plug(mafOp *op)								{};
 
-  /** Configure */
+  /** Create user interface elements like Menù, Toolbar, ... according to the Plug flags.*/
   virtual void Configure();
 
-  /** Main initialisation.*/
+  /** Main initialization.*/
   virtual void Init(int argc, char **argv) {};
 	/** Returns the pointer to the main panel of the application.*/
 	virtual mmgMDIFrame *GetTopWin()						{return m_Win;};
@@ -146,6 +147,7 @@ protected:
   mafVTKLog         *m_VtkLog;
   mmgLocaleSettings *m_LocaleSettings;
   mmgMeasureUnitSettings *m_MeasureUnitSettings;
+  mmgApplicationSettings *m_ApplicationSettings;
 
 	bool m_PlugMenu;    ///< Flag to plug or not the Menu into the application. Default is true.
 	bool m_PlugToolbar; ///< Flag to plug or not the Toolbar into the application. Default is true.

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 10:11:54 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2006-07-14 16:53:26 $
+  Version:   $Revision: 1.31 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,6 +37,7 @@
 #include "mmgTimeBar.h"
 #include "mmgLocaleSettings.h"
 #include "mmgMeasureUnitSettings.h"
+#include "mmgApplicationSettings.h"
 #include "mafWXLog.h"
 #include "mafPics.h"
 #include "mafVTKLog.h"
@@ -50,12 +51,13 @@ mafLogicWithGUI::mafLogicWithGUI()
 
   m_LocaleSettings = new mmgLocaleSettings(this);
   m_MeasureUnitSettings = new mmgMeasureUnitSettings(this);
+  m_ApplicationSettings = new mmgApplicationSettings(this);
 
   m_ToolBar       = NULL;
   m_MenuBar       = NULL;
 
-	m_LogToFile			= false;
-	m_LogAllEvents	= false;
+	m_LogToFile			= m_ApplicationSettings->GetLogToFileStatus();
+	m_LogAllEvents	= m_ApplicationSettings->GetLogVerboseStatus();
 	m_Logger				= NULL;
   m_VtkLog        = NULL;
 
@@ -73,6 +75,7 @@ mafLogicWithGUI::~mafLogicWithGUI()
 {
   cppDEL(m_LocaleSettings);
   cppDEL(m_MeasureUnitSettings);
+  cppDEL(m_ApplicationSettings);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithGUI::Configure()
@@ -209,23 +212,23 @@ void mafLogicWithGUI::CreateLogbar()
   m_VtkLog = mafVTKLog::New();
   m_VtkLog->SetInstance(m_VtkLog);
 
-  //wxTextCtrl *log  = new wxTextCtrl( m_Win, -1, "", wxPoint(0,0), wxSize(100,300), /*wxNO_BORDER |*/ wxTE_MULTILINE );
-  wxTextCtrl *log  = new wxTextCtrl( m_Win, MENU_VIEW_LOGBAR, "", wxPoint(0,0), wxSize(100,300), /*wxNO_BORDER |*/ wxTE_MULTILINE );mafWXLog *m_Logger = new mafWXLog(log);
-  wxString s = mafGetApplicationDirectory().c_str();
-  wxDateTime *log_time = new wxDateTime();
-  s += "\\";
-  s += m_AppTitle.GetCStr();
-//  s += wxString::Format("_%02d_%02d_%d_%02d_%2d",log_time->GetDay(),log_time->GetMonth() + 1,log_time->GetYear(),log_time->GetHour(),log_time->GetMinute());
-  s += ".log";
+  wxTextCtrl *log  = new wxTextCtrl( m_Win, MENU_VIEW_LOGBAR, "", wxPoint(0,0), wxSize(100,300), /*wxNO_BORDER |*/ wxTE_MULTILINE );
+  m_Logger = new mafWXLog(log);
+  m_Logger->LogToFile(m_LogToFile);
   if(m_LogToFile)
   {
+    wxString s = mafGetApplicationDirectory().c_str();
+    wxDateTime log_time = wxDateTime::Now();
+    s += "\\";
+    s += m_Win->GetTitle();
+    s += wxString::Format("_%02d_%02d_%d_%02d_%2d",log_time.GetYear(),log_time.GetMonth() + 1,log_time.GetDay(),log_time.GetHour(),log_time.GetMinute());
+    s += ".log";
     m_Logger->SetFileName(s);
-    m_Logger->LogToFile(m_LogToFile);
   }
+  m_Logger->SetVerbose(m_LogAllEvents);
 
   wxLog *old_log = wxLog::SetActiveTarget( m_Logger );
   cppDEL(old_log);
-  cppDEL(log_time);
 
   m_Win->AddDockPane(log, wxPaneInfo()
     .Name("logbar")
@@ -233,7 +236,7 @@ void mafLogicWithGUI::CreateLogbar()
     .Bottom()
     .Layer(0)
     .MinSize(100,10)
-    .TopDockable(false) // prevent docking on top side - otherwise may dock also beside the toolbar -- and it's hugly
+    .TopDockable(false) // prevent docking on top side - otherwise may dock also beside the toolbar -- and it's hugely
   );
   
   mafLogMessage(_("welcome"));

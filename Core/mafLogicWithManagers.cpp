@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 10:53:03 $
-  Version:   $Revision: 1.68 $
+  Date:      $Date: 2006-07-14 16:54:10 $
+  Version:   $Revision: 1.69 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -56,6 +56,7 @@
 #include "mmgViewFrame.h"
 #include "mmgLocaleSettings.h"
 #include "mmgMeasureUnitSettings.h"
+#include "mmgApplicationSettings.h"
 #include "mafRemoteLogic.h"
 #include "mmiPER.h"
 #include "mmgSettingsDialog.h"
@@ -168,17 +169,18 @@ void mafLogicWithManagers::Configure()
   
   // Fill the SettingsDialog //SIL. 09-jun-2006 : 
   
-  m_SettingsDialog->AddPage( m_Win->GetDockSettingGui(), "User Interface Preferences"); 
+  m_SettingsDialog->AddPage( m_ApplicationSettings->GetGui(), _("Application Settings"));
+  m_SettingsDialog->AddPage( m_Win->GetDockSettingGui(), _("User Interface Preferences"));
   
   if(m_InteractionManager)
-    m_SettingsDialog->AddPage(m_InteractionManager->GetGui(), "Interaction Manager");
+    m_SettingsDialog->AddPage(m_InteractionManager->GetGui(), _("Interaction Manager"));
     
   if(m_LocaleSettings)
-    m_SettingsDialog->AddPage(m_LocaleSettings->GetGui(), "Interface language");
+    m_SettingsDialog->AddPage(m_LocaleSettings->GetGui(), _("Interface language"));
 
   if (m_MeasureUnitSettings)
   {
-    m_SettingsDialog->AddPage(m_MeasureUnitSettings->GetGui(), "Measure Unit");
+    m_SettingsDialog->AddPage(m_MeasureUnitSettings->GetGui(), _("Measure Unit"));
   }
 }
 //----------------------------------------------------------------------------
