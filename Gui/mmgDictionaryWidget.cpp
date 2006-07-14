@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDictionaryWidget.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-07-14 16:52:24 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,7 +42,7 @@
 
 wxString mmgDictionaryWidget::m_File = "";
 
-enum 
+enum DICTIONARY_WIDGET_ID
 {
 	LOAD_DICT = MINID,
 };
