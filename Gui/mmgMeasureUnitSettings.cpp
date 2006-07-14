@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgMeasureUnitSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2006-07-07 12:42:22 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2006-07-14 16:51:38 $
+Version:   $Revision: 1.7 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -51,7 +51,7 @@ mmgMeasureUnitSettings::mmgMeasureUnitSettings(mafObserver *Listener)
   InitializeMeasureUnit();
 
   m_Gui = new mmgGui(this);
-  m_Gui->Label(_("main units"));
+  m_Gui->Label(_("Application measure units"));
   m_Gui->Combo(MEASURE_DEFAULT_DATA_UNIT_ID,_("data"),&m_ChoosedDataUnit,5,m_DefaultUnits);
   m_Gui->Combo(MEASURE_DEFAULT_VISUAL_UNIT_ID,_("visual"),&m_ChoosedVisualUnit,5,m_DefaultUnits);
   m_Gui->Divider(2);
