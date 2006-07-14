@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDockSettings.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-07-14 16:52:46 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,7 +27,7 @@
 //----------------------------------------------------------------------------
 // widgets' IDs
 //----------------------------------------------------------------------------
-enum 
+enum DOCK_SETTINGS_ID
 {
   ID_PaneBorderSize = MINID,
   ID_SashSize,
@@ -78,41 +78,41 @@ mmgDockSettings::mmgDockSettings(wxFrameManager& mgr)
   m_CaptionModeLabels[2] = "paint caption with vertical gradient";
   
   
-  m_gui = new mmgGui(this);
+  m_Gui = new mmgGui(this);
 
-  m_gui->Bool( ID_AllowFloating,   "Allow pane floating",&m_AllowFloating, 1);
-  //m_gui->Bool( ID_AllowActivePane, "Hilight active pane",&m_AllowActivePane, 1);
+  m_Gui->Bool( ID_AllowFloating,   "Allow pane floating",&m_AllowFloating, 1);
+  //m_Gui->Bool( ID_AllowActivePane, "Hilight active pane",&m_AllowActivePane, 1);
 
-  //m_gui->Divider(1);
-  //m_gui->Label("Pane caption mode");
-  m_gui->Radio(ID_CaptionMode,"",&m_CaptionMode,3,m_CaptionModeLabels);
-  m_gui->Divider(0);
+  //m_Gui->Divider(1);
+  //m_Gui->Label("Pane caption mode");
+  m_Gui->Radio(ID_CaptionMode,"",&m_CaptionMode,3,m_CaptionModeLabels);
+  m_Gui->Divider(0);
 
-  m_gui->Label("Pane metrics",false);
-  m_gui->Slider(ID_PaneBorderSize,"BorderSize",&m_PaneBorderSize,0,10);
-  m_gui->Slider(ID_SashSize,"SashSize",&m_SashSize,0,10);
-  m_gui->Slider(ID_CaptionSize,"CaptionSize",&m_CaptionSize,2,24);
-  m_gui->Divider(1);
+  m_Gui->Label("Pane metrics",false);
+  m_Gui->Slider(ID_PaneBorderSize,"BorderSize",&m_PaneBorderSize,0,10);
+  m_Gui->Slider(ID_SashSize,"SashSize",&m_SashSize,0,10);
+  m_Gui->Slider(ID_CaptionSize,"CaptionSize",&m_CaptionSize,2,24);
+  m_Gui->Divider(1);
 
-  m_gui->Label("Pane colors",false);
-  m_gui->Color(ID_BackgroundColor,"Background",&m_BackgroundColor);
-  m_gui->Color(ID_SashColor,"Sash",&m_SashColor);
-  m_gui->Color(ID_BorderColor,"Border",&m_BorderColor);
-  m_gui->Color(ID_GripperColor,"Gripper",&m_GripperColor);
-  m_gui->Divider(1);
+  m_Gui->Label("Pane colors",false);
+  m_Gui->Color(ID_BackgroundColor,"Background",&m_BackgroundColor);
+  m_Gui->Color(ID_SashColor,"Sash",&m_SashColor);
+  m_Gui->Color(ID_BorderColor,"Border",&m_BorderColor);
+  m_Gui->Color(ID_GripperColor,"Gripper",&m_GripperColor);
+  m_Gui->Divider(1);
 
-  m_gui->Label("Caption colors",false);
-  //m_gui->Label("Inactive caption colors",false);
-  m_gui->Color(ID_InactiveCaptionColor,"Color",&m_InactiveCaptionColor);
-  m_gui->Color(ID_InactiveCaptionGradientColor,"Gradient",&m_InactiveCaptionGradientColor);
-  m_gui->Color(ID_InactiveCaptionTextColor,"Text",&m_InactiveCaptionTextColor);
-  m_gui->Divider(1);
+  m_Gui->Label("Caption colors",false);
+  //m_Gui->Label("Inactive caption colors",false);
+  m_Gui->Color(ID_InactiveCaptionColor,"Color",&m_InactiveCaptionColor);
+  m_Gui->Color(ID_InactiveCaptionGradientColor,"Gradient",&m_InactiveCaptionGradientColor);
+  m_Gui->Color(ID_InactiveCaptionTextColor,"Text",&m_InactiveCaptionTextColor);
+  m_Gui->Divider(1);
 
-  //m_gui->Label("Active caption colors",false);
-  //m_gui->Color(ID_ActiveCaptionColor,"Color",&m_ActiveCaptionColor);
-  //m_gui->Color(ID_ActiveCaptionGradientColor,"Gradient",&m_ActiveCaptionGradientColor);
-  //m_gui->Color(ID_ActiveCaptionTextColor,"Text",&m_ActiveCaptionTextColor);
-  //m_gui->Label("");
+  //m_Gui->Label("Active caption colors",false);
+  //m_Gui->Color(ID_ActiveCaptionColor,"Color",&m_ActiveCaptionColor);
+  //m_Gui->Color(ID_ActiveCaptionGradientColor,"Gradient",&m_ActiveCaptionGradientColor);
+  //m_Gui->Color(ID_ActiveCaptionTextColor,"Text",&m_ActiveCaptionTextColor);
+  //m_Gui->Label("");
 }
 //----------------------------------------------------------------------------
 mmgDockSettings::~mmgDockSettings()
@@ -196,7 +196,7 @@ void mmgDockSettings::ShowModal()
 //----------------------------------------------------------------------------
 {
   mmgDialog dlg("AUI Settings",mafCLOSE | mafCLOSEWINDOW);
-  dlg.Add(m_gui,1, wxALL, 10);
+  dlg.Add(m_Gui,1, wxALL, 10);
   dlg.ShowModal();
   
   // you dont need to destroy the GUI.

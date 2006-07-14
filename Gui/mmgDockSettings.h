@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDockSettings.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-07-14 16:52:46 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,12 +30,12 @@ public:
  virtual ~mmgDockSettings();
 
  void OnEvent(mafEventBase *evt);
- mmgGui* GetGui() {return m_gui;};
+ mmgGui* GetGui() {return m_Gui;};
 
 protected:
   wxFrameManager& m_mgr;
 
-  mmgGui*  m_gui;
+  mmgGui*  m_Gui;
   int      m_PaneBorderSize;
   int      m_SashSize;
   int      m_CaptionSize;
