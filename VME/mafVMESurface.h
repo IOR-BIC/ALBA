@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-21 13:15:02 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-07-14 15:12:36 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,22 +33,21 @@ class MAF_EXPORT mafVMESurface : public mafVMEGeneric
 public:
   mafTypeMacro(mafVMESurface,mafVMEGeneric);
 
-  /** 
-  Set data for the give timestamp. This function automatically creates a
-  a VMEItem for the data to be stored. The optional parameter specify if
-  data must be copied, referenced, or detached from original source. Default
-  is to copy data which creates a new data set copying the original one.
+  /** Set data for the give timestamp. 
+  This function automatically creates a VMEItem for the data to be stored. 
+  The optional parameter specify if data must be copied, referenced, or detached from original source. 
+  Default is to copy data which creates a new data set copying the original one.
   Referencing means the data is kept connected to its original source, and
   detaching means disconnect is like referencing but also disconnect the data
   from the source.
   Return MAF_OK if succeeded, MAF_ERROR if they kind of data is not accepted by
-  this type of VME. */
+  this type of VME. The accepted surface is composed by polygonal cells (eg: triangles) or strips.*/
   virtual int SetData(vtkPolyData *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
 
-  /** return the right type of output */  
+  /** return the right type of output */
   mafVMEOutputSurface *GetSurfaceOutput() {return (mafVMEOutputSurface *)GetOutput();}
 
-  /** return the right type of output */  
+  /** return the right type of output */
   virtual mafVMEOutput *GetOutput();
 
   /** return icon */
