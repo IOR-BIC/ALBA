@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-11 09:23:35 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2006-07-14 08:29:32 $
+  Version:   $Revision: 1.31 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -223,8 +223,8 @@ public:
   bool Remove(wxSizer*  sizer ) {return m_Sizer->Detach(sizer);};
 
   /** Recalc 'this' Gui Size and MinSize considering the space required by the children widgets.
-      FitGui is called inplicitly when a gui is inserted in a mmgGuiHolder or mmgPanel.
-      FitGui must call explicitly when children widget are changed dinamically. */
+      FitGui is called implicitly when a gui is inserted in a mmgGuiHolder or mmgPanel.
+      FitGui must call explicitly when children widget are changed dynamically. */
   void FitGui();
 
 	/** Update gui widget. */
@@ -250,8 +250,7 @@ public:
   */
   int GetId(int mod_id)       {m_Id++; assert(m_Id<MAXID); m_WidgetTableID[m_Id-MINID]=mod_id; return m_Id;}; 
 
-  /** 
-  Turn On/Off the collaboration status. */
+  /** Turn On/Off the collaboration status. */
   void Collaborate(bool status) {m_CollaborateStatus = status;};
 
   void GetWidgetValue(long widget_id, WidgetDataType &widget_data);
@@ -270,8 +269,7 @@ protected:
   long          m_EntryStyle;
 
   /**  \par implementation details:
-  m_BoldFont is the font used for the Bold labels
-  */
+  m_BoldFont is the font used for the Bold labels*/
   wxFont m_BoldFont;
   wxFont m_Font;
 
