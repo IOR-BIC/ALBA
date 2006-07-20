@@ -63,6 +63,8 @@ IF (MAF_USE_VTK)
     mmoVTKExporter.h
     mmoVTKImporter.cpp
     mmoVTKImporter.h
+    mmoCrop.cpp
+    mmoCrop.h
   )
 ENDIF (MAF_USE_VTK)
 
