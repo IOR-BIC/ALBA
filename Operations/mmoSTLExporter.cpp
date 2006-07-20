@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoSTLExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 11:35:29 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-07-20 17:36:33 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -74,13 +74,13 @@ void mmoSTLExporter::OpRun()
   mafString wildc = "Stereo Litography (*.stl)|*.stl";
 
   m_Gui = new mmgGui(this);
-	m_Gui->FileSave(ID_CHOOSE_FILENAME,"stl file", &m_File, wildc);
+	//m_Gui->FileSave(ID_CHOOSE_FILENAME,"stl file", &m_File, wildc,"Save As...");
   m_Gui->Label("file type",true);
 	m_Gui->Bool(ID_STL_BINARY_FILE,"binary",&m_Binary,0);
 	m_Gui->Label("absolute matrix",true);
 	m_Gui->Bool(ID_ABS_MATRIX_TO_STL,"apply",&m_ABSMatrixFlag,0);
 	m_Gui->OkCancel();
-  m_Gui->Enable(wxOK,m_File != "");
+  //m_Gui->Enable(wxOK,m_File != "");
 	
 	ShowGui();
 }
@@ -93,8 +93,21 @@ void mmoSTLExporter::OnEvent(mafEventBase *maf_event)
     switch(e->GetId())
     {
       case wxOK:
-        ExportSurface();
-        OpStop(OP_RUN_OK);
+				{
+					mafString FileDir = mafGetApplicationDirectory().c_str();
+					FileDir<<"\\";
+					FileDir<<this->m_Input->GetName();
+					FileDir<<".stl";
+					mafString wildc = "STL (*.stl)|*.stl";
+					m_File = mafGetSaveFile(FileDir.GetCStr(), wildc.GetCStr()).c_str();
+					if(m_File!="")
+					{
+						ExportSurface();
+						OpStop(OP_RUN_OK);
+					}
+					else
+						OpStop(OP_RUN_CANCEL);
+				}
       break;
       case ID_CHOOSE_FILENAME:
         m_Gui->Enable(wxOK,m_File != "");
