@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDockSettings.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-14 16:52:46 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-07-20 14:30:32 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,7 +21,7 @@
 
 #include "mmgDockSettings.h"
 #include "mmgDockManager.h"
-#include "mmgGUI.h"
+#include "mmgGui.h"
 #include "mmgDialog.h"
 
 //----------------------------------------------------------------------------
