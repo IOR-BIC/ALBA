@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-14 16:54:10 $
-  Version:   $Revision: 1.69 $
+  Date:      $Date: 2006-07-20 14:41:06 $
+  Version:   $Revision: 1.70 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -163,8 +163,10 @@ void mafLogicWithManagers::Configure()
   }
   if (m_UseInteractionManager && m_UseViewManager && m_UseOpManager)
   {
+#ifdef __WIN32__
     m_RemoteLogic = new mafRemoteLogic(this, m_ViewManager, m_OpManager);
     m_RemoteLogic->SetClientUnit(m_InteractionManager->GetClientDevice());
+#endif
   }
   
   // Fill the SettingsDialog //SIL. 09-jun-2006 : 

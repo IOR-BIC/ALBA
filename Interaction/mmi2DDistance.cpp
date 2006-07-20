@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi2DDistance.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-07 08:17:49 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-07-20 14:41:17 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -74,7 +74,7 @@ mmi2DDistance::mmi2DDistance()
   m_Mouse     = NULL;
 
   mafString plot_title = _("Density vs. Length (mm)");
-  mafString plot_titleX = L"mm";
+  mafString plot_titleX = "mm";
   mafString plot_titleY = _("Dens.");
   vtkNEW(m_PlotActor);
   m_PlotActor->GetProperty()->SetColor(0.02,0.06,0.62);	

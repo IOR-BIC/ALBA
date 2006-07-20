@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafRemoteLogic.cpp,v $
 Language:  C++
-Date:      $Date: 2006-06-08 14:11:06 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2006-07-20 14:40:53 $
+Version:   $Revision: 1.3 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -38,7 +38,9 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafEventInteraction.h"
 #include "mafTransform.h"
 
-#include "typeinfo.h"
+#ifdef __WIN32__
+  #include "typeinfo.h"
+#endif
 
 //----------------------------------------------------------------------------
 mafRemoteLogic::mafRemoteLogic(mafObserver *Listener, mafViewManager *view_manager, mafOpManager *operation_manager)
