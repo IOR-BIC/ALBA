@@ -116,6 +116,8 @@ SET(PROJECT_SRCS
 IF (MAF_USE_VTK)
   SET(PROJECT_SRCS
   ${PROJECT_SRCS}
+  mafLODActor.cpp
+  mafLODActor.h
   mafPipeBox.cpp
   mafPipeBox.h
   mmaMaterial.cpp
