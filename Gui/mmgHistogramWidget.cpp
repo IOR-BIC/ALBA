@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgHistogramWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2006-07-07 13:17:26 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2006-07-20 17:34:35 $
+Version:   $Revision: 1.10 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -69,7 +69,7 @@ mmgHistogramWidget::mmgHistogramWidget(wxWindow* parent, wxWindowID id, const wx
   m_HistogramRWI->m_RwiBase->Reparent(this);
   m_HistogramRWI->m_RwiBase->SetListener(this);
   m_HistogramRWI->m_RwiBase->Show(true);
-
+/*
   wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
   sizer->Add(m_HistogramRWI->m_RwiBase,1, wxEXPAND);
 
@@ -80,7 +80,7 @@ mmgHistogramWidget::mmgHistogramWidget(wxWindow* parent, wxWindowID id, const wx
 
   SetAutoLayout(TRUE);
   sizer->Fit(this);
-
+*/
   CreateGui();
 }
 //----------------------------------------------------------------------------
