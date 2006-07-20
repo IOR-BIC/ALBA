@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgMeasureUnitSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2006-07-14 16:51:38 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2006-07-20 17:35:08 $
+Version:   $Revision: 1.8 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -62,6 +62,7 @@ mmgMeasureUnitSettings::mmgMeasureUnitSettings(mafObserver *Listener)
   m_Gui->Enable(MEASURE_SCALE_FACTOR_ID,m_ChoosedDataUnit == 4 || m_ChoosedVisualUnit == 4);
   m_Gui->Enable(MEASURE_DATA_STRING_ID,m_ChoosedDataUnit == 4);
   m_Gui->Enable(MEASURE_VISUAL_STRING_ID,m_ChoosedDataUnit == 4);
+  m_Gui->Label("");
 }
 //----------------------------------------------------------------------------
 mmgMeasureUnitSettings::~mmgMeasureUnitSettings() 

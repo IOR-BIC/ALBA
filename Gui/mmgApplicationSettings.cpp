@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2006-07-14 16:50:41 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2006-07-20 17:35:08 $
+Version:   $Revision: 1.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -39,6 +39,7 @@ mmgApplicationSettings::mmgApplicationSettings(mafObserver *Listener)
   m_Gui->Bool(ID_LOG_TO_FILE,_("log to file"),&m_LogToFile,1);
   m_Gui->Bool(ID_LOG_VERBOSE,_("log verbose"),&m_VerboseLog,1);
   m_Gui->Label(_("changes will take effect when \nthe application restart"),false,true);
+  m_Gui->Label("");
 }
 //----------------------------------------------------------------------------
 mmgApplicationSettings::~mmgApplicationSettings() 

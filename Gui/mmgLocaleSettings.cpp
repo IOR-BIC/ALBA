@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgLocaleSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2006-07-14 16:52:03 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2006-07-20 17:35:08 $
+Version:   $Revision: 1.5 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -39,7 +39,8 @@ mmgLocaleSettings::mmgLocaleSettings(mafObserver *Listener)
   m_Gui = new mmgGui(this);   
   m_Gui->Label(_("User Interface Language"));
   m_Gui->Radio(LANGUAGE_ID,"", &m_LanguageId,5,lang_array);
-  m_Gui->Label(_("changes will take effect when \nthe application restart"));
+  m_Gui->Label(_("changes will take effect when \nthe application restart"),false,true);
+  m_Gui->Label("");
 }
 //----------------------------------------------------------------------------
 mmgLocaleSettings::~mmgLocaleSettings() 
