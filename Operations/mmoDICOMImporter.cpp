@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-12 17:09:44 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-07-21 10:51:09 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -591,7 +591,7 @@ void mmoDICOMImporter::BuildVolumeCineMRI()
 		accumulate->SetNumberOfSlices(n_slices);
 
     // always build the volume on z-axis
-    accumulate->BuildVolumeOnAxes(2);
+    accumulate->BuildVolumeOnAxes(m_SortAxes);
     
     // get the time stamp from the dicom tag;
     // timestamp is in ms
@@ -677,12 +677,9 @@ void mmoDICOMImporter::BuildVolume()
 	{
 		if (s_count == n_slices) {break;}
     ShowSlice(count);
-		double b[6];
-		m_SliceTexture->GetInput()->GetBounds(b);
-    accumulate->SetSlice(s_count, m_SliceTexture->GetInput());
+    accumulate->SetSlice(s_count,m_SliceTexture->GetInput());
     s_count++;
 	}
-	
   ImportDicomTags();
   if(m_NumberOfSlices == 1)
   {
@@ -1221,14 +1218,53 @@ void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event)
           //calcola altezza rettangolo
           double b[6];
           m_CropPlane->GetOutput()->GetBounds(b);
-          double dx = (b[1] - b[0]) / 10;
-          double dy = (b[3] - b[2]) / 10;
-
+          double dx = (b[1] - b[0]) / 5;
+          double dy = (b[3] - b[2]) / 5;
+					
           double O[3], P1[3], P2[3];
+					//Modified by Matteo 21/07/2006
+					//Caso di default P1 in alto a SX e P2 in basso a DX
           m_CropPlane->GetOrigin(O);
           m_CropPlane->GetPoint1(P1);
           m_CropPlane->GetPoint2(P2);
-
+					//Se non siamo nel caso di default modifichiamo in modo da ritornare in quel caso
+					if(P2[0]<P1[0] && P2[1]<P1[1])//Caso P1 in basso a DX e P2 in alto a SX
+					{
+						O[0] = P2[0];
+						O[1] = P1[1];
+						double tempx=P1[0];
+						double tempy=P1[1];
+						P1[0] = P2[0];
+						P1[1] = P2[1];
+						P2[0] = tempx;
+						P2[1] = tempy;
+						m_CropPlane->SetOrigin(O);
+            m_CropPlane->SetPoint1(P1);
+            m_CropPlane->SetPoint2(P2);
+					}
+					else if(P1[0]<P2[0] && P1[1]>P2[1])//Caso P1 in basso a SX e P2 in alto a DX
+					{
+						O[0] = P1[0];
+						O[1] = P1[1];
+						double tempy=P1[1];
+						P1[1] = P2[1];
+						P2[1] = tempy;
+						m_CropPlane->SetOrigin(O);
+            m_CropPlane->SetPoint1(P1);
+            m_CropPlane->SetPoint2(P2);
+					}
+					else if(P1[0]>P2[0] && P1[1]<P2[1])//Caso P1 in alto a DX e P2 in basso a SX
+					{
+						O[0] = P2[0];
+						O[1] = P2[1];
+						double tempx=P1[0];
+						P1[0] = P2[0];
+						P2[0] = tempx;
+						m_CropPlane->SetOrigin(O);
+            m_CropPlane->SetPoint1(P1);
+            m_CropPlane->SetPoint2(P2);
+					}
+					//End Matteo
           if (m_GizmoStatus == GIZMO_NOT_EXIST)
           {
             m_GizmoStatus = GIZMO_RESIZING;
@@ -1241,11 +1277,11 @@ void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event)
           }
           else if (m_GizmoStatus == GIZMO_DONE)
           {
-            //	  6------------5----------4--->x
+            //	  8------------1----------2--->x
             //		|												|
             //		7												3
             //		|												|
-            //		8------------1----------2
+            //		6------------5----------4
             //		|
             //	  v y
 
@@ -1260,7 +1296,7 @@ void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event)
               m_SideToBeDragged = 2;
             }
             else if (P2[0] - dx/2 <= pos[0] && pos[0] <= P2[0] + dx/2 &&
-              P2[1] + dy/2 <= pos[1] && pos[1] <= P1[1] - dy/2)
+              P2[1] - dy/2 >= pos[1] && pos[1] >= P1[1] + dy/2)
             {
               m_SideToBeDragged = 3;
             }
@@ -1280,7 +1316,7 @@ void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event)
               m_SideToBeDragged = 6;
             }
             else if (P1[0] - dx/2 <= pos[0] && pos[0] <= P1[0] + dx/2 &&
-              P2[1] + dy/2 <= pos[1] && pos[1] <= P1[1] - dy/2)
+              P2[1] - dy/2 >= pos[1] && pos[1] >= P1[1] + dy/2)
             {
               m_SideToBeDragged = 7;
             }
@@ -1300,6 +1336,7 @@ void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event)
               m_CropPlane->SetOrigin(pos);
               m_CropPlane->SetPoint1(pos[0], pos[1], pos[2]);
               m_CropPlane->SetPoint2(pos[0], pos[1], pos[2]);
+							m_CropPlane->SetXResolution(10);
             }
           }
           m_DicomDialog->GetRWI()->CameraUpdate();
@@ -1328,7 +1365,7 @@ void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event)
           {
           }
           else if (m_SideToBeDragged == 1)
-            m_CropPlane->SetPoint1(oldP1[0], pos[1], oldP1[2]);
+						m_CropPlane->SetPoint1(oldP1[0], pos[1], oldP1[2]);
           else if (m_SideToBeDragged == 2)
           {
             m_CropPlane->SetPoint1(oldP1[0], pos[1], oldP1[2]);
