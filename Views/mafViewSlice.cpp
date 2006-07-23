@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-16 18:26:07 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-07-23 19:34:55 $
+  Version:   $Revision: 1.17 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,6 +21,7 @@
 
 #include "mafViewSlice.h"
 #include "mafPipeVolumeSlice.h"
+#include "mafPipeSurfaceSlice.h"
 #include "mafVME.h"
 #include "mafVMEVolume.h"
 #include "mafVMESlicer.h"
@@ -42,6 +43,9 @@
 #include "vtkProperty2D.h"
 #include "vtkActor2D.h"
 #include "vtkRenderer.h"
+#include "vtkTextMapper.h"
+#include "vtkTextProperty.h"
+
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewSlice);
@@ -57,12 +61,23 @@ mafViewSlice::mafViewSlice(wxString label, int camera_position, bool show_axes, 
   
   m_Slice[0] = m_Slice[1] = m_Slice[2] = 0.0;
   m_SliceInitialized = false;
+
+  m_TextActor=NULL;
+  m_TextMapper=NULL;
+  m_TextColor[0]=1;
+  m_TextColor[1]=0;
+  m_TextColor[2]=0;
+
+  m_CurrentSurface.clear();
 }
 //----------------------------------------------------------------------------
 mafViewSlice::~mafViewSlice()
 //----------------------------------------------------------------------------
 {
   BorderDelete();
+  vtkDEL(m_TextMapper);
+  vtkDEL(m_TextActor);
+  m_CurrentSurface.clear();
 }
 //----------------------------------------------------------------------------
 mafView *mafViewSlice::Copy(mafObserver *Listener)
@@ -94,7 +109,79 @@ void mafViewSlice::Create()
   vtkNEW(m_Picker2D);
   m_Picker2D->SetTolerance(0.001);
   m_Picker2D->InitializePickList();
+
+  // text stuff
+  m_Text = "";
+  m_TextMapper = vtkTextMapper::New();
+  m_TextMapper->SetInput(m_Text.c_str());
+  m_TextMapper->GetTextProperty()->AntiAliasingOff();
+
+  m_TextActor = vtkActor2D::New();
+  m_TextActor->SetMapper(m_TextMapper);
+  m_TextActor->SetPosition(3,3);
+  m_TextActor->GetProperty()->SetColor(m_TextColor);
+
+  m_Rwi->m_RenFront->AddActor(m_TextActor);
 }
+
+
+
+//----------------------------------------------------------------------------
+void mafViewSlice::SetTextColor(double color[3])
+//----------------------------------------------------------------------------
+{
+  m_TextColor[0]=color[0];
+  m_TextColor[1]=color[1];
+  m_TextColor[2]=color[2];
+  m_TextActor->GetProperty()->SetColor(m_TextColor);
+  m_TextMapper->Modified();
+}
+//----------------------------------------------------------------------------
+void mafViewSlice::UpdateText(int ID)
+//----------------------------------------------------------------------------
+{
+  if (ID==1)
+  {
+    int slice_mode;
+    switch(m_CameraPosition)
+    {
+    case CAMERA_OS_X:
+      slice_mode = SLICE_X;
+      break;
+    case CAMERA_OS_Y:
+      slice_mode = SLICE_Y;
+      break;
+    case CAMERA_OS_P:
+      slice_mode = SLICE_ORTHO;
+      break;
+    case CAMERA_PERSPECTIVE:
+      slice_mode = SLICE_ARB;
+      break;
+    default:
+      slice_mode = SLICE_Z;
+    }
+    //set the init coordinates value
+    if(slice_mode == SLICE_X)
+      m_Text = "X = ";
+    else if(slice_mode == SLICE_Y)
+      m_Text = "Y = ";
+    else if(slice_mode == SLICE_Z)
+      m_Text = "Z = ";
+
+    if((slice_mode != SLICE_ORTHO) && (slice_mode != SLICE_ARB))
+      m_Text += wxString::Format("%.1f",m_Slice[slice_mode]);
+
+    m_TextMapper->SetInput(m_Text.c_str());
+    m_TextMapper->Modified();
+  }
+  else
+  {
+    m_Text="";
+    m_TextMapper->SetInput(m_Text.c_str());
+    m_TextMapper->Modified();
+  }
+}
+
 //----------------------------------------------------------------------------
 void mafViewSlice::InitializeSlice(double slice[3])
 //----------------------------------------------------------------------------
@@ -164,6 +251,12 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
         {
           ((mafPipeVolumeSlice *)pipe)->InitializeSliceParameters(slice_mode,false);
         }
+        UpdateText();
+      }
+      else if(pipe_name.Equals("mafPipeSurfaceSlice"))
+      {
+        m_CurrentSurface.push_back(n);
+        ((mafPipeSurfaceSlice *)pipe)->SetSlice(m_Slice);
       }
       pipe->Create(n);
       n->m_Pipe = (mafPipe*)pipe;
@@ -275,7 +368,24 @@ void mafViewSlice::SetSlice(double origin[3])
   {
     mafPipeVolumeSlice *pipe = (mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe;
     pipe->SetSlice(origin); 
+
+    // update text
+    this->UpdateText();
   }
+  
+  if(m_CurrentSurface.empty())
+    return;
+  for(int i=0;i<m_CurrentSurface.size();i++)
+  {
+    pipe_name = m_CurrentSurface.at(i)->m_Pipe->GetTypeName();
+    if (pipe_name.Equals("mafPipeSurfaceSlice"))
+    {
+      mafPipeSurfaceSlice *pipe = (mafPipeSurfaceSlice *)m_CurrentSurface[i]->m_Pipe;
+      pipe->SetSlice(origin); 
+    }
+  }
+  // update text
+  this->UpdateText();
 }
 //----------------------------------------------------------------------------
 void mafViewSlice::GetSlice(double slice[3])
@@ -338,4 +448,55 @@ void mafViewSlice::BorderDelete()
     m_Rwi->m_RenFront->RemoveActor(m_Border);
     vtkDEL(m_Border);
   }  
+}
+
+//----------------------------------------------------------------------------
+void mafViewSlice::UpdateSurfacesList(mafNode *node)
+//----------------------------------------------------------------------------
+{
+  for(int i=0;i<m_CurrentSurface.size();i++)
+  {
+    if (m_CurrentSurface[i]==m_Sg->Vme2Node(node))
+    {
+      std::vector<mafSceneNode*>::iterator startIterator;
+      m_CurrentSurface.erase(m_CurrentSurface.begin()+i);
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void mafViewSlice::VmeShow(mafNode *node, bool show)
+//----------------------------------------------------------------------------
+{
+  Superclass::VmeShow(node, show);
+
+  if (node->IsMAFType(mafVMEVolume))
+  {
+    if (show)
+    {
+  /*    m_CurrentVolume = mafVMEVolume::SafeDownCast(node);
+      double sr[2],center[3];
+      vtkDataSet *data = m_CurrentVolume->GetOutput()->GetVTKData();
+      data->Update();
+      data->GetCenter(center);
+      data->GetScalarRange(sr);
+      m_Luts->SetRange((long)sr[0],(long)sr[1]);
+      m_Luts->SetSubRange((long)sr[0],(long)sr[1]);
+      vtkNEW(m_ColorLUT);
+      m_ColorLUT->SetRange(sr);
+      m_ColorLUT->Build();
+      lutPreset(4,m_ColorLUT);
+  */  }
+    else
+    {
+  /*    m_CurrentVolume->GetEventSource()->RemoveObserver(this);
+      m_CurrentVolume = NULL;
+      for(int i=0; i<m_NumOfChildView; i++)
+        ((mafViewSliceLHPBuilder *)m_ChildViewList[i])->UpdateText(0);
+  */  
+      this->UpdateText(0);
+
+    }
+  }
+
 }

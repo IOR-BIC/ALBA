@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-11 17:27:21 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2006-07-23 19:34:55 $
+  Version:   $Revision: 1.15 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -96,8 +96,8 @@ protected:
   double m_GizmoHandlePosition[3];
 
   mafVMEVolume *m_CurrentVolume; ///< Current visualized volume
-  mmgLutSlider *m_Luts; ///< Double slider used to change brightness and contrast of the image
-  mmgLutSwatch *m_LutSwatch;
+  mmgLutSlider *m_LutSlider; ///< Double slider used to change brightness and contrast of the image
+  mmgLutSwatch *m_LutWidget; ///< LUT widget in view side panel 
   vtkLookupTable *m_ColorLUT;
   mafViewSlice *m_Views[4]; ///< Child views
   int	m_Side; ///< change Azimuth of the camera

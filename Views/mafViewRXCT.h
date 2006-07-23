@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.h,v $
   Language:  C++
-  Date:      $Date: 2006-05-08 15:49:42 $
-  Version:   $Revision: 1.7 $
-  Authors:   Paolo Quadrani
+  Date:      $Date: 2006-07-23 19:34:55 $
+  Version:   $Revision: 1.8 $
+  Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -26,11 +26,13 @@ class mafVMEVolume;
 class vtkLookupTable;
 class mafGizmoSlice;
 class mmgLutSwatch;
+class mmgLutSlider;
 
 //----------------------------------------------------------------------------
 // mafViewRXCT :
 //----------------------------------------------------------------------------
-/** */
+/** 
+This view features two Rx views and one compound view made of six CT slices.*/
 class mafViewRXCT: public mafViewCompound
 {
 public:
@@ -56,10 +58,19 @@ public:
   /** IDs for the GUI */
   enum VIEW_RXCT_WIDGET_ID
   {
-    ID_LUT_CHOOSER = Superclass::ID_LAST,
+    ID_LUT_WIDGET = Superclass::ID_LAST,
     ID_MOVE_ALL_SLICES,
+    ID_RIGHT_OR_LEFT,
+    ID_SNAP,
+    ID_ADJUST_SLICES,
+    ID_BORDER_CHANGE,
+    ID_ALL_SURFACE,
     ID_LAST
   };
+
+  /** 
+  Create the GUI on the bottom of the compounded view. */
+  virtual void CreateGuiView();
 
 protected:
   /**
@@ -87,13 +98,34 @@ protected:
 
   double m_BorderColor[6][3];
 
+  void SetThicknessForAllSurfaceSlices(mafNode *root);
+
+  /**
+  Sort the slice */
+  void SortSlices();
+
+  int			m_Sort[6];
+  double	m_Pos[6];
+
+
   mafGizmoSlice   *m_Gizmo[6];
   mafVMEVolume    *m_CurrentVolume; ///< Current visualized volume
-  mmgLutSwatch    *m_LutSwatch;
-  vtkLookupTable  *m_ColorLUT;
+  
   mafViewRX       *m_ViewsRX[2];
-  mafViewCompound *m_ViewCT;
+  mafViewCompound *m_ViewCTCompound;
 
+  // this member variables are used by side panel gui view
   int m_MoveAllSlices;
+  int m_RightOrLeft;
+  int m_Snap;
+  int m_AllSurface;
+  wxSize m_Size;
+  double m_Border;
+  std::vector<mafSceneNode*> m_CurrentSurface;
+
+  mmgGui  *m_GuiViews[3];
+  mmgLutSlider *m_LutSliders[3];
+  vtkLookupTable  *m_vtkLUT[3];  
+  mmgLutSwatch    *m_LutWidget;
 };
 #endif

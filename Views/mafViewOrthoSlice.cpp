@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-11 17:27:02 $
-  Version:   $Revision: 1.33 $
+  Date:      $Date: 2006-07-23 19:34:55 $
+  Version:   $Revision: 1.34 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -78,8 +78,8 @@ mafViewOrthoSlice::mafViewOrthoSlice(wxString label, bool show_ruler)
 : mafViewCompound(label, 2, 2)
 //----------------------------------------------------------------------------
 {
-  m_Luts = NULL;
-  m_LutSwatch = NULL;
+  m_LutSlider = NULL;
+  m_LutWidget = NULL;
   for (int v=0;v<4;v++)
   {
     m_Views[v] = NULL;
@@ -140,9 +140,9 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
       vtkData->GetCenter(vtkDataCenter);
       vtkData->GetScalarRange(sr);
       m_ColorLUT = currentVolumeMaterial->m_ColorLut;
-      m_LutSwatch->SetLut(m_ColorLUT);
-      m_Luts->SetRange((long)sr[0],(long)sr[1]);
-      m_Luts->SetSubRange((long)currentVolumeMaterial->m_TableRange[0],(long)currentVolumeMaterial->m_TableRange[1]);
+      m_LutWidget->SetLut(m_ColorLUT);
+      m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
+      m_LutSlider->SetSubRange((long)currentVolumeMaterial->m_TableRange[0],(long)currentVolumeMaterial->m_TableRange[1]);
       for(int i=0; i<m_NumOfChildView; i++)
       {
         mafPipeVolumeSlice *p = (mafPipeVolumeSlice *)((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
@@ -178,12 +178,12 @@ void mafViewOrthoSlice::CreateGuiView()
   m_GuiView = new mmgGui(this);
   
   m_GuiView->Label("");
-  m_Luts = new mmgLutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
-  m_Luts->SetListener(this);
-  m_Luts->SetSize(500,24);
-  m_Luts->SetMinSize(wxSize(500,24));
+  m_LutSlider = new mmgLutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
+  m_LutSlider->SetListener(this);
+  m_LutSlider->SetSize(500,24);
+  m_LutSlider->SetMinSize(wxSize(500,24));
   EnableWidgets(m_CurrentVolume != NULL);
-  m_GuiView->Add(m_Luts);
+  m_GuiView->Add(m_LutSlider);
   m_GuiView->Reparent(m_Win);
 }
 //----------------------------------------------------------------------------
@@ -219,7 +219,7 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
         }
         double *sr;
         sr = m_ColorLUT->GetRange();
-        m_Luts->SetSubRange((long)sr[0],(long)sr[1]);
+        m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
         CameraUpdate();
       }
       break;
@@ -228,7 +228,7 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
         if(((mafViewSlice *)m_ChildViewList[0])->VolumeIsVisible())
         {
           int low, hi;
-          m_Luts->GetSubRange(&low,&hi);
+          m_LutSlider->GetSubRange(&low,&hi);
           m_ColorLUT->SetTableRange(low,hi);
           mmaVolumeMaterial *currentVolumeMaterial = m_CurrentVolume->GetMaterial();
           currentVolumeMaterial->UpdateFromTables();
@@ -264,7 +264,7 @@ mmgGui* mafViewOrthoSlice::CreateGui()
 
   m_Gui->Combo(ID_LAYOUT_CHOOSER,"layout",&m_LayoutConfiguration,3,layout_choices);
   m_Gui->Divider();
-  m_LutSwatch = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
+  m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
   m_Gui->Divider(2);
 
   wxString sidesName[2];
@@ -313,7 +313,7 @@ void mafViewOrthoSlice::EnableWidgets(bool enable)
   {
     m_Gui->Enable(ID_LUT_CHOOSER,enable);
   }
-  m_Luts->Enable(enable);
+  m_LutSlider->Enable(enable);
 
 }
 

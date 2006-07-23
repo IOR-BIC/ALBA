@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-16 13:09:25 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2006-07-23 19:34:54 $
+  Version:   $Revision: 1.15 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,6 +16,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafViewVTK.h"
+#include <vector>
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -23,6 +24,7 @@
 class mafVME;
 class mafSceneNode;
 class vtkActor2D;
+class vtkTextMapper;
 
 //----------------------------------------------------------------------------
 // mafViewSlice :
@@ -94,12 +96,31 @@ public:
   Give an initial origin for the slice.*/
   void InitializeSlice(double slice[3]);
 
+  /** Set color of the text in CT View**/
+  void SetTextColor(double color[3]);
+
+  /** Refresh text in CT View**/
+  void UpdateText(int ID = 1);
+  
+  /** Update list of surfaces vme */
+  void UpdateSurfacesList(mafNode *node);
+
+  void VmeShow(mafNode *node, bool show);
+
 protected:
   virtual mmgGui *CreateGui();
 
   mafSceneNode    *m_CurrentVolume; ///< Current visualized volume
   vtkActor2D      *m_Border;
   double           m_Slice[3];
-  bool             m_SliceInitialized;
+  bool             m_SliceInitialized; 
+
+  // text stuff
+  vtkActor2D    *m_TextActor;
+  vtkTextMapper	*m_TextMapper;
+  wxString m_Text;
+  double	 m_TextColor[3];
+  std::vector<mafSceneNode*> m_CurrentSurface;
+
 };
 #endif
