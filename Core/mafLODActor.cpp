@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLODActor.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-20 17:31:47 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-07-24 12:41:31 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani & Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -35,7 +35,7 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkMath.h"
 
-vtkCxxRevisionMacro(mafLODActor, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(mafLODActor, "$Revision: 1.2 $");
 vtkStandardNewMacro(mafLODActor);
 
 //------------------------------------------------------------------------
@@ -241,7 +241,7 @@ void mafLODActor::Render(vtkRenderer *ren, vtkMapper *mapper)
   size_vect[1] = h;
   size_vect[2] = 0.0;
   mindim = w>h ? w : h;
-  maxdim = (int)(vtkMath::Norm(size_vect) * 1.5);
+  maxdim = (int)(vtkMath::Norm(size_vect) * 2.0);
 
   sz = sqrt( vtkMath::Distance2BetweenPoints(d1,d2) );
 
