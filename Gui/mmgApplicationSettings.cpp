@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2006-07-20 17:35:08 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2006-07-24 15:48:27 $
+Version:   $Revision: 1.3 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -29,8 +29,12 @@ mmgApplicationSettings::mmgApplicationSettings(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
 	m_Listener    = Listener;
+  
+  // Default values for the application.
   m_LogToFile   = 0;
   m_VerboseLog  = 0;
+  m_CacheFolder = wxGetCwd().c_str();
+  m_LogFolder = wxGetCwd().c_str();
   
   InitializeApplicationSettings();
 
@@ -38,6 +42,9 @@ mmgApplicationSettings::mmgApplicationSettings(mafObserver *Listener)
   m_Gui->Label(_("Application general settings"));
   m_Gui->Bool(ID_LOG_TO_FILE,_("log to file"),&m_LogToFile,1);
   m_Gui->Bool(ID_LOG_VERBOSE,_("log verbose"),&m_VerboseLog,1);
+  m_Gui->DirOpen(ID_LOD_DIR,_("log dir"),&m_LogFolder);
+  m_Gui->Divider(2);
+  m_Gui->DirOpen(ID_CACHE_FOLDER,"cache",&m_CacheFolder,_("set the local cache folder \nto put downloaded files"));
   m_Gui->Label(_("changes will take effect when \nthe application restart"),false,true);
   m_Gui->Label("");
 }
@@ -55,6 +62,8 @@ void mmgApplicationSettings::OnEvent(mafEventBase *maf_event)
   {
     case ID_LOG_TO_FILE:
     case ID_LOG_VERBOSE:
+    case ID_LOD_DIR:
+    case ID_CACHE_FOLDER:
     break;
     default:
       mafEventMacro(*maf_event);
@@ -63,6 +72,8 @@ void mmgApplicationSettings::OnEvent(mafEventBase *maf_event)
   wxConfig *config = new wxConfig(wxEmptyString);
   config->Write("LogToFile",m_LogToFile);
   config->Write("LogVerbose",m_VerboseLog);
+  config->Write("CacheFolder",m_CacheFolder.GetCStr());
+  config->Write("LogFolder",m_LogFolder.GetCStr());
   cppDEL(config);
 }
 //----------------------------------------------------------------------------
@@ -75,9 +86,35 @@ void mmgApplicationSettings::InitializeApplicationSettings()
   {
     m_LogToFile = log_flags;
   }
+  else
+  {
+    config->Write("LogToFile",m_LogToFile);
+  }
   if(config->Read("LogVerbose", &log_flags))
   {
     m_VerboseLog = log_flags;
   }
+  else
+  {
+    config->Write("LogVerbose",m_VerboseLog);
+  }
+  wxString cf;
+  if(config->Read("LogFolder", &cf))
+  {
+    m_LogFolder = cf.c_str();
+  }
+  else
+  {
+    config->Write("LogFolder",m_LogFolder.GetCStr());
+  }
+  if(config->Read("CacheFolder", &cf))
+  {
+    m_CacheFolder = cf.c_str();
+  }
+  else
+  {
+    config->Write("CacheFolder",m_CacheFolder.GetCStr());
+  }
+  
   cppDEL(config);
 }

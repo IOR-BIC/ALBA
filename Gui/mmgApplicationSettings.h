@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationSettings.h,v $
 Language:  C++
-Date:      $Date: 2006-07-14 16:50:41 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2006-07-24 15:48:27 $
+Version:   $Revision: 1.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -35,6 +35,8 @@ public:
   {
     ID_LOG_TO_FILE = MINID,
     ID_LOG_VERBOSE,
+    ID_LOD_DIR,
+    ID_CACHE_FOLDER
   };
 
   /** Answer to the messages coming from interface. */
@@ -50,12 +52,20 @@ public:
   /** Return true if Verbose Log is enabled.*/
   bool GetLogVerboseStatus() {return m_VerboseLog != 0;};
 
+  /** Return the folder in which store the log files.*/
+  mafString &GetLogFolder() {return m_LogFolder;};
+
+  /** Return the path for the local cache in which download remote VMEs.*/
+  mafString &GetCacheFolder() {return m_CacheFolder;};
+
 protected:
   /** Initialize the application settings.*/
   void InitializeApplicationSettings();
   mmgGui *m_Gui;
   int     m_LogToFile;
   int     m_VerboseLog;
+  mafString m_LogFolder;
+  mafString m_CacheFolder;
 
   mafObserver *m_Listener;
 };
