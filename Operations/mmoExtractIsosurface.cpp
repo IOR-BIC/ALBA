@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoExtractIsosurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-27 10:10:41 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-07-24 15:33:22 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,6 +39,7 @@
 #include "mafVMESurface.h"
 #include "mafVMEOutput.h"
 #include "mmiExtractIsosurface.h"
+#include "mmaVolumeMaterial.h"
 
 #include "vtkLight.h"
 #include "vtkCamera.h"
@@ -61,7 +62,7 @@
 #include "vtkImageData.h"
 #include "vtkTexture.h"
 #include "vtkVolumeSlicer.h"
-
+#include "vtkSmartPointer.h"
 //----------------------------------------------------------------------------
 mmoExtractIsosurface::mmoExtractIsosurface(wxString label) :
 mafOp(label), m_IsosurfaceVme(NULL)
@@ -389,20 +390,41 @@ void mmoExtractIsosurface::CreateSlicePipeline()
 	m_PolydataSlicer->SetInput(dataset);
 
 	m_SliceImage = vtkImageData::New();
-  m_SliceImage->SetScalarTypeToUnsignedChar();
-	m_SliceImage->SetNumberOfScalarComponents(3);
+ 
+  m_SliceImage->SetScalarType(dataset->GetPointData()->GetScalars()->GetDataType());
+  m_SliceImage->SetNumberOfScalarComponents(dataset->GetPointData()->GetScalars()->GetNumberOfComponents());  
   m_SliceImage->SetExtent(ext[0], ext[1], ext[2], ext[3], 0, 0);
 	m_SliceImage->SetSpacing(xspc, yspc, 1.f);
 
   m_VolumeSlicer->SetOutput(m_SliceImage);
-	m_VolumeSlicer->SetWindow(w);
-	m_VolumeSlicer->SetLevel(l);
 	m_VolumeSlicer->Update();
+  
+  mmaVolumeMaterial *material = ((mafVMEVolume *)m_Input)->GetMaterial();
+  
+  // if the lookup table has not yet been initialized...
+  if (material->m_TableRange[1] < material->m_TableRange[0]) 
+  {
+    double scalarRange[2];
 
+    dataset->GetScalarRange(scalarRange);
+
+    double low = scalarRange[0];
+    double high = scalarRange[1];
+    
+    // ...initialize it
+    material->m_Window_LUT = high-low;
+    material->m_Level_LUT  = (low+high)*.5;
+    material->m_TableRange[0] = low;
+    material->m_TableRange[1] = high;
+  }
+  material->UpdateProp();
+   
   m_SliceTexture = vtkTexture::New();
 	m_SliceTexture->RepeatOff();
 	m_SliceTexture->InterpolateOn();
 	m_SliceTexture->SetQualityTo32Bit();
+  m_SliceTexture->SetLookupTable(material->m_ColorLut);
+  m_SliceTexture->MapColorScalarsThroughLookupTableOn();
 	m_SliceTexture->SetInput(m_SliceImage);
 
   m_Polydata	= vtkPolyData::New();
@@ -430,7 +452,7 @@ void mmoExtractIsosurface::CreateSlicePipeline()
   m_CutterPlane->SetNormal(0,0,1);
   
   m_IsosurfaceCutter = vtkFixedCutter::New();
-  m_IsosurfaceCutter->SetCutFunction(m_CutterPlane);
+  m_IsosurfaceCutter->SetCutFunction(m_CutterPlane);  
   m_IsosurfaceCutter->SetInput(contour);
   m_IsosurfaceCutter->Update();
 
