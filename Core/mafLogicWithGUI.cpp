@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-14 16:53:26 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2006-07-24 15:48:52 $
+  Version:   $Revision: 1.32 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -217,7 +217,7 @@ void mafLogicWithGUI::CreateLogbar()
   m_Logger->LogToFile(m_LogToFile);
   if(m_LogToFile)
   {
-    wxString s = mafGetApplicationDirectory().c_str();
+    wxString s = m_ApplicationSettings->GetLogFolder();
     wxDateTime log_time = wxDateTime::Now();
     s += "\\";
     s += m_Win->GetTitle();
