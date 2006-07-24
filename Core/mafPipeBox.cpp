@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:52:58 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-07-24 15:47:49 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -107,7 +107,8 @@ void mafPipeBox::Create(mafSceneNode *n/*, bool use_axes*/)
 	m_OutlineProperty->SetInterpolationToFlat();
 
 	vtkNEW(m_OutlineActor);
-	m_OutlineActor->SetMapper(m_OutlineMapper);
+	m_OutlineActor->SetScale(1.01);
+  m_OutlineActor->SetMapper(m_OutlineMapper);
 	m_OutlineActor->VisibilityOff();
 	m_OutlineActor->PickableOff();
 	m_OutlineActor->SetProperty(m_OutlineProperty);
