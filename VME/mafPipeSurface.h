@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-15 17:30:12 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2006-07-24 12:40:59 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,11 +27,12 @@ class vtkOutlineCornerFilter;
 class vtkTexture;
 class vtkPolyDataMapper;
 class vtkPolyData;
-class vtkActor;
+class mafLODActor;
 class vtkProperty;
 class mafAxes;
 class mmgMaterialButton;
 class mmaMaterial;
+//class vtkActor;
 
 //----------------------------------------------------------------------------
 // mafPipeSurface :
@@ -78,11 +79,11 @@ public:
 protected:
   vtkTexture              *m_Texture;
   vtkPolyDataMapper	      *m_Mapper;
-  vtkActor                *m_Actor;
+  mafLODActor             *m_Actor;
   vtkOutlineCornerFilter  *m_OutlineBox;
   vtkPolyDataMapper       *m_OutlineMapper;
   vtkProperty             *m_OutlineProperty;
-  vtkActor                *m_OutlineActor;
+  mafLODActor             *m_OutlineActor;
   mafAxes                 *m_Axes;
 
   int m_UseVTKProperty;

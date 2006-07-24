@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-15 17:30:12 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2006-07-24 12:40:59 $
+  Version:   $Revision: 1.25 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,13 +29,14 @@
 #include "mafDataVector.h"
 #include "mafVMEGenericAbstract.h"
 
+#include "mafLODActor.h"
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFAssembly.h"
 #include "vtkRenderer.h"
 #include "vtkOutlineCornerFilter.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkPolyData.h"
-#include "vtkActor.h"
+//#include "vtkActor.h"
 #include "vtkProperty.h"
 #include "vtkTexture.h"
 #include "vtkPointData.h"
@@ -107,7 +108,7 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
   m_SurfaceMaterial = surface_output->GetMaterial();
   assert(m_SurfaceMaterial);  // all vme that use PipeSurface must have the material correctly set
 
-  m_Mapper = vtkPolyDataMapper::New();
+  vtkNEW(m_Mapper);
 
   if (m_SurfaceMaterial->m_MaterialType == mmaMaterial::USE_TEXTURE)
   {
@@ -134,7 +135,7 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
   m_RenderingDisplayListFlag = m_Vme->IsAnimated() ? 1 : 0;
   m_Mapper->SetImmediateModeRendering(m_RenderingDisplayListFlag);
 
-  m_Texture = vtkTexture::New();
+  vtkNEW(m_Texture);
   m_Texture->SetQualityTo32Bit();
   m_Texture->InterpolateOn();
   if (m_SurfaceMaterial->m_MaterialType == mmaMaterial::USE_TEXTURE)
@@ -155,7 +156,7 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
     }
   }
 
-  m_Actor = vtkActor::New();
+  vtkNEW(m_Actor);
 	m_Actor->SetMapper(m_Mapper);
   if (m_SurfaceMaterial->m_MaterialType == mmaMaterial::USE_LOOKUPTABLE)
   {
@@ -183,19 +184,19 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
   m_AssemblyFront->AddPart(m_Actor);
 
   // selection highlight
-	m_OutlineBox = vtkOutlineCornerFilter::New();
+	vtkNEW(m_OutlineBox);
 	m_OutlineBox->SetInput(data);  
 
-	m_OutlineMapper = vtkPolyDataMapper::New();
+	vtkNEW(m_OutlineMapper);
 	m_OutlineMapper->SetInput(m_OutlineBox->GetOutput());
 
-	m_OutlineProperty = vtkProperty::New();
+	vtkNEW(m_OutlineProperty);
 	m_OutlineProperty->SetColor(1,1,1);
 	m_OutlineProperty->SetAmbient(1);
 	m_OutlineProperty->SetRepresentationToWireframe();
 	m_OutlineProperty->SetInterpolationToFlat();
 
-	m_OutlineActor = vtkActor::New();
+	vtkNEW(m_OutlineActor);
 	m_OutlineActor->SetMapper(m_OutlineMapper);
 	m_OutlineActor->VisibilityOff();
 	m_OutlineActor->PickableOff();
