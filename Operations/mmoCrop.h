@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCrop.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-20 17:38:24 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-07-24 16:14:43 $
+  Version:   $Revision: 1.2 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -14,16 +14,15 @@
 #define __mmoCrop_H__
 
 #include "mafNode.h"
+#include "mafOp.h"
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
 class mmgGui;
 
-class mafOp;
 class mafEventBase;
 class mafString;
 
-class mafNode;
 class mafVMEVolumeGray;
 class mafVMESurface;
 class mafVMEGizmo;
@@ -51,13 +50,15 @@ public:
 
 	bool Accept(mafNode* Node) {return ( Node && Node->IsA("mafVMEVolumeGray"));};
 	void OpRun();	
-	void OpDo();
-	void OpUndo();
 	
+  /**	Extract the volume cropped*/
+	void Crop();
+
+  void OpDo();
+
   virtual void CreateGui();  
 
 protected:
-
   void UpdateGui();
   void OpStop(int result);	
   

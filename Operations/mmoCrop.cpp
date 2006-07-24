@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCrop.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-20 17:38:29 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-07-24 16:14:43 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,19 +18,18 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+#include "mmoCrop.h"
 #include <wx/busyinfo.h>
 #include "mafEvent.h"
-#include "mafOp.h"
+#include "mmgGui.h"
+
 #include "mafGizmoROI.h"
-#include "mafVME.h"
+
 #include "mafString.h"
+#include "mafVME.h"
 #include "mafVMEVolumeGray.h"
 
-#include "mmgGui.h"
-#include "mmoCrop.h"
-
-#include "mafNode.h"
-
+#include "vtkMAFSmartPointer.h"
 #include "vtkPolyData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkStructuredPoints.h"
@@ -38,38 +37,8 @@
 #include "vtkExtractRectilinearGrid.h"
 
 //----------------------------------------------------------------------------
-// Constants :
-//----------------------------------------------------------------------------
-
-enum {
-        ID_SHOW_HANDLES,
-        ID_SHOW_ROI,
-        ID_FIRST = MINID,	
-        ID_CROP_DIR_X,
-        ID_CROP_DIR_Y,
-        ID_CROP_DIR_Z,
-        ID_RESET_CROPPING_AREA,
-     };
-
-
-//----------------------------------------------------------------------------
-void mmoCrop::UpdateGui()
-//----------------------------------------------------------------------------
-
-{
-	double bounds[6];
-  m_GizmoROI->GetBounds(bounds);
-	this->m_XminXmax[0] = bounds[0];
-	this->m_XminXmax[1] = bounds[1];
-	this->m_YminYmax[0] = bounds[2];
-	this->m_YminYmax[1] = bounds[3];
-	this->m_ZminZmax[0] = bounds[4];
-	this->m_ZminZmax[1] = bounds[5];
-	this->m_Gui->Update();
-}
-
-//----------------------------------------------------------------------------
-mmoCrop::mmoCrop(wxString label) : mafOp(label)
+mmoCrop::mmoCrop(wxString label) 
+: mafOp(label)
 //----------------------------------------------------------------------------
 {
 	m_OpType	= OPTYPE_OP;
@@ -77,12 +46,10 @@ mmoCrop::mmoCrop(wxString label) : mafOp(label)
   m_ShowHandles = 1;
   m_ShowROI = 1;
 
-
   m_Vme = NULL;
 	m_InputRG = NULL;
 	m_InputSP = NULL;	
   m_GizmoROI = NULL;
-
 }
 //----------------------------------------------------------------------------
 mmoCrop::~mmoCrop()
@@ -103,10 +70,9 @@ void mmoCrop::OpRun()
 //----------------------------------------------------------------------------
 {
 	m_Input->Modified();
-  //m_Input->UpdateCurrentData();
 
   // create gizmo roi
-	mafVME* Node=mafVME::SafeDownCast(m_Input);;
+	mafVME* Node = mafVME::SafeDownCast(m_Input);
   m_GizmoROI = new mafGizmoROI(Node, this);
   m_GizmoROI->Show(true);
 
@@ -125,25 +91,24 @@ void mmoCrop::OpRun()
     this->m_InputRG = vtkRectilinearGrid::SafeDownCast(Node->GetOutput()->GetVTKData());		
     this->m_InputRG->GetBounds(this->m_InputBounds);
 	}
-
 	this->CreateGui();
 		
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
-
 }
 //----------------------------------------------------------------------------
-void mmoCrop::OpDo()
+void mmoCrop::Crop()
 //----------------------------------------------------------------------------
 {
 	m_GizmoROI->GetBounds(this->m_CroppingBoxBounds);
 
-	mafString cropped_vme_name="cropped_";
+	mafString cropped_vme_name = "cropped_";
 	cropped_vme_name.Append(this->m_Input->GetName());
-	mafNEW(m_Vme);
+
+  mafNEW(m_Vme);
 	m_Vme->SetName(cropped_vme_name);
 
 	m_Input->Modified();
-	mafVME *Node=mafVME::SafeDownCast(m_Input);
+	mafVME *Node = mafVME::SafeDownCast(m_Input);
 	if (Node->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))	
 	{
     vtkRectilinearGrid *rgData = vtkRectilinearGrid::SafeDownCast(Node->GetOutput()->GetVTKData());
@@ -194,7 +159,6 @@ void mmoCrop::OpDo()
 	}
   else if (Node->GetOutput()->GetVTKData()->IsA("vtkStructuredPoints"))
 	{
-	 	
 		int voi_dim[6];
 		
 		voi_dim[0] = ceil((this->m_CroppingBoxBounds[0] - this->m_InputBounds[0])/(this->m_XSpacing));
@@ -206,7 +170,6 @@ void mmoCrop::OpDo()
 		voi_dim[4] = ceil((this->m_CroppingBoxBounds[4] - this->m_InputBounds[4])/(this->m_ZSpacing));
 		voi_dim[5] = floor((m_CroppingBoxBounds[5] - this->m_InputBounds[4])/ m_ZSpacing);
 
-	
 		// vtkExtractVOI is not working as expected ???
 		// output origin is always in (0, 0, 0).
 		// As a workaround I'm using the probe filter...
@@ -229,7 +192,8 @@ void mmoCrop::OpDo()
 		double in_org[3];
 		this->m_InputSP->GetOrigin(in_org);
 
-		vtkStructuredPoints *v_esp = vtkStructuredPoints::New();
+		// using the vtkMAFSmartPointer allows you to don't mind the object Delete
+    vtkMAFSmartPointer<vtkStructuredPoints> v_esp;
 		v_esp->SetOrigin(in_org[0] + voi_dim[0] * m_XSpacing,
 										 in_org[1] + voi_dim[2] * m_YSpacing,
 										 in_org[2] + voi_dim[4] * m_ZSpacing);
@@ -241,42 +205,64 @@ void mmoCrop::OpDo()
     v_esp->Modified();
 
 		// I'm using probe filter instead of ExtractVOI (see why before...)
-
     mafString progress_string("please wait, cropping...");
-    wxBusyInfo wait(progress_string.GetCStr());
+    if (!m_TestMode)
+    {
+      wxBusyInfo wait(progress_string.GetCStr());
+    }
 
-    vtkProbeFilter *probeFilter = vtkProbeFilter::New();
+    vtkMAFSmartPointer<vtkProbeFilter> probeFilter;
     probeFilter->SetInput(v_esp);
 		probeFilter->SetSource(this->m_InputSP);
 		probeFilter->Update();
 
 		m_Vme->SetDataByDetaching(probeFilter->GetOutput(),Node->GetTimeStamp());
-
-		probeFilter->Delete();
-    v_esp->Delete();
 	}
 
+  m_Vme->ReparentTo(m_Input); //Re-parenting a VME implies that it is also added to the tree.
+  m_Output = m_Vme; // Used to make the UnDo: if the output var is set, the undo is done by default.
+}
+//----------------------------------------------------------------------------
+void mmoCrop::OpDo()
+//----------------------------------------------------------------------------
+{
   m_Vme->ReparentTo(m_Input);
+}
+//----------------------------------------------------------------------------
+void mmoCrop::UpdateGui()
+//----------------------------------------------------------------------------
+{
+  double bounds[6];
+  m_GizmoROI->GetBounds(bounds);
+  this->m_XminXmax[0] = bounds[0];
+  this->m_XminXmax[1] = bounds[1];
+  this->m_YminYmax[0] = bounds[2];
+  this->m_YminYmax[1] = bounds[3];
+  this->m_ZminZmax[0] = bounds[4];
+  this->m_ZminZmax[1] = bounds[5];
+  this->m_Gui->Update();
+}
 
-	mafEventMacro(mafEvent(this,VME_ADD,m_Vme));
-	
-	cppDEL(m_GizmoROI);
-	m_GizmoROI = NULL;
-}
 //----------------------------------------------------------------------------
-void mmoCrop::OpUndo()
+// Constants :
 //----------------------------------------------------------------------------
-{   
-	assert(m_Vme != NULL);
-  mafEventMacro(mafEvent(this,VME_REMOVE,m_Vme));
-}
+enum CROP_WIDGET_ID
+{
+  ID_SHOW_HANDLES,
+  ID_SHOW_ROI,
+  ID_FIRST = MINID,	
+  ID_CROP_DIR_X,
+  ID_CROP_DIR_Y,
+  ID_CROP_DIR_Z,
+  ID_RESET_CROPPING_AREA,
+};
 
 //----------------------------------------------------------------------------
 void mmoCrop::CreateGui() 
 //----------------------------------------------------------------------------
 {
 	double bounds[6];
-	mafVME *Node=mafVME::SafeDownCast(m_Input);
+	mafVME *Node = mafVME::SafeDownCast(m_Input);
 	Node->GetOutput()->GetVTKData()->GetBounds(bounds);
 	this->m_XminXmax[0] = bounds[0];
 	this->m_XminXmax[1] = bounds[1];
@@ -286,97 +272,87 @@ void mmoCrop::CreateGui()
 	this->m_ZminZmax[1] = bounds[5];
 
 	m_Gui = new mmgGui(this);
-	m_Gui->SetListener(this);
   m_Gui->Label("");
-  m_Gui->Bool(ID_SHOW_HANDLES, "handles", &m_ShowHandles, 0, "toggle gizmo handles visibility");
-  m_Gui->Bool(ID_SHOW_ROI, "ROI", &m_ShowROI, 0, "toggle region of interest visibility");     
+  m_Gui->Bool(ID_SHOW_HANDLES, _("handles"), &m_ShowHandles, 0, _("toggle gizmo handles visibility"));
+  m_Gui->Bool(ID_SHOW_ROI, "ROI", &m_ShowROI, 0, _("toggle region of interest visibility"));
 	m_Gui->Label("");
-	m_Gui->VectorN(ID_CROP_DIR_X, "range x", this->m_XminXmax, 2, bounds[0], bounds[1]);
-	m_Gui->VectorN(ID_CROP_DIR_Y, "range y", this->m_YminYmax, 2, bounds[2], bounds[3]);
-	m_Gui->VectorN(ID_CROP_DIR_Z, "range z", this->m_ZminZmax, 2, bounds[4], bounds[5]);
+	m_Gui->VectorN(ID_CROP_DIR_X, _("range x"), this->m_XminXmax, 2, bounds[0], bounds[1]);
+	m_Gui->VectorN(ID_CROP_DIR_Y, _("range y"), this->m_YminYmax, 2, bounds[2], bounds[3]);
+	m_Gui->VectorN(ID_CROP_DIR_Z, _("range z"), this->m_ZminZmax, 2, bounds[4], bounds[5]);
 
-  m_Gui->Button(ID_RESET_CROPPING_AREA, "reset", "", "reset the cropping area");
+  m_Gui->Button(ID_RESET_CROPPING_AREA, _("reset"), "", _("reset the cropping area"));
 	m_Gui->Label("");
 	m_Gui->OkCancel();
-	ShowGui();
-	
+
+  ShowGui();
 }
 
 //----------------------------------------------------------------------------
 void mmoCrop::OnEvent(mafEventBase *maf_event) 
 //----------------------------------------------------------------------------
 {
-	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  double bb[6];
+
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
 	{
 		switch(e->GetId())
 		{
 			case ID_SHOW_HANDLES:
 			{
-	      
-				bool show = m_ShowHandles ? true : false;      
-				m_GizmoROI->ShowHandles(show);
+				m_GizmoROI->ShowHandles(m_ShowHandles != 0);
 				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 			}
 			break;
 			case ID_SHOW_ROI:      
 			{
-	  
-				bool show = m_ShowROI ? true : false;      
-				m_GizmoROI->ShowROI(show);
+				m_GizmoROI->ShowROI(m_ShowROI != 0);
 				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 			}
 			break;
 			case ID_CROP_DIR_X:
-					double bb[6];
-					m_GizmoROI->GetBounds(bb);
-					bb[0] = this->m_XminXmax[0];
-					bb[1] = this->m_XminXmax[1];
-					this->m_Gui->Update();
-					m_GizmoROI->SetBounds(bb);
-					mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				m_GizmoROI->GetBounds(bb);
+				bb[0] = this->m_XminXmax[0];
+				bb[1] = this->m_XminXmax[1];
+				m_Gui->Update();
+				m_GizmoROI->SetBounds(bb);
+				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 			break;
 			case ID_CROP_DIR_Y:
-					m_GizmoROI->GetBounds(bb);
-					bb[2] = this->m_YminYmax[0];
-					bb[3] = this->m_YminYmax[1];
-					this->m_Gui->Update();
-					m_GizmoROI->SetBounds(bb);
-					mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				m_GizmoROI->GetBounds(bb);
+				bb[2] = this->m_YminYmax[0];
+				bb[3] = this->m_YminYmax[1];
+				this->m_Gui->Update();
+				m_GizmoROI->SetBounds(bb);
+				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 			break;
 			case ID_CROP_DIR_Z:
-					m_GizmoROI->GetBounds(bb);
-					bb[4] = this->m_ZminZmax[0];
-					bb[5] = this->m_ZminZmax[1];
-					this->m_Gui->Update();
-					m_GizmoROI->SetBounds(bb);
-					mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				m_GizmoROI->GetBounds(bb);
+				bb[4] = this->m_ZminZmax[0];
+				bb[5] = this->m_ZminZmax[1];
+				this->m_Gui->Update();
+				m_GizmoROI->SetBounds(bb);
+				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 			break;
-
 			case ID_RESET_CROPPING_AREA:
-					m_GizmoROI->Reset();
-					this->UpdateGui();
-					mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				m_GizmoROI->Reset();
+				this->UpdateGui();
+				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 			break;    
 			case wxOK:
-				this->OpStop(OP_RUN_OK);
-				return;   
+				Crop();
+				OpStop(OP_RUN_OK);
 			break;
-
 			case wxCANCEL:
-				this->OpStop(OP_RUN_CANCEL);
-				return;
+				OpStop(OP_RUN_CANCEL);
 			break;
-
 			case ID_TRANSFORM:
-					UpdateGui();
+				UpdateGui();
 			break;
-
 			default:
 				mafEventMacro(*e);
 			break;
 		}	
 	}
- 
 }
 
 //----------------------------------------------------------------------------
@@ -384,7 +360,8 @@ void mmoCrop::OpStop(int result)
 //----------------------------------------------------------------------------
 {  
   HideGui();
-  delete m_Gui;
   m_GizmoROI->Show(false);
+	cppDEL(m_GizmoROI);
+	m_GizmoROI = NULL;
   mafEventMacro(mafEvent(this,result));  
 }
