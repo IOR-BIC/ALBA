@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-28 23:10:49 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-07-24 08:53:23 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -145,7 +145,7 @@ int mmaMeter::InternalRestore(mafStorageElement *node)
   return MAF_ERROR;
 }
 //-----------------------------------------------------------------------
-void mmaMeter::Print(std::ostream& os, const int tabs)
+void mmaMeter::Print(std::ostream& os, const int tabs) const
 //-----------------------------------------------------------------------
 {
   Superclass::Print(os,tabs);

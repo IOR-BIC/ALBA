@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:54 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-07-24 08:53:23 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -190,7 +190,7 @@ bool mafVMEItem::Equals(mafVMEItem *o)
 }
 
 //-------------------------------------------------------------------------
-void mafVMEItem::Print(std::ostream& os, const int tabs)// const
+void mafVMEItem::Print(std::ostream& os, const int tabs) const
 //-------------------------------------------------------------------------
 {
   mafIndent indent(tabs);

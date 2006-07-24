@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttribute.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:41 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-07-24 08:52:58 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -57,7 +57,7 @@ public:
   mafAttribute *NewInstance() const {return mafAttribute::SafeDownCast(NewObjectInstance());}
 
   /** dump the object to output stream */
-  virtual void Print(std::ostream& os, const int tabs=0);// const;
+  virtual void Print(std::ostream& os, const int tabs=0) const;
 protected:
   
   virtual int InternalStore(mafStorageElement *parent);

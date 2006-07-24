@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObjectFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:22 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2006-07-24 08:52:50 $
+  Version:   $Revision: 1.14 $
   Authors:   Based on itkObjectFactory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -357,7 +357,7 @@ void mafObjectFactory::RegisterFactory(mafObjectFactory* factory)
 }
 
 //------------------------------------------------------------------------------
-void mafObjectFactory::Print(std::ostream& os, const int indent)// const
+void mafObjectFactory::Print(std::ostream& os, const int indent) const
 //------------------------------------------------------------------------------
 {
   Superclass::Print(os, indent);

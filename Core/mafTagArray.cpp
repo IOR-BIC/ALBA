@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTagArray.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:41 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-07-24 08:52:58 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -251,7 +251,7 @@ int mafTagArray::InternalRestore(mafStorageElement *node)
 }
 
 //-------------------------------------------------------------------------
-void mafTagArray::Print(std::ostream& os, const int tabs)// const
+void mafTagArray::Print(std::ostream& os, const int tabs) const
 //-------------------------------------------------------------------------
 {
   Superclass::Print(os,tabs);

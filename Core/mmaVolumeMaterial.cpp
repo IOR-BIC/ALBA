@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaVolumeMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-09 10:42:42 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-07-24 08:52:59 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -262,7 +262,7 @@ void mmaVolumeMaterial::UpdateFromTables()
   m_Level_LUT  = (m_TableRange[1] + m_TableRange[0])* .5;
 }
 //-----------------------------------------------------------------------
-void mmaVolumeMaterial::Print(std::ostream& os, const int tabs)
+void mmaVolumeMaterial::Print(std::ostream& os, const int tabs) const
 //-----------------------------------------------------------------------
 {
   Superclass::Print(os,tabs);

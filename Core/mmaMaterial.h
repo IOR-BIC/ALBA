@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-28 14:49:15 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-07-24 08:52:59 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -57,7 +57,7 @@ public:
   wxBitmap *MakeIcon();
   
   /** print a dump of this object */
-  virtual void Print(std::ostream& os, const int tabs=0);
+  virtual void Print(std::ostream& os, const int tabs=0) const;
 
   /** Copy the contents of another Meter attribute into this one. */
   virtual void DeepCopy(const mafAttribute *a);

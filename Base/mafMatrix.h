@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:22 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-07-24 08:52:50 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -39,7 +39,7 @@ class MAF_EXPORT mafMatrix : public mafReferenceCounted
 {
 public:
   mafTypeMacro(mafMatrix,mafReferenceCounted);
-  virtual void Print(std::ostream& os, const int indent=0);// const;
+  virtual void Print(std::ostream& os, const int indent=0) const;
 
   mafMatrix();
   virtual ~mafMatrix();

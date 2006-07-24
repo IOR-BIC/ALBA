@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeBox.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-02 21:59:09 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-07-24 08:52:58 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,7 +20,7 @@
 class vtkOutlineCornerFilter;
 class vtkOutlineSource;
 class vtkPolyDataMapper;
-class vtkActor;
+class mafLODActor;
 class vtkProperty;
 class mafAxes;
 
@@ -50,11 +50,11 @@ public:
 
   vtkOutlineSource       *m_Box;
   vtkPolyDataMapper	     *m_Mapper;
-  vtkActor               *m_Actor;
+  mafLODActor            *m_Actor;
   vtkOutlineCornerFilter *m_OutlineBox;
 	vtkPolyDataMapper      *m_OutlineMapper;
   vtkProperty            *m_OutlineProperty;
-  vtkActor               *m_OutlineActor;
+  mafLODActor            *m_OutlineActor;
   mafAxes                *m_Axes;
 
 protected:

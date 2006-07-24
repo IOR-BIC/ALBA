@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:22 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-07-24 08:52:50 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -55,7 +55,7 @@ mafTransformBase::mafTransformBase(const mafTransformBase& copy)
 }
 
 //----------------------------------------------------------------------------
-void mafTransformBase::Print(std::ostream& os, const int indent)// const
+void mafTransformBase::Print(std::ostream& os, const int indent) const
 //----------------------------------------------------------------------------
 {
   Superclass::Print(os,indent);

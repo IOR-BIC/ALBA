@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemScalar.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:54 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-07-24 08:53:23 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -53,7 +53,7 @@ class MAF_EXPORT mafVMEItemScalar : public mafVMEItem
 public:  
   mafTypeMacro(mafVMEItemScalar,mafVMEItem);
 
-  virtual void Print(std::ostream& os, const int indent=0);// const;
+  virtual void Print(std::ostream& os, const int indent=0) const;
 
   /** copy data from another dataset */
   virtual void DeepCopy(mafVMEItem *a);

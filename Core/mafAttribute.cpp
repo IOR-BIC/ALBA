@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttribute.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:41 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-07-24 08:52:58 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -97,7 +97,7 @@ int mafAttribute::InternalRestore(mafStorageElement *node)
   return node->RestoreText("Name",m_Name);
 }
 //-------------------------------------------------------------------------
-void mafAttribute::Print(std::ostream& os, const int tabs)// const
+void mafAttribute::Print(std::ostream& os, const int tabs) const
 //-------------------------------------------------------------------------
 {
   mafIndent indent(tabs);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-19 08:52:57 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-07-24 08:52:58 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,6 +25,7 @@
 #include "mafVME.h"
 #include "mafAxes.h"
 
+#include "mafLODActor.h"
 #include "vtkMAFAssembly.h"
 #include "vtkRenderer.h"
 #include "vtkOutlineSource.h"
@@ -33,7 +34,6 @@
 #include "vtkStripper.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkPolyData.h"
-#include "vtkActor.h"
 #include "vtkProperty.h"
 
 //----------------------------------------------------------------------------

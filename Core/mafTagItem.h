@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTagItem.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:41 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-07-24 08:52:59 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -54,7 +54,7 @@ public:
   bool operator==(const mafTagItem& p) const;
   bool operator!=(const mafTagItem& p) const;
 
-  virtual void Print(std::ostream& os, const int indent=0);// const;
+  virtual void Print(std::ostream& os, const int indent=0) const;
 
   /** Set/Get the name of this Tag*/
   void SetName(const char *name);

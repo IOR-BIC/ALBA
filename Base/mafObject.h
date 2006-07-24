@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObject.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:22 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-07-24 08:52:50 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -70,7 +70,7 @@ public:
   static mafObject* SafeDownCast(mafObject *o);
 
   /** print debug information for this object */
-  virtual void Print(std::ostream &os, const int indent=0);// const;
+  virtual void Print(std::ostream &os, const int indent=0) const;
 
   mafObject(const mafObject& c) {}
 

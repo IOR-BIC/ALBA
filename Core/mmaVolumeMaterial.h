@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaVolumeMaterial.h,v $
   Language:  C++
-  Date:      $Date: 2006-05-09 09:23:17 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-07-24 08:52:59 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -39,7 +39,7 @@ public:
   mafTypeMacro(mmaVolumeMaterial, mafAttribute);
   
   /** Print a dump of this object */
-  virtual void Print(std::ostream& os, const int tabs=0);
+  virtual void Print(std::ostream& os, const int tabs=0) const;
 
   /** Copy the contents of another Meter attribute into this one. */
   virtual void DeepCopy(const mafAttribute *a);

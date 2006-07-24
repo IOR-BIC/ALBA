@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMeter.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:54:43 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-07-24 08:53:23 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,7 +27,7 @@ public:
   mafTypeMacro(mmaMeter, mafAttribute);
 
   /** print a dump of this object */
-  virtual void Print(std::ostream& os, const int tabs=0);
+  virtual void Print(std::ostream& os, const int tabs=0) const;
 
   /** Copy the contents of another Meter attribute into this one. */
   virtual void DeepCopy(const mafAttribute *a);

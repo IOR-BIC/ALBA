@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-07-24 08:52:59 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -457,7 +457,7 @@ int mmaMaterial::GetMaterialTextureID()
   return m_TextureID;
 }
 //-----------------------------------------------------------------------
-void mmaMaterial::Print(std::ostream& os, const int tabs)
+void mmaMaterial::Print(std::ostream& os, const int tabs) const
 //-----------------------------------------------------------------------
 {
   Superclass::Print(os,tabs);

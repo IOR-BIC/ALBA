@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOBB.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:22 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-07-24 08:52:50 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -138,7 +138,7 @@ public:
   void GetOrientation(double rxyz[3]);
 
   /** dump the bounding box */
-  virtual void Print(std::ostream& os, const int tabs=0);// const;
+  virtual void Print(std::ostream& os, const int tabs=0) const;
 
   // member variables are left public to simplify access
 

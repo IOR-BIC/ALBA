@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataPipe.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:41 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-07-24 08:52:58 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -93,7 +93,7 @@ public:
   mafDataPipe *MakeACopy();
 
   /**
-    Copy from another pipe, the function return VTK_ERROR if the specifyed pipe 
+    Copy from another pipe, the function return VTK_ERROR if the specified pipe 
     is not compatible. */
   virtual int DeepCopy(mafDataPipe *pipe);
 
@@ -114,7 +114,7 @@ public:
   int GetDependOnAbsPose() {return m_DependOnAbsPose;}
 
   /** print a dump of this object */
-  virtual void Print(std::ostream& os, const int tabs=0);// const;
+  virtual void Print(std::ostream& os, const int tabs=0) const;
 
   void OnEvent(mafEventBase *maf_event);
   
