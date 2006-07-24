@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCrop.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 16:14:43 $
-  Version:   $Revision: 1.2 $
-  Authors:   Matteo Giacomoni
+  Date:      $Date: 2006-07-24 16:15:19 $
+  Version:   $Revision: 1.3 $
+  Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
