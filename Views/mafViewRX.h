@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRX.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-16 18:26:07 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-07-25 16:09:11 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -68,8 +68,9 @@ public:
   virtual void VmeDeletePipe(mafNode *vme);
 
   /** 
-  Change the range of the WindowLevel Lookup table.*/
+  Set/Get the WindowLevel Lookup table values.*/
   void SetLutRange(double low_val, double high_val);
+  void GetLutRange(double minMax[2]);
 
   /** 
   Return true if a there is a volume inside the view.*/

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRX.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-16 18:26:06 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-07-25 16:09:11 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -204,3 +204,17 @@ void mafViewRX::SetLutRange(double low_val, double high_val)
     pipe->SetLutRange(low_val, high_val); 
   }
 }
+//----------------------------------------------------------------------------
+void mafViewRX::GetLutRange(double minMax[2])
+//----------------------------------------------------------------------------
+{
+  if(!m_CurrentVolume) 
+    return;
+  mafString pipe_name = m_CurrentVolume->m_Pipe->GetTypeName();
+  if (pipe_name.Equals("mafPipeVolumeProjected"))
+  {
+    mafPipeVolumeProjected *pipe = (mafPipeVolumeProjected *)m_CurrentVolume->m_Pipe;
+    pipe->GetLutRange(minMax); 
+  }
+}
+
