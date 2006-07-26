@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-11 09:23:35 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2006-07-26 10:10:32 $
+  Version:   $Revision: 1.36 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -837,7 +837,7 @@ wxSlider *mmgGui::Slider(int id,wxString label,int* var,int min, int max, wxStri
 
 	if(label == "")
 	{
-    int text_w   = EW/2;
+    int text_w   = EW*0.8;
     int slider_w = FW-text_w;
     w_id_text = GetId(id);
 		text = new wxTextCtrl (this, w_id_text, "", dp, wxSize(text_w,  LH), m_EntryStyle);
@@ -854,7 +854,7 @@ wxSlider *mmgGui::Slider(int id,wxString label,int* var,int min, int max, wxStri
 	}
 	else
 	{
-    int text_w   = EW/2;
+    int text_w   = EW*0.8;
 		int slider_w = DW-text_w;
 		lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
@@ -891,7 +891,7 @@ mmgFloatSlider *mmgGui::FloatSlider(int id,wxString label,double *var,double min
 
 	if(label == "")
 	{
-    int text_w   = EW/2;
+    int text_w   = EW*0.8;
     int slider_w = FW-text_w;
     w_id_text = GetId(id);
 		text = new wxTextCtrl    (this, w_id_text, "", dp, wxSize(text_w,  LH), m_EntryStyle/*|wxTE_READONLY*/);
@@ -908,7 +908,7 @@ mmgFloatSlider *mmgGui::FloatSlider(int id,wxString label,double *var,double min
 	}
 	else
 	{
-    int text_w   = EW/2;
+    int text_w   = EW*0.8;
 		int slider_w = DW-text_w;
 		lab = new wxStaticText  (this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
