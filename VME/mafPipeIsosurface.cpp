@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2006-06-21 15:55:47 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2006-07-26 10:10:53 $
+Version:   $Revision: 1.8 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -169,10 +169,9 @@ mmgGui *mafPipeIsosurface::CreateGui()
 
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
-  m_ContourSlider = m_Gui->FloatSlider(ID_CONTOUR_VALUE,"contour", &m_ContourValue,range[0],range[1]);
+	m_ContourSlider = m_Gui->FloatSlider(ID_CONTOUR_VALUE,"contour", &m_ContourValue,range[0],range[1]);
   m_AlphaSlider = m_Gui->FloatSlider(ID_ALPHA_VALUE,"alpha", &m_AlphaValue,0.0,1.0);
-	m_Gui->Button(ID_GENERATE_ISOSURFACE,"generate iso");
-
+	//m_Gui->Button(ID_GENERATE_ISOSURFACE,"generate iso");
   return m_Gui;
 }
 //----------------------------------------------------------------------------
@@ -187,6 +186,7 @@ void mafPipeIsosurface::OnEvent(mafEventBase *maf_event)
       {
         SetContourValue((float)m_ContourValue);
         m_Vme->ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
+				m_Gui->Update();
       }
       break;
       case ID_GENERATE_ISOSURFACE:
