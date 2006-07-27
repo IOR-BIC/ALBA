@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:53:23 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-07-27 10:15:33 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005
@@ -264,7 +264,7 @@ int mafVMEItemScalar::InternalRestoreData()
     {
 #ifdef MAF_USE_CRYPTO
       std::string file_string;
-      mafDefaultDecryptInMemory(filename, file_string);
+      mafDefaultDecryptFileInMemory(filename, file_string);
       //data.read_ascii(file_string); //------------------------------------------------------------------- <--
 #else
       mafErrorMacro("Crypted data not supported: MAF not linked to Crypto library.");
@@ -403,7 +403,7 @@ int mafVMEItemScalar::InternalStoreData(const char *url)
       if (m_Crypting)
       {
 #ifdef MAF_USE_CRYPTO
-        mafDefaultEncryptFromMemory(m_DataString.GetCStr(), data_size, filename);
+        mafDefaultEncryptFileFromMemory(m_DataString.GetCStr(), data_size, filename);
 #else
         mafErrorMacro("Crypted data is not supported: Crypto library not linked to MAF!");
         return MAF_ERROR;

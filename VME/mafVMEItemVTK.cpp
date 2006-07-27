@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:53:23 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-07-27 10:15:33 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -308,7 +308,7 @@ int mafVMEItemVTK::InternalRestoreData()
     std::string file_string;
     if (GetCrypting())
     {
-      mafDefaultDecryptInMemory(filename, file_string);
+      mafDefaultDecryptFileInMemory(filename, file_string);
     }
 #endif
 
@@ -496,7 +496,7 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
         writer->SetHeader("# MAF data file - mafVMEItemVTK output\n");
         writer->Write();
 
-        mafDefaultEncryptFromMemory(writer->GetOutputString(), writer->GetOutputStringLength(),filename);
+        mafDefaultEncryptFileFromMemory(writer->GetOutputString(), writer->GetOutputStringLength(),filename);
 #else
         mafErrorMacro("Crypted data is not supported: Crypto library not linked to MAF!");
         return MAF_ERROR;
