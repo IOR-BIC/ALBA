@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCrop.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 16:15:19 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-07-27 10:44:47 $
+  Version:   $Revision: 1.4 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -71,15 +71,22 @@ void mmoCrop::OpRun()
 {
 	m_Input->Modified();
 
-  // create gizmo roi
 	mafVME* Node = mafVME::SafeDownCast(m_Input);
-  m_GizmoROI = new mafGizmoROI(Node, this);
-  m_GizmoROI->Show(true);
+	Node->Update();
+	// create gizmo roi
+	if(!this->m_TestMode)
+	{
+		m_GizmoROI = new mafGizmoROI(Node, this);
+		m_GizmoROI->Show(true);
+	}
 
 	if (Node->GetOutput()->GetVTKData()->IsA("vtkStructuredPoints"))
   {
 		this->m_InputSP = vtkStructuredPoints::SafeDownCast(Node->GetOutput()->GetVTKData());
-    this->m_InputSP->GetBounds(this->m_InputBounds);							
+    this->m_InputSP->Update();
+		this->m_InputSP->GetBounds(this->m_InputBounds);	
+		if(!this->m_TestMode)
+			m_GizmoROI->SetBounds(m_InputBounds);
     double spc[3];	
     this->m_InputSP->GetSpacing(spc);
     this->m_XSpacing = spc[0];
@@ -89,17 +96,23 @@ void mmoCrop::OpRun()
 	else if (Node->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
 	{
     this->m_InputRG = vtkRectilinearGrid::SafeDownCast(Node->GetOutput()->GetVTKData());		
-    this->m_InputRG->GetBounds(this->m_InputBounds);
+    this->m_InputRG->Update();
+		this->m_InputRG->GetBounds(this->m_InputBounds);
+		if(!this->m_TestMode)
+			m_GizmoROI->SetBounds(m_InputBounds);
 	}
-	this->CreateGui();
-		
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	if(!this->m_TestMode)
+	{
+		this->CreateGui();
+		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	}
 }
 //----------------------------------------------------------------------------
 void mmoCrop::Crop()
 //----------------------------------------------------------------------------
 {
-	m_GizmoROI->GetBounds(this->m_CroppingBoxBounds);
+	if(!this->m_TestMode)
+		m_GizmoROI->GetBounds(this->m_CroppingBoxBounds);
 
 	mafString cropped_vme_name = "cropped_";
 	cropped_vme_name.Append(this->m_Input->GetName());
@@ -109,110 +122,97 @@ void mmoCrop::Crop()
 
 	m_Input->Modified();
 	mafVME *Node = mafVME::SafeDownCast(m_Input);
+
 	if (Node->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))	
 	{
-    vtkRectilinearGrid *rgData = vtkRectilinearGrid::SafeDownCast(Node->GetOutput()->GetVTKData());
+		vtkRectilinearGrid *rgData = vtkRectilinearGrid::SafeDownCast(Node->GetOutput()->GetVTKData());
 
-    // get cropping bounds
-    double gizmoBounds[6] = {0,0,0,0,0,0};
-    m_GizmoROI->GetBounds(gizmoBounds);
+		// get cropping bounds
+		double gizmoBounds[6] = {0,0,0,0,0,0};
+		if(!this->m_TestMode)
+			m_GizmoROI->GetBounds(gizmoBounds);
+		else
+		{
+			for(int i=0;i<6;i++)
+				gizmoBounds[i]=this->m_CroppingBoxBounds[i];
+		}
 
-    // convert from bounds to index
-    int boundsIndexArray[6] = {0,0,0,0,0,0};
+		// convert from bounds to index
+		int boundsIndexArray[6] = {0,0,0,0,0,0};
 
-    vtkDataArray *coordArray[3] = {NULL, NULL, NULL};
-    coordArray[0] = rgData->GetXCoordinates();
-    coordArray[1] = rgData->GetYCoordinates();
-    coordArray[2] = rgData->GetZCoordinates();
+		vtkDataArray *coordArray[3] = {NULL, NULL, NULL};
+		coordArray[0] = rgData->GetXCoordinates();
+		coordArray[1] = rgData->GetYCoordinates();
+		coordArray[2] = rgData->GetZCoordinates();
 
-    // for each coordinate array
-    for (int numArray = 0; numArray < 3; numArray++)
-    {
-      int coordId = 0;
-      int minId = 0, maxId = 0;      
+		// for each coordinate array
+		for (int numArray = 0; numArray < 3; numArray++)
+		{
+			int coordId = 0;
+			int minId = 0, maxId = 0;      
 
-      while (coordArray[numArray]->GetComponent(coordId,0) < gizmoBounds[2*numArray])
-      {
-        minId = coordId + 1;
-        coordId++;
-      }
-      
-      while (coordArray[numArray]->GetComponent(coordId,0) < gizmoBounds[2*numArray + 1])
-      {
-        maxId = coordId - 1;
-        coordId++;
-      }
+			while (coordArray[numArray]->GetComponent(coordId,0) < gizmoBounds[2*numArray])
+			{
+				minId = coordId+1;
+				coordId++;
+			}
+			//coordId++;
+			while (coordArray[numArray]->GetComponent(coordId,0) < gizmoBounds[2*numArray + 1])
+			{
+				maxId = coordId + 1;
+				coordId++;
+			}
 
-      boundsIndexArray[2*numArray] = minId;
-      boundsIndexArray[2*numArray + 1] = maxId; 
-    }
-
-    vtkExtractRectilinearGrid *extractRG = vtkExtractRectilinearGrid::New();
-    extractRG->SetInput(vtkRectilinearGrid::SafeDownCast(Node->GetOutput()->GetVTKData()));
-    extractRG->SetVOI(boundsIndexArray);   
-    extractRG->Update();  
-		
+			boundsIndexArray[2*numArray] = minId;
+			boundsIndexArray[2*numArray + 1] = maxId; 
+		}
+		vtkExtractRectilinearGrid *extractRG = vtkExtractRectilinearGrid::New();
+		extractRG->SetInput(vtkRectilinearGrid::SafeDownCast(Node->GetOutput()->GetVTKData()));
+		extractRG->SetVOI(boundsIndexArray);   
+		extractRG->Update();  
+			
 		m_Vme->SetDataByDetaching(extractRG->GetOutput(),Node->GetTimeStamp());
 
-    extractRG->Delete();
-    extractRG = NULL;
+		extractRG->Delete();
+		extractRG = NULL;
 	}
-  else if (Node->GetOutput()->GetVTKData()->IsA("vtkStructuredPoints"))
+	else if (Node->GetOutput()->GetVTKData()->IsA("vtkStructuredPoints"))
 	{
 		int voi_dim[6];
-		
+			
 		voi_dim[0] = ceil((this->m_CroppingBoxBounds[0] - this->m_InputBounds[0])/(this->m_XSpacing));
 		voi_dim[1] = floor((m_CroppingBoxBounds[1] - this->m_InputBounds[0])/ m_XSpacing);
- 
+	 
 		voi_dim[2] = ceil((this->m_CroppingBoxBounds[2] - this->m_InputBounds[2])/(this->m_YSpacing));
 		voi_dim[3] = floor((m_CroppingBoxBounds[3] - this->m_InputBounds[2])/ m_YSpacing);
-		
+			
 		voi_dim[4] = ceil((this->m_CroppingBoxBounds[4] - this->m_InputBounds[4])/(this->m_ZSpacing));
 		voi_dim[5] = floor((m_CroppingBoxBounds[5] - this->m_InputBounds[4])/ m_ZSpacing);
-
-		// vtkExtractVOI is not working as expected ???
-		// output origin is always in (0, 0, 0).
-		// As a workaround I'm using the probe filter...
-		/*
-		vtkStructuredPoints *v_sp = vtkStructuredPoints::New();
-				v_sp->DeepCopy((vtkStructuredPoints *)(this->m_input->GetCurrentData()));
-				
-
-		vtkExtractVOI *v_evoi = vtkExtractVOI::New();
-		v_evoi->SetInput(v_sp);
-		v_evoi->SetVOI(voi_dim);
-		v_evoi->SetSampleRate(1, 1, 1);
-		v_evoi->Update();
-		
-		
-		v_evoi->Delete();
-		v_evoi = NULL;
-		*////////////////////////////////////////////////
-		
+			
 		double in_org[3];
 		this->m_InputSP->GetOrigin(in_org);
 
 		// using the vtkMAFSmartPointer allows you to don't mind the object Delete
-    vtkMAFSmartPointer<vtkStructuredPoints> v_esp;
+		vtkMAFSmartPointer<vtkStructuredPoints> v_esp;
 		v_esp->SetOrigin(in_org[0] + voi_dim[0] * m_XSpacing,
-										 in_org[1] + voi_dim[2] * m_YSpacing,
-										 in_org[2] + voi_dim[4] * m_ZSpacing);
+											in_org[1] + voi_dim[2] * m_YSpacing,
+											in_org[2] + voi_dim[4] * m_ZSpacing);
 		v_esp->SetSpacing(m_XSpacing, m_YSpacing, m_ZSpacing);
 		v_esp->SetDimensions(voi_dim[1] - voi_dim[0] + 1,
-												 voi_dim[3] - voi_dim[2] + 1,
-												 voi_dim[5] - voi_dim[4] + 1);
+													voi_dim[3] - voi_dim[2] + 1,
+													voi_dim[5] - voi_dim[4] + 1);
 
-    v_esp->Modified();
+		v_esp->Modified();
 
 		// I'm using probe filter instead of ExtractVOI (see why before...)
-    mafString progress_string("please wait, cropping...");
-    if (!m_TestMode)
-    {
-      wxBusyInfo wait(progress_string.GetCStr());
-    }
+		mafString progress_string("please wait, cropping...");
+		if (!m_TestMode)
+		{
+			wxBusyInfo wait(progress_string.GetCStr());
+		}
 
-    vtkMAFSmartPointer<vtkProbeFilter> probeFilter;
-    probeFilter->SetInput(v_esp);
+		vtkMAFSmartPointer<vtkProbeFilter> probeFilter;
+		probeFilter->SetInput(v_esp);
 		probeFilter->SetSource(this->m_InputSP);
 		probeFilter->Update();
 
@@ -364,4 +364,11 @@ void mmoCrop::OpStop(int result)
 	cppDEL(m_GizmoROI);
 	m_GizmoROI = NULL;
   mafEventMacro(mafEvent(this,result));  
+}
+//----------------------------------------------------------------------------
+void mmoCrop::SetCroppingBoxBounds(double bounds[])
+//----------------------------------------------------------------------------
+{
+	for(int i=0;i<6;i++)
+		this->m_CroppingBoxBounds[i]=bounds[i];
 }

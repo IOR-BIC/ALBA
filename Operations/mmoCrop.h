@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCrop.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 16:15:19 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-07-27 10:44:47 $
+  Version:   $Revision: 1.4 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -56,7 +56,10 @@ public:
 
   void OpDo();
 
-  virtual void CreateGui();  
+  virtual void CreateGui(); 
+
+	/**	Set cropping area*/
+	void SetCroppingBoxBounds(double bounds[]);
 
 protected:
   void UpdateGui();
