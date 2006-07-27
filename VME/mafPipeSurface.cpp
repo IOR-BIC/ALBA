@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 12:40:59 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2006-07-27 10:08:15 $
+  Version:   $Revision: 1.26 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -73,6 +73,8 @@ mafPipeSurface::mafPipeSurface()
   m_UseVTKProperty  = 1;
   m_UseTexture      = 0;
   m_UseLookupTable  = 0;
+
+  m_EnableActorLOD  = 1;
 }
 //----------------------------------------------------------------------------
 void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
@@ -158,6 +160,7 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
 
   vtkNEW(m_Actor);
 	m_Actor->SetMapper(m_Mapper);
+  m_Actor->SetEnableHighThreshold(m_EnableActorLOD);
   if (m_SurfaceMaterial->m_MaterialType == mmaMaterial::USE_LOOKUPTABLE)
   {
     m_UseTexture = 0;
@@ -289,10 +292,13 @@ mmgGui *mafPipeSurface::CreateGui()
   mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
   m_Gui->Combo(ID_TEXTURE_MAPPING_MODE,"mapping",&surface_output->GetMaterial()->m_TextureMappingMode,3,mapping_mode);
   m_Gui->Enable(ID_TEXTURE_MAPPING_MODE,surface_output->GetMaterial()->m_MaterialType == mmaMaterial::USE_TEXTURE);
-  m_Gui->Label(""); //SIL. 18-may-2006 : 
+  m_Gui->Label("");
   m_Gui->Bool(ID_USE_VTK_PROPERTY,"property",&m_UseVTKProperty);
   m_Gui->Bool(ID_USE_TEXTURE,"texture",&m_UseTexture);
   m_Gui->Bool(ID_USE_LOOKUP_TABLE,"lut",&m_UseLookupTable);
+  m_Gui->Divider(2);
+  m_Gui->Bool(ID_ENABLE_LOD,"enable LOD",&m_EnableActorLOD);
+  m_Gui->Label("");
 
   if (m_SurfaceMaterial == NULL)
   {
@@ -326,6 +332,11 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       }
     	break;
+      case ID_ENABLE_LOD:
+        m_Actor->SetEnableHighThreshold(m_EnableActorLOD);
+        m_OutlineActor->SetEnableHighThreshold(m_EnableActorLOD);
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+      break;
       case ID_USE_VTK_PROPERTY:
         if (m_UseVTKProperty != 0)
         {
