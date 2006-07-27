@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLODActor.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-20 17:31:47 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-07-27 10:07:22 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani & Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -51,6 +51,15 @@ public:
   /** Return the status of the fading flag.*/
   vtkGetMacro(EnableFading, int);
   
+  /** Enable/Disable high threshold LOD.*/
+  vtkSetClampMacro(EnableHighThreshold, int, 0, 1);
+
+  /** Enable/Disable high threshold LOD.*/
+  vtkBooleanMacro(EnableHighThreshold,int);
+
+  /** Return the status of the high threshold LOD flag.*/
+  vtkGetMacro(EnableHighThreshold, int);
+
 protected:
   mafLODActor();
   ~mafLODActor();
@@ -66,5 +75,6 @@ private:
   int PixelThreshold;
   int FlagDimension;
   int EnableFading;
+  int EnableHighThreshold;
 };
 #endif

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLODActor.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 12:41:31 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-07-27 10:07:22 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani & Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -34,8 +34,9 @@
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkMath.h"
+#include "vtkCamera.h"
 
-vtkCxxRevisionMacro(mafLODActor, "$Revision: 1.2 $");
+vtkCxxRevisionMacro(mafLODActor, "$Revision: 1.3 $");
 vtkStandardNewMacro(mafLODActor);
 
 //------------------------------------------------------------------------
@@ -43,6 +44,7 @@ mafLODActor::mafLODActor()
 //------------------------------------------------------------------------
 {
   EnableFading = 1;
+  EnableHighThreshold = 1;
   FlagDimension = 10;
   PixelThreshold = 20;
 
@@ -235,6 +237,7 @@ void mafLODActor::Render(vtkRenderer *ren, vtkMapper *mapper)
 
   double size_vect[3];
   int w,h, mindim, maxdim;
+
   w = ren->GetRenderWindow()->GetSize()[0];
   h = ren->GetRenderWindow()->GetSize()[1];
   size_vect[0] = w;
@@ -248,7 +251,7 @@ void mafLODActor::Render(vtkRenderer *ren, vtkMapper *mapper)
   if (EnableFading)
   {
     // fade the actor by changing its opacity
-    if (sz >= mindim && sz <= maxdim)
+    if (sz >= mindim && sz <= maxdim && EnableHighThreshold)
     {
       double opacity = 1 - (sz - mindim) / (double)(maxdim - mindim);
       opacity = (opacity < 0 ) ? 0.0 : opacity;
@@ -281,7 +284,7 @@ void mafLODActor::Render(vtkRenderer *ren, vtkMapper *mapper)
     FlagActor->Render(ren,FlagMapper); 
     glPointSize( 1 );
   }
-  else if (sz > maxdim)
+  else if (sz > maxdim && EnableHighThreshold)
   {
     // no draw at all
   }
@@ -289,6 +292,5 @@ void mafLODActor::Render(vtkRenderer *ren, vtkMapper *mapper)
   {
     vtkOpenGLActor::Render(ren, mapper);
   }
-
   glPopAttrib();
 }
