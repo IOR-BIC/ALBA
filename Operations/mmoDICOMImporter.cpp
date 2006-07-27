@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-21 10:51:09 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-07-27 12:43:17 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -843,6 +843,23 @@ void mmoDICOMImporter::ShowSlice(int slice_num)
 		if(crop_bounds[3] > m_DicomBounds[3]) 
 			crop_bounds[3] = m_DicomBounds[3];
         
+		double Origin[3];
+		m_DicomReader->GetOutput()->GetOrigin(Origin);
+
+		int k = 0;
+		while(k * spacing[0] +Origin[0]<crop_bounds[0])
+		{
+			k++;
+		}
+		crop_bounds[0] = (k-1) * spacing[0] +Origin[0];
+		
+		k=0;
+		while(k * spacing[1] +Origin[1]<crop_bounds[2])
+		{
+			k++;
+		}
+		crop_bounds[2] = (k-1) * spacing[1] +Origin[1];
+
     double dim_x_clip = ceil((double)(((crop_bounds[1] - crop_bounds[0]) / spacing[0]) + 1));
     double dim_y_clip = ceil((double)(((crop_bounds[3] - crop_bounds[2]) / spacing[1]) + 1));
     
