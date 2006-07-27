@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-19 12:21:55 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-07-27 10:41:19 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -101,7 +101,8 @@ void mmoVTKImporter::ImportVTK()
 //----------------------------------------------------------------------------
 {
   bool success = false;
-	wxBusyInfo wait("Loading file: ...");
+	if(!this->m_TestMode)
+		wxBusyInfo wait("Loading file: ...");
   
   vtkMAFSmartPointer<vtkDataSetReader> reader;
   reader->SetFileName(m_File);
@@ -126,7 +127,8 @@ void mmoVTKImporter::ImportVTK()
       preader = vtkUnstructuredGridReader::New();
     break;
     default:
-      wxMessageBox("Unsupported file format", "I/O Error", wxICON_ERROR );
+			if(!this->m_TestMode)
+				wxMessageBox("Unsupported file format", "I/O Error", wxICON_ERROR );
     return;
   }
   mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,preader));
@@ -178,6 +180,6 @@ void mmoVTKImporter::ImportVTK()
     }
   }
   vtkDEL(preader);
-  if(!success)
+  if(!success && !this->m_TestMode)
     wxMessageBox("Error reading VTK file.", "I/O Error", wxICON_ERROR );
 }
