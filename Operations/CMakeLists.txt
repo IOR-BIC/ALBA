@@ -8,6 +8,10 @@ PROJECT(medOperations)
 SET(PROJECT_SRCS
   mmoDICOMImporter.cpp
   mmoDICOMImporter.h
+  mmoCTAImporter.cpp
+  mmoCTAImporter.h
+  mmoCTMRIImporter.cpp
+  mmoCTMRIImporter.h
 )
 
 # List libraries that are needed by this project.
