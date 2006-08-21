@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2006-06-26 13:17:50 $
-# Version:   $Revision: 1.2 $
+# Date:      $Date: 2006-08-21 13:33:32 $
+# Version:   $Revision: 1.3 $
 #
 # Description:
 # CMake Project file for the Medical Library.
@@ -25,15 +25,6 @@ MARK_AS_ADVANCED (
   LIBRARY_OUTPUT_PATH 
   EXECUTABLE_OUTPUT_PATH
 )
-
-#-----------------------------------------------------------------------------
-# MED version number.  An even minor number corresponds to releases.
-#-----------------------------------------------------------------------------
-SET(MED_MAJOR_VERSION 2)
-SET(MED_MINOR_VERSION 0)
-SET(MED_BUILD_VERSION 0)
-SET(MED_VERSION
-    "${MED_MAJOR_VERSION}.${MED_MINOR_VERSION}.${VTK_BUILD_VERSION}")
 
 #-----------------------------------------------------------------------------
 # this is to enable precompiled headers under VC6.0
@@ -143,3 +134,23 @@ IF(MAF_FOUND)
 ELSE (MAF_FOUND)
   MESSAGE (FATAL_ERROR "MAF library not found or configuration error, cannot build MED")
 ENDIF (MAF_FOUND)
+
+
+#-----------------------------------------------------------------------------
+# MEDICAL_PARABUILD deploy stuff.  
+#-----------------------------------------------------------------------------
+
+# This is specific for automatic deploy of maf medical through Parabuild.
+# A MEDICAL_PARABUILD_VERSION variable is created to gather versioning information
+      
+# this values are set by hand when major or minor is released
+SET(MEDICAL_PARABUILD_MAJOR_VERSION 1 CACHE INTERNAL "major version")
+SET(MEDICAL_PARABUILD_MINOR_VERSION 0 CACHE INTERNAL "minor version")
+
+# automatic values from parabuild created temporary environment variable
+SET(MEDICAL_PARABUILD_BUILD_TIMESTAMP $ENV{PARABUILD_BUILD_TIMESTAMP} CACHE INTERNAL "build timestamp")
+SET(MEDICAL_PARABUILD_BUILD_NUMBER $ENV{PARABUILD_BUILD_NUMBER} CACHE INTERNAL "build number")
+
+# create the main version variable:
+SET(MEDICAL_PARABUILD_VERSION "${MEDICAL_PARABUILD_MAJOR_VERSION}_${MEDICAL_PARABUILD_MINOR_VERSION}_TS_${MEDICAL_PARABUILD_BUILD_TIMESTAMP}_BUILD_${MEDICAL_PARABUILD_BUILD_NUMBER}" CACHE INTERNAL "big version identifier concatenating other identifier")
+ 
