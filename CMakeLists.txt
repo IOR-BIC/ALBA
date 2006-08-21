@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2006-07-10 12:54:34 $
-# Version:   $Revision: 1.32 $
+# Date:      $Date: 2006-08-21 13:32:58 $
+# Version:   $Revision: 1.33 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -193,6 +193,25 @@ MARK_AS_ADVANCED(
    USE_MFL_FILE
 )
 
+
+#-----------------------------------------------------------------------------
+# MAF_PARABUILD deploy stuff.  
+#-----------------------------------------------------------------------------
+
+# This is specific for automatic deploy of maf through Parabuild.
+# A MAF_PARABUILD_VERSION variable is created to gather versioning information
+      
+# this values are set by hand when major or minor is released
+SET(MAF_PARABUILD_MAJOR_VERSION 2 CACHE INTERNAL "major version")
+SET(MAF_PARABUILD_MINOR_VERSION 2 CACHE INTERNAL "minor version")
+
+# automatic values from parabuild created temporary environment variable
+SET(MAF_PARABUILD_BUILD_TIMESTAMP $ENV{PARABUILD_BUILD_TIMESTAMP} CACHE INTERNAL "build timestamp")
+SET(MAF_PARABUILD_BUILD_NUMBER $ENV{PARABUILD_BUILD_NUMBER} CACHE INTERNAL "build number")
+
+# create the main version variable:
+SET(MAF_PARABUILD_VERSION "${MAF_PARABUILD_MAJOR_VERSION}_${MAF_PARABUILD_MINOR_VERSION}_TS_${MAF_PARABUILD_BUILD_TIMESTAMP}_BUILD_${MAF_PARABUILD_BUILD_NUMBER}" CACHE INTERNAL "big version identifier concatenating other identifier")
+ 
 #-----------------------------------------------------------------------------
 # Write the list of variables and their values that are defined by CMake 
 # when running this CMakeList file
