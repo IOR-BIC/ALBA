@@ -15,16 +15,16 @@ FIND_PATH(CPPUNIT_INCLUDE_DIR cppunit/TestCase.h
   /home/erc/include
   /usr/local/include
   /usr/include
-  ${MED_SOURCE_DIR}/../cppunit-1.11.6/include
-  ${MED_SOURCE_DIR}/../../cppunit-1.11.6/include
+  ${MED_SOURCE_DIR}/../cppunit-1.12.0/include
+  ${MED_SOURCE_DIR}/../../cppunit-1.12.0/include
 )
 
 FIND_LIBRARY(CPPUNIT_LIBRARY cppunitd
   /home/erc/lib
   /usr/local/lib
   /usr/lib
-  ${MED_SOURCE_DIR}/../cppunit-1.11.6/lib
-  ${MED_SOURCE_DIR}/../../cppunit-1.11.6/lib
+  ${MED_SOURCE_DIR}/../cppunit-1.12.0/lib
+  ${MED_SOURCE_DIR}/../../cppunit-1.12.0/lib
 )
 
 IF(CPPUNIT_INCLUDE_DIR)
