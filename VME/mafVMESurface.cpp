@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 10:26:09 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-08-25 23:25:42 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -89,6 +89,7 @@ int mafVMESurface::SetData(vtkPolyData *data, mafTimeStamp t, int mode)
 
   if(polydata)
   {
+    polydata->Update();
     if (polydata->GetPoints() && polydata->GetVerts()->GetNumberOfCells()==0 && \
       (polydata->GetPolys()->GetNumberOfCells() > 0 || polydata->GetStrips()->GetNumberOfCells() > 0) && \
       polydata->GetLines()->GetNumberOfCells() == 0)
@@ -104,6 +105,8 @@ int mafVMESurface::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
 {
   assert(data);
   vtkPolyData *polydata = vtkPolyData::SafeDownCast(data);
+
+  if (polydata) polydata->Update();
 
   if (polydata && polydata->GetPoints() && polydata->GetVerts()->GetNumberOfCells()==0 && \
      (polydata->GetPolys()->GetNumberOfCells() > 0 || polydata->GetStrips()->GetNumberOfCells() > 0) && \
