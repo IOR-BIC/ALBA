@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPointSet.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-08-31 15:10:07 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-08-25 23:31:22 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -410,6 +410,9 @@ int mafVMEPointSet::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
 {
   assert(data);
   vtkPolyData *polydata = vtkPolyData::SafeDownCast(data);
+  
+  if (polydata)
+    polydata->Update();
 
   if (polydata&&polydata->GetPolys()->GetNumberOfCells()==0&& \
     polydata->GetStrips()->GetNumberOfCells()==0&&polydata->GetLines()->GetNumberOfCells()==0)

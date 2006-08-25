@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolyline.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 14:57:20 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-08-25 23:31:22 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -81,6 +81,9 @@ int mafVMEPolyline::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
 {
   assert(data);
   vtkPolyData *polydata = vtkPolyData::SafeDownCast(data);
+  
+  if (polydata)
+    polydata->Update();
 
   // check this is a ploydata containing only lines
   if (polydata && polydata->GetPolys()->GetNumberOfCells()==0 && \
