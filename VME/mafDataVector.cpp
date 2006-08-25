@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-11 09:24:36 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-08-25 23:24:48 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -187,10 +187,11 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
       {
         if (item->GetId()<0)
           item->SetId(root->GetNextItemId());
-        
-        // data file URL is specified as a local filename
-        data_file_url<<base_name<<"."<<mafString(item->GetId())<<"."<<item->GetDataFileExtension(); // extension is defined by the kind of item itself
+                
       }
+
+      // data file URL is specified as a local filename
+      data_file_url<<base_name<<"."<<mafString(item->GetId())<<"."<<item->GetDataFileExtension(); // extension is defined by the kind of item itself
       
       item->SetCrypting(m_Crypting);
 
