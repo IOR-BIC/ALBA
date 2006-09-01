@@ -57,6 +57,8 @@ IF (MAF_USE_VTK)
     mmoTransformInterface.h
     mmoVolumeResample.cpp
     mmoVolumeResample.h
+    mmoVOIDensity.cpp
+    mmoVOIDensity.h
     mmoVRMLImporter.cpp
     mmoVRMLImporter.h
     mmoVTKExporter.cpp
