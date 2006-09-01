@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-26 13:48:24 $
-  Version:   $Revision: 1.37 $
+  Date:      $Date: 2006-09-01 14:05:57 $
+  Version:   $Revision: 1.38 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -890,7 +890,7 @@ mmgFloatSlider *mmgGui::FloatSlider(int id,wxString label,double *var,double min
 	wxStaticText   *lab  = NULL;
   int w_id_text;
   int w_id_sli;
-
+	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 	if(label == "")
 	{
     int text_w   = EW*0.8;
@@ -899,14 +899,13 @@ mmgFloatSlider *mmgGui::FloatSlider(int id,wxString label,double *var,double min
 		text = new wxTextCtrl    (this, w_id_text, "", dp, wxSize(text_w,  LH), m_EntryStyle/*|wxTE_READONLY*/);
     text->SetFont(m_Font);
     w_id_sli  = GetId(id);
-		sli  = new mmgFloatSlider(this, GetId(id),*var,min,max, dp, wxSize(slider_w,LH));
+		sli  = new mmgFloatSlider(this, w_id_sli,*var,min,max, dp, wxSize(slider_w,LH));
     if(m_UseBackgroundColor) 
       sli->SetBackgroundColour(m_BackgroundColor);
-
-		wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
+		text->SetValidator(mmgValidator(this,w_id_text,text,var,min,max)); //- if uncommented, remove also wxTE_READONLY from the text (in both places)
+	  sli->SetValidator(mmgValidator(this,w_id_sli,sli,var,text));
 		sizer->Add(text, 0);
 		sizer->Add(sli,  0);
-		Add(sizer,0,wxALL, M); 
 	}
 	else
 	{
@@ -917,21 +916,20 @@ mmgFloatSlider *mmgGui::FloatSlider(int id,wxString label,double *var,double min
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
     w_id_text = GetId(id);
-		text = new wxTextCtrl    (this, GetId(id), "", dp, wxSize(text_w,LH), m_EntryStyle/*|wxTE_READONLY*/);
+		text = new wxTextCtrl    (this, w_id_text, "", dp, wxSize(text_w,LH), m_EntryStyle/*|wxTE_READONLY*/);
     text->SetFont(m_Font);
     w_id_sli = GetId(id);
-		sli = new mmgFloatSlider(this, GetId(id),*var,min,max, dp, wxSize(slider_w,LH));
+		sli = new mmgFloatSlider(this, w_id_sli,*var,min,max, dp, wxSize(slider_w,LH));
     if(m_UseBackgroundColor) 
       sli->SetBackgroundColour(m_BackgroundColor);
-		
-		wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
+
+		text->SetValidator(mmgValidator(this,w_id_text,text,var,min,max)); //- if uncommented, remove also wxTE_READONLY from the text (in both places)
+		sli->SetValidator(mmgValidator(this,w_id_sli,sli,var,text));
 		sizer->Add(lab,  0, wxRIGHT, LM);
 		sizer->Add(text, 0);
 		sizer->Add(sli,  0);
-		Add(sizer,0,wxALL, M); 
 	}
-	sli->SetValidator(mmgValidator(this,w_id_sli,sli,var,text));
-  text->SetValidator(mmgValidator(this,w_id_text,text,var,sli,min,max)); //- if uncommented, remove also wxTE_READONLY from the text (in both places)
+	Add(sizer,0,wxALL, M); 
 	if(tooltip != "")	text->SetToolTip(tooltip);
 	return sli;
 }
