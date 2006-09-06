@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCrop.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-27 10:44:47 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-09-06 08:57:40 $
+  Version:   $Revision: 1.5 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,12 +29,14 @@
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
 
+#include "vtkDistanceFilter.h"
 #include "vtkMAFSmartPointer.h"
 #include "vtkPolyData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkStructuredPoints.h"
 #include "vtkProbeFilter.h"
 #include "vtkExtractRectilinearGrid.h"
+#include "vtkDoubleArray.h"
 
 //----------------------------------------------------------------------------
 mmoCrop::mmoCrop(wxString label) 
@@ -57,6 +59,7 @@ mmoCrop::~mmoCrop()
 {
 	m_InputRG = NULL;
 	m_InputSP = NULL;
+	mafDEL(m_Vme);
 }
 
 //----------------------------------------------------------------------------
@@ -159,7 +162,7 @@ void mmoCrop::Crop()
 			//coordId++;
 			while (coordArray[numArray]->GetComponent(coordId,0) < gizmoBounds[2*numArray + 1])
 			{
-				maxId = coordId + 1;
+				maxId = coordId - 1;
 				coordId++;
 			}
 
@@ -167,8 +170,8 @@ void mmoCrop::Crop()
 			boundsIndexArray[2*numArray + 1] = maxId; 
 		}
 		vtkExtractRectilinearGrid *extractRG = vtkExtractRectilinearGrid::New();
-		extractRG->SetInput(vtkRectilinearGrid::SafeDownCast(Node->GetOutput()->GetVTKData()));
-		extractRG->SetVOI(boundsIndexArray);   
+		extractRG->SetInput(rgData);
+		extractRG->SetVOI(boundsIndexArray); 
 		extractRG->Update();  
 			
 		m_Vme->SetDataByDetaching(extractRG->GetOutput(),Node->GetTimeStamp());
@@ -361,6 +364,7 @@ void mmoCrop::OpStop(int result)
 {  
   HideGui();
   m_GizmoROI->Show(false);
+	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 	cppDEL(m_GizmoROI);
 	m_GizmoROI = NULL;
   mafEventMacro(mafEvent(this,result));  

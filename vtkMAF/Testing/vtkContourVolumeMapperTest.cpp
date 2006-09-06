@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkContourVolumeMapperTest.cpp,v $
 Language:  C++
-Date:      $Date: 2006-06-28 10:20:16 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2006-09-06 08:57:54 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -19,6 +19,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 #include <string>
 #include <assert.h>
+
+#include "vtkMAFSmartPointer.h"
 
 #include "vtkVolume.h"
 #include "vtkRenderer.h"
@@ -64,7 +66,7 @@ void vtkContourVolumeMapperTest::Test() {
 	char filename[]   = "cube";
 	//------------------ create objects
   vtkContourVolumeMapper *mapper = vtkContourVolumeMapper::New();
-  vtkVolume        *volume = vtkVolume::New();
+  vtkMAFSmartPointer<vtkVolume> volume;
   volume->SetMapper(mapper);
 
   // create windows
@@ -163,8 +165,7 @@ void vtkContourVolumeMapperTest::Test() {
   renWin->Delete();
   iren->Delete();
   mapper->Delete();
-  volume->Delete();
-  }
+}
 
 //-----------------------------------------------------------
 //
