@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoROI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-16 11:48:39 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-09-06 15:19:02 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,6 +31,7 @@
 #include "mafTransform.h"
 #include "mafVME.h"
 #include "mafVMEOutput.h"
+#include "mafSmartPointer.h"
 
 #include "vtkTransform.h"
 #include "vtkCubeSource.h"
@@ -281,13 +282,22 @@ void mafGizmoROI::UpdateHandlePositions()
     mafTransform::GetPosition(*GHandle[1]->GetPose(), posMax);
     
     double xMean = (posMin[0] + posMax[0]) / 2;
-
     for (int i = 2; i < 6; i++)
     {      
       mafTransform::GetPosition(*GHandle[i]->GetPose(), oldPos);
       oldPos[0] = xMean;
       mafTransform::SetPosition(*GHandle[i]->GetPose(), oldPos);
       mafTransform::SetPosition(GHandle[i]->GetPivotMatrix(), oldPos);
+			//Matteo 23-08-06
+			mafSmartPointer<mafTransform> tr;
+			tr->SetMatrix(*GHandle[i]->GetPose());
+
+			mafMatrix mat;
+			mat.DeepCopy(tr->GetMatrixPointer());
+			mat.SetTimeStamp(InputVME->GetTimeStamp());
+
+			GHandle[i]->SetPose(&mat);
+			//End Matteo
     }
   }
   // move 2 or 3 => recenter 0, 1, 4, 5
@@ -306,6 +316,16 @@ void mafGizmoROI::UpdateHandlePositions()
         oldPos[1] = yMean;
         mafTransform::SetPosition(*GHandle[i]->GetPose(), oldPos);
         mafTransform::SetPosition(GHandle[i]->GetPivotMatrix(), oldPos);
+				//Matteo 23-08-06
+				mafSmartPointer<mafTransform> tr;
+				tr->SetMatrix(*GHandle[i]->GetPose());
+
+				mafMatrix mat;
+				mat.DeepCopy(tr->GetMatrixPointer());
+				mat.SetTimeStamp(InputVME->GetTimeStamp());
+
+				GHandle[i]->SetPose(&mat);
+				//End Matteo
       }
     }
   }
@@ -323,6 +343,16 @@ void mafGizmoROI::UpdateHandlePositions()
       oldPos[2] = zMean;
       mafTransform::SetPosition(*GHandle[i]->GetPose(), oldPos);
       mafTransform::SetPosition(GHandle[i]->GetPivotMatrix(), oldPos);
+			//Matteo 23-08-06
+			mafSmartPointer<mafTransform> tr;
+			tr->SetMatrix(*GHandle[i]->GetPose());
+
+			mafMatrix mat;
+			mat.DeepCopy(tr->GetMatrixPointer());
+			mat.SetTimeStamp(InputVME->GetTimeStamp());
+
+			GHandle[i]->SetPose(&mat);
+			//End Matteo
     }
   }
   // since handles position has changed outline bounds must be recomputed
@@ -425,7 +455,7 @@ void mafGizmoROI::UpdateGizmosLength()
   double min_dim = *result;
   for (int i = 0; i <6; i++)
   {
-    GHandle[i]->SetLength(min_dim/8);
+    GHandle[i]->SetLength(min_dim/12);
   }
 }
 
