@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeProjected.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-04-12 13:15:16 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-09-07 09:54:31 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -46,6 +46,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkProjectRG.h"
 #include "vtkProperty.h"
 #include "vtkDoubleArray.h"
+#include "vtkOutlineCornerFilter.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeVolumeProjected);
@@ -57,6 +58,10 @@ mafPipeVolumeProjected::mafPipeVolumeProjected()
 //----------------------------------------------------------------------------
 {
   m_CamPosition = CAMERA_RX_FRONT;
+
+	m_VolumeBox = NULL;
+	m_VolumeBoxMapper = NULL;
+	m_VolumeBoxActor = NULL;
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeProjected::InitializeProjectParameters(int cam_position)
@@ -149,7 +154,7 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 	{
 		RGProjection = vtkProjectRG::New();
     mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,RGProjection));
-		RGProjection->SetInput(((vtkRectilinearGrid *)vtk_data));
+		RGProjection->SetInput(vtkRectilinearGrid::SafeDownCast(vtk_data));
 		vtkStructuredPoints *SP = vtkStructuredPoints::New();
 		if (m_CamPosition == CAMERA_RX_FRONT)
 			RGProjection->SetProjectionModeToY();
@@ -256,6 +261,20 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 	m_UsedAssembly->AddPart(m_TickActor);
 	m_UsedAssembly->AddPart(m_RXActor);	
 
+
+	vtkNEW(m_VolumeBox);
+	m_VolumeBox->SetInput(m_Vme->GetOutput()->GetVTKData());
+
+	vtkNEW(m_VolumeBoxMapper);
+	m_VolumeBoxMapper->SetInput(m_VolumeBox->GetOutput());
+
+	vtkNEW(m_VolumeBoxActor);
+	m_VolumeBoxActor->SetMapper(m_VolumeBoxMapper);
+
+	m_VolumeBoxActor->SetVisibility(m_Selected);
+
+	m_AssemblyFront->AddPart(m_VolumeBoxActor);
+
   //ghost -  //SIL. 26-5-2003 
 	//create something invisible in the front renderer so that ResetCamera will work
   m_ghost = NULL;
@@ -285,6 +304,8 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 mafPipeVolumeProjected::~mafPipeVolumeProjected()
 //----------------------------------------------------------------------------
 {
+	if(m_VolumeBoxActor)
+    m_AssemblyFront->RemovePart(m_VolumeBoxActor);
 	m_UsedAssembly->RemovePart(m_TickActor);
 	m_UsedAssembly->RemovePart(m_RXActor);
   if(m_ghost) 
@@ -294,11 +315,17 @@ mafPipeVolumeProjected::~mafPipeVolumeProjected()
 	vtkDEL(m_TickActor);
 	vtkDEL(m_RXActor);
   vtkDEL(m_ghost);
+
+	vtkDEL(m_VolumeBox);
+	vtkDEL(m_VolumeBoxMapper);
+	vtkDEL(m_VolumeBoxActor);
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeProjected::Select(bool sel)
 //----------------------------------------------------------------------------
 {
+	m_Selected = sel;
+	m_VolumeBoxActor->SetVisibility(sel);
   //there's no selection highlight for volume in rx-view
 }
 //----------------------------------------------------------------------------

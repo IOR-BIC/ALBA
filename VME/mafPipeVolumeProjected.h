@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeProjected.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-07 15:06:54 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-09-07 09:54:41 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -24,6 +24,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class vtkActor;
 class vtkWindowLevelLookupTable;
 class vtkMAFAssembly;
+class vtkOutlineCornerFilter;
+class vtkPolyDataMapper;
 
 //----------------------------------------------------------------------------
 // mafPipeVolumeProjected :
@@ -55,6 +57,10 @@ protected:
   vtkActor *m_RXActor;
   vtkActor *m_TickActor;
   vtkActor *m_ghost;
+
+	vtkOutlineCornerFilter *m_VolumeBox;
+  vtkPolyDataMapper			 *m_VolumeBoxMapper;
+  vtkActor               *m_VolumeBoxActor;
 
   vtkWindowLevelLookupTable *m_Lut;
   vtkMAFAssembly            *m_UsedAssembly;
