@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-06 13:37:15 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2006-09-07 09:55:17 $
+  Version:   $Revision: 1.32 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -46,6 +46,8 @@
 #include "vtkDataSet.h"
 #include "vtkTransform.h"
 #include "vtkRenderer.h"
+#include "vtkOutlineSource.h"
+#include "mafLODActor.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeVolumeSlice);
@@ -69,10 +71,15 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
   }
   m_SliceParametersInitialized  = false;
   m_ShowVolumeBox               = false;
+	m_ShowBounds									= false;
   
   m_AssemblyUsed = NULL;
   m_ColorLUT  = NULL;
   m_CustomColorLUT = NULL;
+
+	m_Box = NULL;
+	m_Mapper = NULL;
+	m_Actor = NULL;
 
   m_SliceDirection  = SLICE_Z;
   m_SliceOpacity  = 1.0;
@@ -100,29 +107,32 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
   m_YVector[2][2] = 0;
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice::InitializeSliceParameters(int direction, bool show_vol_bbox)
+void mafPipeVolumeSlice::InitializeSliceParameters(int direction, bool show_vol_bbox, bool show_bounds)
 //----------------------------------------------------------------------------
 {
   m_SliceDirection= direction;
   m_ShowVolumeBox = show_vol_bbox;
+	m_ShowBounds = show_bounds;
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice::InitializeSliceParameters(int direction, double slice_origin[3], bool show_vol_bbox)
+void mafPipeVolumeSlice::InitializeSliceParameters(int direction, double slice_origin[3], bool show_vol_bbox,bool show_bounds)
 //----------------------------------------------------------------------------
 {
   m_SliceParametersInitialized = true;
   m_SliceDirection= direction;
   m_ShowVolumeBox = show_vol_bbox;
+	m_ShowBounds = show_bounds;
 
   m_Origin[0] = slice_origin[0];
   m_Origin[1] = slice_origin[1];
   m_Origin[2] = slice_origin[2];
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice::InitializeSliceParameters(int direction, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox)
+void mafPipeVolumeSlice::InitializeSliceParameters(int direction, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox,bool show_bounds)
 //----------------------------------------------------------------------------
 {
   m_SliceParametersInitialized = true;
+	m_ShowBounds = show_bounds;
   
   m_SliceDirection= direction;
   m_ShowVolumeBox = show_vol_bbox;
@@ -173,7 +183,7 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
   material->UpdateProp();
 
 	if(m_SliceDirection == SLICE_ARB)
-		m_SliceDirection = SLICE_X;
+		m_SliceDirection = SLICE_Z;
 
 	if (!m_SliceParametersInitialized)
 	{
@@ -229,8 +239,8 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 		CreateSlice(m_SliceDirection);
 	}
 
-	if(m_ShowVolumeBox)
-	{
+	//if(m_ShowVolumeBox)
+	//{
 		vtkNEW(m_VolumeBox);
 		m_VolumeBox->SetInput(m_Vme->GetOutput()->GetVTKData());
 
@@ -240,14 +250,30 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 		vtkNEW(m_VolumeBoxActor);
 		m_VolumeBoxActor->SetMapper(m_VolumeBoxMapper);
 
+		m_VolumeBoxActor->SetVisibility(m_ShowVolumeBox);
+
 		m_AssemblyFront->AddPart(m_VolumeBoxActor);
-	}
+		if(m_ShowBounds)
+		{
+			double bounds[6];
+			m_Vme->GetOutput()->Update();
+			m_Vme->GetOutput()->GetVMELocalBounds(bounds);
+			vtkNEW(m_Box);
+			m_Box->SetBounds(bounds);
+			vtkNEW(m_Mapper);
+			m_Mapper->SetInput(m_Box->GetOutput());
+			vtkNEW(m_Actor);
+			m_Actor->SetMapper(m_Mapper);
+			m_AssemblyFront->AddPart(m_Actor);
+		}
+
+	/*}
 	else
 	{
 		m_VolumeBox				= NULL;
 		m_VolumeBoxMapper = NULL;
 		m_VolumeBoxActor	= NULL;
-	}
+	}*/
 
 	// if the actor is in the background renderer
 	// create something invisible in the front renderer so that ResetCamera will work
@@ -328,6 +354,8 @@ mafPipeVolumeSlice::~mafPipeVolumeSlice()
 {
 	if(m_VolumeBoxActor)
     m_AssemblyFront->RemovePart(m_VolumeBoxActor);
+	if(m_Actor)
+		m_AssemblyFront->RemovePart(m_Actor);
 
 	for(int i = 0; i<3; i++)
 	{
@@ -353,6 +381,7 @@ mafPipeVolumeSlice::~mafPipeVolumeSlice()
 	vtkDEL(m_VolumeBox);
 	vtkDEL(m_VolumeBoxMapper);
 	vtkDEL(m_VolumeBoxActor);
+	vtkDEL(m_Actor);
 
   if(m_GhostActor) 
     m_AssemblyFront->RemovePart(m_GhostActor);
@@ -547,4 +576,12 @@ void mafPipeVolumeSlice::SetColorLookupTable(vtkLookupTable *lut)
       m_Texture[i]->SetLookupTable(m_CustomColorLUT);
   }
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+}
+//----------------------------------------------------------------------------
+void mafPipeVolumeSlice::Select(bool sel)
+//----------------------------------------------------------------------------
+{
+	m_Selected = sel;
+	m_ShowVolumeBox = sel;
+	m_VolumeBoxActor->SetVisibility(sel);
 }

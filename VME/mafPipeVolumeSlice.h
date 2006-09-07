@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-05-03 10:20:19 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2006-09-07 09:55:17 $
+  Version:   $Revision: 1.18 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,6 +33,8 @@ class vtkFollower;
 class vtkVolumeSlicer;
 class vtkCamera;
 class vtkMAFAssembly;
+class vtkOutlineSource;
+class mafLODActor;
 
 //----------------------------------------------------------------------------
 // constant:
@@ -69,9 +71,9 @@ public:
     ID_LAST
   };
 
-  void InitializeSliceParameters(int direction, bool show_vol_bbox);
-  void InitializeSliceParameters(int direction, double slice_origin[3], bool show_vol_bbox);
-  void InitializeSliceParameters(int direction, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox);
+  void InitializeSliceParameters(int direction, bool show_vol_bbox, bool show_bounds=false);
+  void InitializeSliceParameters(int direction, double slice_origin[3], bool show_vol_bbox,bool show_bounds=false);
+  void InitializeSliceParameters(int direction, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox,bool show_bounds=false);
   virtual void Create(mafSceneNode *n);
 
 	/** Set the range to the lookup table for the slice. */
@@ -108,6 +110,8 @@ public:
   Get the opacity of the slice. */
   float GetSliceOpacity();
 
+	virtual void Select(bool select); 
+
 protected:
 	/** Create the slicer pipeline. */
 	void CreateSlice(int direction);
@@ -142,7 +146,12 @@ protected:
 
   vtkActor               *m_GhostActor;
 
+	vtkOutlineSource       *m_Box;
+  vtkPolyDataMapper	     *m_Mapper;
+  mafLODActor            *m_Actor;
+
   bool                    m_SliceParametersInitialized;
   bool                    m_ShowVolumeBox;
+	bool										m_ShowBounds;
 };
 #endif // __mafPipeVolumeSlice_H__
