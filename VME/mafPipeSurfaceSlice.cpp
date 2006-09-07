@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-13 11:03:57 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-09-07 09:53:15 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -75,9 +75,9 @@ mafPipeSurfaceSlice::mafPipeSurfaceSlice()
   m_Origin[1] = 0;
   m_Origin[2] = 0;
 
-  /*m_Normal[0] = 0;
+  m_Normal[0] = 0;
   m_Normal[1] = 0;
-  m_Normal[2] = 0;*/
+  m_Normal[2] = 1;
 
   m_ScalarVisibility = 0;
   m_RenderingDisplayListFlag = 0;
@@ -113,7 +113,7 @@ void mafPipeSurfaceSlice::Create(mafSceneNode *n/*, bool use_axes*/)
 	m_Cutter = vtkFixedCutter::New();
 
 	m_Plane->SetOrigin(m_Origin);
-	m_Plane->SetNormal(0,0,1);
+	m_Plane->SetNormal(m_Normal);
 	vtkMAFToLinearTransform* m_VTKTransform = vtkMAFToLinearTransform::New();
   m_VTKTransform->SetInputMatrix(m_Vme->GetAbsMatrixPipe()->GetMatrixPointer());
 	m_Plane->SetTransform(m_VTKTransform);
@@ -185,10 +185,10 @@ void mafPipeSurfaceSlice::Create(mafSceneNode *n/*, bool use_axes*/)
 
   m_Actor = vtkActor::New();
   m_Actor->SetMapper(m_Mapper);
-//  if (material->m_MaterialType == mmaMaterial::USE_VTK_PROPERTY)
-//  {
+  if (material->m_MaterialType == mmaMaterial::USE_VTK_PROPERTY)
+  {
   m_Actor->SetProperty(material->m_Prop);
-//  }
+  }
 //  else if (material->m_MaterialType == mmaMaterial::USE_TEXTURE)
   if (material->m_MaterialType == mmaMaterial::USE_TEXTURE)
   {
@@ -267,7 +267,7 @@ mmgGui *mafPipeSurfaceSlice::CreateGui()
 {
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
-  m_Gui->FloatSlider(ID_BORDER_CHANGE,"Border",&m_Border,1.0,5.0);
+  m_Gui->FloatSlider(ID_BORDER_CHANGE,_("Border"),&m_Border,1.0,5.0);
   return m_Gui;
 }
 //----------------------------------------------------------------------------
@@ -336,6 +336,22 @@ void mafPipeSurfaceSlice::SetSlice(double *Origin)
 	if(m_Plane && m_Cutter)
 	{
 		m_Plane->SetOrigin(m_Origin);
+		m_Cutter->SetCutFunction(m_Plane);
+		m_Cutter->Update();
+	}
+}
+//----------------------------------------------------------------------------
+void mafPipeSurfaceSlice::SetNormal(double *Normal)
+//----------------------------------------------------------------------------
+{
+	m_Normal[0] = Normal[0];
+	m_Normal[1] = Normal[1];
+	m_Normal[2] = Normal[2];
+	
+
+	if(m_Plane && m_Cutter)
+	{
+		m_Plane->SetNormal(m_Normal);
 		m_Cutter->SetCutFunction(m_Plane);
 		m_Cutter->Update();
 	}

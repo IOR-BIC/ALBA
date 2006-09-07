@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-13 11:03:57 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-09-07 09:53:15 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -58,6 +58,8 @@ public:
   virtual void Select(bool select); 
 
   void SetSlice(double *Origin);
+
+	void SetNormal(double *Normal);
 
   /** IDs for the GUI */
   enum PIPE_SURFACE_WIDGET_ID
