@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVolumeResample.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-16 12:12:02 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-09-07 09:50:54 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -41,6 +41,18 @@ public:
 	void OpRun();	
 	void OpDo();
 	void OpUndo();  
+
+	/**
+	Set spacing for test mode*/
+	void SetSpacing(double Spacing[3]);
+
+	/**
+	Set bounds for test mode*/
+	void SetBounds(double Bounds[6],int Type);
+
+	/**
+	Resample the input volume*/
+	void Resample();
 
 protected:
   mafVMEVolumeGray *m_ResampledVme;

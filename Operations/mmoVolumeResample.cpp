@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-28 08:34:42 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-09-07 09:50:54 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -71,6 +71,9 @@ mmoVolumeResample::mmoVolumeResample(wxString label) : mafOp(label)
 mmoVolumeResample::~mmoVolumeResample()
 //----------------------------------------------------------------------------
 {
+	mafDEL(m_ResampledVme);
+	mafDEL(m_ResampleBoxVme);
+	vtkDEL(m_ResampleBox);
 }
 //----------------------------------------------------------------------------
 bool mmoVolumeResample::Accept(mafNode* vme) 
@@ -256,11 +259,18 @@ void mmoVolumeResample::OpRun()
 {
   // extract information from input data
 	CreateGizmoCube();
-  CreateGui();
+	if(!this->m_TestMode)
+		CreateGui();
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
 void mmoVolumeResample::OpDo()
+//----------------------------------------------------------------------------
+{
+	m_ResampledVme->ReparentTo(m_Input);
+}
+//----------------------------------------------------------------------------
+void mmoVolumeResample::Resample()
 //----------------------------------------------------------------------------
 {
   mafSmartPointer<mafTransform> box_pose;
@@ -276,13 +286,18 @@ void mmoVolumeResample::OpDo()
 	mafString new_vme_name = "resampled_";
 	new_vme_name += m_Input->GetName();
 
-  m_ResampledVme = (mafVMEVolumeGray *)m_Input->NewInstance();
+	mafNEW(m_ResampledVme);
+	m_ResampledVme->SetName(new_vme_name);
+
+	m_Input->Modified();
+	mafVME *Node = mafVME::SafeDownCast(m_Input);
+  /*m_ResampledVme = (mafVMEVolumeGray *)m_Input->NewInstance();
   m_ResampledVme->Register(m_ResampledVme);
   m_ResampledVme->GetTagArray()->DeepCopy(m_Input->GetTagArray()); // copy tags
   m_ResampledVme->SetName(new_vme_name);
 
   m_ResampledVme->ReparentTo(m_Input->GetParent());
-  m_ResampledVme->SetMatrix(box_pose->GetMatrix());
+  m_ResampledVme->SetMatrix(box_pose->GetMatrix());*/
 
   int output_extent[6];
   output_extent[0] = 0;
@@ -307,7 +322,7 @@ void mmoVolumeResample::OpDo()
         // set at each iteration since I'm using the SetMatrix, which doesn't support
         // transform pipelines.
         mafSmartPointer<mafMatrix> output_parent_abs_pose;
-        m_ResampledVme->GetParent()->GetOutput()->GetAbsMatrix(*output_parent_abs_pose.GetPointer(),input_item->GetTimeStamp());
+        Node->GetParent()->GetOutput()->GetAbsMatrix(*output_parent_abs_pose.GetPointer(),input_item->GetTimeStamp());
         local_pose->SetInputFrame(output_parent_abs_pose);
 
         mafSmartPointer<mafMatrix> input_parent_abs_pose;
@@ -316,7 +331,7 @@ void mmoVolumeResample::OpDo()
         local_pose->Update();
 
         mafSmartPointer<mafMatrix> output_abs_pose;
-        m_ResampledVme->GetOutput()->GetAbsMatrix(*output_abs_pose.GetPointer(),input_item->GetTimeStamp());
+        Node->GetOutput()->GetAbsMatrix(*output_abs_pose.GetPointer(),input_item->GetTimeStamp());
         output_to_input->SetInputFrame(output_abs_pose);
 
         mafSmartPointer<mafMatrix> input_abs_pose;
@@ -379,12 +394,14 @@ void mmoVolumeResample::OpDo()
       }
     }
   }
-	mafDEL(m_ResampledVme);
+	m_ResampledVme->ReparentTo(m_Input); //Re-parenting a VME implies that it is also added to the tree.
+  m_Output = m_ResampledVme; // Used to make the UnDo: if the output var is set, the undo is done by default.
 }
 //----------------------------------------------------------------------------
 void mmoVolumeResample::OpUndo()
 //----------------------------------------------------------------------------
 {   
+	assert(m_ResampledVme);
 	mafEventMacro(mafEvent(this,VME_REMOVE,m_ResampledVme));
 }
 //----------------------------------------------------------------------------
@@ -405,6 +422,14 @@ enum VOLUME_RESAMPLE_WIDGET_ID
   ID_VOLUME_CURRENT_SLICE,
   ID_VOLUME_AUTOSPACING,
   ID_VOLUME_ZERO_VALUE
+};
+
+enum BOUNDS
+{
+	ID_VME4DBOUNDS = 0,
+	ID_VMELOCALBOUNDS,
+	ID_VMEBOUNDS,
+	ID_PERSONALBOUNDS,
 };
 
 //----------------------------------------------------------------------------
@@ -497,6 +522,7 @@ void mmoVolumeResample::OnEvent(mafEventBase *maf_event)
         UpdateGui();
       break;
       case wxOK:
+				Resample();
         GizmoDelete();
         HideGui();
         mafEventMacro(mafEvent(this,OP_RUN_OK));
@@ -530,4 +556,37 @@ void mmoVolumeResample::OnEvent(mafEventBase *maf_event)
       break;
     }	
   }
+}
+//----------------------------------------------------------------------------
+void mmoVolumeResample::SetSpacing(double Spacing[3]) 
+//----------------------------------------------------------------------------
+{
+	m_VolumeSpacing[0] = Spacing[0];
+	m_VolumeSpacing[1] = Spacing[1];
+	m_VolumeSpacing[2] = Spacing[2];
+}
+//----------------------------------------------------------------------------
+void mmoVolumeResample::SetBounds(double Bounds[6],int Type) 
+//----------------------------------------------------------------------------
+{
+	switch (Type)
+	{
+	case ID_VME4DBOUNDS:
+		SetBoundsToVME4DBounds();
+		break;
+	case ID_VMELOCALBOUNDS:
+		SetBoundsToVMELocalBounds();
+		break;
+	case ID_VMEBOUNDS:
+		this->SetBoundsToVMEBounds();
+		break;
+	case ID_PERSONALBOUNDS:
+		m_VolumeBounds[0] = Bounds[0];
+		m_VolumeBounds[1] = Bounds[1];
+		m_VolumeBounds[2] = Bounds[2];
+		m_VolumeBounds[3] = Bounds[3];
+		m_VolumeBounds[4] = Bounds[4];
+		m_VolumeBounds[5] = Bounds[5];
+		break;
+	}
 }
