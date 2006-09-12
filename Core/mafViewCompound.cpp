@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-16 09:25:29 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2006-09-12 15:07:06 $
+  Version:   $Revision: 1.26 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -181,7 +181,8 @@ void mafViewCompound::CameraUpdate()
 mafSceneGraph *mafViewCompound::GetSceneGraph()
 //----------------------------------------------------------------------------
 {
-  return ((mafViewVTK *)m_ChildViewList[m_DefauldChildView])->GetSceneGraph();
+  //return ((mafViewVTK *)m_ChildViewList[m_DefauldChildView])->GetSceneGraph();
+  return GetSubView()->GetSceneGraph();
 }
 //----------------------------------------------------------------------------
 mafRWIBase *mafViewCompound::GetRWI()
