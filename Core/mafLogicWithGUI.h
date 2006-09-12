@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-14 16:53:26 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2006-09-12 10:25:24 $
+  Version:   $Revision: 1.19 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,6 +17,7 @@
 #include "mafDefines.h" //important: mafDefines should always be included as first
 #include "mafEvent.h"
 #include "mafObserver.h"
+#include "mafSideBar.h"
 #include <wx/notebook.h>
 #include <wx/icon.h>
 //----------------------------------------------------------------------------
@@ -28,7 +29,6 @@ class mmgNamedPanel;
 class mmgTimeBar;
 class mafWXLog;
 class mafVTKLog;
-class mafSideBar;
 class mmgLocaleSettings;
 class mmgMeasureUnitSettings;
 class mmgApplicationSettings;
@@ -93,7 +93,7 @@ public:
 	/** Sets the flag to know if Toolbar should be built.*/
 	void PlugToolbar(bool plug) {m_PlugToolbar	= plug;};
 	/** Sets the flag to know if Side bar should be built.*/
-	void PlugSidebar(bool plug) {m_PlugSidebar	= plug;};
+  void PlugSidebar(bool plug, long style = mafSideBar::DOUBLE_NOTEBOOK) {m_PlugSidebar	= plug; m_SidebarStyle = style;};
 	/** Sets the flag to know if Time bar should be built.*/
 	void PlugTimebar(bool plug) {m_PlugTimebar	= plug;};
 	/** Sets the flag to know if Log bar should be built.*/
@@ -152,6 +152,7 @@ protected:
 	bool m_PlugMenu;    ///< Flag to plug or not the Menu into the application. Default is true.
 	bool m_PlugToolbar; ///< Flag to plug or not the Toolbar into the application. Default is true.
 	bool m_PlugSidebar; ///< Flag to plug or not the Side-bar into the application. Default is true.
+  long m_SidebarStyle;///< Store the style of the sidebar. Old style (MAF 1.x): SINGLE_NOTEBOOK or new style (MAF 2.x): DOUBLE_NOTEBOOK
 	bool m_PlugTimebar; ///< Flag to plug or not the Time-bar into the application. Default is true.
 	bool m_PlugLogbar;  ///< Flag to plug or not the Log area into the application. Default is true.
 };
