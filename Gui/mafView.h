@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-28 16:32:40 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-09-12 15:06:09 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -97,6 +97,7 @@ public:
   virtual void			CameraUpdate()																					{};
   virtual void      SetMouse(mmdMouse *mouse)                               {};
   virtual mafRWIBase *GetRWI()                                              {return NULL;};
+  virtual mafSceneGraph *GetSceneGraph()                                    {return NULL;};
   virtual void      GetImage(wxBitmap &bmp, int magnification = 1)          {};
 
   /** Called to update all components that depends on Application Options.*/
