@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-12 10:31:03 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-09-12 15:07:33 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -178,10 +178,11 @@ void mmgContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
 		break;
     case CONTEXTUAL_MENU_VME_PIPE:
     {
-      mafVME *vme = (mafVME *)((mafViewVTK *)m_ViewActive)->GetSceneGraph()->GetSelectedVme();
-      mafSceneGraph *sg = ((mafViewVTK *)m_ViewActive)->GetSceneGraph();
+      mafSceneGraph *sg = m_ViewActive->GetSceneGraph();
+      mafVME *vme = NULL;
       if(sg)
       {
+        vme = (mafVME *)sg->GetSelectedVme();
         mafSceneNode *sn = sg->Vme2Node(vme);
         if (sn)
         {
@@ -196,6 +197,14 @@ void mmgContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
             dlg.Add(gui,1,wxEXPAND);
             dlg.ShowModal();
             gui->Reparent(old_parent);
+            if (old_parent == mafGetFrame())
+            {
+              gui->Show(false);
+            }
+          }
+          else
+          {
+            wxMessageBox("Visual pipe has no gui!!", _("Warning"));
           }
         }
       }
