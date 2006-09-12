@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgColorWidget.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 16:19:20 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-09-12 15:58:27 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -59,7 +59,6 @@ protected:
   void UpdateHSVBitmap();    // update the sv square (H changed)
   void UpdateAlphaBitmap();  // update the alpha chooser (A changed)
   void PaintHandles(wxPaintDC &DC);
-  void OnEraseBackground(wxEraseEvent& event) {};  // overrided to prevent flickering
   void OnPaint(wxPaintEvent &event);                
 
   void OnLeftMouseButtonDown(wxMouseEvent &event);

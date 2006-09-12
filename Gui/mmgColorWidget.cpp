@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgColorWidget.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-09-12 15:58:27 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -40,7 +40,6 @@
 //----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(mmgColorWidget,wxPanel)
   EVT_PAINT(mmgColorWidget::OnPaint)
-  EVT_ERASE_BACKGROUND(mmgColorWidget::OnEraseBackground) 
 
   EVT_LEFT_DOWN(mmgColorWidget::OnLeftMouseButtonDown)
   EVT_LEFT_UP(mmgColorWidget::OnLeftMouseButtonUp)
