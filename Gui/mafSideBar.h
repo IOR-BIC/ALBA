@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-09-12 10:24:09 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,8 +39,14 @@ class mmgSplittedPanel;
 class mafSideBar
 {
 public:
-	mafSideBar(wxWindow* parent, int id, mafObserver *Listener);
+	mafSideBar(wxWindow* parent, int id, mafObserver *Listener, long style = DOUBLE_NOTEBOOK);
 	~mafSideBar(); 
+
+  enum SIDEBAR_STYLE
+  {
+    SINGLE_NOTEBOOK,
+    DOUBLE_NOTEBOOK
+  };
 
 	// Description:
 	// Add a new vme into the tree.
