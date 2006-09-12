@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2006-09-12 10:24:23 $
+  Version:   $Revision: 1.29 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,7 +32,7 @@
 #include "mafVMEOutput.h"
 
 //----------------------------------------------------------------------------
-mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener)
+mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener, long style)
 //----------------------------------------------------------------------------
 {
   m_SelectedVme  = NULL;
@@ -41,46 +41,55 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener)
   //splitted panel  
   m_Notebook = new wxNotebook(parent,id);
   m_Notebook->SetFont(wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT)));
-  //m_SideSplittedPanel = new mmgNamedPanel(m_Notebook,-1,false,true); //SIL. 29-4-2003 - 200 is the height of the vme_property panel
   m_SideSplittedPanel = new wxSplitterWindow(m_Notebook, -1,wxDefaultPosition,wxSize(-1,-1),/*wxSP_3DSASH |*/ wxSP_FULLSASH);
 
   //tree ----------------------------
-  //m_Tree = new mmgCheckTree(m_SideSplittedPanel,-1,true);  //SIL. 23-may-2006 : 
   m_Tree = new mmgCheckTree(m_SideSplittedPanel,-1,false,true);
   m_Tree->SetListener(Listener);
   m_Tree->SetSize(-1,300);
   m_Tree->SetTitle(" vme hierarchy: ");
-  //m_SideSplittedPanel->Add(m_Tree);
-  m_Notebook->AddPage(m_SideSplittedPanel,_("vme manager"),true);
+  m_Notebook->AddPage(m_SideSplittedPanel,_("data tree"),true);
 
   //view property panel
-  //m_ViewPropertyPanel = new mmgGuiHolder(m_Notebook,-1,true);  //SIL. 23-may-2006 : 
   m_ViewPropertyPanel = new mmgGuiHolder(m_Notebook,-1,false,true);
   m_ViewPropertyPanel->SetTitle(_("no view selected:"));
   m_Notebook->AddPage(m_ViewPropertyPanel,_("view settings"));
 
   //op_panel ----------------------------
   m_OpPanel  = new mmgPanelStack(m_Notebook ,-1);
-  //mmgNamedPanel *empty_op = new mmgNamedPanel(m_OpPanel ,-1,true);  //SIL. 23-may-2006 : 
   mmgNamedPanel *empty_op = new mmgNamedPanel(m_OpPanel ,-1,false,true);
   empty_op->SetTitle(_(" no operation running:"));
   m_OpPanel->Push(empty_op);
-  m_Notebook->AddPage(m_OpPanel ,_(" op.params"));
+  m_Notebook->AddPage(m_OpPanel ,_("operation"));
 
-  wxNotebook *vme_notebook = new wxNotebook(m_SideSplittedPanel,-1);
-  vme_notebook->SetFont(wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT)));
+  if (style == DOUBLE_NOTEBOOK)
+  {
+    wxNotebook *vme_notebook = new wxNotebook(m_SideSplittedPanel,-1);
+    vme_notebook->SetFont(wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT)));
 
-  m_VmeOutputPanel = new mmgGuiHolder(vme_notebook,-1,false,true);
-  vme_notebook->AddPage(m_VmeOutputPanel,_(" vme output "));
-  m_VmePipePanel = new mmgGuiHolder(vme_notebook,-1,false,true);
-  vme_notebook->AddPage(m_VmePipePanel,_(" vme pipe "));
-  m_VmePanel = new mmgGuiHolder(vme_notebook,-1,false,true);
-  vme_notebook->AddPage(m_VmePanel,_(" vme object "));
+    m_VmeOutputPanel = new mmgGuiHolder(vme_notebook,-1,false,true);
+    vme_notebook->AddPage(m_VmeOutputPanel,_(" vme output "));
+    m_VmePipePanel = new mmgGuiHolder(vme_notebook,-1,false,true);
+    vme_notebook->AddPage(m_VmePipePanel,_(" vme pipe "));
+    m_VmePanel = new mmgGuiHolder(vme_notebook,-1,false,true);
+    vme_notebook->AddPage(m_VmePanel,_("vme"));
 
-  //m_SideSplittedPanel->Add(vme_notebook,1);
-  //m_side_bar->Put(m_Notebook);
-  m_SideSplittedPanel->SetMinimumPaneSize(50);
-  m_SideSplittedPanel->SplitHorizontally(m_Tree,vme_notebook);
+    m_SideSplittedPanel->SetMinimumPaneSize(50);
+    m_SideSplittedPanel->SplitHorizontally(m_Tree,vme_notebook);
+  }
+  else
+  {
+    m_VmePanel = new mmgGuiHolder(m_Notebook,-1,false,true);
+    m_Notebook->AddPage(m_VmePanel ,_("vme"));
+
+    m_VmeOutputPanel = new mmgGuiHolder(m_SideSplittedPanel,-1,false,true);
+    m_VmeOutputPanel->Show();
+    m_SideSplittedPanel->SetMinimumPaneSize(50);
+    m_SideSplittedPanel->SplitHorizontally(m_Tree,m_VmeOutputPanel);
+
+    m_VmePipePanel = new mmgGuiHolder(m_Notebook,-1,false,true);
+    m_VmePipePanel->Show(false);
+  }
 }
 //----------------------------------------------------------------------------
 mafSideBar::~mafSideBar() 
