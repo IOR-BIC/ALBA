@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-09-12 15:59:01 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,6 +25,8 @@
 #include "mmgValidator.h"
 #include "mmgButton.h"
 #include "mmgLutPreset.h"
+#include "mmgDialog.h"
+
 //----------------------------------------------------------------------------
 // const
 //----------------------------------------------------------------------------
@@ -145,11 +147,11 @@ mmgLutEditor::mmgLutEditor(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 	sizer->Add( lab, 0, wxALL, M);
 	sz = new wxBoxSizer(wxHORIZONTAL);
 
-  butt = new mmgButton(this, ID_SHADE_RGB, "shade colors in rgba space",dp, wxSize(143,BH) );
+  butt = new mmgButton(this, ID_SHADE_RGB, "shade in rgba space",dp, wxSize(143,BH) );
 	butt->SetValidator( mmgValidator(this,ID_SHADE_RGB,butt) );
 	sz->Add( butt, 0, wxRIGHT, 2);
 
-  butt = new mmgButton(this, ID_SHADE_HSV, "shade colors in hsva space",dp, wxSize(143,BH) );
+  butt = new mmgButton(this, ID_SHADE_HSV, "shade in hsva space",dp, wxSize(143,BH) );
 	butt->SetValidator( mmgValidator(this,ID_SHADE_HSV,butt) );
 	sz->Add( butt, 0);
   sizer->Add(sz,0,wxALL, M);
@@ -356,11 +358,11 @@ void mmgLutEditor::ShowLutDialog(vtkLookupTable *lut, mafObserver *listener, int
 //----------------------------------------------------------------------------
 {
   long style = /*wxDIALOG_MODAL |*/ wxDEFAULT_DIALOG_STYLE | /*wxSTAY_ON_TOP |*/ wxNO_FULL_REPAINT_ON_RESIZE | wxCLIP_CHILDREN;
-  wxDialog *dlg = new wxDialog(NULL, -1, "LutEditor", wxDefaultPosition, wxSize(300,670),	style);
+  mmgDialog dlg("LutEditor", mafCLOSEWINDOW);
   
-  mmgLutEditor *led = new mmgLutEditor(dlg, id);
+  mmgLutEditor *led = new mmgLutEditor(&dlg, id);
   led->SetListener(listener);
   led->SetLut(lut);
-  dlg->ShowModal();
-  delete dlg;
+  dlg.Add(led,1,wxEXPAND);
+  dlg.ShowModal();
 }
