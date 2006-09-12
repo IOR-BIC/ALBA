@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-22 11:05:30 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-09-12 10:31:03 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,6 +33,9 @@
 #include "mafViewVTK.h"
 #include "mafViewCompound.h"
 #include "mmgMDIChild.h"
+#include "mmgDialog.h"
+#include "mmgGui.h"
+#include "mafPipe.h"
 
 #include "mafPipe.h"
 
@@ -52,6 +55,7 @@ enum VIEW_CONTEXTUAL_MENU_ID
 		CONTEXTUAL_MENU_HIDE_VME,				
 		CONTEXTUAL_MENU_DELETE_VME,
 		CONTEXTUAL_MENU_TRANSFORM,
+    CONTEXTUAL_MENU_VME_PIPE,
 		CONTEXTUAL_MENU_QUIT_CHILD_VIEW,
 		CONTEXTUAL_MENU_MAXIMIZE_CHILD_VIEW,
     CONTEXTUAL_MENU_MAXIMIZE_CHILD_SUB_VIEW,
@@ -98,6 +102,8 @@ void mmgContextualMenu::ShowContextualMenu(wxFrame *child, mafView *view, bool v
 		this->Append(CONTEXTUAL_MENU_HIDE_VME, "Hide");
 		this->Append(CONTEXTUAL_MENU_DELETE_VME, "Delete");
 		this->Append(CONTEXTUAL_MENU_TRANSFORM, "Transform  \tCtrl+T");
+    this->AppendSeparator();
+    this->Append(CONTEXTUAL_MENU_VME_PIPE,"vme pipe");
     this->AppendSeparator();
   }
 	this->Append(CONTEXTUAL_MENU_RENAME_VIEW, "Rename View");
@@ -170,6 +176,31 @@ void mmgContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
 			}
 		}
 		break;
+    case CONTEXTUAL_MENU_VME_PIPE:
+    {
+      mafVME *vme = (mafVME *)((mafViewVTK *)m_ViewActive)->GetSceneGraph()->GetSelectedVme();
+      mafSceneGraph *sg = ((mafViewVTK *)m_ViewActive)->GetSceneGraph();
+      if(sg)
+      {
+        mafSceneNode *sn = sg->Vme2Node(vme);
+        if (sn)
+        {
+          mafPipe *p = sn->m_Pipe;
+          if (p)
+          {
+            wxString t = vme->GetName();
+            t += " pipe gui";
+            mmgDialog dlg(t,mafCLOSEWINDOW);
+            mmgGui *gui = p->GetGui();
+            wxWindow *old_parent = gui->GetParent();
+            dlg.Add(gui,1,wxEXPAND);
+            dlg.ShowModal();
+            gui->Reparent(old_parent);
+          }
+        }
+      }
+    }
+    break;
 		case CONTEXTUAL_MENU_DELETE_VME:
 			//send the event to simulate the cut started by the menu button.
 			mafEventMacro(mafEvent(this, MENU_OP, (long)OP_CUT));
