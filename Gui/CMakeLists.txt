@@ -66,7 +66,6 @@ SET(PROJECT_SRCS
   mmgMDIChild.h
   mmgMDIFrame.cpp
   mmgMDIFrame.h
-  mmgMovieCtrl.cpp
   mmgMovieCtrl.h
   mmgMutexPanel.cpp
   mmgMutexPanel.h
