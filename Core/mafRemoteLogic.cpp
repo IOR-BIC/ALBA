@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafRemoteLogic.cpp,v $
 Language:  C++
-Date:      $Date: 2006-07-20 14:40:53 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2006-09-13 16:41:48 $
+Version:   $Revision: 1.4 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -215,7 +215,7 @@ void mafRemoteLogic::RemoteMessage(mafString &cmd, bool to_server)
       long v_id;
       data_cmd.ToLong(&v_id);
       m_ViewManager->m_FromRemote = true;
-      mafEventMacro(mafEvent(this,VIEW_CREATE,v_id + VIEW_START));
+      mafEventMacro(mafEvent(this,VIEW_CREATE,(long)(v_id + VIEW_START)));
       if (m_RemoteMouse)
       {
         mafEventBase eb(this,VIEW_SELECT, m_ViewManager->GetSelectedView(), REMOTE_COMMAND_CHANNEL);
