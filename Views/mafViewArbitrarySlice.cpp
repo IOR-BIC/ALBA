@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-13 13:47:53 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-09-13 13:54:41 $
+  Version:   $Revision: 1.2 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -227,7 +227,7 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			m_Slicer->GetMaterial()->GetMaterialTexture()->GetScalarRange(sr2);
 			m_ChildViewList[ARBITRARY_VIEW]->VmeShow(m_Slicer, show);
 			m_ChildViewList[SLICE_VIEW]->VmeShow(m_Slicer, show);
-			((mafViewVTK*)m_ChildViewList[SLICE_VIEW])->GetAttachCamera()->SetVme(m_Slicer);
+			//((mafViewVTK*)m_ChildViewList[SLICE_VIEW])->GetAttachCamera()->SetVme(m_Slicer);
 			((mafViewVTK*)m_ChildViewList[SLICE_VIEW])->CameraReset(m_Slicer);
 
 			// create the gizmos
