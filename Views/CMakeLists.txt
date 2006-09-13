@@ -6,6 +6,8 @@ PROJECT(medViews)
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
+  mafViewArbitrarySlice.cpp
+  mafViewArbitrarySlice.h
   mafViewOrthoSlice.cpp
   mafViewOrthoSlice.h
   mafViewRX.cpp
