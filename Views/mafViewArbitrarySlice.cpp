@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-13 18:47:03 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-09-13 19:07:34 $
+  Version:   $Revision: 1.4 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -301,7 +301,7 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 		if(Vme->IsA("mafVMEVolumeGray"))
 		{
 			m_Slicer->ReparentTo(NULL);
-			((mafViewVTK*)m_ChildViewList[SLICE_VIEW])->GetAttachCamera()->SetVme(NULL);
+			//((mafViewVTK*)m_ChildViewList[SLICE_VIEW])->GetAttachCamera()->SetVme(NULL);
 
 			//remove gizmos
 			m_Gui->Remove(m_GuiGizmos);
