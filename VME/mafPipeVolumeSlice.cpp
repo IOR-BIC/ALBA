@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-07 09:55:17 $
-  Version:   $Revision: 1.32 $
+  Date:      $Date: 2006-09-15 09:13:02 $
+  Version:   $Revision: 1.33 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -293,10 +293,14 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 void mafPipeVolumeSlice::CreateSlice(int direction)
 //----------------------------------------------------------------------------
 {
-	double xspc = 0.33, yspc = 0.33;
+	double xspc = 0.33, yspc = 0.33, zspc = 1.0;
 
   vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();
   vtk_data->Update();
+  if(vtk_data->IsA("vtkImageData") || vtk_data->IsA("vtkStructuredPoints"))
+  {
+    ((vtkImageData *)vtk_data)->GetSpacing(xspc,yspc,zspc);
+  }
 
 	vtkNEW(m_SlicerPolygonal[direction]);
 	vtkNEW(m_SlicerImage[direction]);
@@ -317,7 +321,7 @@ void mafPipeVolumeSlice::CreateSlice(int direction)
 	m_Image[direction]->SetNumberOfScalarComponents(vtk_data->GetPointData()->GetScalars()->GetNumberOfComponents());
   //m_Image[direction]->SetNumberOfScalarComponents(3);
 	m_Image[direction]->SetExtent(0, m_TextureRes - 1, 0, m_TextureRes - 1, 0, 0);
-	m_Image[direction]->SetSpacing(xspc, yspc, 1.f);
+	m_Image[direction]->SetSpacing(xspc, yspc, zspc);
 
 	m_SlicerImage[direction]->SetOutput(m_Image[direction]);
   m_SlicerImage[direction]->Update();
