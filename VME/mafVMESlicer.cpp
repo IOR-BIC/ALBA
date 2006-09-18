@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:55 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2006-09-18 16:44:20 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -36,6 +36,7 @@
 #include "vtkVolumeSlicer.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkLinearTransform.h"
+#include "vtkPointData.h"
 
 #include <assert.h>
 
@@ -60,8 +61,6 @@ mafVMESlicer::mafVMESlicer()
   m_Xspc = m_Yspc = 0.3;
 
   vtkMAFSmartPointer<vtkImageData> image;
-  image->SetScalarTypeToUnsignedChar();
-  image->SetNumberOfScalarComponents(3);
   image->SetExtent(0, m_TextureRes - 1, 0, m_TextureRes - 1, 0, 0);
   image->SetUpdateExtent(0, m_TextureRes - 1, 0, m_TextureRes - 1, 0, 0);
   image->SetSpacing(m_Xspc, m_Yspc, 1.f);
@@ -195,6 +194,11 @@ void mafVMESlicer::InternalPreUpdate()
         vtkdata->Update();
       }
 
+      vtkImageData *texture = m_PSlicer->GetTexture();
+      texture->SetScalarType(vtkdata->GetPointData()->GetScalars()->GetDataType());
+      texture->SetNumberOfScalarComponents(vtkdata->GetPointData()->GetScalars()->GetNumberOfComponents());
+      texture->Modified();
+
       m_PSlicer->SetInput(vtkdata);
       m_PSlicer->SetPlaneOrigin(pos);
       m_PSlicer->SetPlaneAxisX(vectX);
@@ -225,8 +229,8 @@ void mafVMESlicer::InternalUpdate()
       vtkdata->GetScalarRange(srange);
       w = srange[1] - srange[0];
       l = (srange[1] + srange[0]) * 0.5;
-      m_ISlicer->SetWindow(w);
-      m_ISlicer->SetLevel(l);
+      //m_ISlicer->SetWindow(w);
+      //m_ISlicer->SetLevel(l);
     }
   }
 }
