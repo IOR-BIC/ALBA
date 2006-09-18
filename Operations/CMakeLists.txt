@@ -29,8 +29,8 @@ IF (MAF_USE_VTK)
     mmoCreateRefSys.h
     mmoCreateSlicer.cpp
     mmoCreateSlicer.h
-    mmoMAFTransform.cpp
-    mmoMAFTransform.h
+    mmoEditMetadata.cpp
+    mmoEditMetadata.h
     mmoExplodeCollapse.cpp
     mmoExplodeCollapse.h
     mmoExtractIsosurface.cpp
@@ -41,6 +41,8 @@ IF (MAF_USE_VTK)
     mmoFilterVolume.h
     mmoImageImporter.cpp
     mmoImageImporter.h
+    mmoMAFTransform.cpp
+    mmoMAFTransform.h
     mmoMSFExporter.cpp
     mmoMSFExporter.h
     mmoMSF1xImporter.cpp
