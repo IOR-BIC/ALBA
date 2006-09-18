@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-27 10:08:15 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2006-09-18 16:45:27 $
+  Version:   $Revision: 1.27 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,6 +44,7 @@
 #include "vtkTextureMapToCylinder.h"
 #include "vtkTextureMapToPlane.h"
 #include "vtkTextureMapToSphere.h"
+#include "vtkWindowLevelLookupTable.h"
 
 #include <vector>
 
@@ -92,6 +93,7 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
   m_OutlineActor    = NULL;
   m_Axes            = NULL;
 
+  m_Vme->Update();
   assert(m_Vme->GetOutput()->IsMAFType(mafVMEOutputSurface));
   mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
   assert(surface_output);
@@ -131,11 +133,9 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
     m_Mapper->SetInput(data);
   }
   
-  m_Mapper->SetScalarVisibility(m_ScalarVisibility);
-  m_Mapper->SetScalarRange(sr);
-  
   m_RenderingDisplayListFlag = m_Vme->IsAnimated() ? 1 : 0;
   m_Mapper->SetImmediateModeRendering(m_RenderingDisplayListFlag);
+  m_Mapper->SetScalarVisibility(m_ScalarVisibility);
 
   vtkNEW(m_Texture);
   m_Texture->SetQualityTo32Bit();
@@ -144,19 +144,25 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
   {
     if (m_SurfaceMaterial->GetMaterialTexture() != NULL)
     {
-      m_Texture->SetInput(m_SurfaceMaterial->GetMaterialTexture());
+      vtkImageData *image = m_SurfaceMaterial->GetMaterialTexture();
+      m_Texture->SetInput(image);
+      image->GetScalarRange(sr);
     }
     else if (m_SurfaceMaterial->GetMaterialTextureID() != -1)
     {
       mafVME *texture_vme = mafVME::SafeDownCast(m_Vme->GetRoot()->FindInTreeById(m_SurfaceMaterial->GetMaterialTextureID()));
       texture_vme->GetOutput()->GetVTKData()->Update();
-      m_Texture->SetInput((vtkImageData *)texture_vme->GetOutput()->GetVTKData());
+      vtkImageData *image = (vtkImageData *)texture_vme->GetOutput()->GetVTKData();
+      m_Texture->SetInput(image);
+      image->GetScalarRange(sr);
     }
     else
     {
-      mafErrorMacro("texture info not correctly set inside material!! ");
+      mafErrorMacro("texture info not correctly stored inside material!!");
     }
   }
+
+  m_Mapper->SetScalarRange(sr);
 
   vtkNEW(m_Actor);
 	m_Actor->SetMapper(m_Mapper);
@@ -176,6 +182,10 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
   }
   if (m_SurfaceMaterial->m_MaterialType == mmaMaterial::USE_TEXTURE)
   {
+    m_SurfaceMaterial->m_GrayLut->SetWindow(sr[1]-sr[0]);
+    m_SurfaceMaterial->m_GrayLut->SetLevel((sr[1]+sr[0])*.5);
+    m_Texture->SetLookupTable((vtkLookupTable *)m_SurfaceMaterial->m_GrayLut);
+    m_Texture->MapColorScalarsThroughLookupTableOn();
     m_Actor->SetTexture(m_Texture);
   }
 
@@ -297,7 +307,7 @@ mmgGui *mafPipeSurface::CreateGui()
   m_Gui->Bool(ID_USE_TEXTURE,"texture",&m_UseTexture);
   m_Gui->Bool(ID_USE_LOOKUP_TABLE,"lut",&m_UseLookupTable);
   m_Gui->Divider(2);
-  m_Gui->Bool(ID_ENABLE_LOD,"enable LOD",&m_EnableActorLOD);
+  m_Gui->Bool(ID_ENABLE_LOD,"LOD",&m_EnableActorLOD);
   m_Gui->Label("");
 
   if (m_SurfaceMaterial == NULL)
