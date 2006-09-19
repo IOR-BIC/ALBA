@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-23 19:34:55 $
-  Version:   $Revision: 1.34 $
+  Date:      $Date: 2006-09-19 11:02:13 $
+  Version:   $Revision: 1.35 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -47,7 +47,7 @@ mafCxxTypeMacro(mafViewOrthoSlice);
 // constants:
 //----------------------------------------------------------------------------
 
-enum
+enum ORTHOSLICE_SUBVIEW_ID
 {
   PERSPECTIVE_VIEW = 0,
   XN_VIEW,
@@ -57,7 +57,7 @@ enum
 };
 
 
-enum
+enum CHILD_VIEW_ID
 {
   CHILD_PERSPECTIVE_VIEW = 0,
   CHILD_ZN_VIEW,
@@ -66,7 +66,7 @@ enum
   CHILD_VIEWS_NUMBER,
 };
 
-enum
+enum GIZMO_ID
 {
   GIZMO_XN = 0,
   GIZMO_YN,

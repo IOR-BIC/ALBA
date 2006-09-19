@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-13 19:07:34 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-09-19 11:02:13 $
+  Version:   $Revision: 1.5 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -66,17 +66,17 @@ mafCxxTypeMacro(mafViewArbitrarySlice);
 // constants:
 //----------------------------------------------------------------------------
 
-enum
+enum ARBITRARY_SUBVIEW_ID
 {
   ARBITRARY_VIEW = 0,
 	SLICE_VIEW,
 };
-enum
+enum GIZMO_TYPE_ID
 {
 	GIZMO_TRANSLATE = 0,
 	GIZMO_ROTATE,
 };
-enum
+enum AXIS_ID
 {
 	X_AXIS = 0,
 	Y_AXIS,

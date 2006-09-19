@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-25 16:09:11 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2006-09-19 11:02:13 $
+  Version:   $Revision: 1.15 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,7 +45,7 @@
 
 const int CT_CHILD_VIEWS_NUMBER  = 6;
 
-enum
+enum RXCT_SUBVIEW_ID
 {
   RX_FRONT_VIEW = 0,
   RX_SIDE_VIEW,
