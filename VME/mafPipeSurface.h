@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-27 10:08:15 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-09-19 10:02:12 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -61,6 +61,7 @@ public:
     ID_USE_VTK_PROPERTY,
     ID_USE_TEXTURE,
     ID_USE_LOOKUP_TABLE,
+    ID_LUT,
     ID_ENABLE_LOD,
     ID_LAST
   };

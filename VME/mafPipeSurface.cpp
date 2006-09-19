@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-18 16:45:27 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2006-09-19 10:02:12 $
+  Version:   $Revision: 1.28 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,12 +21,14 @@
 
 #include "mafPipeSurface.h"
 #include "mafSceneNode.h"
-#include "mafVMESurface.h"
-#include "mmaMaterial.h"
 #include "mmgGui.h"
 #include "mmgMaterialButton.h"
+#include "mmgLutPreset.h"
 #include "mafAxes.h"
+#include "mmaMaterial.h"
+
 #include "mafDataVector.h"
+#include "mafVMESurface.h"
 #include "mafVMEGenericAbstract.h"
 
 #include "mafLODActor.h"
@@ -44,7 +46,6 @@
 #include "vtkTextureMapToCylinder.h"
 #include "vtkTextureMapToPlane.h"
 #include "vtkTextureMapToSphere.h"
-#include "vtkWindowLevelLookupTable.h"
 
 #include <vector>
 
@@ -182,10 +183,9 @@ void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
   }
   if (m_SurfaceMaterial->m_MaterialType == mmaMaterial::USE_TEXTURE)
   {
-    m_SurfaceMaterial->m_GrayLut->SetWindow(sr[1]-sr[0]);
-    m_SurfaceMaterial->m_GrayLut->SetLevel((sr[1]+sr[0])*.5);
-    m_Texture->SetLookupTable((vtkLookupTable *)m_SurfaceMaterial->m_GrayLut);
-    m_Texture->MapColorScalarsThroughLookupTableOn();
+    m_UseLookupTable = 1;
+    lutPreset(4,m_SurfaceMaterial->m_ColorLut);
+    m_Texture->SetLookupTable(m_SurfaceMaterial->m_ColorLut);
     m_Actor->SetTexture(m_Texture);
   }
 
@@ -259,30 +259,6 @@ void mafPipeSurface::Select(bool sel)
 void mafPipeSurface::UpdateProperty(bool fromTag)
 //----------------------------------------------------------------------------
 {
-	/*
-	if(fromTag)
-  {
-		((mafVmeData *)m_Vme->GetClientData())->UpdateFromTag();
-    int idx = m_Vme->GetTagArray()->FindTag("VME_CENTER_ROTATION_POSE");
-    vtkTagItem *item = NULL;
-    double vec[16];
-    if (idx != -1)
-    {
-      item = m_Vme->GetTagArray()->GetTag(idx);
-      mflSmartPointer<vtkMatrix4x4> pose;
-      for (int el=0;el<16;el++)
-      {
-        vec[el] = item->GetValueAsDouble(el);
-      }
-      pose->DeepCopy(vec);
-      m_axes->SetPose(pose);
-    }
-    else
-      m_axes->SetPose();
-  }
-  else
-	  m_Mapper->SetScalarVisibility(((mafVmeData *)m_Vme->GetClientData())->GetColorByScalar());
-	*/
 }
 //----------------------------------------------------------------------------
 mmgGui *mafPipeSurface::CreateGui()
@@ -293,19 +269,28 @@ mmgGui *mafPipeSurface::CreateGui()
 
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
+  m_Gui->Bool(ID_RENDERING_DISPLAY_LIST,"displaylist",&m_RenderingDisplayListFlag,0,"turn on/off \nrendering displaylist calculation");
   m_Gui->Bool(ID_SCALAR_VISIBILITY,"scalar vis.", &m_ScalarVisibility,0,"turn on/off the scalar visibility");
   m_Gui->Divider();
+  m_Gui->Bool(ID_USE_VTK_PROPERTY,"property",&m_UseVTKProperty);
   m_MaterialButton = new mmgMaterialButton(m_Vme,this);
   m_Gui->AddGui(m_MaterialButton->GetGui());
-  m_Gui->Bool(ID_RENDERING_DISPLAY_LIST,"displaylist",&m_RenderingDisplayListFlag,0,"turn on/off \nrendering displaylist calculation");
+  m_MaterialButton->Enable(m_UseVTKProperty != 0);
+  m_Gui->Divider();
+  m_Gui->Bool(ID_USE_TEXTURE,"texture",&m_UseTexture);
   m_Gui->Button(ID_CHOOSE_TEXTURE,"texture");
   mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
   m_Gui->Combo(ID_TEXTURE_MAPPING_MODE,"mapping",&surface_output->GetMaterial()->m_TextureMappingMode,3,mapping_mode);
-  m_Gui->Enable(ID_TEXTURE_MAPPING_MODE,surface_output->GetMaterial()->m_MaterialType == mmaMaterial::USE_TEXTURE);
-  m_Gui->Label("");
-  m_Gui->Bool(ID_USE_VTK_PROPERTY,"property",&m_UseVTKProperty);
-  m_Gui->Bool(ID_USE_TEXTURE,"texture",&m_UseTexture);
+  m_Gui->Enable(ID_CHOOSE_TEXTURE,m_UseTexture != 0);
+  m_Gui->Enable(ID_TEXTURE_MAPPING_MODE,m_UseTexture != 0);
+  m_Gui->Enable(ID_TEXTURE_MAPPING_MODE,m_SurfaceMaterial->m_MaterialType == mmaMaterial::USE_TEXTURE && m_UseTexture != 0);
+  m_Gui->Divider();
   m_Gui->Bool(ID_USE_LOOKUP_TABLE,"lut",&m_UseLookupTable);
+  double sr[2];
+  m_Mapper->GetScalarRange(sr);
+  m_SurfaceMaterial->m_ColorLut->SetTableRange(sr);
+  m_Gui->Lut(ID_LUT,"lut",m_SurfaceMaterial->m_ColorLut);
+  m_Gui->Enable(ID_LUT,m_UseLookupTable != 0);
   m_Gui->Divider(2);
   m_Gui->Bool(ID_ENABLE_LOD,"LOD",&m_EnableActorLOD);
   m_Gui->Label("");
@@ -342,6 +327,9 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       }
     	break;
+      case ID_LUT:
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+      break;
       case ID_ENABLE_LOD:
         m_Actor->SetEnableHighThreshold(m_EnableActorLOD);
         m_OutlineActor->SetEnableHighThreshold(m_EnableActorLOD);
@@ -356,9 +344,11 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
         {
           m_Actor->SetProperty(NULL);
         }
+        m_MaterialButton->Enable(m_UseVTKProperty != 0);
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
       case ID_USE_LOOKUP_TABLE:
+        m_Gui->Enable(ID_LUT,m_UseLookupTable != 0);
       break;
       case ID_USE_TEXTURE:
         if (m_UseTexture)
@@ -369,6 +359,9 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
         {
           m_Actor->SetTexture(NULL);
         }
+        m_Gui->Enable(ID_CHOOSE_TEXTURE,m_UseTexture != 0);
+        m_Gui->Enable(ID_TEXTURE_MAPPING_MODE,m_UseTexture != 0);
+        m_Gui->Enable(ID_TEXTURE_MAPPING_MODE,m_SurfaceMaterial->m_MaterialType == mmaMaterial::USE_TEXTURE && m_UseTexture != 0);
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
       case ID_CHOOSE_TEXTURE:
