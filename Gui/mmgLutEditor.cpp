@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-12 15:59:01 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-09-19 14:27:28 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -67,7 +67,7 @@ enum LUT_EDITOR_WIDGET_ID
 // mmgLutEditor
 //----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(mmgLutEditor,wxPanel)
-  EVT_COMBOBOX(ID_PRESET, mmgLutEditor::OnComboSelection)
+  //EVT_COMBOBOX(ID_PRESET, mmgLutEditor::OnComboSelection)
 END_EVENT_TABLE()
 
 //----------------------------------------------------------------------------
@@ -235,8 +235,10 @@ void mmgLutEditor::OnEvent( mafEventBase *event )
 	  {
       case ID_PRESET:
       {
-				//Paolo 30/01/2006
-				//code moved into OnComboSelection to avoid application stuck on preset selection
+        lutPreset( m_Preset, m_Lut);
+        m_NumEntry      = m_Lut->GetNumberOfTableValues();
+        m_LutWidget->SetLut(m_Lut);
+        m_LutSwatch->SetLut(m_Lut);
       }
       break; 
       case ID_NUMENTRY:
