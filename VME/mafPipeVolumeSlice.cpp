@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-15 09:13:02 $
-  Version:   $Revision: 1.33 $
+  Date:      $Date: 2006-09-19 09:47:16 $
+  Version:   $Revision: 1.34 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,11 +23,13 @@
 #include "mafDecl.h"
 #include "mmgGui.h"
 #include "mafSceneNode.h"
-#include "mafVMEVolume.h"
-#include "mafVMEOutputVolume.h"
-#include "mafTransformBase.h"
 #include "mmaVolumeMaterial.h"
 
+#include "mafTransformBase.h"
+#include "mafVMEVolume.h"
+#include "mafVMEOutputVolume.h"
+
+#include "mafLODActor.h"
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFAssembly.h"
 #include "vtkMath.h"
@@ -47,7 +49,6 @@
 #include "vtkTransform.h"
 #include "vtkRenderer.h"
 #include "vtkOutlineSource.h"
-#include "mafLODActor.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeVolumeSlice);
