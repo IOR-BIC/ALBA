@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTMRIImporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-28 14:41:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-09-19 08:35:40 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -83,6 +83,17 @@ public:
 
 	/** Create the dialog interface for the importer. */
   virtual void CreateGui();  
+
+	/** Set dictonary location*/
+	void SetDictonary(mafString dic);
+
+	/** Set directory of studies*/
+	void SetDirectory(mafString dir);
+
+	/** Operation wait the user interact with the dialog*/
+	void WaitUser();
+
+	void SetSender(mafOp *sender);
 
 protected:
 	/** Build the list of dicom filer recognized. */
@@ -172,6 +183,8 @@ protected:
 	wxTextCtrl   *m_TimeText;
 	wxSlider		 *m_TimeScanner;
 	wxStaticText *m_TimeLabel;
+
+	mafOp *m_Sender;
 };
 
 /*class mmoDICOMImporterListElement

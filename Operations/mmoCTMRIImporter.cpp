@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTMRIImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-28 14:41:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-09-19 08:35:47 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -72,6 +72,8 @@ mmoCTMRIImporter::mmoCTMRIImporter(wxString label) : mafOp(label)
 	m_OpType	= OPTYPE_IMPORTER;
 	m_Canundo	= true;
 
+	m_Sender = this;
+
 	for (int i = 0; i < 6; i++) 
 		m_DicomBounds[i] = 0;
 	m_Volume	= NULL;
@@ -134,6 +136,10 @@ mmoCTMRIImporter::mmoCTMRIImporter(wxString label) : mafOp(label)
 	m_GizmoStatus = GIZMO_NOT_EXIST;
 	m_SideToBeDragged = 0;
 }
+void mmoCTMRIImporter::SetSender(mafOp *sender)
+{
+	m_Sender=sender;
+}
 //----------------------------------------------------------------------------
 mmoCTMRIImporter::~mmoCTMRIImporter()
 //----------------------------------------------------------------------------
@@ -153,6 +159,7 @@ void mmoCTMRIImporter::OpRun()
 {
 	CreatePipeline();
 	CreateGui();
+	WaitUser();
 }
 //----------------------------------------------------------------------------
 void mmoCTMRIImporter::OpStop(int result)
@@ -187,7 +194,7 @@ void mmoCTMRIImporter::OpStop(int result)
 	cppDEL(m_DicomDialog);
 	cppDEL(m_FilesList);
 
-	mafEventMacro(mafEvent(this,result));
+	mafEventMacro(mafEvent(m_Sender,result));
 }
 //----------------------------------------------------------------------------
 void mmoCTMRIImporter::OpDo()
@@ -196,9 +203,9 @@ void mmoCTMRIImporter::OpDo()
 	//assert(m_Volume != NULL);
   //assert(m_Image != NULL);
   if(m_Image != NULL)
-	  mafEventMacro(mafEvent(this,VME_ADD,m_Image));
+	  mafEventMacro(mafEvent(m_Sender,VME_ADD,m_Image));
   if(m_Volume != NULL)
-    mafEventMacro(mafEvent(this,VME_ADD,m_Volume));
+    mafEventMacro(mafEvent(m_Sender,VME_ADD,m_Volume));
 
 }
 //----------------------------------------------------------------------------
@@ -208,9 +215,9 @@ void mmoCTMRIImporter::OpUndo()
 	//assert(m_Volume != NULL);
   //assert(m_Image != NULL);
   if(m_Image != NULL)
-	  mafEventMacro(mafEvent(this,VME_REMOVE,m_Image));
+	  mafEventMacro(mafEvent(m_Sender,VME_REMOVE,m_Image));
   if(m_Volume != NULL)
-    mafEventMacro(mafEvent(this,VME_REMOVE,m_Volume));
+    mafEventMacro(mafEvent(m_Sender,VME_REMOVE,m_Volume));
 }
 //----------------------------------------------------------------------------
 void mmoCTMRIImporter::CreatePipeline()
@@ -379,12 +386,6 @@ void mmoCTMRIImporter::CreateGui()
   int w,h;
   m_DicomDialog->GetSize(&w,&h);
   m_DicomDialog->SetSize(x_init+10,y_init+10,w,h);
-
-	m_DicomDialog->ShowModal();
-	int res = (m_DicomDialog->GetReturnCode() == wxID_OK) ? OP_RUN_OK : OP_RUN_CANCEL;
-
-	OpStop(res);
-	return;
 }
 //----------------------------------------------------------------------------
 void mmoCTMRIImporter::BuildDicomFileList(const char *dir)
@@ -1053,11 +1054,11 @@ void mmoCTMRIImporter::	OnEvent(mafEventBase *maf_event)
         ResetStructure();
         // scan dicom directory
         BuildDicomFileList(m_DICOMDir.GetCStr());
-        if(m_NumberOfStudy == 1)
+        /*if(m_NumberOfStudy == 1)
         {
           m_StudyListbox->SetSelection(0);
           OnEvent(&mafEvent(this, ID_STUDY));
-        }
+        }*/
       break;
       case ID_STUDY:
       {
@@ -1520,4 +1521,36 @@ int mmoCTMRIImporter::GetImageId(int timeId, int heigthId)
   }
 
   return (heigthId * cardiacNumberOfImages + timeId); 
+}
+//----------------------------------------------------------------------------
+void mmoCTMRIImporter::WaitUser()
+//----------------------------------------------------------------------------
+{
+	m_DicomDialog->ShowModal();
+	int res = (m_DicomDialog->GetReturnCode() == wxID_OK) ? OP_RUN_OK : OP_RUN_CANCEL;
+
+	OpStop(res);
+	return;
+}
+//----------------------------------------------------------------------------
+void mmoCTMRIImporter::SetDirectory(mafString dir)
+//----------------------------------------------------------------------------
+{
+	m_DICOMDir=dir;
+	if(m_Gui)
+	{
+		OnEvent(&mafEvent(m_Sender, ID_OPEN_DIR));
+		m_Gui->Update();
+	}
+}
+//----------------------------------------------------------------------------
+void mmoCTMRIImporter::SetDictonary(mafString dic)
+//----------------------------------------------------------------------------
+{
+	m_DictionaryFilename=dic;
+	if(m_Gui)
+	{
+		m_Gui->Enable(ID_OPEN_DIR,1);
+		m_Gui->Update();
+	}
 }
