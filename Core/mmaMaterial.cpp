@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:52:59 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-09-19 09:46:23 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -96,7 +96,7 @@ mmaMaterial::mmaMaterial()
   m_SaturationRange[1]  = 1;
   m_TableRange[0]       = 0.0;
   m_TableRange[1]       = 1.0;
-  m_NumValues           = 256;
+  m_NumValues           = 128;
 
   m_TextureID           = -1;
 
