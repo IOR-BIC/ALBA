@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-13 13:47:53 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-09-19 12:23:03 $
+  Version:   $Revision: 1.2 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,6 +28,7 @@ class mafGizmoRotate;
 class mafVMEVolumeGray;
 class mafVMESlicer;
 class mafMatrix;
+class mafAttachCamera;
 class mmgGui;
 
 //----------------------------------------------------------------------------
@@ -68,6 +69,8 @@ public:
 
 	virtual mafView* Copy(mafObserver *Listener);
 
+	virtual void CameraUpdate();
+
 protected:
 
 	void OnEventThis(mafEventBase *maf_event);  
@@ -90,6 +93,7 @@ protected:
 	mafVMEVolumeGray	*m_CurrentVolume;
 	mafVMESlicer			*m_Slicer;
 	mafMatrix					*m_MatrixReset;
+	mafAttachCamera		*m_AttachCamera;
 
 	vtkLookupTable    *m_vtkLUT;
 

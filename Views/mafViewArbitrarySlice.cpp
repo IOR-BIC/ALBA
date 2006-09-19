@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-19 11:02:13 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-09-19 12:23:09 $
+  Version:   $Revision: 1.6 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,6 +27,7 @@
 #include "mafTransform.h"
 #include "mafPipeVolumeSlice.h"
 #include "mafPipeSurfaceSlice.h"
+#include "mafPipeSurface.h"
 #include "mafVMEVolumeGray.h"
 #include "mafVMESurface.h"
 #include "mafGizmoTranslate.h"
@@ -43,6 +44,7 @@
 #include "mafNodeIterator.h"
 #include "mmgLutPreset.h"
 #include "mafVMEOutputSurface.h"
+#include "mafAttribute.h"
 
 #include "vtkTransform.h"
 #include "vtkLookupTable.h"
@@ -96,6 +98,7 @@ mafViewArbitrarySlice::mafViewArbitrarySlice(wxString label, bool show_ruler)
 	m_CurrentVolume = NULL;
 	m_Slicer = NULL;
 	m_GuiGizmos = NULL;
+	m_AttachCamera = NULL;
 
 	m_SliceCenterSurface[0] = 0.0;
 	m_SliceCenterSurface[1] = 0.0;
@@ -204,29 +207,22 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			m_ChildViewList[ARBITRARY_VIEW]->VmeShow(node, show);
 			m_ChildViewList[SLICE_VIEW]->VmeShow(node, show);
 
-			vtkNEW(m_vtkLUT);
-      m_vtkLUT->SetRange(sr);
-      m_vtkLUT->Build();
-      lutPreset(4,m_vtkLUT);
-
-			m_CurrentVolume->GetMaterial()->m_ColorLut=m_vtkLUT;
-			m_CurrentVolume->Update();
-
 			mafNEW(m_Slicer);
 			m_Slicer->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
 			m_Slicer->ReparentTo(mafVME::SafeDownCast(node));
 			m_Slicer->SetPose(m_SliceCenterSurfaceReset,m_SliceAngleReset,0);
 			m_Slicer->SetName("Slicer");
-			//m_Slicer->GetMaterial()->m_ColorLut=m_CurrentVolume->GetMaterial()->m_ColorLut;
-			((mafVMEOutputSurface*)m_Slicer->GetOutput())->GetTexture()->UpdateData();
-			m_Slicer->GetMaterial()->UpdateProp();
 			m_Slicer->SetAbsMatrix(*m_MatrixReset);
 			m_Slicer->Update();
 			double sr2[2];
-			m_Slicer->GetMaterial()->GetMaterialTexture()->GetScalarRange(sr2);
+			m_Slicer->GetSurfaceOutput()->GetVTKData()->GetScalarRange(sr2);
 			m_ChildViewList[ARBITRARY_VIEW]->VmeShow(m_Slicer, show);
 			m_ChildViewList[SLICE_VIEW]->VmeShow(m_Slicer, show);
-			//((mafViewVTK*)m_ChildViewList[SLICE_VIEW])->GetAttachCamera()->SetVme(m_Slicer);
+			;
+			//Set camera of slice viw in way that it will follow the volume
+			if(!m_AttachCamera)
+				m_AttachCamera=new mafAttachCamera(m_Gui,((mafViewVTK*)m_ChildViewList[SLICE_VIEW])->m_Rwi,this);
+			m_AttachCamera->SetVme(m_Slicer);
 			((mafViewVTK*)m_ChildViewList[SLICE_VIEW])->CameraReset(m_Slicer);
 
 			// create the gizmos
@@ -301,7 +297,7 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 		if(Vme->IsA("mafVMEVolumeGray"))
 		{
 			m_Slicer->ReparentTo(NULL);
-			//((mafViewVTK*)m_ChildViewList[SLICE_VIEW])->GetAttachCamera()->SetVme(NULL);
+			m_AttachCamera->SetVme(NULL);
 
 			//remove gizmos
 			m_Gui->Remove(m_GuiGizmos);
@@ -612,4 +608,15 @@ void mafViewArbitrarySlice::PostMultiplyEventMatrix(mafEventBase *maf_event)
     // clean up
     tr->Delete();
   }
+}
+//----------------------------------------------------------------------------
+void mafViewArbitrarySlice::CameraUpdate()
+//----------------------------------------------------------------------------
+{
+	if (m_AttachCamera != NULL)
+  {
+    m_AttachCamera->UpdateCameraMatrix();
+  }
+  for(int i=0; i<m_NumOfChildView; i++)
+    m_ChildViewList[i]->CameraUpdate();
 }
