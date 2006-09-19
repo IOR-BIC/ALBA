@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-28 16:32:59 $
-  Version:   $Revision: 1.45 $
+  Date:      $Date: 2006-09-19 10:21:22 $
+  Version:   $Revision: 1.46 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -61,17 +61,15 @@ public:
     ID_LAST
   };*/
 
-  /** 
-  Add the vme to the view's scene-graph*/
+  /** Add the vme to the view's scene-graph*/
   virtual void VmeAdd(mafNode *vme);
-  /** 
-  Remove the vme from the view's scene-graph*/
+  
+  /** Remove the vme from the view's scene-graph*/
   virtual void VmeRemove(mafNode *vme);
 
   virtual void VmeSelect(mafNode *vme, bool select);
 
-  /** 
-  Called to show/hide vme*/
+  /** Called to show/hide vme*/
   virtual void VmeShow(mafNode *vme, bool show);
 
   /** 
@@ -82,6 +80,7 @@ public:
   /** 
   Set the visualization status for the node (visible, not visible, mutex, ...) \sa mafSceneGraph*/
   virtual int GetNodeStatus(mafNode *vme);
+  
   /** 
   Return a pointer to the visual pipe of the node passed as argument. 
   It is used in mafSideBar to plug the visual pipe's GUI in the tabbed vme panel. \sa mafSideBar*/
@@ -92,8 +91,8 @@ public:
   To create visual pipe first check in m_PipeMap if custom visual pipe is defined, 
   otherwise ask to vme which is its visual pipe. */
   virtual void VmeCreatePipe(mafNode *vme);
-  /** 
-  Delete vme's visual pipe. It is called when vme is removed from visualization.*/
+  
+  /** Delete vme's visual pipe. It is called when vme is removed from visualization.*/
   virtual void VmeDeletePipe(mafNode *vme);
 
   /** Called to update all components that depends on Application Options.*/
@@ -106,8 +105,7 @@ public:
   virtual mafSceneGraph *GetSceneGraph()	  {return m_Sg;}; 
   virtual mafRWIBase    *GetRWI()           {return m_Rwi->m_RwiBase;};
 
-  /** 
-  Return a pointer to the image of the renderwindow.*/
+  /** Return a pointer to the image of the renderwindow.*/
   void GetImage(wxBitmap &bmp, int magnification = 1);
 
   virtual vtkRenderer     *GetFrontRenderer();
@@ -120,16 +118,13 @@ public:
   to piked prop, vme and its behavior if it exists. */
   virtual bool FindPokedVme(mafDevice *device,mafMatrix &point_pose,vtkProp3D *&picked_prop,mafVME *&picked_vme,mafInteractor *&picked_behavior);
 
-  /** 
-  Perform a picking according to the screen position (x,y) and return true on success*/
+  /** Perform a picking according to the screen position (x,y) and return true on success*/
   virtual bool Pick(int x, int y);
 
-  /** 
-  Perform a picking according to the absolute matrix given and return true on success*/
+  /** Perform a picking according to the absolute matrix given and return true on success*/
   virtual bool Pick(mafMatrix &m);
 
-	/** 
-    Set the vtk RenderWindow size. Used only for Linux (not necessary for Windows) */
+	/** Set the vtk RenderWindow size. Used only for Linux (not necessary for Windows) */
   void SetWindowSize(int w, int h);
 
   /** Struct containing information regarding visual pipe plugged into the view. */
@@ -140,25 +135,23 @@ public:
   };
   typedef std::map<mafString, mafVisualPipeInfo> mafPipeMap;
 
-  /** 
-    Plug a visual pipe for a particular vme. It is used also to plug custom pipe.*/
+  /** Plug a visual pipe for a particular vme. It is used also to plug custom pipe.*/
   void PlugVisualPipe(mafString vme_type, mafString pipe_type, long visibility = VISIBLE);
 
   mafPipeMap m_PipeMap; ///< Map used to store visual pipeline associated with vme types
 
-  /** 
-    Set the mouse device to use inside the view */
+  /** Set the mouse device to use inside the view */
   void SetMouse(mmdMouse *mouse);
 
-  /** 
-  Print this view.*/
+  /** Print this view.*/
   virtual void Print(wxDC *dc, wxRect margins);
 
   /** Allow to link the camera of the view to other cameras.*/
   virtual void LinkView(bool link_camera = true);
 
+  mafRWI *m_Rwi;
+
 protected:
-  mafRWI        *m_Rwi; 
   mafSceneGraph *m_Sg;
   mafLightKit		*m_LightKit;
   mafTextKit    *m_TextKit;
@@ -167,7 +160,7 @@ protected:
 
   int   m_CameraPosition; 
   int   m_NumberOfVisibleVme; ///< perform ResetCamera only for the first vme shown into the view
-  bool  m_ShowAxes;  ///< Flag used to show/hide axes in low left cornel of the view
+  bool  m_ShowAxes;  ///< Flag used to show/hide axes in low left corner of the view
   int   m_StereoType; ///< Indicate the stereo type to use with the view
   bool  m_ShowRuler;
   bool  m_ShowGrid;
@@ -177,8 +170,7 @@ protected:
   virtual void OnPreResetCamera();
   virtual void OnPostResetCamera();
 
-  /** 
-  Return the visual pipe's name.*/
+  /** Return the visual pipe's name.*/
   void GetVisualPipeName(mafNode *node, mafString &pipe_name);
 };
 #endif
