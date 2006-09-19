@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix3x3.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:52:50 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-09-19 15:28:57 $
+  Version:   $Revision: 1.6 $
   Authors:   Based on vtkMath code (www.vtk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -29,7 +29,7 @@ class MAF_EXPORT mafMatrix3x3: public mafObject, public mafTimeStamped
 {
 public:
   mafTypeMacro(mafMatrix3x3,mafObject);
-  virtual void mafMatrix3x3::Print (std::ostream& os, const int indent=0) const;
+  virtual void Print (std::ostream& os, const int indent=0) const;
 
   mafMatrix3x3();
   virtual ~mafMatrix3x3();
@@ -80,7 +80,7 @@ public:
 
   /** Set equal to Identity matrix */
   void Identity() { mafMatrix3x3::Identity(GetElements()); Modified();}
-  static void mafMatrix3x3::Identity(double A[3][3]);
+  static void Identity(double A[3][3]);
 
   /** Transpose the 3x3 matrix.*/
   static void Transpose(const double A[3][3], double AT[3][3]);
@@ -115,11 +115,11 @@ public:
   /** Compute the determinant of the matrix and return it.*/
   double Determinant() {return Determinant(GetElements());}
 
-  static inline double mafMatrix3x3::Determinant(const double c1[3], 
+  static inline double Determinant(const double c1[3], 
                                       const double c2[3], 
                                       const double c3[3]);
 
-  static inline double mafMatrix3x3::Determinant(double a1, double a2, double a3, 
+  static inline double Determinant(double a1, double a2, double a3, 
                                       double b1, double b2, double b3, 
                                       double c1, double c2, double c3);
   

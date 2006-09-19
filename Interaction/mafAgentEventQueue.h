@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAgentEventQueue.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-07 08:22:03 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-09-19 15:29:17 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -80,8 +80,7 @@ public:
 
   mafTypeMacro(mafAgentEventQueue,mafAgent);
 
-  /**
-  Push an event in the queue (FIFO)*/
+  /** Push an event in the queue (FIFO)*/
   int PushEvent(mafEventBase &event) {return PushEvent(&event);}
   virtual int PushEvent(mafEventBase *event);
   int PushEvent(mafID event_id, void *sender, void *data=NULL);
@@ -90,20 +89,16 @@ public:
   return the first event in the queue (FIFO)*/
   mafEventBase *PeekEvent();
   
-  /**
-  return the last event in the queue (FIFO)*/
+  /** return the last event in the queue (FIFO)*/
   mafEventBase *PeekLastEvent();
 
-  /**
-  Return event queue size*/
-  int mafAgentEventQueue::GetQueueSize();
+  /** Return event queue size*/
+  int GetQueueSize();
 
-  /**
-  return false if there are events in the queue*/
+  /** return false if there are events in the queue*/
   bool IsQueueEmpty() {return this->GetQueueSize()==0;}
 
-  /**
-  Dispatch events in queue; */
+  /** Dispatch events in queue; */
   virtual bool DispatchEvents(); 
 
   /**

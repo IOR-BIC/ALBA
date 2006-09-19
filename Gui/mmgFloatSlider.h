@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgFloatSlider.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 09:51:06 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-09-19 15:29:11 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,14 +36,14 @@ class mmgFloatSlider: public FLOAT_SLIDER_PARENT
     DECLARE_DYNAMIC_CLASS(mmgFloatSlider)
 public:
 	
-  mmgFloatSlider::mmgFloatSlider( wxWindow *parent=NULL, 
-																	wxWindowID id=-1, 
-																	const double &value=0, 
-																	const double &minvalue=0, 
-																	const double &maxvalue=1,
-																	const wxPoint &position=wxDefaultPosition, 
-																	const wxSize& size=wxDefaultSize, 
-																	long style=wxSL_HORIZONTAL );
+  mmgFloatSlider( wxWindow *parent=NULL, 
+									wxWindowID id=-1, 
+									const double &value=0, 
+									const double &minvalue=0, 
+									const double &maxvalue=1,
+									const wxPoint &position=wxDefaultPosition, 
+									const wxSize& size=wxDefaultSize, 
+									long style=wxSL_HORIZONTAL );
   ~mmgFloatSlider();
   
   /** Set the slider value. */

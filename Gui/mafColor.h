@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafColor.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 15:22:05 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-09-19 15:29:11 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -40,13 +40,13 @@ class mafColor
 {
   public:
   /** default ctor*/
-  mafColor::mafColor();
+  mafColor();
   /** ctor accepting an integer RGBA */
-  mafColor::mafColor( int r, int g, int b, int a=0 ); 
+  mafColor( int r, int g, int b, int a=0 ); 
   /** ctor accepting an vtk color */
-  mafColor::mafColor( double *vtkRGBA ); 
+  mafColor( double *vtkRGBA ); 
   /** ctor accepting an wxColour */
-  mafColor::mafColor( wxColour col ); 
+  mafColor( wxColour col ); 
 
   /** Set using wxColour */ 
   void     Set( wxColour col );
