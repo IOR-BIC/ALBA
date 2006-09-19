@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-19 08:48:05 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2006-09-19 09:53:57 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -53,10 +53,6 @@ mafVMESlicer::mafVMESlicer()
   output->SetTransform(m_Transform); // force my transform in the output
   SetOutput(output);
 
-  // attach a datapipe which creates a bridge between VTK and MAF
-  mafDataPipeCustom *dpipe=mafDataPipeCustom::New();
-  SetDataPipe(dpipe);
-
   m_TextureRes = 256;
   m_Xspc = m_Yspc = 0.3;
 
@@ -76,6 +72,11 @@ mafVMESlicer::mafVMESlicer()
   vtkMAFSmartPointer<vtkTransformPolyDataFilter> back_trans;
   back_trans->SetInput(slice);
   back_trans->SetTransform(GetOutput()->GetTransform()->GetVTKTransform()->GetInverse());
+
+  // attach a datapipe which creates a bridge between VTK and MAF
+  mafDataPipeCustom *dpipe = mafDataPipeCustom::New();
+  dpipe->SetDependOnAbsPose(true);
+  SetDataPipe(dpipe);
 
   dpipe->SetInput(back_trans->GetOutput());
   dpipe->SetNthInput(1,image);
@@ -176,11 +177,9 @@ void mafVMESlicer::InternalPreUpdate()
       double pos[3];
       float vectX[3],vectY[3], n[3];
 
-      mafTransform trans;
-      trans.SetMatrix(*(GetOutput()->GetMatrix()));
-      trans.GetPosition(pos);
-      trans.GetVersor(0, vectX);
-      trans.GetVersor(1, vectY);
+      m_Transform->GetPosition(pos);
+      m_Transform->GetVersor(0, vectX);
+      m_Transform->GetVersor(1, vectY);
 
       vtkMath::Normalize(vectX);
       vtkMath::Normalize(vectY);
@@ -189,10 +188,7 @@ void mafVMESlicer::InternalPreUpdate()
       vtkMath::Cross(n, vectX, vectY);
       vtkMath::Normalize(vectY);
 
-      if (vtkdata->IsA("vtkRectilinearGrid"))
-      {
-        vtkdata->Update();
-      }
+      vtkdata->Update();
 
       vtkImageData *texture = m_PSlicer->GetTexture();
       texture->SetScalarType(vtkdata->GetPointData()->GetScalars()->GetDataType());
@@ -221,16 +217,8 @@ void mafVMESlicer::InternalUpdate()
   {
     if (vtkDataSet *vtkdata=vol->GetOutput()->GetVTKData())
     {
-      // set filter windowing, must do it here after updating 
-      // the input. Note: this is executed before the Execute of
-      // the VTK pipe, so before the vtkVolumeSlicer computes
-      // its output data.
-      double srange[2],w,l;
-      vtkdata->GetScalarRange(srange);
-      w = srange[1] - srange[0];
-      l = (srange[1] + srange[0]) * 0.5;
-      //m_ISlicer->SetWindow(w);
-      //m_ISlicer->SetLevel(l);
+      m_PSlicer->Update();
+      m_ISlicer->Update();
     }
   }
 }
