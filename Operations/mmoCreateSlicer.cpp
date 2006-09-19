@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-18 10:26:47 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-09-19 09:45:24 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -71,11 +71,10 @@ void mmoCreateSlicer::OpDo()
 //----------------------------------------------------------------------------
 {
   m_Slicer->ReparentTo(mafVME::SafeDownCast(m_Input));
-  double b[6], center[3], rot[3];
+  double center[3], rot[3];
+  mafOBB b;
   rot[0] = rot[1] = rot[2] = 0;
-  ((mafVME *)m_Input)->GetOutput()->GetBounds(b);
-  center[0] = (b[0]+b[1]) * 0.5;
-  center[1] = (b[2]+b[3]) * 0.5;
-  center[2] = (b[4]+b[5]) * 0.5;
+  ((mafVME *)m_Input)->GetOutput()->GetVMELocalBounds(b);
+  b.GetCenter(center);
   m_Slicer->SetPose(center,rot,0);
 }
