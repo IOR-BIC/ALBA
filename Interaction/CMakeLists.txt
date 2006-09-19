@@ -142,13 +142,11 @@ SET(PROJECT_SRCS
 )
 
 ## SIL == removed under Linux - since it requires mafDrivers - which seems to be Win32 only
-IF(WIN32)
-  SET(PROJECT_SRCS
+SET(PROJECT_SRCS
   ${PROJECT_SRCS}
   mmdClientMAF.cpp
   mmdClientMAF.h
   )
-ENDIF(WIN32)
 
 
 IF (MAF_USE_P5_GLOVE)
