@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-18 16:44:20 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2006-09-19 08:48:05 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -256,6 +256,7 @@ int mafVMESlicer::InternalRestore(mafStorageElement *node)
     if (node->RestoreMatrix("Transform",&matrix)==MAF_OK)
     {
       m_Transform->SetMatrix(matrix);
+      GetMaterial()->SetMaterialTexture(GetSurfaceOutput()->GetTexture());
       return MAF_OK;
     }
   }
