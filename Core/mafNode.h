@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:41 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2006-09-20 14:59:27 $
+  Version:   $Revision: 1.31 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -229,7 +229,7 @@ public:
   mafNodeIterator *NewIterator();
 
   /**
-    Set/Get the flag to make this VME visible to tree traversal. mflVMEIterator, 
+    Set/Get the flag to make this VME visible to tree traversal. mafVMEIterator,
     GetSpaceBounds and Get4DBounds will skip this VME if the flag is OFF.*/
   void SetVisibleToTraverse(bool flag) {m_VisibleToTraverse=flag;}
   bool GetVisibleToTraverse() {return m_VisibleToTraverse;}
