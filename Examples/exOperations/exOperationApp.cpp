@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-08 14:10:15 $
-  Version:   $Revision: 1.42 $
+  Date:      $Date: 2006-09-20 09:13:14 $
+  Version:   $Revision: 1.43 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -42,6 +42,8 @@
 #include "mmoCreateProber.h"
 #include "mmoCreateRefSys.h"
 #include "mmoCreateSlicer.h"
+#include "mmoCrop.h"
+#include "mmoEditMetadata.h"
 #include "mmoExplodeCollapse.h"
 #include "mmoExtractIsosurface.h"
 #include "mmoFilterSurface.h"
@@ -65,6 +67,7 @@
 
 #include "mafViewVTK.h"
 #include "mafViewCompound.h"
+//#include "mafViewPlot.h"
 
 //--------------------------------------------------------------------------------
 // Create the Application
@@ -85,17 +88,18 @@ bool exOperationApp::OnInit()
   assert(result==MAF_OK);
 
   m_Logic = new mafLogicWithManagers();
+  m_Logic->GetTopWin()->SetTitle("Operations example");
+
   //m_Logic->PlugTimebar(false);
   //m_Logic->PlugMenu(false);
   //m_Logic->PlugToolbar(false);
   //m_Logic->PlugLogbar(false);
-  //m_Logic->PlugSidebar(false);
+  //m_Logic->PlugSidebar(true, mafSideBar::SINGLE_NOTEBOOK);
   //m_Logic->PlugOpManager(false);
   //m_Logic->PlugViewManager(false);
   //m_Logic->PlugVMEManager(false);  // the VmeManager at the moment cause 4 leaks of 200+32+24+56 bytes  //SIL. 20-4-2005: 
   m_Logic->Configure();
 
-  m_Logic->GetTopWin()->SetTitle("Operations example");
   SetTopWindow(mafGetFrame());  
 
   //------------------------------------------------------------
@@ -131,6 +135,7 @@ bool exOperationApp::OnInit()
   m_Logic->Plug(new mmoCreateRefSys("RefSys"),"Create");
   m_Logic->Plug(new mmoCreateProber("Prober"),"Create");
   m_Logic->Plug(new mmoCreateSlicer("Slicer"),"Create");
+  m_Logic->Plug(new mmoEditMetadata("Metadata Editor"));
   m_Logic->Plug(new mmoExplodeCollapse("Explode/Collapse cloud"));
   m_Logic->Plug(new mmoExtractIsosurface("Extract Isosurface"));
   m_Logic->Plug(new mmoFilterSurface("Surface"),"Filter");
@@ -138,6 +143,7 @@ bool exOperationApp::OnInit()
   m_Logic->Plug(new mmoMAFTransform("Transform  \tCtrl+T"));
   m_Logic->Plug(new mmoReparentTo("Reparent to...  \tCtrl+R"));
   m_Logic->Plug(new mmoVolumeResample("Resample Volume"));
+  m_Logic->Plug(new mmoCrop("Crop Volume"));
   //------------------------------------------------------------
   
   //------------------------------------------------------------
@@ -154,6 +160,7 @@ bool exOperationApp::OnInit()
   mafViewVTK *viso = new mafViewVTK("Isosurface view");
   viso->PlugVisualPipe("mafVMEVolumeGray", "mafPipeIsosurface",MUTEX);
   m_Logic->Plug(viso);
+  //m_Logic->Plug(new mafViewPlot("Plot view"));
 
   mafViewCompound *vc = new mafViewCompound("view compound",3);
   mafViewVTK *v2 = new mafViewVTK("Slice view", CAMERA_CT);
