@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTMRIImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-19 08:35:47 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-09-20 14:48:58 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -90,7 +90,7 @@ mmoCTMRIImporter::mmoCTMRIImporter(wxString label) : mafOp(label)
 
   m_DictionaryFilename	= "";
   wxString dictionary = mafGetApplicationDirectory().c_str();
-//  dictionary += "\\Config\\Dictionary\\";
+  dictionary += "\\Config\\Dictionary\\";
 	dictionary.Append("dicom3.dic");
 	if(wxFileExists(dictionary)) 
 		m_DictionaryFilename = dictionary;
