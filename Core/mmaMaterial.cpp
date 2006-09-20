@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-19 09:46:23 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-09-20 14:59:52 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,12 +27,13 @@
 #include "mmaMaterial.h"
 #include "mafDecl.h"
 #include "mafEvent.h"
-#include "vtkMAFSmartPointer.h"
+#include "mmgLutPreset.h"
+
 #include "mafStorageElement.h"
 #include "mafIndent.h"
-
 #include "mafNode.h"
 
+#include "vtkMAFSmartPointer.h"
 #include "vtkProperty.h"
 #include "vtkTransferFunction2D.h"
 #include "vtkTexturedSphereSource.h"
@@ -47,7 +48,6 @@
 #include "vtkLight.h"
 #include "vtkImageExport.h"
 #include "vtkLookupTable.h"
-#include "vtkWindowLevelLookupTable.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mmaMaterial)
@@ -62,8 +62,8 @@ mmaMaterial::mmaMaterial()
   m_Name        = "MaterialAttributes";
   m_MaterialName= "new material";
   vtkNEW(m_ColorLut);
-  vtkNEW(m_GrayLut);
   vtkNEW(m_Prop);
+  lutPreset(4,m_ColorLut);
   m_VolumeProp  = NULL;
   m_Icon        = NULL;
   m_TextureImage= NULL;
@@ -88,8 +88,6 @@ mmaMaterial::mmaMaterial()
   m_Opacity          = 1.0;
   m_Representation   = 2.0;
 
-  m_Level_LUT           = 0.5;
-  m_Window_LUT          = 1.0;
   m_HueRange[0]         = 0.0;
   m_HueRange[1]         = 0.6667;
   m_SaturationRange[0]  = 0;
@@ -107,7 +105,6 @@ mmaMaterial::~mmaMaterial()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_ColorLut);
-  vtkDEL(m_GrayLut);
 	vtkDEL(m_Prop); 
   vtkDEL(m_VolumeProp); 
 	cppDEL(m_Icon);
@@ -240,8 +237,6 @@ void mmaMaterial::DeepCopy(const mafAttribute *a)
   m_TextureID           = ((mmaMaterial *)a)->m_TextureID;
   m_TextureMappingMode  = ((mmaMaterial *)a)->m_TextureMappingMode;
   // lut
-  m_Level_LUT           = ((mmaMaterial *)a)->m_Level_LUT;
-  m_Window_LUT          = ((mmaMaterial *)a)->m_Window_LUT;
   m_HueRange[0]         = ((mmaMaterial *)a)->m_HueRange[0];
   m_HueRange[1]         = ((mmaMaterial *)a)->m_HueRange[1];
   m_SaturationRange[0]  = ((mmaMaterial *)a)->m_SaturationRange[0];
@@ -275,8 +270,6 @@ bool mmaMaterial::Equals(const mafAttribute *a)
       m_SpecularPower       == ((mmaMaterial *)a)->m_SpecularPower      &&
       m_Opacity             == ((mmaMaterial *)a)->m_Opacity            &&
       m_TextureID           == ((mmaMaterial *)a)->m_TextureID          &&
-      m_Level_LUT           == ((mmaMaterial *)a)->m_Level_LUT          &&
-      m_Window_LUT          == ((mmaMaterial *)a)->m_Window_LUT         &&
       m_HueRange[0]         == ((mmaMaterial *)a)->m_HueRange[0]        &&
       m_HueRange[1]         == ((mmaMaterial *)a)->m_HueRange[1]        &&
       m_SaturationRange[0]  == ((mmaMaterial *)a)->m_SaturationRange[0] &&
@@ -317,8 +310,6 @@ int mmaMaterial::InternalStore(mafStorageElement *parent)
     if (m_MaterialType == USE_LOOKUPTABLE)
     {
       // lut
-      parent->StoreDouble("Level_LUT", m_Level_LUT);
-      parent->StoreDouble("Window_LUT", m_Window_LUT);
       parent->StoreDouble("HueRange0", m_HueRange[0]);
       parent->StoreDouble("HueRange1", m_HueRange[1]);
       parent->StoreDouble("SaturationRange0", m_SaturationRange[0]);
@@ -374,8 +365,6 @@ int mmaMaterial::InternalRestore(mafStorageElement *node)
     if (m_MaterialType == USE_LOOKUPTABLE)
     {
       // lut
-      node->RestoreDouble("Level_LUT", m_Level_LUT);
-      node->RestoreDouble("Window_LUT", m_Window_LUT);
       node->RestoreDouble("HueRange0", m_HueRange[0]);
       node->RestoreDouble("HueRange1", m_HueRange[1]);
       node->RestoreDouble("SaturationRange0", m_SaturationRange[0]);
@@ -419,10 +408,6 @@ void mmaMaterial::UpdateProp()
   m_Prop->SetOpacity(m_Opacity);
   m_Prop->SetRepresentation((int)m_Representation);
   m_Prop->Modified();
-
-  m_GrayLut->SetLevel(m_Level_LUT);
-  m_GrayLut->SetWindow(m_Window_LUT);
-  m_GrayLut->Build();
 
   m_ColorLut->SetHueRange(m_HueRange);
   m_ColorLut->SetSaturationRange(m_SaturationRange);

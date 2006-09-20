@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:52:59 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-09-20 14:59:52 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,7 +24,6 @@
 class vtkProperty;
 class vtkVolumeProperty2;
 class vtkLookupTable;
-class vtkWindowLevelLookupTable;
 class vtkImageData;
 
 //----------------------------------------------------------------------------
@@ -83,7 +82,6 @@ public:
   vtkProperty        *m_Prop;
   vtkVolumeProperty2 *m_VolumeProp;
   vtkLookupTable     *m_ColorLut;
-  vtkWindowLevelLookupTable *m_GrayLut;
 
   mafString m_MaterialName;
   wxBitmap *m_Icon;
@@ -98,8 +96,6 @@ public:
   double    m_Opacity;
   double    m_Representation;
 
-  double    m_Level_LUT;
-  double    m_Window_LUT;
   double    m_HueRange[2];
   double    m_SaturationRange[2];
   double    m_TableRange[2];
