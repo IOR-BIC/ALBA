@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewHTML.h,v $
   Language:  C++
-  Date:      $Date: 2006-04-24 08:14:55 $
-  Version:   $Revision: 1.2 $
-  Authors:   Paolo Quadrani
+  Date:      $Date: 2006-09-20 12:20:30 $
+  Version:   $Revision: 1.3 $
+  Authors:   Paolo Quadrani    Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -13,82 +13,65 @@
 #ifndef __mafViewHTML_H__
 #define __mafViewHTML_H__
 
-//----------------------------------------------------------------------------
-// Include:
-//----------------------------------------------------------------------------
+
 #include "mafView.h"
 
 //----------------------------------------------------------------------------
-// forward references :
+// forward references
 //----------------------------------------------------------------------------
-class mafVME;
-class wxMozillaBrowser;
-
+class mafRWI;
+class mafSceneGraph;
+class mafSceneGraph;
+class mmgCheckListBox;
+class wxHtmlWindow;
 //----------------------------------------------------------------------------
 // mafViewHTML :
 //----------------------------------------------------------------------------
-/** 
-mafViewHTML is a View that build a web browser using wxMozilla
-*/
+/**   */
 class mafViewHTML: public mafView
 {
 public:
-  mafViewHTML(wxString label = "htmlView", bool external = false);
-  virtual ~mafViewHTML(); 
+	          mafViewHTML(wxString label = "vtkViewHTML", int camera_position = CAMERA_PERSPECTIVE, bool show_axes = true, bool show_grid = false, int stereo = 0);
+	virtual	 ~mafViewHTML();
 
   mafTypeMacro(mafViewHTML, mafView);
 
-  virtual mafView*  Copy(mafObserver *Listener);
-  virtual void      Create();
-  virtual void			OnEvent(mafEventBase *maf_event);
+	mafView				*Copy(mafObserver *Listener = NULL);
+  void           Create();
+	mafSceneGraph *GetSceneGraph();
+  mafRWIBase    *GetDefaultRWI();
 
-  /** 
-  Add the vme to the view's scene-graph*/
-  virtual void VmeAdd(mafNode *vme);
-  /** 
-  Remove the vme from the view's scene-graph*/
-  virtual void VmeRemove(mafNode *vme);
+  void VmeAdd   (mafNode *vme);
+	void VmeRemove(mafNode *vme);
+	void VmeSelect(mafNode *vme, bool select);
+	void VmeShow  (mafNode *vme, bool show);
+	void VmeUpdateProperty(mafNode*n, bool fromTag = false) 	{};
+  void VmeCreatePipe(mafNode *vme);
+  void VmeDeletePipe(mafNode *vme)                           {};
 
-  virtual void VmeSelect(mafNode *vme, bool select);
+	void OnEvent(mafEventBase *maf_event);
 
-  /** 
-  Called to show/hide vme*/
-  virtual void VmeShow(mafNode *vme, bool show);
-
-  /** 
-  Called to update visual pipe properties of the vme passed as argument. If the 'fromTag' flag is true,
-  the update is done by reading the visual parameters from tags.*/
-  virtual void VmeUpdateProperty(mafNode *vme, bool fromTag = false);
-
-  /** 
-  Set the visualization status for the node (visible, not visible, mutex, ...) \sa mafSceneGraph*/
-  virtual int GetNodeStatus(mafNode *vme);
-  
-  /** 
-  Create the visual pipe for the node passed as argument. 
-  To create visual pipe first check in m_PipeMap if custom visual pipe is defined, 
-  otherwise ask to vme which is its visual pipe. */
-  virtual void VmeCreatePipe(mafNode *vme);
-
-  /** 
-  Delete vme's visual pipe. It is called when vme is removed from visualization.*/
-  virtual void VmeDeletePipe(mafNode *vme);
-
-	/** 
-    Set the vtk RenderWindow size. Used only for Linux (not necessary for Windows) */
-  void SetWindowSize(int w, int h);
-
-  /** 
-    Set the mouse device to use inside the view */
-  void SetMouse(mmdMouse *mouse);
+    /** IDs for the GUI */
+  enum VIEW_HTML_WIDGET_ID
+  {
+	  ID_LOAD = MINID,
+	  ID_FORWARD,
+	  ID_BACK,
+    ID_URL,
+  };
 
 protected:
-  virtual mmgGui *CreateGui();
+  mafRWI	      *m_Rwi;
+  mafSceneGraph *m_Sg;
+  mafNode        *m_ActiveNote;
 
-  wxMozillaBrowser *m_MozillaBrowser;
+  void  OnLoad();
+  void  OnForward();
+  void  OnBack();
+  
+	mmgGui *CreateGui();
 
-  /** 
-  Return the visual pipe's name.*/
-  void GetVisualPipeName(mafNode *node, mafString &pipe_name);
+  wxHtmlWindow *m_Html;
+  wxString m_Url;
 };
 #endif
