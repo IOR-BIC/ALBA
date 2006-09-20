@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-08 14:35:05 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-09-20 12:24:21 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,6 +22,7 @@
 
 #include "mafVersion.h"
 
+#include "mafVMEExternalData.h"
 #include "mafVMEGeneric.h"
 #include "mafVMEGizmo.h"
 #include "mafVMEGroup.h"
@@ -99,6 +100,7 @@ mafVMEFactory::mafVMEFactory()
   mafPlugObjectMacro(mmaVolumeMaterial,"Volume material attributes");
   
   mafPlugNodeMacro(mafVMERoot,"root for VME tree");
+  mafPlugNodeMacro(mafVMEExternalData,"VME used for referencing MAF external data.");
   mafPlugNodeMacro(mafVMEGroup,"VME used for composing assemblies");
   mafPlugNodeMacro(mafVMEGeneric,"Generic VME storing VTK datasets");
   mafPlugNodeMacro(mafVMEImage,"Generic VME storing vtkImageData datasets");

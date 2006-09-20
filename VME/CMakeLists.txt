@@ -18,6 +18,8 @@ SET(PROJECT_SRCS
   mafMatrixVector.h
   mafPipeFactoryVME.cpp
   mafPipeFactoryVME.h
+  mafVMEExternalData.cpp
+  mafVMEExternalData.h
   mafVMEFactory.cpp
   mafVMEFactory.h
   mafVMEGenericAbstract.cpp
