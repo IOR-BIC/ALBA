@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-08 14:06:34 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-09-20 15:35:37 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -101,12 +101,12 @@ mmgGui* mafVMEOutputVolume::CreateGui()
   }
   mafString vtk_data_type;
   vtk_data_type << this->GetVTKData()->GetClassName();
-  m_Gui->Label("vtk type: ", vtk_data_type, true);
-  m_Gui->Label(" bounds: ",true);
+  m_Gui->Label(_("vtk type: "), vtk_data_type, true);
+  m_Gui->Label(_(" bounds: "),true);
   m_Gui->Label(&m_VolumeBounds[0]);
   m_Gui->Label(&m_VolumeBounds[1]);
   m_Gui->Label(&m_VolumeBounds[2]);
-  m_Gui->Label("scalar range:",true);
+  m_Gui->Label(_("scalar range:"),true);
   m_Gui->Label(&m_ScaralRangeString);
   return m_Gui;
 }

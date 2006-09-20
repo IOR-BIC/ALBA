@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2006-09-07 09:52:14 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2006-09-20 15:35:37 $
+Version:   $Revision: 1.10 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -170,8 +170,8 @@ mmgGui *mafPipeIsosurface::CreateGui()
 
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
-	m_ContourSlider = m_Gui->FloatSlider(ID_CONTOUR_VALUE,"contour", &m_ContourValue,range[0],range[1]);
-  m_AlphaSlider = m_Gui->FloatSlider(ID_ALPHA_VALUE,"alpha", &m_AlphaValue,0.0,1.0);
+	m_ContourSlider = m_Gui->FloatSlider(ID_CONTOUR_VALUE,_("contour"), &m_ContourValue,range[0],range[1]);
+  m_AlphaSlider = m_Gui->FloatSlider(ID_ALPHA_VALUE,_("alpha"), &m_AlphaValue,0.0,1.0);
 	//m_Gui->Button(ID_GENERATE_ISOSURFACE,"generate iso");
   return m_Gui;
 }
@@ -196,7 +196,7 @@ void mafPipeIsosurface::OnEvent(mafEventBase *maf_event)
         m_ContourMapper->GetOutput(0, surface);
         m_ContourMapper->Update();
 
-        wxString name = wxString::Format("%s Isosurface %g", m_Vme->GetName(),m_ContourValue);
+        wxString name = wxString::Format(_("%s Isosurface %g"), m_Vme->GetName(),m_ContourValue);
 
         mafNEW(m_IsosurfaceVme);
         m_IsosurfaceVme->SetName(name.c_str());

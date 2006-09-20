@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-17 13:08:39 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-09-20 15:35:37 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -422,16 +422,16 @@ mmgGui* mafVMEProber::CreateGui()
   m_Gui->SetListener(this);
   m_Gui->Divider();
   mafVME *vol = mafVME::SafeDownCast(GetVolumeLink());
-  m_VolumeName = vol ? vol->GetName() : "none";
-  m_Gui->Button(ID_VOLUME_LINK,&m_VolumeName,"Volume", "Select the volume to be probed");
+  m_VolumeName = vol ? vol->GetName() : _("none");
+  m_Gui->Button(ID_VOLUME_LINK,&m_VolumeName,_("Volume"), _("Select the volume to be probed"));
 
   mafVME *surf = mafVME::SafeDownCast(GetSurfaceLink());
-  m_SurfaceName = surf ? surf->GetName() : "none";
-  m_Gui->Button(ID_SURFACE_LINK,&m_SurfaceName,"Surface", "Select the polydata to probe the volume");
+  m_SurfaceName = surf ? surf->GetName() : _("none");
+  m_Gui->Button(ID_SURFACE_LINK,&m_SurfaceName,_("Surface"), _("Select the polydata to probe the volume"));
 
   m_ProberMode = GetMode();
-  wxString prober_mode[2] = {"density", "distance"};
-  m_Gui->Combo(ID_MODALITY,"modality", &m_ProberMode, 2, prober_mode);
+  wxString prober_mode[2] = {_("density"), _("distance")};
+  m_Gui->Combo(ID_MODALITY,_("modality"), &m_ProberMode, 2, prober_mode);
 
   return m_Gui;
 }
@@ -446,7 +446,7 @@ void mafVMEProber::OnEvent(mafEventBase *maf_event)
     {
       case ID_VOLUME_LINK:
       {
-        mafString title = "Choose volume vme";
+        mafString title = _("Choose volume vme");
         e->SetId(VME_CHOOSE);
         e->SetArg((long)m_VMEVolumeAccept);
         e->SetString(&title);
@@ -462,7 +462,7 @@ void mafVMEProber::OnEvent(mafEventBase *maf_event)
       break;
       case ID_SURFACE_LINK:
       {
-        mafString title = "Choose surface vme";
+        mafString title = _("Choose surface vme");
         e->SetId(VME_CHOOSE);
         e->SetArg((long)m_VMESurfaceAccept);
         e->SetString(&title);

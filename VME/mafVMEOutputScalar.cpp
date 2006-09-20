@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-28 16:35:01 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-09-20 15:35:37 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -85,8 +85,8 @@ mmgGui* mafVMEOutputScalar::CreateGui()
   m_NumberOfRows << (int)data.rows();
   m_NumberOfColumns = "";
   m_NumberOfColumns << (int)data.columns();
-  m_Gui->Label("rows: ",&m_NumberOfRows);
-  m_Gui->Label("columns: ",&m_NumberOfColumns);
+  m_Gui->Label(_("rows: "),&m_NumberOfRows);
+  m_Gui->Label(_("columns: "),&m_NumberOfColumns);
   return m_Gui;
 }
 

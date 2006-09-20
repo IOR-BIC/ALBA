@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERefSys.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:55 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-09-20 15:35:37 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -322,7 +322,7 @@ mmgGui* mafVMERefSys::CreateGui()
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
   m_Gui->Divider();
-  m_Gui->Double(ID_SCALE_FACTOR,"scale",&m_ScaleFactor);
+  m_Gui->Double(ID_SCALE_FACTOR,_("scale"),&m_ScaleFactor);
 
   return m_Gui;
 }

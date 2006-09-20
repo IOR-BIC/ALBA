@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:55 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2006-09-20 15:35:37 $
+  Version:   $Revision: 1.24 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -734,42 +734,42 @@ mmgGui* mafVMEMeter::CreateGui()
   
 
   int num_mode = 3;
-  const wxString mode_choices_string[] = {"point distance", "line distance", "line angle"};
+  const wxString mode_choices_string[] = {_("point distance"), _("line distance"), _("line angle")};
 
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
   m_Gui->Divider();
-  m_Gui->Combo(ID_METER_MODE,"mode",&(GetMeterAttributes()->m_MeterMode),num_mode,mode_choices_string,"Choose the meter mode");
+  m_Gui->Combo(ID_METER_MODE,_("mode"),&(GetMeterAttributes()->m_MeterMode),num_mode,mode_choices_string,_("Choose the meter mode"));
   m_Gui->Divider();
   mafVME *start_vme = GetStartVME();
   if (start_vme && start_vme->IsMAFType(mafVMELandmarkCloud))
   {
     sub_id = GetLinkSubId("StartVME");
-    m_StartVmeName = (sub_id != -1) ? ((mafVMELandmarkCloud *)start_vme)->GetLandmarkName(sub_id) : "none";
+    m_StartVmeName = (sub_id != -1) ? ((mafVMELandmarkCloud *)start_vme)->GetLandmarkName(sub_id) : _("none");
   }
   else
-    m_StartVmeName = start_vme ? start_vme->GetName() : "none";
-  m_Gui->Button(ID_START_METER_LINK,&m_StartVmeName,"Start", "Select the start vme for the meter");
+    m_StartVmeName = start_vme ? start_vme->GetName() : _("none");
+  m_Gui->Button(ID_START_METER_LINK,&m_StartVmeName,_("Start"), _("Select the start vme for the meter"));
 
   mafVME *end_vme1 = GetEnd1VME();
   if (end_vme1 && end_vme1->IsMAFType(mafVMELandmarkCloud))
   {
     sub_id = GetLinkSubId("EndVME1");
-    m_EndVme1Name = (sub_id != -1) ? ((mafVMELandmarkCloud *)end_vme1)->GetLandmarkName(sub_id) : "none";
+    m_EndVme1Name = (sub_id != -1) ? ((mafVMELandmarkCloud *)end_vme1)->GetLandmarkName(sub_id) : _("none");
   }
   else
-    m_EndVme1Name = end_vme1 ? end_vme1->GetName() : "none";
-  m_Gui->Button(ID_END1_METER_LINK,&m_EndVme1Name,"End 1", "Select the end vme for point distance");
+    m_EndVme1Name = end_vme1 ? end_vme1->GetName() : _("none");
+  m_Gui->Button(ID_END1_METER_LINK,&m_EndVme1Name,_("End 1"), _("Select the end vme for point distance"));
 
   mafVME *end_vme2 = GetEnd2VME();
   if (end_vme2 && end_vme2->IsMAFType(mafVMELandmarkCloud))
   {
     sub_id = GetLinkSubId("EndVME2");
-    m_EndVme2Name = (sub_id != -1) ? ((mafVMELandmarkCloud *)end_vme2)->GetLandmarkName(sub_id) : "none";
+    m_EndVme2Name = (sub_id != -1) ? ((mafVMELandmarkCloud *)end_vme2)->GetLandmarkName(sub_id) : _("none");
   }
   else
-    m_EndVme2Name = end_vme2 ? end_vme2->GetName() : "none";
-  m_Gui->Button(ID_END2_METER_LINK,&m_EndVme2Name,"End 2", "Select the vme representing \nthe point for line distance");
+    m_EndVme2Name = end_vme2 ? end_vme2->GetName() : _("none");
+  m_Gui->Button(ID_END2_METER_LINK,&m_EndVme2Name,_("End 2"), _("Select the vme representing \nthe point for line distance"));
 
   if(GetMeterAttributes()->m_MeterMode == POINT_DISTANCE)
     m_Gui->Enable(ID_END2_METER_LINK,false);
@@ -790,7 +790,7 @@ void mafVMEMeter::OnEvent(mafEventBase *maf_event)
       case ID_END2_METER_LINK:
       {
         mafID button_id = e->GetId();
-        mafString title = "Choose meter vme link";
+        mafString title = _("Choose meter vme link");
         e->SetId(VME_CHOOSE);
         e->SetArg((long)m_VMEAccept);
         e->SetString(&title);
