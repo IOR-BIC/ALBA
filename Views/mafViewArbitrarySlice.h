@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-19 12:23:03 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-09-20 10:52:18 $
+  Version:   $Revision: 1.3 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,6 +30,8 @@ class mafVMESlicer;
 class mafMatrix;
 class mafAttachCamera;
 class mmgGui;
+class mmgLutSlider;
+class mmgLutSwatch;
 
 //----------------------------------------------------------------------------
 // mafViewOrthoSlice :
@@ -48,6 +50,7 @@ public:
 	{
 		ID_COMBO_GIZMOS = Superclass::ID_LAST,
 		ID_RESET,
+		ID_LUT_CHOOSER,
 		ID_LAST,
 	};
 
@@ -63,15 +66,30 @@ public:
 	Remove VME into plugged sub-views*/
   virtual void VmeRemove(mafNode *node);
 
-	virtual void OnEvent(mafEventBase *maf_event);
+	/** 
+  Create the GUI on the bottom of the compounded view. */
+  virtual void CreateGuiView();
 
-	virtual mmgGui* CreateGui();
+	virtual void OnEvent(mafEventBase *maf_event);
 
 	virtual mafView* Copy(mafObserver *Listener);
 
 	virtual void CameraUpdate();
 
 protected:
+
+	/**
+  Internally used to create a new instance of the GUI. This function should be
+  overridden by subclasses to create specialized GUIs. Each subclass should append
+  its own widgets and define the enum of IDs for the widgets as an extension of
+  the superclass enum. The last id value must be defined as "LAST_ID" to allow the 
+  subclass to continue the ID enumeration from it. For appending the widgets in the
+  same panel GUI, each CreateGUI() function should first call the superclass' one.*/
+	virtual mmgGui* CreateGui();
+
+	/** 
+	Enable/disable view widgets.*/
+  void EnableWidgets(bool enable = true);
 
 	void OnEventThis(mafEventBase *maf_event);  
 
@@ -95,13 +113,15 @@ protected:
 	mafMatrix					*m_MatrixReset;
 	mafAttachCamera		*m_AttachCamera;
 
-	vtkLookupTable    *m_vtkLUT;
+	vtkLookupTable    *m_ColorLUT;
 
 	double	m_SliceCenterSurface[3];
 	double	m_SliceCenterSurfaceReset[3];
 	double	m_SliceAngleReset[3];
 	int			m_TypeGizmo;
 
-	mmgGui	*m_GuiGizmos;
+	mmgLutSlider	*m_LutSlider; ///< Double slider used to change brightness and contrast of the image
+	mmgLutSwatch	*m_LutWidget; ///< LUT widget in view side panel 
+	mmgGui				*m_GuiGizmos;
 };
 #endif

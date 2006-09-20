@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-19 12:23:09 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-09-20 10:52:40 $
+  Version:   $Revision: 1.7 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,6 +45,8 @@
 #include "mmgLutPreset.h"
 #include "mafVMEOutputSurface.h"
 #include "mafAttribute.h"
+#include "mmgLutSlider.h"
+#include "mmgLutSwatch.h"
 
 #include "vtkTransform.h"
 #include "vtkLookupTable.h"
@@ -99,6 +101,9 @@ mafViewArbitrarySlice::mafViewArbitrarySlice(wxString label, bool show_ruler)
 	m_Slicer = NULL;
 	m_GuiGizmos = NULL;
 	m_AttachCamera = NULL;
+	m_LutSlider = NULL;
+	m_LutWidget = NULL;
+	m_ColorLUT= NULL;
 
 	m_SliceCenterSurface[0] = 0.0;
 	m_SliceCenterSurface[1] = 0.0;
@@ -117,6 +122,7 @@ mafViewArbitrarySlice::~mafViewArbitrarySlice()
 {
 	m_MatrixReset = NULL;
 	m_CurrentVolume = NULL;
+	m_ColorLUT = NULL;
 
 	if(m_GizmoTranslate)
 	{
@@ -207,18 +213,25 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			m_ChildViewList[ARBITRARY_VIEW]->VmeShow(node, show);
 			m_ChildViewList[SLICE_VIEW]->VmeShow(node, show);
 
+			//Create VME slicer
 			mafNEW(m_Slicer);
 			m_Slicer->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
 			m_Slicer->ReparentTo(mafVME::SafeDownCast(node));
 			m_Slicer->SetPose(m_SliceCenterSurfaceReset,m_SliceAngleReset,0);
-			m_Slicer->SetName("Slicer");
+			//m_Slicer->SetName("Slicer");
 			m_Slicer->SetAbsMatrix(*m_MatrixReset);
 			m_Slicer->Update();
-			double sr2[2];
-			m_Slicer->GetSurfaceOutput()->GetVTKData()->GetScalarRange(sr2);
+			
+			//Show Slicer
 			m_ChildViewList[ARBITRARY_VIEW]->VmeShow(m_Slicer, show);
 			m_ChildViewList[SLICE_VIEW]->VmeShow(m_Slicer, show);
-			;
+	
+			mmaMaterial *currentSurfaceMaterial = m_Slicer->GetMaterial();
+			m_ColorLUT = m_Slicer->GetMaterial()->m_ColorLut;
+      m_LutWidget->SetLut(m_ColorLUT);
+      m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
+      m_LutSlider->SetSubRange((long)currentSurfaceMaterial->m_TableRange[0],(long)currentSurfaceMaterial->m_TableRange[1]);
+
 			//Set camera of slice viw in way that it will follow the volume
 			if(!m_AttachCamera)
 				m_AttachCamera=new mafAttachCamera(m_Gui,((mafViewVTK*)m_ChildViewList[SLICE_VIEW])->m_Rwi,this);
@@ -258,10 +271,6 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			vtkDEL(transform);
 			vtkDEL(filter);
 			vtkDEL(TransformReset);
-		}
-		else if(Vme->IsA("mafVMEGizmo"))
-		{
-			m_ChildViewList[ARBITRARY_VIEW]->VmeShow(node, show);
 		}
 		else if(Vme->IsA("mafVMESurface"))
 		{
@@ -327,15 +336,19 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 				}
 			}
 			iter->Delete();
+
 			m_CurrentVolume = NULL;
+			m_ColorLUT = NULL;
+			m_LutWidget->SetLut(m_ColorLUT);
 		}
 	}
+	EnableWidgets(m_CurrentVolume != NULL);
 }
 //----------------------------------------------------------------------------
 void mafViewArbitrarySlice::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-	if (maf_event->GetSender() == this->m_Gui) // from this view gui
+	if (maf_event->GetSender() == this->m_Gui || maf_event->GetSender() == this->m_LutSlider) // from this view gui
   {
     OnEventThis(maf_event); 
   }
@@ -493,42 +506,59 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
 				}
 			}
 			break;
+		case ID_RANGE_MODIFIED:
+      {
+        if(m_CurrentVolume)
+        {
+          int low, hi;
+          m_LutSlider->GetSubRange(&low,&hi);
+          m_ColorLUT->SetTableRange(low,hi);
+        }
+      }
+			break;
+		case ID_LUT_CHOOSER:
+      {
+        double *sr;
+        sr = m_ColorLUT->GetRange();
+        m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
+      }
+			break;
 		case ID_RESET:
 			{
-			m_SliceCenterSurface[0]=m_SliceCenterSurfaceReset[0];
-			m_SliceCenterSurface[1]=m_SliceCenterSurfaceReset[1];
-			m_SliceCenterSurface[2]=m_SliceCenterSurfaceReset[2];
-			
-			m_GizmoRotate->SetAbsPose(m_MatrixReset);
-			m_GizmoTranslate->SetAbsPose(m_MatrixReset);
-			m_Slicer->SetAbsMatrix(*m_MatrixReset);
-			//update because I need to refresh the normal of the camera
-			mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-			//update the normal of the cutter plane of the surface
-			mafNode *root=m_CurrentVolume->GetRoot();
-			mafNodeIterator *iter = root->NewIterator();
-			for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
-			{
-				if(node->IsA("mafVMESurface"))
+				m_SliceCenterSurface[0]=m_SliceCenterSurfaceReset[0];
+				m_SliceCenterSurface[1]=m_SliceCenterSurfaceReset[1];
+				m_SliceCenterSurface[2]=m_SliceCenterSurfaceReset[2];
+				
+				m_GizmoRotate->SetAbsPose(m_MatrixReset);
+				m_GizmoTranslate->SetAbsPose(m_MatrixReset);
+				m_Slicer->SetAbsMatrix(*m_MatrixReset);
+				//update because I need to refresh the normal of the camera
+				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				//update the normal of the cutter plane of the surface
+				mafNode *root=m_CurrentVolume->GetRoot();
+				mafNodeIterator *iter = root->NewIterator();
+				for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 				{
-					mafPipeSurfaceSlice *PipeArbitraryViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(node));
-					mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(node));
-					if(PipeArbitraryViewSurface && PipeArbitraryViewSurface)
+					if(node->IsA("mafVMESurface"))
 					{
-						double normal[3];
-						((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-						PipeArbitraryViewSurface->SetNormal(normal);
-						PipeSliceViewSurface->SetNormal(normal);
-						PipeArbitraryViewSurface->SetSlice(m_SliceCenterSurface);
-						PipeSliceViewSurface->SetSlice(m_SliceCenterSurface);
+						mafPipeSurfaceSlice *PipeArbitraryViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(node));
+						mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(node));
+						if(PipeArbitraryViewSurface && PipeArbitraryViewSurface)
+						{
+							double normal[3];
+							((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+							PipeArbitraryViewSurface->SetNormal(normal);
+							PipeSliceViewSurface->SetNormal(normal);
+							PipeArbitraryViewSurface->SetSlice(m_SliceCenterSurface);
+							PipeSliceViewSurface->SetSlice(m_SliceCenterSurface);
+						}
 					}
 				}
+				iter->Delete();
+				break;
 			}
-			iter->Delete();
-			break;
-			}
-			default:
-        mafViewCompound::OnEvent(maf_event);
+		default:
+			mafViewCompound::OnEvent(maf_event);
 		}
 	}
 }
@@ -561,9 +591,13 @@ mmgGui* mafViewArbitrarySlice::CreateGui()
 	m_Gui->Combo(ID_COMBO_GIZMOS,"Gizmo",&m_TypeGizmo,2,Text);
 	//button to reset at the star position
 	m_Gui->Button(ID_RESET,"Reset","");
-
 	m_Gui->Divider(2);
+
+	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
+
 	m_Gui->Update();
+	
+	EnableWidgets(m_CurrentVolume != NULL);
 	return m_Gui;
 }
 //----------------------------------------------------------------------------
@@ -615,8 +649,39 @@ void mafViewArbitrarySlice::CameraUpdate()
 {
 	if (m_AttachCamera != NULL)
   {
+		//Camera follows the slicer
     m_AttachCamera->UpdateCameraMatrix();
   }
   for(int i=0; i<m_NumOfChildView; i++)
     m_ChildViewList[i]->CameraUpdate();
+}
+//----------------------------------------------------------------------------
+void mafViewArbitrarySlice::CreateGuiView()
+//----------------------------------------------------------------------------
+{
+  m_GuiView = new mmgGui(this);
+  
+  m_GuiView->Label("");
+  m_LutSlider = new mmgLutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
+  m_LutSlider->SetListener(this);
+  m_LutSlider->SetSize(500,24);
+  m_LutSlider->SetMinSize(wxSize(500,24));
+  EnableWidgets(m_CurrentVolume != NULL);
+  m_GuiView->Add(m_LutSlider);
+  m_GuiView->Reparent(m_Win);
+}
+//----------------------------------------------------------------------------
+void mafViewArbitrarySlice::EnableWidgets(bool enable)
+//----------------------------------------------------------------------------
+{
+  if (m_Gui)
+  {
+		m_Gui->Enable(ID_RESET,enable);
+		m_Gui->Enable(ID_COMBO_GIZMOS,enable);
+    m_Gui->Enable(ID_LUT_CHOOSER,enable);
+		m_Gui->FitGui();
+		m_Gui->Update();
+  }
+  m_LutSlider->Enable(enable);
+
 }
