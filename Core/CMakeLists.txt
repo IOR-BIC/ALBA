@@ -18,6 +18,8 @@ SET(PROJECT_SRCS
 	mafSceneNode.h
 	mafViewCompound.cpp
 	mafViewCompound.h
+	mafViewHTML.cpp
+	mafViewHTML.h
 	mafViewPlot.cpp
 	mafViewPlot.h
 	mafViewVTK.cpp
