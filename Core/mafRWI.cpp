@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-26 13:41:09 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2006-09-20 12:23:35 $
+  Version:   $Revision: 1.32 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -72,7 +72,7 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axe
   m_StereoMovieDir    = "";
   m_StereoMovieEnable = 0;
 
-  m_StereoType = 0;
+  m_StereoType = stereo;
 
   m_Light = vtkLight::New();
   m_Light->SetLightTypeToCameraLight();
