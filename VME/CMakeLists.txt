@@ -12,6 +12,8 @@ SET(PROJECT_SRCS
   medPipeVolumeMIP.h
   medPipeDensityDistance.cpp
   medPipeDensityDistance.h
+  medPipeVolumeDRR.cpp
+  medPipeVolumeDRR.h
 )
 
 # List libraries that are needed by this project.
