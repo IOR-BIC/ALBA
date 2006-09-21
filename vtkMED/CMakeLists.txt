@@ -14,6 +14,8 @@ SET(vtkMED_SRCS
   vtkImageUnPacker.h
   vtkPackedImage.cxx
   vtkPackedImage.h
+  vtkXRayVolumeMapper.cxx
+  vtkXRayVolumeMapper.h
 )
 
 # List the kits from VTK that are needed by this project.
