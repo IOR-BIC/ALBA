@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateRefSys.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-18 10:26:47 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,6 +26,10 @@
 #include "mafVME.h"
 #include "mafVMERoot.h"
 #include "mafVMERefSys.h"
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoCreateRefSys);
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mmoCreateRefSys::mmoCreateRefSys(wxString label) :

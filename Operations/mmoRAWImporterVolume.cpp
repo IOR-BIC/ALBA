@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-19 12:34:56 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,6 +39,10 @@
 #include "vtkWindowLevelLookupTable.h"
 #include "vtkPlaneSource.h"
 #include "vtkImageToStructuredPoints.h"
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoRAWImporterVolume);
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mmoRAWImporterVolume::mmoRAWImporterVolume(wxString label) : mafOp(label)

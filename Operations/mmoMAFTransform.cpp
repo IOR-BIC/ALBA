@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMAFTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-21 15:57:43 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.13 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -59,6 +59,11 @@ enum MAF_TRANSFORM_ID
   ID_AUX_REF_SYS,
   ID_ENABLE_SCALING,
 };
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoMAFTransform);
+//----------------------------------------------------------------------------
+
 //----------------------------------------------------------------------------
 mmoMAFTransform::mmoMAFTransform(wxString label) :
 mmoTransformInterface(label)

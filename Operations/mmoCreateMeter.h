@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateMeter.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:34 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -28,8 +28,11 @@ class mafEvent;
 class mmoCreateMeter: public mafOp
 {
 public:
-  mmoCreateMeter(wxString label);
- ~mmoCreateMeter(); 
+  mmoCreateMeter(wxString label = "CreateMeter");
+  ~mmoCreateMeter(); 
+
+  mafTypeMacro(mmoCreateMeter, mafOp);
+
   mafOp* Copy();
 
   bool Accept(mafNode *node);

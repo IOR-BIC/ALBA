@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateRefSys.h,v $
   Language:  C++
-  Date:      $Date: 2006-05-18 10:26:47 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,8 +28,11 @@ class mafNode;
 class mmoCreateRefSys: public mafOp
 {
 public:
-  mmoCreateRefSys(wxString label);
+  mmoCreateRefSys(wxString label = "CreateRefSys");
  ~mmoCreateRefSys(); 
+
+  mafTypeMacro(mmoCreateRefSys, mafOp);
+
   mafOp* Copy();
 
   bool Accept(mafNode *node);

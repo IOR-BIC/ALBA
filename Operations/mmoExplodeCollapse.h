@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoExplodeCollapse.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-10 15:15:28 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -30,8 +30,11 @@ class mafNode;
 class mmoExplodeCollapse: public mafOp
 {
 public:
-  mmoExplodeCollapse(wxString label);
+  mmoExplodeCollapse(wxString label = "ExplodeCollapse");
  ~mmoExplodeCollapse(); 
+  
+  mafTypeMacro(mmoExplodeCollapse, mafOp);
+
   mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */

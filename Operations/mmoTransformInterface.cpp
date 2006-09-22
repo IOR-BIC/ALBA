@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTransformInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-04-11 10:47:28 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.7 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,6 +44,10 @@
 #include "vtkStructuredPoints.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkTransformPolyDataFilter.h"
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoTransformInterface);
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mmoTransformInterface::mmoTransformInterface(wxString label) :

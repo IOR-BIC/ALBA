@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExplodeCollapse.cpp,v $
 Language:  C++
-Date:      $Date: 2005-10-10 15:15:28 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2006-09-22 10:11:57 $
+Version:   $Revision: 1.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -23,6 +23,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mafVMELandmarkCloud.h" 
 #include "mafVMELandmark.h"
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoExplodeCollapse);
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mmoExplodeCollapse::mmoExplodeCollapse(wxString label) :

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmo2DMeasure.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-07 08:17:22 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,10 +31,12 @@ class mafEvent;
 class mmo2DMeasure: public mafOp
 {
 public:
-	mmo2DMeasure(wxString label);
+	mmo2DMeasure(wxString label = "2DMeasure");
 	~mmo2DMeasure(); 
 	virtual void OnEvent(mafEventBase *maf_event);
   
+  mafTypeMacro(mmo2DMeasure, mafOp);
+
   /** Return a copy of itself, this needs to put the operation into the undo stack. */
 	mafOp* Copy();
 	

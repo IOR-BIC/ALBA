@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterVolume.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-19 12:34:56 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -37,10 +37,13 @@ class mmoRAWImporterVolume: public mafOp
 {
 public:
              
-            	 mmoRAWImporterVolume(wxString label);
+            	 mmoRAWImporterVolume(wxString label = "RAWImporterVolume");
 	virtual     ~mmoRAWImporterVolume();
 	virtual void OnEvent(mafEventBase *maf_event);
-	mafOp* Copy();
+	
+  mafTypeMacro(mmoRAWImporterVolume, mafOp);
+
+  mafOp* Copy();
 
   enum RAW_SCALAR_TYPE
   {

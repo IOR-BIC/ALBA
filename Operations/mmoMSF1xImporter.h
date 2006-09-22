@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMSF1xImporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-21 10:06:07 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -32,8 +32,11 @@ class mafMSFImporter;
 class mmoMSF1xImporter: public mafOp
 {
 public:
-  mmoMSF1xImporter(wxString label);
+  mmoMSF1xImporter(wxString label = "MSF1xImporter");
  ~mmoMSF1xImporter(); 
+  
+  mafTypeMacro(mmoMSF1xImporter, mafOp);
+
   mafOp* Copy();
 
 	/** this operation does not depend on the selected node */

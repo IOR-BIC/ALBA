@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoImageImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-28 08:34:42 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -56,6 +56,10 @@ bool CompareNumber(std::string first, std::string second)
 
   return (first_num - second_num) < 0;   // compare number
 }
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoImageImporter);
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mmoImageImporter::mmoImageImporter(wxString label) :

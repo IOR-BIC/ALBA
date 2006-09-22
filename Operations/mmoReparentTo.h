@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoReparentTo.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-06 14:48:35 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,8 +33,11 @@ class mmgGui;
 class mmoReparentTo: public mafOp
 {
 public:
-  mmoReparentTo(wxString label);
+  mmoReparentTo(wxString label = "ReparentTo");
  ~mmoReparentTo(); 
+  
+  mafTypeMacro(mmoReparentTo, mafOp);
+
   mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */

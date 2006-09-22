@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-19 12:25:09 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -32,6 +32,10 @@
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkTransform.h"
 #include "vtkAbstractTransform.h"
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoVTKExporter);
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mmoVTKExporter::mmoVTKExporter(wxString label) :

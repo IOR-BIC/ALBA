@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoASCIIImporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-21 15:23:39 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -32,10 +32,13 @@ class mafVMEScalar;
 class mmoASCIIImporter: public mafOp
 {
 public:
-  mmoASCIIImporter(wxString label);
- ~mmoASCIIImporter(); 
+  mmoASCIIImporter(wxString label = "ASCIIImporter");
+  ~mmoASCIIImporter(); 
  
   virtual void OnEvent(mafEventBase *maf_event);
+
+  mafTypeMacro(mmoASCIIImporter, mafOp);
+
   mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */

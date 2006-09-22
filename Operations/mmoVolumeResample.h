@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVolumeResample.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-07 09:50:54 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -32,10 +32,13 @@ class mmoVolumeResample: public mafOp
 {
 public:
              
-            	 mmoVolumeResample(wxString label);
+            	 mmoVolumeResample(wxString label = "VolumeResample");
 	virtual     ~mmoVolumeResample();
 	virtual void OnEvent(mafEventBase *maf_event);
-	mafOp* Copy();
+	
+  mafTypeMacro(mmoVolumeResample, mafOp);
+
+  mafOp* Copy();
 
 	bool Accept(mafNode* vme);
 	void OpRun();	

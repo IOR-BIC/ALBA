@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoReparentTo.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-19 11:28:57 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,6 +33,10 @@
 #include "vtkTransformPolyDataFilter.h"
 
 #include <vector>
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoReparentTo);
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mmoReparentTo::mmoReparentTo(wxString label) : mafOp(label)

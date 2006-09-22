@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-27 10:41:19 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -40,6 +40,10 @@
 #include "vtkStructuredGridReader.h"
 #include "vtkRectilinearGridReader.h"
 #include "vtkUnstructuredGridReader.h"
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoVTKImporter);
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mmoVTKImporter::mmoVTKImporter(wxString label) :

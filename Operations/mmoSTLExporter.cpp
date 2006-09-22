@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoSTLExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-20 17:36:33 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -32,6 +32,10 @@
 #include "vtkTriangleFilter.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkTransform.h"
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoSTLExporter);
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mmoSTLExporter::mmoSTLExporter(wxString label) :

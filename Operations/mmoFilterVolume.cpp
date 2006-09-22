@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoFilterVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-06 14:31:27 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -30,6 +30,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkImageData.h"
 #include "vtkImageGaussianSmooth.h"
 #include "vtkImageMedian3D.h"
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoFilterVolume);
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mmoFilterVolume::mmoFilterVolume(wxString label) 

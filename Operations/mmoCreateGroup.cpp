@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateGroup.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-18 10:26:47 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,6 +25,10 @@
 
 #include "mafVMERoot.h"
 #include "mafVMEGroup.h"
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoCreateGroup);
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mmoCreateGroup::mmoCreateGroup(wxString label) :

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKImporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-14 12:33:00 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -35,8 +35,11 @@ class mafVMEGeneric;
 class mmoVTKImporter: public mafOp
 {
 public:
-  mmoVTKImporter(wxString label);
+  mmoVTKImporter(wxString label = "VTKImporter");
  ~mmoVTKImporter(); 
+  
+  mafTypeMacro(mmoVTKImporter, mafOp);
+
   mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */

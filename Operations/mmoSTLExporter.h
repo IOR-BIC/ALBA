@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoSTLExporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-19 12:00:34 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,8 +31,11 @@ class mafNode;
 class mmoSTLExporter: public mafOp
 {
 public:
-  mmoSTLExporter(wxString label);
+  mmoSTLExporter(wxString label = "STLExporter");
  ~mmoSTLExporter(); 
+  
+  mafTypeMacro(mmoSTLExporter, mafOp);
+
   mafOp* Copy();
 	void OnEvent(mafEventBase *maf_event);
 

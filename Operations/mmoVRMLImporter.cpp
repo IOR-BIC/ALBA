@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVRMLImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-19 12:29:12 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -37,6 +37,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkRenderer.h"
 #include "vtkVRMLImporter.h"
 #include "vtkRendererCollection.h"
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoVRMLImporter);
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
  mmoVRMLImporter:: mmoVRMLImporter(wxString label) : mafOp(label)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoFilterSurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-11 15:24:28 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -28,10 +28,13 @@ class mafEvent;
 class mmoFilterSurface: public mafOp
 {
 public:
-	mmoFilterSurface(wxString label);
+	mmoFilterSurface(wxString label = "FilterSurface");
 	~mmoFilterSurface(); 
 	virtual void OnEvent(mafEventBase *maf_event);
-	mafOp* Copy();
+
+  mafTypeMacro(mmoFilterSurface, mafOp);
+
+  mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
 	bool Accept(mafNode *node);

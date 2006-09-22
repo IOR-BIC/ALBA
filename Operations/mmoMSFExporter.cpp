@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMSFExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-19 12:20:00 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,6 +28,10 @@
 #include "mafVME.h"
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoMSFExporter);
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mmoMSFExporter::mmoMSFExporter(wxString label) :

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoFilterVolume.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-06 12:26:09 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -28,10 +28,13 @@ class mafEvent;
 class mmoFilterVolume: public mafOp
 {
 public:
-	mmoFilterVolume(wxString label);
+	mmoFilterVolume(wxString label = "FilterVolume");
 	~mmoFilterVolume(); 
 	virtual void OnEvent(mafEventBase *maf_event);
-	mafOp* Copy();
+	
+  mafTypeMacro(mmoFilterVolume, mafOp);
+
+  mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
 	bool Accept(mafNode *node);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoSTLImporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 11:35:30 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,9 +33,12 @@ class mafEvent;
 class mmoSTLImporter: public mafOp
 {
 public:
-	mmoSTLImporter(wxString label);
+	mmoSTLImporter(wxString label = "STLImporter");
 	~mmoSTLImporter(); 
-	mafOp* Copy();
+	
+  mafTypeMacro(mmoSTLImporter, mafOp);
+
+  mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
 	bool Accept(mafNode *node);

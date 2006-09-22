@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-07 09:50:54 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -43,6 +43,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkStructuredPoints.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkPointData.h"
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoVolumeResample);
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mmoVolumeResample::mmoVolumeResample(wxString label) : mafOp(label)

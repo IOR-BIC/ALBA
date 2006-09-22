@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoSTLImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-12 14:47:57 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,6 +33,11 @@
 #include "vtkPolyData.h"
 
 #include <fstream>
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoSTLImporter);
+//----------------------------------------------------------------------------
+
 //----------------------------------------------------------------------------
 mmoSTLImporter::mmoSTLImporter(wxString label) :
 mafOp(label)

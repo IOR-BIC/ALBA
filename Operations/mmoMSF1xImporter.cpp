@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMSF1xImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-28 10:22:47 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,6 +26,10 @@
 #include "mafVMERoot.h"
 #include "mafTagArray.h"
 #include "mafMSFImporter.h"
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoMSF1xImporter);
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mmoMSF1xImporter::mmoMSF1xImporter(wxString label) :

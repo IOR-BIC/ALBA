@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTransformInterface.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 13:03:01 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni        
 ==========================================================================
   Copyright (c) 2002/2004
@@ -53,10 +53,13 @@ class mafTransform;
 class mmoTransformInterface : public mafOp
 {
 public:
+  mmoTransformInterface(wxString label = "TransformInterface");
   virtual ~mmoTransformInterface(); 
  
   /** Return true for the acceptable vme type. */
   bool Accept(mafNode* vme) {return true;};
+
+  mafTypeMacro(mmoTransformInterface, mafOp);
 
   /** Override superclass */
   mafOp* Copy();
@@ -76,9 +79,6 @@ public:
   int GetEnableScaling() {return m_EnableScaling;};
 
 protected:
-  
-  mmoTransformInterface(wxString label);
-
   /** Create the gui */
   virtual void CreateGui() {};
   

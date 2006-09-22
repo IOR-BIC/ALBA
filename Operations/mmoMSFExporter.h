@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMSFExporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-19 12:20:00 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -32,8 +32,11 @@ class mafEvent;
 class mmoMSFExporter: public mafOp
 {
 public:
-  mmoMSFExporter(wxString label);
+  mmoMSFExporter(wxString label = "MSFExporter");
  ~mmoMSFExporter(); 
+  
+  mafTypeMacro(mmoMSFExporter, mafOp);
+
   mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */

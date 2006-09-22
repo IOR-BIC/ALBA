@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoAddLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-16 13:05:46 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,6 +34,10 @@
 
 #include "vtkDataSet.h"
 #include "vtkPoints.h"
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoAddLandmark);
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mmoAddLandmark::mmoAddLandmark(wxString label) :

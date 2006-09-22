@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKExporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-19 12:25:09 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,8 +30,11 @@ class mafVME;
 class mmoVTKExporter: public mafOp
 {
 public:
-  mmoVTKExporter(wxString label);
+  mmoVTKExporter(wxString label = "VTKExporter");
  ~mmoVTKExporter(); 
+  
+  mafTypeMacro(mmoVTKExporter, mafOp);
+
   mafOp* Copy();
 	void OnEvent(mafEventBase *maf_event);
 

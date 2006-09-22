@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoClipSurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-13 13:42:22 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,9 +43,11 @@ class vtkGlyph3D;
 class mmoClipSurface: public mafOp
 {
 public:
-  mmoClipSurface(wxString label);
- ~mmoClipSurface(); 
+  mmoClipSurface(wxString label = "ClipSurface");
+  ~mmoClipSurface(); 
 	virtual void OnEvent(mafEventBase *maf_event);
+
+  mafTypeMacro(mmoClipSurface, mafOp);
 
   mafOp* Copy();
 

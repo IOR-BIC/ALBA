@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoFilterSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-28 08:34:42 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-09-22 10:11:57 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -35,6 +35,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkTriangleFilter.h"
 #include "vtkPolyDataNormals.h"
 #include "vtkPolyDataConnectivityFilter.h"
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoFilterSurface);
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mmoFilterSurface::mmoFilterSurface(wxString label) :
