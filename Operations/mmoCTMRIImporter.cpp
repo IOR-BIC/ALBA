@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTMRIImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-20 14:48:58 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-09-22 10:12:18 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -65,6 +65,11 @@ int compareTriggerTime(const mmoCTMRIImporterListElement **arg1,const mmoCTMRIIm
 int compareImageNumber(const mmoCTMRIImporterListElement **arg1,const mmoCTMRIImporterListElement **arg2);
 
 WX_DEFINE_LIST(ListCTMRIFiles);
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoCTMRIImporter);
+//----------------------------------------------------------------------------
+
 //----------------------------------------------------------------------------
 mmoCTMRIImporter::mmoCTMRIImporter(wxString label) : mafOp(label)
 //----------------------------------------------------------------------------

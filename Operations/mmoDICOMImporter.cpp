@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-27 12:43:17 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-09-22 10:12:18 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -65,6 +65,11 @@ int compareTriggerTime(const mmoDICOMImporterListElement **arg1,const mmoDICOMIm
 int compareImageNumber(const mmoDICOMImporterListElement **arg1,const mmoDICOMImporterListElement **arg2);
 
 WX_DEFINE_LIST(ListDicomFiles);
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoDICOMImporter);
+//----------------------------------------------------------------------------
+
 //----------------------------------------------------------------------------
 mmoDICOMImporter::mmoDICOMImporter(wxString label) : mafOp(label)
 //----------------------------------------------------------------------------

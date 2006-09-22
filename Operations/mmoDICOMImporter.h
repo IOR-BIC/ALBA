@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-12 17:08:49 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-09-22 10:12:18 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -58,10 +58,13 @@ WX_DECLARE_LIST(mmoDICOMImporterListElement, ListDicomFiles);
 class mmoDICOMImporter: public mafOp
 {
 public:
-            	 mmoDICOMImporter(wxString label);
+            	 mmoDICOMImporter(wxString label = "DICOMImporter");
 	virtual     ~mmoDICOMImporter();
 	virtual void OnEvent(mafEventBase *maf_event);
-	mafOp* Copy();
+	
+  mafTypeMacro(mmoDICOMImporter, mafOp);
+
+  mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
 	bool Accept(mafNode *node) {return true;};

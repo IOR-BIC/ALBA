@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTAImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-28 14:41:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-09-22 10:12:18 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -65,6 +65,11 @@ int compareTriggerTime(const mmoCTAImporterListElement **arg1,const mmoCTAImport
 int compareImageNumber(const mmoCTAImporterListElement **arg1,const mmoCTAImporterListElement **arg2);
 
 WX_DEFINE_LIST(ListCTAFiles);
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoCTAImporter);
+//----------------------------------------------------------------------------
+
 //----------------------------------------------------------------------------
 mmoCTAImporter::mmoCTAImporter(wxString label) : mafOp(label)
 //----------------------------------------------------------------------------

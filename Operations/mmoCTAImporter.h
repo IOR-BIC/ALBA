@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTAImporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-28 14:41:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-09-22 10:12:18 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -58,10 +58,13 @@ WX_DECLARE_LIST(mmoCTAImporterListElement, ListCTAFiles);
 class mmoCTAImporter: public mafOp
 {
 public:
-            	 mmoCTAImporter(wxString label);
+            	 mmoCTAImporter(wxString label = "CTAImporter");
 	virtual     ~mmoCTAImporter();
 	virtual void OnEvent(mafEventBase *maf_event);
-	mafOp* Copy();
+	
+  mafTypeMacro(mmoCTAImporter, mafOp);
+
+  mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
 	bool Accept(mafNode *node) {return true;};

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTMRIImporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-19 08:35:40 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-09-22 10:12:18 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -58,10 +58,13 @@ WX_DECLARE_LIST(mmoCTMRIImporterListElement, ListCTMRIFiles);
 class mmoCTMRIImporter: public mafOp
 {
 public:
-            	 mmoCTMRIImporter(wxString label);
+            	 mmoCTMRIImporter(wxString label = "CTMRIImporter");
 	virtual     ~mmoCTMRIImporter();
 	virtual void OnEvent(mafEventBase *maf_event);
-	mafOp* Copy();
+	
+  mafTypeMacro(mmoCTMRIImporter, mafOp);
+
+  mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
 	bool Accept(mafNode *node) {return true;};
