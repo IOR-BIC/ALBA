@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-10 14:16:24 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2006-09-22 10:09:39 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,6 +17,7 @@
 #include "mafDefines.h" //important: mafDefines should always be included as first
 #include "mafEvent.h"
 #include "mafObserver.h"
+#include "mafObject.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -42,9 +43,11 @@ enum OPERATIONS_TYPE_ID
 //----------------------------------------------------------------------------
 /**
 */
-class mafOp: public mafObserver
+class mafOp: public mafObserver, public mafObject
 {
 public:
+  mafTypeMacro(mafOp, mafObject);
+
 					mafOp();
 					mafOp(wxString label);
 	virtual	~mafOp(); 
