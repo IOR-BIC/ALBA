@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-12 10:26:24 $
-  Version:   $Revision: 1.71 $
+  Date:      $Date: 2006-09-22 10:07:57 $
+  Version:   $Revision: 1.72 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -271,10 +271,22 @@ void mafLogicWithManagers::Init(int argc, char **argv)
 			  m_VMEManager->MSFOpen(file);
 			  UpdateFrameTitle();
 		  }
+      else
+      {
+        m_VMEManager->MSFNew();
+      }
 	  }
     else
     {
       m_VMEManager->MSFNew();
+    }
+  }
+  if (m_OpManager)
+  {
+    if(argc > 1 )
+    {
+      mafString op_type = argv[1];
+      m_OpManager->OpRun(op_type);
     }
   }
 }
