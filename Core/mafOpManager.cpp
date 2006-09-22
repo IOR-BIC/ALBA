@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-03 10:59:22 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2006-09-22 10:07:11 $
+  Version:   $Revision: 1.20 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -448,6 +448,19 @@ bool mafOpManager::WarnUser(mafOp *op)
 		if(dialog.ShowModal() == wxID_NO) go = false;
 	}
   return go;
+}
+//----------------------------------------------------------------------------
+void mafOpManager::OpRun(mafString &op_type)
+//----------------------------------------------------------------------------
+{
+  for (int i=0; i< m_NumOp; i++)
+  {
+    if (op_type.Equals(m_OpList[i]->GetTypeName()))
+    {
+      OpRun(m_OpList[i]);
+      break;
+    }
+  }
 }
 //----------------------------------------------------------------------------
 void mafOpManager::OpRun(int op_id)

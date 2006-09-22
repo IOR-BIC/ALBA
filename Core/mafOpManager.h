@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-03 10:59:22 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-09-22 10:07:11 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -65,10 +65,13 @@ public:
 	virtual mafNode* GetSelectedVme();
 
 	/** Run the operation by id. */
-  virtual void OpRun		(int op_id);
+  virtual void OpRun(int op_id);
 	
 	/** Call this to exec an operation with user interaction and undo/redo services. */
-  virtual void OpRun		(mafOp *op);
+  virtual void OpRun(mafOp *op);
+
+  /** Run the operation by searching it from its type name.*/
+  virtual void OpRun(mafString &op_type);
 
 	/** Execute the operation 'op' and warn the user if the operation is undoable. */
   virtual void OpExec		(mafOp *op);
