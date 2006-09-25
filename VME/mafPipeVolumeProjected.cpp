@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeProjected.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-07 09:54:31 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-09-25 11:19:58 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -204,7 +204,7 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
   vtkRectilinearGrid *rg_data = vtkRectilinearGrid::SafeDownCast(vtk_data);
 	if (rg_data)
 	{
-		vtkDoubleArray* z_fa = ((vtkDoubleArray *)rg_data->GetZCoordinates());
+    vtkDoubleArray* z_fa = vtkDoubleArray::SafeDownCast(rg_data->GetZCoordinates());
 		for (int i = 0; i < z_fa->GetNumberOfTuples(); i++)
 		{
 			CTLinesPoints->InsertNextPoint(xmax, ymax, z_fa->GetValue(i));
