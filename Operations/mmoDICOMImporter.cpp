@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:12:18 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-09-27 08:42:00 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -90,13 +90,13 @@ mmoDICOMImporter::mmoDICOMImporter(wxString label) : mafOp(label)
 
   m_DictionaryFilename	= "";
   wxString dictionary = mafGetApplicationDirectory().c_str();
-//  dictionary += "\\Config\\Dictionary\\";
+  dictionary += "\\Config\\Dictionary\\";
 	dictionary.Append("dicom3.dic");
 	if(wxFileExists(dictionary)) 
 		m_DictionaryFilename = dictionary;
 
 	m_DICOMDir	= mafGetApplicationDirectory().c_str();
-//  m_DICOMDir += "\\Data\\External\\";
+  m_DICOMDir += "\\Data\\External\\";
 	m_CurrentSlice			  = 0;
 	m_CurrentTime				  = 0;
   m_BuildStepValue			= 0;

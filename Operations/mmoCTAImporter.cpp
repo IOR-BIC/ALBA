@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTAImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:12:18 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-09-27 08:41:54 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -93,13 +93,13 @@ mmoCTAImporter::mmoCTAImporter(wxString label) : mafOp(label)
 
   m_DictionaryFilename	= "";
   wxString dictionary = mafGetApplicationDirectory().c_str();
-//  dictionary += "\\Config\\Dictionary\\";
+  dictionary += "\\Config\\Dictionary\\";
 	dictionary.Append("dicom3.dic");
 	if(wxFileExists(dictionary)) 
 		m_DictionaryFilename = dictionary;
 
 	m_DICOMDir	= mafGetApplicationDirectory().c_str();
-//  m_DICOMDir += "\\Data\\External\\";
+  m_DICOMDir += "\\Data\\External\\";
 	m_CurrentSlice			  = 0;
 	m_CurrentTime				  = 0;
   m_BuildStepValue			= 0;
