@@ -2,13 +2,13 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2006-08-21 13:32:58 $
-# Version:   $Revision: 1.33 $
+# Date:      $Date: 2006-09-29 14:17:42 $
+# Version:   $Revision: 1.34 $
 #
 # Description:
 # CMake Project file for the MAF.
 
-SET (CMAKE_BACKWARDS_COMPATIBILITY "2.0" CACHE INSTERNAL "This project is for CMake 2.0")
+SET (CMAKE_BACKWARDS_COMPATIBILITY "2.0" CACHE INTERNAL "This project is for CMake 2.0")
 CMAKE_MINIMUM_REQUIRED(VERSION 2.0) 
 
 PROJECT (MAF)
