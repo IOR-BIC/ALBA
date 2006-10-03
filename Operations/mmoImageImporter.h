@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoImageImporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:11:57 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-10-03 13:24:07 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -48,11 +48,24 @@ public:
 	/** Builds operation's interface. */
   void OpRun();
 
+  /** Set the filename for the .stl to import */
+  void SetFileName(const char *file_name);
+
+  
+  void SetBuildVolumeFlag(bool buildVolumeFlag) {m_BuildVolumeFlag = buildVolumeFlag;};
+  void SetFilePrefix(mafString filePrefix){m_FilePrefix = filePrefix;};  
+  void SetFilePattern(mafString filePattern){m_FilePattern = filePattern;};  
+  void SetFileExtension(mafString fileExtension){m_FileExtension = fileExtension;};  
+  void SetFileOffset(int fileOffset){m_FileOffset = fileOffset;};  
+  void SetFileSpacing(int fileSpacing){m_FileSpacing = fileSpacing;};
+  void SetImageZSpacing(double imageZSpacing){m_ImageZSpacing = imageZSpacing;};
+
+  void ImportImage();
 protected:
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   void OpStop(int result);
 
-  void ImportImage();
+  
   void BuildImageSequence();
   void BuildVolume();
 

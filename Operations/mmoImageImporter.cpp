@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoImageImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:11:57 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-10-03 13:24:07 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -109,13 +109,17 @@ void mmoImageImporter::OpRun()
 //----------------------------------------------------------------------------
 {
 	mafString wildc = "Images (*.bmp;*.jpg;*.png;*.tif)| *.bmp;*.jpg;*.png;*.tif";
-	m_Files.clear();
 	
-	m_Gui = new mmgGui(this);
-
-  mafGetOpenMultiFiles(m_FileDirectory.c_str(),wildc.GetCStr(),m_Files);
+  if (!m_TestMode)
+  {
+    m_Files.clear();
+	  m_Gui = new mmgGui(this);
+  
+    mafGetOpenMultiFiles(m_FileDirectory.c_str(),wildc.GetCStr(),m_Files);
+  }
 
   m_NumFiles = m_Files.size();
+
   if(m_NumFiles == 0)
   {
     OpStop(OP_RUN_CANCEL);
@@ -124,28 +128,34 @@ void mmoImageImporter::OpRun()
   {
     wxSplitPath(m_Files[0].c_str(),&m_FileDirectory,&m_FilePrefix,&m_FileExtension);
     
-    m_Gui->Bool(ID_BUILD_VOLUME,"Volume",&m_BuildVolumeFlag,0,"Check to build volume, otherwise a sequence of image is generated!");
-	  m_Gui->String(ID_STRING_PREFIX,"file pref.", &m_FilePrefix);
-	  m_Gui->String(ID_STRING_PATTERN,"file patt.", &m_FilePattern);
-	  m_Gui->String(ID_STRING_EXT,"file ext.", &m_FileExtension);
-	  m_Gui->Integer(ID_OFFSET,"file offset:",&m_FileOffset,0, MAXINT,"set the first slice number in the files name");
-	  m_Gui->Integer(ID_SPACING,"file spc.:",&m_FileSpacing,1, MAXINT, "set the spacing between the slices in the files name");
-	  m_Gui->Double(ID_DATA_SPACING,"data spc.:",&m_ImageZSpacing,1);
-    m_Gui->OkCancel();
+    if (!m_TestMode)
+    {
+      m_Gui->Bool(ID_BUILD_VOLUME,"Volume",&m_BuildVolumeFlag,0,"Check to build volume, otherwise a sequence of image is generated!");
+	    m_Gui->String(ID_STRING_PREFIX,"file pref.", &m_FilePrefix);
+	    m_Gui->String(ID_STRING_PATTERN,"file patt.", &m_FilePattern);
+	    m_Gui->String(ID_STRING_EXT,"file ext.", &m_FileExtension);
+	    m_Gui->Integer(ID_OFFSET,"file offset:",&m_FileOffset,0, MAXINT,"set the first slice number in the files name");
+	    m_Gui->Integer(ID_SPACING,"file spc.:",&m_FileSpacing,1, MAXINT, "set the spacing between the slices in the files name");
+	    m_Gui->Double(ID_DATA_SPACING,"data spc.:",&m_ImageZSpacing,1);
+      m_Gui->OkCancel();
 
-    m_Gui->Enable(ID_STRING_PREFIX,false);
-    m_Gui->Enable(ID_STRING_PATTERN,false);
-    m_Gui->Enable(ID_STRING_EXT,false);
-    m_Gui->Enable(ID_OFFSET,false);
-    m_Gui->Enable(ID_SPACING,false);
-    m_Gui->Enable(ID_DATA_SPACING,false);
-    m_Gui->Update();
-    ShowGui();
+      m_Gui->Enable(ID_STRING_PREFIX,false);
+      m_Gui->Enable(ID_STRING_PATTERN,false);
+      m_Gui->Enable(ID_STRING_EXT,false);
+      m_Gui->Enable(ID_OFFSET,false);
+      m_Gui->Enable(ID_SPACING,false);
+      m_Gui->Enable(ID_DATA_SPACING,false);
+      m_Gui->Update();
+      ShowGui();
+    }
 
     if(m_NumFiles == 1)
     {
       ImportImage();
-      OpStop(OP_RUN_OK);
+      if (!m_TestMode)
+      {
+        OpStop(OP_RUN_OK);
+      }
     }
   }
 }
@@ -171,13 +181,16 @@ void mmoImageImporter::OnEvent(mafEventBase *maf_event)
     switch(e->GetId())
     {
       case ID_BUILD_VOLUME:
-        m_Gui->Enable(ID_STRING_PREFIX,m_BuildVolumeFlag != 0);
-        m_Gui->Enable(ID_STRING_PATTERN,m_BuildVolumeFlag != 0);
-        m_Gui->Enable(ID_STRING_EXT,m_BuildVolumeFlag != 0);
-        m_Gui->Enable(ID_OFFSET,m_BuildVolumeFlag != 0);
-        m_Gui->Enable(ID_SPACING,m_BuildVolumeFlag != 0);
-        m_Gui->Enable(ID_DATA_SPACING,m_BuildVolumeFlag != 0);
-        m_Gui->Update();
+        if (!m_TestMode)
+        {
+          m_Gui->Enable(ID_STRING_PREFIX,m_BuildVolumeFlag != 0);
+          m_Gui->Enable(ID_STRING_PATTERN,m_BuildVolumeFlag != 0);
+          m_Gui->Enable(ID_STRING_EXT,m_BuildVolumeFlag != 0);
+          m_Gui->Enable(ID_OFFSET,m_BuildVolumeFlag != 0);
+          m_Gui->Enable(ID_SPACING,m_BuildVolumeFlag != 0);
+          m_Gui->Enable(ID_DATA_SPACING,m_BuildVolumeFlag != 0);
+          m_Gui->Update();
+        }
       break;
       case wxOK:
         ImportImage();
@@ -193,8 +206,10 @@ void mmoImageImporter::OnEvent(mafEventBase *maf_event)
 void mmoImageImporter::ImportImage()
 //----------------------------------------------------------------------------
 {
-  wxBusyCursor wait;
-
+  if (!m_TestMode)
+  {
+    wxBusyCursor wait;
+  }
   if(m_BuildVolumeFlag)
     BuildVolume();        //Build volume
   else
@@ -275,6 +290,7 @@ void mmoImageImporter::BuildImageSequence()
     m_ImportedImage->SetName("Imported Images");
   else
     m_ImportedImage->SetName(name);
+
   mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
 
   m_ImportedImage->SetTimeStamp(start_time);
@@ -285,12 +301,14 @@ void mmoImageImporter::BuildVolume()
 //----------------------------------------------------------------------------
 {
   wxString prefix  = m_FileDirectory + "\\" + m_FilePrefix;
+  prefix.Replace("/", "\\");
   wxString pattern = m_FilePattern  + "."  + m_FileExtension;
   int dim[3];
 
   vtkImageToStructuredPoints *convert = NULL;
-  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
 
+  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+  
   if(m_FileExtension.Upper() == "BMP")
 	{
     vtkBMPReader *r = vtkBMPReader::New();
@@ -404,4 +422,11 @@ void mmoImageImporter::BuildVolume()
     m_Output = m_ImportedImageAsVolume;
   }
   vtkDEL(convert);
+}
+//----------------------------------------------------------------------------
+void mmoImageImporter::SetFileName(const char *file_name)
+//----------------------------------------------------------------------------
+{
+ m_Files.push_back(file_name);
+ m_NumFiles = m_Files.size();
 }
