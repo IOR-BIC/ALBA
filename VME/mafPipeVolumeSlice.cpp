@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-19 09:47:16 $
-  Version:   $Revision: 1.34 $
+  Date:      $Date: 2006-10-03 13:20:30 $
+  Version:   $Revision: 1.35 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -182,6 +182,12 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
   
   m_ColorLUT = material->m_ColorLut;
   material->UpdateProp();
+
+  double sr[2];
+  m_Vme->GetOutput()->GetVTKData()->GetScalarRange(sr);
+  m_ColorLUT->SetTableRange(sr[0], sr[1]);
+  material->UpdateFromTables();
+  mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 
 	if(m_SliceDirection == SLICE_ARB)
 		m_SliceDirection = SLICE_Z;
