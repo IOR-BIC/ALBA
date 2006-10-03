@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:55 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2006-10-03 13:20:16 $
+  Version:   $Revision: 1.20 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -618,8 +618,8 @@ vtkPolyData *mafVMELandmarkCloud::NewPolyData(mafTimeStamp t)
 void mafVMELandmarkCloud::SetRadius(double rad)
 //-------------------------------------------------------------------------
 {
-  if (rad == m_Radius)
-    return;
+  //if (rad == m_Radius)
+  //  return;
 
   mafTagItem item;
   m_Radius = rad;
@@ -628,6 +628,8 @@ void mafVMELandmarkCloud::SetRadius(double rad)
   item.SetValue(rad);
   GetTagArray()->SetTag(item);
   GetEventSource()->InvokeEvent(this, mafVMELandmarkCloud::CLOUDE_RADIUS_MODIFIED);
+  mafEvent cam_event(this,CAMERA_UPDATE);
+  this->ForwardUpEvent(cam_event);
 }
 
 //-------------------------------------------------------------------------
@@ -1183,7 +1185,7 @@ void mafVMELandmarkCloud::OnEvent(mafEventBase *maf_event)
     switch(e->GetId())
     {
       case ID_LM_RADIUS:
-        SetRadius(e->GetDouble());
+        SetRadius(m_Radius);
       break;
       case ID_OPEN_CLOSE_CLOUD:
         if (m_CloudStateCheckbox)
