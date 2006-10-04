@@ -16,6 +16,10 @@ SET(PROJECT_SRCS
   mafViewRXCT.h
   mafViewSlice.cpp
   mafViewSlice.h
+  mafViewGlobalSlice.cpp
+  mafViewGlobalSlice.h
+  mafViewGlobalSliceCompound.cpp
+  mafViewGlobalSliceCompound.h
 )
 
 # List libraries that are needed by this project.

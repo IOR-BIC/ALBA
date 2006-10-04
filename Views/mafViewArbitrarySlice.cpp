@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-04 13:30:01 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-10-04 13:31:11 $
+  Version:   $Revision: 1.10 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -264,6 +264,8 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			m_Gui->AddGui(m_GuiGizmos);
 			m_Gui->FitGui();
 			m_Gui->Update();
+
+			m_Slicer->SetVisibleToTraverse(false);
 
 			vtkDEL(pts);
 			vtkDEL(pd);
