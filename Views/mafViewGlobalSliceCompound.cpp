@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSliceCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-04 13:32:15 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-10-04 15:12:27 $
+  Version:   $Revision: 1.2 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -107,16 +107,23 @@ void mafViewGlobalSliceCompound::OnEvent(mafEventBase *maf_event)
   switch(maf_event->GetId()) 
   {
 		case ID_RANGE_MODIFIED:
-    {
-			//Windowing
-			if(mafVMEVolumeGray::SafeDownCast(GetSceneGraph()->GetSelectedVme()))
-      {
-				int low, hi;
-        m_LutSlider->GetSubRange(&low,&hi);
-        m_ColorLUT->SetTableRange(low,hi);
-				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-      }
-    }
+			{
+				//Windowing
+				if(mafVMEVolumeGray::SafeDownCast(GetSceneGraph()->GetSelectedVme()))
+				{
+					int low, hi;
+					m_LutSlider->GetSubRange(&low,&hi);
+					m_ColorLUT->SetTableRange(low,hi);
+					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				}
+			}
+			break;
+		case ID_LUT_CHOOSER:
+			{
+				double *sr;
+				sr = m_ColorLUT->GetRange();
+				m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
+			}
 			break;
     default:
       mafEventMacro(*maf_event);
@@ -129,6 +136,7 @@ mmgGui* mafViewGlobalSliceCompound::CreateGui()
 	assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
 	m_Gui->AddGui(((mafViewGlobalSlice*)m_ChildViewList[ID_VIEW_GLOBAL_SLICE])->GetGui());
+	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
 	m_Gui->FitGui();
 	m_Gui->Update();
   return m_Gui;
@@ -162,6 +170,8 @@ void mafViewGlobalSliceCompound::EnableWidgets(bool enable)
 //----------------------------------------------------------------------------
 {
 	//if a volume is visualized enable the widgets
+	if(m_Gui)
+		m_Gui->Enable(ID_LUT_CHOOSER,enable);
   m_LutSlider->Enable(enable);
 }
 //----------------------------------------------------------------------------
@@ -185,7 +195,7 @@ void mafViewGlobalSliceCompound::UpdateWindowing(bool enable,mafNode *node)
 		Volume->GetVolumeOutput()->GetVTKData()->GetScalarRange(sr);
 		mmaVolumeMaterial *currentSurfaceMaterial = Volume->GetMaterial();
 		m_ColorLUT = Volume->GetMaterial()->m_ColorLut;
-		//m_LutWidget->SetLut(m_ColorLUT);
+		m_LutWidget->SetLut(m_ColorLUT);
 		m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
 		m_LutSlider->SetSubRange((long)currentSurfaceMaterial->m_TableRange[0],(long)currentSurfaceMaterial->m_TableRange[1]);
 	}

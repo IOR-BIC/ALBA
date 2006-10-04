@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSliceCompound.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-04 13:32:15 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-10-04 15:12:27 $
+  Version:   $Revision: 1.2 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,6 +40,13 @@ public:
   virtual ~mafViewGlobalSliceCompound(); 
 
   mafTypeMacro(mafViewGlobalSliceCompound, mafViewCompound);
+
+	/** IDs for the view GUI */
+	enum VIEW_SLICE_WIDGET_ID
+	{
+		ID_LUT_CHOOSER = Superclass::ID_LAST,
+		ID_LAST
+	};
 
   /** 
   Redefine this method to package the compounded view */
