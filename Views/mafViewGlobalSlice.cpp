@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-04 13:32:15 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-10-04 15:10:56 $
+  Version:   $Revision: 1.2 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,15 +39,19 @@
 #include "mmgFloatSlider.h"
 #include "mafTransform.h"
 #include "mafAbsMatrixPipe.h"
+#include "mafString.h"
 
 #include "vtkCellPicker.h"
 #include "vtkRayCast3DPicker.h"
 #include "vtkDataSet.h"
-#include "vtkPoints.h"
 #include "vtkPolyData.h"
 #include "vtkTransform.h"
-#include "vtkTransformPolyDataFilter.h"
 #include "vtkMath.h"
+#include "vtkActor2D.h"
+#include "vtkTextMapper.h"
+#include "vtkTextProperty.h"
+#include "vtkProperty2D.h"
+#include "vtkRenderer.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewGlobalSlice);
@@ -100,12 +104,23 @@ mafViewGlobalSlice::mafViewGlobalSlice(wxString label, int camera_position, bool
 	m_GlobalSlider = NULL;
 	m_SelectedVolume = NULL;
 
+	m_TextActor = NULL;
+	m_TextMapper = NULL;
+	m_TextColor[0]=1.0;
+	m_TextColor[1]=1.0;
+	m_TextColor[2]=1.0;
+
 	m_Dn = 0;
 }
 //----------------------------------------------------------------------------
 mafViewGlobalSlice::~mafViewGlobalSlice()
 //----------------------------------------------------------------------------
 {
+	if(m_Rwi && m_TextActor)
+		m_Rwi->m_RenFront->RemoveActor2D(m_TextActor);
+
+	vtkDEL(m_TextActor);
+	vtkDEL(m_TextMapper);
 }
 //----------------------------------------------------------------------------
 mafView *mafViewGlobalSlice::Copy(mafObserver *Listener)
@@ -137,6 +152,18 @@ void mafViewGlobalSlice::Create()
   vtkNEW(m_Picker2D);
   m_Picker2D->SetTolerance(0.001);
   m_Picker2D->InitializePickList();
+
+	m_Text = "";
+	m_TextMapper = vtkTextMapper::New();
+	m_TextMapper->SetInput(m_Text.GetCStr());
+	m_TextMapper->GetTextProperty()->AntiAliasingOff();
+
+	m_TextActor = vtkActor2D::New();
+	m_TextActor->SetMapper(m_TextMapper);
+	m_TextActor->SetPosition(3,3);
+	m_TextActor->GetProperty()->SetColor(m_TextColor);
+
+	m_Rwi->m_RenFront->AddActor(m_TextActor);
 }
 //----------------------------------------------------------------------------
 void mafViewGlobalSlice::VmeSelect(mafNode *node,bool select)
@@ -257,6 +284,8 @@ void mafViewGlobalSlice::VmeCreatePipe(mafNode *node)
   }
 	transform->Delete();
   transform = NULL;
+
+	UpdateText();
 }
 //----------------------------------------------------------------------------
 void mafViewGlobalSlice::VmeDeletePipe(mafNode *vme)
@@ -481,7 +510,7 @@ void mafViewGlobalSlice::UpdateSlice()
 
 	m_Dn = 0;
 
-	//UpdateText();
+	UpdateText();
   
   mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
@@ -522,4 +551,12 @@ void mafViewGlobalSlice::SetSlice(double origin[3], int dn)
 	m_Dn = dn;
 
 	UpdateSlice();
+}
+//----------------------------------------------------------------------------
+void mafViewGlobalSlice::UpdateText()
+//----------------------------------------------------------------------------
+{
+	m_Text=wxString::Format("o = [%.1f %.1f %.1f]  n = [%.1f %.1f %.1f]",m_SliceOrigin[0],m_SliceOrigin[1],m_SliceOrigin[2],m_SliceNormal[0],m_SliceNormal[1],m_SliceNormal[2]);
+	m_TextMapper->SetInput(m_Text.GetCStr());
+	m_TextMapper->Modified();
 }

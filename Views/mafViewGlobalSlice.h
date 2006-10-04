@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-04 13:32:15 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-10-04 15:10:56 $
+  Version:   $Revision: 1.2 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,6 +26,9 @@ class mafView;
 class mafObserver;
 class mafSceneNode;
 class mafEventBase;
+class mafString;
+class vtkActor2D;
+class vtkTextMapper;
 
 //----------------------------------------------------------------------------
 // mafViewGlobalSlice :
@@ -45,7 +48,6 @@ public:
     ID_POS_SLIDER = Superclass::ID_LAST,
 		ID_CHANGE_VIEW,
 		ID_OPACITY_SLIDER,
-		ID_LUT_CHOOSER,
     ID_LAST
   };
 
@@ -79,6 +81,7 @@ protected:
 
 	void UpdateSliceParameters();
 	void UpdateSlice();
+	void UpdateText();
 
 	virtual mmgGui  *CreateGui();
 
@@ -98,5 +101,10 @@ protected:
 
 	mafSceneNode		*m_SelectedVolume;
 	mmgFloatSlider	*m_GlobalSlider;
+
+	vtkActor2D					*m_TextActor;
+	vtkTextMapper	*m_TextMapper;
+	mafString		m_Text;
+	double			m_TextColor[3];
 };
 #endif
