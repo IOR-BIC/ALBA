@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-20 14:47:16 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-10-04 13:30:01 $
+  Version:   $Revision: 1.9 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -155,6 +155,8 @@ void mafViewArbitrarySlice::PackageView()
 void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 //----------------------------------------------------------------------------
 {
+	m_ChildViewList[ARBITRARY_VIEW]->VmeShow(node, show);
+	m_ChildViewList[SLICE_VIEW]->VmeShow(node, show);
 	mafVME *Vme=mafVME::SafeDownCast(node);
 	Vme->Update();
 	if (show)
@@ -210,9 +212,6 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			m_MatrixReset->Identity();
 			m_MatrixReset->SetVTKMatrix(TransformReset->GetMatrix());
 
-			m_ChildViewList[ARBITRARY_VIEW]->VmeShow(node, show);
-			m_ChildViewList[SLICE_VIEW]->VmeShow(node, show);
-
 			//Create VME slicer
 			mafNEW(m_Slicer);
 			m_Slicer->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
@@ -254,8 +253,6 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			m_GizmoRotate->SetAbsPose(m_MatrixReset);
 			m_GizmoRotate->Show(false);
 
-			m_Slicer->SetVisibleToTraverse(false);
-
 			m_TypeGizmo = GIZMO_TRANSLATE;
 			
 			//Create the Gizmos' Gui
@@ -279,8 +276,6 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			//a surface is visible only if there is a volume in the view
 			if(m_CurrentVolume)
 			{
-				m_ChildViewList[ARBITRARY_VIEW]->VmeShow(node, show);
-				m_ChildViewList[SLICE_VIEW]->VmeShow(node, show);
 
 				double normal[3];
 				((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
@@ -293,11 +288,6 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 				PipeSliceViewSurface->SetNormal(normal);
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 			}
-		}
-		else//another type of vme
-		{
-			m_ChildViewList[ARBITRARY_VIEW]->VmeShow(node, show);
-			m_ChildViewList[SLICE_VIEW]->VmeShow(node, show);
 		}
 	}
 	else//if show=false
@@ -586,8 +576,6 @@ mmgGui* mafViewArbitrarySlice::CreateGui()
 {
 	assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
-
-	m_ChildViewList[SLICE_VIEW]->GetGui();
 
 	//combo box to choose the type of gizmo
 	wxString Text[2]={"Gizmo Translation","Gizmo Rotation"};
