@@ -54,7 +54,7 @@ SET(vtkMAF_SRCS
 )
 
 IF (MAF_USE_ITK)
-SET(PROJECT_SRCS  ${PROJECT_SRCS}
+SET(vtkMAF_SRCS  ${vtkMAF_SRCS}
   itkRawMotionImporterUtility.cxx
   itkRawMotionImporterUtility.h
   )
