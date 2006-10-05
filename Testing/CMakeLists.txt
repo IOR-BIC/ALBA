@@ -11,10 +11,22 @@ ELSE (CPPUNIT_FOUND)
   MESSAGE("Cppunit library not found! Please fill the corresponding cache entries")
 ENDIF (CPPUNIT_FOUND)
   
-OPTION(BUILD_VIEWS_TESTING "Enable building of testing for BASE classes" ON)
+OPTION(BUILD_VIEWS_TESTING "Enable building of testing for View classes" ON)
 IF (BUILD_VIEWS_TESTING)
   SUBDIRS(Views)
 ENDIF (BUILD_VIEWS_TESTING)
+
+OPTION(BUILD_VME_TESTING "Enable building of testing for VME classes" ON)
+IF (BUILD_VME_TESTING)
+  SUBDIRS(VME)
+ENDIF (BUILD_VME_TESTING)
+
+OPTION(BUILD_OPERATIONS_TESTING "Enable building of testing for OPERATIONS classes" ON)
+IF (BUILD_OPERATIONS_TESTING)
+  SUBDIRS(Operations)
+ENDIF (BUILD_OPERATIONS_TESTING)
+
+
 
 
 # wxWidgets specific classes

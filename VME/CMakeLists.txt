@@ -14,6 +14,8 @@ SET(PROJECT_SRCS
   medPipeDensityDistance.h
   medPipeVolumeDRR.cpp
   medPipeVolumeDRR.h
+  mafVMERawMotionData.cpp
+  mafVMERawMotionData.h
 )
 
 # List libraries that are needed by this project.
