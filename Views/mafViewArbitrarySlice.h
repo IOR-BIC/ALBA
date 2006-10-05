@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-20 10:52:18 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-10-05 10:17:09 $
+  Version:   $Revision: 1.4 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,20 +54,16 @@ public:
 		ID_LAST,
 	};
 
-	/** 
-  Create visual pipe and initialize them to build an OrthoSlice visualization */
+	/** Create visual pipe and initialize them to build an OrthoSlice visualization */
   virtual void PackageView();
 
-	/** 
-  Show/Hide VMEs into plugged sub-views*/
+	/** Show/Hide VMEs into plugged sub-views*/
   virtual void VmeShow(mafNode *node, bool show);
 
-	/** 
-	Remove VME into plugged sub-views*/
+	/** Remove VME into plugged sub-views*/
   virtual void VmeRemove(mafNode *node);
 
-	/** 
-  Create the GUI on the bottom of the compounded view. */
+	/** Create the GUI on the bottom of the compounded view. */
   virtual void CreateGuiView();
 
 	virtual void OnEvent(mafEventBase *maf_event);
@@ -78,27 +74,23 @@ public:
 
 protected:
 
-	/**
-  Internally used to create a new instance of the GUI. This function should be
-  overridden by subclasses to create specialized GUIs. Each subclass should append
-  its own widgets and define the enum of IDs for the widgets as an extension of
-  the superclass enum. The last id value must be defined as "LAST_ID" to allow the 
+	/** Internally used to create a new instance of the GUI. 
+  This function should be overridden by subclasses to create specialized GUIs. 
+  Each subclass should append its own widgets and define the enum of IDs for the widgets as 
+  an extension of the superclass enum. The last id value must be defined as "LAST_ID" to allow the 
   subclass to continue the ID enumeration from it. For appending the widgets in the
   same panel GUI, each CreateGUI() function should first call the superclass' one.*/
 	virtual mmgGui* CreateGui();
 
-	/** 
-	Enable/disable view widgets.*/
+	/** Enable/disable view widgets.*/
   void EnableWidgets(bool enable = true);
 
 	void OnEventThis(mafEventBase *maf_event);  
 
-	/**
-	This function is called when a rotate gizmo is moved*/
+	/** This function is called when a rotate gizmo is moved*/
 	void OnEventGizmoRotate(mafEventBase *maf_event);
 
-	/**
-	This function is called when a tanslate gizmo is moved*/
+	/**	This function is called when a translate gizmo is moved*/
 	void OnEventGizmoTranslate(mafEventBase *maf_event);
 
 	void PostMultiplyEventMatrix(mafEventBase *maf_event);
