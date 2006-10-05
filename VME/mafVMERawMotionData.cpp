@@ -1,16 +1,26 @@
 /*=========================================================================
-
- Program:   Visualization Toolkit
- Module:    $RCSfile: mafVMERawMotionData.cpp,v $
- Language:  C++
- Date:      $Date: 2006-10-05 10:12:28 $
- Version:   $Revision: 1.2 $
-
+  Program:   Multimod Application Framework
+  Module:    $RCSfile: mafVMERawMotionData.cpp,v $
+  Language:  C++
+  Date:      $Date: 2006-10-05 11:33:14 $
+  Version:   $Revision: 1.3 $
+  Authors:   Stefano Perticoni - porting Daniele Giunchi
+==========================================================================
+  Copyright (c) 2001/2005 
+  CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
+
+#include "mafDefines.h" 
+//----------------------------------------------------------------------------
+// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// This force to include Window,wxWidgets and VTK exactly in this order.
+// Failing in doing this will result in a run-time error saying:
+// "Failure#0: The value of ESP was not properly saved across a function call"
+//----------------------------------------------------------------------------
 
 #include "mafVMERawMotionData.h"
 
-#include "mafString.h"	
+
 #include "mafVMELandmarkCloud.h"  
 #include "mafVMEItem.h"
 
@@ -21,12 +31,14 @@
 #include <iostream>
 #include <string>
 
+
+//----------------------------------------------------------------------------
+// constant
 //----------------------------------------------------------------------------
 //If there is no dictionary or if the dictionary
 //does not define a NOT_USED value I use
 //the value -9999.00 to identify landmarks that
 //are not visible at a given timestamp.
-
 const double CONST_NOT_USED_IOR_MAL = -9999.00;
 
 //-------------------------------------------------------------------------
@@ -37,7 +49,7 @@ mafCxxTypeMacro(mafVMERawMotionData)
 mafVMERawMotionData::mafVMERawMotionData()
 //----------------------------------------------------------------------------
 { 
-	this->Dictionary = 0;
+	this->m_Dictionary = 0;
 }
 //----------------------------------------------------------------------------
 mafVMERawMotionData::~mafVMERawMotionData()
@@ -50,7 +62,7 @@ mafVMERawMotionData::~mafVMERawMotionData()
 void mafVMERawMotionData::SetDictionaryFileName(const char *name)
 //----------------------------------------------------------------------------
 {
-  this->DictionaryFileName = name;
+  this->m_DictionaryFileName = name;
   this->DictionaryOn();
   this->Modified();
 }
@@ -59,7 +71,7 @@ void mafVMERawMotionData::SetDictionaryFileName(const char *name)
 void mafVMERawMotionData::SetFileName(const char *name)
 //----------------------------------------------------------------------------
 {
-  this->FileName = name;
+  this->m_FileName = name;
   this->Modified();
 }
 
@@ -72,7 +84,7 @@ int mafVMERawMotionData::Read()
 
   vnl_matrix<double> M;
 
-  if (utils.ReadMatrix(M,this->FileName))
+  if (utils.ReadMatrix(M,this->m_FileName))
   {
     mafErrorMacro("File does not exist!");
 	  return 1;
@@ -85,7 +97,7 @@ int mafVMERawMotionData::Read()
 
 	if (this->GetDictionary())
 	{	
-    std::ifstream v_dictionary(this->DictionaryFileName, std::ios::in);
+    std::ifstream v_dictionary(this->m_DictionaryFileName, std::ios::in);
 
 		int v_current_col = 0;	
 
@@ -108,23 +120,23 @@ int mafVMERawMotionData::Read()
 			while(v_dictionary >> v_lmname)	
 			{
 			  v_dictionary >> v_segment_name;			
-        v_current_dlc = mafVMELandmarkCloud::SafeDownCast(this->FindInTreeByName(v_segment_name.c_str()));
-			  if (v_current_dlc == NULL)
+        m_CurrentDlc = mafVMELandmarkCloud::SafeDownCast(this->FindInTreeByName(v_segment_name.c_str()));
+			  if (m_CurrentDlc == NULL)
 			  {
 			    //Create the new cloud
-			    mafNEW(v_current_dlc);
-			    v_current_dlc->SetRadius(15);
-			    v_current_dlc->SetName(v_segment_name.c_str());
+			    mafNEW(m_CurrentDlc);
+			    m_CurrentDlc->SetRadius(15);
+			    m_CurrentDlc->SetName(v_segment_name.c_str());
 
 			    //Add new cloud to vme tree
-			    this->AddChild(v_current_dlc);
+			    this->AddChild(m_CurrentDlc);
 			  }
 						
-				v_current_dlc->AppendLandmark(v_lmname.c_str());
+				m_CurrentDlc->AppendLandmark(v_lmname.c_str());
 
 				for (int i = 0; i < M.rows(); i++)
 				{ 
-				  v_current_dlc->SetLandmark(v_lmname.c_str(),
+				  m_CurrentDlc->SetLandmark(v_lmname.c_str(),
 					                          M(i, v_current_col),						
 					                          M(i, v_current_col + 1),
 					                          M(i, v_current_col + 2), 
@@ -136,12 +148,12 @@ int mafVMERawMotionData::Read()
 							M(i, v_current_col + 1) == not_used_identifier ||
 							M(i, v_current_col + 2) == not_used_identifier)
 					{
-						double pippo = M(i, v_current_col + 2);
-						v_current_dlc->SetLandmarkVisibility(v_lmname.c_str(), 0, i);
+						//double value = M(i, v_current_col + 2);
+						m_CurrentDlc->SetLandmarkVisibility(v_lmname.c_str(), 0, i);
 					}
 				}	
 				v_current_col +=  3;
-//				v_current_dlc = NULL;
+//				m_CurrentDlc = NULL;
 			}//while	
 		}//if vdict is open
 		else
@@ -159,9 +171,9 @@ int mafVMERawMotionData::Read()
     not_used_identifier = 9999;
 			
 		int current_lm = 0;
-		mafNEW(v_dlc);
-    v_dlc->SetName("dummy segment");
-		v_dlc->SetRadius(15);
+		mafNEW(m_Dlc);
+    m_Dlc->SetName("dummy segment");
+		m_Dlc->SetRadius(15);
     		
 	  //Create (M.columns() / 3) landmarks
 		for (int j = 0; j < M.columns(); j += 3)
@@ -170,12 +182,12 @@ int mafVMERawMotionData::Read()
 			lm_name ="lm_";
       lm_name << current_lm;
               
-			v_dlc->AppendLandmark(lm_name);
+			m_Dlc->AppendLandmark(lm_name);
 			current_lm++;
 
 			for (int i = 0; i < M.rows(); i++)
 			{ 
-				v_dlc->SetLandmark(lm_name,
+				m_Dlc->SetLandmark(lm_name,
 				M(i, j),						
 				M(i, j + 1),
 				M(i, j + 2), 
@@ -187,14 +199,14 @@ int mafVMERawMotionData::Read()
 						fabs(M(i, j + 1)) > not_used_identifier ||
 						fabs(M(i, j + 2)) > not_used_identifier)
 				{
-					v_dlc->SetLandmarkVisibility(lm_name, 0, i);
+					m_Dlc->SetLandmarkVisibility(lm_name, 0, i);
 				}
 			}	
 			
 		}						
-		this->AddChild(v_dlc);						
-//		v_dlc->Delete();
-//		v_dlc = NULL;
+		this->AddChild(m_Dlc);						
+//		m_Dlc->Delete();
+//		m_Dlc = NULL;
 	}//if
 	  
   return 0;
