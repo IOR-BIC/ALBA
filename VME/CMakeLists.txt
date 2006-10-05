@@ -14,9 +14,14 @@ SET(PROJECT_SRCS
   medPipeDensityDistance.h
   medPipeVolumeDRR.cpp
   medPipeVolumeDRR.h
+)
+
+IF (MAF_USE_ITK)
+SET(PROJECT_SRCS  ${PROJECT_SRCS}
   mafVMERawMotionData.cpp
   mafVMERawMotionData.h
 )
+ENDIF (MAF_USE_ITK)
 
 # List libraries that are needed by this project.
 SET(PROJECT_LIBS "mafVME" "mafInteraction")

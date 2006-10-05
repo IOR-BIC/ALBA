@@ -12,13 +12,18 @@ SET(PROJECT_SRCS
   mmoCTAImporter.h
   mmoCTMRIImporter.cpp
   mmoCTMRIImporter.h
+  mmoLandmarkImporter.cpp
+  mmoLandmarkImporter.h
+)
+
+IF (MAF_USE_ITK)
+SET(PROJECT_SRCS  ${PROJECT_SRCS}
   mmoRawMotionDataImporter.cpp
   mmoRawMotionDataImporter.h
   mmoLandmarkExporter.cpp
   mmoLandmarkExporter.h
-  mmoLandmarkImporter.cpp
-  mmoLandmarkImporter.h
-)
+  )
+ENDIF (MAF_USE_ITK)
 
 # List libraries that are needed by this project.
 SET(PROJECT_LIBS "mafVME" "mafInteraction")
