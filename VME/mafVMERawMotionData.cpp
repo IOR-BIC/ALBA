@@ -3,21 +3,20 @@
  Program:   Visualization Toolkit
  Module:    $RCSfile: mafVMERawMotionData.cpp,v $
  Language:  C++
- Date:      $Date: 2006-10-05 08:46:10 $
- Version:   $Revision: 1.1 $
+ Date:      $Date: 2006-10-05 10:12:28 $
+ Version:   $Revision: 1.2 $
 
 =========================================================================*/
+
 #include "mafVMERawMotionData.h"
+
+#include "mafString.h"	
+#include "mafVMELandmarkCloud.h"  
+#include "mafVMEItem.h"
+
 #include "vtkObjectFactory.h"
 #include "vtkCommand.h"
-#include "mafString.h"	
 
-
-#include "mafVMELandmarkCloud.h"  
-
-#include <vnl\vnl_matrix.h>      
-
-#include "mafVMEItem.h"
 #include "itkRawMotionImporterUtility.h"
 #include <iostream>
 #include <string>
