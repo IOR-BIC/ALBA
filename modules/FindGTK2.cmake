@@ -2,8 +2,8 @@
   # Module:    $RCSfile: FindGTK2.cmake,v $
   # Author:    Silvano Imboden
   # Language:  CMake 2.05
-  # Date:      $Date: 2006-06-14 14:46:34 $
-  # Version:   $Revision: 1.2 $
+  # Date:      $Date: 2006-10-05 11:06:52 $
+  # Version:   $Revision: 1.3 $
   ##################################################################
   
   # ---------------------------------------------------------------------
@@ -92,7 +92,7 @@
                 RETURN_VALUE RET3)
     
     ## extract strings beginninig with (-D) 
-    STRING(REGEX MATCHALL "[-][D]([^ ;])+" GTK_DEFINES "${GTK_FLAGS }" )
+    STRING(REGEX MATCHALL "[-][D]([^ ;])+" GTK_DEFINES "${GTK_FLAGS}" )
     
     #MESSAGE("DBG: res=>>${RET3}<< GTK_FLAGS = >>${GTK_FLAGS}<<") 
     #MESSAGE("DBG: GTK_DEFINES = >>${GTK_DEFINES}<<")
