@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-04 15:10:56 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-10-05 10:49:29 $
+  Version:   $Revision: 1.3 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,26 +20,21 @@
 //----------------------------------------------------------------------------
 
 #include "mafViewGlobalSlice.h"
-#include "mafView.h"
 #include "mafObserver.h"
 #include "mafNode.h"
 #include "mafSceneNode.h"
-#include "mafString.h"
 #include "mafPipeFactory.h"
 #include "mafPipe.h"
 #include "mafPipeVolumeSlice.h"
 #include "mafPipeSurfaceSlice.h"
-#include "mafObject.h"
 #include "mafAttachCamera.h"
+#include "mmgFloatSlider.h"
+
+#include "mafTransform.h"
+#include "mafAbsMatrixPipe.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
 #include "mafVMEVolume.h"
-#include "mafEvent.h"
-#include "mafEventBase.h"
-#include "mmgFloatSlider.h"
-#include "mafTransform.h"
-#include "mafAbsMatrixPipe.h"
-#include "mafString.h"
 
 #include "vtkCellPicker.h"
 #include "vtkRayCast3DPicker.h"
