@@ -51,9 +51,14 @@ SET(vtkMAF_SRCS
   vtkVolumeResample.cxx
   vtkVolumeSlicer.cxx
   vtkVolumeSlicer.h
+)
+
+IF (MAF_USE_ITK)
+SET(PROJECT_SRCS  ${PROJECT_SRCS}
   itkRawMotionImporterUtility.cxx
   itkRawMotionImporterUtility.h
-)
+  )
+ENDIF (MAF_USE_ITK)
 
 # List the kits from VTK that are needed by this project.
 SET(vtkMAF_LIBS
