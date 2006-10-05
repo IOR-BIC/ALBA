@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: itkRawMotionImporterUtility.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-03 13:20:48 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-10-05 09:55:32 $
+  Version:   $Revision: 1.2 $
   Thanks:    Thanks to Sebastien Barre who developed this class. Thanks to
              Tim Hutton too for the idea.
 
@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __itkRawMotionImporterUtility_h
 #define __itkRawMotionImporterUtility_h
 
-#include <vnl\vnl_matrix.h>
+#include "vnl/vnl_matrix.h"
 
 //----------------------------------------------------------------------------
 class itkRawMotionImporterUtility
