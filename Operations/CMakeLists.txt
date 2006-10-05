@@ -12,6 +12,12 @@ SET(PROJECT_SRCS
   mmoCTAImporter.h
   mmoCTMRIImporter.cpp
   mmoCTMRIImporter.h
+  mmoRawMotionDataImporter.cpp
+  mmoRawMotionDataImporter.h
+  mmoLandmarkExporter.cpp
+  mmoLandmarkExporter.h
+  mmoLandmarkImporter.cpp
+  mmoLandmarkImporter.h
 )
 
 # List libraries that are needed by this project.
