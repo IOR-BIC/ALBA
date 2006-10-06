@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTest.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-10-06 14:35:12 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,6 +22,10 @@
 #include "mmoTest.h"
 #include "mmgGui.h"
 #include "mafNode.h"
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoTest);
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mmoTest::mmoTest(wxString label)

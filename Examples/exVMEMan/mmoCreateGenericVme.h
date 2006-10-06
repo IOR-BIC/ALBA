@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateGenericVme.h,v $
   Language:  C++
-  Date:      $Date: 2006-05-24 11:18:28 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-10-06 14:35:12 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,10 +24,11 @@ class mmoCreateGenericVme : public mafOp
 // ============================================================================
 {
 public:
-                mmoCreateGenericVme(wxString label);
-               ~mmoCreateGenericVme();
-	virtual void OnEvent(mafEventBase *event);
+  mmoCreateGenericVme(wxString label = "CreateGenericVme");
+  ~mmoCreateGenericVme();
+  virtual void OnEvent(mafEventBase *event);
   mafOp* Copy();
+  mafTypeMacro(mmoCreateGenericVme, mafOp);
 
   bool Accept(mafNode* vme) {return vme != NULL;};
   void OpRun();
@@ -38,11 +39,3 @@ protected:
   mafNodeGeneric  *m_vme; 
 };
 #endif // __mmoCreateGenericVme_H__
-
-
-
-
-
-
-
-

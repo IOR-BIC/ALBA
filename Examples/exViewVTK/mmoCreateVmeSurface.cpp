@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateVmeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-10-06 14:34:34 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,6 +23,11 @@
 #include "mafVMESurface.h"
 #include "vtkConeSource.h"
 #include "vtkPolyData.h"
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoCreateVmeSurface);
+//----------------------------------------------------------------------------
+
 //----------------------------------------------------------------------------
 mmoCreateVmeSurface::mmoCreateVmeSurface(wxString label)
 : mafOp(label)

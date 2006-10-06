@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exVMEManApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-25 21:27:12 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-10-06 14:35:11 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,7 +24,7 @@
 #include "mafNodeFactory.h"
 #include "mafPics.h"
 #include "mmgMDIFrame.h"
-
+#include "mafPipeFactoryVME.h"
 #include "mafVMEFactory.h"
 #include "mafNodeGeneric.h"
 #include "mafNodeRoot.h"
@@ -46,15 +46,18 @@ bool exVMEManApp::OnInit()
 
   int result = mafVMEFactory::Initialize();
   assert(result==MAF_OK);
+
+  result = mafPipeFactoryVME::Initialize();
+  assert(result==MAF_OK);
   
   m_logic = new mafLogicWithManagers();
-  m_logic->Configure();
-
   m_logic->GetTopWin()->SetTitle("testOpMan");
+  m_logic->Configure();
+  SetTopWindow(mafGetFrame()); 
+  
   m_logic->Plug(new mmoCreateGenericVme("Add Vme Generic \tCtrl+A"));
   m_logic->Plug(new mmoTest("Test \tCtrl+B"));
 
-  SetTopWindow(mafGetFrame());  
   m_logic->Show();
   m_logic->Init(0,NULL);
   return TRUE;

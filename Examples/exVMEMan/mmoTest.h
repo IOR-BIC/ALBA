@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTest.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-10-06 14:35:12 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,10 +24,11 @@ class mmoTest : public mafOp
 // ============================================================================
 {
 public:
-                mmoTest(wxString label);
+                mmoTest(wxString label = "Test");
                ~mmoTest();
 	virtual void OnEvent(mafEventBase *event);
   mafOp* Copy();
+  mafTypeMacro(mmoTest, mafOp);
 
   bool Accept(mafNode* vme) {return true;};
   void OpRun();
