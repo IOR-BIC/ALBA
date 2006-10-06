@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2006-08-21 13:33:32 $
-# Version:   $Revision: 1.3 $
+# Date:      $Date: 2006-10-06 09:10:08 $
+# Version:   $Revision: 1.4 $
 #
 # Description:
 # CMake Project file for the Medical Library.
@@ -12,6 +12,12 @@ SET (CMAKE_BACKWARDS_COMPATIBILITY "2.0" CACHE INSTERNAL "This project is for CM
 CMAKE_MINIMUM_REQUIRED(VERSION 2.0) 
 
 PROJECT (MED)
+
+
+# Create the header to configure the classes.
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/medDefines.h.in
+             ${PROJECT_BINARY_DIR}/medDefines.h
+             @ONLY)
 
 #-----------------------------------------------------------------------------
 # where to place output binaries
@@ -116,7 +122,7 @@ IF(MAF_FOUND)
   # Testing stuff
   #-----------------------------------------------------------------------------
   IF(BUILD_TESTING)
-    FIND_PATH(MED_DATA_ROOT "TestingDataRoot.txt" "${MED_SOURCE_DIR}/../TestingData" "${MED_SOURCE_DIR}/../mmData/TestingData" "${MED_SOURCE_DIR}/../../TestingData" DOC "Test data repository")
+    FIND_PATH(MED_DATA_ROOT "TestingDataRoot.txt" "${MED_SOURCE_DIR}/Testing/unittestData" "${MED_SOURCE_DIR}/../TestingData" "${MED_SOURCE_DIR}/../mmData/TestingData" "${MED_SOURCE_DIR}/../../TestingData"  DOC "Test data repository")
     INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
     ENABLE_TESTING()
   

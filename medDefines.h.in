@@ -1,0 +1,9 @@
+#ifndef __medDefines_h
+#define __medDefines_h
+
+//--------------------------------------------------------------------------
+// Data root used to reach data for testing
+//--------------------------------------------------------------------------
+#define MED_DATA_ROOT "@MED_DATA_ROOT@"
+
+#endif // __medDefines_h

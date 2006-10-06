@@ -2,15 +2,16 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoLandmarkExporterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2006-10-05 08:49:36 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2006-10-06 09:10:57 $
+Version:   $Revision: 1.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#include "mafDefines.h" 
+#include "mafDefines.h"
+#include "medDefines.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -40,10 +41,10 @@ void mmoLandmarkExporterTest::Test()
   mafNEW(vmeRawMotionData);
 
   // try to set this data to the volume
-  mafString filename=MAF_DATA_ROOT;
+  mafString filename=MED_DATA_ROOT;
   filename<<"/RAW_MAL/Fprg3bsi_NOT_USED.man";
 
-  mafString fileDict=MAF_DATA_ROOT;
+  mafString fileDict=MED_DATA_ROOT;
   fileDict<<"/RAW_MAL/DICT_FPRG3BSL_421_NOT_USED.TXT";
 
   vmeRawMotionData->DictionaryOn();
@@ -57,7 +58,7 @@ void mmoLandmarkExporterTest::Test()
 	//Inizialize exporter
 	mmoLandmarkExporter *exporter=new mmoLandmarkExporter("test exporter");
 	exporter->SetInput(vmeRawMotionData);
-	mafString fileExp=MAF_DATA_ROOT;
+	mafString fileExp=MED_DATA_ROOT;
   fileExp<<"/RAW_MAL/Export.txt";
   exporter->TestModeOn();
 	exporter->SetFileName(fileExp);

@@ -2,15 +2,16 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoLandmarkImporterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2006-10-05 08:49:36 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2006-10-06 09:10:58 $
+Version:   $Revision: 1.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#include "mafDefines.h" 
+#include "mafDefines.h"
+#include "medDefines.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -41,7 +42,7 @@ void mmoLandmarkImporterTest::Test()
 	mmoLandmarkImporter *importer=new mmoLandmarkImporter("importer");
 	importer->TestModeOn();
   importer->SetInput(storage->GetRoot());
-	mafString filename=MAF_DATA_ROOT;
+	mafString filename=MED_DATA_ROOT;
   filename<<"/RAW_MAL/cloud_to_be_imported";
 	importer->SetFileName(filename.GetCStr());
 	importer->Read();
@@ -72,7 +73,7 @@ void mmoLandmarkImporterTest::TestTimeVariant()
 	mmoLandmarkImporter *importer=new mmoLandmarkImporter("importer");
 	importer->TestModeOn();
   importer->SetInput(storage->GetRoot());
-	mafString filename=MAF_DATA_ROOT;
+	mafString filename=MED_DATA_ROOT;
   filename<<"/RAW_MAL/Export.txt";
 	importer->SetFileName(filename.GetCStr());
 	importer->Read();
@@ -105,7 +106,7 @@ void mmoLandmarkImporterTest::TestUnTag()
 	mmoLandmarkImporter *importer=new mmoLandmarkImporter("importer");
 	importer->TestModeOn();
   importer->SetInput(storage->GetRoot());
-	mafString filename=MAF_DATA_ROOT;
+	mafString filename=MED_DATA_ROOT;
   filename<<"/RAW_MAL/cloud_NOT_TAGGED";
 	importer->SetFileName(filename.GetCStr());
 	importer->ReadWithoutTag();
