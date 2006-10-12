@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:09:39 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2006-10-12 08:28:36 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -74,8 +74,7 @@ public:
 	/** Set the input vme for the operation. */
 	virtual void		SetInput(mafNode* vme)	{m_Input = vme;};
 
-  /** 
-  Return the mafNode result of the operation.*/
+  /** Return the mafNode result of the operation.*/
   virtual mafNode *GetOutput() {return m_Output;};
 
 	/** Return true for the acceptable vme type. */
