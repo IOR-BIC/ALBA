@@ -64,13 +64,13 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = "@MAF_BINARY_DIR@/Base/" \
-                         "@MAF_BINARY_DIR@/Core/" \
-                         "@MAF_BINARY_DIR@/IO/" \
-                         "@MAF_BINARY_DIR@/Gui/" \
-                         "@MAF_BINARY_DIR@/VME/" \
-                         "@MAF_BINARY_DIR@/Operations/" \
-                         "@MAF_BINARY_DIR@/Interaction/" \
+INPUT                  = "@MAF_BINARY_PATH@/Base/" \
+                         "@MAF_BINARY_PATH@/Core/" \
+                         "@MAF_BINARY_PATH@/IO/" \
+                         "@MAF_BINARY_PATH@/Gui/" \
+                         "@MAF_BINARY_PATH@/VME/" \
+                         "@MAF_BINARY_PATH@/Operations/" \
+                         "@MAF_BINARY_PATH@/Interaction/" \
                          "@MED_SOURCE_DIR@/Common/" \
                          "@MED_SOURCE_DIR@/Operations/" \
                          "@MED_SOURCE_DIR@/VME/" \
