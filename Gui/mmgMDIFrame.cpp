@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-10 15:22:20 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2006-10-12 10:01:02 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -199,9 +199,9 @@ void mmgMDIFrame::OnSize(wxSizeEvent& event)
   {
     wxRect r;
     m_frameStatusBar->GetFieldRect(4,r);
-    m_Gauge->SetSize(r.x,r.y+2,r.width -4 ,r.height -4);
+    m_Gauge->SetPosition(r.GetPosition());
   }
-  event.Skip();
+  //event.Skip();
 }
 //-----------------------------------------------------------
 void mmgMDIFrame::OnDropFile(wxDropFilesEvent &event)
@@ -229,7 +229,7 @@ void mmgMDIFrame::OnDropFile(wxDropFilesEvent &event)
   }
 }
 //----------------------------------------------------------------------------
-void mmgMDIFrame::CreateStatusbar ()
+void mmgMDIFrame::CreateStatusbar()
 //----------------------------------------------------------------------------
 {
   static const int widths[]={-1,60,60,60,210,100}; // enlarged the last tab for the "free mem watch" information
@@ -311,13 +311,13 @@ void mmgMDIFrame::ProgressBarSetText(wxString *msg)
 void mmgMDIFrame::RenderStart()
 //-----------------------------------------------------------
 {
-    SetStatusText( "Rendering",1);
+  SetStatusText( "Rendering",1);
 }
 //-----------------------------------------------------------
 void mmgMDIFrame::RenderEnd()
 //-----------------------------------------------------------
 {
-    SetStatusText( " ",1);
+  SetStatusText( " ",1);
 }
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #ifdef MAF_USE_VTK
