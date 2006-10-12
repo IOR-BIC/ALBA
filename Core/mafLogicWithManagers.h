@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-12 08:50:01 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2006-10-12 09:05:45 $
+  Version:   $Revision: 1.28 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -136,7 +136,7 @@ protected:
   virtual void CreateMenu();
 
   /** create a new storage object */
-  virtual void CreateStorage(mafEvent *e);
+  virtual void CreateLocalStorage(mafEvent *e);
 
   /**
   Redefined to add Print buttons */
@@ -151,12 +151,6 @@ protected:
   By default (file_to_open = NULL) it ask the user to choose a file to open,
   otherwise it open the given one.*/
 	virtual void OnFileOpen(const char *file_to_open = NULL);
-  /** FILE UPLOAD evt. handler 
-  By default (remote_file = NULL) AND the entire msf is uploaded and only the remote directory is asked to the user, 
-  otherwise given parameters are managed to upload the file correctly. 'upload_flag' can be:
-  UPLOAD_SELECTED_VME, UPLOAD_SUBTREE or UPLOAD_TREE (default) and the corresponding compressed:
-  UPLOAD_COMPRESSED_VME, UPLOAD_COMPRESSED_SUBTREE, UPLOAD_COMPRESSED_TREE.*/
-  virtual void OnFileUpload(const char *remote_file, unsigned int upload_flag = UPLOAD_TREE);
   /** FILE HISTORY evt. handler */
 	virtual void OnFileHistory(int menuId);
   /** FILE SAVE evt. handler */
