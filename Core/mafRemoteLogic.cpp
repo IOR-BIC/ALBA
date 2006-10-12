@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafRemoteLogic.cpp,v $
 Language:  C++
-Date:      $Date: 2006-09-13 16:41:48 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2006-10-12 08:51:42 $
+Version:   $Revision: 1.5 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -387,9 +387,17 @@ void mafRemoteLogic::RemoteMessage(mafString &cmd, bool to_server)
     else if(command == "RunOperation")
     {
       long op_id;
-      data_cmd.ToLong(&op_id);
+      mafString op_type;
       m_OperationManager->m_FromRemote = true;
-      m_OperationManager->OpRun(op_id);
+      if (data_cmd.ToLong(&op_id))
+      {
+        m_OperationManager->OpRun(op_id);
+      }
+      else
+      {
+        op_type = data_cmd.c_str();
+        m_OperationManager->OpRun(op_type);
+      }
       m_OperationManager->m_FromRemote = false;
     }
     else if(command == "WidgetID")
@@ -547,7 +555,9 @@ void mafRemoteLogic::SynchronizeApplication()
   }
 
   if(send_msg)
+  {
     RemoteMessage(cmd);
+  }
 
   // Retrieve Remote layout.
   cmd = "GetViewLayout";
