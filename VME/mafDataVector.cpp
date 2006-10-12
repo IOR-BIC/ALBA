@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-08-25 23:24:48 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-10-12 15:29:00 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -68,6 +68,10 @@ bool mafDataVector::GetCrypting()
 void mafDataVector::SetCrypting(bool flag)
 //-------------------------------------------------------------------------
 {
+  if (m_Crypting == flag)
+  {
+    return;
+  }
   m_Crypting = flag;
   Modified();
 }
