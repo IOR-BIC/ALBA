@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-01 14:05:57 $
-  Version:   $Revision: 1.38 $
+  Date:      $Date: 2006-10-12 08:25:06 $
+  Version:   $Revision: 1.39 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1344,7 +1344,7 @@ void mmgGui::VectorN(int id,wxString label, int *var,int num_elem,int min, int m
 void mmgGui::OnListBox (wxCommandEvent &event)
 //----------------------------------------------------------------------------
 {
-	mafEventMacro(mafEvent(this, GetModuleId(event.GetId())));
+  mafEventMacro(mafEvent(this, GetModuleId(event.GetId()),(long) event.m_commandInt)); 
 }
 //----------------------------------------------------------------------------
 void mmgGui::OnCheckListBox (wxCommandEvent &event)
