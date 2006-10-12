@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeProjected.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-25 11:19:58 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-10-12 15:49:23 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -46,6 +46,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkProjectRG.h"
 #include "vtkProperty.h"
 #include "vtkDoubleArray.h"
+#include "vtkFloatArray.h"
 #include "vtkOutlineCornerFilter.h"
 
 //----------------------------------------------------------------------------
@@ -205,14 +206,30 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 	if (rg_data)
 	{
     vtkDoubleArray* z_fa = vtkDoubleArray::SafeDownCast(rg_data->GetZCoordinates());
-		for (int i = 0; i < z_fa->GetNumberOfTuples(); i++)
+		if(z_fa)
 		{
-			CTLinesPoints->InsertNextPoint(xmax, ymax, z_fa->GetValue(i));
-			CTLinesPoints->InsertNextPoint(xmax+(xmax-xmin)/30, ymax+(ymax-ymin)/30 ,z_fa->GetValue(i));
-			points_id[0] = counter;
-			points_id[1] = counter+1;
-			counter+=2;
-			CTCells->InsertNextCell(2 , points_id);
+			for (int i = 0; i < z_fa->GetNumberOfTuples(); i++)
+			{
+				CTLinesPoints->InsertNextPoint(xmax, ymax, z_fa->GetValue(i));
+				CTLinesPoints->InsertNextPoint(xmax+(xmax-xmin)/30, ymax+(ymax-ymin)/30 ,z_fa->GetValue(i));
+				points_id[0] = counter;
+				points_id[1] = counter+1;
+				counter+=2;
+				CTCells->InsertNextCell(2 , points_id);
+			}
+		}
+		else
+		{
+			vtkFloatArray* z_fa_f = vtkFloatArray::SafeDownCast(rg_data->GetZCoordinates());
+			for (int i = 0; i < z_fa_f->GetNumberOfTuples(); i++)
+			{
+				CTLinesPoints->InsertNextPoint(xmax, ymax, z_fa_f->GetValue(i));
+				CTLinesPoints->InsertNextPoint(xmax+(xmax-xmin)/30, ymax+(ymax-ymin)/30 ,z_fa_f->GetValue(i));
+				points_id[0] = counter;
+				points_id[1] = counter+1;
+				counter+=2;
+				CTCells->InsertNextCell(2 , points_id);
+			}
 		}
 	}
   vtkStructuredPoints *sp_data = vtkStructuredPoints::SafeDownCast(vtk_data);
