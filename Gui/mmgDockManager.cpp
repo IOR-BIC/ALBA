@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDockManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-10-12 10:01:33 $
+  Version:   $Revision: 1.3 $
   Authors:   Benjamin I. Williams
 ==========================================================================
   Copyright:   (C) Copyright 2005, Kirix Corporation, All Rights Reserved.
@@ -14,7 +14,7 @@
 #include <wx/minifram.h>
 #include <wx/image.h>
 #include "mmgDockManager.h"
-
+#include "mmgMDIFrame.h"
 
 // -- various array and event implementations --
 
@@ -3564,8 +3564,9 @@ void wxFrameManager::OnSize(wxSizeEvent& event)
 {
     if (m_frame)
     {
-        DoFrameLayout();
-        Repaint();
+      ((mmgMDIFrame *)m_frame)->OnSize(event);
+      DoFrameLayout();
+      Repaint();
     }
 }
 
