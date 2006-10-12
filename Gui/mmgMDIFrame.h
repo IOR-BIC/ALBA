@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-10-12 10:00:06 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -103,6 +103,9 @@ class mmgMDIFrame: public wxMDIParentFrame
   /** Link a vtkViewport to the progress bar. */
   void BindToProgressBar(vtkViewport* ren);
 
+  /** Redraw the frame. */
+  void OnSize(wxSizeEvent& event);
+
 protected:
   mmgMDIFrameCallback *m_StartCallback; 
   mmgMDIFrameCallback *m_EndCallback; ; 
@@ -127,9 +130,6 @@ protected:
 
 	/** Send the MENU_FILE_QUIT event. */
   void OnCloseWindow(wxCloseEvent& event);
-
-	/** Redraw the frame. */
-  void OnSize(wxSizeEvent& event);
 
 	/** Redraw sash panels. */
   void OnSashDrag(wxSashEvent& event);
