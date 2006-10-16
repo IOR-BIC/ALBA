@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-12 08:28:36 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-10-16 09:08:16 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,13 +60,16 @@ public:
 	virtual mafOp*	Copy();
 
 	/** Builds operation's interface. */
-	virtual void		OpRun();
+	virtual void OpRun();
+
+  /** Initialize operation's variables according to the parameter's list. */
+  virtual void SetParameters(void *param) {};
 
 	/** Execute the operation. */
-	virtual void		OpDo();
+	virtual void OpDo();
 
 	/** Makes the undo for the operation. */
-	virtual void		OpUndo();
+	virtual void OpUndo();
 
 	/** Return the operation's interface. */
 	virtual mmgGui*	OpGui()	{return m_Gui;};
@@ -110,9 +113,9 @@ public:
 	/** Stop operation with CANCEL condition. */
 	virtual void		ForceStopWithCancel();
 
-	wxString				m_Label; 
-	int							m_Id;
-	mafOp					 *m_Next;
+	wxString				m_Label; ///< Label of the operation that will appear on the SideBar tab.
+	int							m_Id; ///< Index of the operation referring to the operation list.
+	mafOp					 *m_Next; ///< Pointer to the next operation in the operation's list.
 
   //SIL 22/04/04
 	long            m_Compatibility;
@@ -123,8 +126,7 @@ public:
   //MARCO 7/05/04
   virtual const char ** GetActions() {return NULL;}; 
 
-  /** 
-  Initialize the mouse device. */
+  /** Initialize the mouse device. */
   void SetMouse(mmdMouse *mouse);
 
   /** Turn On/Off the collaboration status. */
@@ -141,13 +143,13 @@ protected:
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   virtual void OpStop(int result);
 
-	mafNode				 *m_Input;
-  mafNode        *m_Output;
-	mmgGui      	 *m_Gui;
+	mafNode				 *m_Input; ///< Pointer to the Input VME.
+  mafNode        *m_Output; ///< Pointer to the Output VME
+	mmgGui      	 *m_Gui; ///< Pointer to the operation's GUI.
 	mmgGuiHolder	 *m_Guih;
-	bool 						m_Canundo;
-	int 						m_OpType;
-	bool						m_InputPreserving;
+	bool 						m_Canundo; ///< Flag to establish if the operation define the UnDo method or not.
+	int 						m_OpType; ///< Store the type of the operation: OPTYPE_OP, OPTYPE_IMPORTER, OPTYPE_EXPORTER
+	bool						m_InputPreserving; ///< Flag to say if the operation change the input data (m_InputPreserving = false) or not.
 	mafObserver    *m_Listener;
   mmdMouse       *m_Mouse;
   bool            m_CollaborateStatus;
