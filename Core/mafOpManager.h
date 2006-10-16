@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:07:11 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-10-16 09:09:14 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -68,10 +68,10 @@ public:
   virtual void OpRun(int op_id);
 	
 	/** Call this to exec an operation with user interaction and undo/redo services. */
-  virtual void OpRun(mafOp *op);
+  virtual void OpRun(mafOp *op, void *op_param = NULL);
 
   /** Run the operation by searching it from its type name.*/
-  virtual void OpRun(mafString &op_type);
+  virtual void OpRun(mafString &op_type, void *op_param = NULL);
 
 	/** Execute the operation 'op' and warn the user if the operation is undoable. */
   virtual void OpExec		(mafOp *op);
@@ -148,26 +148,28 @@ protected:
 
   void SetAccelerator(mafOp *op);
 
-  mmdMouse          *m_Mouse;
-  bool							 m_Warn;
+  mmdMouse          *m_Mouse; ///< Pointer to the mouse devices.
+  bool							 m_Warn; ///< Flag to warn the user when an undoable application is starting.
 	mafOpContextStack  m_Context;
-  mafOp             *m_RunningOp;
-	wxMenu            *m_Menu[3];
-  mafNode						*m_Selected;
+  mafOp             *m_RunningOp; ///< Pointer to the current running operation.
+	wxMenu            *m_Menu[3]; ///< Array of pointers to the menù 'Operations', 'Importer' and 'Exporter'
+  mafNode						*m_Selected; ///< Pointer to the current selected node.
 
-	mafOp             *m_OpList[MAXOP];
-  int                m_NumOp;
+	mafOp             *m_OpList[MAXOP]; ///< List of pointer of plugged operations.
+  int                m_NumOp; ///< Number of plugged operations.
   wxAcceleratorEntry m_OpAccelEntries[MAXOP];
   int                m_NumOfAccelerators;
 
-  mafOpSelect       *m_OpSelect;
-  mafOpCut          *m_OpCut;
-  mafOpCopy         *m_OpCopy;
-  mafOpPaste        *m_OpPaste;
+  void *m_OpParameters; ///< Pointer to the operation's parameter list.
+
+  mafOpSelect       *m_OpSelect; ///< Pointer to the (always available) operation for selecting VMEs
+  mafOpCut          *m_OpCut; ///< Pointer to the (always available) operation for cutting VMEs
+  mafOpCopy         *m_OpCopy; ///< Pointer to the (always available) operation for copying VMEs
+  mafOpPaste        *m_OpPaste; ///< Pointer to the (always available) operation for pasting VMEs
   //mafOpTransform    *m_optransform;
 
-  wxMenuBar         *m_MenuBar;
-	wxToolBar         *m_ToolBar;
+  wxMenuBar         *m_MenuBar; ///< Pointer to the Application's main menù
+	wxToolBar         *m_ToolBar; ///< Pointer to the application's Toolbal
 
   bool m_CollaborateStatus;  ///< Flag set to know if the application is in collaborative mode or no.
 
