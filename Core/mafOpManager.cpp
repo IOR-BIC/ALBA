@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:07:11 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2006-10-16 09:10:04 $
+  Version:   $Revision: 1.21 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -80,6 +80,8 @@ mafOpManager::mafOpManager()
 	m_Selected	= NULL;
 	m_Warn			= false;
   m_FromRemote= false;
+
+  m_OpParameters = NULL;
   
 	m_Menu[OPTYPE_IMPORTER] = NULL;
   m_Menu[OPTYPE_EXPORTER] = NULL;
@@ -450,14 +452,14 @@ bool mafOpManager::WarnUser(mafOp *op)
   return go;
 }
 //----------------------------------------------------------------------------
-void mafOpManager::OpRun(mafString &op_type)
+void mafOpManager::OpRun(mafString &op_type, void *op_param)
 //----------------------------------------------------------------------------
 {
   for (int i=0; i< m_NumOp; i++)
   {
     if (op_type.Equals(m_OpList[i]->GetTypeName()))
     {
-      OpRun(m_OpList[i]);
+      OpRun(m_OpList[i], op_param);
       break;
     }
   }
@@ -499,7 +501,7 @@ void mafOpManager::OpRun(int op_id)
 	}
 }
 //----------------------------------------------------------------------------
-void mafOpManager::OpRun(mafOp *op)   
+void mafOpManager::OpRun(mafOp *op, void *op_param)   
 //----------------------------------------------------------------------------
 {
 	//Code to manage operation's Input Preserving
@@ -509,7 +511,7 @@ void mafOpManager::OpRun(mafOp *op)
 		wxMessageDialog dialog(mafGetFrame(),warning_msg, "VME Preserving Warning",wxYES_NO|wxYES_DEFAULT);
 		if(dialog.ShowModal() == wxID_YES)
     {
-      wxString synthetic_name = "Copyed ";
+      wxString synthetic_name = "Copied ";
       mafAutoPointer<mafNode> synthetic_vme = m_Selected->MakeCopy();
       synthetic_vme->ReparentTo(m_Selected->GetParent());
       synthetic_name.Append(m_Selected->GetName());
@@ -527,6 +529,10 @@ void mafOpManager::OpRun(mafOp *op)
 	o->SetListener(this);
 	o->SetInput(m_Selected);
   o->SetMouse(m_Mouse);
+  if (op_param != NULL)
+  {
+    o->SetParameters(op_param);
+  }
   m_RunningOp = o;
 
   Notify(OP_RUN_STARTING);  //SIL. 17-9-2004: - moved here in order to notify which op is started
