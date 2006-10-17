@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTMRIImporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:12:18 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-10-17 09:57:17 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -96,7 +96,11 @@ public:
 	/** Operation wait the user interact with the dialog*/
 	void WaitUser();
 
-	void SetSender(mafOp *sender);
+	/** Initialize operation's variables according to the parameter's list. */
+	virtual void SetParameters(void *param);
+
+	/** Set Type DICOM to read CT/MRI */
+	void SetModality(mafString modality);
 
 protected:
 	/** Build the list of dicom filer recognized. */
@@ -186,8 +190,6 @@ protected:
 	wxTextCtrl   *m_TimeText;
 	wxSlider		 *m_TimeScanner;
 	wxStaticText *m_TimeLabel;
-
-	mafOp *m_Sender;
 };
 
 /*class mmoDICOMImporterListElement

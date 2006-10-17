@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTMRIImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-27 08:36:16 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-10-17 09:57:11 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -71,13 +71,39 @@ mafCxxTypeMacro(mmoCTMRIImporter);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
+// Constants :
+//----------------------------------------------------------------------------
+enum DICOM_IMPORTER_ID
+{
+	ID_FIRST = MINID,
+	ID_DICTIONARY,
+	ID_OPEN_DIR,
+	ID_SCAN_SLICE,
+	ID_CROP_MODE_BUTTON,
+	ID_BUILDVOLUME_MODE_BUTTON,
+	ID_STUDY,
+	ID_CROP_BUTTON,
+	ID_UNDO_CROP_BUTTON,
+	ID_BUILD_STEP,
+	ID_BUILD_BUTTON,
+	ID_CANCEL,
+	ID_PATIENT_NAME,
+	ID_PATIENT_ID,
+	ID_SURGEON_NAME,
+	ID_TYPE_DICOM,
+	ID_SCAN_TIME,
+	ID_CT,
+	ID_MRI,
+	ID_CMRI,
+};
+
+//----------------------------------------------------------------------------
 mmoCTMRIImporter::mmoCTMRIImporter(wxString label) : mafOp(label)
 //----------------------------------------------------------------------------
 {
 	m_OpType	= OPTYPE_IMPORTER;
 	m_Canundo	= true;
 
-	m_Sender = this;
 
 	for (int i = 0; i < 6; i++) 
 		m_DicomBounds[i] = 0;
@@ -141,10 +167,6 @@ mmoCTMRIImporter::mmoCTMRIImporter(wxString label) : mafOp(label)
 	m_GizmoStatus = GIZMO_NOT_EXIST;
 	m_SideToBeDragged = 0;
 }
-void mmoCTMRIImporter::SetSender(mafOp *sender)
-{
-	m_Sender=sender;
-}
 //----------------------------------------------------------------------------
 mmoCTMRIImporter::~mmoCTMRIImporter()
 //----------------------------------------------------------------------------
@@ -164,6 +186,16 @@ void mmoCTMRIImporter::OpRun()
 {
 	CreatePipeline();
 	CreateGui();
+	if(m_DictionaryFilename!="")
+	{
+		m_Gui->Enable(ID_OPEN_DIR,1);
+		m_Gui->Update();
+		if(m_DICOMDir!="")
+		{
+			OnEvent(&mafEvent(this, ID_OPEN_DIR));
+			m_Gui->Update();
+		}
+	}
 	WaitUser();
 }
 //----------------------------------------------------------------------------
@@ -199,7 +231,7 @@ void mmoCTMRIImporter::OpStop(int result)
 	cppDEL(m_DicomDialog);
 	cppDEL(m_FilesList);
 
-	mafEventMacro(mafEvent(m_Sender,result));
+	mafEventMacro(mafEvent(this,result));
 }
 //----------------------------------------------------------------------------
 void mmoCTMRIImporter::OpDo()
@@ -208,9 +240,9 @@ void mmoCTMRIImporter::OpDo()
 	//assert(m_Volume != NULL);
   //assert(m_Image != NULL);
   if(m_Image != NULL)
-	  mafEventMacro(mafEvent(m_Sender,VME_ADD,m_Image));
+	  mafEventMacro(mafEvent(this,VME_ADD,m_Image));
   if(m_Volume != NULL)
-    mafEventMacro(mafEvent(m_Sender,VME_ADD,m_Volume));
+    mafEventMacro(mafEvent(this,VME_ADD,m_Volume));
 
 }
 //----------------------------------------------------------------------------
@@ -220,9 +252,9 @@ void mmoCTMRIImporter::OpUndo()
 	//assert(m_Volume != NULL);
   //assert(m_Image != NULL);
   if(m_Image != NULL)
-	  mafEventMacro(mafEvent(m_Sender,VME_REMOVE,m_Image));
+	  mafEventMacro(mafEvent(this,VME_REMOVE,m_Image));
   if(m_Volume != NULL)
-    mafEventMacro(mafEvent(m_Sender,VME_REMOVE,m_Volume));
+    mafEventMacro(mafEvent(this,VME_REMOVE,m_Volume));
 }
 //----------------------------------------------------------------------------
 void mmoCTMRIImporter::CreatePipeline()
@@ -267,32 +299,6 @@ void mmoCTMRIImporter::CreatePipeline()
   m_Mouse->AddObserver(m_DicomInteractor, MCH_INPUT);
 }
 //----------------------------------------------------------------------------
-// Constants :
-//----------------------------------------------------------------------------
-enum DICOM_IMPORTER_ID
-{
-	ID_FIRST = MINID,
-	ID_DICTIONARY,
-	ID_OPEN_DIR,
-	ID_SCAN_SLICE,
-	ID_CROP_MODE_BUTTON,
-	ID_BUILDVOLUME_MODE_BUTTON,
-	ID_STUDY,
-	ID_CROP_BUTTON,
-	ID_UNDO_CROP_BUTTON,
-	ID_BUILD_STEP,
-	ID_BUILD_BUTTON,
-	ID_CANCEL,
-	ID_PATIENT_NAME,
-	ID_PATIENT_ID,
-	ID_SURGEON_NAME,
-	ID_TYPE_DICOM,
-	ID_SCAN_TIME,
-	ID_CT,
-	ID_MRI,
-	ID_CMRI,
-};
-//----------------------------------------------------------------------------
 void mmoCTMRIImporter::CreateGui()
 //----------------------------------------------------------------------------
 {
@@ -306,8 +312,8 @@ void mmoCTMRIImporter::CreateGui()
 	m_Gui = new mmgGui(this);
 	m_Gui->SetListener(this);
 
-	if(this->m_Label == "CT") m_Gui->Label("CT Importer",true);
-	else if(this->m_Label == "MRI") m_Gui->Label("MRI Importer",true);
+	if(m_DICOM == 0) m_Gui->Label("CT Importer",true);
+	else if(m_DICOM == 0) m_Gui->Label("MRI Importer",true);
 
 	//m_Gui->Label("Type of DICOM",true);
 	//m_Gui->Combo(ID_TYPE_DICOM,"",&m_DICOM,1,TypeOfDICOM);
@@ -443,36 +449,36 @@ void mmoCTMRIImporter::BuildDicomFileList(const char *dir)
 				ct_mode.Trim();
 				if (strcmp( reader->GetModality(), "CT" ) == 0 )
 				{
-				//if (strcmp(reader->GetCTMode(),"SCOUT MODE") == 0 || reader->GetStatus() == -1)
-				if(ct_mode.Find("SCOUT") != -1 || reader->GetStatus() == -1)
-				{
-					reader->Delete();
-					continue;
-				}
-				
-				//row = m_StudyListbox->FindString(reader->GetStudy());
-				row = m_StudyListbox->FindString(reader->GetStudyUID());
-				if (row == -1)
-				{
-					// the study is not present into the listbox, so need to create new
-					// list of files related to the new studyID
-					m_FilesList = new ListCTMRIFiles;
-					//m_StudyListbox->Append(reader->GetStudy());
-					m_StudyListbox->Append(reader->GetStudyUID());
-					m_StudyListbox->SetClientData(m_NumberOfStudy,(void *)m_FilesList);
-					reader->GetSliceLocation(slice_pos);
-					//mmoDICOMImporterListElement *element = new mmoDICOMImporterListElement(str_tmp,slice_pos);
-					//m_FilesList->Append(element);
-					m_FilesList->Append(new mmoCTMRIImporterListElement(str_tmp,slice_pos));
-					m_NumberOfStudy++;
-				}
-				else 
-				{
-					reader->GetSliceLocation(slice_pos);
-					//mmoDICOMImporterListElement *element = new mmoDICOMImporterListElement(str_tmp,SlicePos);
-					//((ListCTMRIFiles *)m_StudyListbox->GetClientData(row))->Append(element);
-					((ListCTMRIFiles *)m_StudyListbox->GetClientData(row))->Append(new mmoCTMRIImporterListElement(str_tmp,slice_pos));
-				}
+					//if (strcmp(reader->GetCTMode(),"SCOUT MODE") == 0 || reader->GetStatus() == -1)
+					if(ct_mode.Find("SCOUT") != -1 || reader->GetStatus() == -1)
+					{
+						reader->Delete();
+						continue;
+					}
+					reader->Update();
+					//row = m_StudyListbox->FindString(reader->GetStudy());
+					row = m_StudyListbox->FindString(reader->GetStudyUID());
+					if (row == -1)
+					{
+						// the study is not present into the listbox, so need to create new
+						// list of files related to the new studyID
+						m_FilesList = new ListCTMRIFiles;
+						//m_StudyListbox->Append(reader->GetStudy());
+						m_StudyListbox->Append(reader->GetStudyUID());
+						m_StudyListbox->SetClientData(m_NumberOfStudy,(void *)m_FilesList);
+						reader->GetSliceLocation(slice_pos);
+						//mmoDICOMImporterListElement *element = new mmoDICOMImporterListElement(str_tmp,slice_pos);
+						//m_FilesList->Append(element);
+						m_FilesList->Append(new mmoCTMRIImporterListElement(str_tmp,slice_pos));
+						m_NumberOfStudy++;
+					}
+					else 
+					{
+						reader->GetSliceLocation(slice_pos);
+						//mmoDICOMImporterListElement *element = new mmoDICOMImporterListElement(str_tmp,SlicePos);
+						//((ListCTMRIFiles *)m_StudyListbox->GetClientData(row))->Append(element);
+						((ListCTMRIFiles *)m_StudyListbox->GetClientData(row))->Append(new mmoCTMRIImporterListElement(str_tmp,slice_pos));
+					}
 				}
 				reader->Delete();
 			}
@@ -1542,20 +1548,33 @@ void mmoCTMRIImporter::SetDirectory(mafString dir)
 //----------------------------------------------------------------------------
 {
 	m_DICOMDir=dir;
-	if(m_Gui)
-	{
-		OnEvent(&mafEvent(m_Sender, ID_OPEN_DIR));
-		m_Gui->Update();
-	}
 }
 //----------------------------------------------------------------------------
 void mmoCTMRIImporter::SetDictonary(mafString dic)
 //----------------------------------------------------------------------------
 {
 	m_DictionaryFilename=dic;
-	if(m_Gui)
+}
+//----------------------------------------------------------------------------
+void mmoCTMRIImporter::SetModality(mafString modality)
+//----------------------------------------------------------------------------
+{
+	if (modality.Equals("CT"))
 	{
-		m_Gui->Enable(ID_OPEN_DIR,1);
-		m_Gui->Update();
+		m_DICOM = 0;
 	}
+	else if (modality.Equals("MRI"))
+	{
+		m_DICOM = 1;
+	}
+}
+//----------------------------------------------------------------------------
+void mmoCTMRIImporter::SetParameters(void *param)
+//----------------------------------------------------------------------------
+{
+	mafString *settings=(mafString*)param;
+	SetModality(settings[0]);
+	SetDirectory(settings[1]);
+	if(m_Gui)
+		m_Gui->Update();
 }
