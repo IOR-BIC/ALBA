@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScale.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-17 11:17:38 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-10-17 13:28:15 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -74,7 +74,7 @@ mafGizmoScale::mafGizmoScale(mafVME* input, mafObserver *listener)
   GuiGizmoScale = new mafGuiGizmoScale(this);
   // initialize gizmo gui
   GuiGizmoScale->SetAbsScaling(InputVME->GetOutput()->GetAbsMatrix());
-  GuiGizmoScale->EnableWidgets(false);
+  GuiGizmoScale->EnableWidgets(true);
 }
 //----------------------------------------------------------------------------
 mafGizmoScale::~mafGizmoScale() 
@@ -464,55 +464,61 @@ void mafGizmoScale::SendTransformMatrixFromGui(mafEventBase *maf_event)
 {
   // Gizmo scale matrix is not keyable for the moment...
 
-/*
+  mafEvent *e = mafEvent::SafeDownCast(maf_event);
   // send matrix to be postmultiplied to listener
   //                                                                  -1    
   // [NewAbsPose] = [M]*[OldAbsPose] => [M] = [NewAbsPose][OldAbsPose]
 
   // build objects
-  vtkMatrix4x4 *M = vtkMatrix4x4::New();
-  vtkMatrix4x4 *invOldAbsPose = vtkMatrix4x4::New();
-  vtkMatrix4x4 *newAbsPose = vtkMatrix4x4::New();
+  mafMatrix *M = mafMatrix::New();
+  mafMatrix *invOldAbsPose = mafMatrix::New();
+  mafMatrix *newAbsPose = mafMatrix::New();
 
   // position from abs pose
   double position[3];
-  mafTransform::GetPosition(this->GetAbsPose(), position);
+  mafTransform::GetPosition(*this->GetAbsPose(), position);
 
   // orientation from abs pose
   double orientation[3];
-  mafTransform::GetOrientation(this->GetAbsPose(), orientation);
+  mafTransform::GetOrientation(*this->GetAbsPose(), orientation);
 
   // incoming matrix is an abs scaling matrix
   newAbsPose->DeepCopy(e->GetMatrix()); // abs scaling from gui
 
-  mafTransform::SetOrientation(newAbsPose, orientation);
-  mafTransform::SetPosition(newAbsPose, position);
+  mafTransform::SetOrientation(*newAbsPose, orientation);
+  mafTransform::SetPosition(*newAbsPose, position);
 
   // premultiply the scaling matrix coming from gui
   vtkMAFSmartPointer<vtkTransform> tr;
-  tr->SetMatrix(newAbsPose);
-  tr->Concatenate(e->GetMatrix());
+  tr->SetMatrix(newAbsPose->GetVTKMatrix());
+  tr->Concatenate(e->GetMatrix()->GetVTKMatrix());
 
   newAbsPose->DeepCopy(tr->GetMatrix());
 
   invOldAbsPose->DeepCopy(this->GetAbsPose());
   invOldAbsPose->Invert();
 
-  vtkMatrix4x4::Multiply4x4(newAbsPose, invOldAbsPose, M);
-
+  mafMatrix::Multiply4x4(*newAbsPose, *InputVME->GetOutput()->GetAbsMatrix(), *M);
   // update gizmo abs pose
-  this->SetAbsPose(newAbsPose, InputVME->GetTimeStamp());
+  //this->SetAbsPose(newAbsPose, InputVME->GetTimeStamp());
 
   // update input vme abs pose
-  InputVME->SetAbsPose(newAbsPose);
+  
+	InputVME->SetAbsMatrix(*M, InputVME->GetTimeStamp());
+  InputVME->Modified();
 
   // notify the listener about changed vme pose
   SendTransformMatrix(M, ID_TRANSFORM, mmiGenericMouse::MOUSE_MOVE);   
 
+  mafSmartPointer<mafMatrix> identity;
+  identity->Identity();
+  GuiGizmoScale->SetAbsScaling(identity);
+
+
   // clean up
   M->Delete();
   invOldAbsPose->Delete();
-  newAbsPose->Delete();*/
+  newAbsPose->Delete();
 }
 
 //----------------------------------------------------------------------------  
