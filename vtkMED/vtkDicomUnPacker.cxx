@@ -11,7 +11,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.5 $");
+vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.6 $");
 vtkStandardNewMacro(vtkDicomUnPacker);
 
 //----------------------------------------------------------------------------
@@ -343,13 +343,22 @@ int vtkDicomUnPacker::read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *
     return -1;
   }
 	RESULT_line = 0;
-
   /**********************************************************************/
-  while (!time_to_exit)
+	while (!time_to_exit)
 	{ 
 		explicitVR = 0;
 		groupWord      = read16(fp,little_endian);
+		if(feof(fp))
+		{
+			Status=-1;
+			return -1;
+		}
 		elementWord    = read16(fp,little_endian);
+		if(feof(fp))
+		{
+			Status=-1;
+			return -1;
+		}
 		elementLength  = read32(fp,little_endian);
 		if (first_one) 
 		{ 	
@@ -426,7 +435,6 @@ int vtkDicomUnPacker::read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *
       }
 		}
 		pos = find(groupWord, elementWord, DICT, DICT_line);
-
 		if(((long)elementLength)==-1) 
 			elementLength=0;
 		if (pos<0) 
@@ -526,7 +534,7 @@ int vtkDicomUnPacker::read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *
 		else  
 		{
 			fseek_result = fseek(fp,elementLength,SEEK_CUR);
-			if( RESULT_line == SIZE_TAG && fseek_result != 0)
+			if( (RESULT_line == SIZE_TAG && fseek_result != 0) || feof(fp))
 			{
 				Status = -1;
 				return -1;
@@ -534,7 +542,6 @@ int vtkDicomUnPacker::read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *
 		}
     RESULT_line++;
   } /* END  while (time_to_exit) */ 
-
 	*result_line = RESULT_line;
 	free((uint8 *)t);
 	fclose(fp);
