@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-23 19:34:55 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2006-10-18 15:58:43 $
+  Version:   $Revision: 1.18 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -255,8 +255,39 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
       }
       else if(pipe_name.Equals("mafPipeSurfaceSlice"))
       {
-        m_CurrentSurface.push_back(n);
-        ((mafPipeSurfaceSlice *)pipe)->SetSlice(m_Slice);
+        double normal[3];
+				switch(m_CameraPosition)
+				{
+				case CAMERA_OS_X:
+					normal[0] = 1;
+				  normal[1] = 0;
+ 					normal[2] = 0;
+					break;
+				case CAMERA_OS_Y:
+					normal[0] = 0;
+					normal[1] = 1;
+					normal[2] = 0;
+					break;
+				case CAMERA_OS_Z:
+					normal[0] = 0;
+					normal[1] = 0;
+					normal[2] = 1;
+					break;
+				case CAMERA_OS_P:
+					break;
+        //case CAMERA_OS_REP:
+				//	this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+				case CAMERA_PERSPECTIVE:
+					break;
+				default:
+					normal[0] = 0;
+					normal[1] = 0;
+					normal[2] = 1;
+				}
+
+		    m_CurrentSurface.push_back(n);
+		    ((mafPipeSurfaceSlice *)pipe)->SetSlice(m_Slice);
+				((mafPipeSurfaceSlice *)pipe)->SetNormal(normal);
       }
       pipe->Create(n);
       n->m_Pipe = (mafPipe*)pipe;

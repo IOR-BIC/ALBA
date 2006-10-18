@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-19 11:02:13 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2006-10-18 15:58:43 $
+  Version:   $Revision: 1.36 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -138,6 +138,7 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
       vtkDataSet *vtkData = m_CurrentVolume->GetOutput()->GetVTKData();
       vtkData->Update();
       vtkData->GetCenter(vtkDataCenter);
+      vtkData->GetCenter(m_GizmoHandlePosition);
       vtkData->GetScalarRange(sr);
       m_ColorLUT = currentVolumeMaterial->m_ColorLut;
       m_LutWidget->SetLut(m_ColorLUT);
@@ -157,7 +158,22 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
       GizmoDelete();
     }
   }
-  
+  else if(node->IsMAFType(mafVMESurface))
+  {
+    if(show)
+    {
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSlice(m_GizmoHandlePosition);
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetSlice(m_GizmoHandlePosition);
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetSlice(m_GizmoHandlePosition);
+    }
+    else
+    {
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->UpdateSurfacesList(node);
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->UpdateSurfacesList(node);
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->UpdateSurfacesList(node);
+    }
+  }
+  CameraUpdate();
   EnableWidgets(m_CurrentVolume != NULL);
 }
 //----------------------------------------------------------------------------
@@ -291,14 +307,14 @@ void mafViewOrthoSlice::PackageView()
     m_Views[v] = new mafViewSlice("Slice view", cam_pos[v],false,false);
     m_Views[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice", MUTEX);
     // plug surface slice visual pipe in not perspective views
-    //if (v != PERSPECTIVE_VIEW)
-    //{
-    //  m_Views[v]->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice",MUTEX);
-    //}
-    //else
-    //{
-    //  m_Views[v]->PlugVisualPipe("mafVMESurface", "mafPipeSurface",MUTEX);
-    //}
+    if (v != PERSPECTIVE_VIEW)
+    {
+      m_Views[v]->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice",MUTEX);
+    }
+    else
+    {
+      m_Views[v]->PlugVisualPipe("mafVMESurface", "mafPipeSurface",MUTEX);
+    }
   }
   PlugChildView(m_Views[PERSPECTIVE_VIEW]);
   PlugChildView(m_Views[ZN_VIEW]);
