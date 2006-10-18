@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-26 13:50:26 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2006-10-18 14:56:10 $
+  Version:   $Revision: 1.23 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -63,6 +63,8 @@
 #include "vtkWindowToImageFilter.h"
 #include "vtkBMPWriter.h"
 #include "vtkJPEGWriter.h"
+#include "vtkTIFFWriter.h"
+#include "vtkPostScriptWriter.h"
 #include "vtkPNGWriter.h"
 #include "vtkImageData.h"
 #include "vtkImageExport.h"
@@ -668,7 +670,8 @@ void mafRWIBase::SaveImage(mafString filename, int magnification)
   wxSplitPath(filename.GetCStr(),&path,&name,&ext);
 	if (filename.IsEmpty() || ext.IsEmpty())
 	{
-    wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg";
+    //wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg";
+    wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg|Image (*.png)|*.png|Image (*.ps)|*.ps|Image (*.tiff)|*.tiff";
     wxString file = wxString::Format("%s\\%sSnapshot", m_SaveDir.GetCStr(),filename.GetCStr());
     file = mafGetSaveFile(file,wildc).c_str(); 
     if(file == "") 
@@ -700,6 +703,27 @@ void mafRWIBase::SaveImage(mafString filename, int magnification)
   else if (ext == "jpg")
   {
     vtkMAFSmartPointer<vtkJPEGWriter> w;
+    w->SetInput(w2i->GetOutput());
+    w->SetFileName(filename.GetCStr());
+    w->Write();
+  }
+  else if (ext == "tiff")
+  {
+    vtkMAFSmartPointer<vtkTIFFWriter> w;
+    w->SetInput(w2i->GetOutput());
+    w->SetFileName(filename.GetCStr());
+    w->Write();
+  }
+  else if (ext == "ps")
+  {
+    vtkMAFSmartPointer<vtkPostScriptWriter> w;
+    w->SetInput(w2i->GetOutput());
+    w->SetFileName(filename.GetCStr());
+    w->Write();
+  }
+  else if (ext == "png")
+  {
+    vtkMAFSmartPointer<vtkPNGWriter> w;
     w->SetInput(w2i->GetOutput());
     w->SetFileName(filename.GetCStr());
     w->Write();
