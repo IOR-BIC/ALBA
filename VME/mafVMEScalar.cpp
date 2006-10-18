@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-08 14:07:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-10-18 13:09:02 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -74,10 +74,27 @@ int mafVMEScalar::SetData(vnl_matrix<double> &data, mafTimeStamp t)
 }
 
 //-------------------------------------------------------------------------
-/*char** mafVMEScalar::GetIcon() 
+void mafVMEScalar::SetScalarIdForXCoordinate(int id)
+//-------------------------------------------------------------------------
+{
+  m_XID = id;
+}
+//-------------------------------------------------------------------------
+void mafVMEScalar::SetScalarIdForYCoordinate(int id)
+//-------------------------------------------------------------------------
+{
+  m_YID = id;
+}
+//-------------------------------------------------------------------------
+void mafVMEScalar::SetScalarIdForZCoordinate(int id)
+//-------------------------------------------------------------------------
+{
+  m_ZID = id;
+}
+//-------------------------------------------------------------------------
+char** mafVMEScalar::GetIcon() 
 //-------------------------------------------------------------------------
 {
   #include "mafVMEScalar.xpm"
   return mafVMEScalar_xpm;
 }
-*/
