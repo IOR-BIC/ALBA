@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeIterator.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-17 11:13:38 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2006-10-18 10:14:12 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -224,7 +224,8 @@ int mafNodeIterator::GoToNextNode()
 
   if (!m_TraversalDone)
   {
-    return (IsVisible(GetCurrentNode()))?MAF_OK:GoToNextNode();
+    //return (IsVisible(GetCurrentNode()))?MAF_OK:GoToNextNode();
+    return IsVisible(m_CurrentNode)||m_IgnoreVisibleToTraverse ? MAF_OK : GoToNextNode();
   }
 
   return MAF_ERROR;
@@ -383,7 +384,8 @@ int mafNodeIterator::GoToPreviousNode()
 
   if (!m_TraversalDone)
   {
-    return (IsVisible(GetCurrentNode()))?MAF_OK:GoToPreviousNode();
+    //return (IsVisible(GetCurrentNode()))?MAF_OK:GoToPreviousNode();
+    return IsVisible(m_CurrentNode)||m_IgnoreVisibleToTraverse ? MAF_OK : GoToPreviousNode();
   }
 
   return MAF_ERROR;
@@ -487,7 +489,8 @@ int mafNodeIterator::GoToLastNode()
   {
     m_TraversalDone=0; // reset the traversal flag
     PreExecute(); // Call the Pre-callbacks
-    return IsVisible(m_CurrentNode)?MAF_OK:GoToPreviousNode();
+    //return IsVisible(m_CurrentNode)?MAF_OK:GoToPreviousNode();
+    return IsVisible(m_CurrentNode)||m_IgnoreVisibleToTraverse ? MAF_OK : GoToPreviousNode();
   }
   else
   {
