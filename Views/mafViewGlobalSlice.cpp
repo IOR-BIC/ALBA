@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-05 10:49:29 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-10-19 15:48:33 $
+  Version:   $Revision: 1.4 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -243,7 +243,7 @@ void mafViewGlobalSlice::VmeCreatePipe(mafNode *node)
       pipe->SetListener(this);
       if (pipe_name.Equals("mafPipeVolumeSlice"))
       {
-        ((mafPipeVolumeSlice *)pipe)->InitializeSliceParameters(m_SliceMode,applied_origin,applied_xVector,applied_yVector,true,true);
+        ((mafPipeVolumeSlice *)pipe)->InitializeSliceParameters(m_SliceMode,applied_origin,applied_xVector,applied_yVector,true,false);
 			}
       else if(pipe_name.Equals("mafPipeSurfaceSlice"))
       {
