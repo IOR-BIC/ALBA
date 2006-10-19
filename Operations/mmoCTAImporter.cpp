@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTAImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-27 08:41:54 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-10-19 15:46:36 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -69,7 +69,32 @@ WX_DEFINE_LIST(ListCTAFiles);
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mmoCTAImporter);
 //----------------------------------------------------------------------------
-
+//----------------------------------------------------------------------------
+// Constants :
+//----------------------------------------------------------------------------
+enum DICOM_IMPORTER_ID
+{
+	ID_FIRST = MINID,
+	ID_DICTIONARY,
+	ID_OPEN_DIR,
+	ID_SCAN_SLICE,
+	ID_CROP_MODE_BUTTON,
+	ID_BUILDVOLUME_MODE_BUTTON,
+	ID_STUDY,
+	ID_CROP_BUTTON,
+	ID_UNDO_CROP_BUTTON,
+	ID_BUILD_STEP,
+	ID_BUILD_BUTTON,
+	ID_CANCEL,
+	ID_PATIENT_NAME,
+	ID_PATIENT_ID,
+	ID_SURGEON_NAME,
+	ID_TYPE_DICOM,
+	ID_SCAN_TIME,
+	ID_CT,
+	ID_MRI,
+	ID_CMRI,
+};
 //----------------------------------------------------------------------------
 mmoCTAImporter::mmoCTAImporter(wxString label) : mafOp(label)
 //----------------------------------------------------------------------------
@@ -98,8 +123,9 @@ mmoCTAImporter::mmoCTAImporter(wxString label) : mafOp(label)
 	if(wxFileExists(dictionary)) 
 		m_DictionaryFilename = dictionary;
 
-	m_DICOMDir	= mafGetApplicationDirectory().c_str();
-  m_DICOMDir += "\\Data\\External\\";
+	//m_DICOMDir	= mafGetApplicationDirectory().c_str();
+  //m_DICOMDir += "\\Data\\External\\";
+  m_DICOMDir = _("");
 	m_CurrentSlice			  = 0;
 	m_CurrentTime				  = 0;
   m_BuildStepValue			= 0;
@@ -156,8 +182,29 @@ mafOp *mmoCTAImporter::Copy()
 void mmoCTAImporter::OpRun()   
 //----------------------------------------------------------------------------
 {
-	CreatePipeline();
+ 	CreatePipeline();
 	CreateGui();
+	if(m_DictionaryFilename!="")
+	{
+		m_Gui->Enable(ID_OPEN_DIR,1);
+		m_Gui->Update();
+		if(m_DICOMDir!="")
+		{
+			OnEvent(&mafEvent(this, ID_OPEN_DIR));
+			m_Gui->Update();
+		}
+	}
+	WaitUser();
+}
+//----------------------------------------------------------------------------
+void mmoCTAImporter::WaitUser()
+//----------------------------------------------------------------------------
+{
+	m_DicomDialog->ShowModal();
+	int res = (m_DicomDialog->GetReturnCode() == wxID_OK) ? OP_RUN_OK : OP_RUN_CANCEL;
+
+	OpStop(res);
+	return;
 }
 //----------------------------------------------------------------------------
 void mmoCTAImporter::OpStop(int result)
@@ -260,32 +307,6 @@ void mmoCTAImporter::CreatePipeline()
   m_Mouse->AddObserver(m_DicomInteractor, MCH_INPUT);
 }
 //----------------------------------------------------------------------------
-// Constants :
-//----------------------------------------------------------------------------
-enum DICOM_IMPORTER_ID
-{
-	ID_FIRST = MINID,
-	ID_DICTIONARY,
-	ID_OPEN_DIR,
-	ID_SCAN_SLICE,
-	ID_CROP_MODE_BUTTON,
-	ID_BUILDVOLUME_MODE_BUTTON,
-	ID_STUDY,
-	ID_CROP_BUTTON,
-	ID_UNDO_CROP_BUTTON,
-	ID_BUILD_STEP,
-	ID_BUILD_BUTTON,
-	ID_CANCEL,
-	ID_PATIENT_NAME,
-	ID_PATIENT_ID,
-	ID_SURGEON_NAME,
-	ID_TYPE_DICOM,
-	ID_SCAN_TIME,
-	ID_CT,
-	ID_MRI,
-	ID_CMRI,
-};
-//----------------------------------------------------------------------------
 void mmoCTAImporter::CreateGui()
 //----------------------------------------------------------------------------
 {
@@ -385,10 +406,6 @@ void mmoCTAImporter::CreateGui()
   m_DicomDialog->GetSize(&w,&h);
   m_DicomDialog->SetSize(x_init+10,y_init+10,w,h);
 
-	m_DicomDialog->ShowModal();
-	int res = (m_DicomDialog->GetReturnCode() == wxID_OK) ? OP_RUN_OK : OP_RUN_CANCEL;
-
-	OpStop(res);
 	return;
 }
 //----------------------------------------------------------------------------
@@ -1525,4 +1542,19 @@ int mmoCTAImporter::GetImageId(int timeId, int heigthId)
   }
 
   return (heigthId * cardiacNumberOfImages + timeId); 
+}
+//----------------------------------------------------------------------------
+void mmoCTAImporter::SetParameters(void *param)
+//----------------------------------------------------------------------------
+{
+	mafString *settings=(mafString*)param;
+	SetDirectory(settings[0]);
+	if(m_Gui)
+		m_Gui->Update();
+}
+//----------------------------------------------------------------------------
+void mmoCTAImporter::SetDirectory(mafString dir)
+//----------------------------------------------------------------------------
+{
+	m_DICOMDir=dir;
 }

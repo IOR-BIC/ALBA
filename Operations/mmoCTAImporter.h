@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTAImporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:12:18 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-10-19 15:46:37 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -86,6 +86,15 @@ public:
 
 	/** Create the dialog interface for the importer. */
   virtual void CreateGui();  
+
+  /** Set operation parameter */
+  virtual void SetParameters(void *param);
+  
+  /** Wait user interaction */
+  void WaitUser();
+
+  /** Set the directory of the CTA repository*/
+  void SetDirectory(mafString dir);
 
 protected:
 	/** Build the list of dicom filer recognized. */
@@ -251,8 +260,6 @@ public:
 
   /** Return the trigger time of the dicom slice*/
   int GetTriggerTime() const {return m_TriggerTime;};
-
-  
 
 protected:
 	double m_Pos[3];
