@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-29 13:44:33 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-10-20 08:30:09 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,7 +26,7 @@
 
 #include "vtkMAFAssembly.h"
 #include "vtkRayCast3DPicker.h"
-#include "vtkCellPicker.h"
+#include "vtkPropPicker.h"
 #include "vtkRendererCollection.h"
 #include "vtkAssemblyPath.h"
 #include "vtkAssemblyNode.h"
