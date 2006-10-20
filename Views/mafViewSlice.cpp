@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-18 15:58:43 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2006-10-20 08:31:13 $
+  Version:   $Revision: 1.19 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,7 +35,7 @@
 
 #include "vtkDataSet.h"
 #include "vtkRayCast3DPicker.h"
-#include "vtkCellPicker.h"
+#include "vtkPropPicker.h"
 #include "vtkPlaneSource.h"
 #include "vtkOutlineFilter.h"
 #include "vtkCoordinate.h"
@@ -107,7 +107,6 @@ void mafViewSlice::Create()
 
   vtkNEW(m_Picker3D);
   vtkNEW(m_Picker2D);
-  m_Picker2D->SetTolerance(0.001);
   m_Picker2D->InitializePickList();
 
   // text stuff
