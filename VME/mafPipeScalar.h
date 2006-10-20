@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeScalar.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-28 16:34:18 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-10-20 08:51:27 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,8 +17,8 @@
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
-class vtkWarpScalar;
-class vtkLineSource;
+class vtkSphereSource;
+class vtkGlyph3D;
 class vtkPolyDataMapper;
 class vtkActor;
 
@@ -42,20 +42,17 @@ public:
   /** IDs for the GUI */
   enum PIPE_SCALAR_WIDGET_ID
   {
-    ID_ACTIVE_SCALAR = Superclass::ID_LAST,
-    ID_SCALAR_FACTOR,
+    ID_RADIUS = Superclass::ID_LAST,
     ID_LAST
   };
 
 protected:
-  int m_ActiveScalar; ///<Active scalar visualized
-  int m_Order;  ///<Order of how are stored the scalar values: 0 = Rows, 1 = Columns
-  double m_ScalarFactor;
-
-  vtkLineSource     *m_LineSource;
-  vtkWarpScalar     *m_WarpScalar;
+  vtkSphereSource   *m_Sphere;
+  vtkGlyph3D        *m_Glyph;
   vtkPolyDataMapper *m_Mapper;
   vtkActor          *m_Actor;
+
+  double m_Radius;
 
   /** Update visual properties*/
   void UpdateProperty(bool fromTag = false);
