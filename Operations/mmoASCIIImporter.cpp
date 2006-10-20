@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoASCIIImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-12 10:02:22 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-10-20 08:33:44 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,6 +20,8 @@
 
 #include "mmoASCIIImporter.h"
 #include <wx/busyinfo.h>
+#include <wx/tokenzr.h>
+
 #include "mafEvent.h"
 #include "mmgGui.h"
 
@@ -42,6 +44,9 @@ mafOp(label)
 	m_Canundo = true;
 	m_Files.clear();
 
+  m_ReadyToExecute = false;
+  m_ScalarOrder = 0;
+
   m_FileDir = mafGetApplicationDirectory().c_str();
   m_ScalarData = NULL;
 }
@@ -52,13 +57,32 @@ mmoASCIIImporter::~mmoASCIIImporter()
   mafDEL(m_ScalarData);
 }
 //----------------------------------------------------------------------------
-mafOp* mmoASCIIImporter::Copy()   
+mafOp* mmoASCIIImporter::Copy()
 //----------------------------------------------------------------------------
 {
   mmoASCIIImporter *cp = new mmoASCIIImporter(m_Label);
   cp->m_Files	= m_Files;
   cp->m_FileDir = m_FileDir;
   return cp;
+}
+//----------------------------------------------------------------------------
+void mmoASCIIImporter::SetParameters(void *param)
+//----------------------------------------------------------------------------
+{
+  wxString op_par = (char *)param;
+  wxStringTokenizer tkz(op_par, " ");
+  wxString order = tkz.GetNextToken();
+  long so;
+  if (order.ToLong(&so))
+  {
+    m_ScalarOrder = so;
+  }
+  
+  while (tkz.HasMoreTokens())
+  {
+    m_Files.insert(m_Files.end(), tkz.GetNextToken().c_str());
+  }
+  m_ReadyToExecute = true;
 }
 //----------------------------------------------------------------------------
 // Constants:
@@ -72,11 +96,23 @@ enum ASCII_IMPORTER_ID
 void mmoASCIIImporter::OpRun()
 //----------------------------------------------------------------------------
 {
+  if (m_ReadyToExecute)
+  {
+    int res = OP_RUN_CANCEL;
+    if (ImportASCII() == MAF_OK)
+    {
+      m_Output = m_ScalarData;
+      res = OP_RUN_OK;
+    }
+    mafEventMacro(mafEvent(this,res));
+    return;
+  }
+
   wxString scalar_order[2] = {"row", "columns"};
   
   m_Gui = new mmgGui(this);
-  m_Gui->Button(ID_ASCII_FILE,"ASCII data","","Choose single or multiple file ASCII.");
   m_Gui->Combo(ID_ASCII_DATA_ORDER,"order",&m_ScalarOrder,2,scalar_order,"Select the order of how are stored the scalars.");
+  m_Gui->Button(ID_ASCII_FILE,"ASCII data","","Choose single or multiple file ASCII.");
   m_Gui->OkCancel();
   
   ShowGui();
@@ -96,10 +132,10 @@ void mmoASCIIImporter::OnEvent(mafEventBase *maf_event)
       }
       break;
       case wxOK:
-        if (ImportASCII() == MAF_OK) 
+        if (ImportASCII() == MAF_OK)
         {
           m_Output = m_ScalarData;
-          OpStop(OP_RUN_OK);        
+          OpStop(OP_RUN_OK);
         }
         else
         {
@@ -108,7 +144,7 @@ void mmoASCIIImporter::OnEvent(mafEventBase *maf_event)
         }
       break;
       case wxCANCEL:
-        OpStop(OP_RUN_CANCEL);        
+        OpStop(OP_RUN_CANCEL);
       break;
     }
   }
@@ -117,7 +153,8 @@ void mmoASCIIImporter::OnEvent(mafEventBase *maf_event)
 int mmoASCIIImporter::ImportASCII()
 //----------------------------------------------------------------------------
 {
-	wxBusyInfo wait("Loading file/s: ...");
+  if(!this->m_TestMode)
+	  wxBusyInfo wait("Loading file/s: ...");
   mafNEW(m_ScalarData);
   m_ScalarData->SetName("scalar");
 
@@ -138,10 +175,7 @@ int mmoASCIIImporter::ImportASCII()
     //Add the scalar array to the mafVMEScalar at the current time 't'.
   }
 
-  mafTagItem item;
-  item.SetName("SCALAR_ORDER");
-  item.SetValue(m_ScalarOrder);
-  m_ScalarData->GetTagArray()->SetTag(item);
+  m_ScalarData->SetScalarArrayOrientation(m_ScalarOrder);
 
   return import_result;
 }

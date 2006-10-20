@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoASCIIImporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:11:57 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-10-20 08:33:44 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -47,6 +47,9 @@ public:
 	/** Builds operation's interface. */
   void OpRun();
 
+  /** Initialize operation's variables according to the parameter's list. */
+  virtual void SetParameters(void *param);
+
 	/** Import ASCII data. */
   int ImportASCII();
 
@@ -69,5 +72,7 @@ protected:
 
   mafVMEScalar *m_ScalarData;
   int m_ScalarOrder;
+
+  bool m_ReadyToExecute;
 };
 #endif
