@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-07 09:53:15 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-10-20 08:42:59 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -57,8 +57,10 @@ public:
   virtual void Create(mafSceneNode *n /*,bool use_axes = true*/ ); //Can't add parameters - is Virtual
   virtual void Select(bool select); 
 
+  /** Set the origin of the slice*/
   void SetSlice(double *Origin);
 
+  /** Set the normal of the slice*/
 	void SetNormal(double *Normal);
 
   /** IDs for the GUI */
