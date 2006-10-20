@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-20 08:45:27 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-10-20 08:48:32 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -225,7 +225,9 @@ void mafVMEScalar::SetScalarIdForXCoordinate(int id)
     return;
   }
   m_XID = id;
+#ifdef MAF_USE_VTK
   GetScalarOutput()->UpdateVTKRepresentation();
+#endif
   Modified();
 }
 //-------------------------------------------------------------------------
@@ -237,7 +239,9 @@ void mafVMEScalar::SetTypeForXCoordinates(int t)
     return;
   }
   m_Xtype = t;
+#ifdef MAF_USE_VTK
   GetScalarOutput()->UpdateVTKRepresentation();
+#endif
   Modified();
 }
 //-------------------------------------------------------------------------
@@ -249,7 +253,9 @@ void mafVMEScalar::SetScalarIdForYCoordinate(int id)
     return;
   }
   m_YID = id;
+#ifdef MAF_USE_VTK
   GetScalarOutput()->UpdateVTKRepresentation();
+#endif
   Modified();
 }
 //-------------------------------------------------------------------------
@@ -261,7 +267,9 @@ void mafVMEScalar::SetTypeForYCoordinates(int t)
     return;
   }
   m_Ytype = t;
+#ifdef MAF_USE_VTK
   GetScalarOutput()->UpdateVTKRepresentation();
+#endif
   Modified();
 }
 //-------------------------------------------------------------------------
@@ -273,7 +281,9 @@ void mafVMEScalar::SetScalarIdForZCoordinate(int id)
     return;
   }
   m_ZID = id;
+#ifdef MAF_USE_VTK
   GetScalarOutput()->UpdateVTKRepresentation();
+#endif
   Modified();
 }
 //-------------------------------------------------------------------------
@@ -285,7 +295,9 @@ void mafVMEScalar::SetTypeForZCoordinates(int t)
     return;
   }
   m_Ztype = t;
+#ifdef MAF_USE_VTK
   GetScalarOutput()->UpdateVTKRepresentation();
+#endif
   Modified();
 }
 //-----------------------------------------------------------------------
