@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-19 10:02:12 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2006-10-20 08:42:34 $
+  Version:   $Revision: 1.29 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,21 +31,21 @@
 #include "mafVMESurface.h"
 #include "mafVMEGenericAbstract.h"
 
-#include "mafLODActor.h"
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFAssembly.h"
-#include "vtkRenderer.h"
-#include "vtkOutlineCornerFilter.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkPolyData.h"
-//#include "vtkActor.h"
-#include "vtkProperty.h"
-#include "vtkTexture.h"
+
 #include "vtkPointData.h"
 #include "vtkImageData.h"
 #include "vtkTextureMapToCylinder.h"
 #include "vtkTextureMapToPlane.h"
 #include "vtkTextureMapToSphere.h"
+#include "vtkOutlineCornerFilter.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkPolyData.h"
+#include "vtkProperty.h"
+#include "vtkTexture.h"
+#include "mafLODActor.h"
+#include "vtkRenderer.h"
 
 #include <vector>
 
@@ -68,6 +68,7 @@ mafPipeSurface::mafPipeSurface()
   m_MaterialButton  = NULL;
   m_TextureAccept   = NULL;
   m_SurfaceMaterial = NULL;
+  m_Gui             = NULL;
 
   m_ScalarVisibility = 0;
   m_RenderingDisplayListFlag = 0;
@@ -434,4 +435,20 @@ void mafPipeSurface::GenerateTextureMapCoordinate()
   {
     m_Mapper->SetInput(data);
   }
+}
+//----------------------------------------------------------------------------
+void mafPipeSurface::SetEnableActorLOD(bool value)
+//----------------------------------------------------------------------------
+{
+  m_EnableActorLOD = (int) value;
+  if(m_Gui)
+    m_Gui->Update();
+}
+//----------------------------------------------------------------------------
+void mafPipeSurface::SetActorPicking(int enable)
+//----------------------------------------------------------------------------
+{
+	m_Actor->SetPickable(enable);
+  m_Actor->Modified();
+	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }

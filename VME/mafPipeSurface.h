@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-19 10:02:12 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2006-10-20 08:42:34 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,6 +51,8 @@ public:
   virtual void Create(mafSceneNode *n /*,bool use_axes = true*/ ); //Can't add parameters - is Virtual
   virtual void Select(bool select); 
 
+  void SetEnableActorLOD(bool value);
+
   /** IDs for the GUI */
   enum PIPE_SURFACE_WIDGET_ID
   {
@@ -77,6 +79,10 @@ public:
   };
 
   mafTextureAccept *m_TextureAccept;
+
+  /** Set the actor picking*/
+  void SetActorPicking(int enable = true);
+
 
 protected:
   vtkTexture              *m_Texture;
