@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:07:57 $
-  Version:   $Revision: 1.72 $
+  Date:      $Date: 2006-10-20 08:32:48 $
+  Version:   $Revision: 1.73 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -286,7 +286,13 @@ void mafLogicWithManagers::Init(int argc, char **argv)
     if(argc > 1 )
     {
       mafString op_type = argv[1];
-      m_OpManager->OpRun(op_type);
+      mafString op_param = argv[2];
+      for (int p = 3; p < argc; p++)
+      {
+        op_param += " ";
+        op_param += argv[p];
+      }
+      m_OpManager->OpRun(op_type, (void *)op_param.GetCStr());
     }
   }
 }
