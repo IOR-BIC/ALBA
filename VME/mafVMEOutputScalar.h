@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputScalar.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-28 16:35:01 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-10-20 08:50:44 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,7 +22,7 @@
 //----------------------------------------------------------------------------
 class mafVMEGereric;
 #ifdef MAF_USE_VTK
-class vtkDataSet;
+class vtkPolyData;
 #endif //MAF_USE_VTK
 
 /** NULL output for VME node with a scalar output data.
@@ -52,10 +52,12 @@ public:
   An event rise when the output data changes to allow attached classes to 
   update their input.*/
   virtual vtkDataSet *GetVTKData();
+
+  /** Function to update VTK representation of vnl matrix representing the scalar data.*/
+  void UpdateVTKRepresentation();
 #endif
 
-  /**
-    Update all the output data structures (data, bounds, matrix and abs matrix).*/
+  /** Update all the output data structures (data, bounds, matrix and abs matrix).*/
   virtual void Update();
     
 protected:
@@ -64,6 +66,10 @@ protected:
 
   mafString m_NumberOfRows;
   mafString m_NumberOfColumns;
+
+#ifdef MAF_USE_VTK
+  vtkPolyData *m_Polydata;
+#endif
 
   mmgGui *CreateGui();
 
