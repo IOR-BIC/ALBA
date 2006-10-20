@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPicker.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-06 10:35:43 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-10-20 12:08:06 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -31,6 +31,7 @@
 
 #include "mafEventInteraction.h"
 
+#include "mafRWIBase.h"
 #include "mafVME.h"
 #include "mafTransform.h"
 
@@ -144,20 +145,36 @@ void mmiPicker::SendPickingInformation(mafView *v, double *mouse_pos, int msg_id
 {
   bool picked_something = false;
 
+  vtkCellPicker *cellPicker;
+  vtkNEW(cellPicker);
   if (v)
   {
     mafViewCompound *vc = mafViewCompound::SafeDownCast(v);
     if (vc)
       v = vc->GetSubView();
     if(mouse_flag)
-      picked_something = v->Pick(mouse_pos[0],mouse_pos[1]);
+    {
+      vtkRendererCollection *rc = v->GetRWI()->GetRenderWindow()->GetRenderers();
+      vtkRenderer *r = NULL;
+      rc->InitTraversal();
+      while(r = rc->GetNextItem())
+      {
+        if(cellPicker->Pick(mouse_pos[0],mouse_pos[1],0,r))
+        {
+          picked_something = true;
+        }
+      }
+    }
     else
       picked_something = v->Pick(*tracker_pos);
     if (picked_something)
     {
-      double pos_picked[3];
-      v->GetPickedPosition(pos_picked);
       vtkPoints *p = vtkPoints::New();
+      double pos_picked[3];
+      if(mouse_flag)
+        cellPicker->GetPickedPositions()->GetPoint(0,pos_picked);
+      else
+        v->GetPickedPosition(pos_picked);
       p->SetNumberOfPoints(1);
       p->SetPoint(0,pos_picked);
       double scalar_value = 0;
@@ -173,4 +190,5 @@ void mmiPicker::SendPickingInformation(mafView *v, double *mouse_pos, int msg_id
       p->Delete();
     }
   }
+  vtkDEL(cellPicker);
 }
