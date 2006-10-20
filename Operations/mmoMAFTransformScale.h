@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMAFTransformScale.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-17 13:26:55 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-10-20 08:34:37 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi  
 ==========================================================================
   Copyright (c) 2002/2004
@@ -74,7 +74,7 @@ protected:
   /** 
   plugged objects */
   mafGizmoScale               *m_GizmoScale;
-  mafGuiTransformMouse        *m_GuiTransform;
+  //mafGuiTransformMouse        *m_GuiTransform;
   mafGuiSaveRestorePose       *m_GuiSaveRestorePose;
   //mafGuiTransformTextEntries  *m_GuiTransformTextEntries;
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMAFTransformScale.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-17 13:26:55 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-10-20 08:34:37 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,7 +49,7 @@ enum MAF_TRANSFORM_ID
 {
 	ID_SHOW_GIZMO = MINID,
   ID_RESET,
-  ID_AUX_REF_SYS,
+//  ID_AUX_REF_SYS,
   ID_ENABLE_SCALING,
 };
 
@@ -66,7 +66,7 @@ mmoTransformInterface(label)
   m_Canundo = true;
 
   m_GizmoScale              = NULL;
-  m_GuiTransform            = NULL;
+//  m_GuiTransform            = NULL;
   m_GuiSaveRestorePose      = NULL;
 //  m_GuiTransformTextEntries = NULL;
 }
@@ -75,7 +75,7 @@ mmoMAFTransformScale::~mmoMAFTransformScale()
 //----------------------------------------------------------------------------
 {
   cppDEL(m_GizmoScale);
-  cppDEL(m_GuiTransform);
+//  cppDEL(m_GuiTransform);
   cppDEL(m_GuiSaveRestorePose);
 //  cppDEL(m_GuiTransformTextEntries);
 }
@@ -120,10 +120,10 @@ void mmoMAFTransformScale::OnEvent(mafEventBase *maf_event)
     OnEventThis(maf_event); 
     return;
   }
-  else if (maf_event->GetSender() == m_GuiTransform) // from gui transform
+  /*else if (maf_event->GetSender() == m_GuiTransform) // from gui transform
   {
     OnEventGuiTransform(maf_event);
-  }
+  }*/
   else if (maf_event->GetSender() == m_GizmoScale) // from scaling gizmo
   {
     OnEventGizmoScale(maf_event);
@@ -168,7 +168,7 @@ void mmoMAFTransformScale::OpStop(int result)
   m_GizmoScale->Show(false);
   cppDEL(m_GizmoScale);
 
-  m_GuiTransform->DetachInteractorFromVme();
+//  m_GuiTransform->DetachInteractorFromVme();
 
   // HideGui seems not to work  with plugged guis :(; using it generate a SetFocusToChild
   // error when operation tab is selected after the operation has ended
@@ -188,7 +188,7 @@ void mmoMAFTransformScale::OnEventThis(mafEventBase *maf_event)
 	  }
     break;
     // move this to opgui; both gizmos and gui should know ref sys
-    case ID_AUX_REF_SYS:
+    /*case ID_AUX_REF_SYS:
     {
       mafString s;
       s << "Choose VME ref sys";
@@ -196,7 +196,7 @@ void mmoMAFTransformScale::OnEventThis(mafEventBase *maf_event)
 			mafEventMacro(e);
       SetRefSysVME(mafVME::SafeDownCast(e.GetVme()));
     }
-    break;
+    break;*/
 
     case wxOK:
     {
@@ -256,7 +256,7 @@ void mmoMAFTransformScale::OnEventGuiTransform(mafEventBase *maf_event)
       // update gizmos positions
       if (m_GizmoScale) m_GizmoScale->SetAbsPose(m_RefSysVME->GetOutput()->GetAbsMatrix());
 
-      m_GuiTransform->SetRefSys(m_RefSysVME);      
+//      m_GuiTransform->SetRefSys(m_RefSysVME);      
 //      m_GuiTransformTextEntries->SetAbsPose(((mafVME *)m_Input)->GetOutput()->GetAbsMatrix());
     }
     break;
@@ -276,8 +276,8 @@ void mmoMAFTransformScale::OnEventGuiSaveRestorePose(mafEventBase *maf_event)
     case ID_TRANSFORM: // from m_GuiSaveRestorePose
     {
       // update gizmos positions
-      m_GizmoScale->SetAbsPose(m_RefSysVME->GetOutput()->GetAbsMatrix());
-      m_GuiTransform->SetRefSys(m_RefSysVME);
+      //m_GizmoScale->SetAbsPose(m_RefSysVME->GetOutput()->GetAbsMatrix());
+//      m_GuiTransform->SetRefSys(m_RefSysVME);
 
       // update gui 
 //      m_GuiTransformTextEntries->SetAbsPose(((mafVME *)m_Input)->GetOutput()->GetAbsMatrix());
@@ -311,7 +311,7 @@ void mmoMAFTransformScale::OnEventGuiTransformTextEntries(mafEventBase *maf_even
         if (m_RefSysVME == mafVME::SafeDownCast(m_Input))
         {      
           m_GizmoScale->SetAbsPose(&absPose);
-          m_GuiTransform->SetRefSys(m_RefSysVME);
+//          m_GuiTransform->SetRefSys(m_RefSysVME);
         }
 
         m_NewAbsMatrix = absPose;
@@ -339,7 +339,7 @@ void mmoMAFTransformScale::CreateGui()
   // Transform Gui
   //---------------------------------
   // create the transform Gui
-  m_GuiTransform = new mafGuiTransformMouse(mafVME::SafeDownCast(m_Input), this);
+//  m_GuiTransform = new mafGuiTransformMouse(mafVME::SafeDownCast(m_Input), this);
 
   // add transform gui to operation
   //m_Gui->AddGui(m_GuiTransform->GetGui());
@@ -371,10 +371,10 @@ void mmoMAFTransformScale::CreateGui()
   m_Gui->AddGui(m_GuiSaveRestorePose->GetGui());
 
   //--------------------------------- 
-  m_Gui->Divider(2);
+  //m_Gui->Divider(2);
 
-  m_Gui->Label("auxiliary ref sys", true);
-	m_Gui->Button(ID_AUX_REF_SYS,"choose");
+  //m_Gui->Label("auxiliary ref sys", true);
+	//m_Gui->Button(ID_AUX_REF_SYS,"choose");
 	if(this->m_RefSysVME == NULL)
   {
     SetRefSysVME(mafVME::SafeDownCast(m_Input));
@@ -426,7 +426,7 @@ void mmoMAFTransformScale::RefSysVmeChanged()
   */
 
   // change isa refsys
-  m_GuiTransform->SetRefSys(m_RefSysVME);
+//  m_GuiTransform->SetRefSys(m_RefSysVME);
   
   // change gscale refsys
   m_GizmoScale->SetRefSys(m_RefSysVME);  
