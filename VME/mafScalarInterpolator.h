@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafScalarInterpolator.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-08 14:07:44 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-10-23 14:16:57 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,7 +15,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafDataInterpolator.h"
-#include "vnl/vnl_matrix.h"
+#include <vnl/vnl_matrix.h>
 
 //----------------------------------------------------------------------------
 // forward declarations

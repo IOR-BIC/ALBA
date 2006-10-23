@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-27 10:15:33 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-10-23 14:16:57 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005
@@ -50,6 +50,7 @@ mafVMEItemScalar::mafVMEItemScalar()
 mafVMEItemScalar::~mafVMEItemScalar()
 //-------------------------------------------------------------------------
 {
+  m_Data.clear();
 }
 
 //-------------------------------------------------------------------------
