@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2006-05-16 09:27:47 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-10-23 11:54:59 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -52,7 +52,7 @@ public:
 
   virtual void SetListener(mafObserver *Listener) {m_Listener = Listener;};
 
-  void OnEvent(mafEventBase *maf_event);
+  virtual void OnEvent(mafEventBase *maf_event);
 
 	/** Reset the camera position. If vme is passed as parameter, the camera is resetted to fill the vme into the view. */
 	void CameraReset(mafNode *vme = NULL);
@@ -107,7 +107,7 @@ public:
   This method is called from logic to update measure unit according to the application settings.*/
   void UpdateRulerUnit();
 
-  mmgGui *GetGui();
+  virtual mmgGui *GetGui();
 
   void LinkCamera(bool linc_camera = true);
 

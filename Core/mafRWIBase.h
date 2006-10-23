@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-02 21:59:09 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-10-23 11:54:59 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -120,50 +120,36 @@ public:
   // event handlers 
   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	
-	/** 
-  Method called whe the render window as to be repainted. */
+	/** Method called whe the render window as to be repainted. */
   void OnPaint(wxPaintEvent &event);
 	/**  */
   void OnEraseBackground (wxEraseEvent& event);
-	/** 
-  Capture mouse and notify the mouse click. */
-  void OnLeftMouseButtonDown(wxMouseEvent &event);
-  /** 
-  Release the mouse and send an event with mouse position. */
-  void OnLeftMouseButtonUp(wxMouseEvent &event);
-	/** 
-  Capture mouse and notify the mouse click. */
-  void OnMiddleMouseButtonDown(wxMouseEvent &event);
-	/** 
-  Release the mouse and send an event with mouse position. */
-  void OnMiddleMouseButtonUp(wxMouseEvent &event);
-	/** 
-  Capture mouse and notify the mouse click. */
-  void OnRightMouseButtonDown(wxMouseEvent &event);
-	/** 
-  Release the mouse and send an event with mouse position. */
-  void OnRightMouseButtonUp(wxMouseEvent &event);
-	/** 
-  Send an event with mouse position. */
-  void OnMouseMotion(wxMouseEvent &event);
-	/** 
-  Send an event with timer information. */
-  void OnTimer(wxTimerEvent &event);
-	/** 
-  Send an event with key code information. */
-  void OnKeyDown(wxKeyEvent &event);
-	/** 
-  Send an event with key code information. */
-  void OnKeyUp(wxKeyEvent &event);
-	/** 
-  Send an event with key code information. */
-  void OnChar(wxKeyEvent &event);
-	/** 
-  Find the current camera and set UseHorizontalViewAngle depending on the win aspect ratio */
-  void OnSize(wxSizeEvent &event);
-	/** 
-  Do nothing. */
-	void OnIdle(wxIdleEvent& event);
+	/** Capture mouse and notify the mouse click. */
+  virtual void OnLeftMouseButtonDown(wxMouseEvent &event);
+  /** Release the mouse and send an event with mouse position. */
+  virtual void OnLeftMouseButtonUp(wxMouseEvent &event);
+	/** Capture mouse and notify the mouse click. */
+  virtual void OnMiddleMouseButtonDown(wxMouseEvent &event);
+	/** Release the mouse and send an event with mouse position. */
+  virtual void OnMiddleMouseButtonUp(wxMouseEvent &event);
+	/** Capture mouse and notify the mouse click. */
+  virtual void OnRightMouseButtonDown(wxMouseEvent &event);
+	/** Release the mouse and send an event with mouse position. */
+  virtual void OnRightMouseButtonUp(wxMouseEvent &event);
+	/** Send an event with mouse position. */
+  virtual void OnMouseMotion(wxMouseEvent &event);
+	/** Send an event with timer information. */
+  virtual void OnTimer(wxTimerEvent &event);
+	/** Send an event with key code information. */
+  virtual void OnKeyDown(wxKeyEvent &event);
+	/** Send an event with key code information. */
+  virtual void OnKeyUp(wxKeyEvent &event);
+	/** Send an event with key code information. */
+  virtual void OnChar(wxKeyEvent &event);
+	/** Find the current camera and set UseHorizontalViewAngle depending on the win aspect ratio */
+  virtual void OnSize(wxSizeEvent &event);
+	/** Do nothing. */
+	virtual void OnIdle(wxIdleEvent& event);
 
   /** Redefined to set the m_CustomInteractorStyle flag. */
   void SetInteractorStyle(vtkInteractorObserver *o);
@@ -172,8 +158,7 @@ public:
   int  m_Width;
   int  m_Height;
 
-  /** 
-  Generate stereo frames for movie.*/
+  /** Generate stereo frames for movie.*/
   void GenerateStereoFrames();
 
 protected:
