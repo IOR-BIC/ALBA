@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-20 08:50:44 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-10-23 13:21:13 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -32,6 +32,7 @@
 #ifdef MAF_USE_VTK
 #include "vtkMAFSmartPointer.h"
 #include "vtkPoints.h"
+#include "vtkCellArray.h"
 #include "vtkPolyData.h"
 #endif
 
@@ -140,10 +141,12 @@ void mafVMEOutputScalar::UpdateVTKRepresentation()
     }
     num_of_points = vz.size();
   }
+  int pointId[2];
   int progress_point = 0;
   double time_point = GetTimeStamp();
   double x_coord, y_coord, z_coord;
   vtkMAFSmartPointer<vtkPoints> points;
+  vtkMAFSmartPointer<vtkCellArray> verts;
   for (int p = 0; p< num_of_points; p++)
   {
     // X coordinate
@@ -186,10 +189,17 @@ void mafVMEOutputScalar::UpdateVTKRepresentation()
       z_coord = time_point;
     }
     points->InsertPoint(p,x_coord,y_coord,z_coord);
+    if (p>0)
+    {
+      pointId[0] = p-1;
+      pointId[1] = p;
+      verts->InsertNextCell(2,pointId);
+    }
     progress_point++;
   }
 
   m_Polydata->SetPoints(points);
+  m_Polydata->SetLines(verts);
   m_Polydata->Modified();
 }
 #endif
