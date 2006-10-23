@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEScalar.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-20 08:45:27 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-10-23 13:21:40 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -71,7 +71,7 @@ public:
   virtual bool Equals(mafVME *vme);
 
   /** Set/Get the scalar array orientation inside the scalar matrix: ROWS or COLUMNS.*/
-  void SetScalarArrayOrientation(int o = ROWS) {m_ScalarArrayOrientationInMatrix = o;};
+  void SetScalarArrayOrientation(int o = ROWS);
 
   /** Set/Get the scalar array orientation inside the scalar matrix: ROWS or COLUMNS.*/
   int GetScalarArrayOrientation() {return m_ScalarArrayOrientationInMatrix;};
@@ -80,7 +80,7 @@ public:
   void SetScalarIdForXCoordinate(int id);
 
   /** Set/Get which scalar ID has to be used as X coordinate for the VTK Representation.*/
-  int GetScalarIdForXCoordinate() {return m_XID;};
+  int GetScalarIdForXCoordinate();
 
   /** Set/Get the type of elements that will be put inside X coordinate: timestamp, progrs numbers or a scalar component.*/
   void SetTypeForXCoordinates(int t);
@@ -92,7 +92,7 @@ public:
   void SetScalarIdForYCoordinate(int id);
   
   /** Set/Get which scalar ID has to be used as Y coordinate for the VTK Representation.*/
-  int GetScalarIdForYCoordinate() {return m_YID;};
+  int GetScalarIdForYCoordinate();
 
   /** Set/Get the type of elements that will be put inside Y coordinate: timestamp, progrs numbers or a scalar component.*/
   void SetTypeForYCoordinates(int t);
@@ -104,7 +104,7 @@ public:
   void SetScalarIdForZCoordinate(int id);
 
   /** Set/Get which scalar ID has to be used as Z coordinate for the VTK Representation.*/
-  int GetScalarIdForZCoordinate() {return m_ZID;};
+  int GetScalarIdForZCoordinate();
 
   /** Set/Get the type of elements that will be put inside Z coordinate: timestamp, progrs numbers or a scalar component.*/
   void SetTypeForZCoordinates(int t);

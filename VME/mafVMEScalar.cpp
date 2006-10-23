@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-20 08:48:32 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-10-23 13:21:40 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -191,7 +191,7 @@ int mafVMEScalar::InternalStore(mafStorageElement *parent)
         parent->StoreInteger("Xtype",m_Xtype)==MAF_OK &&
         parent->StoreInteger("Ytype",m_Ytype)==MAF_OK &&
         parent->StoreInteger("Ztype",m_Ztype)==MAF_OK &&
-        parent->StoreInteger("ScalarArrayOrientationInMatrix",m_ScalarArrayOrientationInMatrix))
+        parent->StoreInteger("ScalarArrayOrientationInMatrix",m_ScalarArrayOrientationInMatrix)==MAF_OK)
       return MAF_OK;
   }
   return MAF_ERROR;
@@ -217,6 +217,18 @@ int mafVMEScalar::InternalRestore(mafStorageElement *node)
   return MAF_ERROR;
 }
 //-------------------------------------------------------------------------
+void mafVMEScalar::SetScalarArrayOrientation(int o)
+//-------------------------------------------------------------------------
+{
+  m_ScalarArrayOrientationInMatrix = o;
+  m_ScalarArrayOrientationInMatrix = m_ScalarArrayOrientationInMatrix < ROWS ? ROWS : m_ScalarArrayOrientationInMatrix;
+  m_ScalarArrayOrientationInMatrix = m_ScalarArrayOrientationInMatrix > COLUMNS ? COLUMNS : m_ScalarArrayOrientationInMatrix;
+#ifdef MAF_USE_VTK
+  GetScalarOutput()->UpdateVTKRepresentation();
+#endif
+  Modified();
+}
+//-------------------------------------------------------------------------
 void mafVMEScalar::SetScalarIdForXCoordinate(int id)
 //-------------------------------------------------------------------------
 {
@@ -231,6 +243,29 @@ void mafVMEScalar::SetScalarIdForXCoordinate(int id)
   Modified();
 }
 //-------------------------------------------------------------------------
+int mafVMEScalar::GetScalarIdForXCoordinate()
+//-------------------------------------------------------------------------
+{
+  mafVMEOutputScalar *output = GetScalarOutput();
+  vnl_matrix<double> data = output->GetScalarData();
+  if (!data.empty())
+  {
+    if (m_ScalarArrayOrientationInMatrix == COLUMNS)
+    {
+      m_XID = m_XID > data.columns() ? data.columns() : m_XID;
+    }
+    else
+    {
+      m_XID = m_XID > data.rows() ? data.rows() : m_XID;
+    }
+  }
+  if (m_Gui)
+  {
+    m_Gui->Update();
+  }
+  return m_XID;
+}
+//-------------------------------------------------------------------------
 void mafVMEScalar::SetTypeForXCoordinates(int t)
 //-------------------------------------------------------------------------
 {
@@ -239,6 +274,8 @@ void mafVMEScalar::SetTypeForXCoordinates(int t)
     return;
   }
   m_Xtype = t;
+  m_Xtype = m_Xtype < USE_TIME ? USE_TIME : m_Xtype;
+  m_Xtype = m_Xtype > USE_SCALAR ? USE_SCALAR : m_Xtype;
 #ifdef MAF_USE_VTK
   GetScalarOutput()->UpdateVTKRepresentation();
 #endif
@@ -259,6 +296,29 @@ void mafVMEScalar::SetScalarIdForYCoordinate(int id)
   Modified();
 }
 //-------------------------------------------------------------------------
+int mafVMEScalar::GetScalarIdForYCoordinate()
+//-------------------------------------------------------------------------
+{
+  mafVMEOutputScalar *output = GetScalarOutput();
+  vnl_matrix<double> data = output->GetScalarData();
+  if (!data.empty())
+  {
+    if (m_ScalarArrayOrientationInMatrix == COLUMNS)
+    {
+      m_YID = m_YID > data.columns() ? data.columns() : m_YID;
+    }
+    else
+    {
+      m_YID = m_YID > data.rows() ? data.rows() : m_YID;
+    }
+  }
+  if (m_Gui)
+  {
+    m_Gui->Update();
+  }
+  return m_YID;
+}
+//-------------------------------------------------------------------------
 void mafVMEScalar::SetTypeForYCoordinates(int t)
 //-------------------------------------------------------------------------
 {
@@ -267,6 +327,8 @@ void mafVMEScalar::SetTypeForYCoordinates(int t)
     return;
   }
   m_Ytype = t;
+  m_Ytype = m_Ytype < USE_TIME ? USE_TIME : m_Ytype;
+  m_Ytype = m_Ytype > USE_SCALAR ? USE_SCALAR : m_Ytype;
 #ifdef MAF_USE_VTK
   GetScalarOutput()->UpdateVTKRepresentation();
 #endif
@@ -287,6 +349,29 @@ void mafVMEScalar::SetScalarIdForZCoordinate(int id)
   Modified();
 }
 //-------------------------------------------------------------------------
+int mafVMEScalar::GetScalarIdForZCoordinate()
+//-------------------------------------------------------------------------
+{
+  mafVMEOutputScalar *output = GetScalarOutput();
+  vnl_matrix<double> data = output->GetScalarData();
+  if (!data.empty())
+  {
+    if (m_ScalarArrayOrientationInMatrix == COLUMNS)
+    {
+      m_ZID = m_ZID > data.columns() ? data.columns() : m_ZID;
+    }
+    else
+    {
+      m_ZID = m_ZID > data.rows() ? data.rows() : m_ZID;
+    }
+  }
+  if (m_Gui)
+  {
+    m_Gui->Update();
+  }
+  return m_ZID;
+}
+//-------------------------------------------------------------------------
 void mafVMEScalar::SetTypeForZCoordinates(int t)
 //-------------------------------------------------------------------------
 {
@@ -295,6 +380,8 @@ void mafVMEScalar::SetTypeForZCoordinates(int t)
     return;
   }
   m_Ztype = t;
+  m_Ztype = m_Ztype < USE_TIME ? USE_TIME : m_Ztype;
+  m_Ztype = m_Ztype > USE_SCALAR ? USE_SCALAR : m_Ztype;
 #ifdef MAF_USE_VTK
   GetScalarOutput()->UpdateVTKRepresentation();
 #endif
