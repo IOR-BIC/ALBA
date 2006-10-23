@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-03 10:59:22 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2006-10-23 11:54:35 $
+  Version:   $Revision: 1.25 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -439,7 +439,10 @@ void mafViewManager::ViewDeleteAll()
 //----------------------------------------------------------------------------
 {
 	while(m_ViewList)
+  {
+    m_ViewList->GetFrame()->Show(false);
     m_ViewList->GetFrame()->Close();
+  }
 }
 //----------------------------------------------------------------------------
 mafView *mafViewManager::GetSelectedView()
