@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGizmo.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-17 11:12:38 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-10-23 11:28:19 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -59,7 +59,7 @@ mafVMEGizmo::~mafVMEGizmo()
 //-------------------------------------------------------------------------
 {
   mafDEL(m_Transform);
-  SetOutput(NULL);
+  vtkDEL(m_GizmoData);
 }
 //-------------------------------------------------------------------------
 int mafVMEGizmo::DeepCopy(mafNode *a)
