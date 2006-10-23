@@ -81,6 +81,8 @@ IF (MAF_USE_ITK)
     mafASCIIImporterUtility.h
     mmoASCIIImporter.cpp
     mmoASCIIImporter.h
+    mmoScalarToSurface.cpp
+    mmoScalarToSurface.h
   )
 ENDIF (MAF_USE_ITK)
 
