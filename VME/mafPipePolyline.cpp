@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolyline.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-05 11:13:19 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-10-23 13:20:39 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -97,7 +97,6 @@ void mafPipePolyline::Create(mafSceneNode *n)
   m_Tube->SetRadius(m_TubeRadius);
   m_Tube->SetCapping(m_Capping);
   m_Tube->SetNumberOfSides(m_TubeResolution);
-  m_Tube->UseDefaultNormalOff();
 
   m_Mapper = vtkPolyDataMapper::New();
 
