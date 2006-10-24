@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckListBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-10-24 09:01:58 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -125,8 +125,8 @@ void mmgCheckListBox::RemoveItem(int id)
 void mmgCheckListBox::CheckItem(int id, bool check)
 //----------------------------------------------------------------------------
 {
-  int index;
-  if( index=FindItemIndex(id) == -1 ) return;
+  int index=FindItemIndex(id);
+  if( index == -1 ) return;
 
   m_prevent_notify = true;
   m_clb->Check(index,check);
