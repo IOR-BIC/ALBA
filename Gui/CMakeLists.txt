@@ -79,6 +79,8 @@ SET(PROJECT_SRCS
   mmgPicButton.h
   mmgRangeSlider.cpp
   mmgRangeSlider.h
+  mmgRollOut.cpp
+  mmgRollOut.h
   mmgScrolledPanel.cpp
   mmgScrolledPanel.h
   mmgSettingsDialog.cpp
