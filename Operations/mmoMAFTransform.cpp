@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMAFTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:11:57 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2006-10-25 13:34:34 $
+  Version:   $Revision: 1.14 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -58,6 +58,11 @@ enum MAF_TRANSFORM_ID
   ID_RESET,
   ID_AUX_REF_SYS,
   ID_ENABLE_SCALING,
+  ID_ROLLOUT_TEXT_ENTRIES,
+  ID_ROLLOUT_GIZMO_TRANSLATE,
+  ID_ROLLOUT_GIZMO_ROTATE,
+  ID_ROLLOUT_GIZMO_SCALE,
+  ID_ROLLOUT_SAVE_POS
 };
 
 //----------------------------------------------------------------------------
@@ -563,7 +568,8 @@ void mmoMAFTransform::CreateGui()
   m_GuiTransformTextEntries = new mafGuiTransformTextEntries(mafVME::SafeDownCast(m_Input), this);
 
   // add transform Gui to operation
-  m_Gui->AddGui(m_GuiTransformTextEntries->GetGui());
+  //m_Gui->AddGui(m_GuiTransformTextEntries->GetGui());
+  m_Gui->RollOut(ID_ROLLOUT_TEXT_ENTRIES," Text entries", m_GuiTransformTextEntries->GetGui(), false);
 
   //---------------------------------
   // Translation Gizmo Gui
@@ -574,7 +580,8 @@ void mmoMAFTransform::CreateGui()
   m_GizmoTranslate->Show(false);
 
   // add translation gizmo Gui to operation
-  m_Gui->AddGui(m_GizmoTranslate->GetGui());
+  //m_Gui->AddGui(m_GizmoTranslate->GetGui());
+  m_Gui->RollOut(ID_ROLLOUT_GIZMO_TRANSLATE," Gizmo translate", m_GizmoTranslate->GetGui(), false);
   
   //---------------------------------
   // Rotation Gizmo Gui
@@ -583,7 +590,8 @@ void mmoMAFTransform::CreateGui()
   m_GizmoRotate->Show(false);
 
   // add rotation gizmo Gui to operation
-  m_Gui->AddGui(m_GizmoRotate->GetGui());
+  //m_Gui->AddGui(m_GizmoRotate->GetGui());
+  m_Gui->RollOut(ID_ROLLOUT_GIZMO_ROTATE," Gizmo rotate", m_GizmoRotate->GetGui(), false);
   
   //---------------------------------
   // Scaling Gizmo Gui
@@ -592,7 +600,8 @@ void mmoMAFTransform::CreateGui()
   m_GizmoScale->Show(false);
 
   // add scaling gizmo gui to operation
-  m_Gui->AddGui(m_GizmoScale->GetGui());
+  //m_Gui->AddGui(m_GizmoScale->GetGui());
+  m_Gui->RollOut(ID_ROLLOUT_GIZMO_SCALE," Gizmo scale", m_GizmoScale->GetGui(), false);
 
   //---------------------------------
   // Store/Restore position Gui
@@ -600,7 +609,8 @@ void mmoMAFTransform::CreateGui()
   m_GuiSaveRestorePose = new mafGuiSaveRestorePose(mafVME::SafeDownCast(m_Input), this);
   
   // add Gui to operation
-  m_Gui->AddGui(m_GuiSaveRestorePose->GetGui());
+  //m_Gui->AddGui(m_GuiSaveRestorePose->GetGui());
+  m_Gui->RollOut(ID_ROLLOUT_SAVE_POS," Save pose", m_GuiSaveRestorePose->GetGui(), false);
 
   //--------------------------------- 
   m_Gui->Divider(2);
