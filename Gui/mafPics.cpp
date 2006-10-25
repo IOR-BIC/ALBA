@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPics.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-23 15:42:58 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-10-25 11:44:09 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -52,20 +52,24 @@ void mafPictureFactory::Initialize()
 //----------------------------------------------------------------------------
 {
   mafPics_Initialized=true;
-   #include <pic/FRAME_ICON16x16.xpm>   
+   #include <pic/FRAME_ICON16x16.xpm>
     mafADDPIC(FRAME_ICON16x16);
-    #include <pic/FRAME_ICON32x32.xpm>   
+    #include <pic/FRAME_ICON32x32.xpm>
     mafADDPIC(FRAME_ICON32x32);
-    #include <pic/CLOSE_SASH.xpm>      
-    mafADDPIC(CLOSE_SASH);   
-    #include <pic/FILE_NEW.xpm>        
+    #include <pic/CLOSE_SASH.xpm>
+    mafADDPIC(CLOSE_SASH);
+    #include <pic/ROLLOUT_CLOSE.xpm>
+    mafADDPIC(ROLLOUT_CLOSE);
+    #include <pic/ROLLOUT_OPEN.xpm>
+    mafADDPIC(ROLLOUT_OPEN);
+    #include <pic/FILE_NEW.xpm>    
     mafADDPIC(FILE_NEW);
-    #include <pic/FILE_OPEN.xpm>       
-    mafADDPIC(FILE_OPEN);    
-    #include <pic/FILE_SAVE.xpm>       
-    mafADDPIC(FILE_SAVE);    
-    #include <pic/FLYTO.xpm>           
-    mafADDPIC(FLYTO);        
+    #include <pic/FILE_OPEN.xpm>
+    mafADDPIC(FILE_OPEN);
+    #include <pic/FILE_SAVE.xpm>
+    mafADDPIC(FILE_SAVE);
+    #include <pic/FLYTO.xpm>
+    mafADDPIC(FLYTO);
     #include <pic/INFO.xpm>
     mafADDPIC(INFO);
     #include <pic/PRINT.xpm>
@@ -74,38 +78,38 @@ void mafPictureFactory::Initialize()
     mafADDPIC(PRINT_PREVIEW);
     #include <pic/SPLASH_SCREEN.xpm>
     mafADDPIC(SPLASH_SCREEN);
-    #include <pic/MDICHILD_ICON.xpm>   
+    #include <pic/MDICHILD_ICON.xpm>
     mafADDPIC(MDICHILD_ICON);
-    #include <pic/OP_COPY.xpm>         
-    mafADDPIC(OP_COPY);      
-    #include <pic/OP_CUT.xpm>          
-    mafADDPIC(OP_CUT);       
-    #include <pic/OP_PASTE.xpm>        
-    mafADDPIC(OP_PASTE);     
-    #include <pic/OP_REDO.xpm>         
-    mafADDPIC(OP_REDO);      
-    #include <pic/OP_UNDO.xpm>         
-    mafADDPIC(OP_UNDO);      
-    #include <pic/PIC_BACK.xpm>        
-    mafADDPIC(PIC_BACK);     
-    #include <pic/PIC_BOTTOM.xpm>      
-    mafADDPIC(PIC_BOTTOM);   
-    #include <pic/PIC_FRONT.xpm>       
-    mafADDPIC(PIC_FRONT);    
-    #include <pic/PIC_LEFT.xpm>        
-    mafADDPIC(PIC_LEFT);     
-    #include <pic/PIC_RIGHT.xpm>       
-    mafADDPIC(PIC_RIGHT);    
-    #include <pic/PIC_TOP.xpm>         
-    mafADDPIC(PIC_TOP);      
-    #include <pic/TIME_BEGIN.xpm>      
+    #include <pic/OP_COPY.xpm>
+    mafADDPIC(OP_COPY);
+    #include <pic/OP_CUT.xpm>
+    mafADDPIC(OP_CUT);
+    #include <pic/OP_PASTE.xpm>
+    mafADDPIC(OP_PASTE);
+    #include <pic/OP_REDO.xpm>
+    mafADDPIC(OP_REDO);
+    #include <pic/OP_UNDO.xpm>
+    mafADDPIC(OP_UNDO);
+    #include <pic/PIC_BACK.xpm>
+    mafADDPIC(PIC_BACK);
+    #include <pic/PIC_BOTTOM.xpm>
+    mafADDPIC(PIC_BOTTOM);
+    #include <pic/PIC_FRONT.xpm>
+    mafADDPIC(PIC_FRONT);
+    #include <pic/PIC_LEFT.xpm>
+    mafADDPIC(PIC_LEFT);
+    #include <pic/PIC_RIGHT.xpm>
+    mafADDPIC(PIC_RIGHT);
+    #include <pic/PIC_TOP.xpm>
+    mafADDPIC(PIC_TOP);
+    #include <pic/TIME_BEGIN.xpm>
     mafADDPIC(TIME_BEGIN);
-    #include <pic/TIME_END.xpm>        
-    mafADDPIC(TIME_END);   
-    #include <pic/TIME_NEXT.xpm>       
-    mafADDPIC(TIME_NEXT);    
-    #include <pic/TIME_PLAY.xpm>       
-    mafADDPIC(TIME_PLAY);    
+    #include <pic/TIME_END.xpm>      
+    mafADDPIC(TIME_END);
+    #include <pic/TIME_NEXT.xpm>
+    mafADDPIC(TIME_NEXT);
+    #include <pic/TIME_PLAY.xpm>
+    mafADDPIC(TIME_PLAY);
     #include <pic/TIME_PREV.xpm>
     mafADDPIC(TIME_PREV);
     #include <pic/TIME_STOP.xpm>
@@ -120,25 +124,25 @@ void mafPictureFactory::Initialize()
     mafADDPIC(ZOOM_SEL);
 
     // these are used by the ListCtrl
-    #include <pic/NODE_YELLOW.xpm>        
-    mafADDPIC(NODE_YELLOW);     
-    #include <pic/NODE_RED.xpm>        
-    mafADDPIC(NODE_RED);     
-    #include <pic/NODE_BLUE.xpm>        
-    mafADDPIC(NODE_BLUE);     
-    #include <pic/NODE_GRAY.xpm>        
-    mafADDPIC(NODE_GRAY);     
+    #include <pic/NODE_YELLOW.xpm>
+    mafADDPIC(NODE_YELLOW);
+    #include <pic/NODE_RED.xpm>
+    mafADDPIC(NODE_RED);
+    #include <pic/NODE_BLUE.xpm>
+    mafADDPIC(NODE_BLUE);
+    #include <pic/NODE_GRAY.xpm>
+    mafADDPIC(NODE_GRAY);
 
-    #include <pic/DISABLED.xpm>        
-    mafADDPIC(DISABLED);     
-    #include <pic/RADIO_ON.xpm>        
-    mafADDPIC(RADIO_ON);     
-    #include <pic/RADIO_OFF.xpm>        
-    mafADDPIC(RADIO_OFF);     
-    #include <pic/CHECK_ON.xpm>        
-    mafADDPIC(CHECK_ON);     
-    #include <pic/CHECK_OFF.xpm>        
-    mafADDPIC(CHECK_OFF);     
+    #include <pic/DISABLED.xpm>
+    mafADDPIC(DISABLED);
+    #include <pic/RADIO_ON.xpm>
+    mafADDPIC(RADIO_ON);
+    #include <pic/RADIO_OFF.xpm>
+    mafADDPIC(RADIO_OFF);
+    #include <pic/CHECK_ON.xpm>
+    mafADDPIC(CHECK_ON);
+    #include <pic/CHECK_OFF.xpm>
+    mafADDPIC(CHECK_OFF);
 }
 //----------------------------------------------------------------------------
 mafPictureFactory::~mafPictureFactory()
