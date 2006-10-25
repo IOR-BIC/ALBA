@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-14 08:29:32 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2006-10-25 13:34:03 $
+  Version:   $Revision: 1.32 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -26,6 +26,7 @@
 class mmgFloatSlider;
 class mmgCheckListBox;
 class mmgLutSwatch;
+class mmgRollOut;
 
 #ifdef MAF_USE_VTK //:::::::::::::::::::::::::::::::::
 class vtkLookupTable;
@@ -206,6 +207,9 @@ public:
 
   /** Grid widget. */
 	wxGrid *Grid(int id, wxString label = "", int height = 60, int row = 2,int cols = 2, wxString tooltip = "");
+
+  /** Create a roll out gui.*/
+  mmgRollOut *RollOut(int id, mafString title, mmgGui *roll_gui, bool rollOutOpen = true);
 
   /** Add window to gui sizer. */
   void Add(wxWindow* window,int option = 0, int flag = wxEXPAND, int border = 0)  {window->Reparent(this); window->Show(true); m_Sizer->Add(window,option,flag,border);};

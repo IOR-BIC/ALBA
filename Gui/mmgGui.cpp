@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-12 08:25:06 $
-  Version:   $Revision: 1.39 $
+  Date:      $Date: 2006-10-25 13:34:03 $
+  Version:   $Revision: 1.40 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,6 +28,7 @@
 #include "mmgGui.h"
 #include "mmgButton.h"
 #include "mmgPicButton.h"
+#include "mmgRollOut.h"
 
 #ifdef MAF_USE_VTK //:::::::::::::::::::::::::::::::::
 #include "mmgLutSwatch.h"
@@ -1339,6 +1340,14 @@ void mmgGui::VectorN(int id,wxString label, int *var,int num_elem,int min, int m
   	sizer->Add(tex,0,wxRIGHT,HM);
 	}
 	Add(sizer,0,wxEXPAND,M);
+}
+//----------------------------------------------------------------------------
+mmgRollOut *mmgGui::RollOut(int id, mafString title, mmgGui *roll_gui, bool rollOutOpen)
+//----------------------------------------------------------------------------
+{
+  int w_id = GetId(id);
+  mmgRollOut *roll = new mmgRollOut(this, title, roll_gui, w_id, rollOutOpen);
+  return roll;
 }
 //----------------------------------------------------------------------------
 void mmgGui::OnListBox (wxCommandEvent &event)
