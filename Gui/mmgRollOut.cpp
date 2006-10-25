@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgRollOut.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-25 11:44:23 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-10-25 13:00:39 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -73,8 +73,14 @@ mmgRollOut::~mmgRollOut()
 void mmgRollOut::OnRollOut(wxCommandEvent &event)
 //----------------------------------------------------------------------------
 {
+  RollOut(!m_RollGui->IsShown());
+}
+//----------------------------------------------------------------------------
+void mmgRollOut::RollOut(bool open)
+//----------------------------------------------------------------------------
+{
   wxString b;
-  m_RollGui->Show(!m_RollGui->IsShown());
+  m_RollGui->Show(open);
   b = m_RollGui->IsShown() ? "ROLLOUT_OPEN": "ROLLOUT_CLOSE";
   m_RollOutButton->SetBitmap(b, ID_CLOSE_SASH);
   m_MainGui->FitGui();

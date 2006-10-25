@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgRollOut.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-25 11:44:23 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-10-25 13:00:39 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,7 +36,10 @@ class mmgRollOut: public wxPanel
 public:
            mmgRollOut(mmgGui *parent, mafString title, mmgGui *roll_gui, bool rollOutOpen = true);
   virtual ~mmgRollOut();
-  
+
+  /** Open/Close the Roll-out.*/
+  void RollOut(bool open = true);
+
 protected:
   /** Answer the click on the Picture button to open/close the roll out gui.*/
   void OnRollOut(wxCommandEvent &event);
