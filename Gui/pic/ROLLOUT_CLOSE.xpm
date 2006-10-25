@@ -1,0 +1,21 @@
+/* XPM */
+static char *ROLLOUT_CLOSE_xpm[] = {
+/* columns rows colors chars-per-pixel */
+"13 13 2 1",
+". c #4D4DA6",
+"  c #EFEDDE",
+/* pixels */
+"             ",
+"             ",
+"    .        ",
+"    ..       ",
+"    ...      ",
+"    ....     ",
+"    .....    ",
+"    ....     ",
+"    ...      ",
+"    ..       ",
+"    .        ",
+"             ",
+"             "
+};
