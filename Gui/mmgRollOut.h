@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgRollOut.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-25 13:00:39 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-10-25 13:33:38 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,7 +34,7 @@ that can be shown/hidden by pressing on the picture button on the left of the ti
 class mmgRollOut: public wxPanel
 {
 public:
-           mmgRollOut(mmgGui *parent, mafString title, mmgGui *roll_gui, bool rollOutOpen = true);
+           mmgRollOut(mmgGui *parent, mafString title, mmgGui *roll_gui, int id = -1, bool rollOutOpen = true);
   virtual ~mmgRollOut();
 
   /** Open/Close the Roll-out.*/

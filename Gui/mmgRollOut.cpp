@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgRollOut.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-25 13:00:39 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-10-25 13:33:38 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,8 +32,8 @@ BEGIN_EVENT_TABLE(mmgRollOut,wxPanel)
 END_EVENT_TABLE()
 
 //----------------------------------------------------------------------------
-mmgRollOut::mmgRollOut(mmgGui *parent, mafString title, mmgGui *roll_gui, bool rollOutOpen)
-:wxPanel(parent,-1)
+mmgRollOut::mmgRollOut(mmgGui *parent, mafString title, mmgGui *roll_gui, int id, bool rollOutOpen)
+:wxPanel(parent,id)
 //----------------------------------------------------------------------------
 {
   wxBoxSizer *topsizer =  new wxBoxSizer( wxHORIZONTAL );
