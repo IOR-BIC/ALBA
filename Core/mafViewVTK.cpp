@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-26 11:10:06 $
-  Version:   $Revision: 1.61 $
+  Date:      $Date: 2006-10-26 12:03:15 $
+  Version:   $Revision: 1.62 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -325,7 +325,7 @@ mmgGui *mafViewVTK::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = mafView::CreateGui(); //new mmgGui(this);
   m_Gui->AddGui(m_Rwi->GetGui());
   
   /////////////////////////////////////////Attach Camera GUI
@@ -370,7 +370,7 @@ void mafViewVTK::OnEvent(mafEventBase *maf_event)
       case ID_ROLLOUT_ANIMATE_KIT:
       break;
       default:
-        mafEventMacro(*maf_event);
+        Superclass::OnEvent(maf_event);
       break;
     }
   }
@@ -507,8 +507,12 @@ void mafViewVTK::OptionsUpdate()
 void mafViewVTK::Print(std::ostream& os, const int tabs)// const
 //-------------------------------------------------------------------------
 {
+  Superclass::Print(os,tabs);
   mafIndent indent(tabs);
 
-  os << indent << "mafViewVTK" << '\t' << this << std::endl;
-
+  os << indent << "mafViewVTK" << '\t' << this << "\n";
+  os << indent << "Name" << '\t' << m_Label << "\n";
+  
+  m_Sg->Print(os, 1);
+  os << std::endl;
 }
