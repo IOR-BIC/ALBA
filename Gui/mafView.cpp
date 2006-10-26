@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-26 10:39:04 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-10-26 12:01:04 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -78,29 +78,12 @@ void mafView::OnEvent(mafEventBase *maf_event)
     {
       case ID_PRINT_INFO:
       {
-        #ifdef VTK_USE_ANSI_STDLIB
-          std::stringstream ss1;
-
-          Print(ss1);
-          wxString message = ss1.str().c_str();
-
-          mafLogMessage("[VIEW PRINTOUT:]\n");
-
-          for (int pos = message.Find('\n'); pos >= 0; pos = message.Find('\n'))
-          {
-            wxString tmp = message.Mid(0,pos);
-            mafLogMessage(tmp.c_str());
-            message = message.Mid(pos+1);
-          }
-        #else
-          std::strstream ss1,ss2;
-          Print(ss1);
-          ss1 << std::ends;  
-          mafLogMessage("[VIEW PRINTOUT:]\n%s\n", ss1.str()); 
-        #endif
+        std::strstream ss1;
+        Print(ss1);
+        ss1 << std::ends;  
+        mafLogMessage("[VIEW PRINTOUT:]\n%s\n", ss1.str()); 
       }
       break;
-
       default:
         mafEventMacro(*maf_event);
     }
@@ -224,8 +207,5 @@ void mafView::Print(std::ostream& os, const int tabs)// const
 //-------------------------------------------------------------------------
 {
   mafIndent indent(tabs);
-
-  os << indent << "mafView" << '\t' << this << std::endl;
-  os << std::endl;
-
+  os << indent << "mafView" << '\t' << this << "\n";
 }
