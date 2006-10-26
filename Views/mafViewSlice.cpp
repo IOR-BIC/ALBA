@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-26 09:13:29 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2006-10-26 17:03:44 $
+  Version:   $Revision: 1.21 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -531,6 +531,13 @@ void mafViewSlice::VmeShow(mafNode *node, bool show)
   }
 
 }
+//----------------------------------------------------------------------------
+void mafViewSlice::VmeRemove(mafNode *vme)
+//----------------------------------------------------------------------------
+{
+  Superclass::VmeRemove(vme);
+}
+
 //-------------------------------------------------------------------------
 void mafViewSlice::Print(std::ostream& os, const int tabs)// const
 //-------------------------------------------------------------------------

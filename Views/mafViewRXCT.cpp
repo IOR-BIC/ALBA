@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-19 11:02:13 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2006-10-26 17:03:44 $
+  Version:   $Revision: 1.16 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -272,7 +272,6 @@ void mafViewRXCT::VmeRemove(mafNode *node)
   if (m_CurrentVolume && node == m_CurrentVolume) 
   {
     m_CurrentVolume = NULL;
-    GizmoDelete();
   }
   Superclass::VmeRemove(node);
 }

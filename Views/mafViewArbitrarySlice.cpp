@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-20 09:34:41 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-10-26 17:03:44 $
+  Version:   $Revision: 1.12 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -123,17 +123,6 @@ mafViewArbitrarySlice::~mafViewArbitrarySlice()
 	m_MatrixReset = NULL;
 	m_CurrentVolume = NULL;
 	m_ColorLUT = NULL;
-
-	if(m_GizmoTranslate)
-	{
-		m_GizmoTranslate->Show(false);
-		cppDEL(m_GizmoTranslate);
-	}
-	if(m_GizmoRotate)
-	{
-		m_GizmoRotate->Show(false);
-		cppDEL(m_GizmoRotate);
-	}
 }
 //----------------------------------------------------------------------------
 void mafViewArbitrarySlice::PackageView()
@@ -636,10 +625,11 @@ void mafViewArbitrarySlice::VmeRemove(mafNode *node)
   {
     m_CurrentVolume = NULL;
     m_GizmoTranslate->Show(false);
-		cppDEL(m_GizmoTranslate);
+		m_GizmoTranslate = NULL;
 		m_GizmoRotate->Show(false);
-		cppDEL(m_GizmoRotate);
+		m_GizmoRotate = NULL;
   }
+
   Superclass::VmeRemove(node);
 }
 //----------------------------------------------------------------------------

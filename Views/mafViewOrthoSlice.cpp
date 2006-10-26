@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-26 13:57:47 $
-  Version:   $Revision: 1.38 $
+  Date:      $Date: 2006-10-26 17:03:44 $
+  Version:   $Revision: 1.39 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -100,13 +100,8 @@ mafViewOrthoSlice::mafViewOrthoSlice(wxString label, bool show_ruler)
 //----------------------------------------------------------------------------
 mafViewOrthoSlice::~mafViewOrthoSlice()
 //----------------------------------------------------------------------------
-{
-  if( m_Gizmo[0] || m_Gizmo[1] || m_Gizmo[2] ) GizmoDelete();
-  
-  if (m_CurrentVolume)
-  {
-    m_CurrentVolume->GetEventSource()->RemoveObserver(this);
-  }
+{  
+
 }
 //----------------------------------------------------------------------------
 mafView *mafViewOrthoSlice::Copy(mafObserver *Listener)
@@ -182,15 +177,11 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
 void mafViewOrthoSlice::VmeRemove(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  if(node->IsMAFType(mafVMEGizmo))
-  {
-    node->Delete();
-  }
   if (m_CurrentVolume && node == m_CurrentVolume) 
   {
-    m_CurrentVolume->GetEventSource()->RemoveObserver(this);
-    m_CurrentVolume = NULL;
+    m_CurrentVolume = NULL;    
   }
+
   Superclass::VmeRemove(node);
 }
 //----------------------------------------------------------------------------
@@ -407,8 +398,6 @@ void mafViewOrthoSlice::GizmoDelete()
   // XN view
   m_ChildViewList[2]->VmeShow(m_Gizmo[GIZMO_YN]->GetOutput(), false);
   m_ChildViewList[2]->VmeShow(m_Gizmo[GIZMO_ZN]->GetOutput(), false);
-
-
   for(int i=0; i<3; i++)
   {
     cppDEL(m_Gizmo[i]);
