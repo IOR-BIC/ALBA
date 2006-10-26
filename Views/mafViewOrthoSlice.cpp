@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-26 09:13:29 $
-  Version:   $Revision: 1.37 $
+  Date:      $Date: 2006-10-26 13:57:47 $
+  Version:   $Revision: 1.38 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,6 +35,7 @@
 #include "mafVMEVolume.h"
 #include "mafIndent.h"
 #include "mafGizmoSlice.h"
+#include "mafVMEGizmo.h"
 
 #include "vtkDataSet.h"
 #include "vtkPointData.h"
@@ -181,6 +182,10 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
 void mafViewOrthoSlice::VmeRemove(mafNode *node)
 //----------------------------------------------------------------------------
 {
+  if(node->IsMAFType(mafVMEGizmo))
+  {
+    node->Delete();
+  }
   if (m_CurrentVolume && node == m_CurrentVolume) 
   {
     m_CurrentVolume->GetEventSource()->RemoveObserver(this);
