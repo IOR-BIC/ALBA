@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-26 09:12:46 $
-  Version:   $Revision: 1.47 $
+  Date:      $Date: 2006-10-26 11:10:06 $
+  Version:   $Revision: 1.48 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,12 +54,14 @@ public:
   virtual void			OnEvent(mafEventBase *maf_event);
 
   /** IDs for the GUI */
-/*  enum VIEW_VTK_WIDGET_ID
+  enum VIEW_VTK_WIDGET_ID
   {
-    ID_SHOW_GRID = Superclass::ID_LAST,
-    ID_GRID_NORMAL,
+    ID_ROLLOUT_ATTACH_CAMERA = Superclass::ID_LAST,
+    ID_ROLLOUT_TEXT_KIT,
+    ID_ROLLOUT_LIGHT_KIT,
+    ID_ROLLOUT_ANIMATE_KIT,
     ID_LAST
-  };*/
+  };
 
   /** Add the vme to the view's scene-graph*/
   virtual void VmeAdd(mafNode *vme);
