@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-26 09:12:46 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2006-10-26 12:01:58 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -486,10 +486,9 @@ void mafSceneGraph::Print(std::ostream& os, const int tabs)// const
   // Superclass::Print(os,tabs);
   mafIndent indent(tabs);
 
-  os << indent << "mafSceneGraph:" << '\t' << this << std::endl;
+  os << indent << "mafSceneGraph:" << '\t' << this << "\n";
 
   // print the scene graph 
-  
   mafSceneNode *currentNode = NULL ;
 
   // if there is at least one node...  
@@ -510,7 +509,4 @@ void mafSceneGraph::Print(std::ostream& os, const int tabs)// const
   {
     os << indent << "The scene graph is empty" << std::endl;
   }
-  
-  os << std::endl;
-
 }
