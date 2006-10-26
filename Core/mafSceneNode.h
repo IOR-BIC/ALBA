@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneNode.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-02 21:59:09 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-10-26 09:12:46 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,6 +42,9 @@ public:
 
   /** Return the vme's visibility. */
   bool IsVisible() {return m_Pipe != NULL;};
+
+  /** print a dump of this object */
+  virtual void Print(std::ostream& os, const int tabs=0);// const;
 
   mafNode           *m_Vme;
   mafSceneNode      *m_Parent;

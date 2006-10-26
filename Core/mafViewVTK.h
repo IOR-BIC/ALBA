@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-19 10:21:22 $
-  Version:   $Revision: 1.46 $
+  Date:      $Date: 2006-10-26 09:12:46 $
+  Version:   $Revision: 1.47 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -150,6 +150,9 @@ public:
   virtual void LinkView(bool link_camera = true);
 
   mafRWI *m_Rwi;
+
+  /** print a dump of this object */
+  virtual void Print(std::ostream& os, const int tabs=0);// const;
 
 protected:
   mafSceneGraph *m_Sg;

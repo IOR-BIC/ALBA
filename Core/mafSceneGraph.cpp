@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-17 11:14:56 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-10-26 09:12:46 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,6 +26,7 @@
 //#include "mafPipeGizmo.h"
 //#include "mafPipePointSet.h"
 #include "mmgGui.h"
+#include "mafIndent.h"
 #include "mafNode.h"
 #include "mafNodeIterator.h"
 #include "mafVME.h"
@@ -476,4 +477,40 @@ int mafSceneGraph::GetNodeStatus(mafNode *node)
   if( n->IsVisible())									return NODE_VISIBLE_ON;
   if(!n->IsVisible())									return NODE_VISIBLE_OFF;
 	return NODE_NON_VISIBLE;
+}
+
+//-------------------------------------------------------------------------
+void mafSceneGraph::Print(std::ostream& os, const int tabs)// const
+//-------------------------------------------------------------------------
+{
+  // Superclass::Print(os,tabs);
+  mafIndent indent(tabs);
+
+  os << indent << "mafSceneGraph:" << '\t' << this << std::endl;
+
+  // print the scene graph 
+  
+  mafSceneNode *currentNode = NULL ;
+
+  // if there is at least one node...  
+  if(m_List)
+  {
+    currentNode = m_List;
+
+    while (currentNode)
+    {
+      //print the current node
+      currentNode->Print(os, 1);
+
+      //go to the next node
+      currentNode = currentNode->m_Next;
+    }
+  }
+  else
+  {
+    os << indent << "The scene graph is empty" << std::endl;
+  }
+  
+  os << std::endl;
+
 }

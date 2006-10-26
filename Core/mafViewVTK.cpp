@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-20 08:29:58 $
-  Version:   $Revision: 1.59 $
+  Date:      $Date: 2006-10-26 09:12:46 $
+  Version:   $Revision: 1.60 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,6 +19,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+#include "mafIndent.h"
 #include "mafViewVTK.h"
 #include <wx/dc.h>
 #include "mafVME.h"
@@ -499,4 +500,14 @@ void mafViewVTK::OptionsUpdate()
 //----------------------------------------------------------------------------
 {
   m_Rwi->UpdateRulerUnit();
+}
+
+//-------------------------------------------------------------------------
+void mafViewVTK::Print(std::ostream& os, const int tabs)// const
+//-------------------------------------------------------------------------
+{
+  mafIndent indent(tabs);
+
+  os << indent << "mafViewVTK" << '\t' << this << std::endl;
+
 }

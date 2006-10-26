@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-12 15:07:06 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2006-10-26 09:12:46 $
+  Version:   $Revision: 1.27 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -259,7 +259,7 @@ void mafViewCompound::OnEvent(mafEventBase *maf_event)
       LinkView(m_LinkSubView != 0);
     break;
     default:
-      mafEventMacro(*maf_event);
+      mafView::OnEvent(maf_event);
   }
 }
 //-------------------------------------------------------------------------

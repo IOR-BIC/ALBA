@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-20 08:30:09 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-10-26 09:11:22 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -164,6 +164,17 @@ public:
   Return the corresponding vtkProp3D of the picked VME*/
   virtual vtkProp3D *GetPickedProp() {return m_PickedProp;};
 
+  /** print a dump of this object */
+  virtual void Print(std::ostream& os, const int tabs=0);// const;
+
+  /** IDs for the GUI */
+  enum VIEW_WIDGET_ID
+  {
+    ID_FIRST = MINID,
+    ID_PRINT_INFO,
+    ID_LAST
+  };
+
 protected:
   mafObserver   *m_Listener;
   wxString       m_Label;
@@ -192,12 +203,6 @@ public:
   bool           m_Plugged; // forget it - it is used from outside 
   mafView       *m_Next;    // forget it - it is used from outside 
 
-  /** IDs for the GUI */
-  enum VIEW_WIDGET_ID
-  {
-    ID_FIRST = MINID,
-    ID_LAST
-  };
 
   /** destroy the Gui */
   void DeleteGui();

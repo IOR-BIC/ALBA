@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 14:51:24 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-10-26 09:12:46 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,7 +19,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-
+#include "mafIndent.h"
 #include "mafPipe.h"
 #include "mafSceneGraph.h"
 #include "mafSceneNode.h"
@@ -253,3 +253,18 @@ void mafSceneNode::OnHeadModifiedEvent(void *arg)
 	  self->m_Sg->VmeUpdateProperty(self->m_scalar);
 }
 @@@ */
+
+//-------------------------------------------------------------------------
+void mafSceneNode::Print(std::ostream& os, const int tabs)// const
+//-------------------------------------------------------------------------
+{
+  mafIndent indent(tabs);
+
+  // print the scene node
+  os << indent << "mafSceneNode" << '\t' << this << std::endl;
+  os << indent << "Linked VME" << '\t' << m_Vme << '\t' << m_Vme->GetName() << std::endl;
+  os << indent << "Visual Pipe" << '\t' << m_Pipe << '\t' <<  (m_Pipe ? m_Pipe->GetTypeName() : "")  << std::endl;  
+  os << indent << "Front Renderer" << '\t' << m_RenFront << std::endl;
+  os <<  indent << "Back Renderer" << '\t' << m_RenBack << std::endl;
+  os << std::endl;
+}

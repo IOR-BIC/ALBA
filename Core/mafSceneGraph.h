@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 14:51:24 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-10-26 09:12:46 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -101,6 +101,9 @@ public:
 
 	// Event to show/hide the LandmarkClouds
 	//@@@ virtual void	OnOpenCloseEvent( mafSceneNode *node );
+
+  /** print a dump of this object */
+  virtual void Print(std::ostream& os, const int tabs=0);// const;
 
 protected:
   /** 
