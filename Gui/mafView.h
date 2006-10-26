@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-26 09:11:22 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2006-10-26 10:39:04 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -124,47 +124,35 @@ public:
   virtual wxWindow*	      GetWindow(){return m_Win;};
   virtual wxFrame*		    GetFrame() {return m_Frame;};
   virtual mmgGui*		      GetGui()   {if(m_Gui == NULL) CreateGui(); assert(m_Gui); return m_Gui;};
-//  virtual mmgGuiHolder*		GetGuih()  {return m_Guih;};
   virtual void		  SetFrame(wxFrame* f) {m_Frame = f;};
 
-  //virtual void			HideGui();
-  //virtual void			ShowGui();
-//  virtual void			ShowSettings()							{};
   virtual void			OnSize(wxSizeEvent &size_event)	{};
 
-  /** 
-  Print this view.*/
+  /** Print this view.*/
   virtual void Print(wxDC *dc, wxRect margins) {};
   
-  /** 
-  Print the bitmap filling the paper size considering margins.*/
+  /** Print the bitmap filling the paper size considering margins.*/
   virtual void PrintBitmap(wxDC *dc, wxRect margins, wxBitmap *bmp);
 
-  /** 
-  Set the vtk RenderWindow size. Used only for Linux (not necessary for Windows) */
+  /** Set the vtk RenderWindow size. Used only for Linux (not necessary for Windows) */
   virtual void SetWindowSize(int w, int h) {};
 
-  /** 
-  Perform a picking according to the screen position (x,y) and return true on success*/
+  /** Perform a picking according to the screen position (x,y) and return true on success*/
   virtual bool Pick(int x, int y);
 
-  /** 
-  Perform a picking according to the absolute matrix given and return true on success*/
+  /** Perform a picking according to the absolute matrix given and return true on success*/
   virtual bool Pick(mafMatrix &m);
 
-  /** 
-  Write into the double array the position picked during Pick method.*/
+  /** Write into the double array the position picked during Pick method.*/
   virtual void GetPickedPosition(double pos[3]);
 
-  /** 
-  Return the picked VME during the Pick method. Return NULL if VME is not found*/
+  /** Return the picked VME during the Pick method. Return NULL if VME is not found*/
   virtual mafVME *GetPickedVme() {return m_PickedVME;};
 
-  /** 
-  Return the corresponding vtkProp3D of the picked VME*/
+  /** Return the corresponding vtkProp3D of the picked VME*/
   virtual vtkProp3D *GetPickedProp() {return m_PickedProp;};
 
-  /** print a dump of this object */
+  /** Print a dump of this object into the Log area.*/
   virtual void Print(std::ostream& os, const int tabs=0);// const;
 
   /** IDs for the GUI */
@@ -193,8 +181,7 @@ protected:
 
   wxPrintData   *m_PrintData;
 
-  /** 
-  Find the VME picked */
+  /** Find the VME picked */
   bool FindPickedVme(vtkAssemblyPath *ap = NULL);
 
 public:
@@ -202,7 +189,6 @@ public:
   int            m_Id;      ///< Used to store the view type created (e.g. view surface).
   bool           m_Plugged; // forget it - it is used from outside 
   mafView       *m_Next;    // forget it - it is used from outside 
-
 
   /** destroy the Gui */
   void DeleteGui();
@@ -214,7 +200,7 @@ protected:
   its own widgets and define the enum of IDs for the widgets as an extension of
   the superclass enum. The last id value must be defined as "LAST_ID" to allow the 
   subclass to continue the ID enumeration from it. For appending the widgets in the
-  same pannel GUI, each CreateGUI() function should first call the superclass' one.*/
+  same panel GUI, each CreateGUI() function should first call the superclass' one.*/
   virtual mmgGui  *CreateGui();
 };
 #endif

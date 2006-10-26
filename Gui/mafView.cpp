@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-26 09:11:22 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-10-26 10:39:04 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,11 +19,12 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mafIndent.h"
 #include "mafView.h"
+#include <wx/print.h>
+
+#include "mafIndent.h"
 #include "mafMatrix.h"
 #include "mafVME.h"
-#include <wx/print.h>
 
 #include "vtkMAFAssembly.h"
 #include "vtkRayCast3DPicker.h"
@@ -38,7 +39,7 @@ mafCxxTypeMacro(mafView);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafView::mafView( wxString label)
+mafView::mafView(wxString label)
 //----------------------------------------------------------------------------
 {
 	m_Label					= label;
@@ -109,27 +110,6 @@ void mafView::OnEvent(mafEventBase *maf_event)
     mafEventMacro(*maf_event);
   }
 }
-
-/*
-//----------------------------------------------------------------------------
-void mafView::ShowGui()
-//----------------------------------------------------------------------------
-{
-  assert(m_Gui); 
-	mafEvent settings_event(this,OP_SHOW_GUI,(wxWindow *)m_Gui);
-	settings_event.SetBool(true);
-	mafEventMacro(settings_event);
-}
-//----------------------------------------------------------------------------
-void mafView::HideGui()
-//----------------------------------------------------------------------------
-{
-	assert(m_Gui); 
-	mafEvent settings_event(this,OP_HIDE_GUI,(wxWindow *)m_Gui);
-	settings_event.SetBool(true);
-	mafEventMacro(settings_event);
-}
-*/
 //-------------------------------------------------------------------------
 void mafView::DeleteGui()
 //-------------------------------------------------------------------------
@@ -142,8 +122,6 @@ mmgGui* mafView::CreateGui()
 {
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
-
-  //m_Gui->Label("view default gui");
 
   mafString type_name = GetTypeName();
   m_Gui->Button(ID_PRINT_INFO, type_name, "", "Print view debug information");
@@ -226,7 +204,7 @@ void mafView::PrintBitmap(wxDC *dc, wxRect margins, wxBitmap *bmp)
   // Use x or y scaling factor, whichever fits on the DC
   float actualScale = wxMin(scaleX,scaleY);
 
-  // Calculate the position on the DC for centring the graphic
+  // Calculate the position on the DC for centering the graphic
   float posX = (float)((w - (iw*actualScale))/2.0);
   float posY = (float)((h - (ih*actualScale))/2.0);
 
