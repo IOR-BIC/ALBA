@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-23 19:34:54 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2006-10-26 09:13:29 $
+  Version:   $Revision: 1.16 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -106,6 +106,9 @@ public:
   void UpdateSurfacesList(mafNode *node);
 
   void VmeShow(mafNode *node, bool show);
+
+  /** print a dump of this object */
+  virtual void Print(std::ostream& os, const int tabs=0);// const;
 
 protected:
   virtual mmgGui *CreateGui();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-20 08:31:13 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2006-10-26 09:13:29 $
+  Version:   $Revision: 1.20 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,6 +19,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+#include "mafIndent.h"
 #include "mafViewSlice.h"
 #include "mafPipeVolumeSlice.h"
 #include "mafPipeSurfaceSlice.h"
@@ -529,4 +530,15 @@ void mafViewSlice::VmeShow(mafNode *node, bool show)
     }
   }
 
+}
+//-------------------------------------------------------------------------
+void mafViewSlice::Print(std::ostream& os, const int tabs)// const
+//-------------------------------------------------------------------------
+{
+  mafIndent indent(tabs);
+
+  os << indent << "mafViewSlice" << '\t' << this << std::endl;
+  os << indent << "Name" << '\t' << m_Label << std::endl;
+  os << std::endl;
+  m_Sg->Print(os,1);
 }

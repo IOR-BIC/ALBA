@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-18 15:58:43 $
-  Version:   $Revision: 1.36 $
+  Date:      $Date: 2006-10-26 09:13:29 $
+  Version:   $Revision: 1.37 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,6 +33,7 @@
 #include "mmaVolumeMaterial.h"
 #include "mafVMESurface.h"
 #include "mafVMEVolume.h"
+#include "mafIndent.h"
 #include "mafGizmoSlice.h"
 
 #include "vtkDataSet.h"
@@ -276,7 +277,8 @@ mmgGui* mafViewOrthoSlice::CreateGui()
   wxString layout_choices[3] = {"default","layout 1","layout 2"};
 
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+
+  mafView::CreateGui();
 
   m_Gui->Combo(ID_LAYOUT_CHOOSER,"layout",&m_LayoutConfiguration,3,layout_choices);
   m_Gui->Divider();
@@ -294,6 +296,7 @@ mmgGui* mafViewOrthoSlice::CreateGui()
   {
     m_ChildViewList[i]->GetGui();
   }
+
   return m_Gui;
 }
 //----------------------------------------------------------------------------
@@ -302,9 +305,10 @@ void mafViewOrthoSlice::PackageView()
 {
   int cam_pos[4] = {CAMERA_OS_P, CAMERA_OS_X, CAMERA_OS_Y, CAMERA_OS_Z};
   
+  wxString viewName[4] = {"perspective","camera x","camera y","camera z"};
   for(int v=PERSPECTIVE_VIEW; v<VIEWS_NUMBER; v++)
   {
-    m_Views[v] = new mafViewSlice("Slice view", cam_pos[v],false,false);
+    m_Views[v] = new mafViewSlice(viewName[v], cam_pos[v],false,false);
     m_Views[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice", MUTEX);
     // plug surface slice visual pipe in not perspective views
     if (v != PERSPECTIVE_VIEW)
@@ -462,4 +466,21 @@ void mafViewOrthoSlice::UpdateSlice(long activeGizmoId, vtkPoints *p)
   
 
   this->CameraUpdate();
+}
+
+
+//-------------------------------------------------------------------------
+void mafViewOrthoSlice::Print(std::ostream& os, const int tabs)// const
+//-------------------------------------------------------------------------
+{
+  mafIndent indent(tabs);
+
+  os << indent << "mafViewOrthoSlice" << '\t' << this << std::endl;
+  
+  //print components view information
+
+  for(int v=PERSPECTIVE_VIEW; v<VIEWS_NUMBER; v++)
+  {
+    m_ChildViewList[v]->Print(os, 1);
+  }
 }
