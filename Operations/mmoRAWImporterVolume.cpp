@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:11:57 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-10-30 14:24:54 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -357,7 +357,8 @@ void mmoRAWImporterVolume::UpdateReader()
 bool mmoRAWImporterVolume::Import()
 //----------------------------------------------------------------------------
 {
-	wxBusyInfo wait("Importing RAW data, please wait...");
+	if(!m_TestMode)
+		wxBusyInfo wait("Importing RAW data, please wait...");
 
  	vtkMAFSmartPointer<vtkImageReader> reader;
 	reader->SetFileName(m_RawFile);  
@@ -402,8 +403,11 @@ bool mmoRAWImporterVolume::Import()
 	reader->SetHeaderSize(m_FileHeader);
 	reader->SetFileDimensionality(3);
   reader->SetDataVOI(0, m_DataDimemsion[0] - 1, 0, m_DataDimemsion[1] - 1, m_SliceVOI[0], m_SliceVOI[1] - 1);
-  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-  mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,reader));
+  if(!this->m_TestMode)
+	{
+		mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+		mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,reader));
+	}
 //  reader->SetDataVOI(0, m_DataDimemsion[0] - 1, 0, m_DataDimemsion[1] - 1, 0, m_SliceVOI[1] - m_SliceVOI[0] - 1);
 //  reader->SetDataOrigin(0.0,0.0,m_SliceVOI[0]*m_DataSpacing[2]);
 	reader->Update();
@@ -436,7 +440,8 @@ bool mmoRAWImporterVolume::Import()
   wxSplitPath(m_RawFile.GetCStr(),&path,&name,&ext);
   m_Output->SetName(name.c_str());
   m_Output->GetTagArray()->SetTag(tag_Nature);
-  mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+	if(!m_TestMode)
+		mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
 	return true;
 }
 //----------------------------------------------------------------------------
