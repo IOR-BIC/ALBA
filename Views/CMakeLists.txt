@@ -20,6 +20,14 @@ SET(PROJECT_SRCS
   mafViewGlobalSlice.h
   mafViewGlobalSliceCompound.cpp
   mafViewGlobalSliceCompound.h
+  mafViewImage.cpp
+  mafViewImage.h
+  mafViewSingleSlice.cpp
+  mafViewSingleSlice.h
+  mafViewSingleSliceCompound.cpp
+  mafViewSingleSliceCompound.h
+  mafViewRXCompound.cpp
+  mafViewRXCompound.h
 )
 
 # List libraries that are needed by this project.

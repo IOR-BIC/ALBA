@@ -1,10 +1,10 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mafViewSlice.cpp,v $
+  Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-30 09:15:19 $
-  Version:   $Revision: 1.22 $
-  Authors:   Paolo Quadrani
+  Date:      $Date: 2006-10-30 09:15:18 $
+  Version:   $Revision: 1.1 $
+  Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -19,8 +19,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mafIndent.h"
-#include "mafViewSlice.h"
+#include "mafViewSingleSlice.h"
 #include "mafPipeVolumeSlice.h"
 #include "mafPipeSurfaceSlice.h"
 #include "mafVME.h"
@@ -33,6 +32,8 @@
 #include "mafRWI.h"
 #include "mafSceneGraph.h"
 #include "mafAttachCamera.h"
+#include "mmgFloatSlider.h"
+#include "mafNodeIterator.h"
 
 #include "vtkDataSet.h"
 #include "vtkRayCast3DPicker.h"
@@ -49,11 +50,11 @@
 
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(mafViewSlice);
+mafCxxTypeMacro(mafViewSingleSlice);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewSlice::mafViewSlice(wxString label, int camera_position, bool show_axes, bool show_grid, bool show_ruler, int stereo)
+mafViewSingleSlice::mafViewSingleSlice(wxString label, int camera_position, bool show_axes, bool show_grid, bool show_ruler, int stereo)
 :mafViewVTK(label,camera_position,show_axes,show_grid, show_ruler, stereo)
 //----------------------------------------------------------------------------
 {
@@ -63,28 +64,34 @@ mafViewSlice::mafViewSlice(wxString label, int camera_position, bool show_axes, 
   m_Slice[0] = m_Slice[1] = m_Slice[2] = 0.0;
   m_SliceInitialized = false;
 
-  m_TextActor=NULL;
-  m_TextMapper=NULL;
-  m_TextColor[0]=1;
-  m_TextColor[1]=0;
-  m_TextColor[2]=0;
+//  m_TextActor=NULL;
+//  m_TextMapper=NULL;
+//  m_TextColor[0]=1;
+//  m_TextColor[1]=0;
+//  m_TextColor[2]=0;
 
+	m_Position = 0;
+	m_PlaneSelect = XY;
+	m_Slider   = NULL;
+	m_OriginVolume[0] = 0.0;
+	m_OriginVolume[1] = 0.0;
+  m_OriginVolume[2] = 0.0;
   m_CurrentSurface.clear();
 }
 //----------------------------------------------------------------------------
-mafViewSlice::~mafViewSlice()
+mafViewSingleSlice::~mafViewSingleSlice()
 //----------------------------------------------------------------------------
 {
   BorderDelete();
-  vtkDEL(m_TextMapper);
-  vtkDEL(m_TextActor);
+//  vtkDEL(m_TextMapper);
+//  vtkDEL(m_TextActor);
   m_CurrentSurface.clear();
 }
 //----------------------------------------------------------------------------
-mafView *mafViewSlice::Copy(mafObserver *Listener)
+mafView *mafViewSingleSlice::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewSlice *v = new mafViewSlice(m_Label, m_CameraPosition, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType);
+  mafViewSingleSlice *v = new mafViewSingleSlice(m_Label, m_CameraPosition, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
@@ -92,7 +99,7 @@ mafView *mafViewSlice::Copy(mafObserver *Listener)
   return v;
 }
 //----------------------------------------------------------------------------
-void mafViewSlice::Create()
+void mafViewSingleSlice::Create()
 //----------------------------------------------------------------------------
 {
   RWI_LAYERS num_layers = m_CameraPosition != CAMERA_OS_P ? TWO_LAYER : ONE_LAYER;
@@ -111,36 +118,36 @@ void mafViewSlice::Create()
   m_Picker2D->InitializePickList();
 
   // text stuff
-  m_Text = "";
-  m_TextMapper = vtkTextMapper::New();
-  m_TextMapper->SetInput(m_Text.c_str());
-  m_TextMapper->GetTextProperty()->AntiAliasingOff();
+//  m_Text = "";
+//  m_TextMapper = vtkTextMapper::New();
+//  m_TextMapper->SetInput(m_Text.c_str());
+//  m_TextMapper->GetTextProperty()->AntiAliasingOff();
 
-  m_TextActor = vtkActor2D::New();
-  m_TextActor->SetMapper(m_TextMapper);
-  m_TextActor->SetPosition(3,3);
-  m_TextActor->GetProperty()->SetColor(m_TextColor);
+//  m_TextActor = vtkActor2D::New();
+//  m_TextActor->SetMapper(m_TextMapper);
+//  m_TextActor->SetPosition(3,3);
+//  m_TextActor->GetProperty()->SetColor(m_TextColor);
 
-  m_Rwi->m_RenFront->AddActor(m_TextActor);
+//  m_Rwi->m_RenFront->AddActor(m_TextActor);
 }
 
 
 
 //----------------------------------------------------------------------------
-void mafViewSlice::SetTextColor(double color[3])
+void mafViewSingleSlice::SetTextColor(double color[3])
 //----------------------------------------------------------------------------
 {
-  m_TextColor[0]=color[0];
+  /*m_TextColor[0]=color[0];
   m_TextColor[1]=color[1];
   m_TextColor[2]=color[2];
   m_TextActor->GetProperty()->SetColor(m_TextColor);
-  m_TextMapper->Modified();
+  m_TextMapper->Modified();*/
 }
 //----------------------------------------------------------------------------
-void mafViewSlice::UpdateText(int ID)
+void mafViewSingleSlice::UpdateText(int ID)
 //----------------------------------------------------------------------------
 {
-  if (ID==1)
+  /*if (ID==1)
   {
     int slice_mode;
     switch(m_CameraPosition)
@@ -179,18 +186,18 @@ void mafViewSlice::UpdateText(int ID)
     m_Text="";
     m_TextMapper->SetInput(m_Text.c_str());
     m_TextMapper->Modified();
-  }
+  }*/
 }
 
 //----------------------------------------------------------------------------
-void mafViewSlice::InitializeSlice(double slice[3])
+void mafViewSingleSlice::InitializeSlice(double slice[3])
 //----------------------------------------------------------------------------
 {
   memcpy(m_Slice,slice,sizeof(m_Slice));
   m_SliceInitialized = true;
 }
 //----------------------------------------------------------------------------
-void mafViewSlice::VmeCreatePipe(mafNode *vme)
+void mafViewSingleSlice::VmeCreatePipe(mafNode *vme)
 //----------------------------------------------------------------------------
 {
   mafString pipe_name = "";
@@ -226,13 +233,19 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
         vtkDataSet *data = ((mafVME *)vme)->GetOutput()->GetVTKData();
         assert(data);
         data->Update();
+				float v1[3] = {1,0,0};
+				float v2[3] = {0,1,0};
         switch(m_CameraPosition)
         {
           case CAMERA_OS_X:
             slice_mode = SLICE_X;
-        	break;
+            v1[0] = 0;v1[1] = 1;v1[2] = 0;
+						v2[0] = 0;v2[1] = 0;v2[2] = 1;
+					break;
           case CAMERA_OS_Y:
             slice_mode = SLICE_Y;
+						v1[0] = 0;v1[1] = 0;v1[2] = 1;
+						v2[0] = 1;v2[1] = 0;v2[2] = 0;
           break;
           case CAMERA_OS_P:
             slice_mode = SLICE_ORTHO;
@@ -246,6 +259,7 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
         if (m_SliceInitialized)
         {
           ((mafPipeVolumeSlice *)pipe)->InitializeSliceParameters(slice_mode,m_Slice,false);
+					((mafPipeVolumeSlice *)pipe)->SetSlice(m_Slice,v1,v2);
         }
         else
         {
@@ -305,7 +319,7 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
   }
 }
 //----------------------------------------------------------------------------
-void mafViewSlice::VmeDeletePipe(mafNode *vme)
+void mafViewSingleSlice::VmeDeletePipe(mafNode *vme)
 //----------------------------------------------------------------------------
 {
   mafSceneNode *n = m_Sg->Vme2Node(vme);
@@ -325,7 +339,7 @@ void mafViewSlice::VmeDeletePipe(mafNode *vme)
   cppDEL(n->m_Pipe);
 }
 //-------------------------------------------------------------------------
-int mafViewSlice::GetNodeStatus(mafNode *vme)
+int mafViewSingleSlice::GetNodeStatus(mafNode *vme)
 //-------------------------------------------------------------------------
 {
   mafSceneNode *n = NULL;
@@ -351,36 +365,125 @@ int mafViewSlice::GetNodeStatus(mafNode *vme)
   return m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;
 }
 //-------------------------------------------------------------------------
-mmgGui *mafViewSlice::CreateGui()
+mmgGui *mafViewSingleSlice::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
   m_AttachCamera = new mafAttachCamera(m_Gui, m_Rwi, this);
-  m_Gui->AddGui(m_AttachCamera->GetGui());
+  //m_Gui->AddGui(m_AttachCamera->GetGui());
+
+	m_Slider = m_Gui->FloatSlider(ID_POSITION, _("Position"), &m_Position,MINDOUBLE,MAXDOUBLE);
+
+	const wxString plane_string[] = {_("XY"), _("YZ"), _("ZX")};
+	m_Gui->Combo(ID_PLANE_SELECT, "View", &m_PlaneSelect, 3, plane_string);
   return m_Gui;
 }
 //----------------------------------------------------------------------------
-void mafViewSlice::OnEvent(mafEventBase *maf_event)
+void mafViewSingleSlice::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  /*if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
     switch(e->GetId()) 
     {
-      default:
-        mafEventMacro(*maf_event);
-      break;
+		case ID_POSITION:
+			{
+				if (m_CurrentVolume)
+				{
+					((mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe)->GetSliceOrigin(m_OriginVolume);
+					if(m_PlaneSelect == XY)
+					{
+						m_OriginVolume[2] = m_Position;
+					}
+					else if(m_PlaneSelect == YZ)
+					{
+						m_OriginVolume[0] = m_Position;
+					}
+					else if(m_PlaneSelect == ZX)
+					{
+						m_OriginVolume[1] = m_Position;
+					}
+					
+					((mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe)->SetSlice(m_OriginVolume);
+					CameraUpdate();
+				}
+				else
+					return;
+				mafNodeIterator *iter = m_CurrentVolume->m_Vme->GetRoot()->NewIterator();
+				for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+				{
+					if(node->IsA("mafVMESurface"))
+					{
+						mafPipe *p= this->GetNodePipe(node);
+						if(p)
+							((mafPipeSurfaceSlice *)p)->SetSlice(m_OriginVolume);
+					}
+				}
+			}
+		break;
+		case ID_PLANE_SELECT:
+		{
+			double b[6];
+			((mafVME *)m_CurrentVolume->m_Vme)->GetOutput()->GetBounds(b);
+
+
+			if(m_PlaneSelect == XY)
+			{
+				m_CameraPosition = CAMERA_OS_Z;
+				m_Position = (b[5] + b[4])/2;
+				m_Slider->SetRange(b[4],b[5],m_Position);
+				m_Slice[2]=m_Position;
+			}
+			else if(m_PlaneSelect == YZ)
+			{
+				m_CameraPosition = CAMERA_OS_X;
+				m_Position = (b[1] + b[0])/2;
+				m_Slider->SetRange(b[0],b[1],m_Position);
+				m_Slice[0]=m_Position;
+			}
+			else if(m_PlaneSelect == ZX)
+			{
+				m_CameraPosition = CAMERA_OS_Y;
+				m_Position = (b[3] + b[2])/2;
+				m_Slider->SetRange(b[2],b[3],m_Position);
+				m_Slice[1]=m_Position;
+			}
+			m_Rwi->CameraSet(m_CameraPosition);
+			m_Gui->Enable(ID_POSITION,true);
+			m_Gui->Update();
+
+
+			mafNodeIterator *iter = m_CurrentVolume->m_Vme->GetRoot()->NewIterator();
+			for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+			{
+				if(node->IsA("mafVMESurface") || node->IsA("mafVMEVolume"))
+				{
+					mafSceneNode *n = m_Sg->Vme2Node(node);
+					if(n && n->IsVisible())
+					{
+						VmeDeletePipe(node);
+						VmeCreatePipe(node);
+					}
+				}
+			}
+			
+			CameraUpdate();
+		}
+		break;
+    default:
+      mafEventMacro(*maf_event);
+    break;
     }
   }
   else
   {
     mafEventMacro(*maf_event);
-  }*/
-  mafEventMacro(*maf_event);
+  }
+  
 }
 //----------------------------------------------------------------------------
-void mafViewSlice::SetLutRange(double low_val, double high_val)
+void mafViewSingleSlice::SetLutRange(double low_val, double high_val)
 //----------------------------------------------------------------------------
 {
   if(!m_CurrentVolume) 
@@ -393,7 +496,7 @@ void mafViewSlice::SetLutRange(double low_val, double high_val)
   }
 }
 //----------------------------------------------------------------------------
-void mafViewSlice::SetSlice(double origin[3])
+void mafViewSingleSlice::SetSlice(double origin[3])
 //----------------------------------------------------------------------------
 {
   if(!m_CurrentVolume)
@@ -424,19 +527,19 @@ void mafViewSlice::SetSlice(double origin[3])
   this->UpdateText();
 }
 //----------------------------------------------------------------------------
-void mafViewSlice::GetSlice(double slice[3])
+void mafViewSingleSlice::GetSlice(double slice[3])
 //----------------------------------------------------------------------------
 {
   memcpy(slice,m_Slice,sizeof(m_Slice));
 }
 //----------------------------------------------------------------------------
-double *mafViewSlice::GetSlice()
+double *mafViewSingleSlice::GetSlice()
 //----------------------------------------------------------------------------
 {
   return m_Slice;
 }
 //----------------------------------------------------------------------------
-void mafViewSlice::BorderCreate(double col[3])
+void mafViewSingleSlice::BorderCreate(double col[3])
 //----------------------------------------------------------------------------
 {
   if(m_Border) BorderDelete();
@@ -476,7 +579,7 @@ void mafViewSlice::BorderCreate(double col[3])
   vtkDEL(pd);
 }
 //----------------------------------------------------------------------------
-void mafViewSlice::BorderDelete()
+void mafViewSingleSlice::BorderDelete()
 //----------------------------------------------------------------------------
 {
   if(m_Border)
@@ -487,7 +590,7 @@ void mafViewSlice::BorderDelete()
 }
 
 //----------------------------------------------------------------------------
-void mafViewSlice::UpdateSurfacesList(mafNode *node)
+void mafViewSingleSlice::UpdateSurfacesList(mafNode *node)
 //----------------------------------------------------------------------------
 {
   for(int i=0;i<m_CurrentSurface.size();i++)
@@ -501,7 +604,7 @@ void mafViewSlice::UpdateSurfacesList(mafNode *node)
 }
 
 //----------------------------------------------------------------------------
-void mafViewSlice::VmeShow(mafNode *node, bool show)
+void mafViewSingleSlice::VmeShow(mafNode *node, bool show)
 //----------------------------------------------------------------------------
 {
   Superclass::VmeShow(node, show);
@@ -510,47 +613,70 @@ void mafViewSlice::VmeShow(mafNode *node, bool show)
   {
     if (show)
     {
-  /*    m_CurrentVolume = mafVMEVolume::SafeDownCast(node);
+      /*m_CurrentVolume = mafVMEVolume::SafeDownCast(node);
       double sr[2],center[3];
       vtkDataSet *data = m_CurrentVolume->GetOutput()->GetVTKData();
       data->Update();
       data->GetCenter(center);
-      data->GetScalarRange(sr);
-      m_Luts->SetRange((long)sr[0],(long)sr[1]);
+      data->GetScalarRange(sr);*/
+
+			((mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe)->GetSliceOrigin(m_OriginVolume);
+      double b[6];
+			((mafVME *)m_CurrentVolume->m_Vme)->GetOutput()->GetBounds(b);
+
+			if(m_PlaneSelect == XY)
+			{
+				m_CameraPosition = CAMERA_OS_Z;
+			  m_Position = (b[5] + b[4])/2;
+				m_Slider->SetRange(b[4],b[5],m_Position);
+				m_Slice[2]=m_Position;
+			}
+			else if(m_PlaneSelect == YZ)
+			{
+				m_CameraPosition = CAMERA_OS_X;
+				m_Position = (b[1] + b[0])/2;
+				m_Slider->SetRange(b[0],b[1],m_Position);
+				m_Slice[0]=m_Position;
+			}
+			else if(m_PlaneSelect == ZX)
+			{
+				m_CameraPosition = CAMERA_OS_Y;
+				m_Position = (b[3] + b[2])/2;
+				m_Slider->SetRange(b[2],b[3],m_Position);
+				m_Slice[1]=m_Position;
+			}
+			
+			m_Gui->Enable(ID_POSITION,true);
+			m_Gui->Update();
+
+      /*m_Luts->SetRange((long)sr[0],(long)sr[1]);
       m_Luts->SetSubRange((long)sr[0],(long)sr[1]);
       vtkNEW(m_ColorLUT);
       m_ColorLUT->SetRange(sr);
       m_ColorLUT->Build();
-      lutPreset(4,m_ColorLUT);
-  */  }
+      lutPreset(4,m_ColorLUT);*/
+			CameraUpdate();
+    }
     else
     {
   /*    m_CurrentVolume->GetEventSource()->RemoveObserver(this);
       m_CurrentVolume = NULL;
       for(int i=0; i<m_NumOfChildView; i++)
-        ((mafViewSliceLHPBuilder *)m_ChildViewList[i])->UpdateText(0);
-  */  
+        ((mafViewSingleSliceLHPBuilder *)m_ChildViewList[i])->UpdateText(0);
+	*/  
+			mafNodeIterator *iter = node->GetRoot()->NewIterator();
+			for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+			{
+				if(node->IsA("mafVMESurface"))
+				{
+					mafEventMacro(mafEvent(this,VME_SHOW,node,false));
+				}
+			}
       this->UpdateText(0);
+			m_Gui->Enable(ID_POSITION,false);
+			m_Gui->Update();
 
     }
   }
 
-}
-//----------------------------------------------------------------------------
-void mafViewSlice::VmeRemove(mafNode *vme)
-//----------------------------------------------------------------------------
-{
-  Superclass::VmeRemove(vme);
-}
-
-//-------------------------------------------------------------------------
-void mafViewSlice::Print(std::ostream& os, const int tabs)// const
-//-------------------------------------------------------------------------
-{
-  mafIndent indent(tabs);
-
-  os << indent << "mafViewSlice" << '\t' << this << std::endl;
-  os << indent << "Name" << '\t' << m_Label << std::endl;
-  os << std::endl;
-  m_Sg->Print(os,1);
 }

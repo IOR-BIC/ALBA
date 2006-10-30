@@ -1,10 +1,10 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mafViewGlobalSliceCompound.cpp,v $
+  Module:    $RCSfile: mafViewSingleSliceCompound.cpp,v $
   Language:  C++
   Date:      $Date: 2006-10-30 09:15:18 $
-  Version:   $Revision: 1.3 $
-  Authors:   Matteo Giacomoni
+  Version:   $Revision: 1.1 $
+  Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -19,8 +19,8 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mafViewGlobalSliceCompound.h"
-#include "mafViewGlobalSlice.h"
+#include "mafViewSingleSliceCompound.h"
+#include "mafViewSingleSlice.h"
 #include "mafViewVTK.h"
 #include "mafRWI.h"
 #include "mafSceneGraph.h"
@@ -47,15 +47,15 @@
 
 enum SUBVIEW_ID
 {
-  ID_VIEW_GLOBAL_SLICE = 0,
+  ID_VIEW_SINGLE_SLICE = 0,
 };
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(mafViewGlobalSliceCompound);
+mafCxxTypeMacro(mafViewSingleSliceCompound);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewGlobalSliceCompound::mafViewGlobalSliceCompound( wxString label, int num_row, int num_col)
+mafViewSingleSliceCompound::mafViewSingleSliceCompound( wxString label, int num_row, int num_col)
 : mafViewCompound(label,num_row,num_col)
 //----------------------------------------------------------------------------
 {
@@ -64,7 +64,7 @@ mafViewGlobalSliceCompound::mafViewGlobalSliceCompound( wxString label, int num_
 	m_ColorLUT = NULL;
 }
 //----------------------------------------------------------------------------
-mafViewGlobalSliceCompound::~mafViewGlobalSliceCompound()
+mafViewSingleSliceCompound::~mafViewSingleSliceCompound()
 //----------------------------------------------------------------------------
 {
 	m_ColorLUT = NULL;
@@ -72,10 +72,10 @@ mafViewGlobalSliceCompound::~mafViewGlobalSliceCompound()
 	cppDEL(m_LutSlider);
 }
 //----------------------------------------------------------------------------
-mafView *mafViewGlobalSliceCompound::Copy(mafObserver *Listener)
+mafView *mafViewSingleSliceCompound::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewGlobalSliceCompound *v = new mafViewGlobalSliceCompound(m_Label, m_ViewRowNum, m_ViewColNum);
+  mafViewSingleSliceCompound *v = new mafViewSingleSliceCompound(m_Label, m_ViewRowNum, m_ViewColNum);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   for (int i=0;i<m_PluggedChildViewList.size();i++)
@@ -87,7 +87,7 @@ mafView *mafViewGlobalSliceCompound::Copy(mafObserver *Listener)
   return v;
 }
 //----------------------------------------------------------------------------
-void mafViewGlobalSliceCompound::CreateGuiView()
+void mafViewSingleSliceCompound::CreateGuiView()
 //----------------------------------------------------------------------------
 {
 	m_GuiView = new mmgGui(this);
@@ -101,7 +101,7 @@ void mafViewGlobalSliceCompound::CreateGuiView()
   m_GuiView->Reparent(m_Win);
 }
 //----------------------------------------------------------------------------
-void mafViewGlobalSliceCompound::OnEvent(mafEventBase *maf_event)
+void mafViewSingleSliceCompound::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
   switch(maf_event->GetId()) 
@@ -130,12 +130,12 @@ void mafViewGlobalSliceCompound::OnEvent(mafEventBase *maf_event)
   }
 }
 //-------------------------------------------------------------------------
-mmgGui* mafViewGlobalSliceCompound::CreateGui()
+mmgGui* mafViewSingleSliceCompound::CreateGui()
 //-------------------------------------------------------------------------
 {
 	assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
-	m_Gui->AddGui(((mafViewGlobalSlice*)m_ChildViewList[ID_VIEW_GLOBAL_SLICE])->GetGui());
+	m_Gui->AddGui(((mafViewSingleSlice*)m_ChildViewList[ID_VIEW_SINGLE_SLICE])->GetGui());
 	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
 	m_LutWidget->Enable(false);
 	m_Gui->FitGui();
@@ -143,17 +143,17 @@ mmgGui* mafViewGlobalSliceCompound::CreateGui()
   return m_Gui;
 }
 //-------------------------------------------------------------------------
-void mafViewGlobalSliceCompound::PackageView()
+void mafViewSingleSliceCompound::PackageView()
 //-------------------------------------------------------------------------
 {
-	m_ViewGlobalSlice = new mafViewGlobalSlice("",CAMERA_PERSPECTIVE);
-	m_ViewGlobalSlice->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
-	m_ViewGlobalSlice->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
+	m_ViewSingleSlice = new mafViewSingleSlice("",CAMERA_CT);
+	m_ViewSingleSlice->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
+	m_ViewSingleSlice->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
 	
-	PlugChildView(m_ViewGlobalSlice);
+	PlugChildView(m_ViewSingleSlice);
 }
 //----------------------------------------------------------------------------
-void mafViewGlobalSliceCompound::VmeShow(mafNode *node, bool show)
+void mafViewSingleSliceCompound::VmeShow(mafNode *node, bool show)
 //----------------------------------------------------------------------------
 {
 	for(int i=0; i<this->GetNumberOfSubView(); i++)
@@ -167,7 +167,7 @@ void mafViewGlobalSliceCompound::VmeShow(mafNode *node, bool show)
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
-void mafViewGlobalSliceCompound::EnableWidgets(bool enable)
+void mafViewSingleSliceCompound::EnableWidgets(bool enable)
 //----------------------------------------------------------------------------
 {
 	//if a volume is visualized enable the widgets
@@ -176,16 +176,16 @@ void mafViewGlobalSliceCompound::EnableWidgets(bool enable)
   m_LutSlider->Enable(enable);
 }
 //----------------------------------------------------------------------------
-void mafViewGlobalSliceCompound::VmeSelect(mafNode *node, bool select)
+void mafViewSingleSliceCompound::VmeSelect(mafNode *node, bool select)
 //----------------------------------------------------------------------------
 {
   for(int i=0; i<m_NumOfChildView; i++)
     m_ChildViewList[i]->VmeSelect(node, select);
 
-	UpdateWindowing(node->IsA("mafVMEVolumeGray") && select && m_ChildViewList[ID_VIEW_GLOBAL_SLICE]->GetNodePipe(node),node);
+	UpdateWindowing(node->IsA("mafVMEVolumeGray") && select && m_ChildViewList[ID_VIEW_SINGLE_SLICE]->GetNodePipe(node),node);
 }
 //----------------------------------------------------------------------------
-void mafViewGlobalSliceCompound::UpdateWindowing(bool enable,mafNode *node)
+void mafViewSingleSliceCompound::UpdateWindowing(bool enable,mafNode *node)
 //----------------------------------------------------------------------------
 {
 	if(enable)
