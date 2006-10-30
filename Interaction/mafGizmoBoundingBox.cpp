@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoBoundingBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-17 11:17:37 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-10-30 15:45:34 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -64,6 +64,12 @@ mafGizmoBoundingBox::mafGizmoBoundingBox(mafVME *input, mafObserver *listener)
   
   // set cone gizmo material property and initial color to red
   this->SetColor(1, 0, 0);
+
+  // hide vme
+  this->Show(false);
+
+  // ask the manager to create the pipeline
+  mafEventMacro(mafEvent(this,VME_SHOW,BoxGizmo,true));
 }
 //----------------------------------------------------------------------------
 mafGizmoBoundingBox::~mafGizmoBoundingBox() 
@@ -112,7 +118,7 @@ void mafGizmoBoundingBox::SetColor(double colR, double colG, double colB)
 void mafGizmoBoundingBox::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  mafEventMacro(mafEvent(this,VME_SHOW,BoxGizmo,show));
+  // use VTK opacity instead of VME_SHOW to speed up the render
   float opacity = show ? 1 : 0;
   BoxGizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoHandle.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-17 11:17:37 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-10-30 15:45:34 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -79,8 +79,11 @@ mafGizmoHandle::mafGizmoHandle(mafVME *input, mafObserver *listener)
   this->SetColor(1, 0, 0);
 
   // hide gizmo at creation
-//  this->Show(false);
+  this->Show(false);
 
+  // ask the manager to create the pipeline
+  mafEventMacro(mafEvent(this,VME_SHOW,BoxGizmo,true));
+  
   //-----------------
   // create isa stuff
   //-----------------
@@ -236,7 +239,7 @@ void mafGizmoHandle::SetColor(double colR, double colG, double colB)
 void mafGizmoHandle::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  mafEventMacro(mafEvent(this,VME_SHOW,BoxGizmo,show));
+  // use VTK opacity instead of VME_SHOW to speed up the render
   double opacity = show ? 1 : 0;
   BoxGizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScale.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-17 13:28:15 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-10-30 15:45:34 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -72,6 +72,7 @@ mafGizmoScale::mafGizmoScale(mafVME* input, mafObserver *listener)
   // create the gizmo gui
   // gui is sending events to this
   GuiGizmoScale = new mafGuiGizmoScale(this);
+
   // initialize gizmo gui
   GuiGizmoScale->SetAbsScaling(InputVME->GetOutput()->GetAbsMatrix());
   GuiGizmoScale->EnableWidgets(true);

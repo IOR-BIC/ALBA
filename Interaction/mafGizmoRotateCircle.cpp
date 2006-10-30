@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateCircle.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-17 11:17:38 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-10-30 15:45:34 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -88,10 +88,14 @@ mafGizmoRotateCircle::mafGizmoRotateCircle(mafVME *input, mafObserver *listener)
   SetRefSysMatrix(m_AbsInputMatrix);
 
   // hide gizmos at creation
-//  this->Show(false);
-  
+  this->Show(false);
+
   // add the gizmo to the tree, this should increase reference count  
   Gizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
+  
+  // ask to the manager to create the pipe
+  mafEventMacro(mafEvent(this,VME_SHOW,Gizmo,true));
+
 }
 //----------------------------------------------------------------------------
 mafGizmoRotateCircle::~mafGizmoRotateCircle() 
@@ -297,7 +301,11 @@ void mafGizmoRotateCircle::SetColor(double colR, double colG, double colB)
 void mafGizmoRotateCircle::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  mafEventMacro(mafEvent(this,VME_SHOW,Gizmo,show));
+  // can not use this since it's too slow... this requires destroying and creating
+  // the pipeline each time...
+  //  mafEventMacro(mafEvent(this,VME_SHOW,Gizmo,show));
+
+  // ... instead I am using vtk opacity to speed up the render
   double opacity = show ? 1 : 0;
   Gizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScaleIsotropic.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-17 11:17:39 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-10-30 15:45:34 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -77,10 +77,13 @@ mafGizmoScaleIsotropic::mafGizmoScaleIsotropic(mafVME *input, mafObserver *liste
   this->SetColor(0, 1, 1);
 
   // hide gizmos at creation
-//  this->Show(false);
+  this->Show(false);
 
   //-----------------
   CubeGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
+
+  // ask the VME manager to create the pipeline
+  mafEventMacro(mafEvent(this,VME_SHOW,CubeGizmo,true));  
 }
 //----------------------------------------------------------------------------
 mafGizmoScaleIsotropic::~mafGizmoScaleIsotropic() 
@@ -202,7 +205,7 @@ void mafGizmoScaleIsotropic::SetColor(double colR, double colG, double colB)
 void mafGizmoScaleIsotropic::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  mafEventMacro(mafEvent(this,VME_SHOW,CubeGizmo,show));
+  // using vtk opacity instead of VME_SHOW to speed up the render
   double opacity = show ? 1 : 0;
   CubeGizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
 }

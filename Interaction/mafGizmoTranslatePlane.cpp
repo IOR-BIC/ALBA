@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslatePlane.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-17 11:17:39 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-10-30 15:45:34 $
+  Version:   $Revision: 1.8 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -107,13 +107,17 @@ mafGizmoTranslatePlane::mafGizmoTranslatePlane(mafVME *input, mafObserver *liste
   this->SetColor(SQ, 1, 1, 0);
 
   // hide gizmos at creation
-//  this->Show(false);
+  this->Show(false);
   
   // add the gizmo to the tree, this should increase reference count 
   for (i = 0; i < 3; i++)
   {
     Gizmo[i]->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
   }
+
+  // ask the manager to create the pipelines
+  for (int i = 0; i < 3; i++)
+    mafEventMacro(mafEvent(this,VME_SHOW,Gizmo[i],true));
 }
 //----------------------------------------------------------------------------
 mafGizmoTranslatePlane::~mafGizmoTranslatePlane() 
@@ -416,9 +420,13 @@ void mafGizmoTranslatePlane::SetColor(int part, double colR, double colG, double
 void mafGizmoTranslatePlane::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  for (int i = 0; i < 3; i++)
-    mafEventMacro(mafEvent(this,VME_SHOW,Gizmo[i],show));
 
+  // can not use this since it's too slow... this requires destroying and creating
+  // the pipeline each time...
+  //for (int i = 0; i < 3; i++)
+  //  mafEventMacro(mafEvent(this,VME_SHOW,Gizmo[i],show));
+
+  // ... instead I am using vtk opacity to speed up the render
   if (show)
   {  
     Gizmo[S1]->GetMaterial()->m_Prop->SetOpacity(1);
