@@ -14,6 +14,8 @@ SET(PROJECT_SRCS
   mmoCTMRIImporter.h
   mmoLandmarkImporter.cpp
   mmoLandmarkImporter.h
+  mmoRegisterClusters.cpp
+  mmoRegisterClusters.h
 )
 
 IF (MAF_USE_ITK)
@@ -26,7 +28,7 @@ SET(PROJECT_SRCS  ${PROJECT_SRCS}
 ENDIF (MAF_USE_ITK)
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS "mafVME" "mafInteraction" "vtkMAF")
+SET(PROJECT_LIBS "mafVME" "mafInteraction")
 
 SET(PROJECT_LIBS ${PROJECT_LIBS} vtkMED medCommon)
 
