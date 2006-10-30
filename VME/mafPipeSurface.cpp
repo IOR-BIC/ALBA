@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-20 08:42:34 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2006-10-30 15:43:51 $
+  Version:   $Revision: 1.30 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -77,7 +77,7 @@ mafPipeSurface::mafPipeSurface()
   m_UseTexture      = 0;
   m_UseLookupTable  = 0;
 
-  m_EnableActorLOD  = 1;
+  m_EnableActorLOD  = 0;
 }
 //----------------------------------------------------------------------------
 void mafPipeSurface::Create(mafSceneNode *n/*, bool use_axes*/)
