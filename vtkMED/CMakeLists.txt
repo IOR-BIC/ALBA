@@ -16,6 +16,8 @@ SET(vtkMED_SRCS
   vtkPackedImage.h
   vtkXRayVolumeMapper.cxx
   vtkXRayVolumeMapper.h
+  vtkWeightedLandmarkTransform.cxx
+  vtkWeightedLandmarkTransform.h
 )
 
 # List the kits from VTK that are needed by this project.
