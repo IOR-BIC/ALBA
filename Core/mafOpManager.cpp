@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-16 09:10:04 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2006-10-31 09:47:45 $
+  Version:   $Revision: 1.22 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -339,7 +339,7 @@ mafNode* mafOpManager::GetSelectedVme()
 	return m_Selected;
 }
 //----------------------------------------------------------------------------
-void mafOpManager::OpSelect(mafNode* vme)   
+void mafOpManager::OpSelect(mafNode* vme)
 //----------------------------------------------------------------------------
 {
 	if(vme == m_Selected ) 
@@ -477,6 +477,13 @@ void mafOpManager::OpRun(int op_id)
 			OpRedo();
 	  break;
 	  case OP_DELETE:
+    {
+      mafNode *node_to_del = m_Selected;
+      OpSelect(m_Selected->GetParent());
+      node_to_del->ReparentTo(NULL);
+      ClearUndoStack();
+    }
+    break;
 	  case OP_CUT:
 			OpExec(m_OpCut);
 	  break;
