@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-20 08:30:46 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-10-31 14:05:20 $
+  Version:   $Revision: 1.6 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -349,10 +349,12 @@ void mafViewGlobalSlice::OnEvent(mafEventBase *maf_event)
 void mafViewGlobalSlice::UpdateSliceParameters()
 //----------------------------------------------------------------------------
 {
-  m_GlobalBoundsInitialized = true;
-  m_SliceOrigin[0] = (m_GlobalBounds[0]+m_GlobalBounds[1])*.5;
-  m_SliceOrigin[1] = (m_GlobalBounds[2]+m_GlobalBounds[3])*.5;
-  m_SliceOrigin[2] = (m_GlobalBounds[4]+m_GlobalBounds[5])*.5;
+	if(!m_GlobalBoundsInitialized)
+	{
+		m_SliceOrigin[0] = (m_GlobalBounds[0]+m_GlobalBounds[1])*.5;
+		m_SliceOrigin[1] = (m_GlobalBounds[2]+m_GlobalBounds[3])*.5;
+		m_SliceOrigin[2] = (m_GlobalBounds[4]+m_GlobalBounds[5])*.5;
+	}
 
   double new_bounds[3] = {0.0,0.0,0.0};
   switch(m_ViewIndex)
@@ -367,7 +369,8 @@ void mafViewGlobalSlice::UpdateSliceParameters()
       new_bounds[0] = m_GlobalBounds[4];
       new_bounds[1] = m_GlobalBounds[5];
       new_bounds[2] = (m_GlobalBounds[4]+m_GlobalBounds[5])*.5;
-      m_SliceOrigin[2] = new_bounds[2];
+      if(!m_GlobalBoundsInitialized)
+				m_SliceOrigin[2] = new_bounds[2];
     break;
     case ID_XZ:
 			m_SliceXVector[0] = 1;
@@ -379,7 +382,8 @@ void mafViewGlobalSlice::UpdateSliceParameters()
       new_bounds[0] = m_GlobalBounds[2];
       new_bounds[1] = m_GlobalBounds[3];
       new_bounds[2] = (m_GlobalBounds[2]+m_GlobalBounds[3])*.5;
-      m_SliceOrigin[1] = new_bounds[2];
+      if(!m_GlobalBoundsInitialized)
+				m_SliceOrigin[1] = new_bounds[2];
     break;
     case ID_YZ:
 			m_SliceXVector[0] = 0.0001;
@@ -391,15 +395,15 @@ void mafViewGlobalSlice::UpdateSliceParameters()
       new_bounds[0] = m_GlobalBounds[0];
       new_bounds[1] = m_GlobalBounds[1];
       new_bounds[2] = (m_GlobalBounds[0]+m_GlobalBounds[1])*.5;
-      m_SliceOrigin[0] = new_bounds[2];
+      if(!m_GlobalBoundsInitialized)
+				m_SliceOrigin[0] = new_bounds[2];
     break;
   }
-  //m_GlobalSlider->SetMax(new_bounds[1]);
-  //m_GlobalSlider->SetMin(new_bounds[0]);
-  m_GlobalSlider->SetRange(new_bounds[0],new_bounds[1],new_bounds[2]);
+  m_GlobalSlider->SetRange(new_bounds[0],new_bounds[1],m_SliceOrigin[m_ViewIndex]);
 	m_GlobalSlider->Update();
-  m_SliderOldOrigin = m_GlobalSlider->GetValue();
+	m_SliderOldOrigin = m_GlobalSlider->GetValue();
 	m_SliderOrigin = m_GlobalSlider->GetValue();
+	m_GlobalBoundsInitialized = true;
 
   m_Gui->Update();
 }
@@ -440,9 +444,9 @@ void mafViewGlobalSlice::UpdateSlice()
 {
 	if(m_Dn != 0)
 	{
-		m_SliceOrigin[0] = m_SliceOrigin[0] + m_SliceNormal[0] * m_Dn;
-		m_SliceOrigin[1] = m_SliceOrigin[1] + m_SliceNormal[1] * m_Dn;
-		m_SliceOrigin[2] = m_SliceOrigin[2] + m_SliceNormal[2] * m_Dn;
+		m_SliceOrigin[0] = m_SliceOrigin[0] + abs(m_SliceNormal[0]) * (m_Dn);
+		m_SliceOrigin[1] = m_SliceOrigin[1] + abs(m_SliceNormal[1]) * (m_Dn);
+		m_SliceOrigin[2] = m_SliceOrigin[2] + abs(m_SliceNormal[2]) * (m_Dn);
 
 		if(m_SliceOrigin[0] > m_GlobalBounds[1])
 			m_SliceOrigin[0] = m_GlobalBounds[1];
