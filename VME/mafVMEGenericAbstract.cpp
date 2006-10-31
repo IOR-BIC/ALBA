@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:54 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-10-31 09:29:04 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -298,8 +298,8 @@ void mafVMEGenericAbstract::OnEvent(mafEventBase *maf_event)
       case ID_VME_CRYPTING:
         SetCrypting(m_Crypting);
       break;
-      default:
-        Superclass::OnEvent(maf_event);
+      //default:
+        //Superclass::OnEvent(maf_event);
     }
   }
   else if (maf_event->GetChannel()==MCH_DOWN)
