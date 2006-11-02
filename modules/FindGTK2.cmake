@@ -2,8 +2,8 @@
   # Module:    $RCSfile: FindGTK2.cmake,v $
   # Author:    Silvano Imboden
   # Language:  CMake 2.05
-  # Date:      $Date: 2006-10-05 11:06:52 $
-  # Version:   $Revision: 1.3 $
+  # Date:      $Date: 2006-11-02 11:19:14 $
+  # Version:   $Revision: 1.4 $
   ##################################################################
   
   # ---------------------------------------------------------------------
@@ -30,7 +30,7 @@
   # -----------------
   FIND_PROGRAM( PKG-CONFIG pkg-config)
   
-  MESSAGE("DBG: PKG-CONFIG = >>${PKG-CONFIG}<<") 
+#MESSAGE("DBG: PKG-CONFIG = >>${PKG-CONFIG}<<") 
   
   IF( PKG-CONFIG STREQUAL "PKG-CONFIG-NOTFOUND" )
     SET(PKG-CONFIG-FOUND 0)
