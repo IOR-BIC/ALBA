@@ -8,8 +8,8 @@ MESSAGE(STATUS "Configuring project ${PROJECT_NAME}")
 CONFIGURE_FILE("${MAF_SOURCE_DIR}/Gui/manifest.in" "${MAF_BINARY_DIR}/Gui/manifest.in" COPYONLY)
 
 SET(PROJECT_SRCS
-  #mmgSashPanel.cpp
-  #mmgSashPanel.h
+  mmgSashPanel.cpp
+  mmgSashPanel.h
   mafEvent.cpp
   mafEvent.h
   mafPics.cpp
@@ -32,8 +32,6 @@ SET(PROJECT_SRCS
   mmgCrossSplitter.h
   mmgDialog.cpp
   mmgDialog.h
-  mmgDictionaryWidget.cpp
-  mmgDictionaryWidget.h
   mmgDockManager.cpp
   mmgDockManager.h
   mmgDockSettings.cpp
@@ -99,6 +97,13 @@ SET(PROJECT_SRCS
   mmgViewWin.h
 )
 
+IF (MAF_USE_CURL)
+	SET(PROJECT_SRCS
+	${PROJECT_SRCS}
+	mmgDialogRemoteFile.cpp
+	mmgDialogRemoteFile.h
+	)
+ENDIF (MAF_USE_CURL)
 
 IF (MAF_USE_VTK)
   SET(PROJECT_SRCS
@@ -108,6 +113,9 @@ IF (MAF_USE_VTK)
 
   mmgDialogPreview.cpp
   mmgDialogPreview.h
+
+  mmgDictionaryWidget.cpp
+  mmgDictionaryWidget.h
 
   mafAnimate.cpp
   mafAnimate.h
