@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2006-09-29 14:17:42 $
-# Version:   $Revision: 1.34 $
+# Date:      $Date: 2006-11-02 11:34:01 $
+# Version:   $Revision: 1.35 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -124,14 +124,17 @@ IF (MAF_CAN_BUILD)
   DBG_MESSAGE("MAF: Configuring MAF Kits")
   MESSAGE(STATUS "MAF: Configuring MAF Kits")
   SUBDIRS (Base)
-  SUBDIRS (Interaction)
+  IF (MAF_USE_VTK)
+    SUBDIRS (Interaction)
+  ENDIF (MAF_USE_VTK)	
   SUBDIRS (Gui)
   SUBDIRS (IO)
   SUBDIRS (Core)
-  SUBDIRS (vtkMAF)
-  SUBDIRS (VME)
-  SUBDIRS (Operations)
-  
+  IF (MAF_USE_VTK)
+    SUBDIRS (vtkMAF)
+    SUBDIRS (VME)
+    SUBDIRS (Operations)
+  ENDIF (MAF_USE_VTK)
   # Configuring Doxygen documentation  
   SUBDIRS (Docs)
   
