@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi2DAngle.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-20 14:41:17 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-11-02 11:32:49 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -394,7 +394,7 @@ void mmi2DAngle::DrawMeasureTool(double x, double y)
     {
       CalculateMeasure();
       mafString as;
-      as = wxString::Format(_("%.2f°"), m_Angle);
+      as = wxString::Format(_("%.2f"), m_Angle);
       m_MeterVector[m_MeterVector.size()-1]->SetText(as);
       m_MeterVector[m_MeterVector.size()-1]->SetTextPosition(tmp_pos);
       m_CurrentRenderer->AddActor2D(m_MeterVector[m_MeterVector.size()-1]);
