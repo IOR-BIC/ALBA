@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-26 15:32:58 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2006-11-02 11:20:22 $
+  Version:   $Revision: 1.26 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -12,6 +12,7 @@
 
 #include "mafDecl.h"
 #include <wx/image.h>
+#include <wx/uri.h>
 #include "mafIncludeWX.h"
 #include "mmuIdFactory.h"
 #include <math.h>
@@ -127,6 +128,25 @@ std::string mafGetApplicationDirectory()
 	return app_dir.c_str();
 }
 //----------------------------------------------------------------------------
+bool IsRemote(mafString filename, mafString &protocol_used)
+//----------------------------------------------------------------------------
+{
+  bool is_remote = false;
+  wxURI data_uri(wxT(filename.GetCStr()));
+  if(data_uri.HasScheme())
+    protocol_used = data_uri.GetScheme().c_str();
+  else
+    is_remote = false; //try to treat it as a local file!!
+
+  if (!protocol_used.IsEmpty())
+  {
+    is_remote = protocol_used.Equals("http")  ||
+                protocol_used.Equals("ftp")   ||
+                protocol_used.Equals("https");
+  }
+  return is_remote;
+}
+//----------------------------------------------------------------------------
 float RoundValue(float f_in, int decimal_digits)
 //----------------------------------------------------------------------------
 {
@@ -199,7 +219,8 @@ std::string  mafIdString(int id)
      case MENU_FILE_NEW:        s="MENU_FILE_NEW"; break; 
      case MENU_FILE_OPEN:       s="MENU_FILE_OPEN"; break; 
      case MENU_FILE_SAVE:       s="MENU_FILE_SAVE"; break; 
-     case MENU_FILE_SAVEAS:     s="MENU_FILE_SAVEAS"; break; 
+     case MENU_FILE_SAVEAS:     s="MENU_FILE_SAVEAS"; break;
+     case MENU_FILE_UPLOAD:     s="MENU_FILE_UPLOAD"; break;
      case MENU_FILE_MERGE:      s="MENU_FILE_MERGE"; break; 
      case MENU_FILE_PRINT:      s="MENU_FILE_PRINT"; break;
      case MENU_FILE_PRINT_PREVIEW:s="MENU_FILE_PRINT_PREVIEW"; break;
@@ -268,8 +289,7 @@ std::string  mafIdString(int id)
      case VME_FEM_DATA_CHOOSED: s="VME_FEM_DATA_CHOOSED"; break;
      case VME_PICKED:	          s="VME_PICKED"; break; 
      case VME_PICKING:	        s="VME_PICKING"; break; 
-     case CREATE_LOCAL_STORAGE: s="CREATE_LOCAL_STORAGE"; break; 
-     case CREATE_REMOTE_STORAGE:s="CREATE_REMOTE_STORAGE"; break; 
+     case CREATE_STORAGE:       s="CREATE_STORAGE"; break; 
 
      case VIEW_QUIT:            s="VIEW_QUIT"; break;
      case VIEW_CREATE:          s="VIEW_CREATE"; break; 

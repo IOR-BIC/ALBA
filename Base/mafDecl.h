@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-26 15:32:58 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2006-11-02 11:20:22 $
+  Version:   $Revision: 1.26 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -19,6 +19,8 @@
 #include <wx/bitmap.h>
 #include <string>
 #include <vector>
+
+#include "mafString.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -86,6 +88,7 @@ MENU_FILE_START,
   MENU_FILE_OPEN,
   MENU_FILE_SAVE,
   MENU_FILE_SAVEAS,
+  MENU_FILE_UPLOAD,
   MENU_FILE_MERGE,
   MENU_FILE_PRINT,
   MENU_FILE_PRINT_PREVIEW,
@@ -165,8 +168,7 @@ EVT_START,
   VME_CHOOSE_FEM_PROPERTY,
   VME_REF_SYS_CHOOSED,  //from mmgVMERefSysChooser to a mafOp (to be moved elsewhere Marco)
   VME_FEM_DATA_CHOOSED, //from mmgVMEFEMDataChooser to a mafOp (to be moved elsewhere Marco)
-  CREATE_LOCAL_STORAGE,
-  CREATE_REMOTE_STORAGE,
+  CREATE_STORAGE,
 
   // events about views
   VIEW_QUIT,		 // from keyboard, used specially to close external views.
@@ -397,6 +399,10 @@ void mafGetOpenMultiFiles(const char * initial, const char * wildcard, std::vect
 
 /** show the File Save Dialog Box */
 std::string  mafGetSaveFile(const char * initial, const char * wildcard, const char * title = "Save File", wxWindow *parent = NULL);
+
+/** return true if the filename use a protocol like ftp, http or https.
+    Write into 'protocol_used' parameter the protocol used by the file.*/
+bool IsRemote(mafString filename, mafString &protocol_used);
 
 /** return a random wxColour from a palette of 16 */
 wxColour  mafRandomColor();
