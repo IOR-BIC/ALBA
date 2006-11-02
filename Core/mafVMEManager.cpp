@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-06 13:38:32 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2006-11-02 11:30:06 $
+  Version:   $Revision: 1.28 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,6 +32,9 @@
 #include "mafVMEManager.h"
 #include "mafNode.h"
 #include "mafVMEStorage.h"
+#include "mafRemoteStorage.h"
+#include "mmgApplicationSettings.h"
+
 #include "mafNodeIterator.h"
 #include "mafTagArray.h"
 
@@ -47,6 +50,15 @@ mafVMEManager::mafVMEManager()
 	m_Storage     = NULL;
   m_Crypting    = false;
   m_LoadingFlag = false;
+
+  mmgApplicationSettings *app_settings = new mmgApplicationSettings(this);
+  m_Host = app_settings->GetRemoteHostName();
+  m_Port = app_settings->GetRemotePort();
+  m_User = app_settings->GetUserName();
+  m_Pwd  = app_settings->GetPassword();
+  cppDEL(app_settings);
+
+  m_FileHistoryIdx = -1;
 
   mafString MSFDir = mafGetApplicationDirectory().c_str();
   MSFDir.ParsePathName();
@@ -110,24 +122,12 @@ mafVMERoot *mafVMEManager::GetRoot()
 {
   return (m_Storage?m_Storage->GetRoot():NULL);
 }
-/*
 //----------------------------------------------------------------------------
-void mafVMEManager::CreateNewStorage()
+mafVMEStorage *mafVMEManager::GetStorage()
 //----------------------------------------------------------------------------
 {
-  if (m_Storage)
-  {
-    NotifyRemove(m_Storage->GetRoot());
-    m_LoadingFlag = true;
-    m_Storage->Delete();
-    m_LoadingFlag = false;
-  }
-  m_Storage = mafVMEStorage::New();
-  m_Storage->GetRoot()->SetName("root");
-  m_Storage->SetListener(this);
-  m_Storage->GetRoot()->Initialize();
+  return m_Storage;
 }
-*/
 //----------------------------------------------------------------------------
 void mafVMEManager::MSFNew(bool notify_root_creation)   
 //----------------------------------------------------------------------------
@@ -154,9 +154,8 @@ void mafVMEManager::MSFNew(bool notify_root_creation)
 
   m_Modified = false;
   
-  //CreateNewStorage();
   m_LoadingFlag = true;
-  mafEvent e(this,CREATE_LOCAL_STORAGE,m_Storage);
+  mafEvent e(this,CREATE_STORAGE,m_Storage);
   mafEventMacro(e);
   m_Storage = (mafVMEStorage *)e.GetMafObject();
   m_LoadingFlag = false;
@@ -169,7 +168,7 @@ void mafVMEManager::MSFNew(bool notify_root_creation)
 		tag_appstamp.SetValue(this->m_AppStamp.GetCStr());
 		m_Storage->GetRoot()->GetTagArray()->SetTag(tag_appstamp);
 		mafEventMacro(mafEvent(this,VME_ADDED,m_Storage->GetRoot()));
-		mafEventMacro(mafEvent(this,VME_SELECTED,m_Storage->GetRoot())); 
+		mafEventMacro(mafEvent(this,VME_SELECTED,m_Storage->GetRoot()));
 	}
 
   m_MSFFile = ""; //next MSFSave will ask for a filename
@@ -178,36 +177,63 @@ void mafVMEManager::MSFNew(bool notify_root_creation)
 void mafVMEManager::MSFOpen(int file_id)   
 //----------------------------------------------------------------------------
 {
-  int idx = file_id - wxID_FILE1;
+  m_FileHistoryIdx = file_id - wxID_FILE1;
 	wxString file = "";
-	file = m_FileHistory.GetHistoryFile(idx);
+	file = m_FileHistory.GetHistoryFile(m_FileHistoryIdx);
 	MSFOpen(file);
 }
 //----------------------------------------------------------------------------
-void mafVMEManager::MSFOpen(wxString filename)   
+void mafVMEManager::MSFOpen(wxString filename)
 //----------------------------------------------------------------------------
 {
   wxWindowDisabler disableAll;
   wxBusyCursor wait_cursor;
   
-  if(!::wxFileExists(filename))
+  mafString protocol = "";
+  bool remote_file = IsRemote(filename.c_str(),protocol);
+  
+  if(!remote_file && !::wxFileExists(filename))
 	{
 		wxString msg("File ");
 		msg += filename;
 		msg += " not found!";
 		mafWarningMessage( msg,"Warning");
+    if(m_FileHistoryIdx != -1)
+    {
+      m_FileHistory.RemoveFileFromHistory(m_FileHistoryIdx);
+      m_FileHistory.Save(*m_Config);
+      m_FileHistoryIdx = -1;
+    }
 		return;
 	}
 
-  // insert and select the root - reset m_MSFFile 
+  // insert and select the root - reset m_MSFFile - delete the old storage and create a new one
   MSFNew(false);
   
   mafString unixname = filename;
 
+  if (remote_file)
+  {
+    // set parameters for remote storage according to the remote file.
+    ((mafRemoteStorage *)m_Storage)->SetHostName(m_Host);
+    ((mafRemoteStorage *)m_Storage)->SetRemotePort(m_Port);
+    ((mafRemoteStorage *)m_Storage)->SetUsername(m_User);
+    ((mafRemoteStorage *)m_Storage)->SetPassword(m_Pwd);
+  }
+  
   wxString path, name, ext;
   wxSplitPath(filename,&path,&name,&ext);
   if(ext == "zmsf")
   {
+    if (remote_file)
+    {
+      // Download the file if it is not present into the cache
+      // we are using the remote storage!!
+      mafString local_filename, remote_filename;
+      remote_filename = filename.c_str();
+      ((mafRemoteStorage *)m_Storage)->DownloadRemoteFile(remote_filename,local_filename);
+      filename = local_filename;
+    }
     unixname = ZIPOpen(filename);
     wxSetWorkingDirectory(m_TmpDir);
   }
@@ -262,28 +288,33 @@ void mafVMEManager::MSFOpen(wxString filename)
 	{
     m_FileHistory.AddFileToHistory(m_ZipFile);
 	}
-  else
+  else if(/*!remote_file && */res == MAF_OK)
   {
     m_FileHistory.AddFileToHistory(m_MSFFile);
   }
+  else if(res != MAF_OK && m_FileHistoryIdx != -1)
+  {
+    m_FileHistory.RemoveFileFromHistory(m_FileHistoryIdx);
+  }
 	m_FileHistory.Save(*m_Config);
+  m_FileHistoryIdx = -1;
 }
 //----------------------------------------------------------------------------
 const char *mafVMEManager::ZIPOpen(wxString filename)
 //----------------------------------------------------------------------------
 {
   m_ZipFile = filename;
-  wxString file, ext, working_dir = "";
-  wxSplitPath(m_ZipFile,&working_dir,&file,&ext);
-  if (working_dir == "")
-    working_dir = ::wxGetCwd();
-  
-  working_dir = working_dir + "\\~TmpData";
-  if (!wxDirExists(working_dir))
-    wxMkdir(working_dir);
-  m_TmpDir = working_dir;
+  wxString zip_cache = wxPathOnly(filename);
+  if (zip_cache.IsEmpty())
+  {
+    zip_cache = ::wxGetCwd();
+  }
+  zip_cache = zip_cache + "\\~TmpData";
+  if (!wxDirExists(zip_cache))
+    wxMkdir(zip_cache);
+  m_TmpDir = zip_cache;
 
-  wxString path, name, complete_name, zfile, out_file;
+  wxString path, name, ext, complete_name, zfile, out_file;
   wxSplitPath(m_ZipFile,&path,&name,&ext);
   complete_name = name + "." + ext;
   
@@ -309,7 +340,7 @@ const char *mafVMEManager::ZIPOpen(wxString filename)
     complete_name = complete_name.Mid(length_header_name);
   zfileStream = zip_fs->OpenFile(zfile);
   zip_is = (wxZlibInputStream *)zfileStream->GetStream();
-  out_file = working_dir + "\\" + complete_name;
+  out_file = m_TmpDir + "\\" + complete_name;
   char *buf;
   int s_size;
   std::ofstream out_file_stream;
@@ -338,7 +369,7 @@ const char *mafVMEManager::ZIPOpen(wxString filename)
     complete_name = name + "." + ext;
     if (enable_mid)
       complete_name = complete_name.Mid(length_header_name);
-    out_file = working_dir + "\\" + complete_name;
+    out_file = m_TmpDir + "\\" + complete_name;
     if(ext == "msf")
     {
       m_MSFFile = out_file;
@@ -354,7 +385,7 @@ const char *mafVMEManager::ZIPOpen(wxString filename)
     delete[] buf;
   }
   
-  zip_fs->ChangePathTo(working_dir,TRUE);
+  zip_fs->ChangePathTo(m_TmpDir,TRUE);
   zip_fs->CleanUpHandlers();
   zfileStream->UnRef();
   delete zfileStream;
@@ -491,6 +522,44 @@ void mafVMEManager::MSFSaveAs()
    m_MSFFile = "";
    m_MakeBakFile = false;
    MSFSave();
+}
+//----------------------------------------------------------------------------
+void mafVMEManager::Upload(mafString local_file, mafString remote_file)
+//----------------------------------------------------------------------------
+{
+  if (m_Storage == NULL)
+  {
+    wxMessageBox(_("Some problem occourred, MAF storage is NULL!!"), _("Warning"));
+    return;
+  }
+  mafRemoteStorage *storage = (mafRemoteStorage *)m_Storage;
+  if (storage->UploadLocalFile(local_file, remote_file) != MAF_OK)
+  {
+
+  }
+  /*
+  if (upload_flag == UPLOAD_TREE)
+  {
+    wxString local_dir = wxPathOnly(m_MSFFile);
+    wxString remote_dir = remote_file.GetCStr();
+    remote_dir = wxPathOnly(remote_dir);
+    wxString upload_file;
+
+    wxArrayString files;
+    wxDir::GetAllFiles(local_dir,&files);
+
+    wxString path, short_name, ext, local_file;
+    for (size_t i = 0; i < files.GetCount(); i++) 
+    {
+      local_file = files.Item(i);
+      wxSplitPath(local_file.c_str(), &path, &short_name, &ext);
+      upload_file = remote_dir + "/" + short_name + "." + ext;
+      if (storage->UploadLocalFile(local_file, upload_file) != MAF_OK)
+      {
+        break;
+      }
+    }
+  }*/
 }
 //----------------------------------------------------------------------------
 void mafVMEManager::VmeAdd(mafNode *n)
