@@ -8,34 +8,10 @@ DBG_MESSAGE("Configuring project mafCore")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-	mafRWI.cpp
-	mafRWI.h
-	mafRWIBase.cpp
-	mafRWIBase.h
-	mafSceneGraph.cpp
-	mafSceneGraph.h
-	mafSceneNode.cpp
-	mafSceneNode.h
-	mafViewCompound.cpp
-	mafViewCompound.h
-	mafViewHTML.cpp
-	mafViewHTML.h
-	mafViewPlot.cpp
-	mafViewPlot.h
-	mafViewVTK.cpp
-	mafViewVTK.h
-	mmgContextualMenu.cpp
-	mmgContextualMenu.h
-	mmgTreeContextualMenu.cpp
-	mmgTreeContextualMenu.h
-	vtkMAFAssembly.cpp
-	vtkMAFAssembly.h
   mafAbsMatrixPipe.cpp
   mafAbsMatrixPipe.h
   mafAttribute.cpp
   mafAttribute.h
-  mafAxes.cpp
-  mafAxes.h
   mafCoreFactory.cpp
   mafCoreFactory.h
   mafDataPipe.cpp
@@ -44,8 +20,6 @@ SET(PROJECT_SRCS
   mafEventIO.h
   mafLogicWithGUI.cpp
   mafLogicWithGUI.h
-  mafLogicWithManagers.cpp
-  mafLogicWithManagers.h
   mafMatrixPipe.cpp
   mafMatrixPipe.h
   mafNode.cpp
@@ -70,14 +44,12 @@ SET(PROJECT_SRCS
   mafOpSelect.h
   mafOpStack.cpp
   mafOpStack.h
-  mafPipe.cpp
-  mafPipe.h
-  mafPipeFactory.cpp
-  mafPipeFactory.h
   mafPrintSupport.cpp
   mafPrintSupport.h
   mafRemoteLogic.cpp
   mafRemoteLogic.h
+  mafRemoteStorage.cpp
+  mafRemoteStorage.h
   mafRoot.cpp
   mafRoot.h
   mafTagArray.cpp
@@ -97,14 +69,8 @@ SET(PROJECT_SRCS
   mafVMERoot.h
   mafVMEStorage.cpp
   mafVMEStorage.h
-  mafViewManager.cpp
-  mafViewManager.h
   mmgListCtrlBitmap.cpp
   mmgListCtrlBitmap.h
-  mmgMaterialButton.cpp
-  mmgMaterialButton.h
-  mmgMaterialChooser.cpp
-  mmgMaterialChooser.h
   mmgVMEChooser.cpp
   mmgVMEChooser.h
   mmgVMEChooserAccept.cpp
@@ -118,6 +84,40 @@ SET(PROJECT_SRCS
 IF (MAF_USE_VTK)
   SET(PROJECT_SRCS
   ${PROJECT_SRCS}
+  mafRWI.cpp
+  mafRWI.h
+  mafRWIBase.cpp
+  mafRWIBase.h
+  mafSceneGraph.cpp
+  mafSceneGraph.h
+  mafSceneNode.cpp
+  mafSceneNode.h
+  mafLogicWithManagers.cpp
+  mafLogicWithManagers.h
+  mafPipe.cpp
+  mafPipe.h
+  mafPipeFactory.cpp
+  mafPipeFactory.h
+  mafViewVTK.cpp
+  mafViewVTK.h
+  mafViewCompound.cpp
+  mafViewCompound.h
+  mafViewHTML.cpp
+  mafViewHTML.h
+  mafViewPlot.cpp
+  mafViewPlot.h
+  mafViewManager.cpp
+  mafViewManager.h
+  mmgContextualMenu.cpp
+  mmgContextualMenu.h
+  mmgTreeContextualMenu.cpp
+  mmgTreeContextualMenu.h
+  mmgMaterialButton.cpp
+  mmgMaterialButton.h
+  mmgMaterialChooser.cpp
+  mmgMaterialChooser.h
+  mafAxes.cpp
+  mafAxes.h
   mafLODActor.cpp
   mafLODActor.h
   mafPipeBox.cpp
@@ -126,6 +126,8 @@ IF (MAF_USE_VTK)
   mmaMaterial.h
   mmaVolumeMaterial.cpp
   mmaVolumeMaterial.h
+  vtkMAFAssembly.cpp
+  vtkMAFAssembly.h
   )
 ENDIF (MAF_USE_VTK)
 
@@ -164,3 +166,4 @@ ENDIF (MAF_USE_WX)
 IF (MAF_USE_CRYPTO)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_CRYPTO_LIBRARY)
 ENDIF (MAF_USE_CRYPTO)
+
