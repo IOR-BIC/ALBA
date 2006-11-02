@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-12 09:05:45 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2006-11-02 11:23:44 $
+  Version:   $Revision: 1.29 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -11,6 +11,7 @@
 =========================================================================*/
 #ifndef __mafLogicWithManagers_H__
 #define __mafLogicWithManagers_H__
+
 
 //----------------------------------------------------------------------------
 // includes :
@@ -73,11 +74,22 @@ public:
                mafLogicWithManagers();
 	virtual     ~mafLogicWithManagers(); 
 
+  enum UPLOAD_FLAGS
+  {
+    UPLOAD_SELECTED_VME = 0,
+    UPLOAD_SUBTREE,
+    UPLOAD_TREE,
+    UPLOAD_COMPRESSED_VME,
+    UPLOAD_COMPRESSED_SUBTREE,
+    UPLOAD_COMPRESSED_TREE,
+  };
+
   /** */
   virtual void OnEvent(mafEventBase *maf_event);
 
   /**  Plug a new view */
 	virtual void Plug(mafView* view);
+
 
   /**  Plug a new operation */
 	virtual void Plug(mafOp *op, wxString menuPath = "");
@@ -136,7 +148,7 @@ protected:
   virtual void CreateMenu();
 
   /** create a new storage object */
-  virtual void CreateLocalStorage(mafEvent *e);
+  virtual void CreateStorage(mafEvent *e);
 
   /**
   Redefined to add Print buttons */
@@ -151,6 +163,12 @@ protected:
   By default (file_to_open = NULL) it ask the user to choose a file to open,
   otherwise it open the given one.*/
 	virtual void OnFileOpen(const char *file_to_open = NULL);
+  /** FILE UPLOAD evt. handler 
+  By default (remote_file = NULL) AND the entire msf is uploaded and only the remote directory is asked to the user, 
+  otherwise given parameters are managed to upload the file correctly. 'upload_flag' can be:
+  UPLOAD_SELECTED_VME, UPLOAD_SUBTREE or UPLOAD_TREE (default) and the corresponding compressed:
+  UPLOAD_COMPRESSED_VME, UPLOAD_COMPRESSED_SUBTREE, UPLOAD_COMPRESSED_TREE.*/
+  virtual void OnFileUpload(const char *remote_file, unsigned int upload_flag = UPLOAD_TREE);
   /** FILE HISTORY evt. handler */
 	virtual void OnFileHistory(int menuId);
   /** FILE SAVE evt. handler */
