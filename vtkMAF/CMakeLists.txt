@@ -65,6 +65,7 @@ SET(vtkMAF_LIBS
   vtkCommon
   vtkRendering
   vtkFiltering
+  vtkGraphics
 )
 
 #-----------------------------------------------------------------------------
