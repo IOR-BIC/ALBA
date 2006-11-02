@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-07 08:21:30 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-11-02 11:31:18 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden, Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -55,6 +55,7 @@ public:
   mafEvent(void *sender, int id, mafObject       *mafobj,  long arg=0);
   mafEvent(void *sender, int id, mafObject       *mafobj,  mafString       *s, long arg=0);
   mafEvent(void *sender, int id, WidgetDataType  &widget_data,  long arg=0);
+  mafEvent(void *sender, int id, mafMatrix    *m1,mafMatrix  *m2=NULL);
 
   virtual void DeepCopy(const mafEventBase *maf_event);
 
@@ -123,7 +124,6 @@ public:
   mafEvent(void *sender, int id, vtkProp         *prop,   mafNode *vme=NULL);
   mafEvent(void *sender, int id, vtkObject       *vtkobj, long arg=0);
   mafEvent(void *sender, int id, vtkObject       *vtkobj, mafString *s);
-  mafEvent(void *sender, int id, mafMatrix    *m1,mafMatrix  *m2=NULL);
 
   vtkProp*         GetProp()      {return m_VtkProp;};
   vtkObject*       GetVtkObj()    {return m_VtkObj;};
