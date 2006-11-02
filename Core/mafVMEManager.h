@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-27 16:48:19 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-11-02 11:29:32 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,9 +37,6 @@ public:
   void SetListener(mafObserver *listener) {m_Listener = listener;};
   void OnEvent(mafEventBase *e);
  
-  /** create a new storage object */
-//  virtual void CreateNewStorage();
-
   /** 
   Destroy all nodes (also the root), for each destroyed node the manager send 
   an event VME_REMOVING, then search the root and select it. */ 
@@ -62,6 +59,9 @@ public:
   
 	/** Save the msf tree with different filename. */
   void MSFSaveAs();
+
+  /** Upload MAF data to the remote host with the given 'remote_file' filename.*/
+  void Upload(mafString local_file, mafString remote_file);
   
 	/** Return true if the tree has been modifyed. */
   bool MSFIsModified() {return m_Modified;};
@@ -102,6 +102,9 @@ public:
 	/** Return the tree's root. */
   mafVMERoot *GetRoot();
 
+  /** Return the storage associated to the current tree.*/
+  mafVMEStorage *GetStorage();
+
 	/** Set the application stamp; this is the mark of the specific vertical application (must be equal to the application name). */
   void SetApplicationStamp(mafString &appstamp) {m_AppStamp = appstamp;};
 
@@ -110,6 +113,18 @@ public:
 
   /** Update vme client data interface from tag. if vme == NULL, the update is propagated from root vme to all the tree. */
   void UpdateFromTag(mafNode *n = NULL);
+
+  /** Set the host-name for the remote host.*/
+  void SetHost(mafString host) {m_Host = host;};
+
+  /** Set the user-name for the remote host.*/
+  void SetUser(mafString user) {m_User = user;};
+
+  /** Set the password for the remote host.*/
+  void SetPassword(mafString pwd) {m_Pwd = pwd;};
+
+  /** Set the port for the remote host.*/
+  void SetRemotePort(int port) {m_Port = port;};
 
 protected:
   /** Create a compressed msf file.*/
@@ -120,6 +135,7 @@ protected:
   mafObserver*      m_Listener;
   wxConfigBase*     m_Config;
   mmgFileHistory	  m_FileHistory;
+  int               m_FileHistoryIdx;
 
   bool              m_MakeBakFile;
   wxString          m_MSFDir;
@@ -128,6 +144,11 @@ protected:
   wxString          m_ZipFile;
   wxString          m_TmpDir;
   wxString          m_MergeFile;
+
+  mafString         m_Host;
+  mafString         m_User;
+  mafString         m_Pwd;
+  int               m_Port;
   
   bool              m_LoadingFlag;  ///< used when an MSF is being loaded
   bool              m_Crypting;     ///< used to enable the Crypting in the MSF
