@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-31 15:37:35 $
-  Version:   $Revision: 1.74 $
+  Date:      $Date: 2006-11-02 11:24:47 $
+  Version:   $Revision: 1.75 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,33 +24,38 @@
 #include <wx/config.h>
 
 #include "mafView.h"
-#include "mafViewVTK.h"
+
 #include "mafViewManager.h"
-#include "mafVMEManager.h"
 #include "mafOp.h"
 #include "mafOpManager.h"
-#include "mafInteractionManager.h"
-#include "mafInteractor.h"
 #include "mafTagArray.h"
 #include "mafTagItem.h"
 #include "mafPrintSupport.h"
 
-#include "mmoVTKImporter.h"
-#include "mmoSTLImporter.h"
-
-#include "mafDeviceManager.h"
-#include "mafAction.h"
-#include "mmdMouse.h"
-#include "mmdClientMAF.h"
-#include "mmiPER.h"
+#ifdef MAF_USE_VTK
+  #include "mafViewVTK.h"
+  
+  #include "mmoVTKImporter.h"
+  #include "mmoSTLImporter.h"
+  #include "mafInteractionManager.h"
+  #include "mafInteractor.h"
+  #include "mafDeviceManager.h"
+  #include "mafAction.h"
+  #include "mmdMouse.h"
+  #include "mmdClientMAF.h"
+  #include "mmiPER.h"
+  #include "mmiPER.h"
+  #include "mmgTreeContextualMenu.h"
+  #include "mmgContextualMenu.h"
+  #include "vtkCamera.h"
+#endif
 
 #include "mafSideBar.h"
 
+#include "mmgDialogRemoteFile.h"
 #include "mmgMDIFrame.h"
 #include "mmgMDIChild.h"
 #include "mmgCheckTree.h"
-#include "mmgTreeContextualMenu.h"
-#include "mmgContextualMenu.h"
 #include "mmgTimeBar.h"
 #include "mmgMaterialChooser.h"
 #include "mmgViewFrame.h"
@@ -58,7 +63,6 @@
 #include "mmgMeasureUnitSettings.h"
 #include "mmgApplicationSettings.h"
 #include "mafRemoteLogic.h"
-#include "mmiPER.h"
 #include "mmgSettingsDialog.h"
 
 #ifdef WIN32
@@ -66,7 +70,9 @@
 #endif
 
 #include "mafVMEStorage.h"
-#include "vtkCamera.h"
+#include "mafRemoteStorage.h"
+//#include "vtkCamera.h"
+
 
 //----------------------------------------------------------------------------
 mafLogicWithManagers::mafLogicWithManagers()
@@ -139,6 +145,8 @@ void mafLogicWithManagers::Configure()
     m_VMEManager->SetListener(this); 
   }
 
+// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
   if (m_UseInteractionManager)
   {
     m_InteractionManager = new mafInteractionManager();
@@ -147,6 +155,7 @@ void mafLogicWithManagers::Configure()
     m_Mouse = m_InteractionManager->GetMouseDevice();
     //SIL m_InteractionManager->GetClientDevice()->AddObserver(this, MCH_INPUT);
   }
+#endif
 
   if(m_UseViewManager)
   {
@@ -161,22 +170,30 @@ void mafLogicWithManagers::Configure()
     m_OpManager->SetListener(this);
     m_OpManager->SetMouse(m_Mouse);
   }
+  
+// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
   if (m_UseInteractionManager && m_UseViewManager && m_UseOpManager)
   {
 #ifdef __WIN32__
     m_RemoteLogic = new mafRemoteLogic(this, m_ViewManager, m_OpManager);
+
     m_RemoteLogic->SetClientUnit(m_InteractionManager->GetClientDevice());
 #endif
+
   }
-  
+#endif
+
   // Fill the SettingsDialog //SIL. 09-jun-2006 : 
   
   m_SettingsDialog->AddPage( m_ApplicationSettings->GetGui(), _("Application Settings"));
   m_SettingsDialog->AddPage( m_Win->GetDockSettingGui(), _("User Interface Preferences"));
-  
+
+// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
   if(m_InteractionManager)
     m_SettingsDialog->AddPage(m_InteractionManager->GetGui(), _("Interaction Manager"));
-    
+#endif    
   if(m_LocaleSettings)
     m_SettingsDialog->AddPage(m_LocaleSettings->GetGui(), _("Interface language"));
 
@@ -200,6 +217,8 @@ void mafLogicWithManagers::Plug(mafOp *op, wxString menuPath)
   {
     m_OpManager->OpAdd(op, menuPath);
     
+// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK    
     if (m_InteractionManager)
     {
       if (const char **actions = op->GetActions())
@@ -211,6 +230,7 @@ void mafLogicWithManagers::Plug(mafOp *op, wxString menuPath)
         }
       }
     }
+#endif
   }
 }
 //----------------------------------------------------------------------------
@@ -301,12 +321,15 @@ void mafLogicWithManagers::CreateMenu()
 //----------------------------------------------------------------------------
 {
   m_MenuBar  = new wxMenuBar;
-  wxMenu    *file_menu = new wxMenu;
-  file_menu->Append(MENU_FILE_NEW,   _("&New"));
-  file_menu->Append(MENU_FILE_OPEN,  _("&Open"));
-  file_menu->Append(MENU_FILE_SAVE,  _("&Save"));
-  file_menu->Append(MENU_FILE_SAVEAS,_("Save &As"));
-
+  wxMenu *file_menu = new wxMenu;
+  file_menu->Append(MENU_FILE_NEW,   _("&New  \tCtrl+N"));
+  file_menu->Append(MENU_FILE_OPEN,  _("&Open   \tCtrl+O"));
+  file_menu->Append(MENU_FILE_SAVE,  _("&Save  \tCtrl+S"));
+  file_menu->Append(MENU_FILE_SAVEAS,_("Save &As  \tCtrl+Shift+S"));
+  if (m_ApplicationSettings->UseRemoteStorage())
+  {
+    //file_menu->Append(MENU_FILE_UPLOAD, _("&Upload"));
+  }
   m_ImportMenu = new wxMenu;
   file_menu->AppendSeparator();
   file_menu->Append(0,_("Import"),m_ImportMenu );
@@ -316,7 +339,7 @@ void mafLogicWithManagers::CreateMenu()
 
   // Print menu item
   file_menu->AppendSeparator();
-  file_menu->Append(MENU_FILE_PRINT, _("&Print"));
+  file_menu->Append(MENU_FILE_PRINT, _("&Print  \tCtrl+P"));
   file_menu->Append(MENU_FILE_PRINT_PREVIEW, _("Print Preview"));
   file_menu->Append(MENU_FILE_PRINT_SETUP, _("Printer Setup"));
   file_menu->Append(MENU_FILE_PRINT_PAGE_SETUP, _("Page Setup"));
@@ -326,7 +349,7 @@ void mafLogicWithManagers::CreateMenu()
   file_menu->Append(0,_("Recent Files"),m_RecentFileMenu);
 
   file_menu->AppendSeparator();
-  file_menu->Append(MENU_FILE_QUIT,  _("&Quit"));
+  file_menu->Append(MENU_FILE_QUIT,  _("&Quit  \tCtrl+Q"));
 
   m_MenuBar->Append(file_menu, _("&File"));
 
@@ -467,7 +490,38 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       break; 
       case MENU_FILE_SAVEAS:
         OnFileSaveAs();
-      break; 
+      break;
+      case MENU_FILE_UPLOAD:
+      {
+        /*  Re-think about it!!
+        wxString remote_path = "";
+        wxString remote_file = "";
+        bool valid_dir = false;
+        wxString msg = _("Insert remote directory on remote host: ") + m_ApplicationSettings->GetRemoteHostName();
+        do 
+        {
+          remote_path = wxGetTextFromUser(msg,_("Remote directory choose"),"/mafstorage/pub/");
+          if (!remote_path.IsEmpty())
+          {
+            remote_file = m_ApplicationSettings->GetRemoteHostName();
+            remote_file << remote_path;
+          }
+          else
+            return;
+          wxString dir_check = remote_file[remote_file.Length()-1];
+          valid_dir = dir_check.IsSameAs("/") || dir_check.IsSameAs("\\");
+          if (!valid_dir)
+          {
+            wxMessageBox(_("Not valid path!! It should ends with '/'"), _("Warning"));
+          }
+        } while(!valid_dir);
+
+        // for now upload the entire msf
+        remote_file += wxFileNameFromPath(m_VMEManager->GetFileName());
+        OnFileUpload(remote_file.c_str());
+        */
+      }
+      break;
       case MENU_FILE_PRINT:
         if (m_ViewManager && m_PrintSupport)
           m_PrintSupport->OnPrint(m_ViewManager->GetSelectedView());
@@ -572,8 +626,11 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       case VIEW_DELETE:
         if(m_PlugSidebar)
           this->m_SideBar->ViewDeleted(e->GetView()); // changed By Marco (is it correct?)
+// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
         if(m_InteractionManager)
           m_InteractionManager->ViewSelected(NULL);
+#endif
         if (m_ViewManager)
         {
           EnableItem(CAMERA_RESET, false);
@@ -615,10 +672,15 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       break;
       case CAMERA_FLYTO:
         if(m_ViewManager) m_ViewManager->CameraFlyToMode();
+// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
         if(m_InteractionManager) m_InteractionManager->CameraFlyToMode();  //modified by Marco. 15-9-2004 fly to with devices.
+#endif
       break;
       case LINK_CAMERA_TO_INTERACTOR:
       {
+// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
         if (m_InteractionManager == NULL || m_InteractionManager->GetPER() == NULL)
           return;
 
@@ -647,6 +709,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
           m_InteractionManager->GetPER()->LinkCameraAdd(cam);
         }
       }
+#endif
       break;
       case TIME_SET:
         TimeSet(e->GetDouble());
@@ -660,6 +723,8 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
         UpdateMeasureUnit();
       break;
       case CAMERA_PRE_RESET:
+// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
         if(m_InteractionManager) 
         {
           vtkRenderer *ren = (vtkRenderer*)e->GetVtkObj();
@@ -667,8 +732,11 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
           m_InteractionManager->PreResetCamera(ren);
           //mafLogMessage("CAMERA_PRE_RESET");
         }
+#endif
       break;
       case CAMERA_POST_RESET:
+// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
         if(m_InteractionManager) 
         {
           vtkRenderer *ren = (vtkRenderer*)e->GetVtkObj();
@@ -676,15 +744,21 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
           m_InteractionManager->PostResetCamera(ren);
           //mafLogMessage("CAMERA_POST_RESET");
         }
+#endif
       break;
       case CAMERA_UPDATE:
         if(m_ViewManager) m_ViewManager->CameraUpdate();
+// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
         if(m_InteractionManager) m_InteractionManager->CameraUpdate(e->GetView());
+#endif
       break;
       case CAMERA_SYNCHRONOUS_UPDATE:     
         m_ViewManager->CameraUpdate();
       break;
       case INTERACTOR_ADD:
+// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
         if(m_InteractionManager)
         {
           mafInteractor *interactor = mafInteractor::SafeDownCast(e->GetMafObject());
@@ -692,8 +766,11 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
           mafString *action_name = e->GetString();
           m_InteractionManager->BindAction(*action_name,interactor);
         }
+#endif
       break;
       case INTERACTOR_REMOVE:
+// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
         if(m_InteractionManager) 
         {
           mafInteractor *interactor = mafInteractor::SafeDownCast(e->GetMafObject());
@@ -701,20 +778,27 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
           mafString *action_name = e->GetString();
           m_InteractionManager->UnBindAction(*action_name,interactor);
         }
+#endif
       break;
       case PER_PUSH:
+// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
         if(m_InteractionManager)
         {
           mmiPER *per = mmiPER::SafeDownCast(e->GetMafObject());
           assert(per);
           m_InteractionManager->PushPER(per);
         }
+#endif
       break; 
       case PER_POP:
+// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
         if(m_InteractionManager) m_InteractionManager->PopPER();
+#endif
       break;
-      case CREATE_LOCAL_STORAGE:
-        CreateLocalStorage(e);
+      case CREATE_STORAGE:
+        CreateStorage(e);
       break;
       case COLLABORATE_ENABLE:
       {
@@ -767,6 +851,28 @@ void mafLogicWithManagers::OnFileNew()
 	m_Win->SetTitle(wxString(m_AppTitle.GetCStr()));
 }
 //----------------------------------------------------------------------------
+void mafLogicWithManagers::OnFileUpload(const char *remote_file, unsigned int upload_flag)
+//----------------------------------------------------------------------------
+{
+  if (remote_file == NULL)
+  {
+    wxMessageBox(_("remote filename not valid!!"), _("Warning"));
+    return;
+  }
+
+  wxMessageBox(_("Not implemented: think about it!!"), _("Warning"));
+  /*
+  if(m_VMEManager)
+  {
+    if(m_VMEManager->AskConfirmAndSave())
+    {
+      // Upload the file to remote host.
+      m_VMEManager->Upload(remote_file,upload_flag);
+    }
+  }
+  */
+}
+//----------------------------------------------------------------------------
 void mafLogicWithManagers::OnFileOpen(const char *file_to_open)
 //----------------------------------------------------------------------------
 {
@@ -774,18 +880,43 @@ void mafLogicWithManagers::OnFileOpen(const char *file_to_open)
   {
 	  if(m_VMEManager->AskConfirmAndSave())
 	  {
-		  wxString wildc    = _("MAF Storage Format file (*.msf)|*.msf|Compressed file (*.zmsf)|*.zmsf");
-		  wxString msf_dir  = mafGetApplicationDirectory().c_str();
-		  wxString file;
-      if (file_to_open != NULL)
+      wxString file;
+      if (m_ApplicationSettings->UseRemoteStorage())
       {
-        file = file_to_open;
+        if (file_to_open != NULL)
+        {
+          file = file_to_open;
+        }
+        else
+        {
+          mmgDialogRemoteFile remoteFile;
+          remoteFile.ShowModal();
+          file = remoteFile.GetFile().GetCStr();
+          mafString protocol;
+          if (IsRemote(file.c_str(),protocol))
+          {
+            m_VMEManager->SetHost(remoteFile.GetHost());
+            m_VMEManager->SetRemotePort(remoteFile.GetPort());
+            m_VMEManager->SetUser(remoteFile.GetUser());
+            m_VMEManager->SetPassword(remoteFile.GetPassword());
+          }
+        }
       }
       else
       {
-        file = mafGetOpenFile(msf_dir, wildc).c_str();
+		    wxString wildc    = _("MAF Storage Format file (*.msf)|*.msf|Compressed file (*.zmsf)|*.zmsf");
+		    wxString msf_dir  = wxGetCwd().c_str();
+        if (file_to_open != NULL)
+        {
+          file = file_to_open;
+        }
+        else
+        {
+          file = mafGetOpenFile(msf_dir, wildc).c_str();
+        }
       }
-		  if(file == "") 
+
+      if(file.IsEmpty())
         return;
 
       if(m_OpManager) m_OpManager->ClearUndoStack();
@@ -858,7 +989,10 @@ void mafLogicWithManagers::OnQuit()
   cppDEL(m_RemoteLogic);
   cppDEL(m_VMEManager);
   cppDEL(m_MaterialChooser);
+// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
   cppDEL(m_InteractionManager);
+#endif
   cppDEL(m_ViewManager);
   cppDEL(m_OpManager);
 
@@ -895,8 +1029,11 @@ void mafLogicWithManagers::VmeSelect(mafEvent& e)	//modified by Paolo 10-9-2003
   if(node != NULL && m_OpManager)
     m_OpManager->OpSelect(node);
     
+// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
   if (m_InteractionManager)
     m_InteractionManager->VmeSelected(node);
+#endif
 
   if(m_RemoteLogic && (e.GetSender() != m_RemoteLogic) && m_RemoteLogic->IsSocketConnected())
   {
@@ -981,17 +1118,23 @@ void mafLogicWithManagers::VmeRemoving(mafNode *vme)
 void mafLogicWithManagers::OpRunStarting()
 //----------------------------------------------------------------------------
 {
-	EnableMenuAndToolbar(false);
+  EnableMenuAndToolbar(false);
+// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
   if(m_InteractionManager) m_InteractionManager->EnableSelect(false);
-	if(m_SideBar)    m_SideBar->EnableSelect(false);
+#endif
+  if(m_SideBar)    m_SideBar->EnableSelect(false);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OpRunTerminated()
 //----------------------------------------------------------------------------
 {
-	EnableMenuAndToolbar(true);
+  EnableMenuAndToolbar(true);
+// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
   if(m_InteractionManager) 
     m_InteractionManager->EnableSelect(true);
+#endif
   if(m_SideBar)
     m_SideBar->EnableSelect(true);
 }
@@ -1062,10 +1205,14 @@ void mafLogicWithManagers::ViewSelect()
     EnableItem(MENU_FILE_PRINT_SETUP, view != NULL);
     EnableItem(MENU_FILE_PRINT_PAGE_SETUP, view != NULL);
 
+// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
     if (m_InteractionManager)
     {
       m_InteractionManager->ViewSelected(view);
     }
+#endif
+
     if(m_OpManager && !m_OpManager->Running()) 
     {
       // needed to update all the operations that will be enabled on View Creation
@@ -1181,21 +1328,52 @@ void mafLogicWithManagers::HandleException()
   OnQuit();
 }
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::CreateLocalStorage(mafEvent *e)
+void mafLogicWithManagers::CreateStorage(mafEvent *e)
 //----------------------------------------------------------------------------
 {
-  mafVMEStorage *storage;
-  storage = (mafVMEStorage *)e->GetMafObject();
-  if (storage)
+  if (m_ApplicationSettings->UseRemoteStorage())
   {
-    m_VMEManager->NotifyRemove(storage->GetRoot());
-    storage->Delete();
+    mafString cache_folder = m_ApplicationSettings->GetCacheFolder();
+    if (!wxDirExists(cache_folder.GetCStr()))
+    {
+      wxMkdir(cache_folder.GetCStr());
+    }
+    mafRemoteStorage *storage;
+    storage = (mafRemoteStorage *)e->GetMafObject();
+    if (storage)
+    {
+      m_VMEManager->NotifyRemove(storage->GetRoot());
+      storage->Delete();
+    }
+    storage = mafRemoteStorage::New();
+    storage->SetLocalCacheFolder(cache_folder);
+    
+    //set default values for remote connection
+    storage->SetHostName(m_ApplicationSettings->GetRemoteHostName());
+    storage->SetRemotePort(m_ApplicationSettings->GetRemotePort());
+    storage->SetUsername(m_ApplicationSettings->GetUserName());
+    storage->SetPassword(m_ApplicationSettings->GetPassword());
+    
+    storage->GetRoot()->SetName("root");
+    storage->SetListener(m_VMEManager);
+    storage->GetRoot()->Initialize();
+    e->SetMafObject(storage);
   }
-  storage = mafVMEStorage::New();
-  storage->GetRoot()->SetName("root");
-  storage->SetListener(m_VMEManager);
-  storage->GetRoot()->Initialize();
-  e->SetMafObject(storage);
+  else
+  {
+    mafVMEStorage *storage;
+    storage = (mafVMEStorage *)e->GetMafObject();
+    if (storage)
+    {
+      m_VMEManager->NotifyRemove(storage->GetRoot());
+      storage->Delete();
+    }
+    storage = mafVMEStorage::New();
+    storage->GetRoot()->SetName("root");
+    storage->SetListener(m_VMEManager);
+    storage->GetRoot()->Initialize();
+    e->SetMafObject(storage);
+  }
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::SetExternalViewFlag(bool external)
@@ -1250,3 +1428,4 @@ void mafLogicWithManagers::ImportExternalFile(mafString &filename)
   else
     wxMessageBox(_("Can not import this type of file!"), _("Warning"));
 }
+

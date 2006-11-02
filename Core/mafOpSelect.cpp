@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpSelect.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-22 16:06:50 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-11-02 11:25:50 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,10 +23,12 @@
 #include "mafOpSelect.h"
 #include "mafNode.h"
 #include "mafVMERoot.h"
-#include "mafVMELandmarkCloud.h"
 #include "mafString.h"
-#include "vtkMatrix4x4.h"
-#include "vtkMath.h"
+#ifdef MAF_USE_VTK
+  #include "mafVMELandmarkCloud.h"
+#endif
+//#include "vtkMatrix4x4.h"
+//#include "vtkMath.h"
 
 //initialize the Clipboard
 mafAutoPointer<mafNode>  mafOpEdit::m_Clipboard(NULL); 
@@ -193,7 +195,9 @@ Restore the Clipboard
 Restore the Selection
 */
 {
-	m_Selection = m_Clipboard.GetPointer();
+  m_Selection = m_Clipboard.GetPointer();
+
+#ifdef MAF_USE_VTK
   if (m_SelectionParent->IsMAFType(mafVMELandmarkCloud) && !((mafVMELandmarkCloud *)m_SelectionParent.GetPointer())->IsOpen())
   {
     ((mafVMELandmarkCloud *)m_SelectionParent.GetPointer())->Open();
@@ -204,6 +208,10 @@ Restore the Selection
   {
     m_Selection->ReparentTo(m_SelectionParent);
   }
+#else
+    m_Selection->ReparentTo(m_SelectionParent);
+#endif
+
   if (mafVME::SafeDownCast(m_SelectionParent.GetPointer()))
   {
     ((mafVME *)m_SelectionParent.GetPointer())->GetOutput()->Update();
@@ -300,7 +308,7 @@ bool mafOpPaste::Accept(mafNode* vme)
   if(ClipboardIsEmpty()) return false;
 	if(vme == NULL) return false;
 	mafNode *cv = m_Clipboard.GetPointer();
-  return cv->CanReparentTo(vme) == VTK_OK;
+  return cv->CanReparentTo(vme) == MAF_OK;
 };
 //----------------------------------------------------------------------------
 void mafOpPaste::OpDo()                    

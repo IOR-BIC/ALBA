@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-19 15:29:04 $
-  Version:   $Revision: 1.34 $
+  Date:      $Date: 2006-11-02 11:22:20 $
+  Version:   $Revision: 1.35 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,8 +40,9 @@
 #include "mmgApplicationSettings.h"
 #include "mafWXLog.h"
 #include "mafPics.h"
-#include "mafVTKLog.h"
-
+#ifdef MAF_USE_VTK
+  #include "mafVTKLog.h"
+#endif
 //----------------------------------------------------------------------------
 mafLogicWithGUI::mafLogicWithGUI()
 //----------------------------------------------------------------------------
@@ -136,8 +137,10 @@ void mafLogicWithGUI::CreateMenu()
 void mafLogicWithGUI::CreateNullLog()
 //----------------------------------------------------------------------------
 {
+#ifdef MAF_USE_VTK
   m_VtkLog = mafVTKLog::New();
   m_VtkLog->SetInstance(m_VtkLog);
+#endif  
   wxTextCtrl *log  = new wxTextCtrl( m_Win, -1, "", wxPoint(0,0), wxSize(100,300), wxNO_BORDER | wxTE_MULTILINE );
 	m_Logger = new mafWXLog(log);
 	log->Show(false);
@@ -172,7 +175,9 @@ void mafLogicWithGUI::OnEvent(mafEventBase *maf_event)
       // ###############################################################
       // commands related to the STATUSBAR
     case BIND_TO_PROGRESSBAR:
+#ifdef MAF_USE_VTK
       m_Win->BindToProgressBar(e->GetVtkObj());
+#endif
       break;
     case PROGRESSBAR_SHOW:
       m_Win->ProgressBarShow();
@@ -202,17 +207,20 @@ void mafLogicWithGUI::OnQuit()
   // if OnQuit is redefined in a derived class,  mafLogicWithGUI::OnQuit() must be clalled last
 
   mafYield();
-  if(m_PlugLogbar) delete wxLog::SetActiveTarget(NULL); 
+  if(m_PlugLogbar) delete wxLog::SetActiveTarget(NULL);
+#ifdef MAF_USE_VTK 
   vtkDEL(m_VtkLog);
+#endif
   m_Win->Destroy();
 }
 //----------------------------------------------------------------------------
 void mafLogicWithGUI::CreateLogbar()
 //----------------------------------------------------------------------------
 {
+#ifdef MAF_USE_VTK
   m_VtkLog = mafVTKLog::New();
   m_VtkLog->SetInstance(m_VtkLog);
-
+#endif
   wxTextCtrl *log  = new wxTextCtrl( m_Win, MENU_VIEW_LOGBAR, "", wxPoint(0,0), wxSize(100,300), /*wxNO_BORDER |*/ wxTE_MULTILINE );
   m_Logger = new mafWXLog(log);
   m_Logger->LogToFile(m_LogToFile);
