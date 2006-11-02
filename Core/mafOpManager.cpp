@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-31 09:47:45 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2006-11-02 11:26:57 $
+  Version:   $Revision: 1.23 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,8 +33,6 @@
 #include "mmdMouse.h"
 
 #include "mafNode.h"
-
-#include "vtkMatrix4x4.h"
 
 //------------------------------------------------------------------------------
 // Events
