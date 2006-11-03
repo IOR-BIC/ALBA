@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:52:50 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-11-03 13:24:59 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,7 +28,7 @@ class vtkMatrix4x4;
 
 /** mafMatrix - Time stamped 4x4 Matrix.
   This class defines a TimeStamped 4x4 Matrix class. If MAF has been compiled
-  with VTK support, this class can be used whereever a vtkMatrix4x4 is requested, 
+  with VTK support, this class can be used wherever a vtkMatrix4x4 is requested, 
   and indeed the internal representation is a vtkMatrix4x4. Also GetVTKMatrix() explicitly
   return a vtkMatrix4x4 pointer.
   Also mafMatrix can reference a vtkMatrix4x4, i.e. register it and share the
