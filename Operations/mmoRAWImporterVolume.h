@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterVolume.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:11:57 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-11-03 14:48:47 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -103,6 +103,8 @@ protected:
 	double	m_DataSpacing[3];
 	int			m_FileHeader;
 	int			m_NumberOfByte;
+	bool		m_BuildRectilinearGrid;
+	mafString	m_CoordFile;
   mmgGui *m_GuiSlider;
 
   mafVMEVolumeGray  *m_VolumeGray;
