@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTAImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-19 15:46:36 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-11-03 13:52:49 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -56,7 +56,6 @@
 #include "vtkRenderer.h"
 #include "vtkOutlineFilter.h"
 #include "vtkRGSliceAccumulate.h"
-#include "vtkImageFlip.h"
 
 int compareX(const mmoCTAImporterListElement **arg1,const mmoCTAImporterListElement **arg2);
 int compareY(const mmoCTAImporterListElement **arg1,const mmoCTAImporterListElement **arg2);
@@ -849,11 +848,6 @@ void mmoCTAImporter::ShowSlice(int slice_num)
 	m_DicomReader->Modified();
 	m_DicomReader->Update();
 	
-	vtkMAFSmartPointer<vtkImageFlip> m_Flip;
-	m_Flip->SetFilteredAxis(1);
-	m_Flip->SetInput(m_DicomReader->GetOutput());
-	m_Flip->Update();
-	
 	m_DicomReader->GetSliceLocation(loc);
 	//double bounds[6];
   
@@ -901,7 +895,7 @@ void mmoCTAImporter::ShowSlice(int slice_num)
 
 		vtkMAFSmartPointer<vtkProbeFilter> probe;
     probe->SetInput(clip);
-		probe->SetSource(m_Flip->GetOutput());
+		probe->SetSource(m_DicomReader->GetOutput());
 		probe->Update();
 		probe->GetOutput()->GetBounds(m_DicomBounds);
 		probe->GetOutput()->GetScalarRange(range);
@@ -910,7 +904,7 @@ void mmoCTAImporter::ShowSlice(int slice_num)
 	else 
 	{
     m_DicomReader->GetOutput()->GetScalarRange(range);
-		m_SliceTexture->SetInput(m_Flip->GetOutput());
+		m_SliceTexture->SetInput(m_DicomReader->GetOutput());
 	}
 	
 	m_SliceTexture->Modified();

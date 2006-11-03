@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTMRIImporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-17 09:57:17 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-11-03 13:52:49 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -138,7 +138,6 @@ protected:
 	vtkPolyDataMapper	*m_SliceMapper;
   vtkTexture				*m_SliceTexture;
 	vtkActor					*m_SliceActor;
-	vtkImageData			*m_Flip;
 
 	vtkPlaneSource		*m_CropPlane;
 	vtkActor					*m_CropActor;	

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:12:18 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-11-03 13:52:49 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -123,7 +123,6 @@ protected:
 	vtkPolyDataMapper	*m_SliceMapper;
   vtkTexture				*m_SliceTexture;
 	vtkActor					*m_SliceActor;
-	vtkImageData			*m_Flip;
 
 	vtkPlaneSource		*m_CropPlane;
 	vtkActor					*m_CropActor;	
