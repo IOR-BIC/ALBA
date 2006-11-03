@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeDRR.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-21 07:55:34 $
-  Version:   $Revision: 1.2 $
-  Authors:   Paolo Quadrani
+  Date:      $Date: 2006-11-03 14:17:47 $
+  Version:   $Revision: 1.3 $
+  Authors:   Paolo Quadrani - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -45,7 +45,7 @@ public:
   virtual void OnEvent(mafEventBase *maf_event);
 
   /** IDs for the GUI */
-  enum PIPE_VOLUME_MIP_WIDGET_ID
+  enum PIPE_VOLUME_DRR_WIDGET_ID
   {
     ID_LUT_CHOOSER = Superclass::ID_LAST,
 		ID_VOLUME_COLOR,
@@ -68,20 +68,12 @@ public:
   virtual void Select(bool select); 
 
 protected:
-  /** 
-  Given a color LUT, generate color transfer function and opacity transfer function*/
-  void UpdateMIPFromLUT();
-
   virtual mmgGui  *CreateGui();
 
   vtkLookupTable              *m_ColorLUT;
-  vtkImageCast                *m_Caster;
   vtkPiecewiseFunction        *m_OpacityTransferFunction;
   vtkVolumeProperty           *m_VolumeProperty;
-  //vtkVolumeRayCastMIPFunction *m_MIPFunction;
   vtkXRayVolumeMapper         *m_VolumeMapper;
-  //vtkVolumeRayCastMapper    *m_VolumeMapperLow;
-  //vtkLODProp3D              *m_VolumeLOD;
 	vtkVolume                    *m_Volume;
 	
   vtkActor  *m_SelectionActor;
@@ -90,22 +82,22 @@ protected:
   double  m_VolumePosition[3];
 
 	//----------------------------- volume settings
-	double              m_ExposureCorrection[2];
+	double             m_ExposureCorrection[2];
 	mmgFloatSlider    *m_ExposureCorrectionSlider[2];
-	double              m_Gamma;
+	double             m_Gamma;
 	mmgFloatSlider    *m_GammaSlider;
 	wxColor            m_VolumeColor;
 
 	//----------------------------- image settings
 	wxColor            m_ImageColor;
-	double              m_ImageAngle;
-	double              m_Offset[2];
+	double             m_ImageAngle;
+	double             m_Offset[2];
 
 	//----------------------------- camera settings
-	double              m_CameraAngle;
+	double             m_CameraAngle;
 	double             m_CameraPosition[3];
 	double             m_CameraFocus[3];
-	double              m_CameraRoll;
+	double             m_CameraRoll;
 
 };
 #endif // __medPipeVolumeDRR_H__

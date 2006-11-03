@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeDRR.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-21 07:55:34 $
-  Version:   $Revision: 1.2 $
-  Authors:   Paolo Quadrani
+  Date:      $Date: 2006-11-03 14:17:47 $
+  Version:   $Revision: 1.3 $
+  Authors:   Paolo Quadrani - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -64,7 +64,6 @@ medPipeVolumeDRR::medPipeVolumeDRR()
 :mafPipe()
 //----------------------------------------------------------------------------
 {
-  m_Caster            = NULL;
   m_OpacityTransferFunction = NULL;
   m_VolumeProperty    = NULL;
   m_Volume            = NULL;
@@ -90,171 +89,11 @@ void medPipeVolumeDRR::Create(mafSceneNode *n)
   wxBusyCursor wait;
 
   // image pipeline
-  double sr[2];
-  vtkImageData *image_data = vtkImageData::New();
   m_Vme->GetOutput()->Update();
+  vtkDataSet* data = m_Vme->GetOutput()->GetVTKData();
 
-  mafString vmeControl = m_Vme->GetOutput()->GetVTKData()->GetClassName();
-  if(vmeControl == "vtkStructuredPoints")
-  {
-   image_data = vtkImageData::SafeDownCast(m_Vme->GetOutput()->GetVTKData());
-  }
-  else if (vmeControl == "vtkRectilinearGrid")
-  {
-  wxMessageBox("Resample the RectilinearGrid before Visualizing in DRR View");
-  return;
-
-  double volumeSpacing[3];
-  volumeSpacing[0] = VTK_DOUBLE_MAX;
-  volumeSpacing[1] = VTK_DOUBLE_MAX;
-  volumeSpacing[2] = VTK_DOUBLE_MAX;
-  
-  vtkDataSet *vme_data = ((mafVME *)m_Vme)->GetOutput()->GetVTKData();
-  vtkRectilinearGrid *rgrid = vtkRectilinearGrid::SafeDownCast(vme_data);
-  
-
-  for (int xi = 1; xi < rgrid->GetXCoordinates()->GetNumberOfTuples (); xi++)
-    {
-      double spcx = rgrid->GetXCoordinates()->GetTuple1(xi)-rgrid->GetXCoordinates()->GetTuple1(xi-1);
-      if (volumeSpacing[0] > spcx)
-        volumeSpacing[0] = spcx;
-    }
-    
-    for (int yi = 1; yi < rgrid->GetYCoordinates()->GetNumberOfTuples (); yi++)
-    {
-      double spcy = rgrid->GetYCoordinates()->GetTuple1(yi)-rgrid->GetYCoordinates()->GetTuple1(yi-1);
-      if (volumeSpacing[1] > spcy)
-        volumeSpacing[1] = spcy;
-    }
-
-    for (int zi = 1; zi < rgrid->GetZCoordinates()->GetNumberOfTuples (); zi++)
-    {
-      double spcz = rgrid->GetZCoordinates()->GetTuple1(zi)-rgrid->GetZCoordinates()->GetTuple1(zi-1);
-      if (volumeSpacing[2] > spcz)
-        volumeSpacing[2] = spcz;
-    }
-
-  for(int i = 0; i < 3; i++)
-  {
-   volumeSpacing[i] = fabs(volumeSpacing[i]);
-  }
-
-  m_Vme->GetOutput()->GetBounds(m_VolumeBounds);
-  m_Vme->GetOutput()->GetAbsPose(m_VolumePosition,m_VolumeOrientation);
-
-  mafSmartPointer<mafTransform> box_pose;
-  box_pose->SetOrientation(m_VolumeOrientation);
-  box_pose->SetPosition(m_VolumePosition);
-
-  mafSmartPointer<mafTransformFrame> local_pose;
-  local_pose->SetInput(box_pose);
-  
-  mafSmartPointer<mafTransformFrame> output_to_input;
-  
-  // In a future version if not a "Natural" data the filter should operate in place.
-	mafString new_vme_name = "resampled_";
-	new_vme_name += m_Vme->GetName();
-
-  double w,l,sr[2];
-  for (int i = 0; i < ((mafVMEGenericAbstract *)m_Vme)->GetDataVector()->GetNumberOfItems(); i++)
-  {
-    if (mafVMEItemVTK *input_item = mafVMEItemVTK::SafeDownCast(((mafVMEGenericAbstract *)m_Vme)->GetDataVector()->GetItemByIndex(i)))
-    {
-      if (vtkDataSet *input_data = input_item->GetData())
-      {
-        // the resample filter
-        // the resample filter
-        vtkMAFSmartPointer<vtkVolumeResample> resampler;
-        resampler->SetZeroValue(0);
-
-        // Set the target be vme's parent frame. And Input frame to the root. I've to 
-        // set at each iteration since I'm using the SetMatrix, which doesn't support
-        // transform pipelines.
-        mafSmartPointer<mafMatrix> output_parent_abs_pose;
-        m_Vme->GetParent()->GetOutput()->GetAbsMatrix(*output_parent_abs_pose.GetPointer(),input_item->GetTimeStamp());
-        local_pose->SetInputFrame(output_parent_abs_pose);
-
-        mafSmartPointer<mafMatrix> input_parent_abs_pose;
-        ((mafVME *)m_Vme->GetParent())->GetOutput()->GetAbsMatrix(*input_parent_abs_pose.GetPointer(),input_item->GetTimeStamp());
-        local_pose->SetTargetFrame(input_parent_abs_pose);
-        local_pose->Update();
-
-        mafSmartPointer<mafMatrix> output_abs_pose;
-        m_Vme->GetOutput()->GetAbsMatrix(*output_abs_pose.GetPointer(),input_item->GetTimeStamp());
-        output_to_input->SetInputFrame(output_abs_pose);
-
-        mafSmartPointer<mafMatrix> input_abs_pose;
-        ((mafVME *)m_Vme)->GetOutput()->GetAbsMatrix(*input_abs_pose.GetPointer(),input_item->GetTimeStamp());
-        output_to_input->SetTargetFrame(input_abs_pose);
-        output_to_input->Update();
-
-        double orient_input[3],orient_target[3];
-        mafTransform::GetOrientation(*output_abs_pose.GetPointer(),orient_target);
-        mafTransform::GetOrientation(*input_abs_pose.GetPointer(),orient_input);
-
-        double origin[3];
-        origin[0] = m_VolumeBounds[0];
-        origin[1] = m_VolumeBounds[2];
-        origin[2] = m_VolumeBounds[4];
-
-        output_to_input->TransformPoint(origin,origin);
-
-        resampler->SetVolumeOrigin(origin[0],origin[1],origin[2]);
-
-        vtkMatrix4x4 *mat = output_to_input->GetMatrix().GetVTKMatrix();
-
-        double local_orient[3],local_position[3];
-        mafTransform::GetOrientation(output_to_input->GetMatrix(),local_orient);
-        mafTransform::GetPosition(output_to_input->GetMatrix(),local_position);
-
-        // extract versors
-        double x_axis[3],y_axis[3];
-
-        mafMatrix::GetVersor(0,mat,x_axis);
-        mafMatrix::GetVersor(1,mat,y_axis);
-        
-        resampler->SetVolumeAxisX(x_axis);
-        resampler->SetVolumeAxisY(y_axis);
-        
-        vtkMAFSmartPointer<vtkStructuredPoints> output_data;
-        output_data->SetSpacing(volumeSpacing);
-        // TODO: here I probably should allow a data type casting... i.e. a GUI widget
-        output_data->SetScalarType(input_data->GetPointData()->GetScalars()->GetDataType());
-        
-        
-        input_data->GetScalarRange(sr);
-
-        w = sr[1] - sr[0];
-        l = (sr[1] + sr[0]) * 0.5;
-
-        resampler->SetWindow(w);
-        resampler->SetLevel(l);
-        resampler->SetInput(input_data);
-        resampler->SetOutput(output_data);
-        resampler->AutoSpacingOff();
-        resampler->Update();
-        
-        output_data->SetSource(NULL);
-        output_data->SetOrigin(m_VolumeBounds[0],m_VolumeBounds[2],m_VolumeBounds[4]);
-
-      }
-    }
-  }
-	
-  }
-
-
-
-  assert(image_data);
-  image_data->Update();
-  image_data->GetScalarRange(sr);
-  
-  vtkNEW(m_Caster);
-  m_Caster->SetInput(image_data);
-  m_Caster->SetNumberOfThreads(1);
-  m_Caster->SetOutputScalarType(image_data->GetScalarType());
-  m_Caster->BypassOff();
-  m_Caster->ClampOverflowOff();
+  double sr[2];
+	data->GetScalarRange(sr);
 
   vtkNEW(m_ColorLUT);
   m_ColorLUT->SetTableRange(sr);
@@ -271,7 +110,7 @@ void medPipeVolumeDRR::Create(mafSceneNode *n)
   m_MIPFunction->SetMaximizeMethodToOpacity();*/
 
   vtkNEW(m_VolumeMapper);
-  m_VolumeMapper->SetInput(m_Caster->GetOutput());
+  m_VolumeMapper->SetInput(data);
   //m_VolumeMapper->SetVolumeRayCastFunction(m_MIPFunction);
   m_VolumeMapper->SetCroppingRegionPlanes(0, 1, 0, 1, 0, 1);
 //  m_VolumeMapper->SetImageSampleDistance(1);
@@ -299,14 +138,14 @@ void medPipeVolumeDRR::Create(mafSceneNode *n)
   */
   vtkNEW(m_Volume);
   m_Volume->SetMapper(m_VolumeMapper);
-  m_Volume->PickableOff();
+  m_Volume->PickableOn();
   
   
   m_AssemblyFront->AddPart(m_Volume);
   
   
   vtkMAFSmartPointer<vtkOutlineCornerFilter> selection_filter;
-  selection_filter->SetInput(image_data);  
+  selection_filter->SetInput(data);  
 
   vtkMAFSmartPointer<vtkPolyDataMapper> selection_papper;
   selection_papper->SetInput(selection_filter->GetOutput());
@@ -324,7 +163,7 @@ void medPipeVolumeDRR::Create(mafSceneNode *n)
   m_SelectionActor->SetProperty(selection_property);
   m_SelectionActor->SetScale(1.01,1.01,1.01);
 
-//  m_AssemblyFront->AddPart(m_SelectionActor); // commented to avoid problems on ray cast volume rendering
+  m_AssemblyFront->AddPart(m_SelectionActor); // commented to avoid problems on ray cast volume rendering
 }
 //----------------------------------------------------------------------------
 medPipeVolumeDRR::~medPipeVolumeDRR()
@@ -334,7 +173,6 @@ medPipeVolumeDRR::~medPipeVolumeDRR()
   //m_AssemblyFront->RemovePart(m_SelectionActor);
 
   vtkDEL(m_ColorLUT);
-  vtkDEL(m_Caster);
 //  vtkDEL(m_OpacityTransferFunction);
   vtkDEL(m_VolumeProperty);
   //vtkDEL(m_MIPFunction);
@@ -413,7 +251,6 @@ void medPipeVolumeDRR::OnEvent(mafEventBase *maf_event)
     switch(e->GetId()) 
     {
       case ID_LUT_CHOOSER:
-        UpdateMIPFromLUT();
       break;
 
 			/////
@@ -495,22 +332,4 @@ void medPipeVolumeDRR::OnEvent(mafEventBase *maf_event)
 
 		this->m_Gui->Update();
   }
-}
-//----------------------------------------------------------------------------
-void medPipeVolumeDRR::UpdateMIPFromLUT()
-//----------------------------------------------------------------------------
-{
-  m_OpacityTransferFunction->RemoveAllPoints();
-  int tv = m_ColorLUT->GetNumberOfTableValues();
-  double rgba[4], sr[2],w,p;
-  m_Caster->GetOutput()->GetScalarRange(sr);
-  w = sr[1] - sr[0];
-  for (int v=0;v<tv;v++)
-  {
-    m_ColorLUT->GetTableValue(v,rgba);
-    p = v*w/tv+sr[0];
-    m_OpacityTransferFunction->AddPoint(p,rgba[3]);
-  }
-  m_OpacityTransferFunction->Update();
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
