@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-03 13:24:59 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-11-03 14:53:46 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -56,7 +56,7 @@ public:
 
 #ifdef MAF_USE_VTK
 
-  /** this constractor references the given matrix instead of copying it */
+  /** this constructor references the given matrix instead of copying it */
   mafMatrix(vtkMatrix4x4 *mat);
 
   /** set internal VTK matrix reference to the given pointer */
