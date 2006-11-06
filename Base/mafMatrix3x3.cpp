@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix3x3.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:52:50 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-11-06 11:56:14 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,9 +33,9 @@ mafMatrix3x3::~mafMatrix3x3()
 mafMatrix3x3 &mafMatrix3x3::operator=(const mafMatrix3x3 &mat)
 //------------------------------------------------------------------------------
 {
-  for (int i=0;i<9;i++)
+  for (int i=0;i<3;i++)
   {
-    for (int j=0;j<9;j++)
+    for (int j=0;j<3;j++)
     {
       this->SetElement(i,j,mat.GetElement(i,j));
     }
@@ -268,7 +268,7 @@ void mafMatrix3x3::LUFactor(double A[3][3], int index[3])
 }
 
 //----------------------------------------------------------------------------
-// Backsubsitution with an LU-decomposed matrix.  This is the standard
+// Backsubstitution with an LU-decomposed matrix.  This is the standard
 // LU decomposition, except that the diagonals elements have been inverted.
 void mafMatrix3x3::LUSolve(const double A[3][3], const int index[3], double x[3])
 //----------------------------------------------------------------------------
@@ -457,7 +457,7 @@ int mafMatrix3x3::JacobiN(double **a, int n, double *w, double **v)
     tmp = w[k];
     for (i=j+1; i<n; i++)                // boundary incorrect, shifted already
       {
-      if (w[i] >= tmp)                   // why exchage if same?
+      if (w[i] >= tmp)                   // why exchange if same?
         {
         k = i;
         tmp = w[k];
@@ -477,7 +477,7 @@ int mafMatrix3x3::JacobiN(double **a, int n, double *w, double **v)
     }
   // insure eigenvector consistency (i.e., Jacobi can compute vectors that
   // are negative of one another (.707,.707,0) and (-.707,-.707,0). This can
-  // reek havoc in hyperstreamline/other stuff. We will select the most
+  // reek havoc in hyper streamline/other stuff. We will select the most
   // positive eigenvector.
   int ceil_half_n = (n >> 1) + (n & 1);
   for (j=0; j<n; j++)
@@ -655,7 +655,7 @@ void mafMatrix3x3::Orthogonalize(const double A[3][3], double B[3][3])
   // third column
   index[2] = 2;
 
-  // A quaternian can only describe a pure rotation, not
+  // A quaternion can only describe a pure rotation, not
   // a rotation with a flip, therefore the flip must be
   // removed before the matrix is converted to a quaternion.
   double d = Determinant(B);
@@ -671,7 +671,7 @@ void mafMatrix3x3::Orthogonalize(const double A[3][3], double B[3][3])
 
   // Do orthogonalization using a quaternion intermediate
   // (this, essentially, does the orthogonalization via
-  // diagonalization of an appropriately constructed symmetric
+  // diagonalize of an appropriately constructed symmetric
   // 4x4 matrix rather than by doing SVD of the 3x3 matrix)
   double quat[4];
   MatrixTommuQuaternion(B,quat);
@@ -734,13 +734,13 @@ void mafMatrix3x3::Diagonalize(const double A[3][3], double w[3], double V[3][3]
   // transpose temporarily, it makes it easier to sort the eigenvectors
   mafMatrix3x3::Transpose(V,V);
 
-  // if two eigenvalues are the same, re-orthogonalize to optimally line
+  // if two eigenvalues are the same, re-orthogonalized to optimally line
   // up the eigenvectors with the x, y, and z axes
   for (i = 0; i < 3; i++)
     {
     if (w[(i+1)%3] == w[(i+2)%3]) // two eigenvalues are the same
       {
-      // find maximum element of the independant eigenvector
+      // find maximum element of the independent eigenvector
       maxVal = fabs(V[i][0]);
       maxI = 0;
       for (j = 1; j < 3; j++)
@@ -767,7 +767,7 @@ void mafMatrix3x3::Diagonalize(const double A[3][3], double w[3], double V[3][3]
         V[maxI][2] = -V[maxI][2];
         }
       
-      // re-orthogonalize the other two eigenvectors
+      // re-orthogonalized the other two eigenvectors
       j = (maxI+1)%3;
       k = (maxI+2)%3;
 
@@ -884,7 +884,7 @@ void mafMatrix3x3::SingularValueDecomposition(const double A[3][3],
     }
   }
 
-  // orthogonalize, diagonalize, etc.
+  // orthogonalized, diagonalized, etc.
   mafMatrix3x3::Orthogonalize(B, U);
   mafMatrix3x3::Transpose(B, B);
   mafMatrix3x3::Multiply(B, U, VT);
@@ -900,4 +900,3 @@ void mafMatrix3x3::SingularValueDecomposition(const double A[3][3],
     w[2] = -w[2];
   }
 }
-
