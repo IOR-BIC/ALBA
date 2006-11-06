@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:52:50 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-11-06 11:16:11 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -351,8 +351,8 @@ void mafMatrix::Invert(const double inElements[16], double outElements[16])
   int i, j;
   double det;
 
-  // calculate the 4x4 determinent
-  // if the determinent is zero, 
+  // calculate the 4x4 determinant
+  // if the determinant is zero, 
   // then the inverse matrix is not unique.
 
   det = mafMatrix::Determinant(inElements);
