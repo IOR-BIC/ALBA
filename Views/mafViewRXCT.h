@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-23 19:34:55 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-11-06 15:11:01 $
+  Version:   $Revision: 1.9 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,6 +50,8 @@ public:
 
   /** Remove VME into plugged sub-views*/
   virtual void VmeRemove(mafNode *node);
+
+	virtual void VmeSelect(mafNode *node, bool select);
 
   /** 
   Create visual pipe and initialize them to build an RXCT visualization */

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-26 17:03:44 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-11-06 15:10:45 $
+  Version:   $Revision: 1.17 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -333,7 +333,7 @@ void mafViewRXCT::OnEvent(mafEventBase *maf_event)
             if(m_Snap==1)
               m_Gizmo[i]->SetGizmoModalityToSnap();
             else
-       m_Gizmo[i]->SetGizmoModalityToBound();
+							m_Gizmo[i]->SetGizmoModalityToBound();
           }
         }
       }
@@ -680,4 +680,29 @@ void mafViewRXCT::SetThicknessForAllSurfaceSlices(mafNode *root)
     }
   }
   iter->Delete();
+}
+//----------------------------------------------------------------------------
+void mafViewRXCT::VmeSelect(mafNode *node, bool select)
+//----------------------------------------------------------------------------
+{
+	for(int i=0; i<m_NumOfChildView; i++)
+		m_ChildViewList[i]->VmeSelect(node, select);
+
+	if(m_Gui)
+	{
+		mafPipe *p=((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(0))->GetNodePipe(node);
+		if(node->IsA("mafVMESurface")&&select&&p)
+		{
+			m_Gui->Enable(ID_ALL_SURFACE,true);
+			m_Gui->Enable(ID_BORDER_CHANGE,true);
+			m_Gui->Enable(ID_ADJUST_SLICES,true);
+		}
+		else
+		{
+			m_Gui->Enable(ID_ALL_SURFACE,false);
+			m_Gui->Enable(ID_BORDER_CHANGE,false);
+			m_Gui->Enable(ID_ADJUST_SLICES,false);
+		}
+		m_Gui->Update();
+	}
 }
