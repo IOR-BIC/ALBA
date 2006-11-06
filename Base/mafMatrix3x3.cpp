@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix3x3.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-06 12:32:32 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-11-06 13:23:53 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -185,27 +185,27 @@ void mafMatrix3x3::Invert(const double A[3][3], double AI[3][3])
   double tmp[3][3];
 
   for (int k = 0; k < 3; k++)
-    {
+  {
     AI[k][0] = A[k][0];
     AI[k][1] = A[k][1];
     AI[k][2] = A[k][2];
-    }
+  }
   // invert one column at a time
   mafMatrix3x3::LUFactor(AI,index);
   for (int i = 0; i < 3; i++)
-    {
+  {
     double *x = tmp[i];
     x[0] = x[1] = x[2] = 0.0;
     x[i] = 1.0;
     mafMatrix3x3::LUSolve(AI,index,x);
-    }
+  }
   for (int j = 0; j < 3; j++)
-    {
+  {
     double *x = tmp[j];
     AI[0][j] = x[0];
     AI[1][j] = x[1];
-    AI[2][j] = x[2];      
-    }
+    AI[2][j] = x[2];
+  }
 }
 
 //----------------------------------------------------------------------------
