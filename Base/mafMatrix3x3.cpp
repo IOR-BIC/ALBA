@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix3x3.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-06 11:56:14 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-11-06 12:32:32 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -118,6 +118,23 @@ void mafMatrix3x3::Zero(double elements[9])
   }
 }
 
+//----------------------------------------------------------------------------
+void mafMatrix3x3::MultiplyVector(const float A[3][3], const float in[3], float out[3])
+//----------------------------------------------------------------------------
+{
+  out[0] = A[0][0] * in[0] + A[0][1] * in[1] + A[0][2] * in[2];
+  out[1] = A[1][0] * in[0] + A[1][1] * in[1] + A[1][2] * in[2];
+  out[2] = A[2][0] * in[0] + A[2][1] * in[1] + A[2][2] * in[2];
+}
+
+//----------------------------------------------------------------------------
+void mafMatrix3x3::MultiplyVector(const double A[3][3], const double in[3], double out[3])
+//----------------------------------------------------------------------------
+{
+  out[0] = A[0][0] * in[0] + A[0][1] * in[1] + A[0][2] * in[2];
+  out[1] = A[1][0] * in[0] + A[1][1] * in[1] + A[1][2] * in[2];
+  out[2] = A[2][0] * in[0] + A[2][1] * in[1] + A[2][2] * in[2];
+}
 
 //----------------------------------------------------------------------------
 void mafMatrix3x3::Multiply(const double A[3][3], const double B[3][3],double C[3][3])
