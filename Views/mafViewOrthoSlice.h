@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-26 09:13:29 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-11-06 13:37:14 $
+  Version:   $Revision: 1.17 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -66,6 +66,7 @@ public:
   {
     ID_LUT_CHOOSER = Superclass::ID_LAST,
     ID_SIDE_ORTHO,
+		ID_SNAP,
     ID_LAST
   };
 
@@ -104,6 +105,7 @@ protected:
   vtkLookupTable *m_ColorLUT;
   mafViewSlice *m_Views[4]; ///< Child views
   int	m_Side; ///< change Azimuth of the camera
+	int m_Snap; ///<change modality of gizmo to snap on grid
 
 };
 #endif

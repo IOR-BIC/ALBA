@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-26 17:03:44 $
-  Version:   $Revision: 1.39 $
+  Date:      $Date: 2006-11-06 13:37:14 $
+  Version:   $Revision: 1.40 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -96,6 +96,7 @@ mafViewOrthoSlice::mafViewOrthoSlice(wxString label, bool show_ruler)
   }
 
   m_Side = 0;
+	m_Snap = 0;
 }
 //----------------------------------------------------------------------------
 mafViewOrthoSlice::~mafViewOrthoSlice()
@@ -261,6 +262,26 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
         this->UpdateSlice(gizmoId, p);
       }
       break;
+			case ID_SNAP:
+			{
+				if(this->m_CurrentVolume==NULL && m_Snap)
+				{
+					wxMessageBox("You can't switch to snap modality!");
+					m_Snap=0;
+					m_Gui->Update();
+				}
+				else
+				{
+					for(int i=GIZMO_XN; i<GIZMOS_NUMBER; i++)
+					{
+						if(m_Snap==1)
+							m_Gizmo[i]->SetGizmoModalityToSnap();
+						else
+							m_Gizmo[i]->SetGizmoModalityToBound();
+					}
+				}
+			}
+			break;
       default:
         mafViewCompound::OnEvent(maf_event);
     }
@@ -285,6 +306,8 @@ mmgGui* mafViewOrthoSlice::CreateGui()
   sidesName[0] = "left";
   sidesName[1] = "right";
   // m_Gui->Radio(ID_SIDE_ORTHO, "side", &m_Side, 2, sidesName, 2);
+
+	m_Gui->Bool(ID_SNAP,"Snap on grid",&m_Snap);
 
 
   EnableWidgets(m_CurrentVolume != NULL);
