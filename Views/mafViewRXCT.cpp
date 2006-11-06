@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-06 15:10:45 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2006-11-06 16:06:59 $
+  Version:   $Revision: 1.18 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -538,11 +538,14 @@ void mafViewRXCT::CreateGuiView()
     m_LutSliders[i] = new mmgLutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(10,24));
     //EnableWidgets(m_CurrentVolume != NULL);
     m_LutSliders[i]->SetListener(this);
+		m_LutSliders[i]->SetMinSize(wxSize(500,24));
     lutsSizer->Add(m_LutSliders[i],wxALIGN_CENTER|wxRIGHT);
   }
 
   m_GuiView->Add(lutsSizer);
   m_GuiView->Reparent(m_Win);
+	m_GuiView->FitGui();
+	m_GuiView->Update();
 }
 
 //----------------------------------------------------------------------------
