@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTAImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-03 13:52:49 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-11-06 11:42:53 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -134,7 +134,7 @@ mmoCTAImporter::mmoCTAImporter(wxString label) : mafOp(label)
 	
   m_PatientName	= " ";
 	m_SurgeonName = " ";
-	m_Identifier	= 0;
+	m_Identifier	= " ";
 
   m_SliceText     = NULL;
 	m_SliceScanner	= NULL;
@@ -330,7 +330,7 @@ void mmoCTAImporter::CreateGui()
 	m_Gui->Divider();
 	m_Gui->Label("patient info:",true);		
 	m_Gui->String(ID_PATIENT_NAME,"name ",&m_PatientName);
-	m_Gui->Double(ID_PATIENT_ID,"id ",&m_Identifier);
+	m_Gui->String(ID_PATIENT_ID,"id ",&m_Identifier);
 	m_StudyListbox = m_Gui->ListBox(ID_STUDY,"study id",50);
 	m_Gui->Label("surgeon info:",true);
 	m_Gui->String(ID_SURGEON_NAME,"name ",&m_SurgeonName);
@@ -1171,7 +1171,7 @@ void mmoCTAImporter::	OnEvent(mafEventBase *maf_event)
         {
           patient_id = m_TagArray->GetTag("PatientID");
           p_id = patient_id->GetValueAsDouble();
-          m_Identifier = p_id;
+          m_Identifier = mafString(p_id);
         }
         if (p_name)
           m_PatientName = p_name;

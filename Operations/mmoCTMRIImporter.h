@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTMRIImporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-03 13:52:49 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-11-06 11:47:26 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -179,7 +179,7 @@ protected:
 	int											  m_SideToBeDragged;
 	mafString 							  m_PatientName;
 	mafString                 m_SurgeonName;
-	double									  m_Identifier;
+	mafString									m_Identifier;
 	int												m_DICOMType;
 
   wxTextCtrl   *m_SliceText;
