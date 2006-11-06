@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix3x3.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-19 15:28:57 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-11-06 13:24:46 $
+  Version:   $Revision: 1.7 $
   Authors:   Based on vtkMath code (www.vtk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -88,7 +88,7 @@ public:
 
   /** Invert the 3x3 matrix.*/
   static void Invert(const double A[3][3], double AI[3][3]);
-  void Invert() {GetElements(),GetElements();}
+  void Invert() {mafMatrix3x3::Invert(GetElements(),GetElements());}
   
   /**
    Orthogonalize a 3x3 matrix and put the result in B.  If matrix A
@@ -97,7 +97,7 @@ public:
   static void Orthogonalize(const double A[3][3], double B[3][3]);
   
   /** 
-   Orthogonalize this matrix inplace.  If this matrix 
+   Orthogonalize this matrix in place.  If this matrix 
    has a negative determinant, then the result will be a
    rotation plus a flip i.e. it will have a determinant of -1. */
   void Orthogonalize() {Orthogonalize(GetElements(),GetElements());Modified();}
