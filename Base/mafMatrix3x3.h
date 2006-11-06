@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix3x3.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-06 13:24:46 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-11-06 15:25:48 $
+  Version:   $Revision: 1.8 $
   Authors:   Based on vtkMath code (www.vtk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -84,11 +84,11 @@ public:
 
   /** Transpose the 3x3 matrix.*/
   static void Transpose(const double A[3][3], double AT[3][3]);
-  void Transpose() {Transpose(GetElements(),GetElements());}
+  void Transpose() {Transpose(GetElements(),GetElements());; Modified();}
 
   /** Invert the 3x3 matrix.*/
   static void Invert(const double A[3][3], double AI[3][3]);
-  void Invert() {mafMatrix3x3::Invert(GetElements(),GetElements());}
+  void Invert() {mafMatrix3x3::Invert(GetElements(),GetElements());; Modified();}
   
   /**
    Orthogonalize a 3x3 matrix and put the result in B.  If matrix A
