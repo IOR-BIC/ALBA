@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPicker.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-20 12:08:06 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-11-07 13:23:44 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -147,6 +147,7 @@ void mmiPicker::SendPickingInformation(mafView *v, double *mouse_pos, int msg_id
 
   vtkCellPicker *cellPicker;
   vtkNEW(cellPicker);
+  cellPicker->SetTolerance(0.001);
   if (v)
   {
     mafViewCompound *vc = mafViewCompound::SafeDownCast(v);
