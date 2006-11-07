@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoAddLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-03 13:23:21 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-11-07 14:14:25 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -133,7 +133,7 @@ void mmoAddLandmark::OpRun()
 			m_PickedVme = mafVME::SafeDownCast(m_Input);
 			mafNEW(m_Cloud);
 			m_Cloud->Open();
-			m_Cloud->SetName("new landmark cloud");
+			m_Cloud->SetName(_("new landmark cloud"));
 			m_Cloud->SetRadius(m_PickedVme->GetOutput()->GetVTKData()->GetLength()/60.0);
 			m_Cloud->ReparentTo(m_PickedVme);
 			mafEventMacro(mafEvent(this,VME_SHOW,m_Cloud,true));
@@ -142,12 +142,12 @@ void mmoAddLandmark::OpRun()
 		else if(m_Input->IsMAFType(mafVMELandmark))
 		{
 			// add a new landmark as brother of this one
-			m_Cloud   = (mafVMELandmarkCloud *) ( m_Input->GetParent() );
+			m_Cloud   = (mafVMELandmarkCloud *) m_Input->GetParent();
 			m_PickedVme = mafVME::SafeDownCast(m_Input->GetParent()->GetParent());
 		}
 		else if(m_Input->IsMAFType(mafVMELandmarkCloud))
 		{
-			m_Cloud   = (mafVMELandmarkCloud*) ( m_Input );
+			m_Cloud   = (mafVMELandmarkCloud*)m_Input;
 			m_PickedVme = mafVME::SafeDownCast(m_Input->GetParent());
 		}
 		else
@@ -161,17 +161,17 @@ void mmoAddLandmark::OpRun()
 		m_OldBehavior = m_PickedVme->GetBehavior();
 		m_PickedVme->SetBehavior(m_LandmarkPicker);
 
-		mafString tooltip("If checked, add the landmark to the current time. \nOtherwise add the landmark at time = 0");
+		mafString tooltip(_("If checked, add the landmark to the current time. \nOtherwise add the landmark at time = 0"));
 
 		// setup gui_panel
 		m_GuiPanel = new mmgNamedPanel(mafGetFrame(),-1);
-		m_GuiPanel->SetTitle("Add Landmark:");
+		m_GuiPanel->SetTitle(_("Add Landmark:"));
 
 		// setup splitter
-		mmgSplittedPanel *sp = new mmgSplittedPanel(m_GuiPanel,-1,155);
+		mmgSplittedPanel *sp = new mmgSplittedPanel(m_GuiPanel,-1);
 		m_GuiPanel->Add(sp,1,wxEXPAND);
 
-		// setup dict
+		// setup dictionary
 		m_Dict = new mmgDictionaryWidget(sp,-1);
 		m_Dict->SetListener(this);
 		m_Dict->SetCloud(m_Cloud);
@@ -184,18 +184,18 @@ void mmoAddLandmark::OpRun()
 		// setup Gui
 		m_Gui = new mmgGui(this);
 		m_Gui->SetListener(this);
-		m_Gui->Button(ID_LOAD,"load dictionary");
-		m_Gui->Label("");
-		m_Gui->Label("landmark name");
+		m_Gui->Button(ID_LOAD,_("load dictionary"));
+		m_Gui->Divider();
+		m_Gui->Label(_("landmark name"));
 		m_Gui->String(ID_LM_NAME,"",&m_LandmarkName);
-		m_Gui->Label("");
-		m_Gui->Bool(ID_ADD_TO_CURRENT_TIME,"current time",&m_AddToCurrentTime,0,tooltip);
-		m_Gui->Label("");
-		m_Gui->Label("choose a name from the dictionary");
-		m_Gui->Label("and place landmark by");
-		m_Gui->Label("clicking on the parent surface");
-		m_Gui->Label("");
-		m_Gui->Vector(ID_CHANGE_POSITION, "Position", m_LandmarkPosition,MINFLOAT,MAXFLOAT,2,"landmark position");
+    m_Gui->Divider();
+		m_Gui->Bool(ID_ADD_TO_CURRENT_TIME, _("current time"),&m_AddToCurrentTime,0,tooltip);
+    m_Gui->Divider();
+		m_Gui->Label(_("choose a name from the dictionary"));
+		m_Gui->Label(_("and place landmark by"));
+		m_Gui->Label(_("clicking on the parent surface"));
+    m_Gui->Divider();
+		m_Gui->Vector(ID_CHANGE_POSITION, _("Position"), m_LandmarkPosition,MINFLOAT,MAXFLOAT,2,_("landmark position"));
 		m_Gui->OkCancel();
 		m_Gui->Enable(wxOK, false);
 		
@@ -208,40 +208,39 @@ void mmoAddLandmark::OpRun()
 		if(m_Input->IsMAFType(mafVMELandmark))
 		{
 			// add a new landmark as brother of this one
-			m_Cloud   = (mafVMELandmarkCloud *) ( m_Input->GetParent() );
+			m_Cloud = (mafVMELandmarkCloud *) m_Input->GetParent();
 		}
 		else if(m_Input->IsMAFType(mafVMELandmarkCloud))
 		{
-			m_Cloud   = (mafVMELandmarkCloud*) ( m_Input );
+			m_Cloud = (mafVMELandmarkCloud*) m_Input;
 		}
 		else
 		{
 			mafNEW(m_Cloud);
 			m_Cloud->Open();
-			m_Cloud->SetName("new landmark cloud");
+			m_Cloud->SetName(_("new landmark cloud"));
 			m_Cloud->ReparentTo(m_Input);
 			mafEventMacro(mafEvent(this,VME_SHOW,m_Cloud,true));
 			m_CloudCreatedFlag = true;
 		}
 
-		mafString tooltip("If checked, add the landmark to the current time. \nOtherwise add the landmark at time = 0");
-
+		mafString tooltip(_("If checked, add the landmark to the current time. \nOtherwise add the landmark at time = 0"));
 
 		m_Gui = new mmgGui(this);
 		m_Gui->SetListener(this);
-		m_Gui->Label("");
-		m_Gui->Label("landmark name");
+    m_Gui->Divider();
+		m_Gui->Label(_("landmark name"));
 		m_Gui->String(ID_LM_NAME,"",&m_LandmarkName);
-		m_Gui->Label("");
-		m_Gui->Button(ID_ADD_LANDMARK,"add landmark");
-		m_Gui->Label("");
-		m_Gui->Bool(ID_ADD_TO_CURRENT_TIME,"current time",&m_AddToCurrentTime,0,tooltip);
-		m_Gui->Label("");
-		m_Gui->Label("After Add landmark");
-		m_Gui->Label("Change its position using");
-		m_Gui->Label("the following boxes");
-    m_Gui->Label("");
-		m_Gui->Vector(ID_CHANGE_POSITION, "Set Position", m_LandmarkPosition,MINFLOAT,MAXFLOAT,2,"landmark position");
+    m_Gui->Divider();
+		m_Gui->Button(ID_ADD_LANDMARK,_("add landmark"));
+    m_Gui->Divider();
+		m_Gui->Bool(ID_ADD_TO_CURRENT_TIME,_("current time"),&m_AddToCurrentTime,0,tooltip);
+    m_Gui->Divider();
+		m_Gui->Label(_("After Add landmark"));
+		m_Gui->Label(_("Change its position using"));
+		m_Gui->Label(_("the following boxes"));
+    m_Gui->Divider();
+		m_Gui->Vector(ID_CHANGE_POSITION, _("Set Position"), m_LandmarkPosition,MINFLOAT,MAXFLOAT,2,_("landmark position"));
 		m_Gui->OkCancel();
 		m_Gui->Enable(wxOK, false);
 
@@ -277,8 +276,7 @@ void mmoAddLandmark::OnEvent(mafEventBase *maf_event)
 		  m_LandmarkName = *(e->GetString());
 			if(this->m_Cloud && this->m_Cloud->FindInTreeByName(m_LandmarkName.GetCStr()))
 			{
-				wxString msg("Landmark with that name already exist, Please change it!");
-				wxMessageBox( msg,"Warning", wxOK|wxICON_WARNING , NULL);
+        ExistingLandmarkMessage();
 				m_LandmarkName = "";
 			}
 			m_Gui->Update();
@@ -287,39 +285,41 @@ void mmoAddLandmark::OnEvent(mafEventBase *maf_event)
       case VME_PICKED:
         if(this->m_Cloud && this->m_Cloud->FindInTreeByName(m_LandmarkName.GetCStr()))
         {
-          wxString msg("Landmark with that name already exist, Please change it!");
-          wxMessageBox( msg,"Warning", wxOK|wxICON_WARNING , NULL);
+          ExistingLandmarkMessage();
           m_LandmarkName = "";
           m_Gui->Update();
         }
         else
         {
-          pts = (vtkPoints *)e->GetVtkObj();
-          pts->GetPoint(0,m_LandmarkPosition);
-          AddLandmark(m_LandmarkPosition);
-					m_Gui->Update();
+          pts = vtkPoints::SafeDownCast(e->GetVtkObj());
+          if (pts)
+          {
+            pts->GetPoint(0,m_LandmarkPosition);
+            AddLandmark(m_LandmarkPosition);
+            m_Gui->Update();
+          }
         }
       break;
       case ID_CHANGE_POSITION:
-		  if(this->m_Cloud && this->m_Cloud->FindInTreeByName(m_LandmarkName.GetCStr()))
-		  {
-				mafVMELandmark *landmark = (mafVMELandmark *)this->m_Cloud->FindInTreeByName(m_LandmarkName.GetCStr());
-			  landmark->SetAbsPose(m_LandmarkPosition[0],m_LandmarkPosition[1],m_LandmarkPosition[2],0,0,0);
-				m_Gui->Update();
-				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-		  }
+      {
+        mafVMELandmark *landmark = mafVMELandmark::SafeDownCast(this->m_Cloud->FindInTreeByName(m_LandmarkName.GetCStr()));
+		    if(this->m_Cloud && landmark)
+		    {
+			    landmark->SetAbsPose(m_LandmarkPosition[0],m_LandmarkPosition[1],m_LandmarkPosition[2],0,0,0);
+			    m_Gui->Update();
+			    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+		    }
+      }
       break;
 			case ID_ADD_LANDMARK:
 		  if(this->m_Cloud && !this->m_Cloud->FindInTreeByName(m_LandmarkName.GetCStr()))
 			{
 				AddLandmark(m_LandmarkPosition);
 				m_Gui->Update();
-				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 			}
 			else
 			{
-				wxString msg("Landmark with that name already exist, Please change it!");
-				wxMessageBox( msg,"Warning", wxOK|wxICON_WARNING , NULL);
+        ExistingLandmarkMessage();
 				m_LandmarkName = "";
 				m_Gui->Update();
 			}
@@ -334,15 +334,14 @@ void mmoAddLandmark::OnEvent(mafEventBase *maf_event)
       case ID_LM_NAME:
       if(this->m_Cloud && this->m_Cloud->FindInTreeByName(m_LandmarkName.GetCStr()))
       {
-        wxString msg("Landmark with that name already exist, Please change it!");
-        wxMessageBox( msg,"Warning", wxOK|wxICON_WARNING , NULL);
+        ExistingLandmarkMessage();
         m_LandmarkName = "";
         m_Gui->Update();
       }
       else if(wxString(m_LandmarkName).Find(" ") != -1)
       {
-        wxString msg("Landmark has character space in his name, substitute those space!");
-        wxMessageBox( msg,"Warning", wxOK|wxICON_WARNING , NULL);
+        wxString msg(_("Landmark has character space in his name, substitute those space!"));
+        wxMessageBox(msg, _("Warning"), wxOK|wxICON_WARNING , NULL);
         m_LandmarkName = "";
         m_Gui->Update();
       }
@@ -354,6 +353,13 @@ void mmoAddLandmark::OnEvent(mafEventBase *maf_event)
   }
 }
 //----------------------------------------------------------------------------
+void mmoAddLandmark::ExistingLandmarkMessage()
+//----------------------------------------------------------------------------
+{
+  wxString existing_lm_msg(_("Landmark with that name already exist, Please change it!"));
+  wxMessageBox(existing_lm_msg, _("Warning"), wxOK|wxICON_WARNING , NULL);
+}
+//----------------------------------------------------------------------------
 void mmoAddLandmark::OpStop(int result)
 //----------------------------------------------------------------------------
 {
@@ -361,14 +367,14 @@ void mmoAddLandmark::OpStop(int result)
   {
 		mafEventMacro(mafEvent(this,OP_HIDE_GUI,(wxWindow *)m_GuiPanel));
 		cppDEL(m_Dict);
-		cppDEL(m_GuiPanel)
+		cppDEL(m_GuiPanel);
+    mafDEL(m_LandmarkPicker);
     m_PickedVme->SetBehavior(m_OldBehavior);
 	}
 	else
 	{
 	  HideGui();
 	}
-
 
 	mafEventMacro(mafEvent(this,result));
 }
