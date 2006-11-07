@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-06 11:47:26 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2006-11-07 12:52:42 $
+  Version:   $Revision: 1.14 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -288,7 +288,7 @@ void mmoDICOMImporter::CreateGui()
 	m_DicomDialog = new mmgDialogPreview("dicom importer", mafCLOSEWINDOW | mafRESIZABLE | mafUSEGUI | mafUSERWI);
 	int x_init,y_init;
 	x_init = mafGetFrame()->GetPosition().x;
-	y_init = mafGetFrame()->GetPosition().y;
+	y_init = mafGetFrame()->GetPosition().y-20;
 
 	mafString wildcard = "DICT files (*.dic)|*.dic|All Files (*.*)|*.*";
 
@@ -401,6 +401,11 @@ void mmoDICOMImporter::BuildDicomFileList(const char *dir)
 		wxMessageBox(wxString::Format("Directory <%s> can not be opened",dir),"Warning!!");
 		return;
 	}
+	mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+	//mafProgressBarShowMacro();
+  //mafProgressBarSetTextMacro("Reading CT directory...");
+	long progress = 0;
+
 	// get the dicom files from the directory
 	if(m_DICOM==0)
 		wxBusyInfo wait_info("Reading CT directory: please wait");
@@ -436,37 +441,40 @@ void mmoDICOMImporter::BuildDicomFileList(const char *dir)
 				ct_mode.Trim();
 				if (strcmp( reader->GetModality(), "CT" ) == 0 )
 				{
-				//if (strcmp(reader->GetCTMode(),"SCOUT MODE") == 0 || reader->GetStatus() == -1)
-				if(ct_mode.Find("SCOUT") != -1 || reader->GetStatus() == -1)
-				{
-					reader->Delete();
-					continue;
+					//if (strcmp(reader->GetCTMode(),"SCOUT MODE") == 0 || reader->GetStatus() == -1)
+					if(ct_mode.Find("SCOUT") != -1 || reader->GetStatus() == -1)
+					{
+						reader->Delete();
+						continue;
+					}
+					
+					//row = m_StudyListbox->FindString(reader->GetStudy());
+					row = m_StudyListbox->FindString(reader->GetStudyUID());
+					if (row == -1)
+					{
+						// the study is not present into the listbox, so need to create new
+						// list of files related to the new studyID
+						m_FilesList = new ListDicomFiles;
+						//m_StudyListbox->Append(reader->GetStudy());
+						m_StudyListbox->Append(reader->GetStudyUID());
+						m_StudyListbox->SetClientData(m_NumberOfStudy,(void *)m_FilesList);
+						reader->GetSliceLocation(slice_pos);
+						//mmoDICOMImporterListElement *element = new mmoDICOMImporterListElement(str_tmp,slice_pos);
+						//m_FilesList->Append(element);
+						m_FilesList->Append(new mmoDICOMImporterListElement(str_tmp,slice_pos));
+						m_NumberOfStudy++;
+					}
+					else 
+					{
+						reader->GetSliceLocation(slice_pos);
+						//mmoDICOMImporterListElement *element = new mmoDICOMImporterListElement(str_tmp,SlicePos);
+						//((ListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(element);
+						((ListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new mmoDICOMImporterListElement(str_tmp,slice_pos));
+					}
 				}
-				
-				//row = m_StudyListbox->FindString(reader->GetStudy());
-				row = m_StudyListbox->FindString(reader->GetStudyUID());
-				if (row == -1)
-				{
-					// the study is not present into the listbox, so need to create new
-					// list of files related to the new studyID
-					m_FilesList = new ListDicomFiles;
-					//m_StudyListbox->Append(reader->GetStudy());
-					m_StudyListbox->Append(reader->GetStudyUID());
-					m_StudyListbox->SetClientData(m_NumberOfStudy,(void *)m_FilesList);
-					reader->GetSliceLocation(slice_pos);
-					//mmoDICOMImporterListElement *element = new mmoDICOMImporterListElement(str_tmp,slice_pos);
-					//m_FilesList->Append(element);
-					m_FilesList->Append(new mmoDICOMImporterListElement(str_tmp,slice_pos));
-					m_NumberOfStudy++;
-				}
-				else 
-				{
-					reader->GetSliceLocation(slice_pos);
-					//mmoDICOMImporterListElement *element = new mmoDICOMImporterListElement(str_tmp,SlicePos);
-					//((ListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(element);
-					((ListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new mmoDICOMImporterListElement(str_tmp,slice_pos));
-				}
-				}
+				progress = i * 100 / m_CTDirectoryReader->GetNumberOfFiles();
+				mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+				//mafProgressBarSetValueMacro(progress);
 				reader->Delete();
 			}
 		}
@@ -559,10 +567,15 @@ void mmoDICOMImporter::BuildDicomFileList(const char *dir)
 						((ListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new mmoDICOMImporterListElement(str_tmp,slice_pos,imageNumber,cardNumImages,trigTime));
 					}
 				}
+				progress = i * 100 / m_CTDirectoryReader->GetNumberOfFiles();
+				mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+				//mafProgressBarSetValueMacro(progress);
 				reader->Delete();
 			}
 		}
 	}
+	mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+	//mafProgressBarHideMacro();
 	if(m_NumberOfStudy == 0)
 	{
 		wxString msg = "No study found!";
@@ -676,6 +689,10 @@ void mmoDICOMImporter::BuildVolume()
 	vtkMAFSmartPointer<vtkRGSliceAccumulate> accumulate;
 	accumulate->SetNumberOfSlices(n_slices);
 	accumulate->BuildVolumeOnAxes(m_SortAxes);
+	mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+	//mafProgressBarShowMacro();
+  //mafProgressBarSetTextMacro("Reading CT directory...");
+	long progress = 0;
 	int count,s_count;
 	for (count = 0, s_count = 0; count < m_NumberOfSlices; count += step)
 	{
@@ -683,7 +700,11 @@ void mmoDICOMImporter::BuildVolume()
     ShowSlice(count);
     accumulate->SetSlice(s_count,m_SliceTexture->GetInput());
     s_count++;
+		progress = count * 100 / m_CTDirectoryReader->GetNumberOfFiles();
+		mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+		//mafProgressBarSetValueMacro(progress);
 	}
+	mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
   ImportDicomTags();
   if(m_NumberOfSlices == 1)
   {
