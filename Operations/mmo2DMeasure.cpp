@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmo2DMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:11:57 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-11-07 10:43:32 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -451,9 +451,9 @@ void mmo2DMeasure::OnEvent(mafEventBase *maf_event)
           }
         break;
         case ID_STORE_MEASURE:
-        {
-          while(m_MeasureText == "")
-            m_MeasureText = wxGetTextFromUser(_(""),_("Insert measure description"), _(m_MeasureText));
+        {         
+          m_MeasureText = wxGetTextFromUser(_(""),_("Insert measure description"), _(m_MeasureText));
+          if(m_MeasureText == "") break;
           mafString t;
           if(m_MeasureType == 0 || m_MeasureType == 1)
           {
