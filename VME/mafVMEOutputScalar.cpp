@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-23 13:21:13 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-11-07 12:25:27 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,6 +33,8 @@
 #include "vtkMAFSmartPointer.h"
 #include "vtkPoints.h"
 #include "vtkCellArray.h"
+#include "vtkDoubleArray.h"
+#include "vtkPointData.h"
 #include "vtkPolyData.h"
 #endif
 
@@ -89,6 +91,8 @@ void mafVMEOutputScalar::UpdateVTKRepresentation()
   assert(m_VME);
   mafVMEScalar *scalar_vme = mafVMEScalar::SafeDownCast(m_VME);
   assert(scalar_vme);
+
+  int active_scalar = scalar_vme->GetActiveScalarOnGeometry();
 
   mafScalarInterpolator *scalarInterpolator = (mafScalarInterpolator *)scalar_vme->GetDataPipe();
   scalarInterpolator->Update();
@@ -147,6 +151,26 @@ void mafVMEOutputScalar::UpdateVTKRepresentation()
   double x_coord, y_coord, z_coord;
   vtkMAFSmartPointer<vtkPoints> points;
   vtkMAFSmartPointer<vtkCellArray> verts;
+  vnl_vector<double> vs;
+  vtkMAFSmartPointer<vtkDoubleArray> scalars;
+  scalars->SetNumberOfValues(num_of_points);
+  scalars->SetNumberOfComponents(1);
+  scalars->FillComponent(0,0.0);
+  if (active_scalar > -1)
+  {
+    if (o == mafVMEScalar::ROWS)
+    {
+      active_scalar = active_scalar >= mat.rows() ? mat.rows() - 1 : active_scalar;
+      vs = mat.get_row(active_scalar);
+    }
+    else
+    {
+      active_scalar = active_scalar >= mat.columns() ? mat.columns() - 1 : active_scalar;
+      vs = mat.get_column(active_scalar);
+    }
+    scalar_vme->SetActiveScalarOnGeometry(active_scalar);
+    vs.copy_out((double *)scalars->GetVoidPointer(0));
+  }
   for (int p = 0; p< num_of_points; p++)
   {
     // X coordinate
@@ -200,6 +224,7 @@ void mafVMEOutputScalar::UpdateVTKRepresentation()
 
   m_Polydata->SetPoints(points);
   m_Polydata->SetLines(verts);
+  m_Polydata->GetPointData()->SetScalars(scalars);
   m_Polydata->Modified();
 }
 #endif
