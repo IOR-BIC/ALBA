@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoScalarToSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-23 14:16:16 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-11-07 12:13:18 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,6 +21,8 @@
 
 
 #include "mmoScalarToSurface.h"
+#include <wx/busyinfo.h>
+
 #include "mafDecl.h"
 
 #include "mafVME.h"
@@ -75,6 +77,11 @@ bool mmoScalarToSurface::Accept(mafNode *node)
 void mmoScalarToSurface::OpRun()   
 //----------------------------------------------------------------------------
 {
+  if (!m_TestMode)
+  {
+    wxBusyCursor wait;
+  }
+
   mafString surface_name = m_Input->GetName();
   surface_name += " surface";
   mafNEW(m_Surface);
@@ -101,6 +108,10 @@ void mmoScalarToSurface::OpRun()
   }
   scalar_surface->Update();
   scalar->SetTimeStamp(ts);
+  if (!m_TestMode)
+  {
+    mafEventMacro(mafEvent(this, BIND_TO_PROGRESSBAR,delaunay));
+  }
   delaunay->SetInput(scalar_surface->GetOutput());
   delaunay->Update();
   m_Surface->SetData(delaunay->GetOutput(),ts);
