@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-26 12:03:15 $
-  Version:   $Revision: 1.62 $
+  Date:      $Date: 2006-11-07 14:12:52 $
+  Version:   $Revision: 1.63 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -269,14 +269,7 @@ void mafViewVTK::VmeCreatePipe(mafNode *vme)
 
   if (pipe_name != "")
   {
-    if((vme->IsMAFType(mafVMELandmarkCloud) && ((mafVMELandmarkCloud*)vme)->IsOpen()) || vme->IsMAFType(mafVMELandmark) && m_NumberOfVisibleVme == 1)
-    {
-      m_NumberOfVisibleVme = 1;
-    }
-    else
-    {
-      m_NumberOfVisibleVme++;
-    }
+    m_NumberOfVisibleVme++;
     mafPipeFactory *pipe_factory  = mafPipeFactory::GetInstance();
     assert(pipe_factory!=NULL);
     mafObject *obj = NULL;
@@ -300,7 +293,7 @@ void mafViewVTK::VmeCreatePipe(mafNode *vme)
     }
     else
     {
-      mafErrorMessage("Cannot create visual pipe object of type \"%s\"!",pipe_name.GetCStr());
+      mafErrorMessage(_("Cannot create visual pipe object of type \"%s\"!"),pipe_name.GetCStr());
     }
   }
 }
@@ -308,14 +301,7 @@ void mafViewVTK::VmeCreatePipe(mafNode *vme)
 void mafViewVTK::VmeDeletePipe(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-  if((vme->IsMAFType(mafVMELandmarkCloud) && ((mafVMELandmarkCloud*)vme)->IsOpen()) || vme->IsMAFType(mafVMELandmark) && m_NumberOfVisibleVme == 0)
-  {
-    m_NumberOfVisibleVme = 0;
-  }
-  else
-  {
-    m_NumberOfVisibleVme--;
-  }
+  m_NumberOfVisibleVme--;
   mafSceneNode *n = m_Sg->Vme2Node(vme);
   assert(n && n->m_Pipe);
   cppDEL(n->m_Pipe);
@@ -510,8 +496,9 @@ void mafViewVTK::Print(std::ostream& os, const int tabs)// const
   Superclass::Print(os,tabs);
   mafIndent indent(tabs);
 
-  os << indent << "mafViewVTK" << '\t' << this << "\n";
-  os << indent << "Name" << '\t' << m_Label << "\n";
+  os << indent << "mafViewVTK " << '\t' << this << "\n";
+  os << indent << "Name: " << '\t' << m_Label << "\n";
+  os << indent << "Visible VME counter: " << '\t' << m_NumberOfVisibleVme << "\n";
   
   m_Sg->Print(os, 1);
   os << std::endl;
