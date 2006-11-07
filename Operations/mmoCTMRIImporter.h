@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTMRIImporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-06 11:47:26 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-11-07 09:33:35 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -102,6 +102,9 @@ public:
 	/** Set Type DICOM to read CT/MRI */
 	void SetModality(mafString modality);
 
+	/** Set loading modality */
+	void SetAutoLoad(bool autoLoad){m_AutoLoad = autoLoad;};
+
 protected:
 	/** Build the list of dicom filer recognized. */
 	void BuildDicomFileList(const char *dir);
@@ -164,6 +167,8 @@ protected:
 	// crop mode variables
 	bool											m_CropFlag;
   bool										  m_CropMode;
+
+	bool											m_AutoLoad; ///<If true the importer start from CRIM connection
 
   // build volume mode variables
 	int												m_BuildStepValue;

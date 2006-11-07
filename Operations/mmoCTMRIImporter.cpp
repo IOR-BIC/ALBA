@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTMRIImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-06 11:47:26 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-11-07 09:33:35 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -125,9 +125,9 @@ mmoCTMRIImporter::mmoCTMRIImporter(wxString label) : mafOp(label)
 	if(wxFileExists(dictionary)) 
 		m_DictionaryFilename = dictionary;
 
-	//m_DICOMDir	= mafGetApplicationDirectory().c_str();
-  //m_DICOMDir += "\\Data\\External\\";
-	m_DICOMDir = "";
+	m_DICOMDir	= mafGetApplicationDirectory().c_str();
+  m_DICOMDir += "\\Data\\External\\";
+	//m_DICOMDir = "";
 	m_CurrentSlice			  = 0;
 	m_CurrentTime				  = 0;
   m_BuildStepValue			= 0;
@@ -149,6 +149,7 @@ mmoCTMRIImporter::mmoCTMRIImporter(wxString label) : mafOp(label)
 
 	m_CropMode = false;
 	m_CropFlag = false;
+	m_AutoLoad = false;
 
 	m_FilesList   = NULL;
 	//m_FilesListCineMRI = NULL;
@@ -190,7 +191,7 @@ void mmoCTMRIImporter::OpRun()
 	{
 		m_Gui->Enable(ID_OPEN_DIR,1);
 		m_Gui->Update();
-		if(m_DICOMDir!="")
+		if(m_DICOMDir!="" && m_AutoLoad)
 		{
 			OnEvent(&mafEvent(this, ID_OPEN_DIR));
 			m_Gui->Update();
@@ -1567,9 +1568,13 @@ void mmoCTMRIImporter::SetModality(mafString modality)
 void mmoCTMRIImporter::SetParameters(void *param)
 //----------------------------------------------------------------------------
 {
-	mafString *settings=(mafString*)param;
-	SetModality(settings[0]);
-	SetDirectory(settings[1]);
-	if(m_Gui)
-		m_Gui->Update();
+	if(param)
+	{
+		m_AutoLoad = true;
+		mafString *settings=(mafString*)param;
+		SetModality(settings[0]);
+		SetDirectory(settings[1]);
+		if(m_Gui)
+			m_Gui->Update();
+	}
 }
