@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoAddLandmark.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-03 13:23:21 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-11-07 14:13:39 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -76,6 +76,9 @@ protected:
 
   /** Used in undo to remove the added landmarks*/
   void RemoveLandmark();
+
+  /** Show a message box to inform the user that the added landmark already exists in the tree.*/
+  void ExistingLandmarkMessage();
 
 	int m_AddToCurrentTime;
 
