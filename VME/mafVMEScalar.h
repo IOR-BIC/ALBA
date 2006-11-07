@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEScalar.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-23 13:21:40 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-11-07 12:24:25 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -52,6 +52,7 @@ public:
     ID_TYPE_FOR_Y,
     ID_SCALAR_FOR_Z,
     ID_TYPE_FOR_Z,
+    ID_ACTIVE_SCALAR,
     ID_LAST
   };
 
@@ -69,6 +70,12 @@ public:
 
   /** Compare with another mafVMEScalar. */
   virtual bool Equals(mafVME *vme);
+
+  /** Assign an active scalar to the geometry; by default (-1) no scalar is associated to the geometry.*/
+  void SetActiveScalarOnGeometry(int scalar = -1);
+
+  /** Return the active scalar id assigned to the geometrical representation of the scalar data.*/
+  int GetActiveScalarOnGeometry();
 
   /** Set/Get the scalar array orientation inside the scalar matrix: ROWS or COLUMNS.*/
   void SetScalarArrayOrientation(int o = ROWS);
@@ -145,7 +152,8 @@ protected:
   int m_Ytype;
   int m_Ztype;
 
-  int m_ScalarArrayOrientationInMatrix;
+  int m_ActiveScalar; ///< Active scalar associated to the geometry.
+  int m_ScalarArrayOrientationInMatrix; ///< Say if the scalars are stored in rws or in columns.
 
 private:
   mafVMEScalar(const mafVMEScalar&); // Not implemented

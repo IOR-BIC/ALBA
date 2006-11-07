@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-23 13:21:40 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-11-07 12:24:50 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -51,6 +51,7 @@ mafVMEScalar::mafVMEScalar()
   m_XID = 0;
   m_YID = 0;
   m_ZID = 0;
+  m_ActiveScalar = -1;
 }
 
 //-------------------------------------------------------------------------
@@ -72,7 +73,7 @@ int mafVMEScalar::DeepCopy(mafNode *a)
     this->SetScalarIdForXCoordinate(scalar->GetScalarIdForXCoordinate());
     this->SetScalarIdForYCoordinate(scalar->GetScalarIdForYCoordinate());
     this->SetScalarIdForZCoordinate(scalar->GetScalarIdForZCoordinate());
-
+    this->SetActiveScalarOnGeometry(scalar->GetActiveScalarOnGeometry());
     return MAF_OK;
   }
   return MAF_ERROR;
@@ -91,6 +92,7 @@ bool mafVMEScalar::Equals(mafVME *vme)
           this->m_XID == scalar->GetScalarIdForXCoordinate() && \
           this->m_YID == scalar->GetScalarIdForYCoordinate() && \
           this->m_ZID == scalar->GetScalarIdForZCoordinate() && \
+          this->m_ActiveScalar == scalar->GetActiveScalarOnGeometry() && \
           this->m_ScalarArrayOrientationInMatrix == scalar->GetScalarArrayOrientation();
   }
   return ret;
@@ -140,6 +142,9 @@ mmgGui* mafVMEScalar::CreateGui()
   m_Gui->Combo(ID_TYPE_FOR_Z,_("type"),&m_Ztype,3,type_array);
   m_Gui->Integer(ID_SCALAR_FOR_Z,_("scalar id"),&m_ZID,0,MAXINT,_("Scalar ID associated to the Z coordinate \nof the VTK representation"));
   m_Gui->Divider();
+  m_Gui->Label(_("scalar for geometry."));
+  m_Gui->Integer(ID_ACTIVE_SCALAR,_("scalat id"),&m_ActiveScalar,-1,MAXINT,_("Active scalar to use with geometry;\n -1 means no scalar active."));
+  m_Gui->Divider();
 
   EnableWidgets();
   return m_Gui;
@@ -164,6 +169,7 @@ void mafVMEScalar::OnEvent(mafEventBase *maf_event)
       case ID_SCALAR_FOR_X:
       case ID_SCALAR_FOR_Y:
       case ID_SCALAR_FOR_Z:
+      case ID_ACTIVE_SCALAR:
       break;
       case ID_TYPE_FOR_X:
       case ID_TYPE_FOR_Y:
@@ -191,6 +197,7 @@ int mafVMEScalar::InternalStore(mafStorageElement *parent)
         parent->StoreInteger("Xtype",m_Xtype)==MAF_OK &&
         parent->StoreInteger("Ytype",m_Ytype)==MAF_OK &&
         parent->StoreInteger("Ztype",m_Ztype)==MAF_OK &&
+        parent->StoreInteger("ActiveScalar",m_ActiveScalar)==MAF_OK &&
         parent->StoreInteger("ScalarArrayOrientationInMatrix",m_ScalarArrayOrientationInMatrix)==MAF_OK)
       return MAF_OK;
   }
@@ -208,6 +215,7 @@ int mafVMEScalar::InternalRestore(mafStorageElement *node)
         node->RestoreInteger("Xtype",m_Xtype) == MAF_OK &&
         node->RestoreInteger("Ytype",m_Ytype) == MAF_OK &&
         node->RestoreInteger("Ztype",m_Ztype) == MAF_OK &&
+        node->RestoreInteger("ActiveScalar",m_ActiveScalar)==MAF_OK &&
         node->RestoreInteger("ScalarArrayOrientationInMatrix",m_ScalarArrayOrientationInMatrix) == MAF_OK)
     {
       return MAF_OK;
@@ -227,6 +235,23 @@ void mafVMEScalar::SetScalarArrayOrientation(int o)
   GetScalarOutput()->UpdateVTKRepresentation();
 #endif
   Modified();
+}
+//-------------------------------------------------------------------------
+void mafVMEScalar::SetActiveScalarOnGeometry(int scalar)
+//-------------------------------------------------------------------------
+{
+  if (scalar == m_ActiveScalar)
+  {
+    return;
+  }
+  m_ActiveScalar = scalar < -1 ? -1 : scalar;
+  Modified();
+}
+//-------------------------------------------------------------------------
+int mafVMEScalar::GetActiveScalarOnGeometry()
+//-------------------------------------------------------------------------
+{
+  return m_ActiveScalar;
 }
 //-------------------------------------------------------------------------
 void mafVMEScalar::SetScalarIdForXCoordinate(int id)
