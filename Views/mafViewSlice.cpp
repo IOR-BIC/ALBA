@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-30 09:15:19 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2006-11-07 12:52:18 $
+  Version:   $Revision: 1.23 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -344,7 +344,8 @@ int mafViewSlice::GetNodeStatus(mafNode *vme)
     else if (vme->IsMAFType(mafVMEImage))
     {
       n = m_Sg->Vme2Node(vme);
-      n->m_Mutex = true;
+      //n->m_Mutex = true;
+			n->m_PipeCreatable = false;
     }
   }
 
