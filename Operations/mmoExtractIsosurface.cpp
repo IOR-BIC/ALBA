@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoExtractIsosurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:11:57 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2006-11-07 10:42:14 $
+  Version:   $Revision: 1.15 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -63,6 +63,7 @@
 #include "vtkTexture.h"
 #include "vtkVolumeSlicer.h"
 #include "vtkSmartPointer.h"
+#include "vtkLookupTable.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mmoExtractIsosurface);
@@ -405,7 +406,11 @@ void mmoExtractIsosurface::CreateSlicePipeline()
 	m_VolumeSlicer->Update();
   
   mmaVolumeMaterial *material = ((mafVMEVolume *)m_Input)->GetMaterial();
-  
+	double sr[2];
+	((mafVMEVolume*)m_Input)->GetOutput()->GetVTKData()->GetScalarRange(sr);
+	material->m_ColorLut->SetRange(sr[0],sr[1]);
+	material->UpdateFromTables();
+
   // if the lookup table has not yet been initialized...
   if (material->m_TableRange[1] < material->m_TableRange[0]) 
   {
