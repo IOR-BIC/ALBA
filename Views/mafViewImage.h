@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewImage.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-30 09:15:18 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-11-07 12:51:58 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,7 +37,7 @@ initialize the visual pipe according to the camera position that is passed throu
 class mafViewImage: public mafViewVTK
 {
 public:
-  mafViewImage(wxString label = "Image", int camera_position = CAMERA_CT, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0);
+  mafViewImage(wxString label = "Image", int camera_position = CAMERA_FRONT, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0);
   virtual ~mafViewImage(); 
 
   mafTypeMacro(mafViewImage, mafViewVTK);
