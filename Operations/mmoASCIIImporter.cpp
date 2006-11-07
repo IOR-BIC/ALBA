@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoASCIIImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-20 08:33:44 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-11-07 12:01:04 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,6 +30,8 @@
 #include "mafVMEScalar.h"
 
 #include "mafTagArray.h"
+
+#include <algorithm>
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mmoASCIIImporter);
@@ -159,6 +161,11 @@ int mmoASCIIImporter::ImportASCII()
   m_ScalarData->SetName("scalar");
 
   int import_result = MAF_ERROR;
+
+  if (m_Files.size() > 1)
+  {
+    std::sort(m_Files.begin(),m_Files.end());
+  }
 
   mafASCIIImporterUtility utility;
   for (int t=0; t<m_Files.size(); t++)
