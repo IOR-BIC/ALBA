@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoImageImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-03 13:24:07 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-11-07 12:11:04 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -307,7 +307,7 @@ void mmoImageImporter::BuildVolume()
 
   vtkImageToStructuredPoints *convert = NULL;
 
-  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+  //mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
   
   if(m_FileExtension.Upper() == "BMP")
 	{
@@ -413,7 +413,7 @@ void mmoImageImporter::BuildVolume()
 	else
 		mafLogMessage("unable to import %s, unrecognized type", m_Files[0].c_str());
   
-  mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+  //mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
   if(convert)
   {
     mafNEW(m_ImportedImageAsVolume);
