@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-03 13:20:16 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2006-11-08 13:31:46 $
+  Version:   $Revision: 1.21 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -1170,7 +1170,7 @@ mmgGui* mafVMELandmarkCloud::CreateGui()
   m_Gui->Divider();
   GetRadius(); // Called to update m_Radius var from tag
   m_CloudStateCheckbox = this->IsOpen() ? 1 : 0;
-  m_Gui->Bool(ID_OPEN_CLOSE_CLOUD,"open",&m_CloudStateCheckbox);
+  m_Gui->Bool(ID_OPEN_CLOSE_CLOUD,"Explode",&m_CloudStateCheckbox);
   m_Gui->Double(ID_LM_RADIUS, "radius", &m_Radius, 0.0,MAXDOUBLE,-1);
 
   return m_Gui;
