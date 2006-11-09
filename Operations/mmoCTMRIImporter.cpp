@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTMRIImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-07 09:33:35 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-11-09 16:39:24 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -306,7 +306,7 @@ void mmoCTMRIImporter::CreateGui()
 	m_DicomDialog = new mmgDialogPreview("dicom importer", mafCLOSEWINDOW | mafRESIZABLE | mafUSEGUI | mafUSERWI);
 	int x_init,y_init;
 	x_init = mafGetFrame()->GetPosition().x;
-	y_init = mafGetFrame()->GetPosition().y;
+	y_init = mafGetFrame()->GetPosition().y-20;
 
 	mafString wildcard = "DICT files (*.dic)|*.dic|All Files (*.*)|*.*";
 
@@ -415,6 +415,10 @@ void mmoCTMRIImporter::BuildDicomFileList(const char *dir)
 		wxMessageBox(wxString::Format("Directory <%s> can not be opened",dir),"Warning!!");
 		return;
 	}
+	mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+	//mafProgressBarShowMacro();
+  //mafProgressBarSetTextMacro("Reading CT directory...");
+	long progress = 0;
 	// get the dicom files from the directory
 	if(m_DICOM==0)
 		wxBusyInfo wait_info("Reading CT directory: please wait");
@@ -481,6 +485,9 @@ void mmoCTMRIImporter::BuildDicomFileList(const char *dir)
 						((ListCTMRIFiles *)m_StudyListbox->GetClientData(row))->Append(new mmoCTMRIImporterListElement(str_tmp,slice_pos));
 					}
 				}
+				progress = i * 100 / m_CTDirectoryReader->GetNumberOfFiles();
+				mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+				//mafProgressBarSetValueMacro(progress);
 				reader->Delete();
 			}
 		}
@@ -573,10 +580,15 @@ void mmoCTMRIImporter::BuildDicomFileList(const char *dir)
 						((ListCTMRIFiles *)m_StudyListbox->GetClientData(row))->Append(new mmoCTMRIImporterListElement(str_tmp,slice_pos,imageNumber,cardNumImages,trigTime));
 					}
 				}
+				progress = i * 100 / m_CTDirectoryReader->GetNumberOfFiles();
+				mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+				//mafProgressBarSetValueMacro(progress);
 				reader->Delete();
 			}
 		}
 	}
+	mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+	//mafProgressBarHideMacro();
 	if(m_NumberOfStudy == 0)
 	{
 		wxString msg = "No study found!";
@@ -690,17 +702,22 @@ void mmoCTMRIImporter::BuildVolume()
 	vtkMAFSmartPointer<vtkRGSliceAccumulate> accumulate;
 	accumulate->SetNumberOfSlices(n_slices);
 	accumulate->BuildVolumeOnAxes(m_SortAxes);
+	mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+	//mafProgressBarShowMacro();
+  //mafProgressBarSetTextMacro("Reading CT directory...");
+	long progress = 0;
 	int count,s_count;
 	for (count = 0, s_count = 0; count < m_NumberOfSlices; count += step)
 	{
 		if (s_count == n_slices) {break;}
     ShowSlice(count);
-		double b[6];
-		m_SliceTexture->GetInput()->GetBounds(b);
     accumulate->SetSlice(s_count, m_SliceTexture->GetInput());
     s_count++;
+		progress = count * 100 / m_CTDirectoryReader->GetNumberOfFiles();
+		mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+		//mafProgressBarSetValueMacro(progress);
 	}
-	
+	mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
   ImportDicomTags();
   if(m_NumberOfSlices == 1)
   {
@@ -849,8 +866,17 @@ void mmoCTMRIImporter::ShowSlice(int slice_num)
 	// switch from m_DicomReader and v_dicom_probe on m_CropFlag
 	if (m_CropFlag) 
 	{
+		double Origin[3];
+		m_DicomReader->GetOutput()->GetOrigin(Origin);
+
 		m_DicomReader->GetOutput()->GetSpacing(spacing);
 		m_CropPlane->GetOutput()->GetBounds(crop_bounds);
+		
+		crop_bounds[0]+=Origin[0];
+		crop_bounds[1]+=Origin[0];
+		crop_bounds[2]+=Origin[1];
+		crop_bounds[3]+=Origin[1];
+		
 		crop_bounds[4] = m_DicomBounds[4];
 		crop_bounds[5] = m_DicomBounds[5];
 
@@ -858,9 +884,7 @@ void mmoCTMRIImporter::ShowSlice(int slice_num)
 			crop_bounds[1] = m_DicomBounds[1];
 		if(crop_bounds[3] > m_DicomBounds[3]) 
 			crop_bounds[3] = m_DicomBounds[3];
-        
-		double Origin[3];
-		m_DicomReader->GetOutput()->GetOrigin(Origin);
+			
 
 		int k = 0;
 		while(k * spacing[0] +Origin[0]<crop_bounds[0])
@@ -909,9 +933,16 @@ void mmoCTMRIImporter::ShowSlice(int slice_num)
 	m_SliceTexture->MapColorScalarsThroughLookupTableOn();
 	m_SliceTexture->SetLookupTable((vtkLookupTable *)m_SliceLookupTable);
 	
-	m_SlicePlane->SetOrigin(m_DicomBounds[0],m_DicomBounds[2],0);
+	double diffx,diffy;
+	diffx=m_DicomBounds[1]-m_DicomBounds[0];
+	diffy=m_DicomBounds[3]-m_DicomBounds[2];
+
+	/*m_SlicePlane->SetOrigin(m_DicomBounds[0],m_DicomBounds[2],0);
 	m_SlicePlane->SetPoint1(m_DicomBounds[1],m_DicomBounds[2],0);
-	m_SlicePlane->SetPoint2(m_DicomBounds[0],m_DicomBounds[3],0);
+	m_SlicePlane->SetPoint2(m_DicomBounds[0],m_DicomBounds[3],0);*/
+	m_SlicePlane->SetOrigin(0,0,0);
+	m_SlicePlane->SetPoint1(diffx,0,0);
+	m_SlicePlane->SetPoint2(0,diffy,0);
 	m_SliceActor->VisibilityOn();
 }
 //----------------------------------------------------------------------------
@@ -1209,16 +1240,42 @@ void mmoCTMRIImporter::	OnEvent(mafEventBase *maf_event)
         m_DicomDialog->GetRWI()->CameraUpdate();
       break;
       case ID_CROP_BUTTON:
+				{
         m_CropFlag = true;
         ShowSlice(m_CurrentSlice);
+				m_CropActor->VisibilityOff();
+				double diffx,diffy,boundsCamera[6];
+				diffx=m_DicomBounds[1]-m_DicomBounds[0];
+				diffy=m_DicomBounds[3]-m_DicomBounds[2];
+				boundsCamera[0]=0.0;
+				boundsCamera[1]=diffx;
+				boundsCamera[2]=0.0;
+				boundsCamera[3]=diffy;
+				boundsCamera[4]=0.0;
+				boundsCamera[5]=0.0;
+
+				m_DicomDialog->GetRWI()->CameraReset(boundsCamera);
         m_DicomDialog->GetRWI()->CameraUpdate();
         m_Gui->Enable(ID_UNDO_CROP_BUTTON,1);
+				}
       break;
       case ID_UNDO_CROP_BUTTON:
+				{
         m_CropFlag = false;
         ShowSlice(m_CurrentSlice);
+				double diffx,diffy,boundsCamera[6];
+				diffx=m_DicomBounds[1]-m_DicomBounds[0];
+				diffy=m_DicomBounds[3]-m_DicomBounds[2];
+				boundsCamera[0]=0.0;
+				boundsCamera[1]=diffx;
+				boundsCamera[2]=0.0;
+				boundsCamera[3]=diffy;
+				boundsCamera[4]=0.0;
+				boundsCamera[5]=0.0;
+				m_DicomDialog->GetRWI()->CameraReset(boundsCamera);
         m_DicomDialog->GetRWI()->CameraUpdate();
         m_Gui->Enable(ID_UNDO_CROP_BUTTON,0);
+				}
       break;
       case ID_BUILDVOLUME_MODE_BUTTON:
         m_CropMode = false;
