@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-20 08:44:16 $
-  Version:   $Revision: 1.36 $
+  Date:      $Date: 2006-11-09 10:43:53 $
+  Version:   $Revision: 1.37 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -260,7 +260,7 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 		m_VolumeBoxActor->SetVisibility(m_ShowVolumeBox);
 		m_VolumeBoxActor->SetScale(1.01);
 
-		m_AssemblyFront->AddPart(m_VolumeBoxActor);
+		m_AssemblyUsed->AddPart(m_VolumeBoxActor);
 		if(m_ShowBounds)
 		{
 			double bounds[6];
@@ -272,7 +272,7 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 			m_Mapper->SetInput(m_Box->GetOutput());
 			vtkNEW(m_Actor);
 			m_Actor->SetMapper(m_Mapper);
-			m_AssemblyFront->AddPart(m_Actor);
+			m_AssemblyUsed->AddPart(m_Actor);
 		}
 
 	/*}
@@ -365,9 +365,9 @@ mafPipeVolumeSlice::~mafPipeVolumeSlice()
 //----------------------------------------------------------------------------
 {
 	if(m_VolumeBoxActor)
-    m_AssemblyFront->RemovePart(m_VolumeBoxActor);
+    m_AssemblyUsed->RemovePart(m_VolumeBoxActor);
 	if(m_Actor)
-		m_AssemblyFront->RemovePart(m_Actor);
+		m_AssemblyUsed->RemovePart(m_Actor);
 
 	for(int i = 0; i<3; i++)
 	{
