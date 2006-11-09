@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-06 16:06:59 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2006-11-09 13:23:51 $
+  Version:   $Revision: 1.19 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -526,26 +526,22 @@ mmgGui* mafViewRXCT::CreateGui()
 void mafViewRXCT::CreateGuiView()
 //----------------------------------------------------------------------------
 {
- 
-
   m_GuiView = new mmgGui(this);
- 
   wxBoxSizer *lutsSizer = new wxBoxSizer(wxHORIZONTAL);
 
   // create three windowing widgets
   for (int i = RX_FRONT_VIEW; i < VIEWS_NUMBER; i++)
   {
     m_LutSliders[i] = new mmgLutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(10,24));
-    //EnableWidgets(m_CurrentVolume != NULL);
     m_LutSliders[i]->SetListener(this);
-		m_LutSliders[i]->SetMinSize(wxSize(500,24));
+		m_LutSliders[i]->SetSize(10,24);
+    m_LutSliders[i]->SetMinSize(wxSize(10,24));
     lutsSizer->Add(m_LutSliders[i],wxALIGN_CENTER|wxRIGHT);
   }
-
   m_GuiView->Add(lutsSizer);
-  m_GuiView->Reparent(m_Win);
 	m_GuiView->FitGui();
 	m_GuiView->Update();
+  m_GuiView->Reparent(m_Win);
 }
 
 //----------------------------------------------------------------------------

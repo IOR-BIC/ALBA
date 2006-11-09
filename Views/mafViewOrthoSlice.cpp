@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-07 12:52:10 $
-  Version:   $Revision: 1.42 $
+  Date:      $Date: 2006-11-09 13:23:51 $
+  Version:   $Revision: 1.43 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -193,15 +193,13 @@ void mafViewOrthoSlice::CreateGuiView()
 //----------------------------------------------------------------------------
 {
   m_GuiView = new mmgGui(this);
-  
-  m_GuiView->Label("");
   m_LutSlider = new mmgLutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
   m_LutSlider->SetListener(this);
   m_LutSlider->SetSize(500,24);
   m_LutSlider->SetMinSize(wxSize(500,24));
-  EnableWidgets(m_CurrentVolume != NULL);
   m_GuiView->Add(m_LutSlider);
   m_GuiView->Reparent(m_Win);
+  EnableWidgets(m_CurrentVolume != NULL);
 }
 //----------------------------------------------------------------------------
 void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
