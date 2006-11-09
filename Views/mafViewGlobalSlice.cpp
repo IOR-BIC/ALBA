@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-31 14:05:20 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-11-09 12:12:35 $
+  Version:   $Revision: 1.7 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,7 +36,7 @@
 #include "mafVMELandmark.h"
 #include "mafVMEVolume.h"
 
-#include "vtkPropPicker.h"
+#include "vtkCellPicker.h"
 #include "vtkRayCast3DPicker.h"
 #include "vtkDataSet.h"
 #include "vtkPolyData.h"
@@ -145,6 +145,7 @@ void mafViewGlobalSlice::Create()
 
   vtkNEW(m_Picker3D);
   vtkNEW(m_Picker2D);
+  m_Picker2D->SetTolerance(0.001);
   m_Picker2D->InitializePickList();
 
 	m_Text = "";

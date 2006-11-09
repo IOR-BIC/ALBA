@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewImage.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-30 09:15:18 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-11-09 12:12:35 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,7 +35,7 @@
 
 #include "vtkDataSet.h"
 #include "vtkRayCast3DPicker.h"
-#include "vtkPropPicker.h"
+#include "vtkCellPicker.h"
 #include "vtkPlaneSource.h"
 #include "vtkOutlineFilter.h"
 #include "vtkCoordinate.h"

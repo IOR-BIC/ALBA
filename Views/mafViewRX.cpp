@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRX.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-20 08:30:46 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-11-09 12:12:35 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,7 +35,7 @@
 
 #include "vtkDataSet.h"
 #include "vtkRayCast3DPicker.h"
-#include "vtkPropPicker.h"
+#include "vtkCellPicker.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewRX);
@@ -79,6 +79,7 @@ void mafViewRX::Create()
 
   vtkNEW(m_Picker3D);
   vtkNEW(m_Picker2D);
+  m_Picker2D->SetTolerance(0.001);
   m_Picker2D->InitializePickList();
 }
 //----------------------------------------------------------------------------
