@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDockManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-12 10:01:33 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-11-09 17:52:17 $
+  Version:   $Revision: 1.4 $
   Authors:   Benjamin I. Williams
 ==========================================================================
   Copyright:   (C) Copyright 2005, Kirix Corporation, All Rights Reserved.
@@ -3450,6 +3450,7 @@ void wxFrameManager::OnFloatingPaneClosed(wxWindow* wnd)
     pane.window->Reparent(m_frame);
     pane.frame = NULL;
     pane.Hide();
+    Update(); // Paolo 09/11/2006 bug fix to update the check into the MenuBar
 }
 
 void wxFrameManager::OnFloatingPaneActivated(wxWindow* wnd)
@@ -3481,8 +3482,9 @@ void wxFrameManager::Render(wxDC* dc)
         wxDockUIPart& part = m_uiparts.Item(i);
 
         // don't draw hidden pane items
-        if (part.sizer_item && !part.sizer_item->IsShown())
-            continue;
+        //if (part.sizer_item && !part.sizer_item->IsShown())
+        if (part.pane && !part.pane->IsShown()) // Paolo 09/11/2006: bug fix on quit application
+            continue;                           // with floating panels: avoid crashes
         
         switch (part.type)
         {
