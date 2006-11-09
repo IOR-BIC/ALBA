@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-20 08:51:27 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-11-09 17:58:23 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,12 +35,11 @@
 #include "vtkMAFAssembly.h"
 #include "vtkRenderer.h"
 
-#include "vtkSphereSource.h"
-#include "vtkGlyph3D.h"
-#include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkTextProperty.h"
+#include "vtkCubeAxesActor2D.h"
+#include "vtkPolyData.h"
 #include "vtkActor.h"
-#include "vtkLookupTable.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeScalar);
@@ -51,11 +50,8 @@ mafPipeScalar::mafPipeScalar()
 :mafPipe()
 //----------------------------------------------------------------------------
 {
-  m_Radius  = 5.0;
-  m_Sphere  = NULL;
-  m_Glyph   = NULL;
-  m_Mapper  = NULL;
-  m_Actor   = NULL;
+  m_CubeAxes  = NULL;
+  m_Actor     = NULL;
 }
 //----------------------------------------------------------------------------
 void mafPipeScalar::Create(mafSceneNode *n)
@@ -65,36 +61,42 @@ void mafPipeScalar::Create(mafSceneNode *n)
   
   m_Selected = false;
 
-  mafVMEScalar *scalar = mafVMEScalar::SafeDownCast(m_Vme);
-  assert(scalar);
+  vtkDataSet *ds = m_Vme->GetOutput()->GetVTKData();
 
-  vtkDataSet *ds = scalar->GetScalarOutput()->GetVTKData();
-  
-  vtkNEW(m_Sphere);
-  m_Sphere->SetRadius(m_Radius);
+  vtkMAFSmartPointer<vtkTextProperty> tprop;
+  tprop->SetColor(1, 1, 1);
+  tprop->ShadowOn();
 
-  vtkNEW(m_Glyph);
-  m_Glyph->SetInput(ds);
-  m_Glyph->SetSource(m_Sphere->GetOutput());
-  
-  vtkNEW(m_Mapper);
-  m_Mapper->SetInput(m_Glyph->GetOutput());
-  m_Mapper->ScalarVisibilityOn();
+  vtkMAFSmartPointer<vtkPolyDataMapper> mapper;
+  mapper->SetInput((vtkPolyData *)ds);
+  mapper->ScalarVisibilityOn();
+  mapper->SetScalarRange(ds->GetScalarRange());
 
   vtkNEW(m_Actor);
-  m_Actor->SetMapper(m_Mapper);
+  m_Actor->SetMapper(mapper);
 
   m_AssemblyFront->AddPart(m_Actor);
+
+  vtkNEW(m_CubeAxes);
+  m_CubeAxes->SetInput(ds);
+  m_CubeAxes->SetCamera(m_RenFront->GetActiveCamera());
+  m_CubeAxes->SetLabelFormat("%6.4g");
+  m_CubeAxes->SetNumberOfLabels(5);
+  m_CubeAxes->SetFlyModeToOuterEdges();
+  m_CubeAxes->SetFontFactor(0.4);
+  m_CubeAxes->SetAxisTitleTextProperty(tprop);
+  m_CubeAxes->SetAxisLabelTextProperty(tprop);
+
+  m_RenFront->AddActor2D(m_CubeAxes);
 }
 //----------------------------------------------------------------------------
 mafPipeScalar::~mafPipeScalar()
 //----------------------------------------------------------------------------
 {
-  m_AssemblyFront->RemovePart(m_Actor);
+  m_RenFront->RemoveActor2D(m_CubeAxes);
+  vtkDEL(m_CubeAxes);
 
-  vtkDEL(m_Sphere);
-  vtkDEL(m_Glyph);
-  vtkDEL(m_Mapper);
+  m_AssemblyFront->RemovePart(m_Actor);
   vtkDEL(m_Actor);
 }
 //----------------------------------------------------------------------------
@@ -108,7 +110,6 @@ mmgGui *mafPipeScalar::CreateGui()
 //----------------------------------------------------------------------------
 {
   m_Gui = new mmgGui(this);
-  m_Gui->Double(ID_RADIUS,_("radius"),&m_Radius,0.001);
   return m_Gui;
 }
 //----------------------------------------------------------------------------
@@ -120,8 +121,6 @@ void mafPipeScalar::OnEvent(mafEventBase *maf_event)
     switch(e->GetId())
     {
       case ID_RADIUS:
-        m_Sphere->SetRadius(m_Radius);
-        m_Sphere->Update();
       break;
     }
     mafEventMacro(mafEvent(this,CAMERA_UPDATE));

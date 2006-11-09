@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeScalar.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-20 08:51:27 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-11-09 17:58:23 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,9 +17,7 @@
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
-class vtkSphereSource;
-class vtkGlyph3D;
-class vtkPolyDataMapper;
+class vtkCubeAxesActor2D;
 class vtkActor;
 
 //----------------------------------------------------------------------------
@@ -47,12 +45,8 @@ public:
   };
 
 protected:
-  vtkSphereSource   *m_Sphere;
-  vtkGlyph3D        *m_Glyph;
-  vtkPolyDataMapper *m_Mapper;
-  vtkActor          *m_Actor;
-
-  double m_Radius;
+  vtkCubeAxesActor2D *m_CubeAxes;
+  vtkActor *m_Actor;
 
   /** Update visual properties*/
   void UpdateProperty(bool fromTag = false);
