@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-10 11:54:27 $
-  Version:   $Revision: 1.76 $
+  Date:      $Date: 2006-11-10 13:50:09 $
+  Version:   $Revision: 1.77 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -133,7 +133,7 @@ void mafLogicWithManagers::Configure()
       .Caption(wxT("ControlBar"))
       .Right()
       .Layer(2)
-      .MinSize(275,450)
+      .MinSize(240,450)
       .TopDockable(false)
       .BottomDockable(false)
       );
