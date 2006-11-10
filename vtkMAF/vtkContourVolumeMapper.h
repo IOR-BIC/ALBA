@@ -1,57 +1,51 @@
-/*=========================================================================
+/*==============================================================================
 
-  Program:   Visualization Toolkit
-  Module:    $RCSfile: vtkContourVolumeMapper.h,v $
-  Language:  C++
-  Date:      $Date: 
-  Version:   $Revision: 
+Program:   Multimod Application framework RELOADED
+Module:    $RCSfile: vtkContourVolumeMapper.h,v $
+Language:  C++
+Date:      $Date: 2006-11-10 11:57:17 $
+Version:   $Revision: 1.4 $
+Authors:   Alexander Savenko, Nigel McFarlane
 
-
-Copyright (c) 1993-2001 Ken Martin, Will Schroeder, Bill Lorensen 
+================================================================================
+Copyright (c) 2002/2006 University of Bedfordshire, UK (www.beds.ac.uk)
 All rights reserved.
+===============================================================================*/
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+/* DESCRIPTION
+vtkContourVolumeMapper - a mapper for direct rendering of isosurfaces &
+a filter for extracting them.
 
- * Redistributions of source code must retain the above copyright notice,
-   this list of conditions and the following disclaimer.
+vtkContourVolumeMapper performs a direct rendering of isosurfaces and 
+extracts them as polydata objects if requested.
+The input for the class can be either structured points (vtkImageData) or 
+rectilinear grids (vtkRectilinearGrids). The optional output is vtkPolyData object.
+This class can produce two kinds of surfaces: a standard isosurface and a 
+simplified one that is obtained by skipping some of the voxels.
+It is not guaranteed that the simplified model will have the same topology as the original one.
+This mapper uses a special representation (min-max blocks) of the volume to speed up rendering. 
+Additional acceleration is achieved by avoiding recalculation of vertices 
+when the same edge is processed again during next iteration. 
+This also solves the problem of locating identical points - the Achilles' heel 
+of the standard VTK implementation of Marching Cubes algorithm.
+*/
 
- * Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
+/* SEE ALSO
+vtkVolumeMapper vtkContourFilter vtkMarchingCubes
+*/
 
- * Neither name of Ken Martin, Will Schroeder, or Bill Lorensen nor the names
-   of any contributors may be used to endorse or promote products derived
-   from this software without specific prior written permission.
+/* CONTENTS
+namespace vtkContourVolumeMapperNamespace
+class vtkContourVolumeMapper
+class Polyline2D
+class ListOfPolyline2D
+*/
 
- * Modified source versions must be plainly marked as such, and must not be
-   misrepresented as being the original software.
+/* PROGRAM FLOW
+First call EstimateRelevantVolume()
+Then Render()
+*/
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS''
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR CONTRIBUTORS BE LIABLE FOR
-ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-=========================================================================*/
-// .NAME vtkContourVolumeMapper - a mapper for direct rendering of isosurfaces & a filter for extracting them
-
-// .SECTION Description
-// vtkContourVolumeMapper performs a direct rendering of isosurfaces and extracts them as polydata objects if requested.
-// The input for the class can be either structured points (vtkImageData) or rectilinear grids (vtkRectilinearGrids). The optional output is vtkPolyData object.
-// This class can produce two kinds of surfaces: a standard isosurface and a simplified one that is obtained by skipping some of the voxels.
-// It is not guaranteed that the simplified model will have the same topology as the original one.
-// This mapper uses a special representation (min-max blocks) of the volume to speed up rendering. 
-// Additional acceleration is achieved by avoiding recalculation of vertices when the same edge is processed again during next iteration. 
-// This also solves the problem of locating identical points - the Achilles' heel of the standard VTK implementation of Marching Cubes algorithm.
-
-// .SECTION see also
-// vtkVolumeMapper vtkContourFilter vtkMarchingCubes
 
 #ifndef __vtkContourVolumeMapper_h
 #define __vtkContourVolumeMapper_h
@@ -69,219 +63,269 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkMAFConfigure.h"
 
+
+
+//------------------------------------------------------------------------------
+// Forward declarations
+//------------------------------------------------------------------------------
 class Polyline2D;
 class ListOfPolyline2D;
 
+
+
+//------------------------------------------------------------------------------
+// namespace for vtkContourVolumeMapper and related classes
+//------------------------------------------------------------------------------
 namespace vtkContourVolumeMapperNamespace {
+  // Defines block as 8x8x8 cube.  
+  // VoxelBlockSizeLog = 3, VoxelBlockSize = 8, VoxelsInBlock = 8^3
   static const int VoxelBlockSizeLog = 3; 
   static const int VoxelBlockSize = 1 << VoxelBlockSizeLog; 
   static const int VoxelsInBlock = VoxelBlockSize * VoxelBlockSize * VoxelBlockSize; 
-  };
 
+  // define vertices and edges of a cube
+  static const int voxelVertIndicesXYZ[8][3] = {{0, 0, 0}, {1, 0, 0}, { 1, 1, 0}, { 0, 1, 0}, {0, 0, 1}, {1, 0, 1}, { 1, 1, 1}, { 0, 1, 1}};
+  static const int edgeOffsets[12][2] = {{0, 1}, {1, 2}, {3, 2}, {0, 3}, {4, 5}, {5, 6}, {7, 6}, {4, 7}, {0,4}, {1, 5}, {3, 7}, {2, 6} };
+  static const int edgeAxis[12] = {0, 1, 0, 1, 0, 1, 0, 1, 2, 2, 2, 2};
+};
+
+
+
+//------------------------------------------------------------------------------
+// class vtkContourVolumeMapper
+//------------------------------------------------------------------------------
 class VTK_vtkMAF_EXPORT vtkContourVolumeMapper : public vtkVolumeMapper {
-  public:
-    static vtkContourVolumeMapper *New();
-    vtkTypeRevisionMacro(vtkContourVolumeMapper, vtkVolumeMapper);
+public:
+  static vtkContourVolumeMapper *New();
+  vtkTypeRevisionMacro(vtkContourVolumeMapper, vtkVolumeMapper);
 
-    void PrintSelf( ostream& os, vtkIndent index );
-    
-    /**
-    the input should be either vtkImageData or vtkRectilinearGrid*/
-    void  SetInput(vtkDataSet *input);
-    vtkDataSet*  GetInput() { return (vtkDataSet*)vtkVolumeMapper::GetInput(); }
+  void PrintSelf( ostream& os, vtkIndent index );
 
-    // Render the volume
-    void Render(vtkRenderer *ren, vtkVolume *vol);
-    
-    /**
-    Enable or disable multiresolution feature. By default it is enabled*/
-    vtkGetMacro(EnableAutoLOD, int);    
-    void SetEnableAutoLOD(int val) { this->EnableAutoLOD = val; }
-    vtkBooleanMacro(EnableAutoLOD, int);
+  /** The input should be either vtkImageData or vtkRectilinearGrid */
+  void  SetInput(vtkDataSet *input);
+  vtkDataSet*  GetInput() { return (vtkDataSet*)vtkVolumeMapper::GetInput(); }
 
-    /**
-    Enable or disables optimization of produced polydata by eliminating "non-visible" enclosed surfaces from the output.*/
-    vtkGetMacro(EnableContourAnalysis, int);    
-    void SetEnableContourAnalysis(int val) { this->EnableContourAnalysis = val; }
-    vtkBooleanMacro(EnableContourAnalysis, int);
+  /** Render the volume */
+  void Render(vtkRenderer *ren, vtkVolume *vol);
 
-    /**
-    Set/get the threshold for Marching cubes algorithm*/
-    vtkGetMacro(ContourValue, float);    
-    void SetContourValue(float val) { if (this->ContourValue != val) { this->ContourValue = val; this->CacheCreated = false; } }
+  /** Enable or disable multiresolution feature. By default it is enabled */
+  vtkGetMacro(EnableAutoLOD, int);    
+  void SetEnableAutoLOD(int val) { this->EnableAutoLOD = val; }
+  vtkBooleanMacro(EnableAutoLOD, int);
 
-    void Update();
+  /**
+  Enable or disables optimization of produced polydata by eliminating 
+  "non-visible" enclosed surfaces from the output.*/
+  vtkGetMacro(EnableContourAnalysis, int);    
+  void SetEnableContourAnalysis(int val) { this->EnableContourAnalysis = val; }
+  vtkBooleanMacro(EnableContourAnalysis, int);
 
-    /**
-    Checks if the input data is supported*/
-    bool IsDataValid(bool warnings);
+  /** Set/get the threshold for Marching cubes algorithm */
+  vtkGetMacro(ContourValue, float);    
+  void SetContourValue(float val) { if (this->ContourValue != val) { this->ContourValue = val; this->CacheCreated = false; } }
 
-    /**
-    This class can function both as a mapper and as polydata source. The level parameter controls the 
-		resolution of the extracted surface: 0 - original surface, 1- simplified surface.*/
-    vtkPolyData *GetOutput(int level = 0, vtkPolyData *data = NULL);
+  void Update();
 
-    /**
-    Get number of triangles in the extracted surface. This method can be used during extraction too!*/
-    unsigned int GetCurrentNumberOfTriangles() const { return this->CreatedTriangles; }
-    
-    /**
-    This method is useful for initial selection of contour value. If the volume is close to 1 than the surface will contain too much noise.*/
-    float        EstimateRelevantVolume(const double value);
-		
-		/**
-		To set the value of trasparecy*/
-		void SetAlpha(double alpha){m_Alpha=alpha;};
+  /** Checks if the input data is supported */
+  bool IsDataValid(bool warnings);
 
-		void SetMaxScalar(double scalar){m_MAXScalar=scalar;};
+  /**
+  This class can function both as a mapper and as polydata source. The level parameter controls the 
+  resolution of the extracted surface: 0 - original surface, 1- simplified surface.*/
+  vtkPolyData *GetOutput(int level = 0, vtkPolyData *data = NULL);
 
-  protected:
-    vtkContourVolumeMapper();
-    ~vtkContourVolumeMapper();
+  /**
+  Get number of triangles in the extracted surface. This method can be used during extraction too! */
+  unsigned int GetCurrentNumberOfTriangles() const { return this->CreatedTriangles; }
 
-    // rendering methods
-    template <typename DataType> void  RenderMCubes(vtkRenderer *renderer, vtkVolume *volume, const DataType *dataPointer);
-    template <typename DataType> void  CreateMCubes(int level, vtkPolyData *polydata, const DataType *dataPointer);
-    template <typename DataType> float EstimateRelevantVolumeTemplate(const DataType ContourValue);
-    //template <typename DataType> void RenderMSquares(vtkRenderer *renderer, vtkVolume *volume, const DataType *dataPointer);
-    template <typename DataType> bool PrepareAccelerationDataTemplate(const DataType *dataPointer);
-    template <typename DataType> void PrepareContoursTemplate(const int slice, const DataType *imageData);
-    void PrepareContours(const int slice, const void *imageData, ListOfPolyline2D&);
+  /**
+  This is the first function to be called before Render()
+  It is used by mafPipeIsosurface::Create() to set the intial contour to an acceptable value.
+  If the value is close to 1 than the surface will contain too much noise.
+  Calls EstimateRelevantVolumeTemplate() with correct scalar datatype
+  Returns the fraction of blocks which contain the contour. */
+  float EstimateRelevantVolume(const double value);
 
-    void DrawCache(vtkRenderer *renderer, vtkVolume *volume);
+  /** To set the value of transparecy */
+  void SetAlpha(double alpha){m_Alpha=alpha;};
 
-    void InitializeRender(bool setup, vtkRenderer *renderer = NULL, vtkVolume *volume = NULL);
-    void EnableClipPlanes(bool enable);
-  
-    int  GetDataType();
+  void SetMaxScalar(double scalar){m_MAXScalar=scalar;};
 
-    void ReleaseData();
+protected:
+  vtkContourVolumeMapper();
+  ~vtkContourVolumeMapper();
 
-    vtkTimeStamp   BuildTime;
 
-    // statistics
-    int            GetPercentageOfSkippedVoxels() const { return 100.f * this->VoxelsSkipped / (this->VoxelsRendered + this->VoxelsSkipped); }
-    float          GetPercentageOfSkippedBlocks() const { return this->SkippedVoxelBlocks; }
+  /** Marching cubes algorithm - calculate triangles, cache and render */
+  template <typename DataType> void  RenderMCubes(vtkRenderer *renderer, vtkVolume *volume, const DataType *dataPointer);
 
-  private:
-    vtkContourVolumeMapper(const vtkContourVolumeMapper&);  // Not implemented.
-    void operator=(const vtkContourVolumeMapper&);  // Not implemented.
+  /** marching cubes algorithm - calculate triangles and return vtkPolyData */
+  template <typename DataType> void  CreateMCubes(int level, vtkPolyData *polydata, const DataType *dataPointer);
 
-    // min-max block structure
-    int            NumBlocks[3];
-    void          *BlockMinMax; // min - 0, max - 1
-    int            VoxelVertIndicesOffsets[8];
+  /** template corresponding to EstimateRelevantVolume() */
+  template <typename DataType> float EstimateRelevantVolumeTemplate(const DataType ContourValue);
 
-    // parameters of the mapper
-    float          ContourValue;
-    int            EnableAutoLOD;          // shall we use multiresolution?
-    int            EnableContourAnalysis;  // shall we optimize the surface?
-		
-		//to set the alpha parameter
-		double				 m_Alpha;
+  //template <typename DataType> void RenderMSquares(vtkRenderer *renderer, vtkVolume *volume, const DataType *dataPointer);
 
-		double				 m_MAXScalar;
+  /**
+  Set up the acceleration structures.
+  Gets data extents.
+  Calculates coords of every voxel, and offsets between neighbouring voxels.
+  Divides volume into 8x8x8 blocks and calculates the min and max of each block. */
+  template <typename DataType> bool PrepareAccelerationDataTemplate(const DataType *dataPointer);
 
-    // volume info
-    double         DataOrigin[3];
-    double         DataSpacing[3];
-    int            DataDimensions[3];
-    float*         VoxelCoordinates[3];
+  template <typename DataType> void PrepareContoursTemplate(const int slice, const DataType *imageData);
+  void PrepareContours(const int slice, const void *imageData, ListOfPolyline2D&);
 
-    // statistics
-    int            VoxelsRendered;
-    int            VoxelsSkipped;
-    float          SkippedVoxelBlocks;     // 0 - 100 (%)
-    float          TimeToDrawNotOptimized;
-    float          TimeToDrawNotOptimizedCache;
-    int            CreatedTriangles; // valid when CreateMCubes is running
+  /** Initialize OpenGL rendering */
+  void InitializeRender(bool setup, vtkRenderer *renderer = NULL, vtkVolume *volume = NULL);
 
-    // caching
-    bool           CacheCreated;
-    float          PrevContourValue[2];   // 0 - for normal and 1 - for LOD mode
-    unsigned  int  NumberOfTriangles[2];  
-    float         *TriangleCache[2];
-    int            TriangleCacheSize[2]; // in triangles (i.e. 6 floats per triangle)
+  /** OpenGL code to render the triangles */
+  void DrawCache(vtkRenderer *renderer, vtkVolume *volume);
 
-    // helping objects
-    float          ViewportDimensions[2];
-    vtkMatrix4x4  *TransformMatrix;
-    vtkMatrix4x4  *VolumeMatrix;
+  void EnableClipPlanes(bool enable);
 
-    ListOfPolyline2D *Polylines; // This should be a parameter of a method but VStudio have problems with template argument in template function.
+  int  GetDataType();    ///< Return datatype of input scalars
+
+  void ReleaseData();
+
+  vtkTimeStamp   BuildTime;
+
+  // statistics
+  int            GetPercentageOfSkippedVoxels() const { return 100.f * this->VoxelsSkipped / (this->VoxelsRendered + this->VoxelsSkipped); }
+  float          GetPercentageOfSkippedBlocks() const { return this->SkippedVoxelBlocks; }
+
+private:
+  vtkContourVolumeMapper(const vtkContourVolumeMapper&);  // Not implemented.
+  void operator=(const vtkContourVolumeMapper&);          // Not implemented.
+
+  // min-max block structure
+  int            NumBlocks[3];
+  void          *BlockMinMax; // min - 0, max - 1
+  int            VoxelVertIndicesOffsets[8];
+
+  // parameters of the mapper
+  float          ContourValue;
+  int            EnableAutoLOD;          ///< shall we use multiresolution?
+  int            EnableContourAnalysis;  ///< shall we optimize the surface?
+
+  // to set the alpha parameter
+  double         m_Alpha;
+  double         m_MAXScalar;
+
+  // volume info
+  double         DataOrigin[3];
+  double         DataSpacing[3];
+  int            DataDimensions[3];
+  float*         VoxelCoordinates[3];
+
+  // statistics
+  int            VoxelsRendered;
+  int            VoxelsSkipped;
+  float          SkippedVoxelBlocks;    // 0 - 100 (%)
+  float          TimeToDrawNotOptimized;
+  float          TimeToDrawNotOptimizedCache;
+  int            CreatedTriangles;      // valid when CreateMCubes is running
+
+  // caching
+  bool           CacheCreated;
+  float          PrevContourValue[2];   // 0 - for normal and 1 - for LOD mode
+  unsigned  int  NumberOfTriangles[2];  
+  float         *TriangleCache[2];      // pointers to the two caches, 0 for normal, 1 for LOD    
+  unsigned int   TriangleCacheSize[2];  // in triangles (there are 6 floats per vertex, 18 floats per triangle)
+
+  // helping objects
+  float          ViewportDimensions[2];
+  vtkMatrix4x4  *TransformMatrix;
+  vtkMatrix4x4  *VolumeMatrix;
+
+  ListOfPolyline2D *Polylines; // This should be a parameter of a method but VStudio have problems with template argument in template function.
+};
+
+
+
+
+
+//------------------------------------------------------------------------------
+// class Polyline2D
+// these classes are used for optimizing the surface by analysing 2D contours
+//------------------------------------------------------------------------------
+class Polyline2D {
+public:
+
+  /// 2D point with operators for ==, [], const [] and ()
+  struct Point {
+    short xy[2];
+    bool operator ==(const Point& operand) const {
+#ifdef WIN32
+      return *((int*)xy) == *((int*)operand.xy);
+#else
+      return xy[0] == operand.xy[0] && xy[1] == operand.xy[1];
+#endif
+    }
+    short& operator[](int index) { return xy[index]; }
+    const short& operator[](int index) const { return xy[index]; }
+    const short* operator()() const { return this->xy; }
   };
 
+  // vertices
+  int    start;
+  int    end;
+  Point *vertices;
 
-// these classes are used for optimizing the surface by analysing 2D contours
-class Polyline2D {
-  public:
-    
-    struct Point {
-      short xy[2];
-      bool operator ==(const Point& operand) const {
-#ifdef WIN32
-         return *((int*)xy) == *((int*)operand.xy);
-#else
-         return xy[0] == operand.xy[0] && xy[1] == operand.xy[1];
-#endif
-        }
-      short& operator[](int index) { return xy[index]; }
-      const short& operator[](int index) const { return xy[index]; }
+  mutable short bbox[4]; // bounding box
+  mutable bool  updateBoundingBox;
 
-      operator const short*() const { return this->xy; }
-      };
+  float minDistance[2];
+  int   closestPolyline[2];
 
-    // vertices
-    int    start;
-    int    end;
-    Point *vertices;
-    
-    mutable short bbox[4]; // bounding box
-    mutable bool  updateBoundingBox;
 
-    float minDistance[2];
-    int   closestPolyline[2];
-    
+public:
 
-  public:
-    
-    Polyline2D(const Point *line);
-    ~Polyline2D() { if (this->vertices != this->verticesBuffer) delete [] vertices; }
-    
-    int  Length() const   { return this->end -this->start + 1; }
-    bool IsClosed() const { return (this->vertices[this->start] == this->vertices[this->end]); }
+  Polyline2D(const Point *line);
+  ~Polyline2D() { if (this->vertices != this->verticesBuffer) delete [] vertices; }
 
-    // modifying polyline
-    bool AddNextLine(const Point *line);
-    bool Merge(Polyline2D &polyline);
-    void Close();
+  int  Length() const   { return this->end -this->start + 1; }
+  bool IsClosed() const { return (this->vertices[this->start] == this->vertices[this->end]); }
 
-    void UpdateBoundingBox() const;
+  // modifying polyline
+  bool AddNextLine(const Point *line);
+  bool Merge(Polyline2D &polyline);
+  void Close();
 
-    bool IsInsideOf(const Polyline2D *polyline) const;
-    void FindClosestPolyline(int index, int numOfPolylines, Polyline2D* polylines);
-    int  FindSubPolyline(int numOfPolylines, Polyline2D* polylines, float &minDistance);
-    bool SplitPolyline(Polyline2D& subpoly, Polyline2D& newpoly);
+  void UpdateBoundingBox() const;
 
-    void Move(Polyline2D &polyline);
+  bool IsInsideOf(const Polyline2D *polyline) const;
+  void FindClosestPolyline(int index, int numOfPolylines, Polyline2D* polylines);
+  int  FindSubPolyline(int numOfPolylines, Polyline2D* polylines, float &minDistance);
+  bool SplitPolyline(Polyline2D& subpoly, Polyline2D& newpoly);
 
-  protected:
-    int size;
+  void Move(Polyline2D &polyline);
 
-    void Allocate(int newsize);
-    void Reallocate();
+protected:
+  int size;
+
+  void Allocate(int newsize);
+  void Reallocate();
 
 #define VERTICES_BUFFER_SIZE 64
-    Point verticesBuffer[VERTICES_BUFFER_SIZE];
-  }; // class
+  Point verticesBuffer[VERTICES_BUFFER_SIZE];
+};
 
 
+
+
+
+//------------------------------------------------------------------------------
+// class ListOfPolyline2D
+// This is a std::vector of polyline pointers
+//------------------------------------------------------------------------------
 class ListOfPolyline2D : public std::vector<Polyline2D*> {
-  public:
-    void clear();
-    bool IsInside(int x, int y, int polylineLengthThreshold);
-    Polyline2D *FindContour(int x, int y, int polylineLengthThreshold, int distance = 1);
-  };
+public:
+  void clear();                                                ///< Clear the list of polylines
+  bool IsInside(int x, int y, int polylineLengthThreshold);
+  Polyline2D *FindContour(int x, int y, int polylineLengthThreshold, int distance = 1);
+};
 
 #endif
 
