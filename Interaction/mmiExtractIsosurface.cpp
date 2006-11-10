@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiExtractIsosurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-16 15:16:20 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-11-10 11:49:25 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -89,6 +89,8 @@ void mmiExtractIsosurface::OnButtonUp(mafEventInteraction *e)
       OnRightButtonUp();
     break;
   }
+	m_Renderer->GetRenderWindow()->SetDesiredUpdateRate(0.001);
+  m_Renderer->GetRenderWindow()->Render();
 }
 //----------------------------------------------------------------------------
 void mmiExtractIsosurface::PickIsoValue(mafDevice *device)
