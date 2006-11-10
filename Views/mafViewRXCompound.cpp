@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-30 09:15:18 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-11-10 12:28:43 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni , Paolo Quadrani, Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -108,7 +108,7 @@ void mafViewRXCompound::VmeShow(mafNode *node, bool show)
 //----------------------------------------------------------------------------
 {
   for(int i=0; i<VIEWS_NUMBER; i++)
-    m_ChildViewList[i]->VmeShow(node, show);
+    ((mafViewRX *)m_ChildViewList[i])->VmeShow(node, show);
 
   if (node->IsMAFType(mafVMEVolume))
   {
@@ -228,6 +228,9 @@ mmgGui* mafViewRXCompound::CreateGui()
   m_Gui->Divider(1);
   
   EnableWidgets(m_CurrentVolume != NULL);
+
+	for(int i=RX_FRONT_VIEW;i<=RX_SIDE_VIEW;i++)
+		((mafViewRX*)m_ChildViewList[i])->GetGui();
 
   return m_Gui;
 }

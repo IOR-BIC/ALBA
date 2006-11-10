@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-09 13:23:51 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2006-11-10 12:27:55 $
+  Version:   $Revision: 1.20 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -517,6 +517,11 @@ mmgGui* mafViewRXCT::CreateGui()
     m_Gui->Enable(ID_ADJUST_SLICES,false);
   }
 
+	for(int i=RX_FRONT_VIEW;i<=RX_SIDE_VIEW;i++)
+		((mafViewRX *)m_ChildViewList[i]->GetGui());
+	
+	for(int i=0;i<=CT_CHILD_VIEWS_NUMBER;i++)
+		(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetGui());
 
   EnableWidgets(m_CurrentVolume != NULL);
 

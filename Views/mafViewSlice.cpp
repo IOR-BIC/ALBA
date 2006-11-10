@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-09 12:12:35 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2006-11-10 12:28:06 $
+  Version:   $Revision: 1.25 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -506,13 +506,13 @@ void mafViewSlice::UpdateSurfacesList(mafNode *node)
 void mafViewSlice::VmeShow(mafNode *node, bool show)
 //----------------------------------------------------------------------------
 {
-  Superclass::VmeShow(node, show);
-
   if (node->IsMAFType(mafVMEVolume))
   {
     if (show)
     {
-  /*    m_CurrentVolume = mafVMEVolume::SafeDownCast(node);
+			if(m_AttachCamera)
+				m_AttachCamera->SetVme(node);
+		/*m_CurrentVolume = mafVMEVolume::SafeDownCast(node);
       double sr[2],center[3];
       vtkDataSet *data = m_CurrentVolume->GetOutput()->GetVTKData();
       data->Update();
@@ -523,19 +523,25 @@ void mafViewSlice::VmeShow(mafNode *node, bool show)
       vtkNEW(m_ColorLUT);
       m_ColorLUT->SetRange(sr);
       m_ColorLUT->Build();
-      lutPreset(4,m_ColorLUT);
-  */  }
+      lutPreset(4,m_ColorLUT);*/
+	  }
     else
     {
-  /*    m_CurrentVolume->GetEventSource()->RemoveObserver(this);
+			/*  
+			m_CurrentVolume->GetEventSource()->RemoveObserver(this);
       m_CurrentVolume = NULL;
       for(int i=0; i<m_NumOfChildView; i++)
-        ((mafViewSliceLHPBuilder *)m_ChildViewList[i])->UpdateText(0);
-  */  
+      ((mafViewSliceLHPBuilder *)m_ChildViewList[i])->UpdateText(0);
+			*/ 
+			if(m_AttachCamera)
+				m_AttachCamera->SetVme(NULL);
       this->UpdateText(0);
-
     }
+		CameraUpdate();
+    m_Rwi->CameraReset(node);
+    m_Rwi->CameraUpdate();
   }
+	Superclass::VmeShow(node, show);
 
 }
 //----------------------------------------------------------------------------
