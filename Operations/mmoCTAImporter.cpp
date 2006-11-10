@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTAImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-09 16:39:24 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-11-10 12:59:19 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -146,6 +146,7 @@ mmoCTAImporter::mmoCTAImporter(wxString label) : mafOp(label)
 
 	m_CropMode = false;
 	m_CropFlag = false;
+	m_AutoLoad = false;
 
 	m_FilesList   = NULL;
 	//m_FilesListCineMRI = NULL;
@@ -187,7 +188,7 @@ void mmoCTAImporter::OpRun()
 	{
 		m_Gui->Enable(ID_OPEN_DIR,1);
 		m_Gui->Update();
-		if(m_DICOMDir!="")
+		if(m_DICOMDir!="" && this->m_AutoLoad)
 		{
 			OnEvent(&mafEvent(this, ID_OPEN_DIR));
 			m_Gui->Update();
@@ -1597,10 +1598,14 @@ int mmoCTAImporter::GetImageId(int timeId, int heigthId)
 void mmoCTAImporter::SetParameters(void *param)
 //----------------------------------------------------------------------------
 {
-	mafString *settings=(mafString*)param;
-	SetDirectory(settings[0]);
-	if(m_Gui)
-		m_Gui->Update();
+	if(param)
+	{
+		m_AutoLoad = true;
+		mafString *settings=(mafString*)param;
+		SetDirectory(settings[0]);
+		if(m_Gui)
+			m_Gui->Update();
+	}
 }
 //----------------------------------------------------------------------------
 void mmoCTAImporter::SetDirectory(mafString dir)
