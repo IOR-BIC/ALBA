@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgNamedPanel.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-11-10 13:50:47 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,7 +44,7 @@ mmgNamedPanel::mmgNamedPanel( wxWindow* parent,wxWindowID id,bool CloseButton,bo
   m_topsizer = NULL;
   m_lab = NULL; 
 
-  m_col = wxColour(133,162,185);
+  //m_col = wxColour(133,162,185);
   m_col = wxColour(110,150,200);
   //m_col = wxColour(190,190,190);
   //m_col = wxColour(255,255,255);
