@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeProjected.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-12 15:49:23 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-11-10 11:44:31 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -290,7 +290,7 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 
 	m_VolumeBoxActor->SetVisibility(m_Selected);
 
-	m_AssemblyFront->AddPart(m_VolumeBoxActor);
+	m_UsedAssembly->AddPart(m_VolumeBoxActor);
 
   //ghost -  //SIL. 26-5-2003 
 	//create something invisible in the front renderer so that ResetCamera will work
@@ -322,7 +322,7 @@ mafPipeVolumeProjected::~mafPipeVolumeProjected()
 //----------------------------------------------------------------------------
 {
 	if(m_VolumeBoxActor)
-    m_AssemblyFront->RemovePart(m_VolumeBoxActor);
+    m_UsedAssembly->RemovePart(m_VolumeBoxActor);
 	m_UsedAssembly->RemovePart(m_TickActor);
 	m_UsedAssembly->RemovePart(m_RXActor);
   if(m_ghost) 
