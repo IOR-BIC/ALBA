@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpSelect.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-02 11:25:50 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-11-10 11:53:12 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -308,7 +308,7 @@ bool mafOpPaste::Accept(mafNode* vme)
   if(ClipboardIsEmpty()) return false;
 	if(vme == NULL) return false;
 	mafNode *cv = m_Clipboard.GetPointer();
-  return cv->CanReparentTo(vme) == MAF_OK;
+  return cv->CanReparentTo(vme);
 };
 //----------------------------------------------------------------------------
 void mafOpPaste::OpDo()                    
