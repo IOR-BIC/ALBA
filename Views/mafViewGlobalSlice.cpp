@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-09 12:12:35 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-11-10 10:44:49 $
+  Version:   $Revision: 1.8 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -358,9 +358,11 @@ void mafViewGlobalSlice::UpdateSliceParameters()
 	}
 
   double new_bounds[3] = {0.0,0.0,0.0};
+	int index;
   switch(m_ViewIndex)
   {
     case ID_XY:
+			index=2;
 			m_SliceXVector[0] = 1;
 			m_SliceXVector[1] = 0;
 			m_SliceXVector[2] = 0;
@@ -374,6 +376,7 @@ void mafViewGlobalSlice::UpdateSliceParameters()
 				m_SliceOrigin[2] = new_bounds[2];
     break;
     case ID_XZ:
+			index=1;
 			m_SliceXVector[0] = 1;
 			m_SliceXVector[1] = 0;
 			m_SliceXVector[2] = 0;
@@ -387,6 +390,7 @@ void mafViewGlobalSlice::UpdateSliceParameters()
 				m_SliceOrigin[1] = new_bounds[2];
     break;
     case ID_YZ:
+			index=0;
 			m_SliceXVector[0] = 0.0001;
 			m_SliceXVector[1] = 1;
 			m_SliceXVector[2] = 0;
@@ -400,7 +404,7 @@ void mafViewGlobalSlice::UpdateSliceParameters()
 				m_SliceOrigin[0] = new_bounds[2];
     break;
   }
-  m_GlobalSlider->SetRange(new_bounds[0],new_bounds[1],m_SliceOrigin[m_ViewIndex]);
+  m_GlobalSlider->SetRange(new_bounds[0],new_bounds[1],m_SliceOrigin[index]);
 	m_GlobalSlider->Update();
 	m_SliderOldOrigin = m_GlobalSlider->GetValue();
 	m_SliderOrigin = m_GlobalSlider->GetValue();
