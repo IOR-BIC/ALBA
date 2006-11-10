@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2006-11-10 11:45:37 $
-Version:   $Revision: 1.12 $
+Date:      $Date: 2006-11-10 11:56:50 $
+Version:   $Revision: 1.13 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -92,8 +92,7 @@ void mafPipeIsosurface::Create(mafSceneNode *n)
 
   vtkNEW(m_Volume);
   m_Volume->SetMapper(m_ContourMapper);
-  //m_Volume->PickableOff();
-
+  m_Volume->PickableOff();
   m_AssemblyFront->AddPart(m_Volume);
 
 	// selection box
