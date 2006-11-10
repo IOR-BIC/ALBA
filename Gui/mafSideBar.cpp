@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-31 15:36:09 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2006-11-10 11:54:54 $
+  Version:   $Revision: 1.31 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -70,7 +70,7 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener, long sty
     m_VmeOutputPanel = new mmgGuiHolder(vme_notebook,-1,false,true);
     vme_notebook->AddPage(m_VmeOutputPanel,_(" vme output "));
     m_VmePipePanel = new mmgGuiHolder(vme_notebook,-1,false,true);
-    vme_notebook->AddPage(m_VmePipePanel,_(" vme pipe "));
+    vme_notebook->AddPage(m_VmePipePanel,_(" visual props "));
     m_VmePanel = new mmgGuiHolder(vme_notebook,-1,false,true);
     vme_notebook->AddPage(m_VmePanel,_("vme"));
 

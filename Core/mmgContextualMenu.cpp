@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-12 15:07:33 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-11-10 11:54:27 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -103,7 +103,7 @@ void mmgContextualMenu::ShowContextualMenu(wxFrame *child, mafView *view, bool v
 		this->Append(CONTEXTUAL_MENU_DELETE_VME, "Delete");
 		this->Append(CONTEXTUAL_MENU_TRANSFORM, "Transform  \tCtrl+T");
     this->AppendSeparator();
-    this->Append(CONTEXTUAL_MENU_VME_PIPE,"vme pipe");
+    // this->Append(CONTEXTUAL_MENU_VME_PIPE,"visual props");
     this->AppendSeparator();
   }
 	this->Append(CONTEXTUAL_MENU_RENAME_VIEW, "Rename View");

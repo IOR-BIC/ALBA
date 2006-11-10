@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-02 11:24:47 $
-  Version:   $Revision: 1.75 $
+  Date:      $Date: 2006-11-10 11:54:27 $
+  Version:   $Revision: 1.76 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -130,7 +130,7 @@ void mafLogicWithManagers::Configure()
     m_SideBar = new mafSideBar(m_Win,MENU_VIEW_SIDEBAR,this,m_SidebarStyle);
     m_Win->AddDockPane(m_SideBar->m_Notebook , wxPaneInfo()
       .Name("sidebar")
-      .Caption(wxT("SideBar"))
+      .Caption(wxT("ControlBar"))
       .Right()
       .Layer(2)
       .MinSize(275,450)
