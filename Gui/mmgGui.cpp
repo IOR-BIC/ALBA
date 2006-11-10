@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-25 13:34:03 $
-  Version:   $Revision: 1.40 $
+  Date:      $Date: 2006-11-10 13:51:32 $
+  Version:   $Revision: 1.41 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -80,8 +80,10 @@ const int HM	= 2*M;										// horizontal margin        (2)
 const int LH	= 18;											// label/entry height       
 const int BH	= 20;											// button height            
 
-const int LW	= 60;											// label width
-const int EW	= 60;											// entry width  - (was 48)  
+//const int LW	= 60;											// label width
+//const int EW	= 60;											// entry width  - (was 48)  
+const int LW	= 55;											// label width
+const int EW	= 55;											// entry width  - (was 48)  
 const int FW	= LW+LM+EW+HM+EW+HM+EW;		// full width               (304)
 const int DW	= EW+HM+EW+HM+EW;					// Data Width - Full Width without the Label (184)
 
