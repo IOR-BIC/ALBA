@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoExtractIsosurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-07 10:42:14 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2006-11-10 11:52:03 $
+  Version:   $Revision: 1.16 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -64,6 +64,7 @@
 #include "vtkVolumeSlicer.h"
 #include "vtkSmartPointer.h"
 #include "vtkLookupTable.h"
+#include "vtkVolume.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mmoExtractIsosurface);
@@ -204,6 +205,7 @@ void mmoExtractIsosurface::CreateOpDialog()
 	m_Rwi->CameraSet(CAMERA_PERSPECTIVE);
 	//m_Rwi->SetAxesVisibility(true);
   //m_Rwi->SetGridVisibility(false);
+	m_Rwi->m_RenderWindow->SetDesiredUpdateRate(0.0001f);
 	m_Rwi->SetSize(0,0,500,500);
   m_Rwi->m_RenderWindow->AddRenderer(m_PIPRen);
 	m_Rwi->Show(true);
@@ -318,23 +320,33 @@ void mmoExtractIsosurface::CreateVolumePipeline()
   vtkDataSet *dataset = vol_vme->GetVolumeOutput()->GetVTKData();
 	m_ContourVolumeMapper = vtkContourVolumeMapper::New();
 	m_ContourVolumeMapper->SetInput(dataset);
+	m_ContourVolumeMapper->EnableAutoLODOn();
 
 	double min = m_MinDensity;
 	double max = m_MaxDensity;
 
+	double range[2] = {0, 0};
+  dataset->GetScalarRange(range);
+
+  float value = 0.5f * (range[0] + range[1]);
+  while (value < range[1] && m_ContourVolumeMapper->EstimateRelevantVolume(value) > 0.3f)
+    value += 0.05f * (range[1] + range[0]) + 1.f;
+
+	m_IsoValue=value;
 	m_ContourVolumeMapper->SetContourValue(m_IsoValue);
 
-  vtkPolyData *contour = vtkPolyData::New();
+  /*vtkPolyData *contour = vtkPolyData::New();
   m_ContourVolumeMapper->GetOutput(0, contour);
 
   m_ContourMapper = vtkPolyDataMapper::New();
   m_ContourMapper->SetInput(contour);
   m_ContourMapper->ScalarVisibilityOff();
 
-  contour->Delete();
+  contour->Delete();*/
 
-  m_ContourActor = vtkActor::New();
-  m_ContourActor->SetMapper(m_ContourMapper);
+  m_ContourActor = vtkVolume::New();
+  m_ContourActor->SetMapper(m_ContourVolumeMapper);
+	m_ContourActor->PickableOff();
 
   m_Rwi->m_RenFront->AddActor(m_ContourActor);
 
@@ -457,6 +469,12 @@ void mmoExtractIsosurface::CreateSlicePipeline()
   vtkPolyData *contour = vtkPolyData::New();
   m_ContourVolumeMapper->GetOutput(0, contour);
 
+	if(contour==NULL)
+	{
+		wxMessageBox("Operation out of memory");
+		return;
+	}
+
   m_CutterPlane = vtkPlane::New();
   m_CutterPlane->SetOrigin(m_SliceImage->GetOrigin());
   m_CutterPlane->SetNormal(0,0,1);
@@ -488,7 +506,7 @@ void mmoExtractIsosurface::DeleteOpDialog()
   m_Rwi->m_RenFront->RemoveActor(m_ContourActor);
   m_Rwi->m_RenFront->RemoveActor(m_Box);
 
-  vtkDEL(m_ContourMapper);
+	//vtkDEL(m_ContourMapper);
   vtkDEL(m_ContourActor);
   vtkDEL(m_Box);
   vtkDEL(m_ContourVolumeMapper);
@@ -548,7 +566,7 @@ void mmoExtractIsosurface::OnEvent(mafEventBase *maf_event)
         UpdateSurface();
       break;
       case ID_ISO_SLIDER:
-        UpdateSurface(true);
+        UpdateSurface();
       break;
       case ID_INCREASE_ISO:
         if(m_IsoValue<m_MaxDensity) m_IsoValue += m_StepDensity;
@@ -581,7 +599,19 @@ void mmoExtractIsosurface::OnEvent(mafEventBase *maf_event)
       break;
       case ID_VIEW_SLICE:
         if(this->m_ShowSlice)
+				{
+					vtkPolyData *contour=m_ContourVolumeMapper->GetOutput();
+					if(contour==NULL)
+					{
+						wxMessageBox("Operation out of memory");
+					}
+					else
+					{
+						m_IsosurfaceCutter->SetInput(contour);
+						m_IsosurfaceCutter->Update();
+					}
           m_Rwi->m_RenderWindow->AddRenderer(m_PIPRen);
+				}
         else
           m_Rwi->m_RenderWindow->RemoveRenderer(m_PIPRen);
         //m_Dialog->FindItem(ID_SLICE)->Enable(m_ShowSlice != 0);
@@ -623,25 +653,31 @@ void mmoExtractIsosurface::OnEvent(mafEventBase *maf_event)
 void mmoExtractIsosurface::UpdateSurface(bool use_lod)
 //----------------------------------------------------------------------------
 {
-  m_Rwi->m_RenderWindow->SetDesiredUpdateRate(0.001f);
+	m_Rwi->m_RenderWindow->SetDesiredUpdateRate(0.001f);
   if (m_ContourVolumeMapper->GetContourValue() != m_IsoValue) 
 	{
     m_ContourVolumeMapper->SetContourValue(m_IsoValue);
     m_ContourVolumeMapper->Update();
-    vtkPolyData *contour = vtkPolyData::New();
-    m_ContourVolumeMapper->GetOutput(0, contour);
-    m_ContourMapper->SetInput(contour);
+		vtkPolyData *contour = vtkPolyData::New();
+		m_IsosurfaceCutter->SetInput(contour);
+		m_IsosurfaceCutter->Update();
+    //m_ContourMapper->SetInput(contour);
     if (m_ShowSlice)
     {
+			contour=m_ContourVolumeMapper->GetOutput();
+			if(contour==NULL)
+			{
+				m_Rwi->m_RenderWindow->Render();
+				wxMessageBox("Operation out of memory");
+				return;
+			}
       m_IsosurfaceCutter->SetInput(contour);
       m_IsosurfaceCutter->Update();
     }
     contour->Delete();
-    if(use_lod) m_Rwi->m_RenderWindow->SetDesiredUpdateRate(15.0f);
   }
 
   m_Rwi->m_RenderWindow->Render();
-  m_Rwi->m_RenderWindow->SetDesiredUpdateRate(15.f);
 }
 //----------------------------------------------------------------------------
 void mmoExtractIsosurface::UpdateSlice()
@@ -662,8 +698,8 @@ void mmoExtractIsosurface::UpdateSlice()
   m_IsosurfaceCutter->Update();
 
   this->m_PIPRen->ResetCameraClippingRange();
+	m_Rwi->m_RenderWindow->SetDesiredUpdateRate(0.001f);
   m_Rwi->m_RenderWindow->Render();
-  m_Rwi->m_RenderWindow->SetDesiredUpdateRate(15.f);
 }
 //----------------------------------------------------------------------------
 void mmoExtractIsosurface::ExtractSurface(bool clean) 
@@ -676,7 +712,12 @@ void mmoExtractIsosurface::ExtractSurface(bool clean)
 	// IMPORTANT, extract the isosurface from m_ContourVolumeMapper in this way
 	// and then call surface->Delete() when the VME is created
 	vtkPolyData *surface = vtkPolyData::New();
-	m_ContourVolumeMapper->GetOutput(0, surface);
+	surface=m_ContourVolumeMapper->GetOutput();
+	if(surface==NULL)
+	{
+		wxMessageBox("Operation out of memory");
+		return;
+	}
   m_ContourVolumeMapper->Update();
 
   wxString name = wxString::Format( "%s Isosurface %g", m_Input->GetName(),m_IsoValue );
