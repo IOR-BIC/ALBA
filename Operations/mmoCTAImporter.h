@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTAImporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-06 11:42:53 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-11-10 12:59:19 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -158,6 +158,8 @@ protected:
 	// crop mode variables
 	bool											m_CropFlag;
   bool										  m_CropMode;
+
+	bool											m_AutoLoad; ///<If true the importer start from CRIM connection
 
   // build volume mode variables
 	int												m_BuildStepValue;
