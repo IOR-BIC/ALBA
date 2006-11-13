@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-10 10:44:49 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-11-13 21:08:19 $
+  Version:   $Revision: 1.9 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -186,6 +186,17 @@ void mafViewGlobalSlice::VmeSelect(mafNode *node,bool select)
       }
     }
   }
+}
+//----------------------------------------------------------------------------
+void mafViewGlobalSlice::VmeAdd(mafNode *vme)
+//----------------------------------------------------------------------------
+{
+	Superclass::VmeAdd(vme);
+	if(m_GlobalBoundsInitialized)
+	{
+		((mafVME*)vme->GetRoot())->GetOutput()->Get4DBounds(m_GlobalBounds);
+		UpdateSliceParameters();
+	}
 }
 //----------------------------------------------------------------------------
 void mafViewGlobalSlice::VmeCreatePipe(mafNode *node)
