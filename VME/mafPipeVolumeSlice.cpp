@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-09 10:43:53 $
-  Version:   $Revision: 1.37 $
+  Date:      $Date: 2006-11-13 17:45:13 $
+  Version:   $Revision: 1.38 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -256,7 +256,7 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 
 		vtkNEW(m_VolumeBoxActor);
 		m_VolumeBoxActor->SetMapper(m_VolumeBoxMapper);
-
+    m_VolumeBoxActor->PickableOff();
 		m_VolumeBoxActor->SetVisibility(m_ShowVolumeBox);
 		m_VolumeBoxActor->SetScale(1.01);
 
