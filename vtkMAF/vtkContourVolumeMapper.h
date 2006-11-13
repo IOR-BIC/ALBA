@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkContourVolumeMapper.h,v $
 Language:  C++
-Date:      $Date: 2006-11-10 11:57:17 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2006-11-13 10:17:36 $
+Version:   $Revision: 1.5 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -46,7 +46,6 @@ First call EstimateRelevantVolume()
 Then Render()
 */
 
-
 #ifndef __vtkContourVolumeMapper_h
 #define __vtkContourVolumeMapper_h
 
@@ -63,20 +62,17 @@ Then Render()
 
 #include "vtkMAFConfigure.h"
 
-
-
 //------------------------------------------------------------------------------
 // Forward declarations
 //------------------------------------------------------------------------------
 class Polyline2D;
 class ListOfPolyline2D;
 
-
-
 //------------------------------------------------------------------------------
 // namespace for vtkContourVolumeMapper and related classes
 //------------------------------------------------------------------------------
-namespace vtkContourVolumeMapperNamespace {
+namespace vtkContourVolumeMapperNamespace 
+{
   // Defines block as 8x8x8 cube.  
   // VoxelBlockSizeLog = 3, VoxelBlockSize = 8, VoxelsInBlock = 8^3
   static const int VoxelBlockSizeLog = 3; 
@@ -87,6 +83,14 @@ namespace vtkContourVolumeMapperNamespace {
   static const int voxelVertIndicesXYZ[8][3] = {{0, 0, 0}, {1, 0, 0}, { 1, 1, 0}, { 0, 1, 0}, {0, 0, 1}, {1, 0, 1}, { 1, 1, 1}, { 0, 1, 1}};
   static const int edgeOffsets[12][2] = {{0, 1}, {1, 2}, {3, 2}, {0, 3}, {4, 5}, {5, 6}, {7, 6}, {4, 7}, {0,4}, {1, 5}, {3, 7}, {2, 6} };
   static const int edgeAxis[12] = {0, 1, 0, 1, 0, 1, 0, 1, 2, 2, 2, 2};
+
+  // container type for sorting depth values
+  struct Idepth
+  {
+    float depth ;
+    int index ;
+    bool operator < (const Idepth &b) const {return this->depth < b.depth ;}
+  };
 };
 
 
@@ -94,7 +98,8 @@ namespace vtkContourVolumeMapperNamespace {
 //------------------------------------------------------------------------------
 // class vtkContourVolumeMapper
 //------------------------------------------------------------------------------
-class VTK_vtkMAF_EXPORT vtkContourVolumeMapper : public vtkVolumeMapper {
+class VTK_vtkMAF_EXPORT vtkContourVolumeMapper : public vtkVolumeMapper 
+{
 public:
   static vtkContourVolumeMapper *New();
   vtkTypeRevisionMacro(vtkContourVolumeMapper, vtkVolumeMapper);
@@ -108,7 +113,7 @@ public:
   /** Render the volume */
   void Render(vtkRenderer *ren, vtkVolume *vol);
 
-  /** Enable or disable multiresolution feature. By default it is enabled */
+  /** Enable or disable multi-resolution feature. By default it is enabled */
   vtkGetMacro(EnableAutoLOD, int);    
   void SetEnableAutoLOD(int val) { this->EnableAutoLOD = val; }
   vtkBooleanMacro(EnableAutoLOD, int);
@@ -140,13 +145,13 @@ public:
 
   /**
   This is the first function to be called before Render()
-  It is used by mafPipeIsosurface::Create() to set the intial contour to an acceptable value.
+  It is used by mafPipeIsosurface::Create() to set the initial contour to an acceptable value.
   If the value is close to 1 than the surface will contain too much noise.
   Calls EstimateRelevantVolumeTemplate() with correct scalar datatype
   Returns the fraction of blocks which contain the contour. */
   float EstimateRelevantVolume(const double value);
 
-  /** To set the value of transparecy */
+  /** To set the value of transparency */
   void SetAlpha(double alpha){m_Alpha=alpha;};
 
   void SetMaxScalar(double scalar){m_MAXScalar=scalar;};
@@ -154,7 +159,6 @@ public:
 protected:
   vtkContourVolumeMapper();
   ~vtkContourVolumeMapper();
-
 
   /** Marching cubes algorithm - calculate triangles, cache and render */
   template <typename DataType> void  RenderMCubes(vtkRenderer *renderer, vtkVolume *volume, const DataType *dataPointer);
@@ -188,6 +192,23 @@ protected:
   int  GetDataType();    ///< Return datatype of input scalars
 
   void ReleaseData();
+
+  /** calculate depth of vertex from screen (matrix is in openGL format) */
+  float DepthOfVertex(float *vertex, float *mat) const ;
+
+  /** Calculate matrix required for depth transform
+  Return product MP of modelview and projection matrices */
+  void CalculateDepthMatrix(float *mat) ;
+
+  /** Sort triangles into back-to-front order 
+  lod is cache 0 or 1 */
+  void SortTriangles(int lod) ;
+
+  /** This helper function returns an estimate of the expected number of triangles 
+  in the normal (non-LOD) mode, given the current number of normal and LOD triangles.
+  A zero value means that the number is undefined (see constructor).
+  Only use this to decide whether to use LOD or not.  */
+  int EstimateTrianglesNoOpt() ;
 
   vtkTimeStamp   BuildTime;
 
@@ -229,10 +250,14 @@ private:
 
   // caching
   bool           CacheCreated;
-  float          PrevContourValue[2];   // 0 - for normal and 1 - for LOD mode
+  float          PrevContourValue[2];
   unsigned  int  NumberOfTriangles[2];  
   float         *TriangleCache[2];      // pointers to the two caches, 0 for normal, 1 for LOD    
   unsigned int   TriangleCacheSize[2];  // in triangles (there are 6 floats per vertex, 18 floats per triangle)
+
+  // sorting triangles
+  int ntriangles_previous[2] ;         // previous no. of triangles
+  unsigned int *ordered_vertices[2] ;  // indices of vertices in sort order
 
   // helping objects
   float          ViewportDimensions[2];
@@ -243,20 +268,19 @@ private:
 };
 
 
-
-
-
 //------------------------------------------------------------------------------
 // class Polyline2D
-// these classes are used for optimizing the surface by analysing 2D contours
+// these classes are used for optimizing the surface by analyzing 2D contours
 //------------------------------------------------------------------------------
-class Polyline2D {
+class Polyline2D 
+{
 public:
-
   /// 2D point with operators for ==, [], const [] and ()
-  struct Point {
+  struct Point 
+  {
     short xy[2];
-    bool operator ==(const Point& operand) const {
+    bool operator ==(const Point& operand) const 
+    {
 #ifdef WIN32
       return *((int*)xy) == *((int*)operand.xy);
 #else
@@ -279,9 +303,7 @@ public:
   float minDistance[2];
   int   closestPolyline[2];
 
-
 public:
-
   Polyline2D(const Point *line);
   ~Polyline2D() { if (this->vertices != this->verticesBuffer) delete [] vertices; }
 
@@ -314,19 +336,15 @@ protected:
 
 
 
-
-
 //------------------------------------------------------------------------------
 // class ListOfPolyline2D
 // This is a std::vector of polyline pointers
 //------------------------------------------------------------------------------
-class ListOfPolyline2D : public std::vector<Polyline2D*> {
+class ListOfPolyline2D : public std::vector<Polyline2D*> 
+{
 public:
   void clear();                                                ///< Clear the list of polylines
   bool IsInside(int x, int y, int polylineLengthThreshold);
   Polyline2D *FindContour(int x, int y, int polylineLengthThreshold, int distance = 1);
 };
-
 #endif
-
-
