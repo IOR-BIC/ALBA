@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeProjected.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-10 11:44:31 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-11-13 17:46:45 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -287,7 +287,7 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 
 	vtkNEW(m_VolumeBoxActor);
 	m_VolumeBoxActor->SetMapper(m_VolumeBoxMapper);
-
+  m_VolumeBoxActor->PickableOff();
 	m_VolumeBoxActor->SetVisibility(m_Selected);
 
 	m_UsedAssembly->AddPart(m_VolumeBoxActor);
