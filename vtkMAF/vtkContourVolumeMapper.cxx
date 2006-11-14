@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkContourVolumeMapper.cxx,v $
 Language:  C++
-Date:      $Date: 2006-11-14 10:21:10 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2006-11-14 10:45:32 $
+Version:   $Revision: 1.10 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -94,7 +94,7 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
 
 using namespace vtkContourVolumeMapperNamespace;
 
-vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.9 $");
+vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.10 $");
 vtkStandardNewMacro(vtkContourVolumeMapper);
 
 
@@ -1098,7 +1098,7 @@ template<typename DataType> void vtkContourVolumeMapper::RenderMCubes(vtkRendere
                 while(*edge >= 0) {
                   // check that memory is not about to be exceeded
                   if (createCache && (numTrianglesRunningTotal[lod] >= this->TriangleCacheSize[lod])){
-                    mafErrorMacro("no. of triangles exceeded allocated cache size\n") ;
+                    std::cout << "no. of triangles exceeded allocated cache size\n";
                     break ;
                   }
                   //if ((!numTrianglesWarningFlag) && numTrianglesRunningTotal[lod] > MaxTrianglesNotOptimized){
