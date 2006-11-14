@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTMRIImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-10 13:06:51 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-11-14 11:10:27 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1092,11 +1092,11 @@ void mmoCTMRIImporter::	OnEvent(mafEventBase *maf_event)
         ResetStructure();
         // scan dicom directory
         BuildDicomFileList(m_DICOMDir.GetCStr());
-        /*if(m_NumberOfStudy == 1)
+        if(m_NumberOfStudy == 1)
         {
           m_StudyListbox->SetSelection(0);
           OnEvent(&mafEvent(this, ID_STUDY));
-        }*/
+        }
       break;
       case ID_STUDY:
       {
