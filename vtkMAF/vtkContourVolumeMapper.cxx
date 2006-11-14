@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkContourVolumeMapper.cxx,v $
 Language:  C++
-Date:      $Date: 2006-11-13 10:17:36 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2006-11-14 10:21:10 $
+Version:   $Revision: 1.9 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -94,7 +94,7 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
 
 using namespace vtkContourVolumeMapperNamespace;
 
-vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.8 $");
+vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.9 $");
 vtkStandardNewMacro(vtkContourVolumeMapper);
 
 
@@ -1776,8 +1776,8 @@ void vtkContourVolumeMapper::SortTriangles(int lod)
     ov[j+2] = index+2 ;
   }
 
-
-  mafErrorMacro("sort: " << " triangles = " << this->NumberOfTriangles[lod] << " " << t1 << " " << t2 << "\n") ;
+  std::cout << "sort: " << " triangles = " << this->NumberOfTriangles[lod] << " " << t1 << " " << t2 << "\n";
+  //mafErrorMacro("sort: " << " triangles = " << this->NumberOfTriangles[lod] << " " << t1 << " " << t2 << "\n") ;
 
   delete[] depthlist ;
 }
