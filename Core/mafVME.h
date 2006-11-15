@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:41 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2006-11-15 14:33:57 $
+  Version:   $Revision: 1.30 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -77,13 +77,13 @@ public:
   virtual bool Equals(mafVME *vme);
 
   /**
-   Set the time for this VME (not for the whole tree). Normaly time 
+   Set the time for this VME (not for the whole tree). Normally time 
    of the tree is set by sending an event with id VME_TIME_SET */
   virtual void SetTimeStamp(mafTimeStamp t);
   virtual mafTimeStamp GetTimeStamp();
   
   /**
-    Set/Get CurrentTime for this VME and all subtree. Normaly time 
+    Set/Get CurrentTime for this VME and all subtree. Normally time 
     of the tree is set by sending an event with id VME_TIME_SET*/
   void SetTreeTime(mafTimeStamp t);
 
