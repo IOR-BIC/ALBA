@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-10 13:50:09 $
-  Version:   $Revision: 1.77 $
+  Date:      $Date: 2006-11-15 13:51:03 $
+  Version:   $Revision: 1.78 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -372,6 +372,10 @@ void mafLogicWithManagers::CreateMenu()
   wxMenu    *option_menu = new wxMenu;
   option_menu->Append(ID_APP_SETTINGS, _("Options..."));
   m_MenuBar->Append(option_menu, _("Tools"));
+
+	wxMenu    *help_menu = new wxMenu;
+	help_menu->Append(ABOUT_APPLICATION,_("About"));
+  m_MenuBar->Append(help_menu, _("&Help"));
 
   m_Win->SetMenuBar(m_MenuBar);
 
@@ -826,6 +830,12 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
         m_Mouse->Collaborate(collaborate);
       }
       break;
+			case ABOUT_APPLICATION:
+			{
+				wxString msg_dlg = wxString::Format("%s Application.",m_AppTitle);
+				wxMessageBox(msg_dlg, "About Application");
+			}
+			break;
       default:
         mafLogicWithGUI::OnEvent(maf_event);
       break; 
