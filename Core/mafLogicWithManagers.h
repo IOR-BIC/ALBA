@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-02 11:23:44 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2006-11-15 14:32:58 $
+  Version:   $Revision: 1.30 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -130,6 +130,9 @@ public:
 
   /** Manage application exception and allow to save at least the tree. */
   void HandleException();
+
+	/** Set the revision string */
+	void SetRevision(mafString revision);
 
 protected:
   //---------------------------------------------------------
@@ -261,5 +264,7 @@ protected:
   bool m_UseOpManager;
   bool m_UseInteractionManager;
   mmgSettingsDialog *m_SettingsDialog;
+
+	mafString m_Revision;
 };
 #endif

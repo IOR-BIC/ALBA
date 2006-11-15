@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-15 13:51:03 $
-  Version:   $Revision: 1.78 $
+  Date:      $Date: 2006-11-15 14:32:58 $
+  Version:   $Revision: 1.79 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -110,6 +110,8 @@ mafLogicWithManagers::mafLogicWithManagers()
   m_PrintSupport = new mafPrintSupport();
   
   m_SettingsDialog = new mmgSettingsDialog();
+
+	m_Revision = _("0.1");
 }
 //----------------------------------------------------------------------------
 mafLogicWithManagers::~mafLogicWithManagers( ) 
@@ -832,7 +834,10 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       break;
 			case ABOUT_APPLICATION:
 			{
-				wxString msg_dlg = wxString::Format("%s Application.",m_AppTitle);
+				mafString message=m_AppTitle;
+				message+=_(" Application ");
+				message+=m_Revision;
+				wxString msg_dlg = wxString::Format("%s",message);
 				wxMessageBox(msg_dlg, "About Application");
 			}
 			break;
@@ -1439,3 +1444,9 @@ void mafLogicWithManagers::ImportExternalFile(mafString &filename)
     wxMessageBox(_("Can not import this type of file!"), _("Warning"));
 }
 
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::SetRevision(mafString revision)
+//----------------------------------------------------------------------------
+{
+	m_Revision=revision;
+}
