@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemScalar.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:53:23 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-11-15 14:37:25 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -47,6 +47,7 @@ class mafTagArray;
   - build a test
   - implement read from TmpFile
   - read from memory
+  - Complete the implementation of reading crypted files.
 */
 class MAF_EXPORT mafVMEItemScalar : public mafVMEItem
 {
@@ -55,50 +56,46 @@ public:
 
   virtual void Print(std::ostream& os, const int indent=0) const;
 
-  /** copy data from another dataset */
+  /** Copy data from another scalar item*/
   virtual void DeepCopy(mafVMEItem *a);
 
-  /** reference another dataset's internal data */ 
+  /** Reference another scalar item's internal data*/ 
   virtual void ShallowCopy(mafVMEItem *a);
 
-  /** 
-    return data scalar. (supported only if MAF is compiled
+  /** Return data scalar. (Supported only if MAF is compiled
     with ITK support which include VNL library) */
   virtual vnl_matrix<double> &GetData();
 
-  /** set the scalar data */
+  /** Set the scalar data */
   virtual void SetData(vnl_matrix<double> &data);
 
-  /**
-    Compare two datasets. Two datasets are considered equivalent if they store
+  /** Compare two scalar items. Two scalar items are considered equivalent if they store
     the same type of data, have the same TimeStamp and equivalent TagArray.
     Id and URL are not considered for the comparison.
-    To force compare the dataset internal data, use SetGlobalCompareDataOn()*/
+    To force compare the scalar items internal data, use SetGlobalCompareDataOn()*/
   virtual bool Equals(mafVMEItem *a);
 
-  /**
-  Return true if data is not empty. Currently this doesn't ensure data is the same on 
+  /** Return true if scalar data is not empty. Currently this doesn't ensure data is the same on 
   the file. IsDataModified() can be used to know if data has been changed with respect
   to file.*/
   virtual bool IsDataPresent() {return !m_Data.empty();}
   
-  /**  UpdateBounds for this data. GetBounds automatically call this function...*/
+  /** UpdateBounds for this data. GetBounds automatically call this function...*/
   virtual void UpdateBounds();
 
   /** Internally used to update data, automatically called by GetData() */
   virtual void UpdateData();
 
-  /** return "vtk" file extension */
+  /** Return "sca" file extension */
   virtual const char * GetDataFileExtension();
 
-  /** destroy VTK reader and unregister VTK dataset */
+  /** Clear scalar data.*/
   virtual void ReleaseData();
 
-  /** return pointer to memory to be used as input. This must be set with SetInputMemory(). */
+  /** Return pointer to memory to be used as input. This must be set with SetInputMemory(). */
   virtual void GetOutputMemory(const char *&out_str, int &size);
 
-  /** 
-    Release memory where data has been written. This should
+  /** Release memory where data has been written. This should
     be used in MEMORY mode where data is written into memory */
   virtual void ReleaseOutputMemory();
 
@@ -106,18 +103,17 @@ protected:
   mafVMEItemScalar(); // to be allocated with New()
   ~mafVMEItemScalar(); // to be deleted with Delete()
 
-  /**
-    Restore data stored in this object. This function asks the storage
+  /** Restore data stored in this object. This function asks the storage
     for the filename corresponding to the URL.
     This method is automatically called by GetData().*/
   virtual int InternalRestoreData();
-  /**
-    Store data stored in this object. This function asks the storage object
+  
+  /** Store scalar item's data. This function asks the storage object
     for a tmp filename for saving and then call ... to store the tmp file
     into the URL. This method is called by Store().*/
   virtual int InternalStoreData(const char *url);
 
-  vnl_matrix<double>  m_Data;       ///< pointer to VTK dataset
+  vnl_matrix<double>  m_Data;       ///< pointer to scalar data
   mafString           m_DataString; 
   int                 m_IOStatus;   ///< internally used to store the IO status
   double              m_ScalarBouns[2];
