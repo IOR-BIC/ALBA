@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-07 12:24:50 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-11-15 14:36:45 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -411,6 +411,29 @@ void mafVMEScalar::SetTypeForZCoordinates(int t)
   GetScalarOutput()->UpdateVTKRepresentation();
 #endif
   Modified();
+}
+//-----------------------------------------------------------------------
+void mafVMEScalar::InternalPreUpdate()
+//-----------------------------------------------------------------------
+{
+#ifdef MAF_USE_VTK
+  GetScalarOutput()->UpdateVTKRepresentation();
+#endif
+}
+//-----------------------------------------------------------------------
+void mafVMEScalar::SetTimeStamp(mafTimeStamp t)
+//-----------------------------------------------------------------------
+{
+  t = t < 0 ? 0 : t;
+  bool update_vtk_data = t != m_CurrentTime;
+  if (update_vtk_data)
+  {
+    Superclass::SetTimeStamp(t);
+
+#ifdef MAF_USE_VTK
+    GetScalarOutput()->UpdateVTKRepresentation();
+#endif
+  }
 }
 //-----------------------------------------------------------------------
 void mafVMEScalar::Print(std::ostream& os, const int tabs)

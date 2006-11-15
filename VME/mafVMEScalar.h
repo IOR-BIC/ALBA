@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEScalar.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-07 12:24:25 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-11-15 14:36:45 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -61,6 +61,10 @@ public:
   Return MAF_OK if succeeded, MAF_ERROR if they kind of data is not accepted by
   this type of VME. */
   virtual int SetData(vnl_matrix<double> &data, mafTimeStamp t);
+
+  /** Set the time for this VME.
+  It updates also the vtk representation for the scalar data.*/
+  void SetTimeStamp(mafTimeStamp t);
 
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0);
@@ -137,6 +141,8 @@ protected:
 
   /** Internally used to create a new instance of the GUI.*/
   virtual mmgGui *CreateGui();
+
+  void InternalPreUpdate();
 
   virtual int InternalStore(mafStorageElement *parent);
   virtual int InternalRestore(mafStorageElement *node);
