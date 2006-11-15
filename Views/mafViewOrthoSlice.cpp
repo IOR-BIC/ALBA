@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-09 13:23:51 $
-  Version:   $Revision: 1.43 $
+  Date:      $Date: 2006-11-15 18:17:32 $
+  Version:   $Revision: 1.44 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -76,7 +76,7 @@ enum GIZMO_ID
   GIZMOS_NUMBER,
 };
 //----------------------------------------------------------------------------
-mafViewOrthoSlice::mafViewOrthoSlice(wxString label, bool show_ruler)
+mafViewOrthoSlice::mafViewOrthoSlice(wxString label)
 : mafViewCompound(label, 2, 2)
 //----------------------------------------------------------------------------
 {
@@ -147,9 +147,9 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
         mafPipeVolumeSlice *p = (mafPipeVolumeSlice *)((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
         p->SetColorLookupTable(m_ColorLUT);
       }
-			((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSlice(m_GizmoHandlePosition);
-			((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetSlice(m_GizmoHandlePosition);
-			((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetSlice(m_GizmoHandlePosition);
+			((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
+			((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
+			((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
       GizmoCreate();
     }
     else
@@ -163,9 +163,9 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
   {
     if(show)
     {
-      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSlice(m_GizmoHandlePosition);
-      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetSlice(m_GizmoHandlePosition);
-      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetSlice(m_GizmoHandlePosition);
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
     }
     else
     {
@@ -260,7 +260,7 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
         vtkPoints *p = (vtkPoints *)e->GetVtkObj();
         if(p == NULL) return;
         p->GetPoint(0,pos);
-        this->UpdateSlice(gizmoId, p);
+        this->SetSlicePosition(gizmoId, p);
       }
       break;
 			case ID_SNAP:
@@ -276,9 +276,9 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
 					for(int i=GIZMO_XN; i<GIZMOS_NUMBER; i++)
 					{
 						if(m_Snap==1)
-							m_Gizmo[i]->SetGizmoModalityToSnap();
+							m_Gizmo[i]->SetGizmoMovingModalityToSnap();
 						else
-							m_Gizmo[i]->SetGizmoModalityToBound();
+							m_Gizmo[i]->SetGizmoMovingModalityToBound();
 					}
 				}
 			}
@@ -378,9 +378,9 @@ void mafViewOrthoSlice::GizmoCreate()
     p->GetSliceOrigin(slice);
 
     m_Gizmo[gizmoId] = new mafGizmoSlice(m_CurrentVolume, this);
-    m_Gizmo[gizmoId]->SetSlice(gizmoId, direction[gizmoId], slice[gizmoId]);
+    m_Gizmo[gizmoId]->SetGizmoSliceLocalPosition(gizmoId, direction[gizmoId], slice[gizmoId]);
     m_Gizmo[gizmoId]->SetColor(&colors[gizmoId*3]);
-    m_Gizmo[gizmoId]->SetGizmoModalityToBound();
+    m_Gizmo[gizmoId]->SetGizmoMovingModalityToBound();
   }
 
   // put them in the right views:
@@ -431,7 +431,7 @@ void mafViewOrthoSlice::GizmoDelete()
 }
 
 //----------------------------------------------------------------------------
-void mafViewOrthoSlice::UpdateSlice(long activeGizmoId, vtkPoints *p)
+void mafViewOrthoSlice::SetSlicePosition(long activeGizmoId, vtkPoints *p)
 //----------------------------------------------------------------------------
 {
   // gizmos update correctly in every views so this method is needed to update slice also
@@ -450,7 +450,7 @@ void mafViewOrthoSlice::UpdateSlice(long activeGizmoId, vtkPoints *p)
     case (GIZMO_XN)	:
     {
       // update the X normal child view
-      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSlice(m_GizmoHandlePosition);
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
     }
     break;
    
@@ -458,14 +458,14 @@ void mafViewOrthoSlice::UpdateSlice(long activeGizmoId, vtkPoints *p)
     case (GIZMO_YN)	:
     {
       // update the Y normal child view
-      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetSlice(m_GizmoHandlePosition);    
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);    
     }
     break;
 
     case (GIZMO_ZN)	:
     {
       // update the Z normal child view
-      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetSlice(m_GizmoHandlePosition);
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
     }
     break;
 
@@ -482,7 +482,7 @@ void mafViewOrthoSlice::UpdateSlice(long activeGizmoId, vtkPoints *p)
   }
 
   // always update the child perspective view
-  ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_PERSPECTIVE_VIEW]))->SetSlice(m_GizmoHandlePosition);
+  ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_PERSPECTIVE_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
   
 
   this->CameraUpdate();

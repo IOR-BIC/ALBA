@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-26 17:03:44 $
-  Version:   $Revision: 1.17 $
-  Authors:   Paolo Quadrani
+  Date:      $Date: 2006-11-15 18:17:33 $
+  Version:   $Revision: 1.18 $
+  Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -74,7 +74,7 @@ public:
 
   /** 
   Set the slice coordinates.*/
-  virtual void SetSlice(double origin[3]);
+  virtual void SetSliceLocalOrigin(double origin[3]);
 
   /** Get the Slice coordinates.*/
   void GetSlice(double slice[3]);

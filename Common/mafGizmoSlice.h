@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-17 11:18:27 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-11-15 18:16:56 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,7 +13,7 @@
 #ifndef __mafGizmoSlice_h
 #define __mafGizmoSlice_h
 
-#include "mafObserver.h"
+#include "mafGizmoInterface.h"
 #include "mafMatrix.h"
 
 //---------------------------------------------------------------------------
@@ -26,32 +26,33 @@ class mafVMEGizmo;
 class vtkPoints;
 class vtkDoubleArray;
 
-/** Gizmo used to perform volume slicing.
-    @sa mafViewRXCT, mafViewOrthoSlice
+/** Gizmo typically used to move volume slices.
+    @sa mafViewRXCT, mafViewOrthoSlice for usage examples: these views act as mediators between gizmo slices
 */
-class mafGizmoSlice : public mafObserver
+class mafGizmoSlice : public mafGizmoInterface
 {
 public:
-					 mafGizmoSlice(mafNode* vme, mafObserver *Listener = NULL);
+
+	mafGizmoSlice(mafNode* inputVme, mafObserver *Listener = NULL, const char *name = "GizmoSlice");
+
   virtual	~mafGizmoSlice();
-    
-	/** Create the plane, set its id and its position */
-	void SetSlice(int id, int axis, double pos);
 
-	/** Set the slice color */
-	void SetColor(double col[3]);
-	
-	void SetListener(mafObserver *listener);
-  void OnEvent(mafEventBase *maf_event);
+  /** Show/Hide the gizmos using actor visibility instead of pipe creation/destruction: this is used for faster 
+  rendering*/
+  void Show(bool show);
 
-  /** return the mafVMEGizmo */
-	mafVME *GetOutput(); 
+  /** This method is used to change the input vme */
+  void SetInput(mafVME *vme);
 
-  /** Set/Get the gizmo moving modality, default is Snap */
-  void SetGizmoModalityToBound(); 
-  void SetGizmoModalityToSnap(); 
-  int  GetGizmoMovingModality() {return this->m_MovingModality;};
+  /** Set the gizmo color */
+  void SetColor(double col[3]);
 
+  /** return the gizmo slice object */
+  mafVME *GetOutput(); 
+
+	/** Set id and position on choosed axis*/
+	void SetGizmoSliceLocalPosition(int gizmoSliceId, int axis, double positionOnAxis);
+  
   enum GISMO_SLICE_AXIS_ID
   {
     GIZMO_SLICE_X = 0,
@@ -59,17 +60,33 @@ public:
     GIZMO_SLICE_Z
   };	
 
+  /** Set/Get the gizmo moving modality, default is Snap */
+  void SetGizmoMovingModalityToBound(); 
+  void SetGizmoMovingModalityToSnap(); 
+  int  GetGizmoMovingModality() {return this->m_MovingModality;};
+  
+  /** Events handling method */
+  void OnEvent(mafEventBase *maf_event);
+ 
+  /** Gizmo is reparented under the vme tree root, this modality is currently not supported */
+  void SetModalityToGlobal() {mafLogMessage("Global modality is currently not supported for this item");};
+
+
 protected:
+
+  void CreateGizmoSlice(mafNode *imputVme, mafObserver *listener, const char *name);
+
+  void DestroyGizmoSlice();
+
 	/** Initialize snap array */
 	void InitSnapArray(mafVME *vol, int axis);
 
+  mafString           m_Name;
   long                m_id;
-  mafVME             *m_VmeInput;
-  mafVMEGizmo      *m_VmeGizmo;
+  mafVMEGizmo        *m_VmeGizmo;
   mmiCompositorMouse *m_GizmoBehavior;
 	vtkDoubleArray     *m_SnapArray;
 
-  mafObserver   *m_Listener;
   mafMatrix     *m_GizmoHandleCenterMatrix;
   vtkPoints		  *m_Point;
 
@@ -83,8 +100,9 @@ protected:
 
   enum MOVING_MODALITY_ID
   {
-    BOUND,
+    BOUND = 0,
     SNAP,
+    MOVING_MODALITY_NUMBERS,
   };
   mmiGenericMouse *m_MouseBH;
 };

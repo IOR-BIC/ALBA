@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-06 15:11:01 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-11-15 18:17:32 $
+  Version:   $Revision: 1.10 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,7 +33,7 @@ class mmgLutSlider;
 //----------------------------------------------------------------------------
 /** 
 This view features two Rx views and one compound view made of six CT slices.*/
-class mafViewRXCT: public mafViewCompound
+class mafViewRXCT : public mafViewCompound
 {
 public:
   mafViewRXCT(wxString label = "View RXCT");
@@ -44,17 +44,16 @@ public:
   virtual mafView *Copy(mafObserver *Listener);
   virtual void OnEvent(mafEventBase *maf_event);
   
-  /** 
-  Show/Hide VMEs into plugged sub-views*/
+  /** Show/Hide VMEs into plugged sub-views */
   virtual void VmeShow(mafNode *node, bool show);
 
-  /** Remove VME into plugged sub-views*/
+  /** Remove VME into plugged sub-views */
   virtual void VmeRemove(mafNode *node);
 
+  /** Operations to be performed on vme selection */
 	virtual void VmeSelect(mafNode *node, bool select);
 
-  /** 
-  Create visual pipe and initialize them to build an RXCT visualization */
+  /** Create visual pipe and initialize them to build a RXCT view */
   void PackageView();
   
   /** IDs for the GUI */
@@ -70,8 +69,7 @@ public:
     ID_LAST
   };
 
-  /** 
-  Create the GUI on the bottom of the compounded view. */
+  /** Create the GUI on the bottom of the compounded view. */
   virtual void CreateGuiView();
 
 protected:
@@ -106,11 +104,16 @@ protected:
   Sort the slice */
   void SortSlices();
 
+  void OnEventSnapModality();
+	void OnEventRangeModified(mafEventBase *maf_event);
+	void OnEventSortSlices();
+	void OnEventSetThickness();
+  void OnEventMouseMove(mafEvent *e);
   int			m_Sort[6];
   double	m_Pos[6];
 
 
-  mafGizmoSlice   *m_Gizmo[6];
+  mafGizmoSlice   *m_GizmoSlice[6];
   mafVMEVolume    *m_CurrentVolume; ///< Current visualized volume
   
   mafViewRX       *m_ViewsRX[2];

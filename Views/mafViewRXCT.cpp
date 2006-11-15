@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-10 12:27:55 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2006-11-15 18:17:32 $
+  Version:   $Revision: 1.21 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -73,7 +73,7 @@ mafViewRXCT::mafViewRXCT(wxString label)
 
   for(int j=0; j<CT_CHILD_VIEWS_NUMBER; j++) 
   {
-    m_Gizmo[j] = NULL;
+    m_GizmoSlice[j] = NULL;
     m_Pos[j]=0;
     m_Sort[j]=j;
   }
@@ -88,13 +88,13 @@ mafViewRXCT::mafViewRXCT(wxString label)
   m_LutSliders[RX_FRONT_VIEW] = m_LutSliders[RX_SIDE_VIEW] = m_LutSliders[CT_COMPOUND_VIEW] = NULL;
   m_vtkLUT[RX_FRONT_VIEW] = m_vtkLUT[RX_SIDE_VIEW] = m_vtkLUT[CT_COMPOUND_VIEW] = NULL;
 
-  m_MoveAllSlices = 0;
   m_RightOrLeft=1;
   m_MoveAllSlices = 0; 
   m_Snap=1;
   m_CurrentSurface.clear();
   m_AllSurface=0;
   m_Border=1;
+
 }
 //----------------------------------------------------------------------------
 mafViewRXCT::~mafViewRXCT()
@@ -276,6 +276,164 @@ void mafViewRXCT::VmeRemove(mafNode *node)
   Superclass::VmeRemove(node);
 }
 //----------------------------------------------------------------------------
+void mafViewRXCT::OnEventRangeModified(mafEventBase *maf_event)
+{
+  // is the volume visible?
+  if(((mafViewSlice *)m_ChildViewList[RX_FRONT_VIEW])->VolumeIsVisible())
+  {
+    int low, hi;
+
+    // from which lut slider the event is coming?
+    if (maf_event->GetSender() == m_LutSliders[RX_FRONT_VIEW])
+    {
+      m_LutSliders[RX_FRONT_VIEW]->GetSubRange(&low,&hi);
+      ((mafViewRX *)m_ChildViewList[RX_FRONT_VIEW])->SetLutRange(low,hi);
+    }
+    else if (maf_event->GetSender() == m_LutSliders[RX_SIDE_VIEW])
+    {
+      m_LutSliders[RX_SIDE_VIEW]->GetSubRange(&low,&hi);
+      ((mafViewRX *)m_ChildViewList[RX_SIDE_VIEW])->SetLutRange(low,hi);
+    }
+    else if (maf_event->GetSender() == m_LutSliders[CT_COMPOUND_VIEW])
+    {
+      m_LutSliders[CT_COMPOUND_VIEW]->GetSubRange(&low,&hi);
+      m_vtkLUT[CT_COMPOUND_VIEW]->SetRange(low,hi);
+      for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++)
+      {
+        mafPipeVolumeSlice *p = NULL;
+        p = mafPipeVolumeSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(m_CurrentVolume));
+        p->SetColorLookupTable(m_vtkLUT[CT_COMPOUND_VIEW]);
+      }
+    }
+
+    CameraUpdate();
+  }
+}
+void mafViewRXCT::OnEventSnapModality()
+{
+  if(this->m_CurrentVolume==NULL && m_Snap)
+  {
+    wxMessageBox("You can't switch to snap modality!");
+    m_Snap=0;
+    m_Gui->Update();
+  }
+  else
+  {
+    for(int i=0; i<6; i++)
+    {
+      if(m_Snap==1)
+        m_GizmoSlice[i]->SetGizmoMovingModalityToSnap();
+      else
+        m_GizmoSlice[i]->SetGizmoMovingModalityToBound();
+    }
+  }
+}
+void mafViewRXCT::OnEventSortSlices()
+{
+  mafNode* node=GetSceneGraph()->GetSelectedVme();
+  mafPipe *p=((mafViewRX *)m_ChildViewList[0])->GetNodePipe(node);
+  if (node->IsMAFType(mafVMEVolume))
+    mafLogMessage("SURFACE NOT SELECTED");
+  else  if (node->IsMAFType(mafVMESurface))
+  {
+    double center[3],b[6],step;
+    mafVMESurface *surface=(mafVMESurface*)node;
+    surface->GetOutput()->GetBounds(b);
+    step = (b[5]-b[4])/7.0;
+    center[0]=0;
+    center[1]=0;
+    for (int currChildCTView=0; currChildCTView < CT_CHILD_VIEWS_NUMBER; currChildCTView++)
+    {
+      if(m_GizmoSlice[currChildCTView])
+      {
+        center[2] = b[5]-step*(currChildCTView+1);
+        center[2] = center[2] > b[5] ? b[5] : center[2];
+        center[2] = center[2] < b[4] ? b[4] : center[2];
+        m_GizmoSlice[currChildCTView]->SetGizmoSliceLocalPosition(currChildCTView,mafGizmoSlice::GIZMO_SLICE_Z,center[2]);
+        m_Pos[currChildCTView]=center[2];
+        m_Sort[currChildCTView]=currChildCTView;
+        ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->SetSliceLocalOrigin(center);
+        ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->SetTextColor(m_BorderColor[currChildCTView]);
+        ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->UpdateText();
+        ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->BorderCreate(m_BorderColor[currChildCTView]);
+        ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->CameraUpdate();
+      }
+    }
+    m_ChildViewList[RX_FRONT_VIEW]->CameraUpdate();
+    m_ChildViewList[RX_SIDE_VIEW]->CameraUpdate();
+  }
+}
+void mafViewRXCT::OnEventSetThickness()
+{
+  if(m_AllSurface)
+  {
+    mafNode* node=this->GetSceneGraph()->GetSelectedVme();
+    mafVME* vme=(mafVME*)node;
+    mafNode* root=vme->GetRoot();
+    SetThicknessForAllSurfaceSlices(root);
+  }
+  else
+  {
+    mafNode *node=this->GetSceneGraph()->GetSelectedVme();
+    mafSceneNode *SN = this->GetSceneGraph()->Vme2Node(node);
+    mafPipe *p=((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(0))->GetNodePipe(node);
+    ((mafPipeSurfaceSlice *)p)->SetThickness(m_Border);
+  }
+}
+void mafViewRXCT::OnEventMouseMove( mafEvent *e )
+{
+  long movingSliceId;
+  movingSliceId = e->GetArg();
+
+  double newSlicePosition[3];
+  vtkPoints *p = (vtkPoints *)e->GetVtkObj();
+  if(p == NULL) {
+    return;
+  }
+  p->GetPoint(0,newSlicePosition);
+  if (m_MoveAllSlices)
+  {
+    double oldSlicePosition[3], delta[3], b[CT_CHILD_VIEWS_NUMBER];
+    ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(movingSliceId))->GetSlice(oldSlicePosition);
+    delta[0] = newSlicePosition[0] - oldSlicePosition[0];
+    delta[1] = newSlicePosition[1] - oldSlicePosition[1];
+    delta[2] = newSlicePosition[2] - oldSlicePosition[2];
+
+    for (int currSubView = 0; currSubView<((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetNumberOfSubView(); currSubView++)
+    {
+      m_CurrentVolume->GetOutput()->GetVMEBounds(b);
+
+      int i=0;
+      while (currSubView!=m_Sort[i]) i++;
+
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currSubView))->GetSlice(oldSlicePosition);
+      newSlicePosition[0] = oldSlicePosition[0] + delta[0];
+      newSlicePosition[1] = oldSlicePosition[1] + delta[1];
+      newSlicePosition[2] = oldSlicePosition[2] + delta[2];
+      newSlicePosition[2] = newSlicePosition[2] > b[5] ? b[5] : newSlicePosition[2];
+      newSlicePosition[2] = newSlicePosition[2] < b[4] ? b[4] : newSlicePosition[2];
+      m_GizmoSlice[currSubView]->SetGizmoSliceLocalPosition(currSubView,mafGizmoSlice::GIZMO_SLICE_Z,newSlicePosition[2]);
+
+      m_Pos[currSubView]=newSlicePosition[2];
+
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currSubView))->SetSliceLocalOrigin(newSlicePosition);
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currSubView))->CameraUpdate();
+    }
+  }
+  else
+  {
+    // move a single slice: this needs reordering
+    m_Pos[movingSliceId]=newSlicePosition[2];
+    SortSlices();
+    int i=0;
+    while (movingSliceId != m_Sort[i]) i++;
+
+    ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->SetSliceLocalOrigin(newSlicePosition);
+    ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->CameraUpdate();
+  }
+  m_ChildViewList[RX_FRONT_VIEW]->CameraUpdate();
+  m_ChildViewList[RX_SIDE_VIEW]->CameraUpdate();
+}
 void mafViewRXCT::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
@@ -286,56 +444,12 @@ void mafViewRXCT::OnEvent(mafEventBase *maf_event)
       // events from the slider
       case ID_RANGE_MODIFIED:
       {
-        // is the volume visible?
-        if(((mafViewSlice *)m_ChildViewList[RX_FRONT_VIEW])->VolumeIsVisible())
-        {
-          int low, hi;
-
-          // from which lut slider the event is coming?
-          if (maf_event->GetSender() == m_LutSliders[RX_FRONT_VIEW])
-          {
-            m_LutSliders[RX_FRONT_VIEW]->GetSubRange(&low,&hi);
-            ((mafViewRX *)m_ChildViewList[RX_FRONT_VIEW])->SetLutRange(low,hi);
-          }
-          else if (maf_event->GetSender() == m_LutSliders[RX_SIDE_VIEW])
-          {
-            m_LutSliders[RX_SIDE_VIEW]->GetSubRange(&low,&hi);
-            ((mafViewRX *)m_ChildViewList[RX_SIDE_VIEW])->SetLutRange(low,hi);
-          }
-          else if (maf_event->GetSender() == m_LutSliders[CT_COMPOUND_VIEW])
-          {
-            m_LutSliders[CT_COMPOUND_VIEW]->GetSubRange(&low,&hi);
-            m_vtkLUT[CT_COMPOUND_VIEW]->SetRange(low,hi);
-            for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++)
-            {
-              mafPipeVolumeSlice *p = NULL;
-              p = mafPipeVolumeSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(m_CurrentVolume));
-              p->SetColorLookupTable(m_vtkLUT[CT_COMPOUND_VIEW]);
-            }
-          }
-
-          CameraUpdate();
-        }
+        OnEventRangeModified(maf_event);
       }
       break;
       case ID_SNAP:
       {
-        if(this->m_CurrentVolume==NULL && m_Snap)
-        {
-          wxMessageBox("You can't switch to snap modality!");
-          m_Snap=0;
-          m_Gui->Update();
-        }
-        else
-        {
-          for(int i=0; i<6; i++)
-          {
-            if(m_Snap==1)
-              m_Gizmo[i]->SetGizmoModalityToSnap();
-            else
-							m_Gizmo[i]->SetGizmoModalityToBound();
-          }
-        }
+        OnEventSnapModality();
       }
       case ID_RIGHT_OR_LEFT:
         {
@@ -351,112 +465,19 @@ void mafViewRXCT::OnEvent(mafEventBase *maf_event)
       case MOUSE_UP:
       case MOUSE_MOVE:
       {
-        long slice = e->GetArg();
-        
-        double pos[3];
-        vtkPoints *p = (vtkPoints *)e->GetVtkObj();
-        if(p == NULL) return;
-        p->GetPoint(0,pos);
-        if (m_MoveAllSlices)
-        {
-          double old_slice[3], delta[3], b[CT_CHILD_VIEWS_NUMBER];
-          ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(slice))->GetSlice(old_slice);
-          delta[0] = pos[0] - old_slice[0];
-          delta[1] = pos[1] - old_slice[1];
-          delta[2] = pos[2] - old_slice[2];
-         
-          for (int sv=0; sv<((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetNumberOfSubView(); sv++)
-          {
-            m_CurrentVolume->GetOutput()->GetVMEBounds(b);
-
-            int i=0;
-            while (sv!=m_Sort[i]) i++;
-
-            ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(sv))->GetSlice(old_slice);
-            pos[0] = old_slice[0] + delta[0];
-            pos[1] = old_slice[1] + delta[1];
-            pos[2] = old_slice[2] + delta[2];
-            pos[2] = pos[2] > b[5] ? b[5] : pos[2];
-            pos[2] = pos[2] < b[4] ? b[4] : pos[2];
-            m_Gizmo[sv]->SetSlice(sv,mafGizmoSlice::GIZMO_SLICE_Z,pos[2]);
-
-            m_Pos[sv]=pos[2];
-
-            ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(sv))->SetSlice(pos);
-            ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(sv))->CameraUpdate();
-          }
-        }
-        else
-        {
-          // move a single slice: this needs reordering
-          m_Pos[slice]=pos[2];
-          SortSlices();
-          int i=0;
-          while (slice!=m_Sort[i]) i++;
-
-          ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->SetSlice(pos);
-          ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->CameraUpdate();
-        }
-        m_ChildViewList[RX_FRONT_VIEW]->CameraUpdate();
-        m_ChildViewList[RX_SIDE_VIEW]->CameraUpdate();
+        OnEventMouseMove(e);
       }
       break;
 
       case ID_ADJUST_SLICES:
         {
-          mafNode* node=GetSceneGraph()->GetSelectedVme();
-          mafPipe *p=((mafViewRX *)m_ChildViewList[0])->GetNodePipe(node);
-          if (node->IsMAFType(mafVMEVolume))
-            mafLogMessage("SURFACE NOT SELECTED");
-          else  if (node->IsMAFType(mafVMESurface))
-          {
-            double center[3],b[6],step;
-            mafVMESurface *surface=(mafVMESurface*)node;
-            surface->GetOutput()->GetBounds(b);
-            step = (b[5]-b[4])/7.0;
-            center[0]=0;
-            center[1]=0;
-            for (int sv=0; sv < CT_CHILD_VIEWS_NUMBER; sv++)
-            {
-              if(m_Gizmo[sv])
-              {
-                center[2] = b[5]-step*(sv+1);
-                center[2] = center[2] > b[5] ? b[5] : center[2];
-                center[2] = center[2] < b[4] ? b[4] : center[2];
-                m_Gizmo[sv]->SetSlice(sv,mafGizmoSlice::GIZMO_SLICE_Z,center[2]);
-                m_Pos[sv]=center[2];
-                m_Sort[sv]=sv;
-                ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(sv))->SetSlice(center);
-                ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(sv))->SetTextColor(m_BorderColor[sv]);
-                ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(sv))->UpdateText();
-                ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(sv))->BorderCreate(m_BorderColor[sv]);
-                ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(sv))->CameraUpdate();
-              }
-            }
-            m_ChildViewList[RX_FRONT_VIEW]->CameraUpdate();
-            m_ChildViewList[RX_SIDE_VIEW]->CameraUpdate();
-          }
+          OnEventSortSlices();
         }
         break;
         
       case ID_BORDER_CHANGE:
       {
-
-        if(m_AllSurface)
-        {
-          mafNode* node=this->GetSceneGraph()->GetSelectedVme();
-          mafVME* vme=(mafVME*)node;
-          mafNode* root=vme->GetRoot();
-          SetThicknessForAllSurfaceSlices(root);
-        }
-        else
-        {
-          mafNode *node=this->GetSceneGraph()->GetSelectedVme();
-          mafSceneNode *SN = this->GetSceneGraph()->Vme2Node(node);
-          mafPipe *p=((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(0))->GetNodePipe(node);
-          ((mafPipeSurfaceSlice *)p)->SetThickness(m_Border);
-        }
-
+        OnEventSetThickness();
       }
       break;
       
@@ -607,13 +628,13 @@ void mafViewRXCT::GizmoCreate()
     mafPipeVolumeSlice *p = NULL;
     p = mafPipeVolumeSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(m_CurrentVolume));
     p->GetSliceOrigin(slice);
-    m_Gizmo[i] = new mafGizmoSlice(m_CurrentVolume, this);
-    m_Gizmo[i]->SetSlice(i,mafGizmoSlice::GIZMO_SLICE_Z,slice[2]);
-    m_Gizmo[i]->SetColor(m_BorderColor[i]);
+    m_GizmoSlice[i] = new mafGizmoSlice(m_CurrentVolume, this);
+    m_GizmoSlice[i]->SetGizmoSliceLocalPosition(i,mafGizmoSlice::GIZMO_SLICE_Z,slice[2]);
+    m_GizmoSlice[i]->SetColor(m_BorderColor[i]);
     ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->BorderCreate(m_BorderColor[i]);
 
-    m_ChildViewList[RX_FRONT_VIEW]->VmeShow(m_Gizmo[i]->GetOutput(), true);
-    m_ChildViewList[RX_SIDE_VIEW]->VmeShow(m_Gizmo[i]->GetOutput(), true);
+    m_ChildViewList[RX_FRONT_VIEW]->VmeShow(m_GizmoSlice[i]->GetOutput(), true);
+    m_ChildViewList[RX_SIDE_VIEW]->VmeShow(m_GizmoSlice[i]->GetOutput(), true);
   }
 }
 //----------------------------------------------------------------------------
@@ -622,12 +643,12 @@ void mafViewRXCT::GizmoDelete()
 {
   for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++)
   {
-    if(m_Gizmo[i])
+    if(m_GizmoSlice[i])
     {
       ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->BorderDelete();
-      m_ChildViewList[RX_FRONT_VIEW]->VmeShow(m_Gizmo[i]->GetOutput(),false);
-      m_ChildViewList[RX_SIDE_VIEW]->VmeShow(m_Gizmo[i]->GetOutput(),false);
-      cppDEL(m_Gizmo[i]);
+      m_ChildViewList[RX_FRONT_VIEW]->VmeShow(m_GizmoSlice[i]->GetOutput(),false);
+      m_ChildViewList[RX_SIDE_VIEW]->VmeShow(m_GizmoSlice[i]->GetOutput(),false);
+      cppDEL(m_GizmoSlice[i]);
     }
   }
 }
@@ -659,7 +680,7 @@ void mafViewRXCT::SortSlices()
     {
       OldPos=((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(j))->GetSlice();
       OldPos[2]=m_Pos[m_Sort[j]];
-      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(j))->SetSlice(OldPos);
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(j))->SetSliceLocalOrigin(OldPos);
       ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(j))->SetTextColor(m_BorderColor[m_Sort[j]]);
       ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(j))->UpdateText();
       ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(j))->BorderCreate(m_BorderColor[m_Sort[j]]);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-06 13:37:14 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2006-11-15 18:17:32 $
+  Version:   $Revision: 1.18 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,7 +38,7 @@ class vtkPoints;
 class mafViewOrthoSlice: public mafViewCompound
 {
 public:
-  mafViewOrthoSlice(wxString label = "View OrthoSlice", bool show_ruler = false);
+  mafViewOrthoSlice(wxString label = "View OrthoSlice");
   virtual ~mafViewOrthoSlice(); 
 
   mafTypeMacro(mafViewOrthoSlice, mafViewCompound);
@@ -93,7 +93,7 @@ protected:
   void GizmoDelete();
 
   /** Update the slices according to the new position. */
-  void UpdateSlice(long gizmoId, vtkPoints *p);
+  void SetSlicePosition(long gizmoId, vtkPoints *p);
 
   mafGizmoSlice   *m_Gizmo[3];
 

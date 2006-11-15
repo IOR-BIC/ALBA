@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-10 12:28:06 $
-  Version:   $Revision: 1.25 $
-  Authors:   Paolo Quadrani
+  Date:      $Date: 2006-11-15 18:17:32 $
+  Version:   $Revision: 1.26 $
+  Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -395,7 +395,7 @@ void mafViewSlice::SetLutRange(double low_val, double high_val)
   }
 }
 //----------------------------------------------------------------------------
-void mafViewSlice::SetSlice(double origin[3])
+void mafViewSlice::SetSliceLocalOrigin(double origin[3])
 //----------------------------------------------------------------------------
 {
   if(!m_CurrentVolume)
