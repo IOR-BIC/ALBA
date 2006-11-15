@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-07 15:09:11 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-11-15 14:33:36 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,10 +21,11 @@
 
 #include "mafSceneNode.h"
 #include "mafSceneGraph.h"
+#include "mmgGui.h"
+
 #include "mafPipe.h"
 #include "mafNode.h"
 #include "vtkMAFAssembly.h"
-#include "mmgGui.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipe);
@@ -41,8 +42,8 @@ mafPipe::mafPipe()
 	m_RenFront      = NULL;
 	m_RenBack       = NULL;
   m_Gui           = NULL;
-	m_Selected = false;
   m_Listener      = NULL;
+	m_Selected = false;
 }
 //----------------------------------------------------------------------------
 void mafPipe::Create(mafSceneNode *n)

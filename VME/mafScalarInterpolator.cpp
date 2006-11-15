@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafScalarInterpolator.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-08 14:07:44 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-11-15 14:37:43 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -71,7 +71,8 @@ void mafScalarInterpolator::PreExecute()
   // if the current item is changed set the data inside new item as input for the interpolator
   // more specialized interpolators could redefine this to have more inputs (e.g. when 
   // interpolating different items)
-  if ( m_CurrentItem && (m_CurrentItem!=m_OldItem || mtime>m_UpdateTime.GetMTime()))
+  if ( m_CurrentItem && (m_CurrentItem != m_OldItem || \
+      mtime > m_UpdateTime.GetMTime() ))
   {
     m_ScalarData = GetCurrentItem()->GetData();
     m_UpdateTime.Modified();

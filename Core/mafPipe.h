@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-07 15:09:11 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2006-11-15 14:33:36 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -79,8 +79,8 @@ public:
 	vtkMAFAssembly *m_AssemblyFront;
 	vtkMAFAssembly *m_AssemblyBack;
 	mafSceneGraph  *m_Sg;
-  bool            m_Selected; 
-  vtkRenderer    *m_RenFront;     
+  bool            m_Selected;
+  vtkRenderer    *m_RenFront;
   vtkRenderer    *m_RenBack;
 
 protected:
