@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoInterface.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:24 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-11-15 18:18:45 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,9 +28,9 @@ class mafVME;
 class mafMatrix;
 
 //----------------------------------------------------------------------------
-/** Abstract class for operations gizmos.
+/** Abstract class for operations and views gizmos.
   This abstract class defines the interface for gizmos that can be plugged into
-  an operation
+  a view or into an operation
 
   @sa
  
@@ -42,7 +42,7 @@ public:
 
   /** 
   Set input vme for the gizmo*/
-  virtual void SetInput(mafVME *vme) = 0; 
+  virtual void SetInput(mafVME *vme) = 0;
   mafVME *GetInput() {return this->InputVME;};
 
   //----------------------------------------------------------------------------
@@ -55,7 +55,7 @@ public:
 
   /**
   Events handling*/        
-  virtual void OnEvent(mafEventBase *maf_event) {};
+  virtual void OnEvent(mafEventBase *maf_event) = 0;
  
   //----------------------------------------------------------------------------
   // show 
@@ -69,15 +69,21 @@ public:
   // Gizmo modality  
   //----------------------------------------------------------------------------
   /**
-  Set the gizmo modality */
+  Set the gizmo working modality */
   enum MODALITY {G_LOCAL = 0, G_GLOBAL};
+
+  /** Modality to be used when gizmo reference frame is the input vme abs pose */
   void SetModalityToLocal(){this->Modality = G_LOCAL;};
+
+  /** Modality to be used when gizmo reference frame is different from input vme abs pose */
   void SetModalityToGlobal() {this->Modality = G_GLOBAL;};
+
+  /** Return the working modality */
   int  GetModality() {return this->Modality;};
 
   //----------------------------------------------------------------------------
   /**
-  Set the gizmo pose*/
+  Set the gizmo abs pose*/
   virtual void SetAbsPose(mafMatrix *absPose) {};
   virtual mafMatrix *GetAbsPose() {return NULL;};
   
@@ -117,6 +123,6 @@ protected:
   virtual void OnEventGizmoGui(mafEventBase *maf_event) {};
 
   /** Gizmo components events handling */
-  virtual void OnEventGizmoComponents(mafEventBase *maf_event) = 0;
+  virtual void OnEventGizmoComponents(mafEventBase *maf_event) {};
 };
 #endif
