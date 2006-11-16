@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoROI.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:24 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-11-16 13:19:56 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,7 +24,6 @@
 // forward references :
 //----------------------------------------------------------------------------
 class mafGizmoHandle;
-class mafGTranslatePlane;
 class mafGizmoBoundingBox;
 class mafMatrix;
 class mafVME;
@@ -62,7 +61,13 @@ class mafVME;
    ->X
 
   Gizmo composed of 6 mafGizmoHandle and 1 mafGizmoBoundingBox used to select a region of interest.
-  @sa mflGHandle mflGBox mmoCrop*/
+
+  This object works by creating smaller components that are parented to the
+  input vme ie works in local coordinates.
+  In order to use it in your client create an instance of it and ask for the region of interest. 
+
+  @sa mafGizmoHandle mafGizmoBoundingBox
+  */
 
 class mafGizmoROI: public mafGizmoInterface
 {

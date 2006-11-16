@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScale.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:25 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-11-16 13:19:56 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -50,8 +50,12 @@ class mmgGui;
   (single axis scaling       
    constrain)
 
- and forward pose matrixes to the 
- listener operation. 
+ and forward pose matrixes to the listener operation. 
+ This object works by creating smaller components that are parented to the
+ vme tree root ie works in global coordinates.
+ in order to use it in your client create an instance of it and concatenate
+ in post multiply modality matrix that this object is sending to the the
+ vme you want to move.
 
  @sa mafGizmoScaleAxis
 */
