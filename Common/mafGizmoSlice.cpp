@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-15 18:16:56 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-11-16 16:23:08 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -283,11 +283,11 @@ void mafGizmoSlice::OnEvent(mafEventBase *maf_event)
         m_VmeGizmo->SetMatrix(tr->GetMatrix());		 
 
         //local position of gizmo cube handle centre
-        double locPos[3];
-        mafTransform::GetPosition(*m_GizmoHandleCenterMatrix, locPos);
+        double slicePlaneOrigin[3];
+        mafTransform::GetPosition(*m_GizmoHandleCenterMatrix, slicePlaneOrigin);
 
         // position sent as vtk point
-        m_Point->SetPoint(0,locPos);
+        m_Point->SetPoint(0,slicePlaneOrigin);
         mafEventMacro(mafEvent(this,MOUSE_MOVE, m_Point, m_id));
 
       }

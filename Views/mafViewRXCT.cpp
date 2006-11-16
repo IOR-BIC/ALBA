@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-15 18:17:32 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2006-11-16 16:22:31 $
+  Version:   $Revision: 1.22 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -385,19 +385,19 @@ void mafViewRXCT::OnEventMouseMove( mafEvent *e )
   long movingSliceId;
   movingSliceId = e->GetArg();
 
-  double newSlicePosition[3];
+  double newSliceLocalOrigin[3];
   vtkPoints *p = (vtkPoints *)e->GetVtkObj();
   if(p == NULL) {
     return;
   }
-  p->GetPoint(0,newSlicePosition);
+  p->GetPoint(0,newSliceLocalOrigin);
   if (m_MoveAllSlices)
   {
-    double oldSlicePosition[3], delta[3], b[CT_CHILD_VIEWS_NUMBER];
-    ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(movingSliceId))->GetSlice(oldSlicePosition);
-    delta[0] = newSlicePosition[0] - oldSlicePosition[0];
-    delta[1] = newSlicePosition[1] - oldSlicePosition[1];
-    delta[2] = newSlicePosition[2] - oldSlicePosition[2];
+    double oldSliceLocalOrigin[3], delta[3], b[CT_CHILD_VIEWS_NUMBER];
+    ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(movingSliceId))->GetSlice(oldSliceLocalOrigin);
+    delta[0] = newSliceLocalOrigin[0] - oldSliceLocalOrigin[0];
+    delta[1] = newSliceLocalOrigin[1] - oldSliceLocalOrigin[1];
+    delta[2] = newSliceLocalOrigin[2] - oldSliceLocalOrigin[2];
 
     for (int currSubView = 0; currSubView<((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetNumberOfSubView(); currSubView++)
     {
@@ -406,29 +406,29 @@ void mafViewRXCT::OnEventMouseMove( mafEvent *e )
       int i=0;
       while (currSubView!=m_Sort[i]) i++;
 
-      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currSubView))->GetSlice(oldSlicePosition);
-      newSlicePosition[0] = oldSlicePosition[0] + delta[0];
-      newSlicePosition[1] = oldSlicePosition[1] + delta[1];
-      newSlicePosition[2] = oldSlicePosition[2] + delta[2];
-      newSlicePosition[2] = newSlicePosition[2] > b[5] ? b[5] : newSlicePosition[2];
-      newSlicePosition[2] = newSlicePosition[2] < b[4] ? b[4] : newSlicePosition[2];
-      m_GizmoSlice[currSubView]->SetGizmoSliceLocalPosition(currSubView,mafGizmoSlice::GIZMO_SLICE_Z,newSlicePosition[2]);
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currSubView))->GetSlice(oldSliceLocalOrigin);
+      newSliceLocalOrigin[0] = oldSliceLocalOrigin[0] + delta[0];
+      newSliceLocalOrigin[1] = oldSliceLocalOrigin[1] + delta[1];
+      newSliceLocalOrigin[2] = oldSliceLocalOrigin[2] + delta[2];
+      newSliceLocalOrigin[2] = newSliceLocalOrigin[2] > b[5] ? b[5] : newSliceLocalOrigin[2];
+      newSliceLocalOrigin[2] = newSliceLocalOrigin[2] < b[4] ? b[4] : newSliceLocalOrigin[2];
+      m_GizmoSlice[currSubView]->SetGizmoSliceLocalPosition(currSubView,mafGizmoSlice::GIZMO_SLICE_Z,newSliceLocalOrigin[2]);
 
-      m_Pos[currSubView]=newSlicePosition[2];
+      m_Pos[currSubView]=newSliceLocalOrigin[2];
 
-      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currSubView))->SetSliceLocalOrigin(newSlicePosition);
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currSubView))->SetSliceLocalOrigin(newSliceLocalOrigin);
       ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currSubView))->CameraUpdate();
     }
   }
   else
   {
     // move a single slice: this needs reordering
-    m_Pos[movingSliceId]=newSlicePosition[2];
+    m_Pos[movingSliceId]=newSliceLocalOrigin[2];
     SortSlices();
     int i=0;
     while (movingSliceId != m_Sort[i]) i++;
 
-    ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->SetSliceLocalOrigin(newSlicePosition);
+    ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->SetSliceLocalOrigin(newSliceLocalOrigin);
     ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->CameraUpdate();
   }
   m_ChildViewList[RX_FRONT_VIEW]->CameraUpdate();
