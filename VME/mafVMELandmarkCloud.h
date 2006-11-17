@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:55 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2006-11-17 13:07:14 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -145,6 +145,7 @@ public:
   {
     ID_LM_RADIUS = Superclass::ID_LAST,
     ID_OPEN_CLOSE_CLOUD,
+    ID_LM_SPHERE_RESOLUTION,
     ID_LAST
   };
 

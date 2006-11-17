@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-08 13:31:46 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2006-11-17 13:07:14 $
+  Version:   $Revision: 1.22 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -643,8 +643,8 @@ double mafVMELandmarkCloud::GetRadius()
 void mafVMELandmarkCloud::SetSphereResolution(int res)
 //-------------------------------------------------------------------------
 {
-  if (res==m_SphereResolution)
-    return;
+  //if (res==m_SphereResolution)
+  //  return;
 
   mafTagItem item;
 
@@ -655,6 +655,8 @@ void mafVMELandmarkCloud::SetSphereResolution(int res)
   item.SetValue(res);
   GetTagArray()->SetTag(item);
   GetEventSource()->InvokeEvent(this, mafVMELandmarkCloud::CLOUDE_SPHERE_RES);
+  mafEvent cam_event(this,CAMERA_UPDATE);
+  this->ForwardUpEvent(cam_event);
 }
 
 //-------------------------------------------------------------------------
@@ -1171,8 +1173,15 @@ mmgGui* mafVMELandmarkCloud::CreateGui()
   GetRadius(); // Called to update m_Radius var from tag
   m_CloudStateCheckbox = this->IsOpen() ? 1 : 0;
   m_Gui->Bool(ID_OPEN_CLOSE_CLOUD,"Explode",&m_CloudStateCheckbox);
-  m_Gui->Double(ID_LM_RADIUS, "radius", &m_Radius, 0.0,MAXDOUBLE,-1);
 
+  m_Gui->Double(ID_LM_RADIUS, "radius", &m_Radius, 0.0,MAXDOUBLE,-1);
+  m_Gui->Enable(ID_LM_RADIUS, m_CloudStateCheckbox == 0);
+
+  GetSphereResolution();
+  m_Gui->Integer(ID_LM_SPHERE_RESOLUTION, "Resolution", &m_SphereResolution, 0.0,MAXINT);
+  m_Gui->Enable(ID_LM_SPHERE_RESOLUTION, m_CloudStateCheckbox == 0);
+  
+  m_Gui->Divider();
   return m_Gui;
 }
 //-------------------------------------------------------------------------
@@ -1196,6 +1205,11 @@ void mafVMELandmarkCloud::OnEvent(mafEventBase *maf_event)
         {
           this->Close();
         }
+        m_Gui->Enable(ID_LM_RADIUS, m_CloudStateCheckbox == 0);
+        m_Gui->Enable(ID_LM_SPHERE_RESOLUTION, m_CloudStateCheckbox == 0);
+      break;
+      case ID_LM_SPHERE_RESOLUTION:
+        SetSphereResolution(m_SphereResolution);
       break;
       default:
         mafVME::OnEvent(maf_event);
