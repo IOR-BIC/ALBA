@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-13 17:45:13 $
-  Version:   $Revision: 1.38 $
+  Date:      $Date: 2006-11-17 13:01:03 $
+  Version:   $Revision: 1.39 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,6 +28,8 @@
 #include "mafTransformBase.h"
 #include "mafVMEVolume.h"
 #include "mafVMEOutputVolume.h"
+
+#include "mmgFloatSlider.h"
 
 #include "mafLODActor.h"
 #include "vtkMAFSmartPointer.h"
@@ -106,6 +108,8 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
   m_YVector[2][0] = 0;
   m_YVector[2][1] = 1;
   m_YVector[2][2] = 0;
+
+	m_ShowSlider = true;
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeSlice::InitializeSliceParameters(int direction, bool show_vol_bbox, bool show_bounds)
@@ -136,6 +140,8 @@ void mafPipeVolumeSlice::InitializeSliceParameters(int direction, double slice_o
 	m_ShowBounds = show_bounds;
   
   m_SliceDirection= direction;
+	if(m_SliceDirection == SLICE_ARB)
+		m_SliceDirection = SLICE_Z;
   m_ShowVolumeBox = show_vol_bbox;
 
   m_Origin[0] = slice_origin[0];
@@ -496,7 +502,7 @@ void mafPipeVolumeSlice::GetSliceNormal(double normal[3])
 	normal[2] = m_Normal[m_SliceDirection][2];
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice::SetSliceOpacity(float opacity)
+void mafPipeVolumeSlice::SetSliceOpacity(double opacity)
 //----------------------------------------------------------------------------
 {
   m_SliceOpacity = opacity;
@@ -521,19 +527,23 @@ mmgGui *mafPipeVolumeSlice::CreateGui()
   double b[6] = {-1,1,-1,1,-1,1};
   m_Gui = new mmgGui(this);
   m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
+	m_Gui->FloatSlider(ID_OPACITY_SLIDER,"opacity",&m_SliceOpacity,0.1,1.0);
   m_Vme->GetOutput()->GetVMELocalBounds(b);
-  if (m_SliceDirection == SLICE_X || m_SliceDirection == SLICE_ORTHO)
-  {
-    m_SliceSlider[0] = m_Gui->FloatSlider(ID_SLICE_SLIDER_X,"x",&m_Origin[0],b[0],b[1]);
-  }
-  if (m_SliceDirection == SLICE_Y || m_SliceDirection == SLICE_ORTHO)
-  {
-    m_SliceSlider[1] = m_Gui->FloatSlider(ID_SLICE_SLIDER_Y,"y",&m_Origin[1],b[2],b[3]);
-  }
-  if (m_SliceDirection == SLICE_Z || m_SliceDirection == SLICE_ORTHO)
-  {
-    m_SliceSlider[2] = m_Gui->FloatSlider(ID_SLICE_SLIDER_Z,"z",&m_Origin[2],b[4],b[5]);
-  }
+	if(m_ShowSlider)
+	{
+		if (m_SliceDirection == SLICE_X || m_SliceDirection == SLICE_ORTHO)
+		{
+			m_SliceSlider[0] = m_Gui->FloatSlider(ID_SLICE_SLIDER_X,"x",&m_Origin[0],b[0],b[1]);
+		}
+		if (m_SliceDirection == SLICE_Y || m_SliceDirection == SLICE_ORTHO)
+		{
+			m_SliceSlider[1] = m_Gui->FloatSlider(ID_SLICE_SLIDER_Y,"y",&m_Origin[1],b[2],b[3]);
+		}
+		if (m_SliceDirection == SLICE_Z || m_SliceDirection == SLICE_ORTHO)
+		{
+			m_SliceSlider[2] = m_Gui->FloatSlider(ID_SLICE_SLIDER_Z,"z",&m_Origin[2],b[4],b[5]);
+		}
+	}
 
   return m_Gui;
 }
@@ -558,6 +568,10 @@ void mafPipeVolumeSlice::OnEvent(mafEventBase *maf_event)
         SetSlice(m_Origin);
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
+			case ID_OPACITY_SLIDER:
+				SetSliceOpacity(m_SliceOpacity);
+				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+			break;
       default:
       break;
     }
@@ -596,4 +610,16 @@ void mafPipeVolumeSlice::Select(bool sel)
 	m_Selected = sel;
 	m_ShowVolumeBox = sel;
 	m_VolumeBoxActor->SetVisibility(sel);
+}
+//----------------------------------------------------------------------------
+void mafPipeVolumeSlice::HideSlider()
+//----------------------------------------------------------------------------
+{
+	m_ShowSlider=false;
+}
+//----------------------------------------------------------------------------
+void mafPipeVolumeSlice::ShowSlider()
+//----------------------------------------------------------------------------
+{
+	m_ShowSlider=true;
 }

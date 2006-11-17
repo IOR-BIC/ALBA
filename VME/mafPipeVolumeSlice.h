@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-07 09:55:17 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2006-11-17 13:01:03 $
+  Version:   $Revision: 1.19 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -68,6 +68,7 @@ public:
     ID_SLICE_SLIDER_X,
     ID_SLICE_SLIDER_Y,
     ID_SLICE_SLIDER_Z,
+		ID_OPACITY_SLIDER,
     ID_LAST
   };
 
@@ -94,23 +95,23 @@ public:
   /** Get slice parameters: origin and normal */
 	void GetSliceNormal(double normal[3]);
 
-  /** 
-  Assign a color lookup table to the slices*/
+  /** Assign a color lookup table to the slices*/
   void SetColorLookupTable(vtkLookupTable *lut);
 
-  /** 
-  Return the color lookup table of the slices*/
+  /** Return the color lookup table of the slices*/
   vtkLookupTable *GetColorLookupTable() {return m_ColorLUT;};
 
-  /** 
-  Set the opacity of the slice. */
-  void SetSliceOpacity(float opacity);
+  /** Set the opacity of the slice. */
+  void SetSliceOpacity(double opacity);
   
-  /** 
-  Get the opacity of the slice. */
+  /** Get the opacity of the slice. */
   float GetSliceOpacity();
 
 	virtual void Select(bool select); 
+
+	void HideSlider();
+
+	void ShowSlider();
 
 protected:
 	/** Create the slicer pipeline. */
@@ -118,11 +119,11 @@ protected:
 
   virtual mmgGui  *CreateGui();
 
-	double m_Origin[3];
-	float  m_Normal[3][3];
-	float  m_XVector[3][3];
-	float  m_YVector[3][3];
-  float  m_SliceOpacity;
+	double	m_Origin[3];
+	float		m_Normal[3][3];
+	float		m_XVector[3][3];
+	float		m_YVector[3][3];
+  double  m_SliceOpacity;
 
 	int		 m_TextureRes;
 	int		 m_SliceDirection; ///< Store the slicing direction: SLICE_X, SLICE_Y or SLICE_)
@@ -153,5 +154,6 @@ protected:
   bool                    m_SliceParametersInitialized;
   bool                    m_ShowVolumeBox;
 	bool										m_ShowBounds;
+	bool										m_ShowSlider;
 };
 #endif // __mafPipeVolumeSlice_H__
