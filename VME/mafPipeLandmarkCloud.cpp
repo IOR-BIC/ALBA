@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeLandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-20 15:35:37 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-11-17 13:07:59 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -240,7 +240,7 @@ void mafPipeLandmarkCloud::OnEvent(mafEventBase *maf_event)
       m_SphereSource->SetRadius(m_Cloud->GetRadius());
     }
   }
-  else if (maf_event->GetId() == mafVMELandmarkCloud::CLOUDE_RADIUS_MODIFIED)
+  else if (maf_event->GetId() == mafVMELandmarkCloud::CLOUDE_SPHERE_RES)
   {
     if (m_SphereSource)
     {
@@ -248,6 +248,7 @@ void mafPipeLandmarkCloud::OnEvent(mafEventBase *maf_event)
       m_SphereSource->SetPhiResolution(m_Cloud->GetSphereResolution());
     }
   }
+  
 }
 //----------------------------------------------------------------------------
 void mafPipeLandmarkCloud::CreateClosedCloudPipe(vtkDataSet *data, double radius, double resolution)
