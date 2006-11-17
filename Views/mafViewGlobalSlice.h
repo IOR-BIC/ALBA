@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-13 21:08:19 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-11-17 13:34:45 $
+  Version:   $Revision: 1.4 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -65,9 +65,6 @@ public:
   Delete vme's visual pipe. It is called when vme is removed from visualization.*/
   virtual void VmeDeletePipe(mafNode *vme);
 
-	/** Add the vme to the view's scene-graph*/
-	virtual void VmeAdd(mafNode *vme);
-
 	virtual void OnEvent(mafEventBase *maf_event);
 
 	virtual void VmeSelect(mafNode *node, bool select);
@@ -79,6 +76,12 @@ public:
 	/** 
 	Set slicer parameter to generate the slice. */
 	void SetSlice(double origin[3], int dn = 0);
+
+	/** 
+  Show/Hide VMEs into plugged sub-views*/
+  virtual void VmeShow(mafNode *node, bool show);
+
+	virtual void CameraUpdate();
 
 protected:
 

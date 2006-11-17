@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-13 21:08:19 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-11-17 13:34:45 $
+  Version:   $Revision: 1.10 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -180,23 +180,12 @@ void mafViewGlobalSlice::VmeSelect(mafNode *node,bool select)
       if (m_SelectedVolume->m_Pipe)
       {
         //m_Gui->Enable(ID_LUT,true);
-        m_Gui->Enable(ID_OPACITY_SLIDER,true);
+        //m_Gui->Enable(ID_OPACITY_SLIDER,true);
         m_Opacity   = ((mafPipeVolumeSlice *)m_SelectedVolume->m_Pipe)->GetSliceOpacity();
         m_Gui->Update();
       }
     }
   }
-}
-//----------------------------------------------------------------------------
-void mafViewGlobalSlice::VmeAdd(mafNode *vme)
-//----------------------------------------------------------------------------
-{
-	Superclass::VmeAdd(vme);
-	if(m_GlobalBoundsInitialized)
-	{
-		((mafVME*)vme->GetRoot())->GetOutput()->Get4DBounds(m_GlobalBounds);
-		UpdateSliceParameters();
-	}
 }
 //----------------------------------------------------------------------------
 void mafViewGlobalSlice::VmeCreatePipe(mafNode *node)
@@ -268,10 +257,14 @@ void mafViewGlobalSlice::VmeCreatePipe(mafNode *node)
 			pipe->Create(n);
 			n->m_Pipe = (mafPipe*)pipe;
 
+			if (pipe_name.Equals("mafPipeVolumeSlice"))
+			{
+				((mafPipeVolumeSlice *)pipe)->HideSlider();
+			}
+
 			if (m_SelectedVolume == n && m_SelectedVolume->m_Vme->IsA("mafVMEVolumeGray"))
 			{
-				m_Gui->Enable(ID_OPACITY_SLIDER,true);
-				m_Gui->Enable(ID_OPACITY_SLIDER,true);
+				//m_Gui->Enable(ID_OPACITY_SLIDER,true);
 				m_Opacity=((mafPipeVolumeSlice *)m_SelectedVolume->m_Pipe)->GetSliceOpacity();
 				m_Gui->Update();
 			}
@@ -312,7 +305,7 @@ void mafViewGlobalSlice::VmeDeletePipe(mafNode *vme)
 	if (m_SelectedVolume == n)
   {
     //m_Gui->Enable(ID_LUT,false);
-    m_Gui->Enable(ID_OPACITY_SLIDER,false);
+    //m_Gui->Enable(ID_OPACITY_SLIDER,false);
     m_Gui->Update();
   }
   assert(n && n->m_Pipe);
@@ -434,7 +427,7 @@ mmgGui* mafViewGlobalSlice::CreateGui()
 	
 	m_GlobalSlider=m_Gui->FloatSlider(ID_POS_SLIDER,"pos.",&m_SliderOrigin,m_GlobalBounds[4],m_GlobalBounds[5]);
 	m_Gui->Combo(ID_CHANGE_VIEW,"view",&m_ViewIndex,3,Views);
-	m_Gui->FloatSlider(ID_OPACITY_SLIDER,"opacity",&m_Opacity,0.1,1.0);
+	//m_Gui->FloatSlider(ID_OPACITY_SLIDER,"opacity",&m_Opacity,0.1,1.0);
 
 	bool Enable = false;
   mafNode *selVME = m_Sg->GetSelectedVme();
@@ -442,11 +435,11 @@ mmgGui* mafViewGlobalSlice::CreateGui()
   {
 		m_SelectedVolume = m_Sg->Vme2Node(selVME);
 		//m_gui->Enable(ID_LUT,en);
-		m_Gui->Enable(ID_OPACITY_SLIDER,true);
+		//m_Gui->Enable(ID_OPACITY_SLIDER,true);
   }
 	else
 	{
-		m_Gui->Enable(ID_OPACITY_SLIDER,false);
+		//m_Gui->Enable(ID_OPACITY_SLIDER,false);
 	}
 
   m_SliderOldOrigin = m_SliderOrigin;
@@ -573,4 +566,26 @@ void mafViewGlobalSlice::UpdateText()
 	m_Text=wxString::Format("o = [%.1f %.1f %.1f]  n = [%.1f %.1f %.1f]",m_SliceOrigin[0],m_SliceOrigin[1],m_SliceOrigin[2],m_SliceNormal[0],m_SliceNormal[1],m_SliceNormal[2]);
 	m_TextMapper->SetInput(m_Text.GetCStr());
 	m_TextMapper->Modified();
+}
+//----------------------------------------------------------------------------
+void mafViewGlobalSlice::CameraUpdate()
+//----------------------------------------------------------------------------
+{
+	Superclass::CameraUpdate();
+	mafNode *node=m_Sg->GetSelectedVme();
+	double GlobalBounds[6];
+	((mafVME*)node->GetRoot())->GetOutput()->Get4DBounds(GlobalBounds);
+	if(m_GlobalBoundsInitialized)
+		if(GlobalBounds[0]!=m_GlobalBounds[0]||GlobalBounds[1]!=m_GlobalBounds[1]||GlobalBounds[2]!=m_GlobalBounds[2]||GlobalBounds[3]!=m_GlobalBounds[3]||GlobalBounds[4]!=m_GlobalBounds[4]||GlobalBounds[5]!=m_GlobalBounds[5])
+		{
+			((mafVME*)node->GetRoot())->GetOutput()->Get4DBounds(m_GlobalBounds);
+			UpdateSliceParameters();
+			UpdateSlice();
+		}
+}
+//----------------------------------------------------------------------------
+void mafViewGlobalSlice::VmeShow(mafNode *node, bool show)
+//----------------------------------------------------------------------------
+{
+	Superclass::VmeShow(node,show);
 }
