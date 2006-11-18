@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-18 16:57:52 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-11-18 17:13:52 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -26,8 +26,9 @@ class mafVMEGizmo;
 class vtkPoints;
 class vtkDoubleArray;
 
-/** Gizmo typically used to move volume slices.
-    @sa mafViewRXCT, mafViewOrthoSlice for usage examples: these views act as mediators between gizmo slices
+/** Gizmo typically used to move volume slices. It is reparented under the input vme ie it is working in
+local coordinates.
+@sa mafViewRXCT, mafViewOrthoSlice for usage examples: these views act as mediators between gizmo slices
 */
 class mafGizmoSlice : public mafGizmoInterface
 {
