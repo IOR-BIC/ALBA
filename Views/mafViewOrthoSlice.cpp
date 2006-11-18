@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-18 16:58:12 $
-  Version:   $Revision: 1.45 $
+  Date:      $Date: 2006-11-18 17:05:19 $
+  Version:   $Revision: 1.46 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -372,13 +372,13 @@ void mafViewOrthoSlice::GizmoCreate()
   // creates the gizmos
   for(gizmoId=GIZMO_XN; gizmoId<GIZMOS_NUMBER; gizmoId++) 
   {
-    double slice[3];
+    double sliceOrigin[3];
     mafPipeVolumeSlice *p = NULL;
     p = mafPipeVolumeSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[0]))->GetNodePipe(m_CurrentVolume));
-    p->GetSliceOrigin(slice);
+    p->GetSliceOrigin(sliceOrigin);
 
     m_Gizmo[gizmoId] = new mafGizmoSlice(m_CurrentVolume, this);
-    m_Gizmo[gizmoId]->CreateGizmoSliceInLocalPositionOnAxis(gizmoId, direction[gizmoId], slice[gizmoId]);
+    m_Gizmo[gizmoId]->CreateGizmoSliceInLocalPositionOnAxis(gizmoId, direction[gizmoId], sliceOrigin[gizmoId]);
     m_Gizmo[gizmoId]->SetColor(&colors[gizmoId*3]);
     m_Gizmo[gizmoId]->SetGizmoMovingModalityToBound();
   }
