@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-15 18:16:56 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-11-18 16:57:52 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -50,8 +50,8 @@ public:
   /** return the gizmo slice object */
   mafVME *GetOutput(); 
 
-	/** Set id and position on choosed axis*/
-	void SetGizmoSliceLocalPosition(int gizmoSliceId, int axis, double positionOnAxis);
+	/** Create the gizmo slice with its id on choosed position on choosed axis*/
+	void CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int axis, double positionOnAxis);
   
   enum GISMO_SLICE_AXIS_ID
   {

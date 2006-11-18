@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-16 16:22:31 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2006-11-18 16:58:12 $
+  Version:   $Revision: 1.23 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -349,7 +349,7 @@ void mafViewRXCT::OnEventSortSlices()
         center[2] = b[5]-step*(currChildCTView+1);
         center[2] = center[2] > b[5] ? b[5] : center[2];
         center[2] = center[2] < b[4] ? b[4] : center[2];
-        m_GizmoSlice[currChildCTView]->SetGizmoSliceLocalPosition(currChildCTView,mafGizmoSlice::GIZMO_SLICE_Z,center[2]);
+        m_GizmoSlice[currChildCTView]->CreateGizmoSliceInLocalPositionOnAxis(currChildCTView,mafGizmoSlice::GIZMO_SLICE_Z,center[2]);
         m_Pos[currChildCTView]=center[2];
         m_Sort[currChildCTView]=currChildCTView;
         ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->SetSliceLocalOrigin(center);
@@ -412,7 +412,7 @@ void mafViewRXCT::OnEventMouseMove( mafEvent *e )
       newSliceLocalOrigin[2] = oldSliceLocalOrigin[2] + delta[2];
       newSliceLocalOrigin[2] = newSliceLocalOrigin[2] > b[5] ? b[5] : newSliceLocalOrigin[2];
       newSliceLocalOrigin[2] = newSliceLocalOrigin[2] < b[4] ? b[4] : newSliceLocalOrigin[2];
-      m_GizmoSlice[currSubView]->SetGizmoSliceLocalPosition(currSubView,mafGizmoSlice::GIZMO_SLICE_Z,newSliceLocalOrigin[2]);
+      m_GizmoSlice[currSubView]->CreateGizmoSliceInLocalPositionOnAxis(currSubView,mafGizmoSlice::GIZMO_SLICE_Z,newSliceLocalOrigin[2]);
 
       m_Pos[currSubView]=newSliceLocalOrigin[2];
 
@@ -629,7 +629,7 @@ void mafViewRXCT::GizmoCreate()
     p = mafPipeVolumeSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(m_CurrentVolume));
     p->GetSliceOrigin(slice);
     m_GizmoSlice[i] = new mafGizmoSlice(m_CurrentVolume, this);
-    m_GizmoSlice[i]->SetGizmoSliceLocalPosition(i,mafGizmoSlice::GIZMO_SLICE_Z,slice[2]);
+    m_GizmoSlice[i]->CreateGizmoSliceInLocalPositionOnAxis(i,mafGizmoSlice::GIZMO_SLICE_Z,slice[2]);
     m_GizmoSlice[i]->SetColor(m_BorderColor[i]);
     ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->BorderCreate(m_BorderColor[i]);
 

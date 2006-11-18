@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-16 16:23:08 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-11-18 16:57:52 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -114,7 +114,7 @@ mafGizmoSlice::~mafGizmoSlice()
   DestroyGizmoSlice();
 }
 //----------------------------------------------------------------------------
-void mafGizmoSlice::SetGizmoSliceLocalPosition(int gizmoSliceId, int axis, double localPositionOnAxis)
+void mafGizmoSlice::CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int axis, double localPositionOnAxis)
 //----------------------------------------------------------------------------
 {
   //register gizmo axis
