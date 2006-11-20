@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoASCIIImporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-20 08:33:44 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-11-20 15:00:19 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -62,6 +62,9 @@ public:
   void SetFileName(std::string &file);
 
 protected:
+  /** Fill the file list getting the list of files matching the specified pattern.*/
+  void FillFileList(const char *file_pattern);
+
   enum SCALAR_DATA_ORDER {
     ROW_DATA = 0,
     COLUMN_DAtA

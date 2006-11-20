@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoASCIIImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-07 12:01:04 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-11-20 15:00:19 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,6 +21,7 @@
 #include "mmoASCIIImporter.h"
 #include <wx/busyinfo.h>
 #include <wx/tokenzr.h>
+#include <wx/dir.h>
 
 #include "mafEvent.h"
 #include "mmgGui.h"
@@ -47,7 +48,7 @@ mafOp(label)
 	m_Files.clear();
 
   m_ReadyToExecute = false;
-  m_ScalarOrder = 0;
+  m_ScalarOrder = 1;
 
   m_FileDir = mafGetApplicationDirectory().c_str();
   m_ScalarData = NULL;
@@ -71,6 +72,7 @@ mafOp* mmoASCIIImporter::Copy()
 void mmoASCIIImporter::SetParameters(void *param)
 //----------------------------------------------------------------------------
 {
+  mafString t = "";
   wxString op_par = (char *)param;
   wxStringTokenizer tkz(op_par, " ");
   wxString order = tkz.GetNextToken();
@@ -79,12 +81,45 @@ void mmoASCIIImporter::SetParameters(void *param)
   {
     m_ScalarOrder = so;
   }
-  
+  else
+  {
+    t = order.c_str();
+    if (t.FindFirst("*.") != -1)
+    {
+      FillFileList(t.GetCStr());
+    }
+    else
+    {
+      m_Files.insert(m_Files.end(), t.GetCStr());
+    }
+  }
+
   while (tkz.HasMoreTokens())
   {
-    m_Files.insert(m_Files.end(), tkz.GetNextToken().c_str());
+    t = tkz.GetNextToken().c_str();
+    if (t.FindFirst("*.") != -1)
+    {
+      FillFileList(t.GetCStr());
+      break;
+    }
+    else
+    {
+      m_Files.insert(m_Files.end(), t.GetCStr());
+    }
   }
   m_ReadyToExecute = true;
+}
+//----------------------------------------------------------------------------
+void mmoASCIIImporter::FillFileList(const char *file_pattern)
+//----------------------------------------------------------------------------
+{
+  wxArrayString files;
+  m_Files.clear();
+  wxDir::GetAllFiles(wxGetWorkingDirectory(), &files, file_pattern);
+  for (int f=0;f<files.GetCount();f++)
+  {
+    m_Files.insert(m_Files.end(), files[f].c_str());
+  }
 }
 //----------------------------------------------------------------------------
 // Constants:
