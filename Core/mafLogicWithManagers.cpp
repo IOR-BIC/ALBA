@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-15 14:32:58 $
-  Version:   $Revision: 1.79 $
+  Date:      $Date: 2006-11-21 13:53:34 $
+  Version:   $Revision: 1.80 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1187,12 +1187,6 @@ void mafLogicWithManagers::ViewCreate(int viewId)
 	if(m_ViewManager)
   {
     mafView* v = m_ViewManager->ViewCreate(viewId);
-    if(m_RemoteLogic && m_RemoteLogic->IsSocketConnected() && !m_ViewManager->m_FromRemote)
-    {
-      mafString cmd = "VIEW_CREATE:";
-      cmd << v->m_Id - VIEW_START;
-      m_RemoteLogic->RemoteMessage(cmd);
-    }
 
     /*
     if(m_OpManager) 
@@ -1242,6 +1236,13 @@ void mafLogicWithManagers::ViewCreated(mafView *v)
   // removed temporarily support for external Views
   if(v) 
 	{
+    if(m_RemoteLogic && m_RemoteLogic->IsSocketConnected() && !m_ViewManager->m_FromRemote)
+    {
+      mafEvent ev(this,VIEW_CREATE,v);
+      ev.SetChannel(REMOTE_COMMAND_CHANNEL);
+      m_RemoteLogic->OnEvent(&ev);
+    }
+
     if (GetExternalViewFlag())
     {
       // external views
