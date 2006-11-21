@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-02 11:26:57 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2006-11-21 14:39:10 $
+  Version:   $Revision: 1.24 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -496,11 +496,6 @@ void mafOpManager::OpRun(int op_id)
       int index = op_id - OP_USER;
 		  if(index >=0 && index <m_NumOp) 
         OpRun(m_OpList[index]);
-      if(m_CollaborateStatus && m_RemoteListener && !m_FromRemote && m_RunningOp->GetType() == OPTYPE_OP)
-      {
-        mafEvent e(this,RUN_OPERATION_EVENT,m_RunningOp);
-        m_RemoteListener->OnEvent(&e);
-      }
 		}
 	  break;
 	}
