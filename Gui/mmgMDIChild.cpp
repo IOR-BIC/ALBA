@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIChild.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-03 11:01:08 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2006-11-21 13:58:23 $
+  Version:   $Revision: 1.23 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -126,12 +126,13 @@ void mmgMDIChild::OnCloseWindow(wxCloseEvent& event)
 
 	mafEventMacro(mafEvent(this,VIEW_DELETE,m_View));
 	Destroy();
+  m_View = NULL;
 }
 //----------------------------------------------------------------------------
 void mmgMDIChild::OnActivate(wxActivateEvent& event)
 //----------------------------------------------------------------------------
 { 
-  if( event.GetActive() && !m_Quitting )
+  if( event.GetActive() && m_View && !m_Quitting )
   {
     mafEventMacro(mafEvent(this,VIEW_SELECT,m_View,(wxWindow*)NULL));
     Layout();
