@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-15 18:17:32 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2006-11-21 16:17:37 $
+  Version:   $Revision: 1.27 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -108,7 +108,7 @@ void mafViewSlice::Create()
 
   vtkNEW(m_Picker3D);
   vtkNEW(m_Picker2D);
-  m_Picker2D->SetTolerance(0.001);
+  m_Picker2D->SetTolerance(0.005);
   m_Picker2D->InitializePickList();
 
   // text stuff

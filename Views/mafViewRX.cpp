@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRX.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-09 12:12:35 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-11-21 16:17:37 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -79,7 +79,7 @@ void mafViewRX::Create()
 
   vtkNEW(m_Picker3D);
   vtkNEW(m_Picker2D);
-  m_Picker2D->SetTolerance(0.001);
+  m_Picker2D->SetTolerance(0.005);
   m_Picker2D->InitializePickList();
 }
 //----------------------------------------------------------------------------
