@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIChild.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-03 15:58:10 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-11-21 16:24:48 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -58,6 +58,9 @@ protected:
 
 	/** Send the event to select the owned view. */
   void OnActivate (wxActivateEvent& event);
+
+  /** Used to maximize view in remote application.*/
+  void OnMaximize(wxMaximizeEvent &event);
 
   wxWindow		*m_Win;
   mafView     *m_View;

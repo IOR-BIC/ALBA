@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIChild.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-21 13:58:23 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2006-11-21 16:24:48 $
+  Version:   $Revision: 1.24 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -47,6 +47,7 @@ BEGIN_EVENT_TABLE(mmgMDIChild,wxMDIChildFrame)
 				EVT_SIZE      (                  mmgMDIChild::OnSize)
         EVT_BUTTON    (VIEW_CLICKED,     mmgMDIChild::OnSelect)
 				EVT_ACTIVATE  (mmgMDIChild::OnActivate)
+        EVT_MAXIMIZE  (mmgMDIChild::OnMaximize)
 END_EVENT_TABLE()
 
 bool mmgMDIChild::m_Quitting = false;
@@ -117,12 +118,12 @@ void mmgMDIChild::EnableResize(bool enable)
 //----------------------------------------------------------------------------
 void mmgMDIChild::OnCloseWindow(wxCloseEvent& event)
 //----------------------------------------------------------------------------
-{ 
+{
   if (!m_AllowCloseFlag) {return;}
 
   // VIEW_DELETE must be sent from here and not from the destructor
 	// otherwise VIEW_DELETE is sent also on the closing of the application
-	// when the listener (the ViewManager) has been already destroied
+	// when the listener (the ViewManager) has been already destroyed
 
 	mafEventMacro(mafEvent(this,VIEW_DELETE,m_View));
 	Destroy();
@@ -136,5 +137,15 @@ void mmgMDIChild::OnActivate(wxActivateEvent& event)
   {
     mafEventMacro(mafEvent(this,VIEW_SELECT,m_View,(wxWindow*)NULL));
     Layout();
+  }
+}
+//----------------------------------------------------------------------------
+void mmgMDIChild::OnMaximize(wxMaximizeEvent &event)
+//----------------------------------------------------------------------------
+{
+  if (m_View)
+  {
+    mafString msg = "MaximizeSelectedView";
+    mafEventMacro(mafEvent(this,VIEW_MAXIMIZE,&msg));
   }
 }
