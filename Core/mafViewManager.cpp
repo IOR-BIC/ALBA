@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-23 11:54:35 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2006-11-21 13:56:54 $
+  Version:   $Revision: 1.26 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -129,6 +129,7 @@ void mafViewManager::OnEvent(mafEventBase *maf_event)
         {
           // Send the event to synchronize the remote application in case of collaboration modality
           mafEvent ev(this,VIEW_SELECTED,view);
+          ev.SetChannel(REMOTE_COMMAND_CHANNEL);
           m_RemoteListener->OnEvent(&ev);
         }
       }
@@ -397,6 +398,7 @@ void mafViewManager::ViewDelete(mafView *view)
   {
     // Send the event to synchronize the remote application in case of collaboration modality
     mafEvent e(this,VIEW_DELETE,view);
+    e.SetChannel(REMOTE_COMMAND_CHANNEL);
     m_RemoteListener->OnEvent(&e);
   }
 
@@ -462,5 +464,6 @@ void mafViewManager::Activate(mafView *view)
   if(externalViewFlag)
     ((mmgViewFrame *)view->GetFrame())->SetFocus();
   else
-    ((mmgMDIChild *)view->GetFrame())->Activate();
+    //((mmgMDIChild *)view->GetFrame())->Activate();
+    ((mmgMDIChild *)view->GetFrame())->SetFocus();
 }
