@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafRemoteLogic.cpp,v $
 Language:  C++
-Date:      $Date: 2006-10-12 08:51:42 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2006-11-21 13:54:34 $
+Version:   $Revision: 1.6 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -73,8 +73,8 @@ mafRemoteLogic::~mafRemoteLogic()
 void mafRemoteLogic::OnEvent(mafEventBase *event)
 //----------------------------------------------------------------------------
 {
-  if(m_ClientUnit && !m_ClientUnit->IsConnected() && m_ClientUnit->IsBusy())
-    return;
+//  if(m_ClientUnit && !m_ClientUnit->IsConnected() && m_ClientUnit->IsBusy())
+//    return;
 
   if (mafEvent *e = mafEvent::SafeDownCast(event)) 
   {
@@ -103,6 +103,15 @@ void mafRemoteLogic::OnEvent(mafEventBase *event)
         m_RemoteMsg += view_id;
         m_RemoteMsg += m_CommandSeparator;
         m_RemoteMsg += view_mult;
+      }
+      else if (id == VIEW_CREATE)
+      {
+        mafView *view = e->GetView();
+        mafString view_id;
+        view_id << (view->m_Id - VIEW_START);
+        m_RemoteMsg = "VIEW_CREATE";
+        m_RemoteMsg += m_CommandSeparator;
+        m_RemoteMsg += view_id;
       }
       else if(id == mafOpManager::OPERATION_INTERFACE_EVENT)
       {
@@ -308,7 +317,10 @@ void mafRemoteLogic::RemoteMessage(mafString &cmd, bool to_server)
       wxString mult = tkz.GetNextToken();
       mult.ToLong(&v_mult);
       mafView *view = m_ViewManager->GetView(v_id,v_mult);
-      view->GetFrame()->Close();
+      if (view)
+      {
+        view->GetFrame()->Close();
+      }
       if (m_RemoteMouse) 
       {
         m_RemoteMouse->OnEvent(&mafEvent(this,VIEW_DELETE,view));
