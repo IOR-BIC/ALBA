@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafRemoteLogic.cpp,v $
 Language:  C++
-Date:      $Date: 2006-11-21 14:40:59 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2006-11-21 16:25:29 $
+Version:   $Revision: 1.8 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -346,9 +346,11 @@ void mafRemoteLogic::RemoteMessage(mafString &cmd, bool to_server)
     else if (command == "MaximizeSelectedView")
     {
       mafView *view = m_ViewManager->GetSelectedView();
-      if (view) 
+      if (view)
       {
+        m_ViewManager->m_FromRemote = true;
         view->GetFrame()->Maximize();
+        m_ViewManager->m_FromRemote = false;
       }
     }
     else if (command == "NormalSizeSelectedView")
