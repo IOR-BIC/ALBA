@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-21 14:39:43 $
-  Version:   $Revision: 1.81 $
+  Date:      $Date: 2006-11-21 16:24:18 $
+  Version:   $Revision: 1.82 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -669,6 +669,12 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
         }
       }
       break;
+      case VIEW_MAXIMIZE:
+        if (m_RemoteLogic && m_RemoteLogic->IsSocketConnected() && !m_ViewManager->m_FromRemote)
+        {
+          m_RemoteLogic->RemoteMessage(*e->GetString());
+        }
+      break;
       case VIEW_SELECTED:
         e->SetBool(m_ViewManager->GetSelectedView() != NULL);
       break;
@@ -862,13 +868,13 @@ void mafLogicWithManagers::OnFileNew()
 {
 	if(m_VMEManager)
   {
-    if(m_OpManager)
-    {
-      m_OpManager->GetSelectedVme()->GetRoot()->CleanTree();
-      m_OpManager->ClearUndoStack(); 
-    }
     if( m_VMEManager->AskConfirmAndSave())
 	  {
+      if(m_OpManager)
+      {
+        m_OpManager->GetSelectedVme()->GetRoot()->CleanTree();
+        m_OpManager->ClearUndoStack(); 
+      }
 		  m_VMEManager->MSFNew();
 	  }
   }
@@ -904,6 +910,11 @@ void mafLogicWithManagers::OnFileOpen(const char *file_to_open)
   {
 	  if(m_VMEManager->AskConfirmAndSave())
 	  {
+      if(m_OpManager)
+      {
+        m_OpManager->GetSelectedVme()->GetRoot()->CleanTree();
+        m_OpManager->ClearUndoStack(); 
+      }
       wxString file;
       if (m_ApplicationSettings->UseRemoteStorage())
       {
@@ -943,7 +954,6 @@ void mafLogicWithManagers::OnFileOpen(const char *file_to_open)
       if(file.IsEmpty())
         return;
 
-      if(m_OpManager) m_OpManager->ClearUndoStack();
 		  m_VMEManager->MSFOpen(file);
 	  }
   }
