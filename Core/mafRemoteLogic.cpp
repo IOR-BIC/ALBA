@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafRemoteLogic.cpp,v $
 Language:  C++
-Date:      $Date: 2006-11-21 13:54:34 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2006-11-21 14:40:59 $
+Version:   $Revision: 1.7 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -165,10 +165,9 @@ void mafRemoteLogic::OnEvent(mafEventBase *event)
       }
       else if(id == mafOpManager::RUN_OPERATION_EVENT)
       {
-        mafOp *op = e->GetOp();
         m_RemoteMsg = "RunOperation";
         m_RemoteMsg << m_CommandSeparator;
-        m_RemoteMsg << op->m_Id;
+        m_RemoteMsg << e->GetArg();
       }
       else if (id == mmdButtonsPad::BUTTON_DOWN ||
         id == mmdButtonsPad::BUTTON_UP   ||
