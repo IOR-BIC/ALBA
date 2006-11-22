@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoEditMetadata.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-22 13:13:15 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-11-22 13:35:57 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -313,5 +313,13 @@ void mmoEditMetadata::AddNewTag(mafString &name)
 void mmoEditMetadata::OpUndo()
 //----------------------------------------------------------------------------
 {
+  // Paolo 22/11/2006: DeepCopy copy the tags coming from the m_OldTagArray but
+  // if in m_TagArray there are other tags they will be present also after the DeepCopy
+  // => DeepCopy do not produce equals tag array in this case! Perhaps the 
+  std::vector<std::string> tag_list;
+  m_TagArray->GetTagList(tag_list);
+  for (int t=0; t<tag_list.size();t++)
+    m_TagArray->DeleteTag(tag_list[t].c_str());
+  
   m_TagArray->DeepCopy(m_OldTagArray);
 }
