@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoASCIIImporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-20 15:00:19 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-11-22 12:55:51 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -28,7 +28,8 @@ class mafVMEScalar;
 //----------------------------------------------------------------------------
 // mmoASCIIImporter :
 //----------------------------------------------------------------------------
-/** */
+/** This type of importer allow to import files containing only numbers 
+written by rows or columns into a mafVMEScalar. Multiple files produce a time-varying mafVMEScalar.*/
 class mmoASCIIImporter: public mafOp
 {
 public:
@@ -70,12 +71,11 @@ protected:
     COLUMN_DAtA
   };
 
-  std::vector<std::string> m_Files;
-  mafString m_FileDir;
+  std::vector<std::string> m_Files; ///< List of files representing the scalar data.
+  mafString m_FileDir; ///< Directory where are located the files.
 
   mafVMEScalar *m_ScalarData;
-  int m_ScalarOrder;
-
-  bool m_ReadyToExecute;
+  int m_ScalarOrder; ///< Indicates if the scalar arrays are in rows (0) or columns (1).
+  bool m_ReadyToExecute; ///< Flag used when the operation runs by passing parameter's list. If it is true in the OpRun it ends without showing the gui.
 };
 #endif
