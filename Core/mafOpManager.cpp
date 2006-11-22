@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-21 14:39:10 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2006-11-22 12:59:44 $
+  Version:   $Revision: 1.25 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -157,8 +157,9 @@ void mafOpManager::OnEvent(mafEventBase *maf_event)
           w_data.iValue  = 0;
           w_data.sValue  = "";
           w_data.dType = NULL_DATA;
-          m_RunningOp->OpGui()->GetWidgetValue(w_id, w_data);
+          m_RunningOp->GetGui()->GetWidgetValue(w_id, w_data);
           mafEvent ev(this,OPERATION_INTERFACE_EVENT,w_data,w_id);
+          ev.SetChannel(REMOTE_COMMAND_CHANNEL);
           m_RemoteListener->OnEvent(&ev);
         }
       break;
@@ -501,7 +502,7 @@ void mafOpManager::OpRun(int op_id)
 	}
 }
 //----------------------------------------------------------------------------
-void mafOpManager::OpRun(mafOp *op, void *op_param)   
+void mafOpManager::OpRun(mafOp *op, void *op_param)
 //----------------------------------------------------------------------------
 {
 	//Code to manage operation's Input Preserving
@@ -522,23 +523,22 @@ void mafOpManager::OpRun(mafOp *op, void *op_param)
 	}
 
 	EnableOp(false);
-  //Notify(OP_RUN_STARTING); //SIL. 17-9-2004: --- moved after m_RunningOp has been set
 
-	mafOp *o = op->Copy();
-  o->m_Id = op->m_Id;    //Paolo 15/09/2004 The operation ID is not copied from the Copy() method.
-	o->SetListener(this);
-	o->SetInput(m_Selected);
-  o->SetMouse(m_Mouse);
+	m_RunningOp = op->Copy();
+  m_RunningOp->m_Id = op->m_Id;    //Paolo 15/09/2004 The operation ID is not copied from the Copy() method.
+	m_RunningOp->SetListener(this);
+	m_RunningOp->SetInput(m_Selected);
+  m_RunningOp->SetMouse(m_Mouse);
+  m_RunningOp->Collaborate(m_CollaborateStatus);
   if (op_param != NULL)
   {
-    o->SetParameters(op_param);
+    m_RunningOp->SetParameters(op_param);
   }
-  m_RunningOp = o;
 
   Notify(OP_RUN_STARTING);  //SIL. 17-9-2004: - moved here in order to notify which op is started
 
-  m_Context.Push(o);
-  o->OpRun();
+  m_Context.Push(m_RunningOp);
+  m_RunningOp->OpRun();
 }
 //----------------------------------------------------------------------------
 void mafOpManager::OpRunOk(mafOp *op)
