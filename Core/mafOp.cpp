@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:09:39 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2006-11-22 12:58:14 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -164,6 +164,7 @@ void mafOp::ShowGui()
 //----------------------------------------------------------------------------
 {
   assert(m_Gui); 
+  m_Gui->Collaborate(m_CollaborateStatus);
   m_Guih = new mmgGuiHolder(mafGetFrame(),-1);
   m_Guih->Put(m_Gui);
 	
@@ -224,6 +225,4 @@ void mafOp::Collaborate(bool status)
 //----------------------------------------------------------------------------
 {
   m_CollaborateStatus = status; 
-  if(m_Gui != NULL) 
-    m_Gui->Collaborate(status);
 }
