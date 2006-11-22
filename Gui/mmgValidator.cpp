@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgValidator.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2006-11-22 15:15:05 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,6 +60,7 @@ void mmgValidator::Init(mafObserver* listener, int mid, wxControl *win)
   m_ComboBox   = NULL;
   m_Button     = NULL;
   m_StaticText = NULL;
+  m_ListBox    = NULL;
 
   m_FloatVar    = NULL;
 	m_DoubleVar   = NULL;
@@ -151,6 +152,9 @@ bool mmgValidator::IsValid()
       if ( !(m_ComboBox && m_ComboBox->IsKindOf(CLASSINFO(wxComboBox)))  ) return false;
       if ( !m_IntVar ) return false;
     break;
+    case VAL_LISTBOX:
+      if ( !(m_ListBox && m_ListBox->IsKindOf(CLASSINFO(wxListBox)))  ) return false;
+    break;
     case VAL_BUTTON:
       if ( !(m_Button && m_Button->IsKindOf(CLASSINFO(wxButton)))  ) return false;
     break;
@@ -189,8 +193,9 @@ bool mmgValidator::Copy(const mmgValidator& val)
   m_FloatSlider	    = val.m_FloatSlider;   
   m_CheckBox        = val.m_CheckBox; 
   m_RadioBox        = val.m_RadioBox; 
-  m_ComboBox        = val.m_ComboBox; 
-  m_Button          = val.m_Button; 
+  m_ComboBox        = val.m_ComboBox;
+  m_ListBox         = val.m_ListBox;
+  m_Button          = val.m_Button;
   m_StaticText      = val.m_StaticText; 
 
   m_FloatVar        = val.m_FloatVar;
@@ -369,12 +374,22 @@ mmgValidator::mmgValidator(mafObserver* listener,int mid,wxTextCtrl *win, double
 mmgValidator::mmgValidator(mafObserver* listener, int mid, wxCheckBox *win,   int*   var) //CheckBox    
 //----------------------------------------------------------------------------
 {
-  Init(listener,mid,win);  
+  Init(listener,mid,win);
   m_Mode      = VAL_CHECKBOX;
-  m_CheckBox  = win; 
-  m_IntVar    = var;     
+  m_CheckBox  = win;
+  m_IntVar    = var;
   m_WidgetData.dType  = INT_DATA;
   m_WidgetData.iValue = *var;
+  assert(IsValid());
+}
+//----------------------------------------------------------------------------
+mmgValidator::mmgValidator(mafObserver* listener,int mid,wxListBox *win)
+//----------------------------------------------------------------------------
+{
+  Init(listener,mid,win);  
+  m_Mode      = VAL_LISTBOX;
+  m_ListBox   = win;
+  m_WidgetData.dType = INT_DATA;
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
@@ -660,6 +675,9 @@ bool mmgValidator::TransferToWindow(void)
     case VAL_CHECKBOX:
       m_CheckBox->SetValue(*m_IntVar ? true : false);
     break;
+    case VAL_LISTBOX:
+      m_ListBox->SetSelection(m_WidgetData.iValue,true);
+    break;
     case VAL_RADIOBOX:
       m_RadioBox->SetSelection(*m_IntVar);
     break;
@@ -819,6 +837,9 @@ bool mmgValidator::TransferFromWindow(void)
     case VAL_CHECKBOX:
 			*m_IntVar = m_CheckBox->GetValue();
       m_WidgetData.iValue = *m_IntVar;
+    break;
+    case VAL_LISTBOX:
+      m_WidgetData.iValue = m_ListBox->GetSelection();
     break;
     case VAL_RADIOBOX:
 			*m_IntVar = m_RadioBox->GetSelection();
@@ -1067,7 +1088,14 @@ void mmgValidator::SetWidgetData(WidgetDataType &widget_data)
   switch(widget_data.dType) 
   {
     case INT_DATA:
-      *m_IntVar = widget_data.iValue;
+      if (m_IntVar)
+      {
+        *m_IntVar = widget_data.iValue;
+      }
+      else if (m_Mode == VAL_LISTBOX)
+      {
+        m_WidgetData.iValue = widget_data.iValue;
+      }
     break;
     case FLOAT_DATA:
       *m_FloatVar = widget_data.fValue;
@@ -1076,8 +1104,14 @@ void mmgValidator::SetWidgetData(WidgetDataType &widget_data)
       *m_DoubleVar = widget_data.dValue;
     break;
     case STRING_DATA:
-      *m_StringVar    = widget_data.sValue;
-      *m_MafStringVar = widget_data.sValue;
+      if (m_StringVar)
+      {
+        *m_StringVar = widget_data.sValue;
+      }
+      if (m_MafStringVar)
+      {
+        *m_MafStringVar = widget_data.sValue;
+      }
     break;
   }
   TransferToWindow();

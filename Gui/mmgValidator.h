@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgValidator.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-16 17:18:22 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-11-22 15:15:05 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,6 +43,7 @@ enum VALIDATOR_MODES
   VAL_CHECKBOX,
   VAL_RADIOBOX,
   VAL_COMBOBOX,
+  VAL_LISTBOX,
   VAL_BUTTON,
   VAL_FILEOPEN,
   VAL_FILESAVE,
@@ -69,6 +70,7 @@ public:
   mmgValidator (mafObserver* listener,int mid,wxCheckBox   *win,   int*   var);
   mmgValidator (mafObserver* listener,int mid,wxRadioBox   *win,   int*   var);
   mmgValidator (mafObserver* listener,int mid,wxComboBox   *win,   int*   var);
+  mmgValidator (mafObserver* listener,int mid,wxListBox    *win);
   mmgValidator (mafObserver* listener,int mid,wxButton     *win);
   mmgValidator (mafObserver* listener,int mid,wxButton     *win,mafString* var, wxTextCtrl* lab, bool openfile, const mafString wildcard); // FileOpen/Save
   mmgValidator (mafObserver* listener,int mid,wxButton     *win,mafString* var, wxTextCtrl* lab); // DirOpen
@@ -113,6 +115,7 @@ protected:
   wxRadioBox     *m_RadioBox;
   wxComboBox     *m_ComboBox;
   wxButton       *m_Button;
+  wxListBox      *m_ListBox;
                         // associated variable (one of these)
   float      *m_FloatVar;
   double     *m_DoubleVar;
