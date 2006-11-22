@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoEditMetadata.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-22 12:55:33 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-11-22 13:13:15 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -149,6 +149,7 @@ void mmoEditMetadata::EnableWidgets()
 {
   bool enable_edit = m_MetadataList->GetCount() > 0;
   m_Gui->Enable(ID_REMOVE_METADATA,enable_edit);
+  m_Gui->Enable(ID_TAG_NAME,enable_edit);
   m_Gui->Enable(ID_TAG_TYPE,enable_edit);
   m_Gui->Enable(ID_TAG_MULTEPLICITY,enable_edit);
   m_Gui->Enable(ID_TAG_COMPONENT,enable_edit);
@@ -243,6 +244,11 @@ void mmoEditMetadata::OnEvent(mafEventBase *maf_event)
         m_TagArray->DeleteTag(m_SelectedTag->GetName());
         m_SelectedTag = NULL;
         sel = sel > 0 ? sel-1 : 0;
+        if (m_MetadataList->GetCount() == 0)
+        {
+          EnableWidgets();
+          return;
+        }
         m_MetadataList->SetSelection(sel,true);
         OnEvent(&mafEvent(m_Gui,ID_METADATA_LIST));
       }
