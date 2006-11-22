@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoASCIIImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-20 15:00:19 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-11-22 12:56:15 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -47,11 +47,11 @@ mafOp(label)
 	m_Canundo = true;
 	m_Files.clear();
 
-  m_ReadyToExecute = false;
   m_ScalarOrder = 1;
 
   m_FileDir = mafGetApplicationDirectory().c_str();
   m_ScalarData = NULL;
+  m_ReadyToExecute = false;
 }
 //----------------------------------------------------------------------------
 mmoASCIIImporter::~mmoASCIIImporter()
@@ -133,6 +133,13 @@ enum ASCII_IMPORTER_ID
 void mmoASCIIImporter::OpRun()
 //----------------------------------------------------------------------------
 {
+  wxString scalar_order[2] = {"row", "columns"};
+  
+  m_Gui = new mmgGui(this);
+  m_Gui->Combo(ID_ASCII_DATA_ORDER,"order",&m_ScalarOrder,2,scalar_order,"Select the order of how are stored the scalars.");
+  m_Gui->Button(ID_ASCII_FILE,"ASCII data","","Choose single or multiple file ASCII.");
+  m_Gui->OkCancel();
+  
   if (m_ReadyToExecute)
   {
     int res = OP_RUN_CANCEL;
@@ -145,13 +152,6 @@ void mmoASCIIImporter::OpRun()
     return;
   }
 
-  wxString scalar_order[2] = {"row", "columns"};
-  
-  m_Gui = new mmgGui(this);
-  m_Gui->Combo(ID_ASCII_DATA_ORDER,"order",&m_ScalarOrder,2,scalar_order,"Select the order of how are stored the scalars.");
-  m_Gui->Button(ID_ASCII_FILE,"ASCII data","","Choose single or multiple file ASCII.");
-  m_Gui->OkCancel();
-  
   ShowGui();
 }
 //----------------------------------------------------------------------------
