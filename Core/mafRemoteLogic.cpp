@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafRemoteLogic.cpp,v $
 Language:  C++
-Date:      $Date: 2006-11-21 16:25:29 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2006-11-22 13:00:25 $
+Version:   $Revision: 1.9 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -433,7 +433,7 @@ void mafRemoteLogic::RemoteMessage(mafString &cmd, bool to_server)
       WidgetDataType w_data;
       w_data.dType  = INT_DATA;
       w_data.iValue = widget_value;
-      m_OperationManager->GetRunningOperation()->OpGui()->SetWidgetValue(widget_id, w_data);
+      m_OperationManager->GetRunningOperation()->GetGui()->SetWidgetValue(widget_id, w_data);
     }
     else if(command == "WidgetFloat")
     {
@@ -447,7 +447,7 @@ void mafRemoteLogic::RemoteMessage(mafString &cmd, bool to_server)
       WidgetDataType w_data;
       w_data.dType  = FLOAT_DATA;
       w_data.fValue = widget_value;
-      m_OperationManager->GetRunningOperation()->OpGui()->SetWidgetValue(widget_id, w_data);
+      m_OperationManager->GetRunningOperation()->GetGui()->SetWidgetValue(widget_id, w_data);
     }
     else if(command == "WidgetDouble")
     {
@@ -461,7 +461,7 @@ void mafRemoteLogic::RemoteMessage(mafString &cmd, bool to_server)
       WidgetDataType w_data;
       w_data.dType  = DOUBLE_DATA;
       w_data.dValue = widget_value;
-      m_OperationManager->GetRunningOperation()->OpGui()->SetWidgetValue(widget_id, w_data);
+      m_OperationManager->GetRunningOperation()->GetGui()->SetWidgetValue(widget_id, w_data);
     }
     else if (command == "WidgetString")
     {
@@ -473,7 +473,7 @@ void mafRemoteLogic::RemoteMessage(mafString &cmd, bool to_server)
       WidgetDataType w_data;
       w_data.dType  = STRING_DATA;
       w_data.sValue = widget_string_value;
-      m_OperationManager->GetRunningOperation()->OpGui()->SetWidgetValue(widget_id, w_data);
+      m_OperationManager->GetRunningOperation()->GetGui()->SetWidgetValue(widget_id, w_data);
     }
     else if (command == "MouseDevice" && m_RemoteMouse)
     {
