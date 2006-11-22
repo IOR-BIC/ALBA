@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-31 14:00:26 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-11-22 15:18:29 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -103,10 +103,10 @@ public:
 	mafView *GetSelectedView();
 
   /** Return the root of the vme tree. */
-  mafNode     *GetCurrentRoot() {return (mafNode*)m_RootVme;};
+  mafNode *GetCurrentRoot() {return (mafNode*)m_RootVme;};
 
   /** Return the created view-list. */
-  mafView* GetList() {return m_ViewList;};
+  mafView *GetList() {return m_ViewList;};
 
   /** Return the plugged view-list. */
   mafView **GetListTemplate() {return m_ViewTemplate;};
