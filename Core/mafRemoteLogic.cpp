@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafRemoteLogic.cpp,v $
 Language:  C++
-Date:      $Date: 2006-11-22 13:00:25 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2006-11-22 15:17:47 $
+Version:   $Revision: 1.10 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -417,9 +417,13 @@ void mafRemoteLogic::RemoteMessage(mafString &cmd, bool to_server)
     {
       long widget_id;
       data_cmd.ToLong(&widget_id);
-      m_OperationManager->m_FromRemote = true;
-      m_OperationManager->GetRunningOperation()->OnEvent(&mafEvent(this,widget_id));
-      m_OperationManager->m_FromRemote = false;
+      WidgetDataType w_data;
+      w_data.dValue  = 0.0;
+      w_data.fValue  = 0.0;
+      w_data.iValue  = 0;
+      w_data.sValue  = "";
+      w_data.dType = NULL_DATA;
+      m_OperationManager->GetRunningOperation()->GetGui()->SetWidgetValue(widget_id, w_data);
     }
     else if(command == "WidgetInt")
     {
