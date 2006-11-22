@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-10 13:51:32 $
-  Version:   $Revision: 1.41 $
+  Date:      $Date: 2006-11-22 15:16:07 $
+  Version:   $Revision: 1.42 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -177,8 +177,10 @@ make it protected, and make mmgValidator friend
       mafEventMacro(mafEvent(this,REMOTE_PARAMETER, (long)id));
     if(id >= MINID && id <MAXID)
       id = GetModuleId(id);
-    //mafEventMacro(mafEvent(this, e->GetId()));
-    mafEventMacro(mafEvent(this, id));
+    e->SetSender(this);
+    e->SetId(id);
+    mafEventMacro(*e);
+    //mafEventMacro(mafEvent(this, id));
   }
 }
 //----------------------------------------------------------------------------
@@ -1188,7 +1190,9 @@ wxListBox *mmgGui::ListBox(int id,wxString label,int height, wxString tooltip, l
 //----------------------------------------------------------------------------
 {
   int width = (label == "") ? FW : DW;
-	wxListBox *lb = new wxListBox(this, GetId(id),dp,wxSize(width ,height),0, NULL,lbox_style | m_EntryStyle);  // wxSUNKEN_BORDER non funzia - aggiunge anche il bordino nero
+  int w_id = GetId(id);
+	wxListBox *lb = new wxListBox(this, w_id,dp,wxSize(width ,height),0, NULL,lbox_style | m_EntryStyle);  // wxSUNKEN_BORDER non funzia - aggiunge anche il bordino nero
+  lb->SetValidator( mmgValidator(this,w_id,lb) );
 	lb->SetFont(m_Font);
   if(tooltip != "") lb->SetToolTip(tooltip);
   if(label == "")
@@ -1355,13 +1359,17 @@ mmgRollOut *mmgGui::RollOut(int id, mafString title, mmgGui *roll_gui, bool roll
 void mmgGui::OnListBox (wxCommandEvent &event)
 //----------------------------------------------------------------------------
 {
-  mafEventMacro(mafEvent(this, GetModuleId(event.GetId()),(long) event.m_commandInt)); 
+  wxListBox *lb = (wxListBox *)event.GetEventObject();
+  ((mmgValidator *)lb->GetValidator())->TransferFromWindow();
+  OnEvent(&mafEvent(this, event.GetId(),(long) event.GetInt()));
+  //mafEventMacro(mafEvent(this, GetModuleId(event.GetId()),(long) event.m_commandInt)); 
 }
 //----------------------------------------------------------------------------
 void mmgGui::OnCheckListBox (wxCommandEvent &event)
 //----------------------------------------------------------------------------
 {
-   mafEventMacro(mafEvent(this, GetModuleId(event.GetId()),event.GetInt()));
+  OnEvent(&mafEvent(this, event.GetId(),(long) event.GetInt()));
+  //mafEventMacro(mafEvent(this, GetModuleId(event.GetId()),event.GetInt()));
 }
 //----------------------------------------------------------------------------
 void mmgGui::Reparent(wxWindow *parent)
