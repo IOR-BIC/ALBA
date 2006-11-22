@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoEditMetadata.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-22 10:27:17 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-11-22 12:55:33 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -78,6 +78,7 @@ enum METADATA_EDIT_ID
   ID_METADATA_LIST = MINID,
   ID_ADD_METADATA,
   ID_REMOVE_METADATA,
+  ID_TAG_NAME,
   ID_TAG_TYPE,
   ID_TAG_MULTEPLICITY,
   ID_TAG_COMPONENT,
@@ -111,6 +112,7 @@ void mmoEditMetadata::OpRun()
   m_Gui->Button(ID_ADD_METADATA,_("Add"));
   m_Gui->Button(ID_REMOVE_METADATA,_("Remove"));
   m_Gui->Divider(2);
+  m_Gui->String(ID_TAG_NAME,_("name"),&m_TagName);
   m_Gui->Combo(ID_TAG_TYPE,_("type"),&m_TagType,2,tag_type);
   m_Gui->Integer(ID_TAG_MULTEPLICITY,_("multep."),&m_TagMulteplicity,1);
   m_Gui->Integer(ID_TAG_COMPONENT,_("comp"),&m_TagComponent,0);
@@ -127,6 +129,11 @@ void mmoEditMetadata::SelectTag(const char *tag_name)
 //----------------------------------------------------------------------------
 {
   m_SelectedTag = m_TagArray->GetTag(tag_name);
+  if (m_SelectedTag == NULL)
+  {
+    wxMessageBox(_("Try to select a not existing Tag!"), _("Warning"));
+    return;
+  }
   m_TagName = m_SelectedTag->GetName();
   m_TagType = m_SelectedTag->GetType() - 1;
   m_TagMulteplicity = m_SelectedTag->GetNumberOfComponents();
@@ -169,8 +176,21 @@ void mmoEditMetadata::OnEvent(mafEventBase *maf_event)
       break;
       case ID_ADD_METADATA:
       {
-        mafString tag_name = wxGetTextFromUser("Insert metadata name:","New metadata","Name").c_str();
-        AddNewTag(tag_name);
+        m_TagName = "New Tag";
+        AddNewTag(m_TagName);
+        m_Gui->Update();
+      }
+      break;
+      case ID_TAG_NAME:
+      {
+        mafTagItem new_named_tag;
+        new_named_tag = *m_SelectedTag;
+        new_named_tag.SetName(m_TagName.GetCStr());
+        m_TagArray->DeleteTag(m_SelectedTag->GetName());
+        m_TagArray->SetTag(new_named_tag);
+        m_SelectedTag = m_TagArray->GetTag(m_TagName.GetCStr());
+        int sel = m_MetadataList->GetSelection();
+        m_MetadataList->SetString(sel,m_TagName.GetCStr());
         m_Gui->Update();
       }
       break;
@@ -179,7 +199,21 @@ void mmoEditMetadata::OnEvent(mafEventBase *maf_event)
         EnableWidgets();
       break;
       case ID_TAG_MULTEPLICITY:
+      {
+        int answere = wxYES;
+        int num_comp = m_SelectedTag->GetNumberOfComponents();
+        if (m_TagMulteplicity < num_comp)
+        {
+          answere = wxMessageBox(_("You are reducing the number of components: you may lost previous data. \nAre you sure?"),_("Warning"), wxYES_NO);
+        }
+        if (answere == wxNO)
+        {
+          m_TagMulteplicity = num_comp;
+          m_Gui->Update();
+          return;
+        }
         m_SelectedTag->SetNumberOfComponents(m_TagMulteplicity);
+      }
       break;
       case ID_TAG_COMPONENT:
         if (m_TagComponent >= m_TagMulteplicity)
@@ -245,10 +279,21 @@ void mmoEditMetadata::AddNewTag(mafString &name)
   m_SelectedTag->SetType(m_TagType+1);
   m_SelectedTag->SetNumberOfComponents(m_TagMulteplicity);
   m_SelectedTag->SetComponent(m_TagValueAsDouble,m_TagComponent);
+  bool tag_present = false;
   while (m_TagArray->IsTagPresent(new_name.c_str()))
   {
+    tag_present = true;
     new_name = m_TagName;
     new_name << n++;
+  }
+  if (tag_present)
+  {
+    wxString msg = _("Tag named ");
+    msg << m_TagName.GetCStr();
+    msg << " renamed in ";
+    msg << new_name;
+    msg <<" because already exists!";
+    wxMessageBox(msg, _("Warning"));
   }
   m_MetadataList->Insert(new_name, m_MetadataList->GetCount());
   m_TagName = new_name;
