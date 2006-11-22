@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-16 09:08:16 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2006-11-22 12:56:59 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -72,7 +72,7 @@ public:
 	virtual void OpUndo();
 
 	/** Return the operation's interface. */
-	virtual mmgGui*	OpGui()	{return m_Gui;};
+	virtual mmgGui*	GetGui()	{return m_Gui;};
 
 	/** Set the input vme for the operation. */
 	virtual void		SetInput(mafNode* vme)	{m_Input = vme;};
@@ -153,6 +153,6 @@ protected:
 	mafObserver    *m_Listener;
   mmdMouse       *m_Mouse;
   bool            m_CollaborateStatus;
-  bool            m_TestMode; ///< Flag used with cppunitTest: put this flag at true when executing tests to avoid busyinfo or splash screen to be created, default is false.
+  bool            m_TestMode; ///< Flag used with cppunitTest: put this flag at true when executing tests to avoid busy-info or splash screen to be created, default is false.
 };
 #endif
