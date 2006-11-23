@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRawExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-30 15:28:54 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-11-23 17:17:48 $
+  Version:   $Revision: 1.2 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -92,6 +92,7 @@ void mmoRAWExporter::OpRun()
 		wxString file = mafGetSaveFile(m_ProposedDirectory,wildc).c_str(); 
 		m_FileName = file;
 
+		//Crete GUI
 		m_Gui = new mmgGui(this);
 		m_Gui->SetListener(this);
 
@@ -167,8 +168,6 @@ void mmoRAWExporter::SaveVolume()
 		char *c_prefix = (char*)( prefix.c_str() ); 
 		exporter->SetFilePrefix(c_prefix);
 		exporter->Write();
-						
-		////////////////////////////////////////////////////////////////////////////////////////////
 
 		//if the user choose a numeration of the slices files not starting with zero: 
 			
@@ -211,10 +210,9 @@ void mmoRAWExporter::SaveVolume()
 		}
 		
 		vtkDEL(exporter);
-		////////////////////////////////////////////////////////////////////////////////////////////
-
 		return;	
 	}
+
 	//if it is a vtkRectilinearGrid
 	if (vtkRectilinearGrid::SafeDownCast(volume->GetOutput()->GetVTKData()))
 	{
@@ -367,23 +365,33 @@ void mmoRAWExporter::SaveVolume()
 				wxString wildc = _("txt file (*.txt)|*.txt");
 				wxString file = mafGetSaveFile(proposed,wildc).c_str();   
 				nome = (file);
+				std::ofstream f_out;
+				f_out.open(nome);
+					
+				f_out<< "Z coordinates:"<<"\n";
+
+				for (int i = 0; i < num_of_slices; i++)
+				{
+					f_out<< z_coords->GetValue(i)<<"\n";	
+				}					
+				f_out.close();
 			}
 			else
 			{
 				nome = m_FileNameZ;
+				std::ofstream f_out;
+				f_out.open(nome);
+					
+				f_out<< "Z coordinates:"<<"\n";
+
+				for (int i = 0; i < num_of_slices; i++)
+				{
+					f_out<< z_coords->GetValue(i)<<"\n";	
+				}					
+				f_out.close();
 			}
-			std::ofstream f_out;
-			f_out.open(nome);
-				
-			f_out<< "Z coordinates:"<<"\n";
 
 			for (int i = 0; i < num_of_slices; i++)
-			{
-				f_out<< z_coords->GetValue(i)<<"\n";	
-			}					
-			f_out.close();
-
-			for (i = 0; i < num_of_slices; i++)
 			{	
 							
 				vtkDoubleArray *double_scalars = vtkDoubleArray::New();
@@ -399,7 +407,8 @@ void mmoRAWExporter::SaveVolume()
         //To note that I set the first value of short_scalars with the last value of float_scalars
         //In this way the exported image won't appear upside down
 				for (int k = 0; k < slice_size; k++)                 
-					short_scalars->SetValue(k, double_scalars->GetValue( slice_size - k - 1 ));
+					//short_scalars->SetValue(k, double_scalars->GetValue( slice_size - k - 1 ));
+					short_scalars->SetValue(k, double_scalars->GetValue( k ));
 						
 				StructuredPoints->GetPointData()->SetScalars(short_scalars);
 								
@@ -414,7 +423,6 @@ void mmoRAWExporter::SaveVolume()
 				short_scalars->Delete();
 				double_scalars->Delete();
 			}
-			////////////////////////////////////////////////////////////////////////////////////////////
 
 			//if the user choose a numeration of the slices files not starting with zero: 
 
@@ -454,7 +462,6 @@ void mmoRAWExporter::SaveVolume()
 			}
 			vtkDEL(exporter);
 			vtkDEL(StructuredPoints);
-			////////////////////////////////////////////////////////////////////////////////////////////
 			return;			
 		}
 	}
