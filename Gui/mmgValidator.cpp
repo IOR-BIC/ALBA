@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgValidator.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-22 15:15:05 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-11-23 10:48:14 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -676,7 +676,10 @@ bool mmgValidator::TransferToWindow(void)
       m_CheckBox->SetValue(*m_IntVar ? true : false);
     break;
     case VAL_LISTBOX:
-      m_ListBox->SetSelection(m_WidgetData.iValue,true);
+      if (m_ListBox->GetCount()>0)
+      {
+        m_ListBox->SetSelection(m_WidgetData.iValue,true);
+      }
     break;
     case VAL_RADIOBOX:
       m_RadioBox->SetSelection(*m_IntVar);
