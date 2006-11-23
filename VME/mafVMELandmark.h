@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:54 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-11-23 10:18:08 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -105,6 +105,9 @@ public:
   /** Return the suggested pipe-typename for the visualization of this vme */
   virtual mafString GetVisualPipe() {return mafString("mafPipeLandmarkCloud");};
 
+  /** Set the current TimeStamp */
+  virtual void SetTimeStamp(mafTimeStamp t);
+
 protected:
   mafVMELandmark();
   virtual ~mafVMELandmark();
@@ -122,6 +125,7 @@ protected:
   virtual mmgGui *CreateGui();
 
   vtkPolyData *m_Polydata; ///< Polydata storing the landmark point
+  mafString m_Position[3];
 
 private:
   mafVMELandmark(const mafVMELandmark&); // Not implemented
