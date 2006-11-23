@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-11 10:46:02 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-11-23 10:18:46 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -70,6 +70,7 @@ mafVMELandmark::mafVMELandmark()
   SetDataPipe(dpipe);
 
   dpipe->GetVTKDataPipe()->SetNthInput(0, m_Polydata);
+  m_Position[0] = m_Position[1] = m_Position[2] = "0.0";
 }
 
 //-------------------------------------------------------------------------
@@ -328,9 +329,12 @@ mmgGui* mafVMELandmark::CreateGui()
   double xyz[3],rxyz[3];
   this->GetOutput()->GetAbsPose(xyz,rxyz);
   m_Gui->Label("abs pose:");
-  m_Gui->Label(wxString::Format("x: %f",xyz[0]));
-  m_Gui->Label(wxString::Format("y: %f",xyz[1]));
-  m_Gui->Label(wxString::Format("z: %f",xyz[2]));
+  m_Position[0] = wxString::Format("x: %f",xyz[0]);
+  m_Position[1] = wxString::Format("y: %f",xyz[1]);
+  m_Position[2] = wxString::Format("z: %f",xyz[2]);
+  m_Gui->Label(_(""), &m_Position[0]);
+  m_Gui->Label(_(""), &m_Position[1]);
+  m_Gui->Label(_(""), &m_Position[2]);
   return m_Gui;
 }
 
@@ -364,4 +368,18 @@ char** mafVMELandmark::GetIcon()
 {
 #include "mafVMELandmark.xpm"
   return mafVMELandmark_xpm;
+}
+//-------------------------------------------------------------------------
+void mafVMELandmark::SetTimeStamp(mafTimeStamp t)
+//-------------------------------------------------------------------------
+{
+  Superclass::SetTimeStamp(t);
+  this->GetOutput()->Update();
+  double xyz[3],rxyz[3];
+  this->GetOutput()->GetAbsPose(xyz,rxyz);  
+  m_Position[0] = wxString::Format("x: %f",xyz[0]);
+  m_Position[1] = wxString::Format("y: %f",xyz[1]);
+  m_Position[2] = wxString::Format("z: %f",xyz[2]);
+  if(m_Gui)
+    m_Gui->Update();
 }
