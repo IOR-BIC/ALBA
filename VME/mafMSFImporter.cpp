@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-11 12:45:09 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2006-11-23 10:19:54 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -231,7 +231,7 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
           {
             RestoreMeterAttribute(vme);
           }
-          if (vme_type == "mflVMELandmarkCloud")
+          if (vme_type == "mflVMELandmarkCloud" || vme_type == "mflVMERigidLandmarkCloud" || vme_type == "mflVMEDynamicLandmarkCloud")
           {
             int num_lm = ((mafVMELandmarkCloud *)vme)->GetNumberOfLandmarks();
             double rad = ((mafVMELandmarkCloud *)vme)->GetRadius();
@@ -268,7 +268,7 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
             continue;
           }
           // add the new VME as a child of the given parent node
-          if (vme_type == "mflVMELandmarkCloud" && child_vme->IsMAFType(mafVMELandmark))
+          if (vme_type == "mflVMELandmarkCloud" || vme_type == "mflVMERigidLandmarkCloud" || vme_type == "mflVMEDynamicLandmarkCloud" && child_vme->IsMAFType(mafVMELandmark))
           {
             ((mafVMELandmarkCloud *)vme)->SetLandmark((mafVMELandmark *)child_vme);
             child_vme->Delete();
@@ -359,7 +359,7 @@ mafVME *mmuMSF1xDocument::CreateVMEInstance(mafString &name)
   {
     return mafVMEVolumeGray::New();
   }
-  else if (name == "mflVMELandmarkCloud")
+  else if (name == "mflVMELandmarkCloud" || name == "mflVMEDynamicLandmarkCloud"  || name == "mflVMERigidLandmarkCloud")
   {
     return mafVMELandmarkCloud::New();
   }
