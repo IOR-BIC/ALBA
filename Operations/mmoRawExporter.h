@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRawExporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-30 15:28:54 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-11-23 17:17:14 $
+  Version:   $Revision: 1.2 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -66,11 +66,10 @@ public:
 protected:
   void OpStop(int result);
 
-  wxString		m_ProposedDirectory;	
-  mafString		m_FileName;
-	mafString		m_FileNameZ;
-  mafNode			*m_Vme; 
-  int		m_SingleFile;
-  int		m_Offset;
+  wxString		m_ProposedDirectory;///<Default directory where to save file .raw
+  mafString		m_FileName;///<Name of the file/files where the exporter will save raw data
+	mafString		m_FileNameZ;///<Name of the file txt where save z coordinates
+  int		m_SingleFile;///<Flag: false if the exporter will create a single file; true if the exporter will create raw slices
+  int		m_Offset;///<The name of the slices will start with this offset
 };
 #endif
