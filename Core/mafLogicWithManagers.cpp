@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-21 16:24:18 $
-  Version:   $Revision: 1.82 $
+  Date:      $Date: 2006-11-23 15:35:14 $
+  Version:   $Revision: 1.83 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1357,7 +1357,7 @@ void mafLogicWithManagers::HandleException()
   int answare = wxMessageBox(_("Do you want to try to save the unsaved work ?"), _("Fatal Exception!!"), wxYES_NO|wxCENTER);
   if(answare == wxYES)
   {
-    OnFileSave();
+    OnFileSaveAs();
     m_OpManager->StopCurrentOperation();
   }
   OnQuit();
