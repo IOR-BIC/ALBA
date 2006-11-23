@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkVolumeResample.cxx,v $
   Language:  C++
-  Date:      $Date: 2005-11-08 16:06:09 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-11-23 17:16:48 $
+  Version:   $Revision: 1.4 $
 
 =========================================================================*/
 #include "vtkObjectFactory.h"
@@ -21,18 +21,18 @@
 
 #include "assert.h"
 
-vtkCxxRevisionMacro(vtkVolumeResample, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(vtkVolumeResample, "$Revision: 1.4 $");
 vtkStandardNewMacro(vtkVolumeResample);
 
 typedef unsigned short u_short;
 typedef unsigned char u_char;
 typedef unsigned int u_int;
 
-inline void clip(float val, float& out) { out = val; }
-inline void clip(float val, char&  out) { int x = float(VTK_CHAR_MAX) * (val - 0.5f); if (x < VTK_CHAR_MIN) out = VTK_CHAR_MIN; else if (x > VTK_CHAR_MAX) out = VTK_CHAR_MAX; else out = char(x); }
-inline void clip(float val, short& out) { int x = float(VTK_SHORT_MAX) * (val - 0.5f);; if (x < VTK_SHORT_MIN) out = VTK_SHORT_MIN; else if (x > VTK_SHORT_MAX) out = VTK_SHORT_MAX; else out = short(x); }
-inline void clip(float val, u_char &  out) { int x = VTK_UNSIGNED_CHAR_MAX * val; if (x < VTK_UNSIGNED_CHAR_MIN) out = VTK_UNSIGNED_CHAR_MIN; else if (x > VTK_UNSIGNED_CHAR_MAX) out = VTK_UNSIGNED_CHAR_MAX; else out = u_char(x); }
-inline void clip(float val, u_short & out) { int x = VTK_UNSIGNED_SHORT_MAX * val; if (x < VTK_UNSIGNED_SHORT_MIN) out = VTK_UNSIGNED_SHORT_MIN; else if (x > VTK_UNSIGNED_SHORT_MAX) out = VTK_UNSIGNED_SHORT_MAX; else out = u_short(x); }
+inline void clip(double val, float& out) { out = val; }
+inline void clip(double val, char&  out) { int x = double(VTK_CHAR_MAX) * (val - 0.5f); if (x < VTK_CHAR_MIN) out = VTK_CHAR_MIN; else if (x > VTK_CHAR_MAX) out = VTK_CHAR_MAX; else out = char(x); }
+inline void clip(double val, short& out) { int x = double(VTK_SHORT_MAX) * (val - 0.5f); if (x < VTK_SHORT_MIN) out = VTK_SHORT_MIN; else if (x > VTK_SHORT_MAX) out = VTK_SHORT_MAX; else out = short(x); }
+inline void clip(double val, u_char &  out) { int x = VTK_UNSIGNED_CHAR_MAX * val; if (x < VTK_UNSIGNED_CHAR_MIN) out = VTK_UNSIGNED_CHAR_MIN; else if (x > VTK_UNSIGNED_CHAR_MAX) out = VTK_UNSIGNED_CHAR_MAX; else out = u_char(x); }
+inline void clip(double val, u_short & out) { int x = VTK_UNSIGNED_SHORT_MAX * val; if (x < VTK_UNSIGNED_SHORT_MIN) out = VTK_UNSIGNED_SHORT_MIN; else if (x > VTK_UNSIGNED_SHORT_MAX) out = VTK_UNSIGNED_SHORT_MAX; else out = u_short(x); }
 
 
 #define min(x0, x1) (((x0) < (x1)) ? (x0) : (x1))
@@ -150,7 +150,7 @@ void vtkVolumeResample::ExecuteInformation() {
   
         // intersect plane with the bounding box
         double spacing[3] = {1.f, 1.f, 1.f};
-        double t[24][2], minT = VTK_FLOAT_MAX, maxT = VTK_FLOAT_MIN, minS = VTK_FLOAT_MAX, maxS = VTK_FLOAT_MIN;
+        double t[24][2], minT = VTK_DOUBLE_MAX, maxT = VTK_DOUBLE_MIN, minS = VTK_DOUBLE_MAX, maxS = VTK_DOUBLE_MIN;
         int    numberOfPoints = 0;
         for (int i = 0; i < 3; i++) {
           const int j = (i + 1) % 3, k = (i + 2) % 3;
@@ -459,7 +459,7 @@ template<typename InputDataType, typename OutputDataType> void vtkVolumeResample
     const double coordToIndex = double(SamplingTableSize - 1) / (coords[lastIndex] - coords[0]);
     for (int i = 0, ti0 = 0; i <= lastIndex; i++) {
       //const int ti1 = mafVolumeResliceRound((i != lastIndex) ? (coords[i] - coords[0]) * coordToIndex : (SamplingTableSize - 1));
-      const int ti1 = mafVolumeResliceFloor((i != lastIndex) ? (coords[i] - coords[0]) * coordToIndex : (SamplingTableSize - 1));
+      const int ti1 = mafVolumeResliceFloor((i != lastIndex) ? (coords[i] - coords[0]) * coordToIndex : (SamplingTableSize));
       if (ti1 <= ti0)
         continue;
       for (int ti = ti0; ti <= ti1; ti++) {
@@ -506,7 +506,7 @@ template<typename InputDataType, typename OutputDataType> void vtkVolumeResample
         const u_int pi[3] = { mafVolumeResliceFloor(p[0]), mafVolumeResliceFloor(p[1]), mafVolumeResliceFloor(p[2])};
         //const u_int pi[3] = { mafVolumeResliceRound(p[0]), mafVolumeResliceRound(p[1]), mafVolumeResliceRound(p[2])};
 
-        if (pi[0] >= SamplingTableSize || pi[1] >= SamplingTableSize || pi[2] >= SamplingTableSize)
+        if (pi[0] > SamplingTableSize || pi[1] > SamplingTableSize || pi[2] > SamplingTableSize)
         {
           /*if (pi[0] >= SamplingTableSize)
           {
@@ -544,7 +544,8 @@ template<typename InputDataType, typename OutputDataType> void vtkVolumeResample
           }
         }
         // mapping
-        clip(((sample + shift) * scale), *pixel);
+        //clip(((sample + shift) * scale), *pixel);
+				*pixel=sample;
         //myDBG(NULL,index);
         for (int i = 1; i < di; i++)
           pixel[i] = *pixel;
