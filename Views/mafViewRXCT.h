@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-15 18:17:32 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-11-23 14:56:58 $
+  Version:   $Revision: 1.11 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -103,6 +103,10 @@ protected:
   /**
   Sort the slice */
   void SortSlices();
+
+	/**
+	Check if the gizmo posiztion is inside the bounding box*/
+	void BoundsValidate(double *pos);
 
   void OnEventSnapModality();
 	void OnEventRangeModified(mafEventBase *maf_event);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-18 16:58:12 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2006-11-23 14:56:58 $
+  Version:   $Revision: 1.24 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -391,6 +391,7 @@ void mafViewRXCT::OnEventMouseMove( mafEvent *e )
     return;
   }
   p->GetPoint(0,newSliceLocalOrigin);
+	BoundsValidate(newSliceLocalOrigin);
   if (m_MoveAllSlices)
   {
     double oldSliceLocalOrigin[3], delta[3], b[CT_CHILD_VIEWS_NUMBER];
@@ -729,5 +730,22 @@ void mafViewRXCT::VmeSelect(mafNode *node, bool select)
 			m_Gui->Enable(ID_ADJUST_SLICES,false);
 		}
 		m_Gui->Update();
+	}
+}
+//----------------------------------------------------------------------------
+void mafViewRXCT::BoundsValidate(double *pos)
+//----------------------------------------------------------------------------
+{
+	if(m_CurrentVolume)
+	{
+		double b[6];
+		m_CurrentVolume->GetOutput()->GetVTKData()->GetBounds(b);
+		for(int i=0;i<3;i++)
+		{
+			if(pos[i]<b[i*2])
+				pos[i]=b[i*2];
+			if(pos[i]>b[i*2+1])
+				pos[i]=b[i*2+1];
+		}
 	}
 }
