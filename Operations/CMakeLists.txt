@@ -16,6 +16,8 @@ SET(PROJECT_SRCS
   mmoLandmarkImporter.h
   mmoRegisterClusters.cpp
   mmoRegisterClusters.h
+  mmoRAWImporterImages.cpp
+  mmoRAWImporterImages.h
 )
 
 IF (MAF_USE_ITK)
