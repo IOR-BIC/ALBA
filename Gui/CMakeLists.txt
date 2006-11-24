@@ -8,14 +8,14 @@ MESSAGE(STATUS "Configuring project ${PROJECT_NAME}")
 CONFIGURE_FILE("${MAF_SOURCE_DIR}/Gui/manifest.in" "${MAF_BINARY_DIR}/Gui/manifest.in" COPYONLY)
 
 SET(PROJECT_SRCS
-  mmgSashPanel.cpp
-  mmgSashPanel.h
   mafEvent.cpp
   mafEvent.h
   mafPics.cpp
   mafPics.h
   mafWXLog.cpp
   mafWXLog.h
+  mmgApplicationLayoutSettings.cpp
+  mmgApplicationLayoutSettings.h
   mmgApplicationSettings.cpp
   mmgApplicationSettings.h
   mmgButton.cpp
@@ -79,6 +79,8 @@ SET(PROJECT_SRCS
   mmgRangeSlider.h
   mmgRollOut.cpp
   mmgRollOut.h
+  mmgSashPanel.h
+  mmgSashPanel.cpp
   mmgScrolledPanel.cpp
   mmgScrolledPanel.h
   mmgSettingsDialog.cpp
