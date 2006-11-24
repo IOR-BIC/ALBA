@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-17 13:01:03 $
-  Version:   $Revision: 1.39 $
+  Date:      $Date: 2006-11-24 15:41:28 $
+  Version:   $Revision: 1.40 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -86,7 +86,7 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
 
   m_SliceDirection  = SLICE_Z;
   m_SliceOpacity  = 1.0;
-  m_TextureRes    = 256;
+  m_TextureRes    = 512;
 
   m_XVector[0][0] = 0.0001;	//should be 0 !!! but there is a bug into vtkVolumeSlicer filter
   m_XVector[0][1] = 1;
