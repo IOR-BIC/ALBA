@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-02 11:30:06 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2006-11-24 16:10:32 $
+  Version:   $Revision: 1.29 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -129,7 +129,7 @@ mafVMEStorage *mafVMEManager::GetStorage()
   return m_Storage;
 }
 //----------------------------------------------------------------------------
-void mafVMEManager::MSFNew(bool notify_root_creation)   
+void mafVMEManager::MSFNew(bool notify_root_creation)
 //----------------------------------------------------------------------------
 {
   if (m_TmpDir != "")
@@ -298,6 +298,8 @@ void mafVMEManager::MSFOpen(wxString filename)
   }
 	m_FileHistory.Save(*m_Config);
   m_FileHistoryIdx = -1;
+
+  mafEventMacro(mafEvent(this,LAYOUT_LOAD));
 }
 //----------------------------------------------------------------------------
 const char *mafVMEManager::ZIPOpen(wxString filename)
