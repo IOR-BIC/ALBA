@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-23 15:35:14 $
-  Version:   $Revision: 1.83 $
+  Date:      $Date: 2006-11-24 16:09:48 $
+  Version:   $Revision: 1.84 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -62,12 +62,15 @@
 #include "mmgLocaleSettings.h"
 #include "mmgMeasureUnitSettings.h"
 #include "mmgApplicationSettings.h"
+#include "mmgApplicationLayoutSettings.h"
 #include "mafRemoteLogic.h"
 #include "mmgSettingsDialog.h"
 
 #ifdef WIN32
   #include "mmdClientMAF.h"
 #endif
+
+#include "mmaApplicationLayout.h"
 
 #include "mafVMEStorage.h"
 #include "mafRemoteStorage.h"
@@ -111,13 +114,16 @@ mafLogicWithManagers::mafLogicWithManagers()
   
   m_SettingsDialog = new mmgSettingsDialog();
 
+  m_ApplicationLayoutSettings = NULL;
+
 	m_Revision = _("0.1");
 }
 //----------------------------------------------------------------------------
-mafLogicWithManagers::~mafLogicWithManagers( ) 
+mafLogicWithManagers::~mafLogicWithManagers()
 //----------------------------------------------------------------------------
 {
   // Managers are destruct in the OnClose 
+  cppDEL(m_ApplicationLayoutSettings);
   cppDEL(m_PrintSupport);
   cppDEL(m_SettingsDialog); 
 }
@@ -186,9 +192,15 @@ void mafLogicWithManagers::Configure()
   }
 #endif
 
-  // Fill the SettingsDialog //SIL. 09-jun-2006 : 
-  
+  // Fill the SettingsDialog
   m_SettingsDialog->AddPage( m_ApplicationSettings->GetGui(), _("Application Settings"));
+
+  if (m_ViewManager)
+  {
+    m_ApplicationLayoutSettings = new mmgApplicationLayoutSettings(this);
+    m_ApplicationLayoutSettings->SetViewManager(m_ViewManager);
+    m_SettingsDialog->AddPage( m_ApplicationLayoutSettings->GetGui(), _("Application Layout"));
+  }
   m_SettingsDialog->AddPage( m_Win->GetDockSettingGui(), _("User Interface Preferences"));
 
 // currently mafInteraction is strictly dependent on VTK (marco)
@@ -200,9 +212,7 @@ void mafLogicWithManagers::Configure()
     m_SettingsDialog->AddPage(m_LocaleSettings->GetGui(), _("Interface language"));
 
   if (m_MeasureUnitSettings)
-  {
     m_SettingsDialog->AddPage(m_MeasureUnitSettings->GetGui(), _("Measure Unit"));
-  }
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Plug(mafView* view) 
@@ -265,10 +275,8 @@ void mafLogicWithManagers::Show()
 
   mafLogicWithGUI::Show();
 
-  if (m_VMEManager) // must be after the mafLogicWithGUI::Show(); because in that method is set the m_AppTitle var
-  {
-    m_VMEManager->SetApplicationStamp(m_AppTitle);
-  }
+  // must be after the mafLogicWithGUI::Show(); because in that method is set the m_AppTitle var
+  SetApplicationStamp(m_AppTitle);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::SetApplicationStamp(mafString &app_stamp)
@@ -684,6 +692,9 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
         if (v)
           v->GetRWI()->SaveImage(v->GetLabel());
       }
+      break;
+      case LAYOUT_LOAD:
+        RestoreLayout();
       break;
       case CAMERA_RESET:
         if(m_ViewManager) m_ViewManager->CameraReset();
@@ -1126,6 +1137,47 @@ void mafLogicWithManagers::VmeAdded(mafNode *vme)
     m_SideBar->VmeAdd(vme);
   if(m_PlugTimebar)
     UpdateTimeBounds();
+}
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::RestoreLayout()
+//----------------------------------------------------------------------------
+{
+  // Retrieve the saved layout.
+  mafNode *vme = m_VMEManager->GetRoot();
+  mmaApplicationLayout *app_layout = mmaApplicationLayout::SafeDownCast(vme->GetAttribute("ApplicationLayout"));
+  if (app_layout)
+  {
+    int maximized, pos[2], size[2];
+    app_layout->GetApplicationInfo(maximized, pos, size);
+    if (maximized != 0)
+    {
+      m_Win->Maximize();
+    }
+    else
+    {
+      wxRect rect(pos[0],pos[1],size[0],size[1]);
+      m_Win->SetSize(rect);
+    }
+    int num = app_layout->GetNumberOfViewsInLayout();
+    std::vector<mmaApplicationLayout::ViewLayoutInfo>::iterator iter = app_layout->GetLayoutList();
+    mafView *v = NULL;
+    for (int i = 0; i < num; i++, iter++)
+    {
+      ViewCreate((*iter).m_Id);
+      mafYield();
+      v = m_ViewManager->GetSelectedView();
+      if (v)
+      {
+        v->SetName((*iter).m_Label.GetCStr());
+        pos[0] = (*iter).m_Position[0];
+        pos[1] = (*iter).m_Position[1];
+        size[0] = (*iter).m_Size[0];
+        size[1] = (*iter).m_Size[1];
+        wxRect rect(pos[0],pos[1],size[0],size[1]);
+        v->GetFrame()->SetSize(rect);
+      }
+    }
+  }
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeRemove(mafNode *vme)

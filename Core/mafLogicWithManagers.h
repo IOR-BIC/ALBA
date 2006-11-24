@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-15 14:32:58 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2006-11-24 16:09:48 $
+  Version:   $Revision: 1.31 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,6 +36,7 @@ class mafPrintSupport;
 class mafRemoteLogic;
 class mmdMouse;
 class mmgSettingsDialog;
+class mmgApplicationLayoutSettings;
 
 //----------------------------------------------------------------------------
 // mafLogicWithManagers :
@@ -229,6 +230,8 @@ protected:
 	/** Select a view and update the display list for the tree. */
 	virtual void ViewSelect();
 
+  virtual void RestoreLayout();
+
   /** Called when user change the measure unit from menù Options.*/
   void UpdateMeasureUnit();
 
@@ -264,6 +267,7 @@ protected:
   bool m_UseOpManager;
   bool m_UseInteractionManager;
   mmgSettingsDialog *m_SettingsDialog;
+  mmgApplicationLayoutSettings *m_ApplicationLayoutSettings;
 
 	mafString m_Revision;
 };
