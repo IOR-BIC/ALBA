@@ -69,6 +69,8 @@ SET(PROJECT_SRCS
   mafVMERoot.h
   mafVMEStorage.cpp
   mafVMEStorage.h
+  mmaApplicationLayout.cpp
+  mmaApplicationLayout.h
   mmgListCtrlBitmap.cpp
   mmgListCtrlBitmap.h
   mmgVMEChooser.cpp
@@ -79,11 +81,24 @@ SET(PROJECT_SRCS
   mmgVMEChooserTree.h
   mmuTimeSet.cpp
   mmuTimeSet.h
+
 )
 
 IF (MAF_USE_VTK)
   SET(PROJECT_SRCS
   ${PROJECT_SRCS}
+  mafAxes.cpp
+  mafAxes.h
+  mafLODActor.cpp
+  mafLODActor.h
+  mafLogicWithManagers.cpp
+  mafLogicWithManagers.h
+  mafPipe.cpp
+  mafPipe.h
+  mafPipeBox.cpp
+  mafPipeBox.h
+  mafPipeFactory.cpp
+  mafPipeFactory.h
   mafRWI.cpp
   mafRWI.h
   mafRWIBase.cpp
@@ -92,40 +107,28 @@ IF (MAF_USE_VTK)
   mafSceneGraph.h
   mafSceneNode.cpp
   mafSceneNode.h
-  mafLogicWithManagers.cpp
-  mafLogicWithManagers.h
-  mafPipe.cpp
-  mafPipe.h
-  mafPipeFactory.cpp
-  mafPipeFactory.h
-  mafViewVTK.cpp
-  mafViewVTK.h
   mafViewCompound.cpp
   mafViewCompound.h
   mafViewHTML.cpp
   mafViewHTML.h
-  mafViewPlot.cpp
-  mafViewPlot.h
   mafViewManager.cpp
   mafViewManager.h
-  mmgContextualMenu.cpp
-  mmgContextualMenu.h
-  mmgTreeContextualMenu.cpp
-  mmgTreeContextualMenu.h
-  mmgMaterialButton.cpp
-  mmgMaterialButton.h
-  mmgMaterialChooser.cpp
-  mmgMaterialChooser.h
-  mafAxes.cpp
-  mafAxes.h
-  mafLODActor.cpp
-  mafLODActor.h
-  mafPipeBox.cpp
-  mafPipeBox.h
+  mafViewPlot.cpp
+  mafViewPlot.h
+  mafViewVTK.cpp
+  mafViewVTK.h
   mmaMaterial.cpp
   mmaMaterial.h
   mmaVolumeMaterial.cpp
   mmaVolumeMaterial.h
+  mmgContextualMenu.cpp
+  mmgContextualMenu.h
+  mmgMaterialButton.cpp
+  mmgMaterialButton.h
+  mmgMaterialChooser.cpp
+  mmgMaterialChooser.h
+  mmgTreeContextualMenu.cpp
+  mmgTreeContextualMenu.h
   vtkMAFAssembly.cpp
   vtkMAFAssembly.h
   )
