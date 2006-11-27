@@ -11,7 +11,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.6 $");
+vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.7 $");
 vtkStandardNewMacro(vtkDicomUnPacker);
 
 //----------------------------------------------------------------------------
@@ -69,6 +69,7 @@ void vtkDicomUnPacker::parser_multepl(tipo str , FILE * fp, long Length, VALUE *
   VAL->type = str;
   VAL->mult = 0;
 /***************************/ 
+
 	for (p=0; p< Length; p++)
 	{
 		c=fgetc(fp);
@@ -78,13 +79,16 @@ void vtkDicomUnPacker::parser_multepl(tipo str , FILE * fp, long Length, VALUE *
 		}
 		else 
 		{        
-			VAL->stringa[VAL->mult][r]=c;  r++;
+			VAL->stringa[VAL->mult][r]=c;  
+			r++;
+			VAL->stringa[VAL->mult][r]='\0';
 		}
 	}
 	   
 	if (str == num)     
 	{
-		for (r=0; r<=VAL->mult; r++) VAL->num[r]=atof(VAL->stringa[r]);
+		for (r=0; r<=VAL->mult; r++) 
+			VAL->num[r]=atof(VAL->stringa[r]);
 	}
 	else 
 	{
