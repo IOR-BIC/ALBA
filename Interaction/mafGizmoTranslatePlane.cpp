@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslatePlane.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-30 15:45:34 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-11-27 09:35:02 $
+  Version:   $Revision: 1.9 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -116,7 +116,7 @@ mafGizmoTranslatePlane::mafGizmoTranslatePlane(mafVME *input, mafObserver *liste
   }
 
   // ask the manager to create the pipelines
-  for (int i = 0; i < 3; i++)
+  for (i = 0; i < 3; i++)
     mafEventMacro(mafEvent(this,VME_SHOW,Gizmo[i],true));
 }
 //----------------------------------------------------------------------------
