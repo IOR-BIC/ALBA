@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-20 08:42:59 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-11-28 12:16:48 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,6 +33,7 @@ class mafAxes;
 class mmgMaterialButton;
 class vtkFixedCutter;
 class vtkPlane;
+class vtkSphereSource;
 
 //----------------------------------------------------------------------------
 // mafPipeSurfaceSlice :
@@ -62,6 +63,12 @@ public:
 
   /** Set the normal of the slice*/
 	void SetNormal(double *Normal);
+
+  /** Create visual-pipe for closed cloud or single landmark */
+  void CreateClosedCloudPipe();
+
+  /** Remove visual-pipe for closed cloud */
+  void RemoveClosedCloudPipe();
 
   /** IDs for the GUI */
   enum PIPE_SURFACE_WIDGET_ID
@@ -98,6 +105,9 @@ protected:
   mafAxes                 *m_Axes;
   vtkPlane				        *m_Plane;
   vtkFixedCutter		      *m_Cutter;
+
+  vtkSphereSource         *m_SphereSource;
+
   double				           m_Border;
 
   double	m_Origin[3];
