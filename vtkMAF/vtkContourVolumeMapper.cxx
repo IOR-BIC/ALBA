@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkContourVolumeMapper.cxx,v $
 Language:  C++
-Date:      $Date: 2006-11-28 12:56:03 $
-Version:   $Revision: 1.11 $
+Date:      $Date: 2006-11-28 15:27:11 $
+Version:   $Revision: 1.12 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -104,7 +104,7 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
 
 using namespace vtkContourVolumeMapperNamespace;
 
-vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.11 $");
+vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.12 $");
 vtkStandardNewMacro(vtkContourVolumeMapper);
 
 
@@ -1152,7 +1152,7 @@ template<typename DataType> void vtkContourVolumeMapper::RenderMCubes(vtkRendere
                 while(*edge >= 0) {
                   // check that memory is not about to be exceeded
                   if (createCache && (numTrianglesRunningTotal[lod] >= this->TriangleCacheSize[lod])){
-                    mafErrorMacro("no. of triangles exceeded allocated cache size\n") ;
+                    vtkErrorMacro("no. of triangles exceeded allocated cache size\n") ;
                     break ;
                   }
 
@@ -1282,7 +1282,7 @@ template<typename DataType> void vtkContourVolumeMapper::RenderMCubes(vtkRendere
     glDrawArrays(GL_TRIANGLES, 0, 3 * this->NumberOfTriangles[LODLevel]);
     unsigned int errorCode = glGetError() ;
     if (errorCode != GL_NO_ERROR){
-      mafErrorMacro("GL Crashed: " << std::hex << errorCode << "\n") ;
+      vtkErrorMacro("GL Crashed: " << std::hex << errorCode << "\n") ;
       assert(glGetError() == GL_NO_ERROR);
     }
   }
@@ -2135,7 +2135,7 @@ void vtkContourVolumeMapper::SortTriangles(int lod)
     ov[j+2] = index+2 ;
   }
 
-  mafErrorMacro("sort: " << " triangles = " << this->NumberOfTriangles[lod] << " " << t1 << " " << t2 << "\n") ;
+  vtkErrorMacro("sort: " << " triangles = " << this->NumberOfTriangles[lod] << " " << t1 << " " << t2 << "\n") ;
 
   delete[] depthlist ;
 }
