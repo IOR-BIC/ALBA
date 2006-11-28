@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaApplicationLayout.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-28 12:18:09 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-11-28 15:07:17 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -45,6 +45,7 @@ public:
     int m_Maximized;
     int m_Position[2];
     int m_Size[2];
+    std::vector<int> m_VisibleVmes;
   };
 
   /** print a dump of this object */
@@ -57,7 +58,7 @@ public:
   virtual bool Equals(const mafAttribute *a);
 
   /** Add the view to the view list to be saved into the layout.*/
-  void AddView(mafView *v);
+  void AddView(mafView *v, bool vme_visibility = false);
 
   /** Remove the view from the view list to be saved into the layout.*/
   void RemoveView(mafView *v);
