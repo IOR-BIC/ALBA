@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-28 10:27:44 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2006-11-28 14:11:06 $
+  Version:   $Revision: 1.26 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -200,6 +200,23 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
       }
       m_CurrentVolume = mafVMEVolume::SafeDownCast(node);
       GizmoCreate();
+
+      //BEGIN cycle for remove old surface and redraw the rigth slice
+      
+      mafNodeIterator *iter = node->GetRoot()->NewIterator();
+      for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+      {
+        if(node->IsA("mafVMESurface"))
+        {
+          mafPipe *p=(m_ChildViewList[RX_FRONT_VIEW])->GetNodePipe(node);
+          if(p)
+          {
+            this->VmeShow(node,false);
+            this->VmeShow(node,true);
+          }
+        } 
+      }
+      //END cycle for remove old surface and redraw the rigth slice
     }
     else
     {
@@ -207,6 +224,7 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
       m_CurrentVolume = NULL;
       GizmoDelete();
     }
+
   }
   else if (node->IsMAFType(mafVMESurface))
   {
