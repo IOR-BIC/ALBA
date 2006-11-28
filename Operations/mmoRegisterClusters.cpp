@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRegisterClusters.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-22 09:38:21 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-11-28 10:24:21 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi  
 ==========================================================================
   Copyright (c) 2002/2004
@@ -468,9 +468,8 @@ void mmoRegisterClusters::OpDo()
 		m_Follower->SetName(name);
 		mafEventMacro(mafEvent(this, VME_ADD, m_Follower));
 	}
-  mafTimeStamp time;
-  time = 0;
-  mafEventMacro(mafEvent(this,TIME_SET,&time));
+
+  mafEventMacro(mafEvent(this,TIME_SET,-1.0));
 }
 //----------------------------------------------------------------------------
 void mmoRegisterClusters::OpUndo()
