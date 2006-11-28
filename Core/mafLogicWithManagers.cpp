@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-28 12:17:58 $
-  Version:   $Revision: 1.85 $
+  Date:      $Date: 2006-11-28 14:41:34 $
+  Version:   $Revision: 1.86 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1148,6 +1148,12 @@ void mafLogicWithManagers::RestoreLayout()
   mmaApplicationLayout *app_layout = mmaApplicationLayout::SafeDownCast(vme->GetAttribute("ApplicationLayout"));
   if (app_layout)
   {
+    int answer = wxMessageBox(_("Do you want to load the layout?"), _("Warning"), wxYES_NO);
+    if (answer == wxNO)
+    {
+      return;
+    }
+    m_ViewManager->ViewDeleteAll();
     int maximized, pos[2], size[2];
     app_layout->GetApplicationInfo(maximized, pos, size);
     if (maximized != 0)
