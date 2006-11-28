@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-24 16:09:48 $
-  Version:   $Revision: 1.84 $
+  Date:      $Date: 2006-11-28 12:17:58 $
+  Version:   $Revision: 1.85 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -199,6 +199,7 @@ void mafLogicWithManagers::Configure()
   {
     m_ApplicationLayoutSettings = new mmgApplicationLayoutSettings(this);
     m_ApplicationLayoutSettings->SetViewManager(m_ViewManager);
+    m_ApplicationLayoutSettings->SetApplicationFrame(m_Win);
     m_SettingsDialog->AddPage( m_ApplicationLayoutSettings->GetGui(), _("Application Layout"));
   }
   m_SettingsDialog->AddPage( m_Win->GetDockSettingGui(), _("User Interface Preferences"));
@@ -1158,6 +1159,12 @@ void mafLogicWithManagers::RestoreLayout()
       wxRect rect(pos[0],pos[1],size[0],size[1]);
       m_Win->SetSize(rect);
     }
+    bool tb_vis = app_layout->GetToolBarVisibility() != 0;
+    bool sb_vis = app_layout->GetSideBarVisibility() != 0;
+    bool lb_vis = app_layout->GetLogBarVisibility() != 0;
+    m_Win->ShowDockPane("toolbar", tb_vis);
+    m_Win->ShowDockPane("logbar", lb_vis);
+    m_Win->ShowDockPane("sidebar", sb_vis);
     int num = app_layout->GetNumberOfViewsInLayout();
     std::vector<mmaApplicationLayout::ViewLayoutInfo>::iterator iter = app_layout->GetLayoutList();
     mafView *v = NULL;

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationLayoutSettings.h,v $
 Language:  C++
-Date:      $Date: 2006-11-24 16:06:57 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2006-11-28 12:18:23 $
+Version:   $Revision: 1.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -21,6 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class mmgGui;
 class mafViewManager;
 class mmaApplicationLayout;
+class mmgMDIFrame;
 
 //----------------------------------------------------------------------------
 // mmgApplicationLayoutSettings :
@@ -47,6 +48,9 @@ public:
 
   void SetViewManager(mafViewManager *view_manager) {m_ViewManager = view_manager;};
 
+  /** Set a reference to the interface elements to store their visibility.*/
+  void SetApplicationFrame(mmgMDIFrame *win) {m_Win = win;};
+
   /** Return the Settings GUI.*/
   mmgGui* GetGui() {return m_Gui;};
 
@@ -57,6 +61,7 @@ protected:
   /** Save current application layout into the attribute mmaApplicationLayout. */
   void SaveLayout();
 
+  mmgMDIFrame           *m_Win;
   mafString              m_DefaultLayout;
   mmgGui                *m_Gui;
   mafObserver           *m_Listener;

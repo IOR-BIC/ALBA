@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationLayoutSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2006-11-24 16:06:57 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2006-11-28 12:18:23 $
+Version:   $Revision: 1.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -23,6 +23,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <wx/config.h>
 #include "mafDecl.h"
 #include "mmgGui.h"
+#include "mmgMDIFrame.h"
 #include "mafViewManager.h"
 #include "mafView.h"
 
@@ -37,6 +38,7 @@ mmgApplicationLayoutSettings::mmgApplicationLayoutSettings(mafObserver *listener
   m_DefaultLayout = "Default Layout";
   m_ViewManager   = NULL;
   m_Layout        = NULL;
+  m_Win           = NULL;
 
   InitializeLayout();
 
@@ -100,6 +102,15 @@ void mmgApplicationLayoutSettings::SaveLayout()
     {
     }
     m_Layout->SetApplicationInfo(frame->IsMaximized(), pos, size);
+    wxPaneInfo toolbar = m_Win->GetDockManager().GetPane("toolbar");
+    bool toolbar_vis = toolbar.IsShown();
+    m_Layout->SetInterfaceElementVisibility("toolbar", toolbar_vis);
+    wxPaneInfo sidebar = m_Win->GetDockManager().GetPane("sidebar");
+    bool sidebar_vis = sidebar.IsShown();
+    m_Layout->SetInterfaceElementVisibility("sidebar", sidebar_vis);
+    wxPaneInfo logbar = m_Win->GetDockManager().GetPane("logbar");
+    bool logbar_vis = logbar.IsShown();
+    m_Layout->SetInterfaceElementVisibility("logbar", logbar_vis);
     m_Layout->SetLayoutName(m_DefaultLayout.GetCStr());
     mafView *v = m_ViewManager->GetList();
     for(; v; v = v->m_Next)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaApplicationLayout.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-24 16:05:25 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-11-28 12:18:09 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -123,6 +123,23 @@ void mmaApplicationLayout::SetApplicationInfo(int maximized, int pos[2], int siz
   m_AppSize[1] = size[1];
 }
 //-----------------------------------------------------------------------
+void mmaApplicationLayout::SetInterfaceElementVisibility(mafString panel_name, int visibility)
+//-----------------------------------------------------------------------
+{
+  if (panel_name.Equals("toolbar"))
+  {
+    m_ToolBarVisibility = visibility;
+  }
+  else if (panel_name.Equals("sidebar"))
+  {
+    m_SideBarVisibility = visibility;
+  }
+  else if (panel_name.Equals("logbar"))
+  {
+    m_LogBarVisibility = visibility;
+  }
+}
+//-----------------------------------------------------------------------
 int mmaApplicationLayout::InternalStore(mafStorageElement *parent)
 //-----------------------------------------------------------------------
 {  
@@ -131,6 +148,10 @@ int mmaApplicationLayout::InternalStore(mafStorageElement *parent)
     parent->StoreInteger("APPLICATION_MAXIMIZED", m_AppMaximized);
     parent->StoreVectorN("APPLICATION_SIZE",m_AppSize,2);
     parent->StoreVectorN("APPLICATION_POSITION",m_AppPosition,2);
+
+    parent->StoreInteger("TOOLBAR_VISIBILITY", m_ToolBarVisibility);
+    parent->StoreInteger("SIDEBAR_VISIBILITY", m_SideBarVisibility);
+    parent->StoreInteger("LOGBAR_VISIBILITY", m_LogBarVisibility);
 
     parent->StoreText("LAYOUT_NAME",m_LayoutName.GetCStr());
     mafString view_id;
@@ -177,6 +198,10 @@ int mmaApplicationLayout::InternalRestore(mafStorageElement *node)
     node->RestoreInteger("APPLICATION_MAXIMIZED", m_AppMaximized);
     node->RestoreVectorN("APPLICATION_SIZE",m_AppSize,2);
     node->RestoreVectorN("APPLICATION_POSITION",m_AppPosition,2);
+
+    node->RestoreInteger("TOOLBAR_VISIBILITY", m_ToolBarVisibility);
+    node->RestoreInteger("SIDEBAR_VISIBILITY", m_SideBarVisibility);
+    node->RestoreInteger("LOGBAR_VISIBILITY", m_LogBarVisibility);
 
     node->RestoreText("LAYOUT_NAME",m_LayoutName);
     mafString view_id;

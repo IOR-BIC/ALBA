@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaApplicationLayout.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-24 16:05:25 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-11-28 12:18:09 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -82,7 +82,19 @@ public:
   /** Retrieve the stored frame settings.*/
   void GetApplicationInfo(int &maximized, int pos[2], int size[2]);
 
+  /** Set the visibility for the corresponding interface element.*/
+  void SetInterfaceElementVisibility(mafString panel_name, int visibility);
+
   std::vector<ViewLayoutInfo>::iterator GetLayoutList() {return m_LayoutViewList.begin();};
+
+  /** Return the stored visibility for the Toolbar.*/
+  int GetToolBarVisibility() {return m_ToolBarVisibility;};
+
+  /** Return the stored visibility for the Logbar.*/
+  int GetLogBarVisibility() {return m_LogBarVisibility;};
+
+  /** Return the stored visibility for the Sidebar.*/
+  int GetSideBarVisibility() {return m_SideBarVisibility;};
 
 protected:
   virtual int InternalStore(mafStorageElement *parent);
@@ -92,6 +104,11 @@ protected:
   int m_AppMaximized;
   int m_AppPosition[2];
   int m_AppSize[2];
+
+  int m_SideBarVisibility;
+  int m_ToolBarVisibility;
+  int m_LogBarVisibility;
+  
   std::vector<ViewLayoutInfo> m_LayoutViewList;
 };
 #endif
