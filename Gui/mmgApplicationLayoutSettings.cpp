@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationLayoutSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2006-11-28 12:18:23 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2006-11-28 14:42:14 $
+Version:   $Revision: 1.3 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -100,6 +100,7 @@ void mmgApplicationLayoutSettings::SaveLayout()
     }
     else
     {
+      m_Layout->ClearLayout();
     }
     m_Layout->SetApplicationInfo(frame->IsMaximized(), pos, size);
     wxPaneInfo toolbar = m_Win->GetDockManager().GetPane("toolbar");
