@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaApplicationLayout.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-28 12:18:09 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-11-28 15:07:48 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -160,6 +160,8 @@ int mmaApplicationLayout::InternalStore(mafStorageElement *parent)
     mafString view_max;
     mafString view_size;
     mafString view_pos;
+    mafString vme_in_view;
+    mafString vme_ids_in_view;
     ViewLayoutInfo info;
     int n = m_LayoutViewList.size();
     parent->StoreInteger("NUMBER_OF_VIEW", n);
@@ -184,6 +186,15 @@ int mmaApplicationLayout::InternalStore(mafStorageElement *parent)
       view_pos << i;
       parent->StoreVectorN(view_size.GetCStr(),info.m_Size,2);
       parent->StoreVectorN(view_pos.GetCStr(),info.m_Position,2);
+      vme_in_view = "VME_IN_VIEW_";
+      vme_in_view << i;
+      parent->StoreInteger(vme_in_view.GetCStr(),info.m_VisibleVmes.size());
+      if (info.m_VisibleVmes.size() > 0)
+      {
+        vme_ids_in_view = "VME_IDS_IN_VIEW_";
+        vme_ids_in_view << i;
+        parent->StoreVectorN(vme_ids_in_view.GetCStr(),info.m_VisibleVmes, info.m_VisibleVmes.size());
+      }
     }
     return MAF_OK;
   }
@@ -210,6 +221,8 @@ int mmaApplicationLayout::InternalRestore(mafStorageElement *node)
     mafString view_max;
     mafString view_size;
     mafString view_pos;
+    mafString vme_in_view;
+    mafString vme_ids_in_view;
     ViewLayoutInfo info;
     int n;
     node->RestoreInteger("NUMBER_OF_VIEW", n);
@@ -234,13 +247,23 @@ int mmaApplicationLayout::InternalRestore(mafStorageElement *node)
       node->RestoreVectorN(view_size.GetCStr(),info.m_Size,2);
       node->RestoreVectorN(view_pos.GetCStr(),info.m_Position,2);
       m_LayoutViewList.push_back(info);
+      vme_in_view = "VME_IN_VIEW_";
+      vme_in_view << i;
+      int num_vme;
+      node->RestoreInteger(vme_in_view.GetCStr(),num_vme);
+      if (num_vme > 0)
+      {
+        vme_ids_in_view = "VME_IDS_IN_VIEW_";
+        vme_ids_in_view << i;
+        node->RestoreVectorN(vme_ids_in_view.GetCStr(),info.m_VisibleVmes, num_vme);
+      }
     }
     return MAF_OK;
   }
   return MAF_ERROR;
 }
 //-----------------------------------------------------------------------
-void mmaApplicationLayout::AddView(mafView *v)
+void mmaApplicationLayout::AddView(mafView *v, bool vme_visibility)
 //-----------------------------------------------------------------------
 {
   ViewLayoutInfo info;
@@ -254,7 +277,15 @@ void mmaApplicationLayout::AddView(mafView *v)
   info.m_Position[1] = r.GetPosition().y;
   info.m_Size[0] = r.GetSize().GetWidth();
   info.m_Size[1] = r.GetSize().GetHeight();
-  
+  info.m_VisibleVmes.clear();
+  if (vme_visibility)
+  {
+    int idx;
+    //for (...)
+    //{
+    //  info.m_VisibleVmes.push_back(idx);
+    //}
+  }
   m_LayoutViewList.push_back(info);
 }
 //-----------------------------------------------------------------------
