@@ -16,6 +16,8 @@ SET(PROJECT_SRCS
   mmoLandmarkImporter.h
   mmoRegisterClusters.cpp
   mmoRegisterClusters.h
+  mmoVolumeMeasure.cpp
+  mmoVolumeMeasure.h
   mmoRAWImporterImages.cpp
   mmoRAWImporterImages.h
 )
