@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-21 16:17:37 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2006-11-28 10:27:31 $
+  Version:   $Revision: 1.28 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -285,7 +285,6 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
 					normal[1] = 0;
 					normal[2] = 1;
 				}
-
 		    m_CurrentSurface.push_back(n);
 		    ((mafPipeSurfaceSlice *)pipe)->SetSlice(m_Slice);
 				((mafPipeSurfaceSlice *)pipe)->SetNormal(normal);
@@ -314,6 +313,7 @@ void mafViewSlice::VmeDeletePipe(mafNode *vme)
     m_NumberOfVisibleVme = 0;
   else
     m_NumberOfVisibleVme--;
+  
   if (vme->IsMAFType(mafVMEVolume))
   {
     m_CurrentVolume = NULL;
@@ -324,6 +324,9 @@ void mafViewSlice::VmeDeletePipe(mafNode *vme)
   }
   assert(n && n->m_Pipe);
   cppDEL(n->m_Pipe);
+
+  if(vme->IsMAFType(mafVMELandmark))
+    UpdateSurfacesList(vme);
 }
 //-------------------------------------------------------------------------
 int mafViewSlice::GetNodeStatus(mafNode *vme)
@@ -415,11 +418,14 @@ void mafViewSlice::SetSliceLocalOrigin(double origin[3])
     return;
   for(int i=0;i<m_CurrentSurface.size();i++)
   {
-    pipe_name = m_CurrentSurface.at(i)->m_Pipe->GetTypeName();
-    if (pipe_name.Equals("mafPipeSurfaceSlice"))
+    if(m_CurrentSurface.at(i) && m_CurrentSurface.at(i)->m_Pipe)
     {
-      mafPipeSurfaceSlice *pipe = (mafPipeSurfaceSlice *)m_CurrentSurface[i]->m_Pipe;
-      pipe->SetSlice(origin); 
+      pipe_name = m_CurrentSurface.at(i)->m_Pipe->GetTypeName();
+      if (pipe_name.Equals("mafPipeSurfaceSlice"))
+      {
+        mafPipeSurfaceSlice *pipe = (mafPipeSurfaceSlice *)m_CurrentSurface[i]->m_Pipe;
+        pipe->SetSlice(origin); 
+      }
     }
   }
   // update text
@@ -532,7 +538,7 @@ void mafViewSlice::VmeShow(mafNode *node, bool show)
       m_CurrentVolume = NULL;
       for(int i=0; i<m_NumOfChildView; i++)
       ((mafViewSliceLHPBuilder *)m_ChildViewList[i])->UpdateText(0);
-			*/ 
+			*/
 			if(m_AttachCamera)
 				m_AttachCamera->SetVme(NULL);
       this->UpdateText(0);
@@ -541,8 +547,8 @@ void mafViewSlice::VmeShow(mafNode *node, bool show)
     m_Rwi->CameraReset(node);
     m_Rwi->CameraUpdate();
   }
+  
 	Superclass::VmeShow(node, show);
-
 }
 //----------------------------------------------------------------------------
 void mafViewSlice::VmeRemove(mafNode *vme)
