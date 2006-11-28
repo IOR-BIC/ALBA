@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmo2DMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-07 10:43:32 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-11-28 12:15:33 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,6 +21,9 @@
 
 #include "mmo2DMeasure.h"
 
+#include "mafNode.h"
+#include "mafTagItem.h"
+#include "mafTagArray.h"
 #include "mmi2DDistance.h"
 #include "mmi2DAngle.h"
 #include "mmi2DIndicator.h"
@@ -148,6 +151,20 @@ void mmo2DMeasure::OpRun()
   m_Gui->Button(ID_REMOVE_MEASURE,_("Remove"));
   m_MeasureList = m_Gui->ListBox(ID_MEASURE_LIST);
 	m_Gui->OkCancel();
+
+  // storing
+  mafNode *root = (mafNode *)m_Input->GetRoot();
+  if(root->GetTagArray()->IsTagPresent("2D_MEASURE"))
+  {
+    mafTagItem *measure_item = root->GetTagArray()->GetTag("2D_MEASURE");
+    int c = measure_item->GetNumberOfComponents();
+    for(int i = 0; i < c; i++)
+    {
+      mafString value;
+      value = measure_item->GetComponent(i);
+      m_MeasureList->Append(_(value));
+    }
+  }
 
   if(m_MeasureList->GetCount() == 0)
   {
@@ -559,6 +576,18 @@ void mmo2DMeasure::OnEvent(mafEventBase *maf_event)
 void mmo2DMeasure::OpStop(int result)
 //----------------------------------------------------------------------------
 {
+  int c = m_MeasureList->GetCount();
+  mafTagItem measure_item;
+  measure_item.SetName("2D_MEASURE");
+  measure_item.SetNumberOfComponents(c);
+  for(int i = 0; i < c; i++)
+    measure_item.SetComponent(mafString(m_MeasureList->GetString(i)),i);
+  mafNode *root = (mafNode *)m_Input->GetRoot();
+  if(root->GetTagArray()->IsTagPresent("2D_MEASURE"))
+  root->GetTagArray()->DeleteTag("2D_MEASURE");
+  root->GetTagArray()->SetTag(measure_item);
+  mafEventMacro(mafEvent(this,VME_MODIFIED,root));
+
 	m_2DDistanceInteractor->RemoveMeter();  
 	m_2DAngleInteractor->RemoveMeter();
   m_2DIndicatorInteractor->RemoveMeter();
