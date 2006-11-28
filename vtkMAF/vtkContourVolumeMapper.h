@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkContourVolumeMapper.h,v $
 Language:  C++
-Date:      $Date: 2006-11-13 10:17:36 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2006-11-28 12:56:03 $
+Version:   $Revision: 1.6 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -84,6 +84,22 @@ namespace vtkContourVolumeMapperNamespace
   static const int edgeOffsets[12][2] = {{0, 1}, {1, 2}, {3, 2}, {0, 3}, {4, 5}, {5, 6}, {7, 6}, {4, 7}, {0,4}, {1, 5}, {3, 7}, {2, 6} };
   static const int edgeAxis[12] = {0, 1, 0, 1, 0, 1, 0, 1, 2, 2, 2, 2};
 
+  // max no. of triangles before LOD required
+  static const int MaxTrianglesNotOptimized = 2000000 ;
+
+  // approx. ratio of time to draw between DrawCache() and RenderMCubes()
+  static const float TimeCacheToMCubesRatio = 0.2 ;
+
+  // no. of levels of detail allowed (2,3 or 4)
+  static const int NumberOfLods = 4 ;
+
+  // Empirical constant: approx no. of triangles for every voxel in a block containing contour
+  // This is used in RenderMCubes() to calculate the default lod.
+  // Too low and RenderMCubes will underestimate the render time, 
+  // too high and the rendering will flicker down to low resolution too much.
+  // Actual value is about 0.5, but the contour slider is very sticky at this value.
+  const float triangles_per_voxel = 2.0 ;
+
   // container type for sorting depth values
   struct Idepth
   {
@@ -93,6 +109,8 @@ namespace vtkContourVolumeMapperNamespace
   };
 };
 
+
+using namespace vtkContourVolumeMapperNamespace ;
 
 
 //------------------------------------------------------------------------------
@@ -110,7 +128,9 @@ public:
   void  SetInput(vtkDataSet *input);
   vtkDataSet*  GetInput() { return (vtkDataSet*)vtkVolumeMapper::GetInput(); }
 
-  /** Render the volume */
+  /** Render the isosurface
+  If data has been cached for this contour value, calls DrawCache()
+  Else calls PrepareAccelerationDataTemplate() and RenderMCubes() */
   void Render(vtkRenderer *ren, vtkVolume *vol);
 
   /** Enable or disable multi-resolution feature. By default it is enabled */
@@ -193,6 +213,55 @@ protected:
 
   void ReleaseData();
 
+  /** This function returns the index increments in xy and z given the lod index
+  For lod = 0,1,2,3... lodxy = 2^n = 1,2,4,8...
+  However, the resolution in z, between slice planes, may already be poor, so
+  lodz <= lodx such that z resolution is not worse than x resolution. */
+  void CalculateVoxelIndexIncrements(int lod, int *lodxy, int *lodz) const ;
+
+  /** Return vertex array offsets given the lod index.
+  Returns offset[0..7] for the LOD cube corresponding to the
+  cube defined in PrepareAccelerationTemplate() */
+  void CalculateVoxelVertIndicesOffsets(int lod, int *offset) const ;
+
+  /** Calculate volume of voxel given lod
+  useful for estimating times or no. of triangles from one lod to another */
+  int VoxelVolume(int lod) const ;
+
+  /** Estimate the number of triangles for the given LOD using fraction of relevant volume.
+  EstimateRelevantVolume() is only called the first time the contour value changes,
+  after which there is no further time cost. */
+  int EstimateTrianglesFromRelevantVolume(int lod) ;
+
+  /** Return an estimate of the expected number of triangles for the given LOD.
+  Only use this to help decide whether to render at this LOD or not. */
+  int EstimateNumberOfTriangles(int lod) ;
+
+  /** Return an estimate of the time to draw using DrawCache()
+  Only use this to help decide whether to render at this LOD or not. */
+  float EstimateTimeToDrawDC(int lod) const ;
+
+  /** Return an estimate of the time to draw using RenderMCubes()
+  Only use this to help decide whether to render at this LOD or not. */
+  float EstimateTimeToDrawRMC(int lod) ;
+
+  /** Return highest resolution (LOD) which DrawCache() can draw
+  This only checks time and triangles - not whether cache exists yet
+  Used to decide whether to call DrawCache() or RenderMCubes() */
+  int BestLODForDrawCache(vtkRenderer *renderer) ;
+
+  /** Return highest resolution (LOD) which RenderMCubes() can draw
+  Used to decide which LOD to create and render */
+  int BestLODForRenderMCubes(vtkRenderer *renderer) ;
+
+  /** Return highest LOD which has been cached
+  returns negative number if nothing found
+  Used by DrawCache() to decide which lod to draw */
+  int HighestLODCached() const ;
+
+  /** Free caches and set stats to undefined, eg after contour value changes */
+  void ClearCachesAndStats() ;
+
   /** calculate depth of vertex from screen (matrix is in openGL format) */
   float DepthOfVertex(float *vertex, float *mat) const ;
 
@@ -203,12 +272,6 @@ protected:
   /** Sort triangles into back-to-front order 
   lod is cache 0 or 1 */
   void SortTriangles(int lod) ;
-
-  /** This helper function returns an estimate of the expected number of triangles 
-  in the normal (non-LOD) mode, given the current number of normal and LOD triangles.
-  A zero value means that the number is undefined (see constructor).
-  Only use this to decide whether to use LOD or not.  */
-  int EstimateTrianglesNoOpt() ;
 
   vtkTimeStamp   BuildTime;
 
@@ -223,10 +286,10 @@ private:
   // min-max block structure
   int            NumBlocks[3];
   void          *BlockMinMax; // min - 0, max - 1
-  int            VoxelVertIndicesOffsets[8];
+  int            VoxelVertIndicesOffsets[NumberOfLods][8];
 
   // parameters of the mapper
-  float          ContourValue;
+  float          ContourValue;           ///< current contour value
   int            EnableAutoLOD;          ///< shall we use multiresolution?
   int            EnableContourAnalysis;  ///< shall we optimize the surface?
 
@@ -243,21 +306,21 @@ private:
   // statistics
   int            VoxelsRendered;
   int            VoxelsSkipped;
-  float          SkippedVoxelBlocks;    // 0 - 100 (%)
-  float          TimeToDrawNotOptimized;
-  float          TimeToDrawNotOptimizedCache;
-  int            CreatedTriangles;      // valid when CreateMCubes is running
+  float          SkippedVoxelBlocks;                // 0 - 100 (%)
+  float          TimeToDrawRMC[NumberOfLods] ;      // time to draw with RenderMCubes()
+  float          TimeToDrawDC[NumberOfLods] ;       // time to draw with DrawCache()
+  int            NumberOfTriangles[NumberOfLods];   // no. of triangles  
+  int            CreatedTriangles;                  // valid when CreateMCubes is running
+  float          TimePerTriangle ;                  // running mean of time per triangle
 
   // caching
-  bool           CacheCreated;
-  float          PrevContourValue[2];
-  unsigned  int  NumberOfTriangles[2];  
-  float         *TriangleCache[2];      // pointers to the two caches, 0 for normal, 1 for LOD    
-  unsigned int   TriangleCacheSize[2];  // in triangles (there are 6 floats per vertex, 18 floats per triangle)
+  bool           CacheCreated ;                     // flag indicating that cache has been created
+  float          PrevContourValue ;                 // last contour value
+  float         *TriangleCache[NumberOfLods];       // pointers to the two caches, 0 for normal, 1 for LOD    
+  unsigned int   TriangleCacheSize[NumberOfLods];   // in triangles (there are 6 floats per vertex, 18 floats per triangle)
 
   // sorting triangles
-  int ntriangles_previous[2] ;         // previous no. of triangles
-  unsigned int *ordered_vertices[2] ;  // indices of vertices in sort order
+  unsigned int *ordered_vertices[NumberOfLods] ;    // indices of vertices in sort order
 
   // helping objects
   float          ViewportDimensions[2];

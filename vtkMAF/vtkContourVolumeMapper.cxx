@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkContourVolumeMapper.cxx,v $
 Language:  C++
-Date:      $Date: 2006-11-14 10:45:32 $
-Version:   $Revision: 1.10 $
+Date:      $Date: 2006-11-28 12:56:03 $
+Version:   $Revision: 1.11 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -19,9 +19,10 @@ All rights reserved.
 // vtkStandardNewMacro()
 // vtkContourVolumeMapper()
 // ~vtkContourVolumeMapper()
+// ReleaseData()
 // PrintSelf()
 // SetInput()
-// EstimteRelevantVolume()
+// EstimateRelevantVolume()
 // EstimateRelevantVolumeTemplate()
 // Render()
 // PrepareAccelerationDataTemplate()
@@ -29,13 +30,22 @@ All rights reserved.
 // Update()
 // IsDataValid()
 // GetDataType()
-// ReleaseData()
 // GetOutput()
 // InitializeRender()
 // DrawCache()
 // RenderMCubes()
 // CreateMCubes()
-// EstimateTrianglesNoOpt()
+// CalculateVoxelIndexIncrements()
+// CalculateVoxelVertIndicesOffsets()
+// VoxelVolume()
+// EstimateTrianglesFromRelevantVolume()
+// EstimateNumberOfTriangles()
+// EstimateTimeToDrawDC()
+// EstimateTimeToDrawRMC()
+// BestLODForDrawCache()
+// BestLODForRenderMCubes()
+// HighestLODCached()
+// ClearCachesAndStats()
 // PrepareContours()
 // PrepareContoursTemplate()
 // DepthOfVertex()
@@ -94,57 +104,97 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
 
 using namespace vtkContourVolumeMapperNamespace;
 
-vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.10 $");
+vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.11 $");
 vtkStandardNewMacro(vtkContourVolumeMapper);
 
 
 
 //------------------------------------------------------------------------------
+// Constructor
 vtkContourVolumeMapper::vtkContourVolumeMapper()
 //------------------------------------------------------------------------------
 {
-
   m_Alpha=1.0;
 
   this->EnableAutoLOD = true;
   this->EnableContourAnalysis = false;
 
   this->BlockMinMax = NULL;
-  this->TriangleCache[0] = this->TriangleCache[1] = NULL;
-  this->TimeToDrawNotOptimized = this->TimeToDrawNotOptimizedCache = 0;
-  this->TriangleCacheSize[0] = this->TriangleCacheSize[1] = 0;
+
   this->VoxelCoordinates[0] = this->VoxelCoordinates[1] = this->VoxelCoordinates[2] = NULL;
 
   this->TransformMatrix = vtkMatrix4x4::New();
   this->VolumeMatrix    = vtkMatrix4x4::New();
 
-  // set initial value of no. of triangles to zero to show that values are undefined
-  this->NumberOfTriangles[0] = 0 ;
-  this->NumberOfTriangles[1] = 0 ;
+  for (int lod = 0 ;  lod < NumberOfLods ;  lod++){
+    // set initial value of no. of triangles to undefined
+    this->NumberOfTriangles[lod] = -1 ;
 
-  // sorting triangles
-  this->ntriangles_previous[0] = 0 ;
-  this->ntriangles_previous[1] = 0 ;
-  this->ordered_vertices[0] = NULL ;
-  this->ordered_vertices[1] = NULL ;
+    // initialize times to draw to undefined
+    this->TimeToDrawDC[lod] = -1.0 ;
+    this->TimeToDrawRMC[lod] = -1.0 ;
 
+    // initialize caches to NULL
+    this->TriangleCache[lod] = NULL;
+    this->TriangleCacheSize[lod] = 0;
+
+    // sorting triangles
+    this->ordered_vertices[lod] = NULL ;
+  }
+
+  this->TimePerTriangle = -1.0 ;
 }
 
 
 //------------------------------------------------------------------------------
+// Destructor
 vtkContourVolumeMapper::~vtkContourVolumeMapper()
 //------------------------------------------------------------------------------
 {
   // delete textures if any
   ReleaseData();
 
-  // delete vertex order array
-  delete[] ordered_vertices[0] ;
-  delete[] ordered_vertices[1] ;
-
   this->TransformMatrix->Delete();
   this->VolumeMatrix->Delete();
 }
+
+
+
+//------------------------------------------------------------------------------
+// Delete allocated data
+// Called by destructor, and where input data has changed - SetInput() and
+// PrepareAccelerationDataTemplate().
+void vtkContourVolumeMapper::ReleaseData()
+//------------------------------------------------------------------------------
+{
+  delete [] this->BlockMinMax;
+  this->BlockMinMax = NULL;
+
+  delete [] this->VoxelCoordinates[0];
+  delete [] this->VoxelCoordinates[1];
+  delete [] this->VoxelCoordinates[2];
+  this->VoxelCoordinates[0] = this->VoxelCoordinates[1] = this->VoxelCoordinates[2] = NULL;
+
+  for (int lod = 0 ;  lod < NumberOfLods ;  lod++){
+    // re-initialize no. of triangles and times to draw
+    this->NumberOfTriangles[lod] = -1 ;
+    this->TimeToDrawDC[lod] = -1.0 ;
+    this->TimeToDrawRMC[lod] = -1.0 ;
+
+    // delete triangle caches
+    delete [] this->TriangleCache[lod];
+    this->TriangleCache[lod] = NULL;
+    this->TriangleCacheSize[lod] = 0;
+
+    // delete vertex order array
+    delete[] ordered_vertices[lod] ;
+    ordered_vertices[lod] = NULL ;
+  }
+
+
+  this->TimePerTriangle = -1.0 ;
+}
+
 
 
 
@@ -239,10 +289,10 @@ template <typename DataType> float vtkContourVolumeMapper::EstimateRelevantVolum
 //------------------------------------------------------------------------------
 // Render the isosurface
 // If data has been cached for this contour value
-//        Calls    DrawCache() if data has been cached for this contour value
+//        Calls DrawCache()
 // Else
-//        Calls    PrepareAccelerationDataTemplate()
-//                RenderMCubes()
+//        Calls PrepareAccelerationDataTemplate()
+//              RenderMCubes()
 void vtkContourVolumeMapper::Render(vtkRenderer *renderer, vtkVolume *volume)
 //------------------------------------------------------------------------------
 {
@@ -251,8 +301,15 @@ void vtkContourVolumeMapper::Render(vtkRenderer *renderer, vtkVolume *volume)
     return;
   }
 
-  // if cache exists, use it
-  if ((this->PrevContourValue[0] == this->ContourValue) && this->CacheCreated && this->TriangleCache[0] != NULL) {
+  // clear the caches and statistics if the contour value has changed
+  if (this->ContourValue != this->PrevContourValue)
+    ClearCachesAndStats() ;
+
+  // find the higest lod which DrawCache() can draw
+  int lod = BestLODForDrawCache(renderer) ;
+
+  // if this lod is cached, draw it, else need to go to RenderMCubes() to get it cached
+  if (this->CacheCreated && (this->TriangleCache[lod] != NULL)) {
     this->DrawCache(renderer, volume);
     return;
   }
@@ -290,13 +347,15 @@ void vtkContourVolumeMapper::Render(vtkRenderer *renderer, vtkVolume *volume)
 
 
 //------------------------------------------------------------------------------
-// Set up the acceleration structures.
+// Set up the acceleration structures if data has changed
 // Gets data extents
 // Calculates coords of every voxel, and offsets between neighbouring voxels
 // Divides volume into 8x8x8 blocks and calculates the min and max of each block.
 template <typename DataType> bool vtkContourVolumeMapper::PrepareAccelerationDataTemplate(const DataType *dataPointer)
 //------------------------------------------------------------------------------
 {
+  int lod ;
+
   // Is data the same?
   if (this->GetInput() != NULL && this->GetInput()->GetMTime() > this->BuildTime)
     this->ReleaseData();
@@ -365,7 +424,8 @@ template <typename DataType> bool vtkContourVolumeMapper::PrepareAccelerationDat
 
 
 
-  // calculate offsets between neighbouring voxels (used later in RenderMCubes())
+  // calculate offsets between neighbouring voxels for normal and lod
+  // (used later in RenderMCubes())
   //               ___
   //     ^ y     /|3 2|
   //     |   x  / |0 1|
@@ -374,15 +434,8 @@ template <typename DataType> bool vtkContourVolumeMapper::PrepareAccelerationDat
   //   / z    |7 6| /
   //          |4 5|/
   //           ---
-  const int sliceDimension = this->DataDimensions[0] * this->DataDimensions[1];
-  this->VoxelVertIndicesOffsets[0] = 0;
-  this->VoxelVertIndicesOffsets[1] = 1;
-  this->VoxelVertIndicesOffsets[2] = this->DataDimensions[0] + 1;
-  this->VoxelVertIndicesOffsets[3] = this->DataDimensions[0];
-  this->VoxelVertIndicesOffsets[4] = this->VoxelVertIndicesOffsets[0] + sliceDimension;
-  this->VoxelVertIndicesOffsets[5] = this->VoxelVertIndicesOffsets[1] + sliceDimension;
-  this->VoxelVertIndicesOffsets[6] = this->VoxelVertIndicesOffsets[2] + sliceDimension;
-  this->VoxelVertIndicesOffsets[7] = this->VoxelVertIndicesOffsets[3] + sliceDimension;
+  for (lod = 0 ;  lod < NumberOfLods ;  lod++)
+    CalculateVoxelVertIndicesOffsets(lod, this->VoxelVertIndicesOffsets[lod]) ;
 
 
 
@@ -451,8 +504,10 @@ template <typename DataType> bool vtkContourVolumeMapper::PrepareAccelerationDat
     } //for (y)
   } //for (z)
 
-  // clear caches
-  this->PrevContourValue[0] = this->PrevContourValue[1] = VTK_FLOAT_MAX;
+
+  // set contour value and cache flag to first time values
+  // NMcF: shouldn't we free the cache memory as well ?
+  this->PrevContourValue = VTK_FLOAT_MAX;
   this->CacheCreated = false;
 
   this->BuildTime.Modified();
@@ -588,26 +643,11 @@ int vtkContourVolumeMapper::GetDataType()
 
 
 
-//------------------------------------------------------------------------------
-void vtkContourVolumeMapper::ReleaseData()
-//------------------------------------------------------------------------------
-{
-  delete [] this->BlockMinMax;
-  this->BlockMinMax = NULL;
-  delete [] this->TriangleCache[0];
-  delete [] this->TriangleCache[1];
-  this->TriangleCache[0] = this->TriangleCache[1] = NULL;
-  delete [] this->VoxelCoordinates[0];
-  delete [] this->VoxelCoordinates[1];
-  delete [] this->VoxelCoordinates[2];
-  this->VoxelCoordinates[0] = this->VoxelCoordinates[1] = this->VoxelCoordinates[2] = NULL;
-}
-
 
 
 //------------------------------------------------------------------------------
 // Return isosurface as polydata
-// Similar to Render() but calls CreateMCubes() instead of RenderMCubes()
+// Similar to Render() but calls CreateMCubes() instead of NumberOfLods()
 vtkPolyData *vtkContourVolumeMapper::GetOutput(int level, vtkPolyData *data)
 //------------------------------------------------------------------------------
 {
@@ -676,8 +716,8 @@ void vtkContourVolumeMapper::InitializeRender(bool setup, vtkRenderer *renderer,
     glEnable(GL_BLEND);
     //End
 
-    glEnable(GL_LIGHTING);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
     glDisable(GL_TEXTURE_2D);
 
     glShadeModel(GL_SMOOTH);
@@ -737,7 +777,7 @@ void vtkContourVolumeMapper::InitializeRender(bool setup, vtkRenderer *renderer,
     glPixelStorei(GL_PACK_ALIGNMENT, 4);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
   }
-  assert(glGetError() == 0);
+  assert(glGetError() == GL_NO_ERROR);
 }
 
 
@@ -750,33 +790,30 @@ void vtkContourVolumeMapper::DrawCache(vtkRenderer *renderer, vtkVolume *volume)
 //------------------------------------------------------------------------------
 {
   // use cache if contour value not changed and cache exists
-  const bool useCache = (this->PrevContourValue[0] == this->ContourValue) && this->CacheCreated;
+  const bool useCache = (this->PrevContourValue == this->ContourValue) && this->CacheCreated;
   assert(useCache);
-
-  // set flag to use LOD cache if LOD enabled and LOD cache is valid
-  const bool enableOptimization = 
-    this->EnableAutoLOD && 
-    this->TimeToDrawNotOptimizedCache > renderer->GetAllocatedRenderTime() && 
-    this->NumberOfTriangles[1] > 1000 && 
-    this->TriangleCache[1] != NULL;
 
   this->Timer->StartTimer();
 
-  int lod = enableOptimization ? 1 : 0 ;
+  // find highest lod with valid cache
+  int lod = HighestLODCached() ;
+  assert(lod >= 0) ;
+
+
   int nvert = 3*this->NumberOfTriangles[lod] ;
   InitializeRender(true, renderer, volume);
 
-  /* if (this->m_Alpha < 1.0){
-  // transparency enabled so sort triangles and render
-  SortTriangles(lod) ;
-
-  if (this->NumberOfTriangles[lod] > 0){
-  glInterleavedArrays(GL_N3F_V3F, 0, this->TriangleCache[lod]);
-  if (this->NumberOfTriangles[lod] > 0)
-  glDrawElements(GL_TRIANGLES, nvert, GL_UNSIGNED_INT, ordered_vertices[lod]);
-  }
-  } */
-
+  //  if (this->m_Alpha < 1.0){
+  //    // transparency enabled so sort triangles and render
+  //    SortTriangles(lod) ;
+  //
+  //    if (this->NumberOfTriangles[lod] > 0){
+  //      glInterleavedArrays(GL_N3F_V3F, 0, this->TriangleCache[lod]);
+  //      if (this->NumberOfTriangles[lod] > 0)
+  //        glDrawElements(GL_TRIANGLES, nvert, GL_UNSIGNED_INT, ordered_vertices[lod]);
+  //    }
+  //  }
+  //  else{
 
   // draw the triangles
   if (this->NumberOfTriangles[lod] > 0){
@@ -786,24 +823,21 @@ void vtkContourVolumeMapper::DrawCache(vtkRenderer *renderer, vtkVolume *volume)
   }
 
 
+
   InitializeRender(false);
 
   this->Timer->StopTimer();
 
   // if not LOD, note time taken to draw non-LOD triangles
   this->TimeToDraw = (float)this->Timer->GetElapsedTime();
-  if (!enableOptimization)
-    this->TimeToDrawNotOptimizedCache = this->TimeToDraw;
+  this->TimeToDrawDC[lod] = this->TimeToDraw ;
 
-  //  float time_per_triangle = this->TimeToDraw / (float)this->NumberOfTriangles[lod] ;
-  //  mafErrorMacro("draw cache: lod= " << lod << "\n" 
-  //    << "\t" << " time limit= " << 60.0*renderer->GetAllocatedRenderTime() 
-  //    << " time= " << 60.0*this->TimeToDraw << "\n" 
-  //    << "\t" << "no. of triangles=" << this->NumberOfTriangles[lod] 
-  //    << "time per triangle= " << time_per_triangle << "\n") ;
+  //mafErrorMacro("draw cache: lod= " << lod << "\n" 
+  //  << "\t" << " time limit= " << 60.0*renderer->GetAllocatedRenderTime() << " time= " << 60.0*this->TimeToDraw << "\n" 
+  //  << "\t" << "no. of triangles=" << this->NumberOfTriangles[lod] << "\n") ;
 
 #ifdef _DEBUG
-  printf("\rCache %d: %.2f %d                                   \r", int(enableOptimization), (float)this->Timer->GetElapsedTime(), this->NumberOfTriangles[enableOptimization ? 1 : 0]);
+  printf("\rCache %d: %.2f %d                                   \r", int(lod), (float)this->Timer->GetElapsedTime(), this->NumberOfTriangles[lod]);
 #endif
 }
 
@@ -818,125 +852,139 @@ void vtkContourVolumeMapper::DrawCache(vtkRenderer *renderer, vtkVolume *volume)
 // Marching cubes algorithm
 // Constructs triangles and renders them.
 
-// Nigel McFarlane 10.11.06 Changes to RenderMCubes()
+// Nigel McFarlane 14.11.06 Changes to RenderMCubes()
 // 1) Optimization given priority over caching, ie optim => no caching, instead of caching => no optim.
 // 2) Cache is deleted if smaller than block buffer, removing danger of program crash.
 // 3) LOD is allowed in z direction if resolution ok.
 // 4) Gradient calculations tidied and dependence on LOD removed.
 // 5) RenderMCubes estimates no. of triangles in advance, and uses LOD when no. of
 //    triangles is too large or unknown (eg for new contour value).
-
+// 6) Set LOD loop to outer loop
+//    Put calculation of lodxy and lodz increments and voxel offsets cubes in functions
 template<typename DataType> void vtkContourVolumeMapper::RenderMCubes(vtkRenderer *renderer, vtkVolume *volume, const DataType *dataPointer)
 //------------------------------------------------------------------------------
 {
-  const int MaxTrianglesNotOptimized = 2000000 ;  // max no. of triangles before LOD required
-  int numTrianglesRunningTotal[2] = {0,0} ;       // keeps running total of triangles
-  bool numTrianglesWarningFlag = false ;          // set if no. of triangles reaches warning level
+  int lod ;
+  int numTrianglesRunningTotal[4] = {0,0,0,0} ;       // keeps running total of triangles
 
-  // Decide whether optimization (ie low-resolution LOD) is required
-  // Optimization required if LOD enabled AND (time to draw too long OR too many triangles)
-  int estTriangles = EstimateTrianglesNoOpt() ; // estimate no. of triangles in non-lod mode
-  bool enableOptimization = this->EnableAutoLOD &&
-    ((this->TimeToDrawNotOptimized + 0.1f > renderer->GetAllocatedRenderTime()) || 
-    (estTriangles > MaxTrianglesNotOptimized)) ;
+
+  // Get max level of detail
+  int LODLevel = BestLODForRenderMCubes(renderer) ;
+
 
   // Decide whether caching can be enabled
-  // Cache enabled if contour value same as previous, no optimization, no cache already and not too many triangles
-  // Cache variable indices are 0 for normal cache and 1 for LOD cache
-  bool createCache = (this->PrevContourValue[0] == this->ContourValue) && !enableOptimization && !this->CacheCreated && (this->NumberOfTriangles[0] <= MaxTrianglesNotOptimized) ;
+  // Caching enabled if  no cache already, 
+  //                     no. of triangles is known exactly (ie it's been rendered once already),
+  //                     and not too many triangles.
+  bool createCache = !this->CacheCreated && (this->NumberOfTriangles[LODLevel] >= 0) && (this->NumberOfTriangles[LODLevel] <= MaxTrianglesNotOptimized) ;
+
+
+  // Decide on range of lods to use
+  // if no autolod, use only 0
+  // if caching, cache lodlevel... nlods-1 (but only render top level)
+  // if no caching, use only lodlevel
+  int firstLOD, lastLOD ;
+  firstLOD = LODLevel ;
+  if (!this->EnableAutoLOD)
+    lastLOD = 0 ;
+  else if (createCache)
+    lastLOD = NumberOfLods - 1 ;
+  else
+    lastLOD = LODLevel ;
+
 
   if (createCache) {
-    // if contour value changed since LOD last cached, predict max possible no. of triangles for LOD cache
-    // very unlikely that no. of triangles under LOD would be more than normal resolution
-    if (this->PrevContourValue[1] != this->ContourValue){
-      this->NumberOfTriangles[1] = this->NumberOfTriangles[0];
-    }
-
-    // allocate normal and LOD caches
-    for (int ci = 0; ci < 2; ci++) {
-      if (this->TriangleCacheSize[ci] < this->NumberOfTriangles[ci] || this->TriangleCache[ci] == NULL) {
+    // allocate caches for each lod in range
+    // since we are caching, NumberOfTriangles[LODLevel] must be valid, so we allocate all caches to this value
+    for (lod = firstLOD ; lod <= lastLOD ;  lod++) {
+      if (this->TriangleCacheSize[lod] < this->NumberOfTriangles[LODLevel] || this->TriangleCache[lod] == NULL) {
         // if cache not big enough, or not defined, reallocate cache
         // 3 vertices per triangle, 3 normals + 3 coords per vertex = 18
-        delete [] this->TriangleCache[ci];
-        this->TriangleCache[ci] = new float [18 * this->NumberOfTriangles[ci]];
+        delete [] this->TriangleCache[lod];
+        this->TriangleCache[lod] = new float [18 * this->NumberOfTriangles[LODLevel]];
 
         // if allocation failed, set createCache back to false
-        if (this->TriangleCache[ci] == NULL) {
+        if (this->TriangleCache[lod] == NULL) {
           createCache = false;
-          this->TriangleCacheSize[ci] = 0;
+          this->TriangleCacheSize[lod] = 0;
           vtkErrorMacro(<< "Contour mapper: not enough memory");
           break;
         }
 
         // cache size in no. of triangles
-        this->TriangleCacheSize[ci] = this->NumberOfTriangles[ci];
-      }
-    }
-  }
-  else {
-    // no caching, so clear both caches, unless cache is already right size to be reused as a block buffer
-    if ((this->TriangleCacheSize[0] < 5*VoxelsInBlock) || (this->TriangleCacheSize[0] > 20*VoxelsInBlock)) {
-      for (int ci = 0; ci < 2; ci++) {
-        delete [] this->TriangleCache[ci];
-        this->TriangleCache[ci] = NULL;
-        this->TriangleCacheSize[ci] = 0;
+        this->TriangleCacheSize[lod] = this->NumberOfTriangles[lod];
       }
     }
   }
 
+  if (!createCache){
+    // no caching (or caching failed)
+    // clear all caches
+    for (lod = 0 ;  lod < NumberOfLods ;  lod++) {
+      delete [] this->TriangleCache[lod];
+      this->TriangleCache[lod] = NULL;
+      this->TriangleCacheSize[lod] = 0;
+    }
+
+    // allocate cache LODLevel as a buffer for block triangles
+    // (use LODLevel rather than zero because it simplifies things later)
+    this->TriangleCacheSize[LODLevel] = 5 * VoxelsInBlock ; // 5 triangles per voxel
+    this->TriangleCache[LODLevel] = new float [18 * this->TriangleCacheSize[LODLevel]];
+  }
+
   this->CacheCreated = createCache;
-  this->TimeToDrawNotOptimizedCache = 0;
 
 
 
   // start the timer and initialize OpenGL
+  this->TimeToDrawRMC[LODLevel] = 0;
   this->Timer->StartTimer();
   InitializeRender(true, renderer, volume);
 
-  // if cache 0 is not defined, allocate it as a buffer for block triangles
-  // (only 0 is used if no caching because each block is rendered immediately, regardless of LOD)
-  if (this->TriangleCache[0] == NULL) {
-    this->TriangleCacheSize[0] = 5 * VoxelsInBlock ; // 5 triangles per voxel
-    this->TriangleCache[0] = new float [18 * this->TriangleCacheSize[0]];
-    this->CacheCreated = false;
-    createCache = false;
+
+
+  // OpenGL: attach triangle cache LODLevel to GL array with 3 normals + 3 vertices per item
+  // Only need TriangleCache[LODLevel] because if caching, only render this level; if not caching, render from block buffer, which is same
+  glInterleavedArrays(GL_N3F_V3F, 0, this->TriangleCache[LODLevel]);
+
+
+
+  // define local variables to reduce overheads and improve readability
+  const DataType (*BlockMinMax)[2] = (DataType (*)[2])this->BlockMinMax;
+  DataType ContourValue = (DataType)this->ContourValue;
+
+  float *verticeArray[NumberOfLods] ;
+  float *normalArray[NumberOfLods] ;
+  for (lod = 0 ;  lod < NumberOfLods ;  lod++){
+    // initialize pointers to NULL
+    normalArray[lod]  = NULL ;
+    verticeArray[lod] = NULL ;
+  }
+  for (lod = firstLOD ;  lod <= lastLOD ;  lod++){
+    if (createCache){
+      // point arrays to start of respective caches
+      normalArray[lod]  = this->TriangleCache[lod] ;
+      verticeArray[lod] = this->TriangleCache[lod] + 3;
+    }
+    else{
+      // point all arrays to start of block buffer
+      normalArray[lod]  = this->TriangleCache[LODLevel] ;
+      verticeArray[lod] = this->TriangleCache[LODLevel] + 3;
+    }
   }
 
-  // OpenGL: attach triangle cache 0 to GL array with 3 normals + 3 vertices per item
-  // Only need TriangleCache[0] because if caching, only render normal level; if not caching, render from block buffer.
-  glInterleavedArrays(GL_N3F_V3F, 0, this->TriangleCache[0]);
+
 
   // process blocks and voxels
   this->SkippedVoxelBlocks = 0;
   this->VoxelsRendered = this->VoxelsSkipped = 0;
 
-  // define local variables to reduce overheads and improve readability
-  const DataType (*BlockMinMax)[2] = (DataType (*)[2])this->BlockMinMax;
-  DataType ContourValue = (DataType)this->ContourValue;
-  float *verticeArray[2] = {this->TriangleCache[0] + 3, this->TriangleCache[1] + 3};
-  float *normalArray[2]  = {this->TriangleCache[0], this->TriangleCache[1]};
-
-
-  // indices of LOD caches to use (can be (0,0), (0,1) or (1,1))
-  // if optimization enabled, only use lod=1
-  // if no optimization and no caching, only use lod=0
-  // if no optimization, but caching enabled, got time to cache lod=0 and lod=1 (but obviously don't render both !)
-  const int firstLOD = enableOptimization ? 1 : 0;
-  const int lastLOD  = (enableOptimization || createCache) ? 1 : 0;
-
-
-  // these offsets define a LOD cube of neighbours twice the size of the cube in PrepareAccelerationDataTemplate()
-  const int VoxelVertIndicesOffsetsLOD[8] = {0, 2, 
-    this->VoxelVertIndicesOffsets[2] << 1, this->VoxelVertIndicesOffsets[3] << 1,
-    this->VoxelVertIndicesOffsets[4], this->VoxelVertIndicesOffsets[4] + 2, 
-    this->VoxelVertIndicesOffsets[4] + (this->VoxelVertIndicesOffsets[2] << 1), 
-    this->VoxelVertIndicesOffsets[4] + (this->VoxelVertIndicesOffsets[3] << 1)};
 
   // initialization
-  this->PrevContourValue[firstLOD] = this->ContourValue;
-  this->PrevContourValue[lastLOD]  = this->ContourValue;
-  this->NumberOfTriangles[firstLOD] = 0;
-  this->NumberOfTriangles[lastLOD] = 0;
+  this->PrevContourValue = this->ContourValue;
+  for (lod = firstLOD ;  lod <= lastLOD ;  lod++)
+    this->NumberOfTriangles[lod] = 0;
+
 
   // no. of voxels per slice and per row
   const int rowSize   = this->DataDimensions[0];
@@ -954,69 +1002,56 @@ template<typename DataType> void vtkContourVolumeMapper::RenderMCubes(vtkRendere
   }
 
 
-  //----------------------------
-  // loop through all the blocks
-  //----------------------------
-  for (int bzi = 0; bzi < this->NumBlocks[2]; bzi++) {
-    // calculate block size in z (all blocks are VoxelBlockSize except last, which is remainder - 1)
-    const int zblockSize = (((bzi + 1) < this->NumBlocks[2]) ? VoxelBlockSize : (this->DataDimensions[2] - 1 - (bzi << VoxelBlockSizeLog)));
 
-    for (int byi = 0; byi < this->NumBlocks[1]; byi++) {
-      // calculate block size in y
-      const int yblockSize = (((byi + 1) < this->NumBlocks[1]) ? VoxelBlockSize : (this->DataDimensions[1] - 1 - (byi << VoxelBlockSizeLog)));
+  //---------------------------
+  // loop over levels of detail
+  //---------------------------
+  for (lod = firstLOD; lod <= lastLOD; lod++) {
+    // Calculate voxel increments in xy plane and in z
+    // Voxel increment is 1 for normal, 2 for LOD, which happens to be lod+1
+    // However, z resolution betwen slices may already be poor,
+    // so set z to 1 if inter-slice spacing is greater than within-slice.
+    int lodxy, lodz ;
+    CalculateVoxelIndexIncrements(lod, &lodxy, &lodz) ;
 
-      for (int bxi = 0; bxi < this->NumBlocks[0]; bxi++) {
-        // calculate block size in x
-        const int xblockSize = (((bxi + 1) < this->NumBlocks[0]) ? VoxelBlockSize : (this->DataDimensions[0] - 1 - (bxi << VoxelBlockSizeLog)));
+    // select cube of offsets corresponding to LOD
+    const int *VoxelOffsets = this->VoxelVertIndicesOffsets[lod] ;
 
-        // calculate block no.
-        const int block = bxi + this->NumBlocks[0] * (byi + bzi * this->NumBlocks[1]);
-
-        // skip the block if contour value is outside range min-max
-        if ((ContourValue < BlockMinMax[block][0]) || (ContourValue > BlockMinMax[block][1])) {
-          this->SkippedVoxelBlocks += 1.f;
-          continue;
-        }
+    // last xyz in volume
+    const int lastIndex[3] = { this->DataDimensions[0] - lodxy, this->DataDimensions[1] - lodxy, this->DataDimensions[2] - lodz};
 
 
-        //--------------------------------
-        // Process the voxels in the block
-        //--------------------------------
 
-        // set up pointLocator array float* pointLocator[9][9][9][3], ie 3 float pointers for every voxel in block.
-        // pointLocator is an array of pointers to every edge in the block, 
-        // so it will become an index of the triangle vertices.
-        float* pointLocator[VoxelBlockSize + 1][VoxelBlockSize + 1][VoxelBlockSize + 1][3]; // three edges per voxel
-        memset(pointLocator, 0, sizeof(pointLocator));
+    //----------------------------
+    // loop through all the blocks
+    //----------------------------
+    for (int bzi = 0; bzi < this->NumBlocks[2]; bzi++) {
+      // calculate block size in z (all blocks are VoxelBlockSize except last, which is remainder - 1)
+      const int zblockSize = (((bzi + 1) < this->NumBlocks[2]) ? VoxelBlockSize : (this->DataDimensions[2] - 1 - (bzi << VoxelBlockSizeLog)));
 
-        // index of first voxel in block
-        const int voxelIBlock = VoxelBlockSize * (bzi * sliceSize + byi * rowSize + bxi);
+      for (int byi = 0; byi < this->NumBlocks[1]; byi++) {
+        // calculate block size in y
+        const int yblockSize = (((byi + 1) < this->NumBlocks[1]) ? VoxelBlockSize : (this->DataDimensions[1] - 1 - (byi << VoxelBlockSizeLog)));
 
+        for (int bxi = 0; bxi < this->NumBlocks[0]; bxi++) {
+          // calculate block size in x
+          const int xblockSize = (((bxi + 1) < this->NumBlocks[0]) ? VoxelBlockSize : (this->DataDimensions[0] - 1 - (bxi << VoxelBlockSizeLog)));
 
-        //---------------------------
-        // loop over levels of detail
-        //---------------------------
-        for (int lod = firstLOD; lod <= lastLOD; lod++) {
-          // Voxel increment is 1 for normal, 2 for LOD, which happens to be lod+1
-          // However, z resolution betwen slices may already be poor,
-          // so set z to 1 if inter-slice spacing is greater than within-slice.
-          int lodxy = lod + 1;
-          int lodz = lod + 1 ;
-          if (this->DataSpacing[2] > this->DataSpacing[0])
-            lodz = 1 ;
+          // calculate block no.
+          const int block = bxi + this->NumBlocks[0] * (byi + bzi * this->NumBlocks[1]);
 
-          // select offsets corresponding to LOD (0 is normal, 1 is LOD)
-          const int *VoxelOffsets = ((lod == 0) ? this->VoxelVertIndicesOffsets : VoxelVertIndicesOffsetsLOD);
-
-          // last xyz in volume
-          const int lastIndex[3] = { this->DataDimensions[0] - lodxy, this->DataDimensions[1] - lodxy, this->DataDimensions[2] - lodz};
+          // skip the block if contour value is outside range min-max
+          if ((ContourValue < BlockMinMax[block][0]) || (ContourValue > BlockMinMax[block][1])) {
+            this->SkippedVoxelBlocks += 1.f;
+            continue;
+          }
 
 
           // set arrays for vertices and normals
-          int numberOfTrianglesInBlock = 0;
           if (!createCache) {
-            verticeArray[lod] = this->TriangleCache[0] + 3;
-            normalArray[lod]  = this->TriangleCache[0];
+            // need to reset pointers to start of block buffer
+            verticeArray[lod] = this->TriangleCache[LODLevel] + 3;
+            normalArray[lod]  = this->TriangleCache[LODLevel];
           }
           else if (this->TriangleCache[lod] == NULL) {
             continue; // no memory do not create this cache
@@ -1024,6 +1059,25 @@ template<typename DataType> void vtkContourVolumeMapper::RenderMCubes(vtkRendere
 
           float* (&vertices) = verticeArray[lod];
           float* (&normals)  = normalArray[lod];
+
+
+
+          //--------------------------------
+          // Process the voxels in the block
+          //--------------------------------
+
+          // set up pointLocator array float* pointLocator[9][9][9][3], ie 3 float pointers for every voxel in block.
+          // pointLocator is an array of pointers to every edge in the block, 
+          // so it will become an index of the triangle vertices.
+          float* pointLocator[VoxelBlockSize + 1][VoxelBlockSize + 1][VoxelBlockSize + 1][3]; // three edges per voxel
+          memset(pointLocator, 0, sizeof(pointLocator));
+
+          // index of first voxel in block
+          const int voxelIBlock = VoxelBlockSize * (bzi * sliceSize + byi * rowSize + bxi);
+
+          // initialize voxel count for block
+          int numberOfTrianglesInBlock = 0;
+
 
 
           //---------------------------------------------
@@ -1098,13 +1152,9 @@ template<typename DataType> void vtkContourVolumeMapper::RenderMCubes(vtkRendere
                 while(*edge >= 0) {
                   // check that memory is not about to be exceeded
                   if (createCache && (numTrianglesRunningTotal[lod] >= this->TriangleCacheSize[lod])){
-                    std::cout << "no. of triangles exceeded allocated cache size\n";
+                    mafErrorMacro("no. of triangles exceeded allocated cache size\n") ;
                     break ;
                   }
-                  //if ((!numTrianglesWarningFlag) && numTrianglesRunningTotal[lod] > MaxTrianglesNotOptimized){
-                  // mafErrorMacro("warning: no. of triangles exceeded lod limit") ;
-                  //  numTrianglesWarningFlag = true ;
-                  //}
 
                   // loop through next three edges
                   for (int ii = 0; ii < 3; ii++, edge++) {
@@ -1212,23 +1262,30 @@ template<typename DataType> void vtkContourVolumeMapper::RenderMCubes(vtkRendere
 
           // if no caching, render the block now, else wait till whole volume is cached
           // n.b. loop does both lods only if caching enabled, so can't draw both lods
-          if (!createCache)
+          if (!createCache){
             glDrawArrays(GL_TRIANGLES, 0, 3 * numberOfTrianglesInBlock);
+            assert(glGetError() == GL_NO_ERROR);
+          }
+
           this->NumberOfTriangles[lod] += numberOfTrianglesInBlock;
 
-        } // next LOD
+        } // nextbxi
+      } // next byi
+    } // next bzi
 
-      } // nextbxi
-    } // next byi
-  } // next bzi
+  } // next LOD
 
 
-  // render the cached triangles (normal level of detail)
+  // render the cached triangles (level of detail = LODLevel)
   // the arrays were attached to openGL earlier with glInterleavedArrays()
-  if (createCache)
-    glDrawArrays(GL_TRIANGLES, 0, 3 * this->NumberOfTriangles[0]);
-
-  assert(glGetError() == GL_NO_ERROR);
+  if (createCache){
+    glDrawArrays(GL_TRIANGLES, 0, 3 * this->NumberOfTriangles[LODLevel]);
+    unsigned int errorCode = glGetError() ;
+    if (errorCode != GL_NO_ERROR){
+      mafErrorMacro("GL Crashed: " << std::hex << errorCode << "\n") ;
+      assert(glGetError() == GL_NO_ERROR);
+    }
+  }
 
   for (int z = 0; z < this->DataDimensions[2]; z++)
     delete polylines[z];
@@ -1239,34 +1296,27 @@ template<typename DataType> void vtkContourVolumeMapper::RenderMCubes(vtkRendere
   InitializeRender(false);
 
   this->Timer->StopTimer();
+
+
+  // note time to draw
   this->TimeToDraw = (float)this->Timer->GetElapsedTime();
-  if (!enableOptimization)
-    this->TimeToDrawNotOptimized = this->TimeToDraw;
+  this->TimeToDrawRMC[LODLevel] = this->TimeToDraw;
+
+  // update running mean of time per triangle
+  float tpt = this->TimeToDrawRMC[LODLevel] / (float)this->NumberOfTriangles[LODLevel] ;
+  if (this->TimePerTriangle > 0.0)
+    this->TimePerTriangle = 0.9*this->TimePerTriangle + 0.1*tpt ;
+  else
+    this->TimePerTriangle = tpt ;
 
   if (this->TimeToDraw < 0.0001f)
     this->TimeToDraw = 0.0001f;
 
 
-  //  if (firstLOD == lastLOD){
-  //    float time_per_triangle0 = this->TimeToDraw / (float)this->NumberOfTriangles[firstLOD] ;
-  //    mafErrorMacro("RenderMCubes:" << "\n" 
-  //      << "\t" << "optim= " << enableOptimization << " caching= " << createCache << " lod= " << firstLOD << "\n" 
-  //     << "\t" << " time limit= " << 60.0*renderer->GetAllocatedRenderTime() 
-  //      << " time= " << 60.0*this->TimeToDraw << "\n" 
-  //      << "\t" << "no. of triangles=" << this->NumberOfTriangles[firstLOD] 
-  //      << "time per triangle= " << time_per_triangle0 << "\n") ;
-  //  }
-  //  else{
-  //    float time_per_triangle0 = this->TimeToDraw / (float)this->NumberOfTriangles[firstLOD] ;
-  //   float time_per_triangle1 = this->TimeToDraw / (float)this->NumberOfTriangles[lastLOD] ; 
-  //    mafErrorMacro("RenderMCubes:" << "\n" 
-  //     << "\t" << "optim= " << enableOptimization << " caching= " << createCache << " lods= " << firstLOD << " " << lastLOD << "\n" 
-  //      << "\t" << " time limit= " << 60.0*renderer->GetAllocatedRenderTime() 
-  //      << " time= " << 60.0*this->TimeToDraw << "\n" 
-  //     << "\t" << "no. of triangles=" << this->NumberOfTriangles[firstLOD] << " " << this->NumberOfTriangles[lastLOD] 
-  //     << "times per triangle= " << time_per_triangle0 << " " << time_per_triangle1 << "\n") ;
-  //  }
-
+  //mafErrorMacro("RenderMCubes:" << "\n" 
+  //  << "\t" << " caching= " << createCache << " lods= " << firstLOD << " " << lastLOD << "\n" 
+  //  << "\t" << " time limit= " << 60.0*renderer->GetAllocatedRenderTime() << " time= " << 60.0*this->TimeToDraw << "\n" 
+  //  << "\t" << "no. of triangles= " << this->NumberOfTriangles[firstLOD] << "\n") ;
 
 
 #if 0
@@ -1285,7 +1335,7 @@ template<typename DataType> void vtkContourVolumeMapper::RenderMCubes(vtkRendere
 // Called by GetOutput()
 template<typename DataType> void vtkContourVolumeMapper::CreateMCubes(int level, vtkPolyData *polydata, const DataType *dataPointer) {
   //------------------------------------------------------------------------------
-  const int estimatedNumberOfTriangles = (this->PrevContourValue[level] == this->ContourValue) ? (this->NumberOfTriangles[level] + 100) : 1000000;
+  const int estimatedNumberOfTriangles = (this->PrevContourValue == this->ContourValue) ? (this->NumberOfTriangles[level] + 100) : 1000000;
   this->CreatedTriangles = 0;
 
   // prepare polydata
@@ -1308,8 +1358,8 @@ template<typename DataType> void vtkContourVolumeMapper::CreateMCubes(int level,
   const DataType (* const BlockMinMax)[2] = (DataType (*)[2])this->BlockMinMax;
   const DataType ContourValue = (DataType)this->ContourValue;
 
-  const int VoxelOffsets[8] = {0, 1 << level, this->VoxelVertIndicesOffsets[2] << level, this->VoxelVertIndicesOffsets[3] << level,
-    this->VoxelVertIndicesOffsets[4], this->VoxelVertIndicesOffsets[4] + (1 << level), this->VoxelVertIndicesOffsets[4] + (this->VoxelVertIndicesOffsets[2] << level), this->VoxelVertIndicesOffsets[4] + (this->VoxelVertIndicesOffsets[3] << level)};
+  const int VoxelOffsets[8] = {0, 1 << level, this->VoxelVertIndicesOffsets[0][2] << level, this->VoxelVertIndicesOffsets[0][3] << level,
+    this->VoxelVertIndicesOffsets[0][4], this->VoxelVertIndicesOffsets[0][4] + (1 << level), this->VoxelVertIndicesOffsets[0][4] + (this->VoxelVertIndicesOffsets[0][2] << level), this->VoxelVertIndicesOffsets[0][4] + (this->VoxelVertIndicesOffsets[0][3] << level)};
 
   const int rowSize   = this->DataDimensions[0];
   const int sliceSize = this->DataDimensions[0] * this->DataDimensions[1];
@@ -1491,30 +1541,340 @@ template<typename DataType> void vtkContourVolumeMapper::CreateMCubes(int level,
 
 
 
+
+
 //------------------------------------------------------------------------------
-// This helper function returns an estimate of the expected number of triangles 
-// in the normal (non-LOD) mode, given the current number of normal and LOD triangles.
-// A zero value means that the number is undefined (see constructor)
-// Only use this to decide whether to use LOD or not.
-int vtkContourVolumeMapper::EstimateTrianglesNoOpt()
+// This function returns the index increments in xy and z given the lod index
+// For lod = 0,1,2,3... lodxy = 2^n = 1,2,4,8...
+// However, the resolution in z, between slice planes, may already be poor, so
+// lodz <= lodx such that z resolution is not worse than x resolution.
+void vtkContourVolumeMapper::CalculateVoxelIndexIncrements(int lod, int *lodxy, int *lodz) const
 //------------------------------------------------------------------------------
 {
-  if ((this->NumberOfTriangles[0] != 0) && (this->PrevContourValue[0] == this->ContourValue)){
-    // no. of normal triangles is valid for this contour value, so just return it
-    return this->NumberOfTriangles[0] ;
+  // set lodxy and lodz to 2^lod
+  *lodxy = 1 << lod ;
+  *lodz = *lodxy ;
+
+  // divide lodz by 2 until z resolution is <= xy resolution
+  while(*lodz*this->DataSpacing[2] > *lodxy*this->DataSpacing[0] && *lodz > 1)
+    *lodz >>= 1 ;
+}
+
+
+
+
+
+//------------------------------------------------------------------------------
+// Return vertex array offsets given the lod index.
+// Returns offset[0..7] for the LOD cube corresponding to the
+// cube defined in PrepareAccelerationTemplate()
+//               ___
+//     ^ y     /|3 2|
+//     |   x  / |0 1|
+//     /-->  / / ---
+//    /     /___ / /
+//   / z    |7 6| /
+//          |4 5|/
+//           ---
+
+void vtkContourVolumeMapper::CalculateVoxelVertIndicesOffsets(int lod, int *offset) const
+//------------------------------------------------------------------------------
+{
+  int lodxy, lodz ;
+  CalculateVoxelIndexIncrements(lod, &lodxy, &lodz) ;
+
+  // calculate voxel offsets for the LOD cube
+  int sliceDimension = this->DataDimensions[0] * this->DataDimensions[1] ;
+  offset[0] = 0 ;
+  offset[1] = lodxy ;
+  offset[2] = lodxy * (this->DataDimensions[0] + 1) ;
+  offset[3] = lodxy * this->DataDimensions[0] ;
+  offset[4] = offset[0] + lodz*sliceDimension;
+  offset[5] = offset[1] + lodz*sliceDimension;
+  offset[6] = offset[2] + lodz*sliceDimension;
+  offset[7] = offset[3] + lodz*sliceDimension;
+}
+
+
+
+
+//------------------------------------------------------------------------------
+// Calculate volume of voxel given lod
+// useful for estimating times or no. of triangles from one lod to another
+int vtkContourVolumeMapper::VoxelVolume(int lod) const
+//------------------------------------------------------------------------------
+{
+  int lodxy, lodz ;
+  CalculateVoxelIndexIncrements(lod, &lodxy, &lodz) ;
+
+  return lodxy*lodxy*lodz ;
+}
+
+
+
+
+
+
+
+//------------------------------------------------------------------------------
+// Estimate the number of triangles for the given LOD using fraction of relevant volume.
+// EstimateRelevantVolume() is only called the first time the contour value changes,
+// after which there is no further time cost.
+int vtkContourVolumeMapper::EstimateTrianglesFromRelevantVolume(int lod)
+//------------------------------------------------------------------------------
+{
+  static float relevantBlocks = -1.0 ;        // remember the result of EstimateRelevantVolume()
+  static float lastContour = VTK_FLOAT_MAX ;  // remember the contour value last time
+
+  // reset stored value to undefined if contour value changed since last calculation
+  if (lastContour != this->ContourValue)
+    relevantBlocks = -1.0 ;
+
+  if (relevantBlocks < 0){
+    // if no stored value, calculate no. of relevant blocks
+    float fracblocks = EstimateRelevantVolume(this->ContourValue) ;
+    relevantBlocks = fracblocks * (float)(this->NumBlocks[0] * this->NumBlocks[1] * this->NumBlocks[2]) ;
+
+    // note contour value for which calculations were done
+    lastContour = this->ContourValue ;
   }
-  else if ((this->NumberOfTriangles[1] != 0) && (this->PrevContourValue[1] == this->ContourValue)){
-    // no. of lod triangles is valid, so use this to estimate normal triangles
-    if (this->DataSpacing[2] <= this->DataSpacing[0])
-      return 8*this->NumberOfTriangles[1] ;
-    else
-      return 4*this->NumberOfTriangles[1] ;
+
+  // estimate triangles from fraction of blocks containing contour
+  float voxperblock = VoxelsInBlock / VoxelVolume(lod) ;
+  int numTriangles = (int)(triangles_per_voxel * voxperblock * relevantBlocks) ;
+
+  // return value
+  return numTriangles ;
+}
+
+
+
+
+//------------------------------------------------------------------------------
+// Return an estimate of the expected number of triangles for the given LOD.
+// Only use this to help decide whether to render at this LOD or not.
+int vtkContourVolumeMapper::EstimateNumberOfTriangles(int lod)
+//------------------------------------------------------------------------------
+{
+  if ((this->NumberOfTriangles[lod] >= 0) && (this->PrevContourValue == this->ContourValue)){
+    // no. of triangles is already valid for this contour value, so just return it
+    return this->NumberOfTriangles[lod] ;
   }
   else{
-    // if both numbers undefined, return a very large number
-    return 100000000 ;
+    // try to find highest resolution for which there is a known no. of triangles
+    int lodj ;
+    for (lodj = 0 ;  lodj < NumberOfLods ;  lodj++){
+      if ((this->NumberOfTriangles[lodj] >= 0) && (this->PrevContourValue == this->ContourValue))
+        break ;
+    }
+
+    if (lodj < NumberOfLods){
+      // got value for this contour value, different lod
+      // estimate time assuming triangles is in inverse proportion to the voxel volume
+      float sizefactor = (float)VoxelVolume(lodj) / (float)VoxelVolume(lod) ;
+      return (int)(sizefactor * (float)NumberOfTriangles[lodj]) ;
+    }
+    else{
+      // estimate triangles from fraction of blocks containing contour
+      return EstimateTrianglesFromRelevantVolume(lod) ;
+    }
   }
 }
+
+
+
+
+
+//------------------------------------------------------------------------------
+// Return an estimate of the time to draw using DrawCache()
+// Only use this to help decide whether to render at this LOD or not.
+float vtkContourVolumeMapper::EstimateTimeToDrawDC(int lod) const
+//------------------------------------------------------------------------------
+{
+  // Note: Rendering is performed either by DrawCache() or RenderMCubes().
+  // If time already exists for DrawCache() at this lod, return it.
+  // If time exists for DrawCache() at another lod, estimate time assuming inverse proportion to voxel volume 
+  // If time exists for RenderMCubes(), estimate, assuming ratio this->TimeCacheToMCubesRatio.
+  // If no data, return v large value.
+
+  if ((this->TimeToDrawDC[lod] >= 0.0) && (this->PrevContourValue == this->ContourValue)){
+    // time data already valid for this contour value, so just return it
+    return this->TimeToDrawDC[lod] ;
+  }
+  else{
+    // find highest resolution for which there is a known time with DrawCache()
+    int loddc ;
+    for (loddc = 0 ;  loddc < NumberOfLods ;  loddc++){
+      if ((this->TimeToDrawDC[loddc] >= 0.0) && (this->PrevContourValue == this->ContourValue))
+        break ;
+    }
+
+    // find highest resolution for which there is a known time with RenderMCubes()
+    int lodrmc ;
+    for (lodrmc = 0 ;  lodrmc < NumberOfLods ;  lodrmc++){
+      if ((this->TimeToDrawRMC[lodrmc] >= 0.0) && (this->PrevContourValue == this->ContourValue))
+        break ;
+    }
+
+    float sizefactor ;
+    if (loddc < NumberOfLods){
+      // estimate time assuming time is in inverse proportion to the voxel volume
+      sizefactor = (float)VoxelVolume(loddc) / (float)VoxelVolume(lod) ;
+      return sizefactor * TimeToDrawDC[loddc] ;
+    }
+    else if (lodrmc < NumberOfLods){
+      // no time data from DrawCache(), but can estimate from RenderMCubes() timing
+      sizefactor = TimeCacheToMCubesRatio * (float)VoxelVolume(lodrmc) / (float)VoxelVolume(lod) ;
+      return sizefactor * TimeToDrawRMC[lodrmc] ;
+    }
+    else{
+      // no valid data from DrawCache() or RenderMCubes() at any lod, so return a very large number
+      return VTK_FLOAT_MAX ;
+    }
+  }
+}
+
+
+
+
+//------------------------------------------------------------------------------
+// Return an estimate of the time to draw using RenderMCubes()
+// Only use this to help decide whether to render at this LOD or not.
+float vtkContourVolumeMapper::EstimateTimeToDrawRMC(int lod)
+//------------------------------------------------------------------------------
+{
+  // Note: Rendering is performed either by DrawCache() or RenderMCubes().
+  // If time already exists for RenderMCubes() at this lod, return it.
+  // If time exists for RenderMCubes() at another lod, estimate time assuming inverse proportion to voxel volume 
+  // If no data, estimate time from fraction of relevant blocks
+
+  if ((this->TimeToDrawRMC[lod] >= 0.0) && (this->PrevContourValue == this->ContourValue)){
+    // time data already valid for this contour value, so just return it
+    return this->TimeToDrawRMC[lod] ;
+  }
+  else{
+    // try to find highest resolution for which there is a known time with RenderMCubes()
+    int lodrmc ;
+    for (lodrmc = 0 ;  lodrmc < NumberOfLods ;  lodrmc++){
+      if ((this->TimeToDrawRMC[lodrmc] >= 0.0) && (this->PrevContourValue == this->ContourValue))
+        break ;
+    }
+
+    if (lodrmc < NumberOfLods){
+      // got value for this contour value, different lod
+      // estimate time assuming time is in inverse proportion to the voxel volume
+      float sizefactor = (float)VoxelVolume(lodrmc) / (float)VoxelVolume(lod) ;
+      return sizefactor * TimeToDrawRMC[lodrmc] ;
+    }
+    else if (this->TimePerTriangle > 0.0){
+      // No valid data at any lod, so estimate no. of triangles and guess from there.
+      // n.b. it doesn't matter if another function has already called this - there is no time cost.
+      int numTriangles = EstimateTrianglesFromRelevantVolume(lod) ;
+      return this->TimePerTriangle * (float)numTriangles ;
+    }
+    else{
+      // haven't even got a time per triangle value yet - just return a large number
+      return VTK_FLOAT_MAX ;
+    }
+  }
+}
+
+
+
+
+//------------------------------------------------------------------------------
+// Return highest resolution (LOD) which DrawCache() would be able to draw
+// This only checks time and triangles - not whether cache exists yet
+// Used to decide whether to call DrawCache() or RenderMCubes()
+int vtkContourVolumeMapper::BestLODForDrawCache(vtkRenderer *renderer)
+//------------------------------------------------------------------------------
+{
+  // return level zero if auto lod not enabled
+  if (!this->EnableAutoLOD)
+    return 0 ;
+
+  // return highest lod with acceptable no. of triangles and time to draw
+  for (int lod = 0 ;  lod < NumberOfLods ;  lod++){
+    if (EstimateNumberOfTriangles(lod) < MaxTrianglesNotOptimized &&
+      EstimateTimeToDrawDC(lod) < renderer->GetAllocatedRenderTime())
+      return lod ;
+  }
+
+  // nothing valid - return lowest level
+  return NumberOfLods - 1 ;
+}
+
+
+
+
+//------------------------------------------------------------------------------
+// Return highest resolution (LOD) which RenderMCubes() can draw
+// Used to decide which LOD to create and render
+int vtkContourVolumeMapper::BestLODForRenderMCubes(vtkRenderer *renderer)
+//------------------------------------------------------------------------------
+{
+  // return level zero if auto lod not enabled
+  if (!this->EnableAutoLOD)
+    return 0 ;
+
+  // return highest lod with acceptable no. of triangles and time to draw
+  for (int lod = 0 ;  lod < NumberOfLods ;  lod++){
+    if (EstimateNumberOfTriangles(lod) < MaxTrianglesNotOptimized &&
+      EstimateTimeToDrawRMC(lod) < renderer->GetAllocatedRenderTime())
+      return lod ;
+  }
+
+  // nothing valid - return lowest level
+  return NumberOfLods - 1 ;
+}
+
+
+
+
+//------------------------------------------------------------------------------
+// Return highest LOD which has been cached
+// returns negative number if nothing found
+// Used by DrawCache() to decide which lod to draw
+int vtkContourVolumeMapper::HighestLODCached() const
+//------------------------------------------------------------------------------
+{
+  for (int lod = 0 ;  lod < NumberOfLods ;  lod++){
+    if (this->TriangleCache[lod] != NULL)
+      return lod ;
+  }
+
+  // nothing valid - return negative number
+  return -1 ;
+}
+
+
+
+
+//------------------------------------------------------------------------------
+// Free caches and set stats to undefined, eg after contour value changes
+void vtkContourVolumeMapper::ClearCachesAndStats()
+//------------------------------------------------------------------------------
+{
+  for (int lod = 0 ;  lod < NumberOfLods ;  lod++){
+    // delete triangle caches
+    delete [] this->TriangleCache[lod];
+    this->TriangleCache[lod] = NULL;
+    this->TriangleCacheSize[lod] = 0;
+
+    // delete vertex order array
+    delete[] ordered_vertices[lod] ;
+    ordered_vertices[lod] = NULL ;
+
+    // set stats to undefined
+    this->NumberOfTriangles[lod] = -1 ;
+    this->TimeToDrawDC[lod] = -1.0 ;
+    this->TimeToDrawRMC[lod] = -1.0 ;
+  }
+
+  this->CacheCreated = false ;
+
+}
+
 
 
 
@@ -1726,11 +2086,10 @@ void vtkContourVolumeMapper::SortTriangles(int lod)
 
   // allocate vertex order array, if necessary
   // (deallocated in the destructor)
-  if ((this->ordered_vertices == NULL) || (this->NumberOfTriangles[lod] != this->ntriangles_previous[lod])){
+  if ((this->ordered_vertices == NULL) || (this->ContourValue != this->PrevContourValue)){
     // allocate if undefined or no. of triangles has changed
     delete[] ordered_vertices[lod] ;
     this->ordered_vertices[lod] = new unsigned int[nvert] ;
-    this->ntriangles_previous[lod] = this->NumberOfTriangles[lod] ;
 
     // put array into default order
     for (int j = 0 ;  j < nvert ; j++)
@@ -1776,8 +2135,7 @@ void vtkContourVolumeMapper::SortTriangles(int lod)
     ov[j+2] = index+2 ;
   }
 
-  std::cout << "sort: " << " triangles = " << this->NumberOfTriangles[lod] << " " << t1 << " " << t2 << "\n";
-  //mafErrorMacro("sort: " << " triangles = " << this->NumberOfTriangles[lod] << " " << t1 << " " << t2 << "\n") ;
+  mafErrorMacro("sort: " << " triangles = " << this->NumberOfTriangles[lod] << " " << t1 << " " << t2 << "\n") ;
 
   delete[] depthlist ;
 }
