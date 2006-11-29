@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRegisterClusters.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-28 10:24:21 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-11-29 23:45:29 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi  
 ==========================================================================
   Copyright (c) 2002/2004
@@ -648,7 +648,10 @@ void mmoRegisterClusters::OnChooseVme(mafNode *vme)
 	if(vme->IsA("mafVMESurface"))
 	{
 		if(m_Follower == NULL)
+		{
 			m_Follower = mafVMESurface::New();
+			m_Follower->Register(this); 
+		}
 		if(m_Follower->CanCopy(vme))
 			m_Follower->DeepCopy(vme);
 		else
