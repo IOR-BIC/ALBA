@@ -1,4 +1,4 @@
-LINK_LIBRARIES(vtkMAF vtkGraphics vtkRendering)
+LINK_LIBRARIES(mafBase vtkMAF vtkGraphics vtkRendering)
 
 INCLUDE(${MAF_SOURCE_DIR}/Libraries/modules/FindCppUnit.cmake)
 IF (CPPUNIT_FOUND)

@@ -2,16 +2,16 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkContourVolumeMapperTest.h,v $
 Language:  C++
-Date:      $Date: 2006-06-28 10:20:16 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2006-12-01 10:26:57 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#ifndef CPP_UNIT_VTKCONTOURVOLUMEMAPPER_H
-#define CPP_UNIT_VTKCONTOURVOLUMEMAPPER_H
+#ifndef __CPP_UNIT_VTKCONTOURVOLUMEMAPPERTEST_H__
+#define __CPP_UNIT_VTKCONTOURVOLUMEMAPPERTEST_H__
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/BriefTestProgressListener.h>
@@ -26,9 +26,11 @@ class vtkRectilinearGrid;
 
 class vtkContourVolumeMapperTest : public CPPUNIT_NS::TestFixture
 {
-  CPPUNIT_TEST_SUITE( vtkContourVolumeMapperTest );
-  CPPUNIT_TEST( Test );
-  CPPUNIT_TEST_SUITE_END();
+  public:
+  
+    CPPUNIT_TEST_SUITE( vtkContourVolumeMapperTest );
+    CPPUNIT_TEST( Test );
+    CPPUNIT_TEST_SUITE_END();
 
   protected:
     void Test();
@@ -40,6 +42,7 @@ class vtkContourVolumeMapperTest : public CPPUNIT_NS::TestFixture
 int 
 main( int argc, char* argv[] )
 {
+
   // Create the event manager and test controller
   CPPUNIT_NS::TestResult controller;
 

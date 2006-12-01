@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkContourVolumeMapperTest.cpp,v $
 Language:  C++
-Date:      $Date: 2006-09-06 08:57:54 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2006-12-01 10:26:57 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -17,8 +17,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
-#include <string>
-#include <assert.h>
+#include <cppunit/config/SourcePrefix.h>
 
 #include "vtkMAFSmartPointer.h"
 
@@ -165,6 +164,9 @@ void vtkContourVolumeMapperTest::Test() {
   renWin->Delete();
   iren->Delete();
   mapper->Delete();
+
+  // this seems to enable leaks printing!
+  mafSleep(1000);
 }
 
 //-----------------------------------------------------------
