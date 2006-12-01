@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVolumeMeasure.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-28 10:25:39 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-12-01 09:09:56 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,7 +32,12 @@ class vtkPolyData;
 // mmoVolumeMeasure :
 //----------------------------------------------------------------------------
 /** 
-Crop a vme gray volume  
+Measure a Volume of a PolyData
+
+This Operation compute a volume of a surface. 
+The algorithm implemented here is based on the discrete form 
+of the divergence theorem. The general assumption here is 
+that the model is of closed surface.
 */
 
 class mmoVolumeMeasure: public mafOp
