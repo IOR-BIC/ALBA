@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationLayoutSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2006-11-28 14:42:14 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2006-12-04 10:30:41 $
+Version:   $Revision: 1.4 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -39,20 +39,23 @@ mmgApplicationLayoutSettings::mmgApplicationLayoutSettings(mafObserver *listener
   m_ViewManager   = NULL;
   m_Layout        = NULL;
   m_Win           = NULL;
+  m_VisibilityVme = false;
 
   InitializeLayout();
 
   m_Gui = new mmgGui(this);
-  m_Gui->Label(_("Application layout"));
+  m_Gui->Label(_("Application layout"), true);
+  m_Gui->Label("For becoming definitive the layout saving,");
+  m_Gui->Label(" it needs to save the project");
   m_Gui->Button(SAVE_LAYOUT_ID,_("Save in root"));
   m_Gui->String(LAYOUT_NAME_ID,_("name"),&m_DefaultLayout);
-  m_Gui->Label("");
+  m_Gui->Bool(LAYOUT_VISIBILITY_VME, _("Visibility"), &m_VisibilityVme ,0,_("If checked the layout will be comprehensive of vme visibility"));
 }
 //----------------------------------------------------------------------------
 mmgApplicationLayoutSettings::~mmgApplicationLayoutSettings() 
 //----------------------------------------------------------------------------
 {
-  mafDEL(m_Layout);
+  //mafDEL(m_Layout); // already destroyed by the vme
   m_Gui = NULL; // gui is destroyed by the dialog.
 }
 //----------------------------------------------------------------------------
@@ -67,6 +70,8 @@ void mmgApplicationLayoutSettings::OnEvent(mafEventBase *maf_event)
     }
     break;
     case LAYOUT_NAME_ID:
+    break;
+    case LAYOUT_VISIBILITY_VME:
     break;
     default:
       mafEventMacro(*maf_event);
@@ -102,6 +107,7 @@ void mmgApplicationLayoutSettings::SaveLayout()
     {
       m_Layout->ClearLayout();
     }
+    m_Layout->SetVisibilityVme(m_VisibilityVme);
     m_Layout->SetApplicationInfo(frame->IsMaximized(), pos, size);
     wxPaneInfo toolbar = m_Win->GetDockManager().GetPane("toolbar");
     bool toolbar_vis = toolbar.IsShown();

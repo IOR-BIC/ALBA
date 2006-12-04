@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationLayoutSettings.h,v $
 Language:  C++
-Date:      $Date: 2006-11-28 12:18:23 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2006-12-04 10:30:41 $
+Version:   $Revision: 1.3 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -37,7 +37,8 @@ public:
   enum APPLICATION_LAYOUT_WIDGET_ID
   {
     SAVE_LAYOUT_ID = MINID,
-    LAYOUT_NAME_ID
+    LAYOUT_NAME_ID,
+    LAYOUT_VISIBILITY_VME,
   };
 
   /** Answer to the messages coming from interface. */
@@ -67,5 +68,6 @@ protected:
   mafObserver           *m_Listener;
   mafViewManager        *m_ViewManager;
   mmaApplicationLayout  *m_Layout;
+  int                    m_VisibilityVme;
 };
 #endif
