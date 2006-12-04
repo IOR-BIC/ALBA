@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaApplicationLayout.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-28 15:07:17 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-12-04 10:29:54 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -97,6 +97,13 @@ public:
   /** Return the stored visibility for the Sidebar.*/
   int GetSideBarVisibility() {return m_SideBarVisibility;};
 
+
+  /** Set the value for vme visibility.*/
+  void SetVisibilityVme(int value){m_VisibilityVme = value;};
+
+  /** Return the value for vme visibility.*/
+  int GetVisibilityVme(){return m_VisibilityVme;};
+
 protected:
   virtual int InternalStore(mafStorageElement *parent);
   virtual int InternalRestore(mafStorageElement *node);
@@ -109,6 +116,7 @@ protected:
   int m_SideBarVisibility;
   int m_ToolBarVisibility;
   int m_LogBarVisibility;
+  int m_VisibilityVme;
   
   std::vector<ViewLayoutInfo> m_LayoutViewList;
 };

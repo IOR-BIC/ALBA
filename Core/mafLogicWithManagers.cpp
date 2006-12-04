@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-28 15:08:05 $
-  Version:   $Revision: 1.87 $
+  Date:      $Date: 2006-12-04 10:29:54 $
+  Version:   $Revision: 1.88 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1188,10 +1188,16 @@ void mafLogicWithManagers::RestoreLayout()
         size[1] = (*iter).m_Size[1];
         wxRect rect(pos[0],pos[1],size[0],size[1]);
         v->GetFrame()->SetSize(rect);
-        //for ()
-        //{
-        //  (*iter).m_VisibleVmes  // VME_SHOW
-        //}        
+
+        for (int i=0; i<(*iter).m_VisibleVmes.size();i++)
+        {
+          mafNode *node_restored = m_VMEManager->GetRoot()->FindInTreeById((*iter).m_VisibleVmes[i]);
+          if (node_restored)
+          {
+            VmeShow(node_restored , true); // VME_SHOW
+          }
+        }        
+
       }
     }
   }
