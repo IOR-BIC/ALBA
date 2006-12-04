@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-17 13:07:14 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2006-12-04 10:31:17 $
+  Version:   $Revision: 1.23 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -1207,6 +1207,8 @@ void mafVMELandmarkCloud::OnEvent(mafEventBase *maf_event)
         }
         m_Gui->Enable(ID_LM_RADIUS, m_CloudStateCheckbox == 0);
         m_Gui->Enable(ID_LM_SPHERE_RESOLUTION, m_CloudStateCheckbox == 0);
+
+        this->ForwardUpEvent(mafEvent(this,VME_SELECTED,this)); 
       break;
       case ID_LM_SPHERE_RESOLUTION:
         SetSphereResolution(m_SphereResolution);
