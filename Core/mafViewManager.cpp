@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-21 13:56:54 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2006-12-06 09:42:46 $
+  Version:   $Revision: 1.27 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -308,7 +308,7 @@ mafView *mafViewManager::ViewCreate(int id)
   for(;view_mult < MAXVIEW; view_mult++)
     if(m_ViewMatrixID[index][view_mult] == NULL)
       break;
-  view->m_Mult = view_mult;
+  new_view->m_Mult = view_mult;
 
   //update the matrix containing all created view
   m_ViewMatrixID[index][view_mult] = new_view;
