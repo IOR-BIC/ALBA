@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMutexLock.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 15:21:09 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-12-06 10:44:51 $
+  Version:   $Revision: 1.7 $
   Authors:   Based on itkmafMutexLock (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -32,6 +32,7 @@ typedef abilock_t FastMutexType;
 #ifdef CMAKE_USE_PTHREADS_INIT
 #include <pthread.h>
 typedef pthread_mutex_t FastMutexType;
+typedef pthread_mutexattr_t MutexAttr;
 #endif
  
 #if defined(_WIN32) && !defined(CMAKE_USE_PTHREADS_INIT)
@@ -61,6 +62,9 @@ public:
   /** Unlock access. */
   void Unlock( void ) const;
   mutable FastMutexType   m_FastMutexLock;
+#ifdef CMAKE_USE_PTHREADS_INIT
+  MutexAttr m_MutexAttributes;
+#endif
 };
 
 //----------------------------------------------------------------------------
@@ -79,7 +83,10 @@ mmuPIMPLMutexLock::mmuPIMPLMutexLock()
   #ifdef CMAKE_HP_PTHREADS_INIT
     pthread_mutex_init(&(m_FastMutexLock), pthread_mutexattr_default);
   #else
-    pthread_mutex_init(&(m_FastMutexLock), NULL);
+    pthread_mutexattr_init(&m_MutexAttributes);
+    pthread_mutexattr_settype(&m_MutexAttributes, PTHREAD_MUTEX_RECURSIVE_NP);
+    pthread_mutex_init(&(m_FastMutexLock), &m_MutexAttributes);
+    //pthread_mutex_init(&(m_FastMutexLock), NULL);
   #endif
   #endif
 }
@@ -94,6 +101,9 @@ mmuPIMPLMutexLock::~mmuPIMPLMutexLock()
 
 #ifdef CMAKE_USE_PTHREADS_INIT
   pthread_mutex_destroy( &m_FastMutexLock);
+#ifndef CMAKE_HP_PTHREADS_INIT
+  pthread_mutexattr_destroy(&m_MutexAttributes);
+#endif
 #endif
 }
 
