@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-03 11:01:39 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-12-06 09:46:15 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -70,9 +70,9 @@ void mmdMouse::OnEvent(mafEventBase *event)
 {
   assert(event);
 
-  mafID id=event->GetId();
+  mafID id = event->GetId();
 
-  mafEventInteraction *e = (mafEventInteraction *)event;
+  mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
 
   if (id == MOUSE_2D_MOVE)
   {
@@ -128,18 +128,22 @@ void mmdMouse::OnEvent(mafEventBase *event)
   }
   else if (id == VIEW_SELECT)
   {
-    mafEvent *e=mafEvent::SafeDownCast(event);
-    assert(e);
-    m_SelectedView = e->GetView();    
+    mafEvent *ev = mafEvent::SafeDownCast(event);
+    if (ev)
+    {
+      m_SelectedView = ev->GetView();    
+    }
   }
   else if (id == MOUSE_CHAR_EVENT)
   {
-    mafEvent *e=mafEvent::SafeDownCast(event);
-    assert(e);
-    unsigned char key = (unsigned char)e->GetArg();
-    mafEventInteraction ev(this,MOUSE_CHAR_EVENT);
-    ev.SetKey(key);
-    InvokeEvent(&ev,MCH_INPUT);
+    mafEvent *ev = mafEvent::SafeDownCast(event);
+    if (ev)
+    {
+      unsigned char key = (unsigned char)ev->GetArg();
+      mafEventInteraction ei(this,MOUSE_CHAR_EVENT);
+      ei.SetKey(key);
+      InvokeEvent(&ei,MCH_INPUT);
+    }
   }
 }
 
@@ -216,6 +220,8 @@ void mmdMouse::DisplayToNormalizedDisplay(double display[2])
 //------------------------------------------------------------------------------
 {
   vtkRenderer *r = GetRenderer();
+  if (r == NULL) {return;}
+
   int *size;
 
   /* get physical window dimensions */
@@ -233,6 +239,8 @@ void mmdMouse::NormalizedDisplayToDisplay(double normalized[2])
 //------------------------------------------------------------------------------
 {
   vtkRenderer *r = GetRenderer();
+  if (r == NULL) {return;}
+
   int *size;
 
   /* get physical window dimensions */
