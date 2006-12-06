@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafRemoteLogic.cpp,v $
 Language:  C++
-Date:      $Date: 2006-12-06 09:35:11 $
-Version:   $Revision: 1.11 $
+Date:      $Date: 2006-12-06 14:14:03 $
+Version:   $Revision: 1.12 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -21,6 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mafRemoteLogic.h"
 #include <wx/tokenzr.h>
+#include <wx/busyinfo.h>
 
 #include "mafDecl.h"
 #include "mafViewManager.h"
@@ -210,6 +211,8 @@ void mafRemoteLogic::RemoteMessage(mafString &cmd, bool to_server)
   }
   else
   {
+    wxBusyCursor wait;
+
     // unpack the message and send the command to MAF
     wxString delimiter = m_CommandSeparator.GetCStr();
     wxString cmd_string = cmd.GetCStr();
