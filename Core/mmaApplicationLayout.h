@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaApplicationLayout.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-04 10:29:54 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-12-06 14:12:48 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -46,6 +46,7 @@ public:
     int m_Position[2];
     int m_Size[2];
     std::vector<int> m_VisibleVmes;
+    double m_CameraParameters[9];
   };
 
   /** print a dump of this object */

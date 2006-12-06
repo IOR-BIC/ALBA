@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaApplicationLayout.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-04 10:29:54 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-12-06 14:12:53 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -29,7 +29,9 @@
 #include "mafNode.h"
 #include "mafSceneGraph.h"
 #include "mafSceneNode.h"
+#include "mafRWIBase.h"
 
+#include "vtkCamera.h"
 #include <iterator>
 
 //----------------------------------------------------------------------------
@@ -165,6 +167,7 @@ int mmaApplicationLayout::InternalStore(mafStorageElement *parent)
     mafString view_pos;
     mafString vme_in_view;
     mafString vme_ids_in_view;
+    mafString view_camera_parameters;
     ViewLayoutInfo info;
     int n = m_LayoutViewList.size();
     parent->StoreInteger("NUMBER_OF_VIEW", n);
@@ -197,6 +200,10 @@ int mmaApplicationLayout::InternalStore(mafStorageElement *parent)
         vme_ids_in_view = "VME_IDS_IN_VIEW_";
         vme_ids_in_view << i;
         parent->StoreVectorN(vme_ids_in_view.GetCStr(),info.m_VisibleVmes, info.m_VisibleVmes.size());
+
+        view_camera_parameters = "VIEW_CAMERA_PARAMETERS_";
+        view_camera_parameters << i;
+        parent->StoreVectorN(view_camera_parameters.GetCStr(),info.m_CameraParameters, 9);
       }
     }
     return MAF_OK;
@@ -226,6 +233,7 @@ int mmaApplicationLayout::InternalRestore(mafStorageElement *node)
     mafString view_pos;
     mafString vme_in_view;
     mafString vme_ids_in_view;
+    mafString view_camera_parameters;
     ViewLayoutInfo info;
     int n;
     node->RestoreInteger("NUMBER_OF_VIEW", n);
@@ -259,6 +267,10 @@ int mmaApplicationLayout::InternalRestore(mafStorageElement *node)
         vme_ids_in_view << i;
         info.m_VisibleVmes.resize(num_vme);
         node->RestoreVectorN(vme_ids_in_view.GetCStr(),info.m_VisibleVmes, num_vme);
+
+        view_camera_parameters = "VIEW_CAMERA_PARAMETERS_";
+        view_camera_parameters << i;
+        node->RestoreVectorN(view_camera_parameters.GetCStr(),info.m_CameraParameters, 9);
       }
       m_LayoutViewList.push_back(info);
     }
@@ -282,6 +294,7 @@ void mmaApplicationLayout::AddView(mafView *v, bool vme_visibility)
   info.m_Size[0] = r.GetSize().GetWidth();
   info.m_Size[1] = r.GetSize().GetHeight();
   info.m_VisibleVmes.clear();
+  
   if (m_VisibilityVme)
   {
     int idx;
@@ -293,6 +306,17 @@ void mmaApplicationLayout::AddView(mafView *v, bool vme_visibility)
         info.m_VisibleVmes.push_back(idx);
       }
     }
+    info.m_CameraParameters[0] = v->GetRWI()->GetCamera()->GetViewUp()[0];
+    info.m_CameraParameters[1] = v->GetRWI()->GetCamera()->GetViewUp()[1];
+    info.m_CameraParameters[2] = v->GetRWI()->GetCamera()->GetViewUp()[2];
+
+    info.m_CameraParameters[3] = v->GetRWI()->GetCamera()->GetPosition()[0];
+    info.m_CameraParameters[4] = v->GetRWI()->GetCamera()->GetPosition()[1];
+    info.m_CameraParameters[5] = v->GetRWI()->GetCamera()->GetPosition()[2];
+
+    info.m_CameraParameters[6] = v->GetRWI()->GetCamera()->GetFocalPoint()[0];
+    info.m_CameraParameters[7] = v->GetRWI()->GetCamera()->GetFocalPoint()[1];
+    info.m_CameraParameters[8] = v->GetRWI()->GetCamera()->GetFocalPoint()[2];
   }
   m_LayoutViewList.push_back(info);
 }
