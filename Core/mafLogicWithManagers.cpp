@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-04 10:29:54 $
-  Version:   $Revision: 1.88 $
+  Date:      $Date: 2006-12-06 09:36:00 $
+  Version:   $Revision: 1.89 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -838,7 +838,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
         bool collaborate = e->GetBool();
         if (collaborate)
         {
-          //m_RemoteLogic->SetRemoteMouse(m_InteractionManager->GetRemoteMouseDevice());
+          m_RemoteLogic->SetRemoteMouse(m_InteractionManager->GetRemoteMouseDevice());
           m_Mouse->AddObserver(m_RemoteLogic, REMOTE_COMMAND_CHANNEL);
           if(m_RemoteLogic->IsSocketConnected())  //check again, because if no server is present
           {                                       //no synchronization is necessary
