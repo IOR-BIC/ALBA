@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:53:23 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-12-06 09:37:06 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -249,7 +249,6 @@ int mafVMEItem::InternalRestore(mafStorageElement *node)
 //-------------------------------------------------------------------------
 {
   mafString crypting;
-  mafNEW(m_TagArray);
   if (node->RestoreText("URL",m_URL)==MAF_OK \
     &&node->RestoreInteger("Id",m_Id)==MAF_OK \
     &&node->RestoreText("DataType",m_DataType)==MAF_OK \
