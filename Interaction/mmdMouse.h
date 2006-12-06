@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdMouse.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-03 11:01:39 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-12-06 09:45:16 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -80,6 +80,8 @@ public:
   /** Turn On/Off the collaboration status. */
   void Collaborate(bool status) {m_CollaborateStatus = status;};
 
+  bool m_FromRemote;  ///< Flag used from RemoteLogic to avoid loop
+
 protected:
   mmdMouse();
   virtual ~mmdMouse();
@@ -90,7 +92,6 @@ protected:
   double      m_LastPosition[2];///< stores the last position
   bool        m_UpdateRwiInOnMoveFlag; ///< If this flag true the m_SelectedRWI is updated in when the mouse move inside the view (used in compounded views)
   bool        m_CollaborateStatus;
-  bool        m_FromRemote;
   bool        m_ButtonPressed;
 
   mafView    *m_SelectedView;   ///< store the selected view to perform the mouse picking
