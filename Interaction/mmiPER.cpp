@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPER.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-16 09:19:42 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-12-06 09:47:27 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -299,83 +299,63 @@ void mmiPER::OnButtonDown(mafEventInteraction *e)
 {
   mafDevice *device = mafDevice::SafeDownCast((mafDevice*)e->GetSender());
 
-  mafView       *v;
+  mafView       *v = NULL;
   mafVME        *picked_vme  = NULL;
   vtkProp3D     *picked_prop = NULL;
   mafInteractor *picked_bh   = NULL;
-  mafMatrix     *point_pose  = e->GetMatrix();
+  mafMatrix     point_pose;
   double        pos_2d[2];
 
   mmdMouse   *mouse   = mmdMouse::SafeDownCast(device);
   mmdTracker *tracker = mmdTracker::SafeDownCast(device);
 
-  if (point_pose && tracker)
+  if (tracker)
   {
+    point_pose = *e->GetMatrix();
     mafAvatar *avatar = tracker->GetAvatar();
     if (avatar)
     {
       v = avatar->GetView();
-      if(v && v->FindPokedVme(device,*point_pose, picked_prop,picked_vme,picked_bh)) 
-      {
-        // if a VME is picked its pointer is written in PickedVME
-        if(m_CanSelect && !picked_vme->IsA("mafVMEGizmo"))
-        {
-          // Send a VME select event to Logic
-          InvokeEvent(VME_SELECT,MCH_UP,picked_vme);
-        }
-      }
-    }
-
-    // Forward the start event to the right behavior
-    if(picked_bh)
-    {
-      // if a vme with a behavior has been picked... /****/
-      SetPickedVME(device,picked_vme); 
-      picked_bh->SetVME(picked_vme);   // set the VME (Marco: to be revoved, the operation should set the VME to the interactor!) /****/
-      picked_bh->SetProp(picked_prop); // set the prop (Marco: to be removed, no access to the vtkProp!!!) /****/
-      picked_bh->OnEvent(e); // forward the start event to picked behavior
-    }
-    // if I don't picked a VME or I picked but I cannot select, move the camera.
-    else if (m_CameraBehavior&&(!m_CameraBehavior->IsInteracting()))
-    {
-      // if the camera behavior is free...
-      m_CameraBehavior->OnEvent(e); // forward to the camera behavior
     }
   }
   else if (mouse)
   {
     e->Get2DPosition(pos_2d);
-    mafMatrix point_pose;
+    point_pose.Identity();
     point_pose.SetElement(0,3,pos_2d[0]);
     point_pose.SetElement(1,3,pos_2d[1]);
     v = mouse->GetView();
+  }
 
-    if(v && v->FindPokedVme(device,point_pose,picked_prop,picked_vme,picked_bh))
+  if(v && v->FindPokedVme(device, point_pose, picked_prop, picked_vme, picked_bh))
+  {
+    SetPickedVME(device, picked_vme);
+    // if a VME is picked its pointer is written in PickedVME
+    if(m_CanSelect && !picked_vme->IsA("mafVMEGizmo"))
     {
-      SetPickedVME(device,picked_vme); 
-      // if a VME is picked its pointer is written in PickedVME
-      if(m_CanSelect && !picked_vme->IsA("mafVMEGizmo"))
-      {
-        // Send a VME select event to Logic
-        InvokeEvent(VME_SELECT,MCH_UP,picked_vme);
-      }
+      // Send a VME select event to Logic
+      InvokeEvent(VME_SELECT,MCH_UP,picked_vme);
     }
-
-    // Forward the start event to the right behavior
-    if(picked_bh)
-	  {
-      // if a vme with a behavior has been picked... 
-//      SetPickedVME(device,picked_vme); 
-      picked_bh->SetVME(picked_vme);   // set the VME (Marco: to be removed, the operation should set the VME to the interactor!) 
-      picked_bh->SetProp(picked_prop); // set the prop (Marco: to be removed, no access to the vtkProp!!!) 
-      picked_bh->OnEvent(e); // forward the start event to picked behavior
-    }
-    // if I don't picked a VME or I picked but I cannot select, move the camera.
-    else if (m_CameraMouseBehavior&&(!m_CameraMouseBehavior->IsInteracting()))
-    {
-      // if the camera behavior is free...
-      m_CameraMouseBehavior->OnEvent(e); // forward to the camera behavior
-    }
+  }
+  // Forward the start event to the right behavior
+  if(picked_bh)
+  {
+    // if a vme with a behavior has been picked... 
+    picked_bh->SetVME(picked_vme);   // set the VME (Marco: to be removed, the operation should set the VME to the interactor!) 
+    picked_bh->SetProp(picked_prop); // set the prop (Marco: to be removed, no access to the vtkProp!!!) 
+    picked_bh->OnEvent(e); // forward the start event to picked behavior
+  }
+  // if I don't picked a VME or I picked but I cannot select, move the camera.
+  else if (tracker && m_CameraBehavior&&(!m_CameraBehavior->IsInteracting()))
+  {
+    // if the camera behavior is free...
+    m_CameraBehavior->OnEvent(e); // forward to the camera behavior
+  }
+  // if I don't picked a VME or I picked but I cannot select, move the camera.
+  else if (mouse && m_CameraMouseBehavior&&(!m_CameraMouseBehavior->IsInteracting()))
+  {
+    // if the camera behavior is free...
+    m_CameraMouseBehavior->OnEvent(e); // forward to the camera behavior
   }
 }
 
