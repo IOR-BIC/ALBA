@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafRemoteLogic.cpp,v $
 Language:  C++
-Date:      $Date: 2006-11-22 15:17:47 $
-Version:   $Revision: 1.10 $
+Date:      $Date: 2006-12-06 09:35:11 $
+Version:   $Revision: 1.11 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -76,9 +76,11 @@ void mafRemoteLogic::OnEvent(mafEventBase *event)
 //  if(m_ClientUnit && !m_ClientUnit->IsConnected() && m_ClientUnit->IsBusy())
 //    return;
 
+  m_RemoteMsg = "";
+
+  mafID id = event->GetId();
   if (mafEvent *e = mafEvent::SafeDownCast(event)) 
   {
-    mafID id = e->GetId();
     if(id == ClientUnit::RemoteMessage_ID) 
     {
       mafString msg = *e->GetString();
@@ -86,7 +88,6 @@ void mafRemoteLogic::OnEvent(mafEventBase *event)
     }
     else if(event->GetChannel() == REMOTE_COMMAND_CHANNEL)
     {
-      m_RemoteMsg = "";
       // build the command event
       if(id == VIEW_DELETE || id == VIEW_SELECTED)
       {
@@ -169,34 +170,35 @@ void mafRemoteLogic::OnEvent(mafEventBase *event)
         m_RemoteMsg << m_CommandSeparator;
         m_RemoteMsg << e->GetArg();
       }
-      else if (id == mmdButtonsPad::BUTTON_DOWN ||
-        id == mmdButtonsPad::BUTTON_UP   ||
-        id == mmdMouse::MOUSE_2D_MOVE)
-      {
-        unsigned long modifiers = ((mafEventInteraction *)event)->GetModifiers();
-        double pos[2];
-        ((mafEventInteraction *)event)->Get2DPosition(pos);
-        m_RemoteMsg = "MouseDevice";
-        m_RemoteMsg << m_CommandSeparator;
-        m_RemoteMsg << id;
-        m_RemoteMsg << m_CommandSeparator;
-        m_RemoteMsg << pos[0];
-        m_RemoteMsg << m_CommandSeparator;
-        m_RemoteMsg << pos[1];
-        m_RemoteMsg << m_CommandSeparator;
-        m_RemoteMsg << (int)modifiers;
-        m_RemoteMsg << m_CommandSeparator;
-        m_RemoteMsg << ((mafEventInteraction *)event)->GetButton();
-      }
-      else if (id == mmdMouse::MOUSE_CHAR_EVENT)
-      {
-      }
-
-      if(!m_RemoteMsg.IsEmpty()) // Send the message to the server
-        RemoteMessage(m_RemoteMsg);
-      return;
     }
   }
+  else if (mafEventInteraction *ei = mafEventInteraction::SafeDownCast(event))
+  {
+    if (id == mmdButtonsPad::BUTTON_DOWN ||
+      id == mmdButtonsPad::BUTTON_UP   ||
+      id == mmdMouse::MOUSE_2D_MOVE)
+    {
+      unsigned long modifiers = ei->GetModifiers();
+      double pos[2];
+      ei->Get2DPosition(pos);
+      m_RemoteMsg = "MouseDevice";
+      m_RemoteMsg << m_CommandSeparator;
+      m_RemoteMsg << id;
+      m_RemoteMsg << m_CommandSeparator;
+      m_RemoteMsg << pos[0];
+      m_RemoteMsg << m_CommandSeparator;
+      m_RemoteMsg << pos[1];
+      m_RemoteMsg << m_CommandSeparator;
+      m_RemoteMsg << (int)modifiers;
+      m_RemoteMsg << m_CommandSeparator;
+      m_RemoteMsg << ei->GetButton();
+    }
+    else if (id == mmdMouse::MOUSE_CHAR_EVENT)
+    {
+    }
+  }
+  if(!m_RemoteMsg.IsEmpty()) // Send the message to the server
+    RemoteMessage(m_RemoteMsg);
 }
 //----------------------------------------------------------------------------
 void mafRemoteLogic::RemoteMessage(mafString &cmd, bool to_server)
@@ -226,7 +228,8 @@ void mafRemoteLogic::RemoteMessage(mafString &cmd, bool to_server)
       mafEventMacro(mafEvent(this,VIEW_CREATE,(long)(v_id + VIEW_START)));
       if (m_RemoteMouse)
       {
-        mafEventBase eb(this,VIEW_SELECT, m_ViewManager->GetSelectedView(), REMOTE_COMMAND_CHANNEL);
+        mafEvent eb(this,VIEW_SELECT, m_ViewManager->GetSelectedView());
+        eb.SetChannel(REMOTE_COMMAND_CHANNEL);
         m_RemoteMouse->OnEvent(&eb);
       }
       m_ViewManager->m_FromRemote = false;
@@ -237,7 +240,7 @@ void mafRemoteLogic::RemoteMessage(mafString &cmd, bool to_server)
       data_cmd.ToLong(&v_id);
       data_cmd = tkz.GetNextToken();
       data_cmd.ToLong(&v_mult);
-      if(m_ViewManager->GetView(v_id,v_mult) == NULL)
+      if(m_ViewManager->GetView(v_id-VIEW_START,v_mult) == NULL)
       {
         m_ViewManager->m_FromRemote = true;
         mafEventMacro(mafEvent(this,VIEW_CREATE,v_id));
@@ -249,7 +252,7 @@ void mafRemoteLogic::RemoteMessage(mafString &cmd, bool to_server)
         data_cmd.ToLong(&v_id);
         data_cmd = tkz.GetNextToken();
         data_cmd.ToLong(&v_mult);
-        if(m_ViewManager->GetView(v_id,v_mult) == NULL)
+        if(m_ViewManager->GetView(v_id-VIEW_START,v_mult) == NULL)
         {
           m_ViewManager->m_FromRemote = true;
           mafEventMacro(mafEvent(this,VIEW_CREATE,v_id));
@@ -338,7 +341,7 @@ void mafRemoteLogic::RemoteMessage(mafString &cmd, bool to_server)
         m_ViewManager->Activate(view);
         if (m_RemoteMouse) 
         {
-          m_RemoteMouse->OnEvent(&mafEvent(this,VIEW_SELECTED,view));
+          m_RemoteMouse->OnEvent(&mafEvent(this,VIEW_SELECT,view));
         }
       }
       m_ViewManager->m_FromRemote = false;
