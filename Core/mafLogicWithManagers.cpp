@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-06 09:36:00 $
-  Version:   $Revision: 1.89 $
+  Date:      $Date: 2006-12-06 14:12:12 $
+  Version:   $Revision: 1.90 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1196,7 +1196,33 @@ void mafLogicWithManagers::RestoreLayout()
           {
             VmeShow(node_restored , true); // VME_SHOW
           }
-        }        
+        }
+
+        if((*iter).m_VisibleVmes.size() > 0)
+        {
+          if(v->IsMAFType(mafViewVTK))
+          {
+            double view_up[3], position[3], focal_point[3];
+            view_up[0] = (*iter).m_CameraParameters[0];
+            view_up[1] = (*iter).m_CameraParameters[1];
+            view_up[2] = (*iter).m_CameraParameters[2];
+
+            position[0] = (*iter).m_CameraParameters[3];
+            position[1] = (*iter).m_CameraParameters[4];
+            position[2] = (*iter).m_CameraParameters[5];
+
+            focal_point[0] = (*iter).m_CameraParameters[6];
+            focal_point[1] = (*iter).m_CameraParameters[7];
+            focal_point[2] = (*iter).m_CameraParameters[8];
+
+            v->GetRWI()->GetCamera()->SetViewUp(view_up);
+            v->GetRWI()->GetCamera()->SetPosition(position);
+            v->GetRWI()->GetCamera()->SetFocalPoint(focal_point);
+          }
+          else //compound
+          {;}
+        }
+          
 
       }
     }
