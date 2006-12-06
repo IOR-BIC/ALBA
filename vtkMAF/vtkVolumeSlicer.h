@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkVolumeSlicer.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-23 17:23:29 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-12-06 15:15:59 $
+  Version:   $Revision: 1.11 $
   Authors:   Alexander Savenko
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -140,7 +140,7 @@ protected:
   void ComputeInputUpdateExtents(vtkDataObject *output);
 
   void PrepareVolume();
-  void CalculateTextureCoordinates(const double point[3], const int size[2], const double spacing[2], double ts[2]);
+  void CalculateTextureCoordinates(const float point[3], const int size[2], const double spacing[2], float ts[2]);
 
   template<typename InputDataType, typename OutputDataType> void CreateImage(const InputDataType *input, OutputDataType *output, vtkImageData *outputObject);
 
@@ -167,7 +167,7 @@ protected:
   // look-up tables and caches
   vtkTimeStamp PreprocessingTime;
 
-  double*       VoxelCoordinates[3];
+  float*       VoxelCoordinates[3];
   double       DataOrigin[3];
   double        DataBounds[3][2];
   int          DataDimensions[3];
