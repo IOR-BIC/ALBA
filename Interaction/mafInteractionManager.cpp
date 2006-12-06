@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-07 12:42:56 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2006-12-06 09:47:56 $
+  Version:   $Revision: 1.30 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -138,17 +138,15 @@ mafInteractionManager::mafInteractionManager()
   //mouse_action->BindDevice(mouse_device); // bind mouse to mouse action
   pointing_action->BindDevice(mouse_device); // bind mouse to point&manipulate action
 
-  #ifdef WIN32
+#ifdef WIN32
   mafPlugDevice<mmdClientMAF>("Client MAF");
   m_ClientDevice = (mmdClientMAF *)m_DeviceManager->AddDevice("mmdClientMAF",true);
 
-/*
   mafPlugDevice<mmdRemoteMouse>("RemoteMouse");
-  mmdRemoteMouse *remote_mouse_device = (mmdRemoteMouse *)m_DeviceManager->AddDevice("mmdRemoteMouse",true); // add as persistent device
+  mmdRemoteMouse *remote_mouse_device = (mmdRemoteMouse *)m_DeviceManager->AddDevice("mmdRemoteMouse", true); // add as persistent device
   assert(remote_mouse_device);
   pointing_action->BindDevice(remote_mouse_device); // bind mouse to point&manipulate action
-*/
-  #endif
+#endif
 }
 
 //------------------------------------------------------------------------------
