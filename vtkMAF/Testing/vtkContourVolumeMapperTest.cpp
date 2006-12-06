@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkContourVolumeMapperTest.cpp,v $
 Language:  C++
-Date:      $Date: 2006-12-01 10:26:57 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2006-12-06 09:49:36 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -60,8 +60,10 @@ static bool ExtractModel   = true;
 static bool CleanModel     = false;
 static bool RG						 = false;
 
-void vtkContourVolumeMapperTest::Test() {
-	
+//-----------------------------------------------------------
+void vtkContourVolumeMapperTest::Test() 
+//-----------------------------------------------------------
+{
 	char filename[]   = "cube";
 	//------------------ create objects
   vtkContourVolumeMapper *mapper = vtkContourVolumeMapper::New();
@@ -170,9 +172,8 @@ void vtkContourVolumeMapperTest::Test() {
 }
 
 //-----------------------------------------------------------
-//
-//-----------------------------------------------------------
 vtkRectilinearGrid* vtkContourVolumeMapperTest::CreateDataRG()
+//-----------------------------------------------------------
 {
 		vtkRectilinearGrid *data = vtkRectilinearGrid::New();
 		int dims[3];
@@ -204,9 +205,8 @@ vtkRectilinearGrid* vtkContourVolumeMapperTest::CreateDataRG()
     return data;
 }
 //-----------------------------------------------------------
-//
-//-----------------------------------------------------------
 vtkImageData* vtkContourVolumeMapperTest::CreateDataID()
+//-----------------------------------------------------------
 {
 		vtkImageData *data = vtkImageData::New();
 		int dims[3], dataExtent[6];
