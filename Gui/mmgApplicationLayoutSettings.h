@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationLayoutSettings.h,v $
 Language:  C++
-Date:      $Date: 2006-12-04 10:30:41 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2006-12-06 14:13:35 $
+Version:   $Revision: 1.4 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -22,6 +22,7 @@ class mmgGui;
 class mafViewManager;
 class mmaApplicationLayout;
 class mmgMDIFrame;
+class mafVMEStorage;
 
 //----------------------------------------------------------------------------
 // mmgApplicationLayoutSettings :
@@ -36,9 +37,15 @@ public:
 
   enum APPLICATION_LAYOUT_WIDGET_ID
   {
-    SAVE_LAYOUT_ID = MINID,
+    SAVE_TREE_LAYOUT_ID = MINID,
     LAYOUT_NAME_ID,
     LAYOUT_VISIBILITY_VME,
+    ID_LIST_LAYOUT,
+    OPEN_LAYOUT_ID,
+    APPLY_LAYOUT_ID,
+    ADD_LAYOUT_ID,
+    REMOVE_LAYOUT_ID,
+    SAVE_APPLICATION_LAYOUT_ID,
   };
 
   /** Answer to the messages coming from interface. */
@@ -59,8 +66,27 @@ protected:
   /** Initialize Application layout used into the application.*/
   void InitializeLayout();
 
-  /** Save current application layout into the attribute mmaApplicationLayout. */
-  void SaveLayout();
+  /** Save current application layout into the attribute mmaApplicationLayout, 
+  inside current MSF data*/
+  void SaveTreeLayout();
+
+  /** */
+  void LoadLayout();
+
+  /** */
+  void AddLayout();
+
+  /** */
+  void RemoveLayout();
+
+  /** */
+  void ApplyLayout();
+
+  /** */
+  void SaveApplicationLayout();
+
+  /** */
+  bool GetModifiedLayouts(){return m_ModifiedLayouts;};
 
   mmgMDIFrame           *m_Win;
   mafString              m_DefaultLayout;
@@ -68,6 +94,11 @@ protected:
   mafObserver           *m_Listener;
   mafViewManager        *m_ViewManager;
   mmaApplicationLayout  *m_Layout;
+  mafVMEStorage            *m_Storage;
   int                    m_VisibilityVme;
+  wxListBox				      *m_List;
+  bool                   m_ModifiedLayouts;
+
+  mafString              m_LayoutFileSave;
 };
 #endif
