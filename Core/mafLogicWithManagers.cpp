@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-06 14:12:12 $
-  Version:   $Revision: 1.90 $
+  Date:      $Date: 2006-12-07 14:40:35 $
+  Version:   $Revision: 1.91 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -202,6 +202,7 @@ void mafLogicWithManagers::Configure()
     m_ApplicationLayoutSettings->SetApplicationFrame(m_Win);
     m_SettingsDialog->AddPage( m_ApplicationLayoutSettings->GetGui(), _("Application Layout"));
   }
+
   m_SettingsDialog->AddPage( m_Win->GetDockSettingGui(), _("User Interface Preferences"));
 
 // currently mafInteraction is strictly dependent on VTK (marco)
@@ -1000,6 +1001,7 @@ void mafLogicWithManagers::OnFileSaveAs()
 void mafLogicWithManagers::OnQuit()
 //----------------------------------------------------------------------------
 {
+  
   if (m_OpManager && m_OpManager->Running())
   {
     return;
@@ -1019,6 +1021,19 @@ void mafLogicWithManagers::OnQuit()
       if(answer == wxYES) 
         m_VMEManager->MSFSave();
       quit = answer != wxCANCEL;
+
+      if(m_ApplicationLayoutSettings->GetModifiedLayouts())
+      {
+        int answer = wxMessageBox
+              (
+              _("would you like to save your layout list ?"),
+              _("Confirm"), 
+              wxYES_NO|wxCANCEL|wxICON_QUESTION , m_Win
+              );
+          if(answer == wxYES) 
+            m_ApplicationLayoutSettings->SaveApplicationLayout();
+      }
+
     }
     else 
     {
@@ -1028,7 +1043,7 @@ void mafLogicWithManagers::OnQuit()
     if(!quit) 
       return;
   }
-  
+
   mmgMDIChild::OnQuit(); 
   m_Win->OnQuit(); 
 
@@ -1443,7 +1458,8 @@ void mafLogicWithManagers::TreeContextualMenu(mafEvent &e)
 //----------------------------------------------------------------------------
 {
   mmgTreeContextualMenu *contextMenu = new mmgTreeContextualMenu();
-  contextMenu->SetListener(this);
+  //contextMenu->SetListener(this);
+  contextMenu->SetListener(m_ApplicationLayoutSettings);
   mafView *v = m_ViewManager->GetSelectedView();
   mafVME  *vme = (mafVME *)e.GetVme();
   bool vme_menu = e.GetBool();
