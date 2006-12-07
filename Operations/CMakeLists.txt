@@ -23,6 +23,8 @@ IF (MAF_USE_VTK)
     mmoCreateGroup.h
     mmoCreateMeter.cpp
     mmoCreateMeter.h
+    mmoCreateSurfaceParametric.cpp
+    mmoCreateSurfaceParametric.h
     mmoCreateProber.cpp
     mmoCreateProber.h
     mmoCreateRefSys.cpp
