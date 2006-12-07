@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTreeContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-16 12:05:18 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-12-07 14:41:16 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,6 +38,7 @@
 #include "mafSceneNode.h"
 #include "mafSceneGraph.h"
 #include "mmgCheckTree.h"
+#include "mmgApplicationLayoutSettings.h"
 
 //#include "mmgBitmaps.h"
 #include "mmgLab.h"
@@ -53,7 +54,8 @@
 //----------------------------------------------------------------------------
 enum TREE_CONTEXTUAL_MENU_ID
 {
-  CONTEXTUAL_TREE_MENU_START = MINID,	
+  CONTEXTUAL_TREE_MENU_START = MINID,
+    RMENU_ADD_TREE_LAYOUT,
 		RMENU_SHOW_VME,				
 		RMENU_SHOW_SUBTREE,
 		RMENU_SHOW_SAMETYPE,
@@ -108,6 +110,9 @@ void mmgTreeContextualMenu::ShowContextualMenu(mmgCheckTree *tree, mafView *view
 	{
     bool enable;
 
+    this->Append(RMENU_ADD_TREE_LAYOUT,  "Save Tree Layout");
+    this->AppendSeparator();
+
     if(m_ViewActive != NULL && mafViewVTK::SafeDownCast(m_ViewActive))
     {
       mafSceneGraph *sg = NULL;
@@ -116,6 +121,7 @@ void mmgTreeContextualMenu::ShowContextualMenu(mmgCheckTree *tree, mafView *view
       {
         mafSceneNode *n = sg->Vme2Node(m_VmeActive);
 
+        
         this->Append(RMENU_SHOW_VME, "Hide/Show","");
         this->AppendSeparator();
         this->Append(RMENU_SHOW_SUBTREE,  "Show sub-tree");
@@ -191,6 +197,9 @@ void mmgTreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
 			mafEventMacro(mafEvent(this, VME_SHOW, m_VmeActive, show));
     }
 		break;
+    case RMENU_ADD_TREE_LAYOUT:
+      mafEventMacro(mafEvent(this, mmgApplicationLayoutSettings::SAVE_TREE_LAYOUT_ID));
+    break;
 		case RMENU_SHOW_SUBTREE:
 			sg->VmeShowSubTree(m_VmeActive, true);
 		break;
