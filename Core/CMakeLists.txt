@@ -30,6 +30,8 @@ SET(PROJECT_SRCS
   mafNodeGeneric.h
   mafNodeIterator.cpp
   mafNodeIterator.h
+  mafNodeLayout.cpp
+  mafNodeLayout.h
   mafNodeManager.cpp
   mafNodeManager.h
   mafNodeRoot.cpp

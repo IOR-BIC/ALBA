@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:47:20 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-12-07 14:38:43 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,6 +23,7 @@
 #include "mafNodeFactory.h"
 #include "mafVersion.h"
 #include "mafNodeRoot.h"
+#include "mafNodeLayout.h"
 #include "mafNodeGeneric.h"
 #include "mafTagArray.h"
 #include "mafIndent.h"
@@ -70,6 +71,7 @@ mafNodeFactory::mafNodeFactory()
   //mafPlugNodeMacro(mafNodeRoot,"root for generic nodes tree");
   //mafPlugNodeMacro(mafNodeGeneric,"a generic node with only basic features");
   //mafPlugObjectMacro(mafTagArray,"a basic kind of attribute used to store key-value pairs");
+  mafPlugNodeMacro(mafNodeLayout,"node for layout list");
 }
 
 //------------------------------------------------------------------------------
