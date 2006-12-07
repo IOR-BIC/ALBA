@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationLayoutSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2006-12-07 11:37:45 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2006-12-07 14:42:02 $
+Version:   $Revision: 1.7 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -31,6 +31,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafSmartPointer.h"
 #include "mafVMEGeneric.h"
 #include "mafNodeIterator.h"
+#include "mafTagArray.h"
+#include "mafViewVTK.h"
+#include "mafRWIBase.h"
+#include "vtkCamera.h"
 
 #include "mmaApplicationLayout.h"
 #include "mafNode.h"
@@ -49,10 +53,8 @@ mmgApplicationLayoutSettings::mmgApplicationLayoutSettings(mafObserver *listener
 
   m_VisibilityVme = false;
   m_ModifiedLayouts = false;
-  InitializeLayout();
-
   m_LayoutFileSave = "";
-  
+
   m_Gui = new mmgGui(this);
   //application layout msf
   m_Gui->Label(_("Application layout msf"), true);
@@ -61,7 +63,8 @@ mmgApplicationLayoutSettings::mmgApplicationLayoutSettings(mafObserver *listener
   m_Gui->Button(SAVE_TREE_LAYOUT_ID,_("Save in root"));
   m_Gui->String(LAYOUT_NAME_ID,_("name"),&m_DefaultLayout);
   m_Gui->Bool(LAYOUT_VISIBILITY_VME, _("Visibility"), &m_VisibilityVme ,0,_("If checked the layout will be comprehensive of vme visibility"));
-
+  m_Gui->Button(APPLY_TREE_LAYOUT_ID,_("Apply Root Layout"));
+  
   //application layout 
   m_Gui->Divider(2);
   m_Gui->Divider(0);
@@ -69,11 +72,13 @@ mmgApplicationLayoutSettings::mmgApplicationLayoutSettings(mafObserver *listener
   m_List= m_Gui->ListBox(ID_LIST_LAYOUT,_(""),100);
   m_Gui->Button(OPEN_LAYOUT_ID,_("Load file"));
   m_Gui->Button(APPLY_LAYOUT_ID,_("Apply layout"));
-  m_Gui->Button(ADD_LAYOUT_ID,_("Add layout"));
+  m_Gui->Button(ADD_LAYOUT_ID,_("Add Current layout"));
   m_Gui->Button(REMOVE_LAYOUT_ID,_("Remove layout"));
   //m_Gui->Button(SAVE_APPLICATION_LAYOUT_ID,_("Save"));
   m_Gui->FileSave(SAVE_APPLICATION_LAYOUT_ID,_("Browse"), &m_LayoutFileSave);
-	m_Gui->Label(_(""));
+	m_Gui->Divider();
+
+  InitializeLayout();
 }
 //----------------------------------------------------------------------------
 mmgApplicationLayoutSettings::~mmgApplicationLayoutSettings() 
@@ -92,6 +97,9 @@ void mmgApplicationLayoutSettings::OnEvent(mafEventBase *maf_event)
     {
       SaveTreeLayout();
     }
+    break;
+    case APPLY_TREE_LAYOUT_ID:
+      ApplyTreeLayout();
     break;
     case LAYOUT_NAME_ID:
     break;
@@ -186,6 +194,26 @@ void mmgApplicationLayoutSettings::InitializeLayout()
   m_Storage->GetRoot()->SetName("ApplicationLayout");
   m_Storage->GetRoot()->Initialize();
   
+  //reg key for application layout
+  wxConfig *configApp = new wxConfig(wxEmptyString);
+  wxString layout_filename;
+  if(configApp->Read("DefaultLayoutFile", &layout_filename))
+  {
+    m_DefaultLayoutFile = layout_filename.c_str();
+  }
+  else
+  {
+    wxString layout_dir  = mafGetApplicationDirectory().c_str();
+    layout_dir << "\\Layout\\layout.msf";
+    configApp->Write("DefaultLayoutFile", layout_dir);
+    m_DefaultLayoutFile = layout_dir;
+  }
+  cppDEL(configApp);
+
+  if(wxFileExists(m_DefaultLayoutFile.GetCStr()))
+  {
+    LoadLayout(true);
+  }
 }
 //----------------------------------------------------------------------------
 void mmgApplicationLayoutSettings::AddLayout()
@@ -229,6 +257,7 @@ void mmgApplicationLayoutSettings::AddLayout()
     mafNode *root = m_Storage->GetRoot();
     mafSmartPointer<mafVMEGeneric> child;
     root->AddChild(child);
+    child->GetTagArray()->SetTag("VISIBLE_IN_THE_TREE",0);
     if(m_Layout = mmaApplicationLayout::SafeDownCast(child->GetAttribute("ApplicationLayout")));
     else
     {
@@ -300,14 +329,19 @@ void mmgApplicationLayoutSettings::SaveApplicationLayout()
   }
 }
 //----------------------------------------------------------------------------
-void mmgApplicationLayoutSettings::LoadLayout()
+void mmgApplicationLayoutSettings::LoadLayout(bool fileDefault)
 //----------------------------------------------------------------------------
 {
   if(m_Storage)
   {
-    mafString file = mafGetOpenFile("", _("All Files (*.*)|*.*"), _("Open Layout File"), GetGui()).c_str();
+    mafString file = "";
+
+    if(fileDefault)
+      file = m_DefaultLayoutFile;
+    else
+      file = mafGetOpenFile("", _("All Files (*.*)|*.*"), _("Open Layout File"), GetGui()).c_str();
     
-    if(file == mafString("")) return;
+    if(file.IsEmpty()) return;
     
     //clear tree
     m_Storage->GetRoot()->CleanTree();
@@ -326,11 +360,22 @@ void mmgApplicationLayoutSettings::LoadLayout()
     iter->Delete();
 
     m_ModifiedLayouts = true;
-    m_LayoutFileSave = _(file);
+    m_LayoutFileSave = file;
 
     if(m_Gui)
+    {
       m_Gui->Update();
 
+      //apply first layout
+      if(m_List->GetCount() != 0)
+      {
+        m_List->SetSelection(0);
+        m_Gui->Update();
+
+        if(!fileDefault)
+          ApplyLayout();
+      }
+    }
   }
 }
 //----------------------------------------------------------------------------
@@ -402,6 +447,106 @@ void mmgApplicationLayoutSettings::ApplyLayout()
         size[1] = (*iter).m_Size[1];
         wxRect rect(pos[0],pos[1],size[0],size[1]);
         v->GetFrame()->SetSize(rect);
+      }
+    }
+  }
+}
+//----------------------------------------------------------------------------
+void mmgApplicationLayoutSettings::ApplyTreeLayout()
+//----------------------------------------------------------------------------
+{
+  // Retrieve the saved layout.
+  mafNode *vme = m_ViewManager->GetCurrentRoot();
+  mmaApplicationLayout *app_layout = mmaApplicationLayout::SafeDownCast(vme->GetAttribute("ApplicationLayout")); 
+  
+  if (app_layout)
+  {
+    int answer = wxMessageBox(_("Do you want to load the layout?"), _("Warning"), wxYES_NO);
+    if (answer == wxNO)
+    {
+      return;
+    }
+    m_ViewManager->ViewDeleteAll();
+    int maximized, pos[2], size[2];
+    app_layout->GetApplicationInfo(maximized, pos, size);
+    if (maximized != 0)
+    {
+      m_Win->Maximize();
+    }
+    else
+    {
+      wxRect rect(pos[0],pos[1],size[0],size[1]);
+      m_Win->SetSize(rect);
+    }
+    bool tb_vis = app_layout->GetToolBarVisibility() != 0;
+    bool sb_vis = app_layout->GetSideBarVisibility() != 0;
+    bool lb_vis = app_layout->GetLogBarVisibility() != 0;
+    m_Win->ShowDockPane("toolbar", tb_vis);
+    m_Win->ShowDockPane("logbar", lb_vis);
+    m_Win->ShowDockPane("sidebar", sb_vis);
+    int num = app_layout->GetNumberOfViewsInLayout();
+    std::vector<mmaApplicationLayout::ViewLayoutInfo>::iterator iter = app_layout->GetLayoutList();
+    mafView *v = NULL;
+    for (int i = 0; i < num; i++, iter++)
+    {
+      if(m_ViewManager)
+      {
+        mafView* v = m_ViewManager->ViewCreate((*iter).m_Id);
+
+        /*
+        if(m_OpManager) 
+        {
+          VmeShow(m_OpManager->GetSelectedVme(),true);
+        }
+        */
+      }
+      mafYield();
+      v = m_ViewManager->GetSelectedView();
+      if (v)
+      {
+        v->SetName((*iter).m_Label.GetCStr());
+        pos[0] = (*iter).m_Position[0];
+        pos[1] = (*iter).m_Position[1];
+        size[0] = (*iter).m_Size[0];
+        size[1] = (*iter).m_Size[1];
+        wxRect rect(pos[0],pos[1],size[0],size[1]);
+        v->GetFrame()->SetSize(rect);
+
+        for (int i=0; i<(*iter).m_VisibleVmes.size();i++)
+        {
+          mafNode *node_restored = m_ViewManager->GetCurrentRoot()->FindInTreeById((*iter).m_VisibleVmes[i]);
+          if (node_restored)
+          {
+            mafEventMacro(mafEvent(this, VME_SHOW, node_restored, true));
+          }
+        }
+
+        if((*iter).m_VisibleVmes.size() > 0)
+        {
+          if(v->IsMAFType(mafViewVTK))
+          {
+            double view_up[3], position[3], focal_point[3];
+            view_up[0] = (*iter).m_CameraParameters[0];
+            view_up[1] = (*iter).m_CameraParameters[1];
+            view_up[2] = (*iter).m_CameraParameters[2];
+
+            position[0] = (*iter).m_CameraParameters[3];
+            position[1] = (*iter).m_CameraParameters[4];
+            position[2] = (*iter).m_CameraParameters[5];
+
+            focal_point[0] = (*iter).m_CameraParameters[6];
+            focal_point[1] = (*iter).m_CameraParameters[7];
+            focal_point[2] = (*iter).m_CameraParameters[8];
+
+            v->GetRWI()->GetCamera()->SetViewUp(view_up);
+            v->GetRWI()->GetCamera()->SetPosition(position);
+            v->GetRWI()->GetCamera()->SetFocalPoint(focal_point);
+          }
+          else //compound
+          {;}
+        }
+          
+
       }
     }
   }

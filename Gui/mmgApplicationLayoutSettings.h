@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationLayoutSettings.h,v $
 Language:  C++
-Date:      $Date: 2006-12-06 14:13:35 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2006-12-07 14:42:02 $
+Version:   $Revision: 1.5 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -38,6 +38,7 @@ public:
   enum APPLICATION_LAYOUT_WIDGET_ID
   {
     SAVE_TREE_LAYOUT_ID = MINID,
+    APPLY_TREE_LAYOUT_ID,
     LAYOUT_NAME_ID,
     LAYOUT_VISIBILITY_VME,
     ID_LIST_LAYOUT,
@@ -62,43 +63,47 @@ public:
   /** Return the Settings GUI.*/
   mmgGui* GetGui() {return m_Gui;};
 
+  /** Return Layout Modification Flag*/
+  bool GetModifiedLayouts(){return m_ModifiedLayouts;};
+ 
+  /** Store in file Layout List*/
+  void SaveApplicationLayout();
+
+   /** Save current application layout into the attribute mmaApplicationLayout, 
+  inside current MSF data*/
+  void SaveTreeLayout();
+
+  /** Add current layout to the list*/
+  void AddLayout();
+
+  /** Add current layout to the list*/
+  void ApplyTreeLayout();
+
 protected:
   /** Initialize Application layout used into the application.*/
   void InitializeLayout();
 
-  /** Save current application layout into the attribute mmaApplicationLayout, 
-  inside current MSF data*/
-  void SaveTreeLayout();
+  /** Load layouts stored in a file*/
+  void LoadLayout(bool fileDefault = false);
 
-  /** */
-  void LoadLayout();
-
-  /** */
-  void AddLayout();
-
-  /** */
+  /** Remove Selected Layout from the list*/
   void RemoveLayout();
 
-  /** */
+  /** Apply selected layout */
   void ApplyLayout();
-
-  /** */
-  void SaveApplicationLayout();
-
-  /** */
-  bool GetModifiedLayouts(){return m_ModifiedLayouts;};
 
   mmgMDIFrame           *m_Win;
   mafString              m_DefaultLayout;
+  mafString              m_DefaultLayoutFile;
+  
+  mafString              m_LayoutFileSave;
   mmgGui                *m_Gui;
   mafObserver           *m_Listener;
   mafViewManager        *m_ViewManager;
   mmaApplicationLayout  *m_Layout;
-  mafVMEStorage            *m_Storage;
+  mafVMEStorage         *m_Storage;
   int                    m_VisibilityVme;
   wxListBox				      *m_List;
   bool                   m_ModifiedLayouts;
-
-  mafString              m_LayoutFileSave;
 };
 #endif
