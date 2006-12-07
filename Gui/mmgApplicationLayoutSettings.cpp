@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationLayoutSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2006-12-06 14:13:35 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2006-12-07 11:37:45 $
+Version:   $Revision: 1.6 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -96,6 +96,7 @@ void mmgApplicationLayoutSettings::OnEvent(mafEventBase *maf_event)
     case LAYOUT_NAME_ID:
     break;
     case LAYOUT_VISIBILITY_VME:
+      m_Gui->Enable(SAVE_APPLICATION_LAYOUT_ID, m_VisibilityVme == 0);
     break;
     case ID_LIST_LAYOUT:
       //select
