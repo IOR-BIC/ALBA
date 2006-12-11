@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2006-12-11 16:46:55 $
+  Version:   $Revision: 1.19 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -108,7 +108,12 @@ void mmgCheckTree::ShowContextualMenu(wxMouseEvent& event)
 {
   int flag;
   wxTreeItemId i = m_tree->HitTest(wxPoint(event.GetX(),event.GetY()),flag);
-  bool vmeMenu = i.IsOk() && ((flag == wxTREE_HITTEST_ONITEMICON) || (flag == wxTREE_HITTEST_ONITEMLABEL));
+  bool vmeMenu = false;
+#ifdef WIN32
+  vmeMenu = i.IsOk() && ((flag == wxTREE_HITTEST_ONITEMICON) || (flag == wxTREE_HITTEST_ONITEMLABEL));
+#else
+  vmeMenu = i.IsOk();
+#endif
 
   mafEvent e;
   e.SetSender(this);
