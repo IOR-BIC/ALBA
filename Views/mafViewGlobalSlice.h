@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-17 13:34:45 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-12-11 16:10:54 $
+  Version:   $Revision: 1.5 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -75,7 +75,7 @@ public:
 	
 	/** 
 	Set slicer parameter to generate the slice. */
-	void SetSlice(double origin[3], int dn = 0);
+	void SetSlice(double origin[3], double dn = 0.0);
 
 	/** 
   Show/Hide VMEs into plugged sub-views*/
@@ -102,7 +102,7 @@ protected:
 	int				m_IDPlane;
 	int				m_SliceMode;
 	int				m_ViewIndex;
-	int				m_Dn;
+	double		m_Dn;
 	bool			m_GlobalBoundsInitialized;
 
 	mafSceneNode		*m_SelectedVolume;

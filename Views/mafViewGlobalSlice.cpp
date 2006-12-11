@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-21 16:17:37 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-12-11 16:10:54 $
+  Version:   $Revision: 1.12 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -105,7 +105,7 @@ mafViewGlobalSlice::mafViewGlobalSlice(wxString label, int camera_position, bool
 	m_TextColor[1]=1.0;
 	m_TextColor[2]=1.0;
 
-	m_Dn = 0;
+	m_Dn = 0.0;
 }
 //----------------------------------------------------------------------------
 mafViewGlobalSlice::~mafViewGlobalSlice()
@@ -408,12 +408,16 @@ void mafViewGlobalSlice::UpdateSliceParameters()
 				m_SliceOrigin[0] = new_bounds[2];
     break;
   }
+	m_GlobalSlider->SetNumberOfSteps((new_bounds[1]-new_bounds[0])*10);
   m_GlobalSlider->SetRange(new_bounds[0],new_bounds[1],m_SliceOrigin[index]);
+	m_GlobalSlider->SetValue(m_SliceOrigin[index]);
 	m_GlobalSlider->Update();
+
 	m_SliderOldOrigin = m_GlobalSlider->GetValue();
 	m_SliderOrigin = m_GlobalSlider->GetValue();
 	m_GlobalBoundsInitialized = true;
 
+	UpdateText();
   m_Gui->Update();
 }
 //----------------------------------------------------------------------------
@@ -451,7 +455,7 @@ mmgGui* mafViewGlobalSlice::CreateGui()
 void mafViewGlobalSlice::UpdateSlice()
 //----------------------------------------------------------------------------
 {
-	if(m_Dn != 0)
+	if(m_Dn != 0.0)
 	{
 		m_SliceOrigin[0] = m_SliceOrigin[0] + abs(m_SliceNormal[0]) * (m_Dn);
 		m_SliceOrigin[1] = m_SliceOrigin[1] + abs(m_SliceNormal[1]) * (m_Dn);
@@ -515,7 +519,7 @@ void mafViewGlobalSlice::UpdateSlice()
     }
   }
 
-	m_Dn = 0;
+	m_Dn = 0.0;
 
 	UpdateText();
   
@@ -543,7 +547,7 @@ void mafViewGlobalSlice::SetSlice(double origin[3], float xVect[3], float yVect[
   SetSlice(origin);
 }
 //----------------------------------------------------------------------------
-void mafViewGlobalSlice::SetSlice(double origin[3], int dn)
+void mafViewGlobalSlice::SetSlice(double origin[3], double dn)
 //----------------------------------------------------------------------------
 {
 	if(m_SliceMode != SLICE_ARB)
@@ -579,6 +583,7 @@ void mafViewGlobalSlice::CameraUpdate()
 		if(GlobalBounds[0]!=m_GlobalBounds[0]||GlobalBounds[1]!=m_GlobalBounds[1]||GlobalBounds[2]!=m_GlobalBounds[2]||GlobalBounds[3]!=m_GlobalBounds[3]||GlobalBounds[4]!=m_GlobalBounds[4]||GlobalBounds[5]!=m_GlobalBounds[5])
 		{
 			((mafVME*)node->GetRoot())->GetOutput()->Get4DBounds(m_GlobalBounds);
+			//m_GlobalBoundsInitialized = false;
 			UpdateSliceParameters();
 			UpdateSlice();
 		}
