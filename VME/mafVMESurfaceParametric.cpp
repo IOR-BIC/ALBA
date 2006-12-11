@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-07 15:01:03 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-12-11 16:49:24 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -54,6 +54,12 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // local defines
 //------------------------------------------------------------------------------
 
+
+//------------------------------------------------------------------------------
+// Events
+//------------------------------------------------------------------------------
+//MAF_ID_IMP(mafVMESurfaceParametric::CHANGE_PARAMETER);   // Event rised by change parameter 
+
 //------------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMESurfaceParametric);
 //------------------------------------------------------------------------------
@@ -63,38 +69,40 @@ mafVMESurfaceParametric::mafVMESurfaceParametric()
 //-------------------------------------------------------------------------
 {
   m_GeometryType = 0;
-	
-	m_RollOutCube     = NULL;
-	m_RollOutSphere   = NULL;
-	m_RollOutCylinder = NULL;
-	m_RollOutCone     = NULL;
-  m_RollOutPlane    = NULL;
-  m_PolyData        = NULL;
+	m_Dimensions   = _("");
 
-  m_SphereRadius  = 2.0;
-  m_SpherePhiRes  = 10.0;
-  m_SphereTheRes  = 10.0;
-  m_ConeHeight    = 5.0;
-  m_ConeRadius    = 2.0;
-  m_ConeCapping   = 0;
-  m_ConeRes       = 20.0;
+	m_RollOutCube = NULL;
+	m_RollOutSphere = NULL;
+	m_RollOutCylinder = NULL;
+	m_RollOutCone = NULL;
+  m_RollOutPlane = NULL;
+
+	
+  m_SphereRadius = 2.0;
+  m_SpherePhiRes = 10.0;
+  m_SphereTheRes = 10.0;
+  m_ConeHeight = 5.0;
+  m_ConeRadius = 2.0;
+  m_ConeCapping = 0;
+  m_ConeRes = 20.0;
   m_CylinderHeight = 5.0;
   m_CylinderRadius = 2.0;
-  m_CylinderRes   = 20.0;
-  m_CubeXLength   = 2.0;
-  m_CubeYLength   = 2.0;
-  m_CubeZLength   = 2.0;
-  m_PlaneXRes     = 2.0;
-  m_PlaneYRes     = 2.0;
-  
+  m_CylinderRes = 20.0;
+  m_CubeXLength = 2.0;
+  m_CubeYLength = 2.0;
+  m_CubeZLength = 2.0;
+  m_PlaneXRes = 2.0;
+  m_PlaneYRes = 2.0;
   m_PlaneOrigin[0] = m_PlaneOrigin[1] = m_PlaneOrigin[2] = 0;
   m_PlanePoint1[0] = 2.0;
   m_PlanePoint1[1] = m_PlanePoint1[2] = 0.0;
   m_PlanePoint2[1] = 3.0;
   m_PlanePoint2[0] = m_PlanePoint2[2] = 0.0;
 
+	m_PolyData = NULL;
+
 	mafNEW(m_Transform);
-	mafVMEOutputSurface *output = mafVMEOutputSurface::New(); // an output with no data
+	mafVMEOutputSurface *output=mafVMEOutputSurface::New(); // an output with no data
 	output->SetTransform(m_Transform); // force my transform in the output
 	SetOutput(output);
 
@@ -136,23 +144,82 @@ int mafVMESurfaceParametric::DeepCopy(mafNode *a)
 { 
   if (Superclass::DeepCopy(a)==MAF_OK)
   {
-    //deep copy
+    mafVMESurfaceParametric *vmeParametricSurface=mafVMESurfaceParametric::SafeDownCast(a);
+    m_Transform->SetMatrix(vmeParametricSurface->m_Transform->GetMatrix());
+    this->m_SphereRadius = vmeParametricSurface->m_SphereRadius;
+    this->m_SpherePhiRes = vmeParametricSurface->m_SpherePhiRes;
+    this->m_SphereTheRes = vmeParametricSurface->m_SphereTheRes;
+    this->m_ConeHeight = vmeParametricSurface->m_ConeHeight;
+    this->m_ConeRadius = vmeParametricSurface->m_ConeCapping;
+    this->m_ConeCapping = vmeParametricSurface->m_ConeCapping;
+    this->m_ConeRes = vmeParametricSurface->m_ConeRes;
+    this->m_CylinderHeight = vmeParametricSurface->m_CylinderHeight;
+    this->m_CylinderRadius = vmeParametricSurface->m_CylinderRadius;
+    this->m_CylinderRes = vmeParametricSurface->m_CylinderRes;
+    this->m_CubeXLength = vmeParametricSurface->m_CubeXLength;
+    this->m_CubeYLength = vmeParametricSurface->m_CubeYLength;
+    this->m_CubeZLength = vmeParametricSurface->m_CubeZLength;
+    this->m_PlaneXRes = vmeParametricSurface->m_PlaneXRes;
+    this->m_PlaneYRes = vmeParametricSurface->m_PlaneYRes;
 
-    return MAF_OK;
-  }  
-  return MAF_ERROR;
+    this->m_PlaneOrigin[0] = vmeParametricSurface->m_PlaneOrigin[0];
+    this->m_PlaneOrigin[1] = vmeParametricSurface->m_PlaneOrigin[1];
+    this->m_PlaneOrigin[2] = vmeParametricSurface->m_PlaneOrigin[2];
+
+    this->m_PlanePoint1[0] = vmeParametricSurface->m_PlanePoint1[0];
+    this->m_PlanePoint1[1] = vmeParametricSurface->m_PlanePoint1[1];
+    this->m_PlanePoint1[2] = vmeParametricSurface->m_PlanePoint1[2];
+
+    this->m_PlanePoint2[0] = vmeParametricSurface->m_PlanePoint2[0];
+    this->m_PlanePoint2[1] = vmeParametricSurface->m_PlanePoint2[1];
+    this->m_PlanePoint2[2] = vmeParametricSurface->m_PlanePoint2[2];
+
+     return MAF_OK;
+    }  
+    return MAF_ERROR;
 }
 
 //-------------------------------------------------------------------------
 bool mafVMESurfaceParametric::Equals(mafVME *vme)
 //-------------------------------------------------------------------------
 {
-  bool ret = false;
   if (Superclass::Equals(vme))
   {
-    //equality
+    if (     
+      m_Transform->GetMatrix()==((mafVMESurfaceParametric *)vme)->m_Transform->GetMatrix() &&
+      this->m_SphereRadius == ((mafVMESurfaceParametric *)vme)->m_SphereRadius &&
+      this->m_SpherePhiRes == ((mafVMESurfaceParametric *)vme)->m_SpherePhiRes &&
+      this->m_SphereTheRes == ((mafVMESurfaceParametric *)vme)->m_SphereTheRes &&
+      this->m_ConeHeight == ((mafVMESurfaceParametric *)vme)->m_ConeHeight  &&
+      this->m_ConeRadius == ((mafVMESurfaceParametric *)vme)->m_ConeCapping  &&
+      this->m_ConeCapping == ((mafVMESurfaceParametric *)vme)->m_ConeCapping  &&
+      this->m_ConeRes == ((mafVMESurfaceParametric *)vme)->m_ConeRes &&
+      this->m_CylinderHeight == ((mafVMESurfaceParametric *)vme)->m_CylinderHeight  &&
+      this->m_CylinderRadius == ((mafVMESurfaceParametric *)vme)->m_CylinderRadius  &&
+      this->m_CylinderRes == ((mafVMESurfaceParametric *)vme)->m_CylinderRes  &&
+      this->m_CubeXLength == ((mafVMESurfaceParametric *)vme)->m_CubeXLength  &&
+      this->m_CubeYLength == ((mafVMESurfaceParametric *)vme)->m_CubeYLength  &&
+      this->m_CubeZLength == ((mafVMESurfaceParametric *)vme)->m_CubeZLength  &&
+      this->m_PlaneXRes == ((mafVMESurfaceParametric *)vme)->m_PlaneXRes  &&
+      this->m_PlaneYRes == ((mafVMESurfaceParametric *)vme)->m_PlaneYRes  &&
+
+      this->m_PlaneOrigin[0] == ((mafVMESurfaceParametric *)vme)->m_PlaneOrigin[0]  &&
+      this->m_PlaneOrigin[1] == ((mafVMESurfaceParametric *)vme)->m_PlaneOrigin[1]  &&
+      this->m_PlaneOrigin[2] == ((mafVMESurfaceParametric *)vme)->m_PlaneOrigin[2]  &&
+
+      this->m_PlanePoint1[0] == ((mafVMESurfaceParametric *)vme)->m_PlanePoint1[0]  &&
+      this->m_PlanePoint1[1] == ((mafVMESurfaceParametric *)vme)->m_PlanePoint1[1]  &&
+      this->m_PlanePoint1[2] == ((mafVMESurfaceParametric *)vme)->m_PlanePoint1[2]  &&
+
+      this->m_PlanePoint2[0] == ((mafVMESurfaceParametric *)vme)->m_PlanePoint2[0]  &&
+      this->m_PlanePoint2[1] == ((mafVMESurfaceParametric *)vme)->m_PlanePoint2[1]  &&
+      this->m_PlanePoint2[2] == ((mafVMESurfaceParametric *)vme)->m_PlanePoint2[2] 
+      )
+    {
+      return MAF_OK;
+    }
   }
-  return ret;
+ return MAF_ERROR;
 }
 //-------------------------------------------------------------------------
 mafVMEOutputSurface *mafVMESurfaceParametric::GetSurfaceOutput()
@@ -237,11 +304,11 @@ void mafVMESurfaceParametric::SourceGui()
 {
 	if(m_Gui)
 	{
-		mmgGui *guiSphere   = new mmgGui(this);
-		mmgGui *guiCone     = new mmgGui(this);
+		mmgGui *guiSphere = new mmgGui(this);
+		mmgGui *guiCone = new mmgGui(this);
 		mmgGui *guiCylinder = new mmgGui(this);
-		mmgGui *guiCube     = new mmgGui(this);
-    mmgGui *guiPlane    = new mmgGui(this);
+		mmgGui *guiCube = new mmgGui(this);
+    mmgGui *guiPlane = new mmgGui(this);
 
   	guiSphere->Double(CHANGE_VALUE_SPHERE,_("Radius"), &m_SphereRadius);
     guiSphere->Double(CHANGE_VALUE_SPHERE,_("Phi res"), &m_SpherePhiRes);
@@ -281,6 +348,7 @@ void mafVMESurfaceParametric::SourceGui()
 				m_RollOutCylinder = m_Gui->RollOut(ID_ROLLOUT_CYLINDER,"Cylinder Parameters", guiCylinder, false);
 				m_RollOutCube = m_Gui->RollOut(ID_ROLLOUT_CUBE,_("Cube Parameters"), guiCube, false);
         m_RollOutPlane = m_Gui->RollOut(ID_ROLLOUT_PLANE,_("Plane Parameters"), guiPlane, false);
+
 			break;
 			case PARAMETRIC_CYLINDER:
 				m_RollOutSphere = m_Gui->RollOut(ID_ROLLOUT_SPHERE,_("Sphere Parameters"), guiSphere, false);
@@ -288,6 +356,7 @@ void mafVMESurfaceParametric::SourceGui()
 				m_RollOutCylinder = m_Gui->RollOut(ID_ROLLOUT_CYLINDER,_("Cylinder Parameters"), guiCylinder);
 				m_RollOutCube = m_Gui->RollOut(ID_ROLLOUT_CUBE,_("Cube Parameters"), guiCube, false);
         m_RollOutPlane = m_Gui->RollOut(ID_ROLLOUT_PLANE,_("Plane Parameters"), guiPlane, false);
+
 			break;
 			case PARAMETRIC_CUBE:
 				m_RollOutSphere = m_Gui->RollOut(ID_ROLLOUT_SPHERE,_("Sphere Parameters"), guiSphere, false);
@@ -295,6 +364,7 @@ void mafVMESurfaceParametric::SourceGui()
 				m_RollOutCylinder = m_Gui->RollOut(ID_ROLLOUT_CYLINDER,_("Cylinder Parameters"), guiCylinder, false);
 				m_RollOutCube = m_Gui->RollOut(ID_ROLLOUT_CUBE,_("Cube Parameters"), guiCube);
         m_RollOutPlane = m_Gui->RollOut(ID_ROLLOUT_PLANE,_("Plane Parameters"), guiPlane, false);
+
 			break;
       case PARAMETRIC_PLANE:
         m_RollOutSphere = m_Gui->RollOut(ID_ROLLOUT_SPHERE,_("Sphere Parameters"), guiSphere, false);
@@ -302,7 +372,8 @@ void mafVMESurfaceParametric::SourceGui()
         m_RollOutCylinder = m_Gui->RollOut(ID_ROLLOUT_CYLINDER,_("Cylinder Parameters"), guiCylinder, false);
         m_RollOutCube = m_Gui->RollOut(ID_ROLLOUT_CUBE,_("Cube Parameters"), guiCube, false);
         m_RollOutPlane = m_Gui->RollOut(ID_ROLLOUT_PLANE,_("Plane Parameters"), guiPlane);
-      break;
+
+        break;
 		}
 		
 		m_Gui->FitGui();
@@ -321,7 +392,7 @@ void mafVMESurfaceParametric::InternalUpdate()
 {
 	switch(m_GeometryType)
 	{
-	  case PARAMETRIC_SPHERE:
+	case PARAMETRIC_SPHERE:
 		{
       vtkMAFSmartPointer<vtkSphereSource> surf;
 			surf->SetRadius(m_SphereRadius);
@@ -331,55 +402,57 @@ void mafVMESurfaceParametric::InternalUpdate()
 			m_PolyData->DeepCopy(surf->GetOutput());
 			m_PolyData->Update();
 		}
-	  break;
-	  case PARAMETRIC_CONE:
+	break;
+	case PARAMETRIC_CONE:
+	{
+    vtkMAFSmartPointer<vtkConeSource> surf;
+    surf->SetHeight(m_ConeHeight);
+    surf->SetRadius(m_ConeRadius);
+    surf->SetCapping(m_ConeCapping);
+    surf->SetResolution(m_ConeRes);
+    surf->Update();
+    m_PolyData->DeepCopy(surf->GetOutput());
+    m_PolyData->Update();
+	}
+	break;
+	case PARAMETRIC_CYLINDER:
+	{
+    vtkMAFSmartPointer<vtkCylinderSource> surf;
+    surf->SetHeight(m_CylinderHeight);
+    surf->SetRadius(m_CylinderRadius);
+    surf->SetResolution(m_CylinderRes);
+    surf->Update();
+    m_PolyData->DeepCopy(surf->GetOutput());
+    m_PolyData->Update();
+
+	}
+	break;
+	case PARAMETRIC_CUBE:
+	{
+    vtkMAFSmartPointer<vtkCubeSource> surf;
+		surf->SetXLength(m_CubeXLength);
+		surf->SetYLength(m_CubeYLength);
+		surf->SetZLength(m_CubeZLength);
+		surf->Update();
+		m_PolyData->DeepCopy(surf->GetOutput());
+		m_PolyData->Update();
+	}
+	break;
+  
+  case PARAMETRIC_PLANE:
     {
-      vtkMAFSmartPointer<vtkConeSource> surf;
-      surf->SetHeight(m_ConeHeight);
-      surf->SetRadius(m_ConeRadius);
-      surf->SetCapping(m_ConeCapping);
-      surf->SetResolution(m_ConeRes);
-      surf->Update();
-      m_PolyData->DeepCopy(surf->GetOutput());
-      m_PolyData->Update();
-    }
-    break;
-	  case PARAMETRIC_CYLINDER:
-	  {
-      vtkMAFSmartPointer<vtkCylinderSource> surf;
-      surf->SetHeight(m_CylinderHeight);
-      surf->SetRadius(m_CylinderRadius);
-      surf->SetResolution(m_CylinderRes);
-      surf->Update();
-      m_PolyData->DeepCopy(surf->GetOutput());
-      m_PolyData->Update();
-	  }
-	  break;
-	  case PARAMETRIC_CUBE:
-	  {
-      vtkMAFSmartPointer<vtkCubeSource> surf;
-		  surf->SetXLength(m_CubeXLength);
-		  surf->SetYLength(m_CubeYLength);
-		  surf->SetZLength(m_CubeZLength);
-		  surf->Update();
-		  m_PolyData->DeepCopy(surf->GetOutput());
-		  m_PolyData->Update();
-	  }
-	  break;
-    case PARAMETRIC_PLANE:
-    {
-      vtkMAFSmartPointer<vtkPlaneSource> surf;
-      surf->SetXResolution(m_PlaneXRes);
-      surf->SetYResolution(m_PlaneYRes);
-      surf->SetOrigin(m_PlaneOrigin);
-      surf->SetPoint1(m_PlanePoint1);
-      surf->SetPoint2(m_PlanePoint2);
-      surf->Update();
-      vtkMAFSmartPointer<vtkTriangleFilter> triangle;
-      triangle->SetInput(surf->GetOutput());
-      triangle->Update();
-      m_PolyData->DeepCopy(triangle->GetOutput());
-      m_PolyData->Update();
+    vtkMAFSmartPointer<vtkPlaneSource> surf;
+    surf->SetXResolution(m_PlaneXRes);
+    surf->SetYResolution(m_PlaneYRes);
+    surf->SetOrigin(m_PlaneOrigin);
+    surf->SetPoint1(m_PlanePoint1);
+    surf->SetPoint2(m_PlanePoint2);
+    surf->Update();
+    vtkMAFSmartPointer<vtkTriangleFilter> triangle;
+    triangle->SetInput(surf->GetOutput());
+    triangle->Update();
+    m_PolyData->DeepCopy(triangle->GetOutput());
+    m_PolyData->Update();
     }
     break;
 	}
@@ -390,26 +463,28 @@ int mafVMESurfaceParametric::InternalStore(mafStorageElement *parent)
 {  
 	if (Superclass::InternalStore(parent)==MAF_OK)
 	{
-    if ( parent->StoreMatrix("Transform",&m_Transform->GetMatrix()) == MAF_OK && 
-		  parent->StoreInteger("Geometry", 	m_GeometryType) == MAF_OK &&
-      parent->StoreDouble("ShereRadius", m_SphereRadius) == MAF_OK &&
-      parent->StoreDouble("SpherePhiRes",m_SpherePhiRes) == MAF_OK &&
-      parent->StoreDouble("SphereThetaRes",m_SphereTheRes) == MAF_OK &&
-      parent->StoreDouble("ConeHieght",m_ConeHeight) == MAF_OK &&
-      parent->StoreDouble("ConeRadius",m_ConeRadius) == MAF_OK &&
-      parent->StoreInteger("ConeCapping",m_ConeCapping) == MAF_OK &&
-      parent->StoreDouble("ConeRes",m_ConeRes) == MAF_OK &&
-      parent->StoreDouble("CylinderHeight",m_CylinderHeight) == MAF_OK &&
-      parent->StoreDouble("CylinderRadius",m_CylinderRadius) == MAF_OK &&
-      parent->StoreDouble("CylinderRes",m_CylinderRes) == MAF_OK &&
-      parent->StoreDouble("CubeXLength",m_CubeXLength) == MAF_OK &&
-      parent->StoreDouble("CubeYLength",m_CubeYLength) == MAF_OK &&
-      parent->StoreDouble("CubeZLength",m_CubeZLength) == MAF_OK &&
-      parent->StoreDouble("PlaneXRes",m_PlaneXRes) == MAF_OK &&
-      parent->StoreDouble("PlaneYRes",m_PlaneYRes) == MAF_OK &&
-      parent->StoreVectorN("PlaneOrigin",m_PlaneOrigin,3) == MAF_OK &&
-      parent->StoreVectorN("PlanePoint1",m_PlanePoint1,3) == MAF_OK &&
-      parent->StoreVectorN("PlanePoint2",m_PlanePoint2,3) == MAF_OK )
+    if (
+		parent->StoreMatrix("Transform",&m_Transform->GetMatrix()) == MAF_OK && 
+		parent->StoreInteger("Geometry", 	m_GeometryType) == MAF_OK &&
+    parent->StoreDouble("ShereRadius", m_SphereRadius) == MAF_OK &&
+    parent->StoreDouble("SpherePhiRes",m_SpherePhiRes) == MAF_OK &&
+    parent->StoreDouble("SphereThetaRes",m_SphereTheRes) == MAF_OK &&
+    parent->StoreDouble("ConeHieght",m_ConeHeight) == MAF_OK &&
+    parent->StoreDouble("ConeRadius",m_ConeRadius) == MAF_OK &&
+    parent->StoreInteger("ConeCapping",m_ConeCapping) == MAF_OK &&
+    parent->StoreDouble("ConeRes",m_ConeRes) == MAF_OK &&
+    parent->StoreDouble("CylinderHeight",m_CylinderHeight) == MAF_OK &&
+    parent->StoreDouble("CylinderRadius",m_CylinderRadius) == MAF_OK &&
+    parent->StoreDouble("CylinderRes",m_CylinderRes) == MAF_OK &&
+    parent->StoreDouble("CubeXLength",m_CubeXLength) == MAF_OK &&
+    parent->StoreDouble("CubeYLength",m_CubeYLength) == MAF_OK &&
+    parent->StoreDouble("CubeZLength",m_CubeZLength) == MAF_OK &&
+    parent->StoreDouble("PlaneXRes",m_PlaneXRes) == MAF_OK &&
+    parent->StoreDouble("PlaneYRes",m_PlaneYRes) == MAF_OK &&
+    parent->StoreVectorN("PlaneOrigin",m_PlaneOrigin,3) == MAF_OK &&
+    parent->StoreVectorN("PlanePoint1",m_PlanePoint1,3) == MAF_OK &&
+    parent->StoreVectorN("PlanePoint2",m_PlanePoint2,3) == MAF_OK
+    )
 		return MAF_OK;
 	}
 	return MAF_ERROR;
@@ -422,7 +497,8 @@ int mafVMESurfaceParametric::InternalRestore(mafStorageElement *node)
 	if (Superclass::InternalRestore(node)==MAF_OK)
 	{
     mafMatrix matrix;
-    if ( node->RestoreMatrix("Transform",&matrix)==MAF_OK &&
+    if (
+      node->RestoreMatrix("Transform",&matrix)==MAF_OK &&
       node->RestoreInteger("Geometry",m_GeometryType) == MAF_OK && 
       node->RestoreDouble("ShereRadius",m_SphereRadius) == MAF_OK && 
       node->RestoreDouble("SpherePhiRes",m_SpherePhiRes) == MAF_OK && 
@@ -441,10 +517,11 @@ int mafVMESurfaceParametric::InternalRestore(mafStorageElement *node)
       node->RestoreDouble("PlaneYRes",m_PlaneYRes) == MAF_OK && 
       node->RestoreVectorN("PlaneOrigin",m_PlaneOrigin,3) == MAF_OK && 
       node->RestoreVectorN("PlanePoint1",m_PlanePoint1,3) == MAF_OK && 
-      node->RestoreVectorN("PlanePoint2",m_PlanePoint2,3) == MAF_OK )
+      node->RestoreVectorN("PlanePoint2",m_PlanePoint2,3) == MAF_OK
+    )
     {
-      m_Transform->SetMatrix(matrix); 
-		  return MAF_OK;
+    m_Transform->SetMatrix(matrix); 
+		return MAF_OK;
     }
 	}
   return MAF_ERROR;
@@ -453,6 +530,10 @@ int mafVMESurfaceParametric::InternalRestore(mafStorageElement *node)
 char** mafVMESurfaceParametric::GetIcon() 
 //-------------------------------------------------------------------------
 {
+
   #include "mafVMESurface.xpm"
   return mafVMESurface_xpm;
+
+
+
 }
