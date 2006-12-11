@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-11 16:49:24 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-12-11 16:53:35 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -69,7 +69,6 @@ mafVMESurfaceParametric::mafVMESurfaceParametric()
 //-------------------------------------------------------------------------
 {
   m_GeometryType = 0;
-	m_Dimensions   = _("");
 
 	m_RollOutCube = NULL;
 	m_RollOutSphere = NULL;
