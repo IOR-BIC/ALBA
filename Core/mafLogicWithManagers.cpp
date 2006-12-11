@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-07 14:40:35 $
-  Version:   $Revision: 1.91 $
+  Date:      $Date: 2006-12-11 16:48:34 $
+  Version:   $Revision: 1.92 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -327,6 +327,8 @@ void mafLogicWithManagers::Init(int argc, char **argv)
       m_OpManager->OpRun(op_type, (void *)op_param.GetCStr());
     }
   }
+
+  m_ApplicationLayoutSettings->LoadLayout(true);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::CreateMenu()
@@ -1007,6 +1009,19 @@ void mafLogicWithManagers::OnQuit()
     return;
   }
 
+	if(m_ApplicationLayoutSettings->GetModifiedLayouts())
+	{
+		int answer = wxMessageBox
+			(
+			_("would you like to save your layout list ?"),
+			_("Confirm"), 
+			wxYES_NO|wxCANCEL|wxICON_QUESTION , m_Win
+			);
+		if(answer == wxYES) 
+			m_ApplicationLayoutSettings->SaveApplicationLayout();
+	}
+
+
   if(m_VMEManager)
   {
     bool quit = false;
@@ -1021,18 +1036,6 @@ void mafLogicWithManagers::OnQuit()
       if(answer == wxYES) 
         m_VMEManager->MSFSave();
       quit = answer != wxCANCEL;
-
-      if(m_ApplicationLayoutSettings->GetModifiedLayouts())
-      {
-        int answer = wxMessageBox
-              (
-              _("would you like to save your layout list ?"),
-              _("Confirm"), 
-              wxYES_NO|wxCANCEL|wxICON_QUESTION , m_Win
-              );
-          if(answer == wxYES) 
-            m_ApplicationLayoutSettings->SaveApplicationLayout();
-      }
 
     }
     else 
@@ -1168,79 +1171,10 @@ void mafLogicWithManagers::RestoreLayout()
     {
       return;
     }
-    m_ViewManager->ViewDeleteAll();
-    int maximized, pos[2], size[2];
-    app_layout->GetApplicationInfo(maximized, pos, size);
-    if (maximized != 0)
-    {
-      m_Win->Maximize();
-    }
-    else
-    {
-      wxRect rect(pos[0],pos[1],size[0],size[1]);
-      m_Win->SetSize(rect);
-    }
-    bool tb_vis = app_layout->GetToolBarVisibility() != 0;
-    bool sb_vis = app_layout->GetSideBarVisibility() != 0;
-    bool lb_vis = app_layout->GetLogBarVisibility() != 0;
-    m_Win->ShowDockPane("toolbar", tb_vis);
-    m_Win->ShowDockPane("logbar", lb_vis);
-    m_Win->ShowDockPane("sidebar", sb_vis);
-    int num = app_layout->GetNumberOfViewsInLayout();
-    std::vector<mmaApplicationLayout::ViewLayoutInfo>::iterator iter = app_layout->GetLayoutList();
-    mafView *v = NULL;
-    for (int i = 0; i < num; i++, iter++)
-    {
-      ViewCreate((*iter).m_Id);
-      mafYield();
-      v = m_ViewManager->GetSelectedView();
-      if (v)
-      {
-        v->SetName((*iter).m_Label.GetCStr());
-        pos[0] = (*iter).m_Position[0];
-        pos[1] = (*iter).m_Position[1];
-        size[0] = (*iter).m_Size[0];
-        size[1] = (*iter).m_Size[1];
-        wxRect rect(pos[0],pos[1],size[0],size[1]);
-        v->GetFrame()->SetSize(rect);
-
-        for (int i=0; i<(*iter).m_VisibleVmes.size();i++)
-        {
-          mafNode *node_restored = m_VMEManager->GetRoot()->FindInTreeById((*iter).m_VisibleVmes[i]);
-          if (node_restored)
-          {
-            VmeShow(node_restored , true); // VME_SHOW
-          }
-        }
-
-        if((*iter).m_VisibleVmes.size() > 0)
-        {
-          if(v->IsMAFType(mafViewVTK))
-          {
-            double view_up[3], position[3], focal_point[3];
-            view_up[0] = (*iter).m_CameraParameters[0];
-            view_up[1] = (*iter).m_CameraParameters[1];
-            view_up[2] = (*iter).m_CameraParameters[2];
-
-            position[0] = (*iter).m_CameraParameters[3];
-            position[1] = (*iter).m_CameraParameters[4];
-            position[2] = (*iter).m_CameraParameters[5];
-
-            focal_point[0] = (*iter).m_CameraParameters[6];
-            focal_point[1] = (*iter).m_CameraParameters[7];
-            focal_point[2] = (*iter).m_CameraParameters[8];
-
-            v->GetRWI()->GetCamera()->SetViewUp(view_up);
-            v->GetRWI()->GetCamera()->SetPosition(position);
-            v->GetRWI()->GetCamera()->SetFocalPoint(focal_point);
-          }
-          else //compound
-          {;}
-        }
-          
-
-      }
-    }
+    
+    m_ApplicationLayoutSettings->SetVisibilityVME(true);
+    m_ApplicationLayoutSettings->ApplyTreeLayout();
+    m_ApplicationLayoutSettings->SetVisibilityVME(false);
   }
 }
 //----------------------------------------------------------------------------
