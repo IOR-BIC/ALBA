@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterImages.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-23 16:53:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-12-11 09:35:32 $
+  Version:   $Revision: 1.2 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -112,8 +112,8 @@ mmoRAWImporterImages::mmoRAWImporterImages(wxString label) : mafOp(label)
 	m_SliceLab    = NULL;
 	m_LookupTable	 = NULL;
 	m_Texture		   = NULL;
-
 	m_Plane = NULL;
+	m_DicomInteractor = NULL;
 
   m_GizmoStatus = GIZMO_NOT_EXIST;
 	m_SideToBeDragged = 0;
@@ -195,10 +195,10 @@ void mmoRAWImporterImages::CreatePipeline()
   ////// ROI gizmo
   vtkNEW(m_GizmoPlane);
 
-	vtkOutlineFilter	*outlineFilter = vtkOutlineFilter::New();
+	vtkMAFSmartPointer<vtkOutlineFilter> outlineFilter;
 	outlineFilter->SetInput(((vtkDataSet *)(m_GizmoPlane->GetOutput())));
 
-	vtkPolyDataMapper *polyDataMapper = vtkPolyDataMapper::New();
+	vtkMAFSmartPointer<vtkPolyDataMapper> polyDataMapper;
 	polyDataMapper->SetInput(outlineFilter->GetOutput());
 
 	vtkNEW(m_GizmoActor);
@@ -208,110 +208,120 @@ void mmoRAWImporterImages::CreatePipeline()
 	m_GizmoActor->SetMapper(polyDataMapper);
   ////// 
 
-	mafNEW(m_DicomInteractor);
-	m_DicomInteractor->SetListener(this);
-	m_Mouse->AddObserver(m_DicomInteractor, MCH_INPUT);
+	if(!this->m_TestMode)
+	{
+		mafNEW(m_DicomInteractor);
+		m_DicomInteractor->SetListener(this);
+		m_Mouse->AddObserver(m_DicomInteractor, MCH_INPUT);
+	}
 }
 //----------------------------------------------------------------------------
 void mmoRAWImporterImages::CreateGui()
 //----------------------------------------------------------------------------
 {
-	m_Dialog = new mmgDialogPreview(_("raw importer"), mafCLOSEWINDOW | mafRESIZABLE | mafUSEGUI | mafUSERWI);
+	int res=OP_RUN_OK;
+	if(!this->m_TestMode)
+	{
+		m_Dialog = new mmgDialogPreview(_("raw importer"), mafCLOSEWINDOW | mafRESIZABLE | mafUSEGUI | mafUSERWI);
 
-	wxString bit_choices[4] = {_("8 bits"),_("16 bits Big Endian"),_("16 bits Little Endian"),_("24 bits (RGB)")};
-  wxString type_choices[2] = {_("interleaved"),_("not interleaved")};
-	
-  m_Gui = new mmgGui(this);
-	m_Gui->SetListener(this);
+		wxString bit_choices[4] = {_("8 bits"),_("16 bits Big Endian"),_("16 bits Little Endian"),_("24 bits (RGB)")};
+		wxString type_choices[2] = {_("interleaved"),_("not interleaved")};
+		
+		m_Gui = new mmgGui(this);
+		m_Gui->SetListener(this);
 
-	m_Gui->Divider(0);
-	m_Gui->DirOpen(ID_OPEN_DIR, _("raw folder"),&m_RawDirectory);
-	m_Gui->String(ID_STRING_PREFIX,_("file pref."), &m_Prefix);
-	m_Gui->String(ID_STRING_PATTERN,_("file patt."), &m_Pattern);
-	m_Gui->String(ID_STRING_EXT,_("file ext."), &m_Extension);
-	m_Gui->Divider(0);
-	m_Gui->Combo(ID_BITS,_("bits/pixel"),&m_Bit,4,bit_choices);
-//	m_Gui->Combo(ID_RGB_TYPE,"",&m_RgbType,2,type_choices);
-  m_Gui->Enable(ID_RGB_TYPE,false);
-	m_Gui->Bool(ID_SIGNED,_("signed"),&m_Signed);
-	m_Gui->Divider(0);
-	m_Gui->Label(_("dimensions (x,y,z): z is the number of slices"));
-	m_Gui->Vector(ID_DIMENSIONS,"",m_Dimension,1,10000,1,10000,1,10000);
-	m_Gui->Bool(ID_ROI,_("define ROI"),&m_CropMode);
-	m_Gui->Label(_("spacing in mm/pixel (x,y,z)"));
-	//m_Gui->Vector(ID_SPC, "",m_Spacing,0.0000001, 100000,6); 	
-	m_Gui->Double(ID_SPC_X,_("x: "),&m_Spacing[0],0.0000001, 100000,0,6);
-	m_Gui->Double(ID_SPC_Y,_("y: "),&m_Spacing[1],0.0000001, 100000,0,6);
-	m_Gui->Double(ID_SPC_Z,_("z: "),&m_Spacing[2],0.0000001, 100000,0,6);
-	m_Gui->Divider(0);
-	//m_Gui->Label("z coordinates file:");
-	m_Gui->Button(ID_COORD,_("load"),_("z coord file:"), _("load the file for non regularly spaced raw volume"));
-	m_Gui->Divider(0);
-	m_Gui->Button(ID_GUESS,_("guess"),_("header size"));
-	m_Gui->Integer(ID_HEADER," ",&m_Header,0);
-	m_Gui->Integer(ID_OFFSET,_("file offset:"),&m_Offset,0, MAXINT,_("set the first slice number in the files name"));
-	m_Gui->Integer(ID_SPACING,_("file spc.:"),&m_FileSpacing,1, MAXINT, _("set the spacing between the slices in the files name"));
-	m_Gui->Divider(0);
-	m_Gui->OkCancel();
+		m_Gui->Divider(0);
+		m_Gui->DirOpen(ID_OPEN_DIR, _("raw folder"),&m_RawDirectory);
+		m_Gui->String(ID_STRING_PREFIX,_("file pref."), &m_Prefix);
+		m_Gui->String(ID_STRING_PATTERN,_("file patt."), &m_Pattern);
+		m_Gui->String(ID_STRING_EXT,_("file ext."), &m_Extension);
+		m_Gui->Divider(0);
+		m_Gui->Combo(ID_BITS,_("bits/pixel"),&m_Bit,4,bit_choices);
+	//	m_Gui->Combo(ID_RGB_TYPE,"",&m_RgbType,2,type_choices);
+		m_Gui->Enable(ID_RGB_TYPE,false);
+		m_Gui->Bool(ID_SIGNED,_("signed"),&m_Signed);
+		m_Gui->Divider(0);
+		m_Gui->Label(_("dimensions (x,y,z): z is the number of slices"));
+		m_Gui->Vector(ID_DIMENSIONS,"",m_Dimension,1,10000,1,10000,1,10000);
+		m_Gui->Bool(ID_ROI,_("define ROI"),&m_CropMode);
+		m_Gui->Label(_("spacing in mm/pixel (x,y,z)"));
+		//m_Gui->Vector(ID_SPC, "",m_Spacing,0.0000001, 100000,6); 	
+		m_Gui->Double(ID_SPC_X,_("x: "),&m_Spacing[0],0.0000001, 100000,0,6);
+		m_Gui->Double(ID_SPC_Y,_("y: "),&m_Spacing[1],0.0000001, 100000,0,6);
+		m_Gui->Double(ID_SPC_Z,_("z: "),&m_Spacing[2],0.0000001, 100000,0,6);
+		m_Gui->Divider(0);
+		//m_Gui->Label("z coordinates file:");
+		m_Gui->Button(ID_COORD,_("load"),_("z coord file:"), _("load the file for non regularly spaced raw volume"));
+		m_Gui->Divider(0);
+		m_Gui->Button(ID_GUESS,_("guess"),_("header size"));
+		m_Gui->Integer(ID_HEADER," ",&m_Header,0);
+		m_Gui->Integer(ID_OFFSET,_("file offset:"),&m_Offset,0, MAXINT,_("set the first slice number in the files name"));
+		m_Gui->Integer(ID_SPACING,_("file spc.:"),&m_FileSpacing,1, MAXINT, _("set the spacing between the slices in the files name"));
+		m_Gui->Divider(0);
+		m_Gui->OkCancel();
 
-	m_Gui->Show(true);
-  m_Gui->Update();
+		m_Gui->Show(true);
+		m_Gui->Update();
 
-	
-	//slice slider +++++++++++++++++++++++++++++++++++++++++++
-	wxPoint dp = wxDefaultPosition;
-	m_SliceLab     = new wxStaticText(m_Dialog, -1, _(" slice num. "),dp, wxSize(-1,16));
-	m_SliceText    = new wxTextCtrl  (m_Dialog, -1, "",					   dp, wxSize(30,16), wxNO_BORDER);
-	m_SliceSlider  = new wxSlider     (m_Dialog, -1,0,0,100,		   dp, wxSize(200,22));
+		
+		//slice slider +++++++++++++++++++++++++++++++++++++++++++
+		wxPoint dp = wxDefaultPosition;
+		m_SliceLab     = new wxStaticText(m_Dialog, -1, _(" slice num. "),dp, wxSize(-1,16));
+		m_SliceText    = new wxTextCtrl  (m_Dialog, -1, "",					   dp, wxSize(30,16), wxNO_BORDER);
+		m_SliceSlider  = new wxSlider     (m_Dialog, -1,0,0,100,		   dp, wxSize(200,22));
 
-	m_SliceSlider->SetValidator(mmgValidator(this,ID_SLICE,m_SliceSlider,&m_CurrentSlice,m_SliceText));
-	m_SliceText->SetValidator(mmgValidator(this,ID_SLICE,m_SliceText,  &m_CurrentSlice,m_SliceSlider,0,100));
+		m_SliceSlider->SetValidator(mmgValidator(this,ID_SLICE,m_SliceSlider,&m_CurrentSlice,m_SliceText));
+		m_SliceText->SetValidator(mmgValidator(this,ID_SLICE,m_SliceText,  &m_CurrentSlice,m_SliceSlider,0,100));
 
-	wxBoxSizer *slice_sizer = new wxBoxSizer(wxHORIZONTAL);
-	slice_sizer->Add(m_SliceLab,    0, wxALIGN_CENTER|wxRIGHT, 5);
-	slice_sizer->Add(m_SliceText,	 0, wxALIGN_CENTER|wxRIGHT, 5);
-	slice_sizer->Add(m_SliceSlider, 1, wxALIGN_CENTER|wxEXPAND);
-   
-	EnableWidgets(false);
+		wxBoxSizer *slice_sizer = new wxBoxSizer(wxHORIZONTAL);
+		slice_sizer->Add(m_SliceLab,    0, wxALIGN_CENTER|wxRIGHT, 5);
+		slice_sizer->Add(m_SliceText,	 0, wxALIGN_CENTER|wxRIGHT, 5);
+		slice_sizer->Add(m_SliceSlider, 1, wxALIGN_CENTER|wxEXPAND);
+	   
+		EnableWidgets(false);
 
-	//sizing & positioning +++++++++++++++++++++++++++++++++++++++++++
-	int x_init = mafGetFrame()->GetPosition().x;
-	int y_init = mafGetFrame()->GetPosition().y;
+		//sizing & positioning +++++++++++++++++++++++++++++++++++++++++++
+		int x_init = mafGetFrame()->GetPosition().x;
+		int y_init = mafGetFrame()->GetPosition().y;
 
-	wxBoxSizer *v_sizer = new wxBoxSizer(wxVERTICAL);
-	//v_sizer->Add(m_Rwi->m_RwiBase,1, wxEXPAND);
-	v_sizer->Add(slice_sizer, 0, wxEXPAND);
-	
-	/*wxBoxSizer *h_sizer = new wxBoxSizer(wxHORIZONTAL);
-	h_sizer->Add(v_sizer, 1, wxEXPAND);
-	h_sizer->Add(m_Gui,   0, wxLEFT, 5);*/
+		wxBoxSizer *v_sizer = new wxBoxSizer(wxVERTICAL);
+		//v_sizer->Add(m_Rwi->m_RwiBase,1, wxEXPAND);
+		v_sizer->Add(slice_sizer, 0, wxEXPAND);
+		
+		/*wxBoxSizer *h_sizer = new wxBoxSizer(wxHORIZONTAL);
+		h_sizer->Add(v_sizer, 1, wxEXPAND);
+		h_sizer->Add(m_Gui,   0, wxLEFT, 5);*/
 
-	m_Dialog->GetGui()->AddGui(m_Gui);
-	m_Dialog->GetRWI()->SetSize(0,0,380,200);
-	m_Dialog->m_RwiSizer->Add(v_sizer, 0, wxEXPAND);
-  m_Dialog->GetRWI()->SetListener(this);
-  m_Dialog->GetRWI()->SetSize(0,0,500,500);
-  m_Dialog->GetRWI()->CameraSet(CAMERA_CT);
-  m_Dialog->GetRWI()->m_RenFront->AddActor(m_Actor);
-  m_Dialog->GetRWI()->m_RenFront->AddActor(m_GizmoActor);
-  m_Dialog->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
+		m_Dialog->GetGui()->AddGui(m_Gui);
+		m_Dialog->GetRWI()->SetSize(0,0,380,200);
+		m_Dialog->m_RwiSizer->Add(v_sizer, 0, wxEXPAND);
+		m_Dialog->GetRWI()->SetListener(this);
+		m_Dialog->GetRWI()->SetSize(0,0,500,500);
+		m_Dialog->GetRWI()->CameraSet(CAMERA_CT);
+		m_Dialog->GetRWI()->m_RenFront->AddActor(m_Actor);
+		m_Dialog->GetRWI()->m_RenFront->AddActor(m_GizmoActor);
+		m_Dialog->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
 
-	int w,h;
-  m_Dialog->GetSize(&w,&h);
-  m_Dialog->SetSize(x_init+10,y_init+10,w,h);
+		int w,h;
+		m_Dialog->GetSize(&w,&h);
+		m_Dialog->SetSize(x_init+10,y_init+10,w,h);
 
-	//m_Dialog->SetSizer(h_sizer);    
-	//m_Dialog->SetAutoLayout(TRUE);	
-	//h_sizer->Fit(m_Dialog);	
+		//m_Dialog->SetSizer(h_sizer);    
+		//m_Dialog->SetAutoLayout(TRUE);	
+		//h_sizer->Fit(m_Dialog);	
 
-	//show the dialog (show return when the user choose ok or cancel ) ++++++++
-	m_Dialog->ShowModal();
+		//show the dialog (show return when the user choose ok or cancel ) ++++++++
+		m_Dialog->ShowModal();
 
-	//Import the file if required +++++++++++++++++++++++++++++++++	
-	int res = (m_Dialog->GetReturnCode() == wxID_OK) ? OP_RUN_OK : OP_RUN_CANCEL;
-	
-	if(res == OP_RUN_OK)
+		//Import the file if required +++++++++++++++++++++++++++++++++	
+		res = (m_Dialog->GetReturnCode() == wxID_OK) ? OP_RUN_OK : OP_RUN_CANCEL;
+		if(res == OP_RUN_OK)
      if( !Import() ) res = OP_RUN_CANCEL; // se l'import fallisce devi ritornare OP_RUN_CANCEL, cosi non verra chiamato DO
+	}
+	else
+	{
+		if( !Import() ) res = OP_RUN_CANCEL;
+	}
 	
 	OpStop(res);
 	return;
@@ -331,8 +341,11 @@ void mmoRAWImporterImages::OpStop(int result)
 		m_Mouse->RemoveObserver(m_DicomInteractor);
 
 	//cleanup +++++++++++++++++++++++++++++++++
-	m_Dialog->GetRWI()->m_RenFront->RemoveActor(m_Actor);
-	m_Dialog->GetRWI()->m_RenFront->RemoveActor(m_GizmoActor);
+	if(!this->m_TestMode)
+	{
+		m_Dialog->GetRWI()->m_RenFront->RemoveActor(m_Actor);
+		m_Dialog->GetRWI()->m_RenFront->RemoveActor(m_GizmoActor);
+	}
 	vtkDEL(m_Reader);
   vtkDEL(m_RedImage);
   vtkDEL(m_GreenImage);
@@ -350,7 +363,11 @@ void mmoRAWImporterImages::OpStop(int result)
  	vtkDEL(m_VtkRawDirectory);
 	cppDEL(m_Dialog);
 
-	mafEventMacro(mafEvent(this,result));
+	m_VolumeGray = NULL;
+	m_VolumeRGB = NULL;
+
+	if(!this->m_TestMode)
+		mafEventMacro(mafEvent(this,result));
 }
 //----------------------------------------------------------------------------
 void mmoRAWImporterImages::OpDo()
@@ -405,40 +422,12 @@ void mmoRAWImporterImages::	OnEvent(mafEventBase *maf_event)
   {	  
 		case ID_OPEN_DIR:
 		{
-			wxBusyInfo wait("Reading File, please wait...");
-
-			vtkNEW(m_VtkRawDirectory);
-			if (m_VtkRawDirectory->Open(m_RawDirectory) == 0)
-				wxLogMessage("Directory <%s> can not be opened", m_RawDirectory);
-
-			wxBusyInfo wait_info("Reading raw directory: please wait");
-
-			EnableWidgets(true);
-
-			m_NumberFile = m_VtkRawDirectory->GetNumberOfFiles();
-			m_NumberSlices = 0;
+			OnOpenDir();
 		}
 		break;
 		case ID_STRING_PREFIX:
 		{
-			const char* nome_file = (m_Prefix);
-			int length = m_Prefix.Len();
-			m_NumberSlices = 0;
-			for( int i = 0; i < m_NumberFile; i++)
-			{
-				if((strncmp(m_VtkRawDirectory->GetFile(i),nome_file,length) == 0))
-					m_NumberSlices++;	
-			}
-			
-			UpdateReader();
-			m_SliceSlider->SetRange(0,m_NumberSlices - 1);
-			m_CurrentSlice = m_NumberSlices/2;	
-			m_SliceSlider->SetValue(m_CurrentSlice);
-			m_SliceText->SetLabel(wxString::Format("%d",m_CurrentSlice));
-			m_Dimension[2] = m_NumberSlices;
-			m_Actor->VisibilityOn();
-			m_Dialog->GetRWI()->CameraReset();    	 
-			m_Gui->Update();			
+			OnStringPrefix();
 		}
 		break;
 		case ID_COORD:
@@ -807,7 +796,8 @@ void mmoRAWImporterImages::	UpdateReader()
 bool mmoRAWImporterImages::Import()
 //----------------------------------------------------------------------------
 {
-  wxBusyCursor wait;
+	if(!this->m_TestMode)
+		wxBusyCursor wait;
 	
 	wxString prefix = m_RawDirectory + "\\" + m_Prefix;
 	wxString pattern = m_Pattern + m_Extension;
@@ -908,9 +898,9 @@ bool mmoRAWImporterImages::Import()
 		vtkStructuredPoints	*structured_data = convert->GetOutput();
 		vtkPointData *data = structured_data->GetPointData();
 		vtkDataArray *scalars = data->GetScalars();
-		vtkDoubleArray *XFloatArray = vtkDoubleArray::New();
-		vtkDoubleArray *YFloatArray = vtkDoubleArray::New();
-		vtkDoubleArray *ZFloatArray = vtkDoubleArray::New();
+		vtkDoubleArray *XDoubleArray = vtkDoubleArray::New();
+		vtkDoubleArray *YDoubleArray = vtkDoubleArray::New();
+		vtkDoubleArray *ZDoubleArray = vtkDoubleArray::New();
 
 		double origin[3];
 		double currentValue;
@@ -919,13 +909,13 @@ bool mmoRAWImporterImages::Import()
 		for (int ix = 0; ix < m_Dimension[0]; ix++)
 		{
 			currentValue =  origin[0]+((double)ix)*m_Spacing[0];
-			XFloatArray->InsertNextValue(currentValue);					
+			XDoubleArray->InsertNextValue(currentValue);					
 		}
 
 		for (int iy = 0; iy < m_Dimension[1]; iy++)
 		{
 			currentValue =  origin[1]+((double)iy)*m_Spacing[1];
-			YFloatArray->InsertNextValue(currentValue);					
+			YDoubleArray->InsertNextValue(currentValue);					
 		}
 					 
 		char title[256];
@@ -938,14 +928,14 @@ bool mmoRAWImporterImages::Import()
 		for (int i = 0; i <= m_Dimension[2]; i++)
 		{
 			f_in>> currentValue;
-			ZFloatArray->InsertNextValue(currentValue);
+			ZDoubleArray->InsertNextValue(currentValue);
 		}
 		f_in.close();
 
     vtkRectilinearGrid *rectilinear_data = vtkRectilinearGrid::New();
-		rectilinear_data->SetXCoordinates(XFloatArray);
-		rectilinear_data->SetYCoordinates(YFloatArray);
-		rectilinear_data->SetZCoordinates(ZFloatArray);
+		rectilinear_data->SetXCoordinates(XDoubleArray);
+		rectilinear_data->SetYCoordinates(YDoubleArray);
+		rectilinear_data->SetZCoordinates(ZDoubleArray);
 		rectilinear_data->SetDimensions(m_Dimension[0],m_Dimension[1],m_Dimension[2]);
 		rectilinear_data->GetPointData()->SetScalars(scalars);
 
@@ -965,9 +955,9 @@ bool mmoRAWImporterImages::Import()
 			return false;
 		}
 
-		vtkDEL(XFloatArray);
-		vtkDEL(YFloatArray);
-		vtkDEL(ZFloatArray);
+		vtkDEL(XDoubleArray);
+		vtkDEL(YDoubleArray);
+		vtkDEL(ZDoubleArray);
 		vtkDEL(rectilinear_data);
 	} 
 	else 
@@ -998,9 +988,8 @@ bool mmoRAWImporterImages::Import()
   m_Output->SetName(name.c_str());
 
 	m_Output->GetTagArray()->SetTag(tag_Nature);
-	m_Output->Register(m_Output); //increment reference count so that the vme can't die
+	//m_Output->Register(m_Output); //increment reference count so that the vme can't die
 
-//	vtkDEL(m_VtkRawDirectory);
 	vtkDEL(r);
 	vtkDEL(convert);
 
@@ -1018,4 +1007,50 @@ int mmoRAWImporterImages::GetFileLength(const char * filename)
 	file.close();
 	len = (m-l);
 	return len;
+}
+//----------------------------------------------------------------------------
+void mmoRAWImporterImages::OnStringPrefix() 
+//----------------------------------------------------------------------------
+{
+	const char* nome_file = (m_Prefix);
+	int length = m_Prefix.Len();
+	m_NumberSlices = 0;
+	for( int i = 0; i < m_NumberFile; i++)
+	{
+		if((strncmp(m_VtkRawDirectory->GetFile(i),nome_file,length) == 0))
+			m_NumberSlices++;	
+	}
+			
+	UpdateReader();
+	m_Dimension[2] = m_NumberSlices;
+	if(!this->m_TestMode)
+	{
+		m_SliceSlider->SetRange(0,m_NumberSlices - 1);
+		m_CurrentSlice = m_NumberSlices/2;	
+		m_SliceSlider->SetValue(m_CurrentSlice);
+		m_SliceText->SetLabel(wxString::Format("%d",m_CurrentSlice));
+		m_Actor->VisibilityOn();
+		m_Dialog->GetRWI()->CameraReset();    	 
+		m_Gui->Update();
+	}
+}
+//----------------------------------------------------------------------------
+void mmoRAWImporterImages::OnOpenDir() 
+//----------------------------------------------------------------------------
+{
+	if(!this->m_TestMode)
+		wxBusyInfo wait("Reading File, please wait...");
+
+	vtkNEW(m_VtkRawDirectory);
+	if (m_VtkRawDirectory->Open(m_RawDirectory) == 0)
+		wxLogMessage("Directory <%s> can not be opened", m_RawDirectory);
+
+	if(!this->m_TestMode)
+	{
+		wxBusyInfo wait_info("Reading raw directory: please wait");
+		EnableWidgets(true);
+	}
+
+	m_NumberFile = m_VtkRawDirectory->GetNumberOfFiles();
+	m_NumberSlices = 0;
 }

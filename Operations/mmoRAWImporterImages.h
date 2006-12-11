@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterImages.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-23 16:53:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-12-11 09:35:32 $
+  Version:   $Revision: 1.2 $
   Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -72,6 +72,22 @@ public:
 	/** Undo the operation. */
 	void OpUndo();
 
+	void OnStringPrefix();
+	void OnOpenDir();
+
+	/** Setting for the test */
+	void SetRawDirectory(mafString Dir){m_RawDirectory=Dir;};
+	void SetSigned(int Signed){m_Signed=Signed;};
+	void SetDataType(int Bit){m_Bit=Bit;};
+	void SetCoordFile(wxString File){m_CoordFile=File;m_Rect = true;m_Spacing[2] = 1.0;};
+	void SetStringPrefix(wxString Prefix){m_Prefix=Prefix;};
+
+	void CreatePipeline();
+	void CreateGui();
+
+	/** Import the raw data into the Data Manager*/
+	bool Import();
+
   enum{
     CROP_SELECTED,
 	  ADD_CROP_ITEM,
@@ -84,18 +100,11 @@ protected:
 	/** Enable the widgets of the interface. */
 	void EnableWidgets(bool enable);
 
-	/** Import the raw data into the Data Manager*/
-	bool Import();
-
 	/** Update the preview */
 	void UpdateReader();
 
 	/** Calculate the length of the file in order to give a guessed value for the header size. */
 	int  GetFileLength(const char * filename);
-	
-	void CreatePipeline();
-
-	void CreateGui();
 
 	mafNode			 *m_Vme; 
 
