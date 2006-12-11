@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkContourVolumeMapper.h,v $
 Language:  C++
-Date:      $Date: 2006-11-28 12:56:03 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2006-12-11 16:51:38 $
+Version:   $Revision: 1.7 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -99,6 +99,11 @@ namespace vtkContourVolumeMapperNamespace
   // too high and the rendering will flicker down to low resolution too much.
   // Actual value is about 0.5, but the contour slider is very sticky at this value.
   const float triangles_per_voxel = 2.0 ;
+
+  // Transparency constant: defines fraction of triangles which are actually sorted on each render.
+  // eg if SortFraction = 10, then 1/10 of triangles sorted per render, takes 2*10-1 = 19 renders to complete
+  // Should be as large as possible without creating artefacts.
+  static const int SortFraction = 10 ;
 
   // container type for sorting depth values
   struct Idepth
@@ -205,7 +210,7 @@ protected:
   void InitializeRender(bool setup, vtkRenderer *renderer = NULL, vtkVolume *volume = NULL);
 
   /** OpenGL code to render the triangles */
-  void DrawCache(vtkRenderer *renderer, vtkVolume *volume);
+  void DrawCache(vtkRenderer *renderer, vtkVolume *volume, int lod);
 
   void EnableClipPlanes(bool enable);
 
@@ -262,16 +267,15 @@ protected:
   /** Free caches and set stats to undefined, eg after contour value changes */
   void ClearCachesAndStats() ;
 
-  /** calculate depth of vertex from screen (matrix is in openGL format) */
-  float DepthOfVertex(float *vertex, float *mat) const ;
-
   /** Calculate matrix required for depth transform
   Return product MP of modelview and projection matrices */
-  void CalculateDepthMatrix(float *mat) ;
+  void CalculateDepthMatrix(double *PM) const ;
 
-  /** Sort triangles into back-to-front order 
-  lod is cache 0 or 1 */
-  void SortTriangles(int lod) ;
+  /** calculate depth of vertex from screen */
+  float DepthOfVertex(double *PM, float *vertex) const ;
+
+  /** Sort triangles into back-to-front order */
+  void SortTriangles(int lod, bool sortall) ;
 
   vtkTimeStamp   BuildTime;
 

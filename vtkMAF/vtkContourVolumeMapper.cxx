@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkContourVolumeMapper.cxx,v $
 Language:  C++
-Date:      $Date: 2006-11-28 15:27:11 $
-Version:   $Revision: 1.12 $
+Date:      $Date: 2006-12-11 16:51:38 $
+Version:   $Revision: 1.13 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -15,42 +15,42 @@ All rights reserved.
 
 // CONTENTS
 //
-// vtkCxxRevisionMacro()
-// vtkStandardNewMacro()
-// vtkContourVolumeMapper()
-// ~vtkContourVolumeMapper()
-// ReleaseData()
-// PrintSelf()
-// SetInput()
-// EstimateRelevantVolume()
-// EstimateRelevantVolumeTemplate()
-// Render()
-// PrepareAccelerationDataTemplate()
-// EnableClipPlanes()
-// Update()
-// IsDataValid()
-// GetDataType()
-// GetOutput()
-// InitializeRender()
-// DrawCache()
-// RenderMCubes()
-// CreateMCubes()
-// CalculateVoxelIndexIncrements()
-// CalculateVoxelVertIndicesOffsets()
-// VoxelVolume()
-// EstimateTrianglesFromRelevantVolume()
-// EstimateNumberOfTriangles()
-// EstimateTimeToDrawDC()
-// EstimateTimeToDrawRMC()
-// BestLODForDrawCache()
-// BestLODForRenderMCubes()
-// HighestLODCached()
-// ClearCachesAndStats()
-// PrepareContours()
-// PrepareContoursTemplate()
-// DepthOfVertex()
-// CalculateDepthMatrix()
-// SortTriangles()
+// vtkContourVolumeMapper::vtkCxxRevisionMacro()
+// vtkContourVolumeMapper::vtkStandardNewMacro()
+// vtkContourVolumeMapper::vtkContourVolumeMapper()
+// vtkContourVolumeMapper::~vtkContourVolumeMapper()
+// vtkContourVolumeMapper::ReleaseData()
+// vtkContourVolumeMapper::PrintSelf()
+// vtkContourVolumeMapper::SetInput()
+// vtkContourVolumeMapper::EstimateRelevantVolume()
+// vtkContourVolumeMapper::EstimateRelevantVolumeTemplate()
+// vtkContourVolumeMapper::Render()
+// vtkContourVolumeMapper::PrepareAccelerationDataTemplate()
+// vtkContourVolumeMapper::EnableClipPlanes()
+// vtkContourVolumeMapper::Update()
+// vtkContourVolumeMapper::IsDataValid()
+// vtkContourVolumeMapper::GetDataType()
+// vtkContourVolumeMapper::GetOutput()
+// vtkContourVolumeMapper::InitializeRender()
+// vtkContourVolumeMapper::DrawCache()
+// vtkContourVolumeMapper::RenderMCubes()
+// vtkContourVolumeMapper::CreateMCubes()
+// vtkContourVolumeMapper::CalculateVoxelIndexIncrements()
+// vtkContourVolumeMapper::CalculateVoxelVertIndicesOffsets()
+// vtkContourVolumeMapper::VoxelVolume()
+// vtkContourVolumeMapper::EstimateTrianglesFromRelevantVolume()
+// vtkContourVolumeMapper::EstimateNumberOfTriangles()
+// vtkContourVolumeMapper::EstimateTimeToDrawDC()
+// vtkContourVolumeMapper::EstimateTimeToDrawRMC()
+// vtkContourVolumeMapper::BestLODForDrawCache()
+// vtkContourVolumeMapper::BestLODForRenderMCubes()
+// vtkContourVolumeMapper::HighestLODCached()
+// vtkContourVolumeMapper::ClearCachesAndStats()
+// vtkContourVolumeMapper::PrepareContours()
+// vtkContourVolumeMapper::PrepareContoursTemplate()
+// vtkContourVolumeMapper::CalculateDepthMatrix()
+// vtkContourVolumeMapper::DepthOfVertex()
+// vtkContourVolumeMapper::SortTriangles()
 //
 // Polyline2D::Reallocate()
 // Polyline2D::Allocate()
@@ -97,14 +97,15 @@ All rights reserved.
 #include "vtkMarchingSquaresCases.h"
 #include "vtkContourVolumeMapper.h"
 #include <algorithm>
-#include <fstream>
+#include <cmath>
+#include "mafMatrix.h"
 
 
 static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCubesTriangleCases::GetCases();
 
 using namespace vtkContourVolumeMapperNamespace;
 
-vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.12 $");
+vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.13 $");
 vtkStandardNewMacro(vtkContourVolumeMapper);
 
 
@@ -305,12 +306,12 @@ void vtkContourVolumeMapper::Render(vtkRenderer *renderer, vtkVolume *volume)
   if (this->ContourValue != this->PrevContourValue)
     ClearCachesAndStats() ;
 
-  // find the higest lod which DrawCache() can draw
+  // find the highest lod which DrawCache() can draw
   int lod = BestLODForDrawCache(renderer) ;
 
   // if this lod is cached, draw it, else need to go to RenderMCubes() to get it cached
   if (this->CacheCreated && (this->TriangleCache[lod] != NULL)) {
-    this->DrawCache(renderer, volume);
+    this->DrawCache(renderer, volume, lod);
     return;
   }
 
@@ -786,40 +787,45 @@ void vtkContourVolumeMapper::InitializeRender(bool setup, vtkRenderer *renderer,
 //------------------------------------------------------------------------------
 // OpenGL code which initializes OpenGL and renders the cached triangles.
 // Draws either normal or LOD cache
-void vtkContourVolumeMapper::DrawCache(vtkRenderer *renderer, vtkVolume *volume)
+void vtkContourVolumeMapper::DrawCache(vtkRenderer *renderer, vtkVolume *volume, int lod)
 //------------------------------------------------------------------------------
 {
   // use cache if contour value not changed and cache exists
-  const bool useCache = (this->PrevContourValue == this->ContourValue) && this->CacheCreated;
+  const bool useCache = (this->PrevContourValue == this->ContourValue)
+    && this->CacheCreated
+    && (this->TriangleCache[lod] != NULL)
+    && (this->NumberOfTriangles[lod] >= 0) ;
   assert(useCache);
 
   this->Timer->StartTimer();
 
-  // find highest lod with valid cache
-  int lod = HighestLODCached() ;
-  assert(lod >= 0) ;
-
-
   int nvert = 3*this->NumberOfTriangles[lod] ;
   InitializeRender(true, renderer, volume);
 
-  //  if (this->m_Alpha < 1.0){
-  //    // transparency enabled so sort triangles and render
-  //    SortTriangles(lod) ;
-  //
-  //    if (this->NumberOfTriangles[lod] > 0){
-  //      glInterleavedArrays(GL_N3F_V3F, 0, this->TriangleCache[lod]);
-  //      if (this->NumberOfTriangles[lod] > 0)
-  //        glDrawElements(GL_TRIANGLES, nvert, GL_UNSIGNED_INT, ordered_vertices[lod]);
-  //    }
-  //  }
-  //  else{
 
-  // draw the triangles
-  if (this->NumberOfTriangles[lod] > 0){
-    glInterleavedArrays(GL_N3F_V3F, 0, this->TriangleCache[lod]);
-    if (this->NumberOfTriangles[lod] > 0)
-      glDrawArrays(GL_TRIANGLES, 0, nvert);
+  bool sortall = false ;
+
+  if (this->m_Alpha < 1.0){
+    // transparency enabled so sort triangles and render
+
+    sortall = (renderer->GetAllocatedRenderTime() > (float)(SortFraction)*this->TimeToDrawDC[lod]) ;
+    SortTriangles(lod, sortall) ;
+
+    if (this->NumberOfTriangles[lod] > 0){
+      glDisable(GL_DEPTH_TEST) ;
+      glInterleavedArrays(GL_N3F_V3F, 0, this->TriangleCache[lod]);
+      if (this->NumberOfTriangles[lod] > 0)
+        glDrawElements(GL_TRIANGLES, nvert, GL_UNSIGNED_INT, ordered_vertices[lod]);
+    }
+  }
+  else{
+    // render the triangles
+    glEnable(GL_DEPTH_TEST) ;
+    if (this->NumberOfTriangles[lod] > 0){
+      glInterleavedArrays(GL_N3F_V3F, 0, this->TriangleCache[lod]);
+      if (this->NumberOfTriangles[lod] > 0)
+        glDrawArrays(GL_TRIANGLES, 0, nvert);
+    }
   }
 
 
@@ -828,14 +834,23 @@ void vtkContourVolumeMapper::DrawCache(vtkRenderer *renderer, vtkVolume *volume)
 
   this->Timer->StopTimer();
 
-  // if not LOD, note time taken to draw non-LOD triangles
+  // note time taken to draw triangles
   this->TimeToDraw = (float)this->Timer->GetElapsedTime();
-  this->TimeToDrawDC[lod] = this->TimeToDraw ;
 
-  //mafErrorMacro("draw cache: lod= " << lod << "\n" 
-  //  << "\t" << " time limit= " << 60.0*renderer->GetAllocatedRenderTime() << " time= " << 60.0*this->TimeToDraw << "\n" 
-  //  << "\t" << "no. of triangles=" << this->NumberOfTriangles[lod] << "\n") ;
+  if ((this->m_Alpha < 1.0) && sortall){
+    // transparency on: sorting all triangles at once is not supposed to be typical, 
+    // and should only happen when time is not critical,
+    // so we only save a fraction of the time taken.
+    this->TimeToDrawDC[lod] = this->TimeToDraw / (float)SortFraction ;
+  }
+  else
+    this->TimeToDrawDC[lod] = this->TimeToDraw ;
 
+
+  // mafLogMessage("draw cache: lod = %d", lod) ;
+  // mafLogMessage("\t time limit = %f time = %f", 60.0*renderer->GetAllocatedRenderTime(), 60.0*this->TimeToDraw) ;
+  // mafLogMessage("\t no. of triangles = %d\n", this->NumberOfTriangles[lod]) ;
+ 
 #ifdef _DEBUG
   printf("\rCache %d: %.2f %d                                   \r", int(lod), (float)this->Timer->GetElapsedTime(), this->NumberOfTriangles[lod]);
 #endif
@@ -851,22 +866,13 @@ void vtkContourVolumeMapper::DrawCache(vtkRenderer *renderer, vtkVolume *volume)
 //------------------------------------------------------------------------------
 // Marching cubes algorithm
 // Constructs triangles and renders them.
-
-// Nigel McFarlane 14.11.06 Changes to RenderMCubes()
-// 1) Optimization given priority over caching, ie optim => no caching, instead of caching => no optim.
-// 2) Cache is deleted if smaller than block buffer, removing danger of program crash.
-// 3) LOD is allowed in z direction if resolution ok.
-// 4) Gradient calculations tidied and dependence on LOD removed.
-// 5) RenderMCubes estimates no. of triangles in advance, and uses LOD when no. of
-//    triangles is too large or unknown (eg for new contour value).
-// 6) Set LOD loop to outer loop
-//    Put calculation of lodxy and lodz increments and voxel offsets cubes in functions
+// Predicts no. of triangles and time to draw before rendering, and chooses appropriate level of detail.
+// Triangles are cached if possible.
 template<typename DataType> void vtkContourVolumeMapper::RenderMCubes(vtkRenderer *renderer, vtkVolume *volume, const DataType *dataPointer)
 //------------------------------------------------------------------------------
 {
   int lod ;
   int numTrianglesRunningTotal[4] = {0,0,0,0} ;       // keeps running total of triangles
-
 
   // Get max level of detail
   int LODLevel = BestLODForRenderMCubes(renderer) ;
@@ -2017,17 +2023,35 @@ template<typename DataType> void vtkContourVolumeMapper::PrepareContoursTemplate
 
 
 
+
+
+
+//------------------------------------------------------------------------------
+// Get transform matrix for depth calculation
+void vtkContourVolumeMapper::CalculateDepthMatrix(double *PM) const
+//------------------------------------------------------------------------------
+{
+  // Get product MP of modelview and projection matrices
+  double M[16], P[16] ;
+
+  glGetDoublev(GL_MODELVIEW_MATRIX, M) ;
+  glGetDoublev(GL_PROJECTION_MATRIX, P) ;
+
+  vtkMatrix4x4::Multiply4x4(P, M, PM) ;
+}
+
+
+
 //------------------------------------------------------------------------------
 // calculate depth of vertex from screen
-// matrix MP is in openGL format
-float vtkContourVolumeMapper::DepthOfVertex(float *v, float *MP) const
+float vtkContourVolumeMapper::DepthOfVertex(double *PM, float *v) const
 //------------------------------------------------------------------------------
 {
   float zhomo, whomo, z ;
 
-  // transform in homogeneous coords v*M
-  zhomo = v[0]*MP[8] + v[1]*MP[9] + v[2]*MP[10] + MP[11] ;
-  whomo = v[0]*MP[12] + v[1]*MP[13] + v[2]*MP[14] + MP[15] ;
+  // transform in homogeneous coords PM*v
+  zhomo = v[0]*PM[2] + v[1]*PM[6] + v[2]*PM[10] + PM[14] ;
+  whomo = v[0]*PM[3] + v[1]*PM[7] + v[2]*PM[11] + PM[15] ;
 
   // perspective division
   z = zhomo/whomo ;
@@ -2038,46 +2062,19 @@ float vtkContourVolumeMapper::DepthOfVertex(float *v, float *MP) const
 
 
 //------------------------------------------------------------------------------
-// Calculate matrix required for depth transform
-// Return product MP of modelview and projection matrices
-void vtkContourVolumeMapper::CalculateDepthMatrix(float *MP)
-//------------------------------------------------------------------------------
-{
-  float M[16], P[16] ;
-
-  glMatrixMode(GL_MODELVIEW);
-  glPushMatrix() ;
-
-  glGetFloatv(GL_MODELVIEW_MATRIX, M) ;
-  glGetFloatv(GL_PROJECTION_MATRIX, P) ;
-
-  glLoadIdentity() ;
-  glLoadMatrixf(P) ;
-  glMultMatrixf(M) ;
-  glGetFloatv(GL_MODELVIEW_MATRIX, MP) ;
-
-  glPopMatrix() ;
-}
-
-
-
-
-
-//------------------------------------------------------------------------------
 // Sort triangles into back-to-front order
-// lod is cache 0 or 1 
-void vtkContourVolumeMapper::SortTriangles(int lod)
+void vtkContourVolumeMapper::SortTriangles(int lod, bool sortall)
 //------------------------------------------------------------------------------
 {
+  static int isort = 0 ;    // remembers which fraction of the triangles got sorted last time
 
   // check that we have some triangles to draw
   if (this->TriangleCache[lod] == NULL)
     return ;
 
-
   // Get depth transform matrix
-  float MP[16] ;
-  CalculateDepthMatrix(MP) ;
+  double PM[16] ;
+  CalculateDepthMatrix(PM) ;
 
   // allocate list of depth values
   int ntri = this->NumberOfTriangles[lod] ;
@@ -2086,7 +2083,7 @@ void vtkContourVolumeMapper::SortTriangles(int lod)
 
   // allocate vertex order array, if necessary
   // (deallocated in the destructor)
-  if ((this->ordered_vertices == NULL) || (this->ContourValue != this->PrevContourValue)){
+  if ((this->ordered_vertices[lod] == NULL) || (this->ContourValue != this->PrevContourValue)){
     // allocate if undefined or no. of triangles has changed
     delete[] ordered_vertices[lod] ;
     this->ordered_vertices[lod] = new unsigned int[nvert] ;
@@ -2096,33 +2093,39 @@ void vtkContourVolumeMapper::SortTriangles(int lod)
       this->ordered_vertices[lod][j] = j ;
   }
 
-  this->Timer->StopTimer() ;
-  this->Timer->StartTimer() ;
-
   // loop through triangles and calculate depth of 1st vertex of each triangle
   // store triangles in order of previous sort
   int i, j, jj ;
-  float *v, depth, mindepth, maxdepth ;
-  for (i = 0, j = 0, mindepth = 10000.0, maxdepth = -10000.0 ;  i < ntri ;  i++, j+=3){
+  float *v, depth ;
+  for (i = 0, j = 0 ;  i < ntri ;  i++, j+=3){
     jj = ordered_vertices[lod][j] ;             // get index jj of next vertex in depth order
     v = this->TriangleCache[lod] + 6*jj + 3 ;   // get pointer to vertex jj
-    depth = DepthOfVertex(v, MP) ;              // calculate depth
+    depth = DepthOfVertex(PM, v) ;              // calculate depth
     depthlist[i].depth = depth ;                // store depth and 1st vertex of triangle i
     depthlist[i].index = jj ;
-
-    mindepth = std::min(depth, mindepth) ;
-    maxdepth = std::max(depth, maxdepth) ;
   }
 
-  this->Timer->StopTimer() ;
-  float t1 = 60.0*this->Timer->GetElapsedTime() ;
-  this->Timer->StartTimer() ;
+
 
   // sort triangles into order
-  std::sort<Idepth*>(depthlist, depthlist+ntri-1) ;
+  if (sortall){
+    // sort all the triangles
+    std::sort<Idepth*>(depthlist, depthlist+ntri-1) ;
+  }
+  else{
+    // sort only a fraction of the triangles each time
+    int imax = 2*(SortFraction-1) ;
+    int sortstep = (int)(0.5 * (float)ntri / (float)SortFraction) ; 
+    int j1 = isort * sortstep ;
+    int j2 = (ntri-1) - (imax - isort)*sortstep ;
 
-  this->Timer->StopTimer() ;
-  float t2 = 60.0*this->Timer->GetElapsedTime() ;
+    isort++ ;
+    if (isort > imax)
+      isort = 0 ;
+
+    std::sort<Idepth*>(depthlist+j1, depthlist+j2) ;
+  }
+
 
 
   // create ordered list of all vertices
@@ -2135,10 +2138,10 @@ void vtkContourVolumeMapper::SortTriangles(int lod)
     ov[j+2] = index+2 ;
   }
 
-  vtkErrorMacro("sort: " << " triangles = " << this->NumberOfTriangles[lod] << " " << t1 << " " << t2 << "\n") ;
-
   delete[] depthlist ;
 }
+
+
 
 
 
