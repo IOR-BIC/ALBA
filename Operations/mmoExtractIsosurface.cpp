@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoExtractIsosurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-10 11:52:03 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-12-11 16:44:12 $
+  Version:   $Revision: 1.17 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -311,6 +311,7 @@ void mmoExtractIsosurface::CreateOpDialog()
 
   CreateVolumePipeline();
   CreateSlicePipeline();
+  this->m_Rwi->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mmoExtractIsosurface::CreateVolumePipeline()
@@ -348,6 +349,8 @@ void mmoExtractIsosurface::CreateVolumePipeline()
   m_ContourActor->SetMapper(m_ContourVolumeMapper);
 	m_ContourActor->PickableOff();
 
+	m_ContourVolumeMapper->Modified();
+	m_ContourVolumeMapper->Update();
   m_Rwi->m_RenFront->AddActor(m_ContourActor);
 
   // bounding box actor
