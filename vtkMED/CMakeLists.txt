@@ -18,6 +18,9 @@ SET(vtkMED_SRCS
   vtkXRayVolumeMapper.h
   vtkWeightedLandmarkTransform.cxx
   vtkWeightedLandmarkTransform.h
+  mafClassicICPRegistration.cxx
+  mafClassicICPRegistration.h
+  mafICPUtility.h
 )
 
 # List the kits from VTK that are needed by this project.

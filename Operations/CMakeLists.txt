@@ -20,6 +20,8 @@ SET(PROJECT_SRCS
   mmoVolumeMeasure.h
   mmoRAWImporterImages.cpp
   mmoRAWImporterImages.h
+  mmoClassicICPRegistration.cpp
+  mmoClassicICPRegistration.h
 )
 
 IF (MAF_USE_ITK)
