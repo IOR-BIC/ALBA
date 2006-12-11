@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationLayoutSettings.h,v $
 Language:  C++
-Date:      $Date: 2006-12-07 14:42:02 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2006-12-11 16:46:17 $
+Version:   $Revision: 1.6 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -23,6 +23,8 @@ class mafViewManager;
 class mmaApplicationLayout;
 class mmgMDIFrame;
 class mafVMEStorage;
+class mafXMLStorage;
+class mafVMERoot;
 
 //----------------------------------------------------------------------------
 // mmgApplicationLayoutSettings :
@@ -46,6 +48,7 @@ public:
     APPLY_LAYOUT_ID,
     ADD_LAYOUT_ID,
     REMOVE_LAYOUT_ID,
+    DEFAULT_LAYOUT_ID,
     SAVE_APPLICATION_LAYOUT_ID,
   };
 
@@ -59,6 +62,10 @@ public:
 
   /** Set a reference to the interface elements to store their visibility.*/
   void SetApplicationFrame(mmgMDIFrame *win) {m_Win = win;};
+
+   /** Set a reference to the interface elements to store their visibility.*/
+  void SetVisibilityVME(bool value) {m_VisibilityVme = value;};
+
 
   /** Return the Settings GUI.*/
   mmgGui* GetGui() {return m_Gui;};
@@ -79,12 +86,13 @@ public:
   /** Add current layout to the list*/
   void ApplyTreeLayout();
 
+  
+  /** Load layouts stored in a file*/
+  void LoadLayout(bool fileDefault = false);
+
 protected:
   /** Initialize Application layout used into the application.*/
   void InitializeLayout();
-
-  /** Load layouts stored in a file*/
-  void LoadLayout(bool fileDefault = false);
 
   /** Remove Selected Layout from the list*/
   void RemoveLayout();
@@ -92,18 +100,27 @@ protected:
   /** Apply selected layout */
   void ApplyLayout();
 
+  /** Set layout as default*/
+   void SetLayoutAsDefault();
+
   mmgMDIFrame           *m_Win;
-  mafString              m_DefaultLayout;
+  mafString              m_DefaultLayoutName;
   mafString              m_DefaultLayoutFile;
+  mafString              m_ActiveLayoutName;
+  mafString              m_LayoutType;
   
   mafString              m_LayoutFileSave;
   mmgGui                *m_Gui;
   mafObserver           *m_Listener;
   mafViewManager        *m_ViewManager;
   mmaApplicationLayout  *m_Layout;
-  mafVMEStorage         *m_Storage;
+  //mafVMEStorage         *m_Storage;
+	mafXMLStorage         *m_XMLStorage;
+	mafVMERoot            *m_XMLRoot;
   int                    m_VisibilityVme;
   wxListBox				      *m_List;
+	int                    m_SelectedItem;
+  int                    m_DefaultFlag;
   bool                   m_ModifiedLayouts;
 };
 #endif

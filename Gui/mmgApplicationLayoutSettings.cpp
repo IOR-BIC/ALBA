@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationLayoutSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2006-12-07 14:42:02 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2006-12-11 16:46:17 $
+Version:   $Revision: 1.8 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -25,11 +25,13 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mmgGui.h"
 #include "mmgMDIFrame.h"
 #include "mafViewManager.h"
+#include "mafVMEManager.h"
 #include "mafView.h"
 #include "mafVMEStorage.h"
+#include "mafXMLStorage.h"
 #include "mafVMERoot.h"
 #include "mafSmartPointer.h"
-#include "mafVMEGeneric.h"
+#include "mafNodeLayout.h"
 #include "mafNodeIterator.h"
 #include "mafTagArray.h"
 #include "mafViewVTK.h"
@@ -44,39 +46,62 @@ mmgApplicationLayoutSettings::mmgApplicationLayoutSettings(mafObserver *listener
 //----------------------------------------------------------------------------
 {
 	m_Listener      = listener;
-  m_DefaultLayout = "Default Layout";
+  m_DefaultLayoutName = " - ";
+
+  m_ActiveLayoutName  = "";
+  m_LayoutType        = " - ";
+  m_DefaultFlag       = 0;
+  
   m_ViewManager   = NULL;
   m_Layout        = NULL;
   m_Win           = NULL;
   m_List		      = NULL;
-  m_Storage       = NULL;
+//  m_Storage       = NULL;
+	m_XMLStorage    = NULL;
+	m_XMLRoot       = NULL;
 
+	m_SelectedItem  = -1;
   m_VisibilityVme = false;
   m_ModifiedLayouts = false;
   m_LayoutFileSave = "";
 
   m_Gui = new mmgGui(this);
+
+  // layout editor
+  m_Gui->Label(_("Layout Editor"), true);
+  m_Gui->Divider(1);
+  m_Gui->String(LAYOUT_NAME_ID,_("name"),&m_ActiveLayoutName);
+  m_Gui->Label(_("Type"), &m_LayoutType);
+  m_Gui->Divider(1);
+   
   //application layout msf
-  m_Gui->Label(_("Application layout msf"), true);
-  m_Gui->Label("For becoming definitive the layout saving,");
-  m_Gui->Label(" it needs to save the project");
-  m_Gui->Button(SAVE_TREE_LAYOUT_ID,_("Save in root"));
-  m_Gui->String(LAYOUT_NAME_ID,_("name"),&m_DefaultLayout);
-  m_Gui->Bool(LAYOUT_VISIBILITY_VME, _("Visibility"), &m_VisibilityVme ,0,_("If checked the layout will be comprehensive of vme visibility"));
-  m_Gui->Button(APPLY_TREE_LAYOUT_ID,_("Apply Root Layout"));
+  m_Gui->Label(_("MSF"), true);
+  //m_Gui->Label("For becoming definitive the layout saving,");
+  //m_Gui->Label(" it needs to save the project");
   
+  //m_Gui->String(LAYOUT_NAME_ID,_("name"),&m_DefaultLayout);
+  m_Gui->Button(APPLY_TREE_LAYOUT_ID,_("Apply Root Layout"));
+  m_Gui->Bool(LAYOUT_VISIBILITY_VME, _("Visibility"), &m_VisibilityVme ,0,_("If checked the layout will be comprehensive of vme visibility"));
+  m_Gui->Button(SAVE_TREE_LAYOUT_ID,_("Save in root"));
+
+  m_Gui->Enable(APPLY_TREE_LAYOUT_ID,false);
+
   //application layout 
-  m_Gui->Divider(2);
-  m_Gui->Divider(0);
-  m_Gui->Label(_("Application layout"), true);
-  m_List= m_Gui->ListBox(ID_LIST_LAYOUT,_(""),100);
+  m_Gui->Divider(1);
+  m_Gui->Label(_("Application"), true);
+	m_Gui->Label(_("default:"), &m_DefaultLayoutName);
+  
   m_Gui->Button(OPEN_LAYOUT_ID,_("Load file"));
-  m_Gui->Button(APPLY_LAYOUT_ID,_("Apply layout"));
   m_Gui->Button(ADD_LAYOUT_ID,_("Add Current layout"));
   m_Gui->Button(REMOVE_LAYOUT_ID,_("Remove layout"));
+  m_List= m_Gui->ListBox(ID_LIST_LAYOUT,_(""),60);
   //m_Gui->Button(SAVE_APPLICATION_LAYOUT_ID,_("Save"));
-  m_Gui->FileSave(SAVE_APPLICATION_LAYOUT_ID,_("Browse"), &m_LayoutFileSave);
-	m_Gui->Divider();
+  m_Gui->Button(APPLY_LAYOUT_ID,_("Apply layout"));
+  m_Gui->Bool(DEFAULT_LAYOUT_ID,_("Default Layout"), &m_DefaultFlag, 1);
+  //here lies the button for set as default
+  
+  m_Gui->FileSave(SAVE_APPLICATION_LAYOUT_ID,_("File"), &m_LayoutFileSave,_("All Files (*.mly)|*.mly"));
+	m_Gui->Label(_(""));
 
   InitializeLayout();
 }
@@ -107,7 +132,12 @@ void mmgApplicationLayoutSettings::OnEvent(mafEventBase *maf_event)
       m_Gui->Enable(SAVE_APPLICATION_LAYOUT_ID, m_VisibilityVme == 0);
     break;
     case ID_LIST_LAYOUT:
-      //select
+    {
+      m_SelectedItem = m_List->GetSelection();
+      mafString sel = m_List->GetStringSelection().c_str();
+      m_DefaultFlag = (sel == m_DefaultLayoutName) ? 1 : 0;
+      m_Gui->Update();
+    }
     break;
     case OPEN_LAYOUT_ID:
       LoadLayout();
@@ -120,6 +150,9 @@ void mmgApplicationLayoutSettings::OnEvent(mafEventBase *maf_event)
     break;
     case REMOVE_LAYOUT_ID:
       RemoveLayout();
+    break;
+    case DEFAULT_LAYOUT_ID:
+      SetLayoutAsDefault();
     break;
     case SAVE_APPLICATION_LAYOUT_ID:
       //save
@@ -170,30 +203,42 @@ void mmgApplicationLayoutSettings::SaveTreeLayout()
     wxPaneInfo logbar = m_Win->GetDockManager().GetPane("logbar");
     bool logbar_vis = logbar.IsShown();
     m_Layout->SetInterfaceElementVisibility("logbar", logbar_vis);
-    m_Layout->SetLayoutName(m_DefaultLayout.GetCStr());
+    m_Layout->SetLayoutName("Layout"); //m_DefaultLayout.GetCStr()
     mafView *v = m_ViewManager->GetList();
     for(; v; v = v->m_Next)
     {
       m_Layout->AddView(v);
     }
+
+    m_Gui->Enable(APPLY_TREE_LAYOUT_ID,true);
+    
   }
 }
 //----------------------------------------------------------------------------
 void mmgApplicationLayoutSettings::InitializeLayout()
 //----------------------------------------------------------------------------
 {
-  wxConfig *config = new wxConfig(wxEmptyString);
+  /*wxConfig *config = new wxConfig(wxEmptyString);
   wxString layout_name;
   if(config->Read("DefaultLayout", &layout_name))
   {
     m_DefaultLayout = layout_name.c_str();
   }
-  cppDEL(config);
+  cppDEL(config);*/
 
-  m_Storage = mafVMEStorage::New();
-  m_Storage->GetRoot()->SetName("ApplicationLayout");
-  m_Storage->GetRoot()->Initialize();
+//  m_Storage = mafVMEStorage::New();
+//  m_Storage->GetRoot()->SetName("ApplicationLayout");
+//  m_Storage->GetRoot()->Initialize();
   
+	m_XMLStorage = mafXMLStorage::New();
+	m_XMLStorage->SetFileType("MLY");
+	m_XMLStorage->SetVersion("2.0");
+	mafNEW(m_XMLRoot);
+	m_XMLRoot->SetName("ApplicationLayout");
+	m_XMLRoot->Initialize();
+	m_XMLStorage->SetDocument(m_XMLRoot);
+	//((mafNode *)m_XMLStorage->GetDocument())->SetName("ApplicationLayout");
+
   //reg key for application layout
   wxConfig *configApp = new wxConfig(wxEmptyString);
   wxString layout_filename;
@@ -204,16 +249,16 @@ void mmgApplicationLayoutSettings::InitializeLayout()
   else
   {
     wxString layout_dir  = mafGetApplicationDirectory().c_str();
-    layout_dir << "\\Layout\\layout.msf";
+    layout_dir << "\\Layout\\layout.mly";
     configApp->Write("DefaultLayoutFile", layout_dir);
     m_DefaultLayoutFile = layout_dir;
   }
   cppDEL(configApp);
 
-  if(wxFileExists(m_DefaultLayoutFile.GetCStr()))
+  /*if(wxFileExists(m_DefaultLayoutFile.GetCStr()))
   {
-    LoadLayout(true);
-  }
+    LoadLayout();
+  }*/
 }
 //----------------------------------------------------------------------------
 void mmgApplicationLayoutSettings::AddLayout()
@@ -237,13 +282,13 @@ void mmgApplicationLayoutSettings::AddLayout()
 
     // delete old child which will be substituted
 		m_List->Delete(m_List->FindString(name));
-    mafNode *root = m_Storage->GetRoot();
-    mafSmartPointer<mafVMEGeneric> child;
+    mafNode *root = ((mafNode *)m_XMLStorage->GetDocument());
+    mafSmartPointer<mafNodeLayout> child;
     root->RemoveChild(root->FindInTreeByName(name));
 	}
 
   // storage
-  if (m_Storage)
+  if (m_XMLStorage)
   {
     wxFrame *frame = (wxFrame *)mafGetFrame();
     int pos[2], size[2];
@@ -254,17 +299,17 @@ void mmgApplicationLayoutSettings::AddLayout()
     size[0] = rect.GetSize().GetWidth();
     size[1] = rect.GetSize().GetHeight();
 
-    mafNode *root = m_Storage->GetRoot();
-    mafSmartPointer<mafVMEGeneric> child;
+    mafNode *root = ((mafNode *)m_XMLStorage->GetDocument());
+    mafSmartPointer<mafNodeLayout> child;
     root->AddChild(child);
-    child->GetTagArray()->SetTag("VISIBLE_IN_THE_TREE",0);
-    if(m_Layout = mmaApplicationLayout::SafeDownCast(child->GetAttribute("ApplicationLayout")));
+    
+    if(m_Layout = mmaApplicationLayout::SafeDownCast(child->GetLayout()));
     else
     {
       mafNEW(m_Layout);
-      child->SetAttribute(name, m_Layout);
+      child->SetAttribute("ApplicationLayout", m_Layout); //mettere application layout
     }
-    m_Layout->SetName(name);
+    m_Layout->SetName("ApplicationLayout");
     child->SetName(name);
     
     //disable visibility (useless for application layout)
@@ -280,7 +325,7 @@ void mmgApplicationLayoutSettings::AddLayout()
     wxPaneInfo logbar = m_Win->GetDockManager().GetPane("logbar");
     bool logbar_vis = logbar.IsShown();
     m_Layout->SetInterfaceElementVisibility("logbar", logbar_vis);
-    m_Layout->SetLayoutName(m_DefaultLayout.GetCStr());
+    m_Layout->SetLayoutName("Layout"); //m_DefaultLayout.GetCStr()
     mafView *v = m_ViewManager->GetList();
     for(; v; v = v->m_Next)
     {
@@ -300,16 +345,19 @@ void mmgApplicationLayoutSettings::AddLayout()
 void mmgApplicationLayoutSettings::RemoveLayout()
 //----------------------------------------------------------------------------
 {
-  int selection = m_List->GetSelection();
-  if(selection != -1)
+  if(m_SelectedItem != -1)
   {   
     // delete old child which will be substituted
-		wxString name = m_List->GetString(selection);
-    mafNode *root = m_Storage->GetRoot();
-    mafSmartPointer<mafVMEGeneric> child;
+		wxString name = m_List->GetString(m_SelectedItem);
+    mafNode *root = ((mafNode *)m_XMLStorage->GetDocument());
+		if(mafString(((mafNodeLayout *)root->FindInTreeByName(name))->GetLayout()->GetLayoutName()) == mafString("Default"))
+			m_DefaultLayoutName = " - ";
+
+		m_Gui->Update();
     root->RemoveChild(root->FindInTreeByName(name));
 
-    m_List->Delete(selection);
+    m_List->Delete(m_SelectedItem);
+    m_SelectedItem = -1;
     m_ModifiedLayouts = true;
   }
   // storage
@@ -318,21 +366,33 @@ void mmgApplicationLayoutSettings::RemoveLayout()
 void mmgApplicationLayoutSettings::SaveApplicationLayout()
 //----------------------------------------------------------------------------
 {
-  if(m_Storage)
+  if(m_XMLStorage)
   {
     //mafString file = mafGetSaveFile("", _("All Files (*.*)|*.*"), _("Save Layout File"), GetGui()).c_str();
     //m_Storage->SetURL(_(file));
 
-    m_Storage->SetURL(_(m_LayoutFileSave));
-    m_Storage->Store();
+    m_XMLStorage->SetURL(m_LayoutFileSave);
+    m_XMLStorage->Store();
     m_ModifiedLayouts = false;
   }
+  /*
+	mafXMLStorage storage;
+	storage.SetFileType("MLY");
+	storage.SetVersion("2.0");
+	storage.SetDocument(m_Storage->GetRoot());
+
+	wxString newname;
+	newname = m_LayoutFileSave.GetCStr();
+	newname = newname.BeforeLast('.');
+	newname += ".mly";
+	storage.SetURL(newname);
+	storage.Store();*/
 }
 //----------------------------------------------------------------------------
 void mmgApplicationLayoutSettings::LoadLayout(bool fileDefault)
 //----------------------------------------------------------------------------
-{
-  if(m_Storage)
+{  
+  if(m_XMLStorage && wxFileExists(m_DefaultLayoutFile.GetCStr()))
   {
     mafString file = "";
 
@@ -344,63 +404,80 @@ void mmgApplicationLayoutSettings::LoadLayout(bool fileDefault)
     if(file.IsEmpty()) return;
     
     //clear tree
-    m_Storage->GetRoot()->CleanTree();
+    ((mafNode *)m_XMLStorage->GetDocument())->CleanTree();
     m_List->Clear();
 
-    m_Storage->SetURL(_(file));
-    m_Storage->Restore();
+    m_XMLStorage->SetURL(file);
+    m_XMLStorage->Restore();
 
     //fill listbox
-    mafNodeIterator *iter = m_Storage->GetRoot()->NewIterator();
+    mafNodeIterator *iter = ((mafNode *)m_XMLStorage->GetDocument())->NewIterator();
     for(mafNode *vme = iter->GetFirstNode(); vme; vme = iter->GetNextNode())
     {
       if(!vme->IsMAFType(mafVMERoot))
+			{
         m_List->Append(vme->GetName());
+				if(mafString(((mafNodeLayout *)vme)->GetLayout()->GetLayoutName()) == mafString("Default"))
+          m_DefaultLayoutName = ((mafNodeLayout *)vme)->GetName();
+			}
     }
     iter->Delete();
 
-    m_ModifiedLayouts = true;
     m_LayoutFileSave = file;
-
+    
     if(m_Gui)
     {
       m_Gui->Update();
+			m_List->Update();
 
-      //apply first layout
+      //apply default layout
       if(m_List->GetCount() != 0)
       {
-        m_List->SetSelection(0);
+			  m_SelectedItem = m_List->FindString(m_DefaultLayoutName.GetCStr());
+        if(m_SelectedItem != -1)
+          m_List->SetSelection(m_SelectedItem, true);
         m_Gui->Update();
 
-        if(!fileDefault)
-          ApplyLayout();
+        if(fileDefault && m_SelectedItem == -1)
+          return;
+
+        ApplyLayout();
+        mafString sel = m_List->GetStringSelection().c_str();
+        m_DefaultFlag = (sel == m_DefaultLayoutName) ? 1 : 0;
+				m_SelectedItem = m_List->GetSelection();
+        m_Gui->Update();
       }
     }
+
+     
   }
 }
 //----------------------------------------------------------------------------
 void mmgApplicationLayoutSettings::ApplyLayout()
 //----------------------------------------------------------------------------
 {
-  int selection = m_List->GetSelection();
-  if(selection == -1)
+  if(m_SelectedItem == -1)
   {
     return;
   }
 
-  wxString name = m_List->GetString(selection);
+  wxString name = m_List->GetString(m_SelectedItem);
 
   // Retrieve the saved layout.
-  mafNode *root = m_Storage->GetRoot();
-  mafVMEGeneric *vme = mafVMEGeneric::SafeDownCast(root->FindInTreeByName(name));
-  mmaApplicationLayout *app_layout = mmaApplicationLayout::SafeDownCast(vme->GetAttribute(name));
+  mafNode *root = ((mafNode *)m_XMLStorage->GetDocument());
+  mafNodeLayout *vme = mafNodeLayout::SafeDownCast(root->FindInTreeByName(name));
+  mmaApplicationLayout *app_layout = mmaApplicationLayout::SafeDownCast(vme->GetLayout()); //application layout
+  m_ActiveLayoutName = vme->GetName();
+  m_LayoutType       = _("Application Layout");
+  if(m_Gui) m_Gui->Update();
+
   if (app_layout)
   {
-    int answer = wxMessageBox(_("Do you want to apply the layout?"), _("Warning"), wxYES_NO);
+    /*int answer = wxMessageBox(_("Do you want to apply the layout?"), _("Warning"), wxYES_NO);
     if (answer == wxNO)
     {
       return;
-    }
+    }*/
     m_ViewManager->ViewDeleteAll();
     int maximized, pos[2], size[2];
     app_layout->GetApplicationInfo(maximized, pos, size);
@@ -458,14 +535,19 @@ void mmgApplicationLayoutSettings::ApplyTreeLayout()
   // Retrieve the saved layout.
   mafNode *vme = m_ViewManager->GetCurrentRoot();
   mmaApplicationLayout *app_layout = mmaApplicationLayout::SafeDownCast(vme->GetAttribute("ApplicationLayout")); 
-  
+
   if (app_layout)
   {
-    int answer = wxMessageBox(_("Do you want to load the layout?"), _("Warning"), wxYES_NO);
+    /*int answer = wxMessageBox(_("Do you want to load the layout?"), _("Warning"), wxYES_NO);
     if (answer == wxNO)
     {
       return;
-    }
+    }*/
+
+    m_ActiveLayoutName = app_layout->GetLayoutName();
+    m_LayoutType       = _("MSF Layout");
+    if(m_Gui) m_Gui->Update();
+
     m_ViewManager->ViewDeleteAll();
     int maximized, pos[2], size[2];
     app_layout->GetApplicationInfo(maximized, pos, size);
@@ -512,7 +594,9 @@ void mmgApplicationLayoutSettings::ApplyTreeLayout()
         wxRect rect(pos[0],pos[1],size[0],size[1]);
         v->GetFrame()->SetSize(rect);
 
-        for (int i=0; i<(*iter).m_VisibleVmes.size();i++)
+        if(m_VisibilityVme)
+        {
+          for (int i=0; i<(*iter).m_VisibleVmes.size();i++)
         {
           mafNode *node_restored = m_ViewManager->GetCurrentRoot()->FindInTreeById((*iter).m_VisibleVmes[i]);
           if (node_restored)
@@ -521,7 +605,7 @@ void mmgApplicationLayoutSettings::ApplyTreeLayout()
           }
         }
 
-        if((*iter).m_VisibleVmes.size() > 0)
+          if((*iter).m_VisibleVmes.size() > 0)
         {
           if(v->IsMAFType(mafViewVTK))
           {
@@ -545,9 +629,54 @@ void mmgApplicationLayoutSettings::ApplyTreeLayout()
           else //compound
           {;}
         }
-          
+        }
 
       }
     }
+  }
+  else
+  {
+    m_Gui->Enable(APPLY_TREE_LAYOUT_ID,false);
+    m_Gui->Enable(SAVE_TREE_LAYOUT_ID,false);
+  }
+}
+//----------------------------------------------------------------------------
+void mmgApplicationLayoutSettings::SetLayoutAsDefault()
+//----------------------------------------------------------------------------
+{
+  if(m_SelectedItem != -1)
+  {   
+    // delete old child which will be substituted
+		/*wxString name = m_List->GetString(selection);
+    mafNode *root = m_Storage->GetRoot();
+    mafSmartPointer<mafNodeLayout> child;
+    root->RemoveChild(root->FindInTreeByName(name));*/
+
+    //m_List->GetItem(selection)->SetBackgroundColour(wxColor(256, 0, 0));
+    m_ModifiedLayouts = true;
+    mafNodeIterator *iter = ((mafNode *)m_XMLStorage->GetDocument())->NewIterator();
+		for(mafNode *vme = iter->GetFirstNode(); vme; vme = iter->GetNextNode())
+		{
+			if(!vme->IsMAFType(mafVMERoot))
+			  ((mafNodeLayout *)vme)->GetLayout()->SetLayoutName("Layout");
+		}
+		iter->Delete();
+
+    if(m_DefaultFlag != 0)
+      m_DefaultLayoutName = m_List->GetString(m_SelectedItem);
+    else
+    {
+      m_DefaultLayoutName = " - ";
+      m_Gui->Update();
+      return;
+    }
+
+		mafNode *root = ((mafNode *)m_XMLStorage->GetDocument());		
+		((mafNodeLayout *)root->FindInTreeByName(m_DefaultLayoutName))->GetLayout()->SetLayoutName("Default"); //m_DefaultLayout.GetCStr()
+		
+		
+    m_ModifiedLayouts = true;
+
+		m_Gui->Update();
   }
 }
