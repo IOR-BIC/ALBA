@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-02 16:41:29 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2006-12-12 14:17:42 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,6 +20,7 @@
 // forward declarations :
 //----------------------------------------------------------------------------
 class vtkVolumeSlicer;
+class vtkTransformPolyDataFilter;
 class mafNode;
 class mmaMaterial;
 class mafVMEOutputSurface;
@@ -66,7 +67,7 @@ public:
   virtual bool IsAnimated();
 
   /** Return the suggested pipe-typename for the visualization of this vme */
-  virtual mafString GetVisualPipe() {return mafString("mafPipeSurface");};
+  virtual mafString GetVisualPipe() {return mafString("mafPipeSurfaceTextured");};
   
   /** Return pointer to material attribute. */
   mmaMaterial *GetMaterial();
@@ -90,6 +91,8 @@ protected:
   mafTransform*     m_Transform; ///< pose matrix for the slicer plane
   vtkVolumeSlicer*  m_PSlicer;  ///< slicer object used to extract the cut contour
   vtkVolumeSlicer*  m_ISlicer;  ///< slicer object used to compute the slice image
+
+  vtkTransformPolyDataFilter *m_BackTransform;
 
   int               m_TextureRes;
   double            m_Xspc;
