@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-11 16:53:35 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-12-12 13:02:10 $
+  Version:   $Revision: 1.4 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -98,8 +98,6 @@ mafVMESurfaceParametric::mafVMESurfaceParametric()
   m_PlanePoint2[1] = 3.0;
   m_PlanePoint2[0] = m_PlanePoint2[2] = 0.0;
 
-	m_PolyData = NULL;
-
 	mafNEW(m_Transform);
 	mafVMEOutputSurface *output=mafVMEOutputSurface::New(); // an output with no data
 	output->SetTransform(m_Transform); // force my transform in the output
@@ -108,9 +106,9 @@ mafVMESurfaceParametric::mafVMESurfaceParametric()
 	GetMaterial();
 
 	vtkNEW(m_PolyData);
-	// attach a data pipe which creates a bridge between VTK and MAF
+
+  // attach a data pipe which creates a bridge between VTK and MAF
 	mafDataPipeCustom *dpipe = mafDataPipeCustom::New();
-	dpipe->SetDependOnAbsPose(true);
 	dpipe->SetInput(m_PolyData);
 	SetDataPipe(dpipe);
 }
@@ -173,9 +171,15 @@ int mafVMESurfaceParametric::DeepCopy(mafNode *a)
     this->m_PlanePoint2[1] = vmeParametricSurface->m_PlanePoint2[1];
     this->m_PlanePoint2[2] = vmeParametricSurface->m_PlanePoint2[2];
 
-     return MAF_OK;
-    }  
-    return MAF_ERROR;
+    mafDataPipeCustom *dpipe = mafDataPipeCustom::SafeDownCast(GetDataPipe());
+    if (dpipe)
+    {
+      dpipe->SetInput(m_PolyData);
+    }
+    InternalUpdate();
+    return MAF_OK;
+  }  
+  return MAF_ERROR;
 }
 
 //-------------------------------------------------------------------------
