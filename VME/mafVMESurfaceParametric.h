@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-07 15:01:03 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-12-12 10:02:04 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -81,7 +81,7 @@ public:
 	/** return an xpm-icon that can be used to represent this node */
 	static char ** GetIcon();
 
-	void SourceGui();
+  void SetGeometryType(int geometry){m_GeometryType = geometry;}
 
 	enum PARAMETRIC_SURFACE_WIDGET_ID
 	{
@@ -121,6 +121,8 @@ protected:
 
 	/** update the output data structure */
 	virtual void InternalUpdate();
+
+  void SourceGui();
 
   /** Internally used to create a new instance of the GUI.*/
   virtual mmgGui *CreateGui();
