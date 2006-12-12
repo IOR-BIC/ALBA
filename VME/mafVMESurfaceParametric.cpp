@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-12 13:02:10 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-12-12 14:17:26 $
+  Version:   $Revision: 1.5 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -143,11 +143,12 @@ int mafVMESurfaceParametric::DeepCopy(mafNode *a)
   {
     mafVMESurfaceParametric *vmeParametricSurface=mafVMESurfaceParametric::SafeDownCast(a);
     m_Transform->SetMatrix(vmeParametricSurface->m_Transform->GetMatrix());
+    this->m_GeometryType = vmeParametricSurface->m_GeometryType;
     this->m_SphereRadius = vmeParametricSurface->m_SphereRadius;
     this->m_SpherePhiRes = vmeParametricSurface->m_SpherePhiRes;
     this->m_SphereTheRes = vmeParametricSurface->m_SphereTheRes;
     this->m_ConeHeight = vmeParametricSurface->m_ConeHeight;
-    this->m_ConeRadius = vmeParametricSurface->m_ConeCapping;
+    this->m_ConeRadius = vmeParametricSurface->m_ConeRadius;
     this->m_ConeCapping = vmeParametricSurface->m_ConeCapping;
     this->m_ConeRes = vmeParametricSurface->m_ConeRes;
     this->m_CylinderHeight = vmeParametricSurface->m_CylinderHeight;
@@ -190,11 +191,12 @@ bool mafVMESurfaceParametric::Equals(mafVME *vme)
   {
     if (     
       m_Transform->GetMatrix()==((mafVMESurfaceParametric *)vme)->m_Transform->GetMatrix() &&
+      this->m_GeometryType == ((mafVMESurfaceParametric *)vme)->m_GeometryType &&
       this->m_SphereRadius == ((mafVMESurfaceParametric *)vme)->m_SphereRadius &&
       this->m_SpherePhiRes == ((mafVMESurfaceParametric *)vme)->m_SpherePhiRes &&
       this->m_SphereTheRes == ((mafVMESurfaceParametric *)vme)->m_SphereTheRes &&
       this->m_ConeHeight == ((mafVMESurfaceParametric *)vme)->m_ConeHeight  &&
-      this->m_ConeRadius == ((mafVMESurfaceParametric *)vme)->m_ConeCapping  &&
+      this->m_ConeRadius == ((mafVMESurfaceParametric *)vme)->m_ConeRadius  &&
       this->m_ConeCapping == ((mafVMESurfaceParametric *)vme)->m_ConeCapping  &&
       this->m_ConeRes == ((mafVMESurfaceParametric *)vme)->m_ConeRes &&
       this->m_CylinderHeight == ((mafVMESurfaceParametric *)vme)->m_CylinderHeight  &&
@@ -281,9 +283,9 @@ void mafVMESurfaceParametric::OnEvent(mafEventBase *maf_event)
           m_RollOutCube->RollOut(m_GeometryType == PARAMETRIC_CUBE);
           m_RollOutPlane->RollOut(m_GeometryType == PARAMETRIC_PLANE);
         }
-				InternalUpdate();
+				/*InternalUpdate();
 				this->ForwardUpEvent(mafEvent(this,CAMERA_UPDATE));
-      break;
+      break;*/
 			case CHANGE_VALUE_SPHERE:
 			case CHANGE_VALUE_CUBE:
 			case CHANGE_VALUE_CONE:
