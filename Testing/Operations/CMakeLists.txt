@@ -18,6 +18,9 @@ ENDIF (MAF_USE_ITK)
 ADD_EXECUTABLE(mmoVolumeMeasureTest mmoVolumeMeasureTest.h mmoVolumeMeasureTest.cpp)
 ADD_TEST(mmoVolumeMeasureTest ${EXECUTABLE_OUTPUT_PATH}/mmoVolumeMeasureTest)
 
+ADD_EXECUTABLE(mmoRAWImporterImagesTest mmoRAWImporterImagesTest.h mmoRAWImporterImagesTest.cpp)
+ADD_TEST(mmoRAWImporterImagesTest ${EXECUTABLE_OUTPUT_PATH}/mmoRAWImporterImagesTest)
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
