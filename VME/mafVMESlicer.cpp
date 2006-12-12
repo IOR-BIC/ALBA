@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-19 09:53:57 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-12-12 14:18:28 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -69,16 +69,17 @@ mafVMESlicer::mafVMESlicer()
   m_PSlicer->SetTexture(image);
   m_ISlicer->SetOutput(image);
   
-  vtkMAFSmartPointer<vtkTransformPolyDataFilter> back_trans;
-  back_trans->SetInput(slice);
-  back_trans->SetTransform(GetOutput()->GetTransform()->GetVTKTransform()->GetInverse());
+  vtkNEW(m_BackTransform);
+  //vtkMAFSmartPointer<vtkTransformPolyDataFilter> back_trans;
+  m_BackTransform->SetInput(slice);
+  m_BackTransform->SetTransform(m_Transform->GetVTKTransform()->GetInverse());
 
   // attach a datapipe which creates a bridge between VTK and MAF
   mafDataPipeCustom *dpipe = mafDataPipeCustom::New();
   dpipe->SetDependOnAbsPose(true);
   SetDataPipe(dpipe);
 
-  dpipe->SetInput(back_trans->GetOutput());
+  dpipe->SetInput(m_BackTransform->GetOutput());
   dpipe->SetNthInput(1,image);
 
   // set the texture in the output, must do it here, after setting slicer filter's input
@@ -92,6 +93,7 @@ mafVMESlicer::mafVMESlicer()
 mafVMESlicer::~mafVMESlicer()
 //-------------------------------------------------------------------------
 {
+  vtkDEL(m_BackTransform);
   mafDEL(m_Transform);
   SetOutput(NULL);
 
@@ -120,6 +122,14 @@ int mafVMESlicer::DeepCopy(mafNode *a)
   {
     mafVMESlicer *vme_slicer=mafVMESlicer::SafeDownCast(a);
     m_Transform->SetMatrix(vme_slicer->m_Transform->GetMatrix());
+    mafDataPipeCustom *dpipe = mafDataPipeCustom::SafeDownCast(GetDataPipe());
+    if (dpipe)
+    {
+      dpipe->SetDependOnAbsPose(true);
+      dpipe->SetInput(m_BackTransform->GetOutput());
+      dpipe->SetNthInput(1,m_PSlicer->GetTexture());
+    }
+    GetMaterial()->SetMaterialTexture(m_PSlicer->GetTexture());
     return MAF_OK;
   }  
   return MAF_ERROR;
@@ -215,6 +225,7 @@ void mafVMESlicer::InternalUpdate()
   mafVME *vol = mafVMEVolume::SafeDownCast(GetParent());
   if(vol)
   {
+    vol->Update();
     if (vtkDataSet *vtkdata=vol->GetOutput()->GetVTKData())
     {
       m_PSlicer->Update();
