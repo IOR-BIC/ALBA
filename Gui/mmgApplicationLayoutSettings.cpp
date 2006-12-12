@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationLayoutSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2006-12-11 16:46:17 $
-Version:   $Revision: 1.8 $
-Authors:   Paolo Quadrani
+Date:      $Date: 2006-12-12 10:03:45 $
+Version:   $Revision: 1.9 $
+Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2001/2005 
 CINECA - Interuniversity Consortium (www.cineca.it)
