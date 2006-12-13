@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-13 14:08:09 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2006-12-13 15:43:19 $
+  Version:   $Revision: 1.14 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,6 +28,7 @@
 #include "mafPipeVolumeSlice.h"
 #include "mafPipeSurfaceSlice.h"
 #include "mafPipeSurface.h"
+#include "mafPipeSurfaceTextured.h"
 #include "mafVMEVolumeGray.h"
 #include "mafVMESurface.h"
 #include "mafGizmoTranslate.h"
@@ -222,10 +223,10 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			m_ChildViewList[ARBITRARY_VIEW]->VmeShow(m_Slicer, show);
 			m_ChildViewList[SLICE_VIEW]->VmeShow(m_Slicer, show);
 
-      mafPipeSurface *pArb=(mafPipeSurface *)(m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(m_Slicer);
+      mafPipeSurfaceTextured *pArb=(mafPipeSurfaceTextured *)(m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(m_Slicer);
       pArb->SetActorPicking(false);
       pArb->SetEnableActorLOD(0);
-      mafPipeSurface *pSli=(mafPipeSurface *)(m_ChildViewList[SLICE_VIEW])->GetNodePipe(m_Slicer);
+      mafPipeSurfaceTextured *pSli=(mafPipeSurfaceTextured *)(m_ChildViewList[SLICE_VIEW])->GetNodePipe(m_Slicer);
       pSli->SetActorPicking(false);
       pSli->SetEnableActorLOD(0);
 	
@@ -281,9 +282,9 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 				double normal[3];
 				((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-				mafPipeSurfaceSlice *PipeArbitraryViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(node));
-				PipeArbitraryViewSurface->SetSlice(m_SliceCenterSurface);
-				PipeArbitraryViewSurface->SetNormal(normal);
+				mafPipeSurface *PipeArbitraryViewSurface = mafPipeSurface::SafeDownCast(((mafViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(node));
+				//PipeArbitraryViewSurface->SetSlice(m_SliceCenterSurface);
+				//PipeArbitraryViewSurface->SetNormal(normal);
 				mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(node));
 
         double surfaceOriginTranslated[3];
@@ -329,7 +330,7 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 				if(Inode->IsA("mafVMESurface"))
 				{
 					mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(Inode));
-					mafPipeSurfaceSlice *PipeArbitraryViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(Inode));
+					mafPipeSurface *PipeArbitraryViewSurface = mafPipeSurface::SafeDownCast(((mafViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(Inode));
 					if(PipeSliceViewSurface && PipeArbitraryViewSurface)
 					{
 						mafEventMacro(mafEvent(this, VME_SHOW, Inode, false));
@@ -426,11 +427,11 @@ void mafViewArbitrarySlice::OnEventGizmoTranslate(mafEventBase *maf_event)
 		      surfaceOriginTranslated[1] = m_SliceCenterSurface[1] + normal[1] * 0.1;
 		      surfaceOriginTranslated[2] = m_SliceCenterSurface[2] + normal[2] * 0.1;
 
-					mafPipeSurfaceSlice *PipeArbitraryViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(node));
+					mafPipeSurface *PipeArbitraryViewSurface = mafPipeSurface::SafeDownCast(((mafViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(node));
 					mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(node));
 					if(PipeArbitraryViewSurface && PipeSliceViewSurface)
 					{
-						PipeArbitraryViewSurface->SetSlice(m_SliceCenterSurface);
+						//PipeArbitraryViewSurface->SetSlice(m_SliceCenterSurface);
 						PipeSliceViewSurface->SetSlice(surfaceOriginTranslated);
 					}
 				}
@@ -477,15 +478,15 @@ void mafViewArbitrarySlice::OnEventGizmoRotate(mafEventBase *maf_event)
 		      surfaceOriginTranslated[1] = m_SliceCenterSurface[1] + normal[1] * 0.1;
 		      surfaceOriginTranslated[2] = m_SliceCenterSurface[2] + normal[2] * 0.1;
 
-					mafPipeSurfaceSlice *PipeArbitraryViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(node));
+					mafPipeSurface *PipeArbitraryViewSurface = mafPipeSurface::SafeDownCast(((mafViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(node));
 					mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(node));
 					if(PipeArbitraryViewSurface && PipeArbitraryViewSurface)
 					{
 						
-						PipeArbitraryViewSurface->SetNormal(normal);
+						//PipeArbitraryViewSurface->SetNormal(normal);
 						PipeSliceViewSurface->SetNormal(normal);
 
-            PipeArbitraryViewSurface->SetSlice(m_SliceCenterSurface);
+            //PipeArbitraryViewSurface->SetSlice(m_SliceCenterSurface);
 						PipeSliceViewSurface->SetSlice(surfaceOriginTranslated);
 					}
 				}
@@ -554,13 +555,13 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
 				{
 					if(node->IsA("mafVMESurface"))
 					{
-						mafPipeSurfaceSlice *PipeArbitraryViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(node));
+						mafPipeSurface *PipeArbitraryViewSurface = mafPipeSurface::SafeDownCast(((mafViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(node));
 						mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(node));
 						if(PipeArbitraryViewSurface && PipeArbitraryViewSurface)
 						{
 							double normal[3];
 							((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-							PipeArbitraryViewSurface->SetNormal(normal);
+							//PipeArbitraryViewSurface->SetNormal(normal);
 							PipeSliceViewSurface->SetNormal(normal);
 
               double surfaceOriginTranslated[3];
@@ -568,7 +569,7 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
 		          surfaceOriginTranslated[1] = m_SliceCenterSurfaceReset[1] + normal[1] * 0.1;
 		          surfaceOriginTranslated[2] = m_SliceCenterSurfaceReset[2] + normal[2] * 0.1;
 
-							PipeArbitraryViewSurface->SetSlice(surfaceOriginTranslated);
+							//PipeArbitraryViewSurface->SetSlice(surfaceOriginTranslated);
 							PipeSliceViewSurface->SetSlice(surfaceOriginTranslated);
 						}
 					}
@@ -612,6 +613,7 @@ mmgGui* mafViewArbitrarySlice::CreateGui()
 
 	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
 
+	m_Gui->Divider();
 	m_Gui->Update();
 	
 	EnableWidgets(m_CurrentVolume != NULL);
