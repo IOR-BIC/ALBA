@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2006-10-06 09:10:08 $
-# Version:   $Revision: 1.4 $
+# Date:      $Date: 2006-12-13 09:21:32 $
+# Version:   $Revision: 1.5 $
 #
 # Description:
 # CMake Project file for the Medical Library.
@@ -18,6 +18,11 @@ PROJECT (MED)
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/medDefines.h.in
              ${PROJECT_BINARY_DIR}/medDefines.h
              @ONLY)
+
+#-----------------------------------------------------------------------------
+# this define the MAF_SUBPROJECT macro
+#-----------------------------------------------------------------------------
+INCLUDE (${MED_SOURCE_DIR}/modules/MEDConfigMacro.cmake)
 
 #-----------------------------------------------------------------------------
 # where to place output binaries
@@ -58,6 +63,22 @@ INCLUDE("${MAF_BINARY_PATH}/MAFConfig.cmake")
 
 IF(MAF_FOUND)
   INCLUDE("${MAF_USE_FILE}")
+  
+  SET(MFL_SOURCE_DIR ${MFL_SOURCE_PATH})
+  MED_SUBPROJECT(MedFL Libraries)
+	IF (MedFL_CONFIG_FOUND)
+  	FIND_FILE (USE_MedFL_FILE UseMedFL.cmake "${MED_BINARY_DIR}/Libraries") 
+	  IF (USE_MedFL_FILE)
+	    MESSAGE(STATUS "MED: MedFL Configured")
+	    SET (MED_CAN_BUILD 1)
+	  ELSE (USE_MedFL_FILE)
+	  	MESSAGE(ERROR "Error configuring Libraries.")
+		ENDIF (USE_MedFL_FILE)
+	ELSE (MedFL_CONFIG_FOUND)
+		MESSAGE(ERROR "Error finding Libraries.")
+	ENDIF (MedFL_CONFIG_FOUND)
+
+	INCLUDE("${USE_MedFL_FILE}")
 
   # Add single dirs to inclusion path
   INCLUDE_DIRECTORIES(BEFORE ".")
@@ -75,7 +96,7 @@ IF(MAF_FOUND)
   INCLUDE_DIRECTORIES(${MED_SOURCE_DIR}/vtkMED)
   INCLUDE_DIRECTORIES(${MED_BINARY_DIR}/vtkMED)
 
-  # Configuring MAF kits
+  # Configuring MED kits
   MESSAGE(STATUS "MAF: Configuring MAF Kits")
 #  SUBDIRS (Interaction)
 #  SUBDIRS (Gui)
@@ -114,9 +135,10 @@ IF(MAF_FOUND)
   #-----------------------------------------------------------------------------
   # Build examples too ?
   #-----------------------------------------------------------------------------
-#  IF (BUILD_EXAMPLES)
-#    SUBDIRS(Examples)
-#  ENDIF (BUILD_EXAMPLES)
+  IF (BUILD_EXAMPLES)
+  	LINK_DIRECTORIES(${MED_BINARY_DIR}/bin)
+    SUBDIRS(Examples)
+  ENDIF (BUILD_EXAMPLES)
   
   #-----------------------------------------------------------------------------
   # Testing stuff
