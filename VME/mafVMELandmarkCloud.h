@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-17 13:07:14 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2006-12-13 14:51:06 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -216,6 +216,9 @@ public:
 protected:
   mafVMELandmarkCloud();
   virtual ~mafVMELandmarkCloud();
+
+  virtual int InternalStore(mafStorageElement *parent);
+  virtual int InternalRestore(mafStorageElement *node);
 
   /** used to initialize and create the material attribute if not yet present */
   virtual int InternalInitialize();

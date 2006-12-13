@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-13 11:28:13 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2006-12-13 14:51:06 $
+  Version:   $Revision: 1.25 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -59,7 +59,7 @@ MAF_ID_IMP(mafVMELandmarkCloud::CLOUDE_SPHERE_RES); // Event rised when the sphe
 mafCxxTypeMacro(mafVMELandmarkCloud);
 //------------------------------------------------------------------------------
 
-//------------------------------------------------------------------------------
+//-------------------------------------------------------------------------
 mafVMELandmarkCloud::mafVMELandmarkCloud()
 //-------------------------------------------------------------------------
 {
@@ -68,8 +68,10 @@ mafVMELandmarkCloud::mafVMELandmarkCloud()
   m_NumberOfLandmarks = -1;
   m_State             = UNSET_CLOUD;
   m_DefaultVisibility = 1;
-  m_Radius            = -1;
-  m_SphereResolution  = -1;
+  //m_Radius            = -1;
+  m_Radius            = 1.0;
+  //m_SphereResolution  = -1;
+  m_SphereResolution  = 15;
   m_CloudStateCheckbox = 0;
 }
 
@@ -618,15 +620,15 @@ vtkPolyData *mafVMELandmarkCloud::NewPolyData(mafTimeStamp t)
 void mafVMELandmarkCloud::SetRadius(double rad)
 //-------------------------------------------------------------------------
 {
-  //if (rad == m_Radius)
-  //  return;
+  if (mafEquals(rad, m_Radius))
+    return;
 
-  mafTagItem item;
+//  mafTagItem item;
   m_Radius = rad;
   Modified();
-  item.SetName("LM_RADIUS");
-  item.SetValue(rad);
-  GetTagArray()->SetTag(item);
+//  item.SetName("LM_RADIUS");
+//  item.SetValue(rad);
+//  GetTagArray()->SetTag(item);
   GetEventSource()->InvokeEvent(this, mafVMELandmarkCloud::CLOUDE_RADIUS_MODIFIED);
   mafEvent cam_event(this,CAMERA_UPDATE);
   this->ForwardUpEvent(cam_event);
@@ -636,24 +638,25 @@ void mafVMELandmarkCloud::SetRadius(double rad)
 double mafVMELandmarkCloud::GetRadius()
 //-------------------------------------------------------------------------
 {
-  return mafRestoreNumericFromTag(GetTagArray(),"LM_RADIUS",m_Radius,-1.0,1.0);
+  //return mafRestoreNumericFromTag(GetTagArray(),"LM_RADIUS",m_Radius,-1.0,1.0);
+  return m_Radius;
 }
 
 //-------------------------------------------------------------------------
 void mafVMELandmarkCloud::SetSphereResolution(int res)
 //-------------------------------------------------------------------------
 {
-  //if (res==m_SphereResolution)
-  //  return;
+  if (res == m_SphereResolution)
+    return;
 
-  mafTagItem item;
+//  mafTagItem item;
 
   m_SphereResolution = res;
   Modified();
 
-  item.SetName("LM_SPHERE_RESOLUTION");
-  item.SetValue(res);
-  GetTagArray()->SetTag(item);
+//  item.SetName("LM_SPHERE_RESOLUTION");
+//  item.SetValue(res);
+//  GetTagArray()->SetTag(item);
   GetEventSource()->InvokeEvent(this, mafVMELandmarkCloud::CLOUDE_SPHERE_RES);
   mafEvent cam_event(this,CAMERA_UPDATE);
   this->ForwardUpEvent(cam_event);
@@ -663,8 +666,9 @@ void mafVMELandmarkCloud::SetSphereResolution(int res)
 int mafVMELandmarkCloud::GetSphereResolution()
 //-------------------------------------------------------------------------
 {
-  mafTagArray *ta = GetTagArray();
-  return mafRestoreNumericFromTag(ta,"LM_SPHERE_RESOLUTION", m_SphereResolution,-1,15);
+  //mafTagArray *ta = GetTagArray();
+  //return mafRestoreNumericFromTag(ta,"LM_SPHERE_RESOLUTION", m_SphereResolution,-1,15);
+  return m_SphereResolution;
 }
 
 //-------------------------------------------------------------------------
@@ -756,7 +760,7 @@ void mafVMELandmarkCloud::Close()
         xyz[2] = mat->GetElements()[2][3];
 
         if (mat->GetElements()[0][0]!=mat->GetElements()[1][1]||mat->GetElements()[0][0]!=mat->GetElements()[2][2]) // DEBUG Test
-          mafErrorMacro("Close: corrupted visibility information for landmark "<<lm->GetName()<<" a time "<<mat->GetTimeStamp());
+          mafErrorMacro("Close: corrupted visibility information for landmark " << lm->GetName() << " a time " << mat->GetTimeStamp());
 
         vis = mat->GetElements()[0][0] != 0;
         
@@ -786,7 +790,7 @@ void mafVMELandmarkCloud::Close()
             }
             else
             {
-              mafErrorMacro("Close: corrupted data structure, NULL polydata for timestamp: "<<item->GetTimeStamp());
+              mafErrorMacro("Close: corrupted data structure, NULL polydata for timestamp: " << item->GetTimeStamp());
             }
           }
           item_id++; 
@@ -897,7 +901,7 @@ void mafVMELandmarkCloud::Open()
       }
       else
       {
-        mafErrorMacro("Open: problems retrieving polydata for timestamp: "<<item->GetTimeStamp());
+        mafErrorMacro("Open: problems retrieving polydata for timestamp: " << item->GetTimeStamp());
       }
 		}
 	}
@@ -1178,7 +1182,6 @@ mmgGui* mafVMELandmarkCloud::CreateGui()
   m_Gui->Double(ID_LM_RADIUS, "radius", &m_Radius, 0.0,MAXDOUBLE,-1);
   m_Gui->Enable(ID_LM_RADIUS, m_CloudStateCheckbox == 0);
 
-  GetSphereResolution();
   m_Gui->Integer(ID_LM_SPHERE_RESOLUTION, "Resolution", &m_SphereResolution, 0.0,MAXINT);
   m_Gui->Enable(ID_LM_SPHERE_RESOLUTION, m_CloudStateCheckbox == 0);
   
@@ -1222,6 +1225,34 @@ void mafVMELandmarkCloud::OnEvent(mafEventBase *maf_event)
   {
     Superclass::OnEvent(maf_event);
   }
+}
+//-----------------------------------------------------------------------
+int mafVMELandmarkCloud::InternalStore(mafStorageElement *parent)
+//-----------------------------------------------------------------------
+{  
+  if (Superclass::InternalStore(parent) == MAF_OK)
+  {
+    if (parent->StoreInteger("LM_SPHERE_RESOLUTION", m_SphereResolution) == MAF_OK &&
+        parent->StoreDouble("LM_RADIUS", m_Radius) == MAF_OK)
+    {
+      return MAF_OK;
+    }
+  }
+  return MAF_ERROR;
+}
+//-----------------------------------------------------------------------
+int mafVMELandmarkCloud::InternalRestore(mafStorageElement *node)
+//-----------------------------------------------------------------------
+{
+  if (Superclass::InternalRestore(node) == MAF_OK)
+  {
+    if (node->RestoreInteger("LM_SPHERE_RESOLUTION", m_SphereResolution) == MAF_OK &&
+        node->RestoreDouble("LM_RADIUS", m_Radius) == MAF_OK)
+    {
+      return MAF_OK;
+    }
+  }
+  return MAF_ERROR;
 }
 //-------------------------------------------------------------------------
 mmaMaterial *mafVMELandmarkCloud::GetMaterial()
