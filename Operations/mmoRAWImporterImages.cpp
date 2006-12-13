@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterImages.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-11 09:35:32 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-12-13 10:58:50 $
+  Version:   $Revision: 1.3 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -241,17 +241,18 @@ void mmoRAWImporterImages::CreateGui()
 		m_Gui->Enable(ID_RGB_TYPE,false);
 		m_Gui->Bool(ID_SIGNED,_("signed"),&m_Signed);
 		m_Gui->Divider(0);
-		m_Gui->Label(_("dimensions (x,y,z): z is the number of slices"));
+		m_Gui->Label(_("dimensions (x,y,z):"));
+		m_Gui->Label(_("z is the number of slices"));
 		m_Gui->Vector(ID_DIMENSIONS,"",m_Dimension,1,10000,1,10000,1,10000);
 		m_Gui->Bool(ID_ROI,_("define ROI"),&m_CropMode);
 		m_Gui->Label(_("spacing in mm/pixel (x,y,z)"));
 		//m_Gui->Vector(ID_SPC, "",m_Spacing,0.0000001, 100000,6); 	
-		m_Gui->Double(ID_SPC_X,_("x: "),&m_Spacing[0],0.0000001, 100000,0,6);
-		m_Gui->Double(ID_SPC_Y,_("y: "),&m_Spacing[1],0.0000001, 100000,0,6);
-		m_Gui->Double(ID_SPC_Z,_("z: "),&m_Spacing[2],0.0000001, 100000,0,6);
+		m_Gui->Double(ID_SPC_X,_("x: "),&m_Spacing[0],0.0000001, 100000,3,6);
+		m_Gui->Double(ID_SPC_Y,_("y: "),&m_Spacing[1],0.0000001, 100000,3,6);
+		m_Gui->Double(ID_SPC_Z,_("z: "),&m_Spacing[2],0.0000001, 100000,3,6);
 		m_Gui->Divider(0);
-		//m_Gui->Label("z coordinates file:");
-		m_Gui->Button(ID_COORD,_("load"),_("z coord file:"), _("load the file for non regularly spaced raw volume"));
+		m_Gui->Label(_("z coordinates file:"));
+		m_Gui->Button(ID_COORD,_("load"),"", _("load the file for non regularly spaced raw volume"));
 		m_Gui->Divider(0);
 		m_Gui->Button(ID_GUESS,_("guess"),_("header size"));
 		m_Gui->Integer(ID_HEADER," ",&m_Header,0);
