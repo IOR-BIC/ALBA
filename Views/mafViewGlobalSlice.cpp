@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-11 16:10:54 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-12-13 11:18:59 $
+  Version:   $Revision: 1.13 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -180,7 +180,7 @@ void mafViewGlobalSlice::VmeSelect(mafNode *node,bool select)
       if (m_SelectedVolume->m_Pipe)
       {
         //m_Gui->Enable(ID_LUT,true);
-        //m_Gui->Enable(ID_OPACITY_SLIDER,true);
+        m_Gui->Enable(ID_OPACITY_SLIDER,true);
         m_Opacity   = ((mafPipeVolumeSlice *)m_SelectedVolume->m_Pipe)->GetSliceOpacity();
         m_Gui->Update();
       }
@@ -264,7 +264,7 @@ void mafViewGlobalSlice::VmeCreatePipe(mafNode *node)
 
 			if (m_SelectedVolume == n && m_SelectedVolume->m_Vme->IsA("mafVMEVolumeGray"))
 			{
-				//m_Gui->Enable(ID_OPACITY_SLIDER,true);
+				m_Gui->Enable(ID_OPACITY_SLIDER,true);
 				m_Opacity=((mafPipeVolumeSlice *)m_SelectedVolume->m_Pipe)->GetSliceOpacity();
 				m_Gui->Update();
 			}
@@ -305,7 +305,7 @@ void mafViewGlobalSlice::VmeDeletePipe(mafNode *vme)
 	if (m_SelectedVolume == n)
   {
     //m_Gui->Enable(ID_LUT,false);
-    //m_Gui->Enable(ID_OPACITY_SLIDER,false);
+    m_Gui->Enable(ID_OPACITY_SLIDER,false);
     m_Gui->Update();
   }
   assert(n && n->m_Pipe);
@@ -431,7 +431,7 @@ mmgGui* mafViewGlobalSlice::CreateGui()
 	
 	m_GlobalSlider=m_Gui->FloatSlider(ID_POS_SLIDER,"pos.",&m_SliderOrigin,m_GlobalBounds[4],m_GlobalBounds[5]);
 	m_Gui->Combo(ID_CHANGE_VIEW,"view",&m_ViewIndex,3,Views);
-	//m_Gui->FloatSlider(ID_OPACITY_SLIDER,"opacity",&m_Opacity,0.1,1.0);
+	m_Gui->FloatSlider(ID_OPACITY_SLIDER,"opacity",&m_Opacity,0.1,1.0);
 
 	bool Enable = false;
   mafNode *selVME = m_Sg->GetSelectedVme();
@@ -439,11 +439,11 @@ mmgGui* mafViewGlobalSlice::CreateGui()
   {
 		m_SelectedVolume = m_Sg->Vme2Node(selVME);
 		//m_gui->Enable(ID_LUT,en);
-		//m_Gui->Enable(ID_OPACITY_SLIDER,true);
+		m_Gui->Enable(ID_OPACITY_SLIDER,true);
   }
 	else
 	{
-		//m_Gui->Enable(ID_OPACITY_SLIDER,false);
+		m_Gui->Enable(ID_OPACITY_SLIDER,false);
 	}
 
   m_SliderOldOrigin = m_SliderOrigin;
