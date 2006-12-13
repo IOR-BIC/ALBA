@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-20 08:42:34 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2006-12-13 14:20:29 $
+  Version:   $Revision: 1.19 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,7 +43,7 @@ public:
   mafTypeMacro(mafPipeSurface,mafPipe);
 
                mafPipeSurface();
-  virtual     ~mafPipeSurface ();
+  virtual     ~mafPipeSurface();
 
   /** process events coming from gui */
   virtual void OnEvent(mafEventBase *maf_event);
@@ -58,34 +58,17 @@ public:
   {
     ID_SCALAR_VISIBILITY = Superclass::ID_LAST,
     ID_RENDERING_DISPLAY_LIST,
-    ID_CHOOSE_TEXTURE,
-    ID_TEXTURE_MAPPING_MODE,
     ID_USE_VTK_PROPERTY,
-    ID_USE_TEXTURE,
     ID_USE_LOOKUP_TABLE,
     ID_LUT,
     ID_ENABLE_LOD,
     ID_LAST
   };
 
-  class mafTextureAccept : public mmgVMEChooserAccept
-  {
-  public:
-
-    mafTextureAccept() {};
-    ~mafTextureAccept() {};
-
-    bool Validate(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEImage));};
-  };
-
-  mafTextureAccept *m_TextureAccept;
-
   /** Set the actor picking*/
   void SetActorPicking(int enable = true);
 
-
 protected:
-  vtkTexture              *m_Texture;
   vtkPolyDataMapper	      *m_Mapper;
   mafLODActor             *m_Actor;
   vtkOutlineCornerFilter  *m_OutlineBox;
@@ -95,7 +78,6 @@ protected:
   mafAxes                 *m_Axes;
 
   int m_UseVTKProperty;
-  int m_UseTexture;
   int m_UseLookupTable;
   int m_EnableActorLOD;
 
@@ -104,12 +86,7 @@ protected:
   mmaMaterial *m_SurfaceMaterial;
   mmgMaterialButton *m_MaterialButton;
 
-//@@@  bool                    m_use_axes; //SIL. 22-5-2003 added line - 
   void UpdateProperty(bool fromTag = false);
-
-  /** 
-  Generate texture coordinate for polydata according to the mapping mode*/
-  void GenerateTextureMapCoordinate();
 
   virtual mmgGui  *CreateGui();
 };  
