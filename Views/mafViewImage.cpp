@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewImage.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-09 12:12:35 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-12-13 15:44:17 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -124,6 +124,7 @@ mmgGui *mafViewImage::CreateGui()
   m_Gui = new mmgGui(this);
   m_AttachCamera = new mafAttachCamera(m_Gui, m_Rwi, this);
   m_Gui->AddGui(m_AttachCamera->GetGui());
+	m_Gui->Divider();
   return m_Gui;
 }
 //----------------------------------------------------------------------------

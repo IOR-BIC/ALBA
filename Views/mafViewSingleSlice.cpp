@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-09 12:12:35 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-12-13 15:44:17 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -378,6 +378,7 @@ mmgGui *mafViewSingleSlice::CreateGui()
 
 	const wxString plane_string[] = {_("XY"), _("YZ"), _("ZX")};
 	m_Gui->Combo(ID_PLANE_SELECT, "View", &m_PlaneSelect, 3, plane_string);
+	m_Gui->Divider();
   return m_Gui;
 }
 //----------------------------------------------------------------------------

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoClassicICPRegistration.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-11 09:13:15 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-12-13 15:44:59 $
+  Version:   $Revision: 1.2 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -110,6 +110,7 @@ void mmoClassicICPRegistration::CreateGui()
 	m_Gui->FileSave(ID_FILE,_("report log"),&m_ReportFilename,wildcard);
 	m_Gui->Label("");
 	m_Gui->OkCancel();
+	m_Gui->Divider();
 
 	m_Gui->Enable(wxOK,false);
 }

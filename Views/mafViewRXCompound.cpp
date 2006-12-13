@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-10 12:28:43 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-12-13 15:44:17 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni , Paolo Quadrani, Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -231,6 +231,8 @@ mmgGui* mafViewRXCompound::CreateGui()
 
 	for(int i=RX_FRONT_VIEW;i<=RX_SIDE_VIEW;i++)
 		((mafViewRX*)m_ChildViewList[i])->GetGui();
+
+	m_Gui->Divider();
 
   return m_Gui;
 }

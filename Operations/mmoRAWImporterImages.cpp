@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterImages.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-13 10:58:50 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-12-13 15:44:59 $
+  Version:   $Revision: 1.4 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -260,7 +260,7 @@ void mmoRAWImporterImages::CreateGui()
 		m_Gui->Integer(ID_SPACING,_("file spc.:"),&m_FileSpacing,1, MAXINT, _("set the spacing between the slices in the files name"));
 		m_Gui->Divider(0);
 		m_Gui->OkCancel();
-
+		m_Gui->Divider(0);
 		m_Gui->Show(true);
 		m_Gui->Update();
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeDensityDistance.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-26 16:39:54 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-12-13 15:44:36 $
+  Version:   $Revision: 1.3 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -407,6 +407,7 @@ mmgGui *medPipeDensityDistance::CreateGui()
 		m_Gui->Enable(ID_SECOND_THRESHOLD,false);
 		m_Gui->Enable(ID_BAR_TIPOLOGY,false);
 	}
+	m_Gui->Divider();
   return m_Gui;
 }
 //----------------------------------------------------------------------------

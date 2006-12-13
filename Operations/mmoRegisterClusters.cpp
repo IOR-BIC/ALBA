@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRegisterClusters.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-29 23:45:29 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-12-13 15:44:59 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi  
 ==========================================================================
   Copyright (c) 2002/2004
@@ -174,6 +174,7 @@ void mmoRegisterClusters::OpRun()
   m_Gui->OkCancel();
 
   m_Gui->Enable(wxOK,false);
+	m_Gui->Divider();
   ShowGui();
 
   assert(!m_PointsSource && !m_PointsTarget);
@@ -261,6 +262,7 @@ void mmoRegisterClusters::OnEvent(mafEventBase *maf_event)
 				  m_GuiSetWeights->FitGui();
 				  m_GuiSetWeights->SetSize(200, 220);
    			  m_GuiSetWeights->OkCancel();
+					m_GuiSetWeights->Divider();
           m_GuiSetWeights->Update();
  
 				  m_Dialog->Add(m_GuiSetWeights,1,wxEXPAND);   

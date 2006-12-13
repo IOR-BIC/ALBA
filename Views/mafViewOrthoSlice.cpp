@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-18 17:05:19 $
-  Version:   $Revision: 1.46 $
+  Date:      $Date: 2006-12-13 15:44:17 $
+  Version:   $Revision: 1.47 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -317,6 +317,7 @@ mmgGui* mafViewOrthoSlice::CreateGui()
     m_ChildViewList[i]->GetGui();
   }
 
+	m_Gui->Divider();
   return m_Gui;
 }
 //----------------------------------------------------------------------------

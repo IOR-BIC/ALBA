@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-28 10:27:31 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2006-12-13 15:44:17 $
+  Version:   $Revision: 1.29 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -363,6 +363,7 @@ mmgGui *mafViewSlice::CreateGui()
   m_Gui = new mmgGui(this);
   m_AttachCamera = new mafAttachCamera(m_Gui, m_Rwi, this);
   m_Gui->AddGui(m_AttachCamera->GetGui());
+	m_Gui->Divider();
   return m_Gui;
 }
 //----------------------------------------------------------------------------

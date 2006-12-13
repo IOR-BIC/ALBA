@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeMIP.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-08 14:58:38 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-12-13 15:44:36 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -183,7 +183,7 @@ mmgGui *medPipeVolumeMIP::CreateGui()
   lutPreset(15,m_ColorLUT);
   m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
   UpdateMIPFromLUT();
-
+	m_Gui->Divider();
   return m_Gui;
 }
 //----------------------------------------------------------------------------

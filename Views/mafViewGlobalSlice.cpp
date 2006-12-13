@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-13 11:18:59 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2006-12-13 15:44:17 $
+  Version:   $Revision: 1.14 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -448,6 +448,7 @@ mmgGui* mafViewGlobalSlice::CreateGui()
 
   m_SliderOldOrigin = m_SliderOrigin;
 
+	m_Gui->Divider();
 	m_Gui->Update();
   return m_Gui;
 }
