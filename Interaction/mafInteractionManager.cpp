@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-06 09:47:56 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2006-12-13 15:27:24 $
+  Version:   $Revision: 1.31 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -54,10 +54,6 @@
 #include "mmdMouse.h"
 #include "mmdRemoteMouse.h"
 #include "mmdClientMAF.h"
-
-#ifdef WIN32
-  #include "mmdClientMAF.h"
-#endif
   
 #include "mafVME.h"
 #include "mafVMEGizmo.h"
@@ -138,7 +134,6 @@ mafInteractionManager::mafInteractionManager()
   //mouse_action->BindDevice(mouse_device); // bind mouse to mouse action
   pointing_action->BindDevice(mouse_device); // bind mouse to point&manipulate action
 
-#ifdef WIN32
   mafPlugDevice<mmdClientMAF>("Client MAF");
   m_ClientDevice = (mmdClientMAF *)m_DeviceManager->AddDevice("mmdClientMAF",true);
 
@@ -146,7 +141,6 @@ mafInteractionManager::mafInteractionManager()
   mmdRemoteMouse *remote_mouse_device = (mmdRemoteMouse *)m_DeviceManager->AddDevice("mmdRemoteMouse", true); // add as persistent device
   assert(remote_mouse_device);
   pointing_action->BindDevice(remote_mouse_device); // bind mouse to point&manipulate action
-#endif
 }
 
 //------------------------------------------------------------------------------
@@ -245,7 +239,6 @@ mmdMouse *mafInteractionManager::GetMouseDevice()
   return mmdMouse::SafeDownCast(m_DeviceManager->GetDevice("Mouse"));
 }
 
-#ifdef WIN32
 //------------------------------------------------------------------------------
 mmdRemoteMouse *mafInteractionManager::GetRemoteMouseDevice()
 //------------------------------------------------------------------------------
@@ -258,7 +251,6 @@ mmdClientMAF *mafInteractionManager::GetClientDevice()
 {
   return m_ClientDevice;
 }
-#endif
 //------------------------------------------------------------------------------
 int mafInteractionManager::BindAction(const char *action,mafInteractor *agent)
 //------------------------------------------------------------------------------
@@ -598,9 +590,9 @@ void mafInteractionManager::OnCameraUpdate(mafEventBase *event)
 //----------------------------------------------------------------------------
 enum IMANAGER_WIDGET_ID
 {
-	ID_DEVICE_TREE = MINID,
-	ID_ADD_DEVICE,
-	ID_REMOVE_DEVICE,
+  ID_DEVICE_TREE = MINID,
+  ID_ADD_DEVICE,
+  ID_REMOVE_DEVICE,
   ID_DEVICE_SETTINGS,
   ID_DEVICE_BINDINGS,
   ID_BINDING_LIST,
@@ -765,7 +757,7 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
             // Paolo 9/11/2005: events to be forwarded to logic
             mafEventMacro(*e);
           }
-		    break; 
+      break; 
       }
     }
     return;

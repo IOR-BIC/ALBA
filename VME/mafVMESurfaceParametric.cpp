@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-12 14:17:26 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-12-13 15:27:24 $
+  Version:   $Revision: 1.6 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -286,14 +286,17 @@ void mafVMESurfaceParametric::OnEvent(mafEventBase *maf_event)
 				/*InternalUpdate();
 				this->ForwardUpEvent(mafEvent(this,CAMERA_UPDATE));
       break;*/
-			case CHANGE_VALUE_SPHERE:
-			case CHANGE_VALUE_CUBE:
-			case CHANGE_VALUE_CONE:
-			case CHANGE_VALUE_CYLINDER:
+      case CHANGE_VALUE_SPHERE:
+      case CHANGE_VALUE_CUBE:
+      case CHANGE_VALUE_CONE:
+      case CHANGE_VALUE_CYLINDER:
       case CHANGE_VALUE_PLANE:
-				InternalUpdate();
-				this->ForwardUpEvent(mafEvent(this,CAMERA_UPDATE));
-			break;
+      {
+	InternalUpdate();
+        mafEvent ev(this,CAMERA_UPDATE);
+	this->ForwardUpEvent(&ev);
+      }
+      break;
       default:
         mafVME::OnEvent(maf_event);
     }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-07 12:42:56 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2006-12-13 15:27:24 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -52,10 +52,8 @@ class mmgTree;
 class mmgCheckListBox;
 class mmgGuiHolder;
 class mmgNamedPanel;
+class mmdClientMAF;
 
-#ifdef WIN32
-  class mmdClientMAF;
-#endif
 
 /** This class takes care of mastering the interaction inside views.
   This class is responsible to coordinate interaction, i.e. 
@@ -94,9 +92,8 @@ public:
   mmdRemoteMouse *GetRemoteMouseDevice();
 
   /** return the ClientMAF device */
-  #ifdef WIN32
-    mmdClientMAF *GetClientDevice();
-  #endif
+  mmdClientMAF *GetClientDevice();
+
   /** return the mouse action, an action to which mouse is bound by default */
   //mafAction *GetMouseAction();
 
@@ -134,8 +131,7 @@ public:
   /** Get an action router.*/
   mafAction *GetAction(const char *name);
 
-  /** 
-    Set the selected view. This makes all dynamic avatars
+  /** Set the selected view. This makes all dynamic avatars
     and interactors to be informed of the current renderer. */
   void ViewSelected(mafView *view);
   
@@ -145,8 +141,7 @@ public:
   /** Set the selected VTK renderer */
   void SetCurrentRenderer(vtkRenderer *ren);
 
-  /** 
-  Return the renderer of the currently selected view,
+  /** Return the renderer of the currently selected view,
   if its a VTK based view otherwise return NULL.*/
   vtkRenderer *GetCurrentRenderer() {return m_CurrentRenderer;}
 
@@ -191,14 +186,14 @@ public:
   mmiSER *GetSER() {return m_StaticEventRouter;}
 
   /** Set the FlyTo mode for the selected view. */
-	void CameraFlyToMode();
+  void CameraFlyToMode();
 
   /** return the minimum time to elapse between two subsequent renderings */
   mafTimeStamp GetIntraFrameTime() {return m_IntraFrameTime;}
   /** set the minimum time to elapse between two subsequent renderings */
   void SetIntraFrameTime(mafTimeStamp iftime) {m_IntraFrameTime=iftime;}
 
-    /** Open a dialog to choose among available devices */
+  /** Open a dialog to choose among available devices */
   int DeviceChooser(wxString &dev_name,wxString &dev_type);
 
   /** This is used to allow also external objects to add devices */
@@ -238,7 +233,7 @@ protected:
   virtual void OnAddAvatar(mafEventBase *event);
   virtual void OnRemoveAvatar(mafEventBase *event);
 
-    /** Create the GUI dialog. */
+  /** Create the GUI dialog. */
   void CreateGUI();
 
   mmgGui*                 m_Gui;  //SIL. 07-jun-2006 : 
@@ -258,9 +253,7 @@ protected:
   mmiPER*                 m_PositionalEventRouter;
   mmiSER*                 m_StaticEventRouter;
   
-  #ifdef WIN32
   mmdClientMAF           *m_ClientDevice;
-  #endif
   
   mmuAvatarsMap                       m_Avatars; ///< keeps a list of visible avatars
   std::list<mafAutoPointer<mmiPER> >  m_PERList; ///< the interactor devoted to Positional Event Routing

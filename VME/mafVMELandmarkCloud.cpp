@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-13 14:51:06 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2006-12-13 15:27:24 $
+  Version:   $Revision: 1.26 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -666,8 +666,6 @@ void mafVMELandmarkCloud::SetSphereResolution(int res)
 int mafVMELandmarkCloud::GetSphereResolution()
 //-------------------------------------------------------------------------
 {
-  //mafTagArray *ta = GetTagArray();
-  //return mafRestoreNumericFromTag(ta,"LM_SPHERE_RESOLUTION", m_SphereResolution,-1,15);
   return m_SphereResolution;
 }
 
@@ -1201,6 +1199,7 @@ void mafVMELandmarkCloud::OnEvent(mafEventBase *maf_event)
         SetRadius(m_Radius);
       break;
       case ID_OPEN_CLOSE_CLOUD:
+      {
         if (m_CloudStateCheckbox)
         {
           this->Open();
@@ -1212,7 +1211,9 @@ void mafVMELandmarkCloud::OnEvent(mafEventBase *maf_event)
         m_Gui->Enable(ID_LM_RADIUS, m_CloudStateCheckbox == 0);
         m_Gui->Enable(ID_LM_SPHERE_RESOLUTION, m_CloudStateCheckbox == 0);
 
-        this->ForwardUpEvent(mafEvent(this,VME_SELECTED,this)); 
+        mafEvent ev(this,VME_SELECTED,this);
+        this->ForwardUpEvent(&ev);
+      }
       break;
       case ID_LM_SPHERE_RESOLUTION:
         SetSphereResolution(m_SphereResolution);
