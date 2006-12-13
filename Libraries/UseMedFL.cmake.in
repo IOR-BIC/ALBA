@@ -1,0 +1,26 @@
+#
+# Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
+# Module:    $RCSfile: UseMedFL.cmake.in,v $
+# Language:  CMake 1.2
+# Date:      $Date: 2006-12-13 09:17:48 $
+# Version:   $Revision: 1.2 $
+#
+# Description:
+# This module add the MFL include paths to a project
+# It should be included after the FindMFL module. It works
+# also if included from within the MFL build tree
+#
+
+SET(MED_USE_Offis @MED_USE_Offis@)
+
+#
+# Offis library
+#
+IF (MED_USE_Offis)
+  SET (Offis_POSSIBLE_ROOT_PATHS @MedFL_BINARY_DIR@/Offis/Build @MedFL_SOURCE_DIR@/Offis/Sources)
+  FIND_FILE(Offis_USE_FILE UseOffis.cmake ${Offis_POSSIBLE_ROOT_PATHS})
+  FIND_PATH(Offis_BINARY_PATH UseOffis.cmake ${Offis_POSSIBLE_ROOT_PATHS})
+  IF (Offis_USE_FILE)
+    INCLUDE (${Offis_USE_FILE}) # currently only local library is supported
+  ENDIF (Offis_USE_FILE)
+ENDIF (MED_USE_Offis)
