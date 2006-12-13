@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-04 10:31:17 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2006-12-13 11:28:13 $
+  Version:   $Revision: 1.24 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -663,7 +663,8 @@ void mafVMELandmarkCloud::SetSphereResolution(int res)
 int mafVMELandmarkCloud::GetSphereResolution()
 //-------------------------------------------------------------------------
 {
-  return mafRestoreNumericFromTag(GetTagArray(),"LM_SPHERE_RESOLUTION",m_SphereResolution,-1,15);
+  mafTagArray *ta = GetTagArray();
+  return mafRestoreNumericFromTag(ta,"LM_SPHERE_RESOLUTION", m_SphereResolution,-1,15);
 }
 
 //-------------------------------------------------------------------------
