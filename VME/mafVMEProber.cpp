@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:55:56 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-12-14 12:10:55 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -193,6 +193,12 @@ int mafVMEProber::DeepCopy(mafNode *a)
     m_LowDensity      = prober->m_LowDensity;
     m_VolumeName      = prober->m_VolumeName;
     m_SurfaceName     = prober->m_SurfaceName;
+    mafDataPipeCustom *dpipe = mafDataPipeCustom::SafeDownCast(GetDataPipe());
+    if (dpipe)
+    {
+      dpipe->SetInput(m_Prober->GetOutput());
+      m_Prober->Update();
+    }
     return MAF_OK;
   }  
   return MAF_ERROR;

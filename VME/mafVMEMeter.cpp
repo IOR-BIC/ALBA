@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:55:55 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2006-12-14 12:10:55 $
+  Version:   $Revision: 1.26 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -120,6 +120,13 @@ int mafVMEMeter::DeepCopy(mafNode *a)
       this->SetLink("EndVME2", linked_node);
     }
     m_Transform->SetMatrix(meter->m_Transform->GetMatrix());
+
+    mafDataPipeCustom *dpipe = mafDataPipeCustom::SafeDownCast(GetDataPipe());
+    if (dpipe)
+    {
+      dpipe->SetInput(m_Goniometer->GetOutput());
+      m_Goniometer->Update();
+    }
     return MAF_OK;
   }  
   return MAF_ERROR;

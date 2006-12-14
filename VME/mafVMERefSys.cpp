@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERefSys.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-20 15:35:37 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-12-14 12:10:55 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -188,7 +188,12 @@ int mafVMERefSys::DeepCopy(mafNode *a)
   {
     mafVMERefSys *vme_ref_sys=mafVMERefSys::SafeDownCast(a);
     m_Transform->SetMatrix(vme_ref_sys->m_Transform->GetMatrix());
-    vme_ref_sys->SetScaleFactor(m_ScaleFactor);
+    SetScaleFactor(vme_ref_sys->GetScaleFactor());
+    mafDataPipeCustom *dpipe = mafDataPipeCustom::SafeDownCast(GetDataPipe());
+    if (dpipe)
+    {
+      dpipe->SetInput(m_ScaleAxis->GetOutput());
+    }
     return MAF_OK;
   }  
   return MAF_ERROR;
@@ -323,6 +328,7 @@ mmgGui* mafVMERefSys::CreateGui()
   m_Gui->SetListener(this);
   m_Gui->Divider();
   m_Gui->Double(ID_SCALE_FACTOR,_("scale"),&m_ScaleFactor);
+  m_Gui->Divider();
 
   return m_Gui;
 }
