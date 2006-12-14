@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-13 15:43:19 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2006-12-14 14:56:53 $
+  Version:   $Revision: 1.15 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -515,6 +515,7 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
 				if(m_TypeGizmo == GIZMO_TRANSLATE)
 				{
 					m_GizmoTranslate->Show(true);
+					m_GizmoTranslate->SetAbsPose(m_Slicer->GetOutput()->GetAbsMatrix(),0);
 					m_GizmoRotate->Show(false);
 				}
 				else if(m_TypeGizmo == GIZMO_ROTATE)
