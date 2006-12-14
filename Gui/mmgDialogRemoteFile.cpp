@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialogRemoteFile.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-03 13:26:37 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2006-12-14 09:46:08 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -91,10 +91,14 @@ void mmgDialogRemoteFile::CreateGui()
   m_Gui->Button(ID_BROWSE_REMOTE_FILE,_("browse"),_("remote files"));
   m_Gui->Button(ID_BROWSE_LOCAL_FILE, _("browse"),_("local files"));
   m_Gui->OkCancel();
+
+	m_Gui->Divider();
   
   m_GuiList = new mmgGui(this);
   m_GuiList->Show(true);
   m_RemoteFilesList = m_GuiList->ListBox(ID_LIST_FILES,"",155);
+
+	m_GuiList->Divider();
 
   wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
   sizer->Add(m_Gui,0, wxEXPAND);

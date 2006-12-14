@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-12 15:19:23 $
-  Version:   $Revision: 1.43 $
+  Date:      $Date: 2006-12-14 09:46:08 $
+  Version:   $Revision: 1.44 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -239,7 +239,7 @@ void mmgGui::Divider (long style)
 {
   if(style == 0) //simple empty space
   {
-    wxStaticText* div = new wxStaticText(this, -1, "",dp, wxSize(FW,4), 0);
+    wxStaticText* div = new wxStaticText(this, -1, "",dp, wxSize(FW,2), 0);
     Add(div,0,wxALL, M);
   }
   else
@@ -1175,7 +1175,7 @@ mmgLutSwatch *mmgGui::Lut(int id,wxString label,vtkLookupTable *lut)
 #endif             //:::::::::::::::::::::::::::::::::
 
 //----------------------------------------------------------------------------
-void mmgGui::OkCancel()
+void mmgGui::OkCancel(int alignment)
 //----------------------------------------------------------------------------
 {
   mmgButton    *b1 = new mmgButton(this, wxOK, "ok",dp, wxSize(FW/2,BH) );
@@ -1188,7 +1188,7 @@ void mmgGui::OkCancel()
   wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
   sizer->Add( b1, 0);
   sizer->Add( b2, 0);
-  Add(sizer,0,wxALL, M); 
+	Add(sizer,0,wxALL|alignment, M);
 }
 //----------------------------------------------------------------------------
 wxListBox *mmgGui::ListBox(int id,wxString label,int height, wxString tooltip, long lbox_style) //<*> togliere direction

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgHistogramWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2006-07-20 17:34:35 $
-Version:   $Revision: 1.10 $
+Date:      $Date: 2006-12-14 09:46:08 $
+Version:   $Revision: 1.11 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -213,6 +213,7 @@ void mmgHistogramWidget::CreateGui()
   m_Gui->Double(ID_SCALE_FACTOR,"scale",&m_ScaleFactor,1.0e-299,MAXDOUBLE,-1);
   m_Gui->Bool(ID_LOGSCALE,"log",&m_LogHistogramFlag,0,"Enable/Disable log scale for histogram");
   m_Gui->Double(ID_LOGFACTOR,"log constant",&m_LogScaleConstant,1.0e-299,MAXDOUBLE,-1,"multiplicative factor for log scale histogram");
+	m_Gui->Divider();
 
   EnableWidgets(m_Data != NULL);
 }

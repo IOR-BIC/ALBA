@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-25 13:34:03 $
-  Version:   $Revision: 1.32 $
+  Date:      $Date: 2006-12-14 09:46:08 $
+  Version:   $Revision: 1.33 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -189,7 +189,7 @@ public:
   void Button  (int id,mafString *label,mafString button_text, mafString tooltip=""); 
 
   /** Ok-Cancel Button widget. */
-  void OkCancel();
+  void OkCancel(int alignment=wxALL);
 
   /** Integer slider widget. */
 	wxSlider *Slider(int id, wxString label, int *var,int min = MININT, int max = MAXINT, wxString tooltip = "");
@@ -252,7 +252,7 @@ public:
   As a side effect a new pair widget_ID->module_ID is stored in m_WidgetTableID
   \sa GetId GetModuleId m_Id m_WidgetTableID
   */
-  int GetId(int mod_id)       {m_Id++; assert(m_Id<MAXID); m_WidgetTableID[m_Id-MINID]=mod_id; return m_Id;}; 
+  int GetId(int mod_id) {m_Id++; assert(m_Id<MAXID); m_WidgetTableID[m_Id-MINID]=mod_id; return m_Id;}; 
 
   /** Turn On/Off the collaboration status. */
   void Collaborate(bool status) {m_CollaborateStatus = status;};

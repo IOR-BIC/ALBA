@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-12-14 09:46:07 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -133,6 +133,8 @@ void mafAnimate::CreateGui()
 
 	m_PositionList = m_Gui->ListBox(ID_LIST," ");
 	m_Gui->Bool(ID_ANIMATE,"animate",&m_AnimateFlag);
+
+	m_Gui->Divider();
 
 	m_Gui->Update();
 }

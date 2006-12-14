@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTextKit.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-21 12:17:44 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-12-14 09:46:08 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -108,6 +108,7 @@ void mafTextKit::CreateGui()
   m_Gui->Color(ID_TEXT_COLOR,"color",&m_TextColor);
   m_Gui->Combo(ID_TEXT_ALIGN,"align",&m_TextAlign,9,align,"Align text inside the view");
   m_Gui->Integer(ID_TEXT_SIZE,"font size",&m_TextSize,1,300);
+	m_Gui->Divider();
 	m_Gui->Update();
 }
 //----------------------------------------------------------------------------
