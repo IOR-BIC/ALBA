@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkContourVolumeMapper.cxx,v $
 Language:  C++
-Date:      $Date: 2006-12-11 16:51:38 $
-Version:   $Revision: 1.13 $
+Date:      $Date: 2006-12-14 09:52:19 $
+Version:   $Revision: 1.14 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -105,7 +105,7 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
 
 using namespace vtkContourVolumeMapperNamespace;
 
-vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.13 $");
+vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.14 $");
 vtkStandardNewMacro(vtkContourVolumeMapper);
 
 
@@ -1268,7 +1268,7 @@ template<typename DataType> void vtkContourVolumeMapper::RenderMCubes(vtkRendere
 
           // if no caching, render the block now, else wait till whole volume is cached
           // n.b. loop does both lods only if caching enabled, so can't draw both lods
-          if (!createCache){
+          if (!createCache && numberOfTrianglesInBlock!=0){
             glDrawArrays(GL_TRIANGLES, 0, 3 * numberOfTrianglesInBlock);
             assert(glGetError() == GL_NO_ERROR);
           }
