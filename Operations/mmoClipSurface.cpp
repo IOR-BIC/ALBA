@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:11:57 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-12-14 09:57:38 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -135,7 +135,10 @@ void mmoClipSurface::OpRun()
   m_Gui->OkCancel();
   m_Gui->Enable(ID_CHOOSE_SURFACE, m_ClipModality == mmoClipSurface::MODE_SURFACE);
   m_Gui->Enable(wxOK,m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION);
-  ShowGui();
+  
+	m_Gui->Divider();
+
+	ShowGui();
   
   ShowClipPlane(m_ClipModality != mmoClipSurface::MODE_SURFACE);
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:41 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2006-12-14 10:01:30 $
+  Version:   $Revision: 1.20 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -550,6 +550,6 @@ mmgGui* mafVMEOutput::CreateGui()
 
   mafString type = GetTypeName(); 
   m_Gui->Label("type: ", type, true);
-
+	m_Gui->Divider();
   return m_Gui;
 }

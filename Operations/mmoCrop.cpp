@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCrop.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:11:57 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-12-14 09:57:38 $
+  Version:   $Revision: 1.7 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -290,6 +290,8 @@ void mmoCrop::CreateGui()
   m_Gui->Button(ID_RESET_CROPPING_AREA, _("reset"), "", _("reset the cropping area"));
 	m_Gui->Label("");
 	m_Gui->OkCancel();
+
+	m_Gui->Divider();
 
   ShowGui();
 }

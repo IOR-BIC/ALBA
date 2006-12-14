@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiGizmoScale.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:28 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-12-14 10:00:21 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,7 +60,7 @@ void mafGuiGizmoScale::CreateGui()
   m_Gui->Double(ID_SCALE_X, "Scaling X", &Scaling[0], 0);
   m_Gui->Double(ID_SCALE_Y, "Scaling Y", &Scaling[1], 0);
   m_Gui->Double(ID_SCALE_Z, "Scaling Z", &Scaling[2], 0);
-
+	m_Gui->Divider();
   m_Gui->Update();
 }
 

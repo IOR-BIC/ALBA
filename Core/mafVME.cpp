@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-15 14:34:49 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2006-12-14 10:01:30 $
+  Version:   $Revision: 1.36 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -815,5 +815,7 @@ mmgGui *mafVME::CreateGui()
     anim_text = "animated";
   }
   m_Gui->Label(anim_text);
+	m_Gui->Divider();
+
   return m_Gui;
 }

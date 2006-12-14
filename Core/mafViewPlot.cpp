@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewPlot.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-28 17:08:35 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-12-14 10:01:45 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -194,7 +194,7 @@ mmgGui *mafViewPlot::CreateGui()
 {
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
-
+	m_Gui->Divider();
   return m_Gui;
 }
 //----------------------------------------------------------------------------

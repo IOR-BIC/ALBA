@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMaterialChooser.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-12-14 10:00:50 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -202,6 +202,7 @@ void mmgMaterialChooser::CreateGUI()
 	//m_Gui->Update();
 	//m_Gui->SetSize(wxSize(220,520));
   //m_Gui->SetMinSize(wxSize(220,520));
+	m_Gui->Divider();
 	m_Gui->Reparent(m_Dialog);
   m_Gui->Show(true);
   m_Gui->Fit();

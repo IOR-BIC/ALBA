@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-13 15:27:24 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2006-12-14 10:00:21 $
+  Version:   $Revision: 1.32 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -1017,6 +1017,7 @@ void mafInteractionManager::CreateGUI()
   m_Gui->Label("installed devices");
   m_Gui->Add(m_DeviceTree,0,0);
   m_Gui->Label("selected device options");
+  m_Gui->Divider();
 
   m_Bindings = new mmgGui(this); // bindings will be added to m_Gui later (at the device selection)
   m_Bindings->Divider(1);

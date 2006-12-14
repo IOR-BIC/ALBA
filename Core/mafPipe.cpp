@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-15 14:33:36 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-12-14 10:02:20 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -81,6 +81,6 @@ mmgGui* mafPipe::CreateGui()
 
   mafString type = "mafPipe" ;
   m_Gui->Label("type :", type);
-
+	m_Gui->Divider();
   return m_Gui;
 }

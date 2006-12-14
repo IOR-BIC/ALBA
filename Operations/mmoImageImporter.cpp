@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoImageImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-07 12:11:04 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-12-14 09:57:38 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -146,6 +146,9 @@ void mmoImageImporter::OpRun()
       m_Gui->Enable(ID_SPACING,false);
       m_Gui->Enable(ID_DATA_SPACING,false);
       m_Gui->Update();
+
+			m_Gui->Divider();
+
       ShowGui();
     }
 

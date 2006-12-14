@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-09 17:58:23 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-12-14 09:55:55 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -110,6 +110,7 @@ mmgGui *mafPipeScalar::CreateGui()
 //----------------------------------------------------------------------------
 {
   m_Gui = new mmgGui(this);
+	m_Gui->Divider();
   return m_Gui;
 }
 //----------------------------------------------------------------------------

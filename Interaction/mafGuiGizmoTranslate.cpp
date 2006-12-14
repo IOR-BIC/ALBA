@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiGizmoTranslate.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:28 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-12-14 10:00:21 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -59,7 +59,7 @@ void mafGuiGizmoTranslate::CreateGui()
   m_Gui->Double(ID_TRANSLATE_X, "Translate X", &Position[0]);
   m_Gui->Double(ID_TRANSLATE_Y, "Translate Y", &Position[1]);
   m_Gui->Double(ID_TRANSLATE_Z, "Translate Z", &Position[2]);
-
+	m_Gui->Divider();
   m_Gui->Update();
 }
 

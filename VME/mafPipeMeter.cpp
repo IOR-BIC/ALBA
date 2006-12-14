@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-04 11:49:58 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-12-14 09:55:55 $
+  Version:   $Revision: 1.17 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -248,6 +248,7 @@ mmgGui *mafPipeMeter::CreateGui()
   m_Gui->Enable(ID_DISTANCE_RANGE,meter_attrib->m_ColorMode == mafVMEMeter::RANGE_COLOR);
   m_Gui->Enable(ID_TUBE_RADIUS, meter_attrib->m_Representation == mafVMEMeter::TUBE_REPRESENTATION);
   m_Gui->Enable(ID_TUBE_CAPPING, meter_attrib->m_Representation == mafVMEMeter::TUBE_REPRESENTATION);
+	m_Gui->Divider();
 
   return m_Gui;
 }

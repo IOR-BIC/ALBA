@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-20 15:35:37 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-12-14 09:55:56 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -432,7 +432,7 @@ mmgGui* mafVMEProber::CreateGui()
   m_ProberMode = GetMode();
   wxString prober_mode[2] = {_("density"), _("distance")};
   m_Gui->Combo(ID_MODALITY,_("modality"), &m_ProberMode, 2, prober_mode);
-
+	m_Gui->Divider();
   return m_Gui;
 }
 //-------------------------------------------------------------------------

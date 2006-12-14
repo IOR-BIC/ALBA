@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmo2DMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-28 12:15:33 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2006-12-14 09:57:38 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -178,6 +178,7 @@ void mmo2DMeasure::OpRun()
   
   m_Gui->Enable(ID_UNDO_MEASURE, m_2DAngleInteractor->SizeMeasureVector() != 0 || m_2DDistanceInteractor->SizeMeasureVector() != 0 || m_2DIndicatorInteractor->SizeMeasureVector() != 0);        
   
+	m_Gui->Divider();
 
   ShowGui();
 }

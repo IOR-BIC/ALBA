@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:11:57 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-12-14 09:57:38 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -482,6 +482,9 @@ void mmoVolumeResample::CreateGui()
 
 	m_Gui->Label("");
 	m_Gui->OkCancel();
+
+	m_Gui->Divider();
+
 	ShowGui();
 }
 

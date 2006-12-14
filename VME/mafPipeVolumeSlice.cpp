@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-24 15:41:28 $
-  Version:   $Revision: 1.40 $
+  Date:      $Date: 2006-12-14 09:55:55 $
+  Version:   $Revision: 1.41 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -544,7 +544,7 @@ mmgGui *mafPipeVolumeSlice::CreateGui()
 			m_SliceSlider[2] = m_Gui->FloatSlider(ID_SLICE_SLIDER_Z,"z",&m_Origin[2],b[4],b[5]);
 		}
 	}
-
+	m_Gui->Divider();
   return m_Gui;
 }
 //----------------------------------------------------------------------------

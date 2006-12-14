@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputLandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-10 16:13:09 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-12-14 09:55:55 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -71,8 +71,9 @@ mmgGui* mafVMEOutputLandmarkCloud::CreateGui()
   assert(m_Gui == NULL);
   m_Gui = mafVMEOutput::CreateGui();
   m_NumLandmarks = mafVMELandmarkCloud::SafeDownCast(m_VME)->GetNumberOfLandmarks();
-  m_Gui->Label("points: ", &m_NumLandmarks, true);
-  return m_Gui;
+  m_Gui->Label(_("points: "), &m_NumLandmarks, true);
+  m_Gui->Divider();
+	return m_Gui;
 }
 //-------------------------------------------------------------------------
 void mafVMEOutputLandmarkCloud::Update()

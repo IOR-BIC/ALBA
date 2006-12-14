@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGroup.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 15:17:47 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-12-14 09:55:55 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -63,7 +63,8 @@ mmgGui* mafVMEGroup::CreateGui()
 //-------------------------------------------------------------------------
 {
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
-  return m_Gui;
+  m_Gui->Divider();
+	return m_Gui;
 }
 
 //-------------------------------------------------------------------------

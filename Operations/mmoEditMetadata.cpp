@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoEditMetadata.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-22 13:35:57 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-12-14 09:57:38 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -122,6 +122,8 @@ void mmoEditMetadata::OpRun()
   EnableWidgets();
   m_Gui->OkCancel();
   
+	m_Gui->Divider();
+
   ShowGui();
 }
 //----------------------------------------------------------------------------

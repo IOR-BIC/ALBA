@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-21 15:57:31 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-12-14 10:00:21 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -110,6 +110,8 @@ void mafGuiTransformMouse::CreateGui()
   // translation constraints
   m_Gui->Label("translation constraints");
 	m_Gui->Combo(ID_TRASLATION_AXES,"",&TranslationConstraintId,9,translation_type);
+
+	m_Gui->Divider();
 
   m_Gui->Update();
 }

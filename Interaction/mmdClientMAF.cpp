@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmdClientMAF.cpp,v $
 Language:  C++
-Date:      $Date: 2006-06-14 14:46:33 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2006-12-14 10:00:21 $
+Version:   $Revision: 1.4 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -54,6 +54,8 @@ void mmdClientMAF::CreateGui()
 
   m_Gui->String(ID_SERVER_HOSTNAME,"server",&m_ServerHost);
   m_Gui->Integer(ID_PORT_NUMBER,"port",&m_PortNumber, 1, 100000);
+
+	m_Gui->Divider();
 }
 
 //----------------------------------------------------------------------------

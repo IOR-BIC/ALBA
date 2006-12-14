@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-20 15:35:37 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2006-12-14 09:55:55 $
+  Version:   $Revision: 1.25 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -773,6 +773,8 @@ mmgGui* mafVMEMeter::CreateGui()
 
   if(GetMeterAttributes()->m_MeterMode == POINT_DISTANCE)
     m_Gui->Enable(ID_END2_METER_LINK,false);
+
+	m_Gui->Divider();
 
   return m_Gui;
 }

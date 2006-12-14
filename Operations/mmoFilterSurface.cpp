@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoFilterSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:11:57 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-12-14 09:57:38 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -152,6 +152,9 @@ void mmoFilterSurface::OpRun()
 
 	m_Gui->Enable(ID_PREVIEW,false);
 	m_Gui->Enable(ID_CLEAR,false);
+
+	m_Gui->Divider();
+
 	ShowGui();
 }
 //----------------------------------------------------------------------------

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-20 15:35:37 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-12-14 09:55:56 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -109,7 +109,8 @@ mmgGui* mafVMEOutputSurface::CreateGui()
     m_NumTriangles = num;
   }
   m_Gui->Label(_("triangles: "), &m_NumTriangles, true);
-  return m_Gui;
+  m_Gui->Divider();
+	return m_Gui;
 }
 //-------------------------------------------------------------------------
 void mafVMEOutputSurface::Update()

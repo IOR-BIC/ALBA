@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-03 13:25:36 $
-  Version:   $Revision: 1.33 $
+  Date:      $Date: 2006-12-14 10:02:20 $
+  Version:   $Revision: 1.34 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -674,7 +674,7 @@ mmgGui *mafRWI::CreateGui()
 
   m_Gui->Divider(2);
   m_Gui->Bool(ID_LINK_CAMERA,"link camera",&m_LinkCamera,0,"Turn On/Off camera interaction synchronization");
-
+	m_Gui->Divider();
   return m_Gui;
 }
 //-------------------------------------------------------------------------

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 15:47:49 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-12-14 10:02:20 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -184,7 +184,8 @@ mmgGui *mafPipeBox::CreateGui()
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
   m_Gui->Combo(ID_BOUNDS_MODE,"bounds", &m_BoundsMode,num_choices,box_type);
-  return m_Gui;
+  m_Gui->Divider();
+	return m_Gui;
 }
 //----------------------------------------------------------------------------
 void mafPipeBox::OnEvent(mafEventBase *maf_event)

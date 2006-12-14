@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-13 14:20:29 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2006-12-14 09:55:55 $
+  Version:   $Revision: 1.32 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -221,7 +221,8 @@ mmgGui *mafPipeSurface::CreateGui()
     m_SurfaceMaterial = surface_output->GetMaterial();
   }
   m_Gui->Enable(ID_USE_LOOKUP_TABLE, m_SurfaceMaterial->m_ColorLut != NULL);
-  return m_Gui;
+  m_Gui->Divider();
+	return m_Gui;
 }
 //----------------------------------------------------------------------------
 void mafPipeSurface::OnEvent(mafEventBase *maf_event)

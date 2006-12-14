@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformTextEntries.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-17 11:17:40 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-12-14 10:00:21 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -85,6 +85,8 @@ void mafGuiTransformTextEntries::CreateGui()
   m_Gui->Double(ID_SCALE_X, "Scale X", &Scaling[0], 0);
   m_Gui->Double(ID_SCALE_Y, "Scale Y", &Scaling[1], 0);
   m_Gui->Double(ID_SCALE_Z, "Scale Z", &Scaling[2], 0);
+
+	m_Gui->Divider();
 
   m_Gui->Update();
 }

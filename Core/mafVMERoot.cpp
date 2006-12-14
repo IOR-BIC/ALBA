@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:41 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2006-12-14 10:01:30 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -226,5 +226,6 @@ mmgGui *mafVMERoot::CreateGui()
     m_ApplicationStamp = GetTagArray()->GetTag("APP_STAMP")->GetValue();
   }
   m_Gui->String(ID_APPLICATION_STAMP, "app stamp", &m_ApplicationStamp, "Tag to associate a msf file \nto a particular application.");
-  return m_Gui;
+  m_Gui->Divider();
+	return m_Gui;
 }

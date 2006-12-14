@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMaterialButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-20 14:05:15 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-12-14 10:00:50 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -84,6 +84,7 @@ void mmgMaterialButton::CreateGui()
   sizer->Add( m_MaterialLabel,  0, wxALIGN_CENTRE|wxLEFT, 5  );
 
   m_Gui->Add(sizer,0,wxLEFT, 5);
+	m_Gui->Divider();
 	m_Gui->Update();
 }
 //----------------------------------------------------------------------------

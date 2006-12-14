@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-31 09:29:04 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2006-12-14 09:55:55 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -284,6 +284,7 @@ mmgGui *mafVMEGenericAbstract::CreateGui()
 #ifdef MAF_USE_CRYPTO
   m_Gui->Bool(ID_VME_CRYPTING,"crypt",&m_Crypting);
 #endif
+	m_Gui->Divider();
   return m_Gui;
 }
 

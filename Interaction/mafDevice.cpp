@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDevice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-12-14 10:00:20 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -126,6 +126,8 @@ void mafDevice::CreateGui()
   m_Gui->Bool(ID_AUTO_START,"auto start",&m_AutoStart,0,"automatically activate device on application startup");
   //m_Gui->Enable(ID_ACTIVATE,!IsInitialized());
   //m_Gui->Enable(ID_SHUTDOWN,IsInitialized()!=0);
+
+	m_Gui->Divider();
 }
 
 //----------------------------------------------------------------------------

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-20 15:35:37 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-12-14 09:55:56 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -108,7 +108,8 @@ mmgGui* mafVMEOutputVolume::CreateGui()
   m_Gui->Label(&m_VolumeBounds[2]);
   m_Gui->Label(_("scalar range:"),true);
   m_Gui->Label(&m_ScaralRangeString);
-  return m_Gui;
+  m_Gui->Divider();
+	return m_Gui;
 }
 //-------------------------------------------------------------------------
 void mafVMEOutputVolume::Update()

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:41 $
-  Version:   $Revision: 1.45 $
+  Date:      $Date: 2006-12-14 10:02:20 $
+  Version:   $Revision: 1.46 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1178,6 +1178,7 @@ mmgGui* mafNode::CreateGui()
   m_Gui->Button(ID_PRINT_INFO, type_name, "", "Print node debug information");
   //m_Gui->Label("type: ", type_name);
   m_Gui->String(ID_NAME,"name :", &m_Name);
+	m_Gui->Divider();
 
   return m_Gui;
 }

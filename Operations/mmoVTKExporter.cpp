@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:11:57 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-12-14 09:57:38 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -99,6 +99,8 @@ void mmoVTKExporter::OpRun()
 	m_Gui->OkCancel();
   m_Gui->Enable(wxOK,m_File != "");
 	
+	m_Gui->Divider();
+
 	ShowGui();
 }
 //----------------------------------------------------------------------------
