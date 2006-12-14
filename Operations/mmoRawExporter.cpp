@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRawExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:57:38 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2006-12-14 10:24:33 $
+  Version:   $Revision: 1.5 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -18,7 +18,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmoRAWExporter.h"
+#include "mmoRawExporter.h"
 #include "wx/wxprec.h"
 #include "wx/busyinfo.h"
 

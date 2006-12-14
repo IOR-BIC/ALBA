@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 10:02:20 $
-  Version:   $Revision: 1.34 $
+  Date:      $Date: 2006-12-14 10:24:48 $
+  Version:   $Revision: 1.35 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -97,23 +97,23 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axe
   }
   m_RenderWindow->AddRenderer(m_RenFront);
 
-	m_RwiBase->SetRenderWindow(m_RenderWindow);
-#ifdef WIN32
+  m_RwiBase->SetRenderWindow(m_RenderWindow);
+//#ifdef WIN32
   m_RwiBase->Initialize();
-#endif
+//#endif
   
-	if(layers == TWO_LAYER)
-	{
-		m_RenBack = vtkRenderer::New();
-		m_RenBack->SetBackground(DEFAULT_BG_COLOR,DEFAULT_BG_COLOR,DEFAULT_BG_COLOR);
-		m_RenBack->SetActiveCamera(m_Camera);
-		m_RenBack->AddLight(m_Light);
-		m_RenBack->BackingStoreOff();
-		m_RenBack->LightFollowCameraOn(); 
-		m_RenBack->SetInteractive(0); 
+  if(layers == TWO_LAYER)
+  {
+    m_RenBack = vtkRenderer::New();
+    m_RenBack->SetBackground(DEFAULT_BG_COLOR,DEFAULT_BG_COLOR,DEFAULT_BG_COLOR);
+    m_RenBack->SetActiveCamera(m_Camera);
+    m_RenBack->AddLight(m_Light);
+    m_RenBack->BackingStoreOff();
+    m_RenBack->LightFollowCameraOn(); 
+    m_RenBack->SetInteractive(0); 
 
     m_RenFront->SetLayer(0); 
-		m_RenBack->SetLayer(1); 
+    m_RenBack->SetLayer(1); 
     m_RenderWindow->SetNumberOfLayers(2);
     m_RenderWindow->AddRenderer(m_RenBack);
   }
@@ -141,12 +141,12 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axe
   m_GridNormal  = GRID_Z;
 
   m_Grid = vtkGridActor::New();
-	m_RenFront->AddActor(m_Grid);
-	m_RenFront->AddActor2D(m_Grid->GetLabelActor());
-	SetGridNormal(m_GridNormal);
+  m_RenFront->AddActor(m_Grid);
+  m_RenFront->AddActor2D(m_Grid->GetLabelActor());
+  SetGridNormal(m_GridNormal);
   SetGridVisibility(m_ShowGrid != 0);
 
-	m_ShowAxes = show_axes;
+  m_ShowAxes = show_axes;
   m_Axes = new mafAxes(m_RenFront);
   m_Axes->SetVisibility(show_axes);
 }
@@ -159,16 +159,16 @@ mafRWI::~mafRWI()
     LinkCamera(false);
   }
   if(m_Grid) m_RenFront->RemoveActor(m_Grid);
-	if(m_Grid) m_RenFront->RemoveActor2D(m_Grid->GetLabelActor());
-	vtkDEL(m_Grid);
+  if(m_Grid) m_RenFront->RemoveActor2D(m_Grid->GetLabelActor());
+  vtkDEL(m_Grid);
 	
   if(m_Ruler) m_RenFront->RemoveActor2D(m_Ruler);
   vtkDEL(m_Ruler);
 
   cppDEL(m_Axes); //Must be removed before deleting renderers
   vtkDEL(m_Light);
-	vtkDEL(m_Camera);
-	if(m_RenFront) 
+  vtkDEL(m_Camera);
+  if(m_RenFront) 
   {
     m_RenFront->RemoveAllProps();
     m_RenderWindow->RemoveRenderer(m_RenFront);
@@ -179,13 +179,13 @@ mafRWI::~mafRWI()
     m_RenBack->RemoveAllProps();
     m_RenderWindow->RemoveRenderer(m_RenBack);
   }
-	vtkDEL(m_RenBack);
-	if(m_RenderWindow) 
+  vtkDEL(m_RenBack);
+  if(m_RenderWindow) 
     m_RenderWindow->SetInteractor(NULL);
   m_RenderWindow->Delete();
   if(m_RwiBase) 
     m_RwiBase->SetRenderWindow(NULL);
-	vtkDEL(m_RwiBase);  //The renderer has to be Deleted as last
+  vtkDEL(m_RwiBase);  //The renderer has to be Deleted as last
 }
 //-----------------------------------------------------------------------------------------
 void mafRWI::CameraSet(int cam_position)
@@ -202,80 +202,80 @@ void mafRWI::CameraSet(int cam_position)
 	|| cam_position == CAMERA_PERSPECTIVE_TOP 
 	|| cam_position == CAMERA_PERSPECTIVE_BOTTOM 
   )
-		m_Camera->ParallelProjectionOff();
-	else
-		m_Camera->ParallelProjectionOn();
+    m_Camera->ParallelProjectionOff();
+  else
+    m_Camera->ParallelProjectionOn();
 
   switch (cam_position) 
-	{
-		case CAMERA_FRONT:
-		case CAMERA_PERSPECTIVE_FRONT:
-			x=0; y=0; z=1; vx=0; vy=1; vz=0;
-		break;
-		case CAMERA_BACK:
-		case CAMERA_PERSPECTIVE_BACK:
-			x=0; y=0; z=-1;vx=0; vy=1; vz=0;
-		break;
-		case CAMERA_LEFT:
-		case CAMERA_PERSPECTIVE_LEFT:
-			x=-1 ;y=0; z=0; vx=0; vy=1; vz=0;
-		break;
-		case CAMERA_RIGHT:
-		case CAMERA_PERSPECTIVE_RIGHT:
-			x=1;y=0; z=0; vx=0; vy=1; vz=0;
-		break;
-		case CAMERA_TOP:
-		case CAMERA_PERSPECTIVE_TOP:
-			x=0; y=1; z=0; vx=0; vy=0; vz=-1;
-		break;
-		case CAMERA_BOTTOM:
-		case CAMERA_PERSPECTIVE_BOTTOM:
-			x=0; y=-1;z=0; vx=0; vy=0; vz=1;
-		break;
-		case CAMERA_PERSPECTIVE:
-	  //x=1; y=1; z=1; vx=0; vy=1; vz=0; //SIL. 23-6-2003 modified
-			x=0; y=1; z=4; vx=0; vy=1; vz=0; 
-		break;
-		case CAMERA_RX_FRONT:
-			x=0; y=-1; z=0; vx=0; vy=0; vz=1;
-		break;
-		case CAMERA_RX_LEFT:
-			x=1 ;y=0; z=0; vx=0; vy=0; vz=1;
-		break;
-		case CAMERA_RX_RIGHT:
-			x=-1;y=0; z=0; vx=0; vy=0; vz=1;
-		break;
-		case CAMERA_DRR_FRONT:
-			m_Camera->ParallelProjectionOff();
-			x=0; y=-1; z=0; vx=0; vy=0; vz=1;	//modified by Paolo 10-6-2003
-		break;
-		case CAMERA_DRR_LEFT:
-			m_Camera->ParallelProjectionOff();
-			x=1 ;y=0; z=0; vx=0; vy=0; vz=1;	//modified by Paolo 10-6-2003
-		break;
-		case CAMERA_DRR_RIGHT:
-			m_Camera->ParallelProjectionOff();
-			x=-1;y=0; z=0; vx=0; vy=0; vz=1;	//modified by Paolo 10-6-2003
-		break;
-//		case CAMERA_CT:
-			//x=0; y=0; z=-1; vx=0; vy=-1; vz=0;
-//		break;
-		case CAMERA_OS_X:
-			//x=-1 ;y=0; z=0; vx=0; vy=0; vz=1;
+  {
+    case CAMERA_FRONT:
+    case CAMERA_PERSPECTIVE_FRONT:
+      x=0; y=0; z=1; vx=0; vy=1; vz=0;
+    break;
+    case CAMERA_BACK:
+    case CAMERA_PERSPECTIVE_BACK:
+      x=0; y=0; z=-1;vx=0; vy=1; vz=0;
+    break;
+    case CAMERA_LEFT:
+    case CAMERA_PERSPECTIVE_LEFT:
+      x=-1 ;y=0; z=0; vx=0; vy=1; vz=0;
+    break;
+    case CAMERA_RIGHT:
+    case CAMERA_PERSPECTIVE_RIGHT:
+      x=1;y=0; z=0; vx=0; vy=1; vz=0;
+    break;
+    case CAMERA_TOP:
+    case CAMERA_PERSPECTIVE_TOP:
+      x=0; y=1; z=0; vx=0; vy=0; vz=-1;
+    break;
+    case CAMERA_BOTTOM:
+    case CAMERA_PERSPECTIVE_BOTTOM:
+      x=0; y=-1;z=0; vx=0; vy=0; vz=1;
+    break;
+    case CAMERA_PERSPECTIVE:
+      //x=1; y=1; z=1; vx=0; vy=1; vz=0; //SIL. 23-6-2003 modified
+      x=0; y=1; z=4; vx=0; vy=1; vz=0; 
+    break;
+    case CAMERA_RX_FRONT:
+      x=0; y=-1; z=0; vx=0; vy=0; vz=1;
+    break;
+    case CAMERA_RX_LEFT:
       x=1 ;y=0; z=0; vx=0; vy=0; vz=1;
-		break;
-		case CAMERA_OS_Y:
-			x=0; y=-1; z=0; vx=0; vy=0; vz=1;
-		break;
+    break;
+    case CAMERA_RX_RIGHT:
+      x=-1;y=0; z=0; vx=0; vy=0; vz=1;
+    break;
+    case CAMERA_DRR_FRONT:
+      m_Camera->ParallelProjectionOff();
+      x=0; y=-1; z=0; vx=0; vy=0; vz=1;	//modified by Paolo 10-6-2003
+    break;
+    case CAMERA_DRR_LEFT:
+      m_Camera->ParallelProjectionOff();
+      x=1 ;y=0; z=0; vx=0; vy=0; vz=1;	//modified by Paolo 10-6-2003
+    break;
+    case CAMERA_DRR_RIGHT:
+      m_Camera->ParallelProjectionOff();
+      x=-1;y=0; z=0; vx=0; vy=0; vz=1;	//modified by Paolo 10-6-2003
+    break;
+//    case CAMERA_CT:
+      //x=0; y=0; z=-1; vx=0; vy=-1; vz=0;
+//    break;
+    case CAMERA_OS_X:
+      //x=-1 ;y=0; z=0; vx=0; vy=0; vz=1;
+      x=1 ;y=0; z=0; vx=0; vy=0; vz=1;
+    break;
+    case CAMERA_OS_Y:
+      x=0; y=-1; z=0; vx=0; vy=0; vz=1;
+    break;
     case CAMERA_CT:
-		case CAMERA_OS_Z:
-			//x=0; y=0; z=-1; vx=0; vy=-1; vz=0;
+    case CAMERA_OS_Z:
+      //x=0; y=0; z=-1; vx=0; vy=-1; vz=0;
       x=0; y=0; z=-1; vx=0; vy=-1; vz=0;
-		break;
-		case CAMERA_OS_P:
+    break;
+    case CAMERA_OS_P:
       m_Camera->ParallelProjectionOff();     // Paolo 09/06/2004
-			x=-1; y=-1; z=1; vx=0; vy=0; vz=1;
-		break;
+      x=-1; y=-1; z=1; vx=0; vy=0; vz=1;
+    break;
     // ste beg
     case CAMERA_RXFEM_XNEG:
       x=-1;y=0; z=0; vx=0; vy=0; vz=1;
@@ -302,27 +302,26 @@ void mafRWI::CameraSet(int cam_position)
   m_Camera->SetViewUp(vx,vy,vz);
   m_Camera->SetClippingRange(0.1,1000);
   
-	CameraReset();
-
+  CameraReset();
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetSize(int x, int y, int w,int h)
 //----------------------------------------------------------------------------
 {
-   ((wxWindow*)m_RwiBase)->SetSize(x,y,w,h);
-   ((wxWindow*)m_RwiBase)->SetMinSize(wxSize(w,h));
+  ((wxWindow*)m_RwiBase)->SetSize(x,y,w,h);
+  ((wxWindow*)m_RwiBase)->SetMinSize(wxSize(w,h));
 }
 //----------------------------------------------------------------------------
 void mafRWI::Show(bool show)
 //----------------------------------------------------------------------------
 {
-   m_RwiBase->Show(show);
+  m_RwiBase->Show(show);
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetGridNormal(int normal_id)
 //----------------------------------------------------------------------------
 {
-   if(m_Grid) m_Grid->SetGridNormal(normal_id);
+  if(m_Grid) m_Grid->SetGridNormal(normal_id);
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetGridPosition(double position)
@@ -336,9 +335,9 @@ void mafRWI::SetGridVisibility(bool show)
 {
   if(m_Grid)
   {
-	  m_ShowGrid = show;
-	  m_Grid->SetVisibility(m_ShowGrid);
-	  m_Grid->GetLabelActor()->SetVisibility(m_ShowGrid);
+    m_ShowGrid = show;
+    m_Grid->SetVisibility(m_ShowGrid);
+    m_Grid->GetLabelActor()->SetVisibility(m_ShowGrid);
     m_RenFront->ResetCameraClippingRange();
   }
 }
@@ -416,9 +415,9 @@ void mafRWI::CameraUpdate()
 {
   //if(!m_RwiBase->IsShown()) return;
   if (m_RenderWindow->GetGenericWindowId() == 0) 
-		return;
+    return;
 
-	m_RenFront->ResetCameraClippingRange(); 
+  m_RenFront->ResetCameraClippingRange(); 
   m_RenderWindow->Render();
   if (m_StereoMovieEnable!=0)
   {
@@ -430,14 +429,14 @@ void mafRWI::CameraReset(mafNode *vme)
 //----------------------------------------------------------------------------
 {
   if (m_RenderWindow->GetGenericWindowId() == 0) 
-		return;
+    return;
 
-	if(m_Grid && m_ShowGrid) 
+  if(m_Grid && m_ShowGrid) 
     m_Grid->VisibilityOff();
 
   mafEventMacro(mafEvent(this,CAMERA_PRE_RESET,m_RenFront)); //- Attention - I'm sending m_RenFront, I suppose that m_RenBack is never required 
   CameraReset(ComputeVisibleBounds(vme));
-	if(m_Grid && m_ShowGrid) 
+  if(m_Grid && m_ShowGrid) 
     m_Grid->VisibilityOn();
 
   mafEventMacro(mafEvent(this,CAMERA_POST_RESET,m_RenFront));
@@ -452,11 +451,11 @@ double *mafRWI::ComputeVisibleBounds(mafNode *node)
   mafVME *vme = NULL;
   
   if(node && (vme = mafVME::SafeDownCast(node)))
-		if(!vme->IsA("mafNodeRoot"))
-			if(vme->GetOutput()->GetVTKData())
-				if(m_Sg) 
-					if(mafSceneNode *n = m_Sg->Vme2Node(vme) )
-						if(n->IsVisible())
+    if(!vme->IsA("mafNodeRoot"))
+      if(vme->GetOutput()->GetVTKData())
+	if(m_Sg) 
+	  if(mafSceneNode *n = m_Sg->Vme2Node(vme) )
+	    if(n->IsVisible())
 	{
     /** Modified by Marco 24-6-2005: this is not generic: do ask the VME for its bounds
 		vme->GetOutput()->GetVTKData()->GetBounds(b1);
@@ -505,9 +504,9 @@ double *mafRWI::ComputeVisibleBounds(mafNode *node)
     */
   
     vme->GetOutput()->GetVMEBounds(b1);    
-		return b1;
-	}
-	m_RenFront->ComputeVisiblePropBounds(b1);
+    return b1;
+  }
+  m_RenFront->ComputeVisiblePropBounds(b1);
   if (m_RenBack)
   {
     m_RenBack->ComputeVisiblePropBounds(b2);
@@ -520,7 +519,7 @@ double *mafRWI::ComputeVisibleBounds(mafNode *node)
     return b;
   }
   else
-	  return b1;
+    return b1;
 }
 //----------------------------------------------------------------------------
 void mafRWI::CameraReset(double bounds[6])
@@ -537,13 +536,13 @@ void mafRWI::CameraReset(double bounds[6])
   vtkMath::Normalize(view_right);
 	
   //convert camera vectors to float
-	double vu[3],vl[3],vr[3];
-	for(int i=0; i<3; i++)
+  double vu[3],vl[3],vr[3];
+  for(int i=0; i<3; i++)
   {
-	  vu[i]=view_up[i];
-	  vl[i]=view_look[i];
-	  vr[i]=view_right[i];
-	} 	
+    vu[i]=view_up[i];
+    vl[i]=view_look[i];
+    vr[i]=view_right[i];
+  } 	
 
   double height;	
   double width;	
@@ -553,49 +552,49 @@ void mafRWI::CameraReset(double bounds[6])
   center[1] = (bounds[2] + bounds[3])/2.0;
   center[2] = (bounds[4] + bounds[5])/2.0;
 	
-	double diag[3];
-	diag[0] = (bounds[1] - bounds[0]);
-	diag[1] = (bounds[3] - bounds[2]);
-	diag[2] = (bounds[5] - bounds[4]);
+  double diag[3];
+  diag[0] = (bounds[1] - bounds[0]);
+  diag[1] = (bounds[3] - bounds[2]);
+  diag[2] = (bounds[5] - bounds[4]);
 
-	//--------------------------------------
-	if(m_Camera->GetParallelProjection())
-	{
-		height = fabs( 0.52 * vtkMath::Dot(vu,diag) );
-		width  = fabs( 0.52 * vtkMath::Dot(vr,diag) );
-		depth  = fabs( 0.52 * vtkMath::Dot(vl,diag) );
-	}
+  //--------------------------------------
+  if(m_Camera->GetParallelProjection())
+  {
+    height = fabs( 0.52 * vtkMath::Dot(vu,diag) );
+    width  = fabs( 0.52 * vtkMath::Dot(vr,diag) );
+    depth  = fabs( 0.52 * vtkMath::Dot(vl,diag) );
+  }
   //--------------------------------------
   else 
-	{
-		height = width = depth = 0.5 * vtkMath::Norm(diag);	
+  {
+    height = width = depth = 0.5 * vtkMath::Norm(diag);	
   }
   //--------------------------------------
 
-	height = (height == 0) ? 1.0 : height;	
+  height = (height == 0) ? 1.0 : height;	
   
-	//check aspect ratio - and eventually compensate height
-	double view_aspect  = (m_RwiBase->m_Width*1.0)/(m_RwiBase->m_Height*1.0);
-	double scene_aspect = (width)/(height);
+  //check aspect ratio - and eventually compensate height
+  double view_aspect  = (m_RwiBase->m_Width*1.0)/(m_RwiBase->m_Height*1.0);
+  double scene_aspect = (width)/(height);
   if( scene_aspect > view_aspect )
   {
     height = width/view_aspect; 
-	}
+  }
 
   double distance;
-	distance  = height/tan(m_Camera->GetViewAngle()*vtkMath::Pi()/360.0);
-	distance += depth/2;
+  distance  = height/tan(m_Camera->GetViewAngle()*vtkMath::Pi()/360.0);
+  distance += depth/2;
 
   // update the camera
   m_Camera->SetFocalPoint(center[0],center[1],center[2]);
   m_Camera->SetPosition(center[0]+distance*vl[0],
-                   center[1]+distance*vl[1],
-                   center[2]+distance*vl[2]);
+                        center[1]+distance*vl[1],
+                        center[2]+distance*vl[2]);
 
   // setup parallel scale
   m_Camera->SetParallelScale(height);
 	
-	//m_RenFront->ResetCameraClippingRange(bounds);
+  //m_RenFront->ResetCameraClippingRange(bounds);
 }
 //-------------------------------------------------------------------------
 /** IDs for the GUI */
@@ -674,7 +673,7 @@ mmgGui *mafRWI::CreateGui()
 
   m_Gui->Divider(2);
   m_Gui->Bool(ID_LINK_CAMERA,"link camera",&m_LinkCamera,0,"Turn On/Off camera interaction synchronization");
-	m_Gui->Divider();
+  m_Gui->Divider();
   return m_Gui;
 }
 //-------------------------------------------------------------------------
