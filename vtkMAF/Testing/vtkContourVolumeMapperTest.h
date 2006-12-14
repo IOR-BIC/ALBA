@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkContourVolumeMapperTest.h,v $
 Language:  C++
-Date:      $Date: 2006-12-01 10:26:57 $
-Version:   $Revision: 1.2 $
-Authors:   Matteo Giacomoni
+Date:      $Date: 2006-12-14 17:47:25 $
+Version:   $Revision: 1.3 $
+Authors:   Matteo Giacomoni, Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
@@ -28,14 +28,30 @@ class vtkContourVolumeMapperTest : public CPPUNIT_NS::TestFixture
 {
   public:
   
+    // CPPUNIT fixture: executed before each test
+    void setUp();
+
+    // CPPUNIT fixture: executed after each test
+    void tearDown();
+
     CPPUNIT_TEST_SUITE( vtkContourVolumeMapperTest );
-    CPPUNIT_TEST( Test );
+    CPPUNIT_TEST( TestFixture );
+    CPPUNIT_TEST( TestImageData );
+    CPPUNIT_TEST( TestRectilinearGrid );
     CPPUNIT_TEST_SUITE_END();
 
   protected:
+
     void Test();
-		vtkImageData* CreateDataID();
-		vtkRectilinearGrid* CreateDataRG();
+    void TestFixture();
+    void TestImageData();
+    void TestRectilinearGrid();
+
+		void CreateDataID();
+		void CreateDataRG();
+    vtkImageData *m_ImageData;
+    vtkRectilinearGrid *m_RGData;
+
 };
 
 
