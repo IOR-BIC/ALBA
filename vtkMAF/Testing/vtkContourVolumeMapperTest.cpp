@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkContourVolumeMapperTest.cpp,v $
 Language:  C++
-Date:      $Date: 2006-12-14 17:47:25 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2006-12-15 10:20:23 $
+Version:   $Revision: 1.6 $
 Authors:   Matteo Giacomoni, Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -85,7 +85,7 @@ void vtkContourVolumeMapperTest::TestFixture()
 void vtkContourVolumeMapperTest::TestRectilinearGrid() 
 //-----------------------------------------------------------
 {
-	char filename[]   = "cube";
+	char filename[]   = "cubePolyFromRG";
 	//------------------ create objects
   vtkContourVolumeMapper *mapper = vtkContourVolumeMapper::New();
   vtkMAFSmartPointer<vtkVolume> volume;
@@ -155,7 +155,7 @@ void vtkContourVolumeMapperTest::TestRectilinearGrid()
 			mapper->SetContourValue(value);
 			vtkPolyData *polydata = mapper->GetOutput(0);
 			CPPUNIT_ASSERT(polydata->GetNumberOfPoints()==((dims[0]*dims[1])));
-      // renWin->Render();
+       // renWin->Render();
 	}
 
   if (ExtractModel && filename) {
@@ -187,7 +187,7 @@ void vtkContourVolumeMapperTest::TestRectilinearGrid()
 void vtkContourVolumeMapperTest::TestImageData() 
 //-----------------------------------------------------------
 {
-  char filename[]   = "cube";
+  char filename[]   = "cubePolyFromID";
   //------------------ create objects
   vtkContourVolumeMapper *mapper = vtkContourVolumeMapper::New();
   vtkMAFSmartPointer<vtkVolume> volume;
@@ -256,7 +256,7 @@ void vtkContourVolumeMapperTest::TestImageData()
     mapper->SetContourValue(value);
     vtkPolyData *polydata = mapper->GetOutput(0);
     CPPUNIT_ASSERT(polydata->GetNumberOfPoints()==((dims[0]*dims[1])));
-    //renWin->Render();
+    // renWin->Render();
   }
 
   if (ExtractModel && filename) {
