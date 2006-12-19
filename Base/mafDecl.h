@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-02 11:20:22 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2006-12-19 11:31:43 $
+  Version:   $Revision: 1.27 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -386,10 +386,10 @@ extern wxWindow* mafGetFrame();
 //mafVmeBaseTypes mafGetBaseType(mafVME* vme); //(to be removed Marco)
 
 /** to be used by mmgFrame and derived class only */    
-void      mafSetFrame(wxWindow* frame);
+void mafSetFrame(wxWindow* frame);
 
 /** process pending events. be careful not to call it recursively */    
-void      mafYield();
+void mafYield();
 
 /** show the File Open Dialog Box */
 std::string  mafGetOpenFile(const char * initial, const char * wildcard, const char * title = "Open File", wxWindow *parent = NULL);
@@ -401,7 +401,7 @@ void mafGetOpenMultiFiles(const char * initial, const char * wildcard, std::vect
 std::string  mafGetSaveFile(const char * initial, const char * wildcard, const char * title = "Save File", wxWindow *parent = NULL);
 
 /** return true if the filename use a protocol like ftp, http or https.
-    Write into 'protocol_used' parameter the protocol used by the file.*/
+  Write into 'protocol_used' parameter the protocol used by the file.*/
 bool IsRemote(mafString filename, mafString &protocol_used);
 
 /** return a random wxColour from a palette of 16 */
@@ -409,6 +409,9 @@ wxColour  mafRandomColor();
 
 /** Used to generate gray scale bitmap given a colored one.*/
 wxBitmap GrayScale(wxBitmap bmp);
+
+/** Used to generate red scale bitmap to represent a VME with data not present.*/
+wxBitmap RedScale(wxBitmap bmp);
 
 /** return the application start-up directory */
 std::string  mafGetApplicationDirectory();

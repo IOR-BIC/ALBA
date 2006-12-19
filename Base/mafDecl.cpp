@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-02 11:20:22 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2006-12-19 11:31:43 $
+  Version:   $Revision: 1.27 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -178,6 +178,28 @@ wxBitmap GrayScale(wxBitmap bmp)
     b = p++;
     gray = *r + *g + *b;
     *r = *g = *b = gray / 3;
+  }
+  return wxBitmap(img);
+}
+//----------------------------------------------------------------------------
+wxBitmap RedScale(wxBitmap bmp)
+//----------------------------------------------------------------------------
+{
+  wxImage img = bmp.ConvertToImage();
+  unsigned char *p = img.GetData();
+  unsigned char *max = p + img.GetWidth() * img.GetHeight() * 3;
+  unsigned char *r, *g, *b;
+  unsigned int red;
+  unsigned int gray;
+  while( p < max )
+  {
+    r = p++;
+    g = p++;
+    b = p++;
+    gray = *r + *g + *b;
+    red = *r * 1.6;
+    *r = *g = *b = gray / 3;
+    *r = red > 255 ? 255 : red;
   }
   return wxBitmap(img);
 }
