@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMAFTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-25 13:34:34 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2006-12-19 11:44:12 $
+  Version:   $Revision: 1.15 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -103,7 +103,9 @@ mmoMAFTransform::~mmoMAFTransform()
 bool mmoMAFTransform::Accept(mafNode* vme)
 //----------------------------------------------------------------------------
 {
-	return (vme!=NULL && vme->IsMAFType(mafVME) && !vme->IsA("mafVMERoot") && !vme->IsA("mafVMEExternalData"));
+	mafEvent e(this,VIEW_SELECTED);
+	mafEventMacro(e);
+	return (vme!=NULL && vme->IsMAFType(mafVME) && !vme->IsA("mafVMERoot") && !vme->IsA("mafVMEExternalData") && e.GetBool());
 }
 //----------------------------------------------------------------------------
 mafOp* mmoMAFTransform::Copy()   

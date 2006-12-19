@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCrop.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:11:57 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-12-19 11:43:44 $
+  Version:   $Revision: 1.6 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,7 +51,7 @@ public:
 
   mafOp* Copy();
 
-	bool Accept(mafNode* Node) {return ( Node && Node->IsA("mafVMEVolumeGray"));};
+	bool Accept(mafNode* Node);
 	void OpRun();	
 	
   /**	Extract the volume cropped*/

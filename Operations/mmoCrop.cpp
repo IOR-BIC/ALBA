@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCrop.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:57:38 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-12-19 11:43:44 $
+  Version:   $Revision: 1.8 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -71,6 +71,14 @@ mafOp *mmoCrop::Copy()
 //----------------------------------------------------------------------------
 {
 	return new mmoCrop(m_Label);
+}
+//----------------------------------------------------------------------------
+bool mmoCrop::Accept(mafNode* Node)
+//----------------------------------------------------------------------------
+{
+	mafEvent e(this,VIEW_SELECTED);
+	mafEventMacro(e);
+	return ( Node && Node->IsA("mafVMEVolumeGray") && e.GetBool());
 }
 //----------------------------------------------------------------------------
 void mmoCrop::OpRun()   

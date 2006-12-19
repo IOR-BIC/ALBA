@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:57:38 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-12-19 11:44:12 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -83,7 +83,9 @@ mmoVolumeResample::~mmoVolumeResample()
 bool mmoVolumeResample::Accept(mafNode* vme) 
 //----------------------------------------------------------------------------
 {
-  return (vme && vme->IsMAFType(mafVMEVolumeGray));
+	mafEvent e(this,VIEW_SELECTED);
+	mafEventMacro(e);
+  return (vme && vme->IsMAFType(mafVMEVolumeGray) && e.GetBool());
 }
 //----------------------------------------------------------------------------
 void mmoVolumeResample::InternalUpdateBounds(double bounds[6], bool center)
