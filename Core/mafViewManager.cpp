@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-06 09:42:46 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2006-12-19 12:30:53 $
+  Version:   $Revision: 1.28 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -402,6 +402,14 @@ void mafViewManager::ViewDelete(mafView *view)
     m_RemoteListener->OnEvent(&e);
   }
 
+  if(m_SelectedView)
+  {
+    if(m_SelectedRWI) 
+      m_SelectedRWI->SetMouse(NULL);
+    m_SelectedRWI = NULL;
+    m_SelectedView = NULL;
+  }
+
   mafEventMacro(mafEvent(this,VIEW_DELETE,view)); // inform the sidebar
 	
   // Paolo 2005-04-22
@@ -427,20 +435,21 @@ void mafViewManager::ViewDelete(mafView *view)
     }
   }
 
-  if(m_SelectedView)
-	{
-    if(m_SelectedRWI) 
-      m_SelectedRWI->SetMouse(NULL);
-    m_SelectedRWI = NULL;
-    m_SelectedView = NULL;
-	}
 	cppDEL(view);
 }
 //----------------------------------------------------------------------------
 void mafViewManager::ViewDeleteAll()
 //----------------------------------------------------------------------------
 {
-	while(m_ViewList)
+  if(m_SelectedView)
+  {
+    if(m_SelectedRWI) 
+      m_SelectedRWI->SetMouse(NULL);
+    m_SelectedRWI = NULL;
+    m_SelectedView = NULL;
+  }
+
+  while(m_ViewList)
   {
     m_ViewList->GetFrame()->Show(false);
     m_ViewList->GetFrame()->Close();
