@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-15 14:33:57 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2006-12-19 11:34:51 $
+  Version:   $Revision: 1.31 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -179,6 +179,9 @@ public:
   
   /** Return true if the number of local time stamps is > 1*/
   virtual bool IsAnimated();
+
+  /** Return true if the data associated with the VME is present and updated at the current time.*/
+  virtual bool IsDataAvailable();
   
   /** Set the crypting status for the vme. */
   void SetCrypting(int crypting);
