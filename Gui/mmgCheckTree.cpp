@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-11 16:46:55 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2006-12-19 11:33:38 $
+  Version:   $Revision: 1.20 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,6 +24,7 @@
 #include "mafDecl.h"
 #include "mafPics.h" 
 #include "mafNode.h"
+#include "mafVME.h"
 #include "mafView.h"
 #include <vector>
 
@@ -218,6 +219,7 @@ void mmgCheckTree::VmeSelected(mafNode *vme)
 {
   this->SelectNode((long)vme);
   m_SelectedNode = vme;
+  VmeUpdateIcon(vme);
 }
 //----------------------------------------------------------------------------
 void mmgCheckTree::VmeModified(mafNode *vme)
@@ -243,7 +245,8 @@ int mmgCheckTree::GetVmeStatus(mafNode *vme)
 void mmgCheckTree::VmeUpdateIcon(mafNode *vme)   
 //----------------------------------------------------------------------------
 {
-  int icon_index = ClassNameToIcon(vme->GetTypeName()) + GetVmeStatus(vme);
+  int dataStatus = ((mafVME *)vme)->IsDataAvailable() ? 0 : 1;
+  int icon_index = ClassNameToIcon(vme->GetTypeName()) + (GetVmeStatus(vme)*2) + dataStatus;
   SetNodeIcon( (long)vme, icon_index );
 }
 //----------------------------------------------------------------------------
@@ -300,7 +303,7 @@ void mmgCheckTree::InitializeImageList()
 
   const int num_of_status = 5; 
   int num_types = v.size();
-  int num_icons = num_types * num_of_status;
+  int num_icons = num_types * (num_of_status * 2); // Added the status "Data not available"
 
   if(num_types <= 0)
   {
@@ -334,14 +337,19 @@ void mmgCheckTree::InitializeImageList()
   for(int i=0; i<num_types; i++)
   {
     wxString name = v[i];
-    m_MapClassNameToIcon[name]=i*num_of_status;
+    //m_MapClassNameToIcon[name]=i*num_of_status;
+    m_MapClassNameToIcon[name]=i*(num_of_status * 2); // Paolo 18/12/2006
     
-    for( int s=0; s<num_of_status; s++)
+    int s;
+    for( s=0; s<num_of_status; s++)
     {
       wxBitmap vmeico = mafPics.GetVmePic(name);
       if(s==0) vmeico = GrayScale(vmeico);
       wxBitmap merged = MergeIcons(state_ico[s],vmeico);
       imgs->Add(merged);
+      vmeico = RedScale(vmeico);
+      wxBitmap missingData = MergeIcons(state_ico[s],vmeico); // Same icon as above, but represent a 
+      imgs->Add(missingData);                                 // node with no data available.
     }
   }
   SetImageList(imgs);
