@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceTextured.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-13 14:19:09 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006-12-19 11:42:28 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -304,6 +304,7 @@ mmgGui *mafPipeSurfaceTextured::CreateGui()
   bool texture_falg = m_SurfaceMaterial->GetMaterialTexture() != NULL || m_SurfaceMaterial->GetMaterialTextureID() != -1;
   m_Gui->Enable(ID_USE_TEXTURE, texture_falg);
   m_Gui->Enable(ID_USE_LOOKUP_TABLE, m_SurfaceMaterial->m_ColorLut != NULL);
+	m_Gui->Divider();
   return m_Gui;
 }
 //----------------------------------------------------------------------------
