@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-11 16:48:34 $
-  Version:   $Revision: 1.92 $
+  Date:      $Date: 2006-12-19 12:32:03 $
+  Version:   $Revision: 1.93 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -653,8 +653,8 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       case VIEW_DELETE:
         if(m_PlugSidebar)
           this->m_SideBar->ViewDeleted(e->GetView()); // changed By Marco (is it correct?)
-// currently mafInteraction is strictly dependent on VTK (marco)
 #ifdef MAF_USE_VTK
+        // currently mafInteraction is strictly dependent on VTK (marco)
         if(m_InteractionManager)
           m_InteractionManager->ViewSelected(NULL);
 #endif
@@ -668,6 +668,10 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
           EnableItem(MENU_FILE_PRINT_PREVIEW, false);
           EnableItem(MENU_FILE_PRINT_SETUP, false);
           EnableItem(MENU_FILE_PRINT_PAGE_SETUP, false);
+        }
+        if (m_OpManager)
+        {
+          m_OpManager->RefreshMenu();
         }
       break;	
       case VIEW_SELECT:
