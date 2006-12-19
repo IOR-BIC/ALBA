@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-22 12:59:44 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2006-12-19 12:31:13 $
+  Version:   $Revision: 1.26 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -736,4 +736,10 @@ void mafOpManager::Collaborate(bool status)
 
   for(int index = 0; index < m_NumOp; index++)
     m_OpList[index]->Collaborate(status);
+}
+//----------------------------------------------------------------------------
+void mafOpManager::RefreshMenu()
+//----------------------------------------------------------------------------
+{
+  EnableOp(!Running());
 }

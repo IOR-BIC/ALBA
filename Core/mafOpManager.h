@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-16 09:09:14 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2006-12-19 12:31:13 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -117,6 +117,9 @@ public:
   void Collaborate(bool status);
 
   bool m_FromRemote; ///< Flag used to check if a command comes from local or remote application.
+
+  /** Called by logic to refresh the operation's menù items.*/
+  void RefreshMenu();
 
 protected:
 	/** Execute the current operation. */
