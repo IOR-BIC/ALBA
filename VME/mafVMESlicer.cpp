@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-12 14:18:28 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2006-12-19 11:37:43 $
+  Version:   $Revision: 1.18 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -166,6 +166,13 @@ bool mafVMESlicer::IsAnimated()
 //-------------------------------------------------------------------------
 {
   return false;
+}
+
+//-------------------------------------------------------------------------
+bool mafVMESlicer::IsDataAvailable()
+//-------------------------------------------------------------------------
+{
+  return GetParent()->IsDataAvailable();
 }
 
 //-------------------------------------------------------------------------

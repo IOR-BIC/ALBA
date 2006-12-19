@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-12 14:17:42 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2006-12-19 11:37:43 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -65,6 +65,9 @@ public:
   /** return always false since (currently) the slicer is not an animated VME (position 
       is the same for all timestamps). */
   virtual bool IsAnimated();
+
+  /** Return true if the data associated with the VME is present and updated at the current time.*/
+  virtual bool IsDataAvailable();
 
   /** Return the suggested pipe-typename for the visualization of this vme */
   virtual mafString GetVisualPipe() {return mafString("mafPipeSurfaceTextured");};

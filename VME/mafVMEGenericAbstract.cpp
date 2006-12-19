@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:55:55 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2006-12-19 11:37:43 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -136,6 +136,19 @@ bool mafVMEGenericAbstract::IsAnimated()
   {
     return (m_MatrixVector->GetNumberOfItems()>1);
   }
+}
+
+//-------------------------------------------------------------------------
+bool mafVMEGenericAbstract::IsDataAvailable()
+//-------------------------------------------------------------------------
+{
+  if (m_DataVector)
+  {
+    mafVMEItem *item = m_DataVector->GetItem(this->GetTimeStamp());
+    return item->IsDataPresent();
+  }
+  else
+    return Superclass::IsDataAvailable();
 }
 
 //-------------------------------------------------------------------------

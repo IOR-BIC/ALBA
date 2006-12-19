@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEProber.h,v $
   Language:  C++
-  Date:      $Date: 2005-08-31 15:11:59 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-12-19 11:37:43 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -165,6 +165,13 @@ public:
 
   /** Clear the parameter 'kframes' because mafVMEProber has no timestamp. */
   void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes);
+
+  /** return always false since (currently) the slicer is not an animated VME (position 
+  is the same for all timestamps). */
+  virtual bool IsAnimated();
+
+  /** Return true if the data associated with the VME is present and updated at the current time.*/
+  virtual bool IsDataAvailable();
 
   /** return icon */
   static char** GetIcon();

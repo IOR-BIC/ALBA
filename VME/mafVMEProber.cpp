@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 12:10:55 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2006-12-19 11:37:43 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -238,6 +238,22 @@ void mafVMEProber::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes)
 //-------------------------------------------------------------------------
 {
   kframes.clear(); // no timestamps
+}
+
+//-------------------------------------------------------------------------
+bool mafVMEProber::IsAnimated()
+//-------------------------------------------------------------------------
+{
+  return false;
+}
+
+//-------------------------------------------------------------------------
+bool mafVMEProber::IsDataAvailable()
+//-------------------------------------------------------------------------
+{
+  mafVME *vol = mafVME::SafeDownCast(GetVolumeLink());
+  mafVME *surf = mafVME::SafeDownCast(GetSurfaceLink());
+  return (vol && surf && vol->IsDataAvailable() && surf->IsDataAvailable());
 }
 
 //-----------------------------------------------------------------------

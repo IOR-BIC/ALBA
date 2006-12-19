@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:54 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-12-19 11:37:43 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -109,6 +109,9 @@ public:
     return true is this VME has more than one time stamp, either  for
     data or matrices */
   virtual bool IsAnimated();
+
+  /** Return true if the data associated with the VME is present and updated at the current time.*/
+  virtual bool IsDataAvailable();
 
   /** return an xpm-icon that can be used to represent this node */
   static char ** GetIcon();   //SIL. 11-4-2005:
