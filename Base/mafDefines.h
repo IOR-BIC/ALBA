@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-02 21:58:31 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2006-12-19 13:59:24 $
+  Version:   $Revision: 1.21 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -49,6 +49,7 @@ enum MAF_RETURN_VALUES_ID
 {
   MAF_OK = 0,
   MAF_ERROR,
+  MAF_WAIT,
   MAF_USER_RETURN_VALUE
 };
 #define ID_NO_EVENT 0
