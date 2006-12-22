@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-23 14:16:57 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2006-12-22 11:16:55 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005
@@ -248,7 +248,7 @@ int mafVMEItemScalar::InternalRestoreData()
     assert(storage);
     
     mafString filename;
-    storage->ResolveInputURL(m_URL,filename);
+    int resolvedURL = storage->ResolveInputURL(m_URL,filename);
     
     vnl_matrix<double> data;
 
@@ -260,40 +260,47 @@ int mafVMEItemScalar::InternalRestoreData()
       c = (int)item->GetComponentAsDouble(1);
       data.set_size(r,c);
     }
-    
-    if (GetCrypting())
+
+    if (resolvedURL == MAF_OK)
     {
-#ifdef MAF_USE_CRYPTO
-      std::string file_string;
-      mafDefaultDecryptFileInMemory(filename, file_string);
-      //data.read_ascii(file_string); //------------------------------------------------------------------- <--
-#else
-      mafErrorMacro("Crypted data not supported: MAF not linked to Crypto library.");
-      return MAF_ERROR;
-#endif
-    }
-    else
-    {
-      vcl_ifstream v_raw_matrix(filename, std::ios::in);
-      if(v_raw_matrix.is_open() != 0)
+      if (GetCrypting())
       {
-        data.read_ascii(v_raw_matrix);
+      #ifdef MAF_USE_CRYPTO
+        std::string file_string;
+        mafDefaultDecryptFileInMemory(filename, file_string);
+        //data.read_ascii(file_string); //------------------------------------------------------------------- <--
+      #else
+        mafErrorMacro("Crypted data not supported: MAF not linked to Crypto library.");
+        return MAF_ERROR;
+      #endif
       }
       else
       {
-        mafErrorMacro("Error accessing scalar data file.");
+        vcl_ifstream v_raw_matrix(filename, std::ios::in);
+        if(v_raw_matrix.is_open() != 0)
+        {
+          data.read_ascii(v_raw_matrix);
+        }
+        else
+        {
+          mafErrorMacro("Error accessing scalar data file.");
+          return MAF_ERROR;
+        }
+      }
+
+      if (data.empty())
+      {
+        mafErrorMacro("Cannot read data file " << filename);
         return MAF_ERROR;
       }
+      else
+      {
+        SetData(data);
+      }
     }
-
-    if (data.empty())
+    else if (resolvedURL == MAF_ERROR)
     {
-      mafErrorMacro("Cannot read data file " << filename);
-      return MAF_ERROR;
-    }
-    else
-    {
-      SetData(data);
+      return MAF_NO_IO;
     }
     return MAF_OK;
   } 
