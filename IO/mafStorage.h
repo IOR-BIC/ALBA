@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorage.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 12:15:15 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2006-12-22 11:12:02 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -76,7 +76,7 @@ public:
   mafStorable *GetDocument();
 
   /** resolve an URL and provide local filename to be used as input */
-  virtual bool ResolveInputURL(const char * url, mafString &filename)=0;
+  virtual int ResolveInputURL(const char * url, mafString &filename)=0;
 
   /** resolve an URL and provide a local filename to be used as output */
   //virtual bool ResolveOutputURL(const mafCString url, mafString &filename)=0;

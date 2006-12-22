@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRemoteStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-17 14:54:07 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2006-12-22 11:14:13 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -106,7 +106,7 @@ void mafRemoteStorage::SetRemotePort(int port)
   m_Port = port;
 }
 //------------------------------------------------------------------------------
-bool mafRemoteStorage::ResolveInputURL(const char *url, mafString &filename)
+int mafRemoteStorage::ResolveInputURL(const char *url, mafString &filename)
 //------------------------------------------------------------------------------
 {
   int res = MAF_OK;
@@ -146,7 +146,7 @@ bool mafRemoteStorage::ResolveInputURL(const char *url, mafString &filename)
     m_RemoteRepository = "";
   }
 
-  return (res == MAF_OK);
+  return res;
 }
 //------------------------------------------------------------------------------
 int mafRemoteStorage::StoreToURL(const char *filename, const char *url)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2006-12-22 11:13:29 $
+  Version:   $Revision: 1.18 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -185,7 +185,7 @@ void mafXMLStorage::SetURL(const char *name)
 }
 
 //------------------------------------------------------------------------------
-bool mafXMLStorage::ResolveInputURL(const char * url, mafString &filename)
+int mafXMLStorage::ResolveInputURL(const char * url, mafString &filename)
 //------------------------------------------------------------------------------
 {
   // currently no real URL support
@@ -208,7 +208,7 @@ bool mafXMLStorage::ResolveInputURL(const char * url, mafString &filename)
     filename=url;
   }
   
-  return true;
+  return MAF_OK;
 }
 //------------------------------------------------------------------------------
 int mafXMLStorage::StoreToURL(const char * filename, const char * url)
@@ -498,7 +498,7 @@ int mafXMLStorage::InternalRestore()
 
     // here I should resolve the XML file name
     mafString filename;
-    if (ResolveInputURL(m_ParserURL,filename))
+    if (ResolveInputURL(m_ParserURL,filename) != MAF_ERROR)
     {
       int errorCode  = 0;
 
