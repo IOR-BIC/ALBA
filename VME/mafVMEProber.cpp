@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-19 11:37:43 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2006-12-22 12:59:52 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -134,7 +134,6 @@ void mafVMEProber::InternalPreUpdate()
         m_Normals->SplittingOff();
         m_Normals->Update();
 
-//        m_Prober->SetInput((vtkDataSet *)m_Normals->GetOutput());
         m_Prober->SetSource(vol->GetOutput()->GetVTKData());
         if(GetMode() == mafVMEProber::DENSITY_MODE)
           m_Prober->SetFilterModeToDensity();
@@ -158,6 +157,17 @@ void mafVMEProber::InternalPreUpdate()
         m_Prober->SetInputMatrix(tmp_matrix.GetVTKMatrix());
       }
     }
+  }
+  else
+  {
+    m_Prober->SetSource(NULL);
+  }
+
+  m_SurfaceName = surf ? surf->GetName() : _("none");
+  m_VolumeName = vol ? vol->GetName() : _("none");
+  if (m_Gui)
+  {
+    m_Gui->Update();
   }
 }
 
