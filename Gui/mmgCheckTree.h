@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-12 11:16:31 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2006-12-22 12:58:26 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -69,6 +69,9 @@ public:
 protected:
   /** Update the vme nodes icon. */
   void VmeUpdateIcon(mafNode *n);
+
+  /** Update all the vme nodes icon. */
+  void TreeUpdateIcon();
   
   /** Return the status of the node according to the vme visibility. */
   virtual int GetVmeStatus(mafNode *vme);

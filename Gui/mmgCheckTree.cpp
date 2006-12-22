@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-22 11:15:37 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2006-12-22 12:58:26 $
+  Version:   $Revision: 1.22 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -253,9 +253,14 @@ void mmgCheckTree::VmeUpdateIcon(mafNode *vme)
 void mmgCheckTree::ViewSelected(mafView *view)
 //----------------------------------------------------------------------------
 {
-  m_View=view;
-
-	m_table->BeginFind();
+  m_View = view;
+  TreeUpdateIcon();
+}
+//----------------------------------------------------------------------------
+void mmgCheckTree::TreeUpdateIcon()
+//----------------------------------------------------------------------------
+{
+  m_table->BeginFind();
 	while(wxNode* node = m_table->Next())
 	{
 		mmgTreeTableElement* el = (mmgTreeTableElement*)node->GetData();
@@ -282,7 +287,7 @@ int mmgCheckTree::ClassNameToIcon(wxString classname)
   else
   {
     // search superclass's icon
-    // if also this icon is not present, "Unknow" icon is used
+    // if also this icon is not present, "Unknown" icon is used
     wxLogMessage("mafPictureFactory::ClassNameToIcon: cant find = %s ",classname.c_str());
     return 0;
   }
@@ -291,7 +296,7 @@ int mmgCheckTree::ClassNameToIcon(wxString classname)
 void mmgCheckTree::InitializeImageList()
 //----------------------------------------------------------------------------
 {
-  // pourpose:
+  // purpose:
   // each vme-picture is combined with each state-picture,
   // all the combined picture are inserted in the image-list.
   // given a vme-class-name and a vme-state
