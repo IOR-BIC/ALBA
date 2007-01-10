@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoExtractIsosurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-11 16:44:12 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2007-01-10 10:21:50 $
+  Version:   $Revision: 1.18 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -225,7 +225,7 @@ void mmoExtractIsosurface::CreateOpDialog()
 	wxStaticText *foo  = new wxStaticText(m_Dialog,-1, "");
 	wxTextCtrl   *text = new wxTextCtrl  (m_Dialog,ID_ISO, "",								 		p,wxSize(50, 16 ), wxNO_BORDER );
   m_IsoSlider				 = new mmgFloatSlider(m_Dialog,ID_ISO_SLIDER,m_IsoValue,m_MinDensity,m_MaxDensity,p,wxSize(150,20));
-	m_IsoSlider->SetNumberOfSteps(200);
+	m_IsoSlider->SetNumberOfSteps(sr[1]-sr[0]);
 	m_StepDensity = m_IsoSlider->GetStep();
   //m_MinDensity  = m_IsoSlider->GetMin();
   //m_MaxDensity  = m_IsoSlider->GetMax();
