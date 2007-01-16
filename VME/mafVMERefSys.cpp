@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERefSys.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 12:10:55 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-01-16 12:38:10 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -29,6 +29,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafIndent.h"
 #include "mmaMaterial.h"
 #include "mmgGui.h"
+#include "mafVMELandmarkCloud.h"
+#include "mafMatrix.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFDataPipe.h"
@@ -43,6 +45,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkLineSource.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkAxes.h"
+#include "vtkMath.h"
+#include "vtkMatrix4x4.h"
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMERefSys)
@@ -61,7 +65,12 @@ mafVMERefSys::mafVMERefSys()
   mafDataPipeCustom *dpipe = mafDataPipeCustom::New();
   SetDataPipe(dpipe);
 
+	DependsOnLinkedNodeOn();
+
+	m_Radio = 0;
   m_ScaleFactor = 1.0;
+
+	m_VMEAccept = new mafVMEAccept();
 
   vtkUnsignedCharArray *data;
   float scalar_red[3]   = {255,0,0};
@@ -133,6 +142,7 @@ mafVMERefSys::mafVMERefSys()
   m_Axes->AddInput(m_XAxis->GetOutput()); // data has the scalars.
   m_Axes->AddInput(m_YAxis->GetOutput());
   m_Axes->AddInput(m_ZAxis->GetOutput());
+
   m_Axes->Update();
 
   m_ScaleAxisTransform = vtkTransform::New();
@@ -179,6 +189,8 @@ mafVMERefSys::~mafVMERefSys()
   vtkDEL(m_ScaleAxisTransform);	
   m_ScaleAxis->SetTransform(NULL);
   vtkDEL(m_ScaleAxis);
+
+	cppDEL(m_VMEAccept);
 }
 //-------------------------------------------------------------------------
 int mafVMERefSys::DeepCopy(mafNode *a)
@@ -324,11 +336,60 @@ mmaMaterial *mafVMERefSys::GetMaterial()
 mmgGui* mafVMERefSys::CreateGui()
 //-------------------------------------------------------------------------
 {
+
+	mafID sub_id = -1;
+
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
   m_Gui->Divider();
   m_Gui->Double(ID_SCALE_FACTOR,_("scale"),&m_ScaleFactor);
   m_Gui->Divider();
+
+	wxString choises[3]={"Normal","Select Origin","Select Plane"};
+	m_Gui->Radio(ID_RADIO,"",&m_Radio,3,choises);
+
+	mafVME *origin_vme = GetOriginVME();
+  if (origin_vme && origin_vme->IsMAFType(mafVMELandmarkCloud))
+  {
+    sub_id = GetLinkSubId("OriginVME");
+		m_OriginVmeName = (sub_id != -1) ? ((mafVMELandmarkCloud *)origin_vme)->GetLandmarkName(sub_id) : _("none");
+  }
+  else
+    m_OriginVmeName = origin_vme ? origin_vme->GetName() : _("none");
+  m_Gui->Button(ID_REF_SYS_ORIGIN,&m_OriginVmeName,_("Origin"), _("Select the vme origin for the ref sys"));
+	m_Gui->Enable(ID_REF_SYS_ORIGIN,origin_vme!=NULL);
+
+  mafVME *point1_vme = GetPoint1VME();
+  if (point1_vme && point1_vme->IsMAFType(mafVMELandmarkCloud))
+  {
+    sub_id = GetLinkSubId("Point1VME");
+    m_Point1VmeName = (sub_id != -1) ? ((mafVMELandmarkCloud *)point1_vme)->GetLandmarkName(sub_id) : _("none");
+  }
+  else
+    m_Point1VmeName = point1_vme ? point1_vme->GetName() : _("none");
+  m_Gui->Button(ID_POINT1,&m_Point1VmeName,_("Point 1"), _("Select the Point 1"));
+	m_Gui->Enable(ID_POINT1,point1_vme!=NULL);
+
+  mafVME *point2_vme = GetPoint2VME();
+  if (point2_vme && point2_vme->IsMAFType(mafVMELandmarkCloud))
+  {
+    sub_id = GetLinkSubId("Point2VME");
+    m_Point2VmeName = (sub_id != -1) ? ((mafVMELandmarkCloud *)point2_vme)->GetLandmarkName(sub_id) : _("none");
+  }
+  else
+    m_Point2VmeName = point2_vme ? point2_vme->GetName() : _("none");
+  m_Gui->Button(ID_POINT2,&m_Point2VmeName,_("Point 2"), _("Select the Point 2"));
+	m_Gui->Enable(ID_POINT2,point2_vme!=NULL);
+
+	if(point2_vme && origin_vme && point2_vme)
+		m_Radio=2;
+	else if(origin_vme)
+		m_Radio=1;
+	else
+		m_Radio=0;
+
+	m_Gui->Update();
+	//this->InternalUpdate();
 
   return m_Gui;
 }
@@ -346,6 +407,66 @@ void mafVMERefSys::OnEvent(mafEventBase *maf_event)
         SetScaleFactor(m_ScaleFactor);
       }
       break;
+			case ID_REF_SYS_ORIGIN:
+      case ID_POINT1:
+      case ID_POINT2:
+      {
+        mafID button_id = e->GetId();
+        mafString title = _("Choose vme");
+        e->SetId(VME_CHOOSE);
+        e->SetArg((long)m_VMEAccept);
+        e->SetString(&title);
+        ForwardUpEvent(e);
+        mafNode *n = e->GetVme();
+        if (n != NULL)
+        {
+          if (button_id == ID_REF_SYS_ORIGIN)
+          {
+						SetRefSysLink("OriginVME", n);
+						m_OriginVmeName = n->GetName();
+          }
+          else if (button_id == ID_POINT1)
+          {
+            SetRefSysLink("Point1VME", n);
+						m_Point1VmeName = n->GetName();
+          }
+          else
+          {
+            SetRefSysLink("Point2VME", n);
+						m_Point2VmeName = n->GetName();
+          }
+					InternalUpdate();
+					m_Gui->Update();
+        }
+      }
+      break;
+			case ID_RADIO:
+				{
+					if(m_Radio==0)
+					{
+						this->RemoveAllLinks();
+						m_Gui->Enable(ID_REF_SYS_ORIGIN,false);
+						m_Gui->Enable(ID_POINT1,false);
+						m_Gui->Enable(ID_POINT2,false);
+					}
+					else if(m_Radio==1)
+					{
+						this->RemoveLink("Point1VME");
+						this->RemoveLink("Point2VME");
+						m_Gui->Enable(ID_REF_SYS_ORIGIN,true);
+						m_Gui->Enable(ID_POINT1,false);
+						m_Gui->Enable(ID_POINT2,false);
+					}
+					else if(m_Radio==2)
+					{
+						m_Gui->Enable(ID_REF_SYS_ORIGIN,true);
+						m_Gui->Enable(ID_POINT1,true);
+						m_Gui->Enable(ID_POINT2,true);
+					}
+					InternalUpdate();
+					m_Gui->Update();
+				}
+			break;
       default:
       mafNode::OnEvent(maf_event);
     }
@@ -371,4 +492,169 @@ char **mafVMERefSys::GetIcon()
 {
 #include "mafVMESurface.xpm"
   return mafVMESurface_xpm;
+}
+//-----------------------------------------------------------------------
+void mafVMERefSys::InternalPreUpdate()
+//-----------------------------------------------------------------------
+{
+}
+//-----------------------------------------------------------------------
+void mafVMERefSys::InternalUpdate()
+//-----------------------------------------------------------------------
+{
+	mafVME *point1_vme = GetPoint1VME();
+	mafVME *point2_vme = GetPoint2VME();
+	mafVME *origin_vme = GetOriginVME();
+
+	if(point1_vme && point2_vme && origin_vme)
+	{
+		double point1[3],point2[3],origin[3],orientation[3];
+		mafSmartPointer<mafTransform> TmpTransform;
+
+		//Get the position of the origin
+		if(origin_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("OriginVME") != -1)
+    {
+			mafVMELandmark *o=((mafVMELandmarkCloud *)origin_vme)->GetLandmark(GetLinkSubId("OriginVME"));
+			o->GetPoint(origin);
+    }
+    else if(origin_vme->IsMAFType(mafVMELandmark))
+    {
+			origin_vme->GetOutput()->Update();  
+      origin_vme->GetOutput()->GetAbsPose(origin, orientation);
+    }
+
+		//Get the position of the point 1
+		if(point1_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("Point1VME") != -1)
+    {
+			mafVMELandmark *l1=((mafVMELandmarkCloud *)point1_vme)->GetLandmark(GetLinkSubId("Point1VME"));
+			l1->GetPoint(point1);
+    }
+    else if(point1_vme->IsMAFType(mafVMELandmark))
+    {
+			point1_vme->GetOutput()->Update();  
+      point1_vme->GetOutput()->GetAbsPose(point1, orientation);
+    }
+
+		//Get the position of the point 2
+		if(point2_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("Point2VME") != -1)
+    {
+			mafVMELandmark *l2=((mafVMELandmarkCloud *)point2_vme)->GetLandmark(GetLinkSubId("Point2VME"));
+			l2->GetPoint(point2);
+    }
+    else if(point2_vme->IsMAFType(mafVMELandmark))
+    {
+			point2_vme->GetOutput()->Update();  
+      point2_vme->GetOutput()->GetAbsPose(point2, orientation);
+    }
+
+		double v1[3],v2[3],v3[3];
+
+		v1[0] = point1[0] - origin[0];
+		v1[1] = point1[1] - origin[1];
+		v1[2] = point1[2] - origin[2];
+
+		v2[0] = point2[0] - origin[0];
+		v2[1] = point2[1] - origin[1];
+		v2[2] = point2[2] - origin[2];
+
+		vtkMath::Normalize(v1);
+		vtkMath::Normalize(v2);
+
+		vtkMath::Cross(v1,v2,v3);
+		vtkMath::Normalize(v3);
+		vtkMath::Cross(v3,v1,v2);
+
+		vtkMatrix4x4 *matrix_translation=vtkMatrix4x4::New();
+		matrix_translation->Identity();
+		for(int i=0;i<3;i++)
+			matrix_translation->SetElement(i,3,origin[i]);
+
+		vtkMatrix4x4 *matrix_rotation=vtkMatrix4x4::New();
+		matrix_rotation->Identity();
+		for(int i=0;i<3;i++)
+			matrix_rotation->SetElement(i,0,v1[i]);
+		for(int i=0;i<3;i++)
+			matrix_rotation->SetElement(i,1,v2[i]);
+		for(int i=0;i<3;i++)
+			matrix_rotation->SetElement(i,2,v3[i]);
+
+		mafMatrix a;
+		a.SetVTKMatrix(matrix_rotation);
+		mafMatrix b;
+		b.SetVTKMatrix(matrix_translation);
+		mafMatrix c;
+		mafMatrix::Multiply4x4(b,a,c);
+
+		this->SetMatrix(c);
+		
+	}
+	else if(origin_vme)
+	{
+		double origin[3],orientation[3];
+
+		//Get the position of the origin
+		if(origin_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("OriginVME") != -1)
+    {
+			mafVMELandmark *o=((mafVMELandmarkCloud *)origin_vme)->GetLandmark(GetLinkSubId("OriginVME"));
+			o->GetPoint(origin);
+    }
+    else if(origin_vme->IsMAFType(mafVMELandmark))
+    {
+			origin_vme->GetOutput()->Update();  
+      origin_vme->GetOutput()->GetAbsPose(origin, orientation);
+    }
+
+		vtkMatrix4x4 *matrix_translation=vtkMatrix4x4::New();
+		matrix_translation->Identity();
+		for(int i=0;i<3;i++)
+			matrix_translation->SetElement(i,3,origin[i]);
+
+		mafMatrix b;
+		b.SetVTKMatrix(matrix_translation);
+		
+		this->SetMatrix(b);
+	}
+	else
+	{
+		vtkMatrix4x4 *matrix_translation=vtkMatrix4x4::New();
+		matrix_translation->Identity();
+
+		mafMatrix b;
+		b.SetVTKMatrix(matrix_translation);
+		
+		this->SetMatrix(b);
+	}
+
+	mafEvent *e	= new mafEvent(this,CAMERA_UPDATE);
+  ForwardUpEvent(e);
+	this->Modified();
+}
+//-------------------------------------------------------------------------
+void mafVMERefSys::SetRefSysLink(const char *link_name, mafNode *n)
+//-------------------------------------------------------------------------
+{
+	if (n->IsMAFType(mafVMELandmark))
+  {
+    SetLink(link_name,n->GetParent(),((mafVMELandmarkCloud *)n->GetParent())->FindLandmarkIndex(n->GetName()));
+  }
+  else
+    SetLink(link_name, n);
+}
+//-------------------------------------------------------------------------
+mafVME *mafVMERefSys::GetPoint1VME()
+//-------------------------------------------------------------------------
+{
+  return mafVME::SafeDownCast(GetLink("Point1VME"));
+}
+//-------------------------------------------------------------------------
+mafVME *mafVMERefSys::GetPoint2VME()
+//-------------------------------------------------------------------------
+{
+  return mafVME::SafeDownCast(GetLink("Point2VME"));
+}
+//-------------------------------------------------------------------------
+mafVME *mafVMERefSys::GetOriginVME()
+//-------------------------------------------------------------------------
+{
+  return mafVME::SafeDownCast(GetLink("OriginVME"));
 }

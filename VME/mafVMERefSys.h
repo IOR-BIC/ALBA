@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERefSys.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-17 13:07:00 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-01-16 12:38:10 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -17,7 +17,9 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // Include:
 //----------------------------------------------------------------------------
 #include "mafVME.h"
+#include "mafVMELandmark.h"
 #include "mafEvent.h"
+#include "mmgVMEChooserAccept.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -48,8 +50,24 @@ public:
   enum REFSYS_WIDGET_ID
   {
     ID_SCALE_FACTOR = Superclass::ID_LAST,
+		ID_REF_SYS_ORIGIN,
+		ID_POINT1,
+		ID_POINT2,
+		ID_RADIO,
     ID_LAST
   };
+
+	 class mafVMEAccept : public mmgVMEChooserAccept
+  {
+  public:
+
+    mafVMEAccept() {};
+    ~mafVMEAccept() {};
+
+    bool Validate(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMELandmark));};
+  };
+  
+  mafVMEAccept *m_VMEAccept;
 
   /** Precess events coming from other objects */ 
   virtual void OnEvent(mafEventBase *maf_event);
@@ -94,6 +112,14 @@ public:
   /** Return the suggested pipe-typename for the visualization of this vme */
   virtual mafString GetVisualPipe() {return mafString("mafPipeSurface");};
 
+	/** 
+  Set links for the refsys*/
+  void SetRefSysLink(const char *link_name, mafNode *n);
+
+	mafVME *GetOriginVME();
+  mafVME *GetPoint1VME();
+  mafVME *GetPoint2VME();
+
 protected:
   mafVMERefSys();
   virtual ~mafVMERefSys();
@@ -101,11 +127,21 @@ protected:
   virtual int InternalStore(mafStorageElement *parent);
   virtual int InternalRestore(mafStorageElement *node);
 
+	/** called to prepare the update of the output */
+  virtual void InternalPreUpdate();
+
+  /** update the output data structure */
+  virtual void InternalUpdate();
+
   /** used to initialize and create the material attribute if not yet present */
   virtual int InternalInitialize();
 
   /** Internally used to create a new instance of the GUI.*/
   virtual mmgGui *CreateGui();
+
+	mafString m_Point1VmeName;
+	mafString m_Point2VmeName;
+	mafString m_OriginVmeName;
 
   vtkArrowSource						*m_XArrow;
   vtkArrowSource						*m_YArrow;
@@ -128,6 +164,8 @@ protected:
   double m_ScaleFactor;
 
   mafTransform *m_Transform; ///< pose matrix for the slicer plane
+
+	int m_Radio;
 
 private:
   mafVMERefSys(const mafVMERefSys&); // Not implemented
