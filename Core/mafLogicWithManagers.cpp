@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-19 12:32:03 $
-  Version:   $Revision: 1.93 $
+  Date:      $Date: 2007-01-16 14:38:23 $
+  Version:   $Revision: 1.94 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1189,6 +1189,10 @@ void mafLogicWithManagers::VmeRemove(mafNode *vme)
     m_VMEManager->VmeRemove(vme);
   if(m_PlugTimebar)
     UpdateTimeBounds();
+  if (m_ViewManager)
+  {
+    m_ViewManager->CameraUpdate();
+  }
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeRemoving(mafNode *vme)
