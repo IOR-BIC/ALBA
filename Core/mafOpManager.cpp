@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-19 12:31:13 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2007-01-16 14:37:12 $
+  Version:   $Revision: 1.27 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -481,6 +481,7 @@ void mafOpManager::OpRun(int op_id)
       OpSelect(m_Selected->GetParent());
       node_to_del->ReparentTo(NULL);
       ClearUndoStack();
+      mafEventMacro(mafEvent(this,CAMERA_UPDATE));
     }
     break;
 	  case OP_CUT:
