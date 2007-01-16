@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:55:55 $
-  Version:   $Revision: 1.32 $
+  Date:      $Date: 2007-01-16 12:40:02 $
+  Version:   $Revision: 1.33 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -157,8 +157,9 @@ void mafPipeSurface::Create(mafSceneNode *n)
 
   m_AssemblyFront->AddPart(m_OutlineActor);
 
-  m_Axes = new mafAxes(m_RenFront, m_Vme);
-  m_Axes->SetVisibility(0);
+	m_Axes = new mafAxes(m_RenFront, m_Vme);
+	if(m_Vme->IsA("mafVMERefSys"))
+		m_Axes->SetVisibility(false);
 }
 //----------------------------------------------------------------------------
 mafPipeSurface::~mafPipeSurface()
@@ -183,7 +184,8 @@ void mafPipeSurface::Select(bool sel)
 	if(m_Actor->GetVisibility()) 
 	{
 		m_OutlineActor->SetVisibility(sel);
-    m_Axes->SetVisibility(sel);
+		if(!m_Vme->IsA("mafVMERefSys"))
+			m_Axes->SetVisibility(sel);
 	}
 }
 //----------------------------------------------------------------------------
