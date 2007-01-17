@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkContourVolumeMapper.h,v $
 Language:  C++
-Date:      $Date: 2006-12-11 16:51:38 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2007-01-17 17:03:48 $
+Version:   $Revision: 1.8 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -65,8 +65,10 @@ Then Render()
 //------------------------------------------------------------------------------
 // Forward declarations
 //------------------------------------------------------------------------------
+class Idepth ;
 class Polyline2D;
 class ListOfPolyline2D;
+
 
 //------------------------------------------------------------------------------
 // namespace for vtkContourVolumeMapper and related classes
@@ -75,12 +77,12 @@ namespace vtkContourVolumeMapperNamespace
 {
   // Defines block as 8x8x8 cube.  
   // VoxelBlockSizeLog = 3, VoxelBlockSize = 8, VoxelsInBlock = 8^3
-  static const int VoxelBlockSizeLog = 3; 
+  static const int VoxelBlockSizeLog = 3 ; 
   static const int VoxelBlockSize = 1 << VoxelBlockSizeLog; 
   static const int VoxelsInBlock = VoxelBlockSize * VoxelBlockSize * VoxelBlockSize; 
 
   // define vertices and edges of a cube
-  static const int voxelVertIndicesXYZ[8][3] = {{0, 0, 0}, {1, 0, 0}, { 1, 1, 0}, { 0, 1, 0}, {0, 0, 1}, {1, 0, 1}, { 1, 1, 1}, { 0, 1, 1}};
+  static const int unitCubeVertsXYZ[8][3] = {{0, 0, 0}, {1, 0, 0}, { 1, 1, 0}, { 0, 1, 0}, {0, 0, 1}, {1, 0, 1}, { 1, 1, 1}, { 0, 1, 1}};
   static const int edgeOffsets[12][2] = {{0, 1}, {1, 2}, {3, 2}, {0, 3}, {4, 5}, {5, 6}, {7, 6}, {4, 7}, {0,4}, {1, 5}, {3, 7}, {2, 6} };
   static const int edgeAxis[12] = {0, 1, 0, 1, 0, 1, 0, 1, 2, 2, 2, 2};
 
@@ -90,7 +92,7 @@ namespace vtkContourVolumeMapperNamespace
   // approx. ratio of time to draw between DrawCache() and RenderMCubes()
   static const float TimeCacheToMCubesRatio = 0.2 ;
 
-  // no. of levels of detail allowed (2,3 or 4)
+  // no. of levels of detail allowed (1, 2, 3 or 4)
   static const int NumberOfLods = 4 ;
 
   // Empirical constant: approx no. of triangles for every voxel in a block containing contour
@@ -105,14 +107,18 @@ namespace vtkContourVolumeMapperNamespace
   // Should be as large as possible without creating artefacts.
   static const int SortFraction = 10 ;
 
-  // container type for sorting depth values
-  struct Idepth
-  {
-    float depth ;
-    int index ;
-    bool operator < (const Idepth &b) const {return this->depth < b.depth ;}
-  };
 };
+
+
+// container type for sorting depth values
+class Idepth
+{
+public:
+  float depth ;
+  int index ;
+  bool operator < (const Idepth &b) const {return this->depth < b.depth ;}
+};
+
 
 
 using namespace vtkContourVolumeMapperNamespace ;
@@ -138,7 +144,7 @@ public:
   Else calls PrepareAccelerationDataTemplate() and RenderMCubes() */
   void Render(vtkRenderer *ren, vtkVolume *vol);
 
-  /** Enable or disable multi-resolution feature. By default it is enabled */
+  /** Enable or disable multi-resolution feature. By default it is enabled  */
   vtkGetMacro(EnableAutoLOD, int);    
   void SetEnableAutoLOD(int val) { this->EnableAutoLOD = val; }
   vtkBooleanMacro(EnableAutoLOD, int);
@@ -189,7 +195,13 @@ protected:
   template <typename DataType> void  RenderMCubes(vtkRenderer *renderer, vtkVolume *volume, const DataType *dataPointer);
 
   /** marching cubes algorithm - calculate triangles and return vtkPolyData */
-  template <typename DataType> void  CreateMCubes(int level, vtkPolyData *polydata, const DataType *dataPointer);
+  template <typename DataType> void  CreateMCubes(int lod, vtkPolyData *polydata, const DataType *dataPointer);
+
+  /** marching cubes algorithm - calculate triangles and return vtkPolyData */
+  template <typename DataType> void  CreateMCubes_new(int lod, vtkPolyData *polydata, const DataType *dataPointer);
+
+  /** marching cubes algorithm - calculate triangles and return vtkPolyData */
+  template <typename DataType> void  CreateMCubes_old(int lod, vtkPolyData *polydata, const DataType *dataPointer);
 
   /** template corresponding to EstimateRelevantVolume() */
   template <typename DataType> float EstimateRelevantVolumeTemplate(const DataType ContourValue);
@@ -218,15 +230,13 @@ protected:
 
   void ReleaseData();
 
-  /** This function returns the index increments in xy and z given the lod index
+  /** Return the index increments in xy and z given the lod index
   For lod = 0,1,2,3... lodxy = 2^n = 1,2,4,8...
   However, the resolution in z, between slice planes, may already be poor, so
   lodz <= lodx such that z resolution is not worse than x resolution. */
-  void CalculateVoxelIndexIncrements(int lod, int *lodxy, int *lodz) const ;
+  void CalculateLodIncrements(int lod, int *lodxy, int *lodz) const ;
 
-  /** Return vertex array offsets given the lod index.
-  Returns offset[0..7] for the LOD cube corresponding to the
-  cube defined in PrepareAccelerationTemplate() */
+  /** Return vertices of voxel cube as offsets to indices in data array */
   void CalculateVoxelVertIndicesOffsets(int lod, int *offset) const ;
 
   /** Calculate volume of voxel given lod
@@ -259,11 +269,6 @@ protected:
   Used to decide which LOD to create and render */
   int BestLODForRenderMCubes(vtkRenderer *renderer) ;
 
-  /** Return highest LOD which has been cached
-  returns negative number if nothing found
-  Used by DrawCache() to decide which lod to draw */
-  int HighestLODCached() const ;
-
   /** Free caches and set stats to undefined, eg after contour value changes */
   void ClearCachesAndStats() ;
 
@@ -276,6 +281,13 @@ protected:
 
   /** Sort triangles into back-to-front order */
   void SortTriangles(int lod, bool sortall) ;
+
+  /** Useful debugging function to convert data pointer to xyz coords */
+  template<typename DataType> const DataType* PointerFromIndices(const DataType *dataPointer, int x, int y, int z) ;
+
+  /** Useful debugging function to convert xyz coords to data pointer */
+  template<typename DataType> void IndicesFromPointer(const DataType* dataPointer, const DataType* p, int *x, int *y, int *z) ;
+
 
   vtkTimeStamp   BuildTime;
 
@@ -290,7 +302,9 @@ private:
   // min-max block structure
   int            NumBlocks[3];
   void          *BlockMinMax; // min - 0, max - 1
-  int            VoxelVertIndicesOffsets[NumberOfLods][8];
+
+  // vertices of voxel cube
+  int           VoxelVertIndicesOffsets[NumberOfLods][8];   // voxel cube as index offsets in the data array
 
   // parameters of the mapper
   float          ContourValue;           ///< current contour value
@@ -320,7 +334,7 @@ private:
   // caching
   bool           CacheCreated ;                     // flag indicating that cache has been created
   float          PrevContourValue ;                 // last contour value
-  float         *TriangleCache[NumberOfLods];       // pointers to the two caches, 0 for normal, 1 for LOD    
+  float         *TriangleCache[NumberOfLods];       // Triangle caches for each level of detail
   unsigned int   TriangleCacheSize[NumberOfLods];   // in triangles (there are 6 floats per vertex, 18 floats per triangle)
 
   // sorting triangles
@@ -414,4 +428,9 @@ public:
   bool IsInside(int x, int y, int polylineLengthThreshold);
   Polyline2D *FindContour(int x, int y, int polylineLengthThreshold, int distance = 1);
 };
+
+
+
+
+
 #endif
