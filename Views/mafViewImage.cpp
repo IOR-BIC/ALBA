@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewImage.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-13 15:44:17 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-01-19 15:28:00 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,6 +27,8 @@
 #include "mafVMESlicer.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
+#include "mafVMEAdvancedProber.h"
+#include "mafVMESurface.h"
 #include "mafPipeFactory.h"
 #include "mafPipe.h"
 #include "mafRWI.h"
@@ -102,7 +104,7 @@ int mafViewImage::GetNodeStatus(mafNode *vme)
   mafSceneNode *n = NULL;
   if (m_Sg != NULL)
   {
-    if (vme->IsMAFType(mafVMEImage))
+    if (vme->IsMAFType(mafVMEImage) || vme->IsA("mafVMEAdvancedProber") || vme->IsMAFType(mafVMESurface))
     {
       n = m_Sg->Vme2Node(vme);
       n->m_Mutex = true;
@@ -150,7 +152,7 @@ void mafViewImage::OnEvent(mafEventBase *maf_event)
 void mafViewImage::VmeShow(mafNode *node, bool show)
 //----------------------------------------------------------------------------
 {
-  if (node->IsMAFType(mafVMEImage))
+  if (node->IsMAFType(mafVMEImage) || node->IsA("mafVMEAdvancedProber") || node->IsMAFType(mafVMESurface))
   {
     if (show)
     {
