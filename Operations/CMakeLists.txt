@@ -22,6 +22,8 @@ SET(PROJECT_SRCS
   mmoRAWImporterImages.h
   mmoClassicICPRegistration.cpp
   mmoClassicICPRegistration.h
+  mmoCreatePanoramic.cpp
+  mmoCreatePanoramic.h
 )
 
 IF (MAF_USE_ITK)
