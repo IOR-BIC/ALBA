@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeDRR.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-03 14:17:47 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-01-19 15:22:48 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -138,7 +138,7 @@ void medPipeVolumeDRR::Create(mafSceneNode *n)
   */
   vtkNEW(m_Volume);
   m_Volume->SetMapper(m_VolumeMapper);
-  m_Volume->PickableOn();
+  m_Volume->PickableOff();
   
   
   m_AssemblyFront->AddPart(m_Volume);
@@ -163,7 +163,7 @@ void medPipeVolumeDRR::Create(mafSceneNode *n)
   m_SelectionActor->SetProperty(selection_property);
   m_SelectionActor->SetScale(1.01,1.01,1.01);
 
-  m_AssemblyFront->AddPart(m_SelectionActor); // commented to avoid problems on ray cast volume rendering
+  //m_AssemblyFront->AddPart(m_SelectionActor); // commented to avoid problems on ray cast volume rendering
 }
 //----------------------------------------------------------------------------
 medPipeVolumeDRR::~medPipeVolumeDRR()
