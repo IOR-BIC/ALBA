@@ -6,6 +6,8 @@ PROJECT(medVME)
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
+  medVMEFactory.cpp 
+  medVMEFactory.h
   medPipeFactoryVME.cpp
   medPipeFactoryVME.h
   medPipeVolumeMIP.cpp
@@ -14,6 +16,10 @@ SET(PROJECT_SRCS
   medPipeDensityDistance.h
   medPipeVolumeDRR.cpp
   medPipeVolumeDRR.h
+  medPipeVolumeVR.cpp
+  medPipeVolumeVR.h
+  mafVMEAdvancedProber.cpp
+  mafVMEAdvancedProber.h
 )
 
 IF (MAF_USE_ITK)
