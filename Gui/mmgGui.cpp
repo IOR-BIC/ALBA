@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:46:08 $
-  Version:   $Revision: 1.44 $
+  Date:      $Date: 2007-01-19 16:15:26 $
+  Version:   $Revision: 1.45 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -944,7 +944,7 @@ mmgFloatSlider *mmgGui::FloatSlider(int id,wxString label,double *var,double min
 	return sli;
 }
 //----------------------------------------------------------------------------
-void mmgGui::Radio(int id,wxString label,int* var, int numchoices, const wxString choices[], int dim, wxString tooltip)
+void mmgGui::Radio(int id,wxString label,int* var, int numchoices, const wxString choices[], int dim, wxString tooltip,int style)
 //----------------------------------------------------------------------------
 {
   // SIL: 24/04/03
@@ -964,7 +964,7 @@ void mmgGui::Radio(int id,wxString label,int* var, int numchoices, const wxStrin
     lab->SetFont(m_Font);
 
     w_id = GetId(id);
-    radio = new wxRadioBox  (this, w_id, "",dp, wxSize(DW,-1), numchoices, choices,dim,wxRA_SPECIFY_COLS|m_EntryStyle|wxTAB_TRAVERSAL );
+    radio = new wxRadioBox  (this, w_id, "",dp, wxSize(DW,-1), numchoices, choices,dim,style|m_EntryStyle|wxTAB_TRAVERSAL );
 
     sizer->Add( lab,  0, wxRIGHT, LM);
     sizer->Add( radio,0, wxRIGHT, HM);
@@ -973,7 +973,7 @@ void mmgGui::Radio(int id,wxString label,int* var, int numchoices, const wxStrin
   else
   {
     w_id = GetId(id);
-    radio = new wxRadioBox  (this, w_id, "",dp, wxSize(FW,-1), numchoices, choices,dim,wxRA_SPECIFY_COLS|m_EntryStyle|wxTAB_TRAVERSAL );
+    radio = new wxRadioBox  (this, w_id, "",dp, wxSize(FW,-1), numchoices, choices,dim,style|m_EntryStyle|wxTAB_TRAVERSAL );
     Add(radio,0, wxRIGHT, HM);
   }
 

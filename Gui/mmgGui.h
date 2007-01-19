@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:46:08 $
-  Version:   $Revision: 1.33 $
+  Date:      $Date: 2007-01-19 16:15:26 $
+  Version:   $Revision: 1.34 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -160,7 +160,7 @@ public:
   void Bool (int id, mafString label, int *var, int flag = 0, mafString tooltip = ""	);
 
   /** Radiobutton widget. */
-  void Radio(int id,wxString label, int *var, int numchoices = 0, const wxString choices[] = NULL, int dim = 1, wxString tooltip = "");
+  void Radio(int id,wxString label, int *var, int numchoices = 0, const wxString choices[] = NULL, int dim = 1, wxString tooltip = "", int style = wxRA_SPECIFY_COLS);
 
   /** Combo widget. */
   void Combo(int id,mafString label, int *var, int numchoices = 0, const wxString choices[] = NULL, mafString tooltip = "");
