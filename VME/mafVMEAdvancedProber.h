@@ -1,0 +1,172 @@
+/*=========================================================================
+  Program:   Multimod Application Framework
+  Module:    $RCSfile: mafVMEAdvancedProber.h,v $
+  Language:  C++
+  Date:      $Date: 2007-01-19 15:23:25 $
+  Version:   $Revision: 1.1 $
+  Authors:   Daniele Giunchi
+==========================================================================
+  Copyright (c) 2001/2005 
+  CINECA - Interuniversity Consortium (www.cineca.it)
+=========================================================================*/
+#ifndef __mafVMEAdvancedProber_h
+#define __mafVMEAdvancedProber_h
+
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "mafVME.h"
+#include "mafEvent.h"
+#include "mmgVMEChooserAccept.h"
+#include "mafVMEVolume.h"
+#include "mafVMEOutputPolyline.h"
+
+//----------------------------------------------------------------------------
+// forward declarations :
+//----------------------------------------------------------------------------
+class mafTransform;
+class mmaMaterial;
+class vtkDistanceFilter;
+class vtkProbeFilter;
+class mafVMESurface;
+class vtkImageData;
+class vtkImageMapToColors;
+class vtkPoints;
+class vtkPlaneSource ;
+class vtkLookupTable;
+class mafVMEImage;
+
+//class vtkAppendPolyData;
+
+class mafVMEAdvancedProber : public mafVME
+{
+public:
+  enum VMEPANORAMIC_MODALITY
+  {
+    FIRST_MODE = 0,
+    
+  };
+
+  mafTypeMacro(mafVMEAdvancedProber, mafVME);
+
+  enum PANORAMIC_WIDGET_ID
+  {
+    ID_VOLUME_LINK = Superclass::ID_LAST,
+    ID_SURFACE_LINK,
+    ID_MODALITY,
+
+    ID_ADD_PROFILE,
+    ID_REMOVE_PROFILE,
+    ID_SAMPLING,
+		ID_SPLINE,
+    ID_PROFILE_NUMBER,
+    ID_PROFILE_DISTANCE,
+    ID_LISTBOX,
+    ID_LAST
+  };
+
+  class mafVMEVolumeAccept : public mmgVMEChooserAccept
+  {
+  public:
+
+    mafVMEVolumeAccept() {};
+    ~mafVMEVolumeAccept() {};
+
+    bool Validate(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEVolume));};
+  };
+  mafVMEVolumeAccept *m_VMEVolumeAccept;
+
+  class mafVMEPolylineAccept : public mmgVMEChooserAccept
+  {
+  public:
+
+    mafVMEPolylineAccept() {};
+    ~mafVMEPolylineAccept() {};
+
+    bool Validate(mafNode *node) {return(node != NULL && ((mafVME *)node)->IsA("mafVMEPolylineSpline"));};
+  };
+  mafVMEPolylineAccept *m_VMEPolylineAccept;
+
+  /** Precess events coming from other objects */ 
+  virtual void OnEvent(mafEventBase *maf_event);
+
+  /** Return the suggested pipe-typename for the visualization of this vme */
+  virtual mafString GetVisualPipe() {return "mafPipeSurfaceTextured";};
+
+  /** Return pointer to material attribute. */
+  mmaMaterial *GetMaterial();
+
+  /** Copy the contents of another mafVMEAdvancedProber into this one. */
+  virtual int DeepCopy(mafNode *a);
+
+  /** Get the link to the volume.*/
+  mafNode *GetVolumeLink();
+
+  /** Get the link to the surface.*/
+  mafNode::mafLinksMap *GetPolylineLink();
+
+  /** Set the link to the volume.*/
+  void SetVolumeLink(mafNode *volume);
+
+  /** Set the link to the surface.*/
+  void SetPolylineLink(mafNode *polyline);
+
+  /** Set the pose matrix for the Prober. */
+  void SetMatrix(const mafMatrix &mat);
+
+  /** Clear the parameter 'kframes' because mafVMEAdvancedProber has no timestamp. */
+  void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes);
+
+  /** return icon */
+  static char** GetIcon();
+
+protected:
+  mafVMEAdvancedProber();
+  virtual ~mafVMEAdvancedProber(); 
+
+  /** Internally used to create a new instance of the GUI.*/
+  virtual mmgGui *CreateGui();
+
+  /** used to initialize and create the material attribute if not yet present */
+  virtual int InternalInitialize();
+
+  virtual int InternalStore(mafStorageElement *parent);
+  virtual int InternalRestore(mafStorageElement *node);
+
+  /** called to prepare the update of the output */
+  virtual void InternalPreUpdate();
+
+  /** update the output data structure */
+  virtual void InternalUpdate();
+
+  //virtual void InternalPreUpdateOld();
+
+  mafString m_VolumeName;
+  std::vector<mafString> m_ProfilesNameList;
+  
+//  mafVMESurface        *m_Surface;
+  vtkImageData *m_Image;
+  vtkImageMapToColors *m_IMTC;
+  vtkPoints *m_Points;
+  vtkPlaneSource *m_Plane;
+	vtkLookupTable *m_Lut;
+
+
+  wxListBox *m_ListBox;
+  double m_SamplingCoefficient;
+	int m_SplineCoefficient;
+  int m_AdditionalProfileNumber;
+  double m_ProfileDistance;
+  
+  std::vector<vtkPoints *> m_PointsVector;
+  std::vector<vtkPolyData *> m_PolyDataVector;
+  std::vector<vtkProbeFilter *> m_DistanceFilterVector;
+
+  mafTransform *m_Transform;
+  //vtkAppendPolyData *append;
+
+private:
+  mafVMEAdvancedProber(const mafVMEAdvancedProber&); // Not implemented
+  void operator=(const mafVMEAdvancedProber&); // Not implemented
+};
+#endif
