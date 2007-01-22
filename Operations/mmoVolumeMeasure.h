@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVolumeMeasure.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-01 09:09:56 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-01-22 06:55:56 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,6 +17,7 @@
 #include "mmgVMEChooserAccept.h"
 #include "mafNode.h"
 #include "mafVMESurface.h"
+#include "mafVMESurfaceParametric.h"
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
@@ -68,7 +69,7 @@ public:
 			mafSurfaceAccept() {};
 		 ~mafSurfaceAccept() {};
 
-		bool Validate(mafNode* node) {return(node != NULL && node->IsMAFType(mafVMESurface));};
+		bool Validate(mafNode* node) {return(node != NULL && (node->IsMAFType(mafVMESurface) || node->IsMAFType(mafVMESurfaceParametric) ));};
 	};
 	mafSurfaceAccept *m_SurfaceAccept;	
   
