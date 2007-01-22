@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-13 15:44:17 $
-  Version:   $Revision: 1.47 $
+  Date:      $Date: 2007-01-22 06:55:07 $
+  Version:   $Revision: 1.48 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -336,6 +336,7 @@ void mafViewOrthoSlice::PackageView()
     if (v != PERSPECTIVE_VIEW)
     {
       m_Views[v]->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice",MUTEX);
+      m_Views[v]->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice",MUTEX);
     }
     else
     {
