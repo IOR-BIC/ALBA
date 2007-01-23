@@ -30,6 +30,10 @@ SET(PROJECT_SRCS
   mafViewRXCompound.h
   mafView3D.cpp
   mafView3D.h
+  mafViewImageCompound.cpp
+  mafViewImageCompound.h
+  mafViewCT.cpp
+  mafViewCT.h
 )
 
 # List libraries that are needed by this project.
