@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-23 15:49:34 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-01-23 16:08:06 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi , Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -176,7 +176,10 @@ bool mafVMEAdvancedSlicer::IsAnimated()
 bool mafVMEAdvancedSlicer::IsDataAvailable()
 //-------------------------------------------------------------------------
 {
-  return GetParent()->IsDataAvailable();
+	if(GetVolumeLink())
+		return ((mafVME*)GetVolumeLink())->IsDataAvailable();
+	else
+		return false;
 }
 
 //-------------------------------------------------------------------------
@@ -190,7 +193,7 @@ void mafVMEAdvancedSlicer::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes
 void mafVMEAdvancedSlicer::InternalPreUpdate()
 //-----------------------------------------------------------------------
 {
-  mafVME *vol = mafVMEVolume::SafeDownCast(GetParent());
+  mafVME *vol = mafVMEVolume::SafeDownCast(GetVolumeLink());
   if(vol)
   {
     if (vtkDataSet *vtkdata=vol->GetOutput()->GetVTKData())
@@ -233,7 +236,7 @@ void mafVMEAdvancedSlicer::InternalPreUpdate()
 void mafVMEAdvancedSlicer::InternalUpdate()
 //-----------------------------------------------------------------------
 {
-  mafVME *vol = mafVMEVolume::SafeDownCast(GetParent());
+  mafVME *vol = mafVMEVolume::SafeDownCast(GetVolumeLink());
   if(vol)
   {
     vol->Update();
@@ -245,36 +248,6 @@ void mafVMEAdvancedSlicer::InternalUpdate()
   }
 }
 //-----------------------------------------------------------------------
-int mafVMEAdvancedSlicer::InternalStore(mafStorageElement *parent)
-//-----------------------------------------------------------------------
-{  
-  if (Superclass::InternalStore(parent)==MAF_OK)
-  {
-    parent->StoreMatrix("Transform",&m_Transform->GetMatrix());
-    return MAF_OK;
-  }
-  return MAF_ERROR;
-}
-
-//-----------------------------------------------------------------------
-int mafVMEAdvancedSlicer::InternalRestore(mafStorageElement *node)
-//-----------------------------------------------------------------------
-{
-  if (Superclass::InternalRestore(node)==MAF_OK)
-  {
-    mafMatrix matrix;
-    if (node->RestoreMatrix("Transform",&matrix)==MAF_OK)
-    {
-      m_Transform->SetMatrix(matrix);
-      GetMaterial()->SetMaterialTexture(GetSurfaceOutput()->GetTexture());
-      return MAF_OK;
-    }
-  }
-
-  return MAF_ERROR;
-}
-
-//-----------------------------------------------------------------------
 void mafVMEAdvancedSlicer::Print(std::ostream& os, const int tabs)
 //-----------------------------------------------------------------------
 {
@@ -283,13 +256,6 @@ void mafVMEAdvancedSlicer::Print(std::ostream& os, const int tabs)
 
   mafMatrix m = m_Transform->GetMatrix();
   m.Print(os,indent.GetNextIndent());
-}
-//-------------------------------------------------------------------------
-char** mafVMEAdvancedSlicer::GetIcon() 
-//-------------------------------------------------------------------------
-{
-  #include "mafVMESurface.xpm"
-  return mafVMESurface_xpm;
 }
 //-------------------------------------------------------------------------
 mmgGui* mafVMEAdvancedSlicer::CreateGui()

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedSlicer.h,v $
   Language:  C++
-  Date:      $Date: 2007-01-23 15:49:34 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-01-23 16:08:06 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi , Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -74,9 +74,6 @@ public:
   
   /** Return pointer to material attribute. */
   mmaMaterial *GetMaterial();
-
-  /** return an xpm-icon that can be used to represent this node */
-  static char ** GetIcon();
   
   enum ADVANCED_PROBER_WIDGET_ID
   {
@@ -116,9 +113,6 @@ public:
 protected:
   mafVMEAdvancedSlicer();
   virtual ~mafVMEAdvancedSlicer();
-
-  virtual int InternalStore(mafStorageElement *parent);
-  virtual int InternalRestore(mafStorageElement *node);
 
 	/** Internally used to create a new instance of the GUI.*/
 	virtual mmgGui *CreateGui();
