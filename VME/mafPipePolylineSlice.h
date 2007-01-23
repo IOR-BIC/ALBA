@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.h,v $
   Language:  C++
-  Date:      $Date: 2007-01-23 13:48:41 $
-  Version:   $Revision: 1.1 $
-  Authors:   Silvano Imboden - Paolo Quadrani
+  Date:      $Date: 2007-01-23 13:54:59 $
+  Version:   $Revision: 1.2 $
+  Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
