@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-23 16:08:06 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-01-23 16:19:50 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi , Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -242,6 +242,8 @@ void mafVMEAdvancedSlicer::InternalUpdate()
     vol->Update();
     if (vtkDataSet *vtkdata=vol->GetOutput()->GetVTKData())
     {
+			m_PSlicer->GetTexture()->SetExtent(0, (int)(m_Width/m_Xspc) - 1, 0, (int)(m_Height/m_Yspc) - 1, 0, 0);
+			m_PSlicer->GetTexture()->SetUpdateExtent(0, (int)(m_Width/m_Xspc) - 1, 0, (int)(m_Height/m_Yspc) - 1, 0, 0);
       m_PSlicer->Update();
       m_ISlicer->Update();
     }
