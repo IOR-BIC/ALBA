@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-02 11:29:32 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-01-23 13:48:01 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -90,6 +90,9 @@ public:
 	/** Show the dialog to confirm the save of the current tree. */
 	bool AskConfirmAndSave();
  
+  /** Set the filename for the current tree. */
+  void SetDirName (mafString dirname) {m_MSFDir = dirname;};
+
 	/** Set the filename for the current tree. */
   void SetFileName (wxString& filename) {m_MSFFile = filename;};
  
