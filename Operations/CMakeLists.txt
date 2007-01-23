@@ -20,8 +20,6 @@ SET(PROJECT_SRCS
   mmoVolumeMeasure.h
   mmoRAWImporterImages.cpp
   mmoRAWImporterImages.h
-  mmoClassicICPRegistration.cpp
-  mmoClassicICPRegistration.h
   mmoCreatePanoramic.cpp
   mmoCreatePanoramic.h
 )
@@ -32,6 +30,8 @@ SET(PROJECT_SRCS  ${PROJECT_SRCS}
   mmoRawMotionDataImporter.h
   mmoLandmarkExporter.cpp
   mmoLandmarkExporter.h
+  mmoClassicICPRegistration.cpp
+  mmoClassicICPRegistration.h
   )
 ENDIF (MAF_USE_ITK)
 

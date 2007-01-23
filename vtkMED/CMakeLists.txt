@@ -18,10 +18,15 @@ SET(vtkMED_SRCS
   vtkXRayVolumeMapper.h
   vtkWeightedLandmarkTransform.cxx
   vtkWeightedLandmarkTransform.h
+)
+
+IF (MAF_USE_ITK)
+SET(vtkMED_SRCS  ${vtkMED_SRCS}
   mafClassicICPRegistration.cxx
   mafClassicICPRegistration.h
   mafICPUtility.h
 )
+ENDIF (MAF_USE_ITK)
 
 # List the kits from VTK that are needed by this project.
 SET(vtkMED_LIBS
