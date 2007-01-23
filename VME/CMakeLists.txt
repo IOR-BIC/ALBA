@@ -30,6 +30,8 @@ SET(PROJECT_SRCS
   mafVMEItem.h
   mafMSFImporter.cpp
   mafMSFImporter.h
+  mafPipePolylineSlice.cpp
+  mafPipePolylineSlice.h
 )
 
 IF (MAF_USE_CRYPTO)
