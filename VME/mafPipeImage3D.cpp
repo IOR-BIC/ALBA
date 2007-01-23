@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeImage3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-24 11:48:00 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-01-23 13:50:13 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -34,6 +34,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkProperty.h"
 #include "vtkImageData.h"
 #include "vtkOutlineCornerFilter.h"
+#include "vtkPointData.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeImage3D);
@@ -107,12 +108,13 @@ void mafPipeImage3D::Create(mafSceneNode *n)
   m_ImageTexture->InterpolateOn();
   m_ImageTexture->SetQualityTo32Bit();
   m_ImageTexture->SetInput(image_data);
-  int num = image_data->GetNumberOfScalarComponents();
-  if (num == 1)
+  
+  if(IsGrayImage())
   {
     m_ImageTexture->SetLookupTable(m_ImageLUT);
     m_ImageTexture->MapColorScalarsThroughLookupTableOn();
   }
+
   m_ImageTexture->Modified();
 
   m_ImageMapper = vtkPolyDataMapper::New();
@@ -203,4 +205,28 @@ vtkProperty *mafPipeImage3D::GetProperty()
 //----------------------------------------------------------------------------
 {
   return m_ImageActor->GetProperty();
+}
+//----------------------------------------------------------------------------
+bool mafPipeImage3D::IsGrayImage()
+//----------------------------------------------------------------------------
+{
+  vtkImageData *image_data = (vtkImageData *)m_Vme->GetOutput()->GetVTKData();
+ 
+  int num = image_data->GetNumberOfScalarComponents();
+  if (num == 1) return true;
+  
+  bool grayImage = true;
+  for(int i=0; i< image_data->GetNumberOfPoints(); i++)
+  {
+    if(!grayImage) break;
+
+    double *value;
+    value = image_data->GetPointData()->GetScalars()->GetTuple3(i);
+    if(value[0] == value[1] && value[0] == value[2]);
+    else
+    {
+      grayImage = false;
+    }
+  }
+  return grayImage;
 }
