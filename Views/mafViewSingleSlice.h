@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-30 09:15:18 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-01-23 15:37:24 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -132,6 +132,7 @@ protected:
   //wxString m_Text;
   //double	 m_TextColor[3];
   std::vector<mafSceneNode*> m_CurrentSurface;
+	std::vector<mafSceneNode*> m_CurrentPolyline;
 
 	double m_Position;
 	double m_OriginVolume[3];

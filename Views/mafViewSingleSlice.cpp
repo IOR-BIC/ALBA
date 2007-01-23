@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-13 15:44:17 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-01-23 15:37:11 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,6 +22,7 @@
 #include "mafViewSingleSlice.h"
 #include "mafPipeVolumeSlice.h"
 #include "mafPipeSurfaceSlice.h"
+#include "mafPipePolylineSlice.h"
 #include "mafVME.h"
 #include "mafVMEVolume.h"
 #include "mafVMESlicer.h"
@@ -77,6 +78,7 @@ mafViewSingleSlice::mafViewSingleSlice(wxString label, int camera_position, bool
 	m_OriginVolume[1] = 0.0;
   m_OriginVolume[2] = 0.0;
   m_CurrentSurface.clear();
+	m_CurrentPolyline.clear();
 }
 //----------------------------------------------------------------------------
 mafViewSingleSlice::~mafViewSingleSlice()
@@ -86,6 +88,7 @@ mafViewSingleSlice::~mafViewSingleSlice()
 //  vtkDEL(m_TextMapper);
 //  vtkDEL(m_TextActor);
   m_CurrentSurface.clear();
+	m_CurrentPolyline.clear();
 }
 //----------------------------------------------------------------------------
 mafView *mafViewSingleSlice::Copy(mafObserver *Listener)
@@ -304,7 +307,43 @@ void mafViewSingleSlice::VmeCreatePipe(mafNode *vme)
 		    ((mafPipeSurfaceSlice *)pipe)->SetSlice(m_Slice);
 				((mafPipeSurfaceSlice *)pipe)->SetNormal(normal);
       }
-      pipe->Create(n);
+			else if(pipe_name.Equals("mafPipePolylineSlice"))
+			{
+				double normal[3];
+				switch(m_CameraPosition)
+				{
+				case CAMERA_OS_X:
+					normal[0] = 1;
+					normal[1] = 0;
+					normal[2] = 0;
+					break;
+				case CAMERA_OS_Y:
+					normal[0] = 0;
+					normal[1] = 1;
+					normal[2] = 0;
+					break;
+				case CAMERA_OS_Z:
+					normal[0] = 0;
+					normal[1] = 0;
+					normal[2] = 1;
+					break;
+				case CAMERA_OS_P:
+					break;
+					//case CAMERA_OS_REP:
+					//	this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+				case CAMERA_PERSPECTIVE:
+					break;
+				default:
+					normal[0] = 0;
+					normal[1] = 0;
+					normal[2] = 1;
+				}
+
+				m_CurrentPolyline.push_back(n);
+				((mafPipePolylineSlice *)pipe)->SetSlice(m_Slice);
+				((mafPipePolylineSlice *)pipe)->SetNormal(normal);
+			}
+			pipe->Create(n);
       n->m_Pipe = (mafPipe*)pipe;
       if (m_NumberOfVisibleVme == 1)
       {
@@ -421,6 +460,12 @@ void mafViewSingleSlice::OnEvent(mafEventBase *maf_event)
 						if(p)
 							((mafPipeSurfaceSlice *)p)->SetSlice(m_OriginVolume);
 					}
+					if(node->IsA("mafVMEPolyline"))
+					{
+						mafPipe *p= this->GetNodePipe(node);
+						if(p)
+							((mafPipePolylineSlice *)p)->SetSlice(m_OriginVolume);
+					}
 				}
 			}
 		break;
@@ -459,7 +504,7 @@ void mafViewSingleSlice::OnEvent(mafEventBase *maf_event)
 			mafNodeIterator *iter = m_CurrentVolume->m_Vme->GetRoot()->NewIterator();
 			for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 			{
-				if(node->IsA("mafVMESurface") || node->IsA("mafVMEVolume"))
+				if(node->IsA("mafVMESurface") || node->IsA("mafVMEVolume") || node->IsA("mafVMEPolyline"))
 				{
 					mafSceneNode *n = m_Sg->Vme2Node(node);
 					if(n && n->IsVisible())
@@ -525,6 +570,18 @@ void mafViewSingleSlice::SetSlice(double origin[3])
       pipe->SetSlice(origin); 
     }
   }
+
+	if(m_CurrentPolyline.empty())
+		return;
+	for(int i=0;i<m_CurrentPolyline.size();i++)
+	{
+		pipe_name = m_CurrentPolyline.at(i)->m_Pipe->GetTypeName();
+		if (pipe_name.Equals("mafPipePolylineSlice"))
+		{
+			mafPipePolylineSlice *pipe = (mafPipePolylineSlice *)m_CurrentPolyline[i]->m_Pipe;
+			pipe->SetSlice(origin); 
+		}
+	}
   // update text
   this->UpdateText();
 }
@@ -603,6 +660,15 @@ void mafViewSingleSlice::UpdateSurfacesList(mafNode *node)
       m_CurrentSurface.erase(m_CurrentSurface.begin()+i);
     }
   }
+
+	for(int i=0;i<m_CurrentPolyline.size();i++)
+	{
+		if (m_CurrentPolyline[i]==m_Sg->Vme2Node(node))
+		{
+			std::vector<mafSceneNode*>::iterator startIterator;
+			m_CurrentPolyline.erase(m_CurrentPolyline.begin()+i);
+		}
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -670,6 +736,10 @@ void mafViewSingleSlice::VmeShow(mafNode *node, bool show)
 			for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 			{
 				if(node->IsA("mafVMESurface"))
+				{
+					mafEventMacro(mafEvent(this,VME_SHOW,node,false));
+				}
+				if(node->IsA("mafVMEPolyline"))
 				{
 					mafEventMacro(mafEvent(this,VME_SHOW,node,false));
 				}
