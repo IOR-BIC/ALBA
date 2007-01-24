@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-24 17:11:21 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-01-24 22:06:12 $
+  Version:   $Revision: 1.5 $
   Authors:   Daniele Giunchi , Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -225,18 +225,18 @@ void mafVMEAdvancedSlicer::InternalPreUpdate()
 			vtkdata->Update();
 
 			vtkImageData *image=vtkImageData::SafeDownCast(vtkdata);
-			vtkImageData *image_copy;
-			vtkNEW(image_copy);
-			image_copy->DeepCopy(image);
-			image_copy->SetUpdateExtent(0,50,0,50,50,51);
-			image_copy->UpdateData();
-			image_copy->Crop();
-			image_copy->Modified();
-			image_copy->UpdateData();
+
+//			m_image_copy->DeepCopy(image);
+			image->SetExtent(0,200,0,20,0,200);
+			image->SetUpdateExtent(0,200,0,20,0,200);
+			
+			image->Crop();
+			//image->Modified();
+			image->UpdateData();
 			
 			vtkImageData *texture = m_PSlicer->GetTexture();
-			texture->SetScalarType(image_copy->GetPointData()->GetScalars()->GetDataType());
-			texture->SetNumberOfScalarComponents(image_copy->GetPointData()->GetScalars()->GetNumberOfComponents());
+			texture->SetScalarType(image->GetPointData()->GetScalars()->GetDataType());
+			texture->SetNumberOfScalarComponents(image->GetPointData()->GetScalars()->GetNumberOfComponents());
 			//texture->SetExtent(0,50,0,50,50,51);
 			//texture->Crop();
 			texture->Modified();
@@ -261,12 +261,12 @@ void mafVMEAdvancedSlicer::InternalPreUpdate()
       texture->SetNumberOfScalarComponents(vtkdata->GetPointData()->GetScalars()->GetNumberOfComponents());
       texture->Modified();*/
 
-      m_PSlicer->SetInput(vtkdata);
+      m_PSlicer->SetInput(image);
       m_PSlicer->SetPlaneOrigin(pos);
       m_PSlicer->SetPlaneAxisX(vectX);
       m_PSlicer->SetPlaneAxisY(vectY);
 
-      m_ISlicer->SetInput(vtkdata);
+      m_ISlicer->SetInput(image);
       m_ISlicer->SetPlaneOrigin(pos);
       m_ISlicer->SetPlaneAxisX(vectX);
       m_ISlicer->SetPlaneAxisY(vectY);
