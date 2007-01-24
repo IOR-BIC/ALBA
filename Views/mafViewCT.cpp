@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCT.cpp,v $
 Language:  C++
-Date:      $Date: 2007-01-23 15:36:20 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-01-24 17:07:56 $
+Version:   $Revision: 1.2 $
 Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -105,6 +105,10 @@ mafView *mafViewCT::Copy(mafObserver *Listener)
 void mafViewCT::VmeShow(mafNode *node, bool show)
 //----------------------------------------------------------------------------
 {
+	for(int i=0; i<this->GetNumberOfSubView(); i++)
+		m_ChildViewList[i]->VmeShow(node, show);
+
+	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
 void mafViewCT::VmeRemove(mafNode *node)
@@ -168,7 +172,7 @@ void mafViewCT::PackageView()
 //----------------------------------------------------------------------------
 {
 	m_ViewCTCompound = new mafViewCompound("CT view",2,5);
-	mafViewVTK *vs = new mafViewVTK("Slice view", CAMERA_CT);
+	mafViewSlice *vs = new mafViewSlice("Slice view", CAMERA_PERSPECTIVE);
 	/*m_Vs->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice",MUTEX);
 	m_Vs->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice",MUTEX);
 	m_Vs->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice",MUTEX);

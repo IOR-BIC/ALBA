@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-23 15:37:55 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2007-01-24 17:08:12 $
+  Version:   $Revision: 1.31 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,6 +34,7 @@
 #include "mafRWI.h"
 #include "mafSceneGraph.h"
 #include "mafAttachCamera.h"
+#include "mafVMEAdvancedSlicer.h"
 
 #include "vtkDataSet.h"
 #include "vtkRayCast3DPicker.h"
@@ -381,7 +382,7 @@ int mafViewSlice::GetNodeStatus(mafNode *vme)
     else if (vme->IsMAFType(mafVMESlicer))
     {
       n = m_Sg->Vme2Node(vme);
-      n->m_PipeCreatable = false;
+      n->m_Mutex = true;
     }
     else if (vme->IsMAFType(mafVMEImage))
     {
@@ -389,6 +390,11 @@ int mafViewSlice::GetNodeStatus(mafNode *vme)
       //n->m_Mutex = true;
 			n->m_PipeCreatable = false;
     }
+		else if (vme->IsA("mafVMEAdvancedSlicer"))
+		{
+			n = m_Sg->Vme2Node(vme);
+			n->m_Mutex = true;
+		}
   }
 
   return m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-23 16:19:50 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-01-24 17:11:21 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi , Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -38,6 +38,7 @@
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkLinearTransform.h"
 #include "vtkPointData.h"
+#include "vtkImageClip.h"
 
 #include <assert.h>
 
@@ -69,6 +70,9 @@ mafVMEAdvancedSlicer::mafVMEAdvancedSlicer()
   m_PSlicer->SetOutput(slice);
   m_PSlicer->SetTexture(image);
   m_ISlicer->SetOutput(image);
+
+	m_Height = 256;
+	m_Width = 256;
   
   vtkNEW(m_BackTransform);
   //vtkMAFSmartPointer<vtkTransformPolyDataFilter> back_trans;
@@ -89,8 +93,10 @@ mafVMEAdvancedSlicer::mafVMEAdvancedSlicer()
   GetMaterial()->m_MaterialType = mmaMaterial::USE_TEXTURE;
   GetMaterial()->m_TextureMappingMode = mmaMaterial::PLANE_MAPPING;
 
-	m_Height = 20;
-	m_Width = 20;
+	m_VMEAccept = new mafVMEAccept();
+
+	vtkNEW(m_Clip);
+	vtkNEW(m_Texture);
 }
 
 //-------------------------------------------------------------------------
@@ -103,6 +109,8 @@ mafVMEAdvancedSlicer::~mafVMEAdvancedSlicer()
 
   vtkDEL(m_PSlicer);
   vtkDEL(m_ISlicer);
+
+	vtkDEL(m_Clip);
 }
 
 //-------------------------------------------------------------------------
@@ -178,6 +186,8 @@ bool mafVMEAdvancedSlicer::IsDataAvailable()
 {
 	if(GetVolumeLink())
 		return ((mafVME*)GetVolumeLink())->IsDataAvailable();
+	else if(GetParent())
+		return ((mafVME*)GetParent())->IsDataAvailable();
 	else
 		return false;
 }
@@ -193,7 +203,7 @@ void mafVMEAdvancedSlicer::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes
 void mafVMEAdvancedSlicer::InternalPreUpdate()
 //-----------------------------------------------------------------------
 {
-  mafVME *vol = mafVMEVolume::SafeDownCast(GetVolumeLink());
+	mafVME *vol=mafVMEVolume::SafeDownCast(GetVolumeLink()) ? mafVMEVolume::SafeDownCast(GetVolumeLink()) : mafVMEVolume::SafeDownCast(GetParent());
   if(vol)
   {
     if (vtkDataSet *vtkdata=vol->GetOutput()->GetVTKData())
@@ -212,12 +222,44 @@ void mafVMEAdvancedSlicer::InternalPreUpdate()
       vtkMath::Cross(n, vectX, vectY);
       vtkMath::Normalize(vectY);
 
-      vtkdata->Update();
+			vtkdata->Update();
 
-      vtkImageData *texture = m_PSlicer->GetTexture();
+			vtkImageData *image=vtkImageData::SafeDownCast(vtkdata);
+			vtkImageData *image_copy;
+			vtkNEW(image_copy);
+			image_copy->DeepCopy(image);
+			image_copy->SetUpdateExtent(0,50,0,50,50,51);
+			image_copy->UpdateData();
+			image_copy->Crop();
+			image_copy->Modified();
+			image_copy->UpdateData();
+			
+			vtkImageData *texture = m_PSlicer->GetTexture();
+			texture->SetScalarType(image_copy->GetPointData()->GetScalars()->GetDataType());
+			texture->SetNumberOfScalarComponents(image_copy->GetPointData()->GetScalars()->GetNumberOfComponents());
+			//texture->SetExtent(0,50,0,50,50,51);
+			//texture->Crop();
+			texture->Modified();
+
+			/*if(vtkdata->IsA("vtkImageData"))
+			{
+
+				m_Clip->SetInput(texture);
+				m_Clip->SetOutputWholeExtent(0,pos[0]*2,0,pos[1]*2,pos[2],pos[2]);
+				m_Clip->SetOutput(texture);
+				m_Clip->Update();
+
+				m_Width = pos[0];
+				m_Height = pos[1];
+				if (m_Gui)
+					m_Gui->Update();
+			}*/
+			
+
+      /*vtkImageData *texture = m_PSlicer->GetTexture();
       texture->SetScalarType(vtkdata->GetPointData()->GetScalars()->GetDataType());
       texture->SetNumberOfScalarComponents(vtkdata->GetPointData()->GetScalars()->GetNumberOfComponents());
-      texture->Modified();
+      texture->Modified();*/
 
       m_PSlicer->SetInput(vtkdata);
       m_PSlicer->SetPlaneOrigin(pos);
@@ -236,14 +278,12 @@ void mafVMEAdvancedSlicer::InternalPreUpdate()
 void mafVMEAdvancedSlicer::InternalUpdate()
 //-----------------------------------------------------------------------
 {
-  mafVME *vol = mafVMEVolume::SafeDownCast(GetVolumeLink());
+  mafVME *vol=mafVMEVolume::SafeDownCast(GetVolumeLink()) ? mafVMEVolume::SafeDownCast(GetVolumeLink()) : mafVMEVolume::SafeDownCast(GetParent());
   if(vol)
   {
     vol->Update();
     if (vtkDataSet *vtkdata=vol->GetOutput()->GetVTKData())
-    {
-			m_PSlicer->GetTexture()->SetExtent(0, (int)(m_Width/m_Xspc) - 1, 0, (int)(m_Height/m_Yspc) - 1, 0, 0);
-			m_PSlicer->GetTexture()->SetUpdateExtent(0, (int)(m_Width/m_Xspc) - 1, 0, (int)(m_Height/m_Yspc) - 1, 0, 0);
+    {		
       m_PSlicer->Update();
       m_ISlicer->Update();
     }
@@ -266,7 +306,7 @@ mmgGui* mafVMEAdvancedSlicer::CreateGui()
 	m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
 	m_Gui->SetListener(this);
 	m_Gui->Divider();
-	mafVME *vol = mafVME::SafeDownCast(GetVolumeLink());
+	mafVMEVolume *vol=mafVMEVolume::SafeDownCast(GetVolumeLink()) ? mafVMEVolume::SafeDownCast(GetVolumeLink()) : mafVMEVolume::SafeDownCast(GetParent());
 	m_VolumeName = vol ? vol->GetName() : _("none");
 	m_Gui->Button(ID_VOLUME_LINK,&m_VolumeName,_("Volume"), _("Select the volume to be probed"));
 
@@ -275,6 +315,8 @@ mmgGui* mafVMEAdvancedSlicer::CreateGui()
 
 	m_Gui->Vector(ID_POSITION,_("Position"),m_Pos);
 	m_Gui->Vector(ID_NORMAL,_("Normal"),m_Normal);
+
+	m_Gui->Divider(1);
 	return m_Gui;
 }
 //-----------------------------------------------------------------------
@@ -292,9 +334,45 @@ void mafVMEAdvancedSlicer::OnEvent(mafEventBase *maf_event)
 	{
 		switch(e->GetId())
 		{
+			case ID_VOLUME_LINK:
+				{
+					mafID button_id = e->GetId();
+					mafString title = _("Choose Volume VME link");
+					e->SetId(VME_CHOOSE);
+					e->SetArg((long)m_VMEAccept);
+					e->SetString(&title);
+					ForwardUpEvent(e);
+					mafNode *n = e->GetVme();
+					if (n != NULL)
+					{
+						
+						SetVolumeLink(n);
+						m_VolumeName = n->GetName();
+						m_Gui->Update();
+						InternalUpdate();
+						Modified();
+					}
+				}
+				break;
 			case ID_HEIGHT:
 			case ID_WIDTH:
-			case ID_VOLUME_LINK:
+				{
+					mafVME *vol=mafVMEVolume::SafeDownCast(GetVolumeLink()) ? mafVMEVolume::SafeDownCast(GetVolumeLink()) : mafVMEVolume::SafeDownCast(GetParent());
+
+					if (vtkDataSet *vtkdata=vol->GetOutput()->GetVTKData())
+					{
+						if(vtkdata->IsA("vtkImageData"))
+						{
+							double pos[3];
+							m_Transform->GetPosition(pos);
+							m_Clip->SetOutputWholeExtent(0,m_Width,0,m_Height,pos[3],pos[3]);
+							m_Clip->Update();
+							InternalUpdate();
+							Modified();
+						}
+					}
+				}
+				break;
 			case ID_POSITION:
 			case ID_NORMAL:
 				this->InternalUpdate();
@@ -307,4 +385,11 @@ void mafVMEAdvancedSlicer::OnEvent(mafEventBase *maf_event)
 	{
 		Superclass::OnEvent(maf_event);
 	}
+}
+//-----------------------------------------------------------------------
+void mafVMEAdvancedSlicer::SetVolumeLink(mafNode *volume)
+//-----------------------------------------------------------------------
+{
+	SetLink("Volume", volume);
+	Modified();
 }
