@@ -20,6 +20,8 @@ SET(PROJECT_SRCS
   medPipeVolumeVR.h
   mafVMEAdvancedProber.cpp
   mafVMEAdvancedProber.h
+  mafVMEAdvancedSlicer.cpp
+  mafVMEAdvancedSlicer.h
 )
 
 IF (MAF_USE_ITK)
