@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERefSys.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-16 12:38:10 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-01-26 09:10:29 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -161,6 +161,8 @@ mafVMERefSys::mafVMERefSys()
   m_ScaleAxis->Update();
 
   dpipe->SetInput(m_ScaleAxis->GetOutput());
+
+	m_Fixed = 0;
 }
 
 //-------------------------------------------------------------------------
@@ -295,6 +297,7 @@ int mafVMERefSys::InternalStore(mafStorageElement *parent)
   {
     parent->StoreMatrix("Transform",&m_Transform->GetMatrix());
     parent->StoreDouble("m_ScaleFactor", m_ScaleFactor);
+		parent->StoreInteger("Fixed", m_Fixed);
     return MAF_OK;
   }
   return MAF_ERROR;
@@ -311,6 +314,7 @@ int mafVMERefSys::InternalRestore(mafStorageElement *node)
     {
       m_Transform->SetMatrix(matrix);
       node->RestoreDouble("m_ScaleFactor", m_ScaleFactor);
+			node->RestoreInteger("Fixed", m_Fixed);
       return MAF_OK;
     }
   }
@@ -387,6 +391,16 @@ mmgGui* mafVMERefSys::CreateGui()
 		m_Radio=1;
 	else
 		m_Radio=0;
+
+  // vme ref sys fixed
+	m_Gui->Bool(ID_FIXED, _("Click for fix the refsys"), &m_Fixed, 1);
+
+	m_Gui->Enable(ID_SCALE_FACTOR, m_Fixed == 0);
+	m_Gui->Enable(ID_REF_SYS_ORIGIN, m_Fixed == 0);
+	m_Gui->Enable(ID_POINT1, m_Fixed == 0);
+	m_Gui->Enable(ID_POINT2, m_Fixed == 0);
+	m_Gui->Enable(ID_RADIO, m_Fixed == 0);
+	m_Gui->Enable(ID_FIXED, m_Fixed == 0);
 
 	m_Gui->Update();
 	//this->InternalUpdate();
@@ -465,6 +479,18 @@ void mafVMERefSys::OnEvent(mafEventBase *maf_event)
 					}
 					InternalUpdate();
 					m_Gui->Update();
+				}
+			break;
+			case ID_FIXED:
+				{
+          m_Gui->Enable(ID_SCALE_FACTOR, m_Fixed == 0);
+					m_Gui->Enable(ID_REF_SYS_ORIGIN, m_Fixed == 0);
+
+					m_Gui->Enable(ID_POINT1, m_Fixed == 0);
+					m_Gui->Enable(ID_POINT2, m_Fixed == 0);
+					m_Gui->Enable(ID_RADIO, m_Fixed == 0);
+
+          m_Gui->Enable(ID_FIXED, m_Fixed == 0);
 				}
 			break;
       default:
