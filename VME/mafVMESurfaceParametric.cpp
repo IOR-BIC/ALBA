@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-13 15:27:24 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-01-26 09:11:11 $
+  Version:   $Revision: 1.7 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -255,7 +255,7 @@ void mafVMESurfaceParametric::GetLocalTimeStamps(std::vector<mafTimeStamp> &kfra
 mmgGui* mafVMESurfaceParametric::CreateGui()
 //-------------------------------------------------------------------------
 {
-  m_Gui = new mmgGui(this);
+  mafVME::CreateGui();
   m_Gui->Divider();
   
 	wxString geometry_array[5] = {_("Sphere"),_("Cone"),_("Cylinder"),_("Parallelepiped"),_("Plane")};
