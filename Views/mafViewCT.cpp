@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCT.cpp,v $
 Language:  C++
-Date:      $Date: 2007-01-24 17:07:56 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-01-26 16:45:49 $
+Version:   $Revision: 1.3 $
 Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -27,6 +27,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mmgLutSlider.h"
 #include "mafVMEVolume.h"
 #include "mafVMESurface.h"
+#include "mafViewSlice.h"
 
 //----------------------------------------------------------------------------
 // constants:
@@ -114,6 +115,10 @@ void mafViewCT::VmeShow(mafNode *node, bool show)
 void mafViewCT::VmeRemove(mafNode *node)
 //----------------------------------------------------------------------------
 {
+	for(int i=0; i<this->GetNumberOfSubView(); i++)
+		m_ChildViewList[i]->VmeRemove(node);
+
+	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
 void mafViewCT::OnEvent(mafEventBase *maf_event)
@@ -126,11 +131,11 @@ void mafViewCT::OnEvent(mafEventBase *maf_event)
 			case ID_LAYOUT_HEIGHT:
 			case ID_LAYOUT_WIDTH:
 			default:
-				mafViewCompound::OnEvent(maf_event);
+				mafEventMacro(*maf_event);
 		}
 	}
 	else
-		mafViewCompound::OnEvent(maf_event);
+		mafEventMacro(*maf_event);
 }
 //-------------------------------------------------------------------------
 mmgGui* mafViewCT::CreateGui()
