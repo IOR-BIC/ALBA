@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoClassicICPRegistration.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-11 17:35:31 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-01-26 09:15:12 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefania Paperini porting Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -71,7 +71,7 @@ bool mmoClassicICPRegistration::Accept(mafNode* vme)
 //----------------------------------------------------------------------------
 {
 	if(!vme) return false;
-	if( vme->IsA("mafVMESurface") ) return true;
+	if( vme->IsA("mafVMESurface") || vme->IsA("mafVMESurfaceParametric")) return true;
 	if( vme->IsA("mafVMELandmarkCloud") && ((mafVMELandmarkCloud *)vme)->IsRigid() ) return true;
   return false;
 };
@@ -160,6 +160,7 @@ void mmoClassicICPRegistration::OpDo()
 	assert(!m_Registered);
 
 	((mafVME*)m_Input)->GetOutput()->Update();
+  
 
 	mafSmartPointer<mafMatrix> icp_matrix;  
 	mafSmartPointer<mafMatrix> final_matrix;
@@ -184,9 +185,19 @@ void mmoClassicICPRegistration::OpDo()
 	target_matrix->Multiply4x4(*target_matrix, *icp_matrix, *final_matrix);
 
   wxString name = wxString::Format(_("%s registered on %s"),m_Input->GetName(), m_Target->GetName());
-	mafNEW(m_Registered);
-	m_Registered->DeepCopy(m_Input); //not to be deleted, - delete it in the Undo or in destructor
-	m_Registered->GetOutput()->Update();
+
+  mafNEW(m_Registered);
+
+  if(m_Input->IsMAFType(mafVMESurface))
+   {	
+     m_Registered->DeepCopy(m_Input); //not to be deleted, - delete it in the Undo or in destructor
+     m_Registered->GetOutput()->Update();
+   }
+  else
+   {
+     m_Registered->SetData((vtkPolyData*)(((mafVME*)m_Input)->GetOutput()->GetVTKData()),0.0);
+     m_Registered->Update();
+   }
   m_Registered->SetName(name);
 	m_Registered->ReparentTo(m_Target->GetParent());
 	m_Registered->SetMatrix(*final_matrix);
