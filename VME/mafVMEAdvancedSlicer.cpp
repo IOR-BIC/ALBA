@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-24 22:06:12 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-01-26 16:53:08 $
+  Version:   $Revision: 1.6 $
   Authors:   Daniele Giunchi , Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,6 +27,7 @@
 #include "mafVMEVolume.h"
 #include "mafVMEOutputSurface.h"
 #include "mmaMaterial.h"
+#include "mmaVolumeMaterial.h"
 #include "mmgGui.h"
 
 #include "vtkMAFSmartPointer.h"
@@ -38,7 +39,8 @@
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkLinearTransform.h"
 #include "vtkPointData.h"
-#include "vtkImageClip.h"
+#include "vtkPlaneSource.h"
+#include "vtkLookupTable.h"
 
 #include <assert.h>
 
@@ -67,16 +69,17 @@ mafVMEAdvancedSlicer::mafVMEAdvancedSlicer()
 
   vtkNEW(m_PSlicer);
   vtkNEW(m_ISlicer);
+	vtkNEW(m_Plane);
   m_PSlicer->SetOutput(slice);
   m_PSlicer->SetTexture(image);
   m_ISlicer->SetOutput(image);
 
-	m_Height = 256;
-	m_Width = 256;
+	m_Height = 20;
+	m_Width = 20;
   
   vtkNEW(m_BackTransform);
   //vtkMAFSmartPointer<vtkTransformPolyDataFilter> back_trans;
-  m_BackTransform->SetInput(slice);
+  m_BackTransform->SetInput(m_Plane->GetOutput());
   m_BackTransform->SetTransform(m_Transform->GetVTKTransform()->GetInverse());
 
   // attach a datapipe which creates a bridge between VTK and MAF
@@ -95,8 +98,8 @@ mafVMEAdvancedSlicer::mafVMEAdvancedSlicer()
 
 	m_VMEAccept = new mafVMEAccept();
 
-	vtkNEW(m_Clip);
 	vtkNEW(m_Texture);
+	vtkNEW(m_Lut);
 }
 
 //-------------------------------------------------------------------------
@@ -109,8 +112,8 @@ mafVMEAdvancedSlicer::~mafVMEAdvancedSlicer()
 
   vtkDEL(m_PSlicer);
   vtkDEL(m_ISlicer);
-
-	vtkDEL(m_Clip);
+	vtkDEL(m_Lut);
+	vtkDEL(m_Texture);
 }
 
 //-------------------------------------------------------------------------
@@ -203,7 +206,7 @@ void mafVMEAdvancedSlicer::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes
 void mafVMEAdvancedSlicer::InternalPreUpdate()
 //-----------------------------------------------------------------------
 {
-	mafVME *vol=mafVMEVolume::SafeDownCast(GetVolumeLink()) ? mafVMEVolume::SafeDownCast(GetVolumeLink()) : mafVMEVolume::SafeDownCast(GetParent());
+	mafVMEVolume *vol=mafVMEVolume::SafeDownCast(GetVolumeLink()) ? mafVMEVolume::SafeDownCast(GetVolumeLink()) : mafVMEVolume::SafeDownCast(GetParent());
   if(vol)
   {
     if (vtkDataSet *vtkdata=vol->GetOutput()->GetVTKData())
@@ -226,40 +229,27 @@ void mafVMEAdvancedSlicer::InternalPreUpdate()
 
 			vtkImageData *image=vtkImageData::SafeDownCast(vtkdata);
 
-//			m_image_copy->DeepCopy(image);
-			image->SetExtent(0,200,0,20,0,200);
-			image->SetUpdateExtent(0,200,0,20,0,200);
+			double spacing[3];
+			image->GetSpacing(spacing);
+			int x0=(int)(pos[0]/spacing[0]-m_Width/(spacing[0]));
+			int x1=(int)(pos[0]/spacing[0]+m_Width/(2*spacing[0]));
+			int y0=(int)(pos[1]/spacing[1]-m_Width/(2*spacing[1]));
+			int y1=(int)(pos[1]/spacing[1]+m_Width/(2*spacing[1]));
+			image->SetExtent(x0,x1,y0,y1,50,200);
+			image->SetUpdateExtent(x0,x1,y0,y1,50,200);
 			
 			image->Crop();
-			//image->Modified();
 			image->UpdateData();
-			
+
+			m_Plane->SetPoint1(pos[0]+m_Width/2,pos[1]-m_Height/2,0);
+			m_Plane->SetPoint2(pos[0]-m_Width/2,pos[1]+m_Height/2,0);
+			m_Plane->SetOrigin(pos[0]-m_Width/2,pos[1]-m_Height/2,0);
+			m_Plane->Update();
+
 			vtkImageData *texture = m_PSlicer->GetTexture();
 			texture->SetScalarType(image->GetPointData()->GetScalars()->GetDataType());
 			texture->SetNumberOfScalarComponents(image->GetPointData()->GetScalars()->GetNumberOfComponents());
-			//texture->SetExtent(0,50,0,50,50,51);
-			//texture->Crop();
 			texture->Modified();
-
-			/*if(vtkdata->IsA("vtkImageData"))
-			{
-
-				m_Clip->SetInput(texture);
-				m_Clip->SetOutputWholeExtent(0,pos[0]*2,0,pos[1]*2,pos[2],pos[2]);
-				m_Clip->SetOutput(texture);
-				m_Clip->Update();
-
-				m_Width = pos[0];
-				m_Height = pos[1];
-				if (m_Gui)
-					m_Gui->Update();
-			}*/
-			
-
-      /*vtkImageData *texture = m_PSlicer->GetTexture();
-      texture->SetScalarType(vtkdata->GetPointData()->GetScalars()->GetDataType());
-      texture->SetNumberOfScalarComponents(vtkdata->GetPointData()->GetScalars()->GetNumberOfComponents());
-      texture->Modified();*/
 
       m_PSlicer->SetInput(image);
       m_PSlicer->SetPlaneOrigin(pos);
@@ -270,6 +260,10 @@ void mafVMEAdvancedSlicer::InternalPreUpdate()
       m_ISlicer->SetPlaneOrigin(pos);
       m_ISlicer->SetPlaneAxisX(vectX);
       m_ISlicer->SetPlaneAxisY(vectY);
+
+			double sr[2];
+			vol->GetOutput()->GetVTKData()->GetScalarRange(sr);
+			GetMaterial()->m_ColorLut->SetTableRange(sr);
     }
   }
 }
@@ -363,10 +357,6 @@ void mafVMEAdvancedSlicer::OnEvent(mafEventBase *maf_event)
 					{
 						if(vtkdata->IsA("vtkImageData"))
 						{
-							double pos[3];
-							m_Transform->GetPosition(pos);
-							m_Clip->SetOutputWholeExtent(0,m_Width,0,m_Height,pos[3],pos[3]);
-							m_Clip->Update();
 							InternalUpdate();
 							Modified();
 						}

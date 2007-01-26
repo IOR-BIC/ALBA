@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedSlicer.h,v $
   Language:  C++
-  Date:      $Date: 2007-01-24 17:11:21 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-01-26 16:53:08 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi , Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,8 +23,9 @@
 //----------------------------------------------------------------------------
 class vtkVolumeSlicer;
 class vtkTransformPolyDataFilter;
-class vtkImageClip;
+class vtkPlaneSource;
 class vktImageData;
+class vtkLookupTable;
 class mafNode;
 class mmaMaterial;
 class mafVMEOutputSurface;
@@ -160,8 +161,9 @@ protected:
 	double						m_Normal[3];
 	double						m_Pos[3];
 
-	vtkImageClip			*m_Clip;
 	vtkImageData			*m_Texture;
+	vtkPlaneSource		*m_Plane;
+	vtkLookupTable		*m_Lut;
 
 private:
   mafVMEAdvancedSlicer(const mafVMEAdvancedSlicer&); // Not implemented
