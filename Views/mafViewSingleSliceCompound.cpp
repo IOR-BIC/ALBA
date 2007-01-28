@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSliceCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-23 15:37:40 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-01-28 08:39:54 $
+  Version:   $Revision: 1.5 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -164,7 +164,8 @@ void mafViewSingleSliceCompound::VmeShow(mafNode *node, bool show)
 
 	if(GetSceneGraph()->GetSelectedVme()==node)
 	{
-		UpdateWindowing(show,node);
+		//UpdateWindowing(show,node);
+		UpdateWindowing(node->IsA("mafVMEVolumeGray") && show && (GetSceneGraph()->GetSelectedVme() == node),node);
 	}
 
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
