@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSliceCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-28 08:39:54 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-01-28 09:56:03 $
+  Version:   $Revision: 1.6 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -200,6 +200,7 @@ void mafViewSingleSliceCompound::UpdateWindowing(bool enable,mafNode *node)
 		Volume->GetVolumeOutput()->GetVTKData()->GetScalarRange(sr);
 		mmaVolumeMaterial *currentSurfaceMaterial = Volume->GetMaterial();
 		m_ColorLUT = Volume->GetMaterial()->m_ColorLut;
+		Volume->GetMaterial()->UpdateProp();
 		m_LutWidget->SetLut(m_ColorLUT);
 		m_LutWidget->Enable(true);
 		m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
