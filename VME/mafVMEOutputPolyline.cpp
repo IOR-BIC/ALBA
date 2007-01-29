@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputPolyline.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 14:55:27 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-01-29 12:06:27 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,11 +21,15 @@
 
 #include "mafVMEOutputPolyline.h"
 #include "mafVME.h"
+#include "mafDataPipe.h"
+#include "mmgGui.h"
 #include "mafIndent.h"
 #include "mmaMaterial.h"
 
 #include "vtkPolyData.h"
+#include "vtkPoints.h"
 
+#include "vtkMath.h"
 #include <assert.h>
 
 //-------------------------------------------------------------------------
@@ -37,6 +41,7 @@ mafVMEOutputPolyline::mafVMEOutputPolyline()
 //-------------------------------------------------------------------------
 {
   m_Material = NULL;
+  m_NumberOfPoints = "0";
 }
 
 //-------------------------------------------------------------------------
@@ -58,6 +63,31 @@ void mafVMEOutputPolyline::SetMaterial(mmaMaterial *material)
   m_Material = material;
 }
 //-------------------------------------------------------------------------
+mmgGui* mafVMEOutputPolyline::CreateGui()
+//-------------------------------------------------------------------------
+{
+  assert(m_Gui == NULL);
+  m_Gui = mafVMEOutput::CreateGui();
+
+  wxBusyCursor wait;
+  
+  if (m_VME && m_VME->GetDataPipe() && m_VME->GetDataPipe()->GetVTKData())
+  {
+    this->Update();
+  }
+  mafString vtk_data_type;
+  vtk_data_type << mafString(GetVTKData()->GetClassName());
+  m_Gui->Label(_("vtk type: "), vtk_data_type, true);
+  
+  CalculateLength();
+  m_Gui->Label(_(" Length: "), &m_Length ,true);
+
+  m_NumberOfPoints = mafString(((vtkPolyData *)m_VME->GetOutput()->GetVTKData())->GetNumberOfPoints());
+  m_Gui->Label(_("Points: "), &m_NumberOfPoints ,true);
+
+  return m_Gui;
+}
+//-------------------------------------------------------------------------
 mmaMaterial *mafVMEOutputPolyline::GetMaterial()
 //-------------------------------------------------------------------------
 {
@@ -67,4 +97,44 @@ mmaMaterial *mafVMEOutputPolyline::GetMaterial()
 
   // search for a material attribute in the VME connected to this output
   return GetVME() ? mmaMaterial::SafeDownCast(GetVME()->GetAttribute("MaterialAttributes")) : NULL;
+}
+//-------------------------------------------------------------------------
+void mafVMEOutputPolyline::Update()
+//-------------------------------------------------------------------------
+{
+  assert(m_VME);
+  m_VME->Update();
+  if (m_VME && m_VME->GetDataPipe() && m_VME->GetDataPipe()->GetVTKData())
+  {
+  	m_Length = mafString(wxString::Format(_("%.2f"),CalculateLength()));  
+    m_NumberOfPoints = mafString(((vtkPolyData *)m_VME->GetOutput()->GetVTKData())->GetNumberOfPoints());
+  }
+  
+  if (m_Gui)
+  {
+    m_Gui->Update();
+  }
+}
+//----------------------------------------------------------------------------
+double mafVMEOutputPolyline::CalculateLength()
+//----------------------------------------------------------------------------
+{
+  double sum = 0;
+  vtkPoints *pts = ((vtkPolyData *)m_VME->GetOutput()->GetVTKData())->GetPoints();
+	if(pts == NULL) return 0.0;
+  for(int i=0; i< pts->GetNumberOfPoints(); i++)
+  { 
+    if (i > 0)
+    {
+      double pos1[3], pos2[3];
+      pts->GetPoint(i, pos1);
+      pts->GetPoint(i-1, pos2);
+
+      sum += sqrt(vtkMath::Distance2BetweenPoints(pos1, pos2));
+
+    }
+
+  }
+  
+  return sum;
 }
