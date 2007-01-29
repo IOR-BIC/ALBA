@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-26 16:53:08 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-01-29 15:26:17 $
+  Version:   $Revision: 1.7 $
   Authors:   Daniele Giunchi , Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -231,19 +231,20 @@ void mafVMEAdvancedSlicer::InternalPreUpdate()
 
 			double spacing[3];
 			image->GetSpacing(spacing);
-			int x0=(int)(pos[0]/spacing[0]-m_Width/(spacing[0]));
-			int x1=(int)(pos[0]/spacing[0]+m_Width/(2*spacing[0]));
-			int y0=(int)(pos[1]/spacing[1]-m_Width/(2*spacing[1]));
-			int y1=(int)(pos[1]/spacing[1]+m_Width/(2*spacing[1]));
-			image->SetExtent(x0,x1,y0,y1,50,200);
-			image->SetUpdateExtent(x0,x1,y0,y1,50,200);
-			
+			int x0=(int)(pos[0]/spacing[0] - (m_Width / (2*spacing[0])));
+			int x1=(int)(pos[0]/spacing[0] + (m_Width / (2*spacing[0])));
+			int y0=(int)(pos[1]/spacing[1] - (m_Height / (2*spacing[1])));
+			int y1=(int)(pos[1]/spacing[1] + (m_Height / (2*spacing[1])));
+			image->SetOrigin(pos[0] - m_Width/2,pos[1] - m_Height/2,pos[2]);
+			image->SetExtent(x0,x1,y0,y1,0,200);
+			image->SetUpdateExtent(x0,x1,y0,y1,0,200);
+
 			image->Crop();
 			image->UpdateData();
 
-			m_Plane->SetPoint1(pos[0]+m_Width/2,pos[1]-m_Height/2,0);
-			m_Plane->SetPoint2(pos[0]-m_Width/2,pos[1]+m_Height/2,0);
-			m_Plane->SetOrigin(pos[0]-m_Width/2,pos[1]-m_Height/2,0);
+			m_Plane->SetPoint1(pos[0] + m_Width/2,pos[1] - m_Height/2,pos[2]);
+			m_Plane->SetPoint2(pos[0] - m_Width/2,pos[1] + m_Height/2,pos[2]);
+			m_Plane->SetOrigin(pos[0] - m_Width/2,pos[1] - m_Height/2,pos[2]);
 			m_Plane->Update();
 
 			vtkImageData *texture = m_PSlicer->GetTexture();
