@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-23 13:48:41 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-01-30 12:54:59 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,13 +21,16 @@
 
 #include "mafPipePolylineSlice.h"
 #include "mafSceneNode.h"
-#include "mafVMEPolyLine.h"
-#include "mmaMaterial.h"
 #include "mmgGui.h"
 #include "mmgMaterialButton.h"
 #include "mafAxes.h"
 #include "mafDataVector.h"
+
 #include "mafVMEGenericAbstract.h"
+#include "mmaMaterial.h"
+#include "mafVMEPolyline.h"
+#include "mafVMEOutputPolyline.h"
+#include "mafAbsMatrixPipe.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFAssembly.h"
@@ -45,7 +48,6 @@
 #include "vtkTextureMapToSphere.h"
 #include "vtkFixedCutter.h"
 #include "vtkPlane.h"
-#include "mafAbsMatrixPipe.h"
 #include "vtkMAFToLinearTransform.h"
 #include "vtkTubeFilter.h"
 
@@ -66,10 +68,10 @@ mafPipePolylineSlice::mafPipePolylineSlice()
   m_OutlineMapper   = NULL;
   m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
-  m_Cutter			= NULL;
-  m_Plane			= NULL;
-	//m_Tube = NULL;
-//	m_TubeRadial = NULL;
+  m_Cutter          = NULL;
+  m_Plane	    = NULL;
+//m_Tube = NULL;
+//m_TubeRadial = NULL;
 
   m_Origin[0] = 0;
   m_Origin[1] = 0;
@@ -85,7 +87,7 @@ mafPipePolylineSlice::mafPipePolylineSlice()
 //  m_Radius=1;
 }
 //----------------------------------------------------------------------------
-void mafPipePolylineSlice::Create(mafSceneNode *n/*, bool use_axes*/)
+void mafPipePolylineSlice::Create(mafSceneNode *n)
 //----------------------------------------------------------------------------
 {
   Superclass::Create(n);
