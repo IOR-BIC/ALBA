@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-19 15:23:25 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-01-30 15:13:39 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1475,8 +1475,7 @@ void mafVMEAdvancedProber::OnEvent(mafEventBase *maf_event)
           SetVolumeLink(n);
           m_VolumeName = n->GetName();
           m_Gui->Update();
-					
-					
+									
 					ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
         }
       }
@@ -1550,7 +1549,7 @@ void mafVMEAdvancedProber::OnEvent(mafEventBase *maf_event)
         m_ListBox->Update();
 				m_Gui->Update();
 				Modified();
-				InternalUpdate();
+				//InternalUpdate();
 
 				ForwardUpEvent(&mafEvent(this,CAMERA_RESET));
 				ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
@@ -1576,7 +1575,8 @@ void mafVMEAdvancedProber::OnEvent(mafEventBase *maf_event)
 			case ID_SPLINE:
       case ID_PROFILE_NUMBER:
       case ID_PROFILE_DISTANCE:
-        InternalUpdate();
+        //InternalUpdate();
+        Modified();
         ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
       break;
       default:
