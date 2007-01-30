@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.h,v $
   Language:  C++
-  Date:      $Date: 2007-01-23 13:54:59 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-01-30 13:03:55 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,20 +17,15 @@
 // Include :
 //----------------------------------------------------------------------------
 #include "mafPipe.h"
-#include "mmgVMEChooserAccept.h"
-#include "mafVMEImage.h"
 
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
 class vtkOutlineCornerFilter;
-class vtkTexture;
 class vtkPolyDataMapper;
-class vtkPolyData;
 class vtkActor;
 class vtkProperty;
 class mafAxes;
-class mmgMaterialButton;
 class vtkFixedCutter;
 class vtkPlane;
 class vtkTubeFilter;
@@ -75,10 +70,9 @@ public:
     ID_RENDERING_DISPLAY_LIST,
     ID_CHOOSE_TEXTURE,
     ID_TEXTURE_MAPPING_MODE,
+    ID_BORDER_CHANGE,
     ID_LAST,
-	ID_BORDER_CHANGE
   };
-
 
   virtual mmgGui  *CreateGui();
 protected:
@@ -101,6 +95,5 @@ protected:
 
   int m_ScalarVisibility;
   int m_RenderingDisplayListFlag;
-
 };  
 #endif // __mafPipePolylineSlice_H__

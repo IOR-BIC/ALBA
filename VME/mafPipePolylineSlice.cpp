@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-30 12:54:59 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-01-30 13:03:55 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,17 +22,14 @@
 #include "mafPipePolylineSlice.h"
 #include "mafSceneNode.h"
 #include "mmgGui.h"
-#include "mmgMaterialButton.h"
 #include "mafAxes.h"
-#include "mafDataVector.h"
 
-#include "mafVMEGenericAbstract.h"
 #include "mmaMaterial.h"
+#include "mafVMEGenericAbstract.h"
 #include "mafVMEPolyline.h"
 #include "mafVMEOutputPolyline.h"
 #include "mafAbsMatrixPipe.h"
 
-#include "vtkMAFSmartPointer.h"
 #include "vtkMAFAssembly.h"
 #include "vtkRenderer.h"
 #include "vtkOutlineCornerFilter.h"
@@ -40,12 +37,7 @@
 #include "vtkPolyData.h"
 #include "vtkActor.h"
 #include "vtkProperty.h"
-#include "vtkTexture.h"
 #include "vtkPointData.h"
-#include "vtkImageData.h"
-#include "vtkTextureMapToCylinder.h"
-#include "vtkTextureMapToPlane.h"
-#include "vtkTextureMapToSphere.h"
 #include "vtkFixedCutter.h"
 #include "vtkPlane.h"
 #include "vtkMAFToLinearTransform.h"
