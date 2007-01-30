@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoInteractionOp.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-07 09:18:05 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-01-30 14:56:34 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,9 +27,12 @@ class mmoInteractionOp : public mafOp
 // ============================================================================
 {
 public:
-                mmoInteractionOp(wxString label);
-               ~mmoInteractionOp();
-	virtual void OnEvent(mafEventBase *e);
+  mmoInteractionOp(wxString label="InteractionOp");
+  ~mmoInteractionOp();
+  
+  mafTypeMacro(mmoInteractionOp, mafOp);
+
+  virtual void OnEvent(mafEventBase *e);
   mafOp* Copy();
 
   bool Accept(mafNode* vme) {return true;};

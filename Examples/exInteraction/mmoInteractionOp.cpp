@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoInteractionOp.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-07 09:18:05 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-01-30 14:56:28 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -46,6 +46,9 @@ const char ** mmoInteractionOp::GetActions()
 }
 /******************************************************************************/
 
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mmoInteractionOp)
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mmoInteractionOp::mmoInteractionOp(wxString label)
@@ -120,7 +123,7 @@ void mmoInteractionOp::OpRun()
   m_Gui->SetListener(this);
   m_Gui->OkCancel();
 
-	ShowGui(); // display the GUI
+  ShowGui(); // display the GUI
 }
 //----------------------------------------------------------------------------
 void mmoInteractionOp::OpDo()
@@ -172,12 +175,12 @@ void mmoInteractionOp::OnEvent(mafEventBase *e)
 { 
 
   switch(e->GetId())
-	{
-	  case wxOK:
-		  OpStop(OP_RUN_OK);
-	  break;
-	  case wxCANCEL:
-		  OpStop(OP_RUN_CANCEL);
+  {
+    case wxOK:
+      OpStop(OP_RUN_OK);
+    break;
+    case wxCANCEL:
+      OpStop(OP_RUN_CANCEL);
     break;
     case ID_TRANSFORM:
     {
@@ -187,8 +190,8 @@ void mmoInteractionOp::OnEvent(mafEventBase *e)
       mafEventMacro(mafEvent(this,CAMERA_UPDATE));
     }    
     break;
-	  default:
-		  mafEventMacro(*e); 
+    default:
+      mafEventMacro(*e); 
     break;
-	}
+  }
 }
