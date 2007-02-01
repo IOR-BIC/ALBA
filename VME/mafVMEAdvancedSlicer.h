@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedSlicer.h,v $
   Language:  C++
-  Date:      $Date: 2007-01-26 16:53:08 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-02-01 16:16:30 $
+  Version:   $Revision: 1.5 $
   Authors:   Daniele Giunchi , Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -126,6 +126,9 @@ public:
 	};
 
 	mafVMEAccept *m_VMEAccept;
+
+	/** Set the plane normal */
+	void SetNormal(float normal[3]);
   
 protected:
   mafVMEAdvancedSlicer();
@@ -158,7 +161,7 @@ protected:
 	mafString					m_VolumeName;
 	int								m_Width;
 	int								m_Height;
-	double						m_Normal[3];
+	float						m_Normal[3];
 	double						m_Pos[3];
 
 	vtkImageData			*m_Texture;

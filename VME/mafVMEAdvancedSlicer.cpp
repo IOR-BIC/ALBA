@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-29 15:26:17 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-02-01 16:16:30 $
+  Version:   $Revision: 1.8 $
   Authors:   Daniele Giunchi , Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -74,8 +74,8 @@ mafVMEAdvancedSlicer::mafVMEAdvancedSlicer()
   m_PSlicer->SetTexture(image);
   m_ISlicer->SetOutput(image);
 
-	m_Height = 20;
-	m_Width = 20;
+	m_Height = 50;
+	m_Width = 50;
   
   vtkNEW(m_BackTransform);
   //vtkMAFSmartPointer<vtkTransformPolyDataFilter> back_trans;
@@ -100,6 +100,14 @@ mafVMEAdvancedSlicer::mafVMEAdvancedSlicer()
 
 	vtkNEW(m_Texture);
 	vtkNEW(m_Lut);
+
+	m_Normal[0] = 0.0;
+	m_Normal[1] = 0.0;
+	m_Normal[2] = 1.0;
+
+	m_Pos[0] = 50.0;
+	m_Pos[1] = 50.0;
+	m_Pos[2] = 50.0;
 }
 
 //-------------------------------------------------------------------------
@@ -201,7 +209,16 @@ void mafVMEAdvancedSlicer::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes
 {
   kframes.clear(); // no timestamps
 }
+//-----------------------------------------------------------------------
+void mafVMEAdvancedSlicer::SetNormal(float normal[3])
+//-----------------------------------------------------------------------
+{
+	m_Normal[0] = normal[0];
+	m_Normal[1] = normal[1];
+	m_Normal[2] = normal[2];
 
+	Modified();
+}
 //-----------------------------------------------------------------------
 void mafVMEAdvancedSlicer::InternalPreUpdate()
 //-----------------------------------------------------------------------
@@ -212,22 +229,43 @@ void mafVMEAdvancedSlicer::InternalPreUpdate()
     if (vtkDataSet *vtkdata=vol->GetOutput()->GetVTKData())
     {
       double pos[3];
-      float vectX[3],vectY[3], n[3];
+      float vectX[3],vectY[3], n[3],normal[3];
 
-      m_Transform->GetPosition(pos);
-      m_Transform->GetVersor(0, vectX);
-      m_Transform->GetVersor(1, vectY);
+			pos[0] = m_Pos[0];
+			pos[1] = m_Pos[1];
+			pos[2] = m_Pos[2];
 
-      vtkMath::Normalize(vectX);
-      vtkMath::Normalize(vectY);
-      vtkMath::Cross(vectY, vectX, n);
-      vtkMath::Normalize(n);
-      vtkMath::Cross(n, vectX, vectY);
-      vtkMath::Normalize(vectY);
+			normal[0] = m_Normal[0];
+			normal[1] = m_Normal[1];
+			normal[2] = m_Normal[2];
+
+			m_Transform->GetVersor(1, vectY);
+
+			if(normal[0]==vectY[0] && normal[1]==vectY[1] && normal[2]==vectY[2])
+			{
+				/*m_Transform->GetVersor(0, vectX);
+				vtkMath::Normalize(normal);
+				vtkMath::Normalize(vectX);
+				vtkMath::Cross(normal,vectX, vectY);
+				vtkMath::Normalize(vectY);
+				vtkMath::Cross(vectY, normal, vectX);
+				vtkMath::Normalize(vectX);*/
+				vectY[0] += 0.001;
+			}
+			else if(normal[0]==1 && normal[1]==0 && normal[2]==0)
+			{
+
+			}
+				vtkMath::Normalize(normal);
+				vtkMath::Normalize(vectY);
+				vtkMath::Cross(normal,vectY, vectX);
+				vtkMath::Normalize(vectX);
+				vtkMath::Cross(normal,vectX, vectY);
+				vtkMath::Normalize(vectY);
 
 			vtkdata->Update();
 
-			vtkImageData *image=vtkImageData::SafeDownCast(vtkdata);
+			/*vtkImageData *image=vtkImageData::SafeDownCast(vtkdata);
 
 			double spacing[3];
 			image->GetSpacing(spacing);
@@ -240,24 +278,59 @@ void mafVMEAdvancedSlicer::InternalPreUpdate()
 			image->SetUpdateExtent(x0,x1,y0,y1,0,200);
 
 			image->Crop();
-			image->UpdateData();
+			image->UpdateData();*/
 
-			m_Plane->SetPoint1(pos[0] + m_Width/2,pos[1] - m_Height/2,pos[2]);
-			m_Plane->SetPoint2(pos[0] - m_Width/2,pos[1] + m_Height/2,pos[2]);
-			m_Plane->SetOrigin(pos[0] - m_Width/2,pos[1] - m_Height/2,pos[2]);
+			//m_Plane->SetPoint1(pos[0] + m_Width/2,pos[1] - m_Height/2,pos[2]);
+			//m_Plane->SetPoint2(pos[0] - m_Width/2,pos[1] + m_Height/2,pos[2]);
+
+			/*vtkMAFSmartPointer<vtkPlaneSource> tempPlane;
+			tempPlane->SetNormal((double*)m_Normal);
+			tempPlane->SetCenter(m_Pos);
+			tempPlane->Update();
+
+			double v1[3], v2[3];
+			tempPlane->GetPoint1(v1);
+			tempPlane->GetPoint2(v2);
+
+			vtkMath::Normalize(v1);
+			vtkMath::Normalize(v2);*/
+
+			double vect[3], vect1[3], vect2[3];
+			vect1[0] = ((double)m_Width/2) * vectX[0];
+			vect1[1] = ((double)m_Width/2) * vectX[1];
+			vect1[2] = ((double)m_Width/2) * vectX[2];
+
+			vect2[0] = ((double)m_Height/2) * vectY[0];
+			vect2[1] = ((double)m_Height/2) * vectY[1];
+			vect2[2] = ((double)m_Height/2) * vectY[2];
+
+			vect[0] = vect1[0] + vect2[0];
+			vect[1] = vect1[1] + vect2[1];
+			vect[2] = vect1[2] + vect2[2];
+
+			m_Plane->SetNormal(normal[0],normal[1],normal[2]);
+			m_Plane->SetCenter(pos);
+			m_Plane->SetOrigin(pos[0] - vect[0],pos[1] - vect[1], pos[2] + vect[2]);
+			m_Plane->SetPoint1(pos[0] + vect[0],pos[1] - vect[1], pos[2] - vect[2]);
+			m_Plane->SetPoint2(pos[0] - vect[0],pos[1] + vect[1], pos[2] + vect[2]);
 			m_Plane->Update();
+			double b[6];
+			m_Plane->GetOutput()->GetBounds(b);
 
 			vtkImageData *texture = m_PSlicer->GetTexture();
-			texture->SetScalarType(image->GetPointData()->GetScalars()->GetDataType());
-			texture->SetNumberOfScalarComponents(image->GetPointData()->GetScalars()->GetNumberOfComponents());
+			texture->SetScalarType(vtkdata->GetPointData()->GetScalars()->GetDataType());
+			texture->SetNumberOfScalarComponents(vtkdata->GetPointData()->GetScalars()->GetNumberOfComponents());
+			texture->SetExtent(0, m_Width/m_Xspc - 1, 0, m_Height/m_Yspc - 1, 0, 0);
+			texture->SetUpdateExtent(0, m_Width/m_Xspc - 1, 0, m_Height/m_Yspc - 1, 0, 0);
+			texture->SetSpacing(m_Xspc, m_Yspc, 1.f);
 			texture->Modified();
 
-      m_PSlicer->SetInput(image);
+      m_PSlicer->SetInput(vtkdata);
       m_PSlicer->SetPlaneOrigin(pos);
       m_PSlicer->SetPlaneAxisX(vectX);
       m_PSlicer->SetPlaneAxisY(vectY);
 
-      m_ISlicer->SetInput(image);
+      m_ISlicer->SetInput(vtkdata);
       m_ISlicer->SetPlaneOrigin(pos);
       m_ISlicer->SetPlaneAxisX(vectX);
       m_ISlicer->SetPlaneAxisY(vectY);
@@ -344,7 +417,6 @@ void mafVMEAdvancedSlicer::OnEvent(mafEventBase *maf_event)
 						SetVolumeLink(n);
 						m_VolumeName = n->GetName();
 						m_Gui->Update();
-						InternalUpdate();
 						Modified();
 					}
 				}
@@ -358,16 +430,17 @@ void mafVMEAdvancedSlicer::OnEvent(mafEventBase *maf_event)
 					{
 						if(vtkdata->IsA("vtkImageData"))
 						{
-							InternalUpdate();
 							Modified();
+							ForwardUpEvent(mafEvent(this,CAMERA_UPDATE));
 						}
 					}
 				}
 				break;
 			case ID_POSITION:
 			case ID_NORMAL:
-				this->InternalUpdate();
 				Modified();
+				ForwardUpEvent(mafEvent(this,CAMERA_UPDATE));
+				m_Gui->Update();
 			default:
 				mafNode::OnEvent(maf_event);
 		}
