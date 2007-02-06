@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-02-05 20:48:31 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-02-06 15:52:12 $
+Version:   $Revision: 1.2 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -43,6 +43,11 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkTextMapper.h"
 #include "vtkTextProperty.h"
 #include "vtkActor2D.h"
+#include "vtkMath.h"
+#include "vtkTransform.h"
+#include "vtkTransformPolyDataFilter.h"
+#include "vtkLandmarkTransform.h"
+#include "vtkPoints.h"
 
 #define VALUE 1.5
 
@@ -93,27 +98,32 @@ mafViewCTNew::mafViewCTNew(wxString label)
 
 	m_ViewCTCompound    = NULL;
 
-	m_WidthSection = 20;
-	m_HeightSection = 10;
-	m_Position[0] = m_Position[1] = m_Position[2] = 0.0;
+	m_WidthSection = 50;
+	m_HeightSection = 50;
+	m_Position[0] = m_Position[1] = m_Position[2] = 50.0;
 	m_Normal[0] = 0.0;
-	m_Normal[0] = 0.0;
-	m_Normal[0] = 1.0;
+	m_Normal[1] = 0.0;
+	m_Normal[2] = 1.0;
 
-	m_PlaneSec = NULL;
-	m_Mapper = NULL;
-	m_Actor = NULL;
+	m_TextActor=NULL;
+	m_Actor=NULL;
+	m_Text=NULL;
+	m_Mapper=NULL;
+	m_Prober=NULL;
+	m_PlaneSec=NULL;
 }
 //----------------------------------------------------------------------------
 mafViewCTNew::~mafViewCTNew()
 //----------------------------------------------------------------------------
 {
-	//m_ViewsRX[RX_FRONT_VIEW] = m_ViewsRX[RX_SIDE_VIEW] = NULL;
-	vtkDEL(m_Actor);
-	vtkDEL(m_Mapper);
-	vtkDEL(m_PlaneSec);
-
 	m_ViewCTCompound = NULL;
+
+	vtkDEL(m_TextActor);
+	vtkDEL(m_Actor);
+	vtkDEL(m_Text);
+	vtkDEL(m_Mapper);
+	vtkDEL(m_Prober);
+	vtkDEL(m_PlaneSec);
 }
 //----------------------------------------------------------------------------
 mafView *mafViewCTNew::Copy(mafObserver *Listener)
@@ -134,8 +144,8 @@ mafView *mafViewCTNew::Copy(mafObserver *Listener)
 void mafViewCTNew::VmeShow(mafNode *node, bool show)
 //----------------------------------------------------------------------------
 {
-	/*for(int i=0; i<this->GetNumberOfSubView(); i++)
-	m_ChildViewList[i]->VmeShow(node, show);*/
+	for(int i=0; i<this->GetNumberOfSubView(); i++)
+		m_ChildViewList[i]->VmeShow(node, show);
 
 	if(node->IsA("mafVMEVolumeGray"))
 	{
@@ -146,6 +156,11 @@ void mafViewCTNew::VmeShow(mafNode *node, bool show)
 		}
 		else
 		{
+			for(int i=0; i<this->GetNumberOfSubView(); i++)
+			{
+				m_ChildViewList[i]->GetSceneGraph()->m_RenFront->RemoveActor(m_Actor);
+				m_ChildViewList[i]->GetSceneGraph()->m_RenFront->RemoveActor(m_TextActor);
+			}
 			m_CurrentVolume = NULL;
 		}
 	}
@@ -175,6 +190,7 @@ void mafViewCTNew::OnEvent(mafEventBase *maf_event)
 		case ID_LAYOUT_NORMAL:
 		case ID_LAYOUT_UPDATE:
 			ProbeVolume();
+			mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 			break;
 		default:
 			mafEventMacro(*maf_event);
@@ -228,7 +244,7 @@ void mafViewCTNew::PackageView()
 //----------------------------------------------------------------------------
 {
 	m_ViewCTCompound = new mafViewCompound("CT view",1,1);
-	mafViewSlice *vs = new mafViewSlice("Slice view");
+	mafViewVTK *vs = new mafViewVTK("Slice view");
 	/*m_Vs->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice",MUTEX);
 	m_Vs->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice",MUTEX);
 	m_Vs->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice",MUTEX);
@@ -271,6 +287,12 @@ void mafViewCTNew::VmeSelect(mafNode *node, bool select)
 void mafViewCTNew::ProbeVolume()
 //----------------------------------------------------------------------------
 {
+	mafViewSlice *vslice = (mafViewSlice *)m_ChildViewList[0];
+	if (m_Actor)
+	{
+		vslice->GetSceneGraph()->m_RenFront->RemoveActor(m_Actor);
+	}
+
 	double b[6];
 	m_CurrentVolume->GetOutput()->Update();
 	m_CurrentVolume->GetOutput()->GetBounds(b);
@@ -281,14 +303,76 @@ void mafViewCTNew::ProbeVolume()
 	vtkLookupTable *lut = vol_material->m_ColorLut;
 
 
+	/*double vectX[3],vectY[3];
+	vectY[0] = (b[1] - b[0])/2 - m_WidthSection/2.0;
+	vectY[1] = (b[3] - b[2])/2 + m_HeightSection/2.0;
+	vectY[2] = (b[5] - b[4])/2;
+
+	double normal[3];
+	normal[0] = m_Normal[0];
+	normal[1] = m_Normal[1];
+	normal[2] = m_Normal[2];
+
+	vtkMath::Normalize(normal);
+	vtkMath::Normalize(vectY);
+	vtkMath::Cross(vectY,normal, vectX);
+	vtkMath::Normalize(vectX);
+	vtkMath::Cross(normal,vectX, vectY);
+	vtkMath::Normalize(vectY);
+
+	double vect[3], vect1[3], vect2[3];
+	vect1[0] = ((double)m_WidthSection/2) * vectX[0];
+	vect1[1] = -((double)m_WidthSection/2) * vectX[1];
+	vect1[2] = ((double)m_WidthSection/2) * vectX[2];
+
+	vect2[0] = ((double)m_HeightSection/2) * vectY[0];
+	vect2[1] = ((double)m_HeightSection/2) * vectY[1];
+	vect2[2] = ((double)m_HeightSection/2) * vectY[2];
+
+	vect[0] = vect1[0] + vect2[0];
+	vect[1] = vect1[1] + vect2[1];
+	vect[2] = vect1[2] + vect2[2];*/
+
+	vtkMAFSmartPointer<vtkPoints> source_points;
+	source_points->SetNumberOfPoints(2);
+	source_points->SetPoint(0,0,0,0);
+	source_points->SetPoint(1,1,0,0);
+
+	vtkMAFSmartPointer<vtkPoints> target_points;
+	target_points->SetNumberOfPoints(2);
+	target_points->SetPoint(0,m_Position);
+	vtkMath::Normalize(m_Normal);
+	double p2[3];
+	p2[0]=m_Position[0] + m_Normal[0];
+	p2[1]=m_Position[1] + m_Normal[1];
+	p2[2]=m_Position[2] + m_Normal[2];
+	target_points->SetPoint(1,p2);
+
+	vtkMAFSmartPointer<vtkLandmarkTransform> trans_matrix;
+	trans_matrix->SetSourceLandmarks(source_points.GetPointer());
+	trans_matrix->SetTargetLandmarks(target_points.GetPointer());
+	trans_matrix->SetModeToRigidBody();
+	trans_matrix->Update();
+
+	vtkMAFSmartPointer<vtkTransform> trans;
+	trans->SetMatrix(trans_matrix->GetMatrix());
+
+	vtkMAFSmartPointer<vtkTransformPolyDataFilter> trans_poly;
+	trans_poly->SetTransform(trans);
+
+
 	//+++ create plane
 	vtkNEW(m_PlaneSec);
-	m_PlaneSec->SetOrigin((b[1] - b[0])/2,(b[3] - b[2])/2,(b[5] - b[4])/2);
-	m_PlaneSec->SetPoint1((b[1] - b[0])/2 + m_WidthSection/2.0,(b[3] - b[2])/2,(b[5] - b[4])/2);
-	m_PlaneSec->SetPoint2((b[1] - b[0])/2,(b[3] - b[2])/2+ m_HeightSection/2.0,(b[5] - b[4])/2);
+	m_PlaneSec->SetOrigin(0,m_WidthSection/2.0,m_HeightSection/2.0);
+	m_PlaneSec->SetPoint1(0,-m_WidthSection/2.0,m_HeightSection/2.0);
+	m_PlaneSec->SetPoint2(0,m_WidthSection/2.0,-m_HeightSection/2.0);
 	m_PlaneSec->SetXResolution((int)(m_WidthSection/(VALUE*m_Spacing[0])));
 	m_PlaneSec->SetYResolution((int)(m_HeightSection/(VALUE*m_Spacing[1])));
+	//planeSec->SetNormal(1,0,0);
 	m_PlaneSec->Update();
+
+	trans_poly->SetInput(m_PlaneSec->GetOutput());
+	trans_poly->Update();
 
 	//+++using prober
 
@@ -298,32 +382,42 @@ void mafViewCTNew::ProbeVolume()
 	////////////////////////////////////////////////
 	//if(m_AdditionalProfileNumber == 0)
 	//{
-	vtkMAFSmartPointer<vtkProbeFilter> prober;
+	vtkNEW(m_Prober);
 	//prober->SetInput(m_PlaneSection[s]);
-	prober->SetInput(m_PlaneSec->GetOutput());
-	prober->SetSource(vtk_data);
-	prober->Update();
+	m_Prober->SetInput(trans_poly->GetOutput());
+	m_Prober->SetSource(vtk_data);
+	m_Prober->Update();
 	//vtkMAFSmartPointer<vtkPolyDataMapper> m_Mapper;
-	vtkNEW(m_Mapper);
 
-	m_Mapper->SetInput(prober->GetPolyDataOutput());
+	//m_Mapper->SetInput(m_Prober->GetPolyDataOutput());
 	//m_Mapper->SetInput(sphere->GetOutput());
 
 	double sr[2];
-	prober->GetOutput()->GetScalarRange(sr);
+	m_Prober->GetOutput()->GetScalarRange(sr);
 	lut->SetTableRange(sr);
 
-	m_Mapper->SetScalarRange(sr);
-	m_Mapper->SetLookupTable(lut);
-
-	prober->GetPolyDataOutput()->GetBounds(b);
+	m_Prober->GetPolyDataOutput()->GetBounds(b);
 
 	double *centerSlice = new double[3];
-	prober->GetPolyDataOutput()->GetCenter(centerSlice);
+	m_Prober->GetPolyDataOutput()->GetCenter(centerSlice);
 	//m_SliceOriginVector.push_back(centerSlice);
 	//m_SliceBoundsVector.push_back(b);
 	//}
 
+	vtkMAFSmartPointer<vtkTransform> transform;
+	transform->SetMatrix(m_CurrentVolume->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+	transform->Update();
+
+	vtkMAFSmartPointer<vtkTransformPolyDataFilter> tpdf;
+	tpdf->SetInput(m_Prober->GetPolyDataOutput());
+	tpdf->SetTransform(transform);
+	tpdf->Update();
+
+	vtkNEW(m_Mapper);
+	m_Mapper->SetInput(tpdf->GetOutput());
+
+	m_Mapper->SetScalarRange(sr);
+	m_Mapper->SetLookupTable(lut);
 
 	//+++creare attore
 	//++++settare nelle slice
@@ -333,17 +427,17 @@ void mafViewCTNew::ProbeVolume()
 
 	//m_SectionActor.push_back(m_Actor);
 
-	vtkMAFSmartPointer<vtkTextMapper> text;
+	vtkNEW(m_Text);
 	mafString t;
 	t = "test";
-	text->SetInput(t);
-	text->GetTextProperty()->SetColor(1.0,1.0,1.0);
+	m_Text->SetInput(t);
+	m_Text->GetTextProperty()->SetColor(1.0,1.0,1.0);
 	//text->GetTextProperty()->BoldOn();
 
 	//text->GetTextProperty()->SetJustificationToRight();
 	//text->GetTextProperty()->SetVerticalJustificationToBottom();
-	vtkMAFSmartPointer<vtkActor2D> textActor;
-	textActor->SetMapper(text);
+	vtkNEW(m_TextActor);
+	m_TextActor->SetMapper(m_Text);
 
 
 	/*if (s == m_StartIndexSliceVisualized)
@@ -356,7 +450,6 @@ void mafViewCTNew::ProbeVolume()
 	}*/
 
 	//mafViewSliceDP *vslice = (mafViewSliceDP *)((mafViewCompoundDP *)m_ChildViewList[1])->GetSubView(s-m_StartIndexSliceVisualized);
-	mafViewSlice *vslice = (mafViewSlice *)m_ChildViewList[0];
 
 
 	//m_SectionLabel.push_back(textActor);
@@ -364,7 +457,7 @@ void mafViewCTNew::ProbeVolume()
 
 	//vslice->GetRWI()->GetCamera()->SetFocalPoint(p2);
 	//vslice->GetRWI()->GetCamera()->SetPosition(p1);
-	vslice->GetRWI()->GetCamera()->SetViewUp(0,0,1);
+	//vslice->GetRWI()->GetCamera()->SetViewUp(0,0,1);
 	vslice->GetRWI()->GetCamera()->SetClippingRange(0.1,1000);
 	//vslice->GetRWI()->GetCamera()->ParallelProjectionOn();
 
@@ -375,7 +468,7 @@ void mafViewCTNew::ProbeVolume()
 
 
 	vslice->GetSceneGraph()->m_RenFront->AddActor(m_Actor);
-	vslice->GetSceneGraph()->m_RenFront->AddActor2D(textActor);
+	vslice->GetSceneGraph()->m_RenFront->AddActor2D(m_TextActor);
 	/*if (s == m_StartIndexSliceVisualized)
 	{
 	vslice->BorderCreate(m_StartMarkerColor);
@@ -390,8 +483,10 @@ void mafViewCTNew::ProbeVolume()
 	}
 	*/
 
-	vslice->GetSceneGraph()->m_RenFront->ResetCamera(b);
+	//vslice->GetSceneGraph()->m_RenFront->ResetCamera(b);
+	//vslice->GetSceneGraph()->m_RenFront->ResetCamera();
 	vslice->CameraUpdate();
+	m_Gui->Update();
 
 	/*vslice->GetRWI()->GetCamera()->GetViewPlaneNormal(m_SliceNormal);
 	double divergence;
@@ -400,5 +495,4 @@ void mafViewCTNew::ProbeVolume()
 	m_SliceOriginVector[s-m_StartIndexSliceVisualized][1] = m_SliceOriginVector[s-m_StartIndexSliceVisualized][1] + m_SliceNormal[1] * divergence;
 	m_SliceOriginVector[s-m_StartIndexSliceVisualized][2] = m_SliceOriginVector[s-m_StartIndexSliceVisualized][2] + m_SliceNormal[2] * divergence;*/
 	//mafLogMessage(wxString::Format(L"%f %f %f" , m_SliceNormal[0],m_SliceNormal[1],m_SliceNormal[2] ));
-
 }

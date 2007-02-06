@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.h,v $
 Language:  C++
-Date:      $Date: 2007-02-05 20:48:31 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-02-06 15:52:12 $
+Version:   $Revision: 1.2 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -21,14 +21,16 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-//class mafViewRX;
 class mafVMEVolume;
 class mafViewVTK;
 class vtkPolyData;
+class vtkActor2D;
 class vtkActor;
-class vtkPlaneSource;
+class vtkTextMapper;
 class vtkPolyDataMapper;
-class vtkActor;
+class vtkProbeFilter;
+class vtkPlaneSource;
+
 //----------------------------------------------------------------------------
 // mafViewCTNew :
 //----------------------------------------------------------------------------
@@ -108,14 +110,13 @@ protected:
 
 	double m_Spacing[3];
 
-	std::vector<vtkPolyData *> m_PlaneSection;
-	std::vector<vtkActor *> m_SectionActor;
-
 	mmgGui  *m_GuiViews[3];
 
-
-	vtkPlaneSource		*m_PlaneSec;
+	vtkActor2D				*m_TextActor;
+	vtkActor					*m_Actor;
+	vtkTextMapper			*m_Text;
 	vtkPolyDataMapper	*m_Mapper;
-	vtkActor			*m_Actor;
+	vtkProbeFilter		*m_Prober;
+	vtkPlaneSource		*m_PlaneSec;
 };
 #endif
