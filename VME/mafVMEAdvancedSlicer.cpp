@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-01 16:16:30 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-02-06 15:52:34 $
+  Version:   $Revision: 1.9 $
   Authors:   Daniele Giunchi , Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -41,6 +41,12 @@
 #include "vtkPointData.h"
 #include "vtkPlaneSource.h"
 #include "vtkLookupTable.h"
+#include "vtkTransform.h"
+#include "vtkTransformPolyDataFilter.h"
+#include "vtkLandmarkTransform.h"
+#include "vtkPoints.h"
+
+#define VALUE 1.5
 
 #include <assert.h>
 
@@ -228,112 +234,105 @@ void mafVMEAdvancedSlicer::InternalPreUpdate()
   {
     if (vtkDataSet *vtkdata=vol->GetOutput()->GetVTKData())
     {
-      double pos[3];
-      float vectX[3],vectY[3], n[3],normal[3];
-
-			pos[0] = m_Pos[0];
-			pos[1] = m_Pos[1];
-			pos[2] = m_Pos[2];
-
-			normal[0] = m_Normal[0];
-			normal[1] = m_Normal[1];
-			normal[2] = m_Normal[2];
-
-			m_Transform->GetVersor(1, vectY);
-
-			if(normal[0]==vectY[0] && normal[1]==vectY[1] && normal[2]==vectY[2])
-			{
-				/*m_Transform->GetVersor(0, vectX);
-				vtkMath::Normalize(normal);
-				vtkMath::Normalize(vectX);
-				vtkMath::Cross(normal,vectX, vectY);
-				vtkMath::Normalize(vectY);
-				vtkMath::Cross(vectY, normal, vectX);
-				vtkMath::Normalize(vectX);*/
-				vectY[0] += 0.001;
-			}
-			else if(normal[0]==1 && normal[1]==0 && normal[2]==0)
-			{
-
-			}
-				vtkMath::Normalize(normal);
-				vtkMath::Normalize(vectY);
-				vtkMath::Cross(normal,vectY, vectX);
-				vtkMath::Normalize(vectX);
-				vtkMath::Cross(normal,vectX, vectY);
-				vtkMath::Normalize(vectY);
 
 			vtkdata->Update();
 
-			/*vtkImageData *image=vtkImageData::SafeDownCast(vtkdata);
+			vtkImageData *image=vtkImageData::SafeDownCast(vtkdata);
 
 			double spacing[3];
 			image->GetSpacing(spacing);
-			int x0=(int)(pos[0]/spacing[0] - (m_Width / (2*spacing[0])));
-			int x1=(int)(pos[0]/spacing[0] + (m_Width / (2*spacing[0])));
-			int y0=(int)(pos[1]/spacing[1] - (m_Height / (2*spacing[1])));
-			int y1=(int)(pos[1]/spacing[1] + (m_Height / (2*spacing[1])));
-			image->SetOrigin(pos[0] - m_Width/2,pos[1] - m_Height/2,pos[2]);
+			int x0=(int)(m_Pos[0]/spacing[0] - (m_Width / (2*spacing[0])));
+			int x1=(int)(m_Pos[0]/spacing[0] + (m_Width / (2*spacing[0])));
+			int y0=(int)(m_Pos[1]/spacing[1] - (m_Height / (2*spacing[1])));
+			int y1=(int)(m_Pos[1]/spacing[1] + (m_Height / (2*spacing[1])));
+			image->SetOrigin(m_Pos[0] - m_Width/2,m_Pos[1] - m_Height/2,m_Pos[2]);
 			image->SetExtent(x0,x1,y0,y1,0,200);
 			image->SetUpdateExtent(x0,x1,y0,y1,0,200);
 
 			image->Crop();
-			image->UpdateData();*/
-
-			//m_Plane->SetPoint1(pos[0] + m_Width/2,pos[1] - m_Height/2,pos[2]);
-			//m_Plane->SetPoint2(pos[0] - m_Width/2,pos[1] + m_Height/2,pos[2]);
-
-			/*vtkMAFSmartPointer<vtkPlaneSource> tempPlane;
-			tempPlane->SetNormal((double*)m_Normal);
-			tempPlane->SetCenter(m_Pos);
-			tempPlane->Update();
-
-			double v1[3], v2[3];
-			tempPlane->GetPoint1(v1);
-			tempPlane->GetPoint2(v2);
-
-			vtkMath::Normalize(v1);
-			vtkMath::Normalize(v2);*/
-
-			double vect[3], vect1[3], vect2[3];
-			vect1[0] = ((double)m_Width/2) * vectX[0];
-			vect1[1] = ((double)m_Width/2) * vectX[1];
-			vect1[2] = ((double)m_Width/2) * vectX[2];
-
-			vect2[0] = ((double)m_Height/2) * vectY[0];
-			vect2[1] = ((double)m_Height/2) * vectY[1];
-			vect2[2] = ((double)m_Height/2) * vectY[2];
-
-			vect[0] = vect1[0] + vect2[0];
-			vect[1] = vect1[1] + vect2[1];
-			vect[2] = vect1[2] + vect2[2];
-
-			m_Plane->SetNormal(normal[0],normal[1],normal[2]);
-			m_Plane->SetCenter(pos);
-			m_Plane->SetOrigin(pos[0] - vect[0],pos[1] - vect[1], pos[2] + vect[2]);
-			m_Plane->SetPoint1(pos[0] + vect[0],pos[1] - vect[1], pos[2] - vect[2]);
-			m_Plane->SetPoint2(pos[0] - vect[0],pos[1] + vect[1], pos[2] + vect[2]);
-			m_Plane->Update();
-			double b[6];
-			m_Plane->GetOutput()->GetBounds(b);
+			image->UpdateData();
 
 			vtkImageData *texture = m_PSlicer->GetTexture();
-			texture->SetScalarType(vtkdata->GetPointData()->GetScalars()->GetDataType());
-			texture->SetNumberOfScalarComponents(vtkdata->GetPointData()->GetScalars()->GetNumberOfComponents());
+			texture->SetScalarType(image->GetPointData()->GetScalars()->GetDataType());
+			texture->SetNumberOfScalarComponents(image->GetPointData()->GetScalars()->GetNumberOfComponents());
 			texture->SetExtent(0, m_Width/m_Xspc - 1, 0, m_Height/m_Yspc - 1, 0, 0);
 			texture->SetUpdateExtent(0, m_Width/m_Xspc - 1, 0, m_Height/m_Yspc - 1, 0, 0);
 			texture->SetSpacing(m_Xspc, m_Yspc, 1.f);
 			texture->Modified();
 
-      m_PSlicer->SetInput(vtkdata);
-      m_PSlicer->SetPlaneOrigin(pos);
-      m_PSlicer->SetPlaneAxisX(vectX);
-      m_PSlicer->SetPlaneAxisY(vectY);
+			vtkMAFSmartPointer<vtkPoints> source_points;
+			source_points->SetNumberOfPoints(2);
+			source_points->SetPoint(0,0,0,0);
+			source_points->SetPoint(1,1,0,0);
 
-      m_ISlicer->SetInput(vtkdata);
-      m_ISlicer->SetPlaneOrigin(pos);
-      m_ISlicer->SetPlaneAxisX(vectX);
-      m_ISlicer->SetPlaneAxisY(vectY);
+			vtkMAFSmartPointer<vtkPoints> target_points;
+			target_points->SetNumberOfPoints(2);
+			target_points->SetPoint(0,m_Pos);
+			vtkMath::Normalize(m_Normal);
+			double p2[3];
+			p2[0]=m_Pos[0] + m_Normal[0];
+			p2[1]=m_Pos[1] + m_Normal[1];
+			p2[2]=m_Pos[2] + m_Normal[2];
+			target_points->SetPoint(1,p2);
+
+			vtkMAFSmartPointer<vtkLandmarkTransform> trans_matrix;
+			trans_matrix->SetSourceLandmarks(source_points.GetPointer());
+			trans_matrix->SetTargetLandmarks(target_points.GetPointer());
+			trans_matrix->SetModeToRigidBody();
+			trans_matrix->Update();
+
+			vtkMAFSmartPointer<vtkTransform> trans;
+			trans->SetMatrix(trans_matrix->GetMatrix());
+
+			vtkMAFSmartPointer<vtkTransformPolyDataFilter> trans_poly;
+			trans_poly->SetTransform(trans);
+
+
+			//+++ create plane
+			vtkNEW(m_Plane);
+			m_Plane->SetOrigin(0,m_Width/2.0,m_Height/2.0);
+			m_Plane->SetPoint1(0,-m_Width/2.0,m_Height/2.0);
+			m_Plane->SetPoint2(0,m_Width/2.0,-m_Height/2.0);
+			m_Plane->SetXResolution((int)(m_Width/(VALUE*m_Xspc)));
+			m_Plane->SetYResolution((int)(m_Height/(VALUE*m_Yspc)));
+			m_Plane->Update();
+
+			trans_poly->SetInput(m_Plane->GetOutput());
+			trans_poly->Update();
+
+
+			double vectX[3],vectY[3],o[3];
+			m_Plane->GetOrigin(o);
+			m_Plane->GetPoint1(vectX);
+			m_Plane->GetPoint2(vectY);
+
+			vectX[0]-=o[0];
+			vectX[1]-=o[1];
+			vectX[2]-=o[2];
+			vectY[0]-=o[0];
+			vectY[1]-=o[1];
+			vectY[2]-=o[2];
+
+			vtkMath::Normalize(vectX);
+			vtkMath::Normalize(vectY);
+
+			float fvectX[3],fvectY[3];
+			fvectX[0]=(float)vectX[0];
+			fvectX[1]=(float)vectX[1];
+			fvectX[2]=(float)vectX[2];
+			fvectY[0]=(float)vectY[0];
+			fvectY[1]=(float)vectY[1];
+			fvectY[2]=(float)vectY[2];
+
+      m_PSlicer->SetInput(image);
+      m_PSlicer->SetPlaneOrigin(m_Pos);
+      m_PSlicer->SetPlaneAxisX(fvectX);
+      m_PSlicer->SetPlaneAxisY(fvectY);
+
+      m_ISlicer->SetInput(image);
+      m_ISlicer->SetPlaneOrigin(m_Pos);
+      m_ISlicer->SetPlaneAxisX(fvectX);
+      m_ISlicer->SetPlaneAxisY(fvectY);
 
 			double sr[2];
 			vol->GetOutput()->GetVTKData()->GetScalarRange(sr);
