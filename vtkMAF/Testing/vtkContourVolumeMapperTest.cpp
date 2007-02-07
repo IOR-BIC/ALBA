@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkContourVolumeMapperTest.cpp,v $
 Language:  C++
-Date:      $Date: 2006-12-15 10:20:23 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2007-02-07 11:23:44 $
+Version:   $Revision: 1.7 $
 Authors:   Matteo Giacomoni, Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -81,9 +81,10 @@ void vtkContourVolumeMapperTest::TestFixture()
 
 }
 
-//-----------------------------------------------------------
+//------------------------------------------------------------------------------
+// Test the mapper with rect. gris data
 void vtkContourVolumeMapperTest::TestRectilinearGrid() 
-//-----------------------------------------------------------
+//------------------------------------------------------------------------------
 {
 	char filename[]   = "cubePolyFromRG";
 	//------------------ create objects
@@ -151,12 +152,36 @@ void vtkContourVolumeMapperTest::TestRectilinearGrid()
   vtkCamera *camera = renderer->GetActiveCamera();
   renderer->ResetCamera(mapper->GetBounds());
   camera->Azimuth(45);
-  for (double value = 0; value < dims[2]; value+=1.0  ) {
-			mapper->SetContourValue(value);
-			vtkPolyData *polydata = mapper->GetOutput(0);
-			CPPUNIT_ASSERT(polydata->GetNumberOfPoints()==((dims[0]*dims[1])));
-       // renWin->Render();
-	}
+
+
+  // switch off the auto lod so that we can control it manually
+  mapper->AutoLODCreateOff() ;
+
+  // This loop tests that the output has the correct no. of points
+  for (int lod = 0 ;  lod < vtkContourVolumeMapperNamespace::NumberOfLods ;  lod++){
+    // get the step lodxy for this lod
+    int lodxy, lodz ;
+    mapper->CalculateLodIncrements(lod, &lodxy, &lodz) ;
+
+    // predict how many points in polydata output
+    int nx = (dims[0]+lodxy-1)/lodxy ;
+    int ny = (dims[1]+lodxy-1)/lodxy ;
+    int npts = nx*ny ;
+
+    // test each z plane in the volume
+    for (double value = 0; value < dims[2]; value+=1.0  ) {
+      mapper->SetContourValue(value);
+      vtkPolyData *polydata = mapper->GetOutput(lod);
+
+      int nactual = polydata->GetNumberOfPoints() ;
+      CPPUNIT_ASSERT(polydata->GetNumberOfPoints()==npts);
+      // renWin->Render();
+    }
+  }
+
+  // switch auto lod back on
+  mapper->AutoLODCreateOn() ;
+
 
   if (ExtractModel && filename) {
     vtkPolyDataWriter *writer = vtkPolyDataWriter::New();
@@ -183,9 +208,10 @@ void vtkContourVolumeMapperTest::TestRectilinearGrid()
 }
 
 
-//-----------------------------------------------------------
+//------------------------------------------------------------------------------
+// Test the mapper with image data
 void vtkContourVolumeMapperTest::TestImageData() 
-//-----------------------------------------------------------
+//------------------------------------------------------------------------------
 {
   char filename[]   = "cubePolyFromID";
   //------------------ create objects
@@ -252,12 +278,33 @@ void vtkContourVolumeMapperTest::TestImageData()
   vtkCamera *camera = renderer->GetActiveCamera();
   renderer->ResetCamera(mapper->GetBounds());
   camera->Azimuth(45);
-  for (double value = 0; value < dims[2]; value+=1.0  ) {
-    mapper->SetContourValue(value);
-    vtkPolyData *polydata = mapper->GetOutput(0);
-    CPPUNIT_ASSERT(polydata->GetNumberOfPoints()==((dims[0]*dims[1])));
-    // renWin->Render();
+
+
+  // switch off the auto lod so that we can control it manually
+  mapper->AutoLODCreateOff() ;
+
+  // This loop tests that the output has the correct no. of points
+  for (int lod = 0 ;  lod < vtkContourVolumeMapperNamespace::NumberOfLods ;  lod++){
+    // get the step lodxy for this lod
+    int lodxy, lodz ;
+    mapper->CalculateLodIncrements(lod, &lodxy, &lodz) ;
+
+    // predict how many points in polydata output
+    int nx = (dims[0]+lodxy-1)/lodxy ;
+    int ny = (dims[1]+lodxy-1)/lodxy ;
+    int npts = nx*ny ;
+
+    // test each z plane in the volume
+    for (double value = 0; value < dims[2]; value+=1.0  ) {
+      mapper->SetContourValue(value);
+      vtkPolyData *polydata = mapper->GetOutput(lod);
+      CPPUNIT_ASSERT(polydata->GetNumberOfPoints()==npts);
+      // renWin->Render();
+    }
   }
+
+  // switch auto lod back on
+  mapper->AutoLODCreateOn() ;
 
   if (ExtractModel && filename) {
     vtkPolyDataWriter *writer = vtkPolyDataWriter::New();
