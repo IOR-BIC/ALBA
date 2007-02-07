@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoExtractIsosurface.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-10 11:52:03 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-02-07 11:25:40 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -70,7 +70,7 @@ public:
   void OpUndo();
 
 protected:
-  mafVMESurface *m_IsosurfaceVme;
+  mafVMESurface *m_IsosurfaceVme;   // polydata VME
 
   mmgDialog		*m_Dialog;
 	mafRWI      *m_Rwi;
@@ -85,6 +85,7 @@ protected:
 	double       m_SliceStep;
   int          m_ShowSlice;
   int          m_Clean;
+  int          m_Autolod;
   double       m_BoundingBox[6];
   double       m_SliceOrigin[3];
   float        m_SliceXVect[3];
@@ -104,7 +105,7 @@ protected:
   vtkVolumeSlicer   *m_PolydataSlicer;
   vtkImageData      *m_SliceImage;
   vtkTexture        *m_SliceTexture;
-  vtkPolyData       *m_Polydata;
+  vtkPolyData       *m_Polydata;          // copy of polydata used by slicer
   vtkPolyDataMapper *m_SlicerMapper;
   vtkActor          *m_SlicerActor;
   vtkPolyDataMapper *m_PolydataMapper;

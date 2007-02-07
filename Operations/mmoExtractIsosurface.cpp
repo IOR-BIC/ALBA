@@ -1,13 +1,13 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoExtractIsosurface.cpp,v $
-  Language:  C++
-  Date:      $Date: 2007-01-10 10:21:50 $
-  Version:   $Revision: 1.18 $
-  Authors:   Paolo Quadrani     Silvano Imboden
+Program:   Multimod Application Framework
+Module:    $RCSfile: mmoExtractIsosurface.cpp,v $
+Language:  C++
+Date:      $Date: 2007-02-07 11:25:40 $
+Version:   $Revision: 1.19 $
+Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
-  Copyright (c) 2002/2004
-  CINECA - Interuniversity Consortium (www.cineca.it) 
+Copyright (c) 2002/2004
+CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
 #include "mafDefines.h" 
@@ -77,23 +77,24 @@ mafOp(label), m_IsosurfaceVme(NULL)
 {
   m_OpType  = OPTYPE_OP;
   m_Canundo = true;
-  
+
   m_IsoSlider   = NULL;
   m_SliceSlider = NULL;
-  
+
   m_Dialog = NULL;
-	m_Rwi = NULL;
-	
+  m_Rwi = NULL;
+
   m_IsoValue = 0;
-	m_MinDensity = 0;
-	m_MaxDensity = 0;
-	
+  m_MinDensity = 0;
+  m_MaxDensity = 0;
+
   m_Slice     = 0;
-	m_SliceMin  = 0;
-	m_SliceMax  = 0;
+  m_SliceMin  = 0;
+  m_SliceMax  = 0;
   m_ShowSlice = 1;
+  m_Autolod = 1;
   m_Clean     = 1;
-  
+
   for(int i=0; i<6; i++) m_BoundingBox[i]=0;
 
   m_Box    = NULL;
@@ -134,12 +135,12 @@ void mmoExtractIsosurface::OpRun()
   int ret_dlg = m_Dialog->ShowModal();
   if( ret_dlg == wxID_OK )
   {
-		 result = OP_RUN_OK;
-  	 ExtractSurface(m_Clean != 0);
+    result = OP_RUN_OK;
+    ExtractSurface(m_Clean != 0);
   }
   DeleteOpDialog();
 
-	mafEventMacro(mafEvent(this,result));
+  mafEventMacro(mafEvent(this,result));
 }
 //----------------------------------------------------------------------------
 void mmoExtractIsosurface::OpDo()
@@ -160,18 +161,19 @@ void mmoExtractIsosurface::OpUndo()
 //----------------------------------------------------------------------------
 enum EXTRACT_ISOSURFACE_ID
 {
-	ID_ISO_SLIDER = MINID,
-	ID_INCREASE_ISO,
-	ID_DECREASE_ISO,
-	ID_ISO,
-	ID_FIT,
-	ID_GRID,
+  ID_ISO_SLIDER = MINID,
+  ID_INCREASE_ISO,
+  ID_DECREASE_ISO,
+  ID_ISO,
+  ID_FIT,
+  ID_GRID,
   ID_SLICE,
   ID_SLICE_SLIDER,
   ID_INCREASE_SLICE,
   ID_DECREASE_SLICE,
   ID_VIEW_SLICE,
   ID_OPTIMIZE_CONTOUR,
+  ID_AUTO_LOD,
   ID_OK,
   ID_CANCEL,
 };
@@ -183,7 +185,7 @@ void mmoExtractIsosurface::CreateOpDialog()
 
   vtkDataSet *dataset = ((mafVME *)m_Input)->GetOutput()->GetVTKData();
   double sr[2];
-	dataset->GetScalarRange(sr);
+  dataset->GetScalarRange(sr);
   m_MinDensity = sr[0];
   m_MaxDensity = sr[1];
   m_IsoValue = (m_MinDensity + m_MaxDensity)*0.5;
@@ -193,8 +195,8 @@ void mmoExtractIsosurface::CreateOpDialog()
   m_SliceMin = b[4];
   m_SliceMax = b[5];
   m_Slice = (m_SliceMin + m_SliceMax)*0.5;
-	
-	
+
+
   //===== setup interface ====
   m_Dialog = new mmgDialog("Extract Isosurface", mafCLOSEWINDOW | mafRESIZABLE);
 
@@ -202,13 +204,13 @@ void mmoExtractIsosurface::CreateOpDialog()
 
   m_Rwi = new mafRWI(m_Dialog,ONE_LAYER,false);
   m_Rwi->SetListener(this);//SIL. 16-6-2004: 
-	m_Rwi->CameraSet(CAMERA_PERSPECTIVE);
-	//m_Rwi->SetAxesVisibility(true);
+  m_Rwi->CameraSet(CAMERA_PERSPECTIVE);
+  //m_Rwi->SetAxesVisibility(true);
   //m_Rwi->SetGridVisibility(false);
-	m_Rwi->m_RenderWindow->SetDesiredUpdateRate(0.0001f);
-	m_Rwi->SetSize(0,0,500,500);
+  m_Rwi->m_RenderWindow->SetDesiredUpdateRate(0.0001f);
+  m_Rwi->SetSize(0,0,500,500);
   m_Rwi->m_RenderWindow->AddRenderer(m_PIPRen);
-	m_Rwi->Show(true);
+  m_Rwi->Show(true);
   m_Rwi->m_RwiBase->SetMouse(m_Mouse);
   mafNEW(m_DensityPicker);
   m_DensityPicker->SetListener(this);
@@ -222,65 +224,68 @@ void mmoExtractIsosurface::CreateOpDialog()
   wxPoint p = wxDefaultPosition;
   // iso interface
   wxStaticText *lab  = new wxStaticText(m_Dialog,-1, "contur value: ");
-	wxStaticText *foo  = new wxStaticText(m_Dialog,-1, "");
-	wxTextCtrl   *text = new wxTextCtrl  (m_Dialog,ID_ISO, "",								 		p,wxSize(50, 16 ), wxNO_BORDER );
+  wxStaticText *foo  = new wxStaticText(m_Dialog,-1, "");
+  wxTextCtrl   *text = new wxTextCtrl  (m_Dialog,ID_ISO, "",								 		p,wxSize(50, 16 ), wxNO_BORDER );
   m_IsoSlider				 = new mmgFloatSlider(m_Dialog,ID_ISO_SLIDER,m_IsoValue,m_MinDensity,m_MaxDensity,p,wxSize(150,20));
-	m_IsoSlider->SetNumberOfSteps(sr[1]-sr[0]);
-	m_StepDensity = m_IsoSlider->GetStep();
+  m_IsoSlider->SetNumberOfSteps(sr[1]-sr[0]);
+  m_StepDensity = m_IsoSlider->GetStep();
   //m_MinDensity  = m_IsoSlider->GetMin();
   //m_MaxDensity  = m_IsoSlider->GetMax();
   m_IsoValue  = m_IsoSlider->GetValue();
 
   // slice interface
-  wxStaticText *lab_slice  = new wxStaticText(m_Dialog,-1, "slice position: ");
-	wxStaticText *foo_slice  = new wxStaticText(m_Dialog,-1, "");
-	wxTextCtrl   *text_slice = new wxTextCtrl  (m_Dialog,ID_SLICE, "",							 		p,wxSize(50, 16 ), wxNO_BORDER );
-  m_SliceSlider						 = new mmgFloatSlider(m_Dialog,ID_SLICE_SLIDER,m_Slice,m_SliceMin,m_SliceMax,p,wxSize(150,20));
-	m_SliceSlider->SetNumberOfSteps(200);
-	m_SliceStep = m_SliceSlider->GetStep();
+  wxStaticText *lab_slice  = new wxStaticText(m_Dialog,   -1, "slice position: ");
+  wxStaticText *foo_slice  = new wxStaticText(m_Dialog,   -1, "");
+  wxTextCtrl   *text_slice = new wxTextCtrl  (m_Dialog,   ID_SLICE, "",							 		p,wxSize(50, 16 ), wxNO_BORDER );
+  m_SliceSlider						 = new mmgFloatSlider(m_Dialog, ID_SLICE_SLIDER,m_Slice,m_SliceMin,m_SliceMax,p,wxSize(150,20));
+  m_SliceSlider->SetNumberOfSteps(200);
+  m_SliceStep = m_SliceSlider->GetStep();
   m_SliceMin  = m_SliceSlider->GetMin();
   m_SliceMax  = m_SliceSlider->GetMax();
   m_Slice     = m_SliceSlider->GetValue();
 
-	mmgButton *b_incr_slice  = new mmgButton(m_Dialog,ID_INCREASE_SLICE, ">",		 p,wxSize(25, 20));
-  mmgButton *b_decr_slice  = new mmgButton(m_Dialog,ID_DECREASE_SLICE, "<",		 p,wxSize(25, 20));
-	mmgButton *b_incr  = new mmgButton(m_Dialog,ID_INCREASE_ISO, ">",				 		 p,wxSize(25, 20));
-  mmgButton *b_decr  = new mmgButton(m_Dialog,ID_DECREASE_ISO, "<",				 		 p,wxSize(25, 20));
-  
-  wxCheckBox *chk     = new wxCheckBox(m_Dialog,ID_VIEW_SLICE,  "slice",         p,wxSize(80,20));
-  wxCheckBox *chk_opt = new wxCheckBox(m_Dialog,ID_OPTIMIZE_CONTOUR, "optimize", p,wxSize(80,20));
-  mmgButton  *b_fit   = new mmgButton(m_Dialog,ID_FIT,          "reset camera",  p,wxSize(80,20));
-//  wxCheckBox *b_grid  = new wxCheckBox(m_Dialog,ID_GRID,         "show/hide grid",p,wxSize(80,20));
-  mmgButton  *b_ok      = new mmgButton(m_Dialog,ID_OK,         "ok",p,wxSize(80,20));
-  mmgButton  *b_cancel  = new mmgButton(m_Dialog,ID_CANCEL,     "cancel",p,wxSize(80,20));
-	
-	// iso interface validator
+  mmgButton *b_incr_slice = new mmgButton(m_Dialog, ID_INCREASE_SLICE, ">",	p,wxSize(25, 20));
+  mmgButton *b_decr_slice = new mmgButton(m_Dialog, ID_DECREASE_SLICE, "<",	p,wxSize(25, 20));
+  mmgButton *b_incr =       new mmgButton(m_Dialog, ID_INCREASE_ISO,   ">",	p,wxSize(25, 20));
+  mmgButton *b_decr =       new mmgButton(m_Dialog, ID_DECREASE_ISO,   "<",	p,wxSize(25, 20));
+
+  wxCheckBox *chk_slice = new wxCheckBox(m_Dialog, ID_VIEW_SLICE,       "slice", p, wxSize(80,20));
+  wxCheckBox *chk_opt =   new wxCheckBox(m_Dialog, ID_OPTIMIZE_CONTOUR, "optimize", p, wxSize(80,20));
+  wxCheckBox *chk_lod =   new wxCheckBox(m_Dialog, ID_AUTO_LOD,         "auto-lod", p, wxSize(80,20));
+  //  wxCheckBox *b_grid  = new wxCheckBox(m_Dialog, ID_GRID,         "show/hide grid", p, wxSize(80,20));
+
+  mmgButton  *b_fit =    new mmgButton(m_Dialog, ID_FIT,    "reset camera", p,wxSize(80,20));
+  mmgButton  *b_ok =     new mmgButton(m_Dialog, ID_OK,     "ok", p, wxSize(80,20));
+  mmgButton  *b_cancel = new mmgButton(m_Dialog, ID_CANCEL, "cancel", p, wxSize(80,20));
+
+  // iso interface validator
   text->SetValidator(mmgValidator(this,ID_ISO,text,&m_IsoValue,m_MinDensity,m_MaxDensity));
-	m_IsoSlider->SetValidator(mmgValidator(this,ID_ISO_SLIDER,m_IsoSlider,&m_IsoValue,text));
+  m_IsoSlider->SetValidator(mmgValidator(this,ID_ISO_SLIDER,m_IsoSlider,&m_IsoValue,text));
   b_incr->SetValidator(mmgValidator(this,ID_INCREASE_ISO,b_incr));
   b_decr->SetValidator(mmgValidator(this,ID_DECREASE_ISO,b_decr));
-  
-	// slice interface validator
+
+  // slice interface validator
   text_slice->SetValidator(mmgValidator(this,ID_SLICE,text_slice,&m_Slice,m_SliceMin,m_SliceMax));
-	m_SliceSlider->SetValidator(mmgValidator(this,ID_SLICE_SLIDER,m_SliceSlider,&m_Slice,text_slice));
+  m_SliceSlider->SetValidator(mmgValidator(this,ID_SLICE_SLIDER,m_SliceSlider,&m_Slice,text_slice));
   b_incr_slice->SetValidator(mmgValidator(this,ID_INCREASE_SLICE,b_incr_slice));
   b_decr_slice->SetValidator(mmgValidator(this,ID_DECREASE_SLICE,b_decr_slice));
-  
+
   b_fit->SetValidator(mmgValidator(this,ID_FIT,b_fit));
   b_ok->SetValidator(mmgValidator(this,ID_OK,b_ok));
   b_cancel->SetValidator(mmgValidator(this,ID_CANCEL,b_cancel));
-//  b_grid->SetValidator(mmgValidator(this,ID_GRID,b_grid));
-  chk->SetValidator( mmgValidator(this,ID_VIEW_SLICE,chk,&m_ShowSlice));
-  chk_opt->SetValidator(mmgValidator(this,ID_OPTIMIZE_CONTOUR,chk_opt,&m_Clean));
+  //  b_grid->SetValidator(mmgValidator(this,ID_GRID,b_grid));
+  chk_slice->SetValidator( mmgValidator(this, ID_VIEW_SLICE, chk_slice, &m_ShowSlice));
+  chk_opt->SetValidator(mmgValidator(this, ID_OPTIMIZE_CONTOUR,chk_opt, &m_Clean));
+  chk_lod->SetValidator(mmgValidator(this, ID_AUTO_LOD, chk_lod, &m_Autolod));
 
-	wxBoxSizer *h_sizer1 = new wxBoxSizer(wxHORIZONTAL);
+  wxBoxSizer *h_sizer1 = new wxBoxSizer(wxHORIZONTAL);
   h_sizer1->Add(lab,     0,wxLEFT);	
   h_sizer1->Add(text,    0,wxLEFT);	
   h_sizer1->Add(b_decr,0,wxLEFT);
   h_sizer1->Add(m_IsoSlider ,1,wxEXPAND);
   h_sizer1->Add(b_incr,0,wxLEFT);	
 
-	wxBoxSizer *h_sizer2= new wxBoxSizer(wxHORIZONTAL);
+  wxBoxSizer *h_sizer2= new wxBoxSizer(wxHORIZONTAL);
   h_sizer2->Add(lab_slice,     0, wxLEFT);	
   h_sizer2->Add(text_slice,    0, wxLEFT);	
   h_sizer2->Add(b_decr_slice,  0, wxLEFT);
@@ -288,13 +293,14 @@ void mmoExtractIsosurface::CreateOpDialog()
   h_sizer2->Add(b_incr_slice,  0, wxLEFT);	
 
   wxBoxSizer *h_sizer3 = new wxBoxSizer(wxHORIZONTAL);
-  h_sizer3->Add(foo,     1,wxEXPAND);	
-  h_sizer3->Add(chk_opt, 0,wxRIGHT);
-  h_sizer3->Add(chk,     0,wxRIGHT);
-//  h_sizer3->Add(b_grid,  0,wxRIGHT);
-  h_sizer3->Add(b_fit,   0,wxRIGHT);
-  h_sizer3->Add(b_ok,   0,wxRIGHT);
-  h_sizer3->Add(b_cancel, 0,wxRIGHT);
+  h_sizer3->Add(foo,       1,wxEXPAND);	
+  h_sizer3->Add(chk_lod,   0,wxRIGHT);
+  h_sizer3->Add(chk_opt,   0,wxRIGHT);
+  h_sizer3->Add(chk_slice, 0,wxRIGHT);
+  //  h_sizer3->Add(b_grid,  0,wxRIGHT);
+  h_sizer3->Add(b_fit,     0,wxRIGHT);
+  h_sizer3->Add(b_ok,      0,wxRIGHT);
+  h_sizer3->Add(b_cancel,  0,wxRIGHT);
 
   wxBoxSizer *v_sizer =  new wxBoxSizer( wxVERTICAL );
   v_sizer->Add(m_Rwi->m_RwiBase, 1,wxEXPAND);
@@ -319,22 +325,23 @@ void mmoExtractIsosurface::CreateVolumePipeline()
 {
   mafVMEVolumeGray *vol_vme = mafVMEVolumeGray::SafeDownCast(m_Input);
   vtkDataSet *dataset = vol_vme->GetVolumeOutput()->GetVTKData();
-	m_ContourVolumeMapper = vtkContourVolumeMapper::New();
-	m_ContourVolumeMapper->SetInput(dataset);
-	m_ContourVolumeMapper->EnableAutoLODOn();
+  m_ContourVolumeMapper = vtkContourVolumeMapper::New();
+  m_ContourVolumeMapper->SetInput(dataset);
+  m_ContourVolumeMapper->AutoLODRenderOn();
+  m_ContourVolumeMapper->AutoLODCreateOn();
 
-	double min = m_MinDensity;
-	double max = m_MaxDensity;
+  double min = m_MinDensity;
+  double max = m_MaxDensity;
 
-	double range[2] = {0, 0};
+  double range[2] = {0, 0};
   dataset->GetScalarRange(range);
 
   float value = 0.5f * (range[0] + range[1]);
   while (value < range[1] && m_ContourVolumeMapper->EstimateRelevantVolume(value) > 0.3f)
     value += 0.05f * (range[1] + range[0]) + 1.f;
 
-	m_IsoValue=value;
-	m_ContourVolumeMapper->SetContourValue(m_IsoValue);
+  m_IsoValue=value;
+  m_ContourVolumeMapper->SetContourValue(m_IsoValue);
 
   /*vtkPolyData *contour = vtkPolyData::New();
   m_ContourVolumeMapper->GetOutput(0, contour);
@@ -347,34 +354,34 @@ void mmoExtractIsosurface::CreateVolumePipeline()
 
   m_ContourActor = vtkVolume::New();
   m_ContourActor->SetMapper(m_ContourVolumeMapper);
-	m_ContourActor->PickableOff();
+  m_ContourActor->PickableOff();
 
-	m_ContourVolumeMapper->Modified();
-	m_ContourVolumeMapper->Update();
+  m_ContourVolumeMapper->Modified();
+  m_ContourVolumeMapper->Update();
   m_Rwi->m_RenFront->AddActor(m_ContourActor);
 
   // bounding box actor
-	m_OutlineFilter = vtkOutlineCornerFilter::New();
-	m_OutlineFilter->SetInput(dataset);
+  m_OutlineFilter = vtkOutlineCornerFilter::New();
+  m_OutlineFilter->SetInput(dataset);
 
-	m_OutlineMapper = vtkPolyDataMapper::New();
-	m_OutlineMapper->SetInput(m_OutlineFilter->GetOutput());
+  m_OutlineMapper = vtkPolyDataMapper::New();
+  m_OutlineMapper->SetInput(m_OutlineFilter->GetOutput());
 
-	m_Box = vtkActor::New();
-	m_Box->SetMapper(m_OutlineMapper);
-	m_Box->VisibilityOn();
-	m_Box->PickableOff();
-	m_Box->GetProperty()->SetColor(0,0,0.8);
-	m_Box->GetProperty()->SetAmbient(1);
-	m_Box->GetProperty()->SetRepresentationToWireframe();
-	m_Box->GetProperty()->SetInterpolationToFlat();
-	m_Rwi->m_RenFront->AddActor(m_Box);
+  m_Box = vtkActor::New();
+  m_Box->SetMapper(m_OutlineMapper);
+  m_Box->VisibilityOn();
+  m_Box->PickableOff();
+  m_Box->GetProperty()->SetColor(0,0,0.8);
+  m_Box->GetProperty()->SetAmbient(1);
+  m_Box->GetProperty()->SetRepresentationToWireframe();
+  m_Box->GetProperty()->SetInterpolationToFlat();
+  m_Rwi->m_RenFront->AddActor(m_Box);
 
-	m_Box->GetBounds(m_BoundingBox);
-	m_Rwi->SetGridPosition(m_BoundingBox[4]);
-	m_Rwi->m_RenFront->ResetCamera(m_BoundingBox);
-	m_Rwi->m_Camera->Dolly(1.2);
-	m_Rwi->m_RenFront->ResetCameraClippingRange();
+  m_Box->GetBounds(m_BoundingBox);
+  m_Rwi->SetGridPosition(m_BoundingBox[4]);
+  m_Rwi->m_RenFront->ResetCamera(m_BoundingBox);
+  m_Rwi->m_Camera->Dolly(1.2);
+  m_Rwi->m_RenFront->ResetCameraClippingRange();
 
 }
 //----------------------------------------------------------------------------
@@ -382,13 +389,13 @@ void mmoExtractIsosurface::CreateSlicePipeline()
 //----------------------------------------------------------------------------
 {
   // slicing the volume
- 	double srange[2],w,l, xspc = 0.33, yspc = 0.33, ext[6];
+  double srange[2],w,l, xspc = 0.33, yspc = 0.33, ext[6];
 
   vtkDataSet *dataset = ((mafVME *)m_Input)->GetOutput()->GetVTKData();
   dataset->GetBounds(ext);
-	dataset->GetScalarRange(srange);
-	w = srange[1] - srange[0];
-	l = (srange[1] + srange[0]) * 0.5;
+  dataset->GetScalarRange(srange);
+  w = srange[1] - srange[0];
+  l = (srange[1] + srange[0]) * 0.5;
 
   dataset->GetCenter(m_SliceOrigin);
   m_Slice = m_SliceOrigin[2];
@@ -399,32 +406,32 @@ void mmoExtractIsosurface::CreateSlicePipeline()
   m_SliceYVect[1] = 1.0;
   m_SliceYVect[2] = 0.0;
 
-	m_PolydataSlicer = vtkVolumeSlicer::New();
-	m_VolumeSlicer	= vtkVolumeSlicer::New();
-	m_VolumeSlicer->SetPlaneOrigin(m_SliceOrigin);
-	m_PolydataSlicer->SetPlaneOrigin(m_VolumeSlicer->GetPlaneOrigin());
-	m_VolumeSlicer->SetPlaneAxisX(m_SliceXVect);
-	m_VolumeSlicer->SetPlaneAxisY(m_SliceYVect);
-	m_PolydataSlicer->SetPlaneAxisX(m_SliceXVect);
-	m_PolydataSlicer->SetPlaneAxisY(m_SliceYVect);
-	m_VolumeSlicer->SetInput(dataset);
-	m_PolydataSlicer->SetInput(dataset);
+  m_PolydataSlicer = vtkVolumeSlicer::New();
+  m_VolumeSlicer	= vtkVolumeSlicer::New();
+  m_VolumeSlicer->SetPlaneOrigin(m_SliceOrigin);
+  m_PolydataSlicer->SetPlaneOrigin(m_VolumeSlicer->GetPlaneOrigin());
+  m_VolumeSlicer->SetPlaneAxisX(m_SliceXVect);
+  m_VolumeSlicer->SetPlaneAxisY(m_SliceYVect);
+  m_PolydataSlicer->SetPlaneAxisX(m_SliceXVect);
+  m_PolydataSlicer->SetPlaneAxisY(m_SliceYVect);
+  m_VolumeSlicer->SetInput(dataset);
+  m_PolydataSlicer->SetInput(dataset);
 
-	m_SliceImage = vtkImageData::New();
- 
+  m_SliceImage = vtkImageData::New();
+
   m_SliceImage->SetScalarType(dataset->GetPointData()->GetScalars()->GetDataType());
   m_SliceImage->SetNumberOfScalarComponents(dataset->GetPointData()->GetScalars()->GetNumberOfComponents());  
   m_SliceImage->SetExtent(ext[0], ext[1], ext[2], ext[3], 0, 0);
-	m_SliceImage->SetSpacing(xspc, yspc, 1.f);
+  m_SliceImage->SetSpacing(xspc, yspc, 1.f);
 
   m_VolumeSlicer->SetOutput(m_SliceImage);
-	m_VolumeSlicer->Update();
-  
+  m_VolumeSlicer->Update();
+
   mmaVolumeMaterial *material = ((mafVMEVolume *)m_Input)->GetMaterial();
-	double sr[2];
-	((mafVMEVolume*)m_Input)->GetOutput()->GetVTKData()->GetScalarRange(sr);
-	material->m_ColorLut->SetRange(sr[0],sr[1]);
-	material->UpdateFromTables();
+  double sr[2];
+  ((mafVMEVolume*)m_Input)->GetOutput()->GetVTKData()->GetScalarRange(sr);
+  material->m_ColorLut->SetRange(sr[0],sr[1]);
+  material->UpdateFromTables();
 
   // if the lookup table has not yet been initialized...
   if (material->m_TableRange[1] < material->m_TableRange[0]) 
@@ -435,7 +442,7 @@ void mmoExtractIsosurface::CreateSlicePipeline()
 
     double low = scalarRange[0];
     double high = scalarRange[1];
-    
+
     // ...initialize it
     material->m_Window_LUT = high-low;
     material->m_Level_LUT  = (low+high)*.5;
@@ -443,45 +450,45 @@ void mmoExtractIsosurface::CreateSlicePipeline()
     material->m_TableRange[1] = high;
   }
   material->UpdateProp();
-   
+
   m_SliceTexture = vtkTexture::New();
-	m_SliceTexture->RepeatOff();
-	m_SliceTexture->InterpolateOn();
-	m_SliceTexture->SetQualityTo32Bit();
+  m_SliceTexture->RepeatOff();
+  m_SliceTexture->InterpolateOn();
+  m_SliceTexture->SetQualityTo32Bit();
   m_SliceTexture->SetLookupTable(material->m_ColorLut);
   m_SliceTexture->MapColorScalarsThroughLookupTableOn();
-	m_SliceTexture->SetInput(m_SliceImage);
+  m_SliceTexture->SetInput(m_SliceImage);
 
   m_Polydata	= vtkPolyData::New();
-	m_PolydataSlicer->SetOutput(m_Polydata);
-	m_PolydataSlicer->SetTexture(m_SliceImage);
-	m_PolydataSlicer->Update();
-	
-  m_SlicerMapper	= vtkPolyDataMapper::New();
-	m_SlicerMapper->SetInput(m_Polydata);
-	m_SlicerMapper->ScalarVisibilityOff();
+  m_PolydataSlicer->SetOutput(m_Polydata);
+  m_PolydataSlicer->SetTexture(m_SliceImage);
+  m_PolydataSlicer->Update();
 
-	m_SlicerActor = vtkActor::New();
-	m_SlicerActor->SetMapper(m_SlicerMapper);
-	m_SlicerActor->SetTexture(m_SliceTexture);
-	m_SlicerActor->GetProperty()->SetAmbient(1.f);
-	m_SlicerActor->GetProperty()->SetDiffuse(0.f);
+  m_SlicerMapper	= vtkPolyDataMapper::New();
+  m_SlicerMapper->SetInput(m_Polydata);
+  m_SlicerMapper->ScalarVisibilityOff();
+
+  m_SlicerActor = vtkActor::New();
+  m_SlicerActor->SetMapper(m_SlicerMapper);
+  m_SlicerActor->SetTexture(m_SliceTexture);
+  m_SlicerActor->GetProperty()->SetAmbient(1.f);
+  m_SlicerActor->GetProperty()->SetDiffuse(0.f);
 
   m_PIPRen->AddActor(m_SlicerActor);
 
   vtkPolyData *contour = vtkPolyData::New();
   m_ContourVolumeMapper->GetOutput(0, contour);
 
-	if(contour==NULL)
-	{
-		wxMessageBox("Operation out of memory");
-		return;
-	}
+  if(contour==NULL)
+  {
+    wxMessageBox("Operation out of memory");
+    return;
+  }
 
   m_CutterPlane = vtkPlane::New();
   m_CutterPlane->SetOrigin(m_SliceImage->GetOrigin());
   m_CutterPlane->SetNormal(0,0,1);
-  
+
   m_IsosurfaceCutter = vtkFixedCutter::New();
   m_IsosurfaceCutter->SetCutFunction(m_CutterPlane);  
   m_IsosurfaceCutter->SetInput(contour);
@@ -495,8 +502,8 @@ void mmoExtractIsosurface::CreateSlicePipeline()
 
   m_PolydataActor = vtkActor::New();
   m_PolydataActor->SetMapper(m_PolydataMapper);
-	m_PolydataActor->GetProperty()->SetColor(1,0,0);
-  
+  m_PolydataActor->GetProperty()->SetColor(1,0,0);
+
   m_PIPRen->AddActor(m_PolydataActor);
   m_PIPRen->ResetCamera();
 }
@@ -504,12 +511,12 @@ void mmoExtractIsosurface::CreateSlicePipeline()
 void mmoExtractIsosurface::DeleteOpDialog()
 //----------------------------------------------------------------------------
 {
-	m_Mouse->RemoveObserver(m_DensityPicker);
+  m_Mouse->RemoveObserver(m_DensityPicker);
 
   m_Rwi->m_RenFront->RemoveActor(m_ContourActor);
   m_Rwi->m_RenFront->RemoveActor(m_Box);
 
-	//vtkDEL(m_ContourMapper);
+  //vtkDEL(m_ContourMapper);
   vtkDEL(m_ContourActor);
   vtkDEL(m_Box);
   vtkDEL(m_ContourVolumeMapper);
@@ -537,6 +544,8 @@ void mmoExtractIsosurface::DeleteOpDialog()
   cppDEL(m_Rwi); 
   cppDEL(m_Dialog);
 }
+
+
 //----------------------------------------------------------------------------
 void mmoExtractIsosurface::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
@@ -545,86 +554,94 @@ void mmoExtractIsosurface::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId())
     {	
-      case ID_OK:
-        m_Dialog->EndModal(wxID_OK);
+    case ID_OK:
+      m_Dialog->EndModal(wxID_OK);
       break;
-      case ID_CANCEL:
-        m_Dialog->EndModal(wxID_CANCEL);
+    case ID_CANCEL:
+      m_Dialog->EndModal(wxID_CANCEL);
       break;
-      case ID_FIT:
-        m_Rwi->m_RenFront->ResetCamera(m_BoundingBox);
-        m_Rwi->m_Camera->Dolly(1.2);
-        m_Rwi->m_RenFront->ResetCameraClippingRange();
-        m_PIPRen->ResetCamera();
-        m_Rwi->m_RenderWindow->Render();
+    case ID_FIT:
+      m_Rwi->m_RenFront->ResetCamera(m_BoundingBox);
+      m_Rwi->m_Camera->Dolly(1.2);
+      m_Rwi->m_RenFront->ResetCameraClippingRange();
+      m_PIPRen->ResetCamera();
+      m_Rwi->m_RenderWindow->Render();
       break;
-      case ID_GRID:
-        //m_Rwi->SetGridVisibility(!m_Rwi->m_show_grid);
-        m_Rwi->m_RenderWindow->Render();
+    case ID_GRID:
+      //m_Rwi->SetGridVisibility(!m_Rwi->m_show_grid);
+      m_Rwi->m_RenderWindow->Render();
       break;
-      case ID_ISO:
-        m_Dialog->TransferDataToWindow();
-        m_IsoValue = m_IsoSlider->GetValue();
-        m_Dialog->TransferDataToWindow();
-        UpdateSurface();
+    case ID_ISO:
+      m_Dialog->TransferDataToWindow();
+      m_IsoValue = m_IsoSlider->GetValue();
+      m_Dialog->TransferDataToWindow();
+      UpdateSurface();
       break;
-      case ID_ISO_SLIDER:
-        UpdateSurface();
+    case ID_ISO_SLIDER:
+      UpdateSurface();
       break;
-      case ID_INCREASE_ISO:
-        if(m_IsoValue<m_MaxDensity) m_IsoValue += m_StepDensity;
-        m_Dialog->TransferDataToWindow();  
-        UpdateSurface();
+    case ID_INCREASE_ISO:
+      if(m_IsoValue<m_MaxDensity) m_IsoValue += m_StepDensity;
+      m_Dialog->TransferDataToWindow();  
+      UpdateSurface();
       break;
-      case ID_DECREASE_ISO:
-        if(m_IsoValue>m_MinDensity) m_IsoValue -= m_StepDensity;
-        m_Dialog->TransferDataToWindow();  
-        UpdateSurface();
+    case ID_DECREASE_ISO:
+      if(m_IsoValue>m_MinDensity) m_IsoValue -= m_StepDensity;
+      m_Dialog->TransferDataToWindow();  
+      UpdateSurface();
       break;
-      case ID_SLICE:
-        m_Dialog->TransferDataToWindow();  
-        m_Slice = m_SliceSlider->GetValue();
-        m_Dialog->TransferDataToWindow();  
-        UpdateSlice();
+    case ID_SLICE:
+      m_Dialog->TransferDataToWindow();  
+      m_Slice = m_SliceSlider->GetValue();
+      m_Dialog->TransferDataToWindow();  
+      UpdateSlice();
       break;
-      case ID_SLICE_SLIDER:
-        UpdateSlice();
+    case ID_SLICE_SLIDER:
+      UpdateSlice();
       break;
-      case ID_INCREASE_SLICE:
-        if(m_Slice<m_SliceMax) m_Slice += m_SliceStep;
-        m_Dialog->TransferDataToWindow();  
-        UpdateSlice();
+    case ID_INCREASE_SLICE:
+      if(m_Slice<m_SliceMax) m_Slice += m_SliceStep;
+      m_Dialog->TransferDataToWindow();  
+      UpdateSlice();
       break;
-      case ID_DECREASE_SLICE:
-        if(m_Slice>m_SliceMin) m_Slice -= m_SliceStep;
-        m_Dialog->TransferDataToWindow();  
-        UpdateSlice();
+    case ID_DECREASE_SLICE:
+      if(m_Slice>m_SliceMin) m_Slice -= m_SliceStep;
+      m_Dialog->TransferDataToWindow();  
+      UpdateSlice();
       break;
-      case ID_VIEW_SLICE:
-        if(this->m_ShowSlice)
-				{
-					vtkPolyData *contour=m_ContourVolumeMapper->GetOutput();
-					if(contour==NULL)
-					{
-						wxMessageBox("Operation out of memory");
-					}
-					else
-					{
-						m_IsosurfaceCutter->SetInput(contour);
-						m_IsosurfaceCutter->Update();
-					}
-          m_Rwi->m_RenderWindow->AddRenderer(m_PIPRen);
-				}
+    case ID_VIEW_SLICE:
+      if(this->m_ShowSlice)
+      {
+        vtkPolyData *contour=m_ContourVolumeMapper->GetOutput();
+        if(contour==NULL)
+        {
+          wxMessageBox("Operation out of memory");
+        }
         else
-          m_Rwi->m_RenderWindow->RemoveRenderer(m_PIPRen);
-        //m_Dialog->FindItem(ID_SLICE)->Enable(m_ShowSlice != 0);
-        //m_Dialog->FindItem(ID_SLICE_SLIDER)->Enable(m_ShowSlice != 0);
-        //m_Dialog->FindItem(ID_INCREASE_SLICE)->Enable(m_ShowSlice != 0);
-        //m_Dialog->FindItem(ID_DECREASE_SLICE)->Enable(m_ShowSlice != 0);
+        {
+          m_IsosurfaceCutter->SetInput(contour);
+          m_IsosurfaceCutter->Update();
+        }
+        m_Rwi->m_RenderWindow->AddRenderer(m_PIPRen);
+        contour->Delete() ; // NMcF
+      }
+      else
+        m_Rwi->m_RenderWindow->RemoveRenderer(m_PIPRen);
+      //m_Dialog->FindItem(ID_SLICE)->Enable(m_ShowSlice != 0);
+      //m_Dialog->FindItem(ID_SLICE_SLIDER)->Enable(m_ShowSlice != 0);
+      //m_Dialog->FindItem(ID_INCREASE_SLICE)->Enable(m_ShowSlice != 0);
+      //m_Dialog->FindItem(ID_DECREASE_SLICE)->Enable(m_ShowSlice != 0);
 
-        m_Rwi->m_RenderWindow->Render();
+      m_Rwi->m_RenderWindow->Render();
       break;
-      case VME_PICKED:
+    case ID_AUTO_LOD:
+      // toggle auto lod for polydata extraction
+      if (m_ContourVolumeMapper->GetAutoLODCreate())
+        m_ContourVolumeMapper->AutoLODCreateOff() ;
+      else
+        m_ContourVolumeMapper->AutoLODCreateOn() ;
+      break ;
+    case VME_PICKED:
       {
         vtkDataSet *vol = ((mafVME *)m_Input)->GetOutput()->GetVTKData();
         double pos[3];
@@ -646,34 +663,38 @@ void mmoExtractIsosurface::OnEvent(mafEventBase *maf_event)
         }
       }
       break;
-      default:
-        mafEventMacro(*e);
+    default:
+      mafEventMacro(*e);
       break; 
     }
   }
 }
-//----------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+// Modify and extract the isosurface
+// Called from various gui events in OnEvent()
 void mmoExtractIsosurface::UpdateSurface(bool use_lod)
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 {
-	m_Rwi->m_RenderWindow->SetDesiredUpdateRate(0.001f);
+  m_Rwi->m_RenderWindow->SetDesiredUpdateRate(0.001f);
   if (m_ContourVolumeMapper->GetContourValue() != m_IsoValue) 
-	{
+  {
     m_ContourVolumeMapper->SetContourValue(m_IsoValue);
     m_ContourVolumeMapper->Update();
-		vtkPolyData *contour = vtkPolyData::New();
-		m_IsosurfaceCutter->SetInput(contour);
-		m_IsosurfaceCutter->Update();
+    vtkPolyData *contour = vtkPolyData::New();
+    m_IsosurfaceCutter->SetInput(contour);
+    m_IsosurfaceCutter->Update();
     //m_ContourMapper->SetInput(contour);
     if (m_ShowSlice)
     {
-			contour=m_ContourVolumeMapper->GetOutput();
-			if(contour==NULL)
-			{
-				m_Rwi->m_RenderWindow->Render();
-				wxMessageBox("Operation out of memory");
-				return;
-			}
+      contour=m_ContourVolumeMapper->GetOutput();
+      if(contour==NULL)
+      {
+        m_Rwi->m_RenderWindow->Render();
+        wxMessageBox("Operation out of memory");
+        return;
+      }
       m_IsosurfaceCutter->SetInput(contour);
       m_IsosurfaceCutter->Update();
     }
@@ -682,6 +703,8 @@ void mmoExtractIsosurface::UpdateSurface(bool use_lod)
 
   m_Rwi->m_RenderWindow->Render();
 }
+
+
 //----------------------------------------------------------------------------
 void mmoExtractIsosurface::UpdateSlice()
 //----------------------------------------------------------------------------
@@ -701,26 +724,30 @@ void mmoExtractIsosurface::UpdateSlice()
   m_IsosurfaceCutter->Update();
 
   this->m_PIPRen->ResetCameraClippingRange();
-	m_Rwi->m_RenderWindow->SetDesiredUpdateRate(0.001f);
+  m_Rwi->m_RenderWindow->SetDesiredUpdateRate(0.001f);
   m_Rwi->m_RenderWindow->Render();
 }
-//----------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+// Extract the surface for the first time and create the isosurface VME
+// Called from OpRun()
 void mmoExtractIsosurface::ExtractSurface(bool clean) 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 {
   wxBusyInfo wait("Extracting Isosurface: please wait ...");
-  
-	m_ContourVolumeMapper->SetEnableContourAnalysis(clean);
-  
-	// IMPORTANT, extract the isosurface from m_ContourVolumeMapper in this way
-	// and then call surface->Delete() when the VME is created
-	vtkPolyData *surface = vtkPolyData::New();
-	surface=m_ContourVolumeMapper->GetOutput();
-	if(surface==NULL)
-	{
-		wxMessageBox("Operation out of memory");
-		return;
-	}
+
+  m_ContourVolumeMapper->SetEnableContourAnalysis(clean);
+
+  // IMPORTANT, extract the isosurface from m_ContourVolumeMapper in this way
+  // and then call surface->Delete() when the VME is created
+  vtkPolyData *surface = vtkPolyData::New();
+  surface=m_ContourVolumeMapper->GetOutput();
+  if(surface==NULL)
+  {
+    wxMessageBox("Operation out of memory");
+    return;
+  }
   m_ContourVolumeMapper->Update();
 
   wxString name = wxString::Format( "%s Isosurface %g", m_Input->GetName(),m_IsoValue );
