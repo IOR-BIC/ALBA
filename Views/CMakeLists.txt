@@ -34,6 +34,8 @@ SET(PROJECT_SRCS
   mafViewImageCompound.h
   mafViewCT.cpp
   mafViewCT.h
+  mafViewCTNew.cpp
+  mafViewCTNew.h
 )
 
 # List libraries that are needed by this project.
