@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkContourVolumeMapper.cxx,v $
 Language:  C++
-Date:      $Date: 2007-01-17 17:03:48 $
-Version:   $Revision: 1.15 $
+Date:      $Date: 2007-02-07 11:23:07 $
+Version:   $Revision: 1.16 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -20,6 +20,7 @@ All rights reserved.
 // vtkContourVolumeMapper::vtkContourVolumeMapper()
 // vtkContourVolumeMapper::~vtkContourVolumeMapper()
 // vtkContourVolumeMapper::ReleaseData()
+// vtkContourVolumeMapper::ClearCachesAndStats()
 // vtkContourVolumeMapper::PrintSelf()
 // vtkContourVolumeMapper::SetInput()
 // vtkContourVolumeMapper::EstimateRelevantVolume()
@@ -44,7 +45,7 @@ All rights reserved.
 // vtkContourVolumeMapper::EstimateTimeToDrawRMC()
 // vtkContourVolumeMapper::BestLODForDrawCache()
 // vtkContourVolumeMapper::BestLODForRenderMCubes()
-// vtkContourVolumeMapper::ClearCachesAndStats()
+// vtkContourVolumeMapper::BestLODForCreateMCubes()
 // vtkContourVolumeMapper::PrepareContours()
 // vtkContourVolumeMapper::PrepareContoursTemplate()
 // vtkContourVolumeMapper::CalculateDepthMatrix()
@@ -108,7 +109,7 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
 
 using namespace vtkContourVolumeMapperNamespace;
 
-vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.15 $");
+vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.16 $");
 vtkStandardNewMacro(vtkContourVolumeMapper);
 
 
@@ -120,7 +121,8 @@ vtkContourVolumeMapper::vtkContourVolumeMapper()
 {
   m_Alpha=1.0;
 
-  this->EnableAutoLOD = true;
+  this->AutoLODRender = true;
+  this->AutoLODCreate = true;
   this->EnableContourAnalysis = false;
 
   this->BlockMinMax = NULL;
@@ -200,6 +202,33 @@ void vtkContourVolumeMapper::ReleaseData()
   this->TimePerTriangle = -1.0 ;
 }
 
+
+
+
+//------------------------------------------------------------------------------
+// Free caches and set stats to undefined, eg after contour value changes
+void vtkContourVolumeMapper::ClearCachesAndStats()
+//------------------------------------------------------------------------------
+{
+  for (int lod = 0 ;  lod < NumberOfLods ;  lod++){
+    // delete triangle caches
+    delete [] this->TriangleCache[lod];
+    this->TriangleCache[lod] = NULL;
+    this->TriangleCacheSize[lod] = 0;
+
+    // delete vertex order array
+    delete[] ordered_vertices[lod] ;
+    ordered_vertices[lod] = NULL ;
+
+    // set stats to undefined
+    this->NumberOfTriangles[lod] = -1 ;
+    this->TimeToDrawDC[lod] = -1.0 ;
+    this->TimeToDrawRMC[lod] = -1.0 ;
+  }
+
+  this->CacheCreated = false ;
+
+}
 
 
 
@@ -441,7 +470,7 @@ template <typename DataType> bool vtkContourVolumeMapper::PrepareAccelerationDat
   //           ---
   for (lod = 0 ;  lod < NumberOfLods ;  lod++)
     CalculateVoxelVertIndicesOffsets(lod, this->VoxelVertIndicesOffsets[lod]) ; // offsets to index in data array
- 
+
 
 
   // calculate no. of blocks in each direction
@@ -653,16 +682,22 @@ int vtkContourVolumeMapper::GetDataType()
 //------------------------------------------------------------------------------
 // Return isosurface as polydata
 // Similar to Render() but calls CreateMCubes() instead of RenderMCubes()
+// Default args are 0 and NULL.
+// Allocates polydata if input polydata is NULL
 vtkPolyData *vtkContourVolumeMapper::GetOutput(int level, vtkPolyData *data)
 //------------------------------------------------------------------------------
 {
-  if (level != 0 && level != 1)
+  // check that level is in correct range
+  if (level < 0 || level >= NumberOfLods)
     return NULL;
+
+  // check that volume data is valid
   if (this->GetInput() == NULL || this->GetInput()->GetPointData() == NULL || this->GetInput()->GetPointData()->GetScalars() == NULL) {
     vtkErrorMacro(<< "No data");
     return NULL;
   }
 
+  // use input polydata or allocate if none
   vtkPolyData *polydata = (data == NULL) ? vtkPolyData::New() : data;
 
   const void *dataPointer = this->GetInput()->GetPointData()->GetScalars()->GetVoidPointer(0);
@@ -851,14 +886,8 @@ void vtkContourVolumeMapper::DrawCache(vtkRenderer *renderer, vtkVolume *volume,
     this->TimeToDrawDC[lod] = this->TimeToDraw ;
 
 
-  // mafLogMessage("draw cache: lod = %d", lod) ;
-  // mafLogMessage("\t time limit = %f time = %f", 60.0*renderer->GetAllocatedRenderTime(), 60.0*this->TimeToDraw) ;
-  // mafLogMessage("\t no. of triangles = %d\n", this->NumberOfTriangles[lod]) ;
-
-#ifdef _DEBUG
-  printf("\rCache %d: %.2f %d                                   \r", int(lod), (float)this->Timer->GetElapsedTime(), this->NumberOfTriangles[lod]);
-#endif
-}
+  // mafLogMessage("draw cache: lod = %d triangles = %d", lod, this->NumberOfTriangles[lod]) ;
+} // DrawCache()
 
 
 
@@ -894,7 +923,7 @@ template<typename DataType> void vtkContourVolumeMapper::RenderMCubes(vtkRendere
   // if no caching, use only lodlevel
   int firstLOD, lastLOD ;
   firstLOD = LODLevel ;
-  if (!this->EnableAutoLOD)
+  if (!this->AutoLODRender)
     lastLOD = 0 ;
   else if (createCache)
     lastLOD = NumberOfLods - 1 ;
@@ -999,9 +1028,9 @@ template<typename DataType> void vtkContourVolumeMapper::RenderMCubes(vtkRendere
   const int rowSize   = this->DataDimensions[0];
   const int sliceSize = this->DataDimensions[0] * this->DataDimensions[1];
 
-  // create array of ListOfPolyLine2D pointers and set them all to zero
-  ListOfPolyline2D *polylines[2000];
-  memset(polylines, 0, sizeof(polylines));
+  // create array of ListOfPolyLine2D pointers polylines[0..dimz-1] and set them all to zero
+  ListOfPolyline2D **polylines = new ListOfPolyline2D*[this->DataDimensions[2]];
+  memset(polylines, 0, this->DataDimensions[2]*sizeof(ListOfPolyline2D*));
 
   if (EnableContourAnalysis) {
     for (int z = 0; z < this->DataDimensions[2]; z++) {
@@ -1140,13 +1169,28 @@ template<typename DataType> void vtkContourVolumeMapper::RenderMCubes(vtkRendere
 
                 // calculate case, each bit of caseIndex is set if corner > contour value
                 int caseIndex = voxelVals[0] > ContourValue; 
-                caseIndex |= (voxelVals[1] > ContourValue) << 1;
-                caseIndex |= (voxelVals[2] > ContourValue) << 2;
-                caseIndex |= (voxelVals[3] > ContourValue) << 3;
-                caseIndex |= (voxelVals[4] > ContourValue) << 4;
-                caseIndex |= (voxelVals[5] > ContourValue) << 5;
-                caseIndex |= (voxelVals[6] > ContourValue) << 6;
-                caseIndex |= (voxelVals[7] > ContourValue) << 7;
+                if(m_MAXScalar==ContourValue)
+                {
+                  // This allows you to get contour at max of range, else can't get last slice in test volume (Matteo 27.06.06) 
+                  caseIndex = voxelVals[0] != ContourValue;
+                  caseIndex |= (voxelVals[1] != ContourValue) << 1;
+                  caseIndex |= (voxelVals[2] != ContourValue) << 2;
+                  caseIndex |= (voxelVals[3] != ContourValue) << 3;
+                  caseIndex |= (voxelVals[4] != ContourValue) << 4;
+                  caseIndex |= (voxelVals[5] != ContourValue) << 5;
+                  caseIndex |= (voxelVals[6] != ContourValue) << 6;
+                  caseIndex |= (voxelVals[7] != ContourValue) << 7;
+                }
+                else
+                {
+                  caseIndex |= (voxelVals[1] > ContourValue) << 1;
+                  caseIndex |= (voxelVals[2] > ContourValue) << 2;
+                  caseIndex |= (voxelVals[3] > ContourValue) << 3;
+                  caseIndex |= (voxelVals[4] > ContourValue) << 4;
+                  caseIndex |= (voxelVals[5] > ContourValue) << 5;
+                  caseIndex |= (voxelVals[6] > ContourValue) << 6;
+                  caseIndex |= (voxelVals[7] > ContourValue) << 7;
+                }
 
                 // get list of edges
                 const EDGE_LIST *edge = marchingCubesCases[caseIndex].edges;
@@ -1186,7 +1230,7 @@ template<typename DataType> void vtkContourVolumeMapper::RenderMCubes(vtkRendere
 
                     // was this edge created?
                     // define a reference to pointLocator for the current edge
-                    // reminder: float* pointLocator[][][][3], allocated, but all pointers initially zero
+                    // reminder: float* pointLocator[][][][3] allocated, but all pointers initially zero
                     float *(&pointLocatorRef) = pointLocator[xi + lodxy*vertIndeces[0][0]][yi + lodxy*vertIndeces[0][1]][zi + lodz*vertIndeces[0][2]][edgeAxis[*edge]];
 
                     if (pointLocatorRef) {
@@ -1200,7 +1244,7 @@ template<typename DataType> void vtkContourVolumeMapper::RenderMCubes(vtkRendere
                     }
                     else {
                       // edge not created, so calculate normals and vertices
-                       // calculate coords of vertex, ie intersection of contour with this edge
+                      // calculate coords of vertex, ie intersection of contour with this edge
                       vertices[0] = fx + vertIndeces[0][0] * fxSize;
                       vertices[1] = fy + vertIndeces[0][1] * fySize;
                       vertices[2] = fz + vertIndeces[0][2] * fzSize;
@@ -1214,7 +1258,7 @@ template<typename DataType> void vtkContourVolumeMapper::RenderMCubes(vtkRendere
                       for (int vi = 0; vi < 2; vi++) {
                         // calculate pointer to vert0 or vert1
                         // you can check that this corresponds to (vx,vy,vz) using PointerFromIndices()
-                        const DataType * const verticePtr = voxelPtr + VoxelOffsets[vi == 0 ? vert0 : vert1];    // pointer to vert0 or vert1
+                        const DataType * const verticePtr = voxelPtr + VoxelOffsets[vi == 0 ? vert0 : vert1];
 
                         // gradient in x
                         const int vx = x + lodxy*vertIndeces[vi][0];    // x index of vertex
@@ -1227,7 +1271,7 @@ template<typename DataType> void vtkContourVolumeMapper::RenderMCubes(vtkRendere
 
                         // gradient in y
                         const int vy = y + lodxy*vertIndeces[vi][1];    // y index of vertex
-                       if (vy == 0)
+                        if (vy == 0)
                           gradient[vi][1] = (int)(verticePtr[rowSize] - verticePtr[0]) ;
                         else if (vy >= lastIndex[1])
                           gradient[vi][1] = (int)(verticePtr[0] - verticePtr[-rowSize]) ;
@@ -1308,6 +1352,7 @@ template<typename DataType> void vtkContourVolumeMapper::RenderMCubes(vtkRendere
 
   for (int z = 0; z < this->DataDimensions[2]; z++)
     delete polylines[z];
+  delete [] polylines ;
 
   // this measures the percentage of empty blocks
   this->SkippedVoxelBlocks = 100.f * this->SkippedVoxelBlocks / (this->NumBlocks[2] * this->NumBlocks[1] * this->NumBlocks[0]);
@@ -1332,43 +1377,55 @@ template<typename DataType> void vtkContourVolumeMapper::RenderMCubes(vtkRendere
     this->TimeToDraw = 0.0001f;
 
   // mafLogMessage("lod %d %d time %f", firstLOD, lastLOD, this->TimeToDrawRMC[LODLevel]) ;
+  // mafLogMessage("RenderMCubes: cv = %f lod = %d triangles = %d", this->ContourValue, LODLevel, this->NumberOfTriangles[LODLevel]) ;
+
 
 #if 0
   printf("\rTime: %.2f (%.0f%% blocks + %.0f%% voxels). %d triangles.   \r", this->TimeToDraw, float(this->SkippedVoxelBlocks), 100.f * this->VoxelsSkipped / (this->VoxelsSkipped + this->VoxelsRendered), this->NumberOfTriangles[enableOptimization ? 1 : 0]);
 #endif
 
-}
+} // RenderMCubes()
+
+
 
 
 
 
 //------------------------------------------------------------------------------
 // NMcF New version of CreateMCubes()
+//
 // The code is basically the same as RenderMCubes() with the rendering and caching
 // replaced by output to polydata.
-template<typename DataType> void vtkContourVolumeMapper::CreateMCubes_new(int LODLevel, vtkPolyData *polydata, const DataType *dataPointer)
+//
+// NB This function must not alter the cache data, eg this->NumberofTriangles or this->PrevContourValue
+// or DrawCache() will crash.
+template<typename DataType> void vtkContourVolumeMapper::CreateMCubes(int LODLevel, vtkPolyData *polydata, const DataType *dataPointer)
 //------------------------------------------------------------------------------
 {
+  // select LOD
+  if (this->AutoLODCreate)
+    LODLevel = BestLODForCreateMCubes() ;
+
+  // estimate intial no. of triangles to allocate
   const int estimatedNumberOfTriangles = (this->PrevContourValue == this->ContourValue) ? (this->NumberOfTriangles[LODLevel] + 100) : MaxTrianglesNotOptimized;
-  this->CreatedTriangles = 0;
-
-
 
   // create arrays for points, triangles and normals, and assign to polydata
+  // nb unregister reduces ref count by 1 so that the objects get deleted when the polydata is deleted.
   vtkPoints *points = vtkPoints::New();
-  polydata->SetPoints(points);
+  //polydata->SetPoints(points);
+  //points->Delete() ;
   points->Allocate(estimatedNumberOfTriangles);         // allocates space for this many points (3 floats per point)
 
   vtkCellArray *triangles = vtkCellArray::New();
-  polydata->SetPolys(triangles);
+  //polydata->SetPolys(triangles);
+  //triangles->Delete() ;
   triangles->Allocate(3 * estimatedNumberOfTriangles);  // allocates space for this many vertex indices (vtkIdType's)
 
   vtkFloatArray *vertexNormals = vtkFloatArray::New();
   vertexNormals->SetNumberOfComponents(3);
-  polydata->GetPointData()->SetNormals(vertexNormals);
+  //polydata->GetPointData()->SetNormals(vertexNormals);
+  //vertexNormals->Delete() ;
   vertexNormals->Allocate(3 * estimatedNumberOfTriangles);    // allocates space for this many floats, so have to multiply by 3 yourself this time
-
-
 
 
   // define local variables to reduce overheads and improve readability
@@ -1379,24 +1436,25 @@ template<typename DataType> void vtkContourVolumeMapper::CreateMCubes_new(int LO
   this->SkippedVoxelBlocks = 0;
   this->VoxelsRendered = this->VoxelsSkipped = 0;
 
-  // initialization
-  this->PrevContourValue = this->ContourValue;
-  this->NumberOfTriangles[LODLevel] = 0;
+  // initialization 
+  // (nb: we use CreatedTriangles because changing this->NumberOfTriangles[lod]) would mess up the cache)
+  // this->PrevContourValue = this->ContourValue;
+  this->CreatedTriangles = 0;
 
   // no. of voxels per slice and per row
   const int rowSize   = this->DataDimensions[0];
   const int sliceSize = this->DataDimensions[0] * this->DataDimensions[1];
 
-  // create array of ListOfPolyLine2D pointers and set them all to zero
-  ListOfPolyline2D *polylines[2000];
-  memset(polylines, 0, sizeof(polylines));
+
+  // create 2 polyline lists
+  ListOfPolyline2D polylines[2];
 
   if (EnableContourAnalysis) {
-    for (int z = 0; z < this->DataDimensions[2]; z++) {
-      polylines[z] = new ListOfPolyline2D();
-      this->PrepareContours(z, dataPointer + z * sliceSize, *polylines[z]);
-    }
+    // assign first slice to polylines[0]
+    int z = 0 ;
+    this->PrepareContours(z, dataPointer + z*sliceSize, polylines[0]);
   }
+
 
 
 
@@ -1411,18 +1469,64 @@ template<typename DataType> void vtkContourVolumeMapper::CreateMCubes_new(int LO
   const int *VoxelOffsets = this->VoxelVertIndicesOffsets[LODLevel] ;
 
   // last xyz in volume
-  const int lastIndex[3] = { this->DataDimensions[0] - lodxy, this->DataDimensions[1] - lodxy, this->DataDimensions[2] - lodz};
+  const int lastIndex[3] = { this->DataDimensions[0] - 1, this->DataDimensions[1] - 1, this->DataDimensions[2] - 1};
+
+
+
+
+  // Set up pointLocator - an array of vertex ID's for every edge in the block.
+  // Differences between CreateMCubes() and RenderMCubes():
+  // 1) Now contains the polydata index instead of vertex vector
+  // 2) Stores current and next slice instead of a block, so that the polydata is properly connected.
+  // 3) pointLocator stored as 1D array, accessed by offsets as if it was pL[z][y][x][3]
+  // NB although we allocate 1+lodz slices, we will only use slices 0 and lodz.
+  const int plDims[3] = {this->DataDimensions[0]+lodxy, this->DataDimensions[1]+lodxy, 1+lodz} ;
+  const int plSliceSize = 3 * plDims[0] * plDims[1] ;
+  const int plOffsets[3] = {3, 3*plDims[0], plSliceSize} ;
+  const int plSliceBytes = plSliceSize * sizeof(vtkIdType) ;
+  vtkIdType* const pointLocator = new vtkIdType[plSliceSize * plDims[2]] ;
+  vtkIdType* const pointLocatorThisSlice = pointLocator ;
+  vtkIdType* const pointLocatorNextSlice = pointLocator + lodz*plOffsets[2] ;
+
+  // initialize everything to undefined
+  memset(pointLocatorThisSlice, -1, plSliceBytes);
+  memset(pointLocatorNextSlice, -1, plSliceBytes);
 
 
 
   //----------------------------
-  // loop through all the blocks
+  // Loop through the slices.
+  // NB outer loop needs to be z because pointLocator is based on slices instead of blocks.
   //----------------------------
-  for (int bzi = 0; bzi < this->NumBlocks[2]; bzi++) {
-    // calculate block size in z (all blocks are VoxelBlockSize except last, which is remainder - 1)
-    // n.b this means that the last block will be zero in size if the remainder is 1
-    const int zblockSize = (((bzi + 1) < this->NumBlocks[2]) ? VoxelBlockSize : (this->DataDimensions[2] - 1 - (bzi << VoxelBlockSizeLog)));
+  for (int z = 0 ;  z < this->DataDimensions[2] - lodz ;  z += lodz){
+    const int bzi = z >> VoxelBlockSizeLog;                                 // calculate block no.
+    const int zi = z - bzi*VoxelBlockSize ;                                 // z relative to block
+    const float fz = this->VoxelCoordinates[2][z];                          // voxel z coord
+    const float fzSize = this->VoxelCoordinates[2][z + lodz] - fz;          // size of LOD voxel                    
+    const float fzSizeNorm = 1.f / (this->VoxelCoordinates[2][z + 1] - fz); // normalization factor : size of normal voxel                        
+    if (fzSize < 0.0001f) // arbitrary minimum size
+      continue;
 
+    // update progress
+    this->CreatedTriangles = triangles->GetNumberOfCells();
+    this->UpdateProgress(float(z) / (this->DataDimensions[2] - 1));
+
+    // reset point locator: copy next slice to current slice and reset next slice
+    memcpy(pointLocatorThisSlice, pointLocatorNextSlice, plSliceBytes);
+    memset(pointLocatorNextSlice, -1, plSliceBytes);
+
+    // prepare contours
+    if (EnableContourAnalysis) {
+      // assign next slice to polylines[plI} where plI alternates between 0 and 1
+      int plI = ((z+lodz)/lodz) % 2 ;
+      this->PrepareContours(z + lodz, dataPointer + (z + lodz)*sliceSize, polylines[plI]);
+    }
+
+
+
+    //----------------------------
+    // loop through the blocks
+    //----------------------------
     for (int byi = 0; byi < this->NumBlocks[1]; byi++) {
       // calculate block size in y
       const int yblockSize = (((byi + 1) < this->NumBlocks[1]) ? VoxelBlockSize : (this->DataDimensions[1] - 1 - (byi << VoxelBlockSizeLog)));
@@ -1435,7 +1539,7 @@ template<typename DataType> void vtkContourVolumeMapper::CreateMCubes_new(int LO
         const int block = bxi + this->NumBlocks[0] * (byi + bzi * this->NumBlocks[1]);
 
         // skip the block if any of the sizes are zero
-        if (xblockSize == 0 || yblockSize == 0 || zblockSize == 0){
+        if (xblockSize == 0 || yblockSize == 0){
           this->SkippedVoxelBlocks += 1.f;
           continue;
         }
@@ -1452,13 +1556,6 @@ template<typename DataType> void vtkContourVolumeMapper::CreateMCubes_new(int LO
         // Process the voxels in the block
         //--------------------------------
 
-        // set up pointLocator array float* pointLocator[9][9][9][3], ie 3 float pointers for every voxel in block.
-        // pointLocator is an array of pointers to every edge in the block, 
-        // so it will become an index of the triangle vertices.
-        // This contained the vertex vector in RenderMCubes() - here it contains the polydata index
-        vtkIdType pointLocator[VoxelBlockSize + 1][VoxelBlockSize + 1][VoxelBlockSize + 1][3]; // three edges per voxel
-        memset(pointLocator, -1, sizeof(pointLocator));
-
         // index of first voxel in block
         const int voxelIBlock = VoxelBlockSize * (bzi * sliceSize + byi * rowSize + bxi);
 
@@ -1470,45 +1567,49 @@ template<typename DataType> void vtkContourVolumeMapper::CreateMCubes_new(int LO
         //---------------------------------------------
         // loop over voxels in block
         //---------------------------------------------
-        for (int zi = 0; zi < zblockSize; zi += lodz) {
-          const int   z  = (bzi << VoxelBlockSizeLog) + zi;                       // voxel z index relative to volume
-          const float fz = this->VoxelCoordinates[2][z];                          // voxel z coord
-          const float fzSize = this->VoxelCoordinates[2][z + lodz] - fz;          // size of LOD voxel                    
-          const float fzSizeNorm = 1.f / (this->VoxelCoordinates[2][z + 1] - fz); // normalization factor : size of normal voxel                        
-          if ((z + lodz) >= this->DataDimensions[2])                              // skip if volume dimension exceeded
+        for (int yi = 0; yi < yblockSize; yi += lodxy) {
+          const int   y  = (byi << VoxelBlockSizeLog) + yi;
+          if ((y + lodxy) >= this->DataDimensions[1])
             continue;
-          if (fzSize < 0.0001f) // arbitrary minimum size
-            continue;
+          const float fy = this->VoxelCoordinates[1][y];
+          const float fySize     = this->VoxelCoordinates[1][y + lodxy] - fy;
+          const float fySizeNorm = 1.f / (this->VoxelCoordinates[1][y + 1] - fy);
 
-          for (int yi = 0; yi < yblockSize; yi += lodxy) {
-            const int   y  = (byi << VoxelBlockSizeLog) + yi;
-            const float fy = this->VoxelCoordinates[1][y];
-            const float fySize     = this->VoxelCoordinates[1][y + lodxy] - fy;
-            const float fySizeNorm = 1.f / (this->VoxelCoordinates[1][y + 1] - fy);
-            if ((y + lodxy) >= this->DataDimensions[1])
+          for (int xi = 0; xi < xblockSize; xi += lodxy) {
+            const int x = (bxi << VoxelBlockSizeLog) + xi;
+            if ((x + lodxy) >= this->DataDimensions[0])
               continue;
+            const float fx = this->VoxelCoordinates[0][x];
+            const float fxSize = this->VoxelCoordinates[0][x + lodxy] - fx;
+            const float fxSizeNorm = 1.f / (this->VoxelCoordinates[0][x + 1] - fx);
 
-            for (int xi = 0; xi < xblockSize; xi += lodxy) {
-              const int x = (bxi << VoxelBlockSizeLog) + xi;
-              const float fx = this->VoxelCoordinates[0][x];
-              const float fxSize = this->VoxelCoordinates[0][x + lodxy] - fx;
-              const float fxSizeNorm = 1.f / (this->VoxelCoordinates[0][x + 1] - fx);
-              if ((x + lodxy) >= this->DataDimensions[0])
-                continue;
-
-              const int voxelI = voxelIBlock + zi * sliceSize + yi * rowSize + xi;    // index of current voxel
-              const DataType * const voxelPtr = dataPointer + voxelI;                 // pointer to current voxel
-              const float fxyzSize[3] = { fxSize, fySize, fzSize };                   // size (LOD size) of current voxel
+            const int voxelI = voxelIBlock + zi * sliceSize + yi * rowSize + xi;    // index of current voxel
+            const DataType * const voxelPtr = dataPointer + voxelI;                 // pointer to current voxel
+            const float fxyzSize[3] = { fxSize, fySize, fzSize };                   // size (LOD size) of current voxel
 
 
-              // Find the marching cubes case
+            // Find the marching cubes case
 
-              // get value of voxel and neighbours (VoxelOffsets was set earlier to normal or LOD sized cube)
-              const DataType voxelVals[8] = {voxelPtr[0], voxelPtr[VoxelOffsets[1]], voxelPtr[VoxelOffsets[2]], voxelPtr[VoxelOffsets[3]],
-                voxelPtr[VoxelOffsets[4]], voxelPtr[VoxelOffsets[5]], voxelPtr[VoxelOffsets[6]], voxelPtr[VoxelOffsets[7]]};
+            // get value of voxel and neighbours (VoxelOffsets was set earlier to normal or LOD sized cube)
+            const DataType voxelVals[8] = {voxelPtr[0], voxelPtr[VoxelOffsets[1]], voxelPtr[VoxelOffsets[2]], voxelPtr[VoxelOffsets[3]],
+              voxelPtr[VoxelOffsets[4]], voxelPtr[VoxelOffsets[5]], voxelPtr[VoxelOffsets[6]], voxelPtr[VoxelOffsets[7]]};
 
-              // calculate case, each bit of caseIndex is set if corner > contour value
-              int caseIndex = voxelVals[0] > ContourValue; 
+            // calculate case, each bit of caseIndex is set if corner > contour value
+            int caseIndex = voxelVals[0] > ContourValue; 
+            if(m_MAXScalar==ContourValue)
+            {
+              // This allows you to get contour at max of range, else can't get last slice in test volume (Matteo 27.06.06) 
+              caseIndex = voxelVals[0] != ContourValue;
+              caseIndex |= (voxelVals[1] != ContourValue) << 1;
+              caseIndex |= (voxelVals[2] != ContourValue) << 2;
+              caseIndex |= (voxelVals[3] != ContourValue) << 3;
+              caseIndex |= (voxelVals[4] != ContourValue) << 4;
+              caseIndex |= (voxelVals[5] != ContourValue) << 5;
+              caseIndex |= (voxelVals[6] != ContourValue) << 6;
+              caseIndex |= (voxelVals[7] != ContourValue) << 7;
+            }
+            else
+            {
               caseIndex |= (voxelVals[1] > ContourValue) << 1;
               caseIndex |= (voxelVals[2] > ContourValue) << 2;
               caseIndex |= (voxelVals[3] > ContourValue) << 3;
@@ -1516,49 +1617,47 @@ template<typename DataType> void vtkContourVolumeMapper::CreateMCubes_new(int LO
               caseIndex |= (voxelVals[5] > ContourValue) << 5;
               caseIndex |= (voxelVals[6] > ContourValue) << 6;
               caseIndex |= (voxelVals[7] > ContourValue) << 7;
+            }
 
-              // get list of edges
-              const EDGE_LIST *edge = marchingCubesCases[caseIndex].edges;
-              if (*edge < 0)
+            // get list of edges
+            const EDGE_LIST *edge = marchingCubesCases[caseIndex].edges;
+            if (*edge < 0)
+              continue;
+
+            if (EnableContourAnalysis) {
+              // remove internal parts
+              if (polylines[0].IsInside(x, y, 50) && polylines[1].IsInside(x, y, 50))
                 continue;
-
-              if (EnableContourAnalysis) {
-                // remove internal parts
-                if (polylines[z]->IsInside(x, y, 50) && polylines[z + 1]->IsInside(x, y, 50))
-                  continue;
-
-                // remove noise
-                if (polylines[z]->FindContour(x, y, 50) == NULL &&
-                  polylines[z]->FindContour(x, y, 75, 4) == NULL && 
-                  !polylines[z + 1]->IsInside(x, y, 60) && (z == 0 || !polylines[z - 1]->IsInside(x, y, 60)))
-                  continue;
-
-              }
+            }
 
 
-              // loop through all edges in list
-              while(*edge >= 0) {
+            // loop through all edges in list
+            while(*edge >= 0) {
 
-                // storage for the triangle we are about to construct
-                float vertx[3] ;
-                float norml[3] ;
-                vtkIdType PolyDataIndex[3] ;
-                int vertexno = 0 ;
+              // storage for the triangle we are about to construct
+              float vertx[3] ;
+              float norml[3] ;
+              vtkIdType PolyDataIndex[3] ;
+              int vertexno = 0 ;
 
-                // loop through next three edges
-                for (int ii = 0; ii < 3; ii++, edge++) {
-                  // get corners of cube at ends of this edge
-                  // vert0 and vert1 are cube indices of corners (see static consts in .h)
-                  // vertIndeces points to offsets
-                  // eg if *edge = 5, vert0 = 5, vert1 = 6, vertIndeces ={{0,0,1}, {1,0,1}}
-                  const int vert0 = edgeOffsets[*edge][0];
-                  const int vert1 = edgeOffsets[*edge][1];
-                  const int *vertIndeces[2] = {unitCubeVertsXYZ[vert0], unitCubeVertsXYZ[vert1] };
+              // loop through next three edges
+              for (int ii = 0; ii < 3; ii++, edge++) {
+                // get corners of cube at ends of this edge
+                // vert0 and vert1 are cube indices of corners (see static consts in .h)
+                // vertIndeces points to offsets
+                // eg if *edge = 5, vert0 = 5, vert1 = 6, vertIndeces ={{0,0,1}, {1,0,1}}
+                const int vert0 = edgeOffsets[*edge][0];
+                const int vert1 = edgeOffsets[*edge][1];
+                const int *vertIndeces[2] = {unitCubeVertsXYZ[vert0], unitCubeVertsXYZ[vert1] };
 
-                  // was this edge created?
-                  // define a reference to pointLocator for the current edge
-                  // reminder: float* pointLocator[9][9][9][3], allocated, but all pointers zero
-                  vtkIdType &pointLocatorRef = pointLocator[xi + vertIndeces[0][0]][yi + vertIndeces[0][1]][zi + vertIndeces[0][2]][edgeAxis[*edge]];
+                // was this edge created?
+                // define a reference to pointLocator for the current edge
+                // reminder: vtkIdType pointLocator[z][x][y][3] with undefined values = -1
+                vtkIdType &pointLocatorRef = pointLocator[
+                  plOffsets[2] * lodz*vertIndeces[0][2] + 
+                    plOffsets[1] * (y + lodxy*vertIndeces[0][1]) + 
+                    plOffsets[0] * (x + lodxy*vertIndeces[0][0]) + 
+                    edgeAxis[*edge]] ;
 
                   if (pointLocatorRef >= 0) {
                     // If edge already created, we've had this vertex before.
@@ -1568,7 +1667,6 @@ template<typename DataType> void vtkContourVolumeMapper::CreateMCubes_new(int LO
                   }
                   else {
                     // edge not created, so calculate normals and vertices
-
                     // calculate coords of vertex, ie intersection of contour with this edge
                     vertx[0] = fx + vertIndeces[0][0] * fxSize;
                     vertx[1] = fy + vertIndeces[0][1] * fySize;
@@ -1581,31 +1679,33 @@ template<typename DataType> void vtkContourVolumeMapper::CreateMCubes_new(int LO
                     // reminder: x, y and z are indices of voxel in volume
                     int gradient[2][3];
                     for (int vi = 0; vi < 2; vi++) {
-                      const DataType * const verticePtr = voxelPtr + VoxelOffsets[vi == 0 ? vert0 : vert1];    // pointer to vert0 or vert1
+                      // calculate pointer to vert0 or vert1
+                      // you can check that this corresponds to (vx,vy,vz) using PointerFromIndices()
+                      const DataType * const verticePtr = voxelPtr + VoxelOffsets[vi == 0 ? vert0 : vert1];
 
                       // gradient in x
-                      const int vx = x + vertIndeces[vi][0];    // x index of vertex
+                      const int vx = x + lodxy*vertIndeces[vi][0];    // x index of vertex
                       if (vx == 0)
                         gradient[vi][0] = (int)(verticePtr[1] - verticePtr[0]) ;
-                      else if (vx == lastIndex[0])
+                      else if (vx >= lastIndex[0])
                         gradient[vi][0] = (int)(verticePtr[0] - verticePtr[-1]) ;
                       else
                         gradient[vi][0] = ((int)(verticePtr[1] - verticePtr[-1])) >> 1 ;
 
                       // gradient in y
-                      const int vy = y + vertIndeces[vi][1];    // y index of vertex
+                      const int vy = y + lodxy*vertIndeces[vi][1];    // y index of vertex
                       if (vy == 0)
                         gradient[vi][1] = (int)(verticePtr[rowSize] - verticePtr[0]) ;
-                      else if (vy == lastIndex[1])
+                      else if (vy >= lastIndex[1])
                         gradient[vi][1] = (int)(verticePtr[0] - verticePtr[-rowSize]) ;
                       else
                         gradient[vi][1] = ((int)(verticePtr[rowSize] - verticePtr[-rowSize])) >> 1 ;
 
                       // gradient in z
-                      const int vz = z + vertIndeces[vi][2];    // z index of vertex
+                      const int vz = z + lodz*vertIndeces[vi][2];    // z index of vertex
                       if (vz == 0)
                         gradient[vi][2] = (int)(verticePtr[sliceSize] - verticePtr[0]) ;
-                      else if (vz == lastIndex[2])
+                      else if (vz >= lastIndex[2])
                         gradient[vi][2] = (int)(verticePtr[0] - verticePtr[-sliceSize]) ;
                       else
                         gradient[vi][2] = ((int)(verticePtr[sliceSize] - verticePtr[-sliceSize])) >> 1 ;
@@ -1631,47 +1731,57 @@ template<typename DataType> void vtkContourVolumeMapper::CreateMCubes_new(int LO
                     pointLocatorRef = PolyDataIndex[vertexno++]; // normals precede vertices
                   }
 
-                } // for ii (next edge in triangle)
+              } // for ii (next edge in triangle)
 
-                // finished triangle - transfer cell data (ie the vertex indices of the triangle)
-                triangles->InsertNextCell(3, PolyDataIndex) ;
-                numberOfTrianglesInBlock++;
+              // finished triangle - transfer cell data (ie the vertex indices of the triangle)
+              triangles->InsertNextCell(3, PolyDataIndex) ;
+              numberOfTrianglesInBlock++;
 
-              } // while(*edge) (next triangle in edge list)
+            } // while(*edge) (next triangle in edge list)
 
-              this->VoxelsRendered++;
+            this->VoxelsRendered++;
 
-            } // next xi
-          } // next yi
-        } // next zi
+          } // next xi
+        } // next yi
 
-        this->NumberOfTriangles[LODLevel] += numberOfTrianglesInBlock;
+        this->CreatedTriangles += numberOfTrianglesInBlock;
 
       } // nextbxi
     } // next byi
-  } // next bzi
+  } // next z
 
 
 
-  for (int z = 0; z < this->DataDimensions[2]; z++)
-    delete polylines[z];
+  for (int plI = 0; plI < 2 ;  plI++)
+    polylines[plI].clear() ;
 
   // this measures the percentage of empty blocks
   this->SkippedVoxelBlocks = 100.f * this->SkippedVoxelBlocks / (this->NumBlocks[2] * this->NumBlocks[1] * this->NumBlocks[0]);
 
-  mafLogMessage("CreateMCubes: triangles = %d  cells = %d", this->NumberOfTriangles[LODLevel], triangles->GetNumberOfCells()) ;
+  // mafLogMessage("CreateMCubes: cv = %f lod = %d triangles = %d", this->ContourValue, LODLevel, this->CreatedTriangles) ;
+  // mafLogMessage("CreateMCubes: no. of pts = %d", points->GetNumberOfPoints()) ;
 
 
-  // free unused memory
+  // free unused memory (beware of memory leaks if ref count is not 1)
   points->Squeeze();
   vertexNormals->Squeeze();
   triangles->Squeeze();
 
+  // assign points, triangles andnormals to polydata
+  polydata->SetPoints(points);
+  polydata->SetPolys(triangles);
+  polydata->GetPointData()->SetNormals(vertexNormals);
+
+  // delete local objects (removes reference but doesn't delete from polydata)
+  points->Delete() ;
+  vertexNormals->Delete() ;
+  triangles->Delete() ;
+
+  delete [] pointLocator ;
+
   this->UpdateProgress(1.f);
+
 } // CreateMCubes_new()
-
-
-
 
 
 
@@ -1680,7 +1790,7 @@ template<typename DataType> void vtkContourVolumeMapper::CreateMCubes_new(int LO
 // Marching cubes with result as vtkPolyData
 // Similar to RenderMCubes(), but doesn't render or cache
 // Called by GetOutput()
-template<typename DataType> void vtkContourVolumeMapper::CreateMCubes(int level, vtkPolyData *polydata, const DataType *dataPointer) {
+template<typename DataType> void vtkContourVolumeMapper::CreateMCubes_old(int level, vtkPolyData *polydata, const DataType *dataPointer) {
   //------------------------------------------------------------------------------
   const int estimatedNumberOfTriangles = (this->PrevContourValue == this->ContourValue) ? (this->NumberOfTriangles[level] + 100) : 1000000;
   this->CreatedTriangles = 0;
@@ -1882,8 +1992,11 @@ template<typename DataType> void vtkContourVolumeMapper::CreateMCubes(int level,
   normals->Squeeze();
   triangles->Squeeze();
 
+  // mafLogMessage("CreateMCubes: cv = %f", this->ContourValue) ;
+  // mafLogMessage("CreateMCubes: no. of pts = %d", points->GetNumberOfPoints()) ;
+
   this->UpdateProgress(1.f);
-} // CreateMCubes()
+} // CreateMCubes_old()
 
 
 
@@ -2137,7 +2250,7 @@ int vtkContourVolumeMapper::BestLODForDrawCache(vtkRenderer *renderer)
 //------------------------------------------------------------------------------
 {
   // return level zero if auto lod not enabled
-  if (!this->EnableAutoLOD)
+  if (!this->AutoLODRender)
     return 0 ;
 
   // return highest lod with acceptable no. of triangles and time to draw
@@ -2156,12 +2269,12 @@ int vtkContourVolumeMapper::BestLODForDrawCache(vtkRenderer *renderer)
 
 //------------------------------------------------------------------------------
 // Return highest resolution (LOD) which RenderMCubes() can draw
-// Used to decide which LOD to create and render
+// Used to decide which LOD to render
 int vtkContourVolumeMapper::BestLODForRenderMCubes(vtkRenderer *renderer)
 //------------------------------------------------------------------------------
 {
   // return level zero if auto lod not enabled
-  if (!this->EnableAutoLOD)
+  if (!this->AutoLODRender)
     return 0 ;
 
   // return highest lod with acceptable no. of triangles and time to draw
@@ -2178,32 +2291,30 @@ int vtkContourVolumeMapper::BestLODForRenderMCubes(vtkRenderer *renderer)
 
 
 
-
-
 //------------------------------------------------------------------------------
-// Free caches and set stats to undefined, eg after contour value changes
-void vtkContourVolumeMapper::ClearCachesAndStats()
+// Return highest resolution (LOD) which CreateMCubes() can extract
+// Used to decide which LOD to create
+int vtkContourVolumeMapper::BestLODForCreateMCubes()
 //------------------------------------------------------------------------------
 {
+  // return level zero if auto lod not enabled
+  if (!this->AutoLODCreate)
+    return 0 ;
+
+  // return highest lod with acceptable no. of triangles
   for (int lod = 0 ;  lod < NumberOfLods ;  lod++){
-    // delete triangle caches
-    delete [] this->TriangleCache[lod];
-    this->TriangleCache[lod] = NULL;
-    this->TriangleCacheSize[lod] = 0;
-
-    // delete vertex order array
-    delete[] ordered_vertices[lod] ;
-    ordered_vertices[lod] = NULL ;
-
-    // set stats to undefined
-    this->NumberOfTriangles[lod] = -1 ;
-    this->TimeToDrawDC[lod] = -1.0 ;
-    this->TimeToDrawRMC[lod] = -1.0 ;
+    if (EstimateNumberOfTriangles(lod) < MaxTrianglesNotOptimized)
+      return lod ;
   }
 
-  this->CacheCreated = false ;
-
+  // nothing valid - return lowest level
+  return NumberOfLods - 1 ;
 }
+
+
+
+
+
 
 
 
@@ -2215,7 +2326,10 @@ static const vtkMarchingSquaresLineCases* marchingSquaresCases = vtkMarchingSqua
 
 
 //------------------------------------------------------------------------------
-void vtkContourVolumeMapper::PrepareContours(const int slice, const void *imageData, ListOfPolyline2D& polylines) {
+// Call PrepareContoursTemplate() for data type
+void vtkContourVolumeMapper::PrepareContours(const int slice, const void *imageData, ListOfPolyline2D& polylines)
+//------------------------------------------------------------------------------
+{
   this->Polylines = &polylines;
 
   switch (this->GetDataType()) {
@@ -2237,7 +2351,10 @@ void vtkContourVolumeMapper::PrepareContours(const int slice, const void *imageD
 
 
 //------------------------------------------------------------------------------
-template<typename DataType> void vtkContourVolumeMapper::PrepareContoursTemplate(const int slice, const DataType *imageData) {
+// Prepare contours
+template<typename DataType> void vtkContourVolumeMapper::PrepareContoursTemplate(const int slice, const DataType *imageData) 
+//------------------------------------------------------------------------------
+{
   const DataType (* const BlockMinMax)[2] = (DataType (*)[2])((DataType *)this->BlockMinMax + 2 * (slice >> VoxelBlockSizeLog) * this->NumBlocks[0] * this->NumBlocks[1]);
   const DataType ContourValue = (DataType)this->ContourValue;
   const int lastXBlock = this->NumBlocks[0] - 1, lastYBlock = this->NumBlocks[1] - 1;
@@ -2951,7 +3068,9 @@ bool Polyline2D::IsInsideOf(const Polyline2D *outerPolyline) const {
 
 //------------------------------------------------------------------------------
 // Clear the list of polylines
-void ListOfPolyline2D::clear() {
+void ListOfPolyline2D::clear() 
+//------------------------------------------------------------------------------
+{
   for (int pj = size() - 1; pj >= 0; pj--)
     delete at(pj);
   erase(begin(), end());

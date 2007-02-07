@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkContourVolumeMapper.h,v $
 Language:  C++
-Date:      $Date: 2007-01-17 17:03:48 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2007-02-07 11:23:07 $
+Version:   $Revision: 1.9 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -139,18 +139,23 @@ public:
   void  SetInput(vtkDataSet *input);
   vtkDataSet*  GetInput() { return (vtkDataSet*)vtkVolumeMapper::GetInput(); }
 
-  /** Render the isosurface
+  /** 
+  Render the isosurface.
   If data has been cached for this contour value, calls DrawCache()
   Else calls PrepareAccelerationDataTemplate() and RenderMCubes() */
   void Render(vtkRenderer *ren, vtkVolume *vol);
 
   /** Enable or disable multi-resolution feature. By default it is enabled  */
-  vtkGetMacro(EnableAutoLOD, int);    
-  void SetEnableAutoLOD(int val) { this->EnableAutoLOD = val; }
-  vtkBooleanMacro(EnableAutoLOD, int);
+  vtkGetMacro(AutoLODRender, int);    
+  void SetAutoLODRender(int val) { this->AutoLODRender = val; }
+  vtkBooleanMacro(AutoLODRender, int);
 
-  /**
-  Enable or disables optimization of produced polydata by eliminating 
+  /** Enable or disable multi-resolution feature. By default it is enabled  */
+  vtkGetMacro(AutoLODCreate, int);    
+  void SetAutoLODCreate(int val) { this->AutoLODCreate = val; }
+  vtkBooleanMacro(AutoLODCreate, int);
+
+  /** Enable or disables optimization of produced polydata by eliminating 
   "non-visible" enclosed surfaces from the output.*/
   vtkGetMacro(EnableContourAnalysis, int);    
   void SetEnableContourAnalysis(int val) { this->EnableContourAnalysis = val; }
@@ -166,8 +171,11 @@ public:
   bool IsDataValid(bool warnings);
 
   /**
-  This class can function both as a mapper and as polydata source. The level parameter controls the 
-  resolution of the extracted surface: 0 - original surface, 1- simplified surface.*/
+  This class can function both as a mapper and as polydata source. 
+  This function extracts the isosurface as polydata.
+  The level parameter controls the resolution of the extracted surface,
+  where level=0 is full resolution, 1 is 1/2, 2 is 1/4 and 3 is 1/8
+  Allocates polydata if input polydata is NULL */
   vtkPolyData *GetOutput(int level = 0, vtkPolyData *data = NULL);
 
   /**
@@ -186,6 +194,12 @@ public:
   void SetAlpha(double alpha){m_Alpha=alpha;};
 
   void SetMaxScalar(double scalar){m_MAXScalar=scalar;};
+
+  /** Return the index increments in xy and z given the lod index
+  For lod = 0,1,2,3... lodxy = 2^n = 1,2,4,8...
+  However, the resolution in z, between slice planes, may already be poor, so
+  lodz <= lodx such that z resolution is not worse than x resolution. */
+  void CalculateLodIncrements(int lod, int *lodxy, int *lodz) const ;
 
 protected:
   vtkContourVolumeMapper();
@@ -230,11 +244,6 @@ protected:
 
   void ReleaseData();
 
-  /** Return the index increments in xy and z given the lod index
-  For lod = 0,1,2,3... lodxy = 2^n = 1,2,4,8...
-  However, the resolution in z, between slice planes, may already be poor, so
-  lodz <= lodx such that z resolution is not worse than x resolution. */
-  void CalculateLodIncrements(int lod, int *lodxy, int *lodz) const ;
 
   /** Return vertices of voxel cube as offsets to indices in data array */
   void CalculateVoxelVertIndicesOffsets(int lod, int *offset) const ;
@@ -266,8 +275,12 @@ protected:
   int BestLODForDrawCache(vtkRenderer *renderer) ;
 
   /** Return highest resolution (LOD) which RenderMCubes() can draw
-  Used to decide which LOD to create and render */
+  Used to decide which LOD to render */
   int BestLODForRenderMCubes(vtkRenderer *renderer) ;
+
+  /** Return highest resolution (LOD) which CreateMCubes() can extract
+  Used to decide which LOD to create */
+  int BestLODForCreateMCubes() ;
 
   /** Free caches and set stats to undefined, eg after contour value changes */
   void ClearCachesAndStats() ;
@@ -308,7 +321,8 @@ private:
 
   // parameters of the mapper
   float          ContourValue;           ///< current contour value
-  int            EnableAutoLOD;          ///< shall we use multiresolution?
+  int            AutoLODRender;          ///< enable level of detail when rendering
+  int            AutoLODCreate;          ///< enable level of detail when extracting polydata
   int            EnableContourAnalysis;  ///< shall we optimize the surface?
 
   // to set the alpha parameter
@@ -419,7 +433,7 @@ protected:
 
 //------------------------------------------------------------------------------
 // class ListOfPolyline2D
-// This is a std::vector of polyline pointers
+// This is a std::vector of polyline pointers, with 3 extra functions
 //------------------------------------------------------------------------------
 class ListOfPolyline2D : public std::vector<Polyline2D*> 
 {
