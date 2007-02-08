@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCT.cpp,v $
 Language:  C++
-Date:      $Date: 2007-01-26 16:45:49 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-02-08 22:13:26 $
+Version:   $Revision: 1.4 $
 Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -130,6 +130,7 @@ void mafViewCT::OnEvent(mafEventBase *maf_event)
 		{
 			case ID_LAYOUT_HEIGHT:
 			case ID_LAYOUT_WIDTH:
+				break;
 			default:
 				mafEventMacro(*maf_event);
 		}
