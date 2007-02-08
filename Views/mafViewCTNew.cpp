@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-02-06 15:52:12 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-02-08 23:07:56 $
+Version:   $Revision: 1.3 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -100,7 +100,7 @@ mafViewCTNew::mafViewCTNew(wxString label)
 
 	m_WidthSection = 50;
 	m_HeightSection = 50;
-	m_Position[0] = m_Position[1] = m_Position[2] = 50.0;
+	m_Position[0] = m_Position[1] = m_Position[2] = 0.0;
 	m_Normal[0] = 0.0;
 	m_Normal[1] = 0.0;
 	m_Normal[2] = 1.0;
@@ -300,7 +300,10 @@ void mafViewCTNew::ProbeVolume()
 	vtk_data->GetSpacing(m_Spacing);
 
 	mmaVolumeMaterial *vol_material = (m_CurrentVolume)->GetMaterial();
-	vtkLookupTable *lut = vol_material->m_ColorLut;
+	mmaVolumeMaterial *copy;
+	mafNEW(copy);
+	copy->DeepCopy(vol_material);
+	vtkLookupTable *lut = copy->m_ColorLut;
 
 
 	/*double vectX[3],vectY[3];
