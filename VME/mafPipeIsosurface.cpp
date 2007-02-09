@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-02-07 11:24:20 $
-Version:   $Revision: 1.14 $
+Date:      $Date: 2007-02-09 15:50:10 $
+Version:   $Revision: 1.15 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -62,6 +62,8 @@ mafPipeIsosurface::mafPipeIsosurface()
 	m_ContourValue    = 300.0;
 
 	m_AlphaValue			= 1.0;
+
+  m_BoundingBoxVisibility = true;
 }
 //----------------------------------------------------------------------------
 void mafPipeIsosurface::Create(mafSceneNode *n)
@@ -114,14 +116,17 @@ void mafPipeIsosurface::Create(mafSceneNode *n)
 	property->SetInterpolationToFlat();
 	m_OutlineActor->SetProperty(property);
 
-	m_AssemblyFront->AddPart(m_OutlineActor);
+  if(m_BoundingBoxVisibility)
+	  m_AssemblyFront->AddPart(m_OutlineActor);
 }
 //----------------------------------------------------------------------------
 mafPipeIsosurface::~mafPipeIsosurface()
 //----------------------------------------------------------------------------
 {
 	m_AssemblyFront->RemovePart(m_Volume);
-	m_AssemblyFront->RemovePart(m_OutlineActor);
+	
+  if(m_BoundingBoxVisibility)
+    m_AssemblyFront->RemovePart(m_OutlineActor);
 
 	vtkDEL(m_Volume);
 	vtkDEL(m_OutlineActor);
@@ -218,4 +223,10 @@ void mafPipeIsosurface::OnEvent(mafEventBase *maf_event)
 			break;
 		}
 	}
+}
+//----------------------------------------------------------------------------
+void mafPipeIsosurface::EnableBoundingBoxVisibility(bool enable)
+//----------------------------------------------------------------------------
+{
+   m_BoundingBoxVisibility = enable;
 }
