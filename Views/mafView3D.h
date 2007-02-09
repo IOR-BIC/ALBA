@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.h,v $
   Language:  C++
-  Date:      $Date: 2007-01-19 15:26:20 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-02-09 16:41:10 $
+  Version:   $Revision: 1.2 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -48,7 +48,7 @@ public:
 
   /** IDs for the GUI */
   enum VIEW_RX_WIDGET_ID
-  {
+  { 
     ID_NONE = Superclass::ID_LAST,
 		ID_COMBO_PIPE,
     ID_LAST
@@ -58,7 +58,7 @@ public:
   Create the visual pipe for the node passed as argument. 
   To create visual pipe first check in m_PipeMap if custom visual pipe is defined, 
   otherwise ask to vme which is its visual pipe. */
-  //virtual void VmeCreatePipe(mafNode *vme);
+  virtual void VmeCreatePipe(mafNode *vme);
 
 	virtual void VmeSelect(mafNode *vme, bool select);
 

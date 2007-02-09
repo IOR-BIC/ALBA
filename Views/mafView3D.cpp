@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-19 15:26:20 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-02-09 16:41:10 $
+  Version:   $Revision: 1.2 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,6 +32,7 @@
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
 #include "mafVMESlicer.h"
+#include "mafPipeIsosurface.h"
 
 #include "vtkDataSet.h"
 #include "vtkRayCast3DPicker.h"
@@ -39,7 +40,8 @@
 
 enum ID_PIPE
 {
-	ID_PIPE_MIP = 0,
+  ID_PIPE_ISO = 0,
+	ID_PIPE_MIP ,
 	ID_PIPE_DRR,
 	ID_PIPE_VR
 };
@@ -53,7 +55,7 @@ mafView3D::mafView3D(wxString label, int camera_position, bool show_axes, bool s
 :mafViewVTK(label,camera_position,show_axes,show_grid,show_ruler,stereo)
 //----------------------------------------------------------------------------
 {
-	m_Choose = ID_PIPE_MIP;
+	m_Choose = ID_PIPE_ISO;
 }
 //----------------------------------------------------------------------------
 mafView3D::~mafView3D()
@@ -86,14 +88,22 @@ void mafView3D::OnEvent(mafEventBase *maf_event)
 					{
 						this->VmeShow(selectedvme,false);
 						wxBusyCursor wait;
-						if(m_Choose == ID_PIPE_MIP)
+						if(m_Choose == ID_PIPE_ISO)
 						{
-							this->PlugVisualPipe("mafVMEVolumeGray","medPipeVolumeMIP");
+							this->PlugVisualPipe("mafVMEVolumeGray","mafPipeIsosurface");
 						}
+            else if(m_Choose == ID_PIPE_MIP)
+            {
+              this->PlugVisualPipe("mafVMEVolumeGray","medPipeVolumeMIP");
+            }
 						else if(m_Choose == ID_PIPE_DRR)
+            {
 							this->PlugVisualPipe("mafVMEVolumeGray","medPipeVolumeDRR");
+            }
             else if(m_Choose == ID_PIPE_VR)
+            {
               this->PlugVisualPipe("mafVMEVolumeGray","medPipeVolumeVR");
+            }
 						this->VmeShow(selectedvme,true);
 						mafEventMacro(mafEvent(this,VME_SELECT,selectedvme->GetParent()));
             mafEventMacro(mafEvent(this,VME_SELECT,selectedvme));
@@ -129,9 +139,9 @@ void mafView3D::Create()
   m_Picker2D->SetTolerance(0.005);
   m_Picker2D->InitializePickList();
 
-	this->PlugVisualPipe("mafVMEVolumeGray","medPipeVolumeMIP");
+	this->PlugVisualPipe("mafVMEVolumeGray","mafPipeIsosurface");
 }
-/*//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void mafView3D::VmeCreatePipe(mafNode *vme)
 //----------------------------------------------------------------------------
 {
@@ -151,6 +161,10 @@ void mafView3D::VmeCreatePipe(mafNode *vme)
       pipe->SetListener(this);
       mafSceneNode *n = m_Sg->Vme2Node(vme);
       assert(n && !n->m_Pipe);
+      if(pipe_name == "mafPipeIsosurface")
+      {
+        ((mafPipeIsosurface *)pipe)->EnableBoundingBoxVisibility(false);
+      }
       pipe->Create(n);
       n->m_Pipe = (mafPipe*)pipe;
       if (m_NumberOfVisibleVme == 1)
@@ -168,6 +182,7 @@ void mafView3D::VmeCreatePipe(mafNode *vme)
     }
   }
 }
+/*
 //----------------------------------------------------------------------------
 void mafView3D::VmeDeletePipe(mafNode *vme)
 //----------------------------------------------------------------------------
@@ -183,8 +198,8 @@ mmgGui *mafView3D::CreateGui()
 {
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
-	wxString choices[3] = {"MIP","DRR","VR"};
-	m_Gui->Combo(ID_COMBO_PIPE,_("Choose pipe"),&m_Choose,3,choices);
+	wxString choices[4] = {"ISO","MIP","DRR","VR"};
+	m_Gui->Combo(ID_COMBO_PIPE,_("Choose pipe"),&m_Choose,4,choices);
 	m_Gui->Divider();
   return m_Gui;
 }
