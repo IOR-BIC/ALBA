@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputPolyline.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-29 12:06:27 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-02-09 10:31:33 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -79,7 +79,7 @@ mmgGui* mafVMEOutputPolyline::CreateGui()
   vtk_data_type << mafString(GetVTKData()->GetClassName());
   m_Gui->Label(_("vtk type: "), vtk_data_type, true);
   
-  CalculateLength();
+  //m_Length = mafString(wxString::Format(_("%.2f"),CalculateLength()));
   m_Gui->Label(_(" Length: "), &m_Length ,true);
 
   m_NumberOfPoints = mafString(((vtkPolyData *)m_VME->GetOutput()->GetVTKData())->GetNumberOfPoints());

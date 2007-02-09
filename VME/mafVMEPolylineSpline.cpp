@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolylineSpline.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-08 16:43:40 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-02-09 10:31:33 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi & Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -175,65 +175,20 @@ void mafVMEPolylineSpline::InternalUpdate() //Multi
 
   ForwardUpEvent(&mafEvent(this,PROGRESSBAR_SHOW));
 
-  // ALGORITHM
+  vtkMAFSmartPointer<vtkPolyData> poly;
+  poly->DeepCopy(((vtkPolyData*)vme->GetOutput()->GetVTKData()));
+  poly->Update();
 
-   m_PointsSplined->Reset();
+  this->SplinePolyline(poly); // generate a "splined" polyline 
 
-	 //cleaned point list
-	 vtkMAFSmartPointer<vtkPoints> pts;
-   
-	 pts->DeepCopy(((vtkPolyData*)vme->GetOutput()->GetVTKData())->GetPoints());
+  this->OrderPolyline(poly); // create orderer sequence of points and cells
 
-	 /*vtkMAFSmartPointer<vtkCellArray> lineCells;
-	 lineCells->InsertNextCell(pts->GetNumberOfPoints());
-	 for (int i = 0; i < pts->GetNumberOfPoints(); i ++)
-		 lineCells->InsertCellPoint(i);      */ 
+	m_Polyline->DeepCopy(poly);
+	m_Polyline->Update();
 
+	ForwardUpEvent(&mafEvent(this,PROGRESSBAR_HIDE));
 
-	 vtkMAFSmartPointer<vtkCardinalSpline> splineX;
-	 vtkMAFSmartPointer<vtkCardinalSpline> splineY;
-	 vtkMAFSmartPointer<vtkCardinalSpline> splineZ;
-
-	 for(int i=0 ; i<pts->GetNumberOfPoints(); i++)
-	 {
-		 //mafLogMessage(wxString::Format(_("old %d : %f %f %f"), i, pts->GetPoint(i)[0],pts->GetPoint(i)[1],pts->GetPoint(i)[2] ));
-		 splineX->AddPoint(i, pts->GetPoint(i)[0]);
-		 splineY->AddPoint(i, pts->GetPoint(i)[1]);
-		 splineZ->AddPoint(i, pts->GetPoint(i)[2]);
-	 }
-
-	 for(int i=0 ; i<(pts->GetNumberOfPoints() * m_SplineCoefficient); i++)
-	 {		 
-		 double t;
-	   t = ( pts->GetNumberOfPoints() - 1.0 ) / ( pts->GetNumberOfPoints()*m_SplineCoefficient - 1.0 ) * i;
-		 m_PointsSplined->InsertPoint(i , splineX->Evaluate(t), splineY->Evaluate(t), splineZ->Evaluate(t));
-		 
-	 }
-
-	 vtkMAFSmartPointer<vtkCellArray> cellArray;
-	 int pointId[2];
-
-	 for(int i = 0; i< m_PointsSplined->GetNumberOfPoints();i++)
-   {
-     if (i > 0)
-     {             
-       pointId[0] = i - 1;
-       pointId[1] = i;
-       cellArray->InsertNextCell(2 , pointId);  
-     }
-   }
-
-	 vtkMAFSmartPointer<vtkPolyData> poly;
-	 poly->SetPoints(m_PointsSplined);
-	 poly->SetLines(cellArray);
-	 poly->Update();
-
-	 m_Polyline->DeepCopy(poly);
-	 m_Polyline->Update();
-
-	 ForwardUpEvent(&mafEvent(this,PROGRESSBAR_HIDE));
-
-	 Modified();
+	Modified();
 }
 //-----------------------------------------------------------------------
 void mafVMEPolylineSpline::InternalPreUpdate()
@@ -353,6 +308,7 @@ void mafVMEPolylineSpline::OnEvent(mafEventBase *maf_event)
 					SetPolylineLink(n);
 					m_PolylineLinkName = n->GetName();
 					InternalUpdate();
+          GetPolylineOutput()->Update();
 					m_Gui->Update();
         }
       }
@@ -360,6 +316,7 @@ void mafVMEPolylineSpline::OnEvent(mafEventBase *maf_event)
 			case ID_NUMBER_NODES:
 				{
 					InternalUpdate();
+          GetPolylineOutput()->Update();
 				}
 				break;
       default:
@@ -370,4 +327,67 @@ void mafVMEPolylineSpline::OnEvent(mafEventBase *maf_event)
   {
     Superclass::OnEvent(maf_event);
   }
+}
+//-------------------------------------------------------------------------
+void mafVMEPolylineSpline::OrderPolyline(vtkPolyData *polyline)
+//-------------------------------------------------------------------------
+{
+  //cell 
+  vtkMAFSmartPointer<vtkCellArray> cellArray;
+  int pointId[2];
+
+  for(int i = 0; i< polyline->GetNumberOfPoints();i++)
+  {
+    if (i > 0)
+    {             
+      pointId[0] = i - 1;
+      pointId[1] = i;
+      cellArray->InsertNextCell(2 , pointId);  
+    }
+  }
+
+  polyline->SetLines(cellArray);
+  polyline->Modified();
+  polyline->Update();
+}
+//-------------------------------------------------------------------------
+void mafVMEPolylineSpline::SplinePolyline(vtkPolyData *polyline)
+//-------------------------------------------------------------------------
+{
+  // ALGORITHM
+  m_PointsSplined->Reset();
+
+  //cleaned point list
+  vtkMAFSmartPointer<vtkPoints> pts;
+
+  pts->DeepCopy(polyline->GetPoints());
+
+  /*vtkMAFSmartPointer<vtkCellArray> lineCells;
+  lineCells->InsertNextCell(pts->GetNumberOfPoints());
+  for (int i = 0; i < pts->GetNumberOfPoints(); i ++)
+  lineCells->InsertCellPoint(i);      */ 
+
+
+  vtkMAFSmartPointer<vtkCardinalSpline> splineX;
+  vtkMAFSmartPointer<vtkCardinalSpline> splineY;
+  vtkMAFSmartPointer<vtkCardinalSpline> splineZ;
+
+  for(int i=0 ; i<pts->GetNumberOfPoints(); i++)
+  {
+    //mafLogMessage(wxString::Format(_("old %d : %f %f %f"), i, pts->GetPoint(i)[0],pts->GetPoint(i)[1],pts->GetPoint(i)[2] ));
+    splineX->AddPoint(i, pts->GetPoint(i)[0]);
+    splineY->AddPoint(i, pts->GetPoint(i)[1]);
+    splineZ->AddPoint(i, pts->GetPoint(i)[2]);
+  }
+
+  for(int i=0 ; i<(pts->GetNumberOfPoints() * m_SplineCoefficient); i++)
+  {		 
+    double t;
+    t = ( pts->GetNumberOfPoints() - 1.0 ) / ( pts->GetNumberOfPoints()*m_SplineCoefficient - 1.0 ) * i;
+    m_PointsSplined->InsertPoint(i , splineX->Evaluate(t), splineY->Evaluate(t), splineZ->Evaluate(t));
+
+  }
+
+  polyline->SetPoints(m_PointsSplined);
+  polyline->Update();
 }

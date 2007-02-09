@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolylineSpline.h,v $
   Language:  C++
-  Date:      $Date: 2007-02-08 16:43:40 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-02-09 10:31:33 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi & Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -80,7 +80,18 @@ public:
   Set links for the Polyline*/
   void SetPolylineLink(mafNode *n);
 
+  /** 
+  Get links for the Polyline*/
 	mafVME *GetPolylineLink();
+
+  /** 
+  Order the points and cell in polydata*/
+  void SplinePolyline(vtkPolyData *polyline);
+
+  /** 
+  Order the points and cell in polydata*/
+  void OrderPolyline(vtkPolyData *polyline);
+
 
 	enum SPLINE_WIDGET_ID
   {
