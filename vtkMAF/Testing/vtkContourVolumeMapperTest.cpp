@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkContourVolumeMapperTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-02-07 11:23:44 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2007-02-09 15:52:19 $
+Version:   $Revision: 1.8 $
 Authors:   Matteo Giacomoni, Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -70,8 +70,11 @@ void vtkContourVolumeMapperTest::setUp()
 
 void vtkContourVolumeMapperTest::tearDown()
 {
-  vtkDEL(m_RGData);
-  vtkDEL(m_ImageData);
+  m_RGData->Delete() ;
+  m_ImageData->Delete() ;
+
+  m_RGData = NULL ;
+  m_ImageData = NULL ;
 
 }
 
@@ -82,12 +85,12 @@ void vtkContourVolumeMapperTest::TestFixture()
 }
 
 //------------------------------------------------------------------------------
-// Test the mapper with rect. gris data
+// Test the mapper with rect. grid data
 void vtkContourVolumeMapperTest::TestRectilinearGrid() 
 //------------------------------------------------------------------------------
 {
-	char filename[]   = "cubePolyFromRG";
-	//------------------ create objects
+  char filename[]   = "cubePolyFromRG";
+  //------------------ create objects
   vtkContourVolumeMapper *mapper = vtkContourVolumeMapper::New();
   vtkMAFSmartPointer<vtkVolume> volume;
   volume->SetMapper(mapper);
@@ -101,31 +104,26 @@ void vtkContourVolumeMapperTest::TestRectilinearGrid()
   vtkRenderWindowInteractor *iren = vtkRenderWindowInteractor::New();
   iren->SetRenderWindow(renWin);
 
-	// prepare for rendering
+  // prepare for rendering
   iren->SetStillUpdateRate(0.05f);
   iren->SetDesiredUpdateRate(15.f);
   vtkInteractorStyleSwitch *style = vtkInteractorStyleSwitch::New();
   iren->SetInteractorStyle(style);
   style->SetCurrentStyleToTrackballActor();
   style->Delete();
-  
+
   renderer->SetBackground(0.05f, 0.05f, 0.05f);
   renWin->SetSize(1024, 768);
 
-	int dims[3];
-	double b[2];
-  //------------------ load (create) data
-  
-	vtkRectilinearGrid *data = vtkRectilinearGrid::New();
-	
-  data->DeepCopy(m_RGData);
+  int dims[3];
+  double b[2];
 
-  data->GetDimensions(dims);
-	mapper->SetInput(data);
-	data->GetScalarRange(b);
-	mapper->SetMaxScalar(b[1]);
-	CPPUNIT_ASSERT(data->GetNumberOfPoints()==(dims[0] * dims[1] * dims[2]));
-	data->Delete();
+  //------------------ load (create) data
+  m_RGData->GetDimensions(dims);
+  mapper->SetInput(m_RGData);
+  m_RGData->GetScalarRange(b);
+  mapper->SetMaxScalar(b[1]);
+  CPPUNIT_ASSERT(m_RGData->GetNumberOfPoints()==(dims[0] * dims[1] * dims[2]));
 
 
   vtkOutlineCornerFilter *filter = vtkOutlineCornerFilter::New();
@@ -145,7 +143,7 @@ void vtkContourVolumeMapperTest::TestRectilinearGrid()
   vtkVolumeSlicer *slicer = NULL, *pslicer = NULL;
 
   mapper->SetEnableContourAnalysis(CleanModel);
-    
+
   renderer->GetActiveCamera()->SetViewAngle(vtkMath::RadiansToDegrees() * 2.f * atan(renWin->GetSize()[1] * 0.27 / (2.f * 700.f)));
   renderer->GetActiveCamera()->SetEyeAngle(2.5);
   renderer->ResetCamera();
@@ -176,6 +174,8 @@ void vtkContourVolumeMapperTest::TestRectilinearGrid()
       int nactual = polydata->GetNumberOfPoints() ;
       CPPUNIT_ASSERT(polydata->GetNumberOfPoints()==npts);
       // renWin->Render();
+
+      polydata->Delete() ;
     }
   }
 
@@ -195,7 +195,7 @@ void vtkContourVolumeMapperTest::TestRectilinearGrid()
 
     writer->Delete();
     polydata->Delete();
-    }
+  }
 
   //------------------ delete objects
   renderer->Delete();
@@ -241,18 +241,13 @@ void vtkContourVolumeMapperTest::TestImageData()
 
   int dims[3];
   double b[2];
+
   //------------------ load (create) data
-
-  vtkImageData *data = vtkImageData::New();
-
-  data->DeepCopy(m_ImageData);
-
-  data->GetDimensions(dims);
-  mapper->SetInput(data);
-  data->GetScalarRange(b);
+  m_ImageData->GetDimensions(dims);
+  mapper->SetInput(m_ImageData);
+  m_ImageData->GetScalarRange(b);
   mapper->SetMaxScalar(b[1]);
-  CPPUNIT_ASSERT(data->GetNumberOfPoints()==(dims[0] * dims[1] * dims[2]));
-  data->Delete();
+  CPPUNIT_ASSERT(m_ImageData->GetNumberOfPoints()==(dims[0] * dims[1] * dims[2]));
 
   vtkOutlineCornerFilter *filter = vtkOutlineCornerFilter::New();
   filter->SetInput(mapper->GetInput());
@@ -300,6 +295,8 @@ void vtkContourVolumeMapperTest::TestImageData()
       vtkPolyData *polydata = mapper->GetOutput(lod);
       CPPUNIT_ASSERT(polydata->GetNumberOfPoints()==npts);
       // renWin->Render();
+
+      polydata->Delete() ;   
     }
   }
 
@@ -330,59 +327,102 @@ void vtkContourVolumeMapperTest::TestImageData()
   mafSleep(1000);
 }
 
-//-----------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+// Create the Rectlinear Grid volume
 void vtkContourVolumeMapperTest::CreateDataRG()
-//-----------------------------------------------------------
+//------------------------------------------------------------------------------
 {
-    m_RGData = vtkRectilinearGrid::New();
-		int dims[3];
-		m_RGData->SetExtent(0, 8, 0, 8, 0, 8);
-    m_RGData->GetDimensions(dims);
-    vtkFloatArray *xyarray = vtkFloatArray::New();
-    xyarray->Allocate(dims[0]);
-    xyarray->SetNumberOfTuples(dims[0]);
-    for (int x = 0; x < dims[0]; x++) {
-      float fx = float(x) * 0.5f;
-      xyarray->SetTuple(x, &fx);
+  int dims[3] = {9, 9, 9} ;
+
+  // do nothing if data already created
+  if (m_RGData != NULL)
+    return ;
+
+  // create data set
+  m_RGData = vtkRectilinearGrid::New();
+  m_RGData->Initialize() ;
+  m_RGData->SetDimensions(dims) ;
+
+  // create data array of desired type
+  vtkShortArray *DA = vtkShortArray::New() ;
+
+  // create arrays for coords of points
+  int x, y, z ;
+  vtkFloatArray *xCoords = vtkFloatArray::New() ;
+  vtkFloatArray *yCoords = vtkFloatArray::New() ;
+  vtkFloatArray *zCoords = vtkFloatArray::New() ;
+  for (x = 0 ;  x < dims[0] ;  x++)
+    xCoords->InsertNextValue((float)x) ;
+  for (y = 0 ;  y < dims[0] ;  y++)
+    yCoords->InsertNextValue((float)y) ;
+  for (z = 0 ;  z < dims[0] ;  z++)
+    zCoords->InsertNextValue((float)z) ;
+
+  // write data into array
+  DA->SetNumberOfComponents(1) ;
+  float r ;
+  float c = 255.0 / (float)(dims[2]-1) ;
+  for (z = 0 ;  z < dims[2] ;  z++){
+    r = c * z ;
+    for (y = 0 ;  y < dims[1] ;  y++){
+      for (x = 0 ;  x < dims[0] ;  x++){
+        DA->InsertNextTuple1(r) ;
+      }
     }
-    m_RGData->SetXCoordinates(xyarray);
-    m_RGData->SetYCoordinates(xyarray);
-    m_RGData->SetZCoordinates(xyarray);
-    xyarray->Delete();
+  }
 
-    m_RGData->GetPointData()->SetScalars(vtkShortArray::New());
-    m_RGData->GetPointData()->GetScalars()->Allocate(dims[0] * dims[1] * dims[2]);
-    m_RGData->GetPointData()->GetScalars()->SetNumberOfComponents(1);
-    m_RGData->GetPointData()->GetScalars()->SetNumberOfTuples(dims[0] * dims[1] * dims[2]);
-    short* ptr = (short*)m_RGData->GetPointData()->GetScalars()->GetVoidPointer(0);
-    for (int z = 0; z < dims[2]; z++)
-      for (int y = 0; y < dims[1]; y++)
-        for (int x = 0; x < dims[0]; x++)
-          //*(ptr++) = abs(x - (dims[0] >> 1)) << 1;
-					*(ptr++)=z;
+  // assign scalar array and coords to rect grid
+  m_RGData->GetPointData()->SetScalars(DA) ;
+  m_RGData->SetXCoordinates(xCoords) ;
+  m_RGData->SetYCoordinates(yCoords) ;
+  m_RGData->SetZCoordinates(zCoords) ;
 
+  // delete local arrays
+  DA->Delete() ;
+  xCoords->Delete() ;
+  yCoords->Delete() ;
+  zCoords->Delete() ;
 }
+
+
 //-----------------------------------------------------------
 void vtkContourVolumeMapperTest::CreateDataID()
 //-----------------------------------------------------------
 {
-		m_ImageData = vtkImageData::New();
-		int dims[3], dataExtent[6];
-		m_ImageData->SetExtent(0, 64, 0, 64, 0, 64);
-    m_ImageData->GetDimensions(dims);
-		m_ImageData->AllocateScalars();
-    m_ImageData->SetSpacing(1, 1, 1);
-    m_ImageData->GetExtent(dataExtent);
-    m_ImageData->SetWholeExtent(dataExtent);
+  int dims[3] = {64, 64, 64} ;
+  double spacing[3] = {1.0, 1.0, 1.0} ;
 
-    m_ImageData->GetPointData()->SetScalars(vtkShortArray::New());
-    m_ImageData->GetPointData()->GetScalars()->Allocate(dims[0] * dims[1] * dims[2]);
-    m_ImageData->GetPointData()->GetScalars()->SetNumberOfComponents(1);
-    m_ImageData->GetPointData()->GetScalars()->SetNumberOfTuples(dims[0] * dims[1] * dims[2]);
-    short* ptr = (short*)m_ImageData->GetPointData()->GetScalars()->GetVoidPointer(0);
-    for (int z = 0; z < dims[2]; z++)
-      for (int y = 0; y < dims[1]; y++)
-        for (int x = 0; x < dims[0]; x++)
-					*(ptr++)=z;
+  // do nothing if data already created
+  if (m_ImageData != NULL)
+    return ;
 
+  // create data set
+  m_ImageData = vtkImageData::New();
+  m_ImageData->Initialize() ;
+  m_ImageData->SetDimensions(dims) ;
+  m_ImageData->SetSpacing(spacing);
+
+  // create data array of desired type
+  vtkShortArray *DA = vtkShortArray::New() ;
+
+  // write data into array
+  DA->SetNumberOfComponents(1) ;
+  float r ;
+  float c = 255.0 / (float)(dims[2]-1) ;
+  for (int z = 0 ;  z < dims[2] ;  z++){
+    r = c*z ;
+    for (int y = 0 ;  y < dims[1] ;  y++){
+      for (int x = 0 ;  x < dims[0] ;  x++){
+        DA->InsertNextTuple1(r) ;
+      }
+    }
+  }
+
+  // assign scalar array and coords to image
+  m_ImageData->GetPointData()->SetScalars(DA) ;
+
+  // delete local arrays
+  DA->Delete() ;
 }
