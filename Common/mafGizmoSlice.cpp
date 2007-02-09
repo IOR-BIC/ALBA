@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-18 16:57:52 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-02-09 14:43:43 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -263,6 +263,28 @@ void mafGizmoSlice::InitSnapArray(mafVME *vol, int axis)
 		    this->m_SnapArray->SetValue(i,z);
 	    }
     }
+	if(vol_data->IsA("vtkPolyData"))
+	{
+		double b[6];
+		vol_data->GetBounds(b);
+		this->m_SnapArray = vtkDoubleArray::New();
+		this->m_SnapArray->SetNumberOfValues(2);
+		if(axis == GIZMO_SLICE_X)
+		{
+			this->m_SnapArray->SetValue(0,b[0]);
+			this->m_SnapArray->SetValue(1,b[1]);
+		}
+		else if(axis == GIZMO_SLICE_Y)
+		{
+			this->m_SnapArray->SetValue(0,b[2]);
+			this->m_SnapArray->SetValue(1,b[3]);
+		}
+		else if(axis == GIZMO_SLICE_Z)
+		{
+			this->m_SnapArray->SetValue(0,b[4]);
+			this->m_SnapArray->SetValue(1,b[5]);
+		}
+	}
   }
 }
 //----------------------------------------------------------------------------
