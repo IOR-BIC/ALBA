@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkContourVolumeMapper.cxx,v $
 Language:  C++
-Date:      $Date: 2007-02-07 11:23:07 $
-Version:   $Revision: 1.16 $
+Date:      $Date: 2007-02-09 15:51:45 $
+Version:   $Revision: 1.17 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -109,7 +109,7 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
 
 using namespace vtkContourVolumeMapperNamespace;
 
-vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.16 $");
+vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.17 $");
 vtkStandardNewMacro(vtkContourVolumeMapper);
 
 
@@ -1409,22 +1409,17 @@ template<typename DataType> void vtkContourVolumeMapper::CreateMCubes(int LODLev
   // estimate intial no. of triangles to allocate
   const int estimatedNumberOfTriangles = (this->PrevContourValue == this->ContourValue) ? (this->NumberOfTriangles[LODLevel] + 100) : MaxTrianglesNotOptimized;
 
-  // create arrays for points, triangles and normals, and assign to polydata
-  // nb unregister reduces ref count by 1 so that the objects get deleted when the polydata is deleted.
+
+  // create arrays for points, triangles and normals.
+  // These will be assigned to the polydata at the end.
   vtkPoints *points = vtkPoints::New();
-  //polydata->SetPoints(points);
-  //points->Delete() ;
   points->Allocate(estimatedNumberOfTriangles);         // allocates space for this many points (3 floats per point)
 
   vtkCellArray *triangles = vtkCellArray::New();
-  //polydata->SetPolys(triangles);
-  //triangles->Delete() ;
   triangles->Allocate(3 * estimatedNumberOfTriangles);  // allocates space for this many vertex indices (vtkIdType's)
 
   vtkFloatArray *vertexNormals = vtkFloatArray::New();
   vertexNormals->SetNumberOfComponents(3);
-  //polydata->GetPointData()->SetNormals(vertexNormals);
-  //vertexNormals->Delete() ;
   vertexNormals->Allocate(3 * estimatedNumberOfTriangles);    // allocates space for this many floats, so have to multiply by 3 yourself this time
 
 
