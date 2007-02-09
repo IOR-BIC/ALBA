@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-02-09 10:06:51 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2007-02-09 16:07:47 $
+Version:   $Revision: 1.5 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -105,12 +105,7 @@ mafViewCTNew::mafViewCTNew(wxString label)
 	m_Normal[1] = 0.0;
 	m_Normal[2] = 1.0;
 
-	m_TextActor=NULL;
-	m_Actor=NULL;
-	m_Text=NULL;
-	m_Mapper=NULL;
-	m_Prober=NULL;
-	m_PlaneSec=NULL;
+
 }
 //----------------------------------------------------------------------------
 mafViewCTNew::~mafViewCTNew()
@@ -118,12 +113,43 @@ mafViewCTNew::~mafViewCTNew()
 {
 	m_ViewCTCompound = NULL;
 
-	vtkDEL(m_TextActor);
-	vtkDEL(m_Actor);
-	vtkDEL(m_Text);
-	vtkDEL(m_Mapper);
-	vtkDEL(m_Prober);
-	vtkDEL(m_PlaneSec);
+  int num = CT_CHILD_VIEWS_NUMBER;
+  /*for(int i=0; i<num; i++)
+  {
+    vtkDEL(m_TextActor[i]);
+  }*/
+	m_TextActor.clear();
+
+  /*for(int i=0; i<num; i++)
+  {
+    vtkDEL(m_Actor[i]);
+  }*/
+  m_Actor.clear();
+
+  /*for(int i=0; i<num; i++)
+  {
+    vtkDEL(m_Text[i]);
+  }*/
+  m_Text.clear();
+	
+  /*for(int i=0; i<num; i++)
+  {
+    vtkDEL(m_Mapper[i]);
+  }*/
+  m_Mapper.clear();
+	
+  /*for(int i=0; i<num; i++)
+  {
+    vtkDEL(m_Prober[i]);
+  }*/
+  m_Prober.clear();
+	
+  /*for(int i=0; i<num; i++)
+  {
+    vtkDEL(m_PlaneSec[i]);
+  }*/
+  m_PlaneSec.clear();
+
 }
 //----------------------------------------------------------------------------
 mafView *mafViewCTNew::Copy(mafObserver *Listener)
@@ -144,8 +170,8 @@ mafView *mafViewCTNew::Copy(mafObserver *Listener)
 void mafViewCTNew::VmeShow(mafNode *node, bool show)
 //----------------------------------------------------------------------------
 {
-	for(int i=0; i<this->GetNumberOfSubView(); i++)
-		m_ChildViewList[i]->VmeShow(node, show);
+	/*for(int i=0; i<this->GetNumberOfSubView(); i++)
+		m_ChildViewList[i]->VmeShow(node, show);*/
 
 	if(node->IsA("mafVMEVolumeGray"))
 	{
@@ -158,8 +184,8 @@ void mafViewCTNew::VmeShow(mafNode *node, bool show)
 		{
 			for(int i=0; i<this->GetNumberOfSubView(); i++)
 			{
-				m_ChildViewList[i]->GetSceneGraph()->m_RenFront->RemoveActor(m_Actor);
-				m_ChildViewList[i]->GetSceneGraph()->m_RenFront->RemoveActor(m_TextActor);
+				m_ChildViewList[i]->GetSceneGraph()->m_RenFront->RemoveActor(m_Actor[i]);
+				m_ChildViewList[i]->GetSceneGraph()->m_RenFront->RemoveActor(m_TextActor[i]);
 			}
 			m_CurrentVolume = NULL;
 		}
@@ -205,7 +231,23 @@ mmgGui* mafViewCTNew::CreateGui()
 //-------------------------------------------------------------------------
 {
 	assert(m_Gui == NULL);
-	m_Gui = new mmgGui(this);
+
+  // creation
+  int num = CT_CHILD_VIEWS_NUMBER;
+  
+  for(int i=0; i<num; i++)
+  {
+    m_TextActor.push_back(vtkActor2D::New());
+    m_Actor.push_back(vtkActor::New());
+    m_Text.push_back(vtkTextMapper::New());
+    m_Mapper.push_back(vtkPolyDataMapper::New());
+    m_Prober.push_back(vtkProbeFilter::New());
+    m_PlaneSec.push_back(vtkPlaneSource::New());
+  }
+  
+  // end creation
+  
+  m_Gui = new mmgGui(this);
 
 	m_Gui->Integer(ID_LAYOUT_WIDTH,"Width",&m_WidthSection);
 	m_Gui->Integer(ID_LAYOUT_HEIGHT,"Height",&m_HeightSection);
@@ -244,7 +286,7 @@ void mafViewCTNew::CreateGuiView()
 void mafViewCTNew::PackageView()
 //----------------------------------------------------------------------------
 {
-	m_ViewCTCompound = new mafViewCompound("CT view",1,1);
+	m_ViewCTCompound = new mafViewCompound("CT view",2,5);
 	mafViewVTK *vs = new mafViewVTK("Slice view");
 	/*m_Vs->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice",MUTEX);
 	m_Vs->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice",MUTEX);
@@ -288,215 +330,188 @@ void mafViewCTNew::VmeSelect(mafNode *node, bool select)
 void mafViewCTNew::ProbeVolume()
 //----------------------------------------------------------------------------
 {
-	mafViewSlice *vslice = (mafViewSlice *)m_ChildViewList[0];
-	if (m_Actor)
-	{
-		vslice->GetSceneGraph()->m_RenFront->RemoveActor(m_Actor);
-	}
+  double b[6];
+  m_CurrentVolume->GetOutput()->Update();
+  m_CurrentVolume->GetOutput()->GetBounds(b);
+  vtkImageData *vtk_data = ((vtkImageData *)m_CurrentVolume->GetOutput()->GetVTKData());
+  vtk_data->GetSpacing(m_Spacing);
 
-	double b[6];
-	m_CurrentVolume->GetOutput()->Update();
-	m_CurrentVolume->GetOutput()->GetBounds(b);
-	vtkImageData *vtk_data = ((vtkImageData *)m_CurrentVolume->GetOutput()->GetVTKData());
-	vtk_data->GetSpacing(m_Spacing);
-
-	mmaVolumeMaterial *vol_material = (m_CurrentVolume)->GetMaterial();
-	mmaVolumeMaterial *copy;
-	mafNEW(copy);
-	copy->DeepCopy(vol_material);
-	vtkLookupTable *lut = copy->m_ColorLut;
+  for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++)
+  {
+    mafViewVTK *vslice = ((mafViewVTK *)((mafViewCompound *)m_ChildViewList[0])->GetSubView(i));
+	  if (m_Actor[i])
+	  {
+		  vslice->GetSceneGraph()->m_RenFront->RemoveActor(m_Actor[i]);
+	  }
 
 
-	/*double vectX[3],vectY[3];
-	vectY[0] = (b[1] - b[0])/2 - m_WidthSection/2.0;
-	vectY[1] = (b[3] - b[2])/2 + m_HeightSection/2.0;
-	vectY[2] = (b[5] - b[4])/2;
+    mmaVolumeMaterial *vol_material = (m_CurrentVolume)->GetMaterial();
+    mmaVolumeMaterial *copy;
+    mafNEW(copy);
+    copy->DeepCopy(vol_material);
+    vtkLookupTable *lut = copy->m_ColorLut; 
 
-	double normal[3];
-	normal[0] = m_Normal[0];
-	normal[1] = m_Normal[1];
-	normal[2] = m_Normal[2];
+	  vtkMAFSmartPointer<vtkPoints> source_points;
+	  source_points->SetNumberOfPoints(2);
+	  source_points->SetPoint(0,0,0,0);
+	  source_points->SetPoint(1,1,0,0);
 
-	vtkMath::Normalize(normal);
-	vtkMath::Normalize(vectY);
-	vtkMath::Cross(vectY,normal, vectX);
-	vtkMath::Normalize(vectX);
-	vtkMath::Cross(normal,vectX, vectY);
-	vtkMath::Normalize(vectY);
+	  vtkMAFSmartPointer<vtkPoints> target_points;
+	  target_points->SetNumberOfPoints(2);
+	  target_points->SetPoint(0,m_Position);
+	  vtkMath::Normalize(m_Normal);
+	  double p2[3];
+	  p2[0]=m_Position[0] + m_Normal[0];
+	  p2[1]=m_Position[1] + m_Normal[1];
+	  p2[2]=m_Position[2] + m_Normal[2];
+	  target_points->SetPoint(1,p2);
 
-	double vect[3], vect1[3], vect2[3];
-	vect1[0] = ((double)m_WidthSection/2) * vectX[0];
-	vect1[1] = -((double)m_WidthSection/2) * vectX[1];
-	vect1[2] = ((double)m_WidthSection/2) * vectX[2];
+	  vtkMAFSmartPointer<vtkLandmarkTransform> trans_matrix;
+	  trans_matrix->SetSourceLandmarks(source_points.GetPointer());
+	  trans_matrix->SetTargetLandmarks(target_points.GetPointer());
+	  trans_matrix->SetModeToRigidBody();
+	  trans_matrix->Update();
 
-	vect2[0] = ((double)m_HeightSection/2) * vectY[0];
-	vect2[1] = ((double)m_HeightSection/2) * vectY[1];
-	vect2[2] = ((double)m_HeightSection/2) * vectY[2];
+	  vtkMAFSmartPointer<vtkTransform> trans;
+	  trans->SetMatrix(trans_matrix->GetMatrix());
 
-	vect[0] = vect1[0] + vect2[0];
-	vect[1] = vect1[1] + vect2[1];
-	vect[2] = vect1[2] + vect2[2];*/
-
-	vtkMAFSmartPointer<vtkPoints> source_points;
-	source_points->SetNumberOfPoints(2);
-	source_points->SetPoint(0,0,0,0);
-	source_points->SetPoint(1,1,0,0);
-
-	vtkMAFSmartPointer<vtkPoints> target_points;
-	target_points->SetNumberOfPoints(2);
-	target_points->SetPoint(0,m_Position);
-	vtkMath::Normalize(m_Normal);
-	double p2[3];
-	p2[0]=m_Position[0] + m_Normal[0];
-	p2[1]=m_Position[1] + m_Normal[1];
-	p2[2]=m_Position[2] + m_Normal[2];
-	target_points->SetPoint(1,p2);
-
-	vtkMAFSmartPointer<vtkLandmarkTransform> trans_matrix;
-	trans_matrix->SetSourceLandmarks(source_points.GetPointer());
-	trans_matrix->SetTargetLandmarks(target_points.GetPointer());
-	trans_matrix->SetModeToRigidBody();
-	trans_matrix->Update();
-
-	vtkMAFSmartPointer<vtkTransform> trans;
-	trans->SetMatrix(trans_matrix->GetMatrix());
-
-	vtkMAFSmartPointer<vtkTransformPolyDataFilter> trans_poly;
-	trans_poly->SetTransform(trans);
+	  vtkMAFSmartPointer<vtkTransformPolyDataFilter> trans_poly;
+	  trans_poly->SetTransform(trans);
 
 
-	//+++ create plane
-	vtkNEW(m_PlaneSec);
-	m_PlaneSec->SetOrigin(0,m_WidthSection/2.0,m_HeightSection/2.0);
-	m_PlaneSec->SetPoint1(0,-m_WidthSection/2.0,m_HeightSection/2.0);
-	m_PlaneSec->SetPoint2(0,m_WidthSection/2.0,-m_HeightSection/2.0);
-	m_PlaneSec->SetXResolution((int)(m_WidthSection/(VALUE*m_Spacing[0])));
-	m_PlaneSec->SetYResolution((int)(m_HeightSection/(VALUE*m_Spacing[1])));
-	//planeSec->SetNormal(1,0,0);
-	m_PlaneSec->Update();
+	  //+++ create plane
 
-	trans_poly->SetInput(m_PlaneSec->GetOutput());
-	trans_poly->Update();
+	  m_PlaneSec[i]->SetOrigin(0,m_WidthSection/2.0,m_HeightSection/2.0);
+	  m_PlaneSec[i]->SetPoint1(0,-m_WidthSection/2.0,m_HeightSection/2.0);
+	  m_PlaneSec[i]->SetPoint2(0,m_WidthSection/2.0,-m_HeightSection/2.0);
+	  m_PlaneSec[i]->SetXResolution((int)(m_WidthSection/(VALUE*m_Spacing[0])));
+	  m_PlaneSec[i]->SetYResolution((int)(m_HeightSection/(VALUE*m_Spacing[1])));
+	  //planeSec->SetNormal(1,0,0);
+	  m_PlaneSec[i]->Update();
 
-	//+++using prober
+	  trans_poly->SetInput(m_PlaneSec[i]->GetOutput());
+	  trans_poly->Update();
 
-	//double *b = new double[6];
-	////////////////////////////////////////////////
-	// No Thickness Code
-	////////////////////////////////////////////////
-	//if(m_AdditionalProfileNumber == 0)
-	//{
-	vtkNEW(m_Prober);
-	//prober->SetInput(m_PlaneSection[s]);
-	m_Prober->SetInput(trans_poly->GetOutput());
-	m_Prober->SetSource(vtk_data);
-	m_Prober->Update();
-	//vtkMAFSmartPointer<vtkPolyDataMapper> m_Mapper;
+	  //+++using prober
 
-	//m_Mapper->SetInput(m_Prober->GetPolyDataOutput());
-	//m_Mapper->SetInput(sphere->GetOutput());
+	  //double *b = new double[6];
+	  ////////////////////////////////////////////////
+	  // No Thickness Code
+	  ////////////////////////////////////////////////
+	  //if(m_AdditionalProfileNumber == 0)
+	  //{
+	  
+	  //prober->SetInput(m_PlaneSection[s]);
+	  m_Prober[i]->SetInput(trans_poly->GetOutput());
+	  m_Prober[i]->SetSource(vtk_data);
+	  m_Prober[i]->Update();
+	  //vtkMAFSmartPointer<vtkPolyDataMapper> m_Mapper;
 
-	double sr[2];
-	m_Prober->GetOutput()->GetScalarRange(sr);
-	lut->SetTableRange(sr);
+	  //m_Mapper->SetInput(m_Prober->GetPolyDataOutput());
+	  //m_Mapper->SetInput(sphere->GetOutput());
 
-	m_Prober->GetPolyDataOutput()->GetBounds(b);
+	  double sr[2];
+	  m_Prober[i]->GetOutput()->GetScalarRange(sr);
+	  lut->SetTableRange(sr);
 
-	double *centerSlice = new double[3];
-	m_Prober->GetPolyDataOutput()->GetCenter(centerSlice);
-	//m_SliceOriginVector.push_back(centerSlice);
-	//m_SliceBoundsVector.push_back(b);
-	//}
+	  m_Prober[i]->GetPolyDataOutput()->GetBounds(b);
 
-	vtkMAFSmartPointer<vtkTransform> transform;
-	transform->SetMatrix(m_CurrentVolume->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
-	transform->Update();
+	  double *centerSlice = new double[3];
+	  m_Prober[i]->GetPolyDataOutput()->GetCenter(centerSlice);
+	  //m_SliceOriginVector.push_back(centerSlice);
+	  //m_SliceBoundsVector.push_back(b);
+	  //}
 
-	vtkMAFSmartPointer<vtkTransformPolyDataFilter> tpdf;
-	tpdf->SetInput(m_Prober->GetPolyDataOutput());
-	tpdf->SetTransform(transform);
-	tpdf->Update();
+	  vtkMAFSmartPointer<vtkTransform> transform;
+	  transform->SetMatrix(m_CurrentVolume->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+	  transform->Update();
 
-	vtkNEW(m_Mapper);
-	m_Mapper->SetInput(tpdf->GetOutput());
+	  vtkMAFSmartPointer<vtkTransformPolyDataFilter> tpdf;
+	  tpdf->SetInput(m_Prober[i]->GetPolyDataOutput());
+	  tpdf->SetTransform(transform);
+	  tpdf->Update();
 
-	m_Mapper->SetScalarRange(sr);
-	m_Mapper->SetLookupTable(lut);
+	  
+	  m_Mapper[i]->SetInput(tpdf->GetOutput());
 
-	//+++creare attore
-	//++++settare nelle slice
-	vtkNEW(m_Actor);
-	m_Actor->SetMapper(m_Mapper);
-	//m_Actor->GetProperty()->SetOpacity(0.7);
+	  m_Mapper[i]->SetScalarRange(sr);
+	  m_Mapper[i]->SetLookupTable(lut);
 
-	//m_SectionActor.push_back(m_Actor);
+	  //+++creare attore
+	  //++++settare nelle slice
+	  
+	  m_Actor[i]->SetMapper(m_Mapper[i]);
+	  //m_Actor->GetProperty()->SetOpacity(0.7);
 
-	vtkNEW(m_Text);
-	mafString t;
-	t = "test";
-	m_Text->SetInput(t);
-	m_Text->GetTextProperty()->SetColor(1.0,1.0,1.0);
-	//text->GetTextProperty()->BoldOn();
+	  //m_SectionActor.push_back(m_Actor);
 
-	//text->GetTextProperty()->SetJustificationToRight();
-	//text->GetTextProperty()->SetVerticalJustificationToBottom();
-	vtkNEW(m_TextActor);
-	m_TextActor->SetMapper(m_Text);
+	  
+	  mafString t;
+	  t = "test";
+	  m_Text[i]->SetInput(t);
+	  m_Text[i]->GetTextProperty()->SetColor(1.0,1.0,1.0);
+	  //text->GetTextProperty()->BoldOn();
 
-
-	/*if (s == m_StartIndexSliceVisualized)
-	{
-	for(int i = 0 ; i < DEFAULT_NUM_SLICES; i++)
-	{
-	mafViewSliceDP *vslice = (mafViewSliceDP *)((mafViewCompoundDP *)m_ChildViewList[1])->GetSubView(i);
-	vslice->BorderDelete();
-	}
-	}*/
-
-	//mafViewSliceDP *vslice = (mafViewSliceDP *)((mafViewCompoundDP *)m_ChildViewList[1])->GetSubView(s-m_StartIndexSliceVisualized);
+	  //text->GetTextProperty()->SetJustificationToRight();
+	  //text->GetTextProperty()->SetVerticalJustificationToBottom();
+	  
+	  m_TextActor[i]->SetMapper(m_Text[i]);
 
 
-	//m_SectionLabel.push_back(textActor);
+	  /*if (s == m_StartIndexSliceVisualized)
+	  {
+	  for(int i = 0 ; i < DEFAULT_NUM_SLICES; i++)
+	  {
+	  mafViewSliceDP *vslice = (mafViewSliceDP *)((mafViewCompoundDP *)m_ChildViewList[1])->GetSubView(i);
+	  vslice->BorderDelete();
+	  }
+	  }*/
+
+	  //mafViewSliceDP *vslice = (mafViewSliceDP *)((mafViewCompoundDP *)m_ChildViewList[1])->GetSubView(s-m_StartIndexSliceVisualized);
 
 
-	//vslice->GetRWI()->GetCamera()->SetFocalPoint(p2);
-	//vslice->GetRWI()->GetCamera()->SetPosition(p1);
-	//vslice->GetRWI()->GetCamera()->SetViewUp(0,0,1);
-	vslice->GetRWI()->GetCamera()->SetClippingRange(0.1,1000);
-	//vslice->GetRWI()->GetCamera()->ParallelProjectionOn();
+	  //m_SectionLabel.push_back(textActor);
 
-	/*int h = m_Size.GetHeight();
-	int w = m_Size.GetWidth();
-	textActor->SetPosition(w/(m_NumOfSection+1) ,DEFAULT_POS_ACTOR_X*h);*/
+
+	  //vslice->GetRWI()->GetCamera()->SetFocalPoint(p2);
+	  //vslice->GetRWI()->GetCamera()->SetPosition(p1);
+	  vslice->GetRWI()->GetCamera()->SetViewUp(0,0,1);
+	  vslice->GetRWI()->GetCamera()->SetClippingRange(0.1,1000);
+	  //vslice->GetRWI()->GetCamera()->ParallelProjectionOn();
+
+	  /*int h = m_Size.GetHeight();
+	  int w = m_Size.GetWidth();
+	  textActor->SetPosition(w/(m_NumOfSection+1) ,DEFAULT_POS_ACTOR_X*h);*/
 
 
 
-	vslice->GetSceneGraph()->m_RenFront->AddActor(m_Actor);
-	vslice->GetSceneGraph()->m_RenFront->AddActor2D(m_TextActor);
-	/*if (s == m_StartIndexSliceVisualized)
-	{
-	vslice->BorderCreate(m_StartMarkerColor);
-	}
-	else if(s == m_EndIndexSliceVisualized)
-	{
-	vslice->BorderCreate(m_EndMarkerColor);
-	}
-	else
-	{
-	vslice->BorderDelete();
-	}
-	*/
+	  vslice->GetSceneGraph()->m_RenFront->AddActor(m_Actor[i]);
+	  vslice->GetSceneGraph()->m_RenFront->AddActor2D(m_TextActor[i]);
+	  /*if (s == m_StartIndexSliceVisualized)
+	  {
+	  vslice->BorderCreate(m_StartMarkerColor);
+	  }
+	  else if(s == m_EndIndexSliceVisualized)
+	  {
+	  vslice->BorderCreate(m_EndMarkerColor);
+	  }
+	  else
+	  {
+	  vslice->BorderDelete();
+	  }
+	  */
 
-	//vslice->GetSceneGraph()->m_RenFront->ResetCamera(b);
-	//vslice->GetSceneGraph()->m_RenFront->ResetCamera();
-	vslice->CameraUpdate();
-	m_Gui->Update();
+	  vslice->GetSceneGraph()->m_RenFront->ResetCamera(b);
+	  //vslice->GetSceneGraph()->m_RenFront->ResetCamera();
+	  vslice->CameraUpdate();
+	  m_Gui->Update();
 
-	/*vslice->GetRWI()->GetCamera()->GetViewPlaneNormal(m_SliceNormal);
-	double divergence;
-	divergence = (vtkImageData::SafeDownCast(vtk_data))->GetSpacing()[0]/10;
-	m_SliceOriginVector[s-m_StartIndexSliceVisualized][0] = m_SliceOriginVector[s-m_StartIndexSliceVisualized][0] + m_SliceNormal[0] * divergence;
-	m_SliceOriginVector[s-m_StartIndexSliceVisualized][1] = m_SliceOriginVector[s-m_StartIndexSliceVisualized][1] + m_SliceNormal[1] * divergence;
-	m_SliceOriginVector[s-m_StartIndexSliceVisualized][2] = m_SliceOriginVector[s-m_StartIndexSliceVisualized][2] + m_SliceNormal[2] * divergence;*/
-	//mafLogMessage(wxString::Format(L"%f %f %f" , m_SliceNormal[0],m_SliceNormal[1],m_SliceNormal[2] ));
+	  /*vslice->GetRWI()->GetCamera()->GetViewPlaneNormal(m_SliceNormal);
+	  double divergence;
+	  divergence = (vtkImageData::SafeDownCast(vtk_data))->GetSpacing()[0]/10;
+	  m_SliceOriginVector[s-m_StartIndexSliceVisualized][0] = m_SliceOriginVector[s-m_StartIndexSliceVisualized][0] + m_SliceNormal[0] * divergence;
+	  m_SliceOriginVector[s-m_StartIndexSliceVisualized][1] = m_SliceOriginVector[s-m_StartIndexSliceVisualized][1] + m_SliceNormal[1] * divergence;
+	  m_SliceOriginVector[s-m_StartIndexSliceVisualized][2] = m_SliceOriginVector[s-m_StartIndexSliceVisualized][2] + m_SliceNormal[2] * divergence;*/
+	  //mafLogMessage(wxString::Format(L"%f %f %f" , m_SliceNormal[0],m_SliceNormal[1],m_SliceNormal[2] ));
+  }
 }

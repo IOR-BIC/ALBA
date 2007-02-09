@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.h,v $
 Language:  C++
-Date:      $Date: 2007-02-06 15:52:12 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-02-09 16:07:47 $
+Version:   $Revision: 1.3 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -112,11 +112,11 @@ protected:
 
 	mmgGui  *m_GuiViews[3];
 
-	vtkActor2D				*m_TextActor;
-	vtkActor					*m_Actor;
-	vtkTextMapper			*m_Text;
-	vtkPolyDataMapper	*m_Mapper;
-	vtkProbeFilter		*m_Prober;
-	vtkPlaneSource		*m_PlaneSec;
+  std::vector<vtkActor2D *>	        m_TextActor;
+	std::vector<vtkActor *>					  m_Actor;
+	std::vector<vtkTextMapper *>			m_Text;
+	std::vector<vtkPolyDataMapper *>	m_Mapper;
+	std::vector<vtkProbeFilter *>		  m_Prober;
+	std::vector<vtkPlaneSource *>		  m_PlaneSec;
 };
 #endif
