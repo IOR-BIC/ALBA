@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewPanoramic.h,v $
 Language:  C++
-Date:      $Date: 2007-02-05 20:48:09 $
-Version:   $Revision: 1.1 $
-Authors:   Daniele Giunchi
+Date:      $Date: 2007-02-09 15:17:02 $
+Version:   $Revision: 1.2 $
+Authors:   Daniele Giunchi , Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 

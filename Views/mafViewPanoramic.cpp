@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewPanoramic.cpp,v $
 Language:  C++
-Date:      $Date: 2007-02-05 20:48:09 $
-Version:   $Revision: 1.1 $
-Authors:   Daniele Giunchi
+Date:      $Date: 2007-02-09 15:17:02 $
+Version:   $Revision: 1.2 $
+Authors:   Daniele Giunchi , Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -119,6 +119,11 @@ int mafViewPanoramic::GetNodeStatus(mafNode *vme)
 			n = m_Sg->Vme2Node(vme);
 			n->m_Mutex = true;
 		}
+		else if (vme->IsA("mafVMEGizmo"))
+		{
+			n = m_Sg->Vme2Node(vme);
+			n->m_PipeCreatable = true;
+		}
 		else
 		{
 			n = m_Sg->Vme2Node(vme);
@@ -143,6 +148,17 @@ mmgGui *mafViewPanoramic::CreateGui()
 void mafViewPanoramic::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
+	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+	{
+		switch(maf_event->GetId()) 
+		{ 
+			case MOUSE_UP:
+			case MOUSE_MOVE:
+				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+			default:
+				mafEventMacro(*maf_event);
+		}
+	}
 	mafEventMacro(*maf_event);
 }
 //----------------------------------------------------------------------------
@@ -169,10 +185,12 @@ void mafViewPanoramic::VmeShow(mafNode *node, bool show)
 	{
 		m_CurrentPanoramic = mafVMEAdvancedProber::SafeDownCast(node);
 		GizmoCreate();
+		Superclass::VmeShow(node, show);
 	}
 	else
 	{
 		m_AttachCamera->SetVme(NULL);
+		Superclass::VmeShow(node, show);
 	}
 
 }
@@ -199,8 +217,9 @@ void mafViewPanoramic::GizmoCreate()
 		double b[6];
 		m_CurrentPanoramic->GetOutput()->GetVTKData()->GetBounds(b);
 		m_GizmoSlice[i] = new mafGizmoSlice(m_CurrentPanoramic, this);
-		m_GizmoSlice[i]->CreateGizmoSliceInLocalPositionOnAxis(i,mafGizmoSlice::GIZMO_SLICE_Z,b[2]);
+		m_GizmoSlice[i]->CreateGizmoSliceInLocalPositionOnAxis(i,mafGizmoSlice::GIZMO_SLICE_X,b[0]);
 		m_GizmoSlice[i]->SetColor(m_GizmoColor[i]);
+		m_GizmoSlice[i]->SetGizmoMovingModalityToBound();
 
 		this->VmeShow(m_GizmoSlice[i]->GetOutput(), true);
 	}
