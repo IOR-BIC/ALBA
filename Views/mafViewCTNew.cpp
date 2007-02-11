@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-02-09 16:07:47 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2007-02-11 11:02:19 $
+Version:   $Revision: 1.6 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -170,8 +170,8 @@ mafView *mafViewCTNew::Copy(mafObserver *Listener)
 void mafViewCTNew::VmeShow(mafNode *node, bool show)
 //----------------------------------------------------------------------------
 {
-	/*for(int i=0; i<this->GetNumberOfSubView(); i++)
-		m_ChildViewList[i]->VmeShow(node, show);*/
+	for(int i=0; i<this->GetNumberOfSubView(); i++)
+		m_ChildViewList[i]->VmeShow(node, show);
 
 	if(node->IsA("mafVMEVolumeGray"))
 	{
@@ -473,11 +473,11 @@ void mafViewCTNew::ProbeVolume()
 	  //m_SectionLabel.push_back(textActor);
 
 
-	  //vslice->GetRWI()->GetCamera()->SetFocalPoint(p2);
-	  //vslice->GetRWI()->GetCamera()->SetPosition(p1);
+	  vslice->GetRWI()->GetCamera()->SetFocalPoint(p2);
+	  vslice->GetRWI()->GetCamera()->SetPosition(m_Position);
 	  vslice->GetRWI()->GetCamera()->SetViewUp(0,0,1);
 	  vslice->GetRWI()->GetCamera()->SetClippingRange(0.1,1000);
-	  //vslice->GetRWI()->GetCamera()->ParallelProjectionOn();
+	  vslice->GetRWI()->GetCamera()->ParallelProjectionOn();
 
 	  /*int h = m_Size.GetHeight();
 	  int w = m_Size.GetWidth();
