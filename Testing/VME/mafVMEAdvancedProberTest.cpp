@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEAdvancedProberTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-02-11 16:24:15 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-02-11 16:33:17 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -83,7 +83,9 @@ void mafVMEAdvancedProberTest::Test()
 	//advProber->GetOutput()->GetVTKData()->GetScalarRange(srout);
 	advProber->GetMaterial()->GetMaterialTexture()->GetScalarRange(srout);
 
-
+	double b1[6],b2[6];
+	volume->GetOutput()->GetVTKData()->GetBounds(b1);
+	advProber->GetOutput()->GetVTKData()->GetBounds(b2);
 
 	mafDEL(advProber);
 	mafDEL(spline);
