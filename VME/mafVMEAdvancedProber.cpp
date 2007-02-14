@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-30 15:13:39 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-02-14 13:49:40 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -100,10 +100,6 @@ mafVMEAdvancedProber::mafVMEAdvancedProber()
 
 
   vtkNEW(m_Image);
-	m_Image->AllocateScalars();
-	m_Image->AllocateScalars();
-	m_Image->AllocateScalars();
-	m_Image->AllocateScalars();
   vtkNEW(m_IMTC);
   vtkNEW(m_Points);
   vtkNEW(m_Plane);
@@ -135,12 +131,11 @@ mafVMEAdvancedProber::~mafVMEAdvancedProber()
   cppDEL(m_VMEVolumeAccept);
   cppDEL(m_VMEPolylineAccept);
 
+	vtkDEL(m_Lut);
   vtkDEL(m_Image);
   vtkDEL(m_IMTC);
   vtkDEL(m_Points);
   vtkDEL(m_Plane);
-//  mafDEL(m_FinalImage);
-  //mafDEL(m_Surface);
 
   SetOutput(NULL);
 }
@@ -174,7 +169,7 @@ int mafVMEAdvancedProber::InternalInitialize()
 void mafVMEAdvancedProber::InternalUpdate() //Multi
 //-----------------------------------------------------------------------
 {
-  wxBusyCursor wait;
+  //wxBusyCursor wait;
 	
   mafVME *vol = mafVME::SafeDownCast(GetVolumeLink());
   mafVMEPolyline *vme;
@@ -185,7 +180,6 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
   for (mafLinksMap::iterator i = GetLinks()->begin(); i != GetLinks()->end(); i++)
   {
     mafString name = i->first;
-    //mafLogMessage(name);
     if(i->first.Equals("Volume")) continue;
     if(i->second.m_Node == NULL)
     {
@@ -749,9 +743,29 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
    m_Image->AllocateScalars();
    m_Image->AllocateScalars();
    m_Image->AllocateScalars();
+	 m_Image->Update();
 
-   for(int i=0 ; i<m_Image->GetNumberOfPoints(); i++)
-     m_Image->GetPointData()->GetScalars()->SetTuple4(i, 0,0,0,0);
+	 vtkMAFSmartPointer<vtkDoubleArray> x;
+	 vtkMAFSmartPointer<vtkDoubleArray> y;
+	 vtkMAFSmartPointer<vtkDoubleArray> z;
+
+	 for(int i = 0 ; i < m_Points->GetNumberOfPoints() ; i++)
+	 {
+		 x->InsertNextTuple1(0.0);
+		 y->InsertNextTuple1(0.0);
+		 z->InsertNextTuple1(0.0);
+	 }
+
+	 x->SetName("XCoords");
+	 y->SetName("YCoords");
+	 z->SetName("ZCoords");
+
+	 m_Image->GetPointData()->AddArray(x);
+	 m_Image->GetPointData()->AddArray(y);
+	 m_Image->GetPointData()->AddArray(z);
+
+   /*for(int i=0 ; i<m_Image->GetNumberOfPoints(); i++)
+			m_Image->GetPointData()->GetScalars()->SetTuple4(i, 0,0,0,0);*/
    m_Image->UpdateData();
    
    //int numberPoints = prob->GetOutput()->GetNumberOfPoints();
@@ -778,9 +792,12 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
     
    
    // additional array for x,y,z coordinates
-	 vtkMAFSmartPointer<vtkDoubleArray> x;
+	 /*vtkMAFSmartPointer<vtkDoubleArray> x;
 	 vtkMAFSmartPointer<vtkDoubleArray> y;
-	 vtkMAFSmartPointer<vtkDoubleArray> z;
+	 vtkMAFSmartPointer<vtkDoubleArray> z;*/
+	 x->Reset();
+	 y->Reset();
+	 z->Reset();
 			
 	 for(int i = 0 ; i < m_Points->GetNumberOfPoints() ; i++)
 	 {
@@ -788,9 +805,9 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
 		 y->InsertNextTuple1(m_Points->GetPoint(i)[1]);
 		 z->InsertNextTuple1(m_Points->GetPoint(i)[2]);
 	 }
-	 x->SetName("XCoords");
+	 /*x->SetName("XCoords");
 	 y->SetName("YCoords");
-	 z->SetName("ZCoords");
+	 z->SetName("ZCoords");*/
 			
 	 m_Image->GetPointData()->AddArray(x);
 	 m_Image->GetPointData()->AddArray(y);
@@ -799,10 +816,15 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
    m_Image->UpdateData();
 
    
-   m_Plane->SetNormal(0,0,-1);
+   /*m_Plane->SetNormal(0,0,-1);
    m_Plane->SetOrigin(b[0],b[2],b[4]);
    m_Plane->SetPoint1(b[0] + spacing * firstDimension,b[2],b[4]);
-   m_Plane->SetPoint2(b[0],b[2]+ spacing * (numberOfIteration+1),b[4] );
+   m_Plane->SetPoint2(b[0],b[2]+ spacing * (numberOfIteration+1),b[4] );*/
+
+	 m_Plane->SetNormal(0,-1,0);
+	 m_Plane->SetOrigin(b[0],b[2],b[4]);
+	 m_Plane->SetPoint1(b[0] + spacing * firstDimension,b[2],b[4]);
+	 m_Plane->SetPoint2(b[0],b[2],b[4] + spacing * (numberOfIteration+1) );
 
    m_Plane->SetResolution(firstDimension,numberOfIteration+1);
    m_Plane->Update();
@@ -1601,9 +1623,6 @@ void mafVMEAdvancedProber::OnEvent(mafEventBase *maf_event)
 char** mafVMEAdvancedProber::GetIcon() 
 //-------------------------------------------------------------------------
 {
-#include "mafVMEAdvancedProber.xpm"
+	#include "mafVMEAdvancedProber.xpm"
   return mafVMEAdvancedProber_xpm;
-
-//  #include "mafVMEProber.xpm"
-//  return mafVMEProber_xpm;
 }
