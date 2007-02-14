@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEAdvancedProberTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-02-11 16:33:17 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-02-14 13:56:34 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -30,10 +30,12 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mmoVTKImporter.h"
 #include "mafString.h"
 #include "mmaMaterial.h"
+#include "mmaVolumeMaterial.h"
 
 #include "vtkDataSet.h"
 #include "vtkPolyData.h"
 #include "vtkImageData.h"
+#include "vtkLookupTable.h"
 
 
 void mafVMEAdvancedProberTest::Test()
@@ -42,23 +44,26 @@ void mafVMEAdvancedProberTest::Test()
 	storage->GetRoot()->SetName("root");
 	storage->GetRoot()->Initialize();
 
-	mmoVTKImporter *importer=new mmoVTKImporter("importer");;
+	mmoVTKImporter *importer_volume=new mmoVTKImporter("importer");
 	mafString filename_volume=MED_DATA_ROOT;
 	filename_volume<<"/VTK_Volumes/Volume.vtk";
-	importer->TestModeOn();
-	importer->SetFileName(filename_volume);
-	importer->SetInput(storage->GetRoot());
-	importer->ImportVTK();
-	mafVMEVolumeGray *volume=mafVMEVolumeGray::SafeDownCast(importer->GetOutput());
+	importer_volume->TestModeOn();
+	importer_volume->SetFileName(filename_volume);
+	importer_volume->SetInput(storage->GetRoot());
+	importer_volume->ImportVTK();
+	mafVMEVolumeGray *volume=mafVMEVolumeGray::SafeDownCast(importer_volume->GetOutput());
 	volume->GetOutput()->GetVTKData()->Update();
 	volume->SetParent(storage->GetRoot());
 	volume->Update();
 
+	mmoVTKImporter *importer_polyline=new mmoVTKImporter("importer");
 	mafString filename_polyline=MED_DATA_ROOT;
 	filename_polyline<<"/Polyline/Polyline.vtk";
-	importer->SetFileName(filename_polyline);
-	importer->ImportVTK();
-	mafVMEPolyline *polyline=mafVMEPolyline::SafeDownCast(importer->GetOutput());
+	importer_polyline->TestModeOn();
+	importer_polyline->SetInput(storage->GetRoot());
+	importer_polyline->SetFileName(filename_polyline);
+	importer_polyline->ImportVTK();
+	mafVMEPolyline *polyline=mafVMEPolyline::SafeDownCast(importer_polyline->GetOutput());
 	polyline->GetOutput()->GetVTKData()->Update();
 	polyline->SetParent(storage->GetRoot());
 	polyline->Update();
@@ -72,6 +77,11 @@ void mafVMEAdvancedProberTest::Test()
 
 	mafVMEAdvancedProber *advProber;
 	mafNEW(advProber);
+	
+  if(volume->GetMaterial()->m_TableRange[1] == -1)
+		volume->GetMaterial()->m_TableRange[1] = 1;
+
+	//volume->GetMaterial()->UpdateProp();
 	advProber->SetVolumeLink(mafNode::SafeDownCast(volume));
 	advProber->SetPolylineLink(mafNode::SafeDownCast(spline));
 	advProber->GetOutput()->GetVTKData()->Update();
@@ -80,15 +90,24 @@ void mafVMEAdvancedProberTest::Test()
 
 	double srin[2],srout[2];
 	volume->GetOutput()->GetVTKData()->GetScalarRange(srin);
-	//advProber->GetOutput()->GetVTKData()->GetScalarRange(srout);
-	advProber->GetMaterial()->GetMaterialTexture()->GetScalarRange(srout);
+	advProber->GetImage()->GetScalarRange(srout);
+	CPPUNIT_ASSERT(srin[0]<=srout[0] && srin[1]>=srout[1]);
 
 	double b1[6],b2[6];
 	volume->GetOutput()->GetVTKData()->GetBounds(b1);
 	advProber->GetOutput()->GetVTKData()->GetBounds(b2);
 
+	advProber->SetParent(NULL);
+	spline->SetParent(NULL);
+	volume->SetParent(NULL);
+	polyline->SetParent(NULL);
+
+	mafDEL(importer_volume);
+	mafDEL(importer_polyline);
+
 	mafDEL(advProber);
 	mafDEL(spline);
-	mafDEL(importer);
-	CPPUNIT_ASSERT(true);
+
+	mafDEL(storage);
+
 }

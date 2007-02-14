@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-09 14:43:43 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-02-14 13:56:12 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -156,6 +156,7 @@ void mafGizmoSlice::CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int 
 		  case GIZMO_SLICE_X:
       {      
 			  cubeHandleLocalPosition[0] = localPositionOnAxis;
+				if(wy<1) wy=localBounds[3]-10;
 			  ps->SetPoint1(0,wy,0);
 			  ps->SetPoint2(0,0,wz);
         m_MouseBH->GetTranslationConstraint()->SetBounds(mmiConstraint::X, interval[0]);
@@ -174,6 +175,7 @@ void mafGizmoSlice::CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int 
       {
 			  cubeHandleLocalPosition[2] = localPositionOnAxis;
 			  ps->SetPoint1(wx,0,0);
+				if(wy<1) wy=localBounds[3]-10;
 			  ps->SetPoint2(0,wy,0);
         m_MouseBH->GetTranslationConstraint()->SetBounds(mmiConstraint::Z, interval[2]);
       }
