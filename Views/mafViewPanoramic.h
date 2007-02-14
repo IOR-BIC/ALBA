@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewPanoramic.h,v $
 Language:  C++
-Date:      $Date: 2007-02-09 15:17:02 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-02-14 13:55:12 $
+Version:   $Revision: 1.3 $
 Authors:   Daniele Giunchi , Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -39,7 +39,7 @@ initialize the visual pipe according to the camera position that is passed throu
 class mafViewPanoramic: public mafViewVTK
 {
 public:
-	mafViewPanoramic(wxString label = "Image", int camera_position = CAMERA_FRONT, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0);
+	mafViewPanoramic(wxString label = "Image", int camera_position = CAMERA_BOTTOM, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0);
 	virtual ~mafViewPanoramic(); 
 
 	mafTypeMacro(mafViewPanoramic, mafViewVTK);
@@ -86,10 +86,13 @@ protected:
 	/**Create gizmos slice*/
 	void GizmoCreate();
 
-	mafGizmoSlice	*m_GizmoSlice[1];
+	/** Delete the gizmo. */
+	void GizmoDelete();
+
+	mafGizmoSlice	*m_GizmoSlice[2];
 	double			 m_Pos[6];
 
-	double			 m_GizmoColor[1][3];
+	double			 m_GizmoColor[2][3];
 
 	mafVMEAdvancedProber	*m_CurrentPanoramic;
 

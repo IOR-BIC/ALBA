@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewPanoramic.cpp,v $
 Language:  C++
-Date:      $Date: 2007-02-09 15:17:02 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-02-14 13:55:12 $
+Version:   $Revision: 1.3 $
 Authors:   Daniele Giunchi , Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -29,6 +29,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVMELandmark.h"
 #include "mafVMEAdvancedProber.h"
 #include "mafVMESurface.h"
+#include "mafVMEPolyline.h"
 #include "mafPipeFactory.h"
 #include "mafPipe.h"
 #include "mafRWI.h"
@@ -48,8 +49,14 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkRenderer.h"
 #include "vtkTextMapper.h"
 #include "vtkTextProperty.h"
+#include "vtkCamera.h"
 
-const int CT_GIZMO_NUMBER  = 1;
+enum ID_GIZMOS
+{
+	GIZMO_X=0,
+	GIZMO_Z,
+	CT_GIZMO_NUMBER,
+};
 
 
 //----------------------------------------------------------------------------
@@ -62,7 +69,7 @@ mafViewPanoramic::mafViewPanoramic(wxString label, int camera_position, bool sho
 //----------------------------------------------------------------------------
 {
 	m_GizmoColor[0][0] = 1; m_GizmoColor[0][1] = 0; m_GizmoColor[0][2] = 0;
-	//m_GizmoColor[1][0] = 0; m_GizmoColor[1][1] = 1; m_GizmoColor[1][2] = 0;
+	m_GizmoColor[1][0] = 0; m_GizmoColor[1][1] = 1; m_GizmoColor[1][2] = 0;
 
 	for(int j=0; j<CT_GIZMO_NUMBER; j++) 
 	{
@@ -105,7 +112,6 @@ void mafViewPanoramic::Create()
 	vtkNEW(m_Picker3D);
 	vtkNEW(m_Picker2D);
 	m_Picker2D->InitializePickList();
-
 }
 //-------------------------------------------------------------------------
 int mafViewPanoramic::GetNodeStatus(mafNode *vme)
@@ -114,7 +120,7 @@ int mafViewPanoramic::GetNodeStatus(mafNode *vme)
 	mafSceneNode *n = NULL;
 	if (m_Sg != NULL)
 	{
-		if (vme->IsMAFType(mafVMEImage) || vme->IsA("mafVMEAdvancedProber") || vme->IsMAFType(mafVMESurface))
+		if (vme->IsMAFType(mafVMEPolyline) || vme->IsMAFType(mafVMEImage) || vme->IsA("mafVMEAdvancedProber") || vme->IsMAFType(mafVMESurface))
 		{
 			n = m_Sg->Vme2Node(vme);
 			n->m_Mutex = true;
@@ -183,9 +189,21 @@ void mafViewPanoramic::VmeShow(mafNode *node, bool show)
 	}
 	else if (node->IsA("mafVMEAdvancedProber"))
 	{
-		m_CurrentPanoramic = mafVMEAdvancedProber::SafeDownCast(node);
-		GizmoCreate();
-		Superclass::VmeShow(node, show);
+		if(show)
+		{
+			m_CurrentPanoramic = mafVMEAdvancedProber::SafeDownCast(node);
+			GizmoCreate();
+			Superclass::VmeShow(node, show);
+			this->GetRWI()->GetCamera()->SetViewPlaneNormal(0,0,1);
+			CameraUpdate();
+		}
+		else
+		{
+			Superclass::VmeShow(node, show);
+			GizmoDelete();
+			m_CurrentPanoramic=NULL;
+			CameraUpdate();
+		}
 	}
 	else
 	{
@@ -217,10 +235,26 @@ void mafViewPanoramic::GizmoCreate()
 		double b[6];
 		m_CurrentPanoramic->GetOutput()->GetVTKData()->GetBounds(b);
 		m_GizmoSlice[i] = new mafGizmoSlice(m_CurrentPanoramic, this);
-		m_GizmoSlice[i]->CreateGizmoSliceInLocalPositionOnAxis(i,mafGizmoSlice::GIZMO_SLICE_X,b[0]);
+		if(i==GIZMO_Z)
+			m_GizmoSlice[i]->CreateGizmoSliceInLocalPositionOnAxis(i,mafGizmoSlice::GIZMO_SLICE_Z,(b[5]-b[4])/2);
+		else if(i==GIZMO_X)
+			m_GizmoSlice[i]->CreateGizmoSliceInLocalPositionOnAxis(i,mafGizmoSlice::GIZMO_SLICE_X,(b[1]-b[0])/2);
 		m_GizmoSlice[i]->SetColor(m_GizmoColor[i]);
 		m_GizmoSlice[i]->SetGizmoMovingModalityToBound();
 
 		this->VmeShow(m_GizmoSlice[i]->GetOutput(), true);
+	}
+}
+//----------------------------------------------------------------------------
+void mafViewPanoramic::GizmoDelete()
+//----------------------------------------------------------------------------
+{
+	for(int i=0; i<CT_GIZMO_NUMBER; i++)
+	{
+		if(m_GizmoSlice[i])
+		{
+			this->VmeShow(m_GizmoSlice[i]->GetOutput(), false);
+			cppDEL(m_GizmoSlice[i]);
+		}
 	}
 }
