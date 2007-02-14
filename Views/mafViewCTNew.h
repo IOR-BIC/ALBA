@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.h,v $
 Language:  C++
-Date:      $Date: 2007-02-09 16:07:47 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-02-14 13:52:50 $
+Version:   $Revision: 1.4 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -66,6 +66,7 @@ public:
 		ID_LAYOUT_HEIGHT,
 		ID_LAYOUT_POSITION,
 		ID_LAYOUT_NORMAL,
+		ID_LAYOUT_THICKNESS,
 		ID_LAYOUT_UPDATE,
 		ID_LAST
 	};
@@ -111,6 +112,11 @@ protected:
 	double m_Spacing[3];
 
 	mmgGui  *m_GuiViews[3];
+
+	// members relative to the projection
+	double m_Thickness;
+	int m_AdditionalProfileNumber;
+	double m_ProfileDistance;
 
   std::vector<vtkActor2D *>	        m_TextActor;
 	std::vector<vtkActor *>					  m_Actor;

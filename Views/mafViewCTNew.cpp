@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-02-11 11:02:19 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2007-02-14 13:52:44 $
+Version:   $Revision: 1.7 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -48,6 +48,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkLandmarkTransform.h"
 #include "vtkPoints.h"
+#include "vtkPointData.h"
 
 #define VALUE 1.5
 
@@ -105,7 +106,9 @@ mafViewCTNew::mafViewCTNew(wxString label)
 	m_Normal[1] = 0.0;
 	m_Normal[2] = 1.0;
 
-
+  m_Thickness = 0;
+	m_AdditionalProfileNumber = 0;
+	m_ProfileDistance = 0;
 }
 //----------------------------------------------------------------------------
 mafViewCTNew::~mafViewCTNew()
@@ -170,8 +173,8 @@ mafView *mafViewCTNew::Copy(mafObserver *Listener)
 void mafViewCTNew::VmeShow(mafNode *node, bool show)
 //----------------------------------------------------------------------------
 {
-	for(int i=0; i<this->GetNumberOfSubView(); i++)
-		m_ChildViewList[i]->VmeShow(node, show);
+	/*for(int i=0; i<this->GetNumberOfSubView(); i++)
+		m_ChildViewList[i]->VmeShow(node, show);*/
 
 	if(node->IsA("mafVMEVolumeGray"))
 	{
@@ -215,6 +218,27 @@ void mafViewCTNew::OnEvent(mafEventBase *maf_event)
 		case ID_LAYOUT_POSITION:
 		case ID_LAYOUT_NORMAL:
     break;
+		case ID_LAYOUT_THICKNESS:
+			{
+				if(m_Thickness == 0)
+				{
+					m_AdditionalProfileNumber = 0;
+					m_ProfileDistance = 0;
+				}
+				else
+				{
+					double spacing;
+					spacing = (m_Spacing[0] <= m_Spacing[1] ? m_Spacing[0] : m_Spacing[1]);
+					m_ProfileDistance = 2.0 * spacing;
+					m_AdditionalProfileNumber = m_Thickness / m_ProfileDistance + 1;
+					m_AdditionalProfileNumber  /= 2;
+					//mafLogMessage(m_AdditionalProfileNumber);
+					if (m_AdditionalProfileNumber * 2 > 4)
+						wxMessageBox(L"Warning: with this Thickness value, it will be required more time to process");
+				}
+
+			}
+			break;
 		case ID_LAYOUT_UPDATE:
 			ProbeVolume();
 			mafEventMacro(mafEvent(this,CAMERA_UPDATE));
@@ -255,7 +279,11 @@ mmgGui* mafViewCTNew::CreateGui()
 	m_Gui->VectorN(ID_LAYOUT_POSITION,"Position",&m_Position[0]);
 	m_Gui->VectorN(ID_LAYOUT_NORMAL,"Normal",&m_Normal[0]);
 
+	m_Gui->Double(ID_LAYOUT_THICKNESS,_("Thickness"), &m_Thickness,0,50,2,_("define the thickness of the slice"));
+
 	m_Gui->Button(ID_LAYOUT_UPDATE,"Update");
+
+	m_Gui->Label("");
 
 	return m_Gui;
 }
@@ -330,6 +358,7 @@ void mafViewCTNew::VmeSelect(mafNode *node, bool select)
 void mafViewCTNew::ProbeVolume()
 //----------------------------------------------------------------------------
 {
+	if (m_CurrentVolume == NULL) return;
   double b[6];
   m_CurrentVolume->GetOutput()->Update();
   m_CurrentVolume->GetOutput()->GetBounds(b);
@@ -398,44 +427,131 @@ void mafViewCTNew::ProbeVolume()
 	  ////////////////////////////////////////////////
 	  // No Thickness Code
 	  ////////////////////////////////////////////////
-	  //if(m_AdditionalProfileNumber == 0)
-	  //{
+	  if(m_AdditionalProfileNumber == 0)
+	  {
 	  
-	  //prober->SetInput(m_PlaneSection[s]);
-	  m_Prober[i]->SetInput(trans_poly->GetOutput());
-	  m_Prober[i]->SetSource(vtk_data);
-	  m_Prober[i]->Update();
-	  //vtkMAFSmartPointer<vtkPolyDataMapper> m_Mapper;
+			//prober->SetInput(m_PlaneSection[s]);
+			m_Prober[i]->SetInput(trans_poly->GetOutput());
+			m_Prober[i]->SetSource(vtk_data);
+			m_Prober[i]->Update();
+			//vtkMAFSmartPointer<vtkPolyDataMapper> m_Mapper;
 
-	  //m_Mapper->SetInput(m_Prober->GetPolyDataOutput());
-	  //m_Mapper->SetInput(sphere->GetOutput());
+			//m_Mapper->SetInput(m_Prober->GetPolyDataOutput());
+			//m_Mapper->SetInput(sphere->GetOutput());
 
-	  double sr[2];
-	  m_Prober[i]->GetOutput()->GetScalarRange(sr);
-	  lut->SetTableRange(sr);
+			double sr[2];
+			m_Prober[i]->GetOutput()->GetScalarRange(sr);
+			lut->SetTableRange(sr);
 
-	  m_Prober[i]->GetPolyDataOutput()->GetBounds(b);
+			m_Prober[i]->GetPolyDataOutput()->GetBounds(b);
 
-	  double *centerSlice = new double[3];
-	  m_Prober[i]->GetPolyDataOutput()->GetCenter(centerSlice);
-	  //m_SliceOriginVector.push_back(centerSlice);
-	  //m_SliceBoundsVector.push_back(b);
-	  //}
+			double *centerSlice = new double[3];
+			m_Prober[i]->GetPolyDataOutput()->GetCenter(centerSlice);
+			//m_SliceOriginVector.push_back(centerSlice);
+			//m_SliceBoundsVector.push_back(b);
+			//}
 
-	  vtkMAFSmartPointer<vtkTransform> transform;
-	  transform->SetMatrix(m_CurrentVolume->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
-	  transform->Update();
+			vtkMAFSmartPointer<vtkTransform> transform;
+			transform->SetMatrix(m_CurrentVolume->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+			transform->Update();
 
-	  vtkMAFSmartPointer<vtkTransformPolyDataFilter> tpdf;
-	  tpdf->SetInput(m_Prober[i]->GetPolyDataOutput());
-	  tpdf->SetTransform(transform);
-	  tpdf->Update();
+			vtkMAFSmartPointer<vtkTransformPolyDataFilter> tpdf;
+			tpdf->SetInput(m_Prober[i]->GetPolyDataOutput());
+			tpdf->SetTransform(transform);
+			tpdf->Update();
 
-	  
-	  m_Mapper[i]->SetInput(tpdf->GetOutput());
+		  
+			m_Mapper[i]->SetInput(tpdf->GetOutput());
 
-	  m_Mapper[i]->SetScalarRange(sr);
-	  m_Mapper[i]->SetLookupTable(lut);
+			m_Mapper[i]->SetScalarRange(sr);
+			m_Mapper[i]->SetLookupTable(lut);
+
+		}
+		////////////////////////////////////////////////
+		// Thickness Code
+		////////////////////////////////////////////////
+		else
+		{
+
+			std::vector<vtkProbeFilter *> probeVector;
+
+			for(int u= -m_AdditionalProfileNumber; u <= m_AdditionalProfileNumber ; u++)
+			{
+				vtkMAFSmartPointer<vtkPolyData> plane;
+				plane->DeepCopy(trans_poly->GetOutput());
+
+				probeVector.push_back(vtkProbeFilter::New());
+
+				// traslo il piano (in realta' tenere conto della normale)
+				//calculate direction p1-p2
+
+				double center[3];
+				plane->GetCenter(center);
+
+				double distanceCenterP2;
+				distanceCenterP2 = sqrt(vtkMath::Distance2BetweenPoints(center, p2));
+
+				vtkMAFSmartPointer<vtkTransform> tr;
+				tr->Translate(((u * m_ProfileDistance)/distanceCenterP2) * (p2[0] - center[0]), ((u * m_ProfileDistance)/distanceCenterP2) * (p2[1] - center[1]) , ((u * m_ProfileDistance)/distanceCenterP2) * (p2[2] - center[2]));
+				tr->Update();
+
+				vtkMAFSmartPointer<vtkTransformPolyDataFilter> tpdf;
+				tpdf->SetInput(plane);
+				tpdf->SetTransform(tr);
+				tpdf->Update(); 
+
+				probeVector[probeVector.size()-1]->SetSource(vtk_data);
+				//probeVector[probeVector.size()-1]->SetFilterModeToDensity();
+				probeVector[probeVector.size()-1]->SetInput(tpdf->GetOutput());
+				probeVector[probeVector.size()-1]->Update();
+			}
+
+			int number = probeVector[probeVector.size()-1]->GetPolyDataOutput()->GetNumberOfPoints();
+			std::vector<double> sumVector;
+			for(int j= 0 ; j< number; j++)
+			{
+				sumVector.push_back(0.0);  
+				for(int i=0; i< probeVector.size(); i++)
+				{
+					sumVector[j] += probeVector[i]->GetPolyDataOutput()->GetPointData()->GetScalars()->GetTuple1(j);
+				}
+				sumVector[j] = sumVector[j]/probeVector.size();
+			}
+
+
+			for(int k=0; k< number; k++)
+				probeVector[probeVector.size()-1]->GetPolyDataOutput()->GetPointData()->GetScalars()->SetTuple1(k , sumVector[k]);
+
+
+
+			double range[2];
+			probeVector[probeVector.size()-1]->GetPolyDataOutput()->GetScalarRange(range);
+
+
+			lut->SetRange(range);
+
+			vtkMAFSmartPointer<vtkTransform> transform;
+			transform->SetMatrix(m_CurrentVolume->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+			transform->Update();
+
+			vtkMAFSmartPointer<vtkTransformPolyDataFilter> tpdf;
+			tpdf->SetInput(probeVector[probeVector.size()-1]->GetPolyDataOutput());
+			tpdf->SetTransform(transform);
+			tpdf->Update();
+
+
+
+			m_Mapper[i]->SetInput(probeVector[probeVector.size()-1]->GetPolyDataOutput());
+			m_Mapper[i]->SetScalarRange(range);
+			m_Mapper[i]->SetLookupTable(lut);  	
+
+			probeVector[probeVector.size()-1]->GetPolyDataOutput()->GetBounds(b);
+
+			/*double *centerSlice = new double[3];
+			probeVector[probeVector.size()-1]->GetPolyDataOutput()->GetCenter(centerSlice);
+			m_SliceOriginVector.push_back(centerSlice);
+			m_SliceBoundsVector.push_back(b);*/
+		}
 
 	  //+++creare attore
 	  //++++settare nelle slice
