@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.h,v $
   Language:  C++
-  Date:      $Date: 2007-02-09 16:41:10 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-02-14 13:53:22 $
+  Version:   $Revision: 1.3 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -61,6 +61,10 @@ public:
   virtual void VmeCreatePipe(mafNode *vme);
 
 	virtual void VmeSelect(mafNode *vme, bool select);
+
+	/** 
+	Set the visualization status for the node (visible, not visible, mutex, ...) \sa mafSceneGraph mafView*/
+	virtual int GetNodeStatus(mafNode *vme);
 
 protected:
 

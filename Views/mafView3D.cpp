@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-09 16:41:10 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-02-14 13:53:22 $
+  Version:   $Revision: 1.3 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,6 +29,7 @@
 #include "mafPipeVolumeProjected.h"
 #include "mafVME.h"
 #include "mafVMEVolume.h"
+#include "mafVMEVolumeGray.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
 #include "mafVMESlicer.h"
@@ -221,4 +222,26 @@ void mafView3D::VmeSelect(mafNode *vme, bool select)
 			m_Gui->Enable(ID_COMBO_PIPE,false);
 		}
 	}
+	CameraUpdate();
+}
+//-------------------------------------------------------------------------
+int mafView3D::GetNodeStatus(mafNode *vme)
+//-------------------------------------------------------------------------
+{
+	mafSceneNode *n = NULL;
+	if (m_Sg != NULL)
+	{
+		if (vme->IsMAFType(mafVMEVolumeGray))
+		{
+			n = m_Sg->Vme2Node(vme);
+			n->m_Mutex = true;
+		}
+		else
+		{
+			n = m_Sg->Vme2Node(vme);
+			n->m_PipeCreatable = false;
+		}
+	}
+
+	return m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;
 }
