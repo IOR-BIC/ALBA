@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoPath.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-08 16:49:27 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-02-15 18:01:22 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -19,43 +19,25 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-
 #include "mafGizmoPath.h"
 #include "mafDecl.h"
 #include "mmaMaterial.h"
 #include "mmgMaterialButton.h"
-
 #include "mmiCompositorMouse.h"
 #include "mmiGenericMouse.h"
-
-#include "mafTransform.h"
 #include "mafSmartPointer.h"
-#include "mafTagArray.h"
 #include "mafVME.h"
 #include "mafVMEGizmo.h"
-
-#include "vtkMAFSmartPointer.h"
-#include "vtkProperty.h"
-#include "vtkPlaneSource.h"
-#include "vtkOutlineFilter.h"
-#include "vtkRectilinearGrid.h"
-#include "vtkStructuredPoints.h"
-#include "vtkPoints.h"
-#include "vtkCubeSource.h"
-#include "vtkAppendPolyData.h"
-#include "vtkPolyData.h"
-#include "vtkRenderer.h"
-#include "vtkDoubleArray.h"
-#include "vtkDOFMatrix.h"
-#include "vtkMatrix4x4.h"
-
 #include "mafVMEPolyline.h"
 #include "mafVMEPolylineSpline.h"
-#include "vtkMath.h"
 #include "mafMatrix.h"
-#include "vtkLineSource.h"
 #include "mafAbsMatrixPipe.h"
 #include "mafVMERoot.h"
+
+#include "vtkMath.h"
+#include "vtkLineSource.h"
+#include "vtkPolyData.h"
+#include "vtkProperty.h"
 
 const double defaultLineLength = 50;
 
@@ -176,21 +158,37 @@ void mafGizmoPath::SetInput( mafVME *vme )
   }
 }
 
-void mafGizmoPath::SetCurvilinearAbscissa( double s )
+int mafGizmoPath::SetCurvilinearAbscissa( double s )
 {
 
-  FindGizmoAbsPose(s);
-  
+  int retVal = FindGizmoAbsPose(s);
+  if (retVal == 0)
+  {
+    return MAF_OK;
+  } 
+  else
+  {
+    return MAF_ERROR;
+  }
 }
 
-void mafGizmoPath::FindGizmoAbsPose( double s )
+int mafGizmoPath::FindGizmoAbsPose( double s )
 {
   // get the two boundary vertexes
   int p0ID = -1, p1ID = -1;
   double distP0s = -1;
 
-  FindBoundaryVerticesID(s,p0ID,p1ID,distP0s);
+  int retVal = FindBoundaryVerticesID(s,p0ID,p1ID,distP0s);
 
+  if (retVal == 0)
+  {
+    // ok
+  } 
+  else if (retVal == -1)
+  {
+    mafLogMessage("invalid abscissa!");
+    return -1;
+  }
   // calculate local point position between vertexes
   double pos[3] = {0,0,0};
   double pOut[3] = {0,0,0};
@@ -237,10 +235,10 @@ void mafGizmoPath::FindGizmoAbsPose( double s )
 
   SendTransformMatrix(mat2Send, ID_TRANSFORM, mafGizmoPath::ABS_POSE );
 
-
+  return 0;
 }
 
-void mafGizmoPath::FindBoundaryVerticesID( double s, int &idMin, int &idMax, double &distSIdMin )
+int mafGizmoPath::FindBoundaryVerticesID( double s, int &idMin, int &idMax, double &sFromIdMin )
 {
   idMin = idMax = -1;
   
@@ -256,11 +254,11 @@ void mafGizmoPath::FindBoundaryVerticesID( double s, int &idMin, int &idMax, dou
   else
   {
     mafLogMessage("out of constrain polyline") ;
-    return;
+    return -1;
   }
 
   vtkPoints *pts = vtkPolyData::SafeDownCast(m_ConstraintPolyline->GetOutput()->GetVTKData())->GetPoints();
-  if(pts == NULL) return;
+  if(pts == NULL) return -1;
 
   double endP[3], startP[3];
 
@@ -281,7 +279,9 @@ void mafGizmoPath::FindBoundaryVerticesID( double s, int &idMin, int &idMax, dou
   
   idMin = i-1;
   idMax = i;
-  distSIdMin = s - lastSum;
+  sFromIdMin = s - lastSum;
+
+  return 0;
 }
 
 void mafGizmoPath::ComputeLocalPointPositionBetweenVertices( double distP0s, int idP0, int idP1, double pOut[3] )
@@ -392,10 +392,12 @@ void mafGizmoPath::CreateVMEGizmo()
 
   assert(root);
 
-  m_VmeGizmoPath->SetVisibleToTraverse(true);
   assert(m_VmeGizmoPath->ReparentTo(root) == MAF_OK);
 
-  // create the interactor
+  // ask the manager to create the pipelines
+  // this his giving problems... amounted for the moment
+  // mafEventMacro(mafEvent(this,VME_SHOW,m_VmeGizmoPath,true));
+  
 }
 
 void mafGizmoPath::DestroyVMEGizmo()

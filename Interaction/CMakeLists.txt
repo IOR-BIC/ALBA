@@ -56,6 +56,8 @@ SET(PROJECT_SRCS
   mafGizmoInterface.h
   mafGizmoPath.cpp
   mafGizmoPath.h
+  mafGizmoPathRuler.cpp
+  mafGizmoPathRuler.h
   mafGizmoROI.cpp
   mafGizmoROI.h
   mafGizmoRotate.cpp

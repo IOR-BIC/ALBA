@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoPath.h,v $
   Language:  C++
-  Date:      $Date: 2007-02-08 16:49:27 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-02-15 18:01:22 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -33,8 +33,9 @@ class mafVME;
 /** Gizmo constrained to arbitrary path...
 
 to use this object instanciate it in your client and listen for ID_TRANSFORM
-events with mafGizmoPath::ABS_POSE argument;
+events with mafGizmoPath::ABS_POSE argument; 
 
+REFACTOR NOTE: this object should be the expanded to support mouse interaction
 */
 
 class mafGizmoPath : public mafGizmoInterface
@@ -47,8 +48,9 @@ public:
   
   enum SentPoseID {ABS_POSE = mmiGenericMouse::MOUSE_UP+1};
 
-  /** Set position along constraint polyline */
-  void SetCurvilinearAbscissa(double s);
+  /** Set position along constraint polyline: returns MAF_OK if successful,
+  MAF_ERROR otherwise*/
+  int SetCurvilinearAbscissa(double s);
 
   /** Set the constraint polyline: any VME can be provided but its output must be a
   mafVMEOutputPolyline*/
@@ -65,7 +67,7 @@ public:
   to the root*/
   void SetInput(mafVME *vme);
 
-  /** return the gizmo object: this is the object to be used by the client*/
+  /** return the gizmo object*/
   mafVMEGizmo *GetOutput() {return m_VmeGizmoPath;}; 
 
   mafMatrix *GetAbsPose();
@@ -121,8 +123,8 @@ protected:
   vtkLineSource *m_LineSource;
   
   
-  void FindGizmoAbsPose(double s);
-  void FindBoundaryVerticesID(double s, int &idMin, int &idMax, double &sFromIdMin);
+  int FindGizmoAbsPose(double s);
+  int FindBoundaryVerticesID(double s, int &idMin, int &idMax, double &sFromIdMin);
   void ComputeLocalPointPositionBetweenVertices(double distP0s, int idP0, int idP1, double pOut[3]);
   void ComputeLocalNormal(int idP0, int idP1, double viewUp[3], double normal[3]);
 
