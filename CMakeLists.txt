@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2006-12-13 15:27:24 $
-# Version:   $Revision: 1.36 $
+# Date:      $Date: 2007-02-16 13:16:53 $
+# Version:   $Revision: 1.37 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -17,6 +17,10 @@ PROJECT (MAF)
 # Macro for DEBUG logging
 #-----------------------------------------------------------------------------
 INCLUDE (${MAF_SOURCE_DIR}/modules/DebugMacro.cmake)
+MARK_AS_ADVANCED (
+  DEBUG_MESSAGES
+)
+
 OPTION(DEBUG_MESSAGES "Enable debug Messages" OFF)
 
 #-----------------------------------------------------------------------------
@@ -58,8 +62,9 @@ ENDIF(WIN32)
 #-----------------------------------------------------------------------------
 # Options for MAF building
 #-----------------------------------------------------------------------------
-OPTION(BUILD_SHARED_LIBS "Build with shared libraries." 0 )
-OPTION(BUILD_EXAMPLES "Build examples." OFF )
+#Remove temporarily the BUILD_SHARED_LIBS because it is not possible to switch the compilation to dynamic.
+#OPTION(BUILD_SHARED_LIBS "Build with shared libraries." 0 )
+OPTION(BUILD_EXAMPLES "Build examples." ON )
 OPTION(BUILD_TESTING "Build the testing tree." OFF)
 
 SET (CONFIGURE_ERROR 0)

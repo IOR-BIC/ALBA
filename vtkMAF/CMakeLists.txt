@@ -85,8 +85,7 @@ ENDIF (NOT VTK_FOUND)
 
 # Give user option of building shared or static libraries.  Default to
 # the choice made for VTK.
-OPTION(BUILD_SHARED_LIBS "Build with shared libraries." 
-       ${VTK_BUILD_SHARED_LIBS})
+#OPTION(BUILD_SHARED_LIBS "Build with shared libraries." ${VTK_BUILD_SHARED_LIBS})
 
 # Set VTKLOCAL_BUILD_SHARED_LIBS to 1 or 0 for use in creating the
 # configuration header.
