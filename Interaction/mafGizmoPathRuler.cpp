@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoPathRuler.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-15 18:01:22 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-02-16 11:45:40 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -170,18 +170,7 @@ void mafGizmoPathRuler::SetCurvilinearAbscissa( double s )
   // set the abscissa for the ticks origin
   for (int i = 0; i < m_GizmoPathVector.size();i++)
   {
-    int valid = m_GizmoPathVector[i]->SetCurvilinearAbscissa(s - m_TicksDistance*(m_OriginTickID - i));
-    if (valid == MAF_OK)
-    {
-      m_CurvilinearAbscissa = s;
-      m_GizmoPathVector[i]->Show(true);
-        // matrixVector.Push(m_GizmoPathVector[i]->GetAbsPose());
-    } 
-    else
-    {
-      m_GizmoPathVector[i]->Show(false);
-      // matrixVector.Push(invalid);
-    } 
+    m_GizmoPathVector[i]->SetCurvilinearAbscissa(s - m_TicksDistance*(m_OriginTickID - i)); 
   }
 
   // send the matrix vector... this is not supported for the moment...

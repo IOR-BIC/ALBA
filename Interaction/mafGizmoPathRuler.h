@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGizmoPathRuler.h,v $
 Language:  C++
-Date:      $Date: 2007-02-15 18:01:22 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-02-16 11:45:40 $
+Version:   $Revision: 1.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -30,6 +30,26 @@ class mafMatrix;
 /** A gizmo representing a ruler that can move on a polyline
 
 REFACTOR NOTE: this object should be expanded to support mouse interaction
+
+usage example:
+
+  m_GizmoPathRuler = new mafGizmoPathRuler(m_ConstraintVME, this,10, 5, 30, 5);
+  m_GizmoPathRuler->SetColor(red);
+
+  // these should be removed since Show should be enough...
+  // anyway for the moment Show is not working as expected so...
+  for (int i = 0;i < m_GizmoPathRuler->GetTicksNumber(); i++)
+  {
+     view->VmeShow(m_GizmoPathRuler->GetOutput(i), true);
+  }
+
+  m_GizmoPathRuler->Show(true);
+
+  // set the new constraint to the gizmo
+  m_GizmoPathRuler->SetConstraintPolyline(m_ConstraintVME);
+
+  // create the gizmo at s = 0
+  m_GizmoPathRuler->SetCurvilinearAbscissa(0);
 */
 
 class mafGizmoPathRuler : public mafGizmoInterface 

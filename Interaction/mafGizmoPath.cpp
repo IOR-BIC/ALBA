@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoPath.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-15 18:01:22 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-02-16 11:45:39 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -158,37 +158,19 @@ void mafGizmoPath::SetInput( mafVME *vme )
   }
 }
 
-int mafGizmoPath::SetCurvilinearAbscissa( double s )
+void mafGizmoPath::SetCurvilinearAbscissa( double s )
 {
-
-  int retVal = FindGizmoAbsPose(s);
-  if (retVal == 0)
-  {
-    return MAF_OK;
-  } 
-  else
-  {
-    return MAF_ERROR;
-  }
+  FindGizmoAbsPose(s);
 }
 
-int mafGizmoPath::FindGizmoAbsPose( double s )
+void mafGizmoPath::FindGizmoAbsPose( double s )
 {
   // get the two boundary vertexes
   int p0ID = -1, p1ID = -1;
   double distP0s = -1;
 
-  int retVal = FindBoundaryVerticesID(s,p0ID,p1ID,distP0s);
+  FindBoundaryVerticesID(s,p0ID,p1ID,distP0s);
 
-  if (retVal == 0)
-  {
-    // ok
-  } 
-  else if (retVal == -1)
-  {
-    mafLogMessage("invalid abscissa!");
-    return -1;
-  }
   // calculate local point position between vertexes
   double pos[3] = {0,0,0};
   double pOut[3] = {0,0,0};
@@ -234,11 +216,10 @@ int mafGizmoPath::FindGizmoAbsPose( double s )
   mat2Send->DeepCopy(&(trans->GetMatrix()));
 
   SendTransformMatrix(mat2Send, ID_TRANSFORM, mafGizmoPath::ABS_POSE );
-
-  return 0;
 }
+  
 
-int mafGizmoPath::FindBoundaryVerticesID( double s, int &idMin, int &idMax, double &sFromIdMin )
+void mafGizmoPath::FindBoundaryVerticesID( double s, int &idMin, int &idMax, double &sFromIdMin )
 {
   idMin = idMax = -1;
   
@@ -247,18 +228,19 @@ int mafGizmoPath::FindBoundaryVerticesID( double s, int &idMin, int &idMax, doub
 
   double lineLenght = outPolyline->CalculateLength();
 
-  if (0 <= s && s <= lineLenght)
+  if (s <  0)
   {
-    // if inside the line continue...
+    s = 0;
+    mafLogMessage("out of constrain polyline: setting s to 0") ;
   }
-  else
+  else if (s  > lineLenght)
   {
-    mafLogMessage("out of constrain polyline") ;
-    return -1;
+    s = lineLenght;
+    mafLogMessage("out of constrain polyline: setting s to constraint length") ;
   }
 
   vtkPoints *pts = vtkPolyData::SafeDownCast(m_ConstraintPolyline->GetOutput()->GetVTKData())->GetPoints();
-  if(pts == NULL) return -1;
+  assert(pts  !=  NULL);
 
   double endP[3], startP[3];
 
@@ -281,7 +263,6 @@ int mafGizmoPath::FindBoundaryVerticesID( double s, int &idMin, int &idMax, doub
   idMax = i;
   sFromIdMin = s - lastSum;
 
-  return 0;
 }
 
 void mafGizmoPath::ComputeLocalPointPositionBetweenVertices( double distP0s, int idP0, int idP1, double pOut[3] )

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoPath.h,v $
   Language:  C++
-  Date:      $Date: 2007-02-15 18:01:22 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-02-16 11:45:40 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -48,9 +48,8 @@ public:
   
   enum SentPoseID {ABS_POSE = mmiGenericMouse::MOUSE_UP+1};
 
-  /** Set position along constraint polyline: returns MAF_OK if successful,
-  MAF_ERROR otherwise*/
-  int SetCurvilinearAbscissa(double s);
+  /** Set position along constraint polyline*/
+  void SetCurvilinearAbscissa(double s);
 
   /** Set the constraint polyline: any VME can be provided but its output must be a
   mafVMEOutputPolyline*/
@@ -123,8 +122,8 @@ protected:
   vtkLineSource *m_LineSource;
   
   
-  int FindGizmoAbsPose(double s);
-  int FindBoundaryVerticesID(double s, int &idMin, int &idMax, double &sFromIdMin);
+  void FindGizmoAbsPose(double s);
+  void FindBoundaryVerticesID(double s, int &idMin, int &idMax, double &sFromIdMin);
   void ComputeLocalPointPositionBetweenVertices(double distP0s, int idP0, int idP1, double pOut[3]);
   void ComputeLocalNormal(int idP0, int idP1, double viewUp[3], double normal[3]);
 
