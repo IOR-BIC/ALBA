@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoLandmarkImporterTXT.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-16 13:36:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-02-19 15:12:26 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -93,8 +93,8 @@ void mmoLandmarkImporterTXT::OpRun()
 	wxString pgd_wildc	= "Landmark (*.*)|*.*";
 	
   
-	mafString f = mafGetOpenFile(m_FileDir,pgd_wildc).c_str(); 
-	if(f != "")
+	wxString f = mafGetOpenFile(m_FileDir,pgd_wildc).c_str(); 
+	if(!f.IsEmpty() && wxFileExists(f))
 	{
 	  m_File = f;
 
@@ -107,6 +107,10 @@ void mmoLandmarkImporterTXT::OpRun()
       ShowGui();
     }
 	}
+  else
+  {
+    OpStop(OP_RUN_CANCEL);
+  }
 
 }
 //----------------------------------------------------------------------------
@@ -171,6 +175,15 @@ void mmoLandmarkImporterTXT::OpUndo()
 	m_Vme = NULL;
 }
 */
+
+//----------------------------------------------------------------------------
+void mmoLandmarkImporterTXT::SetSkipColumn(int column)   
+//----------------------------------------------------------------------------
+{
+m_Start = column;
+}
+
+
 //----------------------------------------------------------------------------
 void mmoLandmarkImporterTXT::Read()   
 //----------------------------------------------------------------------------
@@ -186,6 +199,7 @@ void mmoLandmarkImporterTXT::Read()
   wxString x;
   wxString y;
   wxString z;
+  double xval, yval, zval, tval;
   int index;
   
   std::vector<int> lm_idx;
@@ -223,15 +237,19 @@ void mmoLandmarkImporterTXT::Read()
       x=tkz.GetNextToken();
       y=tkz.GetNextToken();
       z=tkz.GetNextToken();
+      x.ToDouble(&xval);
+      y.ToDouble(&yval);
+      z.ToDouble(&zval);
+      time.ToDouble(&tval);
 
       if(x=="" && y=="" && z=="" )
       {
-        m_VmeCloud->SetLandmark(lm_idx[counter],0,0,0,atof(time));
-        m_VmeCloud->SetLandmarkVisibility(lm_idx[counter], 0, atof(time));
+        m_VmeCloud->SetLandmark(lm_idx[counter],0,0,0,tval);
+        m_VmeCloud->SetLandmarkVisibility(lm_idx[counter], 0,tval);
       }
       else
       {
-        m_VmeCloud->SetLandmark(lm_idx[counter], atof(x), atof(y), atof(z), atof(time));
+        m_VmeCloud->SetLandmark(lm_idx[counter],xval,yval,zval,tval);
       }
       counter++;
     }

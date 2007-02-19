@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoLandmarkImporterTXT.h,v $
   Language:  C++
-  Date:      $Date: 2007-02-16 13:36:47 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-02-19 15:12:38 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -49,18 +49,18 @@ public:
 
   /** Read the file.
   the format of the file admits some speficics.
-  1) a line with initial # is a comment
-  2) Before a sequence of landmark it can be a line with "Time XXX" where XXX is a number current of timestep
-     After the list of landmark is finished for that time, a new line with Time XXY or similar will follow.
-     If there's not time, the cloud is considered time-INVARIANT
-  3) the line with landmark data are:
-     nameOfLandmark x y z
+  1) Ignore the first line
+  2) Ignore the first n columns specified by user
+  3) the first element of each line is Time, then x y z x1 y1 z1 ecc
   */
   void Read();
 
 
   /** Set the filename for the file to import */
   void SetFileName(const char *file_name){m_File = file_name;};
+
+  /** Set number of column to skip */
+  void SetSkipColumn(int column);
 
 
 	/** Makes the undo for the operation. */
