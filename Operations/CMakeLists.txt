@@ -43,8 +43,6 @@ IF (MAF_USE_VTK)
     mmoFilterSurface.h
     mmoFilterVolume.cpp
     mmoFilterVolume.h
-    mmoGizmoUsage.h
-    mmoGizmoUsage.cpp
     mmoImageImporter.cpp
     mmoImageImporter.h
     mmoMAFTransform.cpp
