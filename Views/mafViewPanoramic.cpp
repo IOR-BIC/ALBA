@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewPanoramic.cpp,v $
 Language:  C++
-Date:      $Date: 2007-02-14 13:55:12 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-02-20 09:16:08 $
+Version:   $Revision: 1.4 $
 Authors:   Daniele Giunchi , Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -32,6 +32,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVMEPolyline.h"
 #include "mafPipeFactory.h"
 #include "mafPipe.h"
+#include "mafPipeSurfaceTextured.h"
 #include "mafRWI.h"
 #include "mafSceneGraph.h"
 #include "mafAttachCamera.h"
@@ -50,13 +51,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkTextMapper.h"
 #include "vtkTextProperty.h"
 #include "vtkCamera.h"
-
-enum ID_GIZMOS
-{
-	GIZMO_X=0,
-	GIZMO_Z,
-	CT_GIZMO_NUMBER,
-};
+#include "vtkPoints.h"
 
 
 //----------------------------------------------------------------------------
@@ -120,12 +115,17 @@ int mafViewPanoramic::GetNodeStatus(mafNode *vme)
 	mafSceneNode *n = NULL;
 	if (m_Sg != NULL)
 	{
-		if (vme->IsMAFType(mafVMEPolyline) || vme->IsMAFType(mafVMEImage) || vme->IsA("mafVMEAdvancedProber") || vme->IsMAFType(mafVMESurface))
+		if (vme->IsMAFType(mafVMEImage) || vme->IsA("mafVMEAdvancedProber") || vme->IsMAFType(mafVMESurface))
 		{
 			n = m_Sg->Vme2Node(vme);
 			n->m_Mutex = true;
 		}
 		else if (vme->IsA("mafVMEGizmo"))
+		{
+			n = m_Sg->Vme2Node(vme);
+			n->m_PipeCreatable = true;
+		}
+		else if(vme->IsMAFType(mafVMEPolyline))
 		{
 			n = m_Sg->Vme2Node(vme);
 			n->m_PipeCreatable = true;
@@ -160,12 +160,34 @@ void mafViewPanoramic::OnEvent(mafEventBase *maf_event)
 		{ 
 			case MOUSE_UP:
 			case MOUSE_MOVE:
-				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				if(maf_event->GetSender()==m_GizmoSlice[GIZMO_X])
+				{
+					vtkPoints *p = (vtkPoints *)e->GetVtkObj();
+					if(p == NULL) {
+						return;
+					}
+					e->SetSender(this);
+					e->SetString(new mafString("X"));
+					mafEventMacro(*e);
+					CameraUpdate();
+				}
+				else if(maf_event->GetSender()==m_GizmoSlice[GIZMO_Z])
+				{
+					vtkPoints *p = (vtkPoints *)e->GetVtkObj();
+					if(p == NULL) {
+						return;
+					}
+					e->SetSender(this);
+					e->SetString(new mafString("Z"));
+					mafEventMacro(*e);
+					CameraUpdate();
+				}
 			default:
 				mafEventMacro(*maf_event);
 		}
 	}
-	mafEventMacro(*maf_event);
+	else
+		mafEventMacro(*maf_event);
 }
 //----------------------------------------------------------------------------
 void mafViewPanoramic::VmeShow(mafNode *node, bool show)
@@ -194,6 +216,7 @@ void mafViewPanoramic::VmeShow(mafNode *node, bool show)
 			m_CurrentPanoramic = mafVMEAdvancedProber::SafeDownCast(node);
 			GizmoCreate();
 			Superclass::VmeShow(node, show);
+			mafPipeSurfaceTextured::SafeDownCast(GetNodePipe(node))->ShowAxisOff();
 			this->GetRWI()->GetCamera()->SetViewPlaneNormal(0,0,1);
 			CameraUpdate();
 		}
@@ -207,7 +230,8 @@ void mafViewPanoramic::VmeShow(mafNode *node, bool show)
 	}
 	else
 	{
-		m_AttachCamera->SetVme(NULL);
+		if(m_AttachCamera)
+			m_AttachCamera->SetVme(NULL);
 		Superclass::VmeShow(node, show);
 	}
 
@@ -228,17 +252,13 @@ void mafViewPanoramic::GizmoCreate()
 {
 	for(int i=0; i<CT_GIZMO_NUMBER; i++) 
 	{
-		double slice[3];
-		/*mafPipeVolumeSlice *p = NULL;
-		p = mafPipeVolumeSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(m_CurrentVolume));
-		p->GetSliceOrigin(slice);*/
 		double b[6];
 		m_CurrentPanoramic->GetOutput()->GetVTKData()->GetBounds(b);
 		m_GizmoSlice[i] = new mafGizmoSlice(m_CurrentPanoramic, this);
 		if(i==GIZMO_Z)
 			m_GizmoSlice[i]->CreateGizmoSliceInLocalPositionOnAxis(i,mafGizmoSlice::GIZMO_SLICE_Z,(b[5]-b[4])/2);
 		else if(i==GIZMO_X)
-			m_GizmoSlice[i]->CreateGizmoSliceInLocalPositionOnAxis(i,mafGizmoSlice::GIZMO_SLICE_X,(b[1]-b[0])/2);
+			m_GizmoSlice[i]->CreateGizmoSliceInLocalPositionOnAxis(i,mafGizmoSlice::GIZMO_SLICE_X,b[0]);
 		m_GizmoSlice[i]->SetColor(m_GizmoColor[i]);
 		m_GizmoSlice[i]->SetGizmoMovingModalityToBound();
 
