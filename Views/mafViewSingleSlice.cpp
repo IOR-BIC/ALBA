@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-23 15:37:11 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-02-20 09:16:56 $
+  Version:   $Revision: 1.5 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,6 +28,8 @@
 #include "mafVMESlicer.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
+#include "mafVMEPolyline.h"
+#include "mafVMEPolylineSpline.h"
 #include "mafPipeFactory.h"
 #include "mafPipe.h"
 #include "mafRWI.h"
@@ -400,6 +402,11 @@ int mafViewSingleSlice::GetNodeStatus(mafNode *vme)
       n = m_Sg->Vme2Node(vme);
       n->m_Mutex = true;
     }
+		else if (vme->IsMAFType(mafVMEPolyline) || vme->IsMAFType(mafVMEPolylineSpline))
+		{
+			n = m_Sg->Vme2Node(vme);
+			n->m_Mutex = true;
+		}
   }
 
   return m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;
@@ -557,6 +564,7 @@ void mafViewSingleSlice::SetSlice(double origin[3])
 
     // update text
     this->UpdateText();
+		CameraUpdate();
   }
   
   if(m_CurrentSurface.empty())
@@ -584,6 +592,7 @@ void mafViewSingleSlice::SetSlice(double origin[3])
 	}
   // update text
   this->UpdateText();
+	CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafViewSingleSlice::GetSlice(double slice[3])
