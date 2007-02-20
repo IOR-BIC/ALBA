@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceTextured.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-13 14:19:09 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-02-20 09:58:41 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,6 +19,7 @@
 #include "mafPipe.h"
 #include "mmgVMEChooserAccept.h"
 #include "mafVMEImage.h"
+#include "mafAxes.h"
 
 //----------------------------------------------------------------------------
 // forward refs :
@@ -29,7 +30,6 @@ class vtkPolyDataMapper;
 class vtkPolyData;
 class mafLODActor;
 class vtkProperty;
-class mafAxes;
 class mmgMaterialButton;
 class mmaMaterial;
 //class vtkActor;
@@ -83,6 +83,8 @@ public:
   /** Set the actor picking*/
   void SetActorPicking(int enable = true);
 
+	void ShowAxisOn(){m_ShowAxis = 1;m_Axes->SetVisibility(m_Selected&&m_ShowAxis);};
+	void ShowAxisOff(){m_ShowAxis = 0;m_Axes->SetVisibility(m_Selected&&m_ShowAxis);};
 
 protected:
   vtkTexture              *m_Texture;
@@ -98,6 +100,8 @@ protected:
   int m_UseTexture;
   int m_UseLookupTable;
   int m_EnableActorLOD;
+
+	int m_ShowAxis;
 
   int m_ScalarVisibility;
   int m_RenderingDisplayListFlag;

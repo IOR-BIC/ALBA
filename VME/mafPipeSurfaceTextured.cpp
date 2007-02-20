@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceTextured.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-19 11:42:28 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-02-20 09:58:41 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -78,6 +78,8 @@ mafPipeSurfaceTextured::mafPipeSurfaceTextured()
   m_UseLookupTable  = 0;
 
   m_EnableActorLOD  = 0;
+
+	m_ShowAxis = 1;
 }
 //----------------------------------------------------------------------------
 void mafPipeSurfaceTextured::Create(mafSceneNode *n/*, bool use_axes*/)
@@ -253,7 +255,7 @@ void mafPipeSurfaceTextured::Select(bool sel)
 	if(m_Actor->GetVisibility()) 
 	{
 		m_OutlineActor->SetVisibility(sel);
-    m_Axes->SetVisibility(sel);
+    m_Axes->SetVisibility(sel&&m_ShowAxis);
 	}
 }
 //----------------------------------------------------------------------------

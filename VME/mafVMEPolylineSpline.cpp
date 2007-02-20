@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolylineSpline.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-09 10:31:33 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-02-20 09:58:41 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi & Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -75,6 +75,7 @@ mafVMEPolylineSpline::mafVMEPolylineSpline()
 mafVMEPolylineSpline::~mafVMEPolylineSpline()
 //-------------------------------------------------------------------------
 {
+	delete m_VMEPolylineAccept;
   vtkDEL(m_Polyline);
 	vtkDEL(m_PointsSplined);
   mafDEL(m_Transform);
@@ -153,7 +154,7 @@ void mafVMEPolylineSpline::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes
 void mafVMEPolylineSpline::InternalUpdate() //Multi
 //-----------------------------------------------------------------------
 {
-  wxBusyCursor wait;
+  //wxBusyCursor wait;
 	
   mafVMEPolyline *vme = mafVMEPolyline::SafeDownCast(GetPolylineLink());
 	if (vme == NULL) 

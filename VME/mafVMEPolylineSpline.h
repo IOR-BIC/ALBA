@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolylineSpline.h,v $
   Language:  C++
-  Date:      $Date: 2007-02-09 10:31:33 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-02-20 09:58:41 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi & Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 #include "mafVME.h"
 #include "mmgVMEChooserAccept.h"
-#include "mafVMEOutputPolyline.h"
+#include "mafVMEPolyline.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -107,7 +107,7 @@ public:
     mafVMEPolylineAccept() {};
     ~mafVMEPolylineAccept() {};
 
-    bool Validate(mafNode *node) {return(node != NULL && ((mafVME *)node)->GetOutput()->IsMAFType(mafVMEOutputPolyline));};
+    bool Validate(mafNode *node) {return(node != NULL && (node->IsA("mafVMEPolyline")));};
   };
   mafVMEPolylineAccept *m_VMEPolylineAccept;
 

@@ -121,6 +121,8 @@ IF (MAF_USE_VTK)
   mafVMEPointSet.h
   mafVMEPolyline.cpp
   mafVMEPolyline.h
+  mafVMEPolylineSpline.cpp
+  mafVMEPolylineSpline.h
   mafVMEProber.cpp
   mafVMEProber.h
   mafVMERefSys.cpp
