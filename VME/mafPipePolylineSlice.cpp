@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-30 13:03:55 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-02-21 17:22:47 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -76,7 +76,7 @@ mafPipePolylineSlice::mafPipePolylineSlice()
   m_ScalarVisibility = 0;
   m_RenderingDisplayListFlag = 0;
   m_Border=1;
-//  m_Radius=1;
+  m_Radius=1;
 }
 //----------------------------------------------------------------------------
 void mafPipePolylineSlice::Create(mafSceneNode *n)
@@ -104,7 +104,7 @@ void mafPipePolylineSlice::Create(mafSceneNode *n)
   double sr[2] = {0,1};
 
 	//////////////////////////////////
-/*	vtkNEW(m_Tube);
+  vtkNEW(m_Tube);
 	m_Tube->UseDefaultNormalOn();
 	m_Tube->SetInput(data);
 	m_Tube->SetRadius(m_Radius);
@@ -112,7 +112,7 @@ void mafPipePolylineSlice::Create(mafSceneNode *n)
 	m_Tube->SetNumberOfSides(16);
 	m_Tube->Update();
 	
-	data = m_Tube->GetOutput();*/
+	data = m_Tube->GetOutput();
 	//////////////////////////////////
 
 	m_Plane	= vtkPlane::New();
@@ -200,8 +200,8 @@ mafPipePolylineSlice::~mafPipePolylineSlice()
 
   vtkDEL(m_Mapper);
   vtkDEL(m_Actor);
-//	vtkDEL(m_Tube);
-//	vtkDEL(m_TubeRadial);
+  vtkDEL(m_Tube);
+  //vtkDEL(m_TubeRadial);
   vtkDEL(m_OutlineBox);
   vtkDEL(m_OutlineMapper);
   vtkDEL(m_OutlineProperty);

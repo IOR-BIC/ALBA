@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoPathRuler.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-16 11:45:40 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-02-21 17:21:02 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -172,6 +172,7 @@ void mafGizmoPathRuler::SetCurvilinearAbscissa( double s )
   {
     m_GizmoPathVector[i]->SetCurvilinearAbscissa(s - m_TicksDistance*(m_OriginTickID - i)); 
   }
+	m_CurvilinearAbscissa = s;
 
   // send the matrix vector... this is not supported for the moment...
 
@@ -205,4 +206,8 @@ void mafGizmoPathRuler::SetColor( double col[3] )
   {
     m_GizmoPathVector[i]->SetColor(col);
   }
+}
+void mafGizmoPathRuler::SetColor( int idGizmo,double col[3] )
+{
+	m_GizmoPathVector[idGizmo]->SetColor(col);
 }

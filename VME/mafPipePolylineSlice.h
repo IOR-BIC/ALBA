@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.h,v $
   Language:  C++
-  Date:      $Date: 2007-01-30 13:03:55 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-02-21 17:22:47 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -78,8 +78,8 @@ public:
 protected:
   vtkPolyDataMapper	      *m_Mapper;
   vtkActor                *m_Actor;
-	//vtkTubeFilter           *m_Tube;
-	//vtkTubeFilter           *m_TubeRadial;
+	vtkTubeFilter           *m_Tube;
+	vtkTubeFilter           *m_TubeRadial;
   vtkOutlineCornerFilter  *m_OutlineBox;
   vtkPolyDataMapper       *m_OutlineMapper;
   vtkProperty             *m_OutlineProperty;
@@ -88,7 +88,7 @@ protected:
   vtkPlane				        *m_Plane;
   vtkFixedCutter		      *m_Cutter;
   double				           m_Border;
-  //double                   m_Radius;
+  double                   m_Radius;
 
   double	m_Origin[3];
   double	m_Normal[3];

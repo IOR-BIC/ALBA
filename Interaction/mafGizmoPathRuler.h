@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGizmoPathRuler.h,v $
 Language:  C++
-Date:      $Date: 2007-02-16 11:45:40 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-02-21 17:21:02 $
+Version:   $Revision: 1.3 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -78,6 +78,7 @@ public:
 
   /** Set the gizmo color */
   void SetColor(double col[3]);
+	void SetColor(int idGizmo,double col[3]);
 
   /** This method is used to change the input: this VME is used only to reparent the gizmo
   to the root*/
