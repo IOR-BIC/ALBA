@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-19 11:31:43 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2007-02-21 17:18:49 $
+  Version:   $Revision: 1.28 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -208,6 +208,7 @@ EVT_START,
   CAMERA_PERSPECTIVE_RIGHT, 
   CAMERA_PERSPECTIVE_TOP,
   CAMERA_PERSPECTIVE_BOTTOM, 
+	CAMERA_ARB, //Camera with arbitrary look vector
 
   CAMERA_SYNCHRONOUS_UPDATE, // from Interaction Manager to perform a view update
   CAMERA_UPDATE, // events from the toolbar 
