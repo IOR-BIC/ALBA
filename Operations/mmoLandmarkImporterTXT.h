@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoLandmarkImporterTXT.h,v $
   Language:  C++
-  Date:      $Date: 2007-02-19 15:12:38 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-02-21 11:56:47 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -41,12 +41,6 @@ public:
 	/** Builds operation's interface. */
 	void OpRun();
 
-	/** Execute the operation. */
-	void OpDo();
-
-  /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
-	void OpStop	(int result);
-
   /** Read the file.
   the format of the file admits some speficics.
   1) Ignore the first line
@@ -55,22 +49,16 @@ public:
   */
   void Read();
 
-
   /** Set the filename for the file to import */
   void SetFileName(const char *file_name){m_File = file_name;};
 
   /** Set number of column to skip */
   void SetSkipColumn(int column);
 
-
-	/** Makes the undo for the operation. */
-	//void OpUndo();                       // gia' implementata in mafOp
-
 protected:
   wxString m_FileDir;
 	wxString m_File;
 	mafVMELandmarkCloud  *m_VmeCloud;
   int m_Start;
-
 };
 #endif

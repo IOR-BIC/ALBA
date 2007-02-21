@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoLandmarkImporterTXT.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-19 15:12:26 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-02-21 11:56:47 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -54,25 +54,23 @@ mafOp(label)
 //----------------------------------------------------------------------------
 {
 	m_OpType	= OPTYPE_IMPORTER;
-	m_Canundo	= false;
+	m_Canundo	= true;
 	m_File		= "";
 	m_FileDir = (mafGetApplicationDirectory() + "/Data/External/").c_str();
 	
 	m_VmeCloud		= NULL;
-  m_Start = 0;
+  m_Start = 1;
 }
 //----------------------------------------------------------------------------
-mmoLandmarkImporterTXT::~mmoLandmarkImporterTXT( ) 
+mmoLandmarkImporterTXT::~mmoLandmarkImporterTXT()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_VmeCloud);
 }
 //----------------------------------------------------------------------------
 mafOp* mmoLandmarkImporterTXT::Copy()   
-/** restituisce una copia di se stesso, serve per metterlo nell'undo stack */
 //----------------------------------------------------------------------------
 {
-	//non devo incrementare l'id counter --- vfc le operazioni sono gia inserite nei menu;
 	mmoLandmarkImporterTXT *cp = new mmoLandmarkImporterTXT(m_Label);
 	cp->m_Canundo = m_Canundo;
 	cp->m_OpType = m_OpType;
@@ -87,17 +85,24 @@ mafOp* mmoLandmarkImporterTXT::Copy()
 void mmoLandmarkImporterTXT::OpRun()   
 //----------------------------------------------------------------------------
 {
-  
 	int result = OP_RUN_CANCEL;
 	m_File = "";
 	wxString pgd_wildc	= "Landmark (*.*)|*.*";
-	
+  mafNEW(m_VmeCloud);
   
 	wxString f = mafGetOpenFile(m_FileDir,pgd_wildc).c_str(); 
 	if(!f.IsEmpty() && wxFileExists(f))
 	{
 	  m_File = f;
+    wxString path, name, ext;
+    wxSplitPath(m_File.c_str(),&path,&name,&ext);
+    m_VmeCloud->SetName(name);
 
+    mafTagItem tag_Nature;
+    tag_Nature.SetName("VME_NATURE");
+    tag_Nature.SetValue("NATURAL");
+
+    m_VmeCloud->GetTagArray()->SetTag(tag_Nature);
     if (!m_TestMode)
     {
       m_Gui = new mmgGui(this);
@@ -111,7 +116,6 @@ void mmoLandmarkImporterTXT::OpRun()
   {
     OpStop(OP_RUN_CANCEL);
   }
-
 }
 //----------------------------------------------------------------------------
 void mmoLandmarkImporterTXT::	OnEvent(mafEventBase *maf_event) 
@@ -122,85 +126,39 @@ void mmoLandmarkImporterTXT::	OnEvent(mafEventBase *maf_event)
     switch(e->GetId())
     {
       case wxOK:
+        Read();
         OpStop(OP_RUN_OK);
       break;
       case wxCANCEL:
         OpStop(OP_RUN_CANCEL);
       break;
       case ID_TYPE_FILE:
-        break;
+      break;
       default:
         mafEventMacro(*e);
     }
   }
 }
 //----------------------------------------------------------------------------
-void mmoLandmarkImporterTXT::OpDo()   
+void mmoLandmarkImporterTXT::SetSkipColumn(int column)
 //----------------------------------------------------------------------------
 {
-	
-	//modified by Stefano. 18-9-2003
-	wxBusyInfo wait("Please wait, working...");
-
-    Read();
-
-  wxString path, name, ext;
-  wxSplitPath(m_File.c_str(),&path,&name,&ext);
-  m_VmeCloud->SetName(name);
-	
-	mafTagItem tag_Nature;
-	tag_Nature.SetName("VME_NATURE");
-	tag_Nature.SetValue("NATURAL");
-
-	m_VmeCloud->GetTagArray()->SetTag(tag_Nature); //m_Vme->GetTagArray()->AddTag(tag_Nature);
-  
-	mafEventMacro(mafEvent(this,VME_ADD,m_VmeCloud));
+  m_Start = column;
 }
-//----------------------------------------------------------------------------
-void mmoLandmarkImporterTXT::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	HideGui();
-	mafEventMacro(mafEvent(this,result));
-}
-/*
-//----------------------------------------------------------------------------
-void mmoLandmarkImporterTXT::OpUndo()   
-
-//----------------------------------------------------------------------------
-{
-	assert(m_Vme);
-	mafEventMacro(mafEvent(this,VME_REMOVE,m_Vme));
-	//m_Vme->Delete(); remove vme from the tree will kill it - we have not referenced it
-	m_Vme = NULL;
-}
-*/
-
-//----------------------------------------------------------------------------
-void mmoLandmarkImporterTXT::SetSkipColumn(int column)   
-//----------------------------------------------------------------------------
-{
-m_Start = column;
-}
-
-
 //----------------------------------------------------------------------------
 void mmoLandmarkImporterTXT::Read()   
 //----------------------------------------------------------------------------
-
 {
-	mafNEW(m_VmeCloud);
+  if (!m_TestMode)
+  {
+    wxBusyInfo wait("Please wait, working...");
+  }
   m_VmeCloud->Open();
   m_VmeCloud->SetRadius(10);
 
-  char name[20];
-  wxString time;
   wxString skipc;
-  wxString x;
-  wxString y;
-  wxString z;
+  mafString time, x, y, z;
   double xval, yval, zval, tval;
-  int index;
   
   std::vector<int> lm_idx;
 
@@ -208,8 +166,8 @@ void mmoLandmarkImporterTXT::Read()
   wxTextInputStream text( inputFile );
 
   wxString line;
-  line=text.ReadLine(); //Ignore textual information
-  line=text.ReadLine();
+  line = text.ReadLine(); //Ignore textual information
+  line = text.ReadLine();
   line.Replace(" ","\t");
 
   wxStringTokenizer tkz(line,wxT('\t'),wxTOKEN_RET_EMPTY_ALL);
@@ -228,21 +186,21 @@ void mmoLandmarkImporterTXT::Read()
     {
       skipc=tkz.GetNextToken();
     }
-    time=tkz.GetNextToken();
+    time = tkz.GetNextToken().c_str();
     
     long counter = 0;
 
     while (tkz.HasMoreTokens())
     {
-      x=tkz.GetNextToken();
-      y=tkz.GetNextToken();
-      z=tkz.GetNextToken();
-      x.ToDouble(&xval);
-      y.ToDouble(&yval);
-      z.ToDouble(&zval);
-      time.ToDouble(&tval);
+      x = tkz.GetNextToken().c_str();
+      y = tkz.GetNextToken().c_str();
+      z = tkz.GetNextToken().c_str();
+      xval = atof(x);
+      yval = atof(y);
+      zval = atof(z);
+      tval = atof(time);
 
-      if(x=="" && y=="" && z=="" )
+      if(x.IsEmpty() && y.IsEmpty() && z.IsEmpty() )
       {
         m_VmeCloud->SetLandmark(lm_idx[counter],0,0,0,tval);
         m_VmeCloud->SetLandmarkVisibility(lm_idx[counter], 0,tval);
@@ -253,11 +211,10 @@ void mmoLandmarkImporterTXT::Read()
       }
       counter++;
     }
-    line=text.ReadLine();
+    line = text.ReadLine();
     line.Replace(" ","\t");
   } while (!inputFile.Eof());
 
-  //MIO
   m_VmeCloud->Close();
   m_VmeCloud->Modified();
 
