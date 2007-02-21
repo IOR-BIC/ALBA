@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-23 11:59:45 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-02-21 16:15:03 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,7 +54,8 @@ protected:
   double m_Time; 
   double m_TimeMin; 
   double m_TimeMax; 
-  int   m_TimeStep; 
+  double m_TimeStep;
+  int m_NumberOfIntervals;
 
   wxBoxSizer		  *m_Sizer;
   mmgPicButton		*m_TimeBarButtons[5];

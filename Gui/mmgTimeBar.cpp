@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-23 11:59:45 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-02-21 16:15:03 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -63,10 +63,11 @@ m_Timer(NULL, ID_TIMER)
   m_Sizer->Fit(this);
   m_Sizer->SetSizeHints(this);
   
-  m_Time      = 0;
+  m_NumberOfIntervals = 500;
+  m_Time     = 0;
   m_TimeMin  = 0; 
   m_TimeMax  = 100; 
-  m_TimeStep = 1;
+  m_TimeStep = (m_TimeMax - m_TimeMin) / m_NumberOfIntervals;
 
   wxStaticText *lab1 = new wxStaticText(this,-1," time "); 
   m_TimeBarEntry = new wxTextCtrl  (this, ID_ENTRY, "" , wxDefaultPosition, wxSize(40,17), 0 );
@@ -74,11 +75,11 @@ m_Timer(NULL, ID_TIMER)
 
   wxStaticText *lab2 = new wxStaticText(this,-1," speed "); 
   m_TimeBarEntryVelocity = new wxTextCtrl  (this, TIME_BAR_VELOCITY, "" , wxDefaultPosition, wxSize(40,17), 0 );
-  m_TimeBarEntryVelocity ->SetValidator(mmgValidator(this,TIME_BAR_VELOCITY,m_TimeBarEntryVelocity,&m_TimeStep,1,100));
+  m_TimeBarEntryVelocity ->SetValidator(mmgValidator(this,TIME_BAR_VELOCITY,m_TimeBarEntryVelocity,&m_TimeStep,0.0000001,100));
 
   m_TimeBarSlider = new mmgFloatSlider(this,ID_SLIDER,m_Time,m_TimeMin,m_TimeMax );
   m_TimeBarSlider->SetValidator( mmgValidator(this,ID_SLIDER,m_TimeBarSlider,&m_Time,m_TimeBarEntry) );
-  m_TimeBarSlider->SetNumberOfSteps(500);
+  m_TimeBarSlider->SetNumberOfSteps(m_NumberOfIntervals);
   TransferDataToWindow();
   m_Sizer->Add( m_TimeBarSlider ,1,wxEXPAND);
   m_Sizer->Add( lab1,0,wxALIGN_CENTER);
@@ -186,7 +187,8 @@ void mmgTimeBar::SetBounds(double min, double max)
   m_Timer.Stop();
   m_TimeMax = max;
   m_TimeMin = min;
-  m_TimeStep = 1;
+  //m_TimeStep = 1;
+  m_TimeStep = (m_TimeMax - m_TimeMin) / m_NumberOfIntervals;
 
   if(m_Time < min) 
   {
