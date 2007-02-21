@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-20 09:16:56 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-02-21 17:01:41 $
+  Version:   $Revision: 1.6 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -422,8 +422,8 @@ mmgGui *mafViewSingleSlice::CreateGui()
 
 	m_Slider = m_Gui->FloatSlider(ID_POSITION, _("Position"), &m_Position,MINDOUBLE,MAXDOUBLE);
 
-	const wxString plane_string[] = {_("XY"), _("YZ"), _("ZX")};
-	m_Gui->Combo(ID_PLANE_SELECT, "View", &m_PlaneSelect, 3, plane_string);
+	//const wxString plane_string[] = {_("XY"), _("YZ"), _("ZX")};
+	//m_Gui->Combo(ID_PLANE_SELECT, "View", &m_PlaneSelect, 3, plane_string);
 	m_Gui->Divider();
   return m_Gui;
 }

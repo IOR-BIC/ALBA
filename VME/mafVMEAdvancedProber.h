@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.h,v $
   Language:  C++
-  Date:      $Date: 2007-02-14 13:49:58 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-02-21 17:03:03 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -166,6 +166,8 @@ protected:
 
   mafTransform *m_Transform;
   //vtkAppendPolyData *append;
+
+	int m_Fixed;
 
 private:
   mafVMEAdvancedProber(const mafVMEAdvancedProber&); // Not implemented

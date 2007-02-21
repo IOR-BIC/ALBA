@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.h,v $
 Language:  C++
-Date:      $Date: 2007-02-14 13:52:50 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2007-02-21 17:01:41 $
+Version:   $Revision: 1.5 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -30,6 +30,7 @@ class vtkTextMapper;
 class vtkPolyDataMapper;
 class vtkProbeFilter;
 class vtkPlaneSource;
+class mafMatrix;
 
 //----------------------------------------------------------------------------
 // mafViewCTNew :
@@ -71,8 +72,35 @@ public:
 		ID_LAST
 	};
 
+	enum CT_SUBVIEW_ID
+	{
+		CT1 = 0,
+		CT2,
+		CT3,
+		CT4,
+		CT5,
+		CT6,
+		CT7,
+		CT8,
+		CT9,
+		CT10,
+		CT_CHILD_VIEWS_NUMBER,
+	};
+
 	/** Create the GUI on the bottom of the compounded view. */
 	virtual void CreateGuiView();
+
+	void SetCurrentZ(double Z);
+	void SetCurrentZ(int idview,double Z);
+
+	void SetMatrix(int idview,mafMatrix *matrix);
+
+	/**
+	Function that compute and create actors with probed texture*/
+	void ProbeVolume();
+
+	void SetColorText(int idView,double *color);
+	void SetColorText(double **color);
 
 protected:
 	/**
@@ -88,13 +116,14 @@ protected:
 	Redefine to arrange views to generate RXCT visualization.*/
 	//virtual void LayoutSubViewCustom(int width, int height);
 
-	/**
-	Function that compute and create actors with probed texture*/
-	void ProbeVolume();
 
 	/**
 	Enable/disable view widgets.*/
 	void EnableWidgets(bool enable = true);
+
+	/**
+	Update normal and position in the idview ViewSlice*/
+	void UpdateSliceView(int idview);
 
 	//double m_BorderColor[10][3];
 
@@ -106,8 +135,10 @@ protected:
 	int m_WidthSection;
 	int m_HeightSection;
 
-	double m_Position[3];
-	double m_Normal[3];
+	std::vector<double *> m_Position;
+	std::vector<double *> m_Normal;
+
+	double m_CurrentZ;
 
 	double m_Spacing[3];
 

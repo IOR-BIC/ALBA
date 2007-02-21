@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-24 17:08:12 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2007-02-21 17:01:41 $
+  Version:   $Revision: 1.32 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -48,6 +48,7 @@
 #include "vtkRenderer.h"
 #include "vtkTextMapper.h"
 #include "vtkTextProperty.h"
+#include "vtkCamera.h"
 
 
 //----------------------------------------------------------------------------
@@ -162,6 +163,9 @@ void mafViewSlice::UpdateText(int ID)
     case CAMERA_PERSPECTIVE:
       slice_mode = SLICE_ARB;
       break;
+		case CAMERA_ARB:
+			slice_mode = SLICE_ARB;
+			break;
     default:
       slice_mode = SLICE_Z;
     }
@@ -315,9 +319,11 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
 					break;
 				case CAMERA_OS_P:
 					break;
-					//case CAMERA_OS_REP:
-					//	this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+				case CAMERA_ARB:
+						this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+					break;
 				case CAMERA_PERSPECTIVE:
+					//this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 					break;
 				default:
 					normal[0] = 0;
@@ -446,45 +452,48 @@ void mafViewSlice::SetLutRange(double low_val, double high_val)
 void mafViewSlice::SetSliceLocalOrigin(double origin[3])
 //----------------------------------------------------------------------------
 {
-  if(!m_CurrentVolume)
-    return;
-  memcpy(m_Slice,origin,sizeof(m_Slice));
-  mafString pipe_name = m_CurrentVolume->m_Pipe->GetTypeName();
-  if (pipe_name.Equals("mafPipeVolumeSlice"))
-  {
-    mafPipeVolumeSlice *pipe = (mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe;
-    pipe->SetSlice(origin); 
-
-    // update text
-    this->UpdateText();
-  }
-  
-  if(m_CurrentSurface.empty())
-    return;
-  for(int i=0;i<m_CurrentSurface.size();i++)
-  {
-    if(m_CurrentSurface.at(i) && m_CurrentSurface.at(i)->m_Pipe)
-    {
-      pipe_name = m_CurrentSurface.at(i)->m_Pipe->GetTypeName();
-      if (pipe_name.Equals("mafPipeSurfaceSlice"))
-      {
-        mafPipeSurfaceSlice *pipe = (mafPipeSurfaceSlice *)m_CurrentSurface[i]->m_Pipe;
-        pipe->SetSlice(origin); 
-      }
-    }
-  }
-
-	if(m_CurrentPolyline.empty())
-		return;
-	for(int i=0;i<m_CurrentPolyline.size();i++)
+  if(m_CurrentVolume)
 	{
-		if(m_CurrentPolyline.at(i) && m_CurrentPolyline.at(i)->m_Pipe)
+		memcpy(m_Slice,origin,sizeof(m_Slice));
+		mafString pipe_name = m_CurrentVolume->m_Pipe->GetTypeName();
+		if (pipe_name.Equals("mafPipeVolumeSlice"))
 		{
-			pipe_name = m_CurrentPolyline.at(i)->m_Pipe->GetTypeName();
-			if (pipe_name.Equals("mafPipePolylineSlice"))
+			mafPipeVolumeSlice *pipe = (mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe;
+			pipe->SetSlice(origin); 
+
+			// update text
+			this->UpdateText();
+		}
+	}
+  
+  if(!m_CurrentSurface.empty())
+	{
+		for(int i=0;i<m_CurrentSurface.size();i++)
+		{
+			if(m_CurrentSurface.at(i) && m_CurrentSurface.at(i)->m_Pipe)
 			{
-				mafPipePolylineSlice *pipe = (mafPipePolylineSlice *)m_CurrentPolyline[i]->m_Pipe;
-				pipe->SetSlice(origin); 
+				mafString pipe_name = m_CurrentSurface.at(i)->m_Pipe->GetTypeName();
+				if (pipe_name.Equals("mafPipeSurfaceSlice"))
+				{
+					mafPipeSurfaceSlice *pipe = (mafPipeSurfaceSlice *)m_CurrentSurface[i]->m_Pipe;
+					pipe->SetSlice(origin); 
+				}
+			}
+		}
+	}
+
+	if(!m_CurrentPolyline.empty())
+	{
+		for(int i=0;i<m_CurrentPolyline.size();i++)
+		{
+			if(m_CurrentPolyline.at(i) && m_CurrentPolyline.at(i)->m_Pipe)
+			{
+				mafString pipe_name = m_CurrentPolyline.at(i)->m_Pipe->GetTypeName();
+				if (pipe_name.Equals("mafPipePolylineSlice"))
+				{
+					mafPipePolylineSlice *pipe = (mafPipePolylineSlice *)m_CurrentPolyline[i]->m_Pipe;
+					pipe->SetSlice(origin); 
+				}
 			}
 		}
 	}
@@ -637,4 +646,53 @@ void mafViewSlice::Print(std::ostream& os, const int tabs)// const
   os << indent << "Name" << '\t' << m_Label << std::endl;
   os << std::endl;
   m_Sg->Print(os,1);
+}
+//-------------------------------------------------------------------------
+void mafViewSlice::SetNormal(double normal[3])
+//-------------------------------------------------------------------------
+{
+	/*if(m_CurrentVolume)
+	{
+		mafString pipe_name = m_CurrentVolume->m_Pipe->GetTypeName();
+		if (pipe_name.Equals("mafPipeVolumeSlice"))
+		{
+			mafPipeVolumeSlice *pipe = (mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe;
+			pipe->SetSlice(origin); 
+
+			// update text
+			this->UpdateText();
+		}
+	}*/
+
+	if(!m_CurrentSurface.empty())
+	{
+		for(int i=0;i<m_CurrentSurface.size();i++)
+		{
+			if(m_CurrentSurface.at(i) && m_CurrentSurface.at(i)->m_Pipe)
+			{
+				mafString pipe_name = m_CurrentSurface.at(i)->m_Pipe->GetTypeName();
+				if (pipe_name.Equals("mafPipeSurfaceSlice"))
+				{
+					mafPipeSurfaceSlice *pipe = (mafPipeSurfaceSlice *)m_CurrentSurface[i]->m_Pipe;
+					pipe->SetNormal(normal); 
+				}
+			}
+		}
+	}
+
+	if(!m_CurrentPolyline.empty())
+	{
+		for(int i=0;i<m_CurrentPolyline.size();i++)
+		{
+			if(m_CurrentPolyline.at(i) && m_CurrentPolyline.at(i)->m_Pipe)
+			{
+				mafString pipe_name = m_CurrentPolyline.at(i)->m_Pipe->GetTypeName();
+				if (pipe_name.Equals("mafPipePolylineSlice"))
+				{
+					mafPipePolylineSlice *pipe = (mafPipePolylineSlice *)m_CurrentPolyline[i]->m_Pipe;
+					pipe->SetNormal(normal); 
+				}
+			}
+		}
+	}
 }

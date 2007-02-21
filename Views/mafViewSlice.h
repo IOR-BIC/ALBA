@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2007-01-23 15:38:23 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2007-02-21 17:01:41 $
+  Version:   $Revision: 1.20 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -111,6 +111,8 @@ public:
 
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0);// const;
+
+	void SetNormal(double normal[3]);
 
 protected:
   virtual mmgGui *CreateGui();

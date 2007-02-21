@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-02-14 13:52:44 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2007-02-21 17:01:41 $
+Version:   $Revision: 1.8 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -28,12 +28,16 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVMEVolume.h"
 #include "mafVMESurface.h"
 #include "mafViewSlice.h"
+#include "mafGizmoPath.h"
+#include "mmaVolumeMaterial.h"
+#include "mafTransform.h"
+#include "mafTagArray.h"
+
 #include "vtkProbeFilter.h"
 #include "vtkPlaneSource.h"
 #include "vtkMAFSmartPointer.h"
 #include "vtkImageData.h"
 #include "vtkPolyDataMapper.h"
-#include "mmaVolumeMaterial.h"
 #include "vtkPolyData.h"
 #include "vtkLookupTable.h"
 #include "vtkActor.h"
@@ -50,28 +54,12 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkPoints.h"
 #include "vtkPointData.h"
 
-#define VALUE 1.5
-
 //----------------------------------------------------------------------------
 // constants:
 //----------------------------------------------------------------------------
 
-const int CT_CHILD_VIEWS_NUMBER  = 10;
-
-enum CT_SUBVIEW_ID
-{
-	CT1 = 0,
-	CT2,
-	CT3,
-	CT4,
-	CT5,
-	CT6,
-	CT7,
-	CT8,
-	CT9,
-	CT10
-};
-
+#define CT_COMPOUND 0
+#define VALUE 1.5
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewCTNew);
@@ -82,77 +70,60 @@ mafViewCTNew::mafViewCTNew(wxString label)
 : mafViewCompound(label, 1, 1)
 //----------------------------------------------------------------------------
 {
-
-	/*m_BorderColor[0][0] = 1.0; m_BorderColor[0][1] = 0.0; m_BorderColor[0][2] = 0.0;
-	m_BorderColor[1][0] = 0.0; m_BorderColor[1][1] = 1.0; m_BorderColor[1][2] = 0.0;
-	m_BorderColor[2][0] = 0.0; m_BorderColor[2][1] = 0.0; m_BorderColor[2][2] = 1.0;
-	m_BorderColor[3][0] = 1.0; m_BorderColor[3][1] = 1.0; m_BorderColor[3][2] = 0.0;
-	m_BorderColor[4][0] = 0.0; m_BorderColor[4][1] = 1.0; m_BorderColor[4][2] = 1.0;
-	m_BorderColor[5][0] = 1.0; m_BorderColor[5][1] = 0.0; m_BorderColor[5][2] = 1.0;
-	m_BorderColor[6][0] = 0.5; m_BorderColor[6][1] = 0.0; m_BorderColor[6][2] = 0.0;
-	m_BorderColor[7][0] = 0.0; m_BorderColor[7][1] = 0.5; m_BorderColor[7][2] = 0.0;
-	m_BorderColor[8][0] = 0.0; m_BorderColor[8][1] = 0.0; m_BorderColor[8][2] = 0.5;
-	m_BorderColor[9][0] = 0.5; m_BorderColor[9][1] = 0.5; m_BorderColor[9][2] = 0.0;*/
-
 	m_CurrentVolume = NULL;
-	//m_LayoutConfiguration = LAYOUT_CUSTOM;
 
 	m_ViewCTCompound    = NULL;
 
-	m_WidthSection = 50;
-	m_HeightSection = 50;
-	m_Position[0] = m_Position[1] = m_Position[2] = 0.0;
-	m_Normal[0] = 0.0;
-	m_Normal[1] = 0.0;
-	m_Normal[2] = 1.0;
+	m_WidthSection = 20;
+	m_HeightSection = 20;
 
   m_Thickness = 0;
 	m_AdditionalProfileNumber = 0;
 	m_ProfileDistance = 0;
+
+	for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++)
+	{
+		m_Normal.push_back(new double[3]);
+		m_Position.push_back(new double[3]);
+		m_TextActor.push_back(vtkActor2D::New());
+		m_Actor.push_back(vtkActor::New());
+		m_Text.push_back(vtkTextMapper::New());
+		m_Text[i]->GetTextProperty()->SetColor(1.0,1.0,1.0);
+		m_Mapper.push_back(vtkPolyDataMapper::New());
+		m_Prober.push_back(vtkProbeFilter::New());
+		m_PlaneSec.push_back(vtkPlaneSource::New());
+	}
+
+	m_CurrentZ = 0.0;
+
 }
 //----------------------------------------------------------------------------
 mafViewCTNew::~mafViewCTNew()
 //----------------------------------------------------------------------------
 {
-	m_ViewCTCompound = NULL;
+		for(int i=0; i<m_Actor.size(); i++)
+		{
+			cppDEL(m_Normal[i]);
+			cppDEL(m_Position[i]);
+			vtkDEL(m_TextActor[i]);
+			vtkDEL(m_Actor[i]);
+			vtkDEL(m_Text[i]);
+			vtkDEL(m_Mapper[i]);
+			vtkDEL(m_Prober[i]);
+			vtkDEL(m_PlaneSec[i]);
+		}
+		m_Normal.clear();
+		m_Position.clear();
+		m_TextActor.clear();
+		m_Actor.clear();
+		m_Text.clear();
+		m_Mapper.clear();
+		m_Prober.clear();
+		m_PlaneSec.clear();
 
-  int num = CT_CHILD_VIEWS_NUMBER;
-  /*for(int i=0; i<num; i++)
-  {
-    vtkDEL(m_TextActor[i]);
-  }*/
-	m_TextActor.clear();
+		m_ViewCTCompound = NULL;
 
-  /*for(int i=0; i<num; i++)
-  {
-    vtkDEL(m_Actor[i]);
-  }*/
-  m_Actor.clear();
-
-  /*for(int i=0; i<num; i++)
-  {
-    vtkDEL(m_Text[i]);
-  }*/
-  m_Text.clear();
-	
-  /*for(int i=0; i<num; i++)
-  {
-    vtkDEL(m_Mapper[i]);
-  }*/
-  m_Mapper.clear();
-	
-  /*for(int i=0; i<num; i++)
-  {
-    vtkDEL(m_Prober[i]);
-  }*/
-  m_Prober.clear();
-	
-  /*for(int i=0; i<num; i++)
-  {
-    vtkDEL(m_PlaneSec[i]);
-  }*/
-  m_PlaneSec.clear();
-
+		m_CurrentVolume = NULL;
 }
 //----------------------------------------------------------------------------
 mafView *mafViewCTNew::Copy(mafObserver *Listener)
@@ -181,29 +152,67 @@ void mafViewCTNew::VmeShow(mafNode *node, bool show)
 		if(show)
 		{
 			m_CurrentVolume = mafVMEVolume::SafeDownCast(node);
+			double b[6];
+			m_CurrentVolume->GetOutput()->Update();
+			m_CurrentVolume->GetOutput()->GetBounds(b);
+			SetCurrentZ((b[5]-b[4])/2);
 			ProbeVolume();
 		}
 		else
 		{
-			for(int i=0; i<this->GetNumberOfSubView(); i++)
+			for(int idSubView=0; idSubView<CT_CHILD_VIEWS_NUMBER; idSubView++)
 			{
-				m_ChildViewList[i]->GetSceneGraph()->m_RenFront->RemoveActor(m_Actor[i]);
-				m_ChildViewList[i]->GetSceneGraph()->m_RenFront->RemoveActor(m_TextActor[i]);
+				if(m_CurrentVolume)
+				{
+					mafViewVTK* view =((mafViewVTK *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND])->GetSubView(idSubView));
+					view->GetSceneGraph()->m_RenFront->RemoveActor(m_Actor[idSubView]);
+					view->GetSceneGraph()->m_RenFront->RemoveActor(m_TextActor[idSubView]);
+				}
 			}
+			CameraUpdate();
 			m_CurrentVolume = NULL;
 		}
 	}
+	else if(node->IsA("mafVMEPolyline"))
+	{
+		if(node->GetTagArray()->IsTagPresent("MFL_MANDIBULAR_CANAL"))
+		{
+			m_ChildViewList[CT_COMPOUND]->VmeShow(node, show);
+			for(int i=0; i< CT_CHILD_VIEWS_NUMBER; i++)
+			{
+				UpdateSliceView(i);
+			}
+			CameraUpdate();
+		}
+	}
 
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	//CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafViewCTNew::VmeRemove(mafNode *node)
 //----------------------------------------------------------------------------
 {
+	if(node == m_CurrentVolume)
+	{
+		m_CurrentVolume = NULL;
+
+		for(int i=0; i<m_Actor.size(); i++)
+		{
+			mafViewVTK* view =((mafViewVTK *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND])->GetSubView(i));
+
+			if(m_Actor[i])
+				view->GetSceneGraph()->m_RenFront->RemoveActor(m_Actor[i]);
+			if(m_TextActor[i])
+				view->GetSceneGraph()->m_RenFront->RemoveActor(m_TextActor[i]);
+		}
+	}
+
 	for(int i=0; i<this->GetNumberOfSubView(); i++)
 		m_ChildViewList[i]->VmeRemove(node);
 
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafViewCTNew::OnEvent(mafEventBase *maf_event)
@@ -215,8 +224,7 @@ void mafViewCTNew::OnEvent(mafEventBase *maf_event)
 		{
 		case ID_LAYOUT_HEIGHT:
 		case ID_LAYOUT_WIDTH:
-		case ID_LAYOUT_POSITION:
-		case ID_LAYOUT_NORMAL:
+			ProbeVolume();
     break;
 		case ID_LAYOUT_THICKNESS:
 			{
@@ -236,12 +244,25 @@ void mafViewCTNew::OnEvent(mafEventBase *maf_event)
 					if (m_AdditionalProfileNumber * 2 > 4)
 						wxMessageBox(L"Warning: with this Thickness value, it will be required more time to process");
 				}
-
+				ProbeVolume();
 			}
 			break;
-		case ID_LAYOUT_UPDATE:
+		/*case ID_LAYOUT_UPDATE:
 			ProbeVolume();
 			mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+			break;*/
+			case MOUSE_UP:
+			case MOUSE_MOVE:
+			{
+				if(e->GetString()->Equals("Z"))
+				{
+					vtkPoints *p = (vtkPoints *)e->GetVtkObj();
+					double pos[3];
+					p->GetPoint(0,pos);
+					SetCurrentZ(pos[2]);
+					ProbeVolume();
+				}
+			}
 			break;
 		default:
 			mafEventMacro(*maf_event);
@@ -255,33 +276,17 @@ mmgGui* mafViewCTNew::CreateGui()
 //-------------------------------------------------------------------------
 {
 	assert(m_Gui == NULL);
-
-  // creation
-  int num = CT_CHILD_VIEWS_NUMBER;
-  
-  for(int i=0; i<num; i++)
-  {
-    m_TextActor.push_back(vtkActor2D::New());
-    m_Actor.push_back(vtkActor::New());
-    m_Text.push_back(vtkTextMapper::New());
-    m_Mapper.push_back(vtkPolyDataMapper::New());
-    m_Prober.push_back(vtkProbeFilter::New());
-    m_PlaneSec.push_back(vtkPlaneSource::New());
-  }
   
   // end creation
   
   m_Gui = new mmgGui(this);
 
-	m_Gui->Integer(ID_LAYOUT_WIDTH,"Width",&m_WidthSection);
-	m_Gui->Integer(ID_LAYOUT_HEIGHT,"Height",&m_HeightSection);
-
-	m_Gui->VectorN(ID_LAYOUT_POSITION,"Position",&m_Position[0]);
-	m_Gui->VectorN(ID_LAYOUT_NORMAL,"Normal",&m_Normal[0]);
+	m_Gui->Integer(ID_LAYOUT_WIDTH,_("Width"),&m_WidthSection);
+	m_Gui->Integer(ID_LAYOUT_HEIGHT,_("Height"),&m_HeightSection);
 
 	m_Gui->Double(ID_LAYOUT_THICKNESS,_("Thickness"), &m_Thickness,0,50,2,_("define the thickness of the slice"));
 
-	m_Gui->Button(ID_LAYOUT_UPDATE,"Update");
+	//m_Gui->Button(ID_LAYOUT_UPDATE,"Update");
 
 	m_Gui->Label("");
 
@@ -315,12 +320,8 @@ void mafViewCTNew::PackageView()
 //----------------------------------------------------------------------------
 {
 	m_ViewCTCompound = new mafViewCompound("CT view",2,5);
-	mafViewVTK *vs = new mafViewVTK("Slice view");
-	/*m_Vs->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice",MUTEX);
-	m_Vs->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice",MUTEX);
-	m_Vs->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice",MUTEX);
-	m_Vs->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice",MUTEX);
-	m_Vs->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice",MUTEX);*/
+	mafViewSlice *vs = new mafViewSlice("Slice view",CAMERA_ARB,false);
+	vs->PlugVisualPipe("mafVMEPolyline","mafPipePolylineSlice");
 	m_ViewCTCompound->PlugChildView(vs);
 	PlugChildView(m_ViewCTCompound);
 }
@@ -355,6 +356,59 @@ void mafViewCTNew::VmeSelect(mafNode *node, bool select)
 		m_ChildViewList[i]->VmeSelect(node, select);
 }
 //----------------------------------------------------------------------------
+void mafViewCTNew::SetCurrentZ(double Z)
+//----------------------------------------------------------------------------
+{
+	m_CurrentZ = Z;
+	for(int i=0;i<m_Position.size();i++)
+		m_Position[i][2] = m_CurrentZ;
+}
+//----------------------------------------------------------------------------
+void mafViewCTNew::SetCurrentZ(int idview,double Z)
+//----------------------------------------------------------------------------
+{
+	m_CurrentZ = Z;
+	m_Position[idview][2] = m_CurrentZ;
+}
+//----------------------------------------------------------------------------
+void mafViewCTNew::SetMatrix(int idview,mafMatrix *matrix)
+//----------------------------------------------------------------------------
+{
+	matrix->GetVersor(0, m_Normal[idview]);
+	mafTransform::GetPosition(*matrix, m_Position[idview]);
+
+	SetCurrentZ(idview,m_CurrentZ);
+
+	UpdateSliceView(idview);
+}
+//----------------------------------------------------------------------------
+void mafViewCTNew::UpdateSliceView(int idview)
+//----------------------------------------------------------------------------
+{
+	mafViewSlice* view =((mafViewSlice *)((mafViewCompound *)m_ChildViewList[0])->GetSubView(idview));
+
+	double position_shifted[3];
+	position_shifted[0]=m_Position[idview][0]+m_Normal[idview][0]*0.1;
+	position_shifted[1]=m_Position[idview][1]+m_Normal[idview][1]*0.1;
+	position_shifted[2]=m_Position[idview][2]+m_Normal[idview][2]*0.1;
+
+	view->SetNormal(m_Normal[idview]);
+	view->SetSliceLocalOrigin(position_shifted);
+}
+//----------------------------------------------------------------------------
+void mafViewCTNew::SetColorText(int idView,double *color)
+//----------------------------------------------------------------------------
+{
+	m_Text[idView]->GetTextProperty()->SetColor(color);
+}
+//----------------------------------------------------------------------------
+void mafViewCTNew::SetColorText(double **color)
+//----------------------------------------------------------------------------
+{
+	for(int idView=0;idView<CT_CHILD_VIEWS_NUMBER;idView++)
+		m_Text[idView]->GetTextProperty()->SetColor(color[idView]);
+}
+//----------------------------------------------------------------------------
 void mafViewCTNew::ProbeVolume()
 //----------------------------------------------------------------------------
 {
@@ -365,12 +419,12 @@ void mafViewCTNew::ProbeVolume()
   vtkImageData *vtk_data = ((vtkImageData *)m_CurrentVolume->GetOutput()->GetVTKData());
   vtk_data->GetSpacing(m_Spacing);
 
-  for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++)
+  for(int idSubView=0; idSubView<CT_CHILD_VIEWS_NUMBER; idSubView++)
   {
-    mafViewVTK *vslice = ((mafViewVTK *)((mafViewCompound *)m_ChildViewList[0])->GetSubView(i));
-	  if (m_Actor[i])
+    mafViewVTK *vslice = ((mafViewVTK *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND])->GetSubView(idSubView));
+	  if (m_Actor.size()>0)
 	  {
-		  vslice->GetSceneGraph()->m_RenFront->RemoveActor(m_Actor[i]);
+		  vslice->GetSceneGraph()->m_RenFront->RemoveActor(m_Actor[idSubView]);
 	  }
 
 
@@ -387,12 +441,13 @@ void mafViewCTNew::ProbeVolume()
 
 	  vtkMAFSmartPointer<vtkPoints> target_points;
 	  target_points->SetNumberOfPoints(2);
-	  target_points->SetPoint(0,m_Position);
-	  vtkMath::Normalize(m_Normal);
+	  target_points->SetPoint(0,m_Position[idSubView]);
+		
+	  vtkMath::Normalize(m_Normal[idSubView]);
 	  double p2[3];
-	  p2[0]=m_Position[0] + m_Normal[0];
-	  p2[1]=m_Position[1] + m_Normal[1];
-	  p2[2]=m_Position[2] + m_Normal[2];
+	  p2[0]=m_Position[idSubView][0] + m_Normal[idSubView][0];
+	  p2[1]=m_Position[idSubView][1] + m_Normal[idSubView][1];
+	  p2[2]=m_Position[idSubView][2] + m_Normal[idSubView][2];
 	  target_points->SetPoint(1,p2);
 
 	  vtkMAFSmartPointer<vtkLandmarkTransform> trans_matrix;
@@ -410,15 +465,15 @@ void mafViewCTNew::ProbeVolume()
 
 	  //+++ create plane
 
-	  m_PlaneSec[i]->SetOrigin(0,m_WidthSection/2.0,m_HeightSection/2.0);
-	  m_PlaneSec[i]->SetPoint1(0,-m_WidthSection/2.0,m_HeightSection/2.0);
-	  m_PlaneSec[i]->SetPoint2(0,m_WidthSection/2.0,-m_HeightSection/2.0);
-	  m_PlaneSec[i]->SetXResolution((int)(m_WidthSection/(VALUE*m_Spacing[0])));
-	  m_PlaneSec[i]->SetYResolution((int)(m_HeightSection/(VALUE*m_Spacing[1])));
+	  m_PlaneSec[idSubView]->SetOrigin(0,m_WidthSection/2.0,m_HeightSection/2.0);
+	  m_PlaneSec[idSubView]->SetPoint1(0,-m_WidthSection/2.0,m_HeightSection/2.0);
+	  m_PlaneSec[idSubView]->SetPoint2(0,m_WidthSection/2.0,-m_HeightSection/2.0);
+	  m_PlaneSec[idSubView]->SetXResolution((int)(m_WidthSection/(VALUE*m_Spacing[0])));
+	  m_PlaneSec[idSubView]->SetYResolution((int)(m_HeightSection/(VALUE*m_Spacing[1])));
 	  //planeSec->SetNormal(1,0,0);
-	  m_PlaneSec[i]->Update();
+	  m_PlaneSec[idSubView]->Update();
 
-	  trans_poly->SetInput(m_PlaneSec[i]->GetOutput());
+	  trans_poly->SetInput(m_PlaneSec[idSubView]->GetOutput());
 	  trans_poly->Update();
 
 	  //+++using prober
@@ -431,22 +486,22 @@ void mafViewCTNew::ProbeVolume()
 	  {
 	  
 			//prober->SetInput(m_PlaneSection[s]);
-			m_Prober[i]->SetInput(trans_poly->GetOutput());
-			m_Prober[i]->SetSource(vtk_data);
-			m_Prober[i]->Update();
+			m_Prober[idSubView]->SetInput(trans_poly->GetOutput());
+			m_Prober[idSubView]->SetSource(vtk_data);
+			m_Prober[idSubView]->Update();
 			//vtkMAFSmartPointer<vtkPolyDataMapper> m_Mapper;
 
 			//m_Mapper->SetInput(m_Prober->GetPolyDataOutput());
 			//m_Mapper->SetInput(sphere->GetOutput());
 
 			double sr[2];
-			m_Prober[i]->GetOutput()->GetScalarRange(sr);
+			m_Prober[idSubView]->GetOutput()->GetScalarRange(sr);
 			lut->SetTableRange(sr);
 
-			m_Prober[i]->GetPolyDataOutput()->GetBounds(b);
+			m_Prober[idSubView]->GetPolyDataOutput()->GetBounds(b);
 
 			double *centerSlice = new double[3];
-			m_Prober[i]->GetPolyDataOutput()->GetCenter(centerSlice);
+			m_Prober[idSubView]->GetPolyDataOutput()->GetCenter(centerSlice);
 			//m_SliceOriginVector.push_back(centerSlice);
 			//m_SliceBoundsVector.push_back(b);
 			//}
@@ -456,15 +511,15 @@ void mafViewCTNew::ProbeVolume()
 			transform->Update();
 
 			vtkMAFSmartPointer<vtkTransformPolyDataFilter> tpdf;
-			tpdf->SetInput(m_Prober[i]->GetPolyDataOutput());
+			tpdf->SetInput(m_Prober[idSubView]->GetPolyDataOutput());
 			tpdf->SetTransform(transform);
 			tpdf->Update();
 
 		  
-			m_Mapper[i]->SetInput(tpdf->GetOutput());
+			m_Mapper[idSubView]->SetInput(tpdf->GetOutput());
 
-			m_Mapper[i]->SetScalarRange(sr);
-			m_Mapper[i]->SetLookupTable(lut);
+			m_Mapper[idSubView]->SetScalarRange(sr);
+			m_Mapper[idSubView]->SetLookupTable(lut);
 
 		}
 		////////////////////////////////////////////////
@@ -472,7 +527,6 @@ void mafViewCTNew::ProbeVolume()
 		////////////////////////////////////////////////
 		else
 		{
-
 			std::vector<vtkProbeFilter *> probeVector;
 
 			for(int u= -m_AdditionalProfileNumber; u <= m_AdditionalProfileNumber ; u++)
@@ -522,11 +576,8 @@ void mafViewCTNew::ProbeVolume()
 			for(int k=0; k< number; k++)
 				probeVector[probeVector.size()-1]->GetPolyDataOutput()->GetPointData()->GetScalars()->SetTuple1(k , sumVector[k]);
 
-
-
 			double range[2];
 			probeVector[probeVector.size()-1]->GetPolyDataOutput()->GetScalarRange(range);
-
 
 			lut->SetRange(range);
 
@@ -539,11 +590,9 @@ void mafViewCTNew::ProbeVolume()
 			tpdf->SetTransform(transform);
 			tpdf->Update();
 
-
-
-			m_Mapper[i]->SetInput(probeVector[probeVector.size()-1]->GetPolyDataOutput());
-			m_Mapper[i]->SetScalarRange(range);
-			m_Mapper[i]->SetLookupTable(lut);  	
+			m_Mapper[idSubView]->SetInput(probeVector[probeVector.size()-1]->GetPolyDataOutput());
+			m_Mapper[idSubView]->SetScalarRange(range);
+			m_Mapper[idSubView]->SetLookupTable(lut);  	
 
 			probeVector[probeVector.size()-1]->GetPolyDataOutput()->GetBounds(b);
 
@@ -556,22 +605,22 @@ void mafViewCTNew::ProbeVolume()
 	  //+++creare attore
 	  //++++settare nelle slice
 	  
-	  m_Actor[i]->SetMapper(m_Mapper[i]);
+	  m_Actor[idSubView]->SetMapper(m_Mapper[idSubView]);
 	  //m_Actor->GetProperty()->SetOpacity(0.7);
 
 	  //m_SectionActor.push_back(m_Actor);
 
 	  
 	  mafString t;
-	  t = "test";
-	  m_Text[i]->SetInput(t);
-	  m_Text[i]->GetTextProperty()->SetColor(1.0,1.0,1.0);
+		t = wxString::Format("%d",idSubView);
+	  m_Text[idSubView]->SetInput(t);
+	  //m_Text[idSubView]->GetTextProperty()->SetColor(1.0,1.0,1.0);
 	  //text->GetTextProperty()->BoldOn();
 
 	  //text->GetTextProperty()->SetJustificationToRight();
 	  //text->GetTextProperty()->SetVerticalJustificationToBottom();
 	  
-	  m_TextActor[i]->SetMapper(m_Text[i]);
+	  m_TextActor[idSubView]->SetMapper(m_Text[idSubView]);
 
 
 	  /*if (s == m_StartIndexSliceVisualized)
@@ -589,8 +638,8 @@ void mafViewCTNew::ProbeVolume()
 	  //m_SectionLabel.push_back(textActor);
 
 
-	  vslice->GetRWI()->GetCamera()->SetFocalPoint(p2);
-	  vslice->GetRWI()->GetCamera()->SetPosition(m_Position);
+	  vslice->GetRWI()->GetCamera()->SetFocalPoint(m_Position[idSubView]);
+	  vslice->GetRWI()->GetCamera()->SetPosition(p2);
 	  vslice->GetRWI()->GetCamera()->SetViewUp(0,0,1);
 	  vslice->GetRWI()->GetCamera()->SetClippingRange(0.1,1000);
 	  vslice->GetRWI()->GetCamera()->ParallelProjectionOn();
@@ -601,8 +650,8 @@ void mafViewCTNew::ProbeVolume()
 
 
 
-	  vslice->GetSceneGraph()->m_RenFront->AddActor(m_Actor[i]);
-	  vslice->GetSceneGraph()->m_RenFront->AddActor2D(m_TextActor[i]);
+	  vslice->GetSceneGraph()->m_RenFront->AddActor(m_Actor[idSubView]);
+	  vslice->GetSceneGraph()->m_RenFront->AddActor2D(m_TextActor[idSubView]);
 	  /*if (s == m_StartIndexSliceVisualized)
 	  {
 	  vslice->BorderCreate(m_StartMarkerColor);

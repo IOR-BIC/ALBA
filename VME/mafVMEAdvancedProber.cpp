@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-14 13:49:40 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-02-21 17:03:03 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -120,6 +120,8 @@ mafVMEAdvancedProber::mafVMEAdvancedProber()
   dpipe->SetDependOnAbsPose(true);
   dpipe->SetInput(m_Plane->GetOutput()); //<***********************m_AdvanceProbeFilter
   SetDataPipe(dpipe);
+
+	m_Fixed = 0;
 }
 
 //-------------------------------------------------------------------------
@@ -1370,6 +1372,7 @@ int mafVMEAdvancedProber::InternalStore(mafStorageElement *parent)
   if (Superclass::InternalStore(parent)==MAF_OK)
   {
     parent->StoreMatrix("Transform",&m_Transform->GetMatrix());
+		parent->StoreInteger("Fixed", m_Fixed);
     return MAF_OK;
   }
   return MAF_ERROR;
@@ -1384,6 +1387,7 @@ int mafVMEAdvancedProber::InternalRestore(mafStorageElement *node)
     if (node->RestoreMatrix("Transform",&matrix)==MAF_OK)
     {
       m_Transform->SetMatrix(matrix);
+			node->RestoreInteger("Fixed", m_Fixed);
       return MAF_OK;
     }
   }
@@ -1420,7 +1424,7 @@ mmgGui* mafVMEAdvancedProber::CreateGui()
   m_Gui->Divider();
   mafVME *vol = mafVME::SafeDownCast(GetVolumeLink());
   m_VolumeName = vol ? vol->GetName() : "none";
-  m_Gui->Button(ID_VOLUME_LINK,&m_VolumeName,_("Volume"), _("Select the volume to be probed"));
+  //m_Gui->Button(ID_VOLUME_LINK,&m_VolumeName,_("Volume"), _("Select the volume to be probed"));
 
 
   /*m_ListBox = new mmgListCtrl(m_Gui, ID_LISTBOX);
@@ -1460,19 +1464,21 @@ mmgGui* mafVMEAdvancedProber::CreateGui()
   //m_Gui->Add(m_ListBox);
   
   m_Gui->Button(ID_ADD_PROFILE, _("Add"), _("") ,_(""));
-  m_Gui->Button(ID_REMOVE_PROFILE, _("Remove"), _("") ,_(""));
+	m_Gui->Enable(ID_ADD_PROFILE,m_Fixed==0);
+  //m_Gui->Button(ID_REMOVE_PROFILE, _("Remove"), _("") ,_(""));
   m_Gui->Divider(2);
 
   m_Gui->Double(ID_SAMPLING, _("Sample"),  &m_SamplingCoefficient, 1 , 5);
-	m_Gui->Integer(ID_SPLINE, _("Spline"),  &m_SplineCoefficient, 1 , 20);
+	//m_Gui->Integer(ID_SPLINE, _("Spline"),  &m_SplineCoefficient, 1 , 20);
 
   m_Gui->Label(_("Projection Panoramic Parameters"));
-  m_Gui->Integer(ID_PROFILE_NUMBER,"Number",&m_AdditionalProfileNumber,0,1000);
-  m_Gui->Double(ID_PROFILE_DISTANCE,"Step",&m_ProfileDistance,0.0);
+  m_Gui->Integer(ID_PROFILE_NUMBER,_("Number"),&m_AdditionalProfileNumber,0,1000);
+  m_Gui->Double(ID_PROFILE_DISTANCE,_("Step"),&m_ProfileDistance,0.0);
   /*m_ProberMode = GetMode();
   wxString prober_mode[2] = {_("density"), _("distance")};
   m_Gui->Combo(ID_MODALITY,_("modality"), &m_ProberMode, 2, prober_mode);*/
 
+	m_Gui->Label("");
   return m_Gui;
 }
 //-------------------------------------------------------------------------
@@ -1575,6 +1581,12 @@ void mafVMEAdvancedProber::OnEvent(mafEventBase *maf_event)
 
 				ForwardUpEvent(&mafEvent(this,CAMERA_RESET));
 				ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
+
+				m_Fixed = 1;
+				m_Gui->Enable(ID_ADD_PROFILE,m_Fixed==0);
+				m_Gui->Update();
+
+
 
       }
       break;
