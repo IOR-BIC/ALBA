@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-22 12:58:26 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2007-02-22 09:00:35 $
+  Version:   $Revision: 1.23 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -245,9 +245,33 @@ int mmgCheckTree::GetVmeStatus(mafNode *vme)
 void mmgCheckTree::VmeUpdateIcon(mafNode *vme)   
 //----------------------------------------------------------------------------
 {
-  int dataStatus = ((mafVME *)vme)->IsDataAvailable() ? 0 : 1;
-  int icon_index = ClassNameToIcon(vme->GetTypeName()) + (GetVmeStatus(vme)*2) + dataStatus;
+  int dataStatus = 1;
+  int icon_index;
+
+  dataStatus = ((mafVME *)vme)->IsDataAvailable() ? 0 : 1;
+  icon_index = ClassNameToIcon(vme->GetTypeName()) + (GetVmeStatus(vme)*2) + dataStatus;
   SetNodeIcon( (long)vme, icon_index );
+  
+  if (vme->GetNumberOfLinks() != 0)
+  {
+    mafNode::mafLinksMap *links = vme->GetLinks();
+    mafVME *linkedVME = NULL;
+    for (mafNode::mafLinksMap::iterator it=links->begin();it!=links->end();it++)
+    {
+      if(it->second.m_Node)
+      {
+        linkedVME = mafVME::SafeDownCast(it->second.m_Node);
+        if (linkedVME)
+        {
+          dataStatus = linkedVME->IsDataAvailable() ? 0 : 1;
+          icon_index = ClassNameToIcon(linkedVME->GetTypeName()) + (GetVmeStatus(linkedVME)*2) + dataStatus;
+          SetNodeIcon( (long)linkedVME, icon_index );
+        }
+      }
+    }
+  }
+//  int icon_index = ClassNameToIcon(vme->GetTypeName()) + (GetVmeStatus(vme)*2) + dataStatus;
+//  SetNodeIcon( (long)vme, icon_index );
 }
 //----------------------------------------------------------------------------
 void mmgCheckTree::ViewSelected(mafView *view)
