@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoPath.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-16 11:45:39 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-02-22 13:02:37 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -373,7 +373,7 @@ void mafGizmoPath::CreateVMEGizmo()
 
   assert(root);
 
-  assert(m_VmeGizmoPath->ReparentTo(root) == MAF_OK);
+  m_VmeGizmoPath->ReparentTo(root);
 
   // ask the manager to create the pipelines
   // this his giving problems... amounted for the moment
