@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-02-09 15:50:10 $
-Version:   $Revision: 1.15 $
+Date:      $Date: 2007-02-23 15:30:39 $
+Version:   $Revision: 1.16 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -228,5 +228,14 @@ void mafPipeIsosurface::OnEvent(mafEventBase *maf_event)
 void mafPipeIsosurface::EnableBoundingBoxVisibility(bool enable)
 //----------------------------------------------------------------------------
 {
-   m_BoundingBoxVisibility = enable;
+	m_BoundingBoxVisibility = enable;
+}
+//----------------------------------------------------------------------------
+void mafPipeIsosurface::SetAlphaValue(double value)
+//----------------------------------------------------------------------------
+{
+	m_AlphaValue=value;
+	m_ContourMapper->SetAlpha(m_AlphaValue);
+	m_ContourMapper->Modified();
+	m_Vme->ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
 }

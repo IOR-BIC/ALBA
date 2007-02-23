@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.h,v $
 Language:  C++
-Date:      $Date: 2007-02-09 15:50:10 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2007-02-23 15:30:39 $
+Version:   $Revision: 1.9 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -50,6 +50,9 @@ public:
 
 	/** return the contour value. */
 	float  GetContourValue();
+
+	void SetAlphaValue(double value);
+	double GetAlphaValue(){return m_AlphaValue;};
 
   /** return the contour value. */
   void  EnableBoundingBoxVisibility(bool enable = true);
