@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.h,v $
   Language:  C++
-  Date:      $Date: 2007-02-20 09:13:50 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-02-23 15:32:49 $
+  Version:   $Revision: 1.5 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,6 +23,7 @@
 class mafVME;
 class mafSceneNode;
 class mmgGui;
+class mafVMEVolumeGray;
 
 //----------------------------------------------------------------------------
 // mafViewRX :
@@ -51,6 +52,20 @@ public:
   { 
     ID_NONE = Superclass::ID_LAST,
 		ID_COMBO_PIPE,
+		ID_CONTOUR_VALUE_ISO,
+		ID_ALPHA_VALUE_ISO,
+		ID_VOLUME_COLOR,
+		ID_EXPOSURE_CORRECTION_L,
+		ID_EXPOSURE_CORRECTION_H,
+		ID_GAMMA,
+		ID_CAMERA_ANGLE,
+		ID_CAMERA_POSITION,
+		ID_CAMERA_FOCUS,
+		ID_CAMERA_ROLL,
+		ID_IMAGE_COLOR,
+		ID_IMAGE_OFFSET_X,
+		ID_IMAGE_OFFSET_Y,
+		ID_IMAGE_ANGLE,
     ID_LAST
   };
 
@@ -60,7 +75,8 @@ public:
   otherwise ask to vme which is its visual pipe. */
   virtual void VmeCreatePipe(mafNode *vme);
 
-	virtual void VmeSelect(mafNode *vme, bool select);
+	/** Show/Hide VMEs into plugged sub-views */
+	virtual void VmeShow(mafNode *node, bool show);
 
 	/** 
 	Set the visualization status for the node (visible, not visible, mutex, ...) \sa mafSceneGraph mafView*/
@@ -70,7 +86,35 @@ protected:
 
 	virtual mmgGui *CreateGui();
 
+	void EnableSubGui(int idSubPipe,bool enable=true);
+
+	void InizializeSubGui();
+
 	int m_Choose;
+
+	mafVMEVolumeGray *m_CurrentVolume;
+
+	//----------------------------- ISO settings
+	double m_ContourValueIso;
+	double m_AlphaValueIso;
+	mmgFloatSlider *m_SliderContourIso;
+	mmgFloatSlider *m_SliderAlphaIso;
+
+	//----------------------------- DRR settings
+	double             m_ExposureCorrection[2];
+	mmgFloatSlider    *m_ExposureCorrectionSlider[2];
+	double             m_Gamma;
+	mmgFloatSlider    *m_GammaSlider;
+	wxColor            m_VolumeColor;
+	wxColor            m_ImageColor;
+	double             m_ImageAngle;
+	double             m_Offset[2];
+	double             m_CameraAngle;
+	double             m_CameraPositionDRR[3];
+	double             m_CameraFocus[3];
+	double             m_CameraRoll;
+
+
 
 };
 #endif
