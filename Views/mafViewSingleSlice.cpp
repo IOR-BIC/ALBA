@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-21 17:01:41 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-02-23 15:21:47 $
+  Version:   $Revision: 1.7 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,6 +37,7 @@
 #include "mafAttachCamera.h"
 #include "mmgFloatSlider.h"
 #include "mafNodeIterator.h"
+#include "mafVMEGizmo.h"
 
 #include "vtkDataSet.h"
 #include "vtkRayCast3DPicker.h"
@@ -407,6 +408,11 @@ int mafViewSingleSlice::GetNodeStatus(mafNode *vme)
 			n = m_Sg->Vme2Node(vme);
 			n->m_Mutex = true;
 		}
+		else if (vme->IsMAFType(mafVMEGizmo))
+		{
+			n = m_Sg->Vme2Node(vme);
+			n->m_PipeCreatable = true;
+		}
   }
 
   return m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;
@@ -421,6 +427,7 @@ mmgGui *mafViewSingleSlice::CreateGui()
   //m_Gui->AddGui(m_AttachCamera->GetGui());
 
 	m_Slider = m_Gui->FloatSlider(ID_POSITION, _("Position"), &m_Position,MINDOUBLE,MAXDOUBLE);
+	m_Gui->Enable(ID_POSITION,false);
 
 	//const wxString plane_string[] = {_("XY"), _("YZ"), _("ZX")};
 	//m_Gui->Combo(ID_PLANE_SELECT, "View", &m_PlaneSelect, 3, plane_string);
