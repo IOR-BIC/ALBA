@@ -22,8 +22,6 @@ SET(PROJECT_SRCS
   mmoVolumeMeasure.h
   mmoRAWImporterImages.cpp
   mmoRAWImporterImages.h
-  mmoCreatePanoramic.cpp
-  mmoCreatePanoramic.h
 )
 
 IF (MAF_USE_ITK)
