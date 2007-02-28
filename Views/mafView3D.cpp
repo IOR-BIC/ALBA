@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-23 15:32:49 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-02-28 09:42:46 $
+  Version:   $Revision: 1.5 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -108,6 +108,77 @@ void mafView3D::OnEvent(mafEventBase *maf_event)
 				if(pipe)
 				{
 					pipe->SetAlphaValue(m_AlphaValueIso);
+					CameraUpdate();
+				}
+			}
+			break;
+		case ID_VOLUME_COLOR:
+			{
+				medPipeVolumeDRR *pipe=medPipeVolumeDRR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+				if(pipe)
+				{
+          pipe->SetColor(m_VolumeColor);
+					CameraUpdate();
+				}
+			}
+			break;
+		case ID_EXPOSURE_CORRECTION_L:
+		case ID_EXPOSURE_CORRECTION_H:
+			{
+				medPipeVolumeDRR *pipe=medPipeVolumeDRR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+				if(pipe)
+				{
+					pipe->SetExposureCorrection(m_ExposureCorrection);
+					CameraUpdate();
+				}
+			}
+			break;
+		case ID_GAMMA:
+			{
+				medPipeVolumeDRR *pipe=medPipeVolumeDRR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+				if(pipe)
+				{
+					pipe->SetGamma(m_Gamma);
+					CameraUpdate();
+				}
+			}
+			break;
+		case ID_CAMERA_ANGLE:
+			{
+				medPipeVolumeDRR *pipe=medPipeVolumeDRR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+				if(pipe)
+				{
+					pipe->SetCameraAngle(m_CameraAngle);
+					CameraUpdate();
+				}
+			}
+			break;
+		case ID_CAMERA_POSITION:
+			{
+				medPipeVolumeDRR *pipe=medPipeVolumeDRR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+				if(pipe)
+				{
+					pipe->SetCameraPosition(m_CameraPositionDRR);
+					CameraUpdate();
+				}
+			}
+			break;
+		case ID_CAMERA_FOCUS:
+			{
+				medPipeVolumeDRR *pipe=medPipeVolumeDRR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+				if(pipe)
+				{
+					pipe->SetCameraFocus(m_CameraFocus);
+					CameraUpdate();
+				}
+			}
+			break;
+		case ID_CAMERA_ROLL:
+			{
+				medPipeVolumeDRR *pipe=medPipeVolumeDRR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+				if(pipe)
+				{
+					pipe->SetCameraRoll(m_CameraRoll);
 					CameraUpdate();
 				}
 			}
@@ -407,4 +478,6 @@ void mafView3D::VmeShow(mafNode *vme,bool show)
 			m_Gui->Enable(ID_COMBO_PIPE,m_CurrentVolume!=NULL);
 		}
 	}
+	CameraReset();
+	CameraUpdate();
 }
