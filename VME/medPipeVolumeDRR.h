@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeDRR.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-03 14:17:47 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-02-28 09:43:36 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -67,6 +67,14 @@ public:
   virtual void Create(mafSceneNode *n);
   virtual void Select(bool select); 
 
+	void SetColor(wxColor color);
+	void SetExposureCorrection(double value[2]);
+	void SetGamma(double value);
+	void SetCameraAngle(double value);
+	void SetCameraPosition(double value[3]);
+	void SetCameraFocus(double value[3]);
+	void SetCameraRoll(double value);
+
 protected:
   virtual mmgGui  *CreateGui();
 
@@ -74,7 +82,7 @@ protected:
   vtkPiecewiseFunction        *m_OpacityTransferFunction;
   vtkVolumeProperty           *m_VolumeProperty;
   vtkXRayVolumeMapper         *m_VolumeMapper;
-	vtkVolume                    *m_Volume;
+	vtkVolume                   *m_Volume;
 	
   vtkActor  *m_SelectionActor;
   double  m_VolumeBounds[6];

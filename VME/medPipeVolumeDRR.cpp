@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeDRR.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-19 15:22:48 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-02-28 09:43:29 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -268,14 +268,12 @@ void medPipeVolumeDRR::OnEvent(mafEventBase *maf_event)
 			case ID_EXPOSURE_CORRECTION_H:
 				if (!vtkXRayVolumeMapper::SetExposureCorrection(this->m_ExposureCorrection))
 					vtkXRayVolumeMapper::GetExposureCorrection(this->m_ExposureCorrection);
-				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 				break;
 
 			case ID_GAMMA:
 				if (!vtkXRayVolumeMapper::SetGamma(this->m_Gamma))
 					this->m_Gamma = vtkXRayVolumeMapper::GetGamma();
-				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 				break;
 
@@ -332,4 +330,92 @@ void medPipeVolumeDRR::OnEvent(mafEventBase *maf_event)
 
 		this->m_Gui->Update();
   }
+}
+//----------------------------------------------------------------------------
+void medPipeVolumeDRR::SetColor(wxColor color)
+//----------------------------------------------------------------------------
+{
+	m_VolumeColor=color;
+	
+	vtkXRayVolumeMapper::SetColor(this->m_VolumeColor.Red() / 255.f, this->m_VolumeColor.Green() / 255.f, this->m_VolumeColor.Blue() / 255.f);
+	
+	if(m_Gui)
+		m_Gui->Update();
+}
+//----------------------------------------------------------------------------
+void medPipeVolumeDRR::SetExposureCorrection(double value[2])
+//----------------------------------------------------------------------------
+{
+	m_ExposureCorrection[0]=value[0];
+	m_ExposureCorrection[1]=value[1];
+	
+	if (!vtkXRayVolumeMapper::SetExposureCorrection(this->m_ExposureCorrection))
+		vtkXRayVolumeMapper::GetExposureCorrection(this->m_ExposureCorrection);
+	
+	if(m_Gui)
+		m_Gui->Update();
+}
+//----------------------------------------------------------------------------
+void medPipeVolumeDRR::SetGamma(double value)
+//----------------------------------------------------------------------------
+{
+	m_Gamma=value;
+
+	if (!vtkXRayVolumeMapper::SetGamma(this->m_Gamma))
+		this->m_Gamma = vtkXRayVolumeMapper::GetGamma();
+
+	if(m_Gui)
+		m_Gui->Update();
+}
+//----------------------------------------------------------------------------
+void medPipeVolumeDRR::SetCameraAngle(double value)
+//----------------------------------------------------------------------------
+{
+	m_CameraAngle=value;
+
+	vtkCamera *camera = this->m_Sg->m_RenFront->GetActiveCamera();
+	camera->SetViewAngle(this->m_CameraAngle);
+
+	if(m_Gui)
+		m_Gui->Update();
+}
+//----------------------------------------------------------------------------
+void medPipeVolumeDRR::SetCameraPosition(double value[3])
+//----------------------------------------------------------------------------
+{
+	m_CameraPosition[0]=value[0];
+	m_CameraPosition[1]=value[1];
+	m_CameraPosition[2]=value[2];
+
+	vtkCamera *camera = this->m_Sg->m_RenFront->GetActiveCamera();
+	camera->SetPosition(this->m_CameraPosition);
+
+	if(m_Gui)
+		m_Gui->Update();
+}
+//----------------------------------------------------------------------------
+void medPipeVolumeDRR::SetCameraFocus(double value[3])
+//----------------------------------------------------------------------------
+{
+	m_CameraFocus[0]=value[0];
+	m_CameraFocus[1]=value[1];
+	m_CameraFocus[2]=value[2];
+
+	vtkCamera *camera = this->m_Sg->m_RenFront->GetActiveCamera();
+	camera->SetFocalPoint(this->m_CameraFocus);
+
+	if (m_Gui)
+		m_Gui->Update();
+}
+//----------------------------------------------------------------------------
+void medPipeVolumeDRR::SetCameraRoll(double value)
+//----------------------------------------------------------------------------
+{
+	m_CameraRoll=value;
+	
+	vtkCamera *camera = this->m_Sg->m_RenFront->GetActiveCamera();
+	camera->SetRoll(this->m_CameraRoll);
+
+	if(m_Gui)
+		m_Gui->Update();
 }
