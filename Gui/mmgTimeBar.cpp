@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-21 16:15:03 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-02-28 15:22:19 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -125,13 +125,13 @@ void mmgTimeBar::OnEvent(mafEventBase *maf_event)
       //HideGui();
       break;
     case TIME_PREV:
-      //m_Time -= m_TimeStep;
-      m_Time -= 1.0;
+      m_Time -= m_TimeStep;
+      //m_Time -= 1.0;
       m_Time = (m_Time <= m_TimeMin) ? m_TimeMin : m_Time;
       break;
     case TIME_NEXT:
-      //m_Time += m_TimeStep;
-      m_Time += 1.0;
+      m_Time += m_TimeStep;
+      //m_Time += 1.0;
       m_Time = (m_Time >= m_TimeMax) ? m_TimeMax : m_Time;
       break;
     case TIME_BEGIN:
