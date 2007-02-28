@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-24 16:09:48 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2007-02-28 13:47:44 $
+  Version:   $Revision: 1.32 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -144,7 +144,7 @@ protected:
 
   // Description:
   // Set the time to update the time bar.
-  virtual void TimeSet(float t);
+  virtual void TimeSet(double t);
 //---------------------------------------------------------
   
   /**

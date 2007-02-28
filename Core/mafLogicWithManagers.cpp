@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-16 14:38:23 $
-  Version:   $Revision: 1.94 $
+  Date:      $Date: 2007-02-28 13:47:44 $
+  Version:   $Revision: 1.95 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1340,7 +1340,7 @@ void mafLogicWithManagers::ViewCreated(mafView *v)
 	}
 }
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::TimeSet(float t)
+void mafLogicWithManagers::TimeSet(double t)
 //----------------------------------------------------------------------------
 {
   if(m_VMEManager) m_VMEManager->TimeSet(t);
