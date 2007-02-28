@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-23 15:21:21 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-02-28 09:41:40 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -33,6 +33,7 @@
 #include "mafTagArray.h"
 #include "mafVME.h"
 #include "mafVMEGizmo.h"
+#include "mafEventInteraction.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkProperty.h"
@@ -299,27 +300,49 @@ void mafGizmoSlice::OnEvent(mafEventBase *maf_event)
     {
       case ID_TRANSFORM:
       {
-        mafSmartPointer<mafTransform> tr;
-        tr->SetMatrix(*m_VmeGizmo->GetOutput()->GetMatrix());
-        tr->Concatenate(*e->GetMatrix(), PRE_MULTIPLY);
+				mafSmartPointer<mafTransform> tr;
+				tr->SetMatrix(*m_VmeGizmo->GetOutput()->GetMatrix());
+				tr->Concatenate(*e->GetMatrix(), PRE_MULTIPLY);
 
-        // update the gizmo local position
-        m_VmeGizmo->SetMatrix(tr->GetMatrix());		 
+				// update the gizmo local position
+				m_VmeGizmo->SetMatrix(tr->GetMatrix());		 
 
-        //local position of gizmo cube handle centre
-        double slicePlaneOrigin[3];
-        mafTransform::GetPosition(*m_GizmoHandleCenterMatrix, slicePlaneOrigin);
+				//local position of gizmo cube handle centre
+				double slicePlaneOrigin[3];
+				mafTransform::GetPosition(*m_GizmoHandleCenterMatrix, slicePlaneOrigin);
 
-        // position sent as vtk point
-        m_Point->SetPoint(0,slicePlaneOrigin);
-        mafEventMacro(mafEvent(this,MOUSE_MOVE, m_Point, m_id));
+				// position sent as vtk point
+				m_Point->SetPoint(0,slicePlaneOrigin);
+				mafEventMacro(mafEvent(this,MOUSE_MOVE, m_Point, m_id));
 
       }
       break;
       default:
-        mafEventMacro(*e);
+				{
+					mafEventMacro(*e);
+				}
       break; 
     }
+	}
+	else if(mafEventInteraction *e = mafEventInteraction::SafeDownCast(maf_event))
+	{
+		if(e->GetId()==mafInteractor::BUTTON_UP)
+		{
+			mafSmartPointer<mafTransform> tr;
+			tr->SetMatrix(*m_VmeGizmo->GetOutput()->GetMatrix());
+			tr->Concatenate(*e->GetMatrix(), PRE_MULTIPLY);
+
+			// update the gizmo local position
+			m_VmeGizmo->SetMatrix(tr->GetMatrix());		 
+
+			//local position of gizmo cube handle centre
+			double slicePlaneOrigin[3];
+			mafTransform::GetPosition(*m_GizmoHandleCenterMatrix, slicePlaneOrigin);
+
+			// position sent as vtk point
+			m_Point->SetPoint(0,slicePlaneOrigin);
+			mafEventMacro(mafEvent(this,MOUSE_UP, m_Point, m_id));
+		}
 	}
 }
 
