@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-02-21 17:01:41 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2007-02-28 09:42:14 $
+Version:   $Revision: 1.9 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -172,6 +172,11 @@ void mafViewCTNew::VmeShow(mafNode *node, bool show)
 			CameraUpdate();
 			m_CurrentVolume = NULL;
 		}
+
+		m_Gui->Enable(ID_LAYOUT_WIDTH,m_CurrentVolume!=NULL);
+		m_Gui->Enable(ID_LAYOUT_HEIGHT,m_CurrentVolume!=NULL);
+		m_Gui->Enable(ID_LAYOUT_THICKNESS,m_CurrentVolume!=NULL);
+		m_Gui->Update();
 	}
 	else if(node->IsA("mafVMEPolyline"))
 	{
@@ -185,9 +190,6 @@ void mafViewCTNew::VmeShow(mafNode *node, bool show)
 			CameraUpdate();
 		}
 	}
-
-	//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-	//CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafViewCTNew::VmeRemove(mafNode *node)
@@ -206,12 +208,16 @@ void mafViewCTNew::VmeRemove(mafNode *node)
 			if(m_TextActor[i])
 				view->GetSceneGraph()->m_RenFront->RemoveActor(m_TextActor[i]);
 		}
+
+		m_Gui->Enable(ID_LAYOUT_WIDTH,m_CurrentVolume!=NULL);
+		m_Gui->Enable(ID_LAYOUT_HEIGHT,m_CurrentVolume!=NULL);
+		m_Gui->Enable(ID_LAYOUT_THICKNESS,m_CurrentVolume!=NULL);
+		m_Gui->Update();
 	}
 
 	for(int i=0; i<this->GetNumberOfSubView(); i++)
 		m_ChildViewList[i]->VmeRemove(node);
 
-	//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 	CameraUpdate();
 }
 //----------------------------------------------------------------------------
@@ -288,8 +294,13 @@ mmgGui* mafViewCTNew::CreateGui()
 
 	//m_Gui->Button(ID_LAYOUT_UPDATE,"Update");
 
+	m_Gui->Enable(ID_LAYOUT_WIDTH,m_CurrentVolume!=NULL);
+	m_Gui->Enable(ID_LAYOUT_HEIGHT,m_CurrentVolume!=NULL);
+	m_Gui->Enable(ID_LAYOUT_THICKNESS,m_CurrentVolume!=NULL);
+
 	m_Gui->Label("");
 
+	m_Gui->Update();
 	return m_Gui;
 }
 //----------------------------------------------------------------------------
@@ -666,13 +677,13 @@ void mafViewCTNew::ProbeVolume()
 	  }
 	  */
 
+
 	  vslice->GetSceneGraph()->m_RenFront->ResetCamera(b);
 	  //vslice->GetSceneGraph()->m_RenFront->ResetCamera();
 	  vslice->CameraUpdate();
 	  m_Gui->Update();
 
-	  /*vslice->GetRWI()->GetCamera()->GetViewPlaneNormal(m_SliceNormal);
-	  double divergence;
+	  /*double divergence;
 	  divergence = (vtkImageData::SafeDownCast(vtk_data))->GetSpacing()[0]/10;
 	  m_SliceOriginVector[s-m_StartIndexSliceVisualized][0] = m_SliceOriginVector[s-m_StartIndexSliceVisualized][0] + m_SliceNormal[0] * divergence;
 	  m_SliceOriginVector[s-m_StartIndexSliceVisualized][1] = m_SliceOriginVector[s-m_StartIndexSliceVisualized][1] + m_SliceNormal[1] * divergence;
