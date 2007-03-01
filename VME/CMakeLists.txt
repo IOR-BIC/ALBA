@@ -14,6 +14,8 @@ SET(PROJECT_SRCS
   medPipeVolumeMIP.h
   medPipeDensityDistance.cpp
   medPipeDensityDistance.h
+  medPipeTrajectories.cpp
+  medPipeTrajectories.h
   medPipeVolumeDRR.cpp
   medPipeVolumeDRR.h
   medPipeVolumeVR.cpp
