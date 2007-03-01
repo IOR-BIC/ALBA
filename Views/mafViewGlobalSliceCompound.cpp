@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSliceCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-22 06:55:22 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-03-01 16:20:28 $
+  Version:   $Revision: 1.6 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -190,10 +190,10 @@ void mafViewGlobalSliceCompound::VmeSelect(mafNode *node, bool select)
 void mafViewGlobalSliceCompound::UpdateWindowing(bool enable,mafNode *node)
 //----------------------------------------------------------------------------
 {
-	if(enable)
+	mafVMEVolumeGray *Volume=mafVMEVolumeGray::SafeDownCast(node);
+	if(enable && Volume)
 	{
 		EnableWidgets(enable);
-		mafVMEVolumeGray *Volume=mafVMEVolumeGray::SafeDownCast(node);
 		double sr[2];
 		Volume->GetVolumeOutput()->GetVTKData()->GetScalarRange(sr);
 		mmaVolumeMaterial *currentSurfaceMaterial = Volume->GetMaterial();
