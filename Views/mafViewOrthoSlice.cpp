@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-22 06:55:07 $
-  Version:   $Revision: 1.48 $
+  Date:      $Date: 2007-03-01 16:16:53 $
+  Version:   $Revision: 1.49 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -123,6 +123,8 @@ mafView *mafViewOrthoSlice::Copy(mafObserver *Listener)
 void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
 //----------------------------------------------------------------------------
 {
+	wxBusyCursor wait;
+
   for(int i=0; i<m_NumOfChildView; i++)
     m_ChildViewList[i]->VmeShow(node, show);
 
