@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-18 14:56:10 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2007-03-02 15:49:10 $
+  Version:   $Revision: 1.24 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,11 +44,14 @@
 
 #endif
 
+#include "mafString.h"
 #include "mafDevice.h"
 #include "mmdButtonsPad.h"
 #include "mmdMouse.h"
 #include "mafEventInteraction.h"
 #include "mafEvent.h"
+#include "mafViewCompound.h"
+#include "mmgApplicationSettings.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkRenderWindow.h"
@@ -663,7 +666,7 @@ wxBitmap *mafRWIBase::GetImage(int magnification)
   return bmp;
 }
 //----------------------------------------------------------------------------
-void mafRWIBase::SaveImage(mafString filename, int magnification)
+void mafRWIBase::SaveImage(mafString filename, int magnification , int forceExtension)
 //---------------------------------------------------------------------------
 {
   wxString path, name, ext;
@@ -673,11 +676,49 @@ void mafRWIBase::SaveImage(mafString filename, int magnification)
     //wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg";
     wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg|Image (*.png)|*.png|Image (*.ps)|*.ps|Image (*.tiff)|*.tiff";
     wxString file = wxString::Format("%s\\%sSnapshot", m_SaveDir.GetCStr(),filename.GetCStr());
+	switch(forceExtension)
+    {
+    case -1:
+    break;
+    case mmgApplicationSettings::JPG :
+      wildc = "Image (*.jpg)|*.jpg";
+    break;
+    case mmgApplicationSettings::BMP:
+      wildc = "Image (*.bmp)|*.bmp";
+    break;
+    }
+    //mafString file ;
+		if(!wxDirExists(mafString(path)))
+		{
+			file = m_SaveDir;
+			file +=  "\\";
+			filename = mafString(name);
+		}
+    
+    file.Append(filename);
     file = mafGetSaveFile(file,wildc).c_str(); 
     if(file == "") 
       return;
     filename = file.c_str();
 	}
+
+  wxString temporary = wxString(filename);
+  temporary = temporary.AfterLast('\\').AfterFirst('.');
+
+  switch(forceExtension)
+  {
+    case -1:
+    break;
+    case mmgApplicationSettings::JPG :
+    if(mafString(temporary) != _("jpg"))
+      filename += _(".jpg");
+    break;
+    case mmgApplicationSettings::BMP:
+    if(mafString(temporary) != _("bmp"))
+      filename += _(".bmp");
+    break;
+  }
+
   mafString basename = filename.BaseName();
   if (basename.IsEmpty())
   {
@@ -731,6 +772,95 @@ void mafRWIBase::SaveImage(mafString filename, int magnification)
   else
   {
     wxMessageBox(_("Image can not be saved. Not valid file!"), _("Warning"));
+  }
+	::wxEndBusyCursor();
+}
+//----------------------------------------------------------------------------
+void mafRWIBase::SaveAllImages(mafString filename , mafViewCompound *v, int forceExtension)
+//---------------------------------------------------------------------------
+{
+  if(v == NULL) return;
+  
+	wxString path, name, ext;
+  wxSplitPath(filename,&path,&name,&ext);
+	if (filename.IsEmpty() || ext.IsEmpty())
+	{
+    mafString wildc = "Image (*.jpg)|*.jpg|Image (*.bmp)|*.bmp";
+    switch(forceExtension)
+    {
+    case -1:
+    break;
+    case mmgApplicationSettings::JPG :
+      wildc = "Image (*.jpg)|*.jpg";
+    break;
+    case mmgApplicationSettings::BMP:
+      wildc = "Image (*.bmp)|*.bmp";
+    break;
+    }
+    mafString file;
+		if(!wxDirExists(mafString(path)))
+		{
+			file = m_SaveDir;
+			file +=  "\\";
+			filename = mafString(name);
+		}
+    file.Append(filename);
+    file = mafGetSaveFile(file,wildc).c_str(); 
+    if(file.IsEmpty())
+      return;
+    filename = file;
+	}
+
+  wxString temporary = wxString(filename);
+  temporary = temporary.AfterLast('\\').AfterFirst('.');
+
+  switch(forceExtension)
+  {
+    case -1:
+    break;
+    case mmgApplicationSettings::JPG :
+    if(mafString(temporary) != _("jpg"))
+      filename += _(".jpg");
+    break;
+    case mmgApplicationSettings::BMP:
+    if(mafString(temporary) != _("bmp"))
+      filename += _(".bmp");
+    break;
+  }
+
+
+
+  mafString basename = filename.BaseName();
+  if (basename.IsEmpty())
+  {
+    filename = m_SaveDir << "\\" << filename;
+  }
+  
+	::wxBeginBusyCursor();
+
+  wxBitmap imageBitmap;
+  v->GetImage(imageBitmap);
+
+  wxSplitPath(filename,&path,&name,&ext);
+
+	ext.MakeLower();
+  if (ext == "bmp")
+	{
+    imageBitmap.SaveFile(filename.GetCStr(), wxBITMAP_TYPE_BMP);
+	}
+  else if (ext == "jpg")
+  {
+    wxJPEGHandler *jpegHandler = new wxJPEGHandler();
+    jpegHandler->SetName("JPEGHANDLER");
+    wxImage::AddHandler(jpegHandler);
+    wxImage image = imageBitmap.ConvertToImage();
+    image.SetOption(_("quality"), 100);
+    image.SaveFile(filename.GetCStr(), wxBITMAP_TYPE_JPEG);
+    wxImage::RemoveHandler("JPEGHANDLER");
+  }
+  else
+  {
+    wxMessageBox("Must save with JPG or BMP extension");
   }
 	::wxEndBusyCursor();
 }

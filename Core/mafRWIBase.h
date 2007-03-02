@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-23 11:54:59 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-03-02 15:49:10 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,6 +34,7 @@ class mmdMouse;
 class vtkImageAppend;
 class vtkPNGWriter;
 class vtkWindowToImageFilter;
+class mafViewCompound;
 
 //----------------------------------------------------------------------------
 // Constant:
@@ -108,7 +109,10 @@ public:
   wxBitmap* GetImage(int magnification = 1);
 	/** 
   Save an image of the render window. */
-  void SaveImage(mafString filename = "", int magnification = 1);
+  void SaveImage(mafString filename = "", int magnification = 1, int forceExtension = -1);
+  /** 
+  Save all images of the compound view. */
+  void SaveAllImages(mafString filename = "", mafViewCompound *v = NULL, int forceExtension=-1);
 	/** 
   Return the current used camera */
 	vtkCamera* GetCamera();
