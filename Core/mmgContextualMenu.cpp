@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-16 13:46:21 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-03-02 15:49:36 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -62,6 +62,7 @@ enum VIEW_CONTEXTUAL_MENU_ID
 		CONTEXTUAL_MENU_NORMAL_SIZE_CHILD_VIEW,
     CONTEXTUAL_MENU_NORMAL_SIZE_CHILD_SUB_VIEW,
 		CONTEXTUAL_MENU_SAVE_AS_IMAGE,
+    CONTEXTUAL_MENU_SAVE_ALL_AS_IMAGE,
     CONTEXTUAL_MENU_EXPORT_AS_VRML,
     //CONTEXTUAL_MENU_EXTERNAL_INTERNAL_VIEW,
 	CONTEXTUAL_VIEW_MENU_STOP
@@ -133,8 +134,15 @@ void mmgContextualMenu::ShowContextualMenu(wxFrame *child, mafView *view, bool v
   //this->Append(CONTEXTUAL_MENU_EXTERNAL_INTERNAL_VIEW, "External", "Switch view visualization between external/internal", TRUE);
   //this->FindItem(CONTEXTUAL_MENU_EXTERNAL_INTERNAL_VIEW)->Check(m_ViewActive->IsExternal());
 	this->AppendSeparator();
-	this->Append(CONTEXTUAL_MENU_SAVE_AS_IMAGE, "Save as Image");
-  this->Append(CONTEXTUAL_MENU_EXPORT_AS_VRML, "Export as VRML");
+	this->Append(CONTEXTUAL_MENU_SAVE_AS_IMAGE, _("Save as Image"));
+
+  if (vc)
+  {
+    this->Append(CONTEXTUAL_MENU_SAVE_ALL_AS_IMAGE, _("Save All as Image"));
+  }  
+  
+  
+  this->Append(CONTEXTUAL_MENU_EXPORT_AS_VRML, _("Export as VRML"));
 
 	int x,y;
 	::wxGetMousePosition(&x, &y);
@@ -258,7 +266,10 @@ void mmgContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
     }
     break;*/
 		case CONTEXTUAL_MENU_SAVE_AS_IMAGE:
-			mafEventMacro(mafEvent(this, VIEW_SAVE_IMAGE));
+			mafEventMacro(mafEvent(this, VIEW_SAVE_IMAGE,false));
+		break;
+    case CONTEXTUAL_MENU_SAVE_ALL_AS_IMAGE:
+			mafEventMacro(mafEvent(this, VIEW_SAVE_IMAGE,true));
 		break;
     case CONTEXTUAL_MENU_EXPORT_AS_VRML:
     {
