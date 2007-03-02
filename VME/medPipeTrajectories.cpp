@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeTrajectories.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-01 09:07:21 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-03-02 15:25:05 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -63,7 +63,7 @@ medPipeTrajectories::medPipeTrajectories()
   m_OutlineMapper   = NULL;
   m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
-  m_Interval = 100;
+  m_Interval = 20;
 }
 //----------------------------------------------------------------------------
 void medPipeTrajectories::Create(mafSceneNode *n)
@@ -99,12 +99,11 @@ void medPipeTrajectories::Create(mafSceneNode *n)
   m_Actor = vtkActor::New();
   m_Actor->SetMapper(m_Mapper);
   mmaMaterial *material = m_Landmark->GetMaterial();
-  //if (material)
-  // m_Actor->SetProperty(material->m_Prop);
+  if (material)
+    m_Actor->SetProperty(material->m_Prop);
  
- 
-
-  m_AssemblyFront->AddPart(m_Actor);
+  m_RenFront->AddActor(m_Actor);
+//  m_AssemblyFront->AddPart(m_Actor);
 
   // selection highlight
   m_OutlineBox = vtkOutlineCornerFilter::New();
@@ -125,15 +124,18 @@ void medPipeTrajectories::Create(mafSceneNode *n)
   m_OutlineActor->PickableOff();
   m_OutlineActor->SetProperty(m_OutlineProperty);
   
-  m_AssemblyFront->AddPart(m_OutlineActor);
+  m_RenFront->AddActor(m_OutlineActor);
+//  m_AssemblyFront->AddPart(m_OutlineActor);
 }
 //----------------------------------------------------------------------------
 medPipeTrajectories::~medPipeTrajectories()
 //----------------------------------------------------------------------------
 {
   m_Landmark->GetEventSource()->RemoveObserver(this);
-  m_AssemblyFront->RemovePart(m_Actor);
-  m_AssemblyFront->RemovePart(m_OutlineActor);
+  m_RenFront->RemoveActor(m_Actor);
+  m_RenFront->RemoveActor(m_OutlineActor);
+//  m_AssemblyFront->RemovePart(m_Actor);
+//  m_AssemblyFront->RemovePart(m_OutlineActor);
 
   vtkDEL(m_Traj);
   vtkDEL(m_Sphere);
@@ -206,12 +208,13 @@ void medPipeTrajectories::UpdateProperty(bool fromTag)
 
 
   int pointId[2], counter = 0;
-  bool current, previous;
+  bool current, previous, sphere_visibility;
 
   if (m_MatrixVector)
   {
-    for (int i = 0; m_TimeVector.size(); i++)
+    for (int i = 0; i< m_TimeVector.size(); i++)
     {
+      
       if (m_TimeVector[i] > t0)
       {
         break;
@@ -219,12 +222,17 @@ void medPipeTrajectories::UpdateProperty(bool fromTag)
     }
     i--;
 
+    if (i<0)
+    {
+      i=0;
+    }
     int minValue = (i-m_Interval) < 0 ? 0 : (i-m_Interval);
     int maxValue = (i + m_Interval) >= m_TimeVector.size() ? m_TimeVector.size() - 1 : (i + m_Interval);
     //Landmark center position
     mafMatrix *m = m_MatrixVector->GetKeyMatrix(i);
     mafTransform::GetPosition(*m,xyz);
     m_Sphere->SetCenter(xyz[0], xyz[1], xyz[2]);
+    sphere_visibility = m_Landmark->GetLandmarkVisibility(m_TimeVector[i]);
 
     //start construct the landmark trajectory
     m = m_MatrixVector->GetKeyMatrix(minValue);
@@ -254,6 +262,10 @@ void medPipeTrajectories::UpdateProperty(bool fromTag)
   line->Modified();
 
   m_Traj->AddInput(line);
-  m_Traj->AddInput(m_Sphere->GetOutput());
+  if (sphere_visibility)
+  {
+    m_Traj->AddInput(m_Sphere->GetOutput());
+  }
+  
   m_Traj->Update();
 }
