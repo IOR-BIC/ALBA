@@ -75,8 +75,6 @@ IF (MAF_USE_VTK)
   mafPipePointSet.h
   mafPipePolyline.cpp
   mafPipePolyline.h
-  mafVMEPolylineSpline.cpp
-  mafVMEPolylineSpline.h
   mafPipeSurface.cpp
   mafPipeSurface.h
   mafPipeSurfaceSlice.cpp
