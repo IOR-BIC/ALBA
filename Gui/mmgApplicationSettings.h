@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationSettings.h,v $
 Language:  C++
-Date:      $Date: 2006-11-02 11:32:13 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-03-02 12:10:02 $
+Version:   $Revision: 1.4 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -44,8 +44,15 @@ public:
     ID_PASSWORD,
     ID_ANONYMOUS_USER,
     ID_USE_DEFAULT_PASSPHRASE,
-    ID_PASSPHRASE
+    ID_PASSPHRASE,
+		IMAGE_TYPE_ID,
   };
+
+	enum IMAGE_TYPE_LIST
+	{
+		JPG = 0,
+		BMP,
+	};
 
   /** Answer to the messages coming from interface. */
   void OnEvent(mafEventBase *maf_event);
@@ -109,12 +116,18 @@ public:
 
   void SetPassPhrase(mafString pass_phrase) {m_PassPhrase = pass_phrase;};
 
+	/**select image type during saving of the views*/
+	int GetImageTypeId(){return m_ImageTypeId;};
+
 protected:
   /** Initialize the application settings.*/
   void InitializeApplicationSettings();
 
   /** Used to enable/disable items according to the current widgets state.*/
   void EnableItems();
+
+	/** Initialize image type saving inside views used into the application.*/
+	void InitializeImageType();
 
   mmgGui *m_Gui;
   
@@ -137,5 +150,7 @@ protected:
   mafString m_PassPhrase;
 
   mafObserver *m_Listener;
+
+	int          m_ImageTypeId;
 };
 #endif

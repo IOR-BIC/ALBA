@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2006-11-02 11:32:13 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2007-03-02 12:10:02 $
+Version:   $Revision: 1.5 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -36,6 +36,9 @@ mmgApplicationSettings::mmgApplicationSettings(mafObserver *Listener)
   m_LogToFile   = 0;
   m_VerboseLog  = 0;
   m_LogFolder = wxGetCwd().c_str();
+
+	m_ImageTypeId = 0;
+	InitializeImageType();
   
   m_AnonymousFalg = true;
   m_RemoteHostName = "ftp://ftp.wxwindows.org";
@@ -71,6 +74,8 @@ mmgApplicationSettings::mmgApplicationSettings(mafObserver *Listener)
   EnableItems();
   m_Gui->Label(_("changes will take effect when the \napplication restart"),false,true);
   m_Gui->Label("");
+	wxString id_array[2] = {_("JPG") , _("BMP")};
+	m_Gui->Combo(IMAGE_TYPE_ID,_("image type"), &m_ImageTypeId,2,id_array);
 }
 //----------------------------------------------------------------------------
 mmgApplicationSettings::~mmgApplicationSettings()
@@ -160,6 +165,11 @@ void mmgApplicationSettings::OnEvent(mafEventBase *maf_event)
       OnEvent(&mafEvent(this,ID_USERNAME));
       OnEvent(&mafEvent(this,ID_PASSWORD));
     break;
+		case IMAGE_TYPE_ID:
+			{
+				config->Write("ImageType",wxString::Format("%d",m_ImageTypeId));
+			}
+			break;
     default:
       mafEventMacro(*maf_event);
     break; 
@@ -279,4 +289,17 @@ void mmgApplicationSettings::InitializeApplicationSettings()
   }
   
   cppDEL(config);
+}
+//----------------------------------------------------------------------------
+void mmgApplicationSettings::InitializeImageType()
+//----------------------------------------------------------------------------
+{
+	wxConfig *config = new wxConfig(wxEmptyString);
+	wxString type;
+
+	if(config->Read(L"ImageType", &type))
+	{
+		m_ImageTypeId = atoi(mafString(type));
+	}
+	cppDEL(config);
 }
