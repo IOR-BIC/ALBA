@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoLandmarkImporterTXT.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-01 09:05:47 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-03-05 16:42:09 $
+  Version:   $Revision: 1.5 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -81,28 +81,25 @@ mafOp* mmoLandmarkImporterTXT::Copy()
 	cp->m_VmeCloud = m_VmeCloud;
 	return cp;
 }
+
 //----------------------------------------------------------------------------
 void mmoLandmarkImporterTXT::OpRun()   
 //----------------------------------------------------------------------------
 {
+
 	int result = OP_RUN_CANCEL;
 	m_File = "";
 	wxString pgd_wildc	= "Landmark (*.*)|*.*";
-  mafNEW(m_VmeCloud);
-  
-	wxString f = mafGetOpenFile(m_FileDir,pgd_wildc).c_str(); 
+  wxString f;
+  if (!m_TestMode)
+  {
+    f = mafGetOpenFile(m_FileDir,pgd_wildc).c_str(); 
+  }
+	
 	if(!f.IsEmpty() && wxFileExists(f))
 	{
 	  m_File = f;
-    wxString path, name, ext;
-    wxSplitPath(m_File.c_str(),&path,&name,&ext);
-    m_VmeCloud->SetName(name);
-
-    mafTagItem tag_Nature;
-    tag_Nature.SetName("VME_NATURE");
-    tag_Nature.SetValue("NATURAL");
-
-    m_VmeCloud->GetTagArray()->SetTag(tag_Nature);
+    
     if (!m_TestMode)
     {
       m_Gui = new mmgGui(this);
@@ -153,6 +150,17 @@ void mmoLandmarkImporterTXT::Read()
   {
     wxBusyInfo wait("Please wait, working...");
   }
+  mafNEW(m_VmeCloud);
+
+  wxString path, name, ext;
+  wxSplitPath(m_File.c_str(),&path,&name,&ext);
+  m_VmeCloud->SetName(name);
+
+  mafTagItem tag_Nature;
+  tag_Nature.SetName("VME_NATURE");
+  tag_Nature.SetValue("NATURAL");
+
+  m_VmeCloud->GetTagArray()->SetTag(tag_Nature);
   m_VmeCloud->Open();
   m_VmeCloud->SetRadius(10);
 

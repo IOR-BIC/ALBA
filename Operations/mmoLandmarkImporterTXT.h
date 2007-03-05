@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoLandmarkImporterTXT.h,v $
   Language:  C++
-  Date:      $Date: 2007-02-21 11:56:47 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-03-05 16:42:09 $
+  Version:   $Revision: 1.4 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -45,7 +45,7 @@ public:
   the format of the file admits some speficics.
   1) Ignore the first line
   2) Ignore the first n columns specified by user
-  3) the first element of each line is Time, then x y z x1 y1 z1 ecc
+  3) the first element of each line is Time, then x y z x1 y1 z1 ecco
   */
   void Read();
 
