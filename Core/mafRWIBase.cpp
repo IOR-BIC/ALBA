@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-02 19:04:14 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2007-03-05 18:46:36 $
+  Version:   $Revision: 1.26 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,7 +50,6 @@
 #include "mmdMouse.h"
 #include "mafEventInteraction.h"
 #include "mafEvent.h"
-#include "mafViewCompound.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkRenderWindow.h"
@@ -677,8 +676,6 @@ void mafRWIBase::SaveImage(mafString filename, int magnification , int forceExte
     wxString file = wxString::Format("%s\\%sSnapshot", m_SaveDir.GetCStr(),filename.GetCStr());
     switch(forceExtension)
     {
-      case -1:
-      break;
       case mmgApplicationSettings::JPG :
         wildc = "Image (*.jpg)|*.jpg";
       break;
@@ -687,33 +684,31 @@ void mafRWIBase::SaveImage(mafString filename, int magnification , int forceExte
       break;
     }
     //mafString file ;
-    if(!wxDirExists(mafString(path)))
+    if(!wxDirExists(path))
     {
       file = m_SaveDir;
       file +=  "\\";
-      filename = mafString(name);
+      filename = name.c_str();
     }
     
     file.Append(filename);
     file = mafGetSaveFile(file,wildc).c_str(); 
-    if(file == "") 
+    if(file.IsEmpty()) 
       return;
     filename = file.c_str();
   }
 
-  wxString temporary = wxString(filename);
+  wxString temporary = filename.GetCStr();
   temporary = temporary.AfterLast('\\').AfterFirst('.');
 
   switch(forceExtension)
   {
-    case -1:
-    break;
     case mmgApplicationSettings::JPG :
-    if(mafString(temporary) != _("jpg"))
+    if(temporary != _("jpg"))
       filename += _(".jpg");
     break;
     case mmgApplicationSettings::BMP:
-    if(mafString(temporary) != _("bmp"))
+    if(temporary != _("bmp"))
       filename += _(".bmp");
     break;
   }
@@ -787,8 +782,6 @@ void mafRWIBase::SaveAllImages(mafString filename, mafViewCompound *v, int force
     mafString wildc = "Image (*.jpg)|*.jpg|Image (*.bmp)|*.bmp";
     switch(forceExtension)
     {
-      case -1:
-      break;
       case mmgApplicationSettings::JPG :
         wildc = "Image (*.jpg)|*.jpg";
       break;
@@ -797,7 +790,7 @@ void mafRWIBase::SaveAllImages(mafString filename, mafViewCompound *v, int force
       break;
     }
     mafString file;
-    if(!wxDirExists(mafString(path)))
+    if(!wxDirExists(path))
     {
       file = m_SaveDir;
       file +=  "\\";
@@ -810,13 +803,11 @@ void mafRWIBase::SaveAllImages(mafString filename, mafViewCompound *v, int force
     filename = file;
   }
 
-  wxString temporary = wxString(filename);
+  wxString temporary = filename.GetCStr();
   temporary = temporary.AfterLast('\\').AfterFirst('.');
 
   switch(forceExtension)
   {
-    case -1:
-    break;
     case mmgApplicationSettings::JPG :
     if(mafString(temporary) != _("jpg"))
       filename += _(".jpg");
