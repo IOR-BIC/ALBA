@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-02 15:48:44 $
-  Version:   $Revision: 1.96 $
+  Date:      $Date: 2007-03-05 18:47:38 $
+  Version:   $Revision: 1.97 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -880,11 +880,10 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       break;
 			case ABOUT_APPLICATION:
 			{
-				mafString message=m_AppTitle;
-				message+=_(" Application ");
-				message+=m_Revision;
-				wxString msg_dlg = wxString::Format("%s",message);
-				wxMessageBox(msg_dlg, "About Application");
+				wxString message = m_AppTitle.GetCStr();
+				message += _(" Application ");
+				message += m_Revision;
+				wxMessageBox(message, "About Application");
 			}
 			break;
       default:
