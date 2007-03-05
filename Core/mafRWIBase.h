@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-02 15:49:10 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2007-03-05 18:45:35 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,6 +18,7 @@
 //----------------------------------------------------------------------------
 #include "mafObserver.h"
 #include "mafString.h"
+#include "mafViewCompound.h"
 #include "vtkRenderWindowInteractor.h"
 
 //----------------------------------------------------------------------------
@@ -34,7 +35,6 @@ class mmdMouse;
 class vtkImageAppend;
 class vtkPNGWriter;
 class vtkWindowToImageFilter;
-class mafViewCompound;
 
 //----------------------------------------------------------------------------
 // Constant:
