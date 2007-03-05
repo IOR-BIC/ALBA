@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-02-23 15:30:39 $
-Version:   $Revision: 1.16 $
+Date:      $Date: 2007-03-05 09:52:18 $
+Version:   $Revision: 1.17 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -196,20 +196,7 @@ void mafPipeIsosurface::OnEvent(mafEventBase *maf_event)
 			break;
 		  case ID_GENERATE_ISOSURFACE:
 			{
-				vtkPolyData *surface = vtkPolyData::New();
-				m_ContourMapper->GetOutput(0, surface);
-				m_ContourMapper->Update();
-
-				wxString name = wxString::Format(_("%s Isosurface %g"), m_Vme->GetName(),m_ContourValue);
-
-				mafNEW(m_IsosurfaceVme);
-				m_IsosurfaceVme->SetName(name.c_str());
-				m_IsosurfaceVme->SetDataByDetaching(surface,0);
-
-				m_IsosurfaceVme->ReparentTo(m_Vme);
-
-				surface->Delete(); 
-				mafDEL(m_IsosurfaceVme);
+				ExctractIsosurface();	
 			}
 			break;
 		  case ID_ALPHA_VALUE:
@@ -223,6 +210,25 @@ void mafPipeIsosurface::OnEvent(mafEventBase *maf_event)
 			break;
 		}
 	}
+}
+//----------------------------------------------------------------------------
+void mafPipeIsosurface::ExctractIsosurface()
+//----------------------------------------------------------------------------
+{
+	vtkPolyData *surface = vtkPolyData::New();
+	m_ContourMapper->GetOutput(0, surface);
+	m_ContourMapper->Update();
+
+	wxString name = wxString::Format(_("%s Isosurface %g"), m_Vme->GetName(),m_ContourValue);
+
+	mafNEW(m_IsosurfaceVme);
+	m_IsosurfaceVme->SetName(name.c_str());
+	m_IsosurfaceVme->SetDataByDetaching(surface,0);
+
+	m_IsosurfaceVme->ReparentTo(m_Vme);
+
+	surface->Delete(); 
+	mafDEL(m_IsosurfaceVme);
 }
 //----------------------------------------------------------------------------
 void mafPipeIsosurface::EnableBoundingBoxVisibility(bool enable)
