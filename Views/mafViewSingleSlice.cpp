@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-23 15:21:47 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-03-08 11:58:51 $
+  Version:   $Revision: 1.8 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -470,13 +470,13 @@ void mafViewSingleSlice::OnEvent(mafEventBase *maf_event)
 				{
 					if(node->IsA("mafVMESurface"))
 					{
-						mafPipe *p= this->GetNodePipe(node);
+						mafPipeSurfaceSlice *p= mafPipeSurfaceSlice::SafeDownCast(this->GetNodePipe(node));
 						if(p)
 							((mafPipeSurfaceSlice *)p)->SetSlice(m_OriginVolume);
 					}
 					if(node->IsA("mafVMEPolyline"))
 					{
-						mafPipe *p= this->GetNodePipe(node);
+						mafPipePolylineSlice *p= mafPipePolylineSlice::SafeDownCast(this->GetNodePipe(node));
 						if(p)
 							((mafPipePolylineSlice *)p)->SetSlice(m_OriginVolume);
 					}
