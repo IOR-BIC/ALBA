@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeMIP.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-02 21:57:17 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-03-08 12:03:54 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -24,11 +24,14 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class vtkImageCast;
 class vtkPiecewiseFunction;
 class vtkVolumeProperty;
-class vtkVolumeRayCastMIPFunction;
+class vtkVolumeRayCastCompositeFunction;
 class vtkVolumeRayCastMapper;
 class vtkActor;
 class vtkLODProp3D;
 class vtkLookupTable;
+class vtkImageResample;
+class vtkImageMedian3D;
+
 //----------------------------------------------------------------------------
 // medPipeVolumeMIP :
 //----------------------------------------------------------------------------
@@ -47,11 +50,15 @@ public:
   enum PIPE_VOLUME_MIP_WIDGET_ID
   {
     ID_LUT_CHOOSER = Superclass::ID_LAST,
+		ID_RESAMPLE_FACTOR,
     ID_LAST
   };
 
   virtual void Create(mafSceneNode *n);
   virtual void Select(bool select); 
+
+	void SetResampleFactor(double value);
+	double GetResampleFactor();
 
 protected:
   /** 
@@ -64,11 +71,21 @@ protected:
   vtkImageCast                *m_Caster;
   vtkPiecewiseFunction        *m_OpacityTransferFunction;
   vtkVolumeProperty           *m_VolumeProperty;
-  vtkVolumeRayCastMIPFunction *m_MIPFunction;
+  vtkVolumeRayCastCompositeFunction *m_MIPFunction;
   vtkVolumeRayCastMapper      *m_VolumeMapper;
   vtkVolumeRayCastMapper      *m_VolumeMapperLow;
   vtkLODProp3D                *m_VolumeLOD;
 
+	vtkImageResample						*m_ResampleFilter;
+	vtkImageMedian3D						*m_Median;
+
+	
+
   vtkActor               *m_SelectionActor;
+  double  m_VolumeBounds[6];
+  double  m_VolumeOrientation[3];
+  double  m_VolumePosition[3];
+
+	double	m_ResampleFactor;
 };
 #endif // __medPipeVolumeMIP_H__
