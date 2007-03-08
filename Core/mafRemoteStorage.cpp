@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRemoteStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-22 11:14:13 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-03-08 15:00:21 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -19,25 +19,13 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mafRemoteStorage.h"
 #include <wx/tokenzr.h>
+
+#include "mafRemoteStorage.h"
+#include "mafRemoteFileManager.h"
 
 #include "mafDirectory.h"
 #include "mafCurlUtility.h"
-
-// Used with FTP Upload
-#define UPLOAD_FILE_AS  "while-uploading.txt"
-#define RENAME_FILE_TO  "renamed-and-fine.txt"
-
-#include <curl/types.h>
-#include <curl/easy.h>
-
-struct LocalFileDownloaded {
-  char *filename;
-  FILE *stream;
-};
-
-mafRemoteStorage * mafRemoteStorage::m_ProgressListener = NULL;
 
 //------------------------------------------------------------------------------
 mafCxxTypeMacro(mafRemoteStorage)
@@ -47,33 +35,23 @@ mafCxxTypeMacro(mafRemoteStorage)
 mafRemoteStorage::mafRemoteStorage()
 //------------------------------------------------------------------------------
 {
-  m_UserName = ""; // blank user name means anonymous user.
-  m_Pwd = "";
   m_HostName = "";
-  m_Port = 0;
   m_LocalCacheFolder = wxGetCwd();
   m_LocalMSFFolder = "";
   m_RemoteRepository = "";
   m_RemoteMSF = "";
-  m_EnableCertificateAuthentication = false;
   m_IsRemoteMSF = false;
-  m_SpeedUpload = 0.0;
-  m_TotalTime   = 0.0;
 
-  m_LocalStream = NULL;
-  m_Headerlist  = NULL;
-
-  mafRemoteStorage::m_ProgressListener = this;
-  curl_global_init(CURL_GLOBAL_DEFAULT);
-  m_Curl = curl_easy_init();
+  mafNEW(m_RemoteFileManager);
+  m_RemoteFileManager->Start();
 }
 
 //------------------------------------------------------------------------------
 mafRemoteStorage::~mafRemoteStorage()
 //------------------------------------------------------------------------------
 {
-  curl_easy_cleanup(m_Curl);
-  curl_global_cleanup();
+  m_RemoteFileManager->Stop();
+  mafDEL(m_RemoteFileManager);
 }
 //------------------------------------------------------------------------------
 void mafRemoteStorage::SetLocalCacheFolder(mafString cache)
@@ -85,13 +63,13 @@ void mafRemoteStorage::SetLocalCacheFolder(mafString cache)
 void mafRemoteStorage::SetUsername(mafString usr)
 //------------------------------------------------------------------------------
 {
-  m_UserName = usr;
+  m_RemoteFileManager->SetUsername(usr);
 }
 //------------------------------------------------------------------------------
 void mafRemoteStorage::SetPassword(mafString pwd)
 //------------------------------------------------------------------------------
 {
-  m_Pwd = pwd;
+  m_RemoteFileManager->SetPassword(pwd);
 }
 //------------------------------------------------------------------------------
 void mafRemoteStorage::SetHostName(mafString host)
@@ -103,7 +81,7 @@ void mafRemoteStorage::SetHostName(mafString host)
 void mafRemoteStorage::SetRemotePort(int port)
 //------------------------------------------------------------------------------
 {
-  m_Port = port;
+  m_RemoteFileManager->SetRemotePort(port);
 }
 //------------------------------------------------------------------------------
 int mafRemoteStorage::ResolveInputURL(const char *url, mafString &filename)
@@ -131,13 +109,42 @@ int mafRemoteStorage::ResolveInputURL(const char *url, mafString &filename)
 
   mafString protocol = "";
   m_IsRemoteMSF = IsRemote(filename,protocol);
-  m_EnableCertificateAuthentication = protocol.Equals("https");
+  m_RemoteFileManager->EnableAuthentication(protocol.Equals("https"));
 
   if (m_IsRemoteMSF)
   {
     // Download the file if it is not present into the cache
     mafString local_filename;
-    res = DownloadRemoteFile(filename, local_filename);
+    //res = DownloadRemoteFile(filename, local_filename);
+    //---------------------------------- Build folder into the local cache to put the downloaded file
+    wxString path, name, ext, tmpFolder;
+    wxString baseName = wxFileNameFromPath(filename.GetCStr());
+    wxSplitPath(baseName,&path,&name,&ext);
+
+    if (ext == "msf")
+    {
+      m_RemoteMSF = filename;
+      tmpFolder = m_LocalCacheFolder;
+      tmpFolder += "\\";
+      tmpFolder += name.c_str();
+
+      if (!wxDirExists(tmpFolder))
+      {
+        wxMkdir(tmpFolder);
+      }
+      m_LocalMSFFolder = tmpFolder;
+    }
+
+    local_filename = m_LocalMSFFolder;
+    local_filename += "\\";
+    local_filename += wxFileNameFromPath(filename.GetCStr()).c_str();
+
+    if (wxFileExists(local_filename.GetCStr()))
+    {
+      return MAF_OK;
+    }
+    //-----------------------------------------------
+    res = m_RemoteFileManager->DownloadRemoteFile(filename, local_filename);
     m_RemoteRepository = wxPathOnly(filename.GetCStr()).c_str();
     filename = local_filename;
   }
@@ -201,7 +208,7 @@ int mafRemoteStorage::StoreToURL(const char *filename, const char *url)
     if (save_res == MAF_OK && !m_RemoteRepository.IsEmpty())
     {
       mafString remote_file = m_RemoteRepository + "/" + wxFileNameFromPath(url);
-      save_res = UploadLocalFile(fullpathname.c_str(), remote_file);
+      save_res = m_RemoteFileManager->UploadLocalFile(fullpathname.c_str(), remote_file);
     }
   }
   else
@@ -224,7 +231,8 @@ int mafRemoteStorage::OpenDirectory(const char *pathname)
   if (m_IsRemoteMSF)
   {
     wxString baseName = wxFileNameFromPath(m_RemoteMSF.GetCStr());
-    wxString path, name, ext, query_string;
+    wxString path, name, ext;
+    mafString query_string;
     wxSplitPath(baseName,&path,&name,&ext);
     query_string = m_RemoteRepository;
     query_string += "/";
@@ -235,18 +243,8 @@ int mafRemoteStorage::OpenDirectory(const char *pathname)
     chunk.memory=NULL; // we expect realloc(NULL, size) to work 
     chunk.size = 0;    // no data at this point 
 
-    mafString auth = m_UserName;
-    auth += ":";
-    auth += m_Pwd;
-    curl_easy_reset(m_Curl);
-    curl_easy_setopt(m_Curl, CURLOPT_URL, query_string.c_str());
-    curl_easy_setopt(m_Curl, CURLOPT_PORT, m_Port);
-    curl_easy_setopt(m_Curl, CURLOPT_USERPWD, auth.GetCStr());
-    curl_easy_setopt(m_Curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
-    curl_easy_setopt(m_Curl, CURLOPT_WRITEDATA, &chunk);
-
-    m_Result = curl_easy_perform(m_Curl);
-    if (m_Result == CURLE_OK)
+    int res = m_RemoteFileManager->ListRemoteDirectory(query_string, chunk);
+    if (res == MAF_OK)
     {
       m_FilesDictionary.clear();
       wxString msf_list = chunk.memory;
@@ -284,86 +282,6 @@ int mafRemoteStorage::OpenLocalMSFDirectory()
   return MAF_OK;
 }
 //------------------------------------------------------------------------------
-int mafRemoteStorage::DownloadRemoteFile(mafString remote_filename, mafString &local_filename)
-//------------------------------------------------------------------------------
-{
-  wxString path, name, ext, tmpFolder;
-  wxString baseName = wxFileNameFromPath(remote_filename.GetCStr());
-  wxSplitPath(baseName,&path,&name,&ext);
-
-  if (ext == "msf")
-  {
-    m_RemoteMSF = remote_filename;
-    tmpFolder = m_LocalCacheFolder;
-    tmpFolder += "\\";
-    tmpFolder += name.c_str();
-
-    if (!wxDirExists(tmpFolder))
-    {
-      wxMkdir(tmpFolder);
-    }
-    m_LocalMSFFolder = tmpFolder;
-  }
-
-  local_filename = m_LocalMSFFolder;
-  local_filename += "\\";
-  local_filename += wxFileNameFromPath(remote_filename.GetCStr()).c_str();
-
-  if (wxFileExists(local_filename.GetCStr()))
-  {
-    return MAF_OK;
-  }
-   
-  struct LocalFileDownloaded localfile = 
-  {
-    (char *)local_filename.GetCStr(), // name to store the file as if successful
-    NULL
-  };
-
-  mafString s = wxString::Format(_("downloading %s. Please wait..."),wxFileNameFromPath(remote_filename.GetCStr())).c_str();
-  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-  mafEventMacro(mafEvent(this,PROGRESSBAR_SET_TEXT,&s));
-
-  mafString auth = m_UserName;
-  auth += ":";
-  auth += m_Pwd;
-  curl_easy_reset(m_Curl);
-  curl_easy_setopt(m_Curl, CURLOPT_URL, remote_filename.GetCStr());
-  curl_easy_setopt(m_Curl, CURLOPT_WRITEFUNCTION, FileDownload);
-  curl_easy_setopt(m_Curl, CURLOPT_WRITEDATA, &localfile);
-  curl_easy_setopt(m_Curl, CURLOPT_PORT, m_Port);
-  curl_easy_setopt(m_Curl, CURLOPT_USERPWD, auth.GetCStr());
-  curl_easy_setopt(m_Curl, CURLOPT_NOPROGRESS, FALSE);
-  curl_easy_setopt(m_Curl, CURLOPT_PROGRESSFUNCTION, FileTransferProgressCall);
-  curl_easy_setopt(m_Curl, CURLOPT_PROGRESSDATA, m_ProgressListener);
-  if (m_EnableCertificateAuthentication)
-  {
-    curl_easy_setopt(m_Curl, CURLOPT_SSL_VERIFYHOST, 0);
-  }
-
-  m_Result = curl_easy_perform(m_Curl);
-  bool curl_error = m_Result != CURLE_OK;
-
-  if(localfile.stream)
-    fclose(localfile.stream);
-
-  if (curl_error && localfile.stream)
-  {
-    wxRemoveFile(localfile.filename);
-  }
-
-  s = _("Ready");
-  mafEventMacro(mafEvent(this,PROGRESSBAR_SET_TEXT,&s));
-  mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-
-  if (curl_error)
-  {
-    ErrorManager(m_Result);
-    return MAF_ERROR;
-  }
-  return MAF_OK;
-}
-//------------------------------------------------------------------------------
 const char* mafRemoteStorage::GetTmpFolder()
 //------------------------------------------------------------------------------
 {
@@ -384,124 +302,4 @@ const char* mafRemoteStorage::GetTmpFolder()
   {
     return mafXMLStorage::GetTmpFolder();
   }
-}
-
-//------------------------------------------------------------------------------
-int mafRemoteStorage::UploadLocalFile(mafString local_filename, mafString remote_filename)
-//------------------------------------------------------------------------------
-{
-  mafString protocol = "";
-  bool is_remote = IsRemote(remote_filename, protocol);
-
-  wxString path,short_name,ext;
-  wxSplitPath(remote_filename,&path,&short_name,&ext);
-  if (ext == "msf")
-    m_LocalStream = fopen(local_filename.GetCStr(), "rt");
-  else
-    m_LocalStream = fopen(local_filename.GetCStr(), "rb");
-
-  if(!m_LocalStream)
-  {
-    wxMessageBox(_("Error uploading file!!"),_("Error"));
-    return MAF_ERROR;
-  }
-
-  // get the file size
-  stat(local_filename.GetCStr(), &FileInfo); 
-
-  mafString auth = m_UserName;
-  auth += ":";
-  auth += m_Pwd;
-  curl_easy_reset(m_Curl);
-  curl_easy_setopt(m_Curl, CURLOPT_URL, remote_filename.GetCStr());
-  curl_easy_setopt(m_Curl, CURLOPT_NOPROGRESS, FALSE);
-  curl_easy_setopt(m_Curl, CURLOPT_UPLOAD, TRUE);
-  curl_easy_setopt(m_Curl, CURLOPT_READFUNCTION,FileUpload);
-  curl_easy_setopt(m_Curl, CURLOPT_READDATA, m_LocalStream);
-  curl_easy_setopt(m_Curl, CURLOPT_INFILESIZE_LARGE,(curl_off_t)FileInfo.st_size);
-
-  if (is_remote)
-  {
-    curl_easy_setopt(m_Curl, CURLOPT_PORT, m_Port);
-    curl_easy_setopt(m_Curl, CURLOPT_USERPWD, auth.GetCStr());
-    if (protocol.Equals("http") || protocol.Equals("https"))
-    {
-      m_EnableCertificateAuthentication = protocol.Equals("https");
-      if (m_EnableCertificateAuthentication)
-      {
-        curl_easy_setopt(m_Curl, CURLOPT_SSL_VERIFYHOST, 0);
-      }
-      curl_easy_setopt(m_Curl, CURLOPT_PUT, TRUE);
-    }
-  }
-
-  m_Result = curl_easy_perform(m_Curl);
-
-  // now extract transfer info
-  curl_easy_getinfo(m_Curl, CURLINFO_SPEED_UPLOAD, &m_SpeedUpload);
-  curl_easy_getinfo(m_Curl, CURLINFO_TOTAL_TIME, &m_TotalTime);
-
-  if (m_LocalStream)
-  {
-    fclose(m_LocalStream);
-  }
-
-  if (m_Result != CURLE_OK)
-  {
-    ErrorManager(m_Result);
-    return MAF_ERROR;
-  }
-
-  //mafLogMessage(_("Speed: %.3f bytes/sec during %.3f seconds\n"), m_SpeedUpload, m_TotalTime);
-
-  return MAF_OK;
-}
-//------------------------------------------------------------------------------
-void mafRemoteStorage::ErrorManager(int err_num)
-//------------------------------------------------------------------------------
-{
-  mafString err_string = curl_easy_strerror((CURLcode)err_num);
-  wxMessageBox(err_string.GetCStr(), _("Warning"));
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Global callback used by cURL 
-////////////////////////////////////////////////////////////////////////////////
-
-//------------------------------------------------------------------------------
-int FileDownload(void *buffer, size_t size, size_t nmemb, void *stream)
-//------------------------------------------------------------------------------
-{
-  struct LocalFileDownloaded *out = (struct LocalFileDownloaded *)stream;
-  if(out && !out->stream) 
-  {
-    // open file for writing
-    out->stream = fopen(out->filename, "wb");
-    if(!out->stream)
-      return -1; // failure, can't open file to write
-  }
-  return fwrite(buffer, size, nmemb, out->stream);
-}
-//------------------------------------------------------------------------------
-size_t FileUpload(void *ptr, size_t size, size_t nmemb, void *stream)
-//------------------------------------------------------------------------------
-{
-  FILE *f = (FILE *)stream;
-  size_t n;
-
-  if (ferror(f))
-    return CURL_READFUNC_ABORT;
-
-  n = fread(ptr, size, nmemb, f) * size;
-
-  return n;
-}
-//------------------------------------------------------------------------------
-int FileTransferProgressCall(mafObserver *listener, double t, double d, double ultotal, double ulnow)
-//------------------------------------------------------------------------------
-{
-  long progress = (long)(d*100.0/t);
-  mafRemoteStorage::m_ProgressListener->OnEvent(&mafEvent(mafRemoteStorage::m_ProgressListener,PROGRESSBAR_SET_VALUE,progress));
-  return 0;
 }

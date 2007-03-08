@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRemoteStorage.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-22 11:13:56 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-03-08 15:00:21 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,21 +17,23 @@
 // includes :
 //----------------------------------------------------------------------------
 #include "mafVMEStorage.h"
-#include <curl/curl.h>
 
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
+class mafRemoteFileManager;
 
 /** A storage class for MSF remote files.
   This is an implementation of remote storage object for storing MSF remote files.
+  File download is non blocking action. While the data is downloading how use the item 
+  should shows its bounding box at least.
   @sa mafVMEStorage
     - 
 */  
 class mafRemoteStorage: public mafVMEStorage
 {
 public:
-  mafTypeMacro(mafRemoteStorage,mafVMEStorage)
+  mafTypeMacro(mafRemoteStorage, mafVMEStorage)
 
   mafRemoteStorage();
   virtual ~mafRemoteStorage();
@@ -63,48 +65,24 @@ public:
   /** Set the folder in which download the remote VME.*/
   void SetLocalCacheFolder(mafString cache);
 
-  /** Download a remote file into the local cache and write in the 'local_filename' the path to reach it.*/
-  int DownloadRemoteFile(mafString remote_filename, mafString &local_filename);
-
-  /** Upload local file to the remote repository.*/
-  int UploadLocalFile(mafString local_filename, mafString remote_filename);
-
-  static mafRemoteStorage *m_ProgressListener;
+  mafRemoteFileManager *GetRemoteFileManager() {return m_RemoteFileManager;};
 
 protected:
-  /** Show messages when errors comes up.*/
-  void ErrorManager(int err_num);
-
   /** Create a filename list of the local MSF directory. */
   int OpenLocalMSFDirectory();
 
   /** Check if a file is into the local MSF cache folder. */
   bool IsFileInLocalDirectory(const char *filename);
 
-  mafString m_UserName;
-  mafString m_Pwd;
   mafString m_HostName;
   mafString m_LocalCacheFolder;
   mafString m_LocalMSFFolder;
   mafString m_RemoteRepository;
   mafString m_RemoteMSF;
   std::set<mafString> m_LocalFilesDictionary;
-  int m_Port;
 
-  bool m_EnableCertificateAuthentication;
   bool m_IsRemoteMSF;
 
-  CURL      *m_Curl;
-  CURLcode   m_Result;
-  struct curl_slist *m_Headerlist;
-  struct stat FileInfo;
-  FILE      *m_LocalStream;
-  double     m_SpeedUpload;
-  double     m_TotalTime;
+  mafRemoteFileManager *m_RemoteFileManager;
 };
-
-extern int FileTransferProgressCall(mafObserver *listener, double t, double d, double ultotal, double ulnow);
-extern int FileDownload(void *buffer, size_t size, size_t nmemb, void *stream);
-extern size_t FileUpload(void *ptr, size_t size, size_t nmemb, void *stream);
-
 #endif // _mafRemoteStorage_h_
