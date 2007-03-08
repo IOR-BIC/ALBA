@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-07 12:35:35 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-03-08 13:23:38 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -64,7 +64,7 @@ mafDeviceManager::~mafDeviceManager()
 //------------------------------------------------------------------------------
 {
   m_Listener = NULL;
-  mafDEL(m_DeviceSet)
+  mafDEL(m_DeviceSet);
 }
 
 //------------------------------------------------------------------------------
