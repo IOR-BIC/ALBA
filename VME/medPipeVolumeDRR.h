@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeDRR.h,v $
   Language:  C++
-  Date:      $Date: 2007-02-28 09:43:36 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-03-08 10:28:17 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -28,6 +28,7 @@ class vtkXRayVolumeMapper;
 class vtkActor;
 class vtkVolume;
 class vtkLookupTable;
+class vtkImageResample;
 class mmgFloatSlider;
 
 //----------------------------------------------------------------------------
@@ -61,6 +62,7 @@ public:
 		ID_IMAGE_OFFSET_Y,
 		ID_IMAGE_ANGLE,
 		ID_EXPORT,
+		ID_RESAMPLE_FACTOR,
 		ID_LAST
   };
 
@@ -74,6 +76,8 @@ public:
 	void SetCameraPosition(double value[3]);
 	void SetCameraFocus(double value[3]);
 	void SetCameraRoll(double value);
+	void SetResampleFactor(double value);
+	double GetResampleFactor();
 
 protected:
   virtual mmgGui  *CreateGui();
@@ -83,11 +87,13 @@ protected:
   vtkVolumeProperty           *m_VolumeProperty;
   vtkXRayVolumeMapper         *m_VolumeMapper;
 	vtkVolume                   *m_Volume;
+	vtkImageResample						*m_ResampleFilter;
 	
   vtkActor  *m_SelectionActor;
   double  m_VolumeBounds[6];
   double  m_VolumeOrientation[3];
   double  m_VolumePosition[3];
+	double  m_ResampleFactor;
 
 	//----------------------------- volume settings
 	double             m_ExposureCorrection[2];

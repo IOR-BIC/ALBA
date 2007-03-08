@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeDRR.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-28 09:43:29 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-03-08 10:28:17 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -55,6 +55,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkRectilinearGrid.h"
 #include "vtkStructuredPoints.h"
 #include "vtkRenderer.h"
+#include "vtkImageResample.h"
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medPipeVolumeDRR);
 //----------------------------------------------------------------------------
@@ -73,10 +74,13 @@ medPipeVolumeDRR::medPipeVolumeDRR()
 //  m_VolumeLOD         = NULL;
   m_SelectionActor    = NULL;
   m_ColorLUT          = NULL;
+	m_ResampleFilter		= NULL;
   m_VolumeBounds[0] = m_VolumeBounds[1] = m_VolumeBounds[2] \
     = m_VolumeBounds[3] = m_VolumeBounds[4] = m_VolumeBounds[5] = 0;
 
   m_VolumeOrientation[0] = m_VolumeOrientation[1] = m_VolumeOrientation[2] = 0;
+
+	m_ResampleFactor = 1.0;
 }
 //----------------------------------------------------------------------------
 void medPipeVolumeDRR::Create(mafSceneNode *n)
@@ -109,8 +113,19 @@ void medPipeVolumeDRR::Create(mafSceneNode *n)
   /*vtkNEW(m_MIPFunction);
   m_MIPFunction->SetMaximizeMethodToOpacity();*/
 
-  vtkNEW(m_VolumeMapper);
-  m_VolumeMapper->SetInput(data);
+	vtkNEW(m_ResampleFilter);
+	vtkNEW(m_VolumeMapper);
+	if(vtkImageData::SafeDownCast(data))
+	{
+		m_ResampleFilter->SetInput((vtkImageData*)data);
+		for(int i=0;i<3;i++)
+			m_ResampleFilter->SetAxisMagnificationFactor(i,m_ResampleFactor);
+		m_ResampleFilter->Update();
+		m_VolumeMapper->SetInput(m_ResampleFilter->GetOutput());
+	}
+	else
+		m_VolumeMapper->SetInput(data);
+
   //m_VolumeMapper->SetVolumeRayCastFunction(m_MIPFunction);
   m_VolumeMapper->SetCroppingRegionPlanes(0, 1, 0, 1, 0, 1);
 //  m_VolumeMapper->SetImageSampleDistance(1);
@@ -140,9 +155,7 @@ void medPipeVolumeDRR::Create(mafSceneNode *n)
   m_Volume->SetMapper(m_VolumeMapper);
   m_Volume->PickableOff();
   
-  
   m_AssemblyFront->AddPart(m_Volume);
-  
   
   vtkMAFSmartPointer<vtkOutlineCornerFilter> selection_filter;
   selection_filter->SetInput(data);  
@@ -180,6 +193,7 @@ medPipeVolumeDRR::~medPipeVolumeDRR()
   //vtkDEL(m_VolumeMapperLow);
   vtkDEL(m_Volume);
   vtkDEL(m_SelectionActor);
+	vtkDEL(m_ResampleFilter);
 }
 //----------------------------------------------------------------------------
 void medPipeVolumeDRR::Select(bool sel)
@@ -203,6 +217,8 @@ mmgGui *medPipeVolumeDRR::CreateGui()
 	//Gui
 
 	this->m_Gui->SetListener(this);
+
+	m_Gui->Double(ID_RESAMPLE_FACTOR,"Resample",&m_ResampleFactor,0.00001,1);
 
 	this->m_Gui->Label("DRR settings:", true);
 	m_Gui->Color(ID_VOLUME_COLOR, "Color", &this->m_VolumeColor);
@@ -277,6 +293,15 @@ void medPipeVolumeDRR::OnEvent(mafEventBase *maf_event)
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 				break;
 
+			case ID_RESAMPLE_FACTOR:
+				{
+					for(int i=0;i<3;i++)
+						m_ResampleFilter->SetAxisMagnificationFactor(i,m_ResampleFactor);
+
+					m_ResampleFilter->Update();
+					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				}
+				break;
 			case ID_IMAGE_COLOR:
 			case ID_IMAGE_ANGLE:
 			case ID_IMAGE_OFFSET_X:
@@ -415,6 +440,29 @@ void medPipeVolumeDRR::SetCameraRoll(double value)
 	
 	vtkCamera *camera = this->m_Sg->m_RenFront->GetActiveCamera();
 	camera->SetRoll(this->m_CameraRoll);
+
+	if(m_Gui)
+		m_Gui->Update();
+}
+//----------------------------------------------------------------------------
+double medPipeVolumeDRR::GetResampleFactor()
+//----------------------------------------------------------------------------
+{
+	return m_ResampleFactor;
+}
+//----------------------------------------------------------------------------
+void medPipeVolumeDRR::SetResampleFactor(double value)
+//----------------------------------------------------------------------------
+{
+	m_ResampleFactor = value;
+
+	if(m_ResampleFilter)
+	{
+		for(int i=0;i<3;i++)
+			m_ResampleFilter->SetAxisMagnificationFactor(i,m_ResampleFactor);
+
+		m_ResampleFilter->Update();
+	}
 
 	if(m_Gui)
 		m_Gui->Update();
