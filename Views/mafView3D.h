@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.h,v $
   Language:  C++
-  Date:      $Date: 2007-02-23 15:32:49 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-03-08 10:26:20 $
+  Version:   $Revision: 1.6 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -52,8 +52,10 @@ public:
   { 
     ID_NONE = Superclass::ID_LAST,
 		ID_COMBO_PIPE,
+		ID_RESAMPLE_FACTOR,
 		ID_CONTOUR_VALUE_ISO,
 		ID_ALPHA_VALUE_ISO,
+		ID_EXTRACT_ISO,
 		ID_VOLUME_COLOR,
 		ID_EXPOSURE_CORRECTION_L,
 		ID_EXPOSURE_CORRECTION_H,
@@ -93,6 +95,8 @@ protected:
 	int m_Choose;
 
 	mafVMEVolumeGray *m_CurrentVolume;
+
+	double m_ResampleFactor;
 
 	//----------------------------- ISO settings
 	double m_ContourValueIso;

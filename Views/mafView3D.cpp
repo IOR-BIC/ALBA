@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-28 09:42:46 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-03-08 10:26:20 $
+  Version:   $Revision: 1.6 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,6 +35,8 @@
 #include "mafVMESlicer.h"
 #include "mafPipeIsosurface.h"
 #include "medPipeVolumeDRR.h"
+#include "medPipeVolumeVR.h"
+#include "medPipeVolumeMIP.h"
 #include "mmgFloatSlider.h"
 
 #include "vtkDataSet.h"
@@ -66,6 +68,7 @@ mafView3D::mafView3D(wxString label, int camera_position, bool show_axes, bool s
 	m_CurrentVolume = NULL;
 	m_SliderContourIso = NULL;
 	m_SliderAlphaIso = NULL;
+	m_ResampleFactor = 0.5;
 }
 //----------------------------------------------------------------------------
 mafView3D::~mafView3D()
@@ -92,6 +95,27 @@ void mafView3D::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId()) 
     {
+		case ID_RESAMPLE_FACTOR:
+			{
+				medPipeVolumeDRR *pipeDDR=medPipeVolumeDRR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+				if(pipeDDR)
+				{
+					pipeDDR->SetResampleFactor(m_ResampleFactor);
+				}
+				medPipeVolumeVR *pipeVR=medPipeVolumeVR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+				if(pipeVR)
+				{
+					pipeVR->SetResampleFactor(m_ResampleFactor);
+				}
+				medPipeVolumeMIP *pipeMIP=medPipeVolumeMIP::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+				if(pipeMIP)
+				{
+					pipeMIP->SetResampleFactor(m_ResampleFactor);
+				}
+				CameraReset();
+				CameraUpdate();
+			}
+			break;
 		case ID_CONTOUR_VALUE_ISO:
 			{
 				mafPipeIsosurface *pipe=mafPipeIsosurface::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
@@ -108,6 +132,16 @@ void mafView3D::OnEvent(mafEventBase *maf_event)
 				if(pipe)
 				{
 					pipe->SetAlphaValue(m_AlphaValueIso);
+					CameraUpdate();
+				}
+			}
+			break;
+		case ID_EXTRACT_ISO:
+			{
+				mafPipeIsosurface *pipe=mafPipeIsosurface::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+				if(pipe)
+				{
+					pipe->ExctractIsosurface();
 					CameraUpdate();
 				}
 			}
@@ -264,10 +298,22 @@ void mafView3D::VmeCreatePipe(mafNode *vme)
       pipe->SetListener(this);
       mafSceneNode *n = m_Sg->Vme2Node(vme);
       assert(n && !n->m_Pipe);
+			if(pipe_name == "medPipeVolumeDRR")
+			{
+				((medPipeVolumeDRR *)pipe)->SetResampleFactor(m_ResampleFactor);
+			}
+			if(pipe_name == "medPipeVolumeVR")
+			{
+				((medPipeVolumeVR *)pipe)->SetResampleFactor(m_ResampleFactor);
+			}
       if(pipe_name == "mafPipeIsosurface")
       {
         ((mafPipeIsosurface *)pipe)->EnableBoundingBoxVisibility(false);
       }
+			if(pipe_name == "medPipeVolumeMIP")
+			{
+				((medPipeVolumeMIP *)pipe)->SetResampleFactor(m_ResampleFactor);
+			}
       pipe->Create(n);
       n->m_Pipe = (mafPipe*)pipe;
       if (m_NumberOfVisibleVme == 1)
@@ -304,6 +350,8 @@ mmgGui *mafView3D::CreateGui()
 	wxString choices[4] = {_("ISO"),_("MIP"),_("DRR"),_("VR")};
 	m_Gui->Combo(ID_COMBO_PIPE,_("Choose pipe"),&m_Choose,4,choices);
 	m_Gui->Enable(ID_COMBO_PIPE,m_CurrentVolume!=NULL);
+	m_Gui->Double(ID_RESAMPLE_FACTOR,_("Resample"),&m_ResampleFactor,0.000001,1);
+	m_Gui->Enable(ID_RESAMPLE_FACTOR,m_CurrentVolume!=NULL);
 	m_Gui->Label("");
 
 	//Isosurface GUI
@@ -312,6 +360,7 @@ mmgGui *mafView3D::CreateGui()
 	m_ContourValueIso = 0.0;
 	m_SliderContourIso = m_Gui->FloatSlider(ID_CONTOUR_VALUE_ISO,_("contour"), &m_ContourValueIso,range[0],range[1]);
 	m_SliderAlphaIso = m_Gui->FloatSlider(ID_ALPHA_VALUE_ISO,_("alpha"), &m_AlphaValueIso,0.0,1.0);
+	m_Gui->Button(ID_EXTRACT_ISO,_("Extract Iso"));
 
 	//DDR GUI
 	m_Gui->Label(_("DRR settings:"));
@@ -369,6 +418,7 @@ void mafView3D::EnableSubGui(int idSubPipe,bool enable)
 			{
 				m_Gui->Enable(ID_ALPHA_VALUE_ISO,enable);
 				m_Gui->Enable(ID_CONTOUR_VALUE_ISO,enable);
+				m_Gui->Enable(ID_EXTRACT_ISO,enable);
 
 				m_Gui->Enable(ID_VOLUME_COLOR,!enable);
 				m_Gui->Enable(ID_EXPOSURE_CORRECTION_L,!enable);
@@ -388,6 +438,7 @@ void mafView3D::EnableSubGui(int idSubPipe,bool enable)
 			{
 				m_Gui->Enable(ID_ALPHA_VALUE_ISO,!enable);
 				m_Gui->Enable(ID_CONTOUR_VALUE_ISO,!enable);
+				m_Gui->Enable(ID_EXTRACT_ISO,!enable);
 
 				m_Gui->Enable(ID_VOLUME_COLOR,enable);
 				m_Gui->Enable(ID_EXPOSURE_CORRECTION_L,enable);
@@ -407,6 +458,7 @@ void mafView3D::EnableSubGui(int idSubPipe,bool enable)
 			{
 				m_Gui->Enable(ID_ALPHA_VALUE_ISO,enable);
 				m_Gui->Enable(ID_CONTOUR_VALUE_ISO,enable);
+				m_Gui->Enable(ID_EXTRACT_ISO,enable);
 
 				m_Gui->Enable(ID_VOLUME_COLOR,enable);
 				m_Gui->Enable(ID_EXPOSURE_CORRECTION_L,enable);
@@ -470,12 +522,14 @@ void mafView3D::VmeShow(mafNode *vme,bool show)
 			InizializeSubGui();
 			EnableSubGui(m_Choose);
 			m_Gui->Enable(ID_COMBO_PIPE,m_CurrentVolume!=NULL);
+			m_Gui->Enable(ID_RESAMPLE_FACTOR,m_CurrentVolume!=NULL);
 		}
 		else
 		{
 			m_CurrentVolume = NULL;
 			EnableSubGui(ID_PIPE_ALL,false);
 			m_Gui->Enable(ID_COMBO_PIPE,m_CurrentVolume!=NULL);
+			m_Gui->Enable(ID_RESAMPLE_FACTOR,m_CurrentVolume!=NULL);
 		}
 	}
 	CameraReset();
