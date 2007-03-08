@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-22 11:16:37 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2007-03-08 14:08:15 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -298,105 +298,107 @@ int mafVMEItemVTK::InternalRestoreData()
     mafString filename;
     int resolvedURL = storage->ResolveInputURL(m_URL,filename);
     
-    mafCString datatype=GetDataType();
-    
-    vtkDataSet *data;
-    vtkDataReader *reader;
+    return ReadData(filename, resolvedURL);
+  }
+  return MAF_NO_IO;
+}
+//-------------------------------------------------------------------------
+int mafVMEItemVTK::ReadData(mafString &filename, int resolvedURL)
+//-------------------------------------------------------------------------
+{
+  vtkDataSet *data;
+  vtkDataReader *reader;
 
-    if (resolvedURL == MAF_OK)
+  mafCString datatype=GetDataType();
+
+  if (resolvedURL == MAF_OK)
+  {
+    #ifdef MAF_USE_CRYPTO
+    std::string file_string;
+    if (GetCrypting())
     {
-      #ifdef MAF_USE_CRYPTO
-      std::string file_string;
+      mafDefaultDecryptFileInMemory(filename, file_string);
+    }
+    #endif
+
+    // Workaround for double read bug of the vtkDataSetReader class
+    // Read immediately the data and destroy the reader to close the input file
+    if (datatype=="vtkPolyData")
+    {
+      reader=vtkPolyDataReader::New();
       if (GetCrypting())
       {
-        mafDefaultDecryptFileInMemory(filename, file_string);
-      }
-      #endif
-
-      // Workaround for double read bug of the vtkDataSetReader class
-      // Read immediately the data and destroy the reader to close the input file
-      if (datatype=="vtkPolyData")
-      {
-        reader=vtkPolyDataReader::New();
-        if (GetCrypting())
-        {
-        #ifdef MAF_USE_CRYPTO
-          reader->ReadFromInputStringOn();
-          reader->SetInputString(file_string.c_str(),file_string.size());
-        #else
-          mafErrorMacro("Crypted data not supported: MAF not linked to Crypto library.");
-          reader->Delete();
-          return MAF_ERROR;
-        #endif
-        }
-        else
-          reader->SetFileName(filename);
-        reader->Update();
-        data=((vtkPolyDataReader *)reader)->GetOutput();
-      }
-      else if (datatype=="vtkStructuredPoints" || datatype=="vtkImageData")
-      {
-        reader=vtkStructuredPointsReader::New();
-        reader->SetFileName(filename);
-        reader->Update();
-        data=((vtkStructuredPointsReader *)reader)->GetOutput();
-      }
-      else if (datatype=="vtkStructuredGrid")
-      {
-        reader=vtkStructuredGridReader::New();
-        reader->SetFileName(filename);
-        reader->Update();
-        data=((vtkStructuredGridReader *)reader)->GetOutput();
-      }
-      else if (datatype=="vtkRectilinearGrid")
-      {
-        reader=vtkRectilinearGridReader::New();
-        reader->SetFileName(filename);
-        reader->Update();
-        data=((vtkRectilinearGridReader *)reader)->GetOutput();
-      }
-      else if (datatype=="vtkUnstructuredGrid")
-      {
-        reader=vtkUnstructuredGridReader::New();
-        reader->SetFileName(filename);
-        reader->Update();
-        data=((vtkUnstructuredGridReader *)reader)->GetOutput();
-      }
-      else
-      {
-        // using generic vtkDataSet reader...
-        mafWarningMacro("Unknown data type, using generic VTK dataset reader");
-        reader=vtkDataSetReader::New();
-        reader->SetFileName(filename);
-        reader->Update();
-        data=((vtkDataSetReader *)reader)->GetOutput();
-      }
-
-      m_DataReader=reader;
-      m_DataReader->Register(NULL);
-
-      if (data==NULL)
-      {
-        mafErrorMacro("Cannot read data file "<<filename);
+      #ifdef MAF_USE_CRYPTO
+        reader->ReadFromInputStringOn();
+        reader->SetInputString(file_string.c_str(),file_string.size());
+      #else
+        mafErrorMacro("Crypted data not supported: MAF not linked to Crypto library.");
+        reader->Delete();
         return MAF_ERROR;
+      #endif
       }
       else
-      {
-        SetData(data);
-
-        // In MAF 2.0 no more disconnecting data from its source!!! 
-        //data->SetSource(NULL);
-      }
-      reader->Delete();
+        reader->SetFileName(filename);
+      reader->Update();
+      data=((vtkPolyDataReader *)reader)->GetOutput();
     }
-    else if (resolvedURL == MAF_ERROR)
+    else if (datatype=="vtkStructuredPoints" || datatype=="vtkImageData")
     {
-      return MAF_NO_IO;
+      reader=vtkStructuredPointsReader::New();
+      reader->SetFileName(filename);
+      reader->Update();
+      data=((vtkStructuredPointsReader *)reader)->GetOutput();
     }
-    return MAF_OK;
-  } 
-  
-  return MAF_NO_IO;
+    else if (datatype=="vtkStructuredGrid")
+    {
+      reader=vtkStructuredGridReader::New();
+      reader->SetFileName(filename);
+      reader->Update();
+      data=((vtkStructuredGridReader *)reader)->GetOutput();
+    }
+    else if (datatype=="vtkRectilinearGrid")
+    {
+      reader=vtkRectilinearGridReader::New();
+      reader->SetFileName(filename);
+      reader->Update();
+      data=((vtkRectilinearGridReader *)reader)->GetOutput();
+    }
+    else if (datatype=="vtkUnstructuredGrid")
+    {
+      reader=vtkUnstructuredGridReader::New();
+      reader->SetFileName(filename);
+      reader->Update();
+      data=((vtkUnstructuredGridReader *)reader)->GetOutput();
+    }
+    else
+    {
+      // using generic vtkDataSet reader...
+      mafWarningMacro("Unknown data type, using generic VTK dataset reader");
+      reader=vtkDataSetReader::New();
+      reader->SetFileName(filename);
+      reader->Update();
+      data=((vtkDataSetReader *)reader)->GetOutput();
+    }
+
+    m_DataReader=reader;
+    m_DataReader->Register(NULL);
+
+    if (data==NULL)
+    {
+      mafErrorMacro("Cannot read data file "<<filename);
+      return MAF_ERROR;
+    }
+    else
+    {
+      SetData(data);
+    }
+    reader->Delete();
+  }
+  else if (resolvedURL == MAF_ERROR)
+  {
+    return MAF_NO_IO;
+  }
+  return MAF_OK;
 }
 
 //-------------------------------------------------------------------------
@@ -599,12 +601,12 @@ void mafVMEItemVTK::ReleaseOutputMemory()
 
   if (m_DataWriter) // release also the writer
   {
-    vtkDEL(m_DataWriter)
+    vtkDEL(m_DataWriter);
   }
 
   if (m_DataReader) // release also the writer
   {
-    vtkDEL(m_DataReader)
+    vtkDEL(m_DataReader);
   }
 }
 //-------------------------------------------------------------------------
@@ -615,6 +617,4 @@ void mafVMEItemVTK::Print(std::ostream& os, const int tabs) const
 
   // to do: implement DUMP of internally stored data
   strstream ostr;
-
-  
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:53:23 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-03-08 14:08:15 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -77,6 +77,9 @@ public:
     Id and URL are not considered for the comparison.
     To force compare the dataset internal data, use SetGlobalCompareDataOn()*/
   virtual bool Equals(mafVMEItem *a);
+
+  /** Read the data file and update the item's data.*/
+  int ReadData(mafString &filename, int resolvedURL = MAF_OK);
 
   /**
   Return true if data is !=NULL. Currently this doesn't ensure data is the same on 
