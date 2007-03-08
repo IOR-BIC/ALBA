@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolyline.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:55:55 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-03-08 12:39:49 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -389,4 +389,14 @@ void mafPipePolyline::SetRadius(double radius)
   item->SetValue(m_SphereRadius);
 
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+}
+//----------------------------------------------------------------------------
+void mafPipePolyline::SetColor(double color[3])
+//----------------------------------------------------------------------------
+{
+	if(m_Actor)
+	{
+		m_Actor->GetProperty()->SetDiffuseColor(color);
+		m_Actor->Modified();
+	}
 }

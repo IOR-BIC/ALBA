@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolyline.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-05 11:13:19 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-03-08 12:39:49 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -57,6 +57,9 @@ public:
 
   /** Set The Radius */
   void SetRadius(double radius);
+
+	/** Set color of the polyline */
+	void SetColor(double color[3]);
 
   /** IDs for the GUI */
   enum PIPE_POLYLINE_WIDGET_ID
