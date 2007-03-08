@@ -48,6 +48,8 @@ SET(PROJECT_SRCS
   mafOpStack.h
   mafPrintSupport.cpp
   mafPrintSupport.h
+  mafRemoteFileManager.cpp
+  mafRemoteFileManager.h
   mafRemoteLogic.cpp
   mafRemoteLogic.h
   mafRemoteStorage.cpp
