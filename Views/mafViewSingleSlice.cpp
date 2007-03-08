@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-08 11:58:51 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-03-08 16:32:29 $
+  Version:   $Revision: 1.9 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -403,7 +403,12 @@ int mafViewSingleSlice::GetNodeStatus(mafNode *vme)
       n = m_Sg->Vme2Node(vme);
       n->m_Mutex = true;
     }
-		else if (vme->IsMAFType(mafVMEPolyline) || vme->IsMAFType(mafVMEPolylineSpline))
+		else if (vme->IsMAFType(mafVMEPolyline))
+		{
+			n = m_Sg->Vme2Node(vme);
+			n->m_Mutex = false;
+		}
+		else if(vme->IsMAFType(mafVMEPolylineSpline))
 		{
 			n = m_Sg->Vme2Node(vme);
 			n->m_Mutex = true;
