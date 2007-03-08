@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-19 11:31:29 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2007-03-08 13:25:37 $
+  Version:   $Revision: 1.19 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -217,12 +217,12 @@ int mafString::SetSize(mafID size)
   {
     // allocate new memory
     tmp=new char[size];
-    *tmp='\0';
     if (!tmp)
     {
       //Cannot allocate memory
       return -1;
     }
+    *tmp='\0';
 
     // copy old contents
     if (m_CStr)
