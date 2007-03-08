@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.h,v $
   Language:  C++
-  Date:      $Date: 2007-01-23 13:48:01 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-03-08 15:00:46 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -148,6 +148,7 @@ protected:
   wxString          m_TmpDir;
   wxString          m_MergeFile;
 
+  mafString         m_LocalCacheFolder;
   mafString         m_Host;
   mafString         m_User;
   mafString         m_Pwd;
