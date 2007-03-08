@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-19 13:59:24 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2007-03-08 13:36:15 $
+  Version:   $Revision: 1.22 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -94,19 +94,19 @@ void mafSleep(int msec);
 //------------------------------------------------------------------------------
 
 /** Delete a VTK object */
-#define vtkDEL(a) if (a) { a->Delete(); a = NULL; }
+#define vtkDEL(a) do{if (a) { a->Delete(); a = NULL; }}while(0)
 
 /** Allocate a new VTK object: don't worry, New is a static member function! */
 #define vtkNEW(a) a=a->New()
 
 /** Allocate a new MAF object: don't worry, New is a static member function! */
-#define mafNEW(a) a=a->New();a->Register(this)
+#define mafNEW(a) do{a=a->New();a->Register(this);}while(0)
 
 /** Delete a MAF object */
-#define mafDEL(a) if (a) { a->Delete(); a = NULL;}
+#define mafDEL(a) do{if (a) { a->Delete(); a = NULL;}}while(0)
 
 /** delete a new() allocated object */
-#define cppDEL(a) if (a) { delete a; a = NULL;}
+#define cppDEL(a) do{if (a) { delete a; a = NULL;}}while(0)
 
 /**
   Macro used by mafObjects for RTTI information. This macro must be placed
