@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgLocaleSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2006-07-20 17:35:08 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2007-03-08 13:24:23 $
+Version:   $Revision: 1.6 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -112,7 +112,9 @@ void mmgLocaleSettings::InitializeLanguage()
   cppDEL(config);
 
   wxString prefix;
-  prefix = wxGetWorkingDirectory();
+  char *tmp = wxGetWorkingDirectory();
+  prefix = tmp;
+  delete[] tmp;
   prefix += "\\Language\\";
   m_Locale.Init(m_Language);
   m_Locale.AddCatalogLookupPathPrefix(prefix);
