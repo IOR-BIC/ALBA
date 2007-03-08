@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-02-28 09:42:14 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2007-03-08 10:27:02 $
+Version:   $Revision: 1.10 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -331,7 +331,7 @@ void mafViewCTNew::PackageView()
 //----------------------------------------------------------------------------
 {
 	m_ViewCTCompound = new mafViewCompound("CT view",2,5);
-	mafViewSlice *vs = new mafViewSlice("Slice view",CAMERA_ARB,false);
+	mafViewSlice *vs = new mafViewSlice("Slice view",CAMERA_ARB,false,false,true);
 	vs->PlugVisualPipe("mafVMEPolyline","mafPipePolylineSlice");
 	m_ViewCTCompound->PlugChildView(vs);
 	PlugChildView(m_ViewCTCompound);
@@ -690,4 +690,31 @@ void mafViewCTNew::ProbeVolume()
 	  m_SliceOriginVector[s-m_StartIndexSliceVisualized][2] = m_SliceOriginVector[s-m_StartIndexSliceVisualized][2] + m_SliceNormal[2] * divergence;*/
 	  //mafLogMessage(wxString::Format(L"%f %f %f" , m_SliceNormal[0],m_SliceNormal[1],m_SliceNormal[2] ));
   }
+}
+//----------------------------------------------------------------------------
+void mafViewCTNew::CameraUpdate()
+//----------------------------------------------------------------------------
+{
+	//for(int i=0; i<m_NumOfChildView; i++)
+	//	m_ChildViewList[i]->CameraUpdate();
+	Superclass::CameraUpdate();
+}
+//----------------------------------------------------------------------------
+void mafViewCTNew::CameraReset(mafNode *node)
+//----------------------------------------------------------------------------
+{
+	if(m_CurrentVolume)
+	{
+		for(int i=0; i<m_NumOfChildView; i++)
+		{
+			double b[6];
+			m_Prober[i]->GetPolyDataOutput()->GetBounds(b);
+			m_ChildViewList[i]->GetSceneGraph()->m_RenFront->ResetCamera(b);
+		}
+		CameraUpdate();
+	}
+	else
+	{
+		Superclass::CameraReset();
+	}
 }
