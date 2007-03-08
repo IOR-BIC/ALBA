@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-24 16:10:32 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2007-03-08 15:01:20 $
+  Version:   $Revision: 1.30 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,6 +33,7 @@
 #include "mafNode.h"
 #include "mafVMEStorage.h"
 #include "mafRemoteStorage.h"
+#include "mafRemoteFileManager.h"
 #include "mmgApplicationSettings.h"
 
 #include "mafNodeIterator.h"
@@ -56,6 +57,7 @@ mafVMEManager::mafVMEManager()
   m_Port = app_settings->GetRemotePort();
   m_User = app_settings->GetUserName();
   m_Pwd  = app_settings->GetPassword();
+  m_LocalCacheFolder = app_settings->GetCacheFolder();
   cppDEL(app_settings);
 
   m_FileHistoryIdx = -1;
@@ -231,7 +233,11 @@ void mafVMEManager::MSFOpen(wxString filename)
       // we are using the remote storage!!
       mafString local_filename, remote_filename;
       remote_filename = filename.c_str();
-      ((mafRemoteStorage *)m_Storage)->DownloadRemoteFile(remote_filename,local_filename);
+      local_filename = m_LocalCacheFolder;
+      local_filename += "\\";
+      local_filename += name;
+      local_filename += ".zmsf";
+      ((mafRemoteStorage *)m_Storage)->GetRemoteFileManager()->DownloadRemoteFile(remote_filename, local_filename);
       filename = local_filename;
     }
     unixname = ZIPOpen(filename);
@@ -535,7 +541,7 @@ void mafVMEManager::Upload(mafString local_file, mafString remote_file)
     return;
   }
   mafRemoteStorage *storage = (mafRemoteStorage *)m_Storage;
-  if (storage->UploadLocalFile(local_file, remote_file) != MAF_OK)
+  if (storage->GetRemoteFileManager()->UploadLocalFile(local_file, remote_file) != MAF_OK)
   {
 
   }
