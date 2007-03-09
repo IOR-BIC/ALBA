@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-08 14:08:15 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2007-03-09 14:29:21 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -58,12 +58,14 @@ mafVMEItemVTK::mafVMEItemVTK()
   m_Data        = NULL;
   m_DataReader  = NULL;
   m_DataWriter  = NULL;
+  m_DataObserver= new mafVMEItemAsynchObserver();
 }
 
 //-------------------------------------------------------------------------
 mafVMEItemVTK::~mafVMEItemVTK()
 //-------------------------------------------------------------------------
 {
+  cppDEL(m_DataObserver);
   vtkDEL(m_DataWriter);
   vtkDEL(m_DataReader);
 }
@@ -116,7 +118,7 @@ bool mafVMEItemVTK::Equals(mafVMEItem *a)
 
     if (data1&&data2)
     {
-      // We test for equivalency of data types. It could happen that the written 
+      // We test for equivalence of data types. It could happen that the written 
       // dataset is inherited from a standard dataset type, thus when we read it 
       // back the data type is changed but data is the same. E.g. vtkImageData
       // are always written as vtkStructuredPoints by vtkDataSetWriter, thus when 
@@ -230,10 +232,8 @@ void mafVMEItemVTK::UpdateData()
   // to reset the DataModified flag.
   if (m_Data.GetPointer()==NULL)
   {
-    if (RestoreData()==MAF_OK)
+    if (RestoreData() == MAF_OK)
     {
-      // Data has been generated internally
-      //SetDataModified(false);
     }
   }
 }
@@ -296,8 +296,12 @@ int mafVMEItemVTK::InternalRestoreData()
     assert(storage);
     
     mafString filename;
-    int resolvedURL = storage->ResolveInputURL(m_URL,filename);
+    int resolvedURL = storage->ResolveInputURL(m_URL, filename, m_DataObserver);
     
+    if (resolvedURL == MAF_WAIT)
+    {
+      return MAF_WAIT;
+    }
     return ReadData(filename, resolvedURL);
   }
   return MAF_NO_IO;
@@ -391,6 +395,7 @@ int mafVMEItemVTK::ReadData(mafString &filename, int resolvedURL)
     else
     {
       SetData(data);
+      m_IsLoadingData = false;
     }
     reader->Delete();
   }
@@ -543,9 +548,7 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
 
         SetURL(""); // if data has been set to NULL reset the filename
       }
-  
       UpdateBounds(); // force updating the bounds
-
     }
 
     if (m_IOStatus!=MAF_OK)
@@ -560,6 +563,14 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
   return MAF_NO_IO;
 }
 
+//-------------------------------------------------------------------------
+void mafVMEItemVTK::ReleaseData()
+//-------------------------------------------------------------------------
+{
+  vtkDEL(m_DataReader); // destroy reader
+  m_Data = NULL;        // unregister dataset
+}
+
 /*
 //-------------------------------------------------------------------------
 void mafVMEItemVTK::ErrorHandler(void *ptr)
@@ -569,13 +580,6 @@ void mafVMEItemVTK::ErrorHandler(void *ptr)
   self->m_IOStatus = MAF_ERROR;
 }
 */
-//-------------------------------------------------------------------------
-void mafVMEItemVTK::ReleaseData()
-//-------------------------------------------------------------------------
-{
-  vtkDEL(m_DataReader); // destroy reader
-  m_Data = NULL;        // unregister dataset
-}
 
 //-------------------------------------------------------------------------
 void mafVMEItemVTK::GetOutputMemory(const char *&out_str, int &size)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-08 14:08:15 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-03-09 14:29:21 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -79,14 +79,14 @@ public:
   virtual bool Equals(mafVMEItem *a);
 
   /** Read the data file and update the item's data.*/
-  int ReadData(mafString &filename, int resolvedURL = MAF_OK);
+  virtual int ReadData(mafString &filename, int resolvedURL = MAF_OK);
 
   /**
   Return true if data is !=NULL. Currently this doesn't ensure data is the same on 
   the file. IsDataModified() can be used to know if data has been changed with respect
   to file.*/
   virtual bool IsDataPresent() {return m_Data!=NULL;}
-  
+
   /**  UpdateBounds for this data. GetBounds automatically call this function...*/
   virtual void UpdateBounds();
 
@@ -126,6 +126,7 @@ protected:
   vtkDataReader *             m_DataReader; ///< the reader used to read VTK data
   vtkDataSetWriter *          m_DataWriter; ///< the writer used to write VTK data
   int                         m_IOStatus;   ///< internally used to store the IO status
+  mafVMEItemAsynchObserver   *m_DataObserver; ///< observer used to update the item's data when downloaded
   
 private:
   mafVMEItemVTK(const mafVMEItemVTK&);
