@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRemoteFileManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-08 14:57:11 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-03-09 14:15:40 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -85,12 +85,19 @@ int mafRemoteFileManager::InternalInitialize()
   if(Superclass::InternalInitialize()!=MAF_OK)
     return MAF_ERROR;
 
+  curl_global_init(CURL_GLOBAL_DEFAULT);
+  m_Curl = curl_easy_init();
+
   return MAF_OK;
 }
 //------------------------------------------------------------------------------
 void mafRemoteFileManager::InternalShutdown()
 //------------------------------------------------------------------------------
 {
+  // free curl environment
+  curl_easy_cleanup(m_Curl);
+  curl_global_cleanup();
+
   Superclass::InternalShutdown();
 }
 //------------------------------------------------------------------------------
@@ -100,9 +107,6 @@ int mafRemoteFileManager::Start()
   if (Initialize() != MAF_OK)
     return MAF_ERROR;
 
-  curl_global_init(CURL_GLOBAL_DEFAULT);
-  m_Curl = curl_easy_init();
-
   return MAF_OK;
 }
 //------------------------------------------------------------------------------
@@ -111,10 +115,6 @@ void mafRemoteFileManager::Stop()
 {
   if (!m_Initialized)
     return;
-
-  // free curl environment
-  curl_easy_cleanup(m_Curl);
-  curl_global_cleanup();
 
   Shutdown();
 }
