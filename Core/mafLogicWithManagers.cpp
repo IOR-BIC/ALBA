@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-05 18:47:38 $
-  Version:   $Revision: 1.97 $
+  Date:      $Date: 2007-03-09 16:25:44 $
+  Version:   $Revision: 1.98 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1337,6 +1337,7 @@ void mafLogicWithManagers::ViewCreated(mafView *v)
       mmgViewFrame *extern_view = new mmgViewFrame(m_Win, -1, v->GetLabel(), wxPoint(10,10),wxSize(800,600)/*, wxSIMPLE_BORDER|wxMAXIMIZE*/);
       extern_view->SetView(v);
       extern_view->SetListener(m_ViewManager);
+      v->GetFrame()->SetWindowStyleFlag(m_ChildFrameStyle);
       v->SetListener(extern_view);
       v->SetFrame(extern_view);
       extern_view->Refresh();
@@ -1344,7 +1345,8 @@ void mafLogicWithManagers::ViewCreated(mafView *v)
     else
     {
       // child views
-      mmgMDIChild *c = new mmgMDIChild(m_Win,v);   
+      mmgMDIChild *c = new mmgMDIChild(m_Win,v);
+      c->SetWindowStyleFlag(m_ChildFrameStyle);
       c->SetListener(m_ViewManager);
       v->SetFrame(c);
     }
