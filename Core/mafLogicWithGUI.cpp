@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-02 11:22:20 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2007-03-09 16:25:24 $
+  Version:   $Revision: 1.36 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,6 +50,7 @@ mafLogicWithGUI::mafLogicWithGUI()
   m_Win = new mmgMDIFrame("maf", wxDefaultPosition, wxSize(800, 600));
   m_Win->SetListener(this);
 
+  m_ChildFrameStyle = wxCAPTION | wxMAXIMIZE_BOX | wxMINIMIZE_BOX | wxTHICK_FRAME; // Default style
   m_LocaleSettings = new mmgLocaleSettings(this);
   m_MeasureUnitSettings = new mmgMeasureUnitSettings(this);
   m_ApplicationSettings = new mmgApplicationSettings(this);
@@ -78,6 +79,12 @@ mafLogicWithGUI::~mafLogicWithGUI()
   cppDEL(m_LocaleSettings);
   cppDEL(m_MeasureUnitSettings);
   cppDEL(m_ApplicationSettings);
+}
+//----------------------------------------------------------------------------
+void mafLogicWithGUI::SetParentFrameStyle(long style)
+//----------------------------------------------------------------------------
+{
+  m_Win->SetWindowStyleFlag(style);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithGUI::Configure()
