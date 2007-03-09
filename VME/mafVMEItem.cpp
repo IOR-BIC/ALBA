@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-06 09:37:06 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-03-09 14:26:56 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -279,7 +279,8 @@ int mafVMEItem::RestoreData()
 {
   m_IsLoadingData = true;
   int ret = InternalRestoreData();
-  m_IsLoadingData = false;
+  //m_IsLoadingData = false;
+  m_IsLoadingData = ret != MAF_OK;
   return ret;
 }
 
@@ -289,4 +290,31 @@ void mafVMEItem::SetInputMemory(const char *int_str,unsigned long size)
 {
   m_InputMemory = int_str;
   m_InputMemorySize = size;
+}
+
+//----------------------------------------------------------------------------
+//     ****************  mafVMEItemAsynchObserver  ****************
+//----------------------------------------------------------------------------
+MAF_ID_IMP(mafVMEItemAsynchObserver::VME_ITEM_DATA_DOWNLOADED);
+
+//----------------------------------------------------------------------------
+mafVMEItemAsynchObserver::mafVMEItemAsynchObserver()
+//----------------------------------------------------------------------------
+{
+  m_Item = NULL;
+}
+//----------------------------------------------------------------------------
+mafVMEItemAsynchObserver::~mafVMEItemAsynchObserver() 
+//----------------------------------------------------------------------------
+{
+  m_Item = NULL;
+}
+//----------------------------------------------------------------------------
+void mafVMEItemAsynchObserver::OnEvent(mafEventBase *maf_event)
+//----------------------------------------------------------------------------
+{
+  if (maf_event->GetId() == VME_ITEM_DATA_DOWNLOADED)
+  {
+    m_Item->ReadData(m_Filename);
+  }
 }
