@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-22 11:16:55 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-03-09 14:29:47 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005
@@ -306,7 +306,13 @@ int mafVMEItemScalar::InternalRestoreData()
   } 
   return MAF_NO_IO;
 }
-
+//-------------------------------------------------------------------------
+int mafVMEItemScalar::ReadData(mafString &filename, int resolvedURL)
+//-------------------------------------------------------------------------
+{
+  // to be changed as in mafVMEItemVTK
+  return MAF_OK;
+}
 //-------------------------------------------------------------------------
 int mafVMEItemScalar::InternalStoreData(const char *url)
 //-------------------------------------------------------------------------

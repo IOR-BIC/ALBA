@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemScalar.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-15 14:37:25 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-03-09 14:29:47 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -74,6 +74,9 @@ public:
     Id and URL are not considered for the comparison.
     To force compare the scalar items internal data, use SetGlobalCompareDataOn()*/
   virtual bool Equals(mafVMEItem *a);
+
+  /** Read the data file and update the item's data.*/
+  virtual int ReadData(mafString &filename, int resolvedURL = MAF_OK);
 
   /** Return true if scalar data is not empty. Currently this doesn't ensure data is the same on 
   the file. IsDataModified() can be used to know if data has been changed with respect
