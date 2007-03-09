@@ -1,14 +1,15 @@
 /*=========================================================================
-
-Program:   Visualization Toolkit
-Module:    $RCSfile: mafAgentThreaded.cpp,v $
-Language:  C++
-Date:      $Date: 2006-06-14 14:46:33 $
-Version:   $Revision: 1.9 $
-
-
-
+  Program:   Multimod Application Framework
+  Module:    $RCSfile: mafAgentThreaded.cpp,v $
+  Language:  C++
+  Date:      $Date: 2007-03-09 11:35:13 $
+  Version:   $Revision: 1.10 $
+  Authors:   Marco Petrone
+==========================================================================
+  Copyright (c) 2002/2004 
+  CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
+
 #include "mafAgentThreaded.h"
 #include "mafMutexLock.h"
 #include "mmuIdFactory.h"
