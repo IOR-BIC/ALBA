@@ -12,6 +12,10 @@ SET(PROJECT_SRCS
   mmoCTAImporter.h
   mmoCTMRIImporter.cpp
   mmoCTMRIImporter.h
+  mmoEMGImporterWS.cpp
+  mmoEMGImporterWS.h
+  mmoGRFImporterWS.cpp
+  mmoGRFImporterWS.h
   mmoLandmarkImporter.cpp
   mmoLandmarkImporter.h
   mmoLandmarkImporterTXT.cpp
@@ -34,6 +38,9 @@ SET(PROJECT_SRCS  ${PROJECT_SRCS}
   mmoLandmarkExporter.h
   mmoClassicICPRegistration.cpp
   mmoClassicICPRegistration.h
+  mmoC3DImporter.cpp
+  mmoC3DImporter.h
+
   )
 ENDIF (MAF_USE_ITK)
 
