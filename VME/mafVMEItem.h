@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:53:23 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2007-03-09 14:26:45 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,6 +21,9 @@
 #include "mafString.h"
 #include "mafMTime.h"
 #include "mafOBB.h"
+#include "mafObserver.h"
+#include "mafEventBase.h"
+
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
@@ -52,7 +55,7 @@ class vtkDataSet;
 class MAF_EXPORT mafVMEItem : public mafReferenceCounted, public mafStorable, public mafEventSender, public mafTimeStamped
 {
 public:
-  MAF_ID_DEC(VME_ITEM_DATA_MODIFIED) ///< event rised by mafVMEItem to advice DataVector a dataset has been modified
+  MAF_ID_DEC(VME_ITEM_DATA_MODIFIED) ///< event raised by mafVMEItem to advice DataVector a dataset has been modified
 
   mafAbstractTypeMacro(mafVMEItem,mafReferenceCounted);
 
@@ -70,7 +73,7 @@ public:
   /** Set the TimeStamp of this dataset */
   void SetTimeStamp (mafTimeStamp t) {m_TimeStamp=t;}
 
-  /** copy dat from another dataset */
+  /** copy data from another dataset */
   virtual void DeepCopy(mafVMEItem *a);
   /** reference another dataset's internal data */ 
   virtual void ShallowCopy(mafVMEItem *a);
@@ -114,7 +117,7 @@ public:
   enum VME_ITEM_WRITE_MODALITIY {DEFAULT,TMP_FILE,MEMORY};
 
   /** 
-    Set the modadility for writing the data: 
+    Set the modality for writing the data: 
     - DEFAULT to the URL
     - TMP_FILE to a local files specified with SetTmpFile()
     - MEMORY store into memory
@@ -195,6 +198,9 @@ public:
   the file. IsDataModified() can be used to know if data has been changed with respect
   to file.*/
   virtual bool IsDataPresent()=0;
+
+  /** Return true if the data is not present on disk and has been downloaded.*/
+  virtual bool IsWaitingData() {return m_IsLoadingData;};
   
   /** return time the data has been updated*/
   unsigned long GetUpdateTime() {return m_UpdateTime.GetMTime();}
@@ -211,6 +217,9 @@ public:
   /** force updating the data in the items (i.e. usaually read it from disk) */
   virtual void UpdateData() = 0;
 
+  /** Read the data file and update the item's data.*/
+  virtual int ReadData(mafString &filename, int resolvedURL = MAF_OK) = 0;
+
 protected:
   mafVMEItem(); // to be allocated with New()
   ~mafVMEItem(); // to be deleted with Delete()
@@ -219,7 +228,7 @@ protected:
   virtual int InternalRestore(mafStorageElement *node);
 
   /**
-    Restore data stored in this object. To be redefined by specialised classes.
+    Restore data stored in this object. To be redefined by specialized classes.
     This method is automatically called by GetData(). 
     Return MAF_OK if data has been read, MAF_ERROR in case of I/O errors
     and MAF_NO_IO in case no I/O is really performed (e.g. data already
@@ -227,7 +236,7 @@ protected:
   virtual int InternalRestoreData()=0;
   
   /**
-    Store data stored in this object. To be redefined by specialised classes.
+    Store data stored in this object. To be redefined by specialized classes.
     Return MAF_OK if data has been read, MAF_ERROR in case of I/O errors
     and MAF_NO_IO in case no I/O is really performed (e.g. data already
     present on storage). */
@@ -246,13 +255,13 @@ protected:
   //void SetVME(mafVME *vme) {m_VME=vme;}
 
   mafTagArray * m_TagArray;             ///< meta data attributes attached to this dataset      
-  bool          m_DataModified;         ///< true when data has been mofied from last storing
+  bool          m_DataModified;         ///< true when data has been modified from last storing
   static bool   m_GlobalCompareDataFlag;///< if true Equals will also compare internal data
 
   bool          m_ReleaseOldFile;       ///< whether to release the old VTK file when data filename changes (set by mafDataVector::InternalStore() ) 
 
   int           m_Id;         ///< the id assigned to the dataset/file to be stored in the MSF
-  bool          m_Crypting;   ///< this flags specify if crypting should be used when saving data
+  bool          m_Crypting;   ///< this flags specify if encryption should be used when saving data
 
   mafString     m_URL;        ///< the URL of the data file for this dataset
   mafTimeStamp  m_TimeStamp;  ///< time stamp of this dataset
@@ -269,4 +278,29 @@ protected:
   unsigned long m_OutputMemorySize; ///< size of the block of memory where data has been stored
 };
 
+/** mafVMEItemAsynchObserver - used by the mafVMEItem to synchronize the asynchronous
+loading data from remote storages.
+
+@sa mafVMEItemVTK mafVMEItemScalar
+*/
+class MAF_EXPORT mafVMEItemAsynchObserver : public mafObserver
+{
+public:
+  MAF_ID_DEC(VME_ITEM_DATA_DOWNLOADED); ///< event used to update the mafVMEItem data when download is finished.
+
+  mafVMEItemAsynchObserver();
+  virtual	~mafVMEItemAsynchObserver();
+
+  virtual void OnEvent(mafEventBase *maf_event);
+
+  /** Set the item to which send the update event when the asynchronous
+  message from the storage comes up.*/
+  void SetItem(mafVMEItem *item) {m_Item = item;};
+
+  void SetFileName(mafString &filename) {m_Filename = filename;};
+
+protected:
+  mafVMEItem *m_Item; ///< Item to update when the loading of the binary data finish
+  mafString   m_Filename; ///< Filename downloaded and to be read.
+};
 #endif
