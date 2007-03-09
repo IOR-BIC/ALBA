@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-08 16:32:29 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-03-09 15:57:05 $
+  Version:   $Revision: 1.10 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,6 +25,7 @@
 #include "mafPipePolylineSlice.h"
 #include "mafVME.h"
 #include "mafVMEVolume.h"
+#include "mafVMEVolumeGray.h"
 #include "mafVMESlicer.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
@@ -698,7 +699,7 @@ void mafViewSingleSlice::VmeShow(mafNode *node, bool show)
 {
   Superclass::VmeShow(node, show);
 
-  if (node->IsMAFType(mafVMEVolume))
+  if (node->IsMAFType(mafVMEVolumeGray))
   {
     if (show)
     {
@@ -754,15 +755,18 @@ void mafViewSingleSlice::VmeShow(mafNode *node, bool show)
         ((mafViewSingleSliceLHPBuilder *)m_ChildViewList[i])->UpdateText(0);
 	*/  
 			mafNodeIterator *iter = node->GetRoot()->NewIterator();
-			for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+			for (mafNode *Inode = iter->GetFirstNode(); Inode; Inode = iter->GetNextNode())
 			{
-				if(node->IsA("mafVMESurface"))
+				if(this->GetNodePipe(Inode))
 				{
-					mafEventMacro(mafEvent(this,VME_SHOW,node,false));
-				}
-				if(node->IsA("mafVMEPolyline"))
-				{
-					mafEventMacro(mafEvent(this,VME_SHOW,node,false));
+					if(Inode->IsA("mafVMESurface"))
+					{
+						mafEventMacro(mafEvent(this,VME_SHOW,Inode,false));
+					}
+					if(Inode->IsA("mafVMEPolyline"))
+					{
+						mafEventMacro(mafEvent(this,VME_SHOW,Inode,false));
+					}
 				}
 			}
       this->UpdateText(0);

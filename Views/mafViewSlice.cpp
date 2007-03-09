@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-21 17:01:41 $
-  Version:   $Revision: 1.32 $
+  Date:      $Date: 2007-03-09 15:57:05 $
+  Version:   $Revision: 1.33 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -610,6 +610,10 @@ void mafViewSlice::VmeShow(mafNode *node, bool show)
       m_ColorLUT->Build();
       lutPreset(4,m_ColorLUT);*/
 	  }
+		else if(node->IsA("mafVMEPolyline"))
+		{
+			this->UpdateSurfacesList(node);
+		}
     else
     {
 			/*  
