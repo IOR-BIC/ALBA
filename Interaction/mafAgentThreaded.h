@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAgentThreaded.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-07 08:22:03 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-03-09 11:34:43 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -28,9 +28,9 @@ class mafMutexLock;
   an event to be processed by a separate thread. This happens by queuing 
   the output event wrapped in a AGENT_ASYNC_DISPATCH, which is later on processed in
   the main thread, by using the original mafAgentEventQueue mechanism for dispatching.
-  Notice that, the asnycronous mechanism requires the  of this class 
+  Notice that, the asynchronous mechanism requires the  of this class 
   to be called on a different thread. Dispatching on another thread is therefore 
-  responsability of a different class, specifically designed to process it incoming events
+  responsibility of a different class, specifically designed to process it incoming events
   on a different tread (e.g. mafAgentEventHandler).
   The mafAgentThreaded DispatchEvents() will take care of extracting the message contained 
   inside a AGENT_ASYNC_DISPATCH event type and dispatch it.
@@ -48,7 +48,7 @@ public:
 
   /**
     Return true if this is a Agent with its own polling thread. Dispatchers requiring
-    a polling thread set this variable to != 0, which makes the intialize function to 
+    a polling thread set this variable to != 0, which makes the initialize function to 
     spawn a thread with a loop continuously calling the InternalUpdate() function.*/
   int GetThreaded() {return m_Threaded;}
 
@@ -93,13 +93,13 @@ protected:
   virtual void InternalShutdown();
 
   /**
-    This function must be overriden by subclasses to perform custom polling of dispatcher when
+    This function must be overridden by subclasses to perform custom polling of dispatcher when
     in threaded mode. This function should poll the dispatcher and return 0. In case it returns
     a value !=0 the polling loop is stopped. The default function stops immediately the loop.*/
   virtual int InternalUpdate();
 
   /**
-   This funciton is used to startup the thread. Subclasses should override
+   This function is used to startup the thread. Subclasses should override
    the InternalUpdateLoop() function which is called by this one.*/
   static void UpdateLoop(mmuThreadInfoStruct *data);
     
