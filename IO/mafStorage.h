@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorage.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-22 11:12:02 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-03-09 14:13:43 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,6 +21,7 @@
 //----------------------------------------------------------------------------
 class mafStorageElement;
 class mafStorable;
+class mafObserver;
 
 /** Abstract class for an abject mastering the storing/restoring of objects
   This is an abstract class providing defining APIs for objects mastering storing/restoring
@@ -76,7 +77,7 @@ public:
   mafStorable *GetDocument();
 
   /** resolve an URL and provide local filename to be used as input */
-  virtual int ResolveInputURL(const char * url, mafString &filename)=0;
+  virtual int ResolveInputURL(const char * url, mafString &filename, mafObserver *observer = NULL)=0;
 
   /** resolve an URL and provide a local filename to be used as output */
   //virtual bool ResolveOutputURL(const mafCString url, mafString &filename)=0;

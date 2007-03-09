@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-22 11:13:29 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2007-03-09 14:13:43 $
+  Version:   $Revision: 1.19 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -185,7 +185,7 @@ void mafXMLStorage::SetURL(const char *name)
 }
 
 //------------------------------------------------------------------------------
-int mafXMLStorage::ResolveInputURL(const char * url, mafString &filename)
+int mafXMLStorage::ResolveInputURL(const char * url, mafString &filename, mafObserver *observer)
 //------------------------------------------------------------------------------
 {
   // currently no real URL support

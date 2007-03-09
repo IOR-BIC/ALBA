@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRemoteStorage.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-08 15:00:21 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-03-09 14:14:19 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -39,7 +39,7 @@ public:
   virtual ~mafRemoteStorage();
   
   /** resolve an URL download remote file and provide local filename to be used as input */
-  virtual int ResolveInputURL(const char *url, mafString &filename);
+  virtual int ResolveInputURL(const char *url, mafString &filename, mafObserver *observer = NULL);
 
   /** resolve an URL and provide a local filename to be used as output, then it is uploaded to the original remote msf */
   virtual int StoreToURL(const char *filename, const char *url);
