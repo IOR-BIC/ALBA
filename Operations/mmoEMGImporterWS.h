@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoEMGImporterWS.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-09 11:32:52 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-03-09 13:41:07 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -56,14 +56,11 @@ public:
   /** Set the filename for the file to import */
   void SetFileName(const char *file_name){m_File = file_name;};
 
-  /** Set number of column to skip */
-  void SetSkipColumn(int column);
 
 protected:
   mafVMEScalar *m_EmgScalar;
   vnl_matrix<double> m_Emg_matrix;
   wxString m_FileDir;
 	wxString m_File;
-  int m_Start, m_Stop;
 };
 #endif

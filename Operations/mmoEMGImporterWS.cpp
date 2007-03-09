@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoEMGImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-09 11:32:52 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-03-09 13:41:07 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -56,8 +56,6 @@ mafOp(label)
 	m_FileDir = (mafGetApplicationDirectory() + "/Data/External/").c_str();
 
   m_EmgScalar = NULL;
-  m_Start = 0;
-  m_Stop = 0;
 }
 //----------------------------------------------------------------------------
 mmoEMGImporterWS::~mmoEMGImporterWS()
@@ -89,13 +87,6 @@ void mmoEMGImporterWS::OpRun()
 	if(!f.IsEmpty() && wxFileExists(f))
 	{
 	  m_File = f;
-/*
-    m_Gui = new mmgGui(this);
-    m_Gui->Integer(ID_TYPE_FILE,"From Col",&m_Start,0,MAXINT,"Select the first column");
-    m_Gui->Integer(ID_TYPE_FILE,"To Col",&m_Stop,m_Start,MAXINT,"Select the last column");
-    m_Gui->OkCancel();
-    ShowGui();
-    */
     Read();
     result = OP_RUN_OK;
   }
@@ -114,12 +105,7 @@ void mmoEMGImporterWS::	OnEvent(mafEventBase *maf_event)
     }
   }
 }
-//----------------------------------------------------------------------------
-void mmoEMGImporterWS::SetSkipColumn(int column)
-//----------------------------------------------------------------------------
-{
-  m_Start = column;
-}
+
 //----------------------------------------------------------------------------
 void mmoEMGImporterWS::Read()   
 //----------------------------------------------------------------------------
