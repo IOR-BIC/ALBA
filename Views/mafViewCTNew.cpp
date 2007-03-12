@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-03-08 16:31:27 $
-Version:   $Revision: 1.11 $
+Date:      $Date: 2007-03-12 11:25:59 $
+Version:   $Revision: 1.12 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -705,11 +705,11 @@ void mafViewCTNew::CameraReset(mafNode *node)
 {
 	if(m_CurrentVolume)
 	{
-		for(int i=0; i<m_NumOfChildView; i++)
+		for(int idSubView=0; idSubView<((mafViewCompound*)m_ChildViewList[CT_COMPOUND])->GetNumberOfSubView(); idSubView++)
 		{
 			double b[6];
-			m_Prober[i]->GetPolyDataOutput()->GetBounds(b);
-			m_ChildViewList[i]->GetSceneGraph()->m_RenFront->ResetCamera(b);
+			m_Prober[idSubView]->GetPolyDataOutput()->GetBounds(b);
+			((mafViewCompound*)m_ChildViewList[CT_COMPOUND])->GetSubView(idSubView)->GetSceneGraph()->m_RenFront->ResetCamera(b);
 		}
 		CameraUpdate();
 	}
