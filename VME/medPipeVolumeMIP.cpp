@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeMIP.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-08 12:03:54 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-03-13 22:09:31 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -41,7 +41,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkImageCast.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkVolumeProperty.h"
-#include "vtkVolumeRayCastCompositeFunction.h"
+#include "vtkVolumeRayCastMIPFunction.h"
 #include "vtkVolumeRayCastMapper.h"
 #include "vtkLODProp3D.h"
 #include "vtkPlaneSource.h"
@@ -295,8 +295,8 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
   m_VolumeProperty->SetInterpolationTypeToLinear();
 
   vtkNEW(m_MIPFunction);
-  m_MIPFunction->SetCompositeMethodToClassifyFirst();
-  //m_MIPFunction->SetMaximizeMethodToScalarValue();
+  //m_MIPFunction->SetCompositeMethodToClassifyFirst();
+  m_MIPFunction->SetMaximizeMethodToScalarValue();
 
   vtkNEW(m_VolumeMapper);
 	m_VolumeMapper->SetInput(m_ResampleFilter->GetOutput());

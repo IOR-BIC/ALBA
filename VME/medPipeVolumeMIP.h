@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeMIP.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-08 12:03:54 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-03-13 22:09:31 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -24,7 +24,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class vtkImageCast;
 class vtkPiecewiseFunction;
 class vtkVolumeProperty;
-class vtkVolumeRayCastCompositeFunction;
+class vtkVolumeRayCastMIPFunction;
 class vtkVolumeRayCastMapper;
 class vtkActor;
 class vtkLODProp3D;
@@ -71,7 +71,7 @@ protected:
   vtkImageCast                *m_Caster;
   vtkPiecewiseFunction        *m_OpacityTransferFunction;
   vtkVolumeProperty           *m_VolumeProperty;
-  vtkVolumeRayCastCompositeFunction *m_MIPFunction;
+  vtkVolumeRayCastMIPFunction *m_MIPFunction;
   vtkVolumeRayCastMapper      *m_VolumeMapper;
   vtkVolumeRayCastMapper      *m_VolumeMapperLow;
   vtkLODProp3D                *m_VolumeLOD;
