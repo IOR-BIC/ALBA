@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-08 16:31:05 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-03-13 22:09:53 $
+  Version:   $Revision: 1.8 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,13 +26,9 @@
 #include "mafAttachCamera.h"
 #include "mmgGui.h"
 #include "mafPipe.h"
-#include "mafPipeVolumeProjected.h"
 #include "mafVME.h"
-#include "mafVMEVolume.h"
 #include "mafVMEVolumeGray.h"
-#include "mafVMELandmarkCloud.h"
-#include "mafVMELandmark.h"
-#include "mafVMESlicer.h"
+#include "mafVMESurface.h"
 #include "mafPipeIsosurface.h"
 #include "medPipeVolumeDRR.h"
 #include "medPipeVolumeVR.h"
@@ -67,6 +63,7 @@ mafView3D::mafView3D(wxString label, int camera_position, bool show_axes, bool s
 {
 	m_Choose = ID_PIPE_ISO;
 	m_CurrentVolume = NULL;
+	m_CurrentSurface = NULL;
 	m_SliderContourIso = NULL;
 	m_SliderAlphaIso = NULL;
 	m_ResampleFactor = 0.5;
@@ -76,6 +73,7 @@ mafView3D::~mafView3D()
 //----------------------------------------------------------------------------
 {
 	m_CurrentVolume = NULL;
+	m_CurrentSurface = NULL;
 }
 //----------------------------------------------------------------------------
 mafView *mafView3D::Copy(mafObserver *Listener)
@@ -223,6 +221,18 @@ void mafView3D::OnEvent(mafEventBase *maf_event)
 				if(((mafVME*)m_CurrentVolume)->GetVisualPipe())
 				{
 					mafVMEVolumeGray *TempVolume=m_CurrentVolume;
+					if(m_CurrentSurface)
+					{
+						if(m_Choose == ID_PIPE_ISO)
+						{
+							mafEventMacro(mafEvent(this,VME_SHOW,m_CurrentSurface,true));
+						}
+						else
+						{
+							mafEventMacro(mafEvent(this,VME_SHOW,m_CurrentSurface,false));
+						}
+						CameraUpdate();
+					}
 					this->VmeShow(m_CurrentVolume,false);
 					wxBusyCursor wait;
 					if(m_Choose == ID_PIPE_ISO)
@@ -242,10 +252,6 @@ void mafView3D::OnEvent(mafEventBase *maf_event)
             this->PlugVisualPipe("mafVMEVolumeGray","medPipeVolumeVR");
           }
 					this->VmeShow(TempVolume,true);
-
-					//mafEventMacro(mafEvent(this,VME_SELECT,selectedvme->GetParent()));
-          //mafEventMacro(mafEvent(this,VME_SELECT,selectedvme));
-					//mafEventMacro(mafEvent(this,VME_SELECT,selectedvme,true));
 				}
 			}
 			break;
@@ -405,6 +411,11 @@ int mafView3D::GetNodeStatus(mafNode *vme)
 			n = m_Sg->Vme2Node(vme);
 			n->m_Mutex = false;
 		}
+		else if (vme->IsMAFType(mafVMESurface))
+		{
+			n = m_Sg->Vme2Node(vme);
+			n->m_Mutex = true;
+		}
 		else
 		{
 			n = m_Sg->Vme2Node(vme);
@@ -536,6 +547,17 @@ void mafView3D::VmeShow(mafNode *vme,bool show)
 			EnableSubGui(ID_PIPE_ALL,false);
 			m_Gui->Enable(ID_COMBO_PIPE,m_CurrentVolume!=NULL);
 			m_Gui->Enable(ID_RESAMPLE_FACTOR,m_CurrentVolume!=NULL);
+		}
+	}
+	if(vme->IsA("mafVMESurface"))
+	{
+		if(show)
+		{
+			m_CurrentSurface = mafVMESurface::SafeDownCast(vme);
+		}
+		else
+		{
+			m_CurrentSurface = NULL;
 		}
 	}
 	CameraReset();

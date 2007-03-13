@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-08 10:26:20 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-03-13 22:09:53 $
+  Version:   $Revision: 1.7 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,6 +24,7 @@ class mafVME;
 class mafSceneNode;
 class mmgGui;
 class mafVMEVolumeGray;
+class mafVMESurface;
 
 //----------------------------------------------------------------------------
 // mafViewRX :
@@ -94,7 +95,9 @@ protected:
 
 	int m_Choose;
 
-	mafVMEVolumeGray *m_CurrentVolume;
+	mafVMEVolumeGray	*m_CurrentVolume;
+	mafVMESurface			*m_CurrentSurface;
+	mafVMESurface			*m_CurrentInvisibleSurface;
 
 	double m_ResampleFactor;
 
