@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.h,v $
 Language:  C++
-Date:      $Date: 2007-03-08 10:27:02 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2007-03-14 09:36:21 $
+Version:   $Revision: 1.7 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -101,6 +101,11 @@ public:
 
 	void SetColorText(int idView,double *color);
 	void SetColorText(double **color);
+
+  /**
+  Update normal and position in the idview ViewSlice*/
+  void SetCTLookupTable(double range[2]);
+  void SetCTLookupTable(double min, double max);
 
 	virtual void CameraUpdate();
 	virtual void CameraReset(mafNode *node = NULL);

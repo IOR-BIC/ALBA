@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-03-12 11:25:59 $
-Version:   $Revision: 1.12 $
+Date:      $Date: 2007-03-14 09:36:21 $
+Version:   $Revision: 1.13 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -432,7 +432,7 @@ void mafViewCTNew::ProbeVolume()
 
   for(int idSubView=0; idSubView<CT_CHILD_VIEWS_NUMBER; idSubView++)
   {
-    mafViewVTK *vslice = ((mafViewVTK *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND])->GetSubView(idSubView));
+    mafViewSlice *vslice = ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND])->GetSubView(idSubView));
 	  if (m_Actor.size()>0)
 	  {
 		  vslice->GetSceneGraph()->m_RenFront->RemoveActor(m_Actor[idSubView]);
@@ -717,4 +717,35 @@ void mafViewCTNew::CameraReset(mafNode *node)
 	{
 		Superclass::CameraReset();
 	}
+}
+//----------------------------------------------------------------------------
+void mafViewCTNew::SetCTLookupTable(double range[2])
+//----------------------------------------------------------------------------
+{
+  SetCTLookupTable(range[0] , range[1]);
+}
+//----------------------------------------------------------------------------
+void mafViewCTNew::SetCTLookupTable(double min, double max)
+//----------------------------------------------------------------------------
+{
+  if(m_CurrentVolume)
+  {
+    double wholeScalarRangeVol[2];
+    m_CurrentVolume->GetOutput()->GetVTKData()->GetScalarRange(wholeScalarRangeVol);
+
+    for(int idSubView=0; idSubView<CT_CHILD_VIEWS_NUMBER; idSubView++)
+    {
+      mafViewSlice *vslice = ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND])->GetSubView(idSubView));
+
+      //calculate the variation
+      double wholeScalarRangeData[2];
+      m_Prober[idSubView]->GetOutput()->GetScalarRange(wholeScalarRangeData);
+
+      double mapLow,mapHigh;
+      mapLow = wholeScalarRangeData[0] + ((wholeScalarRangeData[1] - wholeScalarRangeData[0])/(wholeScalarRangeVol[1] - wholeScalarRangeVol[0])) * (min - wholeScalarRangeVol[0]);
+      mapHigh = wholeScalarRangeData[1] + ((wholeScalarRangeData[1] - wholeScalarRangeData[0])/(wholeScalarRangeVol[1] - wholeScalarRangeVol[0])) * (max - wholeScalarRangeVol[1]);
+
+      m_Mapper[idSubView]->SetScalarRange(mapLow, mapHigh);
+    }
+  }
 }
