@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.h,v $
   Language:  C++
-  Date:      $Date: 2007-02-21 17:03:03 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-03-14 09:37:11 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -121,6 +121,9 @@ public:
   static char** GetIcon();
 
 	vtkImageData* GetImage(){return m_Image;};
+
+  /** update the output data structure */
+  virtual vtkLookupTable *GetLUT(){return m_Lut;};
 
 protected:
   mafVMEAdvancedProber();
