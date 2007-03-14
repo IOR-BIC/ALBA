@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-09 15:57:05 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-03-14 09:36:43 $
+  Version:   $Revision: 1.11 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -392,32 +392,38 @@ int mafViewSingleSlice::GetNodeStatus(mafNode *vme)
     if (vme->IsMAFType(mafVMEVolume))
     {
       n = m_Sg->Vme2Node(vme);
-      n->m_Mutex = true;
+      if(n)
+        n->m_Mutex = true;
     }
     else if (vme->IsMAFType(mafVMESlicer))
     {
       n = m_Sg->Vme2Node(vme);
-      n->m_PipeCreatable = false;
+      if(n)
+        n->m_PipeCreatable = false;
     }
     else if (vme->IsMAFType(mafVMEImage))
     {
       n = m_Sg->Vme2Node(vme);
-      n->m_Mutex = true;
+      if(n)
+        n->m_Mutex = true;
     }
 		else if (vme->IsMAFType(mafVMEPolyline))
 		{
 			n = m_Sg->Vme2Node(vme);
-			n->m_Mutex = false;
+      if(n)
+			  n->m_Mutex = false;
 		}
 		else if(vme->IsMAFType(mafVMEPolylineSpline))
 		{
 			n = m_Sg->Vme2Node(vme);
-			n->m_Mutex = true;
+      if(n)
+			  n->m_Mutex = true;
 		}
 		else if (vme->IsMAFType(mafVMEGizmo))
 		{
 			n = m_Sg->Vme2Node(vme);
-			n->m_PipeCreatable = true;
+      if(n)
+			  n->m_PipeCreatable = true;
 		}
   }
 
