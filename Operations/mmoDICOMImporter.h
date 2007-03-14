@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-06 11:47:26 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-03-14 09:35:56 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -152,7 +152,7 @@ protected:
 
   // build volume mode variables
 	int												m_BuildStepValue;
-	wxString									m_BuildStepChoices[3];
+	wxString									m_BuildStepChoices[4];
 
 	mafTagArray							 *m_TagArray;
 	mmgDialogPreview				 *m_DicomDialog;

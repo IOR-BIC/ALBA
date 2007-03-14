@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-09 16:39:24 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2007-03-14 09:35:56 $
+  Version:   $Revision: 1.16 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -101,7 +101,8 @@ mmoDICOMImporter::mmoDICOMImporter(wxString label) : mafOp(label)
   m_BuildStepValue			= 0;
 	m_BuildStepChoices[0]	= "1x";
 	m_BuildStepChoices[1]	= "2x";
-	m_BuildStepChoices[2] = "4x";
+  m_BuildStepChoices[2]	= "3x";
+	m_BuildStepChoices[3] = "4x";
 	
   m_PatientName	= " ";
 	m_SurgeonName = " ";
@@ -315,7 +316,7 @@ void mmoDICOMImporter::CreateGui()
 	m_Gui->Button(ID_CROP_BUTTON,"crop", "");
 	m_Gui->Button(ID_UNDO_CROP_BUTTON,"undo crop", "");
 	m_Gui->Label("build volume",true);
-	m_Gui->Combo(ID_BUILD_STEP, "step", &m_BuildStepValue, 3, m_BuildStepChoices);
+	m_Gui->Combo(ID_BUILD_STEP, "step", &m_BuildStepValue, 4, m_BuildStepChoices);
 	m_Gui->Button(ID_BUILD_BUTTON,"build", "");
 	m_Gui->Divider();
 	m_Gui->Button(ID_CANCEL,"cancel");
@@ -587,10 +588,12 @@ void mmoDICOMImporter::BuildVolumeCineMRI()
 {
 	int step;
 
-	if(m_BuildStepValue == 0)
-		step = 1;
-	else 
-		step = m_BuildStepValue << 1;
+  if(m_BuildStepValue == 0)
+    step = 1;
+  else if (m_BuildStepValue == 1)
+    step = m_BuildStepValue << 1;
+  else
+    step = m_BuildStepValue + 1;
 
 	int n_slices = m_NumberOfSlices / step;
 
@@ -678,8 +681,11 @@ void mmoDICOMImporter::BuildVolume()
 
 	if(m_BuildStepValue == 0)
 		step = 1;
-	else 
+	else if (m_BuildStepValue == 1)
 		step = m_BuildStepValue << 1;
+  else
+    step = m_BuildStepValue + 1;
+
 
 	int n_slices = m_NumberOfSlices / step;
 
