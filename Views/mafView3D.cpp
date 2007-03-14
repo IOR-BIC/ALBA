@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-13 22:09:53 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-03-14 16:43:53 $
+  Version:   $Revision: 1.9 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -223,13 +223,10 @@ void mafView3D::OnEvent(mafEventBase *maf_event)
 					mafVMEVolumeGray *TempVolume=m_CurrentVolume;
 					if(m_CurrentSurface)
 					{
-						if(m_Choose == ID_PIPE_ISO)
+						if(!(m_Choose == ID_PIPE_ISO))
 						{
-							mafEventMacro(mafEvent(this,VME_SHOW,m_CurrentSurface,true));
-						}
-						else
-						{
-							mafEventMacro(mafEvent(this,VME_SHOW,m_CurrentSurface,false));
+							//mafEventMacro(mafEvent(this,VME_SHOW,m_CurrentSurface,false));
+							VmeShow(m_CurrentSurface,false);
 						}
 						CameraUpdate();
 					}

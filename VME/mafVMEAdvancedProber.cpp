@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-21 17:03:03 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-03-14 16:44:55 $
+  Version:   $Revision: 1.5 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,6 +33,7 @@
 #include "mafTagArray.h"
 #include "mafMatrix.h"
 #include "mafAbsMatrixPipe.h"
+#include "mafVMEPolylineSpline.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFDataPipe.h"
@@ -174,7 +175,7 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
   //wxBusyCursor wait;
 	
   mafVME *vol = mafVME::SafeDownCast(GetVolumeLink());
-  mafVMEPolyline *vme;
+  mafVMEPolylineSpline *vme;
   
   int counter = 0;
   std::vector<vtkPolyData *> profilesOrdered;
@@ -191,9 +192,13 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
       mafLogMessage(message);
       return;
     }
-    
-    vme = (mafVMEPolyline *)i->second.m_Node;
+
+    vme = (mafVMEPolylineSpline *)i->second.m_Node;
     vme->Update();
+
+		//If Profile has only 1 points or less panoramic shouldn't be created
+		/*if(vme->GetOutput()->GetVTKData()->GetNumberOfPoints()<=1)
+			return;*/
 
     ////transform
     ////this part set the transform for every polydata inside a node, using the pose of the node
@@ -299,6 +304,9 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
       maxDis = lengths[in];
     }
   }
+	if (index==-1)
+		return;
+
   //mafLogMessage(index);
 
   // ALGORITHM

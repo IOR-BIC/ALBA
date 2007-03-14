@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-14 09:36:43 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-03-14 16:43:53 $
+  Version:   $Revision: 1.12 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -348,6 +348,7 @@ void mafViewSingleSlice::VmeCreatePipe(mafNode *vme)
 				((mafPipePolylineSlice *)pipe)->SetNormal(normal);
 			}
 			pipe->Create(n);
+
       n->m_Pipe = (mafPipe*)pipe;
       if (m_NumberOfVisibleVme == 1)
       {
@@ -572,22 +573,24 @@ void mafViewSingleSlice::SetLutRange(double low_val, double high_val)
 void mafViewSingleSlice::SetSlice(double origin[3])
 //----------------------------------------------------------------------------
 {
-  if(!m_CurrentVolume)
-    return;
-  memcpy(m_Slice,origin,sizeof(m_Slice));
-  mafString pipe_name = m_CurrentVolume->m_Pipe->GetTypeName();
-  if (pipe_name.Equals("mafPipeVolumeSlice"))
-  {
-    mafPipeVolumeSlice *pipe = (mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe;
-    pipe->SetSlice(origin); 
+	memcpy(m_Slice,origin,sizeof(m_Slice));
+	mafString pipe_name;
+  if(m_CurrentVolume)
+	{
+		pipe_name = m_CurrentVolume->m_Pipe->GetTypeName();
+		if (pipe_name.Equals("mafPipeVolumeSlice"))
+		{
+			mafPipeVolumeSlice *pipe = (mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe;
+			pipe->SetSlice(origin); 
 
-    // update text
-    this->UpdateText();
-		CameraUpdate();
-  }
+			// update text
+			this->UpdateText();
+			CameraUpdate();
+		}
+	}
   
-  if(m_CurrentSurface.empty())
-    return;
+  //if(m_CurrentSurface.empty())
+  //  return;
   for(int i=0;i<m_CurrentSurface.size();i++)
   {
     pipe_name = m_CurrentSurface.at(i)->m_Pipe->GetTypeName();
@@ -598,8 +601,8 @@ void mafViewSingleSlice::SetSlice(double origin[3])
     }
   }
 
-	if(m_CurrentPolyline.empty())
-		return;
+	//if(m_CurrentPolyline.empty())
+	//	return;
 	for(int i=0;i<m_CurrentPolyline.size();i++)
 	{
 		pipe_name = m_CurrentPolyline.at(i)->m_Pipe->GetTypeName();
