@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoLandmarkImporterWSTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-03-09 15:27:43 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-03-14 08:44:13 $
+Version:   $Revision: 1.3 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -41,7 +41,7 @@ void mmoLandmarkImporterWSTest::TestWSImporter()
 	mmoLandmarkImporterWS *importer=new mmoLandmarkImporterWS("importer");
 	importer->TestModeOn();
 	mafString filename=MED_DATA_ROOT;
-  filename<<"/AL_File/pbCV1b05al.csv";
+  filename<<"/AL_FileTXT/pbCV1b05al.csv";
 	importer->SetFileName(filename.GetCStr());
   importer->SetSkipColumn(0);
 	importer->Read();
@@ -57,7 +57,7 @@ void mmoLandmarkImporterWSTest::TestVisibility()
   mmoLandmarkImporterWS *importer=new mmoLandmarkImporterWS("importer");
   importer->TestModeOn();
   mafString filename=MED_DATA_ROOT;
-  filename<<"/AL_File/pbCV1b05al.csv";
+  filename<<"/AL_FileTXT/pbCV1b05al.csv";
   importer->SetFileName(filename.GetCStr());
   importer->SetSkipColumn(0);
   importer->Read();
@@ -76,7 +76,7 @@ void mmoLandmarkImporterWSTest::TestCoordinates()
   mmoLandmarkImporterWS *importer=new mmoLandmarkImporterWS("importer");
   importer->TestModeOn();
   mafString filename=MED_DATA_ROOT;
-  filename<<"/AL_File/pbCV1b05al.csv";
+  filename<<"/AL_FileTXT/pbCV1b05al.csv";
   importer->SetFileName(filename.GetCStr());
   importer->SetSkipColumn(0);
   importer->Read();

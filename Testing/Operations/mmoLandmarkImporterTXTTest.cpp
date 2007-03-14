@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoLandmarkImporterTXTTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-03-09 15:27:43 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-03-14 08:44:13 $
+Version:   $Revision: 1.3 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -41,7 +41,7 @@ void mmoLandmarkImporterTXTTest::TestTXTImporter()
 	mmoLandmarkImporterTXT *importer=new mmoLandmarkImporterTXT("importer");
 	importer->TestModeOn();
 	mafString filename=MED_DATA_ROOT;
-  filename<<"/AL_File/cammino02.txt";
+  filename<<"/AL_FileTXT/cammino02.txt";
 	importer->SetFileName(filename.GetCStr());
   importer->SetSkipColumn(1);
 	importer->Read();
@@ -57,7 +57,7 @@ void mmoLandmarkImporterTXTTest::TestVisibility()
   mmoLandmarkImporterTXT *importer=new mmoLandmarkImporterTXT("importer");
   importer->TestModeOn();
   mafString filename=MED_DATA_ROOT;
-  filename<<"/AL_File/cammino02.txt";
+  filename<<"/AL_FileTXT/cammino02.txt";
   importer->SetFileName(filename.GetCStr());
   importer->SetSkipColumn(1);
   importer->Read();
@@ -76,7 +76,7 @@ void mmoLandmarkImporterTXTTest::TestCoordinates()
   mmoLandmarkImporterTXT *importer=new mmoLandmarkImporterTXT("importer");
   importer->TestModeOn();
   mafString filename=MED_DATA_ROOT;
-  filename<<"/AL_File/cammino02.txt";
+  filename<<"/AL_FileTXT/cammino02.txt";
   importer->SetFileName(filename.GetCStr());
   importer->SetSkipColumn(1);
   importer->Read();
