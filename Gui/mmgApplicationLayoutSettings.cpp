@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationLayoutSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2006-12-12 10:03:45 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2007-03-14 17:13:23 $
+Version:   $Revision: 1.10 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -110,6 +110,8 @@ mmgApplicationLayoutSettings::~mmgApplicationLayoutSettings()
 //----------------------------------------------------------------------------
 {
   //mafDEL(m_Layout); // already destroyed by the vme
+  vtkDEL(m_XMLStorage);
+  mafDEL(m_XMLRoot);
   m_Gui = NULL; // gui is destroyed by the dialog.
 }
 //----------------------------------------------------------------------------
@@ -230,7 +232,8 @@ void mmgApplicationLayoutSettings::InitializeLayout()
 //  m_Storage->GetRoot()->SetName("ApplicationLayout");
 //  m_Storage->GetRoot()->Initialize();
   
-	m_XMLStorage = mafXMLStorage::New();
+	//m_XMLStorage = mafXMLStorage::New();
+  vtkNEW(m_XMLStorage);
 	m_XMLStorage->SetFileType("MLY");
 	m_XMLStorage->SetVersion("2.0");
 	mafNEW(m_XMLRoot);
