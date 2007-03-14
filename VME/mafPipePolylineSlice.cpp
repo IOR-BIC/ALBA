@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-21 17:22:47 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-03-14 17:08:07 $
+  Version:   $Revision: 1.5 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -156,6 +156,7 @@ void mafPipePolylineSlice::Create(mafSceneNode *n)
   m_Actor = vtkActor::New();
   m_Actor->SetMapper(m_Mapper);
 
+	m_Actor->GetProperty()->SetColor(((mafVMEPolyline *)m_Vme)->GetMaterial()->m_Diffuse);
   m_Actor->GetProperty()->SetLineWidth (1);
   m_AssemblyFront->AddPart(m_Actor);
 

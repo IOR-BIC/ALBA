@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolyline.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-08 12:39:49 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-03-14 17:07:57 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -115,6 +115,16 @@ void mafPipePolyline::Create(mafSceneNode *n)
     m_Mapper->SetInput(apd->GetOutput());
     apd->Delete();
   }
+	else if (m_Representation == GLYPH_UNCONNECTED)
+	{
+		m_Glyph->Update();
+		vtkAppendPolyData *apd = vtkAppendPolyData::New();
+		//apd->AddInput(data);
+		apd->AddInput(m_Glyph->GetOutput());
+		apd->Update();
+		m_Mapper->SetInput(apd->GetOutput());
+		apd->Delete();
+	}
   else
     m_Mapper->SetInput(data);
 
@@ -180,8 +190,8 @@ void mafPipePolyline::Select(bool sel)
 mmgGui *mafPipePolyline::CreateGui()
 //----------------------------------------------------------------------------
 {
-  const wxString representation_string[] = {_("line"), _("tube"), _("sphere")};
-  int num_choices = 3;
+  const wxString representation_string[] = {_("line"), _("tube"), _("sphere"), _("unconnected sphere")};
+  int num_choices = 4;
   m_Gui = new mmgGui(this);
   m_Gui->Combo(ID_POLYLINE_REPRESENTATION,"",&m_Representation,num_choices,representation_string);
   m_Gui->Label(_("tube"));
@@ -196,8 +206,8 @@ mmgGui *mafPipePolyline::CreateGui()
   m_Gui->Enable(ID_TUBE_RADIUS, m_Representation == TUBE);
   m_Gui->Enable(ID_TUBE_CAPPING, m_Representation == TUBE);
   m_Gui->Enable(ID_TUBE_RESOLUTION, m_Representation == TUBE);
-  m_Gui->Enable(ID_SPHERE_RADIUS, m_Representation == GLYPH);
-  m_Gui->Enable(ID_SPHERE_RESOLUTION, m_Representation == GLYPH);
+  m_Gui->Enable(ID_SPHERE_RADIUS, m_Representation == GLYPH || m_Representation == GLYPH_UNCONNECTED);
+  m_Gui->Enable(ID_SPHERE_RESOLUTION, m_Representation == GLYPH || m_Representation == GLYPH_UNCONNECTED);
 	m_Gui->Divider();
 
   return m_Gui;
@@ -278,6 +288,16 @@ void mafPipePolyline::UpdateProperty(bool fromTag)
     m_Mapper->SetInput(apd->GetOutput());
     apd->Delete();
   }
+	else if (m_Representation == GLYPH_UNCONNECTED)
+	{
+		m_Glyph->Update();
+		vtkAppendPolyData *apd = vtkAppendPolyData::New();
+		//apd->AddInput(data);
+		apd->AddInput(m_Glyph->GetOutput());
+		apd->Update();
+		m_Mapper->SetInput(apd->GetOutput());
+		apd->Delete();
+	}
   else
     m_Mapper->SetInput(data);
 }
@@ -360,9 +380,9 @@ void mafPipePolyline::SetRepresentation(int representation)
   {
     m_Representation = POLYLINE;
   }
-  else if (representation > GLYPH)
+  else if (representation > GLYPH_UNCONNECTED)
   {
-    m_Representation = GLYPH;
+    m_Representation = GLYPH_UNCONNECTED;
   }
   else
     m_Representation = representation;
@@ -372,8 +392,8 @@ void mafPipePolyline::SetRepresentation(int representation)
     m_Gui->Enable(ID_TUBE_RADIUS, m_Representation == TUBE);
     m_Gui->Enable(ID_TUBE_CAPPING, m_Representation == TUBE);
     m_Gui->Enable(ID_TUBE_RESOLUTION, m_Representation == TUBE);
-    m_Gui->Enable(ID_SPHERE_RADIUS, m_Representation == GLYPH);
-    m_Gui->Enable(ID_SPHERE_RESOLUTION, m_Representation == GLYPH);
+    m_Gui->Enable(ID_SPHERE_RADIUS, m_Representation == GLYPH || m_Representation == GLYPH_UNCONNECTED);
+    m_Gui->Enable(ID_SPHERE_RESOLUTION, m_Representation == GLYPH || m_Representation == GLYPH_UNCONNECTED);
   }
   UpdateProperty();
 }

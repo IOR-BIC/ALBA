@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutSlider.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-12 14:37:30 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-03-14 17:09:08 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -210,7 +210,7 @@ void mmgLutSlider::MoveButton(int id, int pos)
 
   Refresh(false);
 
-  mafEventMacro(mafEvent(this,ID_RANGE_MODIFIED));
+  mafEventMacro(mafEvent(this,ID_RANGE_MODIFIED,(wxObject *)this));
 }
 //----------------------------------------------------------------------------
 void mmgLutSlider::SetText(long i, wxString text)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolyline.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-08 12:39:49 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-03-14 17:07:57 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -55,6 +55,9 @@ public:
   /** Set the polyline representation as sphere glyphed polyline.*/
   void SetRepresentationToGlyph() {SetRepresentation(GLYPH);};
 
+  /** Set the polyline representation as sphere glyphed polyline.*/
+  void SetRepresentationToUnconnectedGlyph() {SetRepresentation(GLYPH_UNCONNECTED);};
+
   /** Set The Radius */
   void SetRadius(double radius);
 
@@ -77,7 +80,8 @@ public:
   {
     POLYLINE = 0,
     TUBE,
-    GLYPH
+    GLYPH,
+		GLYPH_UNCONNECTED,
   };
 
 protected:

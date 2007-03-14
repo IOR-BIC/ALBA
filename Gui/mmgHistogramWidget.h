@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgHistogramWidget.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-07 13:17:26 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-03-14 17:09:08 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,6 +28,7 @@
 class mafRWI;
 class vtkDataArray;
 class mmgGui;
+class vtkImageData;
 
 //----------------------------------------------------------------------------
 /** mmgHistogramWidget : widget that encapsulate render window into a gui*/
@@ -49,6 +50,9 @@ public:
     ID_LOGFACTOR,
     ID_REPRESENTATION
   };
+
+	/** Set a pre-calculated histogram, just visualize it instead calculate. It is used like a cache.*/
+	void SetHistogramData(vtkImageData *histogram);
 
   /** Input data from which generate histogram.*/
   void SetData(vtkDataArray *data);
@@ -121,5 +125,6 @@ protected:
   vtkDataArray  *m_Data;
   mafRWI        *m_HistogramRWI;
   vtkHistogram  *m_Histogram;
+	vtkImageData  *m_HistogramData;
 };
 #endif

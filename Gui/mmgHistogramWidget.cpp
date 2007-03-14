@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgHistogramWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2006-12-14 09:46:08 $
-Version:   $Revision: 1.11 $
+Date:      $Date: 2007-03-14 17:09:08 $
+Version:   $Revision: 1.12 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -42,6 +42,7 @@ mmgHistogramWidget::mmgHistogramWidget(wxWindow* parent, wxWindowID id, const wx
 {
 	m_Listener    = NULL;
   m_Histogram   = NULL;
+	m_HistogramData = NULL;
   m_Gui         = NULL;
   m_Data        = NULL;
 
@@ -256,4 +257,10 @@ void mmgHistogramWidget::EnableWidgets(bool enable)
   m_Gui->Enable(mmgHistogramWidget::ID_SCALE_FACTOR,enable && m_AutoscaleHistogram == 0);
   m_Gui->Enable(mmgHistogramWidget::ID_LOGSCALE,enable);
   m_Gui->Enable(mmgHistogramWidget::ID_LOGFACTOR,m_LogHistogramFlag != 0);
+}
+//----------------------------------------------------------------------------
+void mmgHistogramWidget::SetHistogramData(vtkImageData *histogram)
+//----------------------------------------------------------------------------
+{
+	m_HistogramData = histogram;
 }
