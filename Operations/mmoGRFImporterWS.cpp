@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoGRFImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-09 13:41:53 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-03-14 09:13:20 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -107,7 +107,7 @@ void mmoGRFImporterWS::	OnEvent(mafEventBase *maf_event)
 void mmoGRFImporterWS::Read()   
 //----------------------------------------------------------------------------
 {
-  if (!m_TestMode)
+  //if (!m_TestMode)
     wxBusyInfo wait("Please wait, working...");
 
   mafNEW(m_GrfScalar);

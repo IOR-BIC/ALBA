@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoEMGImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-09 13:41:07 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-03-14 09:13:20 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -110,7 +110,7 @@ void mmoEMGImporterWS::	OnEvent(mafEventBase *maf_event)
 void mmoEMGImporterWS::Read()   
 //----------------------------------------------------------------------------
 {
-  if (!m_TestMode)
+  //if (!m_TestMode)
     wxBusyInfo wait("Please wait, working...");
   
   mafNEW(m_EmgScalar);
