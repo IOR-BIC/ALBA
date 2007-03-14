@@ -41,7 +41,7 @@ SET(PROJECT_SRCS  ${PROJECT_SRCS}
   mmoGRFImporterWS.cpp
   mmoGRFImporterWS.h
 
-  )
+)
 ENDIF (MAF_USE_ITK)
 
 # List libraries that are needed by this project.
