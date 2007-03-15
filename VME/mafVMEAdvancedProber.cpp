@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-14 16:44:55 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-03-15 14:38:13 $
+  Version:   $Revision: 1.6 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -77,7 +77,7 @@ mafVMEAdvancedProber::mafVMEAdvancedProber()
 //-------------------------------------------------------------------------
 {
 	m_ListBox = NULL;
-  m_SamplingCoefficient = 2.0;
+  m_SamplingCoefficient = 1.0;
 	m_SplineCoefficient = 2;
   m_Image = NULL;
   m_IMTC = NULL;
