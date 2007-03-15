@@ -17,3 +17,6 @@ ENDIF (CPPUNIT_FOUND)
 
 ADD_EXECUTABLE(vtkContourVolumeMapperTest vtkContourVolumeMapperTest.h vtkContourVolumeMapperTest.cpp)
 ADD_TEST(vtkContourVolumeMapperTest ${EXECUTABLE_OUTPUT_PATH}/vtkContourVolumeMapperTest)
+
+ADD_EXECUTABLE(vtkRemoveCellsFilterTest vtkRemoveCellsFilterTest.h vtkRemoveCellsFilterTest.cpp)
+ADD_TEST(vtkRemoveCellsFilterTest ${EXECUTABLE_OUTPUT_PATH}/vtkRemoveCellsFilterTest)
