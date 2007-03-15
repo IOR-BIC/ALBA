@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAgentEventQueue.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-19 15:29:17 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-03-15 17:12:24 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -81,9 +81,9 @@ public:
   mafTypeMacro(mafAgentEventQueue,mafAgent);
 
   /** Push an event in the queue (FIFO)*/
-  int PushEvent(mafEventBase &event) {return PushEvent(&event);}
-  virtual int PushEvent(mafEventBase *event);
-  int PushEvent(mafID event_id, void *sender, void *data=NULL);
+  bool PushEvent(mafEventBase &event) {return PushEvent(&event);}
+  virtual bool PushEvent(mafEventBase *event);
+  bool PushEvent(mafID event_id, void *sender, void *data=NULL);
 
   /**
   return the first event in the queue (FIFO)*/

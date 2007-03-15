@@ -3,8 +3,8 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: mafAgentEventQueue.cpp,v $
 Language:  C++
-Date:      $Date: 2006-06-14 14:46:33 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2007-03-15 17:12:24 $
+Version:   $Revision: 1.8 $
 
 =========================================================================*/
 #include "mafAgentEventQueue.h"
@@ -102,7 +102,7 @@ bool mafAgentEventQueue::DispatchEvents()
         }
         else
         {
-          if (m_DispatchMode==SelfProcessMode)
+          if (m_DispatchMode==SelfProcessMode || channel==MCH_INPUT)
           {
             OnEvent(event);
           }
@@ -170,14 +170,14 @@ bool mafAgentEventQueue::DispatchEvents()
 }
 
 //------------------------------------------------------------------------------
-int mafAgentEventQueue::PushEvent(mafID event, void *sender,void *data)
+bool mafAgentEventQueue::PushEvent(mafID event, void *sender,void *data)
 //------------------------------------------------------------------------------
 {
   return this->PushEvent(&mafEventBase(sender,event,data));
 }
 
 //------------------------------------------------------------------------------
-int mafAgentEventQueue::PushEvent(mafEventBase *event)
+bool mafAgentEventQueue::PushEvent(mafEventBase *event)
 //------------------------------------------------------------------------------
 {
   assert(event);
