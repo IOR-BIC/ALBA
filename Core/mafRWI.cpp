@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 10:24:48 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2007-03-15 17:11:26 $
+  Version:   $Revision: 1.36 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -356,7 +356,7 @@ void mafRWI::SetRuleVisibility(bool show)
     m_Ruler->SetVisibility(show);
 }
 //----------------------------------------------------------------------------
-void mafRWI::SetRulerScaleFactor(double scale_factor)
+void mafRWI::SetRulerScaleFactor(const double &scale_factor)
 //----------------------------------------------------------------------------
 {
   m_RulerScaleFactor = scale_factor;
@@ -364,7 +364,7 @@ void mafRWI::SetRulerScaleFactor(double scale_factor)
   m_Gui->Update();
 }
 //----------------------------------------------------------------------------
-void mafRWI::SetRulerLegend(mafString &ruler_legend)
+void mafRWI::SetRulerLegend(const mafString &ruler_legend)
 //----------------------------------------------------------------------------
 {
   m_RulerLegend = ruler_legend;
@@ -372,14 +372,14 @@ void mafRWI::SetRulerLegend(mafString &ruler_legend)
   m_Gui->Update();
 }
 //----------------------------------------------------------------------------
-void mafRWI::SetGridColor(wxColor col)
+void mafRWI::SetGridColor(const wxColor &col)
 //----------------------------------------------------------------------------
 {
   if(m_Grid) 
     m_Grid->SetGridColor(col.Red()/255.0,col.Green()/255.0,col.Blue()/255.0);
 }
 //----------------------------------------------------------------------------
-void mafRWI::SetBackgroundColor(wxColor col)
+void mafRWI::SetBackgroundColor(const wxColor &col)
 //----------------------------------------------------------------------------
 {
   m_RenFront->SetBackground(col.Red()/255.0,col.Green()/255.0,col.Blue()/255.0);
@@ -392,7 +392,7 @@ void mafRWI::SetStereo(int stereo_type)
 {
   if(m_RenBack) 
   {
-    mafLogMessage("LAL WARNING: SetStereo is disabled for RWI with two layers"); 
+    mafLogMessage("WARNING: SetStereo is disabled for RWI with two layers");
     return;
   }
 	

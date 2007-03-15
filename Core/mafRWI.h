@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-23 11:54:59 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-03-15 17:11:26 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -82,10 +82,10 @@ public:
 	void SetGridVisibility(bool show);
 
 	/** Set the color for the grid actor. */
-	void SetGridColor(wxColor col);
+	void SetGridColor(const wxColor &col);
 
 	/** Set the background color for the render window. */
-	void SetBackgroundColor(wxColor col);
+	void SetBackgroundColor(const wxColor &col);
 
 	/** Set the stereo type. */
 	void SetStereo(int stereo_type);
@@ -98,10 +98,10 @@ public:
 
   /** Set the scale factor to convert the data scale to the visualized scale of the rule. 
       By default the ruler shows the same scale of the data. */
-  void SetRulerScaleFactor(double scale_factor);
+  void SetRulerScaleFactor(const double &scale_factor);
 
   /** Set the label of the ruler. Example the unit measure of the data. */
-  void SetRulerLegend(mafString &ruler_legend);
+  void SetRulerLegend(const mafString &ruler_legend);
 
   /** Update scale factor and legend.
   This method is called from logic to update measure unit according to the application settings.*/
