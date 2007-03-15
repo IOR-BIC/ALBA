@@ -8,6 +8,10 @@ PROJECT(vtkMAF)
 # Set your list of sources here.  Do not change the name of the
 # vtkMAF_SRCS variable.
 SET(vtkMAF_SRCS
+  vtkCellsFilter.cxx
+  vtkCellsFilter.h  
+  vtkRemoveCellsFilter.cxx
+  vtkRemoveCellsFilter.h
   vtkContourVolumeMapper.cxx
   vtkContourVolumeMapper.h
 #  vtkContourVolumeMapperAdv.cxx
