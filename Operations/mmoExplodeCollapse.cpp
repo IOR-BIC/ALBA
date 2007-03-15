@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExplodeCollapse.cpp,v $
 Language:  C++
-Date:      $Date: 2006-09-22 10:11:57 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-03-15 14:22:25 $
+Version:   $Revision: 1.3 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -29,7 +29,7 @@ mafCxxTypeMacro(mmoExplodeCollapse);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoExplodeCollapse::mmoExplodeCollapse(wxString label) :
+mmoExplodeCollapse::mmoExplodeCollapse(const wxString &label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {

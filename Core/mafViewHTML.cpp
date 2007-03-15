@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewHTML.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-20 12:20:30 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-03-15 14:22:00 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani    Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,7 +44,7 @@ mafCxxTypeMacro(mafViewHTML);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewHTML::mafViewHTML(wxString label, int camera_position, bool show_axes, bool show_grid, int stereo)
+mafViewHTML::mafViewHTML(const wxString &label, int camera_position, bool show_axes, bool show_grid, int stereo)
 :mafView(label)
 //----------------------------------------------------------------------------
 {

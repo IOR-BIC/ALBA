@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCrop.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-02 12:10:55 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.11 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,7 +43,7 @@ mafCxxTypeMacro(mmoCrop);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoCrop::mmoCrop(wxString label) 
+mmoCrop::mmoCrop(const wxString &label) 
 : mafOp(label)
 //----------------------------------------------------------------------------
 {

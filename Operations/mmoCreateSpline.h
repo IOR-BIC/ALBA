@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateSpline.h,v $
   Language:  C++
-  Date:      $Date: 2007-02-20 10:01:23 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi & Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -28,7 +28,7 @@ class mafEvent;
 class mmoCreateSpline: public mafOp
 {
 public:
-  mmoCreateSpline(wxString label = "Create Parametric Surface");
+  mmoCreateSpline(const wxString &label = "Create Parametric Surface");
   ~mmoCreateSpline(); 
 
   mafTypeMacro(mmoCreateSpline, mafOp);

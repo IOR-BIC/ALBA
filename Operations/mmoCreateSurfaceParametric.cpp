@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateSurfaceParametric.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-07 15:01:25 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -34,7 +34,7 @@ mafCxxTypeMacro(mmoCreateSurfaceParametric);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoCreateSurfaceParametric::mmoCreateSurfaceParametric(wxString label) :
+mmoCreateSurfaceParametric::mmoCreateSurfaceParametric(const wxString &label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {

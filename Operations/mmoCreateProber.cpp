@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:11:57 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -34,7 +34,7 @@ mafCxxTypeMacro(mmoCreateProber);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoCreateProber::mmoCreateProber(wxString label) :
+mmoCreateProber::mmoCreateProber(const wxString &label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMAFTransform.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:11:57 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.7 $
   Authors:   Stefano Perticoni        
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,7 +39,7 @@ Transform a vme using constrains
 class mmoMAFTransform : public mmoTransformInterface
 {
 public:
-  mmoMAFTransform(wxString label = "MAFTransform");
+  mmoMAFTransform(const wxString &label = "MAFTransform");
  ~mmoMAFTransform(); 
   virtual void OnEvent(mafEventBase *maf_event);
   

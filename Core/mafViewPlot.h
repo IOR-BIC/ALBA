@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewPlot.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-28 16:33:19 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-03-15 14:22:00 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,7 +35,7 @@ mafViewPlot is a View that got a mafXYPlot and plot curves on a plane.
 class mafViewPlot: public mafView
 {
 public:
-  mafViewPlot(wxString label = "plot View");
+  mafViewPlot(const wxString &label = "plot View");
   virtual ~mafViewPlot();
 
   mafTypeMacro(mafViewPlot, mafView);

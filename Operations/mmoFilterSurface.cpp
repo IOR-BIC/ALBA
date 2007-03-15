@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoFilterSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:57:38 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -41,7 +41,7 @@ mafCxxTypeMacro(mmoFilterSurface);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoFilterSurface::mmoFilterSurface(wxString label) :
+mmoFilterSurface::mmoFilterSurface(const wxString &label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {

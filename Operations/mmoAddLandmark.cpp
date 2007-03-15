@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoAddLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:57:38 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-03-15 14:22:24 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,7 +40,7 @@ mafCxxTypeMacro(mmoAddLandmark);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoAddLandmark::mmoAddLandmark(wxString label) :
+mmoAddLandmark::mmoAddLandmark(const wxString &label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {

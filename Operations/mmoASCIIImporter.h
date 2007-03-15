@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoASCIIImporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-22 12:55:51 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -33,7 +33,7 @@ written by rows or columns into a mafVMEScalar. Multiple files produce a time-va
 class mmoASCIIImporter: public mafOp
 {
 public:
-  mmoASCIIImporter(wxString label = "ASCIIImporter");
+  mmoASCIIImporter(const wxString &label = "ASCIIImporter");
   ~mmoASCIIImporter(); 
  
   virtual void OnEvent(mafEventBase *maf_event);

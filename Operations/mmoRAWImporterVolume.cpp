@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-03 14:48:47 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.15 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,7 +50,7 @@ mafCxxTypeMacro(mmoRAWImporterVolume);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoRAWImporterVolume::mmoRAWImporterVolume(wxString label) : mafOp(label)
+mmoRAWImporterVolume::mmoRAWImporterVolume(const wxString &label) : mafOp(label)
 //----------------------------------------------------------------------------
 {
 	m_OpType			= OPTYPE_IMPORTER;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:11:57 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -35,7 +35,7 @@ mafCxxTypeMacro(mmoCreateSlicer);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoCreateSlicer::mmoCreateSlicer(wxString label) :
+mmoCreateSlicer::mmoCreateSlicer(const wxString &label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {

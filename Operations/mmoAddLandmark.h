@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoAddLandmark.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-07 14:13:39 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,7 +38,7 @@ class mmgDictionaryWidget;
 class mmoAddLandmark: public mafOp
 {
 public:
-	mmoAddLandmark(wxString label = "AddLandmark");
+	mmoAddLandmark(const wxString &label = "AddLandmark");
 	~mmoAddLandmark(); 
 	virtual void OnEvent(mafEventBase *maf_event);
 

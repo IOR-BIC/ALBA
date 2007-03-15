@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-19 11:44:12 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -49,7 +49,7 @@ mafCxxTypeMacro(mmoVolumeResample);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoVolumeResample::mmoVolumeResample(wxString label) : mafOp(label)
+mmoVolumeResample::mmoVolumeResample(const wxString &label) : mafOp(label)
 //----------------------------------------------------------------------------
 {
 	m_OpType	= OPTYPE_OP;

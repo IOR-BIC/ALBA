@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoExtractIsosurface.h,v $
   Language:  C++
-  Date:      $Date: 2007-02-07 11:25:40 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,7 +49,7 @@ class vtkVolume;
 class mmoExtractIsosurface: public mafOp
 {
 public:
-	mmoExtractIsosurface(wxString label = "ExtractIsosurface");
+	mmoExtractIsosurface(const wxString &label = "ExtractIsosurface");
  ~mmoExtractIsosurface(); 
 	
   mafTypeMacro(mmoExtractIsosurface, mafOp);

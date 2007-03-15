@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-09 11:25:47 $
-  Version:   $Revision: 1.64 $
+  Date:      $Date: 2007-03-15 14:21:33 $
+  Version:   $Revision: 1.65 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,7 +54,7 @@ mafCxxTypeMacro(mafViewVTK);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewVTK::mafViewVTK(wxString label, int camera_position, bool show_axes, bool show_grid, bool show_ruler, int stereo)
+mafViewVTK::mafViewVTK(const wxString &label, int camera_position, bool show_axes, bool show_grid, bool show_ruler, int stereo)
 :mafView(label)
 //----------------------------------------------------------------------------
 {
@@ -499,6 +499,8 @@ void mafViewVTK::Print(std::ostream& os, const int tabs)// const
 
   os << indent << "mafViewVTK " << '\t' << this << "\n";
   os << indent << "Name: " << '\t' << m_Label << "\n";
+  os << indent << "View ID: " << '\t' << m_Id << "\n";
+  os << indent << "View Mult: " << '\t' << m_Mult << "\n";
   os << indent << "Visible VME counter: " << '\t' << m_NumberOfVisibleVme << "\n";
   
   m_Sg->Print(os, 1);

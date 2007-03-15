@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCrop.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-19 11:43:44 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.7 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,7 +43,7 @@ class mmoCrop: public mafOp
 {
 public:
              
-            	 mmoCrop(wxString label = "Crop");
+            	 mmoCrop(const wxString &label = "Crop");
 	virtual     ~mmoCrop();
 	virtual void OnEvent(mafEventBase *maf_event);
 

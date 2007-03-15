@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMAFTransformScale.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-20 08:34:37 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -58,7 +58,7 @@ mafCxxTypeMacro(mmoMAFTransformScale);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoMAFTransformScale::mmoMAFTransformScale(wxString label) :
+mmoMAFTransformScale::mmoMAFTransformScale(const wxString &label) :
 mmoTransformInterface(label)
 //----------------------------------------------------------------------------
 {

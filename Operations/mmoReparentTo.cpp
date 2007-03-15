@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoReparentTo.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:11:57 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -39,7 +39,7 @@ mafCxxTypeMacro(mmoReparentTo);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoReparentTo::mmoReparentTo(wxString label) : mafOp(label)
+mmoReparentTo::mmoReparentTo(const wxString &label) : mafOp(label)
 //----------------------------------------------------------------------------
 {
   m_OpType    = OPTYPE_OP;

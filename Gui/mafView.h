@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-09 11:25:13 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2007-03-15 14:22:50 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -74,7 +74,7 @@ mafView can be the base class for composed Views.
 class mafView: public mafObserver, public mafObject
 {
 public:
-  mafView(wxString label = "View");
+  mafView(const wxString &label = "View");
   virtual ~mafView(); 
 
   mafTypeMacro(mafView, mafObject);

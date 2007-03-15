@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:57:38 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,7 +54,7 @@ mafCxxTypeMacro(mmoClipSurface);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoClipSurface::mmoClipSurface(wxString label) :
+mmoClipSurface::mmoClipSurface(const wxString &label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {

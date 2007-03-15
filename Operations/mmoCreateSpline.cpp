@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateSpline.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-20 10:01:23 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi & Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -34,7 +34,7 @@ mafCxxTypeMacro(mmoCreateSpline);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoCreateSpline::mmoCreateSpline(wxString label) :
+mmoCreateSpline::mmoCreateSpline(const wxString &label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {

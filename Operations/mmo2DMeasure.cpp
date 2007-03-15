@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmo2DMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:57:38 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-03-15 14:22:24 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,7 +38,7 @@ mafCxxTypeMacro(mmo2DMeasure);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmo2DMeasure::mmo2DMeasure(wxString label) 
+mmo2DMeasure::mmo2DMeasure(const wxString &label) 
 :mafOp(label)
 //----------------------------------------------------------------------------
 {

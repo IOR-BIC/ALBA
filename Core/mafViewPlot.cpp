@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewPlot.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 10:01:45 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-03-15 14:22:00 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,7 +33,7 @@ mafCxxTypeMacro(mafViewPlot);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewPlot::mafViewPlot(wxString label)
+mafViewPlot::mafViewPlot(const wxString &label)
 :mafView(label)
 //----------------------------------------------------------------------------
 {

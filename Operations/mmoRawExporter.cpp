@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRawExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 10:24:33 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.6 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -46,7 +46,7 @@
 #include <fstream>
 
 //----------------------------------------------------------------------------
-mmoRAWExporter::mmoRAWExporter(wxString label) :
+mmoRAWExporter::mmoRAWExporter(const wxString &label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {
@@ -74,7 +74,7 @@ bool mmoRAWExporter::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 // Constants :
 //----------------------------------------------------------------------------
-enum 
+enum RAW_EXPORTER_ID
 {
 	ID_SINGLE_FILE = MINID,
 	ID_INT,

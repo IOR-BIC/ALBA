@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoSTLExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:57:38 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -38,7 +38,7 @@ mafCxxTypeMacro(mmoSTLExporter);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoSTLExporter::mmoSTLExporter(wxString label) :
+mmoSTLExporter::mmoSTLExporter(const wxString &label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {

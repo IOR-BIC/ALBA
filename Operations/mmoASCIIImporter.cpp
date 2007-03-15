@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoASCIIImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:57:38 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -39,7 +39,7 @@ mafCxxTypeMacro(mmoASCIIImporter);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoASCIIImporter::mmoASCIIImporter(wxString label) :
+mmoASCIIImporter::mmoASCIIImporter(const wxString &label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {

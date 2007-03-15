@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewHTML.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-20 12:20:30 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-03-15 14:22:00 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani    Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,7 +31,7 @@ class wxHtmlWindow;
 class mafViewHTML: public mafView
 {
 public:
-	          mafViewHTML(wxString label = "vtkViewHTML", int camera_position = CAMERA_PERSPECTIVE, bool show_axes = true, bool show_grid = false, int stereo = 0);
+	          mafViewHTML(const wxString &label = "vtkViewHTML", int camera_position = CAMERA_PERSPECTIVE, bool show_axes = true, bool show_grid = false, int stereo = 0);
 	virtual	 ~mafViewHTML();
 
   mafTypeMacro(mafViewHTML, mafView);

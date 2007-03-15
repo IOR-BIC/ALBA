@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVRMLImporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-19 11:37:11 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -37,7 +37,7 @@ class mafVMEGroup;
 class mmoVRMLImporter: public mafOp
 {
 public:
-           mmoVRMLImporter(wxString label = "VRMLImporter");
+           mmoVRMLImporter(const wxString &label = "VRMLImporter");
 	virtual ~mmoVRMLImporter();
 	
   mafTypeMacro(mmoVRMLImporter, mafOp);

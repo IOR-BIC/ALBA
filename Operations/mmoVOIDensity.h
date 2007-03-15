@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVOIDensity.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:11:57 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.3 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,7 +33,7 @@ class mafString;
 class mmoVOIDensity: public mafOp
 {
 public:
-	mmoVOIDensity(wxString label = "VOIDensity");
+	mmoVOIDensity(const wxString &label = "VOIDensity");
 	~mmoVOIDensity(); 
 	virtual void OnEvent(mafEventBase *maf_event);
   

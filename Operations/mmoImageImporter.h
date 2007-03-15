@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoImageImporter.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-03 13:24:07 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,7 +34,7 @@ class mafVMEVolumeRGB;
 class mmoImageImporter: public mafOp
 {
 public:
-  mmoImageImporter(wxString label = "ImageImporter");
+  mmoImageImporter(const wxString &label = "ImageImporter");
  ~mmoImageImporter(); 
 	virtual void OnEvent(mafEventBase *maf_event);
   

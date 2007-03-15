@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmo2DMeasure.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:11:57 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-03-15 14:22:24 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,7 +31,7 @@ class mafEvent;
 class mmo2DMeasure: public mafOp
 {
 public:
-	mmo2DMeasure(wxString label = "2DMeasure");
+	mmo2DMeasure(const wxString &label = "2DMeasure");
 	~mmo2DMeasure(); 
 	virtual void OnEvent(mafEventBase *maf_event);
   

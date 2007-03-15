@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoScalarToSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-07 12:13:18 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,7 +42,7 @@ mafCxxTypeMacro(mmoScalarToSurface);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoScalarToSurface::mmoScalarToSurface(wxString label) :
+mmoScalarToSurface::mmoScalarToSurface(const wxString &label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {

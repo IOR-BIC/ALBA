@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTransformInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-22 10:11:57 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-03-15 14:22:25 $
+  Version:   $Revision: 1.8 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,7 +50,7 @@ mafCxxTypeMacro(mmoTransformInterface);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoTransformInterface::mmoTransformInterface(wxString label) :
+mmoTransformInterface::mmoTransformInterface(const wxString &label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {
