@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-14 16:43:53 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-03-15 10:06:04 $
+  Version:   $Revision: 1.10 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,6 +33,7 @@
 #include "medPipeVolumeDRR.h"
 #include "medPipeVolumeVR.h"
 #include "medPipeVolumeMIP.h"
+#include "mafPipePolyline.h"
 #include "mafVMEPolyline.h"
 #include "mmgFloatSlider.h"
 
@@ -556,6 +557,10 @@ void mafView3D::VmeShow(mafNode *vme,bool show)
 		{
 			m_CurrentSurface = NULL;
 		}
+	}
+	else if((vme->IsMAFType(mafVMEPolyline)) && show)
+	{
+		((mafPipePolyline*)GetNodePipe(vme))->SetRepresentationToTube();
 	}
 	CameraReset();
 	CameraUpdate();

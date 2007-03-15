@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-03-14 09:36:21 $
-Version:   $Revision: 1.13 $
+Date:      $Date: 2007-03-15 10:06:05 $
+Version:   $Revision: 1.14 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -155,6 +155,10 @@ void mafViewCTNew::VmeShow(mafNode *node, bool show)
 			double b[6];
 			m_CurrentVolume->GetOutput()->Update();
 			m_CurrentVolume->GetOutput()->GetBounds(b);
+			double wholeScalarRangeVol[2];
+			m_CurrentVolume->GetOutput()->GetVTKData()->GetScalarRange(wholeScalarRangeVol);
+			m_MinLUTHistogram = wholeScalarRangeVol[0];
+			m_MaxLUTHistogram = wholeScalarRangeVol[1];
 			SetCurrentZ((b[5]-b[4])/2);
 			ProbeVolume();
 		}
@@ -566,7 +570,6 @@ void mafViewCTNew::ProbeVolume()
 				tpdf->Update(); 
 
 				probeVector[probeVector.size()-1]->SetSource(vtk_data);
-				//probeVector[probeVector.size()-1]->SetFilterModeToDensity();
 				probeVector[probeVector.size()-1]->SetInput(tpdf->GetOutput());
 				probeVector[probeVector.size()-1]->Update();
 			}
@@ -606,47 +609,15 @@ void mafViewCTNew::ProbeVolume()
 			m_Mapper[idSubView]->SetLookupTable(lut);  	
 
 			probeVector[probeVector.size()-1]->GetPolyDataOutput()->GetBounds(b);
-
-			/*double *centerSlice = new double[3];
-			probeVector[probeVector.size()-1]->GetPolyDataOutput()->GetCenter(centerSlice);
-			m_SliceOriginVector.push_back(centerSlice);
-			m_SliceBoundsVector.push_back(b);*/
 		}
-
-	  //+++creare attore
-	  //++++settare nelle slice
 	  
 	  m_Actor[idSubView]->SetMapper(m_Mapper[idSubView]);
-	  //m_Actor->GetProperty()->SetOpacity(0.7);
-
-	  //m_SectionActor.push_back(m_Actor);
-
 	  
 	  mafString t;
 		t = wxString::Format("%d",idSubView);
 	  m_Text[idSubView]->SetInput(t);
-	  //m_Text[idSubView]->GetTextProperty()->SetColor(1.0,1.0,1.0);
-	  //text->GetTextProperty()->BoldOn();
-
-	  //text->GetTextProperty()->SetJustificationToRight();
-	  //text->GetTextProperty()->SetVerticalJustificationToBottom();
 	  
 	  m_TextActor[idSubView]->SetMapper(m_Text[idSubView]);
-
-
-	  /*if (s == m_StartIndexSliceVisualized)
-	  {
-	  for(int i = 0 ; i < DEFAULT_NUM_SLICES; i++)
-	  {
-	  mafViewSliceDP *vslice = (mafViewSliceDP *)((mafViewCompoundDP *)m_ChildViewList[1])->GetSubView(i);
-	  vslice->BorderDelete();
-	  }
-	  }*/
-
-	  //mafViewSliceDP *vslice = (mafViewSliceDP *)((mafViewCompoundDP *)m_ChildViewList[1])->GetSubView(s-m_StartIndexSliceVisualized);
-
-
-	  //m_SectionLabel.push_back(textActor);
 
 
 	  vslice->GetRWI()->GetCamera()->SetFocalPoint(m_Position[idSubView]);
@@ -655,41 +626,15 @@ void mafViewCTNew::ProbeVolume()
 	  vslice->GetRWI()->GetCamera()->SetClippingRange(0.1,1000);
 	  vslice->GetRWI()->GetCamera()->ParallelProjectionOn();
 
-	  /*int h = m_Size.GetHeight();
-	  int w = m_Size.GetWidth();
-	  textActor->SetPosition(w/(m_NumOfSection+1) ,DEFAULT_POS_ACTOR_X*h);*/
-
-
 
 	  vslice->GetSceneGraph()->m_RenFront->AddActor(m_Actor[idSubView]);
 	  vslice->GetSceneGraph()->m_RenFront->AddActor2D(m_TextActor[idSubView]);
-	  /*if (s == m_StartIndexSliceVisualized)
-	  {
-	  vslice->BorderCreate(m_StartMarkerColor);
-	  }
-	  else if(s == m_EndIndexSliceVisualized)
-	  {
-	  vslice->BorderCreate(m_EndMarkerColor);
-	  }
-	  else
-	  {
-	  vslice->BorderDelete();
-	  }
-	  */
 
 
 	  vslice->GetSceneGraph()->m_RenFront->ResetCamera(b);
-	  //vslice->GetSceneGraph()->m_RenFront->ResetCamera();
-	  vslice->CameraUpdate();
 	  m_Gui->Update();
-
-	  /*double divergence;
-	  divergence = (vtkImageData::SafeDownCast(vtk_data))->GetSpacing()[0]/10;
-	  m_SliceOriginVector[s-m_StartIndexSliceVisualized][0] = m_SliceOriginVector[s-m_StartIndexSliceVisualized][0] + m_SliceNormal[0] * divergence;
-	  m_SliceOriginVector[s-m_StartIndexSliceVisualized][1] = m_SliceOriginVector[s-m_StartIndexSliceVisualized][1] + m_SliceNormal[1] * divergence;
-	  m_SliceOriginVector[s-m_StartIndexSliceVisualized][2] = m_SliceOriginVector[s-m_StartIndexSliceVisualized][2] + m_SliceNormal[2] * divergence;*/
-	  //mafLogMessage(wxString::Format(L"%f %f %f" , m_SliceNormal[0],m_SliceNormal[1],m_SliceNormal[2] ));
   }
+	SetCTLookupTable(m_MinLUTHistogram,m_MaxLUTHistogram);
 }
 //----------------------------------------------------------------------------
 void mafViewCTNew::CameraUpdate()
@@ -730,6 +675,8 @@ void mafViewCTNew::SetCTLookupTable(double min, double max)
 {
   if(m_CurrentVolume)
   {
+		m_MinLUTHistogram = min;
+		m_MaxLUTHistogram = max;
     double wholeScalarRangeVol[2];
     m_CurrentVolume->GetOutput()->GetVTKData()->GetScalarRange(wholeScalarRangeVol);
 
@@ -747,5 +694,6 @@ void mafViewCTNew::SetCTLookupTable(double min, double max)
 
       m_Mapper[idSubView]->SetScalarRange(mapLow, mapHigh);
     }
+		CameraUpdate();
   }
 }

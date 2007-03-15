@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.h,v $
 Language:  C++
-Date:      $Date: 2007-03-14 09:36:21 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2007-03-15 10:06:05 $
+Version:   $Revision: 1.8 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -156,6 +156,9 @@ protected:
 	double m_Thickness;
 	int m_AdditionalProfileNumber;
 	double m_ProfileDistance;
+
+	double	m_MinLUTHistogram;
+	double	m_MaxLUTHistogram;
 
   std::vector<vtkActor2D *>	        m_TextActor;
 	std::vector<vtkActor *>					  m_Actor;
