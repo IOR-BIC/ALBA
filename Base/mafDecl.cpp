@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-19 11:31:43 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2007-03-15 15:17:05 $
+  Version:   $Revision: 1.28 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -354,6 +354,11 @@ std::string  mafIdString(int id)
 		 case CAMERA_FIT:						s="CAMERA_FIT"; break; 
 		 case CAMERA_FLYTO:					s="CAMERA_FLYTO"; break; 
      case LINK_CAMERA_TO_INTERACTOR: s="LINK_CAMERA_TO_INTERACTOR"; break; 
+     case DEVICE_ADD:           s="DEVICE_ADD"; break; 
+     case DEVICE_REMOVE:        s="DEVICE_REMOVE"; break; 
+     case DEVICE_GET:           s="DEVICE_GET"; break; 
+     case INTERACTOR_ADD:       s="INTERACTOR_ADD"; break; 
+     case INTERACTOR_REMOVE:    s="INTERACTOR_REMOVE"; break; 
 
      case OP_RUN:	              s="OP_RUN"; break; 
      case OP_RUN_OK:	          s="OP_RUN_OK"; break; 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2007-02-21 17:18:49 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2007-03-15 15:17:05 $
+  Version:   $Revision: 1.29 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -261,6 +261,10 @@ EVT_START,
 
   INTERACTOR_ADD,     //modified by Marco. 25-8-2004 bind an interactor to an action 
   INTERACTOR_REMOVE,  //modified by Marco. 25-8-2004 unbind an interactor from an action
+
+  DEVICE_ADD,
+  DEVICE_REMOVE,
+  DEVICE_GET,
 
 EVT_USER_START, // to be used from vertical applications
 EVT_USER_END = EVT_USER_START+1000,
