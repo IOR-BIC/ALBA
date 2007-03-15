@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-22 12:58:14 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2007-03-15 13:53:28 $
+  Version:   $Revision: 1.19 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,7 +32,7 @@ mafCxxTypeMacro(mafOp);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafOp::mafOp(wxString label)
+mafOp::mafOp(const wxString &label)
 //----------------------------------------------------------------------------
 {
 	m_Gui       = NULL;

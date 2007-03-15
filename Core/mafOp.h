@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-22 12:56:59 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2007-03-15 13:53:28 $
+  Version:   $Revision: 1.19 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,7 +49,7 @@ public:
   mafTypeMacro(mafOp, mafObject);
 
 					mafOp();
-					mafOp(wxString label);
+					mafOp(const wxString &label);
 	virtual	~mafOp(); 
 					void		SetListener(mafObserver *Listener)	{m_Listener = Listener;};
           
