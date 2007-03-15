@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-26 09:12:46 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2007-03-15 14:23:31 $
+  Version:   $Revision: 1.28 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,7 +37,7 @@ mafCxxTypeMacro(mafViewCompound);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewCompound::mafViewCompound( wxString label, int num_row, int num_col)
+mafViewCompound::mafViewCompound(const wxString &label, int num_row, int num_col)
 : mafView(label)
 //----------------------------------------------------------------------------
 {
@@ -50,6 +50,7 @@ mafViewCompound::mafViewCompound( wxString label, int num_row, int num_col)
   m_ChildViewList.clear();
   m_PluggedChildViewList.clear();
   m_GuiView = NULL;
+  m_GuiViewWindow = NULL;
   m_SubViewMaximized = -1;
   m_Mouse = NULL;
   m_LayoutConfiguration = GRID_LAYOUT;
@@ -299,12 +300,23 @@ void mafViewCompound::OnLayout()
   int sh = m_Size.GetHeight();
   int gh = 0;
 
+  if (m_GuiViewWindow)
+  {
+    wxSize gui_size = m_GuiViewWindow->GetBestSize();
+    gh = gui_size.GetHeight();
+    if(sw<gh || sh<gh) return;
+    sh -= gh;
+    m_GuiViewWindow->SetMinSize(wxSize(sw,gh));
+    m_GuiViewWindow->SetSize(0,sh,sw,gh);
+  }
+
   if (m_GuiView)
   {
     wxSize gui_size = m_GuiView->GetBestSize();
     gh = gui_size.GetHeight();
     if(sw<gh || sh<gh) return;
     sh -= gh;
+    m_GuiView->SetMinSize(wxSize(sw,gh));
     m_GuiView->SetSize(0,sh,sw,gh);
   }
 
