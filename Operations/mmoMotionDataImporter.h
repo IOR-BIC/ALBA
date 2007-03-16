@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMotionDataImporter.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 12:30:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-03-16 10:32:05 $
+  Version:   $Revision: 1.2 $
   Authors:   Fedor Moiseev
 ==========================================================================
 Copyright (c) 2002/2004
@@ -40,7 +40,7 @@ template <class MotionReader>
 class mmoMotionDataImporter : public mafOp
 {
 public:
-  mmoMotionDataImporter(const wxString &label, const wxString &pgdWildc, const wxString &dicWildc) :  mafOp(label)
+  mmoMotionDataImporter(const wxString &label, const wxString &pgdWildc, const wxString &dicWildc) :  mafOp(label), m_pgdWildc(pgdWildc), m_dicWildc(dicWildc)
         //----------------------------------------------------------------------------
   {
     m_OpType	= OPTYPE_IMPORTER;
