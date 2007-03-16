@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkSimpleRulerActor2D.cxx,v $
   Language:  C++
-  Date:      $Date: 2006-03-21 12:17:39 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-03-16 16:47:11 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -34,7 +34,7 @@
 #include "vtkProperty2D.h"
 #include "vtkPolyDataMapper2D.h"
 
-vtkCxxRevisionMacro(vtkSimpleRulerActor2D, "$Revision: 1.6 $");
+vtkCxxRevisionMacro(vtkSimpleRulerActor2D, "$Revision: 1.7 $");
 vtkStandardNewMacro(vtkSimpleRulerActor2D);
 //------------------------------------------------------------------------------
 vtkSimpleRulerActor2D::vtkSimpleRulerActor2D()
@@ -83,6 +83,10 @@ vtkSimpleRulerActor2D::~vtkSimpleRulerActor2D()
   if(ScaleLabel)  ScaleLabel->Delete();
   if(HorizontalAxesLabel) HorizontalAxesLabel->Delete();
   if(VerticalAxesLabel) VerticalAxesLabel->Delete();
+  if (this->Legend) 
+  { 
+    delete [] this->Legend; 
+  }  
 }
 //------------------------------------------------------------------------------
 void vtkSimpleRulerActor2D::PrintSelf(ostream& os, vtkIndent indent)
@@ -262,6 +266,7 @@ void vtkSimpleRulerActor2D::RulerCreate()
   axis_cell->Delete();
   axis_pd->Delete();
   axis_pdm->Delete();
+  axis_p->Delete();
 
   //Label //////////////////////////
   ScaleLabel = vtkTextActor::New();
