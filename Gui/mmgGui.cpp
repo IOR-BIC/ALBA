@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-19 16:15:26 $
-  Version:   $Revision: 1.45 $
+  Date:      $Date: 2007-03-16 15:21:55 $
+  Version:   $Revision: 1.46 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -954,11 +954,12 @@ void mmgGui::Radio(int id,wxString label,int* var, int numchoices, const wxStrin
   // SIL. 23-may-2006 : -- fixed with wxWidgets 2.6.3
 
   wxRadioBox *radio = NULL;
-  wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
   int w_id;
 
   if(!label.IsEmpty())
   {
+    wxBoxSizer *sizer = NULL;
+    sizer = new wxBoxSizer(wxHORIZONTAL);
     wxStaticText *lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,-1), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
