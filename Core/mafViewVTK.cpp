@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:21:33 $
-  Version:   $Revision: 1.65 $
+  Date:      $Date: 2007-03-16 08:27:10 $
+  Version:   $Revision: 1.66 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -155,7 +155,7 @@ vtkRenderer *mafViewVTK::GetBackRenderer()
 }
 
 //----------------------------------------------------------------------------
-void mafViewVTK::VmeAdd(mafNode *vme)
+void mafViewVTK::VmeAdd(const mafNode *vme)
 //----------------------------------------------------------------------------
 {
   assert(m_Sg); 
@@ -166,10 +166,10 @@ void mafViewVTK::VmeAdd(mafNode *vme)
   }
 }
 //----------------------------------------------------------------------------
-void mafViewVTK::VmeShow(mafNode *vme, bool show)												{assert(m_Sg); m_Sg->VmeShow(vme,show);}
-void mafViewVTK::VmeUpdateProperty(mafNode *vme, bool fromTag)	        {assert(m_Sg); m_Sg->VmeUpdateProperty(vme,fromTag);}
+void mafViewVTK::VmeShow(const mafNode *vme, bool show)												{assert(m_Sg); m_Sg->VmeShow(vme,show);}
+void mafViewVTK::VmeUpdateProperty(const mafNode *vme, bool fromTag)	        {assert(m_Sg); m_Sg->VmeUpdateProperty(vme,fromTag);}
 //----------------------------------------------------------------------------
-int  mafViewVTK::GetNodeStatus(mafNode *vme)
+int  mafViewVTK::GetNodeStatus(const mafNode *vme)
 //----------------------------------------------------------------------------
 {
   int status = m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;
@@ -190,7 +190,7 @@ int  mafViewVTK::GetNodeStatus(mafNode *vme)
   return status;
 }
 //----------------------------------------------------------------------------
-void mafViewVTK::VmeRemove(mafNode *vme)
+void mafViewVTK::VmeRemove(const mafNode *vme)
 //----------------------------------------------------------------------------
 {
   assert(m_Sg); 
@@ -201,7 +201,7 @@ void mafViewVTK::VmeRemove(mafNode *vme)
   }
 }
 //----------------------------------------------------------------------------
-void mafViewVTK::VmeSelect(mafNode *vme, bool select)
+void mafViewVTK::VmeSelect(const mafNode *vme, bool select)
 //----------------------------------------------------------------------------
 {
   assert(m_Sg); 
@@ -234,7 +234,7 @@ void mafViewVTK::CameraUpdate()
   m_Rwi->CameraUpdate();
 }
 //----------------------------------------------------------------------------
-mafPipe* mafViewVTK::GetNodePipe(mafNode *vme)
+mafPipe* mafViewVTK::GetNodePipe(const mafNode *vme)
 //----------------------------------------------------------------------------
 {
    assert(m_Sg);
@@ -243,7 +243,7 @@ mafPipe* mafViewVTK::GetNodePipe(mafNode *vme)
    return n->m_Pipe;
 }
 //----------------------------------------------------------------------------
-void mafViewVTK::GetVisualPipeName(mafNode *node, mafString &pipe_name)
+void mafViewVTK::GetVisualPipeName(const mafNode *node, mafString &pipe_name)
 //----------------------------------------------------------------------------
 {
   assert(node->IsA("mafVME"));
@@ -262,7 +262,7 @@ void mafViewVTK::GetVisualPipeName(mafNode *node, mafString &pipe_name)
   }
 }
 //----------------------------------------------------------------------------
-void mafViewVTK::VmeCreatePipe(mafNode *vme)
+void mafViewVTK::VmeCreatePipe(const mafNode *vme)
 //----------------------------------------------------------------------------
 {
   mafString pipe_name = "";
@@ -299,7 +299,7 @@ void mafViewVTK::VmeCreatePipe(mafNode *vme)
   }
 }
 //----------------------------------------------------------------------------
-void mafViewVTK::VmeDeletePipe(mafNode *vme)
+void mafViewVTK::VmeDeletePipe(const mafNode *vme)
 //----------------------------------------------------------------------------
 {
   m_NumberOfVisibleVme--;

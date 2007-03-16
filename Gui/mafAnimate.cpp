@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:46:07 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-03-16 08:26:54 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -34,7 +34,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkRenderer.h"
 
 //----------------------------------------------------------------------------
-mafAnimate::mafAnimate(vtkRenderer *renderer, mafNode *vme, mafObserver *listener)
+mafAnimate::mafAnimate(vtkRenderer *renderer, const mafNode *vme, mafObserver *listener)
 //----------------------------------------------------------------------------
 {
 	m_Listener	= listener;
@@ -57,7 +57,7 @@ mafAnimate::~mafAnimate()
 {
 }
 //----------------------------------------------------------------------------
-void mafAnimate::SetInputVME(mafNode *vme) 
+void mafAnimate::SetInputVME(const mafNode *vme) 
 //----------------------------------------------------------------------------
 {
   assert(m_Gui && m_PositionList && m_StorePositionButton && m_RenamePositionButton && m_DeletePositionButton);
@@ -65,7 +65,7 @@ void mafAnimate::SetInputVME(mafNode *vme)
   ResetKit();
 
   if(!vme) return;
-  mafVME *root = mafVME::SafeDownCast(vme->GetRoot());
+  mafVME *root = mafVME::SafeDownCast(((mafNode *)vme)->GetRoot());
 	if(!root) return;
   m_Tags = root->GetTagArray();
 	if(!m_Tags) return;

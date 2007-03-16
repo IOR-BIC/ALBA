@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:23:31 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2007-03-16 08:27:10 $
+  Version:   $Revision: 1.23 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -68,25 +68,25 @@ public:
   
   /** 
   Create the plugged sub-view and call virtual method CreateGuiView() */
-  virtual void     Create();
+  virtual void Create();
   
   /** 
   Create the GUI on the bottom of the compounded view. */
-  virtual void     CreateGuiView();
+  virtual void CreateGuiView();
   
-  virtual void     OnEvent(mafEventBase *maf_event);
+  virtual void OnEvent(mafEventBase *maf_event);
 
   /** 
   Add VME into plugged sub-views*/
-  virtual void VmeAdd(mafNode *node);
+  virtual void VmeAdd(const mafNode *node);
 
   /** 
   Remove VME into plugged sub-views*/
-  virtual void VmeRemove(mafNode *node);
-  virtual void VmeSelect(mafNode *node, bool select);
+  virtual void VmeRemove(const mafNode *node);
+  virtual void VmeSelect(const mafNode *node, bool select);
   /** 
   Show/Hide VMEs into plugged sub-views*/
-  virtual void VmeShow(mafNode *node, bool show);
+  virtual void VmeShow(const mafNode *node, bool show);
 	virtual void VmeUpdateProperty(mafNode *node, bool fromTag = false)		{};
 
   virtual void CameraReset(mafNode *node = NULL);
@@ -95,7 +95,7 @@ public:
   /** 
   return the status of the node within this view. es: NON_VISIBLE,VISIBLE_ON, ... 
   having mafViewCompound::GetNodeStatus allow mmgCheckTree to not know about mafSceneGraph */
-  virtual int  GetNodeStatus(mafNode *vme);
+  virtual int  GetNodeStatus(const mafNode *vme);
 
   virtual void OnSize(wxSizeEvent &event);
 

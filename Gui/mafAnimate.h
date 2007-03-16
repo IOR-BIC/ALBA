@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-21 12:18:31 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-03-16 08:26:54 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,7 +32,7 @@ mafAnimate allow to store and retrieve a particular point of view.
 class mafAnimate : public mafObserver
 {
 public:
-	mafAnimate(vtkRenderer *renderer, mafNode *vme, mafObserver *listener = NULL);
+	mafAnimate(vtkRenderer *renderer, const mafNode *vme, mafObserver *listener = NULL);
 	~mafAnimate(); 
 	void OnEvent(mafEventBase *maf_event);
 	void SetListener(mafObserver *listener) {m_Listener = listener;};
@@ -41,7 +41,7 @@ public:
 	mmgGui *GetGui() {return m_Gui;};
 
   /** set the vme that hold the tagarray where the ViewPoint are stored */
-	void SetInputVME(mafNode *vme);
+	void SetInputVME(const mafNode *vme);
 
   /** delete All entries in listbox.*/
   void ResetKit();
