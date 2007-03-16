@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-16 08:27:10 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2007-03-16 15:22:09 $
+  Version:   $Revision: 1.30 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -130,35 +130,35 @@ void mafViewCompound::CreateGuiView()
   m_GuiView->Reparent(m_Win);*/
 }
 //----------------------------------------------------------------------------
-void mafViewCompound::VmeAdd(const mafNode *node)
+void mafViewCompound::VmeAdd(mafNode *node)
 //----------------------------------------------------------------------------
 {
   for(int i=0; i<m_NumOfChildView; i++)
     m_ChildViewList[i]->VmeAdd(node);
 }
 //----------------------------------------------------------------------------
-void mafViewCompound::VmeRemove(const mafNode *node)
+void mafViewCompound::VmeRemove(mafNode *node)
 //----------------------------------------------------------------------------
 {
   for(int i=0; i<m_NumOfChildView; i++)
     m_ChildViewList[i]->VmeRemove(node);
 }
 //----------------------------------------------------------------------------
-void mafViewCompound::VmeSelect(const mafNode *node, bool select)
+void mafViewCompound::VmeSelect(mafNode *node, bool select)
 //----------------------------------------------------------------------------
 {
   for(int i=0; i<m_NumOfChildView; i++)
     m_ChildViewList[i]->VmeSelect(node, select);
 }
 //----------------------------------------------------------------------------
-void mafViewCompound::VmeShow(const mafNode *node, bool show)
+void mafViewCompound::VmeShow(mafNode *node, bool show)
 //----------------------------------------------------------------------------
 {
   for(int i=0; i<m_NumOfChildView; i++)
     m_ChildViewList[i]->VmeShow(node, show);
 }
 //----------------------------------------------------------------------------
-int mafViewCompound::GetNodeStatus(const mafNode *node)
+int mafViewCompound::GetNodeStatus(mafNode *node)
 //----------------------------------------------------------------------------
 {
   // should be redefined for compounded views

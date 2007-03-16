@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-16 08:16:17 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2007-03-16 15:22:09 $
+  Version:   $Revision: 1.22 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -75,7 +75,7 @@ void mafSceneGraph::DeleteNodeList(mafSceneNode *n)
   }
 }
 //----------------------------------------------------------------------------
-void mafSceneGraph::VmeAdd(const mafNode *vme)   
+void mafSceneGraph::VmeAdd(mafNode *vme)   
 //----------------------------------------------------------------------------
 {
 	mafSceneNode *node = NodeAdd(vme);
@@ -138,7 +138,7 @@ void mafSceneGraph::VmeAdd(const mafNode *vme)
   @@@ */
 }
 //----------------------------------------------------------------------------
-mafSceneNode *mafSceneGraph::NodeAdd(const mafNode *vme)   
+mafSceneNode *mafSceneGraph::NodeAdd(mafNode *vme)   
 //----------------------------------------------------------------------------
 {
   assert(vme);
@@ -171,7 +171,7 @@ mafSceneNode *mafSceneGraph::NodeAdd(const mafNode *vme)
   return node;
 }
 //----------------------------------------------------------------------------
-void mafSceneGraph::VmeRemove(const mafNode *vme)   
+void mafSceneGraph::VmeRemove(mafNode *vme)   
 //----------------------------------------------------------------------------
 {
   VmeShow(vme,false);
@@ -201,7 +201,7 @@ void mafSceneGraph::VmeRemove(const mafNode *vme)
 		delete node;
 }
 //----------------------------------------------------------------------------
-mafSceneNode *mafSceneGraph::Vme2Node(const mafNode *vme)   
+mafSceneNode *mafSceneGraph::Vme2Node(mafNode *vme)   
 //----------------------------------------------------------------------------
 {
   for(mafSceneNode *n = m_List; n; n=n->m_Next)
@@ -210,17 +210,17 @@ mafSceneNode *mafSceneGraph::Vme2Node(const mafNode *vme)
   return NULL;
 }
 //----------------------------------------------------------------------------
-void mafSceneGraph::VmeSelect(const mafNode *vme, bool select)   
+void mafSceneGraph::VmeSelect(mafNode *vme, bool select)   
 //----------------------------------------------------------------------------
 {
-  if(select) m_SelectedVme = (mafNode *)vme;
+  if(select) m_SelectedVme = vme;
 
 	mafSceneNode *node = Vme2Node(vme);
 	if(node == NULL) return;
   node->Select(select);
 }
 //----------------------------------------------------------------------------
-void mafSceneGraph::VmeUpdateProperty(const mafNode *vme, bool fromTag)
+void mafSceneGraph::VmeUpdateProperty(mafNode *vme, bool fromTag)
 //----------------------------------------------------------------------------
 {
   mafSceneNode *node = Vme2Node(vme);
@@ -249,7 +249,7 @@ void mafSceneGraph::SetAutoShowFlag(mafNodeBaseTypes type,  bool flag)
 }
 @@@ */
 //----------------------------------------------------------------------------
-void mafSceneGraph::VmeShow(const mafNode *vme, bool show)   
+void mafSceneGraph::VmeShow(mafNode *vme, bool show)   
 //----------------------------------------------------------------------------
 {
 	mafSceneNode *node = Vme2Node(vme);
@@ -317,7 +317,7 @@ void mafSceneGraph::VmeShowByType(mafNodeBaseTypes type,	bool show)
 @@@ */
 
 //----------------------------------------------------------------------------
-void mafSceneGraph::VmeShowByType(const mafNode *vme,  bool show)
+void mafSceneGraph::VmeShowByType(mafNode *vme,  bool show)
 //----------------------------------------------------------------------------
 {
   for(mafSceneNode *n = m_List; n; n=n->m_Next)
@@ -337,10 +337,10 @@ void mafSceneGraph::VmeShowByType(const mafNode *vme,  bool show)
 // Changed behavior.
 // Mutex vme may be shown only is no other vme of the same type is currently shown.
 // Mutex vme may always be hidden.
-void mafSceneGraph::VmeShowSubTree(const mafNode *vme,  bool show)
+void mafSceneGraph::VmeShowSubTree(mafNode *vme,  bool show)
 //----------------------------------------------------------------------------
 {
-  mafNodeIterator *iter = ((mafNode *)vme)->NewIterator();
+  mafNodeIterator *iter = vme->NewIterator();
 	for(mafNode *v = iter->GetFirstNode(); v; v = iter->GetNextNode())
 	{
     mafSceneNode *n = Vme2Node(v);
@@ -454,7 +454,7 @@ void mafSceneGraph::OnOpenCloseEvent(mafSceneNode *node)
 @@@ */
 
 //----------------------------------------------------------------------------
-int mafSceneGraph::GetNodeStatus(const mafNode *node)
+int mafSceneGraph::GetNodeStatus(mafNode *node)
 //----------------------------------------------------------------------------
 {
   if (node->IsMAFType(mafVMERoot))
@@ -463,7 +463,7 @@ int mafSceneGraph::GetNodeStatus(const mafNode *node)
   }
 
   mafSceneNode *n = Vme2Node(node);
-	if(!n )
+	if(!n)
     return NODE_NON_VISIBLE;
 
   if (!node->IsMAFType(mafVME))

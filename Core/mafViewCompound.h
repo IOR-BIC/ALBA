@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-16 08:27:10 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2007-03-16 15:22:09 $
+  Version:   $Revision: 1.24 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -78,15 +78,15 @@ public:
 
   /** 
   Add VME into plugged sub-views*/
-  virtual void VmeAdd(const mafNode *node);
+  virtual void VmeAdd(mafNode *node);
 
   /** 
   Remove VME into plugged sub-views*/
-  virtual void VmeRemove(const mafNode *node);
-  virtual void VmeSelect(const mafNode *node, bool select);
+  virtual void VmeRemove(mafNode *node);
+  virtual void VmeSelect(mafNode *node, bool select);
   /** 
   Show/Hide VMEs into plugged sub-views*/
-  virtual void VmeShow(const mafNode *node, bool show);
+  virtual void VmeShow(mafNode *node, bool show);
 	virtual void VmeUpdateProperty(mafNode *node, bool fromTag = false)		{};
 
   virtual void CameraReset(mafNode *node = NULL);
@@ -95,7 +95,7 @@ public:
   /** 
   return the status of the node within this view. es: NON_VISIBLE,VISIBLE_ON, ... 
   having mafViewCompound::GetNodeStatus allow mmgCheckTree to not know about mafSceneGraph */
-  virtual int  GetNodeStatus(const mafNode *vme);
+  virtual int  GetNodeStatus(mafNode *vme);
 
   virtual void OnSize(wxSizeEvent &event);
 
@@ -196,7 +196,7 @@ protected:
   its own widgets and define the enum of IDs for the widgets as an extension of
   the superclass enum. The last id value must be defined as "LAST_ID" to allow the 
   subclass to continue the ID enumeration from it. For appending the widgets in the
-  same pannel GUI, each CreateGUI() function should first call the superclass' one.*/
+  same panel GUI, each CreateGUI() function should first call the superclass' one.*/
   virtual mmgGui  *CreateGui();
 
   /** Arrange sub-view into the defined layout configuration.*/

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-16 08:27:00 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2007-03-16 15:21:17 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -84,14 +84,14 @@ public:
   virtual mafView*  Copy(mafObserver *Listener) {return NULL;};
   virtual void      Create() {};
 
-  virtual void			VmeAdd(const mafNode *vme)															{};
-  virtual void			VmeRemove(const mafNode *vme)														{};
-  virtual void			VmeSelect(const mafNode *vme, bool select)							{};
-  virtual void			VmeShow(const mafNode *vme, bool show)									{};
-	virtual void      VmeUpdateProperty(const mafNode *vme, bool fromTag = false)		{};
+  virtual void			VmeAdd(mafNode *vme)															{};
+  virtual void			VmeRemove(mafNode *vme)														{};
+  virtual void			VmeSelect(mafNode *vme, bool select)							{};
+  virtual void			VmeShow(mafNode *vme, bool show)									{};
+	virtual void      VmeUpdateProperty(mafNode *vme, bool fromTag = false)		{};
 
-  virtual void	    VmeCreatePipe(const mafNode *vme)										    {};
-  virtual void	    VmeDeletePipe(const mafNode *vme)										    {};
+  virtual void	    VmeCreatePipe(mafNode *vme)										    {};
+  virtual void	    VmeDeletePipe(mafNode *vme)										    {};
 
   virtual void			CameraReset(mafNode *node = NULL)  											{};
   virtual void			CameraUpdate()																					{};
@@ -111,10 +111,10 @@ public:
 
   /** return the status of the node within this view. es: NON_VISIBLE,VISIBLE_ON, ... */
   //having mafView::GetNodeStatus allow mmgCheckTree to not know about mafSceneGraph
-  virtual int GetNodeStatus(const mafNode *vme) {return NODE_NON_VISIBLE;};
+  virtual int GetNodeStatus(mafNode *vme) {return NODE_NON_VISIBLE;};
   
   /** return the current pipe for the specified vme (if any exist at this moment) */
-  virtual mafPipe* GetNodePipe(const mafNode *vme) {return NULL;};
+  virtual mafPipe* GetNodePipe(mafNode *vme) {return NULL;};
 
   wxString  GetLabel() {return m_Label;};
   wxString  GetName()  {return m_Name;};
