@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-26 09:12:46 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-03-16 08:15:04 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,12 +37,12 @@
 //@@@ #include "mflAgent.h"
 
 //----------------------------------------------------------------------------
-mafSceneNode::mafSceneNode(mafSceneGraph *sg,mafSceneNode *parent, mafNode* vme, vtkRenderer *ren, vtkRenderer *ren2)
+mafSceneNode::mafSceneNode(mafSceneGraph *sg,mafSceneNode *parent, const mafNode* vme, vtkRenderer *ren, vtkRenderer *ren2)
 //----------------------------------------------------------------------------
 {
 	m_Sg            = sg;
 	m_Parent				= parent;
-	m_Vme						= vme;
+	m_Vme						= (mafNode *)vme;
 	m_RenFront			= ren;
 	m_RenBack				= ren2;
   m_Next					= NULL;
@@ -53,11 +53,11 @@ mafSceneNode::mafSceneNode(mafSceneGraph *sg,mafSceneNode *parent, mafNode* vme,
   m_AssemblyFront = NULL;
   m_AssemblyBack  = NULL;
   
-  assert(vme);
+  assert(m_Vme);
   vtkLinearTransform *transform = NULL;
-  if(vme->IsA("mafVME"))
+  if(m_Vme->IsA("mafVME"))
   {
-    mafVME* v = ((mafVME*)vme);
+    mafVME* v = ((mafVME*)m_Vme);
     assert(v->GetOutput());
     assert(v->GetOutput()->GetTransform());
     assert(v->GetOutput()->GetTransform()->GetVTKTransform());
@@ -65,7 +65,7 @@ mafSceneNode::mafSceneNode(mafSceneGraph *sg,mafSceneNode *parent, mafNode* vme,
   }
 
   m_AssemblyFront = vtkMAFAssembly::New();
-  m_AssemblyFront->SetVme(vme);
+  m_AssemblyFront->SetVme(m_Vme);
   m_AssemblyFront->SetUserTransform(transform);
 
   if(m_RenFront != NULL) //modified by Vladik. 03-03-2004
@@ -79,7 +79,7 @@ mafSceneNode::mafSceneNode(mafSceneGraph *sg,mafSceneNode *parent, mafNode* vme,
 	if(m_RenBack != NULL)
 	{
 		m_AssemblyBack = vtkMAFAssembly::New();
-    m_AssemblyBack->SetVme(vme);
+    m_AssemblyBack->SetVme(m_Vme);
     m_AssemblyBack->SetUserTransform(transform);
     if(m_Vme->IsA("mafNodeRoot") || m_Vme->IsA("mafVMERoot")) 
 			m_RenBack->AddActor(m_AssemblyBack); 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-16 07:25:39 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-03-16 08:16:17 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,23 +40,23 @@ public:
 
 	/** 
   Add a vme to the scene graph. */
-	virtual void VmeAdd(mafNode *vme);
+	virtual void VmeAdd(const mafNode *vme);
 
 	/** 
   Remove a vme from the scene graph. */
-	virtual void VmeRemove(mafNode *vme);
+	virtual void VmeRemove(const mafNode *vme);
 
 	/** 
   Select a vme and store a reference to it into m_SelectedVme variable. */
-	virtual void VmeSelect(mafNode *vme, bool select);
+	virtual void VmeSelect(const mafNode *vme, bool select);
 
 	/** 
   Change the visibility of the vme and if necessary create the vme related pipe. */
-	virtual void VmeShow(mafNode *vme, bool show);
+	virtual void VmeShow(const mafNode *vme, bool show);
 
 	/** 
   Show/Hide the Vme with the same type of the passed vme */
-	virtual void VmeShowByType(mafNode *vme, bool show);
+	virtual void VmeShowByType(const mafNode *vme, bool show);
 
 	/** 
   Show all the same vme type. */
@@ -64,11 +64,11 @@ public:
 
 	/** 
   Show all the vme subtree. */
-	virtual void VmeShowSubTree(mafNode *vme, bool show);
+	virtual void VmeShowSubTree(const mafNode *vme, bool show);
 
 	/** 
   Update the vme's properties. */
-	virtual void VmeUpdateProperty(mafNode *vme, bool fromTag = false);
+	virtual void VmeUpdateProperty(const mafNode *vme, bool fromTag = false);
 
 	/** 
   Find the corresponding vme's node. */
@@ -116,7 +116,7 @@ protected:
 	mafNode  *m_shown_mutex_vme[NUM_OF_BASETYPE];
 */
 
-	mafSceneNode *NodeAdd(mafNode *vme);
+	mafSceneNode *NodeAdd(const mafNode *vme);
 
   mafObserver	*m_Listener;
 	mmgGui			*m_Gui;

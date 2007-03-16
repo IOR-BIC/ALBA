@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneNode.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-26 09:12:46 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-03-16 08:15:04 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,7 +28,7 @@ class mafSceneGraph;
 class mafSceneNode
 {
 public:
-								mafSceneNode(mafSceneGraph *sg, mafSceneNode *parent, mafNode* vme, vtkRenderer *ren1, vtkRenderer *ren2=NULL);
+								mafSceneNode(mafSceneGraph *sg, mafSceneNode *parent, const mafNode* vme, vtkRenderer *ren1, vtkRenderer *ren2=NULL);
   virtual      ~mafSceneNode    ();
 
   /** Call Select method for the vme's pipe. */
