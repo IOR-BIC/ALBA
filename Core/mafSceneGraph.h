@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-26 09:12:46 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-03-16 07:25:39 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -72,7 +72,7 @@ public:
 
 	/** 
   Find the corresponding vme's node. */
-	virtual mafSceneNode *Vme2Node(mafNode *vme);
+	virtual mafSceneNode *Vme2Node(const mafNode *vme);
 
   mafSceneNode	*m_List;      ///< list of visualized node
   vtkRenderer		*m_RenFront;  ///< pointer to the front renderer
@@ -97,7 +97,7 @@ public:
 
   /**
   Used by the mmgCheckTree - return the status of a SceneNode*/
-	virtual int  GetNodeStatus (mafNode *node);
+	virtual int  GetNodeStatus (const mafNode *node);
 
 	// Event to show/hide the LandmarkClouds
 	//@@@ virtual void	OnOpenCloseEvent( mafSceneNode *node );

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-20 09:54:54 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2007-03-16 07:25:39 $
+  Version:   $Revision: 1.20 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -201,7 +201,7 @@ void mafSceneGraph::VmeRemove(mafNode *vme)
 		delete node;
 }
 //----------------------------------------------------------------------------
-mafSceneNode *mafSceneGraph::Vme2Node(mafNode *vme)   
+mafSceneNode *mafSceneGraph::Vme2Node(const mafNode *vme)   
 //----------------------------------------------------------------------------
 {
   for(mafSceneNode *n = m_List; n; n=n->m_Next)
@@ -454,7 +454,7 @@ void mafSceneGraph::OnOpenCloseEvent(mafSceneNode *node)
 @@@ */
 
 //----------------------------------------------------------------------------
-int mafSceneGraph::GetNodeStatus(mafNode *node)
+int mafSceneGraph::GetNodeStatus(const mafNode *node)
 //----------------------------------------------------------------------------
 {
   if (node->IsMAFType(mafVMERoot))
@@ -466,7 +466,11 @@ int mafSceneGraph::GetNodeStatus(mafNode *node)
 	if(!n )
     return NODE_NON_VISIBLE;
 
-  mafVME *vme = mafVME::SafeDownCast(node);
+  if (!node->IsMAFType(mafVME))
+  {
+    return NODE_NON_VISIBLE;
+  }
+  mafVME *vme = (mafVME *)node;
   bool creatable = n->m_PipeCreatable && vme && !vme->GetVisualPipe().IsEmpty();
 	//landmark are not creatable
 	//if(vme->IsA("mafNodeLandmark")) creatable = false;
