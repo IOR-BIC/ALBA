@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERawMotionData.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-05 11:33:14 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-03-16 13:03:52 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni - porting Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -120,23 +120,26 @@ int mafVMERawMotionData::Read()
 			while(v_dictionary >> v_lmname)	
 			{
 			  v_dictionary >> v_segment_name;			
-        m_CurrentDlc = mafVMELandmarkCloud::SafeDownCast(this->FindInTreeByName(v_segment_name.c_str()));
-			  if (m_CurrentDlc == NULL)
+        mafVMELandmarkCloud *currentDlc;
+        currentDlc = mafVMELandmarkCloud::SafeDownCast(this->FindInTreeByName(v_segment_name.c_str()));
+			  if (currentDlc == NULL)
 			  {
 			    //Create the new cloud
-			    mafNEW(m_CurrentDlc);
-			    m_CurrentDlc->SetRadius(15);
-			    m_CurrentDlc->SetName(v_segment_name.c_str());
+			    mafNEW(currentDlc);
+			    currentDlc->SetRadius(15);
+			    currentDlc->SetName(v_segment_name.c_str());
 
 			    //Add new cloud to vme tree
-			    this->AddChild(m_CurrentDlc);
+			    this->AddChild(currentDlc);
+          if(currentDlc)
+            currentDlc->Delete();
 			  }
 						
-				m_CurrentDlc->AppendLandmark(v_lmname.c_str());
+				currentDlc->AppendLandmark(v_lmname.c_str());
 
 				for (int i = 0; i < M.rows(); i++)
 				{ 
-				  m_CurrentDlc->SetLandmark(v_lmname.c_str(),
+				  currentDlc->SetLandmark(v_lmname.c_str(),
 					                          M(i, v_current_col),						
 					                          M(i, v_current_col + 1),
 					                          M(i, v_current_col + 2), 
@@ -149,11 +152,10 @@ int mafVMERawMotionData::Read()
 							M(i, v_current_col + 2) == not_used_identifier)
 					{
 						//double value = M(i, v_current_col + 2);
-						m_CurrentDlc->SetLandmarkVisibility(v_lmname.c_str(), 0, i);
+						currentDlc->SetLandmarkVisibility(v_lmname.c_str(), 0, i);
 					}
 				}	
 				v_current_col +=  3;
-//				m_CurrentDlc = NULL;
 			}//while	
 		}//if vdict is open
 		else
@@ -171,9 +173,10 @@ int mafVMERawMotionData::Read()
     not_used_identifier = 9999;
 			
 		int current_lm = 0;
-		mafNEW(m_Dlc);
-    m_Dlc->SetName("dummy segment");
-		m_Dlc->SetRadius(15);
+    mafVMELandmarkCloud *dlc;
+		mafNEW(dlc);
+    dlc->SetName("dummy segment");
+		dlc->SetRadius(15);
     		
 	  //Create (M.columns() / 3) landmarks
 		for (int j = 0; j < M.columns(); j += 3)
@@ -182,12 +185,12 @@ int mafVMERawMotionData::Read()
 			lm_name ="lm_";
       lm_name << current_lm;
               
-			m_Dlc->AppendLandmark(lm_name);
+			dlc->AppendLandmark(lm_name);
 			current_lm++;
 
 			for (int i = 0; i < M.rows(); i++)
 			{ 
-				m_Dlc->SetLandmark(lm_name,
+				dlc->SetLandmark(lm_name,
 				M(i, j),						
 				M(i, j + 1),
 				M(i, j + 2), 
@@ -199,14 +202,14 @@ int mafVMERawMotionData::Read()
 						fabs(M(i, j + 1)) > not_used_identifier ||
 						fabs(M(i, j + 2)) > not_used_identifier)
 				{
-					m_Dlc->SetLandmarkVisibility(lm_name, 0, i);
+					dlc->SetLandmarkVisibility(lm_name, 0, i);
 				}
 			}	
 			
 		}						
-		this->AddChild(m_Dlc);						
-//		m_Dlc->Delete();
-//		m_Dlc = NULL;
+		this->AddChild(dlc);						
+		dlc->Delete();
+		dlc = NULL;
 	}//if
 	  
   return 0;

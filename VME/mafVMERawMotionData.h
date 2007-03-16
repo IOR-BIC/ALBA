@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERawMotionData.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-05 11:33:14 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-03-16 13:03:52 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni - porting Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -68,8 +68,6 @@ protected:
   mafString m_DictionaryFileName; 
   mafString m_FileName; 
   int m_Dictionary;
-  mafVMELandmarkCloud *m_CurrentDlc;
-	mafVMELandmarkCloud *m_Dlc;
 
 private:
   mafVMERawMotionData(const mafVMERawMotionData&);  // Not implemented.
