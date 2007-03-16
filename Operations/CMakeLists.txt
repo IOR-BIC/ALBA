@@ -28,8 +28,7 @@ SET(PROJECT_SRCS
 
 IF (MAF_USE_ITK)
 SET(PROJECT_SRCS  ${PROJECT_SRCS}
-  mmoRawMotionDataImporter.cpp
-  mmoRawMotionDataImporter.h
+  mmoMotionDataImporter.h
   mmoLandmarkExporter.cpp
   mmoLandmarkExporter.h
   mmoClassicICPRegistration.cpp
