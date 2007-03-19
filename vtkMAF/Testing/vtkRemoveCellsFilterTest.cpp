@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkRemoveCellsFilterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-03-15 14:45:08 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-03-19 15:29:56 $
+Version:   $Revision: 1.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -84,6 +84,7 @@ void vtkRemoveCellsFilterTest::RenderData( vtkPolyData *data )
 
 void vtkRemoveCellsFilterTest::TestRemoveMarkedCells()
 {
+  
   vtkMAFSmartPointer<vtkSphereSource> sphere;
   sphere->Update();
 
