@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkRemoveCellsFilterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-03-19 15:29:56 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-03-19 15:48:59 $
+Version:   $Revision: 1.3 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -24,16 +24,11 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkInteractorStyleSwitch.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
-#include "vtkPolyDataWriter.h"
-#include "vtkPolyDataNormals.h"
 
 #include "vtkSphereSource.h"
-#include "vtkTimerLog.h"
 #include "vtkCamera.h"
-#include "vtkProperty.h"
 #include "vtkRemoveCellsFilter.h"
 
 #include "vtkRemoveCellsFilterTest.h"

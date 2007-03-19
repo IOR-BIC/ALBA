@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkRemoveCellsFilterTest.h,v $
 Language:  C++
-Date:      $Date: 2007-03-15 14:45:08 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-03-19 15:48:59 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni, Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -20,9 +20,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <cppunit/TestResult.h>
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TestRunner.h>
-
-class vtkImageData;
-class vtkRectilinearGrid;
 
 class vtkRemoveCellsFilterTest : public CPPUNIT_NS::TestFixture
 {
