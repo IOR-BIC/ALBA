@@ -33,6 +33,8 @@ IF (MAF_USE_VTK)
     mmoCreateSlicer.h
     mmoCreateSpline.cpp
     mmoCreateSpline.h
+    mmoRemoveCells.cpp
+    mmoRemoveCells.h
     mmoEditMetadata.cpp
     mmoEditMetadata.h
     mmoExplodeCollapse.cpp
