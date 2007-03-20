@@ -141,6 +141,8 @@ SET(PROJECT_SRCS
   mmiPER.h
   mmiPicker.cpp
   mmiPicker.h
+  mmiSelectCell.cpp
+  mmiSelectCell.h
   mmiSER.cpp
   mmiSER.h
 )

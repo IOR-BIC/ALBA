@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiSelectCell.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-20 18:42:48 $
-  Version:   $Revision: 1.1 $
-  Authors:   Paolo Quadrani & Marco Petrone
+  Date:      $Date: 2007-03-20 18:45:43 $
+  Version:   $Revision: 1.2 $
+  Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
