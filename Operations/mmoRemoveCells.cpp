@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoRemoveCells.cpp,v $
 Language:  C++
-Date:      $Date: 2007-03-20 18:49:05 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-03-20 21:08:52 $
+Version:   $Revision: 1.3 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -219,7 +219,7 @@ void mmoRemoveCells::CreateOpDialog()
 
   wxStaticText *help  = new wxStaticText(m_Dialog,-1, "Use CTRL to select cells");
 
-  mmgButton  *unselect =    new mmgButton(m_Dialog, ID_UNSELECT,    "unselect all", p,wxSize(80,20));
+  mmgButton  *unselectAllButton =    new mmgButton(m_Dialog, ID_UNSELECT,    "unselect all", p,wxSize(80,20));
   // mmgButton  *b_fit =    new mmgButton(m_Dialog, ID_FIT,    "reset camera", p,wxSize(80,20));
   mmgButton  *ok =     new mmgButton(m_Dialog, ID_OK,     "ok", p, wxSize(80,20));
   mmgButton  *cancel = new mmgButton(m_Dialog, ID_CANCEL, "cancel", p, wxSize(80,20));
@@ -227,10 +227,13 @@ void mmoRemoveCells::CreateOpDialog()
   diameter->SetValidator(mmgValidator(this,ID_DIAMETER,diameter,&m_Diameter,m_MinBrushSize,m_MaxBrushMSize));
   unselect->SetValidator(mmgValidator(this, ID_DELETE, unselect, &m_UnselectCells));
 
-  unselect->SetValidator(mmgValidator(this,ID_UNSELECT,unselect));
+  unselectAllButton->SetValidator(mmgValidator(this,ID_UNSELECT,unselectAllButton));
   // b_fit->SetValidator(mmgValidator(this,ID_FIT,b_fit));
   ok->SetValidator(mmgValidator(this,ID_OK,ok));
   cancel->SetValidator(mmgValidator(this,ID_CANCEL,cancel));
+
+  wxBoxSizer *h_sizer0 = new wxBoxSizer(wxHORIZONTAL);
+  h_sizer0->Add(help,     0,wxRIGHT);	
 
   wxBoxSizer *h_sizer1 = new wxBoxSizer(wxHORIZONTAL);
   h_sizer1->Add(brushSize,     0,wxRIGHT);	
@@ -238,20 +241,16 @@ void mmoRemoveCells::CreateOpDialog()
   h_sizer1->Add(foo,     0,wxRIGHT);	
   h_sizer1->Add(unselect,     0,wxRIGHT);	
 
-  wxBoxSizer *h_sizer0 = new wxBoxSizer(wxHORIZONTAL);
-  h_sizer0->Add(help,     0,wxRIGHT);	
-
-  wxBoxSizer *h_sizer3 = new wxBoxSizer(wxHORIZONTAL);
-  h_sizer3->Add(unselect,     0,wxRIGHT);	
-  h_sizer3->Add(ok,      0,wxRIGHT);
-  h_sizer3->Add(cancel,  0,wxRIGHT);
-  
-
+  wxBoxSizer *h_sizer2 = new wxBoxSizer(wxHORIZONTAL);
+  h_sizer2->Add(unselectAllButton,     0,wxRIGHT);	
+  h_sizer2->Add(ok,      0,wxRIGHT);
+  h_sizer2->Add(cancel,  0,wxRIGHT);
+ 
   wxBoxSizer *v_sizer =  new wxBoxSizer( wxVERTICAL );
   v_sizer->Add(m_Rwi->m_RwiBase, 1,wxEXPAND);
   v_sizer->Add(h_sizer0,     0,wxEXPAND | wxALL,5);
   v_sizer->Add(h_sizer1,     0,wxEXPAND | wxALL,5);
-  v_sizer->Add(h_sizer3,     0,wxEXPAND | wxALL,5);
+  v_sizer->Add(h_sizer2,     0,wxEXPAND | wxALL,5);
 
   m_Dialog->Add(v_sizer, 1, wxEXPAND);
 
