@@ -43,6 +43,10 @@ IF (MAF_USE_VTK)
     mmoExtractIsosurface.h
     mmoFilterSurface.cpp
     mmoFilterSurface.h
+    mmoDecimateSurface.cpp
+    mmoDecimateSurface.h
+    mmoConnectivitySurface.cpp
+    mmoConnectivitySurface.h
     mmoFilterVolume.cpp
     mmoFilterVolume.h
     mmoImageImporter.cpp
@@ -79,6 +83,8 @@ IF (MAF_USE_VTK)
     mmoVTKImporter.h
     mmoCrop.cpp
     mmoCrop.h
+    mmoBooleanSurface.cpp
+    mmoBooleanSurface.h
   )
 ENDIF (MAF_USE_VTK)
 
