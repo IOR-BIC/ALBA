@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-16 14:37:12 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2007-03-21 09:39:18 $
+  Version:   $Revision: 1.28 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,6 +32,8 @@
 
 #include "mmdMouse.h"
 
+#include "mafTagArray.h"
+#include "mafTagItem.h"
 #include "mafNode.h"
 
 //------------------------------------------------------------------------------
@@ -507,7 +509,15 @@ void mafOpManager::OpRun(mafOp *op, void *op_param)
 //----------------------------------------------------------------------------
 {
 	//Code to manage operation's Input Preserving
-	if(!op->IsInputPreserving())
+  mafTagItem *ti = NULL;
+  mafString tag_nature = "";
+  if (m_Selected->GetTagArray()->IsTagPresent("VME_NATURE"))
+  {
+    ti = m_Selected->GetTagArray()->GetTag("VME_NATURE");
+    tag_nature = ti->GetValue();
+  }
+  
+	if(!tag_nature.IsEmpty() && tag_nature.Equals("NATURAL") && !op->IsInputPreserving())
 	{
 		wxString warning_msg = "The operation do not preserve input VME integrity, a copy is required! \nThis should take a lot of memory and time depending on data dimension. \nDo you want to make a copy?";
 		wxMessageDialog dialog(mafGetFrame(),warning_msg, "VME Preserving Warning",wxYES_NO|wxYES_DEFAULT);
@@ -518,6 +528,9 @@ void mafOpManager::OpRun(mafOp *op, void *op_param)
       synthetic_vme->ReparentTo(m_Selected->GetParent());
       synthetic_name.Append(m_Selected->GetName());
       synthetic_vme->SetName(synthetic_name);
+      ti = synthetic_vme->GetTagArray()->GetTag("VME_NATURE");
+      ti->SetValue("SYNTHETIC");
+      mafEventMacro(mafEvent(this,VME_SHOW,m_Selected,false));
       OpSelect(synthetic_vme);
       mafEventMacro(mafEvent(this,VME_SHOW,synthetic_vme,true));
     }
