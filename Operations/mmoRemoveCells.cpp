@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoRemoveCells.cpp,v $
 Language:  C++
-Date:      $Date: 2007-03-20 21:08:52 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-03-21 11:36:07 $
+Version:   $Revision: 1.4 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -189,21 +189,25 @@ void mmoRemoveCells::CreateOpDialog()
 
   //===== setup interface ====
   m_Dialog = new mmgDialog("Remove Cells", mafCLOSEWINDOW | mafRESIZABLE);
-
-  m_VtkRenderer = vtkRenderer::New();
-
+  
   m_Rwi = new mafRWI(m_Dialog,ONE_LAYER,false);
   m_Rwi->SetListener(this);
   m_Rwi->CameraSet(CAMERA_PERSPECTIVE);
 
   m_Rwi->m_RenderWindow->SetDesiredUpdateRate(0.0001f);
   m_Rwi->SetSize(0,0,800,800);
-  m_Rwi->m_RenderWindow->AddRenderer(m_VtkRenderer);
   m_Rwi->Show(true);
   m_Rwi->m_RwiBase->SetMouse(m_Mouse);
 
-  m_VtkRenderer->AddActor(m_PolydataActor);
-  m_VtkRenderer->ResetCamera();
+  m_Rwi->m_RenFront->AddActor(m_PolydataActor);
+
+  vtkPolyData *polydata = vtkPolyData::SafeDownCast(((mafVME *)m_Input)->GetOutput()->GetVTKData());
+ 
+  double bounds[6] = {0,0,0,0,0,0};
+  polydata->GetBounds(bounds);
+
+  m_Rwi->m_RenFront->ResetCamera(polydata->GetBounds());
+  m_Rwi->m_RenFront->ResetCameraClippingRange(bounds);
 
   mafNEW(m_SelectCellInteractor);
 
@@ -220,7 +224,7 @@ void mmoRemoveCells::CreateOpDialog()
   wxStaticText *help  = new wxStaticText(m_Dialog,-1, "Use CTRL to select cells");
 
   mmgButton  *unselectAllButton =    new mmgButton(m_Dialog, ID_UNSELECT,    "unselect all", p,wxSize(80,20));
-  // mmgButton  *b_fit =    new mmgButton(m_Dialog, ID_FIT,    "reset camera", p,wxSize(80,20));
+  mmgButton  *b_fit =    new mmgButton(m_Dialog, ID_FIT,    "reset camera", p,wxSize(80,20));
   mmgButton  *ok =     new mmgButton(m_Dialog, ID_OK,     "ok", p, wxSize(80,20));
   mmgButton  *cancel = new mmgButton(m_Dialog, ID_CANCEL, "cancel", p, wxSize(80,20));
 
@@ -228,7 +232,7 @@ void mmoRemoveCells::CreateOpDialog()
   unselect->SetValidator(mmgValidator(this, ID_DELETE, unselect, &m_UnselectCells));
 
   unselectAllButton->SetValidator(mmgValidator(this,ID_UNSELECT,unselectAllButton));
-  // b_fit->SetValidator(mmgValidator(this,ID_FIT,b_fit));
+  b_fit->SetValidator(mmgValidator(this,ID_FIT,b_fit));
   ok->SetValidator(mmgValidator(this,ID_OK,ok));
   cancel->SetValidator(mmgValidator(this,ID_CANCEL,cancel));
 
@@ -243,6 +247,7 @@ void mmoRemoveCells::CreateOpDialog()
 
   wxBoxSizer *h_sizer2 = new wxBoxSizer(wxHORIZONTAL);
   h_sizer2->Add(unselectAllButton,     0,wxRIGHT);	
+  h_sizer2->Add(b_fit,     0,wxRIGHT);	
   h_sizer2->Add(ok,      0,wxRIGHT);
   h_sizer2->Add(cancel,  0,wxRIGHT);
  
@@ -287,10 +292,6 @@ void mmoRemoveCells::DeleteOpDialog()
 
   mafDEL(m_SelectCellInteractor);
 
-  m_VtkRenderer->RemoveActor(m_PolydataActor);
-  m_Rwi->m_RenderWindow->RemoveRenderer(m_VtkRenderer);
-
-  vtkDEL(m_VtkRenderer);
   vtkDEL(m_PolydataMapper);
   vtkDEL(m_PolydataActor);
   vtkDEL(m_rcf);
@@ -322,7 +323,17 @@ void mmoRemoveCells::OnEvent(mafEventBase *maf_event)
       break;
 
       case ID_FIT:
+      {
+        vtkPolyData *polydata = vtkPolyData::SafeDownCast(((mafVME *)m_Input)->GetOutput()->GetVTKData());
+
+        double bounds[6] = {0,0,0,0,0,0};
+        polydata->GetBounds(bounds);
+
+        m_Rwi->m_RenFront->ResetCamera(polydata->GetBounds());
+        m_Rwi->m_RenFront->ResetCameraClippingRange(bounds);
+
         m_Rwi->m_RenderWindow->Render();
+      }
       break;
 
       case VME_PICKED:

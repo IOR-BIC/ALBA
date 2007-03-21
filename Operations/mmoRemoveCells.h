@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRemoveCells.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-20 18:39:44 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-03-21 11:36:07 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -106,7 +106,6 @@ protected:
 
   mmgDialog		*m_Dialog;
 	mafRWI      *m_Rwi;
-  vtkRenderer *m_VtkRenderer;
   vtkPolyDataMapper *m_PolydataMapper;
   vtkActor          *m_PolydataActor;
   mmiSelectCell *m_SelectCellInteractor;
