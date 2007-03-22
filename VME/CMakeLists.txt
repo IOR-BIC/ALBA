@@ -10,6 +10,8 @@ SET(PROJECT_SRCS
   medVMEFactory.h
   medPipeFactoryVME.cpp
   medPipeFactoryVME.h
+  medPipeGraph.cpp
+  medPipeGraph.h
   medPipeVolumeMIP.cpp
   medPipeVolumeMIP.h
   medPipeDensityDistance.cpp
