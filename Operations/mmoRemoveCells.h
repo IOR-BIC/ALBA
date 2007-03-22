@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRemoveCells.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-21 11:36:07 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-03-22 12:15:55 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -48,16 +48,23 @@ class vtkRemoveCellsFilter;
 //----------------------------------------------------------------------------
 // mmoRemoveCells :
 //----------------------------------------------------------------------------
-/** */
+/** 
+Perform cells selection and removing on surfaces.
+CTRL modifier must be used in order to select cells in render window while
+performing mouse dragging.
+This operation assumes that input polygonal data is made of triangles only.
+*/
 class mmoRemoveCells: public mafOp
 {
 public:
-	mmoRemoveCells(wxString label = "RemoveCells");
+	
+  mmoRemoveCells(wxString label = "RemoveCells");
  ~mmoRemoveCells(); 
 	
   mafTypeMacro(mmoRemoveCells, mafOp);
 
   mafOp* Copy();
+
   void OnEvent(mafEventBase *maf_event);
 
 	/** Return true for the acceptable vme type. */
@@ -66,20 +73,26 @@ public:
 	/** Builds operation's interface by calling CreateOpDialog() method. */
   void OpRun();
 
-  void RemoveCells();
-
 	/** Execute the operation. */
   void OpDo();
 
 	/** Makes the undo for the operation. */
   void OpUndo();
 
+  /** testing functions:this could be used from the commandline */
+
+  /** set the seed ie the cell originating the selection area */
   void SetSeed(vtkIdType cellSeed);
-  void MarkCells();
 
   /** Set the selection region radius */
   double GetDiameter() const { return m_Diameter; };
   void SetDiameter(double val) {m_Diameter = val;};
+
+  /** Mark cells to be removed */
+  void MarkCells();
+
+  /** performs cells removing */
+  void RemoveCells();
 
 protected:
 
