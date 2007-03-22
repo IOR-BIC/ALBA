@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-09 16:25:44 $
-  Version:   $Revision: 1.98 $
+  Date:      $Date: 2007-03-22 15:08:50 $
+  Version:   $Revision: 1.99 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -598,6 +598,9 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       case VME_CHOOSE_MATERIAL:
         VmeChooseMaterial((mafVME *)e->GetVme(), e->GetBool());
       break;
+      case UPDATE_PROPERTY:
+        VmeUpdateProperties((mafVME *)e->GetVme(), e->GetBool());
+        break;
       case SHOW_CONTEXTUAL_MENU:
         if (e->GetSender() == m_SideBar->GetTree())
           TreeContextualMenu(*e);
@@ -1392,6 +1395,14 @@ void mafLogicWithManagers::VmeChooseMaterial(mafVME *vme, bool updateProperty)
     this->m_ViewManager->CameraUpdate();
     this->m_VMEManager->MSFModified(true);
   }
+}
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::VmeUpdateProperties(mafVME *vme, bool updateProperty)
+//----------------------------------------------------------------------------
+{
+  this->m_ViewManager->PropertyUpdate(updateProperty);
+  this->m_ViewManager->CameraUpdate();
+  this->m_VMEManager->MSFModified(true);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::ViewContextualMenu(bool vme_menu)

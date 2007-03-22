@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2007-02-28 13:47:44 $
-  Version:   $Revision: 1.32 $
+  Date:      $Date: 2007-03-22 15:08:50 $
+  Version:   $Revision: 1.33 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -207,7 +207,10 @@ protected:
 
   /** Build a dialog to show all available materials. */	
   virtual void VmeChooseMaterial(mafVME *vme, bool updateProperty);
-	
+
+  //Update Vme Visual Properties
+  virtual void VmeUpdateProperties(mafVME *vme, bool updateProperty);
+
   /** Called when an operation starts. Disable all menu and lock the Selection */ 
 	virtual void OpRunStarting();
   /** Called when an operation stops. Re-enable all menu and unlock the Selection */ 
