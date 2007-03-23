@@ -3,7 +3,7 @@
   Program:   Visualization Toolkit
   Module:    vtkCellsFilter.h
   Language:  C++
-  RCS:   $Id: vtkCellsFilter.h,v 1.1 2007-03-15 14:44:04 ior01 Exp $
+  RCS:   $Id: vtkCellsFilter.h,v 1.2 2007-03-23 13:29:28 aqd0 Exp $
 
   Copyright (c) Goodwin Lawlor 2004
   All rights reserved.
@@ -38,7 +38,7 @@ class VTK_vtkMAF_EXPORT vtkCellsFilter : public vtkPolyDataToPolyDataFilter
 {
 
 public:
-
+  static vtkCellsFilter *New();
   vtkTypeRevisionMacro(vtkCellsFilter, vtkPolyDataToPolyDataFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
   

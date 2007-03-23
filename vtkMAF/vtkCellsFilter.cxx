@@ -3,7 +3,7 @@
   Program:   Visualization Toolkit
   Module:    vtkCellsFilter.cxx
   Language:  C++
-  Version:   $Id: vtkCellsFilter.cxx,v 1.1 2007-03-15 14:44:04 ior01 Exp $
+  Version:   $Id: vtkCellsFilter.cxx,v 1.2 2007-03-23 13:29:28 aqd0 Exp $
 
   Copyright (c) 2004 Goodwin Lawlor
   All rights reserved.
@@ -28,7 +28,8 @@
 #include "vtkCharArray.h"
 #include "vtkLookupTable.h"
 
-vtkCxxRevisionMacro(vtkCellsFilter, "$Revision: 1.1 $");  
+vtkCxxRevisionMacro(vtkCellsFilter, "$Revision: 1.2 $");  
+vtkStandardNewMacro(vtkCellsFilter);
 
 // Constructs with initial  values.
 vtkCellsFilter::vtkCellsFilter()
