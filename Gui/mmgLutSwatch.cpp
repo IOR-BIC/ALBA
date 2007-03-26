@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutSwatch.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-03-26 14:13:57 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -184,7 +184,7 @@ void mmgLutSwatch::Update()
   
   float num = m_Lut->GetNumberOfTableValues();
 
-  unsigned char *data = new unsigned char[w*h*3];
+  unsigned char *data = (unsigned char*)malloc(sizeof(unsigned char)*w*h*3);
   unsigned char *p = data;
 
   int x,y;
