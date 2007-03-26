@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERefSys.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-26 09:10:29 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-03-26 14:13:12 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -611,6 +611,9 @@ void mafVMERefSys::InternalUpdate()
 		mafMatrix c;
 		mafMatrix::Multiply4x4(b,a,c);
 
+    vtkDEL(matrix_rotation);
+    vtkDEL(matrix_translation);
+
 		this->SetMatrix(c);
 		
 	}
@@ -637,6 +640,8 @@ void mafVMERefSys::InternalUpdate()
 
 		mafMatrix b;
 		b.SetVTKMatrix(matrix_translation);
+
+    vtkDEL(matrix_translation);
 		
 		this->SetMatrix(b);
 	}
@@ -647,12 +652,14 @@ void mafVMERefSys::InternalUpdate()
 
 		mafMatrix b;
 		b.SetVTKMatrix(matrix_translation);
+    vtkDEL(matrix_translation);
 		
 		this->SetMatrix(b);
 	}
 
 	mafEvent *e	= new mafEvent(this,CAMERA_UPDATE);
   ForwardUpEvent(e);
+  delete e;
 	this->Modified();
 }
 //-------------------------------------------------------------------------
