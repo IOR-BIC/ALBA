@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-22 17:55:25 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-03-26 07:42:14 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,15 +50,9 @@ public:
 
   virtual void Create(mafSceneNode *n);
 
+  //Create plots of scalar data
   void medPipeGraph::UpdateGraph();
   
-  //return data to plot
-  std::vector<vtkRectilinearGrid*>  GetScalarData(mafSceneNode *n);
-
-  std::vector<vtkDoubleArray*> medPipeGraph::GetScalarArray();
-
-  vtkDoubleArray *medPipeGraph::GetTimeArray();
-
   void medPipeGraph::OnEvent(mafEventBase *maf_event); 
   
 protected:
@@ -87,21 +81,21 @@ private:
 
   double m_OldColour[3];
 
-  double			m_xmin;
-  double			m_xmax;
-  double			m_ymin;
-  double			m_ymax;
-  int				m_xlabel;
-  int				m_ylabel;
+  double			m_Xmin;
+  double			m_Xmax;
+  double			m_Ymin;
+  double			m_Ymax;
+  int				m_Xlabel;
+  int				m_Ylabel;
 
-  wxString		m_x_title;
-  wxString		m_y_title;
+  wxString		m_X_title;
+  wxString		m_Y_title;
 
   std::vector<vtkRectilinearGrid*> m_vtkData;
 
-  std::vector<vtkDoubleArray*> scalar_array;
+  std::vector<vtkDoubleArray*> scalar_Array;
  
-  vtkDoubleArray      *time_array;
+  vtkDoubleArray      *time_Array;
   std::vector<mafTimeStamp> m_TimeVector;  
 
 

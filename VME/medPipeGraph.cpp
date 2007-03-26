@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-22 17:55:25 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-03-26 07:42:14 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -15,7 +15,7 @@
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
-// Failing in doing this will result in a run-time_array error saying:
+// Failing in doing this will result in a run-time_Array error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
@@ -83,15 +83,15 @@ medPipeGraph::medPipeGraph()
   m_CheckBox  = NULL;
   m_Legend    = FALSE;
 
-  m_xmin			= 0;
-  m_xmax			= 0;
-  m_ymin			= 0;
-  m_ymax			= 0;
-  m_xlabel		= 10;
-  m_ylabel		= 10;
+  m_Xmin			= 0;
+  m_Xmax			= 0;
+  m_Ymin			= 0;
+  m_Ymax			= 0;
+  m_Xlabel		= 10;
+  m_Ylabel		= 10;
 
-  m_x_title		= "Time";
-  m_y_title		= "Scalar";
+  m_X_title		= "Time";
+  m_Y_title		= "Scalar";
  
 }
 //----------------------------------------------------------------------------
@@ -115,12 +115,12 @@ void medPipeGraph::Create(mafSceneNode *n)
   m_Emg_plot->Update();
   m_Emg_plot->GetTimeStamps(m_TimeVector);
   
-  time_array = vtkDoubleArray::New();
+  time_Array = vtkDoubleArray::New();
   
   mafTimeStamp t;
   for (t = 1; t < m_TimeVector.size(); t++)
   {
-    time_array->InsertNextValue(m_TimeVector[t]);
+    time_Array->InsertNextValue(m_TimeVector[t]);
   }  
   
   vtkNEW(m_Actor1);
@@ -140,8 +140,8 @@ void medPipeGraph::Create(mafSceneNode *n)
   m_Actor1->SetAxisTitleTextProperty(tProp);
   m_Actor1->SetAxisLabelTextProperty(tProp);
   m_Actor1->SetTitleTextProperty(tProp);	
-  m_Actor1->SetXTitle(m_x_title);
-  m_Actor1->SetYTitle(m_y_title);
+  m_Actor1->SetXTitle(m_X_title);
+  m_Actor1->SetYTitle(m_Y_title);
 
   m_LegendBox_Actor = m_Actor1->GetLegendBoxActor();
 
@@ -195,7 +195,7 @@ void medPipeGraph::UpdateGraph()
   vtkDoubleArray *scalar;
   scalar = vtkDoubleArray::New();
   m_vtkData.clear();
-  scalar_array.clear();
+  scalar_Array.clear();
 
   mafVMEScalar *m_Emg_plot = mafVMEScalar::SafeDownCast(m_Vme);
   
@@ -226,14 +226,14 @@ void medPipeGraph::UpdateGraph()
         scalar->InsertValue(counter,scalar_data);
         counter++;
       }
-      scalar_array.push_back(scalar);
+      scalar_Array.push_back(scalar);
           
       vtkRectilinearGrid *rect_grid;
       rect_grid = vtkRectilinearGrid::New();
 
       rect_grid->SetDimensions(x_dim, 1, 1);
-      rect_grid->SetXCoordinates(time_array); 
-      rect_grid->GetPointData()->SetScalars(scalar_array.at(counter_array));
+      rect_grid->SetXCoordinates(time_Array); 
+      rect_grid->GetPointData()->SetScalars(scalar_Array.at(counter_array));
       
       m_vtkData.push_back(rect_grid);
       m_Actor1->AddInput(m_vtkData.at(counter_array));
@@ -242,58 +242,37 @@ void medPipeGraph::UpdateGraph()
   }
 
   double times_range[2];
-  time_array->GetRange(times_range);
+  time_Array->GetRange(times_range);
 
   double data_range[2];
   for (unsigned long i = 0; i < m_vtkData.size(); i++)
   {
-    scalar_array.at(i)->GetRange(data_range);
+    scalar_Array.at(i)->GetRange(data_range);
 
-    if(m_ymin > data_range[0])
-      m_ymin = data_range[0];
+    if(m_Ymin > data_range[0])
+      m_Ymin = data_range[0];
 
-    if(m_ymax < data_range[1])
-      m_ymax = data_range[1];
+    if(m_Ymax < data_range[1])
+      m_Ymax = data_range[1];
   }
 
-  if(m_xmin > times_range[0])
-    m_xmin = times_range[0];
+  if(m_Xmin > times_range[0])
+    m_Xmin = times_range[0];
 
-  if(m_xmax < times_range[1])
-    m_xmax = times_range[1];
+  if(m_Xmax < times_range[1])
+    m_Xmax = times_range[1];
 
-  m_Actor1->SetPlotRange(m_xmin, m_ymin, m_xmax, m_ymax); 
+  m_Actor1->SetPlotRange(m_Xmin, m_Ymin, m_Xmax, m_Ymax); 
 
-  m_xmin = 0;
-  m_ymin = 0;
-  m_xmax = 0;
-  m_ymax = 0;
+  m_Xmin = 0;
+  m_Ymin = 0;
+  m_Xmax = 0;
+  m_Ymax = 0;
 
-  m_Actor1->SetNumberOfXLabels(m_xlabel);
-  m_Actor1->SetNumberOfYLabels(m_ylabel);
+  m_Actor1->SetNumberOfXLabels(m_Xlabel);
+  m_Actor1->SetNumberOfYLabels(m_Ylabel);
 
   m_RenFront->AddActor2D(m_Actor1);
-}
-
-//----------------------------------------------------------------------------
-std::vector<vtkRectilinearGrid*> medPipeGraph::GetScalarData(mafSceneNode *n)
-//----------------------------------------------------------------------------
-{
-  Create(n);
-  return m_vtkData;
-}
-
-//----------------------------------------------------------------------------
-std::vector<vtkDoubleArray*> medPipeGraph::GetScalarArray()
-//----------------------------------------------------------------------------
-{
-  return scalar_array;
-}
-//----------------------------------------------------------------------------
-vtkDoubleArray *medPipeGraph::GetTimeArray()
-//----------------------------------------------------------------------------
-{
-  return time_array;
 }
 //----------------------------------------------------------------------------
 mmgGui* medPipeGraph::CreateGui()
