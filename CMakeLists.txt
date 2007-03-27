@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2007-02-16 13:21:22 $
-# Version:   $Revision: 1.38 $
+# Date:      $Date: 2007-03-27 08:15:36 $
+# Version:   $Revision: 1.39 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -63,10 +63,14 @@ ENDIF(WIN32)
 # Options for MAF building
 #-----------------------------------------------------------------------------
 #Remove temporarily the BUILD_SHARED_LIBS because it is not possible to switch the compilation to dynamic.
-SET(BUILD_SHARED_LIBS 0)
-#OPTION(BUILD_SHARED_LIBS "Build with shared libraries." 0 )
+#SET(BUILD_SHARED_LIBS 0)
+OPTION(BUILD_SHARED_LIBS "Build with shared libraries." 0 )
 OPTION(BUILD_EXAMPLES "Build examples." ON )
 OPTION(BUILD_TESTING "Build the testing tree." OFF)
+
+MARK_AS_ADVANCED (
+  BUILD_SHARED_LIBS
+)
 
 SET (CONFIGURE_ERROR 0)
 
