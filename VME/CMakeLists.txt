@@ -10,8 +10,7 @@ SET(PROJECT_SRCS
   medVMEFactory.h
   medPipeFactoryVME.cpp
   medPipeFactoryVME.h
-  medPipeGraph.cpp
-  medPipeGraph.h
+
   medPipeVolumeMIP.cpp
   medPipeVolumeMIP.h
   medPipeDensityDistance.cpp
@@ -32,6 +31,8 @@ IF (MAF_USE_ITK)
 SET(PROJECT_SRCS  ${PROJECT_SRCS}
   mafVMERawMotionData.cpp
   mafVMERawMotionData.h
+  medPipeGraph.cpp
+  medPipeGraph.h
 )
 ENDIF (MAF_USE_ITK)
 
