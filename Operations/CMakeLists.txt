@@ -28,6 +28,8 @@ SET(PROJECT_SRCS
 
 IF (MAF_USE_ITK)
 SET(PROJECT_SRCS  ${PROJECT_SRCS}
+  itkRawMotionImporterUtility.cxx
+  itkRawMotionImporterUtility.h
   mmoMotionDataImporter.h
   mmoLandmarkExporter.cpp
   mmoLandmarkExporter.h
@@ -39,7 +41,6 @@ SET(PROJECT_SRCS  ${PROJECT_SRCS}
   mmoEMGImporterWS.h
   mmoGRFImporterWS.cpp
   mmoGRFImporterWS.h
-
 )
 ENDIF (MAF_USE_ITK)
 
