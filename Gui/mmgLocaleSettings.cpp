@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgLocaleSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-03-08 13:24:23 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2007-03-29 09:12:15 $
+Version:   $Revision: 1.7 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -39,6 +39,7 @@ mmgLocaleSettings::mmgLocaleSettings(mafObserver *Listener)
   m_Gui = new mmgGui(this);   
   m_Gui->Label(_("User Interface Language"));
   m_Gui->Radio(LANGUAGE_ID,"", &m_LanguageId,5,lang_array);
+	m_Gui->Enable(LANGUAGE_ID,false); //29-03-2007 disabling for bug #218
   m_Gui->Label(_("changes will take effect when \nthe application restart"),false,true);
   m_Gui->Label("");
 }
