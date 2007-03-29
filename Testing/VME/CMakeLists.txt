@@ -2,7 +2,7 @@ PROJECT (MedicalVME_TEST)
 
 LINK_LIBRARIES(medVME)
 LINK_LIBRARIES(medCommon)
-
+LINK_LIBRARIES(medOperations)
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework
 #-----------------------------------------------------------------------------
