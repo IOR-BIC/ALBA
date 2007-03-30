@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafICPUtility.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-30 10:49:47 $
-  Version:   $Revision: 1.3 $
-  Authors:   Paolo Quadrani porting Matteo Giacomoni    
+  Date:      $Date: 2007-03-30 10:52:50 $
+  Version:   $Revision: 1.4 $
+  Authors:   Andrea Cutti porting Matteo Giacomoni    
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -95,7 +95,7 @@ protected:
   ~mafICPUtility() {};
 };
 
-vtkCxxRevisionMacro(mafICPUtility, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(mafICPUtility, "$Revision: 1.4 $");
   vtkStandardNewMacro(mafICPUtility);
 //----------------------------------------------------------------------------
 inline vnl_matrix<double> mafICPUtility::PolyData2VnlFilter(vtkPolyData* Shape)
