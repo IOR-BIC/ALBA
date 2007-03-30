@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTree.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-03-30 10:55:31 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -55,14 +55,14 @@ but this will mean that mmgTree has some knowledge on the node objects
 thus making mmgTree non-general-purposes and also that
 every node can be connected to one mmgTree only.
 
-The solution adopted here is to store all the wxTreeCtrlItem in a HashTable (m_table)
+The solution adopted here is to store all the wxTreeCtrlItem in a HashTable (m_NodeTable)
 indexed by the node_id's. Thus explicit conversion between node_ids and items has to be addressed.
 
-ItemFromNode is implemented using m_table. Note that wxHashTable store only object 
+ItemFromNode is implemented using m_NodeTable. Note that wxHashTable store only object 
 of type mmgTreeTableElement so a new class mmgTreeTableItem was derived from wxHashTableItem
 to store a pointer to wxTreeCtrlItem
 
-NodeFromItem may be implemented searching all the elements in m_table but this
+NodeFromItem may be implemented searching all the elements in m_NodeTable but this
 will be time-consuming, another solution is to store the node_id in the item.
 Items may store user-data in a class derived from wxTreeItemData, so a class mmgTreeItemData
 was created for this purposes. A new mmgTreeItemData object is created every time 
@@ -83,9 +83,9 @@ recursively move all the item in the subtree, and then delete the old item.Durin
 the HasChildren flag, the IsExpanded flag and the HashTable contents has to be kept consistent.
 
 Deleting a node:
-Deleting an item destroy all the sub-items,leaving the m_table inconsistent.
+Deleting an item destroy all the sub-items,leaving the m_NodeTable inconsistent.
 To correctly implement the operation, DeleteNode must call itself recursively on the 
-item subtree, then Delete the item and remove the corresponding m_table entry. 
+item subtree, then Delete the item and remove the corresponding m_NodeTable entry. 
 */
 class mmgTree: public mmgNamedPanel
 {
@@ -134,10 +134,10 @@ public:
   void SortChildren(long node_id =0);
 
   /** if autosort is on - the tree is always kept sorted */
-  void SetAutoSort(bool enable) {m_autosort=enable;};
+  void SetAutoSort(bool enable) {m_Autosort=enable;};
 
   /** Get the autosort flag. */
-  bool GetAutoSort() {return m_autosort;};
+  bool GetAutoSort() {return m_Autosort;};
 
   /** collapse the children of node_id */
   void CollapseNode(long node_id);
@@ -155,14 +155,14 @@ public:
   long NodeFromItem(wxTreeItemId& item);
   
   
-  void SetTreeStyle(long style) {m_tree->SetWindowStyle(style);};
-  long GetTreeStyle()           {return m_tree->GetWindowStyle();};
+  void SetTreeStyle(long style) {m_NodeTree->SetWindowStyle(style);};
+  long GetTreeStyle()           {return m_NodeTree->GetWindowStyle();};
 
 protected:
   /** Private function that notify the Listener of node selection and deselection. */
   virtual void OnSelectionChanged(wxTreeEvent& event);
   
-	/** When tree is used on a wxNotebook m_tree must be called on Sizing . */
+	/** When tree is used on a wxNotebook m_NodeTree must be called on Sizing . */
   void OnSize(wxSizeEvent& event);
 
 	/** Return true if node exist. */
@@ -179,12 +179,12 @@ protected:
 
   bool IsRootHidden() {return (GetTreeStyle() & wxTR_HIDE_ROOT) != 0; };
 
-  bool               m_prevent_notify;
-  bool               m_autosort;
-  long               m_root;
-  wxTreeCtrl        *m_tree;         
-  wxImageList       *m_images;       
-  wxHashTable       *m_table;        
+  bool               m_PreventNotify;
+  bool               m_Autosort;
+  long               m_NodeRoot;
+  wxTreeCtrl        *m_NodeTree;         
+  wxImageList       *m_NodeImages;       
+  wxHashTable       *m_NodeTable;        
   mafObserver       *m_Listener;     
 
 	//----------------------------------------------------------------------------
@@ -193,10 +193,10 @@ protected:
 	//----------------------------------------------------------------------------
 	class mmgTreeItemData: public wxTreeItemData{
 	public:
-			mmgTreeItemData(long node_id) {m_node_id = node_id; };
-			long GetNode()                {return m_node_id;};
+			mmgTreeItemData(long node_id) {m_NodeId = node_id; };
+			long GetNode()                {return m_NodeId;};
 	protected:
-			long m_node_id;
+			long m_NodeId;
 	};
 	//----------------------------------------------------------------------------
 	// mmgTreeTableElement:
@@ -205,11 +205,11 @@ protected:
 	class mmgTreeTableElement: public wxObject
 	{
 	public:
-	  mmgTreeTableElement(wxTreeItemId item) {m_item=item;  };
-		wxTreeItemId GetItem()                 {return m_item;};
-		void SetItem(wxTreeItemId item){m_item=item;  };
+	  mmgTreeTableElement(wxTreeItemId item) {m_TreeItemId=item;  };
+		wxTreeItemId GetItem()                 {return m_TreeItemId;};
+		void SetItem(wxTreeItemId item){m_TreeItemId=item;  };
 	protected:
-		wxTreeItemId m_item;          
+		wxTreeItemId m_TreeItemId;          
 	};
 
 DECLARE_EVENT_TABLE()

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-03-30 10:55:31 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,50 +39,50 @@ mmgTree::mmgTree( wxWindow* parent,wxWindowID id, bool CloseButton, bool HideTit
 :mmgNamedPanel(parent,id,CloseButton,HideTitle)
 //----------------------------------------------------------------------------
 {
-  m_Listener = NULL;
-  m_images = NULL;
-  m_table = NULL;
-  m_prevent_notify = false;
-  m_autosort	= false;
+  m_Listener    = NULL;
+  m_NodeImages  = NULL;
+  m_NodeTable   = NULL;
+  m_PreventNotify = false;
+  m_Autosort	    = false;
 
-  m_tree = new wxTreeCtrl(this,ID_TREE,wxDefaultPosition,wxSize(100,100),wxNO_BORDER | wxTR_HAS_BUTTONS );
-  m_sizer->Add(m_tree,1,wxEXPAND);
+  m_NodeTree = new wxTreeCtrl(this,ID_TREE,wxDefaultPosition,wxSize(100,100),wxNO_BORDER | wxTR_HAS_BUTTONS );
+  m_sizer->Add(m_NodeTree,1,wxEXPAND);
 
   //default imagelist
   wxBitmap bmp = mafPics.GetBmp("NODE_GRAY");
   int w = bmp.GetWidth();
   int h = bmp.GetHeight();
 
-  m_images = new wxImageList(w,h,FALSE,4);
-  m_images->Add(bmp);
-  m_images->Add(mafPics.GetBmp("NODE_RED"));
-  m_images->Add(mafPics.GetBmp("NODE_BLUE"));
-  m_images->Add(mafPics.GetBmp("NODE_YELLOW"));
-  m_tree->SetImageList(m_images);
+  m_NodeImages = new wxImageList(w,h,FALSE,4);
+  m_NodeImages->Add(bmp);
+  m_NodeImages->Add(mafPics.GetBmp("NODE_RED"));
+  m_NodeImages->Add(mafPics.GetBmp("NODE_BLUE"));
+  m_NodeImages->Add(mafPics.GetBmp("NODE_YELLOW"));
+  m_NodeTree->SetImageList(m_NodeImages);
 
   Reset();
 }
 //----------------------------------------------------------------------------
-mmgTree::~mmgTree( )
+mmgTree::~mmgTree()
 //----------------------------------------------------------------------------
 {
-  if (m_table) 
+  if (m_NodeTable) 
   {
-    m_table->DeleteContents(true);
-    delete m_table;
+    m_NodeTable->DeleteContents(true);
+    delete m_NodeTable;
   }
-  delete m_images;
+  delete m_NodeImages;
 }
 //----------------------------------------------------------------------------
-void mmgTree::Reset ()
+void mmgTree::Reset()
 //----------------------------------------------------------------------------
 {
-  m_tree->DeleteAllItems();
+  m_NodeTree->DeleteAllItems();
 
-  if (m_table != NULL) delete m_table; // short way to delete all associated objets
-  m_table = new wxHashTable(wxKEY_INTEGER,100);
-  m_table->DeleteContents(true);
-  m_root  = 0;
+  if (m_NodeTable != NULL) delete m_NodeTable; // short way to delete all associated objets
+  m_NodeTable = new wxHashTable(wxKEY_INTEGER,100);
+  m_NodeTable->DeleteContents(true);
+  m_NodeRoot  = 0;
 }
 //----------------------------------------------------------------------------
 bool mmgTree::AddNode (long node_id, long parent_id , wxString label, int icon)
@@ -90,7 +90,7 @@ bool mmgTree::AddNode (long node_id, long parent_id , wxString label, int icon)
 {
 	/*
 	- se parent_id = 0 to create the root
-	- icon must be a valid index in the m_images - otherwise it is clamped
+	- icon must be a valid index in the m_NodeImages - otherwise it is clamped
 	- fails if node_id already exist
 	- parent_id must exist
 	- return true on success
@@ -103,38 +103,41 @@ bool mmgTree::AddNode (long node_id, long parent_id , wxString label, int icon)
   // check if already inserted
   if( NodeExist(node_id) ) return false;
 
-	if( parent_id == 0 && m_root == 0 ) 
+	if( parent_id == 0 && m_NodeRoot == 0 ) 
 	{
-		item = m_tree->AddRoot(label, icon, icon, new mmgTreeItemData(node_id));
-		m_root = node_id;
+		item = m_NodeTree->AddRoot(label, icon, icon, new mmgTreeItemData(node_id));
+		m_NodeRoot = node_id;
 	}
   else
   {
     if(!NodeExist(parent_id) ) return false;
     parent_item = ItemFromNode(parent_id);
     //insert normally
-    item = m_tree->AppendItem(parent_item,label,icon,icon,new mmgTreeItemData(node_id));
+    item = m_NodeTree->AppendItem(parent_item,label,icon,icon,new mmgTreeItemData(node_id));
     // expand parent node
-    m_tree->SortChildren(parent_item);
-    m_tree->SetItemHasChildren(parent_item,true);
-    m_tree->Expand(parent_item);
+    if (m_Autosort)
+    {
+      m_NodeTree->SortChildren(parent_item);
+    }
+    m_NodeTree->SetItemHasChildren(parent_item,true);
+    m_NodeTree->Expand(parent_item);
   }
 
   //insert [node_id -> item] in the table
   mmgTreeTableElement *el = new mmgTreeTableElement( item );  
-  m_table->Put(node_id, el);
+  m_NodeTable->Put(node_id, el);
 
   return true;
 }
 //----------------------------------------------------------------------------
-bool mmgTree::DeleteNode  (long node_id)
+bool mmgTree::DeleteNode(long node_id)
 //----------------------------------------------------------------------------
 {
 	/*
 	- node_id must exist
 	- return true on success
 	- check that node_id exist
-	- calls DeleteNode2 to delete all the item in the subtree keeping m_table consistent
+	- calls DeleteNode2 to delete all the item in the subtree keeping m_NodeTable consistent
 	- keep parent->HasChildren consistent
 	- if the item was selected, select the parent node (). [ to prevent the shown property-gui to become inconsistent ]
 	*/
@@ -142,61 +145,61 @@ bool mmgTree::DeleteNode  (long node_id)
   if( !NodeExist(node_id) ) return false;
 
   wxTreeItemId item = ItemFromNode(node_id);
-  wxTreeItemId parent_item = m_tree->GetItemParent(item);
+  wxTreeItemId parent_item = m_NodeTree->GetItemParent(item);
 
   // move the selection (if not deleting the root => parent=NULL)
-  if (parent_item && m_tree->IsSelected(item))
+  if (parent_item && m_NodeTree->IsSelected(item))
   {
-    m_tree->SelectItem(parent_item);
+    m_NodeTree->SelectItem(parent_item);
   }
 
   // if the old parent has no other children, set HasChildren to false => hide the widget to expand the subtree
   // but skip if we are deleting the root => parent=NULL
-  if( parent_item && m_tree->GetChildrenCount(parent_item,false) <= 1 )
+  if( parent_item && m_NodeTree->GetChildrenCount(parent_item,false) <= 1 )
   {
-    m_tree->SetItemHasChildren(parent_item,false);
+    m_NodeTree->SetItemHasChildren(parent_item,false);
   }
    
   DeleteNode2(node_id);
    
-  if(node_id == m_root) m_root = 0; // if we deleted the root we can create a new one
+  if(node_id == m_NodeRoot) m_NodeRoot = 0; // if we deleted the root we can create a new one
   return true;
 }
 //----------------------------------------------------------------------------
-void mmgTree::DeleteNode2 (long node_id)
+void mmgTree::DeleteNode2(long node_id)
 //----------------------------------------------------------------------------
 {
 	/*
 	- private function called by DeleteNode. Delete recursively a node and its subtree
 	- doesn't check if node exist
 	- doesn't handle the selection
-	- keep m_table consistent
+	- keep m_NodeTable consistent
 	*/
 
   wxTreeItemIdValue cookie;
   wxTreeItemId item  = ItemFromNode(node_id);
-  wxTreeItemId child = m_tree->GetFirstChild(item, cookie);
+  wxTreeItemId child = m_NodeTree->GetFirstChild(item, cookie);
   while(child.IsOk())
   {
     DeleteNode2(NodeFromItem(child)); 
-    child = m_tree->GetNextChild(item, cookie);
+    child = m_NodeTree->GetNextChild(item, cookie);
   }
-  m_tree->Delete(item);
+  m_NodeTree->Delete(item);
 
-  wxObject *el = m_table->Delete(node_id);
+  wxObject *el = m_NodeTable->Delete(node_id);
   if (el != NULL ) delete el;
 }
 //----------------------------------------------------------------------------
-bool mmgTree::SetNodeLabel (long node_id, wxString label)
+bool mmgTree::SetNodeLabel(long node_id, wxString label)
 //----------------------------------------------------------------------------
 {
   if( !NodeExist(node_id) ) return false;
   wxTreeItemId  item = ItemFromNode(node_id);
-  m_tree->SetItemText(item,label);
+  m_NodeTree->SetItemText(item,label);
 
-  wxTreeItemId parent = m_tree->GetItemParent(item);
+  wxTreeItemId parent = m_NodeTree->GetItemParent(item);
   if(parent.IsOk() )
-    if(m_autosort) m_tree->SortChildren(parent); 
+    if(m_Autosort) m_NodeTree->SortChildren(parent); 
 
   return true;
 }
@@ -209,7 +212,7 @@ bool mmgTree::SetNodeParent(long node_id, long parent_id )
 	- fails if parent_id is a children of node_id
 	- return true on success
 	- check that node_id exist
-	- calls DeleteNode2 to delete all the item in the subtree keeping m_table consistent
+	- calls DeleteNode2 to delete all the item in the subtree keeping m_NodeTable consistent
 	- keep parent->HasChildren consistent
 	- if the item was selected, select the parent node. [ to prevent the shown property-gui to become inconsistent ]
 	*/
@@ -221,17 +224,17 @@ bool mmgTree::SetNodeParent(long node_id, long parent_id )
 
   // check that node_id is not an ancestor of parent_id
   wxTreeItemId i = ItemFromNode(parent_id);;
-  while( i = m_tree->GetItemParent(i) )
+  while( i = m_NodeTree->GetItemParent(i) )
   {
     if ( NodeFromItem(i) == node_id ) return false;
   }
 
   // if the old parent has no other children, set HasChildren to false => hide the widget to expand the subtree
   i = ItemFromNode(node_id);;
-  wxTreeItemId old_parent_item = m_tree->GetItemParent(i);
-  if( m_tree->GetChildrenCount(old_parent_item,false) <= 1 )
+  wxTreeItemId old_parent_item = m_NodeTree->GetItemParent(i);
+  if( m_NodeTree->GetChildrenCount(old_parent_item,false) <= 1 )
   {
-    m_tree->SetItemHasChildren(old_parent_item,false);
+    m_NodeTree->SetItemHasChildren(old_parent_item,false);
   }
 
   // Now the checks are made - start to move
@@ -239,10 +242,10 @@ bool mmgTree::SetNodeParent(long node_id, long parent_id )
 
   // Set hasChildren of the new parent and open it
   i = ItemFromNode(parent_id);;
-  m_tree->SetItemHasChildren(i,true);
-	m_tree->SortChildren(i);
+  m_NodeTree->SetItemHasChildren(i,true);
+	m_NodeTree->SortChildren(i);
 
-  m_tree->Expand(i);
+  m_NodeTree->Expand(i);
 
   return true;
 }
@@ -255,60 +258,60 @@ void mmgTree::SetNodeParent2(long node_id, long parent_id )
 	- copy old_node under parent_id
 	- move recursively all the children under the new node
 	- delete old_node
-	- keep m_table,HasChildren,IsExpanded consistent
+	- keep m_NodeTable,HasChildren,IsExpanded consistent
 	*/
 
   wxTreeItemId item        = ItemFromNode(node_id);
   wxTreeItemId parent_item = ItemFromNode(parent_id);
-  int          icon        = m_tree->GetItemImage(item);
-  wxString     label       = m_tree->GetItemText(item);
-  wxTreeItemId new_item    = m_tree->AppendItem(parent_item,label,icon,icon,new mmgTreeItemData(node_id));
-  bool         HasChildren = m_tree->ItemHasChildren(item);
-  bool         IsExpanded  = m_tree->IsExpanded(item);
+  int          icon        = m_NodeTree->GetItemImage(item);
+  wxString     label       = m_NodeTree->GetItemText(item);
+  wxTreeItemId new_item    = m_NodeTree->AppendItem(parent_item,label,icon,icon,new mmgTreeItemData(node_id));
+  bool         HasChildren = m_NodeTree->ItemHasChildren(item);
+  bool         IsExpanded  = m_NodeTree->IsExpanded(item);
 
   // update the table
-  mmgTreeTableElement* el = (mmgTreeTableElement*)m_table->Get(node_id);
+  mmgTreeTableElement* el = (mmgTreeTableElement*)m_NodeTable->Get(node_id);
   assert (el != NULL);
   el->SetItem(new_item);
 
   // move recursively the sub tree under new_item
   wxTreeItemIdValue cookie;
-  wxTreeItemId child = m_tree->GetFirstChild(item, cookie);
+  wxTreeItemId child = m_NodeTree->GetFirstChild(item, cookie);
   while(child.IsOk())
   {
     SetNodeParent2( NodeFromItem(child), node_id);
-    child = m_tree->GetNextChild(item, cookie);
+    child = m_NodeTree->GetNextChild(item, cookie);
   }
 
   //Synchronize HasChildren and Expanded
-  m_tree->SetItemHasChildren(new_item,HasChildren);
-  if( IsExpanded ) m_tree->Expand(new_item); else m_tree->Collapse(new_item);
+  m_NodeTree->SetItemHasChildren(new_item,HasChildren);
+  if( IsExpanded ) m_NodeTree->Expand(new_item); else m_NodeTree->Collapse(new_item);
 
-  m_tree->Delete(item);
+  m_NodeTree->Delete(item);
 }
 //----------------------------------------------------------------------------
-bool mmgTree::SetNodeIcon (long node_id, int icon)
+bool mmgTree::SetNodeIcon(long node_id, int icon)
 //----------------------------------------------------------------------------
 {
   icon = CheckIconId(icon);
   if( !NodeExist(node_id) ) return false;
   wxTreeItemId  item = ItemFromNode(node_id);
-  m_tree->SetItemImage(item,icon);
-  m_tree->SetItemImage(item,icon,wxTreeItemIcon_Selected);
+  m_NodeTree->SetItemImage(item,icon);
+  m_NodeTree->SetItemImage(item,icon,wxTreeItemIcon_Selected);
   return true;
 }
 //----------------------------------------------------------------------------
 bool mmgTree::NodeExist(long node_id)
 //----------------------------------------------------------------------------
 {
-  mmgTreeTableElement* el = (mmgTreeTableElement*)m_table->Get(node_id);
+  mmgTreeTableElement* el = (mmgTreeTableElement*)m_NodeTable->Get(node_id);
   return el != NULL;
 }
 //----------------------------------------------------------------------------
 wxTreeItemId mmgTree::ItemFromNode(long node_id)
 //----------------------------------------------------------------------------
 {
-  mmgTreeTableElement* el = (mmgTreeTableElement*)m_table->Get(node_id);
+  mmgTreeTableElement* el = (mmgTreeTableElement*)m_NodeTable->Get(node_id);
   assert (el != NULL);
   return el->GetItem();
 }
@@ -316,7 +319,7 @@ wxTreeItemId mmgTree::ItemFromNode(long node_id)
 long mmgTree::NodeFromItem(wxTreeItemId& item)
 //----------------------------------------------------------------------------
 {
-  mmgTreeItemData *nd = (mmgTreeItemData*)m_tree->GetItemData(item);
+  mmgTreeItemData *nd = (mmgTreeItemData*)m_NodeTree->GetItemData(item);
   if(nd == NULL) return 0;
   return nd->GetNode();
 }
@@ -325,7 +328,7 @@ void mmgTree::OnSelectionChanged(wxTreeEvent& event)
 //----------------------------------------------------------------------------
 {
   wxTreeItemId i;
-  if(m_prevent_notify) return;
+  if(m_PreventNotify) return;
 
   i = event.GetItem();
   if(i.IsOk())
@@ -338,9 +341,9 @@ bool mmgTree::SelectNode(long node_id)
 {
   if( !NodeExist(node_id) ) return false;
   wxTreeItemId  item = ItemFromNode(node_id);
-  m_prevent_notify = true;
-  m_tree->SelectItem(item);
-  m_prevent_notify = false;
+  m_PreventNotify = true;
+  m_NodeTree->SelectItem(item);
+  m_PreventNotify = false;
   return true;
 }
 //----------------------------------------------------------------------------
@@ -348,22 +351,22 @@ void mmgTree::OnSize(wxSizeEvent& event)
 //----------------------------------------------------------------------------
 {
 	mmgNamedPanel::OnSize(event);
-  m_tree->Refresh();
+  m_NodeTree->Refresh();
 }
 //----------------------------------------------------------------------------
 int mmgTree::CheckIconId(int icon)
 //----------------------------------------------------------------------------
 {
-  if(!m_images) return 0;
+  if(!m_NodeImages) return 0;
   if( icon <0 )
   {
     mafLogMessage("mmgTree: icon id = %d out of range ", icon);
     return 0;
   }
-  if( icon >= m_images->GetImageCount() ) 
+  if( icon >= m_NodeImages->GetImageCount() ) 
   {
     mafLogMessage("mmgTree: icon id = %d out of range ", icon);
-    return m_images->GetImageCount()-1;
+    return m_NodeImages->GetImageCount()-1;
   }
   return icon;
 }
@@ -371,7 +374,7 @@ int mmgTree::CheckIconId(int icon)
 void mmgTree::SetImageList(wxImageList *img)
 //----------------------------------------------------------------------------
 {
-  if(m_root != 0)
+  if(m_NodeRoot != 0)
   {
     mafLogMessage("warning: mmgTree::SetImageList must be called before adding any node");
     // if you replace the imagelist with a shorter one 
@@ -381,10 +384,10 @@ void mmgTree::SetImageList(wxImageList *img)
     //return; //SIL. 7-4-2005: - commented 4 testing -- to be reinserted
   }
 
-  if(img == m_images) return;
-  cppDEL(m_images);
-  m_images = img;
-  m_tree->SetImageList(m_images);
+  if(img == m_NodeImages) return;
+  cppDEL(m_NodeImages);
+  m_NodeImages = img;
+  m_NodeTree->SetImageList(m_NodeImages);
 }
 //----------------------------------------------------------------------------
 int mmgTree::GetNodeIcon(long node_id)
@@ -393,16 +396,16 @@ int mmgTree::GetNodeIcon(long node_id)
   if( !NodeExist(node_id) ) return 0;
   wxTreeItemId  item = ItemFromNode(node_id);
   if(!item.IsOk()) return 0;
-  return m_tree->GetItemImage(item);
+  return m_NodeTree->GetItemImage(item);
 }
 //----------------------------------------------------------------------------
 void mmgTree::SortChildren(long node_id)
 //----------------------------------------------------------------------------
 {
   if(node_id == 0)
-    m_tree->SortChildren(m_tree->GetRootItem());
+    m_NodeTree->SortChildren(m_NodeTree->GetRootItem());
   else
-    m_tree->SortChildren(ItemFromNode(node_id));
+    m_NodeTree->SortChildren(ItemFromNode(node_id));
 }
 //----------------------------------------------------------------------------
 void mmgTree::CollapseNode(long node_id)
@@ -412,7 +415,7 @@ void mmgTree::CollapseNode(long node_id)
   wxTreeItemId  item;
   item = ItemFromNode(node_id);
   if(!item.IsOk()) return;
-  m_tree->Collapse(item);
+  m_NodeTree->Collapse(item);
 }
 //----------------------------------------------------------------------------
 void mmgTree::ExpandNode(long node_id)
@@ -422,7 +425,5 @@ void mmgTree::ExpandNode(long node_id)
   wxTreeItemId  item;
   item = ItemFromNode(node_id);
   if(!item.IsOk()) return;
-  m_tree->Expand(item);
+  m_NodeTree->Expand(item);
 }
-
-

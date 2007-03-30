@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-22 09:00:35 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2007-03-30 10:55:31 $
+  Version:   $Revision: 1.24 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -35,16 +35,16 @@
 class mmgCheckTreeEvtHandler : public wxEvtHandler
 {
 public:
-  mmgCheckTreeEvtHandler() : m_tree(0) { }
-  mmgCheckTreeEvtHandler(mmgCheckTree* tree) : m_tree(tree) { }
+  mmgCheckTreeEvtHandler() : m_NodeTree(0) { }
+  mmgCheckTreeEvtHandler(mmgCheckTree* tree) : m_NodeTree(tree) { }
   
-  void OnMouseDown(wxMouseEvent& event)        {m_tree->OnMouseDown(event);};
-  void OnMouseUp(wxMouseEvent& event)          {m_tree->OnMouseUp(event);};
-  void OnMouseEvent(wxMouseEvent& event)       {m_tree->OnMouseEvent(event);};
-	void ShowContextualMenu(wxMouseEvent& event) {m_tree->ShowContextualMenu(event);};
+  void OnMouseDown(wxMouseEvent& event)        {m_NodeTree->OnMouseDown(event);};
+  void OnMouseUp(wxMouseEvent& event)          {m_NodeTree->OnMouseUp(event);};
+  void OnMouseEvent(wxMouseEvent& event)       {m_NodeTree->OnMouseEvent(event);};
+	void ShowContextualMenu(wxMouseEvent& event) {m_NodeTree->ShowContextualMenu(event);};
 		
 private:
-  mmgCheckTree  *m_tree;
+  mmgCheckTree  *m_NodeTree;
   
 	DECLARE_DYNAMIC_CLASS(mmgCheckTreeEvtHandler )
   DECLARE_EVENT_TABLE()
@@ -92,7 +92,7 @@ mmgCheckTree::mmgCheckTree( wxWindow* parent,wxWindowID id, bool CloseButton, bo
   m_SelectedNode = NULL;
   m_RMenu	= NULL;
 
-  m_tree->PushEventHandler( new mmgCheckTreeEvtHandler(this) );
+  m_NodeTree->PushEventHandler( new mmgCheckTreeEvtHandler(this) );
 
   InitializeImageList();
 }
@@ -101,14 +101,14 @@ mmgCheckTree::~mmgCheckTree( )
 //----------------------------------------------------------------------------
 {
 	if(m_RMenu) delete m_RMenu;
-	m_tree->PopEventHandler(true);
+	m_NodeTree->PopEventHandler(true);
 }
 //----------------------------------------------------------------------------
 void mmgCheckTree::ShowContextualMenu(wxMouseEvent& event)
 //----------------------------------------------------------------------------
 {
   int flag;
-  wxTreeItemId i = m_tree->HitTest(wxPoint(event.GetX(),event.GetY()),flag);
+  wxTreeItemId i = m_NodeTree->HitTest(wxPoint(event.GetX(),event.GetY()),flag);
   bool vmeMenu = false;
 #ifdef WIN32
   vmeMenu = i.IsOk() && ((flag == wxTREE_HITTEST_ONITEMICON) || (flag == wxTREE_HITTEST_ONITEMLABEL));
@@ -120,7 +120,7 @@ void mmgCheckTree::ShowContextualMenu(wxMouseEvent& event)
   e.SetSender(this);
   e.SetId(SHOW_CONTEXTUAL_MENU);
   e.SetBool(vmeMenu);
-  e.SetArg(m_autosort);
+  e.SetArg(m_Autosort);
   if(vmeMenu)
     e.SetVme((mafNode *) (NodeFromItem(i)));
   mafEventMacro(e);
@@ -139,7 +139,7 @@ void mmgCheckTree::OnMouseDown( wxMouseEvent& event )
   //prevent node selection if the icon was clicked,
   //prevent node selection anyway, if the selection is disabled,
   int flag;
-	wxTreeItemId i = m_tree->HitTest(wxPoint(event.GetX(),event.GetY()),flag);
+	wxTreeItemId i = m_NodeTree->HitTest(wxPoint(event.GetX(),event.GetY()),flag);
 	if(i.IsOk() && flag & wxTREE_HITTEST_ONITEMICON )
 	{
     OnIconClick(i); 
@@ -156,7 +156,7 @@ void mmgCheckTree::OnMouseUp( wxMouseEvent& event )
   //pourpose: prevent selection if I clicked on the icon.
   //to select you must click the node name
   int flag;
-	wxTreeItemId i = m_tree->HitTest(wxPoint(event.GetX(),event.GetY()),flag);
+	wxTreeItemId i = m_NodeTree->HitTest(wxPoint(event.GetX(),event.GetY()),flag);
 	if(flag & wxTREE_HITTEST_ONITEMICON )
 		return;//eat message
 	event.Skip();//process event as usual
@@ -170,7 +170,7 @@ void mmgCheckTree::OnMouseEvent( wxMouseEvent& event )
   if(event.ButtonDown() || event.ButtonUp() || event.ButtonDClick())
 	{
 	 int flag;
-	 wxTreeItemId i = m_tree->HitTest(wxPoint(event.GetX(),event.GetY()),flag);
+	 wxTreeItemId i = m_NodeTree->HitTest(wxPoint(event.GetX(),event.GetY()),flag);
 	 if(flag & wxTREE_HITTEST_ONITEMICON )
 			return;//eat message
 	}
@@ -284,8 +284,8 @@ void mmgCheckTree::ViewSelected(mafView *view)
 void mmgCheckTree::TreeUpdateIcon()
 //----------------------------------------------------------------------------
 {
-  m_table->BeginFind();
-	while(wxNode* node = m_table->Next())
+  m_NodeTable->BeginFind();
+	while(wxNode* node = m_NodeTable->Next())
 	{
 		mmgTreeTableElement* el = (mmgTreeTableElement*)node->GetData();
 		assert(el);
@@ -420,7 +420,7 @@ void mmgCheckTree::OnSelectionChanged(wxTreeEvent& event)
 //----------------------------------------------------------------------------
 {
   wxTreeItemId i;
-  if(m_prevent_notify) return;
+  if(m_PreventNotify) return;
 
   i = event.GetItem();
   if(i.IsOk())

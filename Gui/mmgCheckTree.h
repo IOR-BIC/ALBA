@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-22 12:58:26 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2007-03-30 10:55:31 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -64,7 +64,7 @@ public:
   */
   void EnableSelect(bool enable);
 
-  wxTreeCtrl *GetTree() {return m_tree;};
+  wxTreeCtrl *GetTree() {return m_NodeTree;};
   
 protected:
   /** Update the vme nodes icon. */

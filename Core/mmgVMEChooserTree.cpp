@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooserTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-03-30 10:55:41 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -152,7 +152,7 @@ void mmgVMEChooserTree::OnSelectionChanged(wxTreeEvent& event)
 //----------------------------------------------------------------------------
 {
   wxTreeItemId i;
-  if(m_prevent_notify) return;
+  if(m_PreventNotify) return;
 
   i = event.GetItem();
   if(i.IsOk())
@@ -191,23 +191,23 @@ void mmgVMEChooserTree::CloneSubTree(mmgCheckTree *source_tree, wxTreeItemId *so
 
   if (dest_parent_item == NULL)
   {
-    m_tree->DeleteAllItems();
-    current_item = m_tree->AddRoot(text,image,image, new mmgTreeItemData(node));
+    m_NodeTree->DeleteAllItems();
+    current_item = m_NodeTree->AddRoot(text,image,image, new mmgTreeItemData(node));
   }
   else
   {
     if (m_ChooserTreeStyle == REPRESENTATION_AS_TREE)
     {
-      current_item = m_tree->AppendItem(*dest_parent_item,text,image,image, new mmgTreeItemData(node));
+      current_item = m_NodeTree->AppendItem(*dest_parent_item,text,image,image, new mmgTreeItemData(node));
     }
     else 
     {
       // Flat tree of acceptable VMEs
       if (image == NODE_VISIBLE_ON)
       {
-        m_tree->AppendItem(m_tree->GetRootItem(),text,image,image, new mmgTreeItemData(node));
+        m_NodeTree->AppendItem(m_NodeTree->GetRootItem(),text,image,image, new mmgTreeItemData(node));
       }
-      current_item = m_tree->GetRootItem();
+      current_item = m_NodeTree->GetRootItem();
     }
   }
 
@@ -222,14 +222,14 @@ void mmgVMEChooserTree::CloneSubTree(mmgCheckTree *source_tree, wxTreeItemId *so
   if (m_ChooserTreeStyle == REPRESENTATION_AS_TREE)
   {
     if(expanded) 
-      m_tree->Expand(current_item); 
+      m_NodeTree->Expand(current_item); 
     else 
-      m_tree->Collapse(current_item);
+      m_NodeTree->Collapse(current_item);
   }
   else
   {
     // in flat representation the root's children are sorted
-    m_tree->Expand(current_item);
-    m_tree->SortChildren(current_item);
+    m_NodeTree->Expand(current_item);
+    m_NodeTree->SortChildren(current_item);
   }
 }
