@@ -85,6 +85,8 @@ IF (MAF_USE_VTK)
     mmoCrop.h
     mmoBooleanSurface.cpp
     mmoBooleanSurface.h
+    mmoEditNormals.cpp
+    mmoEditNormals.h
   )
 ENDIF (MAF_USE_VTK)
 

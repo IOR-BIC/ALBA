@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoBooleanSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-03-21 16:31:28 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-03-30 08:29:55 $
+Version:   $Revision: 1.2 $
 Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -62,6 +62,8 @@ mafOp(label)
 
 	m_FirstOperatorVME = NULL;
 	m_SecondOperatorVME = NULL;
+  m_SecondOperatorFromParametric = NULL;
+  m_ResultVME = NULL;
 
 	m_ImplicitPlaneGizmo  = NULL;
 
@@ -75,6 +77,9 @@ mafOp(label)
 	m_Modality = MODE_SURFACE;
 
 	m_ClipInside = 0;
+	m_Subdivision = 1;
+
+	m_VTKResult.resize(0);
 }
 //----------------------------------------------------------------------------
 mmoBooleanSurface::~mmoBooleanSurface()
@@ -90,12 +95,17 @@ mmoBooleanSurface::~mmoBooleanSurface()
 	vtkDEL(m_ClipperPlane);
 	vtkDEL(m_Arrow);
 	vtkDEL(m_PlaneSource);
+
+  mafDEL(m_ImplicitPlaneGizmo);
+
+  mafDEL(m_SecondOperatorFromParametric);
+  mafDEL(m_ResultVME);
 }
 //----------------------------------------------------------------------------
 bool mmoBooleanSurface::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 {
-	return (node && node->IsMAFType(mafVMESurface));
+	return (node && (node->IsMAFType(mafVMESurface) || node->IsMAFType(mafVMESurfaceParametric)));
 }
 //----------------------------------------------------------------------------
 mafOp *mmoBooleanSurface::Copy()   
@@ -111,6 +121,7 @@ enum FILTER_SURFACE_ID
 	ID_CHOOSE_UNION = MINID,
 	ID_CHOOSE_INTERSECTION,
 	ID_CHOOSE_DIFFERENCE,
+	ID_SUBDIVISION,
 	ID_UNDO,
 	ID_MODALITY,
 	ID_CLIP,
@@ -124,7 +135,23 @@ void mmoBooleanSurface::OpRun()
 
 	m_Gui = new mmgGui(this);
 
-	m_FirstOperatorVME = mafVMESurface::SafeDownCast(m_Input);
+  //creation of vme result
+  mafNEW(m_ResultVME);
+	vtkMAFSmartPointer<vtkPolyData> poly;
+	poly->DeepCopy((vtkPolyData*)((mafVME*)m_Input)->GetOutput()->GetVTKData());
+  m_ResultVME->SetData(poly,((mafVME*)m_Input)->GetTimeStamp());
+  mafString name = _("bool_");
+  name << m_Input->GetName();
+  m_ResultVME->SetAbsMatrix(*((mafVME*)m_Input)->GetOutput()->GetAbsMatrix());
+  m_ResultVME->SetName(name);
+  m_ResultVME->Modified();
+  m_ResultVME->Update();
+
+  m_ResultVME->ReparentTo(m_Input->GetRoot());
+
+  mafEventMacro(mafEvent(this,VME_SHOW,m_ResultVME,true));
+
+	m_FirstOperatorVME = m_ResultVME;
 	vtkPolyData *initialData;
 	vtkNEW(initialData);
 	initialData->DeepCopy((vtkPolyData*)m_FirstOperatorVME->GetOutput()->GetVTKData());
@@ -137,6 +164,7 @@ void mmoBooleanSurface::OpRun()
 	m_Gui->Button(ID_CHOOSE_UNION,_("Union VME"));
 	m_Gui->Button(ID_CHOOSE_INTERSECTION,_("Intersect VME"));
 	m_Gui->Button(ID_CHOOSE_DIFFERENCE,_("Difference VME"));
+	m_Gui->Integer(ID_SUBDIVISION,_("Subdivide"), &m_Subdivision,1,10);
 
 	m_Gui->Label("Implicit:",true);
 	m_Gui->Button(ID_CLIP,_("Clip"));
@@ -151,7 +179,7 @@ void mmoBooleanSurface::OpRun()
 
 	m_Gui->Enable(wxOK,false);
 
-	ShowClipPlane(m_Modality != MODE_SURFACE);
+	ShowClipPlane(m_Modality == MODE_IMPLICIT_FUNCTION);
 
 	ShowGui();
 }
@@ -159,21 +187,13 @@ void mmoBooleanSurface::OpRun()
 void mmoBooleanSurface::OpDo()
 //----------------------------------------------------------------------------
 {
-	if(m_VTKResult.size()>1)
-	{
-		m_FirstOperatorVME->SetData((vtkPolyData*)m_VTKResult[m_VTKResult.size()-1],0);
-		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-	}
+	m_ResultVME->ReparentTo(m_Input->GetRoot());
 }
 //----------------------------------------------------------------------------
 void mmoBooleanSurface::OpUndo()
 //----------------------------------------------------------------------------
 {
-	if(m_VTKResult.size()>1)
-	{
-		m_FirstOperatorVME->SetData((vtkPolyData*)m_VTKResult[0],0);
-		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-	}
+	 mafEventMacro(mafEvent(this,VME_REMOVE,m_ResultVME));
 }
 //----------------------------------------------------------------------------
 void mmoBooleanSurface::OnEvent(mafEventBase *maf_event)
@@ -193,6 +213,11 @@ void mmoBooleanSurface::OnEvent(mafEventBase *maf_event)
 			{
 				mafString title = "Choose Union Surface";
 				VmeChoose(title,e);
+        if(m_FirstOperatorVME == m_SecondOperatorVME || m_Input == m_SecondOperatorVME)
+        {
+          wxMessageBox(_("Can't operate over the same VME"));
+          return;
+        }
 				Union();
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 			}
@@ -201,6 +226,11 @@ void mmoBooleanSurface::OnEvent(mafEventBase *maf_event)
 			{
 				mafString title = "Choose Intersect Surface";
 				VmeChoose(title,e);
+        if(m_FirstOperatorVME == m_SecondOperatorVME || m_Input == m_SecondOperatorVME)
+        {
+          wxMessageBox(_("Can't operate over the same VME"));
+          return;
+        }
 				Intersection();
 
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
@@ -210,6 +240,11 @@ void mmoBooleanSurface::OnEvent(mafEventBase *maf_event)
 			{
 				mafString title = "Choose Difference Surface";
 				VmeChoose(title,e);
+        if(m_FirstOperatorVME == m_SecondOperatorVME || m_Input == m_SecondOperatorVME)
+        {
+          wxMessageBox(_("Can't operate over the same VME"));
+          return;
+        }
 				Difference();
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 			}
@@ -233,18 +268,19 @@ void mmoBooleanSurface::OnEvent(mafEventBase *maf_event)
 				m_Gui->Enable(ID_CHOOSE_UNION, m_Modality == MODE_SURFACE);
 				m_Gui->Enable(ID_CHOOSE_INTERSECTION, m_Modality == MODE_SURFACE);
 				m_Gui->Enable(ID_CHOOSE_DIFFERENCE, m_Modality == MODE_SURFACE);
+				m_Gui->Enable(ID_SUBDIVISION, m_Modality == MODE_SURFACE);
 
 				m_Gui->Enable(ID_CLIP,m_Modality == MODE_IMPLICIT_FUNCTION);
 				m_Gui->Enable(ID_CLIP_INSIDE,m_Modality == MODE_IMPLICIT_FUNCTION);
 
 				m_Gui->Update();
-				ShowClipPlane(m_Modality != MODE_SURFACE);
+				ShowClipPlane(m_Modality == MODE_IMPLICIT_FUNCTION);
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 			}
 			break;
 		case ID_TRANSFORM:
 			{
-				vtkTransform *currTr = vtkTransform::New();
+				vtkMAFSmartPointer<vtkTransform> currTr;
 				currTr->PostMultiply();
 				currTr->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix());
 				currTr->Concatenate(e->GetMatrix()->GetVTKMatrix());
@@ -259,7 +295,6 @@ void mmoBooleanSurface::OnEvent(mafEventBase *maf_event)
 				UpdateISARefSys();
 
 				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
-				currTr->Delete();
 			}
 			break;
 		case wxOK:
@@ -292,7 +327,7 @@ void mmoBooleanSurface::Clip()
 
 	m_ClipperPlane->SetTransform(tr);
 	vtkMAFSmartPointer<vtkClipPolyData>clipper;
-	clipper->SetInput(vtkPolyData::SafeDownCast(((mafVME *)m_Input)->GetOutput()->GetVTKData()));
+	clipper->SetInput(vtkPolyData::SafeDownCast(m_FirstOperatorVME->GetOutput()->GetVTKData()));
 	clipper->SetClipFunction(m_ClipperPlane);
 	tr->Delete();
 	mat->Delete();
@@ -310,7 +345,10 @@ void mmoBooleanSurface::Clip()
 	int result=m_FirstOperatorVME->SetData(resultPolydata,0);
 
 	if(result == MAF_ERROR)
+	{
 		wxMessageBox("The result surface hasn't any points","ATTENCTION!",wxICON_EXCLAMATION);
+		vtkDEL(resultPolydata);
+	}
 	else
 	{
 		m_Gui->Enable(ID_UNDO,true);
@@ -337,7 +375,7 @@ void mmoBooleanSurface::Undo()
 	{
 		vtkDEL(m_VTKResult[m_VTKResult.size()-1]);
 		m_VTKResult.pop_back();
-		m_FirstOperatorVME->SetData((vtkPolyData*)m_VTKResult[m_VTKResult.size()-1],0);
+		m_FirstOperatorVME->SetData((vtkPolyData*)m_VTKResult[m_VTKResult.size()-1],((mafVME*)m_Input)->GetTimeStamp());
 	}
 	m_Gui->Enable(ID_UNDO,m_VTKResult.size()>1);
 	m_Gui->Enable(wxOK,m_VTKResult.size()>1);
@@ -363,8 +401,7 @@ void mmoBooleanSurface::Union()
 			transformSecondDataInput->Update();
 
 			//Union
-			vtkAppendPolyData *append;
-			vtkNEW(append);
+			vtkMAFSmartPointer<vtkAppendPolyData> append;
 			append->SetInput(transformFirstDataInput->GetOutput());
 			append->AddInput(transformSecondDataInput->GetOutput());
 			append->Update();
@@ -378,15 +415,19 @@ void mmoBooleanSurface::Union()
 			vtkPolyData *resultPolydata;
 			vtkNEW(resultPolydata);
 			resultPolydata->DeepCopy(transformResultDataInput->GetOutput());
+ 
 			m_VTKResult.push_back(resultPolydata);
 		}
 		else
 		{
 			return;
 		}
-		m_FirstOperatorVME->SetData((vtkPolyData*)m_VTKResult[m_VTKResult.size()-1],0);
-		m_Gui->Enable(ID_UNDO,true);
-		m_Gui->Enable(wxOK,true);
+		m_FirstOperatorVME->SetData((vtkPolyData*)m_VTKResult[m_VTKResult.size()-1],((mafVME*)m_Input)->GetTimeStamp());
+		if(!m_TestMode)
+		{
+			m_Gui->Enable(ID_UNDO,true);
+			m_Gui->Enable(wxOK,true);
+		}
 	}
 }
 //----------------------------------------------------------------------------
@@ -397,14 +438,17 @@ void mmoBooleanSurface::Intersection()
 	{
 		vtkPolyData *dataFirstOperator = vtkPolyData::SafeDownCast(m_FirstOperatorVME->GetOutput()->GetVTKData());
 		vtkPolyData *dataSecondOperator = vtkPolyData::SafeDownCast(m_SecondOperatorVME->GetOutput()->GetVTKData());
+		
 		if(dataFirstOperator && dataSecondOperator)
 		{
-			vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstDataInput;
+			vtkTransformPolyDataFilter *transformFirstDataInput;
+			vtkNEW(transformFirstDataInput);
 			transformFirstDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)m_FirstOperatorVME)->GetAbsMatrixPipe()->GetVTKTransform());
 			transformFirstDataInput->SetInput((vtkPolyData *)((mafVME *)m_FirstOperatorVME)->GetOutput()->GetVTKData());
 			transformFirstDataInput->Update();
 
-			vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformSecondDataInput;
+			vtkTransformPolyDataFilter *transformSecondDataInput;
+			vtkNEW(transformSecondDataInput);
 			transformSecondDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)m_SecondOperatorVME)->GetAbsMatrixPipe()->GetVTKTransform());
 			transformSecondDataInput->SetInput((vtkPolyData *)((mafVME *)m_SecondOperatorVME)->GetOutput()->GetVTKData());
 			transformSecondDataInput->Update();
@@ -413,20 +457,24 @@ void mmoBooleanSurface::Intersection()
 
 			// clip input surface by another surface
 			// triangulate input for subdivision filter
-			vtkMAFSmartPointer<vtkTriangleFilter> triangles;
+			vtkTriangleFilter *triangles;
+			vtkNEW(triangles);
 			triangles->SetInput(transformFirstDataInput->GetOutput());
 			triangles->Update();
 
 			// subdivide triangles in sphere 1 to get better clipping
-			vtkMAFSmartPointer<vtkLinearSubdivisionFilter> subdivider;
+			vtkLinearSubdivisionFilter *subdivider;
+			vtkNEW(subdivider);
 			subdivider->SetInput(triangles->GetOutput());
-			subdivider->SetNumberOfSubdivisions(3);   //  use  this  (0-3+)  to  see improvement in clipping
+			subdivider->SetNumberOfSubdivisions(m_Subdivision);   //  use  this  (0-3+)  to  see improvement in clipping
 			subdivider->Update();
 
-			vtkMAFSmartPointer<vtkImplicitPolyData> implicitPolyData;
+			vtkImplicitPolyData *implicitPolyData;
+			vtkNEW(implicitPolyData);
 			implicitPolyData->SetInput(transformSecondDataInput->GetOutput());
 
-			vtkMAFSmartPointer<vtkClipPolyData>clipper;
+			vtkClipPolyData *clipper;
+			vtkNEW(clipper);
 			clipper->SetInput(subdivider->GetOutput());
 			clipper->SetClipFunction(implicitPolyData);
 
@@ -437,7 +485,8 @@ void mmoBooleanSurface::Intersection()
 
 			//End Intersection
 
-			vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformResultDataInput;
+			vtkTransformPolyDataFilter *transformResultDataInput;
+			vtkNEW(transformResultDataInput);
 			transformResultDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)m_FirstOperatorVME)->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
 			transformResultDataInput->SetInput(clipper->GetOutput());
 			transformResultDataInput->Update();
@@ -447,16 +496,30 @@ void mmoBooleanSurface::Intersection()
 			resultPolydata->DeepCopy(transformResultDataInput->GetOutput());
 			resultPolydata->Update();
 
-			int result=m_FirstOperatorVME->SetData(resultPolydata,0);
+			int result=m_FirstOperatorVME->SetData(resultPolydata,((mafVME*)m_Input)->GetTimeStamp());
 
 			if(result == MAF_ERROR)
+			{
 				wxMessageBox("The result surface hasn't any points","ATTENCTION!",wxICON_EXCLAMATION);
+				mafDEL(resultPolydata);
+			}
 			else
 			{
-				m_Gui->Enable(ID_UNDO,true);
-				m_Gui->Enable(wxOK,true);
-				m_VTKResult.push_back(resultPolydata);
+				if(!m_TestMode)
+				{
+					m_Gui->Enable(ID_UNDO,true);
+					m_Gui->Enable(wxOK,true);
+					m_VTKResult.push_back(resultPolydata);
+				}
 			}
+			vtkDEL(resultPolydata);
+			vtkDEL(transformResultDataInput);
+			vtkDEL(clipper);
+			vtkDEL(implicitPolyData);
+			vtkDEL(subdivider);
+			vtkDEL(triangles);
+			vtkDEL(transformSecondDataInput);
+			vtkDEL(transformFirstDataInput);
 		}
 		else
 		{
@@ -599,12 +662,14 @@ void mmoBooleanSurface::Difference()
 		vtkPolyData *dataSecondOperator = vtkPolyData::SafeDownCast(m_SecondOperatorVME->GetOutput()->GetVTKData());
 		if(dataFirstOperator && dataSecondOperator)
 		{
-			vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstDataInput;
+			vtkTransformPolyDataFilter *transformFirstDataInput;
+			vtkNEW(transformFirstDataInput);
 			transformFirstDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)m_FirstOperatorVME)->GetAbsMatrixPipe()->GetVTKTransform());
 			transformFirstDataInput->SetInput((vtkPolyData *)((mafVME *)m_FirstOperatorVME)->GetOutput()->GetVTKData());
 			transformFirstDataInput->Update();
 
-			vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformSecondDataInput;
+			vtkTransformPolyDataFilter *transformSecondDataInput;
+			vtkNEW(transformSecondDataInput);
 			transformSecondDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)m_SecondOperatorVME)->GetAbsMatrixPipe()->GetVTKTransform());
 			transformSecondDataInput->SetInput((vtkPolyData *)((mafVME *)m_SecondOperatorVME)->GetOutput()->GetVTKData());
 			transformSecondDataInput->Update();
@@ -613,17 +678,20 @@ void mmoBooleanSurface::Difference()
 
 			// clip input surface by another surface
 			// triangulate input for subdivision filter
-			vtkMAFSmartPointer<vtkTriangleFilter> triangles;
+			vtkTriangleFilter *triangles;
+			vtkNEW(triangles);
 			triangles->SetInput(transformFirstDataInput->GetOutput());
 			triangles->Update();
 
 			// subdivide triangles in sphere 1 to get better clipping
-			vtkMAFSmartPointer<vtkLinearSubdivisionFilter> subdivider;
+			vtkLinearSubdivisionFilter *subdivider;
+			vtkNEW(subdivider);
 			subdivider->SetInput(triangles->GetOutput());
-			subdivider->SetNumberOfSubdivisions(1);   //  use  this  (0-3+)  to  see improvement in clipping
+			subdivider->SetNumberOfSubdivisions(m_Subdivision);   //  use  this  (0-3+)  to  see improvement in clipping
 			subdivider->Update();
 
-			vtkMAFSmartPointer<vtkImplicitPolyData> implicitPolyData;
+			vtkImplicitPolyData *implicitPolyData;
+			vtkNEW(implicitPolyData);
 			implicitPolyData->SetInput(transformSecondDataInput->GetOutput());
 
 			vtkClipPolyData *clipper;
@@ -638,7 +706,8 @@ void mmoBooleanSurface::Difference()
 
 			//End Intersection
 
-			vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformResultDataInput;
+			vtkTransformPolyDataFilter *transformResultDataInput;
+			vtkNEW(transformResultDataInput);
 			transformResultDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)m_FirstOperatorVME)->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
 			transformResultDataInput->SetInput(clipper->GetOutput());
 			transformResultDataInput->Update();
@@ -647,15 +716,29 @@ void mmoBooleanSurface::Difference()
 			vtkNEW(resultPolydata);
 			resultPolydata->DeepCopy(transformResultDataInput->GetOutput());
 
-			int result=m_FirstOperatorVME->SetData(resultPolydata,0);
+			int result=m_FirstOperatorVME->SetData(resultPolydata,((mafVME*)m_Input)->GetTimeStamp());
 			if(result == MAF_ERROR)
+			{
 				wxMessageBox("The result surface hasn't any points","ATTENCTION!",wxICON_EXCLAMATION);
+				mafDEL(resultPolydata);
+			}
 			else
 			{
-				m_Gui->Enable(ID_UNDO,true);
-				m_Gui->Enable(wxOK,true);
-				m_VTKResult.push_back(resultPolydata);
+				if(!m_TestMode)
+				{
+					m_Gui->Enable(ID_UNDO,true);
+					m_Gui->Enable(wxOK,true);
+					m_VTKResult.push_back(resultPolydata);
+				}
 			}
+			vtkDEL(resultPolydata);
+			vtkDEL(transformResultDataInput);
+			vtkDEL(clipper);
+			vtkDEL(implicitPolyData);
+			vtkDEL(subdivider);
+			vtkDEL(triangles);
+			vtkDEL(transformSecondDataInput);
+			vtkDEL(transformFirstDataInput);
 		}
 		else
 		{
@@ -672,8 +755,19 @@ void mmoBooleanSurface::VmeChoose(mafString title,mafEvent *e)
 	e->SetId(VME_CHOOSE);
 	mafEventMacro(*e);
 	m_SecondOperatorVME = mafVMESurface::SafeDownCast(e->GetVme());
-	if(m_SecondOperatorVME == NULL)
-		return;
+	if(m_SecondOperatorVME == NULL && mafVMESurfaceParametric::SafeDownCast(e->GetVme()) != NULL)
+  {
+    vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformSecondDataInput;
+    transformSecondDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)e->GetVme())->GetAbsMatrixPipe()->GetVTKTransform());
+    transformSecondDataInput->SetInput((vtkPolyData *)((mafVME *)e->GetVme())->GetOutput()->GetVTKData());
+    transformSecondDataInput->Update();
+
+    mafNEW(m_SecondOperatorFromParametric);
+    m_SecondOperatorFromParametric->SetData(transformSecondDataInput->GetOutput(), ((mafVME*)m_Input)->GetTimeStamp());
+    m_SecondOperatorFromParametric->Update();
+
+    m_SecondOperatorVME = m_SecondOperatorFromParametric;
+  }
 }
 //----------------------------------------------------------------------------
 void mmoBooleanSurface::OpStop(int result)
@@ -688,12 +782,9 @@ void mmoBooleanSurface::OpStop(int result)
 	}
 	mafDEL(m_ImplicitPlaneGizmo);
 
-	if(result==OP_RUN_CANCEL)
-	{		
-		if(m_VTKResult.size()>1)
-		{
-			m_FirstOperatorVME->SetData((vtkPolyData*)m_VTKResult[0],0);
-		}
+  if(result == OP_RUN_CANCEL)
+	{
+	  mafEventMacro(mafEvent(this,VME_REMOVE,m_ResultVME));
 	}
 
 	HideGui();

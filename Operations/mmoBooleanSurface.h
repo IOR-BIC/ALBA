@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoBooleanSurface.h,v $
 Language:  C++
-Date:      $Date: 2007-03-21 16:31:28 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-03-30 08:29:56 $
+Version:   $Revision: 1.2 $
 Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -17,6 +17,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mmgVMEChooserAccept.h"
 #include "mafNode.h"
 #include "mafVMESurface.h"
+#include "mafVMESurfaceParametric.h"
+
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -50,7 +52,7 @@ public:
 		mafSurfaceAccept() {};
 		~mafSurfaceAccept() {};
 
-		bool Validate(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMESurface));};
+		bool Validate(mafNode *node) {return(node != NULL && (node->IsMAFType(mafVMESurface) || node->IsMAFType(mafVMESurfaceParametric)));};
 	};
 	mafSurfaceAccept *m_SurfaceAccept;
 
@@ -79,6 +81,9 @@ public:
 	void Difference();
 	void Undo();
 
+	void SetFactor1(mafVMESurface *surface){m_FirstOperatorVME=surface;};
+	void SetFactor2(mafVMESurface *surface){m_SecondOperatorVME=surface;};
+
 protected:
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	void OpStop(int result);
@@ -102,10 +107,15 @@ protected:
 	mafVMESurface *m_SecondOperatorVME;
 	mafVMESurface *m_FirstOperatorVME;
 
+  mafVMESurface *m_ResultVME; //<the vme result of operation
+
+  mafVMESurface *m_SecondOperatorFromParametric;
+
 	std::vector<vtkPolyData*> m_VTKResult;
 
 	int m_Modality;
 	int m_ClipInside;
+	int m_Subdivision;
 
 };
 #endif
