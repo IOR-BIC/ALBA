@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafICPUtility.h,v $
   Language:  C++
-  Date:      $Date: 2007-01-11 17:36:07 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-03-30 10:49:47 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani porting Matteo Giacomoni    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,14 +27,14 @@
 #include <algorithm>
 #include <vcl_utility.h>
 #include <vcl_map.h>
-#include <vnl\vnl_matrix.h>
-#include <vnl\vnl_vector.h>
-#include <vnl\vnl_matrix_fixed.h>
-#include <vnl\vnl_vector_fixed.h>
-#include <vnl\vnl_matrix.h>
-#include <vnl\algo\vnl_matrix_inverse.h>
-#include <vnl\algo\vnl_svd.h>
-#include <vnl\algo\vnl_determinant.h>
+#include <vnl/vnl_matrix.h>
+#include <vnl/vnl_vector.h>
+#include <vnl/vnl_matrix_fixed.h>
+#include <vnl/vnl_vector_fixed.h>
+#include <vnl/vnl_matrix.h>
+#include <vnl/algo/vnl_matrix_inverse.h>
+#include <vnl/algo/vnl_svd.h>
+#include <vnl/algo/vnl_determinant.h>
 
 //----------------------------------------------------------------------------
 class VTK_vtkMAF_EXPORT mafICPUtility : public vtkObject
@@ -84,7 +84,6 @@ public:
 
   inline RegResult StandardRegistration( vnl_matrix<double>& MS, vnl_matrix<double>& DS, float Convergence);
 
-
   mafString RotationFixedFile;
   mafString RotationFixedIndexFile;
   mafString KnownMinLocalPositionFile;
@@ -96,7 +95,7 @@ protected:
   ~mafICPUtility() {};
 };
 
-vtkCxxRevisionMacro(mafICPUtility, "$Revision: 1.2 $");
+vtkCxxRevisionMacro(mafICPUtility, "$Revision: 1.3 $");
   vtkStandardNewMacro(mafICPUtility);
 //----------------------------------------------------------------------------
 inline vnl_matrix<double> mafICPUtility::PolyData2VnlFilter(vtkPolyData* Shape)
@@ -1051,9 +1050,11 @@ inline mafICPUtility::RegResult mafICPUtility::StandardRegistration( vnl_matrix<
 
 	
 	//-----------Contruzione Point Locator----------------------
+  int i;
 	vtkPoints *MS_vtkpoints = vtkPoints::New();
 	MS_vtkpoints->SetNumberOfPoints(MS.rows());
-	for (int i = 0; i < MS.rows(); i++) {
+	for (i = 0; i < MS.rows(); i++) 
+  {
 		MS_vtkpoints->InsertPoint(i, MS(i,0), MS(i,1), MS(i,2));
 	}
 	
@@ -1090,8 +1091,8 @@ inline mafICPUtility::RegResult mafICPUtility::StandardRegistration( vnl_matrix<
 	vnl_vector_fixed<double,3> th(1E-5,1E-5,1E-5);
 	vnl_vector_fixed<double,3> t(1E-5,1E-5,1E-5);
 
-	float test=1;	
 	int cycle=0;
+  float test=1;	
 	float test_lim = Convergence;
 		
 	double err=100;			
@@ -1116,107 +1117,88 @@ inline mafICPUtility::RegResult mafICPUtility::StandardRegistration( vnl_matrix<
 	vnl_vector_fixed<double,6> dv;
 	
 	double b = 1E-5;
+  int j;
 
-	while(test>test_lim){
-
-		
+	while(test > test_lim)
+  {
 		R_DS=theta2R(th)*DS;
 
-		for (int i=0; i< DScols; i++) translation.set_column(i,t);
-		DS_move=R_DS+translation;
-
+		for (i = 0; i < DScols; i++) 
+      translation.set_column(i, t);
+		
+    DS_move = R_DS + translation;
 	
-		for(int j=0; j<3; j++){
-			th_a=th;
+		for(j = 0; j < 3; j++)
+    {
+			th_a = th;
 			th_a.put(j, th[j]*a);
-			dy=( (theta2R(th_a)*DS)+translation-DS_move ) / ( th[j]*b );
+			dy = ((theta2R(th_a) * DS) + translation - DS_move) / (th[j] * b);
 			S.set_column(j,dy.data_block());
 		}
 
-		for(int j=0; j<3; j++){
+		for(j = 0; j < 3; j++)
+    {
 			t_a=t;
 			t_a.put(j, t[j]*a);
-			for (int i=0; i< DScols; i++) translation.set_column(i,t_a);
-			dy=( R_DS+translation-DS_move ) / ( t[j]*b );
-			S.set_column(j+3,dy.data_block());
+			for (i = 0; i < DScols; i++) 
+        translation.set_column(i,t_a);
+			dy = (R_DS + translation - DS_move) / (t[j] * b);
+			S.set_column(j + 3, dy.data_block());
 		}
-			
-
 		findPointLocator(MS_vtkpoints, p_locator, DS_move.data_block(), DScols, closest_pts);
 
-		em=closest_pts-DS_move;
+		em = closest_pts - DS_move;
 		e.set(em.data_block());
 		
 		//Updating transformation parameters:
-		St=S.transpose();
-		vnl_matrix_inverse<double> inv_St_S(St*S);
-		vnl_matrix<double> dv_mat_temp=inv_St_S * St;
-		dv=dv_mat_temp * e;
-		th +=dv.extract(3,0);
-		t +=dv.extract(3,3);
+		St = S.transpose();
+		vnl_matrix_inverse<double> inv_St_S(St * S);
+		vnl_matrix<double> dv_mat_temp = inv_St_S * St;
+		dv = dv_mat_temp * e;
+		th += dv.extract(3, 0);
+		t += dv.extract(3, 3);
 			
 		//Updating cycle-ending variables:
-		coston=e.squared_magnitude();
-		test=abs(coston-costov)/costov;
-		costov=coston;
+		coston = e.squared_magnitude();
+		test = abs(coston-costov)/costov;
+		costov = coston;
 
-		err = sqrt( coston / (3*DScols) );
-
+		err = sqrt(coston / (3 * DScols));
 		cycle++;
-		
 	}
 
-
 	mafICPUtility::RegResult res;
-	res.R=theta2R(th);
-	res.t=t;
-	res.err= err;
-	res.test=test;
+	res.R = theta2R(th);
+	res.t = t;
+	res.err = err;
+	res.test = test;
 	res.th = th;
 
-
 	vnl_matrix_fixed<double,4,4> pos_mat;
-
-	int i, j;
-
-	for (i=0; i<3; i++)
+	for (i = 0; i<3; i++)
+	{
+		for (j = 0; j<3; j++)
 		{
-			for (j=0; j<3; j++)
-				{
-					pos_mat.put(i,j, res.R.get(i,j));
+		  pos_mat.put(i, j, res.R.get(i, j));
+	  }
+  }
 
-				}
+	pos_mat.put(0, 3, t.get(0));
+	pos_mat.put(1, 3, t.get(1));
+	pos_mat.put(2, 3, t.get(2));
 
-		}
-
-
-	pos_mat.put(0,3,t.get(0));
-	pos_mat.put(1,3,t.get(1));
-	pos_mat.put(2,3,t.get(2));
-	
-
-	pos_mat.put(3,0,0);
-	pos_mat.put(3,1,0);
-	pos_mat.put(3,2,0);
-	pos_mat.put(3,3,1);
-		
+	pos_mat.put(3, 0, 0);
+	pos_mat.put(3, 1, 0);
+	pos_mat.put(3, 2, 0);
+	pos_mat.put(3, 3, 1);
 		
 	res.pose = pos_mat;
-
-	//vcl_cout << "test finale vale: " << res.test << test << '\n';
-	//vcl_cout << "err finale vale: " << res.err << err << '\n';
-	//vcl_cout << "th vale: \n" << th << '\n';
-	//vcl_cout << "t vale: \n" << t << '\n';
-
 
 	MS_vtkpoints->Delete();
 	MS_poly->Delete();
 	p_locator->Delete();
 	
 	return res;
-	
-
-
 }
 //----------------------------------------------------------------------------
 inline void mafICPUtility::Target_on_Source(vnl_matrix_fixed<double,3,3>& R, vnl_vector_fixed<double,3>& p)
@@ -1230,5 +1212,4 @@ inline void mafICPUtility::Target_on_Source(vnl_matrix_fixed<double,3,3>& R, vnl
 	//R.inplace_transpose();
 	p = ptemp;
 }
-
 #endif
