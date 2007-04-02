@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVolumeMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-28 10:25:39 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-04-02 10:08:57 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -48,8 +48,10 @@ mmoVolumeMeasure::mmoVolumeMeasure(wxString label)
   m_TriangleFilter = NULL;
   m_MassProperties = NULL;
   m_VmeSurface    = NULL;
-  m_MeasureText = _("");
-  m_VolumeMeasure = _("");
+  m_MeasureText = "";
+  m_VolumeMeasure = "";
+	m_NormalizedShapeIndex = "";
+	m_SurfaceArea = "";
 }
 //----------------------------------------------------------------------------
 mmoVolumeMeasure::~mmoVolumeMeasure()
@@ -96,7 +98,9 @@ void mmoVolumeMeasure::OpRun()
   m_Gui->Label(_("measure result:"),true);
   
   
-  m_Gui->Label(_("volume  = "),&m_VolumeMeasure);
+  m_Gui->Label(_("volume= "),&m_VolumeMeasure);
+	m_Gui->Label(_("surf. area= "),&m_SurfaceArea);
+	m_Gui->Label(_("N.S.I.= "),&m_NormalizedShapeIndex);
   
   m_Gui->Divider();
   m_Gui->Label(_("Measure description."),true);
@@ -151,7 +155,7 @@ void mmoVolumeMeasure::OnEvent(mafEventBase *maf_event)
 	case ID_COMPUTE_MEASURE:
     {
 	 
-     m_VolumeMeasure = VolumeCompute(m_VmeSurface);
+     VolumeCompute(m_VmeSurface);
 	   m_Gui->Update();
     }
     break;
@@ -160,7 +164,7 @@ void mmoVolumeMeasure::OnEvent(mafEventBase *maf_event)
       m_MeasureText = wxGetTextFromUser(_(""),_("Insert measure description"), _(m_MeasureText));
       if(m_MeasureText == "") break;
       mafString t;
-        t = m_VolumeMeasure + _(" ") + m_MeasureText;
+        t = m_VolumeMeasure + _(" ") + m_SurfaceArea + " " + m_NormalizedShapeIndex + " " + m_MeasureText;
       m_MeasureList->Append(_(t));
       m_MeasureText = _("");
       m_Gui->Enable(ID_REMOVE_MEASURE,true);
@@ -231,20 +235,28 @@ void mmoVolumeMeasure::OpStop(int result)
 }
 
 //----------------------------------------------------------------------------
-wxString mmoVolumeMeasure::VolumeCompute(mafVME *vme)
+void mmoVolumeMeasure::VolumeCompute(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-	if (vme == NULL) return _("Impossible compute the surface volume");
-	else{
-	
-	vtkNEW(m_TriangleFilter);
-	vtkNEW(m_MassProperties);
+	if (vme == NULL)
+	{
+		m_NormalizedShapeIndex = wxString::Format(_("Impossible compute the N.S.I."));
+		m_SurfaceArea = wxString::Format(_("Impossible compute the surface area"));
+		m_VolumeMeasure = wxString::Format(_("Impossible compute the surface volume"));
+		return;
+	}
+	else
+	{
+		vtkNEW(m_TriangleFilter);
+		vtkNEW(m_MassProperties);
 
-  m_TriangleFilter->SetInput(vtkPolyData::SafeDownCast(vme->GetOutput()->GetVTKData()));
-  m_TriangleFilter->Update();
-	m_MassProperties->SetInput(m_TriangleFilter->GetOutput());
-  m_MassProperties->Update();
+		m_TriangleFilter->SetInput(vtkPolyData::SafeDownCast(vme->GetOutput()->GetVTKData()));
+		m_TriangleFilter->Update();
+		m_MassProperties->SetInput(m_TriangleFilter->GetOutput());
+		m_MassProperties->Update();
 
-	return wxString::Format(_("%g"), m_MassProperties->GetVolume());
+		m_NormalizedShapeIndex = wxString::Format(_("%g"),m_MassProperties->GetNormalizedShapeIndex());
+		m_SurfaceArea = wxString::Format(_("%g"),m_MassProperties->GetSurfaceArea());
+		m_VolumeMeasure = wxString::Format(_("%g"), m_MassProperties->GetVolume());
 	}
 }

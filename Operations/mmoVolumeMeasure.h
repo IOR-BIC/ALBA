@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVolumeMeasure.h,v $
   Language:  C++
-  Date:      $Date: 2007-01-22 06:55:56 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-04-02 10:08:57 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -58,7 +58,7 @@ public:
 	
   /**
   Compute the Volume */
-  wxString VolumeCompute(mafVME *vme);
+  void VolumeCompute(mafVME *vme);
 
   void OpDo();
 
@@ -79,7 +79,9 @@ protected:
   mafVMESurface  *m_VmeSurface;
   
   mafString m_MeasureText;
-  mafString m_VolumeMeasure;
+  mafString m_NormalizedShapeIndex;
+	mafString m_SurfaceArea;
+	mafString m_VolumeMeasure;
   wxListBox *m_MeasureList;
  
   vtkTriangleFilter *m_TriangleFilter;
