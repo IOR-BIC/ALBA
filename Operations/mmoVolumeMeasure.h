@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVolumeMeasure.h,v $
   Language:  C++
-  Date:      $Date: 2007-04-02 10:08:57 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-04-02 14:00:02 $
+  Version:   $Revision: 1.5 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -59,6 +59,8 @@ public:
   /**
   Compute the Volume */
   void VolumeCompute(mafVME *vme);
+
+	mafString GetVolume(){return m_VolumeMeasure;};
 
   void OpDo();
 
