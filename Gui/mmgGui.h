@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2007-01-19 16:15:26 $
-  Version:   $Revision: 1.34 $
+  Date:      $Date: 2007-04-02 14:55:16 $
+  Version:   $Revision: 1.35 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -203,7 +203,7 @@ public:
   mmgCheckListBox *CheckList(int id, wxString label = "", int height = 60, wxString tooltip = "");
 
   /** Listbox widget. */
-	wxListBox *ListBox(int id, wxString label = "", int height = 60, wxString tooltip = "", long lbox_style = 0);
+	wxListBox *ListBox(int id, wxString label = "", int height = 60, wxString tooltip = "", long lbox_style = 0, int width = -1);
 
   /** Grid widget. */
 	wxGrid *Grid(int id, wxString label = "", int height = 60, int row = 2,int cols = 2, wxString tooltip = "");

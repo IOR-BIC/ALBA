@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-16 15:21:55 $
-  Version:   $Revision: 1.46 $
+  Date:      $Date: 2007-04-02 14:55:16 $
+  Version:   $Revision: 1.47 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1192,10 +1192,11 @@ void mmgGui::OkCancel(int alignment)
 	Add(sizer,0,wxALL|alignment, M);
 }
 //----------------------------------------------------------------------------
-wxListBox *mmgGui::ListBox(int id,wxString label,int height, wxString tooltip, long lbox_style) //<*> togliere direction
+wxListBox *mmgGui::ListBox(int id,wxString label,int height, wxString tooltip, long lbox_style , int width) //<*> togliere direction
 //----------------------------------------------------------------------------
 {
-  int width = (label == "") ? FW : DW;
+	if(width<0)
+		width = (label == "") ? FW : DW;
   int w_id = GetId(id);
 	wxListBox *lb = new wxListBox(this, w_id,dp,wxSize(width ,height),0, NULL,lbox_style | m_EntryStyle);  // wxSUNKEN_BORDER non funzia - aggiunge anche il bordino nero
   lb->SetValidator( mmgValidator(this,w_id,lb) );
