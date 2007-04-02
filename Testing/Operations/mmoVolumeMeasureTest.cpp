@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoVolumeMeasureTest.cpp,v $
 Language:  C++
-Date:      $Date: 2006-11-28 11:15:47 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-04-02 13:15:33 $
+Version:   $Revision: 1.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -46,7 +46,8 @@ void mmoVolumeMeasureTest::Test()
 	mmoVolumeMeasure *volumeMeasureOp=new mmoVolumeMeasure("Volume Measure");
 	volumeMeasureOp->TestModeOn();
   mafString result;
-  result = volumeMeasureOp->VolumeCompute(vmeSurface);
+ volumeMeasureOp->VolumeCompute(vmeSurface);
+ result = volumeMeasureOp->GetVolume();
 	
   //printf("%s", result);
   CPPUNIT_ASSERT(result == mafString("6000"));
