@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoBooleanSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-03-30 08:29:55 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-04-02 09:32:38 $
+Version:   $Revision: 1.3 $
 Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -78,8 +78,6 @@ mafOp(label)
 
 	m_ClipInside = 0;
 	m_Subdivision = 1;
-
-	m_VTKResult.resize(0);
 }
 //----------------------------------------------------------------------------
 mmoBooleanSurface::~mmoBooleanSurface()
@@ -509,10 +507,9 @@ void mmoBooleanSurface::Intersection()
 				{
 					m_Gui->Enable(ID_UNDO,true);
 					m_Gui->Enable(wxOK,true);
-					m_VTKResult.push_back(resultPolydata);
 				}
+				m_VTKResult.push_back(resultPolydata);
 			}
-			vtkDEL(resultPolydata);
 			vtkDEL(transformResultDataInput);
 			vtkDEL(clipper);
 			vtkDEL(implicitPolyData);
@@ -728,10 +725,9 @@ void mmoBooleanSurface::Difference()
 				{
 					m_Gui->Enable(ID_UNDO,true);
 					m_Gui->Enable(wxOK,true);
-					m_VTKResult.push_back(resultPolydata);
 				}
+				m_VTKResult.push_back(resultPolydata);
 			}
-			vtkDEL(resultPolydata);
 			vtkDEL(transformResultDataInput);
 			vtkDEL(clipper);
 			vtkDEL(implicitPolyData);
