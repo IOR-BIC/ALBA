@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-22 06:54:52 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2007-04-02 15:50:44 $
+  Version:   $Revision: 1.29 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,6 +34,7 @@
 #include "mmaVolumeMaterial.h"
 #include "mafVMEVolume.h"
 #include "mafVMESurface.h"
+#include "mafVMESurfaceParametric.h"
 
 #include "vtkDataSet.h"
 #include "vtkLookupTable.h"
@@ -226,7 +227,7 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
     }
 
   }
-  else if (node->IsMAFType(mafVMESurface))
+  else if (node->IsMAFType(mafVMESurface)||node->IsMAFType(mafVMESurfaceParametric))
   {
     // showing a surface with the volume present already
     if (show && m_CurrentVolume)
@@ -295,6 +296,7 @@ void mafViewRXCT::VmeRemove(mafNode *node)
 }
 //----------------------------------------------------------------------------
 void mafViewRXCT::OnEventRangeModified(mafEventBase *maf_event)
+//----------------------------------------------------------------------------
 {
   // is the volume visible?
   if(((mafViewSlice *)m_ChildViewList[RX_FRONT_VIEW])->VolumeIsVisible())
@@ -327,7 +329,9 @@ void mafViewRXCT::OnEventRangeModified(mafEventBase *maf_event)
     CameraUpdate();
   }
 }
+//----------------------------------------------------------------------------
 void mafViewRXCT::OnEventSnapModality()
+//----------------------------------------------------------------------------
 {
   if(this->m_CurrentVolume==NULL && m_Snap)
   {
@@ -346,7 +350,9 @@ void mafViewRXCT::OnEventSnapModality()
     }
   }
 }
+//----------------------------------------------------------------------------
 void mafViewRXCT::OnEventSortSlices()
+//----------------------------------------------------------------------------
 {
   mafNode* node=GetSceneGraph()->GetSelectedVme();
   mafPipe *p=((mafViewRX *)m_ChildViewList[0])->GetNodePipe(node);
@@ -380,8 +386,38 @@ void mafViewRXCT::OnEventSortSlices()
     m_ChildViewList[RX_FRONT_VIEW]->CameraUpdate();
     m_ChildViewList[RX_SIDE_VIEW]->CameraUpdate();
   }
+	else if (node->IsMAFType(mafVMESurfaceParametric))
+	{
+		double center[3],b[6],step;
+		mafVMESurfaceParametric *surface=(mafVMESurfaceParametric*)node;
+		surface->GetOutput()->GetBounds(b);
+		step = (b[5]-b[4])/7.0;
+		center[0]=0;
+		center[1]=0;
+		for (int currChildCTView=0; currChildCTView < CT_CHILD_VIEWS_NUMBER; currChildCTView++)
+		{
+			if(m_GizmoSlice[currChildCTView])
+			{
+				center[2] = b[5]-step*(currChildCTView+1);
+				center[2] = center[2] > b[5] ? b[5] : center[2];
+				center[2] = center[2] < b[4] ? b[4] : center[2];
+				m_GizmoSlice[currChildCTView]->CreateGizmoSliceInLocalPositionOnAxis(currChildCTView,mafGizmoSlice::GIZMO_SLICE_Z,center[2]);
+				m_Pos[currChildCTView]=center[2];
+				m_Sort[currChildCTView]=currChildCTView;
+				((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->SetSliceLocalOrigin(center);
+				((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->SetTextColor(m_BorderColor[currChildCTView]);
+				((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->UpdateText();
+				((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->BorderCreate(m_BorderColor[currChildCTView]);
+				((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->CameraUpdate();
+			}
+		}
+		m_ChildViewList[RX_FRONT_VIEW]->CameraUpdate();
+		m_ChildViewList[RX_SIDE_VIEW]->CameraUpdate();
+	}
 }
+//----------------------------------------------------------------------------
 void mafViewRXCT::OnEventSetThickness()
+//----------------------------------------------------------------------------
 {
   if(m_AllSurface)
   {
@@ -398,7 +434,9 @@ void mafViewRXCT::OnEventSetThickness()
     ((mafPipeSurfaceSlice *)p)->SetThickness(m_Border);
   }
 }
+//----------------------------------------------------------------------------
 void mafViewRXCT::OnEventMouseMove( mafEvent *e )
+//----------------------------------------------------------------------------
 {
   long movingSliceId;
   movingSliceId = e->GetArg();
@@ -453,6 +491,7 @@ void mafViewRXCT::OnEventMouseMove( mafEvent *e )
   m_ChildViewList[RX_FRONT_VIEW]->CameraUpdate();
   m_ChildViewList[RX_SIDE_VIEW]->CameraUpdate();
 }
+//----------------------------------------------------------------------------
 void mafViewRXCT::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
@@ -544,7 +583,7 @@ mmgGui* mafViewRXCT::CreateGui()
   m_Gui->FloatSlider(ID_BORDER_CHANGE,"Border",&m_Border,1.0,5.0);
 
   mafNode* node=this->GetSceneGraph()->GetSelectedVme();
-  if (node->IsA("mafVMESurface"))
+  if (node->IsA("mafVMESurface")||node->IsA("mafVMESurfaceParametric"))
   {
     m_Gui->Enable(ID_ALL_SURFACE,true);
     m_Gui->Enable(ID_BORDER_CHANGE,true);
@@ -739,7 +778,7 @@ void mafViewRXCT::VmeSelect(mafNode *node, bool select)
 	if(m_Gui)
 	{
 		mafPipe *p=((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(0))->GetNodePipe(node);
-		if(node->IsA("mafVMESurface")&&select&&p)
+		if((node->IsA("mafVMESurface")||node->IsA("mafVMESurfaceParametric"))&&select&&p)
 		{
 			m_Gui->Enable(ID_ALL_SURFACE,true);
 			m_Gui->Enable(ID_BORDER_CHANGE,true);
