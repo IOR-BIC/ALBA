@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVolumeMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-02 10:08:57 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-04-02 10:48:54 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -243,7 +243,6 @@ void mmoVolumeMeasure::VolumeCompute(mafVME *vme)
 		m_NormalizedShapeIndex = wxString::Format(_("Impossible compute the N.S.I."));
 		m_SurfaceArea = wxString::Format(_("Impossible compute the surface area"));
 		m_VolumeMeasure = wxString::Format(_("Impossible compute the surface volume"));
-		return;
 	}
 	else
 	{
