@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-28 12:16:48 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-04-03 10:19:48 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -70,6 +70,9 @@ public:
   /** Remove visual-pipe for closed cloud */
   void RemoveClosedCloudPipe();
 
+	void ShowBoxSelectionOn(){m_ShowSelection=true;};
+	void ShowBoxSelectionOff(){m_ShowSelection=false;};
+
   /** IDs for the GUI */
   enum PIPE_SURFACE_WIDGET_ID
   {
@@ -109,6 +112,8 @@ protected:
   vtkSphereSource         *m_SphereSource;
 
   double				           m_Border;
+
+	bool	m_ShowSelection;
 
   double	m_Origin[3];
   double	m_Normal[3];

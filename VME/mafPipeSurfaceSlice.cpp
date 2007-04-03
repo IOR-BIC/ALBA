@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:55:55 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-04-03 10:19:48 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -91,6 +91,8 @@ mafPipeSurfaceSlice::mafPipeSurfaceSlice()
   m_ScalarVisibility = 0;
   m_RenderingDisplayListFlag = 0;
   m_Border=1;
+
+	m_ShowSelection = false;
 }
 //----------------------------------------------------------------------------
 void mafPipeSurfaceSlice::Create(mafSceneNode *n/*, bool use_axes*/)
@@ -331,9 +333,9 @@ void mafPipeSurfaceSlice::Select(bool sel)
 //----------------------------------------------------------------------------
 {
 	m_Selected = sel;
-	if(m_Actor && m_Actor->GetVisibility()) 
+	if(m_Actor && m_Actor->GetVisibility() && m_ShowSelection) 
 	{
-			//m_OutlineActor->SetVisibility(sel);
+			m_OutlineActor->SetVisibility(sel);
       //m_Axes->SetVisibility(sel);
 	}
 }
