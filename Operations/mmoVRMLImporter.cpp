@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVRMLImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-03 10:00:52 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-04-03 10:29:14 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -24,6 +24,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mmgDialog.h"
 
 #include "mmaMaterial.h"
+#include "mafTagArray.h"
 #include "mafVME.h"
 #include "mafVMESurface.h"
 #include "mafVMEGroup.h"
