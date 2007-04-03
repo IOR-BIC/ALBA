@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-23 15:36:54 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2007-04-03 09:22:26 $
+  Version:   $Revision: 1.16 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -64,7 +64,7 @@ enum PLANE_ID
 
 //----------------------------------------------------------------------------
 mafViewGlobalSlice::mafViewGlobalSlice(wxString label, int camera_position, bool show_axes, bool show_grid, bool show_ruler, int stereo)
-: mafViewVTK(label)
+: mafViewVTK(label,camera_position,show_axes,show_grid, show_ruler, stereo)
 //----------------------------------------------------------------------------
 {
 	m_SliceOrigin[0] = m_SliceOrigin[1] = m_SliceOrigin[2] = 0.0;
@@ -121,7 +121,7 @@ mafViewGlobalSlice::~mafViewGlobalSlice()
 mafView *mafViewGlobalSlice::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewGlobalSlice *v = new mafViewGlobalSlice(m_Label);
+  mafViewGlobalSlice *v = new mafViewGlobalSlice(m_Label, m_CameraPosition, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
@@ -247,6 +247,7 @@ void mafViewGlobalSlice::VmeCreatePipe(mafNode *node)
 			}
       else if(pipe_name.Equals("mafPipeSurfaceSlice"))
       {
+				((mafPipeSurfaceSlice *)pipe)->ShowBoxSelectionOn();
         ((mafPipeSurfaceSlice *)pipe)->SetSlice(m_SliceOrigin);
 				double DoubleNormal[3];
 				DoubleNormal[0]=(double)m_SliceNormal[0];
