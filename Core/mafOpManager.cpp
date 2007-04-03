@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-21 09:39:18 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2007-04-03 14:31:26 $
+  Version:   $Revision: 1.29 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -519,8 +519,8 @@ void mafOpManager::OpRun(mafOp *op, void *op_param)
   
 	if(!tag_nature.IsEmpty() && tag_nature.Equals("NATURAL") && !op->IsInputPreserving())
 	{
-		wxString warning_msg = "The operation do not preserve input VME integrity, a copy is required! \nThis should take a lot of memory and time depending on data dimension. \nDo you want to make a copy?";
-		wxMessageDialog dialog(mafGetFrame(),warning_msg, "VME Preserving Warning",wxYES_NO|wxYES_DEFAULT);
+		wxString warning_msg = "The operation do not preserve input VME integrity, a copy is required! \nThis should require a lot of memory and time depending on data dimension. \nDo you want to continue?";
+		wxMessageDialog dialog(mafGetFrame(),warning_msg, "VME Preserving Warning", wxYES_NO | wxYES_DEFAULT);
 		if(dialog.ShowModal() == wxID_YES)
     {
       wxString synthetic_name = "Copied ";
@@ -533,6 +533,11 @@ void mafOpManager::OpRun(mafOp *op, void *op_param)
       mafEventMacro(mafEvent(this,VME_SHOW,m_Selected,false));
       OpSelect(synthetic_vme);
       mafEventMacro(mafEvent(this,VME_SHOW,synthetic_vme,true));
+    }
+    else
+    {
+      m_RunningOp = NULL;
+      return;
     }
 	}
 
