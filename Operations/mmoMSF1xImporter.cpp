@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMSF1xImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-04-03 10:18:22 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -89,7 +89,10 @@ void mmoMSF1xImporter::ImportMSF()
   m_Importer->SetRoot((mafVMERoot *)m_Input->GetRoot());
   
   //mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,preader));
-  
+  mafTagItem item;
+  mafVMERoot *root = (mafVMERoot *)m_Input->GetRoot();
+  root->GetTagArray()->GetTag("APP_STAMP" , item);
+
   success = (m_Importer->Restore() == MAF_OK);
 
   if(!success)
@@ -98,6 +101,8 @@ void mmoMSF1xImporter::ImportMSF()
   ((mafVMERoot *)m_Input->GetRoot())->GetStorage()->SetURL(m_File.GetCStr());
   ((mafVMERoot *)m_Input->GetRoot())->GetStorage()->ForceParserURL();
   ((mafVMERoot *)m_Input->GetRoot())->Update();
+
+  root->GetTagArray()->SetTag("APP_STAMP", item.GetValue(), item.GetType());
 
   cppDEL(m_Importer);
 }
