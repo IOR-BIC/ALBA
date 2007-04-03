@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoSTLExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-04-03 10:00:30 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,7 +23,7 @@
 #include "mafDecl.h"
 #include "mmgGui.h"
 
-#include "mafVMESurface.h"
+#include "mafVME.h"
 #include "mafVMEOutputSurface.h"
 #include "mafTransformBase.h"
 
@@ -60,7 +60,7 @@ mmoSTLExporter::~mmoSTLExporter( )
 bool mmoSTLExporter::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  return (node && node->IsMAFType(mafVMESurface));
+  return (node && ((mafVME *)node)->GetOutput()->IsMAFType(mafVMEOutputSurface));
 }
 //----------------------------------------------------------------------------
 // constants
@@ -138,15 +138,16 @@ void mmoSTLExporter::OpStop(int result)
 void mmoSTLExporter::ExportSurface()
 //----------------------------------------------------------------------------
 {
-	((mafVMESurface *)m_Input)->GetSurfaceOutput()->Update();
-	
-	vtkMAFSmartPointer<vtkTriangleFilter>triangles;
-	triangles->SetInput(((mafVMESurface *)m_Input)->GetSurfaceOutput()->GetSurfaceData());
+  mafVMEOutputSurface *out_surface = mafVMEOutputSurface::SafeDownCast(((mafVME *)m_Input)->GetOutput());
+  out_surface->Update();
+
+  vtkMAFSmartPointer<vtkTriangleFilter>triangles;
+	vtkMAFSmartPointer<vtkTransformPolyDataFilter> v_tpdf;
+	triangles->SetInput(out_surface->GetSurfaceData());
 	triangles->Update();
 
-	vtkMAFSmartPointer<vtkTransformPolyDataFilter> v_tpdf;
 	v_tpdf->SetInput(triangles->GetOutput());
-  v_tpdf->SetTransform(((mafVMESurface *)m_Input)->GetOutput()->GetAbsTransform()->GetVTKTransform());
+	v_tpdf->SetTransform(out_surface->GetAbsTransform()->GetVTKTransform());
 	v_tpdf->Update();
 
 	vtkMAFSmartPointer<vtkSTLWriter> writer;

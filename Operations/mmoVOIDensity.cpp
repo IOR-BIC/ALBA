@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVOIDensity.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-04-03 10:00:30 $
+  Version:   $Revision: 1.5 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,7 +23,9 @@
 #include "mafString.h"
 #include "mmoVOIDensity.h"
 #include "mafEventBase.h"
-#include "mafVMESurface.h"
+
+#include "mafVMEOutputSurface.h"
+
 #include "mafAbsMatrixPipe.h"
 
 #include "vtkMAFSmartPointer.h"
@@ -71,7 +73,7 @@ mmoVOIDensity::mmoVOIDensity(const wxString &label)
   m_StandardDeviationString = mafString(wxString::Format("%f",m_StandardDeviation));
 }
 //----------------------------------------------------------------------------
-mmoVOIDensity::~mmoVOIDensity( ) 
+mmoVOIDensity::~mmoVOIDensity()
 //----------------------------------------------------------------------------
 {
 	m_Surface = NULL;
@@ -168,6 +170,12 @@ void mmoVOIDensity::OnEvent(mafEventBase *maf_event)
 				if(m_Surface == NULL)
 					return;
 				mafVME *VME=mafVME::SafeDownCast(m_Surface);
+        if (VME == NULL)
+        {
+          wxMessageBox(_("Not valid surface choosed!!"), _("Warning"));
+          m_Surface = NULL;
+          return;
+        }
 				VME->Update();
 				vtkMAFSmartPointer<vtkFeatureEdges> FE;
 				FE->SetInput((vtkPolyData *)(VME->GetOutput()->GetVTKData()));
@@ -227,13 +235,17 @@ void mmoVOIDensity::ExtractVolumeScalars()
   int NumberVoxels, PointId;
   
   m_NumberOfScalars = 0;
-	mafVMESurface *VME=mafVMESurface::SafeDownCast(m_Surface);
-  VME->GetOutput()->GetBounds(b);
+	vtkAbstractTransform *transform;
+	vtkPolyData *polydata;
+	mafVME *VME = mafVME::SafeDownCast(m_Surface);
+	VME->GetOutput()->GetBounds(b);
 	VME->Update();
+	transform=(vtkAbstractTransform*)VME->GetAbsMatrixPipe()->GetVTKTransform();
+	polydata=(vtkPolyData *)VME->GetOutput()->GetVTKData();
 
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> TransformDataClipper;
-  TransformDataClipper->SetTransform((vtkAbstractTransform *)VME->GetAbsMatrixPipe()->GetVTKTransform());
-  TransformDataClipper->SetInput((vtkPolyData *)VME->GetOutput()->GetVTKData());
+  TransformDataClipper->SetTransform(transform);
+  TransformDataClipper->SetInput(polydata);
   TransformDataClipper->Update();
 
 	vtkMAFSmartPointer<vtkImplicitPolyData> ImplicitSurface;

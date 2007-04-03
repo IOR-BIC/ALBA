@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVOIDensity.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-04-03 10:00:30 $
+  Version:   $Revision: 1.4 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -94,7 +94,7 @@ public:
 			mafVMESurfaceAccept() {};
 		 ~mafVMESurfaceAccept() {};
 
-		bool Validate(mafNode* Node) {return(Node != NULL && Node->IsA("mafVMESurface"));};
+		bool Validate(mafNode* Node) {return(Node != NULL && (((mafVME *)Node)->GetOutput()->IsA("mafVMEOutputSurface")));};
 	};
   mafVMESurfaceAccept *m_VMESurfaceAccept;
 
