@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2007-04-03 10:00:52 $
+  Version:   $Revision: 1.16 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -570,8 +570,8 @@ bool mmoRAWImporterVolume::Import()
 	}
 
 	mafTagItem tag_Nature;
-	tag_Nature.SetName(_("VME_NATURE"));
-	tag_Nature.SetValue(_("NATURAL"));
+	tag_Nature.SetName("VME_NATURE");
+	tag_Nature.SetValue("NATURAL");
 
 	wxString name, ext, path;
   wxSplitPath(m_RawFile.GetCStr(),&path,&name,&ext);

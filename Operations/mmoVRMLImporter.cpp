@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVRMLImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-04-03 10:00:52 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -234,6 +234,10 @@ void  mmoVRMLImporter::ImportVRML()
 
       surface->GetMatrixVector()->AppendKeyMatrix(matrix);
       surface->ReparentTo(m_Group);
+      mafTagItem tag_Nature;
+      tag_Nature.SetName("VME_NATURE");
+      tag_Nature.SetValue("NATURAL");
+      surface->GetTagArray()->SetTag(tag_Nature);
     }
   }
   m_Output = m_Group;
