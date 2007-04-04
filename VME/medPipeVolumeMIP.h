@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeMIP.h,v $
   Language:  C++
-  Date:      $Date: 2007-04-04 10:07:58 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-04-04 10:52:54 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -29,11 +29,9 @@ class vtkVolumeRayCastMapper;
 class vtkActor;
 class vtkLODProp3D;
 class vtkLookupTable;
-class vtkImageResample;
-class vtkImageMedian3D;
-
 class vtkVolume;
-
+class vtkImageResample;
+class vtkLookupTable;
 //----------------------------------------------------------------------------
 // medPipeVolumeMIP :
 //----------------------------------------------------------------------------
@@ -51,16 +49,16 @@ public:
   /** IDs for the GUI */
   enum PIPE_VOLUME_MIP_WIDGET_ID
   {
-    ID_LUT_CHOOSER = Superclass::ID_LAST,
-		ID_RESAMPLE_FACTOR,
+    ID_RESAMPLE_FACTOR = Superclass::ID_LAST,
+    ID_LUT_CHOOSER,
     ID_LAST
   };
 
   virtual void Create(mafSceneNode *n);
   virtual void Select(bool select); 
 
-	void SetResampleFactor(double value);
-	double GetResampleFactor();
+  void SetResampleFactor(double value);
+  double GetResampleFactor(){return m_ResampleFactor;};
 
 protected:
   /** 
@@ -69,27 +67,14 @@ protected:
 
   virtual mmgGui  *CreateGui();
 
-  vtkLookupTable              *m_ColorLUT;
-  vtkImageCast                *m_Caster;
+  double					  m_ResampleFactor;
+  vtkImageResample			  *m_ResampleFilter;	
   vtkPiecewiseFunction        *m_OpacityTransferFunction;
   vtkVolumeProperty           *m_VolumeProperty;
   vtkVolumeRayCastMIPFunction *m_MIPFunction;
   vtkVolumeRayCastMapper      *m_VolumeMapper;
-  vtkVolumeRayCastMapper      *m_VolumeMapperLow;
-  vtkLODProp3D                *m_VolumeLOD;
+  vtkVolume					  *m_Volume;
+  vtkLookupTable      *m_ColorLUT;
 
-  vtkVolume                   *m_Volume;
-
-	vtkImageResample						*m_ResampleFilter;
-	vtkImageMedian3D						*m_Median;
-
-	
-
-  vtkActor               *m_SelectionActor;
-  double  m_VolumeBounds[6];
-  double  m_VolumeOrientation[3];
-  double  m_VolumePosition[3];
-
-	double	m_ResampleFactor;
 };
 #endif // __medPipeVolumeMIP_H__
