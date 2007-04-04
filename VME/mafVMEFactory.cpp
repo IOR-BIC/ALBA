@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-08 16:43:40 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2007-04-04 13:53:14 $
+  Version:   $Revision: 1.21 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -45,6 +45,7 @@
 #include "mafVMESlicer.h"
 #include "mafVMESurface.h"
 #include "mafVMESurfaceParametric.h"
+#include "mafVMEVector.h"
 #include "mafVMEVolume.h"
 #include "mafVMEVolumeGray.h"
 #include "mafVMEVolumeRGB.h"
@@ -125,6 +126,7 @@ mafVMEFactory::mafVMEFactory()
   mafPlugNodeMacro(mafVMEScalar,"VME representing time varying scalar values");
 #endif
   mafPlugNodeMacro(mafVMESlicer,"VME representing a slice of a volume");
+  mafPlugNodeMacro(mafVMEVector,"VME representing aa applyed vector");
 }
 
 //------------------------------------------------------------------------------

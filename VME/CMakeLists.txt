@@ -131,6 +131,8 @@ IF (MAF_USE_VTK)
   mafVMESurface.h
   mafVMESurfaceParametric.cpp
   mafVMESurfaceParametric.h
+  mafVMEVector.cpp
+  mafVMEVector.h
   mafVMEVolume.cpp
   mafVMEVolume.h
   mafVMEVolumeGray.cpp
