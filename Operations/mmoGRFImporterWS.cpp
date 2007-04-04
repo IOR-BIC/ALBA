@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoGRFImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-14 09:13:20 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-04-04 11:39:50 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,6 +23,12 @@
 #include <wx/tokenzr.h>
 #include <wx/wfstream.h>
 
+#include <vtkCubeSource.h>
+#include "vtkMAFSmartPointer.h"
+#include "vtkCellArray.h"
+#include <vtkPoints.h>
+#include <vtkPolyData.h>
+
 #include "mmoGRFImporterWS.h"
 
 #include "mafDecl.h"
@@ -31,11 +37,19 @@
 
 #include "mafVME.h"
 #include "mafVMEScalar.h"
+#include "mafVMEVector.h"
+#include "mafVMESurface.h"
 #include "mafTagArray.h"
 #include "mafSmartPointer.h"
 
+
+
 #include <iostream>
 #include <fstream>
+
+#define DELTA 10.0
+
+
 
 //----------------------------------------------------------------------------
 // Constants :
@@ -52,14 +66,50 @@ mafOp(label)
 	m_Canundo	= true;
 	m_File		= "";
 	m_FileDir = (mafGetApplicationDirectory() + "/Data/External/").c_str();
-
-  m_GrfScalar = NULL;
+  m_Output = NULL;
+  m_PlatformLeft = NULL;
+  m_PlatformRight = NULL;
+  m_VectorLeft = NULL;
+  m_VectorRight = NULL;
+ 
 }
 //----------------------------------------------------------------------------
 mmoGRFImporterWS::~mmoGRFImporterWS()
 //----------------------------------------------------------------------------
 {
-  mafDEL(m_GrfScalar);
+//  mafDEL(m_GrfScalar);
+  mafDEL(m_PlatformLeft);
+  mafDEL(m_PlatformRight);
+  mafDEL(m_VectorLeft);
+  mafDEL(m_VectorRight);
+
+
+}
+//----------------------------------------------------------------------------
+void mmoGRFImporterWS::OpDo()
+//----------------------------------------------------------------------------
+{
+  if(m_PlatformLeft != NULL)
+  {
+    mafEventMacro(mafEvent(this,VME_ADD,m_PlatformLeft));
+    m_VectorLeft->ReparentTo(m_PlatformLeft);
+  }
+
+  if(m_PlatformRight != NULL)
+  {
+    mafEventMacro(mafEvent(this,VME_ADD,m_PlatformRight));
+    m_VectorRight->ReparentTo(m_PlatformRight);
+  }
+}
+//----------------------------------------------------------------------------
+void mmoGRFImporterWS::OpUndo()
+//----------------------------------------------------------------------------
+{   
+
+  if(m_PlatformLeft != NULL)
+    mafEventMacro(mafEvent(this,VME_REMOVE,m_PlatformLeft));
+  if(m_PlatformRight != NULL)
+    mafEventMacro(mafEvent(this,VME_REMOVE,m_PlatformRight));
 }
 //----------------------------------------------------------------------------
 mafOp* mmoGRFImporterWS::Copy()   
@@ -110,23 +160,29 @@ void mmoGRFImporterWS::Read()
   //if (!m_TestMode)
     wxBusyInfo wait("Please wait, working...");
 
-  mafNEW(m_GrfScalar);
+//  mafNEW(m_GrfScalar);
   wxString path, name, ext;
   wxSplitPath(m_File.c_str(),&path,&name,&ext);
-  m_GrfScalar->SetName(name);
+//  m_GrfScalar->SetName(name);
 
   mafTagItem tag_Nature;
   tag_Nature.SetName("VME_NATURE");
   tag_Nature.SetValue("NATURAL");
 
-  mafString time, scalar;
-
+  
   wxFileInputStream inputFile( m_File );
   wxTextInputStream text( inputFile );
 
-  double grf_time; 
-  double val_scalar;
+ 
+//  double val_scalar;
   wxString line;
+
+  mafString platform1St[12];
+  mafString platform2St[12];
+
+  double platform1[12];
+  double platform2[12];
+
 
   line = text.ReadLine(); 
   line = text.ReadLine();
@@ -137,47 +193,174 @@ void mmoGRFImporterWS::Read()
 
   line = text.ReadLine(); //Skip textual lines
   line = text.ReadLine();
-  line = text.ReadLine(); 
+   
+  //Get values of the corners of the first platforms
   line = text.ReadLine();
-  line = text.ReadLine();
-  line = text.ReadLine();
-  line = text.ReadLine();
-  line = text.ReadLine();
-  line = text.ReadLine();
-  line.Replace(","," ");
+  wxStringTokenizer corners1(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
+  mafString junk = corners1.GetNextToken(); //Value to ignore
+  for (int i = 0 ; i < 12 ; i++)
+  {
+    platform1St[i] = corners1.GetNextToken().c_str();
+    platform1[i] = atof(platform1St[i]);
+  }
+  
 
-  int space, num_tk;
-  unsigned i;
+  //Get values of the corners of the second platforms
+  line = text.ReadLine();
+  wxStringTokenizer corners2(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
+  junk = corners2.GetNextToken(); //Value to ignore
+  for (int i = 0 ; i < 12 ; i++)
+  {
+    platform2St[i] = corners2.GetNextToken().c_str();
+    platform2[i] = atof(platform2St[i]);
+  }
+
+  vtkMAFSmartPointer<vtkCubeSource> platformLeft;
+  vtkMAFSmartPointer<vtkCubeSource> platformRight;
+
+
+  //Get values for platforms
+   mafNEW(m_PlatformLeft);
+   mafNEW(m_PlatformRight);
+  
+  double thickness1 = platform1[2]-DELTA;
+  double thickness2 = platform2[2]-DELTA;
+
+  platformLeft->SetBounds(platform1[0],platform1[3],platform1[7],platform1[1],thickness1,platform1[2]);
+  platformRight->SetBounds(platform2[0],platform2[3],platform2[7],platform2[1],thickness2,platform2[2]);
+
+  
+
+  line = text.ReadLine(); //Ignore lines
+  line = text.ReadLine();
+  line = text.ReadLine();
+  line = text.ReadLine();
+
+  //Read vector data
+  
+  //line.Replace(","," ");
+
+
+//  int space, num_tk;
+  //unsigned i;
   wxString frame;
+  mafString timeSt;
+  mafTimeStamp time;
+
+  mafString cop1StX,cop1StY,cop1StZ,ref1StX,ref1StY,ref1StZ,force1StX,force1StY,force1StZ,moment1StX,moment1StY,moment1StZ;
+  mafString cop2StX,cop2StY,cop2StZ,ref2StX,ref2StY,ref2StZ,force2StX,force2StY,force2StZ,moment2StX,moment2StY,moment2StZ;
+
+  vtkMAFSmartPointer<vtkPolyData> vector;
+  vtkMAFSmartPointer<vtkPoints> points;
+  vtkMAFSmartPointer<vtkCellArray> cellArray;
+  int pointId[2];
+
+  mafNEW(m_VectorLeft);
+  mafNEW(m_VectorRight);
+  m_VectorLeft->SetName("Left_vector");
+  m_VectorRight->SetName("Right_vector");
 
   do 
   {
-    space = line.Find(' ');
-    frame = line.SubString(0,space - 1);
-    grf_time = atof(frame)/freq_val; 
-    wxStringTokenizer tkz(line,wxT(' '),wxTOKEN_RET_EMPTY_ALL);
+    line = text.ReadLine();
+    wxStringTokenizer tkz(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
+    timeSt = tkz.GetNextToken().c_str();
+    time = atof(timeSt)/freq_val; 
+    
 
-    tkz.GetNextToken(); //To skip the time value
-    num_tk = tkz.CountTokens();
-    i = 0;
+    //Values of the first platform
+    cop1StX = tkz.GetNextToken().c_str();
+    cop1StY = tkz.GetNextToken().c_str();
+    cop1StZ = tkz.GetNextToken().c_str();
+    ref1StX = tkz.GetNextToken().c_str();
+    ref1StY = tkz.GetNextToken().c_str();
+    ref1StZ = tkz.GetNextToken().c_str();
+    force1StX = tkz.GetNextToken().c_str();
+    force1StY = tkz.GetNextToken().c_str();
+    force1StZ = tkz.GetNextToken().c_str();
+    moment1StX = tkz.GetNextToken().c_str();
+    moment1StY = tkz.GetNextToken().c_str();
+    moment1StZ = tkz.GetNextToken().c_str();
 
-    while (tkz.HasMoreTokens())
+    double cop1X = atof(cop1StX);
+    double cop1Y = atof(cop1StY);
+    double cop1Z = atof(cop1StZ);
+
+    double ref1X = atof(ref1StX);
+    double ref1Y = atof(ref1StY);
+    double ref1Z = atof(ref1StZ);
+   
+    double force1X = atof(force1StX);
+    double force1Y = atof(force1StY);
+    double force1Z = atof(force1StZ);
+
+    double moment1X = atof(moment1StX);
+    double moment1Y = atof(moment1StY);
+    double moment1Z = atof(moment1StZ);
+
+
+
+    if (cop1X != NULL && cop1Y != NULL && cop1Z != NULL)
     {
-      scalar = tkz.GetNextToken();
-      val_scalar = atof(scalar);
-      m_Grf_matrix.set_size(1,num_tk - 1);
+      points->InsertNextPoint(cop1X, cop1Y, cop1Z);
+      points->InsertNextPoint(force1X, force1Y, force1Z);
+      pointId[0] = 0;
+      pointId[1] = 1;
+      cellArray->InsertNextCell(2, pointId);  
+      vector->SetPoints(points);
+      vector->SetLines(cellArray);
 
-      m_Grf_matrix.put(0,i,val_scalar); //Add scalar value to the vnl_matrix
-
-      i++;     
+      m_VectorLeft->SetData(vector, time);
     }
 
-    m_GrfScalar->SetData(m_Grf_matrix, grf_time);
+    //Values of the second platform
+    cop2StX = tkz.GetNextToken().c_str();
+    cop2StY = tkz.GetNextToken().c_str();
+    cop2StZ = tkz.GetNextToken().c_str();
+    ref2StX = tkz.GetNextToken().c_str();
+    ref2StY = tkz.GetNextToken().c_str();
+    ref2StZ = tkz.GetNextToken().c_str();
+    force2StX = tkz.GetNextToken().c_str();
+    force2StY = tkz.GetNextToken().c_str();
+    force2StZ = tkz.GetNextToken().c_str();
+    moment2StX = tkz.GetNextToken().c_str();
+    moment2StY = tkz.GetNextToken().c_str();
+    moment2StZ = tkz.GetNextToken().c_str();
 
-    line = text.ReadLine();
-    line.Replace(","," ");
+    double cop2X = atof(cop2StX);
+    double cop2Y = atof(cop2StY);
+    double cop2Z = atof(cop2StZ);
 
-  } while (!inputFile.Eof());
+    double ref2X = atof(ref2StX);
+    double ref2Y = atof(ref2StY);
+    double ref2Z = atof(ref2StZ);
 
-  m_Output = m_GrfScalar;
+    double force2X = atof(force2StX);
+    double force2Y = atof(force2StY);
+    double force2Z = atof(force2StZ);
+
+    double moment2X = atof(moment2StX);
+    double moment2Y = atof(moment2StY);
+    double moment2Z = atof(moment2StZ);
+
+
+    if (cop2X != NULL && cop2Y != NULL && cop2Z != NULL)
+    {
+      points->InsertNextPoint(cop2X, cop2Y, cop2Z);
+      points->InsertNextPoint(force2X, force2Y, force2Z);
+      pointId[0] = 0;
+      pointId[1] = 1;
+      cellArray->InsertNextCell(2, pointId);  
+      vector->SetPoints(points);
+      vector->SetLines(cellArray);
+ 
+      m_VectorRight->SetData(vector, time);
+    }
+
+
+    //Create the mafVMESurface for the platforms
+    m_PlatformLeft->SetData(platformLeft->GetOutput(), time);
+    m_PlatformRight->SetData(platformRight->GetOutput(), time);
+    
+  }while (!inputFile.Eof());
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoGRFImporterWS.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-09 13:41:53 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-04-04 11:39:50 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -12,6 +12,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #ifndef __mmoGRFImporterWS_H__
 #define __mmoGRFImporterWS_H__
+
+
 
 //----------------------------------------------------------------------------
 // Include :
@@ -23,7 +25,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // forward references :
 //----------------------------------------------------------------------------
 class mafEvent;
-class mafVMEScalar;
+class mafVMEVector;
+class vtkCubeSource;
+class mafVMESurface;
+//class mafVMEScalar;
 
 //----------------------------------------------------------------------------
 // mmoGRFImporterWS :
@@ -34,6 +39,12 @@ class mmoGRFImporterWS : public mafOp
 public:
 	mmoGRFImporterWS(wxString label);
 	~mmoGRFImporterWS(); 
+
+  void mmoGRFImporterWS::OpDo();
+
+  void mmoGRFImporterWS::OpUndo();
+
+
 	mafOp* Copy();
   virtual void OnEvent(mafEventBase *maf_event);
 
@@ -57,9 +68,14 @@ public:
   void SetFileName(const char *file_name){m_File = file_name;};
 
 protected:
-  mafVMEScalar *m_GrfScalar;
-  vnl_matrix<double> m_Grf_matrix;
-  wxString m_FileDir;
-	wxString m_File;
+
+  mafVMESurface      *m_PlatformLeft;
+  mafVMESurface      *m_PlatformRight;
+  mafVMEVector       *m_VectorLeft;
+  mafVMEVector       *m_VectorRight;
+  vnl_matrix<double>  m_Grf_matrix;
+  wxString            m_FileDir;
+	wxString            m_File;
+
 };
 #endif
