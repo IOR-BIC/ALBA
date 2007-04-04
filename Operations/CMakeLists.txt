@@ -97,6 +97,8 @@ IF (MAF_USE_ITK)
     mafASCIIImporterUtility.h
     mmoASCIIImporter.cpp
     mmoASCIIImporter.h
+    mafVMEMeshAnsysTextImporter.cpp
+    mafVMEMeshAnsysTextImporter.h
     mmoScalarToSurface.cpp
     mmoScalarToSurface.h
   )
