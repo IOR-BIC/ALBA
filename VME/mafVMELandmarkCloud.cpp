@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-13 15:27:24 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2007-04-04 11:40:34 $
+  Version:   $Revision: 1.27 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -40,6 +40,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkBitArray.h"
 #include "vtkPointData.h"
 #include "vtkTransform.h"
+#include "vtkDataSet.h"
+#include "vtkDataSetWriter.h"
 
 #include <vector>
 
@@ -51,9 +53,9 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //------------------------------------------------------------------------------
 // Events
 //------------------------------------------------------------------------------
-MAF_ID_IMP(mafVMELandmarkCloud::CLOUDE_OPEN_CLOSE);   // Event rised by Open and Close functions 
-MAF_ID_IMP(mafVMELandmarkCloud::CLOUDE_RADIUS_MODIFIED); // Event rised when the radius is changed with a SetRadius()
-MAF_ID_IMP(mafVMELandmarkCloud::CLOUDE_SPHERE_RES); // Event rised when the sphere resolution is changed with a SetSphereResolution()
+MAF_ID_IMP(mafVMELandmarkCloud::CLOUD_OPEN_CLOSE);   // Event rised by Open and Close functions 
+MAF_ID_IMP(mafVMELandmarkCloud::CLOUD_RADIUS_MODIFIED); // Event rised when the radius is changed with a SetRadius()
+MAF_ID_IMP(mafVMELandmarkCloud::CLOUD_SPHERE_RES); // Event rised when the sphere resolution is changed with a SetSphereResolution()
 
 //------------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMELandmarkCloud);
@@ -68,11 +70,11 @@ mafVMELandmarkCloud::mafVMELandmarkCloud()
   m_NumberOfLandmarks = -1;
   m_State             = UNSET_CLOUD;
   m_DefaultVisibility = 1;
-  //m_Radius            = -1;
   m_Radius            = 1.0;
-  //m_SphereResolution  = -1;
   m_SphereResolution  = 15;
   m_CloudStateCheckbox = 0;
+
+  m_SingleFile = 0;
 }
 
 //-------------------------------------------------------------------------
@@ -617,49 +619,35 @@ vtkPolyData *mafVMELandmarkCloud::NewPolyData(mafTimeStamp t)
 }
 
 //-------------------------------------------------------------------------
-void mafVMELandmarkCloud::SetRadius(double rad)
+void mafVMELandmarkCloud::SetRadius(double rad, bool force_update)
 //-------------------------------------------------------------------------
 {
-  if (mafEquals(rad, m_Radius))
+  if (mafEquals(rad, m_Radius) && !force_update)
     return;
 
-//  mafTagItem item;
   m_Radius = rad;
   Modified();
-//  item.SetName("LM_RADIUS");
-//  item.SetValue(rad);
-//  GetTagArray()->SetTag(item);
-  GetEventSource()->InvokeEvent(this, mafVMELandmarkCloud::CLOUDE_RADIUS_MODIFIED);
-  mafEvent cam_event(this,CAMERA_UPDATE);
-  this->ForwardUpEvent(cam_event);
+  GetEventSource()->InvokeEvent(this, mafVMELandmarkCloud::CLOUD_RADIUS_MODIFIED);
 }
 
 //-------------------------------------------------------------------------
 double mafVMELandmarkCloud::GetRadius()
 //-------------------------------------------------------------------------
 {
-  //return mafRestoreNumericFromTag(GetTagArray(),"LM_RADIUS",m_Radius,-1.0,1.0);
   return m_Radius;
 }
 
 //-------------------------------------------------------------------------
-void mafVMELandmarkCloud::SetSphereResolution(int res)
+void mafVMELandmarkCloud::SetSphereResolution(int res, bool force_update)
 //-------------------------------------------------------------------------
 {
-  if (res == m_SphereResolution)
+  if (mafEquals(res, m_SphereResolution) && !force_update)
     return;
-
-//  mafTagItem item;
 
   m_SphereResolution = res;
   Modified();
 
-//  item.SetName("LM_SPHERE_RESOLUTION");
-//  item.SetValue(res);
-//  GetTagArray()->SetTag(item);
-  GetEventSource()->InvokeEvent(this, mafVMELandmarkCloud::CLOUDE_SPHERE_RES);
-  mafEvent cam_event(this,CAMERA_UPDATE);
-  this->ForwardUpEvent(cam_event);
+  GetEventSource()->InvokeEvent(this, mafVMELandmarkCloud::CLOUD_SPHERE_RES);
 }
 
 //-------------------------------------------------------------------------
@@ -844,9 +832,15 @@ void mafVMELandmarkCloud::Close()
   {
     RemoveChild(landmarks[i]);
   }
+
+  if (m_Gui)
+  {
+    m_Gui->Enable(ID_SINGLE_FILE,!IsOpen());
+    m_Gui->Update();
+  }
     
   Modified();
-  GetEventSource()->InvokeEvent(this, mafVMELandmarkCloud::CLOUDE_OPEN_CLOSE);
+  GetEventSource()->InvokeEvent(this, mafVMELandmarkCloud::CLOUD_OPEN_CLOSE);
 }
 
 //-------------------------------------------------------------------------
@@ -875,7 +869,7 @@ void mafVMELandmarkCloud::Open()
     
 		for (mafDataVector::Iterator it = m_DataVector->Begin(); it != m_DataVector->End() ; it++)
 		{
-			double xyz[3];
+      double xyz[3];
       mafVMEItemVTK *item = mafVMEItemVTK::SafeDownCast(it->second);
       assert(item);
       if (vtkPolyData *polydata = (vtkPolyData *)item->GetData())
@@ -885,7 +879,7 @@ void mafVMELandmarkCloud::Open()
 			  GetPoint(polydata,i,xyz);
         mat.GetElements()[0][3] = xyz[0];
         mat.GetElements()[1][3] = xyz[1];
-        mat.GetElements()[2][3] = xyz[2];		  
+        mat.GetElements()[2][3] = xyz[2];
 
         // In case non visible set the scale factor to 0.
         if (!vis)
@@ -911,7 +905,7 @@ void mafVMELandmarkCloud::Open()
   // change the state to open to enable extra features
   SetState(OPEN_CLOUD);
   Modified();
-  GetEventSource()->InvokeEvent(this, mafVMELandmarkCloud::CLOUDE_OPEN_CLOSE);
+  GetEventSource()->InvokeEvent(this, mafVMELandmarkCloud::CLOUD_OPEN_CLOSE);
 }
 
 //-------------------------------------------------------------------------
@@ -1172,6 +1166,8 @@ mmgGui* mafVMELandmarkCloud::CreateGui()
 {
   m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
+//  m_Gui->Bool(ID_SINGLE_FILE,_("single file"),&m_SingleFile);
+//  m_Gui->Enable(ID_SINGLE_FILE,!IsOpen());
   m_Gui->Divider();
   GetRadius(); // Called to update m_Radius var from tag
   m_CloudStateCheckbox = this->IsOpen() ? 1 : 0;
@@ -1196,7 +1192,10 @@ void mafVMELandmarkCloud::OnEvent(mafEventBase *maf_event)
     switch(e->GetId())
     {
       case ID_LM_RADIUS:
-        SetRadius(m_Radius);
+        SetRadius(m_Radius, true);
+      break;
+      case ID_SINGLE_FILE:
+        m_DataVector->SetSingleFileMode(m_SingleFile != 0);
       break;
       case ID_OPEN_CLOSE_CLOUD:
       {
@@ -1216,7 +1215,7 @@ void mafVMELandmarkCloud::OnEvent(mafEventBase *maf_event)
       }
       break;
       case ID_LM_SPHERE_RESOLUTION:
-        SetSphereResolution(m_SphereResolution);
+        SetSphereResolution(m_SphereResolution, true);
       break;
       default:
         mafVME::OnEvent(maf_event);
@@ -1230,7 +1229,7 @@ void mafVMELandmarkCloud::OnEvent(mafEventBase *maf_event)
 //-----------------------------------------------------------------------
 int mafVMELandmarkCloud::InternalStore(mafStorageElement *parent)
 //-----------------------------------------------------------------------
-{  
+{
   if (Superclass::InternalStore(parent) == MAF_OK)
   {
     if (parent->StoreInteger("LM_SPHERE_RESOLUTION", m_SphereResolution) == MAF_OK &&
@@ -1239,6 +1238,53 @@ int mafVMELandmarkCloud::InternalStore(mafStorageElement *parent)
       return MAF_OK;
     }
   }
+  /*
+  if (IsOpen())
+  {
+    if (Superclass::InternalStore(parent) == MAF_OK)
+    {
+      if (parent->StoreInteger("LM_SPHERE_RESOLUTION", m_SphereResolution) == MAF_OK &&
+        parent->StoreDouble("LM_RADIUS", m_Radius) == MAF_OK)
+      {
+        return MAF_OK;
+      }
+    }
+  }
+  else
+  {
+    int res = MAF_ERROR;
+    mafString lm_data;
+    mafString itemName;
+    int i=0;
+    if (parent->StoreInteger("LM_SPHERE_RESOLUTION", m_SphereResolution) == MAF_OK &&
+      parent->StoreDouble("LM_RADIUS", m_Radius) == MAF_OK)
+    {
+      res = MAF_OK;
+    }
+    for (mafDataVector::Iterator it = m_DataVector->Begin(); it != m_DataVector->End() ; it++)
+    {
+      mafVMEItemVTK *item = mafVMEItemVTK::SafeDownCast(it->second);
+      assert(item);
+      if (vtkPolyData *polydata = (vtkPolyData *)item->GetData())
+      {
+        vtkMAFSmartPointer<vtkDataSetWriter> w;
+        w->SetInput(polydata);
+        w->WriteToOutputStringOn();
+        w->Write();
+        lm_data = w->GetOutputString();
+        itemName = "Frame_";
+        itemName << i;
+        if (parent->StoreData(itemName.GetCStr(), lm_data.GetCStr(), lm_data.Length()) == MAF_ERROR)
+        {
+          return MAF_ERROR;
+        }
+      }
+      i++;
+    }
+    return res;
+  }
+  */
+
   return MAF_ERROR;
 }
 //-----------------------------------------------------------------------

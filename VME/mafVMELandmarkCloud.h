@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-13 14:51:06 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2007-04-04 11:40:34 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -50,9 +50,9 @@ public:
   //------------------------------------------------------------------------------
   /** @ingroup Events */
   /** @{ */
-  MAF_ID_DEC(CLOUDE_OPEN_CLOSE);      ///< Event rised by Open and Close functions
-  MAF_ID_DEC(CLOUDE_RADIUS_MODIFIED); ///< Event rised when the radius is changed with a SetRadius()
-  MAF_ID_DEC(CLOUDE_SPHERE_RES);      ///< Event rised when the sphere resolution is changed with a SetSphereResolution()
+  MAF_ID_DEC(CLOUD_OPEN_CLOSE);      ///< Event rised by Open and Close functions
+  MAF_ID_DEC(CLOUD_RADIUS_MODIFIED); ///< Event rised when the radius is changed with a SetRadius()
+  MAF_ID_DEC(CLOUD_SPHERE_RES);      ///< Event rised when the sphere resolution is changed with a SetSphereResolution()
   /** @} */
 
   mafTypeMacro(mafVMELandmarkCloud, mafVMEPointSet);
@@ -123,13 +123,13 @@ public:
   /**
   Set/Get the m_Radius of this landmark. The radius is stored as an TAG item: "LM_RADIUS".
   If no radius has been ever set, the default value is "1".*/
-  virtual void SetRadius(double rad);
+  virtual void SetRadius(double rad, bool force_update = false);
   virtual double GetRadius();
 
   /**
   Set/Get the resolution of the landmarks' spheres. The resolution is stored as an TAG item: "LM_SPHERE_RESOLUTION".
   If no resolution has been ever set, default value is "15".*/
-  virtual void SetSphereResolution(int res);
+  virtual void SetSphereResolution(int res, bool force_update = false);
   virtual int GetSphereResolution();
 
   /**
@@ -146,6 +146,7 @@ public:
     ID_LM_RADIUS = Superclass::ID_LAST,
     ID_OPEN_CLOSE_CLOUD,
     ID_LM_SPHERE_RESOLUTION,
+    ID_SINGLE_FILE,
     ID_LAST
   };
 
@@ -248,6 +249,7 @@ protected:
   /** Internally used to create a new instance of the GUI.*/
   virtual mmgGui *CreateGui();
 
+  int m_SingleFile;
   int m_NumberOfLandmarks;
   int m_State;
   int m_DefaultVisibility;
