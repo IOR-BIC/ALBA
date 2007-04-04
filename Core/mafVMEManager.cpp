@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-08 15:01:20 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2007-04-04 17:10:50 $
+  Version:   $Revision: 1.31 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -369,6 +369,9 @@ const char *mafVMEManager::ZIPOpen(wxString filename)
   out_file_stream.close();
   delete[] buf;
   
+  zfileStream->UnRef();
+  delete zfileStream;
+
   while ((zfile = zip_fs->FindNext()) != "")
   {
     zfileStream = zip_fs->OpenFile(zfile);
@@ -391,12 +394,12 @@ const char *mafVMEManager::ZIPOpen(wxString filename)
     out_file_stream.write(buf, s_size);
     out_file_stream.close();
     delete[] buf;
+    zfileStream->UnRef();
+    delete zfileStream;
   }
   
   zip_fs->ChangePathTo(m_TmpDir,TRUE);
   zip_fs->CleanUpHandlers();
-  zfileStream->UnRef();
-  delete zfileStream;
   delete zip_fs;
   
   if (m_MSFFile == "")
