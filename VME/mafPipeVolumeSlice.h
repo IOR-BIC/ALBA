@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-17 13:01:03 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2007-04-04 11:08:32 $
+  Version:   $Revision: 1.20 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -109,13 +109,17 @@ public:
 
 	virtual void Select(bool select); 
 
-	void HideSlider();
+	void ShowTICKsOn();
+	void ShowTICKsOff();
 
+	void HideSlider();
 	void ShowSlider();
 
 protected:
 	/** Create the slicer pipeline. */
 	void CreateSlice(int direction);
+
+	void CreateTICKs();
 
   virtual mmgGui  *CreateGui();
 
@@ -144,6 +148,7 @@ protected:
 	vtkOutlineCornerFilter *m_VolumeBox;
   vtkPolyDataMapper			 *m_VolumeBoxMapper;
   vtkActor               *m_VolumeBoxActor;
+	vtkActor							 *m_TickActor;
 
   vtkActor               *m_GhostActor;
 
@@ -155,5 +160,6 @@ protected:
   bool                    m_ShowVolumeBox;
 	bool										m_ShowBounds;
 	bool										m_ShowSlider;
+	bool										m_ShowTICKs;
 };
 #endif // __mafPipeVolumeSlice_H__

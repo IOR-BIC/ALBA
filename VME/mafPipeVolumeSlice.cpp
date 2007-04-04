@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-03 10:17:24 $
-  Version:   $Revision: 1.43 $
+  Date:      $Date: 2007-04-04 11:08:32 $
+  Version:   $Revision: 1.44 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,6 +51,9 @@
 #include "vtkTransform.h"
 #include "vtkRenderer.h"
 #include "vtkOutlineSource.h"
+#include "vtkCellArray.h"
+#include "vtkDoubleArray.h"
+#include "vtkFloatArray.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeVolumeSlice);
@@ -84,6 +87,8 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
 	m_Mapper = NULL;
 	m_Actor = NULL;
 
+	m_TickActor = NULL;
+
   m_SliceDirection  = SLICE_Z;
   m_SliceOpacity  = 1.0;
   m_TextureRes    = 512;
@@ -110,6 +115,7 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
   m_YVector[2][2] = 0;
 
 	m_ShowSlider = true;
+	m_ShowTICKs	 = false;
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeSlice::InitializeSliceParameters(int direction, bool show_vol_bbox, bool show_bounds)
@@ -252,6 +258,8 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 		CreateSlice(m_SliceDirection);
 	}
 
+	CreateTICKs();
+
 	//if(m_ShowVolumeBox)
 	//{
 		vtkNEW(m_VolumeBox);
@@ -305,6 +313,113 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 		m_GhostActor->GetProperty()->SetInterpolationToFlat();
 		m_AssemblyFront->AddPart(m_GhostActor);
   }
+}
+//----------------------------------------------------------------------------
+void mafPipeVolumeSlice::CreateTICKs()
+//----------------------------------------------------------------------------
+{
+	//---- TICKs creation --------------------------
+	vtkPolyData  *CTLinesPD      = vtkPolyData::New();	
+	vtkPoints    *CTLinesPoints  = vtkPoints::New();	
+	vtkCellArray *CTCells        = vtkCellArray::New();
+	int points_id[2];    
+	int	counter = 0;
+
+	vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();
+	vtk_data->Update();
+
+	double bounds[6];
+	vtk_data->GetBounds(bounds);
+
+	double xmin, xmax, ymin, ymax, zmin, zmax;
+	xmin = bounds[0];
+	xmax = bounds[1];
+	ymin = bounds[2];
+	ymax = bounds[3];
+	zmin = bounds[4];
+	zmax = bounds[5];
+
+	vtkRectilinearGrid *rg_data = vtkRectilinearGrid::SafeDownCast(vtk_data);
+	if (rg_data)
+	{
+		vtkDoubleArray* z_fa = vtkDoubleArray::SafeDownCast(rg_data->GetZCoordinates());
+		if(z_fa)
+		{
+			for (int i = 0; i < z_fa->GetNumberOfTuples(); i++)
+			{
+				CTLinesPoints->InsertNextPoint(xmax, ymax, z_fa->GetValue(i));
+				CTLinesPoints->InsertNextPoint(xmax+(xmax-xmin)/30, ymax+(ymax-ymin)/30 ,z_fa->GetValue(i));
+				points_id[0] = counter;
+				points_id[1] = counter+1;
+				counter+=2;
+				CTCells->InsertNextCell(2 , points_id);
+			}
+		}
+		else
+		{
+			vtkFloatArray* z_fa_f = vtkFloatArray::SafeDownCast(rg_data->GetZCoordinates());
+			for (int i = 0; i < z_fa_f->GetNumberOfTuples(); i++)
+			{
+				CTLinesPoints->InsertNextPoint(xmax, ymax, z_fa_f->GetValue(i));
+				CTLinesPoints->InsertNextPoint(xmax+(xmax-xmin)/30, ymax+(ymax-ymin)/30 ,z_fa_f->GetValue(i));
+				points_id[0] = counter;
+				points_id[1] = counter+1;
+				counter+=2;
+				CTCells->InsertNextCell(2 , points_id);
+			}
+		}
+	}
+	vtkStructuredPoints *sp_data = vtkStructuredPoints::SafeDownCast(vtk_data);
+	if (sp_data)
+	{
+		int dim[3];
+		double origin[3];
+		double spacing[3];
+		sp_data->GetDimensions(dim);
+		sp_data->GetOrigin(origin);
+		sp_data->GetSpacing(spacing);
+
+		for (int i=0; i < dim[2]; i++)
+		{
+			float z_i = origin[2] + i*spacing[2];	//?
+			CTLinesPoints->InsertNextPoint(xmax, ymax, z_i);
+			CTLinesPoints->InsertNextPoint(xmax+(xmax-xmin)/30,ymax+(ymax-ymin)/30,z_i);
+
+			points_id[0] = counter;
+			points_id[1] = counter+1;
+			counter+=2;
+			CTCells->InsertNextCell(2 , points_id);
+		}	
+	}
+	CTLinesPD->SetPoints(CTLinesPoints);
+	CTLinesPD->SetLines(CTCells); 
+	CTLinesPD->Modified();	  
+
+	//Add tick to scene
+	vtkPolyDataMapper *TickMapper = vtkPolyDataMapper::New();
+	TickMapper->SetInput(CTLinesPD);
+
+	vtkProperty	*TickProperty = vtkProperty::New();
+	TickProperty->SetColor(1,0,0);
+	TickProperty->SetAmbient(1);
+	TickProperty->SetRepresentationToWireframe();
+	TickProperty->SetInterpolationToFlat();
+
+	m_TickActor = vtkActor::New();
+	m_TickActor->SetMapper(TickMapper);
+	m_TickActor->SetVisibility(m_ShowTICKs);
+	m_TickActor->PickableOff();
+	m_TickActor->SetProperty(TickProperty);
+
+	m_AssemblyUsed->AddPart(m_TickActor);
+
+	vtkDEL(CTLinesPoints);
+	vtkDEL(CTCells);
+	vtkDEL(CTLinesPD);
+
+	vtkDEL(TickMapper);
+	vtkDEL(TickProperty);
+
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeSlice::CreateSlice(int direction)
@@ -377,6 +492,8 @@ mafPipeVolumeSlice::~mafPipeVolumeSlice()
     m_AssemblyFront->RemovePart(m_VolumeBoxActor);
 	if(m_Actor)
 		m_AssemblyUsed->RemovePart(m_Actor);
+	if(m_TickActor)
+		m_AssemblyUsed->RemovePart(m_TickActor);
 
 	for(int i = 0; i<3; i++)
 	{
@@ -403,6 +520,7 @@ mafPipeVolumeSlice::~mafPipeVolumeSlice()
 	vtkDEL(m_VolumeBoxMapper);
 	vtkDEL(m_VolumeBoxActor);
 	vtkDEL(m_Actor);
+	vtkDEL(m_TickActor);
 
   if(m_GhostActor) 
     m_AssemblyFront->RemovePart(m_GhostActor);
@@ -625,4 +743,20 @@ void mafPipeVolumeSlice::ShowSlider()
 //----------------------------------------------------------------------------
 {
 	m_ShowSlider=true;
+}
+//----------------------------------------------------------------------------
+void mafPipeVolumeSlice::ShowTICKsOn()
+//----------------------------------------------------------------------------
+{
+	m_ShowTICKs=true;
+	if(m_TickActor)
+		m_TickActor->SetVisibility(m_ShowTICKs);
+}
+//----------------------------------------------------------------------------
+void mafPipeVolumeSlice::ShowTICKsOff()
+//----------------------------------------------------------------------------
+{
+	m_ShowTICKs=false;
+	if(m_TickActor)
+		m_TickActor->SetVisibility(m_ShowTICKs);
 }
