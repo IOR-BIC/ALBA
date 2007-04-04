@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeLandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:55:55 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-04-04 11:41:35 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -207,7 +207,7 @@ void mafPipeLandmarkCloud::OnEvent(mafEventBase *maf_event)
       break;
     }
   }
-  else if (maf_event->GetId() == mafVMELandmarkCloud::CLOUDE_OPEN_CLOSE)
+  else if (maf_event->GetId() == mafVMELandmarkCloud::CLOUD_OPEN_CLOSE)
   {
     if(m_Cloud->IsOpen())
     {
@@ -234,19 +234,21 @@ void mafPipeLandmarkCloud::OnEvent(mafEventBase *maf_event)
     }
     mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
-  else if (maf_event->GetId() == mafVMELandmarkCloud::CLOUDE_RADIUS_MODIFIED)
+  else if (maf_event->GetId() == mafVMELandmarkCloud::CLOUD_RADIUS_MODIFIED)
   {
     if (m_SphereSource)
     {
       m_SphereSource->SetRadius(m_Cloud->GetRadius());
+      mafEventMacro(mafEvent(this,CAMERA_UPDATE));
     }
   }
-  else if (maf_event->GetId() == mafVMELandmarkCloud::CLOUDE_SPHERE_RES)
+  else if (maf_event->GetId() == mafVMELandmarkCloud::CLOUD_SPHERE_RES)
   {
     if (m_SphereSource)
     {
       m_SphereSource->SetThetaResolution(m_Cloud->GetSphereResolution());
       m_SphereSource->SetPhiResolution(m_Cloud->GetSphereResolution());
+      mafEventMacro(mafEvent(this,CAMERA_UPDATE));
     }
   }
   

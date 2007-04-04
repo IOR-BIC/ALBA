@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-03 10:19:48 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-04-04 11:41:17 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -369,7 +369,7 @@ void mafPipeSurfaceSlice::OnEvent(mafEventBase *maf_event)
       break;
     }
   }
-  else if (maf_event->GetId() == mafVMELandmarkCloud::CLOUDE_OPEN_CLOSE)
+  else if (maf_event->GetId() == mafVMELandmarkCloud::CLOUD_OPEN_CLOSE)
   {
     if(((mafVMELandmarkCloud *)m_Vme)->IsOpen())
     {
@@ -396,14 +396,14 @@ void mafPipeSurfaceSlice::OnEvent(mafEventBase *maf_event)
     }
     mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
-  else if (maf_event->GetId() == mafVMELandmarkCloud::CLOUDE_RADIUS_MODIFIED)
+  else if (maf_event->GetId() == mafVMELandmarkCloud::CLOUD_RADIUS_MODIFIED)
   {
     if (m_SphereSource)
     {
       m_SphereSource->SetRadius(((mafVMELandmarkCloud *)m_Vme)->GetRadius());
     }
   }
-  else if (maf_event->GetId() == mafVMELandmarkCloud::CLOUDE_SPHERE_RES)
+  else if (maf_event->GetId() == mafVMELandmarkCloud::CLOUD_SPHERE_RES)
   {
     if (m_SphereSource)
     {
