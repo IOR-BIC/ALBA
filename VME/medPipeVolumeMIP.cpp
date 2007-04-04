@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeMIP.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-13 22:09:31 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-04-04 10:07:58 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -58,6 +58,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkImageResample.h"
 #include "vtkXRayVolumeMapper.h"
 
+#include "vtkVolume.h"
+
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medPipeVolumeMIP);
 //----------------------------------------------------------------------------
@@ -75,7 +77,8 @@ medPipeVolumeMIP::medPipeVolumeMIP()
   m_VolumeMapper      = NULL;
   m_VolumeMapperLow   = NULL;
 
-	m_VolumeLOD         = NULL;
+	//m_VolumeLOD         = NULL;
+  m_Volume            = NULL;
 
 	m_SelectionActor    = NULL;
   m_ColorLUT          = NULL;
@@ -279,16 +282,20 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
 		m_ResampleFilter->SetAxisMagnificationFactor(i,m_ResampleFactor);
 	m_ResampleFilter->Update();
 
-  vtkNEW(m_ColorLUT);
-  m_ColorLUT->SetTableRange(sr);
+  //vtkNEW(m_ColorLUT);
+  
 
   vtkNEW(m_OpacityTransferFunction);
   mmaVolumeMaterial *material = ((mafVMEVolume *)m_Vme)->GetMaterial();
-  //m_OpacityTransferFunction = material->m_OpacityTransferFunction;
-  m_OpacityTransferFunction->AddPoint(0,0);
-  m_OpacityTransferFunction->AddPoint(10501,0);
-  m_OpacityTransferFunction->AddPoint(21000,0.0001);
-  m_OpacityTransferFunction->AddPoint(32767,0.2);
+  m_OpacityTransferFunction = material->m_OpacityTransferFunction;
+
+  m_ColorLUT = material->m_ColorLut;
+
+  /*m_OpacityTransferFunction->AddPoint(0,0.0001);
+  m_OpacityTransferFunction->AddPoint(10501,0.01);
+  m_OpacityTransferFunction->AddPoint(21000,0.08);
+  m_OpacityTransferFunction->AddPoint(32767,0.3);*/
+  UpdateMIPFromLUT();
 
   vtkNEW(m_VolumeProperty);
   m_VolumeProperty->SetScalarOpacity(m_OpacityTransferFunction);
@@ -296,7 +303,7 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
 
   vtkNEW(m_MIPFunction);
   //m_MIPFunction->SetCompositeMethodToClassifyFirst();
-  m_MIPFunction->SetMaximizeMethodToScalarValue();
+  m_MIPFunction->SetMaximizeMethodToOpacity();
 
   vtkNEW(m_VolumeMapper);
 	m_VolumeMapper->SetInput(m_ResampleFilter->GetOutput());
@@ -319,13 +326,21 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
   m_VolumeMapperLow->SetSampleDistance(5);
 
 
-  vtkNEW(m_VolumeLOD);
-  m_VolumeLOD->AddLOD(m_VolumeMapperLow, m_VolumeProperty,0);
-  m_VolumeLOD->AddLOD(m_VolumeMapper, m_VolumeProperty,0);
-  m_VolumeLOD->PickableOff();
+  //vtkNEW(m_VolumeLOD);
+  //m_VolumeLOD->AddLOD(m_VolumeMapperLow, m_VolumeProperty,0);
+  //m_VolumeLOD->AddLOD(m_VolumeMapper, m_VolumeProperty,0);
+  //m_VolumeLOD->PickableOff();
+
+  vtkNEW(m_Volume);
+  m_Volume->SetMapper(m_VolumeMapper);
+  m_Volume->SetProperty(m_VolumeProperty);
+  m_Volume->PickableOff();
+
+
   //m_VolumeLOD->SetEstimatedRenderTime(100);
   //mafLogMessage(mafString(m_VolumeLOD->GetEstimatedRenderTime()));
-  m_AssemblyFront->AddPart(m_VolumeLOD);
+  //m_AssemblyFront->AddPart(m_VolumeLOD);
+  m_AssemblyFront->AddPart(m_Volume);
 
   vtkMAFSmartPointer<vtkOutlineCornerFilter> selection_filter;
   selection_filter->SetInput(image_data);  
@@ -352,11 +367,12 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
 medPipeVolumeMIP::~medPipeVolumeMIP()
 //----------------------------------------------------------------------------
 {
-  m_AssemblyFront->RemovePart(m_VolumeLOD);
+  //m_AssemblyFront->RemovePart(m_VolumeLOD);
+  m_AssemblyFront->RemovePart(m_Volume);
 	
   //m_AssemblyFront->RemovePart(m_SelectionActor);
 
-  vtkDEL(m_ColorLUT);
+  //vtkDEL(m_ColorLUT);
 	vtkDEL(m_Median);
   vtkDEL(m_Caster);
 //  vtkDEL(m_OpacityTransferFunction);
@@ -364,7 +380,8 @@ medPipeVolumeMIP::~medPipeVolumeMIP()
   vtkDEL(m_MIPFunction);
   vtkDEL(m_VolumeMapper);
   vtkDEL(m_VolumeMapperLow);
-  vtkDEL(m_VolumeLOD);
+  //vtkDEL(m_VolumeLOD);
+  vtkDEL(m_Volume);
   vtkDEL(m_SelectionActor);
 }
 //----------------------------------------------------------------------------
@@ -372,9 +389,13 @@ void medPipeVolumeMIP::Select(bool sel)
 //----------------------------------------------------------------------------
 {
 	m_Selected = sel;
-  if(m_VolumeLOD == NULL) return;
-	if(m_VolumeLOD->GetVisibility())
-			m_SelectionActor->SetVisibility(sel);
+  //if(m_VolumeLOD == NULL) return;
+  if(m_Volume == NULL) return;
+	/*if(m_VolumeLOD->GetVisibility())
+			m_SelectionActor->SetVisibility(sel);*/
+
+  if(m_Volume->GetVisibility())
+    m_SelectionActor->SetVisibility(sel);
 }
 //----------------------------------------------------------------------------
 mmgGui *medPipeVolumeMIP::CreateGui()
@@ -384,7 +405,7 @@ mmgGui *medPipeVolumeMIP::CreateGui()
   m_Gui = new mmgGui(this);
   lutPreset(15,m_ColorLUT);
   m_Gui->Lut(ID_LUT_CHOOSER,_("lut"),m_ColorLUT);
-  //UpdateMIPFromLUT();
+  UpdateMIPFromLUT();
 
 	m_Gui->Double(ID_RESAMPLE_FACTOR,_("Resample"),&m_ResampleFactor,0.0000001,1);
 
@@ -423,7 +444,7 @@ void medPipeVolumeMIP::UpdateMIPFromLUT()
   {
     m_ColorLUT->GetTableValue(v,rgba);
     p = v*w/tv+sr[0];
-    m_OpacityTransferFunction->AddPoint(p,rgba[3]);
+    m_OpacityTransferFunction->AddPoint(p,p/sr[1]);
   }
   m_OpacityTransferFunction->Update();
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
@@ -442,9 +463,11 @@ void medPipeVolumeMIP::SetResampleFactor(double value)
 
 	if(m_ResampleFilter)
 	{
-    m_AssemblyFront->RemovePart(m_VolumeLOD);
+    //m_AssemblyFront->RemovePart(m_VolumeLOD);
+    m_AssemblyFront->RemovePart(m_Volume);
 
-    vtkDEL(m_VolumeLOD);
+    //vtkDEL(m_VolumeLOD);
+    vtkDEL(m_Volume);
     vtkDEL(m_VolumeMapper);
 		vtkDEL(m_VolumeMapperLow);
 
@@ -476,11 +499,18 @@ void medPipeVolumeMIP::SetResampleFactor(double value)
 		m_VolumeMapperLow->SetNumberOfThreads(1);
 		m_VolumeMapperLow->SetSampleDistance(5);
 
-		vtkNEW(m_VolumeLOD);
-		m_VolumeLOD->AddLOD(m_VolumeMapperLow, m_VolumeProperty,0);
-		m_VolumeLOD->AddLOD(m_VolumeMapper, m_VolumeProperty,0);
-		m_VolumeLOD->PickableOff();
-		m_AssemblyFront->AddPart(m_VolumeLOD);
+    //vtkNEW(m_VolumeLOD);
+    //m_VolumeLOD->AddLOD(m_VolumeMapperLow, m_VolumeProperty,0);
+    //m_VolumeLOD->AddLOD(m_VolumeMapper, m_VolumeProperty,0);
+    //m_VolumeLOD->PickableOff();
+
+    vtkNEW(m_Volume);
+    m_Volume->SetMapper(m_VolumeMapper);
+    m_Volume->SetProperty(m_VolumeProperty);
+    m_Volume->PickableOff();
+
+		//m_AssemblyFront->AddPart(m_VolumeLOD);
+    m_AssemblyFront->AddPart(m_Volume);
 	}
 
 	if(m_Gui)
