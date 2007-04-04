@@ -97,12 +97,16 @@ IF (MAF_USE_VTK)
   mafVMELandmark.h
   mafVMELandmarkCloud.cpp
   mafVMELandmarkCloud.h
+  mafVMEMesh.cpp
+  mafVMEMesh.h
   mafVMEMeter.cpp
   mafVMEMeter.h
   mafVMEOutputImage.cpp
   mafVMEOutputImage.h
   mafVMEOutputLandmarkCloud.cpp
   mafVMEOutputLandmarkCloud.h
+  mafVMEOutputMesh.cpp
+  mafVMEOutputMesh.h
   mafVMEOutputMeter.cpp
   mafVMEOutputMeter.h
   mafVMEOutputPointSet.cpp

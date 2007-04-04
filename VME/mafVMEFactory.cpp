@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-04 13:53:14 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2007-04-04 16:38:14 $
+  Version:   $Revision: 1.22 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,6 +30,7 @@
 #include "mafVMELandmark.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMEMeter.h"
+#include "mafVMEMesh.h"
 #include "mafVMEPointSet.h"
 #include "mafVMEPolyline.h"
 #include "mafVMEPolylineSpline.h"
@@ -109,6 +110,7 @@ mafVMEFactory::mafVMEFactory()
   mafPlugNodeMacro(mafVMEGroup,"VME used for composing assemblies");
   mafPlugNodeMacro(mafVMEGeneric,"Generic VME storing VTK datasets");
   mafPlugNodeMacro(mafVMEImage,"Generic VME storing vtkImageData datasets");
+  mafPlugNodeMacro(mafVMEMesh,"Generic VME storing vtkUnstructuredGrid datasets");
   mafPlugNodeMacro(mafVMESurface,"Generic VME storing vtkPolyData surfaces datasets");
   mafPlugNodeMacro(mafVMESurfaceParametric,"Generic VME storing vtkPolyData parametric surfaces");
   mafPlugNodeMacro(mafVMEVolumeGray,"Generic VME storing vtk volume datasets with one scalar component");
