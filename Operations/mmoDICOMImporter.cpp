@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-02 15:23:14 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2007-04-05 09:30:56 $
+  Version:   $Revision: 1.18 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -944,7 +944,7 @@ void mmoDICOMImporter::ResetSliders()
 	m_SliceScanner->SetRange(0,m_NumberOfSlices - 1);
 	m_SliceText->SetValidator(mmgValidator(this,ID_SCAN_SLICE,m_SliceText,&m_CurrentSlice,m_SliceScanner,0,m_NumberOfSlices-1));
 	m_TimeScanner->SetRange(0,m_NumberOfTimeFrames -1);
-	m_TimeText->SetValidator(mmgValidator(this,ID_SCAN_TIME,m_TimeText,&m_CurrentTime,m_TimeScanner,0,m_NumberOfSlices-1));
+	m_TimeText->SetValidator(mmgValidator(this,ID_SCAN_TIME,m_TimeText,&m_CurrentTime,m_TimeScanner,0,m_NumberOfTimeFrames-1));
 	m_Gui->Update();
 }
 //----------------------------------------------------------------------------
@@ -1209,9 +1209,8 @@ void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event)
 						ShowSlice(currImageId);
 						m_DicomDialog->GetRWI()->CameraUpdate();
 					}
-					m_SliceScanner->SetValue(currImageId);
+					m_SliceScanner->SetValue(m_CurrentSlice);
 					m_DicomDialog->Update();
-
 				}
       break;
 			case ID_SCAN_TIME:
@@ -1223,6 +1222,8 @@ void mmoDICOMImporter::	OnEvent(mafEventBase *maf_event)
 						ShowSlice(currImageId);
 						m_DicomDialog->GetRWI()->CameraUpdate();
 					}
+					m_TimeScanner->SetValue(m_CurrentTime);
+					m_DicomDialog->Update();
 				}
       break;
       case ID_CROP_MODE_BUTTON:

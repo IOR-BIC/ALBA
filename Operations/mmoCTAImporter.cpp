@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTAImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-10 13:06:50 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-04-05 09:30:56 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -362,13 +362,13 @@ void mmoCTAImporter::CreateGui()
 	wxPoint dp = wxDefaultPosition;
 	m_SliceLabel = new wxStaticText(m_DicomDialog, -1, " slice num. ",dp, wxSize(-1,16));
 	m_SliceText = new wxTextCtrl(m_DicomDialog, -1, "", dp, wxSize(30,16), wxNO_BORDER);
-	m_SliceScanner = new wxSlider(m_DicomDialog, -1, 0, 0, 100, dp, wxSize(200,22));
+	m_SliceScanner = new wxSlider(m_DicomDialog, -1, 0, 0, VTK_INT_MAX, dp, wxSize(200,22));
 	m_SliceLabel->Enable(false);
 	m_SliceText->Enable(false);
 	m_SliceScanner->Enable(false);
 
 	m_SliceScanner->SetValidator(mmgValidator(this,ID_SCAN_SLICE,m_SliceScanner,&m_CurrentSlice,m_SliceText));
-  m_SliceText->SetValidator(mmgValidator(this,ID_SCAN_SLICE,m_SliceText,&m_CurrentSlice,m_SliceScanner,0,100));
+  m_SliceText->SetValidator(mmgValidator(this,ID_SCAN_SLICE,m_SliceText,&m_CurrentSlice,m_SliceScanner,0,VTK_INT_MAX));
 
 	wxBoxSizer *slice_sizer = new wxBoxSizer(wxHORIZONTAL);
 	slice_sizer->Add(m_SliceLabel, 0, wxALIGN_CENTER|wxRIGHT, 5);
@@ -958,7 +958,9 @@ void mmoCTAImporter::ResetSliders()
 //----------------------------------------------------------------------------
 {
 	m_SliceScanner->SetRange(0,m_NumberOfSlices - 1);
+	m_SliceText->SetValidator(mmgValidator(this,ID_SCAN_SLICE,m_SliceText,&m_CurrentSlice,m_SliceScanner,0,m_NumberOfSlices - 1));
 	m_TimeScanner->SetRange(0, m_NumberOfTimeFrames -1);
+	m_TimeText->SetValidator(mmgValidator(this,ID_SCAN_TIME,m_TimeText,&m_CurrentTime,m_TimeScanner,0,m_NumberOfTimeFrames-1));
 	m_Gui->Update();
 }
 //----------------------------------------------------------------------------
@@ -1223,6 +1225,8 @@ void mmoCTAImporter::	OnEvent(mafEventBase *maf_event)
 						ShowSlice(currImageId);
 						m_DicomDialog->GetRWI()->CameraUpdate();
 					}
+					m_SliceScanner->SetValue(m_CurrentSlice);
+					m_DicomDialog->Update();
 				}
       break;
 			case ID_SCAN_TIME:
@@ -1234,6 +1238,8 @@ void mmoCTAImporter::	OnEvent(mafEventBase *maf_event)
 						ShowSlice(currImageId);
 						m_DicomDialog->GetRWI()->CameraUpdate();
 					}
+					m_TimeScanner->SetValue(m_CurrentTime);
+					m_DicomDialog->Update();
 				}
       break;
       case ID_CROP_MODE_BUTTON:
