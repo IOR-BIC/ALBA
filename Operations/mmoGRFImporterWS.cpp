@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoGRFImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-05 15:00:33 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-04-05 15:20:37 $
+  Version:   $Revision: 1.5 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -269,8 +269,7 @@ void mmoGRFImporterWS::Read()
 
   do 
   {
-    mafEventMacro(mafEvent(this, VME_SHOW, m_VectorLeft, false));
-    mafEventMacro(mafEvent(this, VME_SHOW, m_VectorRight, false));
+
     line = text.ReadLine();
     wxStringTokenizer tkz(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
     timeSt = tkz.GetNextToken().c_str();
@@ -321,7 +320,7 @@ void mmoGRFImporterWS::Read()
       vector1->Update;
 
       m_VectorLeft->SetData(vector1, time);
-      mafEventMacro(mafEvent(this, VME_SHOW, m_VectorRight, true));
+
     }
 
     //Values of the second platform
@@ -366,9 +365,7 @@ void mmoGRFImporterWS::Read()
       vector2->SetLines(cellArray2);
       vector2->Update;
  
-      m_VectorRight->SetData(vector2, time);
-      mafEventMacro(mafEvent(this, VME_SHOW, m_VectorRight, true));
-      
+      m_VectorRight->SetData(vector2, time);   
     }
 
 
