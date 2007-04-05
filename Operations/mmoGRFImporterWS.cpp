@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoGRFImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-04 11:39:50 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-04-05 15:00:33 $
+  Version:   $Revision: 1.4 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -222,6 +222,8 @@ void mmoGRFImporterWS::Read()
   //Get values for platforms
    mafNEW(m_PlatformLeft);
    mafNEW(m_PlatformRight);
+   m_PlatformLeft->SetName("Left_Platform");
+   m_PlatformRight->SetName("Right_Platform");
   
   double thickness1 = platform1[2]-DELTA;
   double thickness2 = platform2[2]-DELTA;
@@ -250,18 +252,25 @@ void mmoGRFImporterWS::Read()
   mafString cop1StX,cop1StY,cop1StZ,ref1StX,ref1StY,ref1StZ,force1StX,force1StY,force1StZ,moment1StX,moment1StY,moment1StZ;
   mafString cop2StX,cop2StY,cop2StZ,ref2StX,ref2StY,ref2StZ,force2StX,force2StY,force2StZ,moment2StX,moment2StY,moment2StZ;
 
-  vtkMAFSmartPointer<vtkPolyData> vector;
-  vtkMAFSmartPointer<vtkPoints> points;
-  vtkMAFSmartPointer<vtkCellArray> cellArray;
-  int pointId[2];
+  vtkMAFSmartPointer<vtkPolyData> vector1;
+  vtkMAFSmartPointer<vtkPolyData> vector2;
+  vtkMAFSmartPointer<vtkPoints> points1;
+  vtkMAFSmartPointer<vtkPoints> points2;
+  vtkMAFSmartPointer<vtkCellArray> cellArray1;
+  vtkMAFSmartPointer<vtkCellArray> cellArray2;
+  int pointId1[2];
+  int pointId2[2];
 
   mafNEW(m_VectorLeft);
   mafNEW(m_VectorRight);
   m_VectorLeft->SetName("Left_vector");
   m_VectorRight->SetName("Right_vector");
+   
 
   do 
   {
+    mafEventMacro(mafEvent(this, VME_SHOW, m_VectorLeft, false));
+    mafEventMacro(mafEvent(this, VME_SHOW, m_VectorRight, false));
     line = text.ReadLine();
     wxStringTokenizer tkz(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
     timeSt = tkz.GetNextToken().c_str();
@@ -300,17 +309,19 @@ void mmoGRFImporterWS::Read()
 
 
 
-    if (cop1X != NULL && cop1Y != NULL && cop1Z != NULL)
+    if (cop1X != NULL || cop1Y != NULL || cop1Z != NULL)
     {
-      points->InsertNextPoint(cop1X, cop1Y, cop1Z);
-      points->InsertNextPoint(force1X, force1Y, force1Z);
-      pointId[0] = 0;
-      pointId[1] = 1;
-      cellArray->InsertNextCell(2, pointId);  
-      vector->SetPoints(points);
-      vector->SetLines(cellArray);
+      points1->InsertPoint(0, cop1X, cop1Y, cop1Z);
+      points1->InsertPoint(1, force1X, force1Y, force1Z);
+      pointId1[0] = 0;
+      pointId1[1] = 1;
+      cellArray1->InsertNextCell(2, pointId1);  
+      vector1->SetPoints(points1);
+      vector1->SetLines(cellArray1);
+      vector1->Update;
 
-      m_VectorLeft->SetData(vector, time);
+      m_VectorLeft->SetData(vector1, time);
+      mafEventMacro(mafEvent(this, VME_SHOW, m_VectorRight, true));
     }
 
     //Values of the second platform
@@ -344,17 +355,20 @@ void mmoGRFImporterWS::Read()
     double moment2Z = atof(moment2StZ);
 
 
-    if (cop2X != NULL && cop2Y != NULL && cop2Z != NULL)
+    if (cop2X != NULL || cop2Y != NULL || cop2Z != NULL)
     {
-      points->InsertNextPoint(cop2X, cop2Y, cop2Z);
-      points->InsertNextPoint(force2X, force2Y, force2Z);
-      pointId[0] = 0;
-      pointId[1] = 1;
-      cellArray->InsertNextCell(2, pointId);  
-      vector->SetPoints(points);
-      vector->SetLines(cellArray);
+      points2->InsertPoint(0, cop2X, cop2Y, cop2Z);
+      points2->InsertPoint(1, force2X, force2Y, force2Z);
+      pointId2[0] = 0;
+      pointId2[1] = 1;
+      cellArray2->InsertNextCell(2, pointId2);  
+      vector2->SetPoints(points2);
+      vector2->SetLines(cellArray2);
+      vector2->Update;
  
-      m_VectorRight->SetData(vector, time);
+      m_VectorRight->SetData(vector2, time);
+      mafEventMacro(mafEvent(this, VME_SHOW, m_VectorRight, true));
+      
     }
 
 
