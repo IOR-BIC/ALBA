@@ -24,6 +24,8 @@ SET(PROJECT_SRCS
   mmoVolumeMeasure.h
   mmoRAWImporterImages.cpp
   mmoRAWImporterImages.h
+  mmoMeshQuality.cpp
+  mmoMeshQuality.h
 )
 
 IF (MAF_USE_ITK)
