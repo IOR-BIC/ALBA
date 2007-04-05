@@ -18,6 +18,8 @@ SET(vtkMED_SRCS
   vtkXRayVolumeMapper.h
   vtkWeightedLandmarkTransform.cxx
   vtkWeightedLandmarkTransform.h
+  vtkTriangleQualityRatio.cxx
+  vtkTriangleQualityRatio.h
 )
 
 IF (MAF_USE_ITK)
