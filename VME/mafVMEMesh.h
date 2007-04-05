@@ -2,13 +2,14 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMesh.h,v $
   Language:  C++
-  Date:      $Date: 2007-04-04 16:38:14 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-04-05 08:22:39 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
+
 #ifndef __mafVMEMesh_h
 #define __mafVMEMesh_h
 //----------------------------------------------------------------------------

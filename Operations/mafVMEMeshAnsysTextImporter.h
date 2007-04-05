@@ -1,18 +1,14 @@
-// .NAME mafVMEMeshAnsysTextImporter
-//
-//  Build a mafVMEMesh from information contained
-//  in some text files. This text files are actually
-//  ANSYS list files without any header, only numbers.
-//  There is a test for this class in the testing directory
-//  and some sample data in the mmData cvs module.
-//  Supported elements type are:
-//  linear tetra, parabolic tetra, linear hexa, parabolic hexa
-// 
-//  BEWARE Hybrid meshes are not supported
-//
-// .SECTION Description
-//
-// .SECTION ToDo
+/*=========================================================================
+Program:   Multimod Application Framework
+Module:    $RCSfile: mafVMEMeshAnsysTextImporter.h,v $
+Language:  C++
+Date:      $Date: 2007-04-05 08:23:08 $
+Version:   $Revision: 1.2 $
+Authors:   Stefano Perticoni
+==========================================================================
+Copyright (c) 2002/2004 
+CINECA - Interuniversity Consortium (www.cineca.it)
+=========================================================================*/
 
 #ifndef __mafVMEMeshAnsysTextImporter_h
 #define __mafVMEMeshAnsysTextImporter_h
@@ -26,6 +22,21 @@
 #include <map>
 #include <fstream>
 
+/**
+ .NAME mafVMEMeshAnsysTextImporter
+
+  Build a mafVMEMesh from information contained
+  in some text files. This text files are actually
+  ANSYS list files without any header, only numbers.
+  Supported elements type are:
+  linear tetra, parabolic tetra, linear hexa, parabolic hexa
+ 
+  BEWARE Hybrid meshes are not supported
+
+ .SECTION Description
+
+ .SECTION ToDo
+*/
 class mafVMEMeshAnsysTextImporter
 {
 public:
