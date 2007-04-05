@@ -1,2 +1,2 @@
-#SUBDIRS(MedicalApp)
+SUBDIRS(MedicalApp)
 SUBDIRS(DicomDataApp)
