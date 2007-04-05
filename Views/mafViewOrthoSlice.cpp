@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-08 16:05:55 $
-  Version:   $Revision: 1.50 $
+  Date:      $Date: 2007-04-05 09:36:28 $
+  Version:   $Revision: 1.51 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -330,9 +330,11 @@ void mafViewOrthoSlice::PackageView()
   int cam_pos[4] = {CAMERA_OS_P, CAMERA_OS_X, CAMERA_OS_Y, CAMERA_OS_Z};
   
   wxString viewName[4] = {"perspective","camera x","camera y","camera z"};
+
+	bool TICKs[4]={false,false,true,true};
   for(int v=PERSPECTIVE_VIEW; v<VIEWS_NUMBER; v++)
   {
-    m_Views[v] = new mafViewSlice(viewName[v], cam_pos[v],false,false);
+    m_Views[v] = new mafViewSlice(viewName[v], cam_pos[v],false,false,false,0,TICKs[v]);
     m_Views[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice", MUTEX);
 		m_Views[v]->PlugVisualPipe("mafVMEImage", "mafPipeBox", NON_VISIBLE);
     // plug surface slice visual pipe in not perspective views

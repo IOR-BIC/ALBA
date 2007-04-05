@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-09 15:57:05 $
-  Version:   $Revision: 1.33 $
+  Date:      $Date: 2007-04-05 09:36:28 $
+  Version:   $Revision: 1.34 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -56,7 +56,7 @@ mafCxxTypeMacro(mafViewSlice);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewSlice::mafViewSlice(wxString label, int camera_position, bool show_axes, bool show_grid, bool show_ruler, int stereo)
+mafViewSlice::mafViewSlice(wxString label, int camera_position, bool show_axes, bool show_grid, bool show_ruler, int stereo,bool showTICKs)
 :mafViewVTK(label,camera_position,show_axes,show_grid, show_ruler, stereo)
 //----------------------------------------------------------------------------
 {
@@ -74,6 +74,8 @@ mafViewSlice::mafViewSlice(wxString label, int camera_position, bool show_axes, 
 
   m_CurrentSurface.clear();
 	m_CurrentPolyline.clear();
+
+	m_ShowVolumeTICKs =showTICKs;
 }
 //----------------------------------------------------------------------------
 mafViewSlice::~mafViewSlice()
@@ -89,7 +91,7 @@ mafViewSlice::~mafViewSlice()
 mafView *mafViewSlice::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewSlice *v = new mafViewSlice(m_Label, m_CameraPosition, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType);
+  mafViewSlice *v = new mafViewSlice(m_Label, m_CameraPosition, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType,m_ShowVolumeTICKs);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
@@ -260,6 +262,12 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
         {
           ((mafPipeVolumeSlice *)pipe)->InitializeSliceParameters(slice_mode,false);
         }
+
+				if(m_ShowVolumeTICKs)
+					((mafPipeVolumeSlice *)pipe)->ShowTICKsOn();
+				else
+					((mafPipeVolumeSlice *)pipe)->ShowTICKsOff();
+
         UpdateText();
       }
       else if(pipe_name.Equals("mafPipeSurfaceSlice"))
