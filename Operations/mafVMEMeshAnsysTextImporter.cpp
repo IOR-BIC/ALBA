@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEMeshAnsysTextImporter.cpp,v $
 Language:  C++
-Date:      $Date: 2007-04-05 08:23:08 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-04-05 14:49:13 $
+Version:   $Revision: 1.3 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -67,27 +67,20 @@ const int FIRST_CONNECTIVITY_COLUMN = 6;
 
 mafVMEMeshAnsysTextImporter::mafVMEMeshAnsysTextImporter()
 {
-  NodesFileName = "";
-  ElementsFileName = "";
-  MaterialsFileName = "";
-  ElementType = UNSUPPORTED_ELEMENT;
-  NodesPerElement = -1;
-  MeshType = UNKNOWN;
+  m_NodesFileName = "";
+  m_ElementsFileName = "";
+  m_MaterialsFileName = "";
+  m_ElementType = UNSUPPORTED_ELEMENT;
+  m_NodesPerElement = -1;
+  m_MeshType = UNKNOWN;
   
-  Output = NULL;
-  mafNEW(Output);
-
-  mafTagItem tag_Nature;
-  tag_Nature.SetName("VME_NATURE");
-  tag_Nature.SetValue("NATURAL");
-  Output->GetTagArray()->SetTag(tag_Nature);
-  Output->SetName("imported mesh");
+  m_Output = NULL;
 
 }
 //----------------------------------------------------------------------------
 mafVMEMeshAnsysTextImporter::~mafVMEMeshAnsysTextImporter()
 {
-  mafDEL(Output);
+  mafDEL(m_Output);
 }
 
 //----------------------------------------------------------------------------
@@ -98,9 +91,22 @@ int mafVMEMeshAnsysTextImporter::Read()
 
   if (this->ParseNodesFile(grid) == -1) return MAF_ERROR ; 
   if (this->ParseElementsFile(grid) == -1) return MAF_ERROR;
-  
+
   int ret = this->ParseMaterialsFile(grid);
-  
+
+  // allocate the output if not yet allocated...
+  if (m_Output == NULL)
+  {
+    mafNEW(m_Output);
+
+    mafTagItem tag_Nature;
+    tag_Nature.SetName("VME_NATURE");
+    tag_Nature.SetValue("NATURAL");
+    m_Output->GetTagArray()->SetTag(tag_Nature);
+    m_Output->SetName("imported mesh");
+
+  }
+
   // TO BE PORTED
   // mafVMEMeshDataToCellData *f2Cell = mafVMEMeshDataToCellData::New();
   // mafVMEMeshParabolicMeshToLinearMesh *p2l = mafVMEMeshParabolicMeshToLinearMesh::New();
@@ -150,7 +156,7 @@ int mafVMEMeshAnsysTextImporter::Read()
   // p2l->Delete();
   // f2Cell->Delete();
   
-  Output->SetDataByDetaching(gridToLinearize,0);
+  m_Output->SetDataByDetaching(gridToLinearize,0);
 
   return MAF_OK;
 }
@@ -165,9 +171,9 @@ int mafVMEMeshAnsysTextImporter::ParseNodesFile(vtkUnstructuredGrid *grid)
   
   vnl_matrix<double> M;
 
-  if (ReadMatrix(M,this->NodesFileName))
+  if (ReadMatrix(M,this->m_NodesFileName))
   {
-    mafErrorMacro("Node files not found! File:" << NodesFileName << " does not exist!" << endl);
+    mafErrorMacro("Node files not found! File:" << m_NodesFileName << " does not exist!" << endl);
 	  return -1;
   }
 
@@ -190,7 +196,7 @@ int mafVMEMeshAnsysTextImporter::ParseNodesFile(vtkUnstructuredGrid *grid)
   // create a map with id_val <-> node_id association
   for (int i = 0; i < M.rows(); i++)
   {
-    NodeIdNodeNumberMap[M(i, node_id_col)] = i;  
+    m_NodeIdNodeNumberMap[M(i, node_id_col)] = i;  
   }
   
   /*
@@ -246,13 +252,13 @@ int mafVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
   // id list for connectivity
   vtkIdList *id_list = vtkIdList::New();
 
-  if (ReadMatrix(M,this->ElementsFileName))
+  if (ReadMatrix(M,this->m_ElementsFileName))
   {
-    mafErrorMacro("Elements file not found! File:" << ElementsFileName << "does not exist!" << endl);
+    mafErrorMacro("Elements file not found! File:" << m_ElementsFileName << "does not exist!" << endl);
 	  return -1;
   }
 
-  id_list->SetNumberOfIds(NodesPerElement);
+  id_list->SetNumberOfIds(m_NodesPerElement);
     
   grid->Allocate(M.rows(),1);
 
@@ -289,12 +295,12 @@ int mafVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
         NodeIdNodeNumberMap[M(i, j)] = node_number
         */
 
-        id_list->SetId(id_index, NodeIdNodeNumberMap[M(i, j)]);
+        id_list->SetId(id_index, m_NodeIdNodeNumberMap[M(i, j)]);
         int mval = M(i,j);
-        int val = NodeIdNodeNumberMap[M(i, j)];
+        int val = m_NodeIdNodeNumberMap[M(i, j)];
         id_index++;
       }
-      grid->InsertNextCell(VtkCellType, id_list);
+      grid->InsertNextCell(m_VtkCellType, id_list);
   }
 
   // store info about cell_id <-> material_id association 
@@ -495,7 +501,7 @@ int mafVMEMeshAnsysTextImporter::GetElementType()
 {
   // read the first line of the connectivity file    
   vcl_ifstream connectivityStream;
-  connectivityStream.open(ElementsFileName, ios::out);
+  connectivityStream.open(m_ElementsFileName, ios::out);
 
   vcl_vector<int> connectivityVector;
 
@@ -522,57 +528,57 @@ int mafVMEMeshAnsysTextImporter::GetElementType()
     if (numConnectivityPoints == 4)
     {
       // element is 4 nodes tetra
-      ElementType = TETRA4; 
-      VtkCellType = 10;
-      NodesPerElement = 4; 
-      MeshType = LINEAR;
+      m_ElementType = TETRA4; 
+      m_VtkCellType = 10;
+      m_NodesPerElement = 4; 
+      m_MeshType = LINEAR;
     }
     else if (numConnectivityPoints == 8)
     {
       // element is 8 nodes hexa
-      ElementType = HEXA8;
-      VtkCellType = 12;
-      NodesPerElement = 8;
-      MeshType = LINEAR;
+      m_ElementType = HEXA8;
+      m_VtkCellType = 12;
+      m_NodesPerElement = 8;
+      m_MeshType = LINEAR;
     }
     else if (numConnectivityPoints == 10)
     {
       // element is 10 nodes tetra 
-      ElementType = TETRA10;
-      VtkCellType = 24;
-      NodesPerElement = 10;
-      MeshType = PARABOLIC;
+      m_ElementType = TETRA10;
+      m_VtkCellType = 24;
+      m_NodesPerElement = 10;
+      m_MeshType = PARABOLIC;
     }
     else if (numConnectivityPoints == 20)
     {
       // element is 20 nodes hexa
-      ElementType = HEXA20;
-      VtkCellType = 25;
-      NodesPerElement = 20;
-      MeshType = PARABOLIC;
+      m_ElementType = HEXA20;
+      m_VtkCellType = 25;
+      m_NodesPerElement = 20;
+      m_MeshType = PARABOLIC;
     }
     else
     {
       mafErrorMacro("Element type with " << numConnectivityPoints << " not supported!" << endl);
-      ElementType = UNSUPPORTED_ELEMENT;	   
-      VtkCellType = -1;
-      MeshType = UNKNOWN;
+      m_ElementType = UNSUPPORTED_ELEMENT;	   
+      m_VtkCellType = -1;
+      m_MeshType = UNKNOWN;
     }
 
   }
   else
   {
-      mafErrorMacro("File: " << ElementsFileName << " does not exist" << endl);
+      mafErrorMacro("File: " << m_ElementsFileName << " does not exist" << endl);
       // since i found no valid element i set ElementType to unsupported
-      ElementType = UNSUPPORTED_ELEMENT;
-      VtkCellType = -1;
-      MeshType = UNKNOWN;
+      m_ElementType = UNSUPPORTED_ELEMENT;
+      m_VtkCellType = -1;
+      m_MeshType = UNKNOWN;
 	    return -1;
   }
 
   // close the stream
   connectivityStream.close();
-  return ElementType;
+  return m_ElementType;
   
 }
 

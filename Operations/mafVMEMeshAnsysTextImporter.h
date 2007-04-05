@@ -1,9 +1,9 @@
-/*=========================================================================
+/*=========================================================================
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEMeshAnsysTextImporter.h,v $
 Language:  C++
-Date:      $Date: 2007-04-05 08:23:08 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-04-05 14:49:13 $
+Version:   $Revision: 1.3 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -31,7 +31,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
   Supported elements type are:
   linear tetra, parabolic tetra, linear hexa, parabolic hexa
  
-  BEWARE Hybrid meshes are not supported
+  BEWARE Hybrid meshes are not upported
 
  .SECTION Description
 
@@ -43,18 +43,18 @@ public:
 
   /**
   // Set/Get nodes file name*/
-  void SetNodesFileName(const char *name)   {this->NodesFileName = name;};
-  const char *GetNodesFileName() {return this->NodesFileName;};
+  void SetNodesFileName(const char *name)   {this->m_NodesFileName = name;};
+  const char *GetNodesFileName() {return this->m_NodesFileName;};
 
   /**
   // Set/Get elements file name*/
-  void SetElementsFileName(const char *name)   {this->ElementsFileName = name;};
-  const char *GetElementsFileName() {return this->ElementsFileName;};
+  void SetElementsFileName(const char *name)   {this->m_ElementsFileName = name;};
+  const char *GetElementsFileName() {return this->m_ElementsFileName;};
 
   /**
   // Set/Get materials file name*/
-  void SetMaterialsFileName(const char *name) {this->MaterialsFileName = name;};
-  const char *GetMaterialsFileName() {return this->MaterialsFileName;};
+  void SetMaterialsFileName(const char *name) {this->m_MaterialsFileName = name;};
+  const char *GetMaterialsFileName() {return this->m_MaterialsFileName;};
 
 
   /**
@@ -63,7 +63,7 @@ public:
 
   /**
   Get the vme created by the reader*/
-  mafVMEMesh *GetOutput() {return Output;};
+  mafVMEMesh *GetOutput() {return m_Output;};
   
   /**
   TO BE PORTED... DO NOT USE!
@@ -99,7 +99,7 @@ public:
 
   /**
   Return the nodes number for current mesh; -1 if the nodes number is unknown.*/
-  int GetNodesPerElement() {return NodesPerElement;};
+  int GetNodesPerElement() {return m_NodesPerElement;};
   
   mafVMEMeshAnsysTextImporter();
   ~mafVMEMeshAnsysTextImporter();
@@ -108,20 +108,20 @@ protected:
  
   /**
   Element type*/
-  int ElementType;
+  int m_ElementType;
 
   /**
   Cell type in vtk file format (Internal use only, look http://www.vtk.org/pdf/file-formats.pdf for more info)
   VtkCellType is -1 if the cell type is unknown*/
-  int VtkCellType;
+  int m_VtkCellType;
 
   /**
   Number of nodes per element for current mesh*/
-  int NodesPerElement;
+  int m_NodesPerElement;
 
   /**
   Register the mesh type*/
-  int MeshType;
+  int m_MeshType;
 
   /**
   // Read nodes*/
@@ -129,7 +129,7 @@ protected:
 
   /**
   // Nodes file name*/
-  const char *NodesFileName;
+  const char *m_NodesFileName;
 
   /**
   // Read elements*/
@@ -137,21 +137,21 @@ protected:
 
   /**
   // Elements file name*/
-  const char *ElementsFileName;
+  const char *m_ElementsFileName;
 
   /**
   // Parse materials file*/
   int ParseMaterialsFile(vtkUnstructuredGrid *grid)
-  {return mafVMEMeshAnsysTextImporter::ParseMaterialsFile(grid, this->MaterialsFileName);};
+  {return mafVMEMeshAnsysTextImporter::ParseMaterialsFile(grid, this->m_MaterialsFileName);};
 
   /**
   // Materials file name*/
-  const char *MaterialsFileName;
+  const char *m_MaterialsFileName;
 
   // The output vme fem
-  mafVMEMesh *Output;
+  mafVMEMesh *m_Output;
 
-  std::map<int, int> NodeIdNodeNumberMap;
+  std::map<int, int> m_NodeIdNodeNumberMap;
   
   int ReadMatrix(vnl_matrix<double> &M, const char *fname);
   
