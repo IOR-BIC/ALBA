@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exMedicalApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-05 10:03:53 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-04-05 15:01:39 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -32,6 +32,7 @@
 #include "mafVMERoot.h"
 #include "mafVMESurface.h"
 #include "mafPipeFactoryVME.h"
+#include "mmoGRFImporterWS.h"
 
 #include "mmoCreateGroup.h"
 #include "mmoCreateMeter.h"
@@ -117,6 +118,8 @@ bool exMedicalApp::OnInit()
   m_logic->Plug(new mmoSTLImporter("STL Importer"));
   m_logic->Plug(new mmoVTKImporter("VTK Importer"));
   //m_logic->Plug(new mmoMSF1xImporter("MSF 1.x Importer"));
+  m_logic->Plug(new mmoGRFImporterWS("Importer GRF"));
+
   //------------------------------------------------------------
 
   //------------------------------------------------------------
@@ -133,6 +136,7 @@ bool exMedicalApp::OnInit()
   m_logic->Plug(new mmoMAFTransform("MAF Transform"));
   m_logic->Plug(new mmoReparentTo("Reparent to...  \tCtrl+R"));
   m_logic->Plug(new mmoInteractionOp("InteractionOp  \tCtrl+R"));  
+  
   //------------------------------------------------------------
   
   //------------------------------------------------------------
