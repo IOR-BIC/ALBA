@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-22 15:08:50 $
-  Version:   $Revision: 1.99 $
+  Date:      $Date: 2007-04-05 11:03:34 $
+  Version:   $Revision: 1.100 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -621,6 +621,20 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
           }
         }
       break;
+			case PARSE_STRING:
+				{
+					if(this->m_OpManager->Running())
+					{
+						wxMessageBox("There is an other operation running!!");
+						return;
+					}
+					int menuId, opId;
+					mafString *s = e->GetString();
+					menuId = this->m_MenuBar->FindMenu("Operations");
+					opId = this->m_MenuBar->GetMenu(menuId)->FindItem(s->GetCStr());
+					m_OpManager->OpRun(opId);
+				}
+				break;
       case OP_RUN_STARTING:
       {
         mmgMDIChild *c = (mmgMDIChild *)m_Win->GetActiveChild();
@@ -1258,6 +1272,11 @@ void mafLogicWithManagers::EnableMenuAndToolbar(bool enable)
   EnableItem(wxID_FILE2,enable );
   EnableItem(wxID_FILE3,enable );
   EnableItem(wxID_FILE4,enable );
+	EnableItem(wxID_FILE5,enable );
+	EnableItem(wxID_FILE6,enable );
+	EnableItem(wxID_FILE7,enable );
+	EnableItem(wxID_FILE8,enable );
+	EnableItem(wxID_FILE9,enable );
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OpShowGui(bool push_gui, mmgPanel *panel)
@@ -1278,7 +1297,6 @@ void mafLogicWithManagers::ViewCreate(int viewId)
 	if(m_ViewManager)
   {
     mafView* v = m_ViewManager->ViewCreate(viewId);
-
     /*
     if(m_OpManager) 
     {
