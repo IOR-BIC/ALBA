@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 16:19:20 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-04-05 11:07:20 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,7 +44,7 @@ void mafSetFrame(wxWindow* frame)
 BEGIN_EVENT_TABLE(mmgFrame, wxFrame)
     EVT_CLOSE(mmgFrame::OnCloseWindow)
     EVT_MENU_RANGE(MENU_START,MENU_END,mmgFrame::OnMenu)
-    EVT_MENU_RANGE(wxID_FILE1,wxID_FILE4,mmgFrame::OnMenu)
+    EVT_MENU_RANGE(wxID_FILE1,wxID_FILE9,mmgFrame::OnMenu)
     EVT_MENU_RANGE(OP_START,OP_END,mmgFrame::OnMenuOp)
     EVT_UPDATE_UI_RANGE(MENU_START,MENU_END,mmgFrame::OnUpdateUI)
     EVT_UPDATE_UI_RANGE(OP_START,OP_END,mmgFrame::OnUpdateUI)
