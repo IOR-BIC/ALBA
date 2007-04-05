@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exMedicalApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-13 09:19:29 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-04-05 10:03:53 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -109,7 +109,7 @@ bool exMedicalApp::OnInit()
   //m_logic->PlugVMEManager(false);  // the VmeManager at the moment cause 4 leaks of 200+32+24+56 bytes  //SIL. 20-4-2005: 
   m_logic->Configure();
 
-  m_logic->GetTopWin()->SetTitle("Interaction example");
+  m_logic->GetTopWin()->SetTitle("Medical example");
   SetTopWindow(mafGetFrame());  
 
   //------------------------------------------------------------
