@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeMIP.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-04 10:52:54 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-04-06 12:10:46 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -47,6 +47,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkLookupTable.h"
 #include "vtkVolume.h"
 #include "vtkImageResample.h"
+#include "vtkImageCast.h"
+#include "mafEventSource.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medPipeVolumeMIP);
@@ -66,6 +68,7 @@ medPipeVolumeMIP::medPipeVolumeMIP()
   m_ResampleFilter = NULL;
 
   m_ColorLUT          = NULL;
+  m_Caster            = NULL;
 
 }
 //----------------------------------------------------------------------------
@@ -84,8 +87,10 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
  
   if(m_Vme->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
   {
+    wxMessageBox(_("Resample the RectilinearGrid before Visualizing in MIP View"));
 	  return;
   }
+
   vtkImageData *image_data = vtkImageData::SafeDownCast(m_Vme->GetOutput()->GetVTKData());
   assert(image_data);
   image_data->Update();
@@ -101,6 +106,15 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
   m_ResampleFilter->SetAxisMagnificationFactor(0,0.5);
   m_ResampleFilter->SetAxisMagnificationFactor(1,0.5);
   m_ResampleFilter->SetAxisMagnificationFactor(2,0.5);
+  m_ResampleFilter->Update();
+
+  vtkNEW(m_Caster);
+  m_Caster->SetInput(m_ResampleFilter->GetOutput());
+  m_Caster->SetNumberOfThreads(1);
+  m_Caster->SetOutputScalarType(VTK_UNSIGNED_SHORT);
+  m_Caster->ClampOverflowOn();
+  m_Caster->Update();
+ 
 	
   mmaVolumeMaterial *material = ((mafVMEVolume *)m_Vme)->GetMaterial();
   
@@ -121,7 +135,7 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
   m_MIPFunction->SetMaximizeMethodToOpacity();
 
   vtkNEW(m_VolumeMapper);
-  m_VolumeMapper->SetInput(m_ResampleFilter->GetOutput());
+  m_VolumeMapper->SetInput(m_Caster->GetOutput());
   
   m_VolumeMapper->SetVolumeRayCastFunction(m_MIPFunction);
   m_VolumeMapper->SetCroppingRegionPlanes(0, 1, 0, 1, 0, 1);
@@ -152,6 +166,7 @@ medPipeVolumeMIP::~medPipeVolumeMIP()
   vtkDEL(m_MIPFunction);
   vtkDEL(m_VolumeMapper);
   vtkDEL(m_Volume);
+  vtkDEL(m_Caster);
 }
 //----------------------------------------------------------------------------
 void medPipeVolumeMIP::Select(bool sel)
@@ -189,8 +204,6 @@ void medPipeVolumeMIP::OnEvent(mafEventBase *maf_event)
 		case ID_RESAMPLE_FACTOR:
 			if(m_ResampleFilter!=0)
 			{
-				double image_data_spacing[3];
-				((vtkImageData*)m_Vme->GetOutput()->GetVTKData())->GetSpacing(image_data_spacing);
 				m_VolumeMapper->SetImageSampleDistance(1/m_ResampleFactor);
 				m_VolumeMapper->SetMaximumImageSampleDistance(10);
 				m_VolumeMapper->SetMinimumImageSampleDistance(1/m_ResampleFactor);
@@ -224,17 +237,22 @@ void medPipeVolumeMIP::SetResampleFactor(double value)
 void medPipeVolumeMIP::UpdateMIPFromLUT()
 //----------------------------------------------------------------------------
 {
-  m_OpacityTransferFunction->RemoveAllPoints();
-  int tv = m_ColorLUT->GetNumberOfTableValues();
-  double rgba[4], sr[2],w,p;
-  vtkImageData::SafeDownCast(m_Vme->GetOutput()->GetVTKData())->GetScalarRange(sr);
-  w = sr[1] - sr[0];
-  for (int v=0;v<tv;v++)
+  if(m_Caster)
   {
-    m_ColorLUT->GetTableValue(v,rgba);
-    p = v*w/tv+sr[0];
-    m_OpacityTransferFunction->AddPoint(p,p/sr[1]);
+    m_OpacityTransferFunction->RemoveAllPoints();
+
+    int tv = m_ColorLUT->GetNumberOfTableValues();
+    double rgba[4], sr[2],w,p;
+    m_Caster->GetOutput()->GetScalarRange(sr);
+    w = sr[1] - sr[0];
+    for (int v=0;v<tv;v++)
+    {
+      m_ColorLUT->GetTableValue(v,rgba);
+      p = v*w/tv+sr[0];
+      m_OpacityTransferFunction->AddPoint(p, (double)v/(double)tv);
+    }
+    m_OpacityTransferFunction->Update();
+    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
-  m_OpacityTransferFunction->Update();
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+  
 }
