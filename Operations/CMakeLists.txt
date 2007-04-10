@@ -26,6 +26,8 @@ SET(PROJECT_SRCS
   mmoRAWImporterImages.h
   mmoMeshQuality.cpp
   mmoMeshQuality.h
+  mmoCropDeformableROI.cpp
+  mmoCropDeformableROI.h
 )
 
 IF (MAF_USE_ITK)
