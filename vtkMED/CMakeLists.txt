@@ -20,6 +20,8 @@ SET(vtkMED_SRCS
   vtkWeightedLandmarkTransform.h
   vtkTriangleQualityRatio.cxx
   vtkTriangleQualityRatio.h
+  vtkMaskPolyDataFilter.cxx
+  vtkMaskPolyDataFilter.h
 )
 
 IF (MAF_USE_ITK)
