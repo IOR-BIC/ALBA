@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoGRFImporterWS.h,v $
   Language:  C++
-  Date:      $Date: 2007-04-04 11:39:50 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-04-10 09:35:51 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -69,13 +69,15 @@ public:
 
 protected:
 
-  mafVMESurface      *m_PlatformLeft;
-  mafVMESurface      *m_PlatformRight;
-  mafVMEVector       *m_VectorLeft;
-  mafVMEVector       *m_VectorRight;
-  vnl_matrix<double>  m_Grf_matrix;
-  wxString            m_FileDir;
-	wxString            m_File;
+  mafVMESurface       *m_PlatformLeft;
+  mafVMESurface       *m_PlatformRight;
+  mafVMEVector        *m_VectorLeft;
+  mafVMEVector        *m_VectorRight;
+  mafVMELandmarkCloud *m_AlCop;
+
+  vnl_matrix<double>   m_Grf_matrix;
+  wxString             m_FileDir;
+	wxString             m_File;
 
 };
 #endif

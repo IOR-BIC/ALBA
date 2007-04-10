@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoGRFImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-05 15:20:37 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-04-10 09:35:51 $
+  Version:   $Revision: 1.6 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,6 +26,8 @@
 #include <vtkCubeSource.h>
 #include "vtkMAFSmartPointer.h"
 #include "vtkCellArray.h"
+#include "mafVMELandmark.h"
+#include "mafVMELandmarkCloud.h"
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
 
@@ -62,16 +64,16 @@ mmoGRFImporterWS::mmoGRFImporterWS(wxString label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {
-	m_OpType	= OPTYPE_IMPORTER;
-	m_Canundo	= true;
-	m_File		= "";
-	m_FileDir = (mafGetApplicationDirectory() + "/Data/External/").c_str();
-  m_Output = NULL;
-  m_PlatformLeft = NULL;
+	m_OpType       	= OPTYPE_IMPORTER;
+	m_Canundo	      = true;
+	m_File		      = "";
+	m_FileDir       = (mafGetApplicationDirectory() + "/Data/External/").c_str();
+  m_Output        = NULL;
+  m_PlatformLeft  = NULL;
   m_PlatformRight = NULL;
-  m_VectorLeft = NULL;
-  m_VectorRight = NULL;
- 
+  m_VectorLeft    = NULL;
+  m_VectorRight   = NULL;
+  m_AlCop        = NULL;
 }
 //----------------------------------------------------------------------------
 mmoGRFImporterWS::~mmoGRFImporterWS()
@@ -82,6 +84,8 @@ mmoGRFImporterWS::~mmoGRFImporterWS()
   mafDEL(m_PlatformRight);
   mafDEL(m_VectorLeft);
   mafDEL(m_VectorRight);
+  mafDEL(m_AlCop);
+  
 
 
 }
@@ -100,6 +104,13 @@ void mmoGRFImporterWS::OpDo()
     mafEventMacro(mafEvent(this,VME_ADD,m_PlatformRight));
     m_VectorRight->ReparentTo(m_PlatformRight);
   }
+
+  if(m_PlatformLeft != NULL && m_PlatformRight != NULL)
+  {
+    mafEventMacro(mafEvent(this,VME_ADD,m_AlCop));
+  }
+
+
 }
 //----------------------------------------------------------------------------
 void mmoGRFImporterWS::OpUndo()
@@ -261,11 +272,20 @@ void mmoGRFImporterWS::Read()
   int pointId1[2];
   int pointId2[2];
 
+  mafString alLeft = "Left";
+  mafString alRight = "Right";
+
   mafNEW(m_VectorLeft);
   mafNEW(m_VectorRight);
+  mafNEW(m_AlCop);
   m_VectorLeft->SetName("Left_vector");
   m_VectorRight->SetName("Right_vector");
-   
+  m_AlCop->SetName("COP");
+  m_AlCop->Open();
+  m_AlCop->SetRadius(10);
+  m_AlCop->AppendLandmark(alLeft);
+  m_AlCop->AppendLandmark(alRight);
+  
 
   do 
   {
@@ -320,8 +340,14 @@ void mmoGRFImporterWS::Read()
       vector1->Update;
 
       m_VectorLeft->SetData(vector1, time);
-
+      m_AlCop->SetLandmark(alLeft, cop1X, cop1Y, cop1Z, time);
+      m_AlCop->SetLandmarkVisibility(alLeft, 1, time);
     }
+    else
+    {
+      m_AlCop->SetLandmarkVisibility(alLeft, 0, time);
+    }
+ 
 
     //Values of the second platform
     cop2StX = tkz.GetNextToken().c_str();
@@ -353,6 +379,7 @@ void mmoGRFImporterWS::Read()
     double moment2Y = atof(moment2StY);
     double moment2Z = atof(moment2StZ);
 
+     
 
     if (cop2X != NULL || cop2Y != NULL || cop2Z != NULL)
     {
@@ -366,8 +393,14 @@ void mmoGRFImporterWS::Read()
       vector2->Update;
  
       m_VectorRight->SetData(vector2, time);   
+      m_AlCop->SetLandmark(alRight, cop2X, cop2Y, cop2Z, time);
+      m_AlCop->SetLandmarkVisibility(alRight, 1, time);
     }
-
+    else
+    {
+      m_AlCop->SetLandmarkVisibility(alRight, 0, time);
+    }
+ 
 
     //Create the mafVMESurface for the platforms
     m_PlatformLeft->SetData(platformLeft->GetOutput(), time);
