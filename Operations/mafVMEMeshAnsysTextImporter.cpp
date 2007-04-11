@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEMeshAnsysTextImporter.cpp,v $
 Language:  C++
-Date:      $Date: 2007-04-05 14:49:13 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-04-11 15:40:36 $
+Version:   $Revision: 1.4 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -32,8 +32,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVMEMesh.h"
 #include "mafTagArray.h"
 
-// TO BE PORTED
-// #include "mafVMEMeshDataToCellData.h"
 // #include "mafVMEMeshParabolicMeshToLinearMesh.h"
 
 // vcl includes
@@ -92,7 +90,7 @@ int mafVMEMeshAnsysTextImporter::Read()
   if (this->ParseNodesFile(grid) == -1) return MAF_ERROR ; 
   if (this->ParseElementsFile(grid) == -1) return MAF_ERROR;
 
-  int ret = this->ParseMaterialsFile(grid);
+  int ret = this->ParseMaterialsFile(grid, m_MaterialsFileName);
 
   // allocate the output if not yet allocated...
   if (m_Output == NULL)
@@ -108,28 +106,24 @@ int mafVMEMeshAnsysTextImporter::Read()
   }
 
   // TO BE PORTED
-  // mafVMEMeshDataToCellData *f2Cell = mafVMEMeshDataToCellData::New();
   // mafVMEMeshParabolicMeshToLinearMesh *p2l = mafVMEMeshParabolicMeshToLinearMesh::New();
 
   // material file is present?
 
-  vtkUnstructuredGrid *gridToLinearize = NULL;
-
-  // NOT HANDLING MATERIALS FILE...
-  //if (ret == 0)
-  //{
-  //  mafErrorMacro("Materials file found; building mesh attribute data from materials info...")
-  //  // convert field data from materials to cell data   
-  //  f2Cell->SetInput(grid);
-  //  f2Cell->Update();
-  //  gridToLinearize = f2Cell->GetOutput();
-  //}
-  //else
-  //{
-    mafErrorMacro("Materials file not yet supported; not building attribute data from materials info...")
-    gridToLinearize = grid;
+  vtkMAFSmartPointer<vtkUnstructuredGrid> gridToLinearize;
   
-    // }
+  if (ret == 0)
+  {
+    mafLogMessage("Materials file found; building mesh attribute data from materials info...");
+
+    // convert field data from materials to cell data       
+    FEMDataToCellData(grid.GetPointer(), gridToLinearize.GetPointer());
+  }
+  else
+  {
+    mafLogMessage("Materials file not found! Not building attribute data from materials info...");
+    gridToLinearize = grid;
+  }
   
   // NOT HANDLING LINEARIZATION...
   //// do we have to linearize?
@@ -147,14 +141,6 @@ int mafVMEMeshAnsysTextImporter::Read()
   //  // Importer->SetInput(gridToLinearize);
   //}
 
-  //Importer->SetModeToMove();
-  //Importer->SetVMEName("mesh");
-  //Importer->Import();
-
-  //this->Output = Importer->GetOutput();
-  
-  // p2l->Delete();
-  // f2Cell->Delete();
   
   m_Output->SetDataByDetaching(gridToLinearize,0);
 
@@ -328,7 +314,7 @@ int mafVMEMeshAnsysTextImporter::ParseMaterialsFile(vtkUnstructuredGrid *grid, c
 {
   if (strcmp(matfilename, "") == 0)
   {
-    mafErrorMacro("Materials filename not specified!" << endl);
+    mafLogMessage("Materials filename not specified!");
     return -1;
   }
 
@@ -597,3 +583,94 @@ int mafVMEMeshAnsysTextImporter::ReadMatrix(vnl_matrix<double> &M, const char *f
   return 1;
 }
 
+void mafVMEMeshAnsysTextImporter::FEMDataToCellData( vtkUnstructuredGrid *input, vtkUnstructuredGrid *output  )
+{
+
+  if ( input == NULL || output == NULL )
+  {
+    return;
+  }
+
+  // materials id per cell
+  vtkDoubleArray *materialIDArrayFD = NULL;
+  int numCells = -1, numMatProp = -1, numMat = -1;
+  mafString matStr("material");
+  mafString matIdStr("material_id");
+  vtkIntArray *materialArrayCD = NULL;
+  vtkFieldData *inFD = NULL;
+  vtkCellData *outCD = NULL;
+
+  numCells = input->GetNumberOfCells();
+  materialArrayCD = vtkIntArray::SafeDownCast(input->GetCellData()->GetArray(matStr.GetCStr()));
+
+  // check for field data existence
+  if (materialArrayCD == NULL)
+  {
+    mafErrorMacro(<<"material cell data not found!");
+    return;
+  }
+
+  inFD = input->GetFieldData();
+
+  // check for field data existence
+  if (inFD == NULL)
+  {
+    mafErrorMacro(<<"field data not found!");
+    return;
+  }
+
+  numMatProp = inFD->GetNumberOfArrays();
+
+  // get the materials id array
+  materialIDArrayFD = vtkDoubleArray::SafeDownCast(inFD->GetArray(matIdStr.GetCStr()));
+  int firstMaterialId = (int) materialIDArrayFD->GetValue(0);
+
+  // check for materials id section existence
+  if (materialIDArrayFD == NULL)
+  {
+    mafErrorMacro(<<"materials_id field data data not found!");
+    return;
+  }
+
+  // copying the input in the output
+  output->DeepCopy(input);
+  outCD = output->GetCellData();
+
+  // for every fields
+  for (int fieldNumber = 0; fieldNumber < numMatProp; fieldNumber++)
+  {
+    if (strcmp(inFD->GetArrayName(fieldNumber), matIdStr.GetCStr())) 
+    {
+      // source array
+      vtkDoubleArray *sourceArray = vtkDoubleArray::SafeDownCast(inFD->GetArray(fieldNumber));
+
+      // create a double array with current field name
+      // target_array is the current field array
+      vtkDoubleArray *targetArray = vtkDoubleArray::New();
+      targetArray->SetName(inFD->GetArrayName(fieldNumber)); 
+      targetArray->SetNumberOfTuples(input->GetNumberOfCells());
+
+      // for each cell
+      for (int cellId = 0; cellId < input->GetNumberOfCells(); cellId++)
+      {
+        // get the current cell material
+        int currentCellMaterialId = materialArrayCD->GetValue(cellId);
+        // set the material prop value in target array
+        targetArray->SetValue(cellId, sourceArray->GetValue(currentCellMaterialId - firstMaterialId));
+      }
+
+      // add the array to the output cell data 
+      outCD->AddArray(targetArray);
+
+      // clean up
+      targetArray->Delete();
+    }
+  }  
+}
+
+int mafVMEMeshAnsysTextImporter::GetMeshType()
+{
+	GetElementType();
+  return m_MeshType;
+
+}

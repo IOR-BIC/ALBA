@@ -1,9 +1,9 @@
-/*=========================================================================
+/*========================================================================
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEMeshAnsysTextImporter.h,v $
 Language:  C++
-Date:      $Date: 2007-04-05 14:49:13 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-04-11 15:40:36 $
+Version:   $Revision: 1.4 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -33,6 +33,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
  
   BEWARE Hybrid meshes are not upported
 
+  See mafVMEMeshAnsysTextImporterTest for use cases
+
  .SECTION Description
 
  .SECTION ToDo
@@ -56,7 +58,6 @@ public:
   void SetMaterialsFileName(const char *name) {this->m_MaterialsFileName = name;};
   const char *GetMaterialsFileName() {return this->m_MaterialsFileName;};
 
-
   /**
   // Read files information; returns MAF_OK if successful otherwise MAF_ERROR*/
   int Read();
@@ -66,7 +67,6 @@ public:
   mafVMEMesh *GetOutput() {return m_Output;};
   
   /**
-  TO BE PORTED... DO NOT USE!
   Read materials info from ansys .lis text file
   and fill the grid field data section. Existing fields are
   overwritten*/
@@ -96,6 +96,9 @@ public:
     UNKNOWN,
     INVALID_MESH_FILE,
   };
+
+  /** return the mesh type */
+  int GetMeshType();
 
   /**
   Return the nodes number for current mesh; -1 if the nodes number is unknown.*/
@@ -141,8 +144,8 @@ protected:
 
   /**
   // Parse materials file*/
-  int ParseMaterialsFile(vtkUnstructuredGrid *grid)
-  {return mafVMEMeshAnsysTextImporter::ParseMaterialsFile(grid, this->m_MaterialsFileName);};
+  // int ParseMaterialsFile(vtkUnstructuredGrid *grid)
+  // {return mafVMEMeshAnsysTextImporter::ParseMaterialsFile(grid, this->m_MaterialsFileName);};
 
   /**
   // Materials file name*/
@@ -154,6 +157,7 @@ protected:
   std::map<int, int> m_NodeIdNodeNumberMap;
   
   int ReadMatrix(vnl_matrix<double> &M, const char *fname);
+  void FEMDataToCellData(vtkUnstructuredGrid *input, vtkUnstructuredGrid *output );
   
 };
 
