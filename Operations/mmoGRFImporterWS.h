@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoGRFImporterWS.h,v $
   Language:  C++
-  Date:      $Date: 2007-04-10 09:35:51 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-04-11 08:45:17 $
+  Version:   $Revision: 1.4 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -28,6 +28,7 @@ class mafEvent;
 class mafVMEVector;
 class vtkCubeSource;
 class mafVMESurface;
+class mafVMELandmarkCloud;
 //class mafVMEScalar;
 
 //----------------------------------------------------------------------------
