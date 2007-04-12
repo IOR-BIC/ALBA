@@ -69,93 +69,115 @@ vtkMaskPolyDataFilter::~vtkMaskPolyDataFilter()
 //
 void vtkMaskPolyDataFilter::Execute()
 {
-  int i,j,k, abortExecute=0;
-  vtkDataSet *output = this->GetOutput();
-  vtkDataSet *input = this->GetInput();
-  int numPts=input->GetNumberOfPoints();
-  vtkPointData *inPD=input->GetPointData(), *outPD=output->GetPointData();
-  vtkCellData *inCD=input->GetCellData(), *outCD=output->GetCellData();
-  int idx, cellId, subId;
-  double  closestPoint[3];
+	int i,j,k, abortExecute=0;
+	vtkDataSet *output = this->GetOutput();
+	vtkDataSet *input = this->GetInput();
+	int numPts=input->GetNumberOfPoints();
+	vtkPointData *inPD=input->GetPointData(), *outPD=output->GetPointData();
+	vtkCellData *inCD=input->GetCellData(), *outCD=output->GetCellData();
+	int idx, cellId, subId;
+	double  closestPoint[3];
 	double *x,*x1;
 	x1 = new double[3];
-  double maxDistance2, distance; 
+	double maxDistance2, distance; 
 	double distance2;
-  double dot, n[3];
-  vtkCell *cell;
-  vtkIdList *cellIds = vtkIdList::New();
-  double pcoords[3];
-  double bounds[6];
-  vtkDebugMacro(<< "Executing MaskPolyDataFilter");
+	double dot, n[3];
+	vtkCell *cell;
+	vtkIdList *cellIds = vtkIdList::New();
+	double pcoords[3];
+	double bounds[6];
+	//  vtkDebugMacro(<< "Executing MaskPolyDataFilter");
 
-  //
-  // Initialize self; create output objects
-  //
-  if ( !this->GetMask() )
-  {
-		vtkErrorMacro(<<"No mask specified");
+	//
+	// Initialize self; create output objects
+	//
+	if ( !this->GetMask() )
+	{
+		//	vtkErrorMacro(<<"No mask specified");
 		return;
-  }
+	}
 
-  vtkPolyData *mask=this->GetMask();
-	
+	vtkPolyData *mask=this->GetMask();
+
 	mask->GetBounds(bounds);
-	
-  double *weights=new double[3];    
-  cellIds->SetNumberOfIds(mask->GetMaxCellSize());
 
-  if ( numPts < 1 )
-  {
-    vtkErrorMacro(<<"No data to Mask");
-    return;
-  }
+	double *weights=new double[3];    
+	cellIds->SetNumberOfIds(mask->GetMaxCellSize());
 
-  
-  //
-  // Create objects to hold output of contour operation
-  //
-  output->DeepCopy(input);
-  //output->DeepCopy(input);	
+	if ( numPts < 1 )
+	{
+		//vtkErrorMacro(<<"No data to Mask");
+		return;
+	}
 
-  outPD->DeepCopy(inPD);
-  outCD->DeepCopy(inCD);
-  
-  //outSc = outPD->GetScalars();
 
-  int numcomp=outPD->GetScalars()->GetNumberOfComponents();
- 
+	//
+	// Create objects to hold output of contour operation
+	//
+	output->DeepCopy(input);
+	//output->DeepCopy(input);	
+
+	outPD->DeepCopy(inPD);
+	outCD->DeepCopy(inCD);
+
+	//outSc = outPD->GetScalars();
+
+	int numcomp=outPD->GetScalars()->GetNumberOfComponents();
+
 	float *tuple=new float[numcomp];
 
-  int progress=0;
-    
-  for (i = 0; i < numPts && !abortExecute; i++) {
-    progress=((float)i*100/(float)numPts);
+	int progress=0;
 
-		if ((progress%20)==0)
+	for (i = 0; i < numPts && !abortExecute; i++) 
+	{
+		progress=((float)i*100/(float)numPts);
+
+		if ((progress%2)==0)
 		{
 			this->UpdateProgress((float)progress/100.0);
 			abortExecute = this->GetAbortExecute();
 		}
 
-    maxDistance2 = (this->MaximumDistance) * (this->MaximumDistance);
-    dot=1;
-    x = output->GetPoint(i);
+		maxDistance2 = (this->MaximumDistance) * (this->MaximumDistance);
+		dot=1;
+		x = output->GetPoint(i);
 
 		// use XNOR table to exclude points that not respect the InsideOut and bounding box condition
 		// i.e. if InsideOut is 1 points inside the sourface must be sets to the FillValue, so points upside the bounding 
 		// box should be skipped
-		if (!(((x[0] <= bounds[0]) || (x[0] >= bounds[1]) || (x[1] <= bounds[2]) || (x[1] >= bounds[3]) || (x[2] <= bounds[4]) || (x[2] >= bounds[5])) ^ this->InsideOut))
-			continue;
+		if ( (x[0] <= bounds[0]) || (x[0] >= bounds[1]) || (x[1] <= bounds[2]) || (x[1] >= bounds[3]) || (x[2] <= bounds[4]) || (x[2] >= bounds[5])) 
+		{
+			//the point is outside the mask's bounds
+			if (this->InsideOut)
+			{
+				//if InsideOut==1 the point outside should be skipped
+				continue;
+			}
+			else
+			{
+				// if insideOut==0 the point outside should be filled with the FillValue
+				for (int n=0;n<numcomp;n++)
+				{
+					tuple[n]=this->FillValue;
+				}
+				outPD->GetScalars()->SetTuple(i,tuple);
+				// done: go to next point
+				continue;
+			}
+		}
+		// at this point the cell is inside the bounds
 
 		// Find the closest point in the PolyData
-    idx = mask->FindPoint(x);
+		idx = mask->FindPoint(x);
 
-		if (idx >= 0) {
-      // find the cells containing the found point
-      mask->GetPointCells(idx, cellIds);
+		if (idx >= 0) 
+		{
+			// find the cells containing the found point
+			mask->GetPointCells(idx, cellIds);
 
 			// examine the each cell to find the closest point to the x point
-      for (j=0; j < cellIds->GetNumberOfIds(); j++) {
+			for (j=0; j < cellIds->GetNumberOfIds(); j++) 
+			{
 				// extract the cell
 				cellId = cellIds->GetId(j);
 				cell = mask->GetCell(cellId);
@@ -171,22 +193,22 @@ void vtkMaskPolyDataFilter::Execute()
 						closestPoint[k]=x1[k];
 					}	  
 				}
-      }
-      
+			}
+
 			// Vector from x to x1
 			for (k=0; k<3; k++) 
 				x1[k] = x[k] - closestPoint[k];
-	  
-			// Projection of the distance vector on the normal
-      dot = vtkMath::Dot(x1,n);     
-    } 
 
-    distance = sqrt(maxDistance2);
+			// Projection of the distance vector on the normal
+			dot = vtkMath::Dot(x1,n);     
+		} 
+
+		distance = sqrt(maxDistance2);
 
 		// find if the x point is inside or outside of the polygon: sign of the distance
-    if (dot < 0) {
-      distance = -distance;
-    }
+		if (dot < 0) {
+			distance = -distance;
+		}
 
 		if ( this->InsideOut )
 		{
@@ -210,17 +232,17 @@ void vtkMaskPolyDataFilter::Execute()
 				outPD->GetScalars()->SetTuple(i,tuple);
 			}
 		}  
-  }
+	}
 
-  
-  //
-  // Loop over all points creating scalar output determined by evaluating 
-  // points using mask geometry.
-  //
 
-  delete [] weights;
+	//
+	// Loop over all points creating scalar output determined by evaluating 
+	// points using mask geometry.
+	//
+
+	delete [] weights;
 	delete tuple;
-  cellIds->Delete();
+	cellIds->Delete();
 }
 
 

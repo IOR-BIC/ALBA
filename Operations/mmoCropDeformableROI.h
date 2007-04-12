@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoCropDeformableROI.h,v $
 Language:  C++
-Date:      $Date: 2007-04-10 10:43:33 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-04-12 13:20:56 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -105,6 +105,7 @@ protected:
 	double m_FillValue;
 	int		m_InsideOut;
 	double	m_MaxDistance;
+	mafNode *m_pNode;
 
 	mafVMEVolumeGray *m_ResultVme;
 

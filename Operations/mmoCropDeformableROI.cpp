@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoCropDeformableROI.cpp,v $
 Language:  C++
-Date:      $Date: 2007-04-10 10:43:33 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-04-12 13:20:56 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -83,6 +83,7 @@ mafOp(label)
 	m_InsideOut = 0;
 	m_MaxDistance = sqrt(1.0e29)/3.0;
 	m_FillValue = 0.0;
+	m_pNode = NULL;
 }
 //----------------------------------------------------------------------------
 mmoCropDeformableROI::~mmoCropDeformableROI()
@@ -134,7 +135,7 @@ void mmoCropDeformableROI::OpRun()
 	m_Gui->Double(ID_DISTANCE,_("distance"),&m_Distance,0.0);
 	m_Gui->Double(ID_FILL_VALUE,_("fill value"),&m_FillValue);
 	m_Gui->Double(ID_MAX_DISTANCE,_("max dist."),&m_MaxDistance,0.0);
-	m_Gui->Bool(ID_INSIDE_OUT,_("inside out"),&m_InsideOut);
+	m_Gui->Bool(ID_INSIDE_OUT,_("crop inside out"),&m_InsideOut);
 
 	m_Gui->OkCancel();
 
@@ -160,6 +161,7 @@ void mmoCropDeformableROI::OnEvent(mafEventBase *maf_event)
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
 	{
+		mafNode *n=NULL;
 		switch(e->GetId())
 		{	
 		case ID_CHOOSE_MASK:
@@ -169,14 +171,15 @@ void mmoCropDeformableROI::OnEvent(mafEventBase *maf_event)
 				e->SetArg((long)m_VMEAccept);
 				e->SetString(&title);
 				mafEventMacro(*e);
-				mafNode *n = e->GetVme();
-				if(n!=NULL)
-				{
-					Algorithm(mafVME::SafeDownCast(n));
-				}
+				m_pNode = e->GetVme();
 			}
 			break;
 		case wxOK:
+			if(m_pNode!=NULL)
+				{
+					Algorithm(mafVME::SafeDownCast(m_pNode));
+				}
+
 			OpStop(OP_RUN_OK);        
 			break;
 		case wxCANCEL:
@@ -204,9 +207,12 @@ void mmoCropDeformableROI::Algorithm(mafVME *vme)
 		m_MaskPolydataFilter->SetFillValue(m_FillValue);
 		m_MaskPolydataFilter->SetMaximumDistance(m_MaxDistance);
 		m_MaskPolydataFilter->SetFillValue(m_FillValue);
+		m_MaskPolydataFilter->SetInsideOut(m_InsideOut);
 		mafVMESurface *surface = mafVMESurface::SafeDownCast(vme);
 		if(!surface)
 			return;
+    	  mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,m_MaskPolydataFilter));
+
 		m_MaskPolydataFilter->SetMask(vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData()));
 		m_MaskPolydataFilter->Update();
 
