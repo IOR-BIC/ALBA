@@ -33,8 +33,6 @@ IF (MAF_USE_VTK)
     mmoCreateSlicer.h
     mmoCreateSpline.cpp
     mmoCreateSpline.h
-    mmoMeshImporter.cpp
-    mmoMeshImporter.h
     mmoRemoveCells.cpp
     mmoRemoveCells.h
     mmoEditMetadata.cpp
@@ -101,6 +99,8 @@ IF (MAF_USE_ITK)
     mmoASCIIImporter.h
     mafVMEMeshAnsysTextImporter.cpp
     mafVMEMeshAnsysTextImporter.h
+    mmoMeshImporter.cpp
+    mmoMeshImporter.h
     mmoScalarToSurface.cpp
     mmoScalarToSurface.h
   )
