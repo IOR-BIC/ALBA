@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoGRFImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-10 09:35:51 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-04-13 07:37:01 $
+  Version:   $Revision: 1.7 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,6 +24,8 @@
 #include <wx/wfstream.h>
 
 #include <vtkCubeSource.h>
+#include <vtkTransformPolyDataFilter.h>
+#include <vtkTransform.h>
 #include "vtkMAFSmartPointer.h"
 #include "vtkCellArray.h"
 #include "mafVMELandmark.h"
@@ -43,8 +45,6 @@
 #include "mafVMESurface.h"
 #include "mafTagArray.h"
 #include "mafSmartPointer.h"
-
-
 
 #include <iostream>
 #include <fstream>
@@ -116,7 +116,6 @@ void mmoGRFImporterWS::OpDo()
 void mmoGRFImporterWS::OpUndo()
 //----------------------------------------------------------------------------
 {   
-
   if(m_PlatformLeft != NULL)
     mafEventMacro(mafEvent(this,VME_REMOVE,m_PlatformLeft));
   if(m_PlatformRight != NULL)
@@ -140,7 +139,7 @@ void mmoGRFImporterWS::OpRun()
 {
   int result = OP_RUN_CANCEL;
   m_File = "";
-  wxString pgd_wildc	= "EMG File (*.*)|*.*";
+  wxString pgd_wildc	= "GRF File (*.*)|*.*";
   wxString f;
   f = mafGetOpenFile(m_FileDir,pgd_wildc).c_str(); 
   if(!f.IsEmpty() && wxFileExists(f))
@@ -171,21 +170,16 @@ void mmoGRFImporterWS::Read()
   //if (!m_TestMode)
     wxBusyInfo wait("Please wait, working...");
 
-//  mafNEW(m_GrfScalar);
   wxString path, name, ext;
   wxSplitPath(m_File.c_str(),&path,&name,&ext);
-//  m_GrfScalar->SetName(name);
 
   mafTagItem tag_Nature;
   tag_Nature.SetName("VME_NATURE");
   tag_Nature.SetValue("NATURAL");
 
-  
   wxFileInputStream inputFile( m_File );
   wxTextInputStream text( inputFile );
 
- 
-//  double val_scalar;
   wxString line;
 
   mafString platform1St[12];
@@ -193,7 +187,6 @@ void mmoGRFImporterWS::Read()
 
   double platform1[12];
   double platform2[12];
-
 
   line = text.ReadLine(); 
   line = text.ReadLine();
@@ -229,7 +222,6 @@ void mmoGRFImporterWS::Read()
   vtkMAFSmartPointer<vtkCubeSource> platformLeft;
   vtkMAFSmartPointer<vtkCubeSource> platformRight;
 
-
   //Get values for platforms
    mafNEW(m_PlatformLeft);
    mafNEW(m_PlatformRight);
@@ -242,8 +234,6 @@ void mmoGRFImporterWS::Read()
   platformLeft->SetBounds(platform1[0],platform1[3],platform1[7],platform1[1],thickness1,platform1[2]);
   platformRight->SetBounds(platform2[0],platform2[3],platform2[7],platform2[1],thickness2,platform2[2]);
 
-  
-
   line = text.ReadLine(); //Ignore lines
   line = text.ReadLine();
   line = text.ReadLine();
@@ -251,12 +241,6 @@ void mmoGRFImporterWS::Read()
 
   //Read vector data
   
-  //line.Replace(","," ");
-
-
-//  int space, num_tk;
-  //unsigned i;
-  wxString frame;
   mafString timeSt;
   mafTimeStamp time;
 
@@ -278,6 +262,7 @@ void mmoGRFImporterWS::Read()
   mafNEW(m_VectorLeft);
   mafNEW(m_VectorRight);
   mafNEW(m_AlCop);
+  
   m_VectorLeft->SetName("Left_vector");
   m_VectorRight->SetName("Right_vector");
   m_AlCop->SetName("COP");
@@ -286,16 +271,13 @@ void mmoGRFImporterWS::Read()
   m_AlCop->AppendLandmark(alLeft);
   m_AlCop->AppendLandmark(alRight);
   
-
   do 
   {
-
     line = text.ReadLine();
     wxStringTokenizer tkz(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
     timeSt = tkz.GetNextToken().c_str();
     time = atof(timeSt)/freq_val; 
-    
-
+   
     //Values of the first platform
     cop1StX = tkz.GetNextToken().c_str();
     cop1StY = tkz.GetNextToken().c_str();
@@ -326,11 +308,9 @@ void mmoGRFImporterWS::Read()
     double moment1Y = atof(moment1StY);
     double moment1Z = atof(moment1StZ);
 
-
-
     if (cop1X != NULL || cop1Y != NULL || cop1Z != NULL)
     {
-      points1->InsertPoint(0, cop1X, cop1Y, cop1Z);
+      points1->InsertPoint(0, 0, 0, 0);
       points1->InsertPoint(1, force1X, force1Y, force1Z);
       pointId1[0] = 0;
       pointId1[1] = 1;
@@ -339,7 +319,21 @@ void mmoGRFImporterWS::Read()
       vector1->SetLines(cellArray1);
       vector1->Update;
 
-      m_VectorLeft->SetData(vector1, time);
+      vtkMAFSmartPointer<vtkTransformPolyDataFilter> transfVecL;
+      vtkMAFSmartPointer<vtkTransform> transf;
+     
+      transf->Translate(cop1X, cop1Y, cop1Z);
+      transfVecL->SetTransform(transf);
+      transfVecL->SetInput(vector1);
+      transfVecL->Update();
+
+
+      m_VectorLeft->SetData(transfVecL->GetOutput(), time);
+
+      m_VectorLeft->Modified();
+      m_VectorLeft->Update();
+      m_VectorLeft->GetOutput()->GetVTKData()->Update();
+
       m_AlCop->SetLandmark(alLeft, cop1X, cop1Y, cop1Z, time);
       m_AlCop->SetLandmarkVisibility(alLeft, 1, time);
     }
@@ -348,7 +342,6 @@ void mmoGRFImporterWS::Read()
       m_AlCop->SetLandmarkVisibility(alLeft, 0, time);
     }
  
-
     //Values of the second platform
     cop2StX = tkz.GetNextToken().c_str();
     cop2StY = tkz.GetNextToken().c_str();
@@ -379,11 +372,9 @@ void mmoGRFImporterWS::Read()
     double moment2Y = atof(moment2StY);
     double moment2Z = atof(moment2StZ);
 
-     
-
     if (cop2X != NULL || cop2Y != NULL || cop2Z != NULL)
     {
-      points2->InsertPoint(0, cop2X, cop2Y, cop2Z);
+      points2->InsertPoint(0, 0, 0, 0);
       points2->InsertPoint(1, force2X, force2Y, force2Z);
       pointId2[0] = 0;
       pointId2[1] = 1;
@@ -391,8 +382,21 @@ void mmoGRFImporterWS::Read()
       vector2->SetPoints(points2);
       vector2->SetLines(cellArray2);
       vector2->Update;
+
+      vtkMAFSmartPointer<vtkTransformPolyDataFilter> transfVecR;
+      vtkMAFSmartPointer<vtkTransform> transf;
+      
+      transf->Translate(cop2X, cop2Y, cop2Z);
+      transfVecR->SetTransform(transf);
+      transfVecR->SetInput(vector2);
+      transfVecR->Update();
  
-      m_VectorRight->SetData(vector2, time);   
+      m_VectorRight->SetData(transfVecR->GetOutput(), time);
+
+      m_VectorRight->Modified();
+      m_VectorRight->Update();
+      m_VectorRight->GetOutput()->GetVTKData()->Update();
+
       m_AlCop->SetLandmark(alRight, cop2X, cop2Y, cop2Z, time);
       m_AlCop->SetLandmarkVisibility(alRight, 1, time);
     }
@@ -400,11 +404,10 @@ void mmoGRFImporterWS::Read()
     {
       m_AlCop->SetLandmarkVisibility(alRight, 0, time);
     }
- 
 
-    //Create the mafVMESurface for the platforms
-    m_PlatformLeft->SetData(platformLeft->GetOutput(), time);
-    m_PlatformRight->SetData(platformRight->GetOutput(), time);
-    
   }while (!inputFile.Eof());
+
+  //Create the mafVMESurface for the platforms
+  m_PlatformLeft->SetData(platformLeft->GetOutput(), 0);
+  m_PlatformRight->SetData(platformRight->GetOutput(), 0);
 }
