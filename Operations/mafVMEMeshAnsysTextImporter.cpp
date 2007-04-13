@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEMeshAnsysTextImporter.cpp,v $
 Language:  C++
-Date:      $Date: 2007-04-11 15:40:36 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2007-04-13 12:03:02 $
+Version:   $Revision: 1.5 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -149,6 +149,12 @@ int mafVMEMeshAnsysTextImporter::Read()
 
 int mafVMEMeshAnsysTextImporter::ParseNodesFile(vtkUnstructuredGrid *grid)
 {
+  if (strcmp(m_NodesFileName, "") == 0)
+  {
+    mafLogMessage("Nodes filename not specified!");
+    return -1;
+  }
+
   int node_id_col = 0;
   int x_col = 1;
   int y_col = x_col + 1;
@@ -220,6 +226,12 @@ int mafVMEMeshAnsysTextImporter::ParseNodesFile(vtkUnstructuredGrid *grid)
 
 int mafVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
 {
+  if (strcmp(m_ElementsFileName, "") == 0)
+  {
+    mafLogMessage("Elements filename not specified!");
+    return -1;
+  }
+
   int cell_id_col = 0;
   int materials_col = 1;
   int FIRST_CONNECTIVITY_COLUMN = 6;
@@ -570,7 +582,6 @@ int mafVMEMeshAnsysTextImporter::GetElementType()
 
 int mafVMEMeshAnsysTextImporter::ReadMatrix(vnl_matrix<double> &M, const char *fname)
 {
-  //Read raw motion data
   vcl_ifstream v_raw_matrix(fname, std::ios::in);
 
 

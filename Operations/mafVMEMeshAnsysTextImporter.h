@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEMeshAnsysTextImporter.h,v $
 Language:  C++
-Date:      $Date: 2007-04-11 15:40:36 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2007-04-13 12:03:02 $
+Version:   $Revision: 1.5 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -66,12 +66,6 @@ public:
   Get the vme created by the reader*/
   mafVMEMesh *GetOutput() {return m_Output;};
   
-  /**
-  Read materials info from ansys .lis text file
-  and fill the grid field data section. Existing fields are
-  overwritten*/
-  int ParseMaterialsFile(vtkUnstructuredGrid *grid, const char *filename);
-
   // supported elements 
   enum
   {  
@@ -109,6 +103,12 @@ public:
 
 protected:
  
+  /**
+  Read materials info from ansys .lis text file
+  and fill the grid field data section. Existing fields are
+  overwritten*/
+  int ParseMaterialsFile(vtkUnstructuredGrid *grid, const char *filename);
+
   /**
   Element type*/
   int m_ElementType;
