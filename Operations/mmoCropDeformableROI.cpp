@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoCropDeformableROI.cpp,v $
 Language:  C++
-Date:      $Date: 2007-04-12 13:20:56 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-04-16 09:56:58 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -55,6 +55,7 @@ MafMedical is partially based on OpenMAF.
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
 #include "mafVMESurface.h"
+#include "mafVMESurfaceParametric.h"
 
 #include "vtkMaskPolydataFilter.h"
 #include "vtkPolyData.h"
@@ -84,6 +85,7 @@ mafOp(label)
 	m_MaxDistance = sqrt(1.0e29)/3.0;
 	m_FillValue = 0.0;
 	m_pNode = NULL;
+  m_Surface = NULL;
 }
 //----------------------------------------------------------------------------
 mmoCropDeformableROI::~mmoCropDeformableROI()
@@ -91,6 +93,10 @@ mmoCropDeformableROI::~mmoCropDeformableROI()
 {
 	vtkDEL(m_MaskPolydataFilter);
 	mafDEL(m_ResultVme);
+
+  if(mafVMESurfaceParametric::SafeDownCast(m_Input))
+    mafDEL(m_Surface);
+
 	cppDEL(m_VMEAccept);
 }
 //----------------------------------------------------------------------------
@@ -208,12 +214,20 @@ void mmoCropDeformableROI::Algorithm(mafVME *vme)
 		m_MaskPolydataFilter->SetMaximumDistance(m_MaxDistance);
 		m_MaskPolydataFilter->SetFillValue(m_FillValue);
 		m_MaskPolydataFilter->SetInsideOut(m_InsideOut);
-		mafVMESurface *surface = mafVMESurface::SafeDownCast(vme);
-		if(!surface)
+		
+    if(m_Surface = mafVMESurface::SafeDownCast(vme));
+    else
+    {
+      mafNEW(m_Surface);
+      vtkPolyData *poly = (vtkPolyData *)(mafVMESurfaceParametric::SafeDownCast(vme)->GetSurfaceOutput()->GetVTKData());
+      m_Surface->SetData(poly,0);
+    }
+		if(!m_Surface)
 			return;
     	  mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,m_MaskPolydataFilter));
 
-		m_MaskPolydataFilter->SetMask(vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData()));
+    m_Surface->Update();
+		m_MaskPolydataFilter->SetMask(vtkPolyData::SafeDownCast(m_Surface->GetOutput()->GetVTKData()));
 		m_MaskPolydataFilter->Update();
 
 		if(vtkRectilinearGrid::SafeDownCast(m_MaskPolydataFilter->GetOutput()))

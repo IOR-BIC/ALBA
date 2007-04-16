@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoCropDeformableROI.h,v $
 Language:  C++
-Date:      $Date: 2007-04-12 13:20:56 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-04-16 09:56:58 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -52,6 +52,7 @@ MafMedical is partially based on OpenMAF.
 
 class vtkMaskPolyDataFilter;
 class mafVMEVolumeGray;
+class mafVMESurface;
 
 //----------------------------------------------------------------------------
 // mmoCropDeformableROI :
@@ -108,6 +109,7 @@ protected:
 	mafNode *m_pNode;
 
 	mafVMEVolumeGray *m_ResultVme;
+  mafVMESurface    *m_Surface;
 
 };
 #endif
