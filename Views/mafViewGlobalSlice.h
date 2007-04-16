@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-11 16:10:54 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-04-16 10:34:54 $
+  Version:   $Revision: 1.6 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,6 +29,11 @@ class mafEventBase;
 class mafString;
 class vtkActor2D;
 class vtkTextMapper;
+class vtkPlaneSource;
+class vtkOutlineCornerFilter;
+class vtkProperty;
+class vtkPolyDataMapper;
+class vtkActor;
 
 //----------------------------------------------------------------------------
 // mafViewGlobalSlice :
@@ -88,6 +93,8 @@ protected:
 	void UpdateSliceParameters();
 	void UpdateSlice();
 	void UpdateText();
+	void InizializePlane();
+	void UpdatePlane();
 
 	virtual mmgGui  *CreateGui();
 
@@ -109,8 +116,14 @@ protected:
 	mmgFloatSlider	*m_GlobalSlider;
 
 	vtkActor2D					*m_TextActor;
-	vtkTextMapper	*m_TextMapper;
-	mafString		m_Text;
-	double			m_TextColor[3];
+	vtkTextMapper				*m_TextMapper;
+	mafString						 m_Text;
+	double							 m_TextColor[3];
+
+	vtkPlaneSource					*m_BoundsPlane;
+	vtkOutlineCornerFilter	*m_BoundsOutlineBox;
+	vtkProperty             *m_BoundsOutlineProperty;
+	vtkPolyDataMapper       *m_BoundsOutlineMapper;
+	vtkActor	              *m_BoundsOutlineActor;
 };
 #endif

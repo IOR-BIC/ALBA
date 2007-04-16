@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-03 09:22:26 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2007-04-16 10:34:54 $
+  Version:   $Revision: 1.17 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -47,6 +47,11 @@
 #include "vtkTextProperty.h"
 #include "vtkProperty2D.h"
 #include "vtkRenderer.h"
+#include "vtkOutlineCornerFilter.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkPlaneSource.h"
+#include "vtkProperty.h"
+#include "vtkActor.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewGlobalSlice);
@@ -106,6 +111,12 @@ mafViewGlobalSlice::mafViewGlobalSlice(wxString label, int camera_position, bool
 	m_TextColor[2]=1.0;
 
 	m_Dn = 0.0;
+
+	m_BoundsPlane = NULL;
+	m_BoundsOutlineBox = NULL;
+	m_BoundsOutlineProperty = NULL;
+	m_BoundsOutlineActor = NULL;
+	m_BoundsOutlineMapper = NULL;
 }
 //----------------------------------------------------------------------------
 mafViewGlobalSlice::~mafViewGlobalSlice()
@@ -113,6 +124,15 @@ mafViewGlobalSlice::~mafViewGlobalSlice()
 {
 	if(m_Rwi && m_TextActor)
 		m_Rwi->m_RenFront->RemoveActor2D(m_TextActor);
+	if(m_Rwi && m_BoundsOutlineActor)
+		m_Rwi->m_RenFront->RemoveActor2D(m_BoundsOutlineActor);
+
+
+	vtkDEL(m_BoundsOutlineActor);
+	vtkDEL(m_BoundsOutlineMapper);
+	vtkDEL(m_BoundsOutlineProperty);
+	vtkDEL(m_BoundsOutlineBox);
+	vtkDEL(m_BoundsPlane);
 
 	vtkDEL(m_TextActor);
 	vtkDEL(m_TextMapper);
@@ -161,6 +181,37 @@ void mafViewGlobalSlice::Create()
 	m_Rwi->m_RenFront->AddActor(m_TextActor);
 }
 //----------------------------------------------------------------------------
+void mafViewGlobalSlice::InizializePlane()
+//----------------------------------------------------------------------------
+{
+	vtkNEW(m_BoundsPlane);
+	m_BoundsPlane->SetOrigin(m_GlobalBounds[0],m_GlobalBounds[2],m_SliceOrigin[2]);
+	m_BoundsPlane->SetPoint1(m_GlobalBounds[1],m_GlobalBounds[2],m_SliceOrigin[2]);
+	m_BoundsPlane->SetPoint2(m_GlobalBounds[0],m_GlobalBounds[3],m_SliceOrigin[2]);
+
+	m_BoundsPlane->Update();
+
+	vtkNEW(m_BoundsOutlineBox);
+	m_BoundsOutlineBox->SetInput(m_BoundsPlane->GetOutput());  
+
+	vtkNEW(m_BoundsOutlineMapper);
+	m_BoundsOutlineMapper->SetInput(m_BoundsOutlineBox->GetOutput());
+
+	vtkNEW(m_BoundsOutlineProperty);
+	m_BoundsOutlineProperty->SetColor(1,1,1);
+	m_BoundsOutlineProperty->SetAmbient(1);
+	m_BoundsOutlineProperty->SetRepresentationToWireframe();
+	m_BoundsOutlineProperty->SetInterpolationToFlat();
+
+	vtkNEW(m_BoundsOutlineActor);
+	m_BoundsOutlineActor->SetMapper(m_BoundsOutlineMapper);
+	m_BoundsOutlineActor->VisibilityOn();
+	m_BoundsOutlineActor->PickableOff();
+	m_BoundsOutlineActor->SetProperty(m_BoundsOutlineProperty);
+
+	m_Rwi->m_RenFront->AddActor(m_BoundsOutlineActor);
+}
+//----------------------------------------------------------------------------
 void mafViewGlobalSlice::VmeSelect(mafNode *node,bool select)
 //----------------------------------------------------------------------------
 {
@@ -171,7 +222,13 @@ void mafViewGlobalSlice::VmeSelect(mafNode *node,bool select)
     if (!m_GlobalBoundsInitialized)
     {
       ((mafVME*)node->GetRoot())->GetOutput()->Get4DBounds(m_GlobalBounds);
-      UpdateSliceParameters();
+
+			double bounds[6];
+			((mafVME*)node->GetRoot())->GetOutput()->GetBounds(bounds);
+			UpdateSliceParameters();
+			InizializePlane();
+
+			CameraUpdate();
     }
 
     if (node->IsA("mafVMEVolumeGray"))
@@ -181,10 +238,16 @@ void mafViewGlobalSlice::VmeSelect(mafNode *node,bool select)
       {
         //m_Gui->Enable(ID_LUT,true);
         m_Gui->Enable(ID_OPACITY_SLIDER,true);
+				m_Gui->Enable(ID_POS_SLIDER,true);
         m_Opacity   = ((mafPipeVolumeSlice *)m_SelectedVolume->m_Pipe)->GetSliceOpacity();
         m_Gui->Update();
       }
     }
+		else
+		{
+			m_Gui->Enable(ID_POS_SLIDER,false);
+			m_Gui->Update();
+		}
   }
 }
 //----------------------------------------------------------------------------
@@ -201,6 +264,8 @@ void mafViewGlobalSlice::VmeCreatePipe(mafNode *node)
   {
     ((mafVME*)node->GetRoot())->GetOutput()->Get4DBounds(m_GlobalBounds);
     UpdateSliceParameters();
+		InizializePlane();
+		CameraUpdate();
   }
 
   double *new_point;
@@ -344,6 +409,7 @@ void mafViewGlobalSlice::OnEvent(mafEventBase *maf_event)
 			case ID_CHANGE_VIEW:
 			{
 				UpdateSliceParameters();
+				//InizializePlane();
 				SetSlice(m_SliceOrigin,m_SliceXVector,m_SliceYVector);
 			}
       default:
@@ -523,9 +589,40 @@ void mafViewGlobalSlice::UpdateSlice()
 
 	m_Dn = 0.0;
 
+	UpdatePlane();
 	UpdateText();
   
   mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+}
+//----------------------------------------------------------------------------
+void mafViewGlobalSlice::UpdatePlane()
+//----------------------------------------------------------------------------
+{
+	if(m_BoundsPlane &&  m_BoundsOutlineActor && m_Rwi)
+	{
+		switch(m_ViewIndex)
+		{
+		case ID_XY:
+			
+			m_BoundsPlane->SetOrigin(m_GlobalBounds[0],m_GlobalBounds[2],m_SliceOrigin[2]);
+			m_BoundsPlane->SetPoint1(m_GlobalBounds[1],m_GlobalBounds[2],m_SliceOrigin[2]);
+			m_BoundsPlane->SetPoint2(m_GlobalBounds[0],m_GlobalBounds[3],m_SliceOrigin[2]);
+			m_BoundsPlane->Update();
+			break;
+		case ID_XZ:
+			m_BoundsPlane->SetOrigin(m_GlobalBounds[0],m_SliceOrigin[1],m_GlobalBounds[4]);
+			m_BoundsPlane->SetPoint1(m_GlobalBounds[1],m_SliceOrigin[1],m_GlobalBounds[4]);
+			m_BoundsPlane->SetPoint2(m_GlobalBounds[0],m_SliceOrigin[1],m_GlobalBounds[5]);
+			m_BoundsPlane->Update();
+			break;
+		case ID_YZ:
+			m_BoundsPlane->SetOrigin(m_SliceOrigin[0],m_GlobalBounds[2],m_GlobalBounds[4]);
+			m_BoundsPlane->SetPoint1(m_SliceOrigin[0],m_GlobalBounds[3],m_GlobalBounds[4]);
+			m_BoundsPlane->SetPoint2(m_SliceOrigin[0],m_GlobalBounds[2],m_GlobalBounds[5]);
+			m_BoundsPlane->Update();
+			break;
+		}
+	}
 }
 //----------------------------------------------------------------------------
 void mafViewGlobalSlice::SetSlice(double origin[3], float xVect[3], float yVect[3])
