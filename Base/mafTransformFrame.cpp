@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 15:09:08 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-04-17 15:55:55 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,6 +30,14 @@ mafTransformFrame::mafTransformFrame()
 mafTransformFrame::~mafTransformFrame()
 //----------------------------------------------------------------------------
 {
+	if(m_Input)
+		m_Input->UnRegister(this);
+
+	if(m_InputFrame)
+		m_InputFrame->UnRegister(this);
+
+	if(m_TargetFrame)
+		m_TargetFrame->UnRegister(this);
 }
 /*
 //----------------------------------------------------------------------------
