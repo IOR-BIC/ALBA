@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-04-17 10:29:48 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -29,6 +29,7 @@
 #include "mafVMEPolyline.h"
 #include "mafVMESurface.h"
 #include "mafVMEVolumeGray.h"
+#include "mafVMEMesh.h"
 
 #include "mafTagArray.h"
 #include "vtkMAFSmartPointer.h"
@@ -58,6 +59,7 @@ mafOp(label)
   m_VmePolyLine = NULL;
   m_VmeSurface  = NULL;
   m_VmeGrayVol  = NULL;
+  m_VmeMesh     = NULL;
   m_VmeGeneric  = NULL;
 
   m_FileDir = mafGetApplicationDirectory().c_str();
@@ -70,6 +72,7 @@ mmoVTKImporter::~mmoVTKImporter( )
   mafDEL(m_VmePolyLine);
   mafDEL(m_VmeSurface);
   mafDEL(m_VmeGrayVol);
+  mafDEL(m_VmeMesh);
   mafDEL(m_VmeGeneric);
 }
 //----------------------------------------------------------------------------
@@ -151,6 +154,7 @@ void mmoVTKImporter::ImportVTK()
       mafNEW(m_VmePolyLine);
       mafNEW(m_VmeSurface);
       mafNEW(m_VmeGrayVol);
+      mafNEW(m_VmeMesh);
       mafNEW(m_VmeGeneric);
       if (m_VmePointSet->SetDataByDetaching(data,0) == MAF_OK)
       {
@@ -167,6 +171,10 @@ void mmoVTKImporter::ImportVTK()
       else if (m_VmeGrayVol->SetDataByDetaching(data,0) == MAF_OK)
       {
         m_Output = m_VmeGrayVol;
+      }
+      else if (m_VmeMesh->SetDataByDetaching(data,0) == MAF_OK)
+      {
+        m_Output = m_VmeMesh;
       }
       else
       {
