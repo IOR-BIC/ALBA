@@ -2,12 +2,11 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkTriangleQualityRatio.cxx,v $
 Language:  C++
-Date:      $Date: 2007-04-05 10:27:54 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-04-17 08:56:44 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
-Copyright (c) 2002/2004
-CINECA - Interuniversity Consortium (www.cineca.it) 
+Copyright (c) 2002/2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 
 MafMedical Library use license agreement
