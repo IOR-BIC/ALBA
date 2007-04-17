@@ -240,7 +240,7 @@ void vtkMaskPolyDataFilter::Execute()
 	// points using mask geometry.
 	//
 
-	delete [] weights;
+	//delete [] weights;
 	delete tuple;
 	cellIds->Delete();
 }

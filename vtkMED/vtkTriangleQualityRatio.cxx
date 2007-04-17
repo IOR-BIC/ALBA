@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkTriangleQualityRatio.cxx,v $
 Language:  C++
-Date:      $Date: 2007-04-17 08:56:44 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-04-17 11:04:26 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -72,6 +72,7 @@ vtkTriangleQualityRatio::~vtkTriangleQualityRatio()
 {
 	m_Input = NULL;
 	m_Output->Delete();
+
 }
 //-------------------------------------------------------------------------
 void vtkTriangleQualityRatio::Update() 
@@ -86,7 +87,7 @@ void vtkTriangleQualityRatio::Update()
 	vtkDoubleArray *array=vtkDoubleArray::New();
 	array->SetName("quality");
 	m_Output->GetCellData()->SetScalars(array);
-
+  array->Delete();
 	// name variables
 	double qualitySum = 0.0;
 	double longestEdge;
@@ -131,9 +132,10 @@ void vtkTriangleQualityRatio::Update()
 		double qualityLocal;
 		if(area>0.000001)
 		{
-			qualitySum += 0.5 * perimeter * longestEdge / area;
+			
 			qualityLocal = 0.5 * perimeter * longestEdge / area;
 			qualityLocal = qualityRatioNormalize/qualityLocal;
+			qualitySum += qualityLocal;
 			if(qualityLocal>m_MaxRatio)
 				m_MaxRatio = qualityLocal;
 			if(qualityLocal<m_MinRatio)
@@ -148,8 +150,5 @@ void vtkTriangleQualityRatio::Update()
 		m_Output->GetCellData()->GetScalars()->InsertNextTuple1(qualityLocal);
 
 	}
-
-	// normalize
-	m_MeanRatio = cellsNumber * qualityRatioNormalize / qualitySum;
-
+	m_MeanRatio = qualitySum / (cellsNumber);
 }
