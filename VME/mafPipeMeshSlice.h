@@ -1,52 +1,53 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mafPipeSurface.h,v $
+  Module:    $RCSfile: mafPipeMeshSlice.h,v $
   Language:  C++
   Date:      $Date: 2007-04-17 10:17:06 $
-  Version:   $Revision: 1.20 $
-  Authors:   Silvano Imboden - Paolo Quadrani
+  Version:   $Revision: 1.1 $
+  Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
+	SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 =========================================================================*/
 
-#ifndef __mafPipeSurface_H__
-#define __mafPipeSurface_H__
+#ifndef __mafPipeMeshSlice_H__
+#define __mafPipeMeshSlice_H__
 
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
 #include "mafPipe.h"
-#include "mmgVMEChooserAccept.h"
-#include "mafVMEImage.h"
 
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
 class vtkOutlineCornerFilter;
-class vtkTexture;
 class vtkPolyDataMapper;
 class vtkPolyData;
-class mafLODActor;
+class vtkActor;
 class vtkProperty;
 class mafAxes;
-class mmgMaterialButton;
-class mmaMaterial;
-class vtkActor;
-class vtkGlyph3D;
-class vtkPolyDataNormals;
-class vtkLineSource;
+class vtkFixedCutter;
+class vtkPlane;
+class vtkDelaunay2D;
 
 //----------------------------------------------------------------------------
-// mafPipeSurface :
+// mafPipeMeshSlice :
 //----------------------------------------------------------------------------
-class mafPipeSurface : public mafPipe
+class mafPipeMeshSlice : public mafPipe
 {
 public:
-  mafTypeMacro(mafPipeSurface,mafPipe);
+  mafTypeMacro(mafPipeMeshSlice,mafPipe);
 
-               mafPipeSurface();
-  virtual     ~mafPipeSurface();
+               mafPipeMeshSlice();
+  virtual     ~mafPipeMeshSlice ();
+
+  /**Return the thickness of the border*/	
+  double GetThickness();
+
+  /**Set the thickness value*/
+  void SetThickness(double thickness); 
 
   /** process events coming from gui */
   virtual void OnEvent(mafEventBase *maf_event);
@@ -54,50 +55,45 @@ public:
   virtual void Create(mafSceneNode *n /*,bool use_axes = true*/ ); //Can't add parameters - is Virtual
   virtual void Select(bool select); 
 
-  void SetEnableActorLOD(bool value);
+  /** Set the origin of the slice*/
+  void SetSlice(double *Origin);
+
+  /** Set the normal of the slice*/
+	void SetNormal(double *Normal);
+
+	void ShowBoxSelectionOn(){m_ShowSelection=true;};
+	void ShowBoxSelectionOff(){m_ShowSelection=false;};
 
   /** IDs for the GUI */
   enum PIPE_SURFACE_WIDGET_ID
-  {
-    ID_SCALAR_VISIBILITY = Superclass::ID_LAST,
-    ID_RENDERING_DISPLAY_LIST,
-    ID_USE_VTK_PROPERTY,
-    ID_USE_LOOKUP_TABLE,
-    ID_LUT,
-    ID_ENABLE_LOD,
-		ID_NORMAL_VISIBILITY,
-    ID_LAST
+  {						
+		ID_BORDER_CHANGE = Superclass::ID_LAST,
+    ID_LAST,
   };
 
-  /** Set the actor picking*/
-  void SetActorPicking(int enable = true);
-
+  virtual mmgGui  *CreateGui();
 protected:
   vtkPolyDataMapper	      *m_Mapper;
-	vtkLineSource						*m_Arrow;
-	vtkPolyDataNormals			*m_Normal;
-	vtkGlyph3D							*m_NormalGlyph;
-	vtkPolyDataMapper				*m_NormalMapper;
-	vtkActor								*m_NormalActor;
-  mafLODActor             *m_Actor;
+  vtkActor                *m_Actor;
   vtkOutlineCornerFilter  *m_OutlineBox;
   vtkPolyDataMapper       *m_OutlineMapper;
   vtkProperty             *m_OutlineProperty;
-  mafLODActor             *m_OutlineActor;
+  vtkActor                *m_OutlineActor;
   mafAxes                 *m_Axes;
+  vtkPlane				        *m_Plane;
+  vtkFixedCutter		      *m_Cutter;
 
-  int m_UseVTKProperty;
-  int m_UseLookupTable;
-  int m_EnableActorLOD;
+  double				           m_Border;
+
+	bool	m_ShowSelection;
+
+  double	m_Origin[3];
+  double	m_Normal[3];
 
   int m_ScalarVisibility;
-	int m_NormalVisibility;
   int m_RenderingDisplayListFlag;
-  mmaMaterial *m_SurfaceMaterial;
-  mmgMaterialButton *m_MaterialButton;
 
-  void UpdateProperty(bool fromTag = false);
+	vtkDelaunay2D *m_Filter;
 
-  virtual mmgGui  *CreateGui();
 };  
-#endif // __mafPipeSurface_H__
+#endif // __mafPipeMeshSlice_H__

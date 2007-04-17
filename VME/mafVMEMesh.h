@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMesh.h,v $
   Language:  C++
-  Date:      $Date: 2007-04-05 08:22:39 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-04-17 10:17:06 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -54,7 +54,7 @@ public:
   static char** GetIcon();
 
   /** Return the suggested pipe-typename for the visualization of this vme */
-  virtual mafString GetVisualPipe() {return mafString("mafPipeBox");};
+  virtual mafString GetVisualPipe() {return mafString("mafPipeMesh");};
 
 protected:
   mafVMEMesh();

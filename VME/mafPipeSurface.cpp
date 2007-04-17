@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-16 12:40:02 $
-  Version:   $Revision: 1.33 $
+  Date:      $Date: 2007-04-17 10:17:06 $
+  Version:   $Revision: 1.34 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,6 +42,10 @@
 #include "vtkProperty.h"
 #include "mafLODActor.h"
 #include "vtkRenderer.h"
+#include "vtkGlyph3D.h"
+#include "vtkPolyDataNormals.h"
+#include "vtkActor.h"
+#include "vtkLineSource.h"
 
 #include <vector>
 
@@ -65,6 +69,7 @@ mafPipeSurface::mafPipeSurface()
   m_Gui             = NULL;
 
   m_ScalarVisibility = 0;
+	m_NormalVisibility = 0;
   m_RenderingDisplayListFlag = 0;
 
   m_UseVTKProperty  = 1;
@@ -160,6 +165,34 @@ void mafPipeSurface::Create(mafSceneNode *n)
 	m_Axes = new mafAxes(m_RenFront, m_Vme);
 	if(m_Vme->IsA("mafVMERefSys"))
 		m_Axes->SetVisibility(false);
+	
+	vtkNEW(m_Normal);
+	m_Normal->SetInput(data);
+	m_Normal->ComputeCellNormalsOff();
+	m_Normal->ComputePointNormalsOn();
+	m_Normal->Update();
+
+	vtkNEW(m_Arrow);
+	
+	vtkNEW(m_NormalGlyph);
+	m_NormalGlyph->SetInput(data);
+	m_NormalGlyph->SetSource(m_Arrow->GetOutput());
+	m_NormalGlyph->SetVectorModeToUseNormal();
+	m_NormalGlyph->Update();
+
+	vtkNEW(m_NormalMapper);
+	m_NormalMapper->SetInput(m_NormalGlyph->GetOutput());
+	m_NormalMapper->Update();
+
+	vtkNEW(m_NormalActor);
+	m_NormalActor->SetMapper(m_NormalMapper);
+	m_NormalActor->SetVisibility(m_NormalVisibility);
+	m_NormalActor->PickableOff();
+	m_NormalActor->Modified();
+
+	m_AssemblyFront->AddPart(m_NormalActor);
+
+
 }
 //----------------------------------------------------------------------------
 mafPipeSurface::~mafPipeSurface()
@@ -167,6 +200,7 @@ mafPipeSurface::~mafPipeSurface()
 {
   m_AssemblyFront->RemovePart(m_Actor);
   m_AssemblyFront->RemovePart(m_OutlineActor);
+	m_AssemblyFront->RemovePart(m_NormalActor);
 
 	vtkDEL(m_Mapper);
   vtkDEL(m_Actor);
@@ -175,6 +209,10 @@ mafPipeSurface::~mafPipeSurface()
   vtkDEL(m_OutlineProperty);
   vtkDEL(m_OutlineActor);
   cppDEL(m_Axes);
+	vtkDEL(m_NormalActor);
+	vtkDEL(m_NormalMapper);
+	vtkDEL(m_NormalGlyph);
+	vtkDEL(m_Normal);
 }
 //----------------------------------------------------------------------------
 void mafPipeSurface::Select(bool sel)
@@ -201,6 +239,7 @@ mmgGui *mafPipeSurface::CreateGui()
   m_Gui = new mmgGui(this);
   m_Gui->Bool(ID_RENDERING_DISPLAY_LIST,"displaylist",&m_RenderingDisplayListFlag,0,"turn on/off \nrendering displaylist calculation");
   m_Gui->Bool(ID_SCALAR_VISIBILITY,"scalar vis.", &m_ScalarVisibility,0,"turn on/off the scalar visibility");
+	m_Gui->Bool(ID_NORMAL_VISIBILITY,"norm. vis.",&m_NormalVisibility);
   m_Gui->Divider();
   m_Gui->Bool(ID_USE_VTK_PROPERTY,"property",&m_UseVTKProperty);
   m_MaterialButton = new mmgMaterialButton(m_Vme,this);
@@ -275,6 +314,10 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
         m_Mapper->SetImmediateModeRendering(m_RenderingDisplayListFlag);
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
+			case ID_NORMAL_VISIBILITY:
+				m_NormalActor->SetVisibility(m_NormalVisibility);
+				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				break;
       default:
         mafEventMacro(*e);
       break;
