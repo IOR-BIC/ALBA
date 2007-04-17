@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkDicomUnPackerTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-04-17 12:41:51 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-04-17 13:54:43 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -52,7 +52,7 @@ void vtkDicomUnPackerTest::ReadTest()
 	double MaxZ = -9999.0;
 	for (int i=0; i < DicomDirectory->GetNumberOfFiles(); i++)
 	{
-		if ((strcmp(DicomDirectory->GetFile(i),".") == 0) || (strcmp(DicomDirectory->GetFile(i),"..") == 0)) 
+		if ((strcmp(DicomDirectory->GetFile(i),".") == 0) || (strcmp(DicomDirectory->GetFile(i),"..") == 0) || (strcmp(DicomDirectory->GetFile(i),"CVS") == 0)) 
 		{
 			continue;
 		}
