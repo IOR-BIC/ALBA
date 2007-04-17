@@ -2,15 +2,16 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkDicomUnPackerTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-04-17 11:04:58 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-04-17 12:41:51 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#include "mafDefines.h" 
+#include "mafDefines.h"
+#include "medDefines.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -39,10 +40,10 @@ void vtkDicomUnPackerTest::ReadTest()
 {
 	//Inizialize DICOM DIRECTORY
 	vtkMAFSmartPointer<vtkDirectory> DicomDirectory;
-	mafString DicomPath=MAF_DATA_ROOT;
+	mafString DicomPath=MED_DATA_ROOT;
 	DicomPath<<"/Dicom/TestDicomUnpacker";
 	DicomDirectory->Open(DicomPath);
-  mafString DictonaryFilename=MAF_DATA_ROOT;  
+  mafString DictonaryFilename=MED_DATA_ROOT;  
 	DictonaryFilename<<"/Dictionaries/dicom3.dic";
 	int NumberOfImage = 0;
 	double MinScalar = 9999.0;
