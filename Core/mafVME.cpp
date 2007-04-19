@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-19 11:34:51 $
-  Version:   $Revision: 1.37 $
+  Date:      $Date: 2007-04-19 14:54:18 $
+  Version:   $Revision: 1.38 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -186,7 +186,7 @@ void mafVME::SetTimeStamp(mafTimeStamp t)
   Modified();
 
   // TODO: consider if to add a flag to disable event issuing
-  //GetEventSource()->InvokeEvent(this,VME_TIME_SET);
+  GetEventSource()->InvokeEvent(this,VME_TIME_SET);
 }
 
 //-------------------------------------------------------------------------

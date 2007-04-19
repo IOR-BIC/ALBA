@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-05 11:03:34 $
-  Version:   $Revision: 1.100 $
+  Date:      $Date: 2007-04-19 14:54:18 $
+  Version:   $Revision: 1.101 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -573,6 +573,8 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       break;
       case VME_MODIFIED:
         VmeModified(e->GetVme());
+				if(!m_PlugTimebar && ((mafVME*)e->GetVme())->IsAnimated())
+					m_Win->ShowDockPane("timebar",!m_Win->DockPaneIsShown("timebar") );
       break; 
       case VME_ADD:
         VmeAdd(e->GetVme());

@@ -3,7 +3,7 @@
   Program:   Visualization Toolkit
   Module:    vtkCellsFilter.h
   Language:  C++
-  RCS:   $Id: vtkCellsFilter.h,v 1.2 2007-03-23 13:29:28 aqd0 Exp $
+  RCS:   $Id: vtkCellsFilter.h,v 1.3 2007-04-19 14:54:42 ior01 Exp $
 
   Copyright (c) Goodwin Lawlor 2004
   All rights reserved.
@@ -85,6 +85,10 @@ public:
   // and then permanently remove them with RemoveMarkedCells
   void SetMarkedOpacity(double opacity);
   vtkGetMacro(MarkedOpacity, double);
+
+	int GetNumberOfMarkedCells(){return MarkedCellIdList->GetNumberOfIds();};
+
+	vtkIdType GetIdMarkedCell(int i){return MarkedCellIdList->GetId(i);};
 
 
 protected:
