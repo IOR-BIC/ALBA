@@ -85,6 +85,8 @@ IF (MAF_USE_VTK)
   mafPipeSurfaceSlice.h
   mafPipeSurfaceTextured.cpp
   mafPipeSurfaceTextured.h
+  mafPipeVector.cpp
+  mafPipeVector.h
   mafPipeVolumeProjected.cpp
   mafPipeVolumeProjected.h
   mafPipeVolumeSlice.cpp
