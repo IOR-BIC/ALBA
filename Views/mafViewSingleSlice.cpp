@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-14 16:43:53 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-04-20 12:40:25 $
+  Version:   $Revision: 1.13 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,6 +39,7 @@
 #include "mmgFloatSlider.h"
 #include "mafNodeIterator.h"
 #include "mafVMEGizmo.h"
+#include "mafPipeMeshSlice.h"
 
 #include "vtkDataSet.h"
 #include "vtkRayCast3DPicker.h"
@@ -311,6 +312,41 @@ void mafViewSingleSlice::VmeCreatePipe(mafNode *vme)
 		    ((mafPipeSurfaceSlice *)pipe)->SetSlice(m_Slice);
 				((mafPipeSurfaceSlice *)pipe)->SetNormal(normal);
       }
+			else if(pipe_name.Equals("mafPipeMeshSlice"))
+			{
+				double normal[3];
+				switch(m_CameraPosition)
+				{
+				case CAMERA_OS_X:
+					normal[0] = 1;
+					normal[1] = 0;
+					normal[2] = 0;
+					break;
+				case CAMERA_OS_Y:
+					normal[0] = 0;
+					normal[1] = 1;
+					normal[2] = 0;
+					break;
+				case CAMERA_OS_Z:
+					normal[0] = 0;
+					normal[1] = 0;
+					normal[2] = 1;
+					break;
+				case CAMERA_OS_P:
+					break;
+					//case CAMERA_OS_REP:
+					//	this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+				case CAMERA_PERSPECTIVE:
+					break;
+				default:
+					normal[0] = 0;
+					normal[1] = 0;
+					normal[2] = 1;
+				}
+
+				((mafPipeMeshSlice *)pipe)->SetSlice(m_Slice);
+				((mafPipeMeshSlice *)pipe)->SetNormal(normal);
+			}
 			else if(pipe_name.Equals("mafPipePolylineSlice"))
 			{
 				double normal[3];
@@ -492,6 +528,12 @@ void mafViewSingleSlice::OnEvent(mafEventBase *maf_event)
 						mafPipePolylineSlice *p= mafPipePolylineSlice::SafeDownCast(this->GetNodePipe(node));
 						if(p)
 							((mafPipePolylineSlice *)p)->SetSlice(m_OriginVolume);
+					}
+					if(node->IsA("mafVMEMesh"))
+					{
+						mafPipeMeshSlice *p= mafPipeMeshSlice::SafeDownCast(this->GetNodePipe(node));
+						if(p)
+							((mafPipeMeshSlice *)p)->SetSlice(m_OriginVolume);
 					}
 				}
 			}
