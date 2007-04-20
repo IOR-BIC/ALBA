@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoGRFImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-13 07:37:01 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-04-20 10:16:19 $
+  Version:   $Revision: 1.8 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,8 +28,8 @@
 #include <vtkTransform.h>
 #include "vtkMAFSmartPointer.h"
 #include "vtkCellArray.h"
-#include "mafVMELandmark.h"
-#include "mafVMELandmarkCloud.h"
+//#include "mafVMELandmark.h"
+//#include "mafVMELandmarkCloud.h"
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
 
@@ -49,7 +49,7 @@
 #include <iostream>
 #include <fstream>
 
-#define DELTA 10.0
+#define DELTA 5.0
 
 
 
@@ -73,21 +73,15 @@ mafOp(label)
   m_PlatformRight = NULL;
   m_VectorLeft    = NULL;
   m_VectorRight   = NULL;
-  m_AlCop        = NULL;
 }
 //----------------------------------------------------------------------------
 mmoGRFImporterWS::~mmoGRFImporterWS()
 //----------------------------------------------------------------------------
 {
-//  mafDEL(m_GrfScalar);
   mafDEL(m_PlatformLeft);
   mafDEL(m_PlatformRight);
   mafDEL(m_VectorLeft);
   mafDEL(m_VectorRight);
-  mafDEL(m_AlCop);
-  
-
-
 }
 //----------------------------------------------------------------------------
 void mmoGRFImporterWS::OpDo()
@@ -104,13 +98,6 @@ void mmoGRFImporterWS::OpDo()
     mafEventMacro(mafEvent(this,VME_ADD,m_PlatformRight));
     m_VectorRight->ReparentTo(m_PlatformRight);
   }
-
-  if(m_PlatformLeft != NULL && m_PlatformRight != NULL)
-  {
-    mafEventMacro(mafEvent(this,VME_ADD,m_AlCop));
-  }
-
-
 }
 //----------------------------------------------------------------------------
 void mmoGRFImporterWS::OpUndo()
@@ -261,16 +248,10 @@ void mmoGRFImporterWS::Read()
 
   mafNEW(m_VectorLeft);
   mafNEW(m_VectorRight);
-  mafNEW(m_AlCop);
   
   m_VectorLeft->SetName("Left_vector");
   m_VectorRight->SetName("Right_vector");
-  m_AlCop->SetName("COP");
-  m_AlCop->Open();
-  m_AlCop->SetRadius(10);
-  m_AlCop->AppendLandmark(alLeft);
-  m_AlCop->AppendLandmark(alRight);
-  
+
   do 
   {
     line = text.ReadLine();
@@ -333,15 +314,8 @@ void mmoGRFImporterWS::Read()
       m_VectorLeft->Modified();
       m_VectorLeft->Update();
       m_VectorLeft->GetOutput()->GetVTKData()->Update();
+    }
 
-      m_AlCop->SetLandmark(alLeft, cop1X, cop1Y, cop1Z, time);
-      m_AlCop->SetLandmarkVisibility(alLeft, 1, time);
-    }
-    else
-    {
-      m_AlCop->SetLandmarkVisibility(alLeft, 0, time);
-    }
- 
     //Values of the second platform
     cop2StX = tkz.GetNextToken().c_str();
     cop2StY = tkz.GetNextToken().c_str();
@@ -396,13 +370,6 @@ void mmoGRFImporterWS::Read()
       m_VectorRight->Modified();
       m_VectorRight->Update();
       m_VectorRight->GetOutput()->GetVTKData()->Update();
-
-      m_AlCop->SetLandmark(alRight, cop2X, cop2Y, cop2Z, time);
-      m_AlCop->SetLandmarkVisibility(alRight, 1, time);
-    }
-    else
-    {
-      m_AlCop->SetLandmarkVisibility(alRight, 0, time);
     }
 
   }while (!inputFile.Eof());
