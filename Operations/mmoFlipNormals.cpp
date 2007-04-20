@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoFlipNormals.cpp,v $
 Language:  C++
-Date:      $Date: 2007-04-19 14:59:41 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-04-20 08:51:08 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -76,6 +76,7 @@ MafMedical is partially based on OpenMAF.
 #include "vtkCellCenters.h" 
 #include "vtkGlyph3D.h"
 #include "vtkArrowSource.h"
+#include "vtkOBBTree.h"
 
 const int ID_REGION = 0;
 
@@ -204,7 +205,7 @@ enum EXTRACT_ISOSURFACE_ID
 	ID_CANCEL,
 	ID_FLIP,
 	ID_RESET,
-	ID_MARKED_CELLS_NUMBER,
+	ID_ALL_NORMAL,
 };
 //----------------------------------------------------------------------------
 void mmoFlipNormals::CreateOpDialog()
@@ -246,9 +247,6 @@ void mmoFlipNormals::CreateOpDialog()
 	wxStaticText *foo  = new wxStaticText(m_Dialog,-1, " ");
 	wxTextCtrl   *diameter = new wxTextCtrl  (m_Dialog,ID_DIAMETER, "",								 		p,wxSize(50, 16 ), wxNO_BORDER );
 	wxCheckBox *unselect =   new wxCheckBox(m_Dialog, ID_DELETE,         "unselect", p, wxSize(80,20));
-	m_CellMarkedNumber = 0;
-	m_CellMarkedNumberString = wxString::Format("Marked Cells = 0");
-	m_MarkedCellsNumber  = new wxStaticText(m_Dialog,ID_MARKED_CELLS_NUMBER, m_CellMarkedNumberString);
 
 	wxStaticText *help  = new wxStaticText(m_Dialog,-1, "Use CTRL to select cells");
 
@@ -256,6 +254,7 @@ void mmoFlipNormals::CreateOpDialog()
 	mmgButton  *b_fit =    new mmgButton(m_Dialog, ID_FIT,    "reset camera", p,wxSize(80,20));
 	mmgButton  *flipButton =    new mmgButton(m_Dialog, ID_FLIP, "flip", p,wxSize(80,20));
 	mmgButton  *resetButton =    new mmgButton(m_Dialog, ID_RESET, "reset", p,wxSize(80,20));
+	mmgButton  *allNormal =    new mmgButton(m_Dialog, ID_ALL_NORMAL, "All Normal", p,wxSize(80,20));
 	mmgButton  *ok =     new mmgButton(m_Dialog, ID_OK,     "ok", p, wxSize(80,20));
 	mmgButton  *cancel = new mmgButton(m_Dialog, ID_CANCEL, "cancel", p, wxSize(80,20));
 
@@ -266,6 +265,7 @@ void mmoFlipNormals::CreateOpDialog()
 	b_fit->SetValidator(mmgValidator(this,ID_FIT,b_fit));
 	flipButton->SetValidator(mmgValidator(this,ID_FLIP,flipButton));
 	resetButton->SetValidator(mmgValidator(this,ID_RESET,resetButton));
+	allNormal->SetValidator(mmgValidator(this,ID_ALL_NORMAL,allNormal));
 	ok->SetValidator(mmgValidator(this,ID_OK,ok));
 	cancel->SetValidator(mmgValidator(this,ID_CANCEL,cancel));
 
@@ -277,13 +277,13 @@ void mmoFlipNormals::CreateOpDialog()
 	h_sizer1->Add(diameter,     0,wxRIGHT);	
 	h_sizer1->Add(foo,     0,wxRIGHT);	
 	h_sizer1->Add(unselect,     0,wxRIGHT);	
-	h_sizer1->Add(m_MarkedCellsNumber,     0,wxRIGHT);	
 
 	wxBoxSizer *h_sizer2 = new wxBoxSizer(wxHORIZONTAL);
 	h_sizer2->Add(unselectAllButton,     0,wxRIGHT);	
 	h_sizer2->Add(b_fit,			0,wxRIGHT);	
 	h_sizer2->Add(flipButton,	0,wxRIGHT);	
 	h_sizer2->Add(resetButton,0,wxRIGHT);
+	h_sizer2->Add(allNormal,	0,wxRIGHT);
 	h_sizer2->Add(ok,					0,wxRIGHT);
 	h_sizer2->Add(cancel,			0,wxRIGHT);
 
@@ -395,9 +395,6 @@ void mmoFlipNormals::OnEvent(mafEventBase *maf_event)
 
 		case ID_UNSELECT:
 			m_CellFilter->UndoMarks();
-			m_CellMarkedNumber=m_CellFilter->GetNumberOfMarkedCells();
-			m_CellMarkedNumberString = wxString::Format("Marked Cells = %d",m_CellMarkedNumber);
-			m_MarkedCellsNumber->SetLabel(m_CellMarkedNumberString);
 			m_Rwi->m_RenderWindow->Render();
 			break;
 
@@ -435,9 +432,6 @@ void mmoFlipNormals::OnEvent(mafEventBase *maf_event)
 				// select circle region by pick
 				MarkCellsInRadius(m_Diameter/2);
 
-				m_CellMarkedNumber=m_CellFilter->GetNumberOfMarkedCells();
-				m_CellMarkedNumberString = wxString::Format("Marked Cells = %d",m_CellMarkedNumber);
-				m_MarkedCellsNumber->SetLabel(m_CellMarkedNumberString);
 				m_Rwi->m_RenderWindow->Render();
 			}
 			break;
@@ -452,9 +446,6 @@ void mmoFlipNormals::OnEvent(mafEventBase *maf_event)
 			{
 				FlipNormals();
 				m_CellFilter->UndoMarks();
-				m_CellMarkedNumber=m_CellFilter->GetNumberOfMarkedCells();
-				m_CellMarkedNumberString = wxString::Format("Marked Cells = %d",m_CellMarkedNumber);
-				m_MarkedCellsNumber->SetLabel(m_CellMarkedNumberString);
 				m_Rwi->m_RenderWindow->Render();
 			}     
 			break ;
@@ -465,12 +456,93 @@ void mmoFlipNormals::OnEvent(mafEventBase *maf_event)
 				m_Rwi->m_RenderWindow->Render();
 			}     
 			break ;
+		case ID_ALL_NORMAL:
+			{
+				ModifyAllNormal();
+				m_Rwi->m_RenderWindow->Render();
+			}     
+			break ;
 
 		default:
 			mafEventMacro(*e);
 			break; 
 		}
 	}
+}
+//----------------------------------------------------------------------------
+void mmoFlipNormals::ModifyAllNormal()
+//----------------------------------------------------------------------------
+{
+	vtkOBBTree *OBBFilter;
+	vtkNEW(OBBFilter);
+	OBBFilter->SetDataSet(m_ResultPolydata);
+	OBBFilter->CacheCellBoundsOn();
+	OBBFilter->BuildLocator();
+
+	double bounds[6];
+	m_ResultPolydata->GetBounds(bounds);
+
+	double dimX, dimY, dimZ;
+	dimX = (bounds[1] - bounds[0]);
+	dimY = (bounds[3] - bounds[2]);
+	dimZ = (bounds[5] - bounds[4]);
+
+	double maxBound = (dimX >= dimY) ? (dimX >= dimZ ? dimX : dimZ) : (dimY >= dimZ ? dimY : dimZ); 
+
+	//Check direction of the first normal
+	vtkPoints *p;
+	vtkNEW(p);
+	double *normal=m_ResultPolydata->GetCellData()->GetNormals()->GetTuple3(m_CellFilter->GetIdMarkedCell(0));
+	int sign[3];
+	sign[0]=normal[0]<0? -1 :1;
+	sign[1]=normal[1]<0? -1 :1;
+	sign[2]=normal[2]<0? -1 :1;
+
+	double point1[3];
+	FindTriangleCellCenter(m_CellFilter->GetIdMarkedCell(0),point1);
+	point1[0]+=(normal[0]*0.001);
+	point1[1]+=(normal[1]*0.001);
+	point1[2]+=(normal[2]*0.001);
+	//point1=m_Centers->GetPoint(m_CellFilter->GetIdMarkedCell(0));
+	double point2[3];
+	point2[0]=(point1[0])+((normal[0]*10)*maxBound);
+	point2[1]=(point1[1])+((normal[1]*10)*maxBound);
+	point2[2]=(point1[2])+((normal[2]*10)*maxBound);
+	OBBFilter->IntersectWithLine(point1,point2,p,NULL);
+
+	int direction=p->GetNumberOfPoints()%2;
+	vtkDEL(p);
+
+	for(int i=0;i<m_Centers->GetNumberOfPoints();i++)
+	{
+		vtkNEW(p);
+		FindTriangleCellCenter(i,point1);
+		normal=m_ResultPolydata->GetCellData()->GetNormals()->GetTuple3(i);
+		point1[0]+=(normal[0]*0.001);
+		point1[1]+=(normal[1]*0.001);
+		point1[2]+=(normal[2]*0.001);
+		int sign[3];
+		sign[0]=normal[0]<0? -1 :1;
+		sign[1]=normal[1]<0? -1 :1;
+		sign[2]=normal[2]<0? -1 :1;
+
+		point2[0]=(point1[0])+((normal[0]*10)*maxBound);
+		point2[1]=(point1[1])+((normal[1]*10)*maxBound);
+		point2[2]=(point1[2])+((normal[2]*10)*maxBound);
+		OBBFilter->IntersectWithLine(point1,point2,p,NULL);
+
+		if((p->GetNumberOfPoints()%2)!=direction)
+		{
+			double *new_normal=m_ResultPolydata->GetCellData()->GetNormals()->GetTuple3(i);
+			new_normal[0]=-new_normal[0];
+			new_normal[1]=-new_normal[1];
+			new_normal[2]=-new_normal[2];
+			m_ResultPolydata->GetCellData()->GetNormals()->SetTuple3(i,new_normal[0],new_normal[1],new_normal[2]);
+		}
+		vtkDEL(p);
+	}
+	m_ResultPolydata->Modified();
+	m_ResultPolydata->Update();
 }
 //----------------------------------------------------------------------------
 void mmoFlipNormals::TraverseMeshAndMark( double radius )

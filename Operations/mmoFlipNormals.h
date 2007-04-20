@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoFlipNormals.h,v $
 Language:  C++
-Date:      $Date: 2007-04-19 14:59:41 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-04-20 08:51:08 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -152,10 +152,6 @@ protected:
 	vtkPolyData					*m_ResultPolydata;
 	vtkPolyData					*m_OriginalPolydata;
 
-	int									m_CellMarkedNumber;
-	wxString						m_CellMarkedNumberString;
-	wxStaticText				*m_MarkedCellsNumber;
-
 	/** 
 	Builds operation's interface and visualization pipeline. */
 	void CreateOpDialog();
@@ -169,7 +165,7 @@ protected:
 	void TraverseMeshAndMark(double radius);
 	void MarkCellsInRadius(double radius);
 	void InitializeMesh();
-	void InizializeVisitedArrays();
+	void ModifyAllNormal();
 
 };
 #endif
