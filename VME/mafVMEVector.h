@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEVector.h,v $
   Language:  C++
-  Date:      $Date: 2007-04-04 13:52:47 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-04-20 11:35:09 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -55,7 +55,7 @@ public:
     mmaMaterial *GetMaterial();
 
     /** Return the suggested pipe-typename for the visualization of this vme */
-    virtual mafString GetVisualPipe() {return mafString("mafPipePolyline");};
+    virtual mafString GetVisualPipe() {return mafString("mafPipeVector");};
 
 protected:
   mafVMEVector();
