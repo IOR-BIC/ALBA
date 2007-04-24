@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-20 11:33:49 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-04-24 08:47:53 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -67,6 +67,8 @@ mafPipeVector::mafPipeVector()
   m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
 
+  m_UseArrow = 1;
+  m_UseSphere = 1;
   m_UseVTKProperty  = 1;
 }
 //----------------------------------------------------------------------------
@@ -255,7 +257,6 @@ void mafPipeVector::OnEvent(mafEventBase *maf_event)
         m_Apd->Update();
       }
       break;
-
 
       default:
         mafEventMacro(*e);
