@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoEditNormals.cpp,v $
 Language:  C++
-Date:      $Date: 2007-03-30 08:48:31 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-04-27 13:52:04 $
+Version:   $Revision: 1.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -35,6 +35,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkTriangleFilter.h"
 #include "vtkPolyDataNormals.h"
 #include "vtkPolyDataConnectivityFilter.h"
+#include "vtkCellData.h"
+#include "vtkFloatArray.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mmoEditNormals);
@@ -202,6 +204,8 @@ void mmoEditNormals::OnGenerateNormals()
 
 	vtkMAFSmartPointer<vtkPolyDataNormals> normalFilter;
 	normalFilter->SetInput(m_ResultPolydata);
+
+	normalFilter->ComputeCellNormalsOn();
 
 	if (m_FlipNormals) 
 		normalFilter->FlipNormalsOn(); 
