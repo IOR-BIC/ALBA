@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoConnectivitySurface.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-21 16:31:28 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-04-27 14:00:47 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -65,6 +65,7 @@ protected:
 	std::vector<mafVME*> m_ExtractedVmes;
 	vtkPolyData		*m_OriginalPolydata;
 	mafString m_NumberOfExtractedSurfaces;
+  mafString m_Alert;
 
 };
 #endif
