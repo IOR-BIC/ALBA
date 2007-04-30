@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoFlipNormals.cpp,v $
 Language:  C++
-Date:      $Date: 2007-04-20 08:51:08 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-04-30 11:34:00 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -214,7 +214,7 @@ void mmoFlipNormals::CreateOpDialog()
 	wxBusyCursor wait;
 
 	//===== setup interface ====
-	m_Dialog = new mmgDialog("Remove Cells", mafCLOSEWINDOW | mafRESIZABLE);
+	m_Dialog = new mmgDialog("Flip Normals", mafCLOSEWINDOW | mafRESIZABLE);
 
 	m_Rwi = new mafRWI(m_Dialog,ONE_LAYER,false);
 	m_Rwi->SetListener(this);
