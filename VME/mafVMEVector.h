@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEVector.h,v $
   Language:  C++
-  Date:      $Date: 2007-04-20 11:35:09 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-05-02 13:01:37 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -31,7 +31,7 @@ class mmaMaterial;
 class MAF_EXPORT mafVMEVector : public mafVMEPolyline
 {
 public:
-  mafTypeMacro(mafVMEVector,mafVMEGeneric);
+  mafTypeMacro(mafVMEVector, mafVMEPolyline);
 
   /** 
     Set data for the give timestamp. This function automatically creates a
@@ -45,14 +45,8 @@ public:
     this type of VME. */
     virtual int SetData(vtkPolyData *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
 
-    /** return the right type of output */  
-    mafVMEOutputPolyline *GetPolylineOutput() {return (mafVMEOutputPolyline *)GetOutput();}
-
-    /** return the right type of output */  
-    virtual mafVMEOutput *GetOutput();
-
-    /** Return pointer to material attribute. */
-    mmaMaterial *GetMaterial();
+    /** Return the module of the vector.*/
+    double GetModule();
 
     /** Return the suggested pipe-typename for the visualization of this vme */
     virtual mafString GetVisualPipe() {return mafString("mafPipeVector");};
@@ -61,9 +55,6 @@ protected:
   mafVMEVector();
   virtual ~mafVMEVector();
 
-  /** used to initialize and create the material attribute if not yet present */
-  virtual int InternalInitialize();
-
 private:
   mafVMEVector(const mafVMEVector&); // Not implemented
   void operator=(const mafVMEVector&); // Not implemented
@@ -71,5 +62,4 @@ private:
   /** private to avoid calling by external classes */
   virtual int SetData(vtkDataSet *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
 };
-
 #endif

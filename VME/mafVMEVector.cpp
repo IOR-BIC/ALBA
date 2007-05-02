@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-04 13:52:47 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-05-02 13:01:37 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -35,7 +35,6 @@ mafVMEVector::mafVMEVector()
 //-------------------------------------------------------------------------
 {
 }
-
 //-------------------------------------------------------------------------
 mafVMEVector::~mafVMEVector()
 //-------------------------------------------------------------------------
@@ -43,32 +42,12 @@ mafVMEVector::~mafVMEVector()
   // data pipe destroyed in mafVME
   // data vector destroyed in mafVMEGeneric
 }
-
-
 //-------------------------------------------------------------------------
-mafVMEOutput *mafVMEVector::GetOutput()
+double mafVMEVector::GetModule()
 //-------------------------------------------------------------------------
 {
-  // allocate the right type of output on demand
-  if (m_Output==NULL)
-  {
-    SetOutput(mafVMEOutputPolyline::New()); // create the output
-  }
-  return m_Output;
+  return GetPolylineOutput()->CalculateLength();
 }
-//-------------------------------------------------------------------------
-int mafVMEVector::InternalInitialize()
-//-------------------------------------------------------------------------
-{
-  if (Superclass::InternalInitialize()==MAF_OK)
-  {
-    // force material allocation
-    GetMaterial();
-    return MAF_OK;
-  }
-  return MAF_ERROR;
-}
-
 //-------------------------------------------------------------------------
 int mafVMEVector::SetData(vtkPolyData *data, mafTimeStamp t, int mode)
 //-------------------------------------------------------------------------
@@ -85,31 +64,15 @@ int mafVMEVector::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
   if (polydata)
     polydata->Update();
 
-  // check this is a ploydata containing only lines
+  // check this is a polydata containing only lines with 2 points (vector)
   if (polydata && polydata->GetPolys()->GetNumberOfCells()==0 && \
       polydata->GetStrips()->GetNumberOfCells()==0 && \
-      polydata->GetVerts()->GetNumberOfCells()==0)
+      polydata->GetVerts()->GetNumberOfCells()==0 && \
+      polydata->GetPoints()->GetNumberOfPoints() == 2)
   {
-    return Superclass::SetData(data,t,mode);
+    return mafVMEGeneric::SetData(data,t,mode);
   }
   
-  mafErrorMacro("Trying to set the wrong type of fata inside a VME Polyline :"<< (data?data->GetClassName():"NULL"));
+  mafErrorMacro("Trying to set the wrong type of fata inside a VME Vector :"<< (data?data->GetClassName():"NULL"));
   return MAF_ERROR;
-}
-
-//-------------------------------------------------------------------------
-mmaMaterial *mafVMEVector::GetMaterial()
-//-------------------------------------------------------------------------
-{
-  mmaMaterial *material = (mmaMaterial *)GetAttribute("MaterialAttributes");
-  if (material == NULL)
-  {
-    material = mmaMaterial::New();
-    SetAttribute("MaterialAttributes", material);
-    if (m_Output)
-    {
-      ((mafVMEOutputPolyline *)m_Output)->SetMaterial(material);
-    }
-  }
-  return material;
 }
