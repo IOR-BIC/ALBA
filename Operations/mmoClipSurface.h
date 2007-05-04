@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoClipSurface.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-05-04 09:14:44 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -86,6 +86,10 @@ public:
   another surface or by an implicit function. */
   int Clip();
 
+	/** Function that returns polydata results of clipping operation*/
+	vtkPolyData *GetResultPolyData(){return m_ResultPolyData;};
+	vtkPolyData *GetClippedPolyData(){return m_ClippedPolyData;};
+
 protected: 
 	virtual void OpStop(int result);
 	
@@ -99,6 +103,8 @@ protected:
   void UpdateISARefSys();
 
   mafVMESurface   *m_ClipperVME;
+	mafVMESurface   *m_ClippedVME;
+
   mafVMEGizmo     *m_ImplicitPlaneGizmo;
   vtkPlane        *m_ClipperPlane;
   vtkClipPolyData *m_Clipper;
@@ -109,9 +115,12 @@ protected:
   mmiGenericMouse    *m_IsaRotate;
 
   vtkPolyData *m_OldSurface;
+	vtkPolyData *m_ResultPolyData;
+	vtkPolyData *m_ClippedPolyData;
 
   int  m_ClipModality;
   int  ClipInside;
+	int m_GenerateClippedOutput;
   bool PlaneCreated;
 };
 #endif

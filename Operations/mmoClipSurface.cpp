@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-30 16:23:00 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-05-04 09:14:44 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,6 +49,7 @@
 #include "vtkGlyph3D.h"
 #include "vtkAppendPolyData.h"
 
+
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mmoClipSurface);
 //----------------------------------------------------------------------------
@@ -63,6 +64,7 @@ mafOp(label)
 	m_InputPreserving = false;
 
   m_ClipperVME    = NULL;
+	m_ClippedVME    = NULL;
   m_ClipperPlane  = NULL;
   m_Arrow         = NULL;
   m_Clipper       = NULL;
@@ -71,6 +73,8 @@ mafOp(label)
   m_IsaCompositor       = NULL;
 
   m_OldSurface = NULL;
+	m_ResultPolyData = NULL;
+	m_ClippedPolyData = NULL;
   
   ClipInside      = 1;
   m_ClipModality  = MODE_IMPLICIT_FUNCTION;
@@ -83,6 +87,7 @@ mmoClipSurface::~mmoClipSurface()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_IsaCompositor);
+	mafDEL(m_ClippedVME);
   vtkDEL(m_ClipperPlane);
   vtkDEL(m_Clipper);
   vtkDEL(m_OldSurface);
@@ -111,6 +116,7 @@ enum CLIP_SURFACE_ID
   ID_CHOOSE_SURFACE = MINID,
   ID_CLIP_BY,
   ID_CLIP_INSIDE,
+	ID_GENERATE_CLIPPED_OUTPUT,
 };
 
 //----------------------------------------------------------------------------
@@ -126,21 +132,25 @@ void mmoClipSurface::OpRun()
   
   m_SurfaceAccept = new mafSurfaceAccept;
 
-  m_Gui = new mmgGui(this);
-  m_Gui->Divider();
-  m_Gui->Combo(ID_CLIP_BY,"clip by",&m_ClipModality,2,clip_by_choices);
-  m_Gui->Button(ID_CHOOSE_SURFACE,"clipper surface");
-  m_Gui->Bool(ID_CLIP_INSIDE,"clip inside",&ClipInside);
-  m_Gui->Divider();
-  m_Gui->OkCancel();
-  m_Gui->Enable(ID_CHOOSE_SURFACE, m_ClipModality == mmoClipSurface::MODE_SURFACE);
-  m_Gui->Enable(wxOK,m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION);
-  
-	m_Gui->Divider();
+	if(!m_TestMode)
+	{
+		m_Gui = new mmgGui(this);
+		m_Gui->Divider();
+		m_Gui->Combo(ID_CLIP_BY,"clip by",&m_ClipModality,2,clip_by_choices);
+		m_Gui->Button(ID_CHOOSE_SURFACE,"clipper surface");
+		m_Gui->Bool(ID_CLIP_INSIDE,"clip inside",&ClipInside);
+		m_Gui->Divider();
+		m_Gui->Bool(ID_GENERATE_CLIPPED_OUTPUT,"generate clipped output",&m_GenerateClippedOutput,1);
+		m_Gui->OkCancel();
+		m_Gui->Enable(ID_CHOOSE_SURFACE, m_ClipModality == mmoClipSurface::MODE_SURFACE);
+		m_Gui->Enable(wxOK,m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION);
+	  
+		m_Gui->Divider();
 
-	ShowGui();
-  
-  ShowClipPlane(m_ClipModality != mmoClipSurface::MODE_SURFACE);
+		ShowGui();
+	  
+		ShowClipPlane(m_ClipModality != mmoClipSurface::MODE_SURFACE);
+	}
 }
 //----------------------------------------------------------------------------
 void mmoClipSurface::OnEvent(mafEventBase *maf_event)
@@ -237,7 +247,17 @@ void mmoClipSurface::OpStop(int result)
 void mmoClipSurface::OpDo()
 //----------------------------------------------------------------------------
 {
-	((mafVMESurface *)m_Input)->SetData(m_Clipper->GetOutput(),((mafVME *)m_Input)->GetTimeStamp());
+	((mafVMESurface *)m_Input)->SetData(m_ResultPolyData,((mafVME *)m_Input)->GetTimeStamp());
+	if(m_GenerateClippedOutput)
+	{
+		mafNEW(m_ClippedVME);
+		m_ClippedVME->DeepCopy(m_Input);
+		m_ClippedVME->SetData(m_ClippedPolyData,((mafVME *)m_Input)->GetTimeStamp());
+		m_ClippedVME->SetName("clipped");
+		m_ClippedVME->Update();
+
+		m_ClippedVME->ReparentTo(m_Input->GetParent());
+	}
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
@@ -245,13 +265,21 @@ void mmoClipSurface::OpUndo()
 //----------------------------------------------------------------------------
 {
   ((mafVMESurface *)m_Input)->SetData(m_OldSurface,((mafVME *)m_Input)->GetTimeStamp());
+	if(m_GenerateClippedOutput)
+	{
+		m_ClippedVME->ReparentTo(NULL);
+		mafDEL(m_ClippedVME);
+	}
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
 int mmoClipSurface::Clip()
 //----------------------------------------------------------------------------
 {
-  wxBusyCursor wait;
+	if(!m_TestMode)
+	{
+    wxBusyCursor wait;
+	}
 
   if(m_ClipModality == mmoClipSurface::MODE_SURFACE)
 	{
@@ -283,7 +311,7 @@ int mmoClipSurface::Clip()
 
 		vtkMAFSmartPointer<vtkImplicitPolyData> implicitPolyData;
 		implicitPolyData->SetInput(transform_data_clipper->GetOutput());
-		
+		int num = subdivider->GetOutput()->GetNumberOfPoints();
 		m_Clipper->SetInput(subdivider->GetOutput());
 		m_Clipper->SetClipFunction(implicitPolyData);
 	}
@@ -308,11 +336,27 @@ int mmoClipSurface::Clip()
     mat->Delete();
   }
 
+	vtkNEW(m_ResultPolyData);
+
 	m_Clipper->SetGenerateClipScalars(0); // 0 outputs input data scalars, 1 outputs implicit function values
 	m_Clipper->SetInsideOut(ClipInside);  // use 0/1 to reverse sense of clipping
 	m_Clipper->SetValue(0);               // use this to control clip distance from clipper function to surface
   m_Clipper->Update();
 
+	m_ResultPolyData->DeepCopy(m_Clipper->GetOutput());
+	m_ResultPolyData->Update();
+
+	if(m_GenerateClippedOutput)
+	{
+		vtkNEW(m_ClippedPolyData);
+		m_Clipper->SetInsideOut(ClipInside?0:1);
+		m_Clipper->Update();
+
+		m_ClippedPolyData->DeepCopy(m_Clipper->GetOutput());
+		m_ClippedPolyData->Update();
+
+	}
+	
   return MAF_OK;
 }
 //----------------------------------------------------------------------------
@@ -449,6 +493,7 @@ void mmoClipSurface::SetClippingModality(int mode)
   {
     return;
   }
+
   m_ClipModality = mode;
 }
 //----------------------------------------------------------------------------
