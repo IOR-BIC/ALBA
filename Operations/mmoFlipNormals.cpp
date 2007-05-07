@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoFlipNormals.cpp,v $
 Language:  C++
-Date:      $Date: 2007-04-30 11:34:00 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2007-05-07 12:03:22 $
+Version:   $Revision: 1.5 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -77,6 +77,7 @@ MafMedical is partially based on OpenMAF.
 #include "vtkGlyph3D.h"
 #include "vtkArrowSource.h"
 #include "vtkOBBTree.h"
+#include "vtkPolyDataNormals.h"
 
 const int ID_REGION = 0;
 
@@ -146,6 +147,20 @@ bool mmoFlipNormals::Accept(mafNode* vme)
 void mmoFlipNormals::OpRun()
 //----------------------------------------------------------------------------
 {
+
+	if(!(vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData()->GetCellData()->GetNormals())
+	{
+		vtkMAFSmartPointer<vtkPolyDataNormals> normalFilter;
+		normalFilter->SetInput((vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData());
+
+		normalFilter->ComputeCellNormalsOn();
+		normalFilter->SplittingOff();
+		normalFilter->FlipNormalsOff();
+		normalFilter->SetFeatureAngle(30);
+		normalFilter->Update();
+
+		((vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData())->DeepCopy(normalFilter->GetOutput());
+	}
 
 	vtkNEW(m_ResultPolydata);
 	m_ResultPolydata->DeepCopy((vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData());
