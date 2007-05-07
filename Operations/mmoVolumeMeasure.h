@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVolumeMeasure.h,v $
   Language:  C++
-  Date:      $Date: 2007-04-02 14:00:02 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-05-07 10:07:13 $
+  Version:   $Revision: 1.6 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -53,7 +53,7 @@ public:
 
   mafOp* Copy();
 
-	bool Accept(mafNode* Node) {return true;};
+	bool Accept(mafNode* Node);
 	void OpRun();	
 	
   /**

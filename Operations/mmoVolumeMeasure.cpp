@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVolumeMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-02 10:48:54 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-05-07 10:07:13 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,6 +28,7 @@
 #include "mafVMESurface.h"
 #include "mafTagItem.h"
 #include "mafTagArray.h"
+#include "mafNodeIterator.h"
 
 #include "vtkTriangleFilter.h"
 #include "vtkMassProperties.h"
@@ -65,6 +66,27 @@ mafOp *mmoVolumeMeasure::Copy()
 //----------------------------------------------------------------------------
 {
 	return new mmoVolumeMeasure(m_Label);
+}
+//----------------------------------------------------------------------------
+bool mmoVolumeMeasure::Accept(mafNode *node)
+//----------------------------------------------------------------------------
+{
+	if(node)
+	{
+		mafNode *root=node->GetRoot();
+		mafNodeIterator *iter = root->NewIterator();
+		for (mafNode *Inode = iter->GetFirstNode(); Inode; Inode = iter->GetNextNode())
+		{
+			if(Inode->IsA("mafVMESurface") || Inode->IsA("mafVMESurfaceParametric"))
+			{
+				iter->Delete();
+				return true;
+			}
+		}
+		iter->Delete();
+		return false;
+	}
+	return false;
 }
 //----------------------------------------------------------------------------
 // Widgets ID's
