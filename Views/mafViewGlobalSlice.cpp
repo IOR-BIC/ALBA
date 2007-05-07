@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-16 10:34:54 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2007-05-07 12:13:03 $
+  Version:   $Revision: 1.18 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -102,6 +102,7 @@ mafViewGlobalSlice::mafViewGlobalSlice(wxString label, int camera_position, bool
 	m_ViewIndex = ID_XY;
 
 	m_GlobalSlider = NULL;
+	m_OpacitySlider = NULL;
 	m_SelectedVolume = NULL;
 
 	m_TextActor = NULL;
@@ -398,6 +399,7 @@ void mafViewGlobalSlice::OnEvent(mafEventBase *maf_event)
 				{
 					pipe->SetSliceOpacity(m_Opacity);
 					mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+					m_OpacitySlider->SetValue(m_Opacity);
 				}
 			}
 			break;
@@ -405,6 +407,7 @@ void mafViewGlobalSlice::OnEvent(mafEventBase *maf_event)
 				m_Dn = m_SliderOrigin - m_SliderOldOrigin;
 				UpdateSlice();
 				m_SliderOldOrigin = m_SliderOrigin;
+				m_GlobalSlider->SetValue(m_SliderOrigin);
 			break;
 			case ID_CHANGE_VIEW:
 			{
@@ -498,7 +501,7 @@ mmgGui* mafViewGlobalSlice::CreateGui()
 	
 	m_GlobalSlider=m_Gui->FloatSlider(ID_POS_SLIDER,"pos.",&m_SliderOrigin,m_GlobalBounds[4],m_GlobalBounds[5]);
 	m_Gui->Combo(ID_CHANGE_VIEW,"view",&m_ViewIndex,3,Views);
-	m_Gui->FloatSlider(ID_OPACITY_SLIDER,"opacity",&m_Opacity,0.1,1.0);
+	m_OpacitySlider=m_Gui->FloatSlider(ID_OPACITY_SLIDER,"opacity",&m_Opacity,0.1,1.0);
 
 	bool Enable = false;
   mafNode *selVME = m_Sg->GetSelectedVme();

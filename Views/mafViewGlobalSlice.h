@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.h,v $
   Language:  C++
-  Date:      $Date: 2007-04-16 10:34:54 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-05-07 12:13:03 $
+  Version:   $Revision: 1.7 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -114,6 +114,7 @@ protected:
 
 	mafSceneNode		*m_SelectedVolume;
 	mmgFloatSlider	*m_GlobalSlider;
+	mmgFloatSlider	*m_OpacitySlider;
 
 	vtkActor2D					*m_TextActor;
 	vtkTextMapper				*m_TextMapper;
