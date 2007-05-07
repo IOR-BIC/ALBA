@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-04 09:14:44 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-05-07 10:32:24 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -138,7 +138,7 @@ void mmoClipSurface::OpRun()
 		m_Gui->Divider();
 		m_Gui->Combo(ID_CLIP_BY,"clip by",&m_ClipModality,2,clip_by_choices);
 		m_Gui->Button(ID_CHOOSE_SURFACE,"clipper surface");
-		m_Gui->Bool(ID_CLIP_INSIDE,"clip inside",&ClipInside);
+		m_Gui->Bool(ID_CLIP_INSIDE,"reverse clipping",&ClipInside);
 		m_Gui->Divider();
 		m_Gui->Bool(ID_GENERATE_CLIPPED_OUTPUT,"generate clipped output",&m_GenerateClippedOutput,1);
 		m_Gui->OkCancel();

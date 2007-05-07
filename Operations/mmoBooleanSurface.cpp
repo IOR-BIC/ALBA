@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoBooleanSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-04-02 09:32:38 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-05-07 10:32:24 $
+Version:   $Revision: 1.4 $
 Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -155,8 +155,8 @@ void mmoBooleanSurface::OpRun()
 	initialData->DeepCopy((vtkPolyData*)m_FirstOperatorVME->GetOutput()->GetVTKData());
 	m_VTKResult.push_back(initialData);
 
-	wxString clip_by_choices[2] = {"surface","implicit function"};
-	m_Gui->Combo(ID_MODALITY,"Modality",&m_Modality,2,clip_by_choices);
+	//wxString clip_by_choices[2] = {"surface","implicit function"};
+	//m_Gui->Combo(ID_MODALITY,"Modality",&m_Modality,2,clip_by_choices);
 
 	m_Gui->Label("Surface:",true);
 	m_Gui->Button(ID_CHOOSE_UNION,_("Union VME"));
@@ -164,11 +164,11 @@ void mmoBooleanSurface::OpRun()
 	m_Gui->Button(ID_CHOOSE_DIFFERENCE,_("Difference VME"));
 	m_Gui->Integer(ID_SUBDIVISION,_("Subdivide"), &m_Subdivision,1,10);
 
-	m_Gui->Label("Implicit:",true);
+	/*m_Gui->Label("Implicit:",true);
 	m_Gui->Button(ID_CLIP,_("Clip"));
 	m_Gui->Bool(ID_CLIP_INSIDE,"Clip Inside",&m_ClipInside,1);
 	m_Gui->Enable(ID_CLIP,m_Modality == MODE_IMPLICIT_FUNCTION);
-	m_Gui->Enable(ID_CLIP_INSIDE,m_Modality == MODE_IMPLICIT_FUNCTION);
+	m_Gui->Enable(ID_CLIP_INSIDE,m_Modality == MODE_IMPLICIT_FUNCTION);*/
 
 	m_Gui->Button(ID_UNDO,_("Undo"));
 	m_Gui->Enable(ID_UNDO,false);
