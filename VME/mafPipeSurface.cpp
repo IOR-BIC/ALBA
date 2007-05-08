@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-17 10:17:06 $
-  Version:   $Revision: 1.34 $
+  Date:      $Date: 2007-05-08 08:57:35 $
+  Version:   $Revision: 1.35 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,9 +43,11 @@
 #include "mafLODActor.h"
 #include "vtkRenderer.h"
 #include "vtkGlyph3D.h"
-#include "vtkPolyDataNormals.h"
 #include "vtkActor.h"
 #include "vtkLineSource.h"
+#include "vtkCellCenters.h"
+#include "vtkCellData.h"
+#include "vtkArrowSource.h"
 
 #include <vector>
 
@@ -67,6 +69,12 @@ mafPipeSurface::mafPipeSurface()
   m_MaterialButton  = NULL;
   m_SurfaceMaterial = NULL;
   m_Gui             = NULL;
+
+	m_NormalGlyph					= NULL;
+	m_NormalMapper				= NULL;
+	m_NormalActor					= NULL;
+	m_CenterPointsFilter	= NULL;
+	m_NormalArrow					= NULL;
 
   m_ScalarVisibility = 0;
 	m_NormalVisibility = 0;
@@ -165,18 +173,46 @@ void mafPipeSurface::Create(mafSceneNode *n)
 	m_Axes = new mafAxes(m_RenFront, m_Vme);
 	if(m_Vme->IsA("mafVMERefSys"))
 		m_Axes->SetVisibility(false);
-	
-	vtkNEW(m_Normal);
-	m_Normal->SetInput(data);
-	m_Normal->ComputeCellNormalsOff();
-	m_Normal->ComputePointNormalsOn();
-	m_Normal->Update();
 
-	vtkNEW(m_Arrow);
-	
+	if(data->GetCellData()->GetNormals())
+	{
+		CreateNormalsPipe();
+	}
+}
+//----------------------------------------------------------------------------
+void mafPipeSurface::CreateNormalsPipe()
+//----------------------------------------------------------------------------
+{
+	mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
+	surface_output->Update();
+	vtkPolyData *data = vtkPolyData::SafeDownCast(surface_output->GetVTKData());
+	data->Update();
+
+	vtkNEW(m_CenterPointsFilter);
+	m_CenterPointsFilter->SetInput(data);
+	m_CenterPointsFilter->Update();
+
+	vtkPolyData *centers = m_CenterPointsFilter->GetOutput();
+	centers->Update();
+	centers->GetPointData()->SetNormals(data->GetCellData()->GetNormals());
+	centers->Update();
+
+	double bounds[6];
+	data->GetBounds(bounds);
+	double maxBounds = (bounds[1]-bounds[0] < bounds[3]-bounds[2])?bounds[1]-bounds[0]:bounds[3]-bounds[2];
+	maxBounds = (maxBounds<bounds[5]-bounds[4])?maxBounds:bounds[5]-bounds[4];
+
+	vtkNEW(m_NormalArrow);
+	m_NormalArrow->SetTipLength(0.0);
+	m_NormalArrow->SetTipRadius(0.0);
+	m_NormalArrow->SetShaftRadius(0.005*maxBounds);
+	m_NormalArrow->SetTipResolution(16);
+	m_NormalArrow->SetShaftResolution(16);
+	m_NormalArrow->Update();
+
 	vtkNEW(m_NormalGlyph);
-	m_NormalGlyph->SetInput(data);
-	m_NormalGlyph->SetSource(m_Arrow->GetOutput());
+	m_NormalGlyph->SetInput(centers);
+	m_NormalGlyph->SetSource(m_NormalArrow->GetOutput());
 	m_NormalGlyph->SetVectorModeToUseNormal();
 	m_NormalGlyph->Update();
 
@@ -191,8 +227,6 @@ void mafPipeSurface::Create(mafSceneNode *n)
 	m_NormalActor->Modified();
 
 	m_AssemblyFront->AddPart(m_NormalActor);
-
-
 }
 //----------------------------------------------------------------------------
 mafPipeSurface::~mafPipeSurface()
@@ -211,8 +245,8 @@ mafPipeSurface::~mafPipeSurface()
   cppDEL(m_Axes);
 	vtkDEL(m_NormalActor);
 	vtkDEL(m_NormalMapper);
+	vtkDEL(m_CenterPointsFilter);
 	vtkDEL(m_NormalGlyph);
-	vtkDEL(m_Normal);
 }
 //----------------------------------------------------------------------------
 void mafPipeSurface::Select(bool sel)
@@ -315,7 +349,11 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
 			case ID_NORMAL_VISIBILITY:
-				m_NormalActor->SetVisibility(m_NormalVisibility);
+				if(m_NormalActor)
+					m_NormalActor->SetVisibility(m_NormalVisibility);
+				else if(m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetNormals())
+					CreateNormalsPipe();
+
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 				break;
       default:

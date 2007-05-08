@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.h,v $
   Language:  C++
-  Date:      $Date: 2007-04-17 10:17:06 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2007-05-08 08:57:35 $
+  Version:   $Revision: 1.21 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,8 +34,9 @@ class mmgMaterialButton;
 class mmaMaterial;
 class vtkActor;
 class vtkGlyph3D;
-class vtkPolyDataNormals;
 class vtkLineSource;
+class vtkCellCenters;
+class vtkArrowSource;
 
 //----------------------------------------------------------------------------
 // mafPipeSurface :
@@ -75,10 +76,11 @@ public:
 protected:
   vtkPolyDataMapper	      *m_Mapper;
 	vtkLineSource						*m_Arrow;
-	vtkPolyDataNormals			*m_Normal;
 	vtkGlyph3D							*m_NormalGlyph;
 	vtkPolyDataMapper				*m_NormalMapper;
 	vtkActor								*m_NormalActor;
+	vtkCellCenters					*m_CenterPointsFilter;
+	vtkArrowSource					*m_NormalArrow;
   mafLODActor             *m_Actor;
   vtkOutlineCornerFilter  *m_OutlineBox;
   vtkPolyDataMapper       *m_OutlineMapper;
@@ -97,6 +99,8 @@ protected:
   mmgMaterialButton *m_MaterialButton;
 
   void UpdateProperty(bool fromTag = false);
+
+	void CreateNormalsPipe();
 
   virtual mmgGui  *CreateGui();
 };  
