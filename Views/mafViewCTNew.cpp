@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-03-15 14:37:58 $
-Version:   $Revision: 1.15 $
+Date:      $Date: 2007-05-09 08:03:26 $
+Version:   $Revision: 1.16 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -574,7 +574,7 @@ void mafViewCTNew::ProbeVolume()
 				probeVector[probeVector.size()-1]->Update();
 			}
 
-			int number = probeVector[probeVector.size()-1]->GetPolyDataOutput()->GetNumberOfPoints();
+			int number = probeVector[m_AdditionalProfileNumber]->GetPolyDataOutput()->GetNumberOfPoints();
 			std::vector<double> sumVector;
 			for(int j= 0 ; j< number; j++)
 			{
@@ -588,10 +588,10 @@ void mafViewCTNew::ProbeVolume()
 
 
 			for(int k=0; k< number; k++)
-				probeVector[probeVector.size()-1]->GetPolyDataOutput()->GetPointData()->GetScalars()->SetTuple1(k , sumVector[k]);
+				probeVector[m_AdditionalProfileNumber]->GetPolyDataOutput()->GetPointData()->GetScalars()->SetTuple1(k , sumVector[k]);
 
 			double range[2];
-			probeVector[probeVector.size()-1]->GetPolyDataOutput()->GetScalarRange(range);
+			probeVector[m_AdditionalProfileNumber]->GetPolyDataOutput()->GetScalarRange(range);
 
 			lut->SetRange(range);
 
@@ -600,15 +600,15 @@ void mafViewCTNew::ProbeVolume()
 			transform->Update();
 
 			vtkMAFSmartPointer<vtkTransformPolyDataFilter> tpdf;
-			tpdf->SetInput(probeVector[probeVector.size()-1]->GetPolyDataOutput());
+			tpdf->SetInput(probeVector[m_AdditionalProfileNumber]->GetPolyDataOutput());
 			tpdf->SetTransform(transform);
 			tpdf->Update();
 
-			m_Mapper[idSubView]->SetInput(probeVector[probeVector.size()-1]->GetPolyDataOutput());
+			m_Mapper[idSubView]->SetInput(probeVector[m_AdditionalProfileNumber]->GetPolyDataOutput());
 			m_Mapper[idSubView]->SetScalarRange(range);
 			m_Mapper[idSubView]->SetLookupTable(lut);  	
 
-			probeVector[probeVector.size()-1]->GetPolyDataOutput()->GetBounds(b);
+			probeVector[m_AdditionalProfileNumber]->GetPolyDataOutput()->GetBounds(b);
 		}
 	  
 	  m_Actor[idSubView]->SetMapper(m_Mapper[idSubView]);
