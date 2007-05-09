@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-08 13:31:35 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-05-09 13:01:52 $
+  Version:   $Revision: 1.4 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -168,6 +168,7 @@ mafPipeVector::~mafPipeVector()
 {
   m_Vme->GetEventSource()->RemoveObserver(this);
   m_AssemblyFront->RemovePart(m_Actor);
+  m_AssemblyFront->RemovePart(m_ActorBunch);
   m_AssemblyFront->RemovePart(m_OutlineActor);
 
   vtkDEL(m_Sphere);
