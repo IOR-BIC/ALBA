@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-08 08:57:35 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2007-05-09 08:14:13 $
+  Version:   $Revision: 1.36 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,11 +43,13 @@
 #include "mafLODActor.h"
 #include "vtkRenderer.h"
 #include "vtkGlyph3D.h"
+#include "vtkPolyDataNormals.h"
 #include "vtkActor.h"
 #include "vtkLineSource.h"
 #include "vtkCellCenters.h"
 #include "vtkCellData.h"
 #include "vtkArrowSource.h"
+#include "vtkFeatureEdges.h"
 
 #include <vector>
 
@@ -70,6 +72,7 @@ mafPipeSurface::mafPipeSurface()
   m_SurfaceMaterial = NULL;
   m_Gui             = NULL;
 
+	m_Normal							= NULL;
 	m_NormalGlyph					= NULL;
 	m_NormalMapper				= NULL;
 	m_NormalActor					= NULL;
@@ -78,6 +81,7 @@ mafPipeSurface::mafPipeSurface()
 
   m_ScalarVisibility = 0;
 	m_NormalVisibility = 0;
+	m_EdgeVisibility	 = 0;
   m_RenderingDisplayListFlag = 0;
 
   m_UseVTKProperty  = 1;
@@ -173,11 +177,51 @@ void mafPipeSurface::Create(mafSceneNode *n)
 	m_Axes = new mafAxes(m_RenFront, m_Vme);
 	if(m_Vme->IsA("mafVMERefSys"))
 		m_Axes->SetVisibility(false);
+	
+	/*vtkNEW(m_Normal);
+	m_Normal->SetInput(data);
+	m_Normal->ComputeCellNormalsOn();
+	m_Normal->ComputePointNormalsOff();
+	m_Normal->Update();*/
 
 	if(data->GetCellData()->GetNormals())
 	{
 		CreateNormalsPipe();
 	}
+
+	CreateEdgesPipe();
+
+}
+//----------------------------------------------------------------------------
+void mafPipeSurface::CreateEdgesPipe()
+//----------------------------------------------------------------------------
+{
+	mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
+	surface_output->Update();
+	vtkPolyData *data = vtkPolyData::SafeDownCast(surface_output->GetVTKData());
+	data->Update();
+
+	vtkNEW(m_ExtractEdges);
+	m_ExtractEdges->SetInput(data);
+	m_ExtractEdges->SetBoundaryEdges(1);
+	m_ExtractEdges->SetFeatureEdges(0);
+	m_ExtractEdges->SetNonManifoldEdges(0);
+	m_ExtractEdges->SetManifoldEdges(0);
+	m_ExtractEdges->Update();
+
+	vtkNEW(m_EdgesMapper);
+	m_EdgesMapper->SetInput(m_ExtractEdges->GetOutput());
+	m_EdgesMapper->ScalarVisibilityOff();
+	m_EdgesMapper->Update();
+
+	vtkNEW(m_EdgesActor);
+	m_EdgesActor->SetMapper(m_EdgesMapper);
+	m_EdgesActor->PickableOff();
+	m_EdgesActor->GetProperty()->SetColor(1-m_Actor->GetProperty()->GetColor()[0],1-m_Actor->GetProperty()->GetColor()[1],1-m_Actor->GetProperty()->GetColor()[2]);
+	m_EdgesActor->SetVisibility(m_EdgeVisibility);
+	m_EdgesActor->Modified();
+
+	m_AssemblyFront->AddPart(m_EdgesActor);
 }
 //----------------------------------------------------------------------------
 void mafPipeSurface::CreateNormalsPipe()
@@ -247,6 +291,7 @@ mafPipeSurface::~mafPipeSurface()
 	vtkDEL(m_NormalMapper);
 	vtkDEL(m_CenterPointsFilter);
 	vtkDEL(m_NormalGlyph);
+	vtkDEL(m_Normal);
 }
 //----------------------------------------------------------------------------
 void mafPipeSurface::Select(bool sel)
@@ -274,6 +319,7 @@ mmgGui *mafPipeSurface::CreateGui()
   m_Gui->Bool(ID_RENDERING_DISPLAY_LIST,"displaylist",&m_RenderingDisplayListFlag,0,"turn on/off \nrendering displaylist calculation");
   m_Gui->Bool(ID_SCALAR_VISIBILITY,"scalar vis.", &m_ScalarVisibility,0,"turn on/off the scalar visibility");
 	m_Gui->Bool(ID_NORMAL_VISIBILITY,"norm. vis.",&m_NormalVisibility);
+	m_Gui->Bool(ID_EDGE_VISIBILITY,"edge vis.",&m_EdgeVisibility);
   m_Gui->Divider();
   m_Gui->Bool(ID_USE_VTK_PROPERTY,"property",&m_UseVTKProperty);
   m_MaterialButton = new mmgMaterialButton(m_Vme,this);
@@ -353,9 +399,14 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
 					m_NormalActor->SetVisibility(m_NormalVisibility);
 				else if(m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetNormals())
 					CreateNormalsPipe();
-
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 				break;
+			case ID_EDGE_VISIBILITY:
+				if(m_EdgesActor)
+					m_EdgesActor->SetVisibility(m_EdgeVisibility);
+				else
+					CreateEdgesPipe();
+				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       default:
         mafEventMacro(*e);
       break;

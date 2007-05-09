@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-08 08:57:35 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2007-05-09 08:14:13 $
+  Version:   $Revision: 1.22 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,9 +34,11 @@ class mmgMaterialButton;
 class mmaMaterial;
 class vtkActor;
 class vtkGlyph3D;
+class vtkPolyDataNormals;
 class vtkLineSource;
 class vtkCellCenters;
 class vtkArrowSource;
+class vtkFeatureEdges;
 
 //----------------------------------------------------------------------------
 // mafPipeSurface :
@@ -67,6 +69,7 @@ public:
     ID_LUT,
     ID_ENABLE_LOD,
 		ID_NORMAL_VISIBILITY,
+		ID_EDGE_VISIBILITY,
     ID_LAST
   };
 
@@ -76,6 +79,7 @@ public:
 protected:
   vtkPolyDataMapper	      *m_Mapper;
 	vtkLineSource						*m_Arrow;
+	vtkPolyDataNormals			*m_Normal;
 	vtkGlyph3D							*m_NormalGlyph;
 	vtkPolyDataMapper				*m_NormalMapper;
 	vtkActor								*m_NormalActor;
@@ -87,6 +91,9 @@ protected:
   vtkProperty             *m_OutlineProperty;
   mafLODActor             *m_OutlineActor;
   mafAxes                 *m_Axes;
+	vtkFeatureEdges					*m_ExtractEdges;
+	vtkPolyDataMapper				*m_EdgesMapper;
+	vtkActor								*m_EdgesActor;
 
   int m_UseVTKProperty;
   int m_UseLookupTable;
@@ -94,12 +101,14 @@ protected:
 
   int m_ScalarVisibility;
 	int m_NormalVisibility;
+	int m_EdgeVisibility;
   int m_RenderingDisplayListFlag;
   mmaMaterial *m_SurfaceMaterial;
   mmgMaterialButton *m_MaterialButton;
 
   void UpdateProperty(bool fromTag = false);
 
+	void CreateEdgesPipe();
 	void CreateNormalsPipe();
 
   virtual mmgGui  *CreateGui();
