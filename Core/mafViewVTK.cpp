@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-16 15:22:09 $
-  Version:   $Revision: 1.67 $
+  Date:      $Date: 2007-05-10 10:09:36 $
+  Version:   $Revision: 1.68 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -70,8 +70,6 @@ mafViewVTK::mafViewVTK(const wxString &label, int camera_position, bool show_axe
   m_TextKit   = NULL;
   m_AttachCamera = NULL;
   m_AnimateKit = NULL;
-
-  m_NumberOfVisibleVme = 0;
 }
 //----------------------------------------------------------------------------
 mafViewVTK::~mafViewVTK() 
@@ -283,14 +281,6 @@ void mafViewVTK::VmeCreatePipe(mafNode *vme)
       assert(n && !n->m_Pipe);
       pipe->Create(n);
       n->m_Pipe = (mafPipe*)pipe;
-      if (m_NumberOfVisibleVme == 1)
-      {
-        CameraReset();
-      }
-      else
-      {
-        CameraUpdate();
-      }
     }
     else
     {

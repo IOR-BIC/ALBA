@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-16 15:22:09 $
-  Version:   $Revision: 1.51 $
+  Date:      $Date: 2007-05-10 10:09:36 $
+  Version:   $Revision: 1.52 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -164,7 +164,6 @@ protected:
   mafAnimate      *m_AnimateKit;
 
   int   m_CameraPosition; 
-  int   m_NumberOfVisibleVme; ///< perform ResetCamera only for the first vme shown into the view
   bool  m_ShowAxes;  ///< Flag used to show/hide axes in low left corner of the view
   int   m_StereoType; ///< Indicate the stereo type to use with the view
   bool  m_ShowRuler;
