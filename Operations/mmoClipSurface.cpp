@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-07 10:32:24 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-05-10 09:07:40 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -80,6 +80,13 @@ mafOp(label)
   m_ClipModality  = MODE_IMPLICIT_FUNCTION;
   
   PlaneCreated = false;
+
+	m_PlaneHeight = 0.0;
+	m_PlaneWidth	= 0.0;
+
+	m_PlaneSource	= NULL;
+	m_Gizmo				= NULL;
+	m_ArrowShape	= NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -93,7 +100,6 @@ mmoClipSurface::~mmoClipSurface()
   vtkDEL(m_OldSurface);
   vtkDEL(m_Arrow);
 }
-
 //----------------------------------------------------------------------------
 mafOp* mmoClipSurface::Copy()   
 //----------------------------------------------------------------------------
@@ -117,6 +123,8 @@ enum CLIP_SURFACE_ID
   ID_CLIP_BY,
   ID_CLIP_INSIDE,
 	ID_GENERATE_CLIPPED_OUTPUT,
+	ID_PLANE_WIDTH,
+	ID_PLANE_HEIGHT,
 };
 
 //----------------------------------------------------------------------------
@@ -136,12 +144,20 @@ void mmoClipSurface::OpRun()
 	{
 		m_Gui = new mmgGui(this);
 		m_Gui->Divider();
-		m_Gui->Combo(ID_CLIP_BY,"clip by",&m_ClipModality,2,clip_by_choices);
-		m_Gui->Button(ID_CHOOSE_SURFACE,"clipper surface");
-		m_Gui->Bool(ID_CLIP_INSIDE,"reverse clipping",&ClipInside);
+		m_Gui->Combo(ID_CLIP_BY,_("clip by"),&m_ClipModality,2,clip_by_choices);
+		m_Gui->Button(ID_CHOOSE_SURFACE,_("clipper surface"));
+		m_Gui->Bool(ID_CLIP_INSIDE,_("reverse clipping"),&ClipInside,1);
+		double b[6];
+		((mafVME *)m_Input)->GetOutput()->GetVMEBounds(b);
+		// bounding box dim
+		m_PlaneWidth = b[1] - b[0];
+		m_PlaneHeight = b[3] - b[2];
+		m_Gui->Double(ID_PLANE_WIDTH,_("plane w."),&m_PlaneWidth,0.0);
+		m_Gui->Double(ID_PLANE_HEIGHT,_("plane h."),&m_PlaneHeight,0.0);
 		m_Gui->Divider();
-		m_Gui->Bool(ID_GENERATE_CLIPPED_OUTPUT,"generate clipped output",&m_GenerateClippedOutput,1);
+		m_Gui->Bool(ID_GENERATE_CLIPPED_OUTPUT,_("generate clipped output"),&m_GenerateClippedOutput,1);
 		m_Gui->OkCancel();
+		m_Gui->Enable(ID_GENERATE_CLIPPED_OUTPUT, m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION);
 		m_Gui->Enable(ID_CHOOSE_SURFACE, m_ClipModality == mmoClipSurface::MODE_SURFACE);
 		m_Gui->Enable(wxOK,m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION);
 	  
@@ -181,7 +197,8 @@ void mmoClipSurface::OnEvent(mafEventBase *maf_event)
       }
       break;
       case ID_CLIP_BY:
-        m_Gui->Enable(ID_CHOOSE_SURFACE, m_ClipModality == 0);
+        m_Gui->Enable(ID_CHOOSE_SURFACE, m_ClipModality == mmoClipSurface::MODE_SURFACE);
+				m_Gui->Enable(ID_GENERATE_CLIPPED_OUTPUT, m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION);
         m_Gui->Enable(wxOK,m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION);
         ClipInside = m_ClipModality;
         m_Gui->Update();
@@ -207,6 +224,19 @@ void mmoClipSurface::OnEvent(mafEventBase *maf_event)
         currTr->Delete();
       }
       break;
+			case ID_PLANE_WIDTH:
+			case ID_PLANE_HEIGHT:
+				{
+					if(PlaneCreated)
+					{
+						m_PlaneSource->SetPoint1(m_PlaneWidth/2,-m_PlaneHeight/2, 0);
+						m_PlaneSource->SetPoint2(-m_PlaneWidth/2, m_PlaneHeight/2, 0);
+						m_PlaneSource->SetOrigin(-m_PlaneWidth/2,-m_PlaneHeight/2, 0);
+						m_PlaneSource->Update();
+						mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+					}
+				}
+				break;
       case wxOK:
       {
         int clip_result = Clip();
@@ -239,6 +269,9 @@ void mmoClipSurface::OpStop(int result)
     mafEventMacro(mafEvent(this, VME_REMOVE, m_ImplicitPlaneGizmo));
   }
   mafDEL(m_ImplicitPlaneGizmo);
+	vtkDEL(m_Gizmo);
+	vtkDEL(m_ArrowShape);
+	vtkDEL(m_PlaneSource);
 
   HideGui();
   mafEventMacro(mafEvent(this,result));
@@ -376,36 +409,36 @@ void mmoClipSurface::ShowClipPlane(bool show)
       double zdim = b[5] - b[4];
 
       // create the gizmo plane on the z = 0 plane
-      vtkMAFSmartPointer<vtkPlaneSource> plane_source;
-      plane_source->SetPoint1(xdim/2,-ydim/2, 0);
-      plane_source->SetPoint2(-xdim/2, ydim/2, 0);
-      plane_source->SetOrigin(-xdim/2,-ydim/2, 0);
-      plane_source->Update();
+      vtkNEW(m_PlaneSource);
+      m_PlaneSource->SetPoint1(m_PlaneWidth/2,-m_PlaneHeight/2, 0);
+      m_PlaneSource->SetPoint2(-m_PlaneWidth/2, m_PlaneHeight/2, 0);
+      m_PlaneSource->SetOrigin(-m_PlaneWidth/2,-m_PlaneHeight/2, 0);
+      m_PlaneSource->Update();
 
       vtkNEW(m_ClipperPlane);
-      m_ClipperPlane->SetOrigin(plane_source->GetOrigin());
-      m_ClipperPlane->SetNormal(plane_source->GetNormal());
+      m_ClipperPlane->SetOrigin(m_PlaneSource->GetOrigin());
+      m_ClipperPlane->SetNormal(m_PlaneSource->GetNormal());
 
-      vtkMAFSmartPointer<vtkArrowSource> arrow_shape;
-      arrow_shape->SetShaftResolution(40);
-      arrow_shape->SetTipResolution(40);
+      vtkNEW(m_ArrowShape);
+      m_ArrowShape->SetShaftResolution(40);
+      m_ArrowShape->SetTipResolution(40);
 
       vtkNEW(m_Arrow);
-      m_Arrow->SetInput(plane_source->GetOutput());
-      m_Arrow->SetSource(arrow_shape->GetOutput());
+      m_Arrow->SetInput(m_PlaneSource->GetOutput());
+      m_Arrow->SetSource(m_ArrowShape->GetOutput());
       m_Arrow->SetVectorModeToUseNormal();
       
       int clip_sign = ClipInside ? 1 : -1;
       m_Arrow->SetScaleFactor(clip_sign * abs(zdim/10.0));
       m_Arrow->Update();
 
-      vtkMAFSmartPointer<vtkAppendPolyData> gizmo;
-      gizmo->AddInput(plane_source->GetOutput());
-      gizmo->AddInput(m_Arrow->GetOutput());
-      gizmo->Update();
+      vtkNEW(m_Gizmo);
+      m_Gizmo->AddInput(m_PlaneSource->GetOutput());
+      m_Gizmo->AddInput(m_Arrow->GetOutput());
+      m_Gizmo->Update();
 
       mafNEW(m_ImplicitPlaneGizmo);
-      m_ImplicitPlaneGizmo->SetData(gizmo->GetOutput());
+      m_ImplicitPlaneGizmo->SetData(m_Gizmo->GetOutput());
       m_ImplicitPlaneGizmo->SetName("implicit plane gizmo");
       m_ImplicitPlaneGizmo->ReparentTo(mafVME::SafeDownCast(m_Input->GetRoot()));
 

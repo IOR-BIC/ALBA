@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoClipSurface.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-04 09:14:44 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-05-10 09:07:40 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,6 +35,9 @@ class vtkPlane;
 class vtkPolyData;
 class vtkClipPolyData;
 class vtkGlyph3D;
+class vtkPlaneSource;
+class vtkArrowSource;
+class vtkAppendPolyData;
 
 //----------------------------------------------------------------------------
 // mmoClipSurface :
@@ -122,5 +125,12 @@ protected:
   int  ClipInside;
 	int m_GenerateClippedOutput;
   bool PlaneCreated;
+
+	double m_PlaneWidth;
+	double m_PlaneHeight;
+
+	vtkPlaneSource	*m_PlaneSource;
+	vtkArrowSource	*m_ArrowShape;
+	vtkAppendPolyData	*m_Gizmo;
 };
 #endif
