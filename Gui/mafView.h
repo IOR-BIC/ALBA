@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-10 09:51:38 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2007-05-10 10:07:14 $
+  Version:   $Revision: 1.20 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -153,7 +153,7 @@ public:
   virtual vtkProp3D *GetPickedProp() {return m_PickedProp;};
 
   /** Return the number of visible VMEs.*/ 
-  virtual int GetNumberOfVisibleVME() {return 0;};
+  virtual int GetNumberOfVisibleVME() {return m_NumberOfVisibleVme;};
 
   /** Print a dump of this object into the Log area.*/
   virtual void Print(std::ostream& os, const int tabs=0);// const;
@@ -181,6 +181,7 @@ protected:
   mafVME        *m_PickedVME;   ///< Pointer to the picked vme. It is initialized on picking
   vtkProp3D     *m_PickedProp;  ///< Pointer to the picked vme Prop3D. It is initialized on picking
   double         m_PickedPosition[3];
+  int            m_NumberOfVisibleVme; ///< perform ResetCamera only for the first vme shown into the view
 
   wxPrintData   *m_PrintData;
 
