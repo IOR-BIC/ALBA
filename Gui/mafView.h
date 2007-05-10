@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-16 15:21:17 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2007-05-10 09:51:38 $
+  Version:   $Revision: 1.19 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -151,6 +151,9 @@ public:
 
   /** Return the corresponding vtkProp3D of the picked VME*/
   virtual vtkProp3D *GetPickedProp() {return m_PickedProp;};
+
+  /** Return the number of visible VMEs.*/ 
+  virtual int GetNumberOfVisibleVME() {return 0;};
 
   /** Print a dump of this object into the Log area.*/
   virtual void Print(std::ostream& os, const int tabs=0);// const;
