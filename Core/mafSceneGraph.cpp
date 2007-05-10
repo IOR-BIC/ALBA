@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-16 15:22:09 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2007-05-10 10:10:20 $
+  Version:   $Revision: 1.23 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -249,7 +249,7 @@ void mafSceneGraph::SetAutoShowFlag(mafNodeBaseTypes type,  bool flag)
 }
 @@@ */
 //----------------------------------------------------------------------------
-void mafSceneGraph::VmeShow(mafNode *vme, bool show)   
+void mafSceneGraph::VmeShow(mafNode *vme, bool show)
 //----------------------------------------------------------------------------
 {
 	mafSceneNode *node = Vme2Node(vme);
@@ -270,6 +270,17 @@ void mafSceneGraph::VmeShow(mafNode *vme, bool show)
 		if(!node->m_Pipe) 
 		{
 			m_View->VmeCreatePipe(vme);
+      if (!vme->IsMAFType(mafVMEGizmo))
+      {
+        if(m_View->GetNumberOfVisibleVME() == 1)
+        {
+          m_View->CameraReset();
+        }
+        else
+        {
+          m_View->CameraUpdate();
+        }
+      }
 			VmeSelect(vme,vme == m_SelectedVme);
 		}
 	}
