@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:50 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-05-10 10:07:25 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -53,6 +53,8 @@ mafView::mafView(const wxString &label)
 	m_Plugged				= false;
   m_Id            = 0;
   m_Mult          = 0;
+
+  m_NumberOfVisibleVme = 0;
 
   m_PrintData = (wxPrintData*) NULL ;
 
