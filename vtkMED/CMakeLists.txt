@@ -22,6 +22,8 @@ SET(vtkMED_SRCS
   vtkTriangleQualityRatio.h
   vtkMaskPolyDataFilter.cxx
   vtkMaskPolyDataFilter.h
+  vtkHoleConnectivity.cxx
+  vtkHoleConnectivity.h
 )
 
 IF (MAF_USE_ITK)
