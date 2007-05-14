@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEDataSetAttributesImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-08 16:27:08 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-05-14 12:04:13 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -138,7 +138,7 @@ int mafVMEDataSetAttributesImporter::Read()
 
   // search for a file name containing the prefix
   vcl_string vclFilePrefix = "";
-  (m_TimeVarying) ? vclFilePrefix = m_FilePrefix.GetCStr() : vclFilePrefix = m_FileBaseName  ;
+  (m_TimeVarying == true) ? vclFilePrefix = m_FilePrefix.GetCStr() : vclFilePrefix = m_FileBaseName  ;
   
   for (fileNamesVectorIterator = fileNamesVector.begin(); fileNamesVectorIterator != fileNamesVector.end(); fileNamesVectorIterator++)
   {
@@ -362,7 +362,7 @@ int mafVMEDataSetAttributesImporter::Read()
         return MAF_ERROR;
       }
 
-      inputDataSetStructureCopy->CopyStructure(m_Input->GetOutput()->GetVTKData());
+      inputDataSetStructureCopy->DeepCopy(m_Input->GetOutput()->GetVTKData());
 
       numNodes = inputDataSetStructureCopy->GetNumberOfPoints();
       numElements = inputDataSetStructureCopy->GetNumberOfCells();
@@ -421,8 +421,13 @@ void mafVMEDataSetAttributesImporter::SplitFileName()
   vcl_string fileName = m_FileName  ;
   int pointPos = fileName.find_last_of('.');
   
-  // find the last /
+  // find the last / on linux
   int slashPos = fileName.find_last_of('/');
+  if (slashPos == -1)
+  {
+    // try on Windows
+    slashPos = fileName.find_last_of('\\');
+  }
 
   // extension
   vcl_string ext(fileName, pointPos,fileName.length()-pointPos);

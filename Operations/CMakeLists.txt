@@ -107,6 +107,8 @@ IF (MAF_USE_ITK)
     mmoMeshImporter.h
     mmoScalarToSurface.cpp
     mmoScalarToSurface.h
+    mmoVMEDataSetAttributesImporter.cpp
+    mmoVMEDataSetAttributesImporter.h
   )
 ENDIF (MAF_USE_ITK)
 

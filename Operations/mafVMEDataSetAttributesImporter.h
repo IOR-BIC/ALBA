@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEDataSetAttributesImporter.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-08 16:27:08 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-05-14 12:04:13 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,10 +32,6 @@ public:
   Construct a mafVMEDataSetAttributesImporter */
   mafVMEDataSetAttributesImporter();
   ~mafVMEDataSetAttributesImporter();
-
-  void TimeVaryingOn() {m_TimeVarying = true;};
-  void TimeVaryingOff() {m_TimeVarying = false;};
-  bool GetTimeVaryingFlag() {return m_TimeVarying;};
   
   /**
   Set the input vme; BEWARE: this filter works in place! */
@@ -50,6 +46,12 @@ public:
   the filename will be used to find the directory containing attribute files*/
   void SetFileName(const char *filename);
   const char *GetFileName() {return m_FileName;};
+
+  /** Time Varying flag */
+  void TimeVaryingOn() {m_TimeVarying = true;};
+  void TimeVaryingOff() {m_TimeVarying = false;};
+  void SetTimeVaryingFlag(bool flag) {m_TimeVarying = flag;};
+  bool GetTimeVaryingFlag() {return m_TimeVarying;};
 
   /**
   Set the prefix of the attribute files; the prefix is the 
@@ -66,7 +68,7 @@ public:
   Set the attribute data type to be imported*/ 
   void SetAttributeTypeToPointData() {this->m_AttributeType = POINT_DATA; };
   void SetAttributeTypeToCellData() {this->m_AttributeType = CELL_DATA; };
-  int SetAttributeType(int attributeType) {this->m_AttributeType = attributeType; };
+  void SetAttributeType(int attributeType) {this->m_AttributeType = attributeType; };
   int GetAttributeType() {return this->m_AttributeType; };
 
   /** 
@@ -77,10 +79,10 @@ public:
   /** 
   Set the UseTSFile ivar. If UseTSFile is true time stamps values for each resul file 
   will be extracted from the text file*/
-  void UseTSFileOn() {this->UseTSFile = true; };
-  void UseTSFileOff() {this->UseTSFile = false; };
-  void SetUseTSFile(bool useTS ) {this->UseTSFile = useTS; };
-  bool GetUseTSFile() {return this->UseTSFile; };
+  void UseTSFileOn() {this->m_UseTSFile = true; };
+  void UseTSFileOff() {this->m_UseTSFile = false; };
+  void SetUseTSFile(bool useTS ) {this->m_UseTSFile = useTS; };
+  bool GetUseTSFile() {return this->m_UseTSFile; };
   
   /** parse the input data file and fill the dataset with the attribute data.
   Returns MAF_OK or MAF_ERROR*/
@@ -118,7 +120,7 @@ protected:
   mafVMEGeneric *m_Input;
 
   /** use timestamp file*/
-  bool UseTSFile;
+  bool m_UseTSFile;
 
   /** result type*/
   int m_AttributeType;

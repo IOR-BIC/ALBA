@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEMeshAnsysTextImporter.cpp,v $
 Language:  C++
-Date:      $Date: 2007-04-13 12:03:02 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2007-05-14 12:04:13 $
+Version:   $Revision: 1.6 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -32,7 +32,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVMEMesh.h"
 #include "mafTagArray.h"
 
-// #include "mafVMEMeshParabolicMeshToLinearMesh.h"
 
 // vcl includes
 #include <vcl_string.h>
