@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslatePlane.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-27 09:35:02 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-05-14 09:22:17 $
+  Version:   $Revision: 1.10 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -105,19 +105,12 @@ mafGizmoTranslatePlane::mafGizmoTranslatePlane(mafVME *input, mafObserver *liste
   this->SetColor(S1, 0, 1, 0);
   this->SetColor(S2, 0, 0, 1);
   this->SetColor(SQ, 1, 1, 0);
-
-  // hide gizmos at creation
-  this->Show(false);
   
   // add the gizmo to the tree, this should increase reference count 
   for (i = 0; i < 3; i++)
   {
     Gizmo[i]->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
   }
-
-  // ask the manager to create the pipelines
-  for (i = 0; i < 3; i++)
-    mafEventMacro(mafEvent(this,VME_SHOW,Gizmo[i],true));
 }
 //----------------------------------------------------------------------------
 mafGizmoTranslatePlane::~mafGizmoTranslatePlane() 
@@ -145,7 +138,7 @@ mafGizmoTranslatePlane::~mafGizmoTranslatePlane()
   for (i = 0; i < 3; i++)
   {
     vtkDEL(RotatePDF[i]);
-    mafEventMacro(mafEvent(this, VME_REMOVE, Gizmo[i]));
+		Gizmo[i]->ReparentTo(NULL);
   }
 }
 
@@ -420,34 +413,8 @@ void mafGizmoTranslatePlane::SetColor(int part, double colR, double colG, double
 void mafGizmoTranslatePlane::Show(bool show)
 //----------------------------------------------------------------------------
 {
-
-  // can not use this since it's too slow... this requires destroying and creating
-  // the pipeline each time...
-  //for (int i = 0; i < 3; i++)
-  //  mafEventMacro(mafEvent(this,VME_SHOW,Gizmo[i],show));
-
-  // ... instead I am using vtk opacity to speed up the render
-  if (show)
-  {  
-    Gizmo[S1]->GetMaterial()->m_Prop->SetOpacity(1);
-    Gizmo[S2]->GetMaterial()->m_Prop->SetOpacity(1);
-    
-    if (IsActive)
-    {
-      Gizmo[SQ]->GetMaterial()->m_Prop->SetOpacity(0.5);  
-    }
-    else
-    {
-      Gizmo[SQ]->GetMaterial()->m_Prop->SetOpacity(0);  
-    }
-  }
-  else
-  {
-    for (int i = 0; i < 3; i++)
-    {
-      Gizmo[i]->GetMaterial()->m_Prop->SetOpacity(0);
-    }
-  }
+  for (int i = 0; i < 3; i++)
+		mafEventMacro(mafEvent(this,VME_SHOW,Gizmo[i],show));
 }
 //----------------------------------------------------------------------------
 void mafGizmoTranslatePlane::ShowSquare(bool show)

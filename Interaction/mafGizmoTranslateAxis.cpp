@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslateAxis.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-30 15:45:34 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-05-14 09:22:17 $
+  Version:   $Revision: 1.9 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -83,18 +83,11 @@ mafGizmoTranslateAxis::mafGizmoTranslateAxis(mafVME *input, mafObserver *listene
   // set come gizmo material property and initial color to red
   this->SetColor(1, 0, 0, 1, 0, 0);
 
-  // hide gizmos at creation
-  this->Show(false);
-
   //-----------------
   // ReparentTo will add also the gizmos to the tree!!
   // add the gizmo to the tree, this should increase reference count 
   CylGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
   ConeGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
-
-  // ask the manager to create the pipelines
-  mafEventMacro(mafEvent(this,VME_SHOW,CylGizmo,true));
-  mafEventMacro(mafEvent(this,VME_SHOW,ConeGizmo,true));
 }
 //----------------------------------------------------------------------------
 mafGizmoTranslateAxis::~mafGizmoTranslateAxis() 
@@ -119,8 +112,8 @@ mafGizmoTranslateAxis::~mafGizmoTranslateAxis()
 	//----------------------
     vtkDEL(IsaComp[i]); 
   }
-  mafEventMacro(mafEvent(this, VME_REMOVE, CylGizmo));
-  mafEventMacro(mafEvent(this, VME_REMOVE, ConeGizmo));  
+	CylGizmo->ReparentTo(NULL);
+	ConeGizmo->ReparentTo(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -439,15 +432,8 @@ void mafGizmoTranslateAxis::SetColor(double cylR, double cylG, double cylB, doub
 void mafGizmoTranslateAxis::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  // can not use this since it's too slow... this requires destroying and creating
-  // the pipeline each time...
-  // mafEventMacro(mafEvent(this,VME_SHOW,CylGizmo,show));
-  // mafEventMacro(mafEvent(this,VME_SHOW,ConeGizmo,show));
-
-  // ... instead I am using vtk opacity to speed up the render
-  double opacity = show ? 1 : 0;
-  CylGizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
-  ConeGizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
+  mafEventMacro(mafEvent(this,VME_SHOW,CylGizmo,show));
+	mafEventMacro(mafEvent(this,VME_SHOW,ConeGizmo,show));
 }
 //----------------------------------------------------------------------------
 void mafGizmoTranslateAxis::SetAbsPose(mafMatrix *absPose)

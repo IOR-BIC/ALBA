@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScaleIsotropic.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-30 15:45:34 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-05-14 09:22:17 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -76,14 +76,8 @@ mafGizmoScaleIsotropic::mafGizmoScaleIsotropic(mafVME *input, mafObserver *liste
   // set cube gizmo material property and initial color to light blue
   this->SetColor(0, 1, 1);
 
-  // hide gizmos at creation
-  this->Show(false);
-
   //-----------------
   CubeGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
-
-  // ask the VME manager to create the pipeline
-  mafEventMacro(mafEvent(this,VME_SHOW,CubeGizmo,true));  
 }
 //----------------------------------------------------------------------------
 mafGizmoScaleIsotropic::~mafGizmoScaleIsotropic() 
@@ -93,7 +87,7 @@ mafGizmoScaleIsotropic::~mafGizmoScaleIsotropic()
   vtkDEL(Cube);
   vtkDEL(IsaComp); 
 
-  mafEventMacro(mafEvent(this, VME_REMOVE, CubeGizmo));  
+	CubeGizmo->ReparentTo(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -205,9 +199,7 @@ void mafGizmoScaleIsotropic::SetColor(double colR, double colG, double colB)
 void mafGizmoScaleIsotropic::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  // using vtk opacity instead of VME_SHOW to speed up the render
-  double opacity = show ? 1 : 0;
-  CubeGizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
+	mafEventMacro(mafEvent(this,VME_SHOW,CubeGizmo,show));
 }
 
 //----------------------------------------------------------------------------

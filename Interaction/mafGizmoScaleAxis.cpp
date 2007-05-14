@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScaleAxis.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-30 15:45:34 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-05-14 09:22:17 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -85,15 +85,8 @@ mafGizmoScaleAxis::mafGizmoScaleAxis(mafVME *input, mafObserver *listener)
   // set come gizmo material property and initial color to red
   this->SetColor(1, 0, 0, 1, 0, 0);
 
-  // hide gizmos at creation
-  this->Show(false);
-
   CylGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
   CubeGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
-
-  // ask to the manager to create the gizmo pipeline
-  mafEventMacro(mafEvent(this,VME_SHOW,CylGizmo,true));
-  mafEventMacro(mafEvent(this,VME_SHOW,CubeGizmo,true));
 }
 //----------------------------------------------------------------------------
 mafGizmoScaleAxis::~mafGizmoScaleAxis() 
@@ -118,11 +111,8 @@ mafGizmoScaleAxis::~mafGizmoScaleAxis()
 	//----------------------
     vtkDEL(IsaComp[i]); 
   }
-  mafEventMacro(mafEvent(this, VME_REMOVE, CylGizmo));
-  mafEventMacro(mafEvent(this, VME_REMOVE, CubeGizmo));  
-
-//  CylGizmo->Delete();
-//  CubeGizmo->Delete();
+	CylGizmo->ReparentTo(NULL);
+	CubeGizmo->ReparentTo(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -473,15 +463,8 @@ void mafGizmoScaleAxis::SetColor(double cylR, double cylG, double cylB, double c
 void mafGizmoScaleAxis::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  // can not use this since it's too slow... this requires destroying and creating
-  // the pipeline each time...
-  // mafEventMacro(mafEvent(this,VME_SHOW,CylGizmo,show));
-  // mafEventMacro(mafEvent(this,VME_SHOW,CubeGizmo,show));
-
-  // ... instead I am using vtk opacity to speed up the render
-  double opacity = show ? 1 : 0;
-  CylGizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
-  CubeGizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
+  mafEventMacro(mafEvent(this,VME_SHOW,CylGizmo,show));
+  mafEventMacro(mafEvent(this,VME_SHOW,CubeGizmo,show));
 }
 
 //----------------------------------------------------------------------------
