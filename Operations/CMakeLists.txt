@@ -40,6 +40,8 @@ SET(PROJECT_SRCS
   mmoFlipNormals.h
   mmoSurfaceReconstruction.cpp
   mmoSurfaceReconstruction.h
+  mmoFillHoles.cpp
+  mmoFillHoles.h
 )
 
 IF (MAF_USE_ITK)
