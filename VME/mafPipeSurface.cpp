@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-09 08:14:13 $
-  Version:   $Revision: 1.36 $
+  Date:      $Date: 2007-05-14 15:59:22 $
+  Version:   $Revision: 1.37 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -276,9 +276,14 @@ void mafPipeSurface::CreateNormalsPipe()
 mafPipeSurface::~mafPipeSurface()
 //----------------------------------------------------------------------------
 {
-  m_AssemblyFront->RemovePart(m_Actor);
-  m_AssemblyFront->RemovePart(m_OutlineActor);
-	m_AssemblyFront->RemovePart(m_NormalActor);
+	if(m_Actor)
+		m_AssemblyFront->RemovePart(m_Actor);
+	if(m_OutlineActor)
+		m_AssemblyFront->RemovePart(m_OutlineActor);
+	if(m_NormalActor)
+		m_AssemblyFront->RemovePart(m_NormalActor);
+	if(m_EdgesActor)
+		m_AssemblyFront->RemovePart(m_EdgesActor);
 
 	vtkDEL(m_Mapper);
   vtkDEL(m_Actor);
@@ -292,6 +297,9 @@ mafPipeSurface::~mafPipeSurface()
 	vtkDEL(m_CenterPointsFilter);
 	vtkDEL(m_NormalGlyph);
 	vtkDEL(m_Normal);
+	vtkDEL(m_EdgesActor);
+	vtkDEL(m_EdgesMapper);
+	vtkDEL(m_ExtractEdges);
 }
 //----------------------------------------------------------------------------
 void mafPipeSurface::Select(bool sel)
