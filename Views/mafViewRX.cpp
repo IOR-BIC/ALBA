@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRX.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-13 15:44:17 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-05-14 09:30:02 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -122,14 +122,6 @@ void mafViewRX::VmeCreatePipe(mafNode *vme)
       }
       pipe->Create(n);
       n->m_Pipe = (mafPipe*)pipe;
-      if (m_NumberOfVisibleVme == 1)
-      {
-        mafEventMacro(mafEvent(this,CAMERA_RESET));
-      }
-      else
-      {
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-      }
     }
     else
       mafErrorMessage("Cannot create visual pipe object of type \"%s\"!",pipe_name.GetCStr());

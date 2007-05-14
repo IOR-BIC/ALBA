@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-05 09:36:28 $
-  Version:   $Revision: 1.51 $
+  Date:      $Date: 2007-05-14 09:30:02 $
+  Version:   $Revision: 1.52 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -177,7 +177,7 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
 			((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->UpdateSurfacesList(node);
 		}
 	}
-	CameraUpdate();
+	//CameraUpdate();
 	EnableWidgets(m_CurrentVolume != NULL);
 }
 //----------------------------------------------------------------------------
