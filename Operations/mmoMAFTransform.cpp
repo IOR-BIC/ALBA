@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMAFTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2007-05-14 09:22:52 $
+  Version:   $Revision: 1.17 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -205,6 +205,8 @@ void mmoMAFTransform::OpStop(int result)
   cppDEL(m_GizmoScale);
 
   m_GuiTransform->DetachInteractorFromVme();
+
+	mafEventMacro(mafEvent(this,CAMERA_UPDATE)); 
 
   // HideGui seems not to work  with plugged guis :(; using it generate a SetFocusToChild
   // error when operation tab is selected after the operation has ended
