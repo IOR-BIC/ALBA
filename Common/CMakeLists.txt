@@ -12,6 +12,8 @@ SET(PROJECT_SRCS
   mafGizmoSlice.h
   mmiInfoImage.cpp
   mmiInfoImage.h
+  mmiSelectPoint.cpp
+  mmiSelectPoint.h
 )
 
 # List libraries that are needed by this project.
