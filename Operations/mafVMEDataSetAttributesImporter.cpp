@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEDataSetAttributesImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-14 12:04:13 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-05-15 16:29:32 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -75,12 +75,17 @@ mafVMEDataSetAttributesImporter::~mafVMEDataSetAttributesImporter()
 
 
 int mafVMEDataSetAttributesImporter::Read()
-{
-
+{  
   if (m_Input == NULL)
   {
     mafWarningMessageMacro("Input vme must be defined!");
     return MAF_ERROR;
+  }
+  
+  int ret = SplitFileName();  
+  if (ret == MAF_ERROR)
+  {
+    return ret;
   }
 
   vtkDataSet *data = m_Input->GetOutput()->GetVTKData();
@@ -410,13 +415,17 @@ int mafVMEDataSetAttributesImporter::Read()
 void mafVMEDataSetAttributesImporter::SetFileName( const char *filename )
 {
   m_FileName = filename	;
-
-  SplitFileName();  
-
+  
 }
 
-void mafVMEDataSetAttributesImporter::SplitFileName()
+int mafVMEDataSetAttributesImporter::SplitFileName()
 {
+  if (m_FileName == "")
+  {
+    mafWarningMessageMacro("filename not specified!!!")
+    return MAF_ERROR;
+  }
+
   // find the last point
   vcl_string fileName = m_FileName  ;
   int pointPos = fileName.find_last_of('.');
@@ -441,5 +450,6 @@ void mafVMEDataSetAttributesImporter::SplitFileName()
   m_ResultsDir = path.c_str();
   m_FileBaseName = baseFileName.c_str();
   m_FileExtension = ext.c_str();
-
+  
+  return MAF_OK;
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVMEDataSetAttributesImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-15 12:30:27 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-05-15 16:29:33 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -87,6 +87,7 @@ void mmoVMEDataSetAttributesImporter::OpRun()
 
 int mmoVMEDataSetAttributesImporter::Read()
 {
+  
   if (!m_TestMode)
   {
     wxBusyInfo wait("Reading file: ...");  
@@ -114,8 +115,10 @@ int mmoVMEDataSetAttributesImporter::Read()
       wxMessageBox("Error parsing input files! See log window for details...");  
     }
   } 
-
-  m_Output = attributesImporter->GetOutput();
+  else
+  {
+    m_Output = attributesImporter->GetOutput();
+  }
 
   cppDEL(attributesImporter);
 
@@ -173,9 +176,9 @@ void mmoVMEDataSetAttributesImporter::CreateGui()
   m_Gui->FileOpen (ID_TSFileName,	"",	&m_TSFileName, wildcard);
   m_Gui->Divider();
 
-  wxString TypeOfImporter[2]={"point data","cell data"};
+  wxString attributeType[2]={"point data","cell data"};
   m_Gui->Label("Importer type",true);
-  m_Gui->Combo(ID_AttributeType,"",&m_AttributeType,2,TypeOfImporter);
+  m_Gui->Combo(ID_AttributeType,"",&m_AttributeType,2,attributeType);
   m_Gui->Divider(2);
 
   m_Gui->Divider();

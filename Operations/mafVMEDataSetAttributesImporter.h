@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEDataSetAttributesImporter.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-14 12:04:13 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-05-15 16:29:32 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -106,7 +106,7 @@ protected:
   void SetFileExtension(const char *ext) {m_FileExtension = ext; };
   const char *GetFileExtension() {return m_FileExtension.GetCStr(); };
 
-  void SplitFileName();
+  int SplitFileName();
 	
   /** file access info */
   mafString m_FileName;
