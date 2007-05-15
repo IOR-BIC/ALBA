@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVMEDataSetAttributesImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-14 12:04:13 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-05-15 12:30:27 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -163,7 +163,7 @@ void mmoVMEDataSetAttributesImporter::CreateGui()
   m_Gui->Divider();
 
   m_Gui->Label("file prefix:",true);
-  m_Gui->FileOpen (ID_FilePrefix,	"",	&m_FilePrefix, wildcard);
+  m_Gui->String(ID_FilePrefix,	"",	&m_FilePrefix, wildcard);
   m_Gui->Divider();
 
   m_Gui->Bool(ID_UseTSFile,"use TS file:",&m_UseTSFile);
@@ -191,7 +191,7 @@ void mmoVMEDataSetAttributesImporter::EnableTimeVaryingGui( bool enable )
 {
   m_Gui->Enable(ID_FilePrefix, enable);
   m_Gui->Enable(ID_UseTSFile, enable);
-  m_Gui->Enable(ID_TSFileName, enable);
+  m_Gui->Enable(ID_TSFileName, enable && m_UseTSFile);
 }
 void mmoVMEDataSetAttributesImporter::OnEvent(mafEventBase *maf_event) 
 {
