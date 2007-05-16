@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgFileHistory.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-05-16 13:01:01 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -141,7 +141,10 @@ void mmgFileHistory::AddFilesToMenu()
         {
           wxString buf;
           buf.Printf(s_MRUEntryFormat, i+1, m_fileHistory[i]);
-          menu->Append(wxID_FILE1+i, buf);
+          if (menu->FindItem(buf) == -1)
+          {
+            menu->Append(wxID_FILE1+i, buf);
+          }
         }
       }
       node = node->GetNext();
@@ -161,7 +164,10 @@ void mmgFileHistory::AddFilesToMenu(wxMenu* menu)
       {
         wxString buf;
         buf.Printf(s_MRUEntryFormat, i+1, m_fileHistory[i]);
-        menu->Append(wxID_FILE1+i, buf);
+        if (menu->FindItem(buf) == -1)
+        {
+          menu->Append(wxID_FILE1+i, buf);
+        }
       }
     }
   }
