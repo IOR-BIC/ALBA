@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-12 10:00:06 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-05-16 13:01:44 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -156,6 +156,9 @@ protected:
   wxPanel      *m_BusyPanel;
   wxStaticText *m_BusyLabel;
   wxGauge      *m_Gauge;
+
+  int  m_MemoryLimitAlert; ///< Used to alert the user when memory decrease under this limit value.
+  bool m_UserAlerted;
 
   // AUI Layout Manager -  //SIL. 23-may-2006 : 
   mmgDockManager    m_DockManager;

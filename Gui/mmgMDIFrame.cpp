@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-12 10:01:02 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2007-05-16 13:01:44 $
+  Version:   $Revision: 1.19 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,47 +37,47 @@ class mmgMDIFrameCallback : public vtkCommand
 {
   public:
     static mmgMDIFrameCallback *New() {return new mmgMDIFrameCallback;}
-    mmgMDIFrameCallback() {m_mode=0; m_frame=NULL;};
+    mmgMDIFrameCallback() {m_mode=0; m_Frame=NULL;};
     void SetMode(int mode){m_mode=mode;};
-    void SetFrame(mmgMDIFrame *frame){m_frame=frame;};
+    void SetFrame(mmgMDIFrame *frame){m_Frame=frame;};
     virtual void Execute(vtkObject *caller, unsigned long, void*)
     {
-      assert(m_frame);
+      assert(m_Frame);
       if(caller->IsA("vtkProcessObject"))
       {
         vtkProcessObject *po = (vtkProcessObject*)caller;
 
         if(m_mode==0) // ProgressEvent-Callback
         {
-          m_frame->ProgressBarSetVal(po->GetProgress()*100);
+          m_Frame->ProgressBarSetVal(po->GetProgress()*100);
           //mafLogMessage("progress = %g", po->GetProgress()*100);
         }
         else if(m_mode==1) // StartEvent-Callback
         {
-          m_frame->ProgressBarShow();
-          m_frame->ProgressBarSetVal(0);
-          m_frame->ProgressBarSetText(&wxString(po->GetClassName()));
+          m_Frame->ProgressBarShow();
+          m_Frame->ProgressBarSetVal(0);
+          m_Frame->ProgressBarSetText(&wxString(po->GetClassName()));
         }
         else if(m_mode==2) // EndEvent-Callback
         {
-          m_frame->ProgressBarHide();
+          m_Frame->ProgressBarHide();
         }
       } 
       else if(caller->IsA("vtkViewport"))
       {
         if(m_mode==1) // StartRenderingEvent-Callback
         {
-          m_frame->RenderStart();
+          m_Frame->RenderStart();
         }
         else if(m_mode==2) // StartRenderingEvent-Callback
         {
-          m_frame->RenderEnd();
+          m_Frame->RenderEnd();
         }
       }
     }
   protected:  
     int m_mode;
-    mmgMDIFrame *m_frame;
+    mmgMDIFrame *m_Frame;
 };
 #endif //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -114,6 +114,9 @@ mmgMDIFrame::mmgMDIFrame(const wxString& title, const wxPoint& pos, const wxSize
   m_DockManager.Update();
   m_DockSettings = new mmgDockSettings(m_DockManager);
 
+  m_MemoryLimitAlert = 50; // 50 MB is the default low limit to alert the user.
+  m_UserAlerted = false;
+
   m_Listener = NULL;
   CreateStatusbar();
   Centre();
@@ -141,7 +144,7 @@ mmgMDIFrame::mmgMDIFrame(const wxString& title, const wxPoint& pos, const wxSize
 }
 
 //----------------------------------------------------------------------------
-mmgMDIFrame::~mmgMDIFrame( ) 
+mmgMDIFrame::~mmgMDIFrame()
 //----------------------------------------------------------------------------
 {
 #ifdef MAF_USE_VTK
@@ -159,13 +162,10 @@ mmgMDIFrame::~mmgMDIFrame( )
 void mmgMDIFrame::OnMenu(wxCommandEvent& e)
 //----------------------------------------------------------------------------
 { 
-	 //SIL. 30-may-2006 : to be cleaned
-	 //cosi non va -- ho l'ID del Dock ma mi serve il puntatore 
-	
 	//if(e.GetId() > SASH_START && e.GetId() < SASH_END )
 	//  ShowDockPane(e.GetId(), !DockPaneIsShown( (wxWindow*)(e.GetEventObject())) );
 	// else
-	  mafEventMacro(mafEvent(this,e.GetId()));
+  mafEventMacro(mafEvent(this,e.GetId()));
 }
 //----------------------------------------------------------------------------
 void mmgMDIFrame::OnMenuOp(wxCommandEvent& e)
@@ -252,13 +252,18 @@ void mmgMDIFrame::CreateStatusbar()
 void mmgMDIFrame::OnIdle(wxIdleEvent& event)
 //----------------------------------------------------------------------------
 { 
-  // @@@   //SIL. 29-3-2005: 
   #ifdef __WIN32__
 	MEMORYSTATUS ms;
 	GlobalMemoryStatus( &ms );
   wxString s;
-  s << "free mem " << ms.dwAvailPhys/1000000 << " mb";   
+  int current_free_memory = ms.dwAvailPhys/1000000;
+  s << "free mem " << current_free_memory << " mb";   
   SetStatusText(s,5);
+  if (current_free_memory < m_MemoryLimitAlert && !m_UserAlerted)
+  {
+    m_UserAlerted = true;
+    wxMessageBox(_("Program is running with few free memory!! \nYou should save your work and free memory before continue."), _("Warning"));
+  }
 	#endif
 }
 //-----------------------------------------------------------
