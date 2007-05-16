@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDockManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-09 17:52:17 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-05-16 13:00:10 $
+  Version:   $Revision: 1.5 $
   Authors:   Benjamin I. Williams
 ==========================================================================
   Copyright:   (C) Copyright 2005, Kirix Corporation, All Rights Reserved.
@@ -4210,7 +4210,7 @@ void mmgDockManager::AddMenuItem(wxWindow* window,const wxString& caption)
     wxMenuBar* menubar = this->m_frame->GetMenuBar();
     if ( menubar )
     {
-      int idx = menubar->FindMenu("View");
+      int idx = menubar->FindMenu(_("&View"));
       if( idx != wxNOT_FOUND)
       {
         wxMenu *m = menubar->GetMenu(idx);
