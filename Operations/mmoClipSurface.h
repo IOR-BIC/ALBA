@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoClipSurface.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-10 09:07:40 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-05-17 15:58:55 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,6 +30,9 @@ class mmiCompositorMouse;
 class mmiGenericMouse;
 class mafVMESurface;
 class mafVMEGizmo;
+class mafGizmoTranslate;
+class mafGizmoRotate;
+class mafGizmoScale;
 
 class vtkPlane;
 class vtkPolyData;
@@ -64,6 +67,13 @@ public:
     MODE_SURFACE = 0,
     MODE_IMPLICIT_FUNCTION
   };
+
+	enum GIZMO_TYPE
+	{
+		GIZMO_TRANSLATE = 0,
+		GIZMO_ROTATE,
+		GIZMO_SCALE,
+	};
   
  	class mafSurfaceAccept : public mmgVMEChooserAccept
 	{
@@ -99,11 +109,30 @@ protected:
   /** Show/hide the gizmo representing the clipping implicit plane. */
   void ShowClipPlane(bool show);
 
+	/** Show/hide the gizmo for scaling implicit plane. */
+	void ShowGizmoScale(bool show);
+
   /** Attach the interaction to the implicit plane. */
   void AttachInteraction();
 
   /** Update interactor ref sys*/
   void UpdateISARefSys();
+
+	/** Create the GUI */
+	void CreateGui();
+
+	void CreateGizmos();
+
+	/** Change type of gizmo in the view */
+	void ChangeGizmo();
+
+	void OnEventThis(mafEventBase *maf_event);
+	void OnEventGizmoTranslate(mafEventBase *maf_event);
+	void OnEventGizmoRotate(mafEventBase *maf_event);
+	void OnEventGizmoScale(mafEventBase *maf_event);
+	void OnEventGizmoPlane(mafEventBase *maf_event);
+
+	void PostMultiplyEventMatrix(mafEventBase *maf_event);
 
   mafVMESurface   *m_ClipperVME;
 	mafVMESurface   *m_ClippedVME;
@@ -121,10 +150,12 @@ protected:
 	vtkPolyData *m_ResultPolyData;
 	vtkPolyData *m_ClippedPolyData;
 
-  int  m_ClipModality;
-  int  ClipInside;
-	int m_GenerateClippedOutput;
-  bool PlaneCreated;
+  int		m_ClipModality;
+	int		m_GizmoType;
+  int		ClipInside;
+	int   m_UseGizmo;
+	int		m_GenerateClippedOutput;
+  bool	PlaneCreated;
 
 	double m_PlaneWidth;
 	double m_PlaneHeight;
@@ -132,5 +163,9 @@ protected:
 	vtkPlaneSource	*m_PlaneSource;
 	vtkArrowSource	*m_ArrowShape;
 	vtkAppendPolyData	*m_Gizmo;
+
+	mafGizmoTranslate		*m_GizmoTranslate;
+	mafGizmoRotate			*m_GizmoRotate;
+	mafGizmoScale				*m_GizmoScale;
 };
 #endif

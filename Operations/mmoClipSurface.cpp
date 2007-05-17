@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-10 09:07:40 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-05-17 15:58:55 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,6 +32,9 @@
 
 #include "mafSmartPointer.h"
 #include "mafVMEGizmo.h"
+#include "mafGizmoTranslate.h"
+#include "mafGizmoRotate.h"
+#include "mafGizmoScale.h"
 #include "mafAbsMatrixPipe.h"
 #include "mafTransform.h"
 
@@ -77,7 +80,9 @@ mafOp(label)
 	m_ClippedPolyData = NULL;
   
   ClipInside      = 1;
+	m_UseGizmo			=	1;
   m_ClipModality  = MODE_IMPLICIT_FUNCTION;
+	m_GizmoType			= GIZMO_TRANSLATE;
   
   PlaneCreated = false;
 
@@ -87,12 +92,20 @@ mafOp(label)
 	m_PlaneSource	= NULL;
 	m_Gizmo				= NULL;
 	m_ArrowShape	= NULL;
+
+	m_GizmoTranslate	= NULL;
+	m_GizmoRotate			= NULL;
+	m_GizmoScale			= NULL;
 }
 
 //----------------------------------------------------------------------------
 mmoClipSurface::~mmoClipSurface()
 //----------------------------------------------------------------------------
 {
+	cppDEL(m_GizmoTranslate);
+	cppDEL(m_GizmoRotate);
+	cppDEL(m_GizmoScale);
+
   mafDEL(m_IsaCompositor);
 	mafDEL(m_ClippedVME);
   vtkDEL(m_ClipperPlane);
@@ -125,6 +138,8 @@ enum CLIP_SURFACE_ID
 	ID_GENERATE_CLIPPED_OUTPUT,
 	ID_PLANE_WIDTH,
 	ID_PLANE_HEIGHT,
+	ID_CHOOSE_GIZMO,
+	ID_USE_GIZMO,
 };
 
 //----------------------------------------------------------------------------
@@ -133,8 +148,6 @@ void mmoClipSurface::OpRun()
 {
   vtkNEW(m_Clipper);
 
-  wxString clip_by_choices[2] = {"surface","implicit function"};
-
   vtkNEW(m_OldSurface);
   m_OldSurface->DeepCopy((vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData());
   
@@ -142,120 +155,298 @@ void mmoClipSurface::OpRun()
 
 	if(!m_TestMode)
 	{
-		m_Gui = new mmgGui(this);
-		m_Gui->Divider();
-		m_Gui->Combo(ID_CLIP_BY,_("clip by"),&m_ClipModality,2,clip_by_choices);
-		m_Gui->Button(ID_CHOOSE_SURFACE,_("clipper surface"));
-		m_Gui->Bool(ID_CLIP_INSIDE,_("reverse clipping"),&ClipInside,1);
-		double b[6];
-		((mafVME *)m_Input)->GetOutput()->GetVMEBounds(b);
-		// bounding box dim
-		m_PlaneWidth = b[1] - b[0];
-		m_PlaneHeight = b[3] - b[2];
-		m_Gui->Double(ID_PLANE_WIDTH,_("plane w."),&m_PlaneWidth,0.0);
-		m_Gui->Double(ID_PLANE_HEIGHT,_("plane h."),&m_PlaneHeight,0.0);
-		m_Gui->Divider();
-		m_Gui->Bool(ID_GENERATE_CLIPPED_OUTPUT,_("generate clipped output"),&m_GenerateClippedOutput,1);
-		m_Gui->OkCancel();
-		m_Gui->Enable(ID_GENERATE_CLIPPED_OUTPUT, m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION);
-		m_Gui->Enable(ID_CHOOSE_SURFACE, m_ClipModality == mmoClipSurface::MODE_SURFACE);
-		m_Gui->Enable(wxOK,m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION);
-	  
-		m_Gui->Divider();
+		CreateGui();
 
 		ShowGui();
 	  
 		ShowClipPlane(m_ClipModality != mmoClipSurface::MODE_SURFACE);
+		//ShowGizmoScale(m_ClipModality != mmoClipSurface::MODE_SURFACE);
+		CreateGizmos();
+		ChangeGizmo();
+	}
+}
+//----------------------------------------------------------------------------
+void mmoClipSurface::CreateGizmos()
+//----------------------------------------------------------------------------
+{
+	m_ImplicitPlaneGizmo->GetOutput()->GetVTKData()->ComputeBounds();
+	m_ImplicitPlaneGizmo->Modified();
+	m_ImplicitPlaneGizmo->Update();
+
+	m_GizmoTranslate = new mafGizmoTranslate(mafVME::SafeDownCast(m_ImplicitPlaneGizmo), this);
+	m_GizmoTranslate->SetRefSys(m_ImplicitPlaneGizmo);
+	m_GizmoTranslate->Show(false);
+	m_GizmoRotate = new mafGizmoRotate(mafVME::SafeDownCast(m_ImplicitPlaneGizmo), this);
+	m_GizmoRotate->SetRefSys(m_ImplicitPlaneGizmo);
+	m_GizmoRotate->Show(false);
+	m_GizmoScale = new mafGizmoScale(mafVME::SafeDownCast(m_ImplicitPlaneGizmo), this);
+	m_GizmoScale->SetRefSys(m_ImplicitPlaneGizmo);
+	m_GizmoScale->Show(false);
+}
+//----------------------------------------------------------------------------
+void mmoClipSurface::CreateGui()
+//----------------------------------------------------------------------------
+{
+	m_Gui = new mmgGui(this);
+	m_Gui->Divider();
+	wxString clip_by_choices[2] = {"surface","implicit function"};
+	m_Gui->Combo(ID_CLIP_BY,_("clip by"),&m_ClipModality,2,clip_by_choices);
+	m_Gui->Bool(ID_USE_GIZMO,_("use gizmo"),&m_UseGizmo,1);
+	wxString gizmo_name[3] = {"translate","rotate","scale"};
+	m_Gui->Combo(ID_CHOOSE_GIZMO,_("gizmo"),&m_GizmoType,3,gizmo_name);
+	m_Gui->Button(ID_CHOOSE_SURFACE,_("clipper surface"));
+	m_Gui->Bool(ID_CLIP_INSIDE,_("reverse clipping"),&ClipInside,1);
+	double b[6];
+	((mafVME *)m_Input)->GetOutput()->GetVMEBounds(b);
+	// bounding box dim
+	m_PlaneWidth = b[1] - b[0];
+	m_PlaneHeight = b[3] - b[2];
+	m_Gui->Double(ID_PLANE_WIDTH,_("plane w."),&m_PlaneWidth,0.0);
+	m_Gui->Double(ID_PLANE_HEIGHT,_("plane h."),&m_PlaneHeight,0.0);
+	m_Gui->Divider();
+	m_Gui->Bool(ID_GENERATE_CLIPPED_OUTPUT,_("generate clipped output"),&m_GenerateClippedOutput,1);
+	m_Gui->OkCancel();
+
+	m_Gui->Enable(ID_GENERATE_CLIPPED_OUTPUT, m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION);
+	m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION);
+	m_Gui->Enable(ID_CHOOSE_SURFACE, m_ClipModality == mmoClipSurface::MODE_SURFACE);
+	m_Gui->Enable(wxOK,m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION);
+
+	m_Gui->Divider();
+}
+//----------------------------------------------------------------------------
+void mmoClipSurface::OnEventThis(mafEventBase *maf_event)
+//----------------------------------------------------------------------------
+{
+	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+	{
+		switch(e->GetId())
+		{
+		case ID_CHOOSE_SURFACE:
+			{
+				mafString title = "Choose m_Clipper Surface";
+				e->SetArg((long)m_SurfaceAccept);
+				e->SetString(&title);
+				e->SetId(VME_CHOOSE);
+				mafEventMacro(*e);
+				m_ClipperVME = mafVMESurface::SafeDownCast(e->GetVme());
+				if(m_ClipperVME == NULL)
+					return;
+				m_Gui->Enable(wxOK,true);
+			}
+			break;
+		case ID_CLIP_INSIDE:
+			if(m_Arrow) 
+			{
+				m_Arrow->SetScaleFactor(-1 * m_Arrow->GetScaleFactor());
+				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+			}
+			break;
+		case ID_CLIP_BY:
+			m_Gui->Enable(ID_CHOOSE_SURFACE, m_ClipModality == mmoClipSurface::MODE_SURFACE);
+			m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION  && m_UseGizmo);
+			m_Gui->Enable(ID_GENERATE_CLIPPED_OUTPUT, m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION);
+			m_Gui->Enable(wxOK,m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION);
+			ClipInside = m_ClipModality;
+			m_Gui->Update();
+			ShowClipPlane(m_ClipModality != mmoClipSurface::MODE_SURFACE);
+			ChangeGizmo();
+			break;
+		case ID_PLANE_WIDTH:
+		case ID_PLANE_HEIGHT:
+			{
+				if(PlaneCreated)
+				{
+					m_PlaneSource->SetPoint1(m_PlaneWidth/2,-m_PlaneHeight/2, 0);
+					m_PlaneSource->SetPoint2(-m_PlaneWidth/2, m_PlaneHeight/2, 0);
+					m_PlaneSource->SetOrigin(-m_PlaneWidth/2,-m_PlaneHeight/2, 0);
+					m_PlaneSource->Update();
+					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				}
+			}
+			break;
+		case ID_CHOOSE_GIZMO:
+			{
+				ChangeGizmo();
+			}
+			break;
+		case ID_USE_GIZMO:
+			{
+				if(m_IsaCompositor && !m_UseGizmo)
+					m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositor);
+				else if(m_UseGizmo)
+					m_ImplicitPlaneGizmo->SetBehavior(NULL);
+
+				m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION  && m_UseGizmo);
+				
+				ChangeGizmo();
+			}
+			break;
+		case wxOK:
+			{
+				int clip_result = Clip();
+				if (clip_result == MAF_ERROR)
+				{
+					wxMessageBox("Error while clipping surface!!", "Clipping Error");
+					OpStop(OP_RUN_CANCEL);
+				}
+				OpStop(OP_RUN_OK);
+			}
+			break;
+		case wxCANCEL:
+			OpStop(OP_RUN_CANCEL);
+			break;
+		default:
+			mafEventMacro(*e);
+			break; 
+		}
+	}
+}
+//----------------------------------------------------------------------------
+void mmoClipSurface::OnEventGizmoTranslate(mafEventBase *maf_event)
+//----------------------------------------------------------------------------
+{
+	switch(maf_event->GetId())
+	{
+	case ID_TRANSFORM:
+		{    
+			// post multiplying matrixes coming from the gizmo to the vme
+			// gizmo does not set vme pose  since they cannot scale
+			PostMultiplyEventMatrix(maf_event);
+		}
+		break;
+
+	default:
+		{
+			mafEventMacro(*maf_event);
+		}
+	}
+}
+//----------------------------------------------------------------------------
+void mmoClipSurface::OnEventGizmoRotate(mafEventBase *maf_event)
+//----------------------------------------------------------------------------
+{
+	switch(maf_event->GetId())
+	{
+	case ID_TRANSFORM:
+		{    
+			// post multiplying matrixes coming from the gizmo to the vme
+			// gizmo does not set vme pose  since they cannot scale
+			PostMultiplyEventMatrix(maf_event);
+		}
+		break;
+
+	default:
+		{
+			mafEventMacro(*maf_event);
+		}
+	}
+}
+//----------------------------------------------------------------------------
+void mmoClipSurface::OnEventGizmoScale(mafEventBase *maf_event)
+//----------------------------------------------------------------------------
+{ 
+	switch(maf_event->GetId())
+	{
+	case ID_TRANSFORM:
+		{ 
+			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		}
+		break;
+
+	default:
+		{
+			mafEventMacro(*maf_event);
+		}
+	}
+}
+//----------------------------------------------------------------------------
+void mmoClipSurface::OnEventGizmoPlane(mafEventBase *maf_event)
+//----------------------------------------------------------------------------
+{
+	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+	{
+		switch(maf_event->GetId())
+		{
+		case ID_TRANSFORM:
+			{
+				vtkTransform *currTr = vtkTransform::New();
+				currTr->PostMultiply();
+				currTr->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix());
+				currTr->Concatenate(e->GetMatrix()->GetVTKMatrix());
+				currTr->Update();
+
+				mafMatrix newAbsMatr;
+				newAbsMatr.DeepCopy(currTr->GetMatrix());
+				newAbsMatr.SetTimeStamp(m_ImplicitPlaneGizmo->GetTimeStamp());
+
+				// set the new pose to the gizmo
+				m_ImplicitPlaneGizmo->SetAbsMatrix(newAbsMatr);
+				UpdateISARefSys();
+
+				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				currTr->Delete();
+			}
+			break;
+		default:
+			{
+				mafEventMacro(*maf_event);
+			}
+		}
 	}
 }
 //----------------------------------------------------------------------------
 void mmoClipSurface::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
-  {
-    switch(e->GetId())
-    {
-      case ID_CHOOSE_SURFACE:
-      {
-        mafString title = "Choose m_Clipper Surface";
-        e->SetArg((long)m_SurfaceAccept);
-        e->SetString(&title);
-        e->SetId(VME_CHOOSE);
-        mafEventMacro(*e);
-        m_ClipperVME = mafVMESurface::SafeDownCast(e->GetVme());
-        if(m_ClipperVME == NULL)
-          return;
-        m_Gui->Enable(wxOK,true);
-      }
-      break;
-      case ID_CLIP_INSIDE:
-      if(m_Arrow) 
-      {
-        m_Arrow->SetScaleFactor(-1 * m_Arrow->GetScaleFactor());
-        mafEventMacro(mafEvent(this, CAMERA_UPDATE));
-      }
-      break;
-      case ID_CLIP_BY:
-        m_Gui->Enable(ID_CHOOSE_SURFACE, m_ClipModality == mmoClipSurface::MODE_SURFACE);
-				m_Gui->Enable(ID_GENERATE_CLIPPED_OUTPUT, m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION);
-        m_Gui->Enable(wxOK,m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION);
-        ClipInside = m_ClipModality;
-        m_Gui->Update();
-        ShowClipPlane(m_ClipModality != mmoClipSurface::MODE_SURFACE);
-      break;
-      case ID_TRANSFORM:
-      {
-        vtkTransform *currTr = vtkTransform::New();
-        currTr->PostMultiply();
-        currTr->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix());
-        currTr->Concatenate(e->GetMatrix()->GetVTKMatrix());
-        currTr->Update();
-
-        mafMatrix newAbsMatr;
-        newAbsMatr.DeepCopy(currTr->GetMatrix());
-        newAbsMatr.SetTimeStamp(m_ImplicitPlaneGizmo->GetTimeStamp());
-
-        // set the new pose to the gizmo
-        m_ImplicitPlaneGizmo->SetAbsMatrix(newAbsMatr);
-        UpdateISARefSys();
-
-        mafEventMacro(mafEvent(this, CAMERA_UPDATE));
-        currTr->Delete();
-      }
-      break;
-			case ID_PLANE_WIDTH:
-			case ID_PLANE_HEIGHT:
-				{
-					if(PlaneCreated)
-					{
-						m_PlaneSource->SetPoint1(m_PlaneWidth/2,-m_PlaneHeight/2, 0);
-						m_PlaneSource->SetPoint2(-m_PlaneWidth/2, m_PlaneHeight/2, 0);
-						m_PlaneSource->SetOrigin(-m_PlaneWidth/2,-m_PlaneHeight/2, 0);
-						m_PlaneSource->Update();
-						mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-					}
-				}
+	if (maf_event->GetSender() == this->m_Gui) // from this operation gui
+	{
+		OnEventThis(maf_event); 
+	}
+	else if(maf_event->GetSender() == this->m_GizmoTranslate)
+	{
+		OnEventGizmoTranslate(maf_event);
+	}
+	else if(maf_event->GetSender() == this->m_GizmoRotate)
+	{
+		OnEventGizmoRotate(maf_event);
+	}
+	else if(maf_event->GetSender() == this->m_GizmoScale)
+	{
+		OnEventGizmoScale(maf_event);
+	}
+	else
+	{
+		OnEventGizmoPlane(maf_event);
+	}
+}
+//----------------------------------------------------------------------------
+void mmoClipSurface::ChangeGizmo()
+//----------------------------------------------------------------------------
+{
+	if(m_ClipModality==mmoClipSurface::MODE_IMPLICIT_FUNCTION)
+	{
+		m_GizmoTranslate->Show(m_GizmoType==GIZMO_TRANSLATE && m_UseGizmo);
+		m_GizmoRotate->Show(m_GizmoType==GIZMO_ROTATE && m_UseGizmo);
+		m_GizmoScale->Show(m_GizmoType==GIZMO_SCALE && m_UseGizmo,m_GizmoType==GIZMO_SCALE && m_UseGizmo,false,m_GizmoType==GIZMO_SCALE && m_UseGizmo);
+		
+		if(m_UseGizmo)
+		{
+			switch(m_GizmoType)
+			{
+			case GIZMO_TRANSLATE:
+				m_GizmoTranslate->SetRefSys(m_ImplicitPlaneGizmo);
 				break;
-      case wxOK:
-      {
-        int clip_result = Clip();
-        if (clip_result == MAF_ERROR)
-        {
-          wxMessageBox("Error while clipping surface!!", "Clipping Error");
-          OpStop(OP_RUN_CANCEL);
-        }
-        OpStop(OP_RUN_OK);
-      }
-      break;
-      case wxCANCEL:
-        OpStop(OP_RUN_CANCEL);
-      break;
-      default:
-        mafEventMacro(*e);
-      break; 
-    }
-  }
+			case GIZMO_ROTATE:
+				m_GizmoRotate->SetRefSys(m_ImplicitPlaneGizmo);
+				break;
+			case GIZMO_SCALE:
+				m_GizmoScale->SetRefSys(m_ImplicitPlaneGizmo);
+				break;
+			}
+		}
+		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	}
 }
 //----------------------------------------------------------------------------
 void mmoClipSurface::OpStop(int result)
@@ -272,6 +463,10 @@ void mmoClipSurface::OpStop(int result)
 	vtkDEL(m_Gizmo);
 	vtkDEL(m_ArrowShape);
 	vtkDEL(m_PlaneSource);
+
+	m_GizmoTranslate->Show(false);
+	m_GizmoRotate->Show(false);
+	m_GizmoScale->Show(false);
 
   HideGui();
   mafEventMacro(mafEvent(this,result));
@@ -393,6 +588,38 @@ int mmoClipSurface::Clip()
   return MAF_OK;
 }
 //----------------------------------------------------------------------------
+void mmoClipSurface::PostMultiplyEventMatrix(mafEventBase *maf_event)
+//----------------------------------------------------------------------------
+{
+	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+	{
+		long arg = e->GetArg();
+
+		// handle incoming transform events
+		vtkTransform *tr = vtkTransform::New();
+		tr->PostMultiply();
+		tr->SetMatrix(((mafVME *)m_ImplicitPlaneGizmo)->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+		tr->Concatenate(e->GetMatrix()->GetVTKMatrix());
+		tr->Update();
+
+		mafMatrix absPose;
+		absPose.DeepCopy(tr->GetMatrix());
+		absPose.SetTimeStamp(0.0);
+
+		if (arg == mmiGenericMouse::MOUSE_MOVE)
+		{
+			// move vme
+			((mafVME *)m_ImplicitPlaneGizmo)->SetAbsMatrix(absPose);
+			// update matrix for OpDo()
+			//m_NewAbsMatrix = absPose;
+		} 
+		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+
+		// clean up
+		tr->Delete();
+	}
+}
+//----------------------------------------------------------------------------
 void mmoClipSurface::ShowClipPlane(bool show)
 //----------------------------------------------------------------------------
 {
@@ -505,7 +732,8 @@ void mmoClipSurface::AttachInteraction()
   m_IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
   m_IsaTranslate->EnableTranslation(true);
 
-  m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositor);
+	if(!m_UseGizmo)
+		m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositor);
 }
 
 //----------------------------------------------------------------------------
