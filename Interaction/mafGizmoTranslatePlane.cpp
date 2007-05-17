@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslatePlane.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-14 09:22:17 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-05-17 15:58:10 $
+  Version:   $Revision: 1.11 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -148,7 +148,10 @@ void mafGizmoTranslatePlane::CreatePipeline()
 {
   // calculate diagonal of InputVme space bounds 
   double b[6],p1[3],p2[3],d;
-  InputVme->GetOutput()->GetBounds(b);
+	if(InputVme->IsA("mafVMEGizmo"))
+		InputVme->GetOutput()->GetVTKData()->GetBounds(b);
+	else
+		InputVme->GetOutput()->GetBounds(b);
   p1[0] = b[0];
   p1[1] = b[2];
   p1[2] = b[4];
