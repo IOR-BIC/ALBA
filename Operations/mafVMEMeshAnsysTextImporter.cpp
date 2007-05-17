@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEMeshAnsysTextImporter.cpp,v $
 Language:  C++
-Date:      $Date: 2007-05-14 12:04:13 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2007-05-17 08:31:02 $
+Version:   $Revision: 1.7 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -418,7 +418,8 @@ if (input.is_open())
 
   num_prop = mat_name_vec.size();
 
-  for (int i = 0; i < num_prop; i++)
+  int i;
+  for (i = 0; i < num_prop; i++)
   {
   vcl_vector<double> tmp;
   tmp.push_back(tmp_vec[i]);
