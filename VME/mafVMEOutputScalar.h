@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputScalar.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-20 08:50:44 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-05-17 13:44:08 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class mafVMEGereric;
+class mafVMEGeneric;
 #ifdef MAF_USE_VTK
 class vtkPolyData;
 #endif //MAF_USE_VTK
