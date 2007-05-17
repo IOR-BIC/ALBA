@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScale.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-30 15:45:34 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-05-17 15:55:54 $
+  Version:   $Revision: 1.7 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -439,7 +439,16 @@ void mafGizmoScale::Show(bool show)
   // update the camera
 //  mafEventMacro(mafEvent(this, CAMERA_UPDATE));   // Paolo 20-07-2005
 }
+//----------------------------------------------------------------------------  
+void mafGizmoScale::Show(bool showX, bool showY, bool showZ, bool showIso)
+//----------------------------------------------------------------------------
+{
+	GSAxis[mafGizmoScale::X_AXIS]->Show(showX);
+	GSAxis[mafGizmoScale::Y_AXIS]->Show(showY);
+	GSAxis[mafGizmoScale::Z_AXIS]->Show(showZ);
 
+	GSIsotropic->Show(showIso);
+}
 //----------------------------------------------------------------------------
 mafMatrix *mafGizmoScale::GetAbsPose()
 //----------------------------------------------------------------------------

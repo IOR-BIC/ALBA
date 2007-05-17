@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScale.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-16 13:19:56 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-05-17 15:55:54 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -85,7 +85,8 @@ public:
   
   /**
   Show the gizmo*/
-  void Show(bool show);
+  void Show(bool show);  
+	void Show(bool showX, bool showY, bool showZ, bool showIso);
 
   /**
   Set the gizmo pose*/
