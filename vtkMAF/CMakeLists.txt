@@ -33,8 +33,6 @@ SET(vtkMAF_SRCS
   vtkImplicitPolyData.h
   vtkLocalAxisCoordinate.cxx
   vtkLocalAxisCoordinate.h
-  vtkPowerCrustSurfaceReconstruction.cxx
-  vtkPowerCrustSurfaceReconstruction.h
   vtkProjectRG.cxx
   vtkProjectRG.h
   vtkProjectSP.cxx
