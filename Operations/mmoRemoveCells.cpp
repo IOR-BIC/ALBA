@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoRemoveCells.cpp,v $
 Language:  C++
-Date:      $Date: 2007-03-21 11:36:07 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2007-05-17 10:17:07 $
+Version:   $Revision: 1.5 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -91,7 +91,7 @@ mafOp(label)
   m_Mesh = NULL;
   m_UnselectCells = 0;
   
-  m_NeighborCellPointIds = NULL;
+  m_NeighborCellPointIdList = NULL;
   m_InputPreserving = false;
 
   m_ResultPolydata	  = NULL;
@@ -132,7 +132,7 @@ void mmoRemoveCells::OpRun()
   int result = OP_RUN_CANCEL;
 
   CreateSurfacePipeline();
-  InitializeMesh();
+  CreateHelperStructures();
 
   if (m_TestMode == false)
   {
@@ -152,6 +152,7 @@ void mmoRemoveCells::OpRun()
 
     DeleteOpDialog();
 
+    DestroyHelperStructures();
     mafEventMacro(mafEvent(this,result));
   }
 }
@@ -373,7 +374,7 @@ void mmoRemoveCells::OnEvent(mafEventBase *maf_event)
   }
 }
 
-void mmoRemoveCells::TraverseMeshAndMark( double radius )
+void mmoRemoveCells::ExecuteMark( double radius )
 {
   
   vtkIdType cellId, ptId, numIds, idCellInWave;
@@ -448,61 +449,32 @@ void mmoRemoveCells::TraverseMeshAndMark( double radius )
 
 void mmoRemoveCells::MarkCellsInRadius(double radius){
 
-  vtkNEW(m_NeighborCellPointIds);
-
-  m_NeighborCellPointIds->Allocate(3);
-
   vtkIdType i;
-  vtkIdType numPts, numCells;
-  vtkPoints *inPts;
+  int numPts, numCells;
   vtkPolyData *polydata = vtkPolyData::SafeDownCast(((mafVME *)m_Input)->GetOutput()->GetVTKData());
 
-  //  Check input/allocate storage
-  //
-  inPts = polydata->GetPoints();
-
-  if (inPts == NULL)
-  {
-    mafLogMessage("No points!");
-    return;
-  }
-
-  numPts = inPts->GetNumberOfPoints();
-  numCells = polydata->GetNumberOfCells();
-
-  if ( numPts < 1 || numCells < 1 )
-  {
-    mafLogMessage("No data to connect!");
-    return;
-  }
  
   // Initialize.  Keep track of points and cells visited.
   //
 
   // heuristic
-  int maxVisitedCells = numCells;
-  m_VisitedCells = new int[maxVisitedCells];
-  for ( i=0; i < maxVisitedCells; i++ )
+  numPts = polydata->GetNumberOfCells();
+  
+  for ( i=numPts-1; i >= 0; --i )
   {
     m_VisitedCells[i] = -1;
   }
 
   // heuristic
-  int maxVisitedPoints = numPts;
-  m_VisitedPoints = new vtkIdType[maxVisitedPoints];  
-  for ( i=0; i < maxVisitedPoints; i++ )
+  numCells = polydata->GetNumberOfPoints();
+  
+  for ( i=numCells-1; i >=  0; --i )
   {
     m_VisitedPoints[i] = -1;
   }
 
   // Traverse all cells marking those visited. Connected region grows 
   // using a connected wave propagation.
-
-  vtkNEW(m_Wave);
-  m_Wave->Allocate(numPts);
-
-  vtkNEW(m_Wave2);
-  m_Wave2->Allocate(numPts);
 
   m_PointNumber = 0;
 
@@ -512,17 +484,12 @@ void mmoRemoveCells::MarkCellsInRadius(double radius){
   m_Wave->InsertNextId(m_CellSeed);
  
   //mark the seeded region
-  TraverseMeshAndMark(m_Diameter/2);
+  ExecuteMark(m_Diameter/2);
    
   m_Wave->Reset();
   m_Wave2->Reset();
-
-  delete [] m_VisitedCells;
-  delete [] m_VisitedPoints;
   
-  vtkDEL(m_NeighborCellPointIds);
-  vtkDEL(m_Wave);
-  vtkDEL(m_Wave2);
+  
 }
   
 
@@ -553,7 +520,7 @@ void mmoRemoveCells::FindTriangleCellCenter(vtkIdType id, double center[3])
   list->Delete();
 }
 
-void mmoRemoveCells::InitializeMesh()
+void mmoRemoveCells::CreateHelperStructures()
 {
   // Build cell structure
   //
@@ -561,8 +528,40 @@ void mmoRemoveCells::InitializeMesh()
   vtkPolyData *polydata = vtkPolyData::SafeDownCast(((mafVME *)m_Input)->GetOutput()->GetVTKData());
   assert(polydata);
 
+
+  if (polydata->GetPoints() == NULL)
+  {
+    mafLogMessage("No points!");
+    assert(false);
+  }
+
+
+  if ( polydata->GetNumberOfPoints() < 1 || polydata->GetNumberOfCells() < 1 )
+  {
+    mafLogMessage("No data to connect!");
+    assert(false);
+  }
+
   this->m_Mesh->CopyStructure(polydata);
   this->m_Mesh->BuildLinks();
+  
+  int maxVisitedCells = m_Mesh->GetNumberOfCells();
+  m_VisitedCells = new int[maxVisitedCells];
+
+  int maxVisitedPoints = m_Mesh->GetNumberOfPoints();
+  m_VisitedPoints = new vtkIdType[maxVisitedPoints];  
+  
+  vtkNEW(m_Wave);
+  m_Wave->Allocate(maxVisitedPoints);
+
+  vtkNEW(m_Wave2);
+  m_Wave2->Allocate(maxVisitedPoints);
+
+
+  vtkNEW(m_NeighborCellPointIdList);
+
+  m_NeighborCellPointIdList->Allocate(3);
+
 }
 
 void mmoRemoveCells::RemoveCells()
@@ -602,4 +601,15 @@ double mmoRemoveCells::EstimateTrianglesDimension()
   
   return (accumulator/probesNumber);
 
+}
+
+void mmoRemoveCells::DestroyHelperStructures()
+{
+  vtkDEL(m_Wave);
+  vtkDEL(m_Wave2);
+
+	delete [] m_VisitedCells;
+  delete [] m_VisitedPoints;
+
+  vtkDEL(m_NeighborCellPointIdList);
 }

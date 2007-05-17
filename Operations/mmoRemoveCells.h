@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRemoveCells.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-22 12:15:55 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-05-17 10:17:07 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -101,7 +101,7 @@ protected:
   void FindTriangleCellCenter(vtkIdType id, double center[3]);
 
   // used to support algorithm execution
-  vtkIdList *m_NeighborCellPointIds;
+  vtkIdList *m_NeighborCellPointIdList;
   int *m_VisitedCells;
   vtkIdType *m_VisitedPoints;
   int m_RegionNumber;
@@ -137,10 +137,11 @@ protected:
   void DeleteOpDialog();
 
   void CreateSurfacePipeline();
-  void TraverseMeshAndMark(double radius);
+  void ExecuteMark(double radius);
 	void MarkCellsInRadius(double radius);
 
-  void InitializeMesh();
+  void DestroyHelperStructures();
+  void CreateHelperStructures();
   double EstimateTrianglesDimension();
 
 };
