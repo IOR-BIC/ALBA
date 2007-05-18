@@ -38,8 +38,6 @@ SET(PROJECT_SRCS
   mmoCropDeformableROI.h
   mmoFlipNormals.cpp
   mmoFlipNormals.h
-  mmoSurfaceReconstruction.cpp
-  mmoSurfaceReconstruction.h
 )
 
 IF (MAF_USE_ITK)
