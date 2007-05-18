@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRemoveCells.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-17 10:17:07 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-05-18 14:47:22 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -144,5 +144,6 @@ protected:
   void CreateHelperStructures();
   double EstimateTrianglesDimension();
 
+  vtkIdList* m_TriangeCentreComputationList;
 };
 #endif

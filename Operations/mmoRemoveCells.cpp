@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoRemoveCells.cpp,v $
 Language:  C++
-Date:      $Date: 2007-05-17 10:17:07 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2007-05-18 14:47:22 $
+Version:   $Revision: 1.6 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -96,6 +96,8 @@ mafOp(label)
 
   m_ResultPolydata	  = NULL;
   m_OriginalPolydata  = NULL;
+
+  m_TriangeCentreComputationList = NULL;
 }
 //----------------------------------------------------------------------------
 mmoRemoveCells::~mmoRemoveCells()
@@ -339,6 +341,7 @@ void mmoRemoveCells::OnEvent(mafEventBase *maf_event)
 
       case VME_PICKED:
       {
+        
         double pos[3];
         vtkPoints *pts = NULL; 
         pts = (vtkPoints *)e->GetVtkObj();
@@ -453,10 +456,8 @@ void mmoRemoveCells::MarkCellsInRadius(double radius){
   int numPts, numCells;
   vtkPolyData *polydata = vtkPolyData::SafeDownCast(((mafVME *)m_Input)->GetOutput()->GetVTKData());
 
- 
   // Initialize.  Keep track of points and cells visited.
-  //
-
+  
   // heuristic
   numPts = polydata->GetNumberOfCells();
   
@@ -506,18 +507,15 @@ void mmoRemoveCells::FindTriangleCellCenter(vtkIdType id, double center[3])
 
   assert(m_Mesh->GetCell(id)->GetNumberOfPoints() == 3);
 
-  vtkIdList *list = vtkIdList::New();
-  list->SetNumberOfIds(3);
+  
+  m_Mesh->GetCellPoints(id, m_TriangeCentreComputationList);
 
-  m_Mesh->GetCellPoints(id, list);
-
-  m_Mesh->GetPoint(list->GetId(0),p0);
-  m_Mesh->GetPoint(list->GetId(1),p1);
-  m_Mesh->GetPoint(list->GetId(2),p2);
+  m_Mesh->GetPoint(m_TriangeCentreComputationList->GetId(0),p0);
+  m_Mesh->GetPoint(m_TriangeCentreComputationList->GetId(1),p1);
+  m_Mesh->GetPoint(m_TriangeCentreComputationList->GetId(2),p2);
 
   vtkTriangle::TriangleCenter(p0,p1,p2,center);
 
-  list->Delete();
 }
 
 void mmoRemoveCells::CreateHelperStructures()
@@ -527,7 +525,7 @@ void mmoRemoveCells::CreateHelperStructures()
   vtkNEW(m_Mesh);
   vtkPolyData *polydata = vtkPolyData::SafeDownCast(((mafVME *)m_Input)->GetOutput()->GetVTKData());
   assert(polydata);
-
+  
 
   if (polydata->GetPoints() == NULL)
   {
@@ -561,6 +559,10 @@ void mmoRemoveCells::CreateHelperStructures()
   vtkNEW(m_NeighborCellPointIdList);
 
   m_NeighborCellPointIdList->Allocate(3);
+  
+
+  m_TriangeCentreComputationList = vtkIdList::New();
+  m_TriangeCentreComputationList->SetNumberOfIds(3);
 
 }
 
@@ -612,4 +614,6 @@ void mmoRemoveCells::DestroyHelperStructures()
   delete [] m_VisitedPoints;
 
   vtkDEL(m_NeighborCellPointIdList);
+  
+  m_TriangeCentreComputationList->Delete();
 }
