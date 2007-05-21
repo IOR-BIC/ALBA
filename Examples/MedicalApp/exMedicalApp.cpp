@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: exMedicalApp.cpp,v $
 Language:  C++
-Date:      $Date: 2007-05-21 08:39:15 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2007-05-21 08:41:59 $
+Version:   $Revision: 1.7 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -267,9 +267,7 @@ bool exMedicalApp::OnInit()
 	//------------------------------------------------------------
 	// View Menu':
 	//------------------------------------------------------------
-
-		m_Logic->Plug(new mafViewVTK("VTK view"));
-#ifdef _DEBUG
+#ifndef _DEBUG
 	//View VTK
 	m_Logic->Plug(new mafViewVTK("VTK view"));
 	//View Arbitrary Slice
