@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: exMedicalApp.cpp,v $
 Language:  C++
-Date:      $Date: 2007-05-21 08:35:14 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2007-05-21 08:39:15 $
+Version:   $Revision: 1.6 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -64,80 +64,81 @@ MafMedical is partially based on OpenMAF.
 #include "mafPipeFactoryVME.h"
 #include "medPipeFactoryVME.h"
 
-//IMPORTERS
-#include "mmoImageImporter.h"
-#include "mmoVRMLImporter.h"
-#include "mmoVTKImporter.h"
-#include "mmoSTLImporter.h"
-#include "mmoMSF1xImporter.h"
-#include "mmoRAWImporterVolume.h"
-#include "mmoMeshImporter.h"
-#ifdef MAF_USE_ITK
-	#include "mmoASCIIImporter.h"
-	#include "mmoEMGImporterWS.h"
-	#include "mmoGRFImporterWS.h"
+#ifndef _DEBUG
+	//IMPORTERS
+	#include "mmoImageImporter.h"
+	#include "mmoVRMLImporter.h"
+	#include "mmoVTKImporter.h"
+	#include "mmoSTLImporter.h"
+	#include "mmoMSF1xImporter.h"
+	#include "mmoRAWImporterVolume.h"
+	#include "mmoMeshImporter.h"
+	#ifdef MAF_USE_ITK
+		#include "mmoASCIIImporter.h"
+		#include "mmoEMGImporterWS.h"
+		#include "mmoGRFImporterWS.h"
+	#endif
+	#include "mmoDICOMImporter.h"
+	#include "mmoCTAImporter.h"
+	#include "mmoCTMRIImporter.h"
+	#include "mmoLandmarkImporter.h"
+	#include "mmoLandmarkImporterTXT.h"
+	#include "mmoLandmarkImporterWS.h"
+	#include "mmoRAWImporterImages.h"
+	#include "mmoC3DImporter.h"
+	//EXPORTERS
+	#include "mmoMSFExporter.h"
+	#include "mmoRAWExporter.h"
+	#include "mmoSTLExporter.h"
+	#include "mmoVTKExporter.h"
+	#include "mmoLandmarkExporter.h"
+	//OPERATIONS
+	#include "mmo2DMeasure.h"
+	#include "mmoAddLandmark.h"
+	#include "mmoClipSurface.h"
+	#include "mmoCreateGroup.h"
+	#include "mmoCreateMeter.h"
+	#include "mmoCreateProber.h"
+	#include "mmoCreateRefSys.h"
+	#include "mmoCreateSlicer.h"
+	#include "mmoCrop.h"
+	#include "mmoEditMetadata.h"
+	#include "mmoExplodeCollapse.h"
+	#include "mmoExtractIsosurface.h"
+	#include "mmoFilterSurface.h"
+	#include "mmoFilterVolume.h"
+	#include "mmoMAFTransform.h"
+	#include "mmoReparentTo.h"
+	#include "mmoVolumeResample.h"
+	#include "mmoDecimateSurface.h"
+	#include "mmoConnectivitySurface.h"
+	#include "mmoBooleanSurface.h"
+	#include "mmoEditNormals.h"
+	#include "mmoCreateSurfaceParametric.h"
+	#include "mmoVOIDensity.h"
+	#ifdef MAF_USE_ITK
+		#include "mmoClassicICPRegistration.h"
+	#endif
+	#include "mmoCropDeformableROI.h"
+	#include "mmoMML.h"
+	#include "mmoMeshQuality.h"
+	#include "mmoVolumeMeasure.h"
+	#include "mmoRegisterClusters.h"
+	#include "mmoFlipNormals.h"
+	#include "mmoCreateSpline.h"
+	#include "mmoRemoveCells.h"
+	//VIEWS
+	#include "mafViewVTK.h"
+	#include "mafViewCompound.h"
+	#include "mafViewRXCompound.h"
+	#include "mafViewRXCT.h"
+	#include "mafViewOrthoSlice.h"
+	#include "mafViewArbitrarySlice.h"
+	#include "mafViewGlobalSliceCompound.h"
+	#include "mafViewSingleSliceCompound.h"
+	#include "mafViewImageCompound.h"
+	#include "mafView3D.h"
 #endif
-#include "mmoDICOMImporter.h"
-#include "mmoCTAImporter.h"
-#include "mmoCTMRIImporter.h"
-#include "mmoLandmarkImporter.h"
-#include "mmoLandmarkImporterTXT.h"
-#include "mmoLandmarkImporterWS.h"
-#include "mmoRAWImporterImages.h"
-#include "mmoC3DImporter.h"
-//EXPORTERS
-#include "mmoMSFExporter.h"
-#include "mmoRAWExporter.h"
-#include "mmoSTLExporter.h"
-#include "mmoVTKExporter.h"
-#include "mmoLandmarkExporter.h"
-//OPERATIONS
-#include "mmo2DMeasure.h"
-#include "mmoAddLandmark.h"
-#include "mmoClipSurface.h"
-#include "mmoCreateGroup.h"
-#include "mmoCreateMeter.h"
-#include "mmoCreateProber.h"
-#include "mmoCreateRefSys.h"
-#include "mmoCreateSlicer.h"
-#include "mmoCrop.h"
-#include "mmoEditMetadata.h"
-#include "mmoExplodeCollapse.h"
-#include "mmoExtractIsosurface.h"
-#include "mmoFilterSurface.h"
-#include "mmoFilterVolume.h"
-#include "mmoMAFTransform.h"
-#include "mmoReparentTo.h"
-#include "mmoVolumeResample.h"
-#include "mmoDecimateSurface.h"
-#include "mmoConnectivitySurface.h"
-#include "mmoBooleanSurface.h"
-#include "mmoEditNormals.h"
-#include "mmoCreateSurfaceParametric.h"
-#include "mmoVOIDensity.h"
-#ifdef MAF_USE_ITK
-	#include "mmoClassicICPRegistration.h"
-#endif
-#include "mmoCropDeformableROI.h"
-#include "mmoMML.h"
-#include "mmoMeshQuality.h"
-#include "mmoVolumeMeasure.h"
-#include "mmoRegisterClusters.h"
-#include "mmoFlipNormals.h"
-#include "mmoCreateSpline.h"
-#include "mmoRemoveCells.h"
-//VIEWS
-#include "mafViewVTK.h"
-#include "mafViewCompound.h"
-#include "mafViewRXCompound.h"
-#include "mafViewRXCT.h"
-#include "mafViewOrthoSlice.h"
-#include "mafViewArbitrarySlice.h"
-#include "mafViewGlobalSliceCompound.h"
-#include "mafViewSingleSliceCompound.h"
-#include "mafViewImageCompound.h"
-#include "mafView3D.h"
-
 //--------------------------------------------------------------------------------
 // Create the Application
 //--------------------------------------------------------------------------------
@@ -180,7 +181,7 @@ bool exMedicalApp::OnInit()
 	//------------------------------------------------------------
 	// Importer Menu':
 	//------------------------------------------------------------
-#ifdef _DEBUG
+#ifndef _DEBUG
 	m_Logic->Plug(new mmoImageImporter("Images"));
 	m_Logic->Plug(new mmoRAWImporterVolume("RAW Volume"));
 	m_Logic->Plug(new mmoSTLImporter("STL"));
@@ -210,7 +211,7 @@ bool exMedicalApp::OnInit()
 	//------------------------------------------------------------
 	// Exporter Menu':
 	//------------------------------------------------------------
-#ifdef _DEBUG
+#ifndef _DEBUG
 	m_Logic->Plug(new mmoMSFExporter("MSF"));
 	m_Logic->Plug(new mmoSTLExporter("STL"));
 	m_Logic->Plug(new mmoVTKExporter("VTK"));
@@ -222,8 +223,7 @@ bool exMedicalApp::OnInit()
 	//------------------------------------------------------------
 	// Operation Menu':
 	//------------------------------------------------------------
-	//MAF
-#ifdef _DEBUG
+#ifndef _DEBUG
 	m_Logic->Plug(new mmo2DMeasure("2D Measure"),"Measure");
 	m_Logic->Plug(new mmoVOIDensity("VOI Density"),"Measure");
 	m_Logic->Plug(new mmoVolumeMeasure("Volume"),"Measure");
@@ -268,6 +268,7 @@ bool exMedicalApp::OnInit()
 	// View Menu':
 	//------------------------------------------------------------
 
+		m_Logic->Plug(new mafViewVTK("VTK view"));
 #ifdef _DEBUG
 	//View VTK
 	m_Logic->Plug(new mafViewVTK("VTK view"));
