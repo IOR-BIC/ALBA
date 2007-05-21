@@ -20,6 +20,6 @@ ELSE (WIN32)
 ENDIF (WIN32)
 
 SET(PROJECT_LIBS
-  mafVME mafOperations medOperations vtkMAF
+  medOperations medViews medVME mafVME mafOperations vtkMAF
 )
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
