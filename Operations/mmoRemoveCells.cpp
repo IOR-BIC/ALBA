@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoRemoveCells.cpp,v $
 Language:  C++
-Date:      $Date: 2007-05-18 14:47:22 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2007-05-21 14:11:27 $
+Version:   $Revision: 1.7 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -501,13 +501,10 @@ void mmoRemoveCells::SetSeed( vtkIdType cellSeed )
 
 void mmoRemoveCells::FindTriangleCellCenter(vtkIdType id, double center[3])
 {
-  double p0[3] = {0,0,0};
-  double p1[3] = {0,0,0};
-  double p2[3] = {0,0,0};
 
-  assert(m_Mesh->GetCell(id)->GetNumberOfPoints() == 3);
 
-  
+    // assert(m_Mesh->GetCell(id)->GetNumberOfPoints() == 3);
+
   m_Mesh->GetCellPoints(id, m_TriangeCentreComputationList);
 
   m_Mesh->GetPoint(m_TriangeCentreComputationList->GetId(0),p0);
@@ -583,26 +580,6 @@ void mmoRemoveCells::RemoveCells()
 void mmoRemoveCells::MarkCells()
 {
   MarkCellsInRadius(m_Diameter/2);  
-}
-
-double mmoRemoveCells::EstimateTrianglesDimension()
-{
-  vtkPolyData *polydata = vtkPolyData::SafeDownCast(((mafVME *)m_Input)->GetOutput()->GetVTKData());
-  
-  int numTriangles = polydata->GetNumberOfCells();
-
-  int probesNumber =  numTriangles > 100 ? 100 : numTriangles;
-
-  double accumulator = 0;
-
-  for (int i = 0; i < numTriangles; i++)
-	{
-    double length =  sqrt(polydata->GetCell(i)->GetLength2());
-    accumulator += length ;
-	}
-  
-  return (accumulator/probesNumber);
-
 }
 
 void mmoRemoveCells::DestroyHelperStructures()

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRemoveCells.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-18 14:47:22 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-05-21 14:11:27 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,6 +44,7 @@ class vtkFixedCutter;
 class vtkPlane;
 class vtkVolume;
 class vtkRemoveCellsFilter;
+class vtkTriangle;
 
 //----------------------------------------------------------------------------
 // mmoRemoveCells :
@@ -142,8 +143,11 @@ protected:
 
   void DestroyHelperStructures();
   void CreateHelperStructures();
-  double EstimateTrianglesDimension();
-
+  
   vtkIdList* m_TriangeCentreComputationList;
+  vtkTriangle *m_DummyTriangle;
+  
+  // helper points here for fast computation
+  double p0[3],p1[3],p2[3];
 };
 #endif
