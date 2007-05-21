@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-14 09:35:56 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-05-21 09:01:24 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,18 +36,6 @@ class mafTagArray;
 class mafVMEVolumeGray;
 class mafVMEImage;
 class vtkImageData;
-
-//----------------------------------------------------------------------------
-// constants :
-//----------------------------------------------------------------------------
-enum DICOM_IMPORTER_MODALITY
-{
-	CROP_SELECTED,
-	ADD_CROP_ITEM,
-	GIZMO_NOT_EXIST,
-	GIZMO_RESIZING,
-	GIZMO_DONE
-};
 
 //WX_DECLARE_LIST(mmoCineMRIImporterListElement, ListDicomCineMRIFiles);
 WX_DECLARE_LIST(mmoDICOMImporterListElement, ListDicomFiles);

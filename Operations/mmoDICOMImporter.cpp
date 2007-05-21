@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-05 09:30:56 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2007-05-21 09:01:24 $
+  Version:   $Revision: 1.19 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -68,6 +68,18 @@ WX_DEFINE_LIST(ListDicomFiles);
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mmoDICOMImporter);
 //----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+// constants :
+//----------------------------------------------------------------------------
+enum DICOM_IMPORTER_MODALITY
+{
+	CROP_SELECTED,
+	ADD_CROP_ITEM,
+	GIZMO_NOT_EXIST,
+	GIZMO_RESIZING,
+	GIZMO_DONE
+};
 
 //----------------------------------------------------------------------------
 mmoDICOMImporter::mmoDICOMImporter(wxString label) : mafOp(label)
