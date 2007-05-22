@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:38:13 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-05-22 11:20:53 $
+  Version:   $Revision: 1.7 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -123,6 +123,7 @@ mafVMEAdvancedProber::mafVMEAdvancedProber()
   SetDataPipe(dpipe);
 
 	m_Fixed = 0;
+  //m_AutomaticCalculum = 1;
 }
 
 //-------------------------------------------------------------------------
@@ -173,6 +174,7 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
 //-----------------------------------------------------------------------
 {
   //wxBusyCursor wait;
+  //if(m_AutomaticCalculum == 0) return;
 	
   mafVME *vol = mafVME::SafeDownCast(GetVolumeLink());
   mafVMEPolylineSpline *vme;
@@ -1299,7 +1301,7 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
 void mafVMEAdvancedProber::InternalPreUpdate()
 //-----------------------------------------------------------------------
 {
-	int a = 0;
+	
 }
 
 //-------------------------------------------------------------------------
@@ -1486,6 +1488,7 @@ mmgGui* mafVMEAdvancedProber::CreateGui()
   wxString prober_mode[2] = {_("density"), _("distance")};
   m_Gui->Combo(ID_MODALITY,_("modality"), &m_ProberMode, 2, prober_mode);*/
 
+  m_Gui->Button(ID_UPDATE,_("Update"),_(""));
 	m_Gui->Label("");
   return m_Gui;
 }
@@ -1617,6 +1620,8 @@ void mafVMEAdvancedProber::OnEvent(mafEventBase *maf_event)
 			case ID_SPLINE:
       case ID_PROFILE_NUMBER:
       case ID_PROFILE_DISTANCE:
+      break;
+      case ID_UPDATE:
         //InternalUpdate();
         Modified();
         ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
