@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-20 12:40:25 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-05-22 11:20:04 $
+  Version:   $Revision: 1.14 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -123,7 +123,7 @@ void mafViewSingleSlice::Create()
 
   vtkNEW(m_Picker3D);
   vtkNEW(m_Picker2D);
-  m_Picker2D->SetTolerance(0.001);
+  m_Picker2D->SetTolerance(0.0001);
   m_Picker2D->InitializePickList();
 
   // text stuff
@@ -827,4 +827,11 @@ void mafViewSingleSlice::VmeShow(mafNode *node, bool show)
     }
   }
 
+}
+//----------------------------------------------------------------------------
+void mafViewSingleSlice::SetPickerTolerance(double tolerance)
+//----------------------------------------------------------------------------
+{
+  m_Picker2D->SetTolerance(tolerance);
+  m_Picker2D->Modified();
 }

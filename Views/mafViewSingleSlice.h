@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.h,v $
   Language:  C++
-  Date:      $Date: 2007-01-23 15:37:24 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-05-22 11:20:04 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,6 +51,11 @@ public:
   /** 
   Set the visualization status for the node (visible, not visible, mutex, ...) \sa mafSceneGraph mafView*/
   virtual int GetNodeStatus(mafNode *vme);
+
+  /** 
+  Set tolerance of the Picker*/
+  void SetPickerTolerance(double tolerance);
+
 
   /** IDs for the view GUI */
   enum VIEW_SLICE_WIDGET_ID
