@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiCompositorMouse.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 15:19:57 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-05-22 15:59:26 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -64,9 +64,22 @@ enum MOUSE_BUTTON
 /** Associates instances of mmiGenericMouse to mouse buttons and ctrl/shift keys combinations.
   
   Associates instances of mmiGenericMouse to mouse buttons and ctrl/shift keys combinations.
+  For example:
+
+  // Create the compositor:
+  behaviorCompositor = mmiCompositorMouse::New();
+
+  mouseLeftBhavior = behaviorCompositor->CreateBehavior(MOUSE_LEFT);
+  mouseMiddleShiftBehavior = behaviorCompositor->CreateBehavior(MOUSE_MIDDLE_SHIFT);
+  ...
+
+
   @sa
-  - mmoTransformGeneric for examples on how to use this class
   - mmiGenericMouse since mmiCompositorMouse is working in pair with this class
+
+  @todo
+  - write test suite
+  
 */
 class mmiCompositorMouse : public mafInteractor
 {
