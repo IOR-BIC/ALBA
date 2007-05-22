@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformMouse.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 15:17:24 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-05-22 10:55:04 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,9 +40,22 @@ class mafVME;
 class mafGuiTransformMouse : public mafGuiTransformInterface
 {
 public:
-
   mafGuiTransformMouse(mafVME *input, mafObserver *listener = NULL);
 	~mafGuiTransformMouse(); 
+
+  // constraints enum
+  enum TRANSFORM_MOUSE_WIDGET_ID
+  {
+    X_AXIS = 0,
+    Y_AXIS, 
+    Z_AXIS,
+    VIEW_PLANE, 
+    NORMAL_VIEW_PLANE,
+    XY_PLANE, 
+    XZ_PLANE, 
+    YZ_PLANE,
+    SURFACE_SNAP
+  };
 
   void OnEvent(mafEventBase *maf_event);
 
@@ -63,6 +76,9 @@ public:
   /** Start and stop interaction through this object isa */
   void AttachInteractorToVme();
   void DetachInteractorFromVme();
+
+  void SetRotationConstraintId(int value){RotationConstraintId = value;};
+  void SetTranslationConstraintId(int value){TranslationConstraintId = value;};
 
 protected:  
   mafInteractor* OldInteractor;
