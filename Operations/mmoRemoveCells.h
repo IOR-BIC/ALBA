@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRemoveCells.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-21 14:11:27 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-05-22 14:51:22 $
+  Version:   $Revision: 1.7 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,22 +29,15 @@ class mafNode;
 class mafRWI;
 
 class vtkActor;
-class vtkContourVolumeMapper;
 class vtkPolyDataMapper;
-class vtkOutlineCornerFilter;
 class vtkRenderer;
 class vtkCell;
 
-class mmiSelectCell;
-class vtkImageData;
-class vtkTexture;
 class vtkPolyData;
-class vtkVolumeSlicer;
-class vtkFixedCutter;
-class vtkPlane;
-class vtkVolume;
 class vtkRemoveCellsFilter;
 class vtkTriangle;
+
+class mmiSelectCell;
 
 //----------------------------------------------------------------------------
 // mmoRemoveCells :
@@ -54,6 +47,10 @@ Perform cells selection and removing on surfaces.
 CTRL modifier must be used in order to select cells in render window while
 performing mouse dragging.
 This operation assumes that input polygonal data is made of triangles only.
+
+@sa mmoRemoveCellsTest
+
+@todo Extract selection related stuff to class
 */
 class mmoRemoveCells: public mafOp
 {

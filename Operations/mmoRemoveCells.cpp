@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoRemoveCells.cpp,v $
 Language:  C++
-Date:      $Date: 2007-05-21 14:11:27 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2007-05-22 14:51:22 $
+Version:   $Revision: 1.8 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -39,24 +39,17 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVMESurface.h"
 #include "mafVMEOutput.h"
 #include "mmiSelectCell.h"
-#include "mmaVolumeMaterial.h"
 
-#include "vtkLight.h"
-#include "vtkCamera.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
-#include "mafVMEVolumeGray.h"
 
 #include "vtkCell.h"
 #include "vtkMath.h"
-#include "vtkDataSet.h"
 #include "vtkPointData.h"
 #include "vtkProperty.h"
 #include "vtkActor.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkPolyData.h"
-#include "vtkPlane.h"
-#include "vtkImageData.h"
 #include "vtkSmartPointer.h"
 #include "vtkVolume.h"
 #include "vtkRemoveCellsFilter.h"
@@ -501,9 +494,6 @@ void mmoRemoveCells::SetSeed( vtkIdType cellSeed )
 
 void mmoRemoveCells::FindTriangleCellCenter(vtkIdType id, double center[3])
 {
-
-
-    // assert(m_Mesh->GetCell(id)->GetNumberOfPoints() == 3);
 
   m_Mesh->GetCellPoints(id, m_TriangeCentreComputationList);
 
