@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 10:00:21 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-05-22 10:54:08 $
+  Version:   $Revision: 1.7 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,20 +37,6 @@
 
 #include "vtkMatrix4x4.h"
 #include "vtkRenderer.h"
-
-// constraints enum
-enum TRANSFORM_MOUSE_WIDGET_ID
-{
-  X_AXIS = 0,
-  Y_AXIS, 
-  Z_AXIS,
-  VIEW_PLANE, 
-	NORMAL_VIEW_PLANE,
-  XY_PLANE, 
-  XZ_PLANE, 
-  YZ_PLANE,
-  SURFACE_SNAP
-};
 
 //----------------------------------------------------------------------------
 mafGuiTransformMouse::mafGuiTransformMouse(mafVME *input, mafObserver *listener)
