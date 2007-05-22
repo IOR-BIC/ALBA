@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-05-09 08:03:26 $
-Version:   $Revision: 1.16 $
+Date:      $Date: 2007-05-22 14:36:13 $
+Version:   $Revision: 1.17 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -74,8 +74,8 @@ mafViewCTNew::mafViewCTNew(wxString label)
 
 	m_ViewCTCompound    = NULL;
 
-	m_WidthSection = 16;
-	m_HeightSection = 32;
+	m_WidthSection = 40;
+	m_HeightSection = 40;
 
   m_Thickness = 1;
 	m_AdditionalProfileNumber = 0;
