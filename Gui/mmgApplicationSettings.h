@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationSettings.h,v $
 Language:  C++
-Date:      $Date: 2007-03-02 12:10:02 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2007-05-23 14:16:13 $
+Version:   $Revision: 1.5 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -14,6 +14,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #define __mmgApplicationSettings_H__
 
 #include "mafObserver.h"
+#include <wx/config.h>
 
 //----------------------------------------------------------------------------
 // forward reference
@@ -86,7 +87,7 @@ public:
 
   void SetCacheFolder(mafString cache_folder) {m_CacheFolder = cache_folder;};
 
-  /** Return the path for the remote hostname.*/
+  /** Return the path for the remote host name.*/
   mafString &GetRemoteHostName() {return m_RemoteHostName;};
 
   void SetRemoteHostName(mafString host) {m_RemoteHostName = host;};
@@ -106,12 +107,12 @@ public:
 
   void SetPassword(mafString pwd) {m_Password = pwd;};
 
-  /** Return the status of the default passphrase usage.*/
+  /** Return the status of the default pass phrase usage.*/
   bool UseDefaultPassPhrase() {return m_UseDefaultPasPhrase != 0;};
 
   void SetUseDefaultPassPhrase(int use_default) {m_UseDefaultPasPhrase = use_default;};
 
-  /** Return the Passphrase used to encrypt/decrypt files.*/
+  /** Return the Pass phrase used to encrypt/decrypt files.*/
   mafString &GetPassPhrase() {return m_PassPhrase;};
 
   void SetPassPhrase(mafString pass_phrase) {m_PassPhrase = pass_phrase;};
@@ -126,10 +127,9 @@ protected:
   /** Used to enable/disable items according to the current widgets state.*/
   void EnableItems();
 
-	/** Initialize image type saving inside views used into the application.*/
-	void InitializeImageType();
-
   mmgGui *m_Gui;
+
+  wxConfig *m_Config;
   
   // Log variables
   int     m_LogToFile;
