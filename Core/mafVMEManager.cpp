@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-04 17:10:50 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2007-05-23 09:07:25 $
+  Version:   $Revision: 1.32 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -244,7 +244,17 @@ void mafVMEManager::MSFOpen(wxString filename)
     wxSetWorkingDirectory(m_TmpDir);
   }
   
-  unixname.ParsePathName(); // convert to unix format
+  mafString sub_unixname;
+  if (unixname.StartsWith("\\\\"))
+  {
+    sub_unixname = unixname;
+    sub_unixname.Erase(0,1);
+    sub_unixname.ParsePathName();
+    unixname = "\\\\";
+    unixname += sub_unixname;
+  }
+  else
+    unixname.ParsePathName(); // convert to unix format
 
   m_MSFFile = unixname; 
   m_Storage->SetURL(m_MSFFile.c_str());
@@ -645,7 +655,7 @@ void mafVMEManager::NotifyAdd(mafNode *n)
 void mafVMEManager::SetFileHistoryMenu(wxMenu *menu)
 //----------------------------------------------------------------------------
 {
-	m_FileHistory.UseMenu(menu);
+  m_FileHistory.UseMenu(menu);
 	m_FileHistory.Load(*m_Config);
 }
 //----------------------------------------------------------------------------
