@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-23 09:07:25 $
-  Version:   $Revision: 1.32 $
+  Date:      $Date: 2007-05-23 12:39:31 $
+  Version:   $Revision: 1.33 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -52,6 +52,7 @@ mafVMEManager::mafVMEManager()
   m_Crypting    = false;
   m_LoadingFlag = false;
 
+  /*
   mmgApplicationSettings *app_settings = new mmgApplicationSettings(this);
   m_Host = app_settings->GetRemoteHostName();
   m_Port = app_settings->GetRemotePort();
@@ -59,13 +60,13 @@ mafVMEManager::mafVMEManager()
   m_Pwd  = app_settings->GetPassword();
   m_LocalCacheFolder = app_settings->GetCacheFolder();
   cppDEL(app_settings);
+  */
 
   m_FileHistoryIdx = -1;
 
   mafString MSFDir = mafGetApplicationDirectory().c_str();
   MSFDir.ParsePathName();
 	m_MSFDir   = MSFDir;
-  //m_MSFDir   += "/Data/MSF/";
 	m_MSFFile   = "";
 	m_ZipFile   = "";
   m_TmpDir   = "";
