@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-19 14:54:18 $
-  Version:   $Revision: 1.101 $
+  Date:      $Date: 2007-05-23 12:46:15 $
+  Version:   $Revision: 1.102 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -151,6 +151,11 @@ void mafLogicWithManagers::Configure()
   if(m_UseVMEManager)
   {
     m_VMEManager = new mafVMEManager();
+    m_VMEManager->SetHost(m_ApplicationSettings->GetRemoteHostName());
+    m_VMEManager->SetRemotePort(m_ApplicationSettings->GetRemotePort());
+    m_VMEManager->SetUser(m_ApplicationSettings->GetUserName());
+    m_VMEManager->SetPassword(m_ApplicationSettings->GetPassword());
+    m_VMEManager->SetLocalCacheFolder(m_ApplicationSettings->GetCacheFolder());
     m_VMEManager->SetListener(this); 
   }
 
