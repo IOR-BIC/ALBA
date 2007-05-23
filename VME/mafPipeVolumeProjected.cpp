@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeProjected.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-13 17:46:45 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-05-23 08:08:03 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -360,4 +360,18 @@ void mafPipeVolumeProjected::GetLutRange(double range[2])
 //----------------------------------------------------------------------------
 {
 	m_Lut->GetTableRange(range);
+}
+//----------------------------------------------------------------------------
+void mafPipeVolumeProjected::TickActorVisibilityOn()
+//----------------------------------------------------------------------------
+{
+  m_TickActor->VisibilityOn();
+  m_TickActor->Modified();
+}
+//----------------------------------------------------------------------------
+void mafPipeVolumeProjected::TickActorVisibilityOff()
+//----------------------------------------------------------------------------
+{
+  m_TickActor->VisibilityOff();
+  m_TickActor->Modified();
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeProjected.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-07 09:54:41 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-05-23 08:08:03 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -51,6 +51,10 @@ public:
 
 	/** Get the range of the texture's lookup table. */
 	void GetLutRange(double range[2]);
+
+  /** Set Tick Actor Visibility */
+  void TickActorVisibilityOn();
+  void TickActorVisibilityOff();
 
 protected:   
 	int       m_CamPosition;
