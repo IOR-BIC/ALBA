@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-08 15:00:46 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-05-23 12:38:11 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -128,6 +128,9 @@ public:
 
   /** Set the port for the remote host.*/
   void SetRemotePort(int port) {m_Port = port;};
+
+  /** Set the local cache folder in which will be downloaded remote files.*/
+  void SetLocalCacheFolder(mafString cache_folder) {m_LocalCacheFolder = cache_folder;};
 
 protected:
   /** Create a compressed msf file.*/
