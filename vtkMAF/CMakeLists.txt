@@ -12,6 +12,8 @@ SET(vtkMAF_SRCS
   vtkCellsFilter.h  
   vtkRemoveCellsFilter.cxx
   vtkRemoveCellsFilter.h
+  vtkClipSurfaceBoundingBox.cxx
+  vtkClipSurfaceBoundingBox.h
   vtkContourVolumeMapper.cxx
   vtkContourVolumeMapper.h
 #  vtkContourVolumeMapperAdv.cxx
