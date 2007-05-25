@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-23 11:42:56 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2007-05-25 13:00:55 $
+  Version:   $Revision: 1.18 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -296,14 +296,14 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 
 				PipeSliceViewSurface->SetSlice(surfaceOriginTranslated);
 				PipeSliceViewSurface->SetNormal(normal);
-				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 			}
 		}
 	}
 	else//if show=false
 	{
-		m_ChildViewList[ARBITRARY_VIEW]->VmeShow(node, show);
-		m_ChildViewList[SLICE_VIEW]->VmeShow(node, show);
+		//m_ChildViewList[ARBITRARY_VIEW]->VmeShow(node, show);
+		//m_ChildViewList[SLICE_VIEW]->VmeShow(node, show);
 
 		if(Vme->IsA("mafVMEVolumeGray"))
 		{
@@ -324,7 +324,7 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			mafDEL(m_MatrixReset);
 
 			//find if some surfaces are show , if yes show off
-			mafNode *root=m_CurrentVolume->GetRoot();
+			/*mafNode *root=m_CurrentVolume->GetRoot();
 			mafNodeIterator *iter = root->NewIterator();
 			for (mafNode *Inode = iter->GetFirstNode(); Inode; Inode = iter->GetNextNode())
 			{
@@ -334,17 +334,18 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 					mafPipeSurface *PipeArbitraryViewSurface = mafPipeSurface::SafeDownCast(((mafViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(Inode));
 					if(PipeSliceViewSurface && PipeArbitraryViewSurface)
 					{
-						mafEventMacro(mafEvent(this, VME_SHOW, Inode, false));
+						//mafEventMacro(mafEvent(this, VME_SHOW, Inode, false));
 					}
 				}
 			}
-			iter->Delete();
+			iter->Delete();*/
 
 			m_CurrentVolume = NULL;
 			m_ColorLUT = NULL;
 			m_LutWidget->SetLut(m_ColorLUT);
 		}
 	}
+	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 	EnableWidgets(m_CurrentVolume != NULL);
 }
 //----------------------------------------------------------------------------
@@ -368,7 +369,7 @@ void mafViewArbitrarySlice::OnEvent(mafEventBase *maf_event)
     // if no one can handle this event send it to the operation listener
     mafEventMacro(*maf_event); 
   }	
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
 void mafViewArbitrarySlice::OnEventGizmoTranslate(mafEventBase *maf_event)
