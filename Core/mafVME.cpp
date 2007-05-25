@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-19 14:54:18 $
-  Version:   $Revision: 1.38 $
+  Date:      $Date: 2007-05-25 09:39:28 $
+  Version:   $Revision: 1.39 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,6 +20,10 @@
 //----------------------------------------------------------------------------
 
 #include "mafVME.h"
+#include "mafDecl.h"
+#include "mmgGui.h"
+
+#include "mafVMEItem.h"
 #include "mafVMEOutput.h"
 #include "mafAbsMatrixPipe.h"
 #include "mafMatrixPipe.h"
@@ -32,9 +36,7 @@
 #include "mafTransform.h"
 #include "mmuTimeSet.h"
 #include "mafIndent.h"
-#include "mafDecl.h"
 #include "mafStorageElement.h"
-#include "mmgGui.h"
 
 #include <assert.h>
 
@@ -737,6 +739,11 @@ void mafVME::OnEvent(mafEventBase *maf_event)
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
     Superclass::OnEvent(maf_event);
+  }
+  else if (maf_event->GetId() == mafVMEItem::VME_ITEM_DATA_MODIFIED)
+  {
+    // Paolo 25-05-2007: Intercept the item data modified to update the output
+    this->GetOutput()->Update();
   }
   else if (maf_event->GetChannel()==MCH_DOWN)
   {
