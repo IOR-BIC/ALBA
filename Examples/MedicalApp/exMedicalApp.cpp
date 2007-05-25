@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: exMedicalApp.cpp,v $
 Language:  C++
-Date:      $Date: 2007-05-21 08:41:59 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2007-05-25 12:42:03 $
+Version:   $Revision: 1.8 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -86,12 +86,16 @@ MafMedical is partially based on OpenMAF.
 	#include "mmoLandmarkImporterWS.h"
 	#include "mmoRAWImporterImages.h"
 	#include "mmoC3DImporter.h"
+#endif
+#ifndef _DEBUG
 	//EXPORTERS
 	#include "mmoMSFExporter.h"
 	#include "mmoRAWExporter.h"
 	#include "mmoSTLExporter.h"
 	#include "mmoVTKExporter.h"
 	#include "mmoLandmarkExporter.h"
+#endif
+#ifndef _DEBUG
 	//OPERATIONS
 	#include "mmo2DMeasure.h"
 	#include "mmoAddLandmark.h"
@@ -127,6 +131,8 @@ MafMedical is partially based on OpenMAF.
 	#include "mmoFlipNormals.h"
 	#include "mmoCreateSpline.h"
 	#include "mmoRemoveCells.h"
+#endif
+#ifndef _DEBUG
 	//VIEWS
 	#include "mafViewVTK.h"
 	#include "mafViewCompound.h"
@@ -268,6 +274,7 @@ bool exMedicalApp::OnInit()
 	// View Menu':
 	//------------------------------------------------------------
 #ifndef _DEBUG
+
 	//View VTK
 	m_Logic->Plug(new mafViewVTK("VTK view"));
 	//View Arbitrary Slice
