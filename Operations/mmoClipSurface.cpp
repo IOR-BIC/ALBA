@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-17 15:58:55 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-05-25 14:32:21 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,6 +51,7 @@
 #include "vtkArrowSource.h"
 #include "vtkGlyph3D.h"
 #include "vtkAppendPolyData.h"
+#include "vtkClipSurfaceBoundingBox.h"
 
 
 //----------------------------------------------------------------------------
@@ -71,6 +72,7 @@ mafOp(label)
   m_ClipperPlane  = NULL;
   m_Arrow         = NULL;
   m_Clipper       = NULL;
+	m_ClipperBoundingBox = NULL;
   
   m_ImplicitPlaneGizmo  = NULL;
   m_IsaCompositor       = NULL;
@@ -81,6 +83,7 @@ mafOp(label)
   
   ClipInside      = 1;
 	m_UseGizmo			=	1;
+	m_ClipBoundBox	= 1;
   m_ClipModality  = MODE_IMPLICIT_FUNCTION;
 	m_GizmoType			= GIZMO_TRANSLATE;
   
@@ -102,14 +105,17 @@ mafOp(label)
 mmoClipSurface::~mmoClipSurface()
 //----------------------------------------------------------------------------
 {
-	cppDEL(m_GizmoTranslate);
-	cppDEL(m_GizmoRotate);
-	cppDEL(m_GizmoScale);
+	//cppDEL(m_GizmoTranslate);
+	//cppDEL(m_GizmoRotate);
+	//cppDEL(m_GizmoScale);
 
+	vtkDEL(m_ResultPolyData);
+	vtkDEL(m_ClippedPolyData);
   mafDEL(m_IsaCompositor);
 	mafDEL(m_ClippedVME);
   vtkDEL(m_ClipperPlane);
   vtkDEL(m_Clipper);
+	vtkDEL(m_ClipperBoundingBox);
   vtkDEL(m_OldSurface);
   vtkDEL(m_Arrow);
 }
@@ -147,21 +153,25 @@ void mmoClipSurface::OpRun()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Clipper);
-
+	vtkNEW(m_ClipperBoundingBox);
   vtkNEW(m_OldSurface);
+
   m_OldSurface->DeepCopy((vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData());
-  
+ 
+	vtkNEW(m_ClippedPolyData);
+	vtkNEW(m_ResultPolyData);
+	m_ResultPolyData->DeepCopy(m_OldSurface);
+
   m_SurfaceAccept = new mafSurfaceAccept;
 
 	if(!m_TestMode)
 	{
 		CreateGui();
-
 		ShowGui();
 	  
 		ShowClipPlane(m_ClipModality != mmoClipSurface::MODE_SURFACE);
-		//ShowGizmoScale(m_ClipModality != mmoClipSurface::MODE_SURFACE);
 		CreateGizmos();
+		//Enable & show Gizmos
 		ChangeGizmo();
 	}
 }
@@ -201,16 +211,16 @@ void mmoClipSurface::CreateGui()
 	// bounding box dim
 	m_PlaneWidth = b[1] - b[0];
 	m_PlaneHeight = b[3] - b[2];
-	m_Gui->Double(ID_PLANE_WIDTH,_("plane w."),&m_PlaneWidth,0.0);
-	m_Gui->Double(ID_PLANE_HEIGHT,_("plane h."),&m_PlaneHeight,0.0);
-	m_Gui->Divider();
+	//m_Gui->Double(ID_PLANE_WIDTH,_("plane w."),&m_PlaneWidth,0.0);
+	//m_Gui->Double(ID_PLANE_HEIGHT,_("plane h."),&m_PlaneHeight,0.0);
+	//m_Gui->Divider();
 	m_Gui->Bool(ID_GENERATE_CLIPPED_OUTPUT,_("generate clipped output"),&m_GenerateClippedOutput,1);
 	m_Gui->OkCancel();
 
 	m_Gui->Enable(ID_GENERATE_CLIPPED_OUTPUT, m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION);
 	m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION);
 	m_Gui->Enable(ID_CHOOSE_SURFACE, m_ClipModality == mmoClipSurface::MODE_SURFACE);
-	m_Gui->Enable(wxOK,m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION);
+	m_Gui->Enable(wxOK,m_ResultPolyData != NULL);
 
 	m_Gui->Divider();
 }
@@ -246,6 +256,7 @@ void mmoClipSurface::OnEventThis(mafEventBase *maf_event)
 			m_Gui->Enable(ID_CHOOSE_SURFACE, m_ClipModality == mmoClipSurface::MODE_SURFACE);
 			m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION  && m_UseGizmo);
 			m_Gui->Enable(ID_GENERATE_CLIPPED_OUTPUT, m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION);
+			m_Gui->Enable(ID_USE_GIZMO,m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION);
 			m_Gui->Enable(wxOK,m_ClipModality == mmoClipSurface::MODE_IMPLICIT_FUNCTION);
 			ClipInside = m_ClipModality;
 			m_Gui->Update();
@@ -288,9 +299,11 @@ void mmoClipSurface::OnEventThis(mafEventBase *maf_event)
 				if (clip_result == MAF_ERROR)
 				{
 					wxMessageBox("Error while clipping surface!!", "Clipping Error");
-					OpStop(OP_RUN_CANCEL);
 				}
-				OpStop(OP_RUN_OK);
+				else
+					OpStop(OP_RUN_OK);
+
+				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 			}
 			break;
 		case wxCANCEL:
@@ -301,6 +314,43 @@ void mmoClipSurface::OnEventThis(mafEventBase *maf_event)
 			break; 
 		}
 	}
+}
+//----------------------------------------------------------------------------
+void mmoClipSurface::ClipBoundingBox()
+//----------------------------------------------------------------------------
+{
+
+	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transform_plane;
+	transform_plane->SetTransform(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetVTKTransform());
+	transform_plane->SetInput(m_PlaneSource->GetOutput());
+	transform_plane->Update();
+
+	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transform_data_input;
+	transform_data_input->SetTransform(((mafVME*)m_Input)->GetAbsMatrixPipe()->GetVTKTransform());
+	transform_data_input->SetInput(m_OldSurface);
+	transform_data_input->Update();
+
+	m_ClipperBoundingBox->SetInput(transform_data_input->GetOutput());
+	m_ClipperBoundingBox->SetMask(transform_plane->GetOutput());
+	m_ClipperBoundingBox->SetClipInside(ClipInside);
+	m_ClipperBoundingBox->Update();
+
+	m_ResultPolyData->DeepCopy(m_ClipperBoundingBox->GetOutput());
+	m_ResultPolyData->Update();
+
+	int result=((mafVMESurface*)m_Input)->SetData(m_ResultPolyData,((mafVME*)m_Input)->GetTimeStamp());
+
+	if(m_GenerateClippedOutput)
+	{
+		m_ClipperBoundingBox->SetClipInside(ClipInside?0:1);
+		m_ClipperBoundingBox->Update();
+
+		m_ClippedPolyData->DeepCopy(m_ClipperBoundingBox->GetOutput());
+		m_ClippedPolyData->Update();
+	}
+
+	if(!m_TestMode)
+		m_Gui->Enable(wxOK,true);
 }
 //----------------------------------------------------------------------------
 void mmoClipSurface::OnEventGizmoTranslate(mafEventBase *maf_event)
@@ -445,8 +495,14 @@ void mmoClipSurface::ChangeGizmo()
 				break;
 			}
 		}
-		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 	}
+	else
+	{
+		m_GizmoTranslate->Show(false);
+		m_GizmoRotate->Show(false);
+		m_GizmoScale->Show(false);
+	}
+	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
 void mmoClipSurface::OpStop(int result)
@@ -467,6 +523,9 @@ void mmoClipSurface::OpStop(int result)
 	m_GizmoTranslate->Show(false);
 	m_GizmoRotate->Show(false);
 	m_GizmoScale->Show(false);
+	cppDEL(m_GizmoTranslate);
+	cppDEL(m_GizmoRotate);
+	cppDEL(m_GizmoScale);
 
   HideGui();
   mafEventMacro(mafEvent(this,result));
@@ -475,12 +534,22 @@ void mmoClipSurface::OpStop(int result)
 void mmoClipSurface::OpDo()
 //----------------------------------------------------------------------------
 {
-	((mafVMESurface *)m_Input)->SetData(m_ResultPolyData,((mafVME *)m_Input)->GetTimeStamp());
+	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transform_output;
+	transform_output->SetTransform((vtkAbstractTransform *)((mafVME *)m_Input)->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
+	transform_output->SetInput(m_ResultPolyData);
+	transform_output->Update();
+
+	((mafVMESurface *)m_Input)->SetData(transform_output->GetOutput(),((mafVME *)m_Input)->GetTimeStamp());
 	if(m_GenerateClippedOutput)
 	{
+		vtkMAFSmartPointer<vtkTransformPolyDataFilter> transform_clipped_output;
+		transform_clipped_output->SetTransform((vtkAbstractTransform *)((mafVME *)m_Input)->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
+		transform_clipped_output->SetInput(m_ClippedPolyData);
+		transform_clipped_output->Update();
+
 		mafNEW(m_ClippedVME);
 		m_ClippedVME->DeepCopy(m_Input);
-		m_ClippedVME->SetData(m_ClippedPolyData,((mafVME *)m_Input)->GetTimeStamp());
+		m_ClippedVME->SetData(transform_clipped_output->GetOutput(),((mafVME *)m_Input)->GetTimeStamp());
 		m_ClippedVME->SetName("clipped");
 		m_ClippedVME->Update();
 
@@ -539,32 +608,37 @@ int mmoClipSurface::Clip()
 
 		vtkMAFSmartPointer<vtkImplicitPolyData> implicitPolyData;
 		implicitPolyData->SetInput(transform_data_clipper->GetOutput());
-		int num = subdivider->GetOutput()->GetNumberOfPoints();
 		m_Clipper->SetInput(subdivider->GetOutput());
 		m_Clipper->SetClipFunction(implicitPolyData);
 	}
   else
   {
-    vtkMatrix4x4 *mat = vtkMatrix4x4::New();
-    mat->DeepCopy(((mafVME *)m_Input)->GetAbsMatrixPipe()->GetMatrixPointer()->GetVTKMatrix());
-    mat->Invert();
-    mat->Modified();
+		if(m_ClipBoundBox)
+		{
+			ClipBoundingBox();
+			return MAF_OK;
+		}
+		else
+		{
+			vtkMatrix4x4 *mat = vtkMatrix4x4::New();
+			mat->DeepCopy(((mafVME *)m_Input)->GetAbsMatrixPipe()->GetMatrixPointer()->GetVTKMatrix());
+			mat->Invert();
+			mat->Modified();
 
-    // clip input surface by an implicit plane
-    vtkTransform *tr = vtkTransform::New();
-    tr->Concatenate(mat);
-    tr->Concatenate(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix());
-    tr->Inverse();
-    tr->Update();
+			// clip input surface by an implicit plane
+			vtkTransform *tr = vtkTransform::New();
+			tr->Concatenate(mat);
+			tr->Concatenate(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix());
+			tr->Inverse();
+			tr->Update();
 
-    m_ClipperPlane->SetTransform(tr);
-    m_Clipper->SetInput(vtkPolyData::SafeDownCast(((mafVME *)m_Input)->GetOutput()->GetVTKData()));
-		m_Clipper->SetClipFunction(m_ClipperPlane);
-    tr->Delete();
-    mat->Delete();
-  }
-
-	vtkNEW(m_ResultPolyData);
+			m_ClipperPlane->SetTransform(tr);
+			m_Clipper->SetInput(vtkPolyData::SafeDownCast(((mafVME *)m_Input)->GetOutput()->GetVTKData()));
+			m_Clipper->SetClipFunction(m_ClipperPlane);
+			tr->Delete();
+			mat->Delete();
+		}
+	}
 
 	m_Clipper->SetGenerateClipScalars(0); // 0 outputs input data scalars, 1 outputs implicit function values
 	m_Clipper->SetInsideOut(ClipInside);  // use 0/1 to reverse sense of clipping
@@ -576,7 +650,7 @@ int mmoClipSurface::Clip()
 
 	if(m_GenerateClippedOutput)
 	{
-		vtkNEW(m_ClippedPolyData);
+
 		m_Clipper->SetInsideOut(ClipInside?0:1);
 		m_Clipper->Update();
 
@@ -584,7 +658,10 @@ int mmoClipSurface::Clip()
 		m_ClippedPolyData->Update();
 
 	}
-	
+
+	if(!m_TestMode) 
+		m_Gui->Enable(wxOK,true);
+
   return MAF_OK;
 }
 //----------------------------------------------------------------------------

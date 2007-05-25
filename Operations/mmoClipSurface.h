@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoClipSurface.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-17 15:58:55 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-05-25 14:32:21 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -41,6 +41,7 @@ class vtkGlyph3D;
 class vtkPlaneSource;
 class vtkArrowSource;
 class vtkAppendPolyData;
+class vtkClipSurfaceBoundingBox;
 
 //----------------------------------------------------------------------------
 // mmoClipSurface :
@@ -121,6 +122,7 @@ protected:
 	/** Create the GUI */
 	void CreateGui();
 
+	/** Change Gizmo visualization */
 	void CreateGizmos();
 
 	/** Change type of gizmo in the view */
@@ -134,12 +136,16 @@ protected:
 
 	void PostMultiplyEventMatrix(mafEventBase *maf_event);
 
+	/** Clip Using vtkClipSurfaceBoundingBox */
+	void ClipBoundingBox();
+
   mafVMESurface   *m_ClipperVME;
 	mafVMESurface   *m_ClippedVME;
 
   mafVMEGizmo     *m_ImplicitPlaneGizmo;
   vtkPlane        *m_ClipperPlane;
   vtkClipPolyData *m_Clipper;
+	vtkClipSurfaceBoundingBox	*m_ClipperBoundingBox;
   vtkGlyph3D      *m_Arrow;
 
   mmiCompositorMouse *m_IsaCompositor;
@@ -155,6 +161,7 @@ protected:
   int		ClipInside;
 	int   m_UseGizmo;
 	int		m_GenerateClippedOutput;
+	int		m_ClipBoundBox;
   bool	PlaneCreated;
 
 	double m_PlaneWidth;
