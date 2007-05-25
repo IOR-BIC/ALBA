@@ -25,6 +25,9 @@ SET(PROJECT_SRCS
   mafVMEAdvancedProber.h
   mafVMEAdvancedSlicer.cpp
   mafVMEAdvancedSlicer.h
+
+  mafPolylineGraph.cpp
+  mafPolylineGraph.h
 )
 
 IF (MAF_USE_ITK)
