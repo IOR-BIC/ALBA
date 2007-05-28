@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoMeshQuality.cpp,v $
 Language:  C++
-Date:      $Date: 2007-04-05 10:26:57 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-05-28 08:28:48 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -117,7 +117,7 @@ mafOp *mmoMeshQuality::Copy()
 //----------------------------------------------------------------------------
 // Constants:
 //----------------------------------------------------------------------------
-enum FILTER_SURFACE_ID
+enum MESH_QUALITY_ID
 {
 	ID_OK = MINID,
 };
