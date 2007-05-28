@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-05-22 14:36:13 $
-Version:   $Revision: 1.17 $
+Date:      $Date: 2007-05-28 10:58:22 $
+Version:   $Revision: 1.18 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -74,8 +74,8 @@ mafViewCTNew::mafViewCTNew(wxString label)
 
 	m_ViewCTCompound    = NULL;
 
-	m_WidthSection = 40;
-	m_HeightSection = 40;
+	m_WidthSection = 30;
+	m_HeightSection = 50;
 
   m_Thickness = 1;
 	m_AdditionalProfileNumber = 0;
@@ -238,22 +238,6 @@ void mafViewCTNew::OnEvent(mafEventBase *maf_event)
     break;
 		case ID_LAYOUT_THICKNESS:
 			{
-				if(m_Thickness == 0)
-				{
-					m_AdditionalProfileNumber = 0;
-					m_ProfileDistance = 0;
-				}
-				else
-				{
-					double spacing;
-					spacing = (m_Spacing[0] <= m_Spacing[1] ? m_Spacing[0] : m_Spacing[1]);
-					m_ProfileDistance = 2.0 * spacing;
-					m_AdditionalProfileNumber = m_Thickness / m_ProfileDistance + 1;
-					m_AdditionalProfileNumber  /= 2;
-					//mafLogMessage(m_AdditionalProfileNumber);
-					if (m_AdditionalProfileNumber * 2 > 4)
-						wxMessageBox(L"Warning: with this Thickness value, it will be required more time to process");
-				}
 				ProbeVolume();
 			}
 			break;
@@ -428,6 +412,26 @@ void mafViewCTNew::ProbeVolume()
 //----------------------------------------------------------------------------
 {
 	if (m_CurrentVolume == NULL) return;
+
+
+  if(m_Thickness == 0)
+  {
+    m_AdditionalProfileNumber = 0;
+    m_ProfileDistance = 0;
+  }
+  else
+  {
+    double spacing;
+    spacing = (m_Spacing[0] <= m_Spacing[1] ? m_Spacing[0] : m_Spacing[1]);
+    m_ProfileDistance = 2.0 * spacing;
+    m_AdditionalProfileNumber = m_Thickness / m_ProfileDistance + 1;
+    m_AdditionalProfileNumber  /= 2;
+    //mafLogMessage(m_AdditionalProfileNumber);
+    if (m_AdditionalProfileNumber * 2 > 4)
+      wxMessageBox(L"Warning: with this Thickness value, it will be required more time to process");
+  }
+
+
   double b[6];
   m_CurrentVolume->GetOutput()->Update();
   m_CurrentVolume->GetOutput()->GetBounds(b);
