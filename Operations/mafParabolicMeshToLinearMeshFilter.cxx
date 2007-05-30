@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafParabolicMeshToLinearMeshFilter.cxx,v $
 Language:  C++
-Date:      $Date: 2007-04-19 14:41:51 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-05-30 09:33:20 $
+Version:   $Revision: 1.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -37,7 +37,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mafString.h"
 
-vtkCxxRevisionMacro(mafParabolicMeshToLinearMeshFilter, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(mafParabolicMeshToLinearMeshFilter, "$Revision: 1.2 $");
 vtkStandardNewMacro(mafParabolicMeshToLinearMeshFilter);
 
 mafParabolicMeshToLinearMeshFilter::mafParabolicMeshToLinearMeshFilter()
@@ -208,6 +208,9 @@ void mafParabolicMeshToLinearMeshFilter::Execute()
     vtkPointData *inPD = input->GetPointData();
     vtkPointData *outPD = output->GetPointData();
    
+    vtkDataArray *activeArray = input->GetPointData()->GetScalars();
+    
+
     for (int idArray = 0; idArray < inPD->GetNumberOfArrays(); idArray++)
     {
       int numPoint = 0;
@@ -227,6 +230,10 @@ void mafParabolicMeshToLinearMeshFilter::Execute()
       }
   
       outPD->AddArray(newArray);
+
+      //modified by Daniele
+      if(strcmp(activeArray->GetName(), newArray->GetName()) == 0) outPD->SetScalars(newArray);
+
       newArray->Delete();
     }
  
