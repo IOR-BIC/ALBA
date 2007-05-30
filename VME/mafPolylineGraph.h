@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2007-05-25 13:22:13 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-05-30 16:21:40 $
+Version:   $Revision: 1.2 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -75,41 +75,41 @@ public:
   //-----------------------------------------------------------------------------
   // public methods
   //-----------------------------------------------------------------------------
-  mafPolylineGraph() ;                       ///> constructor: empty graph
-  ~mafPolylineGraph() ;                      ///> destructor
-  int GetNumberOfVertices() const ;          ///> get no. of vertices
-  int GetNumberOfEdges() const ;             ///> get no. of edges
-  int GetNumberOfBranches() const ;          ///> get no. of branches
-  vtkIdType GetMaxVertexId() const ;         ///> get index of last vertex in graph
-  vtkIdType GetMaxEdgeId() const ;           ///> get index of last edge in graph
-  vtkIdType GetMaxBranchId() const ;         ///> get index of last branch in graph
+  mafPolylineGraph() ;                       ///< constructor: empty graph
+  ~mafPolylineGraph() ;                      ///< destructor
+  int GetNumberOfVertices() const ;          ///< get no. of vertices
+  int GetNumberOfEdges() const ;             ///< get no. of edges
+  int GetNumberOfBranches() const ;          ///< get no. of branches
+  vtkIdType GetMaxVertexId() const ;         ///< get index of last vertex in graph
+  vtkIdType GetMaxEdgeId() const ;           ///< get index of last edge in graph
+  vtkIdType GetMaxBranchId() const ;         ///< get index of last branch in graph
 
-  void GetVertexCoords(vtkIdType v, double *coords) const ;      ///> get coords of vertex
-  void SetVertexCoords(vtkIdType v, const double *coords) ;      ///> set coords of vertex
+  void GetVertexCoords(vtkIdType v, double *coords) const ;      ///< get coords of vertex
+  void SetVertexCoords(vtkIdType v, const double *coords) ;      ///< set coords of vertex
 
-  void GetBranchName(vtkIdType b, wxString *name) const ; ///> get name of branch
-  void SetBranchName(vtkIdType b, const wxString *name) ; ///> set name of branch
-  void UnsetBranchName(vtkIdType b) ;                     ///> unset name of branch to undefined
-  vtkIdType FindBranchName(const wxString *name) const ;  ///> find branch with name
+  void GetBranchName(vtkIdType b, wxString *name) const ; ///< get name of branch
+  void SetBranchName(vtkIdType b, const wxString *name) ; ///< set name of branch
+  void UnsetBranchName(vtkIdType b) ;                     ///< unset name of branch to undefined
+  vtkIdType FindBranchName(const wxString *name) const ;  ///< find branch with name
 
-  bool IsEdgeDirected(vtkIdType e) const ;                ///> get directed property of edge
-  void SetEdgeDirected(vtkIdType e, bool directed) ;      ///> set directed property of edge
-  void ReverseEdge(vtkIdType e) ;                         ///> reverse direction of edge (swap end vertices)
+  bool IsEdgeDirected(vtkIdType e) const ;                ///< get directed property of edge
+  void SetEdgeDirected(vtkIdType e, bool directed) ;      ///< set directed property of edge
+  void ReverseEdge(vtkIdType e) ;                         ///< reverse direction of edge (swap end vertices)
 
-  double GetEdgeWeight(vtkIdType e) const ;               ///> get weight of edge
-  void SetEdgeWeight(vtkIdType e, double wt) ;            ///> set weight of edge
+  double GetEdgeWeight(vtkIdType e) const ;               ///< get weight of edge
+  void SetEdgeWeight(vtkIdType e, double wt) ;            ///< set weight of edge
 
-  bool AddNewEdge(vtkIdType v0, vtkIdType v1) ;     ///> Add new edge between existing vertices
+  bool AddNewEdge(vtkIdType v0, vtkIdType v1) ;     ///< Add new edge between existing vertices
 
   /** Add new vertex to graph.
   The vertex can be empty or it can connect to an existing vertex with a new edge 
   You can optionally specify the coords of the vertex */
-  void AddNewVertex(double *coords = NULL) ;                ///> empty vertex
-  bool AddNewVertex(vtkIdType v0, double *coords = NULL) ;  ///> connect to existing vertex
+  void AddNewVertex(double *coords = NULL) ;                ///< empty vertex
+  bool AddNewVertex(vtkIdType v0, double *coords = NULL) ;  ///< connect to existing vertex
 
   /** Add new branch to graph */
-  void AddNewBranch(const wxString *name = NULL) ;               ///> empty branch with optional name
-  bool AddNewBranch(vtkIdType v0, const wxString *name = NULL) ; ///> branch with start vertex and optional name
+  void AddNewBranch(const wxString *name = NULL) ;               ///< empty branch with optional name
+  bool AddNewBranch(vtkIdType v0, const wxString *name = NULL) ; ///< branch with start vertex and optional name
 
   /** Read graph from vtkPolyData (polyline only).
   Each polydata point becomes a graph vertex.
@@ -165,11 +165,11 @@ public:
   Be careful: this also moves the branch at the end of the list to index i. */
   bool DeleteBranch(vtkIdType i) ;
 
-  bool IsConnected() const ;                                ///> is graph connected
-  bool IsConnectedTree() const ;                            ///> is graph a connected tree
-  void Clear() ;                                            ///> clear graph
-  bool SelfCheck() const ;                                  ///> check internal consistency
-  void PrintSelf(std::ostream& os, const int tabs) const ;  ///> print self
+  bool IsConnected() const ;                                ///< is graph connected
+  bool IsConnectedTree() const ;                            ///< is graph a connected tree
+  void Clear() ;                                            ///< clear graph
+  bool SelfCheck() const ;                                  ///< check internal consistency
+  void PrintSelf(std::ostream& os, const int tabs) const ;  ///< print self
 
 
   //----------------------------------------------------------------------------
@@ -180,30 +180,30 @@ public:
   //----------------------------------------------------------------------------
   class Vertex{
   public:
-    Vertex() ;                   ///> constructor
-    Vertex(double *coords) ;     ///> constructor
-    ~Vertex() ;                  ///> destructor
-    int GetDegree() const ;                 ///> return degree of vertex
-    vtkIdType GetEdgeId(int i) const ;      ///> get index of ith edge
-    void SetEdgeId(int i, vtkIdType e) ;    ///> set ith edge
-    void AddEdgeId(vtkIdType e) ;           ///> add new edge id to end of list
-    int FindEdgeId(vtkIdType e) const ;     ///> find position (0..deg-1) of this edge id in the list, return -1 if invalid
-    bool DeleteEdgeId(vtkIdType e) ;        ///> delete this edge and assoc. vertex from the vertex
-    vtkIdType GetVertexId(int i) const ;    ///> get index of ith vertex neighbour
-    void SetVertexId(int i, vtkIdType v) ;  ///> set ith vertex neighbour
-    void AddVertexId(vtkIdType v) ;         ///> add new vertex id to end of list
-    int FindVertexId(vtkIdType v) const ;   ///> find position (0..deg-1) of this vertex id in the list, return undefinedInt if invalid
-    bool DeleteVertexId(vtkIdType v) ;      ///> delete this vertex and assoc. edge from the vertex
-    void GetVerticesIdList(vtkIdList *idlist) const ;         ///> return vertices as a vtkIdlist
-    void GetCoords(double *coords) const ;                    ///> get coords of vertex
-    void SetCoords(const double *coords) ;                    ///> set coords of vertex  
-    void Clear() ;                                            ///> clear data from vertex
-    bool SelfCheck() const ;                                  ///> check self consistency
-    void PrintSelf(std::ostream& os, const int tabs) const ;  ///> print self
+    Vertex() ;                   ///< constructor
+    Vertex(double *coords) ;     ///< constructor
+    ~Vertex() ;                  ///< destructor
+    int GetDegree() const ;                 ///< return degree of vertex
+    vtkIdType GetEdgeId(int i) const ;      ///< get index of ith edge
+    void SetEdgeId(int i, vtkIdType e) ;    ///< set ith edge
+    void AddEdgeId(vtkIdType e) ;           ///< add new edge id to end of list
+    int FindEdgeId(vtkIdType e) const ;     ///< find position (0..deg-1) of this edge id in the list, return -1 if invalid
+    bool DeleteEdgeId(vtkIdType e) ;        ///< delete this edge and assoc. vertex from the vertex
+    vtkIdType GetVertexId(int i) const ;    ///< get index of ith vertex neighbour
+    void SetVertexId(int i, vtkIdType v) ;  ///< set ith vertex neighbour
+    void AddVertexId(vtkIdType v) ;         ///< add new vertex id to end of list
+    int FindVertexId(vtkIdType v) const ;   ///< find position (0..deg-1) of this vertex id in the list, return undefinedInt if invalid
+    bool DeleteVertexId(vtkIdType v) ;      ///< delete this vertex and assoc. edge from the vertex
+    void GetVerticesIdList(vtkIdList *idlist) const ;         ///< return vertices as a vtkIdlist
+    void GetCoords(double *coords) const ;                    ///< get coords of vertex
+    void SetCoords(const double *coords) ;                    ///< set coords of vertex  
+    void Clear() ;                                            ///< clear data from vertex
+    bool SelfCheck() const ;                                  ///< check self consistency
+    void PrintSelf(std::ostream& os, const int tabs) const ;  ///< print self
   private:
-    double m_coords[3] ;                    ///> coordinates of point
-    std::vector<vtkIdType> edgeId ;         ///> edges 0..deg-1 attached to vertex
-    std::vector<vtkIdType> vertexId ;       ///> vertices 0..deg-1 attached to vertex, in same order
+    double m_coords[3] ;                    ///< coordinates of point
+    std::vector<vtkIdType> edgeId ;         ///< edges 0..deg-1 attached to vertex
+    std::vector<vtkIdType> vertexId ;       ///< vertices 0..deg-1 attached to vertex, in same order
   } ;
 
 
@@ -215,32 +215,32 @@ public:
   //----------------------------------------------------------------------------
   class Edge{
   public:
-    Edge() ;                                     ///> constructor
-    Edge(vtkIdType v0, vtkIdType v1) ;           ///> constructor with end vertices
-    Edge(const Edge& e) ;                        ///> copy constructor (because array member doesn't deep copy)
-    ~Edge() ;                                    ///> destructor
-    Edge& operator=(const Edge& e) ;             ///> assignment operator
-    vtkIdType GetVertexId(int i) const ;                    ///> get index of vertex i, where i = 0 or 1
-    void SetVertexId(int i, vtkIdType v) ;                  ///> set index of vertex, where i = 0 or 1
-    void SetVertexIds(vtkIdType v0, vtkIdType v1) ;         ///> set indices of vertices
-    void GetVerticesIdList(vtkIdList *idlist) const ;       ///> return vertices as a vtkIdlist
-    vtkIdType GetOtherEndVertexId(vtkIdType v) const ;      ///> get the vertex id at the other end of the edge
-    vtkIdType GetBranchId() const ;                         ///> get branch which edge belongs to
-    void SetBranchId(vtkIdType b) ;                         ///> set branch which edge belongs to
-    bool IsVertexPair(vtkIdType v0, vtkIdType v1) const  ;        ///> is the edge equal to these vertices (order doesn't matter)
-    bool IsVertexPairOrdered(vtkIdType v0, vtkIdType v1) const ;  ///> is the edge equal to these vertices in this order
-    void SetDirected(bool directed) ;                             ///> set directed property
-    bool IsDirected() const ;                                     ///> is edge directed
-    void ReverseDirection() ;                               ///> exchange vertices 0 and 1
-    double GetWeight() const ;                              ///> get weight
-    void SetWeight(double w) ;                              ///> set weight
-    bool SelfCheck() const ;                                  ///> check self consistency
-    void PrintSelf(std::ostream& os, const int tabs) const ;  ///> print self
+    Edge() ;                                     ///< constructor
+    Edge(vtkIdType v0, vtkIdType v1) ;           ///< constructor with end vertices
+    Edge(const Edge& e) ;                        ///< copy constructor (because array member doesn't deep copy)
+    ~Edge() ;                                    ///< destructor
+    Edge& operator=(const Edge& e) ;             ///< assignment operator
+    vtkIdType GetVertexId(int i) const ;                    ///< get index of vertex i, where i = 0 or 1
+    void SetVertexId(int i, vtkIdType v) ;                  ///< set index of vertex, where i = 0 or 1
+    void SetVertexIds(vtkIdType v0, vtkIdType v1) ;         ///< set indices of vertices
+    void GetVerticesIdList(vtkIdList *idlist) const ;       ///< return vertices as a vtkIdlist
+    vtkIdType GetOtherEndVertexId(vtkIdType v) const ;      ///< get the vertex id at the other end of the edge
+    vtkIdType GetBranchId() const ;                         ///< get branch which edge belongs to
+    void SetBranchId(vtkIdType b) ;                         ///< set branch which edge belongs to
+    bool IsVertexPair(vtkIdType v0, vtkIdType v1) const  ;        ///< is the edge equal to these vertices (order doesn't matter)
+    bool IsVertexPairOrdered(vtkIdType v0, vtkIdType v1) const ;  ///< is the edge equal to these vertices in this order
+    void SetDirected(bool directed) ;                             ///< set directed property
+    bool IsDirected() const ;                                     ///< is edge directed
+    void ReverseDirection() ;                               ///< exchange vertices 0 and 1
+    double GetWeight() const ;                              ///< get weight
+    void SetWeight(double w) ;                              ///< set weight
+    bool SelfCheck() const ;                                  ///< check self consistency
+    void PrintSelf(std::ostream& os, const int tabs) const ;  ///< print self
   private:
-    vtkIdType vertexId[2] ;                                 ///> vertices at ends of edge
-    bool directed ;                                         ///> directed edge - if true, points from v0 to v1 (default = false)
-    double weight ;                                         ///> weight (default = 1.0)
-    vtkIdType branchId ;                                      ///> index of branch which edge belongs to (value = UndefinedId if no branch)
+    vtkIdType vertexId[2] ;                                 ///< vertices at ends of edge
+    bool directed ;                                         ///< directed edge - if true, points from v0 to v1 (default = false)
+    double weight ;                                         ///< weight (default = 1.0)
+    vtkIdType branchId ;                                      ///< index of branch which edge belongs to (value = UndefinedId if no branch)
   } ;
 
 
@@ -252,57 +252,57 @@ public:
   //----------------------------------------------------------------------------
   class Branch{
   public:
-    Branch(const wxString *name = NULL) ;                                 ///> constructor: empty branch with optional name
-    explicit Branch(vtkIdType startvertex, const wxString *name = NULL) ; ///> constructor: branch with initial vertex and optional name
-    ~Branch() ;                                                           ///> destructor
-    int GetNumberOfVertices() const ;                   ///> get number of vertices
-    int GetNumberOfEdges() const ;                      ///> get number of edges (should be vertices - 1)
-    void GetName(wxString *name) const ;                ///> get name of branch
-    void SetName(const wxString *name) ;                ///> set name of branch
-    void UnsetName() ;                                  ///> unset name of branch to undefined
-    vtkIdType GetEdgeId(int i) const ;                  ///> get index of ith edge
-    void SetEdgeId(int i, vtkIdType e) ;                ///> set ith edge
-    void AddEdgeId(vtkIdType e) ;                       ///> add edge to end of list
-    int FindEdgeId(vtkIdType e) const ;                 ///> find position (0..ne-1) of this edge id in the list, return -1 if invalid
-    void InsertEdgeId(int i, vtkIdType e) ;             ///> insert edge
-    vtkIdType GetLastEdgeId() const ;                   ///> get id of last edge
-    vtkIdType GetVertexId(int i) const ;                ///> get index of ith vertex
-    void SetVertexId(int i, vtkIdType v) ;              ///> set ith vertex
-    void AddVertexId(vtkIdType v) ;                     ///> add new vertex to end of list
-    int FindVertexId(vtkIdType v) const ;               ///> find position (0..nv-1) of this vertex id in the list, return -1 if invalid
-    void InsertVertexId(int i, vtkIdType v) ;           ///> insert vertex at position i in list
-    vtkIdType GetLastVertexId() const ;                 ///> get id of last vertex
-    void DeleteLastVertex() ;                           ///> delete last vertex and edge from end of list
-    void GetVerticesIdList(vtkIdList *idlist) const ;   ///> return vertices as a vtkIdlist
-    void ReverseDirection() ;                           ///> reverse branch direction
-    void Clear() ;                                      ///> clear data from branch
-    bool SelfCheck() const ;                                  ///> check self consistency (empty branches are allowed)
-    void PrintSelf(std::ostream& os, const int tabs) const ;  ///> print self
+    Branch(const wxString *name = NULL) ;                                 ///< constructor: empty branch with optional name
+    explicit Branch(vtkIdType startvertex, const wxString *name = NULL) ; ///< constructor: branch with initial vertex and optional name
+    ~Branch() ;                                                           ///< destructor
+    int GetNumberOfVertices() const ;                   ///< get number of vertices
+    int GetNumberOfEdges() const ;                      ///< get number of edges (should be vertices - 1)
+    void GetName(wxString *name) const ;                ///< get name of branch
+    void SetName(const wxString *name) ;                ///< set name of branch
+    void UnsetName() ;                                  ///< unset name of branch to undefined
+    vtkIdType GetEdgeId(int i) const ;                  ///< get index of ith edge
+    void SetEdgeId(int i, vtkIdType e) ;                ///< set ith edge
+    void AddEdgeId(vtkIdType e) ;                       ///< add edge to end of list
+    int FindEdgeId(vtkIdType e) const ;                 ///< find position (0..ne-1) of this edge id in the list, return -1 if invalid
+    void InsertEdgeId(int i, vtkIdType e) ;             ///< insert edge
+    vtkIdType GetLastEdgeId() const ;                   ///< get id of last edge
+    vtkIdType GetVertexId(int i) const ;                ///< get index of ith vertex
+    void SetVertexId(int i, vtkIdType v) ;              ///< set ith vertex
+    void AddVertexId(vtkIdType v) ;                     ///< add new vertex to end of list
+    int FindVertexId(vtkIdType v) const ;               ///< find position (0..nv-1) of this vertex id in the list, return -1 if invalid
+    void InsertVertexId(int i, vtkIdType v) ;           ///< insert vertex at position i in list
+    vtkIdType GetLastVertexId() const ;                 ///< get id of last vertex
+    void DeleteLastVertex() ;                           ///< delete last vertex and edge from end of list
+    void GetVerticesIdList(vtkIdList *idlist) const ;   ///< return vertices as a vtkIdlist
+    void ReverseDirection() ;                           ///< reverse branch direction
+    void Clear() ;                                      ///< clear data from branch
+    bool SelfCheck() const ;                                  ///< check self consistency (empty branches are allowed)
+    void PrintSelf(std::ostream& os, const int tabs) const ;  ///< print self
   private:
-    wxString m_name ;                                   ///> name of branch
-    std::vector<vtkIdType> vertexId ;                   ///> list by vertices
-    std::vector<vtkIdType> edgeId ;                     ///> list by edges
+    wxString m_name ;                                   ///< name of branch
+    std::vector<vtkIdType> vertexId ;                   ///< list by vertices
+    std::vector<vtkIdType> edgeId ;                     ///< list by edges
   } ;
 
   //-----------------------------------------------------------------------------
   // Public functions which return const pointers to vertices, edges and branches.
   // These allow read-only access to const methods of the nested classes
   //-----------------------------------------------------------------------------
-  const Vertex* GetConstVertexPtr(vtkIdType i) const ;   ///> return read-only pointer to vertex, return NULL if index out of range
-  const Edge* GetConstEdgePtr(vtkIdType i) const ;       ///> return read-only pointer to edge, return NULL if index out of range
-  const Branch* GetConstBranchPtr(vtkIdType i) const ;   ///> return read-only pointer to branch, return NULL if index out of range
+  const Vertex* GetConstVertexPtr(vtkIdType i) const ;   ///< return read-only pointer to vertex, return NULL if index out of range
+  const Edge* GetConstEdgePtr(vtkIdType i) const ;       ///< return read-only pointer to edge, return NULL if index out of range
+  const Branch* GetConstBranchPtr(vtkIdType i) const ;   ///< return read-only pointer to branch, return NULL if index out of range
 
 private:
   //-----------------------------------------------------------------------------
   // private methods
   //-----------------------------------------------------------------------------
-  void AllocateVertices(int nv) ;             ///> initialize or resize list of vertices
-  void AllocateEdges(int ne) ;                ///> initialize or resize list of edges
-  void AllocateBranches(int ne) ;             ///> initialize or resize list of branches
+  void AllocateVertices(int nv) ;             ///< initialize or resize list of vertices
+  void AllocateEdges(int ne) ;                ///< initialize or resize list of edges
+  void AllocateBranches(int ne) ;             ///< initialize or resize list of branches
 
-  bool SwapVertexIndices(vtkIdType i, vtkIdType j) ;  ///> swap two vertex indices throughout graph
-  bool SwapEdgeIndices(vtkIdType i, vtkIdType j) ;    ///> swap two edge indices throughout graph
-  bool SwapBranchIndices(vtkIdType i, vtkIdType j) ;  ///> swap two branch indices throughout graph
+  bool SwapVertexIndices(vtkIdType i, vtkIdType j) ;  ///< swap two vertex indices throughout graph
+  bool SwapEdgeIndices(vtkIdType i, vtkIdType j) ;    ///< swap two edge indices throughout graph
+  bool SwapBranchIndices(vtkIdType i, vtkIdType j) ;  ///< swap two branch indices throughout graph
 
   /** Delete last edge from the graph.    
   If the edge was a member of a branch, the branch will be split. */
@@ -322,17 +322,17 @@ private:
   // These give full read and write access to the nested classes,
   // and can only be used by methods of mafPolylineGraph.
   //-----------------------------------------------------------------------------
-  Vertex* GetVertexPtr(vtkIdType i) ;         ///> private: return pointer to vertex, return NULL if index out of range
-  Edge* GetEdgePtr(vtkIdType i)  ;            ///> private: return pointer to edge, return NULL if index out of range
-  Branch* GetBranchPtr(vtkIdType i)  ;        ///> private: return pointer to branch, return NULL if index out of range
+  Vertex* GetVertexPtr(vtkIdType i) ;         ///< private: return pointer to vertex, return NULL if index out of range
+  Edge* GetEdgePtr(vtkIdType i)  ;            ///< private: return pointer to edge, return NULL if index out of range
+  Branch* GetBranchPtr(vtkIdType i)  ;        ///< private: return pointer to branch, return NULL if index out of range
 
 
   //-----------------------------------------------------------------------------
   // member variables
   //-----------------------------------------------------------------------------
-  std::vector<Vertex> vertex ;                ///> list of vertices
-  std::vector<Edge> edge ;                    ///> list of edges
-  std::vector<Branch> branch ;                ///> list of branches
+  std::vector<Vertex> vertex ;                ///< list of vertices
+  std::vector<Edge> edge ;                    ///< list of edges
+  std::vector<Branch> branch ;                ///< list of branches
 } ;
 
 #endif
