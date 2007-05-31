@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: exMedicalApp.cpp,v $
 Language:  C++
-Date:      $Date: 2007-05-25 12:42:03 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2007-05-31 08:15:43 $
+Version:   $Revision: 1.9 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -131,6 +131,7 @@ MafMedical is partially based on OpenMAF.
 	#include "mmoFlipNormals.h"
 	#include "mmoCreateSpline.h"
 	#include "mmoRemoveCells.h"
+	#include "mmoExtrusionHoles.h"
 #endif
 #ifndef _DEBUG
 	//VIEWS
@@ -169,7 +170,7 @@ bool exMedicalApp::OnInit()
 	result = medPipeFactoryVME::Initialize();
 	assert(result==MAF_OK);
 
-	m_Logic = new mafLogicWithManagers();
+	m_Logic = new medLogicWithManagers();
 	m_Logic->GetTopWin()->SetTitle("Medical example");
 
 	//m_Logic->PlugTimebar(false);
@@ -262,6 +263,7 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new mmoCropDeformableROI("Crop ROI"),"Modify");
 	m_Logic->Plug(new mmoFlipNormals("Flip Normals"),"Modify");
 	m_Logic->Plug(new mmoRemoveCells("Remove Cells"),"Modify");
+	m_Logic->Plug(new mmoExtrusionHoles(),"Modify");
 
 	m_Logic->Plug(new mmoRegisterClusters("Clusters"),"Register");
 	#ifdef MAF_USE_ITK

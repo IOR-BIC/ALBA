@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: exMedicalApp.h,v $
 Language:  C++
-Date:      $Date: 2007-05-21 08:35:14 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-05-31 08:15:43 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -43,7 +43,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafLogicWithManagers.h" 
+#include "medLogicWithManagers.h" 
 
 // ============================================================================
 class exMedicalApp : public wxApp
@@ -53,7 +53,7 @@ public:
   bool OnInit();
   int  OnExit();
 protected:
-  mafLogicWithManagers *m_Logic;
+  medLogicWithManagers *m_Logic;
 
 	void OnFatalException();
 };
