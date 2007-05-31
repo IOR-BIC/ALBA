@@ -14,6 +14,8 @@ SET(PROJECT_SRCS
   mmiInfoImage.h
   mmiSelectPoint.cpp
   mmiSelectPoint.h
+  medLogicWithManagers.cpp
+  medLogicWithManagers.h
 )
 
 # List libraries that are needed by this project.
