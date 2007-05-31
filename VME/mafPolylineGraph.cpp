@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2007-05-25 13:22:13 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-05-31 11:04:19 $
+Version:   $Revision: 1.2 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -84,6 +84,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // Branch::~Branch()
 // Branch::GetNumberOfVertices()
 // Branch::GetNumberOfEdges()
+// Branch::GetName(*name)
 // Branch::GetName()
 // Branch::SetName()
 // Branch::UnsetName()
@@ -736,6 +737,14 @@ void mafPolylineGraph::Branch::GetName(wxString *name) const
 //-------------------------------------------------------------------------
 {
   *name = m_name ;
+}
+
+//-------------------------------------------------------------------------
+// Get name
+const wxString* mafPolylineGraph::Branch::GetName() const
+//-------------------------------------------------------------------------
+{
+  return &m_name ;
 }
 
 
@@ -1835,6 +1844,7 @@ bool mafPolylineGraph::AddNewBranch(vtkIdType v0, const wxString *name)
 
 //-------------------------------------------------------------------------
 // Split branch by removing ref to edge
+// The front part of the split gets the original name, the end part is unnamed
 bool mafPolylineGraph::SplitBranchAtEdge(vtkIdType b, vtkIdType e)
 //-------------------------------------------------------------------------
 {
@@ -1870,9 +1880,11 @@ bool mafPolylineGraph::SplitBranchAtEdge(vtkIdType b, vtkIdType e)
   for (j = i+1 ;  j < bold->GetNumberOfVertices() ;  j++)
     bnew->AddVertexId(bold->GetVertexId(j)) ;
 
+  // copy name to temp branch
+  btemp->SetName(bold->GetName()) ;
+
   // copy temp branch back to old branch
   *bold = *btemp ;
-
 
   // set the branch reference of the split edge to undefined
   GetEdgePtr(e)->SetBranchId(UndefinedId) ;
@@ -1892,6 +1904,7 @@ bool mafPolylineGraph::SplitBranchAtEdge(vtkIdType b, vtkIdType e)
 
 //-------------------------------------------------------------------------
 // Split branch by duplicating vertex at position i
+// The front part of the split gets the original name, the end part is unnamed
 bool mafPolylineGraph::SplitBranchAtVertex(vtkIdType b, vtkIdType v)
 //-------------------------------------------------------------------------
 {
@@ -1926,6 +1939,9 @@ bool mafPolylineGraph::SplitBranchAtVertex(vtkIdType b, vtkIdType v)
   // copy vertices i..n-1 to new branch
   for (j = i ;  j < bold->GetNumberOfVertices() ;  j++)
     bnew->AddVertexId(bold->GetVertexId(j)) ;
+
+  // copy name to temp branch
+  btemp->SetName(bold->GetName()) ;
 
   // copy temp brach back to old branch
   *bold = *btemp ;

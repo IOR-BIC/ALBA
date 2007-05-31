@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2007-05-30 16:21:40 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-05-31 11:04:19 $
+Version:   $Revision: 1.3 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -99,17 +99,17 @@ public:
   double GetEdgeWeight(vtkIdType e) const ;               ///< get weight of edge
   void SetEdgeWeight(vtkIdType e, double wt) ;            ///< set weight of edge
 
-  bool AddNewEdge(vtkIdType v0, vtkIdType v1) ;     ///< Add new edge between existing vertices
+  bool AddNewEdge(vtkIdType v0, vtkIdType v1) ;           ///< Add new edge between existing vertices
 
   /** Add new vertex to graph.
   The vertex can be empty or it can connect to an existing vertex with a new edge 
   You can optionally specify the coords of the vertex */
-  void AddNewVertex(double *coords = NULL) ;                ///< empty vertex
-  bool AddNewVertex(vtkIdType v0, double *coords = NULL) ;  ///< connect to existing vertex
+  void AddNewVertex(double *coords = NULL) ;                ///< add new empty vertex
+  bool AddNewVertex(vtkIdType v0, double *coords = NULL) ;  ///< add new vertex, connecting to existing vertex
 
   /** Add new branch to graph */
-  void AddNewBranch(const wxString *name = NULL) ;               ///< empty branch with optional name
-  bool AddNewBranch(vtkIdType v0, const wxString *name = NULL) ; ///< branch with start vertex and optional name
+  void AddNewBranch(const wxString *name = NULL) ;               ///< add new empty branch with optional name
+  bool AddNewBranch(vtkIdType v0, const wxString *name = NULL) ; ///< add new branch with start vertex and optional name
 
   /** Read graph from vtkPolyData (polyline only).
   Each polydata point becomes a graph vertex.
@@ -124,11 +124,13 @@ public:
   bool CopyToPolydata(vtkPolyData *polydata) const ;
 
   /** Split branch by finding and removing edge.
-  A new branch is created at the end of the list. */
+  A new branch is created at the end of the list. 
+  The front section of the split gets the name. */
   bool SplitBranchAtEdge(vtkIdType b, vtkIdType e) ;
 
   /** Split branch at vertex v.
-  A new branch is created at the end of the list. */
+  A new branch is created at the end of the list.
+  The front section of the split gets the name. */
   bool SplitBranchAtVertex(vtkIdType b, vtkIdType v) ;
 
   /** Add new vertex to end of branch. 
@@ -258,6 +260,7 @@ public:
     int GetNumberOfVertices() const ;                   ///< get number of vertices
     int GetNumberOfEdges() const ;                      ///< get number of edges (should be vertices - 1)
     void GetName(wxString *name) const ;                ///< get name of branch
+    const wxString* GetName() const ;                   ///< get name of branch
     void SetName(const wxString *name) ;                ///< set name of branch
     void UnsetName() ;                                  ///< unset name of branch to undefined
     vtkIdType GetEdgeId(int i) const ;                  ///< get index of ith edge
