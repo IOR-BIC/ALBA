@@ -27,6 +27,9 @@ ADD_TEST(mmoLandmarkImporterTXTTest ${EXECUTABLE_OUTPUT_PATH}/mmoLandmarkImporte
 
  ADD_EXECUTABLE(mmoLandmarkImporterWSTest mmoLandmarkImporterWSTest.h mmoLandmarkImporterWSTest.cpp)
   ADD_TEST(mmoLandmarkImporterWSTest ${EXECUTABLE_OUTPUT_PATH}/mmoLandmarkImporterWSTest)
+  
+ADD_EXECUTABLE(mmoExtrusionHolesTest mmoExtrusionHolesTest.h mmoExtrusionHolesTest.cpp)
+ADD_TEST(mmoExtrusionHolesTest ${EXECUTABLE_OUTPUT_PATH}/mmoExtrusionHolesTest)
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
