@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-24 17:08:30 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-06-04 15:11:54 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,9 +25,8 @@
 #include "mafVMEAdvancedProber.h"
 #include "mafVMEAdvancedSlicer.h"
 
-
 #ifdef MAF_USE_ITK
-  
+  #include "mafVMERawMotionData.h"
 #endif
 
 
@@ -77,9 +76,10 @@ medVMEFactory::medVMEFactory()
 
   mafPlugNodeMacro(mafVMEAdvancedProber,"VME for Advanced Probing");
 	mafPlugNodeMacro(mafVMEAdvancedSlicer,"VME for Advanced Slicing");
+  
 
 #ifdef MAF_USE_ITK
-  
+  mafPlugNodeMacro(mafVMERawMotionData,"VME that is a group for RawMotionData");
 #endif
   //mafPlugNodeMacro(mafVMEthing,"VME representing a thing");
 }
