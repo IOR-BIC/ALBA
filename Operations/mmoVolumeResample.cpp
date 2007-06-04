@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-06-04 08:35:59 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -43,6 +43,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkStructuredPoints.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkPointData.h"
+#include "vtkTransform.h"
+#include "vtkTransformPolyDataFilter.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mmoVolumeResample);
@@ -60,6 +62,10 @@ mmoVolumeResample::mmoVolumeResample(const wxString &label) : mafOp(label)
   // initialize Crop OBB parameters
   m_VolumePosition[0]    = m_VolumePosition[1]    = m_VolumePosition[2]    = 0;
   m_VolumeOrientation[0] = m_VolumeOrientation[1] = m_VolumeOrientation[2] = 0;
+
+	m_OldVolumePosition[0] = m_OldVolumePosition[1] = m_OldVolumePosition[2] = 0;
+	m_NewVolumePosition[0] = m_NewVolumePosition[1] = m_NewVolumePosition[2] = 0;
+	m_PrecedentPosition[0] = m_PrecedentPosition[1] = m_PrecedentPosition[2] = 0;
 
   m_VolumeBounds[0] = m_VolumeBounds[1] = m_VolumeBounds[2] = \
   m_VolumeBounds[3] = m_VolumeBounds[4] = m_VolumeBounds[5] = 0;
@@ -187,8 +193,11 @@ void mmoVolumeResample::UpdateGizmoData()
                   m_VolumeBounds[2], m_VolumeBounds[3], \
                   m_VolumeBounds[4], m_VolumeBounds[5]);
 
-  m_ResampleBoxVme->SetAbsPose(m_VolumePosition[0],m_VolumePosition[1],m_VolumePosition[2], \
-                       m_VolumeOrientation[0],m_VolumeOrientation[1],m_VolumeOrientation[2]);
+  /*m_ResampleBoxVme->SetAbsPose(m_VolumePosition[0],m_VolumePosition[1],m_VolumePosition[2], \
+                       m_VolumeOrientation[0],m_VolumeOrientation[1],m_VolumeOrientation[2]);*/
+
+	m_ResampleBoxVme->SetAbsPose(m_NewVolumePosition[0],m_NewVolumePosition[1],m_NewVolumePosition[2], \
+		m_VolumeOrientation[0],m_VolumeOrientation[1],m_VolumeOrientation[2]);
 }
 //----------------------------------------------------------------------------
 void mmoVolumeResample::CreateGizmoCube()
@@ -208,6 +217,7 @@ void mmoVolumeResample::CreateGizmoCube()
   m_ResampleBoxVme->GetMaterial()->m_Diffuse[2] = 0;
   m_ResampleBoxVme->GetMaterial()->UpdateProp();
   m_ResampleBoxVme->ReparentTo((mafVME *)m_Input->GetRoot());
+	mafEventMacro(mafEvent(this,VME_SHOW,m_ResampleBoxVme,true));
   
   UpdateGizmoData();
   AutoSpacing();
@@ -242,6 +252,10 @@ void mmoVolumeResample::SetBoundsToVMELocalBounds()
 
   InternalUpdateBounds(bounds,false);
   ((mafVME *)m_Input)->GetOutput()->GetAbsPose(m_VolumePosition,m_VolumeOrientation);
+
+	m_OldVolumePosition[0] = m_VolumePosition[0];
+	m_OldVolumePosition[1] = m_VolumePosition[1];
+	m_OldVolumePosition[2] = m_VolumePosition[2];
 }
 //----------------------------------------------------------------------------
 void mmoVolumeResample::GizmoDelete()
@@ -273,7 +287,7 @@ void mmoVolumeResample::OpRun()
 void mmoVolumeResample::OpDo()
 //----------------------------------------------------------------------------
 {
-	m_ResampledVme->ReparentTo(m_Input);
+	m_ResampledVme->ReparentTo(m_Input->GetParent());
 }
 //----------------------------------------------------------------------------
 void mmoVolumeResample::Resample()
@@ -281,7 +295,8 @@ void mmoVolumeResample::Resample()
 {
   mafSmartPointer<mafTransform> box_pose;
   box_pose->SetOrientation(m_VolumeOrientation);
-  box_pose->SetPosition(m_VolumePosition);
+  box_pose->SetPosition(m_NewVolumePosition);
+	//box_pose->SetPosition(m_VolumePosition);
 
   mafSmartPointer<mafTransformFrame> local_pose;
   local_pose->SetInput(box_pose);
@@ -292,18 +307,18 @@ void mmoVolumeResample::Resample()
 	mafString new_vme_name = "resampled_";
 	new_vme_name += m_Input->GetName();
 
-	mafNEW(m_ResampledVme);
+	/*mafNEW(m_ResampledVme);
 	m_ResampledVme->SetName(new_vme_name);
 
 	m_Input->Modified();
-	mafVME *Node = mafVME::SafeDownCast(m_Input);
-  /*m_ResampledVme = (mafVMEVolumeGray *)m_Input->NewInstance();
+	mafVME *Node = mafVME::SafeDownCast(m_Input);*/
+  m_ResampledVme = (mafVMEVolumeGray *)m_Input->NewInstance();
   m_ResampledVme->Register(m_ResampledVme);
   m_ResampledVme->GetTagArray()->DeepCopy(m_Input->GetTagArray()); // copy tags
   m_ResampledVme->SetName(new_vme_name);
 
   m_ResampledVme->ReparentTo(m_Input->GetParent());
-  m_ResampledVme->SetMatrix(box_pose->GetMatrix());*/
+  m_ResampledVme->SetMatrix(box_pose->GetMatrix());
 
   int output_extent[6];
   output_extent[0] = 0;
@@ -328,7 +343,7 @@ void mmoVolumeResample::Resample()
         // set at each iteration since I'm using the SetMatrix, which doesn't support
         // transform pipelines.
         mafSmartPointer<mafMatrix> output_parent_abs_pose;
-        Node->GetParent()->GetOutput()->GetAbsMatrix(*output_parent_abs_pose.GetPointer(),input_item->GetTimeStamp());
+        m_ResampledVme->GetParent()->GetOutput()->GetAbsMatrix(*output_parent_abs_pose.GetPointer(),input_item->GetTimeStamp());
         local_pose->SetInputFrame(output_parent_abs_pose);
 
         mafSmartPointer<mafMatrix> input_parent_abs_pose;
@@ -337,7 +352,7 @@ void mmoVolumeResample::Resample()
         local_pose->Update();
 
         mafSmartPointer<mafMatrix> output_abs_pose;
-        Node->GetOutput()->GetAbsMatrix(*output_abs_pose.GetPointer(),input_item->GetTimeStamp());
+        m_ResampledVme->GetOutput()->GetAbsMatrix(*output_abs_pose.GetPointer(),input_item->GetTimeStamp());
         output_to_input->SetInputFrame(output_abs_pose);
 
         mafSmartPointer<mafMatrix> input_abs_pose;
@@ -400,8 +415,12 @@ void mmoVolumeResample::Resample()
       }
     }
   }
-	m_ResampledVme->ReparentTo(m_Input); //Re-parenting a VME implies that it is also added to the tree.
-  m_Output = m_ResampledVme; // Used to make the UnDo: if the output var is set, the undo is done by default.
+	//m_ResampledVme->ReparentTo(m_Input); //Re-parenting a VME implies that it is also added to the tree.
+  //m_Output = m_ResampledVme; // Used to make the UnDo: if the output var is set, the undo is done by default.
+	mafMatrix identity_matrix;
+	m_ResampledVme->SetMatrix(identity_matrix);
+	m_Output = m_ResampledVme; // Used to make the UnDo: if the output var is set, the undo is done by default.
+	//mafDEL(m_ResampledVme);
 }
 //----------------------------------------------------------------------------
 void mmoVolumeResample::OpUndo()
@@ -444,23 +463,24 @@ void mmoVolumeResample::CreateGui()
 {
 	m_Gui = new mmgGui(this);
 
-  m_Gui->Button(ID_VOLUME_VMELOCALBOUNDS,"VME Local Bounds","","set the crop bounding box to the oriented VME bounds (default option)");
-  m_Gui->Button(ID_VOLUME_VMEBOUNDS,"VME Global Bounds","","set the crop bounding box to the VME global bounds");
-  m_Gui->Button(ID_VOLUME_4DBOUNDS,"VME 4D Bounds","","set the crop bounding box to the current VME 4D bounds");
-  m_Gui->Label("");
-	m_Gui->Label("Resample Bounding Box Extent",true);
+  //m_Gui->Button(ID_VOLUME_VMELOCALBOUNDS,"VME Local Bounds","","set the crop bounding box to the oriented VME bounds (default option)");
+  //m_Gui->Button(ID_VOLUME_VMEBOUNDS,"VME Global Bounds","","set the crop bounding box to the VME global bounds");
+  //m_Gui->Button(ID_VOLUME_4DBOUNDS,"VME 4D Bounds","","set the crop bounding box to the current VME 4D bounds");
+  //m_Gui->Label("");
+	m_Gui->Label("ROI Selection",true);
+	m_Gui->Label("Resample Bounding Box Extent");
 	m_Gui->VectorN(ID_VOLUME_DIR_X, "X", &m_VolumeBounds[0], 2);
 	m_Gui->VectorN(ID_VOLUME_DIR_Y, "Y", &m_VolumeBounds[2], 2);
 	m_Gui->VectorN(ID_VOLUME_DIR_Z, "Z", &m_VolumeBounds[4], 2);
 
-  m_Gui->Label("Resample Volume Parameters",true);
-  m_Gui->Label("Bouding Box Origin",false);
+	m_Gui->Label("");
+
+  m_Gui->Label("ROI Orientation",true);
+  m_Gui->Label("Bouding Box Origin");
   m_Gui->Vector(ID_VOLUME_ORIGIN, "", m_VolumePosition,MINFLOAT,MAXFLOAT,2,"output volume origin");
 
-  m_Gui->Label("Bouding Box Orientation",false);
+  m_Gui->Label("Bouding Box Orientation");
   m_Gui->Vector(ID_VOLUME_ORIENTATION, "", m_VolumeOrientation,MINFLOAT,MAXFLOAT,2,"output volume orientation");
-	
-  m_Gui->Label("");
 
   m_Gui->Label("Volume Spacing",false);
   m_Gui->Vector(ID_VOLUME_SPACING, "", this->m_VolumeSpacing,MINFLOAT,MAXFLOAT,4,"output volume spacing");
@@ -470,7 +490,7 @@ void mmoVolumeResample::CreateGui()
 
   m_Gui->Label("");
   
-  double range[2];
+  /*double range[2];
   wxString str_range;
   ((mafVME *)m_Input)->GetOutput()->GetVTKData()->GetScalarRange(range);
   str_range.Printf("[ %.3f , %.3f ]",range[0],range[1]);
@@ -482,7 +502,8 @@ void mmoVolumeResample::CreateGui()
   m_Gui->Label("Padding Value");
   m_Gui->Double(ID_VOLUME_ZERO_VALUE,"",&m_ZeroPadValue);
 
-	m_Gui->Label("");
+	m_Gui->Label("");*/
+
 	m_Gui->OkCancel();
 
 	m_Gui->Divider();
@@ -498,14 +519,27 @@ void mmoVolumeResample::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId())
     {
-      case ID_VOLUME_ORIGIN:
-      case ID_VOLUME_ORIENTATION:
+			case ID_VOLUME_ORIENTATION:
+			case ID_VOLUME_ORIGIN:
+				{
+					/*if(m_PrecedentPosition[0] != m_VolumePosition[0])
+						m_NewVolumePosition[0] = m_NewVolumePosition[0] - m_PrecedentPosition[0] + m_VolumePosition[0];
+					if(m_PrecedentPosition[1] != m_VolumePosition[1])
+						m_NewVolumePosition[1] = m_NewVolumePosition[1] - m_PrecedentPosition[1] + m_VolumePosition[1];
+					if(m_PrecedentPosition[2] != m_VolumePosition[2])
+						m_NewVolumePosition[2] = m_NewVolumePosition[2] - m_PrecedentPosition[2] + m_VolumePosition[2];
+
+					m_PrecedentPosition[0] = m_VolumePosition[0];
+					m_PrecedentPosition[1] = m_VolumePosition[1];
+					m_PrecedentPosition[2] = m_VolumePosition[2];*/
+					ShiftCenterResampled();
+				}
       case ID_VOLUME_DIR_X:		
       case ID_VOLUME_DIR_Y:
       case ID_VOLUME_DIR_Z:
         UpdateGizmoData();
         mafEventMacro(mafEvent(this, CAMERA_UPDATE));
-      break;
+				break;
       case ID_VOLUME_SPACING:
       break;
       case ID_VOLUME_VMEBOUNDS:
@@ -598,4 +632,45 @@ void mmoVolumeResample::SetBounds(double Bounds[6],int Type)
 		m_VolumeBounds[5] = Bounds[5];
 		break;
 	}
+}
+//----------------------------------------------------------------------------
+void mmoVolumeResample::ShiftCenterResampled() 
+//----------------------------------------------------------------------------
+{
+
+	double centerVolume[3];
+
+	((mafVME *)m_Input)->GetOutput()->GetVTKData()->GetCenter(centerVolume);
+
+	vtkMAFSmartPointer<vtkPoints> points;
+	points->InsertNextPoint(centerVolume);
+
+	vtkMAFSmartPointer<vtkPolyData> poly;
+	poly->SetPoints(points);
+	poly->Update();
+
+	vtkMAFSmartPointer<vtkTransform> t;
+	t->RotateX(m_VolumeOrientation[0]);
+	t->RotateY(m_VolumeOrientation[1]);
+	t->RotateZ(m_VolumeOrientation[2]);
+	t->Update();
+
+
+	vtkMAFSmartPointer<vtkTransformPolyDataFilter> ptf;
+	ptf->SetTransform(t);
+	ptf->SetInput(poly);
+	ptf->Update();
+
+	double pt[3];
+	ptf->GetOutput()->GetPoint(0,pt);
+
+	//3 components
+	double difference[3];
+	difference[0] = centerVolume[0] - pt[0];
+	difference[1] = centerVolume[1] - pt[1];
+	difference[2] = centerVolume[2] - pt[2];
+
+	m_NewVolumePosition[0] = m_OldVolumePosition[0] + difference[0] + m_VolumePosition[0];
+	m_NewVolumePosition[1] = m_OldVolumePosition[1] + difference[1] + m_VolumePosition[1];
+	m_NewVolumePosition[2] = m_OldVolumePosition[2] + difference[2] + m_VolumePosition[2];
 }

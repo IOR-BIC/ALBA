@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVolumeResample.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-06-04 08:35:59 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -59,6 +59,10 @@ public:
 
 protected:
   mafVMEVolumeGray *m_ResampledVme;
+
+	double m_OldVolumePosition[3];
+	double m_NewVolumePosition[3];
+	double m_PrecedentPosition[3];
 	
   double m_VolumePosition[3];
   double m_VolumeOrientation[3];
@@ -70,6 +74,7 @@ protected:
 	//gizmo's functions
 	void CreateGizmoCube();
   virtual void CreateGui();
+	void ShiftCenterResampled();
 	void UpdateGizmoData();
 	void UpdateGui();
 	void GizmoDelete();
