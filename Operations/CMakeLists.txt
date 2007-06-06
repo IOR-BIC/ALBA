@@ -17,6 +17,8 @@ IF (MAF_USE_VTK)
     mmo2DMeasure.h
     mmoAddLandmark.cpp
     mmoAddLandmark.h
+    mmoBmpExporter.cpp
+    mmoBmpExporter.h
     mmoClipSurface.cpp
     mmoClipSurface.h
     mmoCreateGroup.cpp
