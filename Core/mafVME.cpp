@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-25 09:39:28 $
-  Version:   $Revision: 1.39 $
+  Date:      $Date: 2007-06-08 16:21:09 $
+  Version:   $Revision: 1.40 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -55,6 +55,9 @@ mafVME::mafVME()
 
   m_CurrentTime   = 0.0;
   m_Crypting      = 0;
+
+  m_EditingVisualPipe = "";
+  m_VisualMode = DEFAULT_VISUAL_MODE;
 }
 
 //-------------------------------------------------------------------------
@@ -832,4 +835,20 @@ mmgGui *mafVME::CreateGui()
 	m_Gui->Divider();
 
   return m_Gui;
+}
+//-------------------------------------------------------------------------
+void mafVME::SetVisualMode(int mode)
+//-------------------------------------------------------------------------
+{
+  if (m_VisualMode != mode)
+  {
+    m_VisualMode = mode;
+    if (m_VisualMode == DEFAULT_VISUAL_MODE)
+    {
+      // Reset the Editing visual pipe
+      m_EditingVisualPipe = "";
+    }
+    mafEvent updateModalityEvent(this, VME_VISUAL_MODE_CHANGED, this);
+    Superclass::OnEvent(&updateModalityEvent);
+  }
 }

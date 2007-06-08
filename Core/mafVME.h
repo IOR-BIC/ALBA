@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-19 11:34:51 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2007-06-08 16:21:09 $
+  Version:   $Revision: 1.32 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -43,6 +43,12 @@ class MAF_EXPORT mafVME : public mafNode
 {
 public:
   mafAbstractTypeMacro(mafVME,mafNode);
+
+  enum VME_VISUAL_MODE
+  {
+    DEFAULT_VISUAL_MODE = 0,
+    EDIT_VISUAL_MODE
+  };
 
   //typedef std::vector<mafTimeStamp> std::vector<mafTimeStamp>;
 
@@ -198,6 +204,21 @@ public:
   /** Return the suggested pipe-typename for the visualization of this vme */
   virtual mafString GetVisualPipe() {return mafString("");};
 
+  /** Set the mode with which render the VME: DEFAULT_VISUAL_MODE or EDIT_VISUAL_MODE.
+  Setting the visual mode to default will produce also the reset of the m_EditingVisualPipe
+  to the empty string. This because the editing visual pipe is set dynamically by the class that
+  use this feature.*/
+  void SetVisualMode(int mode = DEFAULT_VISUAL_MODE);
+
+  /** Get the mode with which render the VME: DEFAULT_VISUAL_MODE or EDIT_VISUAL_MODE*/
+  int GetVisualMode() {return m_VisualMode;};
+
+  /** Set the visual pipe class string to be used to show the VME when is edited.*/
+  virtual void SetEditingVisualPipe(mafString &editPipe) {m_EditingVisualPipe = editPipe;};
+
+  /** Return the pipe-typename for the editing visualization of this vme */
+  virtual mafString GetEditingVisualPipe() {return m_EditingVisualPipe;};
+
   /** 
     return the interactor assigned as a behavior to this VME. This is the 
     interactor to which events coming from input devices are sent when 
@@ -249,6 +270,9 @@ protected:
   int             m_Crypting;     ///< enable flag for this VME
   
   mafInteractor*  m_Behavior;     ///< the interactor representing the behavior of this VME
+
+  mafString       m_EditingVisualPipe; ///< store the editing visual pipe class name. It is reseted when the VME switch to defauld visual mode
+  int             m_VisualMode; ///< Store the visual mode to allow the visual pipe to choose the right visual pipe to render the VME
   
 private:
   mafVME(const mafVME&); // Not implemented
