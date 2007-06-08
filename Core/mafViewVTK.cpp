@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-10 10:09:36 $
-  Version:   $Revision: 1.68 $
+  Date:      $Date: 2007-06-08 16:21:34 $
+  Version:   $Revision: 1.69 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -247,12 +247,22 @@ void mafViewVTK::GetVisualPipeName(mafNode *node, mafString &pipe_name)
   assert(node->IsA("mafVME"));
   mafVME *v = ((mafVME*)node);
 
-  mafString vme_type = v->GetTypeName();
-  if (!m_PipeMap.empty())
+  if (v->GetVisualMode() == mafVME::EDIT_VISUAL_MODE)
   {
-    // pick up the visual pipe from the view's visual pipe map
-    pipe_name = m_PipeMap[vme_type].m_PipeName;
+    pipe_name = v->GetEditingVisualPipe();
   }
+  else
+  {
+    // custom visualization for the view should be considered only
+    // if we are not in editing mode.
+    mafString vme_type = v->GetTypeName();
+    if (!m_PipeMap.empty())
+    {
+      // pick up the visual pipe from the view's visual pipe map
+      pipe_name = m_PipeMap[vme_type].m_PipeName;
+    }
+  }
+
   if(pipe_name.IsEmpty())
   {
     // pick up the default visual pipe from the vme
