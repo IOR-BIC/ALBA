@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-23 12:46:15 $
-  Version:   $Revision: 1.102 $
+  Date:      $Date: 2007-06-08 16:26:45 $
+  Version:   $Revision: 1.103 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,6 +39,7 @@
   #include "mmoVTKImporter.h"
   #include "mmoSTLImporter.h"
   #include "mafInteractionManager.h"
+
   #include "mafInteractor.h"
   #include "mafDeviceManager.h"
   #include "mafAction.h"
@@ -70,6 +71,8 @@
 #ifdef WIN32
   #include "mmdClientMAF.h"
 #endif
+
+
 
 #include "mmaApplicationLayout.h"
 
@@ -165,6 +168,7 @@ void mafLogicWithManagers::Configure()
   {
     m_InteractionManager = new mafInteractionManager();
     m_InteractionManager->SetListener(this);
+
 
     m_Mouse = m_InteractionManager->GetMouseDevice();
     //SIL m_InteractionManager->GetClientDevice()->AddObserver(this, MCH_INPUT);
@@ -594,16 +598,30 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
         VmeRemoving(e->GetVme());
       break; 
       case VME_CHOOSE:
-        {
-          mafString *s = e->GetString();
-          if(s != NULL)
-            e->SetVme(VmeChoose(e->GetArg(), e->GetBool(), *s));
-          else
-            e->SetVme(VmeChoose(e->GetArg(), e->GetBool()));
-        }
+      {
+        mafString *s = e->GetString();
+        if(s != NULL)
+          e->SetVme(VmeChoose(e->GetArg(), e->GetBool(), *s));
+        else
+          e->SetVme(VmeChoose(e->GetArg(), e->GetBool()));
+      }
       break;
       case VME_CHOOSE_MATERIAL:
         VmeChooseMaterial((mafVME *)e->GetVme(), e->GetBool());
+      break;
+      case VME_VISUAL_MODE_CHANGED:
+      {
+        mafVME *vme = (mafVME *)e->GetVme();
+        if (vme->GetEditingVisualPipe().IsEmpty())
+        {
+          VmeUpdateProperties(vme,false);
+        }
+        else
+        {
+          VmeShow(vme, false);
+          VmeShow(vme, true);
+        }
+      }
       break;
       case UPDATE_PROPERTY:
         VmeUpdateProperties((mafVME *)e->GetVme(), e->GetBool());
@@ -620,7 +638,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
         if(m_OpManager) 
         {
           m_OpManager->OpRun(e->GetArg());
-          if(m_RemoteLogic && m_RemoteLogic->IsSocketConnected() && !m_OpManager->m_FromRemote)
+          if(m_OpManager->GetRunningOperation() && m_RemoteLogic && m_RemoteLogic->IsSocketConnected() && !m_OpManager->m_FromRemote)
           {
             mafEvent re(this, mafOpManager::RUN_OPERATION_EVENT, e->GetArg());
             re.SetChannel(REMOTE_COMMAND_CHANNEL);
@@ -628,20 +646,20 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
           }
         }
       break;
-			case PARSE_STRING:
-				{
-					if(this->m_OpManager->Running())
-					{
-						wxMessageBox("There is an other operation running!!");
-						return;
-					}
-					int menuId, opId;
-					mafString *s = e->GetString();
-					menuId = this->m_MenuBar->FindMenu("Operations");
-					opId = this->m_MenuBar->GetMenu(menuId)->FindItem(s->GetCStr());
-					m_OpManager->OpRun(opId);
-				}
-				break;
+      case PARSE_STRING:
+        {
+          if(this->m_OpManager->Running())
+          {
+            wxMessageBox("There is an other operation running!!");
+            return;
+          }
+          int menuId, opId;
+          mafString *s = e->GetString();
+          menuId = m_MenuBar->FindMenu("Operations");
+          opId = m_MenuBar->GetMenu(menuId)->FindItem(s->GetCStr());
+          m_OpManager->OpRun(opId);
+        }
+      break;
       case OP_RUN_STARTING:
       {
         mmgMDIChild *c = (mmgMDIChild *)m_Win->GetActiveChild();
@@ -676,13 +694,16 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
         ViewCreated(e->GetView());
       break;
       case VIEW_DELETE:
+      {
+
         if(m_PlugSidebar)
-          this->m_SideBar->ViewDeleted(e->GetView()); // changed By Marco (is it correct?)
+          this->m_SideBar->ViewDeleted(e->GetView());
 #ifdef MAF_USE_VTK
         // currently mafInteraction is strictly dependent on VTK (marco)
         if(m_InteractionManager)
           m_InteractionManager->ViewSelected(NULL);
 #endif
+
         if (m_ViewManager)
         {
           EnableItem(CAMERA_RESET, false);
@@ -694,10 +715,11 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
           EnableItem(MENU_FILE_PRINT_SETUP, false);
           EnableItem(MENU_FILE_PRINT_PAGE_SETUP, false);
         }
-        if (m_OpManager)
-        {
-          m_OpManager->RefreshMenu();
-        }
+      }
+      if (m_OpManager)
+      {
+        m_OpManager->RefreshMenu();
+      }
       break;	
       case VIEW_SELECT:
       {
@@ -873,6 +895,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
         if(m_InteractionManager) m_InteractionManager->PopPER();
 #endif
       break;
+
       case CREATE_STORAGE:
         CreateStorage(e);
       break;
@@ -1272,18 +1295,18 @@ void mafLogicWithManagers::EnableMenuAndToolbar(bool enable)
   EnableItem(MENU_FILE_NEW,enable);
   EnableItem(MENU_FILE_OPEN,enable);
   EnableItem(MENU_FILE_SAVE,enable);
-  EnableItem(MENU_FILE_SAVEAS,enable );
-  EnableItem(MENU_FILE_MERGE,enable );
-  EnableItem(MENU_FILE_QUIT,enable );
-  EnableItem(wxID_FILE1,enable );
-  EnableItem(wxID_FILE2,enable );
-  EnableItem(wxID_FILE3,enable );
-  EnableItem(wxID_FILE4,enable );
-	EnableItem(wxID_FILE5,enable );
-	EnableItem(wxID_FILE6,enable );
-	EnableItem(wxID_FILE7,enable );
-	EnableItem(wxID_FILE8,enable );
-	EnableItem(wxID_FILE9,enable );
+  EnableItem(MENU_FILE_SAVEAS,enable);
+  EnableItem(MENU_FILE_MERGE,enable);
+  EnableItem(MENU_FILE_QUIT,enable);
+  EnableItem(wxID_FILE1,enable);
+  EnableItem(wxID_FILE2,enable);
+  EnableItem(wxID_FILE3,enable);
+  EnableItem(wxID_FILE4,enable);
+  EnableItem(wxID_FILE5,enable);
+  EnableItem(wxID_FILE6,enable);
+  EnableItem(wxID_FILE7,enable);
+  EnableItem(wxID_FILE8,enable);
+  EnableItem(wxID_FILE9,enable);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OpShowGui(bool push_gui, mmgPanel *panel)
@@ -1304,6 +1327,7 @@ void mafLogicWithManagers::ViewCreate(int viewId)
 	if(m_ViewManager)
   {
     mafView* v = m_ViewManager->ViewCreate(viewId);
+
     /*
     if(m_OpManager) 
     {
@@ -1351,7 +1375,7 @@ void mafLogicWithManagers::ViewCreated(mafView *v)
 {
   // removed temporarily support for external Views
   if(v) 
-	{
+  {
     if(m_RemoteLogic && m_RemoteLogic->IsSocketConnected() && !m_ViewManager->m_FromRemote)
     {
       mafEvent ev(this,VIEW_CREATE,v);
@@ -1378,7 +1402,7 @@ void mafLogicWithManagers::ViewCreated(mafView *v)
       c->SetListener(m_ViewManager);
       v->SetFrame(c);
     }
-	}
+  }
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::TimeSet(double t)
@@ -1422,10 +1446,10 @@ void mafLogicWithManagers::VmeChooseMaterial(mafVME *vme, bool updateProperty)
   }
 }
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::VmeUpdateProperties(mafVME *vme, bool updateProperty)
+void mafLogicWithManagers::VmeUpdateProperties(mafVME *vme, bool updatePropertyFromTag)
 //----------------------------------------------------------------------------
 {
-  this->m_ViewManager->PropertyUpdate(updateProperty);
+  this->m_ViewManager->PropertyUpdate(updatePropertyFromTag);
   this->m_ViewManager->CameraUpdate();
   this->m_VMEManager->MSFModified(true);
 }
@@ -1499,6 +1523,7 @@ void mafLogicWithManagers::CreateStorage(mafEvent *e)
     
     storage->GetRoot()->SetName("root");
     storage->SetListener(m_VMEManager);
+    
     storage->GetRoot()->Initialize();
     e->SetMafObject(storage);
   }
@@ -1571,7 +1596,6 @@ void mafLogicWithManagers::ImportExternalFile(mafString &filename)
   else
     wxMessageBox(_("Can not import this type of file!"), _("Warning"));
 }
-
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::SetRevision(mafString revision)
 //----------------------------------------------------------------------------
