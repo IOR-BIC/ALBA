@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-11 15:26:16 $
-  Version:   $Revision: 1.36 $
+  Date:      $Date: 2007-06-11 15:30:46 $
+  Version:   $Revision: 1.37 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -92,7 +92,8 @@ public:
 	virtual void Plug(mafView* view);
 
 
-  /**  Plug a new operation */
+  /**  Plug a new operation and its undo flag: if the operation does not support
+  undo the undo flag has no effect */
 	virtual void Plug(mafOp *op, wxString menuPath = "", bool canUndo = true);
 	
   /** Configure the application.
