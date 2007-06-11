@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-08 16:26:45 $
-  Version:   $Revision: 1.103 $
+  Date:      $Date: 2007-06-11 15:26:16 $
+  Version:   $Revision: 1.104 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -234,12 +234,12 @@ void mafLogicWithManagers::Plug(mafView* view)
     m_ViewManager->ViewAdd(view);
 }
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::Plug(mafOp *op, wxString menuPath)
+void mafLogicWithManagers::Plug(mafOp *op, wxString menuPath, bool canUndo)
 //----------------------------------------------------------------------------
 {
   if(m_OpManager) 
   {
-    m_OpManager->OpAdd(op, menuPath);
+    m_OpManager->OpAdd(op, menuPath, canUndo);
     
 // currently mafInteraction is strictly dependent on VTK (marco)
 #ifdef MAF_USE_VTK    

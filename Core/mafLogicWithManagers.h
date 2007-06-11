@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-08 16:23:42 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2007-06-11 15:26:16 $
+  Version:   $Revision: 1.36 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -93,7 +93,7 @@ public:
 
 
   /**  Plug a new operation */
-	virtual void Plug(mafOp *op, wxString menuPath = "");
+	virtual void Plug(mafOp *op, wxString menuPath = "", bool canUndo = true);
 	
   /** Configure the application.
   At this point are plugged all the managers, the side-bar docking panel. 
