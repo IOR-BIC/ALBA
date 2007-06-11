@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-14 15:59:22 $
-  Version:   $Revision: 1.37 $
+  Date:      $Date: 2007-06-11 11:50:49 $
+  Version:   $Revision: 1.38 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -317,6 +317,24 @@ void mafPipeSurface::Select(bool sel)
 void mafPipeSurface::UpdateProperty(bool fromTag)
 //----------------------------------------------------------------------------
 {
+  if (IsEditingActive())
+  {
+    // check if you have to turn off the editing visual pipe for the VME.
+    if (m_Vme->GetVisualMode() == mafVME::DEFAULT_VISUAL_MODE)
+    {
+      EditingVisualPipeOff();
+      // Here goes default visual pipe stuff update
+    }
+  }
+  else
+  {
+    // check if you have to activate the editing visual pipe for the VME.
+    if (m_Vme->GetVisualMode() == mafVME::EDIT_VISUAL_MODE)
+    {
+      EditingVisualPipeOn();
+      // Here goes visual pipe stuff create/update
+    }
+  }
 }
 //----------------------------------------------------------------------------
 mmgGui *mafPipeSurface::CreateGui()
