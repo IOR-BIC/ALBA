@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-11 15:22:00 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2007-06-11 16:00:17 $
+  Version:   $Revision: 1.32 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -442,15 +442,19 @@ bool mafOpManager::WarnUser(mafOp *op)
 //----------------------------------------------------------------------------
 {
 	bool go = true;
-	if(m_Warn && !op->CanUndo())
+	if(m_Warn)
 	{
-		wxMessageDialog dialog(
-							mafGetFrame(),
-							"This operation can not UnDo. Continue?",
-							"UnDo Warning",
-							wxYES_NO|wxYES_DEFAULT
-							);
-		if(dialog.ShowModal() == wxID_NO) go = false;
+    bool show_message = (op == NULL) || !op->CanUndo();
+    if (show_message)
+    {
+      wxMessageDialog dialog(
+        mafGetFrame(),
+        _("This operation can not UnDo. Continue?"),
+        _("Warning"),
+        wxYES_NO|wxYES_DEFAULT
+        );
+      if(dialog.ShowModal() == wxID_NO) go = false;
+    }
 	}
   return go;
 }
@@ -481,11 +485,14 @@ void mafOpManager::OpRun(int op_id)
 	  break;
 	  case OP_DELETE:
     {
-      mafNode *node_to_del = m_Selected;
-      OpSelect(m_Selected->GetParent());
-      node_to_del->ReparentTo(NULL);
-      ClearUndoStack();
-      mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+      if (WarnUser(NULL))
+      {
+        mafNode *node_to_del = m_Selected;
+        OpSelect(m_Selected->GetParent());
+        node_to_del->ReparentTo(NULL);
+        ClearUndoStack();
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+      }
     }
     break;
 	  case OP_CUT:
@@ -573,10 +580,7 @@ void mafOpManager::OpRunOk(mafOp *op)
   m_Context.Pop();
 
   m_RunningOp = NULL;
-//	if(WarnUser(op))
-//	{
-		OpDo(op);
-//	}
+	OpDo(op);
   Notify(OP_RUN_TERMINATED);
 	if(m_Context.Caller() == NULL) 	
     EnableOp();
@@ -605,13 +609,10 @@ void mafOpManager::OpExec(mafOp *op)
 	assert(op);
 	if(op->Accept(m_Selected))
   {
-    if(WarnUser(op))
-	  {
-		  mafOp *o = op->Copy();
-		  o->SetListener(this);
-		  o->SetInput(m_Selected);
-		  OpDo(o);
-	  }
+		mafOp *o = op->Copy();
+		o->SetListener(this);
+		o->SetInput(m_Selected);
+		OpDo(o);
   }
 	EnableOp();
 }
@@ -619,7 +620,7 @@ void mafOpManager::OpExec(mafOp *op)
 void mafOpManager::OpDo(mafOp *op)
 //----------------------------------------------------------------------------
 {
- 	if(!WarnUser(op)) 
+ 	if(!op->CanUndo())
   {
     delete op;
 		return;
