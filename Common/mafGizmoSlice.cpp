@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-28 09:41:40 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-06-11 08:43:15 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -142,6 +142,8 @@ void mafGizmoSlice::CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int 
 	  vtkMAFSmartPointer<vtkPlaneSource> ps;
 	  ps->SetOrigin(cubeHandleLocalPosition);
 
+    double borderCube = VolumeVTKData->GetLength()/50;
+
     cubeHandleLocalPosition[0] = localBounds[0];
     cubeHandleLocalPosition[1] = localBounds[2];
     cubeHandleLocalPosition[2] = localBounds[4];
@@ -157,27 +159,33 @@ void mafGizmoSlice::CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int 
 		  case GIZMO_SLICE_X:
       {      
 			  cubeHandleLocalPosition[0] = localPositionOnAxis;
+        cubeHandleLocalPosition[1] -= borderCube /2;
+        cubeHandleLocalPosition[2] -= borderCube /2;
 				if(wy<0.00001) wy=-10;
-			  ps->SetPoint1(0,wy,0);
-			  ps->SetPoint2(0,0,wz);
+			  ps->SetPoint1(0,wy + borderCube /2,0);
+			  ps->SetPoint2(0,0,wz + borderCube /2);
         m_MouseBH->GetTranslationConstraint()->SetBounds(mmiConstraint::X, interval[0]);
       }
 		  break;
 		  case GIZMO_SLICE_Y:
       {     
+        cubeHandleLocalPosition[0] -= borderCube /2;
 			  cubeHandleLocalPosition[1] = localPositionOnAxis;
-			  ps->SetPoint1(wx,0,0);
-			  ps->SetPoint2(0,0,wz); 
+        cubeHandleLocalPosition[2] -= borderCube /2;
+			  ps->SetPoint1(wx+ borderCube /2,0,0);
+			  ps->SetPoint2(0,0,wz+ borderCube /2); 
         m_MouseBH->GetTranslationConstraint()->SetBounds(mmiConstraint::Y, interval[1]);
       } 
 		  break;
 		  case GIZMO_SLICE_Z:
 		  default:
       {
+        cubeHandleLocalPosition[0] -= borderCube /2;
+        cubeHandleLocalPosition[1] -= borderCube /2;
 			  cubeHandleLocalPosition[2] = localPositionOnAxis;
-			  ps->SetPoint1(wx,0,0);
+			  ps->SetPoint1(wx+ borderCube /2,0,0);
 				if(wy<0.00001) wy=-10;
-			  ps->SetPoint2(0,wy,0);
+			  ps->SetPoint2(0,wy+ borderCube /2,0);
         m_MouseBH->GetTranslationConstraint()->SetBounds(mmiConstraint::Z, interval[2]);
       }
 		  break;
