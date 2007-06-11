@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-08 16:21:09 $
-  Version:   $Revision: 1.32 $
+  Date:      $Date: 2007-06-11 14:27:11 $
+  Version:   $Revision: 1.33 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -208,7 +208,7 @@ public:
   Setting the visual mode to default will produce also the reset of the m_EditingVisualPipe
   to the empty string. This because the editing visual pipe is set dynamically by the class that
   use this feature.*/
-  void SetVisualMode(int mode = DEFAULT_VISUAL_MODE);
+  void SetVisualMode(int mode);
 
   /** Get the mode with which render the VME: DEFAULT_VISUAL_MODE or EDIT_VISUAL_MODE*/
   int GetVisualMode() {return m_VisualMode;};
