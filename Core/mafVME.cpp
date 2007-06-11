@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-08 16:21:09 $
-  Version:   $Revision: 1.40 $
+  Date:      $Date: 2007-06-11 14:52:24 $
+  Version:   $Revision: 1.41 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -826,10 +826,10 @@ mmgGui *mafVME::CreateGui()
   m_Gui->SetListener(this);
 
   mafString anim_text;
-  anim_text = "not animated";
+  anim_text = _("not animated");
   if (IsAnimated())
   {
-    anim_text = "animated";
+    anim_text = _("animated");
   }
   m_Gui->Label(anim_text);
 	m_Gui->Divider();
