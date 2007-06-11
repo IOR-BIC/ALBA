@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-15 14:33:36 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2007-06-11 11:48:22 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -74,14 +74,23 @@ public:
   /** destroy the Gui */
   void DeleteGui();
 
-  mmgGui         *m_Gui;      ///< user interface
-  mafVME         *m_Vme;
-	vtkMAFAssembly *m_AssemblyFront;
-	vtkMAFAssembly *m_AssemblyBack;
-	mafSceneGraph  *m_Sg;
-  bool            m_Selected;
-  vtkRenderer    *m_RenFront;
-  vtkRenderer    *m_RenBack;
+  /** Return true if the editing visual pipe is active otherwise false is returned.*/
+  bool IsEditingActive() {return m_EditingVME;};
+
+  /** Turn On the editing visual pipe code.*/
+  void EditingVisualPipeOn() {m_EditingVME = true;};
+
+  /** Turn Off the editing visual pipe code.*/
+  void EditingVisualPipeOff() {m_EditingVME = false;};
+
+  mmgGui         *m_Gui;      ///< User Interface
+  mafVME         *m_Vme;      ///< VME used as input for the visual pipe
+	vtkMAFAssembly *m_AssemblyFront; ///< Assembly used to contain the actor in the front layer
+	vtkMAFAssembly *m_AssemblyBack;  ///< Assembly used to contain the actor in the background layer
+	mafSceneGraph  *m_Sg;       ///< Pointer to the SceneGraph
+  bool            m_Selected; ///< Flag used to say if the rendered VME is selected.
+  vtkRenderer    *m_RenFront; ///< Renderer associated to the front layer
+  vtkRenderer    *m_RenBack;  ///< Renderer associated to the background layer
 
 protected:
   /**
@@ -94,5 +103,7 @@ protected:
   virtual mmgGui  *CreateGui();
 
   mafObserver *m_Listener;
+
+  bool         m_EditingVME; ///< Flag to indicate if is active the editing visual pipe for the VME
 };
 #endif
