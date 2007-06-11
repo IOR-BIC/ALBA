@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-19 12:31:13 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-06-11 15:22:00 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -53,10 +53,10 @@ public:
   MAF_ID_DEC(RUN_OPERATION_EVENT)
 
 	/** Add the operation 'op' to the list of available operations. */
-	virtual void OpAdd		(mafOp *op, wxString menuPath = "");
+	virtual void OpAdd(mafOp *op, wxString menuPath = "", bool can_undo = true);
 
 	/** Fill the application men with the operations name.	*/
-	virtual void FillMenu (wxMenu* import, wxMenu* mexport, wxMenu* operations);
+	virtual void FillMenu(wxMenu* import, wxMenu* mexport, wxMenu* operations);
 
 	/** Record the selected vme and enable the menu_entries relative to the compatible operations. */
 	virtual void VmeSelected(mafNode* v);

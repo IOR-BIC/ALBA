@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-11 14:52:00 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2007-06-11 15:22:00 $
+  Version:   $Revision: 1.31 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -173,7 +173,7 @@ void mafOpManager::OnEvent(mafEventBase *maf_event)
   }
 }
 //----------------------------------------------------------------------------
-void mafOpManager::OpAdd(mafOp *op, wxString menuPath)
+void mafOpManager::OpAdd(mafOp *op, wxString menuPath, bool can_undo)
 //----------------------------------------------------------------------------
 {
   assert(m_NumOp < MAXOP);
@@ -181,6 +181,7 @@ void mafOpManager::OpAdd(mafOp *op, wxString menuPath)
   op->m_OpMenuPath = menuPath;
 	op->m_Id = m_NumOp + OP_USER;
   op->SetListener(this);
+  op->SetCanundo(can_undo);
   m_NumOp++;
 }
 //----------------------------------------------------------------------------
