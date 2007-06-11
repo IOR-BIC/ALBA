@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 13:53:28 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2007-06-11 14:51:19 $
+  Version:   $Revision: 1.20 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -138,6 +138,12 @@ public:
 
   /** Used to turn off m_TestMode flag.*/
   void TestModeOff() {m_TestMode = false;};
+
+  /** Set the Canundo flag for the operation when is plugged.*/
+  void SetCanundo(bool can_undo = true) {m_Canundo = can_undo;};
+
+  /** Return the Canundo flag for the operation.*/
+  bool GetCanundo() {return m_Canundo;};
 
 protected:
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
