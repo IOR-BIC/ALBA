@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-03 14:31:26 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2007-06-11 14:52:00 $
+  Version:   $Revision: 1.30 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -78,7 +78,8 @@ mafOpManager::mafOpManager()
   m_RemoteListener = NULL;
   m_RunningOp = NULL;
 	m_Selected	= NULL;
-	m_Warn			= false;
+	//m_Warn			= false;
+  m_Warn			= true;
   m_FromRemote= false;
 
   m_OpParameters = NULL;
@@ -508,6 +509,11 @@ void mafOpManager::OpRun(int op_id)
 void mafOpManager::OpRun(mafOp *op, void *op_param)
 //----------------------------------------------------------------------------
 {
+  if(!WarnUser(op))
+  {
+    return;
+  }
+
 	//Code to manage operation's Input Preserving
   mafTagItem *ti = NULL;
   mafString tag_nature = "";
@@ -566,10 +572,10 @@ void mafOpManager::OpRunOk(mafOp *op)
   m_Context.Pop();
 
   m_RunningOp = NULL;
-	if(WarnUser(op))
-	{
+//	if(WarnUser(op))
+//	{
 		OpDo(op);
-	}
+//	}
   Notify(OP_RUN_TERMINATED);
 	if(m_Context.Caller() == NULL) 	
     EnableOp();
