@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-11 15:22:00 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-06-11 15:59:44 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -123,13 +123,13 @@ public:
 
 protected:
 	/** Execute the current operation. */
-  virtual void OpDo					(mafOp *op);
+  virtual void OpDo(mafOp *op);
 
 	/** This method is called if the operation must be executed. */
-  virtual void OpRunOk			(mafOp *op);
+  virtual void OpRunOk(mafOp *op);
 
 	/** The operation is not executed and is deleted. */
-  virtual void OpRunCancel	(mafOp *op);
+  virtual void OpRunCancel(mafOp *op);
 
 	/** Execute the 'UnDo' method of the operation. */
   virtual void OpUndo();
@@ -138,10 +138,10 @@ protected:
 	virtual void OpRedo();
 
 	/** Warn the user if the operation is undoable. */
-  virtual bool WarnUser			(mafOp *op);
+  virtual bool WarnUser(mafOp *op);
 
 	/** Sent a string message to the listener. */
-  virtual void Notify	      (int msg);
+  virtual void Notify(int msg);
 
 	/** Enable/Disable the men items operation. */
   virtual void EnableOp(bool CanEnable = true);
