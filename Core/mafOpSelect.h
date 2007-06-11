@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpSelect.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:54:44 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-06-11 16:06:43 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,7 +31,7 @@ class vtkMatrix4x4;
 class mafOpSelect: public mafOp
 {
 public:
-    mafOpSelect(wxString label="Select");
+    mafOpSelect(wxString label=_("Select"));
    ~mafOpSelect(); 
     bool Accept(mafNode* vme);
     void SetInput(mafNode* vme);
@@ -69,7 +69,7 @@ protected:
 class mafOpCut: public mafOpEdit
 {
 public:
-    mafOpCut(wxString label="Cut"); 
+    mafOpCut(wxString label=_("Cut"));
     ~mafOpCut(); 
     bool Accept(mafNode* vme);
     void OpDo();
@@ -84,7 +84,7 @@ protected:
 class mafOpCopy: public mafOpEdit
 {
 public:
-    mafOpCopy(wxString label="Copy"); 
+    mafOpCopy(wxString label=_("Copy"));
     ~mafOpCopy();
     bool Accept(mafNode* vme);
     void OpDo();
@@ -97,7 +97,7 @@ public:
 class mafOpPaste: public mafOpEdit
 {
 public:
-    mafOpPaste(wxString label="Paste"); 
+    mafOpPaste(wxString label=_("Paste"));
     bool Accept(mafNode* vme);       
     void OpDo();
     void OpUndo();
