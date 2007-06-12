@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-03 14:53:46 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-06-12 15:08:20 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -92,7 +92,7 @@ public:
   void Modified();
   
   /** Set the TimeStamp for this matrix */
-  void SetTimeStamp(mafTimeStamp t) {m_TimeStamp=t;};
+  void SetTimeStamp(mafTimeStamp t) {m_TimeStamp=t; Modified();};
   mafTimeStamp GetTimeStamp() const {return m_TimeStamp;};
 
   /** Get the given matrix versor. Static version. */
