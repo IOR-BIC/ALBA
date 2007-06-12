@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-11 15:26:16 $
-  Version:   $Revision: 1.104 $
+  Date:      $Date: 2007-06-12 11:14:14 $
+  Version:   $Revision: 1.105 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -187,6 +187,7 @@ void mafLogicWithManagers::Configure()
     m_OpManager = new mafOpManager();
     m_OpManager->SetListener(this);
     m_OpManager->SetMouse(m_Mouse);
+    m_OpManager->WarningIfCantUndo(m_ApplicationSettings->GetWarnUserFlag());
   }
   
 // currently mafInteraction is strictly dependent on VTK (marco)
@@ -241,7 +242,7 @@ void mafLogicWithManagers::Plug(mafOp *op, wxString menuPath, bool canUndo)
   {
     m_OpManager->OpAdd(op, menuPath, canUndo);
     
-// currently mafInteraction is strictly dependent on VTK (marco)
+// currently mafInteraction is strictly dependent on VTK
 #ifdef MAF_USE_VTK    
     if (m_InteractionManager)
     {
@@ -660,6 +661,12 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
           m_OpManager->OpRun(opId);
         }
       break;
+      case MENU_OPTION_APPLICATION_SETTINGS:
+        if (m_OpManager)
+        {
+          m_OpManager->WarningIfCantUndo(m_ApplicationSettings->GetWarnUserFlag());
+        }
+      break;
       case OP_RUN_STARTING:
       {
         mmgMDIChild *c = (mmgMDIChild *)m_Win->GetActiveChild();
@@ -895,7 +902,6 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
         if(m_InteractionManager) m_InteractionManager->PopPER();
 #endif
       break;
-
       case CREATE_STORAGE:
         CreateStorage(e);
       break;
