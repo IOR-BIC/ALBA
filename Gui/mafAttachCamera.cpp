@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttachCamera.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:46:07 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-06-12 10:37:04 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,6 +26,7 @@
 #include "mafSceneGraph.h"
 
 #include "mafVME.h"
+#include "mafEventSource.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkTransform.h"
@@ -53,6 +54,10 @@ mafAttachCamera::~mafAttachCamera()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_AttachedVmeMatrix);
+  if (m_AttachedVme)
+  {
+    m_AttachedVme->GetEventSource()->RemoveObserver(this);
+  }
 
   if(m_Gui)	
 	  m_Gui->SetListener(NULL);
@@ -97,12 +102,27 @@ void mafAttachCamera::OnEvent(mafEventBase *maf_event)
         }
         else
         {
+          m_AttachedVme->GetEventSource()->RemoveObserver(this);
           m_AttachedVme = NULL;
         }
       break;
     }
     mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 	}
+  else
+  {
+    switch(maf_event->GetId())
+    {
+      case NODE_DETACHED_FROM_TREE:
+        m_AttachedVme = NULL;
+        m_CameraAttach = 0;
+        m_Gui->Update();
+      break;
+      case VME_TIME_SET:
+        UpdateCameraMatrix();
+      break;
+    }
+  }
 }
 //----------------------------------------------------------------------------
 void mafAttachCamera::SetVme(mafNode *node)
@@ -115,6 +135,7 @@ void mafAttachCamera::SetVme(mafNode *node)
   }
   if (m_AttachedVmeMatrix == NULL)
     vtkNEW(m_AttachedVmeMatrix);
+  m_AttachedVme->GetEventSource()->AddObserver(this);
 }
 //----------------------------------------------------------------------------
 void mafAttachCamera::UpdateCameraMatrix()
@@ -125,6 +146,7 @@ void mafAttachCamera::UpdateCameraMatrix()
     return;
   }
 
+  //m_AttachedVme->Update();
   vtkMatrix4x4 *new_matrix = m_AttachedVme->GetOutput()->GetAbsMatrix()->GetVTKMatrix();
 
   m_AttachedVmeMatrix->Invert();
@@ -135,6 +157,5 @@ void mafAttachCamera::UpdateCameraMatrix()
   delta->Concatenate(m_AttachedVmeMatrix);
 
   m_Rwi->m_Camera->ApplyTransform(delta);
-
   m_AttachedVmeMatrix->DeepCopy(new_matrix);
 }
