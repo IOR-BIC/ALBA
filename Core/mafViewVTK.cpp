@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-08 16:21:34 $
-  Version:   $Revision: 1.69 $
+  Date:      $Date: 2007-06-12 10:37:50 $
+  Version:   $Revision: 1.70 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -224,10 +224,6 @@ void mafViewVTK::CameraReset(mafNode *node)
 void mafViewVTK::CameraUpdate() 
 //----------------------------------------------------------------------------
 {
-  if (m_AttachCamera != NULL)
-  {
-    m_AttachCamera->UpdateCameraMatrix();
-  }
   assert(m_Rwi); 
   m_Rwi->CameraUpdate();
 }
