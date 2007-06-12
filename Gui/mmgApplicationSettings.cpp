@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-05-23 14:16:13 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2007-06-12 11:12:19 $
+Version:   $Revision: 1.7 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -38,6 +38,8 @@ mmgApplicationSettings::mmgApplicationSettings(mafObserver *Listener)
   m_LogFolder = wxGetCwd().c_str();
 
 	m_ImageTypeId = 0;
+
+  m_WarnUserFlag = true;
   
   m_AnonymousFalg = true;
 //  m_RemoteHostName = "ftp://ftp.wxwindows.org";
@@ -71,8 +73,9 @@ mmgApplicationSettings::mmgApplicationSettings(mafObserver *Listener)
   m_Gui->Divider(2);
   m_Gui->Bool(ID_LOG_TO_FILE,_("log to file"),&m_LogToFile,1);
   m_Gui->Bool(ID_LOG_VERBOSE,_("log verbose"),&m_VerboseLog,1);
-  m_Gui->DirOpen(ID_LOD_DIR,_("log dir"),&m_LogFolder);
+  m_Gui->DirOpen(ID_LOG_DIR,_("log dir"),&m_LogFolder);
   m_Gui->Divider(2);
+  m_Gui->Bool(ID_WARN_UNDO, _("warn on undoable"), &m_WarnUserFlag, 1, _("If checked the use is warned when an operation \nthat not support the undo is executed."));
   EnableItems();
   m_Gui->Label(_("changes will take effect when the \napplication restart"),false,true);
   m_Gui->Label("");
@@ -92,7 +95,7 @@ void mmgApplicationSettings::EnableItems()
 //----------------------------------------------------------------------------
 {
   m_Gui->Enable(ID_LOG_VERBOSE,m_LogToFile != 0);
-  m_Gui->Enable(ID_LOD_DIR,m_LogToFile != 0);
+  m_Gui->Enable(ID_LOG_DIR,m_LogToFile != 0);
 
   m_Gui->Enable(ID_CACHE_FOLDER,m_UseRemoteStorage != 0);
   m_Gui->Enable(ID_ANONYMOUS_USER,m_UseRemoteStorage != 0);
@@ -115,8 +118,12 @@ void mmgApplicationSettings::OnEvent(mafEventBase *maf_event)
     case ID_LOG_VERBOSE:
       m_Config->Write("LogVerbose",m_VerboseLog);
     break;
-    case ID_LOD_DIR:
+    case ID_LOG_DIR:
       m_Config->Write("LogFolder",m_LogFolder.GetCStr());
+    break;
+    case ID_WARN_UNDO:
+      m_Config->Write("WarnUser",m_WarnUserFlag);
+      mafEventMacro(mafEvent(this,MENU_OPTION_APPLICATION_SETTINGS));
     break;
     case ID_CACHE_FOLDER:
       m_Config->Write("CacheFolder",m_CacheFolder.GetCStr());
@@ -197,6 +204,14 @@ void mmgApplicationSettings::InitializeApplicationSettings()
   else
   {
     m_Config->Write("LogFolder",m_LogFolder.GetCStr());
+  }
+  if (m_Config->Read("WarnUser", &long_item))
+  {
+    m_WarnUserFlag = long_item;
+  }
+  else
+  {
+    m_Config->Write("WarnUser",m_WarnUserFlag);
   }
   if(m_Config->Read("UseRemoteStorage", &long_item))
   {

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationSettings.h,v $
 Language:  C++
-Date:      $Date: 2007-05-23 14:16:13 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2007-06-12 11:12:19 $
+Version:   $Revision: 1.6 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -36,7 +36,8 @@ public:
   {
     ID_LOG_TO_FILE = MINID,
     ID_LOG_VERBOSE,
-    ID_LOD_DIR,
+    ID_LOG_DIR,
+    ID_WARN_UNDO,
     ID_STORAGE_TYPE,
     ID_CACHE_FOLDER,
     ID_HOST_NAME,
@@ -76,6 +77,9 @@ public:
   mafString &GetLogFolder() {return m_LogFolder;};
 
   void SetLogFolder(mafString log_folder) {m_LogFolder = log_folder;};
+
+  /** Return the status of the WarnUser flag.*/
+  bool GetWarnUserFlag() {return m_WarnUserFlag != 0;};
 
   /** Return true if Remote Storage flag is enabled.*/
   bool UseRemoteStorage() {return m_UseRemoteStorage != 0;};
@@ -135,6 +139,8 @@ protected:
   int     m_LogToFile;
   int     m_VerboseLog;
   mafString m_LogFolder;
+
+  int m_WarnUserFlag; ///< Warn user flag on not supported undo operations
 
   // Remote storage variables
   int       m_UseRemoteStorage;
