@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-08 13:25:37 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2007-06-13 16:51:21 $
+  Version:   $Revision: 1.20 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -681,8 +681,14 @@ const char *mafString::BaseName(const char *filename)
   if (filename==NULL)
     return NULL;
 
-  char *ptr=strrchr(filename,'/');
-  return (ptr==NULL?filename:ptr+1);
+  char *ptr = strrchr(filename,'/');
+#ifdef _WIN32
+  if (ptr == NULL)
+  {
+    ptr = strrchr(filename,'\\');
+  }
+#endif
+  return (ptr == NULL ? filename : ptr + 1);
 }
 
 //----------------------------------------------------------------------------
