@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooser.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-06-15 14:15:18 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,7 +27,6 @@
 //----------------------------------------------------------------------------
 #include "mmgVMEChooser.h"
 #include "mafDecl.h"
-#include "mmgVMEChooserAccept.h"
 
 #include "mafNode.h"
 
@@ -37,11 +36,11 @@ mmgVMEChooser::mmgVMEChooser(mmgCheckTree *tree, wxString dialog_title, long vme
 //----------------------------------------------------------------------------
 {
   if(vme_accept_function == 0)
-    m_VmeAcceptFunction = NULL;
+    Validate_Callback = NULL;
   else
-    m_VmeAcceptFunction = (mmgVMEChooserAccept *)vme_accept_function;
+    Validate_Callback = (ValidateCallBackType)vme_accept_function;
 
-  m_ChooserTree = new mmgVMEChooserTree(this,tree,vme_accept_function,-1,false,true,style);
+  m_ChooserTree = new mmgVMEChooserTree(this,tree,Validate_Callback,-1,false,true,style);
   m_ChooserTree->SetListener(this);
   m_ChooserTree->SetTitle("");
   m_ChooserTree->SetSize(wxSize(200,400));
@@ -74,9 +73,9 @@ void mmgVMEChooser::OnEvent(mafEventBase *maf_event)
     switch(e->GetId())
     {
       case VME_SELECTED:
-				if(m_VmeAcceptFunction)
+				if(Validate_Callback)
 				{
-					if(m_VmeAcceptFunction->Validate(m_ChooserTree->GetChoosedNode()))
+					if(Validate_Callback(m_ChooserTree->GetChoosedNode()))
 						m_OkButton->Enable(true);
 					else
 						m_OkButton->Enable(false);

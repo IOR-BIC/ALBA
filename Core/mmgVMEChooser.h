@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooser.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-09 11:42:44 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-06-15 14:15:18 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -22,7 +22,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmgVmeChooserAccept;
 class mmgCheckTree;
 class mafNode;
 
@@ -45,6 +44,6 @@ public:
 
 protected:
   mmgVMEChooserTree *m_ChooserTree;
-  mmgVMEChooserAccept *m_VmeAcceptFunction;
+  ValidateCallBackType Validate_Callback; // pointer to the callback
 };
 #endif

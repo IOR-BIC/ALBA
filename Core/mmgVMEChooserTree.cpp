@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooserTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-30 10:55:41 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-06-15 14:15:18 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,7 +21,6 @@
 
 
 #include "mmgVMEChooserTree.h" 
-#include "mmgVMEChooserAccept.h"
 #include "mafDecl.h"
 #include "mmgDialog.h"
 #include "mafPics.h" 
@@ -40,7 +39,7 @@ BEGIN_EVENT_TABLE(mmgVMEChooserTree,wxPanel)
 END_EVENT_TABLE()
 
 //----------------------------------------------------------------------------
-mmgVMEChooserTree::mmgVMEChooserTree( wxWindow *parent, mmgCheckTree *tree, long vme_accept_function,wxWindowID id, bool CloseButton, bool HideTitle, long style)
+mmgVMEChooserTree::mmgVMEChooserTree( wxWindow *parent, mmgCheckTree *tree, ValidateCallBackType vme_accept_function,wxWindowID id, bool CloseButton, bool HideTitle, long style)
 :mmgCheckTree(parent, id, CloseButton, HideTitle)
 //----------------------------------------------------------------------------
 {
@@ -48,9 +47,9 @@ mmgVMEChooserTree::mmgVMEChooserTree( wxWindow *parent, mmgCheckTree *tree, long
   m_ChooserTreeStyle  = style;
 
   if(vme_accept_function == 0)
-    m_AcceptFunction = NULL;
+    ValidateFunction = NULL;
   else
-    m_AcceptFunction = (mmgVMEChooserAccept *)vme_accept_function;
+    ValidateFunction = vme_accept_function;
   
   InitializeImageList();
 
@@ -66,7 +65,7 @@ int mmgVMEChooserTree::GetVmeStatus(mafNode *node)
 //----------------------------------------------------------------------------
 {
   int image_id;
-  if(m_AcceptFunction == NULL)
+  if(ValidateFunction == NULL)
   {
     if (!node->IsMAFType(mafVMERoot))
     {
@@ -76,7 +75,7 @@ int mmgVMEChooserTree::GetVmeStatus(mafNode *node)
   }
   else
   {
-    if(m_AcceptFunction->Validate(node))
+    if(ValidateFunction(node))
     {
       image_id = ClassNameToIcon(node->GetTypeName()) + NODE_VISIBLE_ON;
       return image_id;

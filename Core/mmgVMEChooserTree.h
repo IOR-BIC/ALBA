@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooserTree.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-31 23:46:21 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-06-15 14:15:18 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,7 +28,8 @@ enum VME_CHOOSER_STYLES
 // Forward refs:
 //----------------------------------------------------------------------------
 class mafNode;
-class mmgVMEChooserAccept;
+
+typedef bool (*ValidateCallBackType) (mafNode *);
 
 //----------------------------------------------------------------------------
 // mmgVMEChooserTree :
@@ -38,7 +39,7 @@ class mmgVMEChooserAccept;
 class mmgVMEChooserTree: public mmgCheckTree
 {
 public:
-                 mmgVMEChooserTree (wxWindow *parent, mmgCheckTree *tree, long vme_accept_function = 0, wxWindowID id=-1, bool CloseButton = false, bool HideTitle = false, long style = REPRESENTATION_AS_TREE); 
+                 mmgVMEChooserTree (wxWindow *parent, mmgCheckTree *tree, ValidateCallBackType vme_accept_function = 0, wxWindowID id=-1, bool CloseButton = false, bool HideTitle = false, long style = REPRESENTATION_AS_TREE); 
   virtual       ~mmgVMEChooserTree();
 
   /** Return the choosed node*/
@@ -62,7 +63,8 @@ protected:
   /** respond to Selection Changed */
   virtual void OnSelectionChanged(wxTreeEvent& event);
 
-  mmgVMEChooserAccept *m_AcceptFunction;
+  ValidateCallBackType ValidateFunction;
+
   mafNode   *m_ChoosedNode;
   long       m_ChooserTreeStyle;
 
