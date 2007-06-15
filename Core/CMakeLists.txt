@@ -79,8 +79,6 @@ SET(PROJECT_SRCS
   mmgListCtrlBitmap.h
   mmgVMEChooser.cpp
   mmgVMEChooser.h
-  mmgVMEChooserAccept.cpp
-  mmgVMEChooserAccept.h
   mmgVMEChooserTree.cpp
   mmgVMEChooserTree.h
   mmuTimeSet.cpp
@@ -173,4 +171,5 @@ ENDIF (MAF_USE_WX)
 IF (MAF_USE_CRYPTO)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_CRYPTO_LIBRARY)
 ENDIF (MAF_USE_CRYPTO)
+
 
