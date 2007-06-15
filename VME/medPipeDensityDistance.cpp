@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeDensityDistance.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-13 15:44:36 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-06-15 14:17:59 $
+  Version:   $Revision: 1.4 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -103,7 +103,6 @@ void medPipeDensityDistance::Create(mafSceneNode *n/*, bool use_axes*/)
 {
   Superclass::Create(n);
 
-  m_VolumeAccept = new mafVolumeAccept;
   vtkNEW(m_Normals);
 	vtkNEW(m_DistanceFilter);
 	vtkNEW(m_Mapper);
@@ -300,7 +299,6 @@ void medPipeDensityDistance::Create(mafSceneNode *n/*, bool use_axes*/)
 medPipeDensityDistance::~medPipeDensityDistance()
 //----------------------------------------------------------------------------
 {
-  delete m_VolumeAccept;
   m_RenFront->RemoveActor2D(m_ScalarBar);
   m_AssemblyFront->RemovePart(m_Actor);
 
@@ -348,12 +346,12 @@ mmgGui *medPipeDensityDistance::CreateGui()
   m_Gui->Integer(ID_MAX_DISTANCE,"Max Dist.",&m_MaxDistance,1,100);
   //m_Gui->Integer(ID_NUM_SECTIONS,"Intervals",&m_NumSections,2,100);
 	m_Gui->Divider(1);
-	m_Choices[0]="Discrete";
-  m_Choices[1]="Continuos";
-	m_Gui->Radio(ID_BAR_TIPOLOGY,"Bar Tipology",&m_BarTipology,2,m_Choices);
+	m_Choices[0]=_("Discrete");
+  m_Choices[1]=_("Continuos");
+	m_Gui->Radio(ID_BAR_TIPOLOGY,_("Bar Tipology"),&m_BarTipology,2,m_Choices);
   m_Gui->Divider(1);
 
-	wxString tip("Threshold value for density maps.");
+	wxString tip(_("Threshold value for density maps."));
 	wxString area_lab[3];	area_lab[0] = "% l";area_lab[1] = "% m";area_lab[2] = "% h";
 	wxColour colour[3] = {m_LowColour,m_MidColour,m_HiColour};
 	wxPoint p = wxDefaultPosition;
@@ -373,7 +371,7 @@ mmgGui *medPipeDensityDistance::CreateGui()
 	m_Gui->Add(sizer,0,wxALL,1);
 	m_Gui->Divider(1);
 
-	wxString tip_distance("Threshold value for distance maps.");
+	wxString tip_distance(_("Threshold value for distance maps."));
 	wxString area_lab_distance[3];	area_lab_distance[0] = "% l";area_lab_distance[1] = "% m";area_lab_distance[2] = "% h";
 	wxColour colour_distance[3] = {m_LowColour,m_WhiteColour,m_HiColour};
 	wxPoint p1 = wxDefaultPosition;
@@ -392,7 +390,7 @@ mmgGui *medPipeDensityDistance::CreateGui()
 	m_Gui->Add(sizer_distance,0,wxALL,1);
 
 	m_Gui->Divider(1);
-  m_Gui->Button(ID_SELECT_VOLUME,"Select Volume");
+  m_Gui->Button(ID_SELECT_VOLUME,_("Select Volume"));
   if(!m_Volume)
   {
     m_Gui->Enable(ID_DENSITY_DISTANCE,false);
@@ -460,7 +458,7 @@ void medPipeDensityDistance::OnEvent(mafEventBase *maf_event)
           if(m_FirstThreshold>=m_SecondThreshold)
             UpdatePipeline();
           else
-            mafMessage("Invalid Thresholds");
+            mafMessage(_("Invalid Thresholds"));
         }
         else
         {
@@ -475,7 +473,7 @@ void medPipeDensityDistance::OnEvent(mafEventBase *maf_event)
 					if(m_FirstThreshold>=m_SecondThreshold)
 						UpdatePipeline();
 					else
-						mafMessage("Invalid Thresholds");
+						mafMessage(_("Invalid Thresholds"));
 				}
 				else
 				{
@@ -485,8 +483,8 @@ void medPipeDensityDistance::OnEvent(mafEventBase *maf_event)
       break;
     case ID_SELECT_VOLUME:
       {
-        mafString title = "Choose Volume";
-        e->SetArg((long)m_VolumeAccept);
+        mafString title = _("Choose Volume");
+        e->SetArg((long)&medPipeDensityDistance::VolumeAccept);
         e->SetString(&title);
         e->SetId(VME_CHOOSE);
         mafEventMacro(*e);
@@ -603,7 +601,7 @@ void medPipeDensityDistance::UpdatePipeline()
 
   if(m_DensityDistance==0)
   {
-    m_ScalarBar->SetTitle("Distance");
+    m_ScalarBar->SetTitle(_("Distance"));
 		m_ScalarBar->SetMaximumNumberOfColors(m_NumSections);
     m_ScalarBar->Modified();
 
@@ -740,7 +738,7 @@ void medPipeDensityDistance::UpdatePipeline()
   }
   else if(m_DensityDistance==1)
   {
-    m_ScalarBar->SetTitle("Density");
+    m_ScalarBar->SetTitle(_("Density"));
     m_ScalarBar->Modified();
 
     m_DistanceFilter->SetFilterModeToDensity();

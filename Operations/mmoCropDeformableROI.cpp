@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoCropDeformableROI.cpp,v $
 Language:  C++
-Date:      $Date: 2007-04-16 09:56:58 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-06-15 14:17:50 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -75,8 +75,6 @@ mafOp(label)
 	m_OpType	= OPTYPE_OP;
 	m_Canundo	= true;
 
-	m_VMEAccept = NULL;
-
 	m_MaskPolydataFilter = NULL;
 	m_ResultVme = NULL;
 
@@ -96,8 +94,6 @@ mmoCropDeformableROI::~mmoCropDeformableROI()
 
   if(mafVMESurfaceParametric::SafeDownCast(m_Input))
     mafDEL(m_Surface);
-
-	cppDEL(m_VMEAccept);
 }
 //----------------------------------------------------------------------------
 bool mmoCropDeformableROI::Accept(mafNode *node)
@@ -125,9 +121,7 @@ enum FILTER_SURFACE_ID
 //----------------------------------------------------------------------------
 void mmoCropDeformableROI::OpRun()   
 //----------------------------------------------------------------------------
-{  
-	m_VMEAccept = new mafVMEAccept();
-
+{
 	mafNEW(m_ResultVme);
 	m_ResultVme->DeepCopy(m_Input);
 
@@ -174,7 +168,7 @@ void mmoCropDeformableROI::OnEvent(mafEventBase *maf_event)
 			{
 				mafString title = _("Choose mask");
 				e->SetId(VME_CHOOSE);
-				e->SetArg((long)m_VMEAccept);
+        e->SetArg((long)&mmoCropDeformableROI::OutputSurfaceAccept);
 				e->SetString(&title);
 				mafEventMacro(*e);
 				m_pNode = e->GetVme();

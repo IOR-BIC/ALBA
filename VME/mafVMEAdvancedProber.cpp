@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-22 11:20:53 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-06-15 14:17:59 $
+  Version:   $Revision: 1.8 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -29,11 +29,16 @@
 #include "mmaMaterial.h"
 #include "mmaVolumeMaterial.h"
 #include "mmgListCtrl.h"
+
 #include "mafTagItem.h"
 #include "mafTagArray.h"
 #include "mafMatrix.h"
 #include "mafAbsMatrixPipe.h"
 #include "mafVMEPolylineSpline.h"
+#include "mafVMEVolumeGray.h"
+#include "mafVMEImage.h"
+#include "mafVMESurface.h"
+#include "mafVMEPolyline.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFDataPipe.h"
@@ -41,7 +46,6 @@
 #include "vtkDistanceFilter.h"
 #include "vtkTransformPolyDataFilter.h"
 
-#include "mafVMEVolumeGray.h"
 #include "vtkCellArray.h"
 #include "vtkCardinalSpline.h"
 #include "vtkPointData.h"
@@ -54,17 +58,8 @@
 #include "vtkPlaneSource.h"
 #include "vtkImageMapToColors.h"
 #include "vtkLookupTable.h"
-#include "mafVMEImage.h"
 
 #include "vtkMath.h"
-
-//test
-#include "mafVMESurface.h"
-#include "mafVMEPolyline.h"
-
-
-//#include "vtkAppendPolyData.h"
-//#include "vtkDelaunay2D.h"
 
 #include <algorithm>
 
@@ -89,23 +84,17 @@ mafVMEAdvancedProber::mafVMEAdvancedProber()
   m_AdditionalProfileNumber = 0; 
   m_ProfileDistance = 0.0;
   
-
-  m_VMEVolumeAccept  = new mafVMEVolumeAccept();
-  m_VMEPolylineAccept = new mafVMEPolylineAccept();
-
   mafNEW(m_Transform);
   mafVMEOutputSurface *output = mafVMEOutputSurface::New(); // an output with no data
   output->SetTransform(m_Transform); // force my transform in the output
   SetOutput(output);
 	//GetOutput()->Update();
 
-
   vtkNEW(m_Image);
   vtkNEW(m_IMTC);
   vtkNEW(m_Points);
   vtkNEW(m_Plane);
 	vtkNEW(m_Lut);
-
 
   //vtkNEW(append);
 
@@ -130,10 +119,7 @@ mafVMEAdvancedProber::mafVMEAdvancedProber()
 mafVMEAdvancedProber::~mafVMEAdvancedProber()
 //-------------------------------------------------------------------------
 {
-
   mafDEL(m_Transform);
-  cppDEL(m_VMEVolumeAccept);
-  cppDEL(m_VMEPolylineAccept);
 
 	vtkDEL(m_Lut);
   vtkDEL(m_Image);
@@ -246,12 +232,9 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
         }
       }
     }
-
-   
     counter++;
   }
-
-  
+ 
 	if (vol == NULL || counter == 0) 
 	{ 
 		int dimensions[3];
@@ -265,7 +248,6 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
 		m_Image->SetSpacing(spacing , 0 , spacing);
 
 		m_Image->UpdateData();
-
 
 		m_IMTC->SetInput(m_Image);
 		m_IMTC->Update();
@@ -718,8 +700,6 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
 
      m_PointsVector.push_back(temporaryPoints);    
    }
-
-
 
    for(int i = 0; i< m_PointsVector.size(); i++)
    {
@@ -1505,7 +1485,7 @@ void mafVMEAdvancedProber::OnEvent(mafEventBase *maf_event)
       {
         mafString title = _("Choose volume vme");
         e->SetId(VME_CHOOSE);
-        e->SetArg((long)m_VMEVolumeAccept);
+        e->SetArg((long)&mafVMEAdvancedProber::VolumeAccept);
         e->SetString(&title);
         ForwardUpEvent(e);
         mafNode *n = e->GetVme();
@@ -1531,7 +1511,7 @@ void mafVMEAdvancedProber::OnEvent(mafEventBase *maf_event)
 				}*/
         mafString title = _("Choose surface vme");
         e->SetId(VME_CHOOSE);
-        e->SetArg((long)m_VMEPolylineAccept);
+        e->SetArg((long)&mafVMEAdvancedProber::PolylineAccept);
         e->SetString(&title);
         ForwardUpEvent(e);
         mafNode *n = e->GetVme();
@@ -1544,8 +1524,8 @@ void mafVMEAdvancedProber::OnEvent(mafEventBase *maf_event)
         
 				if(wxNOT_FOUND != m_ListBox->FindString(n->GetName()))
 				{
-					wxMessageBox(L"Warning: you're introducing a profile\nwith the same name of a selected one.\n\
-              Modify it and readd it"); 
+					wxMessageBox(_("Warning: you're introducing a profile\nwith the same name of a selected one.\n\
+              Modify it and readd it"));
             return;
 				}
 
@@ -1596,16 +1576,13 @@ void mafVMEAdvancedProber::OnEvent(mafEventBase *maf_event)
 				m_Fixed = 1;
 				m_Gui->Enable(ID_ADD_PROFILE,m_Fixed==0);
 				m_Gui->Update();
-
-
-
       }
       break;
       case ID_REMOVE_PROFILE:
       { 
 				if(m_ListBox->GetCount()!=0)
 				{
-					wxString name=m_ListBox->GetStringSelection();
+					wxString name = m_ListBox->GetStringSelection();
 					RemoveLink(name);
 					m_ListBox->Delete(m_ListBox->FindString(m_ListBox->GetStringSelection()));
 
@@ -1613,7 +1590,6 @@ void mafVMEAdvancedProber::OnEvent(mafEventBase *maf_event)
 					m_Gui->Update();
 					ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
 				}
-
       }
       break;
       case ID_SAMPLING:
@@ -1634,15 +1610,6 @@ void mafVMEAdvancedProber::OnEvent(mafEventBase *maf_event)
   {
     Superclass::OnEvent(maf_event);
   }
-
-  // control
-  /*for(int i=0; i< m_IdListBox.size(); i++)
-  {
-    mafLogMessage(m_IdListBox[i]);
-    mafLogMessage(m_ProfilesNameList[i]);
-  }*/
-  
-  
 }
 //-------------------------------------------------------------------------
 char** mafVMEAdvancedProber::GetIcon() 

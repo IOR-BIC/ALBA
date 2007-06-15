@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRegisterClusters.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-30 09:54:26 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-06-15 14:17:50 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani      - porting Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,7 +17,6 @@
 // Include :
 //----------------------------------------------------------------------------
 #include "mafOp.h"
-#include "mmgVMEChooserAccept.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMESurface.h"
 
@@ -36,7 +35,7 @@ class mmgDialog;
 class mmoRegisterClusters: public mafOp
 {
 public:
-  mmoRegisterClusters(wxString label = "Register Landmark Cloud");
+  mmoRegisterClusters(wxString label = _("Register Landmark Cloud"));
  ~mmoRegisterClusters(); 
   virtual void OnEvent(mafEventBase *maf_event);
   
@@ -56,35 +55,14 @@ public:
 	/** Makes the undo for the operation. */
   void OpUndo();
 
-	class mafClusterAccept : public mmgVMEChooserAccept
-	{
-		public:
-			
-			mafClusterAccept() {};
-		 ~mafClusterAccept() {};
+	static bool ClosedCloudAccept(mafNode* node) {return (node != NULL && node->IsA("mafVMELandmarkCloud") && !((mafVMELandmarkCloud*)node)->IsOpen());};
 
-		bool Validate(mafNode* node) {return (node != NULL && node->IsA("mafVMELandmarkCloud") && !((mafVMELandmarkCloud*)node)->IsOpen());};
-	};
-  mafClusterAccept *m_cluster_accept;
-
-	class mafClusterSurfaceAccept : public mmgVMEChooserAccept
-	{
-		public:
-			
-			mafClusterSurfaceAccept() {};
-		 ~mafClusterSurfaceAccept() {};
-
-		bool Validate(mafNode* node) {return (node != NULL && node->IsMAFType(mafVMESurface) /*mafGetBaseType(vme) == VME_SURFACE*/);};
-	};
-  mafClusterSurfaceAccept *m_cluster_surface_accept;
+	static bool SurfaceAccept(mafNode* node) {return (node != NULL && node->IsMAFType(mafVMESurface));};
 
 protected:
   /** Method called to extract matching point between source and target.*/
 	int ExtractMatchingPoints(double time = -1);
   
-	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
-	void OpStop(int result);
-	
 	/** Register the source  on the target  according 
 	to the registration method selected: rigid, similar or affine. */
 	void RegisterPoints(double currTime = -1);

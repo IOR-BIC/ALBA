@@ -2,40 +2,43 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRegisterClusters.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-13 15:44:59 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-06-15 14:17:50 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi  
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#include "mafDecl.h"
-#include <wx/busyinfo.h>
+#include "mafDefines.h" 
+//----------------------------------------------------------------------------
+// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// This force to include Window,wxWidgets and VTK exactly in this order.
+// Failing in doing this will result in a run-time error saying:
+// "Failure#0: The value of ESP was not properly saved across a function call"
+//----------------------------------------------------------------------------
 
 #include "mmoRegisterClusters.h"
 
+#include "mafDecl.h"
+#include <wx/busyinfo.h>
+
 #include "mafEvent.h"
 #include "mmgGui.h"
-#include "mafOp.h"
 
 #include "mmgDialog.h"
 
-
 #include "mafVME.h"
-//#include "mafVMEItemVTK.h"
-#include "mafVMESurface.h"
-#include "vtkMAFSmartPointer.h"
 #include "mafSmartPointer.h"
 #include "mafVMELandmark.h"
+
+#include "vtkMAFSmartPointer.h"
 
 #include "vtkPolyData.h"
 #include "vtkPoints.h"
 #include "vtkWeightedLandmarkTransform.h"
 #include "vtkTransform.h"
 #include "vtkTransformPolyDataFilter.h"
-
-
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mmoRegisterClusters);
@@ -72,9 +75,6 @@ mafOp(label)
 	m_MultiTime				= 0;
 	m_RegistrationMode = RIGID;
 
-	m_cluster_accept         = new mafClusterAccept;
-	m_cluster_surface_accept = new mafClusterSurfaceAccept;
-
 	m_CommonPoints = NULL;
 	m_Weight		   = NULL;
 
@@ -88,12 +88,8 @@ mmoRegisterClusters::~mmoRegisterClusters( )
 //----------------------------------------------------------------------------
 {
 	vtkDEL(m_Follower);
-//	vtkDEL(m_Registered);
 	vtkDEL(m_PointsSource);
 	vtkDEL(m_PointsTarget);
-
-  delete m_cluster_accept;
-  delete m_cluster_surface_accept;
 
   if(m_Weight)
 	{
@@ -112,8 +108,8 @@ bool mmoRegisterClusters::Accept(mafNode* node)
 //----------------------------------------------------------------------------
 {
 	if(!node) return false;
-   //modified by Marco. 2-6-2004 //modified by Marco. 2-6-2004  performance optimization
-	if( node->IsA("mafVMELandmarkCloud") && !((mafVMELandmarkCloud*)node)->IsOpen() )
+  //if( node->IsA("mafVMELandmarkCloud") && !((mafVMELandmarkCloud*)node)->IsOpen() )
+  if(ClosedCloudAccept(node))
   {
     if(!mafVMELandmarkCloud::SafeDownCast(node)->IsAnimated())
       return true;
@@ -147,28 +143,28 @@ void mmoRegisterClusters::OpRun()
   m_Gui = new mmgGui(this);
   m_Gui->SetListener(this);
 	
-	m_Gui->Label("source :",true);
+	m_Gui->Label(_("source :"),true);
 	m_Gui->Label(&m_SourceName);
   
-	m_Gui->Label("target :",true);
+	m_Gui->Label(_("target :"),true);
 	m_Gui->Label(&m_TargetName);
 	
-	m_Gui->Label("follower surface:",true);
+	m_Gui->Label(_("follower surface:"),true);
 	m_Gui->Label(&m_FollowerName);
 	
-	m_Gui->Button(ID_CHOOSE,"target ");
-	m_Gui->Button(ID_CHOOSE_SURFACE,"follower surface");
+	m_Gui->Button(ID_CHOOSE,_("target "));
+	m_Gui->Button(ID_CHOOSE_SURFACE,_("follower surface"));
 	
-	m_Gui->Button(ID_WEIGHT,"weighted registration");
+	m_Gui->Button(ID_WEIGHT,_("weighted registration"));
   m_Gui->Enable(ID_WEIGHT,false);
 	
-	m_Gui->Combo(ID_REGTYPE, "reg. type", &m_RegistrationMode, num_choices, choices_string); 
+	m_Gui->Combo(ID_REGTYPE, _("reg. type"), &m_RegistrationMode, num_choices, choices_string); 
 	
-	m_Gui->Bool(ID_MULTIPLE_TIME_REGISTRATION,"multi-time",&m_MultiTime,1);
+	m_Gui->Bool(ID_MULTIPLE_TIME_REGISTRATION,_("multi-time"),&m_MultiTime,1);
 	m_Gui->Enable(ID_MULTIPLE_TIME_REGISTRATION,false);
 	
-	m_Gui->Label("Apply registration matrix to landmarks");
-	m_Gui->Bool(ID_APPLY_REGISTRATION,"Apply",&m_Apply,1);
+	m_Gui->Label(_("Apply registration matrix to landmarks"));
+	m_Gui->Bool(ID_APPLY_REGISTRATION,_("Apply"),&m_Apply,1);
 	m_Gui->Enable(ID_APPLY_REGISTRATION,false);
 	
   m_Gui->OkCancel();
@@ -192,8 +188,8 @@ void mmoRegisterClusters::OnEvent(mafEventBase *maf_event)
     {
 		  case ID_CHOOSE:
 		  {
-			  mafString s("Choose cloud");
-			  mafEvent e(this,VME_CHOOSE, &s, (long)m_cluster_accept);
+			  mafString s(_("Choose cloud"));
+        mafEvent e(this,VME_CHOOSE, &s, (long)&mmoRegisterClusters::ClosedCloudAccept);
 			  mafEventMacro(e);
 			  mafNode *vme = e.GetVme();
 		    OnChooseVme(vme);
@@ -203,8 +199,8 @@ void mmoRegisterClusters::OnEvent(mafEventBase *maf_event)
 		  break;
 		  case ID_CHOOSE_SURFACE:
 		  {
-			  mafString s("Choose surface");
-			  mafEvent e(this,VME_CHOOSE, &s, (long)m_cluster_surface_accept);
+			  mafString s(_("Choose surface"));
+        mafEvent e(this,VME_CHOOSE, &s, (long)&mmoRegisterClusters::SurfaceAccept);
 			  mafEventMacro(e);
 			  mafNode *vme = e.GetVme();
 		    OnChooseVme(vme);
@@ -223,7 +219,7 @@ void mmoRegisterClusters::OnEvent(mafEventBase *maf_event)
 				  x_init = mafGetFrame()->GetPosition().x;
 				  y_init = mafGetFrame()->GetPosition().y;
 
-          m_Dialog = new mmgDialog("setting weights", mafCLOSEWINDOW);
+          m_Dialog = new mmgDialog(_("setting weights"), mafCLOSEWINDOW);
 				  m_Dialog->SetSize(x_init+40,y_init+40,220,220);
   				
 				  m_GuiSetWeights = new mmgGui(this);
@@ -254,8 +250,6 @@ void mmoRegisterClusters::OnEvent(mafEventBase *maf_event)
 					  }
 					  m_CommonPoints->Close();
 				  }
-
-				  
           
           m_GuiSetWeights->Show(true);
 				  m_GuiSetWeights->Reparent(m_Dialog);
@@ -300,17 +294,10 @@ void mmoRegisterClusters::OnEvent(mafEventBase *maf_event)
   }
 }
 //----------------------------------------------------------------------------
-void mmoRegisterClusters::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	HideGui();
-	mafEventMacro(mafEvent(this,result));        
-}
-//----------------------------------------------------------------------------
 void mmoRegisterClusters::OpDo()
 //----------------------------------------------------------------------------
 {
-	wxBusyInfo wait("Please wait, working..."); 
+	wxBusyInfo wait(_("Please wait, working..."));
 
   //check for the multi-time registration
 	if(m_MultiTime)
@@ -331,20 +318,17 @@ void mmoRegisterClusters::OpDo()
 		//	mafProgressBarSetValueMacro(p);
       mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,p));
 			//Set the new time for the vme used to register the one frame source 
-      m_Target->SetTimeStamp(currTime); //setcurrenttime
+      m_Target->SetTimeStamp(currTime); //set current time
       m_Target->Update(); //>UpdateAllData();
 
 			if(ExtractMatchingPoints(currTime))
       {
 				RegisterPoints(currTime);
       }
-      
-	
 		}
     timeStamps.clear();
 
     mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-
 	}
 	else
 	{
@@ -377,7 +361,7 @@ void mmoRegisterClusters::OpDo()
 				for (int tm = 0; tm < num; tm++)
 				{
 					cTime = time[tm];
-          m_Registered->SetTimeStamp(cTime); //Setcurrenttime
+          m_Registered->SetTimeStamp(cTime); //Set current time
           // TODO: should not be necessary any more
           m_Registered->Update(); //>UpdateCurrentData();
 					
@@ -385,7 +369,6 @@ void mmoRegisterClusters::OpDo()
 					
 					/** Variante */
 					vtkMAFSmartPointer<vtkPoints> points;
-					
 
           for(int i=0; i< m_Registered->GetNumberOfLandmarks(); i++)
 					{
@@ -395,8 +378,6 @@ void mmoRegisterClusters::OpDo()
           }
 					data->SetPoints(points);
 					data->Update();
-
-					
 					
           // TODO: refactoring to use directly the matrix pipe
           transform->SetMatrix(m_Registered->GetOutput()->GetMatrix()->GetVTKMatrix());  //modified by Marco. 2-2-2004
@@ -405,7 +386,6 @@ void mmoRegisterClusters::OpDo()
 					
 					matrix->Identity();
 					m_Registered->SetPose(*matrix,cTime);
-					
 
 					/** Variante */
 					for(int i=0; i< transformData->GetOutput()->GetNumberOfPoints(); i++)
@@ -414,7 +394,6 @@ void mmoRegisterClusters::OpDo()
             transformData->GetOutput()->GetPoint(i, coords);
 					  m_Registered->SetLandmark(i, coords[0], coords[1], coords[2] , cTime);
 					}
-
           //m_Registered->SetDataByDetaching(vtkPolyData::SafeDownCast(transformData->GetOutput()) ,cTime );
 				}
 			}
@@ -425,7 +404,6 @@ void mmoRegisterClusters::OpDo()
 
 				/** Variante */
 				vtkMAFSmartPointer<vtkPoints> points;
-				
 
 				for(int i=0; i< m_Registered->GetNumberOfLandmarks(); i++)
 				{
@@ -435,7 +413,6 @@ void mmoRegisterClusters::OpDo()
 				}
 				data->SetPoints(points);
 				data->Update();
-
 
 				//m_Registered->GetMatrix(matrix,cTime);
   
@@ -454,7 +431,6 @@ void mmoRegisterClusters::OpDo()
 				transformData->GetOutput()->GetPoint(i, coords);
 				m_Registered->SetLandmark(i, coords[0], coords[1], coords[2] , cTime);
 				}
-
         //m_Registered->SetDataByDetaching((vtkPolyData *)transformData->GetOutput(), cTime);
 			}
 
@@ -511,12 +487,10 @@ int mmoRegisterClusters::ExtractMatchingPoints(double time)
 	int i;
 	int j;
 
-	//numero dei punti comuni tra m_Source e m_Target
+	//number of common points between m_Source and m_Target
 	int ncp = 0;
 
-	//modified by STEFY 24-5-2004(begin)
 	m_CommonPoints = mafVMELandmarkCloud::New();
-	//modified by STEFY 24-5-2004(end)
 
 	bool found_one = false;
 
@@ -609,7 +583,7 @@ void mmoRegisterClusters::RegisterPoints(double currTime)
 		m_Registered->SetName(name);
 	}
 	
-	//postmultiply the registration matrix by the abs matrix of the target to position the
+	//post-multiply the registration matrix by the abs matrix of the target to position the
 	//registered  at the correct position in the space
   mafMatrix *mat;
 	mafNEW(mat);
@@ -644,7 +618,7 @@ void mmoRegisterClusters::RegisterPoints(double currTime)
 void mmoRegisterClusters::OnChooseVme(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-	if(!vme) // user choose cancel - keep everithing as before
+	if(!vme) // user choose cancel - keep everything as before
 		return;
 
 	if(vme->IsA("mafVMESurface"))
@@ -658,7 +632,7 @@ void mmoRegisterClusters::OnChooseVme(mafNode *vme)
 			m_Follower->DeepCopy(vme);
 		else
 		{
-			wxMessageBox("Bad follower!", "Alert", wxOK, NULL);
+			wxMessageBox(_("Bad follower!"), _("Alert"), wxOK, NULL);
 			vtkDEL(m_Follower);
 			return;
 		}
@@ -682,7 +656,7 @@ void mmoRegisterClusters::OnChooseVme(mafNode *vme)
 
 	if(!vme->IsA("mafVMESurface")  &&  !vme->IsA("mafVMELandmarkCloud"))
 	{
-		wxMessageBox("Bad vme type!", "Alert", wxOK, NULL);
+		wxMessageBox(_("Bad vme type!"), _("Alert"), wxOK, NULL);
 		return;
 	}
 	m_Gui->Update();

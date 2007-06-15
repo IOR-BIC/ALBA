@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-22 11:20:53 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-06-15 14:17:59 $
+  Version:   $Revision: 1.6 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,7 +17,6 @@
 //----------------------------------------------------------------------------
 #include "mafVME.h"
 #include "mafEvent.h"
-#include "mmgVMEChooserAccept.h"
 #include "mafVMEVolume.h"
 #include "mafVMEOutputPolyline.h"
 
@@ -44,7 +43,6 @@ public:
   enum VMEPANORAMIC_MODALITY
   {
     FIRST_MODE = 0,
-    
   };
 
   mafTypeMacro(mafVMEAdvancedProber, mafVME);
@@ -66,27 +64,9 @@ public:
     ID_LAST
   };
 
-  class mafVMEVolumeAccept : public mmgVMEChooserAccept
-  {
-  public:
+  static bool VolumeAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEVolume));};
 
-    mafVMEVolumeAccept() {};
-    ~mafVMEVolumeAccept() {};
-
-    bool Validate(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEVolume));};
-  };
-  mafVMEVolumeAccept *m_VMEVolumeAccept;
-
-  class mafVMEPolylineAccept : public mmgVMEChooserAccept
-  {
-  public:
-
-    mafVMEPolylineAccept() {};
-    ~mafVMEPolylineAccept() {};
-
-    bool Validate(mafNode *node) {return(node != NULL && ((mafVME *)node)->IsA("mafVMEPolylineSpline"));};
-  };
-  mafVMEPolylineAccept *m_VMEPolylineAccept;
+  static bool PolylineAccept(mafNode *node) {return(node != NULL && ((mafVME *)node)->IsA("mafVMEPolylineSpline"));};
 
   /** Precess events coming from other objects */ 
   virtual void OnEvent(mafEventBase *maf_event);

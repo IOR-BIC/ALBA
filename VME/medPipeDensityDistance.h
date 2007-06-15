@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeDensityDistance.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-16 13:09:09 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-06-15 14:17:59 $
+  Version:   $Revision: 1.2 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,7 +17,6 @@
 // Include :
 //----------------------------------------------------------------------------
 #include "mafPipe.h"
-#include "mmgVMEChooserAccept.h"
 #include "mafVMEImage.h"
 #include "mafVMEVolume.h"
 
@@ -74,16 +73,7 @@ public:
     ID_LAST
   };
 
-  class mafVolumeAccept : public mmgVMEChooserAccept
-	{
-		public:
-			
-			mafVolumeAccept() {};
-		 ~mafVolumeAccept() {};
-
-		bool Validate(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEVolume));};
-	};
-  mafVolumeAccept *m_VolumeAccept;
+  static bool VolumeAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEVolume));};
 
 protected:
   vtkPolyDataMapper	      *m_Mapper;

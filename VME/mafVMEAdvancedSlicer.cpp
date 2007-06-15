@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-06 15:52:34 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-06-15 14:17:59 $
+  Version:   $Revision: 1.10 $
   Authors:   Daniele Giunchi , Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -102,8 +102,6 @@ mafVMEAdvancedSlicer::mafVMEAdvancedSlicer()
   GetMaterial()->m_MaterialType = mmaMaterial::USE_TEXTURE;
   GetMaterial()->m_TextureMappingMode = mmaMaterial::PLANE_MAPPING;
 
-	m_VMEAccept = new mafVMEAccept();
-
 	vtkNEW(m_Texture);
 	vtkNEW(m_Lut);
 
@@ -174,7 +172,6 @@ bool mafVMEAdvancedSlicer::Equals(mafVME *vme)
   }
   return false;
 }
-
 
 //-------------------------------------------------------------------------
 mafVMEOutputSurface *mafVMEAdvancedSlicer::GetSurfaceOutput()
@@ -287,8 +284,7 @@ void mafVMEAdvancedSlicer::InternalPreUpdate()
 			vtkMAFSmartPointer<vtkTransformPolyDataFilter> trans_poly;
 			trans_poly->SetTransform(trans);
 
-
-			//+++ create plane
+      //+++ create plane
 			vtkNEW(m_Plane);
 			m_Plane->SetOrigin(0,m_Width/2.0,m_Height/2.0);
 			m_Plane->SetPoint1(0,-m_Width/2.0,m_Height/2.0);
@@ -299,7 +295,6 @@ void mafVMEAdvancedSlicer::InternalPreUpdate()
 
 			trans_poly->SetInput(m_Plane->GetOutput());
 			trans_poly->Update();
-
 
 			double vectX[3],vectY[3],o[3];
 			m_Plane->GetOrigin(o);
@@ -349,7 +344,7 @@ void mafVMEAdvancedSlicer::InternalUpdate()
   if(vol)
   {
     vol->Update();
-    if (vtkDataSet *vtkdata=vol->GetOutput()->GetVTKData())
+    if (vtkDataSet *vtkdata = vol->GetOutput()->GetVTKData())
     {		
       m_PSlicer->Update();
       m_ISlicer->Update();
@@ -406,7 +401,7 @@ void mafVMEAdvancedSlicer::OnEvent(mafEventBase *maf_event)
 					mafID button_id = e->GetId();
 					mafString title = _("Choose Volume VME link");
 					e->SetId(VME_CHOOSE);
-					e->SetArg((long)m_VMEAccept);
+          e->SetArg((long)&mafVMEAdvancedSlicer::VolumeAccept);
 					e->SetString(&title);
 					ForwardUpEvent(e);
 					mafNode *n = e->GetVme();

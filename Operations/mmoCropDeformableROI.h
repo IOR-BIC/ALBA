@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoCropDeformableROI.h,v $
 Language:  C++
-Date:      $Date: 2007-04-16 09:56:58 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-06-15 14:17:50 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -43,7 +43,6 @@ MafMedical is partially based on OpenMAF.
 #define __mmoCropDeformableROI_H__
 
 #include "mafOp.h"
-#include "mmgVMEChooserAccept.h"
 #include "mafVME.h"
 
 //----------------------------------------------------------------------------
@@ -68,17 +67,7 @@ public:
 
 	mafTypeMacro(mmoCropDeformableROI, mafOp);
 
-	class mafVMEAccept : public mmgVMEChooserAccept
-	{
-	public:
-
-		mafVMEAccept() {};
-		~mafVMEAccept() {};
-
-		bool Validate(mafNode *node) {return(node != NULL && ((mafVME*)node)->GetOutput()->IsA("mafVMEOutputSurface"));};
-	};
-
-	mafVMEAccept *m_VMEAccept;
+	static bool OutputSurfaceAccept(mafNode *node) {return(node != NULL && ((mafVME*)node)->GetOutput()->IsA("mafVMEOutputSurface"));};
 
 	mafOp* Copy();
 

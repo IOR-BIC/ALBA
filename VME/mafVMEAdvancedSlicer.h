@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedSlicer.h,v $
   Language:  C++
-  Date:      $Date: 2007-02-01 16:16:30 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-06-15 14:17:59 $
+  Version:   $Revision: 1.6 $
   Authors:   Daniele Giunchi , Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,7 +15,6 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafVME.h"
-#include "mmgVMEChooserAccept.h"
 #include "mafVMEVolume.h"
 
 //----------------------------------------------------------------------------
@@ -32,7 +31,7 @@ class mafVMEOutputSurface;
 
 /** mafVMEAdvancedSlicer - a procedural VME computing the slice of its parent VME.
   mafVMEAdvancedSlicer is a node implementing a slicer of a VME (currently only VME-Volume).
-  The sliced volume is the partent VME.
+  The sliced volume is the parent VME.
   @sa mafVMEVolume
   @todo
   - 
@@ -115,17 +114,7 @@ public:
 	/** Precess events coming from other objects */ 
 	virtual void OnEvent(mafEventBase *maf_event);
 
-	class mafVMEAccept : public mmgVMEChooserAccept
-	{
-	public:
-
-		mafVMEAccept() {};
-		~mafVMEAccept() {};
-
-		bool Validate(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEVolume));};
-	};
-
-	mafVMEAccept *m_VMEAccept;
+	static bool VolumeAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEVolume));};
 
 	/** Set the plane normal */
 	void SetNormal(float normal[3]);
