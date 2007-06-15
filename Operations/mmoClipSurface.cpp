@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-25 14:32:21 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-06-15 14:16:18 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -162,8 +162,6 @@ void mmoClipSurface::OpRun()
 	vtkNEW(m_ResultPolyData);
 	m_ResultPolyData->DeepCopy(m_OldSurface);
 
-  m_SurfaceAccept = new mafSurfaceAccept;
-
 	if(!m_TestMode)
 	{
 		CreateGui();
@@ -235,7 +233,7 @@ void mmoClipSurface::OnEventThis(mafEventBase *maf_event)
 		case ID_CHOOSE_SURFACE:
 			{
 				mafString title = "Choose m_Clipper Surface";
-				e->SetArg((long)m_SurfaceAccept);
+        e->SetArg((long)&mmoClipSurface::SurfaceAccept);
 				e->SetString(&title);
 				e->SetId(VME_CHOOSE);
 				mafEventMacro(*e);
@@ -508,8 +506,6 @@ void mmoClipSurface::ChangeGizmo()
 void mmoClipSurface::OpStop(int result)
 //----------------------------------------------------------------------------
 {
-  delete m_SurfaceAccept;
-
   if(m_ImplicitPlaneGizmo)
   {
     m_ImplicitPlaneGizmo->SetBehavior(NULL);

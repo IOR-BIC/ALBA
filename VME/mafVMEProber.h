@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEProber.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-19 11:37:43 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-06-15 14:16:38 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,7 +17,6 @@
 //----------------------------------------------------------------------------
 #include "mafVME.h"
 #include "mafEvent.h"
-#include "mmgVMEChooserAccept.h"
 #include "mafVMEVolume.h"
 #include "mafVMEOutputSurface.h"
 
@@ -51,27 +50,9 @@ public:
     ID_LAST
   };
 
-  class mafVMEVolumeAccept : public mmgVMEChooserAccept
-  {
-  public:
+  static bool VolumeAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEVolume));};
 
-    mafVMEVolumeAccept() {};
-    ~mafVMEVolumeAccept() {};
-
-    bool Validate(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEVolume));};
-  };
-  mafVMEVolumeAccept *m_VMEVolumeAccept;
-
-  class mafVMESurfaceAccept : public mmgVMEChooserAccept
-  {
-  public:
-
-    mafVMESurfaceAccept() {};
-    ~mafVMESurfaceAccept() {};
-
-    bool Validate(mafNode *node) {return(node != NULL && ((mafVME *)node)->GetOutput()->IsMAFType(mafVMEOutputSurface));};
-  };
-  mafVMESurfaceAccept *m_VMESurfaceAccept;
+  static bool OutputSurfaceAccept(mafNode *node) {return(node != NULL && ((mafVME *)node)->GetOutput()->IsMAFType(mafVMEOutputSurface));};
 
   /** Precess events coming from other objects */ 
   virtual void OnEvent(mafEventBase *maf_event);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.h,v $
   Language:  C++
-  Date:      $Date: 2006-05-04 11:50:45 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2007-06-15 14:16:38 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,7 +17,6 @@
 #include "mafVME.h"
 #include "mafVMEOutputPolyline.h"
 #include "mafEvent.h"
-#include "mmgVMEChooserAccept.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -67,17 +66,7 @@ public:
     ID_LAST
   };
 
-  class mafVMEAccept : public mmgVMEChooserAccept
-  {
-  public:
-
-    mafVMEAccept() {};
-    ~mafVMEAccept() {};
-
-    bool Validate(mafNode *node) {return(node != NULL && node->IsMAFType(mafVME));};
-  };
-  
-  mafVMEAccept *m_VMEAccept;
+  static bool VMEAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVME));};
 
   /** Precess events coming from other objects */ 
   virtual void OnEvent(mafEventBase *maf_event);

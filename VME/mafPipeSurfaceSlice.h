@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice.h,v $
   Language:  C++
-  Date:      $Date: 2007-04-03 10:19:48 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-06-15 14:17:05 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,7 +17,6 @@
 // Include :
 //----------------------------------------------------------------------------
 #include "mafPipe.h"
-#include "mmgVMEChooserAccept.h"
 #include "mafVMEImage.h"
 
 //----------------------------------------------------------------------------
@@ -84,17 +83,7 @@ public:
 	ID_BORDER_CHANGE
   };
 
-  class mafTextureAccept : public mmgVMEChooserAccept
-  {
-  public:
-
-    mafTextureAccept() {};
-    ~mafTextureAccept() {};
-
-    bool Validate(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEImage));};
-  };
-
-  mafTextureAccept *m_TextureAccept;
+  //bool ImageAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEImage));};
 
   virtual mmgGui  *CreateGui();
 protected:

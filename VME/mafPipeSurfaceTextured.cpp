@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceTextured.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-20 09:58:41 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-06-15 14:17:29 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -66,7 +66,6 @@ mafPipeSurfaceTextured::mafPipeSurfaceTextured()
   m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
   m_MaterialButton  = NULL;
-  m_TextureAccept   = NULL;
   m_SurfaceMaterial = NULL;
   m_Gui             = NULL;
 
@@ -236,8 +235,6 @@ mafPipeSurfaceTextured::~mafPipeSurfaceTextured()
   m_AssemblyFront->RemovePart(m_Actor);
   m_AssemblyFront->RemovePart(m_OutlineActor);
 
-  cppDEL(m_TextureAccept);
-
   vtkDEL(m_Texture);
 	vtkDEL(m_Mapper);
   vtkDEL(m_Actor);
@@ -268,7 +265,6 @@ mmgGui *mafPipeSurfaceTextured::CreateGui()
 //----------------------------------------------------------------------------
 {
   wxString mapping_mode[3] = {"Plane", "Cylinder","Sphere"};
-  m_TextureAccept = new mafTextureAccept();
 
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
@@ -372,7 +368,7 @@ void mafPipeSurfaceTextured::OnEvent(mafEventBase *maf_event)
       {
         mafString title = "Choose texture";
         e->SetId(VME_CHOOSE);
-        e->SetArg((long)m_TextureAccept);
+        e->SetArg((long)&mafPipeSurfaceTextured::ImageAccept);
         e->SetString(&title);
         mafEventMacro(*e);
         mafNode *n = e->GetVme();

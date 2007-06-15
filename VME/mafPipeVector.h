@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVector.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-08 13:31:35 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-06-15 14:17:29 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,7 +17,6 @@
 // Include :
 //----------------------------------------------------------------------------
 #include "mafPipe.h"
-#include "mmgVMEChooserAccept.h"
 #include "mafVMEImage.h"
 
 //----------------------------------------------------------------------------

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERefSys.h,v $
   Language:  C++
-  Date:      $Date: 2007-01-26 09:10:29 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-06-15 14:16:38 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -19,7 +19,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVME.h"
 #include "mafVMELandmark.h"
 #include "mafEvent.h"
-#include "mmgVMEChooserAccept.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -58,17 +57,7 @@ public:
     ID_LAST
   };
 
-	 class mafVMEAccept : public mmgVMEChooserAccept
-  {
-  public:
-
-    mafVMEAccept() {};
-    ~mafVMEAccept() {};
-
-    bool Validate(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMELandmark));};
-  };
-  
-  mafVMEAccept *m_VMEAccept;
+	static bool LandmarkAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMELandmark));};
 
   /** Precess events coming from other objects */ 
   virtual void OnEvent(mafEventBase *maf_event);

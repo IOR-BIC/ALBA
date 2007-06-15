@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-04 11:41:17 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-06-15 14:17:05 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -74,7 +74,6 @@ mafPipeSurfaceSlice::mafPipeSurfaceSlice()
   m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
   m_MaterialButton  = NULL;
-  m_TextureAccept   = NULL;
   m_Cutter			= NULL;
   m_Plane			= NULL;
 
@@ -312,8 +311,6 @@ mafPipeSurfaceSlice::~mafPipeSurfaceSlice()
   m_Vme->GetEventSource()->RemoveObserver(this);
   m_AssemblyFront->RemovePart(m_Actor);
   m_AssemblyFront->RemovePart(m_OutlineActor);
-
-  cppDEL(m_TextureAccept);
 
   vtkDEL(m_Texture);
   vtkDEL(m_Mapper);
@@ -602,7 +599,6 @@ void mafPipeSurfaceSlice::CreateClosedCloudPipe()
   {
   m_Actor->SetProperty(material->m_Prop);
   }
-//  else if (material->m_MaterialType == mmaMaterial::USE_TEXTURE)
   if (material->m_MaterialType == mmaMaterial::USE_TEXTURE)
   {
     m_Actor->SetTexture(m_Texture);
@@ -646,8 +642,6 @@ void mafPipeSurfaceSlice::RemoveClosedCloudPipe()
   }
 
   m_AssemblyFront->RemovePart(m_OutlineActor);
-
-  cppDEL(m_TextureAccept);
 
   vtkDEL(m_Texture);
   vtkDEL(m_Mapper);

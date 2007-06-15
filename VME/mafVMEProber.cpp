@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-22 12:59:52 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-06-15 14:16:38 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -55,9 +55,6 @@ mafVMEProber::mafVMEProber()
   m_HighDensity = -1.0;
   m_LowDensity  = -1.0;
   
-  m_VMEVolumeAccept  = new mafVMEVolumeAccept();
-  m_VMESurfaceAccept = new mafVMESurfaceAccept();
-
   vtkNEW(m_Normals);
   vtkNEW(m_Prober);
   m_Prober->SetInput((vtkDataSet *)m_Normals->GetOutput());
@@ -84,8 +81,6 @@ mafVMEProber::~mafVMEProber()
   mafDEL(m_Transform);
   vtkDEL(m_Normals);
   vtkDEL(m_Prober);
-  cppDEL(m_VMEVolumeAccept);
-  cppDEL(m_VMESurfaceAccept);
   SetOutput(NULL);
 }
 
@@ -480,7 +475,7 @@ void mafVMEProber::OnEvent(mafEventBase *maf_event)
       {
         mafString title = _("Choose volume vme");
         e->SetId(VME_CHOOSE);
-        e->SetArg((long)m_VMEVolumeAccept);
+        e->SetArg((long)&mafVMEProber::VolumeAccept);
         e->SetString(&title);
         ForwardUpEvent(e);
         mafNode *n = e->GetVme();
@@ -496,7 +491,7 @@ void mafVMEProber::OnEvent(mafEventBase *maf_event)
       {
         mafString title = _("Choose surface vme");
         e->SetId(VME_CHOOSE);
-        e->SetArg((long)m_VMESurfaceAccept);
+        e->SetArg((long)&mafVMEProber::OutputSurfaceAccept);
         e->SetString(&title);
         ForwardUpEvent(e);
         mafNode *n = e->GetVme();

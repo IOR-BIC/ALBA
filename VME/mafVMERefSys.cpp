@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERefSys.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-26 14:13:12 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-06-15 14:16:38 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -69,8 +69,6 @@ mafVMERefSys::mafVMERefSys()
 
 	m_Radio = 0;
   m_ScaleFactor = 1.0;
-
-	m_VMEAccept = new mafVMEAccept();
 
   vtkUnsignedCharArray *data;
   float scalar_red[3]   = {255,0,0};
@@ -191,8 +189,6 @@ mafVMERefSys::~mafVMERefSys()
   vtkDEL(m_ScaleAxisTransform);	
   m_ScaleAxis->SetTransform(NULL);
   vtkDEL(m_ScaleAxis);
-
-	cppDEL(m_VMEAccept);
 }
 //-------------------------------------------------------------------------
 int mafVMERefSys::DeepCopy(mafNode *a)
@@ -428,7 +424,7 @@ void mafVMERefSys::OnEvent(mafEventBase *maf_event)
         mafID button_id = e->GetId();
         mafString title = _("Choose vme");
         e->SetId(VME_CHOOSE);
-        e->SetArg((long)m_VMEAccept);
+        e->SetArg((long)&mafVMERefSys::LandmarkAccept);
         e->SetString(&title);
         ForwardUpEvent(e);
         mafNode *n = e->GetVme();

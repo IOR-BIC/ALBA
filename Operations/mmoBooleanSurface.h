@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoBooleanSurface.h,v $
 Language:  C++
-Date:      $Date: 2007-03-30 08:29:56 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-06-15 14:16:18 $
+Version:   $Revision: 1.3 $
 Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -14,7 +14,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #define __mmoBooleanSurface_H__
 
 #include "mafOp.h"
-#include "mmgVMEChooserAccept.h"
 #include "mafNode.h"
 #include "mafVMESurface.h"
 #include "mafVMESurfaceParametric.h"
@@ -45,16 +44,7 @@ public:
 
 	mafTypeMacro(mmoBooleanSurface, mafOp);
 
-	class mafSurfaceAccept : public mmgVMEChooserAccept
-	{
-	public:
-
-		mafSurfaceAccept() {};
-		~mafSurfaceAccept() {};
-
-		bool Validate(mafNode *node) {return(node != NULL && (node->IsMAFType(mafVMESurface) || node->IsMAFType(mafVMESurfaceParametric)));};
-	};
-	mafSurfaceAccept *m_SurfaceAccept;
+	static bool SurfaceAccept(mafNode *node) {return(node != NULL && (node->IsMAFType(mafVMESurface) || node->IsMAFType(mafVMESurfaceParametric)));};
 
 	enum SURFACE_MODALITY
 	{

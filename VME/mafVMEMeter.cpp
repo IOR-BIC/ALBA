@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-16 12:38:38 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2007-06-15 14:16:38 $
+  Version:   $Revision: 1.28 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -61,8 +61,6 @@ mafVMEMeter::mafVMEMeter()
   m_EndVme1Name   = "";
   m_EndVme2Name   = "";
   
-  m_VMEAccept = new mafVMEAccept();
-
   mafNEW(m_Transform);
   mafVMEOutputMeter *output = mafVMEOutputMeter::New(); // an output with no data
   output->SetTransform(m_Transform); // force my transform in the output
@@ -89,7 +87,6 @@ mafVMEMeter::mafVMEMeter()
 mafVMEMeter::~mafVMEMeter()
 //-------------------------------------------------------------------------
 {
-  cppDEL(m_VMEAccept);
   mafDEL(m_Transform);
   vtkDEL(m_LineSource);
   vtkDEL(m_LineSource2);
@@ -802,7 +799,7 @@ void mafVMEMeter::OnEvent(mafEventBase *maf_event)
         mafID button_id = e->GetId();
         mafString title = _("Choose meter vme link");
         e->SetId(VME_CHOOSE);
-        e->SetArg((long)m_VMEAccept);
+        e->SetArg((long)&mafVMEMeter::VMEAccept);
         e->SetString(&title);
         ForwardUpEvent(e);
         mafNode *n = e->GetVme();

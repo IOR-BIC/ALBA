@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoClipSurface.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-25 14:32:21 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-06-15 14:16:18 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,7 +17,6 @@
 // Include :
 //----------------------------------------------------------------------------
 #include "mafOp.h"
-#include "mmgVMEChooserAccept.h"
 #include "mafNode.h"
 #include "mafVMESurface.h"
 
@@ -76,16 +75,7 @@ public:
 		GIZMO_SCALE,
 	};
   
- 	class mafSurfaceAccept : public mmgVMEChooserAccept
-	{
-		public:
-			
-			mafSurfaceAccept() {};
-		 ~mafSurfaceAccept() {};
-
-		bool Validate(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMESurface));};
-	};
-  mafSurfaceAccept *m_SurfaceAccept;
+  static bool SurfaceAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMESurface));};
 
   /** Set the modality to clip input surface. Available modality are MODE_SURFACE or MODE_IMPLICIT_FUNCTION*/
   void SetClippingModality(int mode = mmoClipSurface::MODE_IMPLICIT_FUNCTION);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceTextured.h,v $
   Language:  C++
-  Date:      $Date: 2007-02-20 09:58:41 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-06-15 14:17:29 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,7 +17,6 @@
 // Include :
 //----------------------------------------------------------------------------
 #include "mafPipe.h"
-#include "mmgVMEChooserAccept.h"
 #include "mafVMEImage.h"
 #include "mafAxes.h"
 
@@ -68,17 +67,7 @@ public:
     ID_LAST
   };
 
-  class mafTextureAccept : public mmgVMEChooserAccept
-  {
-  public:
-
-    mafTextureAccept() {};
-    ~mafTextureAccept() {};
-
-    bool Validate(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEImage));};
-  };
-
-  mafTextureAccept *m_TextureAccept;
+  static bool ImageAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEImage));};
 
   /** Set the actor picking*/
   void SetActorPicking(int enable = true);

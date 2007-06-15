@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolylineSpline.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-20 09:58:41 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-06-15 14:16:38 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi & Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -67,15 +67,12 @@ mafVMEPolylineSpline::mafVMEPolylineSpline()
 
 	m_SplineCoefficient = 10;
 
-	m_VMEPolylineAccept = new mafVMEPolylineAccept();
-
 	DependsOnLinkedNodeOn();
 }
 //-------------------------------------------------------------------------
 mafVMEPolylineSpline::~mafVMEPolylineSpline()
 //-------------------------------------------------------------------------
 {
-	delete m_VMEPolylineAccept;
   vtkDEL(m_Polyline);
 	vtkDEL(m_PointsSplined);
   mafDEL(m_Transform);
@@ -300,7 +297,7 @@ void mafVMEPolylineSpline::OnEvent(mafEventBase *maf_event)
         mafID button_id = e->GetId();
         mafString title = _("Choose vme");
         e->SetId(VME_CHOOSE);
-        e->SetArg((long)m_VMEPolylineAccept);
+        e->SetArg((long)&mafVMEPolylineSpline::PolylineAccept);
         e->SetString(&title);
         ForwardUpEvent(e);
         mafNode *n = e->GetVme();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVOIDensity.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-03 10:00:30 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-06-15 14:16:18 $
+  Version:   $Revision: 1.6 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -111,7 +111,6 @@ void mmoVOIDensity::OpRun()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_VOIScalars);
-	m_VMESurfaceAccept = new mafVMESurfaceAccept;
 	if(!this->m_TestMode)
 	{
 		// setup Gui
@@ -164,7 +163,7 @@ void mmoVOIDensity::OnEvent(mafEventBase *maf_event)
 			case ID_CHOOSE_SURFACE:
 			{
 				mafString title = "VOI surface";
-				mafEvent event(this,VME_CHOOSE,&title,(long)m_VMESurfaceAccept);
+        mafEvent event(this,VME_CHOOSE,&title,(long)&mmoVOIDensity::OutputSurfaceAccept);
 				mafEventMacro(event);
 				m_Surface = event.GetVme();
 				if(m_Surface == NULL)
@@ -219,7 +218,6 @@ void mmoVOIDensity::OnEvent(mafEventBase *maf_event)
 void mmoVOIDensity::OpStop(int result)
 //----------------------------------------------------------------------------
 {
- 	cppDEL(m_VMESurfaceAccept);
 	HideGui();
 	mafEventMacro(mafEvent(this,result));
 }

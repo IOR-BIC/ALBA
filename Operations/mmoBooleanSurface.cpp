@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoBooleanSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-05-07 10:32:24 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2007-06-15 14:16:18 $
+Version:   $Revision: 1.5 $
 Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -129,8 +129,6 @@ enum FILTER_SURFACE_ID
 void mmoBooleanSurface::OpRun()   
 //----------------------------------------------------------------------------
 {  		
-	m_SurfaceAccept = new mafSurfaceAccept;
-
 	m_Gui = new mmgGui(this);
 
   //creation of vme result
@@ -746,7 +744,7 @@ void mmoBooleanSurface::Difference()
 void mmoBooleanSurface::VmeChoose(mafString title,mafEvent *e)
 //----------------------------------------------------------------------------
 {
-	e->SetArg((long)m_SurfaceAccept);
+	e->SetArg((long)&mmoBooleanSurface::SurfaceAccept);
 	e->SetString(&title);
 	e->SetId(VME_CHOOSE);
 	mafEventMacro(*e);
@@ -769,8 +767,6 @@ void mmoBooleanSurface::VmeChoose(mafString title,mafEvent *e)
 void mmoBooleanSurface::OpStop(int result)
 //----------------------------------------------------------------------------
 {
-	delete m_SurfaceAccept;
-
 	if(m_ImplicitPlaneGizmo)
 	{
 		m_ImplicitPlaneGizmo->SetBehavior(NULL);

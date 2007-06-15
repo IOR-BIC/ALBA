@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVOIDensity.h,v $
   Language:  C++
-  Date:      $Date: 2007-04-03 10:00:30 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-06-15 14:16:18 $
+  Version:   $Revision: 1.5 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -15,7 +15,6 @@
 
 #include "mafVME.h"
 #include "mafEvent.h"
-#include "mmgVMEChooserAccept.h"
 #include "mafVMEVolume.h"
 #include "mafVMEOutputSurface.h"
 #include "mafOp.h"
@@ -87,16 +86,7 @@ public:
   Extract scalars from input volume that are inside the choosed surface. */
 	void ExtractVolumeScalars();
 
- 	class mafVMESurfaceAccept : public mmgVMEChooserAccept
-	{
-		public:
-			
-			mafVMESurfaceAccept() {};
-		 ~mafVMESurfaceAccept() {};
-
-		bool Validate(mafNode* Node) {return(Node != NULL && (((mafVME *)Node)->GetOutput()->IsA("mafVMEOutputSurface")));};
-	};
-  mafVMESurfaceAccept *m_VMESurfaceAccept;
+ 	static bool OutputSurfaceAccept(mafNode* Node) {return(Node != NULL && (((mafVME *)Node)->GetOutput()->IsA("mafVMEOutputSurface")));};
 
 protected:
   /** 
