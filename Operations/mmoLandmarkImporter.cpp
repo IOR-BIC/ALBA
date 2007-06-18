@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoLandmarkImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-05 08:44:58 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-06-18 10:08:59 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -101,6 +101,10 @@ void mmoLandmarkImporter::OpRun()
       ShowGui();
     }
 	}
+  else
+  {
+    mafEventMacro(mafEvent(this,result));
+  }
 
 }
 //----------------------------------------------------------------------------
@@ -117,6 +121,8 @@ void mmoLandmarkImporter::	OnEvent(mafEventBase *maf_event)
       case wxCANCEL:
         OpStop(OP_RUN_CANCEL);
       break;
+      default:
+        mafEventMacro(*e);
     }
   }
 }
