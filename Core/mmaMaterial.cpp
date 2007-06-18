@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-20 14:59:52 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-06-18 13:11:51 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -318,9 +318,9 @@ int mmaMaterial::InternalStore(mafStorageElement *parent)
       parent->StoreDouble("TableRange1", m_TableRange[1]);
       parent->StoreInteger("NumValues", m_NumValues);
       mafString lutvalues;
-      lutvalues = "LUT_VALUE_#";
       for (int v = 0; v < m_NumValues; v++)
       {
+				lutvalues = "LUT_VALUE_";
         lutvalues << v;
         double *rgba = m_ColorLut->GetTableValue(v);
         parent->StoreVectorN(lutvalues.GetCStr(),rgba,4);
@@ -374,13 +374,13 @@ int mmaMaterial::InternalRestore(mafStorageElement *node)
       node->RestoreInteger("NumValues", m_NumValues);
       m_ColorLut->SetNumberOfTableValues(m_NumValues);
       mafString lutvalues;
-      lutvalues = "LUT_VALUE_#";
+      double rgba[4];
       for (int v = 0; v < m_NumValues; v++)
       {
-        lutvalues << v;
-        double rgba[4];
-        node->RestoreVectorN(lutvalues,rgba,4);
-        m_ColorLut->SetTableValue(v,rgba);
+				lutvalues = "LUT_VALUE_";
+				lutvalues << v;
+				node->RestoreVectorN(lutvalues,rgba,4);
+				m_ColorLut->SetTableValue(v,rgba);
       }
     }
     else if (m_MaterialType == USE_TEXTURE)
