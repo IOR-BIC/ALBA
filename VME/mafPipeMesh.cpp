@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMesh.cpp,v $
 Language:  C++
-Date:      $Date: 2007-05-30 11:58:42 $
-Version:   $Revision: 1.2 $
-Authors:   Daniele Giunchi - Matteo Giacomoni
+Date:      $Date: 2007-06-18 13:08:18 $
+Version:   $Revision: 1.3 $
+Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -74,10 +74,15 @@ mafPipeMesh::mafPipeMesh()
 	m_GeometryFilter      = NULL;
 
   m_Wireframe = 0;
-  m_ScalarPoints = 0;
+  m_ScalarIndex = 0;
+  m_NumberOfArrays = 0;
   m_Table						= NULL;
 
   m_ActiveScalarType = POINT_TYPE;
+  m_PointCellArraySeparation = 0;
+
+	m_ScalarsName = NULL;
+	m_ScalarsVTKName = NULL;
 }
 //----------------------------------------------------------------------------
 void mafPipeMesh::Create(mafSceneNode *n)
@@ -95,7 +100,22 @@ void mafPipeMesh::Create(mafSceneNode *n)
 	m_OutlineActor    = NULL;
 	m_Axes            = NULL;
 
-	m_Vme->Update();
+	ExecutePipe();
+
+	AddActorsToAssembly(m_AssemblyFront);
+
+  if(m_RenFront)
+	  m_Axes = new mafAxes(m_RenFront, m_Vme);
+}
+//----------------------------------------------------------------------------
+void mafPipeMesh::ExecutePipe()
+//----------------------------------------------------------------------------
+{
+  m_Vme->Update();
+  m_Vme->GetOutput()->GetVTKData()->Update();
+
+  CreateFieldDataControlArrays();
+
 	assert(m_Vme->GetOutput()->IsMAFType(mafVMEOutputMesh));
 	mafVMEOutputMesh *mesh_output = mafVMEOutputMesh::SafeDownCast(m_Vme->GetOutput());
 	assert(mesh_output);
@@ -104,9 +124,16 @@ void mafPipeMesh::Create(mafSceneNode *n)
 	assert(data);
 	data->Update();
 
+	m_MeshMaterial = mesh_output->GetMaterial();
+  m_MeshMaterial->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
+
+  m_PointCellArraySeparation = data->GetPointData()->GetNumberOfArrays();
+  m_NumberOfArrays = m_PointCellArraySeparation + data->GetCellData()->GetNumberOfArrays();
+ 
 
   // point type scalars
 	vtkDataArray *scalars = data->GetPointData()->GetScalars();
+
   double sr[2] = {0,1};
   if(scalars)
   {
@@ -120,9 +147,17 @@ void mafPipeMesh::Create(mafSceneNode *n)
     m_ActiveScalarType = CELL_TYPE;
   }
 
-  vtkNEW(m_Table);
-  lutPreset(4,m_Table);
+	if(m_MeshMaterial->m_ColorLut)
+	{
+	  m_Table = m_MeshMaterial->m_ColorLut;
+	}
+	else
+	{
+    vtkNEW(m_Table);
+    lutPreset(4,m_Table);
 
+		m_MeshMaterial->m_ColorLut = m_Table;
+	}
 
   m_Table->SetValueRange(sr);
   m_Table->SetHueRange(0.667, 0.0);
@@ -170,15 +205,8 @@ void mafPipeMesh::Create(mafSceneNode *n)
   
  // m_ActorWired->GetProperty()->SetLineWidth(3);
   //m_ActorWired->SetScale(1.1);
-
-
-	m_AssemblyFront->AddPart(m_Actor);
-
-  m_AssemblyFront->AddPart(m_ActorWired);
-
-
-
-	// selection highlight
+  
+  // selection highlight
 	vtkNEW(m_OutlineBox);
 	m_OutlineBox->SetInput(data);  
 
@@ -197,29 +225,43 @@ void mafPipeMesh::Create(mafSceneNode *n)
 	m_OutlineActor->PickableOff();
 	m_OutlineActor->SetProperty(m_OutlineProperty);
 
-	m_AssemblyFront->AddPart(m_OutlineActor);
-
-	m_Axes = new mafAxes(m_RenFront, m_Vme);
+}
+//----------------------------------------------------------------------------
+void mafPipeMesh::AddActorsToAssembly(vtkMAFAssembly *assembly)
+//----------------------------------------------------------------------------
+{
+  assembly->AddPart(m_Actor);
+  assembly->AddPart(m_ActorWired);
+	assembly->AddPart(m_OutlineActor);	
+}
+//----------------------------------------------------------------------------
+void mafPipeMesh::RemoveActorsFromAssembly(vtkMAFAssembly *assembly)
+//----------------------------------------------------------------------------
+{
+	assembly->RemovePart(m_Actor);
+  assembly->RemovePart(m_ActorWired);
+	assembly->RemovePart(m_OutlineActor);
 }
 //----------------------------------------------------------------------------
 mafPipeMesh::~mafPipeMesh()
 //----------------------------------------------------------------------------
 {
-	m_AssemblyFront->RemovePart(m_Actor);
-  m_AssemblyFront->RemovePart(m_ActorWired);
-	m_AssemblyFront->RemovePart(m_OutlineActor);
+	RemoveActorsFromAssembly(m_AssemblyFront);
 
   vtkDEL(m_LinearizationFilter);
 	vtkDEL(m_GeometryFilter);
 	vtkDEL(m_Mapper);
 	vtkDEL(m_Actor);
   vtkDEL(m_ActorWired);
+  vtkDEL(m_MapperWired);
 	vtkDEL(m_OutlineBox);
 	vtkDEL(m_OutlineMapper);
 	vtkDEL(m_OutlineProperty);
 	vtkDEL(m_OutlineActor);
 	cppDEL(m_Axes);
-  vtkDEL(m_Table);
+  /*cppDEL(m_ScalarsName);
+  cppDEL(m_ScalarsVTKName);*/
+  //vtkDEL(m_Table);
 }
 //----------------------------------------------------------------------------
 void mafPipeMesh::Select(bool sel)
@@ -240,38 +282,10 @@ void mafPipeMesh::UpdateProperty(bool fromTag)
 mmgGui *mafPipeMesh::CreateGui()
 //----------------------------------------------------------------------------
 {
-
-  int numPointScalars = m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetNumberOfArrays();
-  int numCellScalars = m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetNumberOfArrays();
-
-  wxString *tempScalarsPointsName=new wxString[numPointScalars + numCellScalars];
-	int count=0;
-  for(int i=0;i<numPointScalars;i++)
-	{
-		if(strcmp(m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetArrayName(i),"")!=0)
-		{
-			count++;
-			tempScalarsPointsName[count-1]=m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetArrayName(i);
-		}
-	}
-  for(int j=0;j<numCellScalars;j++)
-	{
-		if(strcmp(m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetArrayName(j),"")!=0)
-		{
-			count++;
-			tempScalarsPointsName[count-1]=m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetArrayName(j);
-		}
-	}
-
-	m_ScalarsPointsName = new wxString[count];
-
-	for(int j=0;j<count;j++)
-		m_ScalarsPointsName[j]=tempScalarsPointsName[j];
-
 	assert(m_Gui == NULL);
 	m_Gui = new mmgGui(this);
   m_Gui->Bool(ID_WIREFRAME,_("Wireframe"), &m_Wireframe);
-  m_Gui->Combo(ID_SCALARS,"",&m_ScalarPoints,numPointScalars+numCellScalars,m_ScalarsPointsName);
+  m_Gui->Combo(ID_SCALARS,"",&m_ScalarIndex,m_NumberOfArrays,m_ScalarsName);
 	
   m_Gui->Lut(ID_LUT,"lut",m_Table);
 
@@ -296,20 +310,26 @@ void mafPipeMesh::OnEvent(mafEventBase *maf_event)
         break;
       case ID_SCALARS:
         {
-          if(m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetArray(m_ScalarsPointsName[m_ScalarPoints].c_str()))
+          if(m_ScalarIndex < m_PointCellArraySeparation)
           {
             m_ActiveScalarType = POINT_TYPE;
           }
-          else if (m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetArray(m_ScalarsPointsName[m_ScalarPoints].c_str()))
+          else 
           {
             m_ActiveScalarType = CELL_TYPE;
           }
-          UpdateScalarsPoints();
+          UpdateScalars();
           mafEventMacro(mafEvent(this,CAMERA_UPDATE));
         }
         break;
       case ID_LUT:
+        {
+          double sr[2];
+          m_Table->GetTableRange(sr);
+          m_Mapper->SetScalarRange(sr);
+        }
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+        break;
 			default:
 				mafEventMacro(*e);
 				break;
@@ -382,23 +402,27 @@ void mafPipeMesh::SetWireframeOff()
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
-void mafPipeMesh::UpdateScalarsPoints()
+void mafPipeMesh::UpdateScalars()
 //----------------------------------------------------------------------------
 {
-  mafVMEMesh *mesh=mafVMEMesh::SafeDownCast(m_Vme);
-  mesh->GetOutput()->GetVTKData()->Update();
-  mesh->Update();
+  
+  m_Vme->GetOutput()->GetVTKData()->Update();
+  m_Vme->Update();
   
   if(m_ActiveScalarType == POINT_TYPE)
-    mesh->GetOutput()->GetVTKData()->GetPointData()->SetActiveScalars(m_ScalarsPointsName[m_ScalarPoints].c_str());
+  {
+    m_Vme->GetOutput()->GetVTKData()->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
+  }
   else if(m_ActiveScalarType == CELL_TYPE)
-    mesh->GetOutput()->GetVTKData()->GetCellData()->SetActiveScalars(m_ScalarsPointsName[m_ScalarPoints].c_str());
-  mesh->Modified();
-  mesh->GetOutput()->GetVTKData()->Update();
-  mesh->Update();
+  {
+    m_Vme->GetOutput()->GetVTKData()->GetCellData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
+  }
+  m_Vme->Modified();
+  m_Vme->GetOutput()->GetVTKData()->Update();
+  m_Vme->Update();
   
 
-  for (mafDataVector::Iterator it = mesh->GetDataVector()->Begin(); it != mesh->GetDataVector()->End(); it++)
+  for (mafDataVector::Iterator it = ((mafVMEMesh *)m_Vme)->GetDataVector()->Begin(); it != ((mafVMEMesh *)m_Vme)->GetDataVector()->End(); it++)
   {
     mafVMEItemVTK *item = mafVMEItemVTK::SafeDownCast(it->second);
     assert(item);
@@ -407,20 +431,23 @@ void mafPipeMesh::UpdateScalarsPoints()
     if(outputVTK)
     {
       if(m_ActiveScalarType == POINT_TYPE)
-        outputVTK->GetPointData()->SetActiveScalars(m_ScalarsPointsName[m_ScalarPoints].c_str());
+      {
+        outputVTK->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
+      }
       else if(m_ActiveScalarType == CELL_TYPE)
-        outputVTK->GetCellData()->SetActiveScalars(m_ScalarsPointsName[m_ScalarPoints].c_str());
+      {
+        outputVTK->GetCellData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
+      }
       outputVTK->Modified();
       outputVTK->Update();
       
     }
   }
-  mesh->Modified();
-  mesh->Update();
   m_Vme->Modified();
   m_Vme->Update();
-
-  vtkUnstructuredGrid *data = vtkUnstructuredGrid::SafeDownCast(mesh->GetOutput()->GetVTKData());
+  
+  vtkUnstructuredGrid *data = vtkUnstructuredGrid::SafeDownCast(m_Vme->GetOutput()->GetVTKData());
+  data->Update();
   double sr[2];
   if(m_ActiveScalarType == POINT_TYPE)
     data->GetPointData()->GetScalars()->GetRange(sr);
@@ -446,4 +473,49 @@ void mafPipeMesh::UpdateScalarsPoints()
 
   UpdateProperty();
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+}
+
+//----------------------------------------------------------------------------
+void mafPipeMesh::CreateFieldDataControlArrays()
+//----------------------------------------------------------------------------
+{
+  //String array allocation
+  int numPointScalars = m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetNumberOfArrays();
+  int numCellScalars = m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetNumberOfArrays();
+
+  wxString *tempScalarsPointsName=new wxString[numPointScalars + numCellScalars];
+  int count=0;
+
+  int pointArrayNumber;
+  for(pointArrayNumber = 0;pointArrayNumber<numPointScalars;pointArrayNumber++)
+  {
+    if(strcmp(m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetArrayName(pointArrayNumber),"")!=0)
+    {
+      count++;
+      tempScalarsPointsName[count-1]=m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetArrayName(pointArrayNumber);
+    }
+  }
+  for(int cellArrayNumber=0;cellArrayNumber<numCellScalars;cellArrayNumber++)
+  {
+    if(strcmp(m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetArrayName(cellArrayNumber),"")!=0)
+    {
+      count++;
+      tempScalarsPointsName[count-1]=m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetArrayName(cellArrayNumber);
+    }
+  }
+
+  m_ScalarsName = new wxString[count];
+  m_ScalarsVTKName = new wxString[count];
+
+  for(int j=0;j<count;j++)
+  {
+    m_ScalarsVTKName[j]=tempScalarsPointsName[j];
+    if(j<pointArrayNumber)
+      m_ScalarsName[j]="[POINT] " + tempScalarsPointsName[j];
+    else
+      m_ScalarsName[j]="[CELL] " + tempScalarsPointsName[j];
+  }
+
+  m_PointCellArraySeparation = pointArrayNumber;
+
 }
