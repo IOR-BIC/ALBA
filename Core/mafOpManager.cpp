@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-11 16:00:17 $
-  Version:   $Revision: 1.32 $
+  Date:      $Date: 2007-06-18 08:46:07 $
+  Version:   $Revision: 1.33 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -620,12 +620,6 @@ void mafOpManager::OpExec(mafOp *op)
 void mafOpManager::OpDo(mafOp *op)
 //----------------------------------------------------------------------------
 {
- 	if(!op->CanUndo())
-  {
-    delete op;
-		return;
-	}
-  
   m_Context.Redo_Clear();
   op->OpDo();
   
