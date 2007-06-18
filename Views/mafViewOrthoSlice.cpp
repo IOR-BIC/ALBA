@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-14 09:30:02 $
-  Version:   $Revision: 1.52 $
+  Date:      $Date: 2007-06-18 15:13:12 $
+  Version:   $Revision: 1.53 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -311,7 +311,7 @@ mmgGui* mafViewOrthoSlice::CreateGui()
   sidesName[1] = "right";
   // m_Gui->Radio(ID_SIDE_ORTHO, "side", &m_Side, 2, sidesName, 2);
 
-	m_Gui->Bool(ID_SNAP,"Snap on grid",&m_Snap);
+	m_Gui->Bool(ID_SNAP,"Snap on grid",&m_Snap,1);
 
 
   EnableWidgets(m_CurrentVolume != NULL);

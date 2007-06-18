@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-02 15:50:44 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2007-06-18 15:13:12 $
+  Version:   $Revision: 1.30 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -571,7 +571,7 @@ mmgGui* mafViewRXCT::CreateGui()
   m_Choices[1]="Left";
   m_Gui->Radio(ID_RIGHT_OR_LEFT,"Side",&m_RightOrLeft,2,m_Choices);
 
-  m_Gui->Bool(ID_SNAP,"Snap on grid",&m_Snap);
+  m_Gui->Bool(ID_SNAP,"Snap on grid",&m_Snap,1);
 
   m_Gui->Bool(ID_MOVE_ALL_SLICES,"Move all",&m_MoveAllSlices);
 
