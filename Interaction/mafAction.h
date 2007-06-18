@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAction.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 16:43:04 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-06-18 07:08:01 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -39,7 +39,11 @@ public:
   MAF_ID_DEC(DEVICE_PLUGGED);         ///< Issued by devices when connected to actions or when queried.
   MAF_ID_DEC(DEVICE_UNPLUGGED);       ///< Issued by devices when connected to actions or when queried.
 
-  enum { SHARED_ACTION = 0, EXCLUSIVE_ACTION };
+  enum ACTION_TYPE
+  {
+    SHARED_ACTION = 0, 
+    EXCLUSIVE_ACTION 
+  };
 
   typedef std::list<mafAutoPointer<mafDevice> > mmuDeviceList;
   
