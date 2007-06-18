@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMesh.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-04 16:38:14 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-06-18 13:09:09 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,6 +28,7 @@
 #include "mafVTKInterpolator.h"
 #include "mafVMEItemVTK.h"
 #include "mafAbsMatrixPipe.h"
+#include "mmaMaterial.h"
 
 #include "vtkDataSet.h"
 #include "vtkUnstructuredGrid.h"
@@ -41,6 +42,7 @@ mafCxxTypeMacro(mafVMEMesh)
 mafVMEMesh::mafVMEMesh()
 //-------------------------------------------------------------------------
 {
+
 }
 
 //-------------------------------------------------------------------------
@@ -64,7 +66,19 @@ mafVMEOutput *mafVMEMesh::GetOutput()
   }
   return m_Output;
 }
-
+//-------------------------------------------------------------------------
+int mafVMEMesh::InternalInitialize()
+//-------------------------------------------------------------------------
+{
+	if (Superclass::InternalInitialize()==MAF_OK)
+	{
+		// force material allocation
+		GetMaterial();
+		GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
+		return MAF_OK;
+	}
+	return MAF_ERROR;
+}
 //-------------------------------------------------------------------------
 int mafVMEMesh::SetData(vtkUnstructuredGrid *data, mafTimeStamp t, int mode)
 //-------------------------------------------------------------------------
@@ -108,4 +122,20 @@ char** mafVMEMesh::GetIcon()
 {
   #include "mafVMEFem.xpm"
   return mafVMEFem_xpm;
+}
+//-------------------------------------------------------------------------
+mmaMaterial *mafVMEMesh::GetMaterial()
+//-------------------------------------------------------------------------
+{
+	mmaMaterial *material = (mmaMaterial *)GetAttribute("MaterialAttributes");
+	if (material == NULL)
+	{
+		material = mmaMaterial::New();
+		SetAttribute("MaterialAttributes", material);
+		if (m_Output)
+		{
+			((mafVMEOutputMesh *)m_Output)->SetMaterial(material);
+		}
+	}
+	return material;
 }

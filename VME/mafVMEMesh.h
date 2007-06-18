@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMesh.h,v $
   Language:  C++
-  Date:      $Date: 2007-04-17 10:17:06 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-06-18 13:09:09 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -55,6 +55,12 @@ public:
 
   /** Return the suggested pipe-typename for the visualization of this vme */
   virtual mafString GetVisualPipe() {return mafString("mafPipeMesh");};
+
+	/** used to initialize and create the material attribute if not yet present */
+	virtual int InternalInitialize();
+
+  /** Return pointer to material attribute. */
+  mmaMaterial *GetMaterial();
 
 protected:
   mafVMEMesh();

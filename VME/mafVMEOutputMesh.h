@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputMesh.h,v $
   Language:  C++
-  Date:      $Date: 2007-04-04 16:38:14 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-06-18 13:08:54 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -19,6 +19,7 @@
 // forward declarations :
 //----------------------------------------------------------------------------
 class vtkUnstructuredGrid;
+class mmaMaterial;
 
 /** 
   mafVMEOutputMesh is the output produced by a node generating an output
@@ -45,10 +46,19 @@ public:
   /** Update all the output data structures (data, bounds, matrix and abs matrix).*/
   virtual void Update();
 
+	/** return material attribute of this mesh if present */
+	mmaMaterial *GetMaterial();
+
+	/** set the material of the mesh */ 
+	void SetMaterial(mmaMaterial *material);
+
 protected: 
 
   mafString  m_NumCells;
   mmgGui *CreateGui();
+
+	mmaMaterial  *m_Material; ///< material object used to store shading propertied to render the surface
+
 
 private:
   mafVMEOutputMesh(const mafVMEOutputMesh&); // Not implemented

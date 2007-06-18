@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputMesh.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-04 16:38:14 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-06-18 13:08:54 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -42,6 +42,7 @@ mafVMEOutputMesh::mafVMEOutputMesh()
 //-------------------------------------------------------------------------
 {
   m_NumCells  = "0";
+	m_Material = NULL;
 }
 
 //-------------------------------------------------------------------------
@@ -92,4 +93,22 @@ void mafVMEOutputMesh::Update()
   {
     m_Gui->Update();
   }
+}
+//-------------------------------------------------------------------------
+mmaMaterial *mafVMEOutputMesh::GetMaterial()
+//-------------------------------------------------------------------------
+{
+	// if the VME set the material directly in the output return it
+	if (m_Material)
+		return  m_Material;
+
+	// search for a material attribute in the VME connected to this output
+	return GetVME() ? mmaMaterial::SafeDownCast(GetVME()->GetAttribute("MaterialAttributes")) : NULL;
+}
+
+//-------------------------------------------------------------------------
+void mafVMEOutputMesh::SetMaterial(mmaMaterial *material)
+//-------------------------------------------------------------------------
+{
+	m_Material = material;
 }
