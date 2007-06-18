@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformBase.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-12 14:23:43 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-06-18 08:47:07 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -125,7 +125,7 @@ public:
   virtual unsigned long GetUpdateTime() {return m_UpdateTime.GetMTime();}
 
   /** set the timestamp for the output matrix */
-  void SetTimeStamp(mafTimeStamp t) {m_TimeStamp=t; Modified();}
+  void SetTimeStamp(mafTimeStamp t) {if (!mafEquals(m_TimeStamp,t)){m_TimeStamp=t; Modified();}}
 
   mafTimeStamp GetTimeStamp() {return m_TimeStamp;}
 
