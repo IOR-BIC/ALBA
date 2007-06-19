@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCrop.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-06-19 08:41:23 $
+  Version:   $Revision: 1.12 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -85,7 +85,7 @@ void mmoCrop::OpRun()
 //----------------------------------------------------------------------------
 {
 	if(!m_TestMode)
-		wxMessageBox("Operation will create a new volume child");
+		mafMessage(_("Operation will create a new volume child"));
 
 	m_Input->Modified();
 

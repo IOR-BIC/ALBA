@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoASCIIImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-30 16:04:00 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-06-19 08:36:59 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -116,7 +116,7 @@ void mmoASCIIImporter::FillFileList(const char *file_pattern)
   wxArrayString files;
   m_Files.clear();
   wxDir::GetAllFiles(wxGetWorkingDirectory(), &files, file_pattern);
-  for (int f=0;f<files.GetCount();f++)
+  for (int f = 0; f < files.GetCount(); f++)
   {
     m_Files.insert(m_Files.end(), files[f].c_str());
   }
@@ -133,11 +133,11 @@ enum ASCII_IMPORTER_ID
 void mmoASCIIImporter::OpRun()
 //----------------------------------------------------------------------------
 {
-  wxString scalar_order[2] = {"row", "columns"};
+  wxString scalar_order[2] = {_("row"), _("columns")};
   
   m_Gui = new mmgGui(this);
-  m_Gui->Combo(ID_ASCII_DATA_ORDER,"order",&m_ScalarOrder,2,scalar_order,"Select the order of how are stored the scalars.");
-  m_Gui->Button(ID_ASCII_FILE,"ASCII data","","Choose single or multiple file ASCII.");
+  m_Gui->Combo(ID_ASCII_DATA_ORDER,_("order"),&m_ScalarOrder,2,scalar_order,_("Select the order of how are stored the scalars."));
+  m_Gui->Button(ID_ASCII_FILE,_("ASCII data"),"",_("Choose single or multiple file ASCII."));
   m_Gui->OkCancel();
   
   if (m_ReadyToExecute)
@@ -177,7 +177,7 @@ void mmoASCIIImporter::OnEvent(mafEventBase *maf_event)
         }
         else
         {
-          wxMessageBox("Some errors occurs during the import phase! Data can not be imported.", "Warning");
+          mafMessage(_("Some errors occurs during the import phase! Data can not be imported."), _("Warning"));
           OpStop(OP_RUN_CANCEL);
         }
       break;
@@ -192,7 +192,7 @@ int mmoASCIIImporter::ImportASCII()
 //----------------------------------------------------------------------------
 {
   if(!this->m_TestMode)
-	  wxBusyInfo wait("Loading file/s: ...");
+	  wxBusyInfo wait(_("Loading file/s: ..."));
   mafNEW(m_ScalarData);
   m_ScalarData->SetName("scalar");
 

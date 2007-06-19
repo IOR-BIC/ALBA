@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-17 10:29:48 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-06-19 08:43:05 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -87,11 +87,11 @@ mafOp* mmoVTKImporter::Copy()
 void mmoVTKImporter::OpRun()   
 //----------------------------------------------------------------------------
 {
-	wxString wildc = "vtk Data (*.vtk)|*.vtk";
+	mafString wildc = "vtk Data (*.vtk)|*.vtk";
   mafString f;
   if (m_File.IsEmpty())
   {
-    f = mafGetOpenFile(m_FileDir, wildc, "Choose VTK file").c_str();
+    f = mafGetOpenFile(m_FileDir, wildc, _("Choose VTK file")).c_str();
     m_File = f;
   }
 
@@ -109,7 +109,7 @@ void mmoVTKImporter::ImportVTK()
 {
   bool success = false;
 	if(!this->m_TestMode)
-		wxBusyInfo wait("Loading file: ...");
+		wxBusyInfo wait(_("Loading file: ..."));
   
   vtkMAFSmartPointer<vtkDataSetReader> reader;
   reader->SetFileName(m_File);
@@ -135,7 +135,7 @@ void mmoVTKImporter::ImportVTK()
     break;
     default:
 			if(!this->m_TestMode)
-				wxMessageBox("Unsupported file format", "I/O Error", wxICON_ERROR );
+				mafMessage(_("Unsupported file format"), _("I/O Error"), wxICON_ERROR );
     return;
   }
   mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,preader));
@@ -193,5 +193,5 @@ void mmoVTKImporter::ImportVTK()
   }
   vtkDEL(preader);
   if(!success && !this->m_TestMode)
-    wxMessageBox("Error reading VTK file.", "I/O Error", wxICON_ERROR );
+    mafMessage(_("Error reading VTK file."), _("I/O Error"), wxICON_ERROR );
 }

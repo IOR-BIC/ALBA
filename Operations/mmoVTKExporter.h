@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKExporter.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-06-19 08:45:36 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -62,9 +62,6 @@ public:
   void SaveVTKData();
 
 protected:
-	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
-	void OpStop(int result);
-
   mafString  m_File;
 	mafString  m_FileDir;
   mafVME   *m_Vme; 

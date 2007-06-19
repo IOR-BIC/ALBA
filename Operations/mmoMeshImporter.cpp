@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMeshImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-13 12:03:02 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-06-19 08:34:44 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -73,17 +73,18 @@ mafOp* mmoMeshImporter::Copy()
 }
 //----------------------------------------------------------------------------
 void mmoMeshImporter::OpRun()   
+//----------------------------------------------------------------------------
 {
   CreateGui();
   ShowGui();
 }
-
-
+//----------------------------------------------------------------------------
 int mmoMeshImporter::Read()
+//----------------------------------------------------------------------------
 {
   if (!m_TestMode)
   {
-    wxBusyInfo wait("Loading file: ...");  
+    wxBusyInfo wait(_("Loading file: ..."));
   }
 	
   mafVMEMeshAnsysTextImporter *reader = new mafVMEMeshAnsysTextImporter;
@@ -96,7 +97,7 @@ int mmoMeshImporter::Read()
   {
     if (!m_TestMode)
     {
-      wxMessageBox("Error parsing input files! See log window for details...");  
+      mafMessage(_("Error parsing input files! See log window for details..."),_("Error"));
     }
   } 
   else if (returnValue == MAF_OK)
@@ -115,11 +116,11 @@ int mmoMeshImporter::Read()
   }
 
   delete reader;
-
   return returnValue;
 }
-
+//----------------------------------------------------------------------------
 void mmoMeshImporter::OpStop(int result)
+//----------------------------------------------------------------------------
 {
   if (result == OP_RUN_OK)
   {
@@ -130,7 +131,9 @@ void mmoMeshImporter::OpStop(int result)
 
 	mafEventMacro(mafEvent(this,result));  	   
 }
-
+//----------------------------------------------------------------------------
+// Operation constants
+//----------------------------------------------------------------------------
 enum Mesh_Importer_ID
 {
   ID_FIRST = MINID,
@@ -141,8 +144,9 @@ enum Mesh_Importer_ID
   ID_OK,
   ID_CANCEL,
 };
-
+//----------------------------------------------------------------------------
 void mmoMeshImporter::CreateGui()
+//----------------------------------------------------------------------------
 {
   mafString wildcard = "lis files (*.lis)|*.lis|All Files (*.*)|*.*";
 
@@ -150,64 +154,57 @@ void mmoMeshImporter::CreateGui()
   m_Gui->SetListener(this);
 
   wxString TypeOfImporter[2]={"Ansys Text","ToDo"};
-  m_Gui->Label("Importer type",true);
+  m_Gui->Label(_("Importer type"), true);
   m_Gui->Combo(ID_Importer_Type,"",&m_ImporterType,1,TypeOfImporter);
   m_Gui->Divider(2);
-  m_Gui->Label("nodes file:",true);
+  m_Gui->Label(_("nodes file:"), true);
   m_Gui->FileOpen (ID_NodesFileName,	"",	&m_NodesFileName, wildcard);
   m_Gui->Divider();
  
-  m_Gui->Label("elements file:",true);
+  m_Gui->Label(_("elements file:"), true);
   m_Gui->FileOpen (ID_ElementsFileName,	"",	&m_ElementsFileName, wildcard);
   m_Gui->Divider();
 
-  m_Gui->Label("materials file (optional):",true);
+  m_Gui->Label(_("materials file (optional):"), true);
   m_Gui->FileOpen (ID_MaterialsFileName,	"",	&m_MaterialsFileName, wildcard);
   m_Gui->Divider(2);
   m_Gui->Divider();
   m_Gui->OkCancel();
 
   m_Gui->Update();
-
 }
-  
-
+//----------------------------------------------------------------------------
 void mmoMeshImporter::OnEvent(mafEventBase *maf_event) 
+//----------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
     switch(e->GetId())
     {
-    
-    case ID_NodesFileName:
-      // this->SetNodesFileName(m_NodesFileName.GetCStr());       
-    break;
-
-    case ID_ElementsFileName:
-      // this->SetElementsFileName(m_ElementsFileName.GetCStr());
-    break;
-
-    case ID_MaterialsFileName:
-      // this->SetMaterialsFileName(m_MaterialsFileName.GetCStr());
-    break;
-
-    case wxOK:
-    {
-      this->OpStop(OP_RUN_OK);
-      return;
-    }
-    break;
-
-    case wxCANCEL:
-    {
-      this->OpStop(OP_RUN_CANCEL);
-      return;
-    }
-    break;
-   
-    default:
-      mafEventMacro(*e);
-    break;
+      case ID_NodesFileName:
+        // this->SetNodesFileName(m_NodesFileName.GetCStr());       
+      break;
+      case ID_ElementsFileName:
+        // this->SetElementsFileName(m_ElementsFileName.GetCStr());
+      break;
+      case ID_MaterialsFileName:
+        // this->SetMaterialsFileName(m_MaterialsFileName.GetCStr());
+      break;
+      case wxOK:
+      {
+        this->OpStop(OP_RUN_OK);
+        return;
+      }
+      break;
+      case wxCANCEL:
+      {
+        this->OpStop(OP_RUN_CANCEL);
+        return;
+      }
+      break;
+      default:
+        mafEventMacro(*e);
+      break;
     }	
   }
 }

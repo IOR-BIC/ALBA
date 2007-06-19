@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-06-19 08:45:36 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -87,7 +87,7 @@ void mmoVTKExporter::OpRun()
   mafString wildc = "vtk Data (*.vtk)|*.vtk";
 
   m_Gui = new mmgGui(this);
-  m_Gui->FileSave(ID_CHOOSE_FILENAME,"vtk file", &m_File, wildc);
+  m_Gui->FileSave(ID_CHOOSE_FILENAME, _("vtk file"), &m_File, wildc);
 	m_Gui->Label("file type",true);
 	m_Gui->Bool(ID_VTK_BINARY_FILE,"binary",&m_Binary,0);
 	m_Gui->Label("absolute matrix",true);
@@ -97,7 +97,7 @@ void mmoVTKExporter::OpRun()
 	else
 		m_Gui->Enable(ID_ABS_MATRIX,false);
 	m_Gui->OkCancel();
-  m_Gui->Enable(wxOK,m_File != "");
+  m_Gui->Enable(wxOK, !m_File.IsEmpty());
 	
 	m_Gui->Divider();
 
@@ -116,7 +116,7 @@ void mmoVTKExporter::OnEvent(mafEventBase *maf_event)
         OpStop(OP_RUN_OK);
       break;
       case ID_CHOOSE_FILENAME:
-        m_Gui->Enable(wxOK,m_File != "");
+        m_Gui->Enable(wxOK, !m_File.IsEmpty());
       break;
       case wxCANCEL:
         OpStop(OP_RUN_CANCEL);
@@ -135,13 +135,7 @@ void mmoVTKExporter::OnEvent(mafEventBase *maf_event)
     }
 	}
 }
-//----------------------------------------------------------------------------
-void mmoVTKExporter::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	HideGui();
-	mafEventMacro(mafEvent(this,result));        
-}
+
 //----------------------------------------------------------------------------
 void mmoVTKExporter::ExportVTK()
 //----------------------------------------------------------------------------
@@ -166,8 +160,7 @@ void mmoVTKExporter::ExportVTK()
     }
 		else
 		{
-			wxString msg("Data not present!");
-			wxMessageBox( msg,"Warning", wxOK|wxICON_WARNING , NULL);
+			mafMessage( _("Data not present!"), _("Warning"), wxOK|wxICON_WARNING);
 		}
 	}
 	else

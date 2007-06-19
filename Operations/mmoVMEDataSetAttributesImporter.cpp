@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVMEDataSetAttributesImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-15 16:29:33 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-06-19 08:30:56 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -112,7 +112,7 @@ int mmoVMEDataSetAttributesImporter::Read()
   {
     if (!m_TestMode)
     {
-      wxMessageBox("Error parsing input files! See log window for details...");  
+      mafMessage(_("Error parsing input files! See log window for details..."),_("Error"));
     }
   } 
   else

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoBooleanSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-06-15 14:16:18 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2007-06-19 08:40:01 $
+Version:   $Revision: 1.6 $
 Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -211,7 +211,7 @@ void mmoBooleanSurface::OnEvent(mafEventBase *maf_event)
 				VmeChoose(title,e);
         if(m_FirstOperatorVME == m_SecondOperatorVME || m_Input == m_SecondOperatorVME)
         {
-          wxMessageBox(_("Can't operate over the same VME"));
+          mafMessage(_("Can't operate over the same VME"));
           return;
         }
 				Union();
@@ -220,11 +220,11 @@ void mmoBooleanSurface::OnEvent(mafEventBase *maf_event)
 			break;
 		case ID_CHOOSE_INTERSECTION:
 			{
-				mafString title = "Choose Intersect Surface";
+				mafString title = _("Choose Intersect Surface");
 				VmeChoose(title,e);
         if(m_FirstOperatorVME == m_SecondOperatorVME || m_Input == m_SecondOperatorVME)
         {
-          wxMessageBox(_("Can't operate over the same VME"));
+          mafMessage(_("Can't operate over the same VME"));
           return;
         }
 				Intersection();
@@ -234,11 +234,11 @@ void mmoBooleanSurface::OnEvent(mafEventBase *maf_event)
 			break;
 		case ID_CHOOSE_DIFFERENCE:
 			{
-				mafString title = "Choose Difference Surface";
+				mafString title = _("Choose Difference Surface");
 				VmeChoose(title,e);
         if(m_FirstOperatorVME == m_SecondOperatorVME || m_Input == m_SecondOperatorVME)
         {
-          wxMessageBox(_("Can't operate over the same VME"));
+          mafMessage(_("Can't operate over the same VME"));
           return;
         }
 				Difference();
@@ -342,7 +342,7 @@ void mmoBooleanSurface::Clip()
 
 	if(result == MAF_ERROR)
 	{
-		wxMessageBox("The result surface hasn't any points","ATTENCTION!",wxICON_EXCLAMATION);
+		mafMessage(_("The result surface hasn't any points"),_("Warning"),wxICON_EXCLAMATION);
 		vtkDEL(resultPolydata);
 	}
 	else
@@ -496,7 +496,7 @@ void mmoBooleanSurface::Intersection()
 
 			if(result == MAF_ERROR)
 			{
-				wxMessageBox("The result surface hasn't any points","ATTENCTION!",wxICON_EXCLAMATION);
+				mafMessage(_("The result surface hasn't any points"),_("Warning"),wxICON_EXCLAMATION);
 				mafDEL(resultPolydata);
 			}
 			else
@@ -714,7 +714,7 @@ void mmoBooleanSurface::Difference()
 			int result=m_FirstOperatorVME->SetData(resultPolydata,((mafVME*)m_Input)->GetTimeStamp());
 			if(result == MAF_ERROR)
 			{
-				wxMessageBox("The result surface hasn't any points","ATTENCTION!",wxICON_EXCLAMATION);
+				mafMessage(_("The result surface hasn't any points"),_("Warning"),wxICON_EXCLAMATION);
 				mafDEL(resultPolydata);
 			}
 			else
