@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVolumeMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-07 10:07:13 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-06-19 11:01:24 $
+  Version:   $Revision: 1.5 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -106,8 +106,7 @@ enum ID_VOLUME_MEASURE
 void mmoVolumeMeasure::OpRun()   
 //----------------------------------------------------------------------------
 {
-	m_SurfaceAccept = new mafSurfaceAccept;
-  wxString measure[3] = {_("points"), _("lines"), _("angle")};
+	wxString measure[3] = {_("points"), _("lines"), _("angle")};
 
   // setup Gui
 	m_Gui = new mmgGui(this);
@@ -168,7 +167,7 @@ void mmoVolumeMeasure::OnEvent(mafEventBase *maf_event)
 			case ID_CHOOSE_ORIGIN:
     {
 		  mafString title = _("Choose Origin Surface");
-	    mafEvent e(this,VME_CHOOSE,&title,(long)m_SurfaceAccept);
+	    mafEvent e(this,VME_CHOOSE,&title,(long)&mmoVolumeMeasure::SurfaceAccept());
       mafEventMacro(e); 
       m_VmeSurface = (mafVMESurface *)e.GetVme();
 			
@@ -234,7 +233,6 @@ void mmoVolumeMeasure::OnEvent(mafEventBase *maf_event)
 void mmoVolumeMeasure::OpStop(int result)
 //----------------------------------------------------------------------------
 {
-  delete m_SurfaceAccept;
   if (result == OP_RUN_CANCEL)
   {
     int c = m_MeasureList->GetCount();
