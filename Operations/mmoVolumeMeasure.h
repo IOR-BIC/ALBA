@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVolumeMeasure.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-19 10:08:39 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-06-19 10:17:26 $
+  Version:   $Revision: 1.8 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -14,7 +14,6 @@
 #define __mmoVolumeMeasure_H__
 
 #include "mafOp.h"
-#include "mmgVMEChooserAccept.h"
 #include "mafNode.h"
 #include "mafVMESurface.h"
 #include "mafVMESurfaceParametric.h"
