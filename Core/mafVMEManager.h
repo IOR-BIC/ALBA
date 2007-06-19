@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-23 12:38:11 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2007-06-19 08:23:02 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,19 +40,19 @@ public:
   /** 
   Destroy all nodes (also the root), for each destroyed node the manager send 
   an event VME_REMOVING, then search the root and select it. */ 
-  void MSFNew   (bool notify_root_creation = true);
+  void MSFNew(bool notify_root_creation = true);
   
 	/** Open the msf filename. */
-	void MSFOpen(wxString filename);
+	void MSFOpen(mafString filename);
   
 	/** Open the msf from file history. */
   void MSFOpen(int file_id);
 
   /** Open the compressed zmsf filename. */
-  const char *ZIPOpen(wxString filename);
+  const char *ZIPOpen(mafString filename);
 
   /** Save the msf tree into a compressed file. */
-  void ZIPSave(wxString file = "");
+  void ZIPSave(mafString file = "");
   
 	/** Save the msf tree. */
   void MSFSave();
@@ -94,10 +94,10 @@ public:
   void SetDirName (mafString dirname) {m_MSFDir = dirname;};
 
 	/** Set the filename for the current tree. */
-  void SetFileName (wxString& filename) {m_MSFFile = filename;};
+  void SetFileName (mafString &filename) {m_MSFFile = filename;};
  
 	/** Get the filename of the current tree. */
-  wxString& GetFileName () {return m_MSFFile;};
+  mafString &GetFileName() {return m_MSFFile;};
  
 	/** Link to the main men the file history manager. */
   void SetFileHistoryMenu(wxMenu *menu);
@@ -133,8 +133,8 @@ public:
   void SetLocalCacheFolder(mafString cache_folder) {m_LocalCacheFolder = cache_folder;};
 
 protected:
-  /** Create a compressed msf file.*/
-  bool MakeZip(const wxString& zipname, wxArrayString *files);
+  /** Create a compressed msf file: zmsf.*/
+  bool MakeZip(const mafString &zipname, wxArrayString *files);
 
   bool              m_Modified;     ///< Used to known when the tree has been modified...
 
@@ -144,12 +144,11 @@ protected:
   int               m_FileHistoryIdx;
 
   bool              m_MakeBakFile;
-  wxString          m_MSFDir;
+  mafString         m_MSFDir;
   mafString         m_AppStamp;     ///< the application stamp for our application
-  wxString          m_MSFFile;
-  wxString          m_ZipFile;
-  wxString          m_TmpDir;
-  wxString          m_MergeFile;
+  mafString         m_MSFFile;
+  mafString         m_ZipFile;
+  mafString         m_TmpDir;
 
   mafString         m_LocalCacheFolder;
   mafString         m_Host;
@@ -157,6 +156,7 @@ protected:
   mafString         m_Pwd;
   int               m_Port;
   
+  bool              m_SingleFileAccess; ///< flag used to manage the access to the single compressed file
   bool              m_LoadingFlag;  ///< used when an MSF is being loaded
   bool              m_Crypting;     ///< used to enable the Crypting in the MSF
   mafVMEStorage*    m_Storage;      
