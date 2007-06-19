@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVOIDensity.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-15 14:16:18 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-06-19 08:55:27 $
+  Version:   $Revision: 1.7 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -118,12 +118,12 @@ void mmoVOIDensity::OpRun()
 		m_Gui->SetListener(this);
 
 		m_Gui->Divider();
-		m_Gui->Button(ID_CHOOSE_SURFACE,"VOI surface");
-		m_Gui->Button(ID_EVALUATE_DENSITY,"Evaluate","","Evaluate density inside the choosed surface");
+		m_Gui->Button(ID_CHOOSE_SURFACE,_("VOI surface"));
+		m_Gui->Button(ID_EVALUATE_DENSITY, _("Evaluate"), "", _("Evaluate density inside the choosed surface"));
 		m_Gui->Divider(2);
-		m_Gui->Label("Number of voxel inside the VOI");
+		m_Gui->Label(_("Number of voxel inside the VOI"));
 		m_Gui->String(ID_NUM_SCALARS,"n=",&m_NumberOfScalarsString,"");
-		m_Gui->Label("Voxels's scalar mean inside the VOI");
+		m_Gui->Label(_("Voxels's scalar mean inside the VOI"));
 		m_Gui->String(ID_MEAN_SCALAR,"m=",&m_MeanScalarString,"");
 		m_Gui->String(ID_MAX_SCALAR,"max=",&m_MaxScalarString,"");
 		m_Gui->String(ID_MIN_SCALAR,"min=",&m_MinScalarString,"");
@@ -162,7 +162,7 @@ void mmoVOIDensity::OnEvent(mafEventBase *maf_event)
 		{
 			case ID_CHOOSE_SURFACE:
 			{
-				mafString title = "VOI surface";
+				mafString title = _("VOI surface");
         mafEvent event(this,VME_CHOOSE,&title,(long)&mmoVOIDensity::OutputSurfaceAccept);
 				mafEventMacro(event);
 				m_Surface = event.GetVme();
@@ -171,7 +171,7 @@ void mmoVOIDensity::OnEvent(mafEventBase *maf_event)
 				mafVME *VME=mafVME::SafeDownCast(m_Surface);
         if (VME == NULL)
         {
-          wxMessageBox(_("Not valid surface choosed!!"), _("Warning"));
+          mafMessage(_("Not valid surface choosed!!"), _("Warning"));
           m_Surface = NULL;
           return;
         }
@@ -189,14 +189,14 @@ void mmoVOIDensity::OnEvent(mafEventBase *maf_event)
 				if(FE->GetOutput()->GetNumberOfCells() != 0)
 				{
 					//open polydata
-					wxMessageBox("Open surface choosed!!", "Alert");
+					mafMessage(_("Open surface choosed!!"), _("Warning"));
 					m_Surface = NULL;
 					return;
 				}
 				
 				m_Gui->Enable(ID_EVALUATE_DENSITY, true);
 				m_Gui->Enable(wxOK, true);
-				VME=NULL;
+				VME = NULL;
 			}
 			break;
 			case ID_EVALUATE_DENSITY:
@@ -213,13 +213,6 @@ void mmoVOIDensity::OnEvent(mafEventBase *maf_event)
 			break; 
 		}
 	}
-}
-//----------------------------------------------------------------------------
-void mmoVOIDensity::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	HideGui();
-	mafEventMacro(mafEvent(this,result));
 }
 //----------------------------------------------------------------------------
 void mmoVOIDensity::ExtractVolumeScalars()

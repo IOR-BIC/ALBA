@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVOIDensity.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-15 14:16:18 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-06-19 08:55:27 $
+  Version:   $Revision: 1.6 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,61 +38,45 @@ public:
   
   mafTypeMacro(mmoVOIDensity, mafOp);
 
-  /** 
-  return a copy of itself, this needs to put the operation into the undo stack. */
+  /** return a copy of itself, this needs to put the operation into the undo stack. */
 	mafOp* Copy();
 	
-	/** 
-  Return true for the acceptable vme type. */
+	/** Return true for the acceptable vme type. */
 	bool Accept(mafNode* Node);
 
-	/** 
-  Set the input vme for the operation. */
+	/** Set the input vme for the operation. */
 	void OpRun();
 
-	/** 
-  Builds operation's interface. */
+	/** Builds operation's interface. */
 	void OpDo();
 
-	/** 
-  Execute the operation. */
+	/** Execute the operation. */
 	void OpUndo();
 
-	/**
-	Set surface of input in test mode*/
+	/**	Set surface of input in test mode*/
 	void SetSurface(mafNode *Surface){m_Surface=Surface;};
 
-	/**
-	Return the min scalar*/
+	/**	Return the min scalar*/
 	double GetMinScalar(){return m_MinScalar;};
 
-	/**
-	Return the MAX scalar*/
+	/**	Return the MAX scalar*/
 	double GetMaxScalar(){return m_MaxScalar;};
 
-	/**
-	Return the mean scalar*/
+	/**	Return the mean scalar*/
 	double GetMeanScalar(){return m_MeanScalar;};
 	
-	/**
-	Return the number of scalars*/
+	/**	Return the number of scalars*/
 	int GetNumberScalars(){return m_NumberOfScalars;};
 
-	/**
-	Return Standard Deviation*/
+	/**	Return Standard Deviation*/
 	double GetStandardDeviation(){return m_StandardDeviation;};
 
-	/** 
-  Extract scalars from input volume that are inside the choosed surface. */
+	/** Extract scalars from input volume that are inside the choosed surface. */
 	void ExtractVolumeScalars();
 
  	static bool OutputSurfaceAccept(mafNode* Node) {return(Node != NULL && (((mafVME *)Node)->GetOutput()->IsA("mafVMEOutputSurface")));};
 
 protected:
-  /** 
-  This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
-	void OpStop(int result);
-
   mafNode        *m_Surface;
   vtkDoubleArray *m_VOIScalars;
   mafString       m_NumberOfScalarsString;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoReparentTo.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-06-19 08:57:17 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -81,7 +81,7 @@ void mmoReparentTo::OpRun()
 	if((m_TargetVme != NULL) && (m_Input->CanReparentTo(m_TargetVme)))
 		result = OP_RUN_OK;
   else
-    wxMessageBox("Cannot reparent to specified node","Reparent Error",wxICON_ERROR );
+    mafMessage(_("Cannot re-parent to specified node"), _("Error"), wxICON_ERROR);
 
 	mafEventMacro(mafEvent(this,result));
 }
@@ -93,7 +93,7 @@ void mmoReparentTo::SetTargetVme(mafVME *target)
 
   if((m_TargetVme == NULL) || !m_Input->CanReparentTo(m_TargetVme))
   {
-    wxMessageBox("Cannot reparent to specified node","Reparent Error",wxICON_ERROR );
+    mafMessage(_("Cannot re-parent to specified node"),_("Error"),wxICON_ERROR);
     mafEventMacro(mafEvent(this,OP_RUN_CANCEL));
   }
 }
@@ -157,7 +157,7 @@ void mmoReparentTo::OpDo()
   }
   else
   {
-    mafLogMessage("Something went wrong while reparenting (bad pointer or memory errors)"); 
+    mafLogMessage(_("Something went wrong while re-parenting (bad pointer or memory errors)"));
   }
 }
 //----------------------------------------------------------------------------
