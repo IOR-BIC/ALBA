@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVolumeMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-19 11:01:24 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-06-19 11:28:47 $
+  Version:   $Revision: 1.6 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -167,7 +167,7 @@ void mmoVolumeMeasure::OnEvent(mafEventBase *maf_event)
 			case ID_CHOOSE_ORIGIN:
     {
 		  mafString title = _("Choose Origin Surface");
-	    mafEvent e(this,VME_CHOOSE,&title,(long)&mmoVolumeMeasure::SurfaceAccept());
+	    mafEvent e(this,VME_CHOOSE,&title,(long)&mmoVolumeMeasure::SurfaceAccept);
       mafEventMacro(e); 
       m_VmeSurface = (mafVMESurface *)e.GetVme();
 			
