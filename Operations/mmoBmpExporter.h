@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoBmpExporter.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-06 08:26:04 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-06-19 13:52:42 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,6 +17,8 @@
 // Include :
 //----------------------------------------------------------------------------
 #include "mafOp.h"
+#include "vtkImageData.h"
+#include "vtkImageFlip.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -25,7 +27,9 @@
 //----------------------------------------------------------------------------
 // mmoBmpExporter :
 //----------------------------------------------------------------------------
-/** */
+/** Export a volume as a stack bmp images. User can choose to export two 
+different bmp format files: 24 bit file or 8 bit gray scale format file, 
+compatible with microCT software. */
 class mmoBmpExporter: public mafOp
 {
 public:
@@ -44,17 +48,25 @@ public:
 
 	/** Makes the undo for the operation. */
   void OpUndo();
+
+  void   OnEvent(mafEventBase *maf_event);
 	
 	//Set the filename for the .bmp to export
 	void SetFileName(const char *file_name){m_FileName = file_name;};
 
-  /** Export the volume as a stack of bmp images. */
+  /** Export the volume as a stack of 24 bit bmp images. */
   void SaveBmp();
 
-protected:
-  void OpStop(int result);
+  /** Export the volume as a stack of 8 bit gray scale bmp images. */
+  bool WriteImageDataAsMonocromeBitmap( vtkImageData *img, mafString filename);
 
+protected:
   wxString		m_ProposedDirectory;///<Default directory where to save file .bmp
-  mafString		m_FileName;///<Name of the file/files where the exporter will save bmp data
+  mafString		m_FileName;///<Name of the file/files where the exporter will save bmp dat
+  mafString m_DirName;
+  int m_Offset;
+  double scalarRange[2];
+  vtkImageData *m_Image;
+  int m_8bit;
  };
 #endif

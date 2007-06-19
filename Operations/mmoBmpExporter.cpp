@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoBmpExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-06 08:26:04 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-06-19 13:52:42 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,6 +28,7 @@
 
 #include "vtkMAFSmartPointer.h"
 
+
 #include "vtkDataSet.h"
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
@@ -36,6 +37,8 @@
 #include "vtkPointData.h"
 #include "vtkImageFlip.h"
 #include "vtkBMPWriter.h"
+#include "vtkDoubleArray.h"
+#include "vtkDirectory.h"
 
 #include <fstream>
 
@@ -46,10 +49,10 @@ mafOp(label)
 {
   m_OpType = OPTYPE_EXPORTER;
   m_Canundo = true;
-  m_FileName = "";
   m_Input = NULL;
-	
-	m_ProposedDirectory = mafGetApplicationDirectory().c_str();
+  m_Offset = 0;
+  m_8bit = 0;
+	m_DirName = "";
 }
 //----------------------------------------------------------------------------
 mmoBmpExporter::~mmoBmpExporter()
@@ -69,29 +72,34 @@ bool mmoBmpExporter::Accept(mafNode *node)
 enum BMP_EXPORTER_ID
 {
 	ID_SINGLE_FILE = MINID,
+  ID_DIROPEN,
+  ID_8BIT,
 	ID_INT,
-
 };
 
 //----------------------------------------------------------------------------
 void mmoBmpExporter::OpRun()   
 //----------------------------------------------------------------------------
 {
-	m_ProposedDirectory += m_Input->GetName();
-	m_ProposedDirectory += ".bmp";
-	if(!m_TestMode)
-	{
-		wxString wildc = "bmp file (*.bmp)|*.bmp";
-		wxString file = mafGetSaveFile(m_ProposedDirectory,wildc).c_str(); 
-		m_FileName = file;
-    if (m_FileName != "")
-    {
-      OpStop(OP_RUN_OK);
-    }
-    else
-    {
-      OpStop(OP_RUN_CANCEL);
-    }
+  if(!m_TestMode)
+  {
+    //Crete GUI
+    m_Gui = new mmgGui(this);
+    m_Gui->SetListener(this);
+    
+    m_Gui->DirOpen(ID_DIROPEN, "export dir", &m_DirName, _("choose dir") );
+   
+    m_Gui->Bool(ID_8BIT, "grayscale", &m_8bit, 0, _("export in 8 bit gray scale format"));
+    m_Gui->Integer(ID_INT,"offset: ", &m_Offset,MININT,MAXINT, _("only if 8 bit"));
+
+    m_Gui->Label("");
+    m_Gui->OkCancel(); 
+     
+    m_Gui->Divider();
+    m_Gui->Enable(ID_INT,false);
+    m_Gui->Enable(wxOK, false);
+
+    ShowGui(); 
 	}
 }
 //----------------------------------------------------------------------------
@@ -99,7 +107,6 @@ void mmoBmpExporter::OpDo()
 //----------------------------------------------------------------------------
 {					
 	assert(m_Input);
-	assert(m_FileName != "");
 	this->SaveBmp();
 }
 //----------------------------------------------------------------------------
@@ -115,36 +122,32 @@ mafOp* mmoBmpExporter::Copy()
     return cp;
 }
 //----------------------------------------------------------------------------
-void mmoBmpExporter::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-  mafEventMacro(mafEvent(this,result));	
-}
-//----------------------------------------------------------------------------
 void mmoBmpExporter::SaveBmp()
 //----------------------------------------------------------------------------
 {
+  assert(m_DirName != "");
+ 
   wxString path,name,ext;
-  ::wxSplitPath(m_FileName,&path,&name,&ext);
+  ::wxSplitPath(m_DirName,&path,&name,&ext);
   path+= _("\\");
-  if(!m_TestMode)
-    wxBusyInfo wait("Please wait, working...");
+  path+= name;
+  path+= _("\\");
+  
+#ifndef TEST_MODE
+    wxBusyInfo wait(_("Please wait, working..."));
+#endif TEST_MODE
 
-	mafVMEVolumeGray *volume=mafVMEVolumeGray::SafeDownCast(m_Input);
-	volume->Update();
+  mafVMEVolumeGray *volume=mafVMEVolumeGray::SafeDownCast(m_Input);
+  volume->Update();
 
   vtkDataSet *ds = volume->GetVolumeOutput()->GetVTKData();
   vtkImageData *imageData = vtkImageData::SafeDownCast(ds);
   vtkRectilinearGrid *rg = vtkRectilinearGrid::SafeDownCast(ds);
-  
+
   vtkMAFSmartPointer<vtkImageData> imageDataRg;
-  
+
   double bounds[6];
-  int dim[3];
-  int xdim;
-  int ydim;
-  int zdim;
-  int slice_size;
+  int dim[3], xdim, ydim, zdim, slice_size;
 
   volume->GetOutput()->GetBounds(bounds);
 
@@ -153,11 +156,11 @@ void mmoBmpExporter::SaveBmp()
   double ymin = bounds[2];
   double ymax = bounds[3];
   double zmin = bounds[4];
-  double zmax = bounds[5];	
+  double zmax = bounds[5];	   
 
- 
-
-	if (rg)
+  //setting the ImageData
+  double spacing_x, spacing_y;
+  if (rg)
   {  
     rg->GetDimensions(dim);
     xdim = dim[0];
@@ -168,9 +171,8 @@ void mmoBmpExporter::SaveBmp()
     imageDataRg->SetOrigin(xmin, ymin, zmin);
     imageDataRg->SetDimensions(xdim, ydim, zdim);
 
-    //setting the ImageDataacing
-    double spacing_x = (xmax-xmin)/xdim;
-    double spacing_y = (ymax-ymin)/ydim;
+    spacing_x = (xmax-xmin)/xdim;
+    spacing_y = (ymax-ymin)/ydim;
 
     imageDataRg->SetSpacing(spacing_x, spacing_y, 1);
     imageDataRg->SetScalarType(rg->GetPointData()->GetScalars()->GetDataType());
@@ -178,59 +180,302 @@ void mmoBmpExporter::SaveBmp()
     imageDataRg->Update();
 
     imageData = imageDataRg;
-	}
+  }
   else
   {
     imageData->GetDimensions(dim);
     xdim = dim[0];
     ydim = dim[1];
     zdim = dim[2];
+
+    spacing_x = imageData->GetSpacing()[0];
+    spacing_y = imageData->GetSpacing()[1];
   }
 
+  int size = xdim * ydim;
+  imageData->GetScalarRange(scalarRange);
+  
+  vtkMAFSmartPointer<vtkImageData> imageSlice;
+  imageSlice->SetScalarTypeToUnsignedChar();
+  imageSlice->SetDimensions(xdim, ydim, 1);
+  imageSlice->SetSpacing(spacing_x, spacing_y, 1);
 
-  vtkMAFSmartPointer<vtkImageFlip> imageFlip;
-  imageFlip->SetFilteredAxis(1);
-
-  //if volume data is not UNSIGNED_CHAR or UNSIGNED_SHORT
-  //volume has to be casted to the desired range 
-
-  if (imageData->GetScalarType() != VTK_UNSIGNED_CHAR) 
-  {   
-    vtkMAFSmartPointer<vtkImageShiftScale> pImageCast;
-
-    imageData->Update(); //important
-    double minmax[2];
-    imageData->GetScalarRange(minmax);
-
-    pImageCast->SetShift(-minmax[0]);
-    pImageCast->SetScale(255/(minmax[1]-minmax[0]));
-    pImageCast->SetOutputScalarTypeToUnsignedChar();
-
-    pImageCast->ClampOverflowOn();
-    pImageCast->SetInput(imageData);
-
-    imageFlip->SetInput(pImageCast->GetOutput());
-
-  }  //resampling   
-  else 
-  {
-    imageFlip->SetInput(imageData);
-  }  
-
-  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-  vtkMAFSmartPointer<vtkBMPWriter> exporter;
-  exporter->SetInput(imageFlip->GetOutput());
-  mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR, exporter));
+  vtkMAFSmartPointer<vtkDoubleArray> scalarSliceIn;
+  scalarSliceIn->SetNumberOfTuples(size);
 
   wxString prefix;
+			prefix = wxString::Format("%s%s_%dx%d",path,name,xdim,ydim);
 
-  prefix = wxString::Format("%s%s_%dx%d",path,name,xdim,ydim);
+  if (m_8bit == 0)
+  {
+    vtkMAFSmartPointer<vtkImageFlip> imageFlip;
+    imageFlip->SetFilteredAxis(1);
 
-  exporter->SetFileDimensionality(2); // the writer will create a number of 2D images
-  exporter->SetFilePattern("%s_%04d.bmp");
+    //if volume data is not UNSIGNED_CHAR or UNSIGNED_SHORT
+    //volume has to be casted to the desired range 
 
-  char *c_prefix = (char*)( prefix.c_str() ); 
-  exporter->SetFilePrefix(c_prefix);
-  exporter->Write();
+    if (imageData->GetScalarType() != VTK_UNSIGNED_CHAR) 
+    {   
+      vtkMAFSmartPointer<vtkImageShiftScale> pImageCast;
 
+      imageData->Update(); //important
+     pImageCast->SetShift(-scalarRange[0]);
+      pImageCast->SetScale(255/(scalarRange[1]-scalarRange[0]));
+      pImageCast->SetOutputScalarTypeToUnsignedChar();
+
+      pImageCast->ClampOverflowOn();
+      pImageCast->SetInput(imageData);
+
+      imageFlip->SetInput(pImageCast->GetOutput());
+
+    }  //resampling   
+    else 
+    {
+      imageFlip->SetInput(imageData);
+    }  
+
+    mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+    vtkMAFSmartPointer<vtkBMPWriter> exporter;
+    //mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR, exporter));
+    exporter->SetInput(imageFlip->GetOutput());
+    exporter->SetFileDimensionality(2); // the writer will create a number of 2D images
+    exporter->SetFilePattern("%s_%04d.bmp");
+    exporter->SetFilePrefix((char*)prefix.c_str());
+     
+    exporter->Write();
+  }
+  else
+  {
+    int counter = 0;
+    double tuple;
+    wxString fileName;
+    long progress = 0;
+
+    mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+    
+    for ( int z = 0 ; z < zdim; z++)
+    {
+      if (mafFloatEquals(fmod(z,10.0f),0.0f))
+      {
+        progress = (z*100)/zdim;
+        mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+      }
+      for (int i = counter, n = 0; i < (counter + size); i++,n++)
+      {
+        tuple = imageData->GetPointData()->GetTuple(i)[0];
+        scalarSliceIn->InsertTuple(n, &tuple);
+      }
+      counter += size;
+      imageSlice->GetPointData()->SetScalars(scalarSliceIn);
+
+      int fileNumber = z + m_Offset;
+
+      fileName = wxString::Format("%s_%04d.bmp",prefix, fileNumber);
+
+      
+      WriteImageDataAsMonocromeBitmap(imageSlice, fileName.c_str());
+      scalarSliceIn->Reset();
+    }
+    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+  }
+}
+
+//----------------------------------------------------------------------------
+void mmoBmpExporter::OnEvent(mafEventBase *maf_event) 
+//----------------------------------------------------------------------------
+{ 
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  {
+    switch(e->GetId())
+    {
+    case ID_8BIT:
+      if (m_8bit == true)
+      {
+        m_Gui->Enable(ID_INT,true);
+      }
+      else
+      {
+        m_Gui->Enable(ID_INT,false);
+      }
+      break;
+    case ID_DIROPEN:
+      if (m_DirName != "")
+      {
+        m_Gui->Enable(wxOK,true);
+      }
+      else
+      {
+        m_Gui->Enable(wxOK,false);
+      }
+      break;
+    case wxOK:          
+      { 
+        OpStop(OP_RUN_OK);
+      }
+      break;
+    case wxCANCEL:
+      {    
+        OpStop(OP_RUN_CANCEL);
+      }
+      break;
+    default:
+      {
+        mafEventMacro(*e); 
+      }
+      break;
+    }
+  }
+}
+// --------------------------------------------------------------
+bool mmoBmpExporter::WriteImageDataAsMonocromeBitmap(vtkImageData *img, mafString filename)
+// --------------------------------------------------------------
+{
+#ifdef WIN32
+  // check filename
+  if( !filename ) return false;
+  FILE *f = fopen( filename, "wb");
+  if(!f) return false;
+  fclose(f); // to be reopended later
+
+
+  // check the img
+  if(!img) return false;
+  if(!img->GetPointData()) return false;
+  if(!img->GetPointData()->GetScalars() ) return false;
+  if(!img->GetPointData()->GetScalars()->GetNumberOfTuples() ) return false;
+  if( img->GetPointData()->GetScalars()->GetNumberOfComponents() != 1 ) return false;
+
+  int *img_dim = img->GetDimensions();
+  int img_w = img_dim[0];
+  int img_h = img_dim[1];
+  int img_z = img_dim[2];
+  if( img_w==0 || img_h==0 || img_z!=1 ) return false;
+
+  vtkMAFSmartPointer<vtkDataArray> scal = img->GetPointData()->GetScalars();
+  int n_scal =  scal->GetNumberOfTuples();
+  double *tuple = scal->GetTuple(0);
+
+  if( n_scal < img_w * img_h ) return false;         // wrong number of scalars -- improbable   
+  if( scalarRange[0] == scalarRange[1] ) return false; // all scalars are the same value -- probable error   
+
+  // (scalar_value + scal_sum) * scal_mul == scalar_value normalized in 0..255
+  double scal_sum = -scalarRange[0];
+  double scal_mul = 255.0 / (scalarRange[1]-scalarRange[0]); //Scalar range of the Volume
+
+
+  ////////////////////////////////////////
+  //Write the Bitmap
+  ////////////////////////////////////////
+
+  // a Windows Bitmap file is:
+  //   - a BITMAPFILEHEADER
+  //   - followed by a BITMAPINFO
+  //   - which is a BITMAPFILEHEADER followed by the PALETTE
+  //   - then follows the byte of the image body. 
+  //   - where ROWS are writtem bottom to top
+  //   - and each row must O-padded to be DWORD aligned 
+  //
+  //   in this code the BITMAPINFO will allocate enought space 
+  //   to hold both the palette and the image-body
+
+  // from windows.h :
+  //typedef struct {
+  //  WORD    bfType;
+  //  DWORD   bfSize;
+  //  WORD    bfReserved1;
+  //  WORD    bfReserved2;
+  //  DWORD   bfOffBits;
+  //} BITMAPFILEHEADER;
+
+  //typedef struct {
+  //  BITMAPINFOHEADER    bmiHeader;
+  //  RGBQUAD             bmiColors[1]; // first element of a ?lenght vector
+  //} BITMAPINFO;
+
+  // Row Lenght in File
+  unsigned int BytePerRow=img_w;          
+  if (BytePerRow%4 != 0) 
+    BytePerRow=( BytePerRow /4 +1 ) * 4;
+
+  long bih_size     = sizeof(BITMAPINFOHEADER);
+  long palette_size = 255 * sizeof(RGBQUAD);
+  long img_size     = BytePerRow * img_h;
+  long bi_size      = bih_size + palette_size + img_size;
+
+  BITMAPFILEHEADER hdr;
+  hdr.bfType       = 0x4d42;
+  hdr.bfSize       = sizeof (BITMAPFILEHEADER) + bi_size;
+  hdr.bfReserved1  = 0;
+  hdr.bfReserved2  = 0;
+  hdr.bfOffBits    = sizeof (BITMAPFILEHEADER) + bih_size + palette_size;
+
+  BITMAPINFO *bi = (BITMAPINFO *) malloc( bi_size );
+  if( !bi ) return false;
+
+  BITMAPINFOHEADER *bih = (BITMAPINFOHEADER *)bi;
+  bih->biSize			      =(DWORD)40;
+  bih->biWidth			    = img_w;
+  bih->biHeight			    = img_h;
+  bih->biPlanes			    = 1;      // 8 bit per pixel ( using palette )
+  bih->biBitCount		    = 8;      // 8 bit per pixel ( using palette )
+  bih->biCompression	  = BI_RGB; // no compression
+  bih->biSizeImage		  = BytePerRow * img_h;  // image-body size in file
+  bih->biXPelsPerMeter	= 0;
+  bih->biYPelsPerMeter	= 0;
+  bih->biClrUsed		    = 256;
+  bih->biClrImportant	  = 0;
+
+  // setup the palette with a grayscale   
+  for(int i=0; i<256; i++)
+  {
+    bi->bmiColors[i].rgbRed      =  i;
+    bi->bmiColors[i].rgbGreen    =  i;
+    bi->bmiColors[i].rgbBlue     =  i;
+    bi->bmiColors[i].rgbReserved =  0;
+  }
+
+  //fill the image body
+  unsigned char *p = (unsigned char*)( bi );
+  p += (  bih_size + palette_size );
+  for(int j=img_h-1; j>=0; j--) // rows must be written from bottom to top
+  {
+    for(int i=0; i<img_w; i++)
+    {
+      double s = scal->GetTuple(img_w*j + i)[0];
+      *p++ = (s + scal_sum) * scal_mul;
+    }
+    // padding bytes
+    for(int k=img_w; k<BytePerRow; k++)
+    {
+      *p++ = 0;
+    }
+  }
+
+  //write the image
+  f = fopen( filename, "wb");
+  fwrite(&hdr,1,sizeof (BITMAPFILEHEADER),f);
+
+  int chunksize  = 10000;
+  int num_chunk  = bi_size/chunksize;
+  int last_chunk = bi_size%chunksize;
+  int written = 0;
+  unsigned char *buff = (unsigned char*)( bi );
+
+  for( int i=0; i<num_chunk; i++ )
+  {
+    written = fwrite(buff,1,chunksize,f);
+    //if(written != chunksize)
+    //    int place_for_breakpoint =0;
+    buff +=chunksize;
+  }
+  written = fwrite(buff,1,last_chunk,f);
+  //if(written != last_chunk)
+  //  int place_for_breakpoint =0;
+
+  fclose(f);
+  free(bi);
+  return true;
+#else
+return false;
+#endif
 }
