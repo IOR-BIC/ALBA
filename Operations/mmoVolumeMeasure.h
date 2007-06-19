@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVolumeMeasure.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-07 10:07:13 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-06-19 10:08:39 $
+  Version:   $Revision: 1.7 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -64,18 +64,10 @@ public:
 
   void OpDo();
 
-  class mafSurfaceAccept : public mmgVMEChooserAccept
-	{
-		public:
-			
-			mafSurfaceAccept() {};
-		 ~mafSurfaceAccept() {};
+  static bool SurfaceAccept(mafNode* node) {return(node != NULL && (node->IsMAFType(mafVMESurface) || node->IsMAFType(mafVMESurfaceParametric) ));};
 
-		bool Validate(mafNode* node) {return(node != NULL && (node->IsMAFType(mafVMESurface) || node->IsMAFType(mafVMESurfaceParametric) ));};
-	};
-	mafSurfaceAccept *m_SurfaceAccept;	
-  
 protected:
+
   void OpStop(int result);	
 
   mafVMESurface  *m_VmeSurface;
