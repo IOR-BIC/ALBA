@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoBmpExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-19 13:52:42 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-06-20 12:53:25 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -51,7 +51,7 @@ mafOp(label)
   m_Canundo = true;
   m_Input = NULL;
   m_Offset = 0;
-  m_8bit = 0;
+  m_8bit = 1;
 	m_DirName = "";
 }
 //----------------------------------------------------------------------------
@@ -132,10 +132,11 @@ void mmoBmpExporter::SaveBmp()
   path+= _("\\");
   path+= name;
   path+= _("\\");
-  
+  /*
 #ifndef TEST_MODE
     wxBusyInfo wait(_("Please wait, working..."));
 #endif TEST_MODE
+    */
 
   mafVMEVolumeGray *volume=mafVMEVolumeGray::SafeDownCast(m_Input);
   volume->Update();
@@ -193,7 +194,7 @@ void mmoBmpExporter::SaveBmp()
   }
 
   int size = xdim * ydim;
-  imageData->GetScalarRange(scalarRange);
+  imageData->GetScalarRange(m_ScalarRange);
   
   vtkMAFSmartPointer<vtkImageData> imageSlice;
   imageSlice->SetScalarTypeToUnsignedChar();
@@ -219,8 +220,8 @@ void mmoBmpExporter::SaveBmp()
       vtkMAFSmartPointer<vtkImageShiftScale> pImageCast;
 
       imageData->Update(); //important
-     pImageCast->SetShift(-scalarRange[0]);
-      pImageCast->SetScale(255/(scalarRange[1]-scalarRange[0]));
+      pImageCast->SetShift(-m_ScalarRange[0]);
+      pImageCast->SetScale(255/(m_ScalarRange[1]-m_ScalarRange[0]));
       pImageCast->SetOutputScalarTypeToUnsignedChar();
 
       pImageCast->ClampOverflowOn();
@@ -356,11 +357,11 @@ bool mmoBmpExporter::WriteImageDataAsMonocromeBitmap(vtkImageData *img, mafStrin
   double *tuple = scal->GetTuple(0);
 
   if( n_scal < img_w * img_h ) return false;         // wrong number of scalars -- improbable   
-  if( scalarRange[0] == scalarRange[1] ) return false; // all scalars are the same value -- probable error   
+  if( m_ScalarRange[0] == m_ScalarRange[1] ) return false; // all scalars are the same value -- probable error   
 
   // (scalar_value + scal_sum) * scal_mul == scalar_value normalized in 0..255
-  double scal_sum = -scalarRange[0];
-  double scal_mul = 255.0 / (scalarRange[1]-scalarRange[0]); //Scalar range of the Volume
+  double scal_sum = -m_ScalarRange[0];
+  double scal_mul = 255.0 / (m_ScalarRange[1]-m_ScalarRange[0]); //Scalar range of the Volume
 
 
   ////////////////////////////////////////
@@ -398,7 +399,7 @@ bool mmoBmpExporter::WriteImageDataAsMonocromeBitmap(vtkImageData *img, mafStrin
     BytePerRow=( BytePerRow /4 +1 ) * 4;
 
   long bih_size     = sizeof(BITMAPINFOHEADER);
-  long palette_size = 255 * sizeof(RGBQUAD);
+  long palette_size = 256 * sizeof(RGBQUAD); 
   long img_size     = BytePerRow * img_h;
   long bi_size      = bih_size + palette_size + img_size;
 

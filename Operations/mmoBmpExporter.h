@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoBmpExporter.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-19 13:52:42 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-06-20 12:53:25 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,10 +49,13 @@ public:
 	/** Makes the undo for the operation. */
   void OpUndo();
 
-  void   OnEvent(mafEventBase *maf_event);
+  void OnEvent(mafEventBase *maf_event);
 	
-	//Set the filename for the .bmp to export
-	void SetFileName(const char *file_name){m_FileName = file_name;};
+	//Set the directory where export the .bmp files
+  void SetDirName(const char *dir_name){m_DirName = dir_name;};
+
+  /** Set the format of exported bmp file: "false" for 24 bit file, "true" for 8 bit gray scale file. */
+  void SetGrayscale(bool grayScale){m_8bit = grayScale;};
 
   /** Export the volume as a stack of 24 bit bmp images. */
   void SaveBmp();
@@ -65,7 +68,7 @@ protected:
   mafString		m_FileName;///<Name of the file/files where the exporter will save bmp dat
   mafString m_DirName;
   int m_Offset;
-  double scalarRange[2];
+  double m_ScalarRange[2];
   vtkImageData *m_Image;
   int m_8bit;
  };
