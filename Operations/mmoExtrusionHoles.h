@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtrusionHoles.h,v $
 Language:  C++
-Date:      $Date: 2007-05-31 08:14:01 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-06-20 16:43:18 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -43,6 +43,8 @@ MafMedical is partially based on OpenMAF.
 
 #include "mafOp.h"
 #include "vtkAppendPolyData.h"
+#include "vtkFeatureEdges.h"
+#include "vtkPolyData.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -53,7 +55,6 @@ class mmgButton;
 class mafRWI;
 class mmiSelectPoint;
 class mafVMESurface;
-class vtkFeatureEdges;
 class vtkHoleConnectivity;
 class vtkPolyDataMapper;
 class vtkActor;
@@ -61,7 +62,6 @@ class vtkSphereSource;
 class vtkGlyph3D;
 class vtkLinearExtrusionFilter;
 class vtkAppendPolyData;
-class vtkPolyData;
 
 //----------------------------------------------------------------------------
 // mmoExtrusionHoles :
@@ -108,6 +108,8 @@ public:
 
 	void SetExtrusionFactor(double value){m_ExtrusionFactor = value;};
 	double GetExtrusionFactor(){return m_ExtrusionFactor;};
+
+	int GetExtractFreeEdgesNumeberOfPoints(){if(m_ExtractFreeEdges)return m_ExtractFreeEdges->GetOutput()->GetNumberOfPoints();};
 
 	vtkPolyData* GetExtrutedSurface(){return m_ResultPolydata;};
 

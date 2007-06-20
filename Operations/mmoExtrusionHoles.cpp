@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtrusionHoles.cpp,v $
 Language:  C++
-Date:      $Date: 2007-05-31 08:14:01 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-06-20 16:43:18 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -59,9 +59,7 @@ MafMedical is partially based on OpenMAF.
 #include "mafVMESurface.h"
 
 #include "vtkRenderWindow.h"
-#include "vtkFeatureEdges.h"
 #include "vtkHoleConnectivity.h"
-#include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkActor.h"
 #include "vtkRenderer.h"
