@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtrusionHolesTest.h,v $
 Language:  C++
-Date:      $Date: 2007-05-31 10:09:53 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-06-20 16:43:47 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -54,11 +54,19 @@ MafMedical is partially based on OpenMAF.
 class mmoExtrusionHolesTest : public CPPUNIT_NS::TestFixture
 {
 	CPPUNIT_TEST_SUITE( mmoExtrusionHolesTest );
-	CPPUNIT_TEST( Test );
+	CPPUNIT_TEST( TestDynamicAllocation );
+	CPPUNIT_TEST( TestStaticAllocation );
+	CPPUNIT_TEST( TestSetGetExtrusionFactor );
+	CPPUNIT_TEST( TestExtractFreeEdge );
+	CPPUNIT_TEST( TestExtrude );
 	CPPUNIT_TEST_SUITE_END();
 
 protected:
-	void Test();
+	void TestDynamicAllocation();
+	void TestStaticAllocation();
+	void TestSetGetExtrusionFactor();
+	void TestExtractFreeEdge();
+	void TestExtrude();
 };
 
 

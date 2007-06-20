@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtrusionHolesTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-05-31 10:09:53 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-06-20 16:43:47 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -60,7 +60,29 @@ MafMedical is partially based on OpenMAF.
 #include "vtkPolyData.h"
 
 //-----------------------------------------------------------
-void mmoExtrusionHolesTest::Test() 
+void mmoExtrusionHolesTest::TestDynamicAllocation() 
+//-----------------------------------------------------------
+{
+	mmoExtrusionHoles *extrusion = new mmoExtrusionHoles();
+	mafDEL(extrusion);
+}
+//-----------------------------------------------------------
+void mmoExtrusionHolesTest::TestStaticAllocation() 
+//-----------------------------------------------------------
+{
+	mmoExtrusionHoles extrusion; 
+}
+//-----------------------------------------------------------
+void mmoExtrusionHolesTest::TestSetGetExtrusionFactor() 
+//-----------------------------------------------------------
+{
+	mmoExtrusionHoles *extrusion = new mmoExtrusionHoles();
+	extrusion->SetExtrusionFactor(4.0);
+	CPPUNIT_ASSERT(extrusion->GetExtrusionFactor()==4.0);
+	mafDEL(extrusion);
+}
+//-----------------------------------------------------------
+void mmoExtrusionHolesTest::TestExtractFreeEdge() 
 //-----------------------------------------------------------
 {
 	//Create storage
@@ -70,6 +92,43 @@ void mmoExtrusionHolesTest::Test()
 
 	mafVMERoot *root=storage->GetRoot();
 
+	//Imput data is a cube with 2 holes
+	mmoVTKImporter *importer=new mmoVTKImporter("importer");
+	importer->TestModeOn();
+	importer->SetInput(root);
+	mafString filename=MED_DATA_ROOT;
+	filename<<"/Extrusion/extrusion_cube.vtk";
+	importer->SetFileName(filename.GetCStr());
+	importer->OpRun();
+	mafVMESurface *cube=mafVMESurface::SafeDownCast(importer->GetOutput());
+	cube->GetOutput()->GetVTKData()->Update();
+	cube->Update();
+
+	mmoExtrusionHoles *extrusion = new mmoExtrusionHoles();
+	extrusion->TestModeOn();
+	extrusion->SetInput(cube);
+	extrusion->OpRun();
+	extrusion->ExtractFreeEdge();
+
+	//In the cube there is an hole with 4 points
+	CPPUNIT_ASSERT(extrusion->GetExtractFreeEdgesNumeberOfPoints()==4);
+
+	mafDEL(extrusion);
+	mafDEL(importer);
+	mafDEL(storage);
+}
+//-----------------------------------------------------------
+void mmoExtrusionHolesTest::TestExtrude() 
+//-----------------------------------------------------------
+{
+	//Create storage
+	mafVMEStorage *storage = mafVMEStorage::New();
+	storage->GetRoot()->SetName("root");
+	storage->GetRoot()->Initialize();
+
+	mafVMERoot *root=storage->GetRoot();
+
+	//Imput data is a cube with 1 hole
 	mmoVTKImporter *importer=new mmoVTKImporter("importer");
 	importer->TestModeOn();
 	importer->SetInput(root);
@@ -94,6 +153,7 @@ void mmoExtrusionHolesTest::Test()
 	extrusion->SetExtrusionFactor(4.0);
 	extrusion->OpRun();
 	extrusion->ExtractFreeEdge();
+	//Select 1° hole with point ID 1
 	extrusion->SelectHole(1);
 	extrusion->Extrude();
 	extrusion->SaveExtrusion();
