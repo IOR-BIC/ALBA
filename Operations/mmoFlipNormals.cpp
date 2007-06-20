@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoFlipNormals.cpp,v $
 Language:  C++
-Date:      $Date: 2007-05-07 12:03:22 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2007-06-20 10:47:05 $
+Version:   $Revision: 1.6 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -507,6 +507,13 @@ void mmoFlipNormals::ModifyAllNormal()
 	//Check direction of the first normal
 	vtkPoints *p;
 	vtkNEW(p);
+
+  if(m_CellFilter->GetNumberOfMarkedCells() == 0)
+  {
+    wxMessageBox("Must select at least one cell");
+    return;
+  }
+
 	double *normal=m_ResultPolydata->GetCellData()->GetNormals()->GetTuple3(m_CellFilter->GetIdMarkedCell(0));
 	int sign[3];
 	sign[0]=normal[0]<0? -1 :1;
