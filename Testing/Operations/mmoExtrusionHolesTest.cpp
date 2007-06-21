@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtrusionHolesTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-06-20 16:43:47 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-06-21 10:33:38 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -113,6 +113,8 @@ void mmoExtrusionHolesTest::TestExtractFreeEdge()
 	//In the cube there is an hole with 4 points
 	CPPUNIT_ASSERT(extrusion->GetExtractFreeEdgesNumeberOfPoints()==4);
 
+	delete wxLog::SetActiveTarget(NULL);
+
 	mafDEL(extrusion);
 	mafDEL(importer);
 	mafDEL(storage);
@@ -165,6 +167,8 @@ void mmoExtrusionHolesTest::TestExtrude()
 	CPPUNIT_ASSERT(bounds[1]-bounds[0] == 4 && bounds[3]-bounds[2] == 4 && bounds[5]-bounds[4] == 8);
 	
 	cube = NULL;
+
+	delete wxLog::SetActiveTarget(NULL);
 	mafDEL(extrusion);
 	mafDEL(importer);
 	mafDEL(storage);
