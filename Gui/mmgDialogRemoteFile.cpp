@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialogRemoteFile.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:46:08 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-06-21 10:16:45 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -137,7 +137,7 @@ void mmgDialogRemoteFile::OnEvent(mafEventBase *maf_event)
       {
         mafString local_file = "";
         mafString wildc = _("MAF Storage Format file (*.msf)|*.msf|Compressed file (*.zmsf)|*.zmsf");
-        local_file = mafGetOpenFile(wxGetCwd().c_str(),wildc.GetCStr(),_("Open local file"),this).c_str();
+        local_file = mafGetOpenFile("",wildc.GetCStr(),_("Open local file"),this).c_str();
         if (!local_file.IsEmpty())
         {
           m_RemoteFilename = local_file;

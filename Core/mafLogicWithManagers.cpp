@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-12 11:14:14 $
-  Version:   $Revision: 1.105 $
+  Date:      $Date: 2007-06-21 10:18:38 $
+  Version:   $Revision: 1.106 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,7 +39,7 @@
   #include "mmoVTKImporter.h"
   #include "mmoSTLImporter.h"
   #include "mafInteractionManager.h"
-
+  
   #include "mafInteractor.h"
   #include "mafDeviceManager.h"
   #include "mafAction.h"
@@ -168,7 +168,7 @@ void mafLogicWithManagers::Configure()
   {
     m_InteractionManager = new mafInteractionManager();
     m_InteractionManager->SetListener(this);
-
+    
 
     m_Mouse = m_InteractionManager->GetMouseDevice();
     //SIL m_InteractionManager->GetClientDevice()->AddObserver(this, MCH_INPUT);
@@ -1023,14 +1023,14 @@ void mafLogicWithManagers::OnFileOpen(const char *file_to_open)
       else
       {
 		    wxString wildc    = _("MAF Storage Format file (*.msf)|*.msf|Compressed file (*.zmsf)|*.zmsf");
-		    wxString msf_dir  = wxGetCwd().c_str();
+		    //wxString msf_dir  = wxGetCwd().c_str();
         if (file_to_open != NULL)
         {
           file = file_to_open;
         }
         else
         {
-          file = mafGetOpenFile(msf_dir, wildc).c_str();
+          file = mafGetOpenFile("", wildc).c_str();
         }
       }
 
