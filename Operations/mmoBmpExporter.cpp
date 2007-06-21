@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoBmpExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-20 12:53:25 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-06-21 09:03:46 $
+  Version:   $Revision: 1.4 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -163,6 +163,7 @@ void mmoBmpExporter::SaveBmp()
   double spacing_x, spacing_y;
   if (rg)
   {  
+    rg->Update();
     rg->GetDimensions(dim);
     xdim = dim[0];
     ydim = dim[1];
@@ -184,6 +185,7 @@ void mmoBmpExporter::SaveBmp()
   }
   else
   {
+    imageData->Update();
     imageData->GetDimensions(dim);
     xdim = dim[0];
     ydim = dim[1];
@@ -206,6 +208,7 @@ void mmoBmpExporter::SaveBmp()
 
   wxString prefix;
 			prefix = wxString::Format("%s%s_%dx%d",path,name,xdim,ydim);
+
 
   if (m_8bit == 0)
   {
@@ -289,41 +292,27 @@ void mmoBmpExporter::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId())
     {
-    case ID_8BIT:
-      if (m_8bit == true)
-      {
-        m_Gui->Enable(ID_INT,true);
-      }
-      else
-      {
-        m_Gui->Enable(ID_INT,false);
-      }
-      break;
-    case ID_DIROPEN:
-      if (m_DirName != "")
-      {
-        m_Gui->Enable(wxOK,true);
-      }
-      else
-      {
-        m_Gui->Enable(wxOK,false);
-      }
-      break;
-    case wxOK:          
-      { 
-        OpStop(OP_RUN_OK);
-      }
-      break;
-    case wxCANCEL:
-      {    
-        OpStop(OP_RUN_CANCEL);
-      }
-      break;
-    default:
-      {
-        mafEventMacro(*e); 
-      }
-      break;
+      case ID_8BIT:
+        m_Gui->Enable(ID_INT,m_8bit == true);
+        break;
+      case ID_DIROPEN:
+        m_Gui->Enable(wxOK,m_DirName != "");
+        break;
+      case wxOK:          
+        { 
+          OpStop(OP_RUN_OK);
+        }
+        break;
+      case wxCANCEL:
+        {    
+          OpStop(OP_RUN_CANCEL);
+        }
+        break;
+      default:
+        {
+          mafEventMacro(*e); 
+        }
+        break;
     }
   }
 }
@@ -351,6 +340,9 @@ bool mmoBmpExporter::WriteImageDataAsMonocromeBitmap(vtkImageData *img, mafStrin
   int img_h = img_dim[1];
   int img_z = img_dim[2];
   if( img_w==0 || img_h==0 || img_z!=1 ) return false;
+  
+  double spacing_x = img->GetSpacing()[0];
+  double spacing_y = img->GetSpacing()[1];
 
   vtkMAFSmartPointer<vtkDataArray> scal = img->GetPointData()->GetScalars();
   int n_scal =  scal->GetNumberOfTuples();
@@ -421,8 +413,8 @@ bool mmoBmpExporter::WriteImageDataAsMonocromeBitmap(vtkImageData *img, mafStrin
   bih->biBitCount		    = 8;      // 8 bit per pixel ( using palette )
   bih->biCompression	  = BI_RGB; // no compression
   bih->biSizeImage		  = BytePerRow * img_h;  // image-body size in file
-  bih->biXPelsPerMeter	= 0;
-  bih->biYPelsPerMeter	= 0;
+  bih->biXPelsPerMeter	= spacing_x;
+  bih->biYPelsPerMeter	= spacing_y;
   bih->biClrUsed		    = 256;
   bih->biClrImportant	  = 0;
 
