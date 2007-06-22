@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoBmpExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-21 09:03:46 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-06-22 09:01:01 $
+  Version:   $Revision: 1.5 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,8 +27,6 @@
 #include "mafVMEVolumeGray.h"
 
 #include "vtkMAFSmartPointer.h"
-
-
 #include "vtkDataSet.h"
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
