@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoROI.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-16 13:19:56 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-06-25 10:03:01 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,12 +19,13 @@
 //----------------------------------------------------------------------------
 #include "mafGizmoInterface.h"
 #include "mafObserver.h"
+#include "mafGizmoBoundingBox.h"
+#include "mafGizmoHandle.h"
 
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
 class mafGizmoHandle;
-class mafGizmoBoundingBox;
 class mafMatrix;
 class mafVME;
 
@@ -72,7 +73,7 @@ class mafVME;
 class mafGizmoROI: public mafGizmoInterface
 {
 public:
-           mafGizmoROI(mafVME *input, mafObserver* listener = NULL);
+	mafGizmoROI(mafVME *input, mafObserver* listener = NULL , int constraintModality=mafGizmoHandle::BOUNDS,mafVME* parent=NULL);
   virtual ~mafGizmoROI(); 
 
   /** 
@@ -122,17 +123,11 @@ public:
   void Reset();
 
 protected:
-  /**
-  The gizmo bounding box*/
-  mafGizmoBoundingBox *OutlineGizmo;
 
   /**
   Highlight one component and dehighlight other components;
   setting highlight to false dehighlight every gizmos*/
   void Highlight(int component, bool highlight); 
-  
-  /** Array holding the six gizmo handles*/  
-  mafGizmoHandle *GHandle[6];
 
   /** 
   Register the active gizmo component at MOUSE_DOWN*/
@@ -155,5 +150,15 @@ protected:
   /** 
   Process events from gizmo components*/
   void OnEventGizmoComponents(mafEventBase *maf_event);
+
+	int m_ConstraintModality;
+
+	/** Array holding the six gizmo handles*/  
+	mafGizmoHandle *GHandle[6];
+
+	/**
+	The gizmo bounding box*/
+	mafGizmoBoundingBox *OutlineGizmo;
+
 };
 #endif

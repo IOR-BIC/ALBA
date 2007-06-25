@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoROI.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-06 15:19:02 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-06-25 10:03:01 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,6 +35,7 @@
 
 #include "vtkTransform.h"
 #include "vtkCubeSource.h"
+#include "vtkDataSet.h"
 
 #include <vector>
 #include <algorithm>
@@ -42,12 +43,13 @@
 using namespace std;
 
 //----------------------------------------------------------------------------
-mafGizmoROI::mafGizmoROI(mafVME* input, mafObserver *listener)
+mafGizmoROI::mafGizmoROI(mafVME* input, mafObserver *listener , int constraintModality, mafVME* parent)
 //----------------------------------------------------------------------------
 {
   assert(input);
   InputVME = input;
   m_Listener = listener;
+	m_ConstraintModality = constraintModality;
   //no gizmo component is active at construction
   
   this->ActiveGizmoComponent = -1;
@@ -57,12 +59,12 @@ mafGizmoROI::mafGizmoROI(mafVME* input, mafObserver *listener)
   {
     // Create mafGizmoHandle and send events to this
     GHandle[i] = NULL;
-    GHandle[i] = new mafGizmoHandle(input, this);
+    GHandle[i] = new mafGizmoHandle(input, this, constraintModality,parent);
     GHandle[i]->SetType(i);
   }
-
-  // create the outline gizmo
-  OutlineGizmo = new mafGizmoBoundingBox(input, this);
+  
+	// create the outline gizmo
+	OutlineGizmo = new mafGizmoBoundingBox(input, this,parent);
 }
 //----------------------------------------------------------------------------
 mafGizmoROI::~mafGizmoROI() 
@@ -363,34 +365,29 @@ void mafGizmoROI::UpdateHandlePositions()
 void mafGizmoROI::UpdateOutlineBounds()
 //----------------------------------------------------------------------------
 {
-  double pos[3] = {0, 0, 0};
-  double xmin, xmax, ymin, ymax, zmin, zmax;
-  
-  // get xmin
-  mafTransform::GetPosition(*GHandle[0]->GetPose(), pos);
-  xmin = pos[0];
+	double pos[3] = {0, 0, 0};
+	
+  double pos1_new[3] = {0, 0, 0};
+	double pos2_new[3] = {0, 0, 0};
+	double b[6],center[3];
 
-  // get xmax
-  mafTransform::GetPosition(*GHandle[1]->GetPose(), pos);
-  xmax = pos[0];
-    
-  // get ymin
-  mafTransform::GetPosition(*GHandle[2]->GetPose(), pos);
-  ymin = pos[1];
+	OutlineGizmo->GetBounds(b);
 
-  // get ymax
-  mafTransform::GetPosition(*GHandle[3]->GetPose(), pos);
-  ymax = pos[1];
+	mafTransform::GetPosition(*OutlineGizmo->GetPose(), pos2_new);
+	mafTransform::GetPosition(*GHandle[ActiveGizmoComponent]->GetPose(), pos1_new);
+	GHandle[ActiveGizmoComponent]->GetHandleCenter(ActiveGizmoComponent,center);
+	int i;
+	if(ActiveGizmoComponent==0||ActiveGizmoComponent==1)
+		i=0;
+	else if(ActiveGizmoComponent==2||ActiveGizmoComponent==3)
+		i=1;
+	else if(ActiveGizmoComponent==4||ActiveGizmoComponent==5)
+		i=2;
+	pos1_new[i]-=pos2_new[i];
+	pos1_new[i]+=center[i];
+	b[ActiveGizmoComponent]=pos1_new[i];
 
-  // get zmin
-  mafTransform::GetPosition(*GHandle[4]->GetPose(), pos);
-  zmin = pos[2];
-
-  // get zmax
-  mafTransform::GetPosition(*GHandle[5]->GetPose(), pos);
-  zmax = pos[2];
-
-  OutlineGizmo->SetBounds(xmin, xmax, ymin, ymax, zmin, zmax);  
+  OutlineGizmo->SetBounds(b);  
 }
 
 //----------------------------------------------------------------------------
@@ -404,24 +401,28 @@ void mafGizmoROI::GetBounds(double bounds[6])
 void mafGizmoROI::SetBounds(double bounds[6])
 //----------------------------------------------------------------------------
 {
-  InputVME->GetOutput()->Update();
-  // check for bounds 
-  double vmeLocBounds[6];
-  InputVME->GetOutput()->GetBounds(vmeLocBounds);
-  double newBounds[6] = {bounds[0], bounds[1], bounds[2], bounds[3], bounds[4], bounds[5]}; 
+	double newBounds[6] = {bounds[0], bounds[1], bounds[2], bounds[3], bounds[4], bounds[5]}; 
+	if(m_ConstraintModality==mafGizmoHandle::BOUNDS)
+	{
+		InputVME->GetOutput()->Update();
+		// check for bounds 
+		double vmeLocBounds[6];
+		InputVME->GetOutput()->GetVTKData()->GetBounds(vmeLocBounds);
 
-  // new bounds must be internal do vme bounds
-  int i;
-  for (i = 0; i < 6; i++)
-  {  
-    if (i % 2 == 0)
-    {
-      if (newBounds[i] < vmeLocBounds[i])     newBounds[i]    = vmeLocBounds[i];
-      if (newBounds[i] > vmeLocBounds[i+1])   newBounds[i]    = vmeLocBounds[i+1];
-      if (newBounds[i+1] < vmeLocBounds[i])   newBounds[i+1]  = vmeLocBounds[i];
-      if (newBounds[i+1] > vmeLocBounds[i+1]) newBounds[i+1]  = vmeLocBounds[i+1];
-    }
-  }
+		// new bounds must be internal do vme bounds
+		int i;
+		for (i = 0; i < 6; i++)
+		{  
+			if (i % 2 == 0)
+			{
+				if (newBounds[i] < vmeLocBounds[i])     newBounds[i]    = vmeLocBounds[i];
+				if (newBounds[i] > vmeLocBounds[i+1])   newBounds[i]    = vmeLocBounds[i+1];
+				if (newBounds[i+1] < vmeLocBounds[i])   newBounds[i+1]  = vmeLocBounds[i];
+				if (newBounds[i+1] > vmeLocBounds[i+1]) newBounds[i+1]  = vmeLocBounds[i+1];
+			}
+		}
+	}
+
   // set box gizmo bounds
   OutlineGizmo->SetBounds(newBounds);
 
@@ -429,7 +430,7 @@ void mafGizmoROI::SetBounds(double bounds[6])
   // calculate bb centers
   // set the positions
   
-  for (i = 0; i < 6; i++)
+  for (int i = 0; i < 6; i++)
   {
     GHandle[i]->SetBBCenters(newBounds);
   }
