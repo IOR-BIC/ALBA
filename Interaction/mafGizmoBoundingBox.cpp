@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoBoundingBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-30 15:45:34 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-06-25 09:59:57 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,7 +42,7 @@
 #include "vtkMath.h"
 
 //----------------------------------------------------------------------------
-mafGizmoBoundingBox::mafGizmoBoundingBox(mafVME *input, mafObserver *listener)
+mafGizmoBoundingBox::mafGizmoBoundingBox(mafVME *input, mafObserver *listener,mafVME *parent)
 //----------------------------------------------------------------------------
 {
 
@@ -60,7 +60,11 @@ mafGizmoBoundingBox::mafGizmoBoundingBox(mafVME *input, mafObserver *listener)
   
   // since i'm working in local mode i reparent to input vme the gizmo
   BoxGizmo->SetData(BoxOutline->GetOutput());
-  BoxGizmo->ReparentTo(InputVme);
+	BoxGizmo->GetOutput()->GetVTKData()->ComputeBounds();
+	if(parent)
+		BoxGizmo->ReparentTo(parent);
+	else
+		BoxGizmo->ReparentTo(InputVme);
   
   // set cone gizmo material property and initial color to red
   this->SetColor(1, 0, 0);

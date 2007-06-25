@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoBoundingBox.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:23 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-06-25 09:59:57 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,6 +19,7 @@
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
 #include "mafObserver.h"
+#include "mafVMEGizmo.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -30,7 +31,6 @@ class vtkOutlineSource;
 class vtkCylinderSource;
 class vtkTransformPolyDataFilter;
 class vtkTransform;
-class mafVMEGizmo;
 class mafMatrix;
 
 //----------------------------------------------------------------------------
@@ -47,7 +47,7 @@ class mafMatrix;
 class mafGizmoBoundingBox: public mafObserver 
 {
 public:
-           mafGizmoBoundingBox(mafVME *input, mafObserver *listener = NULL);
+           mafGizmoBoundingBox(mafVME *input, mafObserver *listener = NULL,mafVME* parent=NULL);
   virtual ~mafGizmoBoundingBox(); 
   
   /** 
@@ -90,7 +90,7 @@ public:
   /**
   Set the gizmo local pose*/
   void SetPose(mafMatrix *pose);
-  mafMatrix *GetPose();
+	mafMatrix *GetPose(){return BoxGizmo->GetOutput()->GetMatrix();};
 
 protected:
   /** Set gizmo color*/
