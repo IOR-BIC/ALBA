@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMesh.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-18 13:09:09 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-06-25 09:22:23 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -74,7 +74,7 @@ int mafVMEMesh::InternalInitialize()
 	{
 		// force material allocation
 		GetMaterial();
-		GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
+		GetMaterial()->m_MaterialType = mmaMaterial::USE_VTK_PROPERTY;
 		return MAF_OK;
 	}
 	return MAF_ERROR;
