@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRawExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.6 $
-  Authors:   Matteo Giacomoni
+  Date:      $Date: 2007-06-25 10:09:53 $
+  Version:   $Revision: 1.7 $
+  Authors:   Stefano Perticoni - Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
