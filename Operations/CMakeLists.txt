@@ -42,6 +42,10 @@ SET(PROJECT_SRCS
   mmoExtrusionHoles.h
   medOpVolumeResample.cpp
   medOpVolumeResample.h
+  medOpSplitSurface.cpp
+  medOpSplitSurface.h
+  medOpInteractiveClipSurface.cpp
+  medOpInteractiveClipSurface.h
 )
 
 IF (MAF_USE_ITK)
