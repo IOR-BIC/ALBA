@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCrop.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-19 08:41:23 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-06-25 09:56:09 $
+  Version:   $Revision: 1.13 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -94,7 +94,7 @@ void mmoCrop::OpRun()
 	// create gizmo roi
 	if(!this->m_TestMode)
 	{
-		m_GizmoROI = new mafGizmoROI(Node, this);
+		m_GizmoROI = new mafGizmoROI(Node, this,mafGizmoHandle::BOUNDS);
 		m_GizmoROI->Show(true);
 	}
 
