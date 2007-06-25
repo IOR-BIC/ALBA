@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolylineSpline.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-15 14:16:38 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-06-25 09:24:27 $
+  Version:   $Revision: 1.5 $
   Authors:   Daniele Giunchi & Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,6 +24,7 @@ class vtkVolumeSlicer;
 class vtkPolyData;
 class mafNode;
 class vtkPoints;
+class mmaMaterial;
 
 /** mafVMEPolylineSpline - a procedural VME computing the slice of its parent VME.
   mafVMEPolylineSpline is a node implementing a slicer of a VME (currently only VME-Volume).
@@ -90,6 +91,9 @@ public:
   /** 
   Order the points and cell in polydata*/
   void OrderPolyline(vtkPolyData *polyline);
+
+  /** Return pointer to material attribute. */
+  mmaMaterial *GetMaterial();
 
 
 	enum SPLINE_WIDGET_ID

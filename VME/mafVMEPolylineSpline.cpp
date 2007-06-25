@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolylineSpline.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-15 14:16:38 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-06-25 09:24:27 $
+  Version:   $Revision: 1.5 $
   Authors:   Daniele Giunchi & Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,6 +27,7 @@
 #include "mafVMEPolyline.h"
 #include "mafVMEOutputPolyline.h"
 #include "mmgGui.h"
+#include "mmaMaterial.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFDataPipe.h"
@@ -388,4 +389,22 @@ void mafVMEPolylineSpline::SplinePolyline(vtkPolyData *polyline)
 
   polyline->SetPoints(m_PointsSplined);
   polyline->Update();
+
 }
+//-------------------------------------------------------------------------
+mmaMaterial *mafVMEPolylineSpline::GetMaterial()
+//-------------------------------------------------------------------------
+{
+  mmaMaterial *material = (mmaMaterial *)GetAttribute("MaterialAttributes");
+  if (material == NULL)
+  {
+    material = mmaMaterial::New();
+    SetAttribute("MaterialAttributes", material);
+    if (m_Output)
+    {
+      ((mafVMEOutputPolyline *)m_Output)->SetMaterial(material);
+    }
+  }
+  return material;
+}
+
