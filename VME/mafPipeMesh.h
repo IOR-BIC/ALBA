@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMesh.h,v $
 Language:  C++
-Date:      $Date: 2007-06-18 13:08:18 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-06-25 09:21:29 $
+Version:   $Revision: 1.4 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -32,6 +32,7 @@ class vtkGeometryFilter;
 class mafAxes;
 class mafParabolicMeshToLinearMeshFilter;
 class vtkLookupTable;
+class mmgMaterialButton;
 
 //----------------------------------------------------------------------------
 // mafPipeMesh :
@@ -57,6 +58,8 @@ public:
     ID_WIREFRAME,
     ID_SCALARS,
     ID_LUT,
+    ID_SCALAR_MAP_ACTIVE,
+    ID_USE_VTK_PROPERTY,
 	};
 
   enum PIPE_MESH_TYPE_SCALARS
@@ -93,6 +96,11 @@ public:
   /** Get Number of Scalars */
   int GetNumberOfArrays(){return m_NumberOfArrays;};
 
+  /** Set scalar map active, so you can see scalar associated to points or cells*/
+  void SetScalarMapActive(int value){m_ScalarMapActive = value;};
+  /** Set VTK Property to visualize the material of vme*/
+  void SetUseVTKProperty(int value){m_UseVTKProperty = value;};
+
 protected:
 	mmaMaterial             *m_MeshMaterial;
 	vtkGeometryFilter                  *m_GeometryFilter;
@@ -110,16 +118,23 @@ protected:
 
   void CreateFieldDataControlArrays();
 	void UpdateProperty(bool fromTag = false);
+	/**Update data value to selected scalar */
   void UpdateScalars();
+  /** Update the visualization with changed scalar*/
+  void UpdatePipeFromScalars();
 
   wxString                *m_ScalarsName;
   wxString                *m_ScalarsVTKName;
+
+  mmgMaterialButton       *m_MaterialButton;
 
   int                      m_PointCellArraySeparation;
   int                      m_ScalarIndex;
   int                      m_NumberOfArrays;
   int                      m_ActiveScalarType;
   int                      m_Wireframe;
+  int                      m_ScalarMapActive;
+  int                      m_UseVTKProperty;
 
 	virtual mmgGui  *CreateGui();
 };  

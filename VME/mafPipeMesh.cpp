@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMesh.cpp,v $
 Language:  C++
-Date:      $Date: 2007-06-18 13:08:18 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-06-25 09:21:29 $
+Version:   $Revision: 1.4 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -33,6 +33,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVMEGenericAbstract.h"
 #include "mafVMEMesh.h"
 #include "mafParabolicMeshToLinearMeshFilter.h"
+#include "mmgMaterialButton.h"
 
 #include "mafVMEItemVTK.h"
 
@@ -83,6 +84,9 @@ mafPipeMesh::mafPipeMesh()
 
 	m_ScalarsName = NULL;
 	m_ScalarsVTKName = NULL;
+
+  m_ScalarMapActive = 0;
+  m_UseVTKProperty  = 1;
 }
 //----------------------------------------------------------------------------
 void mafPipeMesh::Create(mafSceneNode *n)
@@ -125,7 +129,9 @@ void mafPipeMesh::ExecutePipe()
 	data->Update();
 
 	m_MeshMaterial = mesh_output->GetMaterial();
-  m_MeshMaterial->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
+  //m_MeshMaterial->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
+
+  
 
   m_PointCellArraySeparation = data->GetPointData()->GetNumberOfArrays();
   m_NumberOfArrays = m_PointCellArraySeparation + data->GetCellData()->GetNumberOfArrays();
@@ -137,14 +143,19 @@ void mafPipeMesh::ExecutePipe()
   double sr[2] = {0,1};
   if(scalars)
   {
+    scalars->Modified();
     scalars->GetRange(sr);
     m_ActiveScalarType = POINT_TYPE;
   }
   else
   {
     scalars = data->GetCellData()->GetScalars();
-    scalars->GetRange(sr);
-    m_ActiveScalarType = CELL_TYPE;
+    if(scalars)
+    {
+      scalars->Modified();
+      scalars->GetRange(sr);
+      m_ActiveScalarType = CELL_TYPE;
+    }
   }
 
 	if(m_MeshMaterial->m_ColorLut)
@@ -185,7 +196,11 @@ void mafPipeMesh::ExecutePipe()
   if(m_ActiveScalarType == CELL_TYPE)
     m_Mapper->SetScalarModeToUseCellData();
 
-	m_Mapper->ScalarVisibilityOn();
+  if(m_ScalarMapActive)
+	  m_Mapper->ScalarVisibilityOn();
+  else
+    m_Mapper->ScalarVisibilityOff();
+
   m_Mapper->Update();
 
 
@@ -197,6 +212,16 @@ void mafPipeMesh::ExecutePipe()
 	vtkNEW(m_Actor);
 	m_Actor->SetMapper(m_Mapper);
   //m_Actor->GetProperty()->SetOpacity(0.5);
+
+  if (m_MeshMaterial->m_MaterialType == mmaMaterial::USE_LOOKUPTABLE)
+  {
+    m_UseVTKProperty = 0;
+  }
+  if (m_MeshMaterial->m_MaterialType == mmaMaterial::USE_VTK_PROPERTY)
+  {
+    m_UseVTKProperty = 1;
+    m_Actor->SetProperty(m_MeshMaterial->m_Prop);
+  }
 
   vtkNEW(m_ActorWired);
   m_ActorWired->SetMapper(m_MapperWired);
@@ -285,11 +310,24 @@ mmgGui *mafPipeMesh::CreateGui()
 	assert(m_Gui == NULL);
 	m_Gui = new mmgGui(this);
   m_Gui->Bool(ID_WIREFRAME,_("Wireframe"), &m_Wireframe);
-  m_Gui->Combo(ID_SCALARS,"",&m_ScalarIndex,m_NumberOfArrays,m_ScalarsName);
-	
+  
+  m_Gui->Bool(ID_USE_VTK_PROPERTY,"property",&m_UseVTKProperty);
+  m_MaterialButton = new mmgMaterialButton(m_Vme,this);
+  m_Gui->AddGui(m_MaterialButton->GetGui());
+  m_MaterialButton->Enable(m_UseVTKProperty != 0);
+
+  m_Gui->Combo(ID_SCALARS,"",&m_ScalarIndex,m_NumberOfArrays,m_ScalarsName);	
+  
+
+  m_Gui->Bool(ID_SCALAR_MAP_ACTIVE,_("enable scalar field mapping"), &m_ScalarMapActive, 1);
   m_Gui->Lut(ID_LUT,"lut",m_Table);
 
+  m_Gui->Enable(ID_SCALARS, m_ScalarMapActive != 0);
+  m_Gui->Enable(ID_LUT, m_ScalarMapActive != 0);
+  
+  m_Gui->Divider();
   m_Gui->Label("");
+  m_Gui->Update();
 	return m_Gui;
 }
 //----------------------------------------------------------------------------
@@ -330,6 +368,37 @@ void mafPipeMesh::OnEvent(mafEventBase *maf_event)
         }
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
         break;
+      case ID_SCALAR_MAP_ACTIVE:
+        {
+          if(m_ScalarMapActive)
+            m_Mapper->ScalarVisibilityOn();
+          else
+            m_Mapper->ScalarVisibilityOff();
+
+          m_Gui->Enable(ID_SCALARS, m_ScalarMapActive != 0);
+          m_Gui->Enable(ID_LUT, m_ScalarMapActive != 0);
+          m_Gui->Update();
+
+          UpdateScalars();
+          mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+        }
+        break;
+      case ID_USE_VTK_PROPERTY:
+        if (m_UseVTKProperty != 0)
+        {
+          m_Actor->SetProperty(m_MeshMaterial->m_Prop);
+          //m_MeshMaterial->m_MaterialType = mmaMaterial::USE_VTK_PROPERTY;
+        }
+        else
+        {
+          m_Actor->SetProperty(NULL);
+          //m_MeshMaterial->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
+        }
+        m_MaterialButton->Enable(m_UseVTKProperty != 0);
+        m_MaterialButton->UpdateMaterialIcon();
+        m_Gui->Update();
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+        break;
 			default:
 				mafEventMacro(*e);
 				break;
@@ -337,39 +406,7 @@ void mafPipeMesh::OnEvent(mafEventBase *maf_event)
 	}
   else if(maf_event->GetId() == VME_TIME_SET)
   {
-    mafVMEMesh *mesh=mafVMEMesh::SafeDownCast(m_Vme);
-    mesh->Update();
-
-
-    vtkUnstructuredGrid *data = vtkUnstructuredGrid::SafeDownCast(mesh->GetOutput()->GetVTKData());
-    double sr[2];
-
-    if(m_ActiveScalarType == POINT_TYPE)
-      data->GetPointData()->GetScalars()->GetRange(sr);
-    else if (m_ActiveScalarType == CELL_TYPE)
-      data->GetCellData()->GetScalars()->GetRange(sr);
-
-    
-    m_Table->SetValueRange(sr);
-    m_Table->SetTableRange(sr);
-    m_Table->SetHueRange(0.667, 0.0);
-    //m_Table->Build();
-
-    m_Mapper->SetLookupTable(m_Table);
-    m_Mapper->SetScalarRange(sr);
-
-
-    if(m_ActiveScalarType == POINT_TYPE)
-      m_Mapper->SetScalarModeToUsePointData();
-    if(m_ActiveScalarType == CELL_TYPE)
-      m_Mapper->SetScalarModeToUseCellData();
-
-    m_Mapper->Update();
-
-    m_Actor->Modified();
-
-    //mafLogMessage("Scalar Range %.3f %.3f",sr[0],sr[1]);
-
+    UpdateScalars();
     UpdateProperty();
   }
 }
@@ -412,10 +449,12 @@ void mafPipeMesh::UpdateScalars()
   if(m_ActiveScalarType == POINT_TYPE)
   {
     m_Vme->GetOutput()->GetVTKData()->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
+    m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetScalars()->Modified();
   }
   else if(m_ActiveScalarType == CELL_TYPE)
   {
     m_Vme->GetOutput()->GetVTKData()->GetCellData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
+    m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetScalars()->Modified();
   }
   m_Vme->Modified();
   m_Vme->GetOutput()->GetVTKData()->Update();
@@ -433,10 +472,12 @@ void mafPipeMesh::UpdateScalars()
       if(m_ActiveScalarType == POINT_TYPE)
       {
         outputVTK->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
+        outputVTK->GetPointData()->GetScalars()->Modified();
       }
       else if(m_ActiveScalarType == CELL_TYPE)
       {
         outputVTK->GetCellData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
+        outputVTK->GetCellData()->GetScalars()->Modified();
       }
       outputVTK->Modified();
       outputVTK->Update();
@@ -446,6 +487,14 @@ void mafPipeMesh::UpdateScalars()
   m_Vme->Modified();
   m_Vme->Update();
   
+  UpdatePipeFromScalars();
+  
+  
+}
+//----------------------------------------------------------------------------
+void mafPipeMesh::UpdatePipeFromScalars()
+//----------------------------------------------------------------------------
+{
   vtkUnstructuredGrid *data = vtkUnstructuredGrid::SafeDownCast(m_Vme->GetOutput()->GetVTKData());
   data->Update();
   double sr[2];
@@ -473,6 +522,7 @@ void mafPipeMesh::UpdateScalars()
 
   UpdateProperty();
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+
 }
 
 //----------------------------------------------------------------------------
