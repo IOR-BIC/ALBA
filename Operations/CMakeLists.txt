@@ -40,6 +40,8 @@ SET(PROJECT_SRCS
   mmoFlipNormals.h
   mmoExtrusionHoles.cpp
   mmoExtrusionHoles.h
+  medOpVolumeResample.cpp
+  medOpVolumeResample.h
 )
 
 IF (MAF_USE_ITK)
