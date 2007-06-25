@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoHandle.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:23 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-06-25 10:02:15 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -82,7 +82,7 @@ class vtkMatrix4x4;
 class mafGizmoHandle: public mafObserver 
 {
 public:
-           mafGizmoHandle(mafVME *input, mafObserver *listener = NULL);
+           mafGizmoHandle(mafVME *input, mafObserver *listener = NULL, int constraintModality=BOUNDS,mafVME *parent=NULL);
   virtual ~mafGizmoHandle(); 
   
   /** 
@@ -127,6 +127,8 @@ public:
   /** 
   Set the constrain ref sys */
   void SetConstrainRefSys(mafMatrix *constrain);
+	
+	enum CONSTRAINT_MODALITY {BOUNDS = 0, FREE};
 
   /**
   Set/Get the pivot matrix */
@@ -148,6 +150,8 @@ public:
   Set translation intervals*/
   void SetTranslationIntervals(double bounds[6]);
 
+	void GetHandleCenter(int type,double HandleCenter[3]);
+
 protected:
 
   /** Register input vme*/
@@ -164,6 +168,12 @@ protected:
 
   /** translation transform for box*/
   vtkTransform *TranslateBoxTr;
+
+	/** translate PDF for box*/
+	vtkTransformPolyDataFilter *TranslateBoxPDFEnd;
+
+	/** translation transform for box*/
+	vtkTransform *TranslateBoxTrEnd;
 
   /** rotate PDF for box*/
   vtkTransformPolyDataFilter *RotateBoxPDF;
@@ -193,12 +203,16 @@ protected:
   int GizmoType;
 
   double BBCenters[6][3];
-  double TranslationIntervals[3][2];
+  double TranslationIntervals[6][2];
 
   /**
   The Pivot Matrix */
   mafMatrix PivotMatrix;
 
   void Update();
+
+	double cubeSize;
+
+	int m_ConstraintModality;
 };
 #endif

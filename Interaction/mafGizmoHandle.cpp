@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoHandle.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-30 15:45:34 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-06-25 10:02:15 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,11 +50,16 @@
 using namespace std;
 
 //----------------------------------------------------------------------------
-mafGizmoHandle::mafGizmoHandle(mafVME *input, mafObserver *listener)
+mafGizmoHandle::mafGizmoHandle(mafVME *input, mafObserver *listener, int constraintModality,mafVME *parent)
 //----------------------------------------------------------------------------
 {
+	m_ConstraintModality = constraintModality;
   IsaComp = NULL;
   Cube = NULL;
+
+	for(int i=0;i<6;i++)
+		for(int j=0;j<3;j++)
+			BBCenters[i][j]=0;
 
   m_Listener = listener;
   InputVme = input;
@@ -72,9 +77,12 @@ mafGizmoHandle::mafGizmoHandle(mafVME *input, mafObserver *listener)
   BoxGizmo->SetName("BoxGizmo");
   
   // since i'm working in local mode i reparent to input vme the gizmo
-  BoxGizmo->SetData(RotateBoxPDF->GetOutput());
-  BoxGizmo->ReparentTo(InputVme);
-  
+  BoxGizmo->SetData(TranslateBoxPDFEnd->GetOutput());
+	if(parent)
+		BoxGizmo->ReparentTo(parent);
+	else
+		BoxGizmo->ReparentTo(InputVme);
+
   // set come gizmo material property and initial color to red
   this->SetColor(1, 0, 0);
 
@@ -95,10 +103,20 @@ mafGizmoHandle::mafGizmoHandle(mafVME *input, mafObserver *listener)
   IsaGen = IsaComp->CreateBehavior(MOUSE_LEFT);
 
   //isa will send events to this
-  IsaGen->SetListener(this);  
-  IsaGen->SetVME(BoxGizmo);
-  IsaGen->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal(InputVme);
-  IsaGen->EnableTranslation(true);
+	if(m_ConstraintModality==BOUNDS)
+	{
+		IsaGen->SetListener(this);  
+		IsaGen->SetVME(BoxGizmo);
+		IsaGen->GetTranslationConstraint()->GetRefSys()->SetTypeToGlobal();
+		IsaGen->EnableTranslation(true);
+	}
+	else if(m_ConstraintModality==FREE)
+	{
+		IsaGen->SetListener(this);  
+		IsaGen->SetVME(BoxGizmo);
+		IsaGen->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal();
+		IsaGen->EnableTranslation(true);
+	}
 
   // assign isa to cylinder and cone
   BoxGizmo->SetBehavior(IsaComp);
@@ -108,9 +126,10 @@ mafGizmoHandle::mafGizmoHandle(mafVME *input, mafObserver *listener)
 
   InputVme->GetOutput()->Update();
   double b[6];
-  InputVme->GetOutput()->GetBounds(b);
+  InputVme->GetOutput()->GetVTKData()->GetBounds(b);
   SetBBCenters(b);
-  SetTranslationIntervals(b);
+	if(m_ConstraintModality==BOUNDS)
+		SetTranslationIntervals(b);
 }
 //----------------------------------------------------------------------------
 mafGizmoHandle::~mafGizmoHandle() 
@@ -147,7 +166,7 @@ void mafGizmoHandle::CreatePipeline()
   result = min_element(dim.begin(), dim.end());
 
   double min_dim = *result;
-  double cubeSize = min_dim / 8;
+  cubeSize = min_dim / 8;
 
   // create box
   Cube = vtkCubeSource::New();
@@ -171,6 +190,12 @@ void mafGizmoHandle::CreatePipeline()
   RotateBoxPDF->SetInput(TranslateBoxPDF->GetOutput());
   RotateBoxPDF->SetTransform(RotateBoxTr);
 
+	TranslateBoxTrEnd = vtkTransform::New();
+
+	TranslateBoxPDFEnd = vtkTransformPolyDataFilter::New();
+	TranslateBoxPDFEnd->SetInput(RotateBoxPDF->GetOutput());
+	TranslateBoxPDFEnd->SetTransform(TranslateBoxTrEnd);
+
   SetLength(cubeSize);
 }
 
@@ -193,7 +218,7 @@ void mafGizmoHandle::SetLength(double length)
   Cube->SetXLength(length / 2);
   Cube->SetYLength(length);
   Cube->SetZLength(length);
-    
+  
   // translate box to match its right side with world y axis
   TranslateBoxTr->Identity();
   TranslateBoxTr->Translate(- length / 4, 0,0);
@@ -370,15 +395,25 @@ void mafGizmoHandle::SetTranslationIntervals(double bounds[6])
 //----------------------------------------------------------------------------
 {
   // fill TranslationIntervals ivar
-  TranslationIntervals[0][0] = bounds[0];
-  TranslationIntervals[0][1] = bounds[1];
   
-  TranslationIntervals[1][0] = bounds[2];
-  TranslationIntervals[1][1] = bounds[3];
-  
-  TranslationIntervals[2][0] = bounds[4];
-  TranslationIntervals[2][1] = bounds[5];
-  
+	TranslationIntervals[0][0] = 0.0;
+	TranslationIntervals[0][1] = bounds[1]-bounds[0];
+
+	TranslationIntervals[1][0] = -(bounds[1]-bounds[0]);
+	TranslationIntervals[1][1] = 0.0;
+
+	TranslationIntervals[2][0] = 0.0;
+	TranslationIntervals[2][1] = bounds[3]-bounds[2];
+
+	TranslationIntervals[3][0] = -(bounds[3]-bounds[2]);
+	TranslationIntervals[3][1] = 0.0;
+
+	TranslationIntervals[4][0] = 0.0;
+	TranslationIntervals[4][1] = bounds[5]-bounds[4];
+
+	TranslationIntervals[5][0] = -(bounds[5]-bounds[4]);
+	TranslationIntervals[5][1] = 0.0;
+
   Update();
 }
 
@@ -394,11 +429,17 @@ void mafGizmoHandle::Update()
   {
     case XMIN:
     {
-      // set the constrain
-      IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::BOUNDS, vtkDOFMatrix::LOCK, vtkDOFMatrix::LOCK);
-      IsaGen->GetTranslationConstraint()->SetBounds(vtkDOFMatrix::X, TranslationIntervals[0]);
-      // place the gizmo
-      BoxGizmo->SetPose(BBCenters[0], rot, InputVme->GetTimeStamp());   
+			// place the gizmo
+			if(m_ConstraintModality==BOUNDS)
+			{
+				IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::BOUNDS, vtkDOFMatrix::LOCK, vtkDOFMatrix::LOCK);
+				IsaGen->GetTranslationConstraint()->SetBounds(vtkDOFMatrix::X, TranslationIntervals[0]);
+			}
+			else if(m_ConstraintModality==FREE)
+				IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::FREE, vtkDOFMatrix::LOCK, vtkDOFMatrix::LOCK);
+			
+			TranslateBoxTrEnd->Identity();
+			TranslateBoxTrEnd->Translate(BBCenters[0]);
       mafTransform::SetPosition(PivotMatrix, BBCenters[0]);
     }
     break;
@@ -406,9 +447,17 @@ void mafGizmoHandle::Update()
     case XMAX:
     {
       RotateBoxTr->RotateZ(180);
-      IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::BOUNDS, vtkDOFMatrix::LOCK, vtkDOFMatrix::LOCK);
-      IsaGen->GetTranslationConstraint()->SetBounds(vtkDOFMatrix::X, TranslationIntervals[0]);
-      BoxGizmo->SetPose(BBCenters[1], rot, InputVme->GetTimeStamp());
+
+			if(m_ConstraintModality==BOUNDS)
+			{
+				IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::BOUNDS, vtkDOFMatrix::LOCK, vtkDOFMatrix::LOCK);
+				IsaGen->GetTranslationConstraint()->SetBounds(vtkDOFMatrix::X, TranslationIntervals[1]);
+			}
+			else if(m_ConstraintModality==FREE)
+				IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::FREE, vtkDOFMatrix::LOCK, vtkDOFMatrix::LOCK);
+
+			TranslateBoxTrEnd->Identity();
+			TranslateBoxTrEnd->Translate(BBCenters[1]);
       mafTransform::SetPosition(PivotMatrix, BBCenters[1]);
     }
     break;
@@ -416,9 +465,17 @@ void mafGizmoHandle::Update()
     case YMIN:
     {
       RotateBoxTr->RotateZ(90);
-      IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::LOCK, vtkDOFMatrix::BOUNDS, vtkDOFMatrix::LOCK);
-      IsaGen->GetTranslationConstraint()->SetBounds(vtkDOFMatrix::Y, TranslationIntervals[1]);
-      BoxGizmo->SetPose(BBCenters[2], rot, InputVme->GetTimeStamp());
+
+			if(m_ConstraintModality==BOUNDS)
+			{
+				IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::LOCK, vtkDOFMatrix::BOUNDS, vtkDOFMatrix::LOCK);
+				IsaGen->GetTranslationConstraint()->SetBounds(vtkDOFMatrix::Y, TranslationIntervals[2]);
+			}
+			else if(m_ConstraintModality==FREE)
+				IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::LOCK, vtkDOFMatrix::FREE, vtkDOFMatrix::LOCK);
+
+			TranslateBoxTrEnd->Identity();
+			TranslateBoxTrEnd->Translate(BBCenters[2]);
       mafTransform::SetPosition(PivotMatrix, BBCenters[2]);
     }
     break;
@@ -426,9 +483,17 @@ void mafGizmoHandle::Update()
     case YMAX:
     {
       RotateBoxTr->RotateZ(-90);
-      IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::LOCK, vtkDOFMatrix::BOUNDS, vtkDOFMatrix::LOCK);
-      IsaGen->GetTranslationConstraint()->SetBounds(vtkDOFMatrix::Y, TranslationIntervals[1]);
-      BoxGizmo->SetPose(BBCenters[3], rot, InputVme->GetTimeStamp());
+
+			if(m_ConstraintModality==BOUNDS)
+			{
+				IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::LOCK, vtkDOFMatrix::BOUNDS, vtkDOFMatrix::LOCK);
+				IsaGen->GetTranslationConstraint()->SetBounds(vtkDOFMatrix::Y, TranslationIntervals[3]);
+			}
+			else if(m_ConstraintModality==FREE)
+				IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::LOCK, vtkDOFMatrix::FREE, vtkDOFMatrix::LOCK);
+			
+			TranslateBoxTrEnd->Identity();
+			TranslateBoxTrEnd->Translate(BBCenters[3]);
       mafTransform::SetPosition(PivotMatrix, BBCenters[3]);
     }
     break;
@@ -436,9 +501,17 @@ void mafGizmoHandle::Update()
     case ZMIN:
     {
       RotateBoxTr->RotateY(-90);
-      IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::LOCK, vtkDOFMatrix::LOCK, vtkDOFMatrix::BOUNDS);
-      IsaGen->GetTranslationConstraint()->SetBounds(vtkDOFMatrix::Z, TranslationIntervals[2]);
-      BoxGizmo->SetPose(BBCenters[4], rot, InputVme->GetTimeStamp());
+
+			if(m_ConstraintModality==BOUNDS)
+			{
+				IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::LOCK, vtkDOFMatrix::LOCK, vtkDOFMatrix::BOUNDS);
+				IsaGen->GetTranslationConstraint()->SetBounds(vtkDOFMatrix::Z, TranslationIntervals[4]);
+			}
+			else if(m_ConstraintModality==FREE)
+				IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::LOCK, vtkDOFMatrix::LOCK, vtkDOFMatrix::FREE);
+
+			TranslateBoxTrEnd->Identity();
+			TranslateBoxTrEnd->Translate(BBCenters[4]);
       mafTransform::SetPosition(PivotMatrix, BBCenters[4]);
     }
     break;
@@ -446,9 +519,17 @@ void mafGizmoHandle::Update()
     case ZMAX:
     {
       RotateBoxTr->RotateY(90);
-      IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::LOCK, vtkDOFMatrix::LOCK, vtkDOFMatrix::BOUNDS);
-      IsaGen->GetTranslationConstraint()->SetBounds(vtkDOFMatrix::Z, TranslationIntervals[2]);
-      BoxGizmo->SetPose(BBCenters[5], rot, InputVme->GetTimeStamp());
+
+			if(m_ConstraintModality==BOUNDS)
+			{
+				IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::LOCK, vtkDOFMatrix::LOCK, vtkDOFMatrix::BOUNDS);
+				IsaGen->GetTranslationConstraint()->SetBounds(vtkDOFMatrix::Z, TranslationIntervals[5]);
+			}
+			else if(m_ConstraintModality==FREE)
+				IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::LOCK, vtkDOFMatrix::LOCK, vtkDOFMatrix::FREE);
+
+			TranslateBoxTrEnd->Identity();
+			TranslateBoxTrEnd->Translate(BBCenters[5]);
       mafTransform::SetPosition(PivotMatrix, BBCenters[5]);
     }
     break;
@@ -457,4 +538,11 @@ void mafGizmoHandle::Update()
     {
     }
   }
+}
+//----------------------------------------------------------------------------
+void mafGizmoHandle::GetHandleCenter(int type,double HandleCenter[6])
+//----------------------------------------------------------------------------
+{
+	for(int i=0;i<3;i++)
+		HandleCenter[i]=BBCenters[type][i];
 }
