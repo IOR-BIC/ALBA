@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoROI.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-25 10:03:01 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-06-25 12:23:44 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -76,89 +76,70 @@ public:
 	mafGizmoROI(mafVME *input, mafObserver* listener = NULL , int constraintModality=mafGizmoHandle::BOUNDS,mafVME* parent=NULL);
   virtual ~mafGizmoROI(); 
 
-  /** 
-  Set input vme for the gizmo*/
+  /** Set input vme for the gizmo*/
   virtual void SetInput(mafVME *vme); 
   
-  /**
-  Events handling*/        
+  /** Events handling*/        
   virtual void OnEvent(mafEventBase *maf_event);
 
-  /**
-  Highlight the given component and set highlight to false for the others */
+  /** Highlight the given component and set highlight to false for the others */
   void Highlight(int component);
 
-  /**
-  Set highlight to false for all gizmo camponents*/
+  /** Set highlight to false for all gizmo components*/
   void HighlightOff(); 
 
   //----------------------------------------------------------------------------
   // show 
   //----------------------------------------------------------------------------
   
-  /**
-  Show the gizmo*/
+  /** Show the gizmo*/
   void Show(bool show);
 
-  /**
-  Show gizmo handles */
+  /** Show gizmo handles */
   void ShowHandles(bool show);
 
-  /**
-  Show gizmo cube */
+  /** Show gizmo cube */
   void ShowROI(bool show);
 
-  /** 
-  Set the constrain ref sys*/
+  /** Set the constrain ref sys*/
   void SetConstrainRefSys(mafMatrix *constrain);
 
-  /**
-  Set/Get the gizmo bounds */
+  /** Set/Get the gizmo bounds */
   void SetBounds(double bounds[6]);
   double *GetBounds();
   void GetBounds(double bounds[6]);
 
-  /**
-  Reset the gizmo*/
+  /** Reset the gizmo*/
   void Reset();
 
 protected:
 
-  /**
-  Highlight one component and dehighlight other components;
-  setting highlight to false dehighlight every gizmos*/
+  /** Highlight one component of the gizmo and turn off the highlight others;
+  setting highlight to false it is turned off to all gizmos' components*/
   void Highlight(int component, bool highlight); 
 
-  /** 
-  Register the active gizmo component at MOUSE_DOWN*/
-  int ActiveGizmoComponent;
+  int m_ActiveGizmoComponent; ///<Register the active gizmo component at MOUSE_DOWN
 
-  /** 
-  After one handle movement recenter other handles*/
+  /** After one handle movement recenter other handles*/
   void UpdateHandlePositions();
 
-  /**
-  Update gizmo outline bounds based on handles position; this method must be called each time a 
-  gizmo handle is moved*/
+  /** Update gizmo outline bounds based on handles position. 
+  This method must be called each time a gizmo handle is moved*/
   void UpdateOutlineBounds();
 
-  /**
-  Update the gizmos length. This function determines how Gizmos will be resized while moving.
+  /** Update the gizmos length. 
+  This function determines how Gizmos will be resized while moving.
   Superclasses should redefine this in order to change the way gizmos are resized.*/
   virtual void UpdateGizmosLength();
 
-  /** 
-  Process events from gizmo components*/
+  /** Process events from gizmo components*/
   void OnEventGizmoComponents(mafEventBase *maf_event);
 
 	int m_ConstraintModality;
 
-	/** Array holding the six gizmo handles*/  
-	mafGizmoHandle *GHandle[6];
+	mafGizmoHandle *m_GHandle[6];///<Array holding the six gizmo handles
 
-	/**
-	The gizmo bounding box*/
-	mafGizmoBoundingBox *OutlineGizmo;
+	mafGizmoBoundingBox *m_OutlineGizmo;///<The gizmo bounding box
 
 };
 #endif

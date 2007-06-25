@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoHandle.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-25 10:02:15 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-06-25 12:23:44 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -85,17 +85,16 @@ public:
            mafGizmoHandle(mafVME *input, mafObserver *listener = NULL, int constraintModality=BOUNDS,mafVME *parent=NULL);
   virtual ~mafGizmoHandle(); 
   
-  /** 
-  Set the gizmo generating vme; the gizmo will be centered on this vme*/
+  /** Set the gizmo generating vme; the gizmo will be centered on this vme*/
   void SetInput(mafVME *vme); 
-  mafVME *GetInput() {return this->InputVme;};
+  mafVME *GetInput() {return this->m_InputVme;};
 
   //----------------------------------------------------------------------------
   // events handling 
   //----------------------------------------------------------------------------
   
   /** Set the event receiver object*/
-  void  SetListener(mafObserver *Listener) {m_Listener = Listener;};
+  void SetListener(mafObserver *Listener) {m_Listener = Listener;};
   
   /** Events handling*/        
   virtual void OnEvent(mafEventBase *maf_event);
@@ -114,104 +113,89 @@ public:
   void   SetLength(double length);
   double GetLength();
    
-  /** 
-  Set the gizmo abs pose */
+  /** Set the gizmo abs pose */
   void SetAbsPose(mafMatrix *absPose);
   mafMatrix *GetAbsPose();
 
-  /**
-  Set the gizmo local pose*/
+  /** Set the gizmo local pose*/
   void SetPose(mafMatrix *pose);
   mafMatrix *GetPose();
 
-  /** 
-  Set the constrain ref sys */
+  /** Set the constrain ref sys */
   void SetConstrainRefSys(mafMatrix *constrain);
 	
 	enum CONSTRAINT_MODALITY {BOUNDS = 0, FREE};
 
-  /**
-  Set/Get the pivot matrix */
-  void SetPivotMatrix(mafMatrix &matrix) {PivotMatrix = matrix;};
-  mafMatrix &GetPivotMatrix() {return PivotMatrix;};
+  /** Set the pivot matrix */
+  void SetPivotMatrix(mafMatrix &matrix) {m_PivotMatrix = matrix;};
+  
+  /** Get the pivot matrix */
+  mafMatrix &GetPivotMatrix() {return m_PivotMatrix;};
 
   enum GIZMOTYPE {XMIN = 0, XMAX, YMIN, YMAX, ZMIN, ZMAX};
-  /**
-  Set the gizmo type: type can be mafGizmoHandle::XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX.
+  
+  /** Set the gizmo type. 
+  Type can be mafGizmoHandle::XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX.
   Place the gizmo on the bounding box and set its constrain*/
   void SetType(int type);
-  int GetType() {return GizmoType;};
+  
+  /** Return the gizmo's type*/
+  int GetType() {return m_GizmoType;};
 
-  /**
-  Set the bounding box centers from its bounds*/
+  /** Set the bounding box centers from its bounds*/
   void SetBBCenters(double bounds[6]);
   
-  /**
-  Set translation intervals*/
+  /** Set translation intervals*/
   void SetTranslationIntervals(double bounds[6]);
 
-	void GetHandleCenter(int type,double HandleCenter[3]);
+  /** Return the center of the handle*/
+	void GetHandleCenter(int type, double HandleCenter[3]);
 
 protected:
 
-  /** Register input vme*/
-  mafVME *InputVme;
-  
-  /** Cube source*/
-  vtkCubeSource *Cube;
+  mafVME *m_InputVme;///<Register input vme
 
-  /** Box gizmo */
-  mafVMEGizmo *BoxGizmo;
+  vtkCubeSource *m_Cube;///<Cube source
 
-  /** translate PDF for box*/
-  vtkTransformPolyDataFilter *TranslateBoxPDF;
+  mafVMEGizmo *m_BoxGizmo; 
 
-  /** translation transform for box*/
-  vtkTransform *TranslateBoxTr;
+  vtkTransformPolyDataFilter *m_TranslateBoxPolyDataFilter;///<translate PDF for box
 
-	/** translate PDF for box*/
-	vtkTransformPolyDataFilter *TranslateBoxPDFEnd;
+  vtkTransform *m_TranslateBoxTr;///<translation transform for box
 
-	/** translation transform for box*/
-	vtkTransform *TranslateBoxTrEnd;
+	vtkTransformPolyDataFilter *m_TranslateBoxPolyDataFilterEnd;///<translate PDF for box
 
-  /** rotate PDF for box*/
-  vtkTransformPolyDataFilter *RotateBoxPDF;
+	vtkTransform *m_TranslateBoxTrEnd;///<translation transform for box
 
-  /** rotation transform for box*/
-  vtkTransform *RotateBoxTr;
+  vtkTransformPolyDataFilter *m_RotateBoxPolyDataFilter;///<rotate PDF for box
+
+  vtkTransform *m_RotateBoxTr;///<rotation transform for box
   
   /** Create vtk objects needed*/
   void CreatePipeline();
 
-  /** isa compositor*/
-  mmiCompositorMouse *IsaComp;
+  mmiCompositorMouse *m_IsaComp; ///< Interactor style compositor
 
-  /** isa generic*/
-  mmiGenericMouse *IsaGen;
+  mmiGenericMouse *m_IsaGen; ///< Generic Interactor style
 
   /** Set the gizmo color */
   void SetColor(double col[3]);
+  
+  /** Set the gizmo color */
   void SetColor(double colR, double colG, double colB);
   
-  /**
-  Register the event receiver object*/
-  mafObserver *m_Listener;
+  mafObserver *m_Listener; ///<Register the event receiver object
 
-  /**
-  Register the gizmo type*/
-  int GizmoType;
+  int m_GizmoType; ///<Register the gizmo type
 
-  double BBCenters[6][3];
-  double TranslationIntervals[6][2];
+  double m_BBCenters[6][3];
+  double m_TranslationIntervals[6][2];
 
-  /**
-  The Pivot Matrix */
-  mafMatrix PivotMatrix;
+  mafMatrix m_PivotMatrix; ///<The Pivot Matrix
 
   void Update();
 
-	double cubeSize;
+	double m_CubeSize;
 
 	int m_ConstraintModality;
 };

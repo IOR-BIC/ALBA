@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoBoundingBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-25 09:59:57 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-06-25 12:23:44 $
+  Version:   $Revision: 1.7 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -47,24 +47,24 @@ mafGizmoBoundingBox::mafGizmoBoundingBox(mafVME *input, mafObserver *listener,ma
 {
 
   m_Listener = listener;
-  InputVme = input;
-  BoxGizmo = NULL;
-  BoxOutline = NULL;
+  m_InputVme = input;
+  m_BoxGizmo = NULL;
+  m_BoxOutline = NULL;
 
-  BoxOutline = vtkOutlineSource::New();
-  BoxOutline->SetBounds(InputVme->GetOutput()->GetVTKData()->GetBounds());
+  m_BoxOutline = vtkOutlineSource::New();
+  m_BoxOutline->SetBounds(m_InputVme->GetOutput()->GetVTKData()->GetBounds());
 
   // create the gizmo
-  BoxGizmo = mafVMEGizmo::New();  
-  BoxGizmo->SetName("BoxGizmo");
+  m_BoxGizmo = mafVMEGizmo::New();  
+  m_BoxGizmo->SetName("BoxGizmo");
   
   // since i'm working in local mode i reparent to input vme the gizmo
-  BoxGizmo->SetData(BoxOutline->GetOutput());
-	BoxGizmo->GetOutput()->GetVTKData()->ComputeBounds();
+  m_BoxGizmo->SetData(m_BoxOutline->GetOutput());
+	m_BoxGizmo->GetOutput()->GetVTKData()->ComputeBounds();
 	if(parent)
-		BoxGizmo->ReparentTo(parent);
+		m_BoxGizmo->ReparentTo(parent);
 	else
-		BoxGizmo->ReparentTo(InputVme);
+		m_BoxGizmo->ReparentTo(m_InputVme);
   
   // set cone gizmo material property and initial color to red
   this->SetColor(1, 0, 0);
@@ -73,16 +73,16 @@ mafGizmoBoundingBox::mafGizmoBoundingBox(mafVME *input, mafObserver *listener,ma
   this->Show(false);
 
   // ask the manager to create the pipeline
-  mafEventMacro(mafEvent(this,VME_SHOW,BoxGizmo,true));
+  mafEventMacro(mafEvent(this,VME_SHOW,m_BoxGizmo,true));
 }
 //----------------------------------------------------------------------------
 mafGizmoBoundingBox::~mafGizmoBoundingBox() 
 //----------------------------------------------------------------------------
 {
-  BoxGizmo->SetBehavior(NULL);
+  m_BoxGizmo->SetBehavior(NULL);
   	
-  mafEventMacro(mafEvent(this, VME_REMOVE, BoxGizmo));  
-  BoxOutline->Delete();
+  mafEventMacro(mafEvent(this, VME_REMOVE, m_BoxGizmo));  
+  m_BoxOutline->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -105,10 +105,10 @@ void mafGizmoBoundingBox::OnEvent(mafEventBase *maf_event)
 void mafGizmoBoundingBox::SetColor(double col[3])
 //----------------------------------------------------------------------------
 {
-  BoxGizmo->GetMaterial()->m_Prop->SetColor(col);
-  BoxGizmo->GetMaterial()->m_Prop->SetAmbient(0);
-  BoxGizmo->GetMaterial()->m_Prop->SetDiffuse(1);
-  BoxGizmo->GetMaterial()->m_Prop->SetSpecular(0);
+  m_BoxGizmo->GetMaterial()->m_Prop->SetColor(col);
+  m_BoxGizmo->GetMaterial()->m_Prop->SetAmbient(0);
+  m_BoxGizmo->GetMaterial()->m_Prop->SetDiffuse(1);
+  m_BoxGizmo->GetMaterial()->m_Prop->SetSpecular(0);
 }
 //----------------------------------------------------------------------------
 void mafGizmoBoundingBox::SetColor(double colR, double colG, double colB)
@@ -124,46 +124,46 @@ void mafGizmoBoundingBox::Show(bool show)
 {
   // use VTK opacity instead of VME_SHOW to speed up the render
   float opacity = show ? 1 : 0;
-  BoxGizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
+  m_BoxGizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
 }
 
 //----------------------------------------------------------------------------
 void mafGizmoBoundingBox::SetAbsPose(mafMatrix *absPose)
 //----------------------------------------------------------------------------
 {
-  BoxGizmo->SetAbsMatrix(*absPose);
+  m_BoxGizmo->SetAbsMatrix(*absPose);
 }
 
 //----------------------------------------------------------------------------
 mafMatrix *mafGizmoBoundingBox::GetAbsPose()
 //----------------------------------------------------------------------------
 {
-  return BoxGizmo->GetOutput()->GetAbsMatrix();
+  return m_BoxGizmo->GetOutput()->GetAbsMatrix();
 }
 
 //----------------------------------------------------------------------------
 void mafGizmoBoundingBox::SetInput(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-  this->InputVme = vme;
+  this->m_InputVme = vme;
   double b[6];
-  InputVme->GetOutput()->GetBounds(b);
-  BoxOutline->SetBounds(b);
+  m_InputVme->GetOutput()->GetBounds(b);
+  m_BoxOutline->SetBounds(b);
 }
           
 //----------------------------------------------------------------------------
 double *mafGizmoBoundingBox::GetBounds()
 //----------------------------------------------------------------------------
 {
-  BoxGizmo->GetOutput()->GetVTKData()->Update();
-  return BoxGizmo->GetOutput()->GetVTKData()->GetBounds();
+  m_BoxGizmo->GetOutput()->GetVTKData()->Update();
+  return m_BoxGizmo->GetOutput()->GetVTKData()->GetBounds();
 }
 
 //----------------------------------------------------------------------------
 void mafGizmoBoundingBox::GetBounds(double bounds[6])
 //----------------------------------------------------------------------------
 {
-  BoxGizmo->GetOutput()->GetVTKData()->GetBounds(bounds);
+  m_BoxGizmo->GetOutput()->GetVTKData()->GetBounds(bounds);
 }
 
 //----------------------------------------------------------------------------
@@ -178,6 +178,6 @@ void mafGizmoBoundingBox::SetBounds(double xmin, double xmax, double ymin, doubl
 void mafGizmoBoundingBox::SetBounds(double bounds[6])  
 //----------------------------------------------------------------------------
 {
-  BoxOutline->SetBounds(bounds);
-  BoxGizmo->GetOutput()->GetVTKData()->Update();
+  m_BoxOutline->SetBounds(bounds);
+  m_BoxGizmo->GetOutput()->GetVTKData()->Update();
 }

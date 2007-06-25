@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoROI.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-25 10:03:01 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-06-25 12:23:44 $
+  Version:   $Revision: 1.7 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -52,19 +52,19 @@ mafGizmoROI::mafGizmoROI(mafVME* input, mafObserver *listener , int constraintMo
 	m_ConstraintModality = constraintModality;
   //no gizmo component is active at construction
   
-  this->ActiveGizmoComponent = -1;
+  this->m_ActiveGizmoComponent = -1;
   this->SetModalityToLocal();
 
   for (int i = 0; i < 6; i++)
   {
     // Create mafGizmoHandle and send events to this
-    GHandle[i] = NULL;
-    GHandle[i] = new mafGizmoHandle(input, this, constraintModality,parent);
-    GHandle[i]->SetType(i);
+    m_GHandle[i] = NULL;
+    m_GHandle[i] = new mafGizmoHandle(input, this, constraintModality,parent);
+    m_GHandle[i]->SetType(i);
   }
   
 	// create the outline gizmo
-	OutlineGizmo = new mafGizmoBoundingBox(input, this,parent);
+	m_OutlineGizmo = new mafGizmoBoundingBox(input, this,parent);
 }
 //----------------------------------------------------------------------------
 mafGizmoROI::~mafGizmoROI() 
@@ -75,11 +75,11 @@ mafGizmoROI::~mafGizmoROI()
   
   for (int i = 0; i < 6; i++)
   {    
-    cppDEL(GHandle[i]);
+    cppDEL(m_GHandle[i]);
   }
 
   // the gizmo outline
-  cppDEL(OutlineGizmo);
+  cppDEL(m_OutlineGizmo);
 }
 //----------------------------------------------------------------------------
 void mafGizmoROI::OnEvent(mafEventBase *maf_event)
@@ -88,7 +88,7 @@ void mafGizmoROI::OnEvent(mafEventBase *maf_event)
   // get the sender
   void *sender = maf_event->GetSender();
     
-  if (sender == GHandle[0] || sender == GHandle[1] || sender == GHandle[2] || sender == GHandle[3] || sender == GHandle[4] || sender == GHandle[5])
+  if (sender == m_GHandle[0] || sender == m_GHandle[1] || sender == m_GHandle[2] || sender == m_GHandle[3] || sender == m_GHandle[4] || sender == m_GHandle[5])
   {
     OnEventGizmoComponents(maf_event); // process events from gizmo handles
   }
@@ -117,35 +117,35 @@ void mafGizmoROI::OnEventGizmoComponents(mafEventBase *maf_event)
         // if a gizmo has been picked highlight the gizmo and register the active component
         if (arg == mmiGenericMouse::MOUSE_DOWN)
         {
-          if (sender == GHandle[0])
+          if (sender == m_GHandle[0])
           {
             this->Highlight(0);
-            ActiveGizmoComponent = 0;
+            m_ActiveGizmoComponent = 0;
           }
-          else if (sender == GHandle[1])
+          else if (sender == m_GHandle[1])
           {
             this->Highlight(1);
-            ActiveGizmoComponent = 1;
+            m_ActiveGizmoComponent = 1;
           }
-          else if (sender == GHandle[2])
+          else if (sender == m_GHandle[2])
           {
             this->Highlight(2);
-            ActiveGizmoComponent = 2;
+            m_ActiveGizmoComponent = 2;
           }
-          else if (sender == GHandle[3])
+          else if (sender == m_GHandle[3])
           {
             this->Highlight(3);
-            ActiveGizmoComponent = 3;
+            m_ActiveGizmoComponent = 3;
           }
-          else if (sender == GHandle[4])
+          else if (sender == m_GHandle[4])
           {
             this->Highlight(4);
-            ActiveGizmoComponent = 4;
+            m_ActiveGizmoComponent = 4;
           }
-          else if (sender == GHandle[5])
+          else if (sender == m_GHandle[5])
           {
             this->Highlight(5);
-            ActiveGizmoComponent = 5;
+            m_ActiveGizmoComponent = 5;
           }
         }
         else if (arg == mmiGenericMouse::MOUSE_MOVE)
@@ -156,14 +156,14 @@ void mafGizmoROI::OnEventGizmoComponents(mafEventBase *maf_event)
 
             // translate selected gizmo
             mafTransform *tr = mafTransform::New();                   
-            tr->SetMatrix(*GHandle[ActiveGizmoComponent]->GetPose());
+            tr->SetMatrix(*m_GHandle[m_ActiveGizmoComponent]->GetPose());
             tr->Concatenate(*e->GetMatrix(), PRE_MULTIPLY);
 
             mafMatrix mat;
             mat.DeepCopy(tr->GetMatrixPointer());
             mat.SetTimeStamp(InputVME->GetTimeStamp());
 
-            GHandle[ActiveGizmoComponent]->SetPose(&mat);
+            m_GHandle[m_ActiveGizmoComponent]->SetPose(&mat);
 
             // update other gizmos positions in order to recenter them
             UpdateHandlePositions();
@@ -201,12 +201,12 @@ void mafGizmoROI::OnEventGizmoComponents(mafEventBase *maf_event)
 void mafGizmoROI::Highlight (int component) 
 //----------------------------------------------------------------------------
 {
-  GHandle[component]->Highlight(true);
+  m_GHandle[component]->Highlight(true);
   for (int i = 0; i < 6; i++ )
   {
     if (i != component)
     {
-      GHandle[i]->Highlight(false);
+      m_GHandle[i]->Highlight(false);
     }
   }
 }
@@ -217,7 +217,7 @@ void mafGizmoROI::HighlightOff ()
 {
   for (int i = 0; i < 6; i++ )
   {
-    GHandle[i]->Highlight(false);
+    m_GHandle[i]->Highlight(false);
   }
 }
 
@@ -235,7 +235,7 @@ void mafGizmoROI::ShowHandles(bool show)
 {
   for (int i = 0; i < 6; i++)
   {
-    GHandle[i]->Show(show);
+    m_GHandle[i]->Show(show);
   }
 }
 
@@ -243,7 +243,7 @@ void mafGizmoROI::ShowHandles(bool show)
 void mafGizmoROI::ShowROI(bool show)
 //----------------------------------------------------------------------------  
 {
-  OutlineGizmo->Show(show);
+  m_OutlineGizmo->Show(show);
 }
   
 //----------------------------------------------------------------------------  
@@ -252,7 +252,7 @@ void mafGizmoROI::SetConstrainRefSys(mafMatrix *constrain)
 {
   for (int i =0; i < 6; i++)
   {
-    GHandle[i]->SetConstrainRefSys(constrain);
+    m_GHandle[i]->SetConstrainRefSys(constrain);
   }
 }
 
@@ -263,10 +263,10 @@ void mafGizmoROI::SetInput(mafVME *input)
   this->InputVME = input;
   for (int i = 0; i < 6; i++)
   {
-    GHandle[i]->SetInput(input);
+    m_GHandle[i]->SetInput(input);
   }
 
-  OutlineGizmo->SetInput(input);
+  m_OutlineGizmo->SetInput(input);
 }
 
 //----------------------------------------------------------------------------  
@@ -278,35 +278,35 @@ void mafGizmoROI::UpdateHandlePositions()
   double oldPos[3] = {0, 0, 0};
 
   // move 0 or 1 => recenter 2, 3, 4, 5
-  if (ActiveGizmoComponent == 0 || ActiveGizmoComponent == 1)
+  if (m_ActiveGizmoComponent == 0 || m_ActiveGizmoComponent == 1)
   {
-    mafTransform::GetPosition(*GHandle[0]->GetPose(), posMin);
-    mafTransform::GetPosition(*GHandle[1]->GetPose(), posMax);
+    mafTransform::GetPosition(*m_GHandle[0]->GetPose(), posMin);
+    mafTransform::GetPosition(*m_GHandle[1]->GetPose(), posMax);
     
     double xMean = (posMin[0] + posMax[0]) / 2;
     for (int i = 2; i < 6; i++)
     {      
-      mafTransform::GetPosition(*GHandle[i]->GetPose(), oldPos);
+      mafTransform::GetPosition(*m_GHandle[i]->GetPose(), oldPos);
       oldPos[0] = xMean;
-      mafTransform::SetPosition(*GHandle[i]->GetPose(), oldPos);
-      mafTransform::SetPosition(GHandle[i]->GetPivotMatrix(), oldPos);
+      mafTransform::SetPosition(*m_GHandle[i]->GetPose(), oldPos);
+      mafTransform::SetPosition(m_GHandle[i]->GetPivotMatrix(), oldPos);
 			//Matteo 23-08-06
 			mafSmartPointer<mafTransform> tr;
-			tr->SetMatrix(*GHandle[i]->GetPose());
+			tr->SetMatrix(*m_GHandle[i]->GetPose());
 
 			mafMatrix mat;
 			mat.DeepCopy(tr->GetMatrixPointer());
 			mat.SetTimeStamp(InputVME->GetTimeStamp());
 
-			GHandle[i]->SetPose(&mat);
+			m_GHandle[i]->SetPose(&mat);
 			//End Matteo
     }
   }
   // move 2 or 3 => recenter 0, 1, 4, 5
-  else if (ActiveGizmoComponent == 2 || ActiveGizmoComponent == 3)
+  else if (m_ActiveGizmoComponent == 2 || m_ActiveGizmoComponent == 3)
   {
-    mafTransform::GetPosition(*GHandle[2]->GetPose(), posMin);
-    mafTransform::GetPosition(*GHandle[3]->GetPose(), posMax);
+    mafTransform::GetPosition(*m_GHandle[2]->GetPose(), posMin);
+    mafTransform::GetPosition(*m_GHandle[3]->GetPose(), posMax);
     
     double yMean = (posMin[1] + posMax[1]) / 2;
 
@@ -314,46 +314,46 @@ void mafGizmoROI::UpdateHandlePositions()
     {      
       if (i != 2 && i != 3)
       {      
-        mafTransform::GetPosition(*GHandle[i]->GetPose(), oldPos);
+        mafTransform::GetPosition(*m_GHandle[i]->GetPose(), oldPos);
         oldPos[1] = yMean;
-        mafTransform::SetPosition(*GHandle[i]->GetPose(), oldPos);
-        mafTransform::SetPosition(GHandle[i]->GetPivotMatrix(), oldPos);
+        mafTransform::SetPosition(*m_GHandle[i]->GetPose(), oldPos);
+        mafTransform::SetPosition(m_GHandle[i]->GetPivotMatrix(), oldPos);
 				//Matteo 23-08-06
 				mafSmartPointer<mafTransform> tr;
-				tr->SetMatrix(*GHandle[i]->GetPose());
+				tr->SetMatrix(*m_GHandle[i]->GetPose());
 
 				mafMatrix mat;
 				mat.DeepCopy(tr->GetMatrixPointer());
 				mat.SetTimeStamp(InputVME->GetTimeStamp());
 
-				GHandle[i]->SetPose(&mat);
+				m_GHandle[i]->SetPose(&mat);
 				//End Matteo
       }
     }
   }
   // move 4 or 5 => recenter 0, 1, 2, 3
-  else if (ActiveGizmoComponent == 4 || ActiveGizmoComponent == 5)
+  else if (m_ActiveGizmoComponent == 4 || m_ActiveGizmoComponent == 5)
   {
-    mafTransform::GetPosition(*GHandle[4]->GetPose(), posMin);
-    mafTransform::GetPosition(*GHandle[5]->GetPose(), posMax);
+    mafTransform::GetPosition(*m_GHandle[4]->GetPose(), posMin);
+    mafTransform::GetPosition(*m_GHandle[5]->GetPose(), posMax);
     
     double zMean = (posMin[2] + posMax[2]) / 2;
 
     for (int i = 0; i < 4; i++)
     {      
-      mafTransform::GetPosition(*GHandle[i]->GetPose(), oldPos);
+      mafTransform::GetPosition(*m_GHandle[i]->GetPose(), oldPos);
       oldPos[2] = zMean;
-      mafTransform::SetPosition(*GHandle[i]->GetPose(), oldPos);
-      mafTransform::SetPosition(GHandle[i]->GetPivotMatrix(), oldPos);
+      mafTransform::SetPosition(*m_GHandle[i]->GetPose(), oldPos);
+      mafTransform::SetPosition(m_GHandle[i]->GetPivotMatrix(), oldPos);
 			//Matteo 23-08-06
 			mafSmartPointer<mafTransform> tr;
-			tr->SetMatrix(*GHandle[i]->GetPose());
+			tr->SetMatrix(*m_GHandle[i]->GetPose());
 
 			mafMatrix mat;
 			mat.DeepCopy(tr->GetMatrixPointer());
 			mat.SetTimeStamp(InputVME->GetTimeStamp());
 
-			GHandle[i]->SetPose(&mat);
+			m_GHandle[i]->SetPose(&mat);
 			//End Matteo
     }
   }
@@ -371,30 +371,30 @@ void mafGizmoROI::UpdateOutlineBounds()
 	double pos2_new[3] = {0, 0, 0};
 	double b[6],center[3];
 
-	OutlineGizmo->GetBounds(b);
+	m_OutlineGizmo->GetBounds(b);
 
-	mafTransform::GetPosition(*OutlineGizmo->GetPose(), pos2_new);
-	mafTransform::GetPosition(*GHandle[ActiveGizmoComponent]->GetPose(), pos1_new);
-	GHandle[ActiveGizmoComponent]->GetHandleCenter(ActiveGizmoComponent,center);
+	mafTransform::GetPosition(*m_OutlineGizmo->GetPose(), pos2_new);
+	mafTransform::GetPosition(*m_GHandle[m_ActiveGizmoComponent]->GetPose(), pos1_new);
+	m_GHandle[m_ActiveGizmoComponent]->GetHandleCenter(m_ActiveGizmoComponent,center);
 	int i;
-	if(ActiveGizmoComponent==0||ActiveGizmoComponent==1)
+	if(m_ActiveGizmoComponent==0||m_ActiveGizmoComponent==1)
 		i=0;
-	else if(ActiveGizmoComponent==2||ActiveGizmoComponent==3)
+	else if(m_ActiveGizmoComponent==2||m_ActiveGizmoComponent==3)
 		i=1;
-	else if(ActiveGizmoComponent==4||ActiveGizmoComponent==5)
+	else if(m_ActiveGizmoComponent==4||m_ActiveGizmoComponent==5)
 		i=2;
 	pos1_new[i]-=pos2_new[i];
 	pos1_new[i]+=center[i];
-	b[ActiveGizmoComponent]=pos1_new[i];
+	b[m_ActiveGizmoComponent]=pos1_new[i];
 
-  OutlineGizmo->SetBounds(b);  
+  m_OutlineGizmo->SetBounds(b);  
 }
 
 //----------------------------------------------------------------------------
 void mafGizmoROI::GetBounds(double bounds[6])
 //----------------------------------------------------------------------------
 {
-  OutlineGizmo->GetBounds(bounds);
+  m_OutlineGizmo->GetBounds(bounds);
 }
 
 //----------------------------------------------------------------------------
@@ -424,7 +424,7 @@ void mafGizmoROI::SetBounds(double bounds[6])
 	}
 
   // set box gizmo bounds
-  OutlineGizmo->SetBounds(newBounds);
+  m_OutlineGizmo->SetBounds(newBounds);
 
   // set new gizmo positions
   // calculate bb centers
@@ -432,7 +432,7 @@ void mafGizmoROI::SetBounds(double bounds[6])
   
   for (int i = 0; i < 6; i++)
   {
-    GHandle[i]->SetBBCenters(newBounds);
+    m_GHandle[i]->SetBBCenters(newBounds);
   }
 }
 
@@ -443,7 +443,7 @@ void mafGizmoROI::UpdateGizmosLength()
   double bounds[6];
 
   // get the minimum outline dimension
-  OutlineGizmo->GetBounds(bounds);
+  m_OutlineGizmo->GetBounds(bounds);
 
   vector<double> dim;
   dim.push_back(bounds[1] - bounds[0]);
@@ -456,7 +456,7 @@ void mafGizmoROI::UpdateGizmosLength()
   double min_dim = *result;
   for (int i = 0; i <6; i++)
   {
-    GHandle[i]->SetLength(min_dim/12);
+    m_GHandle[i]->SetLength(min_dim/12);
   }
 }
 

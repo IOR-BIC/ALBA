@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoBoundingBox.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-25 09:59:57 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-06-25 12:23:44 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,10 +50,9 @@ public:
            mafGizmoBoundingBox(mafVME *input, mafObserver *listener = NULL,mafVME* parent=NULL);
   virtual ~mafGizmoBoundingBox(); 
   
-  /** 
-  Set the gizmo generating vme; the gizmo will be centered on this vme*/
+  /** Set the gizmo generating vme; the gizmo will be centered on this vme*/
   void SetInput(mafVME *vme); 
-  mafVME *GetInput() {return this->InputVme;};
+  mafVME *GetInput() {return this->m_InputVme;};
 
   //----------------------------------------------------------------------------
   // events handling 
@@ -75,37 +74,33 @@ public:
   /** Show the gizmo */
   void Show(bool show);
   
-  /**
-  Set/Get the gizmo bounds */
+  /** Set/Get the gizmo bounds */
   void SetBounds(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax);
   void SetBounds(double bounds[6]);
   double *GetBounds();
   void GetBounds(double bounds[6]);
 
-  /** 
-  Set the gizmo abs pose */
+  /** Set the gizmo abs pose */
   void SetAbsPose(mafMatrix *absPose);
   mafMatrix *GetAbsPose();
 
-  /**
-  Set the gizmo local pose*/
+  /** Set the gizmo local pose*/
   void SetPose(mafMatrix *pose);
-	mafMatrix *GetPose(){return BoxGizmo->GetOutput()->GetMatrix();};
+	mafMatrix *GetPose(){return m_BoxGizmo->GetOutput()->GetMatrix();};
 
 protected:
   /** Set gizmo color*/
   void SetColor(double col[3]);
+  
+  /** Set gizmo color*/
   void SetColor(double colR, double colG, double colB);
   
-  /**
-  Register the event receiver object*/
-  mafObserver *m_Listener;
+	mafObserver *m_Listener;///<Register the event receiver object
 
-  /** Register input vme*/
-  mafVME *InputVme;
+	mafVME *m_InputVme;///<Register input vme
 
-  vtkOutlineSource *BoxOutline;
+  vtkOutlineSource *m_BoxOutline;
 
-  mafVMEGizmo *BoxGizmo;
+  mafVMEGizmo *m_BoxGizmo;
 };
 #endif
