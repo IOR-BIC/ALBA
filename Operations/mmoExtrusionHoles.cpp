@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtrusionHoles.cpp,v $
 Language:  C++
-Date:      $Date: 2007-06-20 16:43:18 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-06-26 13:41:48 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -384,7 +384,7 @@ void mmoExtrusionHoles::CreateOpDialog()
 	h_sizer3->Add(b_cancel,0,wxRIGHT);
 
 	wxTextCtrl *extrusion = new wxTextCtrl(m_Dialog,ID_EXTRUSION_FACTOR, _("extrusion factor"),p,wxSize(50, 16 ), wxNO_BORDER );
-	mmgButton  *b_extrude	= new mmgButton(m_Dialog, ID_EXTRUDE,_("save extrusion"), p, wxSize(80,20));
+	mmgButton  *b_extrude	= new mmgButton(m_Dialog, ID_EXTRUDE,_("apply extrusion"), p, wxSize(80,20));
 
 	b_extrude->SetValidator(mmgValidator(this,ID_EXTRUDE,b_extrude));
 	extrusion->SetValidator(mmgValidator(this,ID_EXTRUSION_FACTOR,extrusion,&m_ExtrusionFactor,-999.0,999.0));
