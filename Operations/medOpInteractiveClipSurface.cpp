@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractiveClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-25 15:31:51 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-06-26 14:29:19 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -290,8 +290,8 @@ void medOpInteractiveClipSurface::OnEventThis(mafEventBase *maf_event)
 			{
 				if(m_IsaCompositor && !m_UseGizmo)
 					m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositor);
-				else if(m_UseGizmo)
-					m_ImplicitPlaneGizmo->SetBehavior(NULL);
+				else if(m_IsaClipWithoutGizmo && m_UseGizmo)
+					m_ImplicitPlaneGizmo->SetBehavior(m_IsaClipWithoutGizmo);
 
 				m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == medOpInteractiveClipSurface::MODE_IMPLICIT_FUNCTION  && m_UseGizmo);
 				
@@ -429,22 +429,46 @@ void medOpInteractiveClipSurface::OnEventGizmoPlane(mafEventBase *maf_event)
 		{
 		case ID_TRANSFORM:
 			{
-				vtkTransform *currTr = vtkTransform::New();
-				currTr->PostMultiply();
-				currTr->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix());
-				currTr->Concatenate(e->GetMatrix()->GetVTKMatrix());
-				currTr->Update();
+				if(e->GetSender()==m_IsaChangeArrowWithoutGizmo || e->GetSender()==m_IsaChangeArrowWithGizmo)
+				{
+					if(m_Arrow) 
+					{
+						if(e->GetArg()==mmiGenericMouse::MOUSE_DOWN)
+						{
+							ClipInside= ClipInside ? 0 : 1;
+							m_Gui->Update();
+							m_Arrow->SetScaleFactor(-1 * m_Arrow->GetScaleFactor());
+							mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+						}
+					}
+				}
+				else if(e->GetSender()==m_IsaClipWithoutGizmo || e->GetSender()==m_IsaClipWithGizmo)
+				{
+					if(e->GetArg()==mmiGenericMouse::MOUSE_DOWN)
+					{
+						Clip();
+						mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+					}
+				}
+				else
+				{
+					vtkTransform *currTr = vtkTransform::New();
+					currTr->PostMultiply();
+					currTr->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix());
+					currTr->Concatenate(e->GetMatrix()->GetVTKMatrix());
+					currTr->Update();
 
-				mafMatrix newAbsMatr;
-				newAbsMatr.DeepCopy(currTr->GetMatrix());
-				newAbsMatr.SetTimeStamp(m_ImplicitPlaneGizmo->GetTimeStamp());
+					mafMatrix newAbsMatr;
+					newAbsMatr.DeepCopy(currTr->GetMatrix());
+					newAbsMatr.SetTimeStamp(m_ImplicitPlaneGizmo->GetTimeStamp());
 
-				// set the new pose to the gizmo
-				m_ImplicitPlaneGizmo->SetAbsMatrix(newAbsMatr);
-				UpdateISARefSys();
+					// set the new pose to the gizmo
+					m_ImplicitPlaneGizmo->SetAbsMatrix(newAbsMatr);
+					UpdateISARefSys();
 
-				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
-				currTr->Delete();
+					mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+					currTr->Delete();
+				}
 			}
 			break;
 		default:
@@ -803,8 +827,28 @@ void medOpInteractiveClipSurface::AttachInteraction()
   m_IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
   m_IsaTranslate->EnableTranslation(true);
 
+	m_IsaChangeArrowWithoutGizmo = m_IsaCompositor->CreateBehavior(MOUSE_LEFT_SHIFT);
+	m_IsaChangeArrowWithoutGizmo->SetListener(this);
+	m_IsaChangeArrowWithoutGizmo->SetVME(m_ImplicitPlaneGizmo);
+
+	m_IsaClipWithoutGizmo = m_IsaCompositor->CreateBehavior(MOUSE_LEFT_CONTROL);
+	m_IsaClipWithoutGizmo->SetListener(this);
+	m_IsaClipWithoutGizmo->SetVME(m_ImplicitPlaneGizmo);
+
+	mafNEW(m_IsaCompositorWithGizmo);
+
+	m_IsaChangeArrowWithGizmo = m_IsaCompositorWithGizmo->CreateBehavior(MOUSE_LEFT_SHIFT);
+	m_IsaChangeArrowWithGizmo->SetListener(this);
+	m_IsaChangeArrowWithGizmo->SetVME(m_ImplicitPlaneGizmo);
+
+	m_IsaClipWithGizmo = m_IsaCompositorWithGizmo->CreateBehavior(MOUSE_LEFT_CONTROL);
+	m_IsaClipWithGizmo->SetListener(this);
+	m_IsaClipWithGizmo->SetVME(m_ImplicitPlaneGizmo);
+
 	if(!m_UseGizmo)
 		m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositor);
+	else
+		m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositorWithGizmo);
 }
 
 //----------------------------------------------------------------------------

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractiveClipSurface.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-25 15:31:51 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-06-26 14:29:19 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -143,6 +143,11 @@ protected:
   mmiCompositorMouse *m_IsaCompositor;
   mmiGenericMouse    *m_IsaTranslate;
   mmiGenericMouse    *m_IsaRotate;
+	mmiGenericMouse		 *m_IsaChangeArrowWithoutGizmo;
+	mmiGenericMouse		 *m_IsaClipWithoutGizmo;
+	mmiCompositorMouse *m_IsaCompositorWithGizmo;
+	mmiGenericMouse		 *m_IsaChangeArrowWithGizmo;
+	mmiGenericMouse		 *m_IsaClipWithGizmo;
 
   vtkPolyData *m_OldSurface;
 	std::vector<vtkPolyData*> m_ResultPolyData;
