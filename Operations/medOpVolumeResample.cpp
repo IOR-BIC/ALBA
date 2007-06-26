@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-25 10:04:30 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-06-26 13:28:35 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -264,6 +264,10 @@ void medOpVolumeResample::AutoSpacing()
 void medOpVolumeResample::UpdateGui()
 //----------------------------------------------------------------------------
 {
+	m_MaxBoundX = m_VolumeBounds[1] - m_VolumeBounds[0];
+	m_MaxBoundY = m_VolumeBounds[3] - m_VolumeBounds[2];
+	m_MaxBoundZ = m_VolumeBounds[5] - m_VolumeBounds[4];
+
 	m_GizmoROI->GetBounds(m_VolumeBounds);
 	if(m_Gui)
 		m_Gui->Update();
@@ -726,11 +730,11 @@ void medOpVolumeResample::OnEventGizmoROI(mafEventBase *maf_event)
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
 	{
+		UpdateGui();
 		switch(e->GetId())
 		{
 		case ID_TRANSFORM:
 			{
-
 			}
 			break;
 		default:
