@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeFactoryVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-27 09:18:09 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-06-29 11:34:31 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -94,14 +94,14 @@ medPipeFactoryVME::medPipeFactoryVME()
 
 
 }
-
+/*
 //------------------------------------------------------------------------------
 const char* medPipeFactoryVME::GetMAFSourceVersion() const
 //------------------------------------------------------------------------------
 {
   return MAF_SOURCE_VERSION;
 }
-
+*/
 //------------------------------------------------------------------------------
 const char* medPipeFactoryVME::GetDescription() const
 //------------------------------------------------------------------------------

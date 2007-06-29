@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeFactoryVME.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-24 14:54:40 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-06-29 11:34:31 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -29,7 +29,7 @@ class MAF_EXPORT medPipeFactoryVME : public mafPipeFactoryVME
 {
 public: 
   mafTypeMacro(medPipeFactoryVME,mafPipeFactoryVME);
-  virtual const char* GetMAFSourceVersion() const;
+  //virtual const char* GetMAFSourceVersion() const;
   virtual const char* GetDescription() const;
   
   static medPipeFactoryVME *GetInstance() {if (!m_Instance) Initialize(); return m_Instance;}

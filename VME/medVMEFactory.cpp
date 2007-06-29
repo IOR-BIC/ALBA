@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-04 15:11:54 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-06-29 11:34:31 $
+  Version:   $Revision: 1.5 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -45,7 +45,7 @@ int medVMEFactory::Initialize()
 {
   if (m_Instance==NULL)
   {
-    m_Instance=medVMEFactory::New();
+    m_Instance = medVMEFactory::New();
 
     if (m_Instance)
     {
@@ -85,17 +85,10 @@ medVMEFactory::medVMEFactory()
 }
 
 //------------------------------------------------------------------------------
-const char* medVMEFactory::GetMAFSourceVersion() const
-//------------------------------------------------------------------------------
-{
-  return MAF_SOURCE_VERSION;
-}
-
-//------------------------------------------------------------------------------
 const char* medVMEFactory::GetDescription() const
 //------------------------------------------------------------------------------
 {
-  return "Factory for MAF VMEs";
+  return "Factory for Medical VMEs";
 }
 
 //------------------------------------------------------------------------------
