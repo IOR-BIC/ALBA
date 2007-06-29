@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-15 14:17:59 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-06-29 12:40:45 $
+  Version:   $Revision: 1.7 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -34,6 +34,7 @@ class vtkPoints;
 class vtkPlaneSource ;
 class vtkLookupTable;
 class mafVMEImage;
+class mafVMEPolylineSpline;
 
 //class vtkAppendPolyData;
 
@@ -135,6 +136,11 @@ protected:
 
   //virtual void InternalPreUpdateOld();
 
+  //check if it's necessary reprocess all panoramic
+  bool CheckUpdatePanoramic(mafVMEPolylineSpline *vme);
+
+  vtkPoints *m_ControlPoints;
+
   mafString m_VolumeName;
   std::vector<mafString> m_ProfilesNameList;
   
@@ -147,10 +153,15 @@ protected:
 
 
   wxListBox *m_ListBox;
-  double m_SamplingCoefficient;
-	int m_SplineCoefficient;
+	//int m_SplineCoefficient;
   int m_AdditionalProfileNumber;
-  double m_ProfileDistance;
+
+  double m_SamplingCoefficient; double m_ControlSamplingCoefficient;
+  double m_ProfileDistance; double m_ControlProfileDistance;
+
+  
+  
+
   
   std::vector<vtkPoints *> m_PointsVector;
   std::vector<vtkPolyData *> m_PolyDataVector;

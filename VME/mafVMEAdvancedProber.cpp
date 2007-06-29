@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-15 14:17:59 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-06-29 12:40:45 $
+  Version:   $Revision: 1.9 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -73,13 +73,14 @@ mafVMEAdvancedProber::mafVMEAdvancedProber()
 {
 	m_ListBox = NULL;
   m_SamplingCoefficient = 1.0;
-	m_SplineCoefficient = 2;
+	//m_SplineCoefficient = 2;
   m_Image = NULL;
   m_IMTC = NULL;
   m_Points = NULL;
   m_Plane = NULL;
   
   m_Transform = NULL;
+  m_ControlPoints = NULL;
 
   m_AdditionalProfileNumber = 0; 
   m_ProfileDistance = 0.0;
@@ -95,6 +96,8 @@ mafVMEAdvancedProber::mafVMEAdvancedProber()
   vtkNEW(m_Points);
   vtkNEW(m_Plane);
 	vtkNEW(m_Lut);
+
+  vtkNEW(m_ControlPoints);
 
   //vtkNEW(append);
 
@@ -126,6 +129,8 @@ mafVMEAdvancedProber::~mafVMEAdvancedProber()
   vtkDEL(m_IMTC);
   vtkDEL(m_Points);
   vtkDEL(m_Plane);
+
+  vtkDEL(m_ControlPoints);
 
   SetOutput(NULL);
 }
@@ -168,6 +173,7 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
   int counter = 0;
   std::vector<vtkPolyData *> profilesOrdered;
 	profilesOrdered.clear();
+  
   for (mafLinksMap::iterator i = GetLinks()->begin(); i != GetLinks()->end(); i++)
   {
     mafString name = i->first;
@@ -234,7 +240,7 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
     }
     counter++;
   }
- 
+  if(!CheckUpdatePanoramic(vme)) return;
 	if (vol == NULL || counter == 0) 
 	{ 
 		int dimensions[3];
@@ -818,7 +824,8 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
 	 m_Plane->SetPoint1(b[0] + spacing * firstDimension,b[2],b[4]);
 	 m_Plane->SetPoint2(b[0],b[2],b[4] + spacing * (numberOfIteration+1) );
 
-   m_Plane->SetResolution(firstDimension,numberOfIteration+1);
+   //m_Plane->SetResolution(firstDimension,numberOfIteration+1);
+   m_Plane->SetResolution(1,1); //with this modification increase the speed
    m_Plane->Update();
 
    mmaVolumeMaterial *vol_material;
@@ -846,6 +853,11 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
 
 	 ((mafVMEOutputSurface *) GetOutput())->SetTexture(m_IMTC->GetOutput());
    GetMaterial()->SetMaterialTexture(((mafVMEOutputSurface *) GetOutput())->GetTexture());
+
+   //control for update
+   m_ControlPoints->DeepCopy(vtkPolyData::SafeDownCast(vme->GetPolylineLink()->GetOutput()->GetVTKData())->GetPoints());
+   m_ControlSamplingCoefficient = m_SamplingCoefficient;
+   m_ControlProfileDistance = m_ProfileDistance;
 
    for(int i=0; i< m_PointsVector.size();i++)
    {
@@ -1617,4 +1629,49 @@ char** mafVMEAdvancedProber::GetIcon()
 {
 	#include "mafVMEAdvancedProber.xpm"
   return mafVMEAdvancedProber_xpm;
+}
+//-------------------------------------------------------------------------
+bool mafVMEAdvancedProber::CheckUpdatePanoramic(mafVMEPolylineSpline *vme) 
+//-------------------------------------------------------------------------
+{
+  vtkPoints *tempPoints;
+
+  if( m_SamplingCoefficient != m_ControlSamplingCoefficient ||
+      m_ProfileDistance     != m_ControlProfileDistance)
+      return true;
+
+  if(vme)
+    tempPoints = vtkPolyData::SafeDownCast(vme->GetPolylineLink()->GetOutput()->GetVTKData())->GetPoints();
+  else
+    return true;
+
+  if(m_ControlPoints->GetNumberOfPoints() == 0) return true;
+
+  bool result = false;
+  if(m_ControlPoints && tempPoints)
+  {
+    for(int i=0; i<tempPoints->GetNumberOfPoints(); i++)
+    {
+      double controlOrig[3], controlNew[3];
+      tempPoints->GetPoint(i,controlNew);
+      m_ControlPoints->GetPoint(i,controlOrig);
+
+      if(
+          controlNew[0] ==  controlOrig[0] &&
+          controlNew[1] ==  controlOrig[1] &&
+          controlNew[2] ==  controlOrig[2]
+        ) ;
+      else
+      {
+        result = true;
+        break;
+      }
+        
+    }
+  }
+
+
+  
+
+  return result;
 }
