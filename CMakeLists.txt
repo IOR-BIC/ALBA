@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2007-03-27 08:15:36 $
-# Version:   $Revision: 1.39 $
+# Date:      $Date: 2007-06-29 08:54:35 $
+# Version:   $Revision: 1.40 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -45,7 +45,7 @@ MARK_AS_ADVANCED (
 # MAF version number.  An even minor number corresponds to releases.
 #-----------------------------------------------------------------------------
 SET(MAF_MAJOR_VERSION 2)
-SET(MAF_MINOR_VERSION 0)
+SET(MAF_MINOR_VERSION 2)
 SET(MAF_BUILD_VERSION 0)
 SET(MAF_VERSION
     "${MAF_MAJOR_VERSION}.${MAF_MINOR_VERSION}.${MAF_BUILD_VERSION}")
