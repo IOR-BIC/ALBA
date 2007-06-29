@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2007-05-31 11:04:19 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-06-29 08:23:25 $
+Version:   $Revision: 1.4 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -38,7 +38,9 @@ const wxString UndefinedName = "****" ;
 //----------------------------------------------------------------------------
 /** mafPolylineGraph class 
 
-mafPolylineGraph is a list of vertices, edges and branches.
+mafPolylineGraph is a class for navigating and editing polyline data.
+
+It consists of a list of vertices, edges and branches.
 Vertices are points.
 Edges connect pairs of vertices.
 Branches are named sequences of connected vertices and edges.
@@ -114,14 +116,25 @@ public:
   /** Read graph from vtkPolyData (polyline only).
   Each polydata point becomes a graph vertex.
   Each polydata cell (line or polyline) becomes a graph branch.
-  Each polydata line or line segment becomes a graph edge. */
+  Each polydata line or line segment becomes a graph edge. 
+  The points stay in the same order: point i in the graph is the same as point i in the polydata.*/
   bool CopyFromPolydata(vtkPolyData *polydata) ;
 
-  /** write polyline graph to vtkPolyData
+  /** Write polyline graph to vtkPolyData.
   Each graph vertex becomes a polydata point.
   Each graph branch becomes a line or polyline.
-  Edges which are not members of branches become lines. */
-  bool CopyToPolydata(vtkPolyData *polydata) const ;
+  Edges which are not members of branches become lines.
+  The points stay in the same order: point i in the polydata is the same as point i in the graph.
+  This also sets the mapping between the graph edges and the cells in the output polydata.*/
+  bool CopyToPolydata(vtkPolyData *polydata) ;
+
+  /* Get location of edge in output polydata
+  The mapping is set by CopyToPolydata() */
+  void GetOutputCellCorrespondingToEdge(vtkIdType edgeid, vtkIdType *cellid, vtkIdType *j) const ;
+
+  /* Get edge id in graph which is the jth edge in cellid in the output polydata
+  The mapping is set by CopyToPolydata() */
+  vtkIdType GetEdgeCorrespondingToOutputCell(vtkIdType cellid, vtkIdType j) const ;
 
   /** Split branch by finding and removing edge.
   A new branch is created at the end of the list. 
@@ -234,15 +247,21 @@ public:
     void SetDirected(bool directed) ;                             ///< set directed property
     bool IsDirected() const ;                                     ///< is edge directed
     void ReverseDirection() ;                               ///< exchange vertices 0 and 1
-    double GetWeight() const ;                              ///< get weight
-    void SetWeight(double w) ;                              ///< set weight
-    bool SelfCheck() const ;                                  ///< check self consistency
-    void PrintSelf(std::ostream& os, const int tabs) const ;  ///< print self
+    double GetWeight() const ;                                                    ///< get weight
+    void SetWeight(double w) ;                                                    ///< set weight
+    void GetMappingToOutputPolydata(vtkIdType *cellid, vtkIdType *index) const ;  ///< get mapping from edge to location in output
+    void SetMappingToOutputPolydata(vtkIdType cellid, vtkIdType index) ;          ///< set mapping from edge to location in output
+    bool SelfCheck() const ;                                                      ///< check self consistency
+    void PrintSelf(std::ostream& os, const int tabs) const ;                      ///< print self
   private:
     vtkIdType vertexId[2] ;                                 ///< vertices at ends of edge
     bool directed ;                                         ///< directed edge - if true, points from v0 to v1 (default = false)
     double weight ;                                         ///< weight (default = 1.0)
     vtkIdType branchId ;                                      ///< index of branch which edge belongs to (value = UndefinedId if no branch)
+
+    vtkIdType m_OutputPolydataCell ;      ///< cell id of edge in output polydata
+    vtkIdType m_OutputPolydataCellIndex ; ///< index of edge on cell in output polydata
+
   } ;
 
 

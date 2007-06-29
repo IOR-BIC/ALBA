@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2007-05-31 11:04:19 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-06-29 08:23:25 $
+Version:   $Revision: 1.3 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -76,6 +76,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // Edge::ReverseDirection()
 // Edge::GetWeight()
 // Edge::SetWeight()
+// Edge::GetMappingToOutputPolydata()
+// Edge::SetMappingToOutputPolydata()
 // Edge::SelfCheck()
 // Edge::PrintSelf()
 // 
@@ -133,6 +135,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // mafPolylineGraph::AddNewBranch(v0)
 // mafPolylineGraph::CopyFromPolydata()
 // mafPolylineGraph::CopyToPolydata()
+// mafPolylineGraph::GetOutputCellCorrespondingToEdge()
+// mafPolylineGraph::GetEdgeCorrespondingToOutputCell()
 // mafPolylineGraph::SplitBranchAtEdge()
 // mafPolylineGraph::SplitBranchAtVertex()
 // mafPolylineGraph::AddNewVertexToBranch()
@@ -141,7 +145,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // mafPolylineGraph::ReverseBranch()
 // mafPolylineGraph::DeleteEdge()
 // mafPolylineGraph::DeleteVertex()
-// mafPolylineGraph::DeleteVertex()
+// mafPolylineGraph::DeleteBranch()
 // mafPolylineGraph::IsConnected()
 // mafPolylineGraph::IsConnectedTree()
 // mafPolylineGraph::Clear() 
@@ -449,7 +453,7 @@ void mafPolylineGraph::Vertex::PrintSelf(std::ostream& os, const int tabs) const
 
 //-------------------------------------------------------------------------
 // constructor (sets default values)
-mafPolylineGraph::Edge::Edge() : directed(false), weight(1.0), branchId(UndefinedId)
+mafPolylineGraph::Edge::Edge() : directed(false), weight(1.0), branchId(UndefinedId), m_OutputPolydataCell(UndefinedId), m_OutputPolydataCellIndex(UndefinedId)
 //-------------------------------------------------------------------------
 {
   vertexId[0] = UndefinedId ;
@@ -458,8 +462,8 @@ mafPolylineGraph::Edge::Edge() : directed(false), weight(1.0), branchId(Undefine
 
 
 //-------------------------------------------------------------------------
-// constructor (sets default values)
-mafPolylineGraph::Edge::Edge(vtkIdType v0, vtkIdType v1) : directed(false), weight(1.0), branchId(UndefinedId)
+// constructor with end vertices
+mafPolylineGraph::Edge::Edge(vtkIdType v0, vtkIdType v1) : directed(false), weight(1.0), branchId(UndefinedId), m_OutputPolydataCell(UndefinedId), m_OutputPolydataCellIndex(UndefinedId)
 //-------------------------------------------------------------------------
 {
   vertexId[0] = v0 ;
@@ -637,6 +641,26 @@ void mafPolylineGraph::Edge::SetWeight(double w)
   weight = w ;
 }
 
+
+
+//-------------------------------------------------------------------------
+// get mapping from edge to location in output
+void mafPolylineGraph::Edge::GetMappingToOutputPolydata(vtkIdType *cellid, vtkIdType *index) const
+//-------------------------------------------------------------------------
+{
+  *cellid = m_OutputPolydataCell ;
+  *index = m_OutputPolydataCellIndex ;
+}
+
+
+//-------------------------------------------------------------------------
+// set mapping from edge to location in output
+void mafPolylineGraph::Edge::SetMappingToOutputPolydata(vtkIdType cellid, vtkIdType index)
+//-------------------------------------------------------------------------
+{
+  m_OutputPolydataCell = cellid ;
+  m_OutputPolydataCellIndex = index ;
+}
 
 
 
@@ -1301,6 +1325,7 @@ void mafPolylineGraph::AllocateBranches(int nb)
 // Each polydata point becomes a graph vertex.
 // Each polydata cell (line or polyline) becomes a graph branch.
 // Each polydata line or line segment becomes a graph edge.
+// The points stay in the same order: point i in the graph is the same as point i in the polydata.
 bool mafPolylineGraph::CopyFromPolydata(vtkPolyData *polydata)
 //-------------------------------------------------------------------------
 {
@@ -1394,14 +1419,16 @@ bool mafPolylineGraph::CopyFromPolydata(vtkPolyData *polydata)
 
 
 //-------------------------------------------------------------------------
-// write polyline graph to vtkPolyData
+// Write polyline graph to vtkPolyData
 // Each graph vertex becomes a polydata point.
 // Each graph branch becomes a line or polyline.
 // Edges which are not members of branches become lines.
-bool mafPolylineGraph::CopyToPolydata(vtkPolyData *polydata) const
+// The points stay in the same order: point i in the polydata is the same as point i in the graph.
+// This also sets the mapping between the graph edges and the cells in the output polydata.
+bool mafPolylineGraph::CopyToPolydata(vtkPolyData *polydata)
 //-------------------------------------------------------------------------
 {
-  int i ;
+  int i, j ;
 
   // clear the polydata
   polydata->Initialize() ;
@@ -1422,6 +1449,12 @@ bool mafPolylineGraph::CopyToPolydata(vtkPolyData *polydata) const
     if (GetConstBranchPtr(i)->GetNumberOfVertices() > 0){
       GetConstBranchPtr(i)->GetVerticesIdList(idlist) ;
       lines->InsertNextCell(idlist) ;
+
+      // set mapping between edges and output cells
+      for (j = 0 ;  j < GetConstBranchPtr(i)->GetNumberOfEdges() ;  j++){
+        vtkIdType edgeid = GetConstBranchPtr(i)->GetEdgeId(j) ;
+        GetEdgePtr(edgeid)->SetMappingToOutputPolydata(i, j) ; // this edge is edge j in cell i
+      }
     }
   }
 
@@ -1430,7 +1463,10 @@ bool mafPolylineGraph::CopyToPolydata(vtkPolyData *polydata) const
     vtkIdType b = GetConstEdgePtr(i)->GetBranchId() ;
     if (b == UndefinedId){
       GetConstEdgePtr(i)->GetVerticesIdList(idlist) ;
-      lines->InsertNextCell(idlist) ;
+      vtkIdType cellid = lines->InsertNextCell(idlist) ;
+
+      // map edge to output cell
+      GetEdgePtr(i)->SetMappingToOutputPolydata(cellid, 0) ; // this edge is edge 0 in cellid
     }
   }
 
@@ -1445,6 +1481,43 @@ bool mafPolylineGraph::CopyToPolydata(vtkPolyData *polydata) const
   return true ;
 }
 
+
+//-------------------------------------------------------------------------
+// Get location of edge in output polydata
+// The mapping is set by CopyToPolydata()
+void mafPolylineGraph::GetOutputCellCorrespondingToEdge(vtkIdType edgeid, vtkIdType *cellid, vtkIdType *index) const
+//-------------------------------------------------------------------------
+{
+  GetConstEdgePtr(edgeid)->GetMappingToOutputPolydata(cellid, index) ;
+  if ((*cellid == UndefinedId) || (*index == UndefinedId)){
+    mafLogMessage("GetOutputCellCorrespondingToEdge() can't find output cell corresponding to edge %d", edgeid) ;
+    mafLogMessage("Perhaps CopyToPolydata() has not been called ?") ;
+    assert(false) ;
+  }
+}
+
+
+//-------------------------------------------------------------------------
+// Get edge id in graph which is the jth edge in cellid in the output polydata
+// The mapping is set by CopyToPolydata()
+vtkIdType mafPolylineGraph::GetEdgeCorrespondingToOutputCell(vtkIdType cellid, vtkIdType index) const
+//-------------------------------------------------------------------------
+{
+  vtkIdType edgeid, i, j ;
+
+  for (edgeid = 0 ;  edgeid < GetNumberOfEdges() ;  edgeid++){
+    GetConstEdgePtr(edgeid)->GetMappingToOutputPolydata(&i, &j) ;
+    if ((i == cellid) && (j == index))
+      return edgeid ;
+  }
+
+  // output cell and index not found in edge mapping
+  mafLogMessage("GetEdgeCorrespondingToOutputCell() can't find output cell corresponding to edge %d", edgeid) ;
+  mafLogMessage("Perhaps CopyToPolydata() has not been called ?") ;
+  assert(false) ;
+
+  return UndefinedId ;
+}
 
 
 //-------------------------------------------------------------------------
@@ -2258,7 +2331,6 @@ bool mafPolylineGraph::DeleteBranch(vtkIdType i)
 
   return true ;
 }
-
 
 
 //-------------------------------------------------------------------------
