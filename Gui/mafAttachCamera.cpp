@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttachCamera.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-12 10:58:00 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-06-29 13:06:57 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -102,8 +102,7 @@ void mafAttachCamera::OnEvent(mafEventBase *maf_event)
         }
         else
         {
-          m_AttachedVme->GetEventSource()->RemoveObserver(this);
-          m_AttachedVme = NULL;
+          SetVme(NULL);
         }
       break;
     }
@@ -114,7 +113,8 @@ void mafAttachCamera::OnEvent(mafEventBase *maf_event)
     switch(maf_event->GetId())
     {
       case NODE_DETACHED_FROM_TREE:
-        m_AttachedVme = NULL;
+        SetVme(NULL);
+        //m_AttachedVme = NULL;
         m_CameraAttach = 0;
         m_Gui->Update();
       break;
@@ -128,8 +128,17 @@ void mafAttachCamera::OnEvent(mafEventBase *maf_event)
 void mafAttachCamera::SetVme(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  m_AttachedVme = mafVME::SafeDownCast(node);
-  if (m_AttachedVme == NULL)
+  if (mafVME::SafeDownCast(node) == NULL)
+  {
+    if (m_AttachedVme && m_AttachedVme->GetEventSource()->IsObserver(this))
+    {
+      m_AttachedVme->GetEventSource()->RemoveObserver(this);
+    }
+    vtkDEL(m_AttachedVmeMatrix);
+    m_AttachedVme = NULL;
+    return;
+  }
+  if (m_AttachedVme && m_AttachedVme->Equals(mafVME::SafeDownCast(node)))
   {
     return;
   }
@@ -137,6 +146,7 @@ void mafAttachCamera::SetVme(mafNode *node)
   {
     vtkNEW(m_AttachedVmeMatrix);
   }
+  m_AttachedVme = mafVME::SafeDownCast(node);
   vtkMatrix4x4 *matrix = m_AttachedVme->GetOutput()->GetAbsMatrix()->GetVTKMatrix();
   m_AttachedVmeMatrix->DeepCopy(matrix);
   m_Rwi->CameraUpdate();
