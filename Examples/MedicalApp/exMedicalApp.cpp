@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: exMedicalApp.cpp,v $
 Language:  C++
-Date:      $Date: 2007-05-31 08:15:43 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2007-06-29 11:36:23 $
+Version:   $Revision: 1.10 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -120,9 +120,9 @@ MafMedical is partially based on OpenMAF.
 	#include "mmoEditNormals.h"
 	#include "mmoCreateSurfaceParametric.h"
 	#include "mmoVOIDensity.h"
-	#ifdef MAF_USE_ITK
+#ifdef MAF_USE_ITK
 		#include "mmoClassicICPRegistration.h"
-	#endif
+#endif
 	#include "mmoCropDeformableROI.h"
 	#include "mmoMML.h"
 	#include "mmoMeshQuality.h"
@@ -157,16 +157,11 @@ bool exMedicalApp::OnInit()
 {
 	mafPics.Initialize();	
 
-	int result = mafVMEFactory::Initialize();
-	assert(result==MAF_OK);
-
+	int result;
 	result = medVMEFactory::Initialize();
 	assert(result==MAF_OK);
 
 	// Initialize and Fill of PipeFactory -- could be a SideEffect of the node plug
-	result = mafPipeFactoryVME::Initialize();
-	assert(result==MAF_OK);
-
 	result = medPipeFactoryVME::Initialize();
 	assert(result==MAF_OK);
 
@@ -196,9 +191,9 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new mmoVTKImporter("VTK"));
 	m_Logic->Plug(new mmoMSF1xImporter("MSF 1.x"));
 	m_Logic->Plug(new mmoMeshImporter("Mesh"));
-	#ifdef MAF_USE_ITK
+#ifdef MAF_USE_ITK
 		m_Logic->Plug(new mmoASCIIImporter("ASCII"));
-	#endif
+#endif
 	m_Logic->Plug(new mmoDICOMImporter("DICOM"),"DICOM Suite");
 	m_Logic->Plug(new mmoCTAImporter("CTA-DSA"),"DICOM Suite");
 	m_Logic->Plug(new mmoCTMRIImporter("CT"),"DICOM Suite");
@@ -207,10 +202,10 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new mmoLandmarkImporterTXT("Landmark TXT"),"Landmark Suite");
 	m_Logic->Plug(new mmoLandmarkImporterWS("Landmark WS"),"Landmark Suite");
 	m_Logic->Plug(new mmoC3DImporter("C3D"),"Landmark Suite");
-	#ifdef MAF_USE_ITK
+#ifdef MAF_USE_ITK
 		m_Logic->Plug(new mmoEMGImporterWS("EMG"));
 		m_Logic->Plug(new mmoGRFImporterWS("GRF"));
-	#endif
+#endif
 	m_Logic->Plug(new mmoRAWImporterImages("RAW Images"));
 #endif
 	//------------------------------------------------------------
@@ -266,9 +261,9 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new mmoExtrusionHoles(),"Modify");
 
 	m_Logic->Plug(new mmoRegisterClusters("Clusters"),"Register");
-	#ifdef MAF_USE_ITK
+#ifdef MAF_USE_ITK
 		m_Logic->Plug(new mmoClassicICPRegistration("Surface"),"Register");
-	#endif
+#endif
 #endif
 	//------------------------------------------------------------
 
