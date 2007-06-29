@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoHandle.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-25 12:23:44 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-06-29 07:12:20 $
+  Version:   $Revision: 1.8 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -424,6 +424,11 @@ void mafGizmoHandle::Update()
   // reset the rotation transform
   m_RotateBoxTr->Identity();
   double rot[3] = {0,0,0};
+  
+	mafMatrix *matIdentity;
+	mafNEW(matIdentity);
+	matIdentity->Identity();
+	SetPose(matIdentity);
 
   switch(m_GizmoType) 
   {
