@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoBmpExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-22 09:01:01 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-06-29 11:37:51 $
+  Version:   $Revision: 1.6 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -291,10 +291,10 @@ void mmoBmpExporter::OnEvent(mafEventBase *maf_event)
     switch(e->GetId())
     {
       case ID_8BIT:
-        m_Gui->Enable(ID_INT,m_8bit == true);
+        m_Gui->Enable(ID_INT, m_8bit != 0);
         break;
       case ID_DIROPEN:
-        m_Gui->Enable(wxOK,m_DirName != "");
+        m_Gui->Enable(wxOK, !m_DirName.IsEmpty());
         break;
       case wxOK:          
         { 
