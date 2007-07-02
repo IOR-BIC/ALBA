@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEEditor.h,v $
 Language:  C++
-Date:      $Date: 2007-07-02 06:55:56 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-07-02 07:04:31 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -68,14 +68,19 @@ public:
 	virtual int SetData(vtkDataSet *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
 
 	/** Return the suggested pipe-typename for the visualization of this vme */
-	virtual mafString GetVisualPipe() {return mafString("medPipePolylineGraphEditor");};
+	virtual mafString GetVisualPipe() {return m_VisualPipeName;};
 
 	/** return the right type of output */  
 	virtual mafVMEOutput *GetOutput();
 
+	/** Set the suggested pipe-typename for the visualization of this vme */
+	void SetVisualPipe(mafString vpipe){m_VisualPipeName = vpipe;};
+
 protected:
 	medVMEEditor();
 	virtual ~medVMEEditor(); 
+
+	mafString m_VisualPipeName;
 
 private:
 	medVMEEditor(const medVMEEditor&); // Not implemented

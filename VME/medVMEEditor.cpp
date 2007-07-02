@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEEditor.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-02 06:55:56 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-07-02 07:04:31 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -63,6 +63,8 @@ mafCxxTypeMacro(medVMEEditor)
 medVMEEditor::medVMEEditor()
 //-------------------------------------------------------------------------
 {
+	m_VisualPipeName = "medPipePolylineGraphEditor";
+
 	GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
 	SetVisibleToTraverse(false);
 }
