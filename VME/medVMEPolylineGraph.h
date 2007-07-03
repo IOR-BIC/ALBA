@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2007-07-03 10:00:31 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-07-03 10:14:37 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -45,14 +45,10 @@ MafMedical is partially based on OpenMAF.
 // Include:
 //----------------------------------------------------------------------------
 #include "mafVMEGeneric.h"
-#include "vtkSystemIncludes.h"
-#include "vtkIdType.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class mafPolylineGraph;
-class vtkPolyData;
 
 class MAF_EXPORT medVMEPolylineGraph : public mafVMEGeneric
 {
@@ -77,33 +73,9 @@ public:
 	/** return the right type of output */  
 	virtual mafVMEOutput *GetOutput();
 
-	/** Add a new branch, vertexID is the vertex where attach the branch */
-	int AddNewBranch(vtkIdType vertexID,mafString *name=NULL);
-
-	/** Add a new branch, vertexCoord is the vertex where attach the branch */
-	int AddNewBranch(double vertexCoord[3],mafString *name=NULL);
-
-	int GetNumberOfBranch();
-
-	/** Return if the Polyline/Graph is connected or not */
-	bool IsConnected();
-
-	/** Change Current Branch */
-	int SelectBranch(vtkIdType branch){m_CurrentBranch = branch;};
-
-	/** Change Current Branch by an edge */
-	int SelectBranch(vtkIdType v1,vtkIdType v2);
-	int SelectBranch(double v1[3],double v2[3]);
-
-	int GetCurrentBranch(){return m_CurrentBranch;};
-
 protected:
 	medVMEPolylineGraph();
 	virtual ~medVMEPolylineGraph(); 
-
-	mafPolylineGraph *m_PolylineGraph; ///<Structure to menage vtkData
-
-	vtkIdType m_CurrentBranch;
 
 private:
 	medVMEPolylineGraph(const medVMEPolylineGraph&); // Not implemented

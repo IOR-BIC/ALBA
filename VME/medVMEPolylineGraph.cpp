@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-03 10:00:31 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-07-03 10:14:37 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -49,13 +49,11 @@ MafMedical is partially based on OpenMAF.
 
 #include "medVMEPolylineGraph.h"
 #include "mafObject.h"
-#include "mafPolylineGraph.h"
 #include "mafVMEOutputPolyline.h"
 
 #include "vtkDataSet.h"
 #include "vtkPolyData.h"
 #include "vtkCellArray.h"
-#include "vtkMath.h"
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(medVMEPolylineGraph)
@@ -65,19 +63,13 @@ mafCxxTypeMacro(medVMEPolylineGraph)
 medVMEPolylineGraph::medVMEPolylineGraph()
 //-------------------------------------------------------------------------
 {
-	m_PolylineGraph = NULL;
 
-	m_PolylineGraph = new mafPolylineGraph;
-	m_PolylineGraph->AddNewBranch();
-
-	m_CurrentBranch = 0;
 }
-
 //-------------------------------------------------------------------------
 medVMEPolylineGraph::~medVMEPolylineGraph()
 //-------------------------------------------------------------------------
 {
-	cppDEL(m_PolylineGraph);
+
 }
 //-------------------------------------------------------------------------
 int medVMEPolylineGraph::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
@@ -94,64 +86,11 @@ int medVMEPolylineGraph::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
 		polydata->GetStrips()->GetNumberOfCells()==0 && \
 		polydata->GetVerts()->GetNumberOfCells()==0)
 	{
-		m_PolylineGraph->CopyFromPolydata(polydata);
-		if(m_PolylineGraph->SelfCheck())
-		{
-			m_PolylineGraph->CopyToPolydata(polydata);
 			return Superclass::SetData(data,t,mode);
-		}
-		else
-			return MAF_ERROR;
 	}
 
 	mafErrorMacro("Trying to set the wrong type of fata inside a VME Polyline :"<< (data?data->GetClassName():"NULL"));
 	return MAF_ERROR;
-}
-//-------------------------------------------------------------------------
-int medVMEPolylineGraph::AddNewBranch(vtkIdType vertexID,mafString *name)
-//-------------------------------------------------------------------------
-{
-	m_PolylineGraph->AddNewBranch(vertexID,(wxString*)name);
-	vtkPolyData *polydata;
-	vtkNEW(polydata);
-	m_PolylineGraph->CopyToPolydata(polydata);
-	int result;
-	result=Superclass::SetData(polydata,GetTimeStamp());
-	if(result==MAF_OK)
-		m_CurrentBranch = GetNumberOfBranch()-1;
-	vtkDEL(polydata);
-	return result;
-}
-//-------------------------------------------------------------------------
-int medVMEPolylineGraph::AddNewBranch(double vertexCoord[3],mafString *name)
-//-------------------------------------------------------------------------
-{
-	double minDistance=VTK_DOUBLE_MAX;
-	int iMin;
-	for(int i=0;i<m_PolylineGraph->GetNumberOfVertices();i++)
-	{
-		double point[3];
-		m_PolylineGraph->GetVertexCoords(i,point);
-		double distance = sqrt(vtkMath::Distance2BetweenPoints(vertexCoord,point));
-		if(distance<minDistance)
-		{
-			iMin=i;
-			minDistance=distance;
-		}
-	}
-	return AddNewBranch(iMin,name);
-}
-//-------------------------------------------------------------------------
-int medVMEPolylineGraph::GetNumberOfBranch()
-//-------------------------------------------------------------------------
-{
-	return m_PolylineGraph->GetNumberOfBranches();
-}
-//-------------------------------------------------------------------------
-bool medVMEPolylineGraph::IsConnected()
-//-------------------------------------------------------------------------
-{
-	return m_PolylineGraph->IsConnected();
 }
 //-------------------------------------------------------------------------
 mafVMEOutput *medVMEPolylineGraph::GetOutput()
@@ -163,53 +102,4 @@ mafVMEOutput *medVMEPolylineGraph::GetOutput()
 		SetOutput(mafVMEOutputPolyline::New()); // create the output
 	}
 	return m_Output;
-}
-//-------------------------------------------------------------------------
-int medVMEPolylineGraph::SelectBranch(vtkIdType v1,vtkIdType v2)
-//-------------------------------------------------------------------------
-{
-	for(int i=0;i<m_PolylineGraph->GetNumberOfEdges();i++)
-	{
-		if(m_PolylineGraph->GetConstEdgePtr(i)->IsVertexPair(v1,v2))
-		{
-			m_CurrentBranch = m_PolylineGraph->GetConstEdgePtr(i)->GetBranchId();
-			return MAF_OK;
-		}
-	}
-	return MAF_ERROR;
-}
-//-------------------------------------------------------------------------
-int medVMEPolylineGraph::SelectBranch(double v1[3],double v2[3])
-//-------------------------------------------------------------------------
-{
-	int iMin;
-	double distaceMin=VTK_DOUBLE_MAX;
-	for(int i=0;i<m_PolylineGraph->GetNumberOfVertices();i++)
-	{
-		double point[3];
-		m_PolylineGraph->GetConstVertexPtr(i)->GetCoords(point);
-		double distance=sqrt(vtkMath::Distance2BetweenPoints(point,v1));
-		if(distance<distaceMin)
-		{
-			distaceMin=distance;
-			iMin=i;
-		}
-	}
-	vtkIdType v1ID=iMin;
-
-	for(int i=0;i<m_PolylineGraph->GetNumberOfVertices();i++)
-	{
-		double point[3];
-		m_PolylineGraph->GetConstVertexPtr(i)->GetCoords(point);
-		double distance=sqrt(vtkMath::Distance2BetweenPoints(point,v2));
-		if(distance<distaceMin)
-		{
-			distaceMin=distance;
-			iMin=i;
-		}
-	}
-
-	vtkIdType v2ID=iMin;
-
-	return SelectBranch(v1ID,v2ID);
 }
