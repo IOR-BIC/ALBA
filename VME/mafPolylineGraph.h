@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2007-06-29 08:23:25 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2007-07-03 15:37:48 $
+Version:   $Revision: 1.5 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -128,13 +128,23 @@ public:
   This also sets the mapping between the graph edges and the cells in the output polydata.*/
   bool CopyToPolydata(vtkPolyData *polydata) ;
 
-  /* Get location of edge in output polydata
-  The mapping is set by CopyToPolydata() */
-  void GetOutputCellCorrespondingToEdge(vtkIdType edgeid, vtkIdType *cellid, vtkIdType *j) const ;
+  /* Get location of edge in output polydata.
+  Returns the cellid and the index on the cell.
+  The mapping is set by CopyToPolydata(). */
+  void GetOutputCellCorrespondingToEdge(vtkIdType edgeid, vtkIdType *cellid, vtkIdType *index) const ;
 
-  /* Get edge id in graph which is the jth edge in cellid in the output polydata
-  The mapping is set by CopyToPolydata() */
-  vtkIdType GetEdgeCorrespondingToOutputCell(vtkIdType cellid, vtkIdType j) const ;
+  /* Get edge id in graph which corresponds to (cellid,index) in the output data
+  The mapping is set by CopyToPolydata(). */
+  vtkIdType GetEdgeCorrespondingToOutputCell(vtkIdType cellid, vtkIdType index) const ;
+
+  /* Get location of branch in output polydata.
+  The mapping is set by CopyToPolydata(). */
+  void GetOutputCellCorrespondingToBranch(vtkIdType branchid, vtkIdType *cellid) const ;
+
+  /* Get branch id in graph corresponding to cell in output polydata.
+  The mapping is set by CopyToPolydata().
+  NB this returns -1 if the cell does not map to a branch. */
+  vtkIdType GetBranchCorrespondingToOutputCell(vtkIdType cellid) const ;
 
   /** Split branch by finding and removing edge.
   A new branch is created at the end of the list. 
@@ -297,13 +307,18 @@ public:
     void DeleteLastVertex() ;                           ///< delete last vertex and edge from end of list
     void GetVerticesIdList(vtkIdList *idlist) const ;   ///< return vertices as a vtkIdlist
     void ReverseDirection() ;                           ///< reverse branch direction
-    void Clear() ;                                      ///< clear data from branch
+    vtkIdType GetMappingToOutputPolydata() const ;          ///< get mapping from branch to output cell
+    void SetMappingToOutputPolydata(vtkIdType cellid) ;     ///< set mapping from branch to output cell
+    void Clear() ;                                          ///< clear data from branch
     bool SelfCheck() const ;                                  ///< check self consistency (empty branches are allowed)
     void PrintSelf(std::ostream& os, const int tabs) const ;  ///< print self
   private:
     wxString m_name ;                                   ///< name of branch
     std::vector<vtkIdType> vertexId ;                   ///< list by vertices
     std::vector<vtkIdType> edgeId ;                     ///< list by edges
+
+    vtkIdType m_OutputPolydataCell ;                    ///< cell id of branch in output polydata
+
   } ;
 
   //-----------------------------------------------------------------------------

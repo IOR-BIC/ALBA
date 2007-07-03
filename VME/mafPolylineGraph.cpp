@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2007-06-29 08:23:25 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-07-03 15:37:48 $
+Version:   $Revision: 1.4 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -105,6 +105,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // Branch::DeletelastVertex()
 // Branch::GetVerticesIdList()
 // Branch::ReverseDirection()
+// Branch::GetMappingToOutputPolydata() 
+// Branch::SetMappingToOutputPolydata()
 // Branch::Clear()
 // Branch::SelfCheck()
 // Branch::PrintSelf()
@@ -702,7 +704,7 @@ void mafPolylineGraph::Edge::PrintSelf(std::ostream& os, const int tabs) const
 //-------------------------------------------------------------------------
 // Branch Constructor
 // Empty branch with optional name
-mafPolylineGraph::Branch::Branch(const wxString *name)
+mafPolylineGraph::Branch::Branch(const wxString *name) : m_OutputPolydataCell(UndefinedId)
 //-------------------------------------------------------------------------
 {
   if (name != NULL)
@@ -714,7 +716,7 @@ mafPolylineGraph::Branch::Branch(const wxString *name)
 
 //-------------------------------------------------------------------------
 // Branch Constructor with initial vertex and optional name
-mafPolylineGraph::Branch::Branch(vtkIdType v, const wxString *name)
+mafPolylineGraph::Branch::Branch(vtkIdType v, const wxString *name) : m_OutputPolydataCell(UndefinedId)
 //-------------------------------------------------------------------------
 {
   // insert first vertex id
@@ -959,6 +961,25 @@ void mafPolylineGraph::Branch::ReverseDirection()
     vertexId.at(i) = vertexId.at(j) ;
     vertexId.at(j) = tempId ;
   }
+}
+
+
+
+
+//-------------------------------------------------------------------------
+// get mapping from branch to output cell
+vtkIdType mafPolylineGraph::Branch::GetMappingToOutputPolydata() const 
+//-------------------------------------------------------------------------
+{
+  return m_OutputPolydataCell ;
+}
+
+//-------------------------------------------------------------------------
+// set mapping from branch to output cell
+void mafPolylineGraph::Branch::SetMappingToOutputPolydata(vtkIdType cellid)
+//-------------------------------------------------------------------------
+{
+  m_OutputPolydataCell = cellid ;
 }
 
 
@@ -1450,6 +1471,9 @@ bool mafPolylineGraph::CopyToPolydata(vtkPolyData *polydata)
       GetConstBranchPtr(i)->GetVerticesIdList(idlist) ;
       lines->InsertNextCell(idlist) ;
 
+      // set mapping between branch and output cell
+      GetBranchPtr(i)->SetMappingToOutputPolydata(i) ;
+
       // set mapping between edges and output cells
       for (j = 0 ;  j < GetConstBranchPtr(i)->GetNumberOfEdges() ;  j++){
         vtkIdType edgeid = GetConstBranchPtr(i)->GetEdgeId(j) ;
@@ -1489,6 +1513,8 @@ void mafPolylineGraph::GetOutputCellCorrespondingToEdge(vtkIdType edgeid, vtkIdT
 //-------------------------------------------------------------------------
 {
   GetConstEdgePtr(edgeid)->GetMappingToOutputPolydata(cellid, index) ;
+
+  // undefined values - fatal error
   if ((*cellid == UndefinedId) || (*index == UndefinedId)){
     mafLogMessage("GetOutputCellCorrespondingToEdge() can't find output cell corresponding to edge %d", edgeid) ;
     mafLogMessage("Perhaps CopyToPolydata() has not been called ?") ;
@@ -1498,25 +1524,61 @@ void mafPolylineGraph::GetOutputCellCorrespondingToEdge(vtkIdType edgeid, vtkIdT
 
 
 //-------------------------------------------------------------------------
-// Get edge id in graph which is the jth edge in cellid in the output polydata
+// Get edge id in graph which is (cellid,index) in the output polydata
 // The mapping is set by CopyToPolydata()
 vtkIdType mafPolylineGraph::GetEdgeCorrespondingToOutputCell(vtkIdType cellid, vtkIdType index) const
 //-------------------------------------------------------------------------
 {
-  vtkIdType edgeid, i, j ;
+  vtkIdType edgeid, j, k ;
 
   for (edgeid = 0 ;  edgeid < GetNumberOfEdges() ;  edgeid++){
-    GetConstEdgePtr(edgeid)->GetMappingToOutputPolydata(&i, &j) ;
-    if ((i == cellid) && (j == index))
+    GetConstEdgePtr(edgeid)->GetMappingToOutputPolydata(&j, &k) ;
+    if ((j == cellid) && (k == index))
       return edgeid ;
   }
 
-  // output cell and index not found in edge mapping
+  // output cell and index not found in edge mapping - fatal error
   mafLogMessage("GetEdgeCorrespondingToOutputCell() can't find output cell corresponding to edge %d", edgeid) ;
   mafLogMessage("Perhaps CopyToPolydata() has not been called ?") ;
   assert(false) ;
+  return -1 ;
+}
 
-  return UndefinedId ;
+
+//-------------------------------------------------------------------------
+// Get location of branch in output polydata
+// The mapping is set by CopyToPolydata()
+void mafPolylineGraph::GetOutputCellCorrespondingToBranch(vtkIdType branchid, vtkIdType *cellid) const
+//-------------------------------------------------------------------------
+{
+  *cellid = GetConstBranchPtr(branchid)->GetMappingToOutputPolydata() ;
+
+  // undefined values - fatal error
+  if (*cellid == UndefinedId){
+    mafLogMessage("GetOutputCellCorrespondingToBranch() can't find output cell corresponding to branch %d", branchid) ;
+    mafLogMessage("Perhaps CopyToPolydata() has not been called ?") ;
+    assert(false) ;
+  }
+}
+
+
+//-------------------------------------------------------------------------
+// Get branch id in graph which corresponds to cellid in the output polydata
+// The mapping is set by CopyToPolydata()
+// Returns -1 if branch not found.
+vtkIdType mafPolylineGraph::GetBranchCorrespondingToOutputCell(vtkIdType cellid) const
+//-------------------------------------------------------------------------
+{
+  vtkIdType branchid, j ;
+
+  for (branchid = 0 ;  branchid < GetNumberOfBranches() ;  branchid++){
+    j = GetConstBranchPtr(branchid)->GetMappingToOutputPolydata() ;
+    if (j == cellid)
+      return branchid ;
+  }
+
+  // output cell does not correspond to a branch - return -1 
+  return -1 ;
 }
 
 

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraphTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-06-28 16:02:50 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-07-03 15:38:01 $
+Version:   $Revision: 1.3 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -117,10 +117,27 @@ void mafPolylineGraphTest::TestCopyToPolydata()
   CPPUNIT_ASSERT(Graph2->GetNumberOfEdges() == Graph1->GetNumberOfEdges()) ;
   CPPUNIT_ASSERT(Graph2->GetNumberOfBranches() == Graph1->GetNumberOfBranches()) ;
 
+  delete Graph1 ;
+  delete Graph2 ;
+  polydata->Delete() ;
+}
+
+
+//------------------------------------------------------------------------------
+// Test mapping methods
+void mafPolylineGraphTest::TestMapping() 
+//------------------------------------------------------------------------------
+{
+  mafPolylineGraph *Graph1 = new mafPolylineGraph ;
+  CPPUNIT_ASSERT(Graph1->CopyFromPolydata(m_Polydata)) ;
+  CPPUNIT_ASSERT(Graph1->SelfCheck()) ;
+
+  // copy the graph back to polydata
+  vtkPolyData *polydata = vtkPolyData::New() ;
+  CPPUNIT_ASSERT(Graph1->CopyToPolydata(polydata)) ;
 
   /*
-  // indices of simple lines and polylines
-  static vtkIdType lineids[7][10] = {
+  branches:
   {0,1},
   {1,2},
   {3,4},
@@ -128,7 +145,6 @@ void mafPolylineGraphTest::TestCopyToPolydata()
   {1, 3, 6, 7, 8, 9, 10, 11, 12},
   {10, 13, 14, 15, 16, 17},
   {15, 18, 19, 20, 21}
-  };
   */
 
   // test the mapping from graph edges to output cells
@@ -154,8 +170,66 @@ void mafPolylineGraphTest::TestCopyToPolydata()
   CPPUNIT_ASSERT(Graph1->GetEdgeCorrespondingToOutputCell(6,2) == 19) ;
   CPPUNIT_ASSERT(Graph1->GetEdgeCorrespondingToOutputCell(6,3) == 20) ;
 
+  // test the mapping from branches to output cells
+  CPPUNIT_ASSERT(Graph1->GetBranchCorrespondingToOutputCell(0) == 0) ;
+  CPPUNIT_ASSERT(Graph1->GetBranchCorrespondingToOutputCell(1) == 1) ;
+  CPPUNIT_ASSERT(Graph1->GetBranchCorrespondingToOutputCell(2) == 2) ;
+  CPPUNIT_ASSERT(Graph1->GetBranchCorrespondingToOutputCell(3) == 3) ;
+  CPPUNIT_ASSERT(Graph1->GetBranchCorrespondingToOutputCell(4) == 4) ;
+  CPPUNIT_ASSERT(Graph1->GetBranchCorrespondingToOutputCell(5) == 5) ;
+  CPPUNIT_ASSERT(Graph1->GetBranchCorrespondingToOutputCell(6) == 6) ;
+
+
+  // delete a branch so that some edges don't belong to a branch
+  Graph1->DeleteBranch(4) ;
+
+  // copy the graph back to polydata
+  CPPUNIT_ASSERT(Graph1->CopyToPolydata(polydata)) ;
+
+  /*
+  branches:
+  {0,1},
+  {1,2},
+  {3,4},
+  {3,5},
+  {15, 18, 19, 20, 21}
+  {10, 13, 14, 15, 16, 17},
+  
+  edges:
+  {1,3} {3,6}, {6,7}, {7,8}, {8,9}, {9,10}, {10,11}, {11,12}
+  */
+
+  CPPUNIT_ASSERT(Graph1->GetEdgeCorrespondingToOutputCell(0,0) == 0) ;
+  CPPUNIT_ASSERT(Graph1->GetEdgeCorrespondingToOutputCell(1,0) == 1) ;
+  CPPUNIT_ASSERT(Graph1->GetEdgeCorrespondingToOutputCell(2,0) == 2) ;
+  CPPUNIT_ASSERT(Graph1->GetEdgeCorrespondingToOutputCell(3,0) == 3) ;
+  CPPUNIT_ASSERT(Graph1->GetEdgeCorrespondingToOutputCell(4,0) == 17) ;
+  CPPUNIT_ASSERT(Graph1->GetEdgeCorrespondingToOutputCell(4,1) == 18) ;
+  CPPUNIT_ASSERT(Graph1->GetEdgeCorrespondingToOutputCell(4,2) == 19) ;
+  CPPUNIT_ASSERT(Graph1->GetEdgeCorrespondingToOutputCell(4,3) == 20) ;
+  CPPUNIT_ASSERT(Graph1->GetEdgeCorrespondingToOutputCell(5,0) == 12) ;
+  CPPUNIT_ASSERT(Graph1->GetEdgeCorrespondingToOutputCell(5,1) == 13) ;
+  CPPUNIT_ASSERT(Graph1->GetEdgeCorrespondingToOutputCell(5,2) == 14) ;
+  CPPUNIT_ASSERT(Graph1->GetEdgeCorrespondingToOutputCell(5,3) == 15) ;
+  CPPUNIT_ASSERT(Graph1->GetEdgeCorrespondingToOutputCell(5,4) == 16) ;
+  CPPUNIT_ASSERT(Graph1->GetEdgeCorrespondingToOutputCell(6,0) == 4) ;
+  CPPUNIT_ASSERT(Graph1->GetEdgeCorrespondingToOutputCell(7,0) == 5) ;
+  CPPUNIT_ASSERT(Graph1->GetEdgeCorrespondingToOutputCell(8,0) == 6) ;
+  CPPUNIT_ASSERT(Graph1->GetEdgeCorrespondingToOutputCell(9,0) == 7) ;
+  CPPUNIT_ASSERT(Graph1->GetEdgeCorrespondingToOutputCell(10,0) == 8) ;
+  CPPUNIT_ASSERT(Graph1->GetEdgeCorrespondingToOutputCell(11,0) == 9) ;
+  CPPUNIT_ASSERT(Graph1->GetEdgeCorrespondingToOutputCell(12,0) == 10) ;
+  CPPUNIT_ASSERT(Graph1->GetEdgeCorrespondingToOutputCell(13,0) == 11) ;
+
+  CPPUNIT_ASSERT(Graph1->GetBranchCorrespondingToOutputCell(0) == 0) ;
+  CPPUNIT_ASSERT(Graph1->GetBranchCorrespondingToOutputCell(1) == 1) ;
+  CPPUNIT_ASSERT(Graph1->GetBranchCorrespondingToOutputCell(2) == 2) ;
+  CPPUNIT_ASSERT(Graph1->GetBranchCorrespondingToOutputCell(3) == 3) ;
+  CPPUNIT_ASSERT(Graph1->GetBranchCorrespondingToOutputCell(4) == 4) ;
+  CPPUNIT_ASSERT(Graph1->GetBranchCorrespondingToOutputCell(5) == 5) ;
+  CPPUNIT_ASSERT(Graph1->GetBranchCorrespondingToOutputCell(6) == -1) ; // returns -1 because there is no longer a branch for cell 6
+
   delete Graph1 ;
-  delete Graph2 ;
   polydata->Delete() ;
 }
 
