@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipePolylineGraphEditor.h,v $
 Language:  C++
-Date:      $Date: 2007-07-03 09:59:44 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-07-03 10:58:01 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -87,17 +87,8 @@ public:
 protected:
 	virtual mmgGui  *CreateGui();
 
-	vtkSphereSource		*m_Sphere;
-	vtkGlyph3D				*m_Glyph;
-	vtkTubeFilter			*m_Tube;
-	vtkPolyDataMapper	*m_MapperSphere;
-	vtkPolyDataMapper	*m_MapperTube;
-	vtkAppendPolyData	*m_AppendPolydata;
-	vtkActor					*m_ActorSphere;
-	vtkActor					*m_ActorTube;
-
-	double						m_SphereRadius;
-	double						m_TubeRadius;
+	vtkPolyDataMapper	*m_Mapper;
+	vtkActor					*m_Actor;
 
 	vtkLookupTable		*m_LUT;
 };

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipePolylineGraphEditor.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-03 09:59:44 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-07-03 10:58:01 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -59,11 +59,7 @@ MafMedical is partially based on OpenMAF.
 #include "vtkMAFAssembly.h"
 
 #include "vtkPolyData.h"
-#include "vtkSphereSource.h"
-#include "vtkGlyph3D.h"
-#include "vtkTubeFilter.h"
 #include "vtkPolyDataMapper.h"
-#include "vtkAppendPolyData.h"
 #include "vtkActor.h"
 #include "vtkLookupTable.h"
 #include "vtkPointData.h"
@@ -79,8 +75,7 @@ medPipePolylineGraphEditor::medPipePolylineGraphEditor()
 :mafPipe()
 //----------------------------------------------------------------------------
 {
-	m_SphereRadius = 2.0;
-	m_TubeRadius	 = 1.0;
+
 }
 //----------------------------------------------------------------------------
 void medPipePolylineGraphEditor::Create(mafSceneNode *n)
@@ -98,70 +93,35 @@ void medPipePolylineGraphEditor::Create(mafSceneNode *n)
 
 	double range[2]={0.0,1.0};
 
-	m_LUT = vtkLookupTable::New();
+	vtkNEW(m_LUT);
 	m_LUT->SetNumberOfColors(2);
 	m_LUT->SetTableValue(0.0, 1.0, 1.0, 1.0, 1.0);
 	m_LUT->SetTableValue(1.0, 1.0, 0.0, 0.0, 1.0);
 	m_LUT->Build();
-	//if(data->GetPointData()->GetScalars())
-		//data->GetPointData()->GetScalars()->SetLookupTable(m_LUT);
 
-	vtkNEW(m_Sphere);
-	m_Sphere->SetRadius(m_SphereRadius);
-	m_Sphere->SetPhiResolution(10);
-	m_Sphere->SetThetaResolution(10);
-
-	vtkNEW(m_Glyph);
-	m_Glyph->SetInput(data);
-	m_Glyph->SetSource(m_Sphere->GetOutput());
-	m_Glyph->SetScaleModeToDataScalingOff();
-	m_Glyph->SetRange(0.0,1.0);
-	m_Glyph->Update();
-
-	vtkNEW(m_Tube);
-	m_Tube->UseDefaultNormalOff();
-	m_Tube->SetInput(data);
-	m_Tube->SetRadius(m_TubeRadius);
-	m_Tube->SetCapping(true);
-	m_Tube->SetNumberOfSides(10);
-
-	vtkNEW(m_AppendPolydata);
-	m_AppendPolydata->AddInput(m_Tube->GetOutput());
-	m_AppendPolydata->AddInput(m_Glyph->GetOutput());
-	m_AppendPolydata->Update();
-
-	vtkNEW(m_MapperSphere);
-	m_MapperSphere->SetInput(data);
-	m_MapperSphere->SetLookupTable(m_LUT);
-	m_MapperSphere->SetScalarRange(range);
+	vtkNEW(m_Mapper);
+	m_Mapper->SetInput(data);
+	m_Mapper->SetLookupTable(m_LUT);
+	m_Mapper->SetScalarRange(range);
 	if(data->GetPointData()->GetScalars())
-		m_MapperSphere->SetScalarModeToUsePointData();
+		m_Mapper->SetScalarModeToUsePointData();
 	else if(data->GetCellData()->GetScalars())
-		m_MapperSphere->SetScalarModeToUseCellData();
-	m_MapperSphere->Modified();
+		m_Mapper->SetScalarModeToUseCellData();
+	m_Mapper->Modified();
 
-	vtkNEW(m_MapperTube);
-	m_MapperTube->SetInput(m_Tube->GetOutput());
-	/*m_MapperTube->SetLookupTable(m_LUT);
-	m_MapperTube->SetScalarRange(data->GetPointData()->GetScalars()->GetRange());
-	m_MapperTube->SetScalarModeToUsePointData();*/
-	m_MapperTube->SetScalarModeToUseCellData();
-	m_MapperTube->Modified();
-
-	vtkNEW(m_ActorSphere);
-	m_ActorSphere->SetMapper(m_MapperSphere);
-	m_AssemblyFront->AddPart(m_ActorSphere);
-
-	vtkNEW(m_ActorTube);
-	m_ActorTube->SetMapper(m_MapperTube);
-	//m_AssemblyFront->AddPart(m_ActorTube);
-
+	vtkNEW(m_Actor);
+	m_Actor->SetMapper(m_Mapper);
+	m_AssemblyFront->AddPart(m_Actor);
 }
 //----------------------------------------------------------------------------
 medPipePolylineGraphEditor::~medPipePolylineGraphEditor()
 //----------------------------------------------------------------------------
 {
+	m_AssemblyFront->RemovePart(m_Actor);
 
+	vtkDEL(m_Actor);
+	vtkDEL(m_Mapper);
+	vtkDEL(m_LUT);
 }
 //----------------------------------------------------------------------------
 void medPipePolylineGraphEditor::Show(bool show)
