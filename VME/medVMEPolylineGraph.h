@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2007-07-03 10:14:37 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-07-03 10:56:42 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -49,6 +49,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
+class vtkPolyData;
 
 class MAF_EXPORT medVMEPolylineGraph : public mafVMEGeneric
 {
@@ -65,7 +66,7 @@ public:
 	from the source.
 	Return MAF_OK if succeeded, MAF_ERROR if they kind of data is not accepted by
 	this type of VME. */
-	virtual int SetData(vtkDataSet *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
+	virtual int SetData(vtkPolyData *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
 
 	/** Return the suggested pipe-typename for the visualization of this vme */
 	virtual mafString GetVisualPipe() {return mafString("mafPipePolyline");};

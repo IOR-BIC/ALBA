@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-03 10:14:37 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-07-03 10:56:42 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -72,11 +72,12 @@ medVMEPolylineGraph::~medVMEPolylineGraph()
 
 }
 //-------------------------------------------------------------------------
-int medVMEPolylineGraph::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
+int medVMEPolylineGraph::SetData(vtkPolyData *data, mafTimeStamp t, int mode)
 //-------------------------------------------------------------------------
 {
 	assert(data);
-	vtkPolyData *polydata = vtkPolyData::SafeDownCast(data);
+
+	vtkPolyData *polydata=data;
 
 	if (polydata)
 		polydata->Update();
