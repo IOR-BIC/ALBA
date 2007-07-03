@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCreateEditSkeleton.h,v $
 Language:  C++
-Date:      $Date: 2007-07-03 10:13:09 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-07-03 10:59:28 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -52,6 +52,7 @@ MafMedical is partially based on OpenMAF.
 class mafVME;
 class medVMEPolylineGraph;
 class medGeometryEditorPolylineGraph;
+class vtkPolyData;
 
 //----------------------------------------------------------------------------
 // medOpCreateEditSkeleton :
@@ -88,6 +89,7 @@ protected:
 	void CreateGui();
 
 	medVMEPolylineGraph	*m_Skeleton;
+	vtkPolyData					*m_ResultPolydata;
 
 	medGeometryEditorPolylineGraph *m_Editor;
 

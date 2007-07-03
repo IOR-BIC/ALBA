@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCreateEditSkeleton.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-03 10:13:09 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-07-03 10:59:28 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -54,13 +54,9 @@ MafMedical is partially based on OpenMAF.
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
 #include "medVMEPolylineGraph.h"
-#include "medVMEEditor.h"
 #include "medGeometryEditorPolylineGraph.h"
 
-#include "mmiPicker.h"
-#include "mafInteractor.h"
-
-#include "vtkPoints.h"
+#include "vtkPolyData.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medOpCreateEditSkeleton);
@@ -75,6 +71,8 @@ mafOp(label)
 	m_Canundo = true;
 
 	m_Editor  = NULL;
+	m_Skeleton = NULL;
+	m_ResultPolydata = NULL;
 }
 //----------------------------------------------------------------------------
 medOpCreateEditSkeleton::~medOpCreateEditSkeleton()
@@ -82,6 +80,7 @@ medOpCreateEditSkeleton::~medOpCreateEditSkeleton()
 {
 	cppDEL(m_Editor);
 	mafDEL(m_Skeleton);
+	vtkDEL(m_ResultPolydata);
 }
 //----------------------------------------------------------------------------
 mafOp* medOpCreateEditSkeleton::Copy()
@@ -112,7 +111,8 @@ void medOpCreateEditSkeleton::OpRun()
 void medOpCreateEditSkeleton::OpDo()
 //----------------------------------------------------------------------------
 {
-	m_Skeleton->SetData((vtkDataSet*)m_Editor->GetOutput(),((mafVME*)m_Input)->GetTimeStamp());
+	m_Skeleton->SetData(m_ResultPolydata,((mafVME*)m_Input)->GetTimeStamp());
+	m_Skeleton->SetName("VME Skeleton");
 	m_Skeleton->ReparentTo(m_Input->GetRoot());
 }
 //----------------------------------------------------------------------------
@@ -158,6 +158,11 @@ void medOpCreateEditSkeleton::OpStop(int result)
 //----------------------------------------------------------------------------
 {
 	m_Editor->Show(false);
+	if(result==OP_RUN_OK)
+	{
+		m_ResultPolydata = m_Editor->GetOutput();
+	}
+
 	cppDEL(m_Editor);
 
 	HideGui();
