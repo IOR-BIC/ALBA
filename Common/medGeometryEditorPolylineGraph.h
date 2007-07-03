@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2007-07-03 10:16:53 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-07-03 11:00:31 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -120,6 +120,7 @@ protected:
 
 	int m_CurrentBranch;///<Branch in witch we are working
 	int m_SelectedPoint;
+	int m_SelectedPointVTK;
 
 	//Gui Variables
 	int m_PointTool;

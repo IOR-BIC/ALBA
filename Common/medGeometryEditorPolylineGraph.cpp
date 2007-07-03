@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-03 10:16:53 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-07-03 11:00:31 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -124,6 +124,7 @@ medGeometryEditorPolylineGraph::medGeometryEditorPolylineGraph(mafVME *input, ma
 	m_VMEEditorSelection->ReparentTo(mafVME::SafeDownCast(input->GetRoot()));
 
 	m_SelectedPoint = -1;
+	m_SelectedPointVTK = -1;
 }
 //----------------------------------------------------------------------------
 void medGeometryEditorPolylineGraph::CreatePipe() 
@@ -361,7 +362,8 @@ void medGeometryEditorPolylineGraph::CreateISA()
 vtkPolyData* medGeometryEditorPolylineGraph::GetOutput()
 //----------------------------------------------------------------------------
 {
-	vtkMAFSmartPointer<vtkPolyData> polydata;
+	vtkPolyData *polydata;
+	vtkNEW(polydata);
 	m_PolylineGraph->CopyToPolydata(polydata);
 	return polydata;
 }
@@ -399,7 +401,20 @@ void medGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 					vtkMAFSmartPointer<vtkPolyData> poly;
 					m_PolylineGraph->CopyToPolydata(poly);
 
+					vtkMAFSmartPointer<vtkCharArray> scalar;
+					scalar->SetNumberOfComponents(1);
+					scalar->SetNumberOfTuples(m_PolylineGraph->GetNumberOfVertices());
+					for (int i=0;i<m_PolylineGraph->GetNumberOfVertices();i++)
+					{
+						scalar->SetTuple1(i,0);
+					}
+					scalar->SetTuple1(m_SelectedPointVTK,1);
+					poly->GetPointData()->SetScalars(scalar);
+
 					UpdateVMEEditorData(poly);
+
+					//VME Selection data are composed by sphere
+					m_VMEEditorSelection->SetData(m_Glyph->GetOutput(),0.0);
 
 					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 				}
@@ -428,7 +443,7 @@ void medGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 
 				vtkMAFSmartPointer<vtkPolyData> poly;
 				m_PolylineGraph->CopyToPolydata(poly);
-				int SelectedPointVTK=poly->FindPoint(vertexCoord);
+				m_SelectedPointVTK=poly->FindPoint(vertexCoord);
 				vtkMAFSmartPointer<vtkCharArray> scalar;
 				scalar->SetNumberOfComponents(1);
 				scalar->SetNumberOfTuples(m_PolylineGraph->GetNumberOfVertices());
@@ -436,7 +451,7 @@ void medGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 				{
 					scalar->SetTuple1(i,0);
 				}
-				scalar->SetTuple1(SelectedPointVTK,1);
+				scalar->SetTuple1(m_SelectedPointVTK,1);
 				poly->GetPointData()->SetScalars(scalar);
 				
 				UpdateVMEEditorData(poly);
@@ -460,10 +475,10 @@ void medGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 				m_PolylineGraph->CopyToPolydata(poly);
 				UpdateVMEEditorData(poly);
 
-				int SelectedPointVTK=m_Tube->GetOutput()->FindPoint(vertexCoord);
+				int SelectedTubePointVTK=m_Tube->GetOutput()->FindPoint(vertexCoord);
 				
 				double *normal;
-				normal=m_Tube->GetOutput()->GetPointData()->GetNormals()->GetTuple3(SelectedPointVTK);
+				normal=m_Tube->GetOutput()->GetPointData()->GetNormals()->GetTuple3(SelectedTubePointVTK);
 				vtkMath::Normalize(normal);
 
 				//Create a line by two points on the normal to intersect the polyline 
