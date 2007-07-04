@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoCropDeformableROI.cpp,v $
 Language:  C++
-Date:      $Date: 2007-06-15 14:17:50 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2007-07-04 14:56:45 $
+Version:   $Revision: 1.5 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -135,7 +135,7 @@ void mmoCropDeformableROI::OpRun()
 	m_Gui->Double(ID_DISTANCE,_("distance"),&m_Distance,0.0);
 	m_Gui->Double(ID_FILL_VALUE,_("fill value"),&m_FillValue);
 	m_Gui->Double(ID_MAX_DISTANCE,_("max dist."),&m_MaxDistance,0.0);
-	m_Gui->Bool(ID_INSIDE_OUT,_("crop inside out"),&m_InsideOut);
+	m_Gui->Bool(ID_INSIDE_OUT,_("mask inside out"),&m_InsideOut);
 
 	m_Gui->OkCancel();
 
