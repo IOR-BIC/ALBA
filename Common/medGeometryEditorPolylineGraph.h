@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2007-07-04 09:37:48 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-07-04 09:50:25 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -51,7 +51,7 @@ MafMedical is partially based on OpenMAF.
 // forward references :
 //----------------------------------------------------------------------------
 class mafVME;
-class medVMEEditor;
+class medVMEPolylineEditor;
 class mafPolylineGraph;
 class mmgGui;
 class mmiPicker;
@@ -110,8 +110,8 @@ protected:
 	mmiPicker					*m_Picker;
 	mafInteractor			*m_OldBehavior;
 
-	medVMEEditor			*m_VMEPolylineEditor;
-	medVMEEditor			*m_VMEPolylineSelection;///<VME that show the selection
+	medVMEPolylineEditor			*m_VMEPolylineEditor;
+	medVMEPolylineEditor			*m_VMEPolylineSelection;///<VME that show the selection
 	mafPolylineGraph	*m_PolylineGraph;
 
 	mmgGui	*m_Gui;
