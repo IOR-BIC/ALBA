@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-26 07:42:14 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-07-04 13:46:15 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,7 +60,7 @@
 #include "vtkPointData.h"
 #include "vtkDataObject.h"
 #include "vtkRectilinearGrid.h"
-#include "mafVMEScalar.h"
+#include "medVMEEmg.h"
 #include "vtkLegendBoxActor.h"
 
 //----------------------------------------------------------------------------
@@ -102,15 +102,14 @@ medPipeGraph::~medPipeGraph()
   m_RenFront->SetBackground(m_OldColour);
 
   vtkDEL(m_Actor1);
- 
-}
+  }
 //----------------------------------------------------------------------------
 void medPipeGraph::Create(mafSceneNode *n)
 //----------------------------------------------------------------------------
 {
   Superclass::Create(n);
  
-  mafVMEScalar *m_Emg_plot = mafVMEScalar::SafeDownCast(m_Vme);
+  medVMEEmg *m_Emg_plot = medVMEEmg::SafeDownCast(m_Vme);
 
   m_Emg_plot->Update();
   m_Emg_plot->GetTimeStamps(m_TimeVector);
@@ -184,7 +183,7 @@ void medPipeGraph::Create(mafSceneNode *n)
   m_Actor1->SetPlotColor(32,124,252,0);
 
   m_RenFront->GetBackground(m_OldColour); // Save the old Color so we can restore it
-  m_RenFront->SetBackground(1,1,1);     
+  m_RenFront->SetBackground(1,1,1);   
 }
 
 //----------------------------------------------------------------------------
@@ -193,11 +192,11 @@ void medPipeGraph::UpdateGraph()
 {
   mafTimeStamp t;
   vtkDoubleArray *scalar;
-  scalar = vtkDoubleArray::New();
+  //scalar = vtkDoubleArray::New();
   m_vtkData.clear();
   scalar_Array.clear();
 
-  mafVMEScalar *m_Emg_plot = mafVMEScalar::SafeDownCast(m_Vme);
+  medVMEEmg *m_Emg_plot = medVMEEmg::SafeDownCast(m_Vme);
   
   int x_dim = m_TimeVector.size(); 
   

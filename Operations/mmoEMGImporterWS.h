@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoEMGImporterWS.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-09 13:41:07 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-07-04 13:46:32 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -23,7 +23,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // forward references :
 //----------------------------------------------------------------------------
 class mafEvent;
-class mafVMEScalar;
+class medVMEEmg;
 
 //----------------------------------------------------------------------------
 // mmoEMGImporterWS :
@@ -49,7 +49,7 @@ public:
   2) Read the second line containing the Frequency
   2) Ignore 2 lines
   3) the first element of each line is Time, then n scalar values
-  4) Put the values in a mafVMEScalar item 
+  4) Put the values in a medVMEEmg item 
   */
   void Read();
 
@@ -58,7 +58,7 @@ public:
 
 
 protected:
-  mafVMEScalar *m_EmgScalar;
+  medVMEEmg *m_EmgScalar;
   vnl_matrix<double> m_Emg_matrix;
   wxString m_FileDir;
 	wxString m_File;

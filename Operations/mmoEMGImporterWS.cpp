@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoEMGImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-14 09:13:20 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-07-04 13:46:32 $
+  Version:   $Revision: 1.4 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,7 +30,7 @@
 #include "mmgGui.h"
 
 #include "mafVME.h"
-#include "mafVMEScalar.h"
+#include "medVMEEmg.h"
 #include "mafTagArray.h"
 #include "mafSmartPointer.h"
 
