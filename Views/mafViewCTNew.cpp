@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-06-12 13:14:06 $
-Version:   $Revision: 1.19 $
+Date:      $Date: 2007-07-04 13:15:57 $
+Version:   $Revision: 1.20 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -77,7 +77,7 @@ mafViewCTNew::mafViewCTNew(wxString label)
 	m_WidthSection = 30;
 	m_HeightSection = 50;
 
-  m_Thickness = 1;
+  m_Thickness = 0;
 	m_AdditionalProfileNumber = 0;
 	m_ProfileDistance = 0;
 
@@ -587,7 +587,7 @@ void mafViewCTNew::ProbeVolume()
 				{
 					sumVector[j] += probeVector[i]->GetPolyDataOutput()->GetPointData()->GetScalars()->GetTuple1(j);
 				}
-				sumVector[j] = sumVector[j]/probeVector.size();
+				sumVector[j] = sumVector[j]/(m_AdditionalProfileNumber*2+1);
 			}
 
 

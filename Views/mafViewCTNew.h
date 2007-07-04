@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.h,v $
 Language:  C++
-Date:      $Date: 2007-03-15 10:06:05 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2007-07-04 13:15:57 $
+Version:   $Revision: 1.9 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -106,6 +106,9 @@ public:
   Update normal and position in the idview ViewSlice*/
   void SetCTLookupTable(double range[2]);
   void SetCTLookupTable(double min, double max);
+
+  /*Set the thickness of every slice actor*/
+  void SetThickness(double value){m_Thickness = value;};
 
 	virtual void CameraUpdate();
 	virtual void CameraReset(mafNode *node = NULL);
