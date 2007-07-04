@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtrusionHoles.cpp,v $
 Language:  C++
-Date:      $Date: 2007-06-26 13:41:48 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-07-04 14:48:19 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -134,6 +134,7 @@ enum FILTER_SURFACE_ID
 	ID_CANCEL,
 	ID_EXTRUSION_FACTOR,
 	ID_EXTRUDE,
+	ID_RADIUS,
 };
 //----------------------------------------------------------------------------
 void mmoExtrusionHoles::OpRun()   
@@ -212,6 +213,12 @@ void mmoExtrusionHoles::OnEvent(mafEventBase *maf_event)
 		case ID_EXTRUDE:
 			{
 				SaveExtrusion();
+			}
+			break;
+		case ID_RADIUS:
+			{
+				m_Sphere->SetRadius(m_SphereRadius);
+				m_Rwi->CameraUpdate();
 			}
 			break;
 		case ID_OK:
@@ -383,18 +390,29 @@ void mmoExtrusionHoles::CreateOpDialog()
 	h_sizer3->Add(m_ButtonOk,0,wxRIGHT);
 	h_sizer3->Add(b_cancel,0,wxRIGHT);
 
+	wxStaticText *label1 = new wxStaticText(m_Dialog, -1, _("sphere radius"),p, wxSize(80, 16 ));
+	wxTextCtrl *radius		= new wxTextCtrl(m_Dialog,ID_RADIUS, _("sphere radius"),p,wxSize(50, 16 ), wxNO_BORDER );
+	
+	wxStaticText *label2 = new wxStaticText(m_Dialog, -1, _("extrusion factor"),p, wxSize(80, 16 ));
 	wxTextCtrl *extrusion = new wxTextCtrl(m_Dialog,ID_EXTRUSION_FACTOR, _("extrusion factor"),p,wxSize(50, 16 ), wxNO_BORDER );
-	mmgButton  *b_extrude	= new mmgButton(m_Dialog, ID_EXTRUDE,_("apply extrusion"), p, wxSize(80,20));
+	mmgButton  *b_extrude	= new mmgButton(m_Dialog, ID_EXTRUDE,_("apply extrusion"), p, wxSize(90,20));
 
 	b_extrude->SetValidator(mmgValidator(this,ID_EXTRUDE,b_extrude));
+	radius->SetValidator(mmgValidator(this,ID_RADIUS,radius,&m_SphereRadius,0.0,999.0));
 	extrusion->SetValidator(mmgValidator(this,ID_EXTRUSION_FACTOR,extrusion,&m_ExtrusionFactor,-999.0,999.0));
 
+	wxBoxSizer *h_sizer1 = new wxBoxSizer(wxHORIZONTAL);
+	h_sizer1->Add(label1,0,wxRIGHT);
+	h_sizer1->Add(radius,0,wxRIGHT);
+
 	wxBoxSizer *h_sizer2 = new wxBoxSizer(wxHORIZONTAL);
-	h_sizer2->Add(b_extrude,0,wxRIGHT);
+	h_sizer2->Add(label2,0,wxRIGHT);
 	h_sizer2->Add(extrusion,0,wxRIGHT);
+	h_sizer2->Add(b_extrude,0,wxRIGHT);
 
 	wxBoxSizer *v_sizer =  new wxBoxSizer( wxVERTICAL );
 	v_sizer->Add(m_Rwi->m_RwiBase, 1,wxEXPAND);
+	v_sizer->Add(h_sizer1,     0,wxEXPAND | wxALL,5);
 	v_sizer->Add(h_sizer2,     0,wxEXPAND | wxALL,5);
 	v_sizer->Add(h_sizer3,     0,wxEXPAND | wxALL,5);
 
@@ -443,12 +461,12 @@ void mmoExtrusionHoles::CreatePolydataPipeline()
 	dimY = (BoundingBox[3] - BoundingBox[2]);
 	dimZ = (BoundingBox[5] - BoundingBox[4]);
 	double maxBounds = (dimX >= dimY) ? (dimX >= dimZ ? dimX : dimZ) : (dimY >= dimZ ? dimY : dimZ); 
-	m_Diameter = maxBounds / 100;
+	m_SphereRadius = maxBounds / 100;
 
 	ExtractFreeEdge();
 
 	vtkNEW(m_Sphere);
-	m_Sphere->SetRadius(m_Diameter);
+	m_Sphere->SetRadius(m_SphereRadius);
 
 	//Create a Glyph to highlight the holes
 	vtkGlyph3D *glyph;

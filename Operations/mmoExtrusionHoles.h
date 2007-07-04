@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtrusionHoles.h,v $
 Language:  C++
-Date:      $Date: 2007-06-20 16:43:18 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-07-04 14:48:19 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -109,7 +109,7 @@ public:
 	void SetExtrusionFactor(double value){m_ExtrusionFactor = value;};
 	double GetExtrusionFactor(){return m_ExtrusionFactor;};
 
-	int GetExtractFreeEdgesNumeberOfPoints(){if(m_ExtractFreeEdges)return m_ExtractFreeEdges->GetOutput()->GetNumberOfPoints();};
+	int GetExtractFreeEdgesNumeberOfPoints(){if(m_ExtractFreeEdges)return m_ExtractFreeEdges->GetOutput()->GetNumberOfPoints(); else return 0;};
 
 	vtkPolyData* GetExtrutedSurface(){return m_ResultPolydata;};
 
@@ -131,7 +131,7 @@ protected:
 	mafVMESurface					*m_ResultSurface;
 	vtkAppendPolyData			*m_ResultAfterExtrusion;
 
-	double								m_Diameter;
+	double								m_SphereRadius;
 	double								m_ExtrusionFactor;
 
 	vtkPolyDataMapper			*m_SurfaceMapper;
