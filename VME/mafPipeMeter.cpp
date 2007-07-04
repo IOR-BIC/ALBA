@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:55:55 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2007-07-04 12:50:24 $
+  Version:   $Revision: 1.18 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -159,6 +159,11 @@ void mafPipeMeter::Create(mafSceneNode *n/*, bool use_axes*/)
     double c[3];
     m_DataActor->GetProperty()->GetColor(c);
     m_Caption->GetProperty()->SetColor(c);
+  }
+  else
+  {
+    m_DataActor->GetProperty()->SetColor(m_MeterVME->GetMaterial()->m_Diffuse);
+    m_Caption->GetProperty()->SetColor(m_MeterVME->GetMaterial()->m_Diffuse);
   }
 //  else
 //    Caption->GetProperty()->SetColor(data->m_mat_gui->GetMaterial()->m_prop->GetColor());
@@ -337,7 +342,7 @@ void mafPipeMeter::UpdateProperty(bool fromTag)
   if(m_MeterVME->GetMeterMode() == mafVMEMeter::LINE_ANGLE) distance_value = m_MeterVME->GetAngle();
   distance_value = RoundValue(distance_value);
   wxString dis;
-  dis = wxString::Format("%g",distance_value);
+  dis = wxString::Format("%.2f",distance_value);
   m_Caption->SetCaption(dis.c_str());
   m_Caption->SetVisibility(m_MeterVME->GetMeterAttributes()->m_LabelVisibility);
 
@@ -358,8 +363,8 @@ void mafPipeMeter::UpdateProperty(bool fromTag)
   else
   {
     m_DataMapper->SetColorModeToDefault();
-    m_DataActor->GetProperty()->GetColor(rgb);
-    m_Caption->GetProperty()->SetColor(rgb);
+    m_DataActor->GetProperty()->SetColor(m_MeterVME->GetMaterial()->m_Diffuse);
+    m_Caption->GetProperty()->SetColor(m_MeterVME->GetMaterial()->m_Diffuse);
   }
 
   double pos[3] = {0,0,0};
