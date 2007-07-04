@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-06-12 11:12:19 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2007-07-04 12:48:09 $
+Version:   $Revision: 1.8 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -165,7 +165,7 @@ void mmgApplicationSettings::OnEvent(mafEventBase *maf_event)
     break;
 		case IMAGE_TYPE_ID:
 		{
-			m_Config->Write("ImageType",wxString::Format("%d",m_ImageTypeId));
+			m_Config->Write("ImageType",m_ImageTypeId);
 		}
 		break;
     default:
@@ -275,7 +275,7 @@ void mmgApplicationSettings::InitializeApplicationSettings()
   }
   if(m_Config->Read("ImageType", &long_item))
   {
-    m_ImageTypeId = atoi(mafString(long_item));
+    m_ImageTypeId = long_item;
   }
   else
   {

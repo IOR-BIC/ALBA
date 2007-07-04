@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-04 07:42:22 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-07-04 12:47:24 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -59,7 +59,7 @@ mafTransformBase::mafTransformBase(const mafTransformBase& copy)
   m_Matrix->DeepCopy(copy.m_Matrix);
 #ifdef MAF_USE_VTK
   if(copy.m_VTKTransform)
-	  m_VTKTransform->DeepCopy(copy.m_VTKTransform);
+	  GetVTKTransform()->DeepCopy(copy.m_VTKTransform);
   else
     m_VTKTransform = NULL;
 #endif
