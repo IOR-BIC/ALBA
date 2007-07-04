@@ -28,6 +28,14 @@ SET(PROJECT_SRCS
 
   mafPolylineGraph.cpp
   mafPolylineGraph.h
+  medVMEPolylineGraph.cpp
+  medVMEPolylineGraph.h
+  medVMEPolylineEditor.cpp
+  medVMEPolylineEditor.h
+  medPipePolylineGraphEditor.cpp
+  medPipePolylineGraphEditor.h
+  medVMEOutputPolylineEditor.cpp
+  medVMEOutputPolylineEditor.h
 )
 
 IF (MAF_USE_ITK)
