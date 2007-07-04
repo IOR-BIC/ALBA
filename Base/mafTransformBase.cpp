@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-04 12:47:24 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-07-04 12:49:01 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -64,7 +64,6 @@ mafTransformBase::mafTransformBase(const mafTransformBase& copy)
     m_VTKTransform = NULL;
 #endif
 	m_TimeStamp = copy.m_TimeStamp;
-
 }
 
 //----------------------------------------------------------------------------
