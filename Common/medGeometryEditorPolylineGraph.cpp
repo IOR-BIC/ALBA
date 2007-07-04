@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-03 11:00:31 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-07-04 09:37:48 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -100,9 +100,9 @@ medGeometryEditorPolylineGraph::medGeometryEditorPolylineGraph(mafVME *input, ma
 	vtkMAFSmartPointer<vtkPolyData> data;
 	m_PolylineGraph->CopyToPolydata(data);
 
-	mafNEW(m_VMEEditor);
-	m_VMEEditor->SetName("VME Editor");
-	m_VMEEditor->ReparentTo(mafVME::SafeDownCast(input->GetRoot()));
+	mafNEW(m_VMEPolylineEditor);
+	m_VMEPolylineEditor->SetName("VME Editor");
+	m_VMEPolylineEditor->ReparentTo(mafVME::SafeDownCast(input->GetRoot()));
 
 	m_InputVME	=	input;
 	m_Listener	= listener;
@@ -118,10 +118,10 @@ medGeometryEditorPolylineGraph::medGeometryEditorPolylineGraph(mafVME *input, ma
 	CreateISA();
 	CreatePipe();
 
-	m_VMEEditor->SetData(m_AppendPolydata->GetOutput(),0.0);
+	m_VMEPolylineEditor->SetData(m_AppendPolydata->GetOutput(),0.0);
 
-	mafNEW(m_VMEEditorSelection);
-	m_VMEEditorSelection->ReparentTo(mafVME::SafeDownCast(input->GetRoot()));
+	mafNEW(m_VMEPolylineSelection);
+	m_VMEPolylineSelection->ReparentTo(mafVME::SafeDownCast(input->GetRoot()));
 
 	m_SelectedPoint = -1;
 	m_SelectedPointVTK = -1;
@@ -163,11 +163,11 @@ medGeometryEditorPolylineGraph::~medGeometryEditorPolylineGraph()
 {
 	m_InputVME->SetBehavior(m_OldBehavior);
 
-	m_VMEEditor->SetBehavior(NULL);
-	m_VMEEditor->ReparentTo(NULL);
+	m_VMEPolylineEditor->SetBehavior(NULL);
+	m_VMEPolylineEditor->ReparentTo(NULL);
 
-	m_VMEEditorSelection->SetBehavior(NULL);
-	m_VMEEditorSelection->ReparentTo(NULL);
+	m_VMEPolylineSelection->SetBehavior(NULL);
+	m_VMEPolylineSelection->ReparentTo(NULL);
 	
 	mafDEL(m_Picker);
 
@@ -179,7 +179,7 @@ medGeometryEditorPolylineGraph::~medGeometryEditorPolylineGraph()
 void medGeometryEditorPolylineGraph::Show(bool show)
 //----------------------------------------------------------------------------
 {
-	mafEventMacro(mafEvent(this,VME_SHOW,m_VMEEditor,show));
+	mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineEditor,show));
 }
 //----------------------------------------------------------------------------
 enum EDITOR_GRAPH_ID
@@ -231,12 +231,12 @@ void medGeometryEditorPolylineGraph::BehaviorUpdate()
 	{
 		if(m_PointTool==ID_ADD_POINT)//If the user want to add a point
 		{
-			m_VMEEditor->SetBehavior(NULL);
+			m_VMEPolylineEditor->SetBehavior(NULL);
 			m_InputVME->SetBehavior(m_Picker);
 		}
 		else if( m_PointTool==ID_MOVE_POINT || m_PointTool==ID_SELECT_POINT )//If the user want to move or select a point
 		{
-			m_VMEEditor->SetBehavior(m_Picker);
+			m_VMEPolylineEditor->SetBehavior(m_Picker);
 			m_InputVME->SetBehavior(NULL);
 		}
 	}
@@ -244,12 +244,12 @@ void medGeometryEditorPolylineGraph::BehaviorUpdate()
 	{
 		if(m_BranchTool==ID_SELECT_BRANCH)//If the user want select a branch
 		{
-			m_VMEEditor->SetBehavior(m_Picker);
+			m_VMEPolylineEditor->SetBehavior(m_Picker);
 			m_InputVME->SetBehavior(NULL);
 		}
 		else if(m_BranchTool==ID_ADD_BRANCH)//If the user want add a branch
 		{
-			m_VMEEditor->SetBehavior(NULL);
+			m_VMEPolylineEditor->SetBehavior(NULL);
 			m_InputVME->SetBehavior(m_Picker);
 		}
 	}
@@ -341,8 +341,8 @@ int medGeometryEditorPolylineGraph::UpdateVMEEditorData(vtkPolyData *polydata)
 	m_AppendPolydata->AddInput(m_Tube->GetOutput());
 	m_AppendPolydata->Update();
 
-	int result = m_VMEEditor->SetData(m_AppendPolydata->GetOutput(),m_VMEEditor->GetTimeStamp());
-	m_VMEEditor->Update();
+	int result = m_VMEPolylineEditor->SetData(m_AppendPolydata->GetOutput(),m_VMEPolylineEditor->GetTimeStamp());
+	m_VMEPolylineEditor->Update();
 
 	return result;
 }
@@ -356,7 +356,7 @@ void medGeometryEditorPolylineGraph::CreateISA()
 	m_Picker->SetListener(this);
 
 	m_InputVME->SetBehavior(m_Picker);
-	m_VMEEditor->SetBehavior(NULL);
+	m_VMEPolylineEditor->SetBehavior(NULL);
 }
 //----------------------------------------------------------------------------
 vtkPolyData* medGeometryEditorPolylineGraph::GetOutput()
@@ -414,7 +414,7 @@ void medGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 					UpdateVMEEditorData(poly);
 
 					//VME Selection data are composed by sphere
-					m_VMEEditorSelection->SetData(m_Glyph->GetOutput(),0.0);
+					m_VMEPolylineSelection->SetData(m_Glyph->GetOutput(),0.0);
 
 					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 				}
@@ -457,8 +457,8 @@ void medGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 				UpdateVMEEditorData(poly);
 
 				//VME Selection data are composed by sphere
-				m_VMEEditorSelection->SetData(m_Glyph->GetOutput(),0.0);
-				mafEventMacro(mafEvent(this,VME_SHOW,m_VMEEditorSelection,true));
+				m_VMEPolylineSelection->SetData(m_Glyph->GetOutput(),0.0);
+				mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,true));
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 			}
 		}
@@ -532,12 +532,12 @@ void medGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 				tube->SetCapping(true);
 				tube->SetNumberOfSides(5);
 
-				m_VMEEditorSelection->SetData(tube->GetOutput(),0.0);
+				m_VMEPolylineSelection->SetData(tube->GetOutput(),0.0);
 
 				m_CurrentBranch = CellID;
 
-				mafEventMacro(mafEvent(this,VME_SHOW,m_VMEEditorSelection,false));
-				mafEventMacro(mafEvent(this,VME_SHOW,m_VMEEditorSelection,true));
+				mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
+				mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,true));
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 			}
 			else if(m_BranchTool==ID_ADD_BRANCH)
@@ -555,11 +555,11 @@ void medGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 
 					AddNewVertex(pos);
 
-					m_VMEEditorSelection->SetData(m_Tube->GetOutput(),0.0);
+					m_VMEPolylineSelection->SetData(m_Tube->GetOutput(),0.0);
 
 					m_SelectedPoint = -1;
 
-					mafEventMacro(mafEvent(this,VME_SHOW,m_VMEEditorSelection,false));
+					mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
 					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 				}
 			}

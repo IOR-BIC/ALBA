@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2007-07-03 11:00:31 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-07-04 09:37:48 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -110,8 +110,8 @@ protected:
 	mmiPicker					*m_Picker;
 	mafInteractor			*m_OldBehavior;
 
-	medVMEEditor			*m_VMEEditor;
-	medVMEEditor			*m_VMEEditorSelection;///<VME that show the selection
+	medVMEEditor			*m_VMEPolylineEditor;
+	medVMEEditor			*m_VMEPolylineSelection;///<VME that show the selection
 	mafPolylineGraph	*m_PolylineGraph;
 
 	mmgGui	*m_Gui;
