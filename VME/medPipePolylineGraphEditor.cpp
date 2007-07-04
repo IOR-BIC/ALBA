@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipePolylineGraphEditor.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-03 10:58:01 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-07-04 09:51:39 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -54,7 +54,7 @@ MafMedical is partially based on OpenMAF.
 #include "mmgGui.h"
 
 #include "mafVME.h"
-#include "medVMEOutputEditor.h"
+#include "medVMEOutputPolylineEditor.h"
 
 #include "vtkMAFAssembly.h"
 
@@ -85,7 +85,7 @@ void medPipePolylineGraphEditor::Create(mafSceneNode *n)
 
 	m_Selected = false;
 
-	medVMEOutputEditor *out_polyline = medVMEOutputEditor::SafeDownCast(m_Vme->GetOutput());
+	medVMEOutputPolylineEditor *out_polyline = medVMEOutputPolylineEditor::SafeDownCast(m_Vme->GetOutput());
 	assert(out_polyline);
 	vtkPolyData *data = vtkPolyData::SafeDownCast(out_polyline->GetVTKData());
 	assert(data);
