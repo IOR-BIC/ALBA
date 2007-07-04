@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:52:50 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-07-04 07:42:22 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -52,6 +52,19 @@ mafTransformBase::~mafTransformBase()
 mafTransformBase::mafTransformBase(const mafTransformBase& copy)
 //----------------------------------------------------------------------------
 {
+	mafNEW(m_Matrix); // dynamic allocation to allow reference counting
+	m_EventSource = new mafEventSource;
+	m_TimeStamp = 0;
+
+  m_Matrix->DeepCopy(copy.m_Matrix);
+#ifdef MAF_USE_VTK
+  if(copy.m_VTKTransform)
+	  m_VTKTransform->DeepCopy(copy.m_VTKTransform);
+  else
+    m_VTKTransform = NULL;
+#endif
+	m_TimeStamp = copy.m_TimeStamp;
+
 }
 
 //----------------------------------------------------------------------------
