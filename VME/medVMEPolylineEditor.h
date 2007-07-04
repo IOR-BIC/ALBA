@@ -1,8 +1,8 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: medVMEPolylineEditor..h,v $
+Module:    $RCSfile: medVMEPolylineEditor.h,v $
 Language:  C++
-Date:      $Date: 2007-07-04 09:44:00 $
+Date:      $Date: 2007-07-04 09:46:41 $
 Version:   $Revision: 1.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
