@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractiveClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-26 14:29:19 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-07-04 13:49:48 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -333,9 +333,24 @@ void medOpInteractiveClipSurface::ClipBoundingBox()
 //----------------------------------------------------------------------------
 {
 
+	vtkMAFSmartPointer<vtkTransform> rotate;
+	rotate->RotateX(180);
+
+	vtkMAFSmartPointer<vtkTransformPolyDataFilter> before_transform_plane;
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transform_plane;
+	if(ClipInside==1)//if clip reverse is necessary rotate plane
+	{
+		before_transform_plane->SetTransform(rotate);
+		before_transform_plane->SetInput(m_PlaneSource->GetOutput());
+		before_transform_plane->Update();
+
+		transform_plane->SetInput(before_transform_plane->GetOutput());
+	}
+	else
+		transform_plane->SetInput(m_PlaneSource->GetOutput());
+	
+	
 	transform_plane->SetTransform(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetVTKTransform());
-	transform_plane->SetInput(m_PlaneSource->GetOutput());
 	transform_plane->Update();
 
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transform_data_input;
@@ -345,7 +360,7 @@ void medOpInteractiveClipSurface::ClipBoundingBox()
 
 	m_ClipperBoundingBox->SetInput(transform_data_input->GetOutput());
 	m_ClipperBoundingBox->SetMask(transform_plane->GetOutput());
-	m_ClipperBoundingBox->SetClipInside(ClipInside);
+	m_ClipperBoundingBox->SetClipInside(0);
 	m_ClipperBoundingBox->Update();
 
 	vtkPolyData *newPolyData;
