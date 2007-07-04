@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipePolyline.cpp,v $
 Language:  C++
-Date:      $Date: 2007-06-25 09:23:47 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2007-07-04 12:50:57 $
+Version:   $Revision: 1.10 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -730,6 +730,8 @@ vtkPolyData *mafPipePolyline::SplineProcess(vtkPolyData *polyData)
   vtkMAFSmartPointer<vtkCardinalSpline> splineY;
   vtkMAFSmartPointer<vtkCardinalSpline> splineZ;
 
+  
+
   for(int i=0 ; i<pts->GetNumberOfPoints(); i++)
   {
     //mafLogMessage(wxString::Format(_("old %d : %f %f %f"), i, pts->GetPoint(i)[0],pts->GetPoint(i)[1],pts->GetPoint(i)[2] ));
@@ -770,14 +772,18 @@ vtkPolyData *mafPipePolyline::SplineProcess(vtkPolyData *polyData)
       else
       {
         //here insert scalar calculating the nearest point
-        int ratio;
-        ratio = (int)(ptsSplined->GetNumberOfPoints()) / (pts->GetNumberOfPoints() -1) ;
-        if((i % ratio) == (ratio -1) && m_Representation != GLYPH) //workaround to remove
-          resultsArray->InsertNextTuple1(polyData->GetPointData()->GetScalars()->GetTuple1(i/ratio + 1));
-        else 
-          resultsArray->InsertNextTuple1(minimum);
+        if(pts->GetNumberOfPoints() == 0); 
+        else if(pts->GetNumberOfPoints() == 1) resultsArray->InsertNextTuple1(minimum);
+        else
+        {
+          int ratio;
+          ratio = (int)(ptsSplined->GetNumberOfPoints()) / (pts->GetNumberOfPoints() -1) ;
+          if((i % ratio) == (ratio -1) && m_Representation != GLYPH) //workaround to remove
+            resultsArray->InsertNextTuple1(polyData->GetPointData()->GetScalars()->GetTuple1(i/ratio + 1));
+          else 
+            resultsArray->InsertNextTuple1(minimum);
+        }
 
-        //distance control
       }
     }
     m_PolySpline->GetPointData()->SetScalars(resultsArray);
