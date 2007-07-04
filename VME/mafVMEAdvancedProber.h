@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-29 12:40:45 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-07-04 09:58:56 $
+  Version:   $Revision: 1.8 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -154,7 +154,8 @@ protected:
 
   wxListBox *m_ListBox;
 	//int m_SplineCoefficient;
-  int m_AdditionalProfileNumber;
+
+  int m_AdditionalProfileNumber;int m_ControlAdditionalProfileNumber;
 
   double m_SamplingCoefficient; double m_ControlSamplingCoefficient;
   double m_ProfileDistance; double m_ControlProfileDistance;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-29 12:40:45 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-07-04 09:58:56 $
+  Version:   $Revision: 1.10 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -858,6 +858,7 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
    m_ControlPoints->DeepCopy(vtkPolyData::SafeDownCast(vme->GetPolylineLink()->GetOutput()->GetVTKData())->GetPoints());
    m_ControlSamplingCoefficient = m_SamplingCoefficient;
    m_ControlProfileDistance = m_ProfileDistance;
+   m_ControlAdditionalProfileNumber = m_AdditionalProfileNumber;
 
    for(int i=0; i< m_PointsVector.size();i++)
    {
@@ -1637,7 +1638,8 @@ bool mafVMEAdvancedProber::CheckUpdatePanoramic(mafVMEPolylineSpline *vme)
   vtkPoints *tempPoints;
 
   if( m_SamplingCoefficient != m_ControlSamplingCoefficient ||
-      m_ProfileDistance     != m_ControlProfileDistance)
+      m_ProfileDistance     != m_ControlProfileDistance     ||
+      m_AdditionalProfileNumber != m_ControlAdditionalProfileNumber)
       return true;
 
   if(vme)
