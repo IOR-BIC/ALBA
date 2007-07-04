@@ -16,6 +16,8 @@ SET(PROJECT_SRCS
   mmiSelectPoint.h
   medLogicWithManagers.cpp
   medLogicWithManagers.h
+  medGeometryEditorPolylineGraph.cpp
+  medGeometryEditorPolylineGraph.h
 )
 
 # List libraries that are needed by this project.
