@@ -46,6 +46,8 @@ SET(PROJECT_SRCS
   medOpSplitSurface.h
   medOpInteractiveClipSurface.cpp
   medOpInteractiveClipSurface.h
+  medOpCreateEditSkeleton.cpp
+  medOpCreateEditSkeleton.h
 )
 
 IF (MAF_USE_ITK)
