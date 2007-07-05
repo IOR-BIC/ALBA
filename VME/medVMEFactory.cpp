@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-04 09:44:43 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-07-05 08:28:58 $
+  Version:   $Revision: 1.7 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,6 +26,7 @@
 #include "mafVMEAdvancedSlicer.h"
 #include "medVMEPolylineGraph.h"
 #include "medVMEPolylineEditor.h"
+#include "medVMEEmg.h"
 
 #ifdef MAF_USE_ITK
   #include "mafVMERawMotionData.h"
@@ -80,6 +81,7 @@ medVMEFactory::medVMEFactory()
 	mafPlugNodeMacro(mafVMEAdvancedSlicer,"VME for Advanced Slicing");
   mafPlugNodeMacro(medVMEPolylineGraph,"VME for Graph and Polyline");
 	mafPlugNodeMacro(medVMEPolylineEditor,"VME for Editing Graph and Polyline");
+  mafPlugNodeMacro(medVMEEmg,"VME rapresenting EMG scalar data");
 
 #ifdef MAF_USE_ITK
   mafPlugNodeMacro(mafVMERawMotionData,"VME that is a group for RawMotionData");
