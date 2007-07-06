@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoEMGImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-04 13:46:32 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-07-06 13:44:31 $
+  Version:   $Revision: 1.5 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -162,14 +162,14 @@ void mmoEMGImporterWS::Read()
     {
       scalar = tkz.GetNextToken();
       val_scalar = atof(scalar);
-      m_Emg_matrix.set_size(1,num_tk - 1);
+      m_EmgMatrix.set_size(1,num_tk - 1);
 
-      m_Emg_matrix.put(0,i,val_scalar); //Add scalar value to the vnl_matrix
+      m_EmgMatrix.put(0,i,val_scalar); //Add scalar value to the vnl_matrix
 
       i++;     
     }
 
-    m_EmgScalar->SetData(m_Emg_matrix, emg_time);
+    m_EmgScalar->SetData(m_EmgMatrix, emg_time);
 
     line = text.ReadLine();
     line.Replace(","," ");
