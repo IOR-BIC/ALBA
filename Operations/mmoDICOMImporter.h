@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-21 09:01:24 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-07-06 11:27:20 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -137,6 +137,7 @@ protected:
 	// crop mode variables
 	bool											m_CropFlag;
   bool										  m_CropMode;
+  bool                      m_BoxCorrect;
 
   // build volume mode variables
 	int												m_BuildStepValue;

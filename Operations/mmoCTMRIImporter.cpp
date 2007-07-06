@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTMRIImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-21 09:01:24 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2007-07-06 11:27:19 $
+  Version:   $Revision: 1.16 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -175,6 +175,8 @@ mmoCTMRIImporter::mmoCTMRIImporter(wxString label) : mafOp(label)
 	
 	m_GizmoStatus = GIZMO_NOT_EXIST;
 	m_SideToBeDragged = 0;
+
+  m_BoxCorrect = false;
 }
 //----------------------------------------------------------------------------
 mmoCTMRIImporter::~mmoCTMRIImporter()
@@ -1255,6 +1257,11 @@ void mmoCTMRIImporter::	OnEvent(mafEventBase *maf_event)
       break;
       case ID_CROP_BUTTON:
 				{
+        if( !m_BoxCorrect )
+        {
+          wxMessageBox("Error on selecting the box");
+          return;
+        }
         m_CropFlag = true;
         ShowSlice(m_CurrentSlice);
 				m_CropActor->VisibilityOff();
@@ -1508,11 +1515,28 @@ void mmoCTMRIImporter::	OnEvent(mafEventBase *maf_event)
       }
       break;
       case MOUSE_UP:  //blocca il gizmo
+      {
         if (m_CropMode == true)
           if (m_GizmoStatus == GIZMO_RESIZING)
             m_GizmoStatus = 	GIZMO_DONE;
           else if (m_GizmoStatus == GIZMO_DONE)
             m_SideToBeDragged = 0;
+
+        double p1[3], p2[3], origin[3];
+        m_CropPlane->GetPoint1(p1);
+        m_CropPlane->GetPoint2(p2);
+        m_CropPlane->GetOrigin(origin);
+
+        if( (p1[0] == p2[0] && p1[1] == p2[1] && p1[2] == p2[2])  ||
+          (p1[0] == origin[0] && p1[1] == origin[1] && p1[2] == origin[2]) ||
+          (p2[0] == origin[0] && p2[1] == origin[1] && p2[2] == origin[2])
+          )
+        {
+          m_BoxCorrect = false;
+        }
+        else
+          m_BoxCorrect = true;
+      }   
       break;
 			case ID_TYPE_DICOM:
 				/*if(m_DICOM==0)

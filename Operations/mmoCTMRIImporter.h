@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTMRIImporter.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-21 09:01:24 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-07-06 11:27:19 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -152,6 +152,7 @@ protected:
 	// crop mode variables
 	bool											m_CropFlag;
   bool										  m_CropMode;
+  bool                      m_BoxCorrect;
 
 	bool											m_AutoLoad; ///<If true the importer start from CRIM connection
 
