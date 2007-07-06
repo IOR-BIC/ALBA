@@ -35,6 +35,8 @@ SET(vtkMAF_SRCS
   vtkImplicitPolyData.h
   vtkLocalAxisCoordinate.cxx
   vtkLocalAxisCoordinate.h
+  vtkMAFMeshCutter.cxx
+  vtkMAFMeshCutter.h
   vtkProjectRG.cxx
   vtkProjectRG.h
   vtkProjectSP.cxx
