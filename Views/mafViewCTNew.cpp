@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-04 13:15:57 $
-Version:   $Revision: 1.20 $
+Date:      $Date: 2007-07-06 13:34:10 $
+Version:   $Revision: 1.21 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -187,11 +187,21 @@ void mafViewCTNew::VmeShow(mafNode *node, bool show)
 		if(node->GetTagArray()->IsTagPresent("MFL_MANDIBULAR_CANAL"))
 		{
 			m_ChildViewList[CT_COMPOUND]->VmeShow(node, show);
-			for(int i=0; i< CT_CHILD_VIEWS_NUMBER; i++)
-			{
-				UpdateSliceView(i);
-			}
-			CameraUpdate();
+      if(show)
+      {
+			  for(int i=0; i< CT_CHILD_VIEWS_NUMBER; i++)
+			  {
+				  UpdateSliceView(i);
+			  }
+			  CameraUpdate();
+      }
+      else
+      {
+        for(int i=0; i< CT_CHILD_VIEWS_NUMBER; i++)
+        {
+          ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND])->GetSubView(i))->UpdateSurfacesList(node);
+        }
+      }
 		}
 	}
 }
