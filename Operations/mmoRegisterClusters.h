@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRegisterClusters.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-15 14:17:50 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-07-09 16:58:31 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani      - porting Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,6 +18,8 @@
 //----------------------------------------------------------------------------
 #include "mafOp.h"
 #include "mafVMELandmarkCloud.h"
+#include "mafVMEGroup.h"
+#include "mafVMEInfoText.h"
 #include "mafVMESurface.h"
 
 //----------------------------------------------------------------------------
@@ -65,7 +67,7 @@ protected:
   
 	/** Register the source  on the target  according 
 	to the registration method selected: rigid, similar or affine. */
-	void RegisterPoints(double currTime = -1);
+	double RegisterPoints(double currTime = -1);
 
 	/** Check the correctness of the vme's type. */
 	void OnChooseVme(mafNode *vme);
@@ -77,6 +79,8 @@ protected:
 	mafVMELandmarkCloud*    m_Source;
 	mafVMELandmarkCloud*    m_Target;
 	mafVMELandmarkCloud*    m_Registered;
+  mafVMEGroup        *    m_Result;
+  mafVMEInfoText     *    m_Info;
 
 	mafVMELandmarkCloud*    m_CommonPoints;
 	double*					m_Weight;			 

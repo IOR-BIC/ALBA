@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRegisterClusters.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-15 14:17:50 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-07-09 16:58:31 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi  
 ==========================================================================
   Copyright (c) 2002/2004
@@ -65,9 +65,12 @@ mafOp(label)
   m_Target					= NULL;
   m_Registered			= NULL;
 	m_Follower				= NULL;
+  m_Result          = NULL;
+  m_Info            = NULL;
   m_PointsSource		= NULL;
   m_PointsTarget		= NULL;
-  
+
+
 	m_SourceName			="none";
   m_TargetName			="none";
 	m_FollowerName		="none";
@@ -90,6 +93,11 @@ mmoRegisterClusters::~mmoRegisterClusters( )
 	vtkDEL(m_Follower);
 	vtkDEL(m_PointsSource);
 	vtkDEL(m_PointsTarget);
+  mafDEL(m_Result);
+  mafDEL(m_Info);
+  mafDEL(m_Registered);
+  mafDEL(m_Follower);
+  mafDEL(m_CommonPoints);
 
   if(m_Weight)
 	{
@@ -299,6 +307,13 @@ void mmoRegisterClusters::OpDo()
 {
 	wxBusyInfo wait(_("Please wait, working..."));
 
+  mafNEW(m_Info);
+  wxString name = wxString::Format("Info for registration %s into %s",m_Source->GetName(), m_Target->GetName());
+  m_Info->SetName(name);
+  m_Info->SetPosLabel("Registration residual: ", 0);
+  m_Info->SetPosShow(true, 0);
+  mafEventMacro(mafEvent(this, VME_ADD, m_Info));
+
   //check for the multi-time registration
 	if(m_MultiTime)
 	{
@@ -323,7 +338,7 @@ void mmoRegisterClusters::OpDo()
 
 			if(ExtractMatchingPoints(currTime))
       {
-				RegisterPoints(currTime);
+				m_Info->SetAbsPose(RegisterPoints(currTime), 0.0, 0.0, 0.0, 0.0, 0.0, currTime);
       }
 		}
     timeStamps.clear();
@@ -333,10 +348,24 @@ void mmoRegisterClusters::OpDo()
 	else
 	{
 		//RegisterPoints(m_Source->GetCurrentTime());
-		RegisterPoints();
+		m_Info->SetAbsPose(RegisterPoints(), 0.0, 0.0, 0.0, 0.0, 0.0);
 	}
-	
-	if(m_Registered)
+
+  if(m_Registered || m_Follower)
+  {
+    mafNEW(m_Result);
+    wxString name = wxString::Format("%s registered into %s",m_Source->GetName(), m_Target->GetName());
+    m_Result->SetName(name);
+    mafEventMacro(mafEvent(this, VME_ADD, m_Result));
+    m_Info->ReparentTo(m_Result);
+  }
+  else
+  {
+    mafEventMacro(mafEvent(this, VME_REMOVE, m_Info));
+    mafDEL(m_Info);
+  }
+
+  if(m_Registered)
 	{
 		if(m_Apply)
 		{
@@ -437,7 +466,8 @@ void mmoRegisterClusters::OpDo()
       m_Registered->Close();
 			time.clear();
 		}
-		mafEventMacro(mafEvent(this, VME_ADD, m_Registered));
+    mafEventMacro(mafEvent(this, VME_ADD, m_Registered));
+    m_Registered->ReparentTo(m_Result);
 	}
 	
 	if(m_Follower)
@@ -445,6 +475,7 @@ void mmoRegisterClusters::OpDo()
 		wxString name = wxString::Format("%s registered on %s",m_Follower->GetName(), m_Target->GetName());
 		m_Follower->SetName(name);
 		mafEventMacro(mafEvent(this, VME_ADD, m_Follower));
+    m_Follower->ReparentTo(m_Result);
 	}
 
   mafEventMacro(mafEvent(this,TIME_SET,-1.0));
@@ -453,14 +484,13 @@ void mmoRegisterClusters::OpDo()
 void mmoRegisterClusters::OpUndo()
 //----------------------------------------------------------------------------
 {
-  assert(m_Registered);
-  mafEventMacro(mafEvent(this, VME_REMOVE, m_Registered));
-	vtkDEL(m_Registered);
-	if(m_Follower)
-	{
-		mafEventMacro(mafEvent(this, VME_REMOVE, m_Follower));
-		vtkDEL(m_Follower);
-	}
+  assert(m_Result);
+  mafEventMacro(mafEvent(this, VME_REMOVE, m_Result));
+	mafDEL(m_Result);
+  mafDEL(m_Registered);
+  mafDEL(m_Follower);
+  mafDEL(m_CommonPoints);
+  mafDEL(m_Info);
 }
 //----------------------------------------------------------------------------
 int mmoRegisterClusters::ExtractMatchingPoints(double time)
@@ -490,6 +520,7 @@ int mmoRegisterClusters::ExtractMatchingPoints(double time)
 	//number of common points between m_Source and m_Target
 	int ncp = 0;
 
+  mafDEL(m_CommonPoints);
 	m_CommonPoints = mafVMELandmarkCloud::New();
 
 	bool found_one = false;
@@ -538,9 +569,10 @@ int mmoRegisterClusters::ExtractMatchingPoints(double time)
 	return ncp;
 }
 //----------------------------------------------------------------------------
-void mmoRegisterClusters::RegisterPoints(double currTime)
+double mmoRegisterClusters::RegisterPoints(double currTime)
 //----------------------------------------------------------------------------
 {
+  double deviation = 0.0;
 	assert(m_PointsSource && m_PointsTarget);
 
 	vtkWeightedLandmarkTransform *RegisterTransform = vtkWeightedLandmarkTransform::New();
@@ -582,6 +614,32 @@ void mmoRegisterClusters::RegisterPoints(double currTime)
 		m_Registered->DeepCopy(m_Source);
 		m_Registered->SetName(name);
 	}
+
+  //calculate deviation
+  for(int i = 0; i < m_PointsSource->GetNumberOfPoints(); i++)
+  {
+    double coord[4];
+    double result[4];
+    double target[3];
+    double dx, dy, dz;
+    m_PointsSource->GetPoint(i, coord);
+    coord[3] = 1.0;
+
+    m_PointsTarget->GetPoint(i, target);
+
+    //transform point
+    RegisterTransform->GetMatrix()->MultiplyPoint(coord, result);
+
+    dx = target[0] - result[0];
+    dy = target[1] - result[1];
+    dz = target[2] - result[2];
+
+    deviation += dx * dx + dy * dy + dz * dz;
+  }
+  if(m_PointsSource->GetNumberOfPoints() != 0)
+    deviation /= m_PointsSource->GetNumberOfPoints();
+  deviation = sqrt(deviation);
+
 	
 	//post-multiply the registration matrix by the abs matrix of the target to position the
 	//registered  at the correct position in the space
@@ -590,6 +648,7 @@ void mmoRegisterClusters::RegisterPoints(double currTime)
 	mat->Identity();
   m_Target->GetOutput()->GetAbsMatrix(*mat,currTime);  //modified by Marco. 2-2-2004
   vtkMatrix4x4::Multiply4x4(mat->GetVTKMatrix(),RegisterTransform->GetMatrix(),t_matrix);
+  mafDEL(mat);
   
 	int numLandmarks = m_Target->GetNumberOfVisibleLandmarks(currTime);
 
@@ -597,7 +656,7 @@ void mmoRegisterClusters::RegisterPoints(double currTime)
 	{
 		RegisterTransform->Delete();
 		t_matrix->Delete();
-		return;
+		return deviation;
 	}
 	else
 	{
@@ -613,6 +672,7 @@ void mmoRegisterClusters::RegisterPoints(double currTime)
 
   vtkDEL(RegisterTransform);
 	vtkDEL(t_matrix);
+  return deviation;
 }
 //----------------------------------------------------------------------------
 void mmoRegisterClusters::OnChooseVme(mafNode *vme)
