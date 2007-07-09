@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoEMGImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-06 13:44:31 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-07-09 10:09:38 $
+  Version:   $Revision: 1.6 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -136,6 +136,7 @@ void mmoEMGImporterWS::Read()
   int comma = line.Find(',');
   wxString freq = line.SubString(0,comma - 1); //Read frequency 
   double freq_val;
+  int sizeMatrix;
   freq_val = atof(freq.c_str());
   
   line = text.ReadLine();
@@ -155,21 +156,27 @@ void mmoEMGImporterWS::Read()
     wxStringTokenizer tkz(line,wxT(' '),wxTOKEN_RET_EMPTY_ALL);
 
     tkz.GetNextToken(); //To skip the time value
-    num_tk = tkz.CountTokens();
+    num_tk = tkz.CountTokens();  
+    //num_tk < 1 ? sizeMatrix = 1 : sizeMatrix = num_tk - 1;
+    if (num_tk > 0)
+    {
+      m_EmgMatrix.set_size(1, num_tk - 1);
+    }
+   
     i = 0;
     
     while (tkz.HasMoreTokens())
     {
       scalar = tkz.GetNextToken();
       val_scalar = atof(scalar);
-      m_EmgMatrix.set_size(1,num_tk - 1);
-
+     
       m_EmgMatrix.put(0,i,val_scalar); //Add scalar value to the vnl_matrix
 
       i++;     
     }
 
     m_EmgScalar->SetData(m_EmgMatrix, emg_time);
+    //m_EmgMatrix.clear();
 
     line = text.ReadLine();
     line.Replace(","," ");
