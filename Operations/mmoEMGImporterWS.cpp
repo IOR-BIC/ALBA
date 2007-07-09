@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoEMGImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-09 10:09:38 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-07-09 13:04:38 $
+  Version:   $Revision: 1.7 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -32,9 +32,6 @@
 #include "mafVME.h"
 #include "medVMEEmg.h"
 #include "mafTagArray.h"
-#include "mafSmartPointer.h"
-
-
 
 #include <iostream>
 #include <fstream>
@@ -62,6 +59,7 @@ mmoEMGImporterWS::~mmoEMGImporterWS()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_EmgScalar);
+ // m_EmgMatrix.clear();
 }
 //----------------------------------------------------------------------------
 mafOp* mmoEMGImporterWS::Copy()   
@@ -157,27 +155,26 @@ void mmoEMGImporterWS::Read()
 
     tkz.GetNextToken(); //To skip the time value
     num_tk = tkz.CountTokens();  
-    //num_tk < 1 ? sizeMatrix = 1 : sizeMatrix = num_tk - 1;
+   
     if (num_tk > 0)
     {
       m_EmgMatrix.set_size(1, num_tk - 1);
-    }
-   
-    i = 0;
+      
+      i = 0;
     
-    while (tkz.HasMoreTokens())
-    {
-      scalar = tkz.GetNextToken();
-      val_scalar = atof(scalar);
-     
-      m_EmgMatrix.put(0,i,val_scalar); //Add scalar value to the vnl_matrix
+      while (tkz.HasMoreTokens())
+      {
+        scalar = tkz.GetNextToken();
+        val_scalar = atof(scalar);
+       
+        m_EmgMatrix.put(0,i,val_scalar); //Add scalar value to the vnl_matrix
 
-      i++;     
+        i++;     
+      }
+    
+      m_EmgScalar->SetData(m_EmgMatrix, emg_time);
     }
-
-    m_EmgScalar->SetData(m_EmgMatrix, emg_time);
-    //m_EmgMatrix.clear();
-
+      
     line = text.ReadLine();
     line.Replace(","," ");
 
