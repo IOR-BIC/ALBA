@@ -28,6 +28,8 @@ SET(PROJECT_SRCS
   mafVMEGroup.h
   mafVMEItem.cpp
   mafVMEItem.h
+  mafVMEInfoText.cpp
+  mafVMEInfoText.h
   mafMSFImporter.cpp
   mafMSFImporter.h
   mafPipePolylineSlice.cpp
