@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-02 13:51:48 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2007-07-09 16:49:02 $
+  Version:   $Revision: 1.18 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -66,7 +66,8 @@ int mafVMEGenericAbstract::DeepCopy(mafNode *a)
 
     if (vme->GetDataVector())
     {
-      m_DataVector=vme->GetDataVector()->NewInstance(); // create a new instance of the same type
+      if(m_DataVector == NULL)
+        m_DataVector=vme->GetDataVector()->NewInstance(); // create a new instance of the same type
       m_DataVector->DeepCopy(vme->GetDataVector()); // copy data
       m_DataVector->SetListener(this);
     }
