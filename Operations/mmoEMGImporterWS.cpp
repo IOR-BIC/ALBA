@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoEMGImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-09 13:04:38 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-07-10 09:21:51 $
+  Version:   $Revision: 1.8 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -59,7 +59,7 @@ mmoEMGImporterWS::~mmoEMGImporterWS()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_EmgScalar);
- // m_EmgMatrix.clear();
+  m_EmgMatrix.clear();
 }
 //----------------------------------------------------------------------------
 mafOp* mmoEMGImporterWS::Copy()   
@@ -158,7 +158,7 @@ void mmoEMGImporterWS::Read()
    
     if (num_tk > 0)
     {
-      m_EmgMatrix.set_size(1, num_tk - 1);
+      m_EmgMatrix.set_size(1, num_tk);
       
       i = 0;
     
