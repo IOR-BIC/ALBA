@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-26 13:28:35 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-07-10 07:51:37 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -668,13 +668,13 @@ void medOpVolumeResample::CreateGui()
   str_range.Printf("[ %.3f , %.3f ]",range[0],range[1]);
   
   m_Gui->Label("Scalar Range:");
-  m_Gui->Label(str_range);
+  m_Gui->Label(str_range);*/
 
   m_Gui->Label("");
   m_Gui->Label("Padding Value");
   m_Gui->Double(ID_VOLUME_ZERO_VALUE,"",&m_ZeroPadValue);
 
-	m_Gui->Label("");*/
+	m_Gui->Label("");
 
 	m_Gui->OkCancel();
 
