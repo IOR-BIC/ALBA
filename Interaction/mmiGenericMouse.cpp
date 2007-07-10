@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-07 11:21:02 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-07-10 15:21:59 $
+  Version:   $Revision: 1.13 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -912,35 +912,37 @@ void mmiGenericMouse::SendTransformMatrix(const mafMatrix &matrix, int mouseActi
 
   mafEventMacro(e);
 
-  // send standard event too...
-  mafEventInteraction event(this,0);
-  event.SetSender(this);
-  
-  // have to recreate the time stamp :-(
-  mafSmartPointer<mafMatrix> tmatrix;
-  tmatrix->DeepCopy(&matrix);
-  tmatrix->SetTimeStamp(vtkTimerLog::GetCurrentTime());
+  // commenting for the moment... this code seems useless
 
-  event.SetMatrix(tmatrix);
-  event.Set2DPosition(m_MousePose[0],m_MousePose[1]);
-  if (mouseAction == MOUSE_DOWN)
-  {
-    event.SetId(BUTTON_DOWN);
-    event.SetButton(GetStartButton());
-    event.SetModifiers(GetModifiers());
-  }
-  else if (mouseAction == MOUSE_UP)
-  {
-    event.SetId(BUTTON_UP);
-    event.SetButton(GetStartButton());
-    event.SetModifiers(GetModifiers());
-  }
-  else
-  {
-    event.SetId(mmdMouse::MOUSE_2D_MOVE);
-  }
+  //// send standard event too...
+  //mafEventInteraction event(this,0);
+  //event.SetSender(this);
+  //
+  //// have to recreate the time stamp :-(
+  //mafSmartPointer<mafMatrix> tmatrix;
+  //tmatrix->DeepCopy(&matrix);
+  //tmatrix->SetTimeStamp(vtkTimerLog::GetCurrentTime());
 
-  mafEventMacro(event);
+  //event.SetMatrix(tmatrix);
+  //event.Set2DPosition(m_MousePose[0],m_MousePose[1]);
+  //if (mouseAction == MOUSE_DOWN)
+  //{
+  //  event.SetId(BUTTON_DOWN);
+  //  event.SetButton(GetStartButton());
+  //  event.SetModifiers(GetModifiers());
+  //}
+  //else if (mouseAction == MOUSE_UP)
+  //{
+  //  event.SetId(BUTTON_UP);
+  //  event.SetButton(GetStartButton());
+  //  event.SetModifiers(GetModifiers());
+  //}
+  //else
+  //{
+  //  event.SetId(mmdMouse::MOUSE_2D_MOVE);
+  //}
+
+  //mafEventMacro(event);
 }
 
 //----------------------------------------------------------------------------
@@ -1274,14 +1276,6 @@ void mmiGenericMouse::SnapOnSurface()
 		p = pc->GetNextProp();
 	}
   
-	pc->InitTraversal();
-	p = pc->GetNextProp();
-	while(p)
-	{
-		p->PickableOn();
-		p = pc->GetNextProp();
-	}
-
   bool picked = false;
   double newAbsPickPos[3];
   mmdMouse *mouse = mmdMouse::SafeDownCast(m_Device);
@@ -1297,6 +1291,15 @@ void mmiGenericMouse::SnapOnSurface()
       }
     }
   }
+
+  pc->InitTraversal();
+  p = pc->GetNextProp();
+  while(p)
+  {
+    p->PickableOn();
+    p = pc->GetNextProp();
+  }
+
   if (!picked)
   {
     TrackballTranslate();
