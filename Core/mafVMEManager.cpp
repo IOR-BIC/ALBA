@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-19 08:23:02 $
-  Version:   $Revision: 1.34 $
+  Date:      $Date: 2007-07-10 13:57:06 $
+  Version:   $Revision: 1.35 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -120,7 +120,7 @@ mafVMEStorage *mafVMEManager::GetStorage()
   return m_Storage;
 }
 //----------------------------------------------------------------------------
-void mafVMEManager::MSFNew(bool notify_root_creation)
+void mafVMEManager::RemoveTempDirectory()
 //----------------------------------------------------------------------------
 {
   if (m_TmpDir != "")
@@ -142,6 +142,12 @@ void mafVMEManager::MSFNew(bool notify_root_creation)
     }
     m_TmpDir = "";
   }
+}
+//----------------------------------------------------------------------------
+void mafVMEManager::MSFNew(bool notify_root_creation)
+//----------------------------------------------------------------------------
+{
+  RemoveTempDirectory();
 
   m_Modified = false;
 
@@ -232,6 +238,15 @@ void mafVMEManager::MSFOpen(mafString filename)
       filename = local_filename;
     }
     unixname = ZIPOpen(filename);
+    if(unixname.IsEmpty())
+    {
+    	mafMessage("Bad or corrupted zmsf file!");
+      m_Modified = false;
+      m_Storage->Delete();
+      m_Storage = NULL;
+      MSFNew();
+      return;
+    }
     wxSetWorkingDirectory(m_TmpDir.GetCStr());
   }
   
@@ -343,11 +358,25 @@ const char *mafVMEManager::ZIPOpen(mafString filename)
     enable_mid = true;
     zfile = zip_fs->FindFirst(complete_name+pkg+"\\*.*");
   }
+  if (zfile == "")
+  {
+    zip_fs->CleanUpHandlers();
+    cppDEL(zip_fs);
+    RemoveTempDirectory();
+    return "";
+  }
   wxSplitPath(zfile,&path,&name,&ext);
   complete_name = name + "." + ext;
   if (enable_mid)
     complete_name = complete_name.Mid(length_header_name);
   zfileStream = zip_fs->OpenFile(zfile);
+  if (zfileStream == NULL)
+  {
+    zip_fs->CleanUpHandlers();
+    cppDEL(zip_fs);
+    RemoveTempDirectory();
+    return "";
+  }
   zip_is = (wxZlibInputStream *)zfileStream->GetStream();
   out_file = m_TmpDir + "\\" + complete_name;
   char *buf;
@@ -376,6 +405,13 @@ const char *mafVMEManager::ZIPOpen(mafString filename)
   while ((zfile = zip_fs->FindNext()) != "")
   {
     zfileStream = zip_fs->OpenFile(zfile);
+    if (zfileStream == NULL)
+    {
+      zip_fs->CleanUpHandlers();
+      cppDEL(zip_fs);
+      RemoveTempDirectory();
+      return "";
+    }
     zip_is = (wxZlibInputStream *)zfileStream->GetStream();
     wxSplitPath(zfile,&path,&name,&ext);
     complete_name = name + "." + ext;
@@ -401,7 +437,7 @@ const char *mafVMEManager::ZIPOpen(mafString filename)
   
   zip_fs->ChangePathTo(m_TmpDir.GetCStr(), TRUE);
   zip_fs->CleanUpHandlers();
-  delete zip_fs;
+  cppDEL(zip_fs);
   
   if (m_MSFFile == "")
   {

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-19 08:23:02 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2007-07-10 13:57:06 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -131,6 +131,9 @@ public:
 
   /** Set the local cache folder in which will be downloaded remote files.*/
   void SetLocalCacheFolder(mafString cache_folder) {m_LocalCacheFolder = cache_folder;};
+
+  /** Remove temporary directory used for compressed msf files.*/
+  void RemoveTempDirectory();
 
 protected:
   /** Create a compressed msf file: zmsf.*/
