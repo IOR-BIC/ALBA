@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-10 13:57:06 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2007-07-10 14:11:27 $
+  Version:   $Revision: 1.36 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -551,7 +551,7 @@ void mafVMEManager::MSFSave()
   }
   if (m_TmpDir != "")
   {
-    ZIPSave();
+    ZIPSave(m_ZipFile);
     m_FileHistory.AddFileToHistory(m_ZipFile.GetCStr());
   }
   else
