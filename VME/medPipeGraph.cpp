@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-04 13:46:15 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-07-10 10:35:08 $
+  Version:   $Revision: 1.4 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -117,7 +117,7 @@ void medPipeGraph::Create(mafSceneNode *n)
   time_Array = vtkDoubleArray::New();
   
   mafTimeStamp t;
-  for (t = 1; t < m_TimeVector.size(); t++)
+  for (t = 0; t < m_TimeVector.size(); t++)
   {
     time_Array->InsertNextValue(m_TimeVector[t]);
   }  
@@ -218,7 +218,7 @@ void medPipeGraph::UpdateGraph()
       
       scalar = vtkDoubleArray::New();
       
-      for (t = 1; t < m_TimeVector.size(); t++)
+      for (t = 0; t < m_TimeVector.size(); t++)
       { 
         m_Emg_plot->SetTimeStamp(m_TimeVector[t]);
         double scalar_data = m_Emg_plot->GetScalarOutput()->GetScalarData().get(0,c);
