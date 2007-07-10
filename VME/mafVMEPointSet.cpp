@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPointSet.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-08-25 23:31:22 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-07-10 07:27:33 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -338,6 +338,7 @@ int mafVMEPointSet::RemovePoint(vtkPolyData *polydata,int idx)
         pointdata->GetTuple(i+1,pnttuple);
         pointdata->SetTuple(i,pnttuple);
       }
+      delete[] pnttuple;
 
       pointdata->Resize(pointdata->GetNumberOfTuples()-1);
 
