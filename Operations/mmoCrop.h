@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCrop.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-07-11 14:15:08 $
+  Version:   $Revision: 1.8 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,7 +23,6 @@ class mmgGui;
 class mafEventBase;
 class mafString;
 
-class mafVMEVolumeGray;
 class mafVMESurface;
 class mafVMEGizmo;
 
@@ -43,7 +42,7 @@ class mmoCrop: public mafOp
 {
 public:
              
-            	 mmoCrop(const wxString &label = "Crop");
+            	 mmoCrop(const wxString &label = _("Crop"));
 	virtual     ~mmoCrop();
 	virtual void OnEvent(mafEventBase *maf_event);
 
@@ -51,11 +50,14 @@ public:
 
   mafOp* Copy();
 
-	bool Accept(mafNode* Node);
+	bool Accept(mafNode* node);
 	void OpRun();	
 	
   /**	Extract the volume cropped*/
 	void Crop();
+
+	/** Makes the undo for the operation. */
+	virtual void OpUndo();
 
   void OpDo();
 
@@ -68,28 +70,25 @@ protected:
   void UpdateGui();
   void OpStop(int result);	
   
-  mafGizmoROI *m_GizmoROI;
+  mafGizmoROI *m_GizmoROI; ///< Gizmo used to define sub-volume region to crop
   
-	vtkRectilinearGrid *m_InputRG;
-	vtkStructuredPoints *m_InputSP;
-	
-	//mafNode *m_Vme;
-	mafVMEVolumeGray *m_Vme;
-	double m_XSpacing;
-	double m_YSpacing;
-	double m_ZSpacing;
-	double m_CroppingBoxBounds[6];	
-	double m_InputBounds[6];	
+	vtkRectilinearGrid *m_InputRG; ///< Pointer for Rectilinear Grid volume
+	vtkStructuredPoints *m_InputSP; ///< Pointer for Structured Points volume
 
-	double m_XminXmax[2];
-	double m_YminYmax[2];
-	double m_ZminZmax[2];
+	double m_XSpacing; ///< X Spacing for cropped volume On Structured Points data
+	double m_YSpacing; ///< Y Spacing for cropped volume On Structured Points data
+	double m_ZSpacing; ///< Z Spacing for cropped volume On Structured Points data
+	double m_CroppingBoxBounds[6]; ///< Bounds of cropped volume
+	double m_InputBounds[6]; ///< Input volume bounds
 
-  int m_ShowHandles;
-  int m_ShowROI;
-  
+	double m_XminXmax[2]; ///< 
+	double m_YminYmax[2]; ///< 
+	double m_ZminZmax[2]; ///< 
+
+  int m_ShowHandles; ///< Flag used to show/hide crop gizmo handles
+  int m_ShowROI; ///< Flag used to show/hide crop gizmo
+
+	vtkRectilinearGrid	*m_OutputRG; ///< Pointer for Rectilinear Grid cropped volume
+	vtkStructuredPoints *m_OutputSP; ///< Pointer for Structured Points cropped volume
 };
-
-
 #endif
-
