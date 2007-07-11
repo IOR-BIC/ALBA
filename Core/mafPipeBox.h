@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeBox.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:52:58 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-07-11 13:49:26 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -48,17 +48,24 @@ public:
     ID_LAST
   };
 
+protected:
+  enum BOUNDS_MODE
+  {
+    BOUNDS_3D = 0,
+    BOUNDS_4D,
+    BOUNDS_3D_SUBTREE,
+    BOUNDS_4D_SUBTREE
+  };
+
   vtkOutlineSource       *m_Box;
   vtkPolyDataMapper	     *m_Mapper;
   mafLODActor            *m_Actor;
   vtkOutlineCornerFilter *m_OutlineBox;
-	vtkPolyDataMapper      *m_OutlineMapper;
+  vtkPolyDataMapper      *m_OutlineMapper;
   vtkProperty            *m_OutlineProperty;
   mafLODActor            *m_OutlineActor;
   mafAxes                *m_Axes;
 
-protected:
-//@@@  bool                    m_use_axes; //SIL. 22-5-2003 added line - 
   int m_BoundsMode;
 
   void UpdateProperty(bool fromTag = false);
