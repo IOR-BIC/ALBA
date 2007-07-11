@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoFlipNormals.cpp,v $
 Language:  C++
-Date:      $Date: 2007-06-20 10:47:05 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2007-07-11 13:53:26 $
+Version:   $Revision: 1.7 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -92,6 +92,7 @@ mafOp(label)
 {
 	m_OpType  = OPTYPE_OP;
 	m_Canundo = true;
+	m_InputPreserving = false;
 	m_Dialog = NULL;
 	m_Rwi = NULL;
 
