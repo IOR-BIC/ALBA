@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 10:02:20 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-07-11 13:50:01 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,6 +24,7 @@
 #include "mmgGui.h"
 #include "mafVME.h"
 #include "mafAxes.h"
+#include "mafEventSource.h"
 
 #include "mafLODActor.h"
 #include "vtkMAFAssembly.h"
@@ -72,6 +73,8 @@ void mafPipeBox::Create(mafSceneNode *n/*, bool use_axes*/)
   m_Axes            = NULL;
 
   m_BoundsMode = 0;
+
+	m_Vme->GetEventSource()->AddObserver(this);
 
   double b[6];
   m_Vme->GetOutput()->Update();
@@ -122,6 +125,8 @@ void mafPipeBox::Create(mafSceneNode *n/*, bool use_axes*/)
 mafPipeBox::~mafPipeBox()
 //----------------------------------------------------------------------------
 {
+	m_Vme->GetEventSource()->RemoveObserver(this);
+
   m_AssemblyFront->RemovePart(m_Actor);
   m_AssemblyFront->RemovePart(m_OutlineActor);
 
@@ -141,8 +146,8 @@ void mafPipeBox::Select(bool sel)
 	m_Selected = sel;
 	if(m_Actor->GetVisibility()) 
 	{
-			m_OutlineActor->SetVisibility(sel);
-			m_Axes->SetVisibility(sel);
+		m_OutlineActor->SetVisibility(sel);
+		m_Axes->SetVisibility(sel);
 	}
 }
 //----------------------------------------------------------------------------
@@ -173,17 +178,27 @@ void mafPipeBox::UpdateProperty(bool fromTag)
   else
 	  m_Mapper->SetScalarVisibility(((mafVmeData *)m_Vme->GetClientData())->GetColorByScalar());
 	*/
+	
+  if(m_Box)
+  {
+	  double b[6];
+	  m_Vme->GetOutput()->Update();
+	  m_Vme->GetOutput()->GetVMELocalBounds(b);
+
+		m_Box->SetBounds(b);
+		m_Box->Update();
+	}
 }
 //-------------------------------------------------------------------------
 mmgGui *mafPipeBox::CreateGui()
 //-------------------------------------------------------------------------
 {
-  const wxString box_type[] = {"3D", "4D","3D Subtree","4D Subtree"};
+  const wxString box_type[] = {_("3D"), _("4D"),_("3D Subtree"),_("4D Subtree")};
   int num_choices = 4;
 
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
-  m_Gui->Combo(ID_BOUNDS_MODE,"bounds", &m_BoundsMode,num_choices,box_type);
+  m_Gui->Combo(ID_BOUNDS_MODE, _("bounds"), &m_BoundsMode, num_choices, box_type);
   m_Gui->Divider();
 	return m_Gui;
 }
@@ -200,13 +215,13 @@ void mafPipeBox::OnEvent(mafEventBase *maf_event)
         double b[6];
         switch(m_BoundsMode) 
         {
-          case 0:
+          case BOUNDS_3D:
             m_Vme->GetOutput()->GetVMELocalBounds(b);
         	break;
-          case 1:
+          case BOUNDS_4D:
             m_Vme->GetOutput()->GetVME4DBounds(b);
           break;
-          case 2:
+          case BOUNDS_3D_SUBTREE:
             m_Vme->GetOutput()->GetBounds(b);
           break;
           default:
@@ -219,7 +234,12 @@ void mafPipeBox::OnEvent(mafEventBase *maf_event)
       default:
         e->Log();
     }
-    mafEvent cam_event(this,CAMERA_UPDATE);
-    m_Vme->ForwardUpEvent(cam_event);
+    //mafEvent cam_event(this,CAMERA_UPDATE);
+    //m_Vme->ForwardUpEvent(cam_event);
+    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
+	if(maf_event->GetId() == VME_OUTPUT_DATA_UPDATE)
+	{
+		UpdateProperty();
+	}
 }
