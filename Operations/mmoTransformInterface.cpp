@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTransformInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-07-11 13:17:19 $
+  Version:   $Revision: 1.9 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -120,11 +120,6 @@ mafOp* mmoTransformInterface::Copy()
 void mmoTransformInterface::OpDo()
 //----------------------------------------------------------------------------
 {
-  if (!m_Input->IsMAFType(mafVMEGeneric))
-  {
-    return;
-  }
-
   // decompose matrix
   mafMatrix rotMat;
   mafMatrix scaleMat;
@@ -147,7 +142,9 @@ void mmoTransformInterface::OpDo()
   vtkMAFSmartPointer<vtkRectilinearGrid> rg;
   vtkMAFSmartPointer<vtkStructuredPoints> sp;
 
-  if (m_EnableScaling == 1)
+  if (m_EnableScaling == 1 && 
+      // group has no dataset
+      !m_Input->IsA("mafVMEGroup"))
   {
     // apply scale to data
     
