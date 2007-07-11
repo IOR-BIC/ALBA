@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtrusionHoles.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-04 14:48:19 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2007-07-11 08:50:09 $
+Version:   $Revision: 1.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -80,6 +80,7 @@ mafOp(label)
 //----------------------------------------------------------------------------
 {
 	m_Canundo = true;
+	m_InputPreserving = false;
 	
 	m_ExtractFreeEdges	= NULL;
 	m_ExtractHole				= NULL;
