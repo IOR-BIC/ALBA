@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-10 15:21:59 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-07-11 16:13:48 $
+  Version:   $Revision: 1.14 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -912,37 +912,39 @@ void mmiGenericMouse::SendTransformMatrix(const mafMatrix &matrix, int mouseActi
 
   mafEventMacro(e);
 
-  // commenting for the moment... this code seems useless
+  // this code is used by some vertical applications...
+  // cannot remove since this will impact on 
+  // gizmo updating 
 
-  //// send standard event too...
-  //mafEventInteraction event(this,0);
-  //event.SetSender(this);
-  //
-  //// have to recreate the time stamp :-(
-  //mafSmartPointer<mafMatrix> tmatrix;
-  //tmatrix->DeepCopy(&matrix);
-  //tmatrix->SetTimeStamp(vtkTimerLog::GetCurrentTime());
+  // send standard event too...
+  mafEventInteraction event(this,0);
+  event.SetSender(this);
+  
+  // have to recreate the time stamp :-(
+  mafSmartPointer<mafMatrix> tmatrix;
+  tmatrix->DeepCopy(&matrix);
+  tmatrix->SetTimeStamp(vtkTimerLog::GetCurrentTime());
 
-  //event.SetMatrix(tmatrix);
-  //event.Set2DPosition(m_MousePose[0],m_MousePose[1]);
-  //if (mouseAction == MOUSE_DOWN)
-  //{
-  //  event.SetId(BUTTON_DOWN);
-  //  event.SetButton(GetStartButton());
-  //  event.SetModifiers(GetModifiers());
-  //}
-  //else if (mouseAction == MOUSE_UP)
-  //{
-  //  event.SetId(BUTTON_UP);
-  //  event.SetButton(GetStartButton());
-  //  event.SetModifiers(GetModifiers());
-  //}
-  //else
-  //{
-  //  event.SetId(mmdMouse::MOUSE_2D_MOVE);
-  //}
+  event.SetMatrix(tmatrix);
+  event.Set2DPosition(m_MousePose[0],m_MousePose[1]);
+  if (mouseAction == MOUSE_DOWN)
+  {
+    event.SetId(BUTTON_DOWN);
+    event.SetButton(GetStartButton());
+    event.SetModifiers(GetModifiers());
+  }
+  else if (mouseAction == MOUSE_UP)
+  {
+    event.SetId(BUTTON_UP);
+    event.SetButton(GetStartButton());
+    event.SetModifiers(GetModifiers());
+  }
+  else
+  {
+    event.SetId(mmdMouse::MOUSE_2D_MOVE);
+  }
 
-  //mafEventMacro(event);
+  mafEventMacro(event);
 }
 
 //----------------------------------------------------------------------------
