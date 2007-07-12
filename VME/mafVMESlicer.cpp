@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-19 11:37:43 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2007-07-12 07:46:01 $
+  Version:   $Revision: 1.19 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -189,7 +189,8 @@ void mafVMESlicer::InternalPreUpdate()
   mafVME *vol = mafVMEVolume::SafeDownCast(GetParent());
   if(vol)
   {
-    if (vtkDataSet *vtkdata=vol->GetOutput()->GetVTKData())
+    vtkDataSet *vtkdata = vol->GetOutput()->GetVTKData();
+    if (vtkdata != NULL)
     {
       double pos[3];
       float vectX[3],vectY[3], n[3];
@@ -206,10 +207,14 @@ void mafVMESlicer::InternalPreUpdate()
       vtkMath::Normalize(vectY);
 
       vtkdata->Update();
-
+      vtkDataArray *scalars = vtkdata->GetPointData()->GetScalars();
+      if (scalars == NULL)
+      {
+        return;
+      }
       vtkImageData *texture = m_PSlicer->GetTexture();
-      texture->SetScalarType(vtkdata->GetPointData()->GetScalars()->GetDataType());
-      texture->SetNumberOfScalarComponents(vtkdata->GetPointData()->GetScalars()->GetNumberOfComponents());
+      texture->SetScalarType(scalars->GetDataType());
+      texture->SetNumberOfScalarComponents(scalars->GetNumberOfComponents());
       texture->Modified();
 
       m_PSlicer->SetInput(vtkdata);
