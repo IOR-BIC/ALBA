@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-10 09:14:33 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-07-16 10:53:54 $
+  Version:   $Revision: 1.12 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -82,6 +82,7 @@ mafVMEAdvancedProber::mafVMEAdvancedProber()
   m_Transform = NULL;
   m_ControlPoints = NULL;
 
+
   m_AdditionalProfileNumber = 0; 
   m_ProfileDistance = 0.0;
   
@@ -98,6 +99,7 @@ mafVMEAdvancedProber::mafVMEAdvancedProber()
 	vtkNEW(m_Lut);
 
   vtkNEW(m_ControlPoints);
+
 
   //vtkNEW(append);
 
@@ -131,6 +133,7 @@ mafVMEAdvancedProber::~mafVMEAdvancedProber()
   vtkDEL(m_Plane);
 
   vtkDEL(m_ControlPoints);
+
 
   SetOutput(NULL);
 }
@@ -859,7 +862,7 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
    m_ControlSamplingCoefficient = m_SamplingCoefficient;
    m_ControlProfileDistance = m_ProfileDistance;
    m_ControlAdditionalProfileNumber = m_AdditionalProfileNumber;
-
+	 
    for(int i=0; i< m_PointsVector.size();i++)
    {
      vtkDEL(m_PointsVector[i]);
@@ -1635,11 +1638,13 @@ char** mafVMEAdvancedProber::GetIcon()
 bool mafVMEAdvancedProber::CheckUpdatePanoramic(mafVMEPolylineSpline *vme) 
 //-------------------------------------------------------------------------
 {
+  if(m_AutomaticCalculum) return true;
   vtkPoints *tempPoints;
 
   if( m_SamplingCoefficient != m_ControlSamplingCoefficient ||
       m_ProfileDistance     != m_ControlProfileDistance     ||
-      m_AdditionalProfileNumber != m_ControlAdditionalProfileNumber)
+      m_AdditionalProfileNumber != m_ControlAdditionalProfileNumber //||
+	   )
       return true;
 
   if(vme && vme->GetPolylineLink())

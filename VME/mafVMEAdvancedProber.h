@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.h,v $
   Language:  C++
-  Date:      $Date: 2007-07-04 09:58:56 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-07-16 10:53:54 $
+  Version:   $Revision: 1.9 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -108,8 +108,8 @@ public:
   virtual vtkLookupTable *GetLUT(){return m_Lut;};
 
   /** AutomaticCaluclum On/Off */
-  //void AutomaticCalculumOn(){m_AutomaticCalculum = 1;};
-  //void AutomaticCalculumOff(){m_AutomaticCalculum = 0;};
+  void AutomaticCalculumOn(){m_AutomaticCalculum = 1;};
+  void AutomaticCalculumOff(){m_AutomaticCalculum = 0;};
 
   /** Set the sampling coefficient */
   void SetSamplingCoefficient(double value){m_SamplingCoefficient = value;};
@@ -160,10 +160,6 @@ protected:
   double m_SamplingCoefficient; double m_ControlSamplingCoefficient;
   double m_ProfileDistance; double m_ControlProfileDistance;
 
-  
-  
-
-  
   std::vector<vtkPoints *> m_PointsVector;
   std::vector<vtkPolyData *> m_PolyDataVector;
   std::vector<vtkProbeFilter *> m_DistanceFilterVector;
@@ -172,7 +168,7 @@ protected:
   //vtkAppendPolyData *append;
 
 	int m_Fixed;
-  //int m_AutomaticCalculum;
+  int m_AutomaticCalculum;
 
 private:
   mafVMEAdvancedProber(const mafVMEAdvancedProber&); // Not implemented
