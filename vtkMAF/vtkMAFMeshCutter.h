@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFMeshCutter.h,v $
 Language:  C++
-Date:      $Date: 2007-07-06 10:40:11 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-07-17 12:58:37 $
+Version:   $Revision: 1.2 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -159,11 +159,11 @@ protected:
 
   /** Are all the point ids in the list members of this face
   Undefined id's are ignored, eg if the list is {1, 3, -1} and the face is {1, 3, 10, 11}, the result is true */
-  bool vtkMAFMeshCutter::AllIdsInFace(vtkCell *face, vtkIdList *idlist) ;
+  bool AllIdsInFace(vtkCell *face, vtkIdList *idlist) ;
 
   /** Find a face containing all id's in the list
   Undefined id's are ignored, ie the result can still be true if some of the id's are undefined */
-  bool vtkMAFMeshCutter::FindFaceContainingAllIds(vtkCell *cell, vtkIdList *idlist, vtkIdType *faceid) ;
+  bool FindFaceContainingAllIds(vtkCell *cell, vtkIdList *idlist, vtkIdType *faceid) ;
 
   /** Construct the polygonal slice through the cell */
   bool ConstructCellSlicePolygon(vtkIdType cellid, vtkIdList *idlist) ;

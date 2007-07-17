@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-09 13:01:52 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-07-17 12:58:30 $
+  Version:   $Revision: 1.5 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -242,7 +242,8 @@ void mafPipeVector::AllVector(bool fromTag)
 
   if (m_MatrixVector)
   {
-    for (int i = 0; i< m_TimeVector.size(); i++)
+    int i;
+    for (i = 0; i< m_TimeVector.size(); i++)
     {
 
       if (m_TimeVector[i] > t0)

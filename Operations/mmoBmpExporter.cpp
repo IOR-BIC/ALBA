@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoBmpExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-29 11:37:51 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-07-17 12:58:20 $
+  Version:   $Revision: 1.7 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -31,7 +31,7 @@
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 
-#include "vtkImageShiftScale.h."
+#include "vtkImageShiftScale.h"
 #include "vtkPointData.h"
 #include "vtkImageFlip.h"
 #include "vtkBMPWriter.h"

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafParabolicMeshToLinearMeshFilter.cxx,v $
 Language:  C++
-Date:      $Date: 2007-05-30 09:33:20 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-07-17 12:58:20 $
+Version:   $Revision: 1.3 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -33,11 +33,11 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <vcl_algorithm.h>
 #include <vcl_map.h>
 #include <vcl_list.h>
-#include <vnl\vnl_matrix.h>
+#include <vnl/vnl_matrix.h>
 
 #include "mafString.h"
 
-vtkCxxRevisionMacro(mafParabolicMeshToLinearMeshFilter, "$Revision: 1.2 $");
+vtkCxxRevisionMacro(mafParabolicMeshToLinearMeshFilter, "$Revision: 1.3 $");
 vtkStandardNewMacro(mafParabolicMeshToLinearMeshFilter);
 
 mafParabolicMeshToLinearMeshFilter::mafParabolicMeshToLinearMeshFilter()

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEDataSetAttributesImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-15 16:29:32 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-07-17 12:58:20 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,7 +38,7 @@
 #include "mafVMEItemVTK.h"
 #include "mafVMEGeneric.h"
 #include "mafDataVector.h"
-#include "mafSmartPointer.h "
+#include "mafSmartPointer.h"
 #include "mafVMEMesh.h"
 #include "mafVMESurface.h"
 #include "mafVMEVolume.h"
@@ -427,7 +427,7 @@ int mafVMEDataSetAttributesImporter::SplitFileName()
   }
 
   // find the last point
-  vcl_string fileName = m_FileName  ;
+  vcl_string fileName = m_FileName.GetCStr();
   int pointPos = fileName.find_last_of('.');
   
   // find the last / on linux
