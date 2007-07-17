@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-15 18:17:32 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2007-07-17 17:06:50 $
+  Version:   $Revision: 1.19 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,6 +54,8 @@ public:
   Show/Hide VMEs into plugged sub-views*/
   virtual void VmeShow(mafNode *node, bool show);
 
+void DestroyOrthoSlicesAndGizmos();
+void CreateOrthoslicesAndGizmos( mafNode * node );
   /** Remove VME into plugged sub-views*/
   virtual void VmeRemove(mafNode *node);
 
@@ -67,6 +69,7 @@ public:
     ID_LUT_CHOOSER = Superclass::ID_LAST,
     ID_SIDE_ORTHO,
 		ID_SNAP,
+    ID_RESET_SLICES,
     ID_LAST
   };
 
@@ -94,6 +97,9 @@ protected:
 
   /** Update the slices according to the new position. */
   void SetSlicePosition(long gizmoId, vtkPoints *p);
+
+  /** Reset slice positions  */
+  void ResetSlicesPosition(mafNode *node);
 
   mafGizmoSlice   *m_Gizmo[3];
 

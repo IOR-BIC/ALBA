@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-18 15:13:12 $
-  Version:   $Revision: 1.53 $
+  Date:      $Date: 2007-07-17 17:06:50 $
+  Version:   $Revision: 1.54 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -133,34 +133,14 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
 	{
 		if (show)
 		{
-			m_CurrentVolume = mafVMEVolume::SafeDownCast(node);
-			mmaVolumeMaterial *currentVolumeMaterial = m_CurrentVolume->GetMaterial();
-			double sr[2],vtkDataCenter[3];
-			vtkDataSet *vtkData = m_CurrentVolume->GetOutput()->GetVTKData();
-			vtkData->Update();
-			vtkData->GetCenter(vtkDataCenter);
-			vtkData->GetCenter(m_GizmoHandlePosition);
-			vtkData->GetScalarRange(sr);
-			m_ColorLUT = currentVolumeMaterial->m_ColorLut;
-			m_LutWidget->SetLut(m_ColorLUT);
-			m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
-			m_LutSlider->SetSubRange((long)currentVolumeMaterial->m_TableRange[0],(long)currentVolumeMaterial->m_TableRange[1]);
-			for(int i=0; i<m_NumOfChildView; i++)
-			{
-				mafPipeVolumeSlice *p = (mafPipeVolumeSlice *)((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
-				p->SetColorLookupTable(m_ColorLUT);
-			}
-			((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
-			((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
-			((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
-			GizmoCreate();
+      // Create Ortho Stuff
+      CreateOrthoslicesAndGizmos(node);
+
 		}
 		else
 		{
-			m_CurrentVolume->GetEventSource()->RemoveObserver(this);
-			m_CurrentVolume = NULL;
-			GizmoDelete();
-		}
+      DestroyOrthoSlicesAndGizmos();
+    }
 	}
 	else if(node->IsMAFType(mafVMESurface))
 	{
@@ -286,6 +266,13 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
 				}
 			}
 			break;
+      case ID_RESET_SLICES:
+      {
+        assert(m_CurrentVolume);
+        this->ResetSlicesPosition(m_CurrentVolume);
+      }
+      break;
+
       default:
         mafViewCompound::OnEvent(maf_event);
     }
@@ -313,6 +300,8 @@ mmgGui* mafViewOrthoSlice::CreateGui()
 
 	m_Gui->Bool(ID_SNAP,"Snap on grid",&m_Snap,1);
 
+  m_Gui->Button(ID_RESET_SLICES,"reset slices","");
+  m_Gui->Divider();
 
   EnableWidgets(m_CurrentVolume != NULL);
   for(int i=1; i<m_NumOfChildView; i++)
@@ -320,9 +309,10 @@ mmgGui* mafViewOrthoSlice::CreateGui()
     m_ChildViewList[i]->GetGui();
   }
 
-	m_Gui->Divider();
+  m_Gui->Divider();
   return m_Gui;
 }
+
 //----------------------------------------------------------------------------
 void mafViewOrthoSlice::PackageView()
 //----------------------------------------------------------------------------
@@ -361,6 +351,7 @@ void mafViewOrthoSlice::EnableWidgets(bool enable)
   if (m_Gui)
   {
     m_Gui->Enable(ID_LUT_CHOOSER,enable);
+    m_Gui->Enable(ID_RESET_SLICES, enable);
   }
   m_LutSlider->Enable(enable);
 
@@ -517,4 +508,63 @@ void mafViewOrthoSlice::Print(std::ostream& os, const int tabs)// const
   {
     m_ChildViewList[v]->Print(os, 1);
   }
+}
+
+void mafViewOrthoSlice::CreateOrthoslicesAndGizmos( mafNode * node )
+{
+  if (node == NULL)
+  {
+    mafLogMessage("node = NULL");
+    return;
+  }
+
+  m_CurrentVolume = mafVMEVolume::SafeDownCast(node);
+  if (m_CurrentVolume == NULL)
+  {
+    mafLogMessage("current volume = NULL");
+    return;
+  }
+
+	mmaVolumeMaterial *currentVolumeMaterial = m_CurrentVolume->GetMaterial();
+	double sr[2],vtkDataCenter[3];
+	vtkDataSet *vtkData = m_CurrentVolume->GetOutput()->GetVTKData();
+	vtkData->Update();
+	vtkData->GetCenter(vtkDataCenter);
+	vtkData->GetCenter(m_GizmoHandlePosition);
+	vtkData->GetScalarRange(sr);
+	m_ColorLUT = currentVolumeMaterial->m_ColorLut;
+	m_LutWidget->SetLut(m_ColorLUT);
+	m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
+	m_LutSlider->SetSubRange((long)currentVolumeMaterial->m_TableRange[0],(long)currentVolumeMaterial->m_TableRange[1]);
+	for(int i=0; i<m_NumOfChildView; i++)
+	{
+		mafPipeVolumeSlice *p = (mafPipeVolumeSlice *)((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
+		p->SetColorLookupTable(m_ColorLUT);
+	}
+	((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
+	((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
+	((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
+	GizmoCreate();
+}
+
+void mafViewOrthoSlice::DestroyOrthoSlicesAndGizmos()
+{
+	// Destroy Ortho Stuff
+  if (m_CurrentVolume == NULL)
+  {
+    mafLogMessage("current volume = NULL");
+    return;
+  }
+	m_CurrentVolume->GetEventSource()->RemoveObserver(this);
+	m_CurrentVolume = NULL;
+	GizmoDelete();
+}
+
+void mafViewOrthoSlice::ResetSlicesPosition( mafNode *node )
+{
+  // workaround... :(
+  // maybe we need some mechanism to execute view code from op?
+  this->VmeShow(node, false);
+  this->VmeShow(node, true);
+  CameraUpdate();
 }
