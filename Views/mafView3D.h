@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-13 22:09:53 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-07-17 13:50:20 $
+  Version:   $Revision: 1.8 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -84,6 +84,12 @@ public:
 	/** 
 	Set the visualization status for the node (visible, not visible, mutex, ...) \sa mafSceneGraph mafView*/
 	virtual int GetNodeStatus(mafNode *vme);
+
+  double GetContourValue(){return m_ContourValueIso;};
+  void SetContourValue(double value){m_ContourValueIso = value; OnEvent(&mafEvent(this,ID_CONTOUR_VALUE_ISO));};
+
+  double GetAlphaValue(){return m_AlphaValueIso;};
+  void SetAlphaValue(double value){m_AlphaValueIso = value;OnEvent(&mafEvent(this,ID_ALPHA_VALUE_ISO));};
 
 protected:
 
