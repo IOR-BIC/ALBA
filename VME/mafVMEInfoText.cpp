@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEInfoText.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-09 16:50:25 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-07-17 14:24:49 $
+  Version:   $Revision: 1.2 $
   Authors:   Fedor Moiseev
 ==========================================================================
   Copyright (c) 2001/2007 
@@ -19,9 +19,10 @@
 //----------------------------------------------------------------------------
 
 #include "mafVMEInfoText.h"
+#include "mmgGui.h"
+
 #include "mafStorageElement.h"
 #include "mafIndent.h"
-#include "mmgGui.h"
 
 #include "vtkMAFSmartPointer.h"
 
