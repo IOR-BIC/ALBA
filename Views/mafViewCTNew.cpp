@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-06 13:34:10 $
-Version:   $Revision: 1.21 $
+Date:      $Date: 2007-07-17 13:50:44 $
+Version:   $Revision: 1.22 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -53,6 +53,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkLandmarkTransform.h"
 #include "vtkPoints.h"
 #include "vtkPointData.h"
+#include "mafPipePolylineSlice.h"
 
 //----------------------------------------------------------------------------
 // constants:
@@ -193,6 +194,13 @@ void mafViewCTNew::VmeShow(mafNode *node, bool show)
 			  {
 				  UpdateSliceView(i);
 			  }
+      
+        for(int i=0; i< CT_CHILD_VIEWS_NUMBER; i++)
+        {
+          mafPipePolylineSlice *pipeSlice = (mafPipePolylineSlice*)((mafViewCompound *)m_ChildViewList[CT_COMPOUND])->GetSubView(i)->GetNodePipe(node);
+          if(pipeSlice) pipeSlice->SplineModeOn();
+        }
+
 			  CameraUpdate();
       }
       else
