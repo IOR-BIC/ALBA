@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeProjected.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-23 08:08:03 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-07-17 10:52:24 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -55,6 +55,9 @@ public:
   /** Set Tick Actor Visibility */
   void TickActorVisibilityOn();
   void TickActorVisibilityOff();
+
+  /** Set the actor picking*/
+  void SetActorPicking(int enable = true);
 
 protected:   
 	int       m_CamPosition;
