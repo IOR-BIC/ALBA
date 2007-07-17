@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEInfoText.h,v $
   Language:  C++
-  Date:      $Date: 2007-07-09 16:50:25 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-07-17 14:24:17 $
+  Version:   $Revision: 1.2 $
   Authors:   Fedor Moiseev
 ==========================================================================
   Copyright (c) 2001/2007 
@@ -13,7 +13,7 @@
 #ifndef __mafVMEInfoText_h
 #define __mafVMEInfoText_h
 
-#include "mafVmeGenericAbstract.h"
+#include "mafVMEGenericAbstract.h"
 #include "mafVMEOutputNULL.h"
 
 class MAF_EXPORT mafVMEInfoText : public mafVMEGenericAbstract
