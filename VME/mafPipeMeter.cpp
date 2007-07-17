@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-04 12:50:24 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2007-07-17 10:51:35 $
+  Version:   $Revision: 1.19 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -326,8 +326,15 @@ void mafPipeMeter::UpdateProperty(bool fromTag)
 //----------------------------------------------------------------------------
 {
   if (!m_DataMapper)
-    return;  
+    return;
   
+
+  if (!m_DataActor)
+    return;
+
+  if (!m_Caption)
+    return;
+
   m_MeterVME->GetPolylineOutput()->Update();
   vtkPolyData *data = m_MeterVME->GetPolylineOutput()->GetPolylineData();
   if (m_MeterVME->GetMeterRepresentation() == mafVMEMeter::LINE_REPRESENTATION)
