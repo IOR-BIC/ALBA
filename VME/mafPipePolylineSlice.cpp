@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-14 17:08:07 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-07-17 10:52:46 $
+  Version:   $Revision: 1.6 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,6 +42,11 @@
 #include "vtkPlane.h"
 #include "vtkMAFToLinearTransform.h"
 #include "vtkTubeFilter.h"
+#include "vtkPolyData.h"
+#include "vtkCardinalSpline.h"
+#include "vtkMAFSmartPointer.h"
+#include "vtkPoints.h"
+#include "vtkCellArray.h"
 
 #include <vector>
 
@@ -77,6 +82,9 @@ mafPipePolylineSlice::mafPipePolylineSlice()
   m_RenderingDisplayListFlag = 0;
   m_Border=1;
   m_Radius=1;
+
+  m_SplineMode = 0;
+  m_SplineCoefficient = 10.0;
 }
 //----------------------------------------------------------------------------
 void mafPipePolylineSlice::Create(mafSceneNode *n)
@@ -92,6 +100,7 @@ void mafPipePolylineSlice::Create(mafSceneNode *n)
   m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
   m_Axes            = NULL;
+  m_PolySpline      = NULL;
 
   assert(m_Vme->GetOutput()->IsMAFType(mafVMEOutputPolyline));
   mafVMEOutputPolyline *polyline_output = mafVMEOutputPolyline::SafeDownCast(m_Vme->GetOutput());
@@ -209,6 +218,7 @@ mafPipePolylineSlice::~mafPipePolylineSlice()
   vtkDEL(m_OutlineActor);
   vtkDEL(m_Plane);
   vtkDEL(m_Cutter);
+  vtkDEL(m_PolySpline);
   cppDEL(m_Axes);
 	//@@@ if(m_use_axes) wxDEL(m_axes);  
 }
@@ -230,6 +240,7 @@ mmgGui *mafPipePolylineSlice::CreateGui()
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
   m_Gui->FloatSlider(ID_BORDER_CHANGE,_("Border"),&m_Border,1.0,5.0);
+  m_Gui->Bool(ID_SPLINE,_("spline"),&m_SplineMode);
   return m_Gui;
 }
 //----------------------------------------------------------------------------
@@ -247,6 +258,12 @@ void mafPipePolylineSlice::OnEvent(mafEventBase *maf_event)
 			  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 		  }
 	  break;
+    case ID_SPLINE:
+      {
+        UpdateProperty();
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+        break;
+      }
       default:
         mafEventMacro(*e);
       break;
@@ -322,4 +339,80 @@ void mafPipePolylineSlice::SetRadius(double radius)
   m_Actor->GetProperty()->SetColor(((mafVMEPolyline *)m_Vme)->GetMaterial()->m_Diffuse);
 	
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));*/
+}
+//----------------------------------------------------------------------------
+void mafPipePolylineSlice::UpdateProperty()
+//----------------------------------------------------------------------------
+{
+  mafVMEOutputPolyline *out_polyline = mafVMEOutputPolyline::SafeDownCast(m_Vme->GetOutput());
+  out_polyline->Update();
+  vtkPolyData *data = vtkPolyData::SafeDownCast(out_polyline->GetVTKData());
+  data->Update();
+
+  if(m_SplineMode)
+    data = SplineProcess(data);
+
+  data->Modified();
+  data->Update();
+  m_Cutter->Update();
+
+}
+//----------------------------------------------------------------------------
+vtkPolyData *mafPipePolylineSlice::SplineProcess(vtkPolyData *polyData)
+//----------------------------------------------------------------------------
+{
+  //cleaned point list
+  vtkMAFSmartPointer<vtkPoints> pts;
+  vtkMAFSmartPointer<vtkPoints> ptsSplined;
+
+  vtkNEW(m_PolySpline);
+
+  pts->DeepCopy(polyData->GetPoints());
+
+  vtkMAFSmartPointer<vtkCardinalSpline> splineX;
+  vtkMAFSmartPointer<vtkCardinalSpline> splineY;
+  vtkMAFSmartPointer<vtkCardinalSpline> splineZ;
+
+
+
+  for(int i=0 ; i<pts->GetNumberOfPoints(); i++)
+  {
+    //mafLogMessage(wxString::Format(_("old %d : %f %f %f"), i, pts->GetPoint(i)[0],pts->GetPoint(i)[1],pts->GetPoint(i)[2] ));
+    splineX->AddPoint(i, pts->GetPoint(i)[0]);
+    splineY->AddPoint(i, pts->GetPoint(i)[1]);
+    splineZ->AddPoint(i, pts->GetPoint(i)[2]);
+  }
+
+  for(int i=0 ; i<(pts->GetNumberOfPoints() * m_SplineCoefficient); i++)
+  {		 
+    double t;
+    t = ( pts->GetNumberOfPoints() - 1.0 ) / ( pts->GetNumberOfPoints()*m_SplineCoefficient - 1.0 ) * i;
+    ptsSplined->InsertPoint(i , splineX->Evaluate(t), splineY->Evaluate(t), splineZ->Evaluate(t));
+
+  }
+
+
+  m_PolySpline->SetPoints(ptsSplined);
+  m_PolySpline->Update();
+
+  //order
+  //cell 
+  vtkMAFSmartPointer<vtkCellArray> cellArray;
+  int pointId[2];
+
+  for(int i = 0; i< m_PolySpline->GetNumberOfPoints();i++)
+  {
+    if (i > 0)
+    {             
+      pointId[0] = i - 1;
+      pointId[1] = i;
+      cellArray->InsertNextCell(2 , pointId);  
+    }
+  }
+
+  m_PolySpline->SetLines(cellArray);
+  m_PolySpline->Modified();
+  m_PolySpline->Update();
+
+  return m_PolySpline;
 }

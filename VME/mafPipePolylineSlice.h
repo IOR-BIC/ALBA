@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.h,v $
   Language:  C++
-  Date:      $Date: 2007-02-21 17:22:47 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-07-17 10:52:46 $
+  Version:   $Revision: 1.5 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,6 +29,7 @@ class mafAxes;
 class vtkFixedCutter;
 class vtkPlane;
 class vtkTubeFilter;
+class vtkPolyData;
 
 //----------------------------------------------------------------------------
 // mafPipePolylineSlice :
@@ -63,6 +64,15 @@ public:
 
 	void SetNormal(double *Normal);
 
+  /** Set spline mode of the polyline */
+  void SetSplineMode(int flag){m_SplineMode = flag;};
+  int GetSplineMode(){return m_SplineMode;};
+
+  void SplineModeOn(){SetSplineMode(1);UpdateProperty();};
+  void SplineModeOff(){SetSplineMode(0);UpdateProperty();};
+
+  vtkPolyData *SplineProcess(vtkPolyData *polyData);
+
   /** IDs for the GUI */
   enum PIPE_SURFACE_WIDGET_ID
   {
@@ -71,10 +81,13 @@ public:
     ID_CHOOSE_TEXTURE,
     ID_TEXTURE_MAPPING_MODE,
     ID_BORDER_CHANGE,
+    ID_SPLINE,
     ID_LAST,
   };
 
   virtual mmgGui  *CreateGui();
+  void UpdateProperty();
+
 protected:
   vtkPolyDataMapper	      *m_Mapper;
   vtkActor                *m_Actor;
@@ -87,11 +100,14 @@ protected:
   mafAxes                 *m_Axes;
   vtkPlane				        *m_Plane;
   vtkFixedCutter		      *m_Cutter;
+  vtkPolyData             *m_PolySpline;
   double				           m_Border;
   double                   m_Radius;
+  int                     m_SplineMode;
 
   double	m_Origin[3];
   double	m_Normal[3];
+  double  m_SplineCoefficient;
 
   int m_ScalarVisibility;
   int m_RenderingDisplayListFlag;
