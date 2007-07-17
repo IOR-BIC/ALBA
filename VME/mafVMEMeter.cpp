@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-15 14:16:38 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2007-07-17 10:52:05 $
+  Version:   $Revision: 1.29 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -780,6 +780,9 @@ mmgGui* mafVMEMeter::CreateGui()
 
 	m_Gui->Divider();
 	m_Gui->Divider();
+
+  InternalUpdate();
+  GetPolylineOutput()->Update();
 
   return m_Gui;
 }
