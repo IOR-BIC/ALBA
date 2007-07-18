@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-22 11:20:04 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2007-07-18 07:56:54 $
+  Version:   $Revision: 1.15 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -827,6 +827,10 @@ void mafViewSingleSlice::VmeShow(mafNode *node, bool show)
     }
   }
 
+  else
+  {
+    UpdateSurfacesList(node);
+  }
 }
 //----------------------------------------------------------------------------
 void mafViewSingleSlice::SetPickerTolerance(double tolerance)
