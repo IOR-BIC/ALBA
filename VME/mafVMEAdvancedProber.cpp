@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-16 10:53:54 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-07-18 09:29:32 $
+  Version:   $Revision: 1.13 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -117,7 +117,7 @@ mafVMEAdvancedProber::mafVMEAdvancedProber()
   SetDataPipe(dpipe);
 
 	m_Fixed = 0;
-  //m_AutomaticCalculum = 1;
+  m_AutomaticCalculum = 0;
 }
 
 //-------------------------------------------------------------------------
