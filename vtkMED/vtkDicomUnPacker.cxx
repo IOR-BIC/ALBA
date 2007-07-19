@@ -11,7 +11,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.7 $");
+vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.8 $");
 vtkStandardNewMacro(vtkDicomUnPacker);
 
 //----------------------------------------------------------------------------
@@ -553,7 +553,7 @@ int vtkDicomUnPacker::read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *
 }
 //----------------------------------------------------------------------------
 template <class T>
-int read_dicom_string_image(char *filename, T *IMAGE, double slope_value, double intercept_value, int rows, int cols, int flip=0)
+int read_dicom_string_image(char *filename, T *IMAGE, double slope_value, double intercept_value, int rows, int cols, int flip=0, int Signed=1)
 //----------------------------------------------------------------------------
 {
 	bool    time_to_exit = false;
@@ -668,7 +668,11 @@ int read_dicom_string_image(char *filename, T *IMAGE, double slope_value, double
 					for (c = 0; c < cols; c++)
 					{
 						read(fp,little_endian,value); // data shold be always in lttle endian
-						HU_value = (double) value;
+						HU_value = value;
+						if(Signed!=1&&value < 0)
+						{
+							HU_value = sizeof(T)==1?(unsigned char)value:(unsigned short)value;
+						}
 						HU_value = HU_value * slope_value + intercept_value;
 						IMAGE[cols*r+c] = (T) HU_value;
 					}
@@ -681,7 +685,11 @@ int read_dicom_string_image(char *filename, T *IMAGE, double slope_value, double
 					for (c = 0; c < cols; c++)
 					{
 						read(fp,little_endian,value); // data shold be always in lttle endian
-						HU_value = (double) value;
+						HU_value = value;
+						if(Signed!=1&&value < 0)
+						{
+							HU_value = sizeof(T)==1?(unsigned char)value:(unsigned short)value;
+						}
 						HU_value = HU_value * slope_value + intercept_value;
 						IMAGE[cols*r+c] = (T) HU_value;
 					}
@@ -845,7 +853,7 @@ int vtkDicomUnPacker::ReadImageInformation(vtkPackedImage *packed)
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==4178)) 
       m_Intercept=(int) VALUES[p].num[0];
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==4179)) 
-      m_Slope=(int) VALUES[p].num[0];
+      m_Slope= VALUES[p].num[0];
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==4)) 
       strcpy(m_PhotometricInterpretation, (char *)&(VALUES[p].stringa[0]));
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==48)) 
@@ -919,7 +927,7 @@ int vtkDicomUnPacker::vtkImageUnPackerUpdate(vtkPackedImage *packed, vtkImageDat
 		break;
 		case 16:
 		{
-			ret = read_dicom_string_image(FileName, (short *)data->GetScalarPointer(), m_Slope, m_Intercept, m_DimY, m_DimX,FlipImage);
+			ret = read_dicom_string_image(FileName, ( short *)data->GetScalarPointer(), m_Slope, m_Intercept, m_DimY, m_DimX,FlipImage,m_PixelRepresentation);
 		}
 		break;
 	}
@@ -932,7 +940,7 @@ int vtkDicomUnPacker::vtkImageUnPackerUpdate(vtkPackedImage *packed, vtkImageDat
 char *vtkDicomUnPacker::GetCTMode()
 //----------------------------------------------------------------------------
 {
-	if(strcmp(Modality,"CT") == 0) 
+	if(strcmp(Modality,"CT") == 0 || strcmp(Modality,"XA") == 0) 
 		return CTMode[0];
 	else
 		return CTMode[1];
