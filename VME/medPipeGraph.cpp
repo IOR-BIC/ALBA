@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-10 10:35:08 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-07-19 12:31:32 $
+  Version:   $Revision: 1.5 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,8 +18,6 @@
 // Failing in doing this will result in a run-time_Array error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
-
-
 
 #include "medPipeGraph.h"
 #include "mafDecl.h"
@@ -41,12 +39,10 @@
 #include "mafASCIIImporterUtility.h"
 #include "mafVMEOutputScalar.h"
 
-
 #include "vnl/vnl_matrix.h"
 #include <wx/txtstrm.h>
 #include <wx/wfstream.h>
 #include <wx/string.h>
-
 
 #include "vtkMAFAssembly.h"
 #include "vtkDataArray.h"
@@ -209,7 +205,7 @@ void medPipeGraph::UpdateGraph()
   { 
     if (m_CheckBox->IsItemChecked(c))
     {
-      name = "emg_" + mafString(c+1);
+      name = "analog_" + mafString(c+1);
       m_LegendBox_Actor->SetNumberOfEntries(32);
       m_LegendBox_Actor->SetEntryString(counter_legend,name);
       counter_legend++;
@@ -289,7 +285,7 @@ mmgGui* medPipeGraph::CreateGui()
 
   for (int n = 1; n <= 32; n++)
   {
-    name = "emg_" + wxString::Format("%d", n);
+    name = "analog_" + wxString::Format("%d", n);
     m_CheckBox->AddItem(n , name, checked);
   }
 
