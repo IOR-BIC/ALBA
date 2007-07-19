@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTMRIImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-06 11:27:19 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2007-07-19 14:51:57 $
+  Version:   $Revision: 1.17 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -462,7 +462,7 @@ void mmoCTMRIImporter::BuildDicomFileList(const char *dir)
 				ct_mode.MakeUpper();
 				ct_mode.Trim(FALSE);
 				ct_mode.Trim();
-				if (strcmp( reader->GetModality(), "CT" ) == 0 )
+				if (strcmp( reader->GetModality(), "CT" ) == 0 || strcmp(reader->GetModality(), "XA" ) == 0)
 				{
 					//if (strcmp(reader->GetCTMode(),"SCOUT MODE") == 0 || reader->GetStatus() == -1)
 					if(ct_mode.Find("SCOUT") != -1 || reader->GetStatus() == -1)
