@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2007-07-04 09:50:25 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2007-07-20 14:14:33 $
+Version:   $Revision: 1.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -52,6 +52,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 class mafVME;
 class medVMEPolylineEditor;
+class medVMEPolylineGraph;
 class mafPolylineGraph;
 class mmgGui;
 class mmiPicker;
@@ -62,10 +63,13 @@ class vtkTubeFilter;
 class vtkAppendPolyData;
 class vtkPolyData;
 
+#define UNDEFINED_POINT_ID -1
+#define UNDEFINED_BRANCH_ID -1
+
 class medGeometryEditorPolylineGraph: public mafObserver 
 {
 public:
-	medGeometryEditorPolylineGraph(mafVME *input, mafObserver *listener = NULL);
+	medGeometryEditorPolylineGraph(mafVME *input, mafObserver *listener = NULL, medVMEPolylineGraph *polyline=NULL);
 	virtual ~medGeometryEditorPolylineGraph(); 
 
 	/** Set the event receiver object*/
@@ -81,10 +85,37 @@ public:
 	mmgGui* GetGui();
 
 	/** Add a new vertex at the selected branch */
-	int AddNewVertex(double vertex[3],vtkIdType branch=-1);
+	int AddNewVertex(double vertex[3],vtkIdType branch=UNDEFINED_BRANCH_ID);
 
 	/** Return the result of the editing */
 	vtkPolyData* GetOutput();
+
+	/** Delete a branch and his child branch */
+	void DeleteBranch(vtkIdType branchID);
+
+	/** Move a point in the new position. If pointID isn't defined it use m_SelectedPoint */
+	void MovePoint(double newPosition[3],int pointID=UNDEFINED_POINT_ID);
+
+	/** Select the nearest point to position */
+	void SelectPoint(double position[3]);
+
+	/** Select Point with the ID */
+	void SelectPoint(int pointID);
+	
+	/** Delete the nearest point to position */
+	void DeletePoint(double position[3]);
+
+	/** Delete pointID-th point */
+	void DeletePoint(int pointID);
+
+	/** Select the nearest branch to position */
+	void SelectBranch(double position[3]);
+
+	/** Attach a new branch to the selected point and add a point (defined by position) to the new branch */
+	void AddBranch(double position[3]);
+
+	/** Insert a point defined by position between two points selected before */
+	void InsertPoint(double position[3]);
 
 protected:
 
@@ -112,7 +143,7 @@ protected:
 
 	medVMEPolylineEditor			*m_VMEPolylineEditor;
 	medVMEPolylineEditor			*m_VMEPolylineSelection;///<VME that show the selection
-	mafPolylineGraph	*m_PolylineGraph;
+	mafPolylineGraph					*m_PolylineGraph;
 
 	mmgGui	*m_Gui;
 
@@ -121,7 +152,13 @@ protected:
 	int m_CurrentBranch;///<Branch in witch we are working
 	int m_SelectedPoint;
 	int m_SelectedPointVTK;
+	int m_SelectedBranch;
 
+	int m_SelectedPoint1ForInserting;
+	int m_SelectedPoint2ForInserting;
+
+	int m_SelectedPoint1ForInsertingVTK;
+	int m_SelectedPoint2ForInsertingVTK;
 	//Gui Variables
 	int m_PointTool;
 	int m_BranchTool;
