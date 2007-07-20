@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-10 07:51:37 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-07-20 10:48:39 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -753,7 +753,7 @@ void medOpVolumeResample::OnEventThis(mafEventBase *maf_event)
     {
 		case ID_SHOW_HANDLE:
 			{
-				m_GizmoROI->ShowHandles(m_ShowHandle);
+				m_GizmoROI->ShowHandles(m_ShowHandle != 0);
 				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 			}
 			break;
