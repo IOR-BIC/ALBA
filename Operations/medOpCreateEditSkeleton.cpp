@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCreateEditSkeleton.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-03 10:59:28 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-07-20 14:12:46 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -69,6 +69,7 @@ mafOp(label)
 {
 	m_OpType  = OPTYPE_OP;
 	m_Canundo = true;
+	m_InputPreserving = true;
 
 	m_Editor  = NULL;
 	m_Skeleton = NULL;
@@ -93,7 +94,7 @@ mafOp* medOpCreateEditSkeleton::Copy()
 bool medOpCreateEditSkeleton::Accept(mafNode* vme)
 //----------------------------------------------------------------------------
 {
-	return vme != NULL && vme->IsMAFType(mafVMEVolumeGray);
+	return (vme != NULL && (vme->IsMAFType(mafVMEVolumeGray)||(vme->IsMAFType(medVMEPolylineGraph)&&vme->GetParent()->IsMAFType(mafVMEVolumeGray))));
 }
 //----------------------------------------------------------------------------
 void medOpCreateEditSkeleton::OpRun()
@@ -101,7 +102,10 @@ void medOpCreateEditSkeleton::OpRun()
 {
 	mafNEW(m_Skeleton);
 
-	m_Editor = new medGeometryEditorPolylineGraph(mafVME::SafeDownCast(m_Input), this);
+	if(m_Input->IsMAFType(mafVMEVolumeGray))
+		m_Editor = new medGeometryEditorPolylineGraph(mafVME::SafeDownCast(m_Input), this);
+	else if(m_Input->IsMAFType(medVMEPolylineGraph))
+		m_Editor = new medGeometryEditorPolylineGraph(mafVME::SafeDownCast(m_Input->GetParent()), this,medVMEPolylineGraph::SafeDownCast(m_Input));
 	m_Editor->Show(true);
 
 	CreateGui();
@@ -111,9 +115,18 @@ void medOpCreateEditSkeleton::OpRun()
 void medOpCreateEditSkeleton::OpDo()
 //----------------------------------------------------------------------------
 {
-	m_Skeleton->SetData(m_ResultPolydata,((mafVME*)m_Input)->GetTimeStamp());
-	m_Skeleton->SetName("VME Skeleton");
-	m_Skeleton->ReparentTo(m_Input->GetRoot());
+	if(m_Input->IsMAFType(mafVMEVolumeGray))
+	{
+		m_Skeleton->SetData(m_ResultPolydata,((mafVME*)m_Input)->GetTimeStamp());
+		m_Skeleton->SetName("VME Skeleton");
+		m_Skeleton->ReparentTo(m_Input);
+	}
+	else if(m_Input->IsMAFType(medVMEPolylineGraph))
+	{
+		medVMEPolylineGraph::SafeDownCast(m_Input)->SetData(m_ResultPolydata,((mafVME*)m_Input)->GetTimeStamp());
+	}
+	
+	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
 void medOpCreateEditSkeleton::OpUndo()
