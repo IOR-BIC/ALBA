@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipePolylineGraphEditor.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-04 09:51:39 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-07-20 14:15:16 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -56,7 +56,10 @@ MafMedical is partially based on OpenMAF.
 #include "mafVME.h"
 #include "medVMEOutputPolylineEditor.h"
 
+#include "mafAbsMatrixPipe.h"
+
 #include "vtkMAFAssembly.h"
+#include "vtkMAFSmartPointer.h"
 
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
@@ -65,6 +68,9 @@ MafMedical is partially based on OpenMAF.
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
 #include "vtkCellData.h"
+#include "vtkFixedCutter.h"
+#include "vtkPlane.h"
+#include "vtkMAFToLinearTransform.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medPipePolylineGraphEditor);
@@ -76,6 +82,18 @@ medPipePolylineGraphEditor::medPipePolylineGraphEditor()
 //----------------------------------------------------------------------------
 {
 
+	m_Origin[0] = 0;
+	m_Origin[1] = 0;
+	m_Origin[2] = 0;
+
+	m_Normal[0] = 0;
+	m_Normal[1] = 0;
+	m_Normal[2] = 0;
+
+	m_Cutter = NULL;
+	m_Mapper = NULL;
+
+	m_Modality = ID_PERSPECTIVE;
 }
 //----------------------------------------------------------------------------
 void medPipePolylineGraphEditor::Create(mafSceneNode *n)
@@ -95,12 +113,28 @@ void medPipePolylineGraphEditor::Create(mafSceneNode *n)
 
 	vtkNEW(m_LUT);
 	m_LUT->SetNumberOfColors(2);
-	m_LUT->SetTableValue(0.0, 1.0, 1.0, 1.0, 1.0);
+	m_LUT->SetTableValue(0.0, 1.0, 1.0, 0.0, 1.0);
 	m_LUT->SetTableValue(1.0, 1.0, 0.0, 0.0, 1.0);
 	m_LUT->Build();
 
+	vtkNEW(m_Plane);
+	vtkNEW(m_Cutter);
+
+	m_Plane->SetOrigin(m_Origin);
+	m_Plane->SetNormal(m_Normal);
+	vtkMAFSmartPointer<vtkMAFToLinearTransform>VTKTransform;
+	VTKTransform->SetInputMatrix(m_Vme->GetAbsMatrixPipe()->GetMatrixPointer());
+	m_Plane->SetTransform(VTKTransform);
+
+	m_Cutter->SetInput(data);
+	m_Cutter->SetCutFunction(m_Plane);
+	m_Cutter->Update();
+
 	vtkNEW(m_Mapper);
-	m_Mapper->SetInput(data);
+	if(m_Modality==ID_SLICE)
+		m_Mapper->SetInput(m_Cutter->GetOutput());
+	else if(m_Modality==ID_PERSPECTIVE)
+		m_Mapper->SetInput(data);
 	m_Mapper->SetLookupTable(m_LUT);
 	m_Mapper->SetScalarRange(range);
 	if(data->GetPointData()->GetScalars())
@@ -121,6 +155,8 @@ medPipePolylineGraphEditor::~medPipePolylineGraphEditor()
 
 	vtkDEL(m_Actor);
 	vtkDEL(m_Mapper);
+	vtkDEL(m_Plane);
+	vtkDEL(m_Cutter);
 	vtkDEL(m_LUT);
 }
 //----------------------------------------------------------------------------
@@ -143,6 +179,67 @@ mmgGui *medPipePolylineGraphEditor::CreateGui()
 	m_Gui = new mmgGui(this);
 
 	return m_Gui;
+}
+//----------------------------------------------------------------------------
+void medPipePolylineGraphEditor::SetModalityPerspective()
+//----------------------------------------------------------------------------
+{
+	m_Modality = ID_PERSPECTIVE;
+
+	if(m_Mapper)
+	{	
+		medVMEOutputPolylineEditor *out_polyline = medVMEOutputPolylineEditor::SafeDownCast(m_Vme->GetOutput());
+		assert(out_polyline);
+		vtkPolyData *data = vtkPolyData::SafeDownCast(out_polyline->GetVTKData());
+		assert(data);
+		data->Update();
+
+		m_Mapper->SetInput(data);
+		m_Mapper->Update();
+	}
+}
+//----------------------------------------------------------------------------
+void medPipePolylineGraphEditor::SetModalitySlice()
+//----------------------------------------------------------------------------
+{
+	m_Modality = ID_SLICE;
+
+	if(m_Mapper)
+	{
+		m_Mapper->SetInput(m_Cutter->GetOutput());
+		m_Mapper->Update();
+	}
+}
+//----------------------------------------------------------------------------
+void medPipePolylineGraphEditor::SetSlice(double *Origin)
+//----------------------------------------------------------------------------
+{
+	m_Origin[0] = Origin[0];
+	m_Origin[1] = Origin[1];
+	m_Origin[2] = Origin[2];
+
+	if(m_Plane && m_Cutter)
+	{
+		m_Plane->SetOrigin(m_Origin);
+		m_Cutter->SetCutFunction(m_Plane);
+		m_Cutter->Update();
+	}
+}
+//----------------------------------------------------------------------------
+void medPipePolylineGraphEditor::SetNormal(double *Normal)
+//----------------------------------------------------------------------------
+{
+	m_Normal[0] = Normal[0];
+	m_Normal[1] = Normal[1];
+	m_Normal[2] = Normal[2];
+
+
+	if(m_Plane && m_Cutter)
+	{
+		m_Plane->SetNormal(m_Normal);
+		m_Cutter->SetCutFunction(m_Plane);
+		m_Cutter->Update();
+	}
 }
 //----------------------------------------------------------------------------
 void medPipePolylineGraphEditor::OnEvent(mafEventBase *maf_event)

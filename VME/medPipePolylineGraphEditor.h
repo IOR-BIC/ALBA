@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipePolylineGraphEditor.h,v $
 Language:  C++
-Date:      $Date: 2007-07-03 10:58:01 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-07-20 14:15:16 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -57,6 +57,8 @@ class vtkPolyDataMapper;
 class vtkAppendPolyData;
 class vtkActor;
 class vtkLookupTable;
+class vtkFixedCutter;
+class vtkPlane;
 
 //----------------------------------------------------------------------------
 // medPipePolylineGraphEditor :
@@ -80,15 +82,34 @@ public:
 		ID_LAST
 	};
 
+	enum MODALITY
+	{
+		ID_SLICE = 0,
+		ID_PERSPECTIVE,
+	};
+
 	virtual void Create(mafSceneNode *n);
 	void Show(bool show); 
-	virtual void Select(bool select);  
+	virtual void Select(bool select);
+
+	void SetSlice(double *Origin);
+	void SetNormal(double *Normal);
+
+	void SetModalitySlice();
+	void SetModalityPerspective();
 
 protected:
 	virtual mmgGui  *CreateGui();
 
 	vtkPolyDataMapper	*m_Mapper;
 	vtkActor					*m_Actor;
+	vtkFixedCutter		*m_Cutter;
+	vtkPlane				  *m_Plane;
+
+	double						m_Normal[3];
+	double						m_Origin[3];
+
+	int	m_Modality;
 
 	vtkLookupTable		*m_LUT;
 };
