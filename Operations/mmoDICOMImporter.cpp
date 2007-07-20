@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-06 11:27:19 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2007-07-20 10:54:13 $
+  Version:   $Revision: 1.21 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -780,6 +780,8 @@ void mmoDICOMImporter::ImportDicomTags()
 {
   if (m_TagArray == NULL) 
     mafNEW(m_TagArray);
+
+	m_TagArray->SetName("TagArray");
 
   for (int i=0;i<m_DicomReader->GetNumberOfTags();i++)
   {

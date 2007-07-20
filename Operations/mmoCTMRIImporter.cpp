@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTMRIImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-19 14:51:57 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2007-07-20 10:54:13 $
+  Version:   $Revision: 1.18 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -784,6 +784,8 @@ void mmoCTMRIImporter::ImportDicomTags()
 {
   if (m_TagArray == NULL) 
     mafNEW(m_TagArray);
+
+	m_TagArray->SetName("TagArray");
 
   for (int i=0;i<m_DicomReader->GetNumberOfTags();i++)
   {
