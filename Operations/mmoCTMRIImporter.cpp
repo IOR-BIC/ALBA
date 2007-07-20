@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCTMRIImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-20 10:54:13 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2007-07-20 14:16:52 $
+  Version:   $Revision: 1.19 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -123,7 +123,7 @@ mmoCTMRIImporter::mmoCTMRIImporter(wxString label) : mafOp(label)
 	m_DICOM = 0;
 	m_DICOMType = -1;
 	
-	if(this->m_Label == "CT") m_DICOM = 0;
+	if(this->m_Label == "CT"  || this->m_Label == "3D-DRA") m_DICOM = 0;
 	else if(this->m_Label == "MRI") m_DICOM = 1;
 
   m_DictionaryFilename	= "";
@@ -323,8 +323,8 @@ void mmoCTMRIImporter::CreateGui()
 	m_Gui = new mmgGui(this);
 	m_Gui->SetListener(this);
 
-	if(m_DICOM == 0) m_Gui->Label("CT Importer",true);
-	else if(m_DICOM == 0) m_Gui->Label("MRI Importer",true);
+	if(m_DICOM == 0) m_Gui->Label("CT / 3D-DRA Importer",true);
+	else if(m_DICOM == 1) m_Gui->Label("MRI Importer",true);
 
 	//m_Gui->Label("Type of DICOM",true);
 	//m_Gui->Combo(ID_TYPE_DICOM,"",&m_DICOM,1,TypeOfDICOM);
