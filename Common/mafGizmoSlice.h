@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-18 17:13:52 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-07-23 10:09:41 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -72,6 +72,9 @@ public:
   /** Gizmo is reparented under the vme tree root, this modality is currently not supported */
   void SetModalityToGlobal() {mafLogMessage("Global modality is currently not supported for this item");};
 
+  void  SetPosition(mafMatrix *matrix);
+  mafMatrix *GetPosition(){return m_GizmoHandleCenterMatrix;};
+  
 
 protected:
 
